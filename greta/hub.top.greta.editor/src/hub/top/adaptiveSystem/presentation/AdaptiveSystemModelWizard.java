@@ -1,5 +1,5 @@
 /**
- * Humboldt Universität zu Berlin, Thoery of Programming
+ * Humboldt Universität zu Berlin, Theory of Programming
  *
  * $Id$
  */
@@ -7,6 +7,7 @@ package hub.top.adaptiveSystem.presentation;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -99,7 +100,25 @@ public class AdaptiveSystemModelWizard extends Wizard implements INewWizard {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Thoery of Programming";
+	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Theory of Programming";
+
+	/**
+	 * The supported extensions for created files.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public static final List<String> FILE_EXTENSIONS =
+		Collections.unmodifiableList(Arrays.asList(AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameExtensions").split("\\s*,\\s*")));
+
+	/**
+	 * A formatted list of supported file extensions, suitable for display.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public static final String FORMATTED_FILE_EXTENSIONS =
+		AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameExtensions").replaceAll("\\s*,\\s*", ", ");
 
 	/**
 	 * This caches an instance of the model package.
@@ -318,24 +337,18 @@ public class AdaptiveSystemModelWizard extends Wizard implements INewWizard {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-	@Override
+		@Override
 		protected boolean validatePage() {
 			if (super.validatePage()) {
-				// Make sure the file ends in ".adaptivesystem".
-				//
-				String requiredExt = AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameExtension");
-				String enteredExt = new Path(getFileName()).getFileExtension();
-				if (enteredExt == null || !enteredExt.equals(requiredExt)) {
-					setErrorMessage(AdaptiveSystemEditorPlugin.INSTANCE.getString("_WARN_FilenameExtension", new Object [] { requiredExt }));
+				String extension = new Path(getFileName()).getFileExtension();
+				if (extension == null || !FILE_EXTENSIONS.contains(extension)) {
+					String key = FILE_EXTENSIONS.size() > 1 ? "_WARN_FilenameExtensions" : "_WARN_FilenameExtension";
+					setErrorMessage(AdaptiveSystemEditorPlugin.INSTANCE.getString(key, new Object [] { FORMATTED_FILE_EXTENSIONS }));
 					return false;
 				}
-				else {
-					return true;
-				}
+				return true;
 			}
-			else {
-				return false;
-			}
+			return false;
 		}
 
 		/**
@@ -570,7 +583,7 @@ public class AdaptiveSystemModelWizard extends Wizard implements INewWizard {
 		newFileCreationPage = new AdaptiveSystemModelWizardNewFileCreationPage("Whatever", selection);
 		newFileCreationPage.setTitle(AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemModelWizard_label"));
 		newFileCreationPage.setDescription(AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemModelWizard_description"));
-		newFileCreationPage.setFileName(AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameDefaultBase") + "." + AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameExtension"));
+		newFileCreationPage.setFileName(AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameDefaultBase") + "." + FILE_EXTENSIONS.get(0));
 		addPage(newFileCreationPage);
 
 		// Try and get the resource selection to determine a current directory for the file dialog.
@@ -597,7 +610,7 @@ public class AdaptiveSystemModelWizard extends Wizard implements INewWizard {
 					// Make up a unique new name here.
 					//
 					String defaultModelBaseFilename = AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameDefaultBase");
-					String defaultModelFilenameExtension = AdaptiveSystemEditorPlugin.INSTANCE.getString("_UI_AdaptiveSystemEditorFilenameExtension");
+					String defaultModelFilenameExtension = FILE_EXTENSIONS.get(0);
 					String modelFilename = defaultModelBaseFilename + "." + defaultModelFilenameExtension;
 					for (int i = 1; ((IContainer)selectedResource).findMember(modelFilename) != null; ++i) {
 						modelFilename = defaultModelBaseFilename + i + "." + defaultModelFilenameExtension;

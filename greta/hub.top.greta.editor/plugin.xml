@@ -2,39 +2,37 @@
 <?eclipse version="3.0"?>
 
 <!--
- Humboldt Universität zu Berlin, Thoery of Programming
+ Humboldt Universität zu Berlin, Theory of Programming
 
  $Id$
 -->
 
 <plugin>
 
+   <extension point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="hub.top.adaptiveSystem.presentation.AdaptiveSystemModelWizardID"
+            name="%_UI_AdaptiveSystemModelWizard_label"
+            class="hub.top.adaptiveSystem.presentation.AdaptiveSystemModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/AdaptiveSystemModelFile_old.gif">
+         <description>%_UI_AdaptiveSystemModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
 
-  <extension
-    point = "org.eclipse.ui.newWizards">
-    <category
-      id = "org.eclipse.emf.ecore.Wizard.category.ID"
-      name="%_UI_Wizard_category">
-    </category>
-    <wizard
-      id = "hub.top.adaptiveSystem.presentation.AdaptiveSystemModelWizardID"
-      name = "%_UI_AdaptiveSystemModelWizard_label"
-      class = "hub.top.adaptiveSystem.presentation.AdaptiveSystemModelWizard"
-      category = "org.eclipse.emf.ecore.Wizard.category.ID"
-      icon = "icons/full/obj16/AdaptiveSystemModelFile.gif">
-      <description>%_UI_AdaptiveSystemModelWizard_description</description>
-      <selection class = "org.eclipse.core.resources.IResource" />
-    </wizard>
-  </extension>
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            id="hub.top.adaptiveSystem.presentation.AdaptiveSystemEditorID"
+            name="%_UI_AdaptiveSystemEditor_label"
+            icon="icons/full/obj16/AdaptiveSystemModelFile_old.gif"
+            extensions="adaptivesystem"
+            class="hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor"
+            contributorClass="hub.top.adaptiveSystem.presentation.AdaptiveSystemActionBarContributor">
+      </editor>
+   </extension>
 
-  <extension point = "org.eclipse.ui.editors">
-    <editor
-        id = "hub.top.adaptiveSystem.presentation.AdaptiveSystemEditorID"
-        name = "%_UI_AdaptiveSystemEditor_label"
-        icon = "icons/full/obj16/AdaptiveSystemModelFile.gif"
-        extensions = "adaptivesystem"
-        class = "hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor" 
-        contributorClass="hub.top.adaptiveSystem.presentation.AdaptiveSystemActionBarContributor" >
-    </editor>
-  </extension>    
 </plugin>

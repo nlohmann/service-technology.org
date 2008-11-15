@@ -84,7 +84,10 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			asEditPart = (AdaptiveSystemEditPart) adaptiveSystemDiagramEditor.getDiagramEditPart();
 			AdaptiveProcessEditPart apEditPart = null;
 			for(Object object : asEditPart.getChildren()) {
-				if(object instanceof AdaptiveProcessEditPart) apEditPart = (AdaptiveProcessEditPart) object;
+				if(object instanceof AdaptiveProcessEditPart) { 
+					apEditPart = (AdaptiveProcessEditPart) object;
+					break;
+				}
 			}
 			
 			//apply all activated oclets
@@ -410,10 +413,10 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							insertedMap.put(oPostEvent, createNode(oPostEvent));
 							for(Condition oPreCondition : oPostEvent.getPreConditions()) {
 								//create an arc between adaptive process event and every associated adaptiveProcessPreCondition of oclet
-								if(currentInsertMap.contains(oPreCondition)) {
+								if(currentInsertMap.containsKey(oPreCondition)) {
 									createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
 								} else
-								if(insertedMap.contains(oPreCondition)) {
+								if(insertedMap.containsKey(oPreCondition)) {
 									createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 								} else {
 									//the condition does not exist - should not occur
@@ -480,10 +483,10 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 								insertedMap.put(oPostEvent, createNode(oPostEvent));
 								for(Condition oPreCondition : oPostEvent.getPreConditions()) {
 									//create an arc between adaptive process event and every associated adaptiveProcessPreCondition of oclet
-									if(currentInsertMap.contains(oPreCondition)) {
+									if(currentInsertMap.containsKey(oPreCondition)) {
 										createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
 									} else
-									if(insertedMap.contains(oPreCondition)) {
+									if(insertedMap.containsKey(oPreCondition)) {
 										createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 									} else {
 										//the condition does not exist - should not occur
@@ -511,7 +514,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							if(currentInsertMap.containsKey(oPreCondition)) {
 								//the condition exists in adaptive Process (is in cut) 
 								createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
-							} else if(insertedMap.contains(oPreCondition)) {
+							} else if(insertedMap.containsKey(oPreCondition)) {
 								//the condition exists in adaptive process (was created during this step)
 								createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 							} else {
@@ -551,7 +554,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 								if(currentInsertMap.containsKey(oPreCondition)) {
 									//the condition exists in adaptive Process (is in cut) 
 									createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
-								} else if(insertedMap.contains(oPreCondition)) {
+								} else if(insertedMap.containsKey(oPreCondition)) {
 									//the condition exists in adaptive process (was created during this step)
 									createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 								} else {
@@ -585,7 +588,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							if(currentInsertMap.containsKey(oPreCondition)) {
 								//the condition exists in adaptive Process (is in cut) 
 								createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
-							} else if(insertedMap.contains(oPreCondition)) {
+							} else if(insertedMap.containsKey(oPreCondition)) {
 								//the condition exists in adaptive process (was created during this step)
 								createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 							} else {
@@ -883,7 +886,8 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		for(Condition cutCondition : adaptiveProcess.getMarkedConditions()) {
 			//check every postEvent of the cutCondition whether it is saturated and not disabled
 			for(Event event : cutCondition.getPostEvents()) {
-				if(event.isSaturated() 
+				if(!this.activatedEvents.contains(event)
+						&& event.isSaturated() 
 						&& (!event.isSetDisabledByAntiOclet() || (event.isSetDisabledByAntiOclet() && !event.isDisabledByAntiOclet())) 
 						&& (!event.isSetDisabledByConflict() || (event.isSetDisabledByConflict() && !event.isDisabledByConflict()))) {
 					if(event.getPostConditions().isEmpty()) {

@@ -11,8 +11,9 @@
                class="hub.top.greta.run.actions.AdaptiveProcessStep"
                disabledIcon="icons/adaptiveProcessStepDisabled4.png"
                icon="icons/adaptiveProcessStepEnabled4.png"
-               id=" hub.top.GRETA.run.step"
+               id="hub.top.GRETA.run.step"
                label="go one step in adaptive process"
+               style="push"
                toolbarPath="org.eclipse.debug.ui.launchActionSet"
                tooltip="go one step in adaptive process">
          </action>
@@ -22,6 +23,7 @@
                icon="icons/wellformedOcletsFrage1.png"
                id="hub.top.GRETA.run.checkOclets"
                label="check wellformedness of oclets"
+               style="push"
                toolbarPath="org.eclipse.debug.ui.launchActionSet"
                tooltip="check wellformedness of oclets">
          </action>

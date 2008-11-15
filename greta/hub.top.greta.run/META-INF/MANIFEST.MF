@@ -6,11 +6,12 @@ Bundle-Version: 1.0.0
 Bundle-Activator: hub.top.greta.run.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.gmf.runtime.notation,
- org.eclipse.emf.edit,
- org.eclipse.core.resources,
- org.eclipse.gmf.runtime.diagram.ui
-Eclipse-LazyStart: true
+ org.eclipse.gmf.runtime.notation;bundle-version="1.1.1",
+ org.eclipse.emf.edit;bundle-version="2.4.1",
+ org.eclipse.core.resources;bundle-version="3.4.1",
+ org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.1.2"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.diagram.edit.commands,
  hub.top.adaptiveSystem.diagram.edit.parts,
@@ -23,5 +24,3 @@ Import-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.provider,
  hub.top.adaptiveSystem.tests,
  hub.top.adaptiveSystem.util
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ActivationPolicy: lazy

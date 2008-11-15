@@ -23,6 +23,12 @@
       </actualFigure>
     </descriptors>
     <descriptors
+        name="ConnectionLabel">
+      <actualFigure
+          xsi:type="gmfgraph:Label"
+          name="ArcWeight"/>
+    </descriptors>
+    <descriptors
         name="AdaptiveProcessDescriptor">
       <actualFigure
           xsi:type="gmfgraph:Rectangle"
@@ -66,7 +72,7 @@
         </children>
       </actualFigure>
       <accessors
-          figure="//@figures.0/@descriptors.1/@actualFigure/@children.1"/>
+          figure="//@figures.0/@descriptors.2/@actualFigure/@children.1"/>
     </descriptors>
     <descriptors
         name="OcletDescriptor">
@@ -89,22 +95,28 @@
             outline="false"
             fill="false">
           <layout
-              xsi:type="gmfgraph:FlowLayout"
-              majorAlignment="CENTER"
-              majorSpacing="0"
-              minorSpacing="0"/>
+              xsi:type="gmfgraph:GridLayout"
+              numColumns="3"
+              equalWidth="false"/>
+          <foregroundColor
+              xsi:type="gmfgraph:ConstantColor"
+              value="orange"/>
           <maximumSize
               dx="1000"
-              dy="15"/>
+              dy="19"/>
           <minimumSize
               dx="200"
-              dy="15"/>
+              dy="19"/>
           <preferredSize
               dx="200"
-              dy="15"/>
+              dy="19"/>
           <children
               xsi:type="gmfgraph:Label"
               name="OcletName">
+            <layoutData
+                xsi:type="gmfgraph:GridLayoutData"
+                horizontalAlignment="BEGINNING"
+                horizontalIndent="10"/>
             <font
                 xsi:type="gmfgraph:BasicFont"
                 faceName=""
@@ -112,10 +124,18 @@
           </children>
           <children
               xsi:type="gmfgraph:Label"
-              name="OcletQuantor"/>
+              name="OcletQuantor">
+            <layoutData
+                xsi:type="gmfgraph:GridLayoutData"
+                horizontalAlignment="BEGINNING"/>
+          </children>
           <children
               xsi:type="gmfgraph:Label"
-              name="OcletOrientation"/>
+              name="OcletOrientation">
+            <layoutData
+                xsi:type="gmfgraph:GridLayoutData"
+                horizontalAlignment="BEGINNING"/>
+          </children>
         </children>
         <children
             xsi:type="gmfgraph:Rectangle"
@@ -130,13 +150,13 @@
         </children>
       </actualFigure>
       <accessors
-          figure="//@figures.0/@descriptors.2/@actualFigure/@children.0/@children.0"/>
+          figure="//@figures.0/@descriptors.3/@actualFigure/@children.0/@children.0"/>
       <accessors
-          figure="//@figures.0/@descriptors.2/@actualFigure/@children.0/@children.1"/>
+          figure="//@figures.0/@descriptors.3/@actualFigure/@children.0/@children.1"/>
       <accessors
-          figure="//@figures.0/@descriptors.2/@actualFigure/@children.1"/>
+          figure="//@figures.0/@descriptors.3/@actualFigure/@children.1"/>
       <accessors
-          figure="//@figures.0/@descriptors.2/@actualFigure/@children.0/@children.2"/>
+          figure="//@figures.0/@descriptors.3/@actualFigure/@children.0/@children.2"/>
     </descriptors>
     <descriptors
         name="PreNetDescriptor">
@@ -170,7 +190,7 @@
         </children>
       </actualFigure>
       <accessors
-          figure="//@figures.0/@descriptors.3/@actualFigure/@children.1"/>
+          figure="//@figures.0/@descriptors.4/@actualFigure/@children.1"/>
     </descriptors>
     <descriptors
         name="DoNetDescriptor">
@@ -204,7 +224,7 @@
         </children>
       </actualFigure>
       <accessors
-          figure="//@figures.0/@descriptors.4/@actualFigure/@children.1"/>
+          figure="//@figures.0/@descriptors.5/@actualFigure/@children.1"/>
     </descriptors>
     <descriptors
         name="EventDescriptor">
@@ -247,8 +267,9 @@
       <actualFigure
           xsi:type="gmfgraph:Ellipse"
           name="ConditionBody">
-        <layout
-            xsi:type="gmfgraph:BorderLayout"/>
+        <foregroundColor
+            xsi:type="gmfgraph:ConstantColor"
+            value="black"/>
         <maximumSize
             dx="20"
             dy="20"/>
@@ -257,13 +278,10 @@
             dy="20"/>
         <children
             xsi:type="gmfgraph:Label"
-            name="Token">
-          <layoutData
-              xsi:type="gmfgraph:BorderLayoutData"/>
-        </children>
+            name="Token"/>
       </actualFigure>
       <accessors
-          figure="//@figures.0/@descriptors.8/@actualFigure/@children.0"/>
+          figure="//@figures.0/@descriptors.9/@actualFigure/@children.0"/>
     </descriptors>
     <descriptors
         name="ConditionNameDescriptor">
@@ -290,19 +308,19 @@
   <nodes
       name="AdaptiveProcess"
       figure="AdaptiveProcessDescriptor"
-      contentPane="//@figures.0/@descriptors.1/@accessors.0"/>
+      contentPane="//@figures.0/@descriptors.2/@accessors.0"/>
   <nodes
       name="Oclet"
       figure="OcletDescriptor"
-      contentPane="//@figures.0/@descriptors.2/@accessors.2"/>
+      contentPane="//@figures.0/@descriptors.3/@accessors.2"/>
   <nodes
       name="PreNet"
       figure="PreNetDescriptor"
-      contentPane="//@figures.0/@descriptors.3/@accessors.0"/>
+      contentPane="//@figures.0/@descriptors.4/@accessors.0"/>
   <nodes
       name="DoNet"
       figure="DoNetDescriptor"
-      contentPane="//@figures.0/@descriptors.4/@accessors.0"/>
+      contentPane="//@figures.0/@descriptors.5/@accessors.0"/>
   <nodes
       name="EventAP"
       figure="EventDescriptor"
@@ -315,7 +333,8 @@
       figure="EventDescriptor"/>
   <nodes
       name="ConditionAP"
-      figure="ConditionDescriptor"/>
+      figure="ConditionDescriptor"
+      contentPane="//@figures.0/@descriptors.9/@accessors.0"/>
   <nodes
       name="ConditionPre"
       figure="ConditionDescriptor"/>
@@ -331,37 +350,37 @@
   <compartments
       name="adaptiveProcessCompartment"
       figure="AdaptiveProcessDescriptor"
-      accessor="//@figures.0/@descriptors.1/@accessors.0"/>
+      accessor="//@figures.0/@descriptors.2/@accessors.0"/>
   <compartments
       name="ocletCompartment"
       figure="OcletDescriptor"
-      accessor="//@figures.0/@descriptors.2/@accessors.2"/>
+      accessor="//@figures.0/@descriptors.3/@accessors.2"/>
   <compartments
       name="preNetCompartment"
       figure="PreNetDescriptor"
-      accessor="//@figures.0/@descriptors.3/@accessors.0"/>
+      accessor="//@figures.0/@descriptors.4/@accessors.0"/>
   <compartments
       name="doNetCompartment"
       figure="DoNetDescriptor"
-      accessor="//@figures.0/@descriptors.4/@accessors.0"/>
+      accessor="//@figures.0/@descriptors.5/@accessors.0"/>
   <labels
       name="OcletNameLabel"
       figure="OcletDescriptor"
       resizeConstraint="NONE"
       affixedParentSide="NORTH"
       elementIcon="false"
-      accessor="//@figures.0/@descriptors.2/@accessors.0"/>
+      accessor="//@figures.0/@descriptors.3/@accessors.0"/>
   <labels
       name="OcletQuantorLabel"
       figure="OcletDescriptor"
       resizeConstraint="NONE"
       elementIcon="false"
-      accessor="//@figures.0/@descriptors.2/@accessors.1"/>
+      accessor="//@figures.0/@descriptors.3/@accessors.1"/>
   <labels
       name="OcletOrientationLabel"
       figure="OcletDescriptor"
       elementIcon="false"
-      accessor="//@figures.0/@descriptors.2/@accessors.3"/>
+      accessor="//@figures.0/@descriptors.3/@accessors.3"/>
   <labels
       name="EventNameLabel"
       figure="EventNameDescriptor"
@@ -387,12 +406,18 @@
   <labels
       name="ConditionTokenLabel"
       figure="ConditionDescriptor"
+      affixedParentSide="NSEW"
       elementIcon="false"
-      accessor="//@figures.0/@descriptors.8/@accessors.0"/>
+      accessor="//@figures.0/@descriptors.9/@accessors.0"/>
   <labels
       name="ConditionTempLabel"
       figure="ConditionTempDescriptor"
       resizeConstraint="EAST"
       affixedParentSide="EAST"
+      elementIcon="false"/>
+  <labels
+      name="ArcWeight"
+      figure="ConnectionLabel"
+      affixedParentSide="NORTH"
       elementIcon="false"/>
 </gmfgraph:Canvas>

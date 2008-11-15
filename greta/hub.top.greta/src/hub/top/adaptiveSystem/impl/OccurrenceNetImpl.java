@@ -1,5 +1,5 @@
 /**
- * Humboldt Universität zu Berlin, Thoery of Programming
+ * Humboldt Universität zu Berlin, Theory of Programming
  *
  * $Id$
  */
@@ -47,7 +47,7 @@ public abstract class OccurrenceNetImpl extends EObjectImpl implements Occurrenc
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Thoery of Programming";
+	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Theory of Programming";
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.

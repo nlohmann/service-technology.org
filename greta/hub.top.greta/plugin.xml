@@ -2,24 +2,24 @@
 <?eclipse version="3.0"?>
 
 <!--
- Humboldt Universität zu Berlin, Thoery of Programming
+ Humboldt Universität zu Berlin, Theory of Programming
 
  $Id$
 -->
 
 <plugin>
 
-  <extension point="org.eclipse.emf.ecore.generated_package">
-    <package 
-       uri = "adaptiveSystem" 
-       class = "hub.top.adaptiveSystem.AdaptiveSystemPackage"
-       genModel = "model/adaptiveSystem.genmodel" /> 
-  </extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <package
+            uri="adaptiveSystem"
+            class="hub.top.adaptiveSystem.AdaptiveSystemPackage"
+            genModel="model/adaptiveSystem.genmodel"/>
+   </extension>
 
-  <extension point="org.eclipse.emf.ecore.extension_parser">
-    <parser 
-       type="adaptivesystem" 
-       class="hub.top.adaptiveSystem.util.AdaptiveSystemResourceFactoryImpl" />
-  </extension>
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            type="adaptivesystem"
+            class="hub.top.adaptiveSystem.util.AdaptiveSystemResourceFactoryImpl"/>
+   </extension>
 
 </plugin>

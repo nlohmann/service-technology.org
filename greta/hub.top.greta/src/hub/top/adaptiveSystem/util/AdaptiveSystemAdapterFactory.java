@@ -1,5 +1,5 @@
 /**
- * Humboldt Universität zu Berlin, Thoery of Programming
+ * Humboldt Universität zu Berlin, Theory of Programming
  *
  * $Id$
  */
@@ -28,7 +28,7 @@ public class AdaptiveSystemAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Thoery of Programming";
+	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Theory of Programming";
 
 	/**
 	 * The cached model package.
@@ -70,7 +70,7 @@ public class AdaptiveSystemAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * The switch the delegates to the <code>createXXX</code> methods.
+	 * The switch that delegates to the <code>createXXX</code> methods.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated

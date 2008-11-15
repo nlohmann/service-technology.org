@@ -2,7 +2,7 @@
 <gmfgen:GenEditorGenerator xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:gmfgen="http://www.eclipse.org/gmf/2006/GenModel">
+    xmlns:gmfgen="http://www.eclipse.org/gmf/2008/GenModel">
   <diagram
       visualID="79"
       editPartClassName="AdaptiveSystemEditPart"
@@ -15,7 +15,6 @@
         href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Diagram"/>
     <elementType
         xsi:type="gmfgen:MetamodelType"
-        displayName="adaptive Process"
         editHelperClassName="AdaptiveSystemEditHelper"/>
     <viewmap
         xsi:type="gmfgen:FigureViewmap"
@@ -40,7 +39,10 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="ConditionDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionDescriptor extends org.eclipse.draw2d.Ellipse {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel fFigureToken; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionDescriptor() {&#xA;&#x9;&#x9;&#xA;&#xA;&#x9;org.eclipse.draw2d.BorderLayout layoutThis = new org.eclipse.draw2d.BorderLayout();&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel token0 = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel();&#xA;token0.setText(&quot;&quot;);&#xA;&#xA;this.add(token0, org.eclipse.draw2d.BorderLayout.CENTER);&#xA;fFigureToken = token0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel getFigureToken() {&#xA;&#x9;&#x9;return fFigureToken;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionDescriptor extends org.eclipse.draw2d.Ellipse {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureToken; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureToken = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureToken.setText(&quot;&quot;);&#xA;&#xA;this.add(fFigureToken);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureToken() {&#xA;&#x9;&#x9;return fFigureToken;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;">
+        <attributes
+            xsi:type="gmfgen:StyleAttributes"
+            fixedForeground="true"/>
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="20"
@@ -67,7 +69,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="ConditionNameDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionNameDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionNameDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionNameDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionNameDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedForeground="true"/>
@@ -75,7 +77,9 @@
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet">
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            editorPattern=""
+            editPattern="">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Node/name"/>
         </modelFacet>
@@ -91,7 +95,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="ConditionTempDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
@@ -114,10 +118,9 @@
         <viewmap
             xsi:type="gmfgen:ParentAssignedViewmap"
             getterName="getFigureToken"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel"/>
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Condition/token"/>
         </modelFacet>
@@ -141,7 +144,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="EventDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setSize(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setSize(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:ResizeConstraints"/>
         <attributes
@@ -169,13 +172,12 @@
             href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
         <viewmap
             xsi:type="gmfgen:FigureViewmap"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel">
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel">
           <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Node/name"/>
         </modelFacet>
@@ -191,7 +193,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="EventTempDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
@@ -223,7 +225,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="PreNetDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class PreNetDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigurePreNetBody; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public PreNetDescriptor() {&#xA;&#x9;&#x9;&#xA;this.setLayoutManager(new org.eclipse.draw2d.StackLayout());&#xA;&#x9;&#x9;this.setFill(false);&#xA;this.setOutline(false);&#xA;this.setLineStyle(org.eclipse.draw2d.Graphics.LINE_DASH);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure preNetBackground0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#x9;preNetBackground0.setBackgroundColor(PRENETBACKGROUND0_BACK&#xA;);&#xA;&#xA;this.add(preNetBackground0);&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure preNetBody0 = new org.eclipse.draw2d.RectangleFigure();&#xA;preNetBody0.setFill(false);&#xA;preNetBody0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#xA;this.add(preNetBody0);&#xA;fFigurePreNetBody = preNetBody0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigurePreNetBody() {&#xA;&#x9;&#x9;return fFigurePreNetBody;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color PRENETBACKGROUND0_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 240);&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class PreNetDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigurePreNetBody; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public PreNetDescriptor() {&#xA;&#x9;&#x9;this.setLayoutManager(new org.eclipse.draw2d.StackLayout());&#xA;&#x9;&#x9;this.setFill(false);&#xA;this.setOutline(false);&#xA;this.setLineStyle(org.eclipse.draw2d.Graphics.LINE_DASH);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure preNetBackground0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#x9;preNetBackground0.setBackgroundColor(PRENETBACKGROUND0_BACK&#xA;);&#xA;&#xA;this.add(preNetBackground0);&#xA;&#xA;&#xA;&#xA;fFigurePreNetBody = new org.eclipse.draw2d.RectangleFigure();&#xA;fFigurePreNetBody.setFill(false);&#xA;fFigurePreNetBody.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#xA;this.add(fFigurePreNetBody);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigurePreNetBody() {&#xA;&#x9;&#x9;return fFigurePreNetBody;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color PRENETBACKGROUND0_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 240);&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="200"
@@ -258,7 +260,10 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="ConditionDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionDescriptor extends org.eclipse.draw2d.Ellipse {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel fFigureToken; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionDescriptor() {&#xA;&#x9;&#x9;&#xA;&#xA;&#x9;org.eclipse.draw2d.BorderLayout layoutThis = new org.eclipse.draw2d.BorderLayout();&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel token0 = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel();&#xA;token0.setText(&quot;&quot;);&#xA;&#xA;this.add(token0, org.eclipse.draw2d.BorderLayout.CENTER);&#xA;fFigureToken = token0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel getFigureToken() {&#xA;&#x9;&#x9;return fFigureToken;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionDescriptor extends org.eclipse.draw2d.Ellipse {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureToken; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureToken = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureToken.setText(&quot;&quot;);&#xA;&#xA;this.add(fFigureToken);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureToken() {&#xA;&#x9;&#x9;return fFigureToken;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;">
+        <attributes
+            xsi:type="gmfgen:StyleAttributes"
+            fixedForeground="true"/>
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="20"
@@ -285,7 +290,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="ConditionNameDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionNameDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionNameDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionNameDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionNameDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedForeground="true"/>
@@ -309,7 +314,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="ConditionTempDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
@@ -332,7 +337,7 @@
         <viewmap
             xsi:type="gmfgen:ParentAssignedViewmap"
             getterName="getFigureToken"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel"/>
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet"
             editPattern="">
@@ -359,7 +364,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="EventDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setSize(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setSize(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="20"
@@ -385,13 +390,12 @@
             href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
         <viewmap
             xsi:type="gmfgen:FigureViewmap"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel">
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel">
           <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Node/name"/>
         </modelFacet>
@@ -407,7 +411,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="EventTempDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
@@ -415,8 +419,7 @@
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editorPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Node/temp"/>
         </modelFacet>
@@ -440,7 +443,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="DoNetDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DoNetDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureDoNetBody; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DoNetDescriptor() {&#xA;&#x9;&#x9;&#xA;this.setLayoutManager(new org.eclipse.draw2d.StackLayout());&#xA;&#x9;&#x9;this.setFill(false);&#xA;this.setOutline(false);&#xA;this.setLineStyle(org.eclipse.draw2d.Graphics.LINE_DASH);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure doNetBackground0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#x9;doNetBackground0.setBackgroundColor(DONETBACKGROUND0_BACK&#xA;);&#xA;&#xA;this.add(doNetBackground0);&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure doNetBody0 = new org.eclipse.draw2d.RectangleFigure();&#xA;doNetBody0.setFill(false);&#xA;doNetBody0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#xA;this.add(doNetBody0);&#xA;fFigureDoNetBody = doNetBody0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureDoNetBody() {&#xA;&#x9;&#x9;return fFigureDoNetBody;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color DONETBACKGROUND0_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 240);&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DoNetDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureDoNetBody; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DoNetDescriptor() {&#xA;&#x9;&#x9;this.setLayoutManager(new org.eclipse.draw2d.StackLayout());&#xA;&#x9;&#x9;this.setFill(false);&#xA;this.setOutline(false);&#xA;this.setLineStyle(org.eclipse.draw2d.Graphics.LINE_DASH);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure doNetBackground0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#x9;doNetBackground0.setBackgroundColor(DONETBACKGROUND0_BACK&#xA;);&#xA;&#xA;this.add(doNetBackground0);&#xA;&#xA;&#xA;&#xA;fFigureDoNetBody = new org.eclipse.draw2d.RectangleFigure();&#xA;fFigureDoNetBody.setFill(false);&#xA;fFigureDoNetBody.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(90)&#xA;));&#xA;&#xA;this.add(fFigureDoNetBody);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureDoNetBody() {&#xA;&#x9;&#x9;return fFigureDoNetBody;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color DONETBACKGROUND0_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 240);&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="200"
@@ -475,7 +478,10 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="ConditionDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionDescriptor extends org.eclipse.draw2d.Ellipse {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel fFigureToken; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionDescriptor() {&#xA;&#x9;&#x9;&#xA;&#xA;&#x9;org.eclipse.draw2d.BorderLayout layoutThis = new org.eclipse.draw2d.BorderLayout();&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel token0 = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel();&#xA;token0.setText(&quot;&quot;);&#xA;&#xA;this.add(token0, org.eclipse.draw2d.BorderLayout.CENTER);&#xA;fFigureToken = token0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel getFigureToken() {&#xA;&#x9;&#x9;return fFigureToken;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionDescriptor extends org.eclipse.draw2d.Ellipse {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureToken; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureToken = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureToken.setText(&quot;&quot;);&#xA;&#xA;this.add(fFigureToken);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureToken() {&#xA;&#x9;&#x9;return fFigureToken;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;">
+        <attributes
+            xsi:type="gmfgen:StyleAttributes"
+            fixedForeground="true"/>
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="20"
@@ -502,7 +508,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="ConditionNameDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionNameDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionNameDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionNameDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionNameDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedForeground="true"/>
@@ -526,7 +532,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="ConditionTempDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConditionTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConditionTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
@@ -534,9 +540,7 @@
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editorPattern=""
-            editPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Node/temp"/>
         </modelFacet>
@@ -551,10 +555,9 @@
         <viewmap
             xsi:type="gmfgen:ParentAssignedViewmap"
             getterName="getFigureToken"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel"/>
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Condition/token"/>
         </modelFacet>
@@ -578,7 +581,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="EventDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setSize(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;));&#xA;this.setSize(getMapMode().DPtoLP(20)&#xA;, getMapMode().DPtoLP(20)&#xA;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="20"
@@ -604,7 +607,7 @@
             href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
         <viewmap
             xsi:type="gmfgen:FigureViewmap"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel">
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel">
           <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
@@ -626,7 +629,7 @@
         <viewmap
             xsi:type="gmfgen:InnerClassViewmap"
             className="EventTempDescriptor"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
+            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class EventTempDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public EventTempDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&quot;);&#xA;&#xA;this.setFont(THIS_FONT);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font THIS_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), &quot;normal13&quot;, 13, org.eclipse.swt.SWT.NORMAL);&#xA;&#xA;">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
@@ -634,8 +637,7 @@
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editorPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Node/temp"/>
         </modelFacet>
@@ -658,7 +660,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="AdaptiveProcessDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class AdaptiveProcessDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureAdaptiveProcessContent; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public AdaptiveProcessDescriptor() {&#xA;&#x9;&#x9;&#xA;this.setLayoutManager(new org.eclipse.draw2d.StackLayout());&#xA;&#x9;&#x9;this.setFill(false);&#xA;this.setOutline(false);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure adaptiveProcessBackground0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#x9;adaptiveProcessBackground0.setBackgroundColor(ADAPTIVEPROCESSBACKGROUND0_BACK&#xA;);&#xA;adaptiveProcessBackground0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;adaptiveProcessBackground0.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;&#xA;this.add(adaptiveProcessBackground0);&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure adaptiveProcessContent0 = new org.eclipse.draw2d.RectangleFigure();&#xA;adaptiveProcessContent0.setFill(false);&#xA;adaptiveProcessContent0.setOutline(false);&#xA;adaptiveProcessContent0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(50)&#xA;, getMapMode().DPtoLP(50)&#xA;));&#xA;adaptiveProcessContent0.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;&#xA;this.add(adaptiveProcessContent0);&#xA;fFigureAdaptiveProcessContent = adaptiveProcessContent0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureAdaptiveProcessContent() {&#xA;&#x9;&#x9;return fFigureAdaptiveProcessContent;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color ADAPTIVEPROCESSBACKGROUND0_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 240);&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class AdaptiveProcessDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureAdaptiveProcessContent; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public AdaptiveProcessDescriptor() {&#xA;&#x9;&#x9;this.setLayoutManager(new org.eclipse.draw2d.StackLayout());&#xA;&#x9;&#x9;this.setFill(false);&#xA;this.setOutline(false);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure adaptiveProcessBackground0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#x9;adaptiveProcessBackground0.setBackgroundColor(ADAPTIVEPROCESSBACKGROUND0_BACK&#xA;);&#xA;adaptiveProcessBackground0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;adaptiveProcessBackground0.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;&#xA;this.add(adaptiveProcessBackground0);&#xA;&#xA;&#xA;&#xA;fFigureAdaptiveProcessContent = new org.eclipse.draw2d.RectangleFigure();&#xA;fFigureAdaptiveProcessContent.setFill(false);&#xA;fFigureAdaptiveProcessContent.setOutline(false);&#xA;fFigureAdaptiveProcessContent.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(50)&#xA;, getMapMode().DPtoLP(50)&#xA;));&#xA;fFigureAdaptiveProcessContent.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;&#xA;this.add(fFigureAdaptiveProcessContent);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureAdaptiveProcessContent() {&#xA;&#x9;&#x9;return fFigureAdaptiveProcessContent;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color ADAPTIVEPROCESSBACKGROUND0_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 240);&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="200"
@@ -692,7 +694,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="OcletDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class OcletDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel fFigureOcletName; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel fFigureOcletQuantor; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureOcletBody; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel fFigureOcletOrientation; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public OcletDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setFill(false);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(1000)&#xA;, getMapMode().DPtoLP(1000)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(100)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure labelContainer0 = new org.eclipse.draw2d.RectangleFigure();&#xA;labelContainer0.setFill(false);&#xA;labelContainer0.setOutline(false);&#xA;labelContainer0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(15)&#xA;));&#xA;labelContainer0.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(1000)&#xA;, getMapMode().DPtoLP(15)&#xA;));&#xA;labelContainer0.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(15)&#xA;));&#xA;&#xA;this.add(labelContainer0);&#xA;&#xA;&#xA;&#x9;org.eclipse.draw2d.FlowLayout layoutLabelContainer0 = new org.eclipse.draw2d.FlowLayout();&#xA;&#x9;layoutLabelContainer0.setStretchMinorAxis(false);&#xA;&#x9;layoutLabelContainer0.setMinorAlignment(org.eclipse.draw2d.FlowLayout.ALIGN_LEFTTOP&#xA;);&#xA;&#xA;&#x9;layoutLabelContainer0.setMajorAlignment(org.eclipse.draw2d.FlowLayout.ALIGN_CENTER&#xA;);&#xA;&#x9;layoutLabelContainer0.setMajorSpacing(0);&#xA;&#x9;layoutLabelContainer0.setMinorSpacing(0);&#xA;&#x9;layoutLabelContainer0.setHorizontal(true);&#xA;&#xA;&#x9;labelContainer0.setLayoutManager(layoutLabelContainer0);&#xA;&#xA;&#xA;&#xA;org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel ocletName1 = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel();&#xA;ocletName1.setText(&quot;&quot;);&#xA;&#xA;ocletName1.setFont(OCLETNAME1_FONT);&#xA;&#xA;&#xA;&#xA;labelContainer0.add(ocletName1);&#xA;fFigureOcletName = ocletName1;&#xA;&#xA;&#xA;org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel ocletQuantor1 = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel();&#xA;ocletQuantor1.setText(&quot;&quot;);&#xA;&#xA;labelContainer0.add(ocletQuantor1);&#xA;fFigureOcletQuantor = ocletQuantor1;&#xA;&#xA;&#xA;org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel ocletOrientation1 = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel();&#xA;ocletOrientation1.setText(&quot;&quot;);&#xA;&#xA;labelContainer0.add(ocletOrientation1);&#xA;fFigureOcletOrientation = ocletOrientation1;&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure ocletBody0 = new org.eclipse.draw2d.RectangleFigure();&#xA;ocletBody0.setFill(false);&#xA;ocletBody0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(1)&#xA;));&#xA;ocletBody0.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(1000)&#xA;, getMapMode().DPtoLP(1)&#xA;));&#xA;&#xA;this.add(ocletBody0);&#xA;fFigureOcletBody = ocletBody0;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel getFigureOcletName() {&#xA;&#x9;&#x9;return fFigureOcletName;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel getFigureOcletQuantor() {&#xA;&#x9;&#x9;return fFigureOcletQuantor;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureOcletBody() {&#xA;&#x9;&#x9;return fFigureOcletBody;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel getFigureOcletOrientation() {&#xA;&#x9;&#x9;return fFigureOcletOrientation;&#xA;&#x9;}&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font OCLETNAME1_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), org.eclipse.swt.widgets.Display.getDefault().getSystemFont().getFontData()[0].getName(), 9, org.eclipse.swt.SWT.BOLD);&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class OcletDescriptor extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureOcletName; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureOcletQuantor; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureOcletBody; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureOcletOrientation; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public OcletDescriptor() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setFill(false);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(200)&#xA;));&#xA;this.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(1000)&#xA;, getMapMode().DPtoLP(1000)&#xA;));&#xA;this.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(100)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure labelContainer0 = new org.eclipse.draw2d.RectangleFigure();&#xA;labelContainer0.setFill(false);&#xA;labelContainer0.setOutline(false);&#xA;&#x9;labelContainer0.setForegroundColor(org.eclipse.draw2d.ColorConstants.orange);&#xA;labelContainer0.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(19)&#xA;));&#xA;labelContainer0.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(1000)&#xA;, getMapMode().DPtoLP(19)&#xA;));&#xA;labelContainer0.setMinimumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(19)&#xA;));&#xA;&#xA;this.add(labelContainer0);&#xA;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutLabelContainer0 = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutLabelContainer0.numColumns = 3;&#xA;&#x9;layoutLabelContainer0.makeColumnsEqualWidth = false;&#xA;&#x9;labelContainer0.setLayoutManager(layoutLabelContainer0);&#xA;&#xA;&#xA;&#xA;fFigureOcletName = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureOcletName.setText(&quot;&quot;);&#xA;&#xA;fFigureOcletName.setFont(FFIGUREOCLETNAME_FONT);&#xA;&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureOcletName = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureOcletName.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureOcletName.horizontalAlignment = org.eclipse.draw2d.GridData.BEGINNING;&#xA;constraintFFigureOcletName.horizontalIndent = 10;&#xA;constraintFFigureOcletName.horizontalSpan = 1;&#xA;constraintFFigureOcletName.verticalSpan = 1;&#xA;constraintFFigureOcletName.grabExcessHorizontalSpace = false;&#xA;constraintFFigureOcletName.grabExcessVerticalSpace = false;&#xA;labelContainer0.add(fFigureOcletName, constraintFFigureOcletName);&#xA;&#xA;&#xA;&#xA;&#xA;fFigureOcletQuantor = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureOcletQuantor.setText(&quot;&quot;);&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureOcletQuantor = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureOcletQuantor.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureOcletQuantor.horizontalAlignment = org.eclipse.draw2d.GridData.BEGINNING;&#xA;constraintFFigureOcletQuantor.horizontalIndent = 0;&#xA;constraintFFigureOcletQuantor.horizontalSpan = 1;&#xA;constraintFFigureOcletQuantor.verticalSpan = 1;&#xA;constraintFFigureOcletQuantor.grabExcessHorizontalSpace = false;&#xA;constraintFFigureOcletQuantor.grabExcessVerticalSpace = false;&#xA;labelContainer0.add(fFigureOcletQuantor, constraintFFigureOcletQuantor);&#xA;&#xA;&#xA;&#xA;&#xA;fFigureOcletOrientation = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureOcletOrientation.setText(&quot;&quot;);&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureOcletOrientation = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureOcletOrientation.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureOcletOrientation.horizontalAlignment = org.eclipse.draw2d.GridData.BEGINNING;&#xA;constraintFFigureOcletOrientation.horizontalIndent = 0;&#xA;constraintFFigureOcletOrientation.horizontalSpan = 1;&#xA;constraintFFigureOcletOrientation.verticalSpan = 1;&#xA;constraintFFigureOcletOrientation.grabExcessHorizontalSpace = false;&#xA;constraintFFigureOcletOrientation.grabExcessVerticalSpace = false;&#xA;labelContainer0.add(fFigureOcletOrientation, constraintFFigureOcletOrientation);&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;fFigureOcletBody = new org.eclipse.draw2d.RectangleFigure();&#xA;fFigureOcletBody.setFill(false);&#xA;fFigureOcletBody.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(200)&#xA;, getMapMode().DPtoLP(1)&#xA;));&#xA;fFigureOcletBody.setMaximumSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(1000)&#xA;, getMapMode().DPtoLP(1)&#xA;));&#xA;&#xA;this.add(fFigureOcletBody);&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private boolean myUseLocalCoordinates = false;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected boolean useLocalCoordinates() {&#xA;&#x9;&#x9;return myUseLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;protected void setUseLocalCoordinates(boolean useLocalCoordinates) {&#xA;&#x9;&#x9;myUseLocalCoordinates = useLocalCoordinates;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureOcletName() {&#xA;&#x9;&#x9;return fFigureOcletName;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureOcletQuantor() {&#xA;&#x9;&#x9;return fFigureOcletQuantor;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureOcletBody() {&#xA;&#x9;&#x9;return fFigureOcletBody;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureOcletOrientation() {&#xA;&#x9;&#x9;return fFigureOcletOrientation;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Font FFIGUREOCLETNAME_FONT = new org.eclipse.swt.graphics.Font(org.eclipse.swt.widgets.Display.getCurrent(), org.eclipse.swt.widgets.Display.getDefault().getSystemFont().getFontData()[0].getName(), 9, org.eclipse.swt.SWT.BOLD);&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:DefaultSizeAttributes"
             width="200"
@@ -716,7 +718,7 @@
             <newElementInitializers>
               <initializers
                   xsi:type="gmfgen:GenFeatureValueSpec"
-                  body="'preNet'">
+                  value="//@expressionProviders/@providers.0/@expressions.0">
                 <feature
                     href="adaptiveSystem.genmodel#//adaptiveSystem/OccurrenceNet/name"/>
               </initializers>
@@ -729,7 +731,7 @@
             <newElementInitializers>
               <initializers
                   xsi:type="gmfgen:GenFeatureValueSpec"
-                  body="'doNet'">
+                  value="//@expressionProviders/@providers.0/@expressions.1">
                 <feature
                     href="adaptiveSystem.genmodel#//adaptiveSystem/OccurrenceNet/name"/>
               </initializers>
@@ -747,14 +749,13 @@
         <viewmap
             xsi:type="gmfgen:ParentAssignedViewmap"
             getterName="getFigureOcletName"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel">
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel">
           <attributes
               xsi:type="gmfgen:StyleAttributes"
               fixedFont="true"/>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet"
-            editPattern="">
+            xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Oclet/name"/>
         </modelFacet>
@@ -769,12 +770,10 @@
         <viewmap
             xsi:type="gmfgen:ParentAssignedViewmap"
             getterName="getFigureOcletQuantor"
-            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel"/>
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet"
-            viewPattern="  [{0} - {1}]"
-            editorPattern=""
-            editPattern="">
+            viewPattern="[{0} - {1}]">
           <metaFeatures
               href="adaptiveSystem.genmodel#//adaptiveSystem/Oclet/quantor"/>
           <metaFeatures
@@ -797,7 +796,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="ConnectionDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConnectionDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConnectionDescriptor() {&#xA;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#x9;this.setBackgroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#xA;&#x9;&#x9;setTargetDecoration(createTargetDecoration());&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RotatableDecoration createTargetDecoration() {&#xA;&#x9;&#x9;org.eclipse.draw2d.PolylineDecoration df = new org.eclipse.draw2d.PolylineDecoration();&#xA;&#x9;&#x9;return df;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConnectionDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConnectionDescriptor() {&#xA;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#x9;this.setBackgroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#xA;&#x9;&#x9;setTargetDecoration(createTargetDecoration());&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RotatableDecoration createTargetDecoration() {&#xA;&#x9;&#x9;org.eclipse.draw2d.PolylineDecoration df = new org.eclipse.draw2d.PolylineDecoration();&#xA;&#x9;&#x9;return df;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:StyleAttributes"
             fixedForeground="true"
@@ -818,6 +817,28 @@
         <targetMetaFeature
             href="adaptiveSystem.genmodel#//adaptiveSystem/ArcToCondition/destination"/>
       </modelFacet>
+      <labels
+          visualID="6001"
+          editPartClassName="ArcToConditionWeightEditPart"
+          itemSemanticEditPolicyClassName="ArcToConditionWeightItemSemanticEditPolicy"
+          notationViewFactoryClassName="ArcToConditionWeightViewFactory">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:FigureViewmap"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel">
+          <attributes
+              xsi:type="gmfgen:LabelOffsetAttributes"
+              y="6"/>
+          <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
+          <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
+        </viewmap>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet">
+          <metaFeatures
+              href="adaptiveSystem.genmodel#//adaptiveSystem/Arc/weight"/>
+        </modelFacet>
+      </labels>
     </links>
     <links
         visualID="3002"
@@ -834,7 +855,7 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="ConnectionDescriptor"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConnectionDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx {&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConnectionDescriptor() {&#xA;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#x9;this.setBackgroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#xA;&#x9;&#x9;setTargetDecoration(createTargetDecoration());&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RotatableDecoration createTargetDecoration() {&#xA;&#x9;&#x9;org.eclipse.draw2d.PolylineDecoration df = new org.eclipse.draw2d.PolylineDecoration();&#xA;&#x9;&#x9;return df;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class ConnectionDescriptor extends org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public ConnectionDescriptor() {&#xA;&#x9;&#x9;&#x9;this.setForegroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#x9;this.setBackgroundColor(org.eclipse.draw2d.ColorConstants.black);&#xA;&#xA;&#x9;&#x9;setTargetDecoration(createTargetDecoration());&#xA;&#x9;}&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RotatableDecoration createTargetDecoration() {&#xA;&#x9;&#x9;org.eclipse.draw2d.PolylineDecoration df = new org.eclipse.draw2d.PolylineDecoration();&#xA;&#x9;&#x9;return df;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
         <attributes
             xsi:type="gmfgen:StyleAttributes"
             fixedForeground="true"
@@ -855,6 +876,30 @@
         <targetMetaFeature
             href="adaptiveSystem.genmodel#//adaptiveSystem/ArcToEvent/destination"/>
       </modelFacet>
+      <labels
+          visualID="6002"
+          editPartClassName="ArcToEventWeightEditPart"
+          itemSemanticEditPolicyClassName="ArcToEventWeightItemSemanticEditPolicy"
+          notationViewFactoryClassName="ArcToEventWeightViewFactory">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:FigureViewmap"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel">
+          <attributes
+              xsi:type="gmfgen:LabelOffsetAttributes"
+              y="6"/>
+          <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
+          <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
+        </viewmap>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            editorPattern=""
+            editPattern="">
+          <metaFeatures
+              href="adaptiveSystem.genmodel#//adaptiveSystem/Arc/weight"/>
+        </modelFacet>
+      </labels>
     </links>
     <compartments
         visualID="5001"
@@ -920,15 +965,15 @@
             xsi:type="gmfgen:ToolEntry"
             title="Adaptive Process"
             description="Create a new Adaptive Process"
-            largeIconPath="/hub.top.apCreate/model/custom/icons/full/MainProcess.gif"
-            smallIconPath="/hub.top.apCreate/model/custom/icons/full/MainProcess.gif"
+            largeIconPath="/hub.top.GRETA/model/custom/icons/full/AdaptiveProcess.gif"
+            smallIconPath="/hub.top.GRETA/model/custom/icons/full/AdaptiveProcess.gif"
             genNodes="//@diagram/@topLevelNodes.0"/>
         <entries
             xsi:type="gmfgen:ToolEntry"
             title="Oclet"
             description="Create a new Oclet"
-            largeIconPath="/hub.top.apCreate/model/custom/icons/full/Oclet.gif"
-            smallIconPath="/hub.top.apCreate/model/custom/icons/full/Oclet.gif"
+            largeIconPath="/hub.top.GRETA/model/custom/icons/full/Oclet.gif"
+            smallIconPath="/hub.top.GRETA/model/custom/icons/full/Oclet.gif"
             genNodes="//@diagram/@topLevelNodes.1"/>
       </groups>
       <groups
@@ -937,14 +982,14 @@
             xsi:type="gmfgen:ToolEntry"
             title="Condition"
             description="Create new Condition"
-            smallIconPath="/hub.top.apCreate/model/custom/icons/full/Condition.gif"
+            smallIconPath="/hub.top.GRETA/model/custom/icons/full/Condition.gif"
             genNodes="//@diagram/@childNodes.0 //@diagram/@childNodes.3 //@diagram/@childNodes.6"/>
         <entries
             xsi:type="gmfgen:ToolEntry"
             title="Event"
             description="Create new Event"
-            largeIconPath="/hub.top.apCreate/model/custom/icons/full/Event.gif"
-            smallIconPath="/hub.top.apCreate/model/custom/icons/full/Event.gif"
+            largeIconPath="/hub.top.GRETA/model/custom/icons/full/Event.gif"
+            smallIconPath="/hub.top.GRETA/model/custom/icons/full/Event.gif"
             genNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.4 //@diagram/@childNodes.7"/>
       </groups>
       <groups
@@ -953,8 +998,8 @@
             xsi:type="gmfgen:ToolEntry"
             title="Arc"
             description="Create new Arc"
-            largeIconPath="/hub.top.apCreate/model/custom/icons/full/Arc.gif"
-            smallIconPath="/hub.top.apCreate/model/custom/icons/full/Arc.gif"
+            largeIconPath="/hub.top.GRETA/model/custom/icons/full/Arc.gif"
+            smallIconPath="/hub.top.GRETA/model/custom/icons/full/Arc.gif"
             genLinks="//@diagram/@links.0 //@diagram/@links.1"/>
       </groups>
     </palette>
@@ -1203,7 +1248,11 @@
       href="adaptiveSystem.genmodel#/"/>
   <expressionProviders>
     <providers
-        xsi:type="gmfgen:GenExpressionInterpreter"
-        expressions="//@diagram/@topLevelNodes.1/@modelFacet/@modelElementInitializer/@initializers.0/@newElementInitializers.0/@initializers.0 //@diagram/@topLevelNodes.1/@modelFacet/@modelElementInitializer/@initializers.1/@newElementInitializers.0/@initializers.0"/>
+        xsi:type="gmfgen:GenExpressionInterpreter">
+      <expressions
+          body="preNet"/>
+      <expressions
+          body="doNet"/>
+    </providers>
   </expressionProviders>
 </gmfgen:GenEditorGenerator>

@@ -15,12 +15,12 @@
           description="Create a new Adaptive Process">
         <smallIcon
             xsi:type="gmftool:BundleImage"
-            path="/model/custom/icons/full/MainProcess.gif"
-            bundle="hub.top.apCreate"/>
+            path="/model/custom/icons/full/AdaptiveProcess.gif"
+            bundle="hub.top.GRETA"/>
         <largeIcon
             xsi:type="gmftool:BundleImage"
-            path="/model/custom/icons/full/MainProcess.gif"
-            bundle="hub.top.apCreate"/>
+            path="/model/custom/icons/full/AdaptiveProcess.gif"
+            bundle="hub.top.GRETA"/>
       </tools>
       <tools
           xsi:type="gmftool:CreationTool"
@@ -29,11 +29,11 @@
         <smallIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Oclet.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
         <largeIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Oclet.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
       </tools>
     </tools>
     <tools
@@ -46,7 +46,7 @@
         <smallIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Condition.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
         <largeIcon
             xsi:type="gmftool:DefaultImage"/>
       </tools>
@@ -57,11 +57,11 @@
         <smallIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Event.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
         <largeIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Event.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
       </tools>
     </tools>
     <tools
@@ -74,11 +74,11 @@
         <smallIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Arc.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
         <largeIcon
             xsi:type="gmftool:BundleImage"
             path="/model/custom/icons/full/Arc.gif"
-            bundle="hub.top.apCreate"/>
+            bundle="hub.top.GRETA"/>
       </tools>
     </tools>
   </palette>

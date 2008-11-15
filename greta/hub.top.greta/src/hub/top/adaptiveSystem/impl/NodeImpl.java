@@ -1,5 +1,5 @@
 /**
- * Humboldt Universität zu Berlin, Thoery of Programming
+ * Humboldt Universität zu Berlin, Theory of Programming
  *
  * $Id$
  */
@@ -44,7 +44,7 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Thoery of Programming";
+	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Theory of Programming";
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -413,7 +413,7 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, AdaptiveSystemPackage.NODE__DISABLED_BY_CONFLICT, oldDisabledByConflict, disabledByConflict, !oldDisabledByConflictESet));
 	}
-
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -468,12 +468,11 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 
 	    if(newContainer instanceof PreNet) setTemp(Temp.WITHOUT);
 	    if(eOldContainer != null && eOldContainer != newContainer && !(eOldContainer instanceof PreNet && newContainer instanceof DoNet)) {
-	    	//TODO: proof whether the arcs between nodes are in the same eContainer and if not delete arcs from Node
 	    	if(!(newContainer instanceof PreNet)) setTemp(TEMP_EDEFAULT);
 	    }
 	  }
-		
-	
+	  
+	  
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

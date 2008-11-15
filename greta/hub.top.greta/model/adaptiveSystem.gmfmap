@@ -3,7 +3,7 @@
     xmlns:xmi="http://www.omg.org/XMI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:gmfmap="http://www.eclipse.org/gmf/2006/mappings"
+    xmlns:gmfmap="http://www.eclipse.org/gmf/2008/mappings"
     xmlns:gmftool="http://www.eclipse.org/gmf/2005/ToolDefinition">
   <nodes>
     <containmentFeature
@@ -29,7 +29,9 @@
           <domainMetaElement
               href="adaptiveSystem.ecore#//Condition"/>
           <labelMappings
-              xsi:type="gmfmap:FeatureLabelMapping">
+              xsi:type="gmfmap:FeatureLabelMapping"
+              editorPattern=""
+              editPattern="">
             <diagramLabel
                 href="adaptiveSystem.gmfgraph#ConditionNameLabel"/>
             <features
@@ -43,8 +45,7 @@
                 href="adaptiveSystem.ecore#//Node/temp"/>
           </labelMappings>
           <labelMappings
-              xsi:type="gmfmap:FeatureLabelMapping"
-              editPattern="">
+              xsi:type="gmfmap:FeatureLabelMapping">
             <diagramLabel
                 href="adaptiveSystem.gmfgraph#ConditionTokenLabel"/>
             <features
@@ -68,8 +69,7 @@
           <domainMetaElement
               href="adaptiveSystem.ecore#//Event"/>
           <labelMappings
-              xsi:type="gmfmap:FeatureLabelMapping"
-              editPattern="">
+              xsi:type="gmfmap:FeatureLabelMapping">
             <diagramLabel
                 href="adaptiveSystem.gmfgraph#EventNameLabel"/>
             <features
@@ -111,11 +111,12 @@
               href="adaptiveSystem.ecore#//Oclet/preNet"/>
           <newElementInitializers>
             <initializers
-                xsi:type="gmfmap:FeatureValueSpec"
-                body="'preNet'">
+                xsi:type="gmfmap:FeatureValueSpec">
               <feature
                   xsi:type="ecore:EAttribute"
                   href="adaptiveSystem.ecore#//OccurrenceNet/name"/>
+              <value
+                  body="preNet"/>
             </initializers>
           </newElementInitializers>
         </initializers>
@@ -126,18 +127,18 @@
               href="adaptiveSystem.ecore#//Oclet/doNet"/>
           <newElementInitializers>
             <initializers
-                xsi:type="gmfmap:FeatureValueSpec"
-                body="'doNet'">
+                xsi:type="gmfmap:FeatureValueSpec">
               <feature
                   xsi:type="ecore:EAttribute"
                   href="adaptiveSystem.ecore#//OccurrenceNet/name"/>
+              <value
+                  body="doNet"/>
             </initializers>
           </newElementInitializers>
         </initializers>
       </domainInitializer>
       <labelMappings
-          xsi:type="gmfmap:FeatureLabelMapping"
-          editPattern="">
+          xsi:type="gmfmap:FeatureLabelMapping">
         <diagramLabel
             href="adaptiveSystem.gmfgraph#OcletNameLabel"/>
         <features
@@ -145,9 +146,7 @@
       </labelMappings>
       <labelMappings
           xsi:type="gmfmap:FeatureLabelMapping"
-          viewPattern="  [{0} - {1}]"
-          editorPattern=""
-          editPattern="">
+          viewPattern="[{0} - {1}]">
         <diagramLabel
             href="adaptiveSystem.gmfgraph#OcletQuantorLabel"/>
         <features
@@ -163,8 +162,6 @@
       <children
           referencedChild="//@nodes.1/@ownedChild/@children.0/@ownedChild">
         <containmentFeature
-            href="adaptiveSystem.ecore#//Oclet/preNet"/>
-        <childrenFeature
             href="adaptiveSystem.ecore#//Oclet/preNet"/>
         <ownedChild>
           <domainMetaElement
@@ -221,16 +218,14 @@
               <domainMetaElement
                   href="adaptiveSystem.ecore#//Event"/>
               <labelMappings
-                  xsi:type="gmfmap:FeatureLabelMapping"
-                  editPattern="">
+                  xsi:type="gmfmap:FeatureLabelMapping">
                 <diagramLabel
                     href="adaptiveSystem.gmfgraph#EventNameLabel"/>
                 <features
                     href="adaptiveSystem.ecore#//Node/name"/>
               </labelMappings>
               <labelMappings
-                  xsi:type="gmfmap:FeatureLabelMapping"
-                  editorPattern="">
+                  xsi:type="gmfmap:FeatureLabelMapping">
                 <diagramLabel
                     href="adaptiveSystem.gmfgraph#EventTempLabel"/>
                 <features
@@ -279,17 +274,14 @@
                     href="adaptiveSystem.ecore#//Node/name"/>
               </labelMappings>
               <labelMappings
-                  xsi:type="gmfmap:FeatureLabelMapping"
-                  editorPattern=""
-                  editPattern="">
+                  xsi:type="gmfmap:FeatureLabelMapping">
                 <diagramLabel
                     href="adaptiveSystem.gmfgraph#ConditionTempLabel"/>
                 <features
                     href="adaptiveSystem.ecore#//Node/temp"/>
               </labelMappings>
               <labelMappings
-                  xsi:type="gmfmap:FeatureLabelMapping"
-                  editPattern="">
+                  xsi:type="gmfmap:FeatureLabelMapping">
                 <diagramLabel
                     href="adaptiveSystem.gmfgraph#ConditionTokenLabel"/>
                 <features
@@ -321,8 +313,7 @@
                     href="adaptiveSystem.ecore#//Node/name"/>
               </labelMappings>
               <labelMappings
-                  xsi:type="gmfmap:FeatureLabelMapping"
-                  editorPattern="">
+                  xsi:type="gmfmap:FeatureLabelMapping">
                 <diagramLabel
                     href="adaptiveSystem.gmfgraph#EventTempLabel"/>
                 <features
@@ -347,6 +338,13 @@
   <links>
     <domainMetaElement
         href="adaptiveSystem.ecore#//ArcToCondition"/>
+    <labelMappings
+        xsi:type="gmfmap:FeatureLabelMapping">
+      <diagramLabel
+          href="adaptiveSystem.gmfgraph#ArcWeight"/>
+      <features
+          href="adaptiveSystem.ecore#//Arc/weight"/>
+    </labelMappings>
     <containmentFeature
         href="adaptiveSystem.ecore#//OccurrenceNet/arcs"/>
     <tool
@@ -364,6 +362,15 @@
   <links>
     <domainMetaElement
         href="adaptiveSystem.ecore#//ArcToEvent"/>
+    <labelMappings
+        xsi:type="gmfmap:FeatureLabelMapping"
+        editorPattern=""
+        editPattern="">
+      <diagramLabel
+          href="adaptiveSystem.gmfgraph#ArcWeight"/>
+      <features
+          href="adaptiveSystem.ecore#//Arc/weight"/>
+    </labelMappings>
     <containmentFeature
         href="adaptiveSystem.ecore#//OccurrenceNet/arcs"/>
     <tool

@@ -1,5 +1,5 @@
 /**
- * Humboldt Universität zu Berlin, Thoery of Programming
+ * Humboldt Universität zu Berlin, Theory of Programming
  *
  * $Id$
  */
@@ -33,7 +33,7 @@ public interface Node extends EObject {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String copyright = "Humboldt Universit\u00e4t zu Berlin, Thoery of Programming";
+	String copyright = "Humboldt Universit\u00e4t zu Berlin, Theory of Programming";
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
@@ -249,9 +249,10 @@ public interface Node extends EObject {
 	 * @generated
 	 */
 	boolean isSetDisabledByConflict();
-
+	
 	/**
 	 * @author Manja Wolf
 	 */
 	public EObject eOldContainer();
+
 } // Node

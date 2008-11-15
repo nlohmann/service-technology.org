@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trace:TraceModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:trace="http://www.eclipse.org/gmf/2006/Trace">
+  <nodeTraces
+      visualID="2001"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'AdaptiveProcess') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'AdaptiveSystem') and _containmentMF_.name = 'adaptiveProcess')">
+    <compartmentTraces
+        visualID="7001"
+        queryText="true"/>
+  </nodeTraces>
+  <nodeTraces
+      visualID="2002"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Oclet') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'AdaptiveSystem') and _containmentMF_.name = 'oclets')">
+    <nodeLabelTraces
+        visualID="5006"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5007"
+        queryText="true"/>
+  </nodeTraces>
+  <childNodeTraces
+      visualID="3001"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Condition') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'OccurrenceNet') and _containmentMF_.name = 'nodes')">
+    <nodeLabelTraces
+        visualID="5001"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5002"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5003"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3002"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Event') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'OccurrenceNet') and _containmentMF_.name = 'nodes')">
+    <nodeLabelTraces
+        visualID="5004"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5005"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3003"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'PreNet') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Oclet') and _containmentMF_.name = 'preNet')">
+    <compartmentTraces
+        visualID="7002"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3004"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Condition') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'OccurrenceNet') and _containmentMF_.name = 'nodes')">
+    <nodeLabelTraces
+        visualID="5008"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5009"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5010"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3005"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Event') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'OccurrenceNet') and _containmentMF_.name = 'nodes')">
+    <nodeLabelTraces
+        visualID="5016"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5017"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3006"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'DoNet') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Oclet') and _containmentMF_.name = 'doNet')">
+    <compartmentTraces
+        visualID="7003"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3007"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Condition') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'OccurrenceNet') and _containmentMF_.name = 'nodes')">
+    <nodeLabelTraces
+        visualID="5011"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5012"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5013"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3008"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'Event') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'OccurrenceNet') and _containmentMF_.name = 'nodes')">
+    <nodeLabelTraces
+        visualID="5014"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5015"
+        queryText="true"/>
+  </childNodeTraces>
+  <linkTraces
+      visualID="4001"
+      queryText="modelFacet.oclIsKindOf(gmfgen::TypeLinkModelFacet) and (let _eClass_:ecore::EClass = modelFacet.oclAsType(gmfgen::TypeLinkModelFacet).metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'ArcToCondition')">
+    <linkLabelTraces
+        visualID="6001"
+        queryText="true"/>
+  </linkTraces>
+  <linkTraces
+      visualID="4002"
+      queryText="modelFacet.oclIsKindOf(gmfgen::TypeLinkModelFacet) and (let _eClass_:ecore::EClass = modelFacet.oclAsType(gmfgen::TypeLinkModelFacet).metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'adaptiveSystem' and _eClass_.name = 'ArcToEvent')">
+    <linkLabelTraces
+        visualID="6002"
+        queryText="true"/>
+  </linkTraces>
+</trace:TraceModel>

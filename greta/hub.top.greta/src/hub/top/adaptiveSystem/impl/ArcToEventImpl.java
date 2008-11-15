@@ -1,5 +1,5 @@
 /**
- * Humboldt Universität zu Berlin, Thoery of Programming
+ * Humboldt Universität zu Berlin, Theory of Programming
  *
  * $Id$
  */
@@ -38,7 +38,7 @@ public class ArcToEventImpl extends ArcImpl implements ArcToEvent {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Thoery of Programming";
+	public static final String copyright = "Humboldt Universit\u00e4t zu Berlin, Theory of Programming";
 
 	/**
 	 * The cached value of the '{@link #getSource() <em>Source</em>}' reference.
@@ -123,7 +123,7 @@ public class ArcToEventImpl extends ArcImpl implements ArcToEvent {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public void setSource(Condition newSource) {
 		//Manja Wolf: START
@@ -204,7 +204,7 @@ public class ArcToEventImpl extends ArcImpl implements ArcToEvent {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated 
+	 * @generated NOT
 	 */
 	public void setDestination(Event newDestination) {
 		//Manja Wolf: START

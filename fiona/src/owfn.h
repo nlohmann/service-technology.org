@@ -200,6 +200,7 @@ class oWFN {
         unsigned int* CurrentMarking;
         list<unsigned int*> FinalMarkingList;
         formula* FinalCondition;
+        std::string finalConditionString;
         std::string finalMarkingString;
         State* currentState;
 

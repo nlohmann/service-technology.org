@@ -1365,9 +1365,13 @@ void makePNG(oWFN* PN) {
     // set strings needed in PNapi output
     globals::output_filename = PN->filename;
     if ( PN->FinalCondition != NULL  ) {
-        assert( PN->FinalCondition->getString() != "" );
-        globals::filename = PN->filename + " \\n Final Condition: "
-                + PN->FinalCondition->getString();
+        if ( PN->finalConditionString != "" ) {
+            globals::filename = PN->filename + " \\n Final Condition: "
+                    + PN->finalConditionString;
+        } else {
+            globals::filename = PN->filename + " \\n Final Condition: "
+                    + PN->FinalCondition->getString();
+        }
     } else {
         globals::filename = PN->filename + " \\n Final Marking: "
                 + PN->finalMarkingString;

@@ -111,7 +111,7 @@ Symbol * S;
 PlSymbol * PS;
 oWFN * PN;                  // the petri net
 unsigned int * finalMarking;
-string current_port = ""; ///< the currently parsed port
+string current_port = "";   // the currently parsed port
 
 placeType type = INTERNAL;      /* type of place */
 
@@ -702,22 +702,39 @@ arc:
 	  }
 ;
 
-statepredicate: LPAR statepredicate RPAR 
+statepredicate: LPAR
+    {
+        PN->finalConditionString += "(";
+    }
+    statepredicate RPAR 
 	{
-	$$ = $2;
+	$$ = $3;
+	PN->finalConditionString += ")";
 }
-| statepredicate OP_AND statepredicate 
+| statepredicate OP_AND
+    {
+        PN->finalConditionString = PN->finalConditionString + " AND ";    
+    }
+    statepredicate 
 	{
 	// [LUHME XV] "conj" groß oder zwei Klassen "...formulaConj" und "...formulaDisj"
-	$$ = new binarybooleanformula(conj,$1,$3);
+	$$ = new binarybooleanformula(conj,$1,$4);
 }
-| statepredicate OP_OR statepredicate 
+| statepredicate OP_OR 
+    {
+		PN->finalConditionString = PN->finalConditionString + " OR ";  
+    }
+    statepredicate 
 	{
-		$$ = new binarybooleanformula(disj,$1,$3);
+		$$ = new binarybooleanformula(disj,$1,$4);
 }
-| OP_NOT statepredicate 
+| OP_NOT 
 	{
-	   $$ = new unarybooleanformula(neg,$2);
+		PN->finalConditionString = PN->finalConditionString + "NOT ";      
+	}
+    statepredicate 
+	{
+	   $$ = new unarybooleanformula(neg,$3);
 }
 | statepredicate OP_AND KEY_ALL_OTHER_PLACES_EMPTY {
 	// [LUHME XV] Entfalten der Formel verschieben,
@@ -764,6 +781,7 @@ statepredicate: LPAR statepredicate RPAR
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
+	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY {
 	// [LUHME XV] Entfalten der Formel verschieben, s.o.
@@ -809,6 +827,7 @@ statepredicate: LPAR statepredicate RPAR
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
+	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";  
 }
 | statepredicate OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY {
 	// [LUHME XV] Entfalten der Formel verschieben, s.o.
@@ -858,6 +877,7 @@ statepredicate: LPAR statepredicate RPAR
 		
 		$$ = new binarybooleanformula(conj, lhs, rhs);
 	}
+	PN->finalConditionString = PN->finalConditionString + " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";  
 }
 | nodeident OP_EQ NUMBER {
 	unsigned int i;
@@ -868,6 +888,7 @@ statepredicate: LPAR statepredicate RPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(eq, PS->getPlace(), i);
+	PN->finalConditionString = PN->finalConditionString + string($1) + " = " + string($3);  
 	free($1);
 	free($3);
 }
@@ -880,6 +901,7 @@ statepredicate: LPAR statepredicate RPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(neq, PS->getPlace(), i);
+	PN->finalConditionString = PN->finalConditionString + string($1) + " != " + string($3);  
 	free($1);
 	free($3);
 }
@@ -892,6 +914,7 @@ statepredicate: LPAR statepredicate RPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(lt, PS->getPlace(), i);
+	PN->finalConditionString = PN->finalConditionString + string($1) + " < " + string($3);  
 	free($1);
 	free($3);
 }
@@ -904,6 +927,7 @@ statepredicate: LPAR statepredicate RPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(gt, PS->getPlace(), i);
+	PN->finalConditionString = PN->finalConditionString + string($1) + " > " + string($3);  
 	free($1);
 	free($3);
 }
@@ -916,6 +940,7 @@ statepredicate: LPAR statepredicate RPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(geq, PS->getPlace(), i);
+	PN->finalConditionString = PN->finalConditionString + string($1) + " >= " + string($3);  
 	free($1);
 	free($3);
 }
@@ -928,7 +953,7 @@ statepredicate: LPAR statepredicate RPAR
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq, PS->getPlace(), i);
+	PN->finalConditionString = PN->finalConditionString + string($1) + " <= " + string($3);  
 	free($1);
 	free($3);
 }
-

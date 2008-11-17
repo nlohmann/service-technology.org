@@ -4110,6 +4110,22 @@ oWFN* oWFN::returnNormalOWFN() {
     result->initialize();
 
 
+    // create final condition, if available
+    if ( this->FinalCondition == NULL ) {
+        // there is no final condition
+        TRACE(TRACE_5, "there is no final condition\n");
+        result->FinalCondition = NULL;
+    } else {
+        // copy existing final condition with updated place references in
+        // atomic forumlae
+        TRACE(TRACE_5, "copy existing final condition\n");
+        result->FinalCondition = FinalCondition->reduced_copy( result );
+        result->FinalCondition->setstatic();
+        // we don't compute a new finalConditionString and use
+        // FinalCondition->getString() instead
+        result->finalConditionString = "";
+    }
+
     TRACE(TRACE_5, "oWFN* oWFN::returnNormalOWFN() : end\n");
     return result;
 }
@@ -4258,6 +4274,9 @@ oWFN* oWFN::returnMatchingOWFN() {
         TRACE(TRACE_5, "copy existing final condition\n");
         result->FinalCondition = FinalCondition->reduced_copy( result );
         result->FinalCondition->setstatic();
+        // we don't compute a new finalConditionString and use
+        // FinalCondition->getString() instead
+        result->finalConditionString = "";
     }
 
 

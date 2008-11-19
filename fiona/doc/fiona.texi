@@ -457,11 +457,82 @@ specification describes the first part of the og-file of the shop. You can find 
 As you take a closer look at the specification you can see that node @samp{21} has an additional attribute --- @samp{finalnode}. So, besides annotating a node with its boolean annotation and its color, you can also declare a node to be a final node of the operating guideline. In the graphics such a node will always be depicted with two surrounding lines.
 
 
+
+@subsection Operating Guidelines with Global Constraint
+
+
+Fiona can also read a textual specification of an extended operating guideline, i.e. an operating
+guideline with a global constraint. An operating guidelines with global constraint characterizes
+those behaviorally compatible partners @math{M} for an open net @math{N} such that a set @math{X}
+of places and transitions of @math{N} is covered in the composition @math{M \oplus N}. Here, to
+cover a place @math{p} means that @math{p} can be marked in some reachable marking while to cover a
+transition @math{t} means that @math{t} is not dead. An operating guideline with global constraint
+consists of an (ordinary) operating guideline and a constraint specifying which nodes of the
+operating guideline have to be contained in the matching relation. Files of such a kind of an
+operating guideline have the suffix .covog.
+
+As an example, suppose we want to cover places @samp{p2} and @samp{p3} as well as transition
+@samp{!new} in our running example, the online shop. The resulting file (@file{docShop.owfn.covog})
+looks like this.
+
+@cartouche
+@smallexample
+  NODES
+    0 : (!login + !order) : blue,
+   17 : !login : blue,
+   18 : (?new * (?deliver + ?known)) : blue,
+        ...
+
+  INITIALNODE
+    0;
+
+  TRANSITIONS
+    0 -> 17 : !order,
+    0 -> 38 : !login,
+   17 -> 18 : !login,
+        ...
+   42 -> 20 : !order;
+
+  COVER
+    Places to cover: p2 p3,
+    Transitions to cover: t2,
+    Global Constraint: (18 + 38),
+
+    0 : none,
+   17 : none,
+   18 : p2 p3 t2,
+   19 : p3,
+   20 : p3,
+        ...
+   42 : p3;
+@end smallexample
+@end cartouche
+
+Until the keyword @samp{COVER} the file contains the same information as the file of the ordinary
+operating guideline (see @file{docShop.owfn.og}). After the keyword @samp{COVER} the set of places
+to be covered and the set of transitions to be covered are listed. In the third line the global
+constraint is shown (@samp{(18 + 38)}), meaning a behaviorally compatible partner @math{M} of
+@math{N} covers nodes @samp{p2}, @samp{p3}, and @samp{!new} if it contains a state that matches
+with node @samp{18} or with node @samp{38}. Below the global constraint for each node of the
+operating guideline, the set of places and transitions of @math{N} covered by this node are
+specified. For example, node @samp{18} covers nodes @samp{p2}, @samp{p3}, and @samp{!new} of the
+open net @math{N}.
+
+
+
 @section Adapter Rules
 
-One of the analysis scenarios of Fiona is to generate an adapter which functions as a mediator between different nets (see Sect. subsec:furtherAnalysisScenarios). In order to build such an adapter it is necessary for the algorithm to know which messages can be mapped onto each other. We encode this mapping in a special @i{adapter rules file} [6], commonly extended with @samp{.ar}.
+One of the analysis scenarios of Fiona is to generate an adapter which functions as a mediator
+between different nets (see Sect. subsec:furtherAnalysisScenarios). In order to build such an
+adapter it is necessary for the algorithm to know which messages can be mapped onto each other. We
+encode this mapping in a special @i{adapter rules file} [6], commonly extended with @samp{.ar}.
 
-Consider the online shop as described in @ref{Running Example} again. Suppose that there exists another net which models a potential customer of the shop. The composition of the two nets, however, does not behave well. As you take a closer look at the services, you notice what the problem is --- the customer net is only able to receive a message that is called @samp{delivery_notice} as opposed to the message that the online shop sends out. That message is called @samp{delivery}. You would now specify this fact as an adapter rule as follows.
+Consider the online shop as described in @ref{Running Example} again. Suppose that there exists
+another net which models a potential customer of the shop. The composition of the two nets,
+however, does not behave well. As you take a closer look at the services, you notice what the
+problem is --- the customer net is only able to receive a message that is called
+@samp{delivery_notice} as opposed to the message that the online shop sends out. That message is
+called @samp{delivery}. You would now specify this fact as an adapter rule as follows.
 
 @cartouche
 @smallexample
@@ -496,6 +567,32 @@ specifies that message @samp{B} may be deleted by the adapter. The following rul
 @end smallexample
 @end cartouche
 
+
+@section Covering Open Net Nodes
+
+Fiona can compute those behaviorally compatible partners @math{M} for an open net @math{N} such
+that a set @math{X} of places and transitions of @math{N} is covered in the composition @math{M
+\oplus N}. Here, to cover a place @math{p} means that @math{p} can be marked in some reachable
+marking while to cover a transition @math{t} means that @math{t} is not dead. To this end one has
+to specify the set @math{X} with the help of a .cov file.
+
+A .cov file defines the set of places and transitions to be covered. It contains two keywords:
+@samp{PLACES} and @samp{TRANSITIONS}. As in the case of an .owfn file after each keyword we specify
+a list of places and transitions, respectively. Elements of these lists are divided by @samp{,} and
+a list is completed by @samp{;}.
+
+As an example, suppose we want to cover places @samp{p2} and @samp{p3} as well as transition
+@samp{!new} in our running example, the online shop, as described in @ref{Running Example}. Then we
+have the following file (@file{docShop.owfn.cov}).
+
+@cartouche
+@smallexample
+  PLACES
+    p2, p3;
+  TRANSITIONS
+    !new;
+@end smallexample
+@end cartouche
 
 
 @c --------------------------------------------------------------------------
@@ -537,9 +634,15 @@ fiona -t ig doc/docShop.owfn
 @end smallexample
 @end cartouche
 
-to have Fiona check controllability. Fiona decides controllability by constructing an IG. After computing the IG, Fiona reports whether the net is controllable or not. Furthermore, you will find a graphic file showing the IG in directory @file{doc}. The graphics is generated by GraphViz Dot (available at @url{http://www.graphviz.org}).
+to have Fiona check controllability. Fiona decides controllability by constructing an IG. After
+computing the IG, Fiona reports whether the net is controllable or not. Furthermore, you will find
+a graphic file showing the IG in directory @file{doc}. The graphics is generated by GraphViz Dot
+(available at @url{http://www.graphviz.org}).
 
-Depending on the size of the given open net, it may take some time for Fiona to build up the IG. So, it is advisable to have Fiona build up a reduced interaction graph [Weinberg_2008_wsfm]. In general, the resulting graph is significantly smaller than the complete IG and thus it takes less time to compute it and it consumes less memory as it is constructed. Type
+Depending on the size of the given open net, it may take some time for Fiona to build up the IG.
+So, it is advisable to have Fiona build up a reduced interaction graph [Weinberg_2008_wsfm]. In
+general, the resulting graph is significantly smaller than the complete IG and thus it takes less
+time to compute it and it consumes less memory as it is constructed. Type
 
 @cartouche
 @smallexample
@@ -634,7 +737,13 @@ fiona -t equivalence myNets/myShop.owfn doc/docShop.owfn
 
 Here, the order of the given nets does not matter. But again, Fiona expects og-files as its input. If owfn-files are given, Fiona will first generate an operating guideline of both nets to run the algorithm. Finally, Fiona will state whether both nets specify the same partners or not.
 
-@item @b{Adapter generation.} Suppose, in addition to the online shop you have given the model of a customer as an owfn-file. You know that both nets are @i{not} behaviorally compatible. Further, you have specified an adapter rule file @file{rules.ar} (see Sect. @b{subsec:adapterRules}) which defines certain message mappings. Then, you can use Fiona to synthesize a partner that functions as an adapter for both nets. If such a partner exists, it mediates between both nets. Thus, the composition of all three nets is well-behaving by construction. For more details see [GierdsMW_2008_tr_cs0208]. Invoke Fiona as follows.
+@item @b{Adapter generation.} Suppose, in addition to the online shop you have given the model of a
+customer as an owfn-file. You know that both nets are @i{not} behaviorally compatible. Further, you
+have specified an adapter rule file @file{rules.ar} (see Sect. @b{subsec:adapterRules}) which
+defines certain message mappings. Then, you can use Fiona to synthesize a partner that functions as
+an adapter for both nets. If such a partner exists, it mediates between both nets. Thus, the
+composition of all three nets is well-behaving by construction. For more details see
+[GierdsMW_2008_tr_cs0208]. Invoke Fiona as follows.
 
 @cartouche
 @smallexample
@@ -651,6 +760,44 @@ fiona -t smalladapter doc/docShop.owfn myNets/customer.owfn -a rules.ar
 @end cartouche
 
 a rather small adapter will be generated by using certain reduction rules. In either case a file called @file{docShop_customer_result.owfn} will be generated which models the adapter of the two nets with respect to the adapter rules given.
+
+
+@item @b{Covering open net nodes.} Suppose, we are interested in characterizing all those
+behaviorally compatible partners @math{M} for an open net @math{N} such that a set @math{X} of
+places and transitions of @math{N} is covered in the composition @math{M \oplus N}. Here, to cover
+a place @math{p} means that @math{p} can be marked in some reachable marking while to cover a
+transition @math{t} means that @math{t} is not dead. To characterize those partners, we need an
+extended notion of an operating guideline, an operating guideline with global constraint. This
+extended notion consists of the operating guideline @math{OG_N} and a global constraint @math{\psi}
+over the nodes of @math{OG_N}. Thereby @math{\psi} specifies which nodes of @math{OG_N} must be
+contained in the matching relation of a partner and the operating guideline. For more details see
+[StahlW_2008_BPM]. To compute an operating guideline with global constraint, you need to specify
+the set of nodes of @math{N} to be covered (here: docShop.owfn.cov). Invoke Fiona as follows.
+
+@cartouche
+@smallexample
+fiona -t og -p cover doc/docShop.owfn doc/docShop.owfn.cov
+@end smallexample
+@end cartouche
+
+Here Fiona creates an output file @file{docShop.owfn.covog}. By invoking Fiona with
+
+@cartouche
+@smallexample
+fiona -t og -p cover -s coverall doc/docShop.owfn
+@end smallexample
+@end cartouche
+
+Fiona shows you which places and transitions of @math{N} are covered in each node of the operating
+guideline. In order to check whether a given open net @math{M} is a behaviorally compatible partner
+of @math{N} that covers the specified set of places and transitions invoke Fiona as follows.
+
+@cartouche
+@smallexample
+fiona -t match -p cover doc/docShop.owfn myNets/covernet.owfn
+@end smallexample
+@end cartouche
+
 @end itemize
 
 
@@ -731,6 +878,8 @@ Parameters:
 @c \hline
 @c @code{deadlocks }& show all but transient states\\
 @c \hline
+@c @code{coverall }& shows all covered open net nodes per OG node (only if @file{-p cover} is used)\\
+@c \hline
 @c \end{longtable}
 @c \end{quote}
 
@@ -790,6 +939,7 @@ Parameters:
 @item @code{r1}--@code{r5} @tab set reduction level in mode @option{-t reduce}
 @item @code{cre} @tab use the ``combine receiving events''---reduction technique to reduce the IG
 @item @code{rbs} @tab use the ``receiving before sending''---reduction technique to reduce the IG
+@item @code{cover} @tab requires @file{-t og} or @file{-t match} and is used for OGs with global constraint
 @end multitable
 @sp 1
 
@@ -838,11 +988,11 @@ We hope, that you will have fun using Fiona and that our tool actually helps you
 
 @cartouche
 @smallexample
-fiona --bug 
+fiona --bug
 @end smallexample
 @end cartouche
 
-to your email. That call lets Fiona state some facts about your local compilation. If possible, it would be very helpful if you could attach your input files as well. 
+to your email. That call lets Fiona state some facts about your local compilation. If possible, it would be very helpful if you could attach your input files as well.
 
 Thanks for using Fiona.
 
@@ -855,28 +1005,31 @@ Thanks for using Fiona.
 
 @table @asis
 @itemx [1]
-Schmidt, K.: Controllability of Open Workflow Nets. In: EMISA 2005. LNI, Bonner K@"ollen Verlag (2005) 236--249 
+Schmidt, K.: Controllability of Open Workflow Nets. In: EMISA 2005. LNI, Bonner K@"ollen Verlag (2005) 236--249
 
 @itemx [2]
 Weinberg, D.: Efficient controllability analysis of open nets. In: WS-FM 2008. LNCS, Springer-Verlag (2008) accepted.
 
 @itemx [3]
-Lohmann, N., Massuthe, P., Wolf, K.: Operating Guidelines for Finite-State Services. In: ICATPN 2007. Volume 4546 of LNCS., Springer-Verlag (2007) 321--341 
+Lohmann, N., Massuthe, P., Wolf, K.: Operating Guidelines for Finite-State Services. In: ICATPN 2007. Volume 4546 of LNCS., Springer-Verlag (2007) 321--341
 
 @itemx [4]
-Massuthe, P., Reisig, W., Schmidt, K.: An Operating Guideline Approach to the SOA. AMCT 1(3) (2005) 35--43 
+Massuthe, P., Reisig, W., Schmidt, K.: An Operating Guideline Approach to the SOA. AMCT 1(3) (2005) 35--43
 
 @itemx [5]
-Stahl, C., Massuthe, P., Bretschneider, J.: Deciding Substitutability of Services with Operating Guidelines. Technical Report 222, Humboldt-Universit@"at zu Berlin, Germany (2008) accepted for a journal. 
+Stahl, C., Massuthe, P., Bretschneider, J.: Deciding Substitutability of Services with Operating Guidelines. Technical Report 222, Humboldt-Universit@"at zu Berlin, Germany (2008) accepted for a journal.
 
 @itemx [6]
-Gierds, C., Mooij, A.J., Wolf, K.: Specifying and generating behavioral service adapter based on transformation rules. Technical Report CS-02-08, Universit@"at Rostock, Germany (2008) submitted to a conference. 
+Gierds, C., Mooij, A.J., Wolf, K.: Specifying and generating behavioral service adapter based on transformation rules. Technical Report CS-02-08, Universit@"at Rostock, Germany (2008) submitted to a conference.
 
 @itemx [7]
-Schmidt, K.: LoLA: A Low Level Analyser. In: ICATPN 2000. Volume 1825 of LNCS., Springer-Verlag (2000) 465--474 
+Schmidt, K.: LoLA: A Low Level Analyser. In: ICATPN 2000. Volume 1825 of LNCS., Springer-Verlag (2000) 465--474
 
 @itemx [8]
 Lohmann, N.: A feature-complete Petri net semantics for WS-BPEL 2.0. In: WS-FM 2007. Volume 4937 of LNCS., Brisbane, Australia, Springer-Verlag (2008) 77--91
+
+@itemx [9]
+Stahl, C., Wolf, K.: Covering Places and Transitions in Open Nets. In: BPM 2008. Volume 5240 of LNCS., Milan, Italy, Springer-Verlag (2008) 116--131
 @end table
 
 

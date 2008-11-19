@@ -1,0 +1,9 @@
+{ "cov" file for fiona_tool_paper }
+
+PLACES
+  p2,
+  p3;
+
+TRANSITIONS
+  t2;  { !new customer }
+

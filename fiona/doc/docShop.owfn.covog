@@ -1,0 +1,54 @@
+NODES
+  0 : (!login + !order) : blue,
+  17 : !login : blue,
+  18 : (?new * (?deliver + ?known)) : blue,
+  19 : !terms : blue,
+  20 : ?deliver : blue,
+  21 : final : blue,
+  28 : ?known : blue,
+  36 : ?deliver : blue,
+  38 : ((!order + ?new) * (!order + ?known)) : blue,
+  39 : !order : blue,
+  41 : (!order + !terms) : blue,
+  42 : !order : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 17 : !order,
+  0 -> 38 : !login,
+  17 -> 18 : !login,
+  18 -> 19 : ?new,
+  18 -> 28 : ?deliver,
+  18 -> 36 : ?known,
+  19 -> 20 : !terms,
+  20 -> 21 : ?deliver,
+  28 -> 21 : ?known,
+  36 -> 21 : ?deliver,
+  38 -> 18 : !order,
+  38 -> 39 : ?known,
+  38 -> 41 : ?new,
+  39 -> 36 : !order,
+  41 -> 42 : !terms,
+  41 -> 19 : !order,
+  42 -> 20 : !order;
+
+COVER
+  Places to cover: p2 p3,
+  Transitions to cover: t2,
+  Global Constraint: (18 + 38),
+
+  0 : none,
+  17 : none,
+  18 : p2 p3 t2,
+  19 : p3,
+  20 : p3,
+  21 : none,
+  25 : none,
+  28 : none,
+  36 : none,
+  38 : p2 p3 t2,
+  39 : none,
+  41 : p3,
+  42 : p3;

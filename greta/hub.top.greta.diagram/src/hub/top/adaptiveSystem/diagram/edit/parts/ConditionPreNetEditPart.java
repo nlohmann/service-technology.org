@@ -460,6 +460,8 @@ public class ConditionPreNetEditPart extends AbstractBorderedShapeEditPart {
 	}
 
 	/** 
+	 * After editing oclet, it have to be checked for wellformedness.
+	 * This method reset the variables for enabling the button.
 	 * @author Manja Wolf
 	 *
 	 */

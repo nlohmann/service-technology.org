@@ -274,14 +274,14 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 						oclet = (Oclet) ((Condition) ((Node) this.getModel())
 								.getElement()).eContainer().eContainer();
 					} else
-					//the condition could be in main process (after moving)
+					//the condition could be in adaptive process (after moving)
 					//than the oclet is in oldContainer of the condition
 					if (((Condition) notification.getNotifier())
 							.eOldContainer().eContainer() instanceof Oclet) {
 						oclet = (Oclet) ((Condition) notification.getNotifier())
 								.eOldContainer().eContainer();
 					} else
-						//the condition is not in oclet nor in main process
+						//the condition is not in oclet nor in adaptive process
 						//should never occur 
 						oclet = null;
 					resetCheckOclets(oclet);
@@ -297,14 +297,14 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 						oclet = (Oclet) ((Condition) ((Node) this.getModel())
 								.getElement()).eContainer().eContainer();
 					} else
-					//the condition could be in main process (after moving)
+					//the condition could be in adaptive process (after moving)
 					//than the oclet is in oldContainer of the condition
 					if (((Condition) notification.getNotifier())
 							.eOldContainer().eContainer() instanceof Oclet) {
 						oclet = (Oclet) ((Condition) notification.getNotifier())
 								.eOldContainer().eContainer();
 					} else
-						//the condition is not in oclet nor in main process
+						//the condition is not in oclet nor in adaptive process
 						//should never occur 
 						oclet = null;
 					resetCheckOclets(oclet);
@@ -333,7 +333,7 @@ public class ConditionDoNetEditPart extends AbstractBorderedShapeEditPart {
 					ArcToEventEditPart arcEP = (ArcToEventEditPart) object;
 					ArcToEvent arc = (ArcToEvent) ((Edge) arcEP.getModel())
 							.getElement();
-					//an arc between main process and an oclet found => remove arc
+					//an arc between adaptive process and an oclet found => remove arc
 					if (arc != null
 							&& arc.getDestination() != null
 							&& arc.getSource() != null

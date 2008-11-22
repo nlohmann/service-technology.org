@@ -121,6 +121,7 @@ public class ArcToConditionEditPart extends ConnectionNodeEditPart implements
 	}
 
 	/** 
+	 * Sets the value of setWellformednessOfOclets to false, because there was an modification of an oclet which should be checked
 	 * @author Manja Wolf
 	 * @param adaptiveProcess
 	 */

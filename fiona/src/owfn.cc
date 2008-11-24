@@ -53,6 +53,11 @@ using namespace std;
 
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
 
+//! anonymous namespace for defining a file local variable
+namespace {
+    std::string finalStateWarning = "\n\t WARNING: found a finalstate which activates a transition - you shouldn't do this! \n";
+}
+
 //comparison function, in order to sort the input/output place names
 bool compare(const owfnPlace* lhs, const owfnPlace* rhs) {
     return lhs->name < rhs->name;
@@ -2979,6 +2984,13 @@ bool oWFN::isFinal() const {
                 }
             }
         }
+
+        // give out a warning if a final state activates transitions
+        if ((FinalCondition->value) && CurrentCardFireList  > 0) {
+            cerr << finalStateWarning; 
+            finalStateWarning = "";
+        }
+
         TRACE(TRACE_5, "bool oWFN::isFinal() : end\n");
         return FinalCondition->value;
     } else {
@@ -2992,6 +3004,11 @@ bool oWFN::isFinal() const {
                 }
             }
             if (finalMarkingFits) {
+                // give out a warning if a final state activates transitions
+                if (CurrentCardFireList  > 0) {
+                    cerr << finalStateWarning; 
+                    finalStateWarning = "";
+                }
 
                 TRACE(TRACE_5, "bool oWFN::isFinal() : end\n");
                 return true;

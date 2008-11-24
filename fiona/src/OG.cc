@@ -48,10 +48,6 @@
 // So, we undefine TRUE.
 #undef TRUE
 
-//! anonymous namespace for defining a file local variable
-namespace {
-    std::string finalStateWarning = "\n\t WARNING: found a finalstate which activates a transition - you shouldn't do this! \n";
-}
 
 //! \brief constructor
 //! \param _PN
@@ -698,8 +694,6 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                     if (currentState->type == FINALSTATE) {
                         if ((PN->FinalCondition) && currentState->cardFireList
                                         > 0) {
-                            cerr << finalStateWarning;
-                            finalStateWarning = "";
 
                             // transient final states are ignored in annotation, just like
                             // all other transient states
@@ -774,8 +768,6 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                 // in case of a final state we add special literal "final" to the clause
                 if ((*iter)->type == FINALSTATE) {
                     if ((PN->FinalCondition) && (*iter)->cardFireList > 0) {
-                        cerr << finalStateWarning;
-                        finalStateWarning = "";
 
                         // transient final states are ignored in annotation, just like
                         // all other transient states

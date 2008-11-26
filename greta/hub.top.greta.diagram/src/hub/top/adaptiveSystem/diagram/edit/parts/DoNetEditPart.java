@@ -1,3 +1,42 @@
+/*****************************************************************************\
+ * Copyright (c) 2008 Manja Wolf, Dirk Fahland. EPL1.0/GPL3.0/LGPL3.0
+ * All rights reserved.
+ * 
+ * ServiceTechnolog.org - Greta
+ *                       (Graphical Runtime Environment for Adaptive Processes) 
+ * 
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0, which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is this file as it was released on November 26, 2008.
+ * The Initial Developer of the Original Code are
+ *      Manja Wolf, and
+ * 		Dirk Fahland
+ * 
+ * Portions created by the Initial Developer are Copyright (c) 2008
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 3 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 3 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the EPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the EPL, the GPL or the LGPL.
+\*****************************************************************************/
+
 package hub.top.adaptiveSystem.diagram.edit.parts;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
@@ -8,9 +47,13 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.DoNet;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Oclet;
+import hub.top.adaptiveSystem.gmf.AutoResizePredictRequest;
+import hub.top.adaptiveSystem.gmf.OcletResizableEditPolicy;
 
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.LayoutListener;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
@@ -40,6 +83,7 @@ import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 /**
@@ -68,9 +112,9 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 	public DoNetEditPart(View view) {
 		super(view);
 	}
-
+	
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
@@ -80,6 +124,13 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
 		// XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
 		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
+		
+		//// <Dirk.F> install nice edit policy
+		installEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE,
+				new OcletResizableEditPolicy (
+						this, PositionConstants.NONE, SWT.VERTICAL | SWT.BOTTOM));
+		//// </Dirk.F>
+
 	}
 
 	/**
@@ -107,6 +158,44 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 		};
 		return lep;
 	}
+	
+	/**
+	 * Active edit part, install layout listener at parent figure
+	 * for auto-resizing this edit part.
+	 * 
+	 * @generated NOT
+	 * @author Dirk Fahland
+	 */
+	@Override
+	public void activate() {
+		
+		// retrieve parent figure
+		IFigure figure = getFigure();
+		IFigure parentFig = figure.getParent();
+		
+		// add layout listener to the surrounding oclet figure
+		// to handle this subnet figure
+		parentFig.addLayoutListener(new LayoutListener.Stub() {
+			
+            @Override
+            public void postLayout(IFigure hostFigure) {
+            	
+            	// after every re-layout of the host figure, send an auto re-size
+            	// request to all edit parts and execute the corresponding commands
+            	// TODO: move to the host figure?
+    	        Dimension newSize = hostFigure.getBounds().getSize();
+    	        AutoResizePredictRequest request = new AutoResizePredictRequest(
+    	        		hostFigure, newSize);
+
+    	        if (DoNetEditPart.this.understandsRequest(request)) {
+		        	Command c = DoNetEditPart.this.getCommand(request);
+		        	DoNetEditPart.this.getViewer().getEditDomain().getCommandStack().execute(c);
+		        }
+            }
+		});
+		super.activate();
+	}
+
 
 	/**
 	 * @generated

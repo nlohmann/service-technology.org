@@ -459,7 +459,7 @@ public class ResourceHelper {
 	/**
 	 * @return standard UTF-8 encoding save options
 	 */
-	public Map<String, String> getSaveOptions() {
+	public static Map<String, String> getSaveOptions() {
 		// Save the contents of the resource to the file system.
 		Map<String, String> options = new HashMap<String, String>();
 		options.put(XMLResource.OPTION_ENCODING, "UTF-8");

@@ -134,7 +134,7 @@ public class ModelEditorON extends hub.sam.tef.editor.model.ModelEditor implemen
 			}
 			
 			public String getCurrentText() {
-				return ((ModelEditorON)getEditor()).getCurrentText();
+				return ((ModelEditorON)getEditor()).getCurrentPrettyPrintedText();
 			}
 			
 			@Override

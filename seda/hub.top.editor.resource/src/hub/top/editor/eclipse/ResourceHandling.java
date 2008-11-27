@@ -100,6 +100,45 @@ public class ResourceHandling {
 		return targetPath;
 	}
 	
+	/**
+	 * Create and store a new resource that contains a model. The target URI of the resource
+	 * is taken from a source resource. The contents of the new resource is provided
+	 * explicitly
+	 * 
+	 * @param window
+	 * @param sourceHelper
+	 * @param targetHelper
+	 * @param modelContents
+	 */
+	public static void createModelResource(IWorkbenchWindow window, ResourceHelper sourceHelper, ResourceHelper targetHelper, EObject modelContents) 
+	{
+		// resolve target file name from current editor input
+		IPath modelFilePath = createTargetPath(sourceHelper, targetHelper.getFeasibleExtension());
+		if (modelFilePath == null) {
+			targetHelper.getPluginHelper().logError("Unable to create target path from "+sourceHelper.getURI(true));
+			return;
+		}
+		// create a file object and retrieve the contents
+		// for the new model file
+		targetHelper.setPath(modelFilePath, false);
+		targetHelper.addToModelContents(modelContents);
+
+		// create the operation to write the new model file
+		NewModelFileOperation op = targetHelper.storeModelContentsInResource(true);
+		try {
+			//IStatus status = OperationHistoryFactory.getOperationHistory().execute(op,
+			//		new NullProgressMonitor(), null);
+			//System.out.println("exited with status "+status);
+			window.run(true, false, op);
+		} catch (InvocationTargetException e) {
+			targetHelper.getPluginHelper().logError(new Error("Unable to store model in "+targetHelper.getURI(true)+". Could not invoke workspace operation: "+e.getCause(), e));
+		} catch (InterruptedException ex) {
+			targetHelper.getPluginHelper().logError(new Error("Storing resource "+targetHelper.getURI(true)+" has been interrupted by "+ex.getCause(), ex));
+		}/* catch (ExecutionException ex) {
+			targetHelper.getPluginHelper().logError("Unable to create model", ex);
+		}*/
+	}
+	
 	public static void createModelResourceFromResource(IWorkbenchWindow window, ResourceHelper sourceHelper, ResourceHelper targetHelper) 
 	{
 		// resolve target file name from current editor input

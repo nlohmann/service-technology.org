@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -1990,7 +1990,7 @@ string AnnotatedGraph::createDotFile(string& filenamePrefix,
          getNumberOfBlueNodes() <= maxSizeForDotFile)) {
 
             trace( "creating the dot file of the OG...\n");
-        
+
             string dotFile = filenamePrefix + ".out";
             fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
             if (!dotFileHandle.good()) {
@@ -2003,19 +2003,19 @@ string AnnotatedGraph::createDotFile(string& filenamePrefix,
             dotFileHandle << "\"];\n";
             dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
             dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
-        
+
             std::map<AnnotatedGraphNode*, bool> visitedNodes;
             createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
-        
+
             dotFileHandle << "}";
             dotFileHandle.close();
-        
+
             // ... dot file created (.out) //
             return dotFile;
     } else {
             trace( "graph is too big to create dot file\n");
     }
-    
+
     return "";
 }
 
@@ -2831,6 +2831,7 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdges() {
     // Reset statistic variables
     std::map<AnnotatedGraphNode*, t_typeOfVisit> visitedNodes;
     nStoredStates = 0;
+    nStoredStatesBlueNodes = 0;
     nEdges = 0;
     nBlueEdges = 0;
     nBlueNodes = 0;
@@ -2870,6 +2871,8 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
         (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
 
         ++nBlueNodes;
+        // Add the number of states of this blue node
+        nStoredStatesBlueNodes += v->reachGraphStateSet.size();
 
         // remember that the current node has been counted as blue
         visitedNodes[v] = VISITED_COUNTED_AS_BLUE;
@@ -2894,7 +2897,7 @@ void AnnotatedGraph::computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphN
         // Current blue path status
         bool onABluePathInLoop = onABluePath;
 
-        // Determine wether we have a blue edge or not.
+        // Determine whether we have a blue edge or not.
         if (onABluePath && vNext->getColor() == BLUE &&
                 (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
             ++nBlueEdges;
@@ -2945,7 +2948,16 @@ void AnnotatedGraph::printGraphStatistics() {
     trace( "    number of states calculated: " + intToString(State::state_count) + "\n");
     trace( "    number of states stored in datastructure: " + intToString(State::state_count_stored_in_binDec) + "\n");
     trace( "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
+    trace( "    number of states stored in blue nodes: " + intToString(getNumberOfStoredStatesBlueNodes()) + "\n");
     TRACE(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
+}
+
+
+//! \brief returns the number of stored states
+//!        may only be called after computeGraphStatistics()
+//! \return number states stored in blue nodes
+unsigned int AnnotatedGraph::getNumberOfStoredStatesBlueNodes() const {
+    return nStoredStatesBlueNodes;
 }
 
 
@@ -3160,7 +3172,7 @@ void AnnotatedGraph::computeAndPrintGraphStatistics() {
 
 
 //! \brief Transforms this OG (represented by an AnnotatedGraph) into a Public
-//!        View. The method works on the AnnotatedGraph object itself. 
+//!        View. The method works on the AnnotatedGraph object itself.
 //!        To prevent this, create a copy with toAnnotatedGraph() first.
 void AnnotatedGraph::transformToPV(bool fromOWFN) {
 // first either the empty node (if the owfn is given) or all true nodes
@@ -3194,9 +3206,9 @@ void AnnotatedGraph::transformToPV(bool fromOWFN) {
 //!        AnnotatedGraph-Object (destination).
 //!        A deep copy is made, all nodes, edges and annotations are copied.
 void AnnotatedGraph::toAnnotatedGraph(AnnotatedGraph* destination) {
-    
+
     // Assign simple members
-    destination->filename = filename; 
+    destination->filename = filename;
 
 
     // map from every node in the annotated graph to its corresponding
@@ -3251,8 +3263,8 @@ void AnnotatedGraph::toAnnotatedGraph(AnnotatedGraph* destination) {
 
 }
 
-//! \brief Copies this AnnotatedGraph-Object into a Graph object (destination). 
-//!        A deep copy is made, all nodes and edges are copied. 
+//! \brief Copies this AnnotatedGraph-Object into a Graph object (destination).
+//!        A deep copy is made, all nodes and edges are copied.
 //!        Since a Graph is not annotated, annotations are not copied.
 void AnnotatedGraph::toGraph(Graph* destination) {
 

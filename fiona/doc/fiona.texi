@@ -12,7 +12,7 @@
 
 @b{About this document:}
 
-This manual is for Fiona, version @value{VERSION}, a tool to analyze interacting open nets, last updated @value{UPDATED}.
+This manual is for Fiona, version @value{VERSION}, a tool to analyze interacting open nets, last update @value{UPDATED}.
 
 Copyright @copyright{} 2008 Peter Massuthe, Daniela Weinberg
 
@@ -70,7 +70,6 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * Some last Words::Some last Words
 * References::References
 * First Steps::How to set up and install Fiona.
-* Command Line Options::How to run Fiona.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -128,6 +127,7 @@ In the following sections we will describe the analysis scenarios of Fiona with 
 
 Initially, the shop waits for a customer to log in (transition @sansserif{?login}). Then, the shop decides internally whether the customer is new to the shop or if the customer has used the shop before. That decision is reported to the customer (transitions @sansserif{!new} or @sansserif{!known}). So, the customer receives either message. If the shop did not recognize the customer, the shop expects the customer to accept the terms of payment of the shop (modeled by sending a message @sansserif{terms} --- transition @sansserif{?terms}) and to send the order (modeled by sending a message @sansserif{order} --- transition @sansserif{?order}). Afterwards, the shop sends the delivery notice to the customer (transition @sansserif{!deliver}). If, however, the customer is known to the shop, it will first expect the customer to send out his order (transition @sansserif{?order}) and then, it will send a delivery message to the customer (transition @sansserif{!deliver}). The online shop reaches its final state after the delivery notice has been sent out (place @sansserif{p9} is marked).
 
+@sp 1
 @center @image{figs/online_shop.owfn}
 @sp 1
 @center @b{Figure 1.} Online Shop as an Open Net
@@ -142,10 +142,26 @@ You can find the example online shop in file @file{docShop.owfn} in the document
 @node Input and Output File Formats
 @chapter Input and Output File Formats
 
+@menu
+* Open Nets::
+* Operating Guidelines::
+* Adapter Rules::
+* Covering Open Net Nodes::
+@end menu
+
+
 Fiona supports different types of input files --- open net files and operating guideline files. Here, it ignores every file extension and checks the type of an input file by its content. So, an open net file or an operating guideline file may contain any file extension, for example @samp{.net} or @samp{.whatever} is possible.
 
-
+@node Open Nets
 @section Open Nets
+
+@menu
+* Places::
+* Initial Marking::
+* Final Markings::
+* Transitions::
+* Open Net Specification of the Online Shop::
+@end menu
 
 The open net file format (@samp{.owfn}) has been adapted from the LoLA [7] file format. It is fairly easy to read and to comprehend. So, it is possible to model an open net manually. Additionally, there exists a compiler BPEL2oWFN (available at @url{http://service-technology.org/bpel2owfn}) that implements a feature-complete open net semantics [8] for WS-BPEL and automatically generates an open net file for a given WS-BPEL process.
 
@@ -164,11 +180,11 @@ Therefore, the open net file consists of four parts:
 @item Transitions
 @end enumerate
 
-We will describe each part in the following sections by successively specifying the online shop of @b{Running Example}.
+We will describe each part in the following sections by successively specifying the online shop of @ref{Running Example}.
 
 You may comment the contents of the file. A comment is enclosed with curly brackets, i.e. @samp{@{ comment @}}. However, you may not use @samp{@{$ @dots{}  $@}}. This notion is used for debug purposes.
 
-
+@node Places
 @subsection Places
 
 Each open net file starts with the definition of its places. As mentioned above, the set of places is divided into three (pairwise disjoint) parts: internal places (keyword @samp{PLACE}), input places (@samp{INPUT}), and output places (@samp{OUTPUT}).
@@ -198,7 +214,7 @@ The elements of a set of places are separated by comma. Each list ends with a se
 or by simply omitting the keyword @samp{INPUT} and the following @samp{;} completely.
 
 
-@anchor{Initial Marking}
+@node Initial Marking
 @subsection Initial Marking
 
 The @samp{PLACES} section is followed by the @samp{INITIALMARKING} section. Every place which is not listed in the @samp{INITIALMARKING} section is implicitly assumed to have zero tokens initially. If you want to create an initial state in which some places are marked, you have to list exactly those places in the @samp{INITIALMARKING} section. Make sure that you specify the correct number of tokens of each place.
@@ -241,12 +257,17 @@ or
 
 which has the same meaning.
 
-
+@node Final Markings
 @subsection Final Markings
+
+@menu
+* Final markings::
+* Final conditions::
+@end menu
 
 The third section lets you specify one or more final markings. There are two possibilities to define final markings which are described in the following: either @samp{FINALMARKING} or @samp{FINALCONDITION}.
 
-
+@node Final markings
 @subsubsection Final markings
 
 The final marking is specified in the same manner as the initial marking (@pxref{Initial Marking}). The final marking of the online shop is one token on place @sansserif{p9}. All other places of the shop have to contain no token. You can specify this as follows.
@@ -280,7 +301,7 @@ In contrast, specifying
 
 characterizes exactly one final marking which is the unique marking where every place of your net contains no token.
 
-
+@node Final conditions
 @subsubsection Final conditions
 
 You can also use a powerful, implicit characterization of final markings by specifying a @samp{FINALCONDITION} instead of @samp{FINALMARKING}.
@@ -358,15 +379,21 @@ For instance, the final condition
 @end smallexample
 @end cartouche
 
-accepts final markings in which either (a) @samp{p9} contains 1 token and all other places of the shop contain zero tokens, or (b) @samp{p8} contains 1 token and all other places contain zero tokens. That is, the first @samp{ALL_OTHER_PLACES_EMPTY} predicate specifies emptiness of the places @samp{p1}, @dots{}, @samp{p8}, whereas the second one specifies emptiness of @samp{p1}, @dots{}, @samp{p7}, and @samp{p9}.
+accepts final markings in which either (a) @samp{p9} contains 1 token and all other places of
+the shop contain zero tokens, or (b) @samp{p8} contains 1 token and all other places contain
+zero tokens. That is, the first @samp{ALL_OTHER_PLACES_EMPTY} predicate specifies emptiness
+of the places @samp{p1}, @dots{}, @samp{p8}, whereas the second one specifies emptiness of
+@samp{p1}, @dots{}, @samp{p7}, and @samp{p9}.
 
 
-@anchor{Transitions}
+@node Transitions
 @subsection Transitions
 
 The last part of an open net file is an enumeration of the transitions of the net.
 
-Suppose you would like to define transition @samp{?login}, which consumes one token from place @samp{p1} and one token from input place @samp{login} and produces a token on place @samp{p2}. Then you would specify it as follows.
+Suppose you would like to define transition @samp{?login}, which consumes one token from
+place @samp{p1} and one token from input place @samp{login} and produces a token on place @samp{p2}.
+Then you would specify it as follows.
 
 @cartouche
 @smallexample
@@ -376,11 +403,14 @@ Suppose you would like to define transition @samp{?login}, which consumes one to
 @end smallexample
 @end cartouche
 
-By careful by naming each transition of the net. The names have to be unique. That is why we chose to name that transition @samp{t1} with @samp{?login} as a comment only. The net might contain another @samp{?login} transition.
+By careful by naming each transition of the net. The names have to be unique. That is why we
+chose to name that transition @samp{t1} with @samp{?login} as a comment only. The net might
+contain another @samp{?login} transition.
 
-The definition of the set of places from which the transition consumes tokens and to which it produces tokens is again specified as stated in @ref{Initial Marking}.
+The definition of the set of places from which the transition consumes tokens and to which it
+produces tokens is again specified as stated in @ref{Initial Marking}.
 
-
+@node Open Net Specification of the Online Shop
 @subsection Open Net Specification of the Online Shop
 
 The first part of the open net specification of the online shop looks like this.
@@ -418,18 +448,28 @@ The first part of the open net specification of the online shop looks like this.
 @end smallexample
 @end cartouche
 
-
+@node Operating Guidelines
 @section Operating Guidelines
 
-Fiona is able to read a textual representation of an operating guideline stored in a special file format (og-file with extension @samp{.og}). Within an og-file the OG is stored as an annotated graph: every node is annotated with a formula and a color. There exists a distinguished initial node and all nodes are connected by labeled edges (@samp{TRANSITIONS}).
+@menu
+* Operating Guidelines with Global Constraint::
+@end menu
 
+Fiona is able to read a textual representation of an operating guideline stored in a special
+file format (og-file with extension @samp{.og}). Within an og-file the OG is stored as an
+annotated graph: every node is annotated with a formula and a color. There exists a distinguished
+initial node and all nodes are connected by labeled edges (@samp{TRANSITIONS}).
+
+@sp 1
 @center @image{figs/online_shop.owfn.og}
 @sp 1
 @center @b{Figure 2.} Operating Guideline of Online Shop
 @sp 2
 
 Figure 2 shows the operating guideline of the online shop. The following
-specification describes the first part of the og-file of the shop. You can find the text file (@file{docShop.owfn.og}) in the documentation directory of your Fiona distribution. Or, you can easily generate it by having Fiona calculate the operating guideline of the shop.
+specification describes the first part of the og-file of the shop. You can find the text file
+(@file{docShop.owfn.og}) in the documentation directory of your Fiona distribution. Or, you can
+easily generate it by having Fiona calculate the operating guideline of the shop.
 
 @cartouche
 @smallexample
@@ -454,10 +494,13 @@ specification describes the first part of the og-file of the shop. You can find 
 @end smallexample
 @end cartouche
 
-As you take a closer look at the specification you can see that node @samp{21} has an additional attribute --- @samp{finalnode}. So, besides annotating a node with its boolean annotation and its color, you can also declare a node to be a final node of the operating guideline. In the graphics such a node will always be depicted with two surrounding lines.
+As you take a closer look at the specification you can see that node @samp{21} has an additional
+attribute --- @samp{finalnode}. So, besides annotating a node with its boolean annotation and its
+color, you can also declare a node to be a final node of the operating guideline. In the graphics
+such a node will always be depicted with two surrounding lines.
 
 
-
+@node Operating Guidelines with Global Constraint
 @subsection Operating Guidelines with Global Constraint
 
 
@@ -519,7 +562,7 @@ specified. For example, node @samp{18} covers nodes @samp{p2}, @samp{p3}, and @s
 open net @math{N}.
 
 
-
+@node Adapter Rules
 @section Adapter Rules
 
 One of the analysis scenarios of Fiona is to generate an adapter which functions as a mediator
@@ -568,6 +611,7 @@ specifies that message @samp{B} may be deleted by the adapter. The following rul
 @end cartouche
 
 
+@node Covering Open Net Nodes
 @section Covering Open Net Nodes
 
 Fiona can compute those behaviorally compatible partners @math{M} for an open net @math{N} such
@@ -600,7 +644,16 @@ have the following file (@file{docShop.owfn.cov}).
 @node How to Use Fiona
 @chapter How to Use Fiona
 
-Fiona can be used in a broad range of service analysis scenarios. Each scenario is invoked by a certain option and Fiona's output and behavior can then be modified by various other options. Type
+@menu
+* Main Analysis Scenarios::
+* Further Analysis Scenarios::
+* Preprocessing and Conversions::
+* More Options::
+@end menu
+
+Fiona can be used in a broad range of service analysis scenarios. Each scenario
+is invoked by a certain option and Fiona's output and behavior can then be modified
+by various other options. Type
 
 @cartouche
 @smallexample
@@ -618,12 +671,15 @@ fiona -- version
 
 Fiona will print out the complete version information.
 
-In the following Sect. @b{subsec:mainAnalysisScenarios} we describe the main analysis scenarios for which Fiona can be used. In Sect. @b{subsec:furtherAnalysisScenarios} we briefly describe other analysis scenarios and in Sect. @b{subsec:moreOptions} we show the options that can be used to trigger the analysis tasks and/or to modify the output of Fiona.
+In the following @ref{Main Analysis Scenarios} we describe the main analysis scenarios
+for which Fiona can be used. In @ref{Further Analysis Scenarios} we briefly describe
+other analysis scenarios, in @ref{Preprocessing and Conversions} and @ref{More Options}
+we show the options that can be used to trigger the analysis tasks and/or to modify the output of Fiona.
 
-
+@node Main Analysis Scenarios
 @section Main Analysis Scenarios
 
-Suppose the online shop of Sect. @b{s:runningExample} is stored in file @file{docShop.owfn} in directory @file{doc}.
+Suppose the online shop of @ref{Running Example} is stored in file @file{docShop.owfn} in directory @file{doc}.
 
 @itemize
 @item @b{Controllability.} You would now like to check if the online shop is controllable or not. So, you type
@@ -640,7 +696,7 @@ a graphic file showing the IG in directory @file{doc}. The graphics is generated
 (available at @url{http://www.graphviz.org}).
 
 Depending on the size of the given open net, it may take some time for Fiona to build up the IG.
-So, it is advisable to have Fiona build up a reduced interaction graph [Weinberg_2008_wsfm]. In
+So, it is advisable to have Fiona build up a reduced interaction graph [2]. In
 general, the resulting graph is significantly smaller than the complete IG and thus it takes less
 time to compute it and it consumes less memory as it is constructed. Type
 
@@ -701,7 +757,7 @@ fiona -t mostpermissivepartner doc/docShop.owfn
 The partner open net is then modeled as an open net and you will find the corresponding file @file{docShop-partner.owfn} in directory @file{doc}. Fiona generates the open net with the help of the tool Petrify (available at @url{http://www.lsi.upc.es/~jordicf/petrify/distrib/home.html}).
 @end itemize
 
-
+@node Further Analysis Scenarios
 @section Further Analysis Scenarios
 
 In this section we describe further analysis scenarios.
@@ -717,7 +773,7 @@ fiona -t pv doc/docShop.owfn
 
 Afterwards, you will find a file @file{docShop.pv.owfn} that specifies the public view of the shop in directory @file{doc}. Further, Fiona generates a graphics that shows the open net of the public view.
 
-@item @b{Substitutability.} We distinguish different notions of substitutability [StahlMB2008_hub_tr222]: @dfn{accordance} and @dfn{equivalence}. Suppose you have modeled a new online shop and stored it in file @file{myNets/myShop.owfn}. Now you would like to check whether the online shop of Sect. @b{s:runningExample} can be substituted by your online shop. Here, you have two options. You use Fiona to check whether the set of compatible partners of your online shop is a subset of the set of partners of the documentation online shop. To check this property, type
+@item @b{Substitutability.} We distinguish different notions of substitutability [5]: @dfn{accordance} and @dfn{equivalence}. Suppose you have modeled a new online shop and stored it in file @file{myNets/myShop.owfn}. Now you would like to check whether the online shop of  @ref{Running Example} can be substituted by your online shop. Here, you have two options. You use Fiona to check whether the set of compatible partners of your online shop is a subset of the set of partners of the documentation online shop. To check this property, type
 
 @cartouche
 @smallexample
@@ -739,11 +795,11 @@ Here, the order of the given nets does not matter. But again, Fiona expects og-f
 
 @item @b{Adapter generation.} Suppose, in addition to the online shop you have given the model of a
 customer as an owfn-file. You know that both nets are @i{not} behaviorally compatible. Further, you
-have specified an adapter rule file @file{rules.ar} (see Sect. @b{subsec:adapterRules}) which
+have specified an adapter rule file @file{rules.ar} (@pxref{Adapter Rules}) which
 defines certain message mappings. Then, you can use Fiona to synthesize a partner that functions as
 an adapter for both nets. If such a partner exists, it mediates between both nets. Thus, the
 composition of all three nets is well-behaving by construction. For more details see
-[GierdsMW_2008_tr_cs0208]. Invoke Fiona as follows.
+[6]. Invoke Fiona as follows.
 
 @cartouche
 @smallexample
@@ -771,8 +827,8 @@ extended notion of an operating guideline, an operating guideline with global co
 extended notion consists of the operating guideline @math{OG_N} and a global constraint @math{\psi}
 over the nodes of @math{OG_N}. Thereby @math{\psi} specifies which nodes of @math{OG_N} must be
 contained in the matching relation of a partner and the operating guideline. For more details see
-[StahlW_2008_BPM]. To compute an operating guideline with global constraint, you need to specify
-the set of nodes of @math{N} to be covered (here: docShop.owfn.cov). Invoke Fiona as follows.
+[9]. To compute an operating guideline with global constraint, you need to specify
+the set of nodes of @math{N} to be covered (here: @file{docShop.owfn.cov}). Invoke Fiona as follows.
 
 @cartouche
 @smallexample
@@ -788,7 +844,7 @@ fiona -t og -p cover -s coverall doc/docShop.owfn
 @end smallexample
 @end cartouche
 
-Fiona shows you which places and transitions of @math{N} are covered in each node of the operating
+Fiona prints out which places and transitions of @math{N} are covered in each node of the operating
 guideline. In order to check whether a given open net @math{M} is a behaviorally compatible partner
 of @math{N} that covers the specified set of places and transitions invoke Fiona as follows.
 
@@ -800,7 +856,7 @@ fiona -t match -p cover doc/docShop.owfn myNets/covernet.owfn
 
 @end itemize
 
-
+@node Preprocessing and Conversions
 @section Preprocessing and Conversions
 
 We will now describe the options that either preprocess or convert a given input file.
@@ -815,35 +871,26 @@ fiona -t <parameter> FILES
 
 Again, depending on the @samp{parameter} the variable @samp{FILES} stands for an open net, an operating guideline or a set of open nets or operating guidelines. The @samp{parameter} may be any of the following.
 
-@c \begin{longtable}{lp{150pt}p{55pt}}
-@c \hline
-@c @code{<parameter>}& description & @code{FILES} \\
-@c \hline
-@c @code{minimizeOG }& minimizes a given OG & og-file\\
-@c \hline
-@c @code{reduce }& structurally reduce a given open net (choose reduction level using parameter @code{r1} ... @code{r5})& owfn-file\\
-@c \hline
-@c @code{normalize }& normalize all given open nets & owfn-file \\
-@c \hline
-@c @code{isacyclic }& check a given OG for cycles & og-file \\
-@c \hline
-@c @code{count }& count the number of services that are characterized by a given OG & og-file \\
-@c \hline @code{checkfalsenodes }& look for nodes that violate their own annotation in
-@c a given OG & og-file\\
-@c \hline @code{removefalsenodes }& remove all nodes that violate their own annotation
-@c in a given OG & og-file\\
-@c \hline
-@c @code{png }& generate png file of given open net & owfn-file\\
-@c \hline
-@c \end{longtable}
+@multitable @columnfractions .20 .55 .25
+@headitem @option{<parameter>} @tab description @tab @code{FILES}
+@item @code{minimizeOG }@tab minimizes a given OG @tab og-file
+@item @code{reduce }@tab structurally reduce a given open net (choose reduction level using parameter @code{r1} ... @code{r5})@tab owfn-file
+@item @code{normalize }@tab normalize all given open nets @tab owfn-file
+@item @code{isacyclic }@tab check a given OG for cycles @tab og-file
+@item @code{count }@tab count the number of services that are characterized by a given OG @tab og-file
+@item @code{checkfalsenodes }@tab look for nodes that violate their own annotation in a given OG @tab og-file
+@item @code{removefalsenodes }@tab remove all nodes that violate their own annotation in a given OG @tab og-file
+@item @code{png }@tab generate png file of given open net @tab owfn-file
+@end multitable
+@sp 1
 
-
+@node More Options
 @section More Options
 
 Fiona provides different options to modify the output, to speed up the computation or to control the analysis tasks, for instance. In the following we will briefly describe every option.
 
 @itemize
-@item @b{Set message maximum.} Set the maximum number of same messages per state to @samp{<level>} (in [LohmannMW2007_atpn] this value is called @dfn{message bound}).
+@item @b{Set message maximum.} Set the maximum number of same messages per state to @samp{<level>} (in [3] this value is called @dfn{message bound}).
 
 Option: @samp{--messagemaximum = <level>} or @samp{-m <level>}
 
@@ -862,26 +909,17 @@ Option: @option{--reduce-nodes} or @option{-R}
 Option: @option{--show = <parameter>} or @option{-s <parameter>}
 
 Parameters:
-@c \begin{quote}
-@c \begin{longtable}{lp{200pt}}
-@c \hline @option{<parameter>} & description \\
-@c \hline \hline
-@c @code{allnodes }& show all nodes of the graph\\
-@c \hline
-@c @code{blue }& show blue nodes only (default)\\
-@c \hline
-@c @code{rednodes }& show blue and red nodes (no empty node and no black nodes)\\
-@c \hline
-@c @code{empty }& show empty node\\
-@c \hline
-@c @code{allstates }& show all calculated states per node\\
-@c \hline
-@c @code{deadlocks }& show all but transient states\\
-@c \hline
-@c @code{coverall }& shows all covered open net nodes per OG node (only if @file{-p cover} is used)\\
-@c \hline
-@c \end{longtable}
-@c \end{quote}
+@multitable @columnfractions .15 .85
+@headitem @option{<parameter>} @tab description
+@item @code{allnodes }@tab show all nodes of the graph
+@item @code{blue }@tab show blue nodes only (default)
+@item @code{rednodes }@tab show blue and red nodes (no empty node and no black nodes)
+@item @code{empty }@tab show empty node
+@item @code{allstates }@tab show all calculated states per node
+@item @code{deadlocks }@tab show all but transient states
+@item @code{coverall }@tab shows all covered open net nodes per OG node (only if @file{-p cover} is used)
+@end multitable
+@sp 1
 
 @item @b{BDD Construction.} An operating guideline can be represented with BDDs. Here, the BDD is created after the operating guideline has been calculated. The argument @samp{<reordering>} specifies the type of reodering that is used.
 
@@ -911,7 +949,7 @@ Option: @option{--BDD=<reordering>} or @option{-b <reordering>}
 @item 20 @tab @code{CUDD_REORDER_LAZY_SIFT}
 @item 21 @tab @code{CUDD_REORDER_EXACT}
 @end multitable
-
+@sp 1
 
 @item @b{On the Fly BDD Construction.} An operating guideline can also be calculated as BDDs on the fly.
 
@@ -932,7 +970,7 @@ Option: @option{--no-output} or @option{-Q}
 Option: @option{--parameter=<parameter> } or @option{-p <parameter>}
 
 Parameters:
-@multitable @columnfractions .15 .85
+@multitable @columnfractions .13 .60
 @headitem @code{<parameter>} @tab description
 @item @code{no-png} @tab does not create a PNG file
 @item @code{no-dot} @tab does not create dot related output
@@ -949,22 +987,19 @@ Option: @option{--debug=<level>} or @option{-d <level>}
 
 Here the parameter @samp{level} may be any of the following values, depending on the degree of detailed information you wish Fiona to output.
 
-@c \begin{quote}
-@c \begin{tabular}{cp{220pt}}
-@c \hline @code{<level>} & description \\
-@c \hline
-@c @code{1} & show nodes and dfs information\\
-@c \hline
-@c @code{2} & show analysis information (i.e. colors)\\
-@c \hline
-@c @code{3} & show information on events and states \\
-@c \hline
-@c @code{4} & yet to be defined ;) \\
-@c \hline
-@c @code{5} & show detailed information on everything\\
-@c \hline
-@c \end{tabular}
-@c \end{quote}
+@multitable @columnfractions .10 .60
+@headitem @code{<level>} @tab description
+@item @code{1} @tab show nodes and dfs information
+@item
+@item @code{2} @tab show analysis information (i.e. colors)
+@item
+@item @code{3} @tab show information on events and states
+@item
+@item @code{4} @tab yet to be defined ;)
+@item
+@item @code{5} @tab show detailed information on everything
+@end multitable
+@sp 1
 
 The debug compilation of Fiona is not optimized to reach a high-performance. If you would like your Fiona compilation to work better with respect to time, then you should configure it as follows:
 
@@ -1040,41 +1075,136 @@ Stahl, C., Wolf, K.: Covering Places and Transitions in Open Nets. In: BPM 2008.
 @node First Steps
 @chapter First Steps
 
-@section Setup and Installation
+@menu
+* How to Get Fiona::
+* How to Build Fiona::
+* Software Dependencies::
+* Testing Your Compilation::
+* Further Make Targets::
+* Contents of the Distribution::
+@end menu
 
-@enumerate
-@item Go to @url{http://service-technology.org/files/fiona} and download the latest release version of Fiona, say @file{fiona-@value{VERSION}.tar.gz}. To setup and compile Fiona, change into your download directory and type
+
+@node How to Get Fiona
+@section How to Get Fiona
+
+
+You can download the latest stable release of Fiona at
+
+@url{http://service-technology.org/files/fiona}.
+
+A nightly build of the most current (possibly unstable) version of Fiona is available at
+
+@url{http://www.informatik.uni-rostock.de/~nl/cc}.
+
+The Fiona project is hosted by @url{Gna.org}. Fiona's Subversion (SVN) repository can be
+checked out through anonymous access over the SVN protocol (TCP 3690), or over http. Depending on
+your network configuration you may prefer to use one or the other.
+
+For checking out using the SVN protocol (TCP 3690), type
 
 @cartouche
 @smallexample
-tar xfz fiona-@value{VERSION}.tar.gz
-cd fiona-@value{VERSION}
+svn co svn://svn.gna.org/svn/service-tech/trunk/fiona
+@end smallexample
+@end cartouche
+
+or, if you prefer to use http, type
+
+@cartouche
+@smallexample
+svn co http://svn.gna.org/svn/service-tech/trunk/fiona
+@end smallexample
+@end cartouche
+@sp 2
+
+
+The distribution of Fiona was created using the GNU autotools. Detailed information on how to
+build and install Fiona can be found in the file @file{INSTALL} in the root directory of
+Fiona. If you are familiar with the setup and installation procedure of any GNU tool or you
+already have a binary of Fiona you may skip the rest of this section.
+
+
+@node How to Build Fiona
+@section How to Build Fiona
+
+@menu
+* Preparing the SVN Respository::
+* Preparing the tar-ball Distribution::
+* Building Fiona::
+@end menu
+
+The steps of how to build Fiona depend on whether you downloaded a tar-ball containing the
+current version of Fiona or whether you checked out the SVN repository.
+
+@node Preparing the SVN Respository
+@subsection Preparing the SVN Respository
+
+Fiona was created using the GNU autotools. So, in order to install Fiona you need to do the
+following steps. Successively type
+
+@cartouche
+@smallexample
+aclocal
+autoconf
+autoheader
+automake -a -c
+@end smallexample
+@end cartouche
+
+Alternatively, you can also type
+
+@cartouche
+@smallexample
+autoreconf -i
+@end smallexample
+@end cartouche
+
+which will do the steps mentioned above for you.
+
+
+@node Preparing the tar-ball Distribution
+@subsection Preparing the tar-ball Distribution
+
+After successful download of Fiona, version @value{VERSION}, change into your download directory and
+type
+
+
+@cartouche
+@smallexample
+tar xfz fiona-\release.tar.gz
+cd fiona-\release
+@end smallexample
+@end cartouche
+
+
+@node Building Fiona
+@subsection Building Fiona
+
+Once you have finished with the steps described above, you will find a file called
+@file{configure} in your Fiona directory. Run the configure shell script by entering
+
+@cartouche
+@smallexample
 ./configure
+@end smallexample
+@end cartouche
+
+
+which attempts to guess correct values for various system dependent variables used during
+compilation and creates a @file{Makefile} in each directory of the package. Then, to build
+the sources, enter
+
+@cartouche
+@smallexample
 make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/fiona} is generated.@footnote{On Microsoft Windows, the file will be called @file{fiona.exe}.} If you experience any compiler warnings, don't panic: Fiona contains some generated or third party code that we cannot influence.
-
-@item To test whether everything went fine, type
-
-@cartouche
-@smallexample
-make check
-@end smallexample
-@end cartouche
-
-to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
-
-@smallexample
-===================
-All 20 tests passed
-===================
-@end smallexample
-
-If an error occurs, please send the output to @email{fiona@@service-technology.org}.
-
-@item To install the binary, the manpage, and the documentation, type
+After compilation, a binary @file{src/fiona}@footnote{Under Windows the binary is called
+@file{fiona.exe}} is generated. If you experience any compiler warnings, don't worry:
+Fiona contains some generated or third party code that is not under our control. To install the
+binary, type
 
 @cartouche
 @smallexample
@@ -1083,11 +1213,122 @@ make install
 @end cartouche
 
 You might need superuser permissions to do so.
-@end enumerate
 
-If you need any further information, see file @file{INSTALL} for detailed instructions.
+If you wish to fully delete Fiona from your system, type
+
+@cartouche
+@smallexample
+make uninstall
+@end smallexample
+@end cartouche
+
+Afterwards you just have to delete the directory of your Fiona distribution/ installation. Then
+there should be no trace leading to Fiona on your system anymore.
+
+The setup and installation procedure can be customized by running @file{./configure} with several
+command-line options. Type
+
+@cartouche
+@smallexample
+./configure --help
+@end smallexample
+@end cartouche
 
 
+for more information.
+
+
+@node Software Dependencies
+@section Software Dependencies
+
+
+In order to compile Fiona correctly and to use the whole functionality of Fiona please make
+sure that the following software is installed on your machine.
+
+@itemize
+@item CygWin (@url{http://cygwin.com/}) (for Windows users only)
+@item in case you checked out our SVN repository, you will need
+  @itemize
+    @item autoconf (@url{http://www.gnu.org/software/autoconf/}) and
+    @item automake (@url{http://www.gnu.org/software/automake/})
+    @item Flex (@url{http://flex.sourceforge.net/})
+    @item Bison (@url{http://www.gnu.org/software/bison/})
+  @end itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item Graphviz dot (@url{http://www.graphviz.org/}) to automatically create PNG files
+@item petrify (@url{http://www.lsi.upc.edu/~jordicf/petrify/})\minus only needed for partner synthesis
+@item CUDD (@url{http://vlsi.colorado.edu/~fabio/CUDD/}) for creating
+        Binary Decision Diagrams (BDD) (the CUDD package is already part of the Fiona distribution)
+@end itemize
+
+
+@node Testing Your Compilation
+@section Testing Your Compilation
+
+
+The distribution of Fiona provides an extensive testsuite. In the directory called
+@file{tests} you can find script files (@file{*.sh}) which define a set of tests that
+correspond to certain functionalities of Fiona. The input files of each such test script are
+located in a directory within the @file{tests} directory that has the same name as the script.
+
+In order to test whether your Fiona compilation works well on your system there are special make
+targets. The command
+
+@cartouche
+@smallexample
+> make check
+@end smallexample
+@end cartouche
+
+
+initiates Fiona to perform a number of self-tests: the test scripts (@file{<test>.sh}) are
+successively invoked. Type
+
+@cartouche
+@smallexample
+> make check-<test>
+@end smallexample
+@end cartouche
+
+
+to invoke a single test script @file{<test>.sh} in the @file{tests} directory. For instance,
+@file{make check-samples} calls the script @file{samples.sh}.
+
+
+@node Further Make Targets
+@section Further Make Targets
+
+
+The generated Makefiles of Fiona provide different make targets. To build a Fiona Windows
+executable which is independent of CygWin, type
+
+@cartouche
+@smallexample
+make win32
+@end smallexample
+@end cartouche
+
+To build a 64 bit executable of Fiona, type
+
+@cartouche
+@smallexample
+make 64bit
+@end smallexample
+@end cartouche
+
+
+In case you use the Fiona distribution from our SVN repository and you update the files rather
+frequently, then it is advisable to clean up your current compilation before compiling it again.
+Fiona provides a special make target that removes all generated files from your system. Type
+
+@cartouche
+@smallexample
+make clean
+@end smallexample
+@end cartouche
+
+
+@node Contents of the Distribution
 @section Contents of the Distribution
 
 The distribution contains several directories:
@@ -1096,44 +1337,19 @@ The distribution contains several directories:
 @item doc
 The Texinfo documentation of Fiona. The documentation can be created using @samp{make pdf}.
 
-@item exp
-Experiments and case studies published in several papers. For each file, say @file{bpm2008.tar.gz}, a Makefile target @samp{bpm2008} exists. You can run all experiments with @samp{make experiments}.
-
 @item man
 The manpage of Fiona which can be displayed using @samp{man fiona} after having Fiona installed (see Installation description above).
-
-@item maintainer
-Some scripts for maintainers of Fiona which can be used to create and distribute releases.
 
 @item src
 The source code of Fiona.
 
 @item tests
 Testcases for Fiona which check the generated binary.
+
+@item nets
+Some example open nets in the open net file format.
+
 @end table
-
-
-
-
-@c --------------------------------------------------------------------------
-
-
-@node Command Line Options
-@chapter Invoking Fiona
-
-Fiona is a command line tool and does not come with a fancy GUI. However, Fiona can be easily scripted and combined with other tools.
-
-@section Command Line Options
-
-For an overview of the command line options, type @samp{fiona -h} to see the following help screen:
-
-@smallexample
-todo
-@end smallexample
-
-
-
-
 
 
 @c --------------------------------------------------------------------------

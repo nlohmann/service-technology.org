@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -148,7 +148,7 @@ void readnet(const std::string& owfnfile) {
     }
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
-        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
         exit(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
@@ -188,7 +188,7 @@ void readnet(const std::string& owfnfile) {
     // doesn't work with, since array for input and output places
     // depend on the order of the Places array, reordering results in
     // a heavy crash
-    
+
     TRACE(TRACE_1, "reading from file " + owfnfile + " finished.\n");
 }
 
@@ -223,7 +223,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
-        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
         exit(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph();
@@ -276,7 +276,7 @@ void reportOptionValues() {
     }
 
     // max_occurrence is set for each input/output place of the net in the owfn file
-    // syntax in the owfn file: 
+    // syntax in the owfn file:
     //      abort {$ MAX_OCCURRENCES = 2 $}
     // (use -1 for unbounded occurrence)
     TRACE(TRACE_5, "-E option found: ");
@@ -285,14 +285,14 @@ void reportOptionValues() {
 
         // store the max occurrence information
         string maxOccurrenceString = "";
-        
+
         // if the max occurrence property of at least one input/output place is set (>0)
         // then the maxOccurenceString will be shown
         bool showMaxOccurrences = false;
-        
+
         maxOccurrenceString += "considering the following events:\n";
         maxOccurrenceString += "    sending events:\n";
-        
+
         for (unsigned int e = 0; e < PN->getInputPlaceCount(); e++) {
             maxOccurrenceString += "        !" + string(PN->getInputPlace(e)->name);
             if (PN->getInputPlace(e)->max_occurrence >= 0) {
@@ -302,7 +302,7 @@ void reportOptionValues() {
                 maxOccurrenceString += " (unbounded)\n";
             }
         }
-        
+
         maxOccurrenceString += "    receiving events:\n";
         for (unsigned int e = 0; e < PN->getOutputPlaceCount(); e++) {
             maxOccurrenceString += "        ?" + string(PN->getOutputPlace(e)->name);
@@ -313,9 +313,9 @@ void reportOptionValues() {
                 maxOccurrenceString += " (unbounded)\n";
             }
         }
-        
+
         maxOccurrenceString += "\n";
-        
+
         // is there at least one input/output place for which the max_occurrence property is set,
         // then show the whole maxOccurrenceString
         // otherwise discard the maxOccurrenceString
@@ -372,7 +372,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
-        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        TRACE(TRACE_0, "Error: A file error occured. Exit.");
         exit(EC_FILE_ERROR);
     }
 
@@ -404,7 +404,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
 //! \param a title for the dot file
 void createOutputFiles(AnnotatedGraph* graph, string prefix, string dotFileTitle) {
     if (!parameters[P_NODOT]) {
-        
+
         string dotFileName = graph->createDotFile(prefix, dotFileTitle); // .out
 
         if (!parameters[P_NOPNG] && dotFileName != "") {
@@ -438,7 +438,7 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
 
     // generate output files
     if (!options[O_NOOUTPUTFILES]) {
-        
+
         if (!parameters[P_NODOT]) {
 
             string title = "Public view of ";
@@ -447,7 +447,7 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
             if (!parameters[P_NOPNG] && dotfile != "") {
                 pv->createPNGFile(outfilePrefix, dotfile);
             }
-        
+
         }
 
         //transform to owfn
@@ -467,7 +467,7 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
             exit(EC_FILE_ERROR);
         }
         (output) << (*PVoWFN);
@@ -475,7 +475,7 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
 
         trace("\n=================================================================\n");
         trace("\n");
-        
+
     }
 
 }
@@ -506,24 +506,24 @@ Graph* computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN, bo
 
     trace("\n");
 
-    
-    AnnotatedGraph* annotatedPV; // This public view will be copied into a graph object later. 
+
+    AnnotatedGraph* annotatedPV; // This public view will be copied into a graph object later.
 
     // If the keepOG parameter is true, create a copy of the OG.
     // If not, simply work on the given OG.
     if (keepOG) {
         annotatedPV = new AnnotatedGraph(); // Create a new object as destination for the deep copy.
-        OG->toAnnotatedGraph(annotatedPV);  // Perform deep copy.   
+        OG->toAnnotatedGraph(annotatedPV);  // Perform deep copy.
     } else {
         annotatedPV = OG;                   // Work on the given OG.
     }
 
     // Transformation into a Public View.
     // The pv object will be transformed - i.e. either the given OG or
-    // a deep copy. 
+    // a deep copy.
     annotatedPV->transformToPV(fromOWFN);
 
-    // Transform the AnnotatedGraph object annotatedPV into a Graph. 
+    // Transform the AnnotatedGraph object annotatedPV into a Graph.
     Graph* pv = new Graph();       // Create a new object as destination for the copy.
     annotatedPV->toGraph(pv);               // Perform copy to Graph - getting rid of annotations.
 
@@ -535,7 +535,7 @@ Graph* computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN, bo
 
     // Return the Graph pointer.
     return pv;
-    
+
 }
 
 
@@ -1021,9 +1021,9 @@ void computeProductOG(const AnnotatedGraph::ogs_t& OGsFromFiles) {
 
         // the second parameter is false, since this OG has no underlying oWFN
         productOG->createOGFile(outfilePrefix, false);
-        
+
         createOutputFiles(productOG, outfilePrefix, AnnotatedGraph::addOGFileSuffix(outfilePrefix));
-        
+
         trace("\n");
     }
 
@@ -1399,10 +1399,10 @@ void makePNG(oWFN* PN) {
         // check whether the stream was succesfully created
         if (!out->is_open()) {
             trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
-           TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+           TRACE(TRACE_0, "Error: A file error occured. Exit.");
            exit(EC_FILE_ERROR);
         }
-        
+
 
         // create the dot and write it to the file
         (*out) << (*PNapiNet);
@@ -1482,7 +1482,7 @@ void reduceOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
             exit(EC_FILE_ERROR);
         }
         (output) << (*PNapiNet);
@@ -1532,7 +1532,7 @@ oWFN* normalizeOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(), ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+            TRACE(TRACE_0, "Error: A file error occured. Exit.");
             exit(EC_FILE_ERROR);
         }
 
@@ -1656,7 +1656,7 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
 
 int main(int argc, char** argv) {
-    
+
     // print debug information about system variables, the current compilation
     // in case of unusal behavior of Fiona, with this information it might be easier to track down
     // the bug(s)
@@ -1677,8 +1677,8 @@ int main(int argc, char** argv) {
         printf("\n\n");
         exit(EXIT_SUCCESS);
     }
-    
-    
+
+
     // [LUHME XV] IFDEF ueberpruefen
     // [LUHME XV] Jans New-Handler
     set_new_handler(&myown_newhandler);

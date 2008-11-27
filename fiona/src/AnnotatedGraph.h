@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -56,7 +56,7 @@
 /// when counting nodes/edges/states and blue nodes/blue edges
 /// we need to remember that we have visited a node already and if
 /// we have counted the node as a blue node or not
-/// (we may reach a blue node from a red path and later on from a blue path!) 
+/// (we may reach a blue node from a red path and later on from a blue path!)
 enum typeOfVisit {
 	VISITED_COUNTED_AS_BLUE,	/// node has been visited and counted as blue
 	VISITED_NOT_COUNTED			/// node has been visited but not (yet) counted
@@ -66,9 +66,9 @@ class AnnotatedGraph : public Graph {
 
 	// private enumeration
 	private:
-		
+
 		typedef typeOfVisit t_typeOfVisit;
-	
+
     // Public Typedefs
     public:
 
@@ -83,10 +83,10 @@ class AnnotatedGraph : public Graph {
 
         /// Type of the predecessor map
         typedef std::map< AnnotatedGraphNode*, AnnotatedGraphNode::LeavingEdges > predecessorMap;
-        
+
         string getSuffix() const;
 
-    // Protected Methods and typedefs    
+    // Protected Methods and typedefs
     protected:
 
         /// Iterator types for nodes
@@ -141,7 +141,7 @@ class AnnotatedGraph : public Graph {
 
         /// remove a node from the annotated graph
         virtual void removeNode(AnnotatedGraphNode*);
-        
+
         /// Public View Generation only:
         /// constructs the dual service, by transforming all sending
         /// events into receiving events and vice versa
@@ -162,19 +162,19 @@ class AnnotatedGraph : public Graph {
 public:
 // CODE FROM PL
         /// Public View Generation only:
-        /// Transforms this OG to a Public View.  
-        /// WARNING: This directly changes the object itself, no copy is made. 
+        /// Transforms this OG to a Public View.
+        /// WARNING: This directly changes the object itself, no copy is made.
         void transformToPV(bool fromOWFN);
 // END OF CODE FROM PL
-        
+
 
         /// Makes a deep copy of the object into another AnnotatedGraph object.
         void toAnnotatedGraph(AnnotatedGraph* destination);
 
         /// Makes a deep copy of the object into a Graph object, losing
         /// additional information like annotations.
-        void toGraph(Graph* destination); 
-        
+        void toGraph(Graph* destination);
+
         // END: NEW PUBLIC VIEW METHODS
 
 protected:
@@ -194,19 +194,23 @@ protected:
         /// Computes the total number of all states stored in all nodes and the
         /// number of all nodes and edges in this graph. Furthermore computes the
         /// number of blue nodes and edges.
-        /// Uses computeNumberOfNodesAndStatesAndEdgesHelper to do a dfs. 
+        /// Uses computeNumberOfNodesAndStatesAndEdgesHelper to do a dfs.
         void computeNumberOfNodesAndStatesAndEdges();
 
         /// Helps computeNumberOfStatesAndEdges to computes the total number of all
         /// states stored in all nodes and the number of all nodes and edges in this graph.
         /// Furthermore computes the number of blue nodes and edges.
         void computeNumberOfNodesAndStatesAndEdgesHelper(AnnotatedGraphNode* v,
-                                                 std::map<AnnotatedGraphNode*, t_typeOfVisit>& visitedNodes, 
+                                                 std::map<AnnotatedGraphNode*, t_typeOfVisit>& visitedNodes,
                                                  bool onABluePath);
 
         /// The total number of all states stored in all nodes in this graph.
         /// Is computed by computeNumberOfStatesAndEdges().
         unsigned int nStoredStates;
+
+        /// The total number of all states stored in blue nodes in this graph.
+        /// Is computed by computeNumberOfStatesAndEdges().
+        unsigned int nStoredStatesBlueNodes;
 
         /// The number of all edges in this graph.
         /// Is computed by computeNumberOfStatesAndEdges().
@@ -220,6 +224,9 @@ protected:
         /// Is computed by computeNumberOfBlueNodesEdges().
         unsigned int nBlueEdges;
 
+        /// Returns the total number of states stored in blue nodes in this
+        /// graph. May only be called after computeGraphStatistics().
+        unsigned int getNumberOfStoredStatesBlueNodes() const;
 
         /// Returns the total number of all states stored in all nodes in this
         /// graph. May only be called after computeGraphStatistics().
@@ -314,13 +321,13 @@ protected:
 
         /// removes all nodes that are always false
         virtual void removeReachableFalseNodes();
-        
+
         /// removes all nodes that are always false
         virtual void removeReachableFalseNodesRecursively(set<AnnotatedGraphNode*>& candidates, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes);
-        
+
         /// removes all nodes that are always false
         virtual void removeReachableFalseNodesInit(AnnotatedGraphNode* currentNode, set<AnnotatedGraphNode*>& redNodes, map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >& parentNodes, set<AnnotatedGraphNode*>& visitedNodes);
-        
+
         /// removes all nodes that have been disconnected from the root
         /// node due to other node removals
         void removeUnreachableNodes();
@@ -357,7 +364,7 @@ protected:
         /// Creates a dot output (.out) of the graph, using a specified title.
         virtual string createDotFile(string& filenamePrefix,
                                      const string& dotGraphTitle) const;
-        
+
         /// Creates an image output (.png) of the graph by calling dot.
 		virtual string createPNGFile(string& filenamePrefix,
                          		     string& dotFileName) const;
@@ -367,10 +374,10 @@ protected:
                          		              string& dotFileName) const;
 
 
-        /// Creates an og output file (.og) of the graph. 
+        /// Creates an og output file (.og) of the graph.
         string createOGFile(const string& filenamePrefix, bool hasOWFN) const;
 
-        /// Adds the suffix for OG files to the given file name prefix, 
+        /// Adds the suffix for OG files to the given file name prefix,
         /// simply adds ".og" to the given string.
         static string addOGFileSuffix(const std::string& filePrefix);
 

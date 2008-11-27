@@ -871,16 +871,16 @@ fiona -t <parameter> FILES
 
 Again, depending on the @samp{parameter} the variable @samp{FILES} stands for an open net, an operating guideline or a set of open nets or operating guidelines. The @samp{parameter} may be any of the following.
 
-@multitable @columnfractions .20 .55 .25
-@headitem @option{<parameter>} @tab description @tab @code{FILES}
-@item @code{minimizeOG }@tab minimizes a given OG @tab og-file
-@item @code{reduce }@tab structurally reduce a given open net (choose reduction level using parameter @code{r1} ... @code{r5})@tab owfn-file
-@item @code{normalize }@tab normalize all given open nets @tab owfn-file
-@item @code{isacyclic }@tab check a given OG for cycles @tab og-file
-@item @code{count }@tab count the number of services that are characterized by a given OG @tab og-file
-@item @code{checkfalsenodes }@tab look for nodes that violate their own annotation in a given OG @tab og-file
-@item @code{removefalsenodes }@tab remove all nodes that violate their own annotation in a given OG @tab og-file
-@item @code{png }@tab generate png file of given open net @tab owfn-file
+@multitable @columnfractions .022 .22 .60 .25 .022
+@headitem @tab @option{<parameter>} @tab description @tab @code{FILES}
+@item @tab @code{minimizeOG }@tab minimizes a given OG @tab og-file
+@item @tab @code{reduce }@tab structurally reduce a given open net (choose reduction level using parameter @code{r1} ... @code{r5})@tab owfn-file
+@item @tab @code{normalize }@tab normalize all given open nets @tab owfn-file
+@item @tab @code{isacyclic }@tab check a given OG for cycles @tab og-file
+@item @tab @code{count }@tab count the number of services that are characterized by a given OG @tab og-file
+@item @tab @code{checkfalsenodes }@tab look for nodes that violate their own annotation in a given OG @tab og-file
+@item @tab @code{removefalsenodes }@tab remove all nodes that violate their own annotation in a given OG @tab og-file
+@item @tab @code{png }@tab generate png file of given open net @tab owfn-file
 @end multitable
 @sp 1
 
@@ -909,45 +909,45 @@ Option: @option{--reduce-nodes} or @option{-R}
 Option: @option{--show = <parameter>} or @option{-s <parameter>}
 
 Parameters:
-@multitable @columnfractions .15 .85
-@headitem @option{<parameter>} @tab description
-@item @code{allnodes }@tab show all nodes of the graph
-@item @code{blue }@tab show blue nodes only (default)
-@item @code{rednodes }@tab show blue and red nodes (no empty node and no black nodes)
-@item @code{empty }@tab show empty node
-@item @code{allstates }@tab show all calculated states per node
-@item @code{deadlocks }@tab show all but transient states
-@item @code{coverall }@tab shows all covered open net nodes per OG node (only if @file{-p cover} is used)
+@multitable @columnfractions .022 .17 .70 .022
+@headitem @tab @option{<parameter>} @tab description
+@item @tab @code{allnodes }@tab show all nodes of the graph
+@item @tab @code{blue }@tab show blue nodes only (default)
+@item @tab @code{rednodes }@tab show blue and red nodes (no empty node and no black nodes)
+@item @tab @code{empty }@tab show empty node
+@item @tab @code{allstates }@tab show all calculated states per node
+@item @tab @code{deadlocks }@tab show all but transient states
+@item @tab @code{coverall }@tab shows all covered open net nodes per OG node (only if @file{-p cover} is used)
 @end multitable
 @sp 1
 
 @item @b{BDD Construction.} An operating guideline can be represented with BDDs. Here, the BDD is created after the operating guideline has been calculated. The argument @samp{<reordering>} specifies the type of reodering that is used.
 
 Option: @option{--BDD=<reordering>} or @option{-b <reordering>}
-@multitable @columnfractions .15 .85
-@headitem @code{<reordering>} @tab Command
-@item 0  @tab @code{CUDD_REORDER_SAME}
-@item 1  @tab @code{CUDD_REORDER_NONE}
-@item 2  @tab @code{CUDD_REORDER_RANDOM}
-@item 3  @tab @code{CUDD_REORDER_RANDOM_PIVOT}
-@item 4  @tab @code{CUDD_REORDER_SIFT}
-@item 5  @tab @code{CUDD_REORDER_SIFT_CONVERGE}
-@item 6  @tab @code{CUDD_REORDER_SYMM_SIFT}
-@item 7  @tab @code{CUDD_REORDER_SYMM_SIFT_CONV}
-@item 8  @tab @code{CUDD_REORDER_WINDOW2}
-@item 9  @tab @code{CUDD_REORDER_WINDOW3}
-@item 10 @tab @code{CUDD_REORDER_WINDOW4}
-@item 11 @tab @code{CUDD_REORDER_WINDOW2_CONV}
-@item 12 @tab @code{CUDD_REORDER_WINDOW3_CONV}
-@item 13 @tab @code{CUDD_REORDER_WINDOW4_CONV}
-@item 14 @tab @code{CUDD_REORDER_GROUP_SIFT}
-@item 15 @tab @code{CUDD_REORDER_GROUP_SIFT_CONV}
-@item 16 @tab @code{CUDD_REORDER_ANNEALING}
-@item 17 @tab @code{CUDD_REORDER_GENETIC}
-@item 18 @tab @code{CUDD_REORDER_LINEAR}
-@item 19 @tab @code{CUDD_REORDER_LINEAR_CONVERGE}
-@item 20 @tab @code{CUDD_REORDER_LAZY_SIFT}
-@item 21 @tab @code{CUDD_REORDER_EXACT}
+@multitable @columnfractions .022 .17 .70 .022
+@headitem @tab @code{<reordering>} @tab Command
+@item @tab 0  @tab @code{CUDD_REORDER_SAME}
+@item @tab 1  @tab @code{CUDD_REORDER_NONE}
+@item @tab 2  @tab @code{CUDD_REORDER_RANDOM}
+@item @tab 3  @tab @code{CUDD_REORDER_RANDOM_PIVOT}
+@item @tab 4  @tab @code{CUDD_REORDER_SIFT}
+@item @tab 5  @tab @code{CUDD_REORDER_SIFT_CONVERGE}
+@item @tab 6  @tab @code{CUDD_REORDER_SYMM_SIFT}
+@item @tab 7  @tab @code{CUDD_REORDER_SYMM_SIFT_CONV}
+@item @tab 8  @tab @code{CUDD_REORDER_WINDOW2}
+@item @tab 9  @tab @code{CUDD_REORDER_WINDOW3}
+@item @tab 10 @tab @code{CUDD_REORDER_WINDOW4}
+@item @tab 11 @tab @code{CUDD_REORDER_WINDOW2_CONV}
+@item @tab 12 @tab @code{CUDD_REORDER_WINDOW3_CONV}
+@item @tab 13 @tab @code{CUDD_REORDER_WINDOW4_CONV}
+@item @tab 14 @tab @code{CUDD_REORDER_GROUP_SIFT}
+@item @tab 15 @tab @code{CUDD_REORDER_GROUP_SIFT_CONV}
+@item @tab 16 @tab @code{CUDD_REORDER_ANNEALING}
+@item @tab 17 @tab @code{CUDD_REORDER_GENETIC}
+@item @tab 18 @tab @code{CUDD_REORDER_LINEAR}
+@item @tab 19 @tab @code{CUDD_REORDER_LINEAR_CONVERGE}
+@item @tab 20 @tab @code{CUDD_REORDER_LAZY_SIFT}
+@item @tab 21 @tab @code{CUDD_REORDER_EXACT}
 @end multitable
 @sp 1
 
@@ -970,14 +970,14 @@ Option: @option{--no-output} or @option{-Q}
 Option: @option{--parameter=<parameter> } or @option{-p <parameter>}
 
 Parameters:
-@multitable @columnfractions .13 .60
-@headitem @code{<parameter>} @tab description
-@item @code{no-png} @tab does not create a PNG file
-@item @code{no-dot} @tab does not create dot related output
-@item @code{r1}--@code{r5} @tab set reduction level in mode @option{-t reduce}
-@item @code{cre} @tab use the ``combine receiving events''---reduction technique to reduce the IG
-@item @code{rbs} @tab use the ``receiving before sending''---reduction technique to reduce the IG
-@item @code{cover} @tab requires @file{-t og} or @file{-t match} and is used for OGs with global constraint
+@multitable @columnfractions .022 .17 .70 .022
+@headitem @tab @code{<parameter>} @tab description
+@item @tab @code{no-png} @tab does not create a PNG file
+@item @tab @code{no-dot} @tab does not create dot related output
+@item @tab @code{r1}--@code{r5} @tab set reduction level in mode @option{-t reduce}
+@item @tab @code{cre} @tab use the ``combine receiving events''---reduction technique to reduce the IG
+@item @tab @code{rbs} @tab use the ``receiving before sending''---reduction technique to reduce the IG
+@item @tab @code{cover} @tab requires @file{-t og} or @file{-t match} and is used for OGs with global constraint
 @end multitable
 @sp 1
 
@@ -987,17 +987,13 @@ Option: @option{--debug=<level>} or @option{-d <level>}
 
 Here the parameter @samp{level} may be any of the following values, depending on the degree of detailed information you wish Fiona to output.
 
-@multitable @columnfractions .10 .60
-@headitem @code{<level>} @tab description
-@item @code{1} @tab show nodes and dfs information
-@item
-@item @code{2} @tab show analysis information (i.e. colors)
-@item
-@item @code{3} @tab show information on events and states
-@item
-@item @code{4} @tab yet to be defined ;)
-@item
-@item @code{5} @tab show detailed information on everything
+@multitable @columnfractions .022 .10 .77 .022
+@headitem @tab @code{<level>} @tab description
+@item @tab @code{1} @tab show nodes and dfs information
+@item @tab @code{2} @tab show analysis information (i.e. colors)
+@item @tab @code{3} @tab show information on events and states
+@item @tab @code{4} @tab yet to be defined ;)
+@item @tab @code{5} @tab show detailed information on everything
 @end multitable
 @sp 1
 

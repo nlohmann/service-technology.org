@@ -562,19 +562,10 @@ void parse_command_line(int argc, char* argv[]) {
                 options[O_SHOW_NODES] = true;
                 if (string(optarg) == "blue") {
                     parameters[P_SHOW_BLUE_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = false;
-                    parameters[P_SHOW_RED_NODES] = false;
-                    parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "empty") {
-                    parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
-                    parameters[P_SHOW_RED_NODES] = false;
-                    parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "rednodes") {
-                    parameters[P_SHOW_BLUE_NODES] = true;
-                    parameters[P_SHOW_EMPTY_NODE] = false;
                     parameters[P_SHOW_RED_NODES] = true;
-                    parameters[P_SHOW_ALL_NODES] = false;
                 } else if (string(optarg) == "allnodes") {
                     parameters[P_SHOW_BLUE_NODES] = true;
                     parameters[P_SHOW_EMPTY_NODE] = true;
@@ -719,6 +710,11 @@ void parse_command_line(int argc, char* argv[]) {
                      << endl;
                 break;
         }
+    }
+
+    // if all kinds of nodes have been chosen to be shown, set all-nodes to true
+    if (parameters[P_SHOW_BLUE_NODES] == true && parameters[P_SHOW_EMPTY_NODE] == true && parameters[P_SHOW_RED_NODES] == true) {
+        parameters[P_SHOW_ALL_NODES] = true;
     }
 
     // IG Reduction - correcting parameters if needed

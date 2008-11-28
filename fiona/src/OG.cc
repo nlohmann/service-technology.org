@@ -167,7 +167,9 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
             (currentEvent->getType() == INPUT &&
              currentEvent->max_occurrence > currentNode->eventsUsedInput[PN->getInputPlaceIndex(currentEvent)]) ||
             (currentEvent->getType() == OUTPUT &&
-             currentEvent->max_occurrence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)])) {
+             currentEvent->max_occurrence > currentNode->eventsUsedOutput[PN->getOutputPlaceIndex(currentEvent)]) ||
+            currentNode->reachGraphStateSet.size() == 0 /* if this is the empty node ignore max occurrences */) {
+
 
             // [LUHME XV] Knoten "v" umbenennen in "newNode"
             // we have to consider this event

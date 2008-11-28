@@ -366,6 +366,12 @@ place: nodeident {
 	P->nrbits = (CurrentCapacity > 0 && logzwo(CurrentCapacity) < 32) ? logzwo(CurrentCapacity) + 1 : 32;
 	// set max_occurrence to default value
 	P->max_occurrence = events_manual;
+
+        // For receiving events increase the max occurence by one in order to reach the empty node
+        if(type == OUTPUT && events_manual != -1) {
+            P->max_occurrence = P->max_occurrence + 1;
+        }
+
 	free($1);
 	if (type == INPUT || type == OUTPUT) {
 		numberOfEvents += events_manual;
@@ -404,6 +410,11 @@ commands:
 		// set max_occurrence to value that was given in oWFN file
 		if (options[O_READ_EVENTS]) {
 			sscanf($3, "%u", &(PS->getPlace()->max_occurrence));
+                        
+                        // For receiving events increase the max occurence by one in order to reach the empty node
+                        if(type == OUTPUT) {
+                            PS->getPlace()->max_occurrence = PS->getPlace()->max_occurrence + 1;
+                        }
 			free($3);
 		}
 //      options[O_EVENT_USE_MAX] = true;

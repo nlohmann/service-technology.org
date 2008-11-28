@@ -31,9 +31,9 @@ result=0
 
 ############################################################################
 
-maxoccurrencesbluenodes_soll=12
-maxoccurrencesblueedges_soll=11
-maxoccurrencesstoredstates_soll=64
+maxoccurrencesbluenodes_soll=16
+maxoccurrencesblueedges_soll=15
+maxoccurrencesstoredstates_soll=73
 
 owfn="$DIR/max_occurrence.owfn"
 cmd="$FIONA $owfn -t OG -m5 -E -e 3"

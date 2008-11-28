@@ -42,13 +42,16 @@ import hub.top.editor.ptnetLoLA.Place;
 
 import java.util.Iterator;
 
+import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.LayeredPane;
 import org.eclipse.draw2d.LayoutListener;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.GraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
@@ -79,7 +82,7 @@ public class PtNetEditPart extends DiagramEditPart {
 	public PtNetEditPart(View view) {
 		super(view);
 	}
-
+	
 	/**
 	 * @generated
 	 */
@@ -96,15 +99,27 @@ public class PtNetEditPart extends DiagramEditPart {
 		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.POPUPBAR_ROLE);
 	}
 
+	public static final String BACKGROUND_LAYERS = "hub.top.editor.petrinets.layers.background";
+	
 	@Override
 	public void activate() {
 
+		// create a new background layer for this diagram
+		LayerManager man = (LayerManager)getRoot();
+		LayeredPane printable = (LayeredPane)man.getLayer(PRINTABLE_LAYERS);
+		FreeformLayer backgroundLayer = new FreeformLayer();
+		// push background to the back of all printable layers
+		printable.add(backgroundLayer,BACKGROUND_LAYERS, 0);
+		
 		NodeFigure borderFig = createBorderFigure();
 
-		// add figure to the background-layer of this diagram, and draw it
+		// add figure to the this diagram, and draw it
 		getFigure().add(borderFig, 0);	
 		borderFig.setParent(getFigure());
 		borderFig.repaint();
+		// add figure to the background layer, must be executed last for
+		// proper positioning
+		backgroundLayer.add(borderFig);		
 		
 		// add a layout-listener that is called whenever a node is
 		// repositioned in this diagram, the layout-listener calculates
@@ -253,6 +268,7 @@ public class PtNetEditPart extends DiagramEditPart {
 					.DPtoLP(25)));
 			this.setFocusTraversable(true);
 			this.setOpaque(false);
+			
 			
 			this.setBorder(new LineBorderNet());
 			

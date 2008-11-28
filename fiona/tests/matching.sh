@@ -35,7 +35,7 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
+        echo $OUTPUT | grep ": YES" > /dev/null
         if [ $? -ne 0 ]; then
             echo ... oWFN does not match with OG although it should
             result=1
@@ -60,9 +60,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -85,9 +85,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -117,9 +117,9 @@ else
         #        reason.
         #    result=1
         #fi
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -144,9 +144,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -171,9 +171,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -198,9 +198,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -225,9 +225,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -250,9 +250,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -277,7 +277,7 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
+        echo $OUTPUT | grep ": YES" > /dev/null
         if [ $? -ne 0 ]; then
             echo ... oWFN does not match with OG although it should
             result=1
@@ -304,7 +304,7 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
+        echo $OUTPUT | grep ": YES" > /dev/null
         if [ $? -ne 0 ]; then
             echo ... oWFN does not match with OG although it should
             result=1
@@ -331,9 +331,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -358,9 +358,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -381,9 +381,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -404,9 +404,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi
@@ -427,9 +427,9 @@ else
     then
         result=1
     else
-        echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+        echo $OUTPUT | grep ": NO" > /dev/null
         if [ $? -ne 0 ]; then
-            echo ... oWFN matches with OG although it should not
+            echo ...  although it should not
             result=1
         fi
     fi

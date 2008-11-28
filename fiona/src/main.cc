@@ -1550,7 +1550,7 @@ oWFN* normalizeOWFN(oWFN* PN) {
 //! \brief match a net against an OG
 //! \param OGToMatch an OG to be matched against an oWFN
 //! \param PN an oWFN to be matched against an OG
-void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
+void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN) {
 
     TRACE(TRACE_5, "void checkMatching(AnnotatedGraph*, oWFN*) : start\n");
 
@@ -1567,24 +1567,27 @@ void checkMatching(AnnotatedGraph* OGToMatch, oWFN* PN) {
         options[O_NOOUTPUTFILES] = temp;
     }
 
-    // use only the labeled core
-    oWFN* coreOWFN = normalOWFN->returnMatchingOWFN();
-
-    // match coreOWFN with given OG
+    // match the oWFN with given OG
     string reasonForFailedMatch;
-    TRACE(TRACE_0, ("matching " + coreOWFN->filename + " with " + (OGToMatch->getFilename())+ "...\n\n"));
-    if ( coreOWFN->matchesWithOG(OGToMatch, reasonForFailedMatch) ) {
-        TRACE(TRACE_1, "\n");
-        TRACE(TRACE_0, "oWFN matches with OG: YES\n\n");
-    } else {
-        TRACE(TRACE_1, "\n");
-        TRACE(TRACE_0, "Match failed: " +reasonForFailedMatch + "\n\n");
-        TRACE(TRACE_0, "oWFN matches with OG: NO\n\n");
+    TRACE(TRACE_0, ("matching " + PN->filename + " and ...\n\n"));
+    for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin(); OGToMatch != OGsToMatch.end(); ++OGToMatch) {
+        // use only the labeled core
+        oWFN* coreOWFN = normalOWFN->returnMatchingOWFN();
+
+        if ( coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
+            TRACE(TRACE_1, "\n");
+            TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": YES\n");
+        } else {
+            TRACE(TRACE_1, "\n");
+            TRACE(TRACE_1, "Match failed: " +reasonForFailedMatch + "\n\n");
+            TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": NO\n");
+        }
+        delete coreOWFN;
     }
+    TRACE(TRACE_0, "\n");
 
     // garbage collection
     if ( normalOWFN != PN ) delete normalOWFN;
-    delete coreOWFN;
 
     TRACE(TRACE_5, "void checkMatching(AnnotatedGraph*, oWFN*) : start\n");
 }
@@ -2035,12 +2038,13 @@ int main(int argc, char** argv) {
              parameters[P_PNG] || parameters[P_REDUCE] || parameters[P_NORMALIZE] ||
              parameters[P_PV]) {
 
-        AnnotatedGraph* OGToMatch = NULL;
+        list<AnnotatedGraph*> OGsToMatch;
         if (parameters[P_MATCH]) {
-            assert(ogfiles.size() == 1);
-            // we match multiple oWFNs with one OG,
-            // so read the og first, then iterate over the nets
-            OGToMatch = readog(*(ogfiles.begin()));
+            // iterate all og files
+            for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin(); iOgFile != ogfiles.end(); ++iOgFile) {
+                // We match every given OG to every oWFN
+                OGsToMatch.push_back(readog(*(iOgFile)));
+            }
         }
 
         string fileName;    // name of og-file
@@ -2106,7 +2110,7 @@ int main(int argc, char** argv) {
                 }
 
                 if (parameters[P_MATCH]) {
-                    checkMatching(OGToMatch, PN); // matching the current oWFN against the single OG
+                    checkMatching(OGsToMatch, PN); // matching the current oWFN against the current OG
                 }
 
                 if (parameters[P_PNG]) {

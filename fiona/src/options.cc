@@ -839,8 +839,8 @@ void parse_command_line(int argc, char* argv[]) {
         exit(EC_BAD_CALL);
     }
     
-    if (parameters[P_MATCH] && ogfiles.size() != 1) {
-        cerr << "Error: \t Exactly one operating guideline must be given for matching!\n" << endl;
+    if (parameters[P_MATCH] && (netfiles.size() < 1 || ogfiles.size() < 1)) {
+        cerr << "Error: \t At least one oWFN and one OG must be given for matching!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(EC_BAD_CALL);
     }

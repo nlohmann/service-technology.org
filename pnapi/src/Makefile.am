@@ -1,12 +1,11 @@
 lib_LIBRARIES = lib_pnapi.a
 
 lib_pnapi_a_SOURCES = \
-	petrinet-input-owfn-parser.yy \
-	petrinet-input-owfn-lexer.ll \
-	petrinet-input-owfn-parser.h petrinet-input-owfn-parser.cc \
-	petrinet-input-owfn-lexer.cc \
 	pnapi.h pnapi.cc \
 	petrinet.h petrinet.cc \
+	parser.h parser.cc \
+	parser-owfn.yy parser-owfn-lexer.ll \
+	parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
 	helpers.h helpers.cc \
 	formula.h formula.cc \
 	options.h typedefs.h \
@@ -17,4 +16,4 @@ lib_pnapi_a_SOURCES = \
 AM_LFLAGS = -olex.yy.c
 
 # clean additional (generated) files
-MAINTAINERCLEANFILES = petrinet-input-owfn-parser.h
+MAINTAINERCLEANFILES = parser-owfn.h

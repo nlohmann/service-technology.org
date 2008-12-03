@@ -319,7 +319,67 @@ class Arc
 class PetriNet
 {
   public:
-    /// adds a place with a given role and type
+
+    /*** public data fields (to be removed?) ***/
+
+    /// conjunctive set of disjunctive place sets for simple final condition
+    list< set< pair<Place *, unsigned int > > > final_set_list;
+
+
+    /*** constructors & destructor ***/
+
+    /// constructor
+    PetriNet();
+
+    /// copy constructor
+    PetriNet(const PetriNet &);
+
+    /// construction from a wiring description
+    //PetriNet(const vector<LinkNode *> &);
+
+    /// destructor
+    ~PetriNet();
+
+
+    /*** overloaded operators ***/
+
+    /// outputs the Petri net
+    friend ostream& operator<< (ostream& os, const PetriNet &obj);
+
+    /// reads a petri net
+    friend istream & operator>>(istream &, PetriNet &);
+
+    /// assignment operator
+    PetriNet & operator=(const PetriNet &);
+
+    /// composes a second net
+    PetriNet & operator+=(const PetriNet &);
+
+
+    /*** query (const) member functions ***/
+
+    string getUniqueName(const string &) const;
+
+    set<Place *> getInputPlaces() const;
+    set<Place *> getOutputPlaces() const;
+
+
+    /*** non-query member functions ***/
+
+    /// creates a new arc
+    Arc & createArc(Node &, Node &);
+
+    /// creates a new place
+    //Place & createPlace(const string & name = "",
+    //			Place::Type type = Place::INTERNAL);
+
+    /// creates a new transition
+    Transition & createTransition(const string & name = "");
+
+
+    /*** query (const) and non-query member functions (to be sorted?) ***/
+
+    /// adds a place with a given role and type (see also createPlace())
     Place* newPlace(string my_role, communication_type my_type = INTERNAL, unsigned int capacity = 0, string my_port = "");
 
     /// adds a transition with a given role
@@ -420,27 +480,6 @@ class PetriNet
 
     /// normalizes the Petri net
     void normalize();
-
-    /// outputs the Petri net
-    friend ostream& operator<< (ostream& os, const PetriNet &obj);
-
-    /// constructor
-    PetriNet();
-
-    /// copy constructor
-    PetriNet(const PetriNet &);
-
-    /// construction from stream
-    PetriNet(FILE *, input_format = INPUT_OWFN);
-
-    /// assignment operator
-    PetriNet & operator=(const PetriNet &);
-
-    /// destructor
-    ~PetriNet();
-
-    /// conjunctive set of disjunctive place sets for simple final condition
-    list< set< pair<Place *, unsigned int > > > final_set_list;
 
     /// sets the invocation string
     void setInvocation(string);
@@ -659,7 +698,10 @@ class PetriNet
 
     // repeated declaration to avoid compilation errors using gcc 4.3
     // see <https://gna.org/bugs/?12113> for more information
+
     ostream& operator<< (ostream& os, const PetriNet &obj);
+
+    istream & operator>>(istream &, PetriNet &);
 
 }
 

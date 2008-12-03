@@ -113,7 +113,7 @@ unsigned int max(unsigned int a, unsigned int b);
  *****************************************************************************/
 
 // to avoid compile errors
-class Node;
+//class Node;
 
 
 /*!

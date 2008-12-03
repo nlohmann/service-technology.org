@@ -6,7 +6,8 @@ TESTS = test_mergePlaces test_mergeTransitions test_mirror \
 		test_makeInnerStructure test_reduce_1 \
 		test_reduce_2 test_reduce_3 test_reduce_4 \
 		test_reduce_5 test_reduce_6 test_reduce_7 \
-		test_isWorkflowNet test_markings
+		test_isWorkflowNet test_markings \
+		test_parser #test_serviceautomaton 
 
 check_PROGRAMS =  test_mergePlaces test_mergeTransitions test_mirror \
 			test_removeTransition test_loop_final_state \
@@ -16,7 +17,8 @@ check_PROGRAMS =  test_mergePlaces test_mergeTransitions test_mirror \
 			test_makeInnerStructure test_reduce_1 \
 			test_reduce_2 test_reduce_3 test_reduce_4 \
 			test_reduce_5 test_reduce_6 test_reduce_7 \
-			test_isWorkflowNet test_markings
+			test_isWorkflowNet test_markings \
+			test_parser #test_serviceautomaton 
 
 test_mergePlaces_SOURCES = test_mergePlaces.cc net_gen.h net_gen.cc
 test_mergeTransitions_SOURCES = test_mergeTransitions.cc net_gen.h net_gen.cc
@@ -38,5 +40,6 @@ test_reduce_6_SOURCES = test_reduce_6.cc
 test_reduce_7_SOURCES = test_reduce_7.cc
 test_isWorkflowNet_SOURCES = test_isWorkflowNet.cc
 test_markings_SOURCES = test_markings.cc
+test_parser_SOURCES = test_parser.cc
 
 LDADD = $(top_builddir)/src/lib_pnapi.a

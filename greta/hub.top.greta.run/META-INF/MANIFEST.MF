@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.gmf.runtime.notation;bundle-version="1.1.1",
  org.eclipse.emf.edit;bundle-version="2.4.1",
  org.eclipse.core.resources;bundle-version="3.4.1",
- org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.1.2"
+ org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.1.2",
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: hub.top.adaptiveSystem,

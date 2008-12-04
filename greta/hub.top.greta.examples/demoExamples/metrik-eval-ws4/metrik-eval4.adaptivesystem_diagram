@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation" xmi:id="_Nqp6MMIFEd2bhqEfm1jXKA" type="AdaptiveSystem" name="metrik-eval4.adaptivesystem_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_U3sIoMIFEd2bhqEfm1jXKA" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_U315oMIFEd2bhqEfm1jXKA" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_U315ocIFEd2bhqEfm1jXKA" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_U3_qoMIFEd2bhqEfm1jXKA" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_U4I0kMIFEd2bhqEfm1jXKA" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_Vr_6ccIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_VsS1YMIFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_VsS1YcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_VsS1YsIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_VsS1Y8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_VsS1ZMIFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_Vr_6csIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_Vr_6cMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Vr_6c8IFEd2bhqEfm1jXKA" x="83" y="11"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_U4I0kcIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_U4I0ksIFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_U3_qocIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="metrik-eval4.adaptivesystem#_UwiXwcIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_U3_qosIFEd2bhqEfm1jXKA" y="20" width="196" height="63"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_U4I0k8IFEd2bhqEfm1jXKA" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_U4I0lsIFEd2bhqEfm1jXKA" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_WHHJIMIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_WHHJI8IFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WHHJJMIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_WHHJJcIFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WHHJJsIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_WHHJIcIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_WGrEQMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WHHJIsIFEd2bhqEfm1jXKA" x="85" y="6"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_WeNagMIFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_WeNag8IFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WeNahMIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_WeXLgMIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WeXLgcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_WeXLgsIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_WeNagcIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_Wd6fkMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WeNagsIFEd2bhqEfm1jXKA" x="85" y="46"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_WwF0scIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_WwF0tMIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WwF0tcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_WwF0tsIFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WwF0t8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_WwF0ssIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_WwF0sMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WwF0s8IFEd2bhqEfm1jXKA" x="85" y="91"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_XENqkcIFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_XENqlMIFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_XENqlcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_XENqlsIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_XENql8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_XENqmMIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_XENqksIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_XENqkMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XENqk8IFEd2bhqEfm1jXKA" x="85" y="126"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_U4I0l8IFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_U4I0mMIFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_U4I0lMIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="metrik-eval4.adaptivesystem#_U3PcsMIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_U4I0lcIFEd2bhqEfm1jXKA" y="83" width="196" height="191"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_U3sIocIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="metrik-eval4.adaptivesystem#_UwiXwMIFEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_U3sIosIFEd2bhqEfm1jXKA" x="450" y="25" width="200" height="278"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_fgrgkcIFEd2bhqEfm1jXKA" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_fgrgksIFEd2bhqEfm1jXKA" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_fgrgk8IFEd2bhqEfm1jXKA" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_fgrglMIFEd2bhqEfm1jXKA" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_fgrglcIFEd2bhqEfm1jXKA" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_fgrglsIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_fgrgl8IFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qgMIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qgcIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qgsIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qg8IFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qhMIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_fg0qssIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qhcIFEd2bhqEfm1jXKA" x="83" y="11"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_fg0qhsIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_fg0qh8IFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qiMIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="metrik-eval4.adaptivesystem#_fg0qscIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qicIFEd2bhqEfm1jXKA" y="20" width="196" height="63"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_fg0qisIFEd2bhqEfm1jXKA" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_fg0qi8IFEd2bhqEfm1jXKA" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_fg0qjMIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_fg0qjcIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qjsIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qj8IFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qkMIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qkcIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_fg0qtcIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qksIFEd2bhqEfm1jXKA" x="85" y="6"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_fg0qk8IFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_fg0qlMIFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qlcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qlsIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0ql8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qmMIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qmcIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_fg0qtsIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qmsIFEd2bhqEfm1jXKA" x="85" y="46"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_fg0qm8IFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_fg0qnMIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qncIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qnsIFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qn8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qoMIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_fg0qt8IFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qocIFEd2bhqEfm1jXKA" x="85" y="91"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_fg0qosIFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_fg0qo8IFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qpMIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qpcIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fg0qpsIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fg0qp8IFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qqMIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_fg0quMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qqcIFEd2bhqEfm1jXKA" x="85" y="126"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_fg0qqsIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_fg0qq8IFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qrMIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="metrik-eval4.adaptivesystem#_fg0qtMIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qrcIFEd2bhqEfm1jXKA" y="83" width="196" height="191"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_fg0qrsIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="metrik-eval4.adaptivesystem#_fg0qsMIFEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fg0qr8IFEd2bhqEfm1jXKA" x="660" y="25" width="200" height="278"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_kr7dcMIFEd2bhqEfm1jXKA" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_kr7dc8IFEd2bhqEfm1jXKA" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_kr7ddMIFEd2bhqEfm1jXKA" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_ksFOcMIFEd2bhqEfm1jXKA" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_ksFOc8IFEd2bhqEfm1jXKA" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_mfaNQcIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_mfaNRMIFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_mfaNRcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_mfaNRsIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_mfaNR8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_mfaNSMIFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_mfaNQsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_mfaNQMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mfaNQ8IFEd2bhqEfm1jXKA" x="66" y="11"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_mz0-EMIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_mz0-E8IFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_mz0-FMIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_mz0-FcIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_mz0-FsIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_mz0-F8IFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_mz0-EcIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_mzrNEMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mz0-EsIFEd2bhqEfm1jXKA" x="115" y="16"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_ksFOdMIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_ksFOdcIFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_ksFOccIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="metrik-eval4.adaptivesystem#_krexgMIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ksFOcsIFEd2bhqEfm1jXKA" y="20" width="196" height="61"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_ksFOdsIFEd2bhqEfm1jXKA" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_ksFOecIFEd2bhqEfm1jXKA" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_nH8M4cIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_nH8M5MIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_nH8M5cIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_nH8M5sIFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_nH8M58IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_nH8M4sIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_nH8M4MIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nH8M48IFEd2bhqEfm1jXKA" x="72" y="9"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_nsAjQcIFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_nsAjRMIFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_nsAjRcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_nsJtMMIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_nsJtMcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_nsJtMsIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_nsAjQsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_nsAjQMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nsAjQ8IFEd2bhqEfm1jXKA" x="72" y="63"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_ksFOesIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_ksFOe8IFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_ksFOd8IFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="metrik-eval4.adaptivesystem#_krxscMIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ksFOeMIFEd2bhqEfm1jXKA" y="81" width="196" height="101"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_kr7dccIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="metrik-eval4.adaptivesystem#_krVAgMIFEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_kr7dcsIFEd2bhqEfm1jXKA" x="450" y="310" height="186"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_uHR9kMIFEd2bhqEfm1jXKA" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_uHR9k8IFEd2bhqEfm1jXKA" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_uHR9lMIFEd2bhqEfm1jXKA" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_uHR9lcIFEd2bhqEfm1jXKA" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_uHR9mMIFEd2bhqEfm1jXKA" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_uo9HQcIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_uo9HRMIFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_uo9HRcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_uo9HRsIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_uo9HR8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_uo9HSMIFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_uo9HQsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_uo9HQMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uo9HQ8IFEd2bhqEfm1jXKA" x="68" y="25"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_uHR9mcIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_uHR9msIFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_uHR9lsIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="metrik-eval4.adaptivesystem#_uHIMkcIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uHR9l8IFEd2bhqEfm1jXKA" y="20" width="196" height="90"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_uHR9m8IFEd2bhqEfm1jXKA" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_uHR9nsIFEd2bhqEfm1jXKA" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_vRyB0cIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_vRyB1MIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_vRyB1cIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_vRyB1sIFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_vRyB18IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_vRyB0sIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_vRyB0MIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_vRyB08IFEd2bhqEfm1jXKA" x="80" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_vouiMcIFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_vouiNMIFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_vouiNcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_vouiNsIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_vouiN8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_vouiOMIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_vouiMsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_vouiMMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_vouiM8IFEd2bhqEfm1jXKA" x="90" y="48"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_uHR9n8IFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_uHR9oMIFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_uHR9nMIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="metrik-eval4.adaptivesystem#_uHIMksIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uHR9ncIFEd2bhqEfm1jXKA" y="110" width="196" height="86"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_uHR9kcIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="metrik-eval4.adaptivesystem#_uHIMkMIFEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uHR9ksIFEd2bhqEfm1jXKA" x="870" y="25"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_0C9R0cIFEd2bhqEfm1jXKA" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_0C9R0sIFEd2bhqEfm1jXKA" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_0C9R08IFEd2bhqEfm1jXKA" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_0C9R1MIFEd2bhqEfm1jXKA" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_0C9R1cIFEd2bhqEfm1jXKA" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_0C9R1sIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_0C9R18IFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_0C9R2MIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_0C9R2cIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_0C9R2sIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_0C9R28IFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_0C9R3MIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_0DHC0sIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0C9R3cIFEd2bhqEfm1jXKA" x="105" y="8"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_0C9R5MIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_0C9R5cIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_0C9R5sIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_0C9R58IFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_0C9R6MIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_0C9R6cIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_0DHC1cIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0C9R6sIFEd2bhqEfm1jXKA" x="105" y="44"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_0C9R68IFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_0C9R7MIFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_0C9R7cIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_0C9R7sIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_0C9R78IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_0C9R8MIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_0C9R8cIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_0DHC1sIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0C9R8sIFEd2bhqEfm1jXKA" x="105" y="84"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_8uBkgcIFEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_8uBkhMIFEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_8uBkhcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_8uBkhsIFEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_8uBkh8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_8uBkiMIFEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_8uBkgsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_8uBkgMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8uBkg8IFEd2bhqEfm1jXKA" x="30" y="86"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_0C9R3sIFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_0C9R38IFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_0C9R4MIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="metrik-eval4.adaptivesystem#_0DHC0cIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0C9R4cIFEd2bhqEfm1jXKA" y="20" width="196" height="121"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_0C9R4sIFEd2bhqEfm1jXKA" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_0C9R48IFEd2bhqEfm1jXKA" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_7xhgAcIFEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_7xhgBMIFEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_7xhgBcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_7xhgBsIFEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_7xhgB8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_7xhgAsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_7xhgAMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7xhgA8IFEd2bhqEfm1jXKA" x="70" y="3"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_9wyCAcIFEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_9wyCBMIFEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_9wyCBcIFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_9wyCBsIFEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_9wyCB8IFEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_9wyCCMIFEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_9wyCAsIFEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_9wyCAMIFEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9wyCA8IFEd2bhqEfm1jXKA" x="70" y="33"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_0C9R88IFEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_0C9R9MIFEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_0C9R9cIFEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="metrik-eval4.adaptivesystem#_0DHC1MIFEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0C9R9sIFEd2bhqEfm1jXKA" y="141" width="196" height="71"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_0C9R98IFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="metrik-eval4.adaptivesystem#_0DHC0MIFEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0C9R-MIFEd2bhqEfm1jXKA" x="660" y="310" height="216"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_C8ob0cIGEd2bhqEfm1jXKA" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_C8ob0sIGEd2bhqEfm1jXKA" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_C8ob08IGEd2bhqEfm1jXKA" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_C8ob1MIGEd2bhqEfm1jXKA" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_C8ob1cIGEd2bhqEfm1jXKA" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_C8ob1sIGEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_C8ob18IGEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob2MIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob2cIGEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob2sIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob28IGEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ob3MIGEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_C8ocEsIGEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ob3cIGEd2bhqEfm1jXKA" x="105" y="8"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_C8ob3sIGEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_C8ob38IGEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob4MIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob4cIGEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob4sIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ob48IGEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_C8ocE8IGEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ob5MIGEd2bhqEfm1jXKA" x="105" y="44"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_C8ob5cIGEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_C8ob5sIGEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob58IGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob6MIGEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob6cIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob6sIGEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ob68IGEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_C8ocFMIGEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ob7MIGEd2bhqEfm1jXKA" x="105" y="84"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_C8ob7cIGEd2bhqEfm1jXKA" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_C8ob7sIGEd2bhqEfm1jXKA" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob78IGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob8MIGEd2bhqEfm1jXKA" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob8cIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob8sIGEd2bhqEfm1jXKA" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ob88IGEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_C8ocFcIGEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ob9MIGEd2bhqEfm1jXKA" x="30" y="86"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_C8ob9cIGEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_C8ob9sIGEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ob98IGEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="metrik-eval4.adaptivesystem#_C8ocEcIGEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ob-MIGEd2bhqEfm1jXKA" y="20" width="196" height="121"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_C8ob-cIGEd2bhqEfm1jXKA" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_C8ob-sIGEd2bhqEfm1jXKA" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_C8ob-8IGEd2bhqEfm1jXKA" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_C8ob_MIGEd2bhqEfm1jXKA" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob_cIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ob_sIGEd2bhqEfm1jXKA" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ob_8IGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ocAMIGEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Event" href="metrik-eval4.adaptivesystem#_C8ocGsIGEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ocAcIGEd2bhqEfm1jXKA" x="70" y="3"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_C8ocAsIGEd2bhqEfm1jXKA" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_C8ocA8IGEd2bhqEfm1jXKA" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ocBMIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ocBcIGEd2bhqEfm1jXKA" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_C8ocBsIGEd2bhqEfm1jXKA" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_C8ocB8IGEd2bhqEfm1jXKA" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ocCMIGEd2bhqEfm1jXKA"/>
+          <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_C8ocG8IGEd2bhqEfm1jXKA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ocCcIGEd2bhqEfm1jXKA" x="70" y="33"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_C8ocCsIGEd2bhqEfm1jXKA"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_C8ocC8IGEd2bhqEfm1jXKA"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ocDMIGEd2bhqEfm1jXKA"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="metrik-eval4.adaptivesystem#_C8ocGcIGEd2bhqEfm1jXKA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ocDcIGEd2bhqEfm1jXKA" y="141" width="196" height="71"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_C8ocDsIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="metrik-eval4.adaptivesystem#_C8ocEMIGEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_C8ocD8IGEd2bhqEfm1jXKA" x="870" y="235" height="216"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_IC0SgMIGEd2bhqEfm1jXKA" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_IDHNcMIGEd2bhqEfm1jXKA" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_IXh-QcIGEd2bhqEfm1jXKA" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_IXh-RMIGEd2bhqEfm1jXKA" type="4001">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_IXh-RcIGEd2bhqEfm1jXKA" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_IXh-RsIGEd2bhqEfm1jXKA" type="4002">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_IXh-R8IGEd2bhqEfm1jXKA" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_IXh-SMIGEd2bhqEfm1jXKA" type="4003"/>
+        <styles xmi:type="notation:ShapeStyle" xmi:id="_IXh-QsIGEd2bhqEfm1jXKA"/>
+        <element xmi:type="adaptiveSystem:Condition" href="metrik-eval4.adaptivesystem#_IXh-QMIGEd2bhqEfm1jXKA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IXh-Q8IGEd2bhqEfm1jXKA" x="185" y="29"/>
+      </children>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_IDHNccIGEd2bhqEfm1jXKA"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_IDHNcsIGEd2bhqEfm1jXKA"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_IC0SgcIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:AdaptiveProcess" href="metrik-eval4.adaptivesystem#_ICXmkMIGEd2bhqEfm1jXKA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IC0SgsIGEd2bhqEfm1jXKA" x="15" y="25" width="426" height="641"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_Nqp6McIFEd2bhqEfm1jXKA"/>
+  <element xmi:type="adaptiveSystem:AdaptiveSystem" href="metrik-eval4.adaptivesystem#_NpmxUMIFEd2bhqEfm1jXKA"/>
+  <edges xmi:type="notation:Edge" xmi:id="_fhuCYMIFEd2bhqEfm1jXKA" type="3002" source="_Vr_6ccIFEd2bhqEfm1jXKA" target="_WHHJIMIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fhuCZMIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fhuCZcIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fhuCYcIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fhuCYsIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_X778wMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fhuCY8IFEd2bhqEfm1jXKA" points="[2, 9, 0, -49]$[0, 48, -2, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fhuCZsIFEd2bhqEfm1jXKA" type="3001" source="_WHHJIMIFEd2bhqEfm1jXKA" target="_WeNagMIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fhuCasIFEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fhuCa8IFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fhuCZ8IFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fhuCaMIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_YSliMMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fhuCacIFEd2bhqEfm1jXKA" points="[0, 10, 0, -30]$[0, 30, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fhuCbMIFEd2bhqEfm1jXKA" type="3001" source="_WwF0scIFEd2bhqEfm1jXKA" target="_XENqkcIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fhuCcMIFEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fhuCccIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fhuCbcIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fhuCbsIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_ZAVZAMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fhuCb8IFEd2bhqEfm1jXKA" points="[0, 10, 0, -25]$[0, 25, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fhuCcsIFEd2bhqEfm1jXKA" type="3002" source="_WeNagMIFEd2bhqEfm1jXKA" target="_WwF0scIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fhuCdsIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fhuCd8IFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fhuCc8IFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fhuCdMIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_YpY4oMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fhuCdcIFEd2bhqEfm1jXKA" points="[0, 10, 0, -35]$[0, 35, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fhuCeMIFEd2bhqEfm1jXKA" type="3002" source="_fgrglsIFEd2bhqEfm1jXKA" target="_fg0qjMIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fhuCfMIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fhuCfcIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fhuCecIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fhuCesIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_fg0qs8IFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fhuCe8IFEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fhuCfsIFEd2bhqEfm1jXKA" type="3001" source="_fg0qjMIFEd2bhqEfm1jXKA" target="_fg0qk8IFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fh3zYMIFEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fh3zYcIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fhuCf8IFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fhuCgMIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_fg0qucIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fhuCgcIFEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fh3zYsIFEd2bhqEfm1jXKA" type="3001" source="_fg0qm8IFEd2bhqEfm1jXKA" target="_fg0qosIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fh3zZsIFEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fh3zZ8IFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fh3zY8IFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fh3zZMIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_fg0qu8IFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fh3zZcIFEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_fh3zaMIFEd2bhqEfm1jXKA" type="3002" source="_fg0qk8IFEd2bhqEfm1jXKA" target="_fg0qm8IFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_fh3zbMIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_fh3zbcIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_fh3zacIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_fh3zasIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_fg0qusIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fh3za8IFEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_oGYLEcIFEd2bhqEfm1jXKA" type="3002" source="_mfaNQcIFEd2bhqEfm1jXKA" target="_nH8M4cIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_oGYLFcIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_oGYLFsIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_oGYLEsIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_oGYLE8IFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_oGYLEMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oGYLFMIFEd2bhqEfm1jXKA" points="[1, 18, -9, -79]$[0, 99, -10, 2]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_oGYLF8IFEd2bhqEfm1jXKA" id="(0.3,0.05)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_ofkHIcIFEd2bhqEfm1jXKA" type="3002" source="_mz0-EMIFEd2bhqEfm1jXKA" target="_nH8M4cIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_ofkHJcIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_ofkHJsIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_ofkHIsIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ofkHI8IFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_ofkHIMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ofkHJMIFEd2bhqEfm1jXKA" points="[-3, 4, 34, -78]$[-27, 72, 10, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_ofkHJ8IFEd2bhqEfm1jXKA" id="(0.2,0.55)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_o2D7kcIFEd2bhqEfm1jXKA" type="3001" source="_nH8M4cIFEd2bhqEfm1jXKA" target="_nsAjQcIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_o2D7lcIFEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_o2D7lsIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_o2D7ksIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_o2D7k8IFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_o2D7kMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_o2D7lMIFEd2bhqEfm1jXKA" points="[1, 10, 1, -44]$[1, 63, 1, 9]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_0DHC2MIFEd2bhqEfm1jXKA" type="3002" source="_uo9HQcIFEd2bhqEfm1jXKA" target="_vRyB0cIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_0DHC3MIFEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_0DHC3cIFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_0DHC2cIFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_0DHC2sIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_wQXxAMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_0DHC28IFEd2bhqEfm1jXKA" points="[1, 9, -11, -61]$[10, 60, -2, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_0DHC3sIFEd2bhqEfm1jXKA" type="3001" source="_vRyB0cIFEd2bhqEfm1jXKA" target="_vouiMcIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_0DHC4sIFEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_0DHC48IFEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_0DHC38IFEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_0DHC4MIFEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_wmH-kMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_0DHC4cIFEd2bhqEfm1jXKA" points="[2, 10, -8, -33]$[7, 33, -3, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C87WwMIGEd2bhqEfm1jXKA" type="3002" source="_0C9R1sIFEd2bhqEfm1jXKA" target="_0C9R5MIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C87WxMIGEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C87WxcIGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C87WwcIGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C87WwsIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_0DHC08IFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C87Ww8IGEd2bhqEfm1jXKA" points="[0, 10, 0, -26]$[0, 26, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C87WxsIGEd2bhqEfm1jXKA" type="3002" source="_8uBkgcIFEd2bhqEfm1jXKA" target="_7xhgAcIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C87WysIGEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C87Wy8IGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C87Wx8IGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C87WyMIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_9KL8EMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C87WycIGEd2bhqEfm1jXKA" points="[7, 6, -33, -32]$[30, 28, -10, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C87WzMIGEd2bhqEfm1jXKA" type="3002" source="_0C9R68IFEd2bhqEfm1jXKA" target="_7xhgAcIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C87W0MIGEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C87W0cIGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C87WzcIGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C87WzsIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_9fMiwMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C87Wz8IGEd2bhqEfm1jXKA" points="[-7, 7, 28, -33]$[-27, 30, 8, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C87W0sIGEd2bhqEfm1jXKA" type="3001" source="_0C9R5MIFEd2bhqEfm1jXKA" target="_0C9R68IFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C87W1sIGEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C87W18IGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C87W08IGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C87W1MIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_0DHC18IFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C87W1cIGEd2bhqEfm1jXKA" points="[0, 10, 0, -30]$[0, 30, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C87W2MIGEd2bhqEfm1jXKA" type="3001" source="_7xhgAcIFEd2bhqEfm1jXKA" target="_9wyCAcIFEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C87W3MIGEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C87W3cIGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C87W2cIGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C87W2sIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_-KaqAMIFEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C87W28IGEd2bhqEfm1jXKA" points="[0, 10, 0, -20]$[0, 20, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C9FHwMIGEd2bhqEfm1jXKA" type="3002" source="_C8ob1sIGEd2bhqEfm1jXKA" target="_C8ob3sIGEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C9FHxMIGEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C9FHxcIGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C9FHwcIGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C9FHwsIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_C8ocFsIGEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C9FHw8IGEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C9O4wMIGEd2bhqEfm1jXKA" type="3002" source="_C8ob7cIGEd2bhqEfm1jXKA" target="_C8ob-8IGEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C9O4xMIGEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C9O4xcIGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C9O4wcIGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C9O4wsIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_C8ocF8IGEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C9O4w8IGEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C9O4xsIGEd2bhqEfm1jXKA" type="3002" source="_C8ob5cIGEd2bhqEfm1jXKA" target="_C8ob-8IGEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C9O4ysIGEd2bhqEfm1jXKA" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C9O4y8IGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C9O4x8IGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C9O4yMIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="metrik-eval4.adaptivesystem#_C8ocGMIGEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C9O4ycIGEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C9O4zMIGEd2bhqEfm1jXKA" type="3001" source="_C8ob3sIGEd2bhqEfm1jXKA" target="_C8ob5cIGEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C9O40MIGEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C9O40cIGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C9O4zcIGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C9O4zsIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_C8ocHMIGEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C9O4z8IGEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_C9O40sIGEd2bhqEfm1jXKA" type="3001" source="_C8ob-8IGEd2bhqEfm1jXKA" target="_C8ocAsIGEd2bhqEfm1jXKA">
+    <children xmi:type="notation:Node" xmi:id="_C9O41sIGEd2bhqEfm1jXKA" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_C9O418IGEd2bhqEfm1jXKA" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_C9O408IGEd2bhqEfm1jXKA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_C9O41MIGEd2bhqEfm1jXKA"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="metrik-eval4.adaptivesystem#_C8ocHcIGEd2bhqEfm1jXKA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_C9O41cIGEd2bhqEfm1jXKA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+</notation:Diagram>

@@ -39,6 +39,7 @@ package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.greta.oclets.canonical.CNodeSet;
 import hub.top.greta.oclets.ts.AdaptiveSystemTS;
 import hub.top.greta.run.Activator;
 
@@ -135,6 +136,15 @@ public class BuildStateSpace implements IWorkbenchWindowActionDelegate {
 				
 				writeDotFile(ts, inputFile);
 				writeGenetFile(ts, inputFile);
+				/*
+				for (CNodeSet state : ts.states) {
+					ByteArrayInputStream contents = new ByteArrayInputStream(state.toDot().getBytes());
+
+					String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
+					IPath targetPath = new Path(targetPathStr+"_ts_"+state.num+".dot");
+					writeFile(targetPath, contents);
+				}
+				*/
 			}
 		}
 	}

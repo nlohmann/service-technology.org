@@ -1,5 +1,8 @@
-Greta v1.1.0
+Greta v1.1.1
 ------------
+
++ added Eclipse feature declaration, Greta can now be installed as an Eclipse
+  feature from http://download.gna.org/service-tech/greta/updatesite/
 + added method to construct the minimal complete prefix of the branching
   process of a set of oclets, the generated branching process is written
   as a dot graph to a file in the workspace
@@ -8,7 +11,12 @@ Greta v1.1.0
 + added state space generation method, the generated state-space is written 
   as dot graph to a file in the workspace
 + added some methods to check structural properties of a system specification,
-  the analysis results are currently printed to a message window 
+  the analysis results are currently printed to a message window
+  
+Greta v1.1.0
+------------
+
++ migrated diagram code to GMF 2.1
 
 
 Greta v1.0.0

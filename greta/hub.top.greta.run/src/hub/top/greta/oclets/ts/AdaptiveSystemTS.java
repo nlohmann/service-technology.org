@@ -344,12 +344,14 @@ public class AdaptiveSystemTS {
 		System.out.println(result);
 	}
 	
-	private static final int AVG_STATE_STRING = 50;
-	private static final int AVG_STEP_STRING = 35;
-	private static final int AVG_OVERHEAD = 50;
+	private static final int OUT_DOT_AVG_STATE_STRING = 50;
+	private static final int OUT_DOT_AVG_STEP_STRING = 35;
+	private static final int OUT_DOT_AVG_OVERHEAD = 50;
 	
 	public String toDot () {
-		StringBuilder b = new StringBuilder(states.size()*AVG_STATE_STRING+steps.size()*AVG_STEP_STRING+AVG_OVERHEAD);
+		System.out.println("number of states: "+this.states.size());
+		
+		StringBuilder b = new StringBuilder(states.size()*OUT_DOT_AVG_STATE_STRING+steps.size()*OUT_DOT_AVG_STEP_STRING+OUT_DOT_AVG_OVERHEAD);
 		b.append("digraph TS {\n");
 		b.append("node [fontname=\"Helvetica\" fontsize=10];\n");
 		b.append("edge [fontname=\"Helvetica\" fontsize=10];\n");
@@ -373,5 +375,35 @@ public class AdaptiveSystemTS {
 		}
 		b.append("}");
 		return b.toString();
+	}
+	
+	private static final int OUT_GENET_AVG_STEP_STRING = 20;
+	private static final int OUT_GENET_AVG_OVERHEAD = 50;
+	
+	public String toGenet () {
+		StringBuilder b = new StringBuilder(steps.size()*OUT_GENET_AVG_STEP_STRING+OUT_GENET_AVG_OVERHEAD);
+		b.append(".outputs ");
+		HashSet<String> stepLabels = new HashSet<String>(); 
+		for (AdaptiveSystemStep step : steps)
+			stepLabels.add(toAlphaNum_(step.label));
+		for (String stepLabel : stepLabels)
+			b.append(stepLabel+" ");
+		b.append("\n");
+		b.append(".state graph\n");
+		for (AdaptiveSystemStep step : steps)
+			b.append("s"+step.source.num+" "+toAlphaNum_(step.label)+" s"+step.target.num+"\n");
+		b.append(".marking {s"+initial.num+"}\n");
+		b.append(".end");
+		return b.toString();
+	}
+	
+	public static String toAlphaNum_(String s) {
+		char[] letters = s.toCharArray();
+		for (int i=0;i<letters.length;i++) {
+			if (Character.isLetterOrDigit(letters[i]))
+				continue;
+			letters[i] = '_';
+		}
+		return new String(letters);
 	}
 }

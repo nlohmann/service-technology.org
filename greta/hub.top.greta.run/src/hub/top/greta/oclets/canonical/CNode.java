@@ -161,6 +161,16 @@ public class CNode {
 	}
 	
 	/**
+	 * replace this node's predecessor CNode p by another CNode newP
+	 * @param p
+	 * @param newP
+	 */
+	public void replacePredecessorNode(CNode p, CNode newP) {
+		if (pred.remove(p))
+			pred.add(newP);
+	}
+	
+	/**
 	 * @param past
 	 */
 	public boolean getPast_checkConflict (Set<CNode> past) {

@@ -30,7 +30,7 @@
          <action
                class="hub.top.greta.run.actions.OcletDependencies"
                id="hub.top.GRETA.run.ocletDependencies"
-               label="check dependencies of oclets"
+               label="dep"
                style="push"
                toolbarPath="org.eclipse.debug.ui.launchActionSet"
                tooltip="check dependencies of oclets">
@@ -38,10 +38,18 @@
          <action
                class="hub.top.greta.run.actions.BuildStateSpace"
                id="hub.top.GRETA.run.buildStateSpace"
-               label="build state space of the system"
+               label="TS"
                style="push"
                toolbarPath="org.eclipse.debug.ui.launchActionSet"
                tooltip="build state space of the system">
+         </action>
+         <action
+               class="hub.top.greta.run.actions.BuildBranchingProcess"
+               id="hub.top.GRETA.run.buildBranchingProcess"
+               label="BP"
+               style="push"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet"
+               tooltip="build branching process of the system">
          </action>
       </actionSet>
    </extension>

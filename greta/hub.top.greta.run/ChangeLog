@@ -1,6 +1,10 @@
 Greta v1.1.0
 ------------
-
++ added method to construct the minimal complete prefix of the branching
+  process of a set of oclets, the generated branching process is written
+  as a dot graph to a file in the workspace
++ added Petrify/Genet output, when generating the state space, the output
+  is also generated in the input format of Petrify/Genet for net synthesis
 + added state space generation method, the generated state-space is written 
   as dot graph to a file in the workspace
 + added some methods to check structural properties of a system specification,

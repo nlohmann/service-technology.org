@@ -39,11 +39,13 @@ package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.greta.oclets.ts.AdaptiveSystemBP;
 import hub.top.greta.oclets.ts.AdaptiveSystemTS;
 import hub.top.greta.run.Activator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -59,9 +61,9 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public class BuildStateSpace implements IWorkbenchWindowActionDelegate {
+public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 
-	public static final String ID = "hub.top.GRETA.run.buildStateSpace";
+	public static final String ID = "hub.top.GRETA.run.buildBranchingProcess";
 	
 	private IWorkbenchWindow workbenchWindow;
 
@@ -80,6 +82,39 @@ public class BuildStateSpace implements IWorkbenchWindowActionDelegate {
 		workbenchWindow = window;
 	}
 	
+
+	@Override
+	public void run(IAction action) {
+		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
+				&& action.getId().equals(BuildBranchingProcess.ID)) {
+			
+			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
+			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
+			
+			AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
+			
+			while (bp.construct()) {
+				System.out.print(".");
+			}
+			System.out.println();
+			
+			IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
+			
+			if (in instanceof IFileEditorInput) {
+				IFile inputFile = ((IFileEditorInput)in).getFile();
+				
+				writeDotFile(bp, inputFile);
+			}
+		}
+
+	}
+
+	@Override
+	public void selectionChanged(IAction action, ISelection selection) {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void writeFile (IPath targetPath, InputStream contents) {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile targetFile = root.getFile(targetPath);
@@ -95,54 +130,12 @@ public class BuildStateSpace implements IWorkbenchWindowActionDelegate {
 		}
 	}
 
-	private void writeDotFile (AdaptiveSystemTS ts, IFile inputFile) {
-		ByteArrayInputStream contents = new ByteArrayInputStream(ts.toDot().getBytes());
+	private void writeDotFile (AdaptiveSystemBP bp, IFile inputFile) {
+		ByteArrayInputStream contents = new ByteArrayInputStream(bp.toDot().getBytes());
 		
 		String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
-		IPath targetPath = new Path(targetPathStr+"_ts.dot");
+		IPath targetPath = new Path(targetPathStr+"_bp.dot");
 
 		writeFile (targetPath, contents);
 	}
-	
-	private void writeGenetFile (AdaptiveSystemTS ts, IFile inputFile) {
-		ByteArrayInputStream contents = new ByteArrayInputStream(ts.toGenet().getBytes());
-
-		String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
-		IPath targetPath = new Path(targetPathStr+"_ts.sg");
-
-		writeFile (targetPath, contents);
-	}
-	
-	@Override
-	public void run(IAction action) {
-		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
-				&& action.getId().equals(BuildStateSpace.ID)) {
-			
-			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
-			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
-			
-			AdaptiveSystemTS ts = new AdaptiveSystemTS(adaptiveSystem);
-
-			while (ts.explore()) {
-				System.out.print(".");
-			}
-			System.out.println();
-			
-			IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
-			
-			if (in instanceof IFileEditorInput) {
-				IFile inputFile = ((IFileEditorInput)in).getFile();
-				
-				writeDotFile(ts, inputFile);
-				writeGenetFile(ts, inputFile);
-			}
-		}
-	}
-
-	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

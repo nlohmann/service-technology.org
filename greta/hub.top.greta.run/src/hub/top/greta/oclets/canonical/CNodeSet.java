@@ -42,6 +42,7 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
+import hub.top.greta.oclets.ts.AdaptiveSystemStep;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -252,8 +253,20 @@ public class CNodeSet {
 	 * store node in this set
 	 * @param c
 	 */
-	public void addNode(CNode c) {
-		nodes.add(c);
+	public CNode addNode(CNode c) {
+		if (!nodes.add(c)) {
+			
+			// there is already an equivalent node in this set
+			// retrieve it via the index structure
+			Integer key = new Integer(c.hashCode());
+			List<CNode> matches = indexedNodes.get(key);
+			for (CNode existing : matches) {
+				if (existing.equals(c))
+					return existing;
+			}
+			
+			return null;
+		}
 		
 		// store new CNode in the index structure
 		Integer key = new Integer(c.hashCode());
@@ -267,6 +280,8 @@ public class CNodeSet {
 		// predecessors of the new node are no longer maximal in
 		// this set
 		maxNodes.removeAll(c.pred);	
+		
+		return c;
 	}
 	
 	/**
@@ -321,7 +336,7 @@ public class CNodeSet {
 		return nodes;
 	}
 	
-	public Collection<CNode> getCutNodes () {
+	public HashSet<CNode> getCutNodes () {
 		return cutNodes;
 	}
 	
@@ -392,9 +407,13 @@ public class CNodeSet {
 	}
 	
 	public Collection<CNode> getEnabledEvents () {
+		return getEnabledEvents(cutNodes);
+	}
+	
+	public Collection<CNode> getEnabledEvents (HashSet<CNode> cut) {
 		LinkedList<CNode> enabledEvents = new LinkedList<CNode>();
 		for (CNode c : nodes) {
-			if (cutNodes.containsAll(c.pred)) {
+			if (c.isEvent && cut.containsAll(c.pred)) {
 				assert(c.isEvent == true);
 				enabledEvents.add(c);
 			}
@@ -426,6 +445,15 @@ public class CNodeSet {
 		s.maxNodes.removeAll(conflictingNodes);
 		
 		return s;
+	}
+	
+	public HashSet<CNode> fire(CNode e, HashSet<CNode> cut) {
+		HashSet<CNode> succCut = new HashSet<CNode>(cut);
+		
+		succCut.removeAll(e.pred);
+		succCut.addAll(getPostConditions(e));
+		
+		return succCut;
 	}
 	
 	public int size() {
@@ -493,6 +521,35 @@ public class CNodeSet {
 		return true;
 	}
 	
+	public static boolean nodesContainedIn(Collection<CNode> myNodes, CNode[] otherNodes, CNode.MatchingRelation matchingRelation) {
+
+		if (myNodes.size() > otherNodes.length)
+			return false;
+		
+		for (CNode myNode : myNodes) {
+			boolean found = false;
+			
+			for (CNode cutNode_of_n : otherNodes) {
+				if (myNode.strictSuffixOf(cutNode_of_n, matchingRelation))
+					found = true;
+			}
+			
+			if (!found)
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * extended containment check that returns true also in the case when some of
+	 * myNodes are not contained in otherNodes (in case such a node has no predecessor
+	 * and at least one node of myNodes is contained in otherNodes)
+	 *  
+	 * @param myNodes
+	 * @param otherNodes
+	 * @param matchingRelation
+	 * @return
+	 */
 	public static boolean nodesContainedIn(CNode[] myNodes, Collection<CNode> otherNodes, CNode.MatchingRelation matchingRelation) {
 
 		if (myNodes.length > otherNodes.size())
@@ -631,5 +688,66 @@ public class CNodeSet {
 	@Override
 	public String toString() {
 		return nodes.toString()+ " cut: " + cutNodes;
+	}
+	
+	public String toDot () {
+		StringBuilder b = new StringBuilder();
+		b.append("digraph BP {\n");
+		
+		b.append("graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10];\n");
+		b.append("node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white];\n");
+		b.append("edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"];\n");
+
+		String tokenFillString = "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+		
+		b.append("\n\n");
+		b.append("node [shape=circle];\n");
+		for (CNode n : nodes) {
+			if (n.isEvent)
+				continue;
+			if (n.pred.isEmpty())
+				b.append("  c"+n.localId+" ["+tokenFillString+"]\n");
+			else
+				b.append("  c"+n.localId+" []\n");
+				
+			b.append("  c"+n.localId+"_l [shape=none];\n");
+			b.append("  c"+n.localId+"_l -> c"+n.localId+" [headlabel=\""+n.label+"\"]\n");
+		}
+		
+		b.append("\n\n");
+		b.append("node [shape=box];\n");
+		for (CNode n : nodes) {
+			if (!n.isEvent)
+				continue;
+			b.append("  e"+n.localId+" []\n");
+			b.append("  e"+n.localId+"_l [shape=none];\n");
+			b.append("  e"+n.localId+"_l -> e"+n.localId+" [headlabel=\""+n.label+"\"]\n");
+		}
+		
+		/*
+		b.append("\n\n");
+		b.append(" subgraph cluster1\n");
+		b.append(" {\n  ");
+		for (CNode n : nodes) {
+			if (n.isEvent) b.append("e"+n.localId+" e"+n.localId+"_l ");
+			else b.append("c"+n.localId+" c"+n.localId+"_l ");
+		}
+		b.append("\n  label=\"\"\n");
+		b.append(" }\n");
+		*/
+		
+		b.append("\n\n");
+		b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
+		for (CNode n : nodes) {
+			String prefix = n.isEvent ? "e" : "c";
+			for (CNode pre : n.pred) {
+				if (pre.isEvent)
+					b.append("  e"+pre.localId+" -> "+prefix+n.localId+" [weight=10000.0]\n");
+				else
+					b.append("  c"+pre.localId+" -> "+prefix+n.localId+" [weight=10000.0]\n");
+			}
+		}
+		b.append("}");
+		return b.toString();
 	}
 }

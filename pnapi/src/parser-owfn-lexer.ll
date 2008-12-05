@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 
 /*!
- * \file    petrinet-input-owfn-lexer.ll
+ * \file    parser-owfn-lexer.ll
  *
  * \brief   lexical scanner for OWFN files
  *
@@ -11,8 +11,6 @@
  * \since   2008/11/10
  *
  * \date    $Date$
- *
- * \note    This file is part of ...
  *
  * \version $Revision$
  */
@@ -41,7 +39,7 @@
 #define pnapi_yyistream pnapi_owfn_istream
 
 #define YY_FATAL_ERROR(msg) \
-   throw msg;
+   pnapi_owfn_error(msg);
 
 #define YY_INPUT(buf,result,max_size) \
    pnapi_yyistream->read(buf, max_size); \

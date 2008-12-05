@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 
 /*!
- * \file    petrinet-input-owfn-parser.h
+ * \file    parser-owfn.yy
  *
  * \brief   bison parser for OWFN files
  *
@@ -12,12 +12,7 @@
  *
  * \date    $Date$
  *
- * \note    This file is part of ...
- *
- *          Large parts of the code are copied from the bpel2owfn OWFN parser.
- *          If I had the time to refactor this: Create an AST containing C++
- *          objects first and then construct the PetriNet instance by some 
- *          visitor strategy ...
+ * \note    Large parts of the code are copied from the bpel2owfn OWFN parser.
  *
  * \version $Revision$
  */
@@ -60,7 +55,7 @@ extern int yylex();
 Node * pnapi_owfn_ast;
 
 // global variables for use in actions during net construction
-PetriNet PN;
+PetriNet * PN;
 int readmode = 0;
 string nodename;
 string current_port;
@@ -117,9 +112,17 @@ int yyerror(const char *);
   ****************************************************************************/
 %%
 
-net:                 KEY_PLACE place_area port_area KEY_MARKING markinglist 
+net:                 { 
+                       PN = new PetriNet();
+		       readmode = 0;
+		       t = NULL; 
+		       in.clear();
+		       out.clear();
+		       finalMarking.clear();
+                     }
+                     KEY_PLACE place_area port_area KEY_MARKING markinglist 
                      SEMICOLON final transitionlist 
-                     { pnapi_owfn_ast = new Node(Node::PETRINET, &PN, $7); }
+                     { pnapi_owfn_ast = new Node(Node::PETRINET, PN, $8); }
                    ;
 
 final:               KEY_FINALMARKING finalmarkinglist SEMICOLON { $$ = NULL; }
@@ -161,9 +164,9 @@ placelist:           placelist COMMA place
 
 place:               nodeident controlcommands {
                                    switch (readmode) {
-                                     case 0: PN.newPlace(nodename, IN); break;
-                                     case 1: PN.newPlace(nodename, OUT); break;
-				     case 2: PN.newPlace(nodename); break;
+                                     case 0: PN->newPlace(nodename, IN); break;
+                                     case 1: PN->newPlace(nodename, OUT); break;
+				     case 2: PN->newPlace(nodename); break;
 				     case 3: break;
 				   } }
                    ;     
@@ -176,7 +179,7 @@ controlcommands:     /* emtpy */
                    | LCONTROL commands RCONTROL
                    ;
 
-commands:            { yyerror("control commands not supported"); /* FIXME */ }
+commands:            { yyerror("control commands not supported"); }
                    ;
 
 markinglist:      /* empty */ 
@@ -184,30 +187,30 @@ markinglist:      /* empty */
                 | markinglist COMMA marking
                 ;
 
-marking:          nodeident COLON NUMBER { (PN.findPlace(nodename))->mark($3); }
-                | nodeident              { (PN.findPlace(nodename))->mark(); }
+marking:          nodeident COLON NUMBER { (PN->findPlace(nodename))->mark($3); }
+                | nodeident              { (PN->findPlace(nodename))->mark(); }
                 ;
 
 finalmarkinglist: /* empty */
                 | finalmarking { if (!finalMarking.empty()) {
-				   PN.final_set_list.push_back(finalMarking);
+				   PN->final_set_list.push_back(finalMarking);
 				   finalMarking.clear();
 				 } }
                 | finalmarkinglist COMMA finalmarking { 
                                  if (!finalMarking.empty()) {
-				   PN.final_set_list.push_back(finalMarking);
+				   PN->final_set_list.push_back(finalMarking);
 				   finalMarking.clear();
 				 } }
                 ;
 
 finalmarking:     nodeident COLON NUMBER {
-                      (PN.findPlace(nodename))->isFinal = true;
+                      (PN->findPlace(nodename))->isFinal = true;
 		      finalMarking.insert(pair<Place *, unsigned int>
-					  (PN.findPlace(nodename), $3)); }
+					  (PN->findPlace(nodename), $3)); }
                 | nodeident {
-		      (PN.findPlace(nodename))->isFinal = true;
+		      (PN->findPlace(nodename))->isFinal = true;
 		      finalMarking.insert(pair<Place *, unsigned int>
-					  (PN.findPlace(nodename), 1)); }
+					  (PN->findPlace(nodename), 1)); }
                 ;
 
 port_area:        /* empty */
@@ -223,16 +226,16 @@ port_definition:  nodeident { current_port = std::string($1); }
                 ;
 
 port_participant_list: nodeident { 
-                     PN.setPlacePort(PN.findPlace(string($1)), current_port); }
+                     PN->setPlacePort(PN->findPlace(string($1)), current_port); }
                 | port_participant_list COMMA nodeident { 
-                     PN.setPlacePort(PN.findPlace(string($3)), current_port); }
+                     PN->setPlacePort(PN->findPlace(string($3)), current_port); }
                 ;
 
 transitionlist:   transitionlist transition
                 | /* empty */
                 ;
 
-transition:       KEY_TRANSITION tname      { t = PN.newTransition(nodename); }
+transition:       KEY_TRANSITION tname      { t = PN->newTransition(nodename); }
                   annotation KEY_CONSUME        { readmode = 4; } 
                   arclist SEMICOLON KEY_PRODUCE { readmode = 5; } 
                   arclist SEMICOLON
@@ -257,14 +260,14 @@ arclist:          /* empty */
 
 arc:              nodeident COLON NUMBER {
                          if (readmode == 4) 
-			   PN.newArc(PN.findPlace(nodename), t, STANDARD, $3);
+			   PN->newArc(PN->findPlace(nodename), t, STANDARD, $3);
 			 if (readmode == 5) 
-			   PN.newArc(t, PN.findPlace(nodename), STANDARD, $3); }
+			   PN->newArc(t, PN->findPlace(nodename), STANDARD, $3); }
                 | nodeident {
 		         if (readmode == 4) 
-			   PN.newArc(PN.findPlace(nodename), t, STANDARD, 1); 
+			   PN->newArc(PN->findPlace(nodename), t, STANDARD, 1); 
 			 if (readmode == 5) 
-			   PN.newArc(t, PN.findPlace(nodename), STANDARD, 1); }
+			   PN->newArc(t, PN->findPlace(nodename), STANDARD, 1); }
                 ;
 
 statepredicate: 
@@ -295,5 +298,5 @@ statepredicate:
 
 int yyerror(const char * msg)
 {
-  throw msg;
+  throw string(msg) + " (near '" + msg + "')";
 }

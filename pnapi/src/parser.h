@@ -46,6 +46,9 @@ namespace PNapi
     template <typename T> class Node
     {
     public:
+
+      /// destructor
+      ~Node();
       
       /// receives a visitor for visiting the subtree rooted at this node
       void visit(Visitor<T> &) const;
@@ -68,6 +71,9 @@ namespace PNapi
     template <typename T> class Parser
     {
     public:
+
+      /// destructor
+      ~Parser();
 
       /// receives a visitor for visiting the nodes of the AST
       void visit(Visitor<T> &) const;
@@ -147,6 +153,8 @@ namespace PNapi
 	Node(Type, PetriNet *, Node *);
 	Node(Type, const char *, int);
 
+	~Node();
+
 	const Type type;
 	PetriNet * const petriNet;
 	const string identifier;
@@ -176,25 +184,37 @@ namespace PNapi
       class Visitor : public parser::Visitor<Node>
       {
       public:
-	inline PetriNet & getPetriNet() const;
+	inline const PetriNet & getPetriNet() const;
 	
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
 
       private:
-	PetriNet * net_;
+	PetriNet net_;
 	deque<Formula *> formulas_;
       };
 
 
       // inline member function
-      PetriNet & Visitor::getPetriNet() const
+      const PetriNet & Visitor::getPetriNet() const
       {
-	return *net_;
+	return net_;
       }
 
     }
 
+
+    /*!
+     * \brief   destructor
+     *
+     * Recursively destroys all children.
+     */
+    template <typename T> Node<T>::~Node()
+    {
+      for (typename vector<Node<T> *>::const_iterator it = children_.begin(); 
+	   it != children_.end(); ++it)
+	delete *it;
+    }
 
     /*!
      * \brief   adds another node as a child of this one
@@ -222,6 +242,16 @@ namespace PNapi
 	   it != children_.end(); ++it)
 	(*it)->visit(visitor);
       visitor.afterChildren(*static_cast<const T *>(this));
+    }
+
+    /*!
+     * \brief   destructor
+     *
+     * Destroys AST if available.
+     */
+    template <typename T> Parser<T>::~Parser()
+    {
+      delete rootNode_;
     }
 
     /*!
@@ -255,12 +285,16 @@ namespace PNapi
      */
     template <typename T> Parser<T> & Parser<T>::parse(istream & is)
     {
+      // possibly clean up old AST
+      if (rootNode_ != NULL)
+	delete rootNode_;
+
       // assign lexer input stream
       flexStream_ = &is;
       
       // call the parser
       if ((*yaccParse_)() != 0)
-	throw "yacc parser failed";
+	throw string("yacc parser failed");
 
       // copy result pointer
       rootNode_ = parseResult_;

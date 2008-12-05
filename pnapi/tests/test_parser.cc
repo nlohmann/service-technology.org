@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
   Parser parser;
   Visitor visitor;
   parser.parse(file).visit(visitor);
-  PetriNet & net = visitor.getPetriNet();
+  const PetriNet & net = visitor.getPetriNet();
   assert(net.getPlaceSet().size() == 11);
   end_test();
 

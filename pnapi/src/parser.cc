@@ -43,6 +43,12 @@ namespace PNapi
       {
       }
 
+      Node::~Node()
+      {
+	if (petriNet != NULL)
+	  delete petriNet;
+      }
+
       Parser::Parser() :
 	parser::Parser<Node>(::pnapi_owfn_istream, ::pnapi_owfn_ast,
 			     &::pnapi_owfn_parse)
@@ -58,7 +64,7 @@ namespace PNapi
 	switch (node.type) 
 	  {
 	  case Node::PETRINET:
-	    net_ = node.petriNet;
+	    net_ = *node.petriNet; // copy the net, the AST might destroy it
 	    break;
 
 	  case Node::FORMULA_EQ:
@@ -67,7 +73,7 @@ namespace PNapi
 	  case Node::FORMULA_GT:
 	  case Node::FORMULA_GE:
 	  case Node::FORMULA_LE:
-	    place = net_->findPlace(node.identifier);
+	    place = net_.findPlace(node.identifier);
 	    nTokens = node.value;
 	    switch (node.type)
 	      {
@@ -96,26 +102,25 @@ namespace PNapi
 	  {
 	  case Node::FORMULA_NOT:
 	    if (formulas_.size() < 1)
-	      throw "operand for unary NOT operator expected";
+	      throw string("operand for unary NOT operator expected");
 	    formulas_.push_back(new FormulaNot(formulas_.front()));
 	    formulas_.pop_front();
 	    break;
-	  case Node::FORMULA_OR:
-	    if (formulas_.size() < 2)
-	      throw "two operands for binary OR operator expected";
-	    formulas_.push_back(new FormulaOr(formulas_.front(), 
-					      formulas_.front()));
-	    formulas_.pop_front();
-	    formulas_.pop_front();
-	    break;
 	  case Node::FORMULA_AND:
-	    if (formulas_.size() < 2)
-	      throw "two operands for binary AND operator expected";
-	    formulas_.push_back(new FormulaAnd(formulas_.front(),
-					       formulas_.front()));
-	    formulas_.pop_front();
-	    formulas_.pop_front();
-	    break;
+	  case Node::FORMULA_OR:
+	    {
+	      if (formulas_.size() < 2)
+		throw string("two operands for binary AND/OR operator expected");
+	      Formula * op1 = formulas_.front(); formulas_.pop_front();
+	      Formula * op2 = formulas_.front(); formulas_.pop_front();
+	      Formula * f;
+	      if (node.type == Node::FORMULA_AND)
+		f = new FormulaAnd(op1, op2);
+	      else
+		f = new FormulaOr(op1, op2);
+	      formulas_.push_back(f);
+	      break;
+	    }
 
 	  case Node::FORMULA_AAOPE:
 	  case Node::FORMULA_AAOIPE:
@@ -126,7 +131,7 @@ namespace PNapi
 	  case Node::PETRINET:
 	    if (!formulas_.empty())
 	      {
-		net_->setFinalCondition(formulas_.front());
+		net_.setFinalCondition(formulas_.front());
 		formulas_.pop_front();
 	      }
 	    assert(formulas_.empty());

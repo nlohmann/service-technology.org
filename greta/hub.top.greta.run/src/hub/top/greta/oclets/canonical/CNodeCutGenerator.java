@@ -37,6 +37,7 @@
 
 package hub.top.greta.oclets.canonical;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -44,13 +45,19 @@ import java.util.Set;
 
 public class CNodeCutGenerator implements Iterator< CNode[] >{
 
+	public static boolean debug = false;
+	
 	private CNode[][] possibleMatches;
 	private int[] cutIterators;
 	protected CNode[] cutToMatch;	// a fixed order of the CNodes for which we want to find a cut
 	private CNode[] currentCut;
 	private int cutSize;
 	
-	private boolean[] dirty;
+	private HashSet<CNode> currentPasts[];
+	
+	private int dirty;		// the highest node that has been updated last
+							// all nodes with equal or higher index have invalid
+							// fields and need to be checked again
 	
 	public CNodeCutGenerator(Set<CNode> cutPattern, Map<CNode, Set<CNode> > cutCandidates) {
 
@@ -60,7 +67,9 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 		currentCut = new CNode[cutSize];
 		cutIterators = new int[cutSize];	// cannot generate array for generic type
 		possibleMatches = new CNode[cutSize][];
-		dirty = new boolean[cutSize];
+		dirty = 0;		// all nodes have to be checked
+		
+		currentPasts = (HashSet<CNode>[]) new HashSet[cutSize];
 
 		int i=0;
 		for (CNode c : cutPattern) {
@@ -77,7 +86,9 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 			
 			cutIterators[i] = 0;
 			currentCut[i] = possibleMatches[i][0];
-			dirty[i] = true;
+			
+			currentPasts[i] = null;
+			
 			i++;
 		}
 		
@@ -92,7 +103,10 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 		cutIterators[i]++;
 		if (cutIterators[i] < possibleMatches[i].length) {
 			currentCut[i] = possibleMatches[i][cutIterators[i]];
-			dirty[i] = true;
+			if (dirty > i)
+				dirty = i;	// overwrite dirty value, as this method is called with
+							// descending parameter i, this end of recursion marks
+							// the lowest node index that was updated
 			return true;
 		} else {
 			if (i == 0) {
@@ -102,7 +116,6 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 				if (next(i-1)) {
 					cutIterators[i] = 0;
 					currentCut[i] = possibleMatches[i][0];
-					dirty[i] = true;
 					return true;
 				} else {
 					currentCut[i] = null;
@@ -113,6 +126,26 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 	}
 	
 	private boolean isCut() {
+		HashSet<CNode> cut = new HashSet<CNode>(cutSize);
+		
+		for (int i=0;i<cutSize;i++)
+			cut.add(currentCut[i]);
+		
+		for (int i=dirty;i<cutSize;i++) {
+			
+			if (i > 0)
+				currentPasts[i] = new HashSet<CNode>(currentPasts[i-1]);
+			else
+				currentPasts[i] = new HashSet<CNode>();
+
+			if (!currentCut[i].isConcurrentTo(cut, currentPasts[i]))
+				return false;
+			
+			dirty++;	// the information for this node index has been updated and
+						// is valid
+		}
+		
+		/*
 		for (int i=0;i<cutSize;i++) {
 			for (int j=0;j<cutSize;j++) {
 				if (i==j)
@@ -124,12 +157,12 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 				}
 			}
 		}
+		*/
 		return true;
 	}
 	
 	private void ensureNextCut () {
 		while (!isCut()) {
-			for (int i=0;i<cutSize;i++) dirty[i] = false;
 			if (!next(cutSize-1))
 				break;	// cancel in case we iterated over all combinations
 		}

@@ -93,10 +93,14 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 			
 			AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
 			
-			while (bp.construct()) {
+			int steps = 0;
+			while (bp.constructBorder()) {
+				steps++;
+				if ((steps % 100) == 0)
+					System.out.print("\n"+steps+" ");
 				System.out.print(".");
 			}
-			System.out.println();
+			System.out.println("\ndone after "+steps+" steps");
 			
 			IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
 			

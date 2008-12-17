@@ -149,6 +149,10 @@ public class CNode {
 		return label;
 	}
 	
+	public boolean isEvent() {
+		return isEvent;
+	}
+	
 	/**
 	 * recursively populate the given list <code>past</code> with nodes
 	 * that are transitively reachable via the {@code CNode#pred} relation
@@ -160,6 +164,10 @@ public class CNode {
 		}
 	}
 	
+	public Set<CNode> getPred () {
+		return pred;
+	}
+	
 	/**
 	 * replace this node's predecessor CNode p by another CNode newP
 	 * @param p
@@ -169,32 +177,61 @@ public class CNode {
 		if (pred.remove(p))
 			pred.add(newP);
 	}
+
+	public boolean getPast_checkConflict (Set<CNode> past) {
+		return !getPast_checkConcurrency(past, null);
+	}
+	
 	
 	/**
+	 * Check whether the current node is concurrent to the given set of nodes
+	 * <code>notDepend</code>. The method re-uses information that was gathered
+	 * in previous calls of getPast_checkConcurrency to check for conflicts
+	 * in the common past of all nodes. If the transitive past of this node
+	 * neither contains a node of <code>notDepend</code>, nor is in conflict
+	 * to any of their pasts (partially explored in <code>past</code>, then
+	 * this node is concurrent to <code>notDepend</code>.
+	 * 
+	 * The execution of this method extends <code>past</code> with all predecessors
+	 * of this node (until a witness for violation of concurrency is found).
+	 * 
 	 * @param past
+	 * @param notDepend
+	 * @return true iff this node is concurrent to <code>notDepend</code>
 	 */
-	public boolean getPast_checkConflict (Set<CNode> past) {
+	private boolean getPast_checkConcurrency (Set<CNode> past, Set<CNode> notDepend) {
 		if (past.contains(this)) {
 			// this node is part of the already explored past
-			// return true if this is not an event, i.e. the
+			// return false if this is not an event, i.e. the
 			// past of this node and the explored past are in
 			// conflict
-			return !this.isEvent;
+			return this.isEvent;
 		}
 		
 		// unknown whether this node is in conflict to the known past
 		for (CNode c : pred) {
-			// check predecessors
-			if (c.getPast_checkConflict(past))
-				return true;
 			
-			// and extend the explored past if feasible
+			// check predecessors
+			
+			// if predecessor is one of the node on which the current must not
+			// depend, the the current node is not concurrent wrt. the given
+			// past and dependency constraints
+			if (notDepend != null && notDepend.contains(c))
+				return false;
+
+			// otherwise check whether the predecessor is in conflict or
+			// causally dependent
+			else if (!c.getPast_checkConcurrency(past, notDepend))
+				return false;
+			
+			// if not, then add the predecessor to the explored past 
 			else
 				past.add(c);
 		}
 		
-		// no conflicting node found, we are not in conflict
-		return false;
+		// no conflicting node found, and no node found on which this node
+		// must not depend, concurrency confirmed
+		return true;
 	}
 	
 	/**
@@ -240,6 +277,22 @@ public class CNode {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Check whether the current node is concurrent to the given set of <code>otherNodes</code>.
+	 * The result is complete only if this method has been called for each node of
+	 * <code>otherNodes</code> reusing the results stored in <code>knownPastOhter</code>.
+	 * 
+	 * @param otherNodes
+	 * @param knownPastOther
+	 * @return <code>true</code> iff this node is concurrent to <code>otherNodes</code>,
+	 *                               reusing information stored in <code>knownPastOther</code>
+	 */
+	public boolean isConcurrentTo(HashSet<CNode> otherNodes,
+			                      HashSet<CNode> knownPastOther)
+	{
+		return getPast_checkConcurrency(knownPastOther, otherNodes);
 	}
 	
 	public boolean isInConflictTo(CNode other) {
@@ -338,7 +391,7 @@ public class CNode {
 	
 	@Override
 	public String toString() {
-		return label+"(active="+activeNode+")";
+		return label +"("+localId+")";/*+"(active="+activeNode+")"*/
 	}
 	
 	/**

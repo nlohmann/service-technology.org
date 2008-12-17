@@ -287,26 +287,72 @@ public class CNodeSet {
 	/**
 	 * remove a node from this set and all its causal successors
 	 * @param c
+	 * @return all nodes that were removed
 	 */
-	public void removeNode(CNode c) {
+	public Collection<CNode> removeNode(CNode c) {
 		HashSet<CNode> nodesToRemove = getAllCausalSuccessors(c);
 		HashSet<CNode> possibleMaxNodes = new HashSet<CNode>();
 		for (CNode r : nodesToRemove) {
-			// remove node r from the data structures of this set
-			nodes.remove(r);
-			maxNodes.remove(r);
+			
 			assert(cutNodes.contains(r) == false);
-			
-			// all predecessors of a removed node are possible new maxNodes
-			possibleMaxNodes.addAll(r.pred);
-			possibleMaxNodes.remove(r);
-			
-			// remove node r from the index structures of this set
-			Integer key = new Integer(r.hashCode());
-			List<CNode> bucket = indexedNodes.get(key);
-			bucket.remove(r);
+			hideNode(r, possibleMaxNodes);
 		}
 		
+		updateMaxNodes(possibleMaxNodes);
+
+		return nodesToRemove;
+	}
+	
+	/**
+	 * Remove a node from this set and from the index structure,
+	 * but leave its causal successors in the net. This function
+	 * aids in constructing suffixes of CNodeSets. This concenvience
+	 * method also updates the maximal nodes of this CNodeSet
+	 * accordingly.
+	 * 
+	 * @param c
+	 */
+	public void hideNode(CNode r) {
+		HashSet<CNode> possibleMaxNodes = new HashSet<CNode>();
+		hideNode(r, possibleMaxNodes);
+		updateMaxNodes(possibleMaxNodes);
+	}
+	
+	/**
+	 * Remove a node from this set and from the index structure,
+	 * but leave its causal successors in the net. This function
+	 * aids in constructing suffixes of CNodeSets. Updating the
+	 * set of maximal nodes must be done by the help of
+	 * {@code CNodeSet#updateMaxNodes(HashSet)}, candidate nodes
+	 * are provided in <code>possibleMaxNodes</code>.
+	 * 
+	 * @param c
+	 */
+	public void hideNode(CNode r, HashSet<CNode> possibleMaxNodes) {
+		
+		// remove node r from the data structures of this set
+		nodes.remove(r);
+		maxNodes.remove(r);
+		
+		// all predecessors of a removed node are possible new maxNodes
+		possibleMaxNodes.addAll(r.pred);
+		possibleMaxNodes.remove(r);
+		
+		// remove node r from the index structures of this set
+		Integer key = new Integer(r.hashCode());
+		List<CNode> bucket = indexedNodes.get(key);
+		if (bucket != null) bucket.remove(r);
+	}
+	
+	/**
+	 * Update the set of maximal nodes of this CNodeSet, candidates for
+	 * new maximal nodes are provided as a parameter. The method checks
+	 * whether a candidate has no successor. If this is the case, then
+	 * it is a maximal node.
+	 * 
+	 * @param possibleMaxNodes
+	 */
+	private void updateMaxNodes(HashSet<CNode> possibleMaxNodes) {
 		for (CNode c2 : nodes) {
 			// remove all possibly maximal nodes that have a successor
 			// in this set
@@ -316,7 +362,7 @@ public class CNodeSet {
 		maxNodes.addAll(possibleMaxNodes);
 	}
 	
-	private HashSet<CNode> getAllCausalSuccessors(CNode pred) {
+	public HashSet<CNode> getAllCausalSuccessors(CNode pred) {
 		HashSet<CNode> dependingNodes = new HashSet<CNode>(this.size());
 		for (CNode max : maxNodes) {
 			max.causallyDependsOn(pred, dependingNodes);
@@ -328,12 +374,34 @@ public class CNodeSet {
 		return nodes.contains(c);
 	}
 	
-	public Collection<CNode> get(Integer key) {
+	public List<CNode> get(Integer key) {
 		return indexedNodes.get(key);
 	}
 	
-	public Collection<CNode> getAllNodes () {
+	public HashSet<CNode> getAllNodes () {
 		return nodes;
+	}
+	
+	public LinkedList<CNode> getAllNodesOrdered () {
+		LinkedList<CNode> queue = new LinkedList<CNode>(maxNodes);
+		LinkedList<CNode> result = new LinkedList<CNode>();
+
+		// breadth-first search on all nodes of this set
+		while (queue.size() > 0) {
+			CNode c = queue.removeFirst();
+			for (CNode p : c.pred) {
+				// check whether node p is in this set (it might have
+				// been hidden earlier!)
+				if (nodes.contains(p) && !queue.contains(p))
+					queue.addLast(p);
+			}
+			// pushing each processed node to front of results
+			result.addFirst(c);	
+		}
+		// result is now a linearization of all nodes of
+		// this set s.t. for any two nodes with index i and j
+		// holds: i < j implies node(i) < node(j) or node(i) || node(j)
+		return result;
 	}
 	
 	public HashSet<CNode> getCutNodes () {
@@ -344,10 +412,8 @@ public class CNodeSet {
 		return maxNodes;
 	}
 	
-	public Map< CNode, Set<CNode> > computeSuccRelation () {
-		Map< CNode, Set<CNode> > succ = new HashMap<CNode, Set<CNode>>(this.size());
-		
-		for (CNode c : nodes) {
+	public void computeSuccRelation (Set<CNode> forNodes, Map< CNode, Set<CNode> > succ) {
+		for (CNode c : forNodes) {
 			for (CNode p : c.pred ) {
 				Set<CNode> p_succ;
 				p_succ = succ.get(p); 
@@ -358,7 +424,11 @@ public class CNodeSet {
 				p_succ.add(c);
 			}
 		}
-		
+	}
+	
+	public Map< CNode, Set<CNode> > computeSuccRelation () {
+		Map< CNode, Set<CNode> > succ = new HashMap<CNode, Set<CNode>>(this.size());
+		computeSuccRelation(nodes, succ);
 		return succ;
 	}
 	
@@ -421,11 +491,10 @@ public class CNodeSet {
 		return enabledEvents;
 	}
 	
-	public Collection<CNode> getPostConditions(CNode e) {
+	public Collection<CNode> getPostSet(CNode e) {
 		LinkedList<CNode> postConditions = new LinkedList<CNode>();
 		for (CNode c : nodes) {
 			if (c.pred.contains(e)) {
-				assert(c.isEvent == false);
 				postConditions.add(c);
 			}
 		}
@@ -435,7 +504,7 @@ public class CNodeSet {
 	public CNodeSet fire(CNode e) {
 		CNodeSet s = CNodeSet.fromCNodeSet_afterCut(this);
 		s.cutNodes.removeAll(e.pred);
-		s.cutNodes.addAll(s.getPostConditions(e));
+		s.cutNodes.addAll(s.getPostSet(e));
 		
 		List<CNode> conflictingNodes = new LinkedList<CNode>();
 		for (CNode c : s.maxNodes) {
@@ -451,7 +520,7 @@ public class CNodeSet {
 		HashSet<CNode> succCut = new HashSet<CNode>(cut);
 		
 		succCut.removeAll(e.pred);
-		succCut.addAll(getPostConditions(e));
+		succCut.addAll(getPostSet(e));
 		
 		return succCut;
 	}
@@ -605,7 +674,7 @@ public class CNodeSet {
 		}
 		
 		for (CNode n : this.maxNodes) {
-			System.err.println(n+" : "+possibleMatches.get(n));
+			//System.err.println(n+" : "+possibleMatches.get(n));
 			if (!n.hasPossibleMatches(possibleMatches))
 				return false;
 		}
@@ -614,18 +683,6 @@ public class CNodeSet {
 	}
 	
 	public boolean enabledBy(CNodeSet set) {
-		/*
-		BasicEMap<CNode, CNode> matchingRelation = new BasicEMap<CNode, CNode>();
-		if (!maxContainedIn(set, matchingRelation))
-			return false;
-		// checker whether any of this set's nodes is mapped to an active node of set,
-		// i.e. whether set contributes to the activation of this CNodeSet
-		for (CNode n : this.nodes) {
-			if (matchingRelation.get(n).activeNode == true)
-				return true;
-		}
-		return false;
-		*/
 		
 		Map<CNode, Set<CNode> > possibleMatches = new HashMap<CNode, Set<CNode>>(nodes.size());
 		if (!containedIn(set, possibleMatches))
@@ -634,13 +691,14 @@ public class CNodeSet {
 		boolean activated = false;
 
 		CNodeCutGenerator cng = new CNodeCutGenerator(this.maxNodes, possibleMatches);
-		System.err.println("---cut candidates---");
+		//System.err.println("---cut candidates---");
 		while (cng.hasNext()) {
 			CNode[] cut = cng.next();
 			CNode.MatchingRelation matchingRelation = new CNode.MatchingRelation();
 			boolean matchingCut = true;
 			
-			String cutString = "[";
+			
+			//String cutString = "[";
 			for (int i=0;i<cut.length;i++) {
 
 				if (!cng.cutToMatch[i].strictSuffixOf(cut[i], matchingRelation)) {
@@ -648,27 +706,171 @@ public class CNodeSet {
 					break;
 				}
 				
-				cutString += cut[i]+",";
+				//cutString += cut[i]+",";
 			}
-			cutString += "]";
+			//cutString += "]";
 			
 			if (matchingCut) {
 				for (int i=0;i<cut.length;i++) {
 					if (cut[i].activeNode) {
 						activated = true;
-						cutString += "*";
+						//cutString += "*";
 					}
 				}
 			}
 			
-			System.err.println(cutString);
+			//System.err.println(cutString);
 		}
-		System.err.println("---end of cut candidates---");
+		//System.err.println("---end of cut candidates---");
 		
 		return activated;
 	}
+	
+	public HashSet<CNode> reachedCut(CNode event) {
+		if (!event.isEvent)
+			return null;
+		
+		HashSet<CNode> cut = new HashSet<CNode>();
+		
+		HashSet<CNode> ePast = new HashSet<CNode>();
+		event.getPast(ePast);
+		ePast.add(event);	  // elementary configuration also contains the event itself
+		
+		for (CNode c : nodes) {
+			if (c.isEvent) continue;
+			// if it is part of the past of this event, it is not in the cut
+			if (ePast.contains(c)) continue;
 
+			// a condition without predecessors is a minimal condition
+			if (c.pred.isEmpty()) {
+				cut.add(c);
+
+			// any other condition must have all its predecessors
+			// i.e. its single pre-event in the past of this event
+			} else if (ePast.containsAll(c.pred))
+				cut.add(c);
+		}
+		return cut;
+	}
+	
+	public LinkedList<CNode[]> findEnablingCuts(HashSet<CNode> patternToFind, HashSet<CNode> knownPartialCut, HashSet<CNode> candidateNodes) {
+		
+		Map<CNode, Set<CNode> > possibleMatches = new HashMap<CNode, Set<CNode>>(nodes.size());
+		if (!gatherPossibleMatches(patternToFind, knownPartialCut,
+				                   candidateNodes, possibleMatches))
+			return null;
+		
+		// the mapping possibleMatches now assigns each node of patternToFind
+		// possible candidate nodes for matching in the candidate set and uses
+		// at least one node from the partial cut
+		CNodeCutGenerator cng = new CNodeCutGenerator(patternToFind, possibleMatches);
+		LinkedList<CNode[]> result = new LinkedList<CNode[]>();
+		while (cng.hasNext())
+			result.add(cng.next());
+		
+		return result;
+	}
+	
+	/**
+	 * Find a candidate set of possibly matching nodes for a given set of nodes. The
+	 * findings of this methods are stored in the mapping possibleMatches that assigns
+	 * to each node of the set toMatch the set of all possibly matching nodes of this
+	 * CNodeSet. The set of matching candidates is restricted by
+	 *   (1) candidateNodes  - only nodes from this set are considered candidates for
+	 *                         matching) and                  
+	 *   (2) knownPartialCut - if a node of this set is considered as matching candidate
+	 *                         then it is the only matching candidate (truncating
+	 *                         search and restricting the resulting mapping) 
+	 * 
+	 * @param toMatch          nodes for which matching nodes shall be found in this
+	 *                         <code>CNodeSet</code>
+	 * @param knownPartialCut  nodes of this <code>CNodeSet</code> that uniquely
+	 *                         match nodes of <code>toMatch</code> 
+	 * @param candidateNodes   only nodes of this set are candidates for matching
+	 * @param possibleMatches  the result mapping
+	 * @return <code>false</code> iff no matching was found or no node from knownCut
+	 *                                is part of the candidate nodes
+	 */
+	public boolean gatherPossibleMatches(HashSet<CNode> toMatch, HashSet<CNode> knownPartialCut, HashSet<CNode> candidateNodes, Map<CNode, Set<CNode> > possibleMatches) {
+
+		if (toMatch.size() > candidateNodes.size())
+			return false;	// don't even try...
+		
+		boolean usesKnownPartialCut = false;
+		for (CNode n : toMatch) {
+			// retrieve all nodes that might match CNode n via the
+			// hash key index of this CNodeSet
+			Integer key = new Integer(n.hashCode());
+			
+			Collection<CNode> matchByHash = this.get(key);
+			if (matchByHash == null)
+				return false;
+			
+			// we found at least one possibly matching node, now
+			// check whether this node really matches structurally
+			// and whether it is part of the candidateNodes, store
+			// all such nodes in the following set
+			HashSet<CNode> n_candidateNodes = new HashSet<CNode>();
+
+			// check all nodes of CNodeSet set that have the same hash value as the current node n
+			for (CNode other : matchByHash) {
+				
+				// if such a node of CNodeSet set has equal label and matching number of predecessors
+				if (n.label.equals(other.label) && ((n.pred.size() == 0) || (n.pred.size() == other.pred.size()))) {
+					
+					if (knownPartialCut.contains(other)) {
+						// assume a safe system: the current candidate node
+						// other has equal labels and matches
+						// the preset, it is part of the cut we are considering:
+						// it is the only matching candidate
+						n_candidateNodes.clear();
+						n_candidateNodes.add(other);
+						usesKnownPartialCut = true;
+						break;
+					} else if (candidateNodes.contains(other)) {
+						// we found a node in the candidateNodes, add it
+						n_candidateNodes.add(other);
+					}
+				}
+			}
+
+			if (n_candidateNodes.isEmpty())
+				// no candidate match: CNodeSet set cannot contain this set
+				return false;
+			
+			// remember all possible matches for this CNode n
+			possibleMatches.put(n, n_candidateNodes);
+		}
+
+		// we found something for each node, check if it involves the cut
+		return usesKnownPartialCut;
+	}
+
+	/**
+	 * instantiate this set CNodeSet by replacing nodes of this
+	 * set with nodes of another CNodeSet, the replacement mapping
+	 * is provided in the matching relation rel and guarantees
+	 * that the replacement preserves labels
+	 *  
+	 * @param rel
+	 * @return the instantiated set (a true copy where nodes have been replaced)
+	 */
 	public CNodeSet instantiate(CNode.MatchingRelation rel) {
+		return instantiate(rel, false);
+	}
+
+	/**
+	 * instantiate this set CNodeSet by replacing nodes of this
+	 * set with nodes of another CNodeSet, the replacement mapping
+	 * is provided in the matching relation rel and guarantees
+	 * that the replacement preserves labels
+	 *  
+	 * @param rel
+	 * @param hideCut	hide the nodes of the cut and all its predecessors in the
+	 *                  instantiated set
+	 * @return the instantiated set (a true copy where nodes have been replaced)
+	 */
+	public CNodeSet instantiate(CNode.MatchingRelation rel, boolean hideCut) {
 		CNodeSet inst = new CNodeSet(this.size());
 		
 		CNode.MatchingRelation copyMap = new CNode.MatchingRelation();
@@ -682,6 +884,24 @@ public class CNodeSet {
 			inst.maxNodes.add(inst.toCNode(c, copyMap));
 		}
 		
+		// initialize the cut of the instantiated set
+		for (CNode c : this.cutNodes) {
+			inst.cutNodes.add(copyMap.get(c));
+		}
+
+		
+		if (hideCut) {
+			// and hide the cut and all predecessor nodes of the cut
+			HashSet<CNode> possibleMaxNodes = new HashSet<CNode>(inst.cutNodes.size());
+			LinkedList<CNode> preCond = new LinkedList<CNode>(inst.cutNodes);
+			while (preCond.size() > 0) {
+				CNode c = preCond.removeFirst();
+				preCond.addAll(c.pred);
+				inst.hideNode(c, possibleMaxNodes);
+			}
+			inst.updateMaxNodes(possibleMaxNodes);
+		}
+		
 		return inst;
 	}
 
@@ -691,6 +911,10 @@ public class CNodeSet {
 	}
 	
 	public String toDot () {
+		return toDot(new HashSet<CNode>(1));
+	}
+	
+	public String toDot (HashSet<CNode> cutoff) {
 		StringBuilder b = new StringBuilder();
 		b.append("digraph BP {\n");
 		
@@ -699,6 +923,7 @@ public class CNodeSet {
 		b.append("edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"];\n");
 
 		String tokenFillString = "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+		String cutOffFillString = "fillcolor=grey";
 		
 		b.append("\n\n");
 		b.append("node [shape=circle];\n");
@@ -711,7 +936,7 @@ public class CNodeSet {
 				b.append("  c"+n.localId+" []\n");
 				
 			b.append("  c"+n.localId+"_l [shape=none];\n");
-			b.append("  c"+n.localId+"_l -> c"+n.localId+" [headlabel=\""+n.label+"\"]\n");
+			b.append("  c"+n.localId+"_l -> c"+n.localId+" [headlabel=\""+n+"\"]\n");
 		}
 		
 		b.append("\n\n");
@@ -719,9 +944,12 @@ public class CNodeSet {
 		for (CNode n : nodes) {
 			if (!n.isEvent)
 				continue;
-			b.append("  e"+n.localId+" []\n");
+			if (cutoff.contains(n))
+				b.append("  e"+n.localId+" ["+cutOffFillString+"]\n");
+			else
+				b.append("  e"+n.localId+" []\n");
 			b.append("  e"+n.localId+"_l [shape=none];\n");
-			b.append("  e"+n.localId+"_l -> e"+n.localId+" [headlabel=\""+n.label+"\"]\n");
+			b.append("  e"+n.localId+"_l -> e"+n.localId+" [headlabel=\""+n+"\"]\n");
 		}
 		
 		/*

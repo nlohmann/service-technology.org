@@ -45,20 +45,27 @@ import hub.top.greta.run.Activator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 public class BuildStateSpace implements IWorkbenchWindowActionDelegate {
 
@@ -122,34 +129,84 @@ public class BuildStateSpace implements IWorkbenchWindowActionDelegate {
 			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
 			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
 			
-			AdaptiveSystemTS ts = new AdaptiveSystemTS(adaptiveSystem);
+			final AdaptiveSystemTS ts = new AdaptiveSystemTS(adaptiveSystem);
+			ts.withOcletSteps = false;
+			
+			Job tsExploreJob = new Job("Exploring state space") {
 
-			int steps = 0;
-			while (ts.explore()) {
-				steps++;
-				if ((steps % 100) == 0)
-					System.out.print("\n"+steps+" ");
-				System.out.print(".");
-			}
-			System.out.println("\ndone after "+steps+" steps");
-			
-			IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
-			
-			if (in instanceof IFileEditorInput) {
-				IFile inputFile = ((IFileEditorInput)in).getFile();
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
 				
-				writeDotFile(ts, inputFile);
-				writeGenetFile(ts, inputFile);
-				/*
-				for (CNodeSet state : ts.states) {
-					ByteArrayInputStream contents = new ByteArrayInputStream(state.toDot().getBytes());
+					monitor.beginTask("Exploring state space", IProgressMonitor.UNKNOWN);
 
-					String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
-					IPath targetPath = new Path(targetPathStr+"_ts_"+state.num+".dot");
-					writeFile(targetPath, contents);
+					System.out.println("------- constructing state-space -------");
+					int steps = 0;
+					boolean interrupted = false;
+					long tStart = System.currentTimeMillis();
+					while (ts.explore()) {
+						
+						steps++;
+						if ((steps % 10) == 0) {
+							//System.out.print("\n"+steps+" ");
+							monitor.subTask("explored "+steps+" states");
+						}
+						//System.out.print(".");
+
+						if (monitor.isCanceled()) {
+							interrupted = true;
+							break;
+						}
+					}
+					long tEnd = System.currentTimeMillis();
+					
+					if (interrupted) System.out.print("\ninterrupted ");
+					else System.out.print("\ndone ");
+					System.out.println("after "+steps+" steps, "+(tEnd-tStart)+"ms");
+					System.out.println(ts.getStatistics());
+					
+					if (ts.hasDeadlock())
+						System.out.println("has a deadlock");
+					else
+						System.out.println("is deadlock-free");
+
+					// write result to files
+					monitor.beginTask("Writing result files", 2);
+					IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
+					if (in instanceof IFileEditorInput) {
+						IFile inputFile = ((IFileEditorInput)in).getFile();
+						
+						monitor.subTask("writing dot file");
+						writeDotFile(ts, inputFile);
+						monitor.worked(1);
+						
+						monitor.subTask("writing genet file");
+						writeGenetFile(ts, inputFile);
+						monitor.worked(1);
+						/*
+						for (CNodeSet state : ts.states) {
+							ByteArrayInputStream contents = new ByteArrayInputStream(state.toDot().getBytes());
+
+							String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
+							String nullStr = "";
+							if (state.num < 10) nullStr += "0";
+							if (state.num < 100) nullStr += "0";
+								
+							IPath targetPath = new Path(targetPathStr+"_ts_"+nullStr+state.num+".dot");
+							writeFile(targetPath, contents);
+						}
+						*/
+					}
+					monitor.done();
+					
+					if (interrupted)
+						return Status.CANCEL_STATUS;
+					else
+						return Status.OK_STATUS;
 				}
-				*/
-			}
+			};
+
+			tsExploreJob.setUser(true);
+			tsExploreJob.schedule();
 		}
 	}
 

@@ -41,10 +41,15 @@ import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.Orientation;
 import hub.top.greta.oclets.canonical.CNode;
 import hub.top.greta.oclets.canonical.CNodeSet;
+import hub.top.greta.oclets.canonical.GraphNode;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
+
+import org.eclipse.swt.widgets.Link;
 
 public class AdaptiveSystemBP {
 	
@@ -64,11 +69,13 @@ public class AdaptiveSystemBP {
 	//private LinkedList<CNode> queue = new LinkedList<CNode>();
 	private HashSet<CNode> dirtyBorderNodes = new HashSet<CNode>();
 	
-	private LinkedList<CNode> unvisitedNodes = new LinkedList<CNode>();
+	private LinkedList<CNode> unvisitedEvents = new LinkedList<CNode>();
 	
 	private LinkedList<CNode> visitedEvents = new LinkedList<CNode>();
 	private HashSet<CNode> cutOffEvents = new HashSet<CNode>();
 	private HashSet<CNode> initialCut = new HashSet<CNode>();
+	
+	private HashMap<CNode, Set<CNode>> co = new HashMap<CNode, Set<CNode> >();
 	
 	public AdaptiveSystemBP(hub.top.adaptiveSystem.AdaptiveSystem as) {
 		bp = CNodeSet.fromAdaptiveProcess(as.getAdaptiveProcess());
@@ -85,6 +92,14 @@ public class AdaptiveSystemBP {
 		unvisitedCuts.add(initialCut);
 		knownCuts.add(initialCut);
 		dirtyCutNodes.add(initialCut);
+		
+		// initialize explicit concurrency relation
+		for (CNode c : initialCut) {
+			co.put(c, new HashSet<CNode>());
+		}
+		for (CNode c : initialCut) {
+			updateConcurrencyRelation(c);
+		}
 		
 		border.addAll(initialCut);
 		dirtyBorderNodes.addAll(initialCut);
@@ -103,7 +118,7 @@ public class AdaptiveSystemBP {
 				oclets[ocletCount] = o;
 				ocletNets[ocletCount] = CNodeSet.fromOclet(o);
 
-				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true);
+				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true, true);
 				ocletCuts[ocletCount] = new CNode[cuts.size()][];
 				int ocletCutCount = 0;
 				for (CNode[] cut : cuts)
@@ -111,14 +126,10 @@ public class AdaptiveSystemBP {
 				/*
 				System.out.println("cuts of "+o.getName()+" ----------");
 				ocletCutCount = 0;
-				for (CNode[] cut : cuts) {
-					System.out.print(ocletCutCount+" [");
-					for (int i=0;i<cut.length;i++)
-						System.out.print(cut[i]+",");
-					System.out.println("]");
-					ocletCutCount++;
-				}*/
-				
+				for (; ocletCutCount < ocletCuts[ocletCount].length; ocletCutCount++) {
+					System.out.println(ocletCutCount+" "+cutToString(ocletCuts[ocletCount][ocletCutCount]));
+				}
+				*/
 				ocletCount++;
 			}
 		}
@@ -128,7 +139,7 @@ public class AdaptiveSystemBP {
 				oclets[ocletCount] = o;
 				ocletNets[ocletCount] = CNodeSet.fromOclet(o);
 
-				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true);
+				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true, true);
 				ocletCuts[ocletCount] = new CNode[cuts.size()][];
 				int ocletCutCount = 0;
 				for (CNode[] cut : cuts)
@@ -215,9 +226,13 @@ public class AdaptiveSystemBP {
 							other.replacePredecessorNode(c, added);
 					}
 				}
-				if (added.isEvent() && !unvisitedNodes.contains(added)) {
-					unvisitedNodes.addLast(added);
+				
+				if (added.isEvent() && !unvisitedEvents.contains(added)) {
+					unvisitedEvents.addLast(added);
 					//System.out.println("adding "+added+" from "+oclets[i].getName());
+				} else if (!added.isEvent() && added == c) {
+					/*updateConcurrencyRelation(added);*/
+					co.put(c, new HashSet<CNode>());
 				}
 			}
 			// update the maximal nodes of the successor state
@@ -226,10 +241,13 @@ public class AdaptiveSystemBP {
 		else {
 			for (CNode c : o.getAllNodes()) {
 				Collection<CNode> removeCandidates = bp.get(new Integer(c.hashCode()));
+				if (removeCandidates == null)
+					continue;
+				
 				for (CNode remC : removeCandidates) {
 					if (c.equals(remC)) {
 						Collection<CNode> removedNodes = bp.removeNode(remC);
-						unvisitedNodes.removeAll(removedNodes);
+						unvisitedEvents.removeAll(removedNodes);
 						break;
 					}
 				}
@@ -248,25 +266,32 @@ public class AdaptiveSystemBP {
 	public boolean equivalentCuts(HashSet<CNode> cut1, HashSet<CNode> cut2) {
 		int enabledCutNum_s1[] = new int[oclets.length];
 		int enabledCutNum_s2[] = new int[oclets.length];
+
 		
 		for (int ocletNum = 0; ocletNum < oclets.length; ocletNum++) {
 			int cutNum = 0;
+			//System.out.print("checking ["+ocletCuts[ocletNum].length+"] ");
 			for (; cutNum < ocletCuts[ocletNum].length; cutNum++) {
+			//	System.out.print(cutNum+" ");
 				if (CNodeSet.nodesContainedIn(ocletCuts[ocletNum][cutNum], cut1, null))
 					break;
 			}
 			enabledCutNum_s1[ocletNum] = cutNum;
+			//System.out.println();
 		}
 		
 		for (int ocletNum = 0; ocletNum < oclets.length; ocletNum++) {
 			int cutNum = 0;
+			//System.out.print("checking ["+ocletCuts[ocletNum].length+"] ");
 			for (; cutNum < ocletCuts[ocletNum].length; cutNum++) {
+			//	System.out.print(cutNum+" ");
 				if (CNodeSet.nodesContainedIn(ocletCuts[ocletNum][cutNum], cut2, null))
 					break;
 			}
 			enabledCutNum_s2[ocletNum] = cutNum;
+			//System.out.println();
 		}
-/*
+		/*
 		    for (int i=0;i<enabledCutNum_s1.length;i++) System.out.print(oclets[i].getName()+"|");
 		    System.out.println();
 		    System.out.println(cutToString(cut1));
@@ -282,6 +307,58 @@ public class AdaptiveSystemBP {
 				return false;
 		
 		return true;
+	}
+	
+	private void updateConcurrencyRelation (CNode newNode) {
+		if (newNode.isEvent()) return;
+		
+		// the pre-event of newNode has just been added to the branching process
+		CNode preNew = newNode.getPreEvent();
+		
+		//System.out.println("newNode = "+newNode+", °newNode = "+preNew);
+		
+		//HashSet<CNode> coset = new HashSet<CNode>();
+		Set<CNode> coset = co.get(newNode);
+		
+		for (CNode existing : bp.getAllNodes()) {
+			if (existing.isEvent() || existing == newNode)
+				continue;
+			
+			CNode preExisting = existing.getPreEvent();
+			Set<CNode> cosetEx = co.get(existing);
+			
+			// both have the same predecessor
+			if (preNew == preExisting ) {
+				coset.add(existing);
+				cosetEx.add(newNode);
+				continue;
+			}
+			
+			boolean notCo = false;
+			for (CNode p : preNew.getPred()) {
+				if (!cosetEx.contains(p)) {
+					notCo = true;
+					//System.out.println("~("+existing+" co "+ p+") --> ~("+existing+" co "+newNode+")");
+					break;
+				}
+			}
+			// CNode existing is concurrent to every predecessor of
+			// CNode newNode's pre-event: both are concurrent
+			if (!notCo) {
+				coset.add(existing);
+				cosetEx.add(newNode);
+			}
+		}
+		
+		co.put(newNode, coset);
+	}
+	
+	private void printConcurrencyRelation () {
+		for (CNode c : co.keySet()) {
+			System.out.print(c+": ");
+			System.out.println(cutToString(co.get(c)));
+		}
+		System.out.println("---");
 	}
 	
 	public boolean construct () {
@@ -327,15 +404,16 @@ public class AdaptiveSystemBP {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean constructBorder () {
 		
 		boolean change = false;
 		boolean cutOffEvent = false;
 		
-		if (unvisitedNodes.size() > 0) {
+		if (unvisitedEvents.size() > 0) {
 			CNode e = null;
 			
-			for (CNode eCand : unvisitedNodes) {
+			for (CNode eCand : unvisitedEvents) {
 				if (border.containsAll(eCand.getPred())) {
 					e = eCand;
 					break;
@@ -346,7 +424,7 @@ public class AdaptiveSystemBP {
 				System.out.println("exploring event after cut-off");
 			
 			if (e != null) {
-				unvisitedNodes.remove(e);
+				unvisitedEvents.remove(e);
 				
 				Collection<CNode> ePost = bp.getPostSet(e);
 				dirtyBorderNodes.addAll(ePost);
@@ -368,6 +446,10 @@ public class AdaptiveSystemBP {
 				
 				//border.removeAll(e.getPred());
 				border.addAll(ePost);
+				
+				for (CNode c : ePost)
+					updateConcurrencyRelation(c);
+				
 				change = true;
 				/*
 				HashSet<CNode> postEvents = new HashSet<CNode>(ePost.size());
@@ -397,17 +479,17 @@ public class AdaptiveSystemBP {
 					// hash key index of this CNodeSet
 					for (CNode other : visitedEvents) {
 						HashSet<CNode> otherCut = bp.reachedCut(other);
-
-						//System.out.println("vs "+other+": "+cutToString(otherCut));
-
+						/*
+						System.out.println("vs "+other+": "+cutToString(otherCut));
+						 */
 						if (otherCut.size() != eCut.size())
 							continue;
 						if (equivalentCuts(eCut, otherCut)) {
 							cutOffEvent = true;
-							/*
+							/*						
 							System.out.println("cut off: "+e+" "+cutToString(eCut));
 							System.out.println("earlier: "+other+" "+cutToString(otherCut));
-							*/
+							 */					
 							break;
 						}
 					}
@@ -416,7 +498,7 @@ public class AdaptiveSystemBP {
 				if (cutOffEvent) {
 					// do not explore any success of a cut-off event
 					HashSet<CNode> future = bp.getAllCausalSuccessors(e);
-					unvisitedNodes.removeAll(future);
+					unvisitedEvents.removeAll(future);
 					cutOffEvents.add(e);
 					cutOffEvents.addAll(future);
 //					System.out.println("removing "+cutToString(future));
@@ -424,21 +506,26 @@ public class AdaptiveSystemBP {
 				
 				visitedEvents.add(e);
 			} else {
-				System.err.println("no fitting extend nodes found in: "+cutToString(unvisitedNodes));
+				System.err.println("no fitting extend nodes found in: "+cutToString(unvisitedEvents));
 				System.err.println("current border: "+cutToString(border));
 			}
 		}
 		
 		if (!cutOffEvent) {
+			//printConcurrencyRelation();
+
+			LinkedList<CNode[]> matchingCuts[] = (LinkedList<CNode[]>[])new LinkedList[oclets.length];
 			for (int i=0;i<oclets.length;i++) {
 				HashSet<CNode> ocletCut = ocletNets[i].getCutNodes();
+				matchingCuts[i] = bp.findEnablingCuts(ocletCut, dirtyBorderNodes, border, co);
+			}
+			
+			for (int i=0;i<oclets.length;i++) {
 				
-				LinkedList<CNode[]> matchingCuts = bp.findEnablingCuts(ocletCut, dirtyBorderNodes, border);
-				
-				if (matchingCuts == null)
+				if (matchingCuts[i] == null)
 					continue;
 				
-				for (CNode[] cut : matchingCuts) {
+				for (CNode[] cut : matchingCuts[i]) {
 					CNode.MatchingRelation oEnabled = isOcletEnabled(i, cut, dirtyBorderNodes);
 					if (oEnabled != null) {
 						applyOclet(i, oEnabled);
@@ -482,11 +569,54 @@ public class AdaptiveSystemBP {
 		}
 		return s+"]";
 	}
-	
 
 	public String toDot () {
 		//System.out.println("number of cuts: "+this.knownCuts.size());
 		//System.out.println("cut-off events:"+cutToString(cutOffEvents));
 		return bp.toDot(cutOffEvents);
+	}
+	
+	public String getStatistics() {
+		int condNum = 0;
+		int eventNum = 0;
+		int cutOffNum = 0;
+		for (CNode n : bp.getAllNodes()) {
+			if (n.isEvent()) {
+				eventNum++;
+				if (cutOffEvents.contains(n))
+					cutOffNum++;
+			}
+			else condNum ++;
+		}
+		return "|C| = "+condNum +" |E| = "+eventNum+" |E_cutOff| = "+cutOffNum;
+	}
+	
+	public void fold() {
+		HashMap<CNode, HashSet<CNode>> equivalentEvents = new HashMap<CNode, HashSet<CNode>>();
+		HashMap<CNode, CNode> equivalentEventsRep = new HashMap<CNode, CNode>();
+		HashMap<CNode, GraphNode> graphNodes = new HashMap<CNode, GraphNode>();
+		
+		for (CNode e : bp.getAllNodes()) {
+			if (!e.isEvent()) continue;
+			
+			boolean found = false;
+			for (CNode other : equivalentEvents.keySet()) {
+				HashSet<CNode> eCut = bp.reachedCut(e);
+				HashSet<CNode> otherCut = bp.reachedCut(other);
+				if (equivalentCuts(eCut, otherCut)) {
+					equivalentEvents.get(other).add(e);
+					equivalentEventsRep.put(e,other);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				HashSet<CNode> eEq = new HashSet<CNode>();
+				eEq.add(e);
+				equivalentEvents.put(e, eEq);
+				equivalentEventsRep.put(e, e);
+				graphNodes.put(e, new GraphNode(e.getLabel(), e.isEvent(), initialCut.contains(eEq)));
+			}
+		}
 	}
 }

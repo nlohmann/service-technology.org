@@ -88,7 +88,7 @@ public class AdaptiveSystemTS {
 				oclets[ocletCount] = o;
 				ocletNets[ocletCount] = CNodeSet.fromOclet(o);
 
-				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true);
+				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true, true);
 				ocletCuts[ocletCount] = new CNode[cuts.size()][];
 				int ocletCutCount = 0;
 				for (CNode[] cut : cuts)
@@ -102,8 +102,8 @@ public class AdaptiveSystemTS {
 						System.out.print(cut[i]+",");
 					System.out.println("]");
 					ocletCutCount++;
-				}*/
-				
+				}
+				*/
 				ocletCount++;
 			}
 		}
@@ -112,7 +112,7 @@ public class AdaptiveSystemTS {
 				oclets[ocletCount] = o;
 				ocletNets[ocletCount] = CNodeSet.fromOclet(o);
 
-				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true);
+				Collection<CNode[]> cuts = ocletNets[ocletCount].getAllCuts(true, true);
 				ocletCuts[ocletCount] = new CNode[cuts.size()][];
 				int ocletCutCount = 0;
 				for (CNode[] cut : cuts)
@@ -126,11 +126,15 @@ public class AdaptiveSystemTS {
 						System.out.print(cut[i]+",");
 					System.out.println("]");
 					ocletCutCount++;
-				}*/
-
+				}
+				*/
 				ocletCount++;
 			}
 		}
+	}
+	
+	private void convertOclets() {
+		
 	}
 	
 	public CNode.MatchingRelation[] enabledOclets (CNodeSet state) {
@@ -166,6 +170,9 @@ public class AdaptiveSystemTS {
 				} else {
 					for (CNode c : o.getAllNodes()) {
 						Collection<CNode> removeCandidates = s.get(new Integer(c.hashCode()));
+						if (removeCandidates == null)
+							continue;
+						
 						for (CNode remC : removeCandidates) {
 							if (c.equals(remC)) {
 								s.removeNode(remC);
@@ -231,6 +238,8 @@ public class AdaptiveSystemTS {
 		return true;
 	}
 	
+	public boolean withOcletSteps = false;
+	
 	public boolean explore () {
 		if (unvisitedStates.isEmpty())
 			return false;
@@ -269,25 +278,26 @@ public class AdaptiveSystemTS {
 					break;
 				}
 			}
-		/*
-			// construct new step and add to the transition system
-			AdaptiveSystemStep step = new AdaptiveSystemStep();
-			step.source = state;
-			step.target = s_oclet;
-			step.label = "";
-			for (int i=0; i < oEnabled.length; i++) {
-				if (oEnabled[i] == null)
-					continue;
-				
-				if (step.label.length() > 0)
-					step.label += ", ";
-				step.label += oclets[i].getName();
+		
+			if (withOcletSteps) {
+				// construct new step and add to the transition system
+				AdaptiveSystemStep step = new AdaptiveSystemStep();
+				step.source = state;
+				step.target = s_oclet;
+				step.label = "";
+				for (int i=0; i < oEnabled.length; i++) {
+					if (oEnabled[i] == null)
+						continue;
+					
+					if (step.label.length() > 0)
+						step.label += ", ";
+					step.label += oclets[i].getName();
+				}
+				this.steps.add(step);
+					
+				if (newState)
+					this.states.add(s_oclet);
 			}
-			this.steps.add(step);
-				
-			if (newState)
-				this.states.add(s_oclet);
-		*/
 		} else {
 			s_oclet = state;
 		}
@@ -317,8 +327,10 @@ public class AdaptiveSystemTS {
 				
 				// construct new step and add to the transition system
 				AdaptiveSystemStep step = new AdaptiveSystemStep();
-				//step.source = s_oclet;
-				step.source = state;
+				if (withOcletSteps)
+					step.source = s_oclet;
+				else
+					step.source = state;
 				
 				step.target = s_events[i];
 				step.label = eEnabled[i].getLabel();
@@ -375,6 +387,18 @@ public class AdaptiveSystemTS {
 		}
 		b.append("}");
 		return b.toString();
+	}
+	
+	public String getStatistics() {
+		return "|Q| = "+states.size() +" |delta| = "+steps.size()+" |Q_visited| = "+stateCount;
+	}
+	
+	public boolean hasDeadlock() {
+		HashSet<CNodeSet> statesWithoutSucc = new HashSet<CNodeSet>(states);
+		for (AdaptiveSystemStep step : steps) {
+			statesWithoutSucc.remove(step.source);
+		}
+		return !statesWithoutSucc.isEmpty();
 	}
 	
 	private static final int OUT_GENET_AVG_STEP_STRING = 20;

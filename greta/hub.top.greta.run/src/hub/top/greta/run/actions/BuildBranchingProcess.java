@@ -46,20 +46,28 @@ import hub.top.greta.run.Activator;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 
@@ -91,24 +99,57 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
 			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
 			
-			AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
+			final AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
 			
-			int steps = 0;
-			while (bp.constructBorder()) {
-				steps++;
-				if ((steps % 100) == 0)
-					System.out.print("\n"+steps+" ");
-				System.out.print(".");
-			}
-			System.out.println("\ndone after "+steps+" steps");
+			Job bpBuildJob = new Job("Constructing branching process") 
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					
+					monitor.beginTask("Constructing branching process", IProgressMonitor.UNKNOWN);
+					
+					System.out.println("------- constructing branching process -------");
+					int steps = 0;
+					boolean interrupted = false;
+					long tStart = System.currentTimeMillis();
+					while (bp.constructBorder()) {
+						steps++;
+						if ((steps % 10) == 0)
+							monitor.subTask("explored "+steps+" events");
+						
+						if (monitor.isCanceled()) {
+							interrupted = true;
+							break;
+						}
+					}
+					long tEnd = System.currentTimeMillis();
+					
+					if (interrupted) System.out.print("\ninterrupted ");
+					else System.out.print("\ndone ");
+					
+					System.out.println("after "+steps+" steps, "+(tEnd-tStart)+"ms");
+					System.out.println(bp.getStatistics());
+
+					monitor.beginTask("Writing result files", 1);
+					IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
+					if (in instanceof IFileEditorInput) {
+						IFile inputFile = ((IFileEditorInput)in).getFile();
+						
+						monitor.subTask("writing dot file");
+						writeDotFile(bp, inputFile);
+						monitor.worked(1);
+					}
+					monitor.done();
+					
+					if (interrupted)
+						return Status.CANCEL_STATUS;
+					else
+						return Status.OK_STATUS;
+				}
+			};
 			
-			IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
-			
-			if (in instanceof IFileEditorInput) {
-				IFile inputFile = ((IFileEditorInput)in).getFile();
-				
-				writeDotFile(bp, inputFile);
-			}
+			bpBuildJob.setUser(true);
+			bpBuildJob.schedule();
 		}
 
 	}

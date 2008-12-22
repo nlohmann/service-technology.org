@@ -59,7 +59,12 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 							// all nodes with equal or higher index have invalid
 							// fields and need to be checked again
 	
-	public CNodeCutGenerator(Set<CNode> cutPattern, Map<CNode, Set<CNode> > cutCandidates) {
+	private Map<CNode, Set<CNode>> co = null;
+	
+	private boolean hasSomeCut = true;
+	
+	public CNodeCutGenerator(Set<CNode> cutPattern, Map<CNode, Set<CNode> > cutCandidates,
+			HashSet<CNode> knownPartialCut, Map<CNode, Set<CNode>> coRelation) {
 
 		cutSize = cutPattern.size();
 		
@@ -75,7 +80,32 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 		for (CNode c : cutPattern) {
 			cutToMatch[i] = c;
 			
-			Set<CNode> candidates = cutCandidates.get(c);
+			Set<CNode> candidates = new HashSet<CNode>(cutCandidates.get(c));
+			if (knownPartialCut != null && coRelation != null) {
+				Set<CNode> nonCandidates = new HashSet<CNode>();
+				// remove all candidate nodes that are not concurrent to a node
+				// from the known partial cut
+				for (CNode cutNode : knownPartialCut) {
+					
+					Set<CNode> coSet = coRelation.get(cutNode);
+					if (coSet.size() > 0)
+						for (CNode other : candidates) {
+							
+							// a node is never concurrent to itself, so don't check 
+							if (other == cutNode)
+								continue;
+							
+							// CNode other is not concurrent to one of the nodes
+							// from the known partial cut: remove from the candidate set
+							if (!coSet.contains(other)) {
+								nonCandidates.add(other);
+								//System.out.println("~("+other+" co "+cutNode);
+							}
+						}
+				}
+				candidates.removeAll(nonCandidates);
+			}
+			
 			possibleMatches[i] = new CNode[candidates.size()];
 			
 			int j = 0;
@@ -85,18 +115,28 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 			}
 			
 			cutIterators[i] = 0;
-			currentCut[i] = possibleMatches[i][0];
+			if (candidates.size() == 0)
+				hasSomeCut = false;
+			else
+				currentCut[i] = possibleMatches[i][0];
 			
 			currentPasts[i] = null;
 			
 			i++;
 		}
 		
-		ensureNextCut();
+		co = coRelation;
+		
+		if (hasSomeCut)
+			ensureNextCut();
+	}
+	
+	public CNodeCutGenerator(Set<CNode> cutPattern, Map<CNode, Set<CNode> > cutCandidates) {
+		this(cutPattern, cutCandidates, null, null);
 	}
 
 	public boolean hasNext() {
-		return currentCut[0] != null;
+		return hasSomeCut && currentCut[0] != null;
 	}
 
 	private boolean next(int i) {
@@ -125,7 +165,23 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 		}
 	}
 	
+	private boolean isCut_co() {
+		for (int i=dirty;i<cutSize;i++) {
+			for (int j=0; j < i; j++) {
+				if (!co.get(currentCut[i]).contains(currentCut[j]))
+					return false;
+			}
+			dirty++;	// concurrency for this node index (and below) has been
+						// verified
+		}
+		return true;
+	}
+	
 	private boolean isCut() {
+		
+		if (co != null)
+			return isCut_co();
+		
 		HashSet<CNode> cut = new HashSet<CNode>(cutSize);
 		
 		for (int i=0;i<cutSize;i++)
@@ -137,7 +193,7 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 				currentPasts[i] = new HashSet<CNode>(currentPasts[i-1]);
 			else
 				currentPasts[i] = new HashSet<CNode>();
-
+			
 			if (!currentCut[i].isConcurrentTo(cut, currentPasts[i]))
 				return false;
 			

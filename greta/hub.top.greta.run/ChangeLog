@@ -1,6 +1,9 @@
 Greta v1.1.1
 ------------
 
++ construction of state-space/branching process is now encapsulated in an
+  Eclipse job allowing concurrent use of Eclipse/Greta during the
+  calculation (preferably on a machine with 2 or more cores)
 + added Eclipse feature declaration, Greta can now be installed as an Eclipse
   feature from http://download.gna.org/service-tech/greta/updatesite/
 + added method to construct the minimal complete prefix of the branching

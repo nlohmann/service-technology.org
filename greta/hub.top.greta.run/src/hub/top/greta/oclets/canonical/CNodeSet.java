@@ -252,6 +252,10 @@ public class CNodeSet {
 	/**
 	 * store node in this set
 	 * @param c
+	 * @return the node which represents the added node in this CNodeSet,
+	 *         the method returns <code>c</code> if this node is truly new,
+	 *         it returns the existing nodes if it exists according to
+	 *         <code> retVal.equals(c)</code>
 	 */
 	public CNode addNode(CNode c) {
 		if (!nodes.add(c)) {
@@ -353,11 +357,24 @@ public class CNodeSet {
 	 * @param possibleMaxNodes
 	 */
 	private void updateMaxNodes(HashSet<CNode> possibleMaxNodes) {
+		
+		
+		
 		for (CNode c2 : nodes) {
 			// remove all possibly maximal nodes that have a successor
 			// in this set
 			possibleMaxNodes.removeAll(c2.pred);
 		}
+		
+		// a node that is no longer a node of this set (by hiding or deleting)
+		// cannot be a maximal node
+		HashSet<CNode> nonMaxNodes = new HashSet<CNode>(possibleMaxNodes.size());
+		for (CNode c : possibleMaxNodes) {
+			if (!nodes.contains(c))
+				nonMaxNodes.add(c);
+		}
+		possibleMaxNodes.removeAll(nonMaxNodes);
+		
 		// add the remaining nodes to the max nodes
 		maxNodes.addAll(possibleMaxNodes);
 	}
@@ -432,7 +449,7 @@ public class CNodeSet {
 		return succ;
 	}
 	
-	public Collection< CNode[] > getAllCuts(boolean skipMax) {
+	public Collection< CNode[] > getAllCuts(boolean skipMax, boolean partial) {
 		LinkedList< CNode[] > result = new LinkedList<CNode[]>();
 		
 		CNode cut[] = new CNode[maxNodes.size()];
@@ -441,39 +458,101 @@ public class CNodeSet {
 		if (!skipMax)
 			result.add(cut);
 
-		getAllCuts(cut, result, computeSuccRelation());
+		getAllCutsPartial(cut, result, computeSuccRelation(), partial);
 		return result;
 	}
 	
-	public void getAllCuts(CNode[] cut, Collection< CNode[]> allCuts, Map< CNode, Set<CNode> > succ) {
-		
-		HashSet< CNode > preEvents = new HashSet< CNode >(cut.length);
-		for (int i=0; i < cut.length; i++)
-			preEvents.addAll(cut[i].pred);
-		for (CNode preEvent : preEvents) {
-			Set<CNode> postConditions = succ.get(preEvent);
-			int postConditionsInCut = 0;
-			int preCutSize = cut.length - postConditions.size() + preEvent.pred.size();
-			
-			int preCutPos = 0;
-			CNode preCut[] = new CNode[preCutSize];
-			for (int j=0; j < cut.length && preCutPos < preCutSize ;j++)
-				if (postConditions.contains(cut[j]))
-					postConditionsInCut++;
-				else
-					// this cut condition will be in the preCut
-					preCut[preCutPos++] = cut[j];
-			
-			if (postConditionsInCut < postConditions.size())
-				continue;
-
-			for (CNode preCond : preEvent.pred) {
-				preCut[preCutPos++] = preCond;
+	// TODO make this check more efficient!
+	private static boolean collectionContainsArray(Collection<CNode[]> coll, CNode[] arr) {
+		for (CNode[] other : coll) {
+			if (other.length != arr.length) continue;
+			int i=0;
+			for (;i < other.length;i++) {
+				int j=0;
+				for (; j < arr.length;j++) {
+					if (other[i] == arr[j]) break;
+				}
+				if (j == arr.length) break; // found no partner for node i, stop
 			}
-			allCuts.add(preCut);
-			
-			getAllCuts(preCut, allCuts, succ);
+			// iterated over all nodes of other, found a partner for each i
+			if (i == other.length) return true;
 		}
+		return false;
+	}
+	
+	public void getAllCuts(CNode[] cut, Collection< CNode[]> allCuts, Map< CNode, Set<CNode> > succ) {
+		getAllCutsPartial(cut, allCuts, succ, false);
+	}
+	
+	public void getAllCutsPartial(CNode[] cut, Collection< CNode[]> allCuts, Map< CNode, Set<CNode> > succ, boolean partial) {
+		
+		boolean emptyPreSet = false;
+		
+		LinkedList<CNode[]> cutQueue = new LinkedList<CNode[]>();
+		cutQueue.addLast(cut);
+		
+		while (cutQueue.size() > 0) {
+			
+			CNode[] currentCut = cutQueue.removeFirst();
+			
+			HashSet< CNode > preEvents = new HashSet< CNode >(currentCut.length);
+			for (int i=0; i < currentCut.length; i++) {
+				if (currentCut[i].pred.size() > 0)
+					preEvents.addAll(currentCut[i].pred);
+				else
+					emptyPreSet = true;
+			}
+			
+			// now generate predecessor cuts for the currentCut by
+			// firing backwards
+			for (CNode preEvent : preEvents) {
+				Set<CNode> postConditions = succ.get(preEvent);
+				int postConditionsInCut = 0;
+				int preCutSize = currentCut.length - postConditions.size() + preEvent.pred.size();
+				
+				int preCutPos = 0;
+				CNode preCut[] = new CNode[preCutSize];
+				for (int j=0; j < currentCut.length && preCutPos < preCutSize ;j++)
+					if (postConditions.contains(currentCut[j]))
+						postConditionsInCut++;
+					else
+						// this cut condition will be in the preCut
+						preCut[preCutPos++] = currentCut[j];
+				
+				if (postConditionsInCut < postConditions.size())
+					continue;
+	
+				for (CNode preCond : preEvent.pred) {
+					preCut[preCutPos++] = preCond;
+				}
+				
+				if (!collectionContainsArray(cutQueue, preCut)) {
+					allCuts.add(preCut);
+					cutQueue.addLast(preCut);
+				}
+			} // generate predecessor cuts
+			
+			// generate all partial cuts at the beginning of this CNodeSet by
+			// removing nodes that have no predecessor
+			if (partial && emptyPreSet) {
+				if (currentCut.length > 1) {
+					for (int toSkip=0; toSkip<currentCut.length; toSkip++) {
+						if (currentCut[toSkip].pred.size() == 0) {
+							CNode[] reducedCut = new CNode[currentCut.length-1];
+							for (int ci=0,ri=0;ci<currentCut.length;ci++) {
+								if (ci == toSkip) continue;
+								reducedCut[ri] = currentCut[ci];
+								ri++;
+							}
+							if (!collectionContainsArray(cutQueue, reducedCut)) {
+								allCuts.add(reducedCut);
+								cutQueue.addLast(reducedCut);
+							}
+						}
+					}
+				}
+			} // generate partial cut
+		} // while cutQueue not empty
 	}
 	
 	public Collection<CNode> getEnabledEvents () {
@@ -598,8 +677,27 @@ public class CNodeSet {
 		for (CNode myNode : myNodes) {
 			boolean found = false;
 			
-			for (CNode cutNode_of_n : otherNodes) {
-				if (myNode.strictSuffixOf(cutNode_of_n, matchingRelation))
+			for (CNode otherNode : otherNodes) {
+				if (myNode.strictSuffixOf(otherNode, matchingRelation))
+					found = true;
+			}
+			
+			if (!found)
+				return false;
+		}
+		return true;
+	}
+	
+	public static boolean nodesContainedIn(CNode[] myNodes, Collection<CNode> otherNodes, CNode.MatchingRelation matchingRelation) {
+
+		if (myNodes.length > otherNodes.size())
+			return false;
+		
+		for (CNode myNode : myNodes) {
+			boolean found = false;
+			
+			for (CNode otherNode : otherNodes) {
+				if (myNode.strictSuffixOf(otherNode, matchingRelation))
 					found = true;
 			}
 			
@@ -619,7 +717,7 @@ public class CNodeSet {
 	 * @param matchingRelation
 	 * @return
 	 */
-	public static boolean nodesContainedIn(CNode[] myNodes, Collection<CNode> otherNodes, CNode.MatchingRelation matchingRelation) {
+	public static boolean nodesContainedInPartial(CNode[] myNodes, Collection<CNode> otherNodes, CNode.MatchingRelation matchingRelation) {
 
 		if (myNodes.length > otherNodes.size())
 			return false;
@@ -630,8 +728,8 @@ public class CNodeSet {
 			
 			Iterator<CNode> it = otherNodes.iterator();
 			while (it.hasNext()) {
-				CNode maxNode_of_n = it.next();
-				if (myNode.strictSuffixOf(maxNode_of_n, matchingRelation)) {
+				CNode otherNode = it.next();
+				if (myNode.strictSuffixOf(otherNode, matchingRelation)) {
 					found = true;
 					partialMatch = true;
 				}
@@ -753,7 +851,9 @@ public class CNodeSet {
 		return cut;
 	}
 	
-	public LinkedList<CNode[]> findEnablingCuts(HashSet<CNode> patternToFind, HashSet<CNode> knownPartialCut, HashSet<CNode> candidateNodes) {
+	public LinkedList<CNode[]> findEnablingCuts(HashSet<CNode> patternToFind,
+			HashSet<CNode> knownPartialCut, HashSet<CNode> candidateNodes,
+			Map<CNode, Set<CNode>> coRelation) {
 		
 		Map<CNode, Set<CNode> > possibleMatches = new HashMap<CNode, Set<CNode>>(nodes.size());
 		if (!gatherPossibleMatches(patternToFind, knownPartialCut,
@@ -763,7 +863,8 @@ public class CNodeSet {
 		// the mapping possibleMatches now assigns each node of patternToFind
 		// possible candidate nodes for matching in the candidate set and uses
 		// at least one node from the partial cut
-		CNodeCutGenerator cng = new CNodeCutGenerator(patternToFind, possibleMatches);
+		CNodeCutGenerator cng = new CNodeCutGenerator(patternToFind, possibleMatches,
+				knownPartialCut, coRelation);
 		LinkedList<CNode[]> result = new LinkedList<CNode[]>();
 		while (cng.hasNext())
 			result.add(cng.next());
@@ -925,12 +1026,23 @@ public class CNodeSet {
 		String tokenFillString = "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
 		String cutOffFillString = "fillcolor=grey";
 		
+		//HashSet<CNode> allNodes = nodes;
+		
+		HashSet<CNode> allNodes = new HashSet<CNode>();
+		LinkedList<CNode> queue = new LinkedList<CNode>(this.maxNodes);
+		while (queue.size() > 0) {
+			CNode c = queue.removeFirst();
+			allNodes.add(c);
+			queue.addAll(c.pred);
+		}
+		
+		
 		b.append("\n\n");
 		b.append("node [shape=circle];\n");
-		for (CNode n : nodes) {
+		for (CNode n : allNodes) {
 			if (n.isEvent)
 				continue;
-			if (n.pred.isEmpty())
+			if (cutNodes.contains(n))
 				b.append("  c"+n.localId+" ["+tokenFillString+"]\n");
 			else
 				b.append("  c"+n.localId+" []\n");
@@ -941,7 +1053,7 @@ public class CNodeSet {
 		
 		b.append("\n\n");
 		b.append("node [shape=box];\n");
-		for (CNode n : nodes) {
+		for (CNode n : allNodes) {
 			if (!n.isEvent)
 				continue;
 			if (cutoff.contains(n))
@@ -966,7 +1078,7 @@ public class CNodeSet {
 		
 		b.append("\n\n");
 		b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
-		for (CNode n : nodes) {
+		for (CNode n : allNodes) {
 			String prefix = n.isEvent ? "e" : "c";
 			for (CNode pre : n.pred) {
 				if (pre.isEvent)

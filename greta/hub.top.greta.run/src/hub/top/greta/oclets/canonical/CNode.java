@@ -74,6 +74,11 @@ public class CNode {
 		}
 	}
 	
+	public CNode (String aLabel, boolean isEvent) {
+		this.label = aLabel;
+		this.isEvent = isEvent;
+	}
+	
 	// copy only local fields of a CNode
 	private static final int COPY_FLAG_LOCAL_FIELDS = 1;
 	// copy references of members of a CNode (but do not copy the referenced objects)
@@ -166,6 +171,15 @@ public class CNode {
 	
 	public Set<CNode> getPred () {
 		return pred;
+	}
+	
+	/**
+	 * @return the unique pre-event of this CNode if it exists, 
+	 *         <code>null</code> otherwise
+	 */
+	public CNode getPreEvent () {
+		if (isEvent || pred.size() == 0) return null;
+		return pred.iterator().next();
 	}
 	
 	/**

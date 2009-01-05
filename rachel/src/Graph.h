@@ -22,6 +22,9 @@
 #define __GRAPH_H
 
 #include <map>
+#include <string>
+#include <set>
+#include <vector>
 #include "types.h"
 
 class Formula;
@@ -88,9 +91,16 @@ class Graph {
     
         /// check if graph is cyclic (helper)
         bool isCyclicRecursively(Node q);
-    
+        
         /// returns (at most 1) successor of a node with a given label
         Edge successor(Node q, const Label &l);
+                
+        /// returns the outgoing receive labels of a node
+        std::set<Label> receiveLabels(Node q);
+
+        /// returns the outgoing send labels of a node
+        std::set<Label> sendLabels(Node q);
+
         
     public:
         /// identifier string
@@ -98,7 +108,7 @@ class Graph {
 
         /// the nodes
         Nodes nodes;
-    
+        
     public:
         /// which nodes where added during matching?
         std::map<Node, bool> addedNodes;
@@ -160,8 +170,11 @@ class Graph {
         /// return the average size of the satisfying assignments
         double averageSatSize();
     
-        // a hack to get the needed numbers for Luhme
-        void printStatisticsForMarkings();
+        /// calculate a compact represenation of the OG's formulae
+        void calculateCompactAnnotations();
+    
+        /// BPMN output of a service automaton
+        void bpmnOutput();
     
         Graph(std::string const id);
 };

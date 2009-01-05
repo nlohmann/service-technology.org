@@ -6,48 +6,18 @@
                       http://service-technology.org/rachel
 
 
-Version 1.11
-============
+Version 1.12-unreleased
+=======================
 
-* implemented Fiona's modified OG file format (an OG file now also consists
-  of an interface definition) and adjusted the respective test cases -- note
-  that Rachel's parser is backwards compatible and still accepts OG files
-  without interface definition
+* implemented methods to calculate a compact representation of the formulae
+  annotated to the operating guideline's states according to the paper
+  submitted to ACSD 2009
 
-* renamed configure script parameter `--enable-use64bit' to `--enable-64bit'
-  to achieve parameter compatibility with Fiona
+* the new method can be triggered with the new mode `-m annotation'
 
-* explicitly handling the disabling of assertions (with parameter
-  `--disable-assert') similar to Fiona's configure script
-
-* canonized names of constants generated for file `src/config.h' and adjusted
-  the output of the `--bug' parameter
-
-* removed unnecessary files `src/getopt.c', `src/getopt1.c', and
-  `src/getopt.h'
-
-* used option `gnits' for Automake, see
-  `http://www.gnu.org/software/automake/manual/automake.html#Gnits'
-
-* moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
-  strict Gnits requirements
-
-* updated documentation
-
-* the configure script now takes care about the compilation flags; for
-  example `./configure --enable-64bit' sets the flags necessary to build a 64
-  bit executable with `make'
-
-* adapted code to avoid warnings of GCC 4.2 (mostly deprecation warnings)
-
-* overworked test scripts: creation of output files is checked now
-
-* simplified header inclusion: all typedefs are now made in `types.h'
-
-* added a command line parameter `--threshold'/`-t' to set a threshold to
-  control the matching algorithm: whenever a formula's assignment reaches
-  this value, it is immediately returned instead of the optimum; this results
-  in faster, yet sub-optimal results
+* File input options `--og' (`-o') and `--automaton' (`-a') are now optional
+  for Gengetopt, but are checked in the `main.cc' file. This was necessary,
+  because the `-m annotation' mode did not need to parse a service automaton.
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

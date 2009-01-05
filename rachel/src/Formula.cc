@@ -101,6 +101,7 @@ bool FormulaFalse::sat(const std::set<Label> &l) const {
     return false;
 }
 
+
 /*!
  * When calculating the correcting matching between a service automaton and an
  * OG, we require the service automaton's final states to be sink states, i.e.
@@ -119,5 +120,34 @@ bool FormulaFalse::sat(const std::set<Label> &l) const {
  * This bug was found by Martin Znamirowski. See <http://gna.org/bugs/?11944>.
  */
 bool FormulaFinal::sat(const std::set<Label> &l) const {
+    return true; // true by default
+}
+
+
+/*
+ * test if formula contains final
+ */
+
+bool FormulaAND::hasFinal() const {
+    return (left->hasFinal() || right->hasFinal()); // sic!
+}
+
+bool FormulaOR::hasFinal() const {
+    return (left->hasFinal() || right->hasFinal());
+}
+
+bool FormulaLit::hasFinal() const {
+    return false;
+}
+
+bool FormulaTrue::hasFinal() const { // sic!
+    return false;
+}
+
+bool FormulaFalse::hasFinal() const {
+    return false;
+}
+
+bool FormulaFinal::hasFinal() const {
     return true;
 }

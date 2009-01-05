@@ -1,5 +1,6 @@
 %{
 #include <libgen.h>
+#include "cmdline.h"
 #include "Graph.h"
 #include "Formula.h"
 
@@ -20,6 +21,7 @@ extern char *G_filename;
 extern char* og_yytext;
 extern int og_yylex();
 extern int og_yyerror(char const *msg);
+extern gengetopt_args_info args_info;
 %}
 
 // Bison options
@@ -57,7 +59,11 @@ extern int og_yyerror(char const *msg);
 og:
    { G_parsedGraph = Graph(basename(G_filename)); }
  interface nodes initialnode transitions
-   { G_parsedGraph.reenumerate(); }
+   { // Do not reenumerate nodes in annotation mode, because there the
+     // node numbers are printed and reenumeration would be confusing.
+     if (args_info.mode_arg != mode_arg_annotation)
+       G_parsedGraph.reenumerate();
+   }
 ;
 
 

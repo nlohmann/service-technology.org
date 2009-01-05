@@ -2,17 +2,32 @@ purpose "Rachel: Repairing Automata for Choreographies by Editing Labels"
 
 description "About Rachel:"
 
+
+section "Options"
+
+option "mode" m
+  "Execution mode of Rachel"
+  string values="matching","simulation","annotation","bpmn" enum
+  typestr="MODE"
+  default="matching"
+  optional
+
+option "verbose" v
+  "Verbose output: mostly status information during longer calculations."
+  flag off
+
+
 section "File input"
 
 option "automaton"  a
   "Read a service automaton. Any annotated formulae are ignored."
   typestr="FILE"
-  string required
+  string optional
 
 option "og" o
   "Read an operating guideline"
   typestr="FILE"
-  string required
+  string optional
 
 
 section "File output"
@@ -22,20 +37,6 @@ option "dot" d
   typestr="FILE"
   string optional
   argoptional
-
-
-section "Options"
-
-option "mode" m
-  "Edit distance"
-  string values="matching","simulation" enum
-  typestr="MODE"
-  default="matching"
-  optional
-
-option "verbose" v
-  "Verbose output: mostly status information during longer calculations."
-  flag off
 
 
 section "Configuration of used cost function"

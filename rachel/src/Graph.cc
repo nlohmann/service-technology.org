@@ -99,7 +99,7 @@ Edge::Edge() :
  * class Graph *
  ***************/
 
-/// returns outgoing edges of a node (not to newly added nodes!)
+/// returns outgoing edges of a node (not newly added nodes!)
 Edges Graph::outEdges(Node q) {
     Edges result;
     
@@ -107,6 +107,32 @@ Edges Graph::outEdges(Node q) {
         if ( !addedNodes[edges[q][i].target] )
             result.push_back(edges[q][i]);
     }
+    
+    return result;
+}
+
+
+/// returns outgoing send edges of a node (not newly added nodes!)
+std::set<Label> Graph::sendLabels(Node q) {
+    std::set<Label> result;
+    
+    for (size_t i = 0; i < edges[q].size(); ++i) {
+        if ( !addedNodes[edges[q][i].target] && edges[q][i].label.substr(0,1) == "!" )
+            result.insert(edges[q][i].label);
+    }    
+    
+    return result;
+}
+
+
+/// returns outgoing receive edges of a node (not newly added nodes!)
+std::set<Label> Graph::receiveLabels(Node q) {
+    std::set<Label> result;
+    
+    for (size_t i = 0; i < edges[q].size(); ++i) {
+        if ( !addedNodes[edges[q][i].target] && edges[q][i].label.substr(0,1) == "?" )
+            result.insert(edges[q][i].label);
+    }    
     
     return result;
 }
@@ -575,56 +601,179 @@ double Graph::averageSatSize() {
 }
 
 
-void Graph::printStatisticsForMarkings() {
+/// calculate a compact represenation of the OG's formulae
+void Graph::calculateCompactAnnotations() {
     unsigned int F_count = 0;
-    unsigned int F_imp_count = 0;
+    unsigned int F_prime_count = 0;
     unsigned int S_count = 0;
-    unsigned int S_imp_count = 0;
+    unsigned int S1_count = 0;
+    unsigned int S2_count = 0;
     
+    // traverse the OG's nodes
     for (size_t i = 0; i < nodes.size(); ++i) {
-        bool F = false;
-        bool F_imp = false;
+        bool in_F = false;
+        bool in_S = false;
         
-        if (isFinal(nodes[i])) {
-            F = true;
+        // STEP 1: treat the "final" assignment
+        // if "final" satisfies the formula, this node belongs to F
+        if (formulas[nodes[i]]->hasFinal()) {
             F_count++;
+            in_F = true;
+            fprintf(stderr, "node %d is in F\n", nodes[i]);
             
-            if (edges[nodes[i]].empty()) {
-                F_imp = true;
-                F_imp_count++;
+            // if the node has no outgoing edges, its implicitly in F
+            if (!edges[nodes[i]].empty()) {
+                F_prime_count++;
+                fprintf(stderr, "node %d is in F'\n", nodes[i]);
             }
         }
         
-        std::vector<Labels> mySat = checkSat(nodes[i]);
-        bool S = true;
-        for (size_t j = 0; j < mySat.size(); ++j) {
-            bool S_temp = true;
-            
-            for (size_t k = 0; k < mySat[j].size(); ++k) {
-                if (mySat[j][k].substr(0,1) == "?")
-                    S_temp = false;
+
+        // STEP 2: check if annotation can only be fulfilled by sending
+        // (i.e., not by receiving or final)
+        if (formulas[nodes[i]] != NULL) {
+            if (!formulas[nodes[i]]->sat(receiveLabels(nodes[i]))) {
+                S_count++;
+                in_S = true;
+                fprintf(stderr, "node %d is in S\n", nodes[i]);
             }
-            
-            S = S && S_temp;
         }
-        
-        if (S) {
-            S_count++;
-            
-            bool S_imp = true;
-            for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
-                if (edges[nodes[i]][j].label.substr(0,1) == "?")
-                    S_imp = false;
+
+        // check for an alternative representation of S
+        // additional check?: !edges[nodes[i]].empty()
+        if (receiveLabels(nodes[i]).empty()) {
+            if (!in_S && !in_F) {
+                S2_count++;
+                fprintf(stderr, "node %d is in S2\n", nodes[i]);
             }
-            
-            if (S_imp)
-                S_imp_count++;
-        }
-        
-        
-        fprintf(stderr, "node %d: (final %d final_imp %d send %d)\n", nodes[i], F, F_imp, S);
+        } else {
+            if (in_S) {
+                S1_count++;
+                fprintf(stderr, "node %d is in S1\n", nodes[i]);
+            }
+        }        
     }
-    
-    fprintf(stderr, "\n%d final (%d explicit), %d send (%d explicit)\n", F_count, F_count - F_imp_count, S_count, S_count - S_imp_count);
+        
+    fprintf(stderr, "\n");
+    fprintf(stderr, "# nodes with final annotation:     %5d = |F|\n", F_count);
+    fprintf(stderr, "  ~ without successor:             %5d\n", F_count - F_prime_count);
+    fprintf(stderr, "  ~ with successor:                %5d = |F'|\n", F_prime_count);
+    fprintf(stderr, "  ~ effect of implicit storage:    %5.2f %%\n",
+        (double(F_prime_count) / double(F_count)) * 100.0);
+    fprintf(stderr, "# nodes with must send annotation: %5d = |S|\n", S_count);
+    fprintf(stderr, "  ~ with ?-successor:              %5d = |S1|\n", S1_count);
+    fprintf(stderr, "  * without ?-successor:           %5d = |S2|\n", S2_count);
+    fprintf(stderr, "  ~ effect of implicit storage:    %5.2f %%\n",
+        (double(S1_count + S2_count) / double(S_count)) * 100.0);
+    fprintf(stderr, "# nodes of OG:                     %5d\n", nodes.size());
+    fprintf(stderr, "  ~ with set bits (explicit)       %5d (%6.2f %%)\n",
+        F_count + S_count, ((double(F_count + S_count) / double(nodes.size())) * 100.0) );
+    fprintf(stderr, "  ~ with set bits (implicit)       %5d (%6.2f %%)\n",
+        F_prime_count + S1_count + S2_count,
+        ((double(F_prime_count + S1_count + S2_count) / double(nodes.size())) * 100.0) );    
 }
 
+
+/// BPMN output of a service automaton
+void Graph::bpmnOutput() {
+    char *xor_generic = "shape=\"diamond\" regular=\"true\" height=\"0.7\" label=\"\" image=\"bpmn/l_xor.png\"";
+    char *mul_generic = "shape=\"diamond\" regular=\"true\" height=\"0.7\" label=\"\" image=\"bpmn/l_multiple.png\"";
+    char *start_generic = "shape=\"circle\" label=\"\" width=\"0.6\" height=\"0.6\"";
+    char *stop_generic = "shape=\"circle\" label=\"\" penwidth=\"4\" width=\"0.6\" height=\"0.6\"";
+    char *send_generic = "shape=\"circle\" peripheries=\"2\" width=\"0.5\" height=\"0.5\" image=\"bpmn/l_send.png\"";
+    char *receive_generic = "shape=\"circle\" peripheries=\"2\" width=\"0.5\" height=\"0.5\" image=\"bpmn/l_receive.png\"";    
+    
+    fprintf(stdout, "digraph G {\n");
+    fprintf(stdout, "  graph [rankdir=\"LR\" fontname=\"Helvetica\" fontsize=\"12\"];\n");
+    fprintf(stdout, "  node [width=\"0.6\" height=\"0.6\" fixedsize=\"true\", fontname=\"Helvetica\" fontsize=\"10\"];\n");
+    fprintf(stdout, "  edge [fontname=\"Helvetica\" fontsize=\"10\"];\n\n");
+    
+    std::map<Node, std::string> leaving;
+    
+    // traverse the SA's nodes and collect predecessors
+    std::map<Node, Nodes> pred;
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        for (size_t j = 0; j < edges[i].size(); ++j) {
+            pred[edges[i][j].target].push_back(edges[i][j].source);
+            
+            if (edges[i][j].label.substr(0,1) == "!") {
+                fprintf(stdout, "  n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
+                    edges[i][j].source, edges[i][j].target, send_generic, edges[i][j].label.c_str());
+            } else {
+                fprintf(stdout, "  n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
+                    edges[i][j].source, edges[i][j].target, receive_generic, edges[i][j].label.c_str());
+            }
+        }
+    }
+    
+    fprintf(stdout, "\n");
+    
+    // traverse the SA's nodes again to create splits and joins
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        // this should be an error of Fiona's IG-OG-output
+        if (pred[i].empty() && edges[i].empty())
+            continue;
+
+
+        // START NODES
+        if (pred[i].empty()) {
+            fprintf(stderr, "%d is the initial node\n", i);
+            fprintf(stdout, "  n_S_%d [%s];\n", i, start_generic);
+        } else if (pred[i].size() > 1) {
+            // JOIN GATEWAY
+            fprintf(stdout, "  n_j_%d [%s];\n", i, xor_generic);
+            fprintf(stderr, "%d needs a preceeding XOR join: 'n_j_%d'\n", i, i);
+
+            // collect incoming arcs
+            for (size_t j = 0; j < pred[i].size(); j++) {
+                fprintf(stdout, "  n_%d_%d -> n_j_%d;\n", pred[i][j], i, i);
+            }
+        }
+        
+
+        // SPLIT GATEWAYS
+        if (edges[i].size() > 1) {        
+            if (!receiveLabels(i).empty() && !sendLabels(i).empty()) {
+                fprintf(stderr, "%d is a mixed split -- CANNOT HANDLE THIS YET!\n", i);
+                continue;
+            }
+            else if (receiveLabels(i).empty()) {
+                fprintf(stdout, "  n_%d_s [%s];\n", i, xor_generic);
+                fprintf(stderr, "%d is an XOR split\n", i);                
+            }
+            else if (sendLabels(i).empty()) {
+                fprintf(stderr, "%d is a pick split\n", i);                
+                fprintf(stdout, "  n_%d_s [%s];\n", i, mul_generic);
+            }
+            
+            // incoming arcs
+            for (size_t j = 0; j < pred[i].size(); j++) {
+                fprintf(stdout, "  n_%d_%d -> n_%d_s\n", pred[i][j], i, i);
+            }
+            
+            // outgoing arcs
+            for (size_t j = 0; j < edges[i].size(); j++) {    
+                fprintf(stdout, "  n_%d_s -> n_%d_%d;\n", i, i, edges[i][j].target);
+            }            
+        }
+        
+        // STOP NODES
+        if (edges[i].size() == 0) {
+            fprintf(stdout, "  n_%d_E [%s];\n", i, stop_generic);
+            fprintf(stderr, "%d is a sink\n", i);
+            
+            // collect incoming arcs
+            for (size_t j = 0; j < pred[i].size(); j++) {
+                if (pred[i].size() == 1)
+                    fprintf(stdout, "  n_%d_%d -> n_%d_E\n", pred[i][j], i, i);
+                else {
+                    fprintf(stdout, "  n_j_%d -> n_%d_E\n", i, i);
+                    break;
+                }
+            }
+        }             
+    }
+    
+    fprintf(stdout, "\n  label=\"\\n\"\n");    
+    fprintf(stdout, "}\n");
+}

@@ -6,6 +6,19 @@
                       http://service-technology.org/rachel
 
 
+Version 1.12-unreleased
+=======================
+
+* implemented methods to calculate a compact representation of the formulae
+  annotated to the operating guideline's states according to the paper
+  submitted to ACSD 2009
+
+* the new method can be triggered with the new mode `-m annotation'
+
+* File input options `--og' (`-o') and `--automaton' (`-a') are now optional
+  for Gengetopt, but are checked in the `main.cc' file. This was necessary,
+  because the `-m annotation' mode did not need to parse a service automaton.
+
 Version 1.11
 ============
 

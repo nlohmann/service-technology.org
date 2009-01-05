@@ -1,3 +1,13 @@
+@heading Version 1.12-unreleased
+@itemize
+@item implemented methods to calculate a compact representation of the formulae annotated to the operating guideline's states according to the paper submitted to ACSD 2009
+
+@item the new method can be triggered with the new mode @option{-m annotation}
+
+@item File input options @option{--og} (@option{-o}) and @option{--automaton} (@option{-a}) are now optional for Gengetopt, but are checked in the @file{main.cc} file. This was necessary, because the @option{-m annotation} mode did not need to parse a service automaton.
+@end itemize
+
+
 @heading Version 1.11
 @itemize
 @item implemented Fiona's modified OG file format (an OG file now also consists of an interface definition) and adjusted the respective test cases --- note that Rachel's parser is backwards compatible and still accepts OG files without interface definition

@@ -80,6 +80,8 @@ std::string mode_name(enum_mode mode) {
     switch (mode) {
         case(mode_arg_simulation): return "simulation";            
         case(mode_arg_matching):   return "matching";
+        case(mode_arg_annotation): return "annotation";
+        case(mode_arg_bpmn):       return "bpmn";
         default:                   assert(false);
     }
 }
@@ -208,38 +210,79 @@ int main(int argc, char** argv) {
         if (cmdline_parser_config_file (args_info.conf_file_arg, &args_info, params) != 0)
             exit(EXIT_FAILURE);
     }
-    
-    
-    // read first graph
-    G_filename = args_info.automaton_arg;
-    og_yyin = fopen(G_filename, "r");
-    if (og_yyin == NULL) {
-        fprintf(stderr, "automaton '%s' not found\n", args_info.automaton_arg);
-        exit(0);
+
+
+
+    // care about the file input for the different modes (gengetopt cannot) do this :-(
+    if (!args_info.automaton_given) {
+        if (args_info.mode_arg == mode_arg_matching ||
+            args_info.mode_arg == mode_arg_simulation ||
+            args_info.mode_arg == mode_arg_bpmn) {
+                fprintf(stderr, "%s: '--automaton' ('-a') option required in mode '%s'\n",
+                    argv[0], mode_name(args_info.mode_arg).c_str());
+                exit(EXIT_FAILURE);
+            }
+    }
+
+    if (!args_info.og_given) {
+        if (args_info.mode_arg == mode_arg_matching ||
+            args_info.mode_arg == mode_arg_simulation ||
+            args_info.mode_arg == mode_arg_annotation ) {
+                fprintf(stderr, "%s: '--og' ('-o') option required in mode '%s'\n",
+                    argv[0], mode_name(args_info.mode_arg).c_str());
+                exit(EXIT_FAILURE);
+            }
     }
     
-    // call parser and copy read graph
-    og_yyparse();
-    fclose(og_yyin);
-    A = G_parsedGraph;
     
-    // read second graph
-    G_filename = args_info.og_arg;
-    og_yyin = fopen(G_filename, "r");
-    if (og_yyin == NULL) {
-        fprintf(stderr, "og '%s' not found\n", args_info.og_arg);
-        exit(0);
+    if (args_info.mode_arg == mode_arg_matching ||
+        args_info.mode_arg == mode_arg_simulation ||
+        args_info.mode_arg == mode_arg_bpmn) {
+        // read first graph (the service automaton)
+        G_filename = args_info.automaton_arg;
+        og_yyin = fopen(G_filename, "r");
+        if (og_yyin == NULL) {
+            fprintf(stderr, "automaton '%s' not found\n", args_info.automaton_arg);
+            exit(EXIT_FAILURE);
+        }
+
+        // call parser and copy read graph
+        og_yyparse();
+        fclose(og_yyin);
+        A = G_parsedGraph;
     }
     
-    // call parser and copy read graph
-    og_yyparse();
-    fclose(og_yyin);
-    B = G_parsedGraph;
     
-    // a hack for Luhme to show information on markings
-//    B.printStatisticsForMarkings();
-//    exit(1);
-    
+    // BPMN output of service automaton
+    if (args_info.mode_arg == mode_arg_bpmn) {
+        A.bpmnOutput();
+        exit(EXIT_SUCCESS);
+    }    
+
+
+    if (args_info.mode_arg == mode_arg_matching ||
+        args_info.mode_arg == mode_arg_simulation ||
+        args_info.mode_arg == mode_arg_annotation) {
+        // read second graph (the OG)
+        G_filename = args_info.og_arg;
+        og_yyin = fopen(G_filename, "r");
+        if (og_yyin == NULL) {
+            fprintf(stderr, "og '%s' not found\n", args_info.og_arg);
+            exit(EXIT_FAILURE);
+        }
+
+        // call parser and copy read graph
+        og_yyparse();
+        fclose(og_yyin);
+        B = G_parsedGraph;
+    }
+
+    // Calculate a compact representation of the OG's annotations according
+    // to the paper submitted to ACSD 2009.
+    if (args_info.mode_arg == mode_arg_annotation) {
+        B.calculateCompactAnnotations();
+        exit(EXIT_SUCCESS);
+    }    
     
     // statistical output
     fprintf(stderr, "calculating %s\n", mode_name(args_info.mode_arg).c_str());

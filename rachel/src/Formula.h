@@ -29,6 +29,7 @@ class Formula {
     public:
         virtual std::string toString() const = 0;
         virtual bool sat(const std::set<Label> &l) const = 0;
+        virtual bool hasFinal() const = 0;
         virtual ~Formula() {};
 };
 
@@ -41,6 +42,7 @@ class FormulaAND : public Formula {
         FormulaAND(Formula *left, Formula *right);
         std::string toString() const;
         bool sat(const std::set<Label> &l) const;
+        bool hasFinal() const;
 };
 
 class FormulaOR : public Formula {
@@ -52,6 +54,7 @@ class FormulaOR : public Formula {
         FormulaOR(Formula *left, Formula *right);
         std::string toString() const;
         bool sat(const std::set<Label> &l) const;
+        bool hasFinal() const;
 };
 
 class FormulaLit : public Formula {
@@ -62,24 +65,28 @@ class FormulaLit : public Formula {
         FormulaLit(const Label literal);
         std::string toString() const;
         bool sat(const std::set<Label> &l) const;
+        bool hasFinal() const;
 };
 
 class FormulaTrue : public Formula {
     public:
         std::string toString() const;
         bool sat(const std::set<Label> &l) const;
+        bool hasFinal() const;
 };
 
 class FormulaFalse : public Formula {
     public:
         std::string toString() const;
         bool sat(const std::set<Label> &l) const;
+        bool hasFinal() const;
 };
 
 class FormulaFinal : public Formula {
     public:
         std::string toString() const;
         bool sat(const std::set<Label> &l) const;
+        bool hasFinal() const;
 };
 
 

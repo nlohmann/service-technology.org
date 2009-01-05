@@ -80,3 +80,29 @@ CLEANFILES = -fr $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) \
 	     $(tarballname) $(tarballname).sig ChangeLog $(PACKAGE).pdf \
 	     $(PACKAGE_TARNAME)_$(PACKAGE_VERSION)* \
 	     $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)*
+
+
+#############################################################################
+# binary builds
+#############################################################################
+
+bindist-solaris:
+	cd $(top_srcdir); ./configure --disable-assert
+	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-sparc-solaris-32
+	cd $(top_srcdir); ./configure --enable-64bit --disable-assert
+	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-sparc-solaris-64
+
+bindist-mac:
+	cd $(top_srcdir); ./configure --enable-universal --disable-dependency-tracking --disable-assert
+	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-universal-macos-32
+	cd $(top_srcdir); ./configure --enable-universal --enable-64bit --disable-dependency-tracking --disable-assert
+	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-universal-macos-64
+
+bindist:
+	$(MAKE) --directory=$(top_srcdir) CXXFLAGS=-O3 CFLAGS=-O3 clean all pdf
+	mkdir $(top_srcdir)/$(BINDIRNAME)
+	cd $(top_srcdir); cp src/$(PACKAGE) COPYING NEWS ChangeLog AUTHORS THANKS README doc/$(PACKAGE).pdf $(BINDIRNAME)
+	cp $(top_srcdir)/doc/background.pdf $(top_srcdir)/$(BINDIRNAME)
+	cd $(top_srcdir)/$(BINDIRNAME) ; file * > CONTENTS
+	zip -rq $(top_srcdir)/$(BINDIRNAME).zip $(top_srcdir)/$(BINDIRNAME)
+	rm -fr $(top_srcdir)/$(BINDIRNAME)

@@ -1,7 +1,7 @@
 /*****************************************************************************\
  Rachel -- Repairing Automata for Choreographies by Editing Labels
  
- Copyright (C) 2008  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
  
  Rachel is free software; you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,20 @@
 
 #include <set>
 #include "types.h"
+
+
+class FormulaBits {
+    public:
+        bool S;
+        bool F;
+        bool S_1;
+        bool S_2;
+        bool F_prime;
+        
+        /// constructor -- standard parameters are used to enable std::map
+        FormulaBits(bool S=false, bool F=false,
+                    bool S_1=false, bool S_2=false, bool F_prime=false);
+};
 
 
 class Formula {

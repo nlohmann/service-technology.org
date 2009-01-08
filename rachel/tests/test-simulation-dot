@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-command="rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m simulation -d"
+command="rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m simulation -d --png"
 echo ""
 echo "test: simulation with Dot output"
 echo "      $command"

@@ -1,7 +1,7 @@
 /*****************************************************************************\
  Rachel -- Repairing Automata for Choreographies by Editing Labels
  
- Copyright (C) 2008  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
  
  Rachel is free software; you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ using std::stack;
 using std::pair;
 using std::map;
 using std::ofstream;
+using std::string;
 
 
 
@@ -51,7 +52,9 @@ using std::ofstream;
 extern int og_yyparse();
 extern FILE *og_yyin;
 
+/// the automaton
 Graph A("");
+/// the operating guideline
 Graph B("");
 
 extern Graph G_parsedGraph;
@@ -88,6 +91,7 @@ std::string mode_name(enum_mode mode) {
 
 
 /// output complete edit script
+/// \todo move me somewhere else
 Graph outputEditScript(Graph &g1, Graph &g2) {
     typedef pair<Node,Node> NodePair;
     
@@ -121,6 +125,8 @@ Graph outputEditScript(Graph &g1, Graph &g2) {
 }
 
 
+/// creates Dot output for the edit actions
+/// \todo move me somewhere else
 void dotOutput(Graph &A, Graph &B, Graph &C) {
     std::string dot_filename;
     
@@ -164,15 +170,15 @@ void dotOutput(Graph &A, Graph &B, Graph &C) {
     
     
     // if dot found during configuration, executed it to create a PNG
-    if (!std::string(HAVE_DOT).empty()) {
+    if (args_info.png_flag && !std::string(HAVE_DOT).empty()) {
         std::string command = std::string(HAVE_DOT) + " " + dot_filename + " -Tpng -O";
         system(command.c_str());
-    }    
+    }
 }
 
 
 int main(int argc, char** argv) {
-    if (argc == 2 && std::string(argv[1]) == "--bug") {
+    if (argc == 2 && string(argv[1]) == "--bug") {
 	    printf("\n\n");
         printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
         printf("- tool:               %s\n", PACKAGE_NAME);
@@ -188,14 +194,13 @@ int main(int argc, char** argv) {
         printf("\n\n");
         exit(EXIT_SUCCESS);
     }
-		
-    struct cmdline_parser_params *params;
+
 
     // set default values
     cmdline_parser_init(&args_info);
 
     // initialize the parameters structure
-    params = cmdline_parser_params_create();
+    struct cmdline_parser_params *params = cmdline_parser_params_create();
     
     // call the cmdline parser
     if (cmdline_parser (argc, argv, &args_info) != 0)
@@ -213,93 +218,76 @@ int main(int argc, char** argv) {
 
 
 
-    // care about the file input for the different modes (gengetopt cannot) do this :-(
-    if (!args_info.automaton_given) {
-        if (args_info.mode_arg == mode_arg_matching ||
-            args_info.mode_arg == mode_arg_simulation ||
-            args_info.mode_arg == mode_arg_bpmn) {
-                fprintf(stderr, "%s: '--automaton' ('-a') option required in mode '%s'\n",
-                    argv[0], mode_name(args_info.mode_arg).c_str());
-                exit(EXIT_FAILURE);
-            }
-    }
-
-    if (!args_info.og_given) {
-        if (args_info.mode_arg == mode_arg_matching ||
-            args_info.mode_arg == mode_arg_simulation ||
-            args_info.mode_arg == mode_arg_annotation ) {
-                fprintf(stderr, "%s: '--og' ('-o') option required in mode '%s'\n",
-                    argv[0], mode_name(args_info.mode_arg).c_str());
-                exit(EXIT_FAILURE);
-            }
-    }
-    
-    
     if (args_info.mode_arg == mode_arg_matching ||
         args_info.mode_arg == mode_arg_simulation ||
         args_info.mode_arg == mode_arg_bpmn) {
-        // read first graph (the service automaton)
-        G_filename = args_info.automaton_arg;
-        og_yyin = fopen(G_filename, "r");
-        if (og_yyin == NULL) {
-            fprintf(stderr, "automaton '%s' not found\n", args_info.automaton_arg);
-            exit(EXIT_FAILURE);
-        }
 
-        // call parser and copy read graph
-        og_yyparse();
-        fclose(og_yyin);
-        A = G_parsedGraph;
+        // care about the automaton file input
+        if (!args_info.automaton_given) {
+            fprintf(stderr, "%s: '--automaton' ('-a') option required in mode '%s'\n",
+                PACKAGE, mode_name(args_info.mode_arg).c_str());
+            exit(EXIT_FAILURE);
+        } else {
+            G_filename = args_info.automaton_arg;
+            og_yyin = fopen(G_filename, "r");
+            if (og_yyin == NULL) {
+                fprintf(stderr, "automaton '%s' not found\n", args_info.automaton_arg);
+                exit(EXIT_FAILURE);
+            }
+
+            // call parser and copy read graph
+            og_yyparse();
+            fclose(og_yyin);
+            A = G_parsedGraph;                
+        }
     }
     
-    
-    // BPMN output of service automaton
-    if (args_info.mode_arg == mode_arg_bpmn) {
-        A.bpmnOutput();
-        exit(EXIT_SUCCESS);
-    }    
-
-
     if (args_info.mode_arg == mode_arg_matching ||
         args_info.mode_arg == mode_arg_simulation ||
         args_info.mode_arg == mode_arg_annotation) {
-        // read second graph (the OG)
-        G_filename = args_info.og_arg;
-        og_yyin = fopen(G_filename, "r");
-        if (og_yyin == NULL) {
-            fprintf(stderr, "og '%s' not found\n", args_info.og_arg);
+
+        // care about the OG file input
+        if (!args_info.og_given) {
+            fprintf(stderr, "%s: '--og' ('-o') option required in mode '%s'\n",
+                PACKAGE, mode_name(args_info.mode_arg).c_str());
             exit(EXIT_FAILURE);
+        } else {
+            G_filename = args_info.og_arg;
+            og_yyin = fopen(G_filename, "r");
+            if (og_yyin == NULL) {
+                fprintf(stderr, "og '%s' not found\n", args_info.og_arg);
+                exit(EXIT_FAILURE);
+            }
+
+            // call parser and copy read graph
+            og_yyparse();
+            fclose(og_yyin);
+            B = G_parsedGraph;            
         }
+    }
+    
 
-        // call parser and copy read graph
-        og_yyparse();
-        fclose(og_yyin);
-        B = G_parsedGraph;
+    // check if graphs are cyclic
+    if (args_info.mode_arg == mode_arg_matching || args_info.mode_arg == mode_arg_simulation) {
+        if (A.isCyclic()) {
+            fprintf(stderr, "automaton '%s' is cyclic; aborting\n", args_info.automaton_arg);
+            _exit(EXIT_FAILURE);
+        }
+        if (B.isCyclic()) {
+            fprintf(stderr, "OG '%s' is cyclic; aborting\n", args_info.og_arg);
+            _exit(EXIT_FAILURE);
+        }        
+
+        // statistical output
+        fprintf(stderr, "calculating %s\n", mode_name(args_info.mode_arg).c_str());
+        fprintf(stderr, "source (SA): %s\t%u nodes\n",
+                basename(args_info.automaton_arg), static_cast<unsigned int>(A.nodes.size()));
+        fprintf(stderr, "target (OG): %s\t%u nodes\n",
+                basename(args_info.og_arg), static_cast<unsigned int>(B.nodes.size()));
     }
 
-    // Calculate a compact representation of the OG's annotations according
-    // to the paper submitted to ACSD 2009.
-    if (args_info.mode_arg == mode_arg_annotation) {
-        B.calculateCompactAnnotations();
-        exit(EXIT_SUCCESS);
-    }    
-    
-    // statistical output
-    fprintf(stderr, "calculating %s\n", mode_name(args_info.mode_arg).c_str());
-    fprintf(stderr, "source (SA): %s\t%u nodes\n",
-            basename(args_info.automaton_arg), static_cast<unsigned int>(A.nodes.size()));
-    fprintf(stderr, "target (OG): %s\t%u nodes\n",
-            basename(args_info.og_arg), static_cast<unsigned int>(B.nodes.size()));
-    
-    if (A.isCyclic()) {
-        fprintf(stderr, "graph %s is cyclic; aborting\n", args_info.automaton_arg);
-        _exit(EXIT_FAILURE);
-    }
-    if (B.isCyclic()) {
-        fprintf(stderr, "graph %s is cyclic; aborting\n", args_info.og_arg);
-        _exit(EXIT_FAILURE);
-    }
-    
+
+    // more statistical output
     if (args_info.verbose_flag && (args_info.mode_arg == mode_arg_matching)) {
         fprintf(stderr, "OG characterizes %.3Le deterministic acyclic services (up to tree isomorphism)\n",
                 B.countServices());
@@ -319,12 +307,22 @@ int main(int argc, char** argv) {
     
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
-        case(mode_arg_simulation): {
+        case (mode_arg_annotation): {
+            B.calculateCompactAnnotations();
+            break;
+        }
+
+        case (mode_arg_bpmn): {
+            A.bpmnOutput();
+            break;
+        }
+
+        case (mode_arg_simulation): {
             fprintf(stderr, "similarity: %.2f\n", Simulation::simulation());
             break;
         }
 
-        case(mode_arg_matching): {
+        case (mode_arg_matching): {
             fprintf(stderr, "matching: %.2f\n", Matching::matching());
             break;
         }
@@ -336,14 +334,25 @@ int main(int argc, char** argv) {
     
     // create dot if requested
     if (args_info.dot_given) {
-        Graph C = outputEditScript(A,B);
-        dotOutput(A, B, C);
+        if (args_info.mode_arg == mode_arg_matching || args_info.mode_arg == mode_arg_simulation) {
+            Graph C = outputEditScript(A,B);
+            dotOutput(A, B, C);
+        }
+        
+        if (mode_arg_annotation) {            
+            fprintf(stdout, "digraph G {\n");
+            fprintf(stdout, "edge [fontname=Helvetica fontsize=10]\n");
+            fprintf(stdout, "node [fontname=Helvetica fontsize=10]\n");            
+            fprintf(stdout, "%s\n", B.toDotAnnotated(false).c_str());
+            fprintf(stdout, "}\n");
+        }
     }
 
     fprintf(stderr, "done\n");
   
     // tidy memory
     free(params);
+
   
     return EXIT_SUCCESS;
 }

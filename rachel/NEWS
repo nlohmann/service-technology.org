@@ -11,13 +11,24 @@ Version 1.12-unreleased
 
 * implemented methods to calculate a compact representation of the formulae
   annotated to the operating guideline's states according to the paper
-  submitted to ACSD 2009
+  submitted to ACSD 2009; the new method can be triggered with the new mode
+  `-m annotation'
 
-* the new method can be triggered with the new mode `-m annotation'
+* in mode `-m annotation', the `--dot' (`-d') parameter creates a version of
+  the input operating guidelines in which the explicit formulae are replaced
+  by different colors representing the bit representation
 
 * File input options `--og' (`-o') and `--automaton' (`-a') are now optional
   for Gengetopt, but are checked in the `main.cc' file. This was necessary,
   because the `-m annotation' mode did not need to parse a service automaton.
+
+* implemented a mode `-m bpmn' to create a rudimentary BPMN (Business Process
+  Modeling Notation) output in Graphviz dot format of a service automaton
+  (given by `--automaton'); the path of the used stencils can be changed with
+  `--shapedir'
+
+* when using the `--dot' (`-d') parameter, a PNG (Portable Network Graphics)
+  file is now only created if the parameter `--png' is given
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

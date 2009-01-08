@@ -29,14 +29,26 @@ option "og" o
   typestr="FILE"
   string optional
 
+option "shapedir" -
+  "Path to BPMN shapes for Graphviz dot output"
+  string
+  default="bpmn/"
+  typestr="PATH"
+  optional
+  hidden
+
 
 section "File output"
 
 option "dot" d
-  "Create a Dot file. If no filename is given, it is derived from the input filenames: \"<automaton>_<og>_<mode>.dot\". If Graphviz Dot was found by the configure script, also a PNG file is created."
+  "Create a Dot file. If no filename is given, it is derived from the input filename(s)."
   typestr="FILE"
   string optional
   argoptional
+
+option "png" -
+  "Together with option \"dot\", also a PNG image is created if Graphviz Dot was found by the configure script."
+  flag off
 
 
 section "Configuration of used cost function"
@@ -106,4 +118,3 @@ option "bug" -
   "Show helpful information (version number, compilation date, compiler version, and platform) in case a bug was found and should be reported."
   flag off
   hidden
-

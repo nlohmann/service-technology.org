@@ -1,7 +1,7 @@
 /*****************************************************************************\
  Rachel -- Repairing Automata for Choreographies by Editing Labels
  
- Copyright (C) 2008  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
  
  Rachel is free software; you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,7 @@
 #include <set>
 #include <vector>
 #include "types.h"
-
-class Formula;
+#include "Formula.h"
 
 
 /***********
@@ -66,6 +65,9 @@ class Graph {
     
         /// the root node
         Node root;
+        
+        /// the final nodes (IG only)
+        std::map<Node, bool> finalNode;
     
         /// the node with the maximal value
         Node max_value;
@@ -78,6 +80,9 @@ class Graph {
 
         /// the node formulas
         std::map<Node, Formula*> formulas;
+        
+        /// bit representation of the formulas
+        std::map<Node, FormulaBits> formulaBits;
     
     private:
         /// preprocess the graph with insertion values (helper)
@@ -127,6 +132,9 @@ class Graph {
     
         /// sets the root node
         void setRoot(Node q);
+        
+        /// adds this node to the final nodes (IG only)
+        void setFinal(Node q);
     
         /// gets the root node
         Node getRoot() const;
@@ -139,6 +147,9 @@ class Graph {
 
         /// returns a dot annotation of the graph
         std::string toDot();
+
+        /// returns a dot annotation of the graph with formula bits
+        std::string toDotAnnotated(bool reduced);
 
         /// returns all satisfying label vectors
         std::vector<Labels> checkSat(Node q);

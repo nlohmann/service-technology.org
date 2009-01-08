@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2008       Niels Lohmann                                        *
+ * Copyright 2008, 2009 Niels Lohmann                                        *
  * Copyright 2005, 2006 Jan Bretschneider                                    *
  *                                                                           *
  * This file is part of Fiona.                                               *
@@ -98,8 +98,8 @@ int og_yyerror(char const *msg) {
     assert(og_yytext != NULL);
     assert(G_filename != NULL);
 
-    fprintf(stderr, "parse error in %s:%d: %s - token last read '%s'\n",
-            G_filename, og_yylineno, msg, og_yytext);
+    fprintf(stderr, "%s: %s:%d: %s - token last read '%s'\n",
+            PACKAGE, G_filename, og_yylineno, msg, og_yytext);
     
     exit(EXIT_FAILURE);
 }

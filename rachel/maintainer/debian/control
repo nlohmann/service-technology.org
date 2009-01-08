@@ -11,7 +11,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: graphviz
 Description: a tool to repair deadlocking service choreographies
-  Rachel is a tool to repair deadlocking service choreographies. Many work
+  Rachel is a tool to repair deadlocking service choreographies. Much work
   has been conducted to analyze service choreographies to assert manyfold
   correctness criteria. While errors can be detected automatically, the
   correction of defective services is usually done manually. Rachel

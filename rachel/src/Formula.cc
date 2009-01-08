@@ -1,7 +1,7 @@
 /*****************************************************************************\
  Rachel -- Repairing Automata for Choreographies by Editing Labels
  
- Copyright (C) 2008  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
  
  Rachel is free software; you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,10 @@
 /*
  * constructors
  */
+FormulaBits::FormulaBits(bool S, bool F, bool S_1, bool S_2, bool F_prime) :
+    S(S), F(F), S_1(S_2), S_2(S_2), F_prime(F_prime)
+{}
+
 
 FormulaAND::FormulaAND(Formula *_left, Formula *_right) : 
     left(_left), right(_right)

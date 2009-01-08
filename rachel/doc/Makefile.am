@@ -15,7 +15,7 @@ all: ../ChangeLog
 # run "rachel --help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/rachel --help > cmdline.out
+	$(top_srcdir)/src/rachel --full-help > cmdline.out
 
 
 #############################################################################

@@ -1,7 +1,7 @@
 /*****************************************************************************\
  Rachel -- Repairing Automata for Choreographies by Editing Labels
  
- Copyright (C) 2008  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
  
  Rachel is free software; you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <set>
+#include <libgen.h>
 #include "config.h"
 #include "Graph.h"
 #include "Formula.h"
@@ -209,9 +210,9 @@ Assignments Graph::sat(Node q) {
  * \param id  identifier of the graph
  *
  */
-Graph::Graph(const std::string _id) :
-  edges(), root(), max_value(0), insertionValue(), deletionValue(),
-  formulas(), id(_id),  nodes(), addedNodes() {
+Graph::Graph(const string _id) :
+  edges(), root(), finalNode(), max_value(0), insertionValue(),
+  deletionValue(), formulas(), id(_id),  nodes(), addedNodes() {
 }
 
 
@@ -255,6 +256,40 @@ string Graph::toDot() {
     }
     
     result += "label=\"" + id + "\"\n";
+    
+    return result;
+}
+
+
+/// returns a Dot representation of the graph
+string Graph::toDotAnnotated(bool reduced) {
+    string result;
+
+    for (size_t i = 0; i != nodes.size(); ++i) {
+        result += "  q_" + toString(nodes[i]) + " [label=\"# " + toString(nodes[i]) + "\"";
+        
+        if (!reduced) {
+            if (formulaBits[i].S)
+                result += " style=filled, fillcolor=skyblue";
+            if (formulaBits[i].F)
+                result += " style=filled, fillcolor=darkolivegreen2";
+        } else {
+            if (formulaBits[i].S_1)
+                result += " style=filled, fillcolor=skyblue";
+            if (formulaBits[i].S_2)
+                result += " style=filled, fillcolor=purple";
+            if (formulaBits[i].F_prime)
+                result += " style=filled, fillcolor=darkolivegreen2";            
+        }
+        
+        result += "];\n";
+
+        for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
+            result += "  q_" + toString(edges[nodes[i]][j].source);
+            result += " -> q_" + toString(edges[nodes[i]][j].target);
+            result += " [label=\"" + edges[nodes[i]][j].label + "\"];\n";
+        }
+    }
     
     return result;
 }
@@ -321,6 +356,12 @@ Node Graph::getRoot() const {
 /// sets the root node
 void Graph::setRoot(Node q) {
     root = q;
+}
+
+
+/// adds this node to the final nodes (IG only)
+void Graph::setFinal(Node q) {
+    finalNode[q] = true;
 }
 
 
@@ -611,20 +652,26 @@ void Graph::calculateCompactAnnotations() {
     
     // traverse the OG's nodes
     for (size_t i = 0; i < nodes.size(); ++i) {
-        bool in_F = false;
         bool in_S = false;
+        bool in_F = false;
+        bool in_S1 = false;
+        bool in_S2 = false;
+        bool in_FP = false;
         
         // STEP 1: treat the "final" assignment
         // if "final" satisfies the formula, this node belongs to F
         if (formulas[nodes[i]]->hasFinal()) {
             F_count++;
             in_F = true;
-            fprintf(stderr, "node %d is in F\n", nodes[i]);
+            if (args_info.verbose_flag)
+                fprintf(stderr, "node %d is in F\n", nodes[i]);
             
             // if the node has no outgoing edges, its implicitly in F
             if (!edges[nodes[i]].empty()) {
                 F_prime_count++;
-                fprintf(stderr, "node %d is in F'\n", nodes[i]);
+                in_FP = true;
+                if (args_info.verbose_flag)
+                    fprintf(stderr, "node %d is in F'\n", nodes[i]);
             }
         }
         
@@ -635,7 +682,8 @@ void Graph::calculateCompactAnnotations() {
             if (!formulas[nodes[i]]->sat(receiveLabels(nodes[i]))) {
                 S_count++;
                 in_S = true;
-                fprintf(stderr, "node %d is in S\n", nodes[i]);
+                if (args_info.verbose_flag)
+                    fprintf(stderr, "node %d is in S\n", nodes[i]);
             }
         }
 
@@ -644,17 +692,26 @@ void Graph::calculateCompactAnnotations() {
         if (receiveLabels(nodes[i]).empty()) {
             if (!in_S && !in_F) {
                 S2_count++;
-                fprintf(stderr, "node %d is in S2\n", nodes[i]);
+                in_S2 = true;
+                if (args_info.verbose_flag)
+                    fprintf(stderr, "node %d is in S2\n", nodes[i]);
             }
         } else {
             if (in_S) {
                 S1_count++;
-                fprintf(stderr, "node %d is in S1\n", nodes[i]);
+                in_S1 = true;
+                if (args_info.verbose_flag)
+                    fprintf(stderr, "node %d is in S1\n", nodes[i]);
             }
-        }        
+        }
+        
+        // store the bit annotation
+        formulaBits[i] = FormulaBits(in_S, in_F, in_S1, in_S2, in_FP);
     }
         
-    fprintf(stderr, "\n");
+    if (args_info.verbose_flag)
+        fprintf(stderr, "\n");
+
     fprintf(stderr, "# nodes with final annotation:     %5d = |F|\n", F_count);
     fprintf(stderr, "  ~ without successor:             %5d\n", F_count - F_prime_count);
     fprintf(stderr, "  ~ with successor:                %5d = |F'|\n", F_prime_count);
@@ -675,20 +732,25 @@ void Graph::calculateCompactAnnotations() {
 
 
 /// BPMN output of a service automaton
+/// \bug: if two edges [x,a,y] and [x,b,y] exists, only the first one is handled
+/// \bug: mixed choices have to be treated somehow
+/// \bug: strict termination has to be enforced
 void Graph::bpmnOutput() {
-    char *xor_generic = "shape=\"diamond\" regular=\"true\" height=\"0.7\" label=\"\" image=\"bpmn/l_xor.png\"";
-    char *mul_generic = "shape=\"diamond\" regular=\"true\" height=\"0.7\" label=\"\" image=\"bpmn/l_multiple.png\"";
-    char *start_generic = "shape=\"circle\" label=\"\" width=\"0.6\" height=\"0.6\"";
-    char *stop_generic = "shape=\"circle\" label=\"\" penwidth=\"4\" width=\"0.6\" height=\"0.6\"";
-    char *send_generic = "shape=\"circle\" peripheries=\"2\" width=\"0.5\" height=\"0.5\" image=\"bpmn/l_send.png\"";
-    char *receive_generic = "shape=\"circle\" peripheries=\"2\" width=\"0.5\" height=\"0.5\" image=\"bpmn/l_receive.png\"";    
+    // BPMN shapes
+    double scale = 0.6;
+    string shape_xor = "shape=\"diamond\" label=\"\" regular=\"true\" height=\"" + toString(scale+0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "xor.png\"";
+    string shape_mul = "shape=\"diamond\" label=\"\" regular=\"true\" height=\"" + toString(scale+0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "multiple.png\"";
+    string shape_mix = "shape=\"diamond\" label=\"\" regular=\"true\" height=\"" + toString(scale+0.1) + "\"";
+    string shape_start = "shape=\"circle\" label=\"\" height=\"" + toString(scale) + "\"";
+    string shape_stop = "shape=\"circle\" label=\"\" penwidth=\"4\" height=\"" + toString(scale) + "\"";
+    string shape_send = "shape=\"circle\" peripheries=\"2\" height=\"" + toString(scale-0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "send.png\"";
+    string shape_receive = "shape=\"circle\" peripheries=\"2\" height=\"" + toString(scale-0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "receive.png\"";    
     
+    // dot header
     fprintf(stdout, "digraph G {\n");
     fprintf(stdout, "  graph [rankdir=\"LR\" fontname=\"Helvetica\" fontsize=\"12\"];\n");
-    fprintf(stdout, "  node [width=\"0.6\" height=\"0.6\" fixedsize=\"true\", fontname=\"Helvetica\" fontsize=\"10\"];\n");
+    fprintf(stdout, "  node [fixedsize=\"true\", fontname=\"Helvetica\" fontsize=\"10\"];\n");
     fprintf(stdout, "  edge [fontname=\"Helvetica\" fontsize=\"10\"];\n\n");
-    
-    std::map<Node, std::string> leaving;
     
     // traverse the SA's nodes and collect predecessors
     std::map<Node, Nodes> pred;
@@ -696,84 +758,135 @@ void Graph::bpmnOutput() {
         for (size_t j = 0; j < edges[i].size(); ++j) {
             pred[edges[i][j].target].push_back(edges[i][j].source);
             
+            // create events
             if (edges[i][j].label.substr(0,1) == "!") {
                 fprintf(stdout, "  n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
-                    edges[i][j].source, edges[i][j].target, send_generic, edges[i][j].label.c_str());
+                    edges[i][j].source, edges[i][j].target,
+                    shape_send.c_str(), edges[i][j].label.c_str());
             } else {
                 fprintf(stdout, "  n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
-                    edges[i][j].source, edges[i][j].target, receive_generic, edges[i][j].label.c_str());
+                    edges[i][j].source, edges[i][j].target,
+                    shape_receive.c_str(), edges[i][j].label.c_str());
             }
         }
     }
     
-    fprintf(stdout, "\n");
-    
-    // traverse the SA's nodes again to create splits and joins
+    std::map<Node, string> in;
+    std::map<Node, string> out;
     for (size_t i = 0; i < nodes.size(); ++i) {
-        // this should be an error of Fiona's IG-OG-output
-        if (pred[i].empty() && edges[i].empty())
-            continue;
-
-
-        // START NODES
-        if (pred[i].empty()) {
-            fprintf(stderr, "%d is the initial node\n", i);
-            fprintf(stdout, "  n_S_%d [%s];\n", i, start_generic);
-        } else if (pred[i].size() > 1) {
-            // JOIN GATEWAY
-            fprintf(stdout, "  n_j_%d [%s];\n", i, xor_generic);
-            fprintf(stderr, "%d needs a preceeding XOR join: 'n_j_%d'\n", i, i);
-
-            // collect incoming arcs
-            for (size_t j = 0; j < pred[i].size(); j++) {
-                fprintf(stdout, "  n_%d_%d -> n_j_%d;\n", pred[i][j], i, i);
+        
+        // start node
+        if (i == root) {
+            fprintf(stdout, "  n_%d_START [%s];\n", i, shape_start.c_str());
+            
+            // if this node has incoming edges, add an XOR join
+            if (pred[i].size() > 0) {
+                fprintf(stdout, "  n_%d_JOIN [%s];\n", i, shape_xor.c_str());
+                fprintf(stdout, "  n_%d_START -> n_%d_JOIN;\n", i, i);
+                in[i] = "n_" + toString(i) + "_JOIN"; }
+            else {
+                in[i] = "n_" + toString(i) + "_START";
             }
         }
-        
 
-        // SPLIT GATEWAYS
-        if (edges[i].size() > 1) {        
+        // more than one incoming edge: join
+        if (pred[i].size() > 1) {
+            fprintf(stdout, "  n_%d_JOIN [%s];\n", i, shape_xor.c_str());
+            in[i] = "n_" + toString(i) + "_JOIN";                
+        }
+
+        // end node
+        if (finalNode[i]) {
+            fprintf(stdout, "  n_%d_END [%s];\n", i, shape_stop.c_str());
+
+            // if this node has outgoing edges, add an XOR (or maybe something else) split
+            if (edges[i].size() > 0) {
+                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_mix.c_str());
+                fprintf(stdout, "  n_%d_SPLIT -> n_%d_END;\n", i, i);
+                out[i] = "n_" + toString(i) + "_SPLIT";
+            } else {
+                out[i] = "n_" + toString(i) + "_END";
+            }
+        }
+
+        // more than one outgoing edge: split
+        if (edges[i].size() > 1) {
+
             if (!receiveLabels(i).empty() && !sendLabels(i).empty()) {
                 fprintf(stderr, "%d is a mixed split -- CANNOT HANDLE THIS YET!\n", i);
-                continue;
+                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_mix.c_str());
+                out[i] = "n_" + toString(i) + "_SPLIT";
             }
             else if (receiveLabels(i).empty()) {
-                fprintf(stdout, "  n_%d_s [%s];\n", i, xor_generic);
-                fprintf(stderr, "%d is an XOR split\n", i);                
+                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_xor.c_str());
+                out[i] = "n_" + toString(i) + "_SPLIT";
             }
             else if (sendLabels(i).empty()) {
-                fprintf(stderr, "%d is a pick split\n", i);                
-                fprintf(stdout, "  n_%d_s [%s];\n", i, mul_generic);
-            }
-            
-            // incoming arcs
-            for (size_t j = 0; j < pred[i].size(); j++) {
-                fprintf(stdout, "  n_%d_%d -> n_%d_s\n", pred[i][j], i, i);
-            }
-            
-            // outgoing arcs
-            for (size_t j = 0; j < edges[i].size(); j++) {    
-                fprintf(stdout, "  n_%d_s -> n_%d_%d;\n", i, i, edges[i][j].target);
+                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_mul.c_str());
+                out[i] = "n_" + toString(i) + "_SPLIT";
             }            
         }
+    }
+
+
+    // add the control flow edges to the BPMN model
+    for (size_t i = 0; i < nodes.size(); ++i) {
+
+/*        
+        string edge_source = (in[i] == "") ?
+            "n_" + toString(pred[i][0]) + "_" + toString(i) :
+            in[i];
+
+        string edge_target = (out[i] == "") ?
+            "n_" + toString(i) + "_" + toString(edges[i][0].target) :
+            out[i];
         
-        // STOP NODES
-        if (edges[i].size() == 0) {
-            fprintf(stdout, "  n_%d_E [%s];\n", i, stop_generic);
-            fprintf(stderr, "%d is a sink\n", i);
-            
-            // collect incoming arcs
-            for (size_t j = 0; j < pred[i].size(); j++) {
-                if (pred[i].size() == 1)
-                    fprintf(stdout, "  n_%d_%d -> n_%d_E\n", pred[i][j], i, i);
-                else {
-                    fprintf(stdout, "  n_j_%d -> n_%d_E\n", i, i);
-                    break;
-                }
+        fprintf(stdout, "  %s -> %s;\n", edge_source.c_str(), edge_target.c_str());
+*/
+        
+        // normal -> normal
+        if (in[i] == "" && out[i] == "") {
+            fprintf(stdout, "  n_%d_%d -> n_%d_%d;\n",
+                pred[i][0], i, i, edges[i][0].target);
+        }
+
+        // normal -> !normal
+        if (in[i] == "" && out[i] != "") {
+            fprintf(stdout, "  n_%d_%d -> %s;\n",
+                pred[i][0], i, out[i].c_str());            
+        }
+
+        // !normal -> normal
+        if (in[i] != "" && out[i] == "") {
+            fprintf(stdout, "  %s -> n_%d_%d;\n",
+                in[i].c_str(), i, edges[i][0].target);            
+        }
+        
+        // !normal -> !normal
+        if (in[i] != "" && out[i] != "") {
+            fprintf(stdout, "  %s -> %s;\n",
+                in[i].c_str(), out[i].c_str());            
+        }
+        
+        // egdes from or to added nodes
+        for (size_t j = 0; j < edges[i].size(); ++j) {
+            // output of event is not normal (join or exit)
+            if (in[edges[i][j].target] != "") {
+                fprintf(stdout, "  n_%d_%d -> %s;\n",
+                    edges[i][j].source, edges[i][j].target,
+                    in[edges[i][j].target].c_str());
             }
-        }             
+            
+            // input of event is not normal (split or standard)
+            if (out[edges[i][j].source] != "") {
+                fprintf(stdout, "  %s -> n_%d_%d;\n",
+                    out[edges[i][j].source].c_str(),
+                    edges[i][j].source, edges[i][j].target);
+            }
+        }
     }
     
-    fprintf(stdout, "\n  label=\"\\n\"\n");    
+    // add a label with the input filename
+    fprintf(stdout, "\n  label=\"\\n%s\"\n", basename(args_info.automaton_arg));    
     fprintf(stdout, "}\n");
 }

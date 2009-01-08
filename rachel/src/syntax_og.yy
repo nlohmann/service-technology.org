@@ -96,9 +96,23 @@ nodes_list:
 node:
   number
     { G_parsedGraph.addNode($1); }
-| number colon formula color_optional
+| number colon formula
     { G_parsedGraph.addNode($1);
       G_parsedGraph.addFormula($1, $3); }
+| number colon key_finalnode
+    { G_parsedGraph.addNode($1);
+      G_parsedGraph.setFinal($1); }
+| number colon formula colon color
+    { G_parsedGraph.addNode($1);
+      G_parsedGraph.addFormula($1, $3); }
+| number colon formula colon key_finalnode
+    { G_parsedGraph.addNode($1);
+      G_parsedGraph.addFormula($1, $3);
+      G_parsedGraph.setFinal($1); }
+| number colon formula colon color colon key_finalnode
+    { G_parsedGraph.addNode($1);
+      G_parsedGraph.addFormula($1, $3);
+      G_parsedGraph.setFinal($1); }
 ;
 
 
@@ -120,13 +134,9 @@ formula:
 ;
 
 
-color_optional:
-  /* empty */
-| colon key_finalnode
-| colon key_blue
-| colon key_red
-| colon key_blue colon key_finalnode
-| colon key_red colon key_finalnode
+color:
+| key_blue
+| key_red
 ;
 
 

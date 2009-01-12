@@ -44,7 +44,7 @@
 
 #include "options.h"
 #include "debug.h"
-#include "fiona.h"
+#include "config.h"
 #include "pnapi.cc"
 
 using namespace std;

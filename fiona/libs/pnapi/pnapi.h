@@ -24,7 +24,7 @@
 //////////////////
 
 #include "petrinet.h"		// to define member functions
-#include "fiona.h"
+#include "config.h"
 
 
 

@@ -59,7 +59,7 @@
 #include "helpers.h"		// helper functions (toString)
 #include "options.h"		// (parameters)
 #include "pnapi.h"
-#include "fiona.h"
+#include "config.h"
 
 
 

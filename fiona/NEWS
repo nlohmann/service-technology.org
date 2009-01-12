@@ -19,6 +19,11 @@ Version 3.1-unreleased
 * fixed bug #12530 (`https://gna.org/bugs/?12530'): the CUDD package is now
   entirely translated with a C++ compiler to allow linking of the `new' logger
 
+* renamed file `fiona.h' to `config.h'
+
+* used macro `CONFIG_DOT' for Graphviz dot calls to achieve compatibility on
+  systems where dot is not available
+
 
 See file ChangeLog <http://service-technology.org/files/fiona/ChangeLog> for
 complete version history.

@@ -62,7 +62,7 @@ typedef enum {
     O_NOOUTPUTFILES,            //!< -Q, produce no output files
     O_PV_MULTIPLE_DEADLOCKS,    //!< -M, use multiple deadlocks in pv generation
     O_PARAMETER,                //!< -p, use additional parameters
-    O_ADAPTER_FILE,             //!< -a, file with adapter rules
+    O_ADAPTER_FILE              //!< -a, file with adapter rules
 } possibleOptions;
 
 

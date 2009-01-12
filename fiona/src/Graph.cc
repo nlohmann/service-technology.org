@@ -298,7 +298,7 @@ string Graph::createPNGFile(string& filenamePrefix,
     string pngFile = filenamePrefix + ".png";
 
     // prepare dot command line for printing
-    string cmd = "dot -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
+    string cmd = string(CONFIG_DOT) + " -Tpng \"" + dotFile + "\" -o \""+ pngFile + "\"";
 
     // print commandline and execute system command
     trace( cmd + "\n\n");

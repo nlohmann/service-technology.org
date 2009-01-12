@@ -8,6 +8,10 @@
 @item test cases using Graphviz Dot or Petrify are now skipped if the configure script did not find these tools
 
 @item fixed bug #12530 (@url{https://gna.org/bugs/?12530}): the @acronym{CUDD} package is now entirely translated with a C++ compiler to allow linking of the @code{new} logger
+
+@item renamed file @file{fiona.h} to @file{config.h}
+
+@item used macro @code{CONFIG_DOT} for Graphviz dot calls to achieve compatibility on systems where dot is not available
 @end itemize
 
 

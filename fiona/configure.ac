@@ -8,7 +8,7 @@ AM_INIT_AUTOMAKE(gnits)
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/main.cc)
-AC_CONFIG_HEADERS(src/fiona.h)
+AC_CONFIG_HEADERS(src/config.h)
 
 # check for generic programs
 AC_PROG_CXX
@@ -23,7 +23,7 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 
 # look up canonical build name and write it to the config header
 AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # needed to compile CUDD on x86_64 machines
 AC_CHECK_SIZEOF([void*])
@@ -132,7 +132,7 @@ fi
 
 
 #############################################################################
-# search for Dot and Petrify and write results to file "src/fiona.h"
+# search for Dot and Petrify and write results to file "src/config.h"
 #############################################################################
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then

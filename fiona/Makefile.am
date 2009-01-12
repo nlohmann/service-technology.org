@@ -20,7 +20,7 @@ svn-clean: maintainer-clean
 	-rm -f libs/Makefile.in libs/cudd/Makefile.in libs/pnapi/Makefile.in
 	-rm -f man/Makefile.in
 	-rm -f -r src/.deps
-	-rm -f src/Fiona.h.in src/fiona.h.in~
+	-rm -f src/config.h.in src/config.h.in~
 	-rm -f tests/Makefile.in
 	@echo -----------------------------------------------------
 	@echo "To recreate installation status enter"

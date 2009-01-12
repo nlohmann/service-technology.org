@@ -324,11 +324,11 @@ void Exchangeability::printDotFile(char* filename,
 
         if ((Cudd_DagSize(bddMp) < 900) && (Cudd_DagSize(bddAnn) < 900)) {
             sprintf(bufferMp,
-                    "dot -Tpng \"%sexchangeability.BDD_MP.out\" -o \"%sexchangeability.BDD_MP.png\"",
-                    filename, filename);
+                    "%s -Tpng \"%sexchangeability.BDD_MP.out\" -o \"%sexchangeability.BDD_MP.png\"",
+                    CONFIG_DOT, filename, filename);
             sprintf(bufferAnn,
-                    "dot -Tpng \"%sexchangeability.BDD_ANN.out\" -o \"%sexchangeability.BDD_ANN.png\"",
-                    filename, filename);
+                    "%s -Tpng \"%sexchangeability.BDD_ANN.out\" -o \"%sexchangeability.BDD_ANN.png\"",
+                    CONFIG_DOT, filename, filename);
 
             system(bufferMp);
             system(bufferAnn);

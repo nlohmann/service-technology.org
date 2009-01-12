@@ -36,6 +36,7 @@
 //#include "owfn.h"
 #include "CommunicationGraph.h"
 #include "pnapi.h"
+#include "options.h"
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
 #include "lexer_owfn_wrap.h"
@@ -284,9 +285,10 @@ string STG2oWFN_main(vector<string>& edgeLabels,
     delete file;
 
     // Make a systemcall to dot in order to create the png
-    string systemcall = "dot -q -Tpng -o\"" + netfile + "-partner.png\" "+ dotFilename;
-    system(systemcall.c_str());
-
+    if (!parameters[P_NOPNG]) {
+        string systemcall = string(CONFIG_DOT) + " -q -Tpng -o\"" + netfile + "-partner.png\" "+ dotFilename;
+        system(systemcall.c_str());
+    }
+    
     return filename;
-
 }

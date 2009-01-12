@@ -427,10 +427,11 @@ void createOutputFiles(AnnotatedGraph* graph, string prefix, string dotFileTitle
 //! \param fromOWFN If set to true, the method uses information of the PN
 //! \param inputs A set of input places that will be put into the resulting owfn - can be omitted.
 //! \param outputs A set of output places that will be put into the resulting owfn - can be omitted.
+//! \todo check: parameter fromOWFN is not used
 void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> inputs = set<string>(), set<string> outputs = set<string>()) {
 
     // dont create the public view automaton's png if it becomes to big
-    unsigned int maxSizeForDot = 150;
+    // not used: unsigned int maxSizeForDot = 150;
 
     // Determine filename
     outfilePrefix = AnnotatedGraph::stripOGFileSuffix(graphName);
@@ -1415,7 +1416,7 @@ void makePNG(oWFN* PN) {
 
         if (parameters[P_TEX]) {
             // annotate .dot file
-            int exitvalue = system(("dot -Tdot " + dotFileName + " -o " + outFileName + ".dot").c_str());
+            int exitvalue = system((string(CONFIG_DOT) + " -Tdot " + dotFileName + " -o " + outFileName + ".dot").c_str());
             if (exitvalue == 0) {
                 trace( (outFileName + ".dot generated\n\n"));
             } else {
@@ -1427,13 +1428,15 @@ void makePNG(oWFN* PN) {
             makeGasTex((outFileName + ".dot"), (outFileName), GasTexGraph::STYLE_OWFN);
         }
 
-        // call dot to create the png file
-        int exitvalue = system(("dot -q -Tpng -o \"" + outFileName + ".png\" " + dotFileName).c_str());
+        if (!parameters[P_NOPNG]) {
+            // call dot to create the png file
+            int exitvalue = system((string(CONFIG_DOT) + " -q -Tpng -o \"" + outFileName + ".png\" " + dotFileName).c_str());
 
-        if (exitvalue == 0) {
-            trace( (outFileName + ".png generated\n\n"));
-        } else {
-            trace( "error: Dot exited with non zero value! dort\n\n" + intToString(exitvalue));
+            if (exitvalue == 0) {
+                trace( (outFileName + ".png generated\n\n"));
+            } else {
+                trace( "error: Dot exited with non zero value! dort\n\n" + intToString(exitvalue));
+            }
         }
     }
 }
@@ -1670,7 +1673,7 @@ int main(int argc, char** argv) {
         printf("- version:            %s\n", PACKAGE_VERSION);
         printf("- compilation date:   %s\n", __DATE__);
         printf("- compiler version:   %s\n", __VERSION__);
-        printf("- platform:           %s\n", BUILDSYSTEM);
+        printf("- platform:           %s\n", CONFIG_BUILDSYSTEM);
         printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
         printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
         printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);

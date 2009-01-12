@@ -138,7 +138,7 @@ void Adapter::outputPNasPNG(PNapi::PetriNet * petrinet, string prefix)
 	
 	    closeOutput(output);
 	    
-		string systemcall = "dot -q -Tpng -o\"" + prefix + ".png\" \"" + prefix + ".dot\"";
+		string systemcall = string(CONFIG_DOT) + " -q -Tpng -o\"" + prefix + ".png\" \"" + prefix + ".dot\"";
 		TRACE(TRACE_1, "Invoking dot with the following options:\n");
 		TRACE(TRACE_1, systemcall + "\n\n");
 		system(systemcall.c_str());
@@ -375,6 +375,7 @@ void Adapter::readRules(PNapi::PetriNet * rewriter)
 
 
 //! \brief main function for generating adapter
+/// \todo think about calling argv[0] instead of "fiona"
 void Adapter::generateAdapter()
 {
     TRACE(TRACE_5, "generateAdapter() : start\n");

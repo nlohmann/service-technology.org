@@ -2027,7 +2027,8 @@ string AnnotatedGraph::createAnnotatedDotFile(string& filenamePrefix, std::strin
 
         string annotatedDotFileName = filenamePrefix + ".dot";
         // annotate .dot file
-        system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
+        if (CONFIG_DOT != "not found")
+            system((string(CONFIG_DOT) + " -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
 
         return annotatedDotFileName;
 }
@@ -2041,7 +2042,7 @@ string AnnotatedGraph::createPNGFile(string& filenamePrefix, std::string& dotFil
     string pngFile = filenamePrefix + ".png";
 
     // prepare dot command line for printing
-    string cmd = "dot -Tpng \"" + dotFileName + "\" -o \""+ pngFile + "\"";
+    string cmd = string(CONFIG_DOT) + " -Tpng \"" + dotFileName + "\" -o \""+ pngFile + "\"";
 
     // print commandline and execute system command
     trace( cmd + "\n\n");

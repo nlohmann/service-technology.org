@@ -698,34 +698,34 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                 const char * prefix = outfilePrefix.c_str();
                 if (options[O_CALC_ALL_STATES]) {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.og.BDD_MP.out\" -o \"%s.og.BDD_MP.png\"",
-                            prefix, prefix);
+                            "%s -Tpng \"%s.og.BDD_MP.out\" -o \"%s.og.BDD_MP.png\"",
+                            CONFIG_DOT, prefix, prefix);
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.og.BDD_ANN.out\" -o \"%s.og.BDD_ANN.png\"",
-                            prefix, prefix);
+                            "%s -Tpng \"%s.og.BDD_ANN.out\" -o \"%s.og.BDD_ANN.png\"",
+                            CONFIG_DOT, prefix, prefix);
                 } else {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.R.og.BDD_MP.out\" -o \"%s.R.og.BDD_MP.png\"",
-                            prefix, prefix);
+                            "%s -Tpng \"%s.R.og.BDD_MP.out\" -o \"%s.R.og.BDD_MP.png\"",
+                            CONFIG_DOT, prefix, prefix);
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.R.og.BDD_ANN.out\" -o \"%s.R.og.BDD_ANN.png\"",
-                            prefix, prefix);
+                            "%s -Tpng \"%s.R.og.BDD_ANN.out\" -o \"%s.R.og.BDD_ANN.png\"",
+                            CONFIG_DOT, prefix, prefix);
                 }
             } else {
                 if (options[O_CALC_ALL_STATES]) {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.og.BDD_MP.out\" -o \"%s.og.BDD_MP.png\"",
-                            PN->filename.c_str(), PN->filename.c_str());
+                            "%s -Tpng \"%s.og.BDD_MP.out\" -o \"%s.og.BDD_MP.png\"",
+                            CONFIG_DOT, PN->filename.c_str(), PN->filename.c_str());
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.og.BDD_ANN.out\" -o \"%s.og.BDD_ANN.png\"",
-                            PN->filename.c_str(), PN->filename.c_str());
+                            "%s -Tpng \"%s.og.BDD_ANN.out\" -o \"%s.og.BDD_ANN.png\"",
+                            CONFIG_DOT, PN->filename.c_str(), PN->filename.c_str());
                 } else {
                     sprintf(bufferMp,
-                            "dot -Tpng \"%s.R.og.BDD_MP.out\" -o \"%s.R.og.BDD_MP.png\"",
-                            PN->filename.c_str(), PN->filename.c_str());
+                            "%s -Tpng \"%s.R.og.BDD_MP.out\" -o \"%s.R.og.BDD_MP.png\"",
+                            CONFIG_DOT, PN->filename.c_str(), PN->filename.c_str());
                     sprintf(bufferAnn,
-                            "dot -Tpng \"%s.R.og.BDD_ANN.out\" -o \"%s.R.og.BDD_ANN.png\"",
-                            PN->filename.c_str(), PN->filename.c_str());
+                            "%s -Tpng \"%s.R.og.BDD_ANN.out\" -o \"%s.R.og.BDD_ANN.png\"",
+                            CONFIG_DOT, PN->filename.c_str(), PN->filename.c_str());
                 }
             }
 
@@ -765,22 +765,22 @@ void BddRepresentation::printDotFile(char** varNames, char* option) {
                     const char * prefix = outfilePrefix.c_str();
                     if (options[O_CALC_ALL_STATES]) {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.og.BDD_MPRED.out -o %s.og.BDD_MPRED.png",
-                                prefix, prefix);
+                                "%s -Tpng %s.og.BDD_MPRED.out -o %s.og.BDD_MPRED.png",
+                                CONFIG_DOT, prefix, prefix);
                     } else {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.R.og.BDD_MPRED.out -o %s.R.og.BDD_MPRED.png",
-                                prefix, prefix);
+                                "%s -Tpng %s.R.og.BDD_MPRED.out -o %s.R.og.BDD_MPRED.png",
+                                CONFIG_DOT, prefix, prefix);
                     }
                 } else {
                     if (options[O_CALC_ALL_STATES]) {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.og.BDD_MPRED.out -o %s.og.BDD_MPRED.png",
-                                PN->filename.c_str(), PN->filename.c_str());
+                                "%s -Tpng %s.og.BDD_MPRED.out -o %s.og.BDD_MPRED.png",
+                                CONFIG_DOT, PN->filename.c_str(), PN->filename.c_str());
                     } else {
                         sprintf(bufferMpRed,
-                                "dot -Tpng %s.R.og.BDD_MPRED.out -o %s.R.og.BDD_MPRED.png",
-                                PN->filename.c_str(), PN->filename.c_str());
+                                "%s -Tpng %s.R.og.BDD_MPRED.out -o %s.R.og.BDD_MPRED.png",
+                                CONFIG_DOT, PN->filename.c_str(), PN->filename.c_str());
                     }
                 }
 

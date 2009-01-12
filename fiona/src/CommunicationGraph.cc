@@ -42,7 +42,7 @@
 #include "options.h"
 #include "debug.h"
 #include "CommunicationGraph.h"
-#include "fiona.h"
+#include "config.h"
 #include "set_helpers.h"
 #include <cassert>
 
@@ -374,7 +374,7 @@ string CommunicationGraph::createAnnotatedDotFile(string& filenamePrefix, string
 // Checking the option is not needed anymore since this function has to be called knowingly.
             string annotatedDotFileName = filenamePrefix + ".dot";
             // annotate .dot file
-            system(("dot -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
+            system((string(CONFIG_DOT) + " -Tdot " + dotFileName + " -o " + annotatedDotFileName).c_str());
 
             return annotatedDotFileName;
 }

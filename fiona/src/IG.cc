@@ -486,11 +486,13 @@ void interactionGraph::getSendingEvents(State* state, GraphFormulaMultiaryOr* my
 //!    \param myclause clause which is connected to the current state
 //! \param outputMessages set of receiving events that are activated in the current node
 //! \param node is not used but needed for having a unified function pointer.
+//! \todo check: parameter "state" is not used
+//! \todo check: parameter "node" is not used
 void interactionGraph::getReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& outputMessages, AnnotatedGraphNode* node) {
 
     TRACE(TRACE_5, "interactionGraph::getReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& receivingEvents, AnnotatedGraphNode* node): start\n");
 
-    int i = 0;
+// unused:    int i = 0;
     // get the activated receiving events
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
         if (PN->getPlace(i)->type == OUTPUT && PN->CurrentMarking[i] > 0) {
@@ -903,6 +905,7 @@ void interactionGraph::receivingBeforeSending(State * state, GraphFormulaMultiar
 //!    \param myclause clause which is connected to the current state
 //! \param receivingEvents set of receiving events that are activated in the current node
 //! \param node the node for which the activated receiving events are calculated
+//! \todo check: parameter "state" is not used
 void interactionGraph::combineReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause,
         setOfMessages& receivingEvents, AnnotatedGraphNode* node) {
 

@@ -37,7 +37,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "fiona.h"
+#include "config.h"
 
 /// In a release output is  restricted to TRACE_0, so write_trace will never be called
 #ifdef NDEBUG

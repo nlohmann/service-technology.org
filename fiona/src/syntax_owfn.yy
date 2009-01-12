@@ -343,7 +343,7 @@ placelists: capacity placelist
 capacity: { CurrentCapacity = CAPACITY; }
 | KEY_SAFE    COLON  {CurrentCapacity = 1;}
 | KEY_SAFE NUMBER  COLON { 
-				sscanf($2, "%u", &CurrentCapacity);
+				sscanf($2, "%i", &CurrentCapacity);
 				free($2);
 			}
 ;
@@ -409,7 +409,7 @@ commands:
 	{
 		// set max_occurrence to value that was given in oWFN file
 		if (options[O_READ_EVENTS]) {
-			sscanf($3, "%u", &(PS->getPlace()->max_occurrence));
+			sscanf($3, "%i", &(PS->getPlace()->max_occurrence));
                         
                         // For receiving events increase the max occurence by one in order to reach the empty node
                         if(type == OUTPUT) {

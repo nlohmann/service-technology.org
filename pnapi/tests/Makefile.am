@@ -1,6 +1,6 @@
 TESTS = 
 
-check_PROGRAMS = 
+check_PROGRAMS =
 
 #test_mergePlaces_SOURCES = test_mergePlaces.cc net_gen.h net_gen.cc
 #test_mergeTransitions_SOURCES = test_mergeTransitions.cc net_gen.h net_gen.cc
@@ -25,6 +25,7 @@ check_PROGRAMS =
 #test_markings_SOURCES = test_markings.cc
 #test_parser_SOURCES = test_parser.cc test.h test.cc
 #test_compose_SOURCES = test_compose.cc test.h test.cc
+#test_serviceautomaton_SOURCES = test_serviceautomaton.cc
 
 LDADD = $(top_builddir)/src/libpnapi.a
 

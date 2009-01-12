@@ -8,216 +8,226 @@ namespace pnapi
 class Place;
 class Node;
 
-/*!
- * \brief   Final Condition Formulas
- */
-namespace formula {
+  /*!
+   * \brief   Final Condition Formulas
+   */
+  namespace formula {
 
-typedef enum { EQ, NEQ, G, GEQ, L, LEQ, NOT, AND, OR, NONE } ftype;
+  typedef enum { EQ, NEQ, G, GEQ, L, LEQ, NOT, AND, OR, NONE } ftype;
 
-class Formula
-{
-public:
-  Formula();
-  Formula(Formula *f);
-  virtual ~Formula();
+  class Formula
+  {
+  public:
+    Formula();
+    Formula(Formula *f);
+    virtual ~Formula();
 
-  virtual bool evaluate(Marking &m);
+    virtual bool evaluate(Marking &m);
 
-  virtual ftype getType();
+    virtual ftype getType();
 
-private:
-  Formula *sub;
-  bool ALL_OTHER_PLACES_EMPTY;
-  bool ALL_INTERFACE_PLACES_EMPTY;
-};
+  private:
+    Formula *sub;
+  };
 
 
 
 
-/***********************************************
- *               Atomic Formulas               *
- ***********************************************/
-class AtomicFormula : public Formula
-{
-public:
-  AtomicFormula();
-  AtomicFormula(Place *p, unsigned int k);
-  virtual ~AtomicFormula();
+  class AllOtherPlacesEmpty : public Formula
+  {
+  public:
+    AllOtherPlacesEmpty();
+    virtual ~AllOtherPlacesEmpty();
 
-  virtual bool evaluate(Marking &m);
-
-  void setPlace(Place *p);
-  void setNumber(unsigned int k);
-
-  Place* getPlace();
-  unsigned int getNumber();
-
-  virtual ftype getType();
-
-protected:
-  Place *place;
-  unsigned int number;
-};
-
-class FormulaEqual : public AtomicFormula
-{
-public:
-  FormulaEqual();
-  FormulaEqual(Place *p, unsigned int k);
-  virtual ~FormulaEqual();
-
-  bool evaluate(Marking &m);
-
-  ftype getType();
-};
-
-class FormulaNotEqual : public AtomicFormula
-{
-public:
-  FormulaNotEqual();
-  FormulaNotEqual(Place *p, unsigned int k);
-  virtual ~FormulaNotEqual();
-
-  bool evaluate(Marking &m);
-
-  ftype getType();
-};
-
-class FormulaGreater : public AtomicFormula
-{
-public:
-  FormulaGreater();
-  FormulaGreater(Place *p, unsigned int k);
-  virtual ~FormulaGreater();
-
-  bool evaluate(Marking &m);
-
-  ftype getType();
-};
-
-class FormulaGreaterEqual : public AtomicFormula
-{
-public:
-  FormulaGreaterEqual();
-  FormulaGreaterEqual(Place *p, unsigned int k);
-  virtual ~FormulaGreaterEqual();
-
-  bool evaluate(Marking &m);
-
-  ftype getType();
-};
-
-class FormulaLess : public AtomicFormula
-{
-public:
-  FormulaLess();
-  FormulaLess(Place *p, unsigned int k);
-  virtual ~FormulaLess();
-
-  bool evaluate(Marking &m);
-
-  ftype getType();
-};
-
-class FormulaLessEqual : public AtomicFormula
-{
-public:
-  FormulaLessEqual();
-  FormulaLessEqual(Place *p, unsigned int k);
-  virtual ~FormulaLessEqual();
-
-  bool evaluate(Marking &m);
-
-  ftype getType();
-};
+    bool evaluate(Marking &m);
+  };
 
 
 
 
-/************************************************
- *          Unary Boolean Formulas              *
- ************************************************/
-class UnaryBooleanFormula : public Formula
-{
-public:
-  UnaryBooleanFormula();
-  UnaryBooleanFormula(Formula *f);
-  virtual ~UnaryBooleanFormula();
+  /***********************************************
+   *               Atomic Formulas               *
+   ***********************************************/
+  class AtomicFormula : public Formula
+  {
+  public:
+    AtomicFormula();
+    AtomicFormula(Place *p, unsigned int k);
+    virtual ~AtomicFormula();
 
-  virtual bool evaluate(Marking &m) = 0;
+    virtual bool evaluate(Marking &m);
 
-  void setSubFormula(Formula *s);
+    void setPlace(Place *p);
+    void setNumber(unsigned int k);
 
-  Formula* getSubFormula();
+    Place* getPlace();
+    unsigned int getNumber();
 
-  virtual ftype getType() = 0;
+    virtual ftype getType();
 
-protected:
-  Formula *sub;
-};
+  protected:
+    Place *place;
+    unsigned int number;
+  };
 
-class FormulaNot : public UnaryBooleanFormula
-{
-public:
-  FormulaNot();
-  FormulaNot(Formula *f);
+  class FormulaEqual : public AtomicFormula
+  {
+  public:
+    FormulaEqual();
+    FormulaEqual(Place *p, unsigned int k);
+    virtual ~FormulaEqual();
 
-  bool evaluate(Marking &m);
+    bool evaluate(Marking &m);
 
-  ftype getType();
-};
+    ftype getType();
+  };
+
+  class FormulaNotEqual : public AtomicFormula
+  {
+  public:
+    FormulaNotEqual();
+    FormulaNotEqual(Place *p, unsigned int k);
+    virtual ~FormulaNotEqual();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
+
+  class FormulaGreater : public AtomicFormula
+  {
+  public:
+    FormulaGreater();
+    FormulaGreater(Place *p, unsigned int k);
+    virtual ~FormulaGreater();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
+
+  class FormulaGreaterEqual : public AtomicFormula
+  {
+  public:
+    FormulaGreaterEqual();
+    FormulaGreaterEqual(Place *p, unsigned int k);
+    virtual ~FormulaGreaterEqual();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
+
+  class FormulaLess : public AtomicFormula
+  {
+  public:
+    FormulaLess();
+    FormulaLess(Place *p, unsigned int k);
+    virtual ~FormulaLess();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
+
+  class FormulaLessEqual : public AtomicFormula
+  {
+  public:
+    FormulaLessEqual();
+    FormulaLessEqual(Place *p, unsigned int k);
+    virtual ~FormulaLessEqual();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
 
 
 
 
-/************************************************
- *           Binary Boolean Formulas            *
- ************************************************/
-class BinaryBooleanFormula : public Formula
-{
-public:
-  BinaryBooleanFormula();
-  BinaryBooleanFormula(Formula *l, Formula *r);
-  virtual ~BinaryBooleanFormula();
+  /************************************************
+   *          Unary Boolean Formulas              *
+   ************************************************/
+  class UnaryBooleanFormula : public Formula
+  {
+  public:
+    UnaryBooleanFormula();
+    UnaryBooleanFormula(Formula *f);
+    virtual ~UnaryBooleanFormula();
 
-  virtual bool evaluate(Marking &m) = 0;
+    virtual bool evaluate(Marking &m) = 0;
 
-  void setLeft(Formula *l);
-  void setRight(Formula *r);
+    void setSubFormula(Formula *s);
 
-  virtual ftype getType() = 0;
+    Formula* getSubFormula();
 
-protected:
-  Formula *left;
-  Formula *right;
-};
+    virtual ftype getType() = 0;
 
-class FormulaAnd : public BinaryBooleanFormula
-{
-public:
-  FormulaAnd();
-  FormulaAnd(Formula *l, Formula *r);
-  virtual ~FormulaAnd();
+  protected:
+    Formula *sub;
+  };
 
-  bool evaluate(Marking &m);
+  class FormulaNot : public UnaryBooleanFormula
+  {
+  public:
+    FormulaNot();
+    FormulaNot(Formula *f);
 
-  ftype getType();
-};
+    bool evaluate(Marking &m);
 
-class FormulaOr : public BinaryBooleanFormula
-{
-public:
-  FormulaOr();
-  FormulaOr(Formula *l, Formula *r);
-  virtual ~FormulaOr();
+    ftype getType();
+  };
 
-  bool evaluate(Marking &m);
 
-  ftype getType();
-};
 
-} /* namespace formula */
+
+  /************************************************
+   *           Binary Boolean Formulas            *
+   ************************************************/
+  class BinaryBooleanFormula : public Formula
+  {
+  public:
+    BinaryBooleanFormula();
+    BinaryBooleanFormula(Formula *l, Formula *r);
+    virtual ~BinaryBooleanFormula();
+
+    virtual bool evaluate(Marking &m) = 0;
+
+    void setLeft(Formula *l);
+    void setRight(Formula *r);
+
+    virtual ftype getType() = 0;
+
+  protected:
+    Formula *left;
+    Formula *right;
+  };
+
+  class FormulaAnd : public BinaryBooleanFormula
+  {
+  public:
+    FormulaAnd();
+    FormulaAnd(Formula *l, Formula *r);
+    virtual ~FormulaAnd();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
+
+  class FormulaOr : public BinaryBooleanFormula
+  {
+  public:
+    FormulaOr();
+    FormulaOr(Formula *l, Formula *r);
+    virtual ~FormulaOr();
+
+    bool evaluate(Marking &m);
+
+    ftype getType();
+  };
+
+  } /* namespace formula */
 
 } /* namespace pnapi */
 

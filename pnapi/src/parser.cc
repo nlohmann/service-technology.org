@@ -6,6 +6,10 @@ extern istream * pnapi_owfn_istream;
 extern PNapi::parser::Node<PNapi::parser::owfn::Node> * pnapi_owfn_ast;
 extern int pnapi_owfn_parse();
 
+extern istream * pnapi_petrify_istream;
+extern PNapi::parser::Node<PNapi::parser::petrify::Node> * pnapi_petrify_ast;
+extern int pnapi_petrify_parse();
+
 namespace PNapi
 {
 
@@ -140,7 +144,143 @@ namespace PNapi
       }
 
     }
+    
+    namespace petrify
+    {
+    
+      Node::Node(Type type) : type(type) {}
+    
+      Node::Node(Type type, Node *child1, Node *child2, Node *child3, Node *child4) :
+        type(type)
+      {
+        if(child1!=NULL)
+        {
+          addChild(*child1);
+        }
+        
+        Node *n1 = new Node(CTRL1);
+        addChild(*n1);
+        
+        if(child2!=NULL)
+        {
+          addChild(*child2);
+        }
+        if(child3!=NULL)
+        {
+          addChild(*child3);
+        }
+        
+        Node *n2 = new Node(CTRL2);
+        addChild(*n2);
+        
+        if(child4!=NULL)
+        {
+          addChild(*child4);
+        }
+      }
+      
+      Node::Node(Type type, string data, Node *child) :
+        type(type), data(data)
+      {
+        if(child != NULL)
+        {
+          addChild(*child);
+        }
+      }
+      
+      Node::Node(Type type, string data, Node *child1, Node *child2) :
+        type(type), data(data)
+      {
+        if(child1 != NULL)
+        {
+          addChild(*child1);
+        }
+        if(child2 != NULL)
+        {
+          addChild(*child2);
+        }
+      }
 
+      Visitor::Visitor()
+      {
+        in_marking_list=false;
+        in_arc_list=false;
+      }
+      
+      Parser::Parser() : 
+        parser::Parser<Node>(::pnapi_petrify_istream, ::pnapi_petrify_ast, &::pnapi_petrify_parse)
+      {
+      }
+      
+      void Visitor::beforeChildren(const Node & node)
+      {
+        // erzeuge result_ aus Knoten hier ...
+        switch(node.type)
+        {
+        case Node::TLIST: 
+          {
+            if(in_arc_list)
+            {
+              tempNodeSet.insert(node.data);
+              result_->transitions.insert(node.data);
+            } else
+            {
+              result_->interface.insert(node.data);
+            }
+            break;
+          }
+        case Node::PLIST: 
+          {
+            result_->places.insert(node.data);
+            if (in_marking_list)
+              result_->initialMarked.insert(node.data);
+            else
+              tempNodeSet.insert(node.data);
+            break;
+          }
+        case Node::PT:
+        case Node::TP: 
+          {
+            tempNodeStack.push(tempNodeSet);
+            tempNodeSet.clear();
+            break;
+          }
+        case Node::CTRL1: 
+          {
+            in_arc_list = true; 
+            break;
+          }
+        case Node::CTRL2: 
+          {
+            in_marking_list = true; 
+            break;
+          }
+        default: break;
+        
+        }
+      }
+
+      void Visitor::afterChildren(const Node & node)
+      {
+        // ... und hier
+        switch(node.type)
+        {
+        case Node::PT:
+        case Node::TP:
+        {
+          result_->arcs[node.data] = tempNodeSet;
+          tempNodeSet.clear();
+          if(tempNodeStack.size() > 0)
+          {
+            tempNodeSet = tempNodeStack.top();
+            tempNodeStack.pop();
+          }
+        }
+        default: break;
+        }
+      }
+      
+    }
   }
 
 }

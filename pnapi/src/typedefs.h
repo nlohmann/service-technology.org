@@ -2,8 +2,14 @@
 #define TYPEDEFS_H_
 
 #include <vector>
+#include <set>
+#include <string>
+#include <map>
 
 using std::vector;
+using std::set;
+using std::string;
+using std::map;
 
 namespace PNapi
 {
@@ -114,6 +120,14 @@ typedef enum
 typedef vector<unsigned int> Marking;
 
 
+struct PetrifyResult
+{
+  set<string> transitions;
+  set<string> places;
+  set<string> initialMarked;
+  set<string> interface;
+  map<string, set<string> > arcs;
+};
 
 
 } /* namespace PNapi */

@@ -376,7 +376,9 @@ class PetriNet
     /// creates a new transition
     Transition & createTransition(const string & name = "");
 
-
+    /// crates a petri net from an STG file
+    void createFromSTG(vector<string> & edgeLabels, const string & fileName, set<string>& inputPlacenames, set<string>& outputPlacenames);
+    
     /*** query (const) and non-query member functions (to be sorted?) ***/
 
     /// adds a place with a given role and type (see also createPlace())
@@ -635,6 +637,9 @@ class PetriNet
     /// remove unneeded initially marked places in choreographies
     void reduce_remove_initially_marked_places_in_choreographies();
 
+    /// helper function for STG2oWFN
+    string remap(string edge, vector<string> & edgeLabels);
+    
     /// merges two parallel transitions
     void mergeParallelTransitions(Transition *t1, Transition *t2);
 

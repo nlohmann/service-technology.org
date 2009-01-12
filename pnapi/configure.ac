@@ -20,6 +20,16 @@ else
  AC_DEFINE(HAVE_DOT, 1, [Dot can be used on this system.])
 fi
 
+AC_CHECK_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
+if test "$PETRIFY" = "not found"; then
+  AC_MSG_WARN([Petrify was not found. See file README.])
+  AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
+fi
+AC_SUBST(PETRIFY)
+
+
 AC_CONFIG_FILES([Makefile
                  Doxyfile
                  src/Makefile

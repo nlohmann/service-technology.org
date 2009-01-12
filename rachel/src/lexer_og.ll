@@ -1,23 +1,24 @@
-/*****************************************************************************
- * Copyright 2008, 2009 Niels Lohmann                                        *
- * Copyright 2005, 2006 Jan Bretschneider                                    *
- *                                                                           *
- * This file is part of Fiona.                                               *
- *                                                                           *
- * Fiona is free software; you can redistribute it and/or modify it          *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
- *****************************************************************************/
+/*****************************************************************************\
+ Rachel -- Repairing Automata for Choreographies by Editing Labels
+ 
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2005, 2006  Jan Bretschneider (Fiona parser)
+ 
+ Rachel is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Rachel is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Rachel (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
 
 /* flex options */
 %option outfile="lex.yy.c"
@@ -26,6 +27,7 @@
 %option yylineno
 %option nodefault
 %option nounput
+%option caseless
 
 %{
 #include <cassert>
@@ -53,39 +55,39 @@ number         [0-9]+
 %%
 
 
-"{"                                     { BEGIN(COMMENT);         }
-<COMMENT>"}"                            { BEGIN(INITIAL);         }
-<COMMENT>[^}]*                          { /* do nothing */        }
+"{"                                     { BEGIN(COMMENT);              }
+<COMMENT>"}"                            { BEGIN(INITIAL);              }
+<COMMENT>[^}]*                          { /* do nothing */             }
 
-NODES                                   { return key_nodes;       }
-INITIALNODE                             { return key_initialnode; }
-TRANSITIONS                             { return key_transitions; }
+"NODES"                                 { return key_nodes;            }
+"INITIALNODE"                           { return key_initialnode;      }
+"TRANSITIONS"                           { return key_transitions;      }
 
-INTERFACE                               { return key_interface;   }
-INPUT                                   { return key_input;       }
-OUTPUT                                  { return key_output;      }
+"INTERFACE"                             { return key_interface;        }
+"INPUT"                                 { return key_input;            }
+"OUTPUT"                                { return key_output;           }
 
-[Tt][Rr][Uu][Ee]                        { return key_true;        }
-[Ff][Aa][Ll][Ss][Ee]                    { return key_false;       }
-[Ff][Ii][Nn][Aa][Ll]                    { return key_final;       }
-"*"                                     { return op_and;          }
-"+"                                     { return op_or;           }
-"("                                     { return lpar;            }
-")"                                     { return rpar;            }
+"TRUE"                                  { return key_true;             }
+"FALSE"                                 { return key_false;            }
+"FINAL"                                 { return key_final;            }
+"*"                                     { return op_and;               }
+"+"                                     { return op_or;                }
+"("                                     { return lpar;                 }
+")"                                     { return rpar;                 }
 
-[Rr][Ee][Dd]                            { return key_red;         }
-[Bb][Ll][Uu][Ee]                        { return key_blue;        }
-[Ff][Ii][Nn][Aa][Ll][Nn][Oo][Dd][Ee]    { return key_finalnode;   }
+"RED"                                   { return key_red;              }
+"BLUE"                                  { return key_blue;             }
+"FINALNODE"                             { return key_finalnode;        }
 
-":"                                     { return colon;           }
-";"                                     { return semicolon;       }
-","                                     { return comma;           }
-"->"                                    { return arrow;           }
+":"                                     { return colon;                }
+";"                                     { return semicolon;            }
+","                                     { return comma;                }
+"->"                                    { return arrow;                }
 
-{number}       { og_yylval.value = atoi(og_yytext); return number; }
-{identifier}   { og_yylval.str = og_yytext; return ident;  }
+{number}       { og_yylval.value = atoi(og_yytext); return number;     }
+{identifier}   { og_yylval.str = og_yytext; return ident;              }
 
-{whitespace}                            { break; }
+{whitespace}                            { /* do nothing */             }
 
 .                                       { og_yyerror("lexical error"); }
 

@@ -1,11 +1,32 @@
+/*****************************************************************************\
+ Rachel -- Repairing Automata for Choreographies by Editing Labels
+ 
+ Copyright (C) 2008, 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (C) 2005, 2006  Jan Bretschneider (Fiona parser)
+ 
+ Rachel is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Rachel is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Rachel (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+
 %{
 #include <libgen.h>
 #include "cmdline.h"
 #include "Graph.h"
 #include "Formula.h"
 
-Graph G_parsedGraph("parsed");
-extern char *G_filename;
+extern Graph G_parsedGraph;
 
 /* Prologue: Syntax and usage of the prologue.
  * Bison Declarations: Syntax and usage of the Bison declarations section.
@@ -57,7 +78,6 @@ extern gengetopt_args_info args_info;
 
 
 og:
-   { G_parsedGraph = Graph(basename(G_filename)); }
  interface nodes initialnode transitions
    { // Do not reenumerate nodes in annotation mode, because there the
      // node numbers are printed and reenumeration would be confusing.

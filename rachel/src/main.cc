@@ -21,7 +21,6 @@
 #include <cstdio>
 #include <fstream>
 #include <stack>
-#include <cassert>
 #include <climits>
 #include <cstdlib>
 #include <string>
@@ -54,10 +53,14 @@ extern FILE *og_yyin;
 
 /// the automaton
 Graph A("");
+
 /// the operating guideline
 Graph B("");
 
-extern Graph G_parsedGraph;
+/// the parsed graph
+Graph G_parsedGraph("");
+
+/// the filename of the current file
 char *G_filename;
 
 /// a map caching the best script for all action pairs
@@ -78,18 +81,6 @@ gengetopt_args_info args_info;
  * functions *
  *************/
 
-/// returns the name of a chose mode
-std::string mode_name(enum_mode mode) {
-    switch (mode) {
-        case(mode_arg_simulation): return "simulation";            
-        case(mode_arg_matching):   return "matching";
-        case(mode_arg_annotation): return "annotation";
-        case(mode_arg_bpmn):       return "bpmn";
-        default:                   assert(false);
-    }
-}
-
-
 /// output complete edit script
 /// \todo move me somewhere else
 Graph outputEditScript(Graph &g1, Graph &g2) {
@@ -98,7 +89,7 @@ Graph outputEditScript(Graph &g1, Graph &g2) {
     Graph g3("edit");
     
     stack<NodePair> todo;
-    todo.push(NodePair(g1.getRoot(),g2.getRoot()));
+    todo.push(NodePair(g1.getRoot(), g2.getRoot()));
     
     while (!todo.empty()) {
         // pop top element
@@ -134,7 +125,7 @@ void dotOutput(Graph &A, Graph &B, Graph &C) {
     if (args_info.dot_arg == NULL) {
         dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
         std::string(basename(args_info.og_arg)) + "_" +
-        mode_name(args_info.mode_arg) + ".dot";
+        cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
     } else {
         dot_filename = args_info.dot_arg;
     }
@@ -170,32 +161,15 @@ void dotOutput(Graph &A, Graph &B, Graph &C) {
     
     
     // if dot found during configuration, executed it to create a PNG
-    if (args_info.png_flag && !std::string(HAVE_DOT).empty()) {
-        std::string command = std::string(HAVE_DOT) + " " + dot_filename + " -Tpng -O";
+    if (args_info.png_flag && !std::string(CONFIG_DOT).empty()) {
+        std::string command = std::string(CONFIG_DOT) + " " + dot_filename + " -Tpng -O";
         system(command.c_str());
     }
 }
 
 
-int main(int argc, char** argv) {
-    if (argc == 2 && string(argv[1]) == "--bug") {
-	    printf("\n\n");
-        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
-        printf("- tool:               %s\n", PACKAGE_NAME);
-        printf("- version:            %s\n", PACKAGE_VERSION);
-        printf("- compilation date:   %s\n", __DATE__);
-        printf("- compiler version:   %s\n", __VERSION__);
-        printf("- platform:           %s\n", BUILDSYSTEM);
-        printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
-        printf("- config ASPECTS:     %s\n", CONFIG_ENABLEASPECTS);
-        printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
-        printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
-        printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
-        printf("\n\n");
-        exit(EXIT_SUCCESS);
-    }
-
-
+/// evaluate the command line parameters
+void evaluateParameters(int argc, char** argv) {
     // set default values
     cmdline_parser_init(&args_info);
 
@@ -215,7 +189,32 @@ int main(int argc, char** argv) {
         if (cmdline_parser_config_file (args_info.conf_file_arg, &args_info, params) != 0)
             exit(EXIT_FAILURE);
     }
+    
+    // tidy memory (is this right)
+    free(params);
+}
 
+
+int main(int argc, char** argv) {
+    if (argc == 2 && string(argv[1]) == "--bug") {
+	    printf("\n\n");
+        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
+        printf("- tool:               %s\n", PACKAGE_NAME);
+        printf("- version:            %s\n", PACKAGE_VERSION);
+        printf("- compilation date:   %s\n", __DATE__);
+        printf("- compiler version:   %s\n", __VERSION__);
+        printf("- platform:           %s\n", CONFIG_BUILDSYSTEM);
+        printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
+        printf("- config ASPECTS:     %s\n", CONFIG_ENABLEASPECTS);
+        printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
+        printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
+        printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
+        printf("\n\n");
+        exit(EXIT_SUCCESS);
+    }
+
+
+    evaluateParameters(argc, argv);
 
 
     if (args_info.mode_arg == mode_arg_matching ||
@@ -225,7 +224,7 @@ int main(int argc, char** argv) {
         // care about the automaton file input
         if (!args_info.automaton_given) {
             fprintf(stderr, "%s: '--automaton' ('-a') option required in mode '%s'\n",
-                PACKAGE, mode_name(args_info.mode_arg).c_str());
+                PACKAGE, cmdline_parser_mode_values[args_info.mode_arg]);
             exit(EXIT_FAILURE);
         } else {
             G_filename = args_info.automaton_arg;
@@ -236,20 +235,23 @@ int main(int argc, char** argv) {
             }
 
             // call parser and copy read graph
+            G_parsedGraph = Graph(G_filename);
             og_yyparse();
             fclose(og_yyin);
             A = G_parsedGraph;                
         }
     }
-    
+
+
     if (args_info.mode_arg == mode_arg_matching ||
         args_info.mode_arg == mode_arg_simulation ||
-        args_info.mode_arg == mode_arg_annotation) {
+        args_info.mode_arg == mode_arg_annotation ||
+        args_info.mode_arg == mode_arg_og) {
 
         // care about the OG file input
         if (!args_info.og_given) {
             fprintf(stderr, "%s: '--og' ('-o') option required in mode '%s'\n",
-                PACKAGE, mode_name(args_info.mode_arg).c_str());
+                PACKAGE, cmdline_parser_mode_values[args_info.mode_arg]);
             exit(EXIT_FAILURE);
         } else {
             G_filename = args_info.og_arg;
@@ -260,6 +262,7 @@ int main(int argc, char** argv) {
             }
 
             // call parser and copy read graph
+            G_parsedGraph = Graph(G_filename);
             og_yyparse();
             fclose(og_yyin);
             B = G_parsedGraph;            
@@ -271,15 +274,15 @@ int main(int argc, char** argv) {
     if (args_info.mode_arg == mode_arg_matching || args_info.mode_arg == mode_arg_simulation) {
         if (A.isCyclic()) {
             fprintf(stderr, "automaton '%s' is cyclic; aborting\n", args_info.automaton_arg);
-            _exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
         if (B.isCyclic()) {
             fprintf(stderr, "OG '%s' is cyclic; aborting\n", args_info.og_arg);
-            _exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }        
 
         // statistical output
-        fprintf(stderr, "calculating %s\n", mode_name(args_info.mode_arg).c_str());
+        fprintf(stderr, "calculating %s\n", cmdline_parser_mode_values[args_info.mode_arg]);
         fprintf(stderr, "source (SA): %s\t%u nodes\n",
                 basename(args_info.automaton_arg), static_cast<unsigned int>(A.nodes.size()));
         fprintf(stderr, "target (OG): %s\t%u nodes\n",
@@ -327,32 +330,105 @@ int main(int argc, char** argv) {
             break;
         }
         
-        default:
-            break;
+        default: {}
     }
 
     
     // create dot if requested
     if (args_info.dot_given) {
-        if (args_info.mode_arg == mode_arg_matching || args_info.mode_arg == mode_arg_simulation) {
-            Graph C = outputEditScript(A,B);
-            dotOutput(A, B, C);
-        }
-        
-        if (mode_arg_annotation) {            
-            fprintf(stdout, "digraph G {\n");
-            fprintf(stdout, "edge [fontname=Helvetica fontsize=10]\n");
-            fprintf(stdout, "node [fontname=Helvetica fontsize=10]\n");            
-            fprintf(stdout, "%s\n", B.toDotAnnotated(false).c_str());
-            fprintf(stdout, "}\n");
+        switch (args_info.mode_arg) {
+            case(mode_arg_matching):
+            case(mode_arg_simulation): {
+                Graph C = outputEditScript(A,B);
+                dotOutput(A, B, C);
+                break;
+            }
+
+            // check: are there more than x nodes?
+            case (mode_arg_annotation): {                
+                std::string dot_filename;
+
+                // if no filename is given via command line, create it
+                if (args_info.dot_arg == NULL) {
+                    dot_filename = std::string(basename(args_info.og_arg)) + ".bits1.dot";
+                } else {
+                    dot_filename = args_info.dot_arg;
+                }
+
+                // try to open the dot file for writing
+                ofstream dot_file;
+                dot_file.open(dot_filename.c_str());
+                if (!dot_file) {
+                    fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
+                    exit (EXIT_FAILURE);
+                }
+                
+                dot_file << "digraph G {\n";
+                dot_file << "edge [fontname=Helvetica fontsize=10]\n";
+                dot_file << "node [fontname=Helvetica fontsize=10 fixedsize=true]\n";            
+                dot_file << B.toDotAnnotated(false) << "\n";
+                dot_file << "}\n";
+                
+                dot_file.close();
+                
+              
+                // if no filename is given via command line, create it
+                if (args_info.dot_arg == NULL) {
+                    dot_filename = std::string(basename(args_info.og_arg)) + ".bits2.dot";
+                } else {
+                    dot_filename = args_info.dot_arg;
+                }
+
+                // try to open the dot file for writing
+                dot_file.open(dot_filename.c_str());
+                if (!dot_file) {
+                    fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
+                    exit (EXIT_FAILURE);
+                }
+                
+                dot_file << "digraph G {\n";
+                dot_file << "edge [fontname=Helvetica fontsize=10]\n";
+                dot_file << "node [fontname=Helvetica fontsize=10 fixedsize=true]\n";            
+                dot_file << B.toDotAnnotated(true) << "\n";
+                dot_file << "}\n";
+                
+                dot_file.close();
+                
+                break;
+            }
+
+            case (mode_arg_og): {
+                std::string dot_filename;
+
+                // if no filename is given via command line, create it
+                if (args_info.dot_arg == NULL) {
+                    dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
+                } else {
+                    dot_filename = args_info.dot_arg;
+                }
+
+                // try to open the dot file for writing
+                ofstream dot_file;
+                dot_file.open(dot_filename.c_str());
+                if (!dot_file) {
+                    fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
+                    exit (EXIT_FAILURE);
+                }
+                
+                dot_file << "digraph G {\n";
+                dot_file << "edge [fontname=Helvetica fontsize=10]\n";
+                dot_file << "node [fontname=Helvetica fontsize=10]\n";            
+                dot_file << B.toDot() << "\n";
+                dot_file << "}\n";
+                
+                dot_file.close();
+                
+                break;
+            }
+            
+            default: {}
         }
     }
-
-    fprintf(stderr, "done\n");
-  
-    // tidy memory
-    free(params);
-
   
     return EXIT_SUCCESS;
 }

@@ -25,80 +25,117 @@
 #include "types.h"
 
 
+/***********
+ * classes *
+ ***********/
+
+/// the implicit formula representation (2 or 3 bits)
 class FormulaBits {
     public:
-        bool S;
-        bool F;
-        bool S_1;
-        bool S_2;
-        bool F_prime;
+        bool S;         ///< every fulfilling assignment contains send events
+        bool F;         ///< final occurs in formula
+        bool S_1;       ///< S bit is set, but state has not only send edges
+        bool S_2;       ///< no send edges and state is neither in S nor in F
+        bool F_prime;   ///< F bis is set, but state has no successors
         
         /// constructor -- standard parameters are used to enable std::map
-        FormulaBits(bool S=false, bool F=false,
-                    bool S_1=false, bool S_2=false, bool F_prime=false);
+        FormulaBits(const bool S=false,
+                    const bool F=false,
+                    const bool S_1=false,
+                    const bool S_2=false,
+                    const bool F_prime=false);
 };
 
 
+/// a formula to be attached to an OG node
 class Formula {
     public:
+        /// returns a string representation of the formula
         virtual std::string toString() const = 0;
+        
+        /// returns a Graphviz doz representation of the formula
+        virtual std::string toDot(bool noBrackets = true) const = 0;
+        
+        /// returns true iff given label set satisfies the formula
         virtual bool sat(const std::set<Label> &l) const = 0;
+        
+        /// returns true if formula contains a final predicate
         virtual bool hasFinal() const = 0;
+        
+        /// destructor
         virtual ~Formula() {};
 };
 
+
+/// a formula to express a conjunction of two other formulae
 class FormulaAND : public Formula {
     private:
-        Formula *left;
-        Formula *right;
+        Formula *left;  ///< left sub-formula
+        Formula *right; ///< right sub-formula
     
     public:
         FormulaAND(Formula *left, Formula *right);
         std::string toString() const;
+        std::string toDot(bool noBrackets = true) const;
         bool sat(const std::set<Label> &l) const;
         bool hasFinal() const;
 };
 
+
+/// a formula to express a disjunction of two other formulae
 class FormulaOR : public Formula {
     private:
-        Formula *left;
-        Formula *right;
+        Formula *left;  ///< left sub-formula
+        Formula *right; ///< right sub-formula
         
     public:
         FormulaOR(Formula *left, Formula *right);
         std::string toString() const;
+        std::string toDot(bool noBrackets = true) const;
         bool sat(const std::set<Label> &l) const;
         bool hasFinal() const;
 };
 
+
+/// a formula to express a literal
 class FormulaLit : public Formula {
     private:
-        Label literal;
-    
+        Label literal; ///< the lable the litaral consists
+
     public:    
         FormulaLit(const Label literal);
         std::string toString() const;
+        std::string toDot(bool noBrackets = true) const;
         bool sat(const std::set<Label> &l) const;
         bool hasFinal() const;
 };
 
+
+/// a formula to express truth
 class FormulaTrue : public Formula {
     public:
         std::string toString() const;
+        std::string toDot(bool noBrackets = true) const;
         bool sat(const std::set<Label> &l) const;
         bool hasFinal() const;
 };
 
+
+/// a formula to express falsity
 class FormulaFalse : public Formula {
     public:
         std::string toString() const;
+        std::string toDot(bool noBrackets = true) const;
         bool sat(const std::set<Label> &l) const;
         bool hasFinal() const;
 };
 
+
+/// a formula to express the final predicate
 class FormulaFinal : public Formula {
     public:
         std::string toString() const;
+        std::string toDot(bool noBrackets = true) const;
         bool sat(const std::set<Label> &l) const;
         bool hasFinal() const;
 };

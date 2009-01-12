@@ -207,12 +207,13 @@ Assignments Graph::sat(Node q) {
  *
  * Constructs a graph with a given identifyer.
  *
- * \param id  identifier of the graph
+ * \param _id  identifier of the graph
  *
  */
-Graph::Graph(const string _id) :
-  edges(), root(), finalNode(), max_value(0), insertionValue(),
-  deletionValue(), formulas(), id(_id),  nodes(), addedNodes() {
+Graph::Graph(const std::string _id) :
+    edges(), root(), finalNode(), max_value(0), insertionValue(),
+    deletionValue(), formulas(), formulaBits(), id(_id),  nodes(),
+    addedNodes() {
 }
 
 
@@ -221,12 +222,12 @@ string Graph::toDot() {
     string result;
 
     for (size_t i = 0; i != nodes.size(); ++i) {
-        result += "  q_" + id + "_" + toString(nodes[i]) + " [label=\"q" + toString(nodes[i]);
-                
+        result += "  q_" + toString(nodes[i]) + " [label=<<FONT>";
+
         if (formulas[nodes[i]] != NULL)
-            result += ": " + formulas[nodes[i]]->toString();
+            result += formulas[nodes[i]]->toDot();
         
-        result += "\"";
+        result += "</FONT>>";
         
         if (addedNodes[nodes[i]])
             result += " style=dashed";
@@ -234,8 +235,8 @@ string Graph::toDot() {
         result += "];\n";
 
         for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
-            result += "  q_"  + id + "_" + toString(edges[nodes[i]][j].source);
-            result += " -> q_" + id + "_" + toString(edges[nodes[i]][j].target);
+            result += "  q_" + toString(edges[nodes[i]][j].source);
+            result += " -> q_" + toString(edges[nodes[i]][j].target);
             result += " [label=\"" + edges[nodes[i]][j].label + "\"";
 
             if (addedNodes[edges[nodes[i]][j].source] || addedNodes[edges[nodes[i]][j].target])
@@ -250,12 +251,9 @@ string Graph::toDot() {
                 default: break;
             }
             
-            result += "]";
-            result += ";\n";
+            result += "];";
         }
     }
-    
-    result += "label=\"" + id + "\"\n";
     
     return result;
 }
@@ -266,20 +264,20 @@ string Graph::toDotAnnotated(bool reduced) {
     string result;
 
     for (size_t i = 0; i != nodes.size(); ++i) {
-        result += "  q_" + toString(nodes[i]) + " [label=\"# " + toString(nodes[i]) + "\"";
+        result += "  q_" + toString(nodes[i]) + "[label=\"\"";
         
         if (!reduced) {
             if (formulaBits[i].S)
                 result += " style=filled, fillcolor=skyblue";
-            if (formulaBits[i].F)
+            else if (formulaBits[i].F)
                 result += " style=filled, fillcolor=darkolivegreen2";
         } else {
             if (formulaBits[i].S_1)
                 result += " style=filled, fillcolor=skyblue";
-            if (formulaBits[i].S_2)
+            else if (formulaBits[i].S_2)
                 result += " style=filled, fillcolor=purple";
-            if (formulaBits[i].F_prime)
-                result += " style=filled, fillcolor=darkolivegreen2";            
+            else if (formulaBits[i].F_prime)
+                result += " style=filled, fillcolor=darkolivegreen2";
         }
         
         result += "];\n";
@@ -722,7 +720,7 @@ void Graph::calculateCompactAnnotations() {
     fprintf(stderr, "  * without ?-successor:           %5d = |S2|\n", S2_count);
     fprintf(stderr, "  ~ effect of implicit storage:    %5.2f %%\n",
         (double(S1_count + S2_count) / double(S_count)) * 100.0);
-    fprintf(stderr, "# nodes of OG:                     %5d\n", nodes.size());
+    fprintf(stderr, "# nodes of OG:                     %5lu\n", (unsigned long)nodes.size());
     fprintf(stderr, "  ~ with set bits (explicit)       %5d (%6.2f %%)\n",
         F_count + S_count, ((double(F_count + S_count) / double(nodes.size())) * 100.0) );
     fprintf(stderr, "  ~ with set bits (implicit)       %5d (%6.2f %%)\n",
@@ -733,7 +731,6 @@ void Graph::calculateCompactAnnotations() {
 
 /// BPMN output of a service automaton
 /// \bug: if two edges [x,a,y] and [x,b,y] exists, only the first one is handled
-/// \bug: mixed choices have to be treated somehow
 /// \bug: strict termination has to be enforced
 void Graph::bpmnOutput() {
     // BPMN shapes
@@ -745,12 +742,18 @@ void Graph::bpmnOutput() {
     string shape_stop = "shape=\"circle\" label=\"\" penwidth=\"4\" height=\"" + toString(scale) + "\"";
     string shape_send = "shape=\"circle\" peripheries=\"2\" height=\"" + toString(scale-0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "send.png\"";
     string shape_receive = "shape=\"circle\" peripheries=\"2\" height=\"" + toString(scale-0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "receive.png\"";    
+    string shape_time = "shape=\"circle\" label=\"\" peripheries=\"2\" height=\"" + toString(scale-0.1) + "\" image=\"" + string(args_info.shapedir_arg) + "time.png\"";
     
     // dot header
     fprintf(stdout, "digraph G {\n");
-    fprintf(stdout, "  graph [rankdir=\"LR\" fontname=\"Helvetica\" fontsize=\"12\"];\n");
+    fprintf(stdout, "  graph [rankdir=\"LR\"];\n");
     fprintf(stdout, "  node [fixedsize=\"true\", fontname=\"Helvetica\" fontsize=\"10\"];\n");
     fprintf(stdout, "  edge [fontname=\"Helvetica\" fontsize=\"10\"];\n\n");
+
+    // start node
+    fprintf(stdout, "  n_%d_START [%s];\n\n", root, shape_start.c_str());
+
+    fprintf(stdout, "  subgraph cluster0 {\n    style=invis\n");
     
     // traverse the SA's nodes and collect predecessors
     std::map<Node, Nodes> pred;
@@ -760,49 +763,47 @@ void Graph::bpmnOutput() {
             
             // create events
             if (edges[i][j].label.substr(0,1) == "!") {
-                fprintf(stdout, "  n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
+                fprintf(stdout, "    n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
                     edges[i][j].source, edges[i][j].target,
                     shape_send.c_str(), edges[i][j].label.c_str());
             } else {
-                fprintf(stdout, "  n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
+                fprintf(stdout, "    n_%d_%d [%s label=\"\\n\\n\\n\\n\\n%s\"];\n",
                     edges[i][j].source, edges[i][j].target,
                     shape_receive.c_str(), edges[i][j].label.c_str());
             }
-        }
+        }        
     }
     
     std::map<Node, string> in;
     std::map<Node, string> out;
     for (size_t i = 0; i < nodes.size(); ++i) {
-        
+
         // start node
         if (i == root) {
-            fprintf(stdout, "  n_%d_START [%s];\n", i, shape_start.c_str());
-            
             // if this node has incoming edges, add an XOR join
             if (pred[i].size() > 0) {
-                fprintf(stdout, "  n_%d_JOIN [%s];\n", i, shape_xor.c_str());
-                fprintf(stdout, "  n_%d_START -> n_%d_JOIN;\n", i, i);
+                fprintf(stdout, "    n_%lu_JOIN [%s];\n", (unsigned long)i, shape_xor.c_str());
+                fprintf(stdout, "    n_%lu_START -> n_%lu_JOIN;\n", (unsigned long)i, (unsigned long)i);
                 in[i] = "n_" + toString(i) + "_JOIN"; }
             else {
                 in[i] = "n_" + toString(i) + "_START";
             }
         }
-
+        
         // more than one incoming edge: join
         if (pred[i].size() > 1) {
-            fprintf(stdout, "  n_%d_JOIN [%s];\n", i, shape_xor.c_str());
+            fprintf(stdout, "    n_%lu_JOIN [%s];\n", (unsigned long)i, shape_xor.c_str());
             in[i] = "n_" + toString(i) + "_JOIN";                
         }
 
         // end node
         if (finalNode[i]) {
-            fprintf(stdout, "  n_%d_END [%s];\n", i, shape_stop.c_str());
+            fprintf(stdout, "    n_%lu_END [%s];\n", (unsigned long)i, shape_stop.c_str());
 
             // if this node has outgoing edges, add an XOR (or maybe something else) split
             if (edges[i].size() > 0) {
-                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_mix.c_str());
-                fprintf(stdout, "  n_%d_SPLIT -> n_%d_END;\n", i, i);
+                fprintf(stdout, "    n_%lu_SPLIT [%s];\n", (unsigned long)i, shape_mix.c_str());
+                fprintf(stdout, "    n_%lu_SPLIT -> n_%lu_END;\n", (unsigned long)i, (unsigned long)i);
                 out[i] = "n_" + toString(i) + "_SPLIT";
             } else {
                 out[i] = "n_" + toString(i) + "_END";
@@ -813,21 +814,22 @@ void Graph::bpmnOutput() {
         if (edges[i].size() > 1) {
 
             if (!receiveLabels(i).empty() && !sendLabels(i).empty()) {
-                fprintf(stderr, "%d is a mixed split -- CANNOT HANDLE THIS YET!\n", i);
-                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_mix.c_str());
+                fprintf(stderr, "%lu is a mixed split -- CANNOT HANDLE THIS YET!\n", (unsigned long)i);
+                fprintf(stdout, "    n_%lu_SPLIT [%s];\n", (unsigned long)i, shape_mix.c_str());
                 out[i] = "n_" + toString(i) + "_SPLIT";
             }
             else if (receiveLabels(i).empty()) {
-                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_xor.c_str());
+                fprintf(stdout, "    n_%lu_SPLIT [%s];\n", (unsigned long)i, shape_xor.c_str());
                 out[i] = "n_" + toString(i) + "_SPLIT";
             }
             else if (sendLabels(i).empty()) {
-                fprintf(stdout, "  n_%d_SPLIT [%s];\n", i, shape_mul.c_str());
+                fprintf(stdout, "    n_%lu_SPLIT [%s];\n", (unsigned long)i, shape_mul.c_str());
                 out[i] = "n_" + toString(i) + "_SPLIT";
             }            
         }
     }
 
+    fprintf(stdout, "  }\n\n");
 
     // add the control flow edges to the BPMN model
     for (size_t i = 0; i < nodes.size(); ++i) {
@@ -846,20 +848,20 @@ void Graph::bpmnOutput() {
         
         // normal -> normal
         if (in[i] == "" && out[i] == "") {
-            fprintf(stdout, "  n_%d_%d -> n_%d_%d;\n",
-                pred[i][0], i, i, edges[i][0].target);
+            fprintf(stdout, "  n_%d_%lu -> n_%lu_%d;\n",
+                pred[i][0], (unsigned long)i, (unsigned long)i, edges[i][0].target);
         }
 
         // normal -> !normal
         if (in[i] == "" && out[i] != "") {
-            fprintf(stdout, "  n_%d_%d -> %s;\n",
-                pred[i][0], i, out[i].c_str());            
+            fprintf(stdout, "  n_%d_%lu -> %s;\n",
+                pred[i][0], (unsigned long)i, out[i].c_str());            
         }
 
         // !normal -> normal
         if (in[i] != "" && out[i] == "") {
-            fprintf(stdout, "  %s -> n_%d_%d;\n",
-                in[i].c_str(), i, edges[i][0].target);            
+            fprintf(stdout, "  %s -> n_%lu_%d;\n",
+                in[i].c_str(), (unsigned long)i, edges[i][0].target);            
         }
         
         // !normal -> !normal
@@ -886,7 +888,6 @@ void Graph::bpmnOutput() {
         }
     }
     
-    // add a label with the input filename
-    fprintf(stdout, "\n  label=\"\\n%s\"\n", basename(args_info.automaton_arg));    
     fprintf(stdout, "}\n");
 }
+

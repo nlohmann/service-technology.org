@@ -200,7 +200,7 @@ rachel --automaton=impl.og --og=spec.og --conf-file=rachel.conf
 
 A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. An example file @file{rachel.conf} is located in the @file{src} folder.
 
-Note: If not all parameters are defined, the standard values apply. Mandatory command-line options such as @samp{automaton} or @samp{og} cannot be defined in configuration files.
+Note: If not all parameters are defined, the standard values apply. Mandatory command-line options such as @option{mode} (@option{m}) cannot be defined in configuration files.
 
 
 

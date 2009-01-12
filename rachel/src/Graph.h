@@ -34,6 +34,7 @@
  ***********/
 
 /// a labeled graph edge
+/// \todo make stuff private
 class Edge {
     public:
         /// the source of the edge
@@ -58,6 +59,7 @@ class Edge {
 
 
 /// a directed graph
+/// \todo let OG and IG derive from here
 class Graph {
     private:
         /// edges indexed by source node
@@ -105,6 +107,9 @@ class Graph {
 
         /// returns the outgoing send labels of a node
         std::set<Label> sendLabels(Node q);
+        
+        /// returns all satisfying label vectors
+        std::vector<Labels> checkSat(Node q);
 
         
     public:
@@ -115,6 +120,9 @@ class Graph {
         Nodes nodes;
         
     public:
+        /// returns true iff the node's annotation is fulfilled by "final"
+        bool isFinal(Node q);
+
         /// which nodes where added during matching?
         std::map<Node, bool> addedNodes;
     
@@ -151,12 +159,6 @@ class Graph {
         /// returns a dot annotation of the graph with formula bits
         std::string toDotAnnotated(bool reduced);
 
-        /// returns all satisfying label vectors
-        std::vector<Labels> checkSat(Node q);
-
-        /// returns true iff the node's annotation is fulfilled by "final"
-        bool isFinal(Node q);
-
         /// preprocess the graph with insertion values (for OGs)
         void preprocessInsertion();
 
@@ -187,7 +189,7 @@ class Graph {
         /// BPMN output of a service automaton
         void bpmnOutput();
     
-        Graph(std::string const id);
+        Graph(const std::string id);
 };
 
 #endif

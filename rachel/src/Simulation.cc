@@ -25,7 +25,6 @@
 
 #include <vector>
 #include <cstdlib>
-#include <cassert>
 #include <cstdio>
 #include "helpers.h"
 #include "cmdline.h"

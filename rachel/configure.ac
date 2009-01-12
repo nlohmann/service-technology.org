@@ -26,16 +26,12 @@ AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
 AC_CHECK_PROG(DOT, dot, dot)
 AC_CHECK_PROG(AGPP, ag++, ag++)
 AC_CHECK_PROG(ACPP, ac++, ac++)
-AC_DEFINE_UNQUOTED(HAVE_DOT, "$DOT", [whether dot was found by configure])
+AC_DEFINE_UNQUOTED(CONFIG_DOT, "$DOT", [whether dot was found by configure])
 AM_MISSING_PROG(HELP2MAN, help2man)
-
-# check for libraries
-AC_CHECK_HEADERS(libgen.h)
-AC_TYPE_SIZE_T
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # flags set by the configure script
 configured_CFLAGS=""

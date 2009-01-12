@@ -18,19 +18,3 @@
 \section lic License
 \verbinclude COPYING
 */
-
-
-/*!
-\file src/syntax_og.cc
-\brief Parser for OG files.
-*/
-
-/*!
-\file src/syntax_og.h
-\brief Token definitions for OG parser.
-*/
-
-/*!
-\file src/lexer_og.cc
-\brief Lexer for OG files.
-*/

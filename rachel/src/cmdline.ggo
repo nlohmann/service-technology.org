@@ -7,7 +7,7 @@ section "Options"
 
 option "mode" m
   "Execution mode of Rachel"
-  string values="matching","simulation","annotation","bpmn" enum
+  string values="matching","simulation","annotation","bpmn","og" enum
   typestr="MODE"
   default="matching"
   optional

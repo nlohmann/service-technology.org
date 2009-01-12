@@ -27,8 +27,8 @@
 /*
  * constructors
  */
-FormulaBits::FormulaBits(bool S, bool F, bool S_1, bool S_2, bool F_prime) :
-    S(S), F(F), S_1(S_2), S_2(S_2), F_prime(F_prime)
+FormulaBits::FormulaBits(bool _S, bool _F, bool _S_1, bool _S_2, bool _F_prime) :
+    S(_S), F(_F), S_1(_S_1), S_2(_S_2), F_prime(_F_prime)
 {}
 
 
@@ -78,6 +78,41 @@ std::string FormulaFalse::toString() const {
 
 std::string FormulaFinal::toString() const {
     return "FINAL";
+}
+
+
+/*
+ * Dot output
+ */
+
+std::string FormulaAND::toDot(bool noBrackets) const {
+    if (noBrackets)
+        return left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &and; </FONT>" + right->toDot(false);
+    else
+        return "(" + left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &and; </FONT>" + right->toDot(false) + ")";
+}
+
+std::string FormulaOR::toDot(bool noBrackets) const {
+    if (noBrackets)
+        return left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &or; </FONT>" + right->toDot(false);
+    else
+        return "(" + left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &and; </FONT>" + right->toDot(false) + ")";
+}
+
+std::string FormulaLit::toDot(bool noBrackets) const {
+    return literal;
+}
+
+std::string FormulaTrue::toDot(bool noBrackets) const {
+    return "true";
+}
+
+std::string FormulaFalse::toDot(bool noBrackets) const {
+    return "false";
+}
+
+std::string FormulaFinal::toDot(bool noBrackets) const {
+    return "final";
 }
 
 

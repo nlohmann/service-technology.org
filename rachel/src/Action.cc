@@ -25,6 +25,10 @@
  * implementation of member functions *
  **************************************/
 
+/****************
+ * class Action *
+ ****************/
+
 /// return a string representation of the action
 std::string Action::toString() const {
     switch (type) {
@@ -73,6 +77,10 @@ action_type Action::getType() const {
     return type;
 }
 
+
+/**********************
+ * class ActionScript *
+ **********************/
 
 /// add an action to the script
 void ActionScript::add(const Action &a) {

@@ -1,16 +1,22 @@
 #include <cassert>
+#include <fstream>
 
+#include "link.h"
 #include "parser.h"
 
+using std::ifstream;
+
+using namespace pnapi::formula;
+
 extern istream * pnapi_owfn_istream;
-extern PNapi::parser::Node<PNapi::parser::owfn::Node> * pnapi_owfn_ast;
+extern pnapi::parser::Node<pnapi::parser::owfn::Node> * pnapi_owfn_ast;
 extern int pnapi_owfn_parse();
 
 extern istream * pnapi_petrify_istream;
-extern PNapi::parser::Node<PNapi::parser::petrify::Node> * pnapi_petrify_ast;
+extern pnapi::parser::Node<pnapi::parser::petrify::Node> * pnapi_petrify_ast;
 extern int pnapi_petrify_parse();
 
-namespace PNapi
+namespace pnapi
 {
 
   namespace parser
@@ -42,8 +48,8 @@ namespace PNapi
 	  addChild(*node);
       }
 
-      Node::Node(Type type, const char * str, int i) : 
-	type(type), petriNet(NULL), value(i), identifier(str)
+      Node::Node(Type type, const string * str, int i) : 
+	type(type), petriNet(NULL), value(i), identifier(*str)
       {
       }
 
@@ -94,9 +100,12 @@ namespace PNapi
 		formula = new FormulaGreaterEqual(place, nTokens); break;
 	      case Node::FORMULA_LE:
 		formula = new FormulaLessEqual(place, nTokens); break;
+	      default: /* empty */ ;
 	      }
 	    formulas_.push_back(formula);
 	    break;
+
+	  default: /* empty */ ;
 	  }
       }
 
@@ -135,16 +144,19 @@ namespace PNapi
 	  case Node::PETRINET:
 	    if (!formulas_.empty())
 	      {
-		net_.setFinalCondition(formulas_.front());
+		//FIXME: net_.setFinalCondition(*formulas_.front());
 		formulas_.pop_front();
 	      }
 	    assert(formulas_.empty());
 	    break;
+
+	  default: /* empty */ ;
 	  }
       }
 
     }
     
+
     namespace petrify
     {
     
@@ -281,6 +293,7 @@ namespace PNapi
       }
       
     }
+
   }
 
 }

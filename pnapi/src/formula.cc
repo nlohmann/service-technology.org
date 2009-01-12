@@ -1,6 +1,10 @@
 #include "petrinet.h"
+#include "formula.h"
 
-namespace PNapi
+namespace pnapi
+{
+
+namespace formula 
 {
 
 /*!
@@ -92,7 +96,8 @@ FormulaEqual::~FormulaEqual()
 
 bool FormulaEqual::evaluate(Marking &m)
 {
-  return m[place->getMarkingID()] == number;
+  //FIXME: return m[place->getMarkingID()] == number;
+  return false;
 }
 
 ftype FormulaEqual::getType()
@@ -114,7 +119,8 @@ FormulaNotEqual::~FormulaNotEqual()
 
 bool FormulaNotEqual::evaluate(Marking &m)
 {
-  return m[place->getMarkingID()] != number;
+  // FIXME: return m[place->getMarkingID()] != number;
+  return false;
 }
 
 ftype FormulaNotEqual::getType()
@@ -137,7 +143,8 @@ FormulaGreater::~FormulaGreater()
 
 bool FormulaGreater::evaluate(Marking &m)
 {
-  return m[place->getMarkingID()] > number;
+  //FIXME: return m[place->getMarkingID()] > number;
+  return false;
 }
 
 ftype FormulaGreater::getType()
@@ -160,7 +167,8 @@ FormulaGreaterEqual::~FormulaGreaterEqual()
 
 bool FormulaGreaterEqual::evaluate(Marking &m)
 {
-  return m[place->getMarkingID()] >= number;
+  // FIXME: return m[place->getMarkingID()] >= number;
+  return false;
 }
 
 ftype FormulaGreaterEqual::getType()
@@ -183,7 +191,8 @@ FormulaLess::~FormulaLess()
 
 bool FormulaLess::evaluate(Marking &m)
 {
-  return m[place->getMarkingID()] < number;
+  // FIXME: return m[place->getMarkingID()] < number;
+  return false;
 }
 
 ftype FormulaLess::getType()
@@ -206,7 +215,8 @@ FormulaLessEqual::~FormulaLessEqual()
 
 bool FormulaLessEqual::evaluate(Marking &m)
 {
-  return m[place->getMarkingID()] <= number;
+  //FIXME: return m[place->getMarkingID()] <= number;
+  return false;
 }
 
 ftype FormulaLessEqual::getType()
@@ -334,5 +344,6 @@ ftype FormulaOr::getType()
 }
 
 
+} /* namespace formula */
 
-} /* namespace PNapi */
+} /* namespace pnapi */

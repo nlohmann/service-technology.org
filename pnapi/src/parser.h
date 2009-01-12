@@ -4,28 +4,37 @@
  * \file    parser.h
  * \brief   Parser Related Structures
  *
- * Includes a C++ parser framework (PNapi::parser) and parsers for various
- * Petri net input formats (e.g. OWFN (PNapi::parser::owfn)).
+ * Includes a C++ parser framework (pnapi::parser) and parsers for various
+ * Petri net input formats (e.g. OWFN (pnapi::parser::owfn)).
  */
 
 #ifndef PNAPI_PARSER_H
 #define PNAPI_PARSER_H
 
+#include <string>
 #include <istream>
 #include <vector>
 #include <deque>
+#include <map>
 #include <set>
 #include <stack>
 
 #include "petrinet.h"
+#include "formula.h"
+#include "link.h"
 
+using std::string;
 using std::istream;
 using std::vector;
 using std::deque;
+using std::map;
 using std::set;
 using std::stack;
 
-namespace PNapi
+using pnapi::formula::Formula;
+
+
+namespace pnapi
 {
 
   /*!
@@ -155,14 +164,14 @@ namespace PNapi
 	Node(Type, Node *);
 	Node(Type, Node *, Node *);
 	Node(Type, PetriNet *, Node *);
-	Node(Type, const char *, int);
+	Node(Type, const string *, int);
 
 	~Node();
 
 	const Type type;
 	PetriNet * const petriNet;
-	const string identifier;
 	const int value;
+	const string identifier;
       };
 
 
@@ -207,6 +216,7 @@ namespace PNapi
 
     }
     
+
     /*!
      * \brief   petrify parser
      *
@@ -215,6 +225,16 @@ namespace PNapi
      */
     namespace petrify
     {
+
+      struct PetrifyResult 
+      { 
+ 	set<string> transitions; 
+	set<string> places; 
+	set<string> initialMarked; 
+	set<string> interface; 
+	map<string, set<string> > arcs; 
+      }; 
+
       /*!
        * \brief   Node of an petrify AST
        */
@@ -270,6 +290,8 @@ namespace PNapi
       }
  
     }
+
+
 
     /*!
      * \brief   destructor
@@ -337,8 +359,8 @@ namespace PNapi
     Parser<T>::Parser(istream * & flexStream, Node<T> * & parseResult, 
 		      int (*yaccParse)()) :
       flexStream_(flexStream),
-      yaccParse_(yaccParse),
       parseResult_(parseResult),
+      yaccParse_(yaccParse),
       rootNode_(NULL)
     {
     }

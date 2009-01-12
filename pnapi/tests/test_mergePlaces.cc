@@ -5,7 +5,7 @@
 
 using std::cout;
 using std::endl;
-using namespace PNapi;
+using namespace pnapi;
 
 int main(int argc, char *argv[])
 {
@@ -19,18 +19,19 @@ int main(int argc, char *argv[])
 	net = createProducerConsumerExample();
 	p1 = net->findPlace(s1);
 	p2 = net->findPlace(s2);
-	net->mergePlaces(p1, p2);
+	net->mergePlaces(*p1, *p2);
 	p1 = net->findPlace(s1);
 	p2 = net->findPlace(s2);
-	assert(p1 == p2);
 	assert(p1 != NULL);
+	assert(p2 != NULL);
+	assert(p1 == p2);
 	delete net;
 	cout << " granted!" << endl;
 
 	cout << "mergePlaces(Place * & p1, string role2) ...";
 	net = createProducerConsumerExample();
 	p1 = net->findPlace(s1);
-	net->mergePlaces(p1, s2);
+	net->mergePlaces(*p1, s2);
 	p1 = net->findPlace(s1);
 	p2 = net->findPlace(s2);
 	assert(p1 == p2);
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
 	cout << "mergePlaces(string role1, Place * & p2) ...";
 	net = createProducerConsumerExample();
 	p2 = net->findPlace(s2);
-	net->mergePlaces(s1, p2);
+	net->mergePlaces(s1, *p2);
 	p1 = net->findPlace(s1);
 	p2 = net->findPlace(s2);
 	assert(p1 == p2);

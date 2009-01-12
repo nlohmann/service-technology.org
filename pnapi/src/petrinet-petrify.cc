@@ -4,6 +4,7 @@
  *****************************************************************************/
 
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -23,7 +24,9 @@ using std::endl;
 using std::ofstream;
 using std::ifstream;
 using std::istringstream;
-using namespace PNapi;
+
+using namespace pnapi;
+using pnapi::parser::petrify::PetrifyResult;
 
 
 /*!
@@ -68,7 +71,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
   string systemcall = string(CONFIG_PETRIFY) + " " + fileName + " -dead -ip -nolog -o " + pnFileName;
   
   // calling petrify if possible
-  if (CONFIG_PETRIFY != "not found") 
+  if (string(CONFIG_PETRIFY) != "not found") 
   {
     system(systemcall.c_str());
   }
@@ -101,7 +104,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
   PetriNet STGPN = PetriNet();
   for (set<string>::iterator p = pnapi_petrify_places.begin(); p != pnapi_petrify_places.end(); p++) 
   {
-    STGPN.newPlace(*p);
+    STGPN.createPlace(*p);
   }
 
   // initially mark places
@@ -130,12 +133,12 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
         if ( transitionName[0] == '?' ) 
         {
           Place *inPlace = STGPN.findPlace(placeName);
-          if (inPlace == NULL) inPlace = STGPN.newPlace(placeName, IN);
+          if (inPlace == NULL) inPlace = &STGPN.createPlace(placeName, Node::INPUT);
         } 
         else if ( transitionName[0] == '!' ) 
         {
           Place *outPlace = STGPN.findPlace(placeName);
-          if (outPlace == NULL) outPlace = STGPN.newPlace(placeName, OUT);
+          if (outPlace == NULL) outPlace = &STGPN.createPlace(placeName, Node::OUTPUT);
         } 
         else 
         {
@@ -155,12 +158,12 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
     {
       // create transition if necessary
       Transition * transition = STGPN.findTransition("t" + remapped);
-      if (transition == NULL) transition = STGPN.newTransition("t" + remapped);
+      if (transition == NULL) transition = &STGPN.createTransition("t" + remapped);
   
       // create arcs t->p
       for (set<string>::iterator p = pnapi_petrify_arcs[*t].begin(); p != pnapi_petrify_arcs[*t].end(); p++) 
       {
-        STGPN.newArc( transition, STGPN.findPlace(*p) );
+        STGPN.createArc( *transition, *STGPN.findPlace(*p) );
       }
            
       // create arcs t->interface and interface->t
@@ -175,13 +178,13 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
         
         if ( remapped[0] == '?' ) 
         {
-          if (place == NULL) place = STGPN.newPlace(placeName, IN);
-          STGPN.newArc(place, transition); 
+          if (place == NULL) place = &STGPN.createPlace(placeName, Node::INPUT);
+          STGPN.createArc(*place, *transition); 
         } 
         else if ( remapped[0] == '!' ) 
         {
-          if (place == NULL) place = STGPN.newPlace(placeName, OUT);
-          STGPN.newArc(transition, place);
+          if (place == NULL) place = &STGPN.createPlace(placeName, Node::OUTPUT);
+          STGPN.createArc(*transition, *place);
         } 
         else 
         {
@@ -210,7 +213,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
        
       if (transitionName.substr(0,5) != "FINAL") 
       {
-        STGPN.newArc(STGPN.findPlace(*p), STGPN.findTransition("t" + transitionName));
+        STGPN.createArc(*STGPN.findPlace(*p), *STGPN.findTransition("t" + transitionName));
       } 
       else 
       {
@@ -222,7 +225,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
    
           
   // Get a reference to the final condition of the petri net.     
-  list< set< pair<Place *, unsigned int > > >& finalCondSet = STGPN.final_set_list;
+  //FIXME: list< set< pair<Place *, unsigned int > > >& finalCondSet = STGPN.final_set_list;
   
    
   // For each transition found to be a final transition...    
@@ -242,7 +245,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
     }      
    
     // Add this clause to the final condition
-    finalCondSet.push_back(nextTrans);
+    //FIXME: finalCondSet.push_back(nextTrans);
                  
   }
   
@@ -264,7 +267,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
        Place *inPlace = STGPN.findPlace(*iter);
        if (inPlace == NULL) 
        {
-           STGPN.newPlace(*iter, IN);
+	 STGPN.createPlace(*iter, Node::INPUT);
        }
    }
    for (set<string>::const_iterator iter = outputPlacenames.begin(); iter != outputPlacenames.end(); iter++) 
@@ -272,7 +275,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
        Place *outPlace = STGPN.findPlace(*iter);
        if (outPlace == NULL) 
        {
-           STGPN.newPlace(*iter, OUT);
+	 STGPN.createPlace(*iter, Node::OUTPUT);
        }
    }
   

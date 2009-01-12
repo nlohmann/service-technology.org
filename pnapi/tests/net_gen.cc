@@ -9,47 +9,47 @@ PetriNet *createProducerConsumerExample()
 	Place *p= NULL;
 
 	// producer
-	p = n->newPlace("ready to produce");
-	n->newPlace("ready to deliver");
-	n->newTransition("produce");
-	n->newTransition("deliver");
+	p = &n->createPlace("ready to produce");
+	n->createPlace("ready to deliver");
+	n->createTransition("produce");
+	n->createTransition("deliver");
 	p->mark(1);
 	p = NULL;
 
-	n->newArc(n->findPlace("ready to produce"), n->findTransition("produce"));
-	n->newArc(n->findTransition("produce"), n->findPlace("ready to deliver"));
-	n->newArc(n->findPlace("ready to deliver"), n->findTransition("deliver"));
-	n->newArc(n->findTransition("deliver"), n->findPlace("ready to produce"));
+	n->createArc(*n->findPlace("ready to produce"), *n->findTransition("produce"));
+	n->createArc(*n->findTransition("produce"), *n->findPlace("ready to deliver"));
+	n->createArc(*n->findPlace("ready to deliver"), *n->findTransition("deliver"));
+	n->createArc(*n->findTransition("deliver"), *n->findPlace("ready to produce"));
 
 	// buffer
-	n->newPlace("buffer filled");
-	p = n->newPlace("buffer empty");
+	n->createPlace("buffer filled");
+	p = &n->createPlace("buffer empty");
 	p->mark(1);
 	p = NULL;
 
-	n->newArc(n->findTransition("deliver"), n->findPlace("buffer filled"));
-	n->newArc(n->findPlace("buffer empty"), n->findTransition("deliver"));
+	n->createArc(*n->findTransition("deliver"), *n->findPlace("buffer filled"));
+	n->createArc(*n->findPlace("buffer empty"), *n->findTransition("deliver"));
 
 	// consumer
-	p = n->newPlace("ready to remove");
-	n->newPlace("ready to consume");
-	n->newTransition("remove");
-	n->newTransition("consume");
+	p = &n->createPlace("ready to remove");
+	n->createPlace("ready to consume");
+	n->createTransition("remove");
+	n->createTransition("consume");
 	p->mark(1);
 	p = NULL;
 
-	n->newArc(n->findPlace("ready to remove"), n->findTransition("remove"));
-	n->newArc(n->findTransition("remove"), n->findPlace("ready to consume"));
-	n->newArc(n->findTransition("remove"), n->findPlace("buffer empty"));
-	n->newArc(n->findPlace("buffer filled"), n->findTransition("remove"));
-	n->newArc(n->findPlace("ready to consume"), n->findTransition("consume"));
-	n->newArc(n->findTransition("consume"), n->findPlace("ready to remove"));
+	n->createArc(*n->findPlace("ready to remove"), *n->findTransition("remove"));
+	n->createArc(*n->findTransition("remove"), *n->findPlace("ready to consume"));
+	n->createArc(*n->findTransition("remove"), *n->findPlace("buffer empty"));
+	n->createArc(*n->findPlace("buffer filled"), *n->findTransition("remove"));
+	n->createArc(*n->findPlace("ready to consume"), *n->findTransition("consume"));
+	n->createArc(*n->findTransition("consume"), *n->findPlace("ready to remove"));
 
 	// interface
-	p = n->newPlace("materials ready", IN);
-	n->newArc(p, n->findTransition("produce"));
-	p = n->newPlace("children happy", OUT);
-	n->newArc(n->findTransition("consume"), p);
+	p = &n->createPlace("materials ready", Node::INPUT);
+	n->createArc(*p, *n->findTransition("produce"));
+	p = &n->createPlace("children happy", Node::OUTPUT);
+	n->createArc(*n->findTransition("consume"), *p);
 	
 	return n;
 }

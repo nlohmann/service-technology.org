@@ -4,7 +4,7 @@
 
 using std::cout;
 using std::endl;
-using namespace PNapi;
+using namespace pnapi;
 
 int main(int argc, char *argv[])
 {

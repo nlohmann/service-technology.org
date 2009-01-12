@@ -60,16 +60,15 @@
 #include <set>
 #include <utility>
 
-#include "pnapi.h" // new
 #include "petrinet.h"
-#include "helpers.h"		// helper functions (toString, setUnion)
+#include "util.h"		// helper functions (toString, setUnion)
 //#include "debug.h"		// (trace)
 
 using std::list;
 using std::pair;
 using std::cerr;
 using std::endl;
-using namespace PNapi;
+using namespace pnapi;
 
 
 
@@ -102,18 +101,18 @@ unsigned int PetriNet::reduce_unused_status_places()
   unsigned int result = 0;
   
   // find unused status places
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
-    if ( (*p)->postset.empty() )
-      if ( !( (*p)->isFinal ) )
-        if ( (*p)->tokens == 0 )
+  for (set<Place*>::iterator p = places_.begin(); p != places_.end(); p++)
+    if ( (*p)->getPostset().empty() )
+      //FIXME: if ( !( (*p)->isFinal ) )
+        if ( (*p)->getTokenCount() == 0 )
           unused_status_places.push_back(*p);
   
   // remove unused places
   for (list<Place*>::iterator p = unused_status_places.begin(); p != unused_status_places.end(); p++)
   {
-    if (P.find(*p) != P.end())
+    if (places_.find(*p) != places_.end())
     {
-      removePlace(*p);
+      deletePlace(**p);
       result++;
     }
   }
@@ -148,15 +147,15 @@ unsigned int PetriNet::reduce_suspicious_transitions()
   unsigned int result = 0;
   
   // find suspicious transitions
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
-    if ((*t)->postset.empty() || (*t)->preset.empty())
+  for (set<Transition*>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    if ((*t)->getPostset().empty() || (*t)->getPreset().empty())
       suspiciousTransitions.push_back(*t);
   
   // remove suspicious transitions
   for (list<Transition*>::iterator t = suspiciousTransitions.begin(); t != suspiciousTransitions.end(); t++)
-    if (T.find(*t) != T.end())
+    if (transitions_.find(*t) != transitions_.end())
     {
-      removeTransition(*t);
+      deleteTransition(**t);
       result++;
     }
       
@@ -190,14 +189,14 @@ void PetriNet::reduce_dead_nodes()
     list<Place*> tempPlaces;
     
     // find insufficiently marked places with empty preset
-    for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+    for (set<Place*>::iterator p = places_.begin(); p != places_.end(); p++)
     {
-      if ((*p)->preset.empty() && !((*p)->isFinal) && !((*p)->historyContains("1.internal.initial")))
+      //FIXME: if ((*p)->getPreset().empty() && !((*p)->isFinal) && !((*p)->historyContains("1.internal.initial")))
       {
         arcs=true;		
-        for(set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
+        for(set<Node*>::iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
         {
-          if(arc_weight(*p,*t) <= (*p)->tokens)	
+          if(findArc(**p,**t)->getWeight() <= (*p)->getTokenCount())	
           {
             arcs=false;
           }
@@ -221,7 +220,7 @@ void PetriNet::reduce_dead_nodes()
       tempPlaces.pop_back();
       
       // transitions in the postset of a dead place are dead
-      for (set<Node*>::iterator t = p->postset.begin(); t != p->postset.end(); t++)
+      for (set<Node*>::iterator t = p->getPostset().begin(); t != p->getPostset().end(); t++)
       {
       	deadTransitions.push_back( static_cast<Transition*>(*t) );
         // trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
@@ -233,18 +232,18 @@ void PetriNet::reduce_dead_nodes()
     // remove dead places and transitions
     for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
     {
-      if (P.find(*p) != P.end())
+      if (places_.find(*p) != places_.end())
       {
-        removePlace(*p);
+        deletePlace(**p);
         result++;
       }
     }   
      
     for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
     {
-      if (T. find(*t) != T.end())
+      if (transitions_. find(*t) != transitions_.end())
       {
-        removeTransition(*t);
+        deleteTransition(**t);
         result++;
       }
     }
@@ -253,27 +252,27 @@ void PetriNet::reduce_dead_nodes()
             // remove isolated communication places
             list<Place*> uselessInputPlaces;
     
-    for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
-      if ((*p)->postset.empty())
+    for (set<Place*>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
+      if ((*p)->getPostset().empty())
         uselessInputPlaces.push_back(*p);
     
     for (list<Place*>::iterator p = uselessInputPlaces.begin(); p != uselessInputPlaces.end(); p++)
-      if (P_in.find(*p) != P_in.end())
+      if (inputPlaces_.find(*p) != inputPlaces_.end())
       {
-        P_in.erase(*p);
+        inputPlaces_.erase(*p);
         result++;
       }
         
         list<Place*> uselessOutputPlaces;
     
-    for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++)
-      if ((*p)->preset.empty())
+    for (set<Place*>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
+      if ((*p)->getPreset().empty())
         uselessOutputPlaces.push_back(*p);
     
     for (list<Place*>::iterator p = uselessOutputPlaces.begin(); p != uselessOutputPlaces.end(); p++)
-      if (P_out.find(*p) != P_out.end())
+      if (outputPlaces_.find(*p) != outputPlaces_.end())
       {
-        P_out.erase(*p);
+        outputPlaces_.erase(*p);
         result++;
       }
       */
@@ -315,44 +314,44 @@ void PetriNet::reduce_identical_places()
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
   
   // iterate the places
-  for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
+  for (set<Place*>::iterator p1 = places_.begin(); p1 != places_.end(); p1++)
   {
     if (!(sameweights(*p1))) // precondition 4
       continue;
     
     // iterate the preset
-    for (set<Node*>:: iterator preTransition = (*p1)->preset.begin(); preTransition != (*p1)->preset.end(); preTransition++)
+    for (set<Node*>:: iterator preTransition = (*p1)->getPreset().begin(); preTransition != (*p1)->getPreset().end(); preTransition++)
     {
-      for (set<Node*>::iterator p2 = (*preTransition)->postset.begin(); p2 != (*preTransition)->postset.end(); p2++)
+      for (set<Node*>::iterator p2 = (*preTransition)->getPostset().begin(); p2 != (*preTransition)->getPostset().end(); p2++)
         if ((*p1 != *p2) &&		// precondition 1
-            ((*p1)->preset == (*p2)->preset) &&	// precondition 2
-            ((*p1)->postset == (*p2)->postset) && // precondition 3
+            ((*p1)->getPreset() == (*p2)->getPreset()) &&	// precondition 2
+            ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
             (sameweights(*p2)) && // precondition 4
-            (arc_weight((*preTransition), (*p1)) == 1) && // precondition 4 
-            (arc_weight((*preTransition), (*p2)) == 1) && // precondition 4
-            ((*p1)->tokens == 0) && // precondition 5
-            (static_cast<Place*>(*p2)->tokens == 0) ) // precondition 5
+            (findArc(**preTransition, **p1)->getWeight() == 1) && // precondition 4 
+            (findArc(**preTransition, **p2)->getWeight() == 1) && // precondition 4
+            ((*p1)->getTokenCount() == 0) && // precondition 5
+            (static_cast<Place*>(*p2)->getTokenCount() == 0) ) // precondition 5
         {
-          string id1 = ((*p1)->nodeFullName());
-          string id2 = ((*p2)->nodeFullName());
+          string id1 = ((*p1)->getName());
+          string id2 = ((*p2)->getName());
           placePairs.insert(pair<string, string>(id1, id2));
         }
     }
     
-    if((*p1)->preset.empty()){
+    if((*p1)->getPreset().empty()){
       // iterate the postset
-      for (set<Node*>:: iterator postTransition = (*p1)->postset.begin(); postTransition != (*p1)->postset.end(); postTransition++)
+      for (set<Node*>:: iterator postTransition = (*p1)->getPostset().begin(); postTransition != (*p1)->getPostset().end(); postTransition++)
       {
-        for (set<Node*>::iterator p2 = (*postTransition)->preset.begin(); p2 != (*postTransition)->preset.end(); p2++)
+        for (set<Node*>::iterator p2 = (*postTransition)->getPreset().begin(); p2 != (*postTransition)->getPreset().end(); p2++)
           if ((*p1 != *p2) &&     // precondition 1
-              ((*p1)->preset == (*p2)->preset) && // precondition 2
-              ((*p1)->postset == (*p2)->postset) && // precondition 3
+              ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
+              ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
               (sameweights(*p2)) && // precondition 4
-              (arc_weight((*p1), (*postTransition)) == 1) && // precondition 4 
-              (arc_weight((*p2), (*postTransition)) == 1) ) // precondition 4
+              (findArc((**p1), (**postTransition))->getWeight() == 1) && // precondition 4 
+              (findArc((**p2), (**postTransition))->getWeight() == 1) ) // precondition 4
           {
-            string id1 = ((*p1)->nodeFullName());
-            string id2 = ((*p2)->nodeFullName());
+            string id1 = ((*p1)->getName());
+            string id2 = ((*p2)->getName());
             placePairs.insert(pair<string, string>(id1, id2));
           }
       }
@@ -405,46 +404,46 @@ void PetriNet::reduce_identical_transitions()
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
   
   // iterate the transitions
-  for (set<Transition*>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+  for (set<Transition*>::iterator t1 = transitions_.begin(); t1 != transitions_.end(); t1++)
   {
     if (!(sameweights(*t1))) // precondition 4
       continue;
     
     // iterate the preset
-    for (set<Node*>:: iterator prePlace = (*t1)->preset.begin(); prePlace != (*t1)->preset.end(); prePlace++)
+    for (set<Node*>:: iterator prePlace = (*t1)->getPreset().begin(); prePlace != (*t1)->getPreset().end(); prePlace++)
     {
-      for (set<Node*>::iterator t2 = (*prePlace)->postset.begin(); t2 != (*prePlace)->postset.end(); t2++)
+      for (set<Node*>::iterator t2 = (*prePlace)->getPostset().begin(); t2 != (*prePlace)->getPostset().end(); t2++)
       {
         if ((*t1 != *t2) &&		// precondition 1
-            ((*t1)->preset == (*t2)->preset) &&	// precondition 2
-            ((*t1)->postset == (*t2)->postset) && // precondition 3
+            ((*t1)->getPreset() == (*t2)->getPreset()) &&	// precondition 2
+            ((*t1)->getPostset() == (*t2)->getPostset()) && // precondition 3
             (sameweights(*t2)) && // precondition 4
-            (arc_weight((*prePlace),(*t1)) == 1) && // precondition 4
-            (arc_weight((*prePlace),(*t2)) == 1) ) // precondition 4
+            (findArc(**prePlace,**t1)->getWeight() == 1) && // precondition 4
+            (findArc(**prePlace,**t2)->getWeight() == 1) ) // precondition 4
         {
-          string id1 = ((*t1)->nodeFullName());
-          string id2 = ((*t2)->nodeFullName());
+          string id1 = ((*t1)->getName());
+          string id2 = ((*t2)->getName());
           transitionPairs.insert(pair<string, string>(id1, id2));
         }
       }
     }
     
-    if ((*t1)->preset.empty())
+    if ((*t1)->getPreset().empty())
     {
       // iterate the postset
-      for (set<Node*>:: iterator postPlace = (*t1)->postset.begin(); postPlace != (*t1)->postset.end(); postPlace++)
+      for (set<Node*>:: iterator postPlace = (*t1)->getPostset().begin(); postPlace != (*t1)->getPostset().end(); postPlace++)
       {
-        for (set<Node*>::iterator t2 = (*postPlace)->preset.begin(); t2 != (*postPlace)->preset.end(); t2++)
+        for (set<Node*>::iterator t2 = (*postPlace)->getPreset().begin(); t2 != (*postPlace)->getPreset().end(); t2++)
         {
           if ((*t1 != *t2) &&     // precondition 1
-              ((*t1)->preset == (*t2)->preset) && // precondition 2
-              ((*t1)->postset == (*t2)->postset) && // precondition 3
+              ((*t1)->getPreset() == (*t2)->getPreset()) && // precondition 2
+              ((*t1)->getPostset() == (*t2)->getPostset()) && // precondition 3
               (sameweights(*t2)) && // precondition 4
-              (arc_weight((*t1),(*postPlace)) == 1) && // precondition 4
-              (arc_weight((*t2),(*postPlace)) == 1) ) // precondition 4
+              (findArc(**t1,**postPlace)->getWeight() == 1) && // precondition 4
+              (findArc(**t2,**postPlace)->getWeight() == 1) ) // precondition 4
           {
-            string id1 = ((*t1)->nodeFullName());
-            string id2 = ((*t2)->nodeFullName());
+            string id1 = ((*t1)->getName());
+            string id2 = ((*t2)->getName());
             transitionPairs.insert(pair<string, string>(id1, id2));
           }
         }
@@ -501,27 +500,27 @@ void PetriNet::reduce_series_places()
   
   
   // iterate the transtions
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition*>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
-    Place* prePlace = static_cast<Place*>(*((*t)->preset.begin()));
-    Place* postPlace = static_cast<Place*>(*((*t)->postset.begin()));
+    Place* prePlace = static_cast<Place*>(*((*t)->getPreset().begin()));
+    Place* postPlace = static_cast<Place*>(*((*t)->getPostset().begin()));
     
-    if (((*t)->preset.size() == 1) && // precondition 1
-        ((*t)->postset.size() == 1) && // precondition 1
+    if (((*t)->getPreset().size() == 1) && // precondition 1
+        ((*t)->getPostset().size() == 1) && // precondition 1
         (prePlace != postPlace) &&			 // precondition 2
-        (!(prePlace->preset.empty())) &&     // precondition 3
-        ((prePlace)->postset.size() == 1) &&		 // precondition 4
-        (arc_weight(prePlace, *t) == 1) && // precondition 5
-        (arc_weight(*t, postPlace) == 1) && // precondition 5
-        (postPlace->tokens == 0 ) && // precondition 6
-        (prePlace->type == INTERNAL) &&	// precondition 7
-        (postPlace->type == INTERNAL) ) // precondition 7
+        (!(prePlace->getPreset().empty())) &&     // precondition 3
+        ((prePlace)->getPostset().size() == 1) &&		 // precondition 4
+        (findArc(*prePlace, **t)->getWeight() == 1) && // precondition 5
+        (findArc(**t, *postPlace)->getWeight() == 1) && // precondition 5
+        (postPlace->getTokenCount() == 0 ) && // precondition 6
+        (prePlace->getType() == Node::INTERNAL) &&	// precondition 7
+        (postPlace->getType() == Node::INTERNAL) ) // precondition 7
         
     {
-      string id1 = ((*((*t)->preset.begin()))->nodeFullName());
-      string id2 = ((*((*t)->postset.begin()))->nodeFullName());
+      string id1 = ((*((*t)->getPreset().begin()))->getName());
+      string id2 = ((*((*t)->getPostset().begin()))->getName());
       placePairs.insert(pair<string, string>(id1, id2));
-      uselessTransitions.insert(((*t)->nodeFullName()));
+      uselessTransitions.insert(((*t)->getName()));
     }
   }
   
@@ -531,14 +530,14 @@ void PetriNet::reduce_series_places()
   {
     Transition* uselessTransition = findTransition(*label);
     if (uselessTransition != NULL)
-      removeTransition(uselessTransition);
+      deleteTransition(*uselessTransition);
   }
   
   // merge place pairs
   for (set<pair<string, string> >::iterator placePair = placePairs.begin();
        placePair != placePairs.end(); placePair++)
   {
-    mergePlaces(placePair->first, placePair->second);
+    //FIXME: mergePlaces(placePair->first, placePair->second);
     result++;
   }
   //if (result!=0)
@@ -584,25 +583,25 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
     set<pair<string, string> > transitionPairs;
 
     // iterate the places
-    for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
-        if (((*p)->postset.size() == 1) && //precondition 1
-            ((*p)->preset.size() == 1) && //precondition 1
-            (!(*p)->isFinal) && // precondition 2
-            (!(*p)->tokens > 0) ) // precondition 2
+    for (set<Place*>::iterator p = places_.begin(); p != places_.end(); p++) {
+        if (((*p)->getPostset().size() == 1) && //precondition 1
+            ((*p)->getPreset().size() == 1) && //precondition 1
+            //FIXME: (!(*p)->isFinal) && // precondition 2
+            (!(*p)->getTokenCount() > 0) ) // precondition 2
         {
-            Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
-            Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
+            Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
+            Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
 
-            if (((t2)->preset.size() == 1) && // precondition 3
-               (setIntersection(t1->postset,t2->postset).empty() ) && // precondition 4
-               (!((t1->type != INTERNAL) && 
-                  (t2->type != INTERNAL) && 
+            if (((t2)->getPreset().size() == 1) && // precondition 3
+		(util::setIntersection(t1->getPostset(),t2->getPostset()).empty() ) && // precondition 4
+		(!((t1->getType() != Node::INTERNAL) && 
+		   (t2->getType() != Node::INTERNAL) && 
                   (keepNormal))) ) //precondition 5
             {
-                string id1 = (t1->nodeFullName(true));
-                string id2 = (t2->nodeFullName(true));
+                string id1 = (t1->getName());
+                string id2 = (t2->getName());
                 transitionPairs.insert(pair<string, string>(id1, id2));
-                uselessPlaces.insert(((*p)->nodeFullName()));
+                uselessPlaces.insert(((*p)->getName()));
             }
         }
     }
@@ -611,7 +610,7 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
     for (set<string>::iterator label = uselessPlaces.begin(); label
                     != uselessPlaces.end(); label++) {
         Place *uselessPlace = findPlace(*label);
-        removePlace(uselessPlace);
+        deletePlace(*uselessPlace);
     }
 
     // merge transition pairs
@@ -620,7 +619,7 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
                     != transitionPairs.end(); transitionPair++) {
         Transition* t1 = findTransition(transitionPair->first);
         Transition* t2 = findTransition(transitionPair->second);
-        mergeTransitions(t1, t2);
+        mergeTransitions(*t1, *t2);
         result++;
     }
     //if (result!=0)
@@ -662,19 +661,19 @@ unsigned int PetriNet::reduce_self_loop_places()
   unsigned int result = 0;
   
   // find places fulfilling the preconditions
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if ( ((*p)->preset.size() == 1) &&       // precondition 1
-         ((*p)->preset == (*p)->postset) &&  // precodnition 2
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
+    if ( ((*p)->getPreset().size() == 1) &&       // precondition 1
+         ((*p)->getPreset() == (*p)->getPostset()) &&  // precodnition 2
          (sameweights(*p)) &&                // precondition 3
-         ((*p)->tokens >= arc_weight((*p),(*((*p)->preset.begin())))) && // precondition 4
-         (!(*p)->isFinal) ) // precondition 5
-        self_loop_places.push_back(*p);
+         ((*p)->getTokenCount() >= findArc(**p,**((*p)->getPreset().begin()))->getWeight()) )//&& // precondition 4
+         //FIXME: (!(*p)->isFinal) ) // precondition 5
+	 self_loop_places.push_back(*p);
   
   // remove useless places
   for (list<Place *>::iterator p = self_loop_places.begin(); p != self_loop_places.end(); p++)
-    if (P.find(*p) != P.end())
+    if (places_.find(*p) != places_.end())
     {
-      removePlace(*p);
+      deletePlace(**p);
       result++;
     }
       
@@ -719,18 +718,18 @@ unsigned int PetriNet::reduce_self_loop_transitions()
   unsigned int result = 0;
   
   // find transitions fulfilling the preconditions
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    if ( ((*t)->preset.size() == 1) &&        // precondition 1
-         ((*t)->preset == (*t)->postset) &&   // precondition 2
-         (arc_weight((*t),(*((*t)->preset.begin()))) == 1) &&  // precondition 3
-         (arc_weight((*((*t)->preset.begin())),(*t)) == 1) )  // precondition 3
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    if ( ((*t)->getPreset().size() == 1) &&        // precondition 1
+         ((*t)->getPreset() == (*t)->getPostset()) &&   // precondition 2
+         (findArc(**t,**((*t)->getPreset().begin()))->getWeight() == 1) &&  // precondition 3
+         (findArc(**((*t)->getPreset().begin()),**t)->getWeight() == 1) )  // precondition 3
         self_loop_transitions.push_back(*t);
   
   // remove useless transitions
   for (list<Transition *>::iterator t = self_loop_transitions.begin(); t != self_loop_transitions.end(); t++)
-    if (T.find(*t) != T.end())
+    if (transitions_.find(*t) != transitions_.end())
     {
-      removeTransition(*t);
+      deleteTransition(**t);
       result++;
     }
       
@@ -765,7 +764,7 @@ void PetriNet::reduce_equal_places()
   set<pair<string, string> > delPairs;
   bool safe = true;
   
-  set<Place*> candidates = P;
+  set<Place*> candidates = places_;
   // since we need two places for this rule, we need sufficent candidates
   while ( candidates.size() > 1 )
   {
@@ -773,38 +772,40 @@ void PetriNet::reduce_equal_places()
     // erase candidate from set, so it cannot compared with itself and set gets smaller
     candidates.erase(p1);
     
-    if ((p1)->postset.size() !=1) //precondition 2
+    if ((p1)->getPostset().size() !=1) //precondition 2
       continue;
     
-    if (arc_weight(p1,*(p1)->postset.begin())!=1) //precondition 3
+    if (findArc(*p1,**(p1)->getPostset().begin())->getWeight()!=1) //precondition 3
       continue;
     
-    Node* t1 = *(p1)->postset.begin();
+    Node* t1 = *(p1)->getPostset().begin();
     
     for (set<Place*>::iterator p2 = candidates.begin(); p2 != candidates.end(); p2++)
     {
-      if ((*p2)->type != INTERNAL) //precondition 0
+      if ((*p2)->getType() != Node::INTERNAL) //precondition 0
         continue;
       
       if(p1 == *p2) // precondition 1
         continue;
       
-      if ((*p2)->postset.size() !=1) //precondition 2
+      if ((*p2)->getPostset().size() !=1) //precondition 2
         continue;
       
-      if (arc_weight(*p2,*(*p2)->postset.begin()) !=1) //precondition 3
+      if (findArc(**p2,**(*p2)->getPostset().begin())->getWeight() !=1) //precondition 3
         continue;
       
-      Node* t2 = *(*p2)->postset.begin();
+      Node* t2 = *(*p2)->getPostset().begin();
       
       if (t1 == t2) //precondition 4
         continue;
-      set<Node*> postSetT1 = postset (t1);
-      set<Node*> postSetT2 = postset (t2);
+      // FIXME
+      //set<Node*> postSetT1 = postset (t1);
+      //set<Node*> postSetT2 = postset (t2);
       
-      if (postSetT1 != postSetT2) //precondition 5
-        continue;
+      //if (postSetT1 != postSetT2) //precondition 5
+      //  continue;
       
+      /* FIXME
       set<Node*> preSetT1 = (t1)->preset;
       set<Node*> preSetT2 = (t2)->preset;
       
@@ -813,9 +814,10 @@ void PetriNet::reduce_equal_places()
       
       if (preSetT1 != preSetT2) //precondition 5
         continue;
+      */
       
-      string id1 = ((p1)->nodeFullName());
-      string id2 = ((*p2)->nodeFullName());
+      string id1 = ((p1)->getName());
+      string id2 = ((*p2)->getName());
 	    
       for (set<pair<string, string> >::iterator labels = placePairs.begin();
            labels != placePairs.end(); labels++)
@@ -833,17 +835,17 @@ void PetriNet::reduce_equal_places()
   
   /*
    // Testing all preconditions
-   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
+   for (set<Place*>::iterator p1 = places_.begin(); p1 != places_.end(); p1++)
    {
-     if ((*p1)->postset.size() !=1) //precondition 2
+     if ((*p1)->getPostset().size() !=1) //precondition 2
        continue;
      
-     if (arc_weight(*p1,*(*p1)->postset.begin())!=1) //precondition 3
+     if (findArc(**p1,**(*p1)->getPostset().begin())->getWeight()!=1) //precondition 3
        continue;
      
-     Node* t1= *(*p1)->postset.begin();
+     Node* t1= *(*p1)->getPostset().begin();
      
-     for (set<Place*>::iterator p2 = P.begin(); p2 != P.end(); p2++)
+     for (set<Place*>::iterator p2 = places_.begin(); p2 != places_.end(); p2++)
      {
        if ((*p2)->type != INTERNAL) //precondition 0
          continue;
@@ -851,19 +853,19 @@ void PetriNet::reduce_equal_places()
        if(*p1 == *p2) // precondition 1
          continue;
        
-       if ((*p2)->postset.size() !=1) //precondition 2
+       if ((*p2)->getPostset().size() !=1) //precondition 2
          continue;
        
-       if (arc_weight(*p2,*(*p2)->postset.begin()) !=1) //precondition 3
+       if (findArc(**p2,**(*p2)->getPostset().begin())->getWeight() !=1) //precondition 3
          continue;
        
-       Node* t2 = *(*p2)->postset.begin();
+       Node* t2 = *(*p2)->getPostset().begin();
        
        if (t1 == t2) //precondition 4
          continue;
        
-       set<Node*> postSetT1 = postset (t1);
-       set<Node*> postSetT2 = postset (t2);
+       set<Node*> postSetT1 = getPostset() (t1);
+       set<Node*> postSetT2 = getPostset() (t2);
        
        if (postSetT1 != postSetT2) //precondition 5
          continue;
@@ -877,8 +879,8 @@ void PetriNet::reduce_equal_places()
        if (preSetT1 != preSetT2) //precondition 5
          continue;
        
-       string id1 = ((*p1)->nodeFullName());
-       string id2 = ((*p2)->nodeFullName());
+       string id1 = ((*p1)->getName());
+       string id2 = ((*p2)->getName());
        
        for (set<pair<string, string> >::iterator labels = placePairs.begin();
             labels != placePairs.end(); labels++)
@@ -903,31 +905,31 @@ void PetriNet::reduce_equal_places()
     Place* p1 = findPlace(labels->first);
     Place* p2 = findPlace(labels->second);
     
-    string trans_id = ((*(p2->postset.begin()))->nodeFullName());
+    string trans_id = ((*(p2->getPostset().begin()))->getName());
     
     unsigned int arcadd = 0;
     
-    for (set<Node*>::iterator n = p2->preset.begin(); n != p2->preset.end(); n++)
+    for (set<Node*>::iterator n = p2->getPreset().begin(); n != p2->getPreset().end(); n++)
     {
       arcadd=0;
       
       // test if there has already been an arc
-      if(p1->preset.find(*n) != p1->preset.end())
+      if(p1->getPreset().find(*n) != p1->getPreset().end())
       {
-        arcadd = arcadd + arc_weight(*n, p1);          
-        for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
-          if (((*f)->source == *n) || ((*f)->target == p1))
-            removeArc(*f);
+        arcadd = arcadd + findArc(**n, *p1)->getWeight();          
+        for (set<Arc*>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+          if ((&(*f)->getSourceNode() == *n) || (&(*f)->getTargetNode() == p1))
+            ;//FIXME:removeArc(*f);
       }
       
-      newArc(*n, p1, STANDARD, (arc_weight(*n,p2) + arcadd));
+      //FIXME: newArc(*n, p1, STANDARD, (findArc(**n,*p2)->getWeight() + arcadd));
       
     }
     
-    p1->tokens = p1->tokens + p2->tokens;
+    //FIXME: p1->tokens = p1->getTokenCount() + p2->getTokenCount();
     
-    removePlace(p2);
-    removeTransition(findTransition(trans_id)); 
+    deletePlace(*p2);
+    deleteTransition(*findTransition(trans_id)); 
     result++;   
   }
   //if (result!=0)
@@ -950,22 +952,23 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
   set<Place*> redundant_places;
   
   // traverse the places
-  for (set<Place *>::const_iterator place = P.begin();
-       place != P.end();
+  for (set<Place *>::const_iterator place = places_.begin();
+       place != places_.end();
        place++)
   {
     // find initial places with empty preset and singleton postset
-    if ( (*place)->tokens == 1  &&
-         (*place)->preset.empty() &&
-         (*place)->postset.size() == 1 )
+    if ( (*place)->getTokenCount() == 1  &&
+         (*place)->getPreset().empty() &&
+         (*place)->getPostset().size() == 1 )
     {
-      Transition *post_transition = static_cast<Transition *> (*((*place)->postset.begin()));
+      //Transition *post_transition = static_cast<Transition *> (*((*place)->getPostset().begin()));
       
+      /* FIXME:
       // if the transition in the postset is executed exactly once...
       if ( post_transition->max_occurrences == 1 )
       {
-        for (set<Node *>::const_iterator pre_place = post_transition->preset.begin();
-             pre_place != post_transition->preset.end();
+        for (set<Node *>::const_iterator pre_place = post_transition->getPreset().begin();
+             pre_place != post_transition->getPreset().end();
              pre_place++)
         {
           // ... and has a former communication place in its preset
@@ -977,6 +980,7 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
           }
         }
       }
+      */
     }
   }
   
@@ -986,7 +990,7 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
        place != redundant_places.end();
        place++)
   {
-    removePlace(*place);
+    deletePlace(**place);
   }
   
   //if (!redundant_places.empty())
@@ -1018,6 +1022,7 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  */
 void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
 {
+  /* FIXME
   if (t1 == t2)
     return;
 
@@ -1027,21 +1032,21 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
   Node *t12 = newTransition("");
 
   // organize the communication type of the new transition
-  if (t1->type == t2->type)
-    t12->type = t1->type;
+  if (t1->getType() == t2->getType())
+    t12->setType(t1->getType());
 
-  else if ((t1->type == IN && t2->type == INTERNAL) ||
-           (t1->type == INTERNAL && t2->type == IN))
-    t12->type = IN;
+  else if ((t1->getType() == Node::INPUT && t2->getType() == Node::INTERNAL) ||
+           (t1->getType() == Node::INTERNAL && t2->getType() == Node::INPUT))
+    t12->setType(Node::INPUT);
 
-  else if ((t1->type == INTERNAL && t2->type == OUT) ||
-           (t1->type == OUT && t2->type == INTERNAL))
-    t12->type = OUT;
+  else if ((t1->getType() == Node::INTERNAL && t2->getType() == Node::OUTPUT) ||
+           (t1->getType() == Node::OUTPUT && t2->getType() == Node::INTERNAL))
+    t12->setType(Node::OUTPUT);
 
-  else if ((t1->type == OUT && t2->type == IN) ||
-           (t1->type == IN && t2->type == OUT) ||
-           (t1->type == INOUT || t2->type == INOUT))
-    t12->type = INOUT;
+  else if ((t1->getType() == OUT && t2->getType() == Node::INPUT) ||
+           (t1->getType() == Node::INPUT && t2->getType() == OUT) ||
+           (t1->getType() == INOUT || t2->getType() == INOUT))
+    t12->getType() = INOUT;
 
 
   // copy t1's history to t12
@@ -1067,19 +1072,23 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
         t12->history.push_back(t2->prefix + *role);
     }
   }
+  */
 
   // merge pre- and postsets for t12
-  t12->preset=t1->preset;
-  t12->postset=t1->postset;
+  // FIXME
+  //t12->preset=t1->getPreset();
+  //t12->postset=t1->getPostset();
 
-  for (set<Node *>::iterator n = t1->preset.begin(); n != t1->preset.end(); n++)
-    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
+  /*
+  for (set<Node *>::iterator n = t1->getPreset().begin(); n != t1->getPreset().end(); n++)
+    newArc((*n), t12, STANDARD, findArc(*(*n),*t1)->getWeight());
 
-  for (set<Node *>::iterator n = t1->postset.begin(); n != t1->postset.end(); n++)
-    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
+  for (set<Node *>::iterator n = t1->getPostset().begin(); n != t1->getPostset().end(); n++)
+    newArc(t12, (*n), STANDARD, findArc(*t1,*(*n))->getWeight());
+  */
 
-  removeTransition(t1);
-  removeTransition(t2);
+  deleteTransition(*t1);
+  deleteTransition(*t2);
 }
 
 /*!
@@ -1121,9 +1130,10 @@ void PetriNet::mergeParallelPlaces(Place *p1, Place *p2)
 
   assert(p1 != NULL);
   assert(p2 != NULL);
-  assert(p1->type == INTERNAL);
-  assert(p2->type == INTERNAL);
+  assert(p1->getType() == Node::INTERNAL);
+  assert(p2->getType() == Node::INTERNAL);
 
+  /* FIXME
   Place *p12 = newPlace("");
 
   p12->history.clear();
@@ -1167,7 +1177,7 @@ void PetriNet::mergeParallelPlaces(Place *p1, Place *p2)
     {
       if ((p->first) == p1 || (p->first) == p2)
       {
-        p12->isFinal = true;
+        //FIXME: p12->isFinal = true;
         s1.insert(pair<Place *, unsigned int>(p12,p->second));
       }
       else
@@ -1175,36 +1185,37 @@ void PetriNet::mergeParallelPlaces(Place *p1, Place *p2)
         s2.insert(*p);
       }
     }
-    set<pair<Place *, unsigned int> > s1s2 = setUnion(s1,s2);
-/*
+    set<pair<Place *, unsigned int> > s1s2 = util::setUnion(s1,s2);
     set<pair<Place *, unsigned int> > s1s2;
     s1s2.insert(s1.begin(), s1.end());
     s1s2.insert(s2.begin(), s2.end());
-*/
     newFinalSetList.push_back(s1s2);
   }
   final_set_list = newFinalSetList;
 
   // merge pre- and postsets for p12
-  p12->preset=p1->preset;
-  p12->postset=p1->postset;
+  // FIXME
+  //p12->preset=p1->getPreset();
+  //p12->postset=p1->getPostset();
 
   // create the weighted arcs for p12
 
-  if ((p1->preset.size() + p1->postset.size()) > 1000)
-    std::cerr << (p1->preset.size() + p1->postset.size()) << " arcs to add..." << std::endl;
+  if ((p1->getPreset().size() + p1->getPostset().size()) > 1000)
+    std::cerr << (p1->getPreset().size() + p1->getPostset().size()) << " arcs to add..." << std::endl;
 
-  for (set<Node *>::iterator n = p1->preset.begin(); n != p1->preset.end(); n++)
-    newArc((*n), p12, STANDARD, arc_weight((*n),p1));
+  for (set<Node *>::iterator n = p1->getPreset().begin(); n != p1->getPreset().end(); n++)
+    newArc((*n), p12, STANDARD, findArc(*(*n),*p1)->getWeight());
 
-  for (set<Node *>::iterator n = p1->postset.begin(); n != p1->postset.end(); n++)
-    newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
+  for (set<Node *>::iterator n = p1->getPostset().begin(); n != p1->getPostset().end(); n++)
+    newArc(p12, (*n), STANDARD, findArc(*p1,*(*n))->getWeight());
 
-  removePlace(p1);
-  removePlace(p2);
+  deletePlace(*p1);
+  deletePlace(*p2);
 
   p1 = NULL;
   p2 = NULL;
+*/
+
 }
 
 
@@ -1252,7 +1263,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
   // trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   // trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
   
-  string old = information();
+  //string old = information();
   bool done = false;
   unsigned int passes = 1;
   
@@ -1303,8 +1314,8 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
     
     // trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
     
-    done = (old == information());
-    old = information();
+    //done = (old == information());
+    //old = information();
   }
   
   
@@ -1340,22 +1351,22 @@ void PetriNet::reduce_identical_places()
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
   
   // iterate the places
-  for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
+  for (set<Place*>::iterator p1 = places_.begin(); p1 != places_.end(); p1++)
   {
-    if (((*p1)->preset.empty()) || ((*p1)->postset.empty()) || !(sameweights(*p1)))
+    if (((*p1)->getPreset().empty()) || ((*p1)->getPostset().empty()) || !(sameweights(*p1)))
       continue;
     
-    for (set<Node*>:: iterator preTransition = (*p1)->preset.begin(); preTransition != (*p1)->preset.end(); preTransition++)
+    for (set<Node*>:: iterator preTransition = (*p1)->getPreset().begin(); preTransition != (*p1)->getPreset().end(); preTransition++)
     {
-      for (set<Node*>::iterator p2 = (*preTransition)->postset.begin(); p2 != (*preTransition)->postset.end(); p2++)
+      for (set<Node*>::iterator p2 = (*preTransition)->getPostset().begin(); p2 != (*preTransition)->getPostset().end(); p2++)
         if ((*p1 != *p2) &&     // precondition 1
-            ((*p1)->preset == (*p2)->preset) && // precondition 2
-            ((*p1)->postset == (*p2)->postset) && // precondition 3
+            ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
+            ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
             (sameweights(*p2)) && // precondition 4
-            (arc_weight((*preTransition), (*p1)) == arc_weight((*p2), (*((*p1)->postset.begin())))) ) // precondition 4
+            (findArc(*(*preTransition), (**p1))->getWeight() == findArc(*(*p2), *(*((*p1)->getPostset().begin())))->getWeight()) ) // precondition 4
         {
-          string id1 = ((*p1)->nodeFullName());
-          string id2 = ((*p2)->nodeFullName());
+          string id1 = ((*p1)->getName());
+          string id2 = ((*p2)->getName());
           placePairs.insert(pair<string, string>(id1, id2));
         }
     }
@@ -1398,22 +1409,22 @@ void PetriNet::reduce_identical_transitions()
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
   
   // iterate the transitions
-  for (set<Transition*>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+  for (set<Transition*>::iterator t1 = transitions_.begin(); t1 != transitions_.end(); t1++)
   {
     if (!(sameweights(*t1)))
       continue;
     
-    for (set<Node*>:: iterator prePlace = (*t1)->preset.begin(); prePlace != (*t1)->preset.end(); prePlace++)
+    for (set<Node*>:: iterator prePlace = (*t1)->getPreset().begin(); prePlace != (*t1)->getPreset().end(); prePlace++)
     {
-      for (set<Node*>::iterator t2 = (*prePlace)->postset.begin(); t2 != (*prePlace)->postset.end(); t2++)
+      for (set<Node*>::iterator t2 = (*prePlace)->getPostset().begin(); t2 != (*prePlace)->getPostset().end(); t2++)
         if ((*t1 != *t2) &&     // precondition 1
-            ((*t1)->preset == (*t2)->preset) && // precondition 2
-            ((*t1)->postset == (*t2)->postset) && // precondition 3
+            ((*t1)->getPreset() == (*t2)->getPreset()) && // precondition 2
+            ((*t1)->getPostset() == (*t2)->getPostset()) && // precondition 3
             (sameweights(*t2)) && // precondition 4
-            (arc_weight((*((*t1)->preset.begin())),(*t1)) == arc_weight((*t2), (*((*t1)->postset.begin()))))) // precondition 4
+            (findArc(*(*((*t1)->getPreset().begin())),*(*t1))->getWeight() == findArc(*(*t2), *(*((*t1)->getPostset().begin())))->getWeight())) // precondition 4
         {
-          string id1 = ((*t1)->nodeFullName());
-          string id2 = ((*t2)->nodeFullName());
+          string id1 = ((*t1)->getName());
+          string id2 = ((*t2)->getName());
           transitionPairs.insert(pair<string, string>(id1, id2));
         }
     }

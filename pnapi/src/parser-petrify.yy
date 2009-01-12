@@ -1,3 +1,5 @@
+// -*- C++ -*-
+
 %name-prefix="pnapi_petrify_"
 %defines
 
@@ -27,7 +29,7 @@ using std::string;
 using std::set;
 using std::map;
 
-using PNapi::parser::petrify::Node;
+using pnapi::parser::petrify::Node;
 
 extern int yylex();
 extern char *yytext;
@@ -42,7 +44,7 @@ Node * pnapi_petrify_ast;
 
 %union {
   char *str; 
-  PNapi::parser::petrify::Node * yt_node;
+  pnapi::parser::petrify::Node * yt_node;
 }
 
 /* the types of the non-terminal symbols */

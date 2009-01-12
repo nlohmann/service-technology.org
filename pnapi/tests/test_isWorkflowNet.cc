@@ -3,7 +3,7 @@
 #include <cassert>
 #include "../src/pnapi.h"
 
-using namespace PNapi;
+using namespace pnapi;
 using std::cout;
 using std::ofstream;
 

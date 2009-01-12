@@ -1,48 +1,17 @@
-/*****************************************************************************\
-  GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
-
-  Copyright (C) 2006, 2007  Niels Lohmann,
-                            Christian Gierds, and
-                            Martin Znamirowski
-  Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
-
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
-
-  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
-
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
-\*****************************************************************************/
-
 /*!
- * \file    helpers.cc
+ * \file    util.cc
  *
- * \brief   helper functions
+ * \brief   utility functions
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: $Author$
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007-07-18 08:16:53 $
+ * \date    $Date$
  * 
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
- *
- * \version \$Revision: 1.2 $
- *
- * \ingroup debug
+ * \version $Revision$
  */
 
 
@@ -61,7 +30,7 @@
 #include <vector>
 
 //#include "debug.h"	// (trace)
-#include "helpers.h"
+#include "util.h"
 //#include "options.h"
 
 using std::istringstream;
@@ -89,11 +58,13 @@ using std::vector;
  * \param i Kimwitu++ integer
  * \return  C++ string object representing i
  */
+/*
 string toString(kc::integer i)
 {
   assert(i!=NULL);
   return toString(i->value);
 }
+*/
 #endif
 
 
@@ -105,8 +76,11 @@ string toString(kc::integer i)
  *
  * \param i standard C int
  * \return  C++ string object representing i
+ *
+ * \note most uses of this function can be avoided by using stream operators 
+ *       consequently
  */
-string toString(int i)
+string pnapi::util::toString(int i)
 {
   std::ostringstream buffer;
   
@@ -118,7 +92,6 @@ string toString(int i)
 
 
 
-
 /*!
  * Convers an STL vector of unsigned ints to a C++ string representation. The
  * integers are seperated by a period.
@@ -126,6 +99,7 @@ string toString(int i)
  * \param v  an STL vector of unsigned ints
  * \return   C++ string object representation of v
  */
+  /*
 string toString(const vector<unsigned int> &v)
 {
   string result;
@@ -140,7 +114,7 @@ string toString(const vector<unsigned int> &v)
 
   return result;
 }
-
+  */
 
 
 
@@ -151,6 +125,7 @@ string toString(const vector<unsigned int> &v)
  * \param s C++ string object
  * \return int representing s or INT_MAX if the conversion failed
  */
+   /*
 int toInt(string s)
 {
   int result;
@@ -165,7 +140,7 @@ int toInt(string s)
   return result;
 }
 
-
+   */
 
 
 
@@ -176,6 +151,7 @@ int toInt(string s)
  * \return unsigned int representing s or UINT_MAX if the conversion failed
  *         (e.g. a negative value was passed)
  */
+    /*
 unsigned int toUInt(string s)
 {
   unsigned int result;
@@ -189,7 +165,7 @@ unsigned int toUInt(string s)
 
   return result;
 }
-
+    */
 
 
 
@@ -199,7 +175,7 @@ unsigned int toUInt(string s)
  * \param b an unsigned int
  * \return max(a,b)
  */
-unsigned int max(unsigned int a, unsigned int b)
+    unsigned int pnapi::util::max(unsigned int a, unsigned int b)
 {
   if (a > b)
     return a;
@@ -217,6 +193,7 @@ unsigned int max(unsigned int a, unsigned int b)
  *
  * \note  The prefix "http:" is not removed.
  */
+      /*
 string strip_namespace(string s)
 {
   if (s.find_first_of(":") != string::npos &&
@@ -225,3 +202,4 @@ string strip_namespace(string s)
   else
     return s;
 }
+      */

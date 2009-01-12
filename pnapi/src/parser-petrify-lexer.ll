@@ -1,6 +1,8 @@
+ // -*- C++ -*-
 
 %option prefix="pnapi_petrify_"
 %option noyywrap
+%option nounput
 %option yylineno
 
 

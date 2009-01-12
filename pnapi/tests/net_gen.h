@@ -3,7 +3,7 @@
 
 #include "../src/pnapi.h"
 
-using namespace PNapi;
+using namespace pnapi;
 
 PetriNet *createProducerConsumerExample();
 

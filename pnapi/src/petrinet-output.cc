@@ -54,11 +54,11 @@
  *****************************************************************************/
 
 #include <cassert>
+#include <iostream>
 #include <iomanip>		// (std::setw)
 
-#include "helpers.h"		// helper functions (toString)
-#include "options.h"		// (parameters)
-#include "pnapi.h"
+#include "util.h"		// helper functions (toString)
+#include "petrinet.h"
 
 
 
@@ -68,162 +68,13 @@ using std::setw;
 using std::right;
 using std::left;
 
-using namespace PNapi;
+using namespace pnapi;
 
 
 
 /******************************************************************************
  * Functions to print information of the net and its nodes
  *****************************************************************************/
-
-/*!
- * \brief   the name of the type
- *
- *          dummy-implementation of virtual function
- */
-string PNapi::Node::nodeTypeName() const
-{
-  return "";
-}
-
-
-
-
-
-/*!
- * \brief   the name of the type
- *
- * \return  the name of the node type, i.e., "place"
- */
-string Place::nodeTypeName() const
-{
-  return "place";
-}
-
-
-
-
-
-/*!
- * \brief   the name of the type
- *
- * \return  the name of the node type, i.e., "transition"
- */
-string Transition::nodeTypeName() const
-{
-  return "transition";
-}
-
-
-
-
-
-/*!
- * \brief   the short name of the node
- *
- *          dummy-implementation of virtual function
- */
-string PNapi::Node::nodeShortName() const
-{
-  return "";
-}
-
-
-
-
-
-/*!
- * \brief   the name of the node
- *
- * \return  the (nice) name of the node for DOT output
- */
-string PNapi::Node::nodeName() const
-{
-  string result = *history.begin();
-
-  if ( type == INTERNAL || nodeType == TRANSITION )
-    result = prefix + result;
-
-  return result;
-}
-
-
-
-
-
-/*!
- * \brief   the name of the node
- *
- * \return  the name of the node for DOT output
- */
-string PNapi::Node::nodeFullName(bool withPrefix) const
-{
-  string result = *history.begin();
-
-  if ( withPrefix || type == INTERNAL || nodeType == TRANSITION )
-    result = prefix + result;
-
-  return result;
-}
-
-
-
-
-
-
-/*!
- * \brief   the short name of the place
- *
- * \return  the short name of the place, e.g. for LoLA output
- */
-string Place::nodeShortName() const
-{
-  if (history.begin()->find("link") != string::npos || history.begin()->find("!link") != string::npos)
-    return *history.begin();
-
-  if (type == INTERNAL)
-    return ("p" + toString(id));
-
-  return *history.begin();
-}
-
-
-
-
-
-/*!
- * \brief   the short name of the transition
- *
- * \return  the short name of the transition, e.g. for LoLA output
- */
-string Transition::nodeShortName() const
-{
-  return ("t" + toString(id));
-}
-
-
-
-
-
-/*!
- * \brief   statistical output
- *
- * \return  string containing information about the net
- *
- * \note    It's used by reduction methods finding the fixed point.
- */
-string PetriNet::information() const
-{
-  string result = "|P|=" + toString(P.size() + P_in.size() + P_out.size());
-  result += ", |P_in|= " + toString(P_in.size());
-  result += ", |P_out|= " + toString(P_out.size());
-  result += ", |T|=" + toString(T.size());
-  result += ", |F|=" + toString(F.size());
-  return result;
-}
-
-
-
 
 
 /*!
@@ -243,54 +94,66 @@ void PetriNet::output_info(ostream *output) const
   (*output) << "PLACES:\nID\tTYPE\t\tROLES\n";
 
   // the internal places
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    (*output) << (*p)->nodeShortName() << "\tinternal";
+    (*output) << (*p)->getName() << "\tinternal";
 
-    for (list<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
-      if (role == (*p)->history.begin())
-        (*output) << "\t" + (*p)->prefix + *role + "\n";
+    deque<string> names = (*p)->getNameHistory();
+    for (deque<string>::iterator role = names.begin(); role != names.end(); role++)
+      if (role == names.begin())
+        //(*output) << "\t" + (*p)->prefix + *role + "\n";
+	(*output) << "\t" + *role + "\n";
       else
-        (*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
+        //(*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
+        (*output) << "\t\t\t" + *role + "\n";
   }
 
   // the input places
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+  for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
   {
-    (*output) << (*p)->nodeShortName() << "\tinput   ";
+    (*output) << (*p)->getName() << "\tinput   ";
 
-    for (list<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
-      if (role == (*p)->history.begin())
-        (*output) << "\t" + (*p)->prefix + *role + "\n";
+    deque<string> names = (*p)->getNameHistory();
+    for (deque<string>::iterator role = names.begin(); role != names.end(); role++)
+      if (role == names.begin())
+        //(*output) << "\t" + (*p)->prefix + *role + "\n";
+        (*output) << "\t" + *role + "\n";
       else
-        (*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
+        //(*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
+        (*output) << "\t\t\t" + *role + "\n";
   }
 
   // the output places
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+  for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
   {
-    (*output) << (*p)->nodeShortName() << "\toutput  ";
+    (*output) << (*p)->getName() << "\toutput  ";
 
-    for (list<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
-      if (role == (*p)->history.begin())
-        (*output) << "\t" + (*p)->prefix + *role + "\n";
+    deque<string> names = (*p)->getNameHistory();
+    for (deque<string>::iterator role = names.begin(); role != names.end(); role++)
+      if (role == names.begin())
+        //(*output) << "\t" + (*p)->prefix + *role + "\n";
+        (*output) << "\t" + *role + "\n";
       else
-        (*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
+        //(*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
+        (*output) << "\t\t\t" + *role + "\n";
   }
 
   // the transitions
   (*output) << "\nTRANSITIONS:\n";
   (*output) << "ID\tROLES\n";
 
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
-    (*output) << (*t)->nodeShortName() + "\t";
+    (*output) << (*t)->getName() + "\t";
 
-    for (list<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
-      if (role == (*t)->history.begin())
-        (*output) << (*t)->prefix + *role + "\n";
+    deque<string> names = (*t)->getNameHistory();
+    for (deque<string>::iterator role = names.begin(); role != names.end(); role++)
+      if (role == names.begin())
+        //(*output) << (*t)->prefix + *role + "\n";
+        (*output) << *role + "\n";
       else
-        (*output) << "\t" + (*t)->prefix + *role + "\n";
+        //(*output) << "\t" + (*t)->prefix + *role + "\n";
+        (*output) << "\t" + *role + "\n";
   }
 }
 
@@ -306,31 +169,34 @@ void PetriNet::output_info(ostream *output) const
 /*!
  * \brief   DOT-output of the arc (used by PetriNet::dotOut())
 */
-string Arc::output_dot(bool draw_interface) const
+string Arc::toString(bool draw_interface) const
 {
+  /* FIXME
   if (!draw_interface)
-    if ((source->nodeType == PLACE && source->type != INTERNAL) ||
-        (target->nodeType == PLACE && target->type != INTERNAL))
+    if ((source->nodeType == PLACE && source->getType() != Node::INTERNAL) ||
+        (target->nodeType == PLACE && target->getType() != Node::INTERNAL))
       return "";
 
   string result = " ";
   if (source->nodeType == PLACE)
-    result += "p" + toString(source->id) + " -> t" + toString(target->id);
+    result += "p" + util::toString(source->id) + " -> t" + util::toString(target->id);
   else
-    result += "t" + toString(source->id) + " -> p" + toString(target->id);
+    result += "t" + util::toString(source->id) + " -> p" + util::toString(target->id);
 
   result += "\t[";
 
   if (weight != 1)
-    result += "label=\"" + toString(weight) + "\"";
+    result += "label=\"" + util::toString(weight) + "\"";
 
-  if ((source->nodeType == PLACE && source->type == INTERNAL) ||
-      (target->nodeType == PLACE && target->type == INTERNAL))
+  if ((source->nodeType == PLACE && source->getType() == Node::INTERNAL) ||
+      (target->nodeType == PLACE && target->getType() == Node::INTERNAL))
     result += "weight=10000.0";
 
   result += "]\n";
 
   return result;
+  */
+  return "";
 }
 
 
@@ -338,29 +204,28 @@ string Arc::output_dot(bool draw_interface) const
 
 
 /*!
- * \brief   DOT-output of the transition (used by PetriNet::dotOut())
+ * DOT-output of the transition. Transitions are colored
+ * corresponding to their initial role.
  *
- *          DOT-output of the transition. Transitions are colored
- *          corresponding to their initial role.
- *
- * \todo    Explain colors used.
+ * \note  This method might be replaced by operator<< in the future.
 */
-string Transition::output_dot() const
+string Transition::toString() const
 {
   string result;
 
-  result += " t" + toString(id) + "  \t";
+  //FIXME: result += " t" + util::toString(id) + "  \t";
 
 #ifdef USING_BPEL2OWFN
-  string label = nodeShortName();
+  string label = getName();
 #else
-  string label = nodeName();
+  string label = getName();
 #endif
 
-  switch(type)
-  {
-    case(IN):		result += "[fillcolor=orange "; break;
-    case(OUT):		result += "[fillcolor=yellow "; break;
+  switch(getType())
+    {
+    case(Node::INPUT):		result += "[fillcolor=orange "; break;
+    case(Node::OUTPUT):		result += "[fillcolor=yellow "; break;
+      /* FIXME
     case(INOUT):	result += "[fillcolor=gold ";
       result += "label=<";
       // the table size depends on the node size of .3 (inch);
@@ -371,70 +236,71 @@ string Transition::output_dot() const
       result += "</TD></TR><TR>";
       result += "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"YELLOW\">";
       result += "</TD></TR></TABLE> >"; break;
-    case(INTERNAL):	result += "["; break;
+      */
+    case(Node::INTERNAL):	result += "["; break;
   }
 
 
   // add labels for transitions with singleton history
 
   // internal activities
-  if (history.size() == 1 && history.begin()->find("internal.empty") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.empty") != string::npos)
     result += "label=\"empty\" fillcolor=gray";
-  if (history.size() == 1 && history.begin()->find("internal.assign") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.assign") != string::npos)
     result += "label=\"asgn\" fillcolor=gray";
-  if (history.size() == 1 && history.begin()->find("internal.opaqueActivity") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.opaqueActivity") != string::npos)
     result += "label=\"opque\" fillcolor=gray";
 
   // communicating activities
-  if (history.size() == 1 && history.begin()->find("internal.receive") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.receive") != string::npos)
     result += "label=\"recv\"";
-  if (history.size() == 1 && history.begin()->find("internal.reply") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.reply") != string::npos)
     result += "label=\"reply\"";
-  if (history.size() == 1 && history.begin()->find("internal.invoke") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.invoke") != string::npos)
     result += "label=\"invk\"";
-  if (history.size() == 1 && history.begin()->find("internal.onMessage_") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.onMessage_") != string::npos)
     result += "label=\"on\\nmsg\"";
-  if (history.size() == 1 && history.begin()->find(".onEvent.") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".onEvent.") != string::npos)
     result += "label=\"on\\nevent\"";
 
   // structured activities
-  if (history.size() == 1 && history.begin()->find("internal.case") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.case") != string::npos)
     result += "label=\"case\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.onAlarm") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.onAlarm") != string::npos)
     result += "label=\"on\\nalarm\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.split") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.split") != string::npos)
     result += "label=\"flow\\nsplit\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.join") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.join") != string::npos)
     result += "label=\"flow\\njoin\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.leave") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.leave") != string::npos)
     result += "label=\"leave\\nloop\" fillcolor=azure2";
-  if (history.size() == 1 && history.begin()->find("internal.loop") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find("internal.loop") != string::npos)
     result += "label=\"enter\\nloop\" fillcolor=azure2";
 
   // everything about links
-  if (history.size() == 1 && history.begin()->find(".setLinks") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".setLinks") != string::npos)
     result += "label=\"tc\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".evaluate") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".evaluate") != string::npos)
     result += "label=\"jc\\neval\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".skip") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".skip") != string::npos)
     result += "label=\"skip\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".reset_false") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".reset_false") != string::npos)
     result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-  if (history.size() == 1 && history.begin()->find(".reset_true") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".reset_true") != string::npos)
     result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
 
 
   // stopping
-  if (history.size() == 1 && history.begin()->find(".stopped.") != string::npos)
+  if (getNameHistory().size() == 1 && getName().find(".stopped.") != string::npos)
     result += "label=\"stop\" fillcolor=darksalmon";
 
 
-  if (!labels.empty())
+  if (!labels_.empty())
   {
     result += " label=\"{";
-    for (set<string>::const_iterator it = labels.begin(); it != labels.end(); it++)
+    for (set<string>::const_iterator it = labels_.begin(); it != labels_.end(); it++)
     {
-      if (it != labels.begin())
+      if (it != labels_.begin())
         result += " ";
       result += (*it);
     }
@@ -443,8 +309,8 @@ string Transition::output_dot() const
 
   result += "]\n";
 
-  result += " t" + toString(id) + "_l\t[style=invis];\n";
-  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\" ]\n";
+  // FIXME:result += " t" + util::toString(id) + "_l\t[style=invis];\n";
+  // FIXME:result += " t" + util::toString(id) + "_l -> t" + util::toString(id) + " [headlabel=\"" + label + "\" ]\n";
 
   return result;
 }
@@ -458,21 +324,19 @@ string Transition::output_dot() const
  *
  *          DOT-output of the place. Places are colored corresponding to their
  *          initial role.
- *
- * \todo    Explain colors used.
 */
-string Place::output_dot() const
+string Place::toString() const
 {
   string result;
 
-  result += " p" + toString(id) + "  \t[";//label=\"\"";
+  //FIXME: result += " p" + util::toString(id) + "  \t[";//label=\"\"";
 
 #ifdef USING_BPEL2OWFN
     string label;
     if ( wasExternal != "")
       label = wasExternal;
   else
-    label = nodeShortName();
+    label = getName();
 
   if (type == IN || type == OUT)
   {
@@ -490,28 +354,30 @@ string Place::output_dot() const
 
 #else
   string label;
-  if ( wasExternal != "")
-    label = wasExternal;
-  else
-    label = nodeName();
+  // FIXME
+  //if ( wasInterface )
+  //  label = wasExternal;
+  //else
+    label = getName();
 #endif
 
   // truncate prefix (could be a problem with ports later on, but looks nice)
-  //  if (type != INTERNAL)
+  //  if (type != Node::INTERNAL)
   // label = label.substr(label.find_last_of(".")+1, label.length());
 
-  if (tokens == 1)
+  if (tokens_ == 1)
     result += "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
-  else if (tokens > 1)
-    result += "label=\"" + toString(tokens) + "\" fontcolor=black fontname=\"Helvetica\" fontsize=10";
+  else if (tokens_ > 1)
+    result += "label=\"" + ::util::toString(tokens_) + "\" fontcolor=black fontname=\"Helvetica\" fontsize=10";
 
-  switch (type)
-  {
-    case (IN):  result += "fillcolor=orange"; break;
-    case (OUT): result += "fillcolor=yellow"; break;
+  switch (getType())
+    {
+    case (Node::INPUT):  result += "fillcolor=orange"; break;
+    case (Node::OUTPUT): result += "fillcolor=yellow"; break;
     default:    break;
-  }
+    }
 
+  /* FIXME
   if (isFinal)
     result += "fillcolor=gray";
   else if (firstMemberIs("!link."))
@@ -524,15 +390,16 @@ string Place::output_dot() const
     result += "fillcolor=seagreen";
   else if (wasExternal != "")
     result += "fillcolor=lightgoldenrod1";
+  */
 
   result += "]\n";
 
-  result += " p" + toString(id) + "_l\t[style=invis];\n";
+  // FIXME:result += " p" + util::toString(id) + "_l\t[style=invis];\n";
 
-  if (type == OUT)
-    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\" ]\n";
+  if (getType() == Node::OUTPUT)
+    ;// FIXME:result += " p" + util::toString(id) + " -> p" + util::toString(id) + "_l [taillabel=\"" + label + "\" ]\n";
   else
-    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\" ]\n";
+    ;// FIXME:result += " p" + util::toString(id) + "_l -> p" + util::toString(id) + " [headlabel=\"" + label + "\" ]\n";
 
   return result;
 }
@@ -560,10 +427,10 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   (*output) << "digraph N {" << endl;
   (*output) << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" fontsize=10 remincross=true label=\"";
 
-  if (globals::reduction_level == 5)
-    (*output) << "structurally reduced ";
+  //if (globals::reduction_level == 5)
+  //  (*output) << "structurally reduced ";
 
-  (*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
+  //(*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
   // REMEMBER The table size of the INOUT transitions depends on the size of a node!
   //          So a width of .3 (in) results in 21 pixel table width ( 0.3 in * 72 dpi ).
   (*output) << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
@@ -573,37 +440,37 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   // list the places
   (*output) << "\n // places" << endl;
   (*output) << " node [shape=circle];" << endl;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*output) << (*p)->output_dot();
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
+    (*output) << (*p)->toString();
 
   if (draw_interface)
   {
-    for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-      (*output) << (*p)->output_dot();
-    for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-      (*output) << (*p)->output_dot();
+    for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
+      (*output) << (*p)->toString();
+    for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
+      (*output) << (*p)->toString();
 
 
 
     // list the transitions
     (*output) << "\n // transitions" << endl;
     (*output) << " node [shape=box]" << endl;
-    for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-      (*output) << (*t)->output_dot();
+    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      (*output) << (*t)->toString();
 
 
     // the inner of the net
     (*output) << "\n // cluster the inner of the net" << endl;
     (*output) << " subgraph cluster1\n {\n ";
-    for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-      (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
+    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      //FIXME: (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
     (*output) << "\n ";
-    for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
     {
-      if ((*p)->tokens > 0)
-        (*output) << " p" << (*p)->id;
+      if ((*p)->getTokenCount() > 0)
+        ;// FIXME: (*output) << " p" << (*p)->id;
       else
-        (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
+        ;// FIXME:(*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
     }
 
     if (draw_interface)
@@ -615,6 +482,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   }
 
 
+  /* FIXME: use interfacePlacesByPort_
     // draw the ports
     for (map<string, set<Place *> >::const_iterator port = ports.begin();
          port != ports.end(); port++)
@@ -628,28 +496,29 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
         for (set<Place*>::const_iterator place = port->second.begin();
              place != port->second.end(); place++)
         {
-            (*output) << "  p" + toString((*place)->id) << ";" << endl;
-            (*output) << "  p" + toString((*place)->id) << "_l;" << endl;
+            // FIXME:(*output) << "  p" + util::toString((*place)->id) << ";" << endl;
+            // FIXME:(*output) << "  p" + util::toString((*place)->id) << "_l;" << endl;
 
             // make the port more compact
             for (set<Place*>::const_iterator place2 = port->second.begin();
                  place2 != port->second.end(); place2++)
             {
                 if ( (*place) != (*place2) )
-                    (*output) << "  p" + toString((*place)->id) + " -> p" + toString((*place2)->id) + " [style=invis];" << endl;
+		  ;// FIXME:(*output) << "  p" + util::toString((*place)->id) + " -> p" + util::toString((*place2)->id) + " [style=invis];" << endl;
             }
         }
 
         (*output) << " }" << endl << endl;
     }
+  */
 
 
 
   // list the arcs
   (*output) << "\n // arcs" << endl;
   (*output) << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black]" << endl;
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    (*output) << (*f)->output_dot(draw_interface);
+  for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+    (*output) << (*f)->toString(draw_interface);
 
   (*output) << endl << "}" << endl;
 }
@@ -681,7 +550,7 @@ void PetriNet::output_pnml(ostream *output) const
 
   (*output) << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << endl << endl;
   (*output) << "<!--" << endl;
-  (*output) << "  Petri net created by " << getPackageString() << " reading file " << globals::filename << "." << endl;
+  //(*output) << "  Petri net created by " << getPackageString() << " reading file " << globals::filename << "." << endl;
   (*output) << "  See http://www.gnu.org/software/bpel2owfn for more details." << endl;
   (*output) << "-->" << endl << endl;
 
@@ -691,16 +560,16 @@ void PetriNet::output_pnml(ostream *output) const
 
   // places
   (*output) << "<!-- input places -->" << endl;
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+  for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->getName() << "\">" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
-    (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->getName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << *(*p)->history.begin() << "</text>" << endl;
+    (*output) << "        <text>" << (*p)->getName() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "      <type>" << endl;
     (*output) << "        <text>input</text>" << endl;
@@ -709,16 +578,16 @@ void PetriNet::output_pnml(ostream *output) const
   }
 
   (*output) << "<!-- output places -->" << endl;
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+  for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->getName() << "\">" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
-    (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->getName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << *(*p)->history.begin() << "</text>" << endl;
+    (*output) << "        <text>" << (*p)->getName() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "      <type>" << endl;
     (*output) << "        <text>output</text>" << endl;
@@ -727,21 +596,21 @@ void PetriNet::output_pnml(ostream *output) const
   }
 
   (*output) << "<!-- internal places -->" << endl;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->getName() << "\">" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
-    (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->getName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << *(*p)->history.begin() << "</text>" << endl;
+    (*output) << "        <text>" << (*p)->getName() << "</text>" << endl;
     (*output) << "      </name>" << endl;
-    if ((*p)->tokens > 0)
+    if ((*p)->getTokenCount() > 0)
     {
       (*output) << "      <initialMarking>" << endl;
-      (*output) << "        <text>" << (*p)->tokens << "</text>" << endl;
+      (*output) << "        <text>" << (*p)->getTokenCount() << "</text>" << endl;
       (*output) << "      </initialMarking>" << endl;
     }
     (*output) << "    </place>" << endl << endl;
@@ -749,16 +618,16 @@ void PetriNet::output_pnml(ostream *output) const
 
 
   // transitions
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "    <transition id=\"" << (*t)->nodeShortName() << "\">" << endl;
+    (*output) << "    <transition id=\"" << (*t)->getName() << "\">" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
-    (*output) << "    <transition id=\"" << (*t)->nodeName() << "\">" << endl;
+    (*output) << "    <transition id=\"" << (*t)->getName() << "\">" << endl;
 #endif
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" << *(*t)->history.begin() << "</text>" << endl;
+    (*output) << "        <text>" << (*t)->getName() << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "    </transition>" << endl << endl;
   }
@@ -766,18 +635,18 @@ void PetriNet::output_pnml(ostream *output) const
 
   // arcs
   int arcNumber = 1;
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
+  for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++, arcNumber++)
   {
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
 #ifdef USING_BPEL2OWFN
-    (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
-    (*output) << "target=\"" << (*f)->target->nodeShortName() << "\">" << endl;
+    (*output) << "source=\"" << (*f)->getSourceNode().getName() << "\" ";
+    (*output) << "target=\"" << (*f)->getTargetNode().getName() << "\">" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
-    (*output) << "source=\"" << (*f)->source->nodeName() << "\" ";
-    (*output) << "target=\"" << (*f)->target->nodeName() << "\">" << endl;
+    (*output) << "source=\"" << (*f)->getSourceNode().getName() << "\" ";
+    (*output) << "target=\"" << (*f)->getTargetNode().getName() << "\">" << endl;
 #endif
-    (*output) << "      <inscription>\n        <text>" << (*f)->weight << "</text>\n      </inscription>" << endl;
+    (*output) << "      <inscription>\n        <text>" << (*f)->getWeight() << "</text>\n      </inscription>" << endl;
     (*output) << "    </arc>" << endl;
   }
   (*output) << endl;
@@ -786,9 +655,11 @@ void PetriNet::output_pnml(ostream *output) const
   (*output) << "      <finalmarking xmlns=\"http://www.informatik.hu-berlin.de/top/tools4bpel\">" << endl;
   (*output) << "        <text>";
 
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  /* FIXME
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
     if ((*p)->isFinal)
-      (*output) << (*p)->nodeShortName() << " ";
+      (*output) << (*p)->getName() << " ";
+  */
 
   (*output) << "</text>" << endl;
   (*output) << "      </finalmarking>" << endl;
@@ -823,32 +694,34 @@ void PetriNet::output_pep(ostream *output) const
 
   // places (only internal)
   (*output) << "PL" << endl;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    (*output) << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40";
-    if ((*p)->tokens > 0)
-      (*output) << "M" << (*p)->tokens;
+    // FIXME:(*output) << (*p)->id << "\"" << (*p)->getName() << "\"80@40";
+    if ((*p)->getTokenCount() > 0)
+      (*output) << "M" << (*p)->getTokenCount();
     (*output) << "k1" << endl;
   }
 
   // transitions
   (*output) << "TR" << endl;
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40" << endl;
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    ;// FIXME:(*output) << (*t)->id << "\"" << (*t)->getName() << "\"80@40" << endl;
 
   // arcs from transitions to places (no output places)
+  /* FIXME
   (*output) << "TP" << endl;
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    if (((*f)->source->nodeType) == TRANSITION)
-      if ( P_out.find(static_cast<Place*>((*f)->target)) == P_out.end())
-        (*output) << (*f)->source->id << "<" << (*f)->target->id << "w" << (*f)->weight << endl;
+  for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+    if (((*f)->getSourceNode()->nodeType) == TRANSITION)
+      if ( outputPlaces_.find(static_cast<Place*>((*f)->getTargetNode())) == outputPlaces_.end())
+        (*output) << (*f)->getSourceNode()->id << "<" << (*f)->getTargetNode()->id << "w" << (*f)->getWeight() << endl;
 
   // arcs from places to transitions
   (*output) << "PT" << endl;
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    if (((*f)->source->nodeType) == PLACE)
-      if ( P_in.find(static_cast<Place*>((*f)->source)) == P_in.end())
-        (*output) << (*f)->source->id << ">" << (*f)->target->id << "w" << (*f)->weight << endl;
+  for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+    if (((*f)->getSourceNode()->nodeType) == PLACE)
+      if ( inputPlaces_.find(static_cast<Place*>((*f)->getSourceNode())) == inputPlaces_.end())
+        (*output) << (*f)->getSourceNode()->id << ">" << (*f)->getTargetNode()->id << "w" << (*f)->getWeight() << endl;
+  */
 }
 
 
@@ -874,29 +747,29 @@ void PetriNet::output_ina(ostream *output) const
   assert(output != NULL);
 
   // net header
-  (*output) << "P   M   PRE,POST  NETZ 1:" << globals::filename.substr(0, globals::filename.find_first_of(".")) << endl;
+  //(*output) << "P   M   PRE,POST  NETZ 1:" << globals::filename.substr(0, globals::filename.find_first_of(".")) << endl;
 
   // places (only internal)
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    (*output) << setw(3) << (*p)->id << " " << (*p)->tokens << "     ";
+    // FIXME:(*output) << setw(3) << (*p)->id << " " << (*p)->getTokenCount() << "     ";
 
-    for (set<Node*>::iterator t = (*p)->preset.begin(); t != (*p)->preset.end(); t++)
+    for (set<Node*>::iterator t = (*p)->getPreset().begin(); t != (*p)->getPreset().end(); t++)
     {
-      if (t != (*p)->preset.begin())
+      if (t != (*p)->getPreset().begin())
         (*output) << " ";
 
-      (*output) << (*t)->id << ":" << arc_weight(*t, *p);
+      // FIXME:(*output) << (*t)->id << ":" << arc_weight(*t, *p);
     }
 
     (*output) << ", ";
 
-    for (set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
+    for (set<Node*>::iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
     {
-      if (t != (*p)->postset.begin())
+      if (t != (*p)->getPostset().begin())
         (*output) << " ";
 
-      (*output) << (*t)->id << ":" << arc_weight(*p, *t);
+      // FIXME:(*output) << (*t)->id << ":" << arc_weight(*p, *t);
     }
 
     (*output) << endl;
@@ -908,10 +781,10 @@ void PetriNet::output_ina(ostream *output) const
   // place names
   (*output) << "place nr.             name capacity time" << endl;
 
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    (*output) << right << setw(8) << (*p)->id << ": ";
-    (*output) << left << setw(16) << (*p)->nodeShortName();
+    // FIXME:(*output) << right << setw(8) << (*p)->id << ": ";
+    (*output) << left << setw(16) << (*p)->getName();
     (*output) << "       oo    0" << endl;
   }
 
@@ -921,19 +794,19 @@ void PetriNet::output_ina(ostream *output) const
   // transition names
   (*output) << "trans nr.             name priority time" << endl;
 
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
-    (*output) << right << setw(8) << (*t)->id << ": ";
-    (*output) << left << setw(16) << (*t)->nodeShortName();
+    // FIXME:(*output) << right << setw(8) << (*t)->id << ": ";
+    (*output) << left << setw(16) << (*t)->getName();
     (*output) << "        0    0" << endl;
   }
 
   (*output) << "@" << endl;
 
   // info (ignored after last '@')
-  (*output) << "generated by: " << getPackageString() << endl;
-  (*output) << "input file:   `" << globals::filename << "'" << endl;
-  (*output) << "net size:     " << information() << endl;
+  //(*output) << "generated by: " << getPackageString() << endl;
+  //(*output) << "input file:   `" << globals::filename << "'" << endl;
+  //(*output) << "net size:     " << information() << endl;
 }
 
 
@@ -958,9 +831,9 @@ void PetriNet::output_spin(ostream *output) const
   (*output) << "/* NO 1-safe */" << endl;
 
   // places (only internal)
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    (*output) << "byte p" << (*p)->id << "=" << (*p)->tokens << ";" << endl;
+    // FIXME:(*output) << "byte p" << (*p)->id << "=" << (*p)->getTokenCount() << ";" << endl;
   }
 
   (*output) << "int {" << endl;
@@ -968,18 +841,18 @@ void PetriNet::output_spin(ostream *output) const
 
 
   // transitions
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
     int follower=0;
     (*output) << "\t::atomic { (";
 
-    if ((*t)->preset.empty())
+    if ((*t)->getPreset().empty())
     {
       (*output) << "0";
     }
     else
     {
-      for (set<Node *>::iterator p = (*t)->preset.begin(); p != (*t)->preset.end(); p++)
+      for (set<Node *>::iterator p = (*t)->getPreset().begin(); p != (*t)->getPreset().end(); p++)
       {
         if(follower)
         {
@@ -989,22 +862,22 @@ void PetriNet::output_spin(ostream *output) const
         {
           follower=1;
         }
-        (*output) << "(p" << (*p)->id << ">=" << arc_weight(*p,*t) << ")";
+        // FIXME:(*output) << "(p" << (*p)->id << ">=" << arc_weight(*p,*t) << ")";
       }
     }
 
     (*output) << ") -> ";
 
-    for (set<Node *>::iterator p = (*t)->preset.begin(); p != (*t)->preset.end(); p++)
+    for (set<Node *>::iterator p = (*t)->getPreset().begin(); p != (*t)->getPreset().end(); p++)
     {
-      (*output) << "p" << (*p)->id << "=p" << (*p)->id << "-" << arc_weight(*p,*t) << ";";
+      // FIXME:(*output) << "p" << (*p)->id << "=p" << (*p)->id << "-" << arc_weight(*p,*t) << ";";
     }
 
     (*output) << endl << "\t\t\t";
 
-    for (set<Node *>::iterator p = (*t)->postset.begin(); p != (*t)->postset.end(); p++)
+    for (set<Node *>::iterator p = (*t)->getPostset().begin(); p != (*t)->getPostset().end(); p++)
     {
-      (*output) << "p" << (*p)->id << "=p" << (*p)->id << "+" << arc_weight(*t,*p) << ";";
+      // FIXME:(*output) << "p" << (*p)->id << "=p" << (*p)->id << "+" << arc_weight(*t,*p) << ";";
     }
 
     (*output) << " }" << endl;
@@ -1034,42 +907,44 @@ void PetriNet::output_apnn(ostream *output) const
 {
   assert(output != NULL);
 
-  (*output) << "\\beginnet{" << globals::filename << "}" << endl << endl;
+  //(*output) << "\\beginnet{" << globals::filename << "}" << endl << endl;
 
   // places (only internal)
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    (*output) << "  \\place{" << (*p)->nodeShortName() << "}{";
-    if ((*p)->tokens > 0)
-      (*output) << "\\init{" << (*p)->tokens << "}";
+    (*output) << "  \\place{" << (*p)->getName() << "}{";
+    if ((*p)->getTokenCount() > 0)
+      (*output) << "\\init{" << (*p)->getTokenCount() << "}";
     (*output) << "}" << endl;
   }
   (*output) << endl;
 
   // transitions
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
-    (*output) << "  \\transition{" << (*t)->nodeShortName() << "}{}" << endl;
+    (*output) << "  \\transition{" << (*t)->getName() << "}{}" << endl;
   }
   (*output) << endl;
 
   // arcs
   int arcNumber = 1;
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
+  for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++, arcNumber++)
   {
+    /* FIXME
     // ignore input places
-    if ((*f)->source->nodeType == PLACE)
-      if ( P_in.find(static_cast<Place*>((*f)->source)) != P_in.end())
+    if ((*f)->getSourceNode()->nodeType == PLACE)
+      if ( inputPlaces_.find(static_cast<Place*>((*f)->getSourceNode())) != inputPlaces_.end())
         continue;
 
     // ignore output places
-    if ((*f)->target->nodeType == PLACE)
-      if ( P_out.find(static_cast<Place*>((*f)->target)) != P_out.end())
+    if ((*f)->getTargetNode()->nodeType == PLACE)
+      if ( outputPlaces_.find(static_cast<Place*>((*f)->getTargetNode())) != outputPlaces_.end())
         continue;
+    */
 
     (*output) << "  \\arc{a" << arcNumber << "}{ ";
-    (*output) << "\\from{" << (*f)->source->nodeShortName() << " } ";
-    (*output) << "\\to{" << (*f)->target->nodeShortName() << "} \\weight{" << (*f)->weight << "} }" << endl;
+    (*output) << "\\from{" << (*f)->getSourceNode().getName() << " } ";
+    (*output) << "\\to{" << (*f)->getTargetNode().getName() << "} \\weight{" << (*f)->getWeight() << "} }" << endl;
   }
   (*output) << endl;
 
@@ -1095,7 +970,7 @@ void PetriNet::output_lola(ostream *output) const
 {
   assert(output != NULL);
 
-  (*output) << "{ Petri net created by " << getPackageString() << " reading " << globals::filename << " }" << endl << endl;
+  //(*output) << "{ Petri net created by " << getPackageString() << " reading " << globals::filename << " }" << endl << endl;
 
   {
     /************************
@@ -1105,11 +980,11 @@ void PetriNet::output_lola(ostream *output) const
     // places (only internal)
     (*output) << "PLACE" << endl;
     unsigned int count = 1;
-    for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
+    for (set<Place *>::iterator p = places_.begin(); p != places_.end(); count++, p++)
     {
-      (*output) << "  " << (*p)->nodeShortName();
+      (*output) << "  " << (*p)->getName();
 
-      if (count < P.size())
+      if (count < places_.size())
         (*output) << "," << endl;
     }
     (*output) << endl << ";" << endl << endl << endl;
@@ -1122,52 +997,52 @@ void PetriNet::output_lola(ostream *output) const
   // initial marking
   (*output) << "MARKING" << endl;
   unsigned int count = 1;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
   {
-    if ((*p)->tokens > 0)
+    if ((*p)->getTokenCount() > 0)
     {
       if (count++ != 1)
         (*output) << "," << endl;
 
-      (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->getName() << ":\t" << (*p)->getTokenCount();
     }
   }
   (*output) << endl << ";" << endl << endl << endl;
 
 
   // transitions
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
-    (*output) << "TRANSITION " << (*t)->nodeShortName() << endl;
+    (*output) << "TRANSITION " << (*t)->getName() << endl;
 
     (*output) << "CONSUME" << endl;
     count = 1;
-    for (set<Node *>::iterator pre = (*t)->preset.begin(); pre != (*t)->preset.end(); count++, pre++)
+    for (set<Node *>::iterator pre = (*t)->getPreset().begin(); pre != (*t)->getPreset().end(); count++, pre++)
     {
       // ignore input places
-      if ( (*pre)->nodeType == PLACE )
-        if ( P_in.find(static_cast<Place*>(*pre)) != P_in.end())
+      // FIXME: if ( (*pre)->nodeType == PLACE )
+        if ( inputPlaces_.find(static_cast<Place*>(*pre)) != inputPlaces_.end())
           continue;
 
-      (*output) << "  " << (*pre)->nodeShortName() << ":\t" << arc_weight(*pre, *t);
+	(*output) << "  " << (*pre)->getName() << ":\t" << findArc(**pre, **t)->getWeight();
 
-      if (count < (*t)->preset.size())
+      if (count < (*t)->getPreset().size())
         (*output) << "," << endl;
     }
     (*output) << ";" << endl;
 
     (*output) << "PRODUCE" << endl;
     count = 1;
-    for (set<Node *>::iterator post = (*t)->postset.begin(); post != (*t)->postset.end(); count++, post++)
+    for (set<Node *>::iterator post = (*t)->getPostset().begin(); post != (*t)->getPostset().end(); count++, post++)
     {
       // ignore output places
-      if ( (*post)->nodeType == PLACE )
-        if ( P_out.find(static_cast<Place*>(*post)) != P_out.end())
+      //FIXME: if ( (*post)->nodeType == PLACE )
+        if ( outputPlaces_.find(static_cast<Place*>(*post)) != outputPlaces_.end())
           continue;
 
-      (*output) << "  " << (*post)->nodeShortName() << ":\t" << arc_weight(*t, *post);
+	(*output) << "  " << (*post)->getName() << ":\t" << findArc(**t, **post)->getWeight();
 
-      if (count < (*t)->postset.size())
+      if (count < (*t)->getPostset().size())
         (*output) << "," << endl;
     }
 
@@ -1201,15 +1076,15 @@ void PetriNet::output_owfn(ostream *output) const
   assert(output != NULL);
 
   (*output) << "{" << endl;
-  (*output) << "  generated by: " << getPackageString() << endl;
+  //(*output) << "  generated by: " << getPackageString() << endl;
 #ifdef USING_BPEL2OWFN
   (*output) << "  input file:   `" << globals::filename << "' (process `" << globals::ASTEmap[1]->attributes["name"] << "')" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
-  (*output) << "  input file:   `" << globals::filename << "'" << endl;
+  //(*output) << "  input file:   `" << globals::filename << "'" << endl;
 #endif
-  (*output) << "  invocation:   `" << getInvocation() << "'" << endl;
-  (*output) << "  net size:     " << information() << endl;
+  //(*output) << "  invocation:   `" << getInvocation() << "'" << endl;
+  //(*output) << "  net size:     " << information() << endl;
   (*output) << "}" << endl << endl;
 
   // places
@@ -1220,18 +1095,18 @@ void PetriNet::output_owfn(ostream *output) const
   (*output) << "    ";
 
   unsigned int count = 1;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
+  for (set<Place *>::iterator p = internalPlaces_.begin(); p != internalPlaces_.end(); count++, p++)
   {
-    if( (*p)->capacity > 0)
+    if( (*p)->getCapacity() > 0)
     {
-      (*output) << "SAFE " << (*p)->capacity << " : ";
+      (*output) << "SAFE " << (*p)->getCapacity() << " : ";
     }
 #ifdef USING_BPEL2OWFN
-    (*output) << (*p)->nodeShortName();
+    (*output) << (*p)->getName();
 #else
-    (*output) << (*p)->nodeName();
+    (*output) << (*p)->getName();
 #endif
-    if (count < P.size())
+    if (count < internalPlaces_.size())
       (*output) << "; ";
   }
   (*output) << ";" << endl << endl;
@@ -1240,20 +1115,22 @@ void PetriNet::output_owfn(ostream *output) const
   // input places
   (*output) << "  INPUT" << endl;
   count = 1;
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); count++, p++)
+  for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); count++, p++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "    " << (*p)->nodeShortName();
+    (*output) << "    " << (*p)->getName();
 #else
-    (*output) << "    " << (*p)->nodeName();
+    (*output) << "    " << (*p)->getName();
 #endif
 
+    /*
       if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
         (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
       if ((*p)->max_occurrences == UINT_MAX)
         (*output) << " {$ MAX_OCCURRENCES = -1 $}";
+    */
 
-    if (count < P_in.size())
+    if (count < inputPlaces_.size())
       (*output) << "," << endl;
   }
   (*output) << ";" << endl << endl;
@@ -1262,20 +1139,22 @@ void PetriNet::output_owfn(ostream *output) const
   // output places
   (*output) << "  OUTPUT" << endl;
   count = 1;
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); count++, p++)
+  for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); count++, p++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "    " << (*p)->nodeShortName();
+    (*output) << "    " << (*p)->getName();
 #else
-    (*output) << "    " << (*p)->nodeName();
+    (*output) << "    " << (*p)->getName();
 #endif
 
+    /*
       if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
         (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
       if ((*p)->max_occurrences == UINT_MAX)
         (*output) << " {$ MAX_OCCURRENCES = -1 $}";
+    */
 
-    if (count < P_out.size())
+    if (count < outputPlaces_.size())
       (*output) << "," << endl;
   }
   (*output) << ";" << endl << endl;
@@ -1284,20 +1163,20 @@ void PetriNet::output_owfn(ostream *output) const
   // initial marking
   (*output) << endl << "INITIALMARKING" << endl;
   count = 1;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = internalPlaces_.begin(); p != internalPlaces_.end(); p++)
   {
-    if ((*p)->tokens > 0)
+    if ((*p)->getTokenCount() > 0)
     {
       if (count++ != 1)
         (*output) << "," << endl;
 
 #ifdef USING_BPEL2OWFN
-      (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->getName() << ":\t" << (*p)->getTokenCount();
 #else
-      (*output) << "  " << (*p)->nodeName() << ":\t" << (*p)->tokens;
+      (*output) << "  " << (*p)->getName() << ":\t" << (*p)->getTokenCount();
 #endif
 
-      if ((*p)->historyContains("1.internal.initial"))
+      //FIXME: if ((*p)->historyContains("1.internal.initial"))
         (*output) << " {initial place}";
     }
   }
@@ -1309,6 +1188,7 @@ void PetriNet::output_owfn(ostream *output) const
   // if the set of final markings is not empty: iterate and add all final markings
   // else: there is only one final marking, have a look at all places and check isFinal.
 
+  /*
   if (final_set_list.size() <= 1)
   {
     (*output) << "FINALMARKING" << endl << "  ";
@@ -1324,9 +1204,9 @@ void PetriNet::output_owfn(ostream *output) const
         }
 
 #ifdef USING_BPEL2OWFN
-        (*output) << (p->first)->nodeShortName();
+        (*output) << (p->first)->getName();
 #else
-        (*output) << (p->first)->nodeName();
+        (*output) << (p->first)->getName();
 #endif
         assert(p->second > 0);
         if (p->second > 1)
@@ -1355,9 +1235,9 @@ void PetriNet::output_owfn(ostream *output) const
       {
         pair<Place*, unsigned int> p = (*((*final_set).begin()));
 #ifdef USING_BPEL2OWFN
-        (*output) << "( (" << p.first->nodeShortName() << "=" << p.second << ") AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p.first->getName() << "=" << p.second << ") AND ALL_OTHER_PLACES_EMPTY )";
 #else
-        (*output) << "( (" << p.first->nodeName() << "=" << p.second << ") AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << "( (" << p.first->getName() << "=" << p.second << ") AND ALL_OTHER_PLACES_EMPTY )";
 #endif
       }
       else
@@ -1370,9 +1250,9 @@ void PetriNet::output_owfn(ostream *output) const
             (*output) << " AND ";
 
 #ifdef USING_BPEL2OWFN
-          (*output) << "(" << (p->first)->nodeShortName() << "=" p->second << ")";
+          (*output) << "(" << (p->first)->getName() << "=" p->second << ")";
 #else
-          (*output) << "(" << (p->first)->nodeName() << "=" << p->second << ")";
+          (*output) << "(" << (p->first)->getName() << "=" << p->second << ")";
 #endif
           first_place = false;
         }
@@ -1388,38 +1268,40 @@ void PetriNet::output_owfn(ostream *output) const
 
   }
   (*output) << ";" << endl << endl << endl;
+  */
 
 
   // transitions
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "TRANSITION " << (*t)->nodeShortName();
+    (*output) << "TRANSITION " << (*t)->getName();
 #else
-    (*output) << "TRANSITION " << (*t)->nodeShortName();
+    (*output) << "TRANSITION " << (*t)->getName();
 #endif
-    switch( (*t)->type )
-    {
-      case (INTERNAL):	(*output) << endl; break;
-      case(IN):		(*output) << " { input }" << endl; break;
-      case(OUT):	(*output) << " { output }" << endl; break;
-      case(INOUT):	(*output) << " { input/output }" << endl; break;
+    switch( (*t)->getType() )
+      {
+      case (Node::INTERNAL):	(*output) << endl; break;
+      case(Node::INPUT):		(*output) << " { input }" << endl; break;
+      case(Node::OUTPUT):	(*output) << " { output }" << endl; break;
+	// FIXME: case(INOUT):	(*output) << " { input/output }" << endl; break;
     }
 
     (*output) << "  CONSUME ";
     count = 1;
-    for (set<Node *>::iterator pre = (*t)->preset.begin(); pre != (*t)->preset.end(); count++, pre++)
+    for (set<Node *>::iterator pre = (*t)->getPreset().begin(); pre != (*t)->getPreset().end(); count++, pre++)
     {
 #ifdef USING_BPEL2OWFN
-      (*output) << (*pre)->nodeShortName();
+      (*output) << (*pre)->getName();
 #else
-      (*output) << (*pre)->nodeName();
+      (*output) << (*pre)->getName();
 #endif
 
-      if (arc_weight(*pre, *t) != 1)
-        (*output) << ":" << arc_weight(*pre, *t);
+      unsigned int weight = findArc(**pre, **t)->getWeight();
+      if (weight != 1)
+        (*output) << ":" << weight;
 
-      if (count < (*t)->preset.size())
+      if (count < (*t)->getPreset().size())
         (*output) << ", ";
     }
     (*output) << ";" << endl;
@@ -1427,23 +1309,25 @@ void PetriNet::output_owfn(ostream *output) const
     (*output) << "  PRODUCE ";
 
     count = 1;
-    for (set<Node *>::iterator post = (*t)->postset.begin(); post != (*t)->postset.end(); count++, post++)
+    for (set<Node *>::iterator post = (*t)->getPostset().begin(); post != (*t)->getPostset().end(); count++, post++)
     {
 #ifdef USING_BPEL2OWFN
-      (*output) << (*post)->nodeShortName();
+      (*output) << (*post)->getName();
 #else
-      (*output) << (*post)->nodeName();
+      (*output) << (*post)->getName();
 #endif
-      if (arc_weight(*t, *post) != 1)
-        (*output) << ":" << arc_weight(*t, *post);
 
-      if (count < (*t)->postset.size())
+      unsigned int weight = findArc(**t, **post)->getWeight();
+      if (weight != 1)
+        (*output) << ":" << weight;
+
+      if (count < (*t)->getPostset().size())
         (*output) << ", ";
     }
 
     (*output) << ";" << endl << endl;
   }
-  (*output) << endl << "{ END OF FILE `" << globals::output_filename << ".owfn' }" << endl << endl;
+  //(*output) << endl << "{ END OF FILE `" << globals::output_filename << ".owfn' }" << endl << endl;
 }
 
 
@@ -1475,42 +1359,22 @@ void PetriNet::output_gastex(ostream *output) const
  * \param   os  an output stream to which the net is streamed
  * \param   obj a PetriNet object
  */
-ostream& PNapi::operator<< (ostream& os, const PNapi::PetriNet &obj)
+ostream& pnapi::operator<< (ostream& os, const pnapi::PetriNet &obj)
 {
-  switch (obj.format)
-  {
-    case(FORMAT_APNN):	obj.output_apnn(&os); break;
-    case(FORMAT_DOT):	obj.output_dot(&os, obj.use_standard_style); break;
-    case(FORMAT_INA):	obj.output_ina(&os); break;
-    case(FORMAT_SPIN):	obj.output_spin(&os); break;
-    case(FORMAT_INFO):	obj.output_info(&os); break;
-    case(FORMAT_LOLA):	obj.output_lola(&os); break;
-    case(FORMAT_OWFN):	obj.output_owfn(&os); break;
-    case(FORMAT_PEP):	obj.output_pep(&os); break;
-    case(FORMAT_PNML):	obj.output_pnml(&os); break;
-    case(FORMAT_GASTEX): obj.output_gastex(&os); break;
+  switch (obj.format_)
+    {
+    case(PetriNet::FORMAT_APNN):	obj.output_apnn(&os); break;
+    case(PetriNet::FORMAT_DOT):	obj.output_dot(&os, true); break;
+    case(PetriNet::FORMAT_INA):	obj.output_ina(&os); break;
+    case(PetriNet::FORMAT_SPIN):	obj.output_spin(&os); break;
+    case(PetriNet::FORMAT_INFO):	obj.output_info(&os); break;
+    case(PetriNet::FORMAT_LOLA):	obj.output_lola(&os); break;
+    case(PetriNet::FORMAT_OWFN):	obj.output_owfn(&os); break;
+    case(PetriNet::FORMAT_PEP):	obj.output_pep(&os); break;
+    case(PetriNet::FORMAT_PNML):	obj.output_pnml(&os); break;
+    case(PetriNet::FORMAT_GASTEX): obj.output_gastex(&os); break;
     default:		break;
   }
 
   return os;
 }
-
-
-
-
-
-/*!
- * \brief   set the output format
- *
- *          Set the output format to be used when the <<-operator is called
- *          the next time.
- *
- * \param   my_format  the output format from the enumeration output_format.
- * \param   standard   if set to false a different output format style is used
- */
-void PetriNet::set_format(output_format my_format, bool standard)
-{
-  format = my_format;
-  use_standard_style = standard;
-}
-

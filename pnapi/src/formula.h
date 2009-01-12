@@ -1,17 +1,19 @@
-#ifndef FORMULA_H
-#define FORMULA_H
+#ifndef PNAPI_FORMULA_H
+#define PNAPI_FORMULA_H
 
-#include "typedefs.h"
-
-typedef enum { EQ, NEQ, G, GEQ, L, LEQ, NOT, AND, OR, NONE } ftype;
-
-namespace PNapi
+namespace pnapi
 {
 
 /// forward declaration needed by
 class Place;
 class Node;
 
+/*!
+ * \brief   Final Condition Formulas
+ */
+namespace formula {
+
+typedef enum { EQ, NEQ, G, GEQ, L, LEQ, NOT, AND, OR, NONE } ftype;
 
 class Formula
 {
@@ -215,6 +217,8 @@ public:
   ftype getType();
 };
 
-} /* namespace PNapi */
+} /* namespace formula */
+
+} /* namespace pnapi */
 
 #endif /* FORMULA_H */

@@ -26,6 +26,9 @@
 /* we read only one file */
 %option noyywrap
 
+/* yyunput not needed (fix compiler warning) */
+%option nounput
+
 
  /***************************************************************************** 
   * C declarations 
@@ -112,7 +115,7 @@ NOT                             { return OP_NOT;}
   pnapi_owfn_lval.yt_int = atoi(yytext);
   return NEGATIVE_NUMBER; }
 [^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { 
-  pnapi_owfn_lval.yt_string = yytext;
+  pnapi_owfn_lval.yt_string = new string(yytext);
   return IDENT; }
 [\n\r]                          { break; }
 [ \t]                           { break; }

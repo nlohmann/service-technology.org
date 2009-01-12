@@ -52,12 +52,26 @@ namespace pnapi
   /*!
    * \brief   Marking of all places of a net
    *
-   * \note    In the future this class might contain a highly efficient 
-   *          implementation if necessary. For now, we use a simple one to 
+   * \note    In the future this class might contain a highly efficient
+   *          implementation if necessary. For now, we use a simple one to
    *          determine the needed functionality.
    */
   class Marking
   {
+  public:
+    Marking();
+    Marking(PetriNet &n);
+    virtual ~Marking();
+
+    map<Place *, unsigned int> getMap() const;
+
+    unsigned int size();
+
+    unsigned int & operator[](Place *offset);
+    bool operator==(const Marking &mm) const;
+
+  private:
+    map<Place *, unsigned int> m;
   };
 
 
@@ -96,8 +110,8 @@ namespace pnapi
     //@{
 
     /// possible file formats for I/O operations
-    enum IOFormat 
-      { 
+    enum IOFormat
+      {
 	FORMAT_OWFN,      ///< Open Workflow Net, format used e.g. by Fiona
 	FORMAT_ONWD,      ///< Open Net Wiring Description
 	FORMAT_APNN,      ///< Abstract Petri Net Notation (APNN)
@@ -156,7 +170,7 @@ namespace pnapi
 
     //@}
 
-    
+
     /*!
      * \name   Creating a Petri net
      *
@@ -184,8 +198,22 @@ namespace pnapi
     //@{
 
     /// compose two nets by adding the given one and merging interfaces
-    void compose(const PetriNet &, const string & = "net1", 
+    void compose(const PetriNet &, const string & = "net1",
 		 const string & = "net2");
+
+    /// deletes all interface places
+    void makeInnerStructure();
+
+    /// normalizes the Petri net
+    void normalize();
+
+    /// checks the finalcondition for Marking m
+    bool checkFinalCondition(Marking &m) const;
+
+    /// calculates the successor m' from m using transition t
+    Marking & successorMarking(Marking &m, Transition *t) const;
+
+    bool activates(Marking &m, Transition &t) const;
 
     // TODO: add reduce()
 
@@ -194,13 +222,13 @@ namespace pnapi
 
 
   private:
-    
+
     /* general properties */
 
     /// format for input/output operations
     IOFormat format_;
 
-    
+
     /* (overlapping) sets for net structure */
 
     /// set of all nodes
@@ -271,7 +299,7 @@ namespace pnapi
     void deleteNode(Node &);
 
     /// merge arcs (used by mergePlaces())
-    void mergeArcs(Place &, Place &, const set<Node *> &, const set<Node *> &, 
+    void mergeArcs(Place &, Place &, const set<Node *> &, const set<Node *> &,
 		   bool);
 
     /// merges two (internal) places
@@ -305,9 +333,6 @@ namespace pnapi
     /// calculate the maximal occurrences of communication
     void calculate_max_occurrences();
 
-    /// deletes all interface places
-    void makeInnerStructure();
-
     /// reevaluates the type of a transition
     void reevaluateType(Transition *t);
 
@@ -326,9 +351,6 @@ namespace pnapi
     /// checks the Petri net for free choice criterion
     bool isFreeChoice() const;
 
-    /// normalizes the Petri net
-    void normalize();
-
 
     /* markings and final condition */
 
@@ -338,24 +360,18 @@ namespace pnapi
     /// reforms the marking m to the places' token
     void marking2Places(Marking &m);
 
-    /// calculates the successor m' from m using transition t
-    Marking calcSuccessorMarking(Marking &m, Transition *t) const;
-
     /// looks for a living transition under m
     Transition *findLivingTransition(Marking &m) const;
-
-    /// checks the finalcondition for Marking m
-    bool checkFinalCondition(Marking &m) const;
 
 
     /* petrify */
 
     /// crates a petri net from an STG file
     void createFromSTG(vector<string> & edgeLabels, const string & fileName, set<string>& inputPlacenames, set<string>& outputPlacenames);
-    
+
     /// helper function for STG2oWFN
     string remap(string edge, vector<string> & edgeLabels);
-    
+
 
     /* output */
 

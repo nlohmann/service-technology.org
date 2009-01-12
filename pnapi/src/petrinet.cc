@@ -33,9 +33,67 @@ namespace pnapi
 {
 
   /*!
-   * Reads a Petri net from a stream (in most cases backed by a file). The 
+   * \brief   Constructor for marking class
+   */
+  Marking::Marking()
+  {
+  }
+
+
+  /*!
+   * \brief   Constructor for marking class
+   *
+   * Reads marking from the Petri net.
+   *
+   * \param   PetriNet &n
+   */
+  Marking::Marking(PetriNet &n)
+  {
+    for (set<Place *>::const_iterator p = n.getPlaces().begin(); p != n.getPlaces().end(); p++)
+      m[*p] = (*p)->getTokenCount();
+  }
+
+
+  /*!
+   * \brief   Returns the map..
+   */
+  map<Place *, unsigned int> Marking::getMap() const
+  {
+    return m;
+  }
+
+
+  /*!
+   * \brief   Returns the size of the Marking
+   */
+  unsigned int Marking::size()
+  {
+    return m.size();
+  }
+
+
+  /*!
+   * \brief   overloaded operator [] for Markings
+   */
+  unsigned int & Marking::operator [](Place *offset)
+  {
+    return m[offset];
+  }
+
+
+  /*!
+   * \brief   overloaded operator == for Markings
+   */
+  bool Marking::operator ==(const Marking &mm) const
+  {
+    return m == mm.getMap();
+  }
+
+
+  /*!
+   * Reads a Petri net from a stream (in most cases backed by a file). The
    * format
-   * of the stream data is not determined automatically. You have to set it 
+   * of the stream data is not determined automatically. You have to set it
    * explicitly using PetriNet::setFormat().
    */
   istream & operator>>(istream & is, PetriNet & net)
@@ -50,11 +108,11 @@ namespace pnapi
 	  net = visitor.getPetriNet();
 	  break;
 	}
-	
+
       default:
 	assert(false);  // unsupported input format
       }
-    
+
     return is;
   }
 
@@ -75,7 +133,7 @@ namespace pnapi
     *this += net;
   }
 
-  
+
   /*!
    * The destructor of the PetriNet class.
    */
@@ -86,7 +144,7 @@ namespace pnapi
       deletePlace(**it);
 
     // delete all transitions
-    for (set<Transition *>::iterator it = transitions_.begin(); 
+    for (set<Transition *>::iterator it = transitions_.begin();
 	 it != transitions_.end(); ++it)
       deleteTransition(**it);
   }
@@ -106,7 +164,7 @@ namespace pnapi
 
   /*!
    */
-  void PetriNet::compose(const PetriNet & net, const string & prefix, 
+  void PetriNet::compose(const PetriNet & net, const string & prefix,
 			 const string & netPrefix)
   {
     assert(prefix != netPrefix);
@@ -207,7 +265,7 @@ namespace pnapi
 
 
   /*!
-   * \return  a pointer to the place or a NULL pointer if the place was not 
+   * \return  a pointer to the place or a NULL pointer if the place was not
    *          found.
    */
   Place * PetriNet::findPlace(const string & name) const
@@ -218,7 +276,7 @@ namespace pnapi
 
 
   /*!
-   * \return  a pointer to the transition or a NULL pointer if the transition 
+   * \return  a pointer to the transition or a NULL pointer if the transition
    *          was not found.
    */
   Transition * PetriNet::findTransition(const string & name) const
@@ -233,7 +291,7 @@ namespace pnapi
   Arc * PetriNet::findArc(const Node & source, const Node & target) const
   {
     for (set<Arc *>::iterator it = arcs_.begin(); it != arcs_.end(); ++it)
-      if (&(*it)->getSourceNode() == &source && 
+      if (&(*it)->getSourceNode() == &source &&
 	  &(*it)->getTargetNode() == &target)
 	return *it;
 
@@ -243,7 +301,7 @@ namespace pnapi
 
   /*!
    */
-  const set<Node *> & PetriNet::getNodes() const 
+  const set<Node *> & PetriNet::getNodes() const
   {
     return nodes_;
   }
@@ -320,8 +378,8 @@ namespace pnapi
   }
 
 
-  void PetriNet::mergeArcs(Place & p1, Place & p2, 
-			   const set<Node *> & set1, const set<Node *> & set2, 
+  void PetriNet::mergeArcs(Place & p1, Place & p2,
+			   const set<Node *> & set1, const set<Node *> & set2,
 			   bool isPostset)
   {
     for (set<Node *>::iterator it = set2.begin(); it != set2.end(); ++it)
@@ -353,12 +411,12 @@ namespace pnapi
     Place * p;
 
     // add all transitions of the net
-    for (set<Transition *>::iterator it = net.transitions_.begin(); 
+    for (set<Transition *>::iterator it = net.transitions_.begin();
 	 it != net.transitions_.end(); ++it)
       new Transition(*this, **it);
 
     // add all non-existing places and merge existing ones
-    for (set<Place *>::iterator it = net.places_.begin(); 
+    for (set<Place *>::iterator it = net.places_.begin();
 	 it != net.places_.end(); ++it)
       {
 	p = findPlace((*it)->getName());
@@ -366,7 +424,7 @@ namespace pnapi
 	  new Place(*this, **it);
 	else
 	  {
-	    assert((p->getType() == Place::INPUT && 
+	    assert((p->getType() == Place::INPUT &&
 		    (*it)->getType() == Place::OUTPUT) ||
 		   (p->getType() == Place::OUTPUT &&
 		    (*it)->getType() == Place::INPUT));
@@ -376,7 +434,7 @@ namespace pnapi
       }
 
     // create arcs according to the arcs in the net
-    for (set<Arc *>::iterator it = net.arcs_.begin(); it != net.arcs_.end(); 
+    for (set<Arc *>::iterator it = net.arcs_.begin(); it != net.arcs_.end();
 	 ++it)
       new Arc(*this, **it);
 
@@ -405,11 +463,11 @@ namespace pnapi
 
   /*!
    */
-  void PetriNet::updateNodeNameHistory(Node & node, 
+  void PetriNet::updateNodeNameHistory(Node & node,
 				       const deque<string> & oldHistory)
   {
     assert(containsNode(node));
-    
+
     finalizeNodeNameHistory(node, oldHistory);
     initializeNodeNameHistory(node);
   }
@@ -462,7 +520,7 @@ namespace pnapi
     initializePlaceType(place);
   }
 
-  
+
   void PetriNet::updateTransitions(Transition & trans)
   {
     updateNodes(trans);
@@ -497,20 +555,20 @@ namespace pnapi
 
 
   /*!
-   * \note  Never call this method directly! Use deletePlace() or 
+   * \note  Never call this method directly! Use deletePlace() or
    *        deleteTransition() instead!
    */
   void PetriNet::deleteNode(Node & node)
   {
     assert(containsNode(node));
-    assert(dynamic_cast<Place *>(&node) == NULL ? true : 
+    assert(dynamic_cast<Place *>(&node) == NULL ? true :
 	   places_.find(dynamic_cast<Place *>(&node)) == places_.end());
-    assert(dynamic_cast<Transition *>(&node) == NULL ? true : 
-	   transitions_.find(dynamic_cast<Transition *>(&node)) == 
+    assert(dynamic_cast<Transition *>(&node) == NULL ? true :
+	   transitions_.find(dynamic_cast<Transition *>(&node)) ==
 	   transitions_.end());
 
     // FIXME: arcs and pre-/postsets!
-    
+
     finalizeNodeNameHistory(node, node.getNameHistory());
     nodes_.erase(&node);
 
@@ -521,7 +579,7 @@ namespace pnapi
   void PetriNet::initializeNodeNameHistory(Node & node)
   {
     deque<string> history = node.getNameHistory();
-    for (deque<string>::iterator it = history.begin(); it != history.end(); 
+    for (deque<string>::iterator it = history.begin(); it != history.end();
 	 ++it)
       {
 	assert((nodesByName_.find(*it))->second == &node ||
@@ -531,10 +589,10 @@ namespace pnapi
   }
 
 
-  void PetriNet::finalizeNodeNameHistory(Node & node, 
+  void PetriNet::finalizeNodeNameHistory(Node & node,
 					 const deque<string> & history)
   {
-    for (deque<string>::const_iterator it = history.begin(); 
+    for (deque<string>::const_iterator it = history.begin();
 	 it != history.end(); ++it)
       nodesByName_.erase(*it);
   }
@@ -544,14 +602,14 @@ namespace pnapi
   {
     switch (place.getType())
       {
-      case Node::INTERNAL: 
+      case Node::INTERNAL:
 	internalPlaces_.insert(&place); break;
-      case Node::INPUT:    
+      case Node::INPUT:
 	inputPlaces_.insert(&place);
 	interfacePlaces_.insert(&place);
 	break;
-      case Node::OUTPUT:   
-	outputPlaces_.insert(&place); 
+      case Node::OUTPUT:
+	outputPlaces_.insert(&place);
 	interfacePlaces_.insert(&place);
 	break;
       }
@@ -568,13 +626,13 @@ namespace pnapi
   {
     switch (type)
       {
-      case Node::INTERNAL: 
+      case Node::INTERNAL:
 	internalPlaces_.erase(&place); break;
-      case Node::INPUT:    
-	inputPlaces_.erase(&place); 
+      case Node::INPUT:
+	inputPlaces_.erase(&place);
 	interfacePlaces_.erase(&place);
-	break; 
-      case Node::OUTPUT:   
+	break;
+      case Node::OUTPUT:
 	outputPlaces_.erase(&place);
 	interfacePlaces_.erase(&place);
 	break;
@@ -582,7 +640,7 @@ namespace pnapi
   }
 
 
-  
+
   /***************************** NOT YET REFACTORED *************************/
 
 
@@ -873,7 +931,7 @@ void PetriNet::mergeTransitions(Transition & t1, Transition & t2)
            (t1->getType() == INOUT || t2->getType() == INOUT))
   {
     ; // FIXME: t12->setType(INOUT);
-    } 
+    }
   else assert(false); ///< this should never happen or we have missed a case
 
   t12->prefix = t1->prefix;
@@ -1383,7 +1441,7 @@ void PetriNet::normalize()
         assert(newP != NULL);
 
         // create new interface place
-        Place *newPin = 
+        Place *newPin =
 	  &createPlace("i_" + (*place)->getName(), (*place)->getType());
         assert(newPin != NULL);
 
@@ -1717,7 +1775,7 @@ void PetriNet::marking2Places(Marking &m)
  *
  * \return  Marking &m' successor marking
  */
-Marking PetriNet::calcSuccessorMarking(Marking &m, Transition *t) const
+Marking & PetriNet::successorMarking(Marking &m, Transition *t) const
 {
   Marking *mm = new Marking(m);
   set<Arc *> activators; ///< set to gather arcs
@@ -1726,35 +1784,66 @@ Marking PetriNet::calcSuccessorMarking(Marking &m, Transition *t) const
   for (set<Arc *>::const_iterator f = arcs_.begin(); f != arcs_.end(); f++)
     if (&(*f)->getTargetNode() == t)
     {
-      //Place *p = static_cast<Place *>((*f)->getSourceNode());
-      /* FIXME
-      if ((*mm)[p->marking_id] >= (*f)->getWeight())
+      Place *p = static_cast<Place *>(&(*f)->getSourceNode());
+      if ((*mm)[p] >= (*f)->getWeight())
         activators.insert(*f);
       else
         break;
-      */
     }
 
   // if m does not activate t then m' = m
   if (t->getPreset().size() != activators.size())
     return *mm;
 
-  /* FIXME
   for (set<Arc *>::const_iterator f = arcs_.begin(); f != arcs_.end(); f++)
-    if ((*f)->getSourceNode() == t)
+    if (&(*f)->getSourceNode() == t)
     {
-      Place *p = static_cast<Place *>((*f)->getTargetNode());
-      (*mm)[p->marking_id] += (*f)->getWeight();
+      Place *p = static_cast<Place *>(&(*f)->getTargetNode());
+      (*mm)[p] += (*f)->getWeight();
     }
 
   for (set<Arc *>::iterator f = activators.begin(); f != activators.end(); f++)
   {
-    Place *p = static_cast<Place *>((*f)->getSourceNode());
-    (*mm)[p->marking_id] -= (*f)->getWeight();
+    Place *p = static_cast<Place *>(&(*f)->getSourceNode());
+    (*mm)[p] -= (*f)->getWeight();
   }
-  */
 
   return *mm;
+}
+
+
+
+
+/*!
+ * \brief   Checks if m activates t
+ *
+ * A transition t is activated by m if all places of the preset of t
+ * are marked as high as the arc weights from those to t.
+ *
+ * \param   Marking m
+ * \param   Transition t
+ *
+ * \return  true iff m activates t.
+ */
+bool PetriNet::activates(Marking &m, Transition &t) const
+{
+  if (t.getPreset().empty())
+    return false;
+
+  bool result = false;
+
+  for (set<Node *>::const_iterator p = t.getPreset().begin(); p != t.getPreset().end(); p++)
+  {
+    Place *pp = static_cast<Place *>(*p);
+    Arc *pt = findArc(*pp, t);
+    if (pt->getWeight() <= m[pp])
+    {
+      result = true;
+      break;
+    }
+  }
+
+  return result;
 }
 
 

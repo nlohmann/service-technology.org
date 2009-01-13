@@ -27,8 +27,8 @@
 /*
  * constructors
  */
-FormulaBits::FormulaBits(bool _S, bool _F, bool _S_1, bool _S_2, bool _F_prime) :
-    S(_S), F(_F), S_1(_S_1), S_2(_S_2), F_prime(_F_prime)
+FormulaBits::FormulaBits(bool S, bool F, bool S_1, bool S_2, bool F_prime) :
+    S(S), F(F), S_1(S_1), S_2(S_2), F_prime(F_prime)
 {}
 
 

@@ -69,7 +69,7 @@ namespace pnapi
       {
 	Place * place;
 	int nTokens;
-	Formula * formula;
+	Formula * formula = NULL;
 
 	switch (node.type) 
 	  {

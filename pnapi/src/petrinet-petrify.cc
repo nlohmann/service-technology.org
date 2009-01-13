@@ -73,7 +73,8 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
   // calling petrify if possible
   if (string(CONFIG_PETRIFY) != "not found") 
   {
-    system(systemcall.c_str());
+    int result = system(systemcall.c_str());
+    assert(result == 0);
   }
   
   

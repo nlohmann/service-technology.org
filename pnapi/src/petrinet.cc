@@ -110,6 +110,14 @@ namespace pnapi
 
   /*!
    */
+  PetriNet & ComponentObserver::getPetriNet() const
+  {
+    return net_;
+  }
+
+
+  /*!
+   */
   void ComponentObserver::updateNodeNameHistory(Node & node,
 					       const deque<string> & oldHistory)
   {
@@ -280,12 +288,14 @@ namespace pnapi
   PetriNet::~PetriNet()
   {
     // delete all places
-    for (set<Place *>::iterator it = places_.begin(); it != places_.end(); ++it)
+    set<Place *> places = places_;
+    for (set<Place *>::iterator it = places.begin(); it != places.end(); ++it)
       deletePlace(**it);
 
     // delete all transitions
-    for (set<Transition *>::iterator it = transitions_.begin();
-	 it != transitions_.end(); ++it)
+    set<Transition *> transitions = transitions_;
+    for (set<Transition *>::iterator it = transitions.begin();
+	 it != transitions.end(); ++it)
       deleteTransition(**it);
   }
 
@@ -622,7 +632,7 @@ namespace pnapi
 
   void PetriNet::deletePlace(Place & place)
   {
-    observer_.finalizePlaceType(place);
+    observer_.finalizePlaceType(place, place.getType());
     places_.erase(&place);
     deleteNode(place);
   }

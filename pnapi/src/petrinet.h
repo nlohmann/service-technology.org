@@ -96,7 +96,7 @@ using formula::Formula;
     ComponentObserver(PetriNet &);
 
     /// the PetriNet this observer belongs to
-    PetriNet & getPetriNet();
+    PetriNet & getPetriNet() const;
 
     void updateArcs(Arc &);
     void updateNodeNameHistory(Node &, const deque<string> &);
@@ -113,7 +113,6 @@ using formula::Formula;
     void initializeNodeNameHistory(Node &);
     void finalizeNodeNameHistory(Node &, const deque<string> &);
     void initializePlaceType(Place &);
-    void finalizePlaceType(Place &);
     void finalizePlaceType(Place &, Node::Type);
 
   };

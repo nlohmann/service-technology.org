@@ -20,5 +20,8 @@ libpnapi_a_SOURCES = \
 # flex option to make the ylwrap script work
 AM_LFLAGS = -olex.yy.c
 
+# show all warnings
+AM_CXXFLAGS = -Wall
+
 # clean additional (generated) files
 MAINTAINERCLEANFILES = parser-owfn.h parser-onwd.h parser-petrify.h

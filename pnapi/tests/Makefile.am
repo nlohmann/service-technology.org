@@ -1,4 +1,4 @@
-TESTS = 
+TESTS =
 
 check_PROGRAMS =
 

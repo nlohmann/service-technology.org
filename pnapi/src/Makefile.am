@@ -13,7 +13,9 @@ libpnapi_a_SOURCES = \
 	formula.h formula.cc \
 	petrinet-output.cc \
 	petrinet-reduction.cc \
-	petrinet-petrify.cc
+	petrinet-petrify.cc \
+	automaton.h automaton.cc \
+	state.h state.cc
 
 # flex option to make the ylwrap script work
 AM_LFLAGS = -olex.yy.c

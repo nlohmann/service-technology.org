@@ -4,40 +4,62 @@
 namespace pnapi
 {
 
-/// forward declaration needed by
+/// forward declaration needed by Formula
+class PetriNet;
 class Place;
 class Node;
+class Marking;
 
   /*!
    * \brief   Final Condition Formulas
    */
   namespace formula {
 
-  typedef enum { EQ, NEQ, G, GEQ, L, LEQ, NOT, AND, OR, NONE } ftype;
-
   class Formula
   {
   public:
-    Formula();
-    Formula(Formula *f);
-    virtual ~Formula();
+    // evaluating the formula
+    virtual bool evaluate(Marking &m) = 0;
+  };
+
+
+
+  /*
+   *    All other places empty
+   */
+  class AllOtherPlacesEmpty : public Formula
+  {
+  public:
+    AllOtherPlacesEmpty(Formula *p);
+    virtual ~AllOtherPlacesEmpty();
 
     virtual bool evaluate(Marking &m);
 
-    virtual ftype getType();
+    set<Place *> concerningPlaces();
 
-  private:
-    Formula *sub;
+  protected:
+    set<Place *> others;
+    Formula *parent;
   };
 
 
 
 
-  class AllOtherPlacesEmpty : public Formula
+  class AllOtherExternalPlacesEmpty : public AllOtherPlacesEmpty
   {
-  public:
-    AllOtherPlacesEmpty();
-    virtual ~AllOtherPlacesEmpty();
+    AllOtherExternalPlacesEmpty(Formula *p);
+    virtual ~AllOtherExternalPlacesEmpty();
+
+    bool evaluate(Marking &m);
+  };
+
+
+
+
+  class AllOtherInternalPlacesEmpty : public AllOtherPlacesEmpty
+  {
+    AllOtherInternalPlacesEmpty(Formula *p);
+    virtual ~AllOtherInternalPlacesEmpty();
 
     bool evaluate(Marking &m);
   };
@@ -63,8 +85,6 @@ class Node;
     Place* getPlace();
     unsigned int getNumber();
 
-    virtual ftype getType();
-
   protected:
     Place *place;
     unsigned int number;
@@ -78,8 +98,6 @@ class Node;
     virtual ~FormulaEqual();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   class FormulaNotEqual : public AtomicFormula
@@ -90,8 +108,6 @@ class Node;
     virtual ~FormulaNotEqual();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   class FormulaGreater : public AtomicFormula
@@ -102,8 +118,6 @@ class Node;
     virtual ~FormulaGreater();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   class FormulaGreaterEqual : public AtomicFormula
@@ -114,8 +128,6 @@ class Node;
     virtual ~FormulaGreaterEqual();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   class FormulaLess : public AtomicFormula
@@ -126,8 +138,6 @@ class Node;
     virtual ~FormulaLess();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   class FormulaLessEqual : public AtomicFormula
@@ -138,8 +148,6 @@ class Node;
     virtual ~FormulaLessEqual();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
 
@@ -157,12 +165,6 @@ class Node;
 
     virtual bool evaluate(Marking &m) = 0;
 
-    void setSubFormula(Formula *s);
-
-    Formula* getSubFormula();
-
-    virtual ftype getType() = 0;
-
   protected:
     Formula *sub;
   };
@@ -174,8 +176,6 @@ class Node;
     FormulaNot(Formula *f);
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
 
@@ -193,11 +193,6 @@ class Node;
 
     virtual bool evaluate(Marking &m) = 0;
 
-    void setLeft(Formula *l);
-    void setRight(Formula *r);
-
-    virtual ftype getType() = 0;
-
   protected:
     Formula *left;
     Formula *right;
@@ -211,8 +206,6 @@ class Node;
     virtual ~FormulaAnd();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   class FormulaOr : public BinaryBooleanFormula
@@ -223,8 +216,6 @@ class Node;
     virtual ~FormulaOr();
 
     bool evaluate(Marking &m);
-
-    ftype getType();
   };
 
   } /* namespace formula */

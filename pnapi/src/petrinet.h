@@ -32,6 +32,7 @@
 #include <stack>
 
 #include "component.h"
+#include "formula.h"
 
 using std::string;
 using std::vector;
@@ -49,6 +50,8 @@ using std::istream;
 namespace pnapi
 {
 
+using formula::Formula;
+
   /*!
    * \brief   Marking of all places of a net
    *
@@ -61,7 +64,7 @@ namespace pnapi
   public:
     Marking();
     Marking(PetriNet &n);
-    virtual ~Marking();
+    virtual ~Marking() {}
 
     map<Place *, unsigned int> getMap() const;
 
@@ -79,7 +82,7 @@ namespace pnapi
    * \brief   observes PetriNet components (Place, Transition, Arc)
    *
    * Each component of a PetriNet (Place, Transition, Arc) notifies its observer
-   * of changes that might influence the PetriNet. There is only one 
+   * of changes that might influence the PetriNet. There is only one
    * ComponentObserver instance per PetriNet instance.
    */
   class ComponentObserver
@@ -91,7 +94,7 @@ namespace pnapi
 
     /// constructor
     ComponentObserver(PetriNet &);
-    
+
     /// the PetriNet this observer belongs to
     PetriNet & getPetriNet();
 
@@ -248,10 +251,10 @@ namespace pnapi
 		 const string & = "net2");
 
     /// deletes all interface places
-    //void makeInnerStructure();
+    void makeInnerStructure();
 
     /// normalizes the Petri net
-    //void normalize();
+    void normalize();
 
     /// checks the finalcondition for Marking m
     bool checkFinalCondition(Marking &m) const;
@@ -260,6 +263,8 @@ namespace pnapi
     Marking & successorMarking(Marking &m, Transition *t) const;
 
     bool activates(Marking &m, Transition &t) const;
+
+    void setFinalCondition(Formula *fc);
 
     // TODO: add reduce()
 
@@ -309,6 +314,9 @@ namespace pnapi
 
     /// all arcs
     set<Arc *> arcs_;
+
+    /// final condition
+    Formula *finalCondition_;
 
 
     /* structural changes */

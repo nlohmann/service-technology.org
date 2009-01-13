@@ -361,7 +361,7 @@ namespace pnapi
    */
   Place & PetriNet::createPlace(const string & name, Node::Type type)
   {
-    return *new Place(*this, observer_, 
+    return *new Place(*this, observer_,
 		      name.empty() ? getUniqueNodeName("p") : name, type);
   }
 
@@ -1435,7 +1435,6 @@ void PetriNet::loop_final_state()
  *
  * \todo    Write test cases.
  */
-	/* FIXME
 void PetriNet::normalize()
 {
 
@@ -1454,46 +1453,36 @@ void PetriNet::normalize()
       while (!t->isNormal())
       {
         // create new internal place from interface place
-        Place *newP = newPlace((*place)->getName() + suffix);
-        assert(newP != NULL);
+        Place &newP = createPlace((*place)->getName() + suffix);
 
         // create new interface place
-        Place *newPin =
-	  &createPlace("i_" + (*place)->getName(), (*place)->getType());
-        assert(newPin != NULL);
+        Place &newPin = createPlace("i_" + (*place)->getName(), (*place)->getType());
 
         // create new transition
-        Transition *newT = newTransition("t_" + (*place)->getName());
-        assert(newT != NULL);
+        Transition &newT = createTransition("t_" + (*place)->getName());
 
         // set arcs (1, 2 & 3)
         if ((*place)->getType() == Node::INPUT)
         {
-          Arc *f1 = newArc(newPin, newT);
-          assert(f1 != NULL);
-          Arc *f2 = newArc(newT, newP);
-          assert(f2 != NULL);
+          Arc f1 = createArc(newPin, newT);
+          Arc f2 = createArc(newT, newP);
           for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
           {
             if (&(*f)->getSourceNode() == (*place))
             {
-              Arc *f3 = newArc(newP, &(*f)->getTargetNode());
-              assert(f3 != NULL);
+              Arc f3 = createArc(newP, (*f)->getTargetNode());
             }
           }
         }
         else
         {
-          Arc *f1 = newArc(newT, newPin);
-          assert(f1 != NULL);
-          Arc *f2 = newArc(newP, newT);
-          assert(f2 != NULL);
+          Arc f1 = createArc(newT, newPin);
+          Arc f2 = createArc(newP, newT);
           for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
           {
             if (&(*f)->getTargetNode() == (*place))
             {
-              Arc *f3 = newArc(&(*f)->getSourceNode(), newP);
-              assert(f3 != NULL);
+              Arc f3 = createArc((*f)->getSourceNode(), newP);
             }
           }
         }
@@ -1505,9 +1494,8 @@ void PetriNet::normalize()
 
   // remove the old interface places
   for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
-    removePlace(*place);
+    deletePlace(**place);
 }
-	*/
 
 
 
@@ -1533,7 +1521,6 @@ bool PetriNet::checkFinalCondition(Marking &m) const
 /*!
  * \brief   deletes all interface places
  */
-/*
 void PetriNet::makeInnerStructure()
 {
     // deletes all IN-places
@@ -1548,7 +1535,6 @@ void PetriNet::makeInnerStructure()
         deletePlace(**place);
     }
 }
-*/
 
 
 
@@ -1895,6 +1881,17 @@ Transition *PetriNet::findLivingTransition(Marking &m) const
   }
 
   return result;
+}
+
+
+
+
+/*!
+ * \brief   Sets the final condition
+ */
+void PetriNet::setFinalCondition(Formula *fc)
+{
+  finalCondition_ = fc;
 }
 
 

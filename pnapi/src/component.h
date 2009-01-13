@@ -35,6 +35,7 @@ namespace pnapi
   
   // forward declarations
   class PetriNet;
+  class ComponentObserver;
   class Arc;
 
 
@@ -59,10 +60,10 @@ namespace pnapi
     enum Type { INTERNAL, INPUT, OUTPUT };
 
     /// constructor
-    Node(PetriNet &, const string &, Type);
+    Node(PetriNet &, ComponentObserver &, const string &, Type);
 
     /// copy constructor
-    Node(PetriNet &, const Node &);
+    Node(PetriNet &, ComponentObserver &, const Node &);
 
     /// destructor
     ~Node();
@@ -102,6 +103,9 @@ namespace pnapi
 
 
   protected:
+
+    /// petri net's observer for this node
+    ComponentObserver & observer_;
 
     /// changes the type of this node
     virtual void setType(Type);
@@ -144,10 +148,11 @@ namespace pnapi
   {
   public:
     /// constructor
-    Transition(PetriNet &, const string &, Type = INTERNAL);
+    Transition(PetriNet &, ComponentObserver &, 
+	       const string &, Type = INTERNAL);
 
     /// copy constructor
-    Transition(PetriNet &, const Transition &);
+    Transition(PetriNet &, ComponentObserver &, const Transition &);
 
     /// adds a label (used for constraint oWFN)
     void addLabel(const string &);
@@ -188,10 +193,10 @@ namespace pnapi
   public:
 
     /// constructor
-    Place(PetriNet &, const string &, Type);
+    Place(PetriNet &, ComponentObserver &, const string &, Type);
 
     /// copy constructor
-    Place(PetriNet &, const Place &);
+    Place(PetriNet &, ComponentObserver &, const Place &);
 
     /// returns the number of tokens lying on this place
     unsigned int getTokenCount() const;
@@ -254,10 +259,10 @@ namespace pnapi
   public:
 
     /// constructor
-    Arc(PetriNet &, Node &, Node &, unsigned int = 1);
+    Arc(PetriNet &, ComponentObserver &, Node &, Node &, unsigned int = 1);
 
     /// copy constructor
-    Arc(PetriNet &, const Arc &);
+    Arc(PetriNet &, ComponentObserver &, const Arc &);
 
     /// returns the Petri net this arc belongs to
     PetriNet & getPetriNet() const;
@@ -288,6 +293,9 @@ namespace pnapi
 
     /// Petri net this arc belongs to
     PetriNet & net_;
+
+    /// petri net's observer for this arc
+    ComponentObserver & observer_;
 
     /// source node of the arc
     Node & source_;

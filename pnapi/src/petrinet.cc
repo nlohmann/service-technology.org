@@ -22,7 +22,7 @@
 
 #include "util.h"
 #include "parser.h"
-#include "petrinode.h"
+#include "component.h"
 #include "petrinet.h"
 
 using std::cerr;
@@ -31,6 +31,10 @@ using std::min;
 
 namespace pnapi
 {
+
+  /****************************************************************************
+   *** Class Marking Function Definitions
+   ***************************************************************************/
 
   /*!
    * \brief   Constructor for marking class
@@ -90,6 +94,141 @@ namespace pnapi
   }
 
 
+
+  /****************************************************************************
+   *** Class ComponentObserver Function Defintions
+   ***************************************************************************/
+
+  /*!
+   */
+  ComponentObserver::ComponentObserver(PetriNet & net) :
+    net_(net)
+  {
+    assert(&net.observer_ == this);
+  }
+
+
+  /*!
+   */
+  void ComponentObserver::updateNodeNameHistory(Node & node,
+					       const deque<string> & oldHistory)
+  {
+    assert(net_.containsNode(node));
+
+    finalizeNodeNameHistory(node, oldHistory);
+    initializeNodeNameHistory(node);
+  }
+
+
+  /*!
+   */
+  void ComponentObserver::updatePlaceType(Place & place, Node::Type type)
+  {
+    assert(net_.containsNode(place));
+
+    finalizePlaceType(place, type);
+    initializePlaceType(place);
+  }
+
+
+  void ComponentObserver::updateArcs(Arc & arc)
+  {
+    assert(&arc.getPetriNet() == &net_);
+    assert(net_.arcs_.find(&arc) == net_.arcs_.end());
+    assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
+
+    net_.arcs_.insert(&arc);
+  }
+
+
+  void ComponentObserver::updatePlaces(Place & place)
+  {
+    updateNodes(place);
+    net_.places_.insert(&place);
+    initializePlaceType(place);
+  }
+
+
+  void ComponentObserver::updateTransitions(Transition & trans)
+  {
+    updateNodes(trans);
+    net_.transitions_.insert(&trans);
+  }
+
+
+  void ComponentObserver::updateNodes(Node & node)
+  {
+    assert(&node.getPetriNet() == &net_);
+    assert(!net_.containsNode(node));
+    assert(net_.nodesByName_.find(node.getName()) == net_.nodesByName_.end());
+
+    net_.nodes_.insert(&node);
+    initializeNodeNameHistory(node);
+  }
+
+
+  void ComponentObserver::initializeNodeNameHistory(Node & node)
+  {
+    deque<string> history = node.getNameHistory();
+    for (deque<string>::iterator it = history.begin(); it != history.end();
+	 ++it)
+      {
+	assert((net_.nodesByName_.find(*it))->second == &node ||
+	       net_.nodesByName_.find(*it) == net_.nodesByName_.end());
+	net_.nodesByName_[*it] = &node;
+      }
+  }
+
+
+  void ComponentObserver::finalizeNodeNameHistory(Node & node,
+						  const deque<string> & history)
+  {
+    for (deque<string>::const_iterator it = history.begin();
+	 it != history.end(); ++it)
+      net_.nodesByName_.erase(*it);
+  }
+
+
+  void ComponentObserver::initializePlaceType(Place & place)
+  {
+    switch (place.getType())
+      {
+      case Node::INTERNAL:
+	net_.internalPlaces_.insert(&place); break;
+      case Node::INPUT:
+	net_.inputPlaces_.insert(&place);
+	net_.interfacePlaces_.insert(&place);
+	break;
+      case Node::OUTPUT:
+	net_.outputPlaces_.insert(&place);
+	net_.interfacePlaces_.insert(&place);
+	break;
+      }
+  }
+
+
+  void ComponentObserver::finalizePlaceType(Place & place, Node::Type type)
+  {
+    switch (type)
+      {
+      case Node::INTERNAL:
+	net_.internalPlaces_.erase(&place); break;
+      case Node::INPUT:
+	net_.inputPlaces_.erase(&place);
+	net_.interfacePlaces_.erase(&place);
+	break;
+      case Node::OUTPUT:
+	net_.outputPlaces_.erase(&place);
+	net_.interfacePlaces_.erase(&place);
+	break;
+      }
+  }
+
+
+  /****************************************************************************
+   *** Class PetriNet Function Defintions
+   ***************************************************************************/
+
   /*!
    * Reads a Petri net from a stream (in most cases backed by a file). The
    * format
@@ -120,7 +259,7 @@ namespace pnapi
   /*!
    */
   PetriNet::PetriNet() :
-    format_(FORMAT_OWFN)
+    observer_(*this)
   {
   }
 
@@ -128,7 +267,8 @@ namespace pnapi
   /*!
    * The copy constructor with deep copy.
    */
-  PetriNet::PetriNet(const PetriNet & net)
+  PetriNet::PetriNet(const PetriNet & net) :
+    observer_(*this)
   {
     *this += net;
   }
@@ -208,7 +348,7 @@ namespace pnapi
    */
   Arc & PetriNet::createArc(Node & source, Node & target, int weight)
   {
-    return *new Arc(*this, source, target, weight);
+    return *new Arc(*this, observer_, source, target, weight);
   }
 
 
@@ -221,8 +361,8 @@ namespace pnapi
    */
   Place & PetriNet::createPlace(const string & name, Node::Type type)
   {
-    return *new Place(*this, name.empty() ? getUniqueNodeName("p") : name,
-		      type);
+    return *new Place(*this, observer_, 
+		      name.empty() ? getUniqueNodeName("p") : name, type);
   }
 
 
@@ -231,7 +371,7 @@ namespace pnapi
    */
   Transition & PetriNet::createTransition(const string & name)
   {
-    return *new Transition(*this, name.empty() ? getUniqueNodeName("t") : name);
+    return *new Transition(*this, observer_, name.empty() ? getUniqueNodeName("t") : name);
   }
 
 
@@ -413,7 +553,7 @@ namespace pnapi
     // add all transitions of the net
     for (set<Transition *>::iterator it = net.transitions_.begin();
 	 it != net.transitions_.end(); ++it)
-      new Transition(*this, **it);
+      new Transition(*this, observer_, **it);
 
     // add all non-existing places and merge existing ones
     for (set<Place *>::iterator it = net.places_.begin();
@@ -421,7 +561,7 @@ namespace pnapi
       {
 	p = findPlace((*it)->getName());
 	if (p == NULL)
-	  new Place(*this, **it);
+	  new Place(*this, observer_, **it);
 	else
 	  {
 	    assert((p->getType() == Place::INPUT &&
@@ -436,7 +576,7 @@ namespace pnapi
     // create arcs according to the arcs in the net
     for (set<Arc *>::iterator it = net.arcs_.begin(); it != net.arcs_.end();
 	 ++it)
-      new Arc(*this, **it);
+      new Arc(*this, observer_, **it);
 
     // FIXME: calculate FINAL stuff
 
@@ -461,29 +601,6 @@ namespace pnapi
   }
 
 
-  /*!
-   */
-  void PetriNet::updateNodeNameHistory(Node & node,
-				       const deque<string> & oldHistory)
-  {
-    assert(containsNode(node));
-
-    finalizeNodeNameHistory(node, oldHistory);
-    initializeNodeNameHistory(node);
-  }
-
-
-  /*!
-   */
-  void PetriNet::updatePlaceType(Place & place, Node::Type type)
-  {
-    assert(containsNode(place));
-
-    finalizePlaceType(place, type);
-    initializePlaceType(place);
-  }
-
-
 
   /****************************************************************************
    *** Private PetriNet Function Definitions
@@ -503,45 +620,9 @@ namespace pnapi
   }
 
 
-  void PetriNet::updateArcs(Arc & arc)
-  {
-    assert(&arc.getPetriNet() == this);
-    assert(arcs_.find(&arc) == arcs_.end());
-    assert(findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
-
-    arcs_.insert(&arc);
-  }
-
-
-  void PetriNet::updatePlaces(Place & place)
-  {
-    updateNodes(place);
-    places_.insert(&place);
-    initializePlaceType(place);
-  }
-
-
-  void PetriNet::updateTransitions(Transition & trans)
-  {
-    updateNodes(trans);
-    transitions_.insert(&trans);
-  }
-
-
-  void PetriNet::updateNodes(Node & node)
-  {
-    assert(&node.getPetriNet() == this);
-    assert(!containsNode(node));
-    assert(nodesByName_.find(node.getName()) == nodesByName_.end());
-
-    nodes_.insert(&node);
-    initializeNodeNameHistory(node);
-  }
-
-
   void PetriNet::deletePlace(Place & place)
   {
-    finalizePlaceType(place);
+    observer_.finalizePlaceType(place);
     places_.erase(&place);
     deleteNode(place);
   }
@@ -569,74 +650,10 @@ namespace pnapi
 
     // FIXME: arcs and pre-/postsets!
 
-    finalizeNodeNameHistory(node, node.getNameHistory());
+    observer_.finalizeNodeNameHistory(node, node.getNameHistory());
     nodes_.erase(&node);
 
     delete &node;
-  }
-
-
-  void PetriNet::initializeNodeNameHistory(Node & node)
-  {
-    deque<string> history = node.getNameHistory();
-    for (deque<string>::iterator it = history.begin(); it != history.end();
-	 ++it)
-      {
-	assert((nodesByName_.find(*it))->second == &node ||
-	       nodesByName_.find(*it) == nodesByName_.end());
-	nodesByName_[*it] = &node;
-      }
-  }
-
-
-  void PetriNet::finalizeNodeNameHistory(Node & node,
-					 const deque<string> & history)
-  {
-    for (deque<string>::const_iterator it = history.begin();
-	 it != history.end(); ++it)
-      nodesByName_.erase(*it);
-  }
-
-
-  void PetriNet::initializePlaceType(Place & place)
-  {
-    switch (place.getType())
-      {
-      case Node::INTERNAL:
-	internalPlaces_.insert(&place); break;
-      case Node::INPUT:
-	inputPlaces_.insert(&place);
-	interfacePlaces_.insert(&place);
-	break;
-      case Node::OUTPUT:
-	outputPlaces_.insert(&place);
-	interfacePlaces_.insert(&place);
-	break;
-      }
-  }
-
-
-  void PetriNet::finalizePlaceType(Place & place)
-  {
-    finalizePlaceType(place, place.getType());
-  }
-
-
-  void PetriNet::finalizePlaceType(Place & place, Node::Type type)
-  {
-    switch (type)
-      {
-      case Node::INTERNAL:
-	internalPlaces_.erase(&place); break;
-      case Node::INPUT:
-	inputPlaces_.erase(&place);
-	interfacePlaces_.erase(&place);
-	break;
-      case Node::OUTPUT:
-	outputPlaces_.erase(&place);
-	interfacePlaces_.erase(&place);
-	break;
-      }
   }
 
 
@@ -1418,9 +1435,9 @@ void PetriNet::loop_final_state()
  *
  * \todo    Write test cases.
  */
+	/* FIXME
 void PetriNet::normalize()
 {
-	/* FIXME
 
   std::string suffix = "_normalized";
   set<Place *> temp;
@@ -1489,8 +1506,8 @@ void PetriNet::normalize()
   // remove the old interface places
   for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
     removePlace(*place);
-	*/
 }
+	*/
 
 
 
@@ -1516,6 +1533,7 @@ bool PetriNet::checkFinalCondition(Marking &m) const
 /*!
  * \brief   deletes all interface places
  */
+/*
 void PetriNet::makeInnerStructure()
 {
     // deletes all IN-places
@@ -1530,7 +1548,7 @@ void PetriNet::makeInnerStructure()
         deletePlace(**place);
     }
 }
-
+*/
 
 
 

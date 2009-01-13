@@ -2,7 +2,7 @@
 
 #include "util.h"
 #include "petrinet.h"
-#include "petrinode.h"
+#include "component.h"
 
 
 namespace pnapi {
@@ -15,18 +15,22 @@ namespace pnapi {
 
   /*!
    */
-  Node::Node(PetriNet & net, const string & name, Type type) :
-    net_(net), type_(type)
+  Node::Node(PetriNet & net, ComponentObserver & observer, const string & name, 
+	     Type type) :
+    observer_(observer), net_(net), type_(type)
   {
+    assert(&observer.getPetriNet() == &net);
+
     history_.push_back(name);
   }
 
   
   /*!
    */
-  Node::Node(PetriNet & net, const Node & node) :
-    net_(net), type_(node.type_), history_(node.history_)
+  Node::Node(PetriNet & net, ComponentObserver & observer, const Node & node) :
+    observer_(observer), net_(net), type_(node.type_), history_(node.history_)
   {
+    assert(&observer.getPetriNet() == &net);
   }
 
 
@@ -83,7 +87,7 @@ namespace pnapi {
     for (deque<string>::iterator it = history_.begin(); it != history_.end();
 	 ++it)
       *it = prefix + *it;
-    //FIXME: net_.notifyNameHistoryChanged(oldHistory);
+    observer_.updateNodeNameHistory(*this, oldHistory);
   }
 
   
@@ -99,8 +103,9 @@ namespace pnapi {
    */
   void Node::addToHistory(const deque<string> & history)
   {
+    deque<string> oldHistory = history_;
     history_.insert(history_.end(), history.begin(), history.end());
-    //FIXME: net_.updateNodeNameHistory(*this);
+    observer_.updateNodeNameHistory(*this, oldHistory);
   }
 
 
@@ -152,21 +157,23 @@ namespace pnapi {
 
   /*!
    */
-  Place::Place(PetriNet & net, const string & name, Node::Type type) :
-    Node(net, name, type), capacity_(0), 
+  Place::Place(PetriNet & net, ComponentObserver & observer, 
+	       const string & name, Node::Type type) :
+    Node(net, observer, name, type), capacity_(0), 
     wasInterface_(type == Node::INTERNAL ? false : true)
   {
-    //FIXME: notifyPetriNetPlaces();
+    observer_.updatePlaces(*this);
   }
 
 
   /*!
    */
-  Place::Place(PetriNet & net, const Place & place) :
-    Node(net, place), capacity_(place.capacity_), 
+  Place::Place(PetriNet & net, ComponentObserver & observer, 
+	       const Place & place) :
+    Node(net, observer, place), capacity_(place.capacity_), 
     wasInterface_(place.wasInterface_)
   {
-    //FIXME: notifyPetriNetPlaces();
+    observer_.updatePlaces(*this);
   }
 
   
@@ -174,9 +181,9 @@ namespace pnapi {
    */
   void Place::setType(Type type)
   {
-    //FIXME: Type oldType = getType();
+    Type oldType = getType();
     Node::setType(type);
-    //FIXME: getPetriNet().updatePlaceType(*this, oldType);
+    observer_.updatePlaceType(*this, oldType);
   }
 
 
@@ -250,13 +257,6 @@ namespace pnapi {
     return *this;
   }
 
-  /* FIXME
-  void Place::notifyPetriNetPlaces()
-  {
-    getPetriNet().updatePlaces(*this);
-  }
-  */
-
 
 
   /****************************************************************************
@@ -266,19 +266,21 @@ namespace pnapi {
 
   /*!
    */
-  Transition::Transition(PetriNet & net, const string & name, Type type) :
-    Node(net, name, type)
+  Transition::Transition(PetriNet & net, ComponentObserver & observer, 
+			 const string & name, Type type) :
+    Node(net, observer, name, type)
   {
-    //FIXME: net.updateTransitions(*this);
+    observer_.updateTransitions(*this);
   }
 
 
   /*!
    */
-  Transition::Transition(PetriNet & net, const Transition & trans) :
-    Node(net, trans)
+  Transition::Transition(PetriNet & net, ComponentObserver & observer, 
+			 const Transition & trans) :
+    Node(net, observer, trans)
   {
-    //FIXME: net.updateTransitions(*this);
+    observer_.updateTransitions(*this);
   }
 
 
@@ -306,29 +308,34 @@ namespace pnapi {
   
   /*!
    */
-  Arc::Arc(PetriNet & net, Node & source, Node & target, unsigned int weight) :
-    net_(net), source_(source), target_(target), weight_(weight)
+  Arc::Arc(PetriNet & net, ComponentObserver & observer, Node & source, 
+	   Node & target, unsigned int weight) :
+    net_(net), observer_(observer), source_(source), target_(target), 
+    weight_(weight)
   {
+    assert(&observer.getPetriNet() == &net);
     source_.updateNeighbourSets(*this);
     target_.updateNeighbourSets(*this);
 
-    //FIXME: net_.updateArcs(*this);
+    observer_.updateArcs(*this);
   }
 
 
   /*!
    */
-  Arc::Arc(PetriNet & net, const Arc & arc) :
-    net_(net), source_(*net.findNode(arc.source_.getName())), 
+  Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc) :
+    net_(net), observer_(observer), 
+    source_(*net.findNode(arc.source_.getName())), 
     target_(*net.findNode(arc.target_.getName())), weight_(arc.weight_)
   {
+    assert(&observer.getPetriNet() == &net);
     assert(net.findNode(arc.source_.getName()) != NULL);
     assert(net.findNode(arc.target_.getName()) != NULL);
 
     source_.updateNeighbourSets(*this);
     target_.updateNeighbourSets(*this);
 
-    //FIXME: net_.updateArcs(*this);
+    observer_.updateArcs(*this);
   }
 
 

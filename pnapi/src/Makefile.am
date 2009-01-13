@@ -2,7 +2,7 @@ lib_LIBRARIES = libpnapi.a
 
 libpnapi_a_SOURCES = \
 	pnapi.h \
-	petrinode.h petrinode.cc \
+	component.h component.cc \
 	petrinet.h petrinet.cc \
 	parser.h parser.cc \
 	parser-owfn.yy parser-owfn-lexer.ll \

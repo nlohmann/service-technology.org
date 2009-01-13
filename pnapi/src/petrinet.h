@@ -31,7 +31,7 @@
 #include <deque>
 #include <stack>
 
-#include "petrinode.h"
+#include "component.h"
 
 using std::string;
 using std::vector;
@@ -76,6 +76,47 @@ namespace pnapi
 
 
   /*!
+   * \brief   observes PetriNet components (Place, Transition, Arc)
+   *
+   * Each component of a PetriNet (Place, Transition, Arc) notifies its observer
+   * of changes that might influence the PetriNet. There is only one 
+   * ComponentObserver instance per PetriNet instance.
+   */
+  class ComponentObserver
+  {
+    /// PetriNet may even do internal updates (on itself)
+    friend class PetriNet;
+
+  public:
+
+    /// constructor
+    ComponentObserver(PetriNet &);
+    
+    /// the PetriNet this observer belongs to
+    PetriNet & getPetriNet();
+
+    void updateArcs(Arc &);
+    void updateNodeNameHistory(Node &, const deque<string> &);
+    void updatePlaces(Place &);
+    void updatePlaceType(Place &, Node::Type);
+    void updateTransitions(Transition &);
+
+
+  private:
+
+    PetriNet & net_;
+
+    void updateNodes(Node &);
+    void initializeNodeNameHistory(Node &);
+    void finalizeNodeNameHistory(Node &, const deque<string> &);
+    void initializePlaceType(Place &);
+    void finalizePlaceType(Place &);
+    void finalizePlaceType(Place &, Node::Type);
+
+  };
+
+
+  /*!
    * \brief   A Petri net
    *
    * Class to represent Petri nets. The net consists of places of
@@ -84,6 +125,11 @@ namespace pnapi
    */
   class PetriNet
   {
+
+    /// needs to update internal structures
+    friend class ComponentObserver;
+
+
   public:
 
     /// standard constructor
@@ -202,10 +248,10 @@ namespace pnapi
 		 const string & = "net2");
 
     /// deletes all interface places
-    void makeInnerStructure();
+    //void makeInnerStructure();
 
     /// normalizes the Petri net
-    void normalize();
+    //void normalize();
 
     /// checks the finalcondition for Marking m
     bool checkFinalCondition(Marking &m) const;
@@ -227,6 +273,9 @@ namespace pnapi
 
     /// format for input/output operations
     IOFormat format_;
+
+    /// observer for nodes and arcs
+    ComponentObserver observer_;
 
 
     /* (overlapping) sets for net structure */
@@ -260,31 +309,6 @@ namespace pnapi
 
     /// all arcs
     set<Arc *> arcs_;
-
-
-    /* update functions */
-
-    // friend declarations to allow access to update*
-    friend void Arc::notifyCreated();
-    friend void Node::notifyNameHistoryChanged();
-    friend void Place::notifyCreated();
-    friend void Place::notifyTypeChanged();
-    friend void Transition::notifyCreated();
-
-    // update receivers
-    void updateArcs(Arc &);
-    void updateNodeNameHistory(Node &, const deque<string> &);
-    void updatePlaces(Place &);
-    void updatePlaceType(Place &, Node::Type);
-    void updateTransitions(Transition &);
-
-    // helpers
-    void updateNodes(Node &);
-    void initializeNodeNameHistory(Node &);
-    void finalizeNodeNameHistory(Node &, const deque<string> &);
-    void initializePlaceType(Place &);
-    void finalizePlaceType(Place &);
-    void finalizePlaceType(Place &, Node::Type);
 
 
     /* structural changes */

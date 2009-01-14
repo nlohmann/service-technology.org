@@ -1,5 +1,6 @@
  // -*- C++ -*-
 
+%option outfile="lex.yy.c"
 %option prefix="pnapi_petrify_"
 %option noyywrap
 %option nounput

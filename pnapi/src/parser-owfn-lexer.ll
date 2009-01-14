@@ -20,6 +20,9 @@
   * flex options 
   ****************************************************************************/
 
+/* created lexer should be called "lex.yy.c" to make the ylwrap script work */
+%option outfile="lex.yy.c"
+
 /* plain c scanner: the prefix is our "namespace" */
 %option prefix="pnapi_owfn_"
 

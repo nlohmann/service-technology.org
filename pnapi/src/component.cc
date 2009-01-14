@@ -133,22 +133,6 @@ namespace pnapi {
   }
 
 
-  /*!
-   */
-  void Node::updateNeighbourSets(Arc & arc) 
-  {
-    Node * source = &arc.getSourceNode();
-    Node * target = &arc.getTargetNode();
-
-    assert(source == this || target == this);
-
-    if (source == this)
-      postset_.insert(target);
-    else
-      preset_.insert(source);
-  }
-
-
 
   /****************************************************************************
    *** Class Place Function Definitions
@@ -284,22 +268,6 @@ namespace pnapi {
   }
 
 
-  /*!
-   */
-  void Transition::addLabel(const string & label)
-  {
-    labels_.insert(label);
-  }
-
-
-  /*!
-   */
-  set<string> Transition::getLabels() const
-  {
-    return labels_;
-  }
-
-
 
   /****************************************************************************
    *** Class Arc Function Definitions
@@ -314,10 +282,8 @@ namespace pnapi {
     weight_(weight)
   {
     assert(&observer.getPetriNet() == &net);
-    source_.updateNeighbourSets(*this);
-    target_.updateNeighbourSets(*this);
 
-    observer_.updateArcs(*this);
+    observer_.updateArcCreated(*this);
   }
 
 
@@ -332,10 +298,18 @@ namespace pnapi {
     assert(net.findNode(arc.source_.getName()) != NULL);
     assert(net.findNode(arc.target_.getName()) != NULL);
 
-    source_.updateNeighbourSets(*this);
-    target_.updateNeighbourSets(*this);
+    observer_.updateArcCreated(*this);
+  }
 
-    observer_.updateArcs(*this);
+
+  /*!
+   * You must not destroy an Arc directly.
+   */
+  Arc::~Arc()
+  {
+    assert(net_.findArc(source_, target_) == NULL);
+
+    observer_.updateArcRemoved(*this);
   }
 
 

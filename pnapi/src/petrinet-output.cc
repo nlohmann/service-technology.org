@@ -294,7 +294,7 @@ string Transition::toString() const
   if (getNameHistory().size() == 1 && getName().find(".stopped.") != string::npos)
     result += "label=\"stop\" fillcolor=darksalmon";
 
-
+  /* FIXME
   if (!labels_.empty())
   {
     result += " label=\"{";
@@ -306,6 +306,7 @@ string Transition::toString() const
     }
     result += "}\"";
   }
+  */
 
   result += "]\n";
 

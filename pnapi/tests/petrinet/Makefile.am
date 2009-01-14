@@ -1,8 +1,9 @@
-TESTS = test_construction
+TESTS = test_construction test_operators
 
-check_PROGRAMS = test_construction
+check_PROGRAMS = test_construction test_operators
 
 test_construction_SOURCES = test_construction.cc
+test_operators_SOURCES    = test_operators.cc
 
 # clean additional (generated) files
 #MAINTAINERCLEANFILES = test_parser.net1.owfn test_parser.net2.owfn

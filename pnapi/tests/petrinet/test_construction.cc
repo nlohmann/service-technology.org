@@ -54,6 +54,16 @@ int main(int argc, char * argv[])
     assert(net.findTransition(p4.getName()) == NULL);
     end_test();
 
+
+    // deleteInterfacePlaces()
+    begin_test("PetriNet::deleteInterfacePlaces() [interface deletion]");
+    net.deleteInterfacePlaces();
+    assert(net.getNodes().size() == 4);
+    assert(net.getInterfacePlaces().empty());
+    assert(!net.containsNode(p3));
+    assert(!net.containsNode(p4));
+    end_test();
+
     
     // destructor
     begin_test("PetriNet::~PetriNet() [destructor]");

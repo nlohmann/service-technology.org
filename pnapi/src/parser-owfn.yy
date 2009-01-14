@@ -184,8 +184,12 @@ markinglist:      /* empty */
                 | markinglist COMMA marking
                 ;
 
-marking:          nodeident COLON NUMBER { (PN->findPlace(nodename))->mark($3); }
-                | nodeident              { (PN->findPlace(nodename))->mark(); }
+marking:          nodeident COLON NUMBER { 
+  //FIXME: (PN->findPlace(nodename))->mark($3); 
+		     }
+                | nodeident              { 
+		  //FIXME: (PN->findPlace(nodename))->mark(); 
+		  }
                 ;
 
 finalmarkinglist: /* empty */
@@ -244,8 +248,12 @@ annotation:       /* empty */
                 | LCONTROL annotation_list RCONTROL
                 ;
 
-annotation_list:  IDENT { t->addLabel(*$1); }
-                | IDENT { t->addLabel(*$1); } COMMA annotation_list
+annotation_list:  IDENT { 
+  //FIXME: t->addLabel(*$1); 
+		  }
+                | IDENT { 
+		  //FIXME: t->addLabel(*$1); 
+		  } COMMA annotation_list
                 ;
 
 arclist:          /* empty */

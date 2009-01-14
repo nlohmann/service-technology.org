@@ -98,7 +98,8 @@ using formula::Formula;
     /// the PetriNet this observer belongs to
     PetriNet & getPetriNet() const;
 
-    void updateArcs(Arc &);
+    void updateArcCreated(Arc &);
+    void updateArcRemoved(Arc &);
     void updateNodeNameHistory(Node &, const deque<string> &);
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
@@ -138,16 +139,13 @@ using formula::Formula;
     PetriNet();
 
     /// destructor
-    ~PetriNet();
+    virtual ~PetriNet();
 
     /// copy constructor
     PetriNet(const PetriNet &);
 
     /// copy assignment operator
     PetriNet & operator=(const PetriNet &);
-
-    /// adds the structure of a second net
-    PetriNet & operator+=(const PetriNet &);
 
 
     /*!
@@ -220,7 +218,7 @@ using formula::Formula;
 
 
     /*!
-     * \name   Creating a Petri net
+     * \name   Basic Structural Changes
      *
      * Functions to add nodes (Node, Place, Transition) and arcs (Arc).
      */
@@ -235,6 +233,9 @@ using formula::Formula;
     /// creates a Transition
     Transition & createTransition(const string & = "");
 
+    /// deletes all interface places
+    void deleteInterfacePlaces();
+
     //@}
 
 
@@ -248,9 +249,6 @@ using formula::Formula;
     /// compose two nets by adding the given one and merging interfaces
     void compose(const PetriNet &, const string & = "net1",
 		 const string & = "net2");
-
-    /// deletes all interface places
-    void makeInnerStructure();
 
     /// normalizes the Petri net
     void normalize();
@@ -329,6 +327,9 @@ using formula::Formula;
     /// deletes a node
     void deleteNode(Node &);
 
+    /// deletes an arc
+    void deleteArc(Arc &);
+
     /// merge arcs (used by mergePlaces())
     void mergeArcs(Place &, Place &, const set<Node *> &, const set<Node *> &,
 		   bool);
@@ -338,6 +339,9 @@ using formula::Formula;
 
 
     /* miscellaneous */
+
+    /// adds the structure of a second net
+    PetriNet & operator+=(const PetriNet &);
 
     /// returns a name for a node to be added
     string getUniqueNodeName(const string &) const;

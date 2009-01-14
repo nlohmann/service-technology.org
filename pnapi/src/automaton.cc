@@ -86,7 +86,7 @@ void Automaton::initialize()
   for (set<Transition *>::const_iterator t = notdone.begin(); t != notdone.end(); t++)
     reasons[*t] = "tau";
 
-  net.makeInnerStructure();
+  net.deleteInterfacePlaces();
 }
 
 

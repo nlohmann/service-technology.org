@@ -139,13 +139,27 @@ namespace pnapi
   }
 
 
-  void ComponentObserver::updateArcs(Arc & arc)
+  void ComponentObserver::updateArcCreated(Arc & arc)
   {
     assert(&arc.getPetriNet() == &net_);
     assert(net_.arcs_.find(&arc) == net_.arcs_.end());
     assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
 
     net_.arcs_.insert(&arc);
+    arc.getTargetNode().preset_.insert(&arc.getSourceNode());
+    arc.getSourceNode().postset_.insert(&arc.getTargetNode());
+  }
+
+
+  void ComponentObserver::updateArcRemoved(Arc & arc)
+  {
+    assert(&arc.getPetriNet() == &net_);
+    assert(net_.arcs_.find(&arc) == net_.arcs_.end());
+    assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
+
+    net_.arcs_.erase(&arc);
+    arc.getTargetNode().preset_.erase(&arc.getSourceNode());
+    arc.getSourceNode().postset_.erase(&arc.getTargetNode());
   }
 
 
@@ -267,7 +281,7 @@ namespace pnapi
   /*!
    */
   PetriNet::PetriNet() :
-    observer_(*this)
+    format_(FORMAT_OWFN), observer_(*this)
   {
   }
 
@@ -276,7 +290,7 @@ namespace pnapi
    * The copy constructor with deep copy.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    observer_(*this)
+    format_(net.format_), observer_(*this)
   {
     *this += net;
   }
@@ -297,6 +311,19 @@ namespace pnapi
     for (set<Transition *>::iterator it = transitions.begin();
 	 it != transitions.end(); ++it)
       deleteTransition(**it);
+
+    // FIXME: possibly delete final condition
+    
+    assert(nodes_.empty());
+    assert(nodesByName_.empty());
+    assert(transitions_.empty());
+    assert(places_.empty());
+    assert(internalPlaces_.empty());
+    assert(inputPlaces_.empty());
+    assert(outputPlaces_.empty());
+    assert(interfacePlaces_.empty());
+    assert(interfacePlacesByPort_.empty());
+    assert(arcs_.empty());
   }
 
 
@@ -313,6 +340,44 @@ namespace pnapi
 
 
   /*!
+   * Adds all nodes and arcs of the second net and combines final conditions.
+   *
+   * \pre   the node names are unique (disjoint name sets); use 
+   *        prefixNodeNames() on <em>both</em> nets to achieve this
+   */
+  PetriNet & PetriNet::operator+=(const PetriNet & net)
+  {
+    // add all transitions of the net
+    for (set<Transition *>::iterator it = net.transitions_.begin();
+	 it != net.transitions_.end(); ++it)
+      {
+	assert(!containsNode((*it)->getName()));
+	new Transition(*this, observer_, **it);
+      }
+
+    // add all places
+    for (set<Place *>::iterator it = net.places_.begin();
+	 it != net.places_.end(); ++it)
+      {
+	assert(!containsNode((*it)->getName()));
+	new Place(*this, observer_, **it);
+      }
+
+    // create arcs according to the arcs in the net
+    for (set<Arc *>::iterator it = net.arcs_.begin(); it != net.arcs_.end();
+	 ++it)
+      new Arc(*this, observer_, **it);
+
+    // FIXME: combine final conditions
+
+    return *this;
+  }
+
+
+  /*!
+   * Given a second Petri net #net, the internal structure is added and input
+   * and output places are connected appropriatly (if an input and an output
+   * place name of the two nets match).
    */
   void PetriNet::compose(const PetriNet & net, const string & prefix,
 			 const string & netPrefix)
@@ -387,6 +452,17 @@ namespace pnapi
 
   /*!
    */
+  void PetriNet::deleteInterfacePlaces()
+  {
+    set<Place *> interface = interfacePlaces_;
+    for(set<Place *>::iterator it = interface.begin(); it != interface.end(); 
+	++it)
+      deletePlace(**it);
+  }
+
+
+  /*!
+   */
   bool PetriNet::containsNode(Node & node) const
   {
     return nodes_.find(&node) != nodes_.end();
@@ -440,6 +516,7 @@ namespace pnapi
    */
   Arc * PetriNet::findArc(const Node & source, const Node & target) const
   {
+    // use an arc cache to make this more efficient
     for (set<Arc *>::iterator it = arcs_.begin(); it != arcs_.end(); ++it)
       if (&(*it)->getSourceNode() == &source &&
 	  &(*it)->getTargetNode() == &target)
@@ -532,6 +609,7 @@ namespace pnapi
 			   const set<Node *> & set1, const set<Node *> & set2,
 			   bool isPostset)
   {
+    /*
     for (set<Node *>::iterator it = set2.begin(); it != set2.end(); ++it)
       {
 	Node & p1Source = isPostset ? p1   : **it;
@@ -548,49 +626,7 @@ namespace pnapi
 	else
 	  arc1->setWeight(arc1->getWeight() + arc2->getWeight());
       }
-  }
-
-
-  /*!
-   * Given a second Petri net #net, the internal structure is added and input
-   * and output places are connected appropriatly (if an input and an output
-   * place name of the two nets match).
-   */
-  PetriNet & PetriNet::operator+=(const PetriNet & net)
-  {
-    Place * p;
-
-    // add all transitions of the net
-    for (set<Transition *>::iterator it = net.transitions_.begin();
-	 it != net.transitions_.end(); ++it)
-      new Transition(*this, observer_, **it);
-
-    // add all non-existing places and merge existing ones
-    for (set<Place *>::iterator it = net.places_.begin();
-	 it != net.places_.end(); ++it)
-      {
-	p = findPlace((*it)->getName());
-	if (p == NULL)
-	  new Place(*this, observer_, **it);
-	else
-	  {
-	    assert((p->getType() == Place::INPUT &&
-		    (*it)->getType() == Place::OUTPUT) ||
-		   (p->getType() == Place::OUTPUT &&
-		    (*it)->getType() == Place::INPUT));
-	    p->merge(**it);
-	    p->internalize();
-	  }
-      }
-
-    // create arcs according to the arcs in the net
-    for (set<Arc *>::iterator it = net.arcs_.begin(); it != net.arcs_.end();
-	 ++it)
-      new Arc(*this, observer_, **it);
-
-    // FIXME: calculate FINAL stuff
-
-    return *this;
+    */
   }
 
 
@@ -600,13 +636,13 @@ namespace pnapi
    */
   string PetriNet::getUniqueNodeName(const string & base) const
   {
-    int i = 0;
-    string name = base;
+    int i = 1;
+    string name;
 
     // use a "mutable" cache to make this more efficient
-    while (nodesByName_.find(name) != nodesByName_.end())
-      name = base + util::toString(++i);
-
+    do name = base + util::toString(i++);
+    while (nodesByName_.find(name) != nodesByName_.end());
+      
     return name;
   }
 
@@ -658,12 +694,26 @@ namespace pnapi
 	   transitions_.find(dynamic_cast<Transition *>(&node)) ==
 	   transitions_.end());
 
-    // FIXME: arcs and pre-/postsets!
+    while (!node.getPreset().empty())
+      deleteArc(*findArc(**node.getPreset().begin(), node));
+    while (!node.getPostset().empty())
+      deleteArc(*findArc(node, **node.getPostset().begin()));
 
     observer_.finalizeNodeNameHistory(node, node.getNameHistory());
     nodes_.erase(&node);
 
     delete &node;
+  }
+
+
+  /*!
+   */
+  void PetriNet::deleteArc(Arc & arc)
+  {
+    assert(arcs_.find(&arc) != arcs_.end());
+
+    arcs_.erase(&arc);
+    delete &arc;
   }
 
 
@@ -695,37 +745,6 @@ bool Transition::isNormal() const
 
 
 
-
-
-
-/*!
- * \brief   mark the place
- *
- * \param   my_tokens  the number of tokens of this place in the inital
- *                     marking
- */
-void Place::mark(unsigned int my_tokens)
-{
-  tokens_ = my_tokens;
-}
-
-
-
-
-/*!
- * \brief   destructor
- */
-/*
-Arc::~Arc()
-{
-  assert(source != NULL);
-  assert(target != NULL);
-
-  // FIXME
-  //source->postset.erase(target);
-  //target->preset.erase(source);
-}
-*/
 
 
 
@@ -1246,6 +1265,7 @@ void PetriNet::calculate_max_occurrences()
  */
 void PetriNet::mirror()
 {
+  /*
   // swap arcs
   for (set<Arc*>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
   {
@@ -1273,6 +1293,7 @@ void PetriNet::mirror()
     else if ( (*t)->getType() == Node::INPUT )
       ;//(*t)->setType(Node::OUTPUT);
   }
+  */
 }
 
 
@@ -1524,25 +1545,6 @@ bool PetriNet::checkFinalCondition(Marking &m) const
 }
 
 
-
-
-/*!
- * \brief   deletes all interface places
- */
-void PetriNet::makeInnerStructure()
-{
-    // deletes all IN-places
-    for(set<Place *>::iterator place = inputPlaces_.begin(); place != inputPlaces_.end(); place = inputPlaces_.begin())
-    {
-        deletePlace(**place);
-    }
-
-    // deletes all OUT-places
-    for(set<Place *>::iterator place = outputPlaces_.begin(); place != outputPlaces_.end(); place = outputPlaces_.begin())
-    {
-        deletePlace(**place);
-    }
-}
 
 
 

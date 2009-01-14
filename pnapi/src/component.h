@@ -54,6 +54,10 @@ namespace pnapi
    */
   class Node
   {
+
+    /// observer needs to update pre- and postsets
+    friend class ComponentObserver;
+
   public:
 
     /// node types (communication)
@@ -66,7 +70,7 @@ namespace pnapi
     Node(PetriNet &, ComponentObserver &, const Node &);
 
     /// destructor
-    ~Node();
+    virtual ~Node();
 
     /// returns the petri net to which this node belongs
     PetriNet & getPetriNet() const;
@@ -92,14 +96,8 @@ namespace pnapi
     /// returns the node's postset
     const set<Node *> & getPostset() const;
 
-    /// update of pre- and postset
-    void updateNeighbourSets(Arc &);
-
     // DOT output of the node
     virtual string toString() const =0;
-
-    // notify PetriNet after change of name history
-    void notifyNameHistoryChanged();
 
 
   protected:
@@ -154,27 +152,14 @@ namespace pnapi
     /// copy constructor
     Transition(PetriNet &, ComponentObserver &, const Transition &);
 
-    /// adds a label (used for constraint oWFN)
-    void addLabel(const string &);
-
-    /// returns the set of labels
-    set<string> getLabels() const;
-
     /// help method for normalize method
     bool isNormal() const;
 
     /// output of the transition
     string toString() const;
 
-    /// notify PetriNet after creation
-    void notifyCreated();
-
 
   private:
-
-    /// labels (used for constraint oWFN)
-    set<string> labels_;
-
 
     /// no standard copying!
     Transition(const Transition &);
@@ -201,9 +186,6 @@ namespace pnapi
     /// returns the number of tokens lying on this place
     unsigned int getTokenCount() const;
 
-    /// mark the place
-    void mark(unsigned int tokens = 1);
-
     /// returns the capacity
     unsigned int getCapacity() const;
 
@@ -212,15 +194,6 @@ namespace pnapi
 
     /// merges two places
     Place & merge(Place &);
-
-    /// internalizes an interface place
-    void internalize();
-
-    /// notify PetriNet after creation
-    void notifyCreated();
-
-    /// notify PetriNet after type change
-    void notifyTypeChanged();
 
     
   private:
@@ -245,6 +218,9 @@ namespace pnapi
     void createArcs(const Place &, Place &, const set<Node *>, 
 		    const set<Node *>, bool) const;
 
+    /// internalizes an interface place
+    void internalize();
+
   };
 
 
@@ -264,6 +240,9 @@ namespace pnapi
     /// copy constructor
     Arc(PetriNet &, ComponentObserver &, const Arc &);
 
+    /// destructor
+    virtual ~Arc();
+
     /// returns the Petri net this arc belongs to
     PetriNet & getPetriNet() const;
 
@@ -276,17 +255,8 @@ namespace pnapi
     /// weight
     unsigned int getWeight() const;
 
-    /// change the weight
-    void setWeight(unsigned int);
-
-    /// swaps source and target node of the arc
-    void mirror();
-
     /// DOT-output of the arc
     string toString(bool = true) const;
-
-    /// notify PetriNet after creation
-    void notifyCreated();
 
 
   private:
@@ -309,6 +279,12 @@ namespace pnapi
 
     /// no copying!
     Arc(const Arc &);
+
+    /// change the weight
+    void setWeight(unsigned int);
+
+    /// swaps source and target node of the arc
+    void mirror();
 
   };
 

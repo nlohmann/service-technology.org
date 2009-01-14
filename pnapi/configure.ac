@@ -33,5 +33,6 @@ AC_SUBST(PETRIFY)
 AC_CONFIG_FILES([Makefile
                  Doxyfile
                  src/Makefile
-                 tests/Makefile])
+                 tests/Makefile
+		 tests/petrinet/Makefile])
 AC_OUTPUT

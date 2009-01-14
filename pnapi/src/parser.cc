@@ -1,7 +1,6 @@
 #include <cassert>
 #include <fstream>
 
-#include "link.h"
 #include "parser.h"
 
 using std::ifstream;

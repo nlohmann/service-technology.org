@@ -1442,8 +1442,6 @@ void PetriNet::loop_final_state()
  *
  *          A Petri net (resp. open net) is called normal if
  *            each transition has only one interface place in its neighborhood.
- *
- * \todo    Write test cases.
  */
 void PetriNet::normalize()
 {
@@ -1474,25 +1472,25 @@ void PetriNet::normalize()
         // set arcs (1, 2 & 3)
         if ((*place)->getType() == Node::INPUT)
         {
-          Arc f1 = createArc(newPin, newT);
-          Arc f2 = createArc(newT, newP);
+          createArc(newPin, newT);
+          createArc(newT, newP);
           for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
           {
             if (&(*f)->getSourceNode() == (*place))
             {
-              Arc f3 = createArc(newP, (*f)->getTargetNode());
+              createArc(newP, (*f)->getTargetNode());
             }
           }
         }
         else
         {
-          Arc f1 = createArc(newT, newPin);
-          Arc f2 = createArc(newP, newT);
+          createArc(newT, newPin);
+          createArc(newP, newT);
           for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
           {
             if (&(*f)->getTargetNode() == (*place))
             {
-              Arc f3 = createArc((*f)->getSourceNode(), newP);
+              createArc((*f)->getSourceNode(), newP);
             }
           }
         }

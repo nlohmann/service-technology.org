@@ -306,6 +306,10 @@ namespace pnapi
     /// weight of the arc
     unsigned int weight_;
 
+
+    /// no copying!
+    Arc(const Arc &);
+
   };
 
 }

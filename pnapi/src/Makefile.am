@@ -1,4 +1,4 @@
-lib_LIBRARIES = libpnapi.a
+noinst_LIBRARIES = libpnapi.a
 
 libpnapi_a_SOURCES = \
 	pnapi.h \

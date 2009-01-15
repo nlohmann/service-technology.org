@@ -19,9 +19,12 @@ BUILT_SOURCES = parser-owfn.cc parser-petrify.cc
 
 EXTRA_DIST = parser-owfn.h parser-petrify.h
 
+# get flags from configure script
+AM_LDFLAGS  = @configured_LDFLAGS@
+AM_CXXFLAGS = @configured_CXXFLAGS@
+
 # show all warnings
-libpnapi_a_LDFLAGS  = @configured_LDFLAGS@
-libpnapi_a_CXXFLAGS = @configured_CXXFLAGS@ -Wall
+libpnapi_a_CPPFLAGS = -Wall
 
 # clean additional (generated) files
 MAINTAINERCLEANFILES = parser-owfn.h parser-onwd.h parser-petrify.h

@@ -188,6 +188,21 @@ namespace pnapi
     initializeNodeNameHistory(node);
   }
 
+  
+  void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
+  {
+    assert(node2.getNameHistory().empty());
+
+    // delete node2 from net
+    Place * place = dynamic_cast<Place *>(&node2);
+    if (place != NULL)
+      net_.deletePlace(*place);
+    else
+      net_.deleteTransition(*dynamic_cast<Transition *>(&node2));
+
+    // FIXME: update final condition (node2 was merged into node1)
+  }
+
 
   void ComponentObserver::initializeNodeNameHistory(Node & node)
   {
@@ -575,62 +590,6 @@ namespace pnapi
 
 
   /*!
-   * The actual function to merge two places. Given places p1 and p2:
-   * -# a new place p12 with empty history is created
-   * -# this place gets the union of the histories of place p1 and p2
-   * -# the presets and postsets of p1 and p2 are calculated and united
-   * -# p12 is connected with all the transitions in the preset and postset
-   * -# the places p1 and p2 are removed
-   *
-   * \param   p1  first place
-   * \param   p2  second place
-   *
-   * \pre     p1 and p2 are internal places.
-   * \post    Places p1 and p2 removed.
-   * \post    Place p12 having the incoming and outgoing arcs of p1 and p2 and
-   *          the union of the histories of t1 and t2.
-   */
-  void PetriNet::mergePlaces(Place & p1, Place & p2)
-  {
-    assert(&p1.getPetriNet() == &p2.getPetriNet());
-    assert(p1.getType() == Node::INTERNAL);
-    assert(p2.getType() == Node::INTERNAL);
-
-    mergeArcs(p1, p2, p1.getPreset(), p2.getPreset(), false);
-    mergeArcs(p1, p2, p1.getPostset(), p2.getPostset(), true);
-
-    // FIXME: what about the final condition formula?
-
-    p1.merge(p2);
-  }
-
-
-  void PetriNet::mergeArcs(Place & p1, Place & p2,
-			   const set<Node *> & set1, const set<Node *> & set2,
-			   bool isPostset)
-  {
-    /*
-    for (set<Node *>::iterator it = set2.begin(); it != set2.end(); ++it)
-      {
-	Node & p1Source = isPostset ? p1   : **it;
-	Node & p2Source = isPostset ? p2   : **it;
-	Node & p1Target = isPostset ? **it : p1;
-	Node & p2Target = isPostset ? **it : p2;
-
-	Arc * arc1 = findArc(p1Source, p1Target);
-	Arc * arc2 = findArc(p2Source, p2Target);
-
-	assert(arc2 != NULL);
-	if (arc1 == NULL)
-	  createArc(p1Source, p1Target, arc2->getWeight());
-	else
-	  arc1->setWeight(arc1->getWeight() + arc2->getWeight());
-      }
-    */
-  }
-
-
-  /*!
    * \param   base  base name
    * \return  a string to be used as a name for a new node
    */
@@ -644,6 +603,97 @@ namespace pnapi
     while (nodesByName_.find(name) != nodesByName_.end());
       
     return name;
+  }
+
+
+  /*!
+   * \brief   checks whether the Petri net is free choice
+   *
+   *          A Petri net is free choice iff
+   *            all two transitions have either disjoint or equal presets
+   *
+   * \return  true if the criterion is fulfilled and false if not
+   */
+  bool PetriNet::isFreeChoice() const
+  {
+    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      for (set<Transition *>::iterator tt = transitions_.begin(); tt != transitions_.end(); tt++)
+	{
+	  set<Node *> t_pre  = (*t)->getPreset();
+	  set<Node *> tt_pre = (*tt)->getPreset();
+	  if ((t_pre != tt_pre) && !(util::setIntersection(t_pre, tt_pre).empty()))
+	    return false;
+	}
+    return true;
+  }
+
+
+  /*!
+   * \brief   normalizes the given Petri net
+   *
+   *          A Petri net (resp. open net) is called normal if
+   *          each transition has only one interface place in its neighborhood.
+   */
+  void PetriNet::normalize()
+  {
+
+    std::string suffix = "_normalized";
+    set<Place *> temp;
+    set<Place *> interface = getInterfacePlaces();
+
+    for (set<Place *>::iterator place = interface.begin(); place
+	   != interface.end(); place++)
+      {
+	set<Node *> neighbors = util::setUnion((*place)->getPreset(), (*place)->getPostset());
+	for (set<Node *>::iterator transition = neighbors.begin();
+	     transition != neighbors.end(); transition++)
+	  {
+	    Transition *t = static_cast<Transition *>(*transition);
+	    while (!t->isNormal())
+	      {
+		// create new internal place from interface place
+		Place &newP = createPlace((*place)->getName() + suffix);
+
+		// create new interface place
+		Place &newPin = createPlace("i_" + (*place)->getName(), (*place)->getType());
+
+		// create new transition
+		Transition &newT = createTransition("t_" + (*place)->getName());
+
+		// set arcs (1, 2 & 3)
+		if ((*place)->getType() == Node::INPUT)
+		  {
+		    createArc(newPin, newT);
+		    createArc(newT, newP);
+		    for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+		      {
+			if (&(*f)->getSourceNode() == (*place))
+			  {
+			    createArc(newP, (*f)->getTargetNode());
+			  }
+		      }
+		  }
+		else
+		  {
+		    createArc(newT, newPin);
+		    createArc(newP, newT);
+		    for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+		      {
+			if (&(*f)->getTargetNode() == (*place))
+			  {
+			    createArc((*f)->getSourceNode(), newP);
+			  }
+		      }
+		  }
+
+		temp.insert(*place);
+	      }
+	  }
+      }
+
+    // remove the old interface places
+    for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
+      deletePlace(**place);
   }
 
 
@@ -721,367 +771,6 @@ namespace pnapi
   /***************************** NOT YET REFACTORED *************************/
 
 
-
-/*!
- * \brief   checks if the transition is normal
- *
- * \note    This is a help method for normalize method
- *          in class PetriNet.
- */
-bool Transition::isNormal() const
-{
-  int counter = 0;
-
-  for (set<Node *>::const_iterator p = getPreset().begin(); p != getPreset().end(); p++)
-    if ((*p)->getType() != Node::INTERNAL)
-      counter++;
-  for (set<Node *>::const_iterator p = getPostset().begin(); p != getPostset().end(); p++)
-    if ((*p)->getType() != Node::INTERNAL)
-      counter++;
-
-  return counter <= 1;
-}
-
-
-
-
-
-
-
-
-/*!
- * \brief   swaps source and target node of the arc
- */
-void Arc::mirror()
-{
-  /* FIXME
-  Node *old_source = source;
-  Node *old_target = target;
-
-  source = old_target;
-  target = old_source;
-
-  assert(target != NULL);
-  assert(source != NULL);
-  source->postset.erase(old_target);
-  source->postset.insert(old_source);
-  target->preset.erase(old_source);
-  target->preset.insert(old_target);
-  */
-}
-
-
-
-
-
-/*****************************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-/*!
- * \brief   adds a place with a given role and type
- *
- * \param   my_role  the initial role of the place
- * \param   my_type  the type of the place (as defined in #communication_type)
- * \param   my_port  the port to which this place belongs
- * \return  pointer of the created place
- *
- * \pre     No place with the given role is defined.
- */
-/*
-Place *PetriNet::newPlace(string my_role, communication_type my_type, unsigned int capacity, string my_port)
-{
-  string my_role_with_suffix = my_role;
-
-  if (my_role != "" && !forEach_suffix.empty())
-    my_role_with_suffix += ("." + forEach_suffix[0]);
-
-  Place *p = NULL; //new Place(*this, getId(), my_role_with_suffix, my_type);
-  assert(p != NULL);
-  //FIXME: p->capacity = capacity;
-
-  // Decide in which set of places the place has to be inserted.
-  switch(my_type)
-  {
-    case (IN):	{ P_in.insert(p);  break; }
-    case (OUT):	{ P_out.insert(p); break; }
-    default:	{ P.insert(p);     break; }
-  }
-
-  // Test if the place is already defined.
-  if (my_role != "")
-  {
-    assert(roleMap[my_role_with_suffix] == NULL);
-    roleMap[my_role_with_suffix] = p;
-  }
-
-  if (my_type != INTERNAL && my_port != "")
-  {
-    ports[my_port].insert(p);
-  }
-
-  return p;
-}
-*/
-
-
-
-
-/*!
- * \brief   Reevaluates the type of transition t
- *
- *          When removing an interface place, the connected
- *          transitions have to get new or same type because
- *          they might be connected to another interface place
- *          or not. In the second case the transition must be
- *          of internal type after the deletion.
- */
-void PetriNet::reevaluateType(Transition *t)
-{
-  /*
-  if (t->getType() != Node::INTERNAL)
-  {
-    set<Node *> pset;
-
-    switch (t->getType())
-      {
-      case Node::INPUT:
-      {
-        pset = t->getPreset();
-        t->setType(Node::INTERNAL);
-        for (set<Node *>::iterator p = pset.begin(); p != pset.end(); p++)
-          if ((*p)->getType() == Node::INPUT)
-          {
-            t->setType((*p)->getType());
-            break;
-          }
-        break;
-      }
-      case Node::OUTPUT:
-      {
-        pset = t->getPostset();
-        t->setType(Node::INTERNAL);
-        for (set<Node *>::iterator p = pset.begin(); p != pset.end(); p++)
-          if ((*p)->getType() == Node::OUTPUT)
-          {
-            t->setType((*p)->getType());
-            break;
-          }
-        break;
-      }
-      case INOUT:
-      {
-        pset = t->getPreset();
-        t->setType(Node::INTERNAL);
-        for (set<Node *>::iterator p = pset.begin(); p != pset.end(); p++)
-          if ((*p)->getType() == Node::INPUT)
-          {
-            t->setType((*p)->getType());
-            break;
-          }
-
-        pset = t->getPostset();
-        for (set<Node *>::iterator p = pset.begin(); p != pset.end(); p++)
-          if ((*p)->getType() == Node::OUTPUT)
-          {
-            if (t->getType() == Node::INTERNAL)
-              t->setType((*p)->getType());
-            else
-              ; // FIXME: t->setType(INOUT);
-            break;
-          }
-        break;
-	}
-      default: break;
-    }
-  }
-      */
-}
-
-
-
-
-
-/*!
- * \brief   returns the set of all nodes
- */
-
-
-/*!
- * \brief   merges two sequential transitions
- *
- *          Merges two transitions. Given transitions t1 and t2:
- *          -# a new transition t12 with empty history is created
- *          -# this transition gets the union of the histories of transition
- *             t1 and t2
- *          -# the presets and postsets of t1 and t2 are calculated and united
- *          -# t12 is connected with all the places in the preset and postset
- *          -# the transitions t1 and t2 are removed
- *
- * \param   t1  first transition
- * \param   t2  second transition
- *
- * \pre     t1 != NULL
- * \pre     t2 != NULL
- * \post    Transitions t1 and t2 removed.
- * \post    Transition t12 having the incoming and outgoing arcs of t1 and t2
- *          and the union of the histories of t1 and t2.
- *
- * \todo    overwork the weight setting part according to the appropriate one
- *          of PetriNet::mergePlaces()
- *
- * \test	This method has been tested in tests/test_mergeTransitions.cc.
- */
-void PetriNet::mergeTransitions(Transition & t1, Transition & t2)
-{
-  /*
-  if (t1 == t2)
-    return;
-
-  assert(t1 != NULL);
-  assert(t2 != NULL);
-
-  // variable needed for correct arc weights
-  //bool sametarget = false;
-  // container for arcs to be deleted
-  set<Arc *>::iterator delArc;
-  // the merged transition
-  Node *t12 = newTransition("");
-
-  // organize the communication type of the new transition
-  if (t1->getType() == t2->getType())
-  {
-    t12->setType(t1->getType());
-  }
-  else if ((t1->getType() == Node::INPUT && t2->getType() == Node::INTERNAL) ||
-           (t1->getType() == Node::INTERNAL && t2->getType() == Node::INPUT))
-  {
-    t12->setType(Node::INPUT);
-  }
-  else if ((t1->getType() == Node::INTERNAL && t2->getType() == Node::OUTPUT) ||
-           (t1->getType() == Node::OUTPUT && t2->getType() == Node::INTERNAL))
-  {
-    t12->setType(Node::OUTPUT);
-  }
-  else if ((t1->getType() == Node::OUTPUT && t2->getType() == Node::INPUT) ||
-           (t1->getType() == Node::INPUT && t2->getType() == Node::OUTPUT) ||
-           (t1->getType() == INOUT || t2->getType() == INOUT))
-  {
-    ; // FIXME: t12->setType(INOUT);
-    }
-  else assert(false); ///< this should never happen or we have missed a case
-
-  t12->prefix = t1->prefix;
-
-  // copy t1's history to t12
-  for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
-  {
-    roleMap[*role] = t12;
-    t12->history.push_back(*role);
-    if (t1->prefix != "")
-    {
-        roleMap[t1->prefix + *role] = t12;
-        t12->history.push_back(t1->prefix + *role);
-    }
-  }
-
-  // copy t2's history to t12
-  for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
-  {
-    roleMap[*role] = t12;
-    t12->history.push_back(*role);
-    if (t1->prefix != "" || t2->prefix != "")
-    {
-        roleMap[t2->prefix + *role] = t12;
-        t12->history.push_back(t2->prefix + *role);
-    }
-  }
-
-  roleMap[t1->getName()] = t12;
-  roleMap[t2->getName()] = t12;
-
-  // merge pre- and postsets for t12
-  // FIXME
-  //t12->preset=setUnion(t1->getPreset(), t2->getPreset());
-  //t12->postset=setUnion(t1->getPostset(), t2->getPostset());
-
-  // create the weighted arcs for t12
-
-  // this is the preset of t12 without the preset of t1. It is needed not generate double arcs if
-  // the preset of t1 and t2 were not distinct.
-  set<Node *> preset2without1 = util::setDifference(t12->getPreset(),t1->getPreset());
-
-
-  // create new arcs from the t1 preset to t12
-  for (set<Node *>::iterator n = t1->getPreset().begin(); n != t1->getPreset().end(); n++)
-    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
-
-  // create new arcs from the preset of t2 to t12 without those, that have been already covered by the preset of t1
-  for (set<Node *>::iterator n = preset2without1.begin(); n != preset2without1.end(); n++)
-    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
-
-  // create new arcs from t12 to postset of t1
-  for (set<Node *>::iterator n = t1->getPostset().begin(); n != t1->getPostset().end(); n++)
-    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
-
-  // create new arcs from t12 to postset of t2 and adjust arcweights if a node of postset of t2 is also in postset of t1
-  for (set<Node *>::iterator n = t2->getPostset().begin(); n != t2->getPostset().end(); n++)
-  {
-    // Find an arc already created in because of the postset of t1
-    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    {
-      if ((&(*f)->getSourceNode() == t12) && (&(*f)->getTargetNode() == (*n)))
-      {
-        sametarget = true;
-        delArc=f;
-      }
-    }
-
-    // if such an arc was found, save its weight, delete it and add its weight to the arc from t12 to postset of t2
-    if (sametarget)
-    {
-      int weightsave = arc_weight(t12,(*n));
-      removeArc(*delArc);
-      newArc(t12, (*n), STANDARD, (arc_weight(t2,(*n)) + weightsave));
-      sametarget = false;
-    }
-    // if no such arc was found, simply add an arc from t12 to postset of t2
-    else
-    {
-      newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
-    }
-  }
-
-
-  // set max_occurrences
-  t12->max_occurrences = (t1->max_occurrences > t2->max_occurrences) ?
-    t1->max_occurrences :
-    t2->max_occurrences;
-
-  deleteTransition(*t1);
-  deleteTransition(*t2);
-  */
-}
-
-
-
-
-
-
-
-
-
-
-
 /*!
  * \brief   returns true iff all arcs connecting to n have the same weight
  *
@@ -1125,136 +814,6 @@ bool PetriNet::sameweights(Node *n) const
 }
 
 
-
-
-
-/*---------------------------------------------------------------------------*/
-
-
-
-
-/*!
- * \brief   moves channel places to the list of internal places
- *
- *          Converts input and output places (channels) to internal places.
- *
- * \todo    What means "P_in.clear(); P_in = set< Place * >();"?
- *
- * \deprecated  This method has been replaced by method compose().
- */
-void PetriNet::makeChannelsInternal()
-{
-  // copy input and output places to the set of internal places
-  for (set<Place *>::iterator place = inputPlaces_.begin(); place != inputPlaces_.end(); place ++)
-    places_.insert(*place);
-
-  for (set<Place *>::iterator place = outputPlaces_.begin(); place != outputPlaces_.end(); place ++)
-    places_.insert(*place);
-
-  // empty the set of input and output places
-  inputPlaces_.clear(); inputPlaces_ = set< Place * >();
-  outputPlaces_.clear(); outputPlaces_ = set< Place * >();
-}
-
-
-
-
-
-/*!
- * \brief   calculate the maximal occurrences of communication
- *
- *          Calculates the maximal number each communication place can be
- *          used, i.e. the maximal occurrences of transitions in the preset
- *          (postset) of output (input) places. This number is determined by
- *          postprocessing the AST.
- *
- * \todo    use information from the postprocessing/CFG to improved (i.e.
- *          minimize) the calculated values
- *
- * \post    All communication places have max_occurrences values between 0
- *          (initial value) and UINT_MAX (maximal value).
- *
- * \note    BPEL2oWFN only method.
- */
-void PetriNet::calculate_max_occurrences()
-{
-#ifdef USING_BPEL2OWFN
-
-  // set the max_occurrences for the transitions (should make more sense...)
-  for (set<Transition *>::iterator transition = T.begin();
-       transition != T.end();
-       transition++)
-  {
-    unsigned int activity_identifier = toUInt((*(*transition)->history.begin()).substr(0, (*(*transition)->history.begin()).find_first_of(".")));
-
-    assert(globals::ASTEmap[activity_identifier] != NULL);
-    (*transition)->max_occurrences = globals::ASTEmap[activity_identifier]->max_occurrences;
-  }
-
-
-
-  // process the input places
-  for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
-  {
-    set<unsigned int> receiving_activities;
-
-    for (set<Node *>::iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
-      for (unsigned int i = 0; i < (*t)->history.size(); i++)
-      {
-        // unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
-        string act_id = (*t)->getName().substr(0, (*t)->getName().find_first_of("."));
-
-        act_id = act_id.substr( act_id.find_last_of( "_" ) + 1 );
-        unsigned int transition_activity_id = toUInt( act_id );
-        assert(globals::ASTEmap[transition_activity_id] != NULL);
-        receiving_activities.insert(transition_activity_id);
-      }
-
-        for (set<unsigned int>::iterator activity_id = receiving_activities.begin(); activity_id != receiving_activities.end(); activity_id++)
-        {
-          if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
-            (*p)->max_occurrences = UINT_MAX;
-          else if ((*p)->max_occurrences != UINT_MAX)
-          {
-            if (globals::ASTEmap[*activity_id]->activityTypeName() == "repeatUntil" ||
-                globals::ASTEmap[*activity_id]->activityTypeName() == "while")
-              (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_loops;
-            else
-              (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
-          }
-          //  Debugging Help
-          //  cerr << "gehoert auch zu Aktivitaet: " << globals::ASTEmap[*activity_id]->activityTypeName() << "!\n";
-        }
-  }
-
-    // process the output places
-    for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
-    {
-      set<unsigned int> sending_activities;
-
-      for (set<Node *>::iterator t = (*p)->getPreset().begin(); t != (*p)->getPreset().end(); t++)
-        for (list<string>::iterator iter = (*t)->history.begin(); iter != (*t)->history.end(); iter++)
-        {
-          unsigned int transition_activity_id = toUInt(iter->substr(0, iter->find_first_of(".")));
-          assert(globals::ASTEmap[transition_activity_id] != NULL);
-          sending_activities.insert(transition_activity_id);
-        }
-
-          for (set<unsigned int>::iterator activity_id = sending_activities.begin(); activity_id != sending_activities.end(); activity_id++)
-          {
-            if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
-              (*p)->max_occurrences = UINT_MAX;
-            else if ((*p)->max_occurrences != UINT_MAX)
-              (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
-          }
-    }
-#endif
-}
-
-
-
-
-
 /*!
  * \brief   swaps input and output places
  *
@@ -1295,8 +854,6 @@ void PetriNet::mirror()
   }
   */
 }
-
-
 
 
 
@@ -1435,101 +992,6 @@ void PetriNet::produce(const PetriNet &net)
 
 
 
-/*!
- * \brief  adds a transition that has read arcs to all final places
- *
- * \test	This method has been tested in tests/test_loop_final_state.cc.
- *
- * \note    BPEL2oWFN only method.
- */
-void PetriNet::loop_final_state()
-{
-  //Transition *t = newTransition("antideadlock");
-
-  for (set<Place *>::iterator place = places_.begin(); place != places_.end(); place++)
-  {
-    /* FIXME
-    if ( (*place)->isFinal )
-      newArc(t, *place, READ);
-    */
-  }
-}
-
-
-
-
-/*!
- * \brief   normalizes the given Petri net
- *
- *          A Petri net (resp. open net) is called normal if
- *            each transition has only one interface place in its neighborhood.
- */
-void PetriNet::normalize()
-{
-
-  std::string suffix = "_normalized";
-  set<Place *> temp;
-  set<Place *> interface = getInterfacePlaces();
-
-  for (set<Place *>::iterator place = interface.begin(); place
-      != interface.end(); place++)
-  {
-    set<Node *> neighbors = util::setUnion((*place)->getPreset(), (*place)->getPostset());
-    for (set<Node *>::iterator transition = neighbors.begin();
-        transition != neighbors.end(); transition++)
-    {
-      Transition *t = static_cast<Transition *>(*transition);
-      while (!t->isNormal())
-      {
-        // create new internal place from interface place
-        Place &newP = createPlace((*place)->getName() + suffix);
-
-        // create new interface place
-        Place &newPin = createPlace("i_" + (*place)->getName(), (*place)->getType());
-
-        // create new transition
-        Transition &newT = createTransition("t_" + (*place)->getName());
-
-        // set arcs (1, 2 & 3)
-        if ((*place)->getType() == Node::INPUT)
-        {
-          createArc(newPin, newT);
-          createArc(newT, newP);
-          for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-          {
-            if (&(*f)->getSourceNode() == (*place))
-            {
-              createArc(newP, (*f)->getTargetNode());
-            }
-          }
-        }
-        else
-        {
-          createArc(newT, newPin);
-          createArc(newP, newT);
-          for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-          {
-            if (&(*f)->getTargetNode() == (*place))
-            {
-              createArc((*f)->getSourceNode(), newP);
-            }
-          }
-        }
-
-        temp.insert(*place);
-      }
-    }
-  }
-
-  // remove the old interface places
-  for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
-    deletePlace(**place);
-}
-
-
-
-
-
 
 /*!
  * \brief   checks a marking m for final condition
@@ -1558,10 +1020,8 @@ bool PetriNet::checkFinalCondition(Marking &m) const
  *
  * \return  true iff (1), (2) and (3) are fulfilled
  * \return  false in any other case
- *
- * \test    Tested in tests/test_isWorkflowNet.cc
  */
-bool PetriNet::isWorkflowNet()
+bool PetriNet::isWorkflow() const
 {
   Place *first = NULL;
   Place *last  = NULL;
@@ -1597,7 +1057,7 @@ bool PetriNet::isWorkflowNet()
   }
 
   // insert new transition which consumes from last and produces on first to form a cycle
-  Transition *tarjan = &createTransition("tarjan");
+  //Transition *tarjan = &createTransition("tarjan");
   //FIXME
   //newArc(last, tarjan);
   //  newArc(tarjan, first);
@@ -1621,7 +1081,7 @@ bool PetriNet::isWorkflowNet()
 
   std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
 
-  deleteTransition(*tarjan);
+  //deleteTransition(*tarjan);
 
   // check set $P \cup T$
   set<Node *> nodeSet;
@@ -1697,30 +1157,6 @@ unsigned int PetriNet::dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked
 }
 
 
-
-
-/*!
- * \brief   checks whether the Petri net is free choice
- *
- *          A Petri net is free choice iff
- *            all two transitions have either disjoint or equal presets
- *
- * \return  true if the criterion is fulfilled and false if not
- *
- * \todo    Write test cases.
- */
-bool PetriNet::isFreeChoice() const
-{
-  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-    for (set<Transition *>::iterator tt = transitions_.begin(); tt != transitions_.end(); tt++)
-    {
-      set<Node *> t_pre  = (*t)->getPreset();
-      set<Node *> tt_pre = (*tt)->getPreset();
-      if ((t_pre != tt_pre) && !(util::setIntersection(t_pre, tt_pre).empty()))
-        return false;
-    }
-  return true;
-}
 
 
 

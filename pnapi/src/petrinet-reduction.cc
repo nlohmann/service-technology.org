@@ -366,7 +366,7 @@ void PetriNet::reduce_identical_places()
     {
       Place* p1 = findPlace(labels->first);
       Place* p2 = findPlace(labels->second);
-      mergeParallelPlaces(p1, p2);
+      p1->merge(*p2, false);
       result++;
     }
     //if (result!=0)
@@ -460,7 +460,7 @@ void PetriNet::reduce_identical_transitions()
       Transition* t1 = findTransition(labels->first);
       Transition* t2 = findTransition(labels->second);
       
-      mergeParallelTransitions(t1, t2);
+      t1->merge(*t2, false);
       result++;
     }
     //if (result!=0)
@@ -537,7 +537,7 @@ void PetriNet::reduce_series_places()
   for (set<pair<string, string> >::iterator placePair = placePairs.begin();
        placePair != placePairs.end(); placePair++)
   {
-    //FIXME: mergePlaces(placePair->first, placePair->second);
+    findPlace(placePair->first)->merge(*findPlace(placePair->second));
     result++;
   }
   //if (result!=0)
@@ -619,7 +619,7 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
                     != transitionPairs.end(); transitionPair++) {
         Transition* t1 = findTransition(transitionPair->first);
         Transition* t2 = findTransition(transitionPair->second);
-        mergeTransitions(*t1, *t2);
+        t1->merge(*t2);
         result++;
     }
     //if (result!=0)
@@ -999,227 +999,6 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
 
 
 /*!
- * \brief   merges two parallel transitions
- *
- *          Merges two parallel transitions. Given transitions t1 and t2:
- *          -# a new transition t12 with empty history is created
- *          -# this transition gets the union of the histories of transition t1
- *             and t2
- *          -# t12 is connected with all the places in the preset and postset of t1
- *          -# the transitions t1 and t2 are removed
- * 
- *          This Function is needed by reduce_identical_transitions
- *
- * \param   t1  first transition
- * \param   t2  second transition
- *
- * \pre     t1 != NULL
- * \pre     t2 != NULL
- * \post    Transitions t1 and t2 removed.
- * \post    Transition t12 having the incoming and outgoing arcs of t1
- *          and the union of the histories of t1 and t2.
- *
- */
-void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
-{
-  /* FIXME
-  if (t1 == t2)
-    return;
-
-  assert(t1 != NULL);
-  assert(t2 != NULL);
-
-  Node *t12 = newTransition("");
-
-  // organize the communication type of the new transition
-  if (t1->getType() == t2->getType())
-    t12->setType(t1->getType());
-
-  else if ((t1->getType() == Node::INPUT && t2->getType() == Node::INTERNAL) ||
-           (t1->getType() == Node::INTERNAL && t2->getType() == Node::INPUT))
-    t12->setType(Node::INPUT);
-
-  else if ((t1->getType() == Node::INTERNAL && t2->getType() == Node::OUTPUT) ||
-           (t1->getType() == Node::OUTPUT && t2->getType() == Node::INTERNAL))
-    t12->setType(Node::OUTPUT);
-
-  else if ((t1->getType() == OUT && t2->getType() == Node::INPUT) ||
-           (t1->getType() == Node::INPUT && t2->getType() == OUT) ||
-           (t1->getType() == INOUT || t2->getType() == INOUT))
-    t12->getType() = INOUT;
-
-
-  // copy t1's history to t12
-  for (list<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
-  {
-    roleMap[*role] = t12;
-    t12->history.push_back(*role);
-    if (t1->prefix != "")
-    {
-        roleMap[t1->prefix + *role] = t12;
-        t12->history.push_back(t1->prefix + *role);
-    }
-  }
-
-  // copy t2's history to t12
-  for (list<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
-  {
-    roleMap[*role] = t12;
-    t12->history.push_back(*role);
-    if (t1->prefix != "" || t2->prefix != "")
-    {
-        roleMap[t2->prefix + *role] = t12;
-        t12->history.push_back(t2->prefix + *role);
-    }
-  }
-  */
-
-  // merge pre- and postsets for t12
-  // FIXME
-  //t12->preset=t1->getPreset();
-  //t12->postset=t1->getPostset();
-
-  /*
-  for (set<Node *>::iterator n = t1->getPreset().begin(); n != t1->getPreset().end(); n++)
-    newArc((*n), t12, STANDARD, findArc(*(*n),*t1)->getWeight());
-
-  for (set<Node *>::iterator n = t1->getPostset().begin(); n != t1->getPostset().end(); n++)
-    newArc(t12, (*n), STANDARD, findArc(*t1,*(*n))->getWeight());
-  */
-
-  deleteTransition(*t1);
-  deleteTransition(*t2);
-}
-
-/*!
- * \brief   merges two parallel places
- *
- *          Function to merge two parallel places. Given places p1 and p2:
- *          -# a new place p12 with empty history is created
- *          -# this place gets the union of the histories of place p1 and p2
- *          -# p12 is connected with the preset and postset of p1
- *          -# the places p1 and p2 are removed
- * 
- *          This function is needed by reduce_identical_places.
- *
- * \param   p1  first place
- * \param   p2  second place
- *
- * \pre     p1 != NULL
- * \pre     p2 != NULL
- * \pre     p1 and p2 are internal places.
- * \post    Places p1 and p2 removed.
- * \post    Place p12 having the incoming and outgoing arcs of p1 and
- *          the union of the histories of p1 and p2.
- * 
- * \note    This function has been copied from mergePlaces
- * \note    What if p1 or p2 is final?
- * 
- */
-void PetriNet::mergeParallelPlaces(Place *p1, Place *p2)
-{
-  if (p1 == p2 && p1 != NULL)
-      return;
-
-  if (p1 == NULL || p2 == NULL)
-  {
-    std::cerr << "[PN] At least one parameter of mergePlaces was NULL!" << std::endl;
-    assert(false);
-    return;
-  }
-
-  assert(p1 != NULL);
-  assert(p2 != NULL);
-  assert(p1->getType() == Node::INTERNAL);
-  assert(p2->getType() == Node::INTERNAL);
-
-  /* FIXME
-  Place *p12 = newPlace("");
-
-  p12->history.clear();
-  p12->prefix = p1->prefix;
-
-  for (list<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
-  {
-    p12->history.push_back(*role);
-    roleMap[*role] = p12;
-    if (p1->prefix != "" || p2->prefix != "")
-    {
-      p12->prefix = p1->prefix;
-      roleMap[p1->prefix + *role] = p12;
-      p12->history.push_back(p1->prefix + *role);
-      roleMap[p2->prefix + *role] = p12;
-      p12->history.push_back(p2->prefix + *role);
-    }
-  }
-
-  for (list<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
-  {
-    p12->history.push_back(*role);
-    roleMap[*role] = p12;
-    if (p1->prefix != "" || p2->prefix != "")
-    {
-      roleMap[p1->prefix + *role] = p12;
-      p12->history.push_back(p1->prefix + *role);
-      roleMap[p2->prefix + *role] = p12;
-      p12->history.push_back(p2->prefix + *role);
-    }
-
-  }
-
-  list<set<pair<Place *, unsigned int> > > newFinalSetList;
-  // change final places in the final sets
-  for (list<set<pair<Place *, unsigned int> > >::iterator final_set = final_set_list.begin(); final_set != final_set_list.end(); final_set++)
-  {
-    set<pair<Place *, unsigned int> > s1;
-    set<pair<Place *, unsigned int> > s2;
-    for (set<pair<Place *, unsigned int> >::iterator p = final_set->begin(); p != final_set->end(); p++)
-    {
-      if ((p->first) == p1 || (p->first) == p2)
-      {
-        //FIXME: p12->isFinal = true;
-        s1.insert(pair<Place *, unsigned int>(p12,p->second));
-      }
-      else
-      {
-        s2.insert(*p);
-      }
-    }
-    set<pair<Place *, unsigned int> > s1s2 = util::setUnion(s1,s2);
-    set<pair<Place *, unsigned int> > s1s2;
-    s1s2.insert(s1.begin(), s1.end());
-    s1s2.insert(s2.begin(), s2.end());
-    newFinalSetList.push_back(s1s2);
-  }
-  final_set_list = newFinalSetList;
-
-  // merge pre- and postsets for p12
-  // FIXME
-  //p12->preset=p1->getPreset();
-  //p12->postset=p1->getPostset();
-
-  // create the weighted arcs for p12
-
-  if ((p1->getPreset().size() + p1->getPostset().size()) > 1000)
-    std::cerr << (p1->getPreset().size() + p1->getPostset().size()) << " arcs to add..." << std::endl;
-
-  for (set<Node *>::iterator n = p1->getPreset().begin(); n != p1->getPreset().end(); n++)
-    newArc((*n), p12, STANDARD, findArc(*(*n),*p1)->getWeight());
-
-  for (set<Node *>::iterator n = p1->getPostset().begin(); n != p1->getPostset().end(); n++)
-    newArc(p12, (*n), STANDARD, findArc(*p1,*(*n))->getWeight());
-
-  deletePlace(*p1);
-  deletePlace(*p2);
-
-  p1 = NULL;
-  p2 = NULL;
-*/
-
-}
-
-
-/*!
  * Removes unnecessary nodes of the generated Petri net:
  *  - structural dead nodes
  *  - unused status places
@@ -1252,11 +1031,6 @@ void PetriNet::mergeParallelPlaces(Place *p1, Place *p2)
  * \note    reduce_dead_nodes, reduce_unused_status_places and 
  *          reduce_suspicious_transitions temporary won't be invoked 
  *          since they are no murta rules.
- * 
- * \todo
- *       - Improve performance of the rules.
- *       - Pass a parameter to this function to choose the property of the
- *         model to be preserved.
  */
 unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
 {

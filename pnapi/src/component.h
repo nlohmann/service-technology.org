@@ -102,20 +102,20 @@ namespace pnapi
 
   protected:
 
+    /// the petri net this node belongs to
+    PetriNet & net_;
+
     /// petri net's observer for this node
     ComponentObserver & observer_;
 
     /// changes the type of this node
     virtual void setType(Type);
 
-    /// changes the history
-    void addToHistory(const deque<string> &);
+    /// merges another node into this one
+    void merge(Node &, bool);
 
 
   private:
-
-    /// the petri net this node belongs to
-    PetriNet & net_;
 
     /// the type of this node
     Type type_;
@@ -132,6 +132,13 @@ namespace pnapi
     
     /// no copying!
     Node(const Node &);
+
+    /// merges the histories of two nodes
+    void mergeNameHistory(Node &);
+
+    /// merges the pre-/postsets of two nodes
+    void mergeArcs(pnapi::Node&, pnapi::Node&, const set<Node*> &, 
+		   const set<Node*> &, bool, bool);
 
   };
 
@@ -157,6 +164,9 @@ namespace pnapi
 
     /// output of the transition
     string toString() const;
+
+    /// merges another transition into this one
+    void merge(Transition &, bool = true);
 
 
   private:
@@ -193,7 +203,7 @@ namespace pnapi
     string toString() const;
 
     /// merges two places
-    Place & merge(Place &);
+    void merge(Place &, bool = true);
 
     
   private:
@@ -213,13 +223,6 @@ namespace pnapi
 
     /// changes the communication type
     void setType(Type type);
-
-    /// create arcs during merging
-    void createArcs(const Place &, Place &, const set<Node *>, 
-		    const set<Node *>, bool) const;
-
-    /// internalizes an interface place
-    void internalize();
 
   };
 
@@ -258,6 +261,9 @@ namespace pnapi
     /// DOT-output of the arc
     string toString(bool = true) const;
 
+    /// merges another arc into this one
+    void merge(Arc &);
+
 
   private:
 
@@ -279,9 +285,6 @@ namespace pnapi
 
     /// no copying!
     Arc(const Arc &);
-
-    /// change the weight
-    void setWeight(unsigned int);
 
     /// swaps source and target node of the arc
     void mirror();

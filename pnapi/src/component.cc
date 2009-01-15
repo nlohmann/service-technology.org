@@ -17,7 +17,7 @@ namespace pnapi {
    */
   Node::Node(PetriNet & net, ComponentObserver & observer, const string & name, 
 	     Type type) :
-    observer_(observer), net_(net), type_(type)
+    net_(net), observer_(observer), type_(type)
   {
     assert(&observer.getPetriNet() == &net);
 
@@ -28,7 +28,7 @@ namespace pnapi {
   /*!
    */
   Node::Node(PetriNet & net, ComponentObserver & observer, const Node & node) :
-    observer_(observer), net_(net), type_(node.type_), history_(node.history_)
+    net_(net), observer_(observer), type_(node.type_), history_(node.history_)
   {
     assert(&observer.getPetriNet() == &net);
   }
@@ -101,16 +101,6 @@ namespace pnapi {
 
   /*!
    */
-  void Node::addToHistory(const deque<string> & history)
-  {
-    deque<string> oldHistory = history_;
-    history_.insert(history_.end(), history.begin(), history.end());
-    observer_.updateNodeNameHistory(*this, oldHistory);
-  }
-
-
-  /*!
-   */
   PetriNet & Node::getPetriNet() const
   {
     return net_;
@@ -130,6 +120,58 @@ namespace pnapi {
   const set<Node *> & Node::getPostset() const
   {
     return postset_;
+  }
+
+
+  void Node::merge(Node & node, bool addArcWeights)
+  {
+    assert(&net_ == &node.net_);
+
+    mergeNameHistory(node);
+
+    mergeArcs(*this, node, preset_, node.preset_, addArcWeights, false);
+    mergeArcs(*this, node, postset_, node.postset_, addArcWeights, true);
+
+    observer_.updateNodesMerged(*this, node);
+  }
+
+
+  void Node::mergeNameHistory(Node & node)
+  {
+    // remove history of node
+    deque<string> nodeHistory = node.history_;
+    node.history_.clear();
+    observer_.updateNodeNameHistory(node, nodeHistory);
+
+    // add history of node to this
+    deque<string> oldHistory = history_;
+    history_.insert(history_.end(), nodeHistory.begin(), nodeHistory.end());
+    observer_.updateNodeNameHistory(*this, oldHistory);
+  }
+
+
+  void Node::mergeArcs(Node & node1, Node & node2, const set<Node *> & set1, 
+		       const set<Node *> & set2, bool addWeights, 
+		       bool isPostset)
+  {
+    for (set<Node *>::iterator it = set2.begin(); it != set2.end(); ++it)
+      {
+	Node & node1Source = isPostset ? node1 : **it;
+	Node & node2Source = isPostset ? node2 : **it;
+	Node & node1Target = isPostset ? **it  : node1;
+	Node & node2Target = isPostset ? **it  : node2;
+
+	Arc * arc1 = net_.findArc(node1Source, node1Target);
+	Arc * arc2 = net_.findArc(node2Source, node2Target);
+
+	assert(arc2 != NULL);
+	if (arc1 == NULL)
+	  net_.createArc(node1Source, node1Target, arc2->getWeight());
+	else if (addWeights)
+	  arc1->merge(*arc2);
+	else
+	  assert(arc1->getWeight() == arc2->getWeight());
+      }
   }
 
 
@@ -188,57 +230,32 @@ namespace pnapi {
 
   
   /*!
-   * \pre   The place must be an interface place.
-   * \post  The place is internal and WasInterface is true.
-   */
-  void Place::internalize()
-  {
-    assert(getType() != Node::INTERNAL);
-
-    setType(Node::INTERNAL);
-
-    assert(getType() == Node::INTERNAL);
-    assert(wasInterface_);
-  }
-
-
-  /*!
-   * Merges the properties of the given node into this one. If the place 
-   * resides in the same PetriNet it is deleted while merging.
+   * Merges the properties of the given node into this one. The merged place 
+   * is deleted.
    *
    * The following properties are merged:
    * - NameHistory (concatenation)
    * - WasInterface (disjunction)
    * - Capacity (maximum)
    * - TokenCount (maximum)
+   * - Pre-/Postset (union)
    *
-   * The following properties are ignored:
-   * - PetriNet
-   * - Type
-   * - Pre-/Postset
-   *
-   * Use PetriNet::mergePlaces() if you want to merge pre- and postset as well.
+   * \pre   the places must reside in the same PetriNet instance
+   * \post  the place is internal after merging
    */
-  Place & Place::merge(Place & place)
+  void Place::merge(Place & place, bool addArcWeights)
   {
-    // collect data
-    deque<string> newHistory = place.getNameHistory();
-    bool newWasInterface = wasInterface_ || place.wasInterface_;
-    unsigned int newCapacity = util::max(capacity_, place.capacity_);
-    unsigned int newTokens = util::max(tokens_, place.tokens_);
+    // be sure to internalize this place
+    if (getType() != INTERNAL)
+      setType(INTERNAL);
 
-    // possibly delete place to avoid collisions
-    PetriNet & net = getPetriNet();
-    if (&net == &place.getPetriNet())
-      ;//FIXME: net.deletePlace(place);
+    // merge place properties
+    wasInterface_ = wasInterface_ || place.wasInterface_;
+    capacity_ = util::max(capacity_, place.capacity_);
+    tokens_ = util::max(tokens_, place.tokens_);
 
-    // actually merge
-    addToHistory(newHistory);
-    wasInterface_ = newWasInterface;
-    capacity_ = newCapacity;
-    tokens_ = newTokens;
-
-    return *this;
+    // Node::merge does all the rest
+    Node::merge(place, addArcWeights);
   }
 
 
@@ -265,6 +282,44 @@ namespace pnapi {
     Node(net, observer, trans)
   {
     observer_.updateTransitions(*this);
+  }
+
+
+  /*!
+   * \brief   checks if the transition is normal
+   *
+   * \note    This is a help method for normalize method
+   *          in class PetriNet.
+   */
+  bool Transition::isNormal() const
+  {
+    int counter = 0;
+
+    for (set<Node *>::const_iterator p = getPreset().begin(); p != getPreset().end(); p++)
+      if ((*p)->getType() != Node::INTERNAL)
+	counter++;
+    for (set<Node *>::const_iterator p = getPostset().begin(); p != getPostset().end(); p++)
+      if ((*p)->getType() != Node::INTERNAL)
+	counter++;
+
+    return counter <= 1;
+  }
+
+
+  /*!
+   * Merges the properties of the given node into this one. The merged 
+   * transition is deleted.
+   *
+   * The following properties are merged:
+   * - NameHistory (concatenation)
+   * - Pre-/Postset (union)
+   *
+   * \pre   the transitions must reside in the same PetriNet instance
+   */
+  void Transition::merge(Transition & trans, bool addArcWeights)
+  {
+    // Node::merge does all the work
+    Node::merge(trans, addArcWeights);
   }
 
 
@@ -347,9 +402,31 @@ namespace pnapi {
 
   /*!
    */
-  void Arc::setWeight(unsigned int weight)
+  void Arc::merge(Arc & arc)
   {
-    weight_ = weight;
+    weight_ += arc.weight_;
+  }
+
+
+  /*!
+   * \brief   swaps source and target node of the arc
+   */
+  void Arc::mirror()
+  {
+    /* FIXME
+       Node *old_source = source;
+       Node *old_target = target;
+
+       source = old_target;
+       target = old_source;
+
+       assert(target != NULL);
+       assert(source != NULL);
+       source->postset.erase(old_target);
+       source->postset.insert(old_source);
+       target->preset.erase(old_source);
+       target->preset.insert(old_target);
+    */
   }
 
 }

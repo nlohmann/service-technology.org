@@ -100,6 +100,7 @@ using formula::Formula;
 
     void updateArcCreated(Arc &);
     void updateArcRemoved(Arc &);
+    void updateNodesMerged(Node &, Node &);
     void updateNodeNameHistory(Node &, const deque<string> &);
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
@@ -240,11 +241,17 @@ using formula::Formula;
 
 
     /*!
-     * \name   Advanced Petri Net Operations
+     * \name   Advanced Petri Net Criteria and Operations
      *
      * Composition, Reduction, Normalization, ...
      */
     //@{
+
+    /// checks the Petri net for workflow criteria
+    bool isWorkflow() const;
+
+    /// checks the Petri net for free choice criterion
+    bool isFreeChoice() const;
 
     /// compose two nets by adding the given one and merging interfaces
     void compose(const PetriNet &, const string & = "net1",
@@ -253,17 +260,48 @@ using formula::Formula;
     /// normalizes the Petri net
     void normalize();
 
+    /// applies structral reduction rules
+    unsigned int reduce(unsigned int = 5, bool = false);
+
+    //@}
+
+
+    /*!
+     * \name   Experimental
+     *
+     * Operations under development
+     */
+    //@{
+
+    /// TODO: decide how to work with final conditions
+    void setFinalCondition(Formula *fc);
+
+    /// TODO: move to Confition/Formula classes
     /// checks the finalcondition for Marking m
     bool checkFinalCondition(Marking &m) const;
 
+    /// TODO: move to class Marking
     /// calculates the successor m' from m using transition t
     Marking & successorMarking(Marking &m, Transition *t) const;
 
+    /// TODO: move to class Marking
     bool activates(Marking &m, Transition &t) const;
 
-    void setFinalCondition(Formula *fc);
+    /// TODO: can this be templated and moved to pnapi::util (util.{h,cc})?
+    /// DFS with Tarjan's algorithm
+    unsigned int dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const;
 
-    // TODO: add reduce()
+    /// TODO: create Marking::Marking(PetriNet)
+    /// calculates the current marking m
+    Marking calcCurrentMarking() const;
+
+    /// TODO: if we don't need this maybe kill it for the time beeing
+    /// reforms the marking m to the places' token
+    void marking2Places(Marking &m);
+
+    /// TODO: move to class Marking
+    /// looks for a living transition under m
+    Transition *findLivingTransition(Marking &m) const;
 
     //@}
 
@@ -330,13 +368,6 @@ using formula::Formula;
     /// deletes an arc
     void deleteArc(Arc &);
 
-    /// merge arcs (used by mergePlaces())
-    void mergeArcs(Place &, Place &, const set<Node *> &, const set<Node *> &,
-		   bool);
-
-    /// merges two (internal) places
-    void mergePlaces(Place &, Place &);
-
 
     /* miscellaneous */
 
@@ -359,44 +390,8 @@ using formula::Formula;
     /// produces a second constraint oWFN
     void produce(const PetriNet &net);
 
-    /// moves channel places to the list of internal places
-    void makeChannelsInternal();
-
-    /// add a loop to the final states to check deadlock freedom with LoLA
-    void loop_final_state();
-
-    /// calculate the maximal occurrences of communication
-    void calculate_max_occurrences();
-
-    /// reevaluates the type of a transition
-    void reevaluateType(Transition *t);
-
     /// returns true if all arcs connecting to n have a weight of 1
     bool sameweights(Node *n) const;
-
-
-    /* Petri net criteria */
-
-    /// checks the Petri net for workflow criteria
-    bool isWorkflowNet();
-
-    /// DFS with Tarjan's algorithm
-    unsigned int dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const;
-
-    /// checks the Petri net for free choice criterion
-    bool isFreeChoice() const;
-
-
-    /* markings and final condition */
-
-    /// calculates the current marking m
-    Marking calcCurrentMarking() const;
-
-    /// reforms the marking m to the places' token
-    void marking2Places(Marking &m);
-
-    /// looks for a living transition under m
-    Transition *findLivingTransition(Marking &m) const;
 
 
     /* petrify */
@@ -443,9 +438,6 @@ using formula::Formula;
 
     /* reduction */
 
-    /// applies structral reduction rules
-    unsigned int reduce(unsigned int reduction_level = 5, bool = false);
-
     /// remove unused status places
     unsigned int reduce_unused_status_places();
 
@@ -478,15 +470,6 @@ using formula::Formula;
 
     /// remove unneeded initially marked places in choreographies
     void reduce_remove_initially_marked_places_in_choreographies();
-
-    /// merges two transitions
-    void mergeTransitions(Transition &, Transition &);
-
-    /// merges two parallel transitions
-    void mergeParallelTransitions(Transition *t1, Transition *t2);
-
-    /// merges two parallel places
-    void mergeParallelPlaces(Place *p1, Place *p2);
 
   };
 

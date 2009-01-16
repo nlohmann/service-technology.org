@@ -27,7 +27,7 @@
 
 using std::cerr;
 using std::min;
-
+using std::pair;
 
 namespace pnapi
 {
@@ -145,9 +145,13 @@ namespace pnapi
     assert(net_.arcs_.find(&arc) == net_.arcs_.end());
     assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
 
+    // update pre- and postsets
     net_.arcs_.insert(&arc);
     arc.getTargetNode().preset_.insert(&arc.getSourceNode());
     arc.getSourceNode().postset_.insert(&arc.getTargetNode());
+
+    // update transition type
+    arc.getTransition().updateType();
   }
 
 
@@ -157,9 +161,13 @@ namespace pnapi
     assert(net_.arcs_.find(&arc) == net_.arcs_.end());
     assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
 
+    // update pre- and postsets
     net_.arcs_.erase(&arc);
     arc.getTargetNode().preset_.erase(&arc.getSourceNode());
     arc.getSourceNode().postset_.erase(&arc.getTargetNode());
+
+    // update transition type
+    arc.getTransition().updateType();
   }
 
 
@@ -240,6 +248,7 @@ namespace pnapi
 	net_.outputPlaces_.insert(&place);
 	net_.interfacePlaces_.insert(&place);
 	break;
+      default: break;
       }
   }
 
@@ -258,6 +267,7 @@ namespace pnapi
 	net_.outputPlaces_.erase(&place);
 	net_.interfacePlaces_.erase(&place);
 	break;
+      default: break;
       }
   }
 
@@ -408,7 +418,7 @@ namespace pnapi
 	 ++it)
       {
 	Place * place = findPlace((*it)->getName());
-	if (place != NULL && place->isComplementType(**it))
+	if (place != NULL && place->isComplementType((*it)->getType()))
 	  mergePlaces.push_back(pair<Place *, Place *>(place, *it));
       }
 
@@ -467,6 +477,7 @@ namespace pnapi
 
   /*!
    */
+  /*
   void PetriNet::deleteInterfacePlaces()
   {
     set<Place *> interface = interfacePlaces_;
@@ -474,6 +485,7 @@ namespace pnapi
 	++it)
       deletePlace(**it);
   }
+  */
 
 
   /*!
@@ -697,6 +709,229 @@ namespace pnapi
   }
 
 
+  /*!
+   * \brief   produces a second constraint oWFN
+   *
+   * \param   a constraint oWFN
+   */
+  void PetriNet::produce(const PetriNet &net)
+  {
+    /*
+    // the constraint oWFN must have an empty interface
+    assert(net.inputPlaces_.empty());
+    assert(net.outputPlaces_.empty());
+
+
+    // copy the constraint oWFN's places to the oWFN
+    for (set<Place *>::iterator p = net.places_.begin(); p != net.places_.end(); p++)
+      {
+	Place *p_new = newPlace((*p)->getName());
+
+	p_new->isFinal = (*p)->isFinal;
+	p_new->tokens = (*p)->tokens;
+      }
+
+
+    // copy the constraint oWFN's unlabeled transitions to the oWFN
+    for (set<Transition *>::iterator t = net.transitions_.begin(); t != net.transitions_.end(); t++)
+      {
+	if ( (*t)->getLabels().empty())
+	  {
+	    //Transition *t_new = newTransition((*t)->getName());
+
+	    // copy the arcs of the constraint oWFN
+	    for (set< Arc * >::iterator arc = net.arcs_.begin(); arc != net.arcs_.end(); arc ++)
+	      {
+		if ( ( (*arc)->getSourceNode()->nodeType == PLACE) && ( (*arc)->getTargetNode() == static_cast<Node *>(*t) ) )
+		  newArc( findPlace( (*arc)->getSourceNode()->getName() ), t_new, STANDARD, (*arc)->getWeight() );
+		if ( ( (*arc)->getTargetNode()->nodeType == PLACE) && ( (*arc)->getSourceNode() == static_cast<Node *>(*t) ) )
+		  newArc( t_new, findPlace( (*arc)->getTargetNode()->getName() ), STANDARD, (*arc)->getWeight() );
+	      }
+	  }
+      }
+
+
+    // transitions of the oWFN that are used as labels in the constraint oWFN
+    set<string> used_labels;
+    set<pair<Transition *, Transition *> > transition_pairs;
+
+
+    // Traverse the used labels and store pairs of constrainted and labeled
+    // transitions. If a label does not identify a transition, look for a plce
+    // with the same label instead. According to its communication type, either
+    // add the transitions in the preset or the postset to the transition pairs.
+    // For example, if "visa" is not found as transition, but there exists an
+    // input place with this name, add all transitions in the postset of this
+    // place, together with the transition labeled "visa" to the transition
+    // pairs.
+    for (set<Transition *>::iterator t = net.transitions_.begin(); t != net.transitions_.end(); t++)
+      {
+	set<string> labels = (*t)->getLabels();
+	for (set<string>::iterator label = labels.begin(); label != labels.end(); label++)
+	  {
+	    Transition *t_l = findTransition(*label);
+
+	    // specified transition not found -- trying places instead
+	    if (t_l == NULL)
+	      {
+		Place *p = findPlace(*label);
+		if (p != NULL)
+		  {
+		    set<Node *> transitions_p;
+
+		    if (p->getType() == Node::INPUT)
+		      transitions_p = p->getPostset();
+		    else
+		      transitions_p = p->getPreset();
+
+		    for (set<Node *>::iterator pre_transition = transitions_p.begin(); pre_transition != transitions_p.end(); pre_transition++)
+		      {
+			used_labels.insert((*pre_transition)->getName());
+			transition_pairs.insert(pair<Transition *, Transition *>(static_cast<Transition *>(*pre_transition), *t));
+		      }
+		  }
+		else
+		  {
+		    std::cerr << "label " << *label << " neither describes a transition nor a place" << std::endl;
+		    assert(false);
+		  }
+	      }
+	    else
+	      {
+		used_labels.insert(*label);
+		transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
+	      }
+	  }
+      }
+
+
+    // create pair transitions with their arcs
+    for (set<pair<Transition *, Transition *> >::iterator tp = transition_pairs.begin(); tp != transition_pairs.end(); tp++)
+      {
+	// I have to comment the next line as Fiona cannot read node names with brackets
+	// Transition *t_new = newTransition("(" + tp->first->getName() + "," + tp->second->getName() + ")");
+	//Transition *t_new = newTransition(tp->first->getName() + "_" + tp->second->getName());
+
+	// copy the arcs of the constraint oWFN
+	for (set< Arc * >::iterator arc = net.arcs_.begin(); arc != net.arcs_.end(); arc ++)
+	  {
+	    if ( ( (*arc)->getSourceNode()->nodeType == PLACE) && ( (*arc)->getTargetNode() == static_cast<Node *>(tp->second) ) )
+	      newArc( findPlace( (*arc)->getSourceNode()->getName() ), t_new, STANDARD, (*arc)->getWeight() );
+	    if ( ( (*arc)->getTargetNode()->nodeType == PLACE) && ( (*arc)->getSourceNode() == static_cast<Node *>(tp->second) ) )
+	      newArc( t_new, findPlace( (*arc)->getTargetNode()->getName() ), STANDARD, (*arc)->getWeight() );
+	  }
+
+	// copy the arcs of the oWFN
+	for (set< Arc * >::iterator arc = arcs_.begin(); arc != arcs_.end(); arc ++)
+	  {
+	    if ( ( (*arc)->getSourceNode()->nodeType == PLACE) && ( (*arc)->getTargetNode() == static_cast<Node *>(tp->first) ) )
+	      newArc( findPlace( (*arc)->getSourceNode()->getName() ), t_new, STANDARD, (*arc)->getWeight() );
+	    if ( ( (*arc)->getTargetNode()->nodeType == PLACE) && ( (*arc)->getSourceNode() == static_cast<Node *>(tp->first) ) )
+	      newArc( t_new, findPlace( (*arc)->getTargetNode()->getName() ), STANDARD, (*arc)->getWeight() );
+	  }
+      }
+
+
+    // remove transitions that are used as labels
+    for (set<string>::iterator t = used_labels.begin(); t != used_labels.end(); t++)
+      deleteTransition(*findTransition(*t));
+    */
+  }
+
+
+  /*!
+   * \brief   checks whether the Petri net is a workflow net or not
+   *
+   *          A Petri net N is a workflow net iff
+   *            (1) there is exactly one place with empty preset
+   *            (2) there is exactly one place with empty postset
+   *            (3) all other nodes are situated on a path between the places described in (1) and (2)
+   *
+   * \return  true iff (1), (2) and (3) are fulfilled
+   * \return  false in any other case
+   */
+  bool PetriNet::isWorkflow() const
+  {
+    Place *first = NULL;
+    Place *last  = NULL;
+
+    // finding places described in condition (1) & (2)
+    for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+      {
+	if ((*p)->getPreset().empty())
+	  {
+	    if (first == NULL)
+	      first = *p;
+	    else
+	      {
+		std::cerr << "This net is no workflow net because there are more than one place with empty preset!\n";
+		return false;
+	      }
+	  }
+	if ((*p)->getPostset().empty())
+	  {
+	    if (last == NULL)
+	      last = *p;
+	    else
+	      {
+		std::cerr << "This net is no workflow net because there are more than one place with empty postset!\n";
+		return false;
+	      }
+	  }
+      }
+    if (first == NULL || last == NULL)
+      {
+	std::cerr << "No workflow net! Either no place with empty preset or no place with empty postset found.\n";
+	return false;
+      }
+
+    // insert new transition which consumes from last and produces on first to form a cycle
+    //Transition *tarjan = &createTransition("tarjan");
+    //FIXME
+    //newArc(last, tarjan);
+    //  newArc(tarjan, first);
+
+    // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
+    // (strongly connected net using tarjan's algorithm)
+    unsigned int i = 0; ///< count index
+    map<Node *, int> index; ///< index property for nodes
+    map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
+    set<Node *> stacked; ///< the stack indication for nodes
+    stack<Node *> S; ///< stack used by Tarjan's algorithm
+
+    // set all nodes' index values to ``undefined''
+    for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+      index[*p] = (-1);
+    for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      index[*t] = (-1);
+
+    // getting the number of strongly connected components reachable from first
+    unsigned int sscCount = dfsTarjan(first, S, stacked, i, index, lowlink);
+
+    std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
+
+    //deleteTransition(*tarjan);
+
+    // check set $P \cup T$
+    set<Node *> nodeSet;
+    for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+      nodeSet.insert(*p);
+    for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      nodeSet.insert(*t);
+
+    /* true iff only one strongly connected component found from first and all nodes
+     * of $\mathcal{N}$ are members of this component
+     */
+    if (sscCount == 1 && util::setDifference(nodeSet, stacked).empty())
+      return true;
+    else
+      {
+	cerr << "No workflow net! Some places are not between the the preset-less and the postset-less place.\n";
+	return false;
+      }
+  }
+
+
 
   /****************************************************************************
    *** Private PetriNet Function Definitions
@@ -767,230 +1002,41 @@ namespace pnapi
   }
 
 
-
-  /***************************** NOT YET REFACTORED *************************/
-
-
-/*!
- * \brief   returns true iff all arcs connecting to n have the same weight
- *
- *          Returns true only if the given node's incoming and outgoing arcs
- *          all have the same weight.
- *
- * \param   n  node to be examined
- *
- * \pre     n != NULL
- *
- * \todo    Znamirowski: Set brackets for for-loop. The code is not readable
- *          this way.
- */
-bool PetriNet::sameweights(Node *n) const
-{
-  /*
-  assert(n != NULL);
-  bool first = true;
-  unsigned int w = 0;
-
-  for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
+  /*!
+   */
+  bool PetriNet::sameweights(Node *n) const
   {
-    if ((&(*f)->getSourceNode() == n) || (&(*f)->getTargetNode() == n) )
-    {
+    /*
+      assert(n != NULL);
+      bool first = true;
+      unsigned int w = 0;
+
+      for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
+      {
+      if ((&(*f)->getSourceNode() == n) || (&(*f)->getTargetNode() == n) )
+      {
       if (first)
       {
-        first=false;
-        w = (*f)->getWeight();
+      first=false;
+      w = (*f)->getWeight();
       }
       else
       {
-        if ( (*f)->getWeight() != w)
-        {
-          return false;
-        }
-      }
-    }
-  }
-  */
-  return true;
-}
-
-
-/*!
- * \brief   swaps input and output places
- *
- *          Swaps the input and output places, i.e. swaps the sets #inputPlaces_ and
- *          #outputPlaces_ and the adjacent arcs.
- *
- *  \test	This method has been tested in tests/test_mirror.cc.
- */
-void PetriNet::mirror()
-{
-  /*
-  // swap arcs
-  for (set<Arc*>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-  {
-    if ( inputPlaces_.find( findPlace( ((*f)->getSourceNode()).getName()) ) != inputPlaces_.end() )
-      (*f)->mirror();
-    else if ( outputPlaces_.find( findPlace( ((*f)->getTargetNode()).getName()) ) != outputPlaces_.end() )
-      (*f)->mirror();
-  }
-
-  // swap input and output places
-  set<Place *> inputPlaces__old = inputPlaces_;
-  set<Place *> outputPlaces__old = outputPlaces_;
-  inputPlaces_ = outputPlaces__old;
-  outputPlaces_ = inputPlaces__old;
-  for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
-    ;//(*p)->setType(Node::INPUT);
-  for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
-    ;//(*p)->setType(Node::OUTPUT);
-
-  // swap the transitions
-  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-  {
-    if ( (*t)->getType() == Node::OUTPUT )
-      ;//(*t)->setType(Node::INPUT);
-    else if ( (*t)->getType() == Node::INPUT )
-      ;//(*t)->setType(Node::OUTPUT);
-  }
-  */
-}
-
-
-
-/*!
- * \brief   produces a second constraint oWFN
- *
- * \param   a constraint oWFN
- *
- * \test    This method has been tested in tests/test_produce.cc.
- */
-void PetriNet::produce(const PetriNet &net)
-{
-  /* FIXME
-  // the constraint oWFN must have an empty interface
-  assert(net.inputPlaces_.empty());
-  assert(net.outputPlaces_.empty());
-
-
-  // copy the constraint oWFN's places to the oWFN
-  for (set<Place *>::iterator p = net.places_.begin(); p != net.places_.end(); p++)
-  {
-    Place *p_new = newPlace((*p)->getName());
-
-    p_new->isFinal = (*p)->isFinal;
-    p_new->tokens = (*p)->tokens;
-  }
-
-
-  // copy the constraint oWFN's unlabeled transitions to the oWFN
-  for (set<Transition *>::iterator t = net.transitions_.begin(); t != net.transitions_.end(); t++)
-  {
-    if ( (*t)->getLabels().empty())
-    {
-      //Transition *t_new = newTransition((*t)->getName());
-
-      // copy the arcs of the constraint oWFN
-      for (set< Arc * >::iterator arc = net.arcs_.begin(); arc != net.arcs_.end(); arc ++)
+      if ( (*f)->getWeight() != w)
       {
-        if ( ( (*arc)->getSourceNode()->nodeType == PLACE) && ( (*arc)->getTargetNode() == static_cast<Node *>(*t) ) )
-          newArc( findPlace( (*arc)->getSourceNode()->getName() ), t_new, STANDARD, (*arc)->getWeight() );
-        if ( ( (*arc)->getTargetNode()->nodeType == PLACE) && ( (*arc)->getSourceNode() == static_cast<Node *>(*t) ) )
-          newArc( t_new, findPlace( (*arc)->getTargetNode()->getName() ), STANDARD, (*arc)->getWeight() );
+      return false;
       }
-    }
+      }
+      }
+      }
+    */
+    return true;
   }
 
 
-  // transitions of the oWFN that are used as labels in the constraint oWFN
-  set<string> used_labels;
-  set<pair<Transition *, Transition *> > transition_pairs;
 
 
-  // Traverse the used labels and store pairs of constrainted and labeled
-  // transitions. If a label does not identify a transition, look for a plce
-  // with the same label instead. According to its communication type, either
-  // add the transitions in the preset or the postset to the transition pairs.
-  // For example, if "visa" is not found as transition, but there exists an
-  // input place with this name, add all transitions in the postset of this
-  // place, together with the transition labeled "visa" to the transition
-  // pairs.
-  for (set<Transition *>::iterator t = net.transitions_.begin(); t != net.transitions_.end(); t++)
-  {
-    set<string> labels = (*t)->getLabels();
-    for (set<string>::iterator label = labels.begin(); label != labels.end(); label++)
-    {
-      Transition *t_l = findTransition(*label);
-
-      // specified transition not found -- trying places instead
-      if (t_l == NULL)
-      {
-        Place *p = findPlace(*label);
-        if (p != NULL)
-        {
-          set<Node *> transitions_p;
-
-          if (p->getType() == Node::INPUT)
-            transitions_p = p->getPostset();
-          else
-            transitions_p = p->getPreset();
-
-          for (set<Node *>::iterator pre_transition = transitions_p.begin(); pre_transition != transitions_p.end(); pre_transition++)
-          {
-            used_labels.insert((*pre_transition)->getName());
-            transition_pairs.insert(pair<Transition *, Transition *>(static_cast<Transition *>(*pre_transition), *t));
-          }
-        }
-        else
-        {
-          std::cerr << "label " << *label << " neither describes a transition nor a place" << std::endl;
-          assert(false);
-        }
-      }
-      else
-      {
-        used_labels.insert(*label);
-        transition_pairs.insert(pair<Transition *, Transition *>(t_l, *t));
-      }
-    }
-  }
-
-
-  // create pair transitions with their arcs
-  for (set<pair<Transition *, Transition *> >::iterator tp = transition_pairs.begin(); tp != transition_pairs.end(); tp++)
-  {
-    // I have to comment the next line as Fiona cannot read node names with brackets
-    // Transition *t_new = newTransition("(" + tp->first->getName() + "," + tp->second->getName() + ")");
-    //Transition *t_new = newTransition(tp->first->getName() + "_" + tp->second->getName());
-
-    // copy the arcs of the constraint oWFN
-    for (set< Arc * >::iterator arc = net.arcs_.begin(); arc != net.arcs_.end(); arc ++)
-    {
-      if ( ( (*arc)->getSourceNode()->nodeType == PLACE) && ( (*arc)->getTargetNode() == static_cast<Node *>(tp->second) ) )
-        newArc( findPlace( (*arc)->getSourceNode()->getName() ), t_new, STANDARD, (*arc)->getWeight() );
-      if ( ( (*arc)->getTargetNode()->nodeType == PLACE) && ( (*arc)->getSourceNode() == static_cast<Node *>(tp->second) ) )
-        newArc( t_new, findPlace( (*arc)->getTargetNode()->getName() ), STANDARD, (*arc)->getWeight() );
-    }
-
-    // copy the arcs of the oWFN
-    for (set< Arc * >::iterator arc = arcs_.begin(); arc != arcs_.end(); arc ++)
-    {
-      if ( ( (*arc)->getSourceNode()->nodeType == PLACE) && ( (*arc)->getTargetNode() == static_cast<Node *>(tp->first) ) )
-        newArc( findPlace( (*arc)->getSourceNode()->getName() ), t_new, STANDARD, (*arc)->getWeight() );
-      if ( ( (*arc)->getTargetNode()->nodeType == PLACE) && ( (*arc)->getSourceNode() == static_cast<Node *>(tp->first) ) )
-        newArc( t_new, findPlace( (*arc)->getTargetNode()->getName() ), STANDARD, (*arc)->getWeight() );
-    }
-  }
-
-
-  // remove transitions that are used as labels
-  for (set<string>::iterator t = used_labels.begin(); t != used_labels.end(); t++)
-    deleteTransition(*findTransition(*t));
-  */
-}
-
-
-
-
+  /***************************** NOT YET REFACTORED *************************/
 
 
 /*!
@@ -1010,97 +1056,6 @@ bool PetriNet::checkFinalCondition(Marking &m) const
 
 
 
-/*!
- * \brief   checks whether the Petri net is a workflow net or not
- *
- *          A Petri net N is a workflow net iff
- *            (1) there is exactly one place with empty preset
- *            (2) there is exactly one place with empty postset
- *            (3) all other nodes are situated on a path between the places described in (1) and (2)
- *
- * \return  true iff (1), (2) and (3) are fulfilled
- * \return  false in any other case
- */
-bool PetriNet::isWorkflow() const
-{
-  Place *first = NULL;
-  Place *last  = NULL;
-
-  // finding places described in condition (1) & (2)
-  for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
-  {
-    if ((*p)->getPreset().empty())
-    {
-      if (first == NULL)
-        first = *p;
-      else
-      {
-        std::cerr << "This net is no workflow net because there are more than one place with empty preset!\n";
-        return false;
-      }
-    }
-    if ((*p)->getPostset().empty())
-    {
-      if (last == NULL)
-        last = *p;
-      else
-      {
-        std::cerr << "This net is no workflow net because there are more than one place with empty postset!\n";
-        return false;
-      }
-    }
-  }
-  if (first == NULL || last == NULL)
-  {
-    std::cerr << "No workflow net! Either no place with empty preset or no place with empty postset found.\n";
-    return false;
-  }
-
-  // insert new transition which consumes from last and produces on first to form a cycle
-  //Transition *tarjan = &createTransition("tarjan");
-  //FIXME
-  //newArc(last, tarjan);
-  //  newArc(tarjan, first);
-
-  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
-  // (strongly connected net using tarjan's algorithm)
-  unsigned int i = 0; ///< count index
-  map<Node *, int> index; ///< index property for nodes
-  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
-  set<Node *> stacked; ///< the stack indication for nodes
-  stack<Node *> S; ///< stack used by Tarjan's algorithm
-
-  // set all nodes' index values to ``undefined''
-  for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
-    index[*p] = (-1);
-  for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
-    index[*t] = (-1);
-
-  // getting the number of strongly connected components reachable from first
-  unsigned int sscCount = dfsTarjan(first, S, stacked, i, index, lowlink);
-
-  std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
-
-  //deleteTransition(*tarjan);
-
-  // check set $P \cup T$
-  set<Node *> nodeSet;
-  for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
-    nodeSet.insert(*p);
-  for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
-    nodeSet.insert(*t);
-
-  /* true iff only one strongly connected component found from first and all nodes
-   * of $\mathcal{N}$ are members of this component
-   */
-  if (sscCount == 1 && util::setDifference(nodeSet, stacked).empty())
-    return true;
-  else
-  {
-    cerr << "No workflow net! Some places are not between the the preset-less and the postset-less place.\n";
-    return false;
-  }
-}
 
 
 

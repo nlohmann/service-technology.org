@@ -20,17 +20,23 @@ int main(int argc, char * argv[])
     Transition & t1 = net.createTransition();
     assert(!t1.getName().empty());
     Transition & t2 = net.createTransition("testTrans");
+    Transition & t3 = net.createTransition("testTrans2");
 
     Arc & arc1 = net.createArc(p1, t1);
     Arc & arc2 = net.createArc(t2, p2);
     Arc & arc3 = net.createArc(p3, t1);
+    Arc & arc4 = net.createArc(t3, p4);
+    Arc & arc5 = net.createArc(p3, t3);
+    assert(t1.getType() == Transition::INPUT);
+    assert(t2.getType() == Transition::INTERNAL);
+    assert(t3.getType() == Transition::INOUT);
     end_test();
 
     
     // get[Component]*()
     begin_test("PetriNet::get*() [component querying]");
-    assert(net.getNodes().size() == 6);
-    assert(net.getTransitions().size() == 2);
+    assert(net.getNodes().size() == 7);
+    assert(net.getTransitions().size() == 3);
     assert(net.getPlaces().size() == 4);
     assert(net.getInterfacePlaces().size() == 2);
     assert(net.getInputPlaces().size() == 1);
@@ -55,14 +61,16 @@ int main(int argc, char * argv[])
     end_test();
 
 
+    /*
     // deleteInterfacePlaces()
     begin_test("PetriNet::deleteInterfacePlaces() [interface deletion]");
     net.deleteInterfacePlaces();
-    assert(net.getNodes().size() == 4);
+    assert(net.getNodes().size() == 5);
     assert(net.getInterfacePlaces().empty());
     assert(!net.containsNode(p3));
     assert(!net.containsNode(p4));
     end_test();
+    */
 
     
     // destructor

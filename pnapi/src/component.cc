@@ -56,7 +56,7 @@ namespace pnapi {
    */
   void Node::setType(Type type)
   {
-    assert(type != type_);
+    //assert(type != type_);
 
     type_ = type;
   }
@@ -64,10 +64,10 @@ namespace pnapi {
 
   /*!
    */
-  bool Node::isComplementType(const Node & node) const
+  bool Node::isComplementType(Type type) const
   {
-    return (type_ == INPUT && node.type_ == OUTPUT) ||
-           (type_ == OUTPUT && node.type_ == INPUT);
+    return (type_ == INPUT && type == OUTPUT) ||
+           (type_ == OUTPUT && type == INPUT);
   }
 
 
@@ -184,11 +184,13 @@ namespace pnapi {
   /*!
    */
   Place::Place(PetriNet & net, ComponentObserver & observer, 
-	       const string & name, Node::Type type) :
-    Node(net, observer, name, type), capacity_(0), 
-    wasInterface_(type == Node::INTERNAL ? false : true)
+	       const string & name, Type type, unsigned int tokens,
+	       unsigned int capacity) :
+    Node(net, observer, name, type), tokens_(tokens), capacity_(capacity), 
+    wasInterface_(type == INTERNAL ? false : true)
   {
     observer_.updatePlaces(*this);
+    setType(type);
   }
 
 
@@ -196,10 +198,11 @@ namespace pnapi {
    */
   Place::Place(PetriNet & net, ComponentObserver & observer, 
 	       const Place & place) :
-    Node(net, observer, place), capacity_(place.capacity_), 
-    wasInterface_(place.wasInterface_)
+    Node(net, observer, place), tokens_(place.tokens_),
+    capacity_(place.capacity_), wasInterface_(place.wasInterface_)
   {
     observer_.updatePlaces(*this);
+    setType(getType());
   }
 
   
@@ -207,6 +210,8 @@ namespace pnapi {
    */
   void Place::setType(Type type)
   {
+    assert(type != INOUT);  // INOUT may only be used for transitions
+
     Type oldType = getType();
     Node::setType(type);
     observer_.updatePlaceType(*this, oldType);
@@ -323,6 +328,33 @@ namespace pnapi {
   }
 
 
+  /*!
+   */
+  void Transition::updateType()
+  {
+    Type newType = INTERNAL;
+    set<Node *> neighbors = util::setUnion(getPreset(), getPostset());
+
+    for (set<Node *>::iterator it = neighbors.begin(); it != neighbors.end();
+	 ++it)
+      {
+	Type itType = (*it)->getType();
+	if (itType == INPUT || itType == OUTPUT)
+	  {
+	    if ((*it)->isComplementType(newType))
+	      {
+		newType = INOUT;
+		break;
+	      }
+	    else
+	      newType = itType;
+	  }
+      }
+
+    setType(newType);
+  }
+
+
 
   /****************************************************************************
    *** Class Arc Function Definitions
@@ -391,6 +423,34 @@ namespace pnapi {
     return target_;
   }
 
+  
+  /*!
+   */
+  Transition & Arc::getTransition() const
+  {
+    Transition * t = dynamic_cast<Transition *>(&source_);
+    if (t != NULL)
+      return *t;
+
+    t = dynamic_cast<Transition *>(&target_);
+    assert(t != NULL);
+    return *t;
+  }
+
+
+  /*!
+   */
+  Place & Arc::getPlace() const
+  {
+    Place * t = dynamic_cast<Place *>(&source_);
+    if (t != NULL)
+      return *t;
+
+    t = dynamic_cast<Place *>(&target_);
+    assert(t != NULL);
+    return *t;
+  }
+
 
   /*!
    */
@@ -405,28 +465,6 @@ namespace pnapi {
   void Arc::merge(Arc & arc)
   {
     weight_ += arc.weight_;
-  }
-
-
-  /*!
-   * \brief   swaps source and target node of the arc
-   */
-  void Arc::mirror()
-  {
-    /* FIXME
-       Node *old_source = source;
-       Node *old_target = target;
-
-       source = old_target;
-       target = old_source;
-
-       assert(target != NULL);
-       assert(source != NULL);
-       source->postset.erase(old_target);
-       source->postset.insert(old_source);
-       target->preset.erase(old_source);
-       target->preset.insert(old_target);
-    */
   }
 
 }

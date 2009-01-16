@@ -1,6 +1,6 @@
 SUBDIRS = . petrinet
 
-noinst_LIBRARIES = libtest.a
+check_LIBRARIES = libtest.a
 
 libtest_a_SOURCES = test.h test.cc
 

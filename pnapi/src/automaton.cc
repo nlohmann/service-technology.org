@@ -86,7 +86,8 @@ void Automaton::initialize()
   for (set<Transition *>::const_iterator t = notdone.begin(); t != notdone.end(); t++)
     reasons[*t] = "tau";
 
-  net.deleteInterfacePlaces();
+  // FIXME: Niels doesn't want this method: just don't use the interface places
+  //net.deleteInterfacePlaces();
 }
 
 

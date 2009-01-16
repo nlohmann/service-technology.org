@@ -1,10 +1,6 @@
 #ifndef SERVICEAUTOMATON_H
 #define SERVICEAUTOMATON_H
 
-#ifndef HASHSIZE
-#define HASHSIZE 65535
-#endif
-
 #include <list>
 #include <ostream>
 #include <set>
@@ -22,6 +18,10 @@ using std::map;
 
 namespace pnapi
 {
+
+#ifndef HASHSIZE
+#define HASHSIZE 65535
+#endif
 
 class PetriNet;
 class Transition;

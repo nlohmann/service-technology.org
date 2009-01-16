@@ -24,6 +24,7 @@ using std::endl;
 using std::ofstream;
 using std::ifstream;
 using std::istringstream;
+using std::pair;
 
 using namespace pnapi;
 using pnapi::parser::petrify::PetrifyResult;

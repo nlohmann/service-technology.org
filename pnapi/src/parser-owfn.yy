@@ -40,6 +40,8 @@
 #include "petrinet.h"
 #include "parser.h"
 
+using std::pair;
+
 using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;

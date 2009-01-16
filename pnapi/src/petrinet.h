@@ -27,8 +27,6 @@
 #include <vector>
 #include <set>
 #include <map>
-#include <list>
-#include <deque>
 #include <stack>
 
 #include "component.h"
@@ -36,21 +34,15 @@
 
 using std::string;
 using std::vector;
-using std::deque;
 using std::set;
 using std::map;
 using std::multimap;
-using std::list;
-using std::pair;
-using std::stack;
 using std::ostream;
 using std::istream;
-
+using std::stack;
 
 namespace pnapi
 {
-
-using formula::Formula;
 
   /*!
    * \brief   Marking of all places of a net
@@ -132,7 +124,6 @@ using formula::Formula;
 
     /// needs to update internal structures
     friend class ComponentObserver;
-
 
   public:
 
@@ -235,7 +226,7 @@ using formula::Formula;
     Transition & createTransition(const string & = "");
 
     /// deletes all interface places
-    void deleteInterfacePlaces();
+    //void deleteInterfacePlaces();
 
     //@}
 
@@ -263,6 +254,9 @@ using formula::Formula;
     /// applies structral reduction rules
     unsigned int reduce(unsigned int = 5, bool = false);
 
+    /// produces a second constraint oWFN
+    void produce(const PetriNet &);
+
     //@}
 
 
@@ -274,7 +268,7 @@ using formula::Formula;
     //@{
 
     /// TODO: decide how to work with final conditions
-    void setFinalCondition(Formula *fc);
+    void setFinalCondition(formula::Formula *fc);
 
     /// TODO: move to Confition/Formula classes
     /// checks the finalcondition for Marking m
@@ -317,6 +311,9 @@ using formula::Formula;
     /// observer for nodes and arcs
     ComponentObserver observer_;
 
+    /// final condition
+    formula::Formula *finalCondition_;
+
 
     /* (overlapping) sets for net structure */
 
@@ -350,9 +347,6 @@ using formula::Formula;
     /// all arcs
     set<Arc *> arcs_;
 
-    /// final condition
-    Formula *finalCondition_;
-
 
     /* structural changes */
 
@@ -379,16 +373,6 @@ using formula::Formula;
 
     /// adds a given prefix to all nodes
     PetriNet & prefixNodeNames(const string &);
-
-
-
-    /*** NOT YET REFACTORED ***/
-
-    /// swaps input and output places
-    void mirror();
-
-    /// produces a second constraint oWFN
-    void produce(const PetriNet &net);
 
     /// returns true if all arcs connecting to n have a weight of 1
     bool sameweights(Node *n) const;

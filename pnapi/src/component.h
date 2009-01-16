@@ -61,7 +61,7 @@ namespace pnapi
   public:
 
     /// node types (communication)
-    enum Type { INTERNAL, INPUT, OUTPUT };
+    enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
 
     /// constructor
     Node(PetriNet &, ComponentObserver &, const string &, Type);
@@ -79,7 +79,7 @@ namespace pnapi
     Type getType() const;
 
     /// compares the type with another node's type
-    bool isComplementType(const Node &) const;
+    bool isComplementType(Type) const;
 
     /// returns the name of the node
     string getName() const;
@@ -151,6 +151,10 @@ namespace pnapi
    */
   class Transition : public Node
   {
+
+    /// observer needs to update type
+    friend class ComponentObserver;
+
   public:
     /// constructor
     Transition(PetriNet &, ComponentObserver &, 
@@ -173,6 +177,9 @@ namespace pnapi
 
     /// no standard copying!
     Transition(const Transition &);
+
+    /// updates the type
+    void updateType();
   };
 
 
@@ -188,7 +195,8 @@ namespace pnapi
   public:
 
     /// constructor
-    Place(PetriNet &, ComponentObserver &, const string &, Type);
+    Place(PetriNet &, ComponentObserver &, const string &, Type, 
+	  unsigned int = 0, unsigned int = 0);
 
     /// copy constructor
     Place(PetriNet &, ComponentObserver &, const Place &);
@@ -255,6 +263,12 @@ namespace pnapi
     /// target node
     Node & getTargetNode() const;
 
+    /// transition
+    Transition & getTransition() const;
+
+    /// place
+    Place & getPlace() const;
+
     /// weight
     unsigned int getWeight() const;
 
@@ -285,9 +299,6 @@ namespace pnapi
 
     /// no copying!
     Arc(const Arc &);
-
-    /// swaps source and target node of the arc
-    void mirror();
 
   };
 

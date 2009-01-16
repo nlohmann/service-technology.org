@@ -225,7 +225,6 @@ string Transition::toString() const
     {
     case(Node::INPUT):		result += "[fillcolor=orange "; break;
     case(Node::OUTPUT):		result += "[fillcolor=yellow "; break;
-      /* FIXME
     case(INOUT):	result += "[fillcolor=gold ";
       result += "label=<";
       // the table size depends on the node size of .3 (inch);
@@ -236,7 +235,6 @@ string Transition::toString() const
       result += "</TD></TR><TR>";
       result += "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"YELLOW\">";
       result += "</TD></TR></TABLE> >"; break;
-      */
     case(Node::INTERNAL):	result += "["; break;
   }
 
@@ -1285,7 +1283,7 @@ void PetriNet::output_owfn(ostream *output) const
       case (Node::INTERNAL):	(*output) << endl; break;
       case(Node::INPUT):		(*output) << " { input }" << endl; break;
       case(Node::OUTPUT):	(*output) << " { output }" << endl; break;
-	// FIXME: case(INOUT):	(*output) << " { input/output }" << endl; break;
+      case(Node::INOUT):	(*output) << " { input/output }" << endl; break;
     }
 
     (*output) << "  CONSUME ";

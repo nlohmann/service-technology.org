@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
+ * Copyright (c) 2008, 2009 Dirk Fahland. All rights reserved.
+ * EPL1.0/GPL3.0/LGPL3.0
  * 
  * ServiceTechnolog.org - Greta
  *                       (Graphical Runtime Environment for Adaptive Processes) 
@@ -48,8 +49,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-
-import org.eclipse.swt.widgets.Link;
 
 public class AdaptiveSystemBP {
 	
@@ -352,7 +351,8 @@ public class AdaptiveSystemBP {
 		
 		co.put(newNode, coset);
 	}
-	
+
+	/*
 	private void printConcurrencyRelation () {
 		for (CNode c : co.keySet()) {
 			System.out.print(c+": ");
@@ -360,6 +360,7 @@ public class AdaptiveSystemBP {
 		}
 		System.out.println("---");
 	}
+	*/
 	
 	public boolean construct () {
 		if (unvisitedCuts.isEmpty())
@@ -551,9 +552,9 @@ public class AdaptiveSystemBP {
 	public static String cutToString(CNode[] cut) {
 		String s = "[";
 		for (int i=0;i<cut.length;i++) {
-			s += cut[i]+" ";
+			s += cut[i];
 			if (i < cut.length-1)
-				s += ",";
+				s += ", ";
 		}
 		return s+"]";
 	}
@@ -562,9 +563,9 @@ public class AdaptiveSystemBP {
 		String s = "[";
 		int i=0;
 		for (CNode c : cut) {
-			s += c+" ";
+			s += c;
 			if (i < cut.size()-1)
-				s += ",";
+				s += ", ";
 			i++;
 		}
 		return s+"]";
@@ -588,7 +589,7 @@ public class AdaptiveSystemBP {
 			}
 			else condNum ++;
 		}
-		return "|C| = "+condNum +" |E| = "+eventNum+" |E_cutOff| = "+cutOffNum;
+		return "|B|="+condNum +" |E|="+eventNum+" |E_cutOff|="+cutOffNum;
 	}
 	
 	public void fold() {

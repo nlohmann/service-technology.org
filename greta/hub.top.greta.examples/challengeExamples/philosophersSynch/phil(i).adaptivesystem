@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adaptiveSystem:AdaptiveSystem xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adaptiveSystem="adaptiveSystem" xmi:id="_4yvB0M3FEd2mzJ5pcyHP7A">
+  <oclets xmi:id="_WaKZsM3GEd2mzJ5pcyHP7A" name="Phil(i)" wellFormed="true">
+    <preNet xmi:id="_WaKZsc3GEd2mzJ5pcyHP7A" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_XxL3AM3GEd2mzJ5pcyHP7A" name="th(i)" temp="" postEvents="_bUkeMM3GEd2mzJ5pcyHP7A" token="1" outgoing="_c27BwM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aNC1cM3GEd2mzJ5pcyHP7A" name="fo(i)" temp="" postEvents="_bUkeMM3GEd2mzJ5pcyHP7A" token="1" outgoing="_cg3SMM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_awqf4M3GEd2mzJ5pcyHP7A" name="fo(i+1)" temp="" postEvents="_bUkeMM3GEd2mzJ5pcyHP7A" token="1" outgoing="_dM-KQM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_cg3SMM3GEd2mzJ5pcyHP7A" source="_aNC1cM3GEd2mzJ5pcyHP7A" destination="_bUkeMM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_c27BwM3GEd2mzJ5pcyHP7A" source="_XxL3AM3GEd2mzJ5pcyHP7A" destination="_bUkeMM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_dM-KQM3GEd2mzJ5pcyHP7A" source="_awqf4M3GEd2mzJ5pcyHP7A" destination="_bUkeMM3GEd2mzJ5pcyHP7A"/>
+    </preNet>
+    <doNet xmi:id="_WgttoM3GEd2mzJ5pcyHP7A" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_bUkeMM3GEd2mzJ5pcyHP7A" name="take(i)" preConditions="_aNC1cM3GEd2mzJ5pcyHP7A _XxL3AM3GEd2mzJ5pcyHP7A _awqf4M3GEd2mzJ5pcyHP7A" postConditions="_de2kcM3GEd2mzJ5pcyHP7A" incoming="_cg3SMM3GEd2mzJ5pcyHP7A _c27BwM3GEd2mzJ5pcyHP7A _dM-KQM3GEd2mzJ5pcyHP7A" outgoing="_iMweAM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_de2kcM3GEd2mzJ5pcyHP7A" name="eat(i)" preEvents="_bUkeMM3GEd2mzJ5pcyHP7A" postEvents="_f50yEM3GEd2mzJ5pcyHP7A" incoming="_iMweAM3GEd2mzJ5pcyHP7A" outgoing="_iizmgM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_e3hAgM3GEd2mzJ5pcyHP7A" name="fo(i)" preEvents="_f50yEM3GEd2mzJ5pcyHP7A" incoming="_i6pewM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_f50yEM3GEd2mzJ5pcyHP7A" name="rel(i)" preConditions="_de2kcM3GEd2mzJ5pcyHP7A" postConditions="_e3hAgM3GEd2mzJ5pcyHP7A _gaUQAM3GEd2mzJ5pcyHP7A _g8SUoM3GEd2mzJ5pcyHP7A" incoming="_iizmgM3GEd2mzJ5pcyHP7A" outgoing="_i6pewM3GEd2mzJ5pcyHP7A _jSWNEM3GEd2mzJ5pcyHP7A _jrrTEM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_gaUQAM3GEd2mzJ5pcyHP7A" name="th(i)" preEvents="_f50yEM3GEd2mzJ5pcyHP7A" incoming="_jSWNEM3GEd2mzJ5pcyHP7A"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_g8SUoM3GEd2mzJ5pcyHP7A" name="fo(i+1)" preEvents="_f50yEM3GEd2mzJ5pcyHP7A" incoming="_jrrTEM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_iMweAM3GEd2mzJ5pcyHP7A" source="_bUkeMM3GEd2mzJ5pcyHP7A" destination="_de2kcM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_iizmgM3GEd2mzJ5pcyHP7A" source="_de2kcM3GEd2mzJ5pcyHP7A" destination="_f50yEM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_i6pewM3GEd2mzJ5pcyHP7A" source="_f50yEM3GEd2mzJ5pcyHP7A" destination="_e3hAgM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_jSWNEM3GEd2mzJ5pcyHP7A" source="_f50yEM3GEd2mzJ5pcyHP7A" destination="_gaUQAM3GEd2mzJ5pcyHP7A"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_jrrTEM3GEd2mzJ5pcyHP7A" source="_f50yEM3GEd2mzJ5pcyHP7A" destination="_g8SUoM3GEd2mzJ5pcyHP7A"/>
+    </doNet>
+  </oclets>
+  <adaptiveProcess xmi:id="_5YR-4M3FEd2mzJ5pcyHP7A" name="bp">
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_A3PcEM3MEd2mzJ5pcyHP7A" name="fo(i)" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_BjzAEM3MEd2mzJ5pcyHP7A" name="th(i)" token="1"/>
+  </adaptiveProcess>
+</adaptiveSystem:AdaptiveSystem>

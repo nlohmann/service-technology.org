@@ -63,6 +63,7 @@ public class CNodeCutGenerator implements Iterator< CNode[] >{
 	
 	private boolean hasSomeCut = true;
 	
+	@SuppressWarnings("unchecked")
 	public CNodeCutGenerator(Set<CNode> cutPattern, Map<CNode, Set<CNode> > cutCandidates,
 			HashSet<CNode> knownPartialCut, Map<CNode, Set<CNode>> coRelation) {
 

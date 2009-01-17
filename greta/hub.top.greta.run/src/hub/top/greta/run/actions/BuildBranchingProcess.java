@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
+ * Copyright (c) 2008, 2009 Dirk Fahland. All rights reserved.
+ * EPL1.0/GPL3.0/LGPL3.0
  * 
  * ServiceTechnolog.org - Greta
  *                       (Graphical Runtime Environment for Adaptive Processes) 
@@ -38,36 +39,22 @@
 package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
-import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.greta.oclets.ts.AdaptiveSystemBP;
-import hub.top.greta.oclets.ts.AdaptiveSystemTS;
-import hub.top.greta.run.Activator;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 
@@ -75,112 +62,92 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 	
 	private IWorkbenchWindow workbenchWindow;
 
-	private AdaptiveSystemDiagramEditor adaptiveSystemDiagramEditor;
 	private AdaptiveSystem adaptiveSystem;
 
 	
-	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void init(IWorkbenchWindow window) {
 		workbenchWindow = window;
 	}
 	
 
-	@Override
 	public void run(IAction action) {
-		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
-				&& action.getId().equals(BuildBranchingProcess.ID)) {
+		if (!action.getId().equals(BuildBranchingProcess.ID))
+			return;
+		
+		IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
+		adaptiveSystem = ActionHelper.getAdaptiveSystem(editor);
+		
+		if (adaptiveSystem == null)
+			return;
 			
-			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
-			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
-			
-			final AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
-			
-			Job bpBuildJob = new Job("Constructing branching process") 
-			{
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
+		final IEditorInput in = editor.getEditorInput();
+		final AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
+		
+		Job bpBuildJob = new Job("Constructing branching process") 
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				
+				monitor.beginTask("Constructing branching process", IProgressMonitor.UNKNOWN);
+				
+				System.out.println("------- constructing branching process -------");
+				int steps = 0;
+				boolean interrupted = false;
+				long tStart = System.currentTimeMillis();
+				while (bp.constructBorder()) {
+					steps++;
+					if ((steps % 10) == 0)
+						monitor.subTask("explored "+steps+" events");
 					
-					monitor.beginTask("Constructing branching process", IProgressMonitor.UNKNOWN);
-					
-					System.out.println("------- constructing branching process -------");
-					int steps = 0;
-					boolean interrupted = false;
-					long tStart = System.currentTimeMillis();
-					while (bp.constructBorder()) {
-						steps++;
-						if ((steps % 10) == 0)
-							monitor.subTask("explored "+steps+" events");
-						
-						if (monitor.isCanceled()) {
-							interrupted = true;
-							break;
-						}
+					if (monitor.isCanceled()) {
+						interrupted = true;
+						break;
 					}
-					long tEnd = System.currentTimeMillis();
-					
-					if (interrupted) System.out.print("\ninterrupted ");
-					else System.out.print("\ndone ");
-					
-					System.out.println("after "+steps+" steps, "+(tEnd-tStart)+"ms");
-					System.out.println(bp.getStatistics());
-
-					monitor.beginTask("Writing result files", 1);
-					IEditorInput in = adaptiveSystemDiagramEditor.getEditorInput();
-					if (in instanceof IFileEditorInput) {
-						IFile inputFile = ((IFileEditorInput)in).getFile();
-						
-						monitor.subTask("writing dot file");
-						writeDotFile(bp, inputFile);
-						monitor.worked(1);
-					}
-					monitor.done();
-					
-					if (interrupted)
-						return Status.CANCEL_STATUS;
-					else
-						return Status.OK_STATUS;
 				}
-			};
-			
-			bpBuildJob.setUser(true);
-			bpBuildJob.schedule();
-		}
+				long tEnd = System.currentTimeMillis();
+				
+				if (interrupted) System.out.print("\ninterrupted ");
+				else System.out.print("\ndone ");
+				
+				System.out.println("after "+steps+" steps, "+(tEnd-tStart)+"ms");
+				System.out.println(bp.getStatistics());
 
+				monitor.beginTask("Writing result files", 1);
+				if (in instanceof IFileEditorInput) {
+					IFile inputFile = ((IFileEditorInput)in).getFile();
+					
+					monitor.subTask("writing dot file");
+					writeDotFile(bp, inputFile);
+					monitor.worked(1);
+				}
+				monitor.done();
+				
+				if (interrupted)
+					return Status.CANCEL_STATUS;
+				else
+					return Status.OK_STATUS;
+			}
+		};
+			
+		bpBuildJob.setUser(true);
+		bpBuildJob.schedule();
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 
 	}
 
-	private void writeFile (IPath targetPath, InputStream contents) {
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IFile targetFile = root.getFile(targetPath);
-		try {
-			if (targetFile.exists())
-				targetFile.setContents(contents, true, true, null);
-			else
-				targetFile.create(contents, true, null);
-			
-		} catch (CoreException e) {
-			ResourcesPlugin.getPlugin().getLog().log(
-				new Status(Status.ERROR, Activator.PLUGIN_ID, "Could not save transition system graph.", e));
-		}
-	}
-
 	private void writeDotFile (AdaptiveSystemBP bp, IFile inputFile) {
-		ByteArrayInputStream contents = new ByteArrayInputStream(bp.toDot().getBytes());
-		
+
 		String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
 		IPath targetPath = new Path(targetPathStr+"_bp.dot");
 
-		writeFile (targetPath, contents);
+		ActionHelper.writeFile (targetPath, bp.toDot());
 	}
 }

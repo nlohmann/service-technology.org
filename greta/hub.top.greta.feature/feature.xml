@@ -2,7 +2,7 @@
 <feature
       id="hub.top.GRETA.feature"
       label="Greta"
-      version="1.1.1.qualifier"
+      version="1.1.2.qualifier"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">
@@ -49,6 +49,7 @@ If you wish to allow use of your version of this program only under the terms of
    </license>
 
    <url>
+      <update label="Greta Updates" url="http://download.gna.org/service-tech/greta/updatesite/"/>
       <discovery label="Service-Technology.org Greta Update Site" url="http://download.gna.org/service-tech/greta/updatesite/"/>
    </url>
 

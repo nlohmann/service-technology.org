@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
+ * Copyright (c) 2008, 2009 Dirk Fahland. All rights reserved.
+ * EPL1.0/GPL3.0/LGPL3.0
  * 
  * ServiceTechnolog.org - Greta
  *                       (Graphical Runtime Environment for Adaptive Processes) 
@@ -131,10 +132,6 @@ public class AdaptiveSystemTS {
 				ocletCount++;
 			}
 		}
-	}
-	
-	private void convertOclets() {
-		
 	}
 	
 	public CNode.MatchingRelation[] enabledOclets (CNodeSet state) {
@@ -390,7 +387,7 @@ public class AdaptiveSystemTS {
 	}
 	
 	public String getStatistics() {
-		return "|Q| = "+states.size() +" |delta| = "+steps.size()+" |Q_visited| = "+stateCount;
+		return "|Q|="+states.size() + " |delta|="+steps.size() + " |Q_visited|="+stateCount;
 	}
 	
 	public boolean hasDeadlock() {

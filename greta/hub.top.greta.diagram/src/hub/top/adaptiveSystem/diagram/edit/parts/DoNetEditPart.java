@@ -387,10 +387,20 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 	 * @param adaptiveSystem
 	 */
 	public void resetCheckOclets() {
-		AdaptiveSystem adaptiveSystem = (AdaptiveSystem) ((DoNet) ((Node) this
+		AdaptiveSystem adaptiveSystem;
+		Oclet oclet;
+		
+		try {
+			adaptiveSystem = (AdaptiveSystem) ((DoNet) ((Node) this
 				.getModel()).getElement()).eContainer().eContainer();
-		Oclet oclet = (Oclet) ((DoNet) ((Node) this.getModel()).getElement())
+			oclet = (Oclet) ((DoNet) ((Node) this.getModel()).getElement())
 				.eContainer();
+		} catch (NullPointerException e) {
+			// in case of complex deletion operations, container relations
+			// and model relations might no longer be valid, returning
+			// null values
+			return;
+		}
 
 		if (adaptiveSystem.isSetWellformednessToOclets()) {
 			SetCommand cmd = new SetCommand(this.getEditingDomain(),

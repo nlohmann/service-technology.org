@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation" xmi:id="_oF0X4NFPEd2PSOQUMkhfkQ" type="AdaptiveSystem" measurementUnit="Pixel">
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_oF0X4dFPEd2PSOQUMkhfkQ"/>
+  <element xmi:type="adaptiveSystem:AdaptiveSystem" href="phil4_decent.adaptivesystem#_knfP0NFPEd2PSOQUMkhfkQ"/>
+</notation:Diagram>

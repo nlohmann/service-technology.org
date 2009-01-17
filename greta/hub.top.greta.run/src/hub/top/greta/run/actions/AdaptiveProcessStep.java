@@ -789,6 +789,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * @author Manja Wolf
 	 * @param apEditPart
 	 */
+	@SuppressWarnings("unchecked")
 	private void arrangeAllAdaptiveProcess(AdaptiveProcessEditPart apEditPart) {
 		
 		AdaptiveProcessCompartmentEditPart mpcEditPart = (AdaptiveProcessCompartmentEditPart) apEditPart.getChildren().get(0);

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adaptiveSystem:AdaptiveSystem xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adaptiveSystem="adaptiveSystem" xmi:id="_aVUlcNNdEd2ATJwfTF-xYg">
+  <oclets xmi:id="_aVUlcdNdEd2ATJwfTF-xYg" name="Phil1" wellFormed="true">
+    <preNet xmi:id="_aVUlctNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlc9NdEd2ATJwfTF-xYg" name="th1" temp="" postEvents="_aVUletNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUld9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUldNNdEd2ATJwfTF-xYg" name="fo1" temp="" postEvents="_aVUletNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUldtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlddNdEd2ATJwfTF-xYg" name="fo2" temp="" postEvents="_aVUletNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUleNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUldtNdEd2ATJwfTF-xYg" source="_aVUldNNdEd2ATJwfTF-xYg" destination="_aVUletNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUld9NdEd2ATJwfTF-xYg" source="_aVUlc9NdEd2ATJwfTF-xYg" destination="_aVUletNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUleNNdEd2ATJwfTF-xYg" source="_aVUlddNdEd2ATJwfTF-xYg" destination="_aVUletNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUledNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUletNdEd2ATJwfTF-xYg" name="take1" preConditions="_aVUldNNdEd2ATJwfTF-xYg _aVUlc9NdEd2ATJwfTF-xYg _aVUlddNdEd2ATJwfTF-xYg" postConditions="_aVUle9NdEd2ATJwfTF-xYg" incoming="_aVUldtNdEd2ATJwfTF-xYg _aVUld9NdEd2ATJwfTF-xYg _aVUleNNdEd2ATJwfTF-xYg" outgoing="_aVUlgNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUle9NdEd2ATJwfTF-xYg" name="eat1" preEvents="_aVUletNdEd2ATJwfTF-xYg" postEvents="_aVUlfdNdEd2ATJwfTF-xYg" incoming="_aVUlgNNdEd2ATJwfTF-xYg" outgoing="_aVUlgdNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlfNNdEd2ATJwfTF-xYg" name="fo1" preEvents="_aVUlfdNdEd2ATJwfTF-xYg" incoming="_aVUlgtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlfdNdEd2ATJwfTF-xYg" name="rel1" preConditions="_aVUle9NdEd2ATJwfTF-xYg" postConditions="_aVUlftNdEd2ATJwfTF-xYg _aVUlf9NdEd2ATJwfTF-xYg _aVUlfNNdEd2ATJwfTF-xYg" incoming="_aVUlgdNdEd2ATJwfTF-xYg" outgoing="_aVUlgtNdEd2ATJwfTF-xYg _aVUlg9NdEd2ATJwfTF-xYg _aVUlhNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlftNdEd2ATJwfTF-xYg" name="th1" preEvents="_aVUlfdNdEd2ATJwfTF-xYg" incoming="_aVUlg9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlf9NdEd2ATJwfTF-xYg" name="fo2" preEvents="_aVUlfdNdEd2ATJwfTF-xYg" incoming="_aVUlhNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlgNNdEd2ATJwfTF-xYg" source="_aVUletNdEd2ATJwfTF-xYg" destination="_aVUle9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlgdNdEd2ATJwfTF-xYg" source="_aVUle9NdEd2ATJwfTF-xYg" destination="_aVUlfdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlgtNdEd2ATJwfTF-xYg" source="_aVUlfdNdEd2ATJwfTF-xYg" destination="_aVUlfNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlg9NdEd2ATJwfTF-xYg" source="_aVUlfdNdEd2ATJwfTF-xYg" destination="_aVUlftNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlhNNdEd2ATJwfTF-xYg" source="_aVUlfdNdEd2ATJwfTF-xYg" destination="_aVUlf9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUlhdNdEd2ATJwfTF-xYg" name="Phil2" wellFormed="true">
+    <preNet xmi:id="_aVUlhtNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlh9NdEd2ATJwfTF-xYg" name="th2" temp="" postEvents="_aVUljtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUli9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUliNNdEd2ATJwfTF-xYg" name="fo2" temp="" postEvents="_aVUljtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUlitNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlidNdEd2ATJwfTF-xYg" name="fo3" temp="" postEvents="_aVUljtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUljNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlitNdEd2ATJwfTF-xYg" source="_aVUliNNdEd2ATJwfTF-xYg" destination="_aVUljtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUli9NdEd2ATJwfTF-xYg" source="_aVUlh9NdEd2ATJwfTF-xYg" destination="_aVUljtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUljNNdEd2ATJwfTF-xYg" source="_aVUlidNdEd2ATJwfTF-xYg" destination="_aVUljtNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUljdNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUljtNdEd2ATJwfTF-xYg" name="take2" preConditions="_aVUliNNdEd2ATJwfTF-xYg _aVUlh9NdEd2ATJwfTF-xYg _aVUlidNdEd2ATJwfTF-xYg" postConditions="_aVUlj9NdEd2ATJwfTF-xYg" incoming="_aVUlitNdEd2ATJwfTF-xYg _aVUli9NdEd2ATJwfTF-xYg _aVUljNNdEd2ATJwfTF-xYg" outgoing="_aVUllNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlj9NdEd2ATJwfTF-xYg" name="eat2" preEvents="_aVUljtNdEd2ATJwfTF-xYg" postEvents="_aVUlkdNdEd2ATJwfTF-xYg" incoming="_aVUllNNdEd2ATJwfTF-xYg" outgoing="_aVUlldNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlkNNdEd2ATJwfTF-xYg" name="fo2" preEvents="_aVUlkdNdEd2ATJwfTF-xYg" incoming="_aVUlltNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlkdNdEd2ATJwfTF-xYg" name="rel2" preConditions="_aVUlj9NdEd2ATJwfTF-xYg" postConditions="_aVUlktNdEd2ATJwfTF-xYg _aVUlk9NdEd2ATJwfTF-xYg _aVUlkNNdEd2ATJwfTF-xYg" incoming="_aVUlldNdEd2ATJwfTF-xYg" outgoing="_aVUlltNdEd2ATJwfTF-xYg _aVUll9NdEd2ATJwfTF-xYg _aVUlmNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlktNdEd2ATJwfTF-xYg" name="th2" preEvents="_aVUlkdNdEd2ATJwfTF-xYg" incoming="_aVUll9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlk9NdEd2ATJwfTF-xYg" name="fo3" preEvents="_aVUlkdNdEd2ATJwfTF-xYg" incoming="_aVUlmNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUllNNdEd2ATJwfTF-xYg" source="_aVUljtNdEd2ATJwfTF-xYg" destination="_aVUlj9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlldNdEd2ATJwfTF-xYg" source="_aVUlj9NdEd2ATJwfTF-xYg" destination="_aVUlkdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlltNdEd2ATJwfTF-xYg" source="_aVUlkdNdEd2ATJwfTF-xYg" destination="_aVUlkNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUll9NdEd2ATJwfTF-xYg" source="_aVUlkdNdEd2ATJwfTF-xYg" destination="_aVUlktNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlmNNdEd2ATJwfTF-xYg" source="_aVUlkdNdEd2ATJwfTF-xYg" destination="_aVUlk9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUlmdNdEd2ATJwfTF-xYg" name="Phil3" wellFormed="true">
+    <preNet xmi:id="_aVUlmtNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlm9NdEd2ATJwfTF-xYg" name="th3" temp="" postEvents="_aVUlotNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUln9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlnNNdEd2ATJwfTF-xYg" name="fo3" temp="" postEvents="_aVUlotNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUlntNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlndNdEd2ATJwfTF-xYg" name="fo4" temp="" postEvents="_aVUlotNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUloNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlntNdEd2ATJwfTF-xYg" source="_aVUlnNNdEd2ATJwfTF-xYg" destination="_aVUlotNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUln9NdEd2ATJwfTF-xYg" source="_aVUlm9NdEd2ATJwfTF-xYg" destination="_aVUlotNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUloNNdEd2ATJwfTF-xYg" source="_aVUlndNdEd2ATJwfTF-xYg" destination="_aVUlotNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUlodNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlotNdEd2ATJwfTF-xYg" name="take3" preConditions="_aVUlnNNdEd2ATJwfTF-xYg _aVUlm9NdEd2ATJwfTF-xYg _aVUlndNdEd2ATJwfTF-xYg" postConditions="_aVUlo9NdEd2ATJwfTF-xYg" incoming="_aVUlntNdEd2ATJwfTF-xYg _aVUln9NdEd2ATJwfTF-xYg _aVUloNNdEd2ATJwfTF-xYg" outgoing="_aVUlqNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlo9NdEd2ATJwfTF-xYg" name="eat3" preEvents="_aVUlotNdEd2ATJwfTF-xYg" postEvents="_aVUlpdNdEd2ATJwfTF-xYg" incoming="_aVUlqNNdEd2ATJwfTF-xYg" outgoing="_aVUlqdNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlpNNdEd2ATJwfTF-xYg" name="fo3" preEvents="_aVUlpdNdEd2ATJwfTF-xYg" incoming="_aVUlqtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlpdNdEd2ATJwfTF-xYg" name="rel3" preConditions="_aVUlo9NdEd2ATJwfTF-xYg" postConditions="_aVUlptNdEd2ATJwfTF-xYg _aVUlp9NdEd2ATJwfTF-xYg _aVUlpNNdEd2ATJwfTF-xYg" incoming="_aVUlqdNdEd2ATJwfTF-xYg" outgoing="_aVUlqtNdEd2ATJwfTF-xYg _aVUlq9NdEd2ATJwfTF-xYg _aVUlrNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlptNdEd2ATJwfTF-xYg" name="th3" preEvents="_aVUlpdNdEd2ATJwfTF-xYg" incoming="_aVUlq9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlp9NdEd2ATJwfTF-xYg" name="fo4" preEvents="_aVUlpdNdEd2ATJwfTF-xYg" incoming="_aVUlrNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlqNNdEd2ATJwfTF-xYg" source="_aVUlotNdEd2ATJwfTF-xYg" destination="_aVUlo9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlqdNdEd2ATJwfTF-xYg" source="_aVUlo9NdEd2ATJwfTF-xYg" destination="_aVUlpdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlqtNdEd2ATJwfTF-xYg" source="_aVUlpdNdEd2ATJwfTF-xYg" destination="_aVUlpNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlq9NdEd2ATJwfTF-xYg" source="_aVUlpdNdEd2ATJwfTF-xYg" destination="_aVUlptNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlrNNdEd2ATJwfTF-xYg" source="_aVUlpdNdEd2ATJwfTF-xYg" destination="_aVUlp9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUlrdNdEd2ATJwfTF-xYg" name="Phil4" wellFormed="true">
+    <preNet xmi:id="_aVUlrtNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlr9NdEd2ATJwfTF-xYg" name="th4" temp="" postEvents="_aVUlttNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUls9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlsNNdEd2ATJwfTF-xYg" name="fo4" temp="" postEvents="_aVUlttNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUlstNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlsdNdEd2ATJwfTF-xYg" name="fo5" temp="" postEvents="_aVUlttNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUltNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlstNdEd2ATJwfTF-xYg" source="_aVUlsNNdEd2ATJwfTF-xYg" destination="_aVUlttNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUls9NdEd2ATJwfTF-xYg" source="_aVUlr9NdEd2ATJwfTF-xYg" destination="_aVUlttNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUltNNdEd2ATJwfTF-xYg" source="_aVUlsdNdEd2ATJwfTF-xYg" destination="_aVUlttNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUltdNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlttNdEd2ATJwfTF-xYg" name="take4" preConditions="_aVUlsNNdEd2ATJwfTF-xYg _aVUlr9NdEd2ATJwfTF-xYg _aVUlsdNdEd2ATJwfTF-xYg" postConditions="_aVUlt9NdEd2ATJwfTF-xYg" incoming="_aVUlstNdEd2ATJwfTF-xYg _aVUls9NdEd2ATJwfTF-xYg _aVUltNNdEd2ATJwfTF-xYg" outgoing="_aVUlvNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlt9NdEd2ATJwfTF-xYg" name="eat4" preEvents="_aVUlttNdEd2ATJwfTF-xYg" postEvents="_aVUludNdEd2ATJwfTF-xYg" incoming="_aVUlvNNdEd2ATJwfTF-xYg" outgoing="_aVUlvdNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUluNNdEd2ATJwfTF-xYg" name="fo4" preEvents="_aVUludNdEd2ATJwfTF-xYg" incoming="_aVUlvtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUludNdEd2ATJwfTF-xYg" name="rel4" preConditions="_aVUlt9NdEd2ATJwfTF-xYg" postConditions="_aVUlutNdEd2ATJwfTF-xYg _aVUlu9NdEd2ATJwfTF-xYg _aVUluNNdEd2ATJwfTF-xYg" incoming="_aVUlvdNdEd2ATJwfTF-xYg" outgoing="_aVUlvtNdEd2ATJwfTF-xYg _aVUlv9NdEd2ATJwfTF-xYg _aVUlwNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlutNdEd2ATJwfTF-xYg" name="th4" preEvents="_aVUludNdEd2ATJwfTF-xYg" incoming="_aVUlv9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlu9NdEd2ATJwfTF-xYg" name="fo5" preEvents="_aVUludNdEd2ATJwfTF-xYg" incoming="_aVUlwNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlvNNdEd2ATJwfTF-xYg" source="_aVUlttNdEd2ATJwfTF-xYg" destination="_aVUlt9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlvdNdEd2ATJwfTF-xYg" source="_aVUlt9NdEd2ATJwfTF-xYg" destination="_aVUludNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlvtNdEd2ATJwfTF-xYg" source="_aVUludNdEd2ATJwfTF-xYg" destination="_aVUluNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlv9NdEd2ATJwfTF-xYg" source="_aVUludNdEd2ATJwfTF-xYg" destination="_aVUlutNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUlwNNdEd2ATJwfTF-xYg" source="_aVUludNdEd2ATJwfTF-xYg" destination="_aVUlu9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUlwdNdEd2ATJwfTF-xYg" name="Phil5" wellFormed="true">
+    <preNet xmi:id="_aVUlwtNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlw9NdEd2ATJwfTF-xYg" name="th5" temp="" postEvents="_aVUlytNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUlx9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlxNNdEd2ATJwfTF-xYg" name="fo5" temp="" postEvents="_aVUlytNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUlxtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlxdNdEd2ATJwfTF-xYg" name="fo6" temp="" postEvents="_aVUlytNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUlyNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlxtNdEd2ATJwfTF-xYg" source="_aVUlxNNdEd2ATJwfTF-xYg" destination="_aVUlytNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlx9NdEd2ATJwfTF-xYg" source="_aVUlw9NdEd2ATJwfTF-xYg" destination="_aVUlytNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUlyNNdEd2ATJwfTF-xYg" source="_aVUlxdNdEd2ATJwfTF-xYg" destination="_aVUlytNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUlydNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlytNdEd2ATJwfTF-xYg" name="take5" preConditions="_aVUlxNNdEd2ATJwfTF-xYg _aVUlw9NdEd2ATJwfTF-xYg _aVUlxdNdEd2ATJwfTF-xYg" postConditions="_aVUly9NdEd2ATJwfTF-xYg" incoming="_aVUlxtNdEd2ATJwfTF-xYg _aVUlx9NdEd2ATJwfTF-xYg _aVUlyNNdEd2ATJwfTF-xYg" outgoing="_aVUl0NNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUly9NdEd2ATJwfTF-xYg" name="eat5" preEvents="_aVUlytNdEd2ATJwfTF-xYg" postEvents="_aVUlzdNdEd2ATJwfTF-xYg" incoming="_aVUl0NNdEd2ATJwfTF-xYg" outgoing="_aVUl0dNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlzNNdEd2ATJwfTF-xYg" name="fo5" preEvents="_aVUlzdNdEd2ATJwfTF-xYg" incoming="_aVUl0tNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUlzdNdEd2ATJwfTF-xYg" name="rel5" preConditions="_aVUly9NdEd2ATJwfTF-xYg" postConditions="_aVUlztNdEd2ATJwfTF-xYg _aVUlz9NdEd2ATJwfTF-xYg _aVUlzNNdEd2ATJwfTF-xYg" incoming="_aVUl0dNdEd2ATJwfTF-xYg" outgoing="_aVUl0tNdEd2ATJwfTF-xYg _aVUl09NdEd2ATJwfTF-xYg _aVUl1NNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlztNdEd2ATJwfTF-xYg" name="th5" preEvents="_aVUlzdNdEd2ATJwfTF-xYg" incoming="_aVUl09NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUlz9NdEd2ATJwfTF-xYg" name="fo6" preEvents="_aVUlzdNdEd2ATJwfTF-xYg" incoming="_aVUl1NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl0NNdEd2ATJwfTF-xYg" source="_aVUlytNdEd2ATJwfTF-xYg" destination="_aVUly9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl0dNdEd2ATJwfTF-xYg" source="_aVUly9NdEd2ATJwfTF-xYg" destination="_aVUlzdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl0tNdEd2ATJwfTF-xYg" source="_aVUlzdNdEd2ATJwfTF-xYg" destination="_aVUlzNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl09NdEd2ATJwfTF-xYg" source="_aVUlzdNdEd2ATJwfTF-xYg" destination="_aVUlztNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl1NNdEd2ATJwfTF-xYg" source="_aVUlzdNdEd2ATJwfTF-xYg" destination="_aVUlz9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUl1dNdEd2ATJwfTF-xYg" name="Phil6" wellFormed="true">
+    <preNet xmi:id="_aVUl1tNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl19NdEd2ATJwfTF-xYg" name="th6" temp="" postEvents="_aVUl3tNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUl29NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl2NNdEd2ATJwfTF-xYg" name="fo6" temp="" postEvents="_aVUl3tNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUl2tNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl2dNdEd2ATJwfTF-xYg" name="fo7" temp="" postEvents="_aVUl3tNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUl3NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl2tNdEd2ATJwfTF-xYg" source="_aVUl2NNdEd2ATJwfTF-xYg" destination="_aVUl3tNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl29NdEd2ATJwfTF-xYg" source="_aVUl19NdEd2ATJwfTF-xYg" destination="_aVUl3tNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl3NNdEd2ATJwfTF-xYg" source="_aVUl2dNdEd2ATJwfTF-xYg" destination="_aVUl3tNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUl3dNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUl3tNdEd2ATJwfTF-xYg" name="take6" preConditions="_aVUl2NNdEd2ATJwfTF-xYg _aVUl19NdEd2ATJwfTF-xYg _aVUl2dNdEd2ATJwfTF-xYg" postConditions="_aVUl39NdEd2ATJwfTF-xYg" incoming="_aVUl2tNdEd2ATJwfTF-xYg _aVUl29NdEd2ATJwfTF-xYg _aVUl3NNdEd2ATJwfTF-xYg" outgoing="_aVUl5NNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl39NdEd2ATJwfTF-xYg" name="eat6" preEvents="_aVUl3tNdEd2ATJwfTF-xYg" postEvents="_aVUl4dNdEd2ATJwfTF-xYg" incoming="_aVUl5NNdEd2ATJwfTF-xYg" outgoing="_aVUl5dNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl4NNdEd2ATJwfTF-xYg" name="fo6" preEvents="_aVUl4dNdEd2ATJwfTF-xYg" incoming="_aVUl5tNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUl4dNdEd2ATJwfTF-xYg" name="rel6" preConditions="_aVUl39NdEd2ATJwfTF-xYg" postConditions="_aVUl4tNdEd2ATJwfTF-xYg _aVUl49NdEd2ATJwfTF-xYg _aVUl4NNdEd2ATJwfTF-xYg" incoming="_aVUl5dNdEd2ATJwfTF-xYg" outgoing="_aVUl5tNdEd2ATJwfTF-xYg _aVUl59NdEd2ATJwfTF-xYg _aVUl6NNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl4tNdEd2ATJwfTF-xYg" name="th6" preEvents="_aVUl4dNdEd2ATJwfTF-xYg" incoming="_aVUl59NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl49NdEd2ATJwfTF-xYg" name="fo7" preEvents="_aVUl4dNdEd2ATJwfTF-xYg" incoming="_aVUl6NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl5NNdEd2ATJwfTF-xYg" source="_aVUl3tNdEd2ATJwfTF-xYg" destination="_aVUl39NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl5dNdEd2ATJwfTF-xYg" source="_aVUl39NdEd2ATJwfTF-xYg" destination="_aVUl4dNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl5tNdEd2ATJwfTF-xYg" source="_aVUl4dNdEd2ATJwfTF-xYg" destination="_aVUl4NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl59NdEd2ATJwfTF-xYg" source="_aVUl4dNdEd2ATJwfTF-xYg" destination="_aVUl4tNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl6NNdEd2ATJwfTF-xYg" source="_aVUl4dNdEd2ATJwfTF-xYg" destination="_aVUl49NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUl6dNdEd2ATJwfTF-xYg" name="Phil7" wellFormed="true">
+    <preNet xmi:id="_aVUl6tNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl69NdEd2ATJwfTF-xYg" name="th7" temp="" postEvents="_aVUl8tNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUl79NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl7NNdEd2ATJwfTF-xYg" name="fo7" temp="" postEvents="_aVUl8tNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUl7tNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl7dNdEd2ATJwfTF-xYg" name="fo8" temp="" postEvents="_aVUl8tNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUl8NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl7tNdEd2ATJwfTF-xYg" source="_aVUl7NNdEd2ATJwfTF-xYg" destination="_aVUl8tNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl79NdEd2ATJwfTF-xYg" source="_aVUl69NdEd2ATJwfTF-xYg" destination="_aVUl8tNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl8NNdEd2ATJwfTF-xYg" source="_aVUl7dNdEd2ATJwfTF-xYg" destination="_aVUl8tNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUl8dNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUl8tNdEd2ATJwfTF-xYg" name="take7" preConditions="_aVUl7NNdEd2ATJwfTF-xYg _aVUl69NdEd2ATJwfTF-xYg _aVUl7dNdEd2ATJwfTF-xYg" postConditions="_aVUl89NdEd2ATJwfTF-xYg" incoming="_aVUl7tNdEd2ATJwfTF-xYg _aVUl79NdEd2ATJwfTF-xYg _aVUl8NNdEd2ATJwfTF-xYg" outgoing="_aVUl-NNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl89NdEd2ATJwfTF-xYg" name="eat7" preEvents="_aVUl8tNdEd2ATJwfTF-xYg" postEvents="_aVUl9dNdEd2ATJwfTF-xYg" incoming="_aVUl-NNdEd2ATJwfTF-xYg" outgoing="_aVUl-dNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl9NNdEd2ATJwfTF-xYg" name="fo7" preEvents="_aVUl9dNdEd2ATJwfTF-xYg" incoming="_aVUl-tNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUl9dNdEd2ATJwfTF-xYg" name="rel7" preConditions="_aVUl89NdEd2ATJwfTF-xYg" postConditions="_aVUl9tNdEd2ATJwfTF-xYg _aVUl99NdEd2ATJwfTF-xYg _aVUl9NNdEd2ATJwfTF-xYg" incoming="_aVUl-dNdEd2ATJwfTF-xYg" outgoing="_aVUl-tNdEd2ATJwfTF-xYg _aVUl-9NdEd2ATJwfTF-xYg _aVUl_NNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl9tNdEd2ATJwfTF-xYg" name="th7" preEvents="_aVUl9dNdEd2ATJwfTF-xYg" incoming="_aVUl-9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl99NdEd2ATJwfTF-xYg" name="fo8" preEvents="_aVUl9dNdEd2ATJwfTF-xYg" incoming="_aVUl_NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl-NNdEd2ATJwfTF-xYg" source="_aVUl8tNdEd2ATJwfTF-xYg" destination="_aVUl89NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUl-dNdEd2ATJwfTF-xYg" source="_aVUl89NdEd2ATJwfTF-xYg" destination="_aVUl9dNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl-tNdEd2ATJwfTF-xYg" source="_aVUl9dNdEd2ATJwfTF-xYg" destination="_aVUl9NNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl-9NdEd2ATJwfTF-xYg" source="_aVUl9dNdEd2ATJwfTF-xYg" destination="_aVUl9tNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUl_NNdEd2ATJwfTF-xYg" source="_aVUl9dNdEd2ATJwfTF-xYg" destination="_aVUl99NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUl_dNdEd2ATJwfTF-xYg" name="Phil8" wellFormed="true">
+    <preNet xmi:id="_aVUl_tNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUl_9NdEd2ATJwfTF-xYg" name="th8" temp="" postEvents="_aVUmBtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmA9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmANNdEd2ATJwfTF-xYg" name="fo8" temp="" postEvents="_aVUmBtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmAtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmAdNdEd2ATJwfTF-xYg" name="fo9" temp="" postEvents="_aVUmBtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmBNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmAtNdEd2ATJwfTF-xYg" source="_aVUmANNdEd2ATJwfTF-xYg" destination="_aVUmBtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmA9NdEd2ATJwfTF-xYg" source="_aVUl_9NdEd2ATJwfTF-xYg" destination="_aVUmBtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmBNNdEd2ATJwfTF-xYg" source="_aVUmAdNdEd2ATJwfTF-xYg" destination="_aVUmBtNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUmBdNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUmBtNdEd2ATJwfTF-xYg" name="take8" preConditions="_aVUmANNdEd2ATJwfTF-xYg _aVUl_9NdEd2ATJwfTF-xYg _aVUmAdNdEd2ATJwfTF-xYg" postConditions="_aVUmB9NdEd2ATJwfTF-xYg" incoming="_aVUmAtNdEd2ATJwfTF-xYg _aVUmA9NdEd2ATJwfTF-xYg _aVUmBNNdEd2ATJwfTF-xYg" outgoing="_aVUmDNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmB9NdEd2ATJwfTF-xYg" name="eat8" preEvents="_aVUmBtNdEd2ATJwfTF-xYg" postEvents="_aVUmCdNdEd2ATJwfTF-xYg" incoming="_aVUmDNNdEd2ATJwfTF-xYg" outgoing="_aVUmDdNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmCNNdEd2ATJwfTF-xYg" name="fo8" preEvents="_aVUmCdNdEd2ATJwfTF-xYg" incoming="_aVUmDtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUmCdNdEd2ATJwfTF-xYg" name="rel8" preConditions="_aVUmB9NdEd2ATJwfTF-xYg" postConditions="_aVUmCtNdEd2ATJwfTF-xYg _aVUmC9NdEd2ATJwfTF-xYg _aVUmCNNdEd2ATJwfTF-xYg" incoming="_aVUmDdNdEd2ATJwfTF-xYg" outgoing="_aVUmDtNdEd2ATJwfTF-xYg _aVUmD9NdEd2ATJwfTF-xYg _aVUmENNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmCtNdEd2ATJwfTF-xYg" name="th8" preEvents="_aVUmCdNdEd2ATJwfTF-xYg" incoming="_aVUmD9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmC9NdEd2ATJwfTF-xYg" name="fo9" preEvents="_aVUmCdNdEd2ATJwfTF-xYg" incoming="_aVUmENNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmDNNdEd2ATJwfTF-xYg" source="_aVUmBtNdEd2ATJwfTF-xYg" destination="_aVUmB9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmDdNdEd2ATJwfTF-xYg" source="_aVUmB9NdEd2ATJwfTF-xYg" destination="_aVUmCdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmDtNdEd2ATJwfTF-xYg" source="_aVUmCdNdEd2ATJwfTF-xYg" destination="_aVUmCNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmD9NdEd2ATJwfTF-xYg" source="_aVUmCdNdEd2ATJwfTF-xYg" destination="_aVUmCtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmENNdEd2ATJwfTF-xYg" source="_aVUmCdNdEd2ATJwfTF-xYg" destination="_aVUmC9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUmEdNdEd2ATJwfTF-xYg" name="Phil9" wellFormed="true">
+    <preNet xmi:id="_aVUmEtNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmE9NdEd2ATJwfTF-xYg" name="th9" temp="" postEvents="_aVUmGtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmF9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmFNNdEd2ATJwfTF-xYg" name="fo9" temp="" postEvents="_aVUmGtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmFtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmFdNdEd2ATJwfTF-xYg" name="fo10" temp="" postEvents="_aVUmGtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmGNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmFtNdEd2ATJwfTF-xYg" source="_aVUmFNNdEd2ATJwfTF-xYg" destination="_aVUmGtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmF9NdEd2ATJwfTF-xYg" source="_aVUmE9NdEd2ATJwfTF-xYg" destination="_aVUmGtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmGNNdEd2ATJwfTF-xYg" source="_aVUmFdNdEd2ATJwfTF-xYg" destination="_aVUmGtNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUmGdNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUmGtNdEd2ATJwfTF-xYg" name="take9" preConditions="_aVUmFNNdEd2ATJwfTF-xYg _aVUmE9NdEd2ATJwfTF-xYg _aVUmFdNdEd2ATJwfTF-xYg" postConditions="_aVUmG9NdEd2ATJwfTF-xYg" incoming="_aVUmFtNdEd2ATJwfTF-xYg _aVUmF9NdEd2ATJwfTF-xYg _aVUmGNNdEd2ATJwfTF-xYg" outgoing="_aVUmINNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmG9NdEd2ATJwfTF-xYg" name="eat9" preEvents="_aVUmGtNdEd2ATJwfTF-xYg" postEvents="_aVUmHdNdEd2ATJwfTF-xYg" incoming="_aVUmINNdEd2ATJwfTF-xYg" outgoing="_aVUmIdNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmHNNdEd2ATJwfTF-xYg" name="fo9" preEvents="_aVUmHdNdEd2ATJwfTF-xYg" incoming="_aVUmItNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUmHdNdEd2ATJwfTF-xYg" name="rel9" preConditions="_aVUmG9NdEd2ATJwfTF-xYg" postConditions="_aVUmHtNdEd2ATJwfTF-xYg _aVUmH9NdEd2ATJwfTF-xYg _aVUmHNNdEd2ATJwfTF-xYg" incoming="_aVUmIdNdEd2ATJwfTF-xYg" outgoing="_aVUmItNdEd2ATJwfTF-xYg _aVUmI9NdEd2ATJwfTF-xYg _aVUmJNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmHtNdEd2ATJwfTF-xYg" name="th9" preEvents="_aVUmHdNdEd2ATJwfTF-xYg" incoming="_aVUmI9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmH9NdEd2ATJwfTF-xYg" name="fo10" preEvents="_aVUmHdNdEd2ATJwfTF-xYg" incoming="_aVUmJNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmINNdEd2ATJwfTF-xYg" source="_aVUmGtNdEd2ATJwfTF-xYg" destination="_aVUmG9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmIdNdEd2ATJwfTF-xYg" source="_aVUmG9NdEd2ATJwfTF-xYg" destination="_aVUmHdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmItNdEd2ATJwfTF-xYg" source="_aVUmHdNdEd2ATJwfTF-xYg" destination="_aVUmHNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmI9NdEd2ATJwfTF-xYg" source="_aVUmHdNdEd2ATJwfTF-xYg" destination="_aVUmHtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmJNNdEd2ATJwfTF-xYg" source="_aVUmHdNdEd2ATJwfTF-xYg" destination="_aVUmH9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_aVUmJdNdEd2ATJwfTF-xYg" name="Phil10" wellFormed="true">
+    <preNet xmi:id="_aVUmJtNdEd2ATJwfTF-xYg" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmJ9NdEd2ATJwfTF-xYg" name="th10" temp="" postEvents="_aVUmLtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmK9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmKNNdEd2ATJwfTF-xYg" name="fo10" temp="" postEvents="_aVUmLtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmKtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmKdNdEd2ATJwfTF-xYg" name="fo1" temp="" postEvents="_aVUmLtNdEd2ATJwfTF-xYg" token="1" outgoing="_aVUmLNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmKtNdEd2ATJwfTF-xYg" source="_aVUmKNNdEd2ATJwfTF-xYg" destination="_aVUmLtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmK9NdEd2ATJwfTF-xYg" source="_aVUmJ9NdEd2ATJwfTF-xYg" destination="_aVUmLtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmLNNdEd2ATJwfTF-xYg" source="_aVUmKdNdEd2ATJwfTF-xYg" destination="_aVUmLtNdEd2ATJwfTF-xYg"/>
+    </preNet>
+    <doNet xmi:id="_aVUmLdNdEd2ATJwfTF-xYg" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUmLtNdEd2ATJwfTF-xYg" name="take10" preConditions="_aVUmKNNdEd2ATJwfTF-xYg _aVUmJ9NdEd2ATJwfTF-xYg _aVUmKdNdEd2ATJwfTF-xYg" postConditions="_aVUmL9NdEd2ATJwfTF-xYg" incoming="_aVUmKtNdEd2ATJwfTF-xYg _aVUmK9NdEd2ATJwfTF-xYg _aVUmLNNdEd2ATJwfTF-xYg" outgoing="_aVUmNNNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmL9NdEd2ATJwfTF-xYg" name="eat10" preEvents="_aVUmLtNdEd2ATJwfTF-xYg" postEvents="_aVUmMdNdEd2ATJwfTF-xYg" incoming="_aVUmNNNdEd2ATJwfTF-xYg" outgoing="_aVUmNdNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmMNNdEd2ATJwfTF-xYg" name="fo10" preEvents="_aVUmMdNdEd2ATJwfTF-xYg" incoming="_aVUmNtNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_aVUmMdNdEd2ATJwfTF-xYg" name="rel10" preConditions="_aVUmL9NdEd2ATJwfTF-xYg" postConditions="_aVUmMtNdEd2ATJwfTF-xYg _aVUmM9NdEd2ATJwfTF-xYg _aVUmMNNdEd2ATJwfTF-xYg" incoming="_aVUmNdNdEd2ATJwfTF-xYg" outgoing="_aVUmNtNdEd2ATJwfTF-xYg _aVUmN9NdEd2ATJwfTF-xYg _aVUmONNdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmMtNdEd2ATJwfTF-xYg" name="th10" preEvents="_aVUmMdNdEd2ATJwfTF-xYg" incoming="_aVUmN9NdEd2ATJwfTF-xYg"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmM9NdEd2ATJwfTF-xYg" name="fo1" preEvents="_aVUmMdNdEd2ATJwfTF-xYg" incoming="_aVUmONNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmNNNdEd2ATJwfTF-xYg" source="_aVUmLtNdEd2ATJwfTF-xYg" destination="_aVUmL9NdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVUmNdNdEd2ATJwfTF-xYg" source="_aVUmL9NdEd2ATJwfTF-xYg" destination="_aVUmMdNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmNtNdEd2ATJwfTF-xYg" source="_aVUmMdNdEd2ATJwfTF-xYg" destination="_aVUmMNNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmN9NdEd2ATJwfTF-xYg" source="_aVUmMdNdEd2ATJwfTF-xYg" destination="_aVUmMtNdEd2ATJwfTF-xYg"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVUmONNdEd2ATJwfTF-xYg" source="_aVUmMdNdEd2ATJwfTF-xYg" destination="_aVUmM9NdEd2ATJwfTF-xYg"/>
+    </doNet>
+  </oclets>
+  <adaptiveProcess xmi:id="_aVUmOdNdEd2ATJwfTF-xYg" name="ap">
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmOtNdEd2ATJwfTF-xYg" name="fo1" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmO9NdEd2ATJwfTF-xYg" name="fo2" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmPNNdEd2ATJwfTF-xYg" name="fo3" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmPdNdEd2ATJwfTF-xYg" name="fo4" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmPtNdEd2ATJwfTF-xYg" name="fo5" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmP9NdEd2ATJwfTF-xYg" name="fo6" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmQNNdEd2ATJwfTF-xYg" name="fo7" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmQdNdEd2ATJwfTF-xYg" name="fo8" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmQtNdEd2ATJwfTF-xYg" name="fo9" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmQ9NdEd2ATJwfTF-xYg" name="fo10" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmRNNdEd2ATJwfTF-xYg" name="th1" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmRdNdEd2ATJwfTF-xYg" name="th2" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmRtNdEd2ATJwfTF-xYg" name="th3" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmR9NdEd2ATJwfTF-xYg" name="th4" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmSNNdEd2ATJwfTF-xYg" name="th5" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmSdNdEd2ATJwfTF-xYg" name="th6" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmStNdEd2ATJwfTF-xYg" name="th7" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmS9NdEd2ATJwfTF-xYg" name="th8" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmTNNdEd2ATJwfTF-xYg" name="th9" token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_aVUmTdNdEd2ATJwfTF-xYg" name="th10" token="1"/>
+  </adaptiveProcess>
+</adaptiveSystem:AdaptiveSystem>

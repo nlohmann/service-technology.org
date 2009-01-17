@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
+ * Copyright (c) 2008, 2009 Dirk Fahland. All rights reserved.
+ * EPL1.0/GPL3.0/LGPL3.0
  * 
  * ServiceTechnolog.org - Greta
  *                       (Graphical Runtime Environment for Adaptive Processes) 
@@ -42,7 +43,6 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
-import hub.top.greta.oclets.ts.AdaptiveSystemStep;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -127,6 +127,7 @@ public class CNodeSet {
 	 * @param otherSet
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static CNodeSet fromCNodeSet_afterCut(CNodeSet otherSet) {
 		CNode.MatchingRelation upToCut = new CNode.MatchingRelation();
 		//HashSet<CNode> past = new HashSet<CNode>(otherSet.size());

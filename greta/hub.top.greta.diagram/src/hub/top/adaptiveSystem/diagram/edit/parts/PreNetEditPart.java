@@ -379,10 +379,20 @@ public class PreNetEditPart extends ShapeNodeEditPart {
 	 * @author Manja Wolf
 	 */
 	public void resetCheckOclets() {
-		AdaptiveSystem adaptiveSystem = (AdaptiveSystem) ((PreNet) ((Node) this
+		AdaptiveSystem adaptiveSystem;
+		Oclet oclet;
+		
+		try {
+			adaptiveSystem = (AdaptiveSystem) ((PreNet) ((Node) this
 				.getModel()).getElement()).eContainer().eContainer();
-		Oclet oclet = (Oclet) ((PreNet) ((Node) this.getModel()).getElement())
+			oclet = (Oclet) ((PreNet) ((Node) this.getModel()).getElement())
 				.eContainer();
+		} catch (NullPointerException e) {
+			// in case of complex deletion operations, container relations
+			// and model relations might no longer be valid, returning
+			// null values
+			return;
+		}
 
 		if (adaptiveSystem.isSetWellformednessToOclets()) {
 			SetCommand cmd = new SetCommand(this.getEditingDomain(),

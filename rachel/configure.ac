@@ -1,4 +1,4 @@
-AC_INIT(Rachel, 1.13, rachel@service-technology.org, rachel)
+AC_INIT(Rachel, 1.12, rachel@service-technology.org, rachel)
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries

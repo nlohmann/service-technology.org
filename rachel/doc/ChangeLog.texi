@@ -1,4 +1,4 @@
-@heading Version 1.13
+@heading Version 1.12
 @itemize
 @item implemented methods to calculate a compact representation of the formulae annotated to the operating guideline's states according to the paper submitted to ACSD 2009; the new method can be triggered with the new mode @option{-m annotation}
 

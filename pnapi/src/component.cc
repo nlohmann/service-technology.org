@@ -15,7 +15,7 @@ namespace pnapi {
 
   /*!
    */
-  Node::Node(PetriNet & net, ComponentObserver & observer, const string & name, 
+  Node::Node(PetriNet & net, ComponentObserver & observer, const string & name,
 	     Type type) :
     net_(net), observer_(observer), type_(type)
   {
@@ -24,7 +24,7 @@ namespace pnapi {
     history_.push_back(name);
   }
 
-  
+
   /*!
    */
   Node::Node(PetriNet & net, ComponentObserver & observer, const Node & node) :
@@ -35,7 +35,7 @@ namespace pnapi {
 
 
   /*!
-   * Do not delete a node directly but ask the net instead: 
+   * Do not delete a node directly but ask the net instead:
    * PetriNet::deleteNode()
    */
   Node::~Node()
@@ -90,7 +90,7 @@ namespace pnapi {
     observer_.updateNodeNameHistory(*this, oldHistory);
   }
 
-  
+
   /*!
    */
   deque<string> Node::getNameHistory() const
@@ -150,8 +150,8 @@ namespace pnapi {
   }
 
 
-  void Node::mergeArcs(Node & node1, Node & node2, const set<Node *> & set1, 
-		       const set<Node *> & set2, bool addWeights, 
+  void Node::mergeArcs(Node & node1, Node & node2, const set<Node *> & set1,
+		       const set<Node *> & set2, bool addWeights,
 		       bool isPostset)
   {
     for (set<Node *>::iterator it = set2.begin(); it != set2.end(); ++it)
@@ -183,10 +183,10 @@ namespace pnapi {
 
   /*!
    */
-  Place::Place(PetriNet & net, ComponentObserver & observer, 
+  Place::Place(PetriNet & net, ComponentObserver & observer,
 	       const string & name, Type type, unsigned int tokens,
 	       unsigned int capacity) :
-    Node(net, observer, name, type), tokens_(tokens), capacity_(capacity), 
+    Node(net, observer, name, type), tokens_(tokens), capacity_(capacity),
     wasInterface_(type == INTERNAL ? false : true)
   {
     observer_.updatePlaces(*this);
@@ -196,7 +196,7 @@ namespace pnapi {
 
   /*!
    */
-  Place::Place(PetriNet & net, ComponentObserver & observer, 
+  Place::Place(PetriNet & net, ComponentObserver & observer,
 	       const Place & place) :
     Node(net, observer, place), tokens_(place.tokens_),
     capacity_(place.capacity_), wasInterface_(place.wasInterface_)
@@ -205,7 +205,7 @@ namespace pnapi {
     setType(getType());
   }
 
-  
+
   /*!
    */
   void Place::setType(Type type)
@@ -233,9 +233,9 @@ namespace pnapi {
     return capacity_;
   }
 
-  
+
   /*!
-   * Merges the properties of the given node into this one. The merged place 
+   * Merges the properties of the given node into this one. The merged place
    * is deleted.
    *
    * The following properties are merged:
@@ -264,6 +264,17 @@ namespace pnapi {
   }
 
 
+  /*!
+   * \brief   Sets the number of token to the place
+   *
+   * \note    This method is experimentally used!
+   */
+  void Place::mark(const unsigned int &t)
+  {
+    tokens_ = t;
+  }
+
+
 
   /****************************************************************************
    *** Class Transition Function Definitions
@@ -272,7 +283,7 @@ namespace pnapi {
 
   /*!
    */
-  Transition::Transition(PetriNet & net, ComponentObserver & observer, 
+  Transition::Transition(PetriNet & net, ComponentObserver & observer,
 			 const string & name, Type type) :
     Node(net, observer, name, type)
   {
@@ -282,7 +293,7 @@ namespace pnapi {
 
   /*!
    */
-  Transition::Transition(PetriNet & net, ComponentObserver & observer, 
+  Transition::Transition(PetriNet & net, ComponentObserver & observer,
 			 const Transition & trans) :
     Node(net, observer, trans)
   {
@@ -312,7 +323,7 @@ namespace pnapi {
 
 
   /*!
-   * Merges the properties of the given node into this one. The merged 
+   * Merges the properties of the given node into this one. The merged
    * transition is deleted.
    *
    * The following properties are merged:
@@ -360,12 +371,12 @@ namespace pnapi {
    *** Class Arc Function Definitions
    ***************************************************************************/
 
-  
+
   /*!
    */
-  Arc::Arc(PetriNet & net, ComponentObserver & observer, Node & source, 
+  Arc::Arc(PetriNet & net, ComponentObserver & observer, Node & source,
 	   Node & target, unsigned int weight) :
-    net_(net), observer_(observer), source_(source), target_(target), 
+    net_(net), observer_(observer), source_(source), target_(target),
     weight_(weight)
   {
     assert(&observer.getPetriNet() == &net);
@@ -377,8 +388,8 @@ namespace pnapi {
   /*!
    */
   Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc) :
-    net_(net), observer_(observer), 
-    source_(*net.findNode(arc.source_.getName())), 
+    net_(net), observer_(observer),
+    source_(*net.findNode(arc.source_.getName())),
     target_(*net.findNode(arc.target_.getName())), weight_(arc.weight_)
   {
     assert(&observer.getPetriNet() == &net);
@@ -423,7 +434,7 @@ namespace pnapi {
     return target_;
   }
 
-  
+
   /*!
    */
   Transition & Arc::getTransition() const

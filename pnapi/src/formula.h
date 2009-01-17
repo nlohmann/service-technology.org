@@ -1,6 +1,10 @@
 #ifndef PNAPI_FORMULA_H
 #define PNAPI_FORMULA_H
 
+#include <list>
+
+using std::list;
+
 namespace pnapi
 {
 
@@ -24,48 +28,6 @@ class Marking;
 
 
 
-  /*
-   *    All other places empty
-   */
-  class AllOtherPlacesEmpty : public Formula
-  {
-  public:
-    AllOtherPlacesEmpty(Formula *p);
-    virtual ~AllOtherPlacesEmpty();
-
-    virtual bool evaluate(Marking &m);
-
-    set<Place *> concerningPlaces();
-
-  protected:
-    set<Place *> others;
-    Formula *parent;
-  };
-
-
-
-
-  class AllOtherExternalPlacesEmpty : public AllOtherPlacesEmpty
-  {
-    AllOtherExternalPlacesEmpty(Formula *p);
-    virtual ~AllOtherExternalPlacesEmpty();
-
-    bool evaluate(Marking &m);
-  };
-
-
-
-
-  class AllOtherInternalPlacesEmpty : public AllOtherPlacesEmpty
-  {
-    AllOtherInternalPlacesEmpty(Formula *p);
-    virtual ~AllOtherInternalPlacesEmpty();
-
-    bool evaluate(Marking &m);
-  };
-
-
-
 
   /***********************************************
    *               Atomic Formulas               *
@@ -73,14 +35,10 @@ class Marking;
   class AtomicFormula : public Formula
   {
   public:
-    AtomicFormula();
     AtomicFormula(Place *p, unsigned int k);
-    virtual ~AtomicFormula();
+    virtual ~AtomicFormula() {}
 
     virtual bool evaluate(Marking &m);
-
-    void setPlace(Place *p);
-    void setNumber(unsigned int k);
 
     Place* getPlace();
     unsigned int getNumber();
@@ -93,9 +51,8 @@ class Marking;
   class FormulaEqual : public AtomicFormula
   {
   public:
-    FormulaEqual();
     FormulaEqual(Place *p, unsigned int k);
-    virtual ~FormulaEqual();
+    virtual ~FormulaEqual() {}
 
     bool evaluate(Marking &m);
   };
@@ -103,9 +60,8 @@ class Marking;
   class FormulaNotEqual : public AtomicFormula
   {
   public:
-    FormulaNotEqual();
     FormulaNotEqual(Place *p, unsigned int k);
-    virtual ~FormulaNotEqual();
+    virtual ~FormulaNotEqual() {}
 
     bool evaluate(Marking &m);
   };
@@ -113,9 +69,8 @@ class Marking;
   class FormulaGreater : public AtomicFormula
   {
   public:
-    FormulaGreater();
     FormulaGreater(Place *p, unsigned int k);
-    virtual ~FormulaGreater();
+    virtual ~FormulaGreater() {}
 
     bool evaluate(Marking &m);
   };
@@ -123,9 +78,8 @@ class Marking;
   class FormulaGreaterEqual : public AtomicFormula
   {
   public:
-    FormulaGreaterEqual();
     FormulaGreaterEqual(Place *p, unsigned int k);
-    virtual ~FormulaGreaterEqual();
+    virtual ~FormulaGreaterEqual() {}
 
     bool evaluate(Marking &m);
   };
@@ -133,9 +87,8 @@ class Marking;
   class FormulaLess : public AtomicFormula
   {
   public:
-    FormulaLess();
     FormulaLess(Place *p, unsigned int k);
-    virtual ~FormulaLess();
+    virtual ~FormulaLess() {}
 
     bool evaluate(Marking &m);
   };
@@ -143,9 +96,8 @@ class Marking;
   class FormulaLessEqual : public AtomicFormula
   {
   public:
-    FormulaLessEqual();
     FormulaLessEqual(Place *p, unsigned int k);
-    virtual ~FormulaLessEqual();
+    virtual ~FormulaLessEqual() {}
 
     bool evaluate(Marking &m);
   };
@@ -159,9 +111,8 @@ class Marking;
   class UnaryBooleanFormula : public Formula
   {
   public:
-    UnaryBooleanFormula();
     UnaryBooleanFormula(Formula *f);
-    virtual ~UnaryBooleanFormula();
+    virtual ~UnaryBooleanFormula() {}
 
     virtual bool evaluate(Marking &m) = 0;
 
@@ -172,8 +123,8 @@ class Marking;
   class FormulaNot : public UnaryBooleanFormula
   {
   public:
-    FormulaNot();
     FormulaNot(Formula *f);
+    virtual ~FormulaNot() {}
 
     bool evaluate(Marking &m);
   };
@@ -184,36 +135,49 @@ class Marking;
   /************************************************
    *           Binary Boolean Formulas            *
    ************************************************/
-  class BinaryBooleanFormula : public Formula
+  class NaryBooleanFormula : public Formula
   {
   public:
-    BinaryBooleanFormula();
-    BinaryBooleanFormula(Formula *l, Formula *r);
-    virtual ~BinaryBooleanFormula();
+    NaryBooleanFormula(Formula *l, Formula *r);
+    NaryBooleanFormula(list<Formula *> &flst);
+    virtual ~NaryBooleanFormula() {}
 
     virtual bool evaluate(Marking &m) = 0;
 
   protected:
-    Formula *left;
-    Formula *right;
+    list<Formula *> subs;
   };
 
-  class FormulaAnd : public BinaryBooleanFormula
+  class FormulaAnd : public NaryBooleanFormula
   {
   public:
-    FormulaAnd();
     FormulaAnd(Formula *l, Formula *r);
-    virtual ~FormulaAnd();
+    FormulaAnd(list<Formula *> &flst);
+    virtual ~FormulaAnd() {}
 
     bool evaluate(Marking &m);
   };
 
-  class FormulaOr : public BinaryBooleanFormula
+  class FormulaOr : public NaryBooleanFormula
   {
   public:
-    FormulaOr();
     FormulaOr(Formula *l, Formula *r);
-    virtual ~FormulaOr();
+    FormulaOr(list<Formula *> &flst);
+    virtual ~FormulaOr() {}
+
+    bool evaluate(Marking &m);
+  };
+
+
+
+
+  /************************************************
+   *                Empty Formula                 *
+   ************************************************/
+  class True : public Formula
+  {
+  public:
+    virtual ~True() {}
 
     bool evaluate(Marking &m);
   };

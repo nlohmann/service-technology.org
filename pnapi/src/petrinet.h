@@ -270,7 +270,7 @@ namespace pnapi
     /// TODO: decide how to work with final conditions
     void setFinalCondition(formula::Formula *fc);
 
-    /// TODO: move to Confition/Formula classes
+    /// TODO: move to Condition/Formula classes
     /// checks the finalcondition for Marking m
     bool checkFinalCondition(Marking &m) const;
 

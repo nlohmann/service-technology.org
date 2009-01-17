@@ -196,7 +196,7 @@ namespace pnapi
     initializeNodeNameHistory(node);
   }
 
-  
+
   void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
   {
     assert(node2.getNameHistory().empty());
@@ -338,7 +338,7 @@ namespace pnapi
       deleteTransition(**it);
 
     // FIXME: possibly delete final condition
-    
+
     assert(nodes_.empty());
     assert(nodesByName_.empty());
     assert(transitions_.empty());
@@ -367,7 +367,7 @@ namespace pnapi
   /*!
    * Adds all nodes and arcs of the second net and combines final conditions.
    *
-   * \pre   the node names are unique (disjoint name sets); use 
+   * \pre   the node names are unique (disjoint name sets); use
    *        prefixNodeNames() on <em>both</em> nets to achieve this
    */
   PetriNet & PetriNet::operator+=(const PetriNet & net)
@@ -481,7 +481,7 @@ namespace pnapi
   void PetriNet::deleteInterfacePlaces()
   {
     set<Place *> interface = interfacePlaces_;
-    for(set<Place *>::iterator it = interface.begin(); it != interface.end(); 
+    for(set<Place *>::iterator it = interface.begin(); it != interface.end();
 	++it)
       deletePlace(**it);
   }
@@ -613,7 +613,7 @@ namespace pnapi
     // use a "mutable" cache to make this more efficient
     do name = base + util::toString(i++);
     while (nodesByName_.find(name) != nodesByName_.end());
-      
+
     return name;
   }
 
@@ -1048,8 +1048,7 @@ namespace pnapi
  */
 bool PetriNet::checkFinalCondition(Marking &m) const
 {
-  //FIXME: return finalcondition->evaluate(m);
-  return false;
+  return finalCondition_->evaluate(m);
 }
 
 

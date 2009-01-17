@@ -1,6 +1,11 @@
 #include "automaton.h"
 #include "state.h"
 
+#include <cmath>
+#include <map>
+
+using std::map;
+
 namespace pnapi
 {
 
@@ -61,19 +66,22 @@ list<string> State::getReason() const
   return reason;
 }
 
-void State::setHashValue(unsigned int hv)
+unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
 {
-  hashValue = new unsigned int(hv);
-}
+  if (pt.empty())
+    return 0;
 
-unsigned int State::getHashValue() const
-{
+  if (hashValue != NULL)
+  {
+    unsigned int hash = 1;
+    for (map<Place *, unsigned int>::const_iterator p = pt.begin();
+        p != pt.end(); ++p)
+      hash *= pow((*p).second, m[(*p).first]);
+
+    hashValue = new unsigned int(hash);
+  }
+
   return *hashValue;
-}
-
-bool State::isHashSet() const
-{
-  return hashValue != NULL;
 }
 
 

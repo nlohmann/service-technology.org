@@ -28,8 +28,6 @@ namespace pnapi
 Automaton::Automaton(PetriNet &n) :
   hashTable(HASHSIZE), net(n), initialmarking(*new Marking(n))
 {
-  primes.resize(initialmarking.size());
-
   fillPrimes();
 }
 
@@ -111,12 +109,11 @@ void Automaton::createAutomaton()
 
 void Automaton::fillPrimes()
 {
-  unsigned int i = 0;
   unsigned int p = 2;
-  while (i < primes.size())
+  for (set<Place *>::const_iterator i = net.getPlaces().begin();
+      i != net.getPlaces().end(); i++)
   {
-    primes[i] = p;
-    i++;
+    primes[*i] = p;
     while (!isPrime(++p))
       ;
   }
@@ -137,17 +134,19 @@ bool Automaton::isPrime(unsigned int &p) const
 
 void Automaton::dfs(State &i)
 {
-  unsigned int hash = hashValue(i);
+  //unsigned int hash = hashValue(i);
   i.setIndex();
 
-  // collision
-  for (set<State *>::const_iterator s = hashTable[hash].begin(); s != hashTable[hash].end(); s++)
+  // collision detection
+  for (set<State *>::const_iterator s =
+    hashTable[i.getHashValue(primes)].begin(); s !=
+    hashTable[i.getHashValue(primes)].end(); s++)
   {
     if (**s == i)
       return;
   }
 
-  hashTable[hash].insert(&i);
+  hashTable[i.getHashValue(primes)].insert(&i);
   Marking m = i.getMarking();
 
   // final state

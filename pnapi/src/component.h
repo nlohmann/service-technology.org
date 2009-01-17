@@ -32,7 +32,7 @@ using std::set;
 
 namespace pnapi
 {
-  
+
   // forward declarations
   class PetriNet;
   class ComponentObserver;
@@ -129,7 +129,7 @@ namespace pnapi
     /// the postset of this node
     set<Node*> postset_;
 
-    
+
     /// no copying!
     Node(const Node &);
 
@@ -137,7 +137,7 @@ namespace pnapi
     void mergeNameHistory(Node &);
 
     /// merges the pre-/postsets of two nodes
-    void mergeArcs(pnapi::Node&, pnapi::Node&, const set<Node*> &, 
+    void mergeArcs(pnapi::Node&, pnapi::Node&, const set<Node*> &,
 		   const set<Node*> &, bool, bool);
 
   };
@@ -157,7 +157,7 @@ namespace pnapi
 
   public:
     /// constructor
-    Transition(PetriNet &, ComponentObserver &, 
+    Transition(PetriNet &, ComponentObserver &,
 	       const string &, Type = INTERNAL);
 
     /// copy constructor
@@ -195,7 +195,7 @@ namespace pnapi
   public:
 
     /// constructor
-    Place(PetriNet &, ComponentObserver &, const string &, Type, 
+    Place(PetriNet &, ComponentObserver &, const string &, Type,
 	  unsigned int = 0, unsigned int = 0);
 
     /// copy constructor
@@ -213,9 +213,12 @@ namespace pnapi
     /// merges two places
     void merge(Place &, bool = true);
 
-    
+    /// marks the place with token
+    void mark(const unsigned int &t);
+
+
   private:
-    
+
     /// marking of the place
     unsigned int tokens_;
 

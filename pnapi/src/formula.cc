@@ -10,32 +10,14 @@ namespace pnapi
   /*!
    * \brief   Atomic formula class's public methods
    */
-  AtomicFormula::AtomicFormula()
-  {
-  }
-
   AtomicFormula::AtomicFormula(Place *p, unsigned int k) :
     place(p), number(k)
-  {
-  }
-
-  AtomicFormula::~AtomicFormula()
   {
   }
 
   bool AtomicFormula::evaluate(Marking &m)
   {
     return false;
-  }
-
-  void AtomicFormula::setPlace(Place *p)
-  {
-    place = p;
-  }
-
-  void AtomicFormula::setNumber(unsigned int k)
-  {
-    number = k;
   }
 
   Place* AtomicFormula::getPlace()
@@ -48,18 +30,9 @@ namespace pnapi
     return number;
   }
 
-  FormulaEqual::FormulaEqual()
-  {
-  }
-
   FormulaEqual::FormulaEqual(Place *p, unsigned int k) :
     AtomicFormula(p, k)
   {
-  }
-
-  FormulaEqual::~FormulaEqual()
-  {
-
   }
 
   bool FormulaEqual::evaluate(Marking &m)
@@ -67,33 +40,13 @@ namespace pnapi
     return m[place] == number;
   }
 
-  FormulaNotEqual::FormulaNotEqual()
-  {
-  }
-
-  FormulaNotEqual::FormulaNotEqual(Place *p, unsigned int k)
-  {
-  }
-
-  FormulaNotEqual::~FormulaNotEqual()
-  {
-  }
-
   bool FormulaNotEqual::evaluate(Marking &m)
   {
     return m[place] != number;
   }
 
-  FormulaGreater::FormulaGreater()
-  {
-  }
-
   FormulaGreater::FormulaGreater(Place *p, unsigned int k) :
     AtomicFormula(p, k)
-  {
-  }
-
-  FormulaGreater::~FormulaGreater()
   {
   }
 
@@ -102,16 +55,8 @@ namespace pnapi
     return m[place] > number;
   }
 
-  FormulaGreaterEqual::FormulaGreaterEqual()
-  {
-  }
-
   FormulaGreaterEqual::FormulaGreaterEqual(Place *p, unsigned int k) :
     AtomicFormula(p, k)
-  {
-  }
-
-  FormulaGreaterEqual::~FormulaGreaterEqual()
   {
   }
 
@@ -120,16 +65,8 @@ namespace pnapi
     return m[place] >= number;
   }
 
-  FormulaLess::FormulaLess()
-  {
-  }
-
   FormulaLess::FormulaLess(Place *p, unsigned int k) :
     AtomicFormula(p, k)
-  {
-  }
-
-  FormulaLess::~FormulaLess()
   {
   }
 
@@ -138,16 +75,8 @@ namespace pnapi
     return m[place] < number;
   }
 
-  FormulaLessEqual::FormulaLessEqual()
-  {
-  }
-
   FormulaLessEqual::FormulaLessEqual(Place *p, unsigned int k) :
     AtomicFormula(p, k)
-  {
-  }
-
-  FormulaLessEqual::~FormulaLessEqual()
   {
   }
 
@@ -159,21 +88,8 @@ namespace pnapi
   /************************************************
    *          Unary Boolean Formulas              *
    ************************************************/
-
-  UnaryBooleanFormula::UnaryBooleanFormula()
-  {
-  }
-
   UnaryBooleanFormula::UnaryBooleanFormula(Formula *f) :
     sub(f)
-  {
-  }
-
-  UnaryBooleanFormula::~UnaryBooleanFormula()
-  {
-  }
-
-  FormulaNot::FormulaNot()
   {
   }
 
@@ -188,56 +104,50 @@ namespace pnapi
   }
 
   /************************************************
-   *           Binary Boolean Formulas            *
+   *           n ary Boolean Formulas            *
    ************************************************/
 
-  BinaryBooleanFormula::BinaryBooleanFormula()
+  NaryBooleanFormula::NaryBooleanFormula(Formula *l, Formula *r)
   {
-  }
-
-  BinaryBooleanFormula::BinaryBooleanFormula(Formula *l, Formula *r) :
-    left(l), right(r)
-  {
-  }
-
-  BinaryBooleanFormula::~BinaryBooleanFormula()
-  {
-  }
-
-  FormulaAnd::FormulaAnd()
-  {
+    subs.push_back(l);
+    subs.push_back(r);
   }
 
   FormulaAnd::FormulaAnd(Formula *l, Formula *r) :
-    BinaryBooleanFormula(l, r)
-  {
-  }
-
-  FormulaAnd::~FormulaAnd()
+    NaryBooleanFormula(l, r)
   {
   }
 
   bool FormulaAnd::evaluate(Marking &m)
   {
-    return left->evaluate(m) && right->evaluate(m);
-  }
+    for (list<Formula *>::const_iterator f = subs.begin(); f != subs.end(); f++)
+      if (!(*f)->evaluate(m))
+        return false;
 
-  FormulaOr::FormulaOr()
-  {
+    return true;
   }
 
   FormulaOr::FormulaOr(Formula *l, Formula *r) :
-    BinaryBooleanFormula(l, r)
-  {
-  }
-
-  FormulaOr::~FormulaOr()
+    NaryBooleanFormula(l, r)
   {
   }
 
   bool FormulaOr::evaluate(Marking &m)
   {
-    return left->evaluate(m) || right->evaluate(m);
+    for (list<Formula *>::const_iterator f = subs.begin(); f != subs.end(); f++)
+      if ((*f)->evaluate(m))
+        return true;
+
+    return false;
+  }
+
+  /************************************************
+   *                Empty Formula                 *
+   ************************************************/
+
+  bool True::evaluate(Marking &m)
+  {
+    return true;
   }
 
 

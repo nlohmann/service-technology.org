@@ -45,12 +45,9 @@ public:
   /// friend operation <<
   friend ostream &operator <<(ostream &os, const Automaton &sa);
 
-  /// calculates the hash value
-  unsigned int hashValue(State &s);
-
 private:
   vector<set<State *> > hashTable;
-  vector<unsigned int> primes;
+  map<Place *, unsigned int> primes;
 
   list<string> in;
   list<string> out;

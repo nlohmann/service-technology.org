@@ -45,9 +45,7 @@ public:
   /// returns the list of reasons
   list<string> getReason() const;
 
-  void setHashValue(unsigned int hv);
-  unsigned int getHashValue() const;
-  bool isHashSet() const;
+  unsigned int getHashValue(map<Place *, unsigned int> &pt);
 
   bool operator ==(const State &m) const;
 

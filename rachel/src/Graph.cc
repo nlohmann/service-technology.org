@@ -221,6 +221,10 @@ Graph::Graph(const std::string _id) :
 string Graph::toDot() {
     string result;
 
+    // an arrow indicating the initial state
+    result += "  q0 [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n";
+    result += "  q0 -> q_" + toString(root) + " [minlen=\"0.5\"];\n";
+
     for (size_t i = 0; i != nodes.size(); ++i) {
         result += "  q_" + toString(nodes[i]) + " [label=<<FONT>";
 
@@ -263,9 +267,14 @@ string Graph::toDot() {
 string Graph::toDotAnnotated(bool reduced) {
     string result;
 
+    // an arrow indicating the initial state
+    result += "  q0 [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n";
+    result += "  q0 -> q_" + toString(root) + " [minlen=\"0.5\"];\n";
+
     for (size_t i = 0; i != nodes.size(); ++i) {
         result += "  q_" + toString(nodes[i]) + "[label=\"\"";
         
+        // draw node
         if (!reduced) {
             if (formulaBits[i].S)
                 result += " style=filled, fillcolor=skyblue";
@@ -282,6 +291,7 @@ string Graph::toDotAnnotated(bool reduced) {
         
         result += "];\n";
 
+        // outgoing edges
         for (size_t j = 0; j < edges[nodes[i]].size(); ++j) {
             result += "  q_" + toString(edges[nodes[i]][j].source);
             result += " -> q_" + toString(edges[nodes[i]][j].target);

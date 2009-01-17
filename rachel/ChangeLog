@@ -6,8 +6,8 @@
                       http://service-technology.org/rachel
 
 
-Version 1.12-unreleased
-=======================
+Version 1.13
+============
 
 * implemented methods to calculate a compact representation of the formulae
   annotated to the operating guideline's states according to the paper
@@ -29,6 +29,10 @@ Version 1.12-unreleased
 
 * when using the `--dot' (`-d') parameter, a PNG (Portable Network Graphics)
   file is now only created if the parameter `--png' is given
+
+* overworked and beautified Graphviz dot output for operating guidelines:
+  annotated formulae now use mathematical symbols for conjunctions and
+  disjunctions, and the initial state is marked
 
 Version 1.11
 ============

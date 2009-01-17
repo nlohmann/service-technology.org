@@ -1,4 +1,4 @@
-@heading Version 1.12-unreleased
+@heading Version 1.13
 @itemize
 @item implemented methods to calculate a compact representation of the formulae annotated to the operating guideline's states according to the paper submitted to ACSD 2009; the new method can be triggered with the new mode @option{-m annotation}
 
@@ -9,6 +9,8 @@
 @item implemented a mode @option{-m bpmn} to create a rudimentary @acronym{BPMN, Business Process Modeling Notation} output in Graphviz dot format of a service automaton (given by @option{--automaton}); the path of the used stencils can be changed with @option{--shapedir}
 
 @item when using the @option{--dot} (@option{-d}) parameter, a @acronym{PNG, Portable Network Graphics} file is now only created if the parameter @option{--png} is given
+
+@item overworked and beautified Graphviz dot output for operating guidelines: annotated formulae now use mathematical symbols for conjunctions and disjunctions, and the initial state is marked
 @end itemize
 
 

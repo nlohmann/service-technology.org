@@ -87,16 +87,16 @@ std::string FormulaFinal::toString() const {
 
 std::string FormulaAND::toDot(bool noBrackets) const {
     if (noBrackets)
-        return left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &and; </FONT>" + right->toDot(false);
+        return left->toDot(false) + "<FONT> &and; </FONT>" + right->toDot(false);
     else
-        return "(" + left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &and; </FONT>" + right->toDot(false) + ")";
+        return "(" + left->toDot(false) + "<FONT> &and; </FONT>" + right->toDot(false) + ")";
 }
 
 std::string FormulaOR::toDot(bool noBrackets) const {
     if (noBrackets)
-        return left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &or; </FONT>" + right->toDot(false);
+        return left->toDot(false) + "<FONT> &or; </FONT>" + right->toDot(false);
     else
-        return "(" + left->toDot(false) + "<FONT POINT-SIZE=\"7\"> &and; </FONT>" + right->toDot(false) + ")";
+        return "(" + left->toDot(false) + "<FONT> &or; </FONT>" + right->toDot(false) + ")";
 }
 
 std::string FormulaLit::toDot(bool noBrackets) const {

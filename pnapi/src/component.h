@@ -81,6 +81,9 @@ namespace pnapi
     /// compares the type with another node's type
     bool isComplementType(Type) const;
 
+    /// checks if two nodes are parallel to each other
+    bool isParallel(const Node &);
+    
     /// returns the name of the node
     string getName() const;
 

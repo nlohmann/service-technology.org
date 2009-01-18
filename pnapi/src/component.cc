@@ -1,9 +1,11 @@
 #include <cassert>
+#include <set>
 
 #include "util.h"
 #include "petrinet.h"
 #include "component.h"
 
+using std::set;
 
 namespace pnapi {
 
@@ -71,6 +73,54 @@ namespace pnapi {
   }
 
 
+  /*!
+   * \brief Checks if two Nodes are parallel to each other. 
+   *  
+   * According to [STA90] (see petrinet-reduction.cc): 
+   * If there exist two distinct nodes n1 (this) and n2 (precondition 1)
+   * with identical preset (precondition 2)
+   * and identical postset (precondition 3)
+   * and the arc weight for each node of the pre- and postset to/from p1 
+   * equals the arc weiht to/from n2 appropriate (precondition 4)
+   * then these nodes are parallel to each other.
+   * 
+   * This function is needed by PetriNet::reduce_rule_3p() 
+   * and PetriNet::reduce_rule_3t().
+   * 
+   * \param n2 is the other node to which parallelism will be checked.
+   * 
+   * \todo  Test me!
+   */
+  bool Node::isParallel(const Node& n2)
+  {
+    if (
+        (this != &n2) &&   // precondition 1
+        (getPreset() == n2.getPreset()) && // precondition 2
+        (getPostset() == n2.getPostset()) // precondition 3
+       )
+    { 
+      // precondition 4 - preset
+        for(set<Node*>::iterator prenode_ = preset_.begin(); prenode_!=preset_.end(); ++prenode_)
+        {
+          if(net_.findArc((*(*prenode_)),(*this))->getWeight() !=
+             net_.findArc((*(*prenode_)),n2)->getWeight() )
+            return false;
+        }
+        
+        // precondition 4 - postset
+        for(set<Node*>::iterator postnode_ = postset_.begin(); postnode_!=postset_.end(); ++postnode_)
+        {
+          if(net_.findArc((*this),(*(*postnode_)))->getWeight() !=
+             net_.findArc(n2,(*(*postnode_)))->getWeight() )
+            return false;
+        }
+        
+        // all preconditions fullfilled
+        return true;
+    }
+    return false;
+  }
+  
   /*!
    */
   string Node::getName() const

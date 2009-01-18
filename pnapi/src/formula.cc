@@ -1,5 +1,9 @@
+#include <sstream>
+
 #include "petrinet.h"
 #include "formula.h"
+
+using std::stringstream;
 
 namespace pnapi
 {
@@ -40,9 +44,34 @@ namespace pnapi
     return m[place] == number;
   }
 
+  const string FormulaEqual::toString() const
+  {
+    string snumber;
+    stringstream sstream;
+    sstream << number;
+    sstream >> snumber;
+
+    return place->getName() + " = " + snumber;
+  }
+
+  FormulaNotEqual::FormulaNotEqual(Place *p, unsigned int k) :
+    AtomicFormula(p, k)
+  {
+  }
+
   bool FormulaNotEqual::evaluate(Marking &m)
   {
     return m[place] != number;
+  }
+
+  const string FormulaNotEqual::toString() const
+  {
+    string snumber;
+    stringstream sstream;
+    sstream << number;
+    sstream >> snumber;
+
+    return place->getName() + " != " + snumber;
   }
 
   FormulaGreater::FormulaGreater(Place *p, unsigned int k) :
@@ -55,6 +84,16 @@ namespace pnapi
     return m[place] > number;
   }
 
+  const string FormulaGreater::toString() const
+  {
+    string snumber;
+    stringstream sstream;
+    sstream << number;
+    sstream >> snumber;
+
+    return place->getName() + " > " + snumber;
+  }
+
   FormulaGreaterEqual::FormulaGreaterEqual(Place *p, unsigned int k) :
     AtomicFormula(p, k)
   {
@@ -63,6 +102,16 @@ namespace pnapi
   bool FormulaGreaterEqual::evaluate(Marking &m)
   {
     return m[place] >= number;
+  }
+
+  const string FormulaGreaterEqual::toString() const
+  {
+    string snumber;
+    stringstream sstream;
+    sstream << number;
+    sstream >> snumber;
+
+    return place->getName() + " >= " + snumber;
   }
 
   FormulaLess::FormulaLess(Place *p, unsigned int k) :
@@ -75,6 +124,16 @@ namespace pnapi
     return m[place] < number;
   }
 
+  const string FormulaLess::toString() const
+  {
+    string snumber;
+    stringstream sstream;
+    sstream << number;
+    sstream >> snumber;
+
+    return place->getName() + " < " + snumber;
+  }
+
   FormulaLessEqual::FormulaLessEqual(Place *p, unsigned int k) :
     AtomicFormula(p, k)
   {
@@ -83,6 +142,16 @@ namespace pnapi
   bool FormulaLessEqual::evaluate(Marking &m)
   {
     return m[place] <= number;
+  }
+
+  const string FormulaLessEqual::toString() const
+  {
+    string snumber;
+    stringstream sstream;
+    sstream << number;
+    sstream >> snumber;
+
+    return place->getName() + " <= " + snumber;
   }
 
   /************************************************
@@ -101,6 +170,11 @@ namespace pnapi
   bool FormulaNot::evaluate(Marking &m)
   {
     return !sub->evaluate(m);
+  }
+
+  const string FormulaNot::toString() const
+  {
+    return " NOT ( " + sub->toString() + " ) ";
   }
 
   /************************************************
@@ -127,6 +201,19 @@ namespace pnapi
     return true;
   }
 
+  const string FormulaAnd::toString() const
+  {
+    string result = " ( ";
+    list<Formula *>::const_iterator fl = subs.end()--;
+
+    for (list<Formula *>::const_iterator f = subs.begin(); f != fl; f++)
+      result.append((*f)->toString() + " AND ");
+
+    result.append((*++fl)->toString() + " ) ");
+
+    return result;
+  }
+
   FormulaOr::FormulaOr(Formula *l, Formula *r) :
     NaryBooleanFormula(l, r)
   {
@@ -141,6 +228,19 @@ namespace pnapi
     return false;
   }
 
+  const string FormulaOr::toString() const
+  {
+    string result = " ( ";
+    list<Formula *>::const_iterator fl = subs.end()--;
+
+    for (list<Formula *>::const_iterator f = subs.begin(); f != fl; f++)
+      result.append((*f)->toString() + " OR ");
+
+    result.append((*++fl)->toString() + " ) ");
+
+    return result;
+  }
+
   /************************************************
    *                Empty Formula                 *
    ************************************************/
@@ -148,6 +248,11 @@ namespace pnapi
   bool True::evaluate(Marking &m)
   {
     return true;
+  }
+
+  const string True::toString() const
+  {
+    return "TRUE";
   }
 
 

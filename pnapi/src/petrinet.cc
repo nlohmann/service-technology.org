@@ -36,13 +36,6 @@ namespace pnapi
    *** Class Marking Function Definitions
    ***************************************************************************/
 
-  /*!
-   * \brief   Constructor for marking class
-   */
-  Marking::Marking()
-  {
-  }
-
 
   /*!
    * \brief   Constructor for marking class
@@ -51,10 +44,22 @@ namespace pnapi
    *
    * \param   PetriNet &n
    */
-  Marking::Marking(PetriNet &n)
+  Marking::Marking(PetriNet &n) :
+    net_(n)
   {
     for (set<Place *>::const_iterator p = n.getPlaces().begin(); p != n.getPlaces().end(); p++)
-      m[*p] = (*p)->getTokenCount();
+      m_[*p] = (*p)->getTokenCount();
+  }
+
+
+  /*!
+   * \brief   Copy-constructor for marking class
+   *
+   * \param   Marking &mm
+   */
+  Marking::Marking(const Marking &m) :
+    m_(m.m_), net_(m.net_)
+  {
   }
 
 
@@ -63,7 +68,16 @@ namespace pnapi
    */
   map<Place *, unsigned int> Marking::getMap() const
   {
-    return m;
+    return m_;
+  }
+
+
+  /*!
+   * \brief   Returns the Petri net laying under the marking
+   */
+  PetriNet & Marking::getPetriNet() const
+  {
+    return net_;
   }
 
 
@@ -72,7 +86,48 @@ namespace pnapi
    */
   unsigned int Marking::size()
   {
-    return m.size();
+    return m_.size();
+  }
+
+
+  /*!
+   * \brief   Decides if this marking activates transition t
+   *
+   * \param   Transition &t
+   *
+   * \return  true iff this activates t
+   */
+  bool Marking::activates(const Transition &t)
+  {
+    for (set<Node *>::const_iterator p = t.getPreset().begin();
+        p != t.getPreset().end(); p++)
+      if ((net_.findArc(**p, t)->getWeight()) > m_[static_cast<Place *>(*p)])
+        return false;
+
+    return true;
+  }
+
+
+  /*!
+   * \brief   Calculates the successor marking under transition t
+   *
+   * \param   Transition &t
+   *
+   * \return  Marking &m' which is the direct successor to this under t
+   */
+  Marking & Marking::successor(const Transition &t)
+  {
+    set<Node *> Ppre = t.getPreset();
+    set<Node *> Ppost = t.getPostset();
+    Marking &m = *new Marking(*this);
+
+    for (set<Node *>::const_iterator p = Ppre.begin(); p != Ppre.end(); p++)
+      m[static_cast<Place *>(*p)] -= net_.findArc(**p, t)->getWeight();
+
+    for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); p++)
+      m[static_cast<Place *>(*p)] += net_.findArc(t, **p)->getWeight();
+
+    return m;
   }
 
 
@@ -81,16 +136,28 @@ namespace pnapi
    */
   unsigned int & Marking::operator [](Place *offset)
   {
-    return m[offset];
+    return m_[offset];
   }
 
 
   /*!
    * \brief   overloaded operator == for Markings
    */
-  bool Marking::operator ==(const Marking &mm) const
+  bool Marking::operator ==(const Marking &m) const
   {
-    return m == mm.getMap();
+    return m_ == m.getMap();
+  }
+
+
+  /*!
+   * \brief   overloaded assignment operator
+   */
+  Marking & Marking::operator =(const Marking &m)
+  {
+    assert(this != &m);
+
+    this->~Marking();
+    return *new (this) Marking(m);
   }
 
 
@@ -1108,146 +1175,6 @@ unsigned int PetriNet::dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked
   }
 
   return retVal;
-}
-
-
-
-
-
-
-
-/*!
- * \brief   calculates the current marking m
- *
- * \return  Marking m which represents the current Marking m
- *          if the net
- *
- * \note    method uses the information in the property token of
- *          each place.
- */
-Marking PetriNet::calcCurrentMarking() const
-{
-  /* FIXME
-  unsigned int placeCount = initMarking(); // initializes the places and returns the number of places
-  Marking *m = new Marking(placeCount, 0);
-
-  for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
-    (*m)[(*p)->marking_id] = (*p)->tokens;
-  for (set<Place *>::const_iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
-    (*m)[(*p)->marking_id] = (*p)->tokens;
-  for (set<Place *>::const_iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
-    (*m)[(*p)->marking_id] = (*p)->tokens;
-
-  return *m;
-  */
-
-  return *new Marking();
-}
-
-
-
-
-/*!
- * \brief   recalculates a marking m to its corresponding place tokens
- *
- * An initial markings was described by setting the tokens variable of each place
- * to one specific value. Now, we can describe Markings without using those variables,
- * so probably it is necessary to translate the new markings to the old fashion.
- *
- * \param   Marking m which represents the new markings
- */
-void PetriNet::marking2Places(Marking &m)
-{
-  /* FIXME
-  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
-    (*p)->tokens = m[(*p)->marking_id];
-  for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
-      (*p)->tokens = m[(*p)->marking_id];
-  for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
-      (*p)->tokens = m[(*p)->marking_id];
-  */
-}
-
-
-
-
-/*!
- * \brief   calculates the successor marking m' to m under Transition t
- *
- * \param   Marking &m current marking
- * \param   Transition &t defines the scope
- *
- * \return  Marking &m' successor marking
- */
-Marking & PetriNet::successorMarking(Marking &m, Transition *t) const
-{
-  Marking *mm = new Marking(m);
-  set<Arc *> activators; ///< set to gather arcs
-
-  // gather all arcs in F that connect a place p in the preset of t with t
-  for (set<Arc *>::const_iterator f = arcs_.begin(); f != arcs_.end(); f++)
-    if (&(*f)->getTargetNode() == t)
-    {
-      Place *p = static_cast<Place *>(&(*f)->getSourceNode());
-      if ((*mm)[p] >= (*f)->getWeight())
-        activators.insert(*f);
-      else
-        break;
-    }
-
-  // if m does not activate t then m' = m
-  if (t->getPreset().size() != activators.size())
-    return *mm;
-
-  for (set<Arc *>::const_iterator f = arcs_.begin(); f != arcs_.end(); f++)
-    if (&(*f)->getSourceNode() == t)
-    {
-      Place *p = static_cast<Place *>(&(*f)->getTargetNode());
-      (*mm)[p] += (*f)->getWeight();
-    }
-
-  for (set<Arc *>::iterator f = activators.begin(); f != activators.end(); f++)
-  {
-    Place *p = static_cast<Place *>(&(*f)->getSourceNode());
-    (*mm)[p] -= (*f)->getWeight();
-  }
-
-  return *mm;
-}
-
-
-
-
-/*!
- * \brief   Checks if m activates t
- *
- * A transition t is activated by m if all places of the preset of t
- * are marked as high as the arc weights from those to t.
- *
- * \param   Marking m
- * \param   Transition t
- *
- * \return  true iff m activates t.
- */
-bool PetriNet::activates(Marking &m, Transition &t) const
-{
-  if (t.getPreset().empty())
-    return false;
-
-  bool result = false;
-
-  for (set<Node *>::const_iterator p = t.getPreset().begin(); p != t.getPreset().end(); p++)
-  {
-    Place *pp = static_cast<Place *>(*p);
-    Arc *pt = findArc(*pp, t);
-    if (pt->getWeight() <= m[pp])
-    {
-      result = true;
-      break;
-    }
-  }
-
-  return result;
 }
 
 

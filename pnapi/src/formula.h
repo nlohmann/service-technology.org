@@ -2,8 +2,10 @@
 #define PNAPI_FORMULA_H
 
 #include <list>
+#include <string>
 
 using std::list;
+using std::string;
 
 namespace pnapi
 {
@@ -24,6 +26,9 @@ class Marking;
   public:
     // evaluating the formula
     virtual bool evaluate(Marking &m) = 0;
+
+    // output method for formulas
+    virtual const string toString() const = 0;
   };
 
 
@@ -43,6 +48,8 @@ class Marking;
     Place* getPlace();
     unsigned int getNumber();
 
+    virtual const string toString() const = 0;
+
   protected:
     Place *place;
     unsigned int number;
@@ -55,6 +62,8 @@ class Marking;
     virtual ~FormulaEqual() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   class FormulaNotEqual : public AtomicFormula
@@ -64,6 +73,8 @@ class Marking;
     virtual ~FormulaNotEqual() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   class FormulaGreater : public AtomicFormula
@@ -73,6 +84,8 @@ class Marking;
     virtual ~FormulaGreater() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   class FormulaGreaterEqual : public AtomicFormula
@@ -82,6 +95,8 @@ class Marking;
     virtual ~FormulaGreaterEqual() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   class FormulaLess : public AtomicFormula
@@ -91,6 +106,8 @@ class Marking;
     virtual ~FormulaLess() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   class FormulaLessEqual : public AtomicFormula
@@ -100,6 +117,8 @@ class Marking;
     virtual ~FormulaLessEqual() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
 
@@ -116,6 +135,8 @@ class Marking;
 
     virtual bool evaluate(Marking &m) = 0;
 
+    virtual const string toString() const = 0;
+
   protected:
     Formula *sub;
   };
@@ -127,13 +148,15 @@ class Marking;
     virtual ~FormulaNot() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
 
 
 
   /************************************************
-   *           Binary Boolean Formulas            *
+   *           n ary Boolean Formulas             *
    ************************************************/
   class NaryBooleanFormula : public Formula
   {
@@ -143,6 +166,8 @@ class Marking;
     virtual ~NaryBooleanFormula() {}
 
     virtual bool evaluate(Marking &m) = 0;
+
+    virtual const string toString() const = 0;
 
   protected:
     list<Formula *> subs;
@@ -156,6 +181,8 @@ class Marking;
     virtual ~FormulaAnd() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   class FormulaOr : public NaryBooleanFormula
@@ -166,6 +193,8 @@ class Marking;
     virtual ~FormulaOr() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
 
@@ -180,6 +209,8 @@ class Marking;
     virtual ~True() {}
 
     bool evaluate(Marking &m);
+
+    const string toString() const;
   };
 
   } /* namespace formula */

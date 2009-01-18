@@ -159,10 +159,10 @@ void Automaton::dfs(State &i)
   set<Transition *> T = net.getTransitions();
   for (set<Transition *>::const_iterator t = T.begin(); t != T.end(); t++)
   {
-    if (!net.activates(m, **t))
+    if (!m.activates(**t))
       continue;
 
-    State *j = new State(net.successorMarking(m, *t));
+    State *j = new State(m.successor(**t));
     if (i == *j)
       continue;
 

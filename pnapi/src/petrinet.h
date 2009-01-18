@@ -54,19 +54,25 @@ namespace pnapi
   class Marking
   {
   public:
-    Marking();
     Marking(PetriNet &n);
+    Marking(const Marking &m);
     virtual ~Marking() {}
 
     map<Place *, unsigned int> getMap() const;
+    PetriNet & getPetriNet() const;
 
     unsigned int size();
 
+    bool activates(const Transition &t);
+    Marking & successor(const Transition &t);
+
     unsigned int & operator[](Place *offset);
-    bool operator==(const Marking &mm) const;
+    bool operator==(const Marking &m) const;
+    Marking & operator=(const Marking &m);
 
   private:
-    map<Place *, unsigned int> m;
+    map<Place *, unsigned int> m_;
+    PetriNet &net_;
   };
 
 
@@ -274,24 +280,9 @@ namespace pnapi
     /// checks the finalcondition for Marking m
     bool checkFinalCondition(Marking &m) const;
 
-    /// TODO: move to class Marking
-    /// calculates the successor m' from m using transition t
-    Marking & successorMarking(Marking &m, Transition *t) const;
-
-    /// TODO: move to class Marking
-    bool activates(Marking &m, Transition &t) const;
-
     /// TODO: can this be templated and moved to pnapi::util (util.{h,cc})?
     /// DFS with Tarjan's algorithm
     unsigned int dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const;
-
-    /// TODO: create Marking::Marking(PetriNet)
-    /// calculates the current marking m
-    Marking calcCurrentMarking() const;
-
-    /// TODO: if we don't need this maybe kill it for the time beeing
-    /// reforms the marking m to the places' token
-    void marking2Places(Marking &m);
 
     /// TODO: move to class Marking
     /// looks for a living transition under m

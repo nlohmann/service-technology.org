@@ -12,6 +12,12 @@
 @item renamed file @file{fiona.h} to @file{config.h}
 
 @item used macro @code{CONFIG_DOT} for Graphviz dot calls to achieve compatibility on systems where dot is not available
+
+@item Fiona now supports operating guidelines with a global constraint
+@itemize
+@item constructing operating guideline with a global constraint (for a given owfn-file and a cov-file)
+@item matching of an open net with an operating guideline with global constraint
+@end itemize
 @end itemize
 
 

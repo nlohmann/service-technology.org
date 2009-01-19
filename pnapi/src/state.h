@@ -14,15 +14,16 @@ namespace pnapi
 class State
 {
 public:
-  //State();
-  State(Marking &mm);
+  /// Constructors & Destructor
+  State(Marking &m);
+  State(const State &s);
   virtual ~State();
 
   /// sets the marking represented by this state
-  void setMarking(Marking &mm);
+  void setMarking(Marking &m);
 
   /// returns the marking represented by this state
-  Marking &getMarking() const;
+  Marking & getMarking() const;
 
   /// sets the dfs index by maxIndex
   void setIndex();
@@ -37,26 +38,36 @@ public:
   void addSuccessor(State &s);
 
   /// returns the list of successors
-  list<State *> getSuccessors() const;
+  const list<State *> & getSuccessors() const;
 
   /// adds a reason for getting to a successor
   void addReason(const string &r);
 
   /// returns the list of reasons
-  list<string> getReason() const;
+  const list<string> & getReason() const;
 
   unsigned int getHashValue(map<Place *, unsigned int> &pt);
 
   bool operator ==(const State &m) const;
 
 private:
-  Marking &m;
-  unsigned int index; // dfs index
-  unsigned int *hashValue;
-  list<State *> successors;
-  list<string> reason;
+  /// the representing marking
+  Marking &m_;
 
-  static unsigned int maxIndex;
+  /// dfs index
+  unsigned int index_;
+
+  /// pointer to the hash value
+  unsigned int *hashValue_;
+
+  /// list of all successors to this state
+  list<State *> successors_;
+
+  /// list of reasons leading to the successors
+  list<string> reasons_;
+
+  /// current dfs index
+  static unsigned int maxIndex_;
 };
 
 }

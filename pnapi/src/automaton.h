@@ -46,18 +46,18 @@ public:
   friend ostream &operator <<(ostream &os, const Automaton &sa);
 
 private:
-  vector<set<State *> > hashTable;
-  map<Place *, unsigned int> primes;
+  vector<set<State *> > hashTable_;
+  map<Place *, unsigned int> primes_;
 
-  list<string> in;
-  list<string> out;
-  unsigned int first;
-  list<unsigned int> finals;
+  list<string> in_;
+  list<string> out_;
+  unsigned int first_;
+  list<unsigned int> finals_;
 
-  map<Transition *, string> reasons;
+  map<Transition *, string> reasons_;
 
-  PetriNet &net;
-  Marking &initialmarking;
+  PetriNet &net_;
+  Marking initialmarking_;
 
   void initHashTable();
 

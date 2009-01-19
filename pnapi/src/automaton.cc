@@ -26,9 +26,18 @@ namespace pnapi
  * \param   PetriNet n
  */
 Automaton::Automaton(PetriNet &n) :
-  hashTable(HASHSIZE), net(n), initialmarking(*new Marking(n))
+  hashTable_(HASHSIZE), net_(n), initialmarking_(n)
 {
   fillPrimes();
+  initialize();
+
+  initialmarking_ = *new Marking(n);
+
+  State *i = new State(initialmarking_);
+
+  dfs(*i);
+
+  first_ = i->getIndex();
 }
 
 
@@ -50,42 +59,52 @@ Automaton::~Automaton()
  * The method normalizes the given net and saves for each
  * transition the (interface-)reason to fire. If there is
  * no interface place from/to one transition, the reason
- * will be a 'tau'.
+ * will be a 'tau'. Then, all interface places will be deleted.
  */
 void Automaton::initialize()
 {
-  net.normalize();
+  net_.normalize();
 
-  set<Place *> Pin = net.getInputPlaces();
-  set<Place *> Pout = net.getOutputPlaces();
+  set<Place *> Pin = net_.getInputPlaces();
+  set<Place *> Pout = net_.getOutputPlaces();
 
   set<Transition *> done;
+  set<Place *> toBeDeleted;
 
   for (set<Place *>::const_iterator ip = Pin.begin(); ip != Pin.end(); ip++)
+  {
     for (set<Node *>::const_iterator it = (*ip)->getPostset().begin(); it
         != (*ip)->getPostset().end(); it++)
     {
       Transition *t = static_cast<Transition *> (*it);
-      reasons[t] = "?" + (*ip)->getName();
-      in.push_back((*ip)->getName());
+      reasons_[t] = "?" + (*ip)->getName();
+      in_.push_back((*ip)->getName());
       done.insert(t);
     }
+    toBeDeleted.insert(*ip);
+  }
+
   for (set<Place *>::const_iterator op = Pout.begin(); op != Pout.end(); op++)
+  {
     for (set<Node *>::const_iterator ot = (*op)->getPreset().begin(); ot
         != (*op)->getPreset().end(); ot++)
     {
       Transition *t = static_cast<Transition *>(*ot);
-      reasons[t] = "!" + (*op)->getName();
-      out.push_back((*op)->getName());
+      reasons_[t] = "!" + (*op)->getName();
+      out_.push_back((*op)->getName());
       done.insert(t);
     }
+    toBeDeleted.insert(*op);
+  }
 
-  set<Transition *> notdone = util::setDifference(net.getTransitions(), done);
+  /*// delete all interface places
+  for (set<Place *>::const_iterator p = toBeDeleted.begin();
+      p != toBeDeleted.end(); p++)
+    net_.deletePlace(**p);*/
+
+  set<Transition *> notdone = util::setDifference(net_.getTransitions(), done);
   for (set<Transition *>::const_iterator t = notdone.begin(); t != notdone.end(); t++)
-    reasons[*t] = "tau";
-
-  // FIXME: Niels doesn't want this method: just don't use the interface places
-  //net.deleteInterfacePlaces();
+    reasons_[*t] = "tau";
 }
 
 
@@ -100,20 +119,20 @@ void Automaton::initialize()
  */
 void Automaton::createAutomaton()
 {
-  State *i = new State(initialmarking);
+  State *i = new State(initialmarking_);
 
   dfs(*i);
 
-  first = i->getIndex();
+  first_ = i->getIndex();
 }
 
 void Automaton::fillPrimes()
 {
   unsigned int p = 2;
-  for (set<Place *>::const_iterator i = net.getPlaces().begin();
-      i != net.getPlaces().end(); i++)
+  for (set<Place *>::const_iterator i = net_.getPlaces().begin();
+      i != net_.getPlaces().end(); i++)
   {
-    primes[*i] = p;
+    primes_[*i] = p;
     while (!isPrime(++p))
       ;
   }
@@ -139,24 +158,24 @@ void Automaton::dfs(State &i)
 
   // collision detection
   for (set<State *>::const_iterator s =
-    hashTable[i.getHashValue(primes)].begin(); s !=
-    hashTable[i.getHashValue(primes)].end(); s++)
+    hashTable_[i.getHashValue(primes_)].begin(); s !=
+    hashTable_[i.getHashValue(primes_)].end(); s++)
   {
     if (**s == i)
       return;
   }
 
-  hashTable[i.getHashValue(primes)].insert(&i);
+  hashTable_[i.getHashValue(primes_)].insert(&i);
   Marking m = i.getMarking();
 
   // final state
-  if (net.checkFinalCondition(m))
+  if (net_.checkFinalCondition(m))
   {
-    finals.push_back(i.getIndex());
+    finals_.push_back(i.getIndex());
     return;
   }
 
-  set<Transition *> T = net.getTransitions();
+  set<Transition *> T = net_.getTransitions();
   for (set<Transition *>::const_iterator t = T.begin(); t != T.end(); t++)
   {
     if (!m.activates(**t))
@@ -167,7 +186,7 @@ void Automaton::dfs(State &i)
       continue;
 
     i.addSuccessor(*j);
-    i.addReason(reasons[*t]);
+    i.addReason(reasons_[*t]);
     dfs(*j);
   }
 }
@@ -176,7 +195,7 @@ ostream &operator <<(ostream &os, const Automaton &sa)
 {
   os << "INTERFACE\n";
     os << "  " << "INPUT ";
-    list<string> lin = sa.in;
+    list<string> lin = sa.in_;
     bool written = false;
     while (!lin.empty())
     {
@@ -192,7 +211,7 @@ ostream &operator <<(ostream &os, const Automaton &sa)
     }
     os << ";\n";
     os << "  " << "OUTPUT ";
-    list<string> lout = sa.out;
+    list<string> lout = sa.out_;
     written = false;
     while (!lout.empty())
     {
@@ -211,8 +230,8 @@ ostream &operator <<(ostream &os, const Automaton &sa)
   os << "NODES\n";
     list<State *> nodelist;
     int i = 0;
-    for (unsigned int n = 0; n < sa.hashTable.size(); n++)
-      for (set<State *>::iterator s = sa.hashTable[n].begin(); s != sa.hashTable[n].end(); s++)
+    for (unsigned int n = 0; n < sa.hashTable_.size(); n++)
+      for (set<State *>::iterator s = sa.hashTable_[n].begin(); s != sa.hashTable_[n].end(); s++)
       {
         if (i == 0)
           os << "  " << (*s)->getIndex();
@@ -229,10 +248,10 @@ ostream &operator <<(ostream &os, const Automaton &sa)
     os << ";\n\n";
 
   os << "INITIALNODE\n";
-    os << "  " << sa.first << ";\n\n";
+    os << "  " << sa.first_ << ";\n\n";
 
   os << "FINALNODES\n";
-    list<unsigned int> finals = sa.finals;
+    list<unsigned int> finals = sa.finals_;
     i = 0;
     while (!finals.empty())
     {

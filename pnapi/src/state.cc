@@ -10,60 +10,66 @@ namespace pnapi
 {
 
 
-State::State(Marking &marking) :
-  m(marking), hashValue(NULL)
+State::State(Marking &m) :
+  m_(m), hashValue_(NULL)
 {
+}
+
+State::State(const State &s) :
+  m_(s.m_), index_(s.index_), successors_(s.successors_), reasons_(s.reasons_)
+{
+  hashValue_ = new unsigned int(*s.hashValue_);
 }
 
 State::~State()
 {
 }
 
-unsigned int State::maxIndex = 0;
+unsigned int State::maxIndex_ = 0;
 
 Marking & State::getMarking() const
 {
-  return m;
+  return m_;
 }
 
-void State::setMarking(Marking &mm)
+void State::setMarking(Marking &m)
 {
-  m = mm;
+  m_ = m;
 }
 
 void State::setIndex()
 {
-  index = maxIndex++;
+  index_ = maxIndex_++;
 }
 
 unsigned int State::getIndex() const
 {
-  return index;
+  return index_;
 }
 
 unsigned int State::size() const
 {
-  return m.size();
+  return m_.size();
 }
 
 void State::addSuccessor(State &s)
 {
-  successors.push_back(&s);
+  successors_.push_back(&s);
 }
 
-list<State *> State::getSuccessors() const
+const list<State *> & State::getSuccessors() const
 {
-  return successors;
+  return successors_;
 }
 
 void State::addReason(const string &r)
 {
-  reason.push_back(r);
+  reasons_.push_back(r);
 }
 
-list<string> State::getReason() const
+const list<string> & State::getReason() const
 {
-  return reason;
+  return reasons_;
 }
 
 unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
@@ -71,17 +77,17 @@ unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
   if (pt.empty())
     return 0;
 
-  if (hashValue != NULL)
+  if (hashValue_ != NULL)
   {
     unsigned int hash = 1;
     for (map<Place *, unsigned int>::const_iterator p = pt.begin();
         p != pt.end(); ++p)
-      hash *= pow((*p).second, m[(*p).first]);
+      hash *= pow((*p).second, m_[(*p).first]);
 
-    hashValue = new unsigned int(hash);
+    hashValue_ = new unsigned int(hash);
   }
 
-  return *hashValue;
+  return *hashValue_;
 }
 
 
@@ -99,7 +105,7 @@ unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
  */
 bool State::operator ==(const State &j) const
 {
-  return m == j.m;
+  return m_ == j.m_;
 }
 
 }

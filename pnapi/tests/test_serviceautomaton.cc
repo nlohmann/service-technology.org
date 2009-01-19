@@ -6,6 +6,7 @@
 using std::cout;
 using std::ofstream;
 using namespace pnapi;
+using namespace pnapi::formula;
 
 int main(int argc, char *argv[])
 {
@@ -42,11 +43,13 @@ int main(int argc, char *argv[])
   net.createArc(t4, po);
   net.createArc(t4, p6);
 
-  net.setFinalCondition(new formula::FormulaGreater(&p6, 0));
+  Formula &final = net.getFinalCondition();
+  Formula *newFinal = new FormulaGreater(&p1, 6);
+  final = *newFinal;
 
-  PetriNet net2(net);
+  //PetriNet net2(net);
 
-  Automaton sa(net2);
+  Automaton sa(net);
 
   sa.initialize();
   sa.createAutomaton();

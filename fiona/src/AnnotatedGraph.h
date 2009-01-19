@@ -132,10 +132,6 @@ class AnnotatedGraph : public Graph {
                                    AnnotatedGraph* leftOG,
                                    AnnotatedGraph* rightOG);
 
-        //! Create the formula describing the structure of the subgraph under the given node through events
-        //! NOTE: graph has to be acyclic!
-        GraphFormulaMultiaryAnd* createStructureFormulaRecursively(AnnotatedGraphNode*);
-
         set<string> sendEvents;
         set<string> recvEvents;
 
@@ -255,9 +251,10 @@ protected:
                                          std::map<AnnotatedGraphNode*, bool>& visitedNodes);
 
         /// dfs through the graph printing each node and edge to the output stream
-        void createDotFileRecursively(AnnotatedGraphNode* v,
-                                      fstream& os,
-                                      std::map<AnnotatedGraphNode*, bool>&) const;
+        virtual void createDotFileRecursively(
+                AnnotatedGraphNode* v,
+                fstream& os,
+                std::map<AnnotatedGraphNode*, bool>&) const;
 
 
     // Public methods
@@ -366,16 +363,16 @@ protected:
                                      const string& dotGraphTitle) const;
 
         /// Creates an image output (.png) of the graph by calling dot.
-		virtual string createPNGFile(string& filenamePrefix,
-                         		     string& dotFileName) const;
+        virtual string createPNGFile(string& filenamePrefix,
+                                     string& dotFileName) const;
 
         /// Creates an annotated dot output (.dot) of the graph by calling dot.
-		virtual string createAnnotatedDotFile(string& filenamePrefix,
-                         		              string& dotFileName) const;
+        virtual string createAnnotatedDotFile(string& filenamePrefix,
+                                              string& dotFileName) const;
 
 
         /// Creates an og output file (.og) of the graph.
-        string createOGFile(const string& filenamePrefix, bool hasOWFN) const;
+        virtual string createOGFile(const string& filenamePrefix, bool hasOWFN) const;
 
         /// Adds the suffix for OG files to the given file name prefix,
         /// simply adds ".og" to the given string.

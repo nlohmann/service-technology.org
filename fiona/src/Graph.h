@@ -132,9 +132,9 @@ class Graph {
         virtual string createDotFile(string& filenamePrefix,
                                      const string& dotGraphTitle) const;
 
-		/// calls dot to create an image file (.png) of a given dot file (.out)
-		virtual string createPNGFile(string& filenamePrefix,
-                         		     string& dotFileName) const;
+        /// calls dot to create an image file (.png) of a given dot file (.out)
+        virtual string createPNGFile(string& filenamePrefix,
+                                     string& dotFileName) const;
 
 		/// tests if this OG is acyclic
         bool isAcyclic();

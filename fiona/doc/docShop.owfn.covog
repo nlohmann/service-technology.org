@@ -7,7 +7,7 @@ NODES
   21 : final : blue,
   28 : ?known : blue,
   36 : ?deliver : blue,
-  38 : ((!order + ?new) * (!order + ?known)) : blue,
+  38 : ((!order + ?known) * (!order + ?new)) : blue,
   39 : !order : blue,
   41 : (!order + !terms) : blue,
   42 : !order : blue;

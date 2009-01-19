@@ -60,6 +60,8 @@ class PlSymbol;
 class Arc;
 class AnnotatedGraph;
 class AnnotatedGraphNode;
+class ConstraintOG;
+class GraphFormulaCNF;
 class GraphFormulaAssignment;
 #ifdef CHECKCAPACITY
 class CapacityException;
@@ -121,6 +123,15 @@ class oWFN {
                                     State* currentState,
                                     string& reasonForFailedMatch,
                                     StateNodesAssoc_t& stateNodesAssoc);
+
+        /// helper for matchesWithConstraintOG; 
+        /// an assignment is passed, which evalutes
+        /// all covered ConstraintOG nodes to true
+        bool matchesWithConstraintOGRecursive(AnnotatedGraphNode* currentOGNode,
+                                    State* currentState,
+                                    string& reasonForFailedMatch,
+                                    StateNodesAssoc_t& stateNodesAssoc,
+                                    GraphFormulaAssignment& covAssignment);
 
         /// returns the port of a given interface place
         std::string get_port_from_place(const owfnPlace *place) const;
@@ -368,6 +379,11 @@ class oWFN {
         /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph)
         void calculateReachableStatesFull(AnnotatedGraphNode*);
 
+        /// NO REDUCTION! calculate all reachable states from the current marking
+        /// and store them in the node n (== AnnotatedGraphNode of CommunicationGraph);
+        /// furthermore it stores the knowledge of the reachable state set 
+        set<string> calculateReachableStatesWithKnowledge(AnnotatedGraphNode*);
+
         /// adds input message to the current marking
         void addInputMessage(unsigned int);
         
@@ -419,6 +435,13 @@ class oWFN {
 
         /// checks whether this owfn matches a given og and returns a reason if not so
         bool matchesWithOG(const AnnotatedGraph* og, string& reasonForFailedMatch);
+
+        /// checks whether this owfn matches a given ConstraintOG og and returns a 
+        /// reason if not so;
+        /// also checks if the coverability criterion is fullfilled
+        bool matchesWithConstraintOG(const AnnotatedGraph* og, 
+                                     const GraphFormulaCNF* covConstraint, 
+                                     string& reasonForFailedMatch);
 
         /// creates an assignment for the OG from a current state
         GraphFormulaAssignment makeAssignmentForOGMatchingForState(

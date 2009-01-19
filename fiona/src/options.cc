@@ -204,6 +204,8 @@ void print_help() {
   trace("                                   allstates - show all calculated states per\n");
   trace("                                               node\n");
   trace("                                   deadlocks - show all but transient states\n");
+  trace("                                   coverall  - show all covered oWFN nodes per\n");
+  trace("                                               node\n");
   trace(" -b | --BDD=<reordering> ....... enable BDD construction (only relevant for OG)\n");
   trace("                                 <reordering> specifies reordering method:\n");
   trace("                                    0 - CUDD_REORDER_SAME\n");
@@ -250,6 +252,8 @@ void print_help() {
   trace("                                                rule for IG reduction (see -r)\n");
   trace("                                   rbs        - use \"receive before sending\"\n");
   trace("                                                rule for IG reduction (see -r)\n");
+  trace("                                   cover      - requires \"-t og\" or \"-t match\"\n");
+  trace("                                                and is used for OGs with constraint\n");
   trace(" -a | --adapterrules=<filename>  read adapter rules from <filename>\n");
   trace("\n");
   trace("\n");
@@ -362,6 +366,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_READ_OG] = false;
     parameters[P_REDUCE] = false;
     parameters[P_NORMALIZE] = false;
+    parameters[P_COVERALL] = false;
     parameters[P_RESPONSIVE] = false;
 
     // -s parameters
@@ -384,6 +389,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_USE_EAD] = false;
     parameters[P_REPRESENTATIVE] = false;
     parameters[P_SINGLE] = true;
+    parameters[P_COVER] = false;
 
 
     
@@ -575,6 +581,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_SHOW_STATES_PER_NODE] = true;
                 } else if (string(optarg) == "deadlocks") {
                     parameters[P_SHOW_DEADLOCKS_PER_NODE] = true;
+                } else if (string(optarg) == "coverall") {
+                    parameters[P_COVERALL] = true;
                 } else {
                     cerr << "Error:\twrong show option" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
@@ -681,6 +689,8 @@ void parse_command_line(int argc, char* argv[]) {
                     parameters[P_REPRESENTATIVE] = false;
                 } else if (lc_optarg == "responsive") {
                     parameters[P_RESPONSIVE] = true;
+                } else if (lc_optarg == "cover") {
+                    parameters[P_COVER] = true;
                 } else {
                     cerr << "Error:\twrong parameter (option -p)" << endl
                     << "\tEnter \"fiona --help\" for more information.\n" << endl;
@@ -891,6 +901,28 @@ void parse_command_line(int argc, char* argv[]) {
         exit(EC_BAD_CALL);
     }
 
+    if (parameters[P_COVER] &&
+
+        // possible options
+        (!parameters[P_OG] && !parameters[P_MATCH]) && 
+
+        // not possible options due to lack of definition
+        (parameters[P_IG] || parameters[P_MATCH] || parameters[P_MINIMIZE_OG] || 
+         parameters[P_PV] || parameters[P_SYNTHESIZE_PARTNER_OWFN] ||
+         parameters[P_PRODUCTOG] || parameters[P_SIMULATES] || parameters[P_EX] || 
+         parameters[P_EQ_R] || parameters[P_ADAPTER] || parameters[P_SMALLADAPTER] ||
+         parameters[P_GASTEX] || parameters[P_COUNT_SERVICES] || parameters[P_REDUCE] || 
+         parameters[P_NORMALIZE] || parameters[P_PARTNER_TEST] ||
+         parameters[P_RESPONSIVE] || parameters[P_TEX] || parameters[P_DISTRIBUTED] || 
+         parameters[P_AUTONOMOUS] || parameters[P_REDUCE_LEVEL] || 
+         parameters[P_USE_CRE] || parameters[P_USE_RBS] || parameters[P_USE_EAD] || 
+         parameters[P_REPRESENTATIVE] || parameters[P_SINGLE])) {
+
+        cerr << "Error: \t Check for coverability is only available for computing operating guidelines";
+        cerr << " and for matching!\n" << endl;
+
+        exit(EC_BAD_CALL); 
+    }
 }
 
 

@@ -11,6 +11,8 @@ bin_PROGRAMS = fiona
 fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         lexer_owfn.ll lexer_owfn_wrap.h\
         syntax_og.yy lexer_og.ll\
+        syntax_covog.yy lexer_covog.ll\
+        syntax_cov.yy lexer_cov.ll\
         syntax_stg.yy lexer_stg.ll \
         syntax_adapt_rules.yy lexer_adapt_rules.ll \
         syntax_dot.yy lexer_dot.ll \
@@ -41,6 +43,7 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
         Exchangeability.h Exchangeability.cc \
         Graph.h Graph.cc \
         AnnotatedGraph.h AnnotatedGraph.cc GraphFormula.h GraphFormula.cc \
+        ConstraintOG.h ConstraintOG.cc \
         containers.h containers.cc\
 	adapter.h adapter.cc\
         stg2owfn.cc set_helpers.h SinglyLinkedList.h\

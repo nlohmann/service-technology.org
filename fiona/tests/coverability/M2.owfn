@@ -1,0 +1,78 @@
+{ M_2 }
+
+PLACE
+INTERNAL
+  p13,  { initial }
+  p14,
+  p15,
+  p16,
+  p17,
+  p18,
+  p19;
+INPUT
+  r_low,
+  r_high,
+  rej,
+  acc;
+
+OUTPUT
+  req_c,
+  cc_y,
+  cc_n;
+
+INITIALMARKING
+  p13:   1;
+
+FINALMARKING
+  p18:   1;
+
+TRANSITION t18    { !req_c }
+CONSUME
+  p13:   1;
+PRODUCE
+  req_c:   1,
+  p14:   1;
+
+TRANSITION t19    { ?r_low }
+CONSUME
+  r_low:   1,
+  p14:   1;
+PRODUCE
+  p15:   1;
+
+TRANSITION t20    { ?r_high }
+CONSUME
+  r_high:   1,
+  p14:   1;
+PRODUCE
+  p16:   1;
+
+TRANSITION t21    { !cc_n }
+CONSUME
+  p15:   1;
+PRODUCE
+  cc_n:   1,
+  p17:   1;
+
+TRANSITION t22    { !cc_n }
+CONSUME
+  p16:   1;
+PRODUCE
+  cc_y:   1,
+  p17:   1;
+
+TRANSITION t23    { ?acc }
+CONSUME
+  acc:    1,
+  p17:   1;
+PRODUCE
+  p18 : 1;
+
+TRANSITION t24     { ?rej }
+CONSUME
+  rej:    1,
+  p17:   1;
+PRODUCE
+  p18 : 1;
+
+{ END OF FILE }

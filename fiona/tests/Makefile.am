@@ -5,7 +5,8 @@ include $(top_srcdir)/Makefile.covcommon
 # All tests that are expected to succeed (the default case) 
 ############################################################################
 TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
-	countservices.sh falseannos.sh oWFNreduction.sh sim_og.sh \
+	countservices.sh coverability.sh falseannos.sh oWFNreduction.sh \
+        sim_og.sh coverability.sh \
 	matching.sh productog.sh publicview.sh samples.sh partner.sh \
 	minimize.sh bddtest.sh statesReduction.sh responsive.sh normalize.sh
 
@@ -254,7 +255,15 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
 	responsive/finalmarking_in_TSCC.owfn \
 	responsive/2_TSCCs_in_1_node_with_communication_1.owfn \
 	responsive/2_TSCCs_in_1_node_with_communication_2.owfn \
-	responsive/cgvExample.owfn
+	responsive/cgvExample.owfn \
+        coverability/M1.owfn \
+        coverability/M2.owfn \
+        coverability/Nc1.owfn \
+        coverability/Nc2.owfn \
+        coverability/Nc3.owfn \
+        coverability/Nc1.owfn.cov \
+        coverability/Nc2.owfn.cov \
+        coverability/Nc3.owfn.cov
 	
 
 # Global check-loud target. Runs all tests. Output files are generated.
@@ -442,7 +451,13 @@ DISTCLEANFILES =  productog/1x2.output.og \
 	bdd_ref/myCoffee.owfn.og \
 	bdd_ref/myCoffee.owfn.og.BDD_ANN.cudd \
 	bdd_ref/myCoffee.owfn.og.BDD_MP.cudd \
-	bdd_ref/myCoffee.owfn.og.png	
+	bdd_ref/myCoffee.owfn.og.png \
+        coverability/Nc1.owfn.out \
+        coverability/Nc1.owfn.covog \
+        coverability/Nc2.owfn.out \
+        coverability/Nc2.owfn.covog \
+        coverability/Nc3.owfn.out \
+        coverability/Nc3.owfn.covog
 
 
 distclean-local:

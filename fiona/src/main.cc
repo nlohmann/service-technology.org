@@ -35,6 +35,7 @@
  */
 
 #include "AnnotatedGraph.h"
+#include "ConstraintOG.h"
 #include "GastexGraph.h"
 #include "owfn.h"
 #include "state.h"
@@ -86,6 +87,17 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
+extern int covog_yylineno;
+extern int covog_yydebug;
+extern int covog_yy_flex_debug;
+extern FILE* covog_yyin;
+extern int covog_yyerror();
+extern int covog_yyparse();
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+extern int covog_yylex_destroy();
+#endif
+
 extern int dot_yylineno;
 extern int dot_yydebug;
 extern int dot_yy_flex_debug;
@@ -104,7 +116,9 @@ extern unsigned int State::state_count;
 extern unsigned int State::state_count_stored_in_binDec;
 extern std::list<std::string> netfiles;
 extern std::list<std::string> ogfiles;
+extern std::list<std::string> covfiles;
 extern AnnotatedGraph* OGToParse;
+extern GraphFormulaCNF* covConstraint;
 
 extern string STG2oWFN_main(vector<string> &, string, set<string>&, set<string>&);
 
@@ -237,6 +251,34 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     return OGToParse;
 }
 
+
+//! \brief reads an og with a (global) constraint (constraint og for short)
+//! from ogfile
+//! \param ogfile constraint og
+//! \return returns the OG object 
+AnnotatedGraph* readconstraintog(const std::string& ogfile, GraphFormulaCNF*& covconstraint) {
+    covog_yylineno = 1;
+    covog_yydebug = 0;
+    covog_yy_flex_debug = 0;
+    assert(ogfile != "");
+    TRACE(TRACE_1, "reading from file " + ogfile + "\n");
+    covog_yyin = fopen(ogfile.c_str(), "r");
+    if (!covog_yyin) {
+        cerr << "cannot open constraint OG file '" << ogfile << "' for reading'\n" << endl;
+        exit(4);
+    }
+    OGToParse = new AnnotatedGraph;
+    ogfileToParse = ogfile;
+    covog_yyparse();
+    fclose(covog_yyin);
+
+    OGToParse->setFilename(ogfile);
+
+    covconstraint = covConstraint;
+    TRACE(TRACE_1, "file successfully read\n");
+
+    return OGToParse;
+}
 
 //! \brief reads all OGs from files and adds them to the given list
 //! \param theOGs a list of OGs
@@ -799,11 +841,28 @@ string computeOG(oWFN* PN) {
             removeFalseNodesTime1, removeFalseNodesTime2,
             removeUnreachableNodesTime1, removeUnreachableNodesTime2;
 
-    OG* graph = new OG(PN);
+    OG* graph;
+    if (parameters[P_COVER]) {
+        // operating guideline with global constraint
+
+        graph = new ConstraintOG(PN);
+        trace("reading the coverability constraint from file ");
+        trace(PN->filename + ".cov" + "\n\n");
+        static_cast<ConstraintOG*>(graph)->readCovConstraint(PN->filename + ".cov");
+    } else {
+        // basic operating guideline
+        graph = new OG(PN);
+    }
+
     bool controllable = false;
     string ogFilename = "";
 
-    trace( "building the operating guideline...\n");
+    if (parameters[P_COVER]) {
+        trace( "building the operating guideline with global constraint...\n");
+    } else {
+        trace( "building the operating guideline...\n");
+    }
+
     graph->printProgressFirst();
 
     seconds = time(NULL);
@@ -855,15 +914,35 @@ string computeOG(oWFN* PN) {
 
     seconds2 = time(NULL);
 
-    trace( "\nbuilding the operating guideline finished.\n");
+    if (parameters[P_COVER]) {
+        trace( "\nbuilding the operating guideline with global constraint finished.\n");
+    } else {
+        trace( "\nbuilding the operating guideline finished.\n");
+    }
     trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
     trace( "\nnet is controllable: ");
-    if (graph->hasNoRoot() || graph->getRoot()->getColor()==RED) {
+    if (graph->hasNoRoot() || graph->getRoot()->getColor() == RED || 
+        (parameters[P_COVER] && 
+        static_cast<ConstraintOG*>(graph)->getCovConstraint()->equals() == FALSE)) {
         trace( "NO\n\n");
     } else {
         trace( "YES\n\n");
         controllable = true;
+    }
+
+    if (parameters[P_COVER]) {
+        set<string> uncovered =
+                static_cast<ConstraintOG*>(graph)->computeUncoverables();
+        if (!uncovered.empty()) {
+            trace("The following oWFN places or transitions can not be covered:\n");
+            for (set<string>::iterator i = uncovered.begin();
+                 i != uncovered.end(); ++i) {
+                trace((*i));
+                trace(", ");
+            }
+            trace("\b\b \n\n");
+        }
     }
 
     // print statistics
@@ -923,7 +1002,13 @@ string computeOG(oWFN* PN) {
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
             string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
             basefilename += graph->getSuffix();
-            createOutputFiles(graph, basefilename, "OG of " + PN->filename);
+            if (parameters[P_COVER]) {
+                createOutputFiles(graph, basefilename, "global constraint: " +
+                                  static_cast<ConstraintOG*>(graph)->getCovConstraint()->asString() +
+                                  "\\n\\nOG with global constraint of " + PN->filename);
+            } else {
+                createOutputFiles(graph, basefilename, "OG of " + PN->filename);
+            }
         }
 
         if (options[O_OUTFILEPREFIX]) {
@@ -1550,10 +1635,11 @@ oWFN* normalizeOWFN(oWFN* PN) {
 }
 
 
-//! \brief match a net against an OG
+//! \brief match a net against an (Constraint) OG
 //! \param OGToMatch an OG to be matched against an oWFN
 //! \param PN an oWFN to be matched against an OG
-void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN) {
+//! \param covConstraint constraint to match against when checking coverability
+void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF* covConstraint = 0) {
 
     TRACE(TRACE_5, "void checkMatching(AnnotatedGraph*, oWFN*) : start\n");
 
@@ -1573,21 +1659,34 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN) {
     // match the oWFN with given OG
     string reasonForFailedMatch;
     TRACE(TRACE_0, ("matching " + PN->filename + " and ...\n\n"));
-    for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin(); OGToMatch != OGsToMatch.end(); ++OGToMatch) {
+    for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin(); 
+         OGToMatch != OGsToMatch.end(); ++OGToMatch) {
         // use only the labeled core
         oWFN* coreOWFN = normalOWFN->returnMatchingOWFN();
 
-        if ( coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
-            TRACE(TRACE_1, "\n");
-            TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": YES\n");
+        if (parameters[P_COVER]) {
+            if ( coreOWFN->matchesWithConstraintOG((*OGToMatch), covConstraint, reasonForFailedMatch) ) {
+                TRACE(TRACE_1, "\n");
+                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": YES\n");
+            } else {
+                TRACE(TRACE_1, "\n");
+                TRACE(TRACE_1, "Match failed: " + reasonForFailedMatch + "\n\n");
+                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": NO\n");
+            }
         } else {
-            TRACE(TRACE_1, "\n");
-            TRACE(TRACE_1, "Match failed: " +reasonForFailedMatch + "\n\n");
-            TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": NO\n");
+            if ( coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
+                TRACE(TRACE_1, "\n");
+                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": YES\n");
+            } else {
+                TRACE(TRACE_1, "\n");
+                TRACE(TRACE_0, "Match failed: " + reasonForFailedMatch + "\n\n");
+                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": NO\n");
+            }
         }
         delete coreOWFN;
     }
     TRACE(TRACE_0, "\n");
+
 
     // garbage collection
     if ( normalOWFN != PN ) delete normalOWFN;
@@ -2042,11 +2141,16 @@ int main(int argc, char** argv) {
              parameters[P_PV]) {
 
         list<AnnotatedGraph*> OGsToMatch;
+        GraphFormulaCNF* covConstraintToMatch = NULL;
         if (parameters[P_MATCH]) {
             // iterate all og files
-            for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin(); iOgFile != ogfiles.end(); ++iOgFile) {
-                // We match every given OG to every oWFN
-                OGsToMatch.push_back(readog(*(iOgFile)));
+            for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin(); 
+                 iOgFile != ogfiles.end(); ++iOgFile) {
+                if (parameters[P_COVER]) {
+                    OGsToMatch.push_back(readconstraintog(*(iOgFile), covConstraintToMatch));
+                } else {
+                    OGsToMatch.push_back(readog(*(iOgFile)));
+                }
             }
         }
 
@@ -2108,12 +2212,20 @@ int main(int argc, char** argv) {
                     //if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
                     //    // TODO compute the most permissive partner
                     //} else {
-                        fileName = computeOG(PN);    // computing OG of the current oWFN
+                    //    fileName = computeOG(PN);    // computing OG of the current oWFN
                     //}
+
+                    // computing OG of the current oWFN
+                    fileName = computeOG(PN);
                 }
 
                 if (parameters[P_MATCH]) {
-                    checkMatching(OGsToMatch, PN); // matching the current oWFN against the current OG
+                    // matching the current oWFN against the current OG
+                    if(parameters[P_COVER]) {
+                        checkMatching(OGsToMatch, PN, covConstraint);
+                    } else {
+                        checkMatching(OGsToMatch, PN);
+                    }
                 }
 
                 if (parameters[P_PNG]) {

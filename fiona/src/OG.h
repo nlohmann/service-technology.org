@@ -46,13 +46,13 @@ class oWFN;
 
 
 class OG : public CommunicationGraph {
-    private:
+    protected:
         /// calculates the annotation (CNF) for the node
         void computeCNF(AnnotatedGraphNode* node) const;
 
         /// Builds the OG of the associated PN recursively starting at
         /// currentNode.
-        void buildGraph(AnnotatedGraphNode* currentNode, double progress_plus);
+        virtual void buildGraph(AnnotatedGraphNode* currentNode, double progress_plus);
 
         /// calculates the set of successor states in case of an input message
         void calculateSuccStatesInput(unsigned int, AnnotatedGraphNode*, AnnotatedGraphNode*);
@@ -74,7 +74,7 @@ class OG : public CommunicationGraph {
         OG(oWFN *);
         
         /// basic deconstructor
-        ~OG();
+        virtual ~OG();
 
         BddRepresentation * bdd;
 
@@ -83,7 +83,7 @@ class OG : public CommunicationGraph {
         void correctNodeColorsAndShortenAnnotations();
 
         /// Builds the OG of the associated PN
-        void buildGraph();
+        virtual void buildGraph();
 
         /// converts an OG into its BDD representation
         void convertToBdd();

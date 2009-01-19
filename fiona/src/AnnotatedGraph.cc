@@ -43,6 +43,8 @@
 #include "options.h"
 #include <sstream>
 #include <vector>
+#include "OG.h"
+#include "ConstraintOG.h"
 
 // TRUE and FALSE #defined in cudd package may interfere with
 // GraphFormulaLiteral::TRUE and ...::FALSE.
@@ -1989,31 +1991,31 @@ string AnnotatedGraph::createDotFile(string& filenamePrefix,
          ((parameters[P_SHOW_EMPTY_NODE] || parameters[P_SHOW_BLUE_NODES]) &&
          getNumberOfBlueNodes() <= maxSizeForDotFile)) {
 
-            trace( "creating the dot file of the OG...\n");
+         trace( "creating the dot file of the graph...\n");
 
-            string dotFile = filenamePrefix + ".out";
-            fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
-            if (!dotFileHandle.good()) {
-                dotFileHandle.close();
-                return "";
-            }
-            dotFileHandle << "digraph g1 {\n";
-            dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
-            dotFileHandle << dotGraphTitle;
-            dotFileHandle << "\"];\n";
-            dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
-            dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
+         string dotFile = filenamePrefix + ".out";
+         fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
+         if (!dotFileHandle.good()) {
+             dotFileHandle.close();
+             return "";
+         }
+         dotFileHandle << "digraph g1 {\n";
+         dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";
+         dotFileHandle << dotGraphTitle;
+         dotFileHandle << "\"];\n";
+         dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
+         dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-            std::map<AnnotatedGraphNode*, bool> visitedNodes;
-            createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
+         std::map<AnnotatedGraphNode*, bool> visitedNodes;
+         createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
 
-            dotFileHandle << "}";
-            dotFileHandle.close();
+         dotFileHandle << "}";
+         dotFileHandle.close();
 
-            // ... dot file created (.out) //
-            return dotFile;
+         // ... dot file created (.out) //
+         return dotFile;
     } else {
-            trace( "graph is too big to create dot file\n");
+         trace( "graph is too big to create dot file\n");
     }
 
     return "";
@@ -2071,7 +2073,7 @@ void AnnotatedGraph::createDotFileRecursively(AnnotatedGraphNode* v,
     if (v == NULL) {
         // print the empty OG...
         os << "p0"
-                << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
+           << " [label=\"#0\", fontcolor=black, color=red, style=dashed];\n";
         return;
     }
 
@@ -3150,8 +3152,10 @@ string AnnotatedGraph::getSuffix() const {
     if (parameters[P_DIAGNOSIS]) {
         suffix += ".diag";
     } else {
-        if (parameters[P_OG]) {
-            suffix += ".og";
+        if (parameters[P_OG] && !parameters[P_COVER]) {
+            suffix += OG::addOGFileSuffix("");
+        } else if (parameters[P_OG] && parameters[P_COVER]) {
+            suffix += ConstraintOG::addOGFileSuffix("");
         } else {
             suffix += ".ig";
         }

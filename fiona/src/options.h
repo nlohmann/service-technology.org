@@ -97,7 +97,8 @@ typedef enum {
     P_SHOW_ALL_NODES,           //!< show red, blue, and empty nodes
     P_SHOW_STATES_PER_NODE,     //!< show all states in a node (aka "knowledge")
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
-
+    P_COVERALL,                 //!< show all places and transitions covered in an OG node
+    
     P_NOPNG,                    //!< do not create a PNG output
     P_NODOT,                    //!< do not create any dot related output
     P_TEX,                      //!< create a gastex tex file in some other mode
@@ -106,6 +107,7 @@ typedef enum {
     P_AUTONOMOUS,               //!< check for autonomous controllability
     P_REDUCE_LEVEL,             //!< set reduction level of mode -t reduce
     P_USE_CRE,                  //!< Use "combine receiving events" for IG-reduction
+    P_COVER,                    //!< working with OGs with global constraint to cover certain transitions/places
     P_USE_RBS,                  //!< Use "receive before sending" for IG-reduction
     P_USE_EAD,                  //!< use "early detection" rule for IG-reduction
     P_REPRESENTATIVE,           //!< state reduction in node using representatives

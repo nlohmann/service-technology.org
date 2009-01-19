@@ -39,6 +39,7 @@
 #include "owfnTransition.h"
 #include "binDecision.h"
 #include "AnnotatedGraph.h"
+#include "ConstraintOG.h"
 #include "debug.h"
 #include "options.h"
 #include "mynew.h"
@@ -2719,6 +2720,191 @@ void oWFN::calculateReachableStatesFull(AnnotatedGraphNode* n) {
 }
 
 
+//! \brief NO REDUCTION! calculate all reachable states from the current marking
+//!        and store them in the node n (== AnnotatedGraphNode of CommunicationGraph);
+//!        it will color the node n RED if a given message bound is violated;
+//!        furthermore the knowledge of the reachable state space is calculated
+//! \param n the node for which the reachability graph is computed
+set<string> oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode* n) {
+
+    // calculates the EG starting at the current marking
+    TRACE(TRACE_5, "oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode* n) : start\n");
+
+    set<string> knowledge;
+
+    if (violatesMessageBound()) {
+        n->setColor(RED);
+        TRACE(TRACE_3, "\t\t\t message bound violated; color of node "
+                       + n->getName()
+                       + " set to RED (calculateReachableStatesWithKnowledge, oben)\n");
+        return knowledge;
+    }
+
+    State * CurrentState;
+    CurrentState = binSearch(this);
+
+    unsigned int * tempCurrentMarking = NULL;
+    unsigned int tempPlaceHashValue;
+
+    //	if (options[O_BDD] == false && CurrentState != NULL) {
+
+    if (CurrentState != NULL) {
+        // marking already has a state -> put it with all successors into the node
+
+        if (n->addState(CurrentState)) {
+            // successors need only be added if state was not yet in current node
+            addSuccStatesToNode(n, CurrentState); // decodes and checks for message bound
+        }
+        TRACE(TRACE_5, "oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode * n) : end (root marking of EG already in bintree; states copied only)\n");
+        return knowledge;
+    } else {
+
+        // the other case:
+        // we have a marking which has not yet a state object assigned to it
+        CurrentState = binInsert(this);
+
+        CurrentState->firelist = firelist();
+        CurrentState->cardFireList = CurrentCardFireList;
+
+        // quasiFireList is needed for autonomous controllability
+        if (parameters[P_IG] || parameters[P_AUTONOMOUS]) {
+            if (CurrentState->quasiFirelist) {
+                delete [] CurrentState->quasiFirelist;
+                CurrentState->quasiFirelist = NULL;
+            }
+            CurrentState->quasiFirelist = quasiFirelist();
+        }
+
+        CurrentState->current = 0;
+        CurrentState->parent = (State *) 0;
+        assert(CurrentState->succ == NULL);
+
+        CurrentState->succ = new State * [CurrentCardFireList];
+        for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
+            CurrentState->succ[istate] = NULL;
+        }
+
+        CurrentState->placeHashValue = placeHashValue;
+        CurrentState->type = typeOfState();
+        assert(CurrentState != NULL);
+        n->addState(CurrentState);
+
+        State * NewState;
+
+        // building EG in a node
+        while (CurrentState) {
+
+            // no more transition to fire from current state?
+            if (CurrentState->current < CurrentState->cardFireList) {
+                // there is a next state that needs to be explored
+
+                if (tempCurrentMarking) {
+                    delete[] tempCurrentMarking;
+                    tempCurrentMarking = NULL;
+                }
+
+                tempCurrentMarking = copyCurrentMarking();
+                tempPlaceHashValue = placeHashValue;
+
+                // fire and reach next state
+                CurrentState->firelist[CurrentState->current]->fire(this);
+                NewState = binSearch(this);
+
+                if (NewState != NULL) {
+                    // Current marking already in bintree 
+                    TRACE(TRACE_5, "Current marking already in bintree \n"); 
+                    if (n->addState(NewState)) {
+                        addSuccStatesToNode(n, NewState);
+                        if (n->getColor() == RED) {
+                            TRACE(TRACE_3, "\t\t\t message bound violated; color of node "
+                                           + n->getName()
+                                           + " set to RED (calculateReachableStatesWithKnowledge, during fire (known state)\n");
+                            TRACE(TRACE_5, "oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode * n) : end\n");
+                            delete[] tempCurrentMarking;
+                            return knowledge;
+                        }
+                    }
+
+                    copyMarkingToCurrentMarking(tempCurrentMarking);
+
+                    CurrentState->firelist[CurrentState->current]->backfire(this);
+
+                    placeHashValue = tempPlaceHashValue;
+
+                    delete[] tempCurrentMarking;
+                    tempCurrentMarking = NULL;
+
+                    assert(CurrentState->succ[CurrentState->current] == NULL);
+                    CurrentState->succ[CurrentState->current] = NewState;
+                    (CurrentState->current)++;
+                } else {
+                    TRACE(TRACE_5, "Current marking new\n");	
+                    NewState = binInsert(this);
+                    
+                    assert(CurrentState->succ[CurrentState -> current] == NULL);
+                    CurrentState->succ[CurrentState -> current] = NewState;
+                    
+                    // test current marking if message bound k reached
+                    if (violatesMessageBound()) {
+                        n->setColor(RED);
+                        TRACE(TRACE_3, "\t\t\t message bound violated; color of node "
+                                       + n->getName()
+                                       + " set to RED (calculateReachableStatesWithKnowledge, during fire (new state))\n");
+                        TRACE(TRACE_5, "oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode * n) : end\n");
+                        delete[] tempCurrentMarking;
+                        return knowledge;
+                    }
+                    
+                    NewState->firelist = firelist();
+                    NewState->cardFireList = CurrentCardFireList;
+                    if (parameters[P_IG]) {
+                        if (NewState->quasiFirelist) {
+                            delete[] NewState->quasiFirelist;
+                            NewState->quasiFirelist = NULL;
+                        }
+                        NewState->quasiFirelist = quasiFirelist();
+                    }
+                    NewState->current = 0;
+                    NewState->parent = CurrentState;
+                    assert(NewState->succ == NULL);
+                    NewState->succ = new State* [CurrentCardFireList];
+                    for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
+                        NewState->succ[istate] = NULL;
+                    }
+                    NewState->placeHashValue = placeHashValue;
+                    NewState->type = typeOfState();
+
+                    CurrentState = NewState;
+
+                    assert(NewState != NULL);
+                    n->addState(NewState);
+
+                    if (tempCurrentMarking) {
+                        delete[] tempCurrentMarking;
+                        tempCurrentMarking = NULL;
+                    }
+                }
+                // no more transition to fire
+            } else {
+                // close state and return to previous state
+                TRACE(TRACE_5, "close state [" + getCurrentMarkingAsString() + "] and return to previous state\n");
+                CurrentState = CurrentState->parent;
+
+                if (CurrentState) { // there is a father to further examine
+                    CurrentState->decode(this);
+                    CurrentState->current++;
+                }
+            }
+        }
+        if (tempCurrentMarking) {
+            delete[] tempCurrentMarking;
+        }
+        TRACE(TRACE_5, "oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode * n) : end\n");
+        return knowledge;
+    }
+}
+
+
 //! \brief adds input message to the current marking
 //! \param message message to be added to the currentmarking
 void oWFN::addInputMessage(unsigned int message) {
@@ -3357,6 +3543,334 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
                    "current OG node " + currentOGNode->getName() + "\n\n");
 
     // We found no reason for the oWFN not to match with the OG. So it matches.
+    reasonForFailedMatch = "";
+    return true;
+}
+
+
+//! \brief Matches this oWFN with the given constraint operating guideline (OG).
+//! \param og constraint operating guideline against this oWFN should be matched.
+//! \param covConstraint the coverability constraint to match against
+//! \param reasonForFailedMatch In case of a failed match, holds a text
+//!        describing why the matching failed.
+//! \return true If this oWFN matches with given ConstraintOG.
+//!         retval false Otherwise.
+bool oWFN::matchesWithConstraintOG(const AnnotatedGraph* OG, 
+                                   const GraphFormulaCNF* covConstraint, 
+                                   string& reasonForFailedMatch) {
+    // check whether the initial marking violates the message bound
+    if (violatesMessageBound()) {
+        reasonForFailedMatch = "Current marking: '"
+                               + getCurrentMarkingAsString()
+                               + "' violated message bound.";
+        return false;
+    }
+
+    // check whether the given OG is empty
+    if (OG->getRoot()->isRed()) {
+        reasonForFailedMatch = "The OG is empty (its root node is red).";
+        return false;
+    }
+
+    // initialize the currentState with the initial marking.
+    State* currentState = binInsert(this);
+    currentState->firelist = firelist();
+    currentState->cardFireList = CurrentCardFireList;
+    currentState->current = 0;
+    currentState->parent = NULL;
+    currentState->succ = new State*[CurrentCardFireList];
+    for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
+        currentState->succ[istate] = NULL;
+    }
+    currentState->placeHashValue = placeHashValue;
+    currentState->type = typeOfState();
+
+    // remember that we checked the currentState and the root node of the graph
+    StateNodesAssoc_t stateNodesAssoc;
+    stateNodesAssoc[currentState].insert(OG->getRoot()->getNumber());
+
+    GraphFormulaAssignment covAssignment;
+    covAssignment.setToTrue(OG->getRoot()->getName());
+    TRACE(TRACE_5, "og node " + OG->getRoot()->getName() + " set to true in coverability constraint\n");
+
+    bool result = matchesWithConstraintOGRecursive(OG->getRoot(), currentState,
+            reasonForFailedMatch, stateNodesAssoc, covAssignment);
+
+    if (!covConstraint->satisfies(covAssignment)) {
+        reasonForFailedMatch =
+            "The given net does not satisfy " \
+            "the coverability constraint of the operating guideline.";
+        return false;
+    } else {
+        // We return true if the recursive method succeeded.
+        return result;
+    }
+}
+
+
+//! \brief helper for matchesWithConstraintOG; 
+//! an assignment is passed, which stores all
+//! covered ConstraintOG nodes; it is then checked if the assignment satisfies the
+//! coverability constraint, thus meeting the proposed requirements to cover 
+//! certain oWFN places and transitions (of the underlying PN of the OG)
+//! \param currentOGNode current node in the ConstraintOG, so we know where we are
+//! \param currentState current oWFN state
+//! \param reasonForFailedMatch In case of a failed match, holds a text
+//!        describing why the matching failed.
+//! \param covAssignment an assignment which evaluates all covered nodes of
+//!        the ConstraintOG to true
+//! \return true If this oWFN matches with given ConstraintOG.
+//!         false Otherwise.
+bool oWFN::matchesWithConstraintOGRecursive(AnnotatedGraphNode* currentOGNode,
+                                  State* currentState,
+                                  string& reasonForFailedMatch,
+                                  StateNodesAssoc_t& stateNodesAssoc,
+                                  GraphFormulaAssignment& covAssignment) {
+
+    unsigned int* oldCurrentMarking = NULL;
+    unsigned int oldPlaceHashValue = 0;
+    AnnotatedGraphNode* oldOGNode = NULL;
+
+    // If currentState becomes NULL we don't need to look any further.
+    if (currentState == NULL) {
+        reasonForFailedMatch = "";
+        return true;
+    }
+
+    // Check whether there are still enabled transitions to be fired in
+    // currentState (transitions that have not been processed yet while
+    // building the reachability graph). currentState->current holds the
+    // index of the current (to be fired) transition in the array of to
+    // be fired transitions currentState->firelist[] with cardinality
+    // currentState->cardFireList.
+    // If currentState->current is out of the firelist's range, we're through.
+    TRACE(TRACE_4, "\nstart cycle with currentState->current = " + intToString(currentState->current) + ", " +
+                   "currentState->cardFireList = " + intToString(currentState->cardFireList) + ",\n" +
+                   "                 current marking " + getCurrentMarkingAsString() + ", " +
+                   "current OG node " + currentOGNode->getName() + "\n");
+
+    while (currentState->current < currentState->cardFireList) {
+
+        // Retrieve the transition leaving the current state that should be fired next.
+        owfnTransition* transition = currentState->firelist[currentState->current];
+        TRACE(TRACE_4, "    transition " + transition->getName() + " should be fired next\n");
+
+        // Save the current marking, so we can easily revert to it if
+        // firing the transition that we will try in this if-branch leads
+        // us to a state we have already seen.
+        if (oldCurrentMarking != NULL) {
+            delete[] oldCurrentMarking;
+            oldCurrentMarking = NULL;
+        }
+        oldCurrentMarking = copyCurrentMarking();
+        oldPlaceHashValue = placeHashValue;
+
+        // Save the currentOGNode to a temporary copy, so we can easily
+        // revert to it if the state we reached to firing the current
+        // transition lead us to an already seen state.
+        oldOGNode = currentOGNode;
+
+
+        // Check whether the transition to be fired is also present in the
+        // OG. If not, exit this function returning false, because the oWFN
+        // does not match with the OG.
+        if (transition->hasNonTauLabelForMatching() &&
+            !currentOGNode->hasBlueEdgeWithLabel(transition->getLabelForMatching())) {
+
+            reasonForFailedMatch = "Transition " + transition->getName() + " labeled with \""
+                                   + transition->getLabelForMatching()
+                                   + "\" leaves the marking ["
+                                   + getCurrentMarkingAsString()
+                                   + "] in the oWFN, but no blue edge with the same label"
+                                   + " leaves the node \"" + currentOGNode->getName()
+                                   + "\" in the OG.";
+
+            delete[] oldCurrentMarking;
+            return false;
+        }
+
+        // Fire the to be tried transition. The thereby reached marking is saved to CurrentMarking.
+        transition->fire(this);
+
+        // if net makes a visible step, the ConstraintOG node does so, too
+        if (transition->hasNonTauLabelForMatching()) {
+            // Fire the transition in the ConstraintOG that belongs to the transition we just fired in the oWFN.
+            currentOGNode = currentOGNode->followEdgeWithLabel(transition->getLabelForMatching());
+            TRACE(TRACE_4, "    transition " + transition->getName() + " is " + transition->getLabelForMatching() +
+                           " labeled, new OG node is " + currentOGNode->getName() + "\n");
+        } else {
+            // if net just made a silent step, the OG node stays unchanged, so do nothing.
+            TRACE(TRACE_4, "    transition " + transition->getName() + " is TAU labeled, OG node is " +
+                           currentOGNode->getName() + " (unchanged)\n");
+        }
+
+
+        // Determine whether we have already seen the state we just reached.
+        State* newState = binSearch(this);
+        
+        // let's see if we have not yet checked the current state 
+        // and if we have not yet checked the current state and the current node already
+        if ( newState != NULL && 
+       	    (stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
+
+        	TRACE(TRACE_2, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
+        	TRACE(TRACE_2, currentOGNode->getName() + "\n");
+        	TRACE(TRACE_2, "    backtracking from node " + currentOGNode->getName());
+        	TRACE(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
+            
+            // We have already seen the state we just reaching by firing
+            // the transition above. So we have to revert to the state that
+            // the transition left from.
+            copyMarkingToCurrentMarking(oldCurrentMarking);
+
+            // owfnTransition::backfire() does not actually backfire.
+            // It merely rechecks enabledness of all transitions in
+            // question with respect to CurrentMarking. Therefore you have
+            // to restore the CurrentMarking first and then call
+            // backfire() to undo the effect of a transition.
+            transition->backfire(this);
+            placeHashValue = oldPlaceHashValue;
+            delete[] oldCurrentMarking;
+            oldCurrentMarking = NULL;
+            currentState->succ[currentState->current] = newState;
+
+            // Increment current to the index of the next to be fired transition.
+            currentState->current++;
+
+            if (transition->hasNonTauLabelForMatching()) {
+                // go back to the previously considered node
+                currentOGNode = oldOGNode;
+            } else {
+                // if net makes a silent (back) step, the ConstraintOG node stays unchanged
+                // so do nothing.
+            }
+        } else {
+
+            // The state we reached by firing the above transition is new.
+            // So we have to initialize this newly seen state.
+            newState = binInsert(this);
+            newState->firelist = firelist();
+            newState->cardFireList = CurrentCardFireList;
+            newState->current = 0;
+            newState->parent = currentState;
+            newState->succ = new State*[CurrentCardFireList];
+            for (size_t istate = 0; istate != CurrentCardFireList; ++istate) {
+                newState->succ[istate] = NULL;
+            }
+            newState->placeHashValue = placeHashValue;
+            newState->type = typeOfState();
+            currentState->succ[currentState->current] = newState;
+
+                TRACE(TRACE_1, "found new marking [" + getCurrentMarkingAsString() + "] at node ");
+                TRACE(TRACE_1, currentOGNode->getName() + "\n");
+
+
+            // Clean up the temporary copy of the former CurrentMarking
+            // because we do not longer need to be able to revert to it as
+            // we have a found a _new_ not yet seen state.
+            if (oldCurrentMarking != NULL) {
+                delete[] oldCurrentMarking;
+                oldCurrentMarking = NULL;
+            }
+
+            // remember that we have checked the current state with a certain (current) node
+            stateNodesAssoc[newState].insert(currentOGNode->getNumber());
+            covAssignment.setToTrue(currentOGNode->getName());
+            TRACE(TRACE_5, "og node " + currentOGNode->getName() + " set to true in coverability constraint\n");
+            
+            // Check whether the initial marking violates the message bound
+            // and exit with an error message if it does.
+            if (violatesMessageBound()) {
+                reasonForFailedMatch = "Current marking: ["
+                                       + getCurrentMarkingAsString()
+                                       + "] violated message bound.";
+                return false;
+            }
+
+            // Continue the matching recursively using newState and currentOGNode.
+            // Upon success, don't forget to continue to work with oldOGNode.
+            if (!matchesWithConstraintOGRecursive(currentOGNode, newState,
+                                        reasonForFailedMatch,
+                                        stateNodesAssoc,
+                                        covAssignment)) {
+                return false;
+            } else {
+                currentOGNode = oldOGNode;
+            }
+        }
+    }
+
+    // There are no transitions left to fire. So we are about to
+    // backtrack to the parent of the currentState. But before we
+    // do this, we have to check whether the currentState satisfies
+    // the annotation of the corresponding ConstraintOG node. So we construct
+    // an assignment for this node such that all propositions
+    // corresponding to currently enabled transitions are set to
+    // true and all others to false; furthermore the literal
+    // 'final' is set to true iff the currentState is a final
+    // state. Because in a GraphFormulaAssignment every
+    // unmentioned literal is considered false, we only set those
+    // literals that should be considered true.
+    //
+    // If the currentState has a leaving tau transition, we can skip
+    // checking the annotation because it is satisfied for sure.
+    // This is because all possible markings are reached through this
+    // algorithm and no OG node formula is allowed to contain the
+    // literal TAU, therefore it doesn't matter if a formula containing
+    // TAU is checked or not.
+    TRACE(TRACE_4, "    no to be fired transition left\n");
+    if (!currentState->hasEnabledTransitionWithTauLabelForMatching()) {
+
+        TRACE(TRACE_4, "    no tau transition found, so we check annotation of current OG node\n");
+        GraphFormulaAssignment assignment = makeAssignmentForOGMatchingForState(currentState);
+
+        if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
+            // Clean up the temporary copy of the former CurrentMarking
+            if (oldCurrentMarking != NULL) {
+                delete[] oldCurrentMarking;
+                oldCurrentMarking = NULL;
+            }
+
+            reasonForFailedMatch = "The marking ["
+                                   + getCurrentMarkingAsString()
+                                   + "] of the oWFN does not satisfy the annotation \""
+                                   + currentOGNode->getAnnotationAsString()
+                                   + "\" of the corresponding node \""
+                                   + currentOGNode->getName()
+                                   + "\" in the OG.";
+
+            return false;
+        } else {
+                TRACE(TRACE_4, "marking [" + getCurrentMarkingAsString() + "] satisfied\n");
+                TRACE(TRACE_4, "    annotation " + currentOGNode->getAnnotationAsString());
+                TRACE(TRACE_4, " of node " + currentOGNode->getName() + "\n");
+        }
+    }
+
+    TRACE(TRACE_4, "end cycle with currentState->current = " + intToString(currentState->current) + ", " +
+                   "currentState->cardFireList = " + intToString(currentState->cardFireList) + ",\n" +
+                   "               current marking " + getCurrentMarkingAsString() + ", " +
+                   "current OG node " + currentOGNode->getName() + "\n\n");
+
+
+    // Although we won't use currentState after tracking back (it will
+    // be lost anyway), we set it to its parent here for convenience.
+    currentState = currentState->parent;
+    if (currentState != NULL) {
+        // Decode currentState into CurrentMarking such that
+        // currentState and CurrentMarking again denote the same
+        // state of the oWFN.
+        currentState->decode(this);
+        currentState->current++;
+    }
+
+    // Clean up before we return from the function.
+    if (oldCurrentMarking != NULL) {
+        delete[] oldCurrentMarking;
+        oldCurrentMarking = NULL;
+    }
+
+    // We found no reason for the oWFN not to match with the ConstraintOG. So it matches.
     reasonForFailedMatch = "";
     return true;
 }

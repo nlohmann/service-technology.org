@@ -45,6 +45,7 @@
 
 std::string ogfileToParse;
 std::string owfnfileToParse;
+std::string covfileToParse;
 
 /// debug level
 trace_level_fiona debug_level = TRACE_0;
@@ -215,4 +216,27 @@ int og_yyerror(const char* msg) {
 
     return yyerror(msg, og_yylineno, og_yytext, ogfileToParse.c_str());
 }
+
+//! \brief function needed for the specific parser, calls yyerror
+//! \param msg error message to print
+//! \return returns 1
+int covog_yyerror(const char* msg) {
+    /* defined by flex */
+    extern int covog_yylineno; ///< line number of current token
+    extern char *covog_yytext; ///< text of the current token
+
+    return yyerror(msg, covog_yylineno, covog_yytext, ogfileToParse.c_str());
+}
+
+//! \brief function needed for the specific parser, calls yyerror
+//! \param msg error message to print
+//! \return returns 1
+int cov_yyerror(const char* msg) {
+    /* defined by flex */
+    extern int cov_yylineno; ///< line number of current token
+    extern char *cov_yytext; ///< text of the current token
+
+    return yyerror(msg, cov_yylineno, cov_yytext, covfileToParse.c_str());
+}
+
 

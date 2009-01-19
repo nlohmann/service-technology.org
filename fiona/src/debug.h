@@ -54,6 +54,7 @@
 
 extern std::string ogfileToParse;
 extern std::string owfnfileToParse;
+extern std::string covfileToParse;
 
 typedef enum {
     TRACE_0, /*!< error messages and some important status messages
@@ -96,5 +97,13 @@ int yyerror(const char* msg);
 /// Prints an error that has been encountered while parsing an OG file. The
 /// program exits after printing the error.
 int og_yyerror(const char* msg);
+
+/// Prints an error that has been encountered while parsing a ConstraintOG file. The
+/// program exits after printing the error.
+int covog_yyerror(const char* msg);
+
+/// Prints an error that has been encountered while parsing an file containing a set 
+/// of oWFN nodes to be covered. The program exits after printing the error.
+int cov_yyerror(const char* msg);
 
 #endif

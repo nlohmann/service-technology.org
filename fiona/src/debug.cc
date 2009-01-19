@@ -217,7 +217,8 @@ int og_yyerror(const char* msg) {
     return yyerror(msg, og_yylineno, og_yytext, ogfileToParse.c_str());
 }
 
-//! \brief function needed for the specific parser, calls yyerror
+//! \brief function needed for if an error occurs while parsing a .covog-file;
+//!        the msg is passed to yyerror 
 //! \param msg error message to print
 //! \return returns 1
 int covog_yyerror(const char* msg) {
@@ -228,7 +229,8 @@ int covog_yyerror(const char* msg) {
     return yyerror(msg, covog_yylineno, covog_yytext, ogfileToParse.c_str());
 }
 
-//! \brief function needed for the specific parser, calls yyerror
+//! \brief function needed for if an error occurs while parsing a .cov-file;
+//!        the msg is passed to yyerror 
 //! \param msg error message to print
 //! \return returns 1
 int cov_yyerror(const char* msg) {

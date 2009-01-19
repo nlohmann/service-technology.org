@@ -5,7 +5,7 @@ include $(top_srcdir)/Makefile.covcommon
 # All tests that are expected to succeed (the default case) 
 ############################################################################
 TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
-	countservices.sh coverability.sh falseannos.sh oWFNreduction.sh \
+	countservices.sh falseannos.sh oWFNreduction.sh \
         sim_og.sh coverability.sh \
 	matching.sh productog.sh publicview.sh samples.sh partner.sh \
 	minimize.sh bddtest.sh statesReduction.sh responsive.sh normalize.sh

@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include "state.h"
+#include "marking.h"
 
 using std::list;
 using std::ostream;

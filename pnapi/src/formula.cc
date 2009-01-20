@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include "petrinet.h"
+#include "marking.h"
 #include "formula.h"
 
 using std::stringstream;
@@ -15,7 +16,12 @@ namespace pnapi
    * \brief   Atomic formula class's public methods
    */
   AtomicFormula::AtomicFormula(Place *p, unsigned int k) :
-    place(p), number(k)
+    place_(p), number_(k)
+  {
+  }
+
+  AtomicFormula::AtomicFormula(const AtomicFormula &f, Place &p) :
+    place_(&p), number_(f.number_)
   {
   }
 
@@ -26,12 +32,12 @@ namespace pnapi
 
   Place* AtomicFormula::getPlace()
   {
-    return place;
+    return place_;
   }
 
   unsigned int AtomicFormula::getNumber()
   {
-    return number;
+    return number_;
   }
 
   FormulaEqual::FormulaEqual(Place *p, unsigned int k) :
@@ -41,17 +47,17 @@ namespace pnapi
 
   bool FormulaEqual::evaluate(Marking &m)
   {
-    return m[place] == number;
+    return m[place_] == number_;
   }
 
   const string FormulaEqual::toString() const
   {
     string snumber;
     stringstream sstream;
-    sstream << number;
+    sstream << number_;
     sstream >> snumber;
 
-    return place->getName() + " = " + snumber;
+    return place_->getName() + " = " + snumber;
   }
 
   FormulaNotEqual::FormulaNotEqual(Place *p, unsigned int k) :
@@ -61,17 +67,17 @@ namespace pnapi
 
   bool FormulaNotEqual::evaluate(Marking &m)
   {
-    return m[place] != number;
+    return m[place_] != number_;
   }
 
   const string FormulaNotEqual::toString() const
   {
     string snumber;
     stringstream sstream;
-    sstream << number;
+    sstream << number_;
     sstream >> snumber;
 
-    return place->getName() + " != " + snumber;
+    return place_->getName() + " != " + snumber;
   }
 
   FormulaGreater::FormulaGreater(Place *p, unsigned int k) :
@@ -81,17 +87,17 @@ namespace pnapi
 
   bool FormulaGreater::evaluate(Marking &m)
   {
-    return m[place] > number;
+    return m[place_] > number_;
   }
 
   const string FormulaGreater::toString() const
   {
     string snumber;
     stringstream sstream;
-    sstream << number;
+    sstream << number_;
     sstream >> snumber;
 
-    return place->getName() + " > " + snumber;
+    return place_->getName() + " > " + snumber;
   }
 
   FormulaGreaterEqual::FormulaGreaterEqual(Place *p, unsigned int k) :
@@ -101,17 +107,17 @@ namespace pnapi
 
   bool FormulaGreaterEqual::evaluate(Marking &m)
   {
-    return m[place] >= number;
+    return m[place_] >= number_;
   }
 
   const string FormulaGreaterEqual::toString() const
   {
     string snumber;
     stringstream sstream;
-    sstream << number;
+    sstream << number_;
     sstream >> snumber;
 
-    return place->getName() + " >= " + snumber;
+    return place_->getName() + " >= " + snumber;
   }
 
   FormulaLess::FormulaLess(Place *p, unsigned int k) :
@@ -121,17 +127,17 @@ namespace pnapi
 
   bool FormulaLess::evaluate(Marking &m)
   {
-    return m[place] < number;
+    return m[place_] < number_;
   }
 
   const string FormulaLess::toString() const
   {
     string snumber;
     stringstream sstream;
-    sstream << number;
+    sstream << number_;
     sstream >> snumber;
 
-    return place->getName() + " < " + snumber;
+    return place_->getName() + " < " + snumber;
   }
 
   FormulaLessEqual::FormulaLessEqual(Place *p, unsigned int k) :
@@ -141,24 +147,29 @@ namespace pnapi
 
   bool FormulaLessEqual::evaluate(Marking &m)
   {
-    return m[place] <= number;
+    return m[place_] <= number_;
   }
 
   const string FormulaLessEqual::toString() const
   {
     string snumber;
     stringstream sstream;
-    sstream << number;
+    sstream << number_;
     sstream >> snumber;
 
-    return place->getName() + " <= " + snumber;
+    return place_->getName() + " <= " + snumber;
   }
 
   /************************************************
    *          Unary Boolean Formulas              *
    ************************************************/
   UnaryBooleanFormula::UnaryBooleanFormula(Formula *f) :
-    sub(f)
+    sub_(f)
+  {
+  }
+
+  UnaryBooleanFormula::UnaryBooleanFormula(const UnaryBooleanFormula &f) :
+    sub_(f.sub_)
   {
   }
 
@@ -169,12 +180,12 @@ namespace pnapi
 
   bool FormulaNot::evaluate(Marking &m)
   {
-    return !sub->evaluate(m);
+    return !sub_->evaluate(m);
   }
 
   const string FormulaNot::toString() const
   {
-    return " NOT ( " + sub->toString() + " ) ";
+    return " NOT ( " + sub_->toString() + " ) ";
   }
 
   /************************************************
@@ -183,8 +194,18 @@ namespace pnapi
 
   NaryBooleanFormula::NaryBooleanFormula(Formula *l, Formula *r)
   {
-    subs.push_back(l);
-    subs.push_back(r);
+    subs_.push_back(l);
+    subs_.push_back(r);
+  }
+
+  NaryBooleanFormula::NaryBooleanFormula(list<Formula *> &flst) :
+    subs_(flst)
+  {
+  }
+
+  NaryBooleanFormula::NaryBooleanFormula(const NaryBooleanFormula &f) :
+    subs_(f.subs_)
+  {
   }
 
   FormulaAnd::FormulaAnd(Formula *l, Formula *r) :
@@ -194,7 +215,8 @@ namespace pnapi
 
   bool FormulaAnd::evaluate(Marking &m)
   {
-    for (list<Formula *>::const_iterator f = subs.begin(); f != subs.end(); f++)
+    for (list<Formula *>::const_iterator f = subs_.begin();
+        f != subs_.end(); f++)
       if (!(*f)->evaluate(m))
         return false;
 
@@ -204,9 +226,9 @@ namespace pnapi
   const string FormulaAnd::toString() const
   {
     string result = " ( ";
-    list<Formula *>::const_iterator fl = subs.end()--;
+    list<Formula *>::const_iterator fl = subs_.end()--;
 
-    for (list<Formula *>::const_iterator f = subs.begin(); f != fl; f++)
+    for (list<Formula *>::const_iterator f = subs_.begin(); f != fl; f++)
       result.append((*f)->toString() + " AND ");
 
     result.append((*++fl)->toString() + " ) ");
@@ -221,7 +243,8 @@ namespace pnapi
 
   bool FormulaOr::evaluate(Marking &m)
   {
-    for (list<Formula *>::const_iterator f = subs.begin(); f != subs.end(); f++)
+    for (list<Formula *>::const_iterator f = subs_.begin();
+        f != subs_.end(); f++)
       if ((*f)->evaluate(m))
         return true;
 
@@ -231,9 +254,9 @@ namespace pnapi
   const string FormulaOr::toString() const
   {
     string result = " ( ";
-    list<Formula *>::const_iterator fl = subs.end()--;
+    list<Formula *>::const_iterator fl = subs_.end()--;
 
-    for (list<Formula *>::const_iterator f = subs.begin(); f != fl; f++)
+    for (list<Formula *>::const_iterator f = subs_.begin(); f != fl; f++)
       result.append((*f)->toString() + " OR ");
 
     result.append((*++fl)->toString() + " ) ");

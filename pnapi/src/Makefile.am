@@ -9,11 +9,13 @@ libpnapi_a_SOURCES = \
 	parser.h parser.cc \
 	util.h util.cc \
 	formula.h formula.cc \
+	condition.h condition.cc \
 	petrinet-output.cc \
 	petrinet-reduction.cc \
 	petrinet-petrify.cc \
 	automaton.h automaton.cc \
-	state.h state.cc
+	state.h state.cc \
+	marking.h marking.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-petrify.cc
 

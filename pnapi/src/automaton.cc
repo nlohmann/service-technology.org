@@ -4,9 +4,11 @@
  * \author  Stephan Mennicke <stephan.mennicke@uni-rostock.de>
  */
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include "util.h"
+//#include "marking.h"
 #include "automaton.h"
 
 using std::cerr;
@@ -23,23 +25,20 @@ namespace pnapi
  * This constructor takes a net n and gets the initial
  * marking from the net itself.
  *
- * \pre     PetriNet n is normal
- *
  * \param   PetriNet n
  *
  * \note    Before building an automaton one has to normalize the by
- *          calling the public method normalize().
+ *          calling the public method normalize(). See precondition
+ *          initialize().
  */
 Automaton::Automaton(PetriNet &n) :
   hashTable_(HASHSIZE), net_(n), initialmarking_(n)
 {
-  assert(net_.isNormal());
-
   fillPrimes();
   initialize();
   State::initialize();
 
-  initialmarking_ = *new Marking(n);
+  initialmarking_ = *new Marking(n, true);
 
   State *i = new State(initialmarking_);
 
@@ -64,15 +63,12 @@ Automaton::~Automaton()
 /*!
  * \brief   Initialization of the service automaton
  *
- * The method normalizes the given net and saves for each
- * transition the (interface-)reason to fire. If there is
- * no interface place from/to one transition, the reason
- * will be a 'tau'. Then, all interface places will be deleted.
+ * This method sets the reasons for firing a transition t.
+ *
+ * \pre     PetriNet net_ is normal.
  */
 void Automaton::initialize()
 {
-  // net_.normalize();
-
   set<Place *> Pin = net_.getInputPlaces();
   set<Place *> Pout = net_.getOutputPlaces();
 
@@ -110,22 +106,6 @@ void Automaton::initialize()
 
 
 
-/*!
- * \brief   creates the service automaton
- *
- * Sets an initial state and starts the depth first
- * search. Afterwards, the property first gets its
- * value.
- */
-void Automaton::createAutomaton()
-{
-  State *i = new State(initialmarking_);
-
-  dfs(*i);
-
-  first_ = i->getIndex();
-}
-
 void Automaton::fillPrimes()
 {
   unsigned int p = 2;
@@ -153,13 +133,12 @@ bool Automaton::isPrime(unsigned int &p) const
 
 void Automaton::dfs(State &i)
 {
-  //unsigned int hash = hashValue(i);
   i.setIndex();
 
   // collision detection
   for (set<State *>::const_iterator s =
-    hashTable_[i.getHashValue(primes_)].begin(); s !=
-    hashTable_[i.getHashValue(primes_)].end(); s++)
+      hashTable_[i.getHashValue(primes_)].begin(); s !=
+      hashTable_[i.getHashValue(primes_)].end(); s++)
   {
     if (**s == i)
       return;
@@ -181,13 +160,13 @@ void Automaton::dfs(State &i)
     if (!m.activates(**t))
       continue;
 
-    State *j = new State(m.successor(**t));
-    if (i == *j)
+    State &j = *new State(m.successor(**t));
+    if (i == j)
       continue;
 
-    i.addSuccessor(*j);
+    i.addSuccessor(j);
     i.addReason(reasons_[*t]);
-    dfs(*j);
+    dfs(j);
   }
 }
 

@@ -1,25 +1,5 @@
 #!/bin/bash
 
-############################################################################
-# Copyright 2008 Robert Danitz                                             #
-#                                                                          #
-# This file is part of Fiona.                                              #
-#                                                                          #
-# Fiona is free software; you can redistribute it and/or modify it         #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# Fiona is distributed in the hope that it will be useful, but WITHOUT     #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with Fiona; if not, write to the Free Software Foundation, Inc., 51      #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
-
 source defaults.sh
 source memcheck_helper.sh
 
@@ -28,6 +8,7 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
+SUBDIR=coverability
 DIR=$testdir/coverability
 FIONA=fiona
 
@@ -38,14 +19,22 @@ rm -f $DIR/*.log
 
 result=0
 
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+fi
+
 ###########################################################################
-# erzeugen der og's
+# creating the OG's 
+###########################################################################
 
 owfn="$DIR/Nc1.owfn"
 cmd="$FIONA $owfn -t og -p cover -s empty"
 
 if [ "$quiet" != "no" ]; then
-    cmd="$cmd -p no-png"
+    cmd="$cmd -Q"
 fi
 
 if [ "$memcheck" = "yes" ]; then
@@ -73,7 +62,7 @@ owfn="$DIR/Nc2.owfn"
 cmd="$FIONA $owfn -t og -p cover -s empty"
 
 if [ "$quiet" != "no" ]; then
-    cmd="$cmd -p no-png"
+    cmd="$cmd -Q"
 fi
 
 if [ "$memcheck" = "yes" ]; then
@@ -101,7 +90,7 @@ owfn="$DIR/Nc3.owfn"
 cmd="$FIONA $owfn -t og -p cover -s empty"
 
 if [ "$quiet" != "no" ]; then
-    cmd="$cmd -p no-png"
+    cmd="$cmd -Q"
 fi
 
 if [ "$memcheck" = "yes" ]; then
@@ -124,11 +113,10 @@ else
 fi
 
 ############################################################################
-
-og="$DIR/Nc1.owfn.covog"
-
+# Matching with Nc1
 ############################################################################
 
+og="$DIR/Nc1.owfn.covog"
 owfn="$DIR/M1.owfn"
 cmd="$FIONA $owfn -t match -p cover $og"
 if [ "$memcheck" = "yes" ]; then
@@ -174,11 +162,10 @@ else
 fi
 
 ############################################################################
-
-og="$DIR/Nc2.owfn.covog"
-
+# Matching with Nc2
 ############################################################################
 
+og="$DIR/Nc2.owfn.covog"
 owfn="$DIR/M1.owfn"
 cmd="$FIONA $owfn -t match -p cover $og"
 if [ "$memcheck" = "yes" ]; then

@@ -262,8 +262,11 @@ EXTRA_DIST = $(TESTS) memcheck_helper.sh \
         coverability/Nc2.owfn \
         coverability/Nc3.owfn \
         coverability/Nc1.owfn.cov \
+        coverability/Nc1.owfn.covog \
         coverability/Nc2.owfn.cov \
-        coverability/Nc3.owfn.cov
+        coverability/Nc2.owfn.covog \
+        coverability/Nc3.owfn.cov \
+        coverability/Nc3.owfn.covog
 	
 
 # Global check-loud target. Runs all tests. Output files are generated.
@@ -453,11 +456,8 @@ DISTCLEANFILES =  productog/1x2.output.og \
 	bdd_ref/myCoffee.owfn.og.BDD_MP.cudd \
 	bdd_ref/myCoffee.owfn.og.png \
         coverability/Nc1.owfn.out \
-        coverability/Nc1.owfn.covog \
         coverability/Nc2.owfn.out \
-        coverability/Nc2.owfn.covog \
-        coverability/Nc3.owfn.out \
-        coverability/Nc3.owfn.covog
+        coverability/Nc3.owfn.out
 
 
 distclean-local:

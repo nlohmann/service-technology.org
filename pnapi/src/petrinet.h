@@ -54,12 +54,13 @@ namespace pnapi
   class Marking
   {
   public:
-    Marking(PetriNet &n);
+    Marking(PetriNet &n, bool internalsOnly = false);
     Marking(const Marking &m);
     virtual ~Marking() {}
 
     map<Place *, unsigned int> getMap() const;
     PetriNet & getPetriNet() const;
+    bool internalsOnly() const;
 
     unsigned int size();
 
@@ -73,6 +74,7 @@ namespace pnapi
   private:
     map<Place *, unsigned int> m_;
     PetriNet &net_;
+    bool internalsOnly_;
   };
 
 

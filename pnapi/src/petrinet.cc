@@ -43,12 +43,15 @@ namespace pnapi
    * Reads marking from the Petri net.
    *
    * \param   PetriNet &n
+   * \param   bool internalsOnly specifies if interface places can
+   *          join the marking
    */
-  Marking::Marking(PetriNet &n) :
-    net_(n)
+  Marking::Marking(PetriNet &n, bool internalsOnly) :
+    net_(n), internalsOnly_(internalsOnly)
   {
     for (set<Place *>::const_iterator p = n.getPlaces().begin(); p != n.getPlaces().end(); p++)
-      m_[*p] = (*p)->getTokenCount();
+      if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
+        m_[*p] = (*p)->getTokenCount();
   }
 
 
@@ -58,7 +61,7 @@ namespace pnapi
    * \param   Marking &mm
    */
   Marking::Marking(const Marking &m) :
-    m_(m.m_), net_(m.net_)
+    m_(m.m_), net_(m.net_), internalsOnly_(m.internalsOnly_)
   {
   }
 
@@ -82,6 +85,15 @@ namespace pnapi
 
 
   /*!
+   * \brief   Returns the value of the attribute internalsOnly_
+   */
+  bool Marking::internalsOnly() const
+  {
+    return internalsOnly_;
+  }
+
+
+  /*!
    * \brief   Returns the size of the Marking
    */
   unsigned int Marking::size()
@@ -101,8 +113,11 @@ namespace pnapi
   {
     for (set<Node *>::const_iterator p = t.getPreset().begin();
         p != t.getPreset().end(); p++)
-      if ((net_.findArc(**p, t)->getWeight()) > m_[static_cast<Place *>(*p)])
-        return false;
+      if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
+        if ((net_.findArc(**p, t)->getWeight()) >
+            m_[static_cast<Place *> (*p)])
+          return false;
+
 
     return true;
   }
@@ -122,10 +137,12 @@ namespace pnapi
     Marking &m = *new Marking(*this);
 
     for (set<Node *>::const_iterator p = Ppre.begin(); p != Ppre.end(); p++)
-      m[static_cast<Place *>(*p)] -= net_.findArc(**p, t)->getWeight();
+      if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
+        m[static_cast<Place *>(*p)] -= net_.findArc(**p, t)->getWeight();
 
     for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); p++)
-      m[static_cast<Place *>(*p)] += net_.findArc(t, **p)->getWeight();
+      if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
+        m[static_cast<Place *>(*p)] += net_.findArc(t, **p)->getWeight();
 
     return m;
   }

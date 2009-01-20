@@ -108,4 +108,16 @@ bool State::operator ==(const State &j) const
   return m_ == j.m_;
 }
 
+
+/*!
+ * \brief   Initializes all states
+ *
+ * \note    This method should be called before building an automaton or
+ *          using states for new automata in new context.
+ */
+void State::initialize()
+{
+  maxIndex_ = 0;
+}
+
 }

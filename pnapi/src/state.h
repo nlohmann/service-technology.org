@@ -25,7 +25,7 @@ public:
   /// returns the marking represented by this state
   Marking & getMarking() const;
 
-  /// sets the dfs index by maxIndex
+  /// sets the dfs index to maxIndex
   void setIndex();
 
   /// returns the dfs index
@@ -49,6 +49,9 @@ public:
   unsigned int getHashValue(map<Place *, unsigned int> &pt);
 
   bool operator ==(const State &m) const;
+
+  /// initializes all states
+  static void initialize();
 
 private:
   /// the representing marking

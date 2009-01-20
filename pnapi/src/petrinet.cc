@@ -44,7 +44,7 @@ namespace pnapi
    *
    * \param   PetriNet &n
    * \param   bool internalsOnly specifies if interface places can
-   *          join the marking
+   *          join the marking (if they can then false and if not then false)
    */
   Marking::Marking(PetriNet &n, bool internalsOnly) :
     net_(n), internalsOnly_(internalsOnly)
@@ -720,6 +720,25 @@ namespace pnapi
 	  if ((t_pre != tt_pre) && !(util::setIntersection(t_pre, tt_pre).empty()))
 	    return false;
 	}
+    return true;
+  }
+
+
+  /*!
+   * \brief   Checks if the net is normal
+   *
+   * A PetriNet N is called normal iff each transition t has only one
+   * Place \f[p \in (P_{in} \cup P_{out}) : p \in ^*t \cup t^*\f]
+   *
+   * \return  true iff the net is normal
+   */
+  bool PetriNet::isNormal() const
+  {
+    for (set<Transition *>::const_iterator t = transitions_.begin();
+        t != transitions_.end(); t++)
+      if (!(*t)->isNormal())
+        return false;
+
     return true;
   }
 

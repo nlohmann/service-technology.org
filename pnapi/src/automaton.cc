@@ -23,13 +23,21 @@ namespace pnapi
  * This constructor takes a net n and gets the initial
  * marking from the net itself.
  *
+ * \pre     PetriNet n is normal
+ *
  * \param   PetriNet n
+ *
+ * \note    Before building an automaton one has to normalize the by
+ *          calling the public method normalize().
  */
 Automaton::Automaton(PetriNet &n) :
   hashTable_(HASHSIZE), net_(n), initialmarking_(n)
 {
+  assert(net_.isNormal());
+
   fillPrimes();
   initialize();
+  State::initialize();
 
   initialmarking_ = *new Marking(n);
 
@@ -63,13 +71,12 @@ Automaton::~Automaton()
  */
 void Automaton::initialize()
 {
-  net_.normalize();
+  // net_.normalize();
 
   set<Place *> Pin = net_.getInputPlaces();
   set<Place *> Pout = net_.getOutputPlaces();
 
   set<Transition *> done;
-  set<Place *> toBeDeleted;
 
   for (set<Place *>::const_iterator ip = Pin.begin(); ip != Pin.end(); ip++)
   {
@@ -81,7 +88,6 @@ void Automaton::initialize()
       in_.push_back((*ip)->getName());
       done.insert(t);
     }
-    toBeDeleted.insert(*ip);
   }
 
   for (set<Place *>::const_iterator op = Pout.begin(); op != Pout.end(); op++)
@@ -94,13 +100,7 @@ void Automaton::initialize()
       out_.push_back((*op)->getName());
       done.insert(t);
     }
-    toBeDeleted.insert(*op);
   }
-
-  /*// delete all interface places
-  for (set<Place *>::const_iterator p = toBeDeleted.begin();
-      p != toBeDeleted.end(); p++)
-    net_.deletePlace(**p);*/
 
   set<Transition *> notdone = util::setDifference(net_.getTransitions(), done);
   for (set<Transition *>::const_iterator t = notdone.begin(); t != notdone.end(); t++)

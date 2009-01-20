@@ -256,6 +256,8 @@ namespace pnapi
     void compose(const PetriNet &, const string & = "net1",
 		 const string & = "net2");
 
+    bool isNormal() const;
+
     /// normalizes the Petri net
     void normalize();
 

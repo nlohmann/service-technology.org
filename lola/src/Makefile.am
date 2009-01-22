@@ -25,8 +25,25 @@ lola_SOURCES = readnet-syntax.yy \
 
 lola_EXTRASOURCES = ltl.H ltl.cc
 
-EXTRA_DIST = readnet-syntax.h
+EXTRA_DIST = readnet-syntax.h configs
 
 lola_CFLAGS = @configured_CFLAGS@
 lola_CXXFLAGS = @configured_CXXFLAGS@
 lola_LDFLAGS = @configured_LDFLAGS@
+
+
+#############################################################################
+# Create a target "lola-xxx" for each "userconfig.H.xxx" file located in the
+# "configs" directory. The created binaries are cleaned with "make clean".
+#############################################################################
+
+CONFIGS = $(patsubst configs/userconfig.H.%,lola-%,$(wildcard configs/userconfig.H.*))
+
+all-configs: $(CONFIGS)
+
+$(CONFIGS): clean-am
+	cp configs/userconfig.H.$(patsubst lola-%,%,$@) userconfig.H
+	$(MAKE) $(AM_MAKEFLAGS) all-am
+	mv lola$(EXEEXT) $@$(EXEEXT)
+
+MAINTAINERCLEANFILES = $(CONFIGS)

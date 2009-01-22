@@ -23,6 +23,11 @@ Version 1.11-unreleased
 * small changes to the test scripts and the lexer to make LoLA compilable on
   FreeBSD
 
+* added a directory `src/configs' containing some example configurations for
+  LoLA; for each file `userconfig.H.xxx' exists a Makefile target `lola-xxx'
+  which compiles LoLA with that configuration - note that the file
+  `src/userconfig.H' will be overwritten
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

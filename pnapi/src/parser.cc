@@ -24,14 +24,14 @@ namespace pnapi
     namespace owfn
     {
 
-      Node::Node(Type type, Node * node) : 
+      Node::Node(Type type, Node * node) :
 	type(type), petriNet(NULL), value(0)
       {
 	if (node != NULL)
 	  addChild(*node);
       }
-	
-      Node::Node(Type type, Node * node1, Node * node2) : 
+
+      Node::Node(Type type, Node * node1, Node * node2) :
 	type(type), petriNet(NULL), value(0)
       {
 	if (node1 != NULL)
@@ -40,14 +40,14 @@ namespace pnapi
 	  addChild(*node2);
       }
 
-      Node::Node(Type type, PetriNet * net, Node * node) : 
+      Node::Node(Type type, PetriNet * net, Node * node) :
 	type(type), petriNet(net), value(0)
       {
 	if (node != NULL)
 	  addChild(*node);
       }
 
-      Node::Node(Type type, const string * str, int i) : 
+      Node::Node(Type type, const string * str, int i) :
 	type(type), petriNet(NULL), value(i), identifier(*str)
       {
       }
@@ -70,7 +70,7 @@ namespace pnapi
 	int nTokens;
 	Formula * formula = NULL;
 
-	switch (node.type) 
+	switch (node.type)
 	  {
 	  case Node::PETRINET:
 	    net_ = *node.petriNet; // copy the net, the AST might destroy it
@@ -87,18 +87,18 @@ namespace pnapi
 	    switch (node.type)
 	      {
 	      case Node::FORMULA_EQ:
-		formula = new FormulaEqual(place, nTokens); break;
+		formula = new FormulaEqual(*place, nTokens); break;
 	      case Node::FORMULA_NE:
-		formula = new FormulaNot(new FormulaEqual(place, nTokens)); 
+		formula = new FormulaNot(*new FormulaEqual(*place, nTokens));
 		break;
 	      case Node::FORMULA_LT:
-		formula = new FormulaLess(place, nTokens); break;
+		formula = new FormulaLess(*place, nTokens); break;
 	      case Node::FORMULA_GT:
-		formula = new FormulaGreater(place, nTokens); break;
+		formula = new FormulaGreater(*place, nTokens); break;
 	      case Node::FORMULA_GE:
-		formula = new FormulaGreaterEqual(place, nTokens); break;
+		formula = new FormulaGreaterEqual(*place, nTokens); break;
 	      case Node::FORMULA_LE:
-		formula = new FormulaLessEqual(place, nTokens); break;
+		formula = new FormulaLessEqual(*place, nTokens); break;
 	      default: /* empty */ ;
 	      }
 	    formulas_.push_back(formula);
@@ -115,7 +115,7 @@ namespace pnapi
 	  case Node::FORMULA_NOT:
 	    if (formulas_.size() < 1)
 	      throw string("operand for unary NOT operator expected");
-	    formulas_.push_back(new FormulaNot(formulas_.front()));
+	    formulas_.push_back(new FormulaNot(*formulas_.front()));
 	    formulas_.pop_front();
 	    break;
 	  case Node::FORMULA_AND:
@@ -127,9 +127,9 @@ namespace pnapi
 	      Formula * op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;
 	      if (node.type == Node::FORMULA_AND)
-		f = new FormulaAnd(op1, op2);
+		f = new FormulaAnd(*op1, *op2);
 	      else
-		f = new FormulaOr(op1, op2);
+		f = new FormulaOr(*op1, *op2);
 	      formulas_.push_back(f);
 	      break;
 	    }
@@ -154,13 +154,13 @@ namespace pnapi
       }
 
     }
-    
+
 
     namespace petrify
     {
-    
+
       Node::Node(Type type) : type(type) {}
-    
+
       Node::Node(Type type, Node *child1, Node *child2, Node *child3, Node *child4) :
         type(type)
       {
@@ -168,10 +168,10 @@ namespace pnapi
         {
           addChild(*child1);
         }
-        
+
         Node *n1 = new Node(CTRL1);
         addChild(*n1);
-        
+
         if(child2!=NULL)
         {
           addChild(*child2);
@@ -180,16 +180,16 @@ namespace pnapi
         {
           addChild(*child3);
         }
-        
+
         Node *n2 = new Node(CTRL2);
         addChild(*n2);
-        
+
         if(child4!=NULL)
         {
           addChild(*child4);
         }
       }
-      
+
       Node::Node(Type type, string data, Node *child) :
         type(type), data(data)
       {
@@ -198,7 +198,7 @@ namespace pnapi
           addChild(*child);
         }
       }
-      
+
       Node::Node(Type type, string data, Node *child1, Node *child2) :
         type(type), data(data)
       {
@@ -217,18 +217,18 @@ namespace pnapi
         in_marking_list=false;
         in_arc_list=false;
       }
-      
-      Parser::Parser() : 
+
+      Parser::Parser() :
         parser::Parser<Node>(::pnapi_petrify_istream, ::pnapi_petrify_ast, &::pnapi_petrify_parse)
       {
       }
-      
+
       void Visitor::beforeChildren(const Node & node)
       {
         // erzeuge result_ aus Knoten hier ...
         switch(node.type)
         {
-        case Node::TLIST: 
+        case Node::TLIST:
           {
             if(in_arc_list)
             {
@@ -240,7 +240,7 @@ namespace pnapi
             }
             break;
           }
-        case Node::PLIST: 
+        case Node::PLIST:
           {
             result_->places.insert(node.data);
             if (in_marking_list)
@@ -250,24 +250,24 @@ namespace pnapi
             break;
           }
         case Node::PT:
-        case Node::TP: 
+        case Node::TP:
           {
             tempNodeStack.push(tempNodeSet);
             tempNodeSet.clear();
             break;
           }
-        case Node::CTRL1: 
+        case Node::CTRL1:
           {
-            in_arc_list = true; 
+            in_arc_list = true;
             break;
           }
-        case Node::CTRL2: 
+        case Node::CTRL2:
           {
-            in_marking_list = true; 
+            in_marking_list = true;
             break;
           }
         default: break;
-        
+
         }
       }
 
@@ -290,7 +290,7 @@ namespace pnapi
         default: break;
         }
       }
-      
+
     }
 
   }

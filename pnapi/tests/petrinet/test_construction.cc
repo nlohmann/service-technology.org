@@ -8,7 +8,7 @@ int main(int argc, char * argv[])
     PetriNet net;
     end_test();
 
-    
+
     // create*()
     begin_test("PetriNet::create*() [component construction]");
     Place & p1 = net.createPlace();
@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
     assert(t3.getType() == Transition::INOUT);
     end_test();
 
-    
+
     // get[Component]*()
     begin_test("PetriNet::get*() [component querying]");
     assert(net.getNodes().size() == 7);
@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
     end_test();
     */
 
-    
+
     // destructor
     begin_test("PetriNet::~PetriNet() [destructor]");
   }

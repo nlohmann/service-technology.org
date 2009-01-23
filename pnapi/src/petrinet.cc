@@ -243,7 +243,7 @@ namespace pnapi
   /*!
    */
   PetriNet::PetriNet() :
-    format_(FORMAT_OWFN), observer_(*this)
+    format_(FORMAT_OWFN), observer_(*this), finalCondition_()
   {
   }
 
@@ -252,7 +252,7 @@ namespace pnapi
    * The copy constructor with deep copy.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    format_(net.format_), observer_(*this)
+    format_(net.format_), observer_(*this), finalCondition_()
   {
     *this += net;
   }
@@ -1004,7 +1004,7 @@ namespace pnapi
  */
 bool PetriNet::checkFinalCondition(Marking &m) const
 {
-  return finalCondition_->evaluate(m);
+  return finalCondition_.checkFinalMarking(m);
 }
 
 
@@ -1105,9 +1105,9 @@ Transition *PetriNet::findLivingTransition(Marking &m) const
 /*!
  * \brief   Sets the final condition
  */
-void PetriNet::setFinalCondition(Formula *fc)
+void PetriNet::setFinalCondition(Condition &fc)
 {
-  finalCondition_ = fc;
+  ///finalCondition_ = fc;
 }
 
 

@@ -30,6 +30,7 @@
 #include <stack>
 
 #include "component.h"
+#include "condition.h"
 #include "formula.h"
 
 using std::string;
@@ -245,7 +246,7 @@ namespace pnapi
     //@{
 
     /// TODO: decide how to work with final conditions
-    void setFinalCondition(formula::Formula *fc);
+    void setFinalCondition(Condition &fc);
 
     /// TODO: move to Condition/Formula classes
     /// checks the finalcondition for Marking m
@@ -274,7 +275,7 @@ namespace pnapi
     ComponentObserver observer_;
 
     /// final condition
-    formula::Formula *finalCondition_;
+    Condition &finalCondition_;
 
 
     /* (overlapping) sets for net structure */

@@ -24,6 +24,7 @@ namespace pnapi
 
   private:
     Formula &f_;
+    //PetriNet &net_;
   };
 
 } /* end of namespace pnapi */

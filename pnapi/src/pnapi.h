@@ -17,6 +17,8 @@
 
 #include "petrinet.h"
 
+using pnapi::io::operator<<;
+
 
 /*!
  * \mainpage

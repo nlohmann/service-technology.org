@@ -49,7 +49,7 @@ namespace pnapi
     /// converts int to string
     string toString(int);
 
-
+    
     /*!
      * \brief returns the union of two sets
      *

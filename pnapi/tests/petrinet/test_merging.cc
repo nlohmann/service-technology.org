@@ -4,8 +4,7 @@ int main(int argc, char * argv[])
 {
   // merge places
   begin_test("Place::merge() [place merging]");
-  PetriNet net;
-  createExamplePetriNet(net);
+  PetriNet net = createExamplePetriNet();
   string s1 = "ready to produce", s2 = "ready to deliver";
   Place * p1 = net.findPlace(s1);
   Place * p2 = net.findPlace(s2);

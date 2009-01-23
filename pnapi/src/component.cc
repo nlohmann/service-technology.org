@@ -88,8 +88,6 @@ namespace pnapi {
    * and PetriNet::reduce_rule_3t().
    *
    * \param n2 is the other node to which parallelism will be checked.
-   *
-   * \todo  Test me!
    */
   bool Node::isParallel(const Node& n2)
   {
@@ -170,6 +168,35 @@ namespace pnapi {
   const set<Node *> & Node::getPostset() const
   {
     return postset_;
+  }
+
+
+  /*!
+   */
+  set<Arc *> Node::getPresetArcs() const
+  {
+    set<Arc *> arcs;
+    for (set<Node *>::iterator it = preset_.begin(); it != preset_.end(); ++it)
+      {
+	assert(net_.findArc(**it, *this) != NULL);
+	arcs.insert(net_.findArc(**it, *this));
+      }
+    return arcs;
+  }
+
+
+  /*!
+   */
+  set<Arc *> Node::getPostsetArcs() const
+  {
+    set<Arc *> arcs;
+    for (set<Node *>::iterator it = postset_.begin(); it != postset_.end(); 
+	 ++it)
+      {
+	assert(net_.findArc(*this, **it) != NULL);
+	arcs.insert(net_.findArc(*this, **it));
+      }
+    return arcs;
   }
 
 

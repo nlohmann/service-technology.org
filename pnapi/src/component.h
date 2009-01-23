@@ -96,8 +96,14 @@ namespace pnapi
     /// returns the node's preset
     const set<Node *> & getPreset() const;
 
+    /// returns the arcs to the node's preset
+    set<Arc *> getPresetArcs() const;
+
     /// returns the node's postset
     const set<Node *> & getPostset() const;
+
+    /// returns the arcs to the node's postset
+    set<Arc *> getPostsetArcs() const;
 
     // DOT output of the node
     virtual string toString() const =0;

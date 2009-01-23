@@ -214,36 +214,9 @@ namespace pnapi
    ***************************************************************************/
 
   /*!
-   * Reads a Petri net from a stream (in most cases backed by a file). The
-   * format
-   * of the stream data is not determined automatically. You have to set it
-   * explicitly using PetriNet::setFormat().
-   */
-  istream & operator>>(istream & is, PetriNet & net)
-  {
-    switch (net.format_)
-      {
-      case PetriNet::FORMAT_OWFN:
-	{
-	  parser::owfn::Parser parser;
-	  parser::owfn::Visitor visitor;
-	  parser.parse(is).visit(visitor);
-	  net = visitor.getPetriNet();
-	  break;
-	}
-
-      default:
-	assert(false);  // unsupported input format
-      }
-
-    return is;
-  }
-
-
-  /*!
    */
   PetriNet::PetriNet() :
-    format_(FORMAT_OWFN), observer_(*this), finalCondition_()
+    observer_(*this)
   {
   }
 
@@ -252,7 +225,7 @@ namespace pnapi
    * The copy constructor with deep copy.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    format_(net.format_), observer_(*this), finalCondition_()
+    observer_(*this)
   {
     *this += net;
   }
@@ -396,10 +369,12 @@ namespace pnapi
    * \param   type  communication type of the place (internal or interface)
    * \return  the newly created place
    */
-  Place & PetriNet::createPlace(const string & name, Node::Type type)
+  Place & PetriNet::createPlace(const string & name, Node::Type type, 
+				unsigned int tokens, unsigned int capacity)
   {
     return *new Place(*this, observer_,
-		      name.empty() ? getUniqueNodeName("p") : name, type);
+		      name.empty() ? getUniqueNodeName("p") : name, type, 
+		      tokens, capacity);
   }
 
 
@@ -1002,9 +977,9 @@ namespace pnapi
  *
  * \return  TRUE iff m fulfills the final condition
  */
-bool PetriNet::checkFinalCondition(Marking &m) const
+bool PetriNet::checkFinalCondition(Marking &m)
 {
-  return finalCondition_.checkFinalMarking(m);
+  return condition_.checkFinalMarking(m);
 }
 
 

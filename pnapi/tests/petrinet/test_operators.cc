@@ -3,8 +3,7 @@
 int main(int argc, char * argv[])
 {
   {
-    PetriNet net;
-    createExamplePetriNet(net);
+    PetriNet net = createExamplePetriNet();
     int nNodes = net.getNodes().size();
 
     begin_test("PetriNet::PetriNet() [copy constructor]");
@@ -13,8 +12,7 @@ int main(int argc, char * argv[])
     end_test();
    
     begin_test("PetriNet::operator=() [assignment operator]");
-    PetriNet assign;
-    createExamplePetriNet(assign);
+    PetriNet assign = createExamplePetriNet();
     assign = net;
     assert(assign.getNodes().size() == nNodes);
     end_test();

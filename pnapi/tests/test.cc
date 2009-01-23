@@ -2,6 +2,10 @@
 
 #include "test.h"
 
+using pnapi::PetriNet;
+using pnapi::Place;
+using pnapi::Node;
+
 
 void begin_test(const std::string & msg)
 {
@@ -13,7 +17,7 @@ void end_test()
   std::cout << "Ok" << std::endl;
 }
 
-void createExamplePetriNet(PetriNet & net)
+void doCreateExamplePetriNet(PetriNet & net)
 {
 	PetriNet *n = &net;
 	Place *p= NULL;
@@ -60,4 +64,11 @@ void createExamplePetriNet(PetriNet & net)
 	n->createArc(*p, *n->findTransition("produce"));
 	p = &n->createPlace("children happy", Node::OUTPUT);
 	n->createArc(*n->findTransition("consume"), *p);
+}
+
+PetriNet createExamplePetriNet()
+{
+  PetriNet net;
+  doCreateExamplePetriNet(net);
+  return net;
 }

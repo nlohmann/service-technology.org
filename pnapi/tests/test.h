@@ -9,12 +9,15 @@
 using std::cout;
 using std::endl;
 
-using namespace pnapi;
+using pnapi::PetriNet;
+using pnapi::Place;
+using pnapi::Transition;
+using pnapi::Arc;
+using pnapi::Node;
+
 
 void begin_test(const std::string &);
 
 void end_test();
 
-void createExamplePetriNet(PetriNet &);
-
-
+PetriNet createExamplePetriNet();

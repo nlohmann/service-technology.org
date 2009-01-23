@@ -15,7 +15,8 @@ libpnapi_a_SOURCES = \
 	petrinet-petrify.cc \
 	automaton.h automaton.cc \
 	state.h state.cc \
-	marking.h marking.cc
+	marking.h marking.cc \
+	io.h io.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-petrify.cc
 

@@ -1,4 +1,4 @@
-/* -*- mode: c++ -*- */
+// -*- C++ -*-
 
 /*!
  * \file    petrinet.h
@@ -22,25 +22,26 @@
 #define PNAPI_PETRINET_H
 
 #include <string>
-#include <ostream>
-#include <istream>
 #include <vector>
 #include <set>
 #include <map>
 #include <stack>
+#include <istream>
+#include <ostream>
 
 #include "component.h"
 #include "condition.h"
 #include "formula.h"
+#include "io.h"
 
 using std::string;
 using std::vector;
 using std::set;
 using std::map;
 using std::multimap;
-using std::ostream;
-using std::istream;
 using std::stack;
+using std::istream;
+using std::ostream;
 
 namespace pnapi
 {
@@ -101,6 +102,10 @@ namespace pnapi
     /// needs to update internal structures
     friend class ComponentObserver;
 
+    /// Petri net output, see pnapi::io
+    friend ostream & io::operator<<(ostream &, const PetriNet &);
+
+
   public:
 
     /// standard constructor
@@ -115,40 +120,6 @@ namespace pnapi
     /// copy assignment operator
     PetriNet & operator=(const PetriNet &);
 
-
-    /*!
-     * \name   Input/Output Operations
-     *
-     * Reading and writing Petri nets from and to files.
-     */
-    //@{
-
-    /// possible file formats for I/O operations
-    enum IOFormat
-      {
-	FORMAT_OWFN,      ///< Open Workflow Net, format used e.g. by Fiona
-	FORMAT_ONWD,      ///< Open Net Wiring Description
-	FORMAT_APNN,      ///< Abstract Petri Net Notation (APNN)
-	FORMAT_DOT,       ///< Graphviz dot
-	FORMAT_INA,       ///< INA
-	FORMAT_SPIN,      ///< INA
-	FORMAT_INFO,      ///< Info File
-	FORMAT_LOLA,      ///< LoLA
-	FORMAT_PEP,       ///< Low-Level PEP Notation
-	FORMAT_PNML,      ///< Petri Net Markup Language (PNML)
-	FORMAT_GASTEX     ///< GasTeX format
-      };
-
-    /// sets the format for I/O operations
-    void setIOFormat(IOFormat);
-
-    /// outputs a Petri net
-    friend ostream & operator<<(ostream &, const PetriNet &);
-
-    /// reads a Petri net
-    friend istream & operator>>(istream &, PetriNet &);
-
-    //@}
 
 
     /*!
@@ -196,7 +167,8 @@ namespace pnapi
     Arc & createArc(Node &, Node &, int = 1);
 
     /// creates a Place
-    Place & createPlace(const string & = "", Node::Type = Node::INTERNAL);
+    Place & createPlace(const string & = "", Node::Type = Node::INTERNAL, 
+			unsigned int = 0, unsigned int = 0);
 
     /// creates a Transition
     Transition & createTransition(const string & = "");
@@ -250,7 +222,7 @@ namespace pnapi
 
     /// TODO: move to Condition/Formula classes
     /// checks the finalcondition for Marking m
-    bool checkFinalCondition(Marking &m) const;
+    bool checkFinalCondition(Marking &m);
 
     /// TODO: can this be templated and moved to pnapi::util (util.{h,cc})?
     /// DFS with Tarjan's algorithm
@@ -268,14 +240,11 @@ namespace pnapi
 
     /* general properties */
 
-    /// format for input/output operations
-    IOFormat format_;
-
     /// observer for nodes and arcs
     ComponentObserver observer_;
 
     /// final condition
-    Condition &finalCondition_;
+    Condition condition_;
 
 
     /* (overlapping) sets for net structure */
@@ -353,34 +322,34 @@ namespace pnapi
     /* output */
 
     /// APNN (Abstract Petri Net Notation) output
-    void output_apnn(ostream *output) const;
+    void output_apnn(ostream &) const;
 
     /// DOT (Graphviz) output
-    void output_dot(ostream *output, bool draw_interface = true) const;
+    void output_dot(ostream &) const;
 
     /// INA output
-    void output_ina(ostream *output) const;
+    void output_ina(ostream &) const;
 
     /// SPIN output
-    void output_spin(ostream *output) const;
+    void output_spin(ostream &) const;
 
     /// info file output
-    void output_info(ostream *output) const;
+    void output_info(ostream &) const;
 
     /// LoLA-output
-    void output_lola(ostream *output) const;
+    void output_lola(ostream &) const;
 
     /// oWFN-output
-    void output_owfn(ostream *output) const;
+    void output_owfn(ostream &) const;
 
     /// low-level PEP output
-    void output_pep(ostream *output) const;
+    void output_pep(ostream &) const;
 
     /// PNML (Petri Net Markup Language) output
-    void output_pnml(ostream *output) const;
+    void output_pnml(ostream &) const;
 
     /// GasTeX output
-    void output_gastex(ostream *output) const;
+    void output_gastex(ostream &) const;
 
 
     /* reduction */
@@ -419,12 +388,6 @@ namespace pnapi
     void reduce_remove_initially_marked_places_in_choreographies();
 
   };
-
-
-  // repeated declaration to avoid compilation errors using gcc 4.3
-  // see <https://gna.org/bugs/?12113> for more information
-  ostream & operator<<(ostream &, const PetriNet &);
-  istream & operator>>(istream &, PetriNet &);
 
 }
 

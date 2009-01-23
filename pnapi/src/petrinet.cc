@@ -152,22 +152,24 @@ namespace pnapi
   void ComponentObserver::initializeNodeNameHistory(Node & node)
   {
     deque<string> history = node.getNameHistory();
-    for (deque<string>::iterator it = history.begin(); it != history.end();
-	 ++it)
-      {
-	assert((net_.nodesByName_.find(*it))->second == &node ||
-	       net_.nodesByName_.find(*it) == net_.nodesByName_.end());
-	net_.nodesByName_[*it] = &node;
-      }
+    deque<string>::iterator it = history.begin();
+    //for (deque<string>::iterator it = history.begin(); it != history.end();
+    //     ++it)
+    {
+      assert((net_.nodesByName_.find(*it))->second == &node ||
+	     net_.nodesByName_.find(*it) == net_.nodesByName_.end());
+      net_.nodesByName_[*it] = &node;
+    }
   }
 
 
   void ComponentObserver::finalizeNodeNameHistory(Node & node,
 						  const deque<string> & history)
   {
-    for (deque<string>::const_iterator it = history.begin();
-	 it != history.end(); ++it)
-      net_.nodesByName_.erase(*it);
+    deque<string>::const_iterator it = history.begin();
+    //for (deque<string>::const_iterator it = history.begin();
+    //     it != history.end(); ++it)
+    net_.nodesByName_.erase(*it);
   }
 
 
@@ -207,6 +209,7 @@ namespace pnapi
       default: break;
       }
   }
+
 
 
   /****************************************************************************

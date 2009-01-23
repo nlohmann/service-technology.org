@@ -197,11 +197,11 @@ else
             then
                 result=1
             else
-                echo $OUTPUT | grep "are equivalent: NO" > /dev/null
+                echo $OUTPUT | grep "are equivalent: YES" > /dev/null
                 resultSIM=$?
                 if [ $resultSIM -ne 0 ]; then
                     let "result += 1"
-                    echo ... equivalence check succeeded unexpectedly; this might be due to a repaired public view generation.
+                    echo ... equivalence check of the OGs of the service and its public view failed.
                 fi
             fi
         fi

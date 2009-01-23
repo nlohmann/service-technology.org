@@ -457,7 +457,10 @@ DISTCLEANFILES =  productog/1x2.output.og \
 	bdd_ref/myCoffee.owfn.og.png \
         coverability/Nc1.owfn.out \
         coverability/Nc2.owfn.out \
-        coverability/Nc3.owfn.out
+        coverability/Nc3.owfn.out \
+	coverability/Nc1.owfn.covog.out \
+	coverability/Nc2.owfn.covog.out \
+	coverability/Nc3.owfn.covog.out
 
 
 distclean-local:

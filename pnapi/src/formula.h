@@ -34,6 +34,8 @@ class Marking;
 
     virtual Formula * flatCopy() const = 0;
     //virtual Formula * deepCopy(const map<Place *, Place *> &newP) const = 0;
+    
+    virtual ~Formula() {}
   };
 
 

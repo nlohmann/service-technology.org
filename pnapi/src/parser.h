@@ -131,6 +131,8 @@ namespace pnapi
        * Implementing only this method would result in a postorder traversal.
        */
       virtual void afterChildren(const T &) =0;
+      
+      virtual ~Visitor() {};
     };
 
 

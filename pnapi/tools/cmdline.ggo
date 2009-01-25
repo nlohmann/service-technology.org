@@ -1,0 +1,91 @@
+args "--unamed-opts --show-required --include-getopt"
+
+package "petri"
+version "1.0"
+purpose "A command-line frontend for the Petri Net API"
+
+
+section "Input"
+
+option
+  "input"
+  i
+  "Select the input file format"
+  typestr="FORMAT"
+  values="owfn","sa" enum
+  optional
+  default="owfn"
+
+
+section "Output"
+
+option
+  "owfn"
+  -
+  "Create open net output"
+  typestr="FILENAME"
+  string optional
+  argoptional
+
+option
+  "dot"
+  -
+  "Create Graphviz dot output"
+  typestr="FILENAME"
+  string optional
+  argoptional
+
+option
+  "lola"
+  -
+  "Create LoLA output"
+  typestr="FILENAME"
+  string optional
+  argoptional
+
+option
+  "pnml"
+  -
+  "Create PNML output"
+  typestr="FILENAME"
+  string optional
+  argoptional
+
+option
+  "sa"
+  -
+  "Create service automaton output"
+  typestr="FILENAME"
+  string optional
+  argoptional
+
+
+
+section "Check for structural properties"
+
+option
+  "check"
+  c
+  "Check a structural property of the Petri net"
+  typestr="PROPERTY"
+  values="normal","freechoice","workflow" enum
+  optional
+
+option
+  "isFreeChoice"
+  -
+  "Check if Petri net is free choice"
+  optional
+
+option
+  "isNormal"
+  -
+  "Check if Petri net is normal"
+  optional
+
+option
+  "isWorkflow"
+  -
+  "Check if Petri net has workflow net structure"
+  optional
+

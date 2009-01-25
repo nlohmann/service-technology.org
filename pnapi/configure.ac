@@ -19,18 +19,20 @@ configured_CFLAGS=""
 configured_CXXFLAGS=""
 configured_LDFLAGS=""
 
+# check for additional programs
+AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
 
 #############################################################################
 # search for Flex and Bison
 #############################################################################
 AC_PROG_LEX
 if test "$LEX" != "flex"; then
-  AC_MSG_WARN([Flex was not found. You will not be able to compile Fiona from scratch. See file README.])
+  AC_MSG_WARN([Flex was not found. You will not be able to compile from scratch. See file README.])
 fi
 
 AC_PROG_YACC
 if test "$YACC" = "yacc"; then
-  AC_MSG_WARN([Bison was not found. You will not be able to compile Fiona from scratch. See file README.])
+  AC_MSG_WARN([Bison was not found. You will not be able to compile from scratch. See file README.])
 fi
 
 
@@ -39,11 +41,12 @@ fi
 #############################################################################
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
- AC_MSG_WARN([Graphviz dot was not found.])
- AC_DEFINE(HAVE_DOT, 0, [Dot can not be used on this system.])
+  AC_MSG_WARN([Graphviz Dot was not found. See file README.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])
 else
- AC_DEFINE(HAVE_DOT, 1, [Dot can be used on this system.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Graphviz Dot can be used.])
 fi
+AC_SUBST(DOT)
 
 AC_CHECK_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
@@ -111,9 +114,9 @@ if test "$enable_universal" = "yes"; then
     AC_MSG_ERROR([Please re-run configure with these options:
   `--disable-dependency-tracking --enable-universal'])
   fi
-  configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
-  configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
-  configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"
+  configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+  configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+  configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"
 fi
 
 # parameter "--enable-win32"
@@ -142,5 +145,6 @@ AC_CONFIG_FILES([Makefile
                  Doxyfile
                  src/Makefile
                  tests/Makefile
-		 tests/petrinet/Makefile])
+		 tests/petrinet/Makefile
+		 tools/Makefile])
 AC_OUTPUT

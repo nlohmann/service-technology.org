@@ -24,9 +24,14 @@ Version 1.11-unreleased
   FreeBSD
 
 * added a directory `src/configs' containing some example configurations for
-  LoLA; for each file `userconfig.H.xxx' exists a Makefile target `lola-xxx'
-  which compiles LoLA with that configuration - note that the file
-  `src/userconfig.H' will be overwritten
+  LoLA; for each file `userconfig.H.xxx' in directory `src/configs' exists a
+  Makefile target `lola-xxx' which compiles LoLA with that configuration
+
+* added Makefile target `all-configs' to compile all configurations in
+  directory `src/configs'
+
+* added maintainer scripts to create source and binary releases; the latter
+  contain binaries of all configurations in directory `src/configs'
 
 Version 1.10
 ============

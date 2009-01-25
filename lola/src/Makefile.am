@@ -39,11 +39,11 @@ lola_LDFLAGS = @configured_LDFLAGS@
 
 CONFIGS = $(patsubst configs/userconfig.H.%,lola-%,$(wildcard configs/userconfig.H.*))
 
-all-configs: $(CONFIGS)
-
 $(CONFIGS): clean-am
+	mv userconfig.H userconfig.H~
 	cp configs/userconfig.H.$(patsubst lola-%,%,$@) userconfig.H
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 	mv lola$(EXEEXT) $@$(EXEEXT)
+	mv userconfig.H~ userconfig.H
 
 MAINTAINERCLEANFILES = $(CONFIGS)

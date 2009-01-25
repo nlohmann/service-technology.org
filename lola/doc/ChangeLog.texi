@@ -12,7 +12,11 @@
 
 @item small changes to the test scripts and the lexer to make LoLA compilable on FreeBSD
 
-@item added a directory @file{src/configs} containing some example configurations for LoLA; for each file @file{userconfig.H.xxx} exists a Makefile target @samp{lola-xxx} which compiles LoLA with that configuration -- note that the file @file{src/userconfig.H} will be overwritten
+@item added a directory @file{src/configs} containing some example configurations for LoLA; for each file @file{userconfig.H.xxx} in directory @file{src/configs} exists a Makefile target @samp{lola-xxx} which compiles LoLA with that configuration
+
+@item added Makefile target @samp{all-configs} to compile all configurations in directory @file{src/configs}
+
+@item added maintainer scripts to create source and binary releases; the latter contain binaries of all configurations in directory @file{src/configs}
 @end itemize
 
 

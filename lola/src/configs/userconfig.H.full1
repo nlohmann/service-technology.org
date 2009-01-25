@@ -49,7 +49,7 @@
 // finally applied in the exectuable program.
 
 //#define COVER
-#define STUBBORN
+//#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
 #define PREDUCTION
@@ -124,8 +124,8 @@
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-//#define FULL
-#define DEADLOCK
+#define FULL
+//#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
 //#define LIVEPROP

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 errorcode[2]="Bad Call"
 errorcode[4]="File Error"

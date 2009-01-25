@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #---------------------------------------------------------------#
 # Script for re-compiling and benchmarking Fiona as well as     #

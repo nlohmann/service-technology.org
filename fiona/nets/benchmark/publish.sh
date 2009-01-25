@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #---------------------------------------------------------------#
 # Script for publishing benchmarking results for Fiona.         #

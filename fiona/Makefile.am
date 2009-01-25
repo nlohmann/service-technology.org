@@ -1,4 +1,4 @@
-SUBDIRS = libs src tests man doc
+SUBDIRS = libs src tests man doc maintainer
 
 
 #############################################################################
@@ -21,7 +21,8 @@ svn-clean: maintainer-clean
 	-rm -f man/Makefile.in
 	-rm -f -r src/.deps
 	-rm -f src/config.h.in src/config.h.in~
-	-rm -f tests/Makefile.in
+	-rm -f tests/Makefile.in tests/regression/Makefile.in tests/regression/Makefile
+	-rm -f maintainer/Makefile.in
 	@echo -----------------------------------------------------
 	@echo "To recreate installation status enter"
 	@echo "  aclocal ; autoconf; autoheader; automake -a -c"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 valgrind_opts="--leak-check=full --show-reachable=yes --freelist-vol=50000000"
 

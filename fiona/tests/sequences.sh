@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source defaults.sh
 source memcheck_helper.sh

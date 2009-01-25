@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #---------------------------------------------------------------#
 # Helper-Script for re-compiling Fiona                          #

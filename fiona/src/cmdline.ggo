@@ -1,6 +1,8 @@
 package "fiona"
 version "2.0"
 
+args "-u --show-required"
+
 purpose "Fiona is a tool to automatically analyze the interactional behavior of a given open net (oWFN)."
 
 description "About Fiona"
@@ -9,27 +11,10 @@ description "About Fiona"
 section "Scenarios"
 
 option "type" t
-  "Select the modus operandi of fiona (only one type is allowed).\
-IG          - compute interaction graph
-OG          - compute operating guideline"
-  details="\
-IG          - compute interaction graph
-OG          - compute operating guideline
-match       - check whether a given oWFN matches with a given OG
-PV          - calculate the public view of a given OG (the result is an automaton in OG file format)
-adapter     - calculate an adapter for a given set of services
-productog   - calculate the product OG of all given OGs
-simulation  - check whether the first OG characterizes more strategies than the second one (if an oWFN is given, its OG is computed automatically)
-equivalence - check whether two OGs characterize the same strategies (if an oWFN is given, its OG is computed automatically) (option -b1 can be used to check the equivalence of (already present!) BDDs)
-filter      - reduces the first OG such that it simulates the second OG (if possible)
-isacyclic   - check a given OG for cycles
-count       - count the number of strategies that are characterized by a given OG
-png         - generate png files for all given oWFNs
-readOG      - only reads a given OG File
-"
-  string values="IG", "OG", "match", "PV", "adapter", "simulation", "equivalence", "filter", "isacyclic", "count", "png", "readOG" enum
+  "Select the modus operandi of fiona (only one type is allowed)."
+  string values="IG", "OG", "match", "productog", "minimizeOG", "reduce", "normalize", "pv", "simulation", "equivalence", "mostpermissivepartner", "smallpartner", "adapter", "png", "checkfalsenodes", "removefalsenodes", "isacyclic", "count", "readOG" enum
   typestr="TYPE"
-  required
+  optional
   default="IG"
 
 option "messagebound" m
@@ -44,7 +29,7 @@ option "messagebound" m
 section "Reduction"
 
 option "reduceIG" r
-  "Use reduction rules for IG."
+  "Use reduction rules for IG. If no reduction rules are given (see -p), all rules are used."
   flag off
 
 option "reduce-nodes" R
@@ -57,13 +42,6 @@ section "Debug and verbosity"
 
 option "debug" d
   "Set the debug level."
-  details="\
-1 - show nodes and dfs information
-2 - show analyse information (i.e. colors)
-3 - show information on events and states
-4 - yet to be defined ;)
-5 - show detailed information on everything
-"
   int values="1", "2", "3", "4", "5" enum
   typestr="LEVEL"
   optional
@@ -71,14 +49,6 @@ option "debug" d
 
 option "show" s
   "Different display options."
-  details="\
-blue      - show blue nodes only (empty node not shown)
-empty     - show empty node
-rednodes  - show blue and red nodes (only empty node not shown)
-allnodes  - how all nodes
-allstates - show all calculated states per node
-deadlocks - show all but transient states
-"
   string values="blue", "empty", "rednodes", "allnodes", "allstates", "deadlocks" enum
   default="blue"
   typestr="PARAMETER"
@@ -90,30 +60,6 @@ section "BDD-related options"
 
 option "BDD" b
   "Enable BDD construction (only relevant for OG)."
-  details="\
- 0 - CUDD_REORDER_SAME
- 1 - CUDD_REORDER_NONE
- 2 - CUDD_REORDER_RANDOM
- 3 - CUDD_REORDER_RANDOM_PIVOT
- 4 - CUDD_REORDER_SIFT
- 5 - CUDD_REORDER_SIFT_CONVERGE
- 6 - CUDD_REORDER_SYMM_SIFT
- 7 - CUDD_REORDER_SYMM_SIFT_CONV
- 8 - CUDD_REORDER_WINDOW2
- 9 - CUDD_REORDER_WINDOW3
-10 - CUDD_REORDER_WINDOW4
-11 - CUDD_REORDER_WINDOW2_CONV
-12 - CUDD_REORDER_WINDOW3_CONV
-13 - CUDD_REORDER_WINDOW4_CONV
-14 - CUDD_REORDER_GROUP_SIFT
-15 - CUDD_REORDER_GROUP_SIFT_CONV
-16 - CUDD_REORDER_ANNEALING
-17 - CUDD_REORDER_GENETIC
-18 - CUDD_REORDER_LINEAR
-19 - CUDD_REORDER_LINEAR_CONVERGE
-20 - CUDD_REORDER_LAZY_SIFT
-21 - CUDD_REORDER_EXACT
-"
   int values="0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21" enum
   typestr="REORDERING"
   optional
@@ -133,14 +79,23 @@ option "multipledeadlocks" M
 
 option "parameter" p
   "Additional parameter."
-  details="no-png    - does not create a PNG file
-diagnosis - disables optimizations
-"
-  string values="no-png", "diagnosis" enum
+  string values="no-png", "no-dot", "responsive", "r1", "r2", "r3", "r4", "r5", "cre", "rbs", "cover" enum
   typestr="PARAM"
   optional
   multiple
 
+option "readevents" E
+  "Set the maximum occurrences of events to values taken from the oWFN file. If none are given, eventsmaximum is used."
+  flag off
+  hidden
+
+option "eventsmaximum" e
+  "Set event to occur at most LEVEL times. '-1' means disabling -e option, but is only possible if -m option is set. (only relevant for OG)"
+  int
+  typestr="LEVEL"
+  default="1"
+  optional
+  hidden
 
 
 section "File input/output"
@@ -151,12 +106,15 @@ option "output" o
   typestr="FILENAME"
   optional
 
-
 option "adapterrules" a
   "Read adapter rules from filename."
   string
   typestr="FILENAME"
   optional
+  
+option "no-output" Q
+  "Runs quietly, i.e., produces no output files."
+  flag off
+  
 
-
-text "\n\nFor more information see:\n  http://www.informatik.hu-berlin.de/top/tools4bpel/fiona"
+text "\n\nFor more information see:\n  http://www.service-technology.org/fiona"

@@ -18,6 +18,20 @@
 @item constructing operating guideline with a global constraint (for a given owfn-file and a cov-file)
 @item matching of an open net with an operating guideline with global constraint
 @end itemize
+
+@item added regression tests to @file{tests/regression} which can be triggered with @code{make check} in that directory
+
+@item made adaptions to the Makefile options to be able to create Mac Universal binaries for 64 bit architectures (XCode 3.0 with SDK @samp{MacOSX10.5.sdk} is needed)
+
+@item added Makefiles in directory @file{maintainer} to organize the distribution of the source tarball and binaries for several platforms
+
+@item added a script @file{maintainer/get_petrify.sh} to retrieve precompiled binaries of Petrify from @url{http://www.lsi.upc.edu/~jordicf/petrify/} and install it into a user-defined directory
+
+@item Fiona can be translated using the @acronym{LLVM}-frontend for GCC (see @url{http://llvm.org/})
+
+@item made the shell scripts more portable by using @code{#!/usr/bin/env bash} instead of @code{#!/bin/bash} (especially important for FreeBSD systems)
+
+@item updated @file{Doxyfile} and adapted output directories to the other tools (@file{dox})
 @end itemize
 
 

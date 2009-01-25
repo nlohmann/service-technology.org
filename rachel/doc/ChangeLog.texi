@@ -1,3 +1,25 @@
+@heading Version 1.13-unreleased
+@itemize
+@item the bit annotations are now written inside the nodes of the Graphviz dot annotation
+
+@item service automata can be drawn as Graphviz dot graphs using mode @option{sa} combined with @option{--dot} (@option{-d})
+
+@item removed @option{--noop} flag
+
+@item reorganized and cleaned up Dot output; in case of calculating an edit distance, only the result is printed; use mode @option{og} or @option{sa} to create a graphic for the input files
+
+@item moved command line parameters for GNU Gengetopt from Makefile to file @file{cmdline.ggo}
+
+@item adapted maintainer scripts for binary distributions to match the filenames used in Fiona
+
+@item Rachel can be translated using the @acronym{LLVM}-frontend for GCC (see @url{http://llvm.org/})
+
+@item updated @file{Doxyfile} and moved in into the @file{doc} directory; the documentation can be created using @samp{make doxygen} which creates the directory @file{doc/doxygen}
+
+@item made adaptions to the Makefile options to be able to create Mac Universal binaries for 64 bit architectures (XCode 3.0 with SDK @samp{MacOSX10.5.sdk} is needed)
+@end itemize
+
+
 @heading Version 1.12
 @itemize
 @item implemented methods to calculate a compact representation of the formulae annotated to the operating guideline's states according to the paper submitted to ACSD 2009; the new method can be triggered with the new mode @option{-m annotation}

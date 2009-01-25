@@ -1,7 +1,5 @@
 SUBDIRS = src man doc tests exp maintainer
 
-EXTRA_DIST = Doxydetails 
-
 #############################################################################
 # remove everything that cannot be built
 #############################################################################

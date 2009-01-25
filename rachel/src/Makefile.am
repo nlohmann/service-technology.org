@@ -67,4 +67,4 @@ endif
 # use GNU gengetopt to create command line parser
 ################################################################
 cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --conf-parser
+	$(GENGETOPT) --input=cmdline.ggo

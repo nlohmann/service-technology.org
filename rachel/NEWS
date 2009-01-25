@@ -6,33 +6,37 @@
                       http://service-technology.org/rachel
 
 
-Version 1.12
-============
+Version 1.13-unreleased
+=======================
 
-* implemented methods to calculate a compact representation of the formulae
-  annotated to the operating guideline's states according to the paper
-  submitted to ACSD 2009; the new method can be triggered with the new mode
-  `-m annotation'
+* the bit annotations are now written inside the nodes of the Graphviz dot
+  annotation
 
-* in mode `-m annotation', the `--dot' (`-d') parameter creates a version of
-  the input operating guidelines in which the explicit formulae are replaced
-  by different colors representing the bit representation
+* service automata can be drawn as Graphviz dot graphs using mode `sa'
+  combined with `--dot' (`-d')
 
-* File input options `--og' (`-o') and `--automaton' (`-a') are now optional
-  for Gengetopt, but are checked in the `main.cc' file. This was necessary,
-  because the `-m annotation' mode did not need to parse a service automaton.
+* removed `--noop' flag
 
-* implemented a mode `-m bpmn' to create a rudimentary BPMN (Business Process
-  Modeling Notation) output in Graphviz dot format of a service automaton
-  (given by `--automaton'); the path of the used stencils can be changed with
-  `--shapedir'
+* reorganized and cleaned up Dot output; in case of calculating an edit
+  distance, only the result is printed; use mode `og' or `sa' to create a
+  graphic for the input files
 
-* when using the `--dot' (`-d') parameter, a PNG (Portable Network Graphics)
-  file is now only created if the parameter `--png' is given
+* moved command line parameters for GNU Gengetopt from Makefile to file
+  `cmdline.ggo'
 
-* overworked and beautified Graphviz dot output for operating guidelines:
-  annotated formulae now use mathematical symbols for conjunctions and
-  disjunctions, and the initial state is marked
+* adapted maintainer scripts for binary distributions to match the filenames
+  used in Fiona
+
+* Rachel can be translated using the LLVM-frontend for GCC (see
+  `http://llvm.org/')
+
+* updated `Doxyfile' and moved in into the `doc' directory; the documentation
+  can be created using `make doxygen' which creates the directory
+  `doc/doxygen'
+
+* made adaptions to the Makefile options to be able to create Mac Universal
+  binaries for 64 bit architectures (XCode 3.0 with SDK `MacOSX10.5.sdk' is
+  needed)
 
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for

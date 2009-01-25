@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <set>
+#include <fstream>
 #include <libgen.h>
 #include "config.h"
 #include "Graph.h"
@@ -32,6 +33,7 @@ using std::map;
 using std::max;
 using std::string;
 using std::set;
+using std::ofstream;
 
 
 /**************************************
@@ -217,24 +219,117 @@ Graph::Graph(const std::string _id) :
 }
 
 
+void Graph::createDotFile(bool reduced) {
+    string dot_filename;
+
+    // if no filename is given via command line, create it
+    if (args_info.dot_arg == NULL) {
+        switch (args_info.mode_arg) {
+            case(mode_arg_matching):
+            case(mode_arg_simulation): {
+                dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
+                    std::string(basename(args_info.og_arg)) + "_" +
+                    cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
+                break;
+            }
+            
+            case (mode_arg_og): {
+                dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
+                break;
+            }
+            
+            case (mode_arg_sa): {
+                dot_filename = std::string(basename(args_info.automaton_arg)) + ".dot";
+                break;
+            }
+        
+            case (mode_arg_annotation): {
+                if (!reduced)
+                    dot_filename = std::string(basename(args_info.og_arg)) + ".bits1.dot";
+                else
+                    dot_filename = std::string(basename(args_info.og_arg)) + ".bits2.dot";                    
+                break;
+            }
+        }
+    } else {
+        dot_filename = args_info.dot_arg;
+    }
+
+
+    // try to open the dot file for writing
+    ofstream dot_file;
+    dot_file.open(dot_filename.c_str());
+    if (!dot_file) {
+        fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
+        exit (EXIT_FAILURE);
+    }
+
+
+    // write header
+    dot_file << "digraph G {\n";
+    dot_file << "edge [fontname=Helvetica fontsize=10]\n";
+    dot_file << "node [fontname=Helvetica fontsize=10]\n";
+    
+    
+    // write dot graph according to chosen mode
+    switch (args_info.mode_arg) {            
+        case (mode_arg_og):
+        case (mode_arg_matching):
+        case (mode_arg_simulation): {
+            dot_file << toDot() << "\n";
+            break;
+        }
+
+        case (mode_arg_annotation): {
+            dot_file << toDotAnnotated(reduced) << "\n";
+            break;
+        }
+        
+        case (mode_arg_sa): {
+            dot_file << toDot(false) << "\n";
+            break;
+        }
+    }
+    
+    
+    // write footer and close file
+    dot_file << "}\n";
+    dot_file.close();
+    
+    
+    // if dot found during configuration, executed it to create a PNG
+    if (args_info.png_flag && !std::string(CONFIG_DOT).empty()) {
+        std::string command = std::string(CONFIG_DOT) + " " + dot_filename + " -Tpng -O";
+        system(command.c_str());
+    }
+}
+
+
 /// returns a Dot representation of the graph
-string Graph::toDot() {
+string Graph::toDot(bool drawFormulae) {
     string result;
 
     // an arrow indicating the initial state
     result += "  q0 [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n";
-    result += "  q0 -> q_" + toString(root) + " [minlen=\"0.5\"];\n";
+    result += "  q0 -> q_" + toString(nodes[root]) + " [minlen=\"0.5\"];\n";
 
     for (size_t i = 0; i != nodes.size(); ++i) {
-        result += "  q_" + toString(nodes[i]) + " [label=<<FONT>";
+        result += "  q_" + toString(nodes[i]) + " [label=";
 
-        if (formulas[nodes[i]] != NULL)
+        if (drawFormulae && formulas[nodes[i]] != NULL) {
+            result += "<<FONT>";
             result += formulas[nodes[i]]->toDot();
-        
-        result += "</FONT>>";
-        
+            result += "</FONT>>";
+        } else {
+            result += "\"\"";
+        }
+                
         if (addedNodes[nodes[i]])
             result += " style=dashed";
+        
+        if (finalNode[nodes[i]] && !drawFormulae) {
+            result += " peripheries=\"2\"";
+        }
         
         result += "];\n";
 
@@ -269,7 +364,7 @@ string Graph::toDotAnnotated(bool reduced) {
 
     // an arrow indicating the initial state
     result += "  q0 [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n";
-    result += "  q0 -> q_" + toString(root) + " [minlen=\"0.5\"];\n";
+    result += "  q0 -> q_" + toString(nodes[root]) + " [minlen=\"0.5\"];\n";
 
     for (size_t i = 0; i != nodes.size(); ++i) {
         result += "  q_" + toString(nodes[i]) + "[label=\"\"";
@@ -277,16 +372,16 @@ string Graph::toDotAnnotated(bool reduced) {
         // draw node
         if (!reduced) {
             if (formulaBits[i].S)
-                result += " style=filled, fillcolor=skyblue";
+                result += " style=filled, fillcolor=skyblue, label=\"S\"";
             else if (formulaBits[i].F)
-                result += " style=filled, fillcolor=darkolivegreen2";
+                result += " style=filled, fillcolor=darkolivegreen2, label=\"F\"";
         } else {
             if (formulaBits[i].S_1)
-                result += " style=filled, fillcolor=skyblue";
+                result += " style=filled, fillcolor=skyblue, label=\"S1\"";
             else if (formulaBits[i].S_2)
-                result += " style=filled, fillcolor=purple";
+                result += " style=filled, fillcolor=purple, label=\"S2\"";
             else if (formulaBits[i].F_prime)
-                result += " style=filled, fillcolor=darkolivegreen2";
+                result += " style=filled, fillcolor=darkolivegreen2, label=\"F'\"";
         }
         
         result += "];\n";

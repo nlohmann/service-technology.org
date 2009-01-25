@@ -1,4 +1,4 @@
-AC_INIT(Rachel, 1.12, rachel@service-technology.org, rachel)
+AC_INIT(Rachel, 1.13-unreleased, rachel@service-technology.org, rachel)
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
@@ -94,9 +94,9 @@ if test "$enable_universal" = "yes"; then
     AC_MSG_ERROR([Please re-run configure with these options:
   `--disable-dependency-tracking --enable-universal'])
   fi
-  configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
-  configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
-  configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"
+  configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+  configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+  configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"
 fi
 
 # parameter "--enable-win32"
@@ -123,6 +123,12 @@ AC_SUBST(configured_LDFLAGS)
 # create output files
 #############################################################################
 
-AC_CONFIG_FILES([Makefile Doxyfile src/Makefile man/Makefile doc/Makefile tests/Makefile exp/Makefile maintainer/Makefile maintainer/debian/changelog.template])
+AC_CONFIG_FILES([Makefile
+                 doc/Doxyfile doc/Doxydetails doc/Makefile
+                 exp/Makefile
+                 maintainer/Makefile maintainer/debian/changelog.template
+                 man/Makefile
+                 src/Makefile
+                 tests/Makefile])
 
 AC_OUTPUT

@@ -4,7 +4,7 @@ rachel_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex
 
-EXTRA_DIST = gendocs.sh gendocs_template background.pdf cmdline.out
+EXTRA_DIST = gendocs.sh gendocs_template background.pdf cmdline.out 
 
 MAINTAINERCLEANFILES = cmdline.out
 
@@ -32,6 +32,13 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
 	head -n `($(GREP) -n -m2 "^Version " ChangeLog.txt | $(SED) -n '2p' | $(SED) -e 's/:/ /' | $(AWK) '{print $$1-1}')` ChangeLog.txt >> ../NEWS
 	echo "\nSee file ChangeLog <http://service-technology.org/files/$(PACKAGE)/ChangeLog> for\ncomplete version history.\n" >> ../NEWS
 	rm ChangeLog.txt
+
+
+#############################################################################
+# run Doxygen to create source code browser
+#############################################################################
+doxygen: Doxyfile Doxydetails
+	doxygen
 
 
 #############################################################################

@@ -116,58 +116,6 @@ Graph outputEditScript(Graph &g1, Graph &g2) {
 }
 
 
-/// creates Dot output for the edit actions
-/// \todo move me somewhere else
-void dotOutput(Graph &A, Graph &B, Graph &C) {
-    std::string dot_filename;
-    
-    // if no filename is given via command line, create it
-    if (args_info.dot_arg == NULL) {
-        dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
-        std::string(basename(args_info.og_arg)) + "_" +
-        cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
-    } else {
-        dot_filename = args_info.dot_arg;
-    }
-    
-    
-    // try to open the dot file for writing
-    ofstream dot_file;
-    dot_file.open(dot_filename.c_str());
-    if (!dot_file) {
-        fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
-        exit (EXIT_FAILURE);
-    }
-    
-    
-    // dot output
-    dot_file << "digraph G {" << endl;
-    dot_file << "graph [labelloc=b fontname=Helvetica fontsize=10]" << endl;
-    dot_file << "edge [fontname=Helvetica fontsize=10]" << endl;
-    dot_file << "node [fontname=Helvetica fontsize=10]" << endl;
-    dot_file << "subgraph cluster0 {" << endl;
-    dot_file << A.toDot() << endl;
-    dot_file << "}" << endl;    
-    dot_file << "subgraph cluster1 {" << endl;
-    dot_file << B.toDot() << endl;
-    dot_file << "}" << endl;
-    dot_file << "subgraph cluster2 {" << endl;
-    dot_file << C.toDot() << endl;
-    dot_file << "}" << endl;    
-    dot_file << "label=\"created by " << PACKAGE << " " << PACKAGE_VERSION << "\"" << endl;
-    dot_file << "}" << endl;
-    
-    dot_file.close();
-    
-    
-    // if dot found during configuration, executed it to create a PNG
-    if (args_info.png_flag && !std::string(CONFIG_DOT).empty()) {
-        std::string command = std::string(CONFIG_DOT) + " " + dot_filename + " -Tpng -O";
-        system(command.c_str());
-    }
-}
-
-
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // set default values
@@ -217,9 +165,11 @@ int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
 
 
+    // modes that read a service automaton
     if (args_info.mode_arg == mode_arg_matching ||
         args_info.mode_arg == mode_arg_simulation ||
-        args_info.mode_arg == mode_arg_bpmn) {
+        args_info.mode_arg == mode_arg_bpmn ||
+        args_info.mode_arg == mode_arg_sa) {
 
         // care about the automaton file input
         if (!args_info.automaton_given) {
@@ -243,6 +193,7 @@ int main(int argc, char** argv) {
     }
 
 
+    // modes that read an operating guideline
     if (args_info.mode_arg == mode_arg_matching ||
         args_info.mode_arg == mode_arg_simulation ||
         args_info.mode_arg == mode_arg_annotation ||
@@ -303,11 +254,6 @@ int main(int argc, char** argv) {
     }
     
 
-    // exit after parsing input files -- for debugging purposes
-    if (args_info.noop_given)
-        return EXIT_SUCCESS;
-    
-    
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case (mode_arg_annotation): {
@@ -329,7 +275,7 @@ int main(int argc, char** argv) {
             fprintf(stderr, "matching: %.2f\n", Matching::matching());
             break;
         }
-        
+
         default: {}
     }
 
@@ -340,95 +286,28 @@ int main(int argc, char** argv) {
             case(mode_arg_matching):
             case(mode_arg_simulation): {
                 Graph C = outputEditScript(A,B);
-                dotOutput(A, B, C);
-                break;
-            }
-
-            // check: are there more than x nodes?
-            case (mode_arg_annotation): {                
-                std::string dot_filename;
-
-                // if no filename is given via command line, create it
-                if (args_info.dot_arg == NULL) {
-                    dot_filename = std::string(basename(args_info.og_arg)) + ".bits1.dot";
-                } else {
-                    dot_filename = args_info.dot_arg;
-                }
-
-                // try to open the dot file for writing
-                ofstream dot_file;
-                dot_file.open(dot_filename.c_str());
-                if (!dot_file) {
-                    fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
-                    exit (EXIT_FAILURE);
-                }
-                
-                dot_file << "digraph G {\n";
-                dot_file << "edge [fontname=Helvetica fontsize=10]\n";
-                dot_file << "node [fontname=Helvetica fontsize=10 fixedsize=true]\n";            
-                dot_file << B.toDotAnnotated(false) << "\n";
-                dot_file << "}\n";
-                
-                dot_file.close();
-                
-              
-                // if no filename is given via command line, create it
-                if (args_info.dot_arg == NULL) {
-                    dot_filename = std::string(basename(args_info.og_arg)) + ".bits2.dot";
-                } else {
-                    dot_filename = args_info.dot_arg;
-                }
-
-                // try to open the dot file for writing
-                dot_file.open(dot_filename.c_str());
-                if (!dot_file) {
-                    fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
-                    exit (EXIT_FAILURE);
-                }
-                
-                dot_file << "digraph G {\n";
-                dot_file << "edge [fontname=Helvetica fontsize=10]\n";
-                dot_file << "node [fontname=Helvetica fontsize=10 fixedsize=true]\n";            
-                dot_file << B.toDotAnnotated(true) << "\n";
-                dot_file << "}\n";
-                
-                dot_file.close();
-                
-                break;
-            }
-
-            case (mode_arg_og): {
-                std::string dot_filename;
-
-                // if no filename is given via command line, create it
-                if (args_info.dot_arg == NULL) {
-                    dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
-                } else {
-                    dot_filename = args_info.dot_arg;
-                }
-
-                // try to open the dot file for writing
-                ofstream dot_file;
-                dot_file.open(dot_filename.c_str());
-                if (!dot_file) {
-                    fprintf(stderr, "could not create file '%s'\n", dot_filename.c_str());
-                    exit (EXIT_FAILURE);
-                }
-                
-                dot_file << "digraph G {\n";
-                dot_file << "edge [fontname=Helvetica fontsize=10]\n";
-                dot_file << "node [fontname=Helvetica fontsize=10]\n";            
-                dot_file << B.toDot() << "\n";
-                dot_file << "}\n";
-                
-                dot_file.close();
-                
+                C.createDotFile();
                 break;
             }
             
-            default: {}
+            case (mode_arg_og): {
+                B.createDotFile();
+                break;                
+            }
+            
+            case (mode_arg_annotation): {
+                B.createDotFile();
+                B.createDotFile(true);
+                break;
+            }
+
+            case (mode_arg_sa): {
+                A.createDotFile();
+                break;
+            }
         }
     }
-  
+
+
     return EXIT_SUCCESS;
 }

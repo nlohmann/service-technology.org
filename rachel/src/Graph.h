@@ -110,7 +110,13 @@ class Graph {
         
         /// returns all satisfying label vectors
         std::vector<Labels> checkSat(Node q);
+        
+        /// returns a dot annotation of the graph
+        std::string toDot(bool drawFormulae = true);
 
+        /// returns a dot annotation of the graph with formula bits
+        std::string toDotAnnotated(bool reduced = false);
+        
         
     public:
         /// identifier string
@@ -153,11 +159,8 @@ class Graph {
         /// returns all combinations of edges that satisfy a node's annotation
         Assignments sat(Node q);
 
-        /// returns a dot annotation of the graph
-        std::string toDot();
-
-        /// returns a dot annotation of the graph with formula bits
-        std::string toDotAnnotated(bool reduced);
+        /// writes a Dot file to disk
+        void createDotFile(bool reduced = false);
 
         /// preprocess the graph with insertion values (for OGs)
         void preprocessInsertion();

@@ -1,3 +1,5 @@
+args "--long-help --include-getopt --show-required --conf-parser"
+
 purpose "Rachel: Repairing Automata for Choreographies by Editing Labels"
 
 description "About Rachel:"
@@ -7,7 +9,7 @@ section "Options"
 
 option "mode" m
   "Execution mode of Rachel"
-  string values="matching","simulation","annotation","bpmn","og" enum
+  string values="matching","simulation","annotation","bpmn","og","sa" enum
   typestr="MODE"
   default="matching"
   optional
@@ -106,11 +108,6 @@ section "Debugging"
 
 option "debug" -
   "Debug output: mostly traces of function calls."
-  flag off
-  hidden
-
-option "noop" -
-  "Only parse the input files and exit."
   flag off
   hidden
 

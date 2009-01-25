@@ -13,8 +13,7 @@ TESTS = test-cmdline \
 	test-matching-threshold \
 	test-frontend-full \
 	test-frontend-error-lexer \
-	test-frontend-error-parser \
-	test-noop
+	test-frontend-error-parser
 
 XFAIL_TESTS = test-cmdline \
 	test-cmdline-configfile-missing \

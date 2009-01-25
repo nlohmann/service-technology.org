@@ -6,6 +6,38 @@
                       http://service-technology.org/rachel
 
 
+Version 1.13-unreleased
+=======================
+
+* the bit annotations are now written inside the nodes of the Graphviz dot
+  annotation
+
+* service automata can be drawn as Graphviz dot graphs using mode `sa'
+  combined with `--dot' (`-d')
+
+* removed `--noop' flag
+
+* reorganized and cleaned up Dot output; in case of calculating an edit
+  distance, only the result is printed; use mode `og' or `sa' to create a
+  graphic for the input files
+
+* moved command line parameters for GNU Gengetopt from Makefile to file
+  `cmdline.ggo'
+
+* adapted maintainer scripts for binary distributions to match the filenames
+  used in Fiona
+
+* Rachel can be translated using the LLVM-frontend for GCC (see
+  `http://llvm.org/')
+
+* updated `Doxyfile' and moved in into the `doc' directory; the documentation
+  can be created using `make doxygen' which creates the directory
+  `doc/doxygen'
+
+* made adaptions to the Makefile options to be able to create Mac Universal
+  binaries for 64 bit architectures (XCode 3.0 with SDK `MacOSX10.5.sdk' is
+  needed)
+
 Version 1.12
 ============
 

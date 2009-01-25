@@ -10,4 +10,4 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 
 
 # cannot be deleted because of SUBDIRS traversal
-MAINTAINERCLEANFILES = petrinet/Makefile.in
+MAINTAINERCLEANFILES = petrinet/Makefile.in automaton/Makefile.in

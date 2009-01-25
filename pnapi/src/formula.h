@@ -26,6 +26,9 @@ class Marking;
   class Formula
   {
   public:
+    // destructor
+    virtual ~Formula() {}
+
     // evaluating the formula
     virtual bool evaluate(Marking &m) const = 0;
 
@@ -33,9 +36,9 @@ class Marking;
     virtual const string toString() const = 0;
 
     virtual Formula * flatCopy() const = 0;
+
     //virtual Formula * deepCopy(const map<Place *, Place *> &newP) const = 0;
-    
-    virtual ~Formula() {}
+
   };
 
 
@@ -54,6 +57,7 @@ class Marking;
     virtual bool evaluate(Marking &m) const = 0;
 
     Place & getPlace();
+
     unsigned int getNumber();
 
     virtual const string toString() const = 0;
@@ -67,6 +71,7 @@ class Marking;
     AtomicFormula(const AtomicFormula &f);
 
     Place &place_;
+
     unsigned int number_;
   };
 
@@ -85,6 +90,7 @@ class Marking;
     const string toString() const;
 
     FormulaEqual * flatCopy() const;
+
     //FormulaEqual * deepCopy(const map<Place *, Place *> &newP) const;
   };
 
@@ -187,7 +193,7 @@ class Marking;
   class UnaryBooleanFormula : public Formula
   {
   public:
-    UnaryBooleanFormula(Formula &f);
+    UnaryBooleanFormula(Formula *f);
 
     UnaryBooleanFormula(const UnaryBooleanFormula &f);
 
@@ -207,7 +213,7 @@ class Marking;
   class FormulaNot : public UnaryBooleanFormula
   {
   public:
-    FormulaNot(Formula &f);
+    FormulaNot(Formula *f);
 
     /// copy constructor
     //FormulaNot(const FormulaNot &f);
@@ -219,6 +225,7 @@ class Marking;
     const string toString() const;
 
     FormulaNot * flatCopy() const;
+
     //FormulaNot * deepCopy(const map<Place *, Place *> &newP) const;
   };
 
@@ -231,11 +238,9 @@ class Marking;
   class NaryBooleanFormula : public Formula
   {
   public:
-    NaryBooleanFormula(Formula &l, Formula &r);
-    NaryBooleanFormula(list<Formula *> &flst);
+    NaryBooleanFormula(Formula *l, Formula *r);
 
-    /// copy constructor
-    NaryBooleanFormula(const NaryBooleanFormula &f);
+    NaryBooleanFormula(list<Formula *> &flst);
 
     virtual ~NaryBooleanFormula() {}
 
@@ -243,21 +248,25 @@ class Marking;
 
     virtual const string toString() const = 0;
 
+    void addSubFormula(Formula *s);
+
     virtual NaryBooleanFormula * flatCopy() const = 0;
+
     //virtual NaryBooleanFormula * deepCopy(const map<Place *, Place *> &newP) const = 0;
 
   protected:
     list<Formula *> subs_;
+
+    /// copy constructor
+    NaryBooleanFormula(const NaryBooleanFormula &f);
   };
 
   class FormulaAnd : public NaryBooleanFormula
   {
   public:
-    FormulaAnd(Formula &l, Formula &r);
-    FormulaAnd(list<Formula *> &flst);
+    FormulaAnd(Formula *l, Formula *r);
 
-    /// copy constructor
-    //FormulaAnd(const FormulaAnd &f);
+    FormulaAnd(list<Formula *> &flst);
 
     virtual ~FormulaAnd() {}
 
@@ -266,17 +275,16 @@ class Marking;
     const string toString() const;
 
     FormulaAnd * flatCopy() const;
+
     //FormulaAnd * deepCopy(const map<Place *, Place *> &newP) const;
   };
 
   class FormulaOr : public NaryBooleanFormula
   {
   public:
-    FormulaOr(Formula &l, Formula &r);
-    FormulaOr(list<Formula *> &flst);
+    FormulaOr(Formula *l, Formula *r);
 
-    /// copy constructor
-    //FormulaOr(const FormulaOr &f);
+    FormulaOr(list<Formula *> &flst);
 
     virtual ~FormulaOr() {}
 
@@ -285,6 +293,7 @@ class Marking;
     const string toString() const;
 
     FormulaOr * flatCopy() const;
+
     //FormulaOr * deepCopy(const map<Place *, Place *> &newP) const;
   };
 
@@ -304,6 +313,7 @@ class Marking;
     const string toString() const;
 
     True * flatCopy() const;
+
     True * deepCopy(const map<Place *, Place *> &newP) const;
   };
 
@@ -317,6 +327,7 @@ class Marking;
     const string toString() const;
 
     False * flatCopy() const;
+
     False * deepCopy(const map<Place *, Place *> &newP) const;
   };
 

@@ -41,10 +41,10 @@ public:
   const list<State *> & getSuccessors() const;
 
   /// adds a reason for getting to a successor
-  void addReason(const string &r);
+  void addReason(string &r);
 
   /// returns the list of reasons
-  const list<string> & getReason() const;
+  const list<string *> & getReasons() const;
 
   unsigned int getHashValue(map<Place *, unsigned int> &pt);
 
@@ -67,7 +67,7 @@ private:
   list<State *> successors_;
 
   /// list of reasons leading to the successors
-  list<string> reasons_;
+  list<string *> reasons_;
 
   /// current dfs index
   static unsigned int maxIndex_;

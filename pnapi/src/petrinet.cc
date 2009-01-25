@@ -217,18 +217,21 @@ namespace pnapi
    ***************************************************************************/
 
   /*!
+   * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet() :
-    observer_(*this)
+    observer_(*this), condition_(new formula::True())
   {
   }
 
 
   /*!
    * The copy constructor with deep copy.
+   *
+   * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    observer_(*this)
+    observer_(*this), condition_(new formula::True())
   {
     *this += net;
   }
@@ -249,8 +252,6 @@ namespace pnapi
     for (set<Transition *>::iterator it = transitions.begin();
 	 it != transitions.end(); ++it)
       deleteTransition(**it);
-
-    // FIXME: possibly delete final condition
 
     assert(nodes_.empty());
     assert(nodesByName_.empty());
@@ -306,7 +307,7 @@ namespace pnapi
 	 ++it)
       new Arc(*this, observer_, **it);
 
-    // FIXME: combine final conditions
+    condition_.merge(net.condition_);
 
     return *this;
   }
@@ -372,11 +373,11 @@ namespace pnapi
    * \param   type  communication type of the place (internal or interface)
    * \return  the newly created place
    */
-  Place & PetriNet::createPlace(const string & name, Node::Type type, 
+  Place & PetriNet::createPlace(const string & name, Node::Type type,
 				unsigned int tokens, unsigned int capacity)
   {
     return *new Place(*this, observer_,
-		      name.empty() ? getUniqueNodeName("p") : name, type, 
+		      name.empty() ? getUniqueNodeName("p") : name, type,
 		      tokens, capacity);
   }
 
@@ -974,21 +975,26 @@ namespace pnapi
 
 
 /*!
- * \brief   checks a marking m for final condition
- *
- * \param   Marking m
- *
- * \return  TRUE iff m fulfills the final condition
+ * \brief   Returns the final condition
  */
-bool PetriNet::checkFinalCondition(Marking &m)
-{
-  return condition_.checkFinalMarking(m);
-}
+  Condition & PetriNet::getFinalCondition()
+  {
+    return condition_;
+  }
 
 
 
 
-
+  /*!
+   * \brief   Sets the final condition
+   *
+   * \note    Do not use it.
+   * \todo    Overwrite = or the standard-copy-constructor
+   */
+  void PetriNet::setFinalCondition(Condition &fc)
+  {
+    condition_ = fc;
+  }
 
 
 
@@ -1075,17 +1081,6 @@ Transition *PetriNet::findLivingTransition(Marking &m) const
   }
 
   return result;
-}
-
-
-
-
-/*!
- * \brief   Sets the final condition
- */
-void PetriNet::setFinalCondition(Condition &fc)
-{
-  ///finalCondition_ = fc;
 }
 
 

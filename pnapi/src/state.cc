@@ -62,12 +62,12 @@ const list<State *> & State::getSuccessors() const
   return successors_;
 }
 
-void State::addReason(const string &r)
+void State::addReason(string &r)
 {
-  reasons_.push_back(r);
+  reasons_.push_back(&r);
 }
 
-const list<string> & State::getReason() const
+const list<string *> & State::getReasons() const
 {
   return reasons_;
 }
@@ -77,7 +77,7 @@ unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
   if (pt.empty())
     return 0;
 
-  if (hashValue_ != NULL)
+  if (hashValue_ == NULL)
   {
     unsigned int hash = 1;
     for (map<Place *, unsigned int>::const_iterator p = pt.begin();

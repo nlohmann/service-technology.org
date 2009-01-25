@@ -1,5 +1,8 @@
 #include <sstream>
 
+#include <iostream>
+using std::cout;
+
 #include "petrinet.h"
 #include "marking.h"
 #include "formula.h"
@@ -92,6 +95,8 @@ namespace pnapi
 
   bool FormulaGreater::evaluate(Marking &m) const
   {
+    cout << "DEBUG: " << place_.getName() << " (";
+    cout << m[&place_] << ") > " << number_ << "?\n";
     return m[&place_] > number_;
   }
 
@@ -188,8 +193,8 @@ namespace pnapi
   /************************************************
    *          Unary Boolean Formulas              *
    ************************************************/
-  UnaryBooleanFormula::UnaryBooleanFormula(Formula &f) :
-    sub_(&f)
+  UnaryBooleanFormula::UnaryBooleanFormula(Formula *f) :
+    sub_(f)
   {
   }
 
@@ -198,7 +203,7 @@ namespace pnapi
   {
   }
 
-  FormulaNot::FormulaNot(Formula &f) :
+  FormulaNot::FormulaNot(Formula *f) :
     UnaryBooleanFormula(f)
   {
   }
@@ -222,10 +227,10 @@ namespace pnapi
    *           n ary Boolean Formulas            *
    ************************************************/
 
-  NaryBooleanFormula::NaryBooleanFormula(Formula &l, Formula &r)
+  NaryBooleanFormula::NaryBooleanFormula(Formula *l, Formula *r)
   {
-    subs_.push_back(&l);
-    subs_.push_back(&r);
+    subs_.push_back(l);
+    subs_.push_back(r);
   }
 
   NaryBooleanFormula::NaryBooleanFormula(list<Formula *> &flst) :
@@ -238,7 +243,12 @@ namespace pnapi
   {
   }
 
-  FormulaAnd::FormulaAnd(Formula &l, Formula &r) :
+  void NaryBooleanFormula::addSubFormula(Formula *s)
+  {
+    subs_.push_back(s);
+  }
+
+  FormulaAnd::FormulaAnd(Formula *l, Formula *r) :
     NaryBooleanFormula(l, r)
   {
   }
@@ -256,12 +266,17 @@ namespace pnapi
   const string FormulaAnd::toString() const
   {
     string result = " ( ";
-    list<Formula *>::const_iterator fl = subs_.end()--;
 
-    for (list<Formula *>::const_iterator f = subs_.begin(); f != fl; f++)
-      result.append((*f)->toString() + " AND ");
+    for (list<Formula *>::const_iterator f = subs_.begin();
+        f != subs_.end(); f++)
+    {
+      result.append((*f)->toString());
+      list<Formula *>::const_iterator g = (++f)--;
+      if (g != subs_.end())
+        result.append(" AND ");
+    }
 
-    result.append((*++fl)->toString() + " ) ");
+    result.append(" ) ");
 
     return result;
   }
@@ -271,7 +286,7 @@ namespace pnapi
     return new FormulaAnd(*this);
   }
 
-  FormulaOr::FormulaOr(Formula &l, Formula &r) :
+  FormulaOr::FormulaOr(Formula *l, Formula *r) :
     NaryBooleanFormula(l, r)
   {
   }
@@ -289,12 +304,17 @@ namespace pnapi
   const string FormulaOr::toString() const
   {
     string result = " ( ";
-    list<Formula *>::const_iterator fl = subs_.end()--;
 
-    for (list<Formula *>::const_iterator f = subs_.begin(); f != fl; f++)
-      result.append((*f)->toString() + " OR ");
+    for (list<Formula *>::const_iterator f = subs_.begin();
+        f != subs_.end(); f++)
+    {
+      result.append((*f)->toString());
+      list<Formula *>::const_iterator g = (++f)--;
+      if (g != subs_.end())
+        result.append(" OR ");
+    }
 
-    result.append((*++fl)->toString() + " ) ");
+    result.append(" ) ");
 
     return result;
   }

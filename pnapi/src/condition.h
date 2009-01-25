@@ -14,7 +14,7 @@ namespace pnapi
   {
   public:
     Condition();
-    Condition(Formula &f);
+    Condition(Formula *f);
     Condition(const Condition &c);
     virtual ~Condition() {}
 
@@ -22,9 +22,14 @@ namespace pnapi
 
     bool checkFinalMarking(Marking &m);
 
+    void setFormula(Formula *f);
+
+    Condition & operator =(const Condition &c);
+
+    string toString() const;
+
   private:
-    Formula &f_;
-    //PetriNet &net_;
+    Formula *f_;
   };
 
 } /* end of namespace pnapi */

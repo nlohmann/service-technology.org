@@ -32,7 +32,7 @@ namespace pnapi
  *          initialize().
  */
 Automaton::Automaton(PetriNet &n) :
-  hashTable_(HASHSIZE), net_(n), initialmarking_(n)
+  hashTable_(HASHSIZE), net_(n), initialmarking_(n), f_(SA)
 {
   fillPrimes();
   initialize();
@@ -134,12 +134,15 @@ bool Automaton::isPrime(unsigned int &p) const
 void Automaton::dfs(State &i)
 {
   i.setIndex();
+  cout << "DEBUG: new index " << i.getIndex();
+  cout << " with hash value " << i.getHashValue(primes_) << "\n";
 
   // collision detection
   for (set<State *>::const_iterator s =
       hashTable_[i.getHashValue(primes_)].begin(); s !=
       hashTable_[i.getHashValue(primes_)].end(); s++)
   {
+    cout << "DEBUG: Collision detected (" << i.getHashValue(primes_) << ")!\n";
     if (**s == i)
       return;
   }
@@ -148,8 +151,9 @@ void Automaton::dfs(State &i)
   Marking m = i.getMarking();
 
   // final state
-  if (net_.checkFinalCondition(m))
+  if (net_.getFinalCondition().checkFinalMarking(m))
   {
+    cout << "DEBUG: " << i.getIndex() << " is pushed back to the final list.\n";
     finals_.push_back(i.getIndex());
     return;
   }
@@ -170,85 +174,91 @@ void Automaton::dfs(State &i)
   }
 }
 
-ostream &operator <<(ostream &os, const Automaton &sa)
+void Automaton::setFormat(Format f)
+{
+  f_ = f;
+}
+
+void Automaton::output_sa(ostream &os) const
 {
   os << "INTERFACE\n";
-    os << "  " << "INPUT ";
-    list<string> lin = sa.in_;
-    bool written = false;
-    while (!lin.empty())
+  os << "  " << "INPUT ";
+  list<string> lin = in_;
+  bool written = false;
+  while (!lin.empty())
+  {
+    if (!written)
     {
-      if (!written)
-      {
-        os << lin.front();
-        lin.pop_front();
-        written = true;
-        continue;
-      }
-      os << ", " << lin.front();
+      os << lin.front();
       lin.pop_front();
+      written = true;
+      continue;
     }
-    os << ";\n";
-    os << "  " << "OUTPUT ";
-    list<string> lout = sa.out_;
-    written = false;
-    while (!lout.empty())
+    os << ", " << lin.front();
+    lin.pop_front();
+  }
+  os << ";\n";
+  os << "  " << "OUTPUT ";
+  list<string> lout = out_;
+  written = false;
+  while (!lout.empty())
+  {
+    if (!written)
     {
-      if (!written)
-      {
-        os << lout.front();
-        lout.pop_front();
-        written = true;
-        continue;
-      }
-      os << ", " << lout.front();
+      os << lout.front();
       lout.pop_front();
+      written = true;
+      continue;
     }
-    os << ";\n\n";
+    os << ", " << lout.front();
+    lout.pop_front();
+  }
+  os << ";\n\n";
 
   os << "NODES\n";
-    list<State *> nodelist;
-    int i = 0;
-    for (unsigned int n = 0; n < sa.hashTable_.size(); n++)
-      for (set<State *>::iterator s = sa.hashTable_[n].begin(); s != sa.hashTable_[n].end(); s++)
-      {
-        if (i == 0)
-          os << "  " << (*s)->getIndex();
-        else
-        {
-          if (!i % 16)
-            os << ",\n  " << (*s)->getIndex();
-          else
-            os << ", " << (*s)->getIndex();
-        }
-        nodelist.push_back(*s);
-        i++;
-      }
-    os << ";\n\n";
-
-  os << "INITIALNODE\n";
-    os << "  " << sa.first_ << ";\n\n";
-
-  os << "FINALNODES\n";
-    list<unsigned int> finals = sa.finals_;
-    i = 0;
-    while (!finals.empty())
+  list<State *> nodelist;
+  int i = 0;
+  for (unsigned int n = 0; n < hashTable_.size(); n++)
+    for (set<State *>::iterator s = hashTable_[n].begin(); s
+        != hashTable_[n].end(); s++)
     {
       if (i == 0)
-      {
-        os << "  " << finals.front();
-      }
+        os << "  " << (*s)->getIndex();
       else
       {
-        if (i % 16 == 0)
-          os << ",\n  " << finals.front();
+        if (!i % 16)
+          os << ",\n  " << (*s)->getIndex();
         else
-          os << ", " << finals.front();
+          os << ", " << (*s)->getIndex();
       }
+      nodelist.push_back(*s);
       i++;
-      finals.pop_front();
     }
-    os << ";\n\n";
+  os << ";\n\n";
+
+  os << "INITIALNODE\n";
+  os << "  " << first_ << ";\n\n";
+
+  os << "FINALNODES\n";
+  list<unsigned int> finals = finals_;
+  i = 0;
+  while (!finals.empty())
+  {
+    if (i == 0)
+    {
+      os << "  " << finals.front();
+    }
+    else
+    {
+      if (i % 16 == 0)
+        os << ",\n  " << finals.front();
+      else
+        os << ", " << finals.front();
+    }
+    i++;
+    finals.pop_front();
+  }
+  os << ";\n\n";
 
   os << "TRANSITIONS\n";
   written = false;
@@ -257,25 +267,42 @@ ostream &operator <<(ostream &os, const Automaton &sa)
     State *c = nodelist.front();
     nodelist.pop_front();
     list<State *> succ = c->getSuccessors();
-    list<string> reas = c->getReason();
+    list<string *> reas = c->getReasons();
     while (!succ.empty())
     {
       if (!written)
       {
         written = true;
         os << "  " << c->getIndex() << " -> " << succ.front()->getIndex()
-          << " : " << reas.front();
+            << " : " << *reas.front();
         succ.pop_front();
         reas.pop_front();
         continue;
       }
       os << ",\n  " << c->getIndex() << " -> " << succ.front()->getIndex()
-        << " : " << reas.front();
+          << " : " << *reas.front();
       succ.pop_front();
       reas.pop_front();
     }
   }
   os << ";\n";
+}
+
+void Automaton::output_stg(ostream &os) const
+{
+  /// will follow as soon as I get an example file
+  /// fiona generates petrinet-stgs but no
+  /// automata stg
+}
+
+ostream &operator <<(ostream &os, const Automaton &sa)
+{
+  switch (sa.f_)
+  {
+  case SA:    sa.output_sa(os); break;
+  case STG:   sa.output_stg(os); break;
+  default:    assert(false); break;
+  }
 
   return os;
 }

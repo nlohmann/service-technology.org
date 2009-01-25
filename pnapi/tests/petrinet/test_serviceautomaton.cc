@@ -1,9 +1,11 @@
 #include <iostream>
 #include <fstream>
+#include <list>
 #include "../src/petrinet.h"
 #include "../src/automaton.h"
 
 using std::cout;
+using std::list;
 using std::ofstream;
 using namespace pnapi;
 using namespace pnapi::formula;
@@ -43,16 +45,16 @@ int main(int argc, char *argv[])
   net.createArc(t4, po);
   net.createArc(t4, p6);
 
-  Formula &final = net.getFinalCondition();
-  Formula *newFinal = new FormulaGreater(&p1, 6);
-  final = *newFinal;
+  FormulaAnd *f = new FormulaAnd(new FormulaEqual(p1, 0),
+      new FormulaEqual(p2, 0));
+  f->addSubFormula(new FormulaEqual(p3, 0));
+  f->addSubFormula(new FormulaEqual(p4, 0));
+  f->addSubFormula(new FormulaEqual(p5, 0));
+  f->addSubFormula(new FormulaGreater(p6, 0));
 
-  //PetriNet net2(net);
+  net.getFinalCondition().setFormula(f);
 
   Automaton sa(net);
-
-  sa.initialize();
-  sa.createAutomaton();
 
   cout << sa;
 

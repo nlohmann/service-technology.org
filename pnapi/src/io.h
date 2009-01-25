@@ -26,7 +26,7 @@ using std::ios_base;
 using std::istream;
 using std::ostream;
 using std::ostream_iterator;
- 
+
 namespace pnapi
 {
 
@@ -71,7 +71,7 @@ namespace pnapi
 
       /// filter places with token count > 0
       static set<Place *> filterMarkedPlaces(const set<Place *> &);
-      
+
       inline static Format getFormat(ios_base &);
       template <typename T> static T & setFormat(T &, Format);
 
@@ -107,8 +107,8 @@ namespace pnapi
 
     /// pnapi::Condition output
     ostream & operator<<(ostream &, const pnapi::Condition &);
-    
-    
+
+
     /// mode manipulator
     inline PetriNetIO setMode(PetriNetIO::Mode m) {
       return PetriNetIO(m); };
@@ -159,7 +159,7 @@ namespace pnapi
       return ios;
     }
 
-    
+
     /*!
      */
     PetriNetIO::Mode PetriNetIO::getMode() const

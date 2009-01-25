@@ -167,7 +167,7 @@ namespace pnapi
     Arc & createArc(Node &, Node &, int = 1);
 
     /// creates a Place
-    Place & createPlace(const string & = "", Node::Type = Node::INTERNAL, 
+    Place & createPlace(const string & = "", Node::Type = Node::INTERNAL,
 			unsigned int = 0, unsigned int = 0);
 
     /// creates a Transition
@@ -217,15 +217,14 @@ namespace pnapi
      */
     //@{
 
-    /// TODO: decide how to work with final conditions
+    /// TODO: looking for a better idea to set conditions
     void setFinalCondition(Condition &fc);
 
-    /// TODO: move to Condition/Formula classes
-    /// checks the finalcondition for Marking m
-    bool checkFinalCondition(Marking &m);
+    /// returns the final condition to operate with it
+    Condition & getFinalCondition();
 
     /// TODO: can this be templated and moved to pnapi::util (util.{h,cc})?
-    /// DFS with Tarjan's algorithm
+    /// DFS using Tarjan's algorithm
     unsigned int dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const;
 
     /// TODO: move to class Marking

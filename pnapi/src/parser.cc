@@ -89,7 +89,7 @@ namespace pnapi
 	      case Node::FORMULA_EQ:
 		formula = new FormulaEqual(*place, nTokens); break;
 	      case Node::FORMULA_NE:
-		formula = new FormulaNot(*new FormulaEqual(*place, nTokens));
+		formula = new FormulaNot(new FormulaEqual(*place, nTokens));
 		break;
 	      case Node::FORMULA_LT:
 		formula = new FormulaLess(*place, nTokens); break;
@@ -115,7 +115,7 @@ namespace pnapi
 	  case Node::FORMULA_NOT:
 	    if (formulas_.size() < 1)
 	      throw string("operand for unary NOT operator expected");
-	    formulas_.push_back(new FormulaNot(*formulas_.front()));
+	    formulas_.push_back(new FormulaNot(formulas_.front()));
 	    formulas_.pop_front();
 	    break;
 	  case Node::FORMULA_AND:
@@ -127,9 +127,9 @@ namespace pnapi
 	      Formula * op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;
 	      if (node.type == Node::FORMULA_AND)
-		f = new FormulaAnd(*op1, *op2);
+		f = new FormulaAnd(op1, op2);
 	      else
-		f = new FormulaOr(*op1, *op2);
+		f = new FormulaOr(op1, op2);
 	      formulas_.push_back(f);
 	      break;
 	    }

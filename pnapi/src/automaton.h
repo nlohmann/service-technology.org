@@ -27,6 +27,8 @@ namespace pnapi
 class PetriNet;
 class Transition;
 
+enum Format { SA, STG };
+
 class Automaton
 {
 public:
@@ -46,6 +48,8 @@ public:
   /// friend operation <<
   friend ostream &operator <<(ostream &os, const Automaton &sa);
 
+  void setFormat(Format f);
+
 private:
   vector<set<State *> > hashTable_;
   map<Place *, unsigned int> primes_;
@@ -60,12 +64,19 @@ private:
   PetriNet &net_;
   Marking initialmarking_;
 
+  /// temporary output flag
+  Format f_;
+
   void initHashTable();
 
   void fillPrimes();
   bool isPrime(unsigned int &p) const;
 
   void dfs(State &i);
+
+  /// temporary output methods
+  void output_sa(ostream &os) const;
+  void output_stg(ostream &os) const;
 };
 
 /*** overloaded operator << ***/

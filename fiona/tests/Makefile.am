@@ -36,7 +36,15 @@ CHECKLOUD_ENVIRONMENT = $(TESTS_ENVIRONMENT) quiet=no
 #   o *.owfn fails for VPATH builds.
 #   o Messing around with VPATH is ugly.
 #   o More reasons at http://www.gnu.org/software/automake/manual/html_mono/automake.html#wildcards
-EXTRA_DIST = $(TESTS) memcheck_helper.sh \
+EXTRA_DIST = regression/Makefile.am \
+	regression/Makefile.in \
+	regression/bug12765.sh \
+	regression/bug12829.sh \
+	regression/bug12895.sh \
+	regression/bug12829/b1-1.s00000035__s00000934.owfn \
+	regression/bug12829/b1.s00000035__s00000934.owfn \
+	regression/bug12895/non_empty_true_node3.owfn \
+	$(TESTS) memcheck_helper.sh \
 	defaults.sh \
 	evaluateExitCode.sh \
 	syntax/max_occurrence.owfn \

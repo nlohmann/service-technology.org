@@ -1,0 +1,70 @@
+          _   _  __  __  _      ____        __        __ _____  _   _ 
+         | | | ||  \/  || |    |___ \   ___ \ \      / /|  ___|| \ | |
+         | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
+         | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
+          \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+                 http://www.service-technology.org/uml2owfn/
+
+Authors and Acknowledgements
+****************************
+
+Authors
+=======
+
+UML2oWFN was written by:
+   * Martin Znamirowski, Humboldt-Universit"at zu Berlin
+   
+   * Dirk Fahland, Humboldt-Universit"at zu Berlin
+
+   * Niels Lohmann, Universtit"at Rostock
+   
+Acknowledgements
+================
+
+We would like to thank:
+
+   * Antoon van Breda a.k.a. Jaded Hobo
+     for the original version of the `colorconsole.h' header,
+
+   * Jana Koehler, IBM Zurich
+     for valueable support concerning the IBM Business Modeler Semantics
+
+   * Hagen V"olzer, IBM Zurich
+     for valueable support concerning the IBM Business Modeler Semantics
+     
+
+
+Contact Person
+==============
+
+Dirk Fahland
+
+Humboldt-Universit"at zu Berlin
+Institut f"ur Informatik
+Unter den Linden 6
+10099 Berlin, Germany
+
+Homepage
+     `http://www.informatik.hu-berlin.de/top/mitarbeiter/fahland'
+
+E-mail
+     <fahland@informatik.hu-berlin.de>
+
+Phone
+     (+49) (30) 2093-3907
+
+Fax
+     (+49) (30) 2093-3067
+
+Copyright
+=========
+
+Copyright (C) 2007, 2008  Martin Znamirowksi, Dirk Fahland, Niels Lohmann
+
+     Copying and distribution of this file, with or without
+     modification, are permitted in any medium without royalty provided
+     the copyright notice and this notice are preserved.
+
+See the User's Manual for more information.
+
+END OF AUTHORS file for UML2oWFN Version 2.00-unreleased

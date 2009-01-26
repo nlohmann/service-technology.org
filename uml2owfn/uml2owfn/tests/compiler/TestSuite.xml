@@ -1,0 +1,2868 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wbim:model xmlns:wbim="http://www.ibm.com/wbim/bomSchema1.0" schemaVersion="6.0.2">
+  <wbim:catalogs>
+    <wbim:dataCatalogs>
+      <wbim:catalog id="Bsnss32t" name="Business items"/>
+    </wbim:dataCatalogs>
+    <wbim:resourceCatalogs>
+      <wbim:catalog id="Rsrcs" name="Resources"/>
+    </wbim:resourceCatalogs>
+    <wbim:organizationCatalogs>
+      <wbim:catalog id="Orgnztns" name="Organizations"/>
+    </wbim:organizationCatalogs>
+    <wbim:processCatalogs>
+      <wbim:catalog id="Prcsss" name="Processes">
+        <wbim:catalog id="StpvsEnd" name="StopvsEnd"/>
+        <wbim:catalog id="BOMcncpt" name="BOMconcepts"/>
+        <wbim:catalog id="BOMcncpt1" name="BOMconceptsPin"/>
+      </wbim:catalog>
+    </wbim:processCatalogs>
+    <wbim:classifierCatalogs>
+      <wbim:catalog id="Clssfrs" name="Classifiers"/>
+    </wbim:classifierCatalogs>
+    <wbim:businessServiceCatalogs>
+      <wbim:catalog id="Bsnss32s" name="Business services"/>
+    </wbim:businessServiceCatalogs>
+    <wbim:businessServiceObjectCatalogs>
+      <wbim:catalog id="Bsnss32s1" name="Business service objects"/>
+    </wbim:businessServiceObjectCatalogs>
+  </wbim:catalogs>
+  <wbim:resourceModel>
+    <wbim:roles>
+      <wbim:role name="Rsrcs##Rolle1"/>
+    </wbim:roles>
+  </wbim:resourceModel>
+  <wbim:processModel>
+    <wbim:processes>
+      <wbim:process name="StpvsEnd##StopvsEnd_1">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:endNode name="End Node"/>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target node="End Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="StpvsEnd##StopvsEnd_2">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##MultipleChoice">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="Input"/>
+            <wbim:input name="Input:2"/>
+            <wbim:input name="Input:3"/>
+            <wbim:constraint name="inputSetConstraint_0"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:3"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Output"/>
+            <wbim:output name="Output:2"/>
+            <wbim:output name="Output:3"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:output name="Output:3"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:output name="Output:4"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:join name="Join">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output:2"/>
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:join>
+          <wbim:connection name="Connection:2">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input:2" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection">
+            <wbim:source contactPoint="Input"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output:3" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input:3" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:4" node="Fork"/>
+            <wbim:target contactPoint="Input:2" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input:4" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output" node="Join"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output:2" node="Join"/>
+            <wbim:target contactPoint="Output"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##ComplexProcess">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:1"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:N"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="Input:1"/>
+            <wbim:input name="Input:2"/>
+            <wbim:input name="Input:N"/>
+            <wbim:constraint name="inputSetConstraint_0"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:1"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:M"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Output:1"/>
+            <wbim:output name="Output:2"/>
+            <wbim:output name="Output:M"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:callToProcess callSynchronously="true" name="MultipleChoice" process="BOMcncpt##MultipleChoice">
+            <wbim:additionalInput name="Input:4">
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:additionalInput>
+            <wbim:additionalInput name="Input:5">
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:additionalInput>
+            <wbim:additionalOutput name="Output:4">
+              <wbim:outputCriterion name="Output Criterion"/>
+            </wbim:additionalOutput>
+          </wbim:callToProcess>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output:4" node="MultipleChoice"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Input:1"/>
+            <wbim:target contactPoint="Input" node="MultipleChoice"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Input:2"/>
+            <wbim:target contactPoint="Input:2" node="MultipleChoice"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Input:N"/>
+            <wbim:target contactPoint="Input:3" node="MultipleChoice"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="MultipleChoice"/>
+            <wbim:target contactPoint="Output:1"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output:2" node="MultipleChoice"/>
+            <wbim:target contactPoint="Output:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output:3" node="MultipleChoice"/>
+            <wbim:target contactPoint="Output:M"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input:5" node="MultipleChoice"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input:4" node="MultipleChoice"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##ForkJoin">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="Input"/>
+            <wbim:input name="Input:2"/>
+            <wbim:input name="Input:3"/>
+            <wbim:constraint name="inputSetConstraint_0"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:3"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Output"/>
+            <wbim:output name="Output:2"/>
+            <wbim:output name="Output:3"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:decision isInclusive="false" name="Decision">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output:4"/>
+              <wbim:output name="Output:7"/>
+              <wbim:output name="Output"/>
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:5"/>
+              <wbim:output name="Output:8"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>34.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 3">
+              <wbim:output name="Output:6"/>
+              <wbim:output name="Output:9"/>
+              <wbim:condition name="Output Condition:3"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:5"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:8"/>
+              <wbim:input name="Input"/>
+              <wbim:input name="Input:4"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:6"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:9"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 3">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:7"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:10"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output:2"/>
+              <wbim:output name="Output:3"/>
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input:3"/>
+              <wbim:input name="Input:4"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input:3"/>
+                <wbim:input name="Input:4"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output:3"/>
+              <wbim:output name="Output:4"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output:3"/>
+                <wbim:output name="Output:4"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:output name="Output:2"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:output name="Output:2"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Input"/>
+            <wbim:target contactPoint="Input:2" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Input:2"/>
+            <wbim:target contactPoint="Input:3" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output:4" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input:5" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:7" node="Decision"/>
+            <wbim:target contactPoint="Input:2" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:8" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output" node="Decision"/>
+            <wbim:target contactPoint="Input:3" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Output:3" node="Task"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output:2" node="Decision"/>
+            <wbim:target contactPoint="Input:4" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="Output:4" node="Task"/>
+            <wbim:target contactPoint="Input:4" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:12">
+            <wbim:source contactPoint="Output:5" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:13">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target contactPoint="Input:6" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:14">
+            <wbim:source contactPoint="Output:8" node="Decision"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:15">
+            <wbim:source contactPoint="Output:2" node="Task:2"/>
+            <wbim:target contactPoint="Input:9" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:16">
+            <wbim:source contactPoint="Output:6" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:17">
+            <wbim:source contactPoint="Output:9" node="Decision"/>
+            <wbim:target contactPoint="Input:2" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:18">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target contactPoint="Input:7" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:19">
+            <wbim:source contactPoint="Output:2" node="Task:3"/>
+            <wbim:target contactPoint="Input:10" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:20">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:21">
+            <wbim:source contactPoint="Output:2" node="Merge"/>
+            <wbim:target contactPoint="Output"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:22">
+            <wbim:source contactPoint="Output:3" node="Merge"/>
+            <wbim:target contactPoint="Output:2"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##InclusiveOr">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:4">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:decision isInclusive="true" name="Decision:2">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>34.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 3">
+              <wbim:output name="Output:3"/>
+              <wbim:condition name="Output Condition:3"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:merge name="Merge:2">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Decision:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Decision:2"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Decision:2"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output:3" node="Decision:2"/>
+            <wbim:target contactPoint="Input" node="Task:4"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target contactPoint="Input" node="Merge:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Output" node="Task:4"/>
+            <wbim:target contactPoint="Input:2" node="Merge:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output" node="Merge:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##InclusiveOr2">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:endNode name="End Node"/>
+          <wbim:endNode name="End Node:2"/>
+          <wbim:endNode name="End Node:3"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:4">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:decision isInclusive="true" name="Decision:2">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>34.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 3">
+              <wbim:output name="Output:3"/>
+              <wbim:condition name="Output Condition:3"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Decision:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Decision:2"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="End Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Decision:2"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target node="End Node:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output:3" node="Decision:2"/>
+            <wbim:target contactPoint="Input" node="Task:4"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output" node="Task:4"/>
+            <wbim:target node="End Node:3"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##ProcessSimple">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="Input"/>
+            <wbim:constraint name="inputSetConstraint_0"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Output"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Input"/>
+            <wbim:target contactPoint="Input:2" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Task2"/>
+            <wbim:target contactPoint="Output"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##SubprocessLocal">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Output"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:loop name="While Loop" isConditionTestedFirst="true">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:flowContent>
+              <wbim:startNode name="Start Node"/>
+              <wbim:stopNode name="Stop Node"/>
+              <wbim:task name="TaskLocalLoop">
+                <wbim:inputs>
+                  <wbim:input name="Input"/>
+                  <wbim:inputCriterion name="Input Criterion">
+                    <wbim:input name="Input"/>
+                  </wbim:inputCriterion>
+                </wbim:inputs>
+                <wbim:outputs>
+                  <wbim:output name="Output"/>
+                  <wbim:outputCriterion name="Output Criterion">
+                    <wbim:output name="Output"/>
+                    <wbim:relatedInputCriteria>
+                      <wbim:inputCriterion name="Input Criterion"/>
+                    </wbim:relatedInputCriteria>
+                  </wbim:outputCriterion>
+                </wbim:outputs>
+              </wbim:task>
+              <wbim:connection name="Connection">
+                <wbim:source node="Start Node"/>
+                <wbim:target contactPoint="Input" node="TaskLocalLoop"/>
+              </wbim:connection>
+              <wbim:connection name="Connection:2">
+                <wbim:source contactPoint="Output" node="TaskLocalLoop"/>
+                <wbim:target node="Stop Node"/>
+              </wbim:connection>
+            </wbim:flowContent>
+            <wbim:loopCondition name="Loop Condition"/>
+          </wbim:loop>
+          <wbim:process name="Subprocess">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:flowContent>
+              <wbim:startNode name="Start Node"/>
+              <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+              <wbim:task name="TaskSubprocess">
+                <wbim:inputs>
+                  <wbim:input name="Input"/>
+                  <wbim:inputCriterion name="Input Criterion">
+                    <wbim:input name="Input"/>
+                  </wbim:inputCriterion>
+                </wbim:inputs>
+                <wbim:outputs>
+                  <wbim:output name="Output"/>
+                  <wbim:outputCriterion name="Output Criterion">
+                    <wbim:output name="Output"/>
+                    <wbim:relatedInputCriteria>
+                      <wbim:inputCriterion name="Input Criterion"/>
+                    </wbim:relatedInputCriteria>
+                  </wbim:outputCriterion>
+                </wbim:outputs>
+              </wbim:task>
+              <wbim:connection name="Connection">
+                <wbim:source node="Start Node"/>
+                <wbim:target contactPoint="Input" node="TaskSubprocess"/>
+              </wbim:connection>
+              <wbim:connection name="Connection:2">
+                <wbim:source contactPoint="Output" node="TaskSubprocess"/>
+                <wbim:target node="Stop Node"/>
+              </wbim:connection>
+            </wbim:flowContent>
+          </wbim:process>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Subprocess"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Subprocess"/>
+            <wbim:target contactPoint="Input" node="While Loop"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="While Loop"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_1_1">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_1_N">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_N_1">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_N_N">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_1_1_not">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_1_N_not">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_N_1_not">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Connection_N_N_not">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt##Repository">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output">
+                <wbim:repositoryValue atBeginning="true" isInsert="false">
+                  <wbim:localRepository name="Local Information Repository" path="Repository/Local Information Repository"/>
+                </wbim:repositoryValue>
+              </wbim:output>
+              <wbim:output name="Output:2"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:output name="Output:2"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input">
+                <wbim:repositoryValue atBeginning="true" isRemove="false">
+                  <wbim:localRepository name="Local Information Repository" path="Repository/Local Information Repository"/>
+                </wbim:repositoryValue>
+              </wbim:input>
+              <wbim:input name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input">
+                <wbim:repositoryValue atBeginning="true" isRemove="false">
+                  <wbim:localRepository name="Local Information Repository" path="Repository/Local Information Repository"/>
+                </wbim:repositoryValue>
+              </wbim:input>
+              <wbim:input name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node:2"/>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input:2" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target node="Stop Node:2"/>
+          </wbim:connection>
+          <wbim:localRepository capacity="-1" isOrdered="false" isUnique="false" name="Local Information Repository" type="String"/>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt1##ProcessPinOverlap">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In1"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In2"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In3"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="In1"/>
+            <wbim:input name="In2"/>
+            <wbim:constraint name="inputSetConstraint_0"/>
+          </wbim:inputCriterion>
+          <wbim:inputCriterion name="Input Criterion:2">
+            <wbim:input name="In2"/>
+            <wbim:input name="In3"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Out1"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Out2"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Out3"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Out1"/>
+            <wbim:output name="Out2"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+          <wbim:outputCriterion name="Output Criterion:2">
+            <wbim:output name="Out2"/>
+            <wbim:output name="Out3"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion:2"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output:3"/>
+              <wbim:output name="Output:5"/>
+              <wbim:output name="Output:7"/>
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:4"/>
+              <wbim:output name="Output:6"/>
+              <wbim:output name="Output:8"/>
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input:3"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+              <wbim:inputCriterion name="Input Criterion:2">
+                <wbim:input name="Input:4"/>
+                <wbim:input name="Input:3"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:3"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:4"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output:3"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+              <wbim:outputCriterion name="Output Criterion:2">
+                <wbim:output name="Output:3"/>
+                <wbim:output name="Output:4"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion:2"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:join name="Join">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:join>
+          <wbim:join name="Join:2">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:join>
+          <wbim:endNode name="End Node"/>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task2"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="In1"/>
+            <wbim:target contactPoint="Input:2" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="In2"/>
+            <wbim:target contactPoint="Input:3" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="In3"/>
+            <wbim:target contactPoint="Input:4" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Task2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:12">
+            <wbim:source contactPoint="Output:4" node="Fork"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:13">
+            <wbim:source contactPoint="Output:6" node="Fork"/>
+            <wbim:target contactPoint="Input:3" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Output:5" node="Fork"/>
+            <wbim:target contactPoint="Input:2" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:14">
+            <wbim:source contactPoint="Output:3" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:15">
+            <wbim:source contactPoint="Output:7" node="Fork"/>
+            <wbim:target contactPoint="Input:3" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:16">
+            <wbim:source contactPoint="Output:8" node="Fork"/>
+            <wbim:target contactPoint="Input:4" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Task2"/>
+            <wbim:target contactPoint="Input" node="Join:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:17">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="End Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:18">
+            <wbim:source contactPoint="Output:2" node="Task:2"/>
+            <wbim:target contactPoint="Input:2" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:19">
+            <wbim:source contactPoint="Output:3" node="Task:2"/>
+            <wbim:target contactPoint="Input:2" node="Join:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:20">
+            <wbim:source contactPoint="Output:4" node="Task:2"/>
+            <wbim:target contactPoint="Input:4" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:21">
+            <wbim:source contactPoint="Output" node="Join"/>
+            <wbim:target contactPoint="Out1"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:22">
+            <wbim:source contactPoint="Output" node="Join:2"/>
+            <wbim:target contactPoint="Out2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:23">
+            <wbim:source contactPoint="Output:2" node="Join"/>
+            <wbim:target contactPoint="Out3"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt1##ProcessPinDisjoint">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In1"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In2"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In3"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="In1"/>
+            <wbim:input name="In2"/>
+            <wbim:constraint name="inputSetConstraint_0"/>
+          </wbim:inputCriterion>
+          <wbim:inputCriterion name="Input Criterion:2">
+            <wbim:input name="In3"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Out1"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Out2"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Out3"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Out1"/>
+            <wbim:output name="Out2"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+          <wbim:outputCriterion name="Output Criterion:2">
+            <wbim:output name="Out3"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion:2"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+              <wbim:inputCriterion name="Input Criterion:2">
+                <wbim:input name="Input:4"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:4"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+              <wbim:outputCriterion name="Output Criterion:2">
+                <wbim:output name="Output:4"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion:2"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:endNode name="End Node"/>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input:3"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:3"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output:3"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Task2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Task2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:17">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target node="End Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection">
+            <wbim:source contactPoint="In1"/>
+            <wbim:target contactPoint="Input:2" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="In2"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="In3"/>
+            <wbim:target contactPoint="Input:4" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Output:2" node="Fork"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task2"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Task2"/>
+            <wbim:target contactPoint="Input:2" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="Output:2" node="Task:2"/>
+            <wbim:target contactPoint="Input:3" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:12">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:13">
+            <wbim:source contactPoint="Output:2" node="Task:3"/>
+            <wbim:target contactPoint="Out1"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:14">
+            <wbim:source contactPoint="Output:3" node="Task:3"/>
+            <wbim:target contactPoint="Out2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:15">
+            <wbim:source contactPoint="Output:4" node="Task:2"/>
+            <wbim:target contactPoint="Out3"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt1##TaskPinDisjointProc">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:decision isInclusive="false" name="Decision">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:input name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+              <wbim:inputCriterion name="Input Criterion:2">
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:output name="Output:2"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+              <wbim:outputCriterion name="Output Criterion:2">
+                <wbim:output name="Output:2"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion:2"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output:2" node="Decision"/>
+            <wbim:target contactPoint="Input:2" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt1##TaskCallPinDisjointProc">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:decision isInclusive="false" name="Decision">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:callToTask callSynchronously="true" name="TaskPinDisjoint" task="BOMcncpt1##TaskPinDisjoint">
+            <wbim:additionalInput name="Input">
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:additionalInput>
+            <wbim:additionalInput name="Input:2">
+              <wbim:inputCriterion name="Input Criterion:2"/>
+            </wbim:additionalInput>
+            <wbim:additionalOutput name="Output">
+              <wbim:outputCriterion name="Output Criterion"/>
+            </wbim:additionalOutput>
+            <wbim:additionalOutput name="Output:2">
+              <wbim:outputCriterion name="Output Criterion:2"/>
+            </wbim:additionalOutput>
+          </wbim:callToTask>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:4">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input:2"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="TaskPinDisjoint"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="InputA" node="TaskPinDisjoint"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output:2" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target contactPoint="Input:2" node="TaskPinDisjoint"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output:2" node="Task:3"/>
+            <wbim:target contactPoint="InputB" node="TaskPinDisjoint"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="TaskPinDisjoint"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="OutputC" node="TaskPinDisjoint"/>
+            <wbim:target contactPoint="Input:2" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:12">
+            <wbim:source contactPoint="Output:2" node="TaskPinDisjoint"/>
+            <wbim:target contactPoint="Input" node="Task:4"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:13">
+            <wbim:source contactPoint="OutputD" node="TaskPinDisjoint"/>
+            <wbim:target contactPoint="Input:2" node="Task:4"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:14">
+            <wbim:source contactPoint="Output" node="Task:4"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="BOMcncpt1##ProcessPinDisjointStopEnd">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="Input"/>
+          </wbim:inputCriterion>
+          <wbim:inputCriterion name="Input Criterion:2">
+            <wbim:input name="Input:2"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="Output"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+          <wbim:outputCriterion name="Output Criterion:2">
+            <wbim:output name="Output:2"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion:2"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Output:2"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output:2"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:decision isInclusive="false" name="Decision">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node:2"/>
+          <wbim:endNode name="End Node"/>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:input name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output" node="Decision"/>
+            <wbim:target node="Stop Node:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output:2" node="Decision"/>
+            <wbim:target node="End Node"/>
+          </wbim:connection>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output" node="Task:2"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target contactPoint="Input:2" node="Task:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="Output" node="Task:3"/>
+            <wbim:target contactPoint="Input" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Input"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="Input:2"/>
+            <wbim:target contactPoint="Input" node="Task:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Output"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="Output:2" node="Task:2"/>
+            <wbim:target contactPoint="Output:2"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+    </wbim:processes>
+    <wbim:tasks>
+      <wbim:task name="BOMcncpt1##TaskPinDisjoint">
+        <wbim:inputs>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="InputA"/>
+          <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="InputB"/>
+          <wbim:inputCriterion name="Input Criterion">
+            <wbim:input name="InputA"/>
+          </wbim:inputCriterion>
+          <wbim:inputCriterion name="Input Criterion:2">
+            <wbim:input name="InputB"/>
+          </wbim:inputCriterion>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="OutputC"/>
+          <wbim:output associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="OutputD"/>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:output name="OutputC"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+          <wbim:outputCriterion name="Output Criterion:2">
+            <wbim:output name="OutputD"/>
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion:2"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+      </wbim:task>
+    </wbim:tasks>
+  </wbim:processModel>
+</wbim:model>

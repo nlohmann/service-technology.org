@@ -1,0 +1,143 @@
+Makefiles and scripts for automated analysis of large repositories of process
+models
+
+
+
+1. Setup
+========
+
+Copy the contents of this directory to a new directory <repo>. In <repo> create
+a subdirectory for each process library (e.g. lib1.xml ... libN.xml); the layout
+of your repository should look as follows:
+
+<repo>
+ + library1
+ |   + lib1.xml
+ + library2
+ |   + lib2.xml
+ | ...
+ + libraryN
+ |   + libN.xml
+ |
+ +- Makfile
+    soundness_info.sh
+    controllability_info.sh
+    
+    
+2. How the Makefile works
+=========================
+
+The Makefile has the aim to create tables of analysis results. The usual
+workflow to create these analysis results is the following:
+
+1. Translate process library into Petri nets.
+   This step can be repeated several times with different parameters, for each
+   parameter setting a new subdirectory in <repo>/libraryJ/ is created, where
+   all the translation results will be stored.
+   
+   For instance <repo>/libraryJ/libJ/sound_r/ will contain Petri nets for
+   soundness analysis that have been structurally reduced.
+   
+2. Analyse the created Petri nets.
+   Several analyses are available, each analysis is only performed on the Petri
+   nets of those directory that corresponds to the analysis task. For instance,
+   soundness will only be checked on nets that have no communication interface.
+   The same Petri nets can be analysed several times with different analysis
+   questions. All analysis results are stored in the directory of the Petri
+   nets. The analysis result files are named "*.outfile.*"
+   
+   For instance <repo>/libraryJ/libJ/sound_r/*.sound.outfile will be the
+   soundness analysis results of the processes of libJ.xml while
+   <repo>/libraryJ/libJ/sound_r/*.safe.outfile will be the safeness analysis
+   results of the processes of libJ.xml
+   
+3. Collect analysis results from the subdirectories and write into LaTeX and
+   HTML tables.
+   This step calls the *_info.sh scripts for each analysis task, thereby reading
+   different "*.outfile.*"s in the same directory to compile comprehensive
+   tables.
+    
+These three steps are reflected in the Makefile as well. In general, it is
+sufficient to call
+
+    make files
+    
+to translate all process libraries of the repository for all known analysis
+tasks (step 1). Then call
+
+    make outfiles
+    
+to automatically run all analyses on the generated files (step 2). Call
+
+    make table
+    
+to let the scripts generate the tables (step 3). Thereby, "table" depends on
+"outfiles" which depends on "files". Thus calling "make table" is sufficient
+to generate the tables. As the analyses may be time consuming, each of these
+steps consists of sub-targets that are automatically fulfilled. These
+sub-targets can be called manually to translate the processes wrt. a specific
+analysis task only.
+
+
+3. Available Analysis Tasks
+===========================
+
+3.1 Soundness analysis
+----------------------
+
+make target | meaning
+------------+-------------------------------------------------------------------
+sound_r       translate all processes for soundness, apply structural reduction
+               
+sound_r_pin   like "sound_r", but the translation to Petri nets uses a different
+              process termination semantics that only requires the correctness
+              of the control-flow and allows errors in the data-flow
+              
+sound_r_out	     run soundness analysis on "sound_r" (reachability of final
+                 state and  safeness of the processes)
+sound_r_pin_out  run analysis on "sound_r_pin"
+
+soundness     "sound_r_out" and "sound_r_pin_out" together
+safesound     "sound_r_out" and "sound_r_pin_out" together where soundness
+              checking is done in parallel
+soundsafe     variant to "safesound"
+              
+*_table       construct table for corresponding analysis result,
+              e.g. sound_r_table 
+              
+              
+3.2 Controllability analysis
+----------------------------
+
+make target | meaning
+------------+-------------------------------------------------------------------
+ig_full       translate all processes for controllability analysis, cutting
+              off parts of the process according to role annotations, and
+              filtering out all unconnected and unintersting processes
+              
+ig_r          like "ig_full", but applies structural reduction on the net after
+              the translation
+               
+owfn_XXX_out      run controllability analysis on all processes of translation
+                  target XXX using Fiona
+              
+owfn_XXX_out_red  run controllability analysis on all processes of translation
+                  target XXX using fiona with Fiona's state space reduction
+                  rules turned on
+              
+controllability   run all contrallability analysis tasks, e.g. "owfn_XXX_out"
+                  and "owfn_XXX_out_red"
+
+*_table       construct table for corresponding analysis result,
+              e.g. "ig_r_table" and "ig_full_table"
+              
+4. Misc
+=======
+
+You can clean the repository of generated files by the help of the Makefile.
+Call
+
+    make clean
+    
+to learn about the available targets for cleaning, allowing you to preserve the
+translated Petri nets, or the generated tables. 

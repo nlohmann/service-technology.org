@@ -125,5 +125,5 @@ bindist:
 	mkdir $(top_srcdir)/$(BINDIRNAME)
 	cd $(top_srcdir); cp src/$(PACKAGE) COPYING NEWS ChangeLog AUTHORS THANKS README maintainer/$(PACKAGE).pdf $(BINDIRNAME)
 	cd $(top_srcdir)/$(BINDIRNAME) ; file * > CONTENTS
-	zip -rq $(top_srcdir)/$(BINDIRNAME).zip $(top_srcdir)/$(BINDIRNAME)
+	tar cfz $(top_srcdir)/$(BINDIRNAME).tar.gz $(top_srcdir)/$(BINDIRNAME)
 	rm -fr $(top_srcdir)/$(BINDIRNAME)

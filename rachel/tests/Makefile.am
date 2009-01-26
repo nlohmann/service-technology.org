@@ -21,7 +21,7 @@ XFAIL_TESTS = test-cmdline \
 	test-frontend-error-lexer \
 	test-frontend-error-parser
 
-TESTS_ENVIRONMENT = testdir=@srcdir@ builddir=@builddir@ PATH=.:../src:$$PATH
+TESTS_ENVIRONMENT = testdir=@srcdir@ builddir=@builddir@ DOT=@DOT@ PATH=.:../src:$$PATH
 
 EXTRA_DIST = $(TESTS) testfiles \
 	lcov/README lcov/gendesc lcov/genhtml \

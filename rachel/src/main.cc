@@ -157,6 +157,7 @@ int main(int argc, char** argv) {
         printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
         printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
         printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
+        printf("- external dot:       %s\n", CONFIG_DOT);
         printf("\n\n");
         exit(EXIT_SUCCESS);
     }

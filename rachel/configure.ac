@@ -23,7 +23,6 @@ AC_PROG_GREP
 
 # check for additional programs
 AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
-AC_CHECK_PROG(DOT, dot, dot)
 AC_CHECK_PROG(AGPP, ag++, ag++)
 AC_CHECK_PROG(ACPP, ac++, ac++)
 AC_DEFINE_UNQUOTED(CONFIG_DOT, "$DOT", [whether dot was found by configure])
@@ -37,6 +36,19 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 configured_CFLAGS=""
 configured_CXXFLAGS=""
 configured_LDFLAGS=""
+
+
+#############################################################################
+# search for Dot and Petrify and write results to file "src/config.h"
+#############################################################################
+AC_CHECK_PROG(DOT, dot, dot, not found)
+if test "$DOT" = "not found"; then
+  AC_MSG_WARN([Graphviz Dot was not found. See file README.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Graphviz Dot can be used.])
+fi
+AC_SUBST(DOT)
 
 
 #############################################################################

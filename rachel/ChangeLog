@@ -38,6 +38,9 @@ Version 1.13-unreleased
   binaries for 64 bit architectures (XCode 3.0 with SDK `MacOSX10.5.sdk' is
   needed)
 
+* if Graphviz dot has not been found by the configure script, the dependent
+  tests are skipped instead of throwing an error
+
 Version 1.12
 ============
 

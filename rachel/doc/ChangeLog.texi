@@ -17,6 +17,8 @@
 @item updated @file{Doxyfile} and moved in into the @file{doc} directory; the documentation can be created using @samp{make doxygen} which creates the directory @file{doc/doxygen}
 
 @item made adaptions to the Makefile options to be able to create Mac Universal binaries for 64 bit architectures (XCode 3.0 with SDK @samp{MacOSX10.5.sdk} is needed)
+
+@item if Graphviz dot has not been found by the configure script, the dependent tests are skipped instead of throwing an error
 @end itemize
 
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 #include "pnapi.h"
 #include "cmdline.h"
 

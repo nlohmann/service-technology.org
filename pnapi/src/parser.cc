@@ -7,9 +7,9 @@ using std::ifstream;
 
 using namespace pnapi::formula;
 
-extern istream * pnapi_owfn_istream;
-extern pnapi::parser::Node<pnapi::parser::owfn::Node> * pnapi_owfn_ast;
-extern int pnapi_owfn_parse();
+//extern istream * pnapi::parser::owfn::pnapi_owfn_istream;
+//extern pnapi::parser::Node<pnapi::parser::owfn::Node> * pnapi_owfn_ast;
+//extern int pnapi_owfn_parse();
 
 extern istream * pnapi_petrify_istream;
 extern pnapi::parser::Node<pnapi::parser::petrify::Node> * pnapi_petrify_ast;
@@ -23,6 +23,11 @@ namespace pnapi
 
     namespace owfn
     {
+
+      istream * inputStream;
+
+      parser::Node<Node> * syntaxTree;
+      
 
       Node::Node(Type type, Node * node) :
 	type(type), petriNet(NULL), value(0)
@@ -59,8 +64,7 @@ namespace pnapi
       }
 
       Parser::Parser() :
-	parser::Parser<Node>(::pnapi_owfn_istream, ::pnapi_owfn_ast,
-			     &::pnapi_owfn_parse)
+	parser::Parser<Node>(inputStream, syntaxTree, owfn::parse)
       {
       }
 

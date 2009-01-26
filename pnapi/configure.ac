@@ -146,5 +146,6 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  tests/Makefile
 		 tests/petrinet/Makefile
+		 tests/automaton/Makefile
 		 tools/Makefile])
 AC_OUTPUT

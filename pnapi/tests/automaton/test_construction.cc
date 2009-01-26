@@ -1,14 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <list>
-#include "../src/petrinet.h"
-#include "../src/automaton.h"
-
-using std::cout;
-using std::list;
-using std::ofstream;
-using namespace pnapi;
-using namespace pnapi::formula;
+#include "test.h"
 
 int main(int argc, char *argv[])
 {
@@ -54,9 +44,12 @@ int main(int argc, char *argv[])
 
   net.getFinalCondition().setFormula(f);
 
-  Automaton sa(net);
 
+  // automaton construction from PetriNet instance
+  begin_test("Automaton::Automaton() [construction]");
+  Automaton sa(net);
   cout << sa;
+  end_test();
 
   return 0;
 }

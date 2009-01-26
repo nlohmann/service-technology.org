@@ -1,5 +1,5 @@
-#ifndef SERVICEAUTOMATON_H
-#define SERVICEAUTOMATON_H
+#ifndef PNAPI_AUTOMATON_H
+#define PNAPI_AUTOMATON_H
 
 #include <list>
 #include <ostream>
@@ -19,10 +19,6 @@ using std::map;
 
 namespace pnapi
 {
-
-#ifndef HASHSIZE
-#define HASHSIZE 65535
-#endif
 
 class PetriNet;
 class Transition;
@@ -51,6 +47,9 @@ public:
   void setFormat(Format f);
 
 private:
+
+  static const int HASHSIZE = 65535;
+
   vector<set<State *> > hashTable_;
   map<Place *, unsigned int> primes_;
 

@@ -15,6 +15,7 @@
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
+#include "automaton.h"
 #include "petrinet.h"
 
 using pnapi::io::operator<<;

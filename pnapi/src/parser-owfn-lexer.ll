@@ -42,7 +42,7 @@
 #include "parser.h"
 #include "parser-owfn.h"
 
-#define pnapi_yyistream pnapi_owfn_istream
+#define pnapi_yyistream pnapi::parser::owfn::inputStream
 
 #define YY_FATAL_ERROR(msg) \
    pnapi_owfn_error(msg);
@@ -54,8 +54,6 @@
    result = pnapi_yyistream->gcount();
 
 extern int pnapi_owfn_error(const char *);
-
-std::istream * pnapi_yyistream = NULL;
 
 %}
 

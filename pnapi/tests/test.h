@@ -15,6 +15,8 @@ using pnapi::Transition;
 using pnapi::Arc;
 using pnapi::Node;
 
+using pnapi::Automaton;
+
 
 void begin_test(const std::string &);
 

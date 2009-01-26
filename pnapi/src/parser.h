@@ -144,6 +144,20 @@ namespace pnapi
     namespace owfn
     {
 
+      // forward declaration
+      class Node;
+
+
+      /// the stream for the lexer
+      extern istream * inputStream;
+
+      /// the resulting AST
+      extern parser::Node<Node> * syntaxTree;
+
+      /// the bison generated parse function
+      int parse();
+
+
       /*!
        * \brief   Node of an OWFN AST
        *

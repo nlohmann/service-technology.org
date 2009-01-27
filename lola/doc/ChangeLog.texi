@@ -17,6 +17,12 @@
 @item added Makefile target @samp{all-configs} to compile all configurations in directory @file{src/configs}
 
 @item added maintainer scripts to create source and binary releases; the latter contain binaries of all configurations in directory @file{src/configs}
+
+@item added a directory @file{utils} for small helper tools:
+@itemize
+@item @samp{graph2dot} creates a graphical representation of a reachability graph created by LoLA (e.g., when configured with mode @samp{FULL})
+@item @samp{path2graph} translates a path created by LoLA (e.g., when configured with mode @samp{DEADLOCK}) into a reachability graph
+@end itemize
 @end itemize
 
 

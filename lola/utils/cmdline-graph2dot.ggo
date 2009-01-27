@@ -1,0 +1,34 @@
+args "--long-help --show-required --include-getopt"
+
+package "graph2dot"
+purpose "Converts a reachability graph into a Graphviz dot notation"
+
+section "Options"
+
+option
+  "columns"
+  c
+  "Number of places of a marking to be printed in a state before a newline is printed. To switch off breaking, select `0'."
+  int
+  optional
+  
+option
+  "emptyStates"
+  e
+  "Do not print the marking in a state, but only a small circle (useful for large graphs)."
+  flag
+  off
+  
+option
+  "filter"
+  f
+  "Only print the marking of the given places in the states. Multiple places can be given, either as comma-separated list or with multiple --filter options."
+  typestr="PLACE"
+  string
+  multiple
+  optional
+
+text "\n"
+text "Examples:\n"
+text "   graph2dot -c1 -fp1,p2,p3 < net.graph > net.dot\n"
+text "   graph2dot -e < net.graph | dot -Tpng -o net.png\n"

@@ -72,9 +72,10 @@ bindist-win:
 
 bindist:
 	$(MAKE) --directory=$(top_srcdir) CXXFLAGS=-O3 CFLAGS=-O3 LDFLAGS=-O3 clean all-configs
+	$(MAKE) --directory=$(top_srcdir)/utils CXXFLAGS=-O3 CFLAGS=-O3 LDFLAGS=-O3
 	wget http://download.gna.org/service-tech/$(PACKAGE)/$(PACKAGE).pdf -q
 	mkdir $(top_srcdir)/$(BINDIRNAME)
-	cd $(top_srcdir); cp $(CONFIGS) COPYING NEWS ChangeLog AUTHORS README maintainer/$(PACKAGE).pdf $(BINDIRNAME)
+	cd $(top_srcdir); cp $(CONFIGS) utils/graph2dot utils/path2graph COPYING NEWS ChangeLog AUTHORS README maintainer/$(PACKAGE).pdf $(BINDIRNAME)
 	cd $(top_srcdir)/$(BINDIRNAME) ; file * > CONTENTS
-	tar cfz $(top_srcdir)/$(BINDIRNAME).tar.gz $(top_srcdir)/$(BINDIRNAME)
+	cd $(top_srcdir); tar cfz $(BINDIRNAME).tar.gz $(BINDIRNAME)
 	rm -fr $(top_srcdir)/$(BINDIRNAME)

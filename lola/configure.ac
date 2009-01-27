@@ -20,6 +20,9 @@ AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
 
+# check for additional programs
+AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
+
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
@@ -106,7 +109,7 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile maintainer/Makefile tests/Makefile Doxyfile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile maintainer/Makefile tests/Makefile utils/Makefile Doxyfile])
 
 AC_OUTPUT
 

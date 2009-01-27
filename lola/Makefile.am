@@ -1,4 +1,4 @@
-SUBDIRS = src doc maintainer tests
+SUBDIRS = src doc maintainer tests utils
 
 EXTRA_DIST = patches
 
@@ -11,7 +11,8 @@ svn-clean: maintainer-clean
 	  missing ylwrap install-sh config.guess config.sub \
 	  src/readnet-syntax.h src/Makefile.in src/config.H.in \
 	  tests/Makefile.in doc/mdate-sh doc/Makefile.in src/.deps \
-	  src/config.H.in~ maintainer/Makefile.in
+	  src/config.H.in~ maintainer/Makefile.in utils/Makefile.in \
+	  utils/graph_syntax.h
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"

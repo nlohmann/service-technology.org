@@ -1,8 +1,9 @@
-SUBDIRS = src tests tools
+SUBDIRS = src tests utils
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
 	-rm -f COPYING
+	-rm -f compile
 	-rm -f aclocal.m4
 	-rm -f configure Doxyfile compile
 	-rm -f depcomp
@@ -15,7 +16,7 @@ svn-clean: maintainer-clean
 	-rm -f -r src/.deps
 	-rm -f src/config.h.in
 	-rm -f tests/Makefile.in
-	-rm -f tools/Makefile.in
+	-rm -f utils/Makefile.in
 	-rm -f INSTALL
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter

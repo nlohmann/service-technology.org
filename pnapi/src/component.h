@@ -107,6 +107,18 @@ namespace pnapi
 
     // DOT output of the node
     virtual string toString() const =0;
+    
+    /*!
+     * \name   Experimental
+     *
+     * Operations under development
+     */
+    //@{
+    
+    /// merges the histories of two nodes
+    void mergeNameHistory(Node &);
+    
+    //@}
 
 
   protected:
@@ -141,9 +153,6 @@ namespace pnapi
 
     /// no copying!
     Node(const Node &);
-
-    /// merges the histories of two nodes
-    void mergeNameHistory(Node &);
 
     /// merges the pre-/postsets of two nodes
     void mergeArcs(pnapi::Node&, pnapi::Node&, const set<Node*> &,

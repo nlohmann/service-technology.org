@@ -361,6 +361,33 @@ namespace pnapi
 
     /// remove dead nodes of the Petri net
     void reduce_dead_nodes();
+    
+    /// elimination of parallel places
+    int reduce_rule_3p();
+    
+    /// elimination of parallel transitions
+    int reduce_rule_3t();
+    
+    /// equality check for rule 4 
+    bool reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* p2);
+    
+    /// elimination of equal places
+    int reduce_rule_4();
+    
+    /// fusion of pre- with posttransition (m to n)
+    int reduce_rule_5();
+    
+    /// fusion of pre- with posttransition (1 to n)
+    int reduce_rule_6();
+    
+    /// elimination of self-loop places
+    int reduce_rule_7();
+    
+    /// elimination of self-loop transitions
+    int reduce_rule_8();
+    
+    /// fusion of pre- with postplaces
+    int reduce_rule_9();
 
     /// elimination of identical places
     void reduce_identical_places();

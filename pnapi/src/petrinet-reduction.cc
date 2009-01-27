@@ -31,17 +31,36 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          Christian Sura <christian.sura@uni-rostock.de>,
+ *          last changes of: \$Author: sura $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2008-06-19 11:42:07 $
+ * \date    \$Date: 2009-01-18 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ *          This file has been refactured according to 
+ *          "Peter H. Starke - Analyse von Petri-Netz-Modellen" ([STA90]).
+ *          Each reduction rule now refers to the appropriate rule in
+ *          chapter 9 of [STA90], except those functions, without an
+ *          appropriate rule in [STA90]. Due to this refactoring some 
+ *          functions have been replaced.
+ *          
+ *          In detail:
+ *          - reduce_identical_places() is now covered by reduce_rule_3p()
+ *          - reduce_identical_transitions() is now covered by reduce_rule_3p()
+ *          - reduce_series_places() is now covered by reduce_rule_9()
+ *          - reduce_series_transitions() is now covered by reduce_rule_6()
+ *          - reduce_self_loop_places() is now covered by reduce_rule_7()
+ *          - reduce_self_loop_transitions() is now covered by reduce_rule_8()
+ *          - reduce_equal_places() is now covered by reduce_rule_4()
+ * 
+ *          According to [STA90] these rules preserve boundedness and liveness.
+ * 
+ * \version \$Revision: 1.5 $
  *
  * \ingroup petrinet
  */
@@ -54,9 +73,9 @@
  * Headers
  *****************************************************************************/
 
+#include <cassert>
 #include <iostream>
 #include <list>
-#include <cassert>
 #include <set>
 #include <utility>
 
@@ -64,10 +83,12 @@
 #include "util.h"		// helper functions (toString, setUnion)
 //#include "debug.h"		// (trace)
 
-using std::list;
-using std::pair;
 using std::cerr;
 using std::endl;
+using std::list;
+using std::pair;
+using std::set;
+
 using namespace pnapi;
 
 
@@ -75,7 +96,7 @@ using namespace pnapi;
 
 
 /******************************************************************************
- * Functions to structurally simplify the Petri net model
+ * Preserved functions to remove unnecessary nodes
  *****************************************************************************/
 
 /*!
@@ -284,6 +305,417 @@ void PetriNet::reduce_dead_nodes()
 
 
 
+/*!
+ * \brief remove unneeded initially marked places in choreographies
+ *
+ * \todo comment me!
+ */
+void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
+{
+  // trace(TRACE_DEBUG, "[PN]\tApplying rule \"Elimination of unnecessary initial places\"...\n");
+  
+  set<Place*> redundant_places;
+  
+  // traverse the places
+  for (set<Place *>::const_iterator place = places_.begin();
+       place != places_.end();
+       place++)
+  {
+    // find initial places with empty preset and singleton postset
+    if ( (*place)->getTokenCount() == 1  &&
+         (*place)->getPreset().empty() &&
+         (*place)->getPostset().size() == 1 )
+    {
+      //Transition *post_transition = static_cast<Transition *> (*((*place)->getPostset().begin()));
+      
+      /* FIXME:
+      // if the transition in the postset is executed exactly once...
+      if ( post_transition->max_occurrences == 1 )
+      {
+        for (set<Node *>::const_iterator pre_place = post_transition->getPreset().begin();
+             pre_place != post_transition->getPreset().end();
+             pre_place++)
+        {
+          // ... and has a former communication place in its preset
+          if (static_cast<Place *>(*pre_place)->wasExternal != "")
+          {
+            // the marked place is not necessary
+            redundant_places.insert(*place);
+            break;
+          }
+        }
+      }
+      */
+    }
+  }
+  
+  
+  // remove the redundant places
+  for (set<Place*>::const_iterator place = redundant_places.begin();
+       place != redundant_places.end();
+       place++)
+  {
+    deletePlace(**place);
+  }
+  
+  //if (!redundant_places.empty())
+    // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(redundant_places.size()) + " places.\n");
+}
+
+
+
+/******************************************************************************
+ * Functions to structurally simplify the Petri net model according to [STA90]
+ *****************************************************************************/
+
+/*!
+ * \brief Elimination of parallel places:
+ * 
+ * If there exist two parallel places p1 and p2 (precondition 1)
+ * and p1 has less than or as many tokens as p2 (precondition 2),
+ * then p2 can be removed.
+ * If precondition 2 is not fulfilled, p1 will be removed.
+ * 
+ * A place is removed by merging its with this one of 
+ * place parallel to it.
+ * 
+ * \return  Number of removed places.
+ * 
+ * \note  This implementation will not affect isolated places. 
+ * 
+ */
+int PetriNet::reduce_rule_3p()
+{
+  set<Place*> obsoletePlaces, seenPlaces;
+  map<Place*, Place*> replaceRelation;
+  
+  // iterate internal places
+  for (set<Place*>::iterator p1 = internalPlaces_.begin(); 
+       p1 != internalPlaces_.end(); ++p1)
+  { 
+    /*
+     * Since parallel places form a equivalence class, each place once
+     * identified as parallel to an other place can be ignored.
+     */
+    if(seenPlaces.find(*p1)!=seenPlaces.end())
+      continue;
+    
+    // STEP 1: Get parallel places.
+    set<Place*> parallelPlaces;
+    
+    // get a transition of the preset
+    Node* preTransition = *((*p1)->getPreset().begin());
+    if(preTransition != 0)
+    {
+      for (set<Node*>::iterator p2 = preTransition->getPostset().begin(); 
+           p2 != preTransition->getPostset().end(); ++p2)
+      {
+        if ((*p1)->isParallel(*(*p2))) // precondition 1
+        {
+          parallelPlaces.insert(static_cast<Place*>(*p2));
+        }
+      }
+    }
+    
+    if((*p1)->getPreset().empty())
+    {
+      // get a transition of the postset
+      Node* postTransition = *((*p1)->getPostset().begin());
+      if(postTransition != 0)
+      {
+        for (set<Node*>::iterator p2 = postTransition->getPreset().begin(); 
+             p2 != postTransition->getPreset().end(); ++p2)
+          if ((*p1)->isParallel(*(*p2))) // precondition 1
+          {
+            parallelPlaces.insert(static_cast<Place*>(*p2));
+          }
+      }
+    }
+    
+    /*
+     * STEP 2: Get minimal marked place and mark all other 
+     * places as obsolete (precondition 2)
+     */
+    
+    Place* minPlace = *p1;
+    unsigned int minMark = minPlace->getTokenCount(); 
+    for(set<Place*>::iterator p=parallelPlaces.begin(); 
+        p!=parallelPlaces.end(); ++p)
+    {
+      if ((*p)->getTokenCount() < minMark)
+      {
+        minMark = (*p)->getTokenCount();
+        minPlace = *p;
+      }
+      seenPlaces.insert(*p); // mark places as seen
+    }
+    parallelPlaces.insert(*p1);
+    for(set<Place*>::iterator p=parallelPlaces.begin(); 
+        p!=parallelPlaces.end(); ++p)
+    {
+      if((*p) != minPlace)
+      {
+        obsoletePlaces.insert(*p);
+        replaceRelation[*p]=minPlace;
+      }
+    }
+  }
+  
+  // STEP 3: remove obsolete places
+  int erg=0;
+  for (set<Place*>::iterator p1 = obsoletePlaces.begin();
+       p1 != obsoletePlaces.end(); ++p1)
+  {
+    Place* p2 = replaceRelation[*p1];
+    p2->mergeNameHistory(**p1);
+    deletePlace(**p1);
+    ++erg;
+  }
+  
+  return erg;
+}
+
+
+/*!
+ * \brief Elimination of parallel transitions:
+ * 
+ * If there exist two parallel transitions t1 and t2 (precondition 1)
+ * one of them can be removed.
+ *  
+ * A place is removed by merging its with this one of 
+ * place parallel to it.
+ * 
+ * \return  Number of removed transitions. 
+ * 
+ */
+int PetriNet::reduce_rule_3t()
+{
+  set<Transition*> obsoleteTransitions, seenTransitions;
+  map<Transition*, Transition*> replaceRelation;
+  
+  // iterate transitions
+  for (set<Transition*>::iterator t1 = transitions_.begin(); 
+       t1 != transitions_.end(); ++t1)
+  { 
+    /*
+     * Since parallel transitions form a equivalence class, 
+     * each transition once identified as parallel to 
+     * an other transition can be ignored.
+     */
+    if(seenTransitions.find(*t1)!=seenTransitions.end())
+      continue;
+    
+    // STEP 1: Get parallel transitions.
+    
+    // get a place of the preset
+    Node* prePlace = *((*t1)->getPreset().begin());
+    if(prePlace != 0)
+    {
+      for (set<Node*>::iterator t2 = prePlace->getPostset().begin(); 
+           t2 != prePlace->getPostset().end(); ++t2)
+      {
+        if ((*t1)->isParallel(*(*t2))) // precondition 1
+        {
+          seenTransitions.insert(static_cast<Transition*>(*t2)); // mark transition as seen
+          obsoleteTransitions.insert(static_cast<Transition*>(*t2));
+          replaceRelation[static_cast<Transition*>(*t2)]=*t1;
+        }
+      }
+    }
+    
+    if((*t1)->getPreset().empty())
+    {
+      // get a place of the postset
+      Node* postPlace = *((*t1)->getPostset().begin());
+      if(postPlace != 0)
+      {
+        for (set<Node*>::iterator t2 = postPlace->getPreset().begin(); 
+             t2 != postPlace->getPreset().end(); ++t2)
+          if ((*t1)->isParallel(*(*t2))) // precondition 1
+          {
+            seenTransitions.insert(static_cast<Transition*>(*t2)); // mark transition as seen
+            obsoleteTransitions.insert(static_cast<Transition*>(*t2));
+            replaceRelation[static_cast<Transition*>(*t2)]=*t1;
+          }
+      }
+    }
+  }
+  
+  // STEP 2: remove obsolete places
+  int erg=0;
+  for (set<Transition*>::iterator t1 = obsoleteTransitions.begin();
+       t1 != obsoleteTransitions.end(); ++t1)
+  {
+    Transition* t2 = replaceRelation[*t1];
+    t2->mergeNameHistory(**t1);
+    deleteTransition(**t1);
+    ++erg;
+  }
+  
+  return erg;
+  
+}
+
+
+/*!
+ * \brief Check whether transitions t1 and t2 are connected to all
+ *        places in the same way, except the given places p1 and p2.
+ */
+bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* p2)
+{
+  // check for equal presets and postsets
+  set<Node*> places, pre1, pre2;
+  places.insert(p1);
+  places.insert(p2);
+  pre1 = util::setDifference(t1->getPreset(),places);
+  pre2 = util::setDifference(t2->getPreset(),places);
+  
+  if( (pre1 != pre2) ||
+      (t1->getPostset() != t2->getPostset()) )
+    return false;
+  
+  // check for arc weights
+  // iterate the preset
+  for (set<Node*>::iterator p = t1->getPreset().begin();
+       p != t1->getPreset().end(); ++p)
+  {
+    if (*p == p1)
+      continue;
+    if(findArc(**p,*t1)->getWeight() != findArc(**p,*t2)->getWeight())
+      return false;
+  }
+  
+  // iterate the postset
+  for (set<Node*>::iterator p = t1->getPostset().begin();
+         p != t1->getPostset().end(); ++p)
+  {
+    if(findArc(*t1,**p)->getWeight() != findArc(*t2,**p)->getWeight())
+      return false;
+  }
+  
+  return true;
+}
+
+
+/*!
+ * \brief Elimination of equal places:
+ * 
+ * If there exist two distinct places p1 and p2 (precondition 1)
+ * with singleton postset t1 and t2 respectively (precondition 2)
+ * connected an arc weight of 1 respectively (precondition 3)
+ * and both transitions are connected with all places different
+ * from p1 and p2 in the same way (precondition 4)
+ * and the preset of p1 and p2 respectively is not empty (precondition 5),
+ * then the following changes can be applied:
+ * 1.: For each transition t in the preset of p2 add an arc
+ *     of the same weight to p1. If such an arc already exist,
+ *     increase its weight by the weight of the arc from t to p2.
+ * 2.: Increase the amount of tokens stored at p1 
+ *     by the amount of tokens stored at p2.
+ * 3.: Remove p2 and t2.  
+ *  
+ * The history of p2 will be stored in p1 and the history of
+ * t2 will be stored in t1.
+ * 
+ * \return  Number of removed places (which equals the number 
+ *          of removed transitions). 
+ * 
+ */
+int PetriNet::reduce_rule_4()
+{
+  /* 
+   * STEP 1:  get places with singleton postset which is connected
+   *          with arc weight 1
+   */
+  set<Place*> relevantPlaces;
+  
+  // iterate internal places
+  for (set<Place*>::iterator p = internalPlaces_.begin(); 
+       p != internalPlaces_.end(); ++p)
+  {
+    if(( (*p)->getPostset().size()==1) && // precondition 2
+       ( (*((*p)->getPostsetArcs().begin()))->getWeight()==1 ) ) // precondition 3
+    {
+      relevantPlaces.insert(*p);
+    }
+  }
+  
+  // STEP 2: check those places for equality
+  set<pair<Place*,Place*> > equalPlaces;
+  
+  for (set<Place*>::iterator p1 = relevantPlaces.begin();
+       p1 != relevantPlaces.end(); ++p1)
+  {
+    for (set<Place*>::iterator p2 = (++p1)--; // precondition 1
+           p2 != relevantPlaces.end(); ++p2)
+    {
+      Transition* t1 = static_cast<Transition*>(*((*p1)->getPostset().begin()));
+      Transition* t2 = static_cast<Transition*>(*((*p2)->getPostset().begin()));
+      if(reduce_isEqual(t1,t2,*p1,*p2))
+      {
+        equalPlaces.insert(pair<Place*,Place*>(*p1,*p2));
+      }
+    }
+  }
+  
+  // STEP 3: actual reduction
+  int count=0;
+  
+  for(set<pair<Place*,Place*> >::iterator equals = equalPlaces.begin();
+      equals != equalPlaces.end(); ++equals)
+  {
+    // STEP 3.1: set arcs
+    Place* p1 = (*equals).first;
+    Place* p2 = (*equals).second;
+    for(set<Arc*>::iterator a = p2->getPresetArcs().begin();
+        a != p2->getPresetArcs().end(); ++a)
+    {
+      int weight = (*a)->getWeight();
+      Arc* a2 = findArc((*a)->getSourceNode(),*p1);
+      if(a2!=0)
+      {
+        weight += a2->getWeight();
+        deleteArc(*a2);
+      }
+      createArc((*a)->getSourceNode(),*p1,weight);
+    }
+    
+    // STEP 3.2: set marking
+    p1->mark(p1->getTokenCount()+p2->getTokenCount());
+    
+    // STEP 3.3: remove place and transition
+    deleteTransition(*(static_cast<Transition*>(*(p2->getPostset().begin()))));
+    deletePlace(*p2);
+    ++count;
+  }
+  
+  return count;
+}
+
+int PetriNet::reduce_rule_5()
+{
+  return 0; 
+}
+
+int PetriNet::reduce_rule_6()
+{
+  return 0;
+}
+
+int PetriNet::reduce_rule_7()
+{
+  return 0;
+}
+
+int PetriNet::reduce_rule_8()
+{
+  return 0;
+}
+
+int PetriNet::reduce_rule_9()
+{
+  return 0;
+}
 
 /*!
  * \brief Elimination of identical places (RB1):
@@ -305,75 +737,13 @@ void PetriNet::reduce_dead_nodes()
  *       - Overwork the preconditions and postconditions. 
  *       - Re-organize the storing and removing of nodes.
  * 
+ * \note  This function is obsolete due to [STA90] rule #3.
+ * 
  */
 void PetriNet::reduce_identical_places()
 {
-  int result=0;
-  set<pair<string, string> > placePairs;
   
-  // trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
-  
-  // iterate the places
-  for (set<Place*>::iterator p1 = places_.begin(); p1 != places_.end(); p1++)
-  {
-    if (!(sameweights(*p1))) // precondition 4
-      continue;
-    
-    // iterate the preset
-    for (set<Node*>:: iterator preTransition = (*p1)->getPreset().begin(); preTransition != (*p1)->getPreset().end(); preTransition++)
-    {
-      for (set<Node*>::iterator p2 = (*preTransition)->getPostset().begin(); p2 != (*preTransition)->getPostset().end(); p2++)
-        if ((*p1 != *p2) &&		// precondition 1
-            ((*p1)->getPreset() == (*p2)->getPreset()) &&	// precondition 2
-            ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
-            (sameweights(*p2)) && // precondition 4
-            (findArc(**preTransition, **p1)->getWeight() == 1) && // precondition 4 
-            (findArc(**preTransition, **p2)->getWeight() == 1) && // precondition 4
-            ((*p1)->getTokenCount() == 0) && // precondition 5
-            (static_cast<Place*>(*p2)->getTokenCount() == 0) ) // precondition 5
-        {
-          string id1 = ((*p1)->getName());
-          string id2 = ((*p2)->getName());
-          placePairs.insert(pair<string, string>(id1, id2));
-        }
-    }
-    
-    if((*p1)->getPreset().empty()){
-      // iterate the postset
-      for (set<Node*>:: iterator postTransition = (*p1)->getPostset().begin(); postTransition != (*p1)->getPostset().end(); postTransition++)
-      {
-        for (set<Node*>::iterator p2 = (*postTransition)->getPreset().begin(); p2 != (*postTransition)->getPreset().end(); p2++)
-          if ((*p1 != *p2) &&     // precondition 1
-              ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
-              ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
-              (sameweights(*p2)) && // precondition 4
-              (findArc((**p1), (**postTransition))->getWeight() == 1) && // precondition 4 
-              (findArc((**p2), (**postTransition))->getWeight() == 1) ) // precondition 4
-          {
-            string id1 = ((*p1)->getName());
-            string id2 = ((*p2)->getName());
-            placePairs.insert(pair<string, string>(id1, id2));
-          }
-      }
-    }
-  }
-    
-    // trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(placePairs.size()) + " places with same preset and postset...\n");
-    
-    // "merge" the found places
-    for (set<pair<string, string> >::iterator labels = placePairs.begin();
-         labels != placePairs.end(); labels++)
-    {
-      Place* p1 = findPlace(labels->first);
-      Place* p2 = findPlace(labels->second);
-      p1->merge(*p2, false);
-      result++;
-    }
-    //if (result!=0)
-      // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
 }
-
-
 
 
 
@@ -394,6 +764,8 @@ void PetriNet::reduce_identical_places()
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
+ * 
+ * \note  This function is obsolete due to [STA90] rule #3.
  * 
  */
 void PetriNet::reduce_identical_transitions()
@@ -489,6 +861,8 @@ void PetriNet::reduce_identical_transitions()
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
  * 
+ * \note  This function is obsolete due to [STA90] rule #9.
+ * 
 */
 void PetriNet::reduce_series_places()
 {
@@ -573,6 +947,8 @@ void PetriNet::reduce_series_places()
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
  *       ???? What about initially marked and final places ????
+ * 
+ * \note  This function is obsolete due to [STA90] rule #5 and #6.
  *
  */
 void PetriNet::reduce_series_transitions(bool keepNormal) {
@@ -653,6 +1029,8 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
  * and p is not final (precondition 5),
  * then this place can be removed.
  * 
+ * \note  This function is obsolete due to [STA90] rule #7.
+ * 
  */
 unsigned int PetriNet::reduce_self_loop_places()
 {
@@ -710,6 +1088,8 @@ unsigned int PetriNet::reduce_self_loop_places()
  * and the arc weights both of (p->t) and of (t->p) is equal to 1 (precondition 3),
  * then this transition can be removed.
  * 
+ * \note  This function is obsolete due to [STA90] rule #8.
+ * 
  */
 unsigned int PetriNet::reduce_self_loop_transitions()
 {
@@ -753,6 +1133,8 @@ unsigned int PetriNet::reduce_self_loop_transitions()
  *
  * Added precondition 0, which ensures that the place which is going to be removed is not an input
  * place.
+ * 
+ * \note  This function is obsolete due to [STA90] rule #4.
  *
  */
 void PetriNet::reduce_equal_places()
@@ -940,62 +1322,7 @@ void PetriNet::reduce_equal_places()
 
 
 
-/*!
- * \brief remove unneeded initially marked places in choreographies
- *
- * \todo comment me!
- */
-void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
-{
-  // trace(TRACE_DEBUG, "[PN]\tApplying rule \"Elimination of unnecessary initial places\"...\n");
-  
-  set<Place*> redundant_places;
-  
-  // traverse the places
-  for (set<Place *>::const_iterator place = places_.begin();
-       place != places_.end();
-       place++)
-  {
-    // find initial places with empty preset and singleton postset
-    if ( (*place)->getTokenCount() == 1  &&
-         (*place)->getPreset().empty() &&
-         (*place)->getPostset().size() == 1 )
-    {
-      //Transition *post_transition = static_cast<Transition *> (*((*place)->getPostset().begin()));
-      
-      /* FIXME:
-      // if the transition in the postset is executed exactly once...
-      if ( post_transition->max_occurrences == 1 )
-      {
-        for (set<Node *>::const_iterator pre_place = post_transition->getPreset().begin();
-             pre_place != post_transition->getPreset().end();
-             pre_place++)
-        {
-          // ... and has a former communication place in its preset
-          if (static_cast<Place *>(*pre_place)->wasExternal != "")
-          {
-            // the marked place is not necessary
-            redundant_places.insert(*place);
-            break;
-          }
-        }
-      }
-      */
-    }
-  }
-  
-  
-  // remove the redundant places
-  for (set<Place*>::const_iterator place = redundant_places.begin();
-       place != redundant_places.end();
-       place++)
-  {
-    deletePlace(**place);
-  }
-  
-  //if (!redundant_places.empty())
-    // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(redundant_places.size()) + " places.\n");
-}
+
 
 
 /*!
@@ -1005,17 +1332,15 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  *  - suspicious transitions
  *
  * Applys some simple structural reduction rules for Petri nets:
- *  - elimination of identical places (RB1)
- *  - elimination of identical transitions (RB2)
- *  - fusion of series places (RA1)
- *  - fusion of series transitions (RA2)
- *  - elimination of self-loop places (RC1)
- *  - elimination of self-loop transitions (RC2)
- *  - elimination of self-loop transitions (RD1)
+ *  - elimination of parallel places (rule_3p)
+ *  - elimination of parallel transitions (rule_3t)
+ *  - elimination of equal places (rule_4)
+ *  - fusion of series places (rule_9)
+ *  - fusion of series transitions (rule_5 and rule_6)
+ *  - elimination of self-loop places (rule_7)
+ *  - elimination of self-loop transitions (rule_8)
  * 
- * The implementations of RA1, RA2, RB1 and RB2 accord with Thomas Pillat's 
- * "Gegenüberstellung struktureller Reduktionstechniken für Petrinetze",
- * written 2008-03-31 (Pillat2008).
+ * Functions are named by the appropriate rule in [STA90].
  *
  * The rules are applied until a fixed point (i.e. the number of places,
  * transitions and arcs does not change) is reached.
@@ -1028,9 +1353,6 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  *          merged with internal transitions (i.e. transitions connected
  *          with internal places only). 
  * 
- * \note    reduce_dead_nodes, reduce_unused_status_places and 
- *          reduce_suspicious_transitions temporary won't be invoked 
- *          since they are no murta rules.
  */
 unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
 {
@@ -1048,7 +1370,6 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
       reduce_dead_nodes();
     }
     
-    /* no murata rule
     if (reduction_level >= 2)
     {
 #ifdef USING_BPEL2OWFN
@@ -1056,7 +1377,6 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
       reduce_suspicious_transitions();
 #endif
     }
-    //*/
     
     if (reduction_level >= 3)
     {
@@ -1098,126 +1418,3 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
   
   return passes;
 }
-
-
-/****************************************************
- * Backup
- ****************************************************/
-
-
-/*!
- * \brief Elimination of identical places (RB1):
- *
- * If there exist two distinct (precondition 1) places with identical preset
- * (precondition 2) and postset (precondition 3) and the weights of all incoming
- * and outgoing arcs have the same value (precondition 4), then they can be merged.
- *
- * \todo 
- *       - Overwork the preconditions and postconditions.
- *       - Re-organize the storing and removing of nodes.
- */
-/*
-void PetriNet::reduce_identical_places()
-{
-  int result=0;
-  set<pair<string, string> > placePairs;
-  
-  // trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
-  
-  // iterate the places
-  for (set<Place*>::iterator p1 = places_.begin(); p1 != places_.end(); p1++)
-  {
-    if (((*p1)->getPreset().empty()) || ((*p1)->getPostset().empty()) || !(sameweights(*p1)))
-      continue;
-    
-    for (set<Node*>:: iterator preTransition = (*p1)->getPreset().begin(); preTransition != (*p1)->getPreset().end(); preTransition++)
-    {
-      for (set<Node*>::iterator p2 = (*preTransition)->getPostset().begin(); p2 != (*preTransition)->getPostset().end(); p2++)
-        if ((*p1 != *p2) &&     // precondition 1
-            ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
-            ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
-            (sameweights(*p2)) && // precondition 4
-            (findArc(*(*preTransition), (**p1))->getWeight() == findArc(*(*p2), *(*((*p1)->getPostset().begin())))->getWeight()) ) // precondition 4
-        {
-          string id1 = ((*p1)->getName());
-          string id2 = ((*p2)->getName());
-          placePairs.insert(pair<string, string>(id1, id2));
-        }
-    }
-  }
-    
-    // trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(placePairs.size()) + " places with same preset and postset...\n");
-    
-    // merge the found places
-    for (set<pair<string, string> >::iterator labels = placePairs.begin();
-         labels != placePairs.end(); labels++)
-    {
-      Place* p1 = findPlace(labels->first);
-      Place* p2 = findPlace(labels->second);
-      mergePlaces(p1, p2);
-      result++;
-    }
-    //if (result!=0)
-      // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
-}
-//*/
-
-/*!
- * \brief Elimination of identical transitions (RB2):
- *
- * If there exist two distinct (precondition 1) transitions with identical
- * preset (precondition 2) and postset (precondition 3) and none of those two
- * is connected to any arc with a weight other than 1 (precondition 4),
- * then they can be merged.
- *
- * \todo
- *       - Overwork the preconditions and postconditions.
- *       - Re-organize the storing and removing of nodes.
- */
-/*
-void PetriNet::reduce_identical_transitions()
-{
-  int result=0;
-  set<pair<string, string> > transitionPairs;
-  
-  // trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
-  
-  // iterate the transitions
-  for (set<Transition*>::iterator t1 = transitions_.begin(); t1 != transitions_.end(); t1++)
-  {
-    if (!(sameweights(*t1)))
-      continue;
-    
-    for (set<Node*>:: iterator prePlace = (*t1)->getPreset().begin(); prePlace != (*t1)->getPreset().end(); prePlace++)
-    {
-      for (set<Node*>::iterator t2 = (*prePlace)->getPostset().begin(); t2 != (*prePlace)->getPostset().end(); t2++)
-        if ((*t1 != *t2) &&     // precondition 1
-            ((*t1)->getPreset() == (*t2)->getPreset()) && // precondition 2
-            ((*t1)->getPostset() == (*t2)->getPostset()) && // precondition 3
-            (sameweights(*t2)) && // precondition 4
-            (findArc(*(*((*t1)->getPreset().begin())),*(*t1))->getWeight() == findArc(*(*t2), *(*((*t1)->getPostset().begin())))->getWeight())) // precondition 4
-        {
-          string id1 = ((*t1)->getName());
-          string id2 = ((*t2)->getName());
-          transitionPairs.insert(pair<string, string>(id1, id2));
-        }
-    }
-  }
-    
-    // trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(transitionPairs.size()) + " transitions with same preset and postset...\n");
-    
-    // merge the found transitions
-    for (set<pair<string, string> >::iterator labels = transitionPairs.begin();
-         labels != transitionPairs.end(); labels++)
-    {
-      Transition* t1 = findTransition(labels->first);
-      Transition* t2 = findTransition(labels->second);
-      
-      mergeParallelTransitions(t1, t2);
-      result++;
-    }
-    //if (result!=0)
-      // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
-}
-//*/
-

@@ -49,6 +49,12 @@ namespace pnapi
    *   ostream << owfn << petrinet;
    *   \endcode
    *   see also: owfn(), operator<<(ostream &, const PetriNet &)
+   *
+   * - GraphViz file format (DOT)
+   *   \code
+   *   ostream << dot << petrinet;
+   *   \endcode
+   *   see also: dot(), operator<<(ostream &, const PetriNet &)
    */
   namespace io
   {
@@ -61,10 +67,10 @@ namespace pnapi
     public:
 
       /// possible I/O formats for Petri nets
-      enum Format { STAT, OWFN };
+      enum Format { STAT, OWFN, DOT, GASTEX };
 
       /// I/O (sub-)mode
-      enum Mode { PLACE, PLACE_CAPACITY, PLACE_TOKEN };
+      enum Mode { PLACE, PLACE_CAPACITY, PLACE_TOKEN, ARC };
 
       /// constructor
       PetriNetIO(Mode);
@@ -99,6 +105,9 @@ namespace pnapi
     /// pnapi::Node output
     ostream & operator<<(ostream &, const pnapi::Arc &);
 
+    /// pnapi::Node output
+    ostream & operator<<(ostream &, const pnapi::Node &);
+
     /// pnapi::Place output
     ostream & operator<<(ostream &, const pnapi::Place &);
 
@@ -120,6 +129,10 @@ namespace pnapi
     /// OWFN manipulator
     inline ostream & owfn(ostream & os) {
       return PetriNetIO::setFormat(os, PetriNetIO::OWFN); }
+
+    /// DOT manipulator
+    inline ostream & dot(ostream & os) {
+      return PetriNetIO::setFormat(os, PetriNetIO::DOT); }
 
 
 
@@ -188,9 +201,9 @@ namespace pnapi
     /*!
      * \brief   delimiters for set output
      */
-    inline string getDelimiter(const set<Arc *> &)        { return ", "; }
-    inline string getDelimiter(const set<Place *> &)      { return ", "; }
-    inline string getDelimiter(const set<Transition *> &) { return ""  ; }
+    inline string getOWFNDelimiter(const set<Arc *> &)        { return ", "; }
+    inline string getOWFNDelimiter(const set<Place *> &)      { return ", "; }
+    inline string getOWFNDelimiter(const set<Transition *> &) { return "\n"  ; }
 
     /*!
      * \brief   ouputs a set of pointers to a stream
@@ -198,7 +211,13 @@ namespace pnapi
     template <typename T>
     ostream & operator<<(ostream & os, const set<T> & s)
     {
-      const string delim = getDelimiter(s);
+      string delim;
+      switch (PetriNetIO::getFormat(os))
+	{
+	case PetriNetIO::OWFN: delim = getOWFNDelimiter(s); break;
+	case PetriNetIO::DOT:  delim = "\n"; break;
+	default: delim = ", "; break;
+	}
       if (s.empty()) return os;
       for (typename set<T>::iterator it = s.begin(); it != --s.end(); ++it)
 	os << **it << delim;

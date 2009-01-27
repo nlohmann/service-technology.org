@@ -48,7 +48,9 @@ namespace pnapi
     {
       switch (PetriNetIO::getFormat(os))
 	{
-	case PetriNetIO::OWFN:   net.output_owfn(os);   break;
+	case PetriNetIO::OWFN:   net.output_owfn  (os); break;
+	case PetriNetIO::DOT:    net.output_dot   (os); break;
+	case PetriNetIO::GASTEX: net.output_gastex(os); break;
 
 	case PetriNetIO::STAT: 
 	  os << "|P| = "     << net.internalPlaces_.size() << ", ";
@@ -69,10 +71,43 @@ namespace pnapi
      */
     ostream & operator<<(ostream & os, const pnapi::Arc & arc)
     {
-      os << arc.getPlace().getName();
-      if (arc.getWeight() != 1)
-	os << ":" << arc.getWeight();
+      bool interface = true;
+
+      switch (PetriNetIO::getFormat(os))
+	{
+	case PetriNetIO::OWFN:    /* ARCS: OWFN    */
+	  os << arc.getPlace().getName();
+	  if (arc.getWeight() != 1)
+	    os << ":" << arc.getWeight();
+	  break;
+
+	case PetriNetIO::DOT:     /* ARCS: DOT     */
+	  if (!interface && arc.getPlace().getType() != Place::INTERNAL)
+	    break;
+	  os << " " << arc.getSourceNode() << " -> " << arc.getTargetNode() 
+	     << "\t["; 
+	  if (arc.getWeight() != 1)
+	    os << "label=\"" << arc.getWeight() << "\"";
+	  if (arc.getPlace().getType() == Place::INTERNAL)
+	    os << "weight=10000.0";
+	  os << "]";
+	  break;
+
+	default: assert(false);
+	}
       return os;
+    }
+
+
+    /*!
+     */
+    ostream & operator<<(ostream & os, const pnapi::Node & node)
+    {
+      const Place * p = dynamic_cast<const Place *>(&node);
+      if (p != NULL)
+	return os << *p;
+      else
+	return os << *dynamic_cast<const Transition *>(&node);
     }
 
 
@@ -80,16 +115,54 @@ namespace pnapi
      */
     ostream & operator<<(ostream & os, const pnapi::Place & p)
     {
-      if (PetriNetIO::getMode(os) == PetriNetIO::PLACE_CAPACITY &&
-	  p.getCapacity() > 0)
-	os << "SAFE " << p.getCapacity() << " : ";
+      switch (PetriNetIO::getFormat(os))
+	{
+	case PetriNetIO::OWFN:    /* PLACES: OWFN    */
+	  if (PetriNetIO::getMode(os) == PetriNetIO::PLACE_CAPACITY &&
+	      p.getCapacity() > 0)
+	    os << "SAFE " << p.getCapacity() << " : ";
+	  os << p.getName();
+	  if (PetriNetIO::getMode(os) == PetriNetIO::PLACE_TOKEN && 
+	      p.getTokenCount() != 1)
+	    os << ": " << p.getTokenCount();
+	  break;
 
-      os << p.getName();
 
-      if (PetriNetIO::getMode(os) == PetriNetIO::PLACE_TOKEN && 
-	  p.getTokenCount() != 1)
-	os << ": " << p.getTokenCount();
+	case PetriNetIO::DOT:     /* PLACES: DOT     */
+	  if (PetriNetIO::getMode(os) == PetriNetIO::ARC)
+	    {
+	      os << p.getName();
+	      break;
+	    }
+	  os << " " << p.getName() << "\t[";
 
+	  if (p.getTokenCount() == 1)
+	    os << "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+	  else if (p.getTokenCount() > 1)
+	    os << "label=\"" << p.getTokenCount() << "\" fontcolor=black "
+	       << "fontname=\"Helvetica\" fontsize=10";
+
+	  switch (p.getType())
+	    {
+	    case (Node::INPUT):  os << "fillcolor=orange"; break;
+	    case (Node::OUTPUT): os << "fillcolor=yellow"; break;
+	    default:    break;
+	    }
+
+	  if (p.wasInterface())
+	    os << "fillcolor=lightgoldenrod1";
+
+	  os << "]" << endl
+
+	     << " " << p.getName() << "_l\t[style=invis]" << endl
+	     << " " << p.getName() << "_l -> " << p.getName() 
+	     << " [headlabel=\"" << p.getName() << "\"]";
+
+	  break;
+
+
+	default: assert(false);   /* PLACES: <UNKNOWN> */
+	}
       return os;
     }
 
@@ -98,19 +171,58 @@ namespace pnapi
      */
     ostream & operator<<(ostream & os, const pnapi::Transition & t)
     {
-      os << "TRANSITION " << t.getName();
-      switch (t.getType())
+      switch (PetriNetIO::getFormat(os))
 	{
-	case Node::INTERNAL: os                        << endl; break;
-	case Node::INPUT:    os << " { input }"        << endl; break;
-	case Node::OUTPUT:   os << " { output }"       << endl; break;
-	case Node::INOUT:    os << " { input/output }" << endl; break;
+	case PetriNetIO::OWFN:    /* TRANSITIONS: OWFN    */
+	  os << "TRANSITION " << t.getName();
+	  switch (t.getType())
+	    {
+	    case Node::INTERNAL: os                        << endl; break;
+	    case Node::INPUT:    os << " { input }"        << endl; break;
+	    case Node::OUTPUT:   os << " { output }"       << endl; break;
+	    case Node::INOUT:    os << " { input/output }" << endl; break;
+	    }
+	  os << "  CONSUME " << t.getPresetArcs()  << ";" << endl
+	     << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
+	  break;
+
+	case PetriNetIO::DOT:     /* TRANSITIONS: DOT     */
+	  if (PetriNetIO::getMode(os) == PetriNetIO::ARC)
+	    {
+	      os << t.getName();
+	      break;
+	    }
+	  os << " " << t.getName() << "\t[";
+
+	  switch(t.getType())
+	    {
+	    case(Node::INPUT):  os << "fillcolor=orange"; break;
+	    case(Node::OUTPUT):	os << "fillcolor=yellow"; break;
+	    case(Node::INOUT):  os 
+		<< "fillcolor=gold label=< <TABLE BORDER=\"1\""
+		<< " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
+		<< " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
+		<< "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"" 
+		<< " BGCOLOR=\"ORANGE\">"
+		<< "</TD></TR><TR>"
+		<< "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
+		<< " BGCOLOR=\"YELLOW\">"
+		<< "</TD></TR></TABLE> >";
+		break;
+	    default: break;
+	    }
+
+	  os << "]" << endl
+
+	     << " " << t.getName() << "_l\t[style=invis]" << endl
+	     << " " << t.getName() << "_l -> " << t.getName() 
+	     << " [headlabel=\"" << t.getName() << "\"]";
+
+	  break;
+
+
+	default: assert(false);   /* TRANSITIONS: <UNKNOWN> */
 	}
-
-      os << "  CONSUME " << t.getPresetArcs()  << ";" << endl
-	 << "  PRODUCE " << t.getPostsetArcs() << ";" << endl
-	 << endl;
-
       return os;
     }
 
@@ -119,9 +231,19 @@ namespace pnapi
      */
     ostream & operator<<(ostream & os, const pnapi::Condition & c)
     {
-      // TODO: implement
-      os << "{ NOT IMPLEMENTED YET }";
+      switch (PetriNetIO::getFormat(os))
+	{
+	case PetriNetIO::OWFN:    /* CONDITION: OWFN    */
+	  // TODO: implement
+	  os << "{ NOT IMPLEMENTED YET }";
+	  break;
 
+	case PetriNetIO::DOT:     /* CONDITION: DOT     */
+	  assert(false);
+	  break;
+
+	default: assert(false);
+	}
       return os;
     }
 

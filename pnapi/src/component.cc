@@ -312,6 +312,14 @@ namespace pnapi {
 
 
   /*!
+   */
+  bool Place::wasInterface() const
+  {
+    return getType() == INTERNAL && wasInterface_;
+  }
+
+
+  /*!
    * Merges the properties of the given node into this one. The merged place
    * is deleted.
    *

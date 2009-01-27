@@ -80,12 +80,120 @@ namespace pnapi
       << "  " << condition_ << ";" << endl << endl 
       << endl
 
-      << transitions_
+      << transitions_ << endl
       << endl 
 
       << "{ END OF FILE }"
       << endl;
   }
+
+
+  /*!
+   * Creates a DOT output (see http://www.graphviz.org) of the Petri
+   * net. It uses the digraph-statement and adds labels to transitions,
+   * places and arcs if neccessary.
+   */
+  void PetriNet::output_dot(ostream & os) const
+  {
+    bool interface = true;
+
+    os  //< output everything to this stream
+
+      << "digraph N {" << endl
+      << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
+      << " fontsize=10 remincross=true label=\""
+      //<< (reduced ? "structurally reduced " : "")
+      << "Petri net" 
+      //<< " generated from " << filename 
+      << "\"]" 
+      << endl
+
+      // REMEMBER The table size of the INOUT transitions depends on the size 
+      // of a node!
+      // So a width of .3 (in) results in 21 pixel table width 
+      // ( 0.3 in * 72 dpi ).
+      << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\""
+      << " height=\".3\" label=\"\" style=filled fillcolor=white]" << endl
+      << " edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none"
+      << " weight=\"20.0\"]" << endl
+      << endl
+
+      << " // places" << endl
+      << " node [shape=circle]" << endl
+      << internalPlaces_ << endl
+      << (interface ? interfacePlaces_ : set<Place *>()) << endl
+      << endl
+
+      << " // transitions" << endl
+      << " node [shape=box]" << endl
+      << transitions_ << endl
+      << endl
+
+      << setMode(PetriNetIO::ARC)
+      << " // arcs" << endl
+      << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal"
+      << " color=black]" << endl
+      << arcs_
+      << endl
+
+      << "}" 
+      << endl;
+  }
+
+      /*
+    // the inner of the net
+    (*output) << "\n // cluster the inner of the net" << endl;
+    (*output) << " subgraph cluster1\n {\n ";
+    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      //FIXME: (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
+    (*output) << "\n ";
+    for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
+    {
+      if ((*p)->getTokenCount() > 0)
+        ;// FIXME: (*output) << " p" << (*p)->id;
+      else
+        ;// FIXME:(*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
+    }
+
+    if (draw_interface)
+      (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
+    else
+      (*output) << "\n  label=\"\" style=invis" << endl;
+      << " }" << endl;
+  }
+      */
+
+  /* FIXME: use interfacePlacesByPort_
+    // draw the ports
+    for (map<string, set<Place *> >::const_iterator port = ports.begin();
+         port != ports.end(); port++)
+    {
+        (*output) << " // cluster for port " << port->first << endl;
+        (*output) << " subgraph cluster_" << port->first << "\n {\n";
+        (*output) << "  label=\"" << port->first << "\";" << endl;
+        (*output) << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl;
+        //(*output) << "  rankdir=TB;" << endl;
+
+        for (set<Place*>::const_iterator place = port->second.begin();
+             place != port->second.end(); place++)
+        {
+            // FIXME:(*output) << "  p" + util::toString((*place)->id) << ";" << endl;
+            // FIXME:(*output) << "  p" + util::toString((*place)->id) << "_l;" << endl;
+
+            // make the port more compact
+            for (set<Place*>::const_iterator place2 = port->second.begin();
+                 place2 != port->second.end(); place2++)
+            {
+                if ( (*place) != (*place2) )
+		  ;// FIXME:(*output) << "  p" + util::toString((*place)->id) + " -> p" + util::toString((*place2)->id) + " [style=invis];" << endl;
+            }
+        }
+
+        (*output) << " }" << endl << endl;
+    }
+  */
+
+
 
 
 
@@ -175,376 +283,6 @@ void PetriNet::output_info(ostream & os) const
         (*output) << "\t" + *role + "\n";
   }
 }
-
-
-
-
-
-/******************************************************************************
- * DOT output of the net
- *****************************************************************************/
-
-
-/*!
- * \brief   DOT-output of the arc (used by PetriNet::dotOut())
-*/
-string Arc::toString(bool draw_interface) const
-{
-  /* FIXME
-  if (!draw_interface)
-    if ((source->nodeType == PLACE && source->getType() != Node::INTERNAL) ||
-        (target->nodeType == PLACE && target->getType() != Node::INTERNAL))
-      return "";
-
-  string result = " ";
-  if (source->nodeType == PLACE)
-    result += "p" + util::toString(source->id) + " -> t" + util::toString(target->id);
-  else
-    result += "t" + util::toString(source->id) + " -> p" + util::toString(target->id);
-
-  result += "\t[";
-
-  if (weight != 1)
-    result += "label=\"" + util::toString(weight) + "\"";
-
-  if ((source->nodeType == PLACE && source->getType() == Node::INTERNAL) ||
-      (target->nodeType == PLACE && target->getType() == Node::INTERNAL))
-    result += "weight=10000.0";
-
-  result += "]\n";
-
-  return result;
-  */
-  return "";
-}
-
-
-
-
-
-/*!
- * DOT-output of the transition. Transitions are colored
- * corresponding to their initial role.
- *
- * \note  This method might be replaced by operator<< in the future.
-*/
-string Transition::toString() const
-{
-  string result;
-
-  //FIXME: result += " t" + util::toString(id) + "  \t";
-
-#ifdef USING_BPEL2OWFN
-  string label = getName();
-#else
-  string label = getName();
-#endif
-
-  switch(getType())
-    {
-    case(Node::INPUT):		result += "[fillcolor=orange "; break;
-    case(Node::OUTPUT):		result += "[fillcolor=yellow "; break;
-    case(INOUT):	result += "[fillcolor=gold ";
-      result += "label=<";
-      // the table size depends on the node size of .3 (inch);
-      result += " <TABLE BORDER=\"1\"";
-      result += " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\"";
-      result += " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>";
-      result += "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"ORANGE\">";
-      result += "</TD></TR><TR>";
-      result += "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\" BGCOLOR=\"YELLOW\">";
-      result += "</TD></TR></TABLE> >"; break;
-    case(Node::INTERNAL):	result += "["; break;
-  }
-
-
-  // add labels for transitions with singleton history
-
-  // internal activities
-  if (getNameHistory().size() == 1 && getName().find("internal.empty") != string::npos)
-    result += "label=\"empty\" fillcolor=gray";
-  if (getNameHistory().size() == 1 && getName().find("internal.assign") != string::npos)
-    result += "label=\"asgn\" fillcolor=gray";
-  if (getNameHistory().size() == 1 && getName().find("internal.opaqueActivity") != string::npos)
-    result += "label=\"opque\" fillcolor=gray";
-
-  // communicating activities
-  if (getNameHistory().size() == 1 && getName().find("internal.receive") != string::npos)
-    result += "label=\"recv\"";
-  if (getNameHistory().size() == 1 && getName().find("internal.reply") != string::npos)
-    result += "label=\"reply\"";
-  if (getNameHistory().size() == 1 && getName().find("internal.invoke") != string::npos)
-    result += "label=\"invk\"";
-  if (getNameHistory().size() == 1 && getName().find("internal.onMessage_") != string::npos)
-    result += "label=\"on\\nmsg\"";
-  if (getNameHistory().size() == 1 && getName().find(".onEvent.") != string::npos)
-    result += "label=\"on\\nevent\"";
-
-  // structured activities
-  if (getNameHistory().size() == 1 && getName().find("internal.case") != string::npos)
-    result += "label=\"case\" fillcolor=azure2";
-  if (getNameHistory().size() == 1 && getName().find("internal.onAlarm") != string::npos)
-    result += "label=\"on\\nalarm\" fillcolor=azure2";
-  if (getNameHistory().size() == 1 && getName().find("internal.split") != string::npos)
-    result += "label=\"flow\\nsplit\" fillcolor=azure2";
-  if (getNameHistory().size() == 1 && getName().find("internal.join") != string::npos)
-    result += "label=\"flow\\njoin\" fillcolor=azure2";
-  if (getNameHistory().size() == 1 && getName().find("internal.leave") != string::npos)
-    result += "label=\"leave\\nloop\" fillcolor=azure2";
-  if (getNameHistory().size() == 1 && getName().find("internal.loop") != string::npos)
-    result += "label=\"enter\\nloop\" fillcolor=azure2";
-
-  // everything about links
-  if (getNameHistory().size() == 1 && getName().find(".setLinks") != string::npos)
-    result += "label=\"tc\" fillcolor=darkseagreen1";
-  if (getNameHistory().size() == 1 && getName().find(".evaluate") != string::npos)
-    result += "label=\"jc\\neval\" fillcolor=darkseagreen1";
-  if (getNameHistory().size() == 1 && getName().find(".skip") != string::npos)
-    result += "label=\"skip\" fillcolor=darkseagreen1";
-  if (getNameHistory().size() == 1 && getName().find(".reset_false") != string::npos)
-    result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-  if (getNameHistory().size() == 1 && getName().find(".reset_true") != string::npos)
-    result += "label=\"reset\\nlink\" fillcolor=darkseagreen1";
-
-
-  // stopping
-  if (getNameHistory().size() == 1 && getName().find(".stopped.") != string::npos)
-    result += "label=\"stop\" fillcolor=darksalmon";
-
-  /* FIXME
-  if (!labels_.empty())
-  {
-    result += " label=\"{";
-    for (set<string>::const_iterator it = labels_.begin(); it != labels_.end(); it++)
-    {
-      if (it != labels_.begin())
-        result += " ";
-      result += (*it);
-    }
-    result += "}\"";
-  }
-  */
-
-  result += "]\n";
-
-  // FIXME:result += " t" + util::toString(id) + "_l\t[style=invis];\n";
-  // FIXME:result += " t" + util::toString(id) + "_l -> t" + util::toString(id) + " [headlabel=\"" + label + "\" ]\n";
-
-  return result;
-}
-
-
-
-
-
-/*!
- * \brief   DOT-output of the place (used by PetriNet::dotOut())
- *
- *          DOT-output of the place. Places are colored corresponding to their
- *          initial role.
-*/
-string Place::toString() const
-{
-  string result;
-
-  //FIXME: result += " p" + util::toString(id) + "  \t[";//label=\"\"";
-
-#ifdef USING_BPEL2OWFN
-    string label;
-    if ( wasExternal != "")
-      label = wasExternal;
-  else
-    label = getName();
-
-  if (type == IN || type == OUT)
-  {
-    // strip "in." or "out."
-    label = label.substr(label.find_first_of(".")+1, label.length());
-
-    // if channel is instantiated, strip the ".instance_" part and replace
-    if (label.find(".instance_") != string::npos)
-    {
-      string label_prefix = label.substr(0, label.find(".instance_"));
-      string label_suffix = label.substr(label.find(".instance_")+10, label.length());
-      label = label_prefix + " (" + label_suffix + ")";
-    }
-  }
-
-#else
-  string label;
-  // FIXME
-  //if ( wasInterface )
-  //  label = wasExternal;
-  //else
-    label = getName();
-#endif
-
-  // truncate prefix (could be a problem with ports later on, but looks nice)
-  //  if (type != Node::INTERNAL)
-  // label = label.substr(label.find_last_of(".")+1, label.length());
-
-  /* FIXME
-  if (tokens_ == 1)
-    result += "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
-  else if (tokens_ > 1)
-    result += "label=\"" + ::util::toString(tokens_) + "\" fontcolor=black fontname=\"Helvetica\" fontsize=10";
-
-  switch (getType())
-    {
-    case (Node::INPUT):  result += "fillcolor=orange"; break;
-    case (Node::OUTPUT): result += "fillcolor=yellow"; break;
-    default:    break;
-    }
-
-  if (isFinal)
-    result += "fillcolor=gray";
-  else if (firstMemberIs("!link."))
-    result += "fillcolor=red";
-  else if (firstMemberIs("link."))
-    result += "fillcolor=green";
-  else if (firstMemberIs("variable."))
-    result += "fillcolor=cyan";
-  else if (historyContains("1.internal.clock"))
-    result += "fillcolor=seagreen";
-  else if (wasExternal != "")
-    result += "fillcolor=lightgoldenrod1";
-  */
-
-  result += "]\n";
-
-  // FIXME:result += " p" + util::toString(id) + "_l\t[style=invis];\n";
-
-  if (getType() == Node::OUTPUT)
-    ;// FIXME:result += " p" + util::toString(id) + " -> p" + util::toString(id) + "_l [taillabel=\"" + label + "\" ]\n";
-  else
-    ;// FIXME:result += " p" + util::toString(id) + "_l -> p" + util::toString(id) + " [headlabel=\"" + label + "\" ]\n";
-
-  return result;
-}
-
-
-
-
-
-/*!
- * \brief   DOT (Graphviz) output
- *
- *          Creates a DOT output (see http://www.graphviz.org) of the Petri
- *          net. It uses the digraph-statement and adds labels to transitions,
- *          places and arcs if neccessary.
- *
- * \param   output the output stream
- * \param   draw_interface if set to true the interface will be drawn (standard)
- *
- * \todo    Add syntax reference.
- */
-void PetriNet::output_dot(ostream & os) const
-{
-  ostream * output = &os;
-  bool draw_interface = true;  // FIXME
-
-  assert(output != NULL);
-
-  (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" fontsize=10 remincross=true label=\"";
-
-  //if (globals::reduction_level == 5)
-  //  (*output) << "structurally reduced ";
-
-  //(*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
-  // REMEMBER The table size of the INOUT transitions depends on the size of a node!
-  //          So a width of .3 (in) results in 21 pixel table width ( 0.3 in * 72 dpi ).
-  (*output) << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
-  (*output) << " edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"]" << endl << endl;
-
-
-  // list the places
-  (*output) << "\n // places" << endl;
-  (*output) << " node [shape=circle];" << endl;
-  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
-    (*output) << (*p)->toString();
-
-  if (draw_interface)
-  {
-    for (set<Place *>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
-      (*output) << (*p)->toString();
-    for (set<Place *>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
-      (*output) << (*p)->toString();
-
-
-
-    // list the transitions
-    (*output) << "\n // transitions" << endl;
-    (*output) << " node [shape=box]" << endl;
-    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-      (*output) << (*t)->toString();
-
-
-    // the inner of the net
-    (*output) << "\n // cluster the inner of the net" << endl;
-    (*output) << " subgraph cluster1\n {\n ";
-    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-      //FIXME: (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
-    (*output) << "\n ";
-    for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
-    {
-      if ((*p)->getTokenCount() > 0)
-        ;// FIXME: (*output) << " p" << (*p)->id;
-      else
-        ;// FIXME:(*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
-    }
-
-    if (draw_interface)
-      (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
-    else
-      (*output) << "\n  label=\"\" style=invis" << endl;
-
-    (*output) << " }" << endl;
-  }
-
-
-  /* FIXME: use interfacePlacesByPort_
-    // draw the ports
-    for (map<string, set<Place *> >::const_iterator port = ports.begin();
-         port != ports.end(); port++)
-    {
-        (*output) << " // cluster for port " << port->first << endl;
-        (*output) << " subgraph cluster_" << port->first << "\n {\n";
-        (*output) << "  label=\"" << port->first << "\";" << endl;
-        (*output) << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl;
-        //(*output) << "  rankdir=TB;" << endl;
-
-        for (set<Place*>::const_iterator place = port->second.begin();
-             place != port->second.end(); place++)
-        {
-            // FIXME:(*output) << "  p" + util::toString((*place)->id) << ";" << endl;
-            // FIXME:(*output) << "  p" + util::toString((*place)->id) << "_l;" << endl;
-
-            // make the port more compact
-            for (set<Place*>::const_iterator place2 = port->second.begin();
-                 place2 != port->second.end(); place2++)
-            {
-                if ( (*place) != (*place2) )
-		  ;// FIXME:(*output) << "  p" + util::toString((*place)->id) + " -> p" + util::toString((*place2)->id) + " [style=invis];" << endl;
-            }
-        }
-
-        (*output) << " }" << endl << endl;
-    }
-  */
-
-
-
-  // list the arcs
-  (*output) << "\n // arcs" << endl;
-  (*output) << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black]" << endl;
-  for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-    (*output) << (*f)->toString(draw_interface);
-
-  (*output) << endl << "}" << endl;
-}
-
-
 
 
 

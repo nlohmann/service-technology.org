@@ -4,7 +4,7 @@ SUBDIRS = src tests tools
 svn-clean: maintainer-clean
 	-rm -f COPYING
 	-rm -f aclocal.m4
-	-rm -f configure Doxyfile
+	-rm -f configure Doxyfile compile
 	-rm -f depcomp
 	-rm -f install-sh
 	-rm -f Makefile.in

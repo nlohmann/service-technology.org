@@ -105,8 +105,6 @@ namespace pnapi
     /// returns the arcs to the node's postset
     set<Arc *> getPostsetArcs() const;
 
-    // DOT output of the node
-    virtual string toString() const =0;
     
     /*!
      * \name   Experimental
@@ -119,7 +117,6 @@ namespace pnapi
     void mergeNameHistory(Node &);
     
     //@}
-
 
   protected:
 
@@ -184,9 +181,6 @@ namespace pnapi
     /// help method for normalize method
     bool isNormal() const;
 
-    /// output of the transition
-    string toString() const;
-
     /// merges another transition into this one
     void merge(Transition &, bool = true);
 
@@ -225,8 +219,8 @@ namespace pnapi
     /// returns the capacity
     unsigned int getCapacity() const;
 
-    /// DOT-output of the place
-    string toString() const;
+    /// if the place was an interface place before
+    bool wasInterface() const;
 
     /// merges two places
     void merge(Place &, bool = true);
@@ -292,9 +286,6 @@ namespace pnapi
 
     /// weight
     unsigned int getWeight() const;
-
-    /// DOT-output of the arc
-    string toString(bool = true) const;
 
     /// merges another arc into this one
     void merge(Arc &);

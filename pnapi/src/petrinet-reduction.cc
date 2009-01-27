@@ -667,6 +667,7 @@ int PetriNet::reduce_rule_4()
     // STEP 3.1: set arcs
     Place* p1 = (*equals).first;
     Place* p2 = (*equals).second;
+    
     for(set<Arc*>::iterator a = p2->getPresetArcs().begin();
         a != p2->getPresetArcs().end(); ++a)
     {
@@ -682,6 +683,10 @@ int PetriNet::reduce_rule_4()
     
     // STEP 3.2: set marking
     p1->mark(p1->getTokenCount()+p2->getTokenCount());
+    
+    // save history
+    p1->mergeNameHistory(*p2);
+    (*(p1->getPostset().begin()))->mergeNameHistory(*(*(p1->getPostset().begin())));
     
     // STEP 3.3: remove place and transition
     deleteTransition(*(static_cast<Transition*>(*(p2->getPostset().begin()))));

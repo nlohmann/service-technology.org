@@ -32,9 +32,9 @@ Copyright @copyright{} 2008 Karsten Wolf
 @title LoLA
 
 @subtitle A Low Level Petri Net Analyser
-@c @subtitle @url{http://service-technology.org/lola}
-@c @vskip 0.5em
-@c @subtitle Version @value{VERSION}, @value{UPDATED}
+@subtitle @url{http://service-technology.org/lola}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
 
 @author Karsten Wolf
 @page
@@ -55,15 +55,16 @@ Copyright @copyright{} 2008 Karsten Wolf
 @c --------------------------------------------------------------------------
 
 @menu
-* About LoLA::About LoLA
-* Net File Format::
-* Supported Properties::
-* Reduction Techniques::
-* Output::
-* Download::  Download
-* First Steps:: First Steps
-* ChangeLog::Version history.
-* Indices:: 
+* About LoLA::An introduction to LoLA and its range of application
+* Net File Format::A description of LoLA's input net file format
+* Supported Properties::The properties LoLA can analyze
+* Reduction Techniques::Reduction techniques LoLA uses to fight state space explosion
+* Output::The file formats LoLA outputs
+* Download::Where to get LoLA
+* First Steps::How to bootstrap LoLA
+* Additional Utilities::Additional tools to postprocess LoLA's outputs
+* ChangeLog::Version history
+* Indices::Concept and keyword indices
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -94,7 +95,7 @@ LoLA (a Low Level Petri Net Analyzer) has been implemented for the validation of
 @item simple textual interaction for easy integration into other tools
 @end itemize
 
-LoLA has been tested on several UNIX platforms (Solaris, SUN-OS, LINUX) as well as under WINDOWS using the CYGWIN environment.
+LoLA has been tested on several UNIX platforms (FreeBSD, Solaris), Linux, as well as under Windows using the CYGWIN environment.
 
 
 
@@ -104,9 +105,9 @@ LoLA has been tested on several UNIX platforms (Solaris, SUN-OS, LINUX) as well 
 The following list gives a short summary of some case studies involving the use of LoLA.
 
 @itemize
-@item Verification of a GALS wrapper 
-@item Validation of a Petri Net Semantics for WS-BPEL 
-@item Verification of WS-BPEL choreographies 
+@item Verification of a @acronym{GALS, globally asynchronous locally synchronous system} wrapper 
+@item Validation of a Petri Net Semantics for @acronym{WS-BPEL, Web Service Business Process Execution Language} 
+@item Verification of @acronym{WS-BPEL} choreographies 
 @item Garavel's challenge in the Petri Net Mailing List 
 @item Exploration of biochemical networks
 @end itemize
@@ -116,22 +117,22 @@ The following list gives a short summary of some case studies involving the use 
 
 A @acronym{GALS} circuit is a complex integrated circuit where several components operate locally synchronously but exchange information asynchronously. @acronym{GALS} technology promises lower energy consumption and higher clock frequency. 
 
-In a joint project, researchers at Humboldt-Universit@"at zu Berlin and the Semiconductor Research Institute in Frankfurt/Oder analysed a @acronym{GALS} circuit that implements a device for coding/decoding signals of wireless @acronym{LAN} connections according to the 802.11 protocol. They were particularly concerned with parts of the circuit they called wrapper. A wrapper is attached to each synchronous component of a @acronym{GALS} circuit. It is responsible for managing the asynchronously incoming data, pausing the local clock in case of no pending data, and shipping the outgoing signals to the respective next component. They modeled a wrapper as a place-transition net and analysed the occurrence of hazard situations. A hazard is a situation where, according to two incoming signals within a very short time interval, output signals may assume undefined values. In the model, a hazard situation corresponds to a particular reachable state predicate. LoLA was used with stubborn sets and the sweep-line method as reduction techniques. Analysis revealed 8 hazard situations in the model. 6 of them were ruled out by the engineers due to timing constraints which were not modeled. The remaining 2 hazards were confirmed as real problems. The circuit was redesigned and another verification confirmed the absence of hazard situations.
+In a joint project, researchers at Humboldt-Universit@"at zu Berlin and the Semiconductor Research Institute in Frankfurt/Oder analysed a @acronym{GALS} circuit that implements a device for coding/decoding signals of wireless @acronym{LAN} connections according to the 802.11 protocol. They were particularly concerned with parts of the circuit they called wrapper. A wrapper is attached to each synchronous component of a @acronym{GALS} circuit. It is responsible for managing the asynchronously incoming data, pausing the local clock in case of no pending data, and shipping the outgoing signals to the respective next component. They modeled a wrapper as a place-transition net and analysed the occurrence of hazard situations. A hazard is a situation where, according to two incoming signals within a very short time interval, output signals may assume undefined values. In the model, a hazard situation corresponds to a particular reachable state predicate. LoLA was used with stubborn sets and the sweep-line method as reduction techniques. Analysis revealed eight hazard situations in the model. Six of them were ruled out by the engineers due to timing constraints which were not modeled. The remaining two hazards were confirmed as real problems. The circuit was redesigned and another verification confirmed the absence of hazard situations.
 
 @b{More information:}
 @itemize
 @item
-Milos Krstic, Eckhard Grass, and Christian Stahl. @b{Request-Driven GALS Technique for Wireless Communication System}. In @i{Proceedings of the 11th International Symposium on Advanced Research in Asynchronous Circuits and Systems (ASYNC 2005)}, New York, NY, USA, pages 76-85, March 2005. IEEE Computer Society.
+Milos Krstic, Eckhard Grass, and Christian Stahl. @b{Request-Driven @acronym{GALS} Technique for Wireless Communication System}. In @i{Proceedings of the 11th International Symposium on Advanced Research in Asynchronous Circuits and Systems (@acronym{ASYNC} 2005)}, New York, NY, USA, pages 76-85, March 2005. @acronym{IEEE} Computer Society.
 @end itemize
 
 
 @subsection Validation of a Petri Net Semantics for WS-BPEL
 
-The language @acronym{WS-BPEL, Web Service Business Process Execution Language} has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universit@"at zu Berlin proposed a formal semantics for @acronym{WS-BPEL} on the basis of high-level Petri nets (with a straightforward place-transition net abstraction that ignores data dependencies). Due to tricky concepts in the language, the translation of @acronym{WS-BPEL} into Petri nets required a validation. The validation was carried out through an automated translation of @acronym{WS-BPEL} into Petri nets and a subsequent analysis of the resulting Petri nets using LoLA. LoLA was used with stubborn sets and the sweep-line method as most frequently used reduction techniques.
+The language @acronym{WS-BPEL} has been proposed by an industrial consortium for the specification of web services. Researchers at Humboldt-Universit@"at zu Berlin proposed a formal semantics for @acronym{WS-BPEL} on the basis of high-level Petri nets (with a straightforward place-transition net abstraction that ignores data dependencies). Due to tricky concepts in the language, the translation of @acronym{WS-BPEL} into Petri nets required a validation. The validation was carried out through an automated translation of @acronym{WS-BPEL} into Petri nets and a subsequent analysis of the resulting Petri nets using LoLA. LoLA was used with stubborn sets and the sweep-line method as most frequently used reduction techniques.
 
 @b{More information:}
 @itemize
-@item Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming BPEL to Petri Nets}. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, @i{Proceedings of the Third International Conference on Business Process Management (BPM 2005)}, volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005.
+@item Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming @acronym{BPEL} to Petri Nets}. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, @i{Proceedings of the Third International Conference on Business Process Management (@acronym{BPM} 2005)}, volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005. [@url{http://dx.doi.org/10.1007/11538394_15, @acronym{DOI}}]
 @end itemize
 
 
@@ -141,13 +142,13 @@ The language @acronym{WS-BPEL} has been proposed by an industrial consortium for
 
 @b{More information:}
 @itemize
-@item Niels Lohmann, Oliver Kopp, Frank Leymann, and Wolfgang Reisig. @b{Analyzing BPEL4Chor: Verification and Participant Synthesis}. In Marlon Dumas and Reiko Heckel, editors, @i{Web Services and Formal Methods, Forth International Workshop, WS-FM 2007}, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science, pages 46-60, 2008. Springer-Verlag.
+@item Niels Lohmann, Oliver Kopp, Frank Leymann, and Wolfgang Reisig. @b{Analyzing BPEL4Chor: Verification and Participant Synthesis}. In Marlon Dumas and Reiko Heckel, editors, @i{Web Services and Formal Methods, Forth International Workshop, @acronym{WS-FM} 2007}, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science, pages 46-60, 2008. Springer-Verlag. [@url{http://dx.doi.org/10.1007/978-3-540-79230-7_4, @acronym{DOI}}]
 @end itemize
 
 
 @subsection Garavel's challenge in the Petri Net Mailing List 
 
-In 2003, H. Garavel posted a place/transition net to the Petri net mailing list. It consisted of 485 places and 776 transitions. He was interested in quasi-liveness, i.e. the absence of any transition that is dead in the initial marking. According to the posting, the example stems from the translation of a @acronym{LOTOS} specification into Petri nets. There were four responses reporting successful verification. One of them involved LoLA. With LoLA, we checked each transition separately for non-death. We succeeded for all but two transitions. For the remaining transitions, goal-oriented execution confirmed non-death. According to the other responses which involved either symbolic (@acronym{BDD} based) verification or the use of the covering step graph technique, the full state space consisted of almost @math{10^{22}} states.
+In 2003, H. Garavel posted a place/transition net to the Petri net mailing list. It consisted of 485 places and 776 transitions. He was interested in quasi-liveness, i.e. the absence of any transition that is dead in the initial marking. According to the posting, the example stems from the translation of a @acronym{LOTOS} specification into Petri nets. There were four responses reporting successful verification. One of them involved LoLA. With LoLA, we checked each transition separately for non-death. We succeeded for all but two transitions. For the remaining transitions, goal-oriented execution confirmed non-death. According to the other responses which involved either symbolic (@acronym{BDD, binary decision diagram} based) verification or the use of the covering step graph technique, the full state space consisted of almost @math{10^{22}} states.
 
 @b{More information:}
 @itemize
@@ -1543,9 +1544,9 @@ The symmetry methods implemented in LoLA correspond to the publications:
 @itemize
 @item Tommi A. Junttila. @b{New canonical representative marking algorithms for place/transition-nets}. In J. Cortadella and W. Reisig, editors, @i{Application and Theory of Petri Nets 2004}, volume 3099 of Lecture Notes in Computer Science, pages 258-277. Springer, 2004.
 
-@item Karsten Schmidt. @b{How to Calculate Symmetries of Petri Nets}. @i{Acta Inf.}, 36(7):545-590, 2000. 
+@item Karsten Schmidt. @b{How to Calculate Symmetries of Petri Nets}. @i{Acta Inf.}, 36(7):545-590, 2000. [@url{http://dx.doi.org/10.1007/s002360050002, @acronym{DOI}}]
 
-@item Karsten Schmidt. @b{Integrating Low Level Symmetries into Reachability Analysis}. In Susanne Graf and Michael I. Schwartzbach, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems: 6th International Conference, TACAS 2000, Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2000, Berlin, Germany, March/April 2000. Proceedings}, volume 1785 of Lecture Notes in Computer Science, pages 315-330, 2000. Springer-Verlag.
+@item Karsten Schmidt. @b{Integrating Low Level Symmetries into Reachability Analysis}. In Susanne Graf and Michael I. Schwartzbach, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems: 6th International Conference, @acronym{TACAS} 2000, Held as Part of the Joint European Conferences on Theory and Practice of Software, @acronym{ETAPS} 2000, Berlin, Germany, March/April 2000. Proceedings}, volume 1785 of Lecture Notes in Computer Science, pages 315-330, 2000. Springer-Verlag. [@url{http://www.springerlink.com/content/d8dckgmuf9p3bq3c/, SpringerLink}]
 @end itemize
 
 
@@ -1581,11 +1582,11 @@ Most stubborn set methods implemented in LoLA correspond to the publications:
 
 @item Rob Gerth, Ruurd Kuiper, Doron Peled, Wojciech Penczek: @b{A Partial Order Approach to Branching Time Logic Model Checking}. @i{Inf. Comput.} 150(2): 132-152 (1999)
 
-@item Lars Michael Kristensen, Karsten Schmidt, Antti Valmari: @b{Question-guided stubborn set methods for state properties}. @i{Formal Methods in System Design (FMSD)} 29(3):215-251 (2006)
+@item Lars Michael Kristensen, Karsten Schmidt, Antti Valmari: @b{Question-guided stubborn set methods for state properties}. @i{Formal Methods in System Design (@acronym{FMSD})} 29(3):215-251 (2006). [@url{http://dx.doi.org/10.1007/s10703-006-0006-1, @acronym{DOI}}]
 
 @item Karsten Schmidt. @b{Stubborn Sets for Model Checking the EF/AG Fragment of @acronym{CTL}}. @i{Fundam. Inform.}, 43(1-4):331-341, August 2000.
 
-@item Karsten Schmidt. @b{Stubborn Sets for Standard Properties}. In @i{Applications and Theory of Petri Nets 1999: 20th International Conference, ICATPN'99, Williamsburg, Virginia, USA, June 1999. Proceedings}, volume 1639 of Lecture Notes in Computer Science, pages 46-65, 1999. Springer-Verlag.
+@item Karsten Schmidt. @b{Stubborn Sets for Standard Properties}. In @i{Applications and Theory of Petri Nets 1999: 20th International Conference, @acronym{ICATPN}'99, Williamsburg, Virginia, USA, June 1999. Proceedings}, volume 1639 of Lecture Notes in Computer Science, pages 46-65, 1999. Springer-Verlag. [@url{http://www.springerlink.com/content/mtj3p6183xchedr9/, SpringerLink}]
 @end itemize
 
 
@@ -1622,7 +1623,7 @@ The sweep-line method as implemented in LoLA corresponds to the publications:
 @itemize
 @item Lars Michael Kristensen and Thomas Mailund. @b{A Generalised Sweep-Line Method for Safety Properties}. @i{Proc. Formal Methods Europe}, volume 2391 of Lecture Notes in Computer Science, 2002, pp. 549-567
 
-@item Karsten Schmidt. @b{Automated Generation of a Progress Measure for the Sweep-Line Method}. @i{STTT}, 8(3):195-203, June 2006. Also in: Kurt Jensen and Andreas Podelski, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems, 10th International Conference, TACAS 2004, Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2004, Barcelona, Spain, March 29-April 2, 2004, Proceedings}, volume 2988 of Lecture Notes in Computer Science, pages 192-204, 2004. Springer-Verlag
+@item Karsten Schmidt. @b{Automated Generation of a Progress Measure for the Sweep-Line Method}. @i{@acronym{STTT}}, 8(3):195-203, June 2006. Also in: Kurt Jensen and Andreas Podelski, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems, 10th International Conference, @acronym{TACAS} 2004, Held as Part of the Joint European Conferences on Theory and Practice of Software, @acronym{ETAPS} 2004, Barcelona, Spain, March 29-April 2, 2004, Proceedings}, volume 2988 of Lecture Notes in Computer Science, pages 192-204, 2004. Springer-Verlag. [@url{http://dx.doi.org/10.1007/b96393, @acronym{DOI}}]
 @end itemize
 
 
@@ -1653,7 +1654,7 @@ The cycle coverage method is compatible only with the stubborn set and symmetry 
 The method has been described in
 
 @itemize
-@item Karsten Schmidt. @b{Using Petri Net Invariants in State Space Construction}. In Hubert Garavel and John Hatcliff, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2003), 9th International Conference, Part of ETAPS 2003, Warsaw, Poland}, volume 2619 of Lecture Notes in Computer Science, pages 473-488, 2003. Springer-Verlag.
+@item Karsten Schmidt. @b{Using Petri Net Invariants in State Space Construction}. In Hubert Garavel and John Hatcliff, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems (@acronym{TACAS} 2003), 9th International Conference, Part of @acronym{ETAPS} 2003, Warsaw, Poland}, volume 2619 of Lecture Notes in Computer Science, pages 473-488, 2003. Springer-Verlag. [@url{http://www.springerlink.com/content/20v8eyakvde5e558/, SpringerLink}]
 @end itemize
 
 
@@ -1685,7 +1686,7 @@ The coverability graph method implemented in LoLA corresponds to the publication
 @itemize
 @item R.M. Karp, R.E. Miller: Parallel program schemata. J. Computer and System Sciences 4, 1969, pp. 147-195
 
-@item Karsten Schmidt. @b{Model-Checking with Coverability Graphs}. @i{Formal Methods in System Design}, 15(3):239-254, November 1999
+@item Karsten Schmidt. @b{Model-Checking with Coverability Graphs}. @i{Formal Methods in System Design}, 15(3):239-254, November 1999. [@url{http://dx.doi.org/10.1023/A:1008753219837, @acronym{DOI}}]
 @end itemize
 
 
@@ -1738,7 +1739,7 @@ The state compression technique is compatible with all other reduction technique
 The method corresponds to the publication:
 
 @itemize
-@item Karsten Schmidt. @b{Using Petri Net Invariants in State Space Construction}. In Hubert Garavel and John Hatcliff, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems (TACAS 2003), 9th International Conference, Part of ETAPS 2003, Warsaw, Poland}, volume 2619 of Lecture Notes in Computer Science, pages 473-488, 2003. Springer-Verlag.
+@item Karsten Schmidt. @b{Using Petri Net Invariants in State Space Construction}. In Hubert Garavel and John Hatcliff, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems (@acronym{TACAS} 2003), 9th International Conference, Part of @acronym{ETAPS} 2003, Warsaw, Poland}, volume 2619 of Lecture Notes in Computer Science, pages 473-488, 2003. Springer-Verlag. [@url{http://www.springerlink.com/content/20v8eyakvde5e558/, SpringerLink}]
 @end itemize
 
 
@@ -2001,6 +2002,34 @@ The source code of LoLA.
 @item tests
 Testcases for LoLA which check the generated binary.
 @end table
+
+
+
+
+@c --------------------------------------------------------------------------
+@node Additional Utilities
+@chapter Additional Utilities
+
+The directory @file{utils} contain several small helper tools to postprocess outputs from LoLA.
+
+@section @code{path2graph}
+@cindex path2graph
+
+@c Several variants of LoLA create paths as counterexamples for certain properties, for instance a path from the initial marking to a deadlock. To display the markings on this path, the tool @code{path2graph} reads a path and the underlying Petri net and creates a reachability graph in LoLA's @file{.graph} format. This can then be read by @code{graph2dot}.
+
+@sp 1
+@smallexample
+@include path2graph.out
+@end smallexample
+
+
+@section @code{graph2dot}
+@cindex graph2dot
+
+@sp 1
+@smallexample
+@include graph2dot.out
+@end smallexample
 
 
 

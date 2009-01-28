@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/net.cc)
-AC_CONFIG_HEADER(src/config.H)
+AC_CONFIG_HEADER(src/config.h)
 
 # check for generic programs
 AC_PROG_CXX

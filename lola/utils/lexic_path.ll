@@ -9,7 +9,7 @@
 #include <cstring>
 #include "syntax_path.h"
 
-extern int path_error(const char *msg);
+void path_error(const char *msg);
 
 %}
 
@@ -31,3 +31,10 @@ number			[0-9][0-9]*
 [ \t\r\n]*		{ /* skip */ }
 <<EOF>>			{ return EOF; }
 .			{ path_error("lexical error"); }
+
+%%
+
+void path_error(const char *msg)
+{
+  fprintf(stderr, "%d: %s\n", path_lineno, msg);
+}

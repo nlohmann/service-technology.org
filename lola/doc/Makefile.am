@@ -1,10 +1,12 @@
 info_TEXINFOS = lola.texi
 
-lola_TEXINFOS = ChangeLog.texi
+lola_TEXINFOS = ChangeLog.texi graph2dot.out path2graph.out
 
 TEXINFO_TEX = texinfo.tex
 
 EXTRA_DIST = gendocs.sh gendocs_template
+
+MAINTAINERCLEANFILES = graph2dot.out path2graph.out
 
 all: ../ChangeLog
 
@@ -23,6 +25,15 @@ all: ../ChangeLog
 	head -n `($(GREP) -n -m2 "^Version " ChangeLog.txt | $(SED) -n '2p' | $(SED) -e 's/:/ /' | $(AWK) '{print $$1-1}')` ChangeLog.txt >> ../NEWS
 	echo "\nSee file ChangeLog <http://service-technology.org/files/$(PACKAGE)/ChangeLog> for\ncomplete version history.\n" >> ../NEWS
 	rm ChangeLog.txt
+
+
+#############################################################################
+# run "rachel --help" to include output in documentation
+#############################################################################
+graph2dot.out: $(top_srcdir)/utils/cmdline-graph2dot.ggo $(top_srcdir)/configure.ac
+	$(top_srcdir)/utils/graph2dot --help > graph2dot.out
+path2graph.out: $(top_srcdir)/utils/cmdline-path2graph.ggo $(top_srcdir)/configure.ac
+	$(top_srcdir)/utils/path2graph --help > path2graph.out
 
 
 #############################################################################

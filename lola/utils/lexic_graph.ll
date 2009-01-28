@@ -19,11 +19,17 @@ number    [0-9][0-9]*
 %%
 
 
-"STATE"   { return KW_STATE; }
-"Prog:"   { return KW_PROG; }
-":"       { return COLON; }
-","       { return COMMA; }
-"->"      { return ARROW; }
+"Places"                { return KW_PLACES; }
+"Transitions"           { return KW_TRANSITIONS; }
+"States"                { return KW_STATES; }
+"Edges"                 { return KW_EDGES; }
+"Hash table entries"    { return KW_HASH; }
+"STATE"                 { return KW_STATE; }
+"Prog:"                 { return KW_PROG; }
+":"                     { return COLON; }
+","                     { return COMMA; }
+"->"                    { return ARROW; }
+">>>>>"                 { return INDENT; }
 
 {number}  { char *temp = (char *)malloc((strlen(graph_text)+1) * sizeof(char));
             strcpy(temp, graph_text);

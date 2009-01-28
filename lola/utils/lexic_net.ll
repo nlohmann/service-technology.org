@@ -9,7 +9,7 @@
 #include <cstring>
 #include "syntax_net.h"
 
-extern int net_error(const char *msg);
+void net_error(const char *msg);
 
 %}
 
@@ -42,3 +42,10 @@ number			[0-9][0-9]*
 [ \t\r\n]*		{ /* skip */ }
 <<EOF>>			{ return EOF; }
 .			{ net_error("lexical error"); }
+
+%%
+
+void net_error(const char *msg)
+{
+  fprintf(stderr, "%d: %s\n", net_lineno, msg);
+}

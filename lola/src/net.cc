@@ -1,4 +1,4 @@
-#include "config.H"
+#include "config.h"
 #include "printnet.H"
 #include "dimensions.H"
 #include "net.H"

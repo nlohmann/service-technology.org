@@ -1,0 +1,32 @@
+args "--long-help --show-required --include-getopt"
+
+package "path2graph"
+purpose "Converts a transition sequence of a net into a reachability graph"
+
+
+section "Input"
+
+option "path" p
+ "Read a transition sequence, counter example, or witness path in LoLA's .path format from file."
+ typestr="FILE"
+ string required
+
+option "net" n
+ "Read a low-level Petri net the transition sequence/counter example/witness path belongs to from file."
+ typestr="FILE"
+ string required
+
+
+section "Output"
+
+option "graph" g
+ "Write the graph to file. (If option is omitted, path2graph writes to stdout)"
+ typestr="FILE"
+ string optional
+
+
+text "\n"
+text "Examples:\n"
+text "   path2graph -p net.path -n net.lola -g net.graph\n"
+text "   path2graph -p net.path -n net.lola | graph2dot | dot -Tpng -o net.png"
+

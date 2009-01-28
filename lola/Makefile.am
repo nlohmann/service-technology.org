@@ -1,4 +1,4 @@
-SUBDIRS = src doc maintainer tests utils
+SUBDIRS = src utils doc maintainer tests
 
 EXTRA_DIST = patches
 

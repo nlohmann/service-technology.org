@@ -11,8 +11,7 @@
 void graph_error(const char *);
 %}
 
-
-name      [&()+:.\-!_a-zA-Z0-9]*
+name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
 number    [0-9][0-9]*
 
 

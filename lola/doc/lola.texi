@@ -2010,25 +2010,102 @@ Testcases for LoLA which check the generated binary.
 @node Additional Utilities
 @chapter Additional Utilities
 
-The directory @file{utils} contain several small helper tools to postprocess outputs from LoLA.
+The directory @file{utils} contains several small helper tools to postprocess outputs from LoLA.
 
-@section @code{path2graph}
-@cindex path2graph
+@section Drawing Reachability Graphs: @sansserif{graph2dot}
+@cindex @sansserif{graph2dot} utility
 
-@c Several variants of LoLA create paths as counterexamples for certain properties, for instance a path from the initial marking to a deadlock. To display the markings on this path, the tool @code{path2graph} reads a path and the underlying Petri net and creates a reachability graph in LoLA's @file{.graph} format. This can then be read by @code{graph2dot}.
+To draw the reachability graph of the Dining Philosophers, execute the following commands:
+
+@cartouche
+@smallexample
+lola-full phils.llnet -m
+graph2dot < phils.graph > phils.dot
+dot phils.dot -T png -O
+@end smallexample
+@end cartouche
+
+The resulting graph @file{phils.dot.png} should look as the graph in Fig. 1.
 
 @sp 1
+@center @image{figs/phils-graph, 5in}
+@center @b{Figure 1.} Reachability graph of the Dining Philosophers
+@sp 1
+
+To display all command-line parameters of @sansserif{graph2dot}, enter
+
 @smallexample
-@include path2graph.out
+@include graph2dot.out
 @end smallexample
 
 
-@section @code{graph2dot}
-@cindex graph2dot
+
+
+
+@section Postprocessing Paths: @sansserif{path2graph}
+@cindex @sansserif{path2graph} utility
+
+
+The Dining Philosophers can deadlock if every philosopher takes his left fork. LoLA can find this deadlock. Enter
+
+@cartouche
+@smallexample
+lola-deadlock phils.llnet -P
+@end smallexample
+@end cartouche
+
+which returns
+
+@smallexample
+15 Places
+12 Transitions
+
+dead state found!
+PATH
+tl.[y=2]
+tl.[y=3]
+tl.[y=1]
+
+>>>>> 4 States, 3 Edges, 4 Hash table entries
+@end smallexample
+
+This, however, gives no information about the deadlock itself or the intermediate states on this path. This is where @sansserif{path2graph} comes into play. It reads the path and the net and creates that part of the reachability graph which consists of the initial state, the intermediate states and the deadlock.
+
+@cartouche
+@smallexample
+lola-deadlock phils.llnet -p
+path2graph -n phils.llnet -p phils.path -g phils-deadlock.graph
+@end smallexample
+@end cartouche
+
+Of course, the resulting @file{.graph} file can be translated into a Graphviz Dot representation with @sansserif{graph2dot}:
+
+@cartouche
+@smallexample
+graph2dot -g phils-deadlock.graph -d phils-deadlock.dot
+dot phils-deadlock.dot -T png -O
+@end smallexample
+@end cartouche
+
+The resulting graph @file{phils-deadlock.dot.png} should look as the graph in Fig. 2.
 
 @sp 1
+@center @image{figs/phils-deadlock, 2in}
+@center @b{Figure 2.} Reachability graph of the Dining Philosophers
+@sp 1
+
+To display all command-line parameters of @sansserif{path2graph}, enter
+
+@cartouche
 @smallexample
-@include graph2dot.out
+path2graph -h
+@end smallexample
+@end cartouche
+
+which displays
+
+@smallexample
+@include path2graph.out
 @end smallexample
 
 

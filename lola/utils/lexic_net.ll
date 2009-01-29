@@ -47,5 +47,5 @@ number			[0-9][0-9]*
 
 void net_error(const char *msg)
 {
-  fprintf(stderr, "%d: %s\n", net_lineno, msg);
+  fprintf(stderr, "net %d: %s\n", net_lineno, msg);
 }

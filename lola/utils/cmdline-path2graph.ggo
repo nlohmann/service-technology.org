@@ -12,10 +12,9 @@ option "path" p
  string required
 
 option "net" n
- "Read a low-level Petri net the transition sequence/counter example/witness path belongs to from file."
+ "Read a low-level Petri net the transition sequence, counterexample, or witness path belongs to from file. Note path2graph can only process low-level Petri nets. To process a high-level net, say `net.lola', first convert it into a low-level net by executing `lola-full net.lola -n' which creates the file `net.llnet'."
  typestr="FILE"
  string required
-
 
 section "Output"
 
@@ -29,4 +28,3 @@ text "\n"
 text "Examples:\n"
 text "   path2graph -p net.path -n net.lola -g net.graph\n"
 text "   path2graph -p net.path -n net.lola | graph2dot | dot -Tpng -o net.png"
-

@@ -14,8 +14,8 @@ void path_error(const char *msg);
 %}
 
 
-name			[&()+:.\-!_a-zA-Z0-9]*
-number			[0-9][0-9]*
+name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
+number	  [0-9][0-9]*
 
 
 %%
@@ -36,5 +36,5 @@ number			[0-9][0-9]*
 
 void path_error(const char *msg)
 {
-  fprintf(stderr, "%d: %s\n", path_lineno, msg);
+  fprintf(stderr, "path %d: %s\n", path_lineno, msg);
 }

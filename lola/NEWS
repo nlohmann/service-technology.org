@@ -34,10 +34,10 @@ Version 1.11-unreleased
   contain binaries of all configurations in directory `src/configs'
 
 * added a directory `utils' for small helper tools:
-     * `graph2dot' creates a graphical representation of a reachability graph
+     * graph2dot creates a graphical representation of a reachability graph
        created by LoLA (e.g., when configured with mode `FULL')
 
-     * `path2graph' translates a path created by LoLA (e.g., when configured
+     * path2graph translates a path created by LoLA (e.g., when configured
        with mode `DEADLOCK') into a reachability graph
 
 

@@ -41,4 +41,4 @@ option "exclude" x
 text "\n"
 text "Examples:\n"
 text "   graph2dot -c1 -fp1,p2,p3 -g net.graph -d net.dot\n"
-text "   cat net.graph | graph2dot -e | dot -Tpng -o net.png\n"
+text "   cat net.graph | graph2dot -e | dot -Tpng -o net.png"

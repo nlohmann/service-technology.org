@@ -1,6 +1,6 @@
 info_TEXINFOS = lola.texi
 
-lola_TEXINFOS = ChangeLog.texi graph2dot.out path2graph.out
+lola_TEXINFOS = ChangeLog.texi graph2dot.out path2graph.out figs
 
 TEXINFO_TEX = texinfo.tex
 
@@ -28,11 +28,13 @@ all: ../ChangeLog
 
 
 #############################################################################
-# run "rachel --help" to include output in documentation
+# collect the "--help" outputs of the utilities for the documentation
 #############################################################################
 graph2dot.out: $(top_srcdir)/utils/cmdline-graph2dot.ggo $(top_srcdir)/configure.ac
+	$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
 	$(top_srcdir)/utils/graph2dot --help > graph2dot.out
 path2graph.out: $(top_srcdir)/utils/cmdline-path2graph.ggo $(top_srcdir)/configure.ac
+	$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
 	$(top_srcdir)/utils/path2graph --help > path2graph.out
 
 
@@ -40,4 +42,7 @@ path2graph.out: $(top_srcdir)/utils/cmdline-path2graph.ggo $(top_srcdir)/configu
 # run the "gendocs.sh" script to create a manual in several formats
 #############################################################################
 manual: $(info_TEXINFOS)
+	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"
+	cp -R figs manual
+	cp -R figs manual/html_node
 	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"

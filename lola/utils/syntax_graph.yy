@@ -58,14 +58,14 @@ suffix:
 
 states:
   state
-| state states;
+| state states
+;
 
 state:
   KW_STATE NUMBER prog
     { fprintf(dot_out, "s%d ", $2);
       currentState = $2; }
-  markings
-  transitions
+  markings transitions
 ;
 
 prog:
@@ -89,7 +89,10 @@ markings:
                     if (printedPlaces > 0)
                         fprintf(dot_out, ", ");
 
-                    if (args_info.columns_given && args_info.columns_arg != 0 && printedPlaces > 0 && (printedPlaces % args_info.columns_arg == 0))
+                    if (args_info.columns_given &&
+                        args_info.columns_arg != 0 &&
+                        printedPlaces > 0 &&
+                        (printedPlaces % args_info.columns_arg == 0))
                         fprintf(dot_out, "\\n");
 
                     fprintf(dot_out, "%s", m->first.c_str());

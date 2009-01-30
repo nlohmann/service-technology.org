@@ -173,9 +173,6 @@ namespace pnapi
     /// creates a Transition
     Transition & createTransition(const string & = "");
 
-    /// deletes all interface places
-    //void deleteInterfacePlaces();
-
     //@}
 
 
@@ -192,11 +189,11 @@ namespace pnapi
     /// checks the Petri net for free choice criterion
     bool isFreeChoice() const;
 
+    bool isNormal() const;
+
     /// compose two nets by adding the given one and merging interfaces
     void compose(const PetriNet &, const string & = "net1",
 		 const string & = "net2");
-
-    bool isNormal() const;
 
     /// normalizes the Petri net
     void normalize();
@@ -222,10 +219,6 @@ namespace pnapi
 
     /// returns the final condition to operate with it
     Condition & getFinalCondition();
-
-    /// TODO: can this be templated and moved to pnapi::util (util.{h,cc})?
-    /// DFS using Tarjan's algorithm
-    unsigned int dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const;
 
     /// TODO: move to class Marking
     /// looks for a living transition under m

@@ -19,6 +19,7 @@
 #include "petrinet.h"
 
 using pnapi::io::operator<<;
+using pnapi::io::operator>>;
 
 
 /*!
@@ -34,8 +35,10 @@ using pnapi::io::operator<<;
  * Everything you will use can be found in the following namespaces:
  * - pnapi
  * - pnapi::formula
+ * - pnapi::io
  *
- * The class pnapi::PetriNet provides the main functionality and can serve as
+ * The classes pnapi::PetriNet and pnapi::Automaton provide the main 
+ * functionality and can serve as
  * an entry point for getting an overview of the API's functionality.
  */
 
@@ -43,7 +46,7 @@ using pnapi::io::operator<<;
 /*!
  * \brief   Petri Net API
  *
- * Structures for working with Petri nets (PetriNet).
+ * Structures for working with Petri nets (PetriNet) and service automata (Automaton).
  */
 namespace pnapi
 {

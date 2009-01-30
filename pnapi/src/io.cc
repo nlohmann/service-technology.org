@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 
 #include "parser.h"
 #include "petrinet.h"

@@ -1,19 +1,10 @@
 #include <cassert>
-#include <fstream>
+#include <sstream>
+#include <iostream>
 
 #include "parser.h"
 
-using std::ifstream;
-
-using namespace pnapi::formula;
-
-//extern istream * pnapi::parser::owfn::pnapi_owfn_istream;
-//extern pnapi::parser::Node<pnapi::parser::owfn::Node> * pnapi_owfn_ast;
-//extern int pnapi_owfn_parse();
-
-extern istream * pnapi_petrify_istream;
-extern pnapi::parser::Node<pnapi::parser::petrify::Node> * pnapi_petrify_ast;
-extern int pnapi_petrify_parse();
+using std::stringstream;
 
 namespace pnapi
 {
@@ -24,48 +15,127 @@ namespace pnapi
     namespace owfn
     {
 
-      istream * inputStream;
+      istream * stream;
 
-      parser::Node<Node> * syntaxTree;
-      
+      Node * node;
+
+      void error(const string & msg)
+      {
+	throw msg;
+      }
+
+      Node::Node() :
+	BaseNode(), type(NO_DATA)
+      {
+      }
+
+      Node::Node(Node * node) :
+	BaseNode(node), type(NO_DATA)
+      {
+      }
+
+      Node::Node(Node * node1, Node * node2) :
+	BaseNode(node1, node2), type(NO_DATA)
+      {
+      }
+
+      Node::Node(Node * node1, Node * node2, Node * node3) :
+	BaseNode(node1, node2, node3), type(NO_DATA)
+      {
+      }
+
+      Node::Node(int val) :
+	type(DATA_NUMBER), number(val)
+      {
+      }
+
+      Node::Node(string * str) :
+	type(DATA_IDENTIFIER), identifier(*str)
+      {
+	delete str;
+      }
 
       Node::Node(Type type, Node * node) :
-	type(type), petriNet(NULL), value(0)
+	type(type)
       {
-	if (node != NULL)
-	  addChild(*node);
+	assert(node != NULL);
+
+	if (node->type == DATA_NUMBER || node->type == DATA_IDENTIFIER)
+	  mergeData(node);
+	else if (node->type == NO_DATA)
+	  mergeChildren(node);
+	else
+	  addChild(node);
       }
 
-      Node::Node(Type type, Node * node1, Node * node2) :
-	type(type), petriNet(NULL), value(0)
+      Node::Node(Type type, Node * node, int number) :
+	type(type), number(number)
       {
-	if (node1 != NULL)
-	  addChild(*node1);
-	if (node2 != NULL)
-	  addChild(*node2);
+	mergeData(node);
       }
 
-      Node::Node(Type type, PetriNet * net, Node * node) :
-	type(type), petriNet(net), value(0)
+      Node::Node(Type type, Node * data, Node * list) :
+	type(type)
       {
-	if (node != NULL)
-	  addChild(*node);
+	mergeData(data);
+	mergeChildren(list);
       }
 
-      Node::Node(Type type, const string * str, int i) :
-	type(type), petriNet(NULL), value(i), identifier(*str)
+      Node::Node(Type type, Node * data, Node * node1, Node * node2) :
+	BaseNode(node1, node2), type(type)
       {
+	mergeData(data);
       }
 
-      Node::~Node()
+      Node & Node::operator=(const Node & node)
       {
-	if (petriNet != NULL)
-	  delete petriNet;
+	number = node.number;
+	identifier = node.identifier;
+	return *this;
+      }
+
+      void Node::mergeData(Node * node)
+      {
+	assert(node != NULL);
+	assert(node->type == DATA_NUMBER || node->type == DATA_IDENTIFIER);
+
+	switch (type)
+	  {
+	  case PLACE:
+	  case TRANSITION:
+	  case MARK:
+	  case ARC:
+	    if (node->type != DATA_NUMBER)
+	      identifier = node->identifier;
+	    else
+	      { stringstream ss; ss << node->number; identifier = ss.str(); }
+	    break;
+
+	  case CAPACITY: *this = *node; break;
+
+	  default: assert(false);
+	  }
+	delete node;
+      }
+
+      void Node::mergeChildren(Node * node)
+      {
+	assert(node != NULL);
+	assert(node->type == NO_DATA);
+
+	children_ = node->children_;
+	node->children_.clear();
+	delete node;
       }
 
       Parser::Parser() :
-	parser::Parser<Node>(inputStream, syntaxTree, owfn::parse)
+	parser::Parser<Node>(stream, node, owfn::parse)
       {
+      }
+
+      PetriNet Visitor::getPetriNet() const
+      {
+	return net_;
       }
 
       void Visitor::beforeChildren(const Node & node)
@@ -76,32 +146,45 @@ namespace pnapi
 
 	switch (node.type)
 	  {
-	  case Node::PETRINET:
-	    net_ = *node.petriNet; // copy the net, the AST might destroy it
+	  case INPUT:    placeType_ = Place::INPUT;    break;
+	  case OUTPUT:   placeType_ = Place::OUTPUT;   break;
+	  case INTERNAL: placeType_ = Place::INTERNAL; break;
+
+	  case PLACE: places_[node.identifier].type = placeType_;     break;
+	  case MARK:  places_[node.identifier].marking = node.number; break;
+
+	  case PRESET:  isPreset_ = true;  break;
+	  case POSTSET: isPreset_ = false; break;
+
+	  case ARC: 
+	    if (isPreset_)
+	      preset_[node.identifier] = node.number; 
+	    else
+	      postset_[node.identifier] = node.number;
 	    break;
 
-	  case Node::FORMULA_EQ:
-	  case Node::FORMULA_NE:
-	  case Node::FORMULA_LT:
-	  case Node::FORMULA_GT:
-	  case Node::FORMULA_GE:
-	  case Node::FORMULA_LE:
+	  case FORMULA_EQ:
+	  case FORMULA_NE:
+	  case FORMULA_LT:
+	  case FORMULA_GT:
+	  case FORMULA_GE:
+	  case FORMULA_LE:
 	    place = net_.findPlace(node.identifier);
-	    nTokens = node.value;
+	    nTokens = node.number;
 	    switch (node.type)
 	      {
-	      case Node::FORMULA_EQ:
+	      case FORMULA_EQ:
 		formula = new FormulaEqual(*place, nTokens); break;
-	      case Node::FORMULA_NE:
+	      case FORMULA_NE:
 		formula = new FormulaNot(new FormulaEqual(*place, nTokens));
 		break;
-	      case Node::FORMULA_LT:
+	      case FORMULA_LT:
 		formula = new FormulaLess(*place, nTokens); break;
-	      case Node::FORMULA_GT:
+	      case FORMULA_GT:
 		formula = new FormulaGreater(*place, nTokens); break;
-	      case Node::FORMULA_GE:
+	      case FORMULA_GE:
 		formula = new FormulaGreaterEqual(*place, nTokens); break;
-	      case Node::FORMULA_LE:
+	      case FORMULA_LE:
 		formula = new FormulaLessEqual(*place, nTokens); break;
 	      default: /* empty */ ;
 	      }
@@ -116,21 +199,45 @@ namespace pnapi
       {
 	switch (node.type)
 	  {
-	  case Node::FORMULA_NOT:
+	  case INITIAL:
+	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
+		 it != places_.end(); ++it)
+	      // FIXME: error check
+	      net_.createPlace(it->first, it->second.type, it->second.marking);
+	    break;
+
+	  case TRANSITION:
+	    {
+	      // FIXME: error check
+	      Transition & trans = net_.createTransition(node.identifier);
+	      for (map<string, unsigned int>::iterator it = preset_.begin();
+		   it != preset_.end(); ++ it)
+		// FIXME: error check
+		net_.createArc(*net_.findPlace(it->first), trans, it->second);
+	      for (map<string, unsigned int>::iterator it = postset_.begin();
+		   it != postset_.end(); ++ it)
+		// FIXME: error check
+		net_.createArc(trans, *net_.findPlace(it->first), it->second);
+	      preset_.clear();
+	      postset_.clear();
+	      break;
+	    }
+
+	  case FORMULA_NOT:
 	    if (formulas_.size() < 1)
 	      throw string("operand for unary NOT operator expected");
 	    formulas_.push_back(new FormulaNot(formulas_.front()));
 	    formulas_.pop_front();
 	    break;
-	  case Node::FORMULA_AND:
-	  case Node::FORMULA_OR:
+	  case FORMULA_AND:
+	  case FORMULA_OR:
 	    {
 	      if (formulas_.size() < 2)
 		throw string("two operands for binary AND/OR operator expected");
 	      Formula * op1 = formulas_.front(); formulas_.pop_front();
 	      Formula * op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;
-	      if (node.type == Node::FORMULA_AND)
+	      if (node.type == FORMULA_AND)
 		f = new FormulaAnd(op1, op2);
 	      else
 		f = new FormulaOr(op1, op2);
@@ -138,19 +245,10 @@ namespace pnapi
 	      break;
 	    }
 
-	  case Node::FORMULA_AAOPE:
-	  case Node::FORMULA_AAOIPE:
-	  case Node::FORMULA_AAOEPE:
+	  case FORMULA_AAOPE:
+	  case FORMULA_AAOIPE:
+	  case FORMULA_AAOEPE:
 	    assert(false) /* FIXME: formula constructs missing */;
-	    break;
-
-	  case Node::PETRINET:
-	    if (!formulas_.empty())
-	      {
-		//FIXME: net_.setFinalCondition(*formulas_.front());
-		formulas_.pop_front();
-	      }
-	    assert(formulas_.empty());
 	    break;
 
 	  default: /* empty */ ;
@@ -163,6 +261,15 @@ namespace pnapi
     namespace petrify
     {
 
+      istream * stream;
+
+      Node * node;
+
+      void error(const string & msg)
+      {
+	throw msg;
+      }
+
       Node::Node(Type type) : type(type) {}
 
       Node::Node(Type type, Node *child1, Node *child2, Node *child3, Node *child4) :
@@ -170,27 +277,27 @@ namespace pnapi
       {
         if(child1!=NULL)
         {
-          addChild(*child1);
+          addChild(child1);
         }
 
         Node *n1 = new Node(CTRL1);
-        addChild(*n1);
+        addChild(n1);
 
         if(child2!=NULL)
         {
-          addChild(*child2);
+          addChild(child2);
         }
         if(child3!=NULL)
         {
-          addChild(*child3);
+          addChild(child3);
         }
 
         Node *n2 = new Node(CTRL2);
-        addChild(*n2);
+        addChild(n2);
 
         if(child4!=NULL)
         {
-          addChild(*child4);
+          addChild(child4);
         }
       }
 
@@ -199,7 +306,7 @@ namespace pnapi
       {
         if(child != NULL)
         {
-          addChild(*child);
+          addChild(child);
         }
       }
 
@@ -208,11 +315,11 @@ namespace pnapi
       {
         if(child1 != NULL)
         {
-          addChild(*child1);
+          addChild(child1);
         }
         if(child2 != NULL)
         {
-          addChild(*child2);
+          addChild(child2);
         }
       }
 
@@ -223,7 +330,7 @@ namespace pnapi
       }
 
       Parser::Parser() :
-        parser::Parser<Node>(::pnapi_petrify_istream, ::pnapi_petrify_ast, &::pnapi_petrify_parse)
+        parser::Parser<Node>(stream, node, petrify::parse)
       {
       }
 

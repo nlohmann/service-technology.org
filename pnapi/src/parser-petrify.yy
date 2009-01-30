@@ -30,16 +30,19 @@ using std::set;
 using std::map;
 
 using pnapi::parser::petrify::Node;
+using pnapi::parser::petrify::node;
 
-extern int yylex();
+#undef yylex
+#undef yyparse
+#undef yyerror
+
+#define yylex pnapi::parser::petrify::lex
+#define yyparse pnapi::parser::petrify::parse
+#define yyerror pnapi::parser::petrify::error
+
 extern char *yytext;
 extern int yylineno;
 
-
-int yyerror(const char *);
-
-// global variable for parse result (root node of AST)
-Node * pnapi_petrify_ast;
 %}
 
 %union {
@@ -71,7 +74,7 @@ stg:
   K_GRAPH newline
   tp_list pt_list
   K_MARKING OPENBRACE place_list CLOSEBRACE newline
-  K_END newline { pnapi_petrify_ast = new Node(Node::STG, $5, $9, $10, $13); }
+  K_END newline { node = new Node(Node::STG, $5, $9, $10, $13); }
 ;
 
 transition_list:
@@ -114,10 +117,3 @@ newline:
   NEWLINE
 | NEWLINE NEWLINE
 ;
-
-%%
-
-int yyerror(const char * msg)
-{
-  throw msg;
-}

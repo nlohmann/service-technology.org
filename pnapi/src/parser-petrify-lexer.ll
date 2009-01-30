@@ -8,25 +8,23 @@
 
 
 %{
-#include <istream>
 #include "parser.h"
 #include "parser-petrify.h"
 
-#define pnapi_yyistream pnapi_petrify_istream
+#define yylex pnapi::parser::petrify::lex
+#define yyerror pnapi::parser::petrify::error
+#define yystream pnapi::parser::petrify::stream
 
-#define YY_FATAL_ERROR(msg) \
-   throw msg;
-
+/* hack to read input from a C++ stream */
 #define YY_INPUT(buf,result,max_size) \
-   pnapi_yyistream->read(buf, max_size); \
-   if (pnapi_yyistream->bad()) \
+   yystream->read(buf, max_size); \
+   if (yystream->bad()) \
      YY_FATAL_ERROR("input in flex scanner failed"); \
-   result = pnapi_yyistream->gcount();
+   result = yystream->gcount();
 
-extern int pnapi_petrify_error(const char *);
-
-// global variable for stream pointer
-std::istream * pnapi_yyistream = NULL;
+/* hack to overwrite YY_FATAL_ERROR behavior */
+#define fprintf(file,fmt,msg) \
+   yyerror(msg);
 %}
 
 %s COMMENT
@@ -79,4 +77,4 @@ transitionname3		"in."{name}
 
 [ \t]         { break; }
 
-.             { pnapi_petrify_error("lexical error"); }
+.             { yyerror("lexical error"); }

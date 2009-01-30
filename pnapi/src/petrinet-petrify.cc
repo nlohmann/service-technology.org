@@ -112,9 +112,7 @@ void PetriNet::createFromSTG(vector<string> & edgeLabels,
   // initially mark places
   for (set<string>::iterator p = pnapi_petrify_initialMarked.begin(); p != pnapi_petrify_initialMarked.end(); p++) 
   {
-    // FIXME: don't use mark() but createPlace() parameter
-    //STGPN.findPlace(*p)->mark();
-    assert(false);
+    STGPN.findPlace(*p)->mark(1);
   }
 
   // create interface places out of dummy transitions

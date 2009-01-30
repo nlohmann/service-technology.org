@@ -1,4 +1,4 @@
-/* -*- mode: c++ -*- */
+// -*- C++ -*-
 
 /*!
  * \file    parser.h
@@ -18,6 +18,7 @@
 #include <map>
 #include <set>
 #include <stack>
+#include <iostream>
 
 #include "petrinet.h"
 #include "formula.h"
@@ -55,27 +56,39 @@ namespace pnapi
      *
      * Provides tree structures and part of a visitor pattern (class Visitor).
      */
-    template <typename T> class Node
+    template <typename T> class BaseNode
     {
     public:
 
+      /// standard constructor
+      BaseNode();
+
+      /// constructor
+      BaseNode(T *);
+
+      /// constructor
+      BaseNode(T *, T *);
+
+      /// constructor
+      BaseNode(T *, T *, T *);
+
       /// destructor
-      ~Node();
+      virtual ~BaseNode();
+
+      /// adds another node as a child of this one
+      T * addChild(T *);
       
       /// receives a visitor for visiting the subtree rooted at this node
       void visit(Visitor<T> &) const;
 
-      /// adds another node as a child of this one
-      void addChild(Node<T> &);
-
-    private:
-      vector<Node<T> *> children_;
+    protected:
+      vector<T *> children_;
     };
 
 
     /*!
      * \brief   Generic Parser Capsule for flex/bison Parsers
-     * \param   T An instance (class) of the Node template.
+     * \param   T An instance (class) of the BaseNode template.
      *
      * All the functionality is provided by traditional C-style lexers and 
      * parsers. To work with a parser, first call #parse() and then #visit().
@@ -85,24 +98,21 @@ namespace pnapi
     public:
 
       /// destructor
-      ~Parser();
-
-      /// receives a visitor for visiting the nodes of the AST
-      void visit(Visitor<T> &) const;
+      virtual ~Parser();
 
       /// parses stream contents with the associated parser
-      Parser<T> & parse(istream &);
+      T & parse(istream &);
 
     protected:
 
       /// constructor to be used in derived classes (framework instances)
-      Parser(istream * &, Node<T> * &, int (*)());
+      Parser(istream * &, T * &, int (*)());
 
     private:
       istream * & flexStream_;
-      Node<T> * & parseResult_;
+      T * & parseResult_;
       int (*yaccParse_)();
-      Node<T> * rootNode_;
+      T * rootNode_;
     };
 
 
@@ -136,6 +146,11 @@ namespace pnapi
     };
 
 
+
+    /*************************************************************************
+     ***** OWFN Parser
+     *************************************************************************/
+
     /*!
      * \brief   OWFN Parser
      *
@@ -144,50 +159,28 @@ namespace pnapi
     namespace owfn
     {
 
-      // forward declaration
+      // forward declarations
       class Node;
 
 
-      /// the stream for the lexer
-      extern istream * inputStream;
+      /// BaseNode instantiation
+      typedef BaseNode<Node> BaseNode;
 
-      /// the resulting AST
-      extern parser::Node<Node> * syntaxTree;
 
-      /// the bison generated parse function
+      /// input stream for lexer
+      extern istream * stream;
+
+      /// output node of parser
+      extern Node * node;
+
+      /// flex generated lexer function
+      int lex();
+
+      /// bison generated parser function
       int parse();
 
-
-      /*!
-       * \brief   Node of an OWFN AST
-       *
-       * Each Node has a Type which is the first parameter in a variety of 
-       * constructors. Furthermore other data collected during the parsing
-       * process (a #petriNet, an #identifier and a #value) may be stored. Node
-       * parameters in a constructor result in the nodes being added as 
-       * children.
-       */
-      class Node : public parser::Node<Node>
-      {
-      public:
-
-	enum Type { 
-	  PETRINET, FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, 
-	  FORMULA_AAOIPE, FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, 
-	  FORMULA_GT, FORMULA_GE, FORMULA_LE };
-
-	Node(Type, Node *);
-	Node(Type, Node *, Node *);
-	Node(Type, PetriNet *, Node *);
-	Node(Type, const string *, int);
-
-	~Node();
-
-	const Type type;
-	PetriNet * const petriNet;
-	const int value;
-	const string identifier;
-      };
+      /// called by generated lexer/parser on error
+      void error(const string &);
 
 
       /*!
@@ -204,6 +197,57 @@ namespace pnapi
 
 
       /*!
+       * \brief   Node types
+       */
+      enum Type 
+	{ 
+	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
+	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, 
+	  INITIAL, MARK,
+	  TRANSITION, ARC, PRESET, POSTSET, 
+	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
+	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT, 
+	  FORMULA_GE, FORMULA_LE 
+	};
+
+
+      /*!
+       * \brief   Node of an OWFN AST
+       *
+       * Each Node has a Type which is the first parameter in a variety of 
+       * constructors. Furthermore other data collected during the parsing
+       * process (a #petriNet, an #identifier and a #value) may be stored. Node
+       * parameters in a constructor result in the nodes being added as 
+       * children.
+       */
+      class Node : public BaseNode
+      {
+      public:
+
+	const Type type;
+	int number;
+	string identifier;
+
+	Node();
+	Node(Node *);
+	Node(Node *, Node *);
+	Node(Node *, Node *, Node *);
+
+	Node(int);
+	Node(string *);
+	Node(Type, Node *);
+	Node(Type, Node *, int);
+	Node(Type, Node *, Node *);
+	Node(Type, Node *, Node *, Node *);
+
+	Node & operator=(const Node &);
+
+	void mergeData(Node *);
+	void mergeChildren(Node *);
+      };
+
+      
+      /*!
        * \brief   Visitor for OWFN AST nodes
        *
        * Constructs a PetriNet (#getPetriNet()) during traversal via 
@@ -212,24 +256,34 @@ namespace pnapi
       class Visitor : public parser::Visitor<Node>
       {
       public:
-	inline const PetriNet & getPetriNet() const;
+	PetriNet getPetriNet() const;
 	
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
 
       private:
+
+	struct PlaceAttributes
+	{
+	  Place::Type type;
+	  unsigned int marking;
+	};
+
 	PetriNet net_;
+	Place::Type placeType_;
+	map<string, PlaceAttributes> places_;
+	bool isPreset_;
+	map<string, unsigned int> preset_, postset_;
 	deque<Formula *> formulas_;
       };
 
-
-      // inline member function
-      const PetriNet & Visitor::getPetriNet() const
-      {
-	return net_;
-      }
-
     }
+
+
+
+    /*************************************************************************
+     ***** PETRIFY Parser
+     *************************************************************************/
     
 
     /*!
@@ -240,6 +294,26 @@ namespace pnapi
      */
     namespace petrify
     {
+
+      // forward declaration
+      class Node;
+
+
+      /// input stream for lexer
+      extern istream * stream;
+
+      /// output node of parser
+      extern Node * node;
+
+      /// flex generated lexer function
+      int lex();
+
+      /// bison generated parser function
+      int parse();
+
+      /// called by generated lexer/parser on error
+      void error(const string &);
+
 
       struct PetrifyResult 
       { 
@@ -253,7 +327,7 @@ namespace pnapi
       /*!
        * \brief   Node of an petrify AST
        */
-      class Node: public parser::Node<Node>
+      class Node: public BaseNode<Node>
       {
       public:
         enum Type {STG, TLIST, PLIST, TP, PT, CTRL1, CTRL2};
@@ -308,15 +382,58 @@ namespace pnapi
 
 
 
+    /*************************************************************************
+     ***** Template Implementation
+     *************************************************************************/
+
+
     /*!
-     * \brief   destructor
-     *
+     */
+    template <typename T>
+    BaseNode<T>::BaseNode()
+    {
+    }
+    
+    /*!
+     */
+    template <typename T>
+    BaseNode<T>::BaseNode(T * node)
+    {
+      assert(node != NULL);
+      addChild(node);
+    }
+    
+    /*!
+     */
+    template <typename T>
+    BaseNode<T>::BaseNode(T * node1, T * node2)
+    {
+      assert(node1 != NULL);
+      assert(node2 != NULL);
+      addChild(node1);
+      addChild(node2);
+    }
+    
+    /*!
+     */
+    template <typename T>
+    BaseNode<T>::BaseNode(T * node1, T * node2, T * node3)
+    {
+      assert(node1 != NULL);
+      assert(node2 != NULL);
+      assert(node3 != NULL);
+      addChild(node1);
+      addChild(node2);
+      addChild(node3);
+    }
+    
+    /*!
      * Recursively destroys all children.
      */
-    template <typename T> Node<T>::~Node()
+    template <typename T> BaseNode<T>::~BaseNode()
     {
-      for (typename vector<Node<T> *>::const_iterator it = children_.begin(); 
-	   it != children_.end(); ++it)
+      for (typename vector<T *>::const_iterator it = 
+	     children_.begin(); it != children_.end(); ++it)
 	delete *it;
     }
 
@@ -327,9 +444,10 @@ namespace pnapi
      * Should be used to recursively construct the AST during parsing (in the 
      * C style bison parser).
      */
-    template <typename T> void Node<T>::addChild(Node<T> & node)
+    template <typename T> T * BaseNode<T>::addChild(T * node)
     {
-      children_.push_back(&node);
+      children_.push_back(node);
+      return static_cast<T *>(this);
     }
 
     /*!
@@ -339,11 +457,11 @@ namespace pnapi
      * First calls Visitor::beforeChildren(), then visits all children and at 
      * last calls Visitor::afterChildren().
      */
-    template <typename T> void Node<T>::visit(Visitor<T> & visitor) const
+    template <typename T> void BaseNode<T>::visit(Visitor<T> & visitor) const
     {
       visitor.beforeChildren(*static_cast<const T *>(this));
-      for (typename vector<Node<T> *>::const_iterator it = children_.begin(); 
-	   it != children_.end(); ++it)
+      for (typename vector<T *>::const_iterator it = 
+	     children_.begin(); it != children_.end(); ++it)
 	(*it)->visit(visitor);
       visitor.afterChildren(*static_cast<const T *>(this));
     }
@@ -371,7 +489,7 @@ namespace pnapi
      * (see owfn::Parser::Parser() for an example).
      */
     template <typename T> 
-    Parser<T>::Parser(istream * & flexStream, Node<T> * & parseResult, 
+    Parser<T>::Parser(istream * & flexStream, T * & parseResult, 
 		      int (*yaccParse)()) :
       flexStream_(flexStream),
       parseResult_(parseResult),
@@ -387,7 +505,7 @@ namespace pnapi
      *
      * The resulting AST can be traversed using the #visit() function.
      */
-    template <typename T> Parser<T> & Parser<T>::parse(istream & is)
+    template <typename T> T & Parser<T>::parse(istream & is)
     {
       // possibly clean up old AST
       if (rootNode_ != NULL)
@@ -406,18 +524,7 @@ namespace pnapi
       // cleanup and return
       flexStream_ = NULL;
       parseResult_ = NULL;
-      return *this;
-    }
-
-    /*!
-     * \brief   receives a visitor for visiting the nodes of the AST
-     * \param   visitor  a visitor
-     *
-     * Traverses the AST using Node::visit().
-     */
-    template <typename T> void Parser<T>::visit(Visitor<T> & visitor) const
-    {
-      rootNode_->visit(visitor);
+      return *rootNode_;
     }
 
   }

@@ -341,8 +341,8 @@ namespace pnapi {
 
     // merge place properties
     wasInterface_ = wasInterface_ || place.wasInterface_;
-    capacity_ = util::max(capacity_, place.capacity_);
-    tokens_ = util::max(tokens_, place.tokens_);
+    capacity_ = capacity_ > place.capacity_ ? capacity_ : place.capacity_;
+    tokens_ = tokens_ > place.tokens_ ? tokens_ : place.tokens_;
 
     // Node::merge does all the rest
     Node::merge(place, addArcWeights);

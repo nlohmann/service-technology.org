@@ -19,6 +19,7 @@
 #include <cassert>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 #include "util.h"
 #include "parser.h"
@@ -28,6 +29,7 @@
 using std::cerr;
 using std::min;
 using std::pair;
+using std::ostringstream;
 
 namespace pnapi
 {
@@ -527,7 +529,7 @@ namespace pnapi
     string name;
 
     // use a "mutable" cache to make this more efficient
-    do name = base + util::toString(i++);
+    do { ostringstream str; str << base << i++; name = str.str(); }
     while (nodesByName_.find(name) != nodesByName_.end());
 
     return name;
@@ -841,7 +843,7 @@ namespace pnapi
       index[*t] = (-1);
 
     // getting the number of strongly connected components reachable from first
-    unsigned int sscCount = dfsTarjan(first, S, stacked, i, index, lowlink);
+    unsigned int sscCount = util::dfsTarjan<Node *>(first, S, stacked, i, index, lowlink);
 
     std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
 
@@ -989,7 +991,6 @@ namespace pnapi
    * \brief   Sets the final condition
    *
    * \note    Do not use it.
-   * \todo    Overwrite = or the standard-copy-constructor
    */
   void PetriNet::setFinalCondition(Condition &fc)
   {
@@ -997,58 +998,6 @@ namespace pnapi
   }
 
 
-
-
-/*!
- * \brief   DFS on the net using Tarjan's algorithm.
- *
- * \param   Node n which is to check
- * \param   Stack S is the stack used in the Tarjan algorithm
- * \param   Set stacked which is needed to identify a node which is already stacked
- * \param   int \f$i \in \fmathbb{N}\f$ which is the equivalent to Tarjan's index variable
- * \param   Map index which describes the index property of a node
- * \param   Map lowlink which describes the lowlink property of a node
- *
- * \return  the number of strongly connected components reachable from the start node.
- *
- * \note    Used by method isWorkflowNet() to check condition (3) - only working for this method.
- */
-unsigned int PetriNet::dfsTarjan(Node *n, stack<Node *> &S, set<Node *> &stacked, unsigned int &i, map<Node *, int> &index, map<Node *, unsigned int> &lowlink) const
-{
-  unsigned int retVal = 0;
-
-  index[n] = i;
-  lowlink[n] = i;
-  i++;
-  S.push(n);
-  stacked.insert(n);
-  std::cout << n->getName() << " stacked, ";
-  for (set<Node *>::const_iterator nn = n->getPostset().begin(); nn != n->getPostset().end(); nn++)
-  {
-    if (index[*nn] < 0)
-    {
-      retVal += dfsTarjan(*nn, S, stacked, i, index, lowlink);
-      lowlink[n] = min(lowlink[n], lowlink[*nn]);
-    }
-    else
-    {
-      if (stacked.count(*nn) > 0)
-        lowlink[n] = min(lowlink[n], lowlink[*nn]);
-    }
-  }
-  if (static_cast<int>(lowlink[n]) == index[n])
-  {
-    retVal++;
-    std::cout << "\nSCC: ";
-    while (!S.empty() && lowlink[S.top()] == lowlink[n])
-    {
-      std::cout << S.top()->getName() << ", ";
-      S.pop();
-    };
-  }
-
-  return retVal;
-}
 
 
 

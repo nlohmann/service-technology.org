@@ -24,12 +24,16 @@
 #include <vector>
 #include <climits>
 #include <algorithm>
+#include <stack>
+#include <map>
 
 using std::vector;
 using std::string;
 using std::set;
 using std::insert_iterator;
 using std::less;
+using std::stack;
+using std::map;
 
 
 namespace pnapi
@@ -43,11 +47,64 @@ namespace pnapi
   namespace util
   {
 
-    /// returns maximum of two numbers
-    unsigned int max(unsigned int, unsigned int);
+    /*
+     * \brief   DFS using Tarjan's algorithm.
+     *
+     * \param   Node n which is to check
+     * \param   Stack S is the stack used in the Tarjan algorithm
+     * \param   Set stacked which is needed to identify a node which is already
+     *          stacked
+     * \param   int \f$i \in \fmathbb{N}\f$ which is the equivalent to Tarjan's
+     *          index variable
+     * \param   Map index which describes the index property of a node
+     * \param   Map lowlink which describes the lowlink property of a node
+     *
+     * \return  the number of strongly connected components reachable from the
+     *          start node.
+     *
+     * \note    Used by method isWorkflowNet() to check condition (3) - only
+     *          working for this method.
+     */
+    template <typename T>
+    unsigned int dfsTarjan(T n, stack<T> & S, set<T> & stacked, 
+			   unsigned int & i, map<T, int> &index, 
+			   map<T, unsigned int> & lowlink)
+    {
+      unsigned int retVal = 0;
 
-    /// converts int to string
-    string toString(int);
+      index[n] = i;
+      lowlink[n] = i;
+      i++;
+      S.push(n);
+      stacked.insert(n);
+      //std::cout << n->getName() << " stacked, ";
+      for (typename set<T>::const_iterator nn = n->getPostset().begin(); 
+	   nn != n->getPostset().end(); nn++)
+	{
+	  if (index[*nn] < 0)
+	    {
+	      retVal += dfsTarjan(*nn, S, stacked, i, index, lowlink);
+	      lowlink[n] = min(lowlink[n], lowlink[*nn]);
+	    }
+	  else
+	    {
+	      if (stacked.count(*nn) > 0)
+		lowlink[n] = min(lowlink[n], lowlink[*nn]);
+	    }
+	}
+      if (static_cast<int>(lowlink[n]) == index[n])
+	{
+	  retVal++;
+	  //std::cout << "\nSCC: ";
+	  while (!S.empty() && lowlink[S.top()] == lowlink[n])
+	    {
+	      //std::cout << S.top()->getName() << ", ";
+	      S.pop();
+	    };
+	}
+      
+      return retVal;
+    }
 
     
     /*!

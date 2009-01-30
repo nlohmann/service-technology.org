@@ -96,6 +96,10 @@ namespace pnapi
     };
 
 
+    /// PetriNet input
+    istream & operator>>(istream & , PetriNet &);
+
+
     /// (sub-)mode setting
     ostream & operator<<(ostream &, const PetriNetIO &);
 
@@ -127,7 +131,7 @@ namespace pnapi
       return PetriNetIO::setFormat(os, PetriNetIO::STAT); }
 
     /// OWFN manipulator
-    inline ostream & owfn(ostream & os) {
+    inline ios_base & owfn(ios_base & os) {
       return PetriNetIO::setFormat(os, PetriNetIO::OWFN); }
 
     /// DOT manipulator

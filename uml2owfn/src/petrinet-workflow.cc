@@ -815,7 +815,7 @@ void ExtendedWorkflowNet::soundness_initialPlaces() {
  * we provide four kinds of termination semantics
  * #1: the "old" UML2 termination semantics that clears all tokens from the net
  *     as soon as data-flow has terminated ( output pinset has fired),
- *      [parameter combination: keepPinsets && !wfNet && !orJoin] (standard)
+ *      [parameter: termination = TERM_UML_STANDARD (standard) ]
  *
  *     this semantics can be suppelemented with live-locking loops on
  *     the terminal places of the net
@@ -824,7 +824,7 @@ void ExtendedWorkflowNet::soundness_initialPlaces() {
  * #2: the workflow net semantics, all control- and data-flow terminates
  *     on a single "omega" places, we thereby assume that data-flow terminates
  *     via an XOR-join while all control-flow terminates via an AND-join
- *      [parameter combination: keepPinsets && wfNet && !orJoin]
+ *      [parameter: termination = TERM_WORKFLOW ]
  *
  *     this semantics can be suppelemented with live-locking loops on
  *     the terminal places of the net
@@ -833,21 +833,19 @@ void ExtendedWorkflowNet::soundness_initialPlaces() {
  * #3: the control-flow OR-join termination semantics which removes data-flow
  *     from the termination semantics and let's all control-flow terminate via
  *     an implicit OR-join
- *      [parameter combination: !keepPinsets && !wfNet && !orJoin]
+ *      [parameter: termination = TERM_IGNORE_DATA ]
  *
  * #4: the "new" UML2 termination semantics; it is equivalent to the "old"
  *     termation semantics (#1) but creates less places: the process control-flow
  *     terminates via an implicit OR-join, the data-flow terminates via an
  *     XOR-join
- *      [parameter combination: keepPinsets && !wfNet && orJoin]
+ *      [parameter: termination = TERM_ORJOIN ]
  *
  * \param liveLocks  introduce live-locks at final state places
  * \param stopNodes  distinguish stop nodes from end nodes
- * \param keepPinsets  ignore termination according to output pinsets
- * \param wfNet  attempt to create a workflow net structure
- * \param orJoin construct valid OR-join for process termination
+ * \param termination  switch, which termination semantics should be used
  */
-void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNodes, bool keepPinsets=true, bool wfNet=false, bool orJoin=false)
+void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNodes, terminationSemantics_t termination)
 {
   set<Place*>      places_to_remove;
   set<Transition*> transitions_to_remove;
@@ -863,7 +861,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
   }
 
   // preparation for termination semantics #4 ("new)
-  if (orJoin) {   // in case of an OR-join: add unique omega-place
+  if (termination == TERM_ORJOIN) { // in case of an OR-join: add unique omega-place
     Place *omega = newPlace("omega");
     omega->isFinal = true,
     omegaPlaces.insert(omega);
@@ -886,12 +884,10 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
     // the output pinset transition is not an output transition anymore
     noMoreOutput.insert((*outPS));
 
-    cerr << (*outPS)->nodeFullName() << endl;
-
     // now extend the output pinset transition according to the termination
     // semantics
 
-    if (!orJoin && keepPinsets) {
+    if (termination == TERM_UML_STANDARD || termination == TERM_WORKFLOW) {
       // semantics #1 ("old") and #2 (workflow net)
 
       // keep pinsets: create omega post-place of the pinset-transition,
@@ -908,7 +904,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         newArc(tLoop, outputPlace, STANDARD, 1);
       }
 
-    } else if (!orJoin && !wfNet) {
+    } else if (termination == TERM_IGNORE_DATA) {
       // semanics #3 ("no data-flow dependent termination")
 
       // do not keep pinsets: remove pinset transition
@@ -919,8 +915,6 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
       {
         Place* place = static_cast<Place*>(*it);
 
-        cerr << place->nodeFullName() << " " << place->id << endl;
-
         string tConsume_str = place->nodeFullName()+"_consume";
         // check whether transition already exists (overlapping pinsets)
         if (!findTransition(tConsume_str)) {
@@ -930,7 +924,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         }
       }
 
-    } else if (orJoin && !wfNet) {
+    } else if (termination == TERM_ORJOIN) {
       // semantics #4 ("new")
 
       // add an arc producing a token on omega
@@ -941,7 +935,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
 
   // now connect the end- and stop- nodes to the output pinset transitions to
   // synchronize control-flow with data-flow upon termination
-  if (keepPinsets)
+  if (termination != TERM_IGNORE_DATA)
   {
     // termination sematnics #1, #2 and #4
 
@@ -967,7 +961,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
     for (set<Place *>::iterator it = process_endNodes.begin(); it != process_endNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
-      if (!orJoin) {
+      if (termination == TERM_UML_STANDARD || termination == TERM_WORKFLOW) {
         // termination semantics #1 ("old") and #2 ("workflow net")
 
         // remove post-transition ".eat" of end place p
@@ -975,7 +969,8 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         transitions_to_remove.insert(t);
       }
 
-      if (!wfNet && !orJoin) {
+
+      if (termination == TERM_UML_STANDARD) {
         // termination semantics #1 ("old")
 
         // not creating a workflow net, add a transition that cleans the end node
@@ -992,7 +987,8 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
           newArc(tEndClean, (*omega));
           outputSetNum++;
         }
-      } else if (wfNet && !orJoin) {
+
+      } else if (termination == TERM_WORKFLOW) {
         // termination semantics #2 ("workflow net")
 
         // try to create a workflow net: each output pinset has its own
@@ -1012,7 +1008,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
     for (set<Place *>::iterator it = process_stopNodes.begin(); it != process_stopNodes.end(); it++) {
       Place* p = static_cast<Place*>(*it);
 
-      if (!orJoin) {
+      if (termination == TERM_UML_STANDARD || termination == TERM_WORKFLOW) {
         // termination semantics #1 ("old") and #2 ("workflow net")
 
         // remove post-transition ".eat" of end place p
@@ -1026,7 +1022,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
       } else {
         // treat stop nodes like end nodes
 
-        if (!wfNet && !orJoin) {
+        if (termination == TERM_UML_STANDARD) {
           // termination semantics #1 ("old")
 
           // not creating a workflow net, add a transition that cleans the end node
@@ -1043,7 +1039,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
             newArc(tEndClean, (*omega));
             outputSetNum++;
           }
-        } else if (wfNet && !orJoin) {
+        } else if (termination == TERM_WORKFLOW) {
           // termination semantics #2 ("workflow net")
 
           // try to create a workflow net: each output pinset has its own
@@ -1060,7 +1056,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
 
     // finishing touches after control- and data-flow are synchronized
     // a workflow net may have only one omega place, create it here
-    if (wfNet && !orJoin) {
+    if (termination == TERM_WORKFLOW) {
       // termination semenatics #2 ("workflow net")
       Place* processOmega = newPlace("omega");
       for (set<Place *>::iterator omega = omegaPlaces.begin();

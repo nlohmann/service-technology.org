@@ -588,6 +588,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
     } else if (tag == "input") {
         if (prozessSchachtelung) {
             if (currentInputCriterion == NULL) {
+                // instantiate a new pin
                 Pin* newPin = new Pin(attributes["name"],currNode);
                 currNode->inputPins.push_back(newPin);
                 if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
@@ -598,7 +599,11 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
                     newPin->optional = true;
                 }
+                // if data is associated to this pin, then it is a data pin
+                if (attributes.find("associatedData") != attributes.end())
+                  newPin->isDataPin = true;
             } else {
+                // assign a pin to the current input pinset
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 Pin* existingProcessPin = currProcess->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
@@ -611,6 +616,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
             }
         } else {
             if (currentInputCriterion == NULL) {
+                // instantiate a new pin
                 Pin* newPin = new Pin(attributes["name"],currNode);
                 currNode->inputPins.push_back(newPin);
                 if (currentBranch != NULL) {
@@ -619,7 +625,11 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
                     newPin->optional = true;
                 }
+                // if data is associated to this pin, then it is a data pin
+                if (attributes.find("associatedData") != attributes.end())
+                  newPin->isDataPin = true;
             } else {
+                // assign a pin to the current input pinset
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
                   currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
@@ -656,7 +666,6 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
             if (currentOutputCriterion == NULL) {
                 Pin* newPin = new Pin(attributes["name"],currNode);
                 currNode->outputPins.push_back(newPin);
-// TODO: check all push_backs
                 if (currentBranch != NULL) {
                     currentBranch->pins.push_back(newPin);
                 }

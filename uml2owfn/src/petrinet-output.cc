@@ -745,7 +745,7 @@ void PetriNet::output_tpn(ostream *output) const
     // places (only internal)
     for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     {
-        (*output) << "place \"" << (*p)->nodeFullName() << "\"";
+        (*output) << "place \"" << toLoLAident((*p)->nodeFullName()) << "\"";
 
         // initial marking
         if ((*p)->tokens > 0)
@@ -759,7 +759,7 @@ void PetriNet::output_tpn(ostream *output) const
     // transitions
     for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     {
-        (*output) << "trans \"" << (*t)->nodeFullName() << "\"" << endl;
+        (*output) << "trans \"" << toLoLAident((*t)->nodeFullName()) << "\"" << endl;
 
         (*output) << "    in";
         for (set<Node *>::iterator pre = (*t)->preset.begin(); pre != (*t)->preset.end(); pre++)
@@ -770,7 +770,7 @@ void PetriNet::output_tpn(ostream *output) const
                     continue;
 
             for (unsigned int i = 0; i < arc_weight(*pre, *t); i++)
-                (*output) << " \"" << (*pre)->nodeFullName() << "\""; // << arc_weight(*pre, *t);
+                (*output) << " \"" << toLoLAident((*pre)->nodeFullName()) << "\""; // << arc_weight(*pre, *t);
         }
         (*output) << endl;
 
@@ -783,12 +783,11 @@ void PetriNet::output_tpn(ostream *output) const
                     continue;
 
             for (unsigned int i = 0; i < arc_weight(*t, *post); i++)
-                (*output) << " \"" << (*post)->nodeFullName() << "\""; // << arc_weight(*t, *post);
+                (*output) << " \"" << toLoLAident((*post)->nodeFullName()) << "\""; // << arc_weight(*t, *post);
 
         }
         (*output) << endl << ";" << endl << endl;
     }
-    (*output) << endl << ";" << endl;
 }
 
 

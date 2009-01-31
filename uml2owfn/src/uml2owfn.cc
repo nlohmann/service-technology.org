@@ -156,21 +156,28 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     // create proper initial marking
     PN.soundness_initialPlaces();
 
+    // set termination semantics that will be used for the analysis
+    terminationSemantics_t termination;
+    if (analysis[A_TERM_WF_NET]) termination = TERM_WORKFLOW;
+    else if (analysis[A_TERM_IGNORE_DATA]) termination = TERM_IGNORE_DATA;
+    else if (analysis[A_TERM_ORJOIN]) termination = TERM_ORJOIN;
+    else termination = TERM_UML_STANDARD;
+
     // add livelocks only if not creating a workflow net
-    bool liveLocks = analysis[A_WF_NET] ? false : true;
+    bool liveLocks = (termination == TERM_WORKFLOW) ? false : true;
     if (analysis[A_DEADLOCKS]) {
       // create proper livelocks on the net to check for deadlocks
 #ifdef DEBUG
       trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
 #endif
-      PN.soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET], analysis[A_ORJOIN]);
+      PN.soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
     }
     else
     {
 #ifdef DEBUG
       trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
 #endif
-      PN.soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], !analysis[A_REMOVE_PINSETS], analysis[A_WF_NET], analysis[A_ORJOIN]);
+      PN.soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
     }
   } // soundness
   // end of all net manipulations (except net reduction)
@@ -394,6 +401,7 @@ int main( int argc, char *argv[])
 
           log_print(process->getName());
 
+          process->updateCharacteristics();
           if (process->empty()) {
               process->processCharacteristics |= UML_EMPTY_PROCESS;
           }

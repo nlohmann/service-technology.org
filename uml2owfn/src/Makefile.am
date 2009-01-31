@@ -52,4 +52,4 @@ MAINTAINERCLEANFILES = frontend-parser.h frontend-parser.cc frontend-lexer.cc \
                         Doxyfile
 
 #veryclean: clean
-	-rm frontend-parser.cc frontend-lexer.cc
+#	-rm frontend-parser.cc frontend-lexer.cc

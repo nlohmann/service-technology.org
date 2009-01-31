@@ -92,6 +92,7 @@ Pin::Pin(string inputName, FlowContentNode* owner) {
     attachedConnection = NULL;
     owningCriterion = NULL;
     optional = false;
+    isDataPin = false;
 }
 
 
@@ -623,9 +624,33 @@ void Process::debugOutput(string delay) {
     }
 }
 
+
+/*!
+ * \brief   traverse the model and update the model characteristics that
+ *          could not be set earler
+ */
+void Process::updateCharacteristics() {
+
+  for (list<FlowContentNode*>::const_iterator child = flowContentNodes.begin(); child != flowContentNodes.end(); child++) {
+    FlowContentNode* n = (*child);
+
+    // joins have pin multiplicities if 'join' tokens with data
+    if (n->getType() == NJOIN) {
+      for (list<Pin*>::const_iterator pin = n->inputPins.begin(); pin != n->inputPins.end(); pin++) {
+        if ((*pin)->isDataPin) {
+          n->processCharacteristics |= UML_PIN_MULTIPLICITIES;
+        }
+      }
+    }
+
+    // the process inherits all node characteristics
+    processCharacteristics |= n->processCharacteristics;
+  }
+}
+
 /*!
  * \brief   calculate and return a statistics of static properties of this process
- */
+*/
 UmlProcessStatistics Process::getStatistics() const {
   UmlProcessStatistics stat = UmlProcessStatistics();
 

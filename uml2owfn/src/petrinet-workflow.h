@@ -42,6 +42,13 @@
 #include "UML-public.h"
 #include "petrinet-formula.h"
 
+typedef enum terminationSemantics_e {
+  TERM_UML_STANDARD,
+  TERM_WORKFLOW,
+  TERM_IGNORE_DATA,
+  TERM_ORJOIN
+} terminationSemantics_t;
+
 /*!
  * \brief   A Petri net with a workflow interpretation
  *
@@ -102,7 +109,7 @@ public:
   void soundness_initialPlaces();
 
   /// turn end of open workflow net into a workflow net
-  void soundness_terminalPlaces(bool liveLocks, bool stopNodes, bool keepPinsets, bool wfNet, bool orJoin);
+  void soundness_terminalPlaces(bool liveLocks, bool stopNodes, terminationSemantics_t termination);
 
 	set< Node* > isFreeChoice() const; ///< check whether this net is a free-choice net
 	Node* isPathCovered() const; ///< check whether every node of the net is on a path from alpha to omega

@@ -9,5 +9,205 @@
 Version 2.00-unreleased
 =======================
 
-* Reimplementation of the frontend:
+* Re-implementation of the compiler frontend.
+
+* Local sub processes and loops are now treated as simple tasks in the parent
+  process. Each subprocess and each loop is added as a process to the list of
+  all output-processes.
+
+* Processes can be cut according to the role information using new options
+     * `--rolecut', cut away all roles that do not include a startnode
+
+     * `--rolecontains=ROLE', additionally keep those roles
+
+     * `--rolexclusively=ROLE', delete all roles, that are not covered by a
+       startnode or by a containrole, that do not match the set of exclusive
+       roles
+
+* Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses
+  full node names instead of short node names.
+
+* Extended the translation log file which now distinguishes properties of UML
+  processes and of the Petri nets
+
+* Added `--enable-debug' and `--disable-assert' to `./configure' parameters
+  to control the use of debug and assert code
+
+Version 1.11
+============
+
+* Added new `./scripts/repository/Makefile' for an automated analysis and
+  result compilation of several large process suites. See manual on usage.
+
+* Fixed handling of paths for output files, output files can now be written
+  to their own directories
+
+* Changed the standard soundness verification procedures to the more efficient
+  liveness property verification algorithm of LoLA. To use the old CTL model
+  checking procedures use parameter `-p ctl'.
+
+* Cleaned the autotools configuration files and added options to directly
+  compile binaries for different platforms.
+
+Version 1.10
+============
+
+* fixed a bug in handling filenames, UML2oWFN can now process files in other
+  directories than the current working directory
+
+* added parameter `-a orJoin' to translate process for soundness analysis
+  assuming an implicit OR-join on the control-flow
+
+* added parameter `-a wfNet' to translate processes into Aalst-workflow-nets,
+  the translation assumes an AND-join on all end- and stop-nodes of the
+  process
+
+* added new analysis switch `-a removePinsets' that relaxes the process
+  termination semantics by requiring that only the control-flow terminates,
+  but that data may still be pending at the process output, and added new
+  `scripts/Makefile' target `translateweak' that uses the `-a removePinsets'
+  option,
+
+* added parameter `-a safe' to check for safeness of a net using LoLA with
+  state predicates, this parameter can be used together with `-a soundness'
+
+* added parameter `-p anon' to anonymize the process output by enumerating
+  places (p1, p2, ...) and transitions (t1, t2, ...) before writing to disk
+
+* added log file output for translation, with parameter "-p log" a log file
+  (name "uml2owfn_<inputfile>.log") with entries of the form "process name;
+  translation successful;reason-for-fail;number of nodes, number of edges,
+  average number of incoming edges, average number of outgoing edges" is
+  written
+
+* added checks for free-choice nets and for workflow-nets (each node is on a
+  path from alpha to omega); this additional Petri net functionality is
+  implemented in the class ExtendedWorkflowNet which inherits from PetriNet
+
+* added check whether generated Petri net is empty, if this is the case, then
+  the net is translated again without reduction rules, the name is extended
+  with a ".unreduced" (if it is still emtpy, then the net is skipped: no net
+  file, no analysis, not in script file)
+
+* changed task file naming scheme to 'net.lola.<tasktype>.task'
+
+* worked on bug #12160: PNAPI: Petri net reduction rules do not preserve
+  (un)-safeness, disallowing place/transition fusion if places/transitions
+  are together in the preset/postset of another transition/place
+
+* overrode the Petri net reduction method in the ExtendedWorkflowNet class,
+  now implementing reduce_series_places (level 1) and reduce_identical_places
+  (level 3)
+
+* stored reduction level in the `scripts/Makefile' in variable
+  `REDUCTION-LEVEL', so the reduction level can be set at the make call
+
+* extended filtering criteria: empty processes are not translated
+
+* fixed bug #12156: UML2oWFN: translation of overlapping pinsets fails,
+  `https://gna.org/bugs/?12156'
+
+* added documentation in ./doc/
+
+* added tests to `./tests/', run `make check' to run the test suite
+
+Version 1.02
+============
+
+* Changed output: The property for the soundness analysis is now appended to
+  the net and written to the net file by default.
+
+* Added parameter switch "-p taskfile" to re-enable the old functionality and
+  to write a separate task file.
+
+* The generated verification script considers all cases accordingly.
+
+* Re-enabled the error routine of the parser. Parser errors are now printed
+  to the console.
+
+* Added null pointer checking in Block::linkInserts() and disabled filtering
+  in the parser. Fixes Bug #12027, `https://gna.org/bugs/index.php?12027'
+
+* Added wbim:humanTask to the lexer. Is parsed and represented as normal task.
+
+* Added wbim:bulkResourceRequirement to the lexer. Is parsed as role
+  requirement. This is feasible because role requirements are (currently)
+  ignored in the process translation, fixes Bug #12031,
+  https://gna.org/bugs/?12031
+
+* Added wbim:indidividualResourceRequirement to the lexer. Is parsed as role
+  requirement. This is feasible because role requirements are (currently)
+  ignored in the process translation
+
+* Extended parser to read atomic "callToProcess"-tags without children
+
+* changed command line help output to provide correct and meaningful examples
+  for command line parameters
+
+* implemented Woflan file format (.tpn), see `https://gna.org/task/?6011'
+
+* file format can be triggered with "-f tpn"
+
+* Soundness checking now distinguishes checking for reachability of end
+  states, checking for deadlocks, and checking for non-reachability of the
+  final state (this will deprecate...)
+
+* soundness analysis now appends "omega" places to each output pinset and
+  transitions that remove tokens from endNodes and stopNodes once the "omega"
+  place is marked
+
+* reachability of end states:
+     * adds live-locking transitions to each "omega" place
+
+     * generates the formula AG EF (omega1 > 1 OR ... OR omegaN > 0 ) AND (p1
+       = 0 AND ... AND pM = 0) with pi being internal places of the process
+
+     * corresponding task file and verification script is generated,
+       verification requires a LoLA with MODELECHECKING, executable file name
+       "lola"
+
+     * command line call: uml2owfn -i <lib.xml> -a soundness -f <format> -o
+
+* checking for deadlocks
+     * adds live-locking transitions to each "omega" place
+
+     * generated verification script requires a LoLA with DEADLOCKS,
+       executable file name "lola_deadlock"
+
+     * command line call: uml2owfn -i <lib.xml> -a soundness -a deadlocks -f
+       <format> -o
+
+* inversed parameter "pins" to "keeppins" (unconnected pins are now removed
+  by default)
+
+* All analysis tasks allow using Petri net reduction rules.
+
+* merged functionality of rev.65-69 of the trunk,
+  `http://svn.gna.org/viewcvs/service-tech?rev=69&view=rev'
+  `http://svn.gna.org/viewcvs/service-tech?rev=68&view=rev'
+  `http://svn.gna.org/viewcvs/service-tech?view=rev&rev=66'
+  `http://svn.gna.org/viewcvs/service-tech?view=rev&rev=65'
+
+* dot-output colors nodes according to their origin in BOM
+
+* translation from BOM to PN now implements the complete task pattern (bug in
+  rev.69) and links process input pinsets and output pinsets
+
+* added class BomProcess (bom-process.cc .h) as an internal representation of
+  the process, the class currently only stores some sets of places and
+  transitions. The sets are used when modifying the Petri net for soundness
+  analysis
+
+* changed parameters:
+     * added analysis parameter [-a (soundness|stop)];
+
+     * "-a soundness" is equivalent to -p soundness in earlier revisions,
+
+     * by "-a stop", the translation for soundness distinguishes stop-nodes
+       and end-nodes, with "-a stop" a state predicate is needed for checking
+       soundness (corresponding lola files and scripts are generated),
+       without "-a stop" a deadlock analysis is sufficient (corresponding
+       lola files and scripts are generated)
+
+
 

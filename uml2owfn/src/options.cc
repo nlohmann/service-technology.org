@@ -158,7 +158,7 @@ void print_help()
   trace("    log                 write a log file for the translation\n");
   trace("    taskfile            write analysis task to a separate file\n");
   trace("    anon                anonymize the process output\n");
-  trace("    ctl                 generate CTL model checking properties for analysis");
+  trace("    ctl                 generate CTL model checking properties for analysis\n");
   trace("                        (if applicable)");
 	trace("\n");
 	trace("  FORMAT is one of the following (multiple formats permitted):\n");
@@ -170,11 +170,13 @@ void print_help()
   trace("                        requires -a soundness\n");
   trace("    safe                analyze for safeness\n");
   trace("    stop                distinguish stop nodes from end nodes\n");
-  trace("    removePinsets       remove output pinsets (requires -a soundness)\n");
+  trace("\n");
+  trace("  the following TASK parameters determine the process termination semantics\n");
+  trace("  that is used for the analysis, they are used mutually exclusive, all\n");
+  trace("  parameters require '-a soundness'\n");
+  trace("    noData              ignore state of data flow upon process termination,\n");
   trace("    wfNet               attempt to translate net into a workflow net,\n");
-  trace("                        (requires -a soundness)\n");
   trace("    orJoin              analyze net by assuming an implicit OR-join,\n");
-  trace("                        (requires -a soundness)\n");
   trace("\n");
 	trace("Examples:\n");
 	trace("  uml2owfn -i library.xml -f owfn -o\n");
@@ -349,12 +351,12 @@ void parse_command_line(int argc, char* argv[])
         globals::analysis[A_DEADLOCKS] = true;
       else if (parameter == "safe")
         globals::analysis[A_SAFE] = true;
-      else if (parameter == "removePinsets")
-        globals::analysis[A_REMOVE_PINSETS] = true;
+      else if (parameter == "noData")
+        globals::analysis[A_TERM_IGNORE_DATA] = true;
       else if (parameter == "wfNet")
-        globals::analysis[A_WF_NET] = true;
+        globals::analysis[A_TERM_WF_NET] = true;
       else if (parameter == "orJoin")
-        globals::analysis[A_ORJOIN] = true;
+        globals::analysis[A_TERM_ORJOIN] = true;
       else {
         trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
         trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
@@ -560,24 +562,36 @@ void parse_command_line(int argc, char* argv[])
       options[O_PARAMETER] = true;
       globals::parameters[P_TASKFILE] = true;
     }
-    if (globals::analysis[A_REMOVE_PINSETS]) {
+
+    // count how many termination semantics shall be applied
+    int terminationFlags = 0;
+    if (globals::analysis[A_TERM_IGNORE_DATA]) {
       trace(TRACE_INFORMATION, "removing output pinsets\n");
       if (!globals::analysis[A_SOUNDNESS]) {
         trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
       }
+      terminationFlags++;
     }
-    if (globals::analysis[A_WF_NET]) {
+    if (globals::analysis[A_TERM_WF_NET]) {
       trace(TRACE_INFORMATION, "creating a workflow net with a final AND-join\n");
       if (!globals::analysis[A_SOUNDNESS]) {
         trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
       }
+      terminationFlags++;
     }
-    if (globals::analysis[A_ORJOIN]) {
+    if (globals::analysis[A_TERM_ORJOIN]) {
       trace(TRACE_INFORMATION, "creating a workflow net with a final implicit OR-join\n");
       if (!globals::analysis[A_SOUNDNESS]) {
         trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
       }
+      terminationFlags++;
     }
+
+    if (terminationFlags > 1) {
+      trace(TRACE_ALWAYS, "ERROR: more than one termination semantics selected, please choose at most one.\n");
+      exit(EXIT_FAILURE);
+    }
+
   }
 
   if (options[O_PARAMETER]) {

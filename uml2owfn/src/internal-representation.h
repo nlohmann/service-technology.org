@@ -34,7 +34,7 @@ using std::ostream;
  * Data structures
  *****************************************************************************/
 
-typedef enum
+typedef enum uml_elementType_e
 {
     NPROCESS,
     NSERVICE,			///< input of an open workflow net (oWFN)
@@ -133,54 +133,57 @@ class Pin {
     private:
         string name;
 
-        // pointer to the one connection attached to this pin
+        /// pointer to the one connection attached to this pin
         FlowContentConnection* attachedConnection;
 
-        // pointer to the node owning this pin
+        /// pointer to the node owning this pin
         FlowContentNode* owningNode;
 
-        // pointer to the petrinet place representing this pin
+        /// pointer to the petrinet place representing this pin
         Place* pinPlace;
 
-        // pointer to the owning criterion. Mainly used to get sure that pinsets are not overlapping
+        /// pointer to the owning criterion. Mainly used to get sure that pinsets are not overlapping
         PinCombination* owningCriterion;
 
     public:
 
-        // boolean saving that this pin is an optional pin the BOM model (meaning not min=1 or not max=1)
+        /// boolean saving that this pin is an optional pin the BOM model (meaning not min=1 or not max=1)
         bool optional;
 
-        // returns the name
+        /// whether this pin takes data-flow tokens, plays a role when filtering pin multiplicities on forks and joins
+        bool isDataPin;
+
+        /// returns the name
         string getName();
 
-        // returns the name
+        /// returns the name
         void setPlace(Place* placeToSet);
 
-        // returns the name
+        /// returns the name
         Place* getPlace();
 
-        // returns true if there is no owning criterion
+        /// returns true if there is no owning criterion
         bool free();
 
-        // sets the criterion owning this pin
+        /// sets the criterion owning this pin
         void setCriterion(PinCombination* combination);
 
-        // returns the attached connection
+        /// returns the attached connection
         FlowContentConnection* getConnection();
 
-        // attaches the connection
+        /// attaches the connection
         void setConnection(FlowContentConnection* attach);
 
-        // returns the owning node
+        /// returns the owning node
         FlowContentNode*  getOwner();
 
-        // constructor
+        /// constructor
         Pin(string inputName, FlowContentNode* owner);
 
-        // generates a debug output on the console for this pin
+        /// generates a debug output on the console for this pin
         void debugOutput(string delay);
 
-        // destructor
+        /// destructor
         ~Pin();
 
 };
@@ -467,18 +470,22 @@ class Process : public Task {
         /// the connection that enters/leaves this pin (if any)
         FlowContentConnection* getAdjacentConnection(Pin *pin) const;
 
-        // translates this flow content element to its petri net pattern
-        // in the given petri net
+        /// translates this flow content element to its petri net pattern
+        /// in the given petri net
         void translateToNet(ExtendedWorkflowNet* PN);
 
-        // adds a flow content node to this process
+        /// adds a flow content node to this process
         void addFCN(FlowContentNode* toAdd);
 
-        // adds a connection to this process
+        /// adds a connection to this process
         void addConnection(FlowContentConnection* toAdd);
 
-        // creates a debug output on the console for this element
+        /// creates a debug output on the console for this element
         void debugOutput(string delay);
+
+        /// traverse the model to update the process characteristics that
+        /// could not be set earlier
+        void updateCharacteristics();
 
         /// generate process statistics
         UmlProcessStatistics getStatistics() const;

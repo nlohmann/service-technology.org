@@ -70,7 +70,7 @@ echo "[strong termination and safeness, LoLA, taskfiles, orJoin termination sema
 echo ""
 echo "[strong termination and safeness, LoLA, taskfiles, weak data-flow termination semantics]"
 	
-	cmd="uml2owfn -i $DIR/$FILE.xml -p filter -a soundness -a safe -a removePinsets -p taskfile -f lola --output=$FILE"
+	cmd="uml2owfn -i $DIR/$FILE.xml -p filter -a soundness -a safe -a noData -p taskfile -f lola --output=$FILE"
 	echo $cmd
 	
 	$cmd &> /dev/null

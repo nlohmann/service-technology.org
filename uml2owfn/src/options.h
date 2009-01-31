@@ -137,9 +137,9 @@ typedef enum
   A_STOP_NODES,   ///< distinguishing stop nodes from end nodes
   A_DEADLOCKS,    ///< check for absence of deadlocks
   A_SAFE,         ///< check for safeness
-  A_REMOVE_PINSETS, ///< remove the output pinsets when checking soundness
-  A_WF_NET,       ///< translate into a workflow net for soundness analysis
-  A_ORJOIN,       ///< analyze soundness by assuming an implicit OR-join
+  A_TERM_IGNORE_DATA,  ///< remove the output pinsets when checking soundness
+  A_TERM_WF_NET,       ///< translate into a workflow net for soundness analysis
+  A_TERM_ORJOIN,       ///< analyze soundness by assuming an implicit OR-join
   A_MAX
 } possibleAnalysis;
 

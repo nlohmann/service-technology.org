@@ -9,10 +9,31 @@
 Version 2.00-unreleased
 =======================
 
-* Reimplementation of the frontend:
+* Re-implementation of the compiler frontend.
 
+* Local sub processes and loops are now treated as simple tasks in the parent
+  process. Each subprocess and each loop is added as a process to the list of
+  all output-processes.
 
+* Processes can be cut according to the role information using new options
+     * `--rolecut', cut away all roles that do not include a startnode
 
-See file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog> for
-complete version history.
+     * `--rolecontains=ROLE', additionally keep those roles
 
+     * `--rolexclusively=ROLE', delete all roles, that are not covered by a
+       startnode or by a containrole, that do not match the set of exclusive
+       roles
+
+* Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses
+  full node names instead of short node names.
+
+* Extended the translation log file which now distinguishes properties of UML
+  processes and of the Petri nets
+
+* Added `--enable-debug' and `--disable-assert' to `./configure' parameters
+  to control the use of debug and assert code
+
+ 
+See file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog>
+for complete version history.
+ 

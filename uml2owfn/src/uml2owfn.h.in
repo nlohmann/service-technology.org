@@ -3,11 +3,20 @@
 /* The platform. */
 #undef BUILDSYSTEM
 
+/* whether to build a 64 Bit binary */
+#undef CONFIG_ENABLE64BIT
+
 /* whether to use assertions */
 #undef CONFIG_ENABLEASSERT
 
 /* whether to compile debug statements */
 #undef CONFIG_ENABLEDEBUG
+
+/* whether to build a Mac universal binary */
+#undef CONFIG_ENABLEUNIVERSAL
+
+/* whether to build a Cygwin-independent Windows binary */
+#undef CONFIG_ENABLEWIN32
 
 /* Compiling with DEBUG statements. */
 #undef DEBUG

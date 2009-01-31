@@ -17,7 +17,7 @@ DIR=$testdir/compiler
 FILE=TestSuite
 
 must_filecount=25
-must_filecount_filter=21
+must_filecount_filter=20
 
 echo ""
 echo "UML2oWFN compiler tests"

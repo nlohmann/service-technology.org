@@ -998,6 +998,9 @@ void AnnotatedGraph::removeReachableFalseNodesRecursively(set<AnnotatedGraphNode
             if (*candidate == getRoot()) {
                 removeNode(*candidate);
                 setRoot(NULL);
+
+                delete *candidate;
+
                 return;
             }
 
@@ -1073,6 +1076,7 @@ void AnnotatedGraph::removeUnreachableNodes() {
         delete edgeIter;
 
         removeNode(currentNode);
+
         delete currentNode;
     }
 

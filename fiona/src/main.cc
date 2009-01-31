@@ -255,7 +255,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
 //! \brief reads an og with a (global) constraint (constraint og for short)
 //! from ogfile
 //! \param ogfile constraint og
-//! \return returns the OG object 
+//! \return returns the OG object
 AnnotatedGraph* readconstraintog(const std::string& ogfile, GraphFormulaCNF*& covconstraint) {
     covog_yylineno = 1;
     covog_yydebug = 0;
@@ -922,8 +922,8 @@ string computeOG(oWFN* PN) {
     trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
 
     trace( "\nnet is controllable: ");
-    if (graph->hasNoRoot() || graph->getRoot()->getColor() == RED || 
-        (parameters[P_COVER] && 
+    if (graph->hasNoRoot() || graph->getRoot()->getColor() == RED ||
+        (parameters[P_COVER] &&
         static_cast<ConstraintOG*>(graph)->getCovConstraint()->equals() == FALSE)) {
         trace( "NO\n\n");
     } else {
@@ -1659,7 +1659,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
     // match the oWFN with given OG
     string reasonForFailedMatch;
     TRACE(TRACE_0, ("matching " + PN->filename + " and ...\n\n"));
-    for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin(); 
+    for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin();
          OGToMatch != OGsToMatch.end(); ++OGToMatch) {
         // use only the labeled core
         oWFN* coreOWFN = normalOWFN->returnMatchingOWFN();
@@ -2144,7 +2144,7 @@ int main(int argc, char** argv) {
         GraphFormulaCNF* covConstraintToMatch = NULL;
         if (parameters[P_MATCH]) {
             // iterate all og files
-            for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin(); 
+            for (AnnotatedGraph::ogfiles_t::const_iterator iOgFile = ogfiles.begin();
                  iOgFile != ogfiles.end(); ++iOgFile) {
                 if (parameters[P_COVER]) {
                     OGsToMatch.push_back(readconstraintog(*(iOgFile), covConstraintToMatch));

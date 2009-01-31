@@ -11,6 +11,7 @@
 @item Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses full node names instead of short node names.
 @item Extended the translation log file which now distinguishes properties of UML processes and of the Petri nets
 @item Added @samp{--enable-debug} and @samp{--disable-assert} to @file{./configure} parameters to control the use of debug and assert code
+@item integrated BOM Anonymizer to UML2oWFN distribution (see directory @file{anon})
 @end itemize
 
 @heading Version 1.11

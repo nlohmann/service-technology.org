@@ -33,6 +33,8 @@ Version 2.00-unreleased
 * Added `--enable-debug' and `--disable-assert' to `./configure' parameters
   to control the use of debug and assert code
 
+* integrated BOM Anonymizer to UML2oWFN distribution (see directory `anon')
+
  
 See file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog>
 for complete version history.

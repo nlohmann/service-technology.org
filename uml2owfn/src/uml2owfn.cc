@@ -11,7 +11,7 @@
 #include <cassert>
 #include <map>
 
-#include "uml2owfn.h"     // generated configuration file
+#include "config.h"     // generated configuration file
 
 #include "uml2owfn-io.h"  // file input and output operations
 

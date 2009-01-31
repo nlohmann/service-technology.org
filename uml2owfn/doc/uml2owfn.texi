@@ -62,6 +62,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * Translation::Translating UML2 activity diagrams/IBM WebSphere Business Modeler process models to Petri nets.
 * Analysis::Analyzing Soundness with UML2oWFN.
 * ChangeLog::Version history.
+* Anonymizing::
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
@@ -621,6 +622,271 @@ bugfixes to @acronym{UML2oWFN} as they have been included in this release.
 The most recent change log is available at Rachel's website at @url{http://service-technology.org/files/uml2owfn/ChangeLog}.
 
 @c ----------------------------------------------------------------------------
+
+
+@node Anonymizing
+@chapter Anonymizing
+
+BOM-Anonymizer implements a complete whitelist-based stream filter that anonymizes attribute values, literal values, and documentation tags occuring in an @acronym{XML} input file without jeopardizing the syntactical correctness of the input.
+
+
+@section Usage
+
+To anonymize the file @file{input.xml}, call
+
+@cartouche
+@code{bom-anon < @i{input.xml} > @i{output.xml} 2> @i{mapping.txt}}
+@end cartouche
+
+The anonymized version is written to @file{output.xml}. Furthermore, the mapping from explicit to anonymized strings (e.g., for debug purposes) is written to @file{mapping.txt}.
+
+
+
+
+@section Processing
+
+BOM-Anonymizer parses the input file and anonymizes any attribute values or literal values that are not listed in a whitelist. The syntax of the input file  is not checked.
+
+@subsection Whitelists
+
+@subsubsection Whitelist for Attributes
+
+The following attributes are not anonymized at all:
+@itemize
+@item @code{a}
+@item @code{alpha}
+@item @code{atBeginning}
+@c @item @code{attribute}
+@item @code{b}
+@item @code{beginingOn}
+@item @code{beta}
+@item @code{callSynchronously}
+@item @code{capacity}
+@item @code{counterIncrement}
+@item @code{currency}
+@item @code{dayOfWeek}
+@item @code{delta}
+@item @code{duration}
+@item @code{expMean}
+@item @code{finalCounter}
+@item @code{gamma}
+@item @code{initialCounter}
+@item @code{isConditionTestedFirst}
+@item @code{isConsumable}
+@item @code{isInclusive}
+@item @code{isInsert}
+@item @code{isObserveContinuously}
+@item @code{isOrdered}
+@item @code{isReadOnly}
+@item @code{isRemove}
+@item @code{isSimpleDecision}
+@item @code{isStatic}
+@item @code{isUnique}
+@item @code{k}
+@item @code{lambda}
+@item @code{max}
+@item @code{maximum}
+@item @code{mean}
+@item @code{min}
+@item @code{minimum}
+@item @code{mode}
+@item @code{multipleInstancesSatisfyCondition}
+@item @code{noInstancesSatisfyCondition}
+@item @code{numberOfTimesToRepeat}
+@item @code{probability}
+@item @code{repetitionPeriod}
+@item @code{schemaVersion}
+@item @code{standardDeviation}
+@item @code{startTime}
+@item @code{time}
+@item @code{timeRequired}
+@item @code{timeUnit}
+@item @code{unit}
+@item @code{unit}
+@item @code{valueTypev}
+@item @code{weekNumber}
+@item @code{xi}
+@item @code{version}
+@item @code{encoding}
+@item @code{xmlns:wbim}
+@end itemize
+
+
+@subsubsection Whitelist for Attribute Values
+
+The following values are not anonymized if they occur in any attribute---no matter whether the attribute is on the whitelist or not:
+@itemize
+@item @code{"Boolean"}
+@item @code{"Byte"}
+@item @code{"Date"}
+@item @code{"DateTime"}
+@item @code{"Double"}
+@item @code{"Duration"}
+@item @code{"Float"}
+@item @code{"Integer"}
+@item @code{"Long"}
+@item @code{"Short"}
+@item @code{"String"}
+@item @code{"Time"}
+@item @code{"Communication Service"}
+@item @code{"Equipment"}
+@item @code{"Facility"}
+@item @code{"General Service"}
+@item @code{"Machine"}
+@item @code{"Tool"}
+@item @code{"Person"}
+@item @code{"Staff"}
+@item @code{"acres"}
+@item @code{"centimeters"}
+@item @code{"feet"}
+@item @code{"gallons (UK)"}
+@item @code{"gallons (US)"}
+@item @code{"grams"}
+@item @code{"hectares"}
+@item @code{"inches"}
+@item @code{"kilograms"}
+@item @code{"kilometers"}
+@item @code{"liters"}
+@item @code{"meters"}
+@item @code{"miles"}
+@item @code{"ounces"}
+@item @code{"pints (UK)"}
+@item @code{"pints (US)"}
+@item @code{"pounds"}
+@item @code{"units"}
+@item @code{"yards"}
+@item @code{"true"}
+@item @code{"false"}
+@end itemize
+
+
+
+@subsubsection Whitelist for Element Values
+
+The following elements are not anonymized:
+@itemize
+@item @code{<wbim:literalValue>} containing a value of type @code{xsd:duration}
+@item @code{<wbim:startTime>} containing a value of type @code{xsd:dateTime}
+@item @code{<wbim:probability>} (containing anything)
+@end itemize
+
+@subsection Standard Values
+
+@c @subsection Standard Values for Attribute Values
+@c 
+@c The following attributes are set to a predefined value:
+@c @itemize
+@c @item @code{probability} is set to @samp{0}
+@c @item @code{counterIncrement} is set to @samp{1}
+@c @item @code{finalCounter} is set to @samp{1}
+@c @item @code{initialCounter} is set to @samp{1}
+@c @end itemize
+
+
+@subsubsection Standard Values for Element Values
+
+@itemize
+@item The @code{wbim:individualResourceRequirement>} element and all its child elements are replaced by a minimal bogus entry.
+
+@cartouche
+@smallexample
+<wbim:individualResourceRequirement individualResource="Person"
+      name="Individual requirement:1" timeRequired="P0Y0M0DT0H0M0S" />
+@end smallexample
+@end cartouche
+
+@item @acronym{XML} comments are replaced by @samp{...}.
+
+before anonymization:
+@cartouche
+@smallexample
+<!-- This is an @acronym{XML} comment that might contain additional information. -->
+@end smallexample
+@end cartouche
+after anonymization:
+@cartouche
+@smallexample
+<!-- ... -->
+@end smallexample
+@end cartouche
+
+@item Values in the elements @code{<wbim:documentation>}, @code{<documentation>}, @code{<wbim:description>}, @code{<description>}, @code{<wbim:annotationText>}, or @code{<annotationText>} are replaced by @samp{...}.
+
+@item Values in the elements @code{<wbim:literalValue>} or @code{<literalValue>} are replaced by @samp{0.0}.
+
+@item Real numbers in any element are replaced by @samp{0.0}.
+
+before anonymization:
+@cartouche
+@smallexample
+<someElement>42.0</someElement>
+@end smallexample
+@end cartouche
+after anonymization:
+@cartouche
+@smallexample
+<someElement>0.0</someElement>
+@end smallexample
+@end cartouche
+
+@end itemize
+
+@subsection Anonymization
+
+Any other string that is not affected by a whitelist or predefined standard value is replaced by a consecutive number. The replacement is unique: all occurrences of a string are replaced by the same anonymized version. However, the original string cannot be reconstructed from the anonymized version.
+
+Example before anonymization:
+@cartouche
+@smallexample
+<wbim:catalog id="Prcsss" name="Processes"/> 
+@end smallexample
+@end cartouche
+
+Example after anonymization:
+@cartouche
+@smallexample
+<wbim:catalog id="s00000001" name="s00000002"/> 
+@end smallexample
+@end cartouche
+
+@subsubsection Element Names Inside Attribute Values
+
+Attributes can contain element names. The @acronym{XSD} of BOM's input format states:
+
+@quotation
+The name of the global element may be prefixed by the catalog @acronym{ID} followed by @samp{##} to denote the name space for the element name.
+@end quotation
+
+Therefore, strings containing @samp{##} are split, anonymized separately, and finally joined to make sure the anonymized file correctly addresses the element names.
+
+Example before anonymization:
+@cartouche
+@smallexample
+<wbim:catalog id="Prcsss" name="Processes"/>
+...
+<wbim:process name="Prcsss##ProcessSimple"> 
+@end smallexample
+@end cartouche
+
+Example after anonymization:
+@cartouche
+@smallexample
+<wbim:catalog id="s00000001" name="s00000002"/>
+...
+<wbim:process name="s00000001##s00000003"> 
+@end smallexample
+@end cartouche
+
+Note that @samp{Prcsss} is replaced by @samp{s00000001} in the first occurrence in the @samp{id} attribute and in the substring of the @samp{name} attribute.
+
+
+
+
+
+
+
+
+
 
 @include fdl.texi
 

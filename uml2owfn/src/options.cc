@@ -52,7 +52,7 @@
 
 #include <libgen.h>     // for ::basename
 
-#include "uml2owfn.h"
+#include "config.h"
 #include "uml2owfn-io.h"
 #include "options.h"
 #include "helpers.h"

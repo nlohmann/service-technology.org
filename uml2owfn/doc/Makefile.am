@@ -1,6 +1,6 @@
 info_TEXINFOS = uml2owfn.texi
 
-uml2owfn_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
+uml2owfn_TEXINFOS = uml2owfn.texi fdl.texi cmdline.out ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex
 

@@ -16,7 +16,7 @@ class ASTNode;
 
 #include "AST-public.h"
 
-#include "uml2owfn.h"
+#include "config.h"
 #include "internal-representation.h"
 
 using std::string;

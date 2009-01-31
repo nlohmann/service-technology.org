@@ -5,7 +5,7 @@
 #define USING_BPEL2OWFN
 
 
-#include "uml2owfn.h"
+#include "config.h"
 #include "petrinet.h"		// to define member functions
 #include "globals.h"
 #include "petrinet-formula.h"   // <Dirk.F> soundness, proper termination predicate

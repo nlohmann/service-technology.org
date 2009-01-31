@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Where else are Makefiles?
-SUBDIRS = src doc tests
+SUBDIRS = src doc tests anon
 
 # maintainer - no maintainer directory yet
 
@@ -16,7 +16,7 @@ svn-clean: maintainer-clean
 	  config.h.in~
 	rm -fr doc/.DS_Store doc/ChangeLog.txt doc/Makefile.in doc/mdate-sh doc/manual
 	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~
-	rm -fr tests/Makefile.in tests/.DS_Store
+	rm -fr tests/Makefile.in tests/.DS_Store doc/Makefile.in anon/Makefile.in doc/mdate-sh
 	rm -fr maintainer/Makefile.in maintainer/.DS_Store
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"

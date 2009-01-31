@@ -6,7 +6,7 @@ AM_INIT_AUTOMAKE
 
 # Location of main() function and name of config header file.
 AC_CONFIG_SRCDIR(src/uml2owfn.cc)
-AC_CONFIG_HEADERS(src/uml2owfn.h)
+AC_CONFIG_HEADERS(src/config.h)
 
 # Compute the canonical build-system type variable, build, and its three
 # individual parts build_cpu, build_vendor, and build_os and write it to
@@ -140,6 +140,7 @@ AC_SUBST(configured_LDFLAGS)
 ############################################################################
 AC_CONFIG_FILES([src/Makefile \
                  tests/Makefile \
+                 anon/Makefile \
                  doc/Makefile \
                  Makefile])
 

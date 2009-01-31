@@ -1,8 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <vector>
+#include <string>
+#include <libgen.h>
 #include "pnapi.h"
 #include "cmdline.h"
+
+using namespace pnapi;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -27,15 +32,80 @@ void evaluateParameters(int argc, char** argv) {
 int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
     
-    // collect input files
+    vector<PetriNet> nets;
+    vector<std::string> names;
+    
+    
+    /********
+    * INPUT *
+    ********/
     if (args_info.inputs_num == 0) {
         // read from stdin
-        fprintf(stderr, "You gave no input files.\n");
+        PetriNet net;
+        std::cin >> io::owfn >> net;
+        nets.push_back(net);
+        names.push_back("stdin");
     } else {
         // read from files
-        fprintf(stderr, "You gave %d input files:\n", args_info.inputs_num);
         for (unsigned int i = 0; i < args_info.inputs_num; i++) {
-            fprintf(stderr, "file #%d: %s\n", i, args_info.inputs[i]);
+            PetriNet net;
+            std::fstream infile;
+            infile.open(args_info.inputs[i], std::fstream::in);
+            infile >> io::owfn >> net;            
+            infile.close();            
+            nets.push_back(net);
+            names.push_back(args_info.inputs[i]);
+        }
+    }
+    
+    
+    /************************
+    * STRUCTURAL PROPERTIES *
+    ************************/
+    if (args_info.check_given) {
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+            std::cerr << names[i] << ": ";
+
+            switch(args_info.check_arg) {            
+                case (check_arg_freechoice):
+                std::cerr << nets[i].isFreeChoice() << std::endl;
+                break;
+
+                case (check_arg_normal):
+                std::cerr << nets[i].isNormal() << std::endl;
+                break;
+
+                case (check_arg_workflow):
+                nets[i].isWorkflow();
+                break;
+            }
+        }
+    }
+    
+    
+    /*********
+    * OUTPUT *
+    *********/   
+    if (args_info.output_given) {
+        for (unsigned int i = 0; i < args_info.output_given; ++i) {
+            std::ofstream outfile;
+            std::string outname = names[0] + "." + args_info.output_orig[i];
+            outfile.open(outname.c_str());
+
+            switch(args_info.output_arg[i]) {
+                case (output_arg_owfn): {
+                    outfile << io::owfn << nets[0];
+                    break;
+                }
+
+                case (output_arg_sa): {
+                    Automaton sa(nets[0]);
+                    outfile << sa;
+                    break;
+                }
+            }
+            
+            outfile.close();
         }
     }
     

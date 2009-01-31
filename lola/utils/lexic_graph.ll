@@ -12,23 +12,26 @@ void graph_error(const char *);
 %}
 
 name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
-number    [0-9][0-9]*
+number    "-"?[0-9][0-9]*
 
 
 %%
 
+{number}" Places"               { /* skip */ }
+{number}" Transitions"          { /* skip */ }
+{number}" significant places"   { /* skip */ }
+"dead state found!"             { /* skip */ }
+">>>>> "{number}" States, "{number}" Edges, "{number}" Hash table entries" { /* skip */ }
 
-"Places"                { return KW_PLACES; }
-"Transitions"           { return KW_TRANSITIONS; }
-"States"                { return KW_STATES; }
-"Edges"                 { return KW_EDGES; }
-"Hash table entries"    { return KW_HASH; }
 "STATE"                 { return KW_STATE; }
 "Prog:"                 { return KW_PROG; }
+"!"                     { return BANG; }
+"*"                     { return STAR; }
+"?"                     { return QUESTION; }
 ":"                     { return COLON; }
 ","                     { return COMMA; }
 "->"                    { return ARROW; }
-">>>>>"                 { return INDENT; }
+"=>"                    { return PATHARROW; }
 
 {number}  { char *temp = (char *)malloc((strlen(graph_text)+1) * sizeof(char));
             strcpy(temp, graph_text);

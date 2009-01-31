@@ -6,7 +6,7 @@ AC_INIT([LoLA],[1.11-unreleased],[lola@service-technology.org],[lola])
 
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.60)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(gnits)
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/net.cc)

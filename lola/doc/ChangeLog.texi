@@ -18,11 +18,7 @@
 
 @item added maintainer scripts to create source and binary releases; the latter contain binaries of all configurations in directory @file{src/configs}
 
-@item added a directory @file{utils} for small helper tools:
-@itemize
-@item @sansserif{graph2dot} creates a graphical representation of a reachability graph created by LoLA (e.g., when configured with mode @samp{FULL})
-@item @sansserif{path2graph} translates a path created by LoLA (e.g., when configured with mode @samp{DEADLOCK}) into a reachability graph
-@end itemize
+@item added a directory @file{utils} for small helper tools: @sansserif{graph2dot} creates a graphical representation of a reachability graph created by LoLA (using option @option{-G} or @option{-M})
 @end itemize
 
 

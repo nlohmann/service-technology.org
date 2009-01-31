@@ -1,12 +1,12 @@
 info_TEXINFOS = lola.texi
 
-lola_TEXINFOS = ChangeLog.texi graph2dot.out path2graph.out figs
+lola_TEXINFOS = ChangeLog.texi graph2dot.out figs
 
 TEXINFO_TEX = texinfo.tex
 
 EXTRA_DIST = gendocs.sh gendocs_template
 
-MAINTAINERCLEANFILES = graph2dot.out path2graph.out
+MAINTAINERCLEANFILES = graph2dot.out
 
 all: ../ChangeLog
 
@@ -33,9 +33,6 @@ all: ../ChangeLog
 graph2dot.out: $(top_srcdir)/utils/cmdline-graph2dot.ggo $(top_srcdir)/configure.ac
 	$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
 	$(top_srcdir)/utils/graph2dot --help > graph2dot.out
-path2graph.out: $(top_srcdir)/utils/cmdline-path2graph.ggo $(top_srcdir)/configure.ac
-	$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
-	$(top_srcdir)/utils/path2graph --help > path2graph.out
 
 
 #############################################################################

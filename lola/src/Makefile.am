@@ -1,3 +1,5 @@
+.SUFFIXES = .ggo
+
 bin_PROGRAMS = lola
 
 #######################
@@ -6,6 +8,7 @@ bin_PROGRAMS = lola
 
 lola_SOURCES = readnet-syntax.yy \
 	       readnet-lexic.ll \
+	       cmdline.c cmdline.h \
 	       net.cc net.H \
 	       buchi.cc buchi.H \
 	       formula.cc formula.H \
@@ -25,11 +28,18 @@ lola_SOURCES = readnet-syntax.yy \
 
 lola_EXTRASOURCES = ltl.H ltl.cc
 
-EXTRA_DIST = readnet-syntax.h configs
+EXTRA_DIST = readnet-syntax.h cmdline.ggo configs
 
 lola_CFLAGS = @configured_CFLAGS@
 lola_CXXFLAGS = @configured_CXXFLAGS@
 lola_LDFLAGS = @configured_LDFLAGS@
+
+
+################################################################
+# use GNU gengetopt to create command line parser
+################################################################
+.ggo.c:
+	$(GENGETOPT) --input=$< -F $(@:.c=)
 
 
 #############################################################################
@@ -42,8 +52,8 @@ CONFIGS = $(patsubst configs/userconfig.H.%,lola-%,$(wildcard configs/userconfig
 $(CONFIGS): clean-am
 	mv userconfig.H userconfig.H~
 	cp configs/userconfig.H.$(patsubst lola-%,%,$@) userconfig.H
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+	$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am
 	mv lola$(EXEEXT) $@$(EXEEXT)
 	mv userconfig.H~ userconfig.H
 
-MAINTAINERCLEANFILES = $(CONFIGS)
+MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h

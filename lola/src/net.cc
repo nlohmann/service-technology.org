@@ -12,6 +12,7 @@
 #include "check.H"
 #include "path.H"
 #include "sweep.H"
+#include "cmdline.h"
 
 #include <fstream>
 #include <iostream>
@@ -20,8 +21,10 @@
 #include <cstdio>
 #include <unistd.h>
 #include <new>
+#include <string>
 
 using std::set_new_handler;
+using std::string;
 
 
 unsigned int BitVectorSize = 0;
@@ -52,18 +55,18 @@ Transition * Transition::EndOfStubbornList = (Transition *) 0;
 extern unsigned int * checkstart;
 #endif
 
-  char * lownetfile;
-  char * pnmlfile;
-  char * netfile;
-  char * analysefile;
-  char * graphfile;
-  char * pathfile;
-  char * statefile;
-  char * symmfile;
-  char * netbasename;
+  char * lownetfile = NULL;
+  char * pnmlfile = NULL;
+  char * netfile = NULL;
+  char * analysefile = NULL;
+  char * graphfile = NULL;
+  char * pathfile = NULL;
+  char * statefile = NULL;
+  char * symmfile = NULL;
+  char * netbasename = NULL;
 
-  bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg, cflg;
-  char graphformat;
+  bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg, cflg = false;
+  char graphformat = '\0';
 
 int garbagefound = 0;
 char * reserve;
@@ -85,25 +88,208 @@ unsigned int Place::NrSignificant = 0;
 void readnet();
 void removeisolated();
 unsigned int NonEmptyHash;
+
+
+/// process the command line options using GNU gengetopt
+void processCommandLine(int argc, char **argv) {
+  // a structure containing command line parameters
+  gengetopt_args_info args_info;
+
+  // call the cmdline parser, initiate args_info
+  if (cmdline_parser (argc, argv, &args_info) != 0) {
+    exit(4);
+  }
+
+  // check if at most one net file is given
+  if (args_info.inputs_num > 1) {
+    fprintf(stderr, "lola: more than one net file given\n");
+    exit(4);    
+  }
+  
+  // check if output parameters are given at most once
+  if (args_info.Net_given + args_info.net_given > 1) {
+    fprintf(stderr, "lola: more than one `-n' / `-N' option given\n");
+    exit(4);
+  }
+  if (args_info.Analysis_given + args_info.analysis_given > 1) {
+    fprintf(stderr, "lola: more than one `-a' / `-A' option given\n");
+    exit(4);
+  }
+  if (args_info.State_given + args_info.state_given > 1) {
+    fprintf(stderr, "lola: more than one `-s' / `-S' option given\n");
+    exit(4);
+  }
+  if (args_info.Automorphisms_given + args_info.automorphisms_given > 1) {
+    fprintf(stderr, "lola: more than one `-y' / `-Y' option given\n");
+    exit(4);
+  }
+  if (args_info.Graph_given + args_info.graph_given + args_info.Marking_given + args_info.marking_given > 1) {
+    fprintf(stderr, "lola: more than one `-g' / `-G' / `-m' / `-M' option given\n");
+    exit(4);
+  }
+  if (args_info.Path_given + args_info.path_given > 1) {
+    fprintf(stderr, "lola: more than one `-p' / `-P' option given\n");
+    exit(4);
+  }
+    
+  // set LoLA's flag variables
+  hflg = args_info.userconfig_given;
+  Nflg = args_info.Net_given;
+  nflg = args_info.net_given;
+  Aflg = args_info.Analysis_given;
+  aflg = args_info.analysis_given;
+  Sflg = args_info.State_given;
+  sflg = args_info.state_given;
+  Yflg = args_info.Automorphisms_given;
+  yflg = args_info.automorphisms_given;
+  Pflg = args_info.Path_given;
+  pflg = args_info.path_given;
+  GMflg = args_info.Graph_given + args_info.Marking_given;
+  gmflg = args_info.graph_given + args_info.marking_given;
+  cflg = args_info.Master_given;
+  
+  // set graph format
+  if (args_info.Graph_given || args_info.graph_given) {
+    graphformat = 'g';
+  }
+  if (args_info.Marking_given || args_info.marking_given) {
+    graphformat = 'm';
+  }
+  
+  // determine net file name and its basename
+  if (args_info.inputs_num == 1) {
+    string temp = string(args_info.inputs[0]);
+    netfile = (char*)realloc(netfile, temp.size()+1);
+    strcpy(netfile, temp.c_str());
+    
+    temp = temp.substr(0, temp.find_last_of("."));
+    netbasename = (char*)realloc(netbasename, temp.size()+1);
+    strcpy(netbasename, temp.c_str());
+  } else {
+    string temp = "unknown_net";
+    netbasename = (char*)realloc(netbasename, temp.size()+1);
+    strcpy(netbasename, temp.c_str());
+  }
+
+  // set output filenames for "-n" option
+  if (args_info.net_given) {
+    if (args_info.net_arg) {
+      string temp = string(args_info.net_arg);
+      lownetfile = (char*)realloc(lownetfile, temp.size()+1);
+      strcpy(lownetfile, temp.c_str());
+      temp = string(args_info.net_arg) + ".pnml";
+      pnmlfile = (char*)realloc(pnmlfile, temp.size()+1);
+      strcpy(pnmlfile, temp.c_str());
+    } else {
+      string temp = string(netbasename) + ".llnet";
+      lownetfile = (char*)realloc(lownetfile, temp.size()+1);
+      strcpy(lownetfile, temp.c_str());
+      temp = string(netbasename) + ".pnml";
+      pnmlfile = (char*)realloc(pnmlfile, temp.size()+1);
+      strcpy(pnmlfile, temp.c_str());
+    }
+  }
+  
+  // set input filename for "-a" option
+  if (args_info.analysis_given) {
+    if (args_info.analysis_arg) {
+      string temp = string(args_info.analysis_arg);
+      analysefile = (char*)realloc(analysefile, temp.size()+1);
+      strcpy(analysefile, temp.c_str());
+    } else {
+      string temp = string(netbasename) + ".task";
+      analysefile = (char*)realloc(analysefile, temp.size()+1);
+      strcpy(analysefile, temp.c_str());
+    }
+  }
+  
+  // set output filename for "-p" option
+  if (args_info.path_given) {
+    if (args_info.path_arg) {
+      string temp = string(args_info.path_arg);
+      pathfile = (char*)realloc(pathfile, temp.size()+1);
+      strcpy(pathfile, temp.c_str());
+    } else {
+      string temp = string(netbasename) + ".path";
+      pathfile = (char*)realloc(pathfile, temp.size()+1);
+      strcpy(pathfile, temp.c_str());
+    }
+  }
+
+  // set output filename for "-s" option
+  if (args_info.state_given) {
+    if (args_info.state_arg) {
+      string temp = string(args_info.state_arg);
+      statefile = (char*)realloc(statefile, temp.size()+1);
+      strcpy(statefile, temp.c_str());
+    } else {
+      string temp = string(netbasename) + ".state";
+      statefile = (char*)realloc(statefile, temp.size()+1);
+      strcpy(statefile, temp.c_str());
+    }
+  }
+
+  // set output filename for "-y" option
+  if (args_info.automorphisms_given) {
+    if (args_info.automorphisms_arg) {
+      string temp = string(args_info.automorphisms_arg);
+      symmfile = (char*)realloc(symmfile, temp.size()+1);
+      strcpy(symmfile, temp.c_str());
+    } else {
+      string temp = string(netbasename) + ".symm";
+      symmfile = (char*)realloc(symmfile, temp.size()+1);
+      strcpy(symmfile, temp.c_str());
+    }
+  }
+
+  // set output filename for "-g"/"-m" option
+  if (args_info.graph_given || args_info.marking_given) {
+    if (args_info.graph_arg) {
+      string temp = string(args_info.graph_arg);
+      graphfile = (char*)realloc(graphfile, temp.size()+1);
+      strcpy(graphfile, temp.c_str());          
+    } else {
+      if (args_info.marking_arg) {
+        string temp = string(args_info.marking_arg);
+        graphfile = (char*)realloc(graphfile, temp.size()+1);
+        strcpy(graphfile, temp.c_str());      
+      } else {
+        string temp = string(netbasename) + ".graph";
+        graphfile = (char*)realloc(graphfile, temp.size()+1);
+        strcpy(graphfile, temp.c_str());      
+      }
+    }
+  }  
+
+  // release memory
+  cmdline_parser_free (&args_info);
+}
+
+
 int main(int argc, char ** argv){
   // handling "lola --bug" (for debug purposes)
-  if (argc == 2 && std::string(argv[1]) == "--bug") {
+  if (argc == 2 && string(argv[1]) == "--bug") {
     printf("\n\n");
     printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
-    printf("- tool:               %s\n", PACKAGE_NAME);
-    printf("- version:            %s\n", PACKAGE_VERSION);
-    printf("- compilation date:   %s\n", __DATE__);
-    printf("- compiler version:   %s\n", __VERSION__);
-    printf("- platform:           %s\n", BUILDSYSTEM);
-    printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
-    printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
-    printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
-    printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
-    printf("- config MPI:         %s\n", CONFIG_ENABLEMPI);
+    printf("- tool:                 %s\n", PACKAGE_NAME);
+    printf("- version:              %s\n", PACKAGE_VERSION);
+    printf("- compilation date:     %s\n", __DATE__);
+    printf("- compiler version:     %s\n", __VERSION__);
+    printf("- platform:             %s\n", BUILDSYSTEM);
+    printf("- config ASSERT:        %s\n", CONFIG_ENABLEASSERT);
+    printf("- config UNIVERSAL:     %s\n", CONFIG_ENABLEUNIVERSAL);
+    printf("- config ENABLE64BIT:   %s\n", CONFIG_ENABLE64BIT);
+    printf("- config WIN32:         %s\n", CONFIG_ENABLEWIN32);
+    printf("- config MPI:           %s\n", CONFIG_ENABLEMPI);
+#ifdef STANDARDCONFIG
+    printf("- chosen userconfig.H:  predefined\n", STANDARDCONFIG);
+#else
+    printf("- chosen userconfig.H:  user-defined\n");
+#endif
     printf("\n\n");
     exit(EXIT_SUCCESS);
   }
-	
+
   int i,h;
 
 
@@ -112,321 +298,14 @@ int main(int argc, char ** argv){
   set_new_handler(&myown_newhandler);
   reserve = new char[10000];
   garbagefound = 0;
+
   // 1. Fileoptionen holen und auswerten
+  processCommandLine(argc, argv);
+
+	if (hflg)
+	  reportconfiguration();
   
-  // Options:
-  // File without option: Input net (stdin if not specified)
-  // -h output configuration
-  // -n [file] output file for LL net
-  // -c Master in distributed search
-  // -a [file] detailed spec. of analysis task (target marking/place/transtion/
-  //                                             /formula)
-  // -s [file] output file for witness state
-  // -y [file] output file for symmetry group generating set
-  // -p [file] output file for witness path
-  // -[gm] [file] output file for graph -g only state number and transitions
-  //									 -m markings and transitions
-  // if [file] is omitted, the following standard names are used:
-  // (<base> refers to the net file name without extension)
-  // -a: <base>.task
-  // -s: <base>.state
-  // -y: <base>.symm
-  // -p: <base>.path
-  // -[gm]: <base>.graph
-  // Using corresponding capital letters refers to output to the
-  // standard output stream. Output to stdout will also happen if
-  // an output file cannot be opened.
-  // if no net file is specified, net is read from stdin, and
-  // <base> is set to "unknown_net"
-
-  hflg = Nflg = nflg = Aflg = Sflg = Yflg = Pflg = GMflg = aflg = sflg = yflg = pflg = gmflg = cflg = false;
-  lownetfile = pnmlfile = netfile = analysefile = graphfile = pathfile = statefile = symmfile = 
-  netbasename = (char *) 0;
-  graphformat = '\0';
-  for(i = 1; i < argc; i++)
-  {
-	char * file;
-	file = (char *) 0;
-	if(argv[i][0] == '-')
-	{
-		// option
-		switch(argv[i][1])
-		{
-		case 'n': if(nflg || Nflg) 
-				  {
-					cerr << "multiple use of options -n/-N not allowed\n";
-					return(4);
-				  }
-				  nflg = true;
-				  if(argv[i][2])
-				  {
-					file = argv[i] + 2;
-				  }
-				  else
-				  {
-					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
-						i++;
-						file = argv[i];
-					}
-				  }
-				  if(file)
-				  {
-					lownetfile = new char [strlen(file) + 2];
-					strcpy(lownetfile,file);
-					pnmlfile = new char [strlen(file) + 20];
-					strcpy(pnmlfile,file);
-					strcpy(pnmlfile + strlen(pnmlfile),".pnml");
-				  }
-				  break;
-		case 'N': if(nflg || Nflg)
-				  {
-					cerr << "multiple use of options -n/-N not allowed\n";
-					return(4);
-				  }
-				  Nflg = true;
-				  break;
-		case 'c':         cflg = true;
-				  break;
-		case 'h':         hflg = true;
-				  break;
-		case 'a': if(aflg || Aflg) 
-				  {
-					cerr << "multiple use of options -a/-A not allowed\n";
-					return(4);
-				  }
-				  aflg = true;
-				  if(argv[i][2])
-				  {
-					file = argv[i] + 2;
-				  }
-				  else
-				  {
-					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
-						i++;
-						file = argv[i];
-					}
-				  }
-				  if(file)
-				  {
-					analysefile = new char [strlen(file) + 2];
-					strcpy(analysefile,file);
-				  }
-				  break;
-		case 'A': if(aflg || Aflg)
-				  {
-					cerr << "multiple use of options -a/-A not allowed\n";
-					return(4);
-				  }
-				  Aflg = true;
-				  break;
-		case 's': if(sflg || Sflg) 
-				  {
-					cerr << "multiple use of options -s/-S not allowed\n";
-					return(4);
-				  }
-				  sflg = true;
-				  if(argv[i][2])
-				  {
-					file = argv[i] + 2;
-				  }
-				  else
-				  {
-					if( (i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
-						i++;
-						file = argv[i];
-					}
-				  }
-				  if(file)
-				  {
-					statefile = new char [strlen(file) + 2];
-					strcpy(statefile,file);
-				  }
-				  break;
-		case 'S': if(sflg || Sflg)
-				  {
-					cerr << "multiple use of options -s/-S not allowed\n";
-					return(4);
-				  }
-				  Sflg = true;
-				  break;
-		case 'y': if(yflg || Yflg) 
-				  {
-					cerr << "multiple use of options -y/-Y not allowed\n";
-					return(4);
-				  }
-				  yflg = true;
-				  if(argv[i][2])
-				  {
-					file = argv[i] + 2;
-				  }
-				  else
-				  {
-					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
-						i++;
-						file = argv[i];
-					}
-				  }
-				  if(file)
-				  {
-					symmfile = new char [strlen(file) + 2];
-					strcpy(symmfile,file);
-				  }
-				  break;
-		case 'Y': if(yflg || Yflg)
-				  {
-					cerr << "multiple use of options -y/-Y not allowed\n";
-					return(4);
-				  }
-				  Yflg = true;
-				  break;
-		case 'p': if(pflg || Pflg) 
-				  {
-					cerr << "multiple use of options -p/-P not allowed\n";
-					return(4);
-				  }
-				  pflg = true;
-				  if(argv[i][2])
-				  {
-					file = argv[i] + 2;
-				  }
-				  else
-				  {
-					if((i+1 < argc) && (argv[i+1][0] != '-'))
-					{	
-						i++;
-						file = argv[i];
-					}
-				  }
-				  if(file)
-				  {
-					pathfile = new char [strlen(file) + 2];
-					strcpy(pathfile,file);
-				  }
-				  break;
-		case 'P': if(pflg || Pflg)
-				  {
-					cerr << "multiple use of options -p/-P not allowed\n";
-					return(4);
-				  }
-				  Pflg = true;
-				  break;
-		case 'f':
-		case 'm':
-		case 'g': graphformat = argv[i][1];
-				  if(gmflg || GMflg) 
-				  {
-					cerr << "multiple use of options -g/-m-f/-G/-M/-F not allowed\n";
-					return(4);
-				  }
-				  gmflg = true;
-				  if(argv[i][2])
-				  {
-					file = argv[i] + 2;
-				  }
-				  else
-				  {
-					if((i+1 < argc) &&(argv[i+1][0] != '-'))
-					{	
-						i++;
-						file = argv[i];
-					}
-				  }
-				  if(file)
-				  {
-					graphfile = new char [strlen(file) + 2];
-					strcpy(graphfile,file);
-				  }
-				  break;
-		case 'F':
-		case 'M':
-		case 'G': graphformat = tolower(argv[i][1]);
-				  if(gmflg || GMflg)
-				  {
-					cerr << "multiple use of options -g/-m-f/-G/-M/-F not allowed\n";
-					return(4);
-				  }
-				  GMflg = true;
-				  break;
-		default: cerr << "unrecognised option: -" << argv[i][1] << "\n";
-				 return(4);
-		}
-	}
-	else
-	{
-		// argument without option - must be net file;
-		if(netfile)
-		{
-			cerr << "multiple net file argument\n";
-			return(4);
-		}
-		netfile = new char[strlen(argv[i])+2 ];
-		netbasename = new char [strlen(argv[i]) + 2];
-		strcpy(netfile,argv[i]);
-		strcpy(netbasename,argv[i]);
-		for(h=strlen(netbasename);;h--)
-		{
-			if(netbasename[h] == '.')
-			{	
-				netbasename[h] = '\0';
-				break;
-			}
-			if(h == 0) break;
-		}
-	}
-  }
-  // all options processed, now standard names for omitted file options
-  if(!netbasename)
-  {
-	netbasename = new char[ strlen("unknown_net") + 2];
-	strcpy(netbasename,"unknown_net");
-  }
-  if(nflg && !lownetfile)
-  {	
-	lownetfile = new char [strlen(netbasename) + 7];
-	strcpy(lownetfile,netbasename);
-	strcpy(lownetfile+strlen(netbasename),".llnet");
-	pnmlfile = new char [strlen(netbasename) + 20];
-	strcpy(pnmlfile,lownetfile);
-	strcpy(pnmlfile+strlen(pnmlfile),".pnml");
-  }
-  if(aflg && !analysefile)
-  {	
-	analysefile = new char [strlen(netbasename) + 7];
-	strcpy(analysefile,netbasename);
-	strcpy(analysefile+strlen(netbasename),".task");
-  }
-  if(sflg && !statefile)
-  {	
-	statefile = new char [strlen(netbasename) + 8];
-	strcpy(statefile,netbasename);
-	strcpy(statefile+strlen(netbasename),".state");
-  }
-  if(yflg && !symmfile)
-  {	
-	symmfile = new char [strlen(netbasename) + 7];
-	strcpy(symmfile,netbasename);
-	strcpy(symmfile+strlen(netbasename),".symm");
-  }
-  if(pflg && !pathfile)
-  {	
-	pathfile = new char [strlen(netbasename) + 7];
-	strcpy(pathfile,netbasename);
-	strcpy(pathfile+strlen(netbasename),".path");
-  }
-  if(gmflg && !graphfile)
-  {	
-	graphfile = new char [strlen(netbasename) + 8];
-	strcpy(graphfile,netbasename);
-	strcpy(graphfile+strlen(netbasename),".graph");
-  }
-
   // 2. Initialisierung
-	if(hflg) reportconfiguration();
-
   NonEmptyHash = 0;
   try {
 #ifdef DISTRIBUTE
@@ -931,4 +810,3 @@ bool IsTransition ;
 }
 
 #endif
-

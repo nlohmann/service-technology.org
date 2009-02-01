@@ -10,7 +10,7 @@ echo "  [2/3] compiling LoLA..."
 $MAKE clean all --silent --directory=lola > /dev/null
 
 echo "  [3/3] running LoLA..."
-lola/src/lola $testdir/nets/planner.lola -a $testdir/nets/planner.task > /dev/null
+lola/src/lola $testdir/nets/planner.lola -a$testdir/nets/planner.task > /dev/null
 
 result=$?
 

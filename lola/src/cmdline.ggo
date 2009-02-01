@@ -1,0 +1,126 @@
+args "--unamed-opts=NET"
+
+purpose "LoLA (a Low Level Petri Net Analyzer) has been implemented for the validation of reduction techniques for place/transition net state spaces."
+
+
+section "Analysis File Input"
+sectiondesc="Some properties (e.g. a marking or a CTL formula) need to be explicitly specified. This can be either done in a separate file using the parameters below, or the property is specified in the end of the net file.\n"
+
+option "Analysis" A
+ "Read the analysis goal from standard input."
+ flag off
+
+option "analysis" a
+ "Read the analysis goal from file. If filename is omitted, derive it from the net file and add `.task' suffix."
+ typestr="FILE"
+ string argoptional optional
+
+
+section "Witness Path Output"
+sectiondesc="For some problems, LoLA is able to provide a witness or counterexample path for the verification problem.\n"
+
+option "Path" P
+ "Write witness path to standard output."
+ flag off
+
+option "path" p
+ "Write witness path to file. If filename is omitted, derive it from the net file and add `.graph' suffix."
+ typestr="FILE"
+ string argoptional optional
+
+
+section "Witness State Output"
+sectiondesc="For some problems, LoLA is able to provide a witness state for the verification problem.\n"
+
+option "State" S
+ "Write witness state to standard output."
+ flag off
+
+option "state" s
+ "Write witness state to file. If filename is omitted, derive it from the net file and add `.state' suffix."
+ typestr="FILE"
+ string argoptional optional
+ 
+
+section "Computed Portion of the State Space Output"
+sectiondesc="For most verification runs, LoLA is able to report on the computed portion of the state space. Exceptions concern the use of reduction techniques (like the sweep-line method or the goal-oriented execution) and the verification of some properties where advanced state space exploration strategies (other then normal depth-first or breadth-first search) are applied.\n"
+
+option "Graph" G
+ "Write state space to standard output (omit markings, show only state number and transitions)."
+ flag off
+
+option "graph" g
+ "Write state space to file (omit markings, show only state numbers and transitions). If filename is omitted, derive it from the net file and add `.graph' suffix."
+ typestr="FILE"
+ string argoptional optional
+ 
+option "Marking" M
+ "Write state space to standard output (show markings and transitions)."
+ flag off
+
+option "marking" m
+ "Write state space to file (show markings and transitions). If filename is omitted, derive it from the net file and add `.graph' suffix."
+ typestr="FILE"
+ string argoptional optional
+ 
+
+section "Place/Transition Net Output"
+sectiondesc="This feature is only useful if the original net specification is a high-level net. Then, it is possible to generate a complete net description file in the place/transition net syntax, containing the semantically equivalent low level counterpart of the given high-level net.\n"
+
+option "Net" N
+ "Write P/T net to standard output."
+  flag off
+
+option "net" n
+ "Write P/T net to file. If filename is omitted, derive it from the net file and add `.llnet' suffix."
+ typestr="FILE"
+ string argoptional optional
+ 
+
+section "Net Automorphisms Output"
+sectiondesc="In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. Each automorphism description starts with `GENERATOR', followed by numbers which are separated by a `.'. These numbers describe the structure of the generating set. The first number is a family number, the second one a consecutive number within each family. Each automorphism can be obtained from generators by composing at most one generator per family. Thereby, the composition of 0 generators is supposed to yield the identity mapping.\n"
+
+option "Automorphisms" Y
+ "Write net automorphisms to standard output."
+  flag off
+
+option "automorphisms" y
+ "Write net automorphisms to file. If filename is omitted, derive it from the net file and add `.symm' suffix."
+ typestr="FILE"
+ string argoptional optional
+
+
+section "Used Configuration Output"
+option "userconfig" h
+ "Show the configuration (i.e. the `userconfig.H') in which this LoLA executable has been compiled."
+ flag off
+
+option "bug" -
+ "Show compilation and configuration information about this LoLA executable which can be used for debug purposes."
+ flag off
+
+section "Distributed Search Option"
+
+option "Master" c
+ "Master in distributed search"
+ flag off
+
+
+text "
+Return Values:
+  The return values of the executable of LoLA has the following meaning: 
+  0   specified state or deadlock found/net or place unbounded/home marking
+      exists/net is reversible/predicate is live/CTL formula true/transition
+      not dead/liveness property does not hold;
+  1   the opposite verification result as a thumb rule, if the outcome of a
+      verification result can be supported by a counterexample or witness
+      path, that case corresponds to return value 0; 
+  2   Memory overflow during verification; 
+  3   Syntax error in the net or property description 
+  4   Error in accessing files (cannot open, no write permission etc.) or
+      invalid command line parameters.
+  >4  uncaught memory overflow, or bug"
+  
+text "
+
+  See http://service-technology.org/lola for more information."

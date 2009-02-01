@@ -19,6 +19,14 @@
 @item added maintainer scripts to create source and binary releases; the latter contain binaries of all configurations in directory @file{src/configs}
 
 @item added a directory @file{utils} for small helper tools: @sansserif{graph2dot} creates a graphical representation of a reachability graph created by LoLA (using option @option{-G} or @option{-M})
+
+@item command line options are now handled by @acronym{GNU} Gengetopt
+
+@item added command line help for @samp{lola --help}
+
+@item added version output for @samp{lola --version}
+
+@item added a manpage for LoLA using @code{help2man} tool
 @end itemize
 
 

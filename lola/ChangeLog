@@ -37,6 +37,14 @@ Version 1.11-unreleased
   graphical representation of a reachability graph created by LoLA (using
   option `-G' or `-M')
 
+* command line options are now handled by GNU Gengetopt
+
+* added command line help for `lola --help'
+
+* added version output for `lola --version'
+
+* added a manpage for LoLA using `help2man' tool
+
 Version 1.10
 ============
 

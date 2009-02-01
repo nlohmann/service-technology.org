@@ -1857,11 +1857,11 @@ The names used in the generated description correspond to the internally used na
 @c --------------------------------------------------------------------------
 @section Net Automorphisms
 @cindex @code{GENERATOR}
-@cindex @code{.state} files
+@cindex @code{.symm} files
 @cindex @code{-y} option
 @cindex @code{-Y} option
 
-In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. This information can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the automorphisms are written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-Y}, the automorphisms are written to the standard output stream which is convenient for integrating LoLA into other tools. 
+In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. This information can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the automorphisms are written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.symm}. Using @option{-Y}, the automorphisms are written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
 Each automorphism description starts with @samp{GENERATOR}, followed by numbers which are separated by a @samp{.}. These numbers describe the structure of the generating set. The first number is a family number, the second one a consecutive number within each family. Each automorphism can be obtained from generators by composing at most one generator per family. Thereby, the composition of 0 generators is supposed to yield the identity mapping. 
 

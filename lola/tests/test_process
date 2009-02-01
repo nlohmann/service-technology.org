@@ -10,7 +10,7 @@ echo "  [2/3] compiling LoLA..."
 $MAKE clean all --silent --directory=lola > /dev/null
 
 echo "  [3/3] running LoLA..."
-lola/src/lola $testdir/nets/process.lola -a $testdir/nets/process.task > /dev/null
+lola/src/lola $testdir/nets/process.lola -a$testdir/nets/process.task > /dev/null
 
 if [ $? -eq 1 ]
 then

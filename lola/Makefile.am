@@ -1,4 +1,4 @@
-SUBDIRS = src utils doc maintainer tests
+SUBDIRS = src utils doc man maintainer tests
 
 EXTRA_DIST = patches
 
@@ -12,7 +12,7 @@ svn-clean: maintainer-clean
 	  src/readnet-syntax.h src/Makefile.in src/config.H.in \
 	  tests/Makefile.in doc/mdate-sh doc/Makefile.in src/.deps \
 	  src/config.H.in~ maintainer/Makefile.in utils/Makefile.in \
-	  utils/graph_syntax.h
+	  utils/graph_syntax.h man/Makefile.in compile
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"

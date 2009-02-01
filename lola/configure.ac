@@ -14,11 +14,13 @@ AC_CONFIG_HEADER(src/config.h)
 
 # check for generic programs
 AC_PROG_CXX
+AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
+AM_MISSING_PROG(HELP2MAN, help2man)
 
 # check for additional programs
 AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
@@ -135,7 +137,7 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile maintainer/Makefile tests/Makefile utils/Makefile Doxyfile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile man/Makefile maintainer/Makefile tests/Makefile utils/Makefile Doxyfile])
 
 AC_OUTPUT
 

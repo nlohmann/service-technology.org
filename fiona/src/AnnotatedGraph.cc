@@ -908,8 +908,6 @@ void AnnotatedGraph::reAnalyzeReachableNodes(set<AnnotatedGraphNode*> &reachable
 
     TRACE(TRACE_5, "AnnotatedGraph::reAnalyzeReachableNodes(): start\n");
 
-    cout << "\n\nnumber of red nodes: " << nRedNodes << endl;
-
     // if there is no root node or if the root node is RED, return -- nothing to be done here
     if (getRoot() == NULL || getRoot()->getColor() == RED) {
     	// || nRedNodes == 0) { this condition is not valid due to the empty node in OG
@@ -3287,7 +3285,7 @@ void AnnotatedGraph::printGraphStatistics() {
     trace( "    number of states stored in nodes: " + intToString(getNumberOfStoredStates()) + "\n");
     trace( "    number of states calculated: " + intToString(State::state_count) + "\n");
 
-    trace( "\n\n    number of red nodes: " + intToString(nRedNodes) + "\n");
+   // trace( "\n\n    number of red nodes: " + intToString(nRedNodes) + "\n");
     TRACE(TRACE_5, "AnnotatedGraph::printGraphStatistics(): end\n");
 }
 

@@ -211,7 +211,7 @@ void InteractionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
                     currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
 
                     addProgress(your_progress);
-                    printProgress();
+                    // printProgress();
 
                     numberDeletedVertices--;
 
@@ -274,7 +274,7 @@ void InteractionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
 
         if (typeOfEdge == SENDING) {
             addProgress(your_progress);
-            printProgress();
+            // printProgress();
         }
     }
 
@@ -400,7 +400,7 @@ bool InteractionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
 
             if (type == SENDING) {
                 addProgress(progress_plus);
-                printProgress();
+                // printProgress();
             }
 
 			// we need to decrease the states counter

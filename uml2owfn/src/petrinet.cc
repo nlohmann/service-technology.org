@@ -590,8 +590,9 @@ PetriNet::~PetriNet()
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     delete *p;
 
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++) {
     delete *t;
+  }
 }
 
 

@@ -101,8 +101,8 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
   trace(TRACE_WARNINGS, "\ngenerating Petri net for " + process->getName()+ "\n");
 
   // Generates a petri net from the current process
-  PN = ExtendedWorkflowNet();   // get a new net
-  process->translateToNet(&PN);
+  ExtendedWorkflowNet *PN = new ExtendedWorkflowNet();   // get a new net
+  process->translateToNet(PN);
 
 #ifdef DEBUG
   trace(TRACE_DEBUG, "  -> done\n");
@@ -115,7 +115,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
     trace(TRACE_DEBUG, "-> removing unconnected pins\n");
 #endif
-    PN.removeUnconnectedPins();
+    PN->removeUnconnectedPins();
     //PN.removeEmptyOutputPinSets();
   }
 
@@ -125,10 +125,11 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
     trace(TRACE_DEBUG, "  cut net\n");
 #endif
-    PN.cutByRoles();
+    PN->cutByRoles();
 
-    if (!PN.isStructurallyCorrect()) {
+    if (!PN->isStructurallyCorrect()) {
       res |= RES_SKIPPED|RES_INCORR_STRUCTURE;
+      delete PN;    // finish Petri net
       return res;   // do not translate in this case
     }
   }
@@ -138,7 +139,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 
     // check net structure: free choice?
     trace(TRACE_DEBUG, "-> checking whether net is free-choice\n");
-    set<Node *> nonFC = PN.isFreeChoice();
+    set<Node *> nonFC = PN->isFreeChoice();
 
     // see if the net contains nodes that violate the free-choice property
     if (!nonFC.empty()) {
@@ -154,7 +155,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #endif
 
     // create proper initial marking
-    PN.soundness_initialPlaces();
+    PN->soundness_initialPlaces();
 
     // set termination semantics that will be used for the analysis
     terminationSemantics_t termination;
@@ -170,14 +171,14 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
       trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
 #endif
-      PN.soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
+      PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
     }
     else
     {
 #ifdef DEBUG
       trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
 #endif
-      PN.soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
+      PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
     }
   } // soundness
   // end of all net manipulations (except net reduction)
@@ -186,9 +187,12 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
   trace(TRACE_DEBUG, "-> checking whether net is connected\n");
 #endif
-  if (!PN.isConnected()) {
+  if (options[O_ROLECUT] && !PN->isConnected()) {
     res |= RES_SKIPPED|RES_UNCONNECTED;
     trace(TRACE_WARNINGS, " [INFO] process is not connected.\n\n");
+    // TODO: WARNING: the allocated net is not freed to avoid
+    //                a bug with the GCC under Linux and Cygwin
+    //delete PN;    // finish Petri net
     return res;   // do not translate in this case
   }
 
@@ -198,7 +202,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     trace(TRACE_DEBUG, "-> checking whether each node is on a path from alpha to omega\n");
 #endif
     Node* ll_node = NULL;
-    ll_node = PN.isPathCovered();
+    ll_node = PN->isPathCovered();
     if (ll_node != NULL){
       res |= RES_NO_WF_STRUCTURE;
       trace(TRACE_WARNINGS, " [INFO] process has no workflow-structure: node " + ll_node->nodeFullName() + " is not on alpha-omega path\n.");
@@ -214,13 +218,16 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     if (options[O_ROLECUT] && globals::deriveRolesToCut) {
       // we want to automatically find interesting services from
       // role information in choreographies
-      if ( ((PN.inputSize() <= 1 && PN.outputSize() <= 1)
-             || PN.inputSize() == 0
-             || PN.outputSize() == 0)
+      if ( ((PN->inputSize() <= 1 && PN->outputSize() <= 1)
+             || PN->inputSize() == 0
+             || PN->outputSize() == 0)
           && globals::parameters[P_FILTER]) {
         // but the current process has no interesting interface, and we are
         // filtering
         res |= RES_SKIPPED|RES_INSUFF_INTERFACE;
+        // TODO: WARNING: the allocated net is not freed to avoid
+        //                a bug with the GCC under Linux and Cygwin
+        //delete PN;    // finish Petri net
         return res;
       }
     }
@@ -229,12 +236,15 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
   // perform structural reduction
   if (reduction_level > 0) {
     trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-    PN.reduce(globals::reduction_level);
+    PN->reduce(globals::reduction_level);
 
     // check whether net reduction created an empty net
-    if (PN.getInternalPlaces().size() == 0) {
+    if (PN->getInternalPlaces().size() == 0) {
       cerr << process->getName() << " retrying (reason: empty process)." << endl;
-      cerr << PN.information() << endl;
+      cerr << PN->information() << endl;
+      // TODO: WARNING: the allocated net is not freed to avoid
+      //                a bug with the GCC under Linux and Cygwin
+      //delete PN;    // finish Petri net
       return RES_SKIPPED|RES_EMPTY_PROCESS;
     }
   }
@@ -249,7 +259,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
       trace(TRACE_DEBUG, "-> soundness analysis: creating final state formula\n");
 #endif
-      finalStateFormula = PN.createOmegaPredicate(false);
+      finalStateFormula = PN->createOmegaPredicate(false);
     }
   }
 
@@ -257,7 +267,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
       trace(TRACE_DEBUG, "-> safeness analysis: creating safeness formula\n");
 #endif
-    safeStateFormula = PN.createSafeStatePredicate(/* can be empty? */ globals::parameters[P_TASKFILE]);
+    safeStateFormula = PN->createSafeStatePredicate(/* can be empty? */ globals::parameters[P_TASKFILE]);
     if (safeStateFormula == NULL || safeStateFormula->size() == 0)
       // no formula needed to check safeness, net is safe
       // this field is evaluated when writing the task and script files
@@ -277,7 +287,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 
   // generate the output for the given process
   globals::currentProcessName = process->getName();  // for comments about origin in generated net files
-  write_net_file(analysis);     // write out current process and further related files
+  write_net_file(PN, analysis); // write out current process and further related files
   write_task_file(analysis);    // write task file for this process (if applciable)
   extend_script_file(analysis); // extend script file for this process (if applicable)
 
@@ -289,6 +299,13 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     delete safeStateFormula;  // TODO clean up subformulas!
     safeStateFormula = NULL;
   }
+
+  cerr << "completed everything" << endl;
+
+// TODO: WARNING: the allocated net is not freed to avoid
+//                a bug with the GCC under Linux and Cygwin
+//  delete PN;    // finish Petri net
+//  PN = NULL;
 
   return res;
 }

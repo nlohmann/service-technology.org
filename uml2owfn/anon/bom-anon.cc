@@ -1,4 +1,4 @@
-/* 
+/*
  BOM-ANONYMIZER was written by Niels Lohmann <niels.lohmann@service-technology.org>.
 
  It is licensed under the Creative Commons Attribution 2.0 Germany License
@@ -10,6 +10,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <cstdlib>
 
 #include "config.h"
 
@@ -37,11 +38,11 @@ string processString(const char *text) {
     // strip the enclosing quotes
     string s(text);
     s = s.substr(1,s.length()-2);
-    
+
     // strip newlines at beginning or end of string
     if (s[0] == '\n')
         s = s.substr(1,s.length()-1);
-        
+
     if (s[s.length()-1] == '\n')
         s = s.substr(0,s.length()-1);
 
@@ -52,7 +53,7 @@ string processString(const char *text) {
         // split the string s into two parts: s1 before "##", s2 after
         string s1 = s.substr(0, s.find_first_of("##"));
         string s2 = s.substr(s.find_first_of("##")+2, s.length());
-        
+
         return anonymize(s1)+"##"+anonymize(s2);
     }
 
@@ -66,16 +67,16 @@ string anonymize(string &s) {
     if (string_cache[s] == "") {
         string_cache[s] = "s" + toString(nextId++);
     }
-    
+
     return string_cache[s];
 }
 
 
-// convert an unsigned int to a string 
+// convert an unsigned int to a string
 string toString(unsigned int q) {
-    ostringstream buffer;    
+    ostringstream buffer;
     buffer << setw(8) << setfill('0') << q;
-    
+
     return buffer.str();
 }
 
@@ -93,14 +94,14 @@ int main(int argc, char** argv) {
         printf("\n\n");
         return EXIT_SUCCESS;
     }
-    
+
     // initialize string cache with value whitelist to avoid anonymizing thereof
     for (unsigned int i = 0; value_whitelist[i] != ""; i++) {
         string_cache[value_whitelist[i]] = value_whitelist[i];
     }
-    
+
     int flex_result = yylex();
-    
+
     // reverse the cache for output of the mapping
     map<string,string> reversed_cache;
     for (map<string,string>::iterator it = string_cache.begin();
@@ -113,9 +114,9 @@ int main(int argc, char** argv) {
                 ("s" + toString(i)).c_str(),
                 reversed_cache["s" + toString(i)].c_str());
     }
-    
+
     string_cache.clear();
     reversed_cache.clear();
-    
+
     return flex_result;
 }

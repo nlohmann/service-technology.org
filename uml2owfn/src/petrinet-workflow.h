@@ -124,6 +124,9 @@ public:
 	/// remove places representing unconnected pins in the given net
   void removeUnconnectedPins ();
 
+  /// remove pinset transitions without pre- and post-places
+  void deleteIsolatedPinsetTransitions();
+
   /// re-enumerate the roles of all nodes of the net
 	void anonymizeNodes();
 

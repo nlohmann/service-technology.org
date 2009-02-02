@@ -66,6 +66,9 @@ AC_DEFINE_UNQUOTED(CONFIG_ENABLEDEBUG, "$enable_debug", [whether to compile debu
 
 if test "$enable_debug" = "yes"; then
   AC_DEFINE(DEBUG, 1, [Compiling with DEBUG statements.])
+  configured_CFLAGS=$configured_CFLAGS" -g"
+  configured_CXXFLAGS=$configured_CXXFLAGS" -g"
+  configured_LDFLAGS=$configured_LDFLAGS" -g"
 fi
 
 # parameter "--disable-assert"

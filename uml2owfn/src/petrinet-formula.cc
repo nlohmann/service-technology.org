@@ -39,6 +39,7 @@
 #include <set>
 #include <sstream>
 #include <utility>
+#include <typeinfo>
 
 #include "petrinet-formula.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)

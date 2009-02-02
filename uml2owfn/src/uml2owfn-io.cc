@@ -39,8 +39,6 @@ using std::stringstream;
  * Global variables
  *****************************************************************************/
 
-/// The Petri Net
-ExtendedWorkflowNet  PN = ExtendedWorkflowNet();
 /// formula specifying the final state
 FormulaState* finalStateFormula = NULL;
 /// formula specifying safness of the net
@@ -183,18 +181,18 @@ string process_name_to_file_name (string processName) {
  *****************************************************************************/
 
 /// write the current Petri net
-void write_net_file(analysis_t analysis) {
+void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
     trace(TRACE_DEBUG, "-> writing Petri net to file\n");
 
     // now the net will not change anymore, re-enumerate nodes of the net
     // to anonymize it
     if (globals::parameters[P_ANONYMIZE]) {
-      PN.reenumerate();
-      PN.anonymizeNodes();
+      PN->reenumerate();
+      PN->anonymizeNodes();
     }
 
     //  PN.calculate_max_occurrences();
-    cerr << PN.information() << endl;
+    cerr << PN->information() << endl;
 
     // create oWFN output ?
     if (formats[F_OWFN]) {
@@ -203,8 +201,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-        PN.set_format(FORMAT_OWFN);
-        (*output) << PN;
+        PN->set_format(FORMAT_OWFN);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -219,8 +217,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
-        PN.set_format(FORMAT_LOLA);
-        (*output) << PN;
+        PN->set_format(FORMAT_LOLA);
+        (*output) << *PN;
 
        if (!shall_write_task_to_file(analysis)) { // append verification property to net
            trace(TRACE_DEBUG, "-> Appending specification for verification ...\n");
@@ -240,8 +238,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
-        PN.set_format(FORMAT_PNML);
-        (*output) << PN;
+        PN->set_format(FORMAT_PNML);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -256,8 +254,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
-        PN.set_format(FORMAT_PEP);
-        (*output) << PN;
+        PN->set_format(FORMAT_PEP);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -272,8 +270,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for Woflan (TPN) ...\n");
-        PN.set_format(FORMAT_TPN);
-        (*output) << PN;
+        PN->set_format(FORMAT_TPN);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -288,8 +286,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for INA ...\n");
-        PN.set_format(FORMAT_INA);
-        (*output) << PN;
+        PN->set_format(FORMAT_INA);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -304,8 +302,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for SPIN ...\n");
-        PN.set_format(FORMAT_SPIN);
-        (*output) << PN;
+        PN->set_format(FORMAT_SPIN);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -320,8 +318,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
-        PN.set_format(FORMAT_APNN);
-        (*output) << PN;
+        PN->set_format(FORMAT_APNN);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -336,8 +334,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-        PN.set_format(FORMAT_DOT, true);
-        (*output) << PN;
+        PN->set_format(FORMAT_DOT, true);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -360,8 +358,8 @@ void write_net_file(analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
-        PN.set_format(FORMAT_INFO);
-        (*output) << PN;
+        PN->set_format(FORMAT_INFO);
+        (*output) << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);

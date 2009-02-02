@@ -108,7 +108,6 @@ string Node::nodeName() const
 string Node::nodeFullName() const
 {
   assert(history.size() > 0);
-  assert(history.begin() != NULL);
   assert(history.begin() != history.end());
 
   string result = *history.begin();

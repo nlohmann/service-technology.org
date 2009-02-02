@@ -29,8 +29,6 @@ using std::string;
 
 // global variables
 
-/// The Petri Net
-extern ExtendedWorkflowNet  PN;
 /// formula specifying the final state
 extern FormulaState* finalStateFormula;
 /// formula specifying safness of the net
@@ -55,7 +53,7 @@ string getOutputFilename_net (possibleFormats format);
 string process_name_to_file_name (string processName);
 
 // file contents create/write functions
-void write_net_file(analysis_t analysis);
+void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis);
 
 void write_log_file ();
 void log_print (string text);

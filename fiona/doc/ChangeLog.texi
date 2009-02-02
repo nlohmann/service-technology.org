@@ -1,6 +1,15 @@
 @heading Version 3.1-unreleased
 
 @itemize
+
+@item implementation of a re-analysis function which is applied to every IG/ OG that is computed, therefore after the re-analysis
+@itemize
+@item the graph does not contain any isolated blue nodes
+@item in case parameter @code{-s bluenodes} is set, all red nodes are deleted from memory
+@end itemize
+
+@item statistical data of IG/ OG is gathered as the graph is built up and during re-analysis
+
 @item adapted code to avoid deprecation warnings of GCC 4.2
 
 @item ChangeLogs are now generated from Texinfo documentation

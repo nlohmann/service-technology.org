@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -139,10 +139,23 @@ template<typename T> class SListIterator {
         }
 
         /**
+         * Adds 'element' to the end of this SList. Complexity is O(1).
+         */
+        void add(const T& element) {
+            // in case we are at the end of the list, but a new element is added
+            // then we have to adjust the iterator's next element
+            if (next_ == NULL) {
+                next_ = list_->add(element);
+            } else {
+                list_->add(element);
+            }
+        }
+
+        /**
          * Returns true iff there is a next element in the corresponding SList. If
          * there is, it can be obtained by a call to getNext().
          */
-        bool hasNext() const {
+        bool hasNext() {
             return next_ != NULL;
         }
 
@@ -201,6 +214,7 @@ template<typename T> class SListIterator {
                 if (list_->first_ == NULL) {
                     list_->last_ = NULL;
                 }
+
             } else {
                 // Case: The element to be removed is not the first element of the
                 // SList.
@@ -318,7 +332,7 @@ template<typename T> class SList {
         /**
          * Adds 'element' to the end of this SList. Complexity is O(1).
          */
-        void add(const T& element) {
+        SListItem<T>* add(const T& element) {
             SListItem<T>* item = new SListItem<T>(element);
 
             if (size_ == 0) {
@@ -331,6 +345,8 @@ template<typename T> class SList {
                 last_ = item;
                 ++size_;
             }
+
+            return item;
         }
 
         /**

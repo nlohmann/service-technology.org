@@ -46,52 +46,69 @@
 
 //! \brief constructor
 //! \param _PN
-//! \fn interactionGraph::interactionGraph(oWFN * _PN)
-interactionGraph::interactionGraph(oWFN* _PN) :
+//! \fn InteractionGraph::InteractionGraph(oWFN * _PN)
+InteractionGraph::InteractionGraph(oWFN* _PN) :
     CommunicationGraph(_PN) {
 }
 
 
 //! \brief destructor !to be implemented!
-//! \fn interactionGraph::~interactionGraph()
-interactionGraph::~interactionGraph() {
+//! \fn InteractionGraph::~InteractionGraph()
+InteractionGraph::~InteractionGraph() {
 }
 
 
 //! \brief builds the graph starting with the root node
-//! \fn void interactionGraph::buildGraph()
-void interactionGraph::buildGraph() {
+//! \fn void InteractionGraph::buildGraph()
+void InteractionGraph::buildGraph() {
 
     // [LUHME XV] Daniela, lösch das mal und überleg Dir, was Du da machen wolltest!
     setOfStatesStubbornTemp.clear();
 
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
-
-    // [LUHME XV] Reihenfolge "push_back()" und "buildGraph()" ist umgekehrt zu OG::buildGraph()
-    // build the IG, whether the reduced or not the reduced one is built is being decided in that
-    // function itself
-    buildGraph(getRoot(), 1);
-
     setOfNodes.push_back(getRoot());
 
-    computeGraphStatistics();
+    // build the IG, whether the reduced or not the reduced one is built is being decided in that
+    // function itself
+    nStoredStates += getRoot()->reachGraphStateSet.size();
 
-    time_t seconds, seconds2;
+    buildGraph(getRoot(), 1);
 
-    TRACE(TRACE_2, "setting final nodes...\n");
-    seconds = time(NULL);
+    nAllNodes = setOfNodes.size();
+
+    TRACE(TRACE_2, "\n\nre-analyzing graph...\n");
+
+    time_t reAnalysisTime_start, reAnalysisTime_end;
+
+    set<AnnotatedGraphNode*> reachableBlueNodes;
+    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
+
+    reAnalysisTime_start = time(NULL);
+    reAnalyzeReachableNodes(reachableBlueNodes, parentNodes);
+    removeFalseAndUnreachableNodes(reachableBlueNodes, parentNodes);
+    reAnalysisTime_end = time(NULL);
+
+    TRACE(TRACE_2, "finished re-analyzing graph...\n");
+
+    TRACE(TRACE_3, "    " + intToString((int) difftime(reAnalysisTime_end, reAnalysisTime_start)) + " s consumed.\n");
+
+    time_t assignFinalNodes_start, assignFinalNodes_end;
+
+    TRACE(TRACE_2, "\nsetting final nodes...\n");
+
+    assignFinalNodes_start = time(NULL);
     assignFinalNodes();
-    seconds2 = time(NULL);
-    TRACE(TRACE_2, "finished setting final nodes...\n");
-    TRACE(TRACE_3, "    " + intToString((int) difftime(seconds2, seconds)) + " s consumed.\n");
+    assignFinalNodes_end = time(NULL);
 
+    TRACE(TRACE_2, "finished setting final nodes...\n");
+    TRACE(TRACE_3, "    " + intToString((int) difftime(assignFinalNodes_end, assignFinalNodes_start)) + " s consumed.\n");
 }
 
 
 //! \brief builds up the graph recursively
 //! \param node current node of the graph
-//! \fn void interactionGraph::buildGraph(AnnotatedGraphNode * node)
-void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
+//! \fn void InteractionGraph::buildGraph(AnnotatedGraphNode * node)
+void InteractionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
     // at this point, the states inside the current node are already computed!
 
@@ -178,15 +195,14 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
 
             TRACE(TRACE_2, PN->createLabel(mmSet) + "\n");
 
-            // [LUHME XV] Variable "v" in "newNode" umbenennen
             // create new AnnotatedGraphNode of the graph
-            AnnotatedGraphNode* v = new AnnotatedGraphNode();
+            AnnotatedGraphNode* newNode = new AnnotatedGraphNode();
 
             if (typeOfEdge == SENDING) {
                 // sending event
-                calculateSuccStatesSendingEvent(mmSet, currentNode, v);
+                calculateSuccStatesSendingEvent(mmSet, currentNode, newNode);
 
-                if (v->getColor() == RED) {
+                if (newNode->getColor() == RED) {
                     // message bound violation occurred during calculateSuccStatesSendingEvent
                     TRACE(TRACE_2, "\t\t\t\t    sending event: ");
                     TRACE(TRACE_2, PN->createLabel(mmSet));
@@ -198,27 +214,37 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
                     printProgress();
 
                     numberDeletedVertices--;
-                    delete v;
-                    v = NULL;
+
+                    delete newNode;
+                    newNode = NULL;
+                } else {
+                	// the knowledge of the new node has been calculated, so add the number of states stored
+					// in the new node to the global counter
+					nStoredStates += newNode->reachGraphStateSet.size();
                 }
             } else {
                 // receiving event
-                calculateSuccStatesReceivingEvent(mmSet, currentNode, v);
+                calculateSuccStatesReceivingEvent(mmSet, currentNode, newNode);
+
+                // the knowledge of the new node has been calculated, so add the number of states stored
+				// in the new node to the global counter
+				nStoredStates += newNode->reachGraphStateSet.size();
             }
 
-            bool added = addGraphNode(currentNode, v, mmSet, typeOfEdge, progress_plus);
-            if (v != NULL && currentNode->getColor() != RED && added) {
+            bool added = addGraphNode(currentNode, newNode, mmSet, typeOfEdge, progress_plus);
+
+            if (newNode != NULL && currentNode->getColor() != RED && added) {
 
                 if (typeOfEdge == RECEIVING) {
-                    buildGraph(v, 0);
+                    buildGraph(newNode, 0);
                 } else {
-                    buildGraph(v, your_progress);
+                    buildGraph(newNode, your_progress);
                 }
                 TRACE(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 
-                if (v->getColor() == RED) {
+                if (newNode->getColor() == RED) {
                     currentNode->removeLiteralFromAnnotation(PN->createLabel(mmSet));
-                } else if (v->getColor() == BLUE) {
+                } else if (newNode->getColor() == BLUE) {
                     // only if "early detection" reduction is activated, we adjust the priority map
                     // [LUHME XV] neu-justieren der Priority-Map auch in den anderen Fällen?
                     if (parameters[P_USE_EAD]) {
@@ -236,6 +262,8 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
             // do not optimize when trying diagnosis
             if (currentNode->getAnnotation()->equals() == FALSE) {
                 currentNode->setColor(RED);
+                nRedNodes++;
+
                 TRACE(TRACE_3, "\t\t any further event suppressed (annotation of node ");
                 TRACE(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
                 TRACE(TRACE_5, "\t\t formula was " + currentNode->getAnnotation()->asString());
@@ -255,6 +283,10 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
     }
     TRACE(TRACE_5, "node analyzed\n");
 
+    if (currentNode->getColor() == RED) {
+        nRedNodes++;
+    }
+
     TRACE(TRACE_1, "\t\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()) + "\n");
 }
 
@@ -271,7 +303,7 @@ void interactionGraph::buildGraph(AnnotatedGraphNode* currentNode, double progre
 //! \param toAdd a reference to the GraphNode that is to be added to the graph
 //! \param messages the label of the edge between the current GraphNode and the one to be added
 //! \param type the type of the edge (SENDING, RECEIVING)
-bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
+bool InteractionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
                                     AnnotatedGraphNode* toAdd,
                                     messageMultiSet messages,
                                     GraphEdgeType type,
@@ -340,6 +372,10 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
             toAdd->setName(intToString(getNumberOfNodes()));
 
             AnnotatedGraphEdge* edgeSucc = new AnnotatedGraphEdge(toAdd, label);
+
+            // a new edge has been added to the graph, must be local to the IG
+            nEdges++;
+
             sourceNode->addLeavingEdge(edgeSucc);
             addNode(toAdd);
 
@@ -349,6 +385,10 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
             TRACE(TRACE_1, "\t successor node already known: " + found->getName() + "\n");
 
             AnnotatedGraphEdge* edgeSucc = new AnnotatedGraphEdge(found, label);
+
+            // a new edge has been added to the graph, must be local to the IG
+            nEdges++;
+
             sourceNode->addLeavingEdge(edgeSucc);
 
             // Still, if that node was computed red before, the literal
@@ -362,6 +402,9 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
                 addProgress(progress_plus);
                 printProgress();
             }
+
+			// we need to decrease the states counter
+            nStoredStates -= toAdd->reachGraphStateSet.size();
 
             delete toAdd;
 
@@ -379,8 +422,8 @@ bool interactionGraph::addGraphNode(AnnotatedGraphNode* sourceNode,
 //! \param messages
 //! \param currentNode the node from which the input event is to be sent
 //! \param typeOfPlace
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, Type typeOfPlace)
-bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
+//! \fn bool InteractionGraph::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, Type typeOfPlace)
+bool InteractionGraph::checkMaximalEvents(messageMultiSet messages,
                                           AnnotatedGraphNode* currentNode,
                                           GraphEdgeType typeOfPlace) {
     TRACE(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet messages, AnnotatedGraphNode * currentNode, bool typeOfPlace): start\n");
@@ -453,7 +496,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages,
 //! \param iter current state
 //!    \param myclause clause which is connected to the current state
 //! \param inputMessages set of sending events that are activated in the current node
-void interactionGraph::getSendingEvents(State* state, GraphFormulaMultiaryOr* myclause, setOfMessages& inputMessages) {
+void InteractionGraph::getSendingEvents(State* state, GraphFormulaMultiaryOr* myclause, setOfMessages& inputMessages) {
 
     TRACE(TRACE_5, "interactionGraph::getSendingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& inputMessages): start\n");
 
@@ -488,7 +531,7 @@ void interactionGraph::getSendingEvents(State* state, GraphFormulaMultiaryOr* my
 //! \param node is not used but needed for having a unified function pointer.
 //! \todo check: parameter "state" is not used
 //! \todo check: parameter "node" is not used
-void interactionGraph::getReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& outputMessages, AnnotatedGraphNode* node) {
+void InteractionGraph::getReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& outputMessages, AnnotatedGraphNode* node) {
 
     TRACE(TRACE_5, "interactionGraph::getReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& receivingEvents, AnnotatedGraphNode* node): start\n");
 
@@ -514,7 +557,7 @@ void interactionGraph::getReceivingEvents(State * state, GraphFormulaMultiaryOr*
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
-void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
+void InteractionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
                                                 AnnotatedGraphNode* node,
                                                 AnnotatedGraphNode* newNode) {
     TRACE(TRACE_5, "interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
@@ -614,7 +657,7 @@ void interactionGraph::calculateSuccStatesSendingEvent(messageMultiSet input,
 //! \param receivingEvent the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
-void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivingEvent,
+void InteractionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivingEvent,
                                                  AnnotatedGraphNode* node,
                                                  AnnotatedGraphNode* newNode) {
     TRACE(TRACE_5, "interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet output, AnnotatedGraphNode * node, AnnotatedGraphNode * newNode) : start\n");
@@ -743,13 +786,13 @@ void interactionGraph::calculateSuccStatesReceivingEvent(messageMultiSet receivi
 //! \param node each state of this node is processed.
 //! \param sendingEvents an already existing message set (previously empty) that is filled with the sending events.
 //! \param receivingEvents an already existing message set (previously empty) that is filled with the receiving events.
-void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents) {
+void InteractionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents) {
 
     TRACE(TRACE_5, "interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  node, setOfMessages& sendingEvents, setOfMessages& receivingEvents): start\n");
 
     // Declaring function pointers for the methods that shall be used.
-    void (interactionGraph::*calcReceiving) (State *, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
-    void (interactionGraph::*calcSending)     (State *, GraphFormulaMultiaryOr*, setOfMessages&);
+    void (InteractionGraph::*calcReceiving) (State *, GraphFormulaMultiaryOr*, setOfMessages&, AnnotatedGraphNode*);
+    void (InteractionGraph::*calcSending)     (State *, GraphFormulaMultiaryOr*, setOfMessages&);
 
 	// if we calculate a responsive partner, we consider TSCCs only and store which
 	// TSCC we have seen already
@@ -758,15 +801,15 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 
     // Define the functions to be used for calculation
     if (parameters[P_USE_CRE]) { // Use "combine receiving events" to calculate receiving events.
-        calcReceiving = &interactionGraph::combineReceivingEvents;
+        calcReceiving = &InteractionGraph::combineReceivingEvents;
     } else { // Do not use a reduction rule.
-        calcReceiving = &interactionGraph::getReceivingEvents;
+        calcReceiving = &InteractionGraph::getReceivingEvents;
     }
 
     if (parameters[P_USE_RBS]) { // Use "receiving before sending" to calculate sending events.
-        calcSending = &interactionGraph::receivingBeforeSending;
+        calcSending = &InteractionGraph::receivingBeforeSending;
     } else { // Do not use a reduction rule.
-        calcSending = &interactionGraph::getSendingEvents;
+        calcSending = &InteractionGraph::getSendingEvents;
     }
 
     // Declare the iterators to be used for processing each state of the current node.
@@ -875,7 +918,7 @@ void interactionGraph::calculateSendingAndReceivingEvents(AnnotatedGraphNode*  n
 //! \param iter current state
 //!    \param myclause clause which is connected to the current state
 //! \param sendingEvents set of sending events for the current node
-void interactionGraph::receivingBeforeSending(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents) {
+void InteractionGraph::receivingBeforeSending(State * state, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents) {
     TRACE(TRACE_5, "interactionGraph::receivingBeforeSending(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& sendingEvents): start\n");
 
     unsigned int i = 0;
@@ -906,7 +949,7 @@ void interactionGraph::receivingBeforeSending(State * state, GraphFormulaMultiar
 //! \param receivingEvents set of receiving events that are activated in the current node
 //! \param node the node for which the activated receiving events are calculated
 //! \todo check: parameter "state" is not used
-void interactionGraph::combineReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause,
+void InteractionGraph::combineReceivingEvents(State * state, GraphFormulaMultiaryOr* myclause,
         setOfMessages& receivingEvents, AnnotatedGraphNode* node) {
 
     TRACE(TRACE_5, "interactionGraph::combineReceivingEvents(StateSet::iterator& iter, GraphFormulaMultiaryOr* myclause, setOfMessages& receivingEvents, AnnotatedGraphNode* node): start\n");

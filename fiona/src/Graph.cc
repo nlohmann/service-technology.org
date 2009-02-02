@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -150,10 +150,20 @@ void Graph::setRootToNodeWithName(const string& nodeName) {
 }
 
 
-//! \brief checks wether a root node is set
+//! \brief checks whether a root node is set
 //! \return returns true if the rootnode is NULL, else false
 bool Graph::hasNoRoot() const {
     return getRoot() == NULL;
+}
+
+
+//! \brief checks whether a root node is set and whether it is blue
+//! \return returns true if the rootnode is BLUE, else false
+bool Graph::hasBlueRoot() const {
+    if (getRoot() != NULL) {
+        return getRoot()->getColor() == BLUE;
+    }
+    return false;
 }
 
 
@@ -245,13 +255,13 @@ bool Graph::isAcyclic() {
 //! \param dotGraphTitle a title for the graph to be shown in the image
 string Graph::createDotFile(string& filenamePrefix,
                             const string& dotGraphTitle) const {
- 
+
     unsigned int maxSizeForDotFile = 5000; // number relevant for .out file
-    
+
     if (setOfNodes.size() <= maxSizeForDotFile) {
-    
+
             trace( "creating the dot file of the graph...\n");
-            
+
             string dotFile = filenamePrefix + ".out";
             fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
             if (!dotFileHandle.good()) {
@@ -265,13 +275,13 @@ string Graph::createDotFile(string& filenamePrefix,
             dotFileHandle << "\"];\n";
             dotFileHandle << "node [fontname=\"Helvetica\" fontsize=10];\n";
             dotFileHandle << "edge [fontname=\"Helvetica\" fontsize=10];\n";
-        
+
             std::map<GraphNode*, bool> visitedNodes;
             createDotFileRecursively(getRoot(), dotFileHandle, visitedNodes);
-        
+
             dotFileHandle << "}";
             dotFileHandle.close();
-        
+
             return dotFile;
     } else {
             trace( "graph is too big to create dot file\n");
@@ -293,7 +303,7 @@ string Graph::createPNGFile(string& filenamePrefix,
                          	string& dotFileName) const {
 
     trace( "creating the png file of the dot file...\n");
-    
+
     string dotFile = filenamePrefix + ".out";
     string pngFile = filenamePrefix + ".png";
 
@@ -303,9 +313,9 @@ string Graph::createPNGFile(string& filenamePrefix,
     // print commandline and execute system command
     trace( cmd + "\n\n");
     system(cmd.c_str());
-    
+
     return pngFile;
-    
+
 }
 
 
@@ -330,9 +340,9 @@ void Graph::createDotFileRecursively(GraphNode* v,
         os << "\", fontcolor=black, color=blue";
 
         if (v->isFinal()) {
-            os << ", peripheries=2";        
+            os << ", peripheries=2";
         }
-        
+
         os << "];\n";
         visitedNodes[v] = true;
 
@@ -369,7 +379,7 @@ void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string>& setOfInputs, set<s
 
     trace( "creating the oWFN from the service automaton ...\n");
 
-    GraphNode* currentNode = getRoot(); 
+    GraphNode* currentNode = getRoot();
 
     // create all variables for storing information
     // while perfomirng the recursion
@@ -383,10 +393,10 @@ void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string>& setOfInputs, set<s
     // public service still need to be part of the interface. Those
     // events have to be given to the function in extra sets
     for(set<string>::iterator input = setOfInputs.begin(); input != setOfInputs.end(); input ++) {
-		PN->newPlace((*input), PNapi::IN);    	
+		PN->newPlace((*input), PNapi::IN);
     }
     for(set<string>::iterator output = setOfOutputs.begin(); output != setOfOutputs.end(); output ++) {
-		PN->newPlace((*output), PNapi::OUT);    	
+		PN->newPlace((*output), PNapi::OUT);
     }
 
     // start the recursion
@@ -394,7 +404,7 @@ void Graph::transformToOWFN(PNapi::PetriNet* PN, set<string>& setOfInputs, set<s
 
     // create the final markings for the petri net
     for (set<string>::iterator finalNodesIt = finalNodeNames.begin(); finalNodesIt != finalNodeNames.end(); ++finalNodesIt) {
-    	// PN->findPlace(*finalNodesIt)->isFinal = true;    	
+    	// PN->findPlace(*finalNodesIt)->isFinal = true;
     	//PNapi::Marking* finalMarking = PN->addFinalMarking();
     	//PN->findPlace(*finalNodesIt)->addToFinalMarking(finalMarking);
         set< pair<PNapi::Place *, unsigned int> > finalMarking;
@@ -427,7 +437,7 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
         TRACE(TRACE_3, "    node " + currentNode->getName() + " has already been visited\n");
         if (incomingTransition != NULL) {
             PN->newArc(incomingTransition, PN->findPlace(currentNode->getName()));
-        } 
+        }
          return;
     }
 
@@ -469,20 +479,20 @@ void Graph::transformToOWFNRecursively(GraphNode* currentNode,
 
         // Adding places and arcs for input and output
         if (currentLabel[0] == '?') {
-            PNapi::Place* input; 
+            PNapi::Place* input;
             currentLabel.erase(0,1);
             input = PN->findPlace(currentLabel);
             if (input == NULL) {
                 input = PN->newPlace(currentLabel, PNapi::IN);
-            } 
+            }
             PN->newArc(input,t);
         } else if (currentLabel[0] == '!') {
-            PNapi::Place* output; 
+            PNapi::Place* output;
             currentLabel.erase(0,1);
             output = PN->findPlace(currentLabel);
             if (output == NULL) {
                 output = PN->newPlace(currentLabel, PNapi::OUT);
-            } 
+            }
             PN->newArc(t,output);
         }
 
@@ -519,7 +529,7 @@ void Graph::getPredecessorRelation(Graph::predecessorMap& resultMap) {
         while ( edge->hasNext() )
         {
         	GraphEdge * ed = edge->getNext();
-            // node is the predeccessor 
+            // node is the predeccessor
             resultMap[ed->getDstNode()].add(new GraphEdge(*node, ed->getLabelWithoutPrefix() ));
         }
     }

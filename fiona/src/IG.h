@@ -43,7 +43,7 @@
 class oWFN;
 
 
-class interactionGraph : public CommunicationGraph {
+class InteractionGraph : public CommunicationGraph {
 
     private:
         /// adds a node and its connecting edge
@@ -85,14 +85,14 @@ class interactionGraph : public CommunicationGraph {
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new
-        NEW_OPERATOR(interactionGraph)
+        NEW_OPERATOR(InteractionGraph)
 #define new NEW_NEW
 
         /// constructor
-        interactionGraph(oWFN*);
+        InteractionGraph(oWFN*);
 
         /// basic destructor
-        virtual ~interactionGraph();
+        virtual ~InteractionGraph();
 
         /// checks whether the set of input messages contains at least one input message
         /// that has been sent at its maximum

@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -63,7 +63,7 @@ AnnotatedGraphNode::AnnotatedGraphNode(const std::string& _name,
                                        GraphFormula* _annotation,
                                        GraphNodeColor _color,
                                        unsigned int _number) : GraphNode(_name, _color, _number) {
-    
+
     annotation = _annotation->getCNF();
     final = false;
     delete _annotation; // because getCNF() returns a newly created formula
@@ -162,19 +162,19 @@ unsigned int AnnotatedGraphNode::getLeavingEdgesCount() const {
 //! \return true iff there is either a sending edge to a differently colored
 //!         successor or, for each external deadlock, there exists a receiving
 //!         edge to a non-colored successor
-bool AnnotatedGraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {    
+bool AnnotatedGraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {
     // collect all edges to differently colored successor nodes
     set<AnnotatedGraphEdge*> edges_to_differently_colored_successors;
     bool colored_successor_present = false;
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge *element = edgeIter->getNext();
         AnnotatedGraphNode* vNext = element->getDstNode();
-        
+
         if (vNext == this)
             continue;
-        
+
         if (vNext->getDiagnosisColor() != color) {
             // if there is a sending edge to a differently colored sucessor, take this edge;
             // otherwise: store this edge for future considerations
@@ -188,34 +188,34 @@ bool AnnotatedGraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum
         }
     }
     delete edgeIter;
-    
+
     // if there is no such colored successor, it can be clearly avoided
     if (!colored_successor_present) {
         return true;
     }
-    
+
     // if there are no differently colored successors, the colored successors can not be avoided
     if (edges_to_differently_colored_successors.empty() ) {
         return false;
     }
-    
+
     // last chance: look if each external deadlock "enables" a receiving edge
     // to a differently colored successor
     for (StateSet::const_iterator state = reachGraphStateSet.begin();
          state != reachGraphStateSet.end(); state++) {
         (*state)->decode(PN);
-        
+
         bool found_enabled_state = false;
-        
+
         if ((*state)->type == DEADLOCK) {
             for (set<AnnotatedGraphEdge*>::iterator edge = edges_to_differently_colored_successors.begin();
                  edge != edges_to_differently_colored_successors.end(); edge++) {
                 if ((*edge)->getType() == SENDING ) {
                     continue;
                 }
-                
+
                 string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
-                
+
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
                         if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
@@ -225,14 +225,14 @@ bool AnnotatedGraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum
                     }
                 }
             }
-            
+
             // looked at all edges but did not finde an enabling state
             if (!found_enabled_state) {
                 return false;
             }
         }
     }
-    
+
     // looked at all edges but did not abort earlier
     return true;
 }
@@ -246,20 +246,20 @@ bool AnnotatedGraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum
 //!         leaving this node.
 bool AnnotatedGraphNode::edgeEnforcable(AnnotatedGraphEdge* e) const {
     assert (e != NULL);
-    
+
     if (e->getType() == SENDING) {
         return true;
     } else {
         string edge_label = e->getLabel().substr(1, e->getLabel().length());
         bool edge_enforcable = true;
-        
+
         // iterate the states and look for deadlocks where the considered
         // message is not present: then, the receiving of this message can
         // not be enforced
         for (StateSet::const_iterator state = reachGraphStateSet.begin();
              state != reachGraphStateSet.end(); state++) {
             (*state)->decode(PN);
-            
+
             if ((*state)->type == DEADLOCK) {
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
@@ -271,7 +271,7 @@ bool AnnotatedGraphNode::edgeEnforcable(AnnotatedGraphEdge* e) const {
                 }
             }
         }
-        
+
         return edge_enforcable;
     }
 }
@@ -283,19 +283,19 @@ bool AnnotatedGraphNode::edgeEnforcable(AnnotatedGraphEdge* e) const {
 //! \todo Whoever implemented me, please comment me!
 bool AnnotatedGraphNode::changes_color(AnnotatedGraphEdge* e) const {
     assert(e != NULL);
-    
+
     AnnotatedGraphNode* vNext = e->getDstNode();
-    
+
     if ( vNext->getDiagnosisColor() == DIAG_RED )
         return false;
-    
+
     if ( !edgeEnforcable(e) )
         return false;
-    
-    
+
+
     map< string, AnnotatedGraphEdge* > v_edges;
     map< string, AnnotatedGraphEdge* > vNext_edges;
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* element = edgeIter->getNext();
@@ -308,22 +308,22 @@ bool AnnotatedGraphNode::changes_color(AnnotatedGraphEdge* e) const {
         vNext_edges[element->getLabel()] = element;
     }
     delete edgeIter;
-    
-    
+
+
     for (map< string, AnnotatedGraphEdge* >::const_iterator v_edge = v_edges.begin();
          v_edge != v_edges.end(); v_edge++) {
         AnnotatedGraphEdge* vNext_edge = vNext_edges[v_edge->first];
-        
+
         if (vNext_edge == NULL)
             continue;
-        
+
         if ( (vNext_edge->getDstNode()->getDiagnosisColor() != v_edge->second->getDstNode()->getDiagnosisColor()) &&
             (vNext_edge->getDstNode()->getDiagnosisColor() == DIAG_RED) &&
             (v_edge->second->getDstNode()->getDiagnosisColor() != DIAG_VIOLET) ) {
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -340,11 +340,11 @@ bool AnnotatedGraphNode::hasEdgeWithLabel(const std::string& edgeLabel) const {
 //! \param edgeLabel the label of the blue edge
 //! \return true iff this node has a blue edge with the given label
 bool AnnotatedGraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
-    
+
     AnnotatedGraphEdge* edge = getEdgeWithLabel(edgeLabel);
     if (edge == NULL)
         return false;
-    
+
     return edge->getDstNode()->isBlue();
 }
 
@@ -354,11 +354,11 @@ bool AnnotatedGraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) cons
 //! \return a edge of this node with the given label, NULL if no such
 //!         edge exists
 AnnotatedGraphEdge* AnnotatedGraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* edge = edgeIter->getNext();
-        
+
         if (edge->getLabel() == edgeLabel) {
             delete edgeIter;
             return edge;
@@ -376,16 +376,16 @@ AnnotatedGraphEdge* AnnotatedGraphNode::getEdgeWithLabel(const std::string& edge
 //! \return the destination node of the labeled edge, NULL if the
 //!         edge could not be found
 AnnotatedGraphNode* AnnotatedGraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
-    
+
     if (!(parameters[P_PV])) {
         assert(edgeLabel != GraphFormulaLiteral::TAU);
     }
-    
+
     AnnotatedGraphEdge* edge = getEdgeWithLabel(edgeLabel);
     if (edge == NULL) {
         return NULL;
     }
-    
+
     return edge->getDstNode();
 }
 
@@ -408,16 +408,16 @@ void AnnotatedGraphNode::removeEdgesToNode(const AnnotatedGraphNode* nodeToDelet
 
 //! \brief analyses the node and sets its color
 void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : start\n");
-    
+
     TRACE(TRACE_3, "\t\t\t analysing node ");
     TRACE(TRACE_3, this->getName() + "...\n");
     assert(this->getColor() == BLUE);
-    
+
     // computing the assignment given by outgoing edges (to blue nodes)
     GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
-    
+
     // traverse outgoing edges and set the corresponding literals
     // to true if the respective node is BLUE
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
@@ -428,18 +428,18 @@ void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
         }
     }
     delete edgeIter;
-    
+
     // only if node has final state, set assignment of literal final to true
     if ((this->hasFinalStateInStateSet == true) || ignoreFinal) {
         myassignment->setToTrue(GraphFormulaLiteral::FINAL);
     }
-    
+
 //    cout << "*myassignment: " << *myassignment->asString << endl;
-    
+
     // evaluating the computed assignment
     bool result = this->getAnnotation()->value(*myassignment);
     delete myassignment;
-    
+
     if (result) {
         TRACE(TRACE_3, "\t\t\t node analysed blue, formula "
               + this->getAnnotation()->asString() + "\n");
@@ -449,7 +449,7 @@ void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
               + this->getAnnotation()->asString() + "\n");
         this->setColor(RED);
     }
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::analyseNodeByFormula() : end\n");
 }
 
@@ -458,10 +458,10 @@ void AnnotatedGraphNode::analyseNode(bool ignoreFinal) {
 //! \param literal the literal which is to be removed
 void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal) {
     TRACE(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : start\n");
-    
+
     //cout << "remove literal " << literal << " from annotation " << annotation->asString() << " of node number " << getName() << endl;
     annotation->removeLiteral(literal);
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::removeLiteralFromAnnotation(const string& literal) : end\n");
 }
 
@@ -471,7 +471,7 @@ void AnnotatedGraphNode::removeLiteralFromAnnotation(const std::string& literal)
 void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
     LeavingEdges::ConstIterator
     edgeIter = getLeavingEdgesConstIterator();
-    
+
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* edge = edgeIter->getNext();
         if (edge->getDstNode()->getColor() == RED) {
@@ -489,12 +489,12 @@ void AnnotatedGraphNode::removeUnneededLiteralsFromAnnotation() {
 //! \return true iff this node should be shown according to the "show" parameter
 bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph, bool hasOWFN) const {
 // always call this method like: v->isToShow(root, (PN != NULL))
-    
+
 #undef TRUE
 
     return ((parameters[P_SHOW_ALL_NODES]) ||
-            (getColor() == BLUE && (!hasOWFN || 
-                                    reachGraphStateSet.size() != 0 || 
+            (getColor() == BLUE && (!hasOWFN ||
+                                    reachGraphStateSet.size() != 0 ||
                                     parameters[P_SHOW_EMPTY_NODE])) ||
             (getColor() == RED && parameters[P_SHOW_RED_NODES]) ||
             (this == rootOfGraph));
@@ -508,7 +508,7 @@ bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph, bool ha
 //! \param assignment the assignment that satisfies the annotation or not
 //! \return true iff the assignment satisfies the annotation
 bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const {
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: start\n");
     assert(annotation != NULL);
     TRACE(TRACE_5, "AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignment& assignment) const: end\n");
@@ -520,25 +520,25 @@ bool AnnotatedGraphNode::assignmentSatisfiesAnnotation(const GraphFormulaAssignm
 //!        leaving the node
 //! \return the assignment described above
 GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::getAssignment(): start\n");
     TRACE(TRACE_5, "computing annotation of node " + getName() + "\n");
-    
+
     GraphFormulaAssignment* myassignment = new GraphFormulaAssignment();
-    
+
     // traverse outgoing edges and set the corresponding literals
     // to true if the respective node is BLUE
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* edge = edgeIter->getNext();
         myassignment->setToTrue(edge->getLabel());
     }
     delete edgeIter;
-    
+
     // we assume that literal final is always true
     myassignment->setToTrue(GraphFormulaLiteral::FINAL);
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::getAssignment(): end\n");
     return myassignment;
 }
@@ -548,20 +548,20 @@ GraphFormulaAssignment* AnnotatedGraphNode::getAssignment() const {
 //!        in the nodes formula or in one of it's leaving edges
 //! \param events set of string to fill
 void AnnotatedGraphNode::getEvents(set<string>& events) {
-    
+
     TRACE(TRACE_5, "AnnotatedGraphNode::getEvents(): start\n");
     TRACE(TRACE_5, "computing annotation of node " + getName() + "\n");
-    
+
     // Adds all event-representing literals from the formula of the node
     // to the set of events
-    annotation->getEventLiterals(events);    
-    
+    annotation->getEventLiterals(events);
+
     // Adds the labels of alle edges to the set
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         AnnotatedGraphEdge* edge = edgeIter->getNext();
         if (edge->getLabel() != GraphFormulaLiteral::TAU) {
-            events.insert(edge->getLabel());            
+            events.insert(edge->getLabel());
         }
     }
     delete edgeIter;
@@ -573,8 +573,8 @@ void AnnotatedGraphNode::getEvents(set<string>& events) {
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length
 //!        and will have the maximal count of occurrences throughout the annotation
-//!        in regards to other elements with minimal clause length. 
-//!        The element will be removed afterwards. 
+//!        in regards to other elements with minimal clause length.
+//!        The element will be removed afterwards.
 PriorityMap::KeyType PriorityMap::pop() {
     KeyType key;
 
@@ -586,7 +586,7 @@ PriorityMap::KeyType PriorityMap::pop() {
     MapType::iterator i;
     for (i = pm.begin(); i != pm.end(); i++) {
 
-        // consider the element with a minimal depth clause (to catch the init values) 
+        // consider the element with a minimal depth clause (to catch the init values)
         if (i->second.first ==  min_depth) {
             // consider the second moment of priority (occurrence count)
             if (i->second.second >= max_occ) {
@@ -595,7 +595,7 @@ PriorityMap::KeyType PriorityMap::pop() {
                 max_occ   = i->second.second;
             }
         }
-        // first moment of priority suffices 
+        // first moment of priority suffices
         else if (i->second.first < min_depth) {
             key = i->first;
             min_depth = i->second.first;
@@ -610,23 +610,23 @@ PriorityMap::KeyType PriorityMap::pop() {
 }
 
 void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
-    
+
     TRACE(TRACE_5, "PriorityMap::adjustPM(oWFN * PN, const std::string & eventName): start\n");
-    
+
     MapClauseEvents::iterator iterClauses;
     set<std::string>::iterator iterLiterals;
     MapTypeIG::iterator iterPM;
-    
+
     set<int> clausesToDelete;
 
     messageMultiSet key;
-    
+
     // consider each clause
     for (iterClauses = pmClauseEvents.begin(); iterClauses != pmClauseEvents.end(); iterClauses++) {
-        
+
         // the given event is found in the currently considered clause
         if (iterClauses->second.find(eventName) != iterClauses->second.end()) {
-            
+
             // now check each literal that is in the clause as well
             for (iterLiterals = iterClauses->second.begin(); iterLiterals != iterClauses->second.end();
                     iterLiterals++) {
@@ -646,10 +646,10 @@ void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
             clausesToDelete.insert(iterClauses->first);
         }
     }
-    
-    for (set<int>::iterator iterClausesToDelete = clausesToDelete.begin(); 
+
+    for (set<int>::iterator iterClausesToDelete = clausesToDelete.begin();
             iterClausesToDelete != clausesToDelete.end(); iterClausesToDelete++) {
-        
+
         pmClauseEvents.erase(*iterClausesToDelete);
     }
 
@@ -659,20 +659,20 @@ void PriorityMap::adjustPM(oWFN * PN, const std::string & eventName) {
 //! \brief Delivers the element from the priority map with the highest priority.
 //!        The element with the highest priority will be in a clause with minimal length
 //!        and will have the maximal count of occurrences throughout the annotation
-//!        in regards to other elements with minimal clause length. 
-//!        The element will be removed afterwards. 
+//!        in regards to other elements with minimal clause length.
+//!        The element will be removed afterwards.
 messageMultiSet PriorityMap::popIG() {
     messageMultiSet key;
 
     MapTypeIG::iterator i;
-    
+
     // initialize with minimum priority values
     int min_depth = INT_MAX;
     int max_occ = 0;
 
     // iterate over the mapped set of interface places
     for (i = pmIG.begin(); i != pmIG.end(); i++) {
-        // consider the element with a minimal depth clause (to catch the init values) 
+        // consider the element with a minimal depth clause (to catch the init values)
         if (i->second.first == min_depth) {
             // consider the second moment of priority (occurrence count)
             if (i->second.second >= max_occ) {
@@ -681,7 +681,7 @@ messageMultiSet PriorityMap::popIG() {
                 max_occ   = i->second.second;
             }
         }
-        // first moment of priority suffices 
+        // first moment of priority suffices
         else if (i->second.first < min_depth) {
             key = i->first;
             min_depth = i->second.first;
@@ -695,7 +695,7 @@ messageMultiSet PriorityMap::popIG() {
     return key;
 }
 
-//! \brief Fills the priority map according to the given annotation with interface places 
+//! \brief Fills the priority map according to the given annotation with interface places
 //!           and their corresponding priority.
 //!        NOTE: All interface places will be considered; places not in the
 //!        annotation will have a minimal priority.
@@ -743,29 +743,29 @@ void PriorityMap::fill(oWFN * PN, GraphFormulaCNF *annotation) {
     TRACE(TRACE_5, "PriorityMap::fill(GraphFormulaCNF *annotation): end\n");
 }
 
-//! \brief Fills the priority map according to the given annotation with interface places 
+//! \brief Fills the priority map according to the given annotation with interface places
 //!           and their corresponding priority.
 //!        NOTE: All interface places will be considered; places not in the
 //!        annotation will have a minimal priority.
 //! \param annotation the annotation, from which the priority map will be extracted.
 void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphFormulaCNF *annotation) {
-    
+
     TRACE(TRACE_5, "PriorityMap::fillForIG(GraphFormulaCNF *annotation): start\n");
 
-    // just to remember which event we have considered already, 
+    // just to remember which event we have considered already,
     // needed for initialising the priority map correctly
-    map<messageMultiSet, bool> eventFound;    
+    map<messageMultiSet, bool> eventFound;
 
     int clauseNo = 0;  // clause counter needed to give each clause a unique number
-    
+
     // iterate over all activated events stored in the set
     for (setOfMessages::iterator activatedEvent = activatedEvents.begin();
                                     activatedEvent != activatedEvents.end();
                                     activatedEvent++) {
 
         // check, if we have not considered this event yet
-        map<messageMultiSet, bool>::iterator found = eventFound.find(*activatedEvent); 
-        if (found != eventFound.end()) {       
+        map<messageMultiSet, bool>::iterator found = eventFound.find(*activatedEvent);
+        if (found != eventFound.end()) {
             // initialize with a minimal priority
             pmIG[*activatedEvent].first  = INT_MAX; // minimal clause length
             pmIG[*activatedEvent].second = 0;       // maximal occurrences in the annotation
@@ -791,17 +791,17 @@ void PriorityMap::fillForIG(setOfMessages &activatedEvents, oWFN * PN, GraphForm
                     // for every literal found, increase the number of occurrences
                     pmIG[*activatedEvent].second++;
 
-                    // if this label's actual clause is shorter than the former minimum, 
+                    // if this label's actual clause is shorter than the former minimum,
                     // set the new minimum
                     if (clause->size() < pmIG[*activatedEvent].first) {
                         pmIG[*activatedEvent].first = clause->size();
                     }
                 }
-                
+
                 // currently considered clause with number clauseNo contains the literal lit
-                pmClauseEvents[clauseNo].insert(lit->asString());    
+                pmClauseEvents[clauseNo].insert(lit->asString());
             }
-            
+
             clauseNo++;    // we consider a new clause now, so increase the clause counter
         }
     }
@@ -815,8 +815,8 @@ bool PriorityMap::empty() const {
     return pm.empty();
 }
 
-//! \brief returns whether the priority map for IGs is empty 
-//! \return returns true if the priority map is empty, false otherwise 
+//! \brief returns whether the priority map for IGs is empty
+//! \return returns true if the priority map is empty, false otherwise
 bool PriorityMap::emptyIG() const {
     return pmIG.empty();
 }

@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -85,7 +85,8 @@ class CommunicationGraph : public AnnotatedGraph {
         /// this set contains all states of the newly calculated node
         StateSet setOfStatesStubbornTemp;
 
-        /// A sorted set of the nodes in the graph. Should always contain the same nodes as the vector, though iteration order can differ.
+        /// A sorted set of the nodes in the graph. Should always contain the same nodes as the vector,
+        /// though iteration order can differ.
         GraphNodeSet setOfSortedNodes;
 
         void addProgress(double);
@@ -134,10 +135,10 @@ class CommunicationGraph : public AnnotatedGraph {
         /// changed significantly and depending on the debug-level set
         void printProgress();
 
-        /// Creates a dot output (.out) of the graph, using "OG|IG of <filename>" as title. 
+        /// Creates a dot output (.out) of the graph, using "OG|IG of <filename>" as title.
         virtual string createDotFile(string& filenamePrefix) const;
 
-        /// Creates a dot output (.out) of the graph, using a custom title. 
+        /// Creates a dot output (.out) of the graph, using a custom title.
         virtual string createDotFile(string& filenamePrefix, const string& dotGraphTitle) const;
 
         /// Creates an image output (.png) of the graph by calling dot.
@@ -147,11 +148,11 @@ class CommunicationGraph : public AnnotatedGraph {
         /// Creates an annotated dot output (.dot) of the graph by calling dot.
         virtual string createAnnotatedDotFile(string& filenamePrefix,
                                             string& dotFileName) const;
-   
+
 
         /// fills the given sets with the names of the inputs and outputs
         /// needed for public view generation. The interfaces of the public view
-        /// and the original netmust be the same, even if some output/inputs are 
+        /// and the original netmust be the same, even if some output/inputs are
         /// not used
         void returnInterface(set<string>& inputs, set<string>& outputs);
 

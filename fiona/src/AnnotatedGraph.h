@@ -212,6 +212,14 @@ protected:
         /// Is computed by computeNumberOfStatesAndEdges().
         unsigned int nEdges;
 
+        /// The number of _all_ nodes in this graph.
+        /// Is computed after the graph has been built (but before re-analysis)
+        unsigned int nAllNodes;
+
+        /// The number of red nodes in this graph.
+        /// Is computed as the graph is built up and during re-analysis.
+        unsigned int nRedNodes;
+
         /// The number of blue to be shown nodes in this graph.
         /// Is computed by computeNumberOfBlueNodesEdges().
         unsigned int nBlueNodes;
@@ -293,7 +301,7 @@ protected:
                      const string& label);
 
         /// Returns the number of nodes in this graph.
-        virtual unsigned int getNumberOfNodes() const;
+        virtual unsigned int getNumberOfAllNodes() const;
 
         /// returns true if a node with the given name was found
         bool hasNodeWithName(const string& nodeName) const;
@@ -310,11 +318,30 @@ protected:
         /// returns a node with the given name, or NULL else
         AnnotatedGraphNode* getNodeWithName(const string& nodeName) const;
 
-        /// retruns true if the graph's root node is NULL
+        /// returns true if the graph's root node is NULL
         bool hasNoRoot() const;
+
+        /// returns true if the graph's root node is NULL
+        bool hasBlueRoot() const;
 
         /// returns a vector containing all nodes that are always false
         void findFalseNodes(std::vector<AnnotatedGraphNode*>* falseNodes);
+
+        /// re-analyze reachable nodes
+        void reAnalyzeReachableNodes(set<AnnotatedGraphNode*>&,
+                                     map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >&);
+
+        /// re-analyze reachable nodes recursively
+        void reAnalyzeReachableNodesRecursively(AnnotatedGraphNode*,
+                                                set<AnnotatedGraphNode*>&,
+                                                map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >&,
+                                                set<AnnotatedGraphNode*>&,
+                                                SList<AnnotatedGraphNode*>&,
+                                                map<AnnotatedGraphNode*, int>&);
+
+        /// removes false and unreachable nodes depending on the parameters set
+        void removeFalseAndUnreachableNodes(set<AnnotatedGraphNode*>&,
+                                            map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> >&);
 
         /// removes all nodes that are always false
         virtual void removeReachableFalseNodes();

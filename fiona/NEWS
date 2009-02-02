@@ -9,6 +9,16 @@
 Version 3.1-unreleased
 ======================
 
+* implementation of a re-analysis function which is applied to every IG/ OG
+  that is computed, therefore after the re-analysis
+     * the graph does not contain any isolated blue nodes
+
+     * in case parameter `-s bluenodes' is set, all red nodes are deleted
+       from memory
+
+* statistical data of IG/ OG is gathered as the graph is built up and during
+  re-analysis
+
 * adapted code to avoid deprecation warnings of GCC 4.2
 
 * ChangeLogs are now generated from Texinfo documentation
@@ -31,7 +41,7 @@ Version 3.1-unreleased
      * matching of an open net with an operating guideline with global
        constraint
 
-* added regression tests toÂ `tests/regression' which can be triggered with
+* added regression tests toÂ `tests/regression' which can be triggered with
   `make check' in that directory
 
 * made adaptions to the Makefile options to be able to create Mac Universal
@@ -53,7 +63,4 @@ Version 3.1-unreleased
 
 * updated `Doxyfile' and adapted output directories to the other tools (`dox')
 
-
-See file ChangeLog <http://service-technology.org/files/fiona/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/fiona/ChangeLog> for\ncomplete version history.\n

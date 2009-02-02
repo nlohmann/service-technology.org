@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -71,7 +71,7 @@ class Graph {
 
         /// remove all edges that have a given node as source
         void removeEdgesFromNodeToAllOtherNodes(GraphNode* nodeToDelete);
-        
+
         /// transforms the service automaton to an OWFN recursively
         void transformToOWFNRecursively(GraphNode* currentNode,
                                         set<GraphNode*>& visitedNodes,
@@ -120,10 +120,11 @@ class Graph {
         /// sets the root node to the one with the given name
         void setRootToNodeWithName(const string& nodeName);
 
-        /// retruns true if the graph's root node is NULL
+        /// returns true if the graph's root node is NULL
         bool hasNoRoot() const;
 
-
+        /// returns true if the graph's root node is BLUE
+        virtual bool hasBlueRoot() const;
 
         /// Creates a dot output (.out) of the graph, using the filename as title.
         virtual string createDotFile(string& filenamePrefix) const;

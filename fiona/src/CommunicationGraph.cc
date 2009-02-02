@@ -892,8 +892,10 @@ void CommunicationGraph::deleteOWFN() {
 //! \brief Adds a node to the CommunicationGraph. The node is inserted in both sets.
 void CommunicationGraph::addNode(AnnotatedGraphNode* toAdd) {
     TRACE(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
+
     setOfNodes.push_back(toAdd);
     setOfSortedNodes.insert(toAdd);
+
     TRACE(TRACE_5, "void CommunicationGraph::addNode(AnnotatedGraphNode*) : start\n");
 
 }

@@ -586,7 +586,7 @@ Graph* computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN, bo
 //! \brief create an IG of an oWFN
 //! \param PN pointer to the given oWFN whose IG will be computed
 //! \param igFilename reference to a string containing the filename of the created IG
-interactionGraph* computeIG(oWFN* PN, string& igFilename) {
+InteractionGraph* computeIG(oWFN* PN, string& igFilename) {
 
     // print information about reduction rules (if desired)
     if (options[O_CALC_REDUCED_IG] || parameters[P_USE_EAD]) {
@@ -606,17 +606,16 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
     trace( "\n");
 
     // [LUHME XV] Konstruktor und "buildGraph()" verheiraten?
-    // [LUHME XV] Klasse "interactionGraph" in "InteractionGraph" umbenennen
-    interactionGraph * graph = new interactionGraph(PN);
+    InteractionGraph * IG = new InteractionGraph(PN);
     igFilename = "";
 
-    // [LUHME XV] "seconds" und "seconds2" durch "start" und "stop" ersetzen, ÜBERALL!
     // build interaction graph
-    time_t seconds, seconds2;
-    seconds = time (NULL);
+    time_t buildGraph_start, buildGraph_end;
+    buildGraph_start = time (NULL);
+
     // [LUHME XV] "buildGraph" in "build" umbenennen
-    graph->buildGraph();
-    seconds2 = time (NULL);
+    IG->buildGraph();
+    buildGraph_end = time (NULL);
 
     if (options[O_CALC_REDUCED_IG]) {
         trace( "building the reduced interaction graph finished.\n");
@@ -624,44 +623,47 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
         trace( "\nbuilding the interaction graph finished.\n");
     }
     // [LUHME XV] Tracen, Zeit in Millisekunden nehmen.
-    cout << difftime(seconds2, seconds) << " s consumed for building graph" << endl;
+    cout << difftime(buildGraph_end, buildGraph_start) << " s consumed for building graph" << endl;
 
     // [LUHME XV] gehört in die Klasse "InteractionGraph" in die Dateiausgabe
     // add interface information to graph: Input -> Output and vice versa
     // input/outputPlacenames contain all possible labels for the IG
     for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
-        graph->outputPlacenames.insert( (PN->getInputPlace(i))->name );
+        IG->outputPlacenames.insert( (PN->getInputPlace(i))->name );
     }
     for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
-        graph->inputPlacenames.insert( PN->getOutputPlace(i)->name );
+        IG->inputPlacenames.insert( PN->getOutputPlace(i)->name );
     }
-
 
     // print statistics
     trace( "\nnet is controllable: ");
-    // [LUHME XV] Diese Abfrage in bool Graph::hasBlueRoot() auslagern; ÜBERALL
-    if (graph->getRoot()->getColor() == BLUE) {
+    if (IG->hasBlueRoot()) {
         trace( "YES\n\n");
     } else {
         trace( "NO\n\n");
     }
 
     trace( "IG statistics:\n");
-    graph->printGraphStatistics();
+    IG->printGraphStatistics();
     trace( "\n");
+
+//    graph->computeGraphStatistics();
+//    trace( "IG statistics:\n");
+//    graph->printGraphStatistics();
+//    trace( "\n");
 
 
     // create output files if needed
     if (!options[O_NOOUTPUTFILES]) {
         if (parameters[P_DIAGNOSIS]) {
-            graph->diagnose();
+            IG->diagnose();
         }
 
         if (!parameters[P_EQ_R]) {    // don't create png if we are in eqr mode
             // generate output files
             string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
-            basefilename += graph->getSuffix();
-            createOutputFiles(graph, basefilename, "IG of " + PN->filename);
+            basefilename += IG->getSuffix();
+            createOutputFiles(IG, basefilename, "IG of " + PN->filename);
         }
 
         // create also an .og file to enable comparison of different IGs
@@ -670,7 +672,7 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
         if (options[O_OUTFILEPREFIX]) {
             igFilename = outfilePrefix;
         } else {
-            igFilename = graph->getFilename();
+            igFilename = IG->getFilename();
         }
 
         if (!options[O_CALC_ALL_STATES]) {
@@ -681,20 +683,20 @@ interactionGraph* computeIG(oWFN* PN, string& igFilename) {
 
         // the second parameter is true, since the oWFN this IG was generated
         // from still exists and additional information are available
-        graph->createOGFile(igFilename, true);
+        IG->createOGFile(igFilename, true);
     }
 
-    return graph;
+    return IG;
 }
 
 
 // [LUHME XV] Brauchen wir diesen Wrapper?
 string computeIG(oWFN* PN) {
 
-    // [LUHME XV] "igFilename" als Member von interactionGraph
+    // [LUHME XV] "igFilename" als Member von InteractionGraph
     string igFilename = "";
     // [LUHME XV] lieber als Konstruktoraufruf hier?
-    interactionGraph* graph = computeIG(PN, igFilename);
+    InteractionGraph* graph = computeIG(PN, igFilename);
 
     TRACE(TRACE_5, "computation finished -- trying to delete graph\n");
 
@@ -768,7 +770,7 @@ string computeSmallPartner(oWFN* givenPN) {
 
     // 1. step: compute the IG of given net
     string igFilename = "";
-    interactionGraph* graph = computeIG(givenPN, igFilename);
+    InteractionGraph* graph = computeIG(givenPN, igFilename);
 
 
     // 2.-4. step wil be done with former computed IG (ignoring partner filename)
@@ -834,14 +836,14 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
 //! \param PN the given oWFN
 string computeOG(oWFN* PN) {
 
-    // [LUHME XV] konsistente Benennung der Zeit-Variablen (siehe Rest von Fiona)
-    time_t  buildGraphTime1, buildGraphTime2,
-            seconds, seconds2,
-            graphStatsTime1, graphStatsTime2,
-            removeFalseNodesTime1, removeFalseNodesTime2,
-            removeUnreachableNodesTime1, removeUnreachableNodesTime2;
+    time_t  buildGraphTime_start, buildGraphTime_end,
+            overAllTime_start, overAllTime_end,
+            graphStatsTime_start, graphStatsTime_end,
+            removeFalseNodesTime_start, removeFalseNodesTime_end,
+            removeUnreachableNodesTime_start, removeUnreachableNodesTime_end;
 
     OG* graph;
+
     if (parameters[P_COVER]) {
         // operating guideline with global constraint
 
@@ -865,17 +867,20 @@ string computeOG(oWFN* PN) {
 
     graph->printProgressFirst();
 
-    seconds = time(NULL);
+    overAllTime_start = time(NULL);
 
     // build operating guideline
     TRACE(TRACE_1, "Building the graph...\n");
-    buildGraphTime1 = time(NULL);
+    buildGraphTime_start = time(NULL);
+
     // [LUHME XV] in "build()" umbenennen
     graph->buildGraph();
-    buildGraphTime2 = time(NULL);
+
+    buildGraphTime_end = time(NULL);
+
     TRACE(TRACE_1, "finished building the graph\n");
     // [LUHME XV] Zeit in Millisekunden nehmen (�BERALL!)
-    TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
+    TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime_end, buildGraphTime_start)) + " s consumed.\n\n");
 
     // add interface information to graph: Input -> Output and vice versa
     // input/outputPlacenames contain all possible labels for the IG
@@ -886,47 +891,33 @@ string computeOG(oWFN* PN) {
         graph->inputPlacenames.insert( PN->getOutputPlace(i)->name );
     }
 
-    // print statistics
-    TRACE(TRACE_1, "computing graph statistics...\n");
-    graphStatsTime1 = time(NULL);
-    graph->computeGraphStatistics();
-    graphStatsTime2 = time(NULL);
-    TRACE(TRACE_1, "finished computing graph statistics\n");
-    TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
+//    if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+////        TRACE(TRACE_1, "removing false nodes...\n");
+////        removeFalseNodesTime1 = time(NULL);
+////        graph->removeReachableFalseNodes();
+////        removeFalseNodesTime2 = time(NULL);
+////        TRACE(TRACE_1, "finished removing false nodes\n");
+////        TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
+////
+//        TRACE(TRACE_1, "removing unreachable nodes...\n");
+//        removeUnreachableNodesTime_start = time(NULL);
+//        graph->removeUnreachableNodes();
+//        removeUnreachableNodesTime_end = time(NULL);
+//        TRACE(TRACE_1, "finished removing unreachable nodes\n");
+//        TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n\n");
+//    }
 
-
-    if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-        TRACE(TRACE_1, "removing false nodes...\n");
-        removeFalseNodesTime1 = time(NULL);
-        graph->removeReachableFalseNodes();
-        removeFalseNodesTime2 = time(NULL);
-        TRACE(TRACE_1, "finished removing false nodes\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
-
-        TRACE(TRACE_1, "removing unreachable nodes...\n");
-        removeUnreachableNodesTime1 = time(NULL);
-        graph->removeUnreachableNodes();
-        removeUnreachableNodesTime2 = time(NULL);
-        TRACE(TRACE_1, "finished removing unreachable nodes\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
-    }
-
-
-    seconds2 = time(NULL);
+    overAllTime_end = time(NULL);
 
     if (parameters[P_COVER]) {
         trace( "\nbuilding the operating guideline with global constraint finished.\n");
     } else {
         trace( "\nbuilding the operating guideline finished.\n");
     }
-    trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
+    trace( "    " + intToString((int) difftime(overAllTime_end, overAllTime_start)) + " s overall consumed for OG computation.\n\n");
 
     trace( "\nnet is controllable: ");
-    if (graph->hasNoRoot() || graph->getRoot()->getColor() == RED ||
-        (parameters[P_COVER] &&
-        static_cast<ConstraintOG*>(graph)->getCovConstraint()->equals() == FALSE)) {
-        trace( "NO\n\n");
-    } else {
+    if (!graph->hasBlueRoot() ||            (parameters[P_COVER] && static_cast<ConstraintOG*>(graph)->getCovConstraint()->equals() == FALSE)) {        trace( "NO\n\n");    } else {
         trace( "YES\n\n");
         controllable = true;
     }
@@ -991,7 +982,7 @@ string computeOG(oWFN* PN) {
             parameters[P_SHOW_EMPTY_NODE] = false;
 
             trace( "\nnet is distributedly controllable: ");
-            if (graph->getRoot()->getColor() == BLUE) {
+            if (graph->hasBlueRoot()) {
                 trace( "MAYBE\n\n");
             } else {
                 trace( "NO\n\n");
@@ -1037,10 +1028,10 @@ string computeOG(oWFN* PN) {
 
     if (options[O_BDD]) {
         trace( "\nbuilding the BDDs...\n");
-        seconds = time (NULL);
+        overAllTime_start = time (NULL);
         graph->convertToBdd();
-        seconds2 = time (NULL);
-        cout << difftime(seconds2, seconds) << " s consumed for building and reordering the BDDs" << endl;
+        overAllTime_end = time (NULL);
+        cout << difftime(overAllTime_end, overAllTime_start) << " s consumed for building and reordering the BDDs" << endl;
 
         //graph->bdd->createDotFile();
         if (!options[O_NOOUTPUTFILES]) {
@@ -1139,11 +1130,11 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
 
-    time_t  buildGraphTime1, buildGraphTime2,
-            seconds, seconds2,
-            graphStatsTime1, graphStatsTime2,
-            removeFalseNodesTime1, removeFalseNodesTime2,
-            removeUnreachableNodesTime1, removeUnreachableNodesTime2;
+    time_t  buildGraphTime_start, buildGraphTime_end,
+            overAllTime_start, overAllTime_end,
+            graphStatsTime_start, graphStatsTime_end,
+            removeFalseNodesTime_start, removeFalseNodesTime_end,
+            removeUnreachableNodesTime_start, removeUnreachableNodesTime_end;
 
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
@@ -1177,44 +1168,44 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace( "building the operating guideline...\n");
         graph->printProgressFirst();
 
-        seconds = time(NULL);
+        overAllTime_start = time(NULL);
 
         TRACE(TRACE_1, "Building the graph...\n");
-        buildGraphTime1 = time(NULL);
+        buildGraphTime_start = time(NULL);
         graph->buildGraph(); // build operating guideline
-        buildGraphTime2 = time(NULL);
+        buildGraphTime_end = time(NULL);
         TRACE(TRACE_1, "finished building the graph\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime_end, buildGraphTime_start)) + " s consumed.\n");
 
         TRACE(TRACE_1, "computing graph statistics...\n");
-        graphStatsTime1 = time(NULL);
+        graphStatsTime_start = time(NULL);
         graph->computeGraphStatistics();
-        graphStatsTime2 = time(NULL);
+        graphStatsTime_end = time(NULL);
         TRACE(TRACE_1, "finished computing graph statistics\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime_end, graphStatsTime_end)) + " s consumed.\n");
 
 
         if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
             TRACE(TRACE_1, "removing false nodes...\n");
-            removeFalseNodesTime1 = time(NULL);
+            removeFalseNodesTime_start = time(NULL);
             graph->removeReachableFalseNodes();
-            removeFalseNodesTime2 = time(NULL);
+            removeFalseNodesTime_end = time(NULL);
             TRACE(TRACE_1, "finished removing false nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime_end, removeFalseNodesTime_start)) + " s consumed.\n");
 
             TRACE(TRACE_1, "removing unreachable nodes...\n");
-            removeUnreachableNodesTime1 = time(NULL);
+            removeUnreachableNodesTime_start = time(NULL);
             graph->removeUnreachableNodes();
-            removeUnreachableNodesTime2 = time(NULL);
+            removeUnreachableNodesTime_end = time(NULL);
             TRACE(TRACE_1, "finished removing unreachable nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n");
         }
 
 
-        seconds2 = time(NULL);
+        overAllTime_end = time(NULL);
 
         trace( "\nbuilding the operating guideline finished.\n");
-        trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n");
+        trace( "    " + intToString((int) difftime(overAllTime_end, overAllTime_start)) + " s overall consumed for OG computation.\n");
 
         // print statistics
         trace( "OG statistics:\n");
@@ -1245,7 +1236,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeReachableFalseNodes();
     secondOG->removeReachableFalseNodes();
 
-    seconds = time (NULL);
+    overAllTime_start = time (NULL);
 
     trace( "\n=================================================================\n");
     trace( "checking whether " + firstOG->getFilename() + " simulates " + secondOG->getFilename() + "...\n\n");
@@ -1258,8 +1249,8 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace( "not characterized by the first one.\n\n");
     }
 
-    seconds2 = time (NULL);
-    cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
+    overAllTime_end = time (NULL);
+    cout << "    " << difftime(overAllTime_end, overAllTime_start) << " s consumed for checking equivalence" << endl << endl;
 
     if (!calledWithNet) {
         trace( "Attention: This result is only valid if the given OGs are complete\n");
@@ -1301,11 +1292,11 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         parameters[P_SHOW_EMPTY_NODE] = true;
     }
 
-    time_t  buildGraphTime1, buildGraphTime2,
-            seconds, seconds2,
-            graphStatsTime1, graphStatsTime2,
-            removeFalseNodesTime1, removeFalseNodesTime2,
-            removeUnreachableNodesTime1, removeUnreachableNodesTime2;
+    time_t  buildGraphTime_start, buildGraphTime_end,
+            overAllTime_start, overAllTime_end,
+            graphStatsTime_start, graphStatsTime_end,
+            removeFalseNodesTime_start, removeFalseNodesTime_end,
+            removeUnreachableNodesTime_start, removeUnreachableNodesTime_end;
 
     // generate the OGs
     list<std::string>::iterator netiter = netfiles.begin();
@@ -1333,7 +1324,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         reportNet();
         delete PlaceTable;
 
-        seconds = time (NULL);
+        overAllTime_start = time (NULL);
 
         // compute OG
         OG* graph = new OG(PN);
@@ -1341,47 +1332,47 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace( "building the operating guideline...\n");
         graph->printProgressFirst();
 
-        seconds = time(NULL);
+        overAllTime_start = time(NULL);
 
         TRACE(TRACE_1, "Building the graph...\n");
-        buildGraphTime1 = time(NULL);
+        buildGraphTime_start = time(NULL);
         graph->buildGraph(); // build operating guideline
-        buildGraphTime2 = time(NULL);
+        buildGraphTime_end = time(NULL);
         TRACE(TRACE_1, "finished building the graph\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime2, buildGraphTime1)) + " s consumed.\n\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime_end, buildGraphTime_start)) + " s consumed.\n\n");
 
         TRACE(TRACE_1, "computing graph statistics...\n");
-        graphStatsTime1 = time(NULL);
+        graphStatsTime_start = time(NULL);
         graph->computeGraphStatistics();
-        graphStatsTime2 = time(NULL);
+        graphStatsTime_end = time(NULL);
         TRACE(TRACE_1, "finished computing graph statistics\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime2, graphStatsTime2)) + " s consumed.\n\n");
+        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime_end, graphStatsTime_end)) + " s consumed.\n\n");
 
 
         if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
             TRACE(TRACE_1, "removing false nodes...\n");
-            removeFalseNodesTime1 = time(NULL);
+            removeFalseNodesTime_start = time(NULL);
             graph->removeReachableFalseNodes();
-            removeFalseNodesTime2 = time(NULL);
+            removeFalseNodesTime_end = time(NULL);
             TRACE(TRACE_1, "finished removing false nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime2, removeFalseNodesTime1)) + " s consumed.\n\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime_end, removeFalseNodesTime_start)) + " s consumed.\n\n");
 
             TRACE(TRACE_1, "removing unreachable nodes...\n");
-            removeUnreachableNodesTime1 = time(NULL);
+            removeUnreachableNodesTime_start = time(NULL);
             graph->removeUnreachableNodes();
-            removeUnreachableNodesTime2 = time(NULL);
+            removeUnreachableNodesTime_end = time(NULL);
             TRACE(TRACE_1, "finished removing unreachable nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime2, removeUnreachableNodesTime2)) + " s consumed.\n\n");
+            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n\n");
         }
 
 
-        seconds2 = time(NULL);
+        overAllTime_end = time(NULL);
 
         trace( "\nbuilding the operating guideline finished.\n");
-        trace( "    " + intToString((int) difftime(seconds2, seconds)) + " s overall consumed for OG computation.\n\n");
+        trace( "    " + intToString((int) difftime(overAllTime_end, overAllTime_start)) + " s overall consumed for OG computation.\n\n");
 
-        seconds2 = time (NULL);
-        cout << "    " << difftime(seconds2, seconds) << " s consumed for building graph" << endl << endl;
+        overAllTime_end = time (NULL);
+        cout << "    " << difftime(overAllTime_end, overAllTime_start) << " s consumed for building graph" << endl << endl;
 
         // print statistics
         trace( "OG statistics:\n");
@@ -1409,7 +1400,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
     firstOG->removeReachableFalseNodes();
     secondOG->removeReachableFalseNodes();
 
-    seconds = time (NULL);
+    overAllTime_start = time (NULL);
 
     TRACE(TRACE_1, "checking whether " + firstOG->getFilename() + " is equivalent to " + secondOG->getFilename() + "\n");
 
@@ -1424,8 +1415,8 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace( " NO\n\n");
     }
 
-    seconds2 = time (NULL);
-    cout << "    " << difftime(seconds2, seconds) << " s consumed for checking equivalence" << endl << endl;
+    overAllTime_end = time (NULL);
+    cout << "    " << difftime(overAllTime_end, overAllTime_start) << " s consumed for checking equivalence" << endl << endl;
 
     if (!calledWithNet && !parameters[P_EQ_R]) {
         trace( "Attention: This result is only valid if the given OGs are complete\n");
@@ -1708,9 +1699,9 @@ void countStrategies(AnnotatedGraph* OG, string graphName) {
 
     if (OG->isAcyclic()) {
 
-        time_t seconds, seconds2;
+        time_t countingTime_start, countingTime_end;
 
-        seconds = time (NULL);
+        countingTime_start = time (NULL);
         trace("Started computing the number of matching tree service automata\n");
         // Compute and show the number of Services
         long double computedNumber = OG->numberOfStrategies();
@@ -1724,9 +1715,9 @@ void countStrategies(AnnotatedGraph* OG, string graphName) {
         } else {
             trace("The computed number exceeds long double (approximately 10^4900)!\n");
         }
-        seconds2 = time (NULL);
+        countingTime_end = time (NULL);
 
-        cout << difftime(seconds2, seconds) << " s consumed for computation" << endl << endl;
+        cout << difftime(countingTime_end, countingTime_start) << " s consumed for computation" << endl << endl;
 
     } else {
         trace("Cannot compute number of matching tree service automata, since the given OG is not acyclic\n\n");
@@ -2019,27 +2010,27 @@ int main(int argc, char** argv) {
                 } else {
                     newFilename = AnnotatedGraph::stripOGFileSuffix(readOG->getFilename()) + ".blue";
                 }
-                // [LUHME XV] nach unten schieben
-                time_t seconds, seconds2;
 
                 if(TRACE_1 <= debug_level) {
                     readOG->computeAndPrintGraphStatistics();
                 }
 
+                time_t removingNodesTime_start, removingNodesTime_end;
+
                 trace( "Removing nodes from '" + readOG->getFilename() + "' ");
                 trace( "that violate their own annotation...\n");
-                seconds = time(NULL);
+                removingNodesTime_start = time(NULL);
                 readOG->removeReachableFalseNodes();
-                seconds2 = time(NULL);
+                removingNodesTime_end = time(NULL);
                 trace( "Removed all nodes with false annotation.\n");
-                cout << "    " << difftime(seconds2, seconds) << " s consumed for removing reachable false nodes" << endl << endl;
+                cout << "    " << difftime(removingNodesTime_end, removingNodesTime_start) << " s consumed for removing reachable false nodes" << endl << endl;
 
                 trace( "Removing unreachable nodes from '" + readOG->getFilename() + "' \n");
-                seconds = time(NULL);
+                removingNodesTime_start = time(NULL);
                 readOG->removeUnreachableNodes();
-                seconds2 = time(NULL);
+                removingNodesTime_end = time(NULL);
                 trace( "Removed all unreachable nodes.\n");
-                cout << "    " << difftime(seconds2, seconds) << " s consumed removing unreachable nodes" << endl << endl;
+                cout << "    " << difftime(removingNodesTime_end, removingNodesTime_start) << " s consumed removing unreachable nodes" << endl << endl;
 
                 if (TRACE_1 <= debug_level) {
                     readOG->computeAndPrintGraphStatistics();

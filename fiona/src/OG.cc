@@ -80,26 +80,49 @@ void OG::buildGraph() {
     // creates the root node and calculates its reachability graph (set of states)
     calculateRootNode();
 
+    // [LUHME XV] muss setOfNodes wirklich gefüllt werden? reicht nicht setOfSortedNodes?
+    setOfNodes.push_back(getRoot());
+
+    nStoredStates += getRoot()->reachGraphStateSet.size();
+
     // [LUHME XV] Parameter OTF existiert nicht mehr (nicht vor Projekt-Ende Tools4BPEL löschen!)
     if (options[O_OTF]) {
         bdd->convertRootNode(getRoot());
     }
-    // [LUHME XV] Reihenfolge "push_back()" und "buildGraph()" ist umgekehrt zu IG::buildGraph()
-    // [LUHME XV] muss setOfNodes wirklich gefüllt werden? reicht nicht setOfSortedNodes?
-    setOfNodes.push_back(getRoot());
 
     // start building up the rest of the graph
     // second parameter means: if finished, 100% of the graph is constructed
     buildGraph(getRoot(), 1);
 
-    time_t seconds, seconds2;
+    nAllNodes = setOfNodes.size();
 
-    TRACE(TRACE_2, "setting final nodes...\n");
-    seconds = time(NULL);
+    TRACE(TRACE_2, "\n\nre-analyzing graph...\n");
+
+    time_t reAnalysisTime_start, reAnalysisTime_end;
+
+    set<AnnotatedGraphNode*> reachableBlueNodes;
+    map<AnnotatedGraphNode*, set<AnnotatedGraphNode*> > parentNodes;
+
+    reAnalysisTime_start = time(NULL);
+    reAnalyzeReachableNodes(reachableBlueNodes, parentNodes);
+    removeFalseAndUnreachableNodes(reachableBlueNodes, parentNodes);
+    reAnalysisTime_end = time(NULL);
+
+    TRACE(TRACE_2, "finished re-analyzing graph...\n");
+
+    TRACE(TRACE_3, "    " + intToString((int) difftime(reAnalysisTime_end, reAnalysisTime_start)) + " s consumed.\n");
+
+    time_t assignFinalNodes_start, assignFinalNodes_end;
+
+    TRACE(TRACE_2, "\nsetting final nodes...\n");
+
+    assignFinalNodes_start = time(NULL);
     assignFinalNodes();
-    seconds2 = time(NULL);
+    assignFinalNodes_end = time(NULL);
+
     TRACE(TRACE_2, "finished setting final nodes...\n");
-    TRACE(TRACE_3, "    " + intToString((int) difftime(seconds2, seconds)) + " s consumed.\n");
+
+    TRACE(TRACE_3, "    " + intToString((int) difftime(assignFinalNodes_end, assignFinalNodes_start)) + " s consumed.\n");
 }
 
 
@@ -171,18 +194,17 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
             currentNode->reachGraphStateSet.size() == 0 /* if this is the empty node ignore max occurrences */) {
 
 
-            // [LUHME XV] Knoten "v" umbenennen in "newNode"
             // we have to consider this event
-            AnnotatedGraphNode* v = new AnnotatedGraphNode();    // create new AnnotatedGraphNode of the graph
+            AnnotatedGraphNode* newNode = new AnnotatedGraphNode();    // create new AnnotatedGraphNode of the graph
             TRACE(TRACE_5, "\t\t\t\t    calculating successor states\n");
 
             if (currentEvent->getType() == INPUT) {
-                calculateSuccStatesInput(PN->getPlaceIndex(currentEvent), currentNode, v);
+                calculateSuccStatesInput(PN->getPlaceIndex(currentEvent), currentNode, newNode);
             } else if (currentEvent->getType() == OUTPUT) {
-                calculateSuccStatesOutput(PN->getPlaceIndex(currentEvent), currentNode, v);
+                calculateSuccStatesOutput(PN->getPlaceIndex(currentEvent), currentNode, newNode);
             }
 
-            if (currentEvent->getType() == INPUT && v->getColor() == RED) {
+            if (currentEvent->getType() == INPUT && newNode->getColor() == RED) {
 
                 // message bound violation occured during calculateSuccStatesInput
                 TRACE(TRACE_2, "\t\t\t            event suppressed (message bound violated)\n");
@@ -191,34 +213,34 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                 printProgress();
                 // [LUHME XV] auch solche Knoten zählen: #blue + #red <= #computed
                 numberDeletedVertices--;      // elsewise deletion of v is counted twice
-                delete v;                     // because ~AnnotatedGraphNode increments numberDeletedVertices
+                delete newNode;               // because ~AnnotatedGraphNode increments numberDeletedVertices
             } else {
                 // node v is BLUE
 
                 // was the new node v computed before?
-                AnnotatedGraphNode* found = findGraphNodeInSet(v);
+                AnnotatedGraphNode* found = findGraphNodeInSet(newNode);
 
                 if (found == NULL) {
                     TRACE(TRACE_1, "\t computed successor node new\n");
 
                     // node v is new, add v and edge (currentNode,v) to OG
-                    addGraphNode(currentNode, v);
+                    addGraphNode(currentNode, newNode);
 
                     if (currentEvent->getType() == INPUT) {
-                        add(currentNode, v, PN->getInputPlaceIndex(currentEvent), SENDING);
+                        add(currentNode, newNode, PN->getInputPlaceIndex(currentEvent), SENDING);
 
                         // going down with sending event ...
-                        buildGraph(v, your_progress);
+                        buildGraph(newNode, your_progress);
                     } else if (currentEvent->getType() == OUTPUT) {
-                        add(currentNode, v, PN->getOutputPlaceIndex(currentEvent), RECEIVING);
+                        add(currentNode, newNode, PN->getOutputPlaceIndex(currentEvent), RECEIVING);
 
                         // going down with receiving event ...
-                        buildGraph(v, 0);
+                        buildGraph(newNode, 0);
                     }
 
                     TRACE(TRACE_1, "\t backtracking to node " + currentNode->getName() + "\n");
 
-                    if (v->getColor() == RED) {
+                    if (newNode->getColor() == RED) {
                         currentNode->removeLiteralFromAnnotation(currentEvent->getLabelForCommGraph());
                     }
                 } else {
@@ -231,6 +253,10 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                     // draw a new edge to the old node
                     string edgeLabel = currentEvent->getLabelForCommGraph();
                     AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(found, edgeLabel);
+
+                    // a new edge has been added to the graph, must be local to the OG
+                    nEdges++;
+
                     currentNode->addLeavingEdge(newEdge);
 
                     // Still, if that node was computed red before, the literal
@@ -242,7 +268,7 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                     }
 
                     // [LUHME XV] nach oben (im Block)?
-                    delete v;
+                    delete newNode;
 
                     if (currentEvent->getType() == INPUT) {
                         addProgress(your_progress);
@@ -266,6 +292,9 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
             // do not optimize when trying diagnosis
             if (currentNode->getAnnotation()->equals() == FALSE) {
                 currentNode->setColor(RED);
+
+                nRedNodes++;
+
                 TRACE(TRACE_3, "\t\t any further event suppressed (annotation of node ");
                 TRACE(TRACE_3, currentNode->getName() + " is unsatisfiable)\n");
                 TRACE(TRACE_3, "\t\t formula was " + currentNode->getAnnotation()->asString());
@@ -284,6 +313,10 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
     TRACE(TRACE_3, "\t\t node " + currentNode->getName() + " has color " + toUpper(currentNode->getColor().toString()));
     TRACE(TRACE_3, " via formula " + currentNode->getAnnotation()->asString() + "\n");
+
+    if (currentNode->getColor() == RED) {
+        nRedNodes++;
+    }
 
     // [LUHME XV] Option OTF kann gelöscht werden (nach Ende Tools4BPEL)
     if (options[O_OTF]) {
@@ -317,6 +350,11 @@ void OG::addGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* toAdd)
     }
 
     addNode(toAdd);
+
+    // the knowledge of the new node has been calculated, so add the number of states stored
+    // in the new node to the global counter
+    nStoredStates += toAdd->reachGraphStateSet.size();
+
     TRACE(TRACE_5, "reachGraph::AddGraphNode (AnnotatedGraphNode* sourceNode, AnnotatedGraphNode * toAdd): end\n");
 }
 
@@ -351,6 +389,9 @@ void OG::add(AnnotatedGraphNode* sourceNode,
 
     // add a new edge to the new node
     AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(destNode, edgeLabel);
+
+    // a new edge has been added to the graph, must be local to the OG
+    nEdges++;
 
     // add the edge to the leaving edges list
     sourceNode->addLeavingEdge(newEdge);

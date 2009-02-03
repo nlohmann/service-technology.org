@@ -1,7 +1,6 @@
-@heading Version 3.1-unreleased
+@heading Version 3.1
 
 @itemize
-
 @item implementation of a re-analysis function which is applied to every IG/ OG that is computed, therefore after the re-analysis
 @itemize
 @item the graph does not contain any isolated blue nodes
@@ -16,8 +15,6 @@
 
 @item test cases using Graphviz Dot or Petrify are now skipped if the configure script did not find these tools
 
-@item fixed bug #12530 (@url{https://gna.org/bugs/?12530}): the @acronym{CUDD} package is now entirely translated with a C++ compiler to allow linking of the @code{new} logger
-
 @item renamed file @file{fiona.h} to @file{config.h}
 
 @item used macro @code{CONFIG_DOT} for Graphviz dot calls to achieve compatibility on systems where dot is not available
@@ -28,7 +25,7 @@
 @item matching of an open net with an operating guideline with global constraint
 @end itemize
 
-@item added regression tests to @file{tests/regression} which can be triggered with @code{make check} in that directory
+@item added regression tests to @file{tests/regression} which can be triggered with @code{make check} in that directory
 
 @item made adaptions to the Makefile options to be able to create Mac Universal binaries for 64 bit architectures (XCode 3.0 with SDK @samp{MacOSX10.5.sdk} is needed)
 
@@ -41,6 +38,21 @@
 @item made the shell scripts more portable by using @code{#!/usr/bin/env bash} instead of @code{#!/bin/bash} (especially important for FreeBSD systems)
 
 @item updated @file{Doxyfile} and adapted output directories to the other tools (@file{dox})
+
+@item fixed bugs since last version:
+@itemize
+@item bug #11905 (@url{https://gna.org/bugs/?11905}): max occurrences and OGs
+@item bug #12101 (@url{https://gna.org/bugs/?12101}): file creation
+@item bug #12207 (@url{https://gna.org/bugs/?12207}): parsing OG files with reduced arcs
+@item bug #12239 (@url{https://gna.org/bugs/?12239}): re-normalization of normalized nets
+@item bug #12484 (@url{https://gna.org/bugs/?12484}): inconsistent results for IG and OG
+@item bug #12500 (@url{https://gna.org/bugs/?12500}): combination of @option{-s allnodes} and @option{-s empty} does not work
+@item bug #12530 (@url{https://gna.org/bugs/?12530}): @code{new}-logger and @acronym{CUDD} package
+@item bug #12564 (@url{https://gna.org/bugs/?12564}): matching
+@item bug #12741 (@url{https://gna.org/bugs/?12741}): wrong numbers with parameter @option{-s rednodes}
+@item bug #12765 (@url{https://gna.org/bugs/?12765}): controllability IG/OG
+@item bug #12829 (@url{https://gna.org/bugs/?12829}): IG reduction
+@end itemize
 @end itemize
 
 

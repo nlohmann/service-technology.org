@@ -11,13 +11,15 @@
 #   and the public view.
 #############################################################################
 
-cd bug12895
+cd $testdir/bug12895
+
+TEMPFILE=`mktemp`
 
 echo "TEST: bug12895.sh"
 
 fiona non_empty_true_node3.owfn -t pv -p no-dot &> /dev/null
-fiona -t equvialence non_empty_true_node3.owfn non_empty_true_node3.pv.owfn -Q  &> result.txt
+fiona -t equvialence non_empty_true_node3.owfn non_empty_true_node3.pv.owfn -Q  &> $TEMPFILE
 
-grep "are equivalent: YES" result.txt > /dev/null
+grep "are equivalent: YES" $TEMPFILE > /dev/null
 
 exit $?

@@ -6,8 +6,8 @@
                      http://service-technology.org/fiona
 
 
-Version 3.1-unreleased
-======================
+Version 3.1
+===========
 
 * implementation of a re-analysis function which is applied to every IG/ OG
   that is computed, therefore after the re-analysis
@@ -26,9 +26,6 @@ Version 3.1-unreleased
 * test cases using Graphviz Dot or Petrify are now skipped if the configure
   script did not find these tools
 
-* fixed bug #12530 (`https://gna.org/bugs/?12530'): the CUDD package is now
-  entirely translated with a C++ compiler to allow linking of the `new' logger
-
 * renamed file `fiona.h' to `config.h'
 
 * used macro `CONFIG_DOT' for Graphviz dot calls to achieve compatibility on
@@ -41,7 +38,7 @@ Version 3.1-unreleased
      * matching of an open net with an operating guideline with global
        constraint
 
-* added regression tests toÂ `tests/regression' which can be triggered with
+* added regression tests to `tests/regression' which can be triggered with
   `make check' in that directory
 
 * made adaptions to the Makefile options to be able to create Mac Universal
@@ -63,4 +60,36 @@ Version 3.1-unreleased
 
 * updated `Doxyfile' and adapted output directories to the other tools (`dox')
 
-\nSee file ChangeLog <http://service-technology.org/files/fiona/ChangeLog> for\ncomplete version history.\n
+* fixed bugs since last version:
+     * bug #11905 (`https://gna.org/bugs/?11905'): max occurrences and OGs
+
+     * bug #12101 (`https://gna.org/bugs/?12101'): file creation
+
+     * bug #12207 (`https://gna.org/bugs/?12207'): parsing OG files with
+       reduced arcs
+
+     * bug #12239 (`https://gna.org/bugs/?12239'): re-normalization of
+       normalized nets
+
+     * bug #12484 (`https://gna.org/bugs/?12484'): inconsistent results for
+       IG and OG
+
+     * bug #12500 (`https://gna.org/bugs/?12500'): combination of `-s
+       allnodes' and `-s empty' does not work
+
+     * bug #12530 (`https://gna.org/bugs/?12530'): `new'-logger and CUDD
+       package
+
+     * bug #12564 (`https://gna.org/bugs/?12564'): matching
+
+     * bug #12741 (`https://gna.org/bugs/?12741'): wrong numbers with
+       parameter `-s rednodes'
+
+     * bug #12765 (`https://gna.org/bugs/?12765'): controllability IG/OG
+
+     * bug #12829 (`https://gna.org/bugs/?12829'): IG reduction
+
+
+See file ChangeLog <http://service-technology.org/files/fiona/ChangeLog> for
+complete version history.
+

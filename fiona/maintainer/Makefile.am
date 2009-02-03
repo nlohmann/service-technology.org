@@ -42,37 +42,37 @@ CLEANFILES = -fr $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) \
 
 
 #############################################################################
-# binary builds
+# binary builds (outcommented --disable-assert, see task #6451)
 #############################################################################
 
 bindist-linux:
 	touch $(top_srcdir)/dot ; chmod a+x $(top_srcdir)/dot
 	touch $(top_srcdir)/petrify ; chmod a+x $(top_srcdir)/petrify
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --disable-assert
+	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-linux-x86
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-64bit --disable-assert
+	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-64bit #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-linux-x86-64
 	rm $(top_srcdir)/dot $(top_srcdir)/petrify
 
 bindist-solaris:
 	touch $(top_srcdir)/dot ; chmod a+x $(top_srcdir)/dot
 	touch $(top_srcdir)/petrify ; chmod a+x $(top_srcdir)/petrify
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --disable-assert
+	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-solaris-sparc
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-64bit --disable-assert
+	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-64bit #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-solaris-sparc-64
 	rm $(top_srcdir)/dot $(top_srcdir)/petrify
 
 bindist-mac:
-	cd $(top_srcdir); CC=$(CC) CXX=$(CXX) ./configure --enable-universal --disable-dependency-tracking --disable-assert
+	cd $(top_srcdir); CC=$(CC) CXX=$(CXX) ./configure --enable-universal --disable-dependency-tracking #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-mac-universal
-	cd $(top_srcdir); CC=$(CC) CXX=$(CXX) ./configure --enable-universal --enable-64bit --disable-dependency-tracking --disable-assert
+	cd $(top_srcdir); CC=$(CC) CXX=$(CXX) ./configure --enable-universal --enable-64bit --disable-dependency-tracking #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-mac-universal-64
 
 bindist-win:
 	touch $(top_srcdir)/dot ; chmod a+x $(top_srcdir)/dot
 	touch $(top_srcdir)/petrify-4.1 ; chmod a+x $(top_srcdir)/petrify-4.1
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-win32 --disable-assert
+	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-win32 #--disable-assert
 	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-win32	
 	rm $(top_srcdir)/dot $(top_srcdir)/petrify-4.1
 
@@ -82,5 +82,5 @@ bindist:
 	mkdir $(top_srcdir)/$(BINDIRNAME)
 	cd $(top_srcdir); cp src/$(PACKAGE) COPYING NEWS ChangeLog AUTHORS THANKS README maintainer/$(PACKAGE).pdf $(BINDIRNAME)
 	cd $(top_srcdir)/$(BINDIRNAME) ; file * > CONTENTS
-	zip -rq $(top_srcdir)/$(BINDIRNAME).zip $(top_srcdir)/$(BINDIRNAME)
+	tar cfz $(top_srcdir)/$(BINDIRNAME).tar.gz $(top_srcdir)/$(BINDIRNAME)
 	rm -fr $(top_srcdir)/$(BINDIRNAME)

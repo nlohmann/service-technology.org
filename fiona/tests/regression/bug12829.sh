@@ -14,25 +14,30 @@
 #   and then check whether all 4 results are positive.
 #############################################################################
 
-cd bug12829
+cd $testdir/bug12829
 
 result=0
 
+TEMPFILE1=`mktemp`
+TEMPFILE2=`mktemp`
+TEMPFILE3=`mktemp`
+TEMPFILE4=`mktemp`
+
 echo "TEST: bug12829.sh"
 
-fiona -t ig -Q b1.s00000035__s00000934.owfn &> result1.txt
-fiona -t ig -Q b1-1.s00000035__s00000934.owfn &> result2.txt
+fiona -t ig -Q b1.s00000035__s00000934.owfn &> $TEMPFILE1
+fiona -t ig -Q b1-1.s00000035__s00000934.owfn &> $TEMPFILE2
 
-fiona -t ig -Q -p cre b1.s00000035__s00000934.owfn &> result3.txt
-fiona -t ig -Q -p rbs b1-1.s00000035__s00000934.owfn &> result4.txt
+fiona -t ig -Q -p cre b1.s00000035__s00000934.owfn &> $TEMPFILE3
+fiona -t ig -Q -p rbs b1-1.s00000035__s00000934.owfn &> $TEMPFILE4
 
-grep "net is controllable: YES" result1.txt > /dev/null
+grep "net is controllable: NO" $TEMPFILE1 > /dev/null
 let result=$result+$?
-grep "net is controllable: YES" result2.txt > /dev/null
+grep "net is controllable: NO" $TEMPFILE2 > /dev/null
 let result=$result+$?
-grep "net is controllable: YES" result3.txt > /dev/null
+grep "net is controllable: NO" $TEMPFILE3 > /dev/null
 let result=$result+$?
-grep "net is controllable: YES" result4.txt > /dev/null
+grep "net is controllable: NO" $TEMPFILE4 > /dev/null
 let result=$result+$?
 
 exit $result

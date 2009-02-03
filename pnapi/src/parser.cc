@@ -12,6 +12,12 @@ namespace pnapi
   namespace parser
   {
 
+    InputError::InputError(const string & msg, const string & token, int line) :
+      message(msg), token(token), line(line)
+    {
+    }
+
+
     namespace owfn
     {
 
@@ -19,9 +25,13 @@ namespace pnapi
 
       Node * node;
 
+      char * token;
+
+      int line;
+
       void error(const string & msg)
       {
-	throw msg;
+	throw InputError(msg, token, line);
       }
 
       Node::Node() :
@@ -225,7 +235,8 @@ namespace pnapi
 
 	  case FORMULA_NOT:
 	    if (formulas_.size() < 1)
-	      throw string("operand for unary NOT operator expected");
+	      assert(false); // FIXME
+	      //throw string("operand for unary NOT operator expected");
 	    formulas_.push_back(new FormulaNot(formulas_.front()));
 	    formulas_.pop_front();
 	    break;
@@ -233,7 +244,8 @@ namespace pnapi
 	  case FORMULA_OR:
 	    {
 	      if (formulas_.size() < 2)
-		throw string("two operands for binary AND/OR operator expected");
+		assert(false); // FIXME
+		//throw string("two operands for binary AND/OR operator expected");
 	      Formula * op1 = formulas_.front(); formulas_.pop_front();
 	      Formula * op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;

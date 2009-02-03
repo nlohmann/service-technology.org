@@ -10,6 +10,9 @@
 /* write tokens to parser-owfn.h for use by scanner */
 %defines
 
+/* more verbose error reporting */
+%error-verbose
+
 
  /*****************************************************************************
   * C declarations

@@ -16,6 +16,9 @@
 /* yyunput not needed (fix compiler warning) */
 %option nounput
 
+/* maintain line number for error reporting */
+%option yylineno
+
 
  /***************************************************************************** 
   * C declarations 
@@ -25,12 +28,14 @@
 #include "parser.h"
 #include "parser-owfn.h"
 
-#define yylex pnapi::parser::owfn::lex
-#define yyerror pnapi::parser::owfn::error
+#define yylex    pnapi::parser::owfn::lex
+#define yytext   pnapi::parser::owfn::token
+#define yyerror  pnapi::parser::owfn::error
+#define yylineno pnapi::parser::owfn::line
 #define yystream pnapi::parser::owfn::stream
 
 /* hack to read input from a C++ stream */
-#define YY_INPUT(buf,result,max_size) \
+#define YY_INPUT(buf,result,max_size)		\
    yystream->read(buf, max_size); \
    if (yystream->bad()) \
      YY_FATAL_ERROR("input in flex scanner failed"); \
@@ -122,4 +127,4 @@ NOT                             { return OP_NOT; }
 [ \t]                           { /* skip */ }
 
  /* anything else */
-.                               { yyerror("lexical error"); }
+.                               { yyerror("unexpected lexical token"); }

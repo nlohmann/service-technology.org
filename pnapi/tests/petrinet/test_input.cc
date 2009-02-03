@@ -1,5 +1,6 @@
 #include <sstream>
 #include "test.h"
+#include "parser.h"
 
 using std::stringstream;
 

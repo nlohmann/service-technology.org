@@ -19,6 +19,7 @@
 #include <set>
 #include <stack>
 #include <iostream>
+#include <cassert>
 
 #include "petrinet.h"
 #include "formula.h"
@@ -145,6 +146,25 @@ namespace pnapi
       virtual ~Visitor() {};
     };
 
+    
+    /*!
+     */
+    class InputError
+    {
+    public:
+
+      InputError(const string &, const string &, int);
+
+      /// error message
+      string message;
+      
+      /// last read token
+      string token;
+
+      /// line number
+      int line;
+    };
+
 
 
     /*************************************************************************
@@ -172,6 +192,12 @@ namespace pnapi
 
       /// output node of parser
       extern Node * node;
+
+      /// last read lexer token
+      extern char * token;
+
+      /// line number in input
+      extern int line;
 
       /// flex generated lexer function
       int lex();
@@ -516,7 +542,9 @@ namespace pnapi
       
       // call the parser
       if ((*yaccParse_)() != 0)
-	throw string("yacc parser failed");
+	assert(false); // we should never end up here because the first error
+                       // already results in an exception (maybe change this
+                       // behavior in the future)
 
       // copy result pointer
       rootNode_ = parseResult_;

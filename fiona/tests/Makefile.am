@@ -16,7 +16,7 @@ TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
 # All tests that are expected to fail (must be a subset of TESTS above)
 # e.g., XFAIL_TESTS = bddtest.sh 
 ############################################################################
-XFAIL_TESTS = publicview.sh
+#XFAIL_TESTS = publicview.sh
 
 
 check_PROGRAMS = slistcheck

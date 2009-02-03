@@ -1,0 +1,38 @@
+PLACE
+  INTERNAL
+    Button_normalized; Coffee_normalized, Euro_normalized, p0; p1;
+
+  INPUT
+    Button,
+    Euro;
+
+  OUTPUT
+    Coffee;
+
+
+INITIALMARKING
+  p1:	1;
+
+FINALMARKING
+  ;
+
+
+TRANSITION t9
+  CONSUME Button_normalized, Euro_normalized, p1;
+  PRODUCE p0;
+
+TRANSITION t10
+  CONSUME p0;
+  PRODUCE Coffee_normalized;
+
+TRANSITION t11 { input }
+  CONSUME Button;
+  PRODUCE Button_normalized;
+
+TRANSITION t12 { input }
+  CONSUME Euro;
+  PRODUCE Euro_normalized;
+
+TRANSITION t13 { output }
+  CONSUME Coffee_normalized;
+  PRODUCE Coffee;

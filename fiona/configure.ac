@@ -1,4 +1,4 @@
-AC_INIT(Fiona, 3.1, fiona@service-technology.org, fiona)
+AC_INIT(Fiona, 3.2-unreleased, fiona@service-technology.org, fiona)
 # remember to also change the version number in `doc/ChangeLog.texi',
 # because otherwise `make dist' will fail with `NEWS not updated' message
 

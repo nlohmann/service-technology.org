@@ -1,0 +1,18 @@
+INTERFACE
+  INPUT
+    Button,
+    Euro;
+  OUTPUT
+    Coffee;
+
+NODES
+  1 : !Coffee : blue,
+  2 : final : blue,
+  0 : [?Button, ?Euro] : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  1 -> 2 : !Coffee,
+  0 -> 1 : [?Button, ?Euro];

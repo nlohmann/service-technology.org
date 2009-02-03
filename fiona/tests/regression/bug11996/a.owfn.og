@@ -1,0 +1,24 @@
+NODES
+  0 : (!a + !b) : blue,
+  1 : !a : blue,
+  2 : ?c : blue,
+  3 : final : blue : finalnode,
+  7 : true : blue,
+  8 : !b : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : !b,
+  0 -> 8 : !a,
+  0 -> 7 : ?c,
+  1 -> 2 : !a,
+  1 -> 7 : ?c,
+  2 -> 3 : ?c,
+  3 -> 7 : ?c,
+  7 -> 7 : ?c,
+  7 -> 7 : !b,
+  7 -> 7 : !a,
+  8 -> 2 : !b,
+  8 -> 7 : ?c;

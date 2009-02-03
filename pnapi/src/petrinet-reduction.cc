@@ -838,6 +838,7 @@ void PetriNet::reduce_identical_transitions()
       Transition* t2 = findTransition(labels->second);
       
       t1->merge(*t2, false);
+      deleteTransition(*t2);
       result++;
     }
     //if (result!=0)
@@ -916,7 +917,9 @@ void PetriNet::reduce_series_places()
   for (set<pair<string, string> >::iterator placePair = placePairs.begin();
        placePair != placePairs.end(); placePair++)
   {
-    findPlace(placePair->first)->merge(*findPlace(placePair->second));
+    Place & p2 = *findPlace(placePair->second);
+    findPlace(placePair->first)->merge(p2);
+    deletePlace(p2);
     result++;
   }
   //if (result!=0)
@@ -1001,6 +1004,7 @@ void PetriNet::reduce_series_transitions(bool keepNormal) {
         Transition* t1 = findTransition(transitionPair->first);
         Transition* t2 = findTransition(transitionPair->second);
         t1->merge(*t2);
+	deleteTransition(*t2);
         result++;
     }
     //if (result!=0)

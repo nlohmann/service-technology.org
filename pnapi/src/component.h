@@ -82,7 +82,7 @@ namespace pnapi
     bool isComplementType(Type) const;
 
     /// checks if two nodes are parallel to each other
-    bool isParallel(const Node &);
+    bool isParallel(const Node &) const;
     
     /// returns the name of the node
     string getName() const;
@@ -92,6 +92,9 @@ namespace pnapi
 
     /// adds a prefix to all names
     void prefixNameHistory(const string &);
+
+    /// merges the histories of two nodes
+    void mergeNameHistory(Node &);
 
     /// returns the node's preset
     const set<Node *> & getPreset() const;
@@ -105,18 +108,6 @@ namespace pnapi
     /// returns the arcs to the node's postset
     set<Arc *> getPostsetArcs() const;
 
-    
-    /*!
-     * \name   Experimental
-     *
-     * Operations under development
-     */
-    //@{
-    
-    /// merges the histories of two nodes
-    void mergeNameHistory(Node &);
-    
-    //@}
 
   protected:
 

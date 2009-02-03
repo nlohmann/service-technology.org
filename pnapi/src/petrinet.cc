@@ -138,6 +138,7 @@ namespace pnapi
 
   void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
   {
+    /*
     assert(node2.getNameHistory().empty());
 
     // delete node2 from net
@@ -146,8 +147,7 @@ namespace pnapi
       net_.deletePlace(*place);
     else
       net_.deleteTransition(*dynamic_cast<Transition *>(&node2));
-
-    // FIXME: update final condition (node2 was merged into node1)
+    */
   }
 
 
@@ -352,6 +352,7 @@ namespace pnapi
 	else if (&it->second->getPetriNet() != this)
 	  it->second = findPlace(it->second->getName());
 	it->first->merge(*it->second);
+	deletePlace(*it->second);
       }
   }
 

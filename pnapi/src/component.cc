@@ -89,7 +89,7 @@ namespace pnapi {
    *
    * \param n2 is the other node to which parallelism will be checked.
    */
-  bool Node::isParallel(const Node& n2)
+  bool Node::isParallel(const Node & n2) const
   {
     if (
         (this != &n2) &&   // precondition 1
@@ -215,10 +215,13 @@ namespace pnapi {
 
   void Node::mergeNameHistory(Node & node)
   {
-    // remove history of node
     deque<string> nodeHistory = node.history_;
+
+    /*
+    // remove history of node
     node.history_.clear();
     observer_.updateNodeNameHistory(node, nodeHistory);
+    */
 
     // add history of node to this
     deque<string> oldHistory = history_;
@@ -320,8 +323,7 @@ namespace pnapi {
 
 
   /*!
-   * Merges the properties of the given node into this one. The merged place
-   * is deleted.
+   * Merges the properties of the given node into this one.
    *
    * The following properties are merged:
    * - NameHistory (concatenation)
@@ -408,8 +410,7 @@ namespace pnapi {
 
 
   /*!
-   * Merges the properties of the given node into this one. The merged
-   * transition is deleted.
+   * Merges the properties of the given node into this one.
    *
    * The following properties are merged:
    * - NameHistory (concatenation)

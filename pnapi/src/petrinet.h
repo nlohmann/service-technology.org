@@ -120,6 +120,8 @@ namespace pnapi
     /// copy assignment operator
     PetriNet & operator=(const PetriNet &);
 
+    /// final condition
+    Condition & finalCondition();
 
 
     /*!
@@ -216,9 +218,6 @@ namespace pnapi
 
     /// TODO: looking for a better idea to set conditions
     void setFinalCondition(Condition &fc);
-
-    /// returns the final condition to operate with it
-    Condition & getFinalCondition();
 
     /// TODO: move to class Marking
     /// looks for a living transition under m

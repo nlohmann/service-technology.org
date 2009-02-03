@@ -316,6 +316,14 @@ namespace pnapi
 
 
   /*!
+   */
+  Condition & PetriNet::finalCondition()
+  {
+    return condition_;
+  }
+
+
+  /*!
    * Given a second Petri net #net, the internal structure is added and input
    * and output places are connected appropriatly (if an input and an output
    * place name of the two nets match).
@@ -975,15 +983,6 @@ namespace pnapi
 
 
   /***************************** NOT YET REFACTORED *************************/
-
-
-/*!
- * \brief   Returns the final condition
- */
-  Condition & PetriNet::getFinalCondition()
-  {
-    return condition_;
-  }
 
 
 

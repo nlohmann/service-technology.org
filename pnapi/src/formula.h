@@ -215,6 +215,8 @@ class Marking;
   public:
     FormulaNot(Formula *f);
 
+    FormulaNot(const Formula &);
+
     /// copy constructor
     //FormulaNot(const FormulaNot &f);
 
@@ -266,6 +268,8 @@ class Marking;
   public:
     FormulaAnd(Formula *l, Formula *r);
 
+    FormulaAnd(const Formula &, const Formula &);
+
     FormulaAnd(list<Formula *> &flst);
 
     virtual ~FormulaAnd() {}
@@ -283,6 +287,8 @@ class Marking;
   {
   public:
     FormulaOr(Formula *l, Formula *r);
+
+    FormulaOr(const Formula &, const Formula &);
 
     FormulaOr(list<Formula *> &flst);
 
@@ -330,6 +336,35 @@ class Marking;
 
     False * deepCopy(const map<Place *, Place *> &newP) const;
   };
+
+  
+  /// formula construction operator
+  FormulaEqual operator==(Place &, unsigned int);
+
+  /// formula construction operator
+  FormulaNotEqual operator!=(Place &, unsigned int);
+
+  /// formula construction operator
+  FormulaGreater operator>(Place &, unsigned int);
+
+  /// formula construction operator
+  FormulaGreaterEqual operator>=(Place &, unsigned int);
+
+  /// formula construction operator
+  FormulaLess operator<(Place &, unsigned int);
+
+  /// formula construction operator
+  FormulaLessEqual operator<=(Place &, unsigned int);
+
+  /// formula construction operator
+  FormulaAnd operator&&(const Formula &, const Formula &);
+
+  /// formula construction operator
+  FormulaOr operator||(const Formula &, const Formula &);
+
+  /// formula construction operator
+  FormulaNot operator!(const Formula &);
+
 
   } /* namespace formula */
 

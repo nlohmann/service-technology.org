@@ -24,7 +24,9 @@ namespace pnapi
 
     void setFormula(Formula *f);
 
-    Condition & operator =(const Condition &c);
+    Condition & operator=(const Condition &);
+
+    Condition & operator=(const Formula &);
 
     string toString() const;
 

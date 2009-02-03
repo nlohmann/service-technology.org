@@ -41,9 +41,15 @@ namespace pnapi
     f_ = f;
   }
 
-  Condition & Condition::operator =(const Condition &c)
+  Condition & Condition::operator=(const Condition & c)
   {
     return (*new Condition(c));
+  }
+
+  Condition & Condition::operator=(const Formula & f)
+  {
+    setFormula(f.flatCopy());
+    return *this;
   }
 
   string Condition::toString() const

@@ -208,6 +208,11 @@ namespace pnapi
   {
   }
 
+  FormulaNot::FormulaNot(const Formula & f) :
+    UnaryBooleanFormula(f.flatCopy())
+  {
+  }
+
   bool FormulaNot::evaluate(Marking &m) const
   {
     return !sub_->evaluate(m);
@@ -253,6 +258,11 @@ namespace pnapi
   {
   }
 
+  FormulaAnd::FormulaAnd(const Formula & l, const Formula & r) :
+    NaryBooleanFormula(l.flatCopy(), r.flatCopy())
+  {
+  }
+
   bool FormulaAnd::evaluate(Marking &m) const
   {
     for (list<Formula *>::const_iterator f = subs_.begin();
@@ -288,6 +298,11 @@ namespace pnapi
 
   FormulaOr::FormulaOr(Formula *l, Formula *r) :
     NaryBooleanFormula(l, r)
+  {
+  }
+
+  FormulaOr::FormulaOr(const Formula & l, const Formula & r) :
+    NaryBooleanFormula(l.flatCopy(), r.flatCopy())
   {
   }
 
@@ -368,6 +383,78 @@ namespace pnapi
   False * False::deepCopy(const map<Place *, Place *> &newP) const
   {
     return new False();
+  }
+
+
+  /*!
+   */
+  FormulaEqual operator==(Place & p, unsigned int k)
+  {
+    return FormulaEqual(p, k);
+  }
+
+
+  /*!
+   */
+  FormulaNotEqual operator!=(Place & p, unsigned int k)
+  {
+    return FormulaNotEqual(p, k);
+  }
+
+
+  /*!
+   */
+  FormulaGreater operator>(Place & p, unsigned int k)
+  {
+    return FormulaGreater(p, k);
+  }
+
+
+  /*!
+   */
+  FormulaGreaterEqual operator>=(Place & p, unsigned int k)
+  {
+    return FormulaGreaterEqual(p, k);
+  }
+
+
+  /*!
+   */
+  FormulaLess operator<(Place & p, unsigned int k)
+  {
+    return FormulaLess(p, k);
+  }
+
+
+  /*!
+   */
+  FormulaLessEqual operator<=(Place & p, unsigned int k)
+  {
+    return FormulaLessEqual(p, k);
+  }
+
+
+  /*!
+   */
+  FormulaAnd operator&&(const Formula & f1, const Formula & f2)
+  {
+    return FormulaAnd(f1, f2);
+  }
+
+
+  /*!
+   */
+  FormulaOr operator||(const Formula & f1, const Formula & f2)
+  {
+    return FormulaOr(f1, f2);
+  }
+
+
+  /*!
+   */
+  FormulaNot operator!(const Formula & f)
+  {
+    return FormulaNot(f);
   }
 
 

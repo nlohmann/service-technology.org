@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
   f->addSubFormula(new FormulaEqual(p5, 0));
   f->addSubFormula(new FormulaGreater(p6, 0));
 
-  net.getFinalCondition().setFormula(f);
+  net.finalCondition().setFormula(f);
 
 
   // automaton construction from PetriNet instance

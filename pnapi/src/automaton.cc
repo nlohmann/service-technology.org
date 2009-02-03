@@ -151,7 +151,7 @@ void Automaton::dfs(State &i)
   Marking m = i.getMarking();
 
   // final state
-  if (net_.getFinalCondition().checkFinalMarking(m))
+  if (net_.finalCondition().checkFinalMarking(m))
   {
     cout << "DEBUG: " << i.getIndex() << " is pushed back to the final list.\n";
     finals_.push_back(i.getIndex());

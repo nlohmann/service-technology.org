@@ -1,12 +1,16 @@
-noinst_PROGRAMS = petri
+noinst_PROGRAMS = petri #generator
 
-petri_SOURCES = main.cc cmdline.c cmdline.h
+petri_SOURCES = petri.cc cmdline.c cmdline.h
+#generator_SOURCES = generator.cc
+
+petri_LDADD =  $(top_builddir)/src/libpnapi.a
+#generator_LDADD =  $(top_builddir)/src/libpnapi.a
+
 BUILT_SOURCES = cmdline.c
 
-petri_CPPFLAGS = -I$(top_srcdir)/src
-petri_LDADD =  $(top_builddir)/src/libpnapi.a
+AM_CPPFLAGS = -I$(top_srcdir)/src
 
-EXTRA_DIST = cmdline.ggo
+EXTRA_DIST = cmdline.ggo generator.cc
 MAINTAINERCLEANFILES = cmdline.c cmdline.h
 
 ################################################################

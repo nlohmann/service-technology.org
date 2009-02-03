@@ -5,6 +5,7 @@
 #include <string>
 #include <libgen.h>
 #include "pnapi.h"
+#include "parser.h"
 #include "cmdline.h"
 
 using namespace pnapi;
@@ -42,7 +43,16 @@ int main(int argc, char** argv) {
     if (args_info.inputs_num == 0) {
         // read from stdin
         PetriNet net;
-        std::cin >> io::owfn >> net;
+        
+        try {
+            std::cin >> io::owfn >> net;
+        } catch (pnapi::parser::InputError error) {
+            std::cerr << "stdin:" << error.line << ": " << error.message << std::endl;
+            std::cerr << "stdin:" << error.line << ": last token `" << error.token << "'" << std::endl;
+            
+            exit(EXIT_FAILURE);
+        }
+        
         nets.push_back(net);
         names.push_back("stdin");
     } else {
@@ -51,7 +61,17 @@ int main(int argc, char** argv) {
             PetriNet net;
             std::fstream infile;
             infile.open(args_info.inputs[i], std::fstream::in);
-            infile >> io::owfn >> net;            
+            
+            try {
+                infile >> io::owfn >> net;
+            } catch (pnapi::parser::InputError error) {
+                std::cerr << args_info.inputs[i] << ":" << error.line << ": " << error.message << std::endl;
+                std::cerr << args_info.inputs[i] << ":" << error.line << ": last token `" << error.token << "'" << std::endl;
+                
+                infile.close();            
+                exit(EXIT_FAILURE);
+            }
+            
             infile.close();            
             nets.push_back(net);
             names.push_back(args_info.inputs[i]);

@@ -102,8 +102,7 @@ fi
 
 
 #############################################################################
-# check for MPI: if compiler wrappers are found, collect their flags and add
-# them to the flags we gathered so far
+# check for MPI: if compiler wrappers are found, use them instead of GCC
 #############################################################################
 
 AC_ARG_ENABLE(mpi,
@@ -116,12 +115,13 @@ AC_DEFINE_UNQUOTED(CONFIG_ENABLEMPI, "$enable_mpi", [whether to compile with MPI
 if test "$enable_mpi" = "yes"; then
   AC_PATH_PROG(MPICC, mpicc, not found)
   AC_PATH_PROG(MPICXX, mpicxx, not found)
+
   if test "$MPICC" = "not found" -o "$MPICXX" = "not found"; then
-    AC_MSG_ERROR([MPI compiler wrappers were not found in the path.])
+    AC_MSG_ERROR([MPI compiler wrappers were not found in the path])
   else
-    configured_CFLAGS=$configured_CFLAGS" `$MPICC --showme:compile`"
-    configured_CXXFLAGS=$configured_CXXFLAGS" `$MPICXX --showme:compile`"
-    configured_LDFLAGS=$configured_LDFLAGS" `$MPICXX --showme:link`"
+    CC=$MPICC
+    CXX=MPICXX
+    AC_CHECK_HEADER([mpi.h])
   fi
 fi
 

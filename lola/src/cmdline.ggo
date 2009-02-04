@@ -103,7 +103,7 @@ section "Distributed Search Option"
 
 option "Master" c
  "Master in distributed search"
- flag off
+ flag off hidden
 
 
 text "

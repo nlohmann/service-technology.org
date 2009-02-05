@@ -90,9 +90,9 @@ if test "$enable_universal" = "yes"; then
     AC_MSG_ERROR([Please re-run configure with these options:
   `--disable-dependency-tracking --enable-universal'])
   fi
-  configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
-  configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386"
-  configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"
+  configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+  configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+  configured_LDFLAGS=$configured_LDFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -mmacosx-version-min=10.4"
 fi
 
 # parameter "--enable-win32"

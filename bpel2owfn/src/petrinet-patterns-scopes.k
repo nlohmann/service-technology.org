@@ -232,8 +232,10 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
         PN.newArc(t2, p2);
         PN.newArc(p5, t2);
         PN.newArc(t2, p6);
-        if (!globals::ASTEmap[phylum->id]->hasEH)
-          PN.newArc(p12, t2);
+// Die Zeile unter dem Kommentar war erst
+//      "if (!globals::ASTEmap[phylum->id]->hasEH) PN.newArc(p12, t2);"
+// was keinen Sinn ergibt, weil IA immer in EH eingebunden wird
+        PN.newArc(p12, t2);
         
         Transition *t3 = PN.newTransition(prefix + "ft");
         PN.newArc(p3, t3);
@@ -306,7 +308,9 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
           PN.newArc(t11, p17);
           
           Transition *t12 = PN.newTransition(prefix + "eh_finalize");
-          PN.newArc(p19, t12);
+// Ich habe diese Kante rausgenommen, weil sie keinen Sinn ergibt: finalize
+// soll erst passieren, wenn der Event Handler daktiviert ist.
+//          PN.newArc(p19, t12);
           PN.newArc(p20, t12);
           PN.newArc(t12, p12);
           

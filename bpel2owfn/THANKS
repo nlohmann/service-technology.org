@@ -58,6 +58,9 @@ ACKNOWLEDGEMENTS
 
  * Ernesto Santana-Diaz
    for writing a Java-based GUI for BPEL2oWFN,
+   
+ * Matthias Weidlich, Hasso-Plattner-Institute (University of Potsdam)
+   for pointing out a bug in the Petri net patterns,
 
  * Jan Martijn van der Werf, Technische Universiteit Eindhoven
    for his help with the PNML-oWFN format.

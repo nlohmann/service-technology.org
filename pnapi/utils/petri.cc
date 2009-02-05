@@ -48,35 +48,30 @@ int main(int argc, char** argv) {
         // read from stdin
         PetriNet net;
         
-        try { std::cin >> meta(FILENAME, "<stdin>") >> owfn >> net; } 
-	catch (InputError error) {
-  	    /* try the code below, if you like it
-            std::cerr << "stdin:" << error.line << ": " << error.message << std::endl;
-            std::cerr << "stdin:" << error.line << ": last token `" << error.token << "'" << std::endl;
-	    */
-	    std::cerr << error << std::endl;
-            
+        try {
+            std::cin >> meta(FILENAME, "<stdin>") >> owfn >> net;
+        } catch (InputError error) {
+            std::cerr << error << std::endl;
             exit(EXIT_FAILURE);
-	}
+        }
         
         nets.push_back(net);
-        names.push_back("stdin");
+        names.push_back("<stdin>");
     } else {
         // read from files
         for (unsigned int i = 0; i < args_info.inputs_num; i++) {
             PetriNet net;
-	    const char * filename = args_info.inputs[i];
-            std::fstream infile;
-            infile.open(filename, std::fstream::in);
+
+            std::fstream infile(args_info.inputs[i], std::fstream::in);
+            if (!infile.is_open()) {
+                std::cerr << args_info.inputs[i] << ": could not open file to read" << std::endl;
+                exit(EXIT_FAILURE);
+            }
             
-            try { infile >> meta(FILENAME, filename) >> owfn >> net; } 
-	    catch (InputError error) {
-	        /* try the code below, if you like it
-                std::cerr << args_info.inputs[i] << ":" << error.line << ": " << error.message << std::endl;
-                std::cerr << args_info.inputs[i] << ":" << error.line << ": last token `" << error.token << "'" << std::endl;
-		*/
-	        std::cerr << error << std::endl;
-  
+            try {
+                infile >> meta(FILENAME, args_info.inputs[i]) >> owfn >> net;
+            } catch (InputError error) {
+                std::cerr << error << std::endl;
                 infile.close();            
                 exit(EXIT_FAILURE);
             }
@@ -87,7 +82,7 @@ int main(int argc, char** argv) {
         }
     }
     
-    
+
     /************************
     * STRUCTURAL PROPERTIES *
     ************************/
@@ -117,9 +112,12 @@ int main(int argc, char** argv) {
     *********/   
     if (args_info.output_given) {
         for (unsigned int i = 0; i < args_info.output_given; ++i) {
-            std::ofstream outfile;
             std::string outname = names[0] + "." + args_info.output_orig[i];
-            outfile.open(outname.c_str());
+            std::ofstream outfile(outname.c_str(), std::fstream::trunc);
+            if (!outfile.is_open()) {
+                std::cerr << outname << ": could not write to file" << std::endl;
+                exit(EXIT_FAILURE);
+            }
 
             switch(args_info.output_arg[i]) {
                 case (output_arg_owfn): {

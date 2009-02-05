@@ -23,6 +23,7 @@
 
 #include "petrinet.h"
 #include "formula.h"
+#include "io.h"
 
 using std::string;
 using std::istream;
@@ -32,8 +33,8 @@ using std::map;
 using std::set;
 using std::stack;
 
+using pnapi::io::InputError;
 using pnapi::formula::Formula;
-
 
 namespace pnapi
 {
@@ -49,6 +50,19 @@ namespace pnapi
 
     // forward declaration
     template <typename T> class Visitor;
+
+
+    /// input stream for lexers
+    extern istream * stream;
+
+    /// last read lexer token
+    extern char * token;
+
+    /// line number in input
+    extern int line;
+
+    /// called by generated lexers/parsers
+    void error(const string &);
 
 
     /*!
@@ -82,8 +96,18 @@ namespace pnapi
       /// receives a visitor for visiting the subtree rooted at this node
       void visit(Visitor<T> &) const;
 
+      /// causes an error if condition is false
+      void check(bool, const string &, const string &) const;
+
     protected:
+      
+      /// children of this node
       vector<T *> children_;
+
+    private:
+      int line;
+      string token;
+      string filename;
     };
 
 
@@ -107,10 +131,9 @@ namespace pnapi
     protected:
 
       /// constructor to be used in derived classes (framework instances)
-      Parser(istream * &, T * &, int (*)());
+      Parser(T * &, int (*)());
 
     private:
-      istream * & flexStream_;
       T * & parseResult_;
       int (*yaccParse_)();
       T * rootNode_;
@@ -147,25 +170,6 @@ namespace pnapi
     };
 
     
-    /*!
-     */
-    class InputError
-    {
-    public:
-
-      InputError(const string &, const string &, int);
-
-      /// error message
-      string message;
-      
-      /// last read token
-      string token;
-
-      /// line number
-      int line;
-    };
-
-
 
     /*************************************************************************
      ***** OWFN Parser
@@ -187,26 +191,14 @@ namespace pnapi
       typedef BaseNode<Node> BaseNode;
 
 
-      /// input stream for lexer
-      extern istream * stream;
-
       /// output node of parser
       extern Node * node;
-
-      /// last read lexer token
-      extern char * token;
-
-      /// line number in input
-      extern int line;
 
       /// flex generated lexer function
       int lex();
 
       /// bison generated parser function
       int parse();
-
-      /// called by generated lexer/parser on error
-      void error(const string &);
 
 
       /*!
@@ -325,9 +317,6 @@ namespace pnapi
       class Node;
 
 
-      /// input stream for lexer
-      extern istream * stream;
-
       /// output node of parser
       extern Node * node;
 
@@ -336,9 +325,6 @@ namespace pnapi
 
       /// bison generated parser function
       int parse();
-
-      /// called by generated lexer/parser on error
-      void error(const string &);
 
 
       struct PetrifyResult 
@@ -416,14 +402,18 @@ namespace pnapi
     /*!
      */
     template <typename T>
-    BaseNode<T>::BaseNode()
+    BaseNode<T>::BaseNode() :
+      line(parser::line), token(parser::token), 
+      filename(io::FileIO::getFilename(*parser::stream))
     {
     }
     
     /*!
      */
     template <typename T>
-    BaseNode<T>::BaseNode(T * node)
+    BaseNode<T>::BaseNode(T * node) :
+      line(parser::line), token(parser::token), 
+      filename(io::FileIO::getFilename(*parser::stream))
     {
       assert(node != NULL);
       addChild(node);
@@ -432,7 +422,9 @@ namespace pnapi
     /*!
      */
     template <typename T>
-    BaseNode<T>::BaseNode(T * node1, T * node2)
+    BaseNode<T>::BaseNode(T * node1, T * node2) :
+      line(parser::line), token(parser::token), 
+      filename(io::FileIO::getFilename(*parser::stream))
     {
       assert(node1 != NULL);
       assert(node2 != NULL);
@@ -443,7 +435,9 @@ namespace pnapi
     /*!
      */
     template <typename T>
-    BaseNode<T>::BaseNode(T * node1, T * node2, T * node3)
+    BaseNode<T>::BaseNode(T * node1, T * node2, T * node3) :
+      line(parser::line), token(parser::token), 
+      filename(io::FileIO::getFilename(*parser::stream))
     {
       assert(node1 != NULL);
       assert(node2 != NULL);
@@ -493,6 +487,17 @@ namespace pnapi
     }
 
     /*!
+     */
+    template <typename T>
+    void BaseNode<T>::check(bool condition, const string & token, 
+			    const string & msg) const
+    {
+      if (!condition)
+	throw io::InputError(io::InputError::SEMANTIC_ERROR, filename, line, 
+			     token, msg);
+    }
+
+    /*!
      * \brief   destructor
      *
      * Destroys AST if available.
@@ -515,9 +520,8 @@ namespace pnapi
      * (see owfn::Parser::Parser() for an example).
      */
     template <typename T> 
-    Parser<T>::Parser(istream * & flexStream, T * & parseResult, 
+    Parser<T>::Parser(T * & parseResult, 
 		      int (*yaccParse)()) :
-      flexStream_(flexStream),
       parseResult_(parseResult),
       yaccParse_(yaccParse),
       rootNode_(NULL)
@@ -538,7 +542,10 @@ namespace pnapi
 	delete rootNode_;
 
       // assign lexer input stream
-      flexStream_ = &is;
+      stream = &is;
+
+      // reset line counter
+      line = 1;
       
       // call the parser
       if ((*yaccParse_)() != 0)
@@ -550,7 +557,7 @@ namespace pnapi
       rootNode_ = parseResult_;
 
       // cleanup and return
-      flexStream_ = NULL;
+      stream = NULL;
       parseResult_ = NULL;
       return *rootNode_;
     }

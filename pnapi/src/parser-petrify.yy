@@ -36,9 +36,10 @@ using pnapi::parser::petrify::node;
 #undef yyparse
 #undef yyerror
 
+#define yyerror pnapi::parser::error
+
 #define yylex pnapi::parser::petrify::lex
 #define yyparse pnapi::parser::petrify::parse
-#define yyerror pnapi::parser::petrify::error
 
 extern char *yytext;
 extern int yylineno;

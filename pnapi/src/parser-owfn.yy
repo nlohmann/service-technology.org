@@ -26,9 +26,10 @@
 #undef yyparse
 #undef yyerror
 
+#define yyerror pnapi::parser::error
+
 #define yylex pnapi::parser::owfn::lex
 #define yyparse pnapi::parser::owfn::parse
-#define yyerror pnapi::parser::owfn::error
 
 %}
 

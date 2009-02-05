@@ -32,7 +32,6 @@
 #include "component.h"
 #include "condition.h"
 #include "formula.h"
-#include "io.h"
 
 using std::string;
 using std::vector;
@@ -45,6 +44,10 @@ using std::ostream;
 
 namespace pnapi
 {
+  
+  // forward declarations
+  class PetriNet;
+  namespace io { ostream & operator<<(ostream &, const PetriNet &); }
 
 
   /*!

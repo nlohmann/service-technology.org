@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "parser.h"
+#include "io.h"
 
 using std::stringstream;
 
@@ -12,27 +13,24 @@ namespace pnapi
   namespace parser
   {
 
-    InputError::InputError(const string & msg, const string & token, int line) :
-      message(msg), token(token), line(line)
+    istream * stream;
+    
+    char * token;
+    
+    int line;
+
+    void error(const string & msg)
     {
+      throw io::InputError(io::InputError::SYNTAX_ERROR, 
+			   io::FileIO::getFilename(*parser::stream), 
+			   parser::line, parser::token, msg);
     }
 
 
     namespace owfn
     {
 
-      istream * stream;
-
       Node * node;
-
-      char * token;
-
-      int line;
-
-      void error(const string & msg)
-      {
-	throw InputError(msg, token, line);
-      }
 
       Node::Node() :
 	BaseNode(), type(NO_DATA)
@@ -139,7 +137,7 @@ namespace pnapi
       }
 
       Parser::Parser() :
-	parser::Parser<Node>(stream, node, owfn::parse)
+	parser::Parser<Node>(node, owfn::parse)
       {
       }
 
@@ -160,17 +158,33 @@ namespace pnapi
 	  case OUTPUT:   placeType_ = Place::OUTPUT;   break;
 	  case INTERNAL: placeType_ = Place::INTERNAL; break;
 
-	  case PLACE: places_[node.identifier].type = placeType_;     break;
-	  case MARK:  places_[node.identifier].marking = node.number; break;
+	  case PLACE: 
+	    node.check(places_.find(node.identifier) == places_.end(),
+		       node.identifier, "node name already used");
+	    places_[node.identifier].type = placeType_;     
+	    break;
+	  case MARK:  
+	    node.check(places_.find(node.identifier) != places_.end(),
+		       node.identifier, "unknown place");
+	    places_[node.identifier].marking = node.number; 
+	    break;
 
 	  case PRESET:  isPreset_ = true;  break;
 	  case POSTSET: isPreset_ = false; break;
 
 	  case ARC: 
 	    if (isPreset_)
-	      preset_[node.identifier] = node.number; 
+	      {
+		node.check(preset_.find(node.identifier) == preset_.end(),
+			   node.identifier, "place already used in preset");
+		preset_[node.identifier] = node.number; 
+	      }
 	    else
-	      postset_[node.identifier] = node.number;
+	      {
+		node.check(postset_.find(node.identifier) == postset_.end(),
+			   node.identifier, "place already used in postset");
+		postset_[node.identifier] = node.number;
+	      }
 	    break;
 
 	  case FORMULA_EQ:
@@ -212,22 +226,28 @@ namespace pnapi
 	  case INITIAL:
 	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
 		 it != places_.end(); ++it)
-	      // FIXME: error check
 	      net_.createPlace(it->first, it->second.type, it->second.marking);
 	    break;
 
 	  case TRANSITION:
 	    {
-	      // FIXME: error check
+	      node.check(!net_.containsNode(node.identifier), node.identifier,
+			 "node name already used");
 	      Transition & trans = net_.createTransition(node.identifier);
 	      for (map<string, unsigned int>::iterator it = preset_.begin();
 		   it != preset_.end(); ++ it)
-		// FIXME: error check
-		net_.createArc(*net_.findPlace(it->first), trans, it->second);
+		{
+		  Place * place = net_.findPlace(it->first);
+		  node.check(place != NULL, it->first, "unknown place");
+		  net_.createArc(*place, trans, it->second);
+		}
 	      for (map<string, unsigned int>::iterator it = postset_.begin();
 		   it != postset_.end(); ++ it)
-		// FIXME: error check
-		net_.createArc(trans, *net_.findPlace(it->first), it->second);
+		{
+		  Place * place = net_.findPlace(it->first);
+		  node.check(place != NULL, it->first, "unknown place");
+		  net_.createArc(trans, *place, it->second);
+		}
 	      preset_.clear();
 	      postset_.clear();
 	      break;
@@ -273,14 +293,7 @@ namespace pnapi
     namespace petrify
     {
 
-      istream * stream;
-
       Node * node;
-
-      void error(const string & msg)
-      {
-	throw msg;
-      }
 
       Node::Node(Type type) : type(type) {}
 
@@ -342,7 +355,7 @@ namespace pnapi
       }
 
       Parser::Parser() :
-        parser::Parser<Node>(stream, node, petrify::parse)
+        parser::Parser<Node>(node, petrify::parse)
       {
       }
 

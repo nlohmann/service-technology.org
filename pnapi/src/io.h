@@ -21,7 +21,11 @@
 #include <istream>
 #include <ostream>
 #include <iterator>
+#include <iostream>
+#include <set>
 
+using std::string;
+using std::set;
 using std::ios_base;
 using std::istream;
 using std::ostream;
@@ -29,6 +33,16 @@ using std::ostream_iterator;
 
 namespace pnapi
 {
+
+  // forward declaration
+  class PetriNet;
+  class Node;
+  class Place;
+  class Transition;
+  class Arc;
+  class Condition;
+  namespace parser { class InputError; }
+
 
   /*!
    * \brief   Input/Output related Structures
@@ -58,6 +72,60 @@ namespace pnapi
    */
   namespace io
   {
+
+    /*!
+     * \brief   Thrown by Parser::parse() and Node::visit()
+     */
+    class InputError
+    {
+    public:
+
+      /// types of errors
+      enum Type { SYNTAX_ERROR, SEMANTIC_ERROR };
+
+
+      /// type of error
+      const Type type;
+
+      /// error message
+      const string message;
+      
+      /// last read token
+      const string token;
+
+      /// line number
+      const int line;
+
+      /// filename
+      const string filename;
+
+
+      /// constructor
+      InputError(Type, const string &, int, const string &, const string &);
+
+    };
+
+
+    enum MetaInformation { FILENAME };
+
+    /*!
+     */
+    class FileIO
+    {
+    public:
+      const string filename;
+
+      FileIO(const string &);
+
+      inline static string getFilename(ios_base &, 
+				       const string & = "<unknown>");
+      template <typename T> static T & setFilename(T &, const string &);
+
+    private:
+      inline static void * & filenamePointer(ios_base &);
+      static void filenameCallback(ios_base::event, ios_base &, int);
+    };
+
 
     /*!
      * \brief   Petri net I/O helpers
@@ -99,6 +167,9 @@ namespace pnapi
     /// PetriNet input
     istream & operator>>(istream & , PetriNet &);
 
+    /// filename setting
+    istream & operator>>(istream &, const FileIO &);
+
 
     /// (sub-)mode setting
     ostream & operator<<(ostream &, const PetriNetIO &);
@@ -122,9 +193,17 @@ namespace pnapi
     ostream & operator<<(ostream &, const pnapi::Condition &);
 
 
+    /// InputError output
+    ostream & operator<<(ostream &, const pnapi::io::InputError &);
+
+
     /// mode manipulator
     inline PetriNetIO setMode(PetriNetIO::Mode m) {
       return PetriNetIO(m); };
+
+    /// filename manipulator
+    inline FileIO meta(MetaInformation key, const string & value) {
+      return FileIO(value); };
 
     /// statistical output manipulator
     inline ostream & stat(ostream & os) {
@@ -138,6 +217,36 @@ namespace pnapi
     inline ostream & dot(ostream & os) {
       return PetriNetIO::setFormat(os, PetriNetIO::DOT); }
 
+
+
+    /*!
+     */
+    string FileIO::getFilename(ios_base & ios, const string & def)
+    {
+      string * name = static_cast<string *>(filenamePointer(ios));
+      return name != NULL ? *name : def;
+    }
+
+
+    /*!
+     */
+    template <typename T>
+    T & FileIO::setFilename(T & ios, const string & name)
+    {
+      // FIXME: register callback with DELETE
+      filenamePointer(ios) = new string(name);
+      return ios;
+    }
+
+
+    /*!
+     */
+    void * & FileIO::filenamePointer(ios_base & ios)
+    {
+      static int n = ios_base::xalloc();
+      ios.register_callback(FileIO::filenameCallback, n);
+      return ios.pword(n);
+    }
 
 
     /*!

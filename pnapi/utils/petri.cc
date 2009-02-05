@@ -5,10 +5,14 @@
 #include <string>
 #include <libgen.h>
 #include "pnapi.h"
-#include "parser.h"
 #include "cmdline.h"
 
 using namespace pnapi;
+
+using pnapi::io::owfn;
+using pnapi::io::meta;
+using pnapi::io::FILENAME;
+using pnapi::io::InputError;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -44,14 +48,16 @@ int main(int argc, char** argv) {
         // read from stdin
         PetriNet net;
         
-        try {
-            std::cin >> io::owfn >> net;
-        } catch (pnapi::parser::InputError error) {
+        try { std::cin >> meta(FILENAME, "<stdin>") >> owfn >> net; } 
+	catch (InputError error) {
+  	    /* try the code below, if you like it
             std::cerr << "stdin:" << error.line << ": " << error.message << std::endl;
             std::cerr << "stdin:" << error.line << ": last token `" << error.token << "'" << std::endl;
+	    */
+	    std::cerr << error << std::endl;
             
             exit(EXIT_FAILURE);
-        }
+	}
         
         nets.push_back(net);
         names.push_back("stdin");
@@ -59,15 +65,18 @@ int main(int argc, char** argv) {
         // read from files
         for (unsigned int i = 0; i < args_info.inputs_num; i++) {
             PetriNet net;
+	    const char * filename = args_info.inputs[i];
             std::fstream infile;
-            infile.open(args_info.inputs[i], std::fstream::in);
+            infile.open(filename, std::fstream::in);
             
-            try {
-                infile >> io::owfn >> net;
-            } catch (pnapi::parser::InputError error) {
+            try { infile >> meta(FILENAME, filename) >> owfn >> net; } 
+	    catch (InputError error) {
+	        /* try the code below, if you like it
                 std::cerr << args_info.inputs[i] << ":" << error.line << ": " << error.message << std::endl;
                 std::cerr << args_info.inputs[i] << ":" << error.line << ": last token `" << error.token << "'" << std::endl;
-                
+		*/
+	        std::cerr << error << std::endl;
+  
                 infile.close();            
                 exit(EXIT_FAILURE);
             }

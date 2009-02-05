@@ -11,9 +11,12 @@
 #include "parser.h"
 #include "parser-petrify.h"
 
+#define yystream pnapi::parser::stream
+#define yylineno pnapi::parser::line
+#define yytext   pnapi::parser::token
+#define yyerror  pnapi::parser::error
+
 #define yylex pnapi::parser::petrify::lex
-#define yyerror pnapi::parser::petrify::error
-#define yystream pnapi::parser::petrify::stream
 
 /* hack to read input from a C++ stream */
 #define YY_INPUT(buf,result,max_size) \

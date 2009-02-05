@@ -15,6 +15,35 @@ namespace pnapi
 
     /*!
      */
+    FileIO::FileIO(const string & name) :
+      filename(name)
+    {
+    }
+
+
+    /*!
+     */
+    void FileIO::filenameCallback(ios_base::event ev, ios_base & ios, int index)
+    {
+      // FIXME: check index
+      if (ev == ios_base::erase_event)
+	{
+	  string * & p = (string *&) filenamePointer(ios);
+	  if (p != NULL) delete p;
+	}
+    }
+
+
+    /*!
+     */
+    istream & operator>>(istream & is, const FileIO & io)
+    {
+      return FileIO::setFilename(is, io.filename);
+    }
+
+
+    /*!
+     */
     PetriNetIO::PetriNetIO(Mode m) :
       mode_(m)
     {
@@ -250,6 +279,25 @@ namespace pnapi
 
 
     /*!
+     */
+    ostream & operator<<(ostream & os, const io::InputError & e)
+    {
+      os << e.filename << ":" << e.line << ": error"; 
+      if (!e.token.empty())
+	switch (e.type)
+	  {
+	  case io::InputError::SYNTAX_ERROR:   
+	    os << " near ‘" << e.token << "’"; 
+	    break;
+	  case io::InputError::SEMANTIC_ERROR: 
+	    os << ": ‘" << e.token << "’"; 
+	    break;
+	  }
+      return os << ": " << e.message;
+    }
+
+
+    /*!
      * Reads a Petri net from a stream (in most cases backed by a file). The
      * format
      * of the stream data is not determined automatically. You have to set it
@@ -273,6 +321,14 @@ namespace pnapi
 	}
 
       return is;
+    }
+
+
+
+    InputError::InputError(Type type, const string & filename, int line, 
+			   const string & token, const string & msg) :
+      type(type), message(msg), token(token), line(line), filename(filename)
+    {
     }
 
   }

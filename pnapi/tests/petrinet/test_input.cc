@@ -5,6 +5,8 @@
 using std::stringstream;
 
 using pnapi::io::owfn;
+using pnapi::io::meta;
+using pnapi::io::FILENAME;
 
 int main(int argc, char * argv[])
 {
@@ -23,7 +25,8 @@ int main(int argc, char * argv[])
   stream << owfn << net;
 
   begin_test("io::operator>>() [Petri net OWFN input]");
-  stream >> owfn >> net;
+  try { stream >> owfn >> net; }
+  catch (InputError e) { cout << endl << e << endl; assert(false); }
   test << owfn << net;
   assert(stream.str() == test.str());
   end_test();

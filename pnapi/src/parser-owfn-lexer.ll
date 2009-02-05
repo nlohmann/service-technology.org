@@ -28,11 +28,12 @@
 #include "parser.h"
 #include "parser-owfn.h"
 
+#define yystream pnapi::parser::stream
+#define yylineno pnapi::parser::line
+#define yytext   pnapi::parser::token
+#define yyerror  pnapi::parser::error
+
 #define yylex    pnapi::parser::owfn::lex
-#define yytext   pnapi::parser::owfn::token
-#define yyerror  pnapi::parser::owfn::error
-#define yylineno pnapi::parser::owfn::line
-#define yystream pnapi::parser::owfn::stream
 
 /* hack to read input from a C++ stream */
 #define YY_INPUT(buf,result,max_size)		\

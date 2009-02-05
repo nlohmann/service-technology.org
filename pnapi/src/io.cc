@@ -29,7 +29,11 @@ namespace pnapi
       if (ev == ios_base::erase_event)
 	{
 	  string * & p = (string *&) filenamePointer(ios);
-	  if (p != NULL) delete p;
+	  if (p != NULL) 
+	    {
+	      delete p;
+	      p = NULL;
+	    }
 	}
     }
 

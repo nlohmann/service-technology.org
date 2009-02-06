@@ -244,6 +244,8 @@ namespace pnapi
    */
   PetriNet::~PetriNet()
   {
+    meta_.clear();
+
     // delete all places
     set<Place *> places = places_;
     for (set<Place *>::iterator it = places.begin(); it != places.end(); ++it)
@@ -882,6 +884,19 @@ namespace pnapi
   /****************************************************************************
    *** Private PetriNet Function Definitions
    ***************************************************************************/
+
+  string PetriNet::getMetaInformation(std::ios_base & ios, 
+				      io::MetaInformation i, 
+				      const string & def) const
+  {
+    map<io::MetaInformation, string> & streamMeta = 
+      io::util::MetaData::data(ios);
+    if (streamMeta.find(i) != streamMeta.end())
+      return streamMeta.find(i)->second;
+    if (meta_.find(i) != meta_.end())
+      return meta_.find(i)->second;
+    return def;
+  }
 
 
   /*!

@@ -32,11 +32,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: sura $
+ *          last changes of: \$Author$
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-01-18 $
+ * \date    \$Date$
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -60,7 +60,7 @@
  * 
  *          According to [STA90] these rules preserve boundedness and liveness.
  * 
- * \version \$Revision: 1.5 $
+ * \version \$Revision$
  *
  * \ingroup petrinet
  */

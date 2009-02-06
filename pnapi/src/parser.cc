@@ -22,7 +22,7 @@ namespace pnapi
     void error(const string & msg)
     {
       throw io::InputError(io::InputError::SYNTAX_ERROR, 
-			   io::FileIO::getFilename(*parser::stream), 
+		       io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
 			   parser::line, parser::token, msg);
     }
 

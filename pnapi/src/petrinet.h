@@ -32,6 +32,7 @@
 #include "component.h"
 #include "condition.h"
 #include "formula.h"
+#include "io.h"
 
 using std::string;
 using std::vector;
@@ -47,7 +48,11 @@ namespace pnapi
   
   // forward declarations
   class PetriNet;
-  namespace io { ostream & operator<<(ostream &, const PetriNet &); }
+  namespace io 
+  { 
+    std::ostream & operator<<(std::ostream &, const PetriNet &); 
+    std::istream & operator>>(std::istream &, PetriNet &) throw (io::InputError); 
+  }
 
 
   /*!
@@ -107,6 +112,9 @@ namespace pnapi
 
     /// Petri net output, see pnapi::io
     friend ostream & io::operator<<(ostream &, const PetriNet &);
+
+    /// Petri net input, see pnapi::io
+    friend istream & io::operator>>(istream &, PetriNet &) throw (io::InputError);
 
 
   public:
@@ -240,6 +248,9 @@ namespace pnapi
     /// final condition
     Condition condition_;
 
+    /// meta information
+    map<io::MetaInformation, string> meta_;
+
 
     /* (overlapping) sets for net structure */
 
@@ -302,6 +313,10 @@ namespace pnapi
 
     /// returns true if all arcs connecting to n have a weight of 1
     bool sameweights(Node *n) const;
+
+    /// returns the meta information if available
+    string getMetaInformation(std::ios_base &, io::MetaInformation, 
+			      const string & = "") const;
 
 
     /* petrify */

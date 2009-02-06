@@ -19,6 +19,7 @@
 #include "petrinet.h"
 #include "automaton.h"
 
+// overloaded operators should be available globally
 using pnapi::io::operator<<;
 using pnapi::io::operator>>;
 

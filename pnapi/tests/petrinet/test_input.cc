@@ -6,7 +6,6 @@ using std::stringstream;
 
 using pnapi::io::owfn;
 using pnapi::io::meta;
-using pnapi::io::FILENAME;
 
 int main(int argc, char * argv[])
 {

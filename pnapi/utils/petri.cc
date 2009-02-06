@@ -11,7 +11,10 @@ using namespace pnapi;
 
 using pnapi::io::owfn;
 using pnapi::io::meta;
-using pnapi::io::FILENAME;
+using pnapi::io::CREATOR;
+using pnapi::io::INPUTFILE;
+using pnapi::io::OUTPUTFILE;
+using pnapi::io::INVOCATION;
 using pnapi::io::InputError;
 
 /// the command line parameters
@@ -49,7 +52,11 @@ int main(int argc, char** argv) {
         PetriNet net;
         
         try {
-            std::cin >> meta(FILENAME, "<stdin>") >> owfn >> net;
+   	    /* try meta information tags, they will be remembered for output */
+            std::cin >> meta(INPUTFILE,  "<stdin>") 
+		     >> meta(CREATOR,    "<toolname>")
+		     >> meta(INVOCATION, "<commandline>")
+		     >> owfn >> net;
         } catch (InputError error) {
             std::cerr << error << std::endl;
             exit(EXIT_FAILURE);
@@ -73,7 +80,7 @@ int main(int argc, char** argv) {
             }
             
             try {
-                infile >> meta(FILENAME, args_info.inputs[i]) >> owfn >> net;
+                infile >> meta(INPUTFILE, args_info.inputs[i]) >> owfn >> net;
             } catch (InputError error) {
                 std::cerr << error << std::endl;
                 infile.close();            
@@ -146,6 +153,14 @@ int main(int argc, char** argv) {
                 std::cerr << outname << ": could not write to file" << std::endl;
                 exit(EXIT_FAILURE);
             }
+
+	    /* 
+	       if you want to, set other meta information tags here
+	       e.g. in OWFN they will be included 
+	       you can even overwrite existing ones (e.g. from input) here
+	       sample code:
+	    */
+	    outfile << meta(OUTPUTFILE, outname);
 
             switch(args_info.output_arg[i]) {
                 case (output_arg_owfn): {

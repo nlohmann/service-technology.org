@@ -18,30 +18,14 @@
 #ifndef PNAPI_IO_H
 #define PNAPI_IO_H
 
-#include <istream>
-#include <ostream>
-#include <iterator>
-#include <iostream>
 #include <set>
-
-using std::string;
-using std::set;
-using std::ios_base;
-using std::istream;
-using std::ostream;
-using std::ostream_iterator;
+#include <map>
 
 namespace pnapi
 {
 
   // forward declaration
   class PetriNet;
-  class Node;
-  class Place;
-  class Transition;
-  class Arc;
-  class Condition;
-  namespace parser { class InputError; }
 
 
   /*!
@@ -49,32 +33,22 @@ namespace pnapi
    *
    * Everything needed to read and write the structures of the Petri Net API
    * from and to streams.
-   *
-   * For the moment, only PetriNet output in the following formats is working:
-   *
-   * - statistical output (short summary)
-   *   \code
-   *   ostream << stat << petrinet;
-   *   \endcode
-   *   see also: stat(), operator<<(ostream &, const PetriNet &)
-   *
-   * - Open WorkFlow Net file format (OWFN)
-   *   \code
-   *   ostream << owfn << petrinet;
-   *   \endcode
-   *   see also: owfn(), operator<<(ostream &, const PetriNet &)
-   *
-   * - GraphViz file format (DOT)
-   *   \code
-   *   ostream << dot << petrinet;
-   *   \endcode
-   *   see also: dot(), operator<<(ostream &, const PetriNet &)
    */
   namespace io
   {
 
+    // forward declarations
+    namespace util { template <typename T> class Manipulator; }
+
+
     /*!
-     * \brief   Thrown by Parser::parse() and Node::visit()
+     * \brief   Meta Information Types
+     */
+    enum MetaInformation { INPUTFILE, OUTPUTFILE, INVOCATION, CREATOR };
+
+
+    /*!
+     * \brief   Exception class thrown by operator>>()
      */
     class InputError
     {
@@ -88,253 +62,225 @@ namespace pnapi
       const Type type;
 
       /// error message
-      const string message;
+      const std::string message;
       
       /// last read token
-      const string token;
+      const std::string token;
 
       /// line number
       const int line;
 
       /// filename
-      const string filename;
+      const std::string filename;
 
 
       /// constructor
-      InputError(Type, const string &, int, const string &, const string &);
+      InputError(Type, const std::string &, int, const std::string &, 
+		 const std::string &);
 
     };
 
 
-    enum MetaInformation { FILENAME };
+    /*!
+     * \name  Input/Output Operators
+     *
+     * reading from and writing to files (and other streams)
+     */
+    //@{
+
+    /// %PetriNet input
+    std::istream & operator>>(std::istream &, PetriNet &) throw (InputError);
+
+    /// %MetaInformation manipulation
+    std::istream & operator>>(std::istream &, const util::Manipulator<
+			      std::pair<MetaInformation, std::string> > &);
+
+    /// %PetriNet output
+    std::ostream & operator<<(std::ostream &, const PetriNet &);
+
+    /// %InputError output
+    std::ostream & operator<<(std::ostream &, const InputError &);
+
+    /// %MetaInformation manipulation
+    std::ostream & operator<<(std::ostream &, const util::Manipulator<
+			      std::pair<MetaInformation, std::string> > &);
+
+    //@}
+
 
     /*!
+     * \name  Stream Manipulators
+     *
+     * changing format and meta information
      */
-    class FileIO
-    {
-    public:
-      const string filename;
+    //@{
 
-      FileIO(const string &);
+    /// Open WorkFlow Net (OWFN) file format
+    std::ios_base & owfn(std::ios_base &);
 
-      inline static string getFilename(ios_base &, 
-				       const string & = "<unknown>");
-      template <typename T> static T & setFilename(T &, const string &);
+    /// statistical output format
+    std::ostream & stat(std::ostream &);
 
-    private:
-      inline static void * & filenamePointer(ios_base &);
-      static void filenameCallback(ios_base::event, ios_base &, int);
-    };
+    /// GraphViz DOT output format
+    std::ostream & dot(std::ostream &);
 
+    /// meta information manipulator
+    util::Manipulator<std::pair<MetaInformation, std::string> > 
+    meta(MetaInformation, const std::string &);
+
+    //@}
+
+  }
+
+
+
+  /*************************************************************************
+   ***** INTERNAL UTILITIES
+   *************************************************************************/
+
+  // forward declarations
+  class Node;
+  class Place;
+  class Transition;
+  class Arc;
+  class Condition;
+
+  namespace io
+  {
 
     /*!
-     * \brief   Petri net I/O helpers
+     * \brief   Utility Classes and Functions for pnapi::io
      */
-    class PetriNetIO
+    namespace util
     {
-    public:
+    
+      /*** ENUM CONSTANTS ***/
 
-      /// possible I/O formats for Petri nets
+      /// possible I/O formats
       enum Format { STAT, OWFN, DOT, GASTEX };
-
+      
       /// I/O (sub-)mode
       enum Mode { PLACE, PLACE_CAPACITY, PLACE_TOKEN, ARC };
 
-      /// constructor
-      PetriNetIO(Mode);
+      
+      /*** TEMPLATE CLASSES ***/
+
+      template <typename T> class Manipulator
+      {
+      public:
+	const T data;
+	Manipulator(const T &);
+      };
+
+
+      template <typename T> class StreamMetaData
+      {
+      public:
+	static T & data(std::ios_base &);
+
+      private:
+	static int index;
+	static void ioscb(std::ios_base::event, std::ios_base &, int);
+      };
+
+      template <typename T> int StreamMetaData<T>::index;
+
+
+      /*** TYPE NAME SHORTCUTS ***/
+
+      typedef StreamMetaData<Format> FormatData;
+      typedef StreamMetaData<Mode> ModeData;
+      typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
+      typedef Manipulator<std::pair<MetaInformation, std::string> > 
+              MetaManipulator;
+
+
+      /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
 
       /// filter places with token count > 0
-      static set<Place *> filterMarkedPlaces(const set<Place *> &);
+      std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
 
-      inline static Format getFormat(ios_base &);
-      template <typename T> static T & setFormat(T &, Format);
+      Manipulator<Mode> mode(Mode);
 
-      inline Mode getMode() const;
-      inline static Mode getMode(ios_base &);
-      template <typename T> static T & setMode(T &, Mode);
-
-    private:
-
-      Mode mode_;
-
-      inline static long & formatFlag(ios_base &);
-
-      inline static long & modeFlag(ios_base &);
-
-    };
+      std::ostream & operator<<(std::ostream &, const pnapi::Arc &);
+      std::ostream & operator<<(std::ostream &, const pnapi::Node &);
+      std::ostream & operator<<(std::ostream &, const pnapi::Place &);
+      std::ostream & operator<<(std::ostream &, const pnapi::Transition &);
+      std::ostream & operator<<(std::ostream &, const pnapi::Condition &);
 
 
-    /// PetriNet input
-    istream & operator>>(istream & , PetriNet &);
+      /*** TEMPLATE CLASS IMPLEMENTATION ***/
 
-    /// filename setting
-    istream & operator>>(istream &, const FileIO &);
-
-
-    /// (sub-)mode setting
-    ostream & operator<<(ostream &, const PetriNetIO &);
-
-    /// pnapi::PetriNet output
-    ostream & operator<<(ostream &, const pnapi::PetriNet &);
-
-    /// pnapi::Node output
-    ostream & operator<<(ostream &, const pnapi::Arc &);
-
-    /// pnapi::Node output
-    ostream & operator<<(ostream &, const pnapi::Node &);
-
-    /// pnapi::Place output
-    ostream & operator<<(ostream &, const pnapi::Place &);
-
-    /// pnapi::Transition output
-    ostream & operator<<(ostream &, const pnapi::Transition &);
-
-    /// pnapi::Condition output
-    ostream & operator<<(ostream &, const pnapi::Condition &);
+      template <typename T>
+      std::ostream & operator<<(std::ostream & os, const Manipulator<T> m)
+      {
+	StreamMetaData<T>::data(os) = m.data;
+	return os;
+      }
 
 
-    /// InputError output
-    ostream & operator<<(ostream &, const pnapi::io::InputError &);
+      inline std::string getOWFNDelimiter(const std::set<Arc *> &) 
+      { return ", "; }
+      inline std::string getOWFNDelimiter(const std::set<Place *> &)      
+      { return ", "; }
+      inline std::string getOWFNDelimiter(const std::set<Transition *> &) 
+      { return "\n"  ; }
 
 
-    /// mode manipulator
-    inline PetriNetIO setMode(PetriNetIO::Mode m) {
-      return PetriNetIO(m); };
+      template <typename T>
+      std::ostream & operator<<(std::ostream & os, const std::set<T> & s)
+      {
+	std::string delim;
+	switch (StreamMetaData<Format>::data(os))
+	  {
+	  case OWFN: delim = getOWFNDelimiter(s); break;
+	  case DOT:  delim = "\n";                break;
+	  default:   delim = ", ";                break;
+	  }
+	if (s.empty()) return os;
+	for (typename std::set<T>::iterator it = s.begin(); it != --s.end(); 
+	     ++it)
+	  os << **it << delim;
+	return os << **--s.end();
+      }
 
-    /// filename manipulator
-    inline FileIO meta(MetaInformation key, const string & value) {
-      return FileIO(value); };
+      
+      template <typename T>
+      Manipulator<T>::Manipulator(const T & data) :
+	data(data)
+      {
+      }
 
-    /// statistical output manipulator
-    inline ostream & stat(ostream & os) {
-      return PetriNetIO::setFormat(os, PetriNetIO::STAT); }
+      
+      template <typename T>
+      T & StreamMetaData<T>::data(std::ios_base & ios)
+      {
+	static int i = std::ios_base::xalloc();
+	index = i;
 
-    /// OWFN manipulator
-    inline ios_base & owfn(ios_base & os) {
-      return PetriNetIO::setFormat(os, PetriNetIO::OWFN); }
+	T * & p = (T * &) ios.pword(index);
+	if (p == NULL)
+	  {
+	    ios.register_callback(ioscb, index);
+	    p = new T;
+	  }
+	return *p;
+      }
 
-    /// DOT manipulator
-    inline ostream & dot(ostream & os) {
-      return PetriNetIO::setFormat(os, PetriNetIO::DOT); }
+      template <typename T>
+      void StreamMetaData<T>::ioscb(std::ios_base::event event, 
+				    std::ios_base & ios, int i)
+      {
+	T * & p = (T * &) ios.pword(index);
+	if (i == index && 
+	    event == std::ios_base::erase_event &&
+	    p != NULL)
+	  {
+	    delete p;
+	    p = NULL;
+	  }
+      }
 
-
-
-    /*!
-     */
-    string FileIO::getFilename(ios_base & ios, const string & def)
-    {
-      string * name = static_cast<string *>(filenamePointer(ios));
-      return name != NULL ? *name : def;
-    }
-
-
-    /*!
-     */
-    template <typename T>
-    T & FileIO::setFilename(T & ios, const string & name)
-    {
-      // FIXME: register callback with DELETE
-      filenamePointer(ios) = new string(name);
-      return ios;
-    }
-
-
-    /*!
-     */
-    void * & FileIO::filenamePointer(ios_base & ios)
-    {
-      static int n = ios_base::xalloc();
-      ios.register_callback(FileIO::filenameCallback, n);
-      return ios.pword(n);
-    }
-
-
-    /*!
-     */
-    template <typename T>
-    T & PetriNetIO::setFormat(T & ios, Format f)
-    {
-      formatFlag(ios) = f;
-      return ios;
-    }
-
-
-    /*!
-     */
-    PetriNetIO::Format PetriNetIO::getFormat(ios_base & ios)
-    {
-      return static_cast<Format>(formatFlag(ios));
-    }
-
-
-    /*!
-     */
-    long & PetriNetIO::formatFlag(ios_base & ios)
-    {
-      static int n = ios_base::xalloc();
-      return ios.iword(n);
-    }
-
-
-    /*!
-     */
-    template <typename T>
-    T & PetriNetIO::setMode(T & ios, Mode m)
-    {
-      modeFlag(ios) = m;
-      return ios;
-    }
-
-
-    /*!
-     */
-    PetriNetIO::Mode PetriNetIO::getMode() const
-    {
-      return mode_;
-    }
-
-
-    /*!
-     */
-    PetriNetIO::Mode PetriNetIO::getMode(ios_base & ios)
-    {
-      return static_cast<Mode>(modeFlag(ios));
-    }
-
-
-    /*!
-     */
-    long & PetriNetIO::modeFlag(ios_base & ios)
-    {
-      static int n = ios_base::xalloc();
-      return ios.iword(n);
-    }
-
-
-    /*!
-     * \brief   delimiters for set output
-     */
-    inline string getOWFNDelimiter(const set<Arc *> &)        { return ", "; }
-    inline string getOWFNDelimiter(const set<Place *> &)      { return ", "; }
-    inline string getOWFNDelimiter(const set<Transition *> &) { return "\n"  ; }
-
-    /*!
-     * \brief   ouputs a set of pointers to a stream
-     */
-    template <typename T>
-    ostream & operator<<(ostream & os, const set<T> & s)
-    {
-      string delim;
-      switch (PetriNetIO::getFormat(os))
-	{
-	case PetriNetIO::OWFN: delim = getOWFNDelimiter(s); break;
-	case PetriNetIO::DOT:  delim = "\n"; break;
-	default: delim = ", "; break;
-	}
-      if (s.empty()) return os;
-      for (typename set<T>::iterator it = s.begin(); it != --s.end(); ++it)
-	os << **it << delim;
-      return os << **--s.end();
     }
 
   }

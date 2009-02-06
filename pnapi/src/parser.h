@@ -404,7 +404,7 @@ namespace pnapi
     template <typename T>
     BaseNode<T>::BaseNode() :
       line(parser::line), token(parser::token), 
-      filename(io::FileIO::getFilename(*parser::stream))
+      filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
     {
     }
     
@@ -413,7 +413,7 @@ namespace pnapi
     template <typename T>
     BaseNode<T>::BaseNode(T * node) :
       line(parser::line), token(parser::token), 
-      filename(io::FileIO::getFilename(*parser::stream))
+      filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
     {
       assert(node != NULL);
       addChild(node);
@@ -424,7 +424,7 @@ namespace pnapi
     template <typename T>
     BaseNode<T>::BaseNode(T * node1, T * node2) :
       line(parser::line), token(parser::token), 
-      filename(io::FileIO::getFilename(*parser::stream))
+      filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
     {
       assert(node1 != NULL);
       assert(node2 != NULL);
@@ -437,7 +437,7 @@ namespace pnapi
     template <typename T>
     BaseNode<T>::BaseNode(T * node1, T * node2, T * node3) :
       line(parser::line), token(parser::token), 
-      filename(io::FileIO::getFilename(*parser::stream))
+      filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
     {
       assert(node1 != NULL);
       assert(node2 != NULL);

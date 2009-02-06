@@ -249,7 +249,7 @@ markings:
   ;
 
 initial:
-  KEY_MARKING marking_list SEMICOLON { $$ = new Node(INITIAL, $2); }
+  KEY_MARKING marking_list SEMICOLON { $$ = new Node(INITIALMARKING, $2); }
   ;
 
 marking_list:

@@ -223,7 +223,7 @@ namespace pnapi
       {
 	switch (node.type)
 	  {
-	  case INITIAL:
+	  case INITIALMARKING:
 	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
 		 it != places_.end(); ++it)
 	      net_.createPlace(it->first, it->second.type, it->second.marking);

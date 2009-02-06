@@ -4,6 +4,7 @@
 #include <iostream>
 #include "AST.h"
 #include "debug.h"
+#include "helpers.h"  // for toInt
 
 using std::string;
 using std::map;
@@ -127,9 +128,11 @@ void ASTNode::prepareInstances(list<Process*>& processes, list<SimpleTask*>& tas
         if (currentInputCriterion == NULL) {
             Pin* newPin = new Pin(attributes["name"],currNode);
             currNode->inputPins.push_back(newPin);
-            if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                newPin->optional = true;
-            }
+            // set minimum and maximum range of pin multiplicities
+            if (attributes.find("minimum") != attributes.end())
+              newPin->min = toInt(attributes["minimum"]);
+            if (attributes.find("maximum") != attributes.end())
+              newPin->max = toInt(attributes["maximum"]);
         } else {
             Pin* existingPin = currNode->getPinByName(attributes["name"]);
             if (!existingPin->free()) {
@@ -142,9 +145,12 @@ void ASTNode::prepareInstances(list<Process*>& processes, list<SimpleTask*>& tas
         if (currentOutputCriterion == NULL) {
             Pin* newPin = new Pin(attributes["name"],currNode);
             currNode->outputPins.push_back(newPin);
-            if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                newPin->optional = true;
-            }
+            // set minimum and maximum range of pin multiplicities
+            if (attributes.find("minimum") != attributes.end())
+              newPin->min = toInt(attributes["minimum"]);
+            if (attributes.find("maximum") != attributes.end())
+              newPin->max = toInt(attributes["maximum"]);
+
         } else {
             Pin* existingPin = currNode->getPinByName(attributes["name"]);
             if (!existingPin->free()) {
@@ -304,14 +310,16 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 for(list<Pin*>::iterator copyInput = (*globalTask)->inputPins.begin(); copyInput != (*globalTask)->inputPins.end(); copyInput++) {
                     Pin* newPin = new Pin((*copyInput)->getName(), currNode);
                     currNode->inputPins.push_back(newPin);
-                    newPin->optional = (*copyInput)->optional;
+                    newPin->min = (*copyInput)->min;
+                    newPin->max = (*copyInput)->max;
                 }
 
                 // copy all output pins
                 for(list<Pin*>::iterator copyOutput = (*globalTask)->outputPins.begin(); copyOutput != (*globalTask)->outputPins.end(); copyOutput++) {
                     Pin* newPin = new Pin((*copyOutput)->getName(), currNode);
                     currNode->inputPins.push_back(newPin);
-                    newPin->optional = (*copyOutput)->optional;
+                    newPin->min = (*copyOutput)->min;
+                    newPin->max = (*copyOutput)->max;
                 }
 
                 // copy all input criteria and translate the pin pointers of the original to pin pointers of the instance
@@ -357,14 +365,16 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 for(list<Pin*>::iterator copyInput = (*globalService)->inputPins.begin(); copyInput != (*globalService)->inputPins.end(); copyInput++) {
                     Pin* newPin = new Pin((*copyInput)->getName(), currNode);
                     currNode->inputPins.push_back(newPin);
-                    newPin->optional = (*copyInput)->optional;
+                    newPin->min = (*copyInput)->min;
+                    newPin->max = (*copyInput)->max;
                 }
 
                 // copy all output pins
                 for(list<Pin*>::iterator copyOutput = (*globalService)->outputPins.begin(); copyOutput != (*globalService)->outputPins.end(); copyOutput++) {
                     Pin* newPin = new Pin((*copyOutput)->getName(), currNode);
                     currNode->inputPins.push_back(newPin);
-                    newPin->optional = (*copyOutput)->optional;
+                    newPin->min = (*copyOutput)->min;
+                    newPin->max = (*copyOutput)->max;
                 }
 
                 // copy all input criteria and translate the pin pointers of the original to pin pointers of the instance
@@ -410,14 +420,16 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 for(list<Pin*>::iterator copyInput = (*globalProcess)->inputPins.begin(); copyInput != (*globalProcess)->inputPins.end(); copyInput++) {
                     Pin* newPin = new Pin((*copyInput)->getName(), currNode);
                     currNode->inputPins.push_back(newPin);
-                    newPin->optional = (*copyInput)->optional;
+                    newPin->min = (*copyInput)->min;
+                    newPin->max = (*copyInput)->max;
                 }
 
                 // copy all output pins
                 for(list<Pin*>::iterator copyOutput = (*globalProcess)->outputPins.begin(); copyOutput != (*globalProcess)->outputPins.end(); copyOutput++) {
                     Pin* newPin = new Pin((*copyOutput)->getName(), currNode);
                     currNode->inputPins.push_back(newPin);
-                    newPin->optional = (*copyOutput)->optional;
+                    newPin->min = (*copyOutput)->min;
+                    newPin->max = (*copyOutput)->max;
                 }
 
                 // copy all input criteria and translate the pin pointers of the original to pin pointers of the instance
@@ -591,14 +603,24 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 // instantiate a new pin
                 Pin* newPin = new Pin(attributes["name"],currNode);
                 currNode->inputPins.push_back(newPin);
-                if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                    newPin->optional = true;
-                }
+                // set minimum and maximum range of pin multiplicities
+                if (attributes.find("minimum") != attributes.end())
+                  newPin->min = toInt(attributes["minimum"]);
+                if (attributes.find("maximum") != attributes.end())
+                  newPin->max = toInt(attributes["maximum"]);
+
+                // if data is associated to this pin, then it is a data pin
+                if (attributes.find("associatedData") != attributes.end())
+                  newPin->isDataPin = true;
+
                 newPin = new Pin(attributes["name"],currProcess);
                 currProcess->inputPins.push_back(newPin);
-                if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                    newPin->optional = true;
-                }
+                // set minimum and maximum range of pin multiplicities
+                if (attributes.find("minimum") != attributes.end())
+                  newPin->min = toInt(attributes["minimum"]);
+                if (attributes.find("maximum") != attributes.end())
+                  newPin->max = toInt(attributes["maximum"]);
+
                 // if data is associated to this pin, then it is a data pin
                 if (attributes.find("associatedData") != attributes.end())
                   newPin->isDataPin = true;
@@ -622,9 +644,12 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 if (currentBranch != NULL) {
                     currentBranch->pins.push_back(newPin);
                 }
-                if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                    newPin->optional = true;
-                }
+                // set minimum and maximum range of pin multiplicities
+                if (attributes.find("minimum") != attributes.end())
+                  newPin->min = toInt(attributes["minimum"]);
+                if (attributes.find("maximum") != attributes.end())
+                  newPin->max = toInt(attributes["maximum"]);
+
                 // if data is associated to this pin, then it is a data pin
                 if (attributes.find("associatedData") != attributes.end())
                   newPin->isDataPin = true;
@@ -643,14 +668,21 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
             if (currentOutputCriterion == NULL) {
                 Pin* newPin = new Pin(attributes["name"],currNode);
                 currNode->outputPins.push_back(newPin);
-                if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                    newPin->optional = true;
-                }
+                // set minimum and maximum range of pin multiplicities
+                if (attributes.find("minimum") != attributes.end())
+                  newPin->min = toInt(attributes["minimum"]);
+                if (attributes.find("maximum") != attributes.end())
+                  newPin->max = toInt(attributes["maximum"]);
+
+
                 newPin = new Pin(attributes["name"],currProcess);
                 currProcess->outputPins.push_back(newPin);
-                if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                    newPin->optional = true;
-                }
+                // set minimum and maximum range of pin multiplicities
+                if (attributes.find("minimum") != attributes.end())
+                  newPin->min = toInt(attributes["minimum"]);
+                if (attributes.find("maximum") != attributes.end())
+                  newPin->max = toInt(attributes["maximum"]);
+
             } else {
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 Pin* existingProcessPin = currProcess->getPinByName(attributes["name"]);
@@ -669,9 +701,12 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 if (currentBranch != NULL) {
                     currentBranch->pins.push_back(newPin);
                 }
-                if ((attributes["minimum"] != "1" && attributes["minimum"] != "") || (attributes["maximum"] != "1" && attributes["maximum"] != "")) {
-                    newPin->optional = true;
-                }
+                // set minimum and maximum range of pin multiplicities
+                if (attributes.find("minimum") != attributes.end())
+                  newPin->min = toInt(attributes["minimum"]);
+                if (attributes.find("maximum") != attributes.end())
+                  newPin->max = toInt(attributes["maximum"]);
+
             } else {
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
@@ -713,9 +748,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
         }
         Pin* connectedPin = sourceNode->getPinByName(sourceContact);
         connectedPin->setConnection(currConnection);
-        if (connectedPin->optional) {
-          currNode->processCharacteristics |= UML_PIN_MULTIPLICITIES;
-        }
+
     } else if (tag == "target") {
         string targetName;
         string targetContact;
@@ -739,9 +772,6 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
             currConnection->setOutput(targetNode->getPinByName(targetContact));
             Pin* connectedPin = targetNode->getPinByName(targetContact);
             connectedPin->setConnection(currConnection);
-            if (connectedPin->optional) {
-              currNode->processCharacteristics |= UML_PIN_MULTIPLICITIES;
-            }
         }
 
 

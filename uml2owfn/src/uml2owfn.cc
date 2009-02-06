@@ -300,8 +300,6 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     safeStateFormula = NULL;
   }
 
-  cerr << "completed everything" << endl;
-
 // TODO: WARNING: the allocated net is not freed to avoid
 //                a bug with the GCC under Linux and Cygwin
 //  delete PN;    // finish Petri net
@@ -426,7 +424,9 @@ int main( int argc, char *argv[])
           UmlProcessStatistics stat = process->getStatistics();
           log_print(stat.toString(';'));
 
-          if (globals::parameters[P_FILTER]) {
+          if (   globals::parameters[P_FILTER]
+              || (UML_EMPTY_PROCESS & process->processCharacteristics))
+          {
             // do not translate process if it violates one of our structural constraints
             if (process->processCharacteristics != UML_STANDARD) {
               string reason = "";

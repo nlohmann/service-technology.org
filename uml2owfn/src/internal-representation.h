@@ -147,8 +147,11 @@ class Pin {
 
     public:
 
-        /// boolean saving that this pin is an optional pin the BOM model (meaning not min=1 or not max=1)
-        bool optional;
+        /// minimum consumption/production of tokens at this pin
+        int min;
+
+        /// maximum consumption/production of tokens at this pin
+        int max;
 
         /// whether this pin takes data-flow tokens, plays a role when filtering pin multiplicities on forks and joins
         bool isDataPin;

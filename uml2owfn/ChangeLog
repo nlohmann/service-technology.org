@@ -27,6 +27,11 @@ Version 2.00-unreleased
 * Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses
   full node names instead of short node names.
 
+* Made filtering of processes more precise according to the semantics
+  implemented in the WebSphere tools: Translation now considers all pin
+  multiplicities, and only non-matching pairs of multiplicities (produce one
+  token, consume two token) are considered erroneous.
+
 * Extended the translation log file which now distinguishes properties of UML
   processes and of the Petri nets
 

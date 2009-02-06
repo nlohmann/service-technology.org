@@ -91,7 +91,8 @@ Pin::Pin(string inputName, FlowContentNode* owner) {
     owningNode = owner;
     attachedConnection = NULL;
     owningCriterion = NULL;
-    optional = false;
+    min = 1;  // standard production/consumption ranges
+    max = 1;
     isDataPin = false;
 }
 
@@ -638,6 +639,7 @@ void Process::updateCharacteristics() {
     if (n->getType() == NJOIN) {
       for (list<Pin*>::const_iterator pin = n->inputPins.begin(); pin != n->inputPins.end(); pin++) {
         if ((*pin)->isDataPin) {
+          cerr << "join has multiplicities" << endl;
           n->processCharacteristics |= UML_PIN_MULTIPLICITIES;
         }
       }
@@ -645,6 +647,18 @@ void Process::updateCharacteristics() {
 
     // the process inherits all node characteristics
     processCharacteristics |= n->processCharacteristics;
+  }
+
+  for (list<FlowContentConnection*>::const_iterator edge = flowContentConnections.begin(); edge != flowContentConnections.end(); edge++) {
+    FlowContentConnection* c = (*edge);
+
+    // pin multiplicities at source and target do not match
+    if (   c->getInput()->min != c->getOutput()->min
+        || c->getInput()->max != c->getOutput()->max)
+    {
+      // extend characteristics for filtering
+      processCharacteristics |= UML_PIN_MULTIPLICITIES;
+    }
   }
 }
 

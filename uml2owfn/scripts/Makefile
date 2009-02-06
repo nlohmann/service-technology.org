@@ -111,16 +111,16 @@ results.csv: safeness soundness
 # create files
 ##########################################################################
 translate: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 translateweak: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a noData -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a noData -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 	
 translatewf: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 translateor: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p filter -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 
 ##########################################################################

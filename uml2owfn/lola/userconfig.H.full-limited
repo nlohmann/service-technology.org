@@ -12,8 +12,8 @@
 // space construction reaches a state with more tokens on a place
 // than specified.
 
-#define CHECKCAPACITY 
-#define CAPACITY 1
+//#define CHECKCAPACITY 
+//#define CAPACITY 1
 
 //// cap state space generation at 1,000,000 states
 #define MAXIMALSTATES 1000000
@@ -52,10 +52,10 @@
 // finally applied in the exectuable program.
 
 //#define COVER
-#define STUBBORN
+//#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
-#define PREDUCTION
+//#define PREDUCTION
 //#define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE

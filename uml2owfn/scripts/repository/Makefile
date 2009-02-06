@@ -1,13 +1,13 @@
 # Script to analyse nets and collect important data in tables
 
 UML2OWFN       = uml2owfn
-UML2OWFN_FLAGS = -p filter -p log
+UML2OWFN_FLAGS = -p log
 LOLA           = lola
 LOLA-MC        = lola-mc
 LOLA-SP        = lola-sp
 LOLA-FULL-LIMITED = lola-full-limited
 FIONA          = fiona
-MAKE		   = make
+MAKE           = make
 #BPELSCRIPT     = ./bpel_info.sh
 BPELSCRIPT     = echo
 #PETRINETSCRIPT = ./petrinet_info.sh
@@ -64,7 +64,7 @@ define TARGET_template_SOUNDNESS
   ALL_TARGETS_COMPLETE += lola_full_$(1)_out lola_safe_$(1)_out lola_sound_$(1)_out
   # targets for creating tables
   $(1)_DIRS := $$(wildcard */*/$(1)/)
-  $(1)_table: lola_sound_$(1)_out lola_safe_$(1)_out ; $$(MAKE) $(1)_tables_petrinet 
+  $(1)_table: lola_sound_$(1)_out lola_safe_$(1)_out ; $$(MAKE) $(1)_tables_petrinet
   $(1)_tables_petrinet: $$($(1)_DIRS:/$(1)/=_$(1)_petrinet.html)
   %_$(1)_petrinet.html: lola_safe_$(1)_out lola_sound_$(1)_out ; @$(SOUNDNESSSCRIPT) $${@:_$(1)_petrinet.html=/$(1)/} $$@
   ALL_TARGETS_TABLE += $(1)_table
@@ -87,7 +87,7 @@ define TARGET_template_CONTROLLABILITY
   ALL_TARGETS_COMPLETE += owfn_$(1)_out owfn_$(1)_red_out
   # targets for creating tables
   $(1)_DIRS := $$(wildcard */*/$(1)/)
-  $(1)_table: owfn_$(1)_out owfn_$(1)_red_out ; $$(MAKE) $(1)_tables_petrinet 
+  $(1)_table: owfn_$(1)_out owfn_$(1)_red_out ; $$(MAKE) $(1)_tables_petrinet
   $(1)_tables_petrinet: $$($(1)_DIRS:/$(1)/=_$(1)_petrinet.html)
   %_$(1)_petrinet.html: owfn_$(1)_out owfn_$(1)_red_out ; @$(CONTROLLABILITYSCRIPT) $${@:_$(1)_petrinet.html=/$(1)/} $$@
   ALL_TARGETS_TABLE += $(1)_table
@@ -101,7 +101,7 @@ $(foreach task,$(CONTROLLABILITY_TASKS),$(eval $(call TARGET_template_CONTROLLAB
 
 files: $(SOUNDNESS_TASKS) $(CONTROLLABILITY_TASKS)
 
-analysis: ${ALL_TARGETS_COMPLETE} 
+analysis: ${ALL_TARGETS_COMPLETE}
 soundness: $(ALL_TARGETS_SOUNDNESS)
 safesound: $(ALL_TARGETS_SAFESOUND)
 soundsafe: $(ALL_TARGETS_SOUNDSAFE)
@@ -123,12 +123,12 @@ outfiles: files
 
 %/sound_r/: %.xml
 	-@$(MKDIR_P) ./$@/
-	-@$(UML2OWFN) $(UML2OWFN_FLAGS) -i $< -r 3 -f lola -a soundness -a safe -p ctl -p taskfile --output=$@/ 2> $@/translation.log
+	-@$(UML2OWFN) $(UML2OWFN_FLAGS) -i $< -r 3 -f lola -a soundness -a safe -a orJoin -p ctl -p taskfile --output=$@/ 2> $@/translation.log
 
 %/sound_r_pin/: %.xml
 	-@$(MKDIR_P) ./$@/
-	-@$(UML2OWFN) $(UML2OWFN_FLAGS) -i $< -r 3 -f lola -a soundness -a safe -a removePinsets -p ctl -p taskfile --output=$@/ 2> $@/translation.log
-	
+	-@$(UML2OWFN) $(UML2OWFN_FLAGS) -i $< -r 3 -f lola -a soundness -a safe -a noData -p ctl -p taskfile --output=$@/ 2> $@/translation.log
+
 %/ig_r/: %.xml
 	-@$(MKDIR_P) ./$@/
 	-@$(UML2OWFN) $(UML2OWFN_FLAGS) -i $< -f owfn -r 3 -R --output=$@/ 2> $@/translation.log
@@ -136,7 +136,7 @@ outfiles: files
 %/ig_full/: %.xml
 	-@$(MKDIR_P) ./$@/
 	-@$(UML2OWFN) $(UML2OWFN_FLAGS) -i $< -f owfn -R --output=$@/ 2> $@/translation.log
-	
+
 ##########################################################################
 # analysis (safeness, soundness, full state space)
 ##########################################################################
@@ -177,14 +177,14 @@ outfiles: files
 # table
 ##########################################################################
 
-#	@$(MAKE) $(DIRS:/=_uml.html)
+#   @$(MAKE) $(DIRS:/=_uml.html)
 table: $(ALL_TARGETS_TABLE)
 
 %_uml.html: %/
 	-@$(BPELSCRIPT) $<
 
 %_petrinet.html: %/
-	-@$(PETRINETSCRIPT) $< 
+	-@$(PETRINETSCRIPT) $<
 
 clean:
 	@echo "the following clean targets are available:"
@@ -193,7 +193,7 @@ clean:
 	@echo "* cleanfiles      generated model files and analysis results"
 	@echo "* cleantable      generated tables, html- and tex-files"
 	@echo
-	
+
 cleanfiles: cleananalysis
 	-@rm */*/*/*.lola
 	-@rm */*/*/*.owfn
@@ -205,14 +205,14 @@ cleanfiles: cleananalysis
 	-@rmdir */*/sound_r_pin/
 	-@rmdir */*/ig_r/
 	-@rmdir */*/ig_full/
-	
+
 cleananalysis: cleantemp
 	-@rm */*/*/*.outfile*
-	
+
 cleantable: cleantemp
 	-@rm */*.html
 	-@rm */*.tex
-	
+
 cleantemp:
 	-@rm */*/*/results.csv
 	-@rm */*/*/result_*.log

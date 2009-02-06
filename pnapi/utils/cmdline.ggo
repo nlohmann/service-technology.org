@@ -1,4 +1,4 @@
-args "--unamed-opts --show-required --include-getopt"
+args "--unamed-opts=FILE --show-required --include-getopt"
 
 package "petri"
 version "1.0"
@@ -10,7 +10,7 @@ section "Input and Output"
 option "input" i
   "Select the input file format"
   typestr="FORMAT"
-  values="owfn" enum
+  values="owfn","lola","sa" enum
   optional
   default="owfn"
 
@@ -22,10 +22,50 @@ option "output" o
   multiple
 
 
-section "Check for structural properties"
+defmode "Check for Structural Properties"
 
-option "check" c
-  "Check a structural property of the Petri net"
+modeoption "isFreeChoice" -
+  "Check if the Petri net is free choice, i.e. if conflicting transitions share all pre-places."
+  flag off
+  mode="Check for Structural Properties"
+
+modeoption "isNormal" -
+  "Check if the Petri net is normal, i.e. every transition is connect to at most one interface place."
+  flag off
+  mode="Check for Structural Properties"
+
+modeoption "isWorkflow" -
+  "Check if the Petri net has workflow structure, i.e. it (i) has a distinct source place, (ii) has a district sink place, and (iii) every node lays on a path between the source place and the sink place."
+  flag off
+  mode="Check for Structural Properties"
+
+modeoption "check" c
+  "Check a structural property of the Petri net, see `isFreeChoice', `isNormal', and `isWorkflow' for details."
   typestr="PROPERTY"
-  values="normal","freechoice","workflow" enum
+  values="freechoice","normal","workflow" enum
+  mode="Check for Structural Properties"
   optional
+  hidden
+
+
+defmode "Modifications"
+
+modeoption "reduce" r
+  "Apply structural reduction rules, i.e. reduce the structure of the net while preserving liveness and boundedness."
+  typestr="LEVEL" int
+  values="0","1","2","3","4","5"
+  default="0"
+  mode="Modifications"
+  optional
+
+modeoption "normalize" n
+  "Normalize the Petri net, i.e. change to structure such that every transition is connected to at most one interface place."
+  mode="Modifications"
+  flag off
+
+
+section "Debugging"
+
+option "verbose" v
+  "Show verbose output"
+  flag off

@@ -54,6 +54,10 @@ int main(int argc, char** argv) {
             std::cerr << error << std::endl;
             exit(EXIT_FAILURE);
         }
+
+        if (args_info.verbose_given) {
+            std::cerr << "<stdin>: " << net << std::endl;
+        }
         
         nets.push_back(net);
         names.push_back("<stdin>");
@@ -76,9 +80,34 @@ int main(int argc, char** argv) {
                 exit(EXIT_FAILURE);
             }
             
-            infile.close();            
+            infile.close();
+            
+            if (args_info.verbose_given) {
+                std::cerr << args_info.inputs[i] << ": " << net << std::endl;
+            }
+            
             nets.push_back(net);
             names.push_back(args_info.inputs[i]);
+        }
+    }
+
+
+    /****************
+    * MODIFICATIONS *
+    *****************/
+    if (args_info.normalize_given) {
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+            nets[i].normalize();
+        }        
+    }
+    
+    
+    /***********************
+    * STRUCTURAL REDUCTION *
+    ***********************/
+    if (args_info.reduce_given && args_info.reduce_arg > 0) {
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+            nets[i].reduce(args_info.reduce_arg);
         }
     }
     
@@ -86,22 +115,21 @@ int main(int argc, char** argv) {
     /************************
     * STRUCTURAL PROPERTIES *
     ************************/
-    if (args_info.check_given) {
+    if (args_info.check_given || args_info.isFreeChoice_given ||
+        args_info.isNormal_given || args_info.isWorkflow_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
             std::cerr << names[i] << ": ";
 
-            switch(args_info.check_arg) {            
-                case (check_arg_freechoice):
-                std::cerr << nets[i].isFreeChoice() << std::endl;
-                break;
-
-                case (check_arg_normal):
-                std::cerr << nets[i].isNormal() << std::endl;
-                break;
-
-                case (check_arg_workflow):
-                nets[i].isWorkflow();
-                break;
+            if (args_info.check_arg == check_arg_freechoice || args_info.isFreeChoice_given) {
+                std::cerr << nets[i].isFreeChoice() << std::endl;                
+            }
+            
+            if (args_info.check_arg == check_arg_normal || args_info.isNormal_given) {
+                std::cerr << nets[i].isNormal() << std::endl;                
+            }
+            
+            if (args_info.check_arg == check_arg_workflow || args_info.isWorkflow_given) {
+                nets[i].isWorkflow();                
             }
         }
     }

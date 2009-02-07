@@ -37,7 +37,7 @@ class Marking;
 
     virtual Formula * flatCopy() const = 0;
 
-    //virtual Formula * deepCopy(const map<Place *, Place *> &newP) const = 0;
+    virtual Formula * deepCopy(map<Place *, Place *> &newP) const = 0;
 
   };
 
@@ -50,6 +50,7 @@ class Marking;
   class AtomicFormula : public Formula
   {
   public:
+    /// standard constructor
     AtomicFormula(Place &p, unsigned int k);
 
     virtual ~AtomicFormula() {}
@@ -64,7 +65,7 @@ class Marking;
 
     virtual AtomicFormula * flatCopy() const = 0;
 
-    //virtual AtomicFormula * deepCopy(const map<Place *, Place *> &newP) const = 0;
+    virtual AtomicFormula * deepCopy(map<Place *, Place *> &newP) const = 0;
 
   protected:
     /// copy constructor
@@ -78,10 +79,8 @@ class Marking;
   class FormulaEqual : public AtomicFormula
   {
   public:
+    /// standard constructor
     FormulaEqual(Place &p, unsigned int k);
-
-    /// copy constructor
-    //FormulaEqual(const FormulaEqual &f);
 
     virtual ~FormulaEqual() {}
 
@@ -91,12 +90,13 @@ class Marking;
 
     FormulaEqual * flatCopy() const;
 
-    //FormulaEqual * deepCopy(const map<Place *, Place *> &newP) const;
+    FormulaEqual * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class FormulaNotEqual : public AtomicFormula
   {
   public:
+    /// standard constructor
     FormulaNotEqual(Place &p, unsigned int k);
 
     /// copy constructor
@@ -109,12 +109,14 @@ class Marking;
     const string toString() const;
 
     FormulaNotEqual * flatCopy() const;
-    //FormulaNotEqual * deepCopy(const map<Place *, Place *> &newP) const;
+
+    FormulaNotEqual * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class FormulaGreater : public AtomicFormula
   {
   public:
+    /// standard constructor
     FormulaGreater(Place &p, unsigned int k);
 
     /// copy constructor
@@ -127,12 +129,14 @@ class Marking;
     const string toString() const;
 
     FormulaGreater * flatCopy() const;
-    //FormulaGreater * deepCopy(const map<Place *, Place *> &newP) const;
+
+    FormulaGreater * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class FormulaGreaterEqual : public AtomicFormula
   {
   public:
+    /// standard constructor
     FormulaGreaterEqual(Place &p, unsigned int k);
 
     /// copy constructor
@@ -145,12 +149,14 @@ class Marking;
     const string toString() const;
 
     FormulaGreaterEqual * flatCopy() const;
-    //FormulaGreaterEqual * deepCopy(const map<Place *, Place *> &newP) const;
+
+    FormulaGreaterEqual * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class FormulaLess : public AtomicFormula
   {
   public:
+    /// standard constructor
     FormulaLess(Place &p, unsigned int k);
 
     ///copy constructor
@@ -163,12 +169,14 @@ class Marking;
     const string toString() const;
 
     FormulaLess * flatCopy() const;
-    //FormulaLess * deepCopy(const map<Place *, Place *> &newP) const;
+
+    FormulaLess * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class FormulaLessEqual : public AtomicFormula
   {
   public:
+    /// standard constructor
     FormulaLessEqual(Place &p, unsigned int k);
 
     /// copy constructor
@@ -181,7 +189,8 @@ class Marking;
     const string toString() const;
 
     FormulaLessEqual * flatCopy() const;
-    //FormulaLessEqual * deepCopy(const map<Place *, Place *> &newP) const;
+
+    FormulaLessEqual * deepCopy(map<Place *, Place *> &newP) const;
   };
 
 
@@ -193,6 +202,7 @@ class Marking;
   class UnaryBooleanFormula : public Formula
   {
   public:
+    /// standard constructor
     UnaryBooleanFormula(Formula *f);
 
     UnaryBooleanFormula(const UnaryBooleanFormula &f);
@@ -204,7 +214,8 @@ class Marking;
     virtual const string toString() const = 0;
 
     virtual UnaryBooleanFormula * flatCopy() const = 0;
-    //virtual UnaryBooleanFormula * deepCopy(const map<Place *, Place *> &newP) const = 0;
+
+    virtual UnaryBooleanFormula * deepCopy(map<Place *, Place *> &newP) const = 0;
 
   protected:
     Formula *sub_;
@@ -213,6 +224,7 @@ class Marking;
   class FormulaNot : public UnaryBooleanFormula
   {
   public:
+    /// standard constructor
     FormulaNot(Formula *f);
 
     FormulaNot(const Formula &);
@@ -228,7 +240,7 @@ class Marking;
 
     FormulaNot * flatCopy() const;
 
-    //FormulaNot * deepCopy(const map<Place *, Place *> &newP) const;
+    FormulaNot * deepCopy(map<Place *, Place *> &newP) const;
   };
 
 
@@ -240,6 +252,7 @@ class Marking;
   class NaryBooleanFormula : public Formula
   {
   public:
+    /// standard constructors
     NaryBooleanFormula(Formula *l, Formula *r);
 
     NaryBooleanFormula(list<Formula *> &flst);
@@ -254,7 +267,7 @@ class Marking;
 
     virtual NaryBooleanFormula * flatCopy() const = 0;
 
-    //virtual NaryBooleanFormula * deepCopy(const map<Place *, Place *> &newP) const = 0;
+    virtual NaryBooleanFormula * deepCopy(map<Place *, Place *> &newP) const = 0;
 
   protected:
     list<Formula *> subs_;
@@ -266,9 +279,10 @@ class Marking;
   class FormulaAnd : public NaryBooleanFormula
   {
   public:
+    /// standard constructors
     FormulaAnd(Formula *l, Formula *r);
 
-    FormulaAnd(const Formula &, const Formula &);
+    FormulaAnd(const Formula &l, const Formula &r);
 
     FormulaAnd(list<Formula *> &flst);
 
@@ -280,15 +294,16 @@ class Marking;
 
     FormulaAnd * flatCopy() const;
 
-    //FormulaAnd * deepCopy(const map<Place *, Place *> &newP) const;
+    FormulaAnd * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class FormulaOr : public NaryBooleanFormula
   {
   public:
+    /// standard constructor
     FormulaOr(Formula *l, Formula *r);
 
-    FormulaOr(const Formula &, const Formula &);
+    FormulaOr(const Formula &l, const Formula &r);
 
     FormulaOr(list<Formula *> &flst);
 
@@ -300,7 +315,7 @@ class Marking;
 
     FormulaOr * flatCopy() const;
 
-    //FormulaOr * deepCopy(const map<Place *, Place *> &newP) const;
+    FormulaOr * deepCopy(map<Place *, Place *> &newP) const;
   };
 
 
@@ -320,7 +335,7 @@ class Marking;
 
     True * flatCopy() const;
 
-    True * deepCopy(const map<Place *, Place *> &newP) const;
+    True * deepCopy(map<Place *, Place *> &newP) const;
   };
 
   class False : public Formula
@@ -334,10 +349,10 @@ class Marking;
 
     False * flatCopy() const;
 
-    False * deepCopy(const map<Place *, Place *> &newP) const;
+    False * deepCopy(map<Place *, Place *> &newP) const;
   };
 
-  
+
   /// formula construction operator
   FormulaEqual operator==(Place &, unsigned int);
 

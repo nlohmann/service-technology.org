@@ -594,7 +594,7 @@ namespace pnapi
    *          A Petri net (resp. open net) is called normal if
    *          each transition has only one interface place in its neighborhood.
    */
-  void PetriNet::normalize()
+    void PetriNet::normalize()
   {
 
     std::string suffix = "_normalized";
@@ -602,54 +602,56 @@ namespace pnapi
     set<Place *> interface = getInterfacePlaces();
 
     for (set<Place *>::iterator place = interface.begin(); place
-	   != interface.end(); place++)
+        != interface.end(); place++)
+    {
+      set<Node *> neighbors = util::setUnion((*place)->getPreset(),
+          (*place)->getPostset());
+      for (set<Node *>::iterator transition = neighbors.begin(); transition
+          != neighbors.end(); transition++)
       {
-	set<Node *> neighbors = util::setUnion((*place)->getPreset(), (*place)->getPostset());
-	for (set<Node *>::iterator transition = neighbors.begin();
-	     transition != neighbors.end(); transition++)
-	  {
-	    Transition *t = static_cast<Transition *>(*transition);
-	    while (!t->isNormal())
-	      {
-		// create new internal place from interface place
-		Place &newP = createPlace((*place)->getName() + suffix);
+        Transition *t = static_cast<Transition *> (*transition);
+        while (!t->isNormal())
+        {
+          // create new internal place from interface place
+          Place &newP = createPlace((*place)->getName() + suffix);
 
-		// create new interface place
-		Place &newPin = createPlace("i_" + (*place)->getName(), (*place)->getType());
+          // create new interface place
+          Place &newPin = createPlace("i_" + (*place)->getName(),
+              (*place)->getType());
 
-		// create new transition
-		Transition &newT = createTransition("t_" + (*place)->getName());
+          // create new transition
+          Transition &newT = createTransition("t_" + (*place)->getName());
 
-		// set arcs (1, 2 & 3)
-		if ((*place)->getType() == Node::INPUT)
-		  {
-		    createArc(newPin, newT);
-		    createArc(newT, newP);
-		    for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-		      {
-			if (&(*f)->getSourceNode() == (*place))
-			  {
-			    createArc(newP, (*f)->getTargetNode());
-			  }
-		      }
-		  }
-		else
-		  {
-		    createArc(newT, newPin);
-		    createArc(newP, newT);
-		    for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-		      {
-			if (&(*f)->getTargetNode() == (*place))
-			  {
-			    createArc((*f)->getSourceNode(), newP);
-			  }
-		      }
-		  }
+          // set arcs (1, 2 & 3)
+          if ((*place)->getType() == Node::INPUT)
+          {
+            createArc(newPin, newT);
+            createArc(newT, newP);
+            for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+            {
+              if (&(*f)->getSourceNode() == (*place))
+              {
+                createArc(newP, (*f)->getTargetNode());
+              }
+            }
+          }
+          else
+          {
+            createArc(newT, newPin);
+            createArc(newP, newT);
+            for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
+            {
+              if (&(*f)->getTargetNode() == (*place))
+              {
+                createArc((*f)->getSourceNode(), newP);
+              }
+            }
+          }
 
-		temp.insert(*place);
-	      }
-	  }
+          temp.insert(*place);
+        }
       }
+    }
 
     // remove the old interface places
     for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
@@ -885,11 +887,11 @@ namespace pnapi
    *** Private PetriNet Function Definitions
    ***************************************************************************/
 
-  string PetriNet::getMetaInformation(std::ios_base & ios, 
-				      io::MetaInformation i, 
+  string PetriNet::getMetaInformation(std::ios_base & ios,
+				      io::MetaInformation i,
 				      const string & def) const
   {
-    map<io::MetaInformation, string> & streamMeta = 
+    map<io::MetaInformation, string> & streamMeta =
       io::util::MetaData::data(ios);
     if (streamMeta.find(i) != streamMeta.end())
       return streamMeta.find(i)->second;

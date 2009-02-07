@@ -15,7 +15,14 @@ namespace pnapi
   public:
     Condition();
     Condition(Formula *f);
+
+    /// flat copy constructor
     Condition(const Condition &c);
+
+    /// deep copy constructor
+    Condition(const Condition &c, map<Place *, Place *> &newP);
+
+    /// destructor
     virtual ~Condition() {}
 
     void merge(const Condition &c);

@@ -21,7 +21,12 @@ namespace pnapi
 
 
   Condition::Condition(const Condition &c) :
-    f_(c.f_)
+    f_(c.f_->flatCopy())
+  {
+  }
+
+  Condition::Condition(const Condition &c, map<Place *, Place *> &newP) :
+    f_(c.f_->deepCopy(newP))
   {
   }
 

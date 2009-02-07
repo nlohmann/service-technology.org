@@ -11,11 +11,7 @@
 #   new syntax and expect success.
 #############################################################################
 
-cd $testdir/bug12207
-
 result=0
-
-echo "TEST: bug12207.sh"
 
 fiona coffee_extended.owfn.ig.og -tpng -pno-png &> /dev/null
 let result=$result+$?-1

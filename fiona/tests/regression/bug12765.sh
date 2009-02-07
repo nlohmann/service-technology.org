@@ -12,21 +12,14 @@
 #   uncontrollability.
 #############################################################################
 
-cd $testdir/bug12765
-
 result=0
 
-TEMPFILE1=`mktemp`
-TEMPFILE2=`mktemp`
+fiona -t ig -Q -m4 cabbababb.owfn &> result-1.tmp
+fiona -t og -Q -m4 cabbababb.owfn &> result-2.tmp
 
-echo "TEST: bug12765.sh"
-
-fiona -t ig -Q -m4 cabbababb.owfn &> $TEMPFILE1
-fiona -t og -Q -m4 cabbababb.owfn &> $TEMPFILE2
-
-grep "net is controllable: NO" $TEMPFILE1 > /dev/null
+grep "net is controllable: NO" result-1.tmp > /dev/null
 let result=$result+$?
-grep "net is controllable: NO" $TEMPFILE2 > /dev/null
+grep "net is controllable: NO" result-2.tmp > /dev/null
 let result=$result+$?
 
 exit $result

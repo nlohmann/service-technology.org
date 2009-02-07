@@ -11,14 +11,8 @@
 #   Normalize net and compare size with expected size.
 #############################################################################
 
-cd $testdir/bug12239
+fiona coffee_extended-partner.normalized.owfn -t normalize -Q &> result.tmp
 
-TEMPFILE=`mktemp`
-
-echo "TEST: bug12239.sh"
-
-fiona coffee_extended-partner.normalized.owfn -t normalize -Q &> $TEMPFILE
-
-grep "|P|=8, |P_in|= 2, |P_out|= 1, |T|=5, |F|=12" $TEMPFILE > /dev/null
+grep "|P|=8, |P_in|= 2, |P_out|= 1, |T|=5, |F|=12" result.tmp > /dev/null
 
 exit $?

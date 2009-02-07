@@ -11,11 +11,7 @@
 #   Fiona to create "myCoffee.ig.og". Check if Fiona returns error code 4.
 #############################################################################
 
-cd $testdir/bug12101
-
 result=0
-
-echo "TEST: bug12101.sh"
 
 touch myCoffee.owfn.ig.og
 chmod a-w myCoffee.owfn.ig.og

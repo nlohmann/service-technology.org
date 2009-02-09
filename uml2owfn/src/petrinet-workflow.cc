@@ -1410,22 +1410,22 @@ bool ExtendedWorkflowNet::complete_to_WFnet() {
     if (p_coset.size() > 1) // only add the interesting coSets
       omegaCoSets.insert(p_coset);
 
-    /*
+/*
     for (set<Place*>::iterator p2 = co[*p].begin(); p2 != co[*p].end(); p2++) {
       cerr << "(" << (*p)->nodeFullName() << " || " << (*p2)->nodeFullName() << ") " << endl;
     }
-    */
+*/
 
     // check if there are omega places which are concurrent AND conflicting
     // then the subsequent extension cannot create an AND-join transition to
     // consume tokens in case of concurrent marking of the places, but only for
     // the alternative case
     for (set<Place*>::iterator p2 = confl[*p].begin(); p2 != confl[*p].end(); p2++) {
-      //cerr << "(" << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << ") " << endl;
+//      cerr << "(" << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << ") " << endl;
       if (co[*p].find(*p2) != co[*p].end())
         contradicting = true;
     }
-    //cerr << endl;
+//    cerr << endl;
   }
 
   // the constructed sets are an overapproximation, it may contain sets
@@ -1441,14 +1441,14 @@ bool ExtendedWorkflowNet::complete_to_WFnet() {
             // place *p2 is in conflict with place *p and both places are in
             // the current coset
 
-            /*
+/*
             cerr << "because of " << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << endl;
             cerr << "splitting" << endl;
             cerr << "{";
             for (set<Place*>::iterator p3 = (*coset).begin(); p3 != (*coset).end(); p3++)
               cerr << (*p3)->nodeFullName() << ", " << endl << " ";
             cerr << "}" << endl << "to" << endl;
-            */
+*/
 
             // create two copies of the coset
             set<Place*> coset_p = *coset;
@@ -1481,14 +1481,15 @@ bool ExtendedWorkflowNet::complete_to_WFnet() {
             if (canBeMaximal) {
               omegaCoSets.insert(coset_p);
 
-              /*
+/*
               cerr << "{";
               for (set<Place*>::iterator p3 = coset_p.begin(); p3 != coset_p.end(); p3++)
                 cerr << (*p3)->nodeFullName() << ", " << endl << " ";
               cerr << "}" << endl;
-              */
+*/
             }
 
+            canBeMaximal = false;
             // check if the new cosets are maximal, i.e. describe reachable markings
             for (set<Place*>::iterator p3 = coset_p2.begin(); p3 != coset_p2.end(); p3++) {
               bool onePlaceMissing = false;
@@ -1508,12 +1509,12 @@ bool ExtendedWorkflowNet::complete_to_WFnet() {
 
             if (canBeMaximal) {
               omegaCoSets.insert(coset_p2);
-              /*
+/*
               cerr << "{";
               for (set<Place*>::iterator p3 = coset_p2.begin(); p3 != coset_p2.end(); p3++)
                 cerr << (*p3)->nodeFullName() << ", " << endl<< " ";
               cerr << "}" << endl;
-              */
+*/
             }
 
             splitSets = true;
@@ -1559,16 +1560,6 @@ bool ExtendedWorkflowNet::complete_to_WFnet() {
       } // finished comparing to all existing coSets
     }
   } while (duplicateFound);
-
-/*
-  {
-    cerr << "{";
-    for (set<Place*>::iterator p2 = p_coset.begin(); p2 != p_coset.end(); p2++) {
-      cerr << (*p2)->nodeFullName() << ", ";
-    }
-    cerr << "}" << endl;
-  }
-*/
 
   // now construct the completion of the multi-terminal workflow net
   // add an AND-join transition for each coset of omega places

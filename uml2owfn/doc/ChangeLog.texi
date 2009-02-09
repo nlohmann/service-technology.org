@@ -9,6 +9,8 @@
   @item @samp{--rolexclusively=ROLE}, delete all roles, that are not covered by a startnode or by a containrole, that do not match the set of exclusive roles
   @end itemize
 @item Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses full node names instead of short node names.
+@item Bugfix: Updated generation of formula for safe states to consider post-places of transitions that lie on a cycle of the net as well. 
+@item Modified semantics of workflow net termination semantics (parameter @samp{-a wfNet}) which now assumes that the net terminates with a global orJoin and tries to extend the given net to a single terminal workflow net. The log file (@samp{-p log}) will contain an entry of this extension does not preserve soundness.
 @item Made filtering of processes more precise according to the semantics implemented in the WebSphere tools: Translation now considers all pin multiplicities, and only non-matching pairs of multiplicities (produce one token, consume two token) are considered erroneous. 
 @item Extended the translation log file which now distinguishes properties of UML processes and of the Petri nets
 @item Added @samp{--enable-debug} and @samp{--disable-assert} to @file{./configure} parameters to control the use of debug and assert code

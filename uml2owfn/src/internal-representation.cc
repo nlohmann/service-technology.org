@@ -639,7 +639,6 @@ void Process::updateCharacteristics() {
     if (n->getType() == NJOIN) {
       for (list<Pin*>::const_iterator pin = n->inputPins.begin(); pin != n->inputPins.end(); pin++) {
         if ((*pin)->isDataPin) {
-          cerr << "join has multiplicities" << endl;
           n->processCharacteristics |= UML_PIN_MULTIPLICITIES;
         }
       }

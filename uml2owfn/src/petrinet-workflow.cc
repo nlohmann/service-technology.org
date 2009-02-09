@@ -41,6 +41,7 @@
 #include <cassert>
 #include <iostream>
 #include <utility>
+#include <typeinfo>
 
 #include <stack>
 
@@ -1257,6 +1258,20 @@ FormulaState* ExtendedWorkflowNet::createSafeStatePredicate (bool mustBeNonEmpty
     processNodesLit_zero.insert(new PetriNetLiteral(p, COMPARE_GREATER, 1));
   }
 
+  // the post-places of all transitions that lay on a circle are also
+  // candidates for getting more than one token
+  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++) {
+    set<Node*> reach;
+    forwardReachableNodes(*t, &reach);
+    if (reach.find(*t) != reach.end()) {
+      // transition *t lies on a circle of the net
+      for (set<Node *>::iterator p = (*t)->postset.begin(); p != (*t)->postset.end(); p++) {
+        // all post-places *p of *t must have not more than one token
+        processNodesLit_zero.insert(new PetriNetLiteral(static_cast<Place*>(*p), COMPARE_GREATER, 1));
+      }
+    }
+  }
+
   // no place that could become unsafe
   if (processNodesLit_zero.empty()) {
     if (mustBeNonEmpty)
@@ -1275,3 +1290,320 @@ FormulaState* ExtendedWorkflowNet::createSafeStatePredicate (bool mustBeNonEmpty
   safeF->subFormulas.insert(processNodesLit_zero.begin(), processNodesLit_zero.end());
   return safeF;
 }
+
+
+/*!
+ * \brief   compute the set of all nodes that are forward reachable from node *n
+ *          (by depth-first search), add resulting nodes to the
+ *          set of nodes *reachable
+ */
+void ExtendedWorkflowNet::forwardReachableNodes(Node *n, set<Node*>* reachable) const {
+  assert(reachable != NULL);
+
+  list<Node *> stack;
+  stack.push_front(n);
+  // depth-first search on all nodes of the net that are reachable from node *n
+  while (!stack.empty()) {
+    Node *current = stack.front(); stack.pop_front();
+    // follow the post-set relation
+    for (set<Node*>::const_iterator post = current->postset.begin(); post != current->postset.end(); post++) {
+      if (reachable->find(*post) == reachable->end()) {
+        stack.push_front(*post);
+        reachable->insert(*post);
+      }
+    }
+  }
+}
+
+/*!
+ * \brief   extend a multi-terminal workflow net to a single-terminal
+ *          workflow net
+ *
+ * \result  true iff the net could be completed to a single terminal workflow
+ *          net while preserving soundness
+ */
+bool ExtendedWorkflowNet::complete_to_WFnet() {
+  // breadth-first search to identify concurrent nodes
+
+  list<Place *> omegaPlaces;
+
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
+    if ((*p)->isFinal)
+      omegaPlaces.push_back(*p);
+  }
+
+  map<Place *, set<Place*> > co;
+  map<Place *, set<Place*> > confl;
+
+  for (list<Place*>::iterator p = omegaPlaces.begin(); p != omegaPlaces.end(); p++) {
+    set<Node *> past_p;
+    list<Node *> stack;
+    stack.push_front(*p);
+    // backwards depth-first search to find all predecessors of place *p
+    while (!stack.empty()) {
+      Node *n = stack.front(); stack.pop_front();
+
+      // search all predecessors of n
+      for (set<Node*>::iterator pred = n->preset.begin(); pred != n->preset.end(); pred++) {
+        if (past_p.find(*pred) == past_p.end()) {
+          // put unvisited predecessor onto stack and add it to the visited nodes
+          stack.push_front(*pred);
+          past_p.insert(*pred);
+        }
+      }
+    }
+    // the set past_p contains all transitive predecessors of place *p
+
+    // compare with all omega places
+    for (list<Place*>::iterator p2 = omegaPlaces.begin(); p2 != omegaPlaces.end(); p2++) {
+      if (*p == *p2)  // don't compare identical places
+        continue;
+
+      set<Node *> past_p2;
+      stack.clear();
+      stack.push_front(*p2);
+      while (!stack.empty()) {
+        Node *n = stack.front(); stack.pop_front();
+
+        // search all predecessors of n
+        for (set<Node*>::iterator pred = n->preset.begin(); pred != n->preset.end(); pred++) {
+          if (past_p2.find(*pred) == past_p2.end()) {
+            // we're just visiting predecessor *pred
+            past_p2.insert(*pred);
+
+            // check if *pred is also backwards reachable from place *p
+            if (past_p.find(*pred) != past_p.end()) {
+              // node *pred is a common predecessor of place *p and place *p2
+
+              // if the predecessor is a transition, both places can be
+              // marked concurrenctly
+              if (typeid(**pred) == typeid(Transition)) {
+                co[*p].insert(*p2);
+                co[*p2].insert(*p);
+
+              // if the predecessor is a place, both places can be
+              // marked alternatively
+              } else if (typeid(**pred) == typeid(Place)) {
+                confl[*p].insert(*p2);
+                confl[*p2].insert(*p);
+              }
+              // we found evidence on how *p and *p2 relate to each other
+              // do not descend further
+            } else {
+              // no hit, search further before node *pred
+              stack.push_front(*pred);
+            }
+          }
+        } // finished searhcing all direct predecessors of node n
+      } // finished searching all transitive predecessors of place *p2
+    } // finished comparing the past of place *p to the past of all other places
+  } // finished constructing the co and confl relation for all omega places
+
+  // construct the set of all possible concurrent set of omega places
+  set< set<Place*> > omegaCoSets;
+  bool contradicting = false;
+  for (list<Place*>::iterator p = omegaPlaces.begin(); p != omegaPlaces.end(); p++) {
+
+    set<Place*> p_coset = co[*p];   // copy the co-set of p
+    p_coset.insert(*p); // and add *p to its co-set as well
+
+    if (p_coset.size() > 1) // only add the interesting coSets
+      omegaCoSets.insert(p_coset);
+
+    /*
+    for (set<Place*>::iterator p2 = co[*p].begin(); p2 != co[*p].end(); p2++) {
+      cerr << "(" << (*p)->nodeFullName() << " || " << (*p2)->nodeFullName() << ") " << endl;
+    }
+    */
+
+    // check if there are omega places which are concurrent AND conflicting
+    // then the subsequent extension cannot create an AND-join transition to
+    // consume tokens in case of concurrent marking of the places, but only for
+    // the alternative case
+    for (set<Place*>::iterator p2 = confl[*p].begin(); p2 != confl[*p].end(); p2++) {
+      //cerr << "(" << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << ") " << endl;
+      if (co[*p].find(*p2) != co[*p].end())
+        contradicting = true;
+    }
+    //cerr << endl;
+  }
+
+  // the constructed sets are an overapproximation, it may contain sets
+  // that contain conflicting nodes, find these sets, and split them
+  bool splitSets;
+  do {
+    splitSets = false;
+    for (set< set<Place*> >::iterator coset = omegaCoSets.begin(); coset != omegaCoSets.end(); coset++ ) {
+      // see if the current coset contains conflicting places
+      for (set<Place*>::iterator p = (*coset).begin(); p != (*coset).end(); p++) {
+        for (set<Place*>::iterator p2 = confl[*p].begin(); p2 != confl[*p].end(); p2++) {
+          if ((*coset).find(*p2) != (*coset).end()) {
+            // place *p2 is in conflict with place *p and both places are in
+            // the current coset
+
+            /*
+            cerr << "because of " << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << endl;
+            cerr << "splitting" << endl;
+            cerr << "{";
+            for (set<Place*>::iterator p3 = (*coset).begin(); p3 != (*coset).end(); p3++)
+              cerr << (*p3)->nodeFullName() << ", " << endl << " ";
+            cerr << "}" << endl << "to" << endl;
+            */
+
+            // create two copies of the coset
+            set<Place*> coset_p = *coset;
+            set<Place*> coset_p2 = *coset;
+            // one not containing place *p, one not containing place *p2
+            coset_p.erase(*p2);
+            coset_p2.erase(*p);
+
+            // remove the old coset and insert the new cosets
+            omegaCoSets.erase(*coset);
+
+            bool canBeMaximal = false;
+            // check if the new cosets are maximal, i.e. describe reachable markings
+            for (set<Place*>::iterator p3 = coset_p.begin(); p3 != coset_p.end(); p3++) {
+              bool onePlaceMissing = false;
+              for (set<Place*>::iterator p4 = co[*p3].begin(); p4 != co[*p3].end(); p4++) {
+                // place *p4 is concurrently reachable to place *p3
+                if (coset_p.find(*p4) == coset_p.end()) {
+                  // place *p4 is not in the reduced coSet that contains place *p3
+                  onePlaceMissing = true;
+                  break;
+                }
+              }
+              // for place *p3, all concurrent places are still in coset_p
+              // so coset_p contains a maximal set of concurrent places
+              if (!onePlaceMissing)
+                canBeMaximal = true;
+            }
+
+            if (canBeMaximal) {
+              omegaCoSets.insert(coset_p);
+
+              /*
+              cerr << "{";
+              for (set<Place*>::iterator p3 = coset_p.begin(); p3 != coset_p.end(); p3++)
+                cerr << (*p3)->nodeFullName() << ", " << endl << " ";
+              cerr << "}" << endl;
+              */
+            }
+
+            // check if the new cosets are maximal, i.e. describe reachable markings
+            for (set<Place*>::iterator p3 = coset_p2.begin(); p3 != coset_p2.end(); p3++) {
+              bool onePlaceMissing = false;
+              for (set<Place*>::iterator p4 = co[*p3].begin(); p4 != co[*p3].end(); p4++) {
+                // place *p4 is concurrently reachable to place *p3
+                if (coset_p2.find(*p4) == coset_p2.end()) {
+                  // place *p4 is not in the reduced coSet that contains place *p3
+                  onePlaceMissing = true;
+                  break;
+                }
+              }
+              // for place *p3, all concurrent places are still in coset_p2
+              // so coset_p2 contains a maximal set of concurrent places
+              if (!onePlaceMissing)
+                canBeMaximal = true;
+            }
+
+            if (canBeMaximal) {
+              omegaCoSets.insert(coset_p2);
+              /*
+              cerr << "{";
+              for (set<Place*>::iterator p3 = coset_p2.begin(); p3 != coset_p2.end(); p3++)
+                cerr << (*p3)->nodeFullName() << ", " << endl<< " ";
+              cerr << "}" << endl;
+              */
+            }
+
+            splitSets = true;
+            break;
+          }
+        }
+        if (splitSets)  // leave for-loop to re-initialize the iterators
+          break;
+      }
+      if (splitSets)  // leave for-loop to re-initialize the iterators
+        break;
+    }
+  } while (splitSets);
+
+  bool duplicateFound;
+  do {
+    duplicateFound = false;
+    // for each coSet
+    for (set< set<Place*> >::iterator coset = omegaCoSets.begin(); coset != omegaCoSets.end(); coset++ ) {
+      // check if there is a second coSet s.t. both coSets are equal
+      for (set< set<Place*> >::iterator coset2 = omegaCoSets.begin(); coset2 != omegaCoSets.end(); coset2++ ) {
+        if (*coset == *coset2) continue;
+
+        if ((*coset).size() == (*coset2).size()) {
+          // we found a coet2 that is possibly equal to coset
+
+          // see if the sets are different
+          bool noDifference = true;
+          for (set<Place*>::iterator p2 = (*coset2).begin(); p2 != (*coset2).end(); p2++) {
+            if ( (*coset).find(*p2) == (*coset).end() ) {
+              // place *p2 is not contained in the given coSet: they are not equal
+              noDifference = false;
+              break;
+            }
+          }
+
+          if (noDifference) {
+            duplicateFound = true;     // we found a duplicate set
+            omegaCoSets.erase(*coset); // remove the duplicate set from the set of all coSets
+            break;
+          }
+        }
+      } // finished comparing to all existing coSets
+    }
+  } while (duplicateFound);
+
+/*
+  {
+    cerr << "{";
+    for (set<Place*>::iterator p2 = p_coset.begin(); p2 != p_coset.end(); p2++) {
+      cerr << (*p2)->nodeFullName() << ", ";
+    }
+    cerr << "}" << endl;
+  }
+*/
+
+  // now construct the completion of the multi-terminal workflow net
+  // add an AND-join transition for each coset of omega places
+  int joinNum = 0;
+  for (set< set<Place*> >::iterator coset = omegaCoSets.begin(); coset != omegaCoSets.end(); coset++ ) {
+    Transition *t = newTransition("tANDjoin"+toString(joinNum));
+    for (set<Place*>::iterator pre = (*coset).begin(); pre != (*coset).end(); pre++) {
+      (*pre)->isFinal = false;
+      newArc(*pre, t);    // add arc from omega place to the AND-join transition
+    }
+    Place *p = newPlace("pANDjoinOmega"+toString(joinNum));
+    p->isFinal = true;
+    newArc(t,p);  // add new omega place after AND-join transition
+    joinNum++;
+  }
+
+  // add an XOR-join transition that that finishes all alternative completions
+  // to a single final omega place
+  Place *pOmega = newPlace("omega");
+
+  joinNum = 0;
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++ ) {
+    if ((*p)->isFinal) {
+      // create a transition consuming from the old omega node and producing
+      // on the new omega node
+      Transition *tFinal = newTransition("tXORjoin"+toString(joinNum));
+      (*p)->isFinal = false;
+      newArc(*p, tFinal);
+      newArc(tFinal, pOmega);
+      joinNum++;
+    }
+  }
+  pOmega->isFinal = true;
+
+
+  return !contradicting;
+}
+

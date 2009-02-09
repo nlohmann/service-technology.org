@@ -140,9 +140,14 @@ public:
   /// create the formula describing the safeness of the net
   FormulaState* createSafeStatePredicate (bool mustBeNonEmpty) const;
 
+  /// extend a multi-terminal workflow net to a single-terminal workflow net
+  bool complete_to_WFnet();
+
 private:
   void reduce_series_places();
   void reduce_series_transitions();
+
+  void forwardReachableNodes(Node *n, set<Node*>* reachable) const;
 };
 
 

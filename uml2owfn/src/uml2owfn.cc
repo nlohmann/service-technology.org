@@ -88,6 +88,7 @@ void analyze_cl(int argc, char *argv[])
 #define RES_UNCONNECTED       16
 #define RES_INSUFF_INTERFACE  32
 #define RES_INCORR_STRUCTURE  64
+#define RES_NOT_PRESERVED     128 ///< did not preserve soundness
 
 /*!
  * \brief translate the process according to the given analysis flags,
@@ -159,7 +160,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 
     // set termination semantics that will be used for the analysis
     terminationSemantics_t termination;
-    if (analysis[A_TERM_WF_NET]) termination = TERM_WORKFLOW;
+    if (analysis[A_TERM_WF_NET]) termination = TERM_ORJOIN;
     else if (analysis[A_TERM_IGNORE_DATA]) termination = TERM_IGNORE_DATA;
     else if (analysis[A_TERM_ORJOIN]) termination = TERM_ORJOIN;
     else termination = TERM_UML_STANDARD;
@@ -180,6 +181,13 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #endif
       PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
     }
+
+    // we want to analyze workflow nets: create a completion
+    if (analysis[A_TERM_WF_NET]) {
+      if (!PN->complete_to_WFnet())
+        res |= RES_NOT_PRESERVED;
+    }
+
   } // soundness
   // end of all net manipulations (except net reduction)
 
@@ -508,6 +516,7 @@ int main( int argc, char *argv[])
                 log_print(";");
                 if (res & RES_NOT_FREECHOICE) log_print("not free-choice/");
                 if (res & RES_NO_WF_STRUCTURE) log_print("no workflow structure/");
+                if (res & RES_NOT_PRESERVED) log_print("did not preserve soundness/");
               }
             }
           }

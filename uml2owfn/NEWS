@@ -27,6 +27,15 @@ Version 2.00-unreleased
 * Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses
   full node names instead of short node names.
 
+* Bugfix: Updated generation of formula for safe states to consider
+  post-places of transitions that lie on a cycle of the net as well.
+
+* Modified semantics of workflow net termination semantics (parameter `-a
+  wfNet') which now assumes that the net terminates with a global orJoin and
+  tries to extend the given net to a single terminal workflow net. The log
+  file (`-p log') will contain an entry of this extension does not preserve
+  soundness.
+
 * Made filtering of processes more precise according to the semantics
   implemented in the WebSphere tools: Translation now considers all pin
   multiplicities, and only non-matching pairs of multiplicities (produce one

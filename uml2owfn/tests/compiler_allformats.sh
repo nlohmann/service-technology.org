@@ -2,22 +2,12 @@
 
 source defaults.sh
 
-# copy files to builddir (in case it is a different directory)
-#if test \( "$testdir" = "$builddir" \)
-#then
-#  builddir_cleanup=0
-#else 
-#  $MKDIR_P $builddir/compiler
-#  cp $testdir/compiler/* $builddir/compiler
-#  builddir_cleanup=1
-#fi
-
 result=0
 DIR=$testdir/compiler
 FILE=TestSuite
 
 must_filecount=25
-must_filecount_filter=20
+must_filecount_filter=21
 
 echo ""
 echo "UML2oWFN compiler tests"
@@ -218,11 +208,5 @@ echo "UML2oWFN compiler tests"
 	rm $builddir/*.lola
 	rm $builddir/uml2owfn_$FILE.log
 
-
-# remove files from builddir
-#if [ $builddir_cleanup -eq 1 ] ; then
-#  rm -f $builddir/compiler/TestSuite.xml
-#  rmdir $builddir/compiler
-#fi
 
 exit $result

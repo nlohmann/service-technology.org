@@ -1,27 +1,22 @@
+// -*- C++ -*-
+
 #ifndef PNAPI_AUTOMATON_H
 #define PNAPI_AUTOMATON_H
 
 #include <list>
-#include <ostream>
-#include <set>
-#include <string>
-#include <vector>
-#include <map>
-#include "state.h"
-#include "marking.h"
 
-using std::list;
-using std::ostream;
-using std::set;
-using std::string;
-using std::vector;
-using std::map;
+#include "marking.h"
+#include "state.h"
 
 namespace pnapi
 {
 
-class PetriNet;
-class Transition;
+  // forward declarations
+  class State;
+  class Place;
+  class PetriNet;
+  class Transition;
+  class Marking;
 
 enum Format { SA, STG };
 
@@ -42,7 +37,7 @@ public:
   void createAutomaton();
 
   /// friend operation <<
-  friend ostream &operator <<(ostream &os, const Automaton &sa);
+  friend std::ostream &operator <<(std::ostream &os, const Automaton &sa);
 
   void setFormat(Format f);
 
@@ -50,13 +45,13 @@ private:
 
   static const int HASHSIZE = 65535;
 
-  vector<set<State *> > hashTable_;
-  map<Place *, unsigned int> primes_;
+  std::vector<std::set<State *> > hashTable_;
+  std::map<Place *, unsigned int> primes_;
 
-  list<string> in_;
-  list<string> out_;
+  std::list<string> in_;
+  std::list<string> out_;
   unsigned int first_;
-  list<unsigned int> finals_;
+  std::list<unsigned int> finals_;
 
   map<Transition *, string> reasons_;
 
@@ -74,13 +69,13 @@ private:
   void dfs(State &i);
 
   /// temporary output methods
-  void output_sa(ostream &os) const;
-  void output_stg(ostream &os) const;
+  void output_sa(std::ostream &os) const;
+  void output_stg(std::ostream &os) const;
 };
 
 /*** overloaded operator << ***/
 
-ostream &operator <<(ostream &os, const Automaton &sa);
+std::ostream &operator <<(std::ostream &os, const Automaton &sa);
 
 }
 

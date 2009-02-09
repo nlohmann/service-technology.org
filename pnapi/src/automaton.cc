@@ -1,5 +1,5 @@
 /*!
- * \file    serviceautomaton.cc
+ * \file    automaton.cc
  *
  * \author  Stephan Mennicke <stephan.mennicke@uni-rostock.de>
  */
@@ -7,12 +7,13 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+
 #include "util.h"
-//#include "marking.h"
 #include "automaton.h"
 
 using std::cerr;
 using std::cout;
+using std::ostream;
 
 namespace pnapi
 {

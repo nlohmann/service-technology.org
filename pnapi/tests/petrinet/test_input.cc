@@ -6,6 +6,7 @@ using std::stringstream;
 
 using pnapi::io::owfn;
 using pnapi::io::meta;
+using pnapi::io::InputError;
 
 int main(int argc, char * argv[])
 {
@@ -13,7 +14,7 @@ int main(int argc, char * argv[])
   PetriNet net;
   Place & p1 = net.createPlace("in", Place::INPUT);
   Place & p2 = net.createPlace("out", Place::OUTPUT);
-  Place & p3 = net.createPlace("", Place::INTERNAL, 4);
+  Place & p3 = net.createPlace("", Place::INTERNAL, 4, 8);
   Place & p4 = net.createPlace();
   Transition & t1 = net.createTransition();
   Transition & t2 = net.createTransition();

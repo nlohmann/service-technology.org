@@ -13,7 +13,7 @@ namespace pnapi
   namespace parser
   {
 
-    istream * stream;
+    std::istream * stream;
     
     char * token;
     
@@ -158,11 +158,38 @@ namespace pnapi
 	  case OUTPUT:   placeType_ = Place::OUTPUT;   break;
 	  case INTERNAL: placeType_ = Place::INTERNAL; break;
 
+	  case CAPACITY: capacity_  = node.number;     break;
+	  case PORT:     port_      = node.identifier; break;
+
 	  case PLACE: 
 	    node.check(places_.find(node.identifier) == places_.end(),
 		       node.identifier, "node name already used");
 	    places_[node.identifier].type = placeType_;     
+	    places_[node.identifier].capacity = capacity_;     
+	    if (!port_.empty())
+	      {
+		node.check(placeType_ != Place::INTERNAL, 
+			   node.identifier, "interface place expected");
+		node.check(places_[node.identifier].port.empty(),
+			   node.identifier, "place already assigned to port ‘" +
+			   places_[node.identifier].port + "’");
+		places_[node.identifier].port = port_;
+	      }
 	    break;
+	  case PORT_PLACE:
+	    {
+	      map<string, PlaceAttributes>::iterator p = 
+		places_.find(node.identifier);
+	      node.check(p != places_.end(),
+			 node.identifier, "unknown place");
+	      node.check(p->second.type != Place::INTERNAL, 
+			 node.identifier, "interface place expected");
+	      node.check(p->second.port.empty(),
+			 node.identifier, "place already assigned to port ‘" +
+			 p->second.port + "’");
+	      p->second.port = port_;
+	      break;
+	    }
 	  case MARK:  
 	    node.check(places_.find(node.identifier) != places_.end(),
 		       node.identifier, "unknown place");
@@ -226,7 +253,8 @@ namespace pnapi
 	  case INITIALMARKING:
 	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
 		 it != places_.end(); ++it)
-	      net_.createPlace(it->first, it->second.type, it->second.marking);
+	      net_.createPlace(it->first, it->second.type, it->second.marking,
+			       it->second.capacity, it->second.port);
 	    break;
 
 	  case TRANSITION:

@@ -20,7 +20,6 @@
 #include <iomanip>
 #include <ostream>
 
-#include "util.h"
 #include "petrinet.h"
 #include "io.h"
 
@@ -30,6 +29,8 @@ using std::cerr;
 using std::setw;
 using std::right;
 using std::left;
+using std::deque;
+using std::set;
 
 using pnapi::io::operator<<;
 using pnapi::io::owfn;
@@ -74,8 +75,12 @@ namespace pnapi
       << "  INPUT"    << endl
       << "    " << inputPlaces_    << ";" << endl << endl
       << "  OUTPUT"   << endl
-      << "    " << outputPlaces_   << ";" << endl << endl
-      << endl 
+      << "    " << outputPlaces_   << ";" << endl
+      << endl
+
+      << (interfacePlacesByPort_.empty() ? "" : "PORTS") << endl
+      << interfacePlacesByPort_
+      << endl
   
       << mode(io::util::PLACE_TOKEN)
       << "INITIALMARKING" << endl

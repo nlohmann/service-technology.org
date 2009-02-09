@@ -11,30 +11,13 @@
 #ifndef PNAPI_PARSER_H
 #define PNAPI_PARSER_H
 
-#include <string>
-#include <istream>
-#include <vector>
-#include <deque>
-#include <map>
-#include <set>
-#include <stack>
-#include <iostream>
 #include <cassert>
+#include <vector>
+#include <stack>
+#include <istream>
 
+#include "component.h"
 #include "petrinet.h"
-#include "formula.h"
-#include "io.h"
-
-using std::string;
-using std::istream;
-using std::vector;
-using std::deque;
-using std::map;
-using std::set;
-using std::stack;
-
-using pnapi::io::InputError;
-using pnapi::formula::Formula;
 
 namespace pnapi
 {
@@ -53,7 +36,7 @@ namespace pnapi
 
 
     /// input stream for lexers
-    extern istream * stream;
+    extern std::istream * stream;
 
     /// last read lexer token
     extern char * token;
@@ -62,7 +45,7 @@ namespace pnapi
     extern int line;
 
     /// called by generated lexers/parsers
-    void error(const string &);
+    void error(const std::string &);
 
 
     /*!
@@ -97,17 +80,17 @@ namespace pnapi
       void visit(Visitor<T> &) const;
 
       /// causes an error if condition is false
-      void check(bool, const string &, const string &) const;
+      void check(bool, const std::string &, const std::string &) const;
 
     protected:
       
       /// children of this node
-      vector<T *> children_;
+      std::vector<T *> children_;
 
     private:
       int line;
-      string token;
-      string filename;
+      std::string token;
+      std::string filename;
     };
 
 
@@ -126,7 +109,7 @@ namespace pnapi
       virtual ~Parser();
 
       /// parses stream contents with the associated parser
-      T & parse(istream &);
+      T & parse(std::istream &);
 
     protected:
 
@@ -169,11 +152,20 @@ namespace pnapi
       virtual ~Visitor() {};
     };
 
-    
+  }
+   
+ 
 
-    /*************************************************************************
-     ***** OWFN Parser
-     *************************************************************************/
+  /*************************************************************************
+   ***** OWFN Parser
+   *************************************************************************/
+
+  // forward declarations
+  class PetriNet;
+  class Place;
+
+  namespace parser
+  {
 
     /*!
      * \brief   OWFN Parser
@@ -220,7 +212,7 @@ namespace pnapi
       enum Type 
 	{ 
 	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
-	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, 
+	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
 	  INITIALMARKING, MARK,
 	  TRANSITION, ARC, PRESET, POSTSET, 
 	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
@@ -244,7 +236,7 @@ namespace pnapi
 
 	const Type type;
 	int number;
-	string identifier;
+	std::string identifier;
 
 	Node();
 	Node(Node *);
@@ -252,7 +244,7 @@ namespace pnapi
 	Node(Node *, Node *, Node *);
 
 	Node(int);
-	Node(string *);
+	Node(std::string *);
 	Node(Type, Node *);
 	Node(Type, Node *, int);
 	Node(Type, Node *, Node *);
@@ -285,14 +277,18 @@ namespace pnapi
 	{
 	  Place::Type type;
 	  unsigned int marking;
+	  unsigned int capacity;
+	  std::string port;
 	};
 
 	PetriNet net_;
 	Place::Type placeType_;
-	map<string, PlaceAttributes> places_;
+	unsigned int capacity_;
+	std::string port_;
+	map<std::string, PlaceAttributes> places_;
 	bool isPreset_;
-	map<string, unsigned int> preset_, postset_;
-	deque<Formula *> formulas_;
+	map<std::string, unsigned int> preset_, postset_;
+	std::deque<Formula *> formulas_;
       };
 
     }
@@ -329,11 +325,11 @@ namespace pnapi
 
       struct PetrifyResult 
       { 
- 	set<string> transitions; 
-	set<string> places; 
-	set<string> initialMarked; 
-	set<string> interface; 
-	map<string, set<string> > arcs; 
+ 	std::set<std::string> transitions; 
+	std::set<std::string> places; 
+	std::set<std::string> initialMarked; 
+	std::set<std::string> interface; 
+	map<std::string, std::set<std::string> > arcs; 
       }; 
 
       /*!
@@ -344,12 +340,12 @@ namespace pnapi
       public:
         enum Type {STG, TLIST, PLIST, TP, PT, CTRL1, CTRL2};
         Node(Type type, Node *child1, Node *child2, Node *child3, Node *child4);
-        Node(Type type, string data, Node *child);
-        Node(Type type, string data, Node *child1, Node *child2);
+        Node(Type type, std::string data, Node *child);
+        Node(Type type, std::string data, Node *child1, Node *child2);
         Node(Type type);
         
         const Type type;
-        const string data;
+        const std::string data;
       };
       
       /*!
@@ -379,8 +375,8 @@ namespace pnapi
         void afterChildren(const Node &);
       private:
         PetrifyResult * result_;
-        set<string> tempNodeSet;
-        stack<set<string> > tempNodeStack;
+	std::set<std::string> tempNodeSet;
+	std::stack<std::set<std::string> > tempNodeStack;
         bool in_marking_list;
         bool in_arc_list;
       };
@@ -452,7 +448,7 @@ namespace pnapi
      */
     template <typename T> BaseNode<T>::~BaseNode()
     {
-      for (typename vector<T *>::const_iterator it = 
+      for (typename std::vector<T *>::const_iterator it = 
 	     children_.begin(); it != children_.end(); ++it)
 	delete *it;
     }
@@ -480,7 +476,7 @@ namespace pnapi
     template <typename T> void BaseNode<T>::visit(Visitor<T> & visitor) const
     {
       visitor.beforeChildren(*static_cast<const T *>(this));
-      for (typename vector<T *>::const_iterator it = 
+      for (typename std::vector<T *>::const_iterator it = 
 	     children_.begin(); it != children_.end(); ++it)
 	(*it)->visit(visitor);
       visitor.afterChildren(*static_cast<const T *>(this));
@@ -489,8 +485,8 @@ namespace pnapi
     /*!
      */
     template <typename T>
-    void BaseNode<T>::check(bool condition, const string & token, 
-			    const string & msg) const
+    void BaseNode<T>::check(bool condition, const std::string & token, 
+			    const std::string & msg) const
     {
       if (!condition)
 	throw io::InputError(io::InputError::SEMANTIC_ERROR, filename, line, 
@@ -535,7 +531,7 @@ namespace pnapi
      *
      * The resulting AST can be traversed using the #visit() function.
      */
-    template <typename T> T & Parser<T>::parse(istream & is)
+    template <typename T> T & Parser<T>::parse(std::istream & is)
     {
       // possibly clean up old AST
       if (rootNode_ != NULL)

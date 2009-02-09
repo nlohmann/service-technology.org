@@ -15,6 +15,7 @@ using std::pair;
 using std::string;
 using std::ios_base;
 using std::ostream;
+using std::set;
 
 namespace pnapi
 {
@@ -108,7 +109,8 @@ namespace pnapi
      * of the stream data is not determined automatically. You have to set it
      * explicitly using a stream manipulator from pnapi::io.
      */
-    std::istream & operator>>(std::istream & is, PetriNet & net) throw (InputError)
+    std::istream & operator>>(std::istream & is, PetriNet & net) 
+      throw (InputError)
     {
       switch (util::FormatData::data(is))
 	{
@@ -163,7 +165,8 @@ namespace pnapi
       set<Place *> filterMarkedPlaces(const set<Place *> & places)
       {
 	set<Place *> filtered;
-	for (set<Place *>::iterator it = places.begin(); it != places.end(); ++it)
+	for (set<Place *>::iterator it = places.begin(); it != places.end(); 
+	     ++it)
 	  if ((*it)->getTokenCount() > 0)
 	    filtered.insert(*it);
 	return filtered;
@@ -332,6 +335,25 @@ namespace pnapi
 	    break;
 
 	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, 
+			   const std::multimap<string, Place *> & places)
+      {
+	if (places.empty())
+	  return os;
+
+	std::multimap<string, Place *>::const_iterator it = places.begin(); 
+	PetriNet & net = it->second->getPetriNet();
+	while (it != places.end())
+	  {
+	    string port = it->first;
+	    os << "  " << port << ": " << net.getInterfacePlaces(port) << ";" 
+	       << endl;
+	    it = places.upper_bound(port);
 	  }
 	return os;
       }

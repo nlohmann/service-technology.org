@@ -21,27 +21,11 @@
 #ifndef PNAPI_PETRINET_H
 #define PNAPI_PETRINET_H
 
-#include <string>
 #include <vector>
-#include <set>
-#include <map>
-#include <stack>
-#include <istream>
-#include <ostream>
 
-#include "component.h"
 #include "condition.h"
-#include "formula.h"
 #include "io.h"
-
-using std::string;
-using std::vector;
-using std::set;
-using std::map;
-using std::multimap;
-using std::stack;
-using std::istream;
-using std::ostream;
+#include "component.h"
 
 namespace pnapi
 {
@@ -50,8 +34,9 @@ namespace pnapi
   class PetriNet;
   namespace io 
   { 
+    class InputError;
     std::ostream & operator<<(std::ostream &, const PetriNet &); 
-    std::istream & operator>>(std::istream &, PetriNet &) throw (io::InputError); 
+    std::istream & operator>>(std::istream &, PetriNet &) throw (InputError); 
   }
 
 
@@ -78,7 +63,7 @@ namespace pnapi
     void updateArcCreated(Arc &);
     void updateArcRemoved(Arc &);
     void updateNodesMerged(Node &, Node &);
-    void updateNodeNameHistory(Node &, const deque<string> &);
+    void updateNodeNameHistory(Node &, const std::deque<string> &);
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
     void updateTransitions(Transition &);
@@ -90,7 +75,7 @@ namespace pnapi
 
     void updateNodes(Node &);
     void initializeNodeNameHistory(Node &);
-    void finalizeNodeNameHistory(Node &, const deque<string> &);
+    void finalizeNodeNameHistory(Node &, const std::deque<string> &);
     void initializePlaceType(Place &);
     void finalizePlaceType(Place &, Node::Type);
 
@@ -111,10 +96,10 @@ namespace pnapi
     friend class ComponentObserver;
 
     /// Petri net output, see pnapi::io
-    friend ostream & io::operator<<(ostream &, const PetriNet &);
+    friend std::ostream & io::operator<<(std::ostream &, const PetriNet &);
 
     /// Petri net input, see pnapi::io
-    friend istream & io::operator>>(istream &, PetriNet &) throw (io::InputError);
+    friend std::istream & io::operator>>(std::istream &, PetriNet &) throw (io::InputError);
 
 
   public:
@@ -154,17 +139,19 @@ namespace pnapi
 
     Arc * findArc(const Node &, const Node &) const;
 
-    const set<Node *> & getNodes() const;
+    const std::set<Node *> & getNodes() const;
 
-    const set<Place *> & getPlaces() const;
+    const std::set<Place *> & getPlaces() const;
 
-    const set<Place *> & getInputPlaces() const;
+    const std::set<Place *> & getInputPlaces() const;
 
-    const set<Place *> & getOutputPlaces() const;
+    const std::set<Place *> & getOutputPlaces() const;
 
-    const set<Place *> & getInterfacePlaces() const;
+    const std::set<Place *> & getInterfacePlaces() const;
 
-    const set<Transition *> & getTransitions() const;
+    std::set<Place *> getInterfacePlaces(const string &) const;
+
+    const std::set<Transition *> & getTransitions() const;
 
     //@}
 
@@ -181,7 +168,8 @@ namespace pnapi
 
     /// creates a Place
     Place & createPlace(const string & = "", Node::Type = Node::INTERNAL,
-			unsigned int = 0, unsigned int = 0);
+			unsigned int = 0, unsigned int = 0, 
+			const string & = "");
 
     /// creates a Transition
     Transition & createTransition(const string & = "");
@@ -220,24 +208,6 @@ namespace pnapi
     //@}
 
 
-    /*!
-     * \name   Experimental
-     *
-     * Operations under development
-     */
-    //@{
-
-    /// TODO: looking for a better idea to set conditions
-    void setFinalCondition(Condition &fc);
-
-    /// TODO: move to class Marking
-    /// looks for a living transition under m
-    Transition *findLivingTransition(Marking &m) const;
-
-    //@}
-
-
-
   private:
 
     /* general properties */
@@ -255,34 +225,34 @@ namespace pnapi
     /* (overlapping) sets for net structure */
 
     /// set of all nodes
-    set<Node *> nodes_;
+    std::set<Node *> nodes_;
 
     /// all nodes indexed by name
     map<string, Node *> nodesByName_;
 
     /// all transitions
-    set<Transition *> transitions_;
+    std::set<Transition *> transitions_;
 
     /// all places
-    set<Place *> places_;
+    std::set<Place *> places_;
 
     /// all internal places
-    set<Place *> internalPlaces_;
+    std::set<Place *> internalPlaces_;
 
     /// all input places
-    set<Place *> inputPlaces_;
+    std::set<Place *> inputPlaces_;
 
     /// all output places
-    set<Place *> outputPlaces_;
+    std::set<Place *> outputPlaces_;
 
     /// all interface places
-    set<Place *> interfacePlaces_;
+    std::set<Place *> interfacePlaces_;
 
     /// ports (grouping of interface places)
-    multimap<string, Place *> interfacePlacesByPort_;
+    std::multimap<string, Place *> interfacePlacesByPort_;
 
     /// all arcs
-    set<Arc *> arcs_;
+    std::set<Arc *> arcs_;
 
 
     /* structural changes */
@@ -322,43 +292,44 @@ namespace pnapi
     /* petrify */
 
     /// crates a petri net from an STG file
-    void createFromSTG(vector<string> & edgeLabels, const string & fileName, set<string>& inputPlacenames, set<string>& outputPlacenames);
+    void createFromSTG(std::vector<string> &, const string &, 
+		       std::set<string> &, std::set<string> &);
 
     /// helper function for STG2oWFN
-    string remap(string edge, vector<string> & edgeLabels);
+    string remap(string edge, std::vector<string> & edgeLabels);
 
 
     /* output */
 
     /// APNN (Abstract Petri Net Notation) output
-    void output_apnn(ostream &) const;
+    void output_apnn(std::ostream &) const;
 
     /// DOT (Graphviz) output
-    void output_dot(ostream &) const;
+    void output_dot(std::ostream &) const;
 
     /// INA output
-    void output_ina(ostream &) const;
+    void output_ina(std::ostream &) const;
 
     /// SPIN output
-    void output_spin(ostream &) const;
+    void output_spin(std::ostream &) const;
 
     /// info file output
-    void output_info(ostream &) const;
+    void output_info(std::ostream &) const;
 
     /// LoLA-output
-    void output_lola(ostream &) const;
+    void output_lola(std::ostream &) const;
 
     /// oWFN-output
-    void output_owfn(ostream &) const;
+    void output_owfn(std::ostream &) const;
 
     /// low-level PEP output
-    void output_pep(ostream &) const;
+    void output_pep(std::ostream &) const;
 
     /// PNML (Petri Net Markup Language) output
-    void output_pnml(ostream &) const;
+    void output_pnml(std::ostream &) const;
 
     /// GasTeX output
-    void output_gastex(ostream &) const;
+    void output_gastex(std::ostream &) const;
 
 
     /* reduction */

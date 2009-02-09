@@ -66,7 +66,9 @@
 %type <yt_node> node_name 
 %type <yt_node> place places place_list internal_places input_places
 %type <yt_node>   output_places capacity_place_list capacity places_ports 
-%type <yt_node>   typed_places
+%type <yt_node>   typed_places ports port_definition port_participants
+%type <yt_node>   port_participant port_list lola_places interface port_list_new
+%type <yt_node>   port_definition_new
 %type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
 %type <yt_node> markings marking marking_list initial
 
@@ -93,13 +95,15 @@ node_name:
  /**************/
 
 places_ports: 
-    KEY_INTERFACE interface KEY_PLACE places SEMICOLON { $$ = new Node();   }
-  | KEY_PLACE typed_places ports                       { $$ = $2; }
+    KEY_INTERFACE interface KEY_PLACE places SEMICOLON 
+      { $$ = new Node($2, new Node(INTERNAL, $4)); }
+  | KEY_PLACE typed_places ports                      
+      { $$ = new Node($2, $3); }
   ;
 
 typed_places: 
     internal_places input_places output_places { $$ = new Node($1, $2, $3); }
-  | lola_places                                { $$ = new Node();           }
+  | lola_places                                { $$ = $1;                   }
   ;
 
 input_places:
@@ -115,7 +119,7 @@ internal_places:
   ;
 
 lola_places: 
-  places SEMICOLON
+  places SEMICOLON { $$ = new Node(INTERNAL, $1); }
   ;
 
 places: 
@@ -158,36 +162,41 @@ commands:
   ;
 
 ports:
-    /* empty */
-  | KEY_PORTS port_list
+    /* empty */         { $$ = new Node(); }
+  | KEY_PORTS port_list { $$ = $2;         }
   ;
 
 port_list:
-    port_definition
-  | port_list port_definition
+    port_definition           { $$ = $1;               }
+  | port_list port_definition { $$ = $1->addChild($2); }
   ;
 
 port_definition:
-  node_name COLON port_participants SEMICOLON
+  node_name COLON port_participants SEMICOLON { $$ = new Node(PORT, $1, $3); }
   ;
 
 port_participants:
-    node_name
-  | port_participants COMMA node_name
+    port_participant                         { $$ = $1;               }
+  | port_participants COMMA port_participant { $$ = $1->addChild($3); }
+  ;
+
+port_participant:
+  node_name { $$ = new Node(PORT_PLACE, $1); }
   ;
 
 interface:
-    input_places output_places synchronous
-  | port_list_new
+    input_places output_places synchronous { $$ = new Node($1, $2); }
+  | port_list_new                          { $$ = $1;               }
   ;
 
 port_list_new:
-    port_definition_new
-  | port_list_new port_definition_new
+    port_definition_new               { $$ = $1;               }
+  | port_list_new port_definition_new { $$ = $1->addChild($2); }
   ;
 
 port_definition_new:
   KEY_PORT node_name input_places output_places synchronous
+    { $$ = new Node(PORT, $2, new Node($3, $4)); }
   ;
 
 synchronous:

@@ -21,14 +21,8 @@
 #ifndef PNAPI_PETRINODE_H
 #define PNAPI_PETRINODE_H
 
-#include <string>
-#include <deque>
 #include <set>
-
-using std::string;
-using std::deque;
-using std::set;
-
+#include <deque>
 
 namespace pnapi
 {
@@ -64,7 +58,7 @@ namespace pnapi
     enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
 
     /// constructor
-    Node(PetriNet &, ComponentObserver &, const string &, Type);
+    Node(PetriNet &, ComponentObserver &, const std::string &, Type);
 
     /// copy constructor
     Node(PetriNet &, ComponentObserver &, const Node &);
@@ -85,28 +79,28 @@ namespace pnapi
     bool isParallel(const Node &) const;
     
     /// returns the name of the node
-    string getName() const;
+    std::string getName() const;
 
     /// returns the name history
-    deque<string> getNameHistory() const;
+    std::deque<std::string> getNameHistory() const;
 
     /// adds a prefix to all names
-    void prefixNameHistory(const string &);
+    void prefixNameHistory(const std::string &);
 
     /// merges the histories of two nodes
     void mergeNameHistory(Node &);
 
     /// returns the node's preset
-    const set<Node *> & getPreset() const;
+    const std::set<Node *> & getPreset() const;
 
     /// returns the arcs to the node's preset
-    set<Arc *> getPresetArcs() const;
+    std::set<Arc *> getPresetArcs() const;
 
     /// returns the node's postset
-    const set<Node *> & getPostset() const;
+    const std::set<Node *> & getPostset() const;
 
     /// returns the arcs to the node's postset
-    set<Arc *> getPostsetArcs() const;
+    std::set<Arc *> getPostsetArcs() const;
 
 
   protected:
@@ -130,21 +124,21 @@ namespace pnapi
     Type type_;
 
     /// the set of roles (i.e. the history) of the node
-    deque<string> history_;
+    std::deque<std::string> history_;
 
     /// the preset of this node
-    set<Node*> preset_;
+    std::set<Node*> preset_;
 
     /// the postset of this node
-    set<Node*> postset_;
+    std::set<Node*> postset_;
 
 
     /// no copying!
     Node(const Node &);
 
     /// merges the pre-/postsets of two nodes
-    void mergeArcs(pnapi::Node&, pnapi::Node&, const set<Node*> &,
-		   const set<Node*> &, bool, bool);
+    void mergeArcs(pnapi::Node&, pnapi::Node&, const std::set<Node*> &,
+		   const std::set<Node*> &, bool, bool);
 
   };
 
@@ -164,7 +158,7 @@ namespace pnapi
   public:
     /// constructor
     Transition(PetriNet &, ComponentObserver &,
-	       const string &, Type = INTERNAL);
+	       const std::string &, Type = INTERNAL);
 
     /// copy constructor
     Transition(PetriNet &, ComponentObserver &, const Transition &);
@@ -198,8 +192,8 @@ namespace pnapi
   public:
 
     /// constructor
-    Place(PetriNet &, ComponentObserver &, const string &, Type,
-	  unsigned int = 0, unsigned int = 0);
+    Place(PetriNet &, ComponentObserver &, const std::string &, Type, unsigned int, 
+	  unsigned int, const std::string &);
 
     /// copy constructor
     Place(PetriNet &, ComponentObserver &, const Place &);
@@ -219,6 +213,9 @@ namespace pnapi
     /// marks the place with token
     void mark(const unsigned int &t);
 
+    /// returns the port this place belongs to
+    std::string getPort() const;
+
 
   private:
 
@@ -230,6 +227,9 @@ namespace pnapi
 
     /// place was an interface place (now internal)
     bool wasInterface_;
+
+    /// port this place belongs to
+    std::string port_;
 
 
     /// no standard copying!

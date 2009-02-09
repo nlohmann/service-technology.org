@@ -20,6 +20,7 @@
 
 #include <set>
 #include <map>
+#include <ostream>
 
 namespace pnapi
 {
@@ -207,6 +208,8 @@ namespace pnapi
       std::ostream & operator<<(std::ostream &, const pnapi::Place &);
       std::ostream & operator<<(std::ostream &, const pnapi::Transition &);
       std::ostream & operator<<(std::ostream &, const pnapi::Condition &);
+      std::ostream & operator<<(std::ostream &, 
+			    const std::multimap<std::string, pnapi::Place *> &);
 
 
       /*** TEMPLATE CLASS IMPLEMENTATION ***/
@@ -219,11 +222,20 @@ namespace pnapi
       }
 
 
-      inline std::string getOWFNDelimiter(const std::set<Arc *> &) 
-      { return ", "; }
-      inline std::string getOWFNDelimiter(const std::set<Place *> &)      
-      { return ", "; }
-      inline std::string getOWFNDelimiter(const std::set<Transition *> &) 
+      inline std::string getOWFNDelimiter(std::ostream & os, 
+					  const std::set<Arc *> &) 
+      { 
+	switch (ModeData::data(os))
+	  {
+	  case PLACE_CAPACITY: return "; ";
+	  default:             return ", "; 
+	  }
+      }
+      inline std::string getOWFNDelimiter(std::ostream & os, 
+					  const std::set<Place *> &)      
+      { return "; "; }
+      inline std::string getOWFNDelimiter(std::ostream & os, 
+					  const std::set<Transition *> &) 
       { return "\n"  ; }
 
 
@@ -231,9 +243,9 @@ namespace pnapi
       std::ostream & operator<<(std::ostream & os, const std::set<T> & s)
       {
 	std::string delim;
-	switch (StreamMetaData<Format>::data(os))
+	switch (FormatData::data(os))
 	  {
-	  case OWFN: delim = getOWFNDelimiter(s); break;
+	  case OWFN: delim = getOWFNDelimiter(os, s); break;
 	  case DOT:  delim = "\n";                break;
 	  default:   delim = ", ";                break;
 	  }

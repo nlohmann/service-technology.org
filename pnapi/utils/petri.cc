@@ -40,8 +40,8 @@ void evaluateParameters(int argc, char** argv) {
 int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
     
-    vector<PetriNet> nets;
-    vector<std::string> names;
+    std::vector<PetriNet> nets;
+    std::vector<std::string> names;
     
     
     /********

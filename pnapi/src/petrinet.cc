@@ -17,19 +17,16 @@
  */
 
 #include <cassert>
-#include <iostream>
-#include <algorithm>
 #include <sstream>
 
 #include "util.h"
-#include "parser.h"
-#include "component.h"
 #include "petrinet.h"
 
-using std::cerr;
-using std::min;
 using std::pair;
+using std::multimap;
+using std::vector;
 using std::ostringstream;
+using std::deque;
 
 namespace pnapi
 {
@@ -58,7 +55,7 @@ namespace pnapi
   /*!
    */
   void ComponentObserver::updateNodeNameHistory(Node & node,
-					       const deque<string> & oldHistory)
+					  const std::deque<string> & oldHistory)
   {
     assert(net_.containsNode(node));
 
@@ -177,17 +174,27 @@ namespace pnapi
 
   void ComponentObserver::initializePlaceType(Place & place)
   {
+    string port = place.getPort();
+
     switch (place.getType())
       {
       case Node::INTERNAL:
-	net_.internalPlaces_.insert(&place); break;
+	assert(port.empty());
+	net_.internalPlaces_.insert(&place); 
+	break;
       case Node::INPUT:
 	net_.inputPlaces_.insert(&place);
 	net_.interfacePlaces_.insert(&place);
+	if (!port.empty())
+	  net_.interfacePlacesByPort_
+	    .insert(pair<string, Place *>(port, &place));
 	break;
       case Node::OUTPUT:
 	net_.outputPlaces_.insert(&place);
 	net_.interfacePlaces_.insert(&place);
+	if (!port.empty())
+	  net_.interfacePlacesByPort_
+	    .insert(pair<string, Place *>(port, &place));
 	break;
       default: break;
       }
@@ -196,17 +203,36 @@ namespace pnapi
 
   void ComponentObserver::finalizePlaceType(Place & place, Node::Type type)
   {
+    pair<multimap<string, Place *>::iterator, 
+      multimap<string, Place *>::iterator> portRange = 
+      net_.interfacePlacesByPort_.equal_range(place.getPort());
+
     switch (type)
       {
       case Node::INTERNAL:
-	net_.internalPlaces_.erase(&place); break;
+	net_.internalPlaces_.erase(&place); 
+	break;
       case Node::INPUT:
 	net_.inputPlaces_.erase(&place);
 	net_.interfacePlaces_.erase(&place);
+	for (multimap<string, Place *>::iterator it = portRange.first; 
+	     it != portRange.second; ++it)
+	  if (it->second == &place)
+	    {
+	      net_.interfacePlacesByPort_.erase(it);
+	      break;
+	    }
 	break;
       case Node::OUTPUT:
 	net_.outputPlaces_.erase(&place);
 	net_.interfacePlaces_.erase(&place);
+	for (multimap<string, Place *>::iterator it = portRange.first; 
+	     it != portRange.second; ++it)
+	  if (it->second == &place)
+	    {
+	      net_.interfacePlacesByPort_.erase(it);
+	      break;
+	    }
 	break;
       default: break;
       }
@@ -387,11 +413,12 @@ namespace pnapi
    * \return  the newly created place
    */
   Place & PetriNet::createPlace(const string & name, Node::Type type,
-				unsigned int tokens, unsigned int capacity)
+				unsigned int tokens, unsigned int capacity,
+				const string & port)
   {
     return *new Place(*this, observer_,
 		      name.empty() ? getUniqueNodeName("p") : name, type,
-		      tokens, capacity);
+		      tokens, capacity, port);
   }
 
 
@@ -519,6 +546,21 @@ namespace pnapi
   const set<Place *> & PetriNet::getInterfacePlaces() const
   {
     return interfacePlaces_;
+  }
+
+
+  /*!
+   */
+  set<Place *> PetriNet::getInterfacePlaces(const string & port) const
+  {
+    set<Place *> places;
+    pair<multimap<string, Place *>::const_iterator, 
+      multimap<string, Place *>::const_iterator> portRange = 
+      interfacePlacesByPort_.equal_range(port);
+    for (multimap<string, Place *>::const_iterator it = portRange.first; 
+	 it != portRange.second; ++it)
+      places.insert(it->second);
+    return places;
   }
 
 
@@ -814,7 +856,7 @@ namespace pnapi
 	      first = *p;
 	    else
 	      {
-		std::cerr << "This net is no workflow net because there are more than one place with empty preset!\n";
+		//std::cerr << "This net is no workflow net because there are more than one place with empty preset!\n";
 		return false;
 	      }
 	  }
@@ -824,14 +866,14 @@ namespace pnapi
 	      last = *p;
 	    else
 	      {
-		std::cerr << "This net is no workflow net because there are more than one place with empty postset!\n";
+		//std::cerr << "This net is no workflow net because there are more than one place with empty postset!\n";
 		return false;
 	      }
 	  }
       }
     if (first == NULL || last == NULL)
       {
-	std::cerr << "No workflow net! Either no place with empty preset or no place with empty postset found.\n";
+	//std::cerr << "No workflow net! Either no place with empty preset or no place with empty postset found.\n";
 	return false;
       }
 
@@ -858,7 +900,7 @@ namespace pnapi
     // getting the number of strongly connected components reachable from first
     unsigned int sscCount = util::dfsTarjan<Node *>(first, S, stacked, i, index, lowlink);
 
-    std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
+    //std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
 
     //deleteTransition(*tarjan);
 
@@ -876,7 +918,7 @@ namespace pnapi
       return true;
     else
       {
-	cerr << "No workflow net! Some places are not between the the preset-less and the postset-less place.\n";
+	//cerr << "No workflow net! Some places are not between the the preset-less and the postset-less place.\n";
 	return false;
       }
   }
@@ -995,61 +1037,5 @@ namespace pnapi
     */
     return true;
   }
-
-
-
-
-  /***************************** NOT YET REFACTORED *************************/
-
-
-
-
-  /*!
-   * \brief   Sets the final condition
-   *
-   * \note    Do not use it.
-   */
-  void PetriNet::setFinalCondition(Condition &fc)
-  {
-    condition_ = fc;
-  }
-
-
-
-
-
-
-/*!
- * \brief     looks for a living transition under marking m
- *
- * \param     Marking m
- *
- * \return    Transition t if t is living under m and NULL if not
- */
-Transition *PetriNet::findLivingTransition(Marking &m) const
-{
-  Transition *result = NULL;
-
-  for (set<Arc *>::const_iterator f = arcs_.begin(); f != arcs_.end(); f++)
-  {
-    //Node *n = (*f)->getSourceNode();
-    /* FIXME
-    if (n->nodeType == PLACE)
-    {
-      Place *p = static_cast<Place *>((*f)->getSourceNode());
-      if (m[p->marking_id] >= (*f)->getWeight())
-      {
-        result = static_cast<Transition *>((*f)->getTargetNode());
-        break;
-      }
-    }
-    */
-  }
-
-  return result;
-}
-
-
-
 
 }

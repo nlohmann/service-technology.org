@@ -34,7 +34,7 @@ using std::insert_iterator;
 using std::less;
 using std::stack;
 using std::map;
-
+using std::min;
 
 namespace pnapi
 {

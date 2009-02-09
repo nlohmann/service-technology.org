@@ -1,7 +1,10 @@
-#include "marking.h"
-#include "petrinet.h"
-
 #include <cassert>
+#include <set>
+
+#include "petrinet.h"
+#include "marking.h"
+
+using std::set;
 
 namespace pnapi
 {

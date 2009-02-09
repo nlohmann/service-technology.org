@@ -131,9 +131,9 @@ namespace pnapi {
    */
   void Node::prefixNameHistory(const string & prefix)
   {
-    deque<string> oldHistory = history_;
-    for (deque<string>::iterator it = history_.begin(); it != history_.end();
-	 ++it)
+    std::deque<string> oldHistory = history_;
+    for (std::deque<string>::iterator it = history_.begin(); 
+	 it != history_.end(); ++it)
       *it = prefix + *it;
     observer_.updateNodeNameHistory(*this, oldHistory);
   }
@@ -141,7 +141,7 @@ namespace pnapi {
 
   /*!
    */
-  deque<string> Node::getNameHistory() const
+  std::deque<string> Node::getNameHistory() const
   {
     return history_;
   }
@@ -215,7 +215,7 @@ namespace pnapi {
 
   void Node::mergeNameHistory(Node & node)
   {
-    deque<string> nodeHistory = node.history_;
+    std::deque<string> nodeHistory = node.history_;
 
     /*
     // remove history of node
@@ -224,7 +224,7 @@ namespace pnapi {
     */
 
     // add history of node to this
-    deque<string> oldHistory = history_;
+    std::deque<string> oldHistory = history_;
     history_.insert(history_.end(), nodeHistory.begin(), nodeHistory.end());
     observer_.updateNodeNameHistory(*this, oldHistory);
   }
@@ -265,10 +265,12 @@ namespace pnapi {
    */
   Place::Place(PetriNet & net, ComponentObserver & observer,
 	       const string & name, Type type, unsigned int tokens,
-	       unsigned int capacity) :
+	       unsigned int capacity, const string & port) :
     Node(net, observer, name, type), tokens_(tokens), capacity_(capacity),
-    wasInterface_(type == INTERNAL ? false : true)
+    wasInterface_(type == INTERNAL ? false : true), port_(port)
   {
+    assert(type != INTERNAL || port.empty());
+
     observer_.updatePlaces(*this);
     setType(type);
   }
@@ -311,6 +313,14 @@ namespace pnapi {
   unsigned int Place::getCapacity() const
   {
     return capacity_;
+  }
+
+  
+  /*!
+   */
+  string Place::getPort() const
+  {
+    return port_;
   }
 
 

@@ -864,7 +864,7 @@ void UArrValue::print(ostream & os)
 	//{
 		//os << content[i] << "/";
 	//}
-	//os << content[length - 1] << "�";
+	//os << content[length - 1] << "´";
 //}
  
  
@@ -1101,7 +1101,7 @@ void UFunction::addresult(UValue * va)
 
 void runtimeerror(char const * mess)
 {
-	cerr << "Run time error: " << mess << endl;
+  fprintf(stderr, "lola: run time error: ‘%s’\n", mess);
 	exit(3);
 }
 

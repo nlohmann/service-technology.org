@@ -70,6 +70,34 @@ extern unsigned int * checkstart;
 
 int garbagefound = 0;
 char * reserve;
+
+
+
+#ifdef MAXIMALSTATES
+/*!
+ \brief abort LoLA if more than MAXIMALSTATES states are processed
+ 
+        This function makes LoLA abort with exit code 5 if the number of
+        currently processed states exceeds the number of states defined as
+        MAXIMALSTATES in file userconfig.H. This function is invoked from
+        files check.cc, graph.cc, and sweep.cc.
+ 
+ \param states the number of currently processed states
+ \return exit LoLA with exit code 5 if states exceed MAXIMALSTATES
+*/
+void checkMaximalStates(unsigned int states) {
+  if (states >= MAXIMALSTATES) {
+    fprintf(stderr, "\nlola: maximal number of states reached\n");
+    fprintf(stderr, "      %d processed states, %d MAXIMALSTATES\n", states, MAXIMALSTATES);
+    _exit(5);
+  }
+}
+#endif
+
+
+
+
+
 inline void garbagecollection()
 {
 }
@@ -77,9 +105,9 @@ inline void garbagecollection()
 void findcyclingtransitions();
 void myown_newhandler()
 {
-		delete reserve;
-                cerr << "new failed\n";
-		throw overflow();
+  delete reserve;
+  fprintf(stderr, "\nlola: new failed\n");
+  throw overflow();
 }
 
 
@@ -103,32 +131,39 @@ void processCommandLine(int argc, char **argv) {
   // check if at most one net file is given
   if (args_info.inputs_num > 1) {
     fprintf(stderr, "lola: more than one net file given\n");
-    exit(4);    
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    exit(4);
   }
   
   // check if output parameters are given at most once
   if (args_info.Net_given + args_info.net_given > 1) {
-    fprintf(stderr, "lola: more than one `-n' / `-N' option given\n");
+    fprintf(stderr, "lola: more than one ‘-n’ / ‘-N’ option given\n");
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
   if (args_info.Analysis_given + args_info.analysis_given > 1) {
-    fprintf(stderr, "lola: more than one `-a' / `-A' option given\n");
+    fprintf(stderr, "lola: more than one ‘-a’ / ‘-A’ option given\n");
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
   if (args_info.State_given + args_info.state_given > 1) {
-    fprintf(stderr, "lola: more than one `-s' / `-S' option given\n");
+    fprintf(stderr, "lola: more than one ‘-s’ / ‘-S’ option given\n");
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
   if (args_info.Automorphisms_given + args_info.automorphisms_given > 1) {
-    fprintf(stderr, "lola: more than one `-y' / `-Y' option given\n");
+    fprintf(stderr, "lola: more than one ‘-y’ / ‘-Y’ option given\n");
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
   if (args_info.Graph_given + args_info.graph_given + args_info.Marking_given + args_info.marking_given > 1) {
-    fprintf(stderr, "lola: more than one `-g' / `-G' / `-m' / `-M' option given\n");
+    fprintf(stderr, "lola: more than one ‘-g’ / ‘-G’ / ‘-m’ / ‘-M’ option given\n");
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
   if (args_info.Path_given + args_info.path_given > 1) {
-    fprintf(stderr, "lola: more than one `-p' / `-P' option given\n");
+    fprintf(stderr, "lola: more than one ‘-p’ / ‘-P’ option given\n");
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
     
@@ -309,7 +344,7 @@ int main(int argc, char ** argv){
   NonEmptyHash = 0;
   try {
 #ifdef DISTRIBUTE
-	if(!init_communication()) _exit(5);
+	if(!init_communication()) _exit(6);
 	rapport("initializing");
 #else
 #ifdef BITHASH
@@ -323,9 +358,7 @@ int main(int argc, char ** argv){
 	}
 	catch(overflow)
 	{
-		char mess[] = "\nhash table too large!\n";
-		//write(2,mess,sizeof(mess));
-		cerr << mess;
+    fprintf(stderr, "lola: hash table too large\n");
 #ifdef DISTRIBUTE
 		end_communication();
 #endif
@@ -349,9 +382,8 @@ int main(int argc, char ** argv){
 	}
 	catch(overflow)
 	{
-		char mess[] = "\nnot enough space to read net\n";
 		//write(2,mess,sizeof(mess));
-		cerr << mess;
+    fprintf(stderr, "lola: not enough space to read net\n");
 #ifdef DISTRIBUTE
 		end_communication();
 #endif
@@ -370,9 +402,8 @@ int main(int argc, char ** argv){
      }
   catch(overflow)
   {
-	char mess [] = "\nnot enough space to store net\n";
 	//write(2,mess,sizeof(mess));
-	cerr << mess;
+    fprintf(stderr, "lola: not enough space to store net\n");
 #ifdef DISTRIBUTE
 		end_communication();
 #endif
@@ -457,9 +488,9 @@ unsigned int j;
   }
   catch(overflow)
   {
-	char mess [] = "\nnot enough space to store generating set for symmetries!\ntry again without use of symmetries!\n";
-	//write(2,mess,sizeof(mess));
-	cerr << mess;
+	  //write(2,mess,sizeof(mess));
+    fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
+    fprintf(stderr, "      try again without use of symmetries!\n");
 #ifdef DISTRIBUTE
 		end_communication();
 #endif
@@ -544,8 +575,8 @@ unsigned int j;
 	ofstream lownetstream(lownetfile);
 	if(!lownetstream)
 	{
-		cerr << "Cannot open net output file: " << lownetfile <<
-		"\nno output written";
+    fprintf(stderr, "lola: cannot open net output file ‘%s’\n", lownetfile);
+    fprintf(stderr, "      no output written\n");
     }
 	else
 	{
@@ -554,8 +585,8 @@ unsigned int j;
 	ofstream pnmlstream(pnmlfile);
 	if(!pnmlstream)
 	{
-		cerr << "Cannot open net output file: " << pnmlfile <<
-		"\nno output written";
+    fprintf(stderr, "lola: cannot open net output file ‘%s’\n", pnmlfile);
+    fprintf(stderr, "      no output written\n");
     }
 	else
 	{
@@ -564,7 +595,7 @@ unsigned int j;
   }
 #ifdef DISTRIBUTE
         SignificantLength = Places[0] -> NrSignificant;
-	if(!init_storage()) _exit(5);
+	if(!init_storage()) _exit(6);
 #endif
   for(j=0,BitVectorSize = 0;j<Places[0]->NrSignificant;j++)
   {
@@ -632,15 +663,13 @@ return  1 - GRAPH();
 }
 catch(overflow)
 {
-	//char mess [] = "memory exhausted\n";
-	//cerr << mess;
+	fprintf(stderr, "lola: memory exhausted\n");
 	_exit(2);
 }
 }
 catch(overflow)
 {
-	char mess [] = "memory exhausted\n";
-	cerr << mess;
+	fprintf(stderr, "lola: memory exhausted\n");
 	_exit(2);
 }
 }

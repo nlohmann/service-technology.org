@@ -11,6 +11,7 @@
 
 extern UBooType * TheBooType;
 extern UNumType * TheNumType;
+extern char *yytext;
 
 #define YYDEBUG 1
 void yyerror(char const *);
@@ -2104,7 +2105,7 @@ void readnet()
 		yyin = fopen(netfile,"r");
 		if(!yyin)
 		{
-			cerr << "cannot open netfile: " << netfile << "\n";
+      fprintf(stderr, "lola: cannot open netfile ‘%s’\n", netfile);
 			exit(4);
 		}
 		diagnosefilename = netfile;
@@ -2155,9 +2156,10 @@ int yywrap()
 }
 */
 
-void yyerror(char const * mess)
-{
-        printf("syntaxerror at line %d of file %s:  %s\n",yylineno, diagnosefilename,mess);
-		exit(3);
+
+/// display a parser error and exit
+void yyerror(char const * mess) {
+    fprintf(stderr, "lola: %s:%d: error near ‘%s’: %s\n", diagnosefilename, yylineno, yytext, mess);
+	exit(3);
 }
 

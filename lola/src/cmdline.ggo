@@ -119,7 +119,8 @@ Return Values:
   3   Syntax error in the net or property description 
   4   Error in accessing files (cannot open, no write permission etc.) or
       invalid command line parameters.
-  >4  uncaught memory overflow, or bug"
+  5   Maximal number of states (MAXIMALSTATES in userconfig.H) exceeded
+  >5  uncaught memory overflow, or bug"
   
 text "
 

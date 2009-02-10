@@ -48,6 +48,8 @@ char rapportstring[] = "search";
 
   unsigned int NrOfStates;
   unsigned int Edges;
+  
+  
 void statistics(unsigned int s, unsigned int e, unsigned int h)
 {
    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
@@ -105,8 +107,8 @@ void print_path(State * s)
       ofstream pathstream(pathfile);
       if(!pathstream)
       {
-         cerr << "Cannot open path output file: " << pathfile <<
-         "\nno output written\n";
+        fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+        fprintf(stderr, "      no output written\n");
       }
       pathstream << "PATH\n";
       printpath(s,&pathstream);
@@ -249,8 +251,8 @@ void print_reg_path(State *s, State * startofrepeatingseq,ofstream * pathstream,
          pathstream = new ofstream(pathfile);
          if(!pathstream)
          {
-            cerr << "Cannot open path output file: " << pathfile
-            << "\nno output written\n";
+            fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+            fprintf(stderr, "      no output written\n");
             return;
          }
          (*pathstream) << "PATH EXPRESSION \n";
@@ -656,8 +658,8 @@ Persistents = 0;
    graphstream = new ofstream(graphfile);
    if(!*graphstream)
    {
-      cerr << "cannot open graph output file: " << graphfile << "\n";
-      cerr << "no output written\n";
+      fprintf(stderr, "lola: cannot open graph output file ‘%s’\n", graphfile);
+      fprintf(stderr, "      no output written\n");
       gmflg = false;
    }
   }
@@ -682,7 +684,7 @@ Persistents = 0;
    int res;
    if(!F)
    {
-      cerr << "\nspecify predicate in analysis task file!\n";
+     fprintf(stderr, "lola: specify predicate in analysis task file!\n");
       _exit(4);
    }
    F = F -> reduce(&res);
@@ -692,7 +694,7 @@ Persistents = 0;
    F -> setstatic();
    if(F ->  tempcard)
    {
-      cerr << "temporal operators are not allowed in state predicates\n";
+      fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
       exit(3);
    }
    cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
@@ -714,6 +716,9 @@ Persistents = 0;
    }
        CurrentState -> firelist = FIRELIST();
    NrOfStates++;
+#ifdef MAXIMALSTATES
+   checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
 #else
   if(SEARCHPROC()) cerr << "Sollte eigentlich nicht vorkommen";
    NrOfStates = 1;
@@ -787,14 +792,16 @@ Persistents = 0;
 #ifdef BOUNDEDPLACE
    if(!CheckPlace)
    {
-      cerr << "\nspecify place to be checked in analysis task file\n";
+      fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
+      fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
       _exit(4);
    }
 #endif
 #ifdef DEADTRANSITION
    if(!CheckTransition)
    {
-      cerr << "\n specify transition to be checked in analysis task file!\n";
+      fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
+      fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
       _exit(4);
    }
 #ifndef DISTRIBUTE
@@ -1107,8 +1114,14 @@ if(!NewOmegas) smallerstate = (State *) 0;
          NewState -> firelist = fl;
 #ifdef TARJAN
          NewState -> dfs = NewState -> min = NrOfStates++;
+#ifdef MAXIMALSTATES
+         checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
 #else
          NrOfStates ++;
+#ifdef MAXIMALSTATES
+         checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
 #endif
    }
    else
@@ -1129,6 +1142,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
          NewState -> firelist = FIRELIST();
 #ifdef TARJAN
          NewState -> dfs = NewState -> min = NrOfStates++;
+#ifdef MAXIMALSTATES
+         checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
 #ifdef FULLTARJAN
       NewState -> phi = F -> value;
 #ifdef EVENTUALLYPROP
@@ -1145,6 +1161,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
 #endif
 #else
       NrOfStates ++;
+#ifdef MAXIMALSTATES
+      checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
 #endif
 #endif
          NewState -> current = 0;
@@ -1740,8 +1759,8 @@ unsigned int breadth_first()
      graphstream = new ofstream(graphfile);
       if(!graphstream)
       {
-         cerr << "Cannot open graph output file: " << graphfile
-         << "\nno output written\n";
+         fprintf(stderr, "lola: cannot open graph output file ‘%s’\n", graphfile);
+         fprintf(stderr, "      no output written\n");
          gmflg = false;
       }
   }
@@ -1873,7 +1892,8 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
 #ifdef BOUNDEDPLACE
    if(!CheckPlace)
    {
-      cerr << "\nspecify place to be checked in analysis task file\n";
+      fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
+      fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
       _exit(4);
    }
 #endif
@@ -1892,7 +1912,8 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
    int res;
    if(!F)
    {
-      cerr << "\nspecify predicate in analysis task file!\n";
+      fprintf(stderr, "lola: specify predicate in analysis task file!\n");
+      fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
       _exit(4);
    }
    F = F -> reduce(&res);
@@ -1902,7 +1923,8 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
    F -> setstatic();
    if(F ->  tempcard)
    {
-      cerr << "temporal operators are not allowed in state predicates\n";
+      fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
+      fprintf(stderr, "      not allowed for task STATEPREDICATE\n");
       exit(3);
    }
    cout << "\n Formula with\n" << F -> card << " subformula.\n";
@@ -2079,6 +2101,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
 #endif
           CurrentState -> min = true;
                 NewState -> dfs =  NrOfStates ++;
+#ifdef MAXIMALSTATES
+                checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
 #ifdef DISTRIBUTE
           if(NrOfStates >= 500) DistributeNow = 1;
 #endif
@@ -2463,6 +2488,9 @@ bool mutual_reach()
          NewState -> current = 0;
          NewState -> firelist = stubbornfirelistreach();
 NrOfStates ++ ;
+#ifdef MAXIMALSTATES
+    checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
          NewState -> parent = CurrentState;
          NewState -> succ =  new State * [CardFireList];
          CurrentState -> succ[CurrentState -> current] = NewState;
@@ -2579,6 +2607,9 @@ bool target_reach()
          NewState -> dfs = NewState -> min = NrOfStates;
 #endif
       NrOfStates ++;
+#ifdef MAXIMALSTATES
+      checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
   if(!NewState -> firelist )
    {
       // early abortion
@@ -2684,7 +2715,8 @@ int liveproperty()
    int res;
    if(!F)
    {
-      cerr << "\nspecify predicate in analysis task file!\n";
+      fprintf(stderr, "lola: specify predicate in analysis task file!\n");
+      fprintf(stderr, "      mandatory for task LIVEPROP\n");
       _exit(4);
    }
    F = F -> reduce(&res);
@@ -2694,7 +2726,8 @@ int liveproperty()
    F -> setstatic();
    if(F ->  tempcard)
    {
-      cerr << "temporal operators are not allowed in state predicates\n";
+      fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
+      fprintf(stderr, "      not allowed for task LIVEPROP\n");
       exit(3);
    }
    cout << "\n Formula with\n" << F -> card << " subformula.\n";
@@ -2744,8 +2777,8 @@ unsigned int i;
    Candidate = TSCCRepresentitives;
    if(!Candidate)
    {
-      cout << "serious internal error, maybe memory overflow?\n";
-      _exit( 2);
+      fprintf(stderr, "lola: serious internal error, maybe memory overflow?\n");
+      _exit(2);
    }
    New = Candidate -> next;
    Old = (StatevectorList *) 0;

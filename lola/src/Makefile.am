@@ -28,7 +28,25 @@ lola_SOURCES = readnet-syntax.yy \
 
 lola_EXTRASOURCES = ltl.H ltl.cc
 
-EXTRA_DIST = readnet-syntax.h cmdline.ggo configs
+EXTRA_DIST = readnet-syntax.h cmdline.ggo \
+             configs/userconfig.H.boundednet \
+             configs/userconfig.H.bpm-liveprop \
+             configs/userconfig.H.bpm-liveprop1 \
+             configs/userconfig.H.bpm-modelchecking \
+             configs/userconfig.H.bpm-modelchecking1 \
+             configs/userconfig.H.bpm-statepredicate \
+             configs/userconfig.H.bpm-statepredicate1 \
+             configs/userconfig.H.deadlock \
+             configs/userconfig.H.deadlock1 \
+             configs/userconfig.H.full \
+             configs/userconfig.H.full1 \
+             configs/userconfig.H.fulllimited \
+             configs/userconfig.H.liveprop \
+             configs/userconfig.H.liveprop1 \
+             configs/userconfig.H.modelchecking \
+             configs/userconfig.H.none \
+             configs/userconfig.H.statepredicate \
+             configs/userconfig.H.statepredicate1
 
 lola_CFLAGS = @configured_CFLAGS@
 lola_CXXFLAGS = @configured_CXXFLAGS@

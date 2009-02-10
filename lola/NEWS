@@ -39,14 +39,16 @@ Version 1.11-unreleased
 
 * command line options are now handled by GNU Gengetopt
 
-* added command line help for `lola --help'
-
-* added version output for `lola --version'
-
 * added a manpage for LoLA using `help2man' tool
 
 * added `--enable-mpi' command line parameter for the `configure' script to
-  use MPI compiler wrappers instead of GCC
+  use MPI compiler wrappers instead of GCC (disabled by default)
+
+* added an option `MAXIMALSTATES' to `userconfig.H': by defining this option
+  to a value, say 100000, LoLA will abort as soon as more than 100000 states
+  are processed; the exit code will be 5
+
+* canonized LoLA's error messages
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

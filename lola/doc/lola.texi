@@ -1787,6 +1787,9 @@ Syntax error in the net or property description
 @itemx 4
 Error in accessing files (cannot open, no write permission etc.)
 
+@itemx 5
+Maximal number of states (@code{MAXIMALSTATES} in @file{userconfig.H}) exceeded
+
 @itemx other
 uncaught memory overflow, or bug
 @end table

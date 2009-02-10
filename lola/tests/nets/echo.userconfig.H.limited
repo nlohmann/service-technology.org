@@ -28,7 +28,7 @@
 // MAXIMALSTATES gives a maximal number of states that are explored before
 // LoLA will abort with exit code 5.
 
-// #define MAXIMALSTATES 100000
+#define MAXIMALSTATES 100000
 
 // MAXPATH is only used for the FINDPATH algorithm. There, LoLA aborts
 // a search attempt after having reached a depth of MAXPATH and
@@ -54,14 +54,14 @@
 // finally applied in the exectuable program.
 
 //#define COVER
-#define STUBBORN
+//#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
-#define PREDUCTION
+//#define PREDUCTION
 //#define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE
-//#define SWEEP
+#define SWEEP
 
 #define NONBRANCHINGONLY
 #define MAXUNSAVED 5
@@ -129,8 +129,8 @@
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-//#define FULL
-#define DEADLOCK
+#define FULL
+//#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
 //#define LIVEPROP

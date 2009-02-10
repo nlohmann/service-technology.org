@@ -27,6 +27,7 @@ int CurrentSection;       // {0, progress span, 2* progress span}  ; index for p
 
 long int NrSame, NrPersistent, PeakMemUse, CurrentMemUse, TransitionsFired, NrSweeps;
 
+
 void print_sweep( char * text)
 {
 	int i;
@@ -246,7 +247,8 @@ int sweep()
 	int res;
 	if(!F)
 	{	
-		cerr << "\nspecify predicate in analysis task file!\n";
+    fprintf(stderr, "lola: specify predicate in analysis task file!\n");
+    fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
 		_exit(4);
 	}
 	F = F -> reduce(&res);
@@ -256,7 +258,8 @@ int sweep()
 	F -> setstatic();
 	if(F ->  tempcard) 
 	{
-		cerr << "temporal operators are not allowed in state predicates\n";
+    fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
+    fprintf(stderr, "      not allowed for task STATEPREDICATE\n");
 		exit(3);
 	}
 	cout << "\n Formula with\n" << F -> card << " subformula.\n";
@@ -403,6 +406,9 @@ int sweep()
 				binSearch(OldPersistent[ProgressValueLow]);
 				binInsert(OldPersistent + ProgressValueLow);
 				CurrentMemUse ++;
+#ifdef MAXIMALSTATES
+                checkMaximalStates(CurrentMemUse); ///// LINE ADDED BY NIELS
+#endif
 			}
 			else
 			{
@@ -413,6 +419,9 @@ int sweep()
 					binInsert(&SameValue);	
 					NrSame++;
 					CurrentMemUse++;
+#ifdef MAXIMALSTATES
+                    checkMaximalStates(CurrentMemUse); ///// LINE ADDED BY NIELS
+#endif
 				}
 			}
 			//print_sweep("After Removal");
@@ -577,6 +586,9 @@ if(jj < Places[0]->cnt) // target_marking found!
 				// insert
 				binInsert(CurrentSweep + NewPos3);
 				CurrentMemUse++;
+#ifdef MAXIMALSTATES
+                checkMaximalStates(CurrentMemUse); ///// LINE ADDED BY NIELS
+#endif
 				if(CurrentMemUse > PeakMemUse) PeakMemUse = CurrentMemUse ;
 				BucketSize[NewPos3] ++;
 				if(fl[currentfired] -> progress_value >= 0)  NrAhead++; else {NrBehind ++;NrPersistent++;};

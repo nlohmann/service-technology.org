@@ -79,8 +79,8 @@ void print_path(State * s)
 		ofstream pathstream(pathfile);
 		if(!pathstream)
 		{
-			cerr << "Cannot open path output file: " << pathfile <<
-			"\nno output written\n";
+      fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+      fprintf(stderr, "      no output written\n");
 		}
 		pathstream << "PATH\n";
 		printpath(s,&pathstream);
@@ -447,8 +447,8 @@ Persistents = 0;
 	graphstream = new ofstream(graphfile);
 	if(!*graphstream)
 	{
-		cerr << "cannot open graph output file: " << graphfile << "\n";
-		cerr << "no output written\n";
+    fprintf(stderr, "lola: cannot open graph output file ‘%s’\n", graphfile);
+    fprintf(stderr, "      no output written\n");
 		gmflg = false;
 	}
   }
@@ -463,7 +463,7 @@ Persistents = 0;
 	int res;
 	if(!F)
 	{	
-		cerr << "\nspecify predicate in analysis task file!\n";
+    fprintf(stderr, "lola: specify predicate in analysis task file\n");
 		_exit(4);
 	}
 	F = F -> reduce(&res);
@@ -473,7 +473,7 @@ Persistents = 0;
 	F -> setstatic();
 	if(F ->  tempcard) 
 	{
-		cerr << "temporal operators are not allowed in state predicates\n";
+    fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
 		exit(3);
 	}
 	cout << "\n Formula with\n" << F -> card << " subformula(s).\n";

@@ -6,6 +6,7 @@ TESTS = test_init \
 	test_choreography \
 	test_umlprocess \
 	test_unbounded \
+	test_limited \
 	test_tidy
 
 EXTRA_DIST = nets $(TESTS)

@@ -247,7 +247,8 @@ void find_path()
 	Reserve = new Transition * [Transitions[0]->cnt];
 	if(!F)
 	{
-		cerr << "\nspecify predicate in analysis task file!\n";
+    fprintf(stderr, "lola: specify predicate in analysis task file\n");
+    fprintf(stderr, "      mandatory for task FINDPATH\n");
 	}
 	F = F -> reduce(& res);
 	if(res == 0) return;
@@ -257,7 +258,8 @@ void find_path()
 	F -> setstatic();
 	if(F -> tempcard > 0)
 	{
-		cerr << "do not use temporal operators in this mode.\n" ;
+    fprintf(stderr, "lola: do not use temporal operators in this mode\n");
+    fprintf(stderr, "      not allowed for task FINDPATH\n");
 		_exit(3);
 	}
 	cout << "\nFormula with\n" << F -> card << " subformulas.\n";
@@ -343,8 +345,8 @@ void find_path()
 	ofstream pathstream(pathfile);
 	if(!pathstream)
 	{
-		cerr << "Cannot open path output file: " << pathfile <<
-		"\nno output written";
+	  fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+    fprintf(stderr, "      no output written\n");
 		pflg = false;
 	}
 				pathstream << "PATH\n";
@@ -386,8 +388,8 @@ GetFullTransition()
 	ofstream pathstream(pathfile);
 	if(!pathstream)
 	{
-		cerr << "Cannot open path output file: " << pathfile <<
-		"\nno output written";
+    fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+    fprintf(stderr, "      no output written\n");
 		pflg = false;
 	}
 				pathstream << "PATH\n";

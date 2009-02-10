@@ -13,6 +13,7 @@
 #include <cstring>
 #include <cstdlib>
 #include "dimensions.H"
+#include "userconfig.H"
 
 using std::ostream;
 using std::ofstream;
@@ -22,6 +23,12 @@ using std::endl;
 
 #define true 1
 #define false 0
+
+
+#ifdef MAXIMALSTATES
+/// abort LoLA if more than MAXIMALSTATES states are processed
+void checkMaximalStates(unsigned int states);
+#endif
 
 
 class Arc; ///< Petri net arcs
@@ -663,7 +670,7 @@ if(Places[(*p)]-> bounded)
 #ifdef CHECKCAPACITY
 	if(CurrentMarking[*p] > Places[*p]->capacity)
 	{
-		cerr << "capacity of place " << Places[*p]->name << " exceeded!" << endl;
+    fprintf(stderr, "lola: capacity of place ‘%s’ exceeded\n", Places[*p]->name);
 		_exit(4);
 	}
 #endif

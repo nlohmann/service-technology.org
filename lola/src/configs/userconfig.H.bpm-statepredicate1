@@ -25,11 +25,6 @@
 
 #define REPORTFREQUENCY 100000
 
-// MAXIMALSTATES gives a maximal number of states that are explored before
-// LoLA will abort with exit code 5.
-
-// #define MAXIMALSTATES 100000
-
 // MAXPATH is only used for the FINDPATH algorithm. There, LoLA aborts
 // a search attempt after having reached a depth of MAXPATH and
 // starts another attempt. When MAXPATH is not defined, a standard
@@ -81,7 +76,7 @@
 // 1 refers to the iteration of symmetries (leads to maximal reduction,
 //   fast for small symmetry groups, slow for large symmetry groups)
 // 2 refers to the iteration of states (leads to maximal reduction.
-//	 fast for large symmetry groups, slow for small symmetry griups)
+//   fast for large symmetry groups, slow for small symmetry griups)
 // 3 refers to the canonical representitive technique (does not lead
 //   to maximal reduction, fast for all kind of symmetry groups)
 // 4 refers to the canonical representitive technique on the fly (i.e.
@@ -130,9 +125,9 @@
 //#define HOME
 //#define FINDPATH
 //#define FULL
-#define DEADLOCK
+//#define DEADLOCK
 //#define NONE
-//#define STATEPREDICATE
+#define STATEPREDICATE
 //#define LIVEPROP
 //#define FAIRPROP
 //#define STABLEPROP

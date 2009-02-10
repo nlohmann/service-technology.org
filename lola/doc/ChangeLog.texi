@@ -22,13 +22,13 @@
 
 @item command line options are now handled by @acronym{GNU} Gengetopt
 
-@item added command line help for @samp{lola --help}
-
-@item added version output for @samp{lola --version}
-
 @item added a manpage for LoLA using @code{help2man} tool
 
 @item added @samp{--enable-mpi} command line parameter for the @file{configure} script to use @acronym{MPI} compiler wrappers instead of @acronym{GCC} (disabled by default)
+
+@item added an option @code{MAXIMALSTATES} to @file{userconfig.H}: by defining this option to a value, say 100000, LoLA will abort as soon as more than 100000 states are processed; the exit code will be 5
+
+@item canonized LoLA's error messages
 @end itemize
 
 

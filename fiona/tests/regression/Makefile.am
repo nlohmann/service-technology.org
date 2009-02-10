@@ -24,8 +24,8 @@ EXTRA_DIST = $(TESTS) \
 # this wrapper script organizes the temp file generation
 EXTRA_DIST += wrap.sh
 
-# where to execute the tests (usually a temp folder)
-TESTDIR = $${TMPDIR-/tmp}/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/$(subdir)
+# where to execute the tests (usually a temp folder inside the build dir)
+TESTDIR = $(abs_builddir)/tmp
 
 # variables passed to the testscripts
 TESTS_ENVIRONMENT = testdir=$(TESTDIR) testroot=$(abs_srcdir) PATH=$(abs_top_builddir)/src:$$PATH $(srcdir)/wrap.sh

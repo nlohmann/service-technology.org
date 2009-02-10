@@ -49,9 +49,9 @@ class UmlProcessStatistics;
 
 
 // flags to set the characteristics of the process (for filtering)
-#define UML_STANDARD 0
-#define UML_OVERLAPPING_PINS 1
-#define UML_PIN_MULTIPLICITIES 2
-#define UML_EMPTY_PROCESS 4
+// take parameter processCharacteristics from options.h
+#define UML_PC(x) (1 << x)
+
+
 
 #endif /* UMLPUBLIC_H_ */

@@ -1,7 +1,7 @@
 # Script to analyse nets and collect important data in tables
 
 UML2OWFN       = uml2owfn
-UML2OWFN_FLAGS = -p log
+UML2OWFN_FLAGS = -p filter -p log
 LOLA           = lola
 LOLA-MC        = lola-mc
 LOLA-SP        = lola-sp

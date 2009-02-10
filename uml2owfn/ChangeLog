@@ -37,9 +37,21 @@ Version 2.00-unreleased
   soundness.
 
 * Made filtering of processes more precise according to the semantics
-  implemented in the WebSphere tools: Translation now considers all pin
-  multiplicities, and only non-matching pairs of multiplicities (produce one
-  token, consume two token) are considered erroneous.
+  implemented in the WebSphere tools, providing a dedicated filtering
+  parameter for different process characteristics:
+     * Translation may filter empty processes (`-s empty'),
+
+     * processes with pin multiplcities (`-s multi'),
+
+     * processes with non-matching pin multiplicities at edges (produce one
+       token, consume two token, `-s multiNonMatching'),
+
+     * processes with overlapping pinsets (`-s overlappingPins'), and
+
+     * processes with trivial communication interfaces (`-s
+       trivialInterface', only applicable if using `--rolecut').
+  The old parameter `-p filter' remains for backwards compatibility and
+  implements `-s empty -s overlappingPins'.
 
 * Extended the translation log file which now distinguishes properties of UML
   processes and of the Petri nets

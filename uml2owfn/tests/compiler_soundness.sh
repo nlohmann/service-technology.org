@@ -2,15 +2,6 @@
 
 source defaults.sh
 
-# copy files to builddir (in case it is a different directory)
-#if test \( "$testdir" = "$builddir" \)
-#then
-#  builddir_cleanup=0
-#else 
-#  $MKDIR_P $builddir/soundness
-#  cp $testdir/soundness/* $builddir/soundness
-#  builddir_cleanup=1
-#fi
 
 result=0
 DIR=$testdir/soundness
@@ -117,14 +108,6 @@ echo "[CTL model checking]"
 	rm -f $builddir/*.task       # task files are optional
 	rm $builddir/*.lola
 	rm $builddir/check_$FILE.sh
-
-
-# remove files from builddir
-#if [ $builddir_cleanup -eq 1 ] ; then
-#  rm -f $builddir/soundness/TestSuite_soundness.txt
-#  rm -f $builddir/soundness/TestSuite_soundness.xml
-#  rmdir $builddir/soundness
-#fi
 
 
 exit $result

@@ -61,22 +61,21 @@ namespace globals {
   // set standard values for directories and file names
   string workingDirectory = "";
   string filename = "<STDIN>";
-  string output_directory = ".";      // write to current directory by default
+  string output_directory = ".";      ///< write to current directory by default
   string output_filename = "";
-  string output_filename_suffix = ""; // suffix of the current output file (if multiple files are written)
+  string output_filename_suffix = ""; ///< suffix of the current output file (if multiple files are written)
   bool getOutputFileNameFromInput = false;
 
   map<possibleParameters, bool> parameters;
   analysis_t analysis;
+  map<processCharacteristics, bool> filterCharacteristics;  ///< characteristics of processes to be filtered
 
   string last_error_token = "";
   string last_error_line = "";
 
   unsigned int reduction_level = 0;
 
-// <Dirk.F start>
   string currentProcessName = "";
-// <Dirk.F end>
 
   // Variables for cutting nets by roles
   set<string>         keepRoles;

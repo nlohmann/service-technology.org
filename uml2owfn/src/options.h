@@ -89,7 +89,8 @@ typedef enum
    O_ANALYSIS,      ///< set the analysis task
    O_ROLECUT,      	///< automatically cut away all roles without start nodes
    O_ROLEEXCLUSIVE,	///< cut away all roles matching exactly a given string
-   O_ROLECONTAINS	  ///< cut away all roles containing a given string
+   O_ROLECONTAINS,  ///< cut away all roles containing a given string
+   O_SKIP_BY_FILTER ///< filter processes according to processCharacteristics
 } possibleOptions;
 
 
@@ -119,9 +120,8 @@ typedef enum
  */
 typedef enum
 {
-  P_LOG,        ///< write a log file about the translation
-  P_FILTER,     ///< apply filtering before translating the process to a net
-  P_KEEP_UNCONN_PINS,  ///< keep unconnected pins upon translation
+  P_LOG,                ///< write a log file about the translation
+  P_KEEP_UNCONN_PINS,   ///< keep unconnected pins upon translation
   P_TASKFILE,   ///< insist on writing task files
   P_ANONYMIZE,  ///< anonymize the process output (re-enumerate places)
   P_CTL         ///< generate CTL properties for analysis (if applicable)
@@ -144,6 +144,21 @@ typedef enum
 } possibleAnalysis;
 
 typedef map<possibleAnalysis, bool> analysis_t;
+
+
+/*!
+ * \brief enumeration of the process characteristics for filtering
+ */
+typedef enum
+{
+  PC_NORMAL,       ///< no specifics
+  PC_OVERLAPPING,  ///< overlapping pinsets
+  PC_PIN_MULTI,           ///< non-normal pin multiplicities
+  PC_PIN_MULTI_NONMATCH,  ///< non-matching pin multiplicities
+  PC_EMPTY,             ///< empty process
+  PC_UNCONNECTED,       ///< unconnected process
+  PC_TRIVIAL_INTERFACE  ///< process has a trivial interface
+} processCharacteristics;
 
 /******************************************************************************
  * External functions

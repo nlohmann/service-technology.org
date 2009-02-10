@@ -11,7 +11,7 @@ LOLA-FULL-LIMITED = lola-full-limited  # LoLA with FULL
 
 REDUCTION-LEVEL   = 3                  # Petri net reduction level for the
                                        # translation
-UML2OWFN-PARAM    = -p ctl             # additional UML2oWFN paramters
+UML2OWFN-PARAM    = -p filter -p ctl   # additional UML2oWFN paramters
 OUTPUT-FORMAT     = lola               # output format to be produced by UML2oWFN
                                        # see uml2owfn -h for feasible options
 ##########################################################################

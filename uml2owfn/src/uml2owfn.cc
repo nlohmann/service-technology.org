@@ -226,10 +226,11 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     if (options[O_ROLECUT] && globals::deriveRolesToCut) {
       // we want to automatically find interesting services from
       // role information in choreographies
-      if ( ((PN->inputSize() <= 1 && PN->outputSize() <= 1)
-             || PN->inputSize() == 0
-             || PN->outputSize() == 0)
-          && globals::parameters[P_FILTER]) {
+      if ( globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]
+           && ((PN->inputSize() <= 1 && PN->outputSize() <= 1)
+               || PN->inputSize() == 0
+               || PN->outputSize() == 0))
+      {
         // but the current process has no interesting interface, and we are
         // filtering
         res |= RES_SKIPPED|RES_INSUFF_INTERFACE;
@@ -418,6 +419,8 @@ int main( int argc, char *argv[])
 
         int processNum = 0;           // running number of processes
         int translatedProcesses = 0;  // translated number of processes
+        // number of processes where workflow completion does not preserve soundness
+        int soundViolatingWfCompletion = 0;
         for(list<Process*>::iterator currProcess = allProcesses.begin(); currProcess != allProcesses.end(); currProcess++) {
           Process *process = *currProcess;
           processNum++;
@@ -426,25 +429,27 @@ int main( int argc, char *argv[])
 
           process->updateCharacteristics();
           if (process->empty()) {
-              process->processCharacteristics |= UML_EMPTY_PROCESS;
+              process->processCharacteristics |= UML_PC(PC_EMPTY);
           }
 
           UmlProcessStatistics stat = process->getStatistics();
           log_print(stat.toString(';'));
 
-          if (   globals::parameters[P_FILTER]
-              || (UML_EMPTY_PROCESS & process->processCharacteristics))
-          {
-            // do not translate process if it violates one of our structural constraints
-            if (process->processCharacteristics != UML_STANDARD) {
-              string reason = "";
-              if (process->processCharacteristics & UML_OVERLAPPING_PINS)
-                reason += " overlapping pinsets,";
-              if (process->processCharacteristics & UML_PIN_MULTIPLICITIES)
-                reason += " pin multiplicities,";
-              if (process->processCharacteristics & UML_EMPTY_PROCESS)
-                reason += " empty process,";
+          // check if this process has to be filtered
+          if (process->processCharacteristics != UML_PC(PC_NORMAL)) {
 
+            string reason = "";
+            if (UML_PC(PC_OVERLAPPING) & process->processCharacteristics && globals::filterCharacteristics[PC_OVERLAPPING])
+              reason += " overlapping pinsets,";
+            if (UML_PC(PC_PIN_MULTI) & process->processCharacteristics && globals::filterCharacteristics[PC_PIN_MULTI])
+              reason += " pin multiplicities,";
+            if (UML_PC(PC_PIN_MULTI_NONMATCH) & process->processCharacteristics && globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH])
+              reason += " non-matching pin multiplicities,";
+            if (UML_PC(PC_EMPTY) & process->processCharacteristics && globals::filterCharacteristics[PC_EMPTY])
+              reason += " empty process,";
+
+            if (reason != "") {
+              // at least one reason filter has been set, skip this process
               trace(TRACE_INFORMATION, "filtering process "+process->getName()+", reason: "+reason+"\n");
               log_println(";---");  // fill last columns of log
               continue;
@@ -516,7 +521,10 @@ int main( int argc, char *argv[])
                 log_print(";");
                 if (res & RES_NOT_FREECHOICE) log_print("not free-choice/");
                 if (res & RES_NO_WF_STRUCTURE) log_print("no workflow structure/");
-                if (res & RES_NOT_PRESERVED) log_print("did not preserve soundness/");
+                if (res & RES_NOT_PRESERVED) {
+                  log_print("did not preserve soundness/");
+                  soundViolatingWfCompletion++;
+                }
               }
             }
           }
@@ -534,7 +542,13 @@ int main( int argc, char *argv[])
       else if (translatedProcesses == 1)
         trace(TRACE_ALWAYS, toString(translatedProcesses)+" of "+toString(processNum)+" processes has been translated.\n");
       else
-        trace(TRACE_ERROR, "None of "+toString(processNum)+" processes has been translated.\n");
+        trace(TRACE_ALWAYS, "None of "+toString(processNum)+" processes has been translated.\n");
+
+      if (soundViolatingWfCompletion >= 1)
+        trace(TRACE_ALWAYS, "For "+toString(soundViolatingWfCompletion)+" of "+toString(translatedProcesses)+" processes soundness could not be preserved.\n");
+      else
+        trace(TRACE_ALWAYS, "All processes have been translated preserving soundness.\n");
+
 
       write_script_file();  // write script file for the entire process library
       write_log_file();     // write translation log for the entire library

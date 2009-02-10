@@ -136,7 +136,7 @@ void ASTNode::prepareInstances(list<Process*>& processes, list<SimpleTask*>& tas
         } else {
             Pin* existingPin = currNode->getPinByName(attributes["name"]);
             if (!existingPin->free()) {
-                currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
             }
             currentInputCriterion->pins.push_back(existingPin);
             existingPin->setCriterion(currentInputCriterion);
@@ -154,7 +154,7 @@ void ASTNode::prepareInstances(list<Process*>& processes, list<SimpleTask*>& tas
         } else {
             Pin* existingPin = currNode->getPinByName(attributes["name"]);
             if (!existingPin->free()) {
-                currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
             }
             currentOutputCriterion->pins.push_back(existingPin);
             existingPin->setCriterion(currentOutputCriterion);
@@ -534,7 +534,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
               if (!additionalInput->free()) {
                 // the current <additionalInput ...> already has a criterion which contains it
-                currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
               }
 
               // remember that the current <additionalInput... /> has this criterion for
@@ -568,7 +568,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
               // we are parsing an assignment: this <outputCriterion ... /> maps
               // a surrounding <additionalOutput ... /> to an existing outputCriterion
               if (!additionalOutput->free()) {
-                currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
               }
 
               // remember that the current <additionalOutput... /> has this criterion for
@@ -629,7 +629,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 Pin* existingProcessPin = currProcess->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
-                  currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                  currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
                 }
                 currentInputCriterion->pins.push_back(existingPin);
                 currentProcessInputCriterion->pins.push_back(existingProcessPin);
@@ -657,7 +657,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 // assign a pin to the current input pinset
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
-                  currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                  currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
                 }
                 currentInputCriterion->pins.push_back(existingPin);
                 existingPin->setCriterion(currentInputCriterion);
@@ -687,7 +687,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 Pin* existingProcessPin = currProcess->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
-                  currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                  currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
                 }
                 currentOutputCriterion->pins.push_back(existingPin);
                 currentProcessOutputCriterion->pins.push_back(existingProcessPin);
@@ -710,7 +710,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
             } else {
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
                 if (!existingPin->free()) {
-                  currNode->processCharacteristics |= UML_OVERLAPPING_PINS;
+                  currNode->processCharacteristics |= UML_PC(PC_OVERLAPPING);
                 }
                 currentOutputCriterion->pins.push_back(existingPin);
                 existingPin->setCriterion(currentOutputCriterion);

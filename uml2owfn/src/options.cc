@@ -102,13 +102,13 @@ static struct option longopts[] =
 {
   { "help",		no_argument,       NULL, 'h' },
   { "version",		no_argument,       NULL, 'v' },
-  { "supressfilter",	no_argument      , NULL, 's' },
-  { "rolecut",	        no_argument      , NULL, 'R' },
+  { "rolecut",	  no_argument      , NULL, 'R' },
   { "input",		required_argument, NULL, 'i' },
   { "output",		optional_argument, NULL, 'o' },
   { "format",		required_argument, NULL, 'f' },
   { "parameter",	required_argument, NULL, 'p' },
   { "debug",		required_argument, NULL, 'd' },
+  { "skip",    required_argument, NULL, 's' },
   { "reduce",		required_argument, NULL, 'r' },
   { "roleexclusive",	required_argument, NULL, 'e' },
   { "rolecontains",	required_argument, NULL, 'c' },
@@ -116,7 +116,7 @@ static struct option longopts[] =
 };
 
 /// short options (needed by GNU getopt)
-const char *par_string = "hvsRi:o::f:p:d:r:e:c:a:";
+const char *par_string = "hvRi:o::f:p:d:r:e:c:a:s:";
 
 
 /******************************************************************************
@@ -149,11 +149,14 @@ void print_help()
 	trace(" -c, --rolecontains=ROLE   cuts away all swimlanes in a process that\n");
 	trace("                           do not contain a startnode or are one of the\n");
 	trace("                           contained roles\n");
+	trace(" -s, --skip=PROCESS-PROP   skip processes in the translation that have the given\n");
+  trace("                           structural property\n");
 	trace(" -h, --help                print this help list and exit\n");
 	trace(" -v, --version             print program version and exit\n");
 	trace("\n");
   trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
   trace("    filter              filter out infeasible processes from the library\n");
+  trace("                        equivalent to: '-s empty -s overlappingPins'\n");
   trace("    keeppins            keep unconnected pins\n");
   trace("    log                 write a log file for the translation\n");
   trace("    taskfile            write analysis task to a separate file\n");
@@ -177,6 +180,17 @@ void print_help()
   trace("    noData              ignore state of data flow upon process termination,\n");
   trace("    wfNet               attempt to translate net into a workflow net,\n");
   trace("    orJoin              analyze net by assuming an implicit OR-join,\n");
+  trace("\n");
+  //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+  trace("  PROCESS-PROP is one of the following (multiple parameters permitted):\n");
+  trace("    empty               the process contains no nodes\n");
+  trace("    multi               the process contains edges with token production\n");
+  trace("                        or consumption different than 1\n");
+  trace("    multiNonMatching    the process contains edges where token production and\n");
+  trace("                        consumption do not match, e.g. produce 1, consume 2\n");
+  trace("    overlappingPins     the process has overlapping pinsets\n");
+  trace("    trivialInterface    the process has a trivial interface (at most one input\n");
+  trace("                        place or output place), effective only with '-R'\n");
   trace("\n");
 	trace("Examples:\n");
 	trace("  uml2owfn -i library.xml -f owfn -o\n");
@@ -317,9 +331,12 @@ void parse_command_line(int argc, char* argv[])
 			options[O_PARAMETER] = true;
 			parameter = string(optarg);
 
-	    if (parameter == "filter")
-	      globals::parameters[P_FILTER] = true;
-      else if (parameter == "taskfile")
+	    if (parameter == "filter") {
+	      options[O_SKIP_BY_FILTER] = true;
+	      globals::filterCharacteristics[PC_EMPTY] = true;
+	      //globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH] = true;
+	      globals::filterCharacteristics[PC_OVERLAPPING] = true;
+	    } else if (parameter == "taskfile")
         globals::parameters[P_TASKFILE] = true;
 	    else if (parameter == "keeppins")
         globals::parameters[P_KEEP_UNCONN_PINS] = true;
@@ -336,6 +353,30 @@ void parse_command_line(int argc, char* argv[])
 			}
 
 			break;
+		}
+
+		case 's':
+		{
+		  options[O_SKIP_BY_FILTER] = true;
+		  parameter = string(optarg);
+
+		  if (parameter == "empty")
+        globals::filterCharacteristics[PC_EMPTY] = true;
+      else if (parameter == "multi")
+        globals::filterCharacteristics[PC_PIN_MULTI] = true;
+      else if (parameter == "multiNonMatching")
+        globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH] = true;
+      else if (parameter == "overlappingPins")
+        globals::filterCharacteristics[PC_OVERLAPPING] = true;
+      else if (parameter == "trivialInterface")
+        globals::filterCharacteristics[PC_TRIVIAL_INTERFACE] = true;
+      else {
+        trace(TRACE_ALWAYS, "Unknown filtering process characteristic \"" + parameter +"\".\n");
+        trace(TRACE_ALWAYS, "Use -h to get a list of valid process characteristics.\n");
+        exit(1);
+      }
+
+		  break;
 		}
 
     case 'a':
@@ -594,9 +635,23 @@ void parse_command_line(int argc, char* argv[])
 
   }
 
+  if (options[O_SKIP_BY_FILTER]) {
+    if (globals::filterCharacteristics[PC_EMPTY])
+      trace(TRACE_INFORMATION, "skipping empty processes\n");
+    if (globals::filterCharacteristics[PC_PIN_MULTI])
+      trace(TRACE_INFORMATION, "skipping processes with pin multiplicities\n");
+    if (globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH])
+      trace(TRACE_INFORMATION, "skipping processes with non-matching pin multiplicities\n");
+    if (globals::filterCharacteristics[PC_OVERLAPPING])
+      trace(TRACE_INFORMATION, "skipping processes with overlapping pinsets\n");
+    if (globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]) {
+      trace(TRACE_INFORMATION, "skipping processes with trivial interface\n");
+      if (!options[O_ROLECUT])
+        trace(TRACE_INFORMATION, "  - note: effective only when cutting rules (option '-R')\n");
+    }
+  }
+
   if (options[O_PARAMETER]) {
-    if (globals::parameters[P_FILTER])
-      trace(TRACE_INFORMATION, "filter processes for syntactical compliance\n");
     if (globals::parameters[P_TASKFILE])
       trace(TRACE_INFORMATION, "write analysis task in separate files\n");
     if (globals::parameters[P_LOG])

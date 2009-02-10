@@ -161,6 +161,28 @@ the file is specified the @samp{-f FORMAT} option. If you have @samp{dot}
 installed, try @samp{-f dot} to generate a graphical representation of each
 net in @samp{.png} format.
 
+
+@section Filtering Processes Based on Structural Properties
+
+@acronym{UML2oWFN} allows to skip some processes in the translation based on
+structural properties of the process. The switch @samp{-s PROP} controls which
+processes shall not be translated. @samp{PROP} can take the following values
+@itemize
+  @item @samp{empty} - Do not translate empty processes.
+  @item @samp{multi} - Do not translate processes that have edges with
+        pin multiplicities different from min:1 and max:1. Please note that
+		@acronym{UML2oWFN} only checks the presence of these values, but that
+		the multiplicties are not translated to the Petri net level in the
+		current version.        
+  @item @samp{multiNonMatching} - Do not translate processes that have edges
+        with non-matching pin multiplicities. For instance an edge where the
+        source pin may produce 2 tokens, but the target pin can only consume 1
+        token.
+  @item @samp{overlapping} - Do not translate processes that have overlapping
+        pinsets. @acronym{UML2oWFN} can handle overlapping pinsets; the
+        resulting Petri net is not free-choice.
+@end itemize
+
 @c ----------------------------------------------------------------------------
 
 @node Analysis
@@ -288,25 +310,32 @@ processes.
 @item @samp{-p log} write a log @file{uml2owfn_lib.log} in CSV (comma separated
 file) format containing information about each process. The column format is
 @example
-file name;is structurally feasible;structural problem;
+file name;correct syntax;structural properties;
 number of nodes;number of edges;
-average number of incoming edges;average number of outgoing edges
+average number of incoming edges;average number of outgoing edges;
+Petri net properties
 @end example
-A process is declared as structurally feasible if
+The column @samp{correct syntax} holds @samp{true} if the input process had
+correct static semantics, and @samp{false} otherwise. The column @samp{structural
+properties} contains a list of characteristic properties of the process, namely,
+whether the process 
   @enumerate
-  @item it could be parsed and translated into a Petri net,
-  @item it is not empty,
-  @item it has no overlapping pinsets, and
-  @item all token consumption/production multiplicities on all edges are exactly
-  min:1 and max:1.
+  @item is empty,
+  @item contains edges with pin multiplicities,
+  @item contains edges with non-matching pin multiplicities (produce 2 token,
+        consume 1 token), and
+  @item whether the process contains overlapping pinsets.
   @end enumerate
-The corresponding column contains values @samp{true} or @samp{false}. If the
-value is @samp{false}, the column @samp{structural problem} provides further
-information. In case the process is structurally feasible, the generated Petri
-net is check for being a free-choice workflow-net. If one of the properties is
-violated, this is also written to @samp{structural problem}; however, the
-soundness analysis is also applicable for processes which are neither
-free-choice, nor workflow nets.
+The column @samp{Petri net properties} contains a list of structural properties
+of the Petri net, namely, whether the net
+  @enumerate
+  @item is not connected,
+  @item has an insufficent interface,
+  @item has an incorrect structure according to UML2 Activity Diagrams,
+  @item is a free-choice Petri net,
+  @item has workflow-net structure, and
+  @item whether the translation did no preserve soundness of the process.
+  @end enumerate
 
 @item @samp{-d 2} prints further information of the translation process to
 standard output, and statistical data on the size of each generated net to
@@ -349,13 +378,13 @@ strict as it requires that all data is available at the process output upon
 process termination. While a violation of this property is still considered an
 error, it might prevent a detection of more severe control-flow errors in the
 process. To this extend, the soundness analysis can be changed to ignore the
-dataflow at the process output. Use option @samp{-a removePinsets} when translating
+dataflow at the process output. Use option @samp{-a noData} when translating
 the library to create slightly changed @samp{.lola} files with corresponding
 @samp{.task} files. The analysis itself is performed as descibed above.
 
 @cartouche
 @example
-uml2owfn -i lib.xml -f lola -a soundness -a safe -a removePinsets -p taskfile -o
+uml2owfn -i lib.xml -f lola -a soundness -a safe -a noData -p taskfile -o
 @end example
 @end cartouche
 
@@ -379,32 +408,29 @@ uml2owfn -i lib.xml -f lola -a soundness -a safe -a removePinsets -p taskfile -o
  
  @item The "workflow net" semantics synchronizes control-flow and data-flow in
  order to detect propert termination locally at a unique "omega" sink place of
- the net as in workflow Petri nets. The termination semantics assumes that
- data-flow terminates via an XOR-join (only one output pinset gets to fire) while
- all control-flow terminates via an AND-join. This assumption may be wrong for
- your process as UML2 Activity Diagrams generally terminate control-flow via an
- implicit OR-join. Interpretation of analysis results therefore must be done
- carefully! Choose
+ the net as in workflow Petri nets. The termination semantics assumes that the
+ control-flow and data-flow terminate via an implicit OR-join of several terminal
+ nodes. It computes an extension of the multi-terminal workflow net to a single
+ terminal workflow net. This extension always preserves unsoundness of the net
+ (i.e. an unsound multi-terminal net will also be unsound after the extension).
+ For a specific class of processes, the extension also preserves soundness;
+ generate a log file with parameter @samp{-p log} to see for which processes
+ soundness is preserved. Choose
  @example
  -a soundness -a wfNet
  @end example
- to use this termination semantics. 
+ to use this termination semantics.
 
 @item The "control-flow only" semantics ignores data-flow upon termination (by
 removing the corresponding parts from the process) and lets the control-flow
 terminate via an implicit OR-join. Choose
  @example
- -a soundness -a removePinsets
+ -a soundness -a noData
  @end example
  to use this termination semantics.
 
-@item A variant of the "standard" UML2 termination semantics which synchronizes
-control-flow over data-flow, but makes both flow independent of each other. Thus
-it is possible to analyze termination problems due to race conditions between
-control-flow and data-flow. In case these are dependent on each other, this semantics
-is equivalent to the standard termination semantics. It assumes that the
-process control-flow terminates via an implicit OR-join while the data-flow
-terminates via an XOR-join. Choose
+@item A variant of the UML2 termination semantics which assumes that
+control-flow and data-flow terminate via an implicit OR-join. Choose
  @example
  -a soundness -a orJoin
  @end example
@@ -452,16 +478,22 @@ file with workflow-net structure. Each file can be loaded into Woflan and
 analyzed for soundness.
 
 The workflow-net translation introduces a unique @samp{alpha} place that is
-initially marked, like in all other soundness analysis use cases. It further
-adds a unique @samp{omega} place that has no outgoing arcs. Each output pinset
-of the process produces on this omega place; the termination of the process via
-an output pinset requires that @i{all} end-nodes are marked. This effectively
-implements an AND-join at the end of the process. 
+initially marked, like in all other soundness analysis use cases. It computes a
+completion logic of transitions and places that cover the reachable final markings
+of the net and the produce on a new unique @samp{omega} place that has no outgoing
+arcs. 
 
-Any process that does not terminate with exactly one token on each end node will
-be analyzed as unsafe, although the original process semantics tell that the
-process is sound. Conversely, every process that is found to be sound by this
-analysis, is also sound in the original semantics.
+@c Each output pinset
+@c of the process produces on this omega place; the termination of the process via
+@c an output pinset requires that @i{all} end-nodes are marked. This effectively
+@c implements an AND-join at the end of the process. 
+
+Any process that is found to be unsound by this analysis, is also unsound in
+the original semantics. For cases, where the structure of the Petri net provides
+ambiguous information for computation of the completion logic, and for cases where
+there exists no such completion, a sound process can become unsound. These cases
+can be identified in the translation log (@samp{-p log}). For any other cases,
+soundness is preserved.
 
 You can use
 
@@ -605,6 +637,7 @@ make cleanall
 @end example
 
 to clean all generated files, leaving only the original process libraries.
+
 
 @c ----------------------------------------------------------------------------
 

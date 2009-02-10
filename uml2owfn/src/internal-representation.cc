@@ -173,7 +173,7 @@ Process* FlowContentElement::getEnclosingProcess() {
 FlowContentNode::FlowContentNode(string givenName, uml_elementType givenType, ASTElement* link, FlowContentElement* parent) : FlowContentElement(link,parent) {
     name = givenName;
     type = givenType;
-    processCharacteristics = UML_STANDARD;
+    processCharacteristics = UML_PC(PC_NORMAL);
     parentFCE = parent;
 }
 
@@ -639,7 +639,7 @@ void Process::updateCharacteristics() {
     if (n->getType() == NJOIN) {
       for (list<Pin*>::const_iterator pin = n->inputPins.begin(); pin != n->inputPins.end(); pin++) {
         if ((*pin)->isDataPin) {
-          n->processCharacteristics |= UML_PIN_MULTIPLICITIES;
+          n->processCharacteristics |= UML_PC(PC_PIN_MULTI);
         }
       }
     }
@@ -651,12 +651,20 @@ void Process::updateCharacteristics() {
   for (list<FlowContentConnection*>::const_iterator edge = flowContentConnections.begin(); edge != flowContentConnections.end(); edge++) {
     FlowContentConnection* c = (*edge);
 
+    // process has non-normal pin-multiplicities
+    if (   c->getInput()->min != 1 || c->getOutput()->min != 1
+        || c->getInput()->max != 1 || c->getOutput()->max != 1)
+    {
+      // extend characteristics for filtering
+      processCharacteristics |= UML_PC(PC_PIN_MULTI);
+    }
+
     // pin multiplicities at source and target do not match
     if (   c->getInput()->min != c->getOutput()->min
         || c->getInput()->max != c->getOutput()->max)
     {
       // extend characteristics for filtering
-      processCharacteristics |= UML_PIN_MULTIPLICITIES;
+      processCharacteristics |= UML_PC(PC_PIN_MULTI_NONMATCH);
     }
   }
 }

@@ -105,6 +105,9 @@ namespace globals
   /// analysis task flags (set by #parse_command_line)
   extern analysis_t analysis;
 
+  /// characteristics of processes to be filtered
+  extern map<processCharacteristics, bool> filterCharacteristics;
+
   /// the last token that was displayed in an error message
   extern string last_error_token;
 

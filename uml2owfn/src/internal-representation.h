@@ -80,7 +80,7 @@ class UmlProcessStatistics {
      */
     UmlProcessStatistics () {
       correct_syntax = true;
-      processCharacteristics = UML_STANDARD;
+      processCharacteristics = UML_PC(PC_NORMAL);
       numNodes = 0;
       numEdges = 0;
       avgInDegree = 0;
@@ -102,16 +102,18 @@ class UmlProcessStatistics {
         result << delim << "false";
 
       // additional syntactical characteristics of the process
-      if (processCharacteristics == UML_STANDARD)
+      if (processCharacteristics == UML_PC(PC_NORMAL))
         result << delim << "---";
       else {
         result << delim;
-        if (processCharacteristics & UML_EMPTY_PROCESS)
+        if (processCharacteristics & UML_PC(PC_EMPTY))
           result << "empty process/";
-        if (processCharacteristics & UML_OVERLAPPING_PINS)
+        if (processCharacteristics & UML_PC(PC_OVERLAPPING))
           result << "overlapping pins/";
-        if (processCharacteristics & UML_PIN_MULTIPLICITIES)
+        if (processCharacteristics & UML_PC(PC_PIN_MULTI))
           result << "pin multiplicities/";
+        if (processCharacteristics & UML_PC(PC_PIN_MULTI_NONMATCH))
+          result << "non-matching pin multiplicities/";
       }
 
       // structural properties of the process

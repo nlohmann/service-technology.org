@@ -7,7 +7,7 @@ DIR=$testdir/compiler
 FILE=TestSuite
 
 must_filecount=25
-must_filecount_filter=21
+must_filecount_filter=24
 
 echo ""
 echo "UML2oWFN compiler tests"
@@ -22,6 +22,86 @@ echo "UML2oWFN compiler tests"
 	if [ ! $is_filecount -eq $must_filecount ] ; then
 	  result=1
 	  echo "[fail] not all processes have been translated, $is_filecount / $must_filecount"
+	fi
+	rm $builddir/*.lola
+
+
+must_filecount_skip=25
+
+	cmd="uml2owfn -i $DIR/$FILE.xml -f lola -s empty --output=$FILE"
+	echo $cmd
+
+	$cmd &> /dev/null
+	result=$(($result | $?))
+
+	is_filecount=$(ls -l $builddir/*.lola | wc -l)
+	if [ ! $is_filecount -eq $must_filecount_skip ] ; then
+	  result=1
+	  echo "[fail] not all processes have been translated, $is_filecount / $must_filecount_skip"
+	fi
+	rm $builddir/*.lola
+	
+	
+must_filecount_skip=20
+
+	cmd="uml2owfn -i $DIR/$FILE.xml -f lola -s multi --output=$FILE"
+	echo $cmd
+
+	$cmd &> /dev/null
+	result=$(($result | $?))
+
+	is_filecount=$(ls -l $builddir/*.lola | wc -l)
+	if [ ! $is_filecount -eq $must_filecount_skip ] ; then
+	  result=1
+	  echo "[fail] not all processes have been translated, $is_filecount / $must_filecount_skip"
+	fi
+	rm $builddir/*.lola
+	
+
+must_filecount_skip=22
+
+	cmd="uml2owfn -i $DIR/$FILE.xml -f lola -s multiNonMatching --output=$FILE"
+	echo $cmd
+
+	$cmd &> /dev/null
+	result=$(($result | $?))
+
+	is_filecount=$(ls -l $builddir/*.lola | wc -l)
+	if [ ! $is_filecount -eq $must_filecount_skip ] ; then
+	  result=1
+	  echo "[fail] not all processes have been translated, $is_filecount / $must_filecount_skip"
+	fi
+	rm $builddir/*.lola
+	
+	
+must_filecount_skip=24
+
+	cmd="uml2owfn -i $DIR/$FILE.xml -f lola -s overlappingPins --output=$FILE"
+	echo $cmd
+
+	$cmd &> /dev/null
+	result=$(($result | $?))
+
+	is_filecount=$(ls -l $builddir/*.lola | wc -l)
+	if [ ! $is_filecount -eq $must_filecount_skip ] ; then
+	  result=1
+	  echo "[fail] not all processes have been translated, $is_filecount / $must_filecount_skip"
+	fi
+	rm $builddir/*.lola
+	
+	
+must_filecount_skip=20
+
+	cmd="uml2owfn -i $DIR/$FILE.xml -f lola -s overlappingPins -s empty -s multi -s multiNonMatching --output=$FILE"
+	echo $cmd
+
+	$cmd &> /dev/null
+	result=$(($result | $?))
+
+	is_filecount=$(ls -l $builddir/*.lola | wc -l)
+	if [ ! $is_filecount -eq $must_filecount_skip ] ; then
+	  result=1
+	  echo "[fail] not all processes have been translated, $is_filecount / $must_filecount_skip"
 	fi
 	rm $builddir/*.lola
 

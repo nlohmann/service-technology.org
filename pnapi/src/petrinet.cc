@@ -259,7 +259,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    observer_(*this), condition_(new formula::True())
+    observer_(*this), condition_(new formula::True()), meta_(net.meta_)
   {
     *this += net;
   }

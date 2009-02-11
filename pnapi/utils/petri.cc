@@ -6,16 +6,17 @@
 #include <libgen.h>
 #include "pnapi.h"
 #include "cmdline.h"
+#include "config.h"
 
+using std::cin;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::vector;
+using std::string;
+using std::ifstream;
+using std::ofstream;
 using namespace pnapi;
-
-using pnapi::io::owfn;
-using pnapi::io::meta;
-using pnapi::io::CREATOR;
-using pnapi::io::INPUTFILE;
-using pnapi::io::OUTPUTFILE;
-using pnapi::io::INVOCATION;
-using pnapi::io::InputError;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -40,49 +41,59 @@ void evaluateParameters(int argc, char** argv) {
 int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
     
-    std::vector<PetriNet> nets;
-    std::vector<std::string> names;
+    vector<PetriNet> nets;
+    vector<string> names;
+    
+    // store invocation in a string for meta information in file output
+    string invocation;
+    for (int i = 0; i < argc; ++i) {
+        invocation += string(argv[i]) + " ";
+    }
     
     
     /********
     * INPUT *
     ********/
-    if (args_info.inputs_num == 0) {
+    if (!args_info.inputs_num) {
         // read from stdin
         PetriNet net;
         
+        // try to parse net
         try {
-   	    /* try meta information tags, they will be remembered for output */
-            std::cin >> meta(INPUTFILE,  "<stdin>") 
-		     >> meta(CREATOR,    "<toolname>")
-		     >> meta(INVOCATION, "<commandline>")
-		     >> owfn >> net;
-        } catch (InputError error) {
-            std::cerr << error << std::endl;
+            cin >> meta(io::INPUTFILE, "stdin") 
+                >> meta(io::CREATOR, PACKAGE_STRING)
+                >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+        } catch (io::InputError error) {
+            cerr << error << endl;
             exit(EXIT_FAILURE);
         }
 
         if (args_info.verbose_given) {
-            std::cerr << "<stdin>: " << net << std::endl;
+            cerr << "<stdin>: " << io::stat << net << endl;
         }
         
+        // store net
         nets.push_back(net);
-        names.push_back("<stdin>");
+        names.push_back("stdin");
     } else {
         // read from files
-        for (unsigned int i = 0; i < args_info.inputs_num; i++) {
+        for (unsigned int i = 0; i < args_info.inputs_num; ++i) {
             PetriNet net;
 
-            std::fstream infile(args_info.inputs[i], std::fstream::in);
+            // try to open file
+            ifstream infile(args_info.inputs[i], ifstream::in);
             if (!infile.is_open()) {
-                std::cerr << args_info.inputs[i] << ": could not open file to read" << std::endl;
+                cerr << args_info.inputs[i] << ": could not open file to read" << endl;
                 exit(EXIT_FAILURE);
             }
             
+            // try to parse net
             try {
-                infile >> meta(INPUTFILE, args_info.inputs[i]) >> owfn >> net;
-            } catch (InputError error) {
-                std::cerr << error << std::endl;
+                infile >> meta(io::INPUTFILE, args_info.inputs[i])
+                    >> meta(io::CREATOR, PACKAGE_STRING)
+                    >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+            } catch (io::InputError error) {
+                cerr << error << endl;
                 infile.close();            
                 exit(EXIT_FAILURE);
             }
@@ -90,9 +101,10 @@ int main(int argc, char** argv) {
             infile.close();
             
             if (args_info.verbose_given) {
-                std::cerr << args_info.inputs[i] << ": " << net << std::endl;
+                cerr << args_info.inputs[i] << ": " << io::stat << net << endl;
             }
             
+            // store net
             nets.push_back(net);
             names.push_back(args_info.inputs[i]);
         }
@@ -125,14 +137,14 @@ int main(int argc, char** argv) {
     if (args_info.check_given || args_info.isFreeChoice_given ||
         args_info.isNormal_given || args_info.isWorkflow_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
-            std::cerr << names[i] << ": ";
+            cerr << names[i] << ": ";
 
             if (args_info.check_arg == check_arg_freechoice || args_info.isFreeChoice_given) {
-                std::cerr << nets[i].isFreeChoice() << std::endl;                
+                cerr << nets[i].isFreeChoice() << endl;                
             }
             
             if (args_info.check_arg == check_arg_normal || args_info.isNormal_given) {
-                std::cerr << nets[i].isNormal() << std::endl;                
+                cerr << nets[i].isNormal() << endl;                
             }
             
             if (args_info.check_arg == check_arg_workflow || args_info.isWorkflow_given) {
@@ -147,20 +159,14 @@ int main(int argc, char** argv) {
     *********/   
     if (args_info.output_given) {
         for (unsigned int i = 0; i < args_info.output_given; ++i) {
-            std::string outname = names[0] + "." + args_info.output_orig[i];
-            std::ofstream outfile(outname.c_str(), std::fstream::trunc);
+            string outname = names[0] + "." + args_info.output_orig[i];
+            ofstream outfile(outname.c_str(), ofstream::trunc);
             if (!outfile.is_open()) {
-                std::cerr << outname << ": could not write to file" << std::endl;
+                cerr << outname << ": could not write to file" << endl;
                 exit(EXIT_FAILURE);
             }
 
-	    /* 
-	       if you want to, set other meta information tags here
-	       e.g. in OWFN they will be included 
-	       you can even overwrite existing ones (e.g. from input) here
-	       sample code:
-	    */
-	    outfile << meta(OUTPUTFILE, outname);
+            outfile << meta(io::OUTPUTFILE, outname);
 
             switch(args_info.output_arg[i]) {
                 case (output_arg_owfn): {

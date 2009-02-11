@@ -1,16 +1,18 @@
-#ifndef MARKING_H
-#define MARKING_H
+// -*- C++ -*-
+
+#ifndef PNAPI_MARKING_H
+#define PNAPI_MARKING_H
 
 #include <map>
-using std::map;
 
 namespace pnapi
 {
 
-/// forward declarations
-class PetriNet;
-class Transition;
-class Place;
+  // forward declarations
+  class PetriNet;
+  class Transition;
+  class Place;
+
 
   /*!
    * \brief   Marking of all places of a net
@@ -26,7 +28,7 @@ class Place;
     Marking(const Marking &m);
     virtual ~Marking() {}
 
-    map<Place *, unsigned int> getMap() const;
+    const std::map<const Place *, unsigned int> & getMap() const;
     PetriNet & getPetriNet() const;
     bool internalsOnly() const;
 
@@ -35,16 +37,17 @@ class Place;
     bool activates(const Transition &t);
     Marking & successor(const Transition &t);
 
-    unsigned int & operator[](Place *offset);
+    unsigned int & operator[](const Place &);
+    unsigned int operator[](const Place &) const;
     bool operator==(const Marking &m) const;
     Marking & operator=(const Marking &m);
 
   private:
-    map<Place *, unsigned int> m_;
+    std::map<const Place *, unsigned int> m_;
     PetriNet &net_;
     bool internalsOnly_;
   };
 
-} /* end of namespace pnapi */
+}
 
-#endif /* MARKING_H */
+#endif

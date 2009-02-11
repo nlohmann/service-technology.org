@@ -325,7 +325,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::Condition & c)
+      ostream & operator<<(ostream & os, const pnapi::formula::Condition & c)
       {
 	switch (FormatData::data(os))
 	  {

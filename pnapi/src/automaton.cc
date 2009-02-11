@@ -8,12 +8,14 @@
 #include <cmath>
 #include <iostream>
 
+#include "petrinet.h"
 #include "util.h"
 #include "automaton.h"
 
 using std::cerr;
 using std::cout;
 using std::ostream;
+using std::list;
 
 namespace pnapi
 {

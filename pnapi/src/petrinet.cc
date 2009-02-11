@@ -248,7 +248,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet() :
-    observer_(*this), condition_(new formula::True())
+    observer_(*this)
   {
   }
 
@@ -259,7 +259,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    observer_(*this), condition_(new formula::True()), meta_(net.meta_)
+    observer_(*this), condition_(net.condition_), meta_(net.meta_)
   {
     *this += net;
   }
@@ -345,7 +345,7 @@ namespace pnapi
 
   /*!
    */
-  Condition & PetriNet::finalCondition()
+  formula::Condition & PetriNet::finalCondition()
   {
     return condition_;
   }

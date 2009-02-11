@@ -213,11 +213,11 @@ namespace pnapi
 	{ 
 	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
 	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
-	  INITIALMARKING, MARK,
+	  INITIALMARKING, FINALMARKING, MARK,
 	  TRANSITION, ARC, PRESET, POSTSET, 
 	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
 	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT, 
-	  FORMULA_GE, FORMULA_LE 
+	  FORMULA_GE, FORMULA_LE , FORMULA_FALSE, FORMULA_TRUE
 	};
 
 
@@ -279,16 +279,18 @@ namespace pnapi
 	  unsigned int marking;
 	  unsigned int capacity;
 	  std::string port;
+
+	  PlaceAttributes() : type(Place::INTERNAL), marking(0), capacity(0) {}
 	};
 
 	PetriNet net_;
 	Place::Type placeType_;
 	unsigned int capacity_;
 	std::string port_;
-	map<std::string, PlaceAttributes> places_;
+	std::map<std::string, PlaceAttributes> places_;
 	bool isPreset_;
-	map<std::string, unsigned int> preset_, postset_;
-	std::deque<Formula *> formulas_;
+	std::map<std::string, unsigned int> preset_, postset_;
+	std::deque<formula::Formula *> formulas_;
       };
 
     }
@@ -329,7 +331,7 @@ namespace pnapi
 	std::set<std::string> places; 
 	std::set<std::string> initialMarked; 
 	std::set<std::string> interface; 
-	map<std::string, std::set<std::string> > arcs; 
+	std::map<std::string, std::set<std::string> > arcs; 
       }; 
 
       /*!

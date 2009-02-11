@@ -70,7 +70,8 @@
 %type <yt_node>   port_participant port_list lola_places interface port_list_new
 %type <yt_node>   port_definition_new
 %type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
-%type <yt_node> markings marking marking_list initial
+%type <yt_node> markings marking marking_list initial final finalmarkings
+%type <yt_node>   finalmarking formula
 
 %start petrinet
 
@@ -254,7 +255,7 @@ synchronize:
  /****************/
 
 markings:
-  initial final { $$ = $1; }
+initial final { $$ = new Node($1, $2); }
   ;
 
 initial:
@@ -273,45 +274,36 @@ marking:
   ;
 
 final:
-    KEY_NOFINALMARKING
-  | KEY_FINALMARKING multiplefinalmarkinglists SEMICOLON
-    /*| KEY_FINALCONDITION statepredicate SEMICOLON */
-  | KEY_FINALCONDITION SEMICOLON 
+    KEY_NOFINALMARKING                       { $$ = new Node(FORMULA_FALSE); }
+  | KEY_FINALMARKING finalmarkings SEMICOLON { $$ = $2;                      }
+  | KEY_FINALCONDITION SEMICOLON             { $$ = new Node(FORMULA_TRUE);  }
+  | KEY_FINALCONDITION formula SEMICOLON     { $$ = $2;                      }
   ;
 
-multiplefinalmarkinglists:
-    finalmarkinglist 
-  | multiplefinalmarkinglists SEMICOLON finalmarkinglist
+finalmarkings:
+    finalmarking                         { $$ = new Node($1);     }
+  | finalmarkings SEMICOLON finalmarking { $$ = $1->addChild($3); }
   ;
 
-finalmarkinglist: 
-    /* empty */
-  | finalmarking
-  | finalmarkinglist COMMA finalmarking
+finalmarking:
+  marking_list { $$ = new Node(FINALMARKING, $1); }
   ;
 
-finalmarking: 
-    node_name COLON NUMBER 
-  | node_name
+formula: 
+    LPAR formula RPAR      { $$ = $2;                            } 
+  | OP_NOT formula         { $$ = new Node(FORMULA_NOT, $2);     }
+  | formula OP_OR formula  { $$ = new Node(FORMULA_OR, $1, $3);  }
+  | formula OP_AND formula { $$ = new Node(FORMULA_AND, $1, $3); }
+  | formula OP_AND KEY_ALL_OTHER_PLACES_EMPTY
+                           { $$ = new Node(FORMULA_AAOPE, $1);   }
+  | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
+                           { $$ = new Node(FORMULA_AAOIPE, $1);  }
+  | formula OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
+                           { $$ = new Node(FORMULA_AAOEPE, $1);  }
+  | node_name OP_EQ NUMBER { $$ = new Node(FORMULA_EQ, $1, $3);  }
+  | node_name OP_NE NUMBER { $$ = new Node(FORMULA_NE, $1, $3);  }
+  | node_name OP_LT NUMBER { $$ = new Node(FORMULA_LT, $1, $3);  }
+  | node_name OP_GT NUMBER { $$ = new Node(FORMULA_GT, $1, $3);  }
+  | node_name OP_GE NUMBER { $$ = new Node(FORMULA_GE, $1, $3);  }
+  | node_name OP_LE NUMBER { $$ = new Node(FORMULA_LE, $1, $3);  }
   ;
-
-/*
-statepredicate: 
-  LPAR statepredicate RPAR             { $$ = $2;                            } 
-| OP_NOT statepredicate                { $$ = new Node(FORMULA_NOT, $2);     }
-| statepredicate OP_OR statepredicate  { $$ = new Node(FORMULA_OR, $1, $3);  }
-| statepredicate OP_AND statepredicate { $$ = new Node(FORMULA_AND, $1, $3); }
-| statepredicate OP_AND KEY_ALL_OTHER_PLACES_EMPTY
-                                       { $$ = new Node(FORMULA_AAOPE, $1);   }
-| statepredicate OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
-                                       { $$ = new Node(FORMULA_AAOIPE, $1);  }
-| statepredicate OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
-                                       { $$ = new Node(FORMULA_AAOEPE, $1);  }
-| node_name OP_EQ NUMBER               { $$ = new Node(FORMULA_EQ, $1, $3);  }
-| node_name OP_NE NUMBER               { $$ = new Node(FORMULA_NE, $1, $3);  }
-| node_name OP_LT NUMBER               { $$ = new Node(FORMULA_LT, $1, $3);  }
-| node_name OP_GT NUMBER               { $$ = new Node(FORMULA_GT, $1, $3);  }
-| node_name OP_GE NUMBER               { $$ = new Node(FORMULA_GE, $1, $3);  }
-| node_name OP_LE NUMBER               { $$ = new Node(FORMULA_LE, $1, $3);  }
-;
-*/

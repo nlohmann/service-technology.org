@@ -31,6 +31,7 @@ namespace pnapi
   class PetriNet;
   class ComponentObserver;
   class Arc;
+  class Marking;
 
 
   /*!

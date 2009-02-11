@@ -1,12 +1,9 @@
-#ifndef STATE_H
-#define STATE_H
+// -*- C++ -*-
 
-#include <list>
+#ifndef PNAPI_STATE_H
+#define PNAPI_STATE_H
+
 #include <string>
-#include "petrinet.h"
-
-using std::list;
-using std::string;
 
 namespace pnapi
 {
@@ -38,15 +35,15 @@ public:
   void addSuccessor(State &s);
 
   /// returns the list of successors
-  const list<State *> & getSuccessors() const;
+  const std::list<State *> & getSuccessors() const;
 
   /// adds a reason for getting to a successor
-  void addReason(string &r);
+  void addReason(std::string &r);
 
   /// returns the list of reasons
-  const list<string *> & getReasons() const;
+  const std::list<std::string *> & getReasons() const;
 
-  unsigned int getHashValue(map<Place *, unsigned int> &pt);
+  unsigned int getHashValue(std::map<Place *, unsigned int> &pt);
 
   bool operator ==(const State &m) const;
 
@@ -64,10 +61,10 @@ private:
   unsigned int *hashValue_;
 
   /// list of all successors to this state
-  list<State *> successors_;
+  std::list<State *> successors_;
 
   /// list of reasons leading to the successors
-  list<string *> reasons_;
+  std::list<std::string *> reasons_;
 
   /// current dfs index
   static unsigned int maxIndex_;

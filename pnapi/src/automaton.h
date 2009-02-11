@@ -4,6 +4,8 @@
 #define PNAPI_AUTOMATON_H
 
 #include <list>
+#include <vector>
+#include <set>
 
 #include "marking.h"
 #include "state.h"
@@ -48,12 +50,12 @@ private:
   std::vector<std::set<State *> > hashTable_;
   std::map<Place *, unsigned int> primes_;
 
-  std::list<string> in_;
-  std::list<string> out_;
+  std::list<std::string> in_;
+  std::list<std::string> out_;
   unsigned int first_;
   std::list<unsigned int> finals_;
 
-  map<Transition *, string> reasons_;
+  std::map<Transition *, std::string> reasons_;
 
   PetriNet &net_;
   Marking initialmarking_;

@@ -117,11 +117,11 @@ NOT                             { return OP_NOT; }
 
  /* identifiers */
 [0-9][0-9]*                     { 
-               pnapi_owfn_lval.yt_int = atoi(yytext); return NUMBER; }
+            pnapi_owfn_lval.yt_int = atoi(yytext); return NUMBER; }
 "-"[0-9][0-9]*                  { 
-               pnapi_owfn_lval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
+            pnapi_owfn_lval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
 [^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { 
-               pnapi_owfn_lval.yt_string = new string(yytext); return IDENT; }
+            pnapi_owfn_lval.yt_string = new std::string(yytext); return IDENT; }
 
  /* whitespace */
 [\n\r]                          { /* skip */ }

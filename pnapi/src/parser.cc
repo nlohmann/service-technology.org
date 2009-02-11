@@ -4,8 +4,13 @@
 
 #include "parser.h"
 #include "io.h"
+#include "formula.h"
 
 using std::stringstream;
+using std::string;
+using std::map;
+
+using namespace pnapi::formula;
 
 namespace pnapi
 {
@@ -227,7 +232,7 @@ namespace pnapi
 	      case FORMULA_EQ:
 		formula = new FormulaEqual(*place, nTokens); break;
 	      case FORMULA_NE:
-		formula = new FormulaNot(new FormulaEqual(*place, nTokens));
+		formula = new FormulaNot(*new FormulaEqual(*place, nTokens));
 		break;
 	      case FORMULA_LT:
 		formula = new FormulaLess(*place, nTokens); break;
@@ -285,7 +290,7 @@ namespace pnapi
 	    if (formulas_.size() < 1)
 	      assert(false); // FIXME
 	      //throw string("operand for unary NOT operator expected");
-	    formulas_.push_back(new FormulaNot(formulas_.front()));
+	    formulas_.push_back(new FormulaNot(*formulas_.front()));
 	    formulas_.pop_front();
 	    break;
 	  case FORMULA_AND:
@@ -298,9 +303,9 @@ namespace pnapi
 	      Formula * op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;
 	      if (node.type == FORMULA_AND)
-		f = new FormulaAnd(op1, op2);
+		f = new FormulaAnd(*op1, *op2);
 	      else
-		f = new FormulaOr(op1, op2);
+		f = new FormulaOr(*op1, *op2);
 	      formulas_.push_back(f);
 	      break;
 	    }

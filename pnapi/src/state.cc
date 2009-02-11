@@ -1,10 +1,12 @@
-#include "automaton.h"
-#include "state.h"
-
 #include <cmath>
 #include <map>
 
+#include "automaton.h"
+#include "state.h"
+
 using std::map;
+using std::list;
+using std::string;
 
 namespace pnapi
 {
@@ -82,7 +84,7 @@ unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
     unsigned int hash = 1;
     for (map<Place *, unsigned int>::const_iterator p = pt.begin();
         p != pt.end(); ++p)
-      hash *= pow((*p).second, m_[(*p).first]);
+      hash *= pow((*p).second, m_[*p->first]);
 
     hashValue_ = new unsigned int(hash);
   }

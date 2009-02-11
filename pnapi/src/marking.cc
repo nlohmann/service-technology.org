@@ -5,6 +5,7 @@
 #include "marking.h"
 
 using std::set;
+using std::map;
 
 namespace pnapi
 {
@@ -47,7 +48,7 @@ namespace pnapi
   /*!
    * \brief   Returns the map..
    */
-  map<Place *, unsigned int> Marking::getMap() const
+  const map<const Place *, unsigned int> & Marking::getMap() const
   {
     return m_;
   }
@@ -116,11 +117,11 @@ namespace pnapi
 
     for (set<Node *>::const_iterator p = Ppre.begin(); p != Ppre.end(); p++)
       if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
-        m[static_cast<Place *>(*p)] -= net_.findArc(**p, t)->getWeight();
+        m[*static_cast<Place *>(*p)] -= net_.findArc(**p, t)->getWeight();
 
     for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); p++)
       if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
-        m[static_cast<Place *>(*p)] += net_.findArc(t, **p)->getWeight();
+        m[*static_cast<Place *>(*p)] += net_.findArc(t, **p)->getWeight();
 
     return m;
   }
@@ -129,9 +130,17 @@ namespace pnapi
   /*!
    * \brief   overloaded operator [] for Markings
    */
-  unsigned int & Marking::operator [](Place *offset)
+  unsigned int & Marking::operator [](const Place & offset)
   {
-    return m_[offset];
+    return m_.find(&offset)->second;
+  }
+
+  
+  unsigned int Marking::operator[](const Place & p) const
+  {
+    assert(m_.find(&p) != m_.end());
+
+    return m_.find(&p)->second;
   }
 
 

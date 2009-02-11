@@ -1,4 +1,5 @@
 #include <sstream>
+#include <fstream>
 #include "test.h"
 #include "parser.h"
 
@@ -7,6 +8,9 @@ using std::stringstream;
 using pnapi::io::owfn;
 using pnapi::io::meta;
 using pnapi::io::InputError;
+using pnapi::io::CREATOR;
+using pnapi::io::INPUTFILE;
+using pnapi::io::OUTPUTFILE;
 
 int main(int argc, char * argv[])
 {
@@ -22,9 +26,9 @@ int main(int argc, char * argv[])
   net.createArc(t1, p3);
   net.createArc(p3, t2);
   net.createArc(t2, p2);
-  stream << owfn << net;
 
   begin_test("io::operator>>() [Petri net OWFN input]");
+  stream << owfn << net;
   try { stream >> owfn >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
   test << owfn << net;

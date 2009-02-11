@@ -27,6 +27,10 @@ namespace pnapi
 
   // forward declaration
   class PetriNet;
+  namespace formula
+  {
+    class Condition;
+  }
 
 
   /*!
@@ -207,7 +211,8 @@ namespace pnapi
       std::ostream & operator<<(std::ostream &, const pnapi::Node &);
       std::ostream & operator<<(std::ostream &, const pnapi::Place &);
       std::ostream & operator<<(std::ostream &, const pnapi::Transition &);
-      std::ostream & operator<<(std::ostream &, const pnapi::Condition &);
+      std::ostream & operator<<(std::ostream &, 
+				const pnapi::formula::Condition &);
       std::ostream & operator<<(std::ostream &, 
 			    const std::multimap<std::string, pnapi::Place *> &);
 

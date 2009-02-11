@@ -63,7 +63,7 @@ namespace pnapi
     void updateArcCreated(Arc &);
     void updateArcRemoved(Arc &);
     void updateNodesMerged(Node &, Node &);
-    void updateNodeNameHistory(Node &, const std::deque<string> &);
+    void updateNodeNameHistory(Node &, const std::deque<std::string> &);
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
     void updateTransitions(Transition &);
@@ -75,7 +75,7 @@ namespace pnapi
 
     void updateNodes(Node &);
     void initializeNodeNameHistory(Node &);
-    void finalizeNodeNameHistory(Node &, const std::deque<string> &);
+    void finalizeNodeNameHistory(Node &, const std::deque<std::string> &);
     void initializePlaceType(Place &);
     void finalizePlaceType(Place &, Node::Type);
 
@@ -117,7 +117,7 @@ namespace pnapi
     PetriNet & operator=(const PetriNet &);
 
     /// final condition
-    Condition & finalCondition();
+    formula::Condition & finalCondition();
 
 
     /*!
@@ -129,13 +129,13 @@ namespace pnapi
 
     bool containsNode(Node &) const;
 
-    bool containsNode(const string &) const;
+    bool containsNode(const std::string &) const;
 
-    Node * findNode(const string &) const;
+    Node * findNode(const std::string &) const;
 
-    Place * findPlace(const string &) const;
+    Place * findPlace(const std::string &) const;
 
-    Transition * findTransition(const string &) const;
+    Transition * findTransition(const std::string &) const;
 
     Arc * findArc(const Node &, const Node &) const;
 
@@ -149,7 +149,7 @@ namespace pnapi
 
     const std::set<Place *> & getInterfacePlaces() const;
 
-    std::set<Place *> getInterfacePlaces(const string &) const;
+    std::set<Place *> getInterfacePlaces(const std::string &) const;
 
     const std::set<Transition *> & getTransitions() const;
 
@@ -167,12 +167,12 @@ namespace pnapi
     Arc & createArc(Node &, Node &, int = 1);
 
     /// creates a Place
-    Place & createPlace(const string & = "", Node::Type = Node::INTERNAL,
+    Place & createPlace(const std::string & = "", Node::Type = Node::INTERNAL,
 			unsigned int = 0, unsigned int = 0, 
-			const string & = "");
+			const std::string & = "");
 
     /// creates a Transition
-    Transition & createTransition(const string & = "");
+    Transition & createTransition(const std::string & = "");
 
     //@}
 
@@ -193,8 +193,8 @@ namespace pnapi
     bool isNormal() const;
 
     /// compose two nets by adding the given one and merging interfaces
-    void compose(const PetriNet &, const string & = "net1",
-		 const string & = "net2");
+    void compose(const PetriNet &, const std::string & = "net1",
+		 const std::string & = "net2");
 
     /// normalizes the Petri net
     void normalize();
@@ -216,10 +216,10 @@ namespace pnapi
     ComponentObserver observer_;
 
     /// final condition
-    Condition condition_;
+    formula::Condition condition_;
 
     /// meta information
-    map<io::MetaInformation, string> meta_;
+    std::map<io::MetaInformation, std::string> meta_;
 
 
     /* (overlapping) sets for net structure */
@@ -228,7 +228,7 @@ namespace pnapi
     std::set<Node *> nodes_;
 
     /// all nodes indexed by name
-    map<string, Node *> nodesByName_;
+    std::map<std::string, Node *> nodesByName_;
 
     /// all transitions
     std::set<Transition *> transitions_;
@@ -249,7 +249,7 @@ namespace pnapi
     std::set<Place *> interfacePlaces_;
 
     /// ports (grouping of interface places)
-    std::multimap<string, Place *> interfacePlacesByPort_;
+    std::multimap<std::string, Place *> interfacePlacesByPort_;
 
     /// all arcs
     std::set<Arc *> arcs_;
@@ -276,27 +276,27 @@ namespace pnapi
     PetriNet & operator+=(const PetriNet &);
 
     /// returns a name for a node to be added
-    string getUniqueNodeName(const string &) const;
+    std::string getUniqueNodeName(const std::string &) const;
 
     /// adds a given prefix to all nodes
-    PetriNet & prefixNodeNames(const string &);
+    PetriNet & prefixNodeNames(const std::string &);
 
     /// returns true if all arcs connecting to n have a weight of 1
     bool sameweights(Node *n) const;
 
     /// returns the meta information if available
-    string getMetaInformation(std::ios_base &, io::MetaInformation, 
-			      const string & = "") const;
+    std::string getMetaInformation(std::ios_base &, io::MetaInformation, 
+			      const std::string & = "") const;
 
 
     /* petrify */
 
     /// crates a petri net from an STG file
-    void createFromSTG(std::vector<string> &, const string &, 
-		       std::set<string> &, std::set<string> &);
+    void createFromSTG(std::vector<std::string> &, const std::string &, 
+		       std::set<std::string> &, std::set<std::string> &);
 
     /// helper function for STG2oWFN
-    string remap(string edge, std::vector<string> & edgeLabels);
+    std::string remap(std::string edge, std::vector<std::string> & edgeLabels);
 
 
     /* output */

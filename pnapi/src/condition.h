@@ -1,47 +1,60 @@
-#ifndef CONDITION_H
-#define CONDITION_H
+// -*- C++ -*-
 
-#include "formula.h"
-#include "marking.h"
+#ifndef PNAPI_CONDITION_H
+#define PNAPI_CONDITION_H
 
-using namespace pnapi::formula;
-
+#include <map>
+#include <string>
 
 namespace pnapi
 {
 
-  class Condition
+  // forward declarations
+  class Place;
+  class Marking;
+
+  namespace formula
   {
-  public:
-    Condition();
-    Condition(Formula *f);
 
-    /// flat copy constructor
-    Condition(const Condition &c);
-
-    /// deep copy constructor
-    Condition(const Condition &c, map<Place *, Place *> &newP);
-
-    /// destructor
-    virtual ~Condition() {}
-
-    void merge(const Condition &c);
-
-    bool checkFinalMarking(Marking &m);
-
-    void setFormula(Formula *f);
-
-    Condition & operator=(const Condition &);
-
-    Condition & operator=(const Formula &);
-
-    string toString() const;
-
-  private:
-    Formula *f_;
-  };
-
-} /* end of namespace pnapi */
+    // forward declarations
+    class Formula;
 
 
-#endif /* CONDITION_H */
+    /*!
+     */
+    class Condition
+    {
+    public:
+      Condition();
+      Condition(Formula *f);
+
+      /// flat copy constructor
+      Condition(const Condition &c);
+
+      /// deep copy constructor
+      Condition(const Condition &c, std::map<const Place *, Place *> &newP);
+
+      /// destructor
+      virtual ~Condition() {}
+
+      void merge(const Condition &c);
+
+      bool checkFinalMarking(Marking &m);
+
+      void setFormula(Formula *f);
+
+      Condition & operator=(const Condition &);
+
+      Condition & operator=(const Formula &);
+
+      std::string toString() const;
+
+    private:
+      Formula *f_;
+    };
+
+  }
+
+}
+
+#endif

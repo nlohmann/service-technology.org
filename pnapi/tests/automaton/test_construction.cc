@@ -35,14 +35,8 @@ int main(int argc, char *argv[])
   net.createArc(t4, po);
   net.createArc(t4, p6);
 
-  FormulaAnd *f = new FormulaAnd(new FormulaEqual(p1, 0),
-      new FormulaEqual(p2, 0));
-  f->addSubFormula(new FormulaEqual(p3, 0));
-  f->addSubFormula(new FormulaEqual(p4, 0));
-  f->addSubFormula(new FormulaEqual(p5, 0));
-  f->addSubFormula(new FormulaGreater(p6, 0));
-
-  net.finalCondition().setFormula(f);
+  net.finalCondition() = 
+    p1 == 0 && p2 == 0 && p3 == 0 && p4 == 0 && p5 == 0 && p6 > 0;
 
 
   // automaton construction from PetriNet instance

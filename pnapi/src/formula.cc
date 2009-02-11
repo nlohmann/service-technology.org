@@ -1,13 +1,19 @@
-#include <sstream>
-
+#ifndef NDEBUG
 #include <iostream>
 using std::cout;
+using std::endl;
+#endif
+
+#include <sstream>
 
 #include "petrinet.h"
 #include "marking.h"
 #include "formula.h"
 
 using std::stringstream;
+using std::string;
+using std::list;
+using std::map;
 
 namespace pnapi
 {
@@ -15,6 +21,81 @@ namespace pnapi
   namespace formula
   {
 
+    /**************************************************************************
+     ***** Formula: clone() implementations
+     **************************************************************************/
+
+    True & True::clone() const
+    {
+      return *new True(*this);
+    }
+
+    False & False::clone() const
+    {
+      return *new False(*this);
+    }
+
+    FormulaEqual & FormulaEqual::clone() const
+    {
+      return *new FormulaEqual(*this);
+    }
+    
+    FormulaNotEqual & FormulaNotEqual::clone() const
+    {
+      return *new FormulaNotEqual(*this);
+    }
+
+    FormulaGreater & FormulaGreater::clone() const
+    {
+      return *new FormulaGreater(*this);
+    }
+
+    FormulaGreaterEqual & FormulaGreaterEqual::clone() const
+    {
+      return *new FormulaGreaterEqual(*this);
+    }
+
+    FormulaLess & FormulaLess::clone() const
+    {
+      return *new FormulaLess(*this);
+    }
+
+    FormulaLessEqual & FormulaLessEqual::clone() const
+    {
+      return *new FormulaLessEqual(*this);
+    }
+
+    FormulaNot & FormulaNot::clone() const
+    {
+      return *new FormulaNot(sub_.clone());
+    }
+
+    FormulaAnd & FormulaAnd::clone() const
+    {
+      return *new FormulaAnd(cloneChildren());
+    }
+
+    FormulaOr & FormulaOr::clone() const
+    {
+      return *new FormulaOr(cloneChildren());
+    }
+
+    list<const Formula *> NaryBooleanFormula::cloneChildren() const
+    {
+      list<const Formula *> clones;
+      for (list<const Formula *>::const_iterator it = subs_.begin(); 
+	   it != subs_.end(); ++it)
+	clones.push_back(&(*it)->clone());
+      return clones;
+    }
+
+
+
+    Formula::~Formula()
+    {
+    }
+
+  
   /*!
    * Atomic formula class's public methods
    */
@@ -22,7 +103,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  AtomicFormula::AtomicFormula(Place &p, unsigned int k) :
+  AtomicFormula::AtomicFormula(const Place & p, unsigned int k) :
     place_(p), number_(k)
   {
   }
@@ -30,15 +111,17 @@ namespace pnapi
   /*!
    * \brief
    */
+    /*
   AtomicFormula::AtomicFormula(const AtomicFormula &f) :
     place_(f.place_), number_(f.number_)
   {
   }
+    */
 
   /*!
    * \brief
    */
-  Place & AtomicFormula::getPlace()
+  const Place & AtomicFormula::getPlace()
   {
     return place_;
   }
@@ -54,7 +137,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaEqual::FormulaEqual(Place &p, unsigned int k) :
+  FormulaEqual::FormulaEqual(const Place & p, unsigned int k) :
     AtomicFormula(p, k)
   {
   }
@@ -62,9 +145,9 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool FormulaEqual::evaluate(Marking &m) const
+  bool FormulaEqual::evaluate(const Marking & m) const
   {
-    return m[&place_] == number_;
+    return m[place_] == number_;
   }
 
   /*!
@@ -91,15 +174,15 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaEqual * FormulaEqual::deepCopy(map<Place *, Place *> & newP) const
+  FormulaEqual * FormulaEqual::deepCopy(map<const Place *, Place *> & newP) const
   {
-    return new FormulaEqual(*newP[&place_], number_);
+    return new FormulaEqual(*newP.find(&place_)->second, number_);
   }
-
+  
   /*!
    * \brief
    */
-  FormulaNotEqual::FormulaNotEqual(Place &p, unsigned int k) :
+  FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k) :
     AtomicFormula(p, k)
   {
   }
@@ -107,9 +190,9 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool FormulaNotEqual::evaluate(Marking &m) const
+  bool FormulaNotEqual::evaluate(const Marking &m) const
   {
-    return m[&place_] != number_;
+    return m[place_] != number_;
   }
 
   /*!
@@ -132,11 +215,11 @@ namespace pnapi
   {
     return new FormulaNotEqual(*this);
   }
-
+    
   /*!
    * \brief
    */
-  FormulaNotEqual * FormulaNotEqual::deepCopy(map<Place *, Place *> &newP) const
+  FormulaNotEqual * FormulaNotEqual::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new FormulaNotEqual(*newP[&place_], number_);
   }
@@ -144,7 +227,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaGreater::FormulaGreater(Place &p, unsigned int k) :
+  FormulaGreater::FormulaGreater(const Place & p, unsigned int k) :
     AtomicFormula(p, k)
   {
   }
@@ -152,11 +235,11 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool FormulaGreater::evaluate(Marking &m) const
+  bool FormulaGreater::evaluate(const Marking &m) const
   {
     cout << "DEBUG: " << place_.getName() << " (";
-    cout << m[&place_] << ") > " << number_ << "?\n";
-    return m[&place_] > number_;
+    cout << m[place_] << ") > " << number_ << "?\n";
+    return m[place_] > number_;
   }
 
   /*!
@@ -183,7 +266,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaGreater * FormulaGreater::deepCopy(map<Place *, Place *> &newP) const
+  FormulaGreater * FormulaGreater::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new FormulaGreater(*newP[&place_], number_);
   }
@@ -191,7 +274,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaGreaterEqual::FormulaGreaterEqual(Place &p, unsigned int k) :
+  FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k) :
     AtomicFormula(p, k)
   {
   }
@@ -199,9 +282,9 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool FormulaGreaterEqual::evaluate(Marking &m) const
+  bool FormulaGreaterEqual::evaluate(const Marking &m) const
   {
-    return m[&place_] >= number_;
+    return m[place_] >= number_;
   }
 
   /*!
@@ -228,7 +311,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaGreaterEqual * FormulaGreaterEqual::deepCopy(map<Place *, Place *> &newP) const
+  FormulaGreaterEqual * FormulaGreaterEqual::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new FormulaGreaterEqual(*newP[&place_], number_);
   }
@@ -236,7 +319,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaLess::FormulaLess(Place &p, unsigned int k) :
+  FormulaLess::FormulaLess(const Place & p, unsigned int k) :
     AtomicFormula(p, k)
   {
   }
@@ -244,9 +327,9 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool FormulaLess::evaluate(Marking &m) const
+  bool FormulaLess::evaluate(const Marking &m) const
   {
-    return m[&place_] < number_;
+    return m[place_] < number_;
   }
 
   /*!
@@ -273,7 +356,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaLess * FormulaLess::deepCopy(map<Place *, Place *> &newP) const
+  FormulaLess * FormulaLess::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new FormulaLess(*newP[&place_], number_);
   }
@@ -281,7 +364,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaLessEqual::FormulaLessEqual(Place &p, unsigned int k) :
+  FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k) :
     AtomicFormula(p, k)
   {
   }
@@ -289,9 +372,9 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool FormulaLessEqual::evaluate(Marking &m) const
+  bool FormulaLessEqual::evaluate(const Marking &m) const
   {
-    return m[&place_] <= number_;
+    return m[place_] <= number_;
   }
 
   /*!
@@ -318,7 +401,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaLessEqual * FormulaLessEqual::deepCopy(map<Place *, Place *> &newP) const
+  FormulaLessEqual * FormulaLessEqual::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new FormulaLessEqual(*newP[&place_], number_);
   }
@@ -330,7 +413,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  UnaryBooleanFormula::UnaryBooleanFormula(Formula *f) :
+  UnaryBooleanFormula::UnaryBooleanFormula(const Formula & f) :
     sub_(f)
   {
   }
@@ -338,57 +421,36 @@ namespace pnapi
   /*!
    * \brief
    */
+    /*
   UnaryBooleanFormula::UnaryBooleanFormula(const UnaryBooleanFormula &f) :
     sub_(f.sub_)
   {
   }
+    */
 
-  /*!
-   * \brief
-   */
-  FormulaNot::FormulaNot(Formula *f) :
+  FormulaNot::FormulaNot(const Formula & f) :
     UnaryBooleanFormula(f)
   {
   }
 
-  /*!
-   * \brief
-   */
-  FormulaNot::FormulaNot(const Formula & f) :
-    UnaryBooleanFormula(f.flatCopy())
+  bool FormulaNot::evaluate(const Marking & m) const
   {
+    return !sub_.evaluate(m);
   }
 
-  /*!
-   * \brief
-   */
-  bool FormulaNot::evaluate(Marking &m) const
-  {
-    return !sub_->evaluate(m);
-  }
-
-  /*!
-   * \brief
-   */
   const string FormulaNot::toString() const
   {
-    return " NOT ( " + sub_->toString() + " ) ";
+    return " NOT ( " + sub_.toString() + " ) ";
   }
 
-  /*!
-   * \brief
-   */
   FormulaNot * FormulaNot::flatCopy() const
   {
     return new FormulaNot(*this);
   }
 
-  /*!
-   * \brief
-   */
-  FormulaNot * FormulaNot::deepCopy(map<Place *, Place *> &newP) const
+  FormulaNot * FormulaNot::deepCopy(map<const Place *, Place *> &newP) const
   {
-    return new FormulaNot(sub_->deepCopy(newP));
+    return new FormulaNot(*sub_.deepCopy(newP));
   }
 
   /************************************************
@@ -398,16 +460,16 @@ namespace pnapi
   /*!
    * \brief
    */
-  NaryBooleanFormula::NaryBooleanFormula(Formula *l, Formula *r)
+  NaryBooleanFormula::NaryBooleanFormula(const Formula & l, const Formula & r)
   {
-    subs_.push_back(l);
-    subs_.push_back(r);
+    subs_.push_back(&l);
+    subs_.push_back(&r);
   }
 
   /*!
    * \brief
    */
-  NaryBooleanFormula::NaryBooleanFormula(list<Formula *> &flst) :
+  NaryBooleanFormula::NaryBooleanFormula(const list<const Formula *> & flst) :
     subs_(flst)
   {
   }
@@ -415,10 +477,12 @@ namespace pnapi
   /*!
    * \brief
    */
+    /*
   NaryBooleanFormula::NaryBooleanFormula(const NaryBooleanFormula &f) :
     subs_(f.subs_)
   {
   }
+    */
 
   /*!
    * \brief
@@ -428,36 +492,25 @@ namespace pnapi
     subs_.push_back(s);
   }
 
-  /*!
-   * \brief
-   */
-  FormulaAnd::FormulaAnd(Formula *l, Formula *r) :
+
+
+    /**************************************************************************
+     ***** Formula: AND
+     **************************************************************************/
+
+  FormulaAnd::FormulaAnd(const Formula & l, const Formula & r) :
     NaryBooleanFormula(l, r)
   {
   }
 
-  /*!
-   * \brief
-   */
-  FormulaAnd::FormulaAnd(const Formula & l, const Formula & r) :
-    NaryBooleanFormula(l.flatCopy(), r.flatCopy())
-  {
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaAnd::FormulaAnd(list<Formula *> &flst) :
+  FormulaAnd::FormulaAnd(const list<const Formula *> & flst) :
     NaryBooleanFormula(flst)
   {
   }
 
-  /*!
-   * \brief
-   */
-  bool FormulaAnd::evaluate(Marking &m) const
+  bool FormulaAnd::evaluate(const Marking & m) const
   {
-    for (list<Formula *>::const_iterator f = subs_.begin();
+    for (list<const Formula *>::const_iterator f = subs_.begin();
         f != subs_.end(); f++)
       if (!(*f)->evaluate(m))
         return false;
@@ -472,11 +525,11 @@ namespace pnapi
   {
     string result = " ( ";
 
-    for (list<Formula *>::const_iterator f = subs_.begin();
+    for (list<const Formula *>::const_iterator f = subs_.begin();
         f != subs_.end(); f++)
     {
       result.append((*f)->toString());
-      list<Formula *>::const_iterator g = (++f)--;
+      list<const Formula *>::const_iterator g = (++f)--;
       if (g != subs_.end())
         result.append(" AND ");
     }
@@ -497,10 +550,10 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaAnd * FormulaAnd::deepCopy(map<Place *, Place *> &newP) const
+  FormulaAnd * FormulaAnd::deepCopy(map<const Place *, Place *> &newP) const
   {
-    list<Formula *> newSubs;
-    for (list<Formula *>::const_iterator f = subs_.begin(); f != subs_.end();
+    list<const Formula *> newSubs;
+    for (list<const Formula *>::const_iterator f = subs_.begin(); f != subs_.end();
         f++)
     {
       newSubs.push_back((*f)->deepCopy(newP));
@@ -509,36 +562,25 @@ namespace pnapi
     return new FormulaAnd(newSubs);
   }
 
-  /*!
-   * \brief
-   */
-  FormulaOr::FormulaOr(Formula *l, Formula *r) :
+
+
+    /**************************************************************************
+     ***** Formula: OR
+     **************************************************************************/
+
+  FormulaOr::FormulaOr(const Formula & l, const Formula & r) :
     NaryBooleanFormula(l, r)
   {
   }
 
-  /*!
-   * \brief
-   */
-  FormulaOr::FormulaOr(const Formula & l, const Formula & r) :
-    NaryBooleanFormula(l.flatCopy(), r.flatCopy())
-  {
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaOr::FormulaOr(list<Formula *> &flst) :
+  FormulaOr::FormulaOr(const list<const Formula *> & flst) :
     NaryBooleanFormula(flst)
   {
   }
 
-  /*!
-   * \brief
-   */
-  bool FormulaOr::evaluate(Marking &m) const
+  bool FormulaOr::evaluate(const Marking & m) const
   {
-    for (list<Formula *>::const_iterator f = subs_.begin();
+    for (list<const Formula *>::const_iterator f = subs_.begin();
         f != subs_.end(); f++)
       if ((*f)->evaluate(m))
         return true;
@@ -553,11 +595,11 @@ namespace pnapi
   {
     string result = " ( ";
 
-    for (list<Formula *>::const_iterator f = subs_.begin();
+    for (list<const Formula *>::const_iterator f = subs_.begin();
         f != subs_.end(); f++)
     {
       result.append((*f)->toString());
-      list<Formula *>::const_iterator g = (++f)--;
+      list<const Formula *>::const_iterator g = (++f)--;
       if (g != subs_.end())
         result.append(" OR ");
     }
@@ -578,10 +620,10 @@ namespace pnapi
   /*!
    * \brief
    */
-  FormulaOr * FormulaOr::deepCopy(map<Place *, Place *> &newP) const
+  FormulaOr * FormulaOr::deepCopy(map<const Place *, Place *> &newP) const
   {
-    list<Formula *> newSubs;
-    for (list<Formula *>::const_iterator f = subs_.begin(); f != subs_.end();
+    list<const Formula *> newSubs;
+    for (list<const Formula *>::const_iterator f = subs_.begin(); f != subs_.end();
         f++)
     {
       newSubs.push_back((*f)->deepCopy(newP));
@@ -597,7 +639,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool True::evaluate(Marking &m) const
+  bool True::evaluate(const Marking &m) const
   {
     return true;
   }
@@ -621,7 +663,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  True * True::deepCopy(map<Place *, Place *> &newP) const
+  True * True::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new True();
   }
@@ -629,7 +671,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  bool False::evaluate(Marking &m) const
+  bool False::evaluate(const Marking &m) const
   {
     return false;
   }
@@ -653,88 +695,62 @@ namespace pnapi
   /*!
    * \brief
    */
-  False * False::deepCopy(map<Place *, Place *> &newP) const
+  False * False::deepCopy(map<const Place *, Place *> &newP) const
   {
     return new False();
   }
 
 
-  /*!
-   * Overloaded operators for formulas
-   */
 
-  /*!
-   */
-  FormulaEqual operator==(Place & p, unsigned int k)
-  {
-    return FormulaEqual(p, k);
+    /**************************************************************************
+     ***** Overloaded operators for formulas
+     *************************************************************************/
+
+    FormulaEqual operator==(const Place & p, unsigned int k)
+    {
+      return FormulaEqual(p, k);
+    }
+
+    FormulaNotEqual operator!=(const Place & p, unsigned int k)
+    {
+      return FormulaNotEqual(p, k);
+    }
+
+    FormulaGreater operator>(const Place & p, unsigned int k)
+    {
+      return FormulaGreater(p, k);
+    }
+
+    FormulaGreaterEqual operator>=(const Place & p, unsigned int k)
+    {
+      return FormulaGreaterEqual(p, k);
+    }
+
+    FormulaLess operator<(const Place & p, unsigned int k)
+    {
+      return FormulaLess(p, k);
+    }
+
+    FormulaLessEqual operator<=(const Place & p, unsigned int k)
+    {
+      return FormulaLessEqual(p, k);
+    }
+
+    FormulaAnd operator&&(const Formula & f1, const Formula & f2)
+    {
+      return FormulaAnd(f1, f2);
+    }
+
+    FormulaOr operator||(const Formula & f1, const Formula & f2)
+    {
+      return FormulaOr(f1, f2);
+    }
+
+    FormulaNot operator!(const Formula & f)
+    {
+      return FormulaNot(f);
+    }
+
   }
 
-
-  /*!
-   */
-  FormulaNotEqual operator!=(Place & p, unsigned int k)
-  {
-    return FormulaNotEqual(p, k);
-  }
-
-
-  /*!
-   */
-  FormulaGreater operator>(Place & p, unsigned int k)
-  {
-    return FormulaGreater(p, k);
-  }
-
-
-  /*!
-   */
-  FormulaGreaterEqual operator>=(Place & p, unsigned int k)
-  {
-    return FormulaGreaterEqual(p, k);
-  }
-
-
-  /*!
-   */
-  FormulaLess operator<(Place & p, unsigned int k)
-  {
-    return FormulaLess(p, k);
-  }
-
-
-  /*!
-   */
-  FormulaLessEqual operator<=(Place & p, unsigned int k)
-  {
-    return FormulaLessEqual(p, k);
-  }
-
-
-  /*!
-   */
-  FormulaAnd operator&&(const Formula & f1, const Formula & f2)
-  {
-    return FormulaAnd(f1, f2);
-  }
-
-
-  /*!
-   */
-  FormulaOr operator||(const Formula & f1, const Formula & f2)
-  {
-    return FormulaOr(f1, f2);
-  }
-
-
-  /*!
-   */
-  FormulaNot operator!(const Formula & f)
-  {
-    return FormulaNot(f);
-  }
-
-
-  } /* namespace formula */
-
-} /* namespace pnapi */
+}

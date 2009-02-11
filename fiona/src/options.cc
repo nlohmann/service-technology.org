@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -132,7 +132,7 @@ void print_help() {
   trace("                                                 matches with a given OG\n");
   trace("                                   productog   - calculate the product OG\n");
   trace("                                                 of all given OGs\n");
-  trace("                                   minimizeOG  - minimizes a given OG\n");
+  trace("                                   minimize    - minimizes a given OG\n");
   trace("\n");
   trace("                                   reduce      - structurally reduce all\n");
   trace("                                                 given oWFNs\n");
@@ -154,10 +154,10 @@ void print_help() {
   trace("                                                 check the equivalence of \n");
   trace("                                                 (already present!) BDDs)\n");
   trace("                         mostpermissivepartner - generates the most permissive\n");
-  trace("                                                 partner for a given oWFN \n"); 
+  trace("                                                 partner for a given oWFN \n");
   trace("                                                 or all given OGs\n");
   trace("                                  smallpartner - generates a (small) partner for\n");
-  trace("                                                 a given oWFN or IG\n"); 
+  trace("                                                 a given oWFN or IG\n");
   trace("                                   adapter     - calculate an adapter for a\n");
   trace("                                                 given set of services\n");
   trace("                                  smalladapter - calculate a small adapter for\n");
@@ -168,11 +168,11 @@ void print_help() {
 //  trace("                                   tex         - generate gastex files for a\n");
 //  trace("                                                 given annotated dot file\n");
   trace("                               checkfalsenodes - checks for nodes that\n");
-  trace("                                                 violate their own annotation.\n"); 
+  trace("                                                 violate their own annotation.\n");
   trace("                              removefalsenodes - removes nodes that\n");
-  trace("                                                 violate their own annotation \n"); 
-  trace("                                                 and stores the result to a\n"); 
-  trace("                                                 specified output file (-o)\n"); 
+  trace("                                                 violate their own annotation \n");
+  trace("                                                 and stores the result to a\n");
+  trace("                                                 specified output file (-o)\n");
   trace("                                   isacyclic   - check a given OG for cycles\n");
   trace("                                   count       - count the number of strategies\n");
   trace("                                                 that are characterized by a\n");
@@ -235,7 +235,7 @@ void print_help() {
   trace(" -o | --output=<filename> ...... prefix of the output files\n");
   trace(" -Q | --no-output .............. runs quietly, i.e., produces no output files\n");
   trace(" -M | --multipledeadlocks ...... create multiple deadlocks of public view\n");
-  trace("                                 (only relevant for PV mode -t PV)\n");  
+  trace("                                 (only relevant for PV mode -t PV)\n");
   trace(" -p | --parameter=<param> ...... additional parameter <param>\n");
   trace("                                   no-png     - does not create a PNG file\n");
   trace("                                   no-dot     - does not create dot-related output\n");
@@ -392,8 +392,8 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_COVER] = false;
 
 
-    
-    
+
+
     bdd_reordermethod = 0;
 
     messages_manual = 1;
@@ -736,17 +736,17 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     // responsive partners can only be calculated if there is no state reduction
-    // in case, the graphs are to be calculated using state reduction, we set 
+    // in case, the graphs are to be calculated using state reduction, we set
     // responsive to false --> this is not possible yet
     if (!options[O_CALC_ALL_STATES] && parameters[P_RESPONSIVE]) {
     	parameters[P_RESPONSIVE] = false;
     }
-    
+
     // Max Occurrences - correcting parameters if needed
     if (!options[O_READ_EVENTS] && !options[O_EVENT_USE_MAX]) {
         options[O_READ_EVENTS] = true;
     }
-    
+
     bool firstfile = true;
     // reading all oWFNs and OGs
     for ( ; optind < argc; ++optind) {
@@ -801,7 +801,7 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     if (parameters[P_MINIMIZE_OG] && ogfiles.size() == 0) {
-        cerr << "Error: \t If option '-t minimizeOG' is used, at least one OG" << endl;
+        cerr << "Error: \t If option '-t minimize' is used, at least one OG" << endl;
         cerr << "       \t file must be given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(EC_BAD_CALL);
@@ -848,7 +848,7 @@ void parse_command_line(int argc, char* argv[]) {
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
         exit(EC_BAD_CALL);
     }
-    
+
     if (parameters[P_MATCH] && (netfiles.size() < 1 || ogfiles.size() < 1)) {
         cerr << "Error: \t At least one oWFN and one OG must be given for matching!\n" << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
@@ -904,24 +904,24 @@ void parse_command_line(int argc, char* argv[]) {
     if (parameters[P_COVER] &&
 
         // possible options
-        (!parameters[P_OG] && !parameters[P_MATCH]) && 
+        (!parameters[P_OG] && !parameters[P_MATCH]) &&
 
         // not possible options due to lack of definition
-        (parameters[P_IG] || parameters[P_MATCH] || parameters[P_MINIMIZE_OG] || 
+        (parameters[P_IG] || parameters[P_MATCH] || parameters[P_MINIMIZE_OG] ||
          parameters[P_PV] || parameters[P_SYNTHESIZE_PARTNER_OWFN] ||
-         parameters[P_PRODUCTOG] || parameters[P_SIMULATES] || parameters[P_EX] || 
+         parameters[P_PRODUCTOG] || parameters[P_SIMULATES] || parameters[P_EX] ||
          parameters[P_EQ_R] || parameters[P_ADAPTER] || parameters[P_SMALLADAPTER] ||
-         parameters[P_GASTEX] || parameters[P_COUNT_SERVICES] || parameters[P_REDUCE] || 
+         parameters[P_GASTEX] || parameters[P_COUNT_SERVICES] || parameters[P_REDUCE] ||
          parameters[P_NORMALIZE] || parameters[P_PARTNER_TEST] ||
-         parameters[P_RESPONSIVE] || parameters[P_TEX] || parameters[P_DISTRIBUTED] || 
-         parameters[P_AUTONOMOUS] || parameters[P_REDUCE_LEVEL] || 
-         parameters[P_USE_CRE] || parameters[P_USE_RBS] || parameters[P_USE_EAD] || 
+         parameters[P_RESPONSIVE] || parameters[P_TEX] || parameters[P_DISTRIBUTED] ||
+         parameters[P_AUTONOMOUS] || parameters[P_REDUCE_LEVEL] ||
+         parameters[P_USE_CRE] || parameters[P_USE_RBS] || parameters[P_USE_EAD] ||
          parameters[P_REPRESENTATIVE] || parameters[P_SINGLE])) {
 
         cerr << "Error: \t Check for coverability is only available for computing operating guidelines";
         cerr << " and for matching!\n" << endl;
 
-        exit(EC_BAD_CALL); 
+        exit(EC_BAD_CALL);
     }
 }
 

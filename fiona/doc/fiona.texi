@@ -1031,7 +1031,7 @@ of the following.
 
 @multitable @columnfractions .022 .22 .60 .25 .022
 @headitem @tab @option{<parameter>} @tab description @tab @code{FILES}
-@item @tab @code{minimizeOG }@tab minimizes a given OG @tab og-file
+@item @tab @code{minimize }@tab minimizes a given OG @tab og-file
 @item @tab @code{reduce }@tab structurally reduce a given open net (choose reduction level using parameter @code{r1} ... @code{r5})@tab owfn-file
 @item @tab @code{normalize }@tab normalize all given open nets @tab owfn-file
 @item @tab @code{isacyclic }@tab check a given OG for cycles @tab og-file

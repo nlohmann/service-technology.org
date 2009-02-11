@@ -36,37 +36,42 @@ unsigned int  * CurrentMarking;
 unsigned int Arc::cnt = 0;
 unsigned int Place::hash_value = 0;
 unsigned int Transition::cnt = 0;
+
 #ifdef STUBBORN
 unsigned int Transition::NrStubborn = 0;
 Transition * Transition::TarjanStack = (Transition *) 0;
 Transition * Transition::CallStack = (Transition *) 0;
 #endif
+
 Transition * LastAttractor; // Last transition in static attractor sets
 unsigned int Transition::NrEnabled = 0;
 Transition * Transition::StartOfEnabledList = (Transition *) 0;
+
 #ifdef EXTENDED
 Transition * Transition::StartOfIgnoredList = (Transition *) 0;
 #endif
+
 #ifdef STUBBORN
 Transition * Transition::StartOfStubbornList = (Transition *) 0;
 Transition * Transition::EndOfStubbornList = (Transition *) 0;
 #endif
+
 #ifdef WITHFORMULA
 extern unsigned int * checkstart;
 #endif
 
-  char * lownetfile = NULL;
-  char * pnmlfile = NULL;
-  char * netfile = NULL;
-  char * analysefile = NULL;
-  char * graphfile = NULL;
-  char * pathfile = NULL;
-  char * statefile = NULL;
-  char * symmfile = NULL;
-  char * netbasename = NULL;
+char * lownetfile = NULL;
+char * pnmlfile = NULL;
+char * netfile = NULL;
+char * analysefile = NULL;
+char * graphfile = NULL;
+char * pathfile = NULL;
+char * statefile = NULL;
+char * symmfile = NULL;
+char * netbasename = NULL;
 
-  bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg, cflg = false;
-  char graphformat = '\0';
+bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg, cflg = false;
+char graphformat = '\0';
 
 int garbagefound = 0;
 char * reserve;
@@ -125,6 +130,7 @@ void processCommandLine(int argc, char **argv) {
 
   // call the cmdline parser, initiate args_info
   if (cmdline_parser (argc, argv, &args_info) != 0) {
+    fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
 
@@ -166,7 +172,20 @@ void processCommandLine(int argc, char **argv) {
     fprintf(stderr, "      see ‘lola --help’ for more information\n");
     exit(4);
   }
-    
+  
+  
+  // process --offspring option
+  if (args_info.offspring_given) {
+    if (!strcmp(args_info.offspring_arg, "")) {
+      fprintf(stderr, "lola: option ‘--offspring’ must not have an empty argument\n");
+      fprintf(stderr, "      see ‘lola --help’ for more information\n");
+      exit(4);      
+    }
+    createUserconfigFile(args_info.offspring_arg);
+    exit(EXIT_SUCCESS);
+  }
+  
+  
   // set LoLA's flag variables
   hflg = args_info.userconfig_given;
   Nflg = args_info.Net_given;
@@ -676,32 +695,35 @@ catch(overflow)
 
 
 
+/*!
+ \brief remove isolated places from the net
+ 
+ \note The places are actually copied to the end of the array "Places" and
+       made unaccessible by decreasing the place count.
+*/
 void removeisolated()
 {
-	unsigned int i;
-
-	Place * p;
-
-	i=0;
-	while(i<Places[0]->cnt)
-	{
-		if(Places[i]->references == 0) // Place isolated
-		{
-			p = Places[Places[0]->cnt - 1];
-			Places[Places[0]->cnt - 1] = Places[i];
-			Places[i] = p;
-			Places[0]->cnt --;
-		}
-		else
-		{
-			i++;
-		}
-	}
-	for(i=0;i<Transitions[0]->cnt;i++)
-	{
-		Transitions[i]->nr = i;
-	}
+  unsigned int i=0;
+  while(i<Places[0]->cnt)
+  {
+    if(Places[i]->references == 0) // Place isolated
+    {
+      Place *p = Places[Places[0]->cnt - 1];
+      Places[Places[0]->cnt - 1] = Places[i];
+      Places[i] = p;
+      Places[0]->cnt --;
+    }
+    else
+    {
+      i++;
+    }
+  }
+  for(i=0;i<Transitions[0]->cnt;i++)
+  {
+    Transitions[i]->nr = i;
+  }
 }
+
 
 #ifdef CYCLE
 void findcyclingtransitions()

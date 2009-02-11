@@ -1,8 +1,5 @@
 SUBDIRS = src utils doc man maintainer tests
 
-EXTRA_DIST = patches
-
-
 ##############################################################################
 # remove everything that can be rebuilt
 ##############################################################################

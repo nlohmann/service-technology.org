@@ -12,8 +12,8 @@
 // space construction reaches a state with more tokens on a place
 // than specified.
 
-#define CHECKCAPACITY 
-#define CAPACITY 1
+//#define CHECKCAPACITY 
+//#define CAPACITY 1
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
@@ -24,11 +24,6 @@
 // defined, a standard value applies.
 
 #define REPORTFREQUENCY 100000
-
-// MAXIMALSTATES gives a maximal number of states that are explored before
-// LoLA will abort with exit code 5.
-
-// #define MAXIMALSTATES 100000
 
 // MAXPATH is only used for the FINDPATH algorithm. There, LoLA aborts
 // a search attempt after having reached a depth of MAXPATH and
@@ -54,7 +49,7 @@
 // finally applied in the exectuable program.
 
 //#define COVER
-#define STUBBORN
+//#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
 #define PREDUCTION
@@ -124,13 +119,13 @@
 //#define REACHABILITY
 //#define MODELCHECKING
 //#define BOUNDEDPLACE
-//#define BOUNDEDNET
+#define BOUNDEDNET
 //#define DEADTRANSITION
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
 //#define FULL
-#define DEADLOCK
+//#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
 //#define LIVEPROP

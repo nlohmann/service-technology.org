@@ -1,5 +1,9 @@
 #include <iostream>
+#include <cassert>
+#include <cstdio>
+#include <string>
 #include "dimensions.H"
+#include "config.h"
 
 using std::cout;
 using std::endl;
@@ -154,6 +158,200 @@ void reportconfiguration()
 #if defined(SYMMETRY) && SYMMINTEGRATION == 4
 	cout << "  MAXATTEMPT      : " << "perform at most " << MAXATTEMPT << " loops of approximizing the canonical representitive." << endl;
 #endif
+#ifdef MAXIMALSTATES
+  cout << "  MAXIMALSTATES   : " << "generate at most " << MAXIMALSTATES << " states" << endl;
+#endif
 }
 
 
+
+
+
+/*!
+ \brief write a userconfig.H that would create the same LoLA binary
+ 
+ In contrast to the result of reportconfiguration(), this function generates
+ pure C code that can directly used to compile a LoLA binary.
+ 
+ This function can be handy if binaries need to be transfered to a different
+ operating system or architecture.
+ 
+ \param suffix  a suffix used to create the file `userconfig.H.suffix', the
+                suffix is set by the command line paramter `--offspring'        
+ */
+void createUserconfigFile(char *suffix)
+{
+  assert(suffix);
+  std::string filename = "userconfig.H." + std::string(suffix);
+  
+  // open file
+  FILE *userconfig = fopen(filename.c_str(), "w");
+  if (!userconfig) {
+    fprintf(stderr, "lola: cannot write to userconfig offspring file ‘%s’\n", filename.c_str());
+    fprintf(stderr, "      no output written\n");
+    exit(4);
+  }
+  
+  // print header
+  fprintf(userconfig, "// This file ‘userconfig.H.%s’ was created by %s.\n", suffix, PACKAGE_STRING);
+  fprintf(userconfig, "// To compile a binary with this configuration, copy this file into the folder\n");
+  fprintf(userconfig, "// ‘src/configs’ of the LoLA distribution and execute ‘make lola-%s’.\n", suffix);
+  fprintf(userconfig, "// See the manual for a description and all possible parameters.\n\n");
+
+  fprintf(userconfig, "// NUMERICAL PARAMETERS\n");
+
+#ifdef CAPACITY
+  if (CAPACITY != -1) {
+    fprintf(userconfig, "#define CAPACITY %u\n", CAPACITY);
+#ifdef CHECKCAPACITY
+    fprintf(userconfig, "#define CHECKCAPACITY\n");
+#endif
+  }
+#endif
+
+#ifdef REPORTFREQUENCY
+  if (REPORTFREQUENCY != 100)
+    fprintf(userconfig, "#define REPORTFREQUENCY %u\n", REPORTFREQUENCY);
+#endif
+
+#ifdef MAXIMALSTATES
+  fprintf(userconfig, "#define MAXIMALSTATES %u\n", MAXIMALSTATES);
+#endif
+
+#ifdef HASHSIZE
+  fprintf(userconfig, "#define HASHSIZE %u\n", HASHSIZE);
+#endif
+
+  fprintf(userconfig, "\n// REDUCTION TECHNIQUES\n");
+
+#ifdef COVER
+  fprintf(userconfig, "#define COVER\n");
+#endif
+
+#ifdef STUBBORN
+  fprintf(userconfig, "#define STUBBORN\n");
+#if defined(STATEPREDICATE) || defined(LIVEPROP)
+#ifdef RELAXED
+  fprintf(userconfig, "#define RELAXED\n");
+#endif
+#endif
+#endif
+
+#ifdef SYMMETRY
+  fprintf(userconfig, "#define SYMMETRY\n");
+#ifdef SYMMINTEGRATION
+  fprintf(userconfig, "#define SYMMINTEGRATION %u\n", SYMMINTEGRATION);
+#ifdef define(MAXATTEMPT) && SYMMINTEGRATION == 4
+  fprintf(userconfig, "#define MAXATTEMPT %u\n", MAXATTEMPT);
+#endif
+#endif
+#endif
+
+#ifdef CYCLE
+  fprintf(userconfig, "#define CYCLE\n");
+#ifdef NONBRANCHINGONLY
+  fprintf(userconfig, "#define NONBRANCHINGONLY\n");
+#endif
+#ifdef MAXUNSAVED
+  fprintf(userconfig, "#define MAXUNSAVED %u\n", MAXUNSAVED);
+#endif
+
+#endif
+
+#ifdef PREDUCTION
+  fprintf(userconfig, "#define PREDUCTION\n");
+#endif
+#ifdef SMALLSTATE
+  fprintf(userconfig, "#define SMALLSTATE\n");
+#endif
+#ifdef BITHASH
+  fprintf(userconfig, "#define BITHASH\n");
+#endif
+#ifdef DISTRIBUTE
+  fprintf(userconfig, "#define DISTRIBUTE\n");
+#endif
+#ifdef SWEEP
+  fprintf(userconfig, "#define SWEEP\n");
+#endif
+
+  fprintf(userconfig, "\n// GRAPH EXPLORATION STRATEGY\n");
+
+#ifdef DEPTH_FIRST
+  fprintf(userconfig, "#define DEPTH_FIRST\n");
+#endif
+#ifdef BREADTH_FIRST
+  fprintf(userconfig, "#define BREADTH_FIRST\n");
+#endif
+
+  fprintf(userconfig, "\n// VERIFICATION PROBLEM\n");
+
+#ifdef REACHABILITY
+  fprintf(userconfig, "#define REACHABILITY\n");
+#endif
+
+#ifdef MODELCHECKING
+  fprintf(userconfig, "#define MODELCHECKING\n");
+#ifdef EXTENDEDCTL
+  fprintf(userconfig, "#define EXTENDEDCTL\n");
+#endif
+#endif
+
+#ifdef BOUNDEDPLACE
+  fprintf(userconfig, "#define BOUNDEDPLACE\n");
+#endif
+#ifdef BOUNDEDNET
+  fprintf(userconfig, "#define BOUNDEDNET\n");
+#endif
+#ifdef DEADTRANSITION
+  fprintf(userconfig, "#define DEADTRANSITION\n");
+#endif
+#ifdef REVERSIBILITY
+  fprintf(userconfig, "#define REVERSIBILITY\n");
+#endif
+#ifdef HOME
+  fprintf(userconfig, "#define HOME\n");
+#endif
+
+#ifdef FINDPATH
+  fprintf(userconfig, "#define FINDPATH\n");
+#ifdef MAXPATH
+  fprintf(userconfig, "#define MAXPATH %u\n", MAXPATH);
+#endif
+#endif
+
+#ifdef FULL
+  fprintf(userconfig, "#define FULL\n");
+#endif
+#ifdef DEADLOCK
+  fprintf(userconfig, "#define DEADLOCK\n");
+#endif
+#ifdef NONE
+  fprintf(userconfig, "#define NONE\n");
+#endif
+#ifdef STATEPREDICATE
+  fprintf(userconfig, "#define STATEPREDICATE\n");
+#endif
+
+#ifdef LIVEPROP
+  fprintf(userconfig, "#define LIVEPROP\n");
+#ifdef TWOPHASE
+  fprintf(userconfig, "#define TWOPHASE\n");
+#endif
+#ifdef STRUCT
+  fprintf(userconfig, "#define STRUCT\n");
+#endif
+#endif
+
+#ifdef FAIRPROP
+  fprintf(userconfig, "#define FAIRPROP\n");
+#endif
+#ifdef STABLEPROP
+  fprintf(userconfig, "#define STABLEPROP\n");
+#endif
+#ifdef EVENTUALLYPROP
+  fprintf(userconfig, "#define EVENTUALLYPROP\n");
+#endif
+  
+  fprintf(stderr, "lola: successfully wrote userconfig offspring file ‘%s’\n", filename.c_str());
+  fclose(userconfig);
+}

@@ -25,6 +25,13 @@ using std::endl;
 #define false 0
 
 
+///// 4 LINES ADDED BY NIELS
+extern void statistics(unsigned int s, unsigned int e, unsigned int h);
+extern unsigned int NrOfStates;
+extern unsigned int Edges;
+extern unsigned int NonEmptyHash;
+
+
 #ifdef MAXIMALSTATES
 /// abort LoLA if more than MAXIMALSTATES states are processed
 void checkMaximalStates(unsigned int states);
@@ -670,7 +677,9 @@ if(Places[(*p)]-> bounded)
 #ifdef CHECKCAPACITY
 	if(CurrentMarking[*p] > Places[*p]->capacity)
 	{
-    fprintf(stderr, "lola: capacity of place ‘%s’ exceeded\n", Places[*p]->name);
+    statistics(NrOfStates,Edges,NonEmptyHash);
+    fprintf(stderr, "lola: capacity of place ‘%s’ exceeded: CAPACITY=%d, but m(%s)=%d\n",
+      Places[*p]->name, Places[*p]->capacity, Places[*p]->name, CurrentMarking[*p]);
 		_exit(4);
 	}
 #endif

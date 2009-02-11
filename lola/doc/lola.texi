@@ -1906,6 +1906,13 @@ During the execution of LoLA, status information is generated and printed to the
 
 
 
+@c --------------------------------------------------------------------------
+@section State Limit
+@cindex @code{#MAXIMALSTATES}
+
+The number of states to be generated can be controlled through the directive @samp{#MAXIMALSTATES} in the file @file{userconfig.H}. As soon as this number of states was generated, LoLA terminates with return value 5. 
+
+
 
 
 @c ==========================================================================

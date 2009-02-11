@@ -37,9 +37,11 @@ Version 1.11-unreleased
   graphical representation of a reachability graph created by LoLA (using
   option `-G' or `-M')
 
-* command line options are now handled by GNU Gengetopt
+* command line options are now handled by GNU Gengetopt (see
+  `http://www.gnu.org/software/gengetopt')
 
-* added a manpage for LoLA using `help2man' tool
+* added a manpage for LoLA using `help2man' tool (see
+  `http://www.gnu.org/software/help2man')
 
 * added `--enable-mpi' command line parameter for the `configure' script to
   use MPI compiler wrappers instead of GCC (disabled by default)
@@ -49,6 +51,15 @@ Version 1.11-unreleased
   are processed; the exit code will be 5
 
 * canonized LoLA's error messages
+
+* removed directory `patches': these options (show number of states after
+  capacity excess; limited state space generation) are now built into LoLA
+
+* added `--offspring' command line parameter that creates a file containing
+  all necessary information to compile a new binary with the same
+  configuration used for the calling binary. To compile this new binary, copy
+  the resulting file `userconfig.H.offspring' into the `src/configs'
+  directory of the source distribution and run `make lola-offspring'.
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

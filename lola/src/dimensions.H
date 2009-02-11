@@ -727,5 +727,6 @@
 #endif
 
 void reportconfiguration();
+void createUserconfigFile(char *filename);
 
 #endif

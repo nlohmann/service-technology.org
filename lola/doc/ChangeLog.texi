@@ -20,15 +20,19 @@
 
 @item added a directory @file{utils} for small helper tools: @sansserif{graph2dot} creates a graphical representation of a reachability graph created by LoLA (using option @option{-G} or @option{-M})
 
-@item command line options are now handled by @acronym{GNU} Gengetopt
+@item command line options are now handled by @acronym{GNU} Gengetopt (see @url{http://www.gnu.org/software/gengetopt})
 
-@item added a manpage for LoLA using @code{help2man} tool
+@item added a manpage for LoLA using @code{help2man} tool (see @url{http://www.gnu.org/software/help2man})
 
 @item added @samp{--enable-mpi} command line parameter for the @file{configure} script to use @acronym{MPI} compiler wrappers instead of @acronym{GCC} (disabled by default)
 
 @item added an option @code{MAXIMALSTATES} to @file{userconfig.H}: by defining this option to a value, say 100000, LoLA will abort as soon as more than 100000 states are processed; the exit code will be 5
 
 @item canonized LoLA's error messages
+
+@item removed directory @file{patches}: these options (show number of states after capacity excess; limited state space generation) are now built into LoLA
+
+@item added @option{--offspring} command line parameter that creates a file containing all necessary information to compile a new binary with the same configuration used for the calling binary. To compile this new binary, copy the resulting file @file{userconfig.H.offspring} into the @file{src/configs} directory of the source distribution and run @samp{make lola-offspring}.
 @end itemize
 
 

@@ -22,9 +22,9 @@ AC_PROG_AWK
 AC_PROG_GREP
 
 # check for additional programs
-AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
-AC_CHECK_PROG(AGPP, ag++, ag++)
-AC_CHECK_PROG(ACPP, ac++, ac++)
+AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
+AC_CHECK_PROGS(AGPP, ag++, [`pwd`/missing ag++])
+AC_CHECK_PROGS(ACPP, ac++, [`pwd`/missing ac++])
 AC_DEFINE_UNQUOTED(CONFIG_DOT, "$DOT", [whether dot was found by configure])
 AM_MISSING_PROG(HELP2MAN, help2man)
 

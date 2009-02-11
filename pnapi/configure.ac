@@ -21,7 +21,7 @@ configured_CXXFLAGS=""
 configured_LDFLAGS=""
 
 # check for additional programs
-AC_CHECK_PROG(GENGETOPT, gengetopt, gengetopt)
+AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
 
 #############################################################################
 # search for Flex and Bison

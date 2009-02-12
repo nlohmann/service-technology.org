@@ -164,7 +164,7 @@ namespace pnapi
     //@{
 
     /// creates an Arc
-    Arc & createArc(Node &, Node &, int = 1);
+    Arc & createArc(Node &, Node &, unsigned int = 1);
 
     /// creates a Place
     Place & createPlace(const std::string & = "", Node::Type = Node::INTERNAL,
@@ -354,6 +354,12 @@ namespace pnapi
     
     /// elimination of equal places
     int reduce_rule_4();
+    
+    /// check if the postset of a set is empty
+    bool reduce_emptyPostset(const std::set<Node*> & nodes);
+    
+    /// check if the preset of a set stores only one item
+    bool reduce_singletonPreset(const std::set<Node*> & nodes);
     
     /// fusion of pre- with posttransition (m to n)
     int reduce_rule_5();

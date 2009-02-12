@@ -399,7 +399,7 @@ namespace pnapi
    * \param   weight  weight of the Arc
    * \return  the newly created Arc
    */
-  Arc & PetriNet::createArc(Node & source, Node & target, int weight)
+  Arc & PetriNet::createArc(Node & source, Node & target, unsigned int weight)
   {
     return *new Arc(*this, observer_, source, target, weight);
   }

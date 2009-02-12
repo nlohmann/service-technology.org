@@ -697,14 +697,420 @@ int PetriNet::reduce_rule_4()
   return count;
 }
 
-int PetriNet::reduce_rule_5()
+/*!
+ * \brief Checks, wether the postset of a set of nodes is empty.
+ */
+bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
 {
-  return 0; 
+  for(set<Node*>::iterator n = nodes.begin();
+      n != nodes.end(); ++n)
+  {
+    if(!((*n)->getPostset().empty()))
+      return false;
+  }
+  return true;
 }
 
+/*!
+ * \brief Check if the preset of a set stores only one item.
+ */
+bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
+{
+  for(set<Node*>::iterator n = nodes.begin();
+      n != nodes.end(); ++n)
+  {
+    if((*n)->getPreset().size() != 1)
+      return false;
+  }
+  return true;
+}
+
+/*!
+ * \brief Fusion of transitions:
+ * 
+ * If there exist a place p with a not empty preset t1 to tk (precondition 1),
+ * a not empty postset t1' to tn' (precondition 2)
+ * which are distinct (precondition 3)
+ * and the postset's postset is not empty (precondition 4)
+ * and the postsets preset is {p} (precondition 5)
+ * and the arc weight from p to each transition of its postset is v (precondition 6)
+ * 
+ * and
+ * 
+ * case a: n == 1 (i.e. there exists only a singleton postset of p) (precondition 7a)
+ *         and the weight of all ingoing arcs of p are multiples of v (precondition 8a)
+ * 
+ * or
+ * 
+ * case b: n > 1 (precondition 7b),
+ *         p stores less than v tokens (precondition 8b)
+ *         and the weight of each ingoing arc of p is v (precondition 9b)
+ * 
+ * then the following changes can be applied:
+ * 
+ * 1.: If p stores at least v tokens, fire its posttransition until
+ *     p stores less than v tokens.
+ * 2.: For each transition ti (1 <= i <= k) 
+ *     and each transition tj' (1 <= j <= n)
+ *     add a new transition tij so that firing of transition tij 
+ *     replaces fireing of transition ti followed by fireing of tj'.
+ * 3.: Remove nodes p, t1 to tk and t1' to tn'.   
+ * 
+ * Tij will store the history of ti, p and tj'.
+ * 
+ * \return  Number of removed places. 
+ * 
+ */
+int PetriNet::reduce_rule_5()
+{
+  // search for places fullfilling the preconditions
+  set<Place*> obsoletePlaces;
+  map<Node*,unsigned int> v_;
+  
+  // transitions must not be in more than one reduction at once
+  map<Node*,bool> seenTransitions;
+  for(set<Transition*>::iterator t = transitions_.begin();
+      t != transitions_.end(); ++t)
+    seenTransitions[*t]=false;
+  
+  // iterate internal places
+  for (set<Place*>::iterator p = internalPlaces_.begin(); 
+       p != internalPlaces_.end(); ++p)
+  {
+    set<Node*> preset = (*p)->getPreset();
+    set<Arc*> preArcs = (*p)->getPresetArcs();
+    set<Node*> postset = (*p)->getPostset();
+    set<Arc*> postArcs = (*p)->getPostsetArcs();
+    
+    // check for seen transitions
+    {
+      bool seen = false;
+      for(set<Node*>::iterator t = preset.begin();
+          t != preset.end(); ++t)
+        seen = (seen || seenTransitions[*t]);
+      for(set<Node*>::iterator t = postset.begin();
+          t != postset.end(); ++t)
+        seen = (seen || seenTransitions[*t]);
+      if(seen)
+        continue;
+    }
+    
+    if((preset.empty()) || // precondition 1
+       (postset.empty()) || // precondition 2
+       (!((util::setIntersection(preset,postset)).empty())) || // precondition 3
+       (reduce_emptyPostset(postset)) || // precondition 4
+       (!(reduce_singletonPreset(postset))) ) // precondition 5
+      continue;
+    
+    unsigned int v = (*(postArcs.begin()))->getWeight();
+    bool precond_6 = true;
+    
+    for(set<Arc*>::iterator a = postArcs.begin();
+        a != postArcs.end(); ++a)
+    {
+      if((*a)->getWeight() != v)
+      {
+        precond_6 = false;
+        break;
+      }
+    }
+    
+    if(!precond_6) // precondition 6
+      continue;
+    
+    if( postset.size() == 1 ) // case a, precondition 7a
+    {
+      bool precond_8a = true;
+      for(set<Arc*>::iterator a = preArcs.begin();
+          a!=preArcs.end(); ++a)
+      {
+        if((*a)->getWeight() % v != 0)
+        {  
+          precond_8a = false;
+          break;
+        }
+      }
+      if(precond_8a) // precondition 8a
+      {
+        obsoletePlaces.insert(*p);
+        v_[*p]=v;
+        for(set<Node*>::iterator t = preset.begin();
+            t != preset.end(); ++t)
+          seenTransitions[*t]=true;
+        for(set<Node*>::iterator t = postset.begin();
+            t != postset.end(); ++t)
+          seenTransitions[*t]=true;
+      }
+    }
+    else // case b, precondition 7b
+    {
+      if((*p)->getTokenCount() >= v) // precondition 8b
+        continue;
+      
+      bool precond_9b = true;
+      for(set<Arc*>::iterator a = preArcs.begin();
+          a!=preArcs.end(); ++a)
+      {
+        if((*a)->getWeight() != v)
+        {
+          precond_9b = false;
+          break;
+        }
+      }
+      if(precond_9b) // precondition 9b
+      {
+        obsoletePlaces.insert(*p);
+        v_[*p]=v;
+        for(set<Node*>::iterator t = preset.begin();
+            t != preset.end(); ++t)
+          seenTransitions[*t]=true;
+        for(set<Node*>::iterator t = postset.begin();
+            t != postset.end(); ++t)
+          seenTransitions[*t]=true;
+      }
+    }
+  }
+  
+  // apply reduction
+  int ret = 0;
+  
+  for(set<Place*>::iterator p = obsoletePlaces.begin();
+      p!=obsoletePlaces.end(); ++p)
+  {
+    // STEP 1
+    while((*p)->getTokenCount() > v_[*p]) // if there are too much tokens stored in p
+    {
+      // fire the only transition in p's postset
+      Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
+      
+      (*p)->mark((*p)->getTokenCount() - v_[*p]); // consume tokens
+      
+      for(set<Arc*>::iterator a = t->getPostsetArcs().begin();
+          a != t->getPostsetArcs().end(); ++a)
+      {
+        Place* postP = static_cast<Place*>(&((*a)->getTargetNode())); 
+        postP->mark(postP->getTokenCount() + (*a)->getWeight()); // produce tokens
+      }
+    }
+    
+    // STEP 2
+    for(set<Node*>::iterator t1 = (*p)->getPreset().begin();
+        t1 != (*p)->getPreset().end(); ++t1)
+      for(set<Node*>::iterator t2 = (*p)->getPostset().begin();
+          t2 != (*p)->getPostset().end(); ++t2)
+      {
+        // save the history
+        Transition* t12 = &createTransition();
+        t12->mergeNameHistory(**t1);
+        t12->mergeNameHistory(**p);
+        t12->mergeNameHistory(**t2);
+        
+        // copy incoming arcs
+        for(set<Arc*>::iterator a = (*t1)->getPresetArcs().begin();
+            a != (*t1)->getPresetArcs().end(); ++a)
+          createArc((*a)->getSourceNode(),*t12,(*a)->getWeight());
+        
+        // arrange outgoing arcs
+        set<Node*> newPostset;
+        map<Node*,unsigned int> weights;
+        
+        for(set<Arc*>::iterator a = (*t1)->getPostsetArcs().begin();
+            a != (*t1)->getPostsetArcs().end(); ++a)
+        {
+          if(&((*a)->getTargetNode()) == (*p))
+              continue;
+          newPostset.insert(&((*a)->getTargetNode()));
+          weights[&((*a)->getTargetNode())]+=(*a)->getWeight();
+        }
+        
+        for(set<Arc*>::iterator a = (*t2)->getPostsetArcs().begin();
+            a != (*t2)->getPostsetArcs().end(); ++a)
+        {
+          newPostset.insert(&((*a)->getTargetNode()));
+          weights[&((*a)->getTargetNode())] += ((findArc((**t1),(**p))->getWeight()) / v_[*p]) * (*a)->getWeight();
+        }
+        
+        for(set<Node*>::iterator np = newPostset.begin();
+            np != newPostset.end(); ++np)
+          createArc(*t12,(**np),weights[*np]);
+      }
+    
+    // STEP 3:
+    set<Node*> preset = (*p)->getPreset();
+    set<Node*> postset = (*p)->getPostset();
+    deletePlace(*(*p));
+    for(set<Node*>::iterator t = preset.begin();
+        t != preset.end(); ++t)
+      deleteTransition(*static_cast<Transition*>(*t));
+    for(set<Node*>::iterator t = postset.begin();
+        t != postset.end(); ++t)
+      deleteTransition(*static_cast<Transition*>(*t));
+    
+    ++ret;
+  }
+  
+  return ret; 
+}
+
+/*!
+ * \brief Fusion of transitions
+ * 
+ * If there exists a place p with only one pretransition t (precondition 1)
+ * and p is the only postplace of t (precondition 2)
+ * and the postset of p is not empty (precondition 3)
+ * and t is not in the postset of p (precondition 4)
+ * and the postset of the preset of t contains only t (precondition 5)
+ * and all arcs to p or from p have the weight v (precondition 6)
+ * and the amount of tokens stored in p is less than v (precondition 7)
+ * then the following reduction can be applied:
+ * 
+ * 1.:  For each transition ti' from the postset of p add a new 
+ *      transition ti which will be connected with the presets 
+ *      of t and ti' and the postset of ti' appropriate.
+ * 2.:  Remove p and its pre- and postset.
+ * 
+ * Ti will store the history of t, p and ti'.
+ * 
+ * \return  Number of removed places.
+ *   
+ */
 int PetriNet::reduce_rule_6()
 {
-  return 0;
+  // search for places fullfilling the preconditions
+  set<Place*> obsoletePlaces;
+  
+  // transitions must not be in more than one reduction at once
+  map<Node*,bool> seenTransitions;
+  for(set<Transition*>::iterator t = transitions_.begin();
+      t != transitions_.end(); ++t)
+    seenTransitions[*t]=false;
+  
+  // iterate internal places
+  for (set<Place*>::iterator p = internalPlaces_.begin(); 
+       p != internalPlaces_.end(); ++p)
+  {
+    
+    if ((*p)->getPreset().size() != 1) // precondition 1
+      continue;
+    
+    Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
+    
+    // check for seen transitions
+    {
+      bool seen = seenTransitions[t];
+      
+      for(set<Node*>::iterator n = (*p)->getPostset().begin();
+          n != (*p)->getPostset().end(); ++n)
+        seen = (seen || seenTransitions[*n]);
+      
+      if(seen)
+        continue;
+    }
+    
+    if( (t->getPostset().size() != 1) || // precondition 2
+        ((*p)->getPostset().empty()) || // precondition 3
+        ((*p)->getPostset().find(t) != (*p)->getPostset().end()) ) // precondition 4
+      continue;
+    
+    bool precond5 = false;
+    
+    for(set<Node*>::iterator n = t->getPreset().begin(); 
+          n != t->getPreset().end(); ++n)
+    {
+      if((*n)->getPostset().size() != 1)
+      {
+        precond5 = true;
+        break;
+      }
+    }
+    
+    if(precond5) // precondition 5
+      continue;
+  
+    unsigned int v = (*((*p)->getPresetArcs().begin()))->getWeight();
+    bool precond6 = false;
+    
+    for(set<Arc*>::iterator a = (*p)->getPostsetArcs().begin();
+          a != (*p)->getPostsetArcs().end(); ++a)
+    {
+      if((*a)->getWeight() != v)
+      {
+        precond6 = true;
+        break;
+      }
+    }
+    
+    if( (precond6) ||  // precondition 6
+        ((*p)->getTokenCount() >= v) ) // precondition 7
+      continue;
+    
+    // all preconditions fullfilled
+    obsoletePlaces.insert(*p); // mark p as obsolete
+    seenTransitions[t] = true; // mark t as seen
+    for(set<Node*>::iterator n = (*p)->getPostset().begin();
+          n != (*p)->getPostset().end(); ++n)
+      seenTransitions[*n] = true; // mark postset as seen
+  }
+  
+  // apply reduction
+  int ret = 0;
+  
+  for(set<Place*>::iterator p = obsoletePlaces.begin();
+        p != obsoletePlaces.end(); ++p)
+  {
+    // STEP 1:
+    Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
+    
+    for(set<Node*>::iterator t__ = (*p)->getPostset().begin();
+          t__ != (*p)->getPostset().end(); ++t__)
+    {
+      Transition* nt = &createTransition(); // get new transition
+      nt->mergeNameHistory(*t); // save history
+      nt->mergeNameHistory(**p); // save history
+      nt->mergeNameHistory(**t__); // save history
+      
+      // arrange preset
+      set<Node*> preset;
+      map<Node*,unsigned int> weights;
+      
+      for(set<Arc*>::iterator a = t->getPresetArcs().begin();
+            a != t->getPresetArcs().end(); ++a)
+      {
+        preset.insert(&((*a)->getSourceNode()));
+        weights[&((*a)->getSourceNode())] += (*a)->getWeight();
+      }
+      
+      for(set<Arc*>::iterator a = (*t__)->getPresetArcs().begin();
+            a != (*t__)->getPresetArcs().end(); ++a)
+      {
+        preset.insert(&((*a)->getSourceNode()));
+        weights[&((*a)->getSourceNode())] += (*a)->getWeight();
+      }
+      
+      for(set<Node*>::iterator n = preset.begin();
+            n != preset.end(); ++n)
+      {
+        createArc((**n),*nt,weights[*n]);
+      }
+      
+      // copy postset
+      for(set<Arc*>::iterator a = (*t__)->getPostsetArcs().begin();
+            a != (*t__)->getPostsetArcs().end(); ++a)
+        createArc(*nt,(*a)->getTargetNode(),(*a)->getWeight());
+    }
+    
+    // STEP 2:
+    deleteTransition(*t);
+    
+    for(set<Node*>::iterator n = (*p)->getPostset().begin();
+          n != (*p)->getPostset().end(); ++n)
+      deleteTransition(*static_cast<Transition*>(*n));
+    
+    deletePlace(**p);
+    ++ret;
+  }
+  
+  return ret;
 }
 
 int PetriNet::reduce_rule_7()

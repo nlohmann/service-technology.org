@@ -20,10 +20,10 @@ AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
-AM_MISSING_PROG(HELP2MAN, help2man)
 
 # check for additional programs
-AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
+AM_MISSING_PROG(GENGETOPT, gengetopt)
+AM_MISSING_PROG(HELP2MAN, help2man)
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD

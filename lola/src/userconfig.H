@@ -119,12 +119,12 @@
 //#define REACHABILITY
 //#define MODELCHECKING
 //#define BOUNDEDPLACE
-#define BOUNDEDNET
+//#define BOUNDEDNET
 //#define DEADTRANSITION
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-//#define FULL
+#define FULL
 //#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE

@@ -1,9 +1,12 @@
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
+#include <sstream>
 #include <vector>
 #include <string>
-#include <libgen.h>
+
 #include "pnapi.h"
 #include "cmdline.h"
 #include "config.h"
@@ -16,6 +19,7 @@ using std::vector;
 using std::string;
 using std::ifstream;
 using std::ofstream;
+using std::ostringstream;
 using namespace pnapi;
 
 /// the command line parameters
@@ -31,9 +35,11 @@ void evaluateParameters(int argc, char** argv) {
     struct cmdline_parser_params *params = cmdline_parser_params_create();
     
     // call the cmdline parser
-    if (cmdline_parser (argc, argv, &args_info) != 0)
-        exit(EXIT_FAILURE);    
-        
+    if (cmdline_parser (argc, argv, &args_info) != 0) {
+        fprintf(stderr, "       see ‘petri --help’ for more information\n");
+        exit(EXIT_FAILURE);
+    }
+    
     free(params);
 }
 
@@ -64,12 +70,12 @@ int main(int argc, char** argv) {
                 >> meta(io::CREATOR, PACKAGE_STRING)
                 >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
         } catch (io::InputError error) {
-            cerr << error << endl;
+            cerr << "petri:" << error << endl;
             exit(EXIT_FAILURE);
         }
 
         if (args_info.verbose_given) {
-            cerr << "<stdin>: " << io::stat << net << endl;
+            cerr << "petri:<stdin>: " << io::stat << net << endl;
         }
         
         // store net
@@ -83,7 +89,7 @@ int main(int argc, char** argv) {
             // try to open file
             ifstream infile(args_info.inputs[i], ifstream::in);
             if (!infile.is_open()) {
-                cerr << args_info.inputs[i] << ": could not open file to read" << endl;
+                cerr << "petri: could not read from file ‘" << args_info.inputs[i] << "’" << endl;
                 exit(EXIT_FAILURE);
             }
             
@@ -93,7 +99,7 @@ int main(int argc, char** argv) {
                     >> meta(io::CREATOR, PACKAGE_STRING)
                     >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
             } catch (io::InputError error) {
-                cerr << error << endl;
+                cerr << "petri:" << error << endl;
                 infile.close();            
                 exit(EXIT_FAILURE);
             }
@@ -101,7 +107,7 @@ int main(int argc, char** argv) {
             infile.close();
             
             if (args_info.verbose_given) {
-                cerr << args_info.inputs[i] << ": " << io::stat << net << endl;
+                cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << net << endl;
             }
             
             // store net
@@ -116,6 +122,11 @@ int main(int argc, char** argv) {
     *****************/
     if (args_info.normalize_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
+            
+            if (args_info.verbose_given) {
+                cerr << "petri: normalizing reducing Petri net ‘" << names[i] << "’..." << endl;
+            }
+            
             nets[i].normalize();
         }        
     }
@@ -126,6 +137,11 @@ int main(int argc, char** argv) {
     ***********************/
     if (args_info.reduce_given && args_info.reduce_arg > 0) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
+
+            if (args_info.verbose_given) {
+                cerr << "petri: structurally reducing Petri net ‘" << names[i] << "’..." << endl;
+            }
+
             nets[i].reduce(args_info.reduce_arg);
         }
     }
@@ -134,19 +150,21 @@ int main(int argc, char** argv) {
     /************************
     * STRUCTURAL PROPERTIES *
     ************************/
-    if (args_info.check_given || args_info.isFreeChoice_given ||
-        args_info.isNormal_given || args_info.isWorkflow_given) {
+    if (args_info.check_given || args_info.isFreeChoice_given || args_info.isNormal_given || args_info.isWorkflow_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
-            cerr << names[i] << ": ";
+            cerr << "petri:" << names[i] << ": ";
 
+            // check for free choice
             if (args_info.check_arg == check_arg_freechoice || args_info.isFreeChoice_given) {
                 cerr << nets[i].isFreeChoice() << endl;                
             }
             
+            // check for normality
             if (args_info.check_arg == check_arg_normal || args_info.isNormal_given) {
                 cerr << nets[i].isNormal() << endl;                
             }
             
+            // check for workflow structure
             if (args_info.check_arg == check_arg_workflow || args_info.isWorkflow_given) {
                 nets[i].isWorkflow();                
             }
@@ -158,30 +176,70 @@ int main(int argc, char** argv) {
     * OUTPUT *
     *********/   
     if (args_info.output_given) {
-        for (unsigned int i = 0; i < args_info.output_given; ++i) {
-            string outname = names[0] + "." + args_info.output_orig[i];
-            ofstream outfile(outname.c_str(), ofstream::trunc);
-            if (!outfile.is_open()) {
-                cerr << outname << ": could not write to file" << endl;
-                exit(EXIT_FAILURE);
-            }
-
-            outfile << meta(io::OUTPUTFILE, outname);
-
-            switch(args_info.output_arg[i]) {
-                case (output_arg_owfn): {
-                    outfile << io::owfn << nets[0];
-                    break;
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+            for (unsigned int j = 0; j < args_info.output_given; ++j) {
+                // try to open file to write
+                string outname = names[i] + "." + args_info.output_orig[j];
+                ofstream outfile(outname.c_str(), ofstream::trunc);
+                if (!outfile.is_open()) {
+                    cerr << "petri: could not write to file ‘" << outname << "’" << endl;
+                    exit(EXIT_FAILURE);
+                }
+                
+                if (args_info.verbose_given) {
+                    cerr << "petri: creating file ‘" << outname << "’..." << endl;
                 }
 
-                case (output_arg_sa): {
-                    Automaton sa(nets[0]);
-                    outfile << sa;
-                    break;
+                outfile << meta(io::OUTPUTFILE, outname);
+
+                switch(args_info.output_arg[j]) {
+                    // create oWFN output
+                    case (output_arg_owfn): {
+                        outfile << io::owfn << nets[i];
+                        break;
+                    }
+
+                    // create automaton output
+                    case (output_arg_sa): {
+                        Automaton sa(nets[i]);
+                        outfile << sa;
+                        break;
+                    }
+
+                    // create dot output
+                    case (output_arg_dot): {
+                        outfile << io::dot << nets[i];
+                        break;
+                    }
+
+                    // create output using Graphviz dot
+                    case (output_arg_png):
+                    case (output_arg_pdf):
+                    case (output_arg_svg): {
+                        if (CONFIG_DOT == "not found") {
+                            cerr << "petri: Graphviz dot was not found by configure script; see README" << endl;
+                            cerr << "       necessary for option ‘--output=owfn’" << endl;
+                            exit(EXIT_FAILURE);
+                        }
+#if !defined(HAVE_POPEN) || !defined(HAVE_PCLOSE)
+                        cerr << "petri: cannot open UNIX pipe to Graphviz dot" << endl;
+                        cerr << "       create dot file with ‘--output=dot’ and call Graphviz dot manually" << endl;
+                        exit(EXIT_FAILURE);
+#endif
+                        ostringstream d;
+                        d << io::dot << nets[i];
+                        string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -o " + outname + " &> /dev/null";
+                        FILE *s = popen(call.c_str(), "w");
+                        assert(s);
+                        fprintf(s, "%s\n", d.str().c_str());
+                        assert(!ferror(s));
+                        pclose(s);
+                        break;
+                    }
                 }
+
+                outfile.close();
             }
-            
-            outfile.close();
         }
     }
     

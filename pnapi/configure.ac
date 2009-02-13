@@ -20,8 +20,11 @@ configured_CFLAGS=""
 configured_CXXFLAGS=""
 configured_LDFLAGS=""
 
+# check for functions
+AC_CHECK_FUNCS([popen pclose])
+
 # check for additional programs
-AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
+AM_MISSING_PROG(GENGETOPT, gengetopt)
 
 #############################################################################
 # search for Flex and Bison
@@ -29,18 +32,20 @@ AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
 AC_PROG_LEX
 if test "$LEX" != "flex"; then
   AC_MSG_WARN([Flex was not found. You will not be able to compile from scratch. See file README.])
+  AM_MISSING_PROG(LEX, flex)
 fi
 
 AC_PROG_YACC
 if test "$YACC" = "yacc"; then
   AC_MSG_WARN([Bison was not found. You will not be able to compile from scratch. See file README.])
+  AM_MISSING_PROG(YACC, bison)
 fi
 
 
 #############################################################################
 # search for Dot and Petrify and write results to file "src/config.h"
 #############################################################################
-AC_CHECK_PROG(DOT, dot, dot, not found)
+AC_CHECK_PROGS(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
   AC_MSG_WARN([Graphviz Dot was not found. See file README.])
   AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])

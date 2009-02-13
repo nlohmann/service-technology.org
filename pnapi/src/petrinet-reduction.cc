@@ -1113,20 +1113,201 @@ int PetriNet::reduce_rule_6()
   return ret;
 }
 
+/*!
+ * \brief Remove loop places.
+ * 
+ * If there exists a place p with identical preset and postset (precondition 1)
+ * and for each transition in the preset of p applies that the
+ * arc weight from p to t equals the arc weight from t to p (precondition 2)
+ * and this arc weight is less than the amount of tokens stored in p (precondition 3)
+ * than this place can be removed as well as each transition 
+ * becoming isolated by this reduction.
+ * 
+ * \return  Number of removed places.
+ * 
+ * \todo: How to handle the history of removed places and transitions?
+ *   
+ */
 int PetriNet::reduce_rule_7()
 {
-  return 0;
+  // search for places fullfilling the preconditions
+  set<Place*> obsoletePlaces;
+  
+  // iterate internal places
+  for (set<Place*>::iterator p = internalPlaces_.begin(); 
+       p != internalPlaces_.end(); ++p)
+  {
+    if(!((*p)->getPreset() == (*p)->getPostset())) // precondition 1
+      continue;
+    
+    unsigned int m = (*p)->getTokenCount();
+    bool precond = false;
+    
+    for(set<Arc*>::iterator a1 = (*p)->getPresetArcs().begin();
+          a1 != (*p)->getPresetArcs().end(); ++a1)
+    {
+      Arc* a2 = findArc((**p),(*a1)->getSourceNode());
+      if( ((*a1)->getWeight() != a2->getWeight()) || // precondition 2
+          (a2->getWeight() != m) ) // precondition 3
+      {
+        precond = true;
+        break;
+      }
+    }
+    
+    if(precond)
+      continue;
+    
+    // p fullfilles the preconditions
+    obsoletePlaces.insert(*p);
+  }
+  
+  // apply reduction
+  int ret = 0;
+  
+  set<Transition*> obsoleteTransitions;
+  
+  for(set<Place*>::iterator p = obsoletePlaces.begin();
+        p != obsoletePlaces.end(); ++p)
+  {
+    // check for isolated transitions
+    for(set<Node*>::iterator t = (*p)->getPreset().begin();
+          t != (*p)->getPreset().end(); ++t)
+      if ( ((*t)->getPreset().size() == 1) &&
+           ((*t)->getPostset().size() == 1) )
+        obsoleteTransitions.insert(static_cast<Transition*>(*t));
+    
+    // remove place
+    deletePlace(**p);
+    ++ret;
+  }
+  
+  // clean transitions
+  for(set<Transition*>::iterator t = obsoleteTransitions.begin();
+        t != obsoleteTransitions.end(); ++t)
+    deleteTransition(**t);
+  
+  return ret;
 }
 
+/*!
+ * \brief Elimination of loops.
+ * 
+ * If there exists a transition t with identical preset and postset (precondition 1)
+ * and for each place of the preset of t applies that the arc weight
+ * from p to t equals the arc weight from t to p (precondition 2)
+ * and there exists an transition t0 different from t (precondition 3)
+ * and for eacht place p in the preset of t applies that
+ * p is in the preset of t0 (precondition 4)
+ * and the arc weight from p to t0 is greater than or equal to
+ * the arc weight from p to t (precondition 5)
+ * than t can be removed.
+ * 
+ * \return  Number of removed places.
+ * 
+ * \todo: How to handle the history of removed transitions?
+ *  
+ */
 int PetriNet::reduce_rule_8()
 {
-  return 0;
+  // search for transitions fullfilling the preconditions
+  set<Transition*> obsoleteTransitions;
+  
+  // don't reduce "backup"-transitions
+  map<Node*,bool> seenTransitions;
+  
+  for (set<Transition*>::iterator t = transitions_.begin(); 
+         t != transitions_.end(); ++t)
+  {
+    seenTransitions[*t] = false;
+  }
+  
+  // iterate transitions
+  for (set<Transition*>::iterator t = transitions_.begin(); 
+       t != transitions_.end(); ++t)
+  {
+    // check if t is a "backup"-transition
+    if(seenTransitions[*t])
+      continue;
+    
+    if(!((*t)->getPreset() == (*t)->getPostset())) // precondition 1
+      continue;
+    
+    bool precond2 = false;
+    
+    for(set<Arc*>::iterator a1 = (*t)->getPresetArcs().begin();
+          a1 != (*t)->getPresetArcs().end(); ++a1)
+    {
+      Arc* a2 = findArc((**t),(*a1)->getSourceNode());
+      if( ((*a1)->getWeight() != a2->getWeight()) ) // precondition 2
+      {
+        precond2 = true;
+        break;
+      }
+    }
+    
+    if(precond2)
+      continue;
+    
+    for (set<Node*>::iterator t0 = (*((*t)->getPreset().begin()))->getPostset().begin(); 
+           t0 != (*((*t)->getPreset().begin()))->getPostset().end(); ++t0)
+    {
+      if((*t)==(*t0)) // precondition 3
+        continue;
+      
+      bool precond45 = false;
+      
+      for (set<Arc*>::iterator a1 = (*t)->getPresetArcs().begin();
+            a1 != (*t)->getPresetArcs().end(); ++a1)
+      {
+        Arc* a2 = findArc((*a1)->getSourceNode(),(**t0));
+        if ( (a2 == 0) || // precondition 4 
+             (a2->getWeight() < (*a1)->getWeight()) ) //precondition 5
+        {
+          precond45 = true;
+          break;
+        }
+      }
+      
+      if (precond45)
+      {
+        continue;
+      }
+      else
+      {
+        // transition t fullfilles the preconditions
+        obsoleteTransitions.insert(*t);
+        seenTransitions[*t0] = true; // mark t0 as "backup"-transition
+        break; 
+      }
+    }
+  }
+  
+  // apply reduction
+  
+  int ret = 0;
+  
+  for(set<Transition*>::iterator t = obsoleteTransitions.begin();
+        t != obsoleteTransitions.end(); ++t)
+  {
+    deleteTransition(**t);
+    ++ret;
+  }
+  
+  return ret;
 }
 
 int PetriNet::reduce_rule_9()
 {
   return 0;
 }
+
+
+/******************************************************************************
+ * Functions to structurally simplify the Petri net model according to [PIL08]
+ *****************************************************************************/
+
+
 
 /*!
  * \brief Elimination of identical places (RB1):

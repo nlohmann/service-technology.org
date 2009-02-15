@@ -376,7 +376,7 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  * then p2 can be removed.
  * If precondition 2 is not fulfilled, p1 will be removed.
  * 
- * A place is removed by merging its with this one of 
+ * A place is removed by merging its history with this one of 
  * place parallel to it.
  * 
  * \return  Number of removed places.
@@ -482,8 +482,8 @@ int PetriNet::reduce_rule_3p()
  * If there exist two parallel transitions t1 and t2 (precondition 1)
  * one of them can be removed.
  *  
- * A place is removed by merging its with this one of 
- * place parallel to it.
+ * A transition is removed by merging its history with this one of 
+ * transition parallel to it.
  * 
  * \return  Number of removed transitions. 
  * 
@@ -1297,9 +1297,157 @@ int PetriNet::reduce_rule_8()
   return ret;
 }
 
+/*!
+ * \brief Fusion of Places.
+ * 
+ * If there exists a transition t with singleton preplace p (precondition 1)
+ * and the arc weight from p to t is 1 (precondition 2)
+ * and t is the only posttransition of of p (precondition 2a)
+ * and the preset of p is not empty (precondition 3)
+ * and the postset of t is not empty (precondition 4)
+ * and p is not in the postset of t (precondition 5)
+ * then the following changes can be applied:
+ * 
+ * 1.:  Fire t until p stores 0 tokens.
+ * 2.:  For each transition t' of the preset of p add a new transition t''
+ *      which will be connected with the preset of t' in the same way as t',
+ *      and with the postset of t' and t so that fireing of t''
+ *      equals fireing of t' once followed by fireing of t until p stores
+ *      0 tokens again.
+ * 3.:  Remove t, p and the preset of p.
+ * 
+ * T'' will store the history of t', p and t.
+ * 
+ * \return  Number of removed places.
+ * 
+ * \note  Precondition 2a is not from [STA90].
+ * 
+ */
 int PetriNet::reduce_rule_9()
 {
-  return 0;
+  // search for places fullfilling the preconditions
+  set<Place*> obsoletePlaces;
+  
+  // transitions must not be in more than one reduction at once
+  map<Node*,bool> seenTransitions;
+  for(set<Transition*>::iterator t = transitions_.begin();
+      t != transitions_.end(); ++t)
+    seenTransitions[*t]=false;
+  
+  // iterate internal places
+  for (set<Place*>::iterator p = internalPlaces_.begin(); 
+       p != internalPlaces_.end(); ++p)
+  {
+    { // check for seen Transitions
+      bool seen = seenTransitions[*((*p)->getPostset().begin())];
+      for(set<Node*>::iterator t = (*p)->getPreset().begin();
+          t != (*p)->getPreset().end(); ++t)
+      {
+        seen = seen || seenTransitions[*t];
+      }
+      
+      if(seen)
+        continue;
+    }
+    
+    if( ((*p)->getPostset().size() != 1) || // precondition 2a
+        ((*p)->getPreset().empty()) || // precondition 3
+        ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) ) //precondition 2
+      continue;
+    
+    Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
+    
+    if( (t->getPreset().size() != 1) || // precondition 1
+        (t->getPostset().empty()) || // precondition 4
+        (t->getPostset().find(*p) != t->getPostset().end()) ) // precondition 5
+      continue;
+    
+    // p is fullfilling the preconditions
+    
+    obsoletePlaces.insert(*p);
+    seenTransitions[t] = true; // mark t as seen
+    for(set<Node*>::iterator ti = (*p)->getPreset().begin();
+          ti != (*p)->getPreset().end(); ++ti)
+      seenTransitions[*ti] = true; // mark preset of p as seen
+  }
+  
+  // apply reduction
+  
+  int ret = 0;
+  
+  for(set<Place*>::iterator p = obsoletePlaces.begin();
+        p != obsoletePlaces.end(); ++p)
+  {
+    // STEP 1:
+    Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
+    unsigned int tokens = (*p)->getTokenCount();
+    
+    for(set<Arc*>::iterator a = t->getPostsetArcs().begin();
+          a != t->getPostsetArcs().end(); ++a)
+    {
+      Place* pi = static_cast<Place*>(&((*a)->getTargetNode()));
+      pi->mark(pi->getTokenCount() + ((*a)->getWeight() * tokens));
+    }
+    
+    (*p)->mark(0);
+    
+    // STEP 2:
+    // iterate preset of p
+    for(set<Node*>::iterator ti = (*p)->getPreset().begin();
+          ti != (*p)->getPreset().end(); ++ti)
+    {
+      Transition* tj = &createTransition(); // create new Transition Tj
+      
+      // save history
+      tj->mergeNameHistory(**ti);
+      tj->mergeNameHistory(**p);
+      tj->mergeNameHistory(*t);
+      
+      // copy preset
+      for(set<Arc*>::iterator a = (*ti)->getPresetArcs().begin();
+            a != (*ti)->getPresetArcs().end(); ++a)
+      {
+        createArc((*a)->getSourceNode(),*tj,(*a)->getWeight());
+      }
+      
+      // arrange postset
+      set<Node*> np;
+      map<Node*,unsigned int> weights;
+      
+      for(set<Arc*>::iterator a = (*ti)->getPostsetArcs().begin();
+            a != (*ti)->getPostsetArcs().end(); ++a)
+      {
+        np.insert(&((*a)->getTargetNode()));
+        weights[&((*a)->getTargetNode())] += (*a)->getWeight();
+      }
+      
+      unsigned int weight = findArc(**ti,**p)->getWeight();
+      
+      for(set<Arc*>::iterator a = t->getPostsetArcs().begin();
+            a != t->getPostsetArcs().end(); ++a)
+      {
+        np.insert(&((*a)->getTargetNode()));
+        weights[&((*a)->getTargetNode())] += ( weight * ((*a)->getWeight()) );
+      }
+      
+      for(set<Node*>::iterator n = np.begin();
+            n != np.end(); ++n)
+      {
+        createArc(*tj,**n,weights[*n]);
+      }
+    }
+    
+    // STEP 3:
+    for(set<Node*>::iterator ti = (*p)->getPreset().begin();
+          ti != (*p)->getPreset().end(); ++ti)
+      deleteTransition(*static_cast<Transition*>(*ti));
+    deleteTransition(*t);
+    deletePlace(**p);
+    
+    ++ret;
+  }
+  
+  return ret;
 }
 
 

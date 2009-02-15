@@ -96,7 +96,7 @@ using namespace pnapi;
 
 
 /******************************************************************************
- * Preserved functions to remove unnecessary nodes
+ * Functions to remove unnecessary nodes
  *****************************************************************************/
 
 /*!
@@ -109,38 +109,43 @@ using namespace pnapi;
  *
  * \return number of removed places
  *
- * \pre \f$p\f$ is an internal place: \f$ p \in P \f$
- * \pre \f$p\f$'s postset is empty: \f$ p^\bullet = \emptyset \f$
- * \pre \f$p\f$ is not covered by a final marking: \f$ m(p) = 0 \f$ for all \f$ m \in \Omega \f$
+ * \pre p is an internal place
+ * \pre p's postset is empty
+ * \pre p is not initially marked
+ * \pre p is not covered by a final marking
  *
- * \post \f$p\f$ is removed: \f$ P' = P \; \backslash \; \{ p \} \f$
+ * \post p is removed
+ * 
+ * \TODO: Fix "is final"
  */
 unsigned int PetriNet::reduce_unused_status_places()
 {
   //trace(TRACE_DEBUG, "[PN]\tReducing unused places...\n");
-  list<Place *> unused_status_places;
+  set<Place *> unused_status_places;
   unsigned int result = 0;
   
   // find unused status places
-  for (set<Place*>::iterator p = places_.begin(); p != places_.end(); p++)
-    if ( (*p)->getPostset().empty() )
-      //FIXME: if ( !( (*p)->isFinal ) )
-        if ( (*p)->getTokenCount() == 0 )
-          unused_status_places.push_back(*p);
+  for (set<Place*>::iterator p = internalPlaces_.begin(); 
+        p != internalPlaces_.end(); ++p)
+    if ( ((*p)->getPostset().empty()) && // precondition 2
+         //FIXME: (!( (*p)->isFinal ) ) && // precondition 4
+         ((*p)->getTokenCount() == 0 ) ) // precondition 3
+      unused_status_places.insert(*p);
   
   // remove unused places
-  for (list<Place*>::iterator p = unused_status_places.begin(); p != unused_status_places.end(); p++)
+  for (set<Place*>::iterator p = unused_status_places.begin(); 
+        p != unused_status_places.end(); ++p)
   {
-    if (places_.find(*p) != places_.end())
-    {
-      deletePlace(**p);
-      result++;
-    }
+    deletePlace(**p);
+    ++result;    
   }
-      if (result!=0)
-      {
-        //trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
-      }
+  
+  /*
+  if (result!=0)
+  {
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+  } //*/
+  
   return result;
 }
 
@@ -156,32 +161,37 @@ unsigned int PetriNet::reduce_unused_status_places()
  *
  * \return number of removed transitions
  *
- * \pre \f$t\f$ is a transition of the net: \f$ t \in T \f$
- * \pre \f$t\f$'s preset or postset empty: \f$ {}^\bullet t = \emptyset \f$ or \f$ t^\bullet = \emptyset \f$
+ * \pre t is a transition of the net
+ * \pre t's preset or postset empty
  *
- * \post \f$t\f$ is removed: \f$ T' = T \; \backslash \; \{ t \} \f$
+ * \post t is removed
  */
 unsigned int PetriNet::reduce_suspicious_transitions()
 {
   // trace(TRACE_DEBUG, "[PN]\tReducing suspicious transitions...\n");
-  list<Transition*> suspiciousTransitions;
+  set<Transition*> suspiciousTransitions;
   unsigned int result = 0;
   
   // find suspicious transitions
-  for (set<Transition*>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-    if ((*t)->getPostset().empty() || (*t)->getPreset().empty())
-      suspiciousTransitions.push_back(*t);
+  for (set<Transition*>::iterator t = transitions_.begin(); 
+        t != transitions_.end(); ++t)
+    if ( (*t)->getPostset().empty() || 
+         (*t)->getPreset().empty() )
+      suspiciousTransitions.insert(*t);
   
   // remove suspicious transitions
-  for (list<Transition*>::iterator t = suspiciousTransitions.begin(); t != suspiciousTransitions.end(); t++)
-    if (transitions_.find(*t) != transitions_.end())
-    {
-      deleteTransition(**t);
-      result++;
-    }
-      
-      //if (result!=0)
-        // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+  for (set<Transition*>::iterator t = suspiciousTransitions.begin(); 
+        t != suspiciousTransitions.end(); ++t)
+  {
+    deleteTransition(**t);
+    ++result;
+  }
+    
+  /*
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+  //*/
+  
   return result;
 }
 
@@ -191,115 +201,109 @@ unsigned int PetriNet::reduce_suspicious_transitions()
 
 /*!
  * Remove structural dead nodes.
+ * 
+ * If there exists a place p with empty preset (precondition 1)
+ * and for each transition t in its postset applies,
+ * that the arc weight from p to t is higher than 
+ * the amount of tokens stored in p (precondition 2)
+ * and p is not involved by a final marking (precondition 3)
+ * then this place and its postset can be removed. 
  *
- * \todo Re-organize the storing and removing of nodes.
+ * \return  Number of removed nodes.
+ * 
  */
-void PetriNet::reduce_dead_nodes()
+unsigned int PetriNet::reduce_dead_nodes()
 {
   // trace(TRACE_DEBUG, "[PN]\tRemoving structurally dead nodes...\n");
-  int result = 0;
+  unsigned int result = 0;
   bool done = false;
-  bool arcs = true;
   
   while (!done)
   {
     done = true;
     
-    list<Place*> deadPlaces;
-    list<Transition*> deadTransitions;
-    list<Place*> tempPlaces;
+    set<Place*> deadPlaces;
+    set<Transition*> deadTransitions;
     
     // find insufficiently marked places with empty preset
-    for (set<Place*>::iterator p = places_.begin(); p != places_.end(); p++)
+    for (set<Place*>::iterator p = internalPlaces_.begin(); 
+          p != internalPlaces_.end(); ++p)
     {
-      //FIXME: if ((*p)->getPreset().empty() && !((*p)->isFinal) && !((*p)->historyContains("1.internal.initial")))
+      if ( ((*p)->getPreset().empty()) ) // precondition 1 
+           //FIXME: && (!((*p)->isFinal)) ) // precondition 3
       {
-        arcs=true;		
-        for(set<Node*>::iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
+        // check the postset
+        bool arcs=true;		
+        
+        for(set<Arc*>::iterator a = (*p)->getPostsetArcs().begin(); 
+              a != (*p)->getPostsetArcs().end(); ++a)
         {
-          if(findArc(**p,**t)->getWeight() <= (*p)->getTokenCount())	
+          if((*a)->getWeight() <= (*p)->getTokenCount())	
           {
-            arcs=false;
+            arcs=false; // the exists a transition that can fire
           }
         }
-        if(arcs)
+        if(arcs) // precondition 2
         {
-          deadPlaces.push_back(*p);
-          tempPlaces.push_back(*p);
+          deadPlaces.insert(*p); // p is a dead place
+
+          // transitions in the postset of a dead place are dead
+          for (set<Node*>::iterator t = (*p)->getPostset().begin(); 
+                t != (*p)->getPostset().end(); ++t)
+          {
+            deadTransitions.insert(static_cast<Transition*>(*t));
+            // trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
+          }
+          
           // trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
-          done = false;
+          done = false; // repeat search for dead nodes once more
         }
       }
     }
     
-    while (!tempPlaces.empty())
-    {
-      // p is a dead place
-      Place* p = tempPlaces.back();
-      assert(p != NULL);
-      
-      tempPlaces.pop_back();
-      
-      // transitions in the postset of a dead place are dead
-      for (set<Node*>::iterator t = p->getPostset().begin(); t != p->getPostset().end(); t++)
-      {
-      	deadTransitions.push_back( static_cast<Transition*>(*t) );
-        // trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
-        done = false;
-      }
-    }
-    
-    
     // remove dead places and transitions
-    for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
+    for (set<Place*>::iterator p = deadPlaces.begin(); 
+          p != deadPlaces.end(); ++p)
     {
-      if (places_.find(*p) != places_.end())
-      {
-        deletePlace(**p);
-        result++;
-      }
+      deletePlace(**p);
+      result++;
     }   
      
-    for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
+    for (set<Transition*>::iterator t = deadTransitions.begin(); 
+          t != deadTransitions.end(); ++t)
     {
-      if (transitions_. find(*t) != transitions_.end())
-      {
-        deleteTransition(**t);
-        result++;
-      }
+      deleteTransition(**t);
+      result++;
     }
             
-     /*       
-            // remove isolated communication places
-            list<Place*> uselessInputPlaces;
+           
+    // remove isolated communication places
+    set<Place*> uselessInterfacePlaces;
     
-    for (set<Place*>::iterator p = inputPlaces_.begin(); p != inputPlaces_.end(); p++)
+    for (set<Place*>::iterator p = inputPlaces_.begin(); 
+          p != inputPlaces_.end(); ++p)
       if ((*p)->getPostset().empty())
-        uselessInputPlaces.push_back(*p);
+        uselessInterfacePlaces.insert(*p);
     
-    for (list<Place*>::iterator p = uselessInputPlaces.begin(); p != uselessInputPlaces.end(); p++)
-      if (inputPlaces_.find(*p) != inputPlaces_.end())
-      {
-        inputPlaces_.erase(*p);
-        result++;
-      }
-        
-        list<Place*> uselessOutputPlaces;
-    
-    for (set<Place*>::iterator p = outputPlaces_.begin(); p != outputPlaces_.end(); p++)
+    for (set<Place*>::iterator p = outputPlaces_.begin(); 
+           p != outputPlaces_.end(); ++p)
       if ((*p)->getPreset().empty())
-        uselessOutputPlaces.push_back(*p);
+        uselessInterfacePlaces.insert(*p);
     
-    for (list<Place*>::iterator p = uselessOutputPlaces.begin(); p != uselessOutputPlaces.end(); p++)
-      if (outputPlaces_.find(*p) != outputPlaces_.end())
-      {
-        outputPlaces_.erase(*p);
-        result++;
-      }
-      */
+    for (set<Place*>::iterator p = uselessInterfacePlaces.begin(); 
+           p != uselessInterfacePlaces.end(); ++p)
+    {
+      deletePlace(**p);
+      ++result;
+    }
   }
-//    if (result!=0)
-      // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " nodes.\n");
+  
+  /*
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " nodes.\n");
+  //*/
+  
+  return result;
 }
 
 
@@ -307,24 +311,25 @@ void PetriNet::reduce_dead_nodes()
 
 /*!
  * \brief remove unneeded initially marked places in choreographies
+ * 
+ * \return  Number of reduced places.
  *
  * \todo comment me!
  */
-void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
+unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
 {
   // trace(TRACE_DEBUG, "[PN]\tApplying rule \"Elimination of unnecessary initial places\"...\n");
   
   set<Place*> redundant_places;
   
-  // traverse the places
-  for (set<Place *>::const_iterator place = places_.begin();
-       place != places_.end();
-       place++)
+  // iterate the places
+  for (set<Place *>::iterator p = internalPlaces_.begin();
+       p != internalPlaces_.end(); ++p)
   {
     // find initial places with empty preset and singleton postset
-    if ( (*place)->getTokenCount() == 1  &&
-         (*place)->getPreset().empty() &&
-         (*place)->getPostset().size() == 1 )
+    if ( (*p)->getTokenCount() == 1  &&
+         (*p)->getPreset().empty() &&
+         (*p)->getPostset().size() == 1 )
     {
       //Transition *post_transition = static_cast<Transition *> (*((*place)->getPostset().begin()));
       
@@ -351,15 +356,22 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
   
   
   // remove the redundant places
+  unsigned int result = 0;
+  
   for (set<Place*>::const_iterator place = redundant_places.begin();
        place != redundant_places.end();
        place++)
   {
     deletePlace(**place);
+    ++result;
   }
   
-  //if (!redundant_places.empty())
-    // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(redundant_places.size()) + " places.\n");
+  /*
+  if (!redundant_places.empty())
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(redundant_places.size()) + " places.\n");
+  //*/
+  
+  return result;
 }
 
 
@@ -384,7 +396,7 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  * \note  This implementation will not affect isolated places. 
  * 
  */
-int PetriNet::reduce_rule_3p()
+unsigned int PetriNet::reduce_rule_3p()
 {
   set<Place*> obsoletePlaces, seenPlaces;
   map<Place*, Place*> replaceRelation;
@@ -462,17 +474,17 @@ int PetriNet::reduce_rule_3p()
   }
   
   // STEP 3: remove obsolete places
-  int erg=0;
+  unsigned int result=0;
   for (set<Place*>::iterator p1 = obsoletePlaces.begin();
        p1 != obsoletePlaces.end(); ++p1)
   {
     Place* p2 = replaceRelation[*p1];
     p2->mergeNameHistory(**p1);
     deletePlace(**p1);
-    ++erg;
+    ++result;
   }
   
-  return erg;
+  return result;
 }
 
 
@@ -488,7 +500,7 @@ int PetriNet::reduce_rule_3p()
  * \return  Number of removed transitions. 
  * 
  */
-int PetriNet::reduce_rule_3t()
+unsigned int PetriNet::reduce_rule_3t()
 {
   set<Transition*> obsoleteTransitions, seenTransitions;
   map<Transition*, Transition*> replaceRelation;
@@ -542,17 +554,17 @@ int PetriNet::reduce_rule_3t()
   }
   
   // STEP 2: remove obsolete places
-  int erg=0;
+  unsigned int result=0;
   for (set<Transition*>::iterator t1 = obsoleteTransitions.begin();
        t1 != obsoleteTransitions.end(); ++t1)
   {
     Transition* t2 = replaceRelation[*t1];
     t2->mergeNameHistory(**t1);
     deleteTransition(**t1);
-    ++erg;
+    ++result;
   }
   
-  return erg;
+  return result;
   
 }
 
@@ -621,7 +633,7 @@ bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* 
  *          of removed transitions). 
  * 
  */
-int PetriNet::reduce_rule_4()
+unsigned int PetriNet::reduce_rule_4()
 {
   /* 
    * STEP 1:  get places with singleton postset which is connected
@@ -659,7 +671,7 @@ int PetriNet::reduce_rule_4()
   }
   
   // STEP 3: actual reduction
-  int count=0;
+  unsigned int result=0;
   
   for(set<pair<Place*,Place*> >::iterator equals = equalPlaces.begin();
       equals != equalPlaces.end(); ++equals)
@@ -691,10 +703,10 @@ int PetriNet::reduce_rule_4()
     // STEP 3.3: remove place and transition
     deleteTransition(*(static_cast<Transition*>(*(p2->getPostset().begin()))));
     deletePlace(*p2);
-    ++count;
+    ++result;
   }
   
-  return count;
+  return result;
 }
 
 /*!
@@ -761,7 +773,7 @@ bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
  * \return  Number of removed places. 
  * 
  */
-int PetriNet::reduce_rule_5()
+unsigned int PetriNet::reduce_rule_5()
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
@@ -872,7 +884,7 @@ int PetriNet::reduce_rule_5()
   }
   
   // apply reduction
-  int ret = 0;
+  unsigned int result = 0;
   
   for(set<Place*>::iterator p = obsoletePlaces.begin();
       p!=obsoletePlaces.end(); ++p)
@@ -946,10 +958,10 @@ int PetriNet::reduce_rule_5()
         t != postset.end(); ++t)
       deleteTransition(*static_cast<Transition*>(*t));
     
-    ++ret;
+    ++result;
   }
   
-  return ret; 
+  return result; 
 }
 
 /*!
@@ -974,7 +986,7 @@ int PetriNet::reduce_rule_5()
  * \return  Number of removed places.
  *   
  */
-int PetriNet::reduce_rule_6()
+unsigned int PetriNet::reduce_rule_6()
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
@@ -1053,7 +1065,7 @@ int PetriNet::reduce_rule_6()
   }
   
   // apply reduction
-  int ret = 0;
+  unsigned int result = 0;
   
   for(set<Place*>::iterator p = obsoletePlaces.begin();
         p != obsoletePlaces.end(); ++p)
@@ -1107,10 +1119,10 @@ int PetriNet::reduce_rule_6()
       deleteTransition(*static_cast<Transition*>(*n));
     
     deletePlace(**p);
-    ++ret;
+    ++result;
   }
   
-  return ret;
+  return result;
 }
 
 /*!
@@ -1128,7 +1140,7 @@ int PetriNet::reduce_rule_6()
  * \todo: How to handle the history of removed places and transitions?
  *   
  */
-int PetriNet::reduce_rule_7()
+unsigned int PetriNet::reduce_rule_7()
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
@@ -1163,7 +1175,7 @@ int PetriNet::reduce_rule_7()
   }
   
   // apply reduction
-  int ret = 0;
+  unsigned int result = 0;
   
   set<Transition*> obsoleteTransitions;
   
@@ -1179,7 +1191,7 @@ int PetriNet::reduce_rule_7()
     
     // remove place
     deletePlace(**p);
-    ++ret;
+    ++result;
   }
   
   // clean transitions
@@ -1187,7 +1199,7 @@ int PetriNet::reduce_rule_7()
         t != obsoleteTransitions.end(); ++t)
     deleteTransition(**t);
   
-  return ret;
+  return result;
 }
 
 /*!
@@ -1208,7 +1220,7 @@ int PetriNet::reduce_rule_7()
  * \todo: How to handle the history of removed transitions?
  *  
  */
-int PetriNet::reduce_rule_8()
+unsigned int PetriNet::reduce_rule_8()
 {
   // search for transitions fullfilling the preconditions
   set<Transition*> obsoleteTransitions;
@@ -1285,16 +1297,16 @@ int PetriNet::reduce_rule_8()
   
   // apply reduction
   
-  int ret = 0;
+  unsigned int result = 0;
   
   for(set<Transition*>::iterator t = obsoleteTransitions.begin();
         t != obsoleteTransitions.end(); ++t)
   {
     deleteTransition(**t);
-    ++ret;
+    ++result;
   }
   
-  return ret;
+  return result;
 }
 
 /*!
@@ -1323,7 +1335,7 @@ int PetriNet::reduce_rule_8()
  * \note  Precondition 2a is not from [STA90].
  * 
  */
-int PetriNet::reduce_rule_9()
+unsigned int PetriNet::reduce_rule_9()
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
@@ -1373,7 +1385,7 @@ int PetriNet::reduce_rule_9()
   
   // apply reduction
   
-  int ret = 0;
+  unsigned int result = 0;
   
   for(set<Place*>::iterator p = obsoletePlaces.begin();
         p != obsoletePlaces.end(); ++p)
@@ -1444,10 +1456,10 @@ int PetriNet::reduce_rule_9()
     deleteTransition(*t);
     deletePlace(**p);
     
-    ++ret;
+    ++result;
   }
   
-  return ret;
+  return result;
 }
 
 

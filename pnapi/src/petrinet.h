@@ -341,19 +341,22 @@ namespace pnapi
     unsigned int reduce_suspicious_transitions();
 
     /// remove dead nodes of the Petri net
-    void reduce_dead_nodes();
+    unsigned int reduce_dead_nodes();
+    
+    /// remove unneeded initially marked places in choreographies
+    unsigned int reduce_remove_initially_marked_places_in_choreographies();
     
     /// elimination of parallel places
-    int reduce_rule_3p();
+    unsigned int reduce_rule_3p();
     
     /// elimination of parallel transitions
-    int reduce_rule_3t();
+    unsigned int reduce_rule_3t();
     
     /// equality check for rule 4 
     bool reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* p2);
     
     /// elimination of equal places
-    int reduce_rule_4();
+    unsigned int reduce_rule_4();
     
     /// check if the postset of a set is empty
     bool reduce_emptyPostset(const std::set<Node*> & nodes);
@@ -362,19 +365,19 @@ namespace pnapi
     bool reduce_singletonPreset(const std::set<Node*> & nodes);
     
     /// fusion of pre- with posttransition (m to n)
-    int reduce_rule_5();
+    unsigned int reduce_rule_5();
     
     /// fusion of pre- with posttransition (1 to n)
-    int reduce_rule_6();
+    unsigned int reduce_rule_6();
     
     /// elimination of self-loop places
-    int reduce_rule_7();
+    unsigned int reduce_rule_7();
     
     /// elimination of self-loop transitions
-    int reduce_rule_8();
+    unsigned int reduce_rule_8();
     
     /// fusion of pre- with postplaces
-    int reduce_rule_9();
+    unsigned int reduce_rule_9();
 
     /// elimination of identical places
     void reduce_identical_places();
@@ -396,9 +399,6 @@ namespace pnapi
 
     /// elimination of identical places
     void reduce_equal_places();
-
-    /// remove unneeded initially marked places in choreographies
-    void reduce_remove_initially_marked_places_in_choreographies();
 
   };
 

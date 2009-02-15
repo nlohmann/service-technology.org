@@ -46,6 +46,14 @@ extern unsigned int NonEmptyHash;
 extern unsigned int numberDeletedVertices;
 extern string texBuffer[];
 
+extern unsigned short int globalExitCode;
+
+// Sets the exit code. If the new exit code is >= exitAtThisCode,
+// exit(newExitCode) is called.
+void setExitCode(unsigned short int newExitCode);
+
+// Retrieve the exit code
+unsigned short int getExitCode();
 
 ///Equivalent for basename() on Posix systems. See 'man 3 basename'.
 extern std::string platform_basename(const std::string& path);

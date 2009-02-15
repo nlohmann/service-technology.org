@@ -150,7 +150,7 @@ void ConstraintOG::readCovConstraint(const string& filename) {
     if (!cov_yyin) {
         cerr << "cannot open COV file '" << filename 
              << "' for reading'\n" << endl;
-        exit(4);
+        setExitCode(4);
     }
 
     PlacesToCover = new set<string>;

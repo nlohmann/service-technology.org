@@ -114,7 +114,12 @@ typedef enum {
     P_SINGLE                    //!< state reduction in node using single marking as representative
 } possibleParameters;
 
+
 // EXIT CODE CONSTANTS
+extern void setExitCode(unsigned short int);
+
+const unsigned short int exitAtThisCode = 2;
+
 const unsigned short int EC_FILE_ERROR = 4;                 //!< An error occured with a file stream.
 const unsigned short int EC_NO_RULES_FILE = 4;              //!< Adapter: No rules file found.
 const unsigned short int EC_NO_CUDD_FILE = 4;               //!< No cudd file found.

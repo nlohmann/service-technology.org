@@ -267,7 +267,7 @@ string Graph::createDotFile(string& filenamePrefix,
             if (!dotFileHandle.good()) {
                 dotFileHandle.close();
                 TRACE(TRACE_0, "Error: A file error occured. Exit.");
-                exit(EC_FILE_ERROR);
+                setExitCode(EC_FILE_ERROR);
             }
             dotFileHandle << "digraph g1 {\n";
             dotFileHandle << "graph [fontname=\"Helvetica\", label=\"";

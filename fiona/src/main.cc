@@ -136,11 +136,25 @@ unsigned int numberOfDecodes;
 unsigned int numberDeletedVertices;
 unsigned int numberOfEvents;
 
+// The global exit code. The main method will return this value.
+unsigned short int globalExitCode = 0;
+
+//! \brief sets the global exit code. Calls exit if exit code is greater equal
+//exitAtThisCode which is defined in options.h as a constant.
+//\param newExitCode an exit code as defined in options.h. 
+void setExitCode(unsigned short int newExitCode) {
+    
+    if (newExitCode >= exitAtThisCode) {
+        exit(newExitCode);
+    }
+
+    globalExitCode = newExitCode;
+}
 
 //! \brief an exit function in case the memory is exhausted
 void myown_newhandler() {
     cerr << "new failed, memory exhausted"<< endl;
-    exit(EC_MEMORY_EXHAUSTED);
+    setExitCode(EC_MEMORY_EXHAUSTED);
 }
 
 
@@ -163,7 +177,7 @@ void readnet(const std::string& owfnfile) {
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
         TRACE(TRACE_0, "Error: A file error occured. Exit.");
-        exit(EC_FILE_ERROR);
+        setExitCode(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
 
@@ -238,7 +252,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
         TRACE(TRACE_0, "Error: A file error occured. Exit.");
-        exit(EC_FILE_ERROR);
+        setExitCode(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph();
     ogfileToParse = ogfile; // for debug - declaration in debug.cc
@@ -265,7 +279,7 @@ AnnotatedGraph* readconstraintog(const std::string& ogfile, GraphFormulaCNF*& co
     covog_yyin = fopen(ogfile.c_str(), "r");
     if (!covog_yyin) {
         cerr << "cannot open constraint OG file '" << ogfile << "' for reading'\n" << endl;
-        exit(4);
+        setExitCode(4);
     }
     OGToParse = new AnnotatedGraph;
     ogfileToParse = ogfile;
@@ -415,7 +429,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
         TRACE(TRACE_0, "Error: A file error occured. Exit.");
-        exit(EC_FILE_ERROR);
+        setExitCode(EC_FILE_ERROR);
     }
 
     // clear the graph holding the parsed informations
@@ -511,7 +525,7 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
         if (!output.good()) {
             output.close();
             TRACE(TRACE_0, "Error: A file error occured. Exit.");
-            exit(EC_FILE_ERROR);
+            setExitCode(EC_FILE_ERROR);
         }
         (output) << (*PVoWFN);
         output.close();
@@ -1477,7 +1491,7 @@ void makePNG(oWFN* PN) {
         if (!out->is_open()) {
             trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
            TRACE(TRACE_0, "Error: A file error occured. Exit.");
-           exit(EC_FILE_ERROR);
+           setExitCode(EC_FILE_ERROR);
         }
 
 
@@ -1497,7 +1511,7 @@ void makePNG(oWFN* PN) {
                 trace( (outFileName + ".dot generated\n\n"));
             } else {
                 trace( "error: Dot exited with non zero value! here\n\n");
-                exit(EC_DOT_ERROR);
+                setExitCode(EC_DOT_ERROR);
             }
 
             // transforming .dot file into gastex format
@@ -1562,7 +1576,7 @@ void reduceOWFN(oWFN* PN) {
         if (!output.good()) {
             output.close();
             TRACE(TRACE_0, "Error: A file error occured. Exit.");
-            exit(EC_FILE_ERROR);
+            setExitCode(EC_FILE_ERROR);
         }
         (output) << (*PNapiNet);
         output.close();
@@ -1612,7 +1626,7 @@ oWFN* normalizeOWFN(oWFN* PN) {
         if (!output.good()) {
             output.close();
             TRACE(TRACE_0, "Error: A file error occured. Exit.");
-            exit(EC_FILE_ERROR);
+            setExitCode(EC_FILE_ERROR);
         }
 
         (output) << (*PNapiNet);
@@ -1771,7 +1785,7 @@ int main(int argc, char** argv) {
         printf("- external dot:       %s\n", CONFIG_DOT);
         printf("- external Petrify:   %s\n", CONFIG_PETRIFY);
         printf("\n\n");
-        exit(EXIT_SUCCESS);
+        setExitCode(EXIT_SUCCESS);
     }
 
 
@@ -2270,7 +2284,7 @@ int main(int argc, char** argv) {
     NewLogger::printall();
 #endif
 
-    return 0;
+    return globalExitCode;
 
 }
 
@@ -2288,3 +2302,5 @@ std::string platform_basename(const std::string& path) {
     return result;
 #endif
 }
+
+

@@ -151,7 +151,7 @@ void Exchangeability::loadBdd(std::string filename) {
             cerr << "\nTo check equivalence of two nets, the BDD representations of"
                  << "\nthe corresponding OGs must have been computed before.\n"
                  << "\nEnter \"fiona --help\" for more information" << endl;
-            exit(EC_NO_CUDD_FILE);
+            setExitCode(EC_NO_CUDD_FILE);
         }
     }
 
@@ -221,23 +221,23 @@ void Exchangeability::loadHeader(FILE* fp,
 
     if (ddType != DDDMP_BDD) {
         cout << "\nError while loading the BDDs: wrong DD-Type";
-        exit(EC_BDD_ERROR);
+        setExitCode(EC_BDD_ERROR);
     }
     if (nRoots != 1) {
         cout
                 << "\nError while loading the BDDs: the file must contain exactly one BDD";
-        exit(EC_BDD_ERROR);
+        setExitCode(EC_BDD_ERROR);
     }
 
     if (nVars == 0) {
         cout << "Error nVars == 0";
-        exit(EC_BDD_ERROR);
+        setExitCode(EC_BDD_ERROR);
     }
 
     if (names != NULL) {
         if (orderedVarNames== NULL) {
             cout << "Error orderedVarNames == NULL";
-            exit(EC_BDD_ERROR);
+            setExitCode(EC_BDD_ERROR);
         }
         qsort((void*)orderedVarNames, *nVars, sizeof(char*), comparestr);
         *names = orderedVarNames; //suppVarNames;

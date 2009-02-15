@@ -306,7 +306,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
         if (!dotFile.good()) {
             dotFile.close();
             TRACE(TRACE_0, "Error: A file error occured. Exit.");
-            exit(EC_FILE_ERROR);
+            setExitCode(EC_FILE_ERROR);
         }
         dotFile << "digraph g1 {\n";
         dotFile << "graph [fontname=\"Helvetica\", label=\"";

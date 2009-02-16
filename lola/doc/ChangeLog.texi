@@ -1,5 +1,9 @@
-@heading Version 1.11-unreleased
+@heading Version 1.11
 @itemize
+@item fixed bug #12903 (@url{https://gna.org/bugs/?12903}): fixed problems regarding @option{BOUNDEDNET} mode
+
+@item fixed bug #12907 (@url{https://gna.org/bugs/?12907}): fixed problems regarding @option{COVER} option
+
 @item completed documentation
 
 @item adapted code to avoid deprecation warnings of GCC 4.2

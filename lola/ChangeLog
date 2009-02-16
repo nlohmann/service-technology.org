@@ -6,8 +6,14 @@
                      http://service-technology.org/lola
 
 
-Version 1.11-unreleased
-=======================
+Version 1.11
+============
+
+* fixed bug #12903 (`https://gna.org/bugs/?12903'): fixed problems regarding
+  `BOUNDEDNET' mode
+
+* fixed bug #12907 (`https://gna.org/bugs/?12907'): fixed problems regarding
+  `COVER' option
 
 * completed documentation
 

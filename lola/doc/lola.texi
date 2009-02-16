@@ -15,7 +15,7 @@
 
 This manual is for LoLA -- A Low Level Petri Net Analyser, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2008 Karsten Wolf
+Copyright @copyright{} 2009 Karsten Wolf
 
 @end copying
 

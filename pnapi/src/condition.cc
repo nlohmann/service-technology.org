@@ -4,71 +4,126 @@ using std::cout;
 using std::endl;
 #endif
 
-#include "formula.h"
 #include "condition.h"
 
 using std::string;
 using std::map;
 
+using pnapi::formula::Formula;
+using pnapi::formula::FormulaTrue;
+using pnapi::formula::FormulaFalse;
+using pnapi::formula::FormulaEqual;
+using pnapi::formula::FormulaNotEqual;
+using pnapi::formula::FormulaGreater;
+using pnapi::formula::FormulaGreaterEqual;
+using pnapi::formula::FormulaLess;
+using pnapi::formula::FormulaLessEqual;
+using pnapi::formula::Conjunction;
+using pnapi::formula::Disjunction;
+using pnapi::formula::Negation;
+
 namespace pnapi
 {
 
-  namespace formula
+  /**************************************************************************
+   ***** Overloaded operators for formulas
+   *************************************************************************/
+
+  FormulaEqual operator==(const Place & p, unsigned int k)
   {
+    return FormulaEqual(p, k);
+  }
 
-    Condition::Condition() :
-      f_(new True())
-    {
-    }
+  FormulaNotEqual operator!=(const Place & p, unsigned int k)
+  {
+    return FormulaNotEqual(p, k);
+  }
 
-    Condition::Condition(Formula *f) :
-      f_(f)
-    {
-    }
+  FormulaGreater operator>(const Place & p, unsigned int k)
+  {
+    return FormulaGreater(p, k);
+  }
+
+  FormulaGreaterEqual operator>=(const Place & p, unsigned int k)
+  {
+    return FormulaGreaterEqual(p, k);
+  }
+
+  FormulaLess operator<(const Place & p, unsigned int k)
+  {
+    return FormulaLess(p, k);
+  }
+
+  FormulaLessEqual operator<=(const Place & p, unsigned int k)
+  {
+    return FormulaLessEqual(p, k);
+  }
+
+  Conjunction operator&&(const Formula & f1, const Formula & f2)
+  {
+    return Conjunction(f1, f2);
+  }
+
+  Disjunction operator||(const Formula & f1, const Formula & f2)
+  {
+    return Disjunction(f1, f2);
+  }
+
+  Negation operator!(const Formula & f)
+  {
+    return Negation(f);
+  }
 
 
-    Condition::Condition(const Condition &c) :
-      f_(c.f_->flatCopy())
-    {
-    }
 
-    Condition::Condition(const Condition &c, map<const Place *, Place *> &newP) :
-      f_(c.f_->deepCopy(newP))
-    {
-    }
+  /**************************************************************************
+   ***** Condition implementation
+   *************************************************************************/
 
-    void Condition::merge(const Condition &c)
-    {
-      //Formula *copy = f_->flatCopy();
-      f_ = new FormulaAnd(*f_, *c.f_);
-    }
+  Condition::Condition() :
+    formula_(new FormulaTrue())
+  {
+  }
 
-    bool Condition::checkFinalMarking(Marking &m)
-    {
-      return f_->evaluate(m);
-    }
+  Condition::Condition(const Condition & c, 
+		       map<const Place *, const Place *> * places) :
+    formula_(c.formula().clone(places))
+  {
+  }
 
-    void Condition::setFormula(Formula *f)
-    {
-      f_ = f;
-    }
+  Condition::~Condition()
+  {
+    delete formula_;
+  }
 
-    Condition & Condition::operator=(const Condition & c)
-    {
-      return (*new Condition(c));
-    }
+  const Formula & Condition::formula() const
+  {
+    return *formula_;
+  }
 
-    Condition & Condition::operator=(const Formula & f)
-    {
-      f_ = &f.clone();
-      return *this;
-    }
+  void Condition::merge(const Condition & c)
+  {
+    *this = formula() && c.formula();
+  }
 
-    string Condition::toString() const
-    {
-      return f_->toString();
-    }
+  bool Condition::isSatisfied(const Marking & m) const
+  {
+    return formula_->isSatisfied(m);
+  }
 
+  Condition & Condition::operator=(const Formula & f)
+  {
+    delete formula_;
+    formula_ = f.clone();
+    return *this;
+  }
+
+  Condition & Condition::operator=(bool formulaTrue)
+  {
+    delete formula_;
+    formula_ = formulaTrue ? (Formula*) new FormulaTrue 
+                           : (Formula*) new FormulaFalse;
+    return *this;
   }
 
 }

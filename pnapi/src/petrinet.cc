@@ -337,7 +337,7 @@ namespace pnapi
 	 ++it)
       new Arc(*this, observer_, **it);
 
-    condition_.merge(net.condition_);
+    //FIXME: condition_.merge(net.condition_);
 
     return *this;
   }
@@ -345,7 +345,7 @@ namespace pnapi
 
   /*!
    */
-  formula::Condition & PetriNet::finalCondition()
+  Condition & PetriNet::finalCondition()
   {
     return condition_;
   }

@@ -24,6 +24,7 @@ int main(int argc, char * argv[])
   net.createArc(t1, p3);
   net.createArc(p3, t2);
   net.createArc(t2, p2);
+  net.finalCondition() = p1 == 2 && p2 == 4 || p3 > 1;
   
   begin_test("io::operator<<() [Petri net OWFN output]");
   owfnResult << owfn << net;
@@ -48,7 +49,7 @@ int main(int argc, char * argv[])
     << "INITIALMARKING" << endl
     << "  p1: 4;" << endl << endl
     << "FINALCONDITION" << endl
-    << "  { NOT IMPLEMENTED YET };" << endl << endl << endl
+    << "  ((in = 2 AND out = 4) OR p1 > 1);" << endl << endl << endl
     << "TRANSITION t1 { input }" << endl
     << "  CONSUME in:3;" << endl
     << "  PRODUCE p1;" << endl << endl

@@ -1,754 +1,375 @@
-#ifndef NDEBUG
-#include <iostream>
-using std::cout;
-using std::endl;
-#endif
+#include <cassert>
 
-#include <sstream>
-
-#include "petrinet.h"
 #include "marking.h"
 #include "formula.h"
+#include "io.h"
 
-using std::stringstream;
-using std::string;
-using std::list;
 using std::map;
+using std::vector;
+using std::ostream;
+
+using pnapi::io::util::operator<<;
 
 namespace pnapi
 {
 
   namespace formula
   {
-
+    
     /**************************************************************************
-     ***** Formula: clone() implementations
+     ***** Constructor() implementation
      **************************************************************************/
 
-    True & True::clone() const
+    Operator::Operator(const Formula & f)
     {
-      return *new True(*this);
+      children_.push_back(f.clone());
     }
 
-    False & False::clone() const
+    Operator::Operator(const Formula & l, const Formula & r)
     {
-      return *new False(*this);
+      children_.push_back(l.clone());
+      children_.push_back(r.clone());
     }
 
-    FormulaEqual & FormulaEqual::clone() const
+    Operator::Operator(const vector<const Formula *> & children, 
+		       map<const Place *, const Place *> * places)
     {
-      return *new FormulaEqual(*this);
-    }
-    
-    FormulaNotEqual & FormulaNotEqual::clone() const
-    {
-      return *new FormulaNotEqual(*this);
+      for (vector<const Formula *>::const_iterator it = children.begin(); 
+	   it != children.end(); ++it)
+	children_.push_back((*it)->clone(places));
     }
 
-    FormulaGreater & FormulaGreater::clone() const
+    Negation::Negation(const Formula & f) :
+      Operator(f)
     {
-      return *new FormulaGreater(*this);
     }
 
-    FormulaGreaterEqual & FormulaGreaterEqual::clone() const
+    Negation::Negation(const vector<const Formula *> & children, 
+		       map<const Place *, const Place *> * places) :
+      Operator(children, places)
     {
-      return *new FormulaGreaterEqual(*this);
+      assert(children.size() == 1);
     }
 
-    FormulaLess & FormulaLess::clone() const
+    Negation::Negation(const Negation & n) :
+      Operator(n.children_)
     {
-      return *new FormulaLess(*this);
     }
 
-    FormulaLessEqual & FormulaLessEqual::clone() const
+    Conjunction::Conjunction(const Formula & l, const Formula & r) :
+      Operator(l, r)
     {
-      return *new FormulaLessEqual(*this);
     }
 
-    FormulaNot & FormulaNot::clone() const
+    Conjunction::Conjunction(const vector<const Formula *> & children, 
+			     map<const Place *, const Place *> * places) :
+      Operator(children, places)
     {
-      return *new FormulaNot(sub_.clone());
+      assert(children.size() > 1);
     }
 
-    FormulaAnd & FormulaAnd::clone() const
+    Conjunction::Conjunction(const Conjunction & c) :
+      Operator(c.children_)
     {
-      return *new FormulaAnd(cloneChildren());
     }
 
-    FormulaOr & FormulaOr::clone() const
+    Disjunction::Disjunction(const Formula & l, const Formula & r) :
+      Operator(l, r)
     {
-      return *new FormulaOr(cloneChildren());
     }
 
-    list<const Formula *> NaryBooleanFormula::cloneChildren() const
+    Disjunction::Disjunction(const vector<const Formula *> & children, 
+			     map<const Place *, const Place *> * places) :
+      Operator(children, places)
     {
-      list<const Formula *> clones;
-      for (list<const Formula *>::const_iterator it = subs_.begin(); 
-	   it != subs_.end(); ++it)
-	clones.push_back(&(*it)->clone());
-      return clones;
+      assert(children.size() > 1);
+    }
+
+    Disjunction::Disjunction(const Disjunction & d) :
+      Operator(children_)
+    {
+    }
+
+    Proposition::Proposition(const Place & p, unsigned int k, 
+			     map<const Place *, const Place *> * places) :
+      place_(places == NULL ? p : *(*places)[&p]), tokens_(k)
+    {
+      assert(places == NULL || (*places)[&p] != NULL);
+    }
+
+    FormulaEqual::FormulaEqual(const Place & p, unsigned int k, 
+			       map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
+    {
+    }
+
+    FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k, 
+				   map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
+    {
+    }
+
+    FormulaGreater::FormulaGreater(const Place & p, unsigned int k, 
+				   map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
+    {
+    }
+
+    FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k, 
+				   map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
+    {
+    }
+
+    FormulaLess::FormulaLess(const Place & p, unsigned int k, 
+			     map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
+    {
+    }
+
+    FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k, 
+				   map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
+    {
     }
 
 
+
+    /**************************************************************************
+     ***** ~Destructor() implementation
+     **************************************************************************/
 
     Formula::~Formula()
     {
     }
 
-  
-  /*!
-   * Atomic formula class's public methods
-   */
+    Operator::~Operator()
+    {
+      for (vector<const Formula *>::iterator it = children_.begin(); 
+	   it != children_.end(); ++it)
+	delete *it;
+    }
 
-  /*!
-   * \brief
-   */
-  AtomicFormula::AtomicFormula(const Place & p, unsigned int k) :
-    place_(p), number_(k)
-  {
-  }
 
-  /*!
-   * \brief
-   */
-    /*
-  AtomicFormula::AtomicFormula(const AtomicFormula &f) :
-    place_(f.place_), number_(f.number_)
-  {
-  }
-    */
 
-  /*!
-   * \brief
-   */
-  const Place & AtomicFormula::getPlace()
-  {
-    return place_;
-  }
+    /**************************************************************************
+     ***** clone() implementation
+     **************************************************************************/
 
-  /*!
-   * \brief
-   */
-  unsigned int AtomicFormula::getNumber()
-  {
-    return number_;
-  }
+    Negation * Negation::clone(map<const Place *, const Place *> * places) const
+    {
+      return new Negation(children_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  FormulaEqual::FormulaEqual(const Place & p, unsigned int k) :
-    AtomicFormula(p, k)
-  {
-  }
+    Conjunction * Conjunction::clone(map<const Place *, 
+				         const Place *> * places) const
+    {
+      return new Conjunction(children_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  bool FormulaEqual::evaluate(const Marking & m) const
-  {
-    return m[place_] == number_;
-  }
+    Disjunction * Disjunction::clone(map<const Place *, 
+				         const Place *> * places) const
+    {
+      return new Disjunction(children_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  const string FormulaEqual::toString() const
-  {
-    string snumber;
-    stringstream sstream;
-    sstream << number_;
-    sstream >> snumber;
+    FormulaTrue * FormulaTrue::clone(map<const Place *,
+				         const Place *> *) const
+    {
+      return new FormulaTrue();
+    }
 
-    return place_.getName() + " = " + snumber;
-  }
+    FormulaFalse * FormulaFalse::clone(map<const Place *, 
+				           const Place *> *) const
+    {
+      return new FormulaFalse();
+    }
 
-  /*!
-   * \brief
-   */
-  FormulaEqual * FormulaEqual::flatCopy() const
-  {
-    return new FormulaEqual(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaEqual * FormulaEqual::deepCopy(map<const Place *, Place *> & newP) const
-  {
-    return new FormulaEqual(*newP.find(&place_)->second, number_);
-  }
-  
-  /*!
-   * \brief
-   */
-  FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k) :
-    AtomicFormula(p, k)
-  {
-  }
-
-  /*!
-   * \brief
-   */
-  bool FormulaNotEqual::evaluate(const Marking &m) const
-  {
-    return m[place_] != number_;
-  }
-
-  /*!
-   * \brief
-   */
-  const string FormulaNotEqual::toString() const
-  {
-    string snumber;
-    stringstream sstream;
-    sstream << number_;
-    sstream >> snumber;
-
-    return place_.getName() + " != " + snumber;
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaNotEqual * FormulaNotEqual::flatCopy() const
-  {
-    return new FormulaNotEqual(*this);
-  }
+    FormulaEqual * FormulaEqual::clone(map<const Place *, 
+				           const Place *> * places) const
+    {
+      return new FormulaEqual(place_, tokens_, places);
+    }
     
-  /*!
-   * \brief
-   */
-  FormulaNotEqual * FormulaNotEqual::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new FormulaNotEqual(*newP[&place_], number_);
-  }
+    FormulaNotEqual * FormulaNotEqual::clone(map<const Place *, 
+					         const Place *> * places) const
+    {
+      return new FormulaNotEqual(place_, tokens_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  FormulaGreater::FormulaGreater(const Place & p, unsigned int k) :
-    AtomicFormula(p, k)
-  {
-  }
+    FormulaGreater * FormulaGreater::clone(map<const Place *, 
+   					       const Place *> * places) const
+    {
+      return new FormulaGreater(place_, tokens_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  bool FormulaGreater::evaluate(const Marking &m) const
-  {
-    cout << "DEBUG: " << place_.getName() << " (";
-    cout << m[place_] << ") > " << number_ << "?\n";
-    return m[place_] > number_;
-  }
+    FormulaGreaterEqual * FormulaGreaterEqual::clone(map<const Place *, 
+						  const Place *> * places) const
+    {
+      return new FormulaGreaterEqual(place_, tokens_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  const string FormulaGreater::toString() const
-  {
-    string snumber;
-    stringstream sstream;
-    sstream << number_;
-    sstream >> snumber;
+    FormulaLess * FormulaLess::clone(map<const Place *, 
+				         const Place *> * places) const
+    {
+      return new FormulaLess(place_, tokens_, places);
+    }
 
-    return place_.getName() + " > " + snumber;
-  }
+    FormulaLessEqual * FormulaLessEqual::clone(map<const Place *, 
+					       const Place *> * places) const
+    {
+      return new FormulaLessEqual(place_, tokens_, places);
+    }
 
-  /*!
-   * \brief
-   */
-  FormulaGreater * FormulaGreater::flatCopy() const
-  {
-    return new FormulaGreater(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaGreater * FormulaGreater::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new FormulaGreater(*newP[&place_], number_);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k) :
-    AtomicFormula(p, k)
-  {
-  }
-
-  /*!
-   * \brief
-   */
-  bool FormulaGreaterEqual::evaluate(const Marking &m) const
-  {
-    return m[place_] >= number_;
-  }
-
-  /*!
-   * \brief
-   */
-  const string FormulaGreaterEqual::toString() const
-  {
-    string snumber;
-    stringstream sstream;
-    sstream << number_;
-    sstream >> snumber;
-
-    return place_.getName() + " >= " + snumber;
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaGreaterEqual * FormulaGreaterEqual::flatCopy() const
-  {
-    return new FormulaGreaterEqual(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaGreaterEqual * FormulaGreaterEqual::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new FormulaGreaterEqual(*newP[&place_], number_);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaLess::FormulaLess(const Place & p, unsigned int k) :
-    AtomicFormula(p, k)
-  {
-  }
-
-  /*!
-   * \brief
-   */
-  bool FormulaLess::evaluate(const Marking &m) const
-  {
-    return m[place_] < number_;
-  }
-
-  /*!
-   * \brief
-   */
-  const string FormulaLess::toString() const
-  {
-    string snumber;
-    stringstream sstream;
-    sstream << number_;
-    sstream >> snumber;
-
-    return place_.getName() + " < " + snumber;
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaLess * FormulaLess::flatCopy() const
-  {
-    return new FormulaLess(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaLess * FormulaLess::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new FormulaLess(*newP[&place_], number_);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k) :
-    AtomicFormula(p, k)
-  {
-  }
-
-  /*!
-   * \brief
-   */
-  bool FormulaLessEqual::evaluate(const Marking &m) const
-  {
-    return m[place_] <= number_;
-  }
-
-  /*!
-   * \brief
-   */
-  const string FormulaLessEqual::toString() const
-  {
-    string snumber;
-    stringstream sstream;
-    sstream << number_;
-    sstream >> snumber;
-
-    return place_.getName() + " <= " + snumber;
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaLessEqual * FormulaLessEqual::flatCopy() const
-  {
-    return new FormulaLessEqual(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaLessEqual * FormulaLessEqual::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new FormulaLessEqual(*newP[&place_], number_);
-  }
-
-  /************************************************
-   *          Unary Boolean Formulas              *
-   ************************************************/
-
-  /*!
-   * \brief
-   */
-  UnaryBooleanFormula::UnaryBooleanFormula(const Formula & f) :
-    sub_(f)
-  {
-  }
-
-  /*!
-   * \brief
-   */
-    /*
-  UnaryBooleanFormula::UnaryBooleanFormula(const UnaryBooleanFormula &f) :
-    sub_(f.sub_)
-  {
-  }
-    */
-
-  FormulaNot::FormulaNot(const Formula & f) :
-    UnaryBooleanFormula(f)
-  {
-  }
-
-  bool FormulaNot::evaluate(const Marking & m) const
-  {
-    return !sub_.evaluate(m);
-  }
-
-  const string FormulaNot::toString() const
-  {
-    return " NOT ( " + sub_.toString() + " ) ";
-  }
-
-  FormulaNot * FormulaNot::flatCopy() const
-  {
-    return new FormulaNot(*this);
-  }
-
-  FormulaNot * FormulaNot::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new FormulaNot(*sub_.deepCopy(newP));
-  }
-
-  /************************************************
-   *           n ary Boolean Formulas            *
-   ************************************************/
-
-  /*!
-   * \brief
-   */
-  NaryBooleanFormula::NaryBooleanFormula(const Formula & l, const Formula & r)
-  {
-    subs_.push_back(&l);
-    subs_.push_back(&r);
-  }
-
-  /*!
-   * \brief
-   */
-  NaryBooleanFormula::NaryBooleanFormula(const list<const Formula *> & flst) :
-    subs_(flst)
-  {
-  }
-
-  /*!
-   * \brief
-   */
-    /*
-  NaryBooleanFormula::NaryBooleanFormula(const NaryBooleanFormula &f) :
-    subs_(f.subs_)
-  {
-  }
-    */
-
-  /*!
-   * \brief
-   */
-  void NaryBooleanFormula::addSubFormula(Formula *s)
-  {
-    subs_.push_back(s);
-  }
-
-
+  
 
     /**************************************************************************
-     ***** Formula: AND
+     ***** isSatisfied() implementation
      **************************************************************************/
 
-  FormulaAnd::FormulaAnd(const Formula & l, const Formula & r) :
-    NaryBooleanFormula(l, r)
-  {
-  }
-
-  FormulaAnd::FormulaAnd(const list<const Formula *> & flst) :
-    NaryBooleanFormula(flst)
-  {
-  }
-
-  bool FormulaAnd::evaluate(const Marking & m) const
-  {
-    for (list<const Formula *>::const_iterator f = subs_.begin();
-        f != subs_.end(); f++)
-      if (!(*f)->evaluate(m))
-        return false;
-
-    return true;
-  }
-
-  /*!
-   * \brief
-   */
-  const string FormulaAnd::toString() const
-  {
-    string result = " ( ";
-
-    for (list<const Formula *>::const_iterator f = subs_.begin();
-        f != subs_.end(); f++)
+    bool Negation::isSatisfied(const Marking & m) const
     {
-      result.append((*f)->toString());
-      list<const Formula *>::const_iterator g = (++f)--;
-      if (g != subs_.end())
-        result.append(" AND ");
+      return !(*children_.begin())->isSatisfied(m);
     }
 
-    result.append(" ) ");
-
-    return result;
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaAnd * FormulaAnd::flatCopy() const
-  {
-    return new FormulaAnd(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaAnd * FormulaAnd::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    list<const Formula *> newSubs;
-    for (list<const Formula *>::const_iterator f = subs_.begin(); f != subs_.end();
-        f++)
+    bool Conjunction::isSatisfied(const Marking & m) const
     {
-      newSubs.push_back((*f)->deepCopy(newP));
+      for (vector<const Formula *>::const_iterator f = children_.begin();
+	   f != children_.end(); f++)
+	if (!(*f)->isSatisfied(m))
+	  return false;
+      return true;
     }
 
-    return new FormulaAnd(newSubs);
-  }
+    bool Disjunction::isSatisfied(const Marking & m) const
+    {
+      for (vector<const Formula *>::const_iterator f = children_.begin();
+	   f != children_.end(); f++)
+	if ((*f)->isSatisfied(m))
+	  return true;
+      return false;
+    }
+
+    bool FormulaTrue::isSatisfied(const Marking &) const
+    {
+      return true;
+    }
+
+    bool FormulaFalse::isSatisfied(const Marking &) const
+    {
+      return false;
+    }
+
+    bool FormulaEqual::isSatisfied(const Marking & m) const
+    {
+      return m[place_] == tokens_;
+    }
+
+    bool FormulaNotEqual::isSatisfied(const Marking & m) const
+    {
+      return m[place_] != tokens_;
+    }
+
+    bool FormulaGreater::isSatisfied(const Marking & m) const
+    {
+      return m[place_] > tokens_;
+    }
+
+    bool FormulaGreaterEqual::isSatisfied(const Marking & m) const
+    {
+      return m[place_] >= tokens_;
+    }
+
+    bool FormulaLess::isSatisfied(const Marking & m) const
+    {
+      return m[place_] < tokens_;
+    }
+
+    bool FormulaLessEqual::isSatisfied(const Marking & m) const
+    {
+      return m[place_] <= tokens_;
+    }
 
 
 
     /**************************************************************************
-     ***** Formula: OR
+     ***** output() implementation
      **************************************************************************/
 
-  FormulaOr::FormulaOr(const Formula & l, const Formula & r) :
-    NaryBooleanFormula(l, r)
-  {
-  }
-
-  FormulaOr::FormulaOr(const list<const Formula *> & flst) :
-    NaryBooleanFormula(flst)
-  {
-  }
-
-  bool FormulaOr::evaluate(const Marking & m) const
-  {
-    for (list<const Formula *>::const_iterator f = subs_.begin();
-        f != subs_.end(); f++)
-      if ((*f)->evaluate(m))
-        return true;
-
-    return false;
-  }
-
-  /*!
-   * \brief
-   */
-  const string FormulaOr::toString() const
-  {
-    string result = " ( ";
-
-    for (list<const Formula *>::const_iterator f = subs_.begin();
-        f != subs_.end(); f++)
+    ostream & Negation::output(ostream & os) const
     {
-      result.append((*f)->toString());
-      list<const Formula *>::const_iterator g = (++f)--;
-      if (g != subs_.end())
-        result.append(" OR ");
+      return os << *this;
     }
 
-    result.append(" ) ");
-
-    return result;
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaOr * FormulaOr::flatCopy() const
-  {
-    return new FormulaOr(*this);
-  }
-
-  /*!
-   * \brief
-   */
-  FormulaOr * FormulaOr::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    list<const Formula *> newSubs;
-    for (list<const Formula *>::const_iterator f = subs_.begin(); f != subs_.end();
-        f++)
+    ostream & Conjunction::output(ostream & os) const
     {
-      newSubs.push_back((*f)->deepCopy(newP));
+      return os << *this;
     }
 
-    return new FormulaOr(newSubs);
-  }
+    ostream & Disjunction::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /************************************************
-   *                Empty Formula                 *
-   ************************************************/
+    ostream & FormulaTrue::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  bool True::evaluate(const Marking &m) const
-  {
-    return true;
-  }
+    ostream & FormulaFalse::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  const string True::toString() const
-  {
-    return "TRUE";
-  }
+    ostream & FormulaEqual::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  True * True::flatCopy() const
-  {
-    return new True();
-  }
+    ostream & FormulaNotEqual::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  True * True::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new True();
-  }
+    ostream & FormulaGreater::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  bool False::evaluate(const Marking &m) const
-  {
-    return false;
-  }
+    ostream & FormulaGreaterEqual::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  const string False::toString() const
-  {
-    return "FALSE";
-  }
+    ostream & FormulaLess::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
-  /*!
-   * \brief
-   */
-  False * False::flatCopy() const
-  {
-    return new False();
-  }
-
-  /*!
-   * \brief
-   */
-  False * False::deepCopy(map<const Place *, Place *> &newP) const
-  {
-    return new False();
-  }
+    ostream & FormulaLessEqual::output(ostream & os) const
+    {
+      return os << *this;
+    }
 
 
 
     /**************************************************************************
-     ***** Overloaded operators for formulas
-     *************************************************************************/
+     ***** accessor implementation
+     **************************************************************************/
 
-    FormulaEqual operator==(const Place & p, unsigned int k)
+    const vector<const Formula *> & Operator::children() const
     {
-      return FormulaEqual(p, k);
+      return children_;
     }
 
-    FormulaNotEqual operator!=(const Place & p, unsigned int k)
+    const Place & Proposition::place() const
     {
-      return FormulaNotEqual(p, k);
+      return place_;
     }
 
-    FormulaGreater operator>(const Place & p, unsigned int k)
+    unsigned int Proposition::tokens() const
     {
-      return FormulaGreater(p, k);
-    }
-
-    FormulaGreaterEqual operator>=(const Place & p, unsigned int k)
-    {
-      return FormulaGreaterEqual(p, k);
-    }
-
-    FormulaLess operator<(const Place & p, unsigned int k)
-    {
-      return FormulaLess(p, k);
-    }
-
-    FormulaLessEqual operator<=(const Place & p, unsigned int k)
-    {
-      return FormulaLessEqual(p, k);
-    }
-
-    FormulaAnd operator&&(const Formula & f1, const Formula & f2)
-    {
-      return FormulaAnd(f1, f2);
-    }
-
-    FormulaOr operator||(const Formula & f1, const Formula & f2)
-    {
-      return FormulaOr(f1, f2);
-    }
-
-    FormulaNot operator!(const Formula & f)
-    {
-      return FormulaNot(f);
+      return tokens_;
     }
 
   }

@@ -245,6 +245,7 @@ namespace pnapi
 
 	Node(int);
 	Node(std::string *);
+	Node(Type);
 	Node(Type, Node *);
 	Node(Type, Node *, int);
 	Node(Type, Node *, Node *);

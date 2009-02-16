@@ -8,7 +8,7 @@ using std::endl;
 
 #include "petrinet.h"
 #include "parser.h"
-
+#include "formula.h"
 #include "io.h"
 
 using std::pair;
@@ -159,6 +159,13 @@ namespace pnapi
       Manipulator<Mode> mode(Mode m)
       {
 	return Manipulator<Mode>(m);
+      }
+
+
+      Manipulator<Delim> delim(const string & s)
+      {
+	Delim d; d.delim = s;
+	return Manipulator<Delim>(d);
       }
 
 
@@ -325,18 +332,81 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::formula::Condition & c)
+      ostream & operator<<(ostream & os, const pnapi::Condition & c)
       {
-	switch (FormatData::data(os))
-	  {
-	  case OWFN:    /* CONDITION: OWFN    */
-	    // TODO: implement
-	    os << "{ NOT IMPLEMENTED YET }";
-	    break;
+	return os << c.formula();
+      }
 
-	  default: assert(false);
-	  }
-	return os;
+      
+      ostream & operator<<(ostream & os, const formula::Formula & f)
+      {
+	return f.output(os);
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::Negation & f)
+      {
+	return os << "NOT (" << **f.children().begin() << ")";
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::Conjunction & f)
+      {
+	return os << "(" << delim(" AND ") << f.children() << ")";
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::Disjunction & f)
+      {
+	return os << "(" << delim(" OR ") << f.children() << ")";
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaTrue &)
+      {
+	return os << "TRUE";
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaFalse &)
+      {
+	return os << "FALSE";
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaEqual & f)
+      {
+	return os << f.place().getName() << " = " << f.tokens();
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaNotEqual & f)
+      {
+	return os << f.place().getName() << " != " << f.tokens();
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaGreater & f)
+      {
+	return os << f.place().getName() << " > " << f.tokens();
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaGreaterEqual & f)
+      {
+	return os << f.place().getName() << " >= " << f.tokens();
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaLess & f)
+      {
+	return os << f.place().getName() << " < " << f.tokens();
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
+      {
+	return os << f.place().getName() << " <= " << f.tokens();
       }
 
 

@@ -4,7 +4,7 @@
 #define PNAPI_FORMULA_H
 
 #include <map>
-#include <list>
+#include <vector>
 #include <string>
 
 namespace pnapi
@@ -22,387 +22,248 @@ namespace pnapi
    */
   namespace formula {
 
-    // forward declarations
-    class Formula;
-    class FormulaEqual;
-    class FormulaNotEqual;
-    class FormulaGreater;
-    class FormulaGreaterEqual;
-    class FormulaLess;
-    class FormulaLessEqual;
-    class FormulaAnd;
-    class FormulaOr;
-    class FormulaNot;
 
-
-    /// formula construction operator
-    FormulaEqual operator==(const Place &, unsigned int);
-
-    /// formula construction operator
-    FormulaNotEqual operator!=(const Place &, unsigned int);
-
-    /// formula construction operator
-    FormulaGreater operator>(const Place &, unsigned int);
-
-    /// formula construction operator
-    FormulaGreaterEqual operator>=(const Place &, unsigned int);
-
-    /// formula construction operator
-    FormulaLess operator<(const Place &, unsigned int);
-
-    /// formula construction operator
-    FormulaLessEqual operator<=(const Place &, unsigned int);
-
-    /// formula construction operator
-    FormulaAnd operator&&(const Formula &, const Formula &);
-
-    /// formula construction operator
-    FormulaOr operator||(const Formula &, const Formula &);
-
-    /// formula construction operator
-    FormulaNot operator!(const Formula &);
-
-
-    /*!
-     */
     class Formula
     {
     public:
       
-      // destructor
+      /// destructor
       virtual ~Formula();
 
-      // evaluating the formula under the given marking
-      virtual bool evaluate(const Marking &) const =0;
+      /// evaluating the formula under the given marking
+      virtual bool isSatisfied(const Marking &) const =0;
 
-      // create a deep copy of the formula
-      virtual Formula & clone() const =0;
+      /// create a deep copy of the formula
+      virtual Formula * clone(std::map<const Place *, const Place *> * 
+			      = NULL) const =0;
 
-
-      virtual const std::string toString() const =0;
-
-      virtual Formula * flatCopy() const =0;
-
-      virtual Formula * deepCopy(std::map<const Place *, Place *> &) const =0;
+      /// output the formula
+      virtual std::ostream & output(std::ostream &) const =0;
 
     };
 
 
 
+    /**************************************************************************
+     ***** Formula Tree Inner Nodes
+     **************************************************************************/
 
-  /***********************************************
-   *               Atomic Formulas               *
-   ***********************************************/
-  class AtomicFormula : public Formula
-  {
-  public:
+    class Operator : public Formula
+    {
+    public:
 
-    AtomicFormula(const Place &, unsigned int);
+      Operator(const Formula &);
 
-    virtual ~AtomicFormula() {}
+      Operator(const Formula &, const Formula &);
 
-    virtual bool evaluate(const Marking &m) const = 0;
+      Operator(const std::vector<const Formula *> &, 
+	       std::map<const Place *, const Place *> * = NULL);
 
-    const Place & getPlace();
+      ~Operator();
 
-    unsigned int getNumber();
+      const std::vector<const Formula *> & children() const;
 
-    virtual const std::string toString() const = 0;
+    protected:
+      std::vector<const Formula *> children_;
+    };
 
-    virtual AtomicFormula * flatCopy() const = 0;
 
-    virtual AtomicFormula * deepCopy(std::map<const Place *, Place *> &newP) const = 0;
+    class Negation : public Operator
+    {
+    public:
 
-  protected:
-    const Place & place_;
-    const unsigned int number_;
-  };
+      Negation(const Negation &);
 
-  class FormulaEqual : public AtomicFormula
-  {
-  public:
+      Negation(const Formula &);
 
-    FormulaEqual(const Place &, unsigned int);
+      Negation(const std::vector<const Formula *> &,
+	       std::map<const Place *, const Place *> * = NULL);
 
-    virtual ~FormulaEqual() {}
+      bool isSatisfied(const Marking &) const;
 
-    bool evaluate(const Marking &m) const;
+      Negation * clone(std::map<const Place *, const Place *> * = NULL) const;
 
-    virtual FormulaEqual & clone() const;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    const std::string toString() const;
 
-    FormulaEqual * flatCopy() const;
+    class Conjunction : public Operator
+    {
+    public:
 
-    FormulaEqual * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+      Conjunction(const Conjunction &);
 
-  class FormulaNotEqual : public AtomicFormula
-  {
-  public:
+      Conjunction(const Formula &, const Formula &);
 
-    FormulaNotEqual(const Place &, unsigned int k);
+      Conjunction(const std::vector<const Formula *> &, 
+		  std::map<const Place *, const Place *> * = NULL);
 
-    virtual ~FormulaNotEqual() {}
+      bool isSatisfied(const Marking &) const;
 
-    bool evaluate(const Marking &m) const;
+      Conjunction * clone(std::map<const Place *, const Place *> * 
+			  = NULL) const;
 
-    virtual FormulaNotEqual & clone() const;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    const std::string toString() const;
 
-    FormulaNotEqual * flatCopy() const;
+    class Disjunction : public Operator
+    {
+    public:
 
-    FormulaNotEqual * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+      Disjunction(const Disjunction &);
 
-  class FormulaGreater : public AtomicFormula
-  {
-  public:
-    /// standard constructor
-    FormulaGreater(const Place &p, unsigned int k);
+      Disjunction(const Formula &, const Formula &);
 
-    /// copy constructor
-    //FormulaGreater(const FormulaGreater &f);
+      Disjunction(const std::vector<const Formula *> &, 
+		  std::map<const Place *, const Place *> * = NULL);
 
-    virtual ~FormulaGreater() {}
+      bool isSatisfied(const Marking &) const;
 
-    bool evaluate(const Marking &m) const;
+      Disjunction * clone(std::map<const Place *, const Place *> *
+			  = NULL) const;
 
-    virtual FormulaGreater & clone() const;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    const std::string toString() const;
 
-    FormulaGreater * flatCopy() const;
 
-    FormulaGreater * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+    /**************************************************************************
+     ***** Formula Tree Leaves
+     **************************************************************************/
 
-  class FormulaGreaterEqual : public AtomicFormula
-  {
-  public:
-    /// standard constructor
-    FormulaGreaterEqual(const Place &p, unsigned int k);
+    class Proposition : public Formula
+    {
+    public:
 
-    /// copy constructor
-    //FormulaGreaterEqual(const FormulaGreaterEqual &f);
+      Proposition(const Place &, unsigned int,
+		  std::map<const Place *, const Place *> *);
 
-    virtual ~FormulaGreaterEqual() {}
+      const Place & place() const;
 
-    bool evaluate(const Marking &m) const;
+      unsigned int tokens() const;
 
-    virtual FormulaGreaterEqual & clone() const;
+    protected:
+      const Place & place_;
+      const unsigned int tokens_;
+    };
 
-    const std::string toString() const;
 
-    FormulaGreaterEqual * flatCopy() const;
+    class FormulaTrue : public Formula
+    {
+    public:
 
-    FormulaGreaterEqual * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+      bool isSatisfied(const Marking &) const;
 
-  class FormulaLess : public AtomicFormula
-  {
-  public:
-    /// standard constructor
-    FormulaLess(const Place &p, unsigned int k);
+      FormulaTrue * clone(std::map<const Place *, const Place *> *
+			  = NULL) const;
 
-    ///copy constructor
-    //FormulaLess(const FormulaLess &f);
+      std::ostream & output(std::ostream &) const;
+    };
 
-    virtual ~FormulaLess() {}
 
-    bool evaluate(const Marking &m) const;
+    class FormulaFalse : public Formula
+    {
+    public:
+      bool isSatisfied(const Marking &) const;
 
-    virtual FormulaLess & clone() const;
+      FormulaFalse * clone(std::map<const Place *, const Place *> * 
+			      = NULL) const;
 
-    const std::string toString() const;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    FormulaLess * flatCopy() const;
 
-    FormulaLess * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+    class FormulaEqual : public Proposition
+    {
+    public:
 
-  class FormulaLessEqual : public AtomicFormula
-  {
-  public:
-    /// standard constructor
-    FormulaLessEqual(const Place &p, unsigned int k);
+      FormulaEqual(const Place &, unsigned int,
+		   std::map<const Place *, const Place *> * = NULL);
 
-    /// copy constructor
-    //FormulaLessEqual(const FormulaLessEqual &f);
+      bool isSatisfied(const Marking &) const;
 
-    virtual ~FormulaLessEqual() {}
+      FormulaEqual * clone(std::map<const Place *, const Place *> *
+			   = NULL) const;
 
-    bool evaluate(const Marking &m) const;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    virtual FormulaLessEqual & clone() const;
 
-    const std::string toString() const;
+    class FormulaNotEqual : public Proposition
+    {
+    public:
 
-    FormulaLessEqual * flatCopy() const;
+      FormulaNotEqual(const Place &, unsigned int,
+		      std::map<const Place *, const Place *> * = NULL);
 
-    FormulaLessEqual * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+      bool isSatisfied(const Marking &) const;
 
+      FormulaNotEqual * clone(std::map<const Place *, const Place *> * 
+			      = NULL) const;
 
+      std::ostream & output(std::ostream &) const;
+    };
 
 
-  /************************************************
-   *          Unary Boolean Formulas              *
-   ************************************************/
-  class UnaryBooleanFormula : public Formula
-  {
-  public:
-    /// constructor
-    UnaryBooleanFormula(const Formula &);
+    class FormulaGreater : public Proposition
+    {
+    public:
+      FormulaGreater(const Place &, unsigned int,
+		     std::map<const Place *, const Place *> * = NULL);
 
-    virtual ~UnaryBooleanFormula() {}
+      bool isSatisfied(const Marking &) const;
 
-    virtual bool evaluate(const Marking &m) const = 0;
+      FormulaGreater * clone(std::map<const Place *, const Place *> * 
+			     = NULL) const;
 
-    virtual const std::string toString() const = 0;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    virtual UnaryBooleanFormula * flatCopy() const = 0;
 
-    virtual UnaryBooleanFormula * deepCopy(std::map<const Place *, Place *> &newP) const = 0;
+    class FormulaGreaterEqual : public Proposition
+    {
+    public:
+      FormulaGreaterEqual(const Place &, unsigned int,
+			  std::map<const Place *, const Place *> * = NULL);
 
-  protected:
-    const Formula & sub_;
-  };
+      bool isSatisfied(const Marking &) const;
 
-  class FormulaNot : public UnaryBooleanFormula
-  {
-  public:
+      FormulaGreaterEqual * clone(std::map<const Place *, const Place *> * 
+				  = NULL) const;
 
-    /// constructor
-    FormulaNot(const Formula &);
+      std::ostream & output(std::ostream &) const;
+    };
 
-    virtual ~FormulaNot() {}
 
-    bool evaluate(const Marking &m) const;
+    class FormulaLess : public Proposition
+    {
+    public:
+      FormulaLess(const Place &, unsigned int,
+		  std::map<const Place *, const Place *> * = NULL);
 
-    virtual FormulaNot & clone() const;
+      bool isSatisfied(const Marking &) const;
 
-    const std::string toString() const;
+      FormulaLess * clone(std::map<const Place *, const Place *> * 
+			  = NULL) const;
 
-    FormulaNot * flatCopy() const;
+      std::ostream & output(std::ostream &) const;
+    };
 
-    FormulaNot * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
 
+    class FormulaLessEqual : public Proposition
+    {
+    public:
+      FormulaLessEqual(const Place &, unsigned int,
+		       std::map<const Place *, const Place *> * = NULL);
 
+      bool isSatisfied(const Marking &) const;
 
+      FormulaLessEqual * clone(std::map<const Place *, const Place *> * 
+			       = NULL) const;
 
-  /************************************************
-   *           n ary Boolean Formulas             *
-   ************************************************/
-  class NaryBooleanFormula : public Formula
-  {
-  public:
-
-    NaryBooleanFormula(const Formula &, const Formula &);
-
-    NaryBooleanFormula(const std::list<const Formula *> &);
-
-    virtual ~NaryBooleanFormula() {}
-
-    virtual bool evaluate(const Marking &m) const = 0;
-
-    virtual const std::string toString() const = 0;
-
-    void addSubFormula(Formula *s);
-
-    virtual NaryBooleanFormula * flatCopy() const = 0;
-
-    virtual NaryBooleanFormula * deepCopy(std::map<const Place *, Place *> &) const =0;
-
-  protected:
-
-    std::list<const Formula *> subs_;
-
-    std::list<const Formula *> cloneChildren() const;
-
-  };
-
-  class FormulaAnd : public NaryBooleanFormula
-  {
-  public:
-
-    FormulaAnd(const Formula &l, const Formula &r);
-
-    FormulaAnd(const std::list<const Formula *> &);
-
-    virtual ~FormulaAnd() {}
-
-    bool evaluate(const Marking &m) const;
-
-    virtual FormulaAnd & clone() const;
-
-    const std::string toString() const;
-
-    FormulaAnd * flatCopy() const;
-
-    FormulaAnd * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
-
-  class FormulaOr : public NaryBooleanFormula
-  {
-  public:
-
-    FormulaOr(const Formula &, const Formula &);
-
-    FormulaOr(const std::list<const Formula *> &);
-
-    virtual ~FormulaOr() {}
-
-    bool evaluate(const Marking &) const;
-
-    virtual FormulaOr & clone() const;
-
-    const std::string toString() const;
-
-    FormulaOr * flatCopy() const;
-
-    FormulaOr * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
-
-
-
-
-  /************************************************
-   *                Empty Formula                 *
-   ************************************************/
-  class True : public Formula
-  {
-  public:
-    virtual ~True() {}
-
-    bool evaluate(const Marking &m) const;
-
-    virtual True & clone() const;
-
-    const std::string toString() const;
-
-    True * flatCopy() const;
-
-    True * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
-
-  class False : public Formula
-  {
-  public:
-    virtual ~False() {}
-
-    bool evaluate(const Marking &m) const;
-
-    virtual False & clone() const;
-
-    const std::string toString() const;
-
-    False * flatCopy() const;
-
-    False * deepCopy(std::map<const Place *, Place *> &newP) const;
-  };
+      std::ostream & output(std::ostream &) const;
+    };
 
   }
 

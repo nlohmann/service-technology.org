@@ -39,6 +39,7 @@ using pnapi::io::owfn;
 using pnapi::io::stat;
 
 using pnapi::io::util::operator<<;
+using pnapi::io::util::delim;
 
 namespace pnapi
 {
@@ -70,10 +71,10 @@ namespace pnapi
       << endl
 
       << "PLACE"      << endl
-      << mode(io::util::PLACE_CAPACITY)
+      << mode(io::util::PLACE_CAPACITY) << delim("; ")
       << "  INTERNAL" << endl
       << "    " << internalPlaces_ << ";" << endl << endl
-      << mode(io::util::PLACE)
+      << mode(io::util::PLACE) << delim(", ")
       << "  INPUT"    << endl
       << "    " << inputPlaces_    << ";" << endl << endl
       << "  OUTPUT"   << endl
@@ -93,6 +94,7 @@ namespace pnapi
       << "  " << condition_ << ";" << endl << endl 
       << endl
 
+      << delim("\n")
       << transitions_ << endl
       << endl 
 
@@ -111,6 +113,8 @@ namespace pnapi
     bool interface = true;
 
     os  //< output everything to this stream
+
+      << delim("\n")
 
       << "digraph N {" << endl
       << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""

@@ -23,8 +23,8 @@
 
 #include <vector>
 
-#include "condition.h"
 #include "io.h"
+#include "condition.h"
 #include "component.h"
 
 namespace pnapi
@@ -32,6 +32,7 @@ namespace pnapi
   
   // forward declarations
   class PetriNet;
+  class Condition;
   namespace io 
   { 
     class InputError;
@@ -117,7 +118,7 @@ namespace pnapi
     PetriNet & operator=(const PetriNet &);
 
     /// final condition
-    formula::Condition & finalCondition();
+    Condition & finalCondition();
 
 
     /*!
@@ -190,6 +191,7 @@ namespace pnapi
     /// checks the Petri net for free choice criterion
     bool isFreeChoice() const;
 
+    /// checks the Petri net for being normalized
     bool isNormal() const;
 
     /// compose two nets by adding the given one and merging interfaces
@@ -216,7 +218,7 @@ namespace pnapi
     ComponentObserver observer_;
 
     /// final condition
-    formula::Condition condition_;
+    Condition condition_;
 
     /// meta information
     std::map<io::MetaInformation, std::string> meta_;

@@ -20,6 +20,7 @@
 
 #include <set>
 #include <map>
+#include <vector>
 #include <ostream>
 
 namespace pnapi
@@ -27,10 +28,7 @@ namespace pnapi
 
   // forward declaration
   class PetriNet;
-  namespace formula
-  {
-    class Condition;
-  }
+  class Condition;
 
 
   /*!
@@ -148,7 +146,21 @@ namespace pnapi
   class Place;
   class Transition;
   class Arc;
-  class Condition;
+  namespace formula
+  {
+    class Formula;
+    class Negation;
+    class Conjunction;
+    class Disjunction;
+    class FormulaEqual;
+    class FormulaNotEqual;
+    class FormulaGreater;
+    class FormulaGreaterEqual;
+    class FormulaLess;
+    class FormulaLessEqual;
+    class FormulaTrue;
+    class FormulaFalse;
+  }
 
   namespace io
   {
@@ -166,6 +178,9 @@ namespace pnapi
       
       /// I/O (sub-)mode
       enum Mode { PLACE, PLACE_CAPACITY, PLACE_TOKEN, ARC };
+
+      /// delimiter type
+      struct Delim { std::string delim; };
 
       
       /*** TEMPLATE CLASSES ***/
@@ -195,6 +210,7 @@ namespace pnapi
 
       typedef StreamMetaData<Format> FormatData;
       typedef StreamMetaData<Mode> ModeData;
+      typedef StreamMetaData<Delim> DelimData;
       typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
       typedef Manipulator<std::pair<MetaInformation, std::string> > 
               MetaManipulator;
@@ -206,15 +222,31 @@ namespace pnapi
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
 
       Manipulator<Mode> mode(Mode);
+      Manipulator<Delim> delim(const std::string &);
 
-      std::ostream & operator<<(std::ostream &, const pnapi::Arc &);
-      std::ostream & operator<<(std::ostream &, const pnapi::Node &);
-      std::ostream & operator<<(std::ostream &, const pnapi::Place &);
-      std::ostream & operator<<(std::ostream &, const pnapi::Transition &);
+      std::ostream & operator<<(std::ostream &, const Arc &);
+      std::ostream & operator<<(std::ostream &, const Node &);
+      std::ostream & operator<<(std::ostream &, const Place &);
+      std::ostream & operator<<(std::ostream &, const Transition &);
       std::ostream & operator<<(std::ostream &, 
-				const pnapi::formula::Condition &);
+				const std::multimap<std::string, Place *> &);
+      std::ostream & operator<<(std::ostream &, const Condition &);
+      std::ostream & operator<<(std::ostream &, const formula::Formula &);
+      std::ostream & operator<<(std::ostream &, const formula::Negation &);
+      std::ostream & operator<<(std::ostream &, const formula::Conjunction &);
+      std::ostream & operator<<(std::ostream &, const formula::Disjunction &);
+      std::ostream & operator<<(std::ostream &, const formula::FormulaTrue &);
+      std::ostream & operator<<(std::ostream &, const formula::FormulaFalse &);
+      std::ostream & operator<<(std::ostream &, const formula::FormulaEqual &);
       std::ostream & operator<<(std::ostream &, 
-			    const std::multimap<std::string, pnapi::Place *> &);
+				const formula::FormulaNotEqual &);
+      std::ostream & operator<<(std::ostream &,
+				const formula::FormulaGreater &);
+      std::ostream & operator<<(std::ostream &, 
+				const formula::FormulaGreaterEqual &);
+      std::ostream & operator<<(std::ostream &, const formula::FormulaLess &);
+      std::ostream & operator<<(std::ostream &, 
+				const formula::FormulaLessEqual &);
 
 
       /*** TEMPLATE CLASS IMPLEMENTATION ***/
@@ -226,39 +258,30 @@ namespace pnapi
 	return os;
       }
 
-
-      inline std::string getOWFNDelimiter(std::ostream & os, 
-					  const std::set<Arc *> &) 
-      { 
-	switch (ModeData::data(os))
-	  {
-	  case PLACE_CAPACITY: return "; ";
-	  default:             return ", "; 
-	  }
+      
+      template <typename T>
+      std::ostream & outputContainer(std::ostream & os, const T & c)
+      {
+	std::string delim = DelimData::data(os).delim;
+	if (c.empty()) return os;
+	for (typename T::const_iterator it = c.begin(); 
+	     it != --c.end(); ++it)
+	  os << **it << delim;
+	return os << **--c.end();
       }
-      inline std::string getOWFNDelimiter(std::ostream & os, 
-					  const std::set<Place *> &)      
-      { return "; "; }
-      inline std::string getOWFNDelimiter(std::ostream & os, 
-					  const std::set<Transition *> &) 
-      { return "\n"  ; }
-
+      
 
       template <typename T>
       std::ostream & operator<<(std::ostream & os, const std::set<T> & s)
       {
-	std::string delim;
-	switch (FormatData::data(os))
-	  {
-	  case OWFN: delim = getOWFNDelimiter(os, s); break;
-	  case DOT:  delim = "\n";                break;
-	  default:   delim = ", ";                break;
-	  }
-	if (s.empty()) return os;
-	for (typename std::set<T>::iterator it = s.begin(); it != --s.end(); 
-	     ++it)
-	  os << **it << delim;
-	return os << **--s.end();
+	return outputContainer(os, s);
+      }
+
+      
+      template <typename T>
+      std::ostream & operator<<(std::ostream & os, const std::vector<T> & v)
+      {
+	return outputContainer(os, v);
       }
 
       

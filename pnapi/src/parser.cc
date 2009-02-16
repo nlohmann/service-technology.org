@@ -68,6 +68,11 @@ namespace pnapi
 	delete str;
       }
 
+      Node::Node(Type type) :
+	type(type)
+      {
+      }
+
       Node::Node(Type type, Node * node) :
 	type(type)
       {
@@ -153,10 +158,6 @@ namespace pnapi
 
       void Visitor::beforeChildren(const Node & node)
       {
-	Place * place;
-	int nTokens;
-	Formula * formula = NULL;
-
 	switch (node.type)
 	  {
 	  case INPUT:    placeType_ = Place::INPUT;    break;
@@ -219,6 +220,7 @@ namespace pnapi
 	      }
 	    break;
 
+	    /*
 	  case FORMULA_EQ:
 	  case FORMULA_NE:
 	  case FORMULA_LT:
@@ -242,10 +244,11 @@ namespace pnapi
 		formula = new FormulaGreaterEqual(*place, nTokens); break;
 	      case FORMULA_LE:
 		formula = new FormulaLessEqual(*place, nTokens); break;
-	      default: /* empty */ ;
+	      default: empty  ;
 	      }
 	    formulas_.push_back(formula);
 	    break;
+	    */
 
 	  default: /* empty */ ;
 	  }
@@ -286,6 +289,7 @@ namespace pnapi
 	      break;
 	    }
 
+	    /*
 	  case FORMULA_NOT:
 	    if (formulas_.size() < 1)
 	      assert(false); // FIXME
@@ -313,8 +317,9 @@ namespace pnapi
 	  case FORMULA_AAOPE:
 	  case FORMULA_AAOIPE:
 	  case FORMULA_AAOEPE:
-	    assert(false) /* FIXME: formula constructs missing */;
+	    assert(false);
 	    break;
+	    */
 
 	  default: /* empty */ ;
 	  }

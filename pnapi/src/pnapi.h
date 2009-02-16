@@ -16,20 +16,22 @@
 #define PNAPI_PNAPI_H
 
 #include "io.h"
-#include "formula.h"
+#include "condition.h"
 #include "petrinet.h"
 #include "automaton.h"
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
 using pnapi::io::operator>>;
-using pnapi::formula::operator==;
-using pnapi::formula::operator>;
-using pnapi::formula::operator>=;
-using pnapi::formula::operator<;
-using pnapi::formula::operator<=;
-using pnapi::formula::operator!=;
-using pnapi::formula::operator!;
+using pnapi::operator==;
+using pnapi::operator>;
+using pnapi::operator>=;
+using pnapi::operator<;
+using pnapi::operator<=;
+using pnapi::operator!=;
+using pnapi::operator!;
+using pnapi::operator||;
+using pnapi::operator&&;
 
 
 /*!

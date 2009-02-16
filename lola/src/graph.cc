@@ -963,7 +963,7 @@ if(i >= Places[0]->cnt) // target_marking found!
        smallerstate -> parent)
    {
 
-      smallerstate -> firelist[CurrentState ->  current] -> traceback();
+      smallerstate -> firelist[smallerstate ->  current] -> traceback();
       NrCovered = 0;
       for(i=0;i<Places[0]->cnt;i++)
       {

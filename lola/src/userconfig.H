@@ -48,11 +48,11 @@
 // reduction techniques. Call lola -h to see which reduction techniques are 
 // finally applied in the exectuable program.
 
-//#define COVER
-//#define STUBBORN
+#define COVER
+#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
-#define PREDUCTION
+//#define PREDUCTION
 //#define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE

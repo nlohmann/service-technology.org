@@ -382,16 +382,16 @@ namespace pnapi
     unsigned int reduce_rule_9();
 
     /// elimination of identical places
-    void reduce_identical_places();
+    unsigned int reduce_identical_places();
 
     /// elimination of identical transitions
-    void reduce_identical_transitions();
+    unsigned int reduce_identical_transitions();
 
     /// fusion of series places
-    void reduce_series_places();
+    unsigned int reduce_series_places();
 
     /// fusion of series transitions
-    void reduce_series_transitions(bool keepNormal);
+    unsigned int reduce_series_transitions(bool keepNormal);
 
     /// elimination of self-loop places
     unsigned int reduce_self_loop_places();
@@ -400,7 +400,7 @@ namespace pnapi
     unsigned int reduce_self_loop_transitions();
 
     /// elimination of identical places
-    void reduce_equal_places();
+    unsigned int reduce_equal_places();
 
   };
 

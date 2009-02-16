@@ -32,9 +32,9 @@ Version 2.00-unreleased
 
 * Modified semantics of workflow net termination semantics (parameter `-a
   wfNet') which now assumes that the net terminates with a global orJoin and
-  tries to extend the given net to a single terminal workflow net. The log
-  file (`-p log') will contain an entry of this extension does not preserve
-  soundness.
+  extends the given net to a single terminal workflow net. The extension
+  constructs a dead-path elimination logic from structural information. The
+  extenion preserves soundness if the net is free-choice.
 
 * Made filtering of processes more precise according to the semantics
   implemented in the WebSphere tools, providing a dedicated filtering

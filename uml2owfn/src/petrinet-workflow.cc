@@ -1316,6 +1316,30 @@ void ExtendedWorkflowNet::forwardReachableNodes(Node *n, set<Node*>* reachable) 
 }
 
 /*!
+ * \brief   compute the set of all nodes that are forward reachable from node *n
+ *          (by depth-first search), add resulting nodes to the
+ *          set of nodes *reachable
+ */
+void ExtendedWorkflowNet::backwardReachableNodes(Node *n, set<Node*>* reachable) const {
+  assert(reachable != NULL);
+
+  list<Node *> stack;
+  stack.push_front(n);
+  // depth-first search on all nodes of the net that are reachable from node *n
+  // via predecessor relation
+  while (!stack.empty()) {
+    Node *current = stack.front(); stack.pop_front();
+    // follow the pre-set relation
+    for (set<Node*>::const_iterator pre = current->preset.begin(); pre != current->preset.end(); pre++) {
+      if (reachable->find(*pre) == reachable->end()) {
+        stack.push_front(*pre);
+        reachable->insert(*pre);
+      }
+    }
+  }
+}
+
+/*!
  * \brief   extend a multi-terminal workflow net to a single-terminal
  *          workflow net
  *
@@ -1598,3 +1622,61 @@ bool ExtendedWorkflowNet::complete_to_WFnet() {
   return !contradicting;
 }
 
+/*!
+ * \brief   extend a multi-terminal workflow net to a single-terminal
+ *          workflow net by structurally computing dead-path eliminiation
+ *
+ */
+bool ExtendedWorkflowNet::complete_to_WFnet_DPE() {
+
+  list<Place *> omegaPlaces;
+
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
+    if ((*p)->isFinal) {
+      omegaPlaces.push_back(*p);
+      (*p)->isFinal = false;
+    }
+  }
+
+  // will terminate the net via an AND-join on all omegaPlaces
+  Transition* omegaANDJoin = newTransition("finalANDjoin");
+
+  // To make this AND-join sound, we have to guarantee that if a final
+  // marking is reached, all omegaPlaces get a token. To this end, we implement
+  // dead-path-elimination that produces a token on an "omega"-place which
+  // produces a "new" token on an omegaPlace whenever the net decides for a
+  // branch that would not lead to marking this omegaPlace.
+
+  // for each omega place
+  for (list<Place*>::iterator omega = omegaPlaces.begin(); omega != omegaPlaces.end(); omega++) {
+    // find all transitive predecessors
+    set<Node *> backwards;
+    backwardReachableNodes(*omega, &backwards);
+
+    for (set<Node*>::iterator n = backwards.begin(); n != backwards.end(); n++) {
+      if (typeid(**n) == typeid(Place)) {
+        // for each *greyPlace that precedes place *omega, find all post-transitions
+        // that do not precede *omega
+        Place *greyPlace = static_cast<Place*>(*n);
+        for (set<Node*>::iterator blackTransition = greyPlace->postset.begin(); blackTransition != greyPlace->postset.end(); blackTransition++) {
+          if (backwards.find(*blackTransition) != backwards.end())
+            continue;
+
+          // the *blackTransition is not a predecessor of place *omega, if it
+          // fires, then *omega will not get a token, therefore add an arc
+          // to guarantee that *omega always gets marked
+          newArc(*blackTransition, *omega);
+        }
+      }
+    }
+
+    // add an arc to the final AND join
+    newArc(*omega, omegaANDJoin);
+  }
+
+  Place* omega = newPlace("omega");
+  newArc(omegaANDJoin, omega);
+  omega->isFinal = true;
+
+  return true;
+}

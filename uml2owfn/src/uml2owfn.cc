@@ -184,7 +184,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 
     // we want to analyze workflow nets: create a completion
     if (analysis[A_TERM_WF_NET]) {
-      if (!PN->complete_to_WFnet())
+      if (!PN->complete_to_WFnet_DPE())
         res |= RES_NOT_PRESERVED;
     }
 

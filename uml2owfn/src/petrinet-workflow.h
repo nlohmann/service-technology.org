@@ -143,11 +143,15 @@ public:
   /// extend a multi-terminal workflow net to a single-terminal workflow net
   bool complete_to_WFnet();
 
+  /// extend a multi-terminal workflow net to a single-terminal workflow net
+  bool complete_to_WFnet_DPE();
+
 private:
   void reduce_series_places();
   void reduce_series_transitions();
 
   void forwardReachableNodes(Node *n, set<Node*>* reachable) const;
+  void backwardReachableNodes(Node *n, set<Node*>* reachable) const;
 };
 
 

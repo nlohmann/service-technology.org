@@ -488,12 +488,15 @@ arcs.
 @c an output pinset requires that @i{all} end-nodes are marked. This effectively
 @c implements an AND-join at the end of the process. 
 
-Any process that is found to be unsound by this analysis, is also unsound in
-the original semantics. For cases, where the structure of the Petri net provides
-ambiguous information for computation of the completion logic, and for cases where
-there exists no such completion, a sound process can become unsound. These cases
-can be identified in the translation log (@samp{-p log}). For any other cases,
-soundness is preserved.
+@c Any process that is found to be unsound by this analysis, is also unsound in
+@c the original semantics. For cases, where the structure of the Petri net provides
+@c ambiguous information for computation of the completion logic, and for cases where
+@c there exists no such completion, a sound process can become unsound. These cases
+@c can be identified in the translation log (@samp{-p log}). For any other cases,
+@c soundness is preserved.
+
+The completion preserves soundness (and unsoundness) for free-choice Petri nets.
+Cases of non-free-choice nets can be identified in the translation log (@samp{-p log}). 
 
 You can use
 

@@ -33,40 +33,40 @@ void evaluateParameters(int argc, char** argv) {
 
     // initialize the parameters structure
     struct cmdline_parser_params *params = cmdline_parser_params_create();
-    
+
     // call the cmdline parser
     if (cmdline_parser (argc, argv, &args_info) != 0) {
         fprintf(stderr, "       see ‘petri --help’ for more information\n");
         exit(EXIT_FAILURE);
     }
-    
+
     free(params);
 }
 
 
 int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
-    
+
     vector<PetriNet> nets;
     vector<string> names;
-    
+
     // store invocation in a string for meta information in file output
     string invocation;
     for (int i = 0; i < argc; ++i) {
         invocation += string(argv[i]) + " ";
     }
-    
-    
+
+
     /********
     * INPUT *
     ********/
     if (!args_info.inputs_num) {
         // read from stdin
         PetriNet net;
-        
+
         // try to parse net
         try {
-            cin >> meta(io::INPUTFILE, "stdin") 
+            cin >> meta(io::INPUTFILE, "stdin")
                 >> meta(io::CREATOR, PACKAGE_STRING)
                 >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
         } catch (io::InputError error) {
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
         if (args_info.verbose_given) {
             cerr << "petri:<stdin>: " << io::stat << net << endl;
         }
-        
+
         // store net
         nets.push_back(net);
         names.push_back("stdin");
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
                 cerr << "petri: could not read from file ‘" << args_info.inputs[i] << "’" << endl;
                 exit(EXIT_FAILURE);
             }
-            
+
             // try to parse net
             try {
                 infile >> meta(io::INPUTFILE, args_info.inputs[i])
@@ -100,16 +100,16 @@ int main(int argc, char** argv) {
                     >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
             } catch (io::InputError error) {
                 cerr << "petri:" << error << endl;
-                infile.close();            
+                infile.close();
                 exit(EXIT_FAILURE);
             }
-            
+
             infile.close();
-            
+
             if (args_info.verbose_given) {
                 cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << net << endl;
             }
-            
+
             // store net
             nets.push_back(net);
             names.push_back(args_info.inputs[i]);
@@ -122,16 +122,16 @@ int main(int argc, char** argv) {
     *****************/
     if (args_info.normalize_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
-            
+
             if (args_info.verbose_given) {
                 cerr << "petri: normalizing reducing Petri net ‘" << names[i] << "’..." << endl;
             }
-            
+
             nets[i].normalize();
-        }        
+        }
     }
-    
-    
+
+
     /***********************
     * STRUCTURAL REDUCTION *
     ***********************/
@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
             nets[i].reduce(args_info.reduce_arg);
         }
     }
-    
+
 
     /************************
     * STRUCTURAL PROPERTIES *
@@ -156,25 +156,25 @@ int main(int argc, char** argv) {
 
             // check for free choice
             if (args_info.check_arg == check_arg_freechoice || args_info.isFreeChoice_given) {
-                cerr << nets[i].isFreeChoice() << endl;                
+                cerr << nets[i].isFreeChoice() << endl;
             }
-            
+
             // check for normality
             if (args_info.check_arg == check_arg_normal || args_info.isNormal_given) {
-                cerr << nets[i].isNormal() << endl;                
+                cerr << nets[i].isNormal() << endl;
             }
-            
+
             // check for workflow structure
             if (args_info.check_arg == check_arg_workflow || args_info.isWorkflow_given) {
-                nets[i].isWorkflow();                
+                nets[i].isWorkflow();
             }
         }
     }
-    
-    
+
+
     /*********
     * OUTPUT *
-    *********/   
+    *********/
     if (args_info.output_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
             for (unsigned int j = 0; j < args_info.output_given; ++j) {
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
                     cerr << "petri: could not write to file ‘" << outname << "’" << endl;
                     exit(EXIT_FAILURE);
                 }
-                
+
                 if (args_info.verbose_given) {
                     cerr << "petri: creating file ‘" << outname << "’..." << endl;
                 }
@@ -201,7 +201,7 @@ int main(int argc, char** argv) {
 
                     // create automaton output
                     case (output_arg_sa): {
-                        Automaton sa(nets[i]);
+                        ServiceAutomaton sa(nets[i]);
                         outfile << sa;
                         break;
                     }
@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-    
-    
+
+
     return EXIT_SUCCESS;
 }

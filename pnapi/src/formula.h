@@ -5,6 +5,7 @@
 
 #include <map>
 #include <vector>
+#include <set>
 #include <string>
 
 namespace pnapi
@@ -26,7 +27,7 @@ namespace pnapi
     class Formula
     {
     public:
-      
+
       /// destructor
       virtual ~Formula();
 
@@ -34,11 +35,14 @@ namespace pnapi
       virtual bool isSatisfied(const Marking &) const =0;
 
       /// create a deep copy of the formula
-      virtual Formula * clone(std::map<const Place *, const Place *> * 
+      virtual Formula * clone(std::map<const Place *, const Place *> *
 			      = NULL) const =0;
 
       /// output the formula
       virtual std::ostream & output(std::ostream &) const =0;
+
+      /// set of concerning places
+      //virtual const std::set<std::string *> & concerningPlaces() const = 0;
 
     };
 
@@ -56,12 +60,14 @@ namespace pnapi
 
       Operator(const Formula &, const Formula &);
 
-      Operator(const std::vector<const Formula *> &, 
+      Operator(const std::vector<const Formula *> &,
 	       std::map<const Place *, const Place *> * = NULL);
 
       ~Operator();
 
       const std::vector<const Formula *> & children() const;
+
+      const std::set<std::string *> & concerningPlaces() const;
 
     protected:
       std::vector<const Formula *> children_;
@@ -95,12 +101,12 @@ namespace pnapi
 
       Conjunction(const Formula &, const Formula &);
 
-      Conjunction(const std::vector<const Formula *> &, 
+      Conjunction(const std::vector<const Formula *> &,
 		  std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      Conjunction * clone(std::map<const Place *, const Place *> * 
+      Conjunction * clone(std::map<const Place *, const Place *> *
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -115,7 +121,7 @@ namespace pnapi
 
       Disjunction(const Formula &, const Formula &);
 
-      Disjunction(const std::vector<const Formula *> &, 
+      Disjunction(const std::vector<const Formula *> &,
 		  std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
@@ -143,6 +149,8 @@ namespace pnapi
 
       unsigned int tokens() const;
 
+      const std::set<std::string *> & concerningPlaces() const;
+
     protected:
       const Place & place_;
       const unsigned int tokens_;
@@ -159,6 +167,8 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+      const std::set<std::string *> & concerningPlaces() const;
     };
 
 
@@ -167,10 +177,12 @@ namespace pnapi
     public:
       bool isSatisfied(const Marking &) const;
 
-      FormulaFalse * clone(std::map<const Place *, const Place *> * 
+      FormulaFalse * clone(std::map<const Place *, const Place *> *
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+      const std::set<std::string *> & concerningPlaces() const;
     };
 
 
@@ -187,6 +199,8 @@ namespace pnapi
 			   = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+      const std::set<std::string *> & concerningPlaces() const;
     };
 
 
@@ -199,7 +213,7 @@ namespace pnapi
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaNotEqual * clone(std::map<const Place *, const Place *> * 
+      FormulaNotEqual * clone(std::map<const Place *, const Place *> *
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -214,7 +228,7 @@ namespace pnapi
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaGreater * clone(std::map<const Place *, const Place *> * 
+      FormulaGreater * clone(std::map<const Place *, const Place *> *
 			     = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -229,7 +243,7 @@ namespace pnapi
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaGreaterEqual * clone(std::map<const Place *, const Place *> * 
+      FormulaGreaterEqual * clone(std::map<const Place *, const Place *> *
 				  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -244,7 +258,7 @@ namespace pnapi
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaLess * clone(std::map<const Place *, const Place *> * 
+      FormulaLess * clone(std::map<const Place *, const Place *> *
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -259,7 +273,7 @@ namespace pnapi
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaLessEqual * clone(std::map<const Place *, const Place *> * 
+      FormulaLessEqual * clone(std::map<const Place *, const Place *> *
 			       = NULL) const;
 
       std::ostream & output(std::ostream &) const;

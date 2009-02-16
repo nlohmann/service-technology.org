@@ -1,4 +1,5 @@
 #include "test.h"
+#include "../../src/automaton.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,13 +36,13 @@ int main(int argc, char *argv[])
   net.createArc(t4, po);
   net.createArc(t4, p6);
 
-  net.finalCondition() = 
+  net.finalCondition() =
     p1 == 0 && p2 == 0 && p3 == 0 && p4 == 0 && p5 == 0 && p6 > 0;
 
 
   // automaton construction from PetriNet instance
   begin_test("Automaton::Automaton() [construction]");
-  Automaton sa(net);
+  pnapi::ServiceAutomaton sa(net);
   cout << sa;
   end_test();
 

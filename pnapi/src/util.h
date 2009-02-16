@@ -8,7 +8,7 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: $Author$
- * 
+ *
  * \since   2005/11/11
  *
  * \date    $Date$
@@ -66,8 +66,8 @@ namespace pnapi
      *          working for this method.
      */
     template <typename T>
-    unsigned int dfsTarjan(T n, stack<T> & S, set<T> & stacked, 
-			   unsigned int & i, map<T, int> &index, 
+    unsigned int dfsTarjan(T n, stack<T> & S, set<T> & stacked,
+			   unsigned int & i, map<T, int> &index,
 			   map<T, unsigned int> & lowlink)
     {
       unsigned int retVal = 0;
@@ -77,8 +77,7 @@ namespace pnapi
       i++;
       S.push(n);
       stacked.insert(n);
-      //std::cout << n->getName() << " stacked, ";
-      for (typename set<T>::const_iterator nn = n->getPostset().begin(); 
+      for (typename set<T>::const_iterator nn = n->getPostset().begin();
 	   nn != n->getPostset().end(); nn++)
 	{
 	  if (index[*nn] < 0)
@@ -95,18 +94,16 @@ namespace pnapi
       if (static_cast<int>(lowlink[n]) == index[n])
 	{
 	  retVal++;
-	  //std::cout << "\nSCC: ";
 	  while (!S.empty() && lowlink[S.top()] == lowlink[n])
 	    {
-	      //std::cout << S.top()->getName() << ", ";
 	      S.pop();
-	    };
+	    }
 	}
-      
+
       return retVal;
     }
 
-    
+
     /*!
      * \brief returns the union of two sets
      *
@@ -138,7 +135,7 @@ namespace pnapi
       set<T> result;
       insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
       set_intersection(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-      
+
       return result;
     }
 
@@ -156,7 +153,7 @@ namespace pnapi
       set<T> result;
       insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
       set_difference(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-      
+
       return result;
     }
 

@@ -3,73 +3,147 @@
 #ifndef PNAPI_STATE_H
 #define PNAPI_STATE_H
 
+#include <set>
 #include <string>
+
+#include "marking.h"
+
+using std::set;
+using std::string;
 
 namespace pnapi
 {
 
-class State
-{
-public:
-  /// Constructors & Destructor
-  State(Marking &m);
-  State(const State &s);
-  virtual ~State();
 
-  /// sets the marking represented by this state
-  void setMarking(Marking &m);
+  template <class T>
+  class Edge
+  {
+  public:
+    /*!
+     * \brief
+     */
+    Edge(T &source, T &destination, const string label) :
+      source_(source), destination_(destination), label_(label)
+    {
+      source_.getPostset().insert(&destination_);
+      destination_.getPreset().insert(&source_);
+    }
 
-  /// returns the marking represented by this state
-  Marking & getMarking() const;
 
-  /// sets the dfs index to maxIndex
-  void setIndex();
+    /*!
+     * \brief
+     */
+    virtual ~Edge()
+    {
+    }
 
-  /// returns the dfs index
-  unsigned int getIndex() const;
 
-  /// returns the marking's size
-  unsigned int size() const;
+    /*!
+     * \brief
+     */
+    string getLabel() const
+    {
+      return label_;
+    }
 
-  /// adds a state to the list of successors
-  void addSuccessor(State &s);
 
-  /// returns the list of successors
-  const std::list<State *> & getSuccessors() const;
+    /*!
+     * \brief
+     */
+    T & getSource() const
+    {
+      return source_;
+    }
 
-  /// adds a reason for getting to a successor
-  void addReason(std::string &r);
 
-  /// returns the list of reasons
-  const std::list<std::string *> & getReasons() const;
+    /*!
+     * \brief
+     */
+    T & getDestination() const
+    {
+      return destination_;
+    }
 
-  unsigned int getHashValue(std::map<Place *, unsigned int> &pt);
 
-  bool operator ==(const State &m) const;
+  private:
+    string label_;
+    T &source_;
+    T &destination_;
+  };
 
-  /// initializes all states
-  static void initialize();
 
-private:
-  /// the representing marking
-  Marking &m_;
+  class State
+  {
+  public:
+    // standard constructor
+    State(string name = "");
+    // standard destructor
+    virtual ~State();
 
-  /// dfs index
-  unsigned int index_;
+    // returns the name
+    const string & getName() const;
+    // returns the preset
+    set<State *> getPreset() const;
+    // returns the postset
+    set<State *> getPostset() const;
 
-  /// pointer to the hash value
-  unsigned int *hashValue_;
+    // comparison operator for states
+    virtual bool operator ==(const State &m) const;
 
-  /// list of all successors to this state
-  std::list<State *> successors_;
+  protected:
+    // name of the state
+    string name_;
+    // preset
+    set<State *> preset_;
+    // postset
+    set<State *> postset_;
+  };
 
-  /// list of reasons leading to the successors
-  std::list<std::string *> reasons_;
 
-  /// current dfs index
-  static unsigned int maxIndex_;
-};
+  class StateB : public State
+  {
+  public:
+    /// Constructors & Destructor
+    StateB(Marking &m);
+    StateB(const StateB &s);
+    virtual ~StateB();
+
+    /// returns the marking represented by this StateB
+    Marking & getMarking() const;
+
+    /// returns the marking's size
+    unsigned int size() const;
+
+    unsigned int getHashValue();
+
+    bool operator ==(const StateB &m) const;
+
+  private:
+    /// the represented marking
+    Marking &m_;
+
+    /// pointer to the hash value
+    unsigned int *hashValue_;
+  };
+
+
+  class StateOG : public State
+  {
+  public:
+    // standard constructor
+    StateOG();
+    // standard destructor
+    virtual ~StateOG();
+
+    // comparison operator
+    bool operator ==(const StateOG &m) const;
+
+  private:
+    /// some type of formula
+
+  };
+
 
 }
 
-#endif /* STATE_H */
+#endif /* State_H */

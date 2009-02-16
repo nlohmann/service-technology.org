@@ -3,81 +3,272 @@
 #ifndef PNAPI_AUTOMATON_H
 #define PNAPI_AUTOMATON_H
 
+#include <cassert>
 #include <list>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "marking.h"
+#include "petrinet.h"
 #include "state.h"
 
 namespace pnapi
 {
 
+
+  /// output format
+  enum Format { SA, STG };
+
+
   // forward declarations
   class State;
   class Place;
-  class PetriNet;
   class Transition;
   class Marking;
+  template <class T> class AbstractAutomaton;
 
-enum Format { SA, STG };
 
-class Automaton
-{
-public:
+  /// Real automata - anything is possible but creating one from a net
+  typedef AbstractAutomaton<State> Automaton;
+  /// Operating Guidelines
+  typedef AbstractAutomaton<StateOG> OG;
 
-  /// constructor with Petri net - initial marking taken from place marks
-  Automaton(PetriNet &n);
 
-  /// standard destructor
-  virtual ~Automaton();
+  /// forward declaration of AbstractAutomaton
+  template <class T>
+  class AbstractAutomaton
+  {
+  public:
+    /// standard constructor
+    AbstractAutomaton();
+    /// constructor used by ServiceAutomaton class
+    AbstractAutomaton(PetriNet &net);
+    /// standard destructor
+    virtual ~AbstractAutomaton();
 
-  /// initializes the service automaton
-  void initialize();
+    /// creating a state
+    void createState(const string name = "");
+    /// creating an edge
+    void createEdge(T &source, T &destination, const string label);
 
-  /// creates the service automaton
-  void createAutomaton();
+    /// friend operation <<
+    template <class R> friend std::ostream &
+    operator <<(std::ostream &os, const AbstractAutomaton<R> &sa);
 
-  /// friend operation <<
-  friend std::ostream &operator <<(std::ostream &os, const Automaton &sa);
+    /// setting the format of the automaton output
+    void setFormat(Format f);
 
-  void setFormat(Format f);
+  protected:
+    set<T *> states_;
+    set<Edge<T> *> edges_;
 
-private:
+    /// described PetriNet
+    PetriNet &net_;
 
-  static const int HASHSIZE = 65535;
+    /// temporary output flag
+    Format f_;
 
-  std::vector<std::set<State *> > hashTable_;
-  std::map<Place *, unsigned int> primes_;
+    /// Service automata output format (ig like)
+    void output_sa(std::ostream &os) const;
+    /// stg output format
+    void output_stg(std::ostream &os) const;
 
-  std::list<std::string> in_;
-  std::list<std::string> out_;
-  unsigned int first_;
-  std::list<unsigned int> finals_;
 
-  std::map<Transition *, std::string> reasons_;
+  };
 
-  PetriNet &net_;
-  Marking initialmarking_;
 
-  /// temporary output flag
-  Format f_;
+  /// operator << for abstract automata
+  template <typename T>
+  std::ostream & operator <<(std::ostream &os, const AbstractAutomaton<T> &sa)
+  {
+    switch (sa.f_)
+    {
+    case SA:    sa.output_sa(os); break;
+    case STG:   sa.output_stg(os); break;
+    default:    assert(false); break;
+    }
 
-  void initHashTable();
+    return os;
+  }
 
-  void fillPrimes();
-  bool isPrime(unsigned int &p) const;
 
-  void dfs(State &i);
+  /*!
+   * \brief   standard constructor
+   */
+  template <class T>
+  AbstractAutomaton<T>::AbstractAutomaton() :
+    net_(*new pnapi::PetriNet())
+  {
+  }
 
-  /// temporary output methods
-  void output_sa(std::ostream &os) const;
-  void output_stg(std::ostream &os) const;
-};
 
-/*** overloaded operator << ***/
+  /*!
+   * \brief
+   */
+  template <class T>
+  AbstractAutomaton<T>::AbstractAutomaton(PetriNet &net) :
+    net_(net)
+  {
+  }
 
-std::ostream &operator <<(std::ostream &os, const Automaton &sa);
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  AbstractAutomaton<T>::~AbstractAutomaton()
+  {
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  void AbstractAutomaton<T>::createState(const string name)
+  {
+    states_.insert(new State(name));
+  }
+
+
+  /*!
+   * \brief
+   */
+#include <iostream>
+using std::cout;
+  template <class T>
+  void AbstractAutomaton<T>::createEdge(T &source, T &destination, const string label)
+  {
+    cout << "DEBUG: Created edge from " << source.getName();
+    cout << " to " << destination.getName() << "\n";
+    edges_.insert(new Edge<T>(source, destination, label));
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  void AbstractAutomaton<T>::setFormat(Format f)
+  {
+    f_ = f;
+  }
+
+
+  /*!
+   * \brief
+   *
+   * \bug     Too many output on interface.
+   */
+  template <class T>
+  void AbstractAutomaton<T>::output_sa(std::ostream &os) const
+  {
+    os << "INTERFACE\n";
+    os << "  " << "INPUT ";
+/*    bool begin = true;
+    for (set<Edge<T> *>::const_iterator e = edges_.begin();
+        e != edges_.end(); e++)
+    {
+      if (begin)
+      {
+        string currLabel = (*e)->getLabel();
+        if (currLabel.c_str()[0] != '!')
+          continue;
+        os << currLabel.substr(1, currLabel.length());
+        begin = false;
+        continue;
+      }
+
+      string currLabel = (*e)->getLabel();
+      if (currLabel.c_str()[0] != '!')
+        continue;
+      os << ", " << currLabel.substr(1, currLabel.length());
+    }*/
+    os << ";\n";
+
+    os << "  " << "OUTPUT ";
+/*      begin = true;
+    for (set<Edge<T> *>::const_iterator e = edges_.begin();
+        e != edges_.end(); e++)
+    {
+      if (begin)
+      {
+        string currLabel = (*e)->getLabel();
+        if (currLabel.c_str()[0] != '?')
+          continue;
+        os << currLabel.substr(1, currLabel.length());
+        begin = false;
+        continue;
+      }
+
+      string currLabel = (*e)->getLabel();
+      if (currLabel.c_str()[0] != '?')
+        continue;
+      os << ", " << currLabel.substr(1, currLabel.length());
+    }*/
+    os << ";\n\n";
+
+    os << "NODES\n";
+
+    os << ";\n\n";
+
+    os << "INITIALNODE\n";
+/*      T *stat = NULL;
+    for (set<T *>::const_iterator s = states_.begin(); s != states_.end();
+        s++)
+    {
+      if ((*s)->getPreset().empty())
+      {
+        stat = *s;
+        break;
+      }
+    }
+    os << "  " << stat->getName() << ";\n\n";*/
+
+    os << "FINALNODES\n";
+
+    os << ";\n\n";
+
+    os << "TRANSITIONS\n";
+
+    os << ";\n";
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  void AbstractAutomaton<T>::output_stg(std::ostream &os) const
+  {
+    /// implement it!
+  }
+
+
+  /// Service Automaton
+  class ServiceAutomaton : public AbstractAutomaton<StateB>
+  {
+  public:
+    /// constructor with Petri net - initial marking taken from place marks
+    ServiceAutomaton(PetriNet &n);
+    /// standard destructor
+    virtual ~ServiceAutomaton();
+
+  private:
+    /// attributes & methods used for creating an automaton from Petri net
+    static const int HASHSIZE = 65535;
+
+    std::vector<std::set<StateB *> > hashTable_;
+
+    Marking initialmarking_;
+
+    /// adds a StateB to the automaton
+    void addState(StateB &s);
+
+    /// Depth-First-Search
+    void dfs(StateB &i);
+  };
+
 
 }
 

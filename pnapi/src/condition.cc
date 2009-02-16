@@ -85,7 +85,7 @@ namespace pnapi
   {
   }
 
-  Condition::Condition(const Condition & c, 
+  Condition::Condition(const Condition & c,
 		       map<const Place *, const Place *> * places) :
     formula_(c.formula().clone(places))
   {
@@ -121,9 +121,14 @@ namespace pnapi
   Condition & Condition::operator=(bool formulaTrue)
   {
     delete formula_;
-    formula_ = formulaTrue ? (Formula*) new FormulaTrue 
+    formula_ = formulaTrue ? (Formula*) new FormulaTrue
                            : (Formula*) new FormulaFalse;
     return *this;
   }
+
+/*  const std::set<std::string> & Condition::concerningPlaces() const
+  {
+    return formula_->concerningPlaces();
+  }*/
 
 }

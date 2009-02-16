@@ -3,6 +3,7 @@
 #include "marking.h"
 #include "formula.h"
 #include "io.h"
+#include "util.h"
 
 using std::map;
 using std::vector;
@@ -15,7 +16,7 @@ namespace pnapi
 
   namespace formula
   {
-    
+
     /**************************************************************************
      ***** Constructor() implementation
      **************************************************************************/
@@ -31,10 +32,10 @@ namespace pnapi
       children_.push_back(r.clone());
     }
 
-    Operator::Operator(const vector<const Formula *> & children, 
+    Operator::Operator(const vector<const Formula *> & children,
 		       map<const Place *, const Place *> * places)
     {
-      for (vector<const Formula *>::const_iterator it = children.begin(); 
+      for (vector<const Formula *>::const_iterator it = children.begin();
 	   it != children.end(); ++it)
 	children_.push_back((*it)->clone(places));
     }
@@ -44,7 +45,7 @@ namespace pnapi
     {
     }
 
-    Negation::Negation(const vector<const Formula *> & children, 
+    Negation::Negation(const vector<const Formula *> & children,
 		       map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
@@ -61,7 +62,7 @@ namespace pnapi
     {
     }
 
-    Conjunction::Conjunction(const vector<const Formula *> & children, 
+    Conjunction::Conjunction(const vector<const Formula *> & children,
 			     map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
@@ -78,7 +79,7 @@ namespace pnapi
     {
     }
 
-    Disjunction::Disjunction(const vector<const Formula *> & children, 
+    Disjunction::Disjunction(const vector<const Formula *> & children,
 			     map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
@@ -90,44 +91,44 @@ namespace pnapi
     {
     }
 
-    Proposition::Proposition(const Place & p, unsigned int k, 
+    Proposition::Proposition(const Place & p, unsigned int k,
 			     map<const Place *, const Place *> * places) :
       place_(places == NULL ? p : *(*places)[&p]), tokens_(k)
     {
       assert(places == NULL || (*places)[&p] != NULL);
     }
 
-    FormulaEqual::FormulaEqual(const Place & p, unsigned int k, 
+    FormulaEqual::FormulaEqual(const Place & p, unsigned int k,
 			       map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
-    FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k, 
+    FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k,
 				   map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
-    FormulaGreater::FormulaGreater(const Place & p, unsigned int k, 
+    FormulaGreater::FormulaGreater(const Place & p, unsigned int k,
 				   map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
-    FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k, 
+    FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k,
 				   map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
-    FormulaLess::FormulaLess(const Place & p, unsigned int k, 
+    FormulaLess::FormulaLess(const Place & p, unsigned int k,
 			     map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
-    FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k, 
+    FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k,
 				   map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
@@ -145,7 +146,7 @@ namespace pnapi
 
     Operator::~Operator()
     {
-      for (vector<const Formula *>::iterator it = children_.begin(); 
+      for (vector<const Formula *>::iterator it = children_.begin();
 	   it != children_.end(); ++it)
 	delete *it;
     }
@@ -161,13 +162,13 @@ namespace pnapi
       return new Negation(children_, places);
     }
 
-    Conjunction * Conjunction::clone(map<const Place *, 
+    Conjunction * Conjunction::clone(map<const Place *,
 				         const Place *> * places) const
     {
       return new Conjunction(children_, places);
     }
 
-    Disjunction * Disjunction::clone(map<const Place *, 
+    Disjunction * Disjunction::clone(map<const Place *,
 				         const Place *> * places) const
     {
       return new Disjunction(children_, places);
@@ -179,49 +180,49 @@ namespace pnapi
       return new FormulaTrue();
     }
 
-    FormulaFalse * FormulaFalse::clone(map<const Place *, 
+    FormulaFalse * FormulaFalse::clone(map<const Place *,
 				           const Place *> *) const
     {
       return new FormulaFalse();
     }
 
-    FormulaEqual * FormulaEqual::clone(map<const Place *, 
+    FormulaEqual * FormulaEqual::clone(map<const Place *,
 				           const Place *> * places) const
     {
       return new FormulaEqual(place_, tokens_, places);
     }
-    
-    FormulaNotEqual * FormulaNotEqual::clone(map<const Place *, 
+
+    FormulaNotEqual * FormulaNotEqual::clone(map<const Place *,
 					         const Place *> * places) const
     {
       return new FormulaNotEqual(place_, tokens_, places);
     }
 
-    FormulaGreater * FormulaGreater::clone(map<const Place *, 
+    FormulaGreater * FormulaGreater::clone(map<const Place *,
    					       const Place *> * places) const
     {
       return new FormulaGreater(place_, tokens_, places);
     }
 
-    FormulaGreaterEqual * FormulaGreaterEqual::clone(map<const Place *, 
+    FormulaGreaterEqual * FormulaGreaterEqual::clone(map<const Place *,
 						  const Place *> * places) const
     {
       return new FormulaGreaterEqual(place_, tokens_, places);
     }
 
-    FormulaLess * FormulaLess::clone(map<const Place *, 
+    FormulaLess * FormulaLess::clone(map<const Place *,
 				         const Place *> * places) const
     {
       return new FormulaLess(place_, tokens_, places);
     }
 
-    FormulaLessEqual * FormulaLessEqual::clone(map<const Place *, 
+    FormulaLessEqual * FormulaLessEqual::clone(map<const Place *,
 					       const Place *> * places) const
     {
       return new FormulaLessEqual(place_, tokens_, places);
     }
 
-  
+
 
     /**************************************************************************
      ***** isSatisfied() implementation
@@ -371,6 +372,64 @@ namespace pnapi
     {
       return tokens_;
     }
+
+
+    /**************************************************************************
+     ***** concerning places implementation
+     **************************************************************************/
+
+/*    std::set<Place *> & Operator::concerningPlaces()
+    {
+      std::set<Place *> &cp = *new std::set<Place *>();
+      cp.clear();
+
+      for (int i = 0; i < children_.size(); i++)
+        util::setUnion(cp, children_[i].concerningPlaces());
+
+      return cp;
+    }
+
+
+    std::set<Place *> & Proposition::concerningPlaces()
+    {
+      std::set<Place *> &cp = *new std::set<Place *>();
+      cp.clear();
+
+      cp.insert(&place_);
+
+      return cp;
+    }
+
+
+    std::set<Place *> & FormulaEqual::concerningPlaces()
+    {
+      std::set<Place *> &cp = *new std::set<Place *>();
+      cp.clear();
+
+      // implementation of "all other places empty"
+      if (tokens_ == 0)
+        cp.insert(&place_);
+
+      return cp;
+    }
+
+
+    std::set<Place *> & FormulaTrue::concerningPlaces()
+    {
+      std::set<Place *> &cp = *new std::set<Place *>();
+      cp.clear();
+
+      return cp;
+    }
+
+
+    std::set<Place *> & FormulaFalse::concerningPlaces()
+    {
+      std::set<Place *> &cp = *new std::set<Place *>();
+      cp.clear();
+
+      return cp;
+    }*/
 
   }
 

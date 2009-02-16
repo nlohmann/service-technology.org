@@ -1,125 +1,212 @@
 #include <cmath>
 #include <map>
+#include <sstream>
+#include <string>
 
-#include "automaton.h"
 #include "state.h"
 
 using std::map;
-using std::list;
 using std::string;
+using std::stringstream;
+
 
 namespace pnapi
 {
 
+  /******************************************************************
+   *                      Basic Class State                         *
+   ******************************************************************/
 
-State::State(Marking &m) :
-  m_(m), hashValue_(NULL)
-{
-}
-
-State::State(const State &s) :
-  m_(s.m_), index_(s.index_), successors_(s.successors_), reasons_(s.reasons_)
-{
-  hashValue_ = new unsigned int(*s.hashValue_);
-}
-
-State::~State()
-{
-}
-
-unsigned int State::maxIndex_ = 0;
-
-Marking & State::getMarking() const
-{
-  return m_;
-}
-
-void State::setMarking(Marking &m)
-{
-  m_ = m;
-}
-
-void State::setIndex()
-{
-  index_ = maxIndex_++;
-}
-
-unsigned int State::getIndex() const
-{
-  return index_;
-}
-
-unsigned int State::size() const
-{
-  return m_.size();
-}
-
-void State::addSuccessor(State &s)
-{
-  successors_.push_back(&s);
-}
-
-const list<State *> & State::getSuccessors() const
-{
-  return successors_;
-}
-
-void State::addReason(string &r)
-{
-  reasons_.push_back(&r);
-}
-
-const list<string *> & State::getReasons() const
-{
-  return reasons_;
-}
-
-unsigned int State::getHashValue(map<Place *, unsigned int> &pt)
-{
-  if (pt.empty())
-    return 0;
-
-  if (hashValue_ == NULL)
+  /*!
+   * \brief   standard constructor
+   */
+  State::State(string name) :
+    preset_(), postset_()
   {
-    unsigned int hash = 1;
-    for (map<Place *, unsigned int>::const_iterator p = pt.begin();
-        p != pt.end(); ++p)
-      hash *= pow((*p).second, m_[*p->first]);
+    static unsigned int number = 1;
+    string snumber;
+    stringstream sstream;
+    sstream << number++;
+    sstream >> snumber;
 
-    hashValue_ = new unsigned int(hash);
+    if (name == "")
+      name_ = "s" + snumber;
+    else
+      name_ = name;
   }
 
-  return *hashValue_;
-}
+
+  /*!
+   * \brief   destructor
+   */
+  State::~State()
+  {
+    preset_.clear();
+    postset_.clear();
+  }
 
 
+  /*!
+   * \brief
+   */
+  const string & State::getName() const
+  {
+    return name_;
+  }
 
 
-/*!
- * \brief   Checks if two states are equal
- *
- * Two states i and j are equal iff their markings
- * they represent are equal.
- *
- * \param   State j
- *
- * \return  TRUE iff the condition is fulfilled.
- */
-bool State::operator ==(const State &j) const
-{
-  return m_ == j.m_;
-}
+  /*!
+   * \brief   returns the preset
+   */
+  set<State *> State::getPreset() const
+  {
+    return preset_;
+  }
 
 
-/*!
- * \brief   Initializes all states
- *
- * \note    This method should be called before building an automaton or
- *          using states for new automata in new context.
- */
-void State::initialize()
-{
-  maxIndex_ = 0;
-}
+  /*!
+   * \brief   returns the postset
+   */
+  set<State *> State::getPostset() const
+  {
+    return postset_;
+  }
+
+
+  /*!
+   * \brief   Comparison operater ==
+   *
+   * \note    I don't know if two states are equal if all the
+   *          attributes are equal. Maybe it's enough to compare
+   *          the post- and presets.
+   */
+  bool State::operator ==(const State &m) const
+  {
+    if (name_ == m.name_ && preset_ == m.preset_ && postset_ == m.postset_)
+      return true;
+    else
+      return false;
+  }
+
+  /******************************************************************
+   *                      State Class Build                         *
+   ******************************************************************/
+
+
+  /*!
+   * \brief   Standard constructor taking a marking
+   */
+  StateB::StateB(Marking &m) :
+    m_(m), hashValue_(NULL)
+  {
+  }
+
+
+  /*!
+   * \brief   Copy constructor
+   */
+  StateB::StateB(const StateB &s) :
+    m_(s.m_)
+  {
+    hashValue_ = new unsigned int(*s.hashValue_);
+  }
+
+
+  /*!
+   * \brief   Standard destructor
+   */
+  StateB::~StateB()
+  {
+  }
+
+
+  /*!
+   * \brief   Returns the representing marking
+   */
+  Marking & StateB::getMarking() const
+  {
+    return m_;
+  }
+
+
+  /*!
+   * \brief   Returns the size of one state
+   *
+   * The state's size depends on the size of the marking vector.
+   */
+  unsigned int StateB::size() const
+  {
+    return m_.size();
+  }
+
+
+  /*!
+   * \brief   Returns the hash value of one state
+   *
+   * If there is already set a hash value, the method just returns
+   * it. If not, the method calculates one and writes it to the property
+   * hashValue_. Afterwards, it will be returned.
+   */
+  unsigned int StateB::getHashValue()
+  {
+    if (hashValue_ == NULL)
+    {
+      unsigned int hash = 0;
+      for (map<const Place *, unsigned int>::const_iterator i = m_.getMap().begin();
+          i != m_.getMap().end(); i++)
+        hash += i->second;
+
+      hashValue_ = new unsigned int(hash);
+    }
+
+    return *hashValue_;
+  }
+
+
+  /*!
+   * \brief   Checks if two StateBs are equal
+   *
+   * Two StateBs i and j are equal iff their markings
+   * they represent are equal.
+   *
+   * \param   StateB j
+   *
+   * \return  TRUE iff the condition is fulfilled.
+   */
+  bool StateB::operator ==(const StateB &j) const
+  {
+    return m_ == j.m_;
+  }
+
+
+  /******************************************************************
+   *                      OG State Class                            *
+   ******************************************************************/
+
+
+  /*!
+   * \brief
+   */
+  StateOG::StateOG()
+  {
+  }
+
+
+  /*!
+   * \brief
+   */
+  StateOG::~StateOG()
+  {
+  }
+
+
+  /*!
+   * \brief
+   */
+  bool StateOG::operator ==(const StateOG &m) const
+  {
+    return false;
+  }
+
 
 }

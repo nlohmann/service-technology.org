@@ -82,24 +82,24 @@ namespace pnapi
      */
     std::ostream & operator<<(std::ostream & os, const PetriNet & net)
     {
-      switch (util::FormatData::data(os))
-	{
-	case util::OWFN:   net.output_owfn  (os); break;
-	case util::DOT:    net.output_dot   (os); break;
-	case util::GASTEX: net.output_gastex(os); break;
+        switch (util::FormatData::data(os))
+        {
+            case util::OWFN:   net.output_owfn  (os); break;
+            case util::DOT:    net.output_dot   (os); break;
+            case util::GASTEX: net.output_gastex(os); break;
 
-	case util::STAT: 
-	  os << "|P| = "     << net.internalPlaces_.size() << ", ";
-	  os << "|P_in| = "  << net.inputPlaces_.size()    << ", ";
-	  os << "|P_out| = " << net.outputPlaces_.size()   << ", ";
-	  os << "|T| = "     << net.transitions_.size()    << ", ";
-	  os << "|F| = "     << net.arcs_.size();
-	  break;
+            case util::STAT: 
+                os << "|P|= "     << net.internalPlaces_.size()+net.inputPlaces_.size()+net.outputPlaces_.size() << "  ";
+                os << "|P_in|= "  << net.inputPlaces_.size()    << "  ";
+                os << "|P_out|= " << net.outputPlaces_.size()   << "  ";
+                os << "|T|= "     << net.transitions_.size()    << "  ";
+                os << "|F|= "     << net.arcs_.size();
+            break;
 
-	default: assert(false);
-	}
+            default: assert(false);
+        }
 
-      return os;
+        return os;
     }
 
 

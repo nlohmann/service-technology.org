@@ -47,12 +47,12 @@
  *          unused status places, transitions without preset or postset,
  *          dead nodes or initial marked places in choreographies.
  *          Section 2 contains rules from  
- *          "Peter H. Starke - Analyse von Petri-Netz-Modellen" ([STA90]).
+ *          "Peter H. Starke - Analyse von Petri-Netz-Modellen" ([Sta90]).
  *          These rules preserve lifeness and boundedness,
  *          but no k-boundedness.
  *          Section 3 contains rules from "Thomas Pillat - 
  *          Gegenüberstellung struktureller Reduktionstechniken
- *          für Petrinetze" ([PIL08])". These rules preserve lifeness and
+ *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
  * \version \$Revision$
@@ -111,7 +111,6 @@ using namespace pnapi;
  *
  * \post p is removed
  * 
- * \TODO: Fix "is final"
  */
 unsigned int PetriNet::reduce_unused_status_places()
 {
@@ -139,7 +138,8 @@ unsigned int PetriNet::reduce_unused_status_places()
   if (result!=0)
   {
     trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
-  } //*/
+  } 
+  //*/
   
   return result;
 }
@@ -204,7 +204,9 @@ unsigned int PetriNet::reduce_suspicious_transitions()
  * and p is not involved by a final marking (precondition 3)
  * then this place and its postset can be removed. 
  *
- * \return  Number of removed nodes.
+ * \post  t and its postset are removed 
+ * 
+ * \return  number of removed nodes
  * 
  */
 unsigned int PetriNet::reduce_dead_nodes()
@@ -261,14 +263,14 @@ unsigned int PetriNet::reduce_dead_nodes()
           p != deadPlaces.end(); ++p)
     {
       deletePlace(**p);
-      result++;
+      ++result;
     }   
      
     for (set<Transition*>::iterator t = deadTransitions.begin(); 
           t != deadTransitions.end(); ++t)
     {
       deleteTransition(**t);
-      result++;
+      ++result;
     }
             
            
@@ -309,10 +311,15 @@ unsigned int PetriNet::reduce_dead_nodes()
  * 
  * \return  Number of reduced places.
  *
+ * \note  This function is useful in BPEL2oWFN but need to be fixed.
+ *        Hence this rule is temporally removed.
+ * 
  * \todo comment me!
  */
 unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
 {
+  /*
+  
   // trace(TRACE_DEBUG, "[PN]\tApplying rule \"Elimination of unnecessary initial places\"...\n");
   
   set<Place*> redundant_places;
@@ -328,7 +335,7 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
     {
       //Transition *post_transition = static_cast<Transition *> (*((*place)->getPostset().begin()));
       
-      /* FIXME:
+      // FIXME:
       // if the transition in the postset is executed exactly once...
       if ( post_transition->max_occurrences == 1 )
       {
@@ -345,7 +352,7 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
           }
         }
       }
-      */
+      
     }
   }
   
@@ -361,18 +368,22 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
     ++result;
   }
   
+  //*/
+  
   /*
   if (!redundant_places.empty())
     trace(TRACE_DEBUG, "[PN]\t...removed " + toString(redundant_places.size()) + " places.\n");
   //*/
   
-  return result;
+  // return result;
+  
+  return 0;
 }
 
 
 
 /******************************************************************************
- * Functions to structurally simplify the Petri net model according to [STA90]
+ * Functions to structurally simplify the Petri net model according to [Sta90]
  *****************************************************************************/
 
 /*!
@@ -386,7 +397,9 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  * A place is removed by merging its history with this one of 
  * place parallel to it.
  * 
- * \return  Number of removed places.
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * \return  number of removed places
  * 
  * \note  This implementation will not affect isolated places. 
  * 
@@ -401,7 +414,7 @@ unsigned int PetriNet::reduce_rule_3p()
        p1 != internalPlaces_.end(); ++p1)
   { 
     /*
-     * Since parallel places form a equivalence class, each place once
+     * Since parallel places form an equivalence class, each place once
      * identified as parallel to an other place can be ignored.
      */
     if(seenPlaces.find(*p1)!=seenPlaces.end())
@@ -489,10 +502,12 @@ unsigned int PetriNet::reduce_rule_3p()
  * If there exist two parallel transitions t1 and t2 (precondition 1)
  * one of them can be removed.
  *  
- * A transition is removed by merging its history with this one of 
- * transition parallel to it.
+ * A transition is removed by merging its history with this one of
+ * the transition parallel to it.
  * 
- * \return  Number of removed transitions. 
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * \return  number of removed transitions 
  * 
  */
 unsigned int PetriNet::reduce_rule_3t()
@@ -505,7 +520,7 @@ unsigned int PetriNet::reduce_rule_3t()
        t1 != transitions_.end(); ++t1)
   { 
     /*
-     * Since parallel transitions form a equivalence class, 
+     * Since parallel transitions form an equivalence class, 
      * each transition once identified as parallel to 
      * an other transition can be ignored.
      */
@@ -560,7 +575,6 @@ unsigned int PetriNet::reduce_rule_3t()
   }
   
   return result;
-  
 }
 
 
@@ -624,8 +638,10 @@ bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* 
  * The history of p2 will be stored in p1 and the history of
  * t2 will be stored in t1.
  * 
- * \return  Number of removed places (which equals the number 
- *          of removed transitions). 
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * \return  number of removed places (which equals the number 
+ *          of removed transitions) 
  * 
  */
 unsigned int PetriNet::reduce_rule_4()
@@ -765,10 +781,21 @@ bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
  * 
  * Tij will store the history of ti, p and tj'.
  * 
- * \return  Number of removed places. 
+ * If both the preset and the postset of p contain interface transitions
+ * (i.e. transitons connected with interfac places) and keepNormal is true, 
+ * the reduction will be prevented (precondition 10).
+ * 
+ * \param   keepNormal determines wether reduction of a normalized net should
+ *          preserve normalization or not. If true, the reduction will be
+ *          prevented if both the preset and the postset of p contain
+ *          interface transitions.
+ * 
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * \return  number of removed places
  * 
  */
-unsigned int PetriNet::reduce_rule_5()
+unsigned int PetriNet::reduce_rule_5(bool keepNormal)
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
@@ -788,6 +815,36 @@ unsigned int PetriNet::reduce_rule_5()
     set<Arc*> preArcs = (*p)->getPresetArcs();
     set<Node*> postset = (*p)->getPostset();
     set<Arc*> postArcs = (*p)->getPostsetArcs();
+    
+    {
+      // precondition 10
+      if(keepNormal)
+      {
+        bool precond10a = false;
+        bool precond10b = false;
+        
+        // check the preset
+        for(set<Node*>::iterator n = preset.begin();
+              n != preset.end(); ++n)
+          if((*n)->getType() != Node::INTERNAL )
+          {
+            precond10a = true;
+            break;
+          }
+        
+        // check the postset
+        for(set<Node*>::iterator n = postset.begin();
+              n != postset.end(); ++n)
+          if((*n)->getType() != Node::INTERNAL )
+          {
+            precond10b = true;
+            break;
+          }
+        
+        if(precond10a && precond10b)
+          continue;
+      }
+    }
     
     // check for seen transitions
     {
@@ -978,10 +1035,21 @@ unsigned int PetriNet::reduce_rule_5()
  * 
  * Ti will store the history of t, p and ti'.
  * 
- * \return  Number of removed places.
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * If both t is an interface transition and the postset of p contains such
+ * (i.e. transitons connected with interfac places) and keepNormal is true, 
+ * the reduction will be prevented (precondition 8).
+ * 
+ * \param   keepNormal determines wether reduction of a normalized net should
+ *          preserve normalization or not. If true, the reduction will be
+ *          prevented if both t is an interface transition and 
+ *          the postset of p contains such.
+ * 
+ * \return  number of removed places
  *   
  */
-unsigned int PetriNet::reduce_rule_6()
+unsigned int PetriNet::reduce_rule_6(bool keepNormal)
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
@@ -1001,6 +1069,27 @@ unsigned int PetriNet::reduce_rule_6()
       continue;
     
     Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
+    
+    {
+      // precondition 8
+      if(keepNormal)
+      {
+        bool precond10 = false;
+        
+        // check the postset
+        for(set<Node*>::iterator n = (*p)->getPostset().begin();
+              n != (*p)->getPostset().end(); ++n)
+          if((*n)->getType() != Node::INTERNAL )
+          {
+            precond10 = true;
+            break;
+          }
+        
+        if( (t->getType() != Node::INTERNAL ) && 
+            precond10 )
+          continue;
+      }
+    }
     
     // check for seen transitions
     {
@@ -1130,7 +1219,9 @@ unsigned int PetriNet::reduce_rule_6()
  * than this place can be removed as well as each transition 
  * becoming isolated by this reduction.
  * 
- * \return  Number of removed places.
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * \return  number of removed places
  * 
  * \todo: How to handle the history of removed places and transitions?
  *   
@@ -1210,7 +1301,9 @@ unsigned int PetriNet::reduce_rule_7()
  * the arc weight from p to t (precondition 5)
  * than t can be removed.
  * 
- * \return  Number of removed places.
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
+ * 
+ * \return  number of removed places
  * 
  * \todo: How to handle the history of removed transitions?
  *  
@@ -1325,18 +1418,30 @@ unsigned int PetriNet::reduce_rule_8()
  * 
  * T'' will store the history of t', p and t.
  * 
- * \return  Number of removed places.
+ * \post  this rule preserves lifeness and boundedness according to [Sta90]
  * 
- * \note  Precondition 2a is not from [STA90].
+ * If both the preset of p contains interface transitions and t is an
+ * interface transition (i.e. transitons connected with interfac places) 
+ * and keepNormal is true, the reduction will be prevented (precondition 6).
+ * 
+ * \param   keepNormal determines wether reduction of a normalized net should
+ *          preserve normalization or not. If true, the reduction will be
+ *          prevented if both the preset of p contains interface transitions 
+ *          and t is an interface transition.
+ * 
+ * \return  number of removed places
+ * 
+ * \note  Precondition 2a is not from [Sta90].
  * 
  */
-unsigned int PetriNet::reduce_rule_9()
+unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 {
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
   
   // transitions must not be in more than one reduction at once
   map<Node*,bool> seenTransitions;
+  
   for(set<Transition*>::iterator t = transitions_.begin();
       t != transitions_.end(); ++t)
     seenTransitions[*t]=false;
@@ -1345,7 +1450,29 @@ unsigned int PetriNet::reduce_rule_9()
   for (set<Place*>::iterator p = internalPlaces_.begin(); 
        p != internalPlaces_.end(); ++p)
   {
-    { // check for seen Transitions
+    { 
+      {
+        // precondition 6
+        if(keepNormal)
+        {
+          bool precond10 = false;
+          
+          // check the preset
+          for(set<Node*>::iterator n = (*p)->getPreset().begin();
+                n != (*p)->getPreset().end(); ++n)
+            if((*n)->getType() != Node::INTERNAL )
+            {
+              precond10 = true;
+              break;
+            }
+          
+          if( ((*((*p)->getPostset().begin()))->getType() != Node::INTERNAL ) && 
+              precond10 )
+            continue;
+        }
+      }
+      
+      // check for seen Transitions
       bool seen = seenTransitions[*((*p)->getPostset().begin())];
       for(set<Node*>::iterator t = (*p)->getPreset().begin();
           t != (*p)->getPreset().end(); ++t)
@@ -1459,7 +1586,7 @@ unsigned int PetriNet::reduce_rule_9()
 
 
 /******************************************************************************
- * Functions to structurally simplify the Petri net model according to [PIL08]
+ * Functions to structurally simplify the Petri net model according to [Pil08]
  *****************************************************************************/
 
 
@@ -1476,9 +1603,10 @@ unsigned int PetriNet::reduce_rule_9()
  * then p1 can be removed and its history will 
  * be attached to the history of p2.
  * 
- * See [PIL08], def. 3.3. 
+ * \post  this rule preserves lifeness and k-boundedness
+ *        according to [Pil08], def. 3.3. 
  * 
- * \return  Number of removed places.
+ * \return  number of removed places
  * 
  */
 unsigned int PetriNet::reduce_identical_places()
@@ -1652,9 +1780,10 @@ unsigned int PetriNet::reduce_identical_places()
  * other than 1 (precondition 4),
  * then t1 can be removed and its history will be stored at t2.
  * 
- * See [PIL08], def. 5.4.
+ * \post  this rule preserves lifeness and k-boundedness
+ *        according to [Pil08], def. 5.4.
  * 
- * \return  Number of removed transitions.
+ * \return  number of removed transitions
  * 
  */
 unsigned int PetriNet::reduce_identical_transitions()
@@ -1835,9 +1964,10 @@ unsigned int PetriNet::reduce_identical_transitions()
  * the postset of q will be connected with p in the same way it
  * was connected to q, and t and q will be removed.
  * 
- * See [PIL08], def. 4.46.
+ * \post  this rule preserves lifeness and k-boundedness
+ *        according to [Pil08], def. 4.46.
  * 
- * \return  Number of removed transitions.
+ * \return  number of removed transitions
  * 
 */
 unsigned int PetriNet::reduce_series_places()
@@ -1925,137 +2055,186 @@ unsigned int PetriNet::reduce_series_places()
 /*!
  * \brief Fusion of series transition (RA2):
  *
- * If there exists a place with singleton preset and postset (precondition 1),
+ * If there exists a place p with singleton preset t1 and postset t2 (precondition 1),
  * which is not final or marked (precondition 2),
- * and if the transition in its postset has no other incoming arcs (precondition 3),
- * and if the preset's postset and the postset's postset are distinct (precondition 4),
- * then the preset and the postset can be merged and the place can be removed.
+ * and if t2 has no other incoming arcs (precondition 3),
+ * and if the postsets of t1 and t2 are distinct (precondition 4),
+ * and the arc weight from t1 to p and from p to t2 is 1 (precondition 5),
+ * then the following reduction can be applied:
+ * 1.:  A new transition t will be created and connected with the preset of
+ *      t1 and the postsets of t1 and t2 according to the appropriate
+ *      arc weights of t1 or t2 to their postplaces.
+ * 2.:  T1, p and t2 will be removed.
  * 
- * This reduction preserves liveness and boundedness (Pillat2008, def. 4.31). 
+ * T stores the history of t1, p and t2. 
+ * 
+ * \post  this rule preserves lifeness and k-boundedness
+ *        according to [Pil08], def. 4.31.
  * 
  * If both the pretransition and the posttransition are connected with an
- * interface place and keepNormal is true, the reduction will be prevented (precondition 5)
- *
+ * interface place and keepNormal is true, the reduction will be prevented (precondition 6)
  * 
  * \param   keepNormal determines wether reduction of a normalized net should
  *          preserve normalization or not. If true, interface transitions
  *          (i.e. transitions connected with interface places) will only be
  *          merged with internal transitions (i.e. transitions connected
- *          with internal places only). 
+ *          with internal places only).
  * 
- * \todo
- *       - Overwork the preconditions and postconditions.
- *       - Re-organize the storing and removing of nodes.
- *       ???? What about initially marked and final places ????
+ * \return  number of removed places 
  * 
- *
  */
 unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
     // trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
-    int result=0;
 
-    set<string> uselessPlaces;
-    set<pair<string, string> > transitionPairs;
+    set<Place*> uselessPlaces;
+    
+    // transitions must not be involved in more than one reduction at once
+    map<Node*,bool> seenTransitions;
+    
+    for(set<Transition*>::iterator t = transitions_.begin();
+          t != transitions_.end(); ++t)
+      seenTransitions[*t] = false;
 
-    // iterate the places
-    for (set<Place*>::iterator p = places_.begin(); p != places_.end(); p++) {
-        if (((*p)->getPostset().size() == 1) && //precondition 1
-            ((*p)->getPreset().size() == 1) && //precondition 1
-            //FIXME: (!(*p)->isFinal) && // precondition 2
-            (!(*p)->getTokenCount() > 0) ) // precondition 2
+    // iterate the internal places
+    for (set<Place*>::iterator p = internalPlaces_.begin(); 
+          p != internalPlaces_.end(); ++p) 
+    {
+      if ( ((*p)->getPostset().size() == 1) && //precondition 1
+           ((*p)->getPreset().size() == 1) && //precondition 1
+           //FIXME: (!(*p)->isFinal) && // precondition 2
+            (!((*p)->getTokenCount() > 0)) ) // precondition 2
+      {
+        Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
+        Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
+
+        // check for seen transitions
+        if( seenTransitions[t1] || seenTransitions[t2])
+          continue;
+        
+        if ( (t2->getPreset().size() == 1) && // precondition 3
+             (util::setIntersection(t1->getPostset(),t2->getPostset()).empty() ) && // precondition 4
+             (!( (t1->getType() != Node::INTERNAL) && 
+                 (t2->getType() != Node::INTERNAL) && 
+                 (keepNormal)) ) && //precondition 4
+             ((*((*p)->getPresetArcs().begin()))->getWeight() != 1) && // precondition 5
+             ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) ) // precondition 5
         {
-            Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
-            Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
-
-            if (((t2)->getPreset().size() == 1) && // precondition 3
-		(util::setIntersection(t1->getPostset(),t2->getPostset()).empty() ) && // precondition 4
-		(!((t1->getType() != Node::INTERNAL) && 
-		   (t2->getType() != Node::INTERNAL) && 
-                  (keepNormal))) ) //precondition 5
-            {
-                string id1 = (t1->getName());
-                string id2 = (t2->getName());
-                transitionPairs.insert(pair<string, string>(id1, id2));
-                uselessPlaces.insert(((*p)->getName()));
-            }
+            uselessPlaces.insert(*p);
+            seenTransitions[t1] = true;
+            seenTransitions[t2] = true;
         }
+      }
     }
+    
+  // apply reduction
+  unsigned int result = 0;
+  
+  for (set<Place*>::iterator p = uselessPlaces.begin(); 
+        p != uselessPlaces.end(); ++p) 
+  {
+    // create new transition
+    Transition* t = &createTransition();
+    
+    Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
+    Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
+    
+    // save history
+    t->mergeNameHistory(*t1);
+    t->mergeNameHistory(**p);
+    t->mergeNameHistory(*t2);
+    
+    // copy preset
+    for(set<Arc*>::iterator a = t1->getPresetArcs().begin();
+          a != t1->getPresetArcs().end(); ++a)
+      createArc((*a)->getSourceNode(),*t,(*a)->getWeight());
+    
+    // copy postset
+    for(set<Arc*>::iterator a = t1->getPostsetArcs().begin();
+          a != t1->getPostsetArcs().end(); ++a)
+      createArc(*t,(*a)->getTargetNode(),(*a)->getWeight());
+    
+    for(set<Arc*>::iterator a = t2->getPostsetArcs().begin();
+          a != t2->getPostsetArcs().end(); ++a)
+      createArc(*t,(*a)->getTargetNode(),(*a)->getWeight());
+    
+    // delete place
+    deletePlace(**p);
+    
+    // delete transitions
+    deleteTransition(*t1);
+    deleteTransition(*t2);
+    
+    ++result;
+  }
 
-    // remove useless places
-    for (set<string>::iterator label = uselessPlaces.begin(); label
-                    != uselessPlaces.end(); label++) {
-        Place *uselessPlace = findPlace(*label);
-        deletePlace(*uselessPlace);
-    }
-
-    // merge transition pairs
-    for (set<pair<string, string> >::iterator transitionPair =
-                    transitionPairs.begin(); transitionPair
-                    != transitionPairs.end(); transitionPair++) {
-        Transition* t1 = findTransition(transitionPair->first);
-        Transition* t2 = findTransition(transitionPair->second);
-        t1->merge(*t2);
-	deleteTransition(*t2);
-        result++;
-    }
-    //if (result!=0)
-    // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+  /*
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+  //*/
+  
+  return result;
 }
 
 
 /*!
- * Elimination of self-loop places (ESP) as depicted in [Murrata89]. The rule
- * preserves liveness, safeness and boundedness.
+ * Elimination of self-loop places (ESP) as depicted in [Murrata89]. 
+ * The rule preserves liveness, safeness and boundedness.
  *
- * \note As \f$ p \f$ has both ingoing and outgoing arcs, \f$ p \f$ is an
+ * \note As p has both ingoing and outgoing arcs, p is an
  *       internal place. Thus, removing this place preserves controllability
- *       and all communicating partners if \f$ p \f$ is not covered by a final
+ *       and all communicating partners if p is not covered by a final
  *       marking. 
  *
  * \return number of removed places
  * 
- * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
- * \pre \f$ p \f$ is initially marked: \f$ m_0(p) > 0 \f$
- * \pre \f$ p \f$ has one transition in its preset and one transition in its postset: \f$ |{}^\bullet p| = 1 \f$, \f$ |p^\bullet| = 1 \f$
- * \pre \f$ p \f$'s preset and postset are equal: \f$ p^\bullet = {}^\bullet p \f$
+ * \pre p is a place of the net
+ * \pre p is initially marked (with exactly one token)
+ * \pre p has one transition in its preset and one transition in its postset
+ * \pre p's preset and postset are equal
  *
- * \post \f$ p \f$ is removed: \f$ P' = P \; \backslash \; \{p\} \f$
+ * \post p is removed
  * 
  * Extension by arc weights:
  * If there exists a place p with singleton preset t (precondition 1),
  * where the preset is identical to the postset (precondition 2),
- * and the arc weights of (p->t) and (t->p) is equal (precondition 3),
- * and p stores initially at least as many tokens as given by the arc weights (precondition 4),
+ * and the arc weights of (p->t) and (t->p) is 1 (precondition 3),
+ * and p stores initially 1 token (precondition 4),
  * and p is not final (precondition 5),
  * then this place can be removed.
  * 
+ * \todo: How to handle the history of removed transitions?
  * 
  */
 unsigned int PetriNet::reduce_self_loop_places()
 {
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RC1 (Elimination of self-loop places)...\n");
-  list<Place *> self_loop_places;
-  unsigned int result = 0;
+  set<Place *> self_loop_places;
   
   // find places fulfilling the preconditions
-  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
+  for (set<Place *>::iterator p = internalPlaces_.begin(); 
+        p != internalPlaces_.end(); ++p)
     if ( ((*p)->getPreset().size() == 1) &&       // precondition 1
          ((*p)->getPreset() == (*p)->getPostset()) &&  // precodnition 2
-         (sameweights(*p)) &&                // precondition 3
-         ((*p)->getTokenCount() >= findArc(**p,**((*p)->getPreset().begin()))->getWeight()) )//&& // precondition 4
+         ((*((*p)->getPresetArcs().begin()))->getWeight() == 1) && // precondition 3
+         ((*((*p)->getPostsetArcs().begin()))->getWeight() == 1) && // precondition 3
+         ((*p)->getTokenCount() == 1 ) ) // precondition 4
          //FIXME: (!(*p)->isFinal) ) // precondition 5
-	 self_loop_places.push_back(*p);
+      self_loop_places.insert(*p);
   
   // remove useless places
-  for (list<Place *>::iterator p = self_loop_places.begin(); p != self_loop_places.end(); p++)
-    if (places_.find(*p) != places_.end())
-    {
-      deletePlace(**p);
-      result++;
-    }
+  unsigned int result = 0;
+  
+  for (set<Place*>::iterator p = self_loop_places.begin(); 
+        p != self_loop_places.end(); ++p)
+  {
+    deletePlace(**p);
+    ++result;
+  }
       
-      //if (result!=0)
-        // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+  /*
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+  //*/
   
   return result;
 }
@@ -2065,21 +2244,21 @@ unsigned int PetriNet::reduce_self_loop_places()
 
 
 /*!
- * Elimination of self-loop transitions (EST) as depicted in [Murrata89]. The
- * rule preserves liveness, safeness and boundedness.
+ * Elimination of self-loop transitions (EST) as depicted in [Murrata89].
+ * The rule preserves liveness, safeness and boundedness.
  *
- * \note As the place in \f$ t \f$'s preset/postset has ingoing and outgoing
- *       arcs, it is an internal place. Thus, \f$ t \f$ does not communicate
+ * \note As the place in t's preset/postset has ingoing and outgoing
+ *       arcs, it is an internal place. Thus, t does not communicate
  *       and its removal does not affect controllability or the set of
  *       communicating partners.
  *
  * \return number of removed transitions
  * 
- * \pre \f$ t \f$ is a transition of the net: \f$ t \in T \f$
- * \pre \f$ t \f$ has one place in its preset and one place in its postset: \f$ |{}^\bullet t| = 1 \f$, \f$ |t^\bullet| = 1 \f$
- * \pre \f$ t \f$'s preset and postset are equal: \f$ t^\bullet = {}^\bullet t \f$
+ * \pre t is a transition of the net
+ * \pre t has one place in its preset and one place in its postset
+ * \pre t's preset and postset are equal
  *
- * \post \f$ t \f$ is removed: \f$ T' = T \; \backslash \; \{t\} \f$
+ * \post t is removed
  * 
  * Extension by arc weights:
  * If there exists a transition t with singleton preset p (precondition 1),
@@ -2087,32 +2266,38 @@ unsigned int PetriNet::reduce_self_loop_places()
  * and the arc weights both of (p->t) and of (t->p) is equal to 1 (precondition 3),
  * then this transition can be removed.
  * 
+ * \todo: How to handle the history of removed transitions?
  * 
  */
 unsigned int PetriNet::reduce_self_loop_transitions()
 {
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RC1 (Elimination of self-loop transitions)...\n");
-  list<Transition *> self_loop_transitions;
-  unsigned int result = 0;
+  set<Transition*> self_loop_transitions;
   
   // find transitions fulfilling the preconditions
-  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+  unsigned int result = 0;
+  
+  for (set<Transition*>::iterator t = transitions_.begin(); 
+        t != transitions_.end(); ++t)
     if ( ((*t)->getPreset().size() == 1) &&        // precondition 1
          ((*t)->getPreset() == (*t)->getPostset()) &&   // precondition 2
-         (findArc(**t,**((*t)->getPreset().begin()))->getWeight() == 1) &&  // precondition 3
-         (findArc(**((*t)->getPreset().begin()),**t)->getWeight() == 1) )  // precondition 3
-        self_loop_transitions.push_back(*t);
+         ((*((*t)->getPresetArcs().begin()))->getWeight() == 1) &&  // precondition 3
+         ((*((*t)->getPostsetArcs().begin()))->getWeight() == 1) )  // precondition 3
+        self_loop_transitions.insert(*t);
   
   // remove useless transitions
-  for (list<Transition *>::iterator t = self_loop_transitions.begin(); t != self_loop_transitions.end(); t++)
-    if (transitions_.find(*t) != transitions_.end())
-    {
-      deleteTransition(**t);
-      result++;
-    }
+  for (set<Transition*>::iterator t = self_loop_transitions.begin(); 
+        t != self_loop_transitions.end(); ++t)
+  {
+    deleteTransition(**t);
+    ++result;
+  }
       
-      //if (result!=0)
-        // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+  /*
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+  //*/
+  
   return result;
 }
 
@@ -2132,10 +2317,12 @@ unsigned int PetriNet::reduce_self_loop_transitions()
  * Added precondition 0, which ensures that the place which is going to be removed is not an input
  * place.
  * 
+ * \note  postponed until references are available
  *
  */
 unsigned int PetriNet::reduce_equal_places()
 {
+  /*
   
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RD1 (elimination of equal places)...\n");
   int result=0;
@@ -2184,7 +2371,7 @@ unsigned int PetriNet::reduce_equal_places()
       //if (postSetT1 != postSetT2) //precondition 5
       //  continue;
       
-      /* FIXME
+      // FIXME
       set<Node*> preSetT1 = (t1)->preset;
       set<Node*> preSetT2 = (t2)->preset;
       
@@ -2193,7 +2380,7 @@ unsigned int PetriNet::reduce_equal_places()
       
       if (preSetT1 != preSetT2) //precondition 5
         continue;
-      */
+      
       
       string id1 = ((p1)->getName());
       string id2 = ((*p2)->getName());
@@ -2212,7 +2399,7 @@ unsigned int PetriNet::reduce_equal_places()
     }
   }
   
-  /*
+  
    // Testing all preconditions
    for (set<Place*>::iterator p1 = places_.begin(); p1 != places_.end(); p1++)
    {
@@ -2274,7 +2461,7 @@ unsigned int PetriNet::reduce_equal_places()
        }
      }
    }
-   */
+   
   
   
   for (set<pair<string, string> >::iterator labels = placePairs.begin();
@@ -2311,8 +2498,15 @@ unsigned int PetriNet::reduce_equal_places()
     deleteTransition(*findTransition(trans_id)); 
     result++;   
   }
-  //if (result!=0)
-    // trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+  
+  */
+  
+  /*
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+  //*/
+  
+  return 0;
 }
 
 
@@ -2328,7 +2522,8 @@ unsigned int PetriNet::reduce_equal_places()
  *  - unused status places
  *  - suspicious transitions
  *
- * Applys some simple structural reduction rules for Petri nets:
+ * Applys some simple structural reduction rules for Petri nets
+ * preserving boundedness and lifeness (but no k-boundedness):
  *  - elimination of parallel places (rule_3p)
  *  - elimination of parallel transitions (rule_3t)
  *  - elimination of equal places (rule_4)
@@ -2337,81 +2532,247 @@ unsigned int PetriNet::reduce_equal_places()
  *  - elimination of self-loop places (rule_7)
  *  - elimination of self-loop transitions (rule_8)
  * 
- * Functions are named by the appropriate rule in [STA90].
+ * Functions are named by the appropriate rule in [Sta90].
+ * 
+ * Fuctions preserving k-boundedness in addition according to 
+ * [Pil08] and [Murate89] are named by their behavior.
  *
- * The rules are applied until a fixed point (i.e. the number of places,
- * transitions and arcs does not change) is reached.
+ * The rules are applied until a fixed point is reached.
  *
  * \return the number of passes until a fixed point was reached
- *
- * \param   keepNormal determines wether reduction of a normalized net should
- *          preserve normalization or not. If true, interface transitions
+ * 
+ * \param   reduction_mode determines, how the reduction_level will be
+ *          interpreted. The first two bits will be read as followed:
+ *          0 - "Classic" reduction as in the former api only using the
+ *              pillat rules
+ *          1 - Reduction rules are applied setwise. 
+ *              See reduction_level for details.
+ *          2 - Full control over every single reduction rule.
+ *          The third bit determines wether or not a normalized
+ *          net should be kept normal. If set interface transitions
  *          (i.e. transitions connected with interface places) will only be
  *          merged with internal transitions (i.e. transitions connected
- *          with internal places only). 
+ *          with internal places only).
+ * 
+ * \param   reduction_level determines which rules will be performed.
+ *          Interpretation depends on reduction_mode.
+ *          In reduction_mode 0:
+ *          0 - Nothing will be done.
+ *          1 - Dead nodes will be removed.
+ *          2 - Unused statusplaces and suspicious transitions 
+ *              will be removed. (BPEL2oWFN only)
+ *          3 - Identical nodes will be removed.
+ *          4 - Series nodes will be removed.
+ *          5 - Self-loop nodes will be removed as well as
+ *              initially marked places in choreographies.
+ *          6 - Equal places will be removed.
+ *          (A higher level of reduction implies all reduction
+ *            rules from lower levels.)
+ *          
+ *          In reduction_mode 1:
+ *          0           - Nothing will be done.
+ *          1st bit set - Unneccessary nodes will be removed.
+ *          2nd bit set - Rules mentioned in [Pil08] and 
+ *                        [Murate89] will be applied.
+ *          3rd bit set - Rules mentioned in [Sta90] will be applied.
+ * 
+ *          In reduction_mode 2:
+ *          Each bit controls a particular rule:
+ *           1st - unused status places
+ *           2nd - suspicious transitions 
+ *           3rd - dead nodes
+ *           4th - initially marked places in choreographies
+ *           5th - Starke rule 3 for places
+ *           6th - Starke rule 3 for transitions
+ *           7th - Starke rule 4
+ *           8th - Starke rule 5
+ *           9th - Starke rule 6
+ *          10th - Starke rule 7
+ *          11th - Starke rule 8
+ *          12th - Starke rule 9
+ *          13th - identical places
+ *          14th - identical transitions
+ *          15th - series places
+ *          16th - series transitions
+ *          17th - self-loop places
+ *          18th - self-loop transitions
+ *          19th - equal places        
+ *  
  * 
  */
-unsigned int PetriNet::reduce(unsigned int reduction_level, bool keepNormal)
+unsigned int PetriNet::reduce(unsigned int reduction_level, unsigned int reduction_mode)
 {
   // trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   // trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
   
-  //string old = information();
-  bool done = false;
-  unsigned int passes = 1;
+  unsigned int mode = 0;
+  bool keepNormal = ((reduction_mode & 4) == 4);
   
-  while (!done)
+  // initialisation
+  switch(reduction_mode & 3)
+  {
+  case 0: 
   {
     if (reduction_level >= 1)
     {
-      reduce_dead_nodes();
+      mode += 4;
     }
     
     if (reduction_level >= 2)
     {
-#ifdef USING_BPEL2OWFN
-      reduce_unused_status_places();
-      reduce_suspicious_transitions();
-#endif
+      mode += 3;
     }
     
     if (reduction_level >= 3)
     {
-      reduce_identical_places();	// RB1
-      reduce_identical_transitions();	// RB2
+      mode += 12288;
     }
     
     if (reduction_level >= 4)
     {
-      reduce_series_places();		// RA1
-      reduce_series_transitions(keepNormal);	// RA2
+      mode += 49152;
     }
     
-    if (reduction_level == 5)
+    if (reduction_level >= 5)
     {
-      reduce_self_loop_places();	// RC1
-      reduce_self_loop_transitions();	// RC2
-      // no murata rule
-      // reduce_remove_initially_marked_places_in_choreographies();
+      mode += 196616;
     }
     
-    /* no murata rule
-    if (reduction_level == 6)
+    if (reduction_level >= 6)
     {
-      reduce_equal_places();		// RD1
+      mode += 262144;
     }
-    //*/
+  }; break;
+  case 1:
+  {
+    if ((reduction_level & 1) == 1)
+    {
+      mode += 15;
+    }
     
+    if ((reduction_level & 2) == 2)
+    {
+      mode += 520192;
+    }
     
-    // trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
+    if ((reduction_level & 4) == 4)
+    {
+      mode += 4080;
+    }
     
-    //done = (old == information());
-    //old = information();
+  }; break;
+  case 2:
+  {
+    mode = reduction_level;
+  }; break;
+  default: return 0;
   }
   
+  unsigned int done = 1;
+  unsigned int passes = 0;
   
-  // trace(TRACE_INFORMATION, "Simplifying complete.\n");
-  // trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
+  
+  // apply reductions
+  while (done > 0)
+  {
+    done = 0;
+    ++passes;
+
+#ifdef USING_BPEL2OWFN
+    if ((mode & 1) == 1)
+    {
+      done += reduce_unused_status_places();
+    }
+    if ((mode & 2) == 2)
+      done += reduce_suspicious_transitions();
+    }
+#endif
+    
+    if ((mode & 4) == 4)
+    {
+      done += reduce_dead_nodes();
+    }
+    
+    if ((mode & 8) == 8)
+    {
+      done += reduce_remove_initially_marked_places_in_choreographies();
+    }
+    
+    if ((mode & 16) == 16)
+    {
+      done += reduce_rule_3p();
+    }
+     
+    if ((mode & 32) == 32)
+    {
+      done += reduce_rule_3t();
+    }
+    
+    if ((mode & 64) == 64)
+    {
+      done += reduce_rule_4();
+    }
+     
+    if ((mode & 128) == 128)
+    {
+      done += reduce_rule_5(keepNormal);
+    }
+    
+    if ((mode & 256) == 256)
+    {
+      done += reduce_rule_6(keepNormal);
+    }
+    
+    if ((mode & 512) == 512)
+    {
+      done += reduce_rule_7();
+    }
+    
+    if ((mode & 1024) == 1024)
+    {
+      done += reduce_rule_8();
+    }
+    
+    if ((mode & 2048) == 2048)
+    {
+      done += reduce_rule_9(keepNormal);
+    }
+    
+    if ((mode & 4096) == 4096)
+    {
+      done += reduce_identical_places();  // RB1
+    }
+    
+    if ((mode & 8192) == 8192)
+    {
+      done += reduce_identical_transitions(); // RB2
+    }
+    
+    if ((mode & 16384) == 16384)
+    {
+      done += reduce_series_places();   // RA1
+    }
+    
+    if ((mode & 32768) == 32768)
+    {
+      done += reduce_series_transitions(keepNormal);  // RA2
+    }
+    
+    if ((mode & 65536) == 65536)
+    {
+      done += reduce_self_loop_places();  // RC1
+    }
+    
+    if ((mode & 131072) == 131072)
+    {
+      done += reduce_self_loop_transitions(); // RC2
+    }
+    
+    if ((mode & 262144) == 262144)
+    {
+      done += reduce_equal_places();    // RD1
+    }
+  }
   
   return passes;
 }

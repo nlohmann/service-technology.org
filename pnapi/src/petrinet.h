@@ -202,7 +202,7 @@ namespace pnapi
     void normalize();
 
     /// applies structral reduction rules
-    unsigned int reduce(unsigned int = 5, bool = false);
+    unsigned int reduce(unsigned int reduction_level = 5, unsigned int reduction_mode = 0);
 
     /// produces a second constraint oWFN
     void produce(const PetriNet &);
@@ -367,10 +367,10 @@ namespace pnapi
     bool reduce_singletonPreset(const std::set<Node*> & nodes);
     
     /// fusion of pre- with posttransition (m to n)
-    unsigned int reduce_rule_5();
+    unsigned int reduce_rule_5(bool keepNormal);
     
     /// fusion of pre- with posttransition (1 to n)
-    unsigned int reduce_rule_6();
+    unsigned int reduce_rule_6(bool keepNormal);
     
     /// elimination of self-loop places
     unsigned int reduce_rule_7();
@@ -379,7 +379,7 @@ namespace pnapi
     unsigned int reduce_rule_8();
     
     /// fusion of pre- with postplaces
-    unsigned int reduce_rule_9();
+    unsigned int reduce_rule_9(bool keepNormal);
 
     /// elimination of identical places
     unsigned int reduce_identical_places();

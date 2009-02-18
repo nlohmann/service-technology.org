@@ -1,3 +1,9 @@
+#ifndef NDEBUG
+#include <iostream>
+using std::cout;
+using std::endl;
+#endif
+
 #include <cassert>
 #include <sstream>
 #include <iostream>
@@ -92,11 +98,19 @@ namespace pnapi
 	mergeData(node);
       }
 
-      Node::Node(Type type, Node * data, Node * list) :
+      Node::Node(Type type, Node * node1, Node * node2) :
 	type(type)
       {
-	mergeData(data);
-	mergeChildren(list);
+	if (type == FORMULA_OR || type == FORMULA_AND)
+	  {
+	    addChild(node1);
+	    addChild(node2);
+	  }
+	else
+	  {
+	    mergeData(node1);
+	    mergeChildren(node2);
+	  }
       }
 
       Node::Node(Type type, Node * data, Node * node1, Node * node2) :
@@ -117,22 +131,14 @@ namespace pnapi
 	assert(node != NULL);
 	assert(node->type == DATA_NUMBER || node->type == DATA_IDENTIFIER);
 
-	switch (type)
-	  {
-	  case PLACE:
-	  case TRANSITION:
-	  case MARK:
-	  case ARC:
-	    if (node->type != DATA_NUMBER)
-	      identifier = node->identifier;
-	    else
-	      { stringstream ss; ss << node->number; identifier = ss.str(); }
-	    break;
+	if (type == CAPACITY)
+	  *this = *node;
+	else
+	  if (node->type != DATA_NUMBER)
+	    identifier = node->identifier;
+	  else
+	    { stringstream ss; ss << node->number; identifier = ss.str(); }
 
-	  case CAPACITY: *this = *node; break;
-
-	  default: assert(false);
-	  }
 	delete node;
       }
 
@@ -148,6 +154,11 @@ namespace pnapi
 
       Parser::Parser() :
 	parser::Parser<Node>(node, owfn::parse)
+      {
+      }
+
+      Visitor::Visitor() :
+	finalMarking_(net_)
       {
       }
 
@@ -196,10 +207,21 @@ namespace pnapi
 	      p->second.port = port_;
 	      break;
 	    }
+
+	  case INITIALMARKING: 
+	    isInitial_ = true;  
+	    break;
+	  case FINALMARKING:   
+	    isInitial_ = false; 
+	    finalMarking_ = Marking(net_, false, true);
+	    break;
 	  case MARK:  
 	    node.check(places_.find(node.identifier) != places_.end(),
 		       node.identifier, "unknown place");
-	    places_[node.identifier].marking = node.number; 
+	    if (isInitial_)
+	      places_[node.identifier].marking = node.number;
+	    else
+	      finalMarking_[*net_.findPlace(node.identifier)] = node.number;
 	    break;
 
 	  case PRESET:  isPreset_ = true;  break;
@@ -220,35 +242,41 @@ namespace pnapi
 	      }
 	    break;
 
-	    /*
+	  case FORMULA_TRUE:  formulas_.push_back(new FormulaTrue);  break;
+	  case FORMULA_FALSE: formulas_.push_back(new FormulaFalse); break;
+
 	  case FORMULA_EQ:
 	  case FORMULA_NE:
 	  case FORMULA_LT:
 	  case FORMULA_GT:
 	  case FORMULA_GE:
 	  case FORMULA_LE:
-	    place = net_.findPlace(node.identifier);
-	    nTokens = node.number;
-	    switch (node.type)
-	      {
-	      case FORMULA_EQ:
-		formula = new FormulaEqual(*place, nTokens); break;
-	      case FORMULA_NE:
-		formula = new FormulaNot(*new FormulaEqual(*place, nTokens));
-		break;
-	      case FORMULA_LT:
-		formula = new FormulaLess(*place, nTokens); break;
-	      case FORMULA_GT:
-		formula = new FormulaGreater(*place, nTokens); break;
-	      case FORMULA_GE:
-		formula = new FormulaGreaterEqual(*place, nTokens); break;
-	      case FORMULA_LE:
-		formula = new FormulaLessEqual(*place, nTokens); break;
-	      default: empty  ;
-	      }
-	    formulas_.push_back(formula);
-	    break;
-	    */
+	    {
+	      Place * place;
+	      unsigned int nTokens;
+	      Formula * formula;
+	      place = net_.findPlace(node.identifier);
+	      nTokens = node.number;
+	      switch (node.type)
+		{
+		case FORMULA_EQ:
+		  formula = new FormulaEqual(*place, nTokens); break;
+		case FORMULA_NE:
+		  formula = new Negation(FormulaEqual(*place, nTokens));
+		  break;
+		case FORMULA_LT:
+		  formula = new FormulaLess(*place, nTokens); break;
+		case FORMULA_GT:
+		  formula = new FormulaGreater(*place, nTokens); break;
+		case FORMULA_GE:
+		  formula = new FormulaGreaterEqual(*place, nTokens); break;
+		case FORMULA_LE:
+		  formula = new FormulaLessEqual(*place, nTokens); break;
+		default: assert(false);
+		}
+	      formulas_.push_back(formula);
+	      break;
+	    }
 
 	  default: /* empty */ ;
 	  }
@@ -263,6 +291,9 @@ namespace pnapi
 		 it != places_.end(); ++it)
 	      net_.createPlace(it->first, it->second.type, it->second.marking,
 			       it->second.capacity, it->second.port);
+	    break;
+	  case FINALMARKING:
+	    net_.finalCondition().addMarking(finalMarking_);
 	    break;
 
 	  case TRANSITION:
@@ -289,37 +320,40 @@ namespace pnapi
 	      break;
 	    }
 
-	    /*
 	  case FORMULA_NOT:
-	    if (formulas_.size() < 1)
-	      assert(false); // FIXME
-	      //throw string("operand for unary NOT operator expected");
-	    formulas_.push_back(new FormulaNot(*formulas_.front()));
-	    formulas_.pop_front();
+	    node.check(formulas_.size() > 0, "", "NOT must have an operand");
+	    formulas_.push_back(new Negation(*formulas_.front()));
+	    delete formulas_.front(); formulas_.pop_front();
 	    break;
 	  case FORMULA_AND:
 	  case FORMULA_OR:
 	    {
-	      if (formulas_.size() < 2)
-		assert(false); // FIXME
-		//throw string("two operands for binary AND/OR operator expected");
+	      node.check(formulas_.size() > 1, "", 
+			 "AND/OR must have two operands");
 	      Formula * op1 = formulas_.front(); formulas_.pop_front();
 	      Formula * op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;
 	      if (node.type == FORMULA_AND)
-		f = new FormulaAnd(*op1, *op2);
+		f = new Conjunction(*op1, *op2);
 	      else
-		f = new FormulaOr(*op1, *op2);
+		f = new Disjunction(*op1, *op2);
 	      formulas_.push_back(f);
+	      delete op1;
+	      delete op2;
 	      break;
 	    }
 
 	  case FORMULA_AAOPE:
 	  case FORMULA_AAOIPE:
 	  case FORMULA_AAOEPE:
-	    assert(false);
+	    assert(false); // FIXME
 	    break;
-	    */
+
+	  case CONDITION:
+	    assert(formulas_.size() == 1);
+	    net_.finalCondition() = *formulas_.front();
+	    delete formulas_.front();
+	    break;
 
 	  default: /* empty */ ;
 	  }

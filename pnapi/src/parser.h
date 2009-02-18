@@ -18,6 +18,7 @@
 
 #include "component.h"
 #include "petrinet.h"
+#include "marking.h"
 
 namespace pnapi
 {
@@ -163,6 +164,7 @@ namespace pnapi
   // forward declarations
   class PetriNet;
   class Place;
+  class Marking;
 
   namespace parser
   {
@@ -213,7 +215,7 @@ namespace pnapi
 	{ 
 	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
 	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
-	  INITIALMARKING, FINALMARKING, MARK,
+	  INITIALMARKING, FINALMARKING, MARK, CONDITION,
 	  TRANSITION, ARC, PRESET, POSTSET, 
 	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
 	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT, 
@@ -267,6 +269,8 @@ namespace pnapi
       class Visitor : public parser::Visitor<Node>
       {
       public:
+	Visitor();
+	
 	PetriNet getPetriNet() const;
 	
 	void beforeChildren(const Node &);
@@ -292,6 +296,8 @@ namespace pnapi
 	bool isPreset_;
 	std::map<std::string, unsigned int> preset_, postset_;
 	std::deque<formula::Formula *> formulas_;
+	bool isInitial_;
+	Marking finalMarking_;
       };
 
     }

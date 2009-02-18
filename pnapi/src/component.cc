@@ -1,3 +1,10 @@
+#ifndef NDEBUG
+#include <iostream>
+#include "io.h"
+using std::cout;
+using std::endl;
+#endif
+
 #include <cassert>
 #include <set>
 
@@ -123,6 +130,7 @@ namespace pnapi {
    */
   string Node::getName() const
   {
+    assert(!history_.empty());
     return *history_.begin();
   }
 
@@ -281,7 +289,8 @@ namespace pnapi {
   Place::Place(PetriNet & net, ComponentObserver & observer,
 	       const Place & place) :
     Node(net, observer, place), tokens_(place.tokens_),
-    capacity_(place.capacity_), wasInterface_(place.wasInterface_)
+    capacity_(place.capacity_), wasInterface_(place.wasInterface_), 
+    port_(place.port_)
   {
     observer_.updatePlaces(*this);
     setType(getType());

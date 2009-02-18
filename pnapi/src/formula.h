@@ -35,7 +35,7 @@ namespace pnapi
       virtual bool isSatisfied(const Marking &) const =0;
 
       /// create a deep copy of the formula
-      virtual Formula * clone(std::map<const Place *, const Place *> *
+      virtual Formula * clone(const std::map<const Place *, const Place *> *
 			      = NULL) const =0;
 
       /// output the formula
@@ -61,7 +61,7 @@ namespace pnapi
       Operator(const Formula &, const Formula &);
 
       Operator(const std::vector<const Formula *> &,
-	       std::map<const Place *, const Place *> * = NULL);
+	       const std::map<const Place *, const Place *> * = NULL);
 
       ~Operator();
 
@@ -83,11 +83,11 @@ namespace pnapi
       Negation(const Formula &);
 
       Negation(const std::vector<const Formula *> &,
-	       std::map<const Place *, const Place *> * = NULL);
+	       const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      Negation * clone(std::map<const Place *, const Place *> * = NULL) const;
+      Negation * clone(const std::map<const Place *, const Place *> * = NULL) const;
 
       std::ostream & output(std::ostream &) const;
     };
@@ -102,11 +102,11 @@ namespace pnapi
       Conjunction(const Formula &, const Formula &);
 
       Conjunction(const std::vector<const Formula *> &,
-		  std::map<const Place *, const Place *> * = NULL);
+		  const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      Conjunction * clone(std::map<const Place *, const Place *> *
+      Conjunction * clone(const std::map<const Place *, const Place *> *
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -122,11 +122,11 @@ namespace pnapi
       Disjunction(const Formula &, const Formula &);
 
       Disjunction(const std::vector<const Formula *> &,
-		  std::map<const Place *, const Place *> * = NULL);
+		  const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      Disjunction * clone(std::map<const Place *, const Place *> *
+      Disjunction * clone(const std::map<const Place *, const Place *> *
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -143,7 +143,7 @@ namespace pnapi
     public:
 
       Proposition(const Place &, unsigned int,
-		  std::map<const Place *, const Place *> *);
+		  const std::map<const Place *, const Place *> *);
 
       const Place & place() const;
 
@@ -163,7 +163,7 @@ namespace pnapi
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaTrue * clone(std::map<const Place *, const Place *> *
+      FormulaTrue * clone(const std::map<const Place *, const Place *> *
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -177,7 +177,7 @@ namespace pnapi
     public:
       bool isSatisfied(const Marking &) const;
 
-      FormulaFalse * clone(std::map<const Place *, const Place *> *
+      FormulaFalse * clone(const std::map<const Place *, const Place *> *
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -191,16 +191,17 @@ namespace pnapi
     public:
 
       FormulaEqual(const Place &, unsigned int,
-		   std::map<const Place *, const Place *> * = NULL);
+		   const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaEqual * clone(std::map<const Place *, const Place *> *
+      FormulaEqual * clone(const std::map<const Place *, const Place *> *
 			   = NULL) const;
 
       std::ostream & output(std::ostream &) const;
 
       const std::set<std::string *> & concerningPlaces() const;
+
     };
 
 
@@ -209,11 +210,11 @@ namespace pnapi
     public:
 
       FormulaNotEqual(const Place &, unsigned int,
-		      std::map<const Place *, const Place *> * = NULL);
+		      const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaNotEqual * clone(std::map<const Place *, const Place *> *
+      FormulaNotEqual * clone(const std::map<const Place *, const Place *> *
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -224,11 +225,11 @@ namespace pnapi
     {
     public:
       FormulaGreater(const Place &, unsigned int,
-		     std::map<const Place *, const Place *> * = NULL);
+		     const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaGreater * clone(std::map<const Place *, const Place *> *
+      FormulaGreater * clone(const std::map<const Place *, const Place *> *
 			     = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -239,11 +240,11 @@ namespace pnapi
     {
     public:
       FormulaGreaterEqual(const Place &, unsigned int,
-			  std::map<const Place *, const Place *> * = NULL);
+			  const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaGreaterEqual * clone(std::map<const Place *, const Place *> *
+      FormulaGreaterEqual * clone(const std::map<const Place *, const Place *> *
 				  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -254,11 +255,11 @@ namespace pnapi
     {
     public:
       FormulaLess(const Place &, unsigned int,
-		  std::map<const Place *, const Place *> * = NULL);
+		  const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaLess * clone(std::map<const Place *, const Place *> *
+      FormulaLess * clone(const std::map<const Place *, const Place *> *
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
@@ -269,11 +270,11 @@ namespace pnapi
     {
     public:
       FormulaLessEqual(const Place &, unsigned int,
-		       std::map<const Place *, const Place *> * = NULL);
+		       const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
 
-      FormulaLessEqual * clone(std::map<const Place *, const Place *> *
+      FormulaLessEqual * clone(const std::map<const Place *, const Place *> *
 			       = NULL) const;
 
       std::ostream & output(std::ostream &) const;

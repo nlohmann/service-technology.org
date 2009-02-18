@@ -71,7 +71,7 @@ namespace pnapi
 
     /// copy constructor
     Condition(const Condition &,
-	      std::map<const Place *, const Place *> * = NULL);
+	      const std::map<const Place *, const Place *> &);
 
     /// destructor
     virtual ~Condition();
@@ -89,9 +89,13 @@ namespace pnapi
     bool isSatisfied(const Marking &) const;
 
     /// merges two condition with each other
-    void merge(const Condition &);
+    void merge(const Condition &, 
+	       const std::map<const Place *, const Place *> &);
 
-    /// returns a set of places, which are contained in the condition
+    /// creates a condition for the given marking and adds it
+    void addMarking(const Marking &);
+
+    /// returns a set of place names, which are contained in the condition
     const std::set<std::string> & concerningPlaces() const;
 
 
@@ -99,6 +103,12 @@ namespace pnapi
 
     /// the formula
     formula::Formula * formula_;
+
+    /// no default copy constructor!
+    Condition(const Condition &);
+
+    /// no default copy assignment operator!
+    Condition & operator=(const Condition &);
 
   };
 

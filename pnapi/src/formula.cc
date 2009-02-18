@@ -1,3 +1,10 @@
+#ifndef NDEBUG
+#include <iostream>
+#include "io.h"
+using std::cout;
+using std::endl;
+#endif
+
 #include <cassert>
 
 #include "marking.h"
@@ -33,7 +40,7 @@ namespace pnapi
     }
 
     Operator::Operator(const vector<const Formula *> & children,
-		       map<const Place *, const Place *> * places)
+		       const map<const Place *, const Place *> * places)
     {
       for (vector<const Formula *>::const_iterator it = children.begin();
 	   it != children.end(); ++it)
@@ -46,10 +53,9 @@ namespace pnapi
     }
 
     Negation::Negation(const vector<const Formula *> & children,
-		       map<const Place *, const Place *> * places) :
+		       const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
-      assert(children.size() == 1);
     }
 
     Negation::Negation(const Negation & n) :
@@ -63,10 +69,9 @@ namespace pnapi
     }
 
     Conjunction::Conjunction(const vector<const Formula *> & children,
-			     map<const Place *, const Place *> * places) :
+			     const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
-      assert(children.size() > 1);
     }
 
     Conjunction::Conjunction(const Conjunction & c) :
@@ -80,10 +85,9 @@ namespace pnapi
     }
 
     Disjunction::Disjunction(const vector<const Formula *> & children,
-			     map<const Place *, const Place *> * places) :
+			     const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
-      assert(children.size() > 1);
     }
 
     Disjunction::Disjunction(const Disjunction & d) :
@@ -92,44 +96,44 @@ namespace pnapi
     }
 
     Proposition::Proposition(const Place & p, unsigned int k,
-			     map<const Place *, const Place *> * places) :
-      place_(places == NULL ? p : *(*places)[&p]), tokens_(k)
+			     const map<const Place *, const Place *> * places) :
+      place_(places == NULL ? p : *places->find(&p)->second), tokens_(k)
     {
-      assert(places == NULL || (*places)[&p] != NULL);
+      assert(places == NULL || places->find(&p)->second != NULL);
     }
 
     FormulaEqual::FormulaEqual(const Place & p, unsigned int k,
-			       map<const Place *, const Place *> * places) :
+			       const map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
     FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k,
-				   map<const Place *, const Place *> * places) :
+				   const map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
     FormulaGreater::FormulaGreater(const Place & p, unsigned int k,
-				   map<const Place *, const Place *> * places) :
+				   const map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
     FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k,
-				   map<const Place *, const Place *> * places) :
+				   const map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
     FormulaLess::FormulaLess(const Place & p, unsigned int k,
-			     map<const Place *, const Place *> * places) :
+			     const map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
 
     FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k,
-				   map<const Place *, const Place *> * places) :
+				   const map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
     {
     }
@@ -157,66 +161,66 @@ namespace pnapi
      ***** clone() implementation
      **************************************************************************/
 
-    Negation * Negation::clone(map<const Place *, const Place *> * places) const
+    Negation * Negation::clone(const map<const Place *, const Place *> * places) const
     {
       return new Negation(children_, places);
     }
 
-    Conjunction * Conjunction::clone(map<const Place *,
+    Conjunction * Conjunction::clone(const map<const Place *,
 				         const Place *> * places) const
     {
       return new Conjunction(children_, places);
     }
 
-    Disjunction * Disjunction::clone(map<const Place *,
+    Disjunction * Disjunction::clone(const map<const Place *,
 				         const Place *> * places) const
     {
       return new Disjunction(children_, places);
     }
 
-    FormulaTrue * FormulaTrue::clone(map<const Place *,
+    FormulaTrue * FormulaTrue::clone(const map<const Place *,
 				         const Place *> *) const
     {
       return new FormulaTrue();
     }
 
-    FormulaFalse * FormulaFalse::clone(map<const Place *,
+    FormulaFalse * FormulaFalse::clone(const map<const Place *,
 				           const Place *> *) const
     {
       return new FormulaFalse();
     }
 
-    FormulaEqual * FormulaEqual::clone(map<const Place *,
+    FormulaEqual * FormulaEqual::clone(const map<const Place *,
 				           const Place *> * places) const
     {
       return new FormulaEqual(place_, tokens_, places);
     }
 
-    FormulaNotEqual * FormulaNotEqual::clone(map<const Place *,
+    FormulaNotEqual * FormulaNotEqual::clone(const map<const Place *,
 					         const Place *> * places) const
     {
       return new FormulaNotEqual(place_, tokens_, places);
     }
 
-    FormulaGreater * FormulaGreater::clone(map<const Place *,
+    FormulaGreater * FormulaGreater::clone(const map<const Place *,
    					       const Place *> * places) const
     {
       return new FormulaGreater(place_, tokens_, places);
     }
 
-    FormulaGreaterEqual * FormulaGreaterEqual::clone(map<const Place *,
+    FormulaGreaterEqual * FormulaGreaterEqual::clone(const map<const Place *,
 						  const Place *> * places) const
     {
       return new FormulaGreaterEqual(place_, tokens_, places);
     }
 
-    FormulaLess * FormulaLess::clone(map<const Place *,
+    FormulaLess * FormulaLess::clone(const map<const Place *,
 				         const Place *> * places) const
     {
       return new FormulaLess(place_, tokens_, places);
     }
 
-    FormulaLessEqual * FormulaLessEqual::clone(map<const Place *,
+    FormulaLessEqual * FormulaLessEqual::clone(const map<const Place *,
 					       const Place *> * places) const
     {
       return new FormulaLessEqual(place_, tokens_, places);

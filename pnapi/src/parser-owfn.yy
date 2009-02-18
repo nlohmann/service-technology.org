@@ -71,7 +71,7 @@
 %type <yt_node>   port_definition_new
 %type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
 %type <yt_node> markings marking marking_list initial final finalmarkings
-%type <yt_node>   finalmarking formula
+%type <yt_node>   finalmarking formula condition
 
 %start petrinet
 
@@ -168,7 +168,7 @@ ports:
   ;
 
 port_list:
-    port_definition           { $$ = $1;               }
+    port_definition           { $$ = new Node($1);     }
   | port_list port_definition { $$ = $1->addChild($2); }
   ;
 
@@ -177,7 +177,7 @@ port_definition:
   ;
 
 port_participants:
-    port_participant                         { $$ = $1;               }
+    port_participant                         { $$ = new Node($1);     }
   | port_participants COMMA port_participant { $$ = $1->addChild($3); }
   ;
 
@@ -191,7 +191,7 @@ interface:
   ;
 
 port_list_new:
-    port_definition_new               { $$ = $1;               }
+    port_definition_new               { $$ = new Node($1);     }
   | port_list_new port_definition_new { $$ = $1->addChild($2); }
   ;
 
@@ -274,8 +274,12 @@ marking:
   ;
 
 final:
+    KEY_FINALMARKING finalmarkings SEMICOLON { $$ = $2;                      }
+  | condition                                { $$ = new Node(CONDITION, $1); }
+  ;
+
+condition:
     KEY_NOFINALMARKING                       { $$ = new Node(FORMULA_FALSE); }
-  | KEY_FINALMARKING finalmarkings SEMICOLON { $$ = $2;                      }
   | KEY_FINALCONDITION SEMICOLON             { $$ = new Node(FORMULA_TRUE);  }
   | KEY_FINALCONDITION formula SEMICOLON     { $$ = $2;                      }
   ;

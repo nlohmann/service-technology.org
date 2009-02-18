@@ -1,5 +1,6 @@
 #ifndef NDEBUG
 #include <iostream>
+#include <fstream>
 using std::cout;
 using std::endl;
 #endif

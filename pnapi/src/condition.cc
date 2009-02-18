@@ -4,12 +4,15 @@ using std::cout;
 using std::endl;
 #endif
 
+#include "marking.h"
 #include "condition.h"
 
 using std::string;
 using std::map;
+using std::vector;
 
 using pnapi::formula::Formula;
+using pnapi::formula::Proposition;
 using pnapi::formula::FormulaTrue;
 using pnapi::formula::FormulaFalse;
 using pnapi::formula::FormulaEqual;
@@ -86,8 +89,8 @@ namespace pnapi
   }
 
   Condition::Condition(const Condition & c,
-		       map<const Place *, const Place *> * places) :
-    formula_(c.formula().clone(places))
+		       const map<const Place *, const Place *> & places) :
+    formula_(c.formula().clone(&places))
   {
   }
 
@@ -101,9 +104,12 @@ namespace pnapi
     return *formula_;
   }
 
-  void Condition::merge(const Condition & c)
+  void Condition::merge(const Condition & c,
+			const map<const Place *, const Place *> & placeMapping)
   {
-    *this = formula() && c.formula();
+    Formula * f = c.formula().clone(&placeMapping);
+    *this = formula() && *f;
+    delete f;
   }
 
   bool Condition::isSatisfied(const Marking & m) const
@@ -124,6 +130,23 @@ namespace pnapi
     formula_ = formulaTrue ? (Formula*) new FormulaTrue
                            : (Formula*) new FormulaFalse;
     return *this;
+  }
+
+  void Condition::addMarking(const Marking & m)
+  {
+    vector<const Formula *> propositions;
+    for (map<const Place *, unsigned int>::const_iterator it = m.begin(); 
+	 it != m.end(); ++it)
+      propositions.push_back(new FormulaEqual(*it->first, it->second));
+
+    if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
+      *this = Conjunction(propositions);
+    else
+      *this = formula() || Conjunction(propositions);
+
+    for (vector<const Formula *>::iterator it = propositions.begin(); 
+	 it != propositions.end(); ++it)
+      delete *it;
   }
 
 /*  const std::set<std::string> & Condition::concerningPlaces() const

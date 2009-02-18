@@ -21,16 +21,19 @@ namespace pnapi
    *
    * Reads marking from the Petri net.
    *
-   * \param   PetriNet &n
-   * \param   bool internalsOnly specifies if interface places can
-   *          join the marking (if they can then false and if not then false)
+   * \param   n
+   * \param   internalsOnly  specifies if interface places can
+   *                         join the marking (if they can then false and if 
+   *                         not then false)
+   * \param   empty          if true, initialize marking to empty marking 
+   *                         instead of reading marking from n
    */
-  Marking::Marking(PetriNet &n, bool internalsOnly) :
+  Marking::Marking(PetriNet &n, bool internalsOnly, bool empty) :
     net_(n), internalsOnly_(internalsOnly)
   {
     for (set<Place *>::const_iterator p = n.getPlaces().begin(); p != n.getPlaces().end(); p++)
       if (!internalsOnly_ || (*p)->getType() == Place::INTERNAL)
-        m_[*p] = (*p)->getTokenCount();
+        m_[*p] = empty ? 0 : (*p)->getTokenCount();
   }
 
 
@@ -71,6 +74,15 @@ namespace pnapi
     return internalsOnly_;
   }
 
+  map<const Place *, unsigned int>::const_iterator Marking::begin() const
+  {
+    return m_.begin();
+  }
+
+  map<const Place *, unsigned int>::const_iterator Marking::end() const
+  {
+    return m_.end();
+  }
 
   /*!
    * \brief   Returns the size of the Marking

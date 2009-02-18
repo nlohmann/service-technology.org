@@ -259,9 +259,10 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    observer_(*this), condition_(net.condition_), meta_(net.meta_)
+    observer_(*this), 
+    condition_(net.condition_, copyStructure(net)),
+    meta_(net.meta_)
   {
-    *this += net;
   }
 
 
@@ -309,12 +310,13 @@ namespace pnapi
 
 
   /*!
-   * Adds all nodes and arcs of the second net and combines final conditions.
+   * Adds all nodes and arcs of the second net.
    *
    * \pre   the node names are unique (disjoint name sets); use
    *        prefixNodeNames() on <em>both</em> nets to achieve this
    */
-  PetriNet & PetriNet::operator+=(const PetriNet & net)
+  map<const Place *, const Place *>  
+  PetriNet::copyStructure(const PetriNet & net)
   {
     // add all transitions of the net
     for (set<Transition *>::iterator it = net.transitions_.begin();
@@ -325,11 +327,12 @@ namespace pnapi
       }
 
     // add all places
+    map<const Place *, const Place *> placeMapping;
     for (set<Place *>::iterator it = net.places_.begin();
 	 it != net.places_.end(); ++it)
       {
 	assert(!containsNode((*it)->getName()));
-	new Place(*this, observer_, **it);
+	placeMapping[*it] = new Place(*this, observer_, **it);
       }
 
     // create arcs according to the arcs in the net
@@ -337,15 +340,21 @@ namespace pnapi
 	 ++it)
       new Arc(*this, observer_, **it);
 
-    //FIXME: condition_.merge(net.condition_);
-
-    return *this;
+    return placeMapping;
   }
 
 
   /*!
    */
   Condition & PetriNet::finalCondition()
+  {
+    return condition_;
+  }
+
+
+  /*!
+   */
+  const Condition & PetriNet::finalCondition() const
   {
     return condition_;
   }
@@ -377,7 +386,8 @@ namespace pnapi
     // prefix and combine the nets
     prefixNodeNames(prefix);
     tmpNet.prefixNodeNames(netPrefix);
-    *this += tmpNet;
+    const map<const Place *, const Place *> & placeMapping = 
+      copyStructure(tmpNet);
 
     // translate references and merge places
     for (vector<pair<Place *, Place *> >::iterator it = mergePlaces.begin();
@@ -390,6 +400,9 @@ namespace pnapi
 	it->first->merge(*it->second);
 	deletePlace(*it->second);
       }
+
+    // merge final conditions
+    condition_.merge(net.condition_, placeMapping);
   }
 
 

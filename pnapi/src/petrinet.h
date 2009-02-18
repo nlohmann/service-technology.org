@@ -119,6 +119,7 @@ namespace pnapi
 
     /// final condition
     Condition & finalCondition();
+    const Condition & finalCondition() const;
 
 
     /*!
@@ -212,18 +213,6 @@ namespace pnapi
 
   private:
 
-    /* general properties */
-
-    /// observer for nodes and arcs
-    ComponentObserver observer_;
-
-    /// final condition
-    Condition condition_;
-
-    /// meta information
-    std::map<io::MetaInformation, std::string> meta_;
-
-
     /* (overlapping) sets for net structure */
 
     /// set of all nodes
@@ -257,6 +246,18 @@ namespace pnapi
     std::set<Arc *> arcs_;
 
 
+    /* general properties */
+
+    /// observer for nodes and arcs
+    ComponentObserver observer_;
+
+    /// final condition
+    Condition condition_;
+
+    /// meta information
+    std::map<io::MetaInformation, std::string> meta_;
+
+
     /* structural changes */
 
     /// deletes a place (used by e.g. merging and reduction rules)
@@ -275,7 +276,7 @@ namespace pnapi
     /* miscellaneous */
 
     /// adds the structure of a second net
-    PetriNet & operator+=(const PetriNet &);
+    std::map<const Place *, const Place *> copyStructure(const PetriNet &);
 
     /// returns a name for a node to be added
     std::string getUniqueNodeName(const std::string &) const;

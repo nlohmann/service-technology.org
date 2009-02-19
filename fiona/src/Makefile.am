@@ -124,3 +124,4 @@ fiona_LDADD = $(builddir)/../libs/cudd/libobj.a \
 allcov: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) CXX="$(CXXCOV)" all
 	-$(MAKE) $(AM_MAKEFLAGS) cleandeps
+

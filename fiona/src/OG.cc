@@ -44,6 +44,8 @@
 #include "GraphFormula.h"
 #include "binDecision.h"
 
+#include <ctime>
+
 // #define TRUE 1 in cudd package can interfere with CommGraphLiteral::TRUE.
 // So, we undefine TRUE.
 #undef TRUE

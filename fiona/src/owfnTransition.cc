@@ -44,6 +44,8 @@
 #include "AnnotatedGraph.h"
 #include "GraphFormula.h"
 
+#include <cstdlib>
+
 //! \brief constructor
 AdjacentPlace::AdjacentPlace(owfnPlace* place, unsigned int multiplicity) :
     place_(place), multiplicity_(multiplicity) {
@@ -311,7 +313,7 @@ void owfnTransition::fire(oWFN * petrinet) {
                     << decrPlace.getMultiplicity() << endl;
             cerr << "number of states calculated so far: "<< State::state_count
                     << endl;
-            _exit(EC_CAPACITY_EXCEEDED);
+            exit(EC_CAPACITY_EXCEEDED);
         } else {
             petrinet->CurrentMarking[petrinet->getPlaceIndex(decrOwfnPlace)] -= decrPlace.getMultiplicity();
         }

@@ -42,7 +42,7 @@
 // you do not know upper limits for the number of tokens on places.
 
 //#define CAPACITY 4
-//#define CHECKCAPACITY
+// #define CHECKCAPACITY
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).

@@ -52,6 +52,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <ctime>
 #include "pnapi.h"
 
 #include "GraphFormula.h"

@@ -44,6 +44,8 @@
 #include "binDecision.h"
 #include "AnnotatedGraphNode.h"
 
+#include <ctime>
+
 //! \brief constructor
 //! \param _PN
 //! \fn InteractionGraph::InteractionGraph(oWFN * _PN)

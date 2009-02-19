@@ -45,6 +45,7 @@
 #include <vector>
 #include "OG.h"
 #include "ConstraintOG.h"
+#include <ctime>
 
 // TRUE and FALSE #defined in cudd package may interfere with
 // GraphFormulaLiteral::TRUE and ...::FALSE.

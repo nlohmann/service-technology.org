@@ -15,6 +15,8 @@ using std::endl;
 using std::stringstream;
 using std::string;
 using std::map;
+using std::set;
+using std::pair;
 
 using namespace pnapi::formula;
 
@@ -40,6 +42,9 @@ namespace pnapi
 
     namespace owfn
     {
+
+      typedef const set<const Place *> * Places;
+      typedef pair<Formula *, const set<const Place *> *> WildcardFormula;
 
       Node * node;
 
@@ -242,8 +247,12 @@ namespace pnapi
 	      }
 	    break;
 
-	  case FORMULA_TRUE:  formulas_.push_back(new FormulaTrue);  break;
-	  case FORMULA_FALSE: formulas_.push_back(new FormulaFalse); break;
+	  case FORMULA_TRUE:  
+	    formulas_.push_back(WildcardFormula(new FormulaTrue, NULL));  
+	    break;
+	  case FORMULA_FALSE: 
+	    formulas_.push_back(WildcardFormula(new FormulaFalse, NULL)); 
+	    break;
 
 	  case FORMULA_EQ:
 	  case FORMULA_NE:
@@ -274,7 +283,7 @@ namespace pnapi
 		  formula = new FormulaLessEqual(*place, nTokens); break;
 		default: assert(false);
 		}
-	      formulas_.push_back(formula);
+	      formulas_.push_back(WildcardFormula(formula, NULL));
 	      break;
 	    }
 
@@ -284,6 +293,8 @@ namespace pnapi
 
       void Visitor::afterChildren(const Node & node)
       {
+	const set<const Place *> * wcPlaces = NULL;
+
 	switch (node.type)
 	  {
 	  case INITIALMARKING:
@@ -321,42 +332,80 @@ namespace pnapi
 	    }
 
 	  case FORMULA_NOT:
-	    node.check(formulas_.size() > 0, "", "NOT must have an operand");
-	    formulas_.push_back(new Negation(*formulas_.front()));
-	    delete formulas_.front(); formulas_.pop_front();
-	    break;
+	    {
+	      assert(formulas_.size() > 0);
+	      WildcardFormula wcf = formulas_.front();
+	      Formula * iwcf = integrateWildcard(wcf);
+	      Formula * f = new Negation(*iwcf); delete iwcf;
+	      formulas_.push_back(WildcardFormula(f, NULL));
+	      delete formulas_.front().first; formulas_.pop_front();
+	      break;
+	    }
 	  case FORMULA_AND:
 	  case FORMULA_OR:
 	    {
-	      node.check(formulas_.size() > 1, "", 
-			 "AND/OR must have two operands");
-	      Formula * op1 = formulas_.front(); formulas_.pop_front();
-	      Formula * op2 = formulas_.front(); formulas_.pop_front();
+	      assert(formulas_.size() > 1);
+	      WildcardFormula op1 = formulas_.front(); formulas_.pop_front();
+	      WildcardFormula op2 = formulas_.front(); formulas_.pop_front();
 	      Formula * f;
 	      if (node.type == FORMULA_AND)
-		f = new Conjunction(*op1, *op2);
+		{
+		  node.check(op1.second == NULL, "", 
+			     "wildcard must be last AND operand");
+		  f = new Conjunction(*op1.first, *op2.first);
+		  formulas_.push_back(WildcardFormula(f, op2.second));
+		}
 	      else
-		f = new Disjunction(*op1, *op2);
-	      formulas_.push_back(f);
-	      delete op1;
-	      delete op2;
+		{
+		  Formula * f1 = integrateWildcard(op1);
+		  Formula * f2 = integrateWildcard(op2);
+		  f = new Disjunction(*f1, *f2); delete f1; delete f2;
+		  formulas_.push_back(WildcardFormula(f, NULL));
+		}
+	      delete op1.first;
+	      delete op2.first;
 	      break;
 	    }
 
 	  case FORMULA_AAOPE:
+	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getPlaces();
+	    // fallthrough intended
 	  case FORMULA_AAOIPE:
+	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getInternalPlaces();
+	    // fallthrough intended
 	  case FORMULA_AAOEPE:
-	    assert(false); // FIXME
+	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getInterfacePlaces();
+	    // fallthrough intended
+	    {
+	      assert(formulas_.size() > 0);
+	      node.check(formulas_.front().second == NULL, "", 
+			 "wildcard must be last AND operand");
+	      Formula * f = new Conjunction(*formulas_.front().first);
+	      formulas_.push_back(WildcardFormula(f, wcPlaces));
+	      delete formulas_.front().first; formulas_.pop_front();
+	    }
 	    break;
 
 	  case CONDITION:
-	    assert(formulas_.size() == 1);
-	    net_.finalCondition() = *formulas_.front();
-	    delete formulas_.front();
-	    break;
+	    {
+	      assert(formulas_.size() == 1);
+	      Formula * f = integrateWildcard(formulas_.front());
+	      net_.finalCondition() = *f; delete f;
+	      delete formulas_.front().first;
+	      break;
+	    }
 
 	  default: /* empty */ ;
 	  }
+      }
+
+      Formula * Visitor::integrateWildcard(WildcardFormula wcf)
+      {
+	Conjunction * c = dynamic_cast<Conjunction *>(wcf.first);
+	if (c == NULL || wcf.second == NULL)
+	  return wcf.first->clone();
+	else
+	  return new Conjunction(*c, *wcf.second);
       }
 
     }

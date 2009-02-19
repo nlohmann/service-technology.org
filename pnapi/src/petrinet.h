@@ -144,6 +144,8 @@ namespace pnapi
     const std::set<Node *> & getNodes() const;
 
     const std::set<Place *> & getPlaces() const;
+    
+    const std::set<Place *> & getInternalPlaces() const;
 
     const std::set<Place *> & getInputPlaces() const;
 

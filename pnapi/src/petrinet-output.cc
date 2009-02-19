@@ -70,21 +70,24 @@ namespace pnapi
       << "}" << endl 
       << endl
 
-      << "PLACE"      << endl
-      << mode(io::util::PLACE_CAPACITY) << delim("; ")
-      << "  INTERNAL" << endl
-      << "    " << internalPlaces_ << ";" << endl << endl
       << mode(io::util::PLACE) << delim(", ")
+      << "PLACE"      << endl
+      << "  INTERNAL" << endl
+      << "    " << io::util::groupPlacesByCapacity(internalPlaces_)
+      << endl << endl
       << "  INPUT"    << endl
-      << "    " << inputPlaces_    << ";" << endl << endl
+      << "    " << inputPlaces_                                     << ";" 
+      << endl << endl
       << "  OUTPUT"   << endl
-      << "    " << outputPlaces_   << ";" << endl
-      << endl
+      << "    " << outputPlaces_                                    << ";" 
+      << endl << endl;
 
-      << (interfacePlacesByPort_.empty() ? "" : "PORTS") << endl
-      << interfacePlacesByPort_
-      << endl
+    if (!interfacePlacesByPort_.empty())
+      os << "PORTS" << endl
+	 << "  " << interfacePlacesByPort_ << endl
+	 << endl;
   
+    os
       << mode(io::util::PLACE_TOKEN)
       << "INITIALMARKING" << endl
       << "  " << io::util::filterMarkedPlaces(internalPlaces_) << ";" << endl 

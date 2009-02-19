@@ -9,7 +9,7 @@ using std::endl;
 
 using std::string;
 using std::map;
-using std::vector;
+using std::set;
 
 using pnapi::formula::Formula;
 using pnapi::formula::Proposition;
@@ -134,17 +134,17 @@ namespace pnapi
 
   void Condition::addMarking(const Marking & m)
   {
-    vector<const Formula *> propositions;
+    set<const Formula *> propositions;
     for (map<const Place *, unsigned int>::const_iterator it = m.begin(); 
 	 it != m.end(); ++it)
-      propositions.push_back(new FormulaEqual(*it->first, it->second));
+      propositions.insert(new FormulaEqual(*it->first, it->second));
 
     if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
       *this = Conjunction(propositions);
     else
       *this = formula() || Conjunction(propositions);
 
-    for (vector<const Formula *>::iterator it = propositions.begin(); 
+    for (set<const Formula *>::iterator it = propositions.begin(); 
 	 it != propositions.end(); ++it)
       delete *it;
   }

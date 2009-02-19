@@ -13,7 +13,7 @@ using std::endl;
 #include "util.h"
 
 using std::map;
-using std::vector;
+using std::set;
 using std::ostream;
 
 using pnapi::io::util::operator<<;
@@ -30,21 +30,24 @@ namespace pnapi
 
     Operator::Operator(const Formula & f)
     {
-      children_.push_back(f.clone());
+      children_.insert(f.clone());
+      simplifyChildren();
     }
 
     Operator::Operator(const Formula & l, const Formula & r)
     {
-      children_.push_back(l.clone());
-      children_.push_back(r.clone());
+      children_.insert(l.clone());
+      children_.insert(r.clone());
+      simplifyChildren();
     }
 
-    Operator::Operator(const vector<const Formula *> & children,
+    Operator::Operator(const set<const Formula *> & children,
 		       const map<const Place *, const Place *> * places)
     {
-      for (vector<const Formula *>::const_iterator it = children.begin();
+      for (set<const Formula *>::const_iterator it = children.begin();
 	   it != children.end(); ++it)
-	children_.push_back((*it)->clone(places));
+	children_.insert((*it)->clone(places));
+      simplifyChildren();
     }
 
     Negation::Negation(const Formula & f) :
@@ -52,7 +55,7 @@ namespace pnapi
     {
     }
 
-    Negation::Negation(const vector<const Formula *> & children,
+    Negation::Negation(const set<const Formula *> & children,
 		       const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
@@ -63,12 +66,30 @@ namespace pnapi
     {
     }
 
+    Conjunction::Conjunction(const Formula & f) :
+      Operator(f)
+    {
+    }
+
     Conjunction::Conjunction(const Formula & l, const Formula & r) :
       Operator(l, r)
     {
     }
 
-    Conjunction::Conjunction(const vector<const Formula *> & children,
+    Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
+      Operator(f)
+    {
+      set<const Place *> cps = concerningPlaces();
+
+      for (set<const Place *>::const_iterator it = wc.begin(); it != wc.end();
+	   ++it)
+	if (cps.find(*it) == cps.end())
+	  children_.insert(new FormulaEqual(**it, 0));
+
+      simplifyChildren();
+    }
+
+    Conjunction::Conjunction(const set<const Formula *> & children,
 			     const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
@@ -84,7 +105,7 @@ namespace pnapi
     {
     }
 
-    Disjunction::Disjunction(const vector<const Formula *> & children,
+    Disjunction::Disjunction(const set<const Formula *> & children,
 			     const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
@@ -150,7 +171,7 @@ namespace pnapi
 
     Operator::~Operator()
     {
-      for (vector<const Formula *>::iterator it = children_.begin();
+      for (set<const Formula *>::iterator it = children_.begin();
 	   it != children_.end(); ++it)
 	delete *it;
     }
@@ -239,7 +260,7 @@ namespace pnapi
 
     bool Conjunction::isSatisfied(const Marking & m) const
     {
-      for (vector<const Formula *>::const_iterator f = children_.begin();
+      for (set<const Formula *>::const_iterator f = children_.begin();
 	   f != children_.end(); f++)
 	if (!(*f)->isSatisfied(m))
 	  return false;
@@ -248,7 +269,7 @@ namespace pnapi
 
     bool Disjunction::isSatisfied(const Marking & m) const
     {
-      for (vector<const Formula *>::const_iterator f = children_.begin();
+      for (set<const Formula *>::const_iterator f = children_.begin();
 	   f != children_.end(); f++)
 	if ((*f)->isSatisfied(m))
 	  return true;
@@ -362,7 +383,7 @@ namespace pnapi
      ***** accessor implementation
      **************************************************************************/
 
-    const vector<const Formula *> & Operator::children() const
+    const set<const Formula *> & Operator::children() const
     {
       return children_;
     }
@@ -382,58 +403,86 @@ namespace pnapi
      ***** concerning places implementation
      **************************************************************************/
 
-/*    std::set<Place *> & Operator::concerningPlaces()
+    set<const Place *> Formula::concerningPlaces() const
     {
-      std::set<Place *> &cp = *new std::set<Place *>();
-      cp.clear();
+      return set<const Place *>();
+    }
 
-      for (int i = 0; i < children_.size(); i++)
-        util::setUnion(cp, children_[i].concerningPlaces());
+    set<const Place *> Operator::concerningPlaces() const
+    {
+      set<const Place *> places;
+      for (set<const Formula *>::const_iterator it = children_.begin(); 
+	   it != children_.end(); ++it)
+	{
+	  set<const Place *> childCps = (*it)->concerningPlaces();
+	  places.insert(childCps.begin(), childCps.end());
+	}
+      return places;
+    }
 
-      return cp;
+    set<const Place *> Proposition::concerningPlaces() const
+    {
+      set<const Place *> places;
+      places.insert(&place_);
+      return places;
     }
 
 
-    std::set<Place *> & Proposition::concerningPlaces()
+    /**************************************************************************
+     ***** simplify children implementation
+     **************************************************************************/
+
+    void Operator::simplifyChildren()
     {
-      std::set<Place *> &cp = *new std::set<Place *>();
-      cp.clear();
-
-      cp.insert(&place_);
-
-      return cp;
     }
 
-
-    std::set<Place *> & FormulaEqual::concerningPlaces()
+    void Conjunction::simplifyChildren()
     {
-      std::set<Place *> &cp = *new std::set<Place *>();
-      cp.clear();
-
-      // implementation of "all other places empty"
-      if (tokens_ == 0)
-        cp.insert(&place_);
-
-      return cp;
+      set<const Formula *> children = children_;
+      for (set<const Formula *>::iterator it = children.begin(); 
+	   it != children.end(); ++it)
+	if (dynamic_cast<const FormulaTrue *>(*it) != NULL)
+	  {
+	    children_.erase(*it);
+	    delete *it;
+	  }
+	else 
+	  {
+	    const Operator * o = dynamic_cast<const Conjunction *>(*it);
+	    if (o != NULL)
+	      {
+		for (set<const Formula *>::const_iterator it = 
+		       o->children().begin(); it != o->children().end(); ++it)
+		  children_.insert((*it)->clone());
+		children_.erase(o);
+		delete o;
+	      }
+	  }
     }
 
-
-    std::set<Place *> & FormulaTrue::concerningPlaces()
+    void Disjunction::simplifyChildren()
     {
-      std::set<Place *> &cp = *new std::set<Place *>();
-      cp.clear();
-
-      return cp;
+      set<const Formula *> children = children_;
+      for (set<const Formula *>::iterator it = children.begin(); 
+	   it != children.end(); ++it)
+	if (dynamic_cast<const FormulaFalse *>(*it) != NULL)
+	  {
+	    children_.erase(*it);
+	    delete *it;
+	  }
+	else 
+	  {
+	    const Operator * o = dynamic_cast<const Disjunction *>(*it);
+	    if (o != NULL)
+	      {
+		for (set<const Formula *>::const_iterator it = 
+		       o->children().begin(); it != o->children().end(); ++it)
+		  children_.insert((*it)->clone());
+		children_.erase(o);
+		delete o;
+	      }
+	  }
     }
-
-
-    std::set<Place *> & FormulaFalse::concerningPlaces()
-    {
-      std::set<Place *> &cp = *new std::set<Place *>();
-      cp.clear();
-
-      return cp;
-    }*/
 
   }
 

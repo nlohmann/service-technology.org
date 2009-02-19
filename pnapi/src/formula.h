@@ -4,7 +4,6 @@
 #define PNAPI_FORMULA_H
 
 #include <map>
-#include <vector>
 #include <set>
 #include <string>
 
@@ -42,7 +41,7 @@ namespace pnapi
       virtual std::ostream & output(std::ostream &) const =0;
 
       /// set of concerning places
-      //virtual const std::set<std::string *> & concerningPlaces() const = 0;
+      virtual std::set<const Place *> concerningPlaces() const;
 
     };
 
@@ -60,17 +59,19 @@ namespace pnapi
 
       Operator(const Formula &, const Formula &);
 
-      Operator(const std::vector<const Formula *> &,
+      Operator(const std::set<const Formula *> &,
 	       const std::map<const Place *, const Place *> * = NULL);
 
       ~Operator();
 
-      const std::vector<const Formula *> & children() const;
+      const std::set<const Formula *> & children() const;
 
-      const std::set<std::string *> & concerningPlaces() const;
+      std::set<const Place *> concerningPlaces() const;
 
     protected:
-      std::vector<const Formula *> children_;
+      std::set<const Formula *> children_;
+
+      virtual void simplifyChildren();
     };
 
 
@@ -82,7 +83,7 @@ namespace pnapi
 
       Negation(const Formula &);
 
-      Negation(const std::vector<const Formula *> &,
+      Negation(const std::set<const Formula *> &,
 	       const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
@@ -99,9 +100,13 @@ namespace pnapi
 
       Conjunction(const Conjunction &);
 
+      Conjunction(const Formula &);
+
       Conjunction(const Formula &, const Formula &);
 
-      Conjunction(const std::vector<const Formula *> &,
+      Conjunction(const Formula &, const std::set<const Place *> &);
+
+      Conjunction(const std::set<const Formula *> &,
 		  const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
@@ -110,6 +115,9 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+    protected:
+      void simplifyChildren();
     };
 
 
@@ -121,7 +129,7 @@ namespace pnapi
 
       Disjunction(const Formula &, const Formula &);
 
-      Disjunction(const std::vector<const Formula *> &,
+      Disjunction(const std::set<const Formula *> &,
 		  const std::map<const Place *, const Place *> * = NULL);
 
       bool isSatisfied(const Marking &) const;
@@ -130,6 +138,9 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+    protected:
+      void simplifyChildren();
     };
 
 
@@ -149,7 +160,7 @@ namespace pnapi
 
       unsigned int tokens() const;
 
-      const std::set<std::string *> & concerningPlaces() const;
+      std::set<const Place *> concerningPlaces() const;
 
     protected:
       const Place & place_;
@@ -167,8 +178,6 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
-
-      const std::set<std::string *> & concerningPlaces() const;
     };
 
 
@@ -181,8 +190,6 @@ namespace pnapi
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
-
-      const std::set<std::string *> & concerningPlaces() const;
     };
 
 
@@ -199,9 +206,6 @@ namespace pnapi
 			   = NULL) const;
 
       std::ostream & output(std::ostream &) const;
-
-      const std::set<std::string *> & concerningPlaces() const;
-
     };
 
 

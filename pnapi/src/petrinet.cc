@@ -540,6 +540,14 @@ namespace pnapi
 
   /*!
    */
+  const set<Place *> & PetriNet::getInternalPlaces() const
+  {
+    return internalPlaces_;
+  }
+
+
+  /*!
+   */
   const set<Place *> & PetriNet::getInputPlaces() const
   {
     return inputPlaces_;

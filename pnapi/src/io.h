@@ -177,7 +177,7 @@ namespace pnapi
       enum Format { STAT, OWFN, DOT, GASTEX };
       
       /// I/O (sub-)mode
-      enum Mode { PLACE, PLACE_CAPACITY, PLACE_TOKEN, ARC };
+      enum Mode { PLACE, PLACE_TOKEN, ARC };
 
       /// delimiter type
       struct Delim { std::string delim; };
@@ -218,8 +218,12 @@ namespace pnapi
 
       /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
 
-      /// filter places with token count > 0
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
+      std::multimap<unsigned int, Place *> 
+      groupPlacesByCapacity(const std::set<Place *> &);
+
+      void outputGroupPrefix(std::ostream &, const std::string &);
+      void outputGroupPrefix(std::ostream &, unsigned int);
 
       Manipulator<Mode> mode(Mode);
       Manipulator<Delim> delim(const std::string &);
@@ -228,8 +232,6 @@ namespace pnapi
       std::ostream & operator<<(std::ostream &, const Node &);
       std::ostream & operator<<(std::ostream &, const Place &);
       std::ostream & operator<<(std::ostream &, const Transition &);
-      std::ostream & operator<<(std::ostream &, 
-				const std::multimap<std::string, Place *> &);
       std::ostream & operator<<(std::ostream &, const Condition &);
       std::ostream & operator<<(std::ostream &, const formula::Formula &);
       std::ostream & operator<<(std::ostream &, const formula::Negation &);
@@ -249,7 +251,7 @@ namespace pnapi
 				const formula::FormulaLessEqual &);
 
 
-      /*** TEMPLATE CLASS IMPLEMENTATION ***/
+      /*** TEMPLATE IMPLEMENTATION ***/
 
       template <typename T>
       std::ostream & operator<<(std::ostream & os, const Manipulator<T> m)
@@ -284,7 +286,26 @@ namespace pnapi
 	return outputContainer(os, v);
       }
 
-      
+
+      template <typename T> std::ostream & 
+      operator<<(std::ostream & os, 
+		 const std::multimap<T, Place *> & places)
+      {
+	for (typename std::multimap<T, Place *>::const_iterator it = 
+	       places.begin(); 
+	     it != places.end(); it = places.upper_bound(it->first))
+	  {
+	    std::set<Place *> subset; 
+	    for (typename std::multimap<T, Place *>::const_iterator subit = it;
+		 subit != places.upper_bound(it->first); ++subit)
+	      subset.insert(subit->second);
+	    outputGroupPrefix(os, it->first);
+	    os << subset << "; ";
+	  }
+        return os;
+      }
+
+
       template <typename T>
       Manipulator<T>::Manipulator(const T & data) :
 	data(data)

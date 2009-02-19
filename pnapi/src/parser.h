@@ -295,9 +295,13 @@ namespace pnapi
 	std::map<std::string, PlaceAttributes> places_;
 	bool isPreset_;
 	std::map<std::string, unsigned int> preset_, postset_;
-	std::deque<formula::Formula *> formulas_;
+	std::deque<std::pair<formula::Formula *, 
+			     const std::set<const Place *> *> > formulas_;
 	bool isInitial_;
 	Marking finalMarking_;
+
+	formula::Formula * integrateWildcard(std::pair<formula::Formula *, 
+					     const std::set<const Place *> *>);
       };
 
     }

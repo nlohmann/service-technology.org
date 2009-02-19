@@ -181,6 +181,30 @@ namespace pnapi
       }
 
 
+      std::multimap<unsigned int, Place *> 
+      groupPlacesByCapacity(const set<Place *> & places)
+      {
+	std::multimap<unsigned int, Place *> grouped;
+	for (set<Place *>::iterator it = places.begin(); it != places.end(); 
+	     ++it)
+	  grouped.insert(pair<unsigned int, Place *>((*it)->getCapacity(),*it));
+	return grouped;
+      }
+
+
+      void outputGroupPrefix(std::ostream & os, const std::string & s)
+      {
+	os << s << ": ";
+      }
+
+
+      void outputGroupPrefix(std::ostream & os, unsigned int capacity)
+      {
+	if (capacity > 0)
+	  os << "SAFE " << capacity << ": ";
+      }
+
+
       ostream & operator<<(ostream & os, const pnapi::Arc & arc)
       {
 	bool interface = true;
@@ -226,9 +250,6 @@ namespace pnapi
 	switch (FormatData::data(os))
 	  {
 	  case OWFN:    /* PLACES: OWFN    */
-	    if (ModeData::data(os) == PLACE_CAPACITY &&
-		p.getCapacity() > 0)
-	      os << "SAFE " << p.getCapacity() << " : ";
 	    os << p.getName();
 	    if (ModeData::data(os) == PLACE_TOKEN && 
 		p.getTokenCount() != 1)
@@ -288,7 +309,8 @@ namespace pnapi
 	      case Node::OUTPUT:   os << " { output }"       << endl; break;
 	      case Node::INOUT:    os << " { input/output }" << endl; break;
 	      }
-	    os << "  CONSUME " << t.getPresetArcs()  << ";" << endl
+	    os << delim(", ") 
+	       << "  CONSUME " << t.getPresetArcs()  << ";" << endl
 	       << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
 	    break;
 
@@ -353,13 +375,19 @@ namespace pnapi
 
       ostream & operator<<(ostream & os, const formula::Conjunction & f)
       {
-	return os << "(" << delim(" AND ") << f.children() << ")";
+	if (f.children().empty())
+	  return os << formula::FormulaTrue();
+	else
+	  return os << "(" << delim(" AND ") << f.children() << ")";
       }
 
 
       ostream & operator<<(ostream & os, const formula::Disjunction & f)
       {
-	return os << "(" << delim(" OR ") << f.children() << ")";
+	if (f.children().empty())
+	  return os << formula::FormulaFalse();
+	else
+	  return os << "(" << delim(" OR ") << f.children() << ")";
       }
 
 
@@ -408,25 +436,6 @@ namespace pnapi
       ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
       {
 	return os << f.place().getName() << " <= " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream & os, 
-			   const std::multimap<string, Place *> & places)
-      {
-	if (places.empty())
-	  return os;
-
-	std::multimap<string, Place *>::const_iterator it = places.begin(); 
-	PetriNet & net = it->second->getPetriNet();
-	while (it != places.end())
-	  {
-	    string port = it->first;
-	    os << "  " << port << ": " << net.getInterfacePlaces(port) << ";" 
-	       << endl;
-	    it = places.upper_bound(port);
-	  }
-	return os;
       }
 
     }

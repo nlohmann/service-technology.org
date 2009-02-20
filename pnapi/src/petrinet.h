@@ -29,15 +29,15 @@
 
 namespace pnapi
 {
-  
+
   // forward declarations
   class PetriNet;
   class Condition;
-  namespace io 
-  { 
+  namespace io
+  {
     class InputError;
-    std::ostream & operator<<(std::ostream &, const PetriNet &); 
-    std::istream & operator>>(std::istream &, PetriNet &) throw (InputError); 
+    std::ostream & operator<<(std::ostream &, const PetriNet &);
+    std::istream & operator>>(std::istream &, PetriNet &) throw (InputError);
   }
 
 
@@ -144,7 +144,7 @@ namespace pnapi
     const std::set<Node *> & getNodes() const;
 
     const std::set<Place *> & getPlaces() const;
-    
+
     const std::set<Place *> & getInternalPlaces() const;
 
     const std::set<Place *> & getInputPlaces() const;
@@ -172,7 +172,7 @@ namespace pnapi
 
     /// creates a Place
     Place & createPlace(const std::string & = "", Node::Type = Node::INTERNAL,
-			unsigned int = 0, unsigned int = 0, 
+			unsigned int = 0, unsigned int = 0,
 			const std::string & = "");
 
     /// creates a Transition
@@ -189,7 +189,7 @@ namespace pnapi
     //@{
 
     /// checks the Petri net for workflow criteria
-    bool isWorkflow() const;
+    bool isWorkflow();
 
     /// checks the Petri net for free choice criterion
     bool isFreeChoice() const;
@@ -290,14 +290,14 @@ namespace pnapi
     bool sameweights(Node *n) const;
 
     /// returns the meta information if available
-    std::string getMetaInformation(std::ios_base &, io::MetaInformation, 
+    std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 			      const std::string & = "") const;
 
 
     /* petrify */
 
     /// crates a petri net from an STG file
-    void createFromSTG(std::vector<std::string> &, const std::string &, 
+    void createFromSTG(std::vector<std::string> &, const std::string &,
 		       std::set<std::string> &, std::set<std::string> &);
 
     /// helper function for STG2oWFN
@@ -347,40 +347,40 @@ namespace pnapi
 
     /// remove dead nodes of the Petri net
     unsigned int reduce_dead_nodes();
-    
+
     /// remove unneeded initially marked places in choreographies
     unsigned int reduce_remove_initially_marked_places_in_choreographies();
-    
+
     /// elimination of parallel places
     unsigned int reduce_rule_3p();
-    
+
     /// elimination of parallel transitions
     unsigned int reduce_rule_3t();
-    
-    /// equality check for rule 4 
+
+    /// equality check for rule 4
     bool reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* p2);
-    
+
     /// elimination of equal places
     unsigned int reduce_rule_4();
-    
+
     /// check if the postset of a set is empty
     bool reduce_emptyPostset(const std::set<Node*> & nodes);
-    
+
     /// check if the preset of a set stores only one item
     bool reduce_singletonPreset(const std::set<Node*> & nodes);
-    
+
     /// fusion of pre- with posttransition (m to n)
     unsigned int reduce_rule_5(bool keepNormal);
-    
+
     /// fusion of pre- with posttransition (1 to n)
     unsigned int reduce_rule_6(bool keepNormal);
-    
+
     /// elimination of self-loop places
     unsigned int reduce_rule_7();
-    
+
     /// elimination of self-loop transitions
     unsigned int reduce_rule_8();
-    
+
     /// fusion of pre- with postplaces
     unsigned int reduce_rule_9(bool keepNormal);
 

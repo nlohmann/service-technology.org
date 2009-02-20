@@ -180,7 +180,7 @@ namespace pnapi
       {
       case Node::INTERNAL:
 	assert(port.empty());
-	net_.internalPlaces_.insert(&place); 
+	net_.internalPlaces_.insert(&place);
 	break;
       case Node::INPUT:
 	net_.inputPlaces_.insert(&place);
@@ -203,19 +203,19 @@ namespace pnapi
 
   void ComponentObserver::finalizePlaceType(Place & place, Node::Type type)
   {
-    pair<multimap<string, Place *>::iterator, 
-      multimap<string, Place *>::iterator> portRange = 
+    pair<multimap<string, Place *>::iterator,
+      multimap<string, Place *>::iterator> portRange =
       net_.interfacePlacesByPort_.equal_range(place.getPort());
 
     switch (type)
       {
       case Node::INTERNAL:
-	net_.internalPlaces_.erase(&place); 
+	net_.internalPlaces_.erase(&place);
 	break;
       case Node::INPUT:
 	net_.inputPlaces_.erase(&place);
 	net_.interfacePlaces_.erase(&place);
-	for (multimap<string, Place *>::iterator it = portRange.first; 
+	for (multimap<string, Place *>::iterator it = portRange.first;
 	     it != portRange.second; ++it)
 	  if (it->second == &place)
 	    {
@@ -226,7 +226,7 @@ namespace pnapi
       case Node::OUTPUT:
 	net_.outputPlaces_.erase(&place);
 	net_.interfacePlaces_.erase(&place);
-	for (multimap<string, Place *>::iterator it = portRange.first; 
+	for (multimap<string, Place *>::iterator it = portRange.first;
 	     it != portRange.second; ++it)
 	  if (it->second == &place)
 	    {
@@ -259,7 +259,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
-    observer_(*this), 
+    observer_(*this),
     condition_(net.condition_, copyStructure(net)),
     meta_(net.meta_)
   {
@@ -315,7 +315,7 @@ namespace pnapi
    * \pre   the node names are unique (disjoint name sets); use
    *        prefixNodeNames() on <em>both</em> nets to achieve this
    */
-  map<const Place *, const Place *>  
+  map<const Place *, const Place *>
   PetriNet::copyStructure(const PetriNet & net)
   {
     // add all transitions of the net
@@ -386,7 +386,7 @@ namespace pnapi
     // prefix and combine the nets
     prefixNodeNames(prefix);
     tmpNet.prefixNodeNames(netPrefix);
-    const map<const Place *, const Place *> & placeMapping = 
+    const map<const Place *, const Place *> & placeMapping =
       copyStructure(tmpNet);
 
     // translate references and merge places
@@ -575,10 +575,10 @@ namespace pnapi
   set<Place *> PetriNet::getInterfacePlaces(const string & port) const
   {
     set<Place *> places;
-    pair<multimap<string, Place *>::const_iterator, 
-      multimap<string, Place *>::const_iterator> portRange = 
+    pair<multimap<string, Place *>::const_iterator,
+      multimap<string, Place *>::const_iterator> portRange =
       interfacePlacesByPort_.equal_range(port);
-    for (multimap<string, Place *>::const_iterator it = portRange.first; 
+    for (multimap<string, Place *>::const_iterator it = portRange.first;
 	 it != portRange.second; ++it)
       places.insert(it->second);
     return places;
@@ -620,14 +620,17 @@ namespace pnapi
    */
   bool PetriNet::isFreeChoice() const
   {
-    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-      for (set<Transition *>::iterator tt = transitions_.begin(); tt != transitions_.end(); tt++)
-	{
-	  set<Node *> t_pre  = (*t)->getPreset();
-	  set<Node *> tt_pre = (*tt)->getPreset();
-	  if ((t_pre != tt_pre) && !(util::setIntersection(t_pre, tt_pre).empty()))
-	    return false;
-	}
+    for (set<Transition *>::iterator t = transitions_.begin();
+        t != transitions_.end(); t++)
+      for (set<Transition *>::iterator tt = transitions_.begin();
+          tt != transitions_.end(); tt++)
+      {
+        set<Node *> t_pre  = (*t)->getPreset();
+        set<Node *> tt_pre = (*tt)->getPreset();
+        if ((t_pre != tt_pre) &&
+            !(util::setIntersection(t_pre, tt_pre).empty()))
+          return false;
+      }
     return true;
   }
 
@@ -654,70 +657,80 @@ namespace pnapi
   /*!
    * \brief   normalizes the given Petri net
    *
-   *          A Petri net (resp. open net) is called normal if
-   *          each transition has only one interface place in its neighborhood.
+   * A Petri net (resp. open net) is called normal if
+   * each transition has only one adjacent interface
+   * place.
+   *
+   * For input places complementary places are introduced.
    */
-    void PetriNet::normalize()
+  void PetriNet::normalize()
   {
-
     std::string suffix = "_normalized";
+
     set<Place *> temp;
-    set<Place *> interface = getInterfacePlaces();
 
-    for (set<Place *>::iterator place = interface.begin(); place
-        != interface.end(); place++)
+    for (set<Transition *>::const_iterator t = transitions_.begin();
+        t != transitions_.end(); t++)
     {
-      set<Node *> neighbors = util::setUnion((*place)->getPreset(),
-          (*place)->getPostset());
-      for (set<Node *>::iterator transition = neighbors.begin(); transition
-          != neighbors.end(); transition++)
+      /// adjacent input places of t
+      set<Place *> t_inp;
+      for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
+          p != (*t)->getPreset().end(); p++)
+        if ((*p)->getType() == Node::INPUT)
+          t_inp.insert(static_cast<Place *>(*p));
+
+      for (set<Place *>::const_iterator ip = t_inp.begin();
+          ip != t_inp.end(); ip++)
       {
-        Transition *t = static_cast<Transition *> (*transition);
-        while (!t->isNormal())
-        {
-          // create new internal place from interface place
-          Place &newP = createPlace((*place)->getName() + suffix);
+        /// new input place
+        Place &ninp = createPlace("i_"+(*ip)->getName()+suffix, Node::INPUT);
+        /// new internal place
+        Place &nint = createPlace((*ip)->getName()+suffix);
+        /// complementary place
+        Place &ncomp = createPlace("comp_"+(*ip)->getName());
+        /// new transition
+        Transition &ntrans = createTransition("t_"+(*ip)->getName());
+        /// creating arcs
+        createArc(ninp, ntrans);
+        createArc(ntrans, nint);
+        createArc(ncomp, ntrans);
+        createArc(*(*t), ncomp);
 
-          // create new interface place
-          Place &newPin = createPlace("i_" + (*place)->getName(),
-              (*place)->getType());
+        temp.insert(*ip);
+      }
 
-          // create new transition
-          Transition &newT = createTransition("t_" + (*place)->getName());
+      /// adjacent output places of t
+      set<Place *> t_out;
+      for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
+          p != (*t)->getPostset().begin(); p++)
+        if ((*p)->getType() == Node::OUTPUT)
+          t_out.insert(static_cast<Place *>(*p));
 
-          // set arcs (1, 2 & 3)
-          if ((*place)->getType() == Node::INPUT)
-          {
-            createArc(newPin, newT);
-            createArc(newT, newP);
-            for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-            {
-              if (&(*f)->getSourceNode() == (*place))
-              {
-                createArc(newP, (*f)->getTargetNode());
-              }
-            }
-          }
-          else
-          {
-            createArc(newT, newPin);
-            createArc(newP, newT);
-            for (set<Arc *>::iterator f = arcs_.begin(); f != arcs_.end(); f++)
-            {
-              if (&(*f)->getTargetNode() == (*place))
-              {
-                createArc((*f)->getSourceNode(), newP);
-              }
-            }
-          }
+      for (set<Place *>::const_iterator op = t_out.begin();
+          op != t_out.end(); op++)
+      {
+        /// normal check
+        if ((*t)->isNormal())
+          break;
 
-          temp.insert(*place);
-        }
+        /// new output place
+        Place &nout = createPlace("i_"+(*op)->getName()+suffix, Node::OUTPUT);
+        /// new internal place
+        Place &nint = createPlace((*op)->getName()+suffix);
+        /// new transition
+        Transition &ntrans = createTransition("t_"+(*op)->getName());
+        /// creating arcs
+        createArc(*(*t), nint);
+        createArc(nint, ntrans);
+        createArc(ntrans, nout);
+
+        temp.insert(*op);
       }
     }
 
     // remove the old interface places
-    for (set<Place *>::iterator place = temp.begin(); place != temp.end(); place++)
+    for (set<Place *>::iterator place = temp.begin(); place != temp.end();
+        place++)
       deletePlace(**place);
   }
 
@@ -863,46 +876,36 @@ namespace pnapi
    * \return  true iff (1), (2) and (3) are fulfilled
    * \return  false in any other case
    */
-  bool PetriNet::isWorkflow() const
+  bool PetriNet::isWorkflow()
   {
     Place *first = NULL;
     Place *last  = NULL;
 
     // finding places described in condition (1) & (2)
     for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+    {
+      if ((*p)->getPreset().empty())
       {
-	if ((*p)->getPreset().empty())
-	  {
-	    if (first == NULL)
-	      first = *p;
-	    else
-	      {
-		//std::cerr << "This net is no workflow net because there are more than one place with empty preset!\n";
-		return false;
-	      }
-	  }
-	if ((*p)->getPostset().empty())
-	  {
-	    if (last == NULL)
-	      last = *p;
-	    else
-	      {
-		//std::cerr << "This net is no workflow net because there are more than one place with empty postset!\n";
-		return false;
-	      }
-	  }
+        if (first == NULL)
+          first = *p;
+        else
+          return false;
       }
+      if ((*p)->getPostset().empty())
+      {
+        if (last == NULL)
+          last = *p;
+        else
+          return false;
+      }
+    }
     if (first == NULL || last == NULL)
-      {
-	//std::cerr << "No workflow net! Either no place with empty preset or no place with empty postset found.\n";
-	return false;
-      }
+      return false;
 
     // insert new transition which consumes from last and produces on first to form a cycle
-    //Transition *tarjan = &createTransition("tarjan");
-    //FIXME
-    //newArc(last, tarjan);
-    //  newArc(tarjan, first);
+    Transition &tarjan = createTransition("tarjan");
+    createArc(*last, tarjan);
+    createArc(tarjan, *first);
 
     // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
     // (strongly connected net using tarjan's algorithm)
@@ -913,17 +916,18 @@ namespace pnapi
     stack<Node *> S; ///< stack used by Tarjan's algorithm
 
     // set all nodes' index values to ``undefined''
-    for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+    for (set<Place *>::const_iterator p = places_.begin();
+        p != places_.end(); p++)
       index[*p] = (-1);
-    for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    for (set<Transition *>::const_iterator t = transitions_.begin();
+        t != transitions_.end(); t++)
       index[*t] = (-1);
 
     // getting the number of strongly connected components reachable from first
-    unsigned int sscCount = util::dfsTarjan<Node *>(first, S, stacked, i, index, lowlink);
+    unsigned int sscCount = util::dfsTarjan<Node *>(first, S,
+        stacked, i, index, lowlink);
 
-    //std::cout << "\nstrongly connected components: " << sscCount << "\n\n";
-
-    //deleteTransition(*tarjan);
+    deleteTransition(tarjan);
 
     // check set $P \cup T$
     set<Node *> nodeSet;
@@ -932,16 +936,14 @@ namespace pnapi
     for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
       nodeSet.insert(*t);
 
-    /* true iff only one strongly connected component found from first and all nodes
+    /*
+     * true iff only one strongly connected component found from first and all nodes
      * of $\mathcal{N}$ are members of this component
      */
     if (sscCount == 1 && util::setDifference(nodeSet, stacked).empty())
       return true;
     else
-      {
-	//cerr << "No workflow net! Some places are not between the the preset-less and the postset-less place.\n";
-	return false;
-      }
+      return false;
   }
 
 

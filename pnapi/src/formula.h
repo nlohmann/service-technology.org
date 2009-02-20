@@ -206,6 +206,8 @@ namespace pnapi
 			   = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+      std::set<const Place *> concerningPlaces() const;
     };
 
 

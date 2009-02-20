@@ -411,7 +411,7 @@ namespace pnapi
     set<const Place *> Operator::concerningPlaces() const
     {
       set<const Place *> places;
-      for (set<const Formula *>::const_iterator it = children_.begin(); 
+      for (set<const Formula *>::const_iterator it = children_.begin();
 	   it != children_.end(); ++it)
 	{
 	  set<const Place *> childCps = (*it)->concerningPlaces();
@@ -427,6 +427,14 @@ namespace pnapi
       return places;
     }
 
+    set<const Place *> FormulaEqual::concerningPlaces() const
+    {
+      set<const Place *> places;
+      if (tokens_ > 0)
+        places.insert(&place_);
+      return places;
+    }
+
 
     /**************************************************************************
      ***** simplify children implementation
@@ -439,19 +447,19 @@ namespace pnapi
     void Conjunction::simplifyChildren()
     {
       set<const Formula *> children = children_;
-      for (set<const Formula *>::iterator it = children.begin(); 
+      for (set<const Formula *>::iterator it = children.begin();
 	   it != children.end(); ++it)
 	if (dynamic_cast<const FormulaTrue *>(*it) != NULL)
 	  {
 	    children_.erase(*it);
 	    delete *it;
 	  }
-	else 
+	else
 	  {
 	    const Operator * o = dynamic_cast<const Conjunction *>(*it);
 	    if (o != NULL)
 	      {
-		for (set<const Formula *>::const_iterator it = 
+		for (set<const Formula *>::const_iterator it =
 		       o->children().begin(); it != o->children().end(); ++it)
 		  children_.insert((*it)->clone());
 		children_.erase(o);
@@ -463,19 +471,19 @@ namespace pnapi
     void Disjunction::simplifyChildren()
     {
       set<const Formula *> children = children_;
-      for (set<const Formula *>::iterator it = children.begin(); 
+      for (set<const Formula *>::iterator it = children.begin();
 	   it != children.end(); ++it)
 	if (dynamic_cast<const FormulaFalse *>(*it) != NULL)
 	  {
 	    children_.erase(*it);
 	    delete *it;
 	  }
-	else 
+	else
 	  {
 	    const Operator * o = dynamic_cast<const Disjunction *>(*it);
 	    if (o != NULL)
 	      {
-		for (set<const Formula *>::const_iterator it = 
+		for (set<const Formula *>::const_iterator it =
 		       o->children().begin(); it != o->children().end(); ++it)
 		  children_.insert((*it)->clone());
 		children_.erase(o);

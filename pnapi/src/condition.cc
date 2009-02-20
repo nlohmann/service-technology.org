@@ -135,7 +135,7 @@ namespace pnapi
   void Condition::addMarking(const Marking & m)
   {
     set<const Formula *> propositions;
-    for (map<const Place *, unsigned int>::const_iterator it = m.begin(); 
+    for (map<const Place *, unsigned int>::const_iterator it = m.begin();
 	 it != m.end(); ++it)
       propositions.insert(new FormulaEqual(*it->first, it->second));
 
@@ -144,14 +144,14 @@ namespace pnapi
     else
       *this = formula() || Conjunction(propositions);
 
-    for (set<const Formula *>::iterator it = propositions.begin(); 
+    for (set<const Formula *>::iterator it = propositions.begin();
 	 it != propositions.end(); ++it)
       delete *it;
   }
 
-/*  const std::set<std::string> & Condition::concerningPlaces() const
+  std::set<const Place *> Condition::concerningPlaces() const
   {
     return formula_->concerningPlaces();
-  }*/
+  }
 
 }

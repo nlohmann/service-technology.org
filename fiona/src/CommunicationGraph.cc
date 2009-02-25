@@ -305,7 +305,7 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         if (!dotFile.good()) {
             dotFile.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
         dotFile << "digraph g1 {\n";
@@ -483,17 +483,21 @@ void CommunicationGraph::createDotFileRecursively(AnnotatedGraphNode* v,
         			os << "[" << PN->getCurrentMarkingAsString() << "]";
         		}
 
-                //  os << " (";
-                // print the suffix (state type)
-//                switch ((*iter)->exactType()) {
-//                    case I_DEADLOCK:    os << "iDL";    break;
-//                    case E_DEADLOCK:    os << "eDL";    break;
-//                    case FINALSTATE:    os << "FS";     break;
-//                    case TRANS:         os << "TR";     break;
-//                    default:            assert(false);
-//                }
+//                cerr << "DEBUG-LEVEL: " << debug_level;
+        		
+        		if (debug_level >= TRACE_3) {
+        		    os << " (";
+        		    // print the suffix (state type)
+                    switch ((*iter)->exactType()) {
+                        case I_DEADLOCK:    os << "iDL";    break;
+                        case E_DEADLOCK:    os << "eDL";    break;
+                        case FINALSTATE:    os << "FS";     break;
+                        case TRANS:         os << "TR";     break;
+                        default:            assert(false);
+                    }
+                    os << ")";
+                }
 //
-//                os << ")" << " (parent: " << (*iter)->parent << ")\\n";
                 os << "\\n";
             }
         }

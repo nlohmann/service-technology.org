@@ -177,7 +177,7 @@ void readnet(const std::string& owfnfile) {
     }
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
@@ -252,7 +252,7 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph();
@@ -429,7 +429,7 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
 
@@ -525,7 +525,7 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
         (output) << (*PVoWFN);
@@ -595,7 +595,6 @@ Graph* computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN, bo
     return pv;
 
 }
-
 
 
 //! \brief create an IG of an oWFN
@@ -744,10 +743,9 @@ string computeSmallPartner(AnnotatedGraph* IG) {
         TRACE(TRACE_1, "    Creating STG File\n");
         stgFilename = IG->printGraphToSTG(edgeLabels);
     } else {
-        trace( "\n    Cannot synthesize a partner for a net, that is not controllable\n\n");
+        trace("\n    Cannot synthesize a partner for a net, that is not controllable\n\n");
         return "";
     }
-
 
     // 3. step: invoke petrify on created STG file
     // prepare petrify command line and execute system command if possible
@@ -759,7 +757,7 @@ string computeSmallPartner(AnnotatedGraph* IG) {
         TRACE(TRACE_2, "        " + systemcall + "\n");
         system(systemcall.c_str());
     } else {
-        trace( "cannot execute command as Petrify was not found in path\n");
+        trace("cannot execute command as Petrify was not found in path\n");
         return "";
     }
 
@@ -768,10 +766,10 @@ string computeSmallPartner(AnnotatedGraph* IG) {
     // 5. step: complete interface with the interface information stored in the
     // IG (done in STG2oWFN_main
     TRACE(TRACE_1, "    Converting petrify result to petri net.\n");
-    string owfnFilename = STG2oWFN_main( edgeLabels, pnFilename, IG->inputPlacenames, IG->outputPlacenames );
+    string owfnFilename = STG2oWFN_main(edgeLabels, pnFilename, IG->inputPlacenames, IG->outputPlacenames);
 
 
-    trace( "Partner synthesis completed. Created file: " + owfnFilename + "\n");
+    trace("Partner synthesis completed. Created file: " + owfnFilename + "\n");
     TRACE(TRACE_5, "string computeSmallPartner(AnnotatedGraph*) : end\n");
 
     return owfnFilename; // return partner filename
@@ -787,10 +785,8 @@ string computeSmallPartner(oWFN* givenPN) {
     string igFilename = "";
     InteractionGraph* graph = computeIG(givenPN, igFilename);
 
-
     // 2.-4. step wil be done with former computed IG (ignoring partner filename)
     computeSmallPartner(graph);
-
 
     // garbage collection
     delete graph;
@@ -1491,7 +1487,7 @@ void makePNG(oWFN* PN) {
         // check whether the stream was succesfully created
         if (!out->is_open()) {
             trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
-           TRACE(TRACE_0, "Error: A file error occured. Exit.");
+           trace("Error: A file error occured. Exit.");
            setExitCode(EC_FILE_ERROR);
         }
 
@@ -1576,7 +1572,7 @@ void reduceOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
         (output) << (*PNapiNet);
@@ -1626,7 +1622,7 @@ oWFN* normalizeOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(), ios::out);
         if (!output.good()) {
             output.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
 
@@ -1652,7 +1648,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
     // normalize given PN if necessary
     oWFN* normalOWFN = PN;
     if ( !PN->isNormal() ) {
-        TRACE(TRACE_0, "normalizing current petrinet " + PN->filename + "\n");
+        trace("normalizing current petrinet " + PN->filename + "\n");
         // TODO: this is a dirty hack to prevent normalization from outputting
         // some files, but it is ok because there will be a general
         // reorganisation of output files soon
@@ -1664,7 +1660,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
 
     // match the oWFN with given OG
     string reasonForFailedMatch;
-    TRACE(TRACE_0, ("matching " + PN->filename + " and ...\n\n"));
+    trace(("matching " + PN->filename + " and ...\n\n"));
     for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin();
          OGToMatch != OGsToMatch.end(); ++OGToMatch) {
         // use only the labeled core
@@ -1673,25 +1669,25 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
         if (parameters[P_COVER]) {
             if ( coreOWFN->matchesWithConstraintOG((*OGToMatch), covConstraint, reasonForFailedMatch) ) {
                 TRACE(TRACE_1, "\n");
-                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": YES\n");
+                trace(((*OGToMatch)->getFilename()) + ": YES\n");
             } else {
                 TRACE(TRACE_1, "\n");
                 TRACE(TRACE_1, "Match failed: " + reasonForFailedMatch + "\n\n");
-                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": NO\n");
+                trace(((*OGToMatch)->getFilename()) + ": NO\n");
             }
         } else {
             if ( coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
                 TRACE(TRACE_1, "\n");
-                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": YES\n");
+                trace(((*OGToMatch)->getFilename()) + ": YES\n");
             } else {
                 TRACE(TRACE_1, "\n");
-                TRACE(TRACE_0, "Match failed: " + reasonForFailedMatch + "\n\n");
-                TRACE(TRACE_0, ((*OGToMatch)->getFilename()) + ": NO\n");
+                trace("Match failed: " + reasonForFailedMatch + "\n\n");
+                trace(((*OGToMatch)->getFilename()) + ": NO\n");
             }
         }
         delete coreOWFN;
     }
-    TRACE(TRACE_0, "\n");
+    trace("\n");
 
 
     // garbage collection
@@ -1769,8 +1765,8 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 int main(int argc, char** argv) {
 
     // print debug information about system variables, the current compilation
-    // in case of unusal behavior of Fiona, with this information it might be easier to track down
-    // the bug(s)
+    // in case of unusal behavior of Fiona, with this information it might be easier
+    // to track down the bug(s)
     if (argc == 2 && std::string(argv[1]) == "--bug") {
         printf("\n\n");
         printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);

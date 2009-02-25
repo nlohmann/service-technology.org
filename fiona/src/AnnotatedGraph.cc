@@ -421,9 +421,7 @@ unsigned int AnnotatedGraph::numberOfServices() {
 
     if (instances > 100000) {
         TRACE(TRACE_2, "Valid Number of instances exceeded.\n");
-        trace(
-                TRACE_0,
-                "The number of strategies is approx INFINITY ;), aborting further calculation.\n");
+        trace("The number of strategies is approx INFINITY ;), aborting further calculation.\n");
         TRACE(TRACE_5, "AnnotatedGraph::numberOfServices(...): end\n");
         return number;
     } else {
@@ -1445,15 +1443,8 @@ void AnnotatedGraph::removeUnreachableNodesRecursively(AnnotatedGraphNode* curre
 //!        the graph such that it still characterizes the same strategies
 void AnnotatedGraph::minimizeGraph() {
     TRACE(TRACE_5, "AnnotatedGraph::minimizeGraph(): start\n");
-    trace( "starting minimization...\n");
 
-    TRACE(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
-
-    time_t seconds, seconds2;
-    seconds = time(NULL);
-
-    // terminology:
-    // greater node means a node stored behind current node in setOfNodes
+    TRACE(TRACE_1, "number of nodes before removing false nodes: " + intToString(setOfNodes.size()) + "\n");
 
     // false nodes are removed to increase performance only;
     // should also work if nodes are unsatisfiable
@@ -1461,6 +1452,15 @@ void AnnotatedGraph::minimizeGraph() {
     removeReachableFalseNodes();
     removeUnreachableNodes();
 
+    TRACE(TRACE_1, "number of nodes before minimization: " + intToString(setOfNodes.size()) + "\n");
+
+    // terminology:
+    // greater node means a node stored behind current node in setOfNodes
+
+    time_t seconds, seconds2;
+    seconds = time(NULL);
+
+    trace( "starting minimization...\n");
     // we only have to minimize if at least two blue nodes are present...
     if (setOfNodes.size() >= 2) {
 
@@ -1546,11 +1546,11 @@ void AnnotatedGraph::minimizeGraph() {
 
     seconds2 = time(NULL);
     cout << "    " << difftime(seconds2, seconds) << " s consumed" << endl;
-    trace( "finished minimization...\n\n");
+    trace("finished minimization...\n\n");
 
     // nicht noetig, weil final flag wird bewahrt
     // assignFinalNodes();
-    TRACE(TRACE_1, "number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
+    trace("number of nodes after minimization: " + intToString(setOfNodes.size()) + "\n\n");
 
 /*
     if (!options[O_OUTFILEPREFIX]) {
@@ -2521,7 +2521,7 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
 
     if (!ogFile.good()) {
             ogFile.close();
-            TRACE(TRACE_0, "Error: A file error occurred. Exit.");
+            trace("Error: A file error occurred. Exit.");
             setExitCode(EC_FILE_ERROR);
     }
     if (hasNoRoot()) {
@@ -3384,7 +3384,7 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     fstream STGFileStream(STGFileName.c_str(), ios_base::out | ios_base::trunc | ios_base::binary);
     if (!STGFileStream.good()) {
             STGFileStream.close();
-            TRACE(TRACE_0, "Error: A file error occured. Exit.");
+            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
     }
     STGFileStream << ".model Labeled_Transition_System" << "\n";

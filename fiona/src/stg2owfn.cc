@@ -264,7 +264,7 @@ string STG2oWFN_main(vector<string>& edgeLabels,
     
     if (!file->good()) {
         file->close();
-        TRACE(TRACE_0, "Error: A file error occured. Exit."); 
+        trace("Error: A file error occured. Exit."); 
         exit(EC_FILE_ERROR);
     }
 

@@ -184,7 +184,7 @@ void GasTexGraph::makeGasTex(string texFileName) {
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
     if (!texFile.good()) {
         texFile.close();
-        TRACE(TRACE_0, "Error: A file error occured. Exit.");
+        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
 

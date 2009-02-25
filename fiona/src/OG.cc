@@ -726,7 +726,7 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                 }
 
                 // use a new reference of the currently considered state
-                State * currentState = (*iter);
+                State* currentState = (*iter);
 
                 // if we are in responsive mode, remember which TSCC we are in
                 // (since current state is a representative of the TSCC it holds: dfs==lowlink)
@@ -757,8 +757,8 @@ void OG::computeCNF(AnnotatedGraphNode* node) const {
                     // get all activated receiving events of OG
                     for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                         if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
-                            GraphFormulaLiteral
-                                            * myliteral= new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
+                            GraphFormulaLiteral* myliteral =
+                                new GraphFormulaLiteral(PN->getOutputPlace(i)->getLabelForCommGraph());
                             myclause->addSubFormula(myliteral);
                         }
                     }

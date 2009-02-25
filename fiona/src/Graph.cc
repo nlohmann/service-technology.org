@@ -266,7 +266,7 @@ string Graph::createDotFile(string& filenamePrefix,
             fstream dotFileHandle(dotFile.c_str(), ios_base::out | ios_base::trunc);
             if (!dotFileHandle.good()) {
                 dotFileHandle.close();
-                TRACE(TRACE_0, "Error: A file error occured. Exit.");
+                trace("Error: A file error occured. Exit.");
                 setExitCode(EC_FILE_ERROR);
             }
             dotFileHandle << "digraph g1 {\n";

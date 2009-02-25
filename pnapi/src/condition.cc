@@ -151,7 +151,7 @@ namespace pnapi
 
   std::set<const Place *> Condition::concerningPlaces() const
   {
-    return formula_->concerningPlaces();
+    return formula_->places(true);
   }
 
 }

@@ -39,21 +39,21 @@ int main(int argc, char * argv[])
     << "}" << endl << endl
     << "PLACE" << endl
     << "  INTERNAL" << endl
-    << "    p2; SAFE 8: p1; " << endl << endl
+    << "    p2; SAFE 8: p1;" << endl << endl
     << "  INPUT" << endl
     << "    in;" << endl << endl
     << "  OUTPUT" << endl
     << "    out;" << endl << endl
     << "PORTS" << endl
-    << "  port1: out; " << endl << endl
+    << "  port1: out;" << endl << endl
     << "INITIALMARKING" << endl
     << "  p1: 4;" << endl << endl
     << "FINALCONDITION" << endl
     << "  ((in = 2 AND out = 4) OR p1 > 1);" << endl << endl << endl
-    << "TRANSITION t1 { input }" << endl
+    << "TRANSITION t1" << endl
     << "  CONSUME in:3;" << endl
     << "  PRODUCE p1;" << endl << endl
-    << "TRANSITION t2 { output }" << endl
+    << "TRANSITION t2" << endl
     << "  CONSUME p1;" << endl
     << "  PRODUCE out;" << endl << endl << endl
     << "{ END OF FILE ‘’ }" << endl;
@@ -64,6 +64,7 @@ int main(int argc, char * argv[])
   begin_test("io::operator<<() [Petri net DOT output]");
   ostringstream dotResult, dotExpected;
   dotResult << dot << net;
+  //cout << dot << net;
   dotExpected 
     << "digraph N {" << endl
     << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" "
@@ -99,9 +100,9 @@ int main(int argc, char * argv[])
     << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black]" 
     << endl
     << " in -> t1	[label=\"3\"]" << endl
+    << " t2 -> out	[]" << endl
     << " t1 -> p1	[weight=10000.0]" << endl
     << " p1 -> t2	[weight=10000.0]" << endl
-    << " t2 -> out	[]" << endl
     << "}" << endl;
   assert(dotResult.str() == dotExpected.str());
   end_test();

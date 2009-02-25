@@ -70,11 +70,11 @@ namespace pnapi
       << "}" << endl 
       << endl
 
-      << mode(io::util::PLACE) << delim(", ")
+      << mode(io::util::PLACE)
       << "PLACE"      << endl
       << "  INTERNAL" << endl
-      << "    " << io::util::groupPlacesByCapacity(internalPlaces_)
-      << endl << endl
+      << "    " << io::util::groupPlacesByCapacity(internalPlaces_) << ";"
+      << endl << endl << delim(", ")
       << "  INPUT"    << endl
       << "    " << inputPlaces_                                     << ";" 
       << endl << endl
@@ -84,7 +84,7 @@ namespace pnapi
 
     if (!interfacePlacesByPort_.empty())
       os << "PORTS" << endl
-	 << "  " << interfacePlacesByPort_ << endl
+	 << "  " << interfacePlacesByPort_ << ";" << endl
 	 << endl;
   
     os

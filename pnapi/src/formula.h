@@ -41,7 +41,7 @@ namespace pnapi
       virtual std::ostream & output(std::ostream &) const =0;
 
       /// set of concerning places
-      virtual std::set<const Place *> concerningPlaces() const;
+      virtual std::set<const Place *> places(bool excludeEmpty = false) const;
 
     };
 
@@ -66,7 +66,7 @@ namespace pnapi
 
       const std::set<const Formula *> & children() const;
 
-      std::set<const Place *> concerningPlaces() const;
+      std::set<const Place *> places(bool excludeEmpty = false) const;
 
     protected:
       std::set<const Formula *> children_;
@@ -160,7 +160,7 @@ namespace pnapi
 
       unsigned int tokens() const;
 
-      std::set<const Place *> concerningPlaces() const;
+      std::set<const Place *> places(bool excludeEmpty = false) const;
 
     protected:
       const Place & place_;
@@ -207,7 +207,7 @@ namespace pnapi
 
       std::ostream & output(std::ostream &) const;
 
-      std::set<const Place *> concerningPlaces() const;
+      std::set<const Place *> places(bool excludeEmpty = false) const;
     };
 
 

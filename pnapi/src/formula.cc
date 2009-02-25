@@ -79,7 +79,7 @@ namespace pnapi
     Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
       Operator(f)
     {
-      set<const Place *> cps = concerningPlaces();
+      set<const Place *> cps = places();
 
       for (set<const Place *>::const_iterator it = wc.begin(); it != wc.end();
 	   ++it)
@@ -403,34 +403,34 @@ namespace pnapi
      ***** concerning places implementation
      **************************************************************************/
 
-    set<const Place *> Formula::concerningPlaces() const
+    set<const Place *> Formula::places(bool excludeEmpty) const
     {
       return set<const Place *>();
     }
 
-    set<const Place *> Operator::concerningPlaces() const
+    set<const Place *> Operator::places(bool excludeEmpty) const
     {
       set<const Place *> places;
       for (set<const Formula *>::const_iterator it = children_.begin();
 	   it != children_.end(); ++it)
 	{
-	  set<const Place *> childCps = (*it)->concerningPlaces();
+	  set<const Place *> childCps = (*it)->places();
 	  places.insert(childCps.begin(), childCps.end());
 	}
       return places;
     }
 
-    set<const Place *> Proposition::concerningPlaces() const
+    set<const Place *> Proposition::places(bool excludeEmpty) const
     {
       set<const Place *> places;
       places.insert(&place_);
       return places;
     }
 
-    set<const Place *> FormulaEqual::concerningPlaces() const
+    set<const Place *> FormulaEqual::places(bool excludeEmpty) const
     {
       set<const Place *> places;
-      if (tokens_ > 0)
+      if (!excludeEmpty && tokens_ > 0)
         places.insert(&place_);
       return places;
     }

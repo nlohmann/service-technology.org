@@ -20,8 +20,10 @@
 
 #include <set>
 #include <map>
+#include <list>
 #include <vector>
 #include <ostream>
+#include <algorithm>
 
 namespace pnapi
 {
@@ -218,6 +220,13 @@ namespace pnapi
 
       /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
 
+      bool compareContainerElements(Node *, Node *);
+      bool compareContainerElements(Place *, Place *);
+      bool compareContainerElements(Transition *, Transition *);
+      bool compareContainerElements(Arc *, Arc *);
+      bool compareContainerElements(const formula::Formula *, 
+				    const formula::Formula *);
+
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
       std::multimap<unsigned int, Place *> 
       groupPlacesByCapacity(const std::set<Place *> &);
@@ -260,30 +269,47 @@ namespace pnapi
 	return os;
       }
 
+
+      template <typename T>
+      std::ostream & outputContainerElement(std::ostream & os, const T * t)
+      {
+	return os << *t;
+      }
+
       
       template <typename T>
-      std::ostream & outputContainer(std::ostream & os, const T & c)
+      std::ostream & outputContainerElement(std::ostream & os, 
+				     const std::pair<T, std::set<Place *> > & p)
+      {
+	outputGroupPrefix(os, p.first);
+	return os << delim(", ") << p.second;
+      }
+
+
+      template <typename T>
+      std::ostream & operator<<(std::ostream & os, const std::vector<T> & v)
       {
 	std::string delim = DelimData::data(os).delim;
-	if (c.empty()) return os;
-	for (typename T::const_iterator it = c.begin(); 
-	     it != --c.end(); ++it)
-	  os << **it << delim;
-	return os << **--c.end();
+	if (v.empty()) return os;
+	for (typename std::vector<T>::const_iterator it = v.begin(); 
+	     it != --v.end(); ++it)
+	  outputContainerElement(os, *it) << delim;
+	return outputContainerElement(os, *--v.end());
       }
-      
+
 
       template <typename T>
       std::ostream & operator<<(std::ostream & os, const std::set<T> & s)
       {
-	return outputContainer(os, s);
-      }
+	// sort the elements
+	std::vector<T> v;
+	for (typename std::set<T>::iterator it = s.begin(); it != s.end(); ++it)
+	  v.push_back(*it);
+	bool (*c)(T, T) = compareContainerElements;
+	std::sort(v.begin(), v.end(), c);
 
-      
-      template <typename T>
-      std::ostream & operator<<(std::ostream & os, const std::vector<T> & v)
-      {
-	return outputContainer(os, v);
+	// output the sorted vector
+	return os << v;
       }
 
 
@@ -291,6 +317,7 @@ namespace pnapi
       operator<<(std::ostream & os, 
 		 const std::multimap<T, Place *> & places)
       {
+	std::vector<std::pair<T, std::set<Place *> > > metaVector;
 	for (typename std::multimap<T, Place *>::const_iterator it = 
 	       places.begin(); 
 	     it != places.end(); it = places.upper_bound(it->first))
@@ -299,10 +326,9 @@ namespace pnapi
 	    for (typename std::multimap<T, Place *>::const_iterator subit = it;
 		 subit != places.upper_bound(it->first); ++subit)
 	      subset.insert(subit->second);
-	    outputGroupPrefix(os, it->first);
-	    os << subset << "; ";
+	    metaVector.push_back(std::pair<T, std::set<Place *> >(it->first, subset));
 	  }
-        return os;
+        return os << delim("; ") << metaVector;
       }
 
 

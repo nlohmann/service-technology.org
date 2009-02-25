@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 using std::cout;
+using std::cerr;
 using std::endl;
 #endif
 
@@ -17,6 +18,8 @@ using std::string;
 using std::ios_base;
 using std::ostream;
 using std::set;
+
+using pnapi::formula::Formula;
 
 namespace pnapi
 {
@@ -170,6 +173,37 @@ namespace pnapi
       }
 
 
+      bool compareContainerElements(Node * n1, Node * n2)
+      {
+	return n1->getName() < n2->getName();
+      }
+
+
+      bool compareContainerElements(Place * p1, Place * p2)
+      {
+	return compareContainerElements((Node *) p1, (Node *) p2);
+      }
+
+
+      bool compareContainerElements(Transition * t1, Transition * t2)
+      {
+	return compareContainerElements((Node *) t1, (Node *) t2);
+      }
+
+
+      bool compareContainerElements(Arc * f1, Arc * f2)
+      {
+	return compareContainerElements(&f1->getPlace(), &f2->getPlace());
+      }
+
+
+      bool compareContainerElements(const formula::Formula *, 
+				    const formula::Formula *)
+      {
+	return false;
+      }
+
+
       set<Place *> filterMarkedPlaces(const set<Place *> & places)
       {
 	set<Place *> filtered;
@@ -301,7 +335,8 @@ namespace pnapi
 	switch (FormatData::data(os))
 	  {
 	  case OWFN:    /* TRANSITIONS: OWFN    */
-	    os << "TRANSITION " << t.getName();
+	    os << "TRANSITION " << t.getName() << endl;
+	    /*
 	    switch (t.getType())
 	      {
 	      case Node::INTERNAL: os                        << endl; break;
@@ -309,6 +344,7 @@ namespace pnapi
 	      case Node::OUTPUT:   os << " { output }"       << endl; break;
 	      case Node::INOUT:    os << " { input/output }" << endl; break;
 	      }
+	    */
 	    os << delim(", ") 
 	       << "  CONSUME " << t.getPresetArcs()  << ";" << endl
 	       << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
@@ -375,10 +411,46 @@ namespace pnapi
 
       ostream & operator<<(ostream & os, const formula::Conjunction & f)
       {
+	string wildcard;
+	set<const Formula *> children = f.children();
+	/*
+	set<const Place *> formulaPlaces = f.places();
+	if (!formulaPlaces.empty())// && formulaPlaces != f.places(true))
+	  {
+	    set<const Place *> netPlaces;
+	    for (set<Place *>::iterator it = (*formulaPlaces.begin())->getPetriNet().getPlaces().begin(); it != (*formulaPlaces.begin())->getPetriNet().getPlaces().end(); ++ it)
+	      netPlaces.insert(*it);
+	    set<const Place *> netInternalPlaces;
+	    for (set<Place *>::iterator it = (*formulaPlaces.begin())->getPetriNet().getInternalPlaces().begin(); it != (*formulaPlaces.begin())->getPetriNet().getInternalPlaces().end(); ++ it)
+	      netInternalPlaces.insert(*it);
+	    set<const Place *> netExternalPlaces;
+	    for (set<Place *>::iterator it = (*formulaPlaces.begin())->getPetriNet().getInterfacePlaces().begin(); it != (*formulaPlaces.begin())->getPetriNet().getInterfacePlaces().end(); ++ it)
+	      netExternalPlaces.insert(*it);
+	    set<const Formula *> filteredChildren;
+	    if (formulaPlaces == netPlaces)
+	      {
+		cerr << "TEST" << endl;
+		wildcard = " AND ALL_OTHER_PLACES_EMPTY";
+		for (set<const Formula *>::iterator it = children.begin(); 
+		     it != children.end(); ++it)
+		  {
+		    const formula::FormulaEqual * f = 
+		      dynamic_cast<const formula::FormulaEqual *>(*it);
+		    if (f->tokens() != 0)
+		      filteredChildren.insert(*it);
+		  }
+	      }
+	    else if (formulaPlaces == netInternalPlaces)
+	      wildcard = " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";
+	    else if (formulaPlaces == netExternalPlaces)
+	      wildcard = " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
+	  }
+	*/
+
 	if (f.children().empty())
 	  return os << formula::FormulaTrue();
 	else
-	  return os << "(" << delim(" AND ") << f.children() << ")";
+	  return os << "(" << delim(" AND ") << children << ")" << wildcard;
       }
 
 

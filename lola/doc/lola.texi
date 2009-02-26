@@ -1057,8 +1057,13 @@ is live.
 @cindex @code{ANALYSE PLACE}
 @cindex @code{.task} files
 @cindex @code{-a} option
+@cindex @code{--Analysis} option
 @cindex @code{-A} option
+@cindex @code{--analysis} option
 @cindex @code{-n} option
+@cindex @code{--net} option
+@cindex @code{-N} option
+@cindex @code{--Net} option
 
 The place to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
@@ -1137,7 +1142,9 @@ Place @samp{p1} is live iff the predicate @samp{p1 > 0} is live.
 @cindex @code{ANALYSE TRANSITION}
 @cindex @code{.task} files
 @cindex @code{-a} option
+@cindex @code{--Analysis} option
 @cindex @code{-A} option
+@cindex @code{--analysis} option
 
 The transition to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
@@ -1366,7 +1373,9 @@ The following reduction techniques may be applied:
 @cindex @code{FORMULA}, @acronym{CTL} specification
 @cindex @code{.task} files
 @cindex @code{-a} option
+@cindex @code{--Analysis} option
 @cindex @code{-A} option
+@cindex @code{--analysis} option
 @cindex @code{AND}
 @cindex @code{OR}
 @cindex @code{NOT}
@@ -1597,6 +1606,9 @@ Most stubborn set methods implemented in LoLA correspond to the publications:
 
 @subheading Applicability
 @cindex @code{-y} option
+@cindex @code{-Y} option
+@cindex @code{--automorphisms} option
+@cindex @code{--Automorphisms} option
 
 The sweep line method is available for all reachability, and dead transition problems. Use of the method is recommended for systems which exhibit substantial sequential subbehaviours in their components. 
 
@@ -1802,6 +1814,8 @@ uncaught memory overflow, or bug
 @cindex @code{.path} files
 @cindex @code{-p} option
 @cindex @code{-P} option
+@cindex @code{--path} option
+@cindex @code{--Path} option
 
 For some problems, LoLA is able to provide a witness or counterexample path for the verification problem. This path can be accessed using the @option{-p} or @option{-P} command line option when running LoLA. When the @option{-p} option is followed by a file name, the path is written to the specified file. If @option{-p} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.path}. Using @option{-P}, the path is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1817,6 +1831,8 @@ If the coverability graph option is used, parts of the path may be enclosed in p
 @cindex @code{.state} files
 @cindex @code{-s} option
 @cindex @code{-S} option
+@cindex @code{--state} option
+@cindex @code{--State} option
 
 For some problems, LoLA is able to provide a witness state for the verification problem. This state can be accessed using the @option{-s} or @option{-S} command line option when running LoLA. When the @option{-s} option is followed by a file name, the state is written to the specified file. If @option{-s} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-S}, the state is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1830,8 +1846,12 @@ The state output starts with @samp{STATE}, followed by the description of a  mar
 @cindex @code{.graph} files
 @cindex @code{-g} option
 @cindex @code{-G} option
+@cindex @code{--graph} option
+@cindex @code{--Graph} option
 @cindex @code{-m} option
 @cindex @code{-M} option
+@cindex @code{--marking} option
+@cindex @code{--Marking} option
 
 For most verification runs, LoLA is able to report on the computed portion of the state space. Exceptions concern the use of reduction techniques (like the sweep-line method or the goal-oriented execution) and the verification of some properties where advanced state space exploration strategies (other then normal depth-first or breadth-first search) are applied. Graph output can be activated using the @option{-g}, @option{-G}, @option{-m}, or @option{-M} command line options when running LoLA. When the @option{-g} or @option{-m} option is followed by a file name, the graph is written to the specified file. If @option{-g} or @option{-m} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.graph}. Using @option{-G} or @option{-M}, the graph is written to the standard output stream which is convenient for integrating LoLA into other tools. The graph output consists of a list of states. If the @option{-m} or @option{-M} options are used, we write for each state, a header, the corresponding marking (in the same syntax as for the place/transition net initial marking), and information about successors. The first and third part of the description depend on the underlying search strategy. If the @option{-g} or @option{-G} options are used, only the first and third parts of the description (i.e., the mere graph structure) are written. 
 
@@ -1850,6 +1870,8 @@ Subsequent to the (optional) marking description, the list of considered transit
 @cindex @code{.llnet} files
 @cindex @code{-n} option
 @cindex @code{-N} option
+@cindex @code{--net} option
+@cindex @code{--Net} option
 
 This feature is only useful if the original net specification is a high-level net. Then, it is possible to generate a complete net description file in the place/transition net syntax, containing the semantically equivalent low level counterpart of the given high-level net. This output option is triggered by the @option{-n} or @option{-N} command line option. When the @option{-n} option is followed by a file name, the net is written to the specified file. If @option{-n} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.llnet}. Using @option{-N}, the net is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1863,6 +1885,8 @@ The names used in the generated description correspond to the internally used na
 @cindex @code{.symm} files
 @cindex @code{-y} option
 @cindex @code{-Y} option
+@cindex @code{--automorphisms} option
+@cindex @code{--Automorphisms} option
 
 In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. This information can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the automorphisms are written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.symm}. Using @option{-Y}, the automorphisms are written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1891,6 +1915,8 @@ a->b, b->c, c->a, d->f, e->e, f->d.
 @cindex @code{.state} files
 @cindex @code{-y} option
 @cindex @code{-Y} option
+@cindex @code{--automorphisms} option
+@cindex @code{--Automorphisms} option
 
 If the sweep-line method is among the reduction techniques to be used, LoLA calculates a progress measure which is an important ingredient to that technique. This measure can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the measure is written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-Y}, the progress measure is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1925,6 +1951,7 @@ After downloading and unpacking LoLA, there will be a directory called lola cont
 
 @cindex @code{#HASHSIZE}
 @cindex @code{-h} option
+@cindex @code{--userconfig} option
 
 @itemize
 @item edit the file @file{userconfig.H}. Most parts of this file concern properties to be verified or available reduction techniques. The effect of editing those parts of @file{userconfig.H} is explained in the respective section of the online documentation. The only remaining option is @samp{#HASHSIZE}. Its value controls the size of the hash table for storing visited states. A larger value speeds up state space exploration a little bit at the price of requiring more memory for the table itself. For most users, the original value should be satisfactory.

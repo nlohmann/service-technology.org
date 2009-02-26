@@ -680,7 +680,7 @@ if(Places[(*p)]-> bounded)
     statistics(NrOfStates,Edges,NonEmptyHash);
     fprintf(stderr, "lola: capacity of place ‘%s’ exceeded: CAPACITY=%d, but m(%s)=%d\n",
       Places[*p]->name, Places[*p]->capacity, Places[*p]->name, CurrentMarking[*p]);
-		_exit(4);
+		exit(4);
 	}
 #endif
 #ifdef COVER

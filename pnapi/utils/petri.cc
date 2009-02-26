@@ -166,7 +166,7 @@ int main(int argc, char** argv) {
 
             // check for workflow structure
             if (args_info.check_arg == check_arg_workflow || args_info.isWorkflow_given) {
-                nets[i].isWorkflow();
+                cerr << nets[i].isWorkflow() << endl;
             }
         }
     }

@@ -681,7 +681,7 @@ UmlProcessStatistics Process::getStatistics() const {
 
   for (list<FlowContentNode*>::const_iterator child = flowContentNodes.begin(); child != flowContentNodes.end(); child++) {
     stat.avgInDegree += (*child)->statistics_getInDegree();
-    stat.avgOutDegree += (*child)->statistics_getInDegree();
+    stat.avgOutDegree += (*child)->statistics_getOutDegree();
   }
 
   stat.avgInDegree = stat.avgInDegree / (float)stat.numNodes;

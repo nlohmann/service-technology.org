@@ -21,3 +21,5 @@ test_input_SOURCES          = test_input.cc
 
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src
 LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.a
+
+MAINTAINERCLEANFILES = test_input.net1.owfn test_input.net2.owfn 

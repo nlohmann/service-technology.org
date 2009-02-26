@@ -309,6 +309,115 @@ namespace pnapi
 
 
     /*************************************************************************
+     ***** ONWD Parser
+     *************************************************************************/
+
+
+    /*!
+     * \brief   ONWD Parser
+     *
+     * Instantiation of the parser framework for parsing ONWD files.
+     */
+    namespace onwd
+    {
+
+      // forward declarations
+      class Node;
+
+
+      /// BaseNode instantiation
+      typedef BaseNode<Node> BaseNode;
+
+
+      /// output node of parser
+      extern Node * node;
+
+      /// flex generated lexer function
+      int lex();
+
+      /// bison generated parser function
+      int parse();
+
+
+      /*!
+       * \brief   Encapsulation of the flex/bison ONWD parser
+       *
+       * Connects to the flex/bison implementation for parsing (#parse()) and 
+       * result retrieval (#visit()). Call the two functions in this order.
+       */
+      class Parser : public parser::Parser<Node>
+      {
+      public:
+	Parser();
+      };
+
+
+      /*!
+       * \brief   Node types
+       */
+      enum Type 
+	{
+	  STRUCT, DATA, //< for simple structuring resp. data nodes
+	  INSTANCE, ANY_WIRING, ALL_WIRING, PLACE
+	};
+
+
+      /*!
+       * \brief   Node of an ONWD AST
+       *
+       * Each Node has a Type which is the first parameter in a variety of 
+       * constructors. Furthermore other data collected during the parsing
+       * process may be stored. Node
+       * parameters in a constructor result in the nodes being added as 
+       * children.
+       */
+      class Node : public BaseNode
+      {
+      public:
+
+	const Type type;
+	const std::string string1;
+	const std::string string2;
+
+	Node();
+	Node(Node *);
+	Node(Node *, Node *);
+	Node(Node *, Node *, Node *);
+
+	Node(Type, std::string *, std::string *);
+
+	Node(Type);
+	Node(Type, Node *);
+	Node(Type, Node *, Node *);
+
+	void mergeData(Node *);
+	void mergeChildren(Node *);
+      };
+
+      
+      /*!
+       * \brief   Visitor for ONWD AST nodes
+       *
+       * Constructs a set of PetriNets during traversal via 
+       * Parser::visit().
+       */
+      class Visitor : public parser::Visitor<Node>
+      {
+      public:
+	void beforeChildren(const Node &);
+	void afterChildren(const Node &);
+
+	const PetriNet & petriNet() { return net_; }
+
+      private:
+	PetriNet net_;
+      };
+
+    }
+
+
+
+    /*************************************************************************
      ***** PETRIFY Parser
      *************************************************************************/
     

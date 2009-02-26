@@ -5,6 +5,7 @@ using std::endl;
 #endif
 
 #include <cassert>
+#include <fstream>
 #include <sstream>
 #include <iostream>
 
@@ -12,6 +13,7 @@ using std::endl;
 #include "io.h"
 #include "formula.h"
 
+using std::ifstream;
 using std::stringstream;
 using std::string;
 using std::map;
@@ -19,6 +21,8 @@ using std::set;
 using std::pair;
 
 using namespace pnapi::formula;
+
+using pnapi::io::operator>>;
 
 namespace pnapi
 {
@@ -546,6 +550,127 @@ namespace pnapi
         }
         default: break;
         }
+      }
+
+    }
+
+
+    namespace onwd
+    {
+
+      Node * node;
+
+      
+      Parser::Parser() :
+	parser::Parser<Node>(node, onwd::parse)
+      {
+      }
+
+
+      /* simple child adding */
+
+      Node::Node() :
+	BaseNode(), type(STRUCT)
+      {
+      }
+
+      Node::Node(Node * node) :
+	BaseNode(node), type(STRUCT)
+      {
+      }
+
+      Node::Node(Node * node1, Node * node2) :
+	BaseNode(node1, node2), type(STRUCT)
+      {
+      }
+
+      Node::Node(Node * node1, Node * node2, Node * node3) :
+	BaseNode(node1, node2, node3), type(STRUCT)
+      {
+      }
+
+
+      /* data node construction */
+
+      Node::Node(Type type, string * str1, string * str2) :
+	type(type), string1(*str1), string2(*str2)
+      {
+	delete str1;
+	delete str2;
+      }
+
+
+      /* typed node construction */
+
+      Node::Node(Type type) :
+	type(type)
+      {
+      }
+
+      Node::Node(Type type, Node * node) :
+	type(type)
+      {
+	assert(node != NULL);
+
+	if (node->type == DATA)
+	  mergeData(node);
+	else if (node->type == STRUCT)
+	  mergeChildren(node);
+	else
+	  addChild(node);
+      }
+
+      Node::Node(Type type, Node * node1, Node * node2) :
+	BaseNode(node1, node2), type(type)
+      {
+      }
+
+
+      void Node::mergeData(Node * node)
+      {
+	assert(node != NULL);
+	assert(node->type == DATA);
+
+	// FIXME
+	assert(false);
+
+	delete node;
+      }
+
+      void Node::mergeChildren(Node * node)
+      {
+	assert(node != NULL);
+	assert(node->type == STRUCT);
+
+	children_ = node->children_;
+	node->children_.clear();
+	delete node;
+      }
+
+      
+      /* visiting nodes */
+
+      void Visitor::beforeChildren(const Node & node)
+      {
+	switch (node.type)
+	  {
+	  case INSTANCE:
+	    {
+	      ifstream file(node.string2.c_str());
+	      PetriNet net;
+	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2) >> net;
+	      net_.compose(net, "", node.string1);
+	    }
+	  default: /* empty */ ;
+	  }
+      }
+
+      void Visitor::afterChildren(const Node & node)
+      {
+	switch (node.type)
+	  {
+	  default: /* empty */ ;
+	  }
       }
 
     }

@@ -33,6 +33,12 @@ namespace pnapi
       return ios;
     }
 
+    std::istream & onwd(std::istream & ios)
+    {
+      util::FormatData::data(ios) = util::ONWD;
+      return ios;
+    }
+
     std::ostream & stat(std::ostream & ios)
     {
       util::FormatData::data(ios) = util::STAT;
@@ -124,6 +130,16 @@ namespace pnapi
 	    parser::owfn::Visitor visitor;
 	    parser.parse(is).visit(visitor);
 	    net = visitor.getPetriNet();
+	    net.meta_ = util::MetaData::data(is);
+	    break;
+	  }
+
+	case util::ONWD:
+	  {
+	    parser::onwd::Parser parser;
+	    parser::onwd::Visitor visitor;
+	    parser.parse(is).visit(visitor);
+	    net = visitor.petriNet();
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }

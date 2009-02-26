@@ -1,8 +1,9 @@
 noinst_LIBRARIES = libpnapi.a
 
 libpnapi_a_SOURCES = \
-	parser-owfn.yy parser-petrify.yy \
-	parser-owfn-lexer.ll parser-petrify-lexer.ll \
+	parser-owfn.yy    parser-owfn-lexer.ll \
+	parser-petrify.yy parser-petrify-lexer.ll \
+	parser-onwd.yy    parser-onwd-lexer.ll \
 	pnapi.h \
 	component.h component.cc \
 	petrinet.h petrinet.cc \
@@ -20,7 +21,7 @@ libpnapi_a_SOURCES = \
 
 BUILT_SOURCES = parser-owfn.cc parser-petrify.cc
 
-EXTRA_DIST = parser-owfn.h parser-petrify.h
+EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h
 
 # get flags from configure script
 AM_LDFLAGS  = @configured_LDFLAGS@

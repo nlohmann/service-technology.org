@@ -123,6 +123,9 @@ namespace pnapi
     /// Open WorkFlow Net (OWFN) file format
     std::ios_base & owfn(std::ios_base &);
 
+    /// Open Net Wiring Description (ONWD) file format
+    std::istream & onwd(std::istream &);
+
     /// statistical output format
     std::ostream & stat(std::ostream &);
 
@@ -176,7 +179,7 @@ namespace pnapi
       /*** ENUM CONSTANTS ***/
 
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX };
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD };
       
       /// I/O (sub-)mode
       enum Mode { PLACE, PLACE_TOKEN, ARC };

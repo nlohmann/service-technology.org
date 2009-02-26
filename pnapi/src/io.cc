@@ -173,13 +173,19 @@ namespace pnapi
       }
 
 
-      bool compareContainerElements(Node * n1, Node * n2)
+      bool compareContainerElements(const Node * n1, const Node * n2)
       {
 	return n1->getName() < n2->getName();
       }
 
 
       bool compareContainerElements(Place * p1, Place * p2)
+      {
+	return compareContainerElements((Node *) p1, (Node *) p2);
+      }
+
+
+      bool compareContainerElements(const Place * p1, const Place * p2)
       {
 	return compareContainerElements((Node *) p1, (Node *) p2);
       }
@@ -413,24 +419,16 @@ namespace pnapi
       {
 	string wildcard;
 	set<const Formula *> children = f.children();
-	/*
+
+	/* WILDCARD COLLAPSING */
 	set<const Place *> formulaPlaces = f.places();
-	if (!formulaPlaces.empty())// && formulaPlaces != f.places(true))
+	if (!formulaPlaces.empty())
 	  {
-	    set<const Place *> netPlaces;
-	    for (set<Place *>::iterator it = (*formulaPlaces.begin())->getPetriNet().getPlaces().begin(); it != (*formulaPlaces.begin())->getPetriNet().getPlaces().end(); ++ it)
-	      netPlaces.insert(*it);
-	    set<const Place *> netInternalPlaces;
-	    for (set<Place *>::iterator it = (*formulaPlaces.begin())->getPetriNet().getInternalPlaces().begin(); it != (*formulaPlaces.begin())->getPetriNet().getInternalPlaces().end(); ++ it)
-	      netInternalPlaces.insert(*it);
-	    set<const Place *> netExternalPlaces;
-	    for (set<Place *>::iterator it = (*formulaPlaces.begin())->getPetriNet().getInterfacePlaces().begin(); it != (*formulaPlaces.begin())->getPetriNet().getInterfacePlaces().end(); ++ it)
-	      netExternalPlaces.insert(*it);
-	    set<const Formula *> filteredChildren;
-	    if (formulaPlaces == netPlaces)
+	    set<Place *> netPlaces = 
+	      (*formulaPlaces.begin())->getPetriNet().getPlaces();
+	    if (formulaPlaces.size() == netPlaces.size())
 	      {
-		cerr << "TEST" << endl;
-		wildcard = " AND ALL_OTHER_PLACES_EMPTY";
+		set<const Formula *> filteredChildren;
 		for (set<const Formula *>::iterator it = children.begin(); 
 		     it != children.end(); ++it)
 		  {
@@ -438,19 +436,17 @@ namespace pnapi
 		      dynamic_cast<const formula::FormulaEqual *>(*it);
 		    if (f->tokens() != 0)
 		      filteredChildren.insert(*it);
+		    else
+		      wildcard = " AND ALL_OTHER_PLACES_EMPTY";
 		  }
+		children = filteredChildren;
 	      }
-	    else if (formulaPlaces == netInternalPlaces)
-	      wildcard = " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";
-	    else if (formulaPlaces == netExternalPlaces)
-	      wildcard = " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
 	  }
-	*/
 
 	if (f.children().empty())
 	  return os << formula::FormulaTrue();
 	else
-	  return os << "(" << delim(" AND ") << children << ")" << wildcard;
+	  return os << "(" << delim(" AND ") << children << wildcard << ")";
       }
 
 

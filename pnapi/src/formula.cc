@@ -414,7 +414,7 @@ namespace pnapi
       for (set<const Formula *>::const_iterator it = children_.begin();
 	   it != children_.end(); ++it)
 	{
-	  set<const Place *> childCps = (*it)->places();
+	  set<const Place *> childCps = (*it)->places(excludeEmpty);
 	  places.insert(childCps.begin(), childCps.end());
 	}
       return places;
@@ -430,7 +430,7 @@ namespace pnapi
     set<const Place *> FormulaEqual::places(bool excludeEmpty) const
     {
       set<const Place *> places;
-      if (!excludeEmpty && tokens_ > 0)
+      if (!excludeEmpty || tokens_ > 0)
         places.insert(&place_);
       return places;
     }

@@ -220,8 +220,9 @@ namespace pnapi
 
       /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
 
-      bool compareContainerElements(Node *, Node *);
+      bool compareContainerElements(const Node *, const Node *);
       bool compareContainerElements(Place *, Place *);
+      bool compareContainerElements(const Place *, const Place *);
       bool compareContainerElements(Transition *, Transition *);
       bool compareContainerElements(Arc *, Arc *);
       bool compareContainerElements(const formula::Formula *, 

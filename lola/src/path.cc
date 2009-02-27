@@ -345,7 +345,7 @@ void find_path()
 	ofstream pathstream(pathfile);
 	if(!pathstream)
 	{
-	  fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+	  fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
     fprintf(stderr, "      no output written\n");
 		pflg = false;
 	}
@@ -388,7 +388,7 @@ GetFullTransition()
 	ofstream pathstream(pathfile);
 	if(!pathstream)
 	{
-    fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+    fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
     fprintf(stderr, "      no output written\n");
 		pflg = false;
 	}

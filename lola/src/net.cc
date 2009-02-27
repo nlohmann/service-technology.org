@@ -130,46 +130,46 @@ void processCommandLine(int argc, char **argv) {
 
   // call the cmdline parser, initiate args_info
   if (cmdline_parser (argc, argv, &args_info) != 0) {
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
 
   // check if at most one net file is given
   if (args_info.inputs_num > 1) {
     fprintf(stderr, "lola: more than one net file given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   
   // check if output parameters are given at most once
   if (args_info.Net_given + args_info.net_given > 1) {
-    fprintf(stderr, "lola: more than one ‘-n’ / ‘-N’ option given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "lola: more than one '-n' / '-N' option given\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   if (args_info.Analysis_given + args_info.analysis_given > 1) {
-    fprintf(stderr, "lola: more than one ‘-a’ / ‘-A’ option given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "lola: more than one '-a' / '-A' option given\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   if (args_info.State_given + args_info.state_given > 1) {
-    fprintf(stderr, "lola: more than one ‘-s’ / ‘-S’ option given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "lola: more than one '-s' / '-S' option given\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   if (args_info.Automorphisms_given + args_info.automorphisms_given > 1) {
-    fprintf(stderr, "lola: more than one ‘-y’ / ‘-Y’ option given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "lola: more than one '-y' / '-Y' option given\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   if (args_info.Graph_given + args_info.graph_given + args_info.Marking_given + args_info.marking_given > 1) {
-    fprintf(stderr, "lola: more than one ‘-g’ / ‘-G’ / ‘-m’ / ‘-M’ option given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "lola: more than one '-g' / '-G' / '-m' / '-M' option given\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   if (args_info.Path_given + args_info.path_given > 1) {
-    fprintf(stderr, "lola: more than one ‘-p’ / ‘-P’ option given\n");
-    fprintf(stderr, "      see ‘lola --help’ for more information\n");
+    fprintf(stderr, "lola: more than one '-p' / '-P' option given\n");
+    fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
   
@@ -177,8 +177,8 @@ void processCommandLine(int argc, char **argv) {
   // process --offspring option
   if (args_info.offspring_given) {
     if (!strcmp(args_info.offspring_arg, "")) {
-      fprintf(stderr, "lola: option ‘--offspring’ must not have an empty argument\n");
-      fprintf(stderr, "      see ‘lola --help’ for more information\n");
+      fprintf(stderr, "lola: option '--offspring' must not have an empty argument\n");
+      fprintf(stderr, "      see 'lola --help' for more information\n");
       exit(4);      
     }
     createUserconfigFile(args_info.offspring_arg);
@@ -594,7 +594,7 @@ unsigned int j;
 	ofstream lownetstream(lownetfile);
 	if(!lownetstream)
 	{
-    fprintf(stderr, "lola: cannot open net output file ‘%s’\n", lownetfile);
+    fprintf(stderr, "lola: cannot open net output file '%s'\n", lownetfile);
     fprintf(stderr, "      no output written\n");
     }
 	else
@@ -604,7 +604,7 @@ unsigned int j;
 	ofstream pnmlstream(pnmlfile);
 	if(!pnmlstream)
 	{
-    fprintf(stderr, "lola: cannot open net output file ‘%s’\n", pnmlfile);
+    fprintf(stderr, "lola: cannot open net output file '%s'\n", pnmlfile);
     fprintf(stderr, "      no output written\n");
     }
 	else

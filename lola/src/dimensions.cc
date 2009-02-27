@@ -187,15 +187,15 @@ void createUserconfigFile(char *suffix)
   // open file
   FILE *userconfig = fopen(filename.c_str(), "w");
   if (!userconfig) {
-    fprintf(stderr, "lola: cannot write to userconfig offspring file ‘%s’\n", filename.c_str());
+    fprintf(stderr, "lola: cannot write to userconfig offspring file '%s'\n", filename.c_str());
     fprintf(stderr, "      no output written\n");
     exit(4);
   }
   
   // print header
-  fprintf(userconfig, "// This file ‘userconfig.H.%s’ was created by %s.\n", suffix, PACKAGE_STRING);
+  fprintf(userconfig, "// This file 'userconfig.H.%s' was created by %s.\n", suffix, PACKAGE_STRING);
   fprintf(userconfig, "// To compile a binary with this configuration, copy this file into the folder\n");
-  fprintf(userconfig, "// ‘src/configs’ of the LoLA distribution and execute ‘make lola-%s’.\n", suffix);
+  fprintf(userconfig, "// 'src/configs' of the LoLA distribution and execute 'make lola-%s'.\n", suffix);
   fprintf(userconfig, "// See the manual for a description and all possible parameters.\n\n");
 
   fprintf(userconfig, "// NUMERICAL PARAMETERS\n");
@@ -352,6 +352,6 @@ void createUserconfigFile(char *suffix)
   fprintf(userconfig, "#define EVENTUALLYPROP\n");
 #endif
   
-  fprintf(stderr, "lola: successfully wrote userconfig offspring file ‘%s’\n", filename.c_str());
+  fprintf(stderr, "lola: successfully wrote userconfig offspring file '%s'\n", filename.c_str());
   fclose(userconfig);
 }

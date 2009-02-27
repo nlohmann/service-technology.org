@@ -11,7 +11,7 @@ option "Analysis" A
  flag off
 
 option "analysis" a
- "Read the analysis goal from file. If filename is omitted, derive it from the net file and add ‘.task’ suffix."
+ "Read the analysis goal from file. If filename is omitted, derive it from the net file and add '.task' suffix."
  typestr="FILE"
  string argoptional optional
 
@@ -24,7 +24,7 @@ option "Path" P
  flag off
 
 option "path" p
- "Write witness path to file. If filename is omitted, derive it from the net file and add ‘.graph’ suffix."
+ "Write witness path to file. If filename is omitted, derive it from the net file and add '.graph' suffix."
  typestr="FILE"
  string argoptional optional
 
@@ -37,7 +37,7 @@ option "State" S
  flag off
 
 option "state" s
- "Write witness state to file. If filename is omitted, derive it from the net file and add ‘.state’ suffix."
+ "Write witness state to file. If filename is omitted, derive it from the net file and add '.state' suffix."
  typestr="FILE"
  string argoptional optional
  
@@ -50,7 +50,7 @@ option "Graph" G
  flag off
 
 option "graph" g
- "Write state space to file (omit markings, show only state numbers and transitions). If filename is omitted, derive it from the net file and add ‘.graph’ suffix."
+ "Write state space to file (omit markings, show only state numbers and transitions). If filename is omitted, derive it from the net file and add '.graph' suffix."
  typestr="FILE"
  string argoptional optional
  
@@ -59,7 +59,7 @@ option "Marking" M
  flag off
 
 option "marking" m
- "Write state space to file (show markings and transitions). If filename is omitted, derive it from the net file and add ‘.graph’ suffix."
+ "Write state space to file (show markings and transitions). If filename is omitted, derive it from the net file and add '.graph' suffix."
  typestr="FILE"
  string argoptional optional
  
@@ -72,31 +72,31 @@ option "Net" N
   flag off
 
 option "net" n
- "Write P/T net to file. If filename is omitted, derive it from the net file and add ‘.llnet’ suffix."
+ "Write P/T net to file. If filename is omitted, derive it from the net file and add '.llnet' suffix."
  typestr="FILE"
  string argoptional optional
  
 
 section "Net Automorphisms Output"
-sectiondesc="In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. Each automorphism description starts with ‘GENERATOR’, followed by numbers which are separated by a ‘.’. These numbers describe the structure of the generating set. The first number is a family number, the second one a consecutive number within each family. Each automorphism can be obtained from generators by composing at most one generator per family. Thereby, the composition of 0 generators is supposed to yield the identity mapping.\n"
+sectiondesc="In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. Each automorphism description starts with 'GENERATOR', followed by numbers which are separated by a '.'. These numbers describe the structure of the generating set. The first number is a family number, the second one a consecutive number within each family. Each automorphism can be obtained from generators by composing at most one generator per family. Thereby, the composition of 0 generators is supposed to yield the identity mapping.\n"
 
 option "Automorphisms" Y
  "Write net automorphisms to standard output."
   flag off
 
 option "automorphisms" y
- "Write net automorphisms to file. If filename is omitted, derive it from the net file and add ‘.symm’ suffix."
+ "Write net automorphisms to file. If filename is omitted, derive it from the net file and add '.symm' suffix."
  typestr="FILE"
  string argoptional optional
 
 
 section "Used Configuration Output"
 option "userconfig" h
- "Show the configuration (i.e. the values chose in ‘userconfig.H’) in which this LoLA executable has been compiled."
+ "Show the configuration (i.e. the values chose in 'userconfig.H') in which this LoLA executable has been compiled."
  flag off
  
 option "offspring" -
- "Create a file containing all necessary information to compile a new binary with the same configuration used for this binary. To compile this new binary, copy the resulting file ‘userconfig.H.offspring’ into the ‘src/configs’ directory of the source distribution and run ‘make lola-offspring’."
+ "Create a file containing all necessary information to compile a new binary with the same configuration used for this binary. To compile this new binary, copy the resulting file 'userconfig.H.offspring' into the 'src/configs' directory of the source distribution and run 'make lola-offspring'."
  typestr="FILE"
  default="offspring"
  string argoptional optional

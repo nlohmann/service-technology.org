@@ -117,7 +117,7 @@ int yywrap()
 	yyin = fopen(analysefile,"r");
 	if(!yyin)
 	{
-	  fprintf(stderr, "lola: cannot open analysis task file ‘%s’\n", analysefile);
+	  fprintf(stderr, "lola: cannot open analysis task file '%s'\n", analysefile);
 		exit(4);
 	}
 	diagnosefilename = analysefile;

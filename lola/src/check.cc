@@ -48,7 +48,7 @@ void printstate(char const* c, unsigned int * st)
     ofstream statestream(statefile);
     if (!statestream)
     { 
-      fprintf(stderr, "lola: cannot open state output file ‘%s’\n", statefile);
+      fprintf(stderr, "lola: cannot open state output file '%s'\n", statefile);
       fprintf(stderr, "      no output written\n");
       return;
     }
@@ -486,7 +486,7 @@ int modelcheck()
     ofstream pathstream(pathfile);
     if(!pathstream)
     {
-       fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+       fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
        fprintf(stderr, "      no output written\n");
        pflg = false;
     }

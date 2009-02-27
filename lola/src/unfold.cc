@@ -1101,7 +1101,7 @@ void UFunction::addresult(UValue * va)
 
 void runtimeerror(char const * mess)
 {
-  fprintf(stderr, "lola: run time error: ‘%s’\n", mess);
+  fprintf(stderr, "lola: run time error: '%s'\n", mess);
 	exit(3);
 }
 

@@ -79,7 +79,7 @@ void print_path(State * s)
 		ofstream pathstream(pathfile);
 		if(!pathstream)
 		{
-      fprintf(stderr, "lola: cannot open path output file ‘%s’\n", pathfile);
+      fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
       fprintf(stderr, "      no output written\n");
 		}
 		pathstream << "PATH\n";
@@ -447,7 +447,7 @@ Persistents = 0;
 	graphstream = new ofstream(graphfile);
 	if(!*graphstream)
 	{
-    fprintf(stderr, "lola: cannot open graph output file ‘%s’\n", graphfile);
+    fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
     fprintf(stderr, "      no output written\n");
 		gmflg = false;
 	}

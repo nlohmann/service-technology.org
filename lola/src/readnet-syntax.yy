@@ -2105,7 +2105,7 @@ void readnet()
 		yyin = fopen(netfile,"r");
 		if(!yyin)
 		{
-      fprintf(stderr, "lola: cannot open netfile ‘%s’\n", netfile);
+      fprintf(stderr, "lola: cannot open netfile '%s'\n", netfile);
 			exit(4);
 		}
 		diagnosefilename = netfile;
@@ -2159,7 +2159,7 @@ int yywrap()
 
 /// display a parser error and exit
 void yyerror(char const * mess) {
-    fprintf(stderr, "lola: %s:%d: error near ‘%s’: %s\n", diagnosefilename, yylineno, yytext, mess);
+    fprintf(stderr, "lola: %s:%d: error near '%s': %s\n", diagnosefilename, yylineno, yytext, mess);
 	exit(3);
 }
 

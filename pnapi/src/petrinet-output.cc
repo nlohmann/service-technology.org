@@ -101,7 +101,7 @@ namespace pnapi
       << transitions_ << endl
       << endl 
 
-      << "{ END OF FILE ‘" << getMetaInformation(os, io::OUTPUTFILE) << "’ }"
+      << "{ END OF FILE '" << getMetaInformation(os, io::OUTPUTFILE) << "' }"
       << endl;
   }
 
@@ -122,7 +122,7 @@ namespace pnapi
 
       << "digraph N {" << endl
       << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
-      << " fontsize=10 remincross=true label=\""
+      << " remincross=true label=\""
       //<< (reduced ? "structurally reduced " : "")
       << "Petri net" 
       //<< " generated from " << filename 
@@ -133,9 +133,9 @@ namespace pnapi
       // of a node!
       // So a width of .3 (in) results in 21 pixel table width 
       // ( 0.3 in * 72 dpi ).
-      << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\""
+      << " node [fontname=\"Helvetica\" fixedsize width=\".3\""
       << " height=\".3\" label=\"\" style=filled fillcolor=white]" << endl
-      << " edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none"
+      << " edge [fontname=\"Helvetica\" color=white arrowhead=none"
       << " weight=\"20.0\"]" << endl
       << endl
 
@@ -164,7 +164,7 @@ namespace pnapi
       << delim("\n")
       << mode(io::util::ARC)
       << " // arcs" << endl
-      << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal"
+      << " edge [fontname=\"Helvetica\" arrowhead=normal"
       << " color=black]" << endl
       << arcs_
       << endl

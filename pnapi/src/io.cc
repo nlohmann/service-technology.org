@@ -76,10 +76,10 @@ namespace pnapi
 	switch (e.type)
 	  {
 	  case io::InputError::SYNTAX_ERROR:   
-	    os << " near ‘" << e.token << "’"; 
+	    os << " near '" << e.token << "'"; 
 	    break;
 	  case io::InputError::SEMANTIC_ERROR: 
-	    os << ": ‘" << e.token << "’"; 
+	    os << ": '" << e.token << "'"; 
 	    break;
 	  }
       return os << ": " << e.message;
@@ -322,7 +322,7 @@ namespace pnapi
 
 	      case INNER:
 		os << p.getName();
-		if (p.getTokenCount() > 0)
+		if (p.getTokenCount() == 0)
 		  os << " " << p.getName() << "_l";
 		break;
 
@@ -333,7 +333,7 @@ namespace pnapi
 		  os << "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
 		else if (p.getTokenCount() > 1)
 		  os << "label=\"" << p.getTokenCount() << "\" fontcolor=black "
-		     << "fontname=\"Helvetica\" fontsize=10";
+		     << "fontname=\"Helvetica\"";
 
 		switch (p.getType())
 		  {

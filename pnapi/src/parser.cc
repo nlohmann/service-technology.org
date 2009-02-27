@@ -197,8 +197,8 @@ namespace pnapi
 		node.check(placeType_ != Place::INTERNAL, 
 			   node.identifier, "interface place expected");
 		node.check(places_[node.identifier].port.empty(),
-			   node.identifier, "place already assigned to port ‘" +
-			   places_[node.identifier].port + "’");
+			   node.identifier, "place already assigned to port '" +
+			   places_[node.identifier].port + "'");
 		places_[node.identifier].port = port_;
 	      }
 	    break;
@@ -211,8 +211,8 @@ namespace pnapi
 	      node.check(p->second.type != Place::INTERNAL, 
 			 node.identifier, "interface place expected");
 	      node.check(p->second.port.empty(),
-			 node.identifier, "place already assigned to port ‘" +
-			 p->second.port + "’");
+			 node.identifier, "place already assigned to port '" +
+			 p->second.port + "'");
 	      p->second.port = port_;
 	      break;
 	    }

@@ -36,7 +36,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser (argc, argv, &args_info) != 0) {
-        fprintf(stderr, "       see ‘petri --help’ for more information\n");
+        fprintf(stderr, "       see 'petri --help' for more information\n");
         exit(EXIT_FAILURE);
     }
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
             // try to open file
             ifstream infile(args_info.inputs[i], ifstream::in);
             if (!infile.is_open()) {
-                cerr << "petri: could not read from file ‘" << args_info.inputs[i] << "’" << endl;
+                cerr << "petri: could not read from file '" << args_info.inputs[i] << "'" << endl;
                 exit(EXIT_FAILURE);
             }
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             if (args_info.verbose_given) {
-                cerr << "petri: normalizing reducing Petri net ‘" << names[i] << "’..." << endl;
+                cerr << "petri: normalizing reducing Petri net '" << names[i] << "'..." << endl;
             }
 
             nets[i].normalize();
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             if (args_info.verbose_given) {
-                cerr << "petri: structurally reducing Petri net ‘" << names[i] << "’..." << endl;
+                cerr << "petri: structurally reducing Petri net '" << names[i] << "'..." << endl;
             }
 
             nets[i].reduce(args_info.reduce_arg);
@@ -182,12 +182,12 @@ int main(int argc, char** argv) {
                 string outname = names[i] + "." + args_info.output_orig[j];
                 ofstream outfile(outname.c_str(), ofstream::trunc);
                 if (!outfile.is_open()) {
-                    cerr << "petri: could not write to file ‘" << outname << "’" << endl;
+                    cerr << "petri: could not write to file '" << outname << "'" << endl;
                     exit(EXIT_FAILURE);
                 }
 
                 if (args_info.verbose_given) {
-                    cerr << "petri: creating file ‘" << outname << "’..." << endl;
+                    cerr << "petri: creating file '" << outname << "'..." << endl;
                 }
 
                 outfile << meta(io::OUTPUTFILE, outname);
@@ -218,12 +218,12 @@ int main(int argc, char** argv) {
                     case (output_arg_svg): {
                         if (CONFIG_DOT == "not found") {
                             cerr << "petri: Graphviz dot was not found by configure script; see README" << endl;
-                            cerr << "       necessary for option ‘--output=owfn’" << endl;
+                            cerr << "       necessary for option '--output=owfn'" << endl;
                             exit(EXIT_FAILURE);
                         }
 #if !defined(HAVE_POPEN) || !defined(HAVE_PCLOSE)
                         cerr << "petri: cannot open UNIX pipe to Graphviz dot" << endl;
-                        cerr << "       create dot file with ‘--output=dot’ and call Graphviz dot manually" << endl;
+                        cerr << "       create dot file with '--output=dot' and call Graphviz dot manually" << endl;
                         exit(EXIT_FAILURE);
 #endif
                         ostringstream d;

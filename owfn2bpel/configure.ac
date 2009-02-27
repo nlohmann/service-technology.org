@@ -23,7 +23,7 @@ AC_DEFINE_UNQUOTED([BUILDOS], ["$build_os"], [The OS.])
 AC_SUBST(LOLANAME, lola-1.02)
 
 # Checks for GNU gengetopt and help2man
-AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
+AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
 # Set files to generate.

@@ -21,8 +21,8 @@ AM_PROG_CC_C_O
 
 # check for additional programs
 AM_MISSING_PROG(HELP2MAN, help2man)
-AC_CHECK_PROGS(GENGETOPT, gengetopt, [`pwd`/missing gengetopt])
-AC_CHECK_PROGS(KC, kc++, [`pwd`/missing kc++])
+AM_MISSING_PROG(GENGETOPT, gengetopt)
+AM_MISSING_PROG(KC, kc++)
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
  AC_DEFINE(HAVE_DOT, 0, [Graphviz dot can not be used on this system.])

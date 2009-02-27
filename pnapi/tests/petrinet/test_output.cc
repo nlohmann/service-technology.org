@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
   begin_test("io::operator<<() [Petri net DOT output]");
   ostringstream dotResult, dotExpected;
   dotResult << dot << net;
-  //cout << dot << net;
+  cout << dot << net;
   dotExpected 
     << "digraph N {" << endl
     << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" "
@@ -96,6 +96,13 @@ int main(int argc, char * argv[])
     << " t2	[fillcolor=yellow]" << endl
     << " t2_l	[style=invis]" << endl
     << " t2_l -> t2 [headlabel=\"t2\"]" << endl << endl
+    << " // inner cluster" << endl
+    << " subgraph cluster1" << endl
+    << " {" << endl
+    << "  t1 t1_l t2 t2_l" << endl
+    << "  p1 p1_l p2" << endl
+    << "  label=\"\" style=\"dashed\"" << endl
+    << " }" << endl << endl
     << " // arcs" << endl
     << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black]" 
     << endl
@@ -104,6 +111,7 @@ int main(int argc, char * argv[])
     << " t1 -> p1	[weight=10000.0]" << endl
     << " p1 -> t2	[weight=10000.0]" << endl
     << "}" << endl;
+  cout << dotExpected.str();
   assert(dotResult.str() == dotExpected.str());
   end_test();
 

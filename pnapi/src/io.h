@@ -182,7 +182,7 @@ namespace pnapi
       enum Format { STAT, OWFN, DOT, GASTEX, ONWD };
       
       /// I/O (sub-)mode
-      enum Mode { PLACE, PLACE_TOKEN, ARC };
+      enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
 
       /// delimiter type
       struct Delim { std::string delim; };

@@ -314,37 +314,44 @@ namespace pnapi
 
 
 	  case DOT:     /* PLACES: DOT     */
-	    if (ModeData::data(os) == ARC)
+	    switch (ModeData::data(os))
 	      {
+	      case ARC:
 		os << p.getName();
 		break;
+
+	      case INNER:
+		os << p.getName();
+		if (p.getTokenCount() > 0)
+		  os << " " << p.getName() << "_l";
+		break;
+
+	      default:
+		os << " " << p.getName() << "\t[";
+
+		if (p.getTokenCount() == 1)
+		  os << "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+		else if (p.getTokenCount() > 1)
+		  os << "label=\"" << p.getTokenCount() << "\" fontcolor=black "
+		     << "fontname=\"Helvetica\" fontsize=10";
+
+		switch (p.getType())
+		  {
+		  case (Node::INPUT):  os << "fillcolor=orange"; break;
+		  case (Node::OUTPUT): os << "fillcolor=yellow"; break;
+		  default:    break;
+		  }
+
+		if (p.wasInterface())
+		  os << "fillcolor=lightgoldenrod1";
+
+		os << "]" << endl
+
+		   << " " << p.getName() << "_l\t[style=invis]" << endl
+		   << " " << p.getName() << "_l -> " << p.getName() 
+		   << " [headlabel=\"" << p.getName() << "\"]";
 	      }
-	    os << " " << p.getName() << "\t[";
-
-	    if (p.getTokenCount() == 1)
-	      os << "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
-	    else if (p.getTokenCount() > 1)
-	      os << "label=\"" << p.getTokenCount() << "\" fontcolor=black "
-		 << "fontname=\"Helvetica\" fontsize=10";
-
-	    switch (p.getType())
-	      {
-	      case (Node::INPUT):  os << "fillcolor=orange"; break;
-	      case (Node::OUTPUT): os << "fillcolor=yellow"; break;
-	      default:    break;
-	      }
-
-	    if (p.wasInterface())
-	      os << "fillcolor=lightgoldenrod1";
-
-	    os << "]" << endl
-
-	       << " " << p.getName() << "_l\t[style=invis]" << endl
-	       << " " << p.getName() << "_l -> " << p.getName() 
-	       << " [headlabel=\"" << p.getName() << "\"]";
-
 	    break;
-
 
 	  default: assert(false);   /* PLACES: <UNKNOWN> */
 	  }
@@ -373,39 +380,41 @@ namespace pnapi
 	    break;
 
 	  case DOT:     /* TRANSITIONS: DOT     */
-	    if (ModeData::data(os) == ARC)
+	    switch (ModeData::data(os))
 	      {
-		os << t.getName();
+	      case ARC: 
+		os << t.getName(); 
 		break;
-	      }
-	    os << " " << t.getName() << "\t[";
 
-	    switch(t.getType())
-	      {
-	      case(Node::INPUT):  os << "fillcolor=orange"; break;
-	      case(Node::OUTPUT):	os << "fillcolor=yellow"; break;
-	      case(Node::INOUT):  os 
-		  << "fillcolor=gold label=< <TABLE BORDER=\"1\""
-		  << " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
-		  << " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
-		  << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"" 
-		  << " BGCOLOR=\"ORANGE\">"
-		  << "</TD></TR><TR>"
-		  << "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
-		  << " BGCOLOR=\"YELLOW\">"
-		  << "</TD></TR></TABLE> >";
+	      case INNER:
+		os << t.getName() << " " << t.getName() << "_l"; 
 		break;
-	      default: break;
+
+	      default:
+		os << " " << t.getName() << "\t[";
+		switch(t.getType())
+		  {
+		  case(Node::INPUT):  os << "fillcolor=orange"; break;
+		  case(Node::OUTPUT):	os << "fillcolor=yellow"; break;
+		  case(Node::INOUT):  os 
+		      << "fillcolor=gold label=< <TABLE BORDER=\"1\""
+		      << " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
+		      << " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
+		      << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"" 
+		      << " BGCOLOR=\"ORANGE\">"
+		      << "</TD></TR><TR>"
+		      << "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
+		      << " BGCOLOR=\"YELLOW\">"
+		      << "</TD></TR></TABLE> >";
+		    break;
+		  default: break;
+		  }
+		os << "]" << endl
+		   << " " << t.getName() << "_l\t[style=invis]" << endl
+		   << " " << t.getName() << "_l -> " << t.getName() 
+		   << " [headlabel=\"" << t.getName() << "\"]";
 	      }
-
-	    os << "]" << endl
-
-	       << " " << t.getName() << "_l\t[style=invis]" << endl
-	       << " " << t.getName() << "_l -> " << t.getName() 
-	       << " [headlabel=\"" << t.getName() << "\"]";
-
 	    break;
-
 
 	  default: assert(false);   /* TRANSITIONS: <UNKNOWN> */
 	  }

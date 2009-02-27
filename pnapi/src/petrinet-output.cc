@@ -118,6 +118,7 @@ namespace pnapi
     os  //< output everything to this stream
 
       << delim("\n")
+      << mode(io::util::NORMAL)
 
       << "digraph N {" << endl
       << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
@@ -149,6 +150,18 @@ namespace pnapi
       << transitions_ << endl
       << endl
 
+      << mode(io::util::INNER)
+      << delim(" ")
+      << " // inner cluster" << endl
+      << " subgraph cluster1" << endl
+      << " {" << endl
+      << "  " << transitions_ << endl
+      << "  " << internalPlaces_ << endl
+      << "  label=\"\" style=" << (interface ? "\"dashed\"" : "invis") << endl
+      << " }" << endl
+      << endl
+
+      << delim("\n")
       << mode(io::util::ARC)
       << " // arcs" << endl
       << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal"
@@ -159,29 +172,6 @@ namespace pnapi
       << "}" 
       << endl;
   }
-
-      /*
-    // the inner of the net
-    (*output) << "\n // cluster the inner of the net" << endl;
-    (*output) << " subgraph cluster1\n {\n ";
-    for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-      //FIXME: (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
-    (*output) << "\n ";
-    for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
-    {
-      if ((*p)->getTokenCount() > 0)
-        ;// FIXME: (*output) << " p" << (*p)->id;
-      else
-        ;// FIXME:(*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
-    }
-
-    if (draw_interface)
-      (*output) << "\n  label=\"\" style=\"dashed\"" << endl;
-    else
-      (*output) << "\n  label=\"\" style=invis" << endl;
-      << " }" << endl;
-  }
-      */
 
   /* FIXME: use interfacePlacesByPort_
     // draw the ports

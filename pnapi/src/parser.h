@@ -413,7 +413,7 @@ namespace pnapi
 	PetriNet net_;
       };
 
-    }
+    } /* namespace onwd */
 
 
 

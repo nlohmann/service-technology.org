@@ -16,6 +16,7 @@
 #include <stack>
 #include <istream>
 
+#include "link.h"
 #include "component.h"
 #include "petrinet.h"
 #include "marking.h"
@@ -312,7 +313,6 @@ namespace pnapi
      ***** ONWD Parser
      *************************************************************************/
 
-
     /*!
      * \brief   ONWD Parser
      *
@@ -407,10 +407,16 @@ namespace pnapi
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
 
-	const std::map<std::string, PetriNet> & instances();
+	std::map<std::string, PetriNet> & instances();
+	const std::map<Place *, LinkNode *> & wiring();
 
       private:
 	std::map<std::string, PetriNet> instances_;
+	std::deque<Place *> places_;
+	std::map<Place *, LinkNode *> wiring_;
+
+	LinkNode * getLinkNode(Place & p, LinkNode::Mode mode);
+	LinkNode::Mode getLinkNodeMode(Type type);
       };
 
     } /* namespace onwd */

@@ -5,6 +5,7 @@ libpnapi_a_SOURCES = \
 	parser-petrify.yy parser-petrify-lexer.ll \
 	parser-onwd.yy    parser-onwd-lexer.ll \
 	pnapi.h \
+	link.h link.cc \
 	component.h component.cc \
 	petrinet.h petrinet.cc \
 	parser.h parser.cc \

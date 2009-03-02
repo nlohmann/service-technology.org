@@ -139,7 +139,7 @@ namespace pnapi
 	    parser::onwd::Parser parser;
 	    parser::onwd::Visitor visitor;
 	    parser.parse(is).visit(visitor);
-	    net.createFromWiring(visitor.instances());
+	    net.createFromWiring(visitor.instances(), visitor.wiring());
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }

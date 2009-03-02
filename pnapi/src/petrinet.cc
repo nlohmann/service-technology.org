@@ -27,6 +27,7 @@ using std::endl;
 #include <cassert>
 #include <sstream>
 
+#include "link.h"
 #include "util.h"
 #include "petrinet.h"
 
@@ -143,8 +144,7 @@ namespace pnapi
 
   void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
   {
-    /*
-    assert(node2.getNameHistory().empty());
+    //assert(node2.getNameHistory().empty());
 
     // delete node2 from net
     Place * place = dynamic_cast<Place *>(&node2);
@@ -152,7 +152,6 @@ namespace pnapi
       net_.deletePlace(*place);
     else
       net_.deleteTransition(*dynamic_cast<Transition *>(&node2));
-    */
   }
 
 
@@ -413,7 +412,7 @@ namespace pnapi
 	else if (&it->second->getPetriNet() != this)
 	  it->second = findPlace(it->second->getName());
 	it->first->merge(*it->second);
-	deletePlace(*it->second);
+	//deletePlace(*it->second);
       }
 
     // merge final conditions
@@ -423,23 +422,62 @@ namespace pnapi
 
   /*!
    */
-  void PetriNet::createFromWiring(const map<string, PetriNet> & instances)
+  void PetriNet::createFromWiring(map<string, PetriNet> & instances,
+				  const map<Place *, LinkNode *> & wiring)
   {
+    vector<LinkNode *> wiredNodes; 
+    wiredNodes.reserve(wiring.size());
+
     // clean up old net
     clear();
 
     // add structure of nets
-    for (map<string, PetriNet>::const_iterator it = instances.begin(); 
+    for (map<string, PetriNet>::iterator it = instances.begin(); 
 	 it != instances.end(); ++it)
       {
 	assert(!it->first.empty());
 
-	PetriNet net = it->second;
+	PetriNet & net = it->second;
 	map<const Place *, const Place *> placeMapping =
 	  copyStructure(net.prefixNodeNames(it->first + "."));
 	condition_.merge(net.condition_, placeMapping);
+
+	// translate references in wiring
+	for (map<Place *, LinkNode *>::const_iterator it = wiring.begin();
+	     it != wiring.end(); ++it)
+	  if (placeMapping.find(it->first) != placeMapping.end())
+	    wiredNodes.push_back(&wiring.find(it->first)->second
+				 ->replacePlace(*placeMapping
+						.find(it->first)->second));
       }
-  }
+
+    set<LinkNode *> expanded;
+    //vector<LinkNode *> * result;
+
+    // expand all nodes
+    for (vector<LinkNode *>::iterator it = wiredNodes.begin();
+	 it != wiredNodes.end(); ++it)
+      {
+	expanded.insert(*it);
+	//result = &(*it).second->expand();
+	//expanded.insert(result->begin(), result->end());
+	//delete (*it).second, result;  // clean up
+      }
+	
+    // join one-to-one links
+    LinkNode * node;
+    set<LinkNode *>::iterator it;
+    while (!expanded.empty())
+      {
+	it = expanded.begin();
+	(*it)->joinPlaces();
+
+	// clean up
+	node = &(*it)->getPartner();
+	expanded.erase(it); delete *it;
+	expanded.erase(node); delete node;
+      }
+   }
 
 
   /*!

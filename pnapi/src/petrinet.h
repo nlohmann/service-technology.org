@@ -33,6 +33,7 @@ namespace pnapi
   // forward declarations
   class PetriNet;
   class Condition;
+  class LinkNode;
   namespace io
   {
     class InputError;
@@ -310,7 +311,8 @@ namespace pnapi
     /* wiring */
 
     /// creates the net by assembling the given nets
-    void createFromWiring(const std::map<std::string, PetriNet> &);
+    void createFromWiring(std::map<std::string, PetriNet> &,
+			  const std::map<Place *, LinkNode *> &);
 
 
     /* output */

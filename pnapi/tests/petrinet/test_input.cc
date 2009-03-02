@@ -109,7 +109,7 @@ int main(int argc, char * argv[])
   file2.close();
   try { onwd >> pnapi::io::onwd >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
-  //cout << owfn << net;
+  cout << owfn << net;
   end_test();
 
   return 0;

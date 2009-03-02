@@ -659,7 +659,17 @@ namespace pnapi
 	      ifstream file(node.string2.c_str());
 	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2) 
 		   >> instances_[node.string1];
+	      break;
 	    }
+
+	  case PLACE:
+	    {
+	      Place * p = instances_[node.string1].findPlace(node.string2);
+	      node.check(p != NULL, node.string2, "unknown place");
+	      places_.push_back(p);
+	      break;
+	    }
+
 	  default: /* empty */ ;
 	  }
       }
@@ -668,13 +678,50 @@ namespace pnapi
       {
 	switch (node.type)
 	  {
+	  case ANY_WIRING:
+	  case ALL_WIRING:
+	    {
+	      Place & p1 = *places_.front(); places_.pop_front();
+	      Place & p2 = *places_.front(); places_.pop_front();
+	      LinkNode * n1 = getLinkNode(p1, getLinkNodeMode(node.type));
+	      LinkNode * n2 = getLinkNode(p2, getLinkNodeMode(node.type));
+	      n1->addLink(*n2);
+	      wiring_[&p1] = n1;
+	      wiring_[&p2] = n2;
+	      break;
+	    }
+
 	  default: /* empty */ ;
 	  }
       }
 
-      const map<string, PetriNet> & Visitor::instances()
+      LinkNode * Visitor::getLinkNode(Place & p, LinkNode::Mode mode)
+      {
+	map<Place *, LinkNode *>::iterator it = wiring_.find(&p);
+	if (it != wiring_.end())
+	  return (*it).second;
+	else
+	  return new LinkNode(p, mode);
+      }
+
+      LinkNode::Mode Visitor::getLinkNodeMode(Type type)
+      {
+	assert(type == ANY_WIRING || type == ALL_WIRING);
+
+	if (type == ANY_WIRING)
+	  return LinkNode::ANY;
+	else
+	  return LinkNode::ALL;
+      }
+
+      map<string, PetriNet> & Visitor::instances()
       { 
 	return instances_; 
+      }
+
+      const map<Place *, LinkNode *> & Visitor::wiring()
+      {
+	return wiring_;
       }
 
 

@@ -21,6 +21,7 @@
 #ifndef PNAPI_PETRINODE_H
 #define PNAPI_PETRINODE_H
 
+#include <string>
 #include <set>
 #include <deque>
 
@@ -235,6 +236,9 @@ namespace pnapi
 
     /// no standard copying!
     Place(const Place &);
+
+    /// no standard copying!
+    Place & operator=(const Place &);
 
     /// changes the communication type
     void setType(Type type);

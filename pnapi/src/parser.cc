@@ -657,9 +657,8 @@ namespace pnapi
 	  case INSTANCE:
 	    {
 	      ifstream file(node.string2.c_str());
-	      PetriNet net;
-	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2) >> net;
-	      net_.compose(net, "", node.string1);
+	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2) 
+		   >> instances_[node.string1];
 	    }
 	  default: /* empty */ ;
 	  }
@@ -672,6 +671,12 @@ namespace pnapi
 	  default: /* empty */ ;
 	  }
       }
+
+      const map<string, PetriNet> & Visitor::instances()
+      { 
+	return instances_; 
+      }
+
 
     } /* namespace onwd */
 

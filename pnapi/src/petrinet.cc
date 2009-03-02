@@ -16,6 +16,14 @@
  * \version $Revision$
  */
 
+#ifndef NDEBUG
+#include <iostream>
+#include <fstream>
+using std::cout;
+using std::cerr;
+using std::endl;
+#endif
+
 #include <cassert>
 #include <sstream>
 
@@ -271,18 +279,7 @@ namespace pnapi
    */
   PetriNet::~PetriNet()
   {
-    meta_.clear();
-
-    // delete all places
-    set<Place *> places = places_;
-    for (set<Place *>::iterator it = places.begin(); it != places.end(); ++it)
-      deletePlace(**it);
-
-    // delete all transitions
-    set<Transition *> transitions = transitions_;
-    for (set<Transition *>::iterator it = transitions.begin();
-	 it != transitions.end(); ++it)
-      deleteTransition(**it);
+    clear();
 
     assert(nodes_.empty());
     assert(nodesByName_.empty());
@@ -294,6 +291,24 @@ namespace pnapi
     assert(interfacePlaces_.empty());
     assert(interfacePlacesByPort_.empty());
     assert(arcs_.empty());
+  }
+
+
+  void PetriNet::clear()
+  {
+    meta_.clear();
+    condition_ = true;
+
+    // delete all places
+    set<Place *> places = places_;
+    for (set<Place *>::iterator it = places.begin(); it != places.end(); ++it)
+      deletePlace(**it);
+
+    // delete all transitions
+    set<Transition *> transitions = transitions_;
+    for (set<Transition *>::iterator it = transitions.begin();
+	 it != transitions.end(); ++it)
+      deleteTransition(**it);
   }
 
 
@@ -407,6 +422,27 @@ namespace pnapi
 
 
   /*!
+   */
+  void PetriNet::createFromWiring(const map<string, PetriNet> & instances)
+  {
+    // clean up old net
+    clear();
+
+    // add structure of nets
+    for (map<string, PetriNet>::const_iterator it = instances.begin(); 
+	 it != instances.end(); ++it)
+      {
+	assert(!it->first.empty());
+
+	PetriNet net = it->second;
+	map<const Place *, const Place *> placeMapping =
+	  copyStructure(net.prefixNodeNames(it->first + "."));
+	condition_.merge(net.condition_, placeMapping);
+      }
+  }
+
+
+  /*!
    * \param   source  the source Node
    * \param   target  the target Node
    * \param   weight  weight of the Arc
@@ -442,19 +478,6 @@ namespace pnapi
   {
     return *new Transition(*this, observer_, name.empty() ? getUniqueNodeName("t") : name);
   }
-
-
-  /*!
-   */
-  /*
-  void PetriNet::deleteInterfacePlaces()
-  {
-    set<Place *> interface = interfacePlaces_;
-    for(set<Place *>::iterator it = interface.begin(); it != interface.end();
-	++it)
-      deletePlace(**it);
-  }
-  */
 
 
   /*!

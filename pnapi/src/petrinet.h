@@ -277,6 +277,9 @@ namespace pnapi
 
     /* miscellaneous */
 
+    /// cleans up the net
+    void clear();
+
     /// adds the structure of a second net
     std::map<const Place *, const Place *> copyStructure(const PetriNet &);
 
@@ -302,6 +305,12 @@ namespace pnapi
 
     /// helper function for STG2oWFN
     std::string remap(std::string edge, std::vector<std::string> & edgeLabels);
+
+
+    /* wiring */
+
+    /// creates the net by assembling the given nets
+    void createFromWiring(const std::map<std::string, PetriNet> &);
 
 
     /* output */

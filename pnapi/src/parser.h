@@ -407,10 +407,10 @@ namespace pnapi
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
 
-	const PetriNet & petriNet() { return net_; }
+	const std::map<std::string, PetriNet> & instances();
 
       private:
-	PetriNet net_;
+	std::map<std::string, PetriNet> instances_;
       };
 
     } /* namespace onwd */

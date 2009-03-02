@@ -71,7 +71,7 @@ namespace pnapi
     protected:
       std::set<const Formula *> children_;
 
-      virtual void simplifyChildren();
+      virtual void simplifyChildren() =0;
     };
 
 
@@ -91,6 +91,9 @@ namespace pnapi
       Negation * clone(const std::map<const Place *, const Place *> * = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+    protected:
+      void simplifyChildren();
     };
 
 

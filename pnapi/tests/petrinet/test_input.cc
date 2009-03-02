@@ -100,7 +100,6 @@ int main(int argc, char * argv[])
        << "WIRING"
        << "  net1.c->net2.c_in, net1.d=>net2.d_in;";
 
-  /*
   begin_test("io::operator>>() [Petri net ONWD input]");
   ofstream file1("test_input.net1.owfn");
   ofstream file2("test_input.net2.owfn");
@@ -110,9 +109,8 @@ int main(int argc, char * argv[])
   file2.close();
   try { onwd >> pnapi::io::onwd >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
-  cout << owfn << net;
+  //cout << owfn << net;
   end_test();
-  */
 
   return 0;
 }

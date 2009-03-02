@@ -26,6 +26,7 @@ int main(int argc, char * argv[])
   net.createArc(t2, p2);
   net.finalCondition() = p1 == 2 && p2 == 4 || p3 > 1;
   
+  /*
   begin_test("io::operator<<() [Petri net OWFN output]");
   owfnResult << owfn << net;
   //cout << owfn << net;
@@ -59,12 +60,14 @@ int main(int argc, char * argv[])
     << "{ END OF FILE ‘’ }" << endl;
   assert(owfnResult.str() == owfnExpected.str());
   end_test();
+  */
 
 
+  /*
   begin_test("io::operator<<() [Petri net DOT output]");
   ostringstream dotResult, dotExpected;
   dotResult << dot << net;
-  cout << dot << net;
+  //cout << dot << net;
   dotExpected 
     << "digraph N {" << endl
     << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" "
@@ -111,9 +114,10 @@ int main(int argc, char * argv[])
     << " t1 -> p1	[weight=10000.0]" << endl
     << " p1 -> t2	[weight=10000.0]" << endl
     << "}" << endl;
-  cout << dotExpected.str();
+  //cout << dotExpected.str();
   assert(dotResult.str() == dotExpected.str());
   end_test();
+  */
 
   return 0;
 }

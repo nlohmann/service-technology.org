@@ -31,14 +31,12 @@ namespace pnapi
     Operator::Operator(const Formula & f)
     {
       children_.insert(f.clone());
-      simplifyChildren();
     }
 
     Operator::Operator(const Formula & l, const Formula & r)
     {
       children_.insert(l.clone());
       children_.insert(r.clone());
-      simplifyChildren();
     }
 
     Operator::Operator(const set<const Formula *> & children,
@@ -47,7 +45,6 @@ namespace pnapi
       for (set<const Formula *>::const_iterator it = children.begin();
 	   it != children.end(); ++it)
 	children_.insert((*it)->clone(places));
-      simplifyChildren();
     }
 
     Negation::Negation(const Formula & f) :
@@ -69,11 +66,13 @@ namespace pnapi
     Conjunction::Conjunction(const Formula & f) :
       Operator(f)
     {
+      simplifyChildren();
     }
 
     Conjunction::Conjunction(const Formula & l, const Formula & r) :
       Operator(l, r)
     {
+      simplifyChildren();
     }
 
     Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
@@ -93,27 +92,32 @@ namespace pnapi
 			     const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
+      simplifyChildren();
     }
 
     Conjunction::Conjunction(const Conjunction & c) :
       Operator(c.children_)
     {
+      simplifyChildren();
     }
 
     Disjunction::Disjunction(const Formula & l, const Formula & r) :
       Operator(l, r)
     {
+      simplifyChildren();
     }
 
     Disjunction::Disjunction(const set<const Formula *> & children,
 			     const map<const Place *, const Place *> * places) :
       Operator(children, places)
     {
+      simplifyChildren();
     }
 
     Disjunction::Disjunction(const Disjunction & d) :
       Operator(children_)
     {
+      simplifyChildren();
     }
 
     Proposition::Proposition(const Place & p, unsigned int k,
@@ -440,7 +444,7 @@ namespace pnapi
      ***** simplify children implementation
      **************************************************************************/
 
-    void Operator::simplifyChildren()
+    void Negation::simplifyChildren()
     {
     }
 

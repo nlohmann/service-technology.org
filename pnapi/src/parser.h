@@ -295,7 +295,7 @@ namespace pnapi
 	std::map<std::string, PlaceAttributes> places_;
 	bool isPreset_;
 	std::map<std::string, unsigned int> preset_, postset_;
-	std::deque<std::pair<formula::Formula *, 
+	std::stack<std::pair<formula::Formula *, 
 			     const std::set<const Place *> *> > formulas_;
 	bool isInitial_;
 	Marking finalMarking_;

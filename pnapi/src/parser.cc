@@ -252,10 +252,10 @@ namespace pnapi
 	    break;
 
 	  case FORMULA_TRUE:  
-	    formulas_.push_back(WildcardFormula(new FormulaTrue, NULL));  
+	    formulas_.push(WildcardFormula(new FormulaTrue, NULL));  
 	    break;
 	  case FORMULA_FALSE: 
-	    formulas_.push_back(WildcardFormula(new FormulaFalse, NULL)); 
+	    formulas_.push(WildcardFormula(new FormulaFalse, NULL)); 
 	    break;
 
 	  case FORMULA_EQ:
@@ -287,7 +287,7 @@ namespace pnapi
 		  formula = new FormulaLessEqual(*place, nTokens); break;
 		default: assert(false);
 		}
-	      formulas_.push_back(WildcardFormula(formula, NULL));
+	      formulas_.push(WildcardFormula(formula, NULL));
 	      break;
 	    }
 
@@ -338,33 +338,33 @@ namespace pnapi
 	  case FORMULA_NOT:
 	    {
 	      assert(formulas_.size() > 0);
-	      WildcardFormula wcf = formulas_.front();
+	      WildcardFormula wcf = formulas_.top(); formulas_.pop();
 	      Formula * iwcf = integrateWildcard(wcf);
 	      Formula * f = new Negation(*iwcf); delete iwcf;
-	      formulas_.push_back(WildcardFormula(f, NULL));
-	      delete formulas_.front().first; formulas_.pop_front();
+	      formulas_.push(WildcardFormula(f, NULL));
+	      delete wcf.first;
 	      break;
 	    }
 	  case FORMULA_AND:
 	  case FORMULA_OR:
 	    {
 	      assert(formulas_.size() > 1);
-	      WildcardFormula op1 = formulas_.front(); formulas_.pop_front();
-	      WildcardFormula op2 = formulas_.front(); formulas_.pop_front();
+	      WildcardFormula op2 = formulas_.top(); formulas_.pop();
+	      WildcardFormula op1 = formulas_.top(); formulas_.pop();
 	      Formula * f;
 	      if (node.type == FORMULA_AND)
 		{
 		  node.check(op1.second == NULL, "", 
 			     "wildcard must be last AND operand");
 		  f = new Conjunction(*op1.first, *op2.first);
-		  formulas_.push_back(WildcardFormula(f, op2.second));
+		  formulas_.push(WildcardFormula(f, op2.second));
 		}
 	      else
 		{
 		  Formula * f1 = integrateWildcard(op1);
 		  Formula * f2 = integrateWildcard(op2);
 		  f = new Disjunction(*f1, *f2); delete f1; delete f2;
-		  formulas_.push_back(WildcardFormula(f, NULL));
+		  formulas_.push(WildcardFormula(f, NULL));
 		}
 	      delete op1.first;
 	      delete op2.first;
@@ -382,20 +382,20 @@ namespace pnapi
 	    // fallthrough intended
 	    {
 	      assert(formulas_.size() > 0);
-	      node.check(formulas_.front().second == NULL, "", 
+	      node.check(formulas_.top().second == NULL, "", 
 			 "wildcard must be last AND operand");
-	      Formula * f = new Conjunction(*formulas_.front().first);
-	      formulas_.push_back(WildcardFormula(f, wcPlaces));
-	      delete formulas_.front().first; formulas_.pop_front();
+	      Formula * f = new Conjunction(*formulas_.top().first);
+	      delete formulas_.top().first; formulas_.pop();
+	      formulas_.push(WildcardFormula(f, wcPlaces));
 	    }
 	    break;
 
 	  case CONDITION:
 	    {
 	      assert(formulas_.size() == 1);
-	      Formula * f = integrateWildcard(formulas_.front());
+	      Formula * f = integrateWildcard(formulas_.top());
 	      net_.finalCondition() = *f; delete f;
-	      delete formulas_.front().first;
+	      delete formulas_.top().first;
 	      break;
 	    }
 

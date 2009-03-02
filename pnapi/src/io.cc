@@ -459,7 +459,7 @@ namespace pnapi
 		  {
 		    const formula::FormulaEqual * f = 
 		      dynamic_cast<const formula::FormulaEqual *>(*it);
-		    if (f->tokens() != 0)
+		    if (f == NULL || f->tokens() != 0)
 		      filteredChildren.insert(*it);
 		    else
 		      wildcard = " AND ALL_OTHER_PLACES_EMPTY";

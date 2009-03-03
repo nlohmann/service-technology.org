@@ -34,6 +34,7 @@ using std::endl;
 using std::pair;
 using std::multimap;
 using std::vector;
+using std::stringstream;
 using std::ostringstream;
 using std::deque;
 
@@ -422,7 +423,7 @@ namespace pnapi
 
   /*!
    */
-  void PetriNet::createFromWiring(map<string, PetriNet> & instances,
+  void PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
 				  const map<Place *, LinkNode *> & wiring)
   {
     vector<LinkNode *> wiredNodes; 
@@ -432,23 +433,28 @@ namespace pnapi
     clear();
 
     // add structure of nets
-    for (map<string, PetriNet>::iterator it = instances.begin(); 
+    for (map<string, vector<PetriNet> >::iterator it = instances.begin(); 
 	 it != instances.end(); ++it)
       {
 	assert(!it->first.empty());
 
-	PetriNet & net = it->second;
-	map<const Place *, const Place *> placeMapping =
-	  copyStructure(net.prefixNodeNames(it->first + "."));
-	condition_.merge(net.condition_, placeMapping);
+	for (unsigned int i = 0; i < it->second.size(); i++)
+	  {
+	    PetriNet & net = it->second[i];
+	    stringstream ss; ss << i + 1;
+	    map<const Place *, const Place *> placeMapping =
+	      copyStructure(net.prefixNodeNames(it->first + "[" + ss.str() + 
+						"]."));
+	    condition_.merge(net.condition_, placeMapping);
 
-	// translate references in wiring
-	for (map<Place *, LinkNode *>::const_iterator it = wiring.begin();
-	     it != wiring.end(); ++it)
-	  if (placeMapping.find(it->first) != placeMapping.end())
-	    wiredNodes.push_back(&wiring.find(it->first)->second
+	    // translate references in wiring
+	    for (map<Place *, LinkNode *>::const_iterator it = wiring.begin();
+		 it != wiring.end(); ++it)
+	      if (placeMapping.find(it->first) != placeMapping.end())
+		wiredNodes.push_back(&wiring.find(it->first)->second
 		 ->replacePlace(const_cast<Place &>(*placeMapping
-				                    .find(it->first)->second)));
+						    .find(it->first)->second)));
+	  }
       }
 
     set<LinkNode *> expanded;

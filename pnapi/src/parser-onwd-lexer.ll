@@ -69,6 +69,13 @@ WIRING         { return KEY_WIRING; }
 \.             { return SYM_DOT; }
 \-\>           { return SYM_SINGLE_ARR; }
 \=\>           { return SYM_DOUBLE_ARR; }
+\[             { return SYM_BRACKET_LEFT; }
+\]             { return SYM_BRACKET_RIGHT; }
+
+[0-9][0-9]* { 
+  pnapi_onwd_lval.yt_int = atoi(yytext); 
+  return CL_NUMBER; 
+}
 
 [a-z][a-zA-Z0-9_]* { 
   pnapi_onwd_lval.yt_string = new std::string(yytext);

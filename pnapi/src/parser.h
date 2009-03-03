@@ -378,6 +378,7 @@ namespace pnapi
 	const Type type;
 	const std::string string1;
 	const std::string string2;
+	const int number;
 
 	Node();
 	Node(Node *);
@@ -385,6 +386,7 @@ namespace pnapi
 	Node(Node *, Node *, Node *);
 
 	Node(Type, std::string *, std::string *);
+	Node(Type, std::string *, std::string *, int);
 
 	Node(Type);
 	Node(Type, Node *);
@@ -407,12 +409,12 @@ namespace pnapi
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
 
-	std::map<std::string, PetriNet> & instances();
+	std::map<std::string, std::vector<PetriNet> > & instances();
 	const std::map<Place *, LinkNode *> & wiring();
 
       private:
-	std::map<std::string, PetriNet> instances_;
-	std::deque<Place *> places_;
+	std::map<std::string, std::vector<PetriNet> > instances_;
+	std::deque<std::vector<Place *> > places_;
 	std::map<Place *, LinkNode *> wiring_;
 
 	LinkNode * getLinkNode(Place & p, LinkNode::Mode mode);

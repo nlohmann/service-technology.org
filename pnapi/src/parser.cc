@@ -19,6 +19,7 @@ using std::string;
 using std::map;
 using std::set;
 using std::pair;
+using std::vector;
 
 using namespace pnapi::formula;
 
@@ -570,22 +571,22 @@ namespace pnapi
       /* simple child adding */
 
       Node::Node() :
-	BaseNode(), type(STRUCT)
+	BaseNode(), type(STRUCT), number(0)
       {
       }
 
       Node::Node(Node * node) :
-	BaseNode(node), type(STRUCT)
+	BaseNode(node), type(STRUCT), number(0)
       {
       }
 
       Node::Node(Node * node1, Node * node2) :
-	BaseNode(node1, node2), type(STRUCT)
+	BaseNode(node1, node2), type(STRUCT), number(0)
       {
       }
 
       Node::Node(Node * node1, Node * node2, Node * node3) :
-	BaseNode(node1, node2, node3), type(STRUCT)
+	BaseNode(node1, node2, node3), type(STRUCT), number(0)
       {
       }
 
@@ -593,7 +594,14 @@ namespace pnapi
       /* data node construction */
 
       Node::Node(Type type, string * str1, string * str2) :
-	type(type), string1(*str1), string2(*str2)
+	type(type), string1(*str1), string2(*str2), number(0)
+      {
+	delete str1;
+	delete str2;
+      }
+
+      Node::Node(Type type, string * str1, string * str2, int number) :
+	type(type), string1(*str1), string2(*str2), number(number)
       {
 	delete str1;
 	delete str2;
@@ -603,12 +611,12 @@ namespace pnapi
       /* typed node construction */
 
       Node::Node(Type type) :
-	type(type)
+	type(type), number(0)
       {
       }
 
       Node::Node(Type type, Node * node) :
-	type(type)
+	type(type), number(0)
       {
 	assert(node != NULL);
 
@@ -621,7 +629,7 @@ namespace pnapi
       }
 
       Node::Node(Type type, Node * node1, Node * node2) :
-	BaseNode(node1, node2), type(type)
+	BaseNode(node1, node2), type(type), number(0)
       {
       }
 
@@ -656,17 +664,27 @@ namespace pnapi
 	  {
 	  case INSTANCE:
 	    {
+	      PetriNet net;
 	      ifstream file(node.string2.c_str());
 	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2) 
-		   >> instances_[node.string1];
+		   >> net;
+	      for (int i = 0; i < node.number; i++)
+		instances_[node.string1].push_back(net);
 	      break;
 	    }
 
 	  case PLACE:
 	    {
-	      Place * p = instances_[node.string1].findPlace(node.string2);
-	      node.check(p != NULL, node.string2, "unknown place");
-	      places_.push_back(p);
+	      vector<Place *> places;
+	      for (vector<PetriNet>::iterator it = 
+		     instances_[node.string1].begin();
+		   it != instances_[node.string1].end(); ++it)
+		{
+		  Place * p = it->findPlace(node.string2);
+		  node.check(p != NULL, node.string2, "unknown place");
+		  places.push_back(p);
+		}
+	      places_.push_back(places);
 	      break;
 	    }
 
@@ -681,13 +699,21 @@ namespace pnapi
 	  case ANY_WIRING:
 	  case ALL_WIRING:
 	    {
-	      Place & p1 = *places_.front(); places_.pop_front();
-	      Place & p2 = *places_.front(); places_.pop_front();
-	      LinkNode * n1 = getLinkNode(p1, getLinkNodeMode(node.type));
-	      LinkNode * n2 = getLinkNode(p2, getLinkNodeMode(node.type));
-	      n1->addLink(*n2);
-	      wiring_[&p1] = n1;
-	      wiring_[&p2] = n2;
+	      vector<Place *> p1s = places_.front(); places_.pop_front();
+	      vector<Place *> p2s = places_.front(); places_.pop_front();
+	      for (vector<Place *>::iterator p1i = p1s.begin(); 
+		   p1i != p1s.end(); ++p1i)
+		for (vector<Place *>::iterator p2i = p2s.begin(); 
+		     p2i != p2s.end(); ++p2i)
+		  {
+		    Place & p1 = **p1i;
+		    Place & p2 = **p2i;
+		    LinkNode * n1 = getLinkNode(p1, getLinkNodeMode(node.type));
+		    LinkNode * n2 = getLinkNode(p2, getLinkNodeMode(node.type));
+		    n1->addLink(*n2);
+		    wiring_[&p1] = n1;
+		    wiring_[&p2] = n2;
+		  }
 	      break;
 	    }
 
@@ -714,7 +740,7 @@ namespace pnapi
 	  return LinkNode::ALL;
       }
 
-      map<string, PetriNet> & Visitor::instances()
+      map<string, vector<PetriNet> > & Visitor::instances()
       { 
 	return instances_; 
       }

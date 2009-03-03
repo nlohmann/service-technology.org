@@ -39,13 +39,16 @@
   ****************************************************************************/
 
 %union {
+  int                         yt_int;
   std::string *               yt_string;
   pnapi::parser::onwd::Node * yt_node;
 }
 
 %token KEY_INSTANCE KEY_WIRING
 %token SYM_COMMA SYM_COLON SYM_SEMICOLON SYM_DOT SYM_SINGLE_ARR SYM_DOUBLE_ARR
+%token SYM_BRACKET_LEFT SYM_BRACKET_RIGHT
 
+%token <yt_int> CL_NUMBER
 %token <yt_string> CL_IDENTIFIER CL_STRING
 
 %type <yt_node> instance instances wiring wirings place
@@ -66,7 +69,10 @@ instances: instance                     { $$ = new Node($1);     }
          | instances SYM_COMMA instance { $$ = $1->addChild($3); }
          ;
 
-instance: CL_IDENTIFIER SYM_COLON CL_STRING { $$ = new Node(INSTANCE, $1, $3); }
+instance: CL_IDENTIFIER SYM_COLON CL_STRING 
+                              { $$ = new Node(INSTANCE, $1, $3, 1); }
+        | CL_IDENTIFIER SYM_BRACKET_LEFT CL_NUMBER SYM_BRACKET_RIGHT 
+  	  SYM_COLON CL_STRING { $$ = new Node(INSTANCE, $1, $6, $3); }
         ;
 
 wirings: wiring                   { $$ = new Node($1);     }

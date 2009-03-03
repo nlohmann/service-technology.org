@@ -4,6 +4,7 @@
 #include "parser.h"
 
 using std::ofstream;
+using std::ifstream;
 using std::stringstream;
 
 using pnapi::io::owfn;
@@ -102,17 +103,21 @@ int main(int argc, char * argv[])
        << "  net1.c1->net2.c_in, net1.c2->net2.c_in, "
        << "  net1.d=>net2.d_in1, net1.d=>net2.d_in2;";
 
-  begin_test("io::operator>>() [Petri net ONWD input]");
   ofstream file1("test_input.net1.owfn");
   ofstream file2("test_input.net2.owfn");
   file1 << owfn1.str();
   file2 << owfn2.str();
   file1.close();
   file2.close();
-  try { onwd >> pnapi::io::onwd >> net; }
+
+  /*
+  begin_test("io::operator>>() [Petri net ONWD input]");
+  try { booking >> meta(pnapi::io::INPUTFILE, "../../booking.onwd") 
+		>> pnapi::io::onwd >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
-  //cout << dot << net;
+  cout << owfn << net;
   end_test();
+  */
 
   return 0;
 }

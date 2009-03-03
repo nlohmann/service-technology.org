@@ -311,7 +311,7 @@ namespace pnapi
     /* wiring */
 
     /// creates the net by assembling the given nets
-    void createFromWiring(std::map<std::string, PetriNet> &,
+    void createFromWiring(std::map<std::string, std::vector<PetriNet> > &,
 			  const std::map<Place *, LinkNode *> &);
 
 

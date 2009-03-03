@@ -50,10 +50,10 @@ namespace pnapi
     void addLink(LinkNode &);
 
     /// replace the internal place reference
-    LinkNode & replacePlace(const Place &);
+    LinkNode & replacePlace(Place &);
 
     /// replace links by a set of new nodes
-    std::vector<LinkNode *> & expand();
+    std::vector<LinkNode *> expand();
 
     /// joins places in case of one-to-one links
     void joinPlaces();
@@ -64,7 +64,7 @@ namespace pnapi
     /*** private attributes ***/
 
     /// associated place
-    const Place * place_;
+    Place * place_;
 
     /// type of this node
     const Type type_;
@@ -96,12 +96,8 @@ namespace pnapi
     /// connects a place to transition (during expansion)
     Place & connectPlace(Transition &);
 
-    /// return a node name unique in both nets
-    std::string getUniqueNodeName(const PetriNet &, const PetriNet &, 
-				  const std::string &);
-
     /// creates the vector of new nodes (during expansion)
-    std::vector<LinkNode *> & createNodes(const PetriNet &);
+    std::vector<LinkNode *> createNodes(std::vector<Place *> &);
   };
 
 }

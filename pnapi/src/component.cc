@@ -354,7 +354,7 @@ namespace pnapi {
    * \pre   the places must reside in the same PetriNet instance
    * \post  the place is internal after merging
    */
-  void Place::merge(Place & place, bool addArcWeights)
+  Place & Place::merge(Place & place, bool addArcWeights)
   {
     // be sure to internalize this place
     if (getType() != INTERNAL)
@@ -367,6 +367,8 @@ namespace pnapi {
 
     // Node::merge does all the rest
     Node::merge(place, addArcWeights);
+    
+    return *this;
   }
 
 

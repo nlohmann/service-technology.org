@@ -52,11 +52,9 @@ namespace pnapi
   {
     LinkNode & partner = getPartner();
     assert(&partner.getPartner() == this);
-    PetriNet & net = place_->getPetriNet();
-    assert(&net == &partner.place_->getPetriNet());
+    assert(&place_->getPetriNet() == &partner.place_->getPetriNet());
 
-    // FIXME: TODO
-    const_cast<Place &>(*partner.place_).merge(const_cast<Place &>(*place_));
+    partner.place_->merge(*place_);
   }
 
 
@@ -69,36 +67,32 @@ namespace pnapi
    *          returned as a set. After calling #expand() for a node the node
    *          should no longer be used.
    */
-  vector<LinkNode *> & LinkNode::expand()
+  vector<LinkNode *> LinkNode::expand()
   {
     assert(!links_.empty());
 
     // construct a new pattern net with a "root" place (to be connected)
-    PetriNet pattern;
-    /*
-    Place & place = pattern.createPlace(place_->getName(), 
-				type_ == SOURCE ? Place::INPUT : Place::OUTPUT);
+    PetriNet & net = place_->getPetriNet();
+    Place & place = place_->merge(net.createPlace());
+    
 
     // broadcast (ALL) patterns have only one transition
-    Transition * trans;
+    Transition * trans = NULL;
     if (mode_ == ALL)
       trans = &connectTransition(place);
 
     // create numbered place (and transition in ANY mode) for each link
+    vector<Place *> places;
     int nLinks = links_.size();
     for (int i = 0; i < nLinks; i++)
     {
       if (mode_ == ANY)
 	trans = &connectTransition(place);
-      connectPlace(*trans);
+      places.push_back(&connectPlace(*trans));
     }
 
-    // compose the pattern net into the node net (joins on root place by name)
-    place_->getPetriNet() += pattern;
-    */
-
     // create nodes for new interface and reconnect old links
-    return createNodes(pattern);
+    return createNodes(places);
   }
 
 
@@ -120,7 +114,7 @@ namespace pnapi
 
   /*!
    */
-  LinkNode & LinkNode::replacePlace(const Place & p)
+  LinkNode & LinkNode::replacePlace(Place & p)
   {
     place_ = &p;
     return *this;
@@ -145,9 +139,7 @@ namespace pnapi
   Transition & LinkNode::connectTransition(Place & place)
   {
     PetriNet & net = place.getPetriNet();
-    Transition & trans = 
-      net.createTransition(getUniqueNodeName(net, place_->getPetriNet(),
-					     place_->getName()));
+    Transition & trans = net.createTransition();
 
     if (type_ == SOURCE)
       net.createArc(place, trans);
@@ -162,17 +154,15 @@ namespace pnapi
   {
     Place * place;
     PetriNet & net = trans.getPetriNet();
-    string name = getUniqueNodeName(net, place_->getPetriNet(), 
-				    place_->getName());
 
     if (type_ == SOURCE)
     {
-      place = &net.createPlace(name, Place::OUTPUT);
+      place = &net.createPlace("", Place::OUTPUT);
       net.createArc(trans, *place);
     }
     else
     {
-      place = &net.createPlace(name, Place::INPUT);
+      place = &net.createPlace("", Place::INPUT);
       net.createArc(*place, trans);
     }
 
@@ -180,55 +170,27 @@ namespace pnapi
   }
 
 
-  string LinkNode::getUniqueNodeName(const PetriNet & net1, 
-				     const PetriNet & net2,
-				     const string & base)
+  vector<LinkNode *> LinkNode::createNodes(vector<Place *> & places)
   {
-    //FIXME: string name = net1.getUniqueNodeName(base);
-    //FIXME: return net2.getUniqueNodeName(name);
-    return "";
-  }
+    assert(places.size() == links_.size());
 
-
-  vector<LinkNode *> & LinkNode::createNodes(const PetriNet & pattern)
-  {
     Place * place;
     LinkNode * node;
-    vector<LinkNode *> * nodes = new vector<LinkNode *>();
-    nodes->reserve(links_.size());
+    vector<LinkNode *> nodes;
+    nodes.reserve(links_.size());
+    vector<Place *>::iterator placeIter = places.begin();
     
-    // prepare access to old pattern interface (just for naming information)
-    set<Place *> patternInterface =
-      type_ == SOURCE ? pattern.getOutputPlaces() : pattern.getInputPlaces();
-    set<Place *>::iterator patternIter = patternInterface.begin();
-
-    assert(patternInterface.size() == links_.size());
-
     // for each link of this node create a new one and reconnect
     while (!links_.empty())
     {
-      place = place_->getPetriNet().findPlace((*patternIter)->getName());
+      place = *placeIter;
       node = new LinkNode(*place);
       (*links_.begin())->replaceLink(*this, *node);
-      nodes->push_back(node);
-      ++patternIter;
+      nodes.push_back(node);
+      ++placeIter;
     }
 
-    return *nodes;
-  }
-
-  
-  LinkNode::LinkNode(const LinkNode & n) :
-    place_(n.place_),
-    type_(n.type_),
-    mode_(n.mode_)
-  {
-    assert(false);
-  }
-
-  LinkNode & LinkNode::operator=(const LinkNode & n)
-  {
-    assert(false);
+    return nodes;
   }
 
 }

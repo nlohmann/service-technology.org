@@ -447,21 +447,20 @@ namespace pnapi
 	     it != wiring.end(); ++it)
 	  if (placeMapping.find(it->first) != placeMapping.end())
 	    wiredNodes.push_back(&wiring.find(it->first)->second
-				 ->replacePlace(*placeMapping
-						.find(it->first)->second));
+		 ->replacePlace(const_cast<Place &>(*placeMapping
+				                    .find(it->first)->second)));
       }
 
     set<LinkNode *> expanded;
-    //vector<LinkNode *> * result;
+    vector<LinkNode *> result;
 
     // expand all nodes
     for (vector<LinkNode *>::iterator it = wiredNodes.begin();
 	 it != wiredNodes.end(); ++it)
       {
-	expanded.insert(*it);
-	//result = &(*it).second->expand();
-	//expanded.insert(result->begin(), result->end());
-	//delete (*it).second, result;  // clean up
+	result = (*it)->expand();
+	expanded.insert(result.begin(), result.end());
+	delete (*it);  // clean up
       }
 	
     // join one-to-one links
@@ -477,8 +476,8 @@ namespace pnapi
 	expanded.erase(it); delete *it;
 	expanded.erase(node); delete node;
       }
-   }
-
+  }
+  
 
   /*!
    * \param   source  the source Node

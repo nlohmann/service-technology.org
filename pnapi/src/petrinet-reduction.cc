@@ -2541,43 +2541,9 @@ unsigned int PetriNet::reduce_equal_places()
  *
  * \return the number of passes until a fixed point was reached
  * 
- * \param   reduction_mode determines, how the reduction_level will be
- *          interpreted. The first two bits will be read as followed:
- *          0 - "Classic" reduction as in the former api only using the
- *              pillat rules
- *          1 - Reduction rules are applied setwise. 
- *              See reduction_level for details.
- *          2 - Full control over every single reduction rule.
- *          The third bit determines wether or not a normalized
- *          net should be kept normal. If set interface transitions
- *          (i.e. transitions connected with interface places) will only be
- *          merged with internal transitions (i.e. transitions connected
- *          with internal places only).
- * 
  * \param   reduction_level determines which rules will be performed.
- *          Interpretation depends on reduction_mode.
- *          In reduction_mode 0:
- *          0 - Nothing will be done.
- *          1 - Dead nodes will be removed.
- *          2 - Unused statusplaces and suspicious transitions 
- *              will be removed. (BPEL2oWFN only)
- *          3 - Identical nodes will be removed.
- *          4 - Series nodes will be removed.
- *          5 - Self-loop nodes will be removed as well as
- *              initially marked places in choreographies.
- *          6 - Equal places will be removed.
- *          (A higher level of reduction implies all reduction
- *            rules from lower levels.)
- *          
- *          In reduction_mode 1:
- *          0           - Nothing will be done.
- *          1st bit set - Unneccessary nodes will be removed.
- *          2nd bit set - Rules mentioned in [Pil08] and 
- *                        [Murate89] will be applied.
- *          3rd bit set - Rules mentioned in [Sta90] will be applied.
- * 
- *          In reduction_mode 2:
- *          Each bit controls a particular rule:
+ *          The first 19 bits determine, which rule will be applied;
+ *          each bit stands for a specific rule. In detail: 
  *           1st - unused status places
  *           2nd - suspicious transitions 
  *           3rd - dead nodes
@@ -2597,76 +2563,35 @@ unsigned int PetriNet::reduce_equal_places()
  *          17th - self-loop places
  *          18th - self-loop transitions
  *          19th - equal places        
+ * 
+ *          The 20th bit determines, wether a normal net should be
+ *          kept normal. Enum ReductionLevel has been implemented,
+ *          to simplify the usage of reduction.
+ *          Additional keywords apply a whole set of rules. I.e.:
  *  
+ *          LEVEL_1 - Dead nodes will be removed.
+ *          LEVEL_2 - Unused statusplaces and suspicious transitions 
+ *                    will be removed. (BPEL2oWFN only)
+ *          LEVEL_3 - Identical nodes will be removed.
+ *          LEVEL_4 - Series nodes will be removed.
+ *          LEVEL_5 - Self-loop nodes will be removed as well as
+ *                    initially marked places in choreographies.
+ *          LEVEL_6 - Equal places will be removed.
+ *          (A higher level of reduction implies all reduction
+ *            rules from lower levels.)
+ *         
+ *          SET_UNNECCESSARY - Unneccessary nodes will be removed.
+ *          SET_PILLAT       - Rules mentioned in [Pil08] and 
+ *                             [Murate89] will be applied.
+ *          SET_STARKE       - Rules mentioned in [Sta90] will be applied.
  * 
  */
-unsigned int PetriNet::reduce(unsigned int reduction_level, unsigned int reduction_mode)
+unsigned int PetriNet::reduce(unsigned int reduction_level)
 {
   // trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   // trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
   
-  unsigned int mode = 0;
-  bool keepNormal = ((reduction_mode & 4) == 4);
-  
-  // initialisation
-  switch(reduction_mode & 3)
-  {
-  case 0: 
-  {
-    if (reduction_level >= 1)
-    {
-      mode += 4;
-    }
-    
-    if (reduction_level >= 2)
-    {
-      mode += 3;
-    }
-    
-    if (reduction_level >= 3)
-    {
-      mode += 12288;
-    }
-    
-    if (reduction_level >= 4)
-    {
-      mode += 49152;
-    }
-    
-    if (reduction_level >= 5)
-    {
-      mode += 196616;
-    }
-    
-    if (reduction_level >= 6)
-    {
-      mode += 262144;
-    }
-  }; break;
-  case 1:
-  {
-    if ((reduction_level & 1) == 1)
-    {
-      mode += 15;
-    }
-    
-    if ((reduction_level & 2) == 2)
-    {
-      mode += 520192;
-    }
-    
-    if ((reduction_level & 4) == 4)
-    {
-      mode += 4080;
-    }
-    
-  }; break;
-  case 2:
-  {
-    mode = reduction_level;
-  }; break;
-  default: return 0;
-  }
+  bool keepNormal = ((reduction_level & KEEP_NORMAL) == KEEP_NORMAL);
   
   unsigned int done = 1;
   unsigned int passes = 0;
@@ -2679,96 +2604,96 @@ unsigned int PetriNet::reduce(unsigned int reduction_level, unsigned int reducti
     ++passes;
 
 #ifdef USING_BPEL2OWFN
-    if ((mode & 1) == 1)
+    if ((reduction_level & UNUSED_STATUS_PLACES) == UNUSED_STATUS_PLACES)
     {
       done += reduce_unused_status_places();
     }
-    if ((mode & 2) == 2)
+    if ((reduction_level & SUSPICIOS_TRANSITIONS) == SUSPICIOS_TRANSITIONS)
       done += reduce_suspicious_transitions();
     }
 #endif
     
-    if ((mode & 4) == 4)
+    if ((reduction_level & DEAD_NODES) == DEAD_NODES)
     {
       done += reduce_dead_nodes();
     }
     
-    if ((mode & 8) == 8)
+    if ((reduction_level & INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES) == INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES)
     {
       done += reduce_remove_initially_marked_places_in_choreographies();
     }
     
-    if ((mode & 16) == 16)
+    if ((reduction_level & STARKE_RULE_3_PLACES) == STARKE_RULE_3_PLACES)
     {
       done += reduce_rule_3p();
     }
      
-    if ((mode & 32) == 32)
+    if ((reduction_level & STARKE_RULE_3_TRANSITIONS) == STARKE_RULE_3_TRANSITIONS)
     {
       done += reduce_rule_3t();
     }
     
-    if ((mode & 64) == 64)
+    if ((reduction_level & STARKE_RULE_4) == STARKE_RULE_4)
     {
       done += reduce_rule_4();
     }
      
-    if ((mode & 128) == 128)
+    if ((reduction_level & STARKE_RULE_5) == STARKE_RULE_5)
     {
       done += reduce_rule_5(keepNormal);
     }
     
-    if ((mode & 256) == 256)
+    if ((reduction_level & STARKE_RULE_6) == STARKE_RULE_6)
     {
       done += reduce_rule_6(keepNormal);
     }
     
-    if ((mode & 512) == 512)
+    if ((reduction_level & STARKE_RULE_7) == STARKE_RULE_7)
     {
       done += reduce_rule_7();
     }
     
-    if ((mode & 1024) == 1024)
+    if ((reduction_level & STARKE_RULE_8) == STARKE_RULE_8)
     {
       done += reduce_rule_8();
     }
     
-    if ((mode & 2048) == 2048)
+    if ((reduction_level & STARKE_RULE_9) == STARKE_RULE_9)
     {
       done += reduce_rule_9(keepNormal);
     }
     
-    if ((mode & 4096) == 4096)
+    if ((reduction_level & IDENTICAL_PLACES) == IDENTICAL_PLACES)
     {
       done += reduce_identical_places();  // RB1
     }
     
-    if ((mode & 8192) == 8192)
+    if ((reduction_level & IDENTICAL_TRANSITIONS) == IDENTICAL_TRANSITIONS)
     {
       done += reduce_identical_transitions(); // RB2
     }
     
-    if ((mode & 16384) == 16384)
+    if ((reduction_level & SERIES_PLACES) == SERIES_PLACES)
     {
       done += reduce_series_places();   // RA1
     }
     
-    if ((mode & 32768) == 32768)
+    if ((reduction_level & SERIES_TRANSITIONS) == SERIES_TRANSITIONS)
     {
       done += reduce_series_transitions(keepNormal);  // RA2
     }
     
-    if ((mode & 65536) == 65536)
+    if ((reduction_level & SELF_LOOP_PLACES) == SELF_LOOP_PLACES)
     {
       done += reduce_self_loop_places();  // RC1
     }
     
-    if ((mode & 131072) == 131072)
+    if ((reduction_level & SELF_LOOP_TRANSITIONS) == SELF_LOOP_TRANSITIONS)
     {
       done += reduce_self_loop_transitions(); // RC2
     }
     
-    if ((mode & 262144) == 262144)
+    if ((reduction_level & EQUAL_PLACES) == EQUAL_PLACES)
     {
       done += reduce_equal_places();    // RD1
     }

@@ -373,11 +373,8 @@ namespace pnapi {
 
 
   /*!
-   * \brief   Sets the number of token to the place
-   *
-   * \note    This method is experimentally used!
    */
-  void Place::mark(const unsigned int &t)
+  void Place::mark(unsigned int t)
   {
     tokens_ = t;
   }

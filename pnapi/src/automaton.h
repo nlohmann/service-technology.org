@@ -3,6 +3,7 @@
 #ifndef PNAPI_AUTOMATON_H
 #define PNAPI_AUTOMATON_H
 
+#include <iostream>
 #include <cassert>
 #include <list>
 #include <set>
@@ -134,13 +135,11 @@ namespace pnapi
   /*!
    * \brief
    */
-#include <iostream>
-using std::cout;
   template <class T>
   void AbstractAutomaton<T>::createEdge(T &source, T &destination, const string label)
   {
-    cout << "DEBUG: Created edge from " << source.getName();
-    cout << " to " << destination.getName() << "\n";
+    std::cout << "DEBUG: Created edge from " << source.getName();
+    std::cout << " to " << destination.getName() << "\n";
     edges_.insert(new Edge<T>(source, destination, label));
   }
 
@@ -256,7 +255,7 @@ using std::cout;
 
   private:
     /// attributes & methods used for creating an automaton from Petri net
-    static const int HASHSIZE = 65535;
+    static const int PNAPI_SA_HASHSIZE = 65535;
 
     std::vector<std::set<StateB *> > hashTable_;
 

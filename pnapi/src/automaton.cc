@@ -34,7 +34,7 @@ namespace pnapi
    *          initialize().
    */
   ServiceAutomaton::ServiceAutomaton(PetriNet &n) :
-    hashTable_(HASHSIZE), initialmarking_(n), AbstractAutomaton<StateB>(n)
+    hashTable_(PNAPI_SA_HASHSIZE), initialmarking_(n), AbstractAutomaton<StateB>(n)
   {
     f_ = SA;
     initialmarking_ = *new Marking(n, true);

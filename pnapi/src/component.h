@@ -213,7 +213,7 @@ namespace pnapi
     Place & merge(Place &, bool = true);
 
     /// marks the place with token
-    void mark(const unsigned int &t);
+    void mark(unsigned int = 1);
 
     /// returns the port this place belongs to
     std::string getPort() const;

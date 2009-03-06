@@ -35,11 +35,11 @@ int main(int argc, char * argv[])
   begin_test("io::operator>>() [Petri net OWFN input]");
   stringstream stream, test;
   stream << owfn << net;
-  //cout << owfn << net;
+  cout << owfn << net;
   try { stream >> owfn >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
   test << owfn << net;
-  //cout << owfn << net;
+  cout << owfn << net;
   assert(stream.str() == test.str());
   end_test();
   */

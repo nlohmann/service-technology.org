@@ -8,6 +8,7 @@ using std::endl;
 
 #include <cassert>
 
+#include "automaton.h"
 #include "petrinet.h"
 #include "parser.h"
 #include "formula.h"
@@ -51,7 +52,13 @@ namespace pnapi
       return ios;
     }
 
-    util::Manipulator<std::pair<MetaInformation, std::string> > 
+    std::ostream & sa(std::ostream &os)
+    {
+      util::FormatData::data(os) = util::SA;
+      return os;
+    }
+
+    util::Manipulator<std::pair<MetaInformation, std::string> >
     meta(MetaInformation i, const std::string & s)
     {
       return util::MetaManipulator(pair<MetaInformation, string>(i, s));
@@ -60,7 +67,7 @@ namespace pnapi
 
     /*!
      */
-    InputError::InputError(Type type, const string & filename, int line, 
+    InputError::InputError(Type type, const string & filename, int line,
 			   const string & token, const string & msg) :
       type(type), message(msg), token(token), line(line), filename(filename)
     {
@@ -71,15 +78,15 @@ namespace pnapi
      */
     std::ostream & operator<<(std::ostream & os, const io::InputError & e)
     {
-      os << e.filename << ":" << e.line << ": error"; 
+      os << e.filename << ":" << e.line << ": error";
       if (!e.token.empty())
 	switch (e.type)
 	  {
-	  case io::InputError::SYNTAX_ERROR:   
-	    os << " near '" << e.token << "'"; 
+	  case io::InputError::SYNTAX_ERROR:
+	    os << " near '" << e.token << "'";
 	    break;
-	  case io::InputError::SEMANTIC_ERROR: 
-	    os << ": '" << e.token << "'"; 
+	  case io::InputError::SEMANTIC_ERROR:
+	    os << ": '" << e.token << "'";
 	    break;
 	  }
       return os << ": " << e.message;
@@ -98,7 +105,7 @@ namespace pnapi
             case util::DOT:    net.output_dot   (os); break;
             case util::GASTEX: net.output_gastex(os); break;
 
-            case util::STAT: 
+            case util::STAT:
                 os << "|P|= "     << net.internalPlaces_.size()+net.inputPlaces_.size()+net.outputPlaces_.size() << "  ";
                 os << "|P_in|= "  << net.inputPlaces_.size()    << "  ";
                 os << "|P_out|= " << net.outputPlaces_.size()   << "  ";
@@ -114,12 +121,47 @@ namespace pnapi
 
 
     /*!
+     * Stream the Automaton object to a given output stream using the stream
+     * format (see pnapi::io).
+     */
+    std::ostream & operator<<(std::ostream &os, const Automaton &sa)
+    {
+      switch (util::FormatData::data(os))
+      {
+      case      util::SA:  sa.output_sa(os);   break;
+      //case      util::STG: sa.output_stg(os);  break;
+      default:  assert(false);
+      }
+
+      return os;
+    }
+
+
+    /*!
+     * Second Automaton output has to be here because the ServiceAutomaton
+     * class can convert Petri nets into a service automaton, and the Automaton
+     * class can read automata from file (in .sa/.ig format).
+     */
+    std::ostream & operator<<(std::ostream &os, const ServiceAutomaton &sa)
+    {
+      switch (util::FormatData::data(os))
+      {
+      case      util::SA:   sa.output_sa(os);   break;
+      //case      util::STG:  sa.output_stg(os);  break;
+      default:  assert(false);
+      }
+
+      return os;
+    }
+
+
+    /*!
      * Reads a Petri net from a stream (in most cases backed by a file). The
      * format
      * of the stream data is not determined automatically. You have to set it
      * explicitly using a stream manipulator from pnapi::io.
      */
-    std::istream & operator>>(std::istream & is, PetriNet & net) 
+    std::istream & operator>>(std::istream & is, PetriNet & net)
       throw (InputError)
     {
       switch (util::FormatData::data(is))
@@ -219,7 +261,7 @@ namespace pnapi
       }
 
 
-      bool compareContainerElements(const formula::Formula *, 
+      bool compareContainerElements(const formula::Formula *,
 				    const formula::Formula *)
       {
 	return false;
@@ -229,7 +271,7 @@ namespace pnapi
       set<Place *> filterMarkedPlaces(const set<Place *> & places)
       {
 	set<Place *> filtered;
-	for (set<Place *>::iterator it = places.begin(); it != places.end(); 
+	for (set<Place *>::iterator it = places.begin(); it != places.end();
 	     ++it)
 	  if ((*it)->getTokenCount() > 0)
 	    filtered.insert(*it);
@@ -237,11 +279,11 @@ namespace pnapi
       }
 
 
-      std::multimap<unsigned int, Place *> 
+      std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const set<Place *> & places)
       {
 	std::multimap<unsigned int, Place *> grouped;
-	for (set<Place *>::iterator it = places.begin(); it != places.end(); 
+	for (set<Place *>::iterator it = places.begin(); it != places.end();
 	     ++it)
 	  grouped.insert(pair<unsigned int, Place *>((*it)->getCapacity(),*it));
 	return grouped;
@@ -276,8 +318,8 @@ namespace pnapi
 	  case DOT:     /* ARCS: DOT     */
 	    if (!interface && arc.getPlace().getType() != Place::INTERNAL)
 	      break;
-	    os << " " << arc.getSourceNode() << " -> " << arc.getTargetNode() 
-	       << "\t["; 
+	    os << " " << arc.getSourceNode() << " -> " << arc.getTargetNode()
+	       << "\t[";
 	    if (arc.getWeight() != 1)
 	      os << "label=\"" << arc.getWeight() << "\"";
 	    if (arc.getPlace().getType() == Place::INTERNAL)
@@ -307,7 +349,7 @@ namespace pnapi
 	  {
 	  case OWFN:    /* PLACES: OWFN    */
 	    os << p.getName();
-	    if (ModeData::data(os) == PLACE_TOKEN && 
+	    if (ModeData::data(os) == PLACE_TOKEN &&
 		p.getTokenCount() != 1)
 	      os << ": " << p.getTokenCount();
 	    break;
@@ -348,7 +390,7 @@ namespace pnapi
 		os << "]" << endl
 
 		   << " " << p.getName() << "_l\t[style=invis]" << endl
-		   << " " << p.getName() << "_l -> " << p.getName() 
+		   << " " << p.getName() << "_l -> " << p.getName()
 		   << " [headlabel=\"" << p.getName() << "\"]";
 	      }
 	    break;
@@ -374,7 +416,7 @@ namespace pnapi
 	      case Node::INOUT:    os << " { input/output }" << endl; break;
 	      }
 	    */
-	    os << delim(", ") 
+	    os << delim(", ")
 	       << "  CONSUME " << t.getPresetArcs()  << ";" << endl
 	       << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
 	    break;
@@ -382,12 +424,12 @@ namespace pnapi
 	  case DOT:     /* TRANSITIONS: DOT     */
 	    switch (ModeData::data(os))
 	      {
-	      case ARC: 
-		os << t.getName(); 
+	      case ARC:
+		os << t.getName();
 		break;
 
 	      case INNER:
-		os << t.getName() << " " << t.getName() << "_l"; 
+		os << t.getName() << " " << t.getName() << "_l";
 		break;
 
 	      default:
@@ -396,11 +438,11 @@ namespace pnapi
 		  {
 		  case(Node::INPUT):  os << "fillcolor=orange"; break;
 		  case(Node::OUTPUT):	os << "fillcolor=yellow"; break;
-		  case(Node::INOUT):  os 
+		  case(Node::INOUT):  os
 		      << "fillcolor=gold label=< <TABLE BORDER=\"1\""
 		      << " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
 		      << " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
-		      << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"" 
+		      << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
 		      << " BGCOLOR=\"ORANGE\">"
 		      << "</TD></TR><TR>"
 		      << "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
@@ -411,7 +453,7 @@ namespace pnapi
 		  }
 		os << "]" << endl
 		   << " " << t.getName() << "_l\t[style=invis]" << endl
-		   << " " << t.getName() << "_l -> " << t.getName() 
+		   << " " << t.getName() << "_l -> " << t.getName()
 		   << " [headlabel=\"" << t.getName() << "\"]";
 	      }
 	    break;
@@ -427,7 +469,7 @@ namespace pnapi
 	return os << c.formula();
       }
 
-      
+
       ostream & operator<<(ostream & os, const formula::Formula & f)
       {
 	return f.output(os);
@@ -449,15 +491,15 @@ namespace pnapi
 	set<const Place *> formulaPlaces = f.places();
 	if (!formulaPlaces.empty())
 	  {
-	    set<Place *> netPlaces = 
+	    set<Place *> netPlaces =
 	      (*formulaPlaces.begin())->getPetriNet().getPlaces();
 	    if (formulaPlaces.size() == netPlaces.size())
 	      {
 		set<const Formula *> filteredChildren;
-		for (set<const Formula *>::iterator it = children.begin(); 
+		for (set<const Formula *>::iterator it = children.begin();
 		     it != children.end(); ++it)
 		  {
-		    const formula::FormulaEqual * f = 
+		    const formula::FormulaEqual * f =
 		      dynamic_cast<const formula::FormulaEqual *>(*it);
 		    if (f == NULL || f->tokens() != 0)
 		      filteredChildren.insert(*it);
@@ -529,6 +571,14 @@ namespace pnapi
       ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
       {
 	return os << f.place().getName() << " <= " << f.tokens();
+      }
+
+
+      ostream & operator<<(ostream &os, const State &s)
+      {
+        os << s.getName();
+
+        return os;
       }
 
     }

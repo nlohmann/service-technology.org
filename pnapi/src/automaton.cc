@@ -34,13 +34,18 @@ namespace pnapi
    *          initialize().
    */
   ServiceAutomaton::ServiceAutomaton(PetriNet &n) :
-    hashTable_(PNAPI_SA_HASHSIZE), initialmarking_(n), AbstractAutomaton<StateB>(n)
+    AbstractAutomaton<StateB>(n), hashTable_(PNAPI_SA_HASHSIZE),
+    initialmarking_(n, true)
   {
-    f_ = SA;
-    initialmarking_ = *new Marking(n, true);
+    cout << "Before normalization!\nOWFN-Output:\n";
+    //cout << io::owfn << n;
+    n.normalize(true);
+    cout << "Net is normalized!\nOWFN-Output:\n";
+    //cout << io::owfn << n;
+    initialmarking_ = *new Marking(n);
 
     StateB *i = new StateB(initialmarking_);
-    states_.insert(i);
+    states_.push_back(i);
 
     dfs(*i);
   }
@@ -59,7 +64,7 @@ namespace pnapi
    */
   void ServiceAutomaton::addState(StateB &s)
   {
-    states_.insert(&s);
+    states_.push_back(&s);
   }
 
 
@@ -101,7 +106,7 @@ namespace pnapi
         if (**s == j)
         {
           doubled = true;
-          createEdge(i, **s, "bla");
+          createEdge(i, **s, edgeLabels_[*t]);
           break;
         }
       }
@@ -110,9 +115,18 @@ namespace pnapi
         continue;
 
       addState(j);
-      createEdge(i, j, "bla");
+      createEdge(i, j, edgeLabels_[*t]);
       dfs(j);
     }
+  }
+
+
+  /*!
+   * \brief   standard constructor of Automaton class
+   */
+  Automaton::Automaton() :
+    AbstractAutomaton<State>()
+  {
   }
 
 

@@ -426,14 +426,14 @@ namespace pnapi
   void PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
 				  const map<Place *, LinkNode *> & wiring)
   {
-    vector<LinkNode *> wiredNodes; 
+    vector<LinkNode *> wiredNodes;
     wiredNodes.reserve(wiring.size());
 
     // clean up old net
     clear();
 
     // add structure of nets
-    for (map<string, vector<PetriNet> >::iterator it = instances.begin(); 
+    for (map<string, vector<PetriNet> >::iterator it = instances.begin();
 	 it != instances.end(); ++it)
       {
 	assert(!it->first.empty());
@@ -443,7 +443,7 @@ namespace pnapi
 	    PetriNet & net = it->second[i];
 	    stringstream ss; ss << i + 1;
 	    map<const Place *, const Place *> placeMapping =
-	      copyStructure(net.prefixNodeNames(it->first + "[" + ss.str() + 
+	      copyStructure(net.prefixNodeNames(it->first + "[" + ss.str() +
 						"]."));
 	    condition_.merge(net.condition_, placeMapping);
 
@@ -468,7 +468,7 @@ namespace pnapi
 	expanded.insert(result.begin(), result.end());
 	delete (*it);  // clean up
       }
-	
+
     // join one-to-one links
     LinkNode * node;
     set<LinkNode *>::iterator it;
@@ -483,7 +483,7 @@ namespace pnapi
 	expanded.erase(node); delete node;
       }
   }
-  
+
 
   /*!
    * \param   source  the source Node
@@ -729,47 +729,54 @@ namespace pnapi
    *
    * For input places complementary places are introduced.
    */
-  void PetriNet::normalize()
+  void PetriNet::normalize(bool makeInnerStructure)
   {
-    std::string suffix = "_normalized";
+    static int in = 1;
+    static int on = 1;
 
     set<Place *> temp;
 
     for (set<Transition *>::const_iterator t = transitions_.begin();
         t != transitions_.end(); t++)
     {
+      if ((*t)->isNormal())
+        continue;
+
       /// adjacent input places of t
       set<Place *> t_inp;
       for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
           p != (*t)->getPreset().end(); p++)
-        if ((*p)->getType() == Node::INPUT)
+        if ((*p)->getType() == Node::INPUT && !(*t)->isNormal())
           t_inp.insert(static_cast<Place *>(*p));
 
       for (set<Place *>::const_iterator ip = t_inp.begin();
           ip != t_inp.end(); ip++)
       {
-        /// new input place
-        Place &ninp = createPlace("i_"+(*ip)->getName()+suffix, Node::INPUT);
+        char c = (in++ % 10) + 48;
+        string nname = (**ip).getName();
+        nname.push_back(c);
         /// new internal place
-        Place &nint = createPlace((*ip)->getName()+suffix);
+        Place &nint = createPlace(nname+"_normalized");
         /// complementary place
-        Place &ncomp = createPlace("comp_"+(*ip)->getName());
+        Place &ncomp = createPlace("comp_"+nname+"_normalized");
+        ncomp.mark(1);
         /// new transition
-        Transition &ntrans = createTransition("t_"+(*ip)->getName());
+        Transition &ntrans = createTransition("!"+nname);
         /// creating arcs
-        createArc(ninp, ntrans);
+        createArc(**ip, ntrans);
         createArc(ntrans, nint);
+        createArc(nint, **t);
         createArc(ncomp, ntrans);
         createArc(*(*t), ncomp);
 
-        temp.insert(*ip);
+        deleteArc(*findArc(**ip, **t));
       }
 
       /// adjacent output places of t
       set<Place *> t_out;
       for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
           p != (*t)->getPostset().begin(); p++)
-        if ((*p)->getType() == Node::OUTPUT)
+        if ((*p)->getType() == Node::OUTPUT && !(*t)->isNormal())
           t_out.insert(static_cast<Place *>(*p));
 
       for (set<Place *>::const_iterator op = t_out.begin();
@@ -779,25 +786,26 @@ namespace pnapi
         if ((*t)->isNormal())
           break;
 
-        /// new output place
-        Place &nout = createPlace("i_"+(*op)->getName()+suffix, Node::OUTPUT);
+        char c = (on++ % 10) + 48;
+        string nname = (**op).getName();
+        nname.push_back(c);
         /// new internal place
-        Place &nint = createPlace((*op)->getName()+suffix);
+        Place &nint = createPlace(nname+"_normalized");
         /// new transition
-        Transition &ntrans = createTransition("t_"+(*op)->getName());
+        Transition &ntrans = createTransition("?"+nname);
         /// creating arcs
         createArc(*(*t), nint);
         createArc(nint, ntrans);
-        createArc(ntrans, nout);
+        createArc(ntrans, **op);
 
-        temp.insert(*op);
+        deleteArc(*findArc(**t, **op));
       }
     }
 
-    // remove the old interface places
-    for (set<Place *>::iterator place = temp.begin(); place != temp.end();
-        place++)
-      deletePlace(**place);
+    if (makeInnerStructure)
+      for (set<Place *>::const_iterator p = interfacePlaces_.begin();
+          p != interfacePlaces_.end(); p++)
+        deletePlace(**p);
   }
 
 

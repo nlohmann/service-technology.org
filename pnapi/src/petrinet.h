@@ -203,7 +203,7 @@ namespace pnapi
 		 const std::string & = "net2");
 
     /// normalizes the Petri net
-    void normalize();
+    void normalize(bool = false);
 
     /// applies structral reduction rules
     unsigned int reduce(unsigned int reduction_level = LEVEL_5);
@@ -213,7 +213,7 @@ namespace pnapi
       NONE = 0,
       UNUSED_STATUS_PLACES = 1 << 0,
       SUSPICIOUS_TRANSITIONS = 1 << 1,
-      DEAD_NODES = 1 << 2, 
+      DEAD_NODES = 1 << 2,
       INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES = 1 << 3,
       STARKE_RULE_3_PLACES = 1 << 4,
       STARKE_RULE_3_TRANSITIONS = 1 << 5,
@@ -231,14 +231,14 @@ namespace pnapi
       SELF_LOOP_TRANSITIONS = 1 << 17,
       EQUAL_PLACES = 1 << 18,
       KEEP_NORMAL = 1 << 19,
-      LEVEL_1 = DEAD_NODES, 
+      LEVEL_1 = DEAD_NODES,
       LEVEL_2 = (LEVEL_1 | UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS),
       LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
       LEVEL_4 = (LEVEL_3 | SERIES_PLACES | SERIES_TRANSITIONS),
-      LEVEL_5 = (LEVEL_4 | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS | 
+      LEVEL_5 = (LEVEL_4 | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
                   INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
       LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
-      SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS | 
+      SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
                           DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
       SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
                     SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
@@ -247,7 +247,7 @@ namespace pnapi
                     STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
                     STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9)
     };
-    
+
     /// produces a second constraint oWFN
     void produce(const PetriNet &);
 

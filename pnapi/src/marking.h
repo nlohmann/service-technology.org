@@ -24,13 +24,13 @@ namespace pnapi
   class Marking
   {
   public:
-    Marking(PetriNet &n, bool internalsOnly = false, bool = false);
+    Marking();
+    Marking(PetriNet &n, bool = false);
     Marking(const Marking &m);
     virtual ~Marking() {}
 
     const std::map<const Place *, unsigned int> & getMap() const;
     PetriNet & getPetriNet() const;
-    bool internalsOnly() const;
 
     std::map<const Place *, unsigned int>::const_iterator begin() const;
     std::map<const Place *, unsigned int>::const_iterator end() const;
@@ -47,7 +47,6 @@ namespace pnapi
   private:
     std::map<const Place *, unsigned int> m_;
     PetriNet &net_;
-    bool internalsOnly_;
   };
 
 }

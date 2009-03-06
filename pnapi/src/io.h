@@ -31,6 +31,9 @@ namespace pnapi
   // forward declaration
   class PetriNet;
   class Condition;
+  class Automaton;
+  class ServiceAutomaton;
+
 
 
   /*!
@@ -68,7 +71,7 @@ namespace pnapi
 
       /// error message
       const std::string message;
-      
+
       /// last read token
       const std::string token;
 
@@ -80,7 +83,7 @@ namespace pnapi
 
 
       /// constructor
-      InputError(Type, const std::string &, int, const std::string &, 
+      InputError(Type, const std::string &, int, const std::string &,
 		 const std::string &);
 
     };
@@ -110,6 +113,11 @@ namespace pnapi
     std::ostream & operator<<(std::ostream &, const util::Manipulator<
 			      std::pair<MetaInformation, std::string> > &);
 
+    /// %Automaton output
+    std::ostream & operator<<(std::ostream &, const Automaton &);
+    /// %ServiceAutomaton output
+    std::ostream & operator<<(std::ostream &, const ServiceAutomaton &);
+
     //@}
 
 
@@ -132,8 +140,11 @@ namespace pnapi
     /// GraphViz DOT output format
     std::ostream & dot(std::ostream &);
 
+    /// Service Automaton (SA) file format
+    std::ostream & sa(std::ostream &);
+
     /// meta information manipulator
-    util::Manipulator<std::pair<MetaInformation, std::string> > 
+    util::Manipulator<std::pair<MetaInformation, std::string> >
     meta(MetaInformation, const std::string &);
 
     //@}
@@ -166,6 +177,8 @@ namespace pnapi
     class FormulaTrue;
     class FormulaFalse;
   }
+  class State;
+  template <class T> class Edge;
 
   namespace io
   {
@@ -175,19 +188,19 @@ namespace pnapi
      */
     namespace util
     {
-    
+
       /*** ENUM CONSTANTS ***/
 
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX, ONWD };
-      
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA };
+
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
 
       /// delimiter type
       struct Delim { std::string delim; };
 
-      
+
       /*** TEMPLATE CLASSES ***/
 
       template <typename T> class Manipulator
@@ -217,7 +230,7 @@ namespace pnapi
       typedef StreamMetaData<Mode> ModeData;
       typedef StreamMetaData<Delim> DelimData;
       typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
-      typedef Manipulator<std::pair<MetaInformation, std::string> > 
+      typedef Manipulator<std::pair<MetaInformation, std::string> >
               MetaManipulator;
 
 
@@ -228,11 +241,11 @@ namespace pnapi
       bool compareContainerElements(const Place *, const Place *);
       bool compareContainerElements(Transition *, Transition *);
       bool compareContainerElements(Arc *, Arc *);
-      bool compareContainerElements(const formula::Formula *, 
+      bool compareContainerElements(const formula::Formula *,
 				    const formula::Formula *);
 
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
-      std::multimap<unsigned int, Place *> 
+      std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);
 
       void outputGroupPrefix(std::ostream &, const std::string &);
@@ -253,15 +266,28 @@ namespace pnapi
       std::ostream & operator<<(std::ostream &, const formula::FormulaTrue &);
       std::ostream & operator<<(std::ostream &, const formula::FormulaFalse &);
       std::ostream & operator<<(std::ostream &, const formula::FormulaEqual &);
-      std::ostream & operator<<(std::ostream &, 
+      std::ostream & operator<<(std::ostream &,
 				const formula::FormulaNotEqual &);
       std::ostream & operator<<(std::ostream &,
 				const formula::FormulaGreater &);
-      std::ostream & operator<<(std::ostream &, 
+      std::ostream & operator<<(std::ostream &,
 				const formula::FormulaGreaterEqual &);
       std::ostream & operator<<(std::ostream &, const formula::FormulaLess &);
-      std::ostream & operator<<(std::ostream &, 
+      std::ostream & operator<<(std::ostream &,
 				const formula::FormulaLessEqual &);
+
+      /*** INTERNALS OF AUTOMATA ***/
+
+      std::ostream & operator<<(std::ostream &, const State &);
+
+      template <class T>
+      std::ostream & operator<<(std::ostream &os, const Edge<T> &e)
+      {
+        os << e.getSource() << " -> " << e.getDestination() << " : ";
+        os << e.getLabel();
+
+        return os;
+      }
 
 
       /*** TEMPLATE IMPLEMENTATION ***/
@@ -280,9 +306,9 @@ namespace pnapi
 	return os << *t;
       }
 
-      
+
       template <typename T>
-      std::ostream & outputContainerElement(std::ostream & os, 
+      std::ostream & outputContainerElement(std::ostream & os,
 				     const std::pair<T, std::set<Place *> > & p)
       {
 	outputGroupPrefix(os, p.first);
@@ -295,7 +321,7 @@ namespace pnapi
       {
 	std::string delim = DelimData::data(os).delim;
 	if (v.empty()) return os;
-	for (typename std::vector<T>::const_iterator it = v.begin(); 
+	for (typename std::vector<T>::const_iterator it = v.begin();
 	     it != --v.end(); ++it)
 	  outputContainerElement(os, *it) << delim;
 	return outputContainerElement(os, *--v.end());
@@ -317,16 +343,16 @@ namespace pnapi
       }
 
 
-      template <typename T> std::ostream & 
-      operator<<(std::ostream & os, 
+      template <typename T> std::ostream &
+      operator<<(std::ostream & os,
 		 const std::multimap<T, Place *> & places)
       {
 	std::vector<std::pair<T, std::set<Place *> > > metaVector;
-	for (typename std::multimap<T, Place *>::const_iterator it = 
-	       places.begin(); 
+	for (typename std::multimap<T, Place *>::const_iterator it =
+	       places.begin();
 	     it != places.end(); it = places.upper_bound(it->first))
 	  {
-	    std::set<Place *> subset; 
+	    std::set<Place *> subset;
 	    for (typename std::multimap<T, Place *>::const_iterator subit = it;
 		 subit != places.upper_bound(it->first); ++subit)
 	      subset.insert(subit->second);
@@ -342,7 +368,7 @@ namespace pnapi
       {
       }
 
-      
+
       template <typename T>
       T & StreamMetaData<T>::data(std::ios_base & ios)
       {
@@ -359,11 +385,11 @@ namespace pnapi
       }
 
       template <typename T>
-      void StreamMetaData<T>::ioscb(std::ios_base::event event, 
+      void StreamMetaData<T>::ioscb(std::ios_base::event event,
 				    std::ios_base & ios, int i)
       {
 	T * & p = (T * &) ios.pword(index);
-	if (i == index && 
+	if (i == index &&
 	    event == std::ios_base::erase_event &&
 	    p != NULL)
 	  {

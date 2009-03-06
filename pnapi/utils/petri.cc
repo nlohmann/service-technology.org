@@ -201,8 +201,8 @@ int main(int argc, char** argv) {
 
                     // create automaton output
                     case (output_arg_sa): {
-                        ServiceAutomaton sa(nets[i]);
-                        outfile << sa;
+                        ServiceAutomaton sauto(nets[i]);
+                        outfile << io::sa << sauto;
                         break;
                     }
 

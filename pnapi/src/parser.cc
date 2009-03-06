@@ -32,14 +32,14 @@ namespace pnapi
   {
 
     std::istream * stream;
-    
+
     char * token;
-    
+
     int line;
 
     void error(const string & msg)
     {
-      throw io::InputError(io::InputError::SYNTAX_ERROR, 
+      throw io::InputError(io::InputError::SYNTAX_ERROR,
 		       io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
 			   parser::line, parser::token, msg);
     }
@@ -188,14 +188,14 @@ namespace pnapi
 	  case CAPACITY: capacity_  = node.number;     break;
 	  case PORT:     port_      = node.identifier; break;
 
-	  case PLACE: 
+	  case PLACE:
 	    node.check(places_.find(node.identifier) == places_.end(),
 		       node.identifier, "node name already used");
-	    places_[node.identifier].type = placeType_;     
-	    places_[node.identifier].capacity = capacity_;     
+	    places_[node.identifier].type = placeType_;
+	    places_[node.identifier].capacity = capacity_;
 	    if (!port_.empty())
 	      {
-		node.check(placeType_ != Place::INTERNAL, 
+		node.check(placeType_ != Place::INTERNAL,
 			   node.identifier, "interface place expected");
 		node.check(places_[node.identifier].port.empty(),
 			   node.identifier, "place already assigned to port '" +
@@ -205,11 +205,11 @@ namespace pnapi
 	    break;
 	  case PORT_PLACE:
 	    {
-	      map<string, PlaceAttributes>::iterator p = 
+	      map<string, PlaceAttributes>::iterator p =
 		places_.find(node.identifier);
 	      node.check(p != places_.end(),
 			 node.identifier, "unknown place");
-	      node.check(p->second.type != Place::INTERNAL, 
+	      node.check(p->second.type != Place::INTERNAL,
 			 node.identifier, "interface place expected");
 	      node.check(p->second.port.empty(),
 			 node.identifier, "place already assigned to port '" +
@@ -218,14 +218,14 @@ namespace pnapi
 	      break;
 	    }
 
-	  case INITIALMARKING: 
-	    isInitial_ = true;  
+	  case INITIALMARKING:
+	    isInitial_ = true;
 	    break;
-	  case FINALMARKING:   
-	    isInitial_ = false; 
-	    finalMarking_ = Marking(net_, false, true);
+	  case FINALMARKING:
+	    isInitial_ = false;
+	    finalMarking_ = Marking(net_, true);
 	    break;
-	  case MARK:  
+	  case MARK:
 	    node.check(places_.find(node.identifier) != places_.end(),
 		       node.identifier, "unknown place");
 	    if (isInitial_)
@@ -237,12 +237,12 @@ namespace pnapi
 	  case PRESET:  isPreset_ = true;  break;
 	  case POSTSET: isPreset_ = false; break;
 
-	  case ARC: 
+	  case ARC:
 	    if (isPreset_)
 	      {
 		node.check(preset_.find(node.identifier) == preset_.end(),
 			   node.identifier, "place already used in preset");
-		preset_[node.identifier] = node.number; 
+		preset_[node.identifier] = node.number;
 	      }
 	    else
 	      {
@@ -252,11 +252,11 @@ namespace pnapi
 	      }
 	    break;
 
-	  case FORMULA_TRUE:  
-	    formulas_.push(WildcardFormula(new FormulaTrue, NULL));  
+	  case FORMULA_TRUE:
+	    formulas_.push(WildcardFormula(new FormulaTrue, NULL));
 	    break;
-	  case FORMULA_FALSE: 
-	    formulas_.push(WildcardFormula(new FormulaFalse, NULL)); 
+	  case FORMULA_FALSE:
+	    formulas_.push(WildcardFormula(new FormulaFalse, NULL));
 	    break;
 
 	  case FORMULA_EQ:
@@ -355,7 +355,7 @@ namespace pnapi
 	      Formula * f;
 	      if (node.type == FORMULA_AND)
 		{
-		  node.check(op1.second == NULL, "", 
+		  node.check(op1.second == NULL, "",
 			     "wildcard must be last AND operand");
 		  f = new Conjunction(*op1.first, *op2.first);
 		  formulas_.push(WildcardFormula(f, op2.second));
@@ -383,7 +383,7 @@ namespace pnapi
 	    // fallthrough intended
 	    {
 	      assert(formulas_.size() > 0);
-	      node.check(formulas_.top().second == NULL, "", 
+	      node.check(formulas_.top().second == NULL, "",
 			 "wildcard must be last AND operand");
 	      Formula * f = new Conjunction(*formulas_.top().first);
 	      delete formulas_.top().first; formulas_.pop();
@@ -561,7 +561,7 @@ namespace pnapi
 
       Node * node;
 
-      
+
       Parser::Parser() :
 	parser::Parser<Node>(node, onwd::parse)
       {
@@ -655,7 +655,7 @@ namespace pnapi
 	delete node;
       }
 
-      
+
       /* visiting nodes */
 
       void Visitor::beforeChildren(const Node & node)
@@ -666,7 +666,7 @@ namespace pnapi
 	    {
 	      PetriNet net;
 	      ifstream file(node.string2.c_str());
-	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2) 
+	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2)
 		   >> net;
 	      for (int i = 0; i < node.number; i++)
 		instances_[node.string1].push_back(net);
@@ -676,7 +676,7 @@ namespace pnapi
 	  case PLACE:
 	    {
 	      vector<Place *> places;
-	      for (vector<PetriNet>::iterator it = 
+	      for (vector<PetriNet>::iterator it =
 		     instances_[node.string1].begin();
 		   it != instances_[node.string1].end(); ++it)
 		{
@@ -701,9 +701,9 @@ namespace pnapi
 	    {
 	      vector<Place *> p1s = places_.front(); places_.pop_front();
 	      vector<Place *> p2s = places_.front(); places_.pop_front();
-	      for (vector<Place *>::iterator p1i = p1s.begin(); 
+	      for (vector<Place *>::iterator p1i = p1s.begin();
 		   p1i != p1s.end(); ++p1i)
-		for (vector<Place *>::iterator p2i = p2s.begin(); 
+		for (vector<Place *>::iterator p2i = p2s.begin();
 		     p2i != p2s.end(); ++p2i)
 		  {
 		    Place & p1 = **p1i;
@@ -741,8 +741,8 @@ namespace pnapi
       }
 
       map<string, vector<PetriNet> > & Visitor::instances()
-      { 
-	return instances_; 
+      {
+	return instances_;
       }
 
       const map<Place *, LinkNode *> & Visitor::wiring()

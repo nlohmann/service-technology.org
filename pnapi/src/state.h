@@ -19,51 +19,17 @@ namespace pnapi
   class Edge
   {
   public:
-    /*!
-     * \brief
-     */
-    Edge(T &source, T &destination, const string label) :
-      source_(source), destination_(destination), label_(label)
-    {
-      source_.getPostset().insert(&destination_);
-      destination_.getPreset().insert(&source_);
-    }
+    /// standard constructor
+    Edge(T &source, T &destination, string label);
+    /// standard destructor
+    virtual ~Edge() {}
 
-
-    /*!
-     * \brief
-     */
-    virtual ~Edge()
-    {
-    }
-
-
-    /*!
-     * \brief
-     */
-    string getLabel() const
-    {
-      return label_;
-    }
-
-
-    /*!
-     * \brief
-     */
-    T & getSource() const
-    {
-      return source_;
-    }
-
-
-    /*!
-     * \brief
-     */
-    T & getDestination() const
-    {
-      return destination_;
-    }
-
+    /// returns the label
+    string getLabel() const;
+    /// returns the source node (state)
+    T & getSource() const;
+    /// returns the destination node (state)
+    T & getDestination() const;
 
   private:
     string label_;
@@ -142,6 +108,50 @@ namespace pnapi
     /// some type of formula
 
   };
+
+
+  /*** Edge<T> implementation ***/
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  Edge<T>::Edge(T &source, T &destination, const string label) :
+    source_(source), destination_(destination), label_(label)
+  {
+    source_.getPostset().insert(&destination_);
+    destination_.getPreset().insert(&source_);
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  string Edge<T>::getLabel() const
+  {
+    return label_;
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  T & Edge<T>::getSource() const
+  {
+    return source_;
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  T & Edge<T>::getDestination() const
+  {
+    return destination_;
+  }
 
 
 }

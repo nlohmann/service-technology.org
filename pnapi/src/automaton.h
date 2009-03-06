@@ -5,32 +5,31 @@
 
 #include <iostream>
 #include <cassert>
+#include <deque>
 #include <list>
 #include <set>
 #include <vector>
+#include <ostream>
 
-#include "marking.h"
-#include "petrinet.h"
 #include "state.h"
+#include "petrinet.h"
+
+using std::deque;
+using std::ostream;
+using std::vector;
 
 namespace pnapi
 {
 
 
-  /// output format
-  enum Format { SA, STG };
-
-
   // forward declarations
-  class State;
-  class Place;
-  class Transition;
+  class PetriNet;
   class Marking;
   template <class T> class AbstractAutomaton;
+  class Automaton;
+  class ServiceAutomaton;
 
 
-  /// Real automata - anything is possible but creating one from a net
-  typedef AbstractAutomaton<State> Automaton;
   /// Operating Guidelines
   typedef AbstractAutomaton<StateOG> OG;
 
@@ -49,28 +48,24 @@ namespace pnapi
 
     /// creating a state
     void createState(const string name = "");
+    /// finding a state
+    const T & findState(const string name) const;
     /// creating an edge
     void createEdge(T &source, T &destination, const string label);
 
-    /// friend operation <<
-    template <class R> friend std::ostream &
-    operator <<(std::ostream &os, const AbstractAutomaton<R> &sa);
 
-    /// setting the format of the automaton output
-    void setFormat(Format f);
+    /// Service automata output format (ig like) -- absolutely experimental!!
+    void output_sa(std::ostream &os) const;
 
   protected:
-    set<T *> states_;
-    set<Edge<T> *> edges_;
+    vector<T *> states_;
+    vector<Edge<T> *> edges_;
 
     /// described PetriNet
-    PetriNet &net_;
-
-    /// temporary output flag
-    Format f_;
+    PetriNet net_;
 
     /// Service automata output format (ig like)
-    void output_sa(std::ostream &os) const;
+    //void output_sa(std::ostream &os) const;
     /// stg output format
     void output_stg(std::ostream &os) const;
 
@@ -78,27 +73,12 @@ namespace pnapi
   };
 
 
-  /// operator << for abstract automata
-  template <typename T>
-  std::ostream & operator <<(std::ostream &os, const AbstractAutomaton<T> &sa)
-  {
-    switch (sa.f_)
-    {
-    case SA:    sa.output_sa(os); break;
-    case STG:   sa.output_stg(os); break;
-    default:    assert(false); break;
-    }
-
-    return os;
-  }
-
-
   /*!
    * \brief   standard constructor
    */
   template <class T>
   AbstractAutomaton<T>::AbstractAutomaton() :
-    net_(*new pnapi::PetriNet())
+    net_(*new PetriNet())
   {
   }
 
@@ -128,7 +108,19 @@ namespace pnapi
   template <class T>
   void AbstractAutomaton<T>::createState(const string name)
   {
-    states_.insert(new State(name));
+    states_.push_back(new State(name));
+  }
+
+
+  /*!
+   * \brief
+   */
+  template <class T>
+  const T & AbstractAutomaton<T>::findState(const string name) const
+  {
+    for (unsigned int i = 0; i < states_.size(); i++)
+      if (states_[i]->getName() == name)
+        return *states_[i];
   }
 
 
@@ -138,73 +130,57 @@ namespace pnapi
   template <class T>
   void AbstractAutomaton<T>::createEdge(T &source, T &destination, const string label)
   {
-    std::cout << "DEBUG: Created edge from " << source.getName();
-    std::cout << " to " << destination.getName() << "\n";
-    edges_.insert(new Edge<T>(source, destination, label));
+    edges_.push_back(new Edge<T>(source, destination, label));
   }
 
 
   /*!
    * \brief
-   */
-  template <class T>
-  void AbstractAutomaton<T>::setFormat(Format f)
-  {
-    f_ = f;
-  }
-
-
-  /*!
-   * \brief
-   *
-   * \bug     Too many output on interface.
    */
   template <class T>
   void AbstractAutomaton<T>::output_sa(std::ostream &os) const
   {
+    deque<string> interface;
+    for (int i = 0; i < edges_.size(); i++)
+    {
+      std::cout << edges_[i]->getLabel() << "\n";
+      if (edges_[i]->getLabel().c_str()[0] == '!')
+      {
+        interface.push_front(edges_[i]->getLabel());
+        std::cout << i << "!\n";
+      }
+      else if (edges_[i]->getLabel().c_str()[0] == '?')
+      {
+        std::cout << i << "?\n";
+        interface.push_back(edges_[i]->getLabel());
+      }
+    }
+
     os << "INTERFACE\n";
     os << "  " << "INPUT ";
-/*    bool begin = true;
-    for (set<Edge<T> *>::const_iterator e = edges_.begin();
-        e != edges_.end(); e++)
+    if (!interface.empty() && interface[0].c_str()[0] == '!')
     {
-      if (begin)
+      os << interface[0];
+      interface.pop_front();
+      while (interface[0].c_str()[0] == '!')
       {
-        string currLabel = (*e)->getLabel();
-        if (currLabel.c_str()[0] != '!')
-          continue;
-        os << currLabel.substr(1, currLabel.length());
-        begin = false;
-        continue;
+        os << ", " << interface[0];
+        interface.pop_front();
       }
-
-      string currLabel = (*e)->getLabel();
-      if (currLabel.c_str()[0] != '!')
-        continue;
-      os << ", " << currLabel.substr(1, currLabel.length());
-    }*/
+    }
     os << ";\n";
 
     os << "  " << "OUTPUT ";
-/*      begin = true;
-    for (set<Edge<T> *>::const_iterator e = edges_.begin();
-        e != edges_.end(); e++)
+    if (!interface.empty())
     {
-      if (begin)
+      os << interface[0];
+      interface.pop_front();
+      while (!interface.empty())
       {
-        string currLabel = (*e)->getLabel();
-        if (currLabel.c_str()[0] != '?')
-          continue;
-        os << currLabel.substr(1, currLabel.length());
-        begin = false;
-        continue;
+        os << ", " << interface[0];
+        interface.pop_front();
       }
-
-      string currLabel = (*e)->getLabel();
-      if (currLabel.c_str()[0] != '?')
-        continue;
-      os << ", " << currLabel.substr(1, currLabel.length());
-    }*/
+    }
     os << ";\n\n";
 
     os << "NODES\n";
@@ -212,17 +188,8 @@ namespace pnapi
     os << ";\n\n";
 
     os << "INITIALNODE\n";
-/*      T *stat = NULL;
-    for (set<T *>::const_iterator s = states_.begin(); s != states_.end();
-        s++)
-    {
-      if ((*s)->getPreset().empty())
-      {
-        stat = *s;
-        break;
-      }
-    }
-    os << "  " << stat->getName() << ";\n\n";*/
+
+    os << ";\n\n";
 
     os << "FINALNODES\n";
 
@@ -244,9 +211,20 @@ namespace pnapi
   }
 
 
+  /// Automaton class which can read .sa files
+  class Automaton : public AbstractAutomaton<State>
+  {
+    friend ostream & operator<<(ostream &, const Automaton &);
+  public:
+    Automaton();
+    virtual ~Automaton() {}
+  };
+
+
   /// Service Automaton
   class ServiceAutomaton : public AbstractAutomaton<StateB>
   {
+    //friend ostream & operator<<(ostream &, const ServiceAutomaton &);
   public:
     /// constructor with Petri net - initial marking taken from place marks
     ServiceAutomaton(PetriNet &n);
@@ -260,6 +238,8 @@ namespace pnapi
     std::vector<std::set<StateB *> > hashTable_;
 
     Marking initialmarking_;
+
+    std::map<Transition *, string> edgeLabels_;
 
     /// adds a StateB to the automaton
     void addState(StateB &s);

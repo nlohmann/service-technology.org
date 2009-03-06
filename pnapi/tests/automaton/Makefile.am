@@ -1,3 +1,5 @@
+#SUBDIRS = . #input
+
 TESTS = test_construction 
 
 check_PROGRAMS = test_construction 

@@ -20,6 +20,22 @@
             id="hub.top.editor.lola.text.modeleditor"
             name="LoLA PT-Net Model Editor">
       </editor>
+      <editor
+            class="hub.top.editor.lola.text.TextEditorTPN"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="tpn"
+            icon="icons/document.l.text.16.png"
+            id="hub.top.editor.tpn.text.texteditor"
+            name="TPN PT-Net Text Editor">
+      </editor>
+      <editor
+            class="hub.top.editor.lola.text.ModelEditorTPN"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="ptnetlola"
+            icon="icons/document.l.16.png"
+            id="hub.top.editor.tpn.text.modeleditor"
+            name="TPN PT-Net Model Editor">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.editors">

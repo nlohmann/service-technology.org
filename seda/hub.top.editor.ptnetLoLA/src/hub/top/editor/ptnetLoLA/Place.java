@@ -37,7 +37,7 @@ public interface Place extends Node {
 	 * @return the value of the '<em>Token</em>' attribute.
 	 * @see #setToken(int)
 	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getPlace_Token()
-	 * @model default="0" required="true" transient="true" volatile="true" derived="true"
+	 * @model default="0" required="true"
 	 * @generated
 	 */
 	int getToken();

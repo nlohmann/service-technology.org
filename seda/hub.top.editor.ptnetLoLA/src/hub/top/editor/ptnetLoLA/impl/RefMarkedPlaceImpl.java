@@ -81,11 +81,18 @@ public class RefMarkedPlaceImpl extends PlaceReferenceImpl implements RefMarkedP
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public void setToken(int newToken) {
 		int oldToken = token;
 		token = newToken;
+		
+		// update token value of the referenced place as the value is stored
+		// there permanently as well, the call will do nothing if the value
+		// of the actual place's token value is already equal to newToken
+		if (this.getPlace() != null)
+			this.getPlace().setToken(newToken);
+		
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.REF_MARKED_PLACE__TOKEN, oldToken, token));
 	}

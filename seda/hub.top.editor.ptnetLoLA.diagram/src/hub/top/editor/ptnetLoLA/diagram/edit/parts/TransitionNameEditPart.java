@@ -574,10 +574,13 @@ public class TransitionNameEditPart extends LabelEditPart implements
 	}
 
 	/**
-	 * @generated
+	 * @generated not
+	 * @author Dirk Fahland
 	 */
 	protected IFigure createFigurePrim() {
-		return new WrappingLabel();
+		WrappingLabel l = new WrappingLabel();
+		l.setTextWrap(true);
+		return l;
 	}
 
 }

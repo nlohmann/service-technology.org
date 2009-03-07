@@ -73,6 +73,16 @@ public class PlaceImpl extends NodeImpl implements Place {
 	protected static final int TOKEN_EDEFAULT = 0;
 
 	/**
+	 * The cached value of the '{@link #getToken() <em>Token</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getToken()
+	 * @generated
+	 * @ordered
+	 */
+	protected int token = TOKEN_EDEFAULT;
+
+	/**
 	 * The default value of the '{@link #getFinalMarking() <em>Final Marking</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -107,12 +117,26 @@ public class PlaceImpl extends NodeImpl implements Place {
 	 * @generated NOT
 	 */
 	public int getToken() {
+
 		PtNet net = (PtNet)eContainer;
-		for (RefMarkedPlace p : net.getInitialMarking().getPlaces()) {
-			if (p.getPlace() == this)
-				return p.getToken();
+		if (this.token == TOKEN_EDEFAULT
+			&& net != null
+			&& net.getInitialMarking() != null
+			&& net.getInitialMarking().getPlaces() != null)
+		{
+			// for backwards compatibility: if the default value is stored,
+			// check if the initialMarking has a corresponding place reference
+			for (RefMarkedPlace p : net.getInitialMarking().getPlaces()) {
+				if (p.getPlace() == this) {
+					// found, copy value
+					this.token = p.getToken();
+					// return p.getToken();
+				}
+			}
+			//return 0;
 		}
-		return 0;
+		
+		return this.token;
 	}
 
 	/**
@@ -123,7 +147,33 @@ public class PlaceImpl extends NodeImpl implements Place {
 	public void setToken(int newToken) {
 		int oldToken = getToken();
 		
+		// no change, return to avoid infinite updates in interplay with
+		// {@link RefMarkedPlace#setToken()}
+		if (newToken == this.token)	
+			return;
+		
+		this.token = newToken;	// write the new value locally
+		boolean doNotify = updateNetInitialMarking(newToken);
+
+		if (doNotify && eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.PLACE__TOKEN, oldToken, newToken));
+	}
+
+	/**
+	 * Update token values in the {@link PtNet#getInitialMarking()} of the net
+	 * of this place.
+	 * 
+	 * @param newToken
+	 * @return true iff notification about value updates are required
+	 * @generated not
+	 */
+	private boolean updateNetInitialMarking(int newToken) {
+		
+		// retrieve place reference from the net's initial marking (if it exists)
 		PtNet net = (PtNet)eContainer;
+		if (net == null)	// in case there is no containing net yet,
+			return true;	// do not update the value, but notify
+		
 		RefMarkedPlace pMarked = null;
 		for (RefMarkedPlace p : net.getInitialMarking().getPlaces()) {
 			if (p.getPlace() == this) {
@@ -132,8 +182,10 @@ public class PlaceImpl extends NodeImpl implements Place {
 			}
 		}
 
+		// update the value of the reference
 		boolean doNotify = true;
 		if (newToken == 0) {
+			// remove the reference if setting the value to 0
 			if (pMarked != null) {
 				pMarked.setToken(0);
 				pMarked.setPlace(null);
@@ -143,6 +195,7 @@ public class PlaceImpl extends NodeImpl implements Place {
 				doNotify = false;
 			}
 		} else if (newToken > 0) {
+			// set the value or create a new reference if the value is > 0
 			if (pMarked != null) {
 				pMarked.setToken(newToken);
 			} else {
@@ -151,11 +204,9 @@ public class PlaceImpl extends NodeImpl implements Place {
 				p.setToken(newToken);
 				net.getInitialMarking().getPlaces().add(p);
 			}
-		} 
-
-		if (doNotify && eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.PLACE__TOKEN, oldToken, newToken));
-
+		}
+		
+		return doNotify;
 	}
 
 	/**
@@ -276,11 +327,27 @@ public class PlaceImpl extends NodeImpl implements Place {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case PtnetLoLAPackage.PLACE__TOKEN:
-				return getToken() != TOKEN_EDEFAULT;
+				return token != TOKEN_EDEFAULT;
 			case PtnetLoLAPackage.PLACE__FINAL_MARKING:
 				return getFinalMarking() != FINAL_MARKING_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (token: ");
+		result.append(token);
+		result.append(')');
+		return result.toString();
 	}
 
 } //PlaceImpl

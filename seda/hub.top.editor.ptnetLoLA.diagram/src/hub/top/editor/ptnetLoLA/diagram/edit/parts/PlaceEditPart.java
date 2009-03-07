@@ -66,6 +66,7 @@ import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
+import org.eclipse.gmf.runtime.gef.ui.internal.figures.CircleFigure;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -222,8 +223,10 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected NodeFigure createNodePlate() {
-		DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(getMapMode()
-				.DPtoLP(25), getMapMode().DPtoLP(25));
+		DefaultSizeNodeFigure result = /*new DefaultSizeNodeFigure(getMapMode()
+				.DPtoLP(25), getMapMode().DPtoLP(25));*/
+		new CircleFigure(getMapMode().DPtoLP(25), getMapMode().DPtoLP(25));
+
 		return result;
 	}
 

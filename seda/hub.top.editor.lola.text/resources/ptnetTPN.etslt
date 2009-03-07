@@ -1,0 +1,56 @@
+/*****************************************************************************\
+ * ServiceTechnolog.org - PetriNet Editor
+ * Copyright (c) 2008 Dirk Fahland.
+ * All rights reserved.
+\*****************************************************************************/
+
+syntax(PtNet) "resources/ptnetLoLA.ecore" {
+    PtNet:element(PtNet) ->
+       	Places
+       	TransitionList;
+    
+    Places -> (PlaceList)? ws(statement) ws(statement);
+       
+    PlaceList [0] -> ws(indent) Place:composite(places) ";";
+    PlaceList [1] -> ws(indent) Place:composite(places) ";" ws(statement) PlaceList;
+    
+    Place:element(Place) -> "place" PlaceName:composite(name) ws(space) (InitialMarking)?;
+    PlaceName -> STRINGDEF;
+    
+    InitialMarking -> "init" ws(space) INTEGER:composite(token);
+           
+           
+    TransitionList -> (Transition:composite(transitions)  { addArcsToNet($0); }  )*;
+    Transition:element(Transition) ->
+       "trans" ws(space) TransitionName:composite(name) ("~"TransitionName:composite(name) )? ws(statement)
+       ws(blockstart) ws(indent)
+           "in"
+           ws(blockstart)
+             ws(indent) (ArcToTransitionList)? ws(empty)
+           ws(blockend) ws(statement)
+           "out"
+           ws(blockstart)
+             ws(indent) (ArcToPlaceList)? ws(empty) 
+           ws(blockend) ws(statement)
+           ";"
+       ws(blockend) ws(statement);
+
+    ArcToTransitionList [0] -> ArcToTransition:composite(incoming)  ;
+    ArcToTransitionList [1] -> ArcToTransition:composite(incoming) ws(space) ArcToTransitionList ;
+    
+    ArcToTransition:element(ArcToTransition) ->
+       PlaceRef:reference(source);
+       
+    ArcToPlaceList [0] -> ArcToPlace:composite(outgoing) ;
+    ArcToPlaceList [1] -> ArcToPlace:composite(outgoing) ws(space) ArcToPlaceList ;
+    
+    ArcToPlace:element(ArcToPlace) ->
+       PlaceRef:reference(target);
+
+    PlaceRef:elementRef(Place) -> PlaceName:composite(name) ;
+    
+    TransitionName -> STRINGDEF;
+    
+    token () {
+    }
+}

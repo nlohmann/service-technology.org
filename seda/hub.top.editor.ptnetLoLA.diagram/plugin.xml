@@ -510,12 +510,21 @@
             id="hub.top.editor.commands.convertToDiagram"
             name="Convert To Diagram">
       </command>
+      <command
+            categoryId="hub.top.editor.commands.category"
+            id="hub.top.editor.commands.anonymizeModel"
+            name="Anonymize Model">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="hub.top.editor.ui.actions.ConvertToDiagram"
             commandId="hub.top.editor.commands.convertToDiagram">
+      </handler>
+      <handler
+            class="hub.top.editor.ui.actions.AnonymizeModel"
+            commandId="hub.top.editor.commands.anonymizeModel">
       </handler>
    </extension>
    <extension
@@ -531,6 +540,10 @@
                   icon="icons/document.net.bw_2.convert.16.png"
                   id="hub.top.editor.menus.convertToDiagram"
                   mnemonic="S">
+            </command>
+            <command
+                  commandId="hub.top.editor.commands.anonymizeModel"
+                  id="hub.top.editor.menus.anonymizeModel">
             </command>
          </menu>
       </menuContribution>

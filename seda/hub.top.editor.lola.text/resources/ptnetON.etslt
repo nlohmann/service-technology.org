@@ -57,7 +57,7 @@ syntax(PtNet) "resources/ptnetLoLA.ecore" {
 /* ------------------ final marking ------------------ */
 
 	FinalMarkingChoice -> "FINALMARKING" FinalMarking:composite(finalMarking);
-	FinalMarkingChoice -> "FINALCONDITION" FinalCondition;
+	FinalMarkingChoice -> "FINALCONDITION" FinalCondition:composite(finalMarking);
        
     FinalMarking:element(Marking) ->
            ws(blockstart)
@@ -65,9 +65,28 @@ syntax(PtNet) "resources/ptnetLoLA.ecore" {
            ws(blockend) ws(statement)
            ";" ws(statement) ws(statement);
 
-    FinalCondition ->
-          /* formula */
+    FinalCondition:element(Marking) ->
+              (FormulaORList)?
            ";" ws(statement) ws(statement);
+           
+    FormulaORList [0] -> FormulaANDList;
+    FormulaORList [1] -> FormulaANDList ws(space) "OR" ws(space) FormulaORList;
+    
+    FormulaANDList [0] -> FormulaLiteral;
+    FormulaANDList [1] -> FormulaLiteral ws(space) "AND" ws(space) FormulaANDList;
+    
+    FormulaLiteral [0] -> "(" FormulaORList ")";
+    FormulaLiteral [1] -> "ALL_OTHER_PLACES_EMPTY";
+    FormulaLiteral [2] -> FormulaLiteralNumeric:composite(places);
+    
+    FormulaLiteralNumeric:element(RefMarkedPlace) -> PlaceRef:reference(place) ws(space) LiteralRelation ws(space) INTEGER:composite(token);
+    
+    LiteralRelation [0] -> ">";
+    LiteralRelation [1] -> ">=";
+    LiteralRelation [2] -> "=";
+    LiteralRelation [3] -> "<=";
+    LiteralRelation [4] -> "<";
+    LiteralRelation [5] -> "<>";
            
 /* ------------------ transitions and arcs ------------------ */
        

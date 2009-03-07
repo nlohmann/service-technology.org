@@ -5,7 +5,7 @@
     nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets" nsPrefix="ptnetLoLA">
   <eClassifiers xsi:type="ecore:EClass" name="Place" eSuperTypes="#//Node">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="token" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
-        volatile="true" transient="true" defaultValueLiteral="0" derived="true"/>
+        defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="finalMarking" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" volatile="true"
         transient="true" defaultValueLiteral="0" derived="true"/>

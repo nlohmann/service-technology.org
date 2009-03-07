@@ -1,5 +1,6 @@
 package hub.top.editor.ptnetLoLA.diagram.part;
 
+import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.ptnetLoLA.transaction.PtnetLoLAEditingDomainFactory;
 
 import org.eclipse.core.resources.IFile;
@@ -47,7 +48,7 @@ import org.eclipse.ui.part.ShowInContext;
  * @generated
  */
 public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
-		IGotoMarker {
+		IGotoMarker, hub.top.editor.eclipse.IFrameWorkEditor {
 
 	/**
 	 * @generated
@@ -270,7 +271,7 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	private ISelection getNavigatorSelection() {
 		IDiagramDocument document = getDiagramDocument();
@@ -278,6 +279,11 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 			return StructuredSelection.EMPTY;
 		}
 		Diagram diagram = document.getDiagram();
+// <Dirk.F> added check for empty eResource
+		if (diagram == null || diagram.eResource() == null)
+			return StructuredSelection.EMPTY;
+// </Dirk.F>
+		
 		IFile file = WorkspaceSynchronizer.getFile(diagram.eResource());
 		if (file != null) {
 			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem item = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem(
@@ -297,6 +303,11 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 		getDiagramGraphicalViewer().setContextMenu(provider);
 		getSite().registerContextMenu(ActionIds.DIAGRAM_EDITOR_CONTEXT_MENU,
 				provider, getDiagramGraphicalViewer());
+	}
+
+	public EditorUtil getEditorUtil() {
+		// TODO Auto-generated method stub
+		return new hub.top.editor.petrinets.diagram.eclipse.PtnetLoLADiagramEditorUtil(this);
 	}
 
 }

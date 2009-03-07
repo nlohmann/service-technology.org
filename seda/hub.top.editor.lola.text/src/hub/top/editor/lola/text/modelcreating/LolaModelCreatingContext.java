@@ -41,6 +41,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 
 import hub.sam.tef.modelcreating.ModelCreatingContext;
+import hub.sam.tef.modelcreating.ModelCreatingException;
 import hub.sam.tef.semantics.ISemanticsProvider;
 import hub.top.editor.ptnetLoLA.Node;
 import hub.top.editor.ptnetLoLA.Place;
@@ -56,7 +57,7 @@ public class LolaModelCreatingContext extends ModelCreatingContext {
 	@Override
 	public Object evaluateActionStatement(String methodName,
 			EList<Object> methodParameters) {
-		
+
 		// methods for filtering during pretty printing
 		if (methodName.startsWith("ppFilter_"))
 			return null;
@@ -87,7 +88,16 @@ public class LolaModelCreatingContext extends ModelCreatingContext {
 		else if (methodName.equals("setNodeTypeOutput")) {
 			return LolaStatementEvaluation.setNodeTypeOutput(this);
 		}
-		else
+		else try {
 			return super.evaluateActionStatement(methodName, methodParameters);
+		} catch (ModelCreatingException e) {
+			return null;
+		}
+	}
+	
+	@Override
+	public Object evaluateActionStatement(String methodName,
+			EList<Object> methodParameters, ActionStatementEvaluationTime time)  {
+		return evaluateActionStatement(methodName, methodParameters);
 	}
 }

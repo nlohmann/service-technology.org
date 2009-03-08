@@ -87,6 +87,8 @@ using std::set;
 using namespace pnapi;
 
 
+#define __REDUCE_CHECK_FINAL(x) (finalCondition().concerningPlaces().find(x) == \
+                                  finalCondition().concerningPlaces().end() )
 
 
 
@@ -97,8 +99,8 @@ using namespace pnapi;
 /*!
  * Remove status places that are not read by any transition. These places are
  * usually the result of reduction rules applied before. The places are not
- * "read" by any transition, thus can be removed if the are not covered by a
- * final marking.
+ * "read" by any transition, thus can be removed if the are not concerned by a
+ * final condition.
  *
  * \note This rule is BPEL2oWFN specific.
  *
@@ -107,7 +109,7 @@ using namespace pnapi;
  * \pre p is an internal place
  * \pre p's postset is empty
  * \pre p is not initially marked
- * \pre p is not covered by a final marking
+ * \pre p is not concerned by a final condition
  *
  * \post p is removed
  * 
@@ -122,7 +124,7 @@ unsigned int PetriNet::reduce_unused_status_places()
   for (set<Place*>::iterator p = internalPlaces_.begin(); 
         p != internalPlaces_.end(); ++p)
     if ( ((*p)->getPostset().empty()) && // precondition 2
-         //FIXME: (!( (*p)->isFinal ) ) && // precondition 4
+        __REDUCE_CHECK_FINAL(*p) && // precondition 4
          ((*p)->getTokenCount() == 0 ) ) // precondition 3
       unused_status_places.insert(*p);
   
@@ -201,7 +203,7 @@ unsigned int PetriNet::reduce_suspicious_transitions()
  * and for each transition t in its postset applies,
  * that the arc weight from p to t is higher than 
  * the amount of tokens stored in p (precondition 2)
- * and p is not involved by a final marking (precondition 3)
+ * and p is not concerned by a final condition (precondition 3)
  * then this place and its postset can be removed. 
  *
  * \post  t and its postset are removed 
@@ -226,8 +228,8 @@ unsigned int PetriNet::reduce_dead_nodes()
     for (set<Place*>::iterator p = internalPlaces_.begin(); 
           p != internalPlaces_.end(); ++p)
     {
-      if ( ((*p)->getPreset().empty()) ) // precondition 1 
-           //FIXME: && (!((*p)->isFinal)) ) // precondition 3
+      if ( ((*p)->getPreset().empty()) && // precondition 1 
+           __REDUCE_CHECK_FINAL(*p) ) // precondition 3
       {
         // check the postset
         bool arcs=true;		
@@ -391,8 +393,11 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  * 
  * If there exist two parallel places p1 and p2 (precondition 1)
  * and p1 has less than or as many tokens as p2 (precondition 2),
+ * and p2 is not concerned by a final condition (precondition 3),
  * then p2 can be removed.
- * If precondition 2 is not fulfilled, p1 will be removed.
+ * If precondition 2 is not fulfilled and p1 is not 
+ * concerned by a final condition (precondition 3), 
+ * p1 will be removed.
  * 
  * A place is removed by merging its history with this one of 
  * place parallel to it.
@@ -473,7 +478,8 @@ unsigned int PetriNet::reduce_rule_3p()
     for(set<Place*>::iterator p=parallelPlaces.begin(); 
         p!=parallelPlaces.end(); ++p)
     {
-      if((*p) != minPlace)
+      if( ((*p) != minPlace) &&
+          __REDUCE_CHECK_FINAL(*p) ) // precondition 3
       {
         obsoletePlaces.insert(*p);
         replaceRelation[*p]=minPlace;
@@ -623,10 +629,11 @@ bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* 
  * 
  * If there exist two distinct places p1 and p2 (precondition 1)
  * with singleton postset t1 and t2 respectively (precondition 2)
- * connected an arc weight of 1 respectively (precondition 3)
+ * connected by an arc weight of 1 respectively (precondition 3)
  * and both transitions are connected with all places different
  * from p1 and p2 in the same way (precondition 4)
  * and the preset of p1 and p2 respectively is not empty (precondition 5),
+ * and p2 is not concerned by a final condition (precondition 6),
  * then the following changes can be applied:
  * 1.: For each transition t in the preset of p2 add an arc
  *     of the same weight to p1. If such an arc already exist,
@@ -657,7 +664,8 @@ unsigned int PetriNet::reduce_rule_4()
        p != internalPlaces_.end(); ++p)
   {
     if(( (*p)->getPostset().size()==1) && // precondition 2
-       ( (*((*p)->getPostsetArcs().begin()))->getWeight()==1 ) ) // precondition 3
+       ( (*((*p)->getPostsetArcs().begin()))->getWeight()==1 ) && // precondition 3
+       ( !((*p)->getPreset().empty()) ) ) // precondition 5
     {
       relevantPlaces.insert(*p);
     }
@@ -665,18 +673,24 @@ unsigned int PetriNet::reduce_rule_4()
   
   // STEP 2: check those places for equality
   set<pair<Place*,Place*> > equalPlaces;
+  set<Place*> seenPlaces; 
   
   for (set<Place*>::iterator p1 = relevantPlaces.begin();
        p1 != relevantPlaces.end(); ++p1)
   {
+    if(seenPlaces.find(*p1) != seenPlaces.end())
+      continue;
+    
     for (set<Place*>::iterator p2 = (++p1)--; // precondition 1
            p2 != relevantPlaces.end(); ++p2)
     {
       Transition* t1 = static_cast<Transition*>(*((*p1)->getPostset().begin()));
       Transition* t2 = static_cast<Transition*>(*((*p2)->getPostset().begin()));
-      if(reduce_isEqual(t1,t2,*p1,*p2))
+      if( __REDUCE_CHECK_FINAL(*p2) && // precondition 6
+          (reduce_isEqual(t1,t2,*p1,*p2)) ) // precondition 4
       {
         equalPlaces.insert(pair<Place*,Place*>(*p1,*p2));
+        seenPlaces.insert(*p2);
       }
     }
   }
@@ -757,6 +771,7 @@ bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
  * and the postset's postset is not empty (precondition 4)
  * and the postsets preset is {p} (precondition 5)
  * and the arc weight from p to each transition of its postset is v (precondition 6)
+ * and p is not concerned by a final condition (precondition f)
  * 
  * and
  * 
@@ -811,6 +826,9 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
   for (set<Place*>::iterator p = internalPlaces_.begin(); 
        p != internalPlaces_.end(); ++p)
   {
+    if(!(__REDUCE_CHECK_FINAL(*p)) ) // precondition f
+      continue;
+    
     set<Node*> preset = (*p)->getPreset();
     set<Arc*> preArcs = (*p)->getPresetArcs();
     set<Node*> postset = (*p)->getPostset();
@@ -1026,6 +1044,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
  * and the postset of the preset of t contains only t (precondition 5)
  * and all arcs to p or from p have the weight v (precondition 6)
  * and the amount of tokens stored in p is less than v (precondition 7)
+ * and p is not concerned by a final condition (precondition 8)
  * then the following reduction can be applied:
  * 
  * 1.:  For each transition ti' from the postset of p add a new 
@@ -1065,7 +1084,8 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
        p != internalPlaces_.end(); ++p)
   {
     
-    if ((*p)->getPreset().size() != 1) // precondition 1
+    if ( ((*p)->getPreset().size() != 1) || // precondition 1
+         (!(__REDUCE_CHECK_FINAL(*p))) ) // precondition 8
       continue;
     
     Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
@@ -1216,6 +1236,7 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
  * and for each transition in the preset of p applies that the
  * arc weight from p to t equals the arc weight from t to p (precondition 2)
  * and this arc weight is less than the amount of tokens stored in p (precondition 3)
+ * and p is not concerned by a final condition (precondition 4)
  * than this place can be removed as well as each transition 
  * becoming isolated by this reduction.
  * 
@@ -1235,7 +1256,8 @@ unsigned int PetriNet::reduce_rule_7()
   for (set<Place*>::iterator p = internalPlaces_.begin(); 
        p != internalPlaces_.end(); ++p)
   {
-    if(!((*p)->getPreset() == (*p)->getPostset())) // precondition 1
+    if(!( ((*p)->getPreset() == (*p)->getPostset()) && // precondition 1 
+          (__REDUCE_CHECK_FINAL(*p)) )) // precondition 4 
       continue;
     
     unsigned int m = (*p)->getTokenCount();
@@ -1406,6 +1428,7 @@ unsigned int PetriNet::reduce_rule_8()
  * and the preset of p is not empty (precondition 3)
  * and the postset of t is not empty (precondition 4)
  * and p is not in the postset of t (precondition 5)
+ * and p is not concerned by a final condition (precondition 6)
  * then the following changes can be applied:
  * 
  * 1.:  Fire t until p stores 0 tokens.
@@ -1486,7 +1509,8 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     
     if( ((*p)->getPostset().size() != 1) || // precondition 2a
         ((*p)->getPreset().empty()) || // precondition 3
-        ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) ) //precondition 2
+        ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) || //precondition 2
+        (!(__REDUCE_CHECK_FINAL(*p))) ) // precondition 6
       continue;
     
     Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
@@ -1600,6 +1624,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
  * and the weights of all incoming and outgoing arcs 
  * have the value 1 (precondition 4), 
  * and neither of them is initially marked (precondition 5), 
+ * and p1 is not concerned by a final condition (precondition 6),
  * then p1 can be removed and its history will 
  * be attached to the history of p2.
  * 
@@ -1625,7 +1650,8 @@ unsigned int PetriNet::reduce_identical_places()
   for (set<Place*>::iterator p1 = internalPlaces_.begin(); 
         p1 != internalPlaces_.end(); ++p1)
   {
-    if(backupPlaces[*p1])
+    if( (backupPlaces[*p1]) ||
+        (!(__REDUCE_CHECK_FINAL(*p1))) ) // precondition 6
       continue;
     
     {
@@ -1958,7 +1984,8 @@ unsigned int PetriNet::reduce_identical_transitions()
  * and p has no other outgoing arcs (precondition 4)
  * and alle arcs connected with this 
  * transition have a weight of 1 (precondition 5)
- * and q ist not initially marked (precondition 6),
+ * and q is not initially marked (precondition 6),
+ * and q is not concerned by a final condition (precondition f)
  * and none of these places is communicating (precondition 7)
  * then the histories of t and q will be attached to p,
  * the postset of q will be connected with p in the same way it
@@ -1991,7 +2018,8 @@ unsigned int PetriNet::reduce_series_places()
     Place* postPlace = static_cast<Place*>(*((*t)->getPostset().begin()));
     
     if ( (seenPlaces[prePlace]) ||
-         (seenPlaces[postPlace]) )
+         (seenPlaces[postPlace]) || 
+         (!(__REDUCE_CHECK_FINAL(postPlace))) ) // precondition f
       continue;
     
     if ( ((*t)->getPreset().size() == 1) && // precondition 1
@@ -2101,7 +2129,7 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
     {
       if ( ((*p)->getPostset().size() == 1) && //precondition 1
            ((*p)->getPreset().size() == 1) && //precondition 1
-           //FIXME: (!(*p)->isFinal) && // precondition 2
+           __REDUCE_CHECK_FINAL(*p) && // precondition 2
             (!((*p)->getTokenCount() > 0)) ) // precondition 2
       {
         Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
@@ -2199,7 +2227,7 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
  * where the preset is identical to the postset (precondition 2),
  * and the arc weights of (p->t) and (t->p) is 1 (precondition 3),
  * and p stores initially 1 token (precondition 4),
- * and p is not final (precondition 5),
+ * and p is not concerned by a final condition (precondition 5),
  * then this place can be removed.
  * 
  * \todo: How to handle the history of removed transitions?
@@ -2217,8 +2245,8 @@ unsigned int PetriNet::reduce_self_loop_places()
          ((*p)->getPreset() == (*p)->getPostset()) &&  // precodnition 2
          ((*((*p)->getPresetArcs().begin()))->getWeight() == 1) && // precondition 3
          ((*((*p)->getPostsetArcs().begin()))->getWeight() == 1) && // precondition 3
-         ((*p)->getTokenCount() == 1 ) ) // precondition 4
-         //FIXME: (!(*p)->isFinal) ) // precondition 5
+         ((*p)->getTokenCount() == 1 ) && // precondition 4
+         __REDUCE_CHECK_FINAL(*p) ) // precondition 5
       self_loop_places.insert(*p);
   
   // remove useless places
@@ -2511,7 +2539,7 @@ unsigned int PetriNet::reduce_equal_places()
 
 
 
-
+#undef __REDUCE_CHECK_FINAL
 
 
 

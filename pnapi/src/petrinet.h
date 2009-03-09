@@ -203,7 +203,7 @@ namespace pnapi
 		 const std::string & = "net2");
 
     /// normalizes the Petri net
-    void normalize(bool = false);
+    const std::map<Transition *, std::string> normalize(bool = false);
 
     /// applies structral reduction rules
     unsigned int reduce(unsigned int reduction_level = LEVEL_5);

@@ -729,76 +729,127 @@ namespace pnapi
    *
    * For input places complementary places are introduced.
    */
-  void PetriNet::normalize(bool makeInnerStructure)
+  const std::map<Transition *, string> PetriNet::normalize(bool makeInnerStructure)
   {
     static int in = 1;
     static int on = 1;
+    std::map<Transition *, string> edgeLabels;
 
-    set<Place *> temp;
-
-    for (set<Transition *>::const_iterator t = transitions_.begin();
-        t != transitions_.end(); t++)
+    if (!isNormal())
     {
-      if ((*t)->isNormal())
-        continue;
+      set<Place *> temp;
 
-      /// adjacent input places of t
-      set<Place *> t_inp;
-      for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
-          p != (*t)->getPreset().end(); p++)
-        if ((*p)->getType() == Node::INPUT && !(*t)->isNormal())
-          t_inp.insert(static_cast<Place *>(*p));
-
-      for (set<Place *>::const_iterator ip = t_inp.begin();
-          ip != t_inp.end(); ip++)
+      for (set<Transition *>::const_iterator t = transitions_.begin();
+          t != transitions_.end(); t++)
       {
-        char c = (in++ % 10) + 48;
-        string nname = (**ip).getName();
-        nname.push_back(c);
-        /// new internal place
-        Place &nint = createPlace(nname+"_normalized");
-        /// complementary place
-        Place &ncomp = createPlace("comp_"+nname+"_normalized");
-        ncomp.mark(1);
-        /// new transition
-        Transition &ntrans = createTransition("!"+nname);
-        /// creating arcs
-        createArc(**ip, ntrans);
-        createArc(ntrans, nint);
-        createArc(nint, **t);
-        createArc(ncomp, ntrans);
-        createArc(*(*t), ncomp);
+        if (edgeLabels[*t] != "")
+          continue;
 
-        deleteArc(*findArc(**ip, **t));
+        /// adjacent input places of t
+        set<Place *> t_inp;
+        for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
+            p != (*t)->getPreset().end(); p++)
+          if ((*p)->getType() == Node::INPUT)
+            t_inp.insert(static_cast<Place *>(*p));
+
+        for (set<Place *>::const_iterator ip = t_inp.begin();
+            ip != t_inp.end(); ip++)
+        {
+          char c = (in++ % 10) + 48;
+          string nname = (**ip).getName();
+          nname.push_back(c);
+          /// new internal place
+          Place &nint = createPlace(nname+"_normalized");
+          /// complementary place
+          Place &ncomp = createPlace("comp_"+nname+"_normalized");
+          ncomp.mark(1);
+          /// new transition
+          Transition &ntrans = createTransition("t_"+nname);
+          /// creating arcs
+          createArc(**ip, ntrans);
+          createArc(ntrans, nint);
+          createArc(nint, **t);
+          createArc(ncomp, ntrans);
+          createArc(*(*t), ncomp);
+
+          condition_ = condition_.formula() && nint == 0;
+
+          edgeLabels[&ntrans] = (**ip).getName();
+
+          deleteArc(*findArc(**ip, **t));
+        }
+
+        /// adjacent output places of t
+        set<Place *> t_out;
+        for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
+            p != (*t)->getPostset().end(); p++)
+          if ((*p)->getType() == Node::OUTPUT)
+            t_out.insert(static_cast<Place *>(*p));
+
+        for (set<Place *>::const_iterator op = t_out.begin();
+            op != t_out.end(); op++)
+        {
+          char c = (on++ % 10) + 48;
+          string nname = (**op).getName();
+          nname.push_back(c);
+          /// new internal place
+          Place &nint = createPlace(nname+"_normalized");
+          /// new transition
+          Transition &ntrans = createTransition("t_"+nname);
+          /// creating arcs
+          createArc(*(*t), nint);
+          createArc(nint, ntrans);
+          createArc(ntrans, **op);
+
+          condition_ = condition_.formula() && nint == 0;
+
+          edgeLabels[&ntrans] = (**op).getName();
+
+          deleteArc(*findArc(**t, **op));
+        }
+
+        edgeLabels[*t] = "tau";
       }
-
-      /// adjacent output places of t
-      set<Place *> t_out;
-      for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
-          p != (*t)->getPostset().begin(); p++)
-        if ((*p)->getType() == Node::OUTPUT && !(*t)->isNormal())
-          t_out.insert(static_cast<Place *>(*p));
-
-      for (set<Place *>::const_iterator op = t_out.begin();
-          op != t_out.end(); op++)
+    }
+    else
+    {
+      for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
       {
-        /// normal check
-        if ((*t)->isNormal())
+        switch ((*t)->getType())
+        {
+        case Node::INPUT:
+        {
+          set<Arc *> preset = (*t)->getPresetArcs();
+          for (set<Arc *>::const_iterator f = preset.begin(); f != preset.end(); f++)
+          {
+            if ((*f)->getPlace().getType() == Node::INPUT)
+            {
+              edgeLabels[*t] = (*f)->getPlace().getName();
+              break;
+            }
+          }
           break;
-
-        char c = (on++ % 10) + 48;
-        string nname = (**op).getName();
-        nname.push_back(c);
-        /// new internal place
-        Place &nint = createPlace(nname+"_normalized");
-        /// new transition
-        Transition &ntrans = createTransition("?"+nname);
-        /// creating arcs
-        createArc(*(*t), nint);
-        createArc(nint, ntrans);
-        createArc(ntrans, **op);
-
-        deleteArc(*findArc(**t, **op));
+        }
+        case Node::OUTPUT:
+        {
+          set<Arc *> postset = (*t)->getPostsetArcs();
+          for (set<Arc *>::const_iterator f = postset.begin(); f != postset.end(); f++)
+          {
+            if ((*f)->getPlace().getType() == Node::OUTPUT)
+            {
+              edgeLabels[*t] = (*f)->getPlace().getName();
+              break;
+            }
+          }
+          break;
+        }
+        case Node::INTERNAL:
+        {
+          edgeLabels[*t] = "tau";
+          break;
+        }
+        default: assert(false);
+        }
       }
     }
 
@@ -806,6 +857,8 @@ namespace pnapi
       for (set<Place *>::const_iterator p = interfacePlaces_.begin();
           p != interfacePlaces_.end(); p++)
         deletePlace(**p);
+
+    return edgeLabels;
   }
 
 

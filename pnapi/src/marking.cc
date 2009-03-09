@@ -92,11 +92,13 @@ namespace pnapi
    */
   bool Marking::activates(const Transition &t)
   {
-    for (set<Node *>::const_iterator p = t.getPreset().begin();
-        p != t.getPreset().end(); p++)
-      if ((net_.findArc(**p, t)->getWeight()) >
-          m_[static_cast<Place *> (*p)])
+    for (set<Arc *>::const_iterator f = t.getPresetArcs().begin();
+        f != t.getPresetArcs().end(); f++)
+    {
+      if ((**f).getWeight() >
+          m_[&(**f).getPlace()])
         return false;
+    }
 
 
     return true;

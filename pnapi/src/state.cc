@@ -20,8 +20,8 @@ namespace pnapi
   /*!
    * \brief   standard constructor
    */
-  State::State(string name) :
-    preset_(), postset_()
+  State::State(string name, bool isFinal) :
+    preset_(), postset_(), isFinal_(isFinal)
   {
     static unsigned int number = 1;
     string snumber;
@@ -70,6 +70,24 @@ namespace pnapi
   set<State *> State::getPostset() const
   {
     return postset_;
+  }
+
+
+  /*!
+   * \brief   toggles the isFinal_ property
+   */
+  void State::final()
+  {
+    isFinal_ = !isFinal_;
+  }
+
+
+  /*!
+   * \brief   Returns the final value of the state
+   */
+  bool State::isFinal() const
+  {
+    return isFinal_;
   }
 
 

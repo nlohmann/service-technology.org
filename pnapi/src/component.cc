@@ -140,7 +140,7 @@ namespace pnapi {
   void Node::prefixNameHistory(const string & prefix)
   {
     std::deque<string> oldHistory = history_;
-    for (std::deque<string>::iterator it = history_.begin(); 
+    for (std::deque<string>::iterator it = history_.begin();
 	 it != history_.end(); ++it)
       *it = prefix + *it;
     observer_.updateNodeNameHistory(*this, oldHistory);
@@ -198,7 +198,7 @@ namespace pnapi {
   set<Arc *> Node::getPostsetArcs() const
   {
     set<Arc *> arcs;
-    for (set<Node *>::iterator it = postset_.begin(); it != postset_.end(); 
+    for (set<Node *>::iterator it = postset_.begin(); it != postset_.end();
 	 ++it)
       {
 	assert(net_.findArc(*this, **it) != NULL);
@@ -289,7 +289,7 @@ namespace pnapi {
   Place::Place(PetriNet & net, ComponentObserver & observer,
 	       const Place & place) :
     Node(net, observer, place), tokens_(place.tokens_),
-    capacity_(place.capacity_), wasInterface_(place.wasInterface_), 
+    capacity_(place.capacity_), wasInterface_(place.wasInterface_),
     port_(place.port_)
   {
     observer_.updatePlaces(*this);
@@ -324,7 +324,7 @@ namespace pnapi {
     return capacity_;
   }
 
-  
+
   /*!
    */
   string Place::getPort() const
@@ -367,7 +367,7 @@ namespace pnapi {
 
     // Node::merge does all the rest
     Node::merge(place, addArcWeights);
-    
+
     return *this;
   }
 

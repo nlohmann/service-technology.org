@@ -7,6 +7,7 @@
 #include <string>
 
 #include "marking.h"
+#include "component.h"
 
 using std::set;
 using std::string;
@@ -14,13 +15,12 @@ using std::string;
 namespace pnapi
 {
 
-
   template <class T>
   class Edge
   {
   public:
     /// standard constructor
-    Edge(T &source, T &destination, string label);
+    Edge(T &source, T &destination, const string label, pnapi::Node::Type type);
     /// standard destructor
     virtual ~Edge() {}
 
@@ -30,11 +30,15 @@ namespace pnapi
     T & getSource() const;
     /// returns the destination node (state)
     T & getDestination() const;
+    /// returns the type of the edge
+    Node::Type getType() const;
 
   private:
     string label_;
     T &source_;
     T &destination_;
+
+    Node::Type type_;
   };
 
 
@@ -42,7 +46,7 @@ namespace pnapi
   {
   public:
     // standard constructor
-    State(string name = "");
+    State(string name = "", bool isFinal = false);
     // standard destructor
     virtual ~State();
 
@@ -52,6 +56,9 @@ namespace pnapi
     set<State *> getPreset() const;
     // returns the postset
     set<State *> getPostset() const;
+
+    void final();
+    bool isFinal() const;
 
     // comparison operator for states
     virtual bool operator ==(const State &m) const;
@@ -63,6 +70,8 @@ namespace pnapi
     set<State *> preset_;
     // postset
     set<State *> postset_;
+    // final
+    bool isFinal_;
   };
 
 
@@ -116,8 +125,9 @@ namespace pnapi
    * \brief
    */
   template <class T>
-  Edge<T>::Edge(T &source, T &destination, const string label) :
-    source_(source), destination_(destination), label_(label)
+  Edge<T>::Edge(T &source, T &destination, const string label,
+      pnapi::Node::Type type) :
+    source_(source), destination_(destination), label_(label), type_(type)
   {
     source_.getPostset().insert(&destination_);
     destination_.getPreset().insert(&source_);
@@ -151,6 +161,13 @@ namespace pnapi
   T & Edge<T>::getDestination() const
   {
     return destination_;
+  }
+
+
+  template <class T>
+  Node::Type Edge<T>::getType() const
+  {
+    return type_;
   }
 
 

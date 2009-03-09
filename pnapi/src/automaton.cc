@@ -37,12 +37,14 @@ namespace pnapi
     AbstractAutomaton<StateB>(n), hashTable_(PNAPI_SA_HASHSIZE),
     initialmarking_(n, true)
   {
-    cout << "Before normalization!\nOWFN-Output:\n";
-    //cout << io::owfn << n;
-    n.normalize(true);
-    cout << "Net is normalized!\nOWFN-Output:\n";
-    //cout << io::owfn << n;
-    initialmarking_ = *new Marking(n);
+    net_.normalize();
+    for (std::set<Transition *>::const_iterator t =
+        net_.getTransitions().begin(); t != net_.getTransitions().end(); t++)
+    {
+      edgeTypes_[*t] = (**t).getType();
+    }
+    edgeLabels_ = net_.normalize(true);
+    initialmarking_ = *new Marking(net_);
 
     StateB *i = new StateB(initialmarking_);
     states_.push_back(i);
@@ -73,21 +75,18 @@ namespace pnapi
    */
   void ServiceAutomaton::dfs(StateB &i)
   {
-    cout << "DEBUG: " << i.getName();
-    cout << " with hash value " << i.getHashValue() << "\n";
-
     hashTable_[i.getHashValue()].insert(&i);
     Marking m = i.getMarking();
 
     // final state
     if (net_.finalCondition().isSatisfied(m))
     {
-      cout << "DEBUG: " << i.getName() << " is a final state.\n";
+      i.final();
       return;
     }
 
-    set<Transition *> Trans = net_.getTransitions();
-    for (set<Transition *>::const_iterator t = Trans.begin(); t != Trans.end(); t++)
+    for (set<Transition *>::const_iterator t = net_.getTransitions().begin();
+        t != net_.getTransitions().end(); t++)
     {
       bool doubled = false;
 
@@ -106,7 +105,7 @@ namespace pnapi
         if (**s == j)
         {
           doubled = true;
-          createEdge(i, **s, edgeLabels_[*t]);
+          createEdge(i, **s, edgeLabels_[*t], edgeTypes_[*t]);
           break;
         }
       }
@@ -115,7 +114,8 @@ namespace pnapi
         continue;
 
       addState(j);
-      createEdge(i, j, edgeLabels_[*t]);
+      createEdge(i, j, edgeLabels_[*t], edgeTypes_[*t]);
+
       dfs(j);
     }
   }

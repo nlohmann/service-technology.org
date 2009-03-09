@@ -66,9 +66,20 @@ int main(int argc, char** argv) {
 
         // try to parse net
         try {
-            cin >> meta(io::INPUTFILE, "stdin")
-                >> meta(io::CREATOR, PACKAGE_STRING)
-                >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+            switch (args_info.input_arg) {
+                case(input_arg_owfn): {
+                    cin >> meta(io::INPUTFILE, "stdin")
+                        >> meta(io::CREATOR, PACKAGE_STRING)
+                        >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+                    break;
+                }
+                case(input_arg_onwd): {
+                    cin >> meta(io::INPUTFILE, "stdin")
+                        >> meta(io::CREATOR, PACKAGE_STRING)
+                        >> meta(io::INVOCATION, invocation) >> io::onwd >> net;
+                    break;
+                }
+            }
         } catch (io::InputError error) {
             cerr << "petri:" << error << endl;
             exit(EXIT_FAILURE);
@@ -95,9 +106,20 @@ int main(int argc, char** argv) {
 
             // try to parse net
             try {
-                infile >> meta(io::INPUTFILE, args_info.inputs[i])
-                    >> meta(io::CREATOR, PACKAGE_STRING)
-                    >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+                switch (args_info.input_arg) {
+                    case(input_arg_owfn): {
+                        infile >> meta(io::INPUTFILE, args_info.inputs[i])
+                            >> meta(io::CREATOR, PACKAGE_STRING)
+                            >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+                        break;
+                    }
+                    case(input_arg_onwd): {
+                        infile >> meta(io::INPUTFILE, args_info.inputs[i])
+                            >> meta(io::CREATOR, PACKAGE_STRING)
+                            >> meta(io::INVOCATION, invocation) >> io::onwd >> net;
+                        break;
+                    }
+                }
             } catch (io::InputError error) {
                 cerr << "petri:" << error << endl;
                 infile.close();

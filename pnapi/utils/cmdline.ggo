@@ -10,7 +10,7 @@ section "Input and Output"
 option "input" i
   "Select the input file format"
   typestr="FORMAT"
-  values="owfn","lola","sa" enum
+  values="owfn","onwd","lola","sa" enum
   optional
   default="owfn"
 

@@ -12,6 +12,11 @@ void begin_test(const std::string & msg)
   std::cout << "Testing " << msg << " ... " << std::flush;
 }
 
+void skip_test()
+{
+  std::cout << "Skipped" << std::endl;
+}
+
 void end_test()
 {
   std::cout << "Ok" << std::endl;

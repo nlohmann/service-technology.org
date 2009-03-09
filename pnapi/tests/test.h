@@ -20,6 +20,8 @@ using pnapi::Automaton;
 
 void begin_test(const std::string &);
 
+void skip_test();
+
 void end_test();
 
 PetriNet createExamplePetriNet();

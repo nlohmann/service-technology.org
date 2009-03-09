@@ -153,5 +153,6 @@ AC_CONFIG_FILES([Makefile
                  tests/Makefile
 		 tests/petrinet/Makefile
 		 tests/automaton/Makefile
+		 tests/reduction/Makefile
 		 utils/Makefile])
 AC_OUTPUT

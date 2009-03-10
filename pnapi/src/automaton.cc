@@ -34,8 +34,7 @@ namespace pnapi
    *          initialize().
    */
   ServiceAutomaton::ServiceAutomaton(PetriNet &n) :
-    AbstractAutomaton<StateB>(n), hashTable_(PNAPI_SA_HASHSIZE),
-    initialmarking_(n, true)
+    AbstractAutomaton<StateB>(n), hashTable_(PNAPI_SA_HASHSIZE)
   {
     net_.normalize();
     for (std::set<Transition *>::const_iterator t =
@@ -44,9 +43,8 @@ namespace pnapi
       edgeTypes_[*t] = (**t).getType();
     }
     edgeLabels_ = net_.normalize(true);
-    initialmarking_ = *new Marking(net_);
 
-    StateB *i = new StateB(initialmarking_);
+    StateB *i = new StateB(*new Marking(net_));
     states_.push_back(i);
 
     dfs(*i);
@@ -64,7 +62,7 @@ namespace pnapi
   /*!
    * \brief
    */
-  void ServiceAutomaton::addState(StateB &s)
+  void ServiceAutomaton::createState(StateB &s)
   {
     states_.push_back(&s);
   }
@@ -113,7 +111,7 @@ namespace pnapi
       if (doubled)
         continue;
 
-      addState(j);
+      createState(j);
       createEdge(i, j, edgeLabels_[*t], edgeTypes_[*t]);
 
       dfs(j);

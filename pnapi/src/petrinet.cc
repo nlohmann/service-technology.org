@@ -733,16 +733,15 @@ namespace pnapi
   {
     static int in = 1;
     static int on = 1;
-    std::map<Transition *, string> edgeLabels;
 
     if (!isNormal())
     {
-      set<Place *> temp;
-
+      std::set<Transition *> temp;
+      temp.clear();
       for (set<Transition *>::const_iterator t = transitions_.begin();
           t != transitions_.end(); t++)
       {
-        if (edgeLabels[*t] != "")
+        if (temp.count(*t) > 0)
           continue;
 
         /// adjacent input places of t
@@ -772,9 +771,9 @@ namespace pnapi
           createArc(ncomp, ntrans);
           createArc(*(*t), ncomp);
 
-          condition_ = condition_.formula() && nint == 0;
+          temp.insert(&ntrans);
 
-          edgeLabels[&ntrans] = (**ip).getName();
+          condition_ = condition_.formula() && nint == 0 && ncomp == 1;
 
           deleteArc(*findArc(**ip, **t));
         }
@@ -801,55 +800,52 @@ namespace pnapi
           createArc(nint, ntrans);
           createArc(ntrans, **op);
 
-          condition_ = condition_.formula() && nint == 0;
+          temp.insert(&ntrans);
 
-          edgeLabels[&ntrans] = (**op).getName();
+          condition_ = condition_.formula() && nint == 0;
 
           deleteArc(*findArc(**t, **op));
         }
-
-        edgeLabels[*t] = "tau";
       }
     }
-    else
+
+    std::map<Transition *, string> edgeLabels;
+    for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
     {
-      for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      switch ((*t)->getType())
       {
-        switch ((*t)->getType())
+      case Node::INPUT:
+      {
+        set<Arc *> preset = (*t)->getPresetArcs();
+        for (set<Arc *>::const_iterator f = preset.begin(); f != preset.end(); f++)
         {
-        case Node::INPUT:
-        {
-          set<Arc *> preset = (*t)->getPresetArcs();
-          for (set<Arc *>::const_iterator f = preset.begin(); f != preset.end(); f++)
+          if ((*f)->getPlace().getType() == Node::INPUT)
           {
-            if ((*f)->getPlace().getType() == Node::INPUT)
-            {
-              edgeLabels[*t] = (*f)->getPlace().getName();
-              break;
-            }
+            edgeLabels[*t] = (*f)->getPlace().getName();
+            break;
           }
-          break;
         }
-        case Node::OUTPUT:
+        break;
+      }
+      case Node::OUTPUT:
+      {
+        set<Arc *> postset = (*t)->getPostsetArcs();
+        for (set<Arc *>::const_iterator f = postset.begin(); f != postset.end(); f++)
         {
-          set<Arc *> postset = (*t)->getPostsetArcs();
-          for (set<Arc *>::const_iterator f = postset.begin(); f != postset.end(); f++)
+          if ((*f)->getPlace().getType() == Node::OUTPUT)
           {
-            if ((*f)->getPlace().getType() == Node::OUTPUT)
-            {
-              edgeLabels[*t] = (*f)->getPlace().getName();
-              break;
-            }
+            edgeLabels[*t] = (*f)->getPlace().getName();
+            break;
           }
-          break;
         }
-        case Node::INTERNAL:
-        {
-          edgeLabels[*t] = "tau";
-          break;
-        }
-        default: assert(false);
-        }
+        break;
+      }
+      case Node::INTERNAL:
+      {
+        edgeLabels[*t] = "tau";
+        break;
+      }
+      default: assert(false);
       }
     }
 

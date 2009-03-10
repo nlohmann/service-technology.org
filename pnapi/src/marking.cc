@@ -95,8 +95,7 @@ namespace pnapi
     for (set<Arc *>::const_iterator f = t.getPresetArcs().begin();
         f != t.getPresetArcs().end(); f++)
     {
-      if ((**f).getWeight() >
-          m_[&(**f).getPlace()])
+      if ((**f).getWeight() > m_[&(**f).getPlace()])
         return false;
     }
 
@@ -139,7 +138,7 @@ namespace pnapi
 
   unsigned int Marking::operator[](const Place & p) const
   {
-    // FIXME: assert(m_.find(&p) != m_.end());
+    FIXME: assert(m_.find(&p) != m_.end());
 
     return m_.find(&p)->second;
   }

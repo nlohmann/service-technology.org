@@ -57,7 +57,6 @@ namespace pnapi
     /// returns the Petri net
     PetriNet getPetriNet() const { return net_; }
 
-
     /// Service automata output format (ig like) -- absolutely experimental!!
     void output_sa(std::ostream &os) const;
 
@@ -88,7 +87,10 @@ namespace pnapi
 
 
   /*!
-   * \brief
+   * \brief   Constructor which instantiates a Petri net
+   *
+   * This constructor is used by the construction Petri net => Service
+   * Automaton.
    */
   template <class T>
   AbstractAutomaton<T>::AbstractAutomaton(PetriNet &net) :
@@ -98,7 +100,7 @@ namespace pnapi
 
 
   /*!
-   * \brief
+   * \brief   Standard destructor
    */
   template <class T>
   AbstractAutomaton<T>::~AbstractAutomaton()
@@ -107,18 +109,17 @@ namespace pnapi
 
 
   /*!
-   * \brief
+   * \brief Creates a state
    */
   template <class T>
   void AbstractAutomaton<T>::createState(const string name)
   {
     states_.push_back(new State(name));
-    std::cout << "State " << name << " created!\n";
   }
 
 
   /*!
-   * \brief
+   * \brief   Finds a state in the set of states
    */
   template <class T>
   const T * AbstractAutomaton<T>::findState(const string name) const
@@ -132,7 +133,7 @@ namespace pnapi
 
 
   /*!
-   * \brief
+   * \brief   Creates an automaton's edge from one state to another with a label
    */
   template <class T>
   void AbstractAutomaton<T>::createEdge(T &source, T &destination,
@@ -143,9 +144,7 @@ namespace pnapi
 
 
   /*!
-   * \brief
-   *
-   * \bug     Too much interface output!
+   * \brief   Provides the SA output (IG like)
    */
   template <class T>
   void AbstractAutomaton<T>::output_sa(std::ostream &os) const
@@ -251,16 +250,16 @@ namespace pnapi
 
 
   /*!
-   * \brief
+   * \brief   Output method for STG format.
    */
   template <class T>
   void AbstractAutomaton<T>::output_stg(std::ostream &os) const
   {
-    /// implement it!
+
   }
 
 
-  /// Automaton class which can read .sa files
+  /// Automaton class which will be able to read SA format
   class Automaton : public AbstractAutomaton<State>
   {
     friend ostream & operator<<(ostream &, const Automaton &);
@@ -275,24 +274,24 @@ namespace pnapi
   {
     //friend ostream & operator<<(ostream &, const ServiceAutomaton &);
   public:
-    /// constructor with Petri net - initial marking taken from place marks
+    /// constructor with Petri net - initial marking taken from place tokens
     ServiceAutomaton(PetriNet &n);
     /// standard destructor
     virtual ~ServiceAutomaton();
 
+    /// overloaded method createState() -- replaces the older method addState
+    void createState(StateB &s);
+
   private:
     /// attributes & methods used for creating an automaton from Petri net
     static const int PNAPI_SA_HASHSIZE = 65535;
-
+    /// hash table for recovering already seen states
     std::vector<std::set<StateB *> > hashTable_;
-
-    Marking initialmarking_;
-
+    /// edge labels which represent the interface of the automaton
     std::map<Transition *, string> edgeLabels_;
+    /// each transitions has got a type according to the interface
+    /// place connected to the transition
     std::map<Transition *, pnapi::Node::Type> edgeTypes_;
-
-    /// adds a StateB to the automaton
-    void addState(StateB &s);
 
     /// Depth-First-Search
     void dfs(StateB &i);

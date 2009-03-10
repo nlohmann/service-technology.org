@@ -127,7 +127,7 @@ namespace pnapi
   template <class T>
   Edge<T>::Edge(T &source, T &destination, const string label,
       pnapi::Node::Type type) :
-    source_(source), destination_(destination), label_(label), type_(type)
+    label_(label), source_(source), destination_(destination), type_(type)
   {
     source_.getPostset().insert(&destination_);
     destination_.getPreset().insert(&source_);

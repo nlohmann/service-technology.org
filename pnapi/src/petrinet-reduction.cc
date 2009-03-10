@@ -87,9 +87,13 @@ using std::set;
 using namespace pnapi;
 
 
-#define __REDUCE_CHECK_FINAL(x) (finalCondition().concerningPlaces().find(x) == \
-                                  finalCondition().concerningPlaces().end() )
+#define __REDUCE_CHECK_FINAL(x) (__reduce_check_final(this,x))
 
+bool __reduce_check_final(PetriNet* net, Place* p)
+{
+  set<const Place*> concerningPlaces = net->finalCondition().concerningPlaces();
+  return (concerningPlaces.find(p) == concerningPlaces.end());
+}
 
 
 /******************************************************************************

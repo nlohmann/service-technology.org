@@ -1,11 +1,10 @@
-#include <iostream>
+#include <fstream>
 
 #include "test.h"
 
-using std::cout;
-using std::endl;
-using namespace pnapi;
-
+using std::fstream;
+using pnapi::io::owfn;
+using pnapi::io::InputError;
 
 int main(int argc, char * argv[])
 {

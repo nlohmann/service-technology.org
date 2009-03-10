@@ -41,7 +41,7 @@ check_PROGRAMS  = test_unused_status_places \
 
 test_unused_status_places_SOURCES = test_unused_status_places.cc 
 test_suspicious_transitions_SOURCES = test_suspicious_transitions.cc
-test_dead_nodes_SOURCES = test_dead_nodes.cc
+test_dead_nodes_SOURCES = test_dead_nodes.cc test_dead_nodes.owfn
 test_initially_marked_SOURCES = test_initially_marked.cc 
 test_starke_3p_SOURCES = test_starke_3p.cc 
 test_starke_3t_SOURCES = test_starke_3t.cc 
@@ -62,4 +62,3 @@ test_equal_places_SOURCES = test_equal_places.cc
 
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src
 LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.a
-

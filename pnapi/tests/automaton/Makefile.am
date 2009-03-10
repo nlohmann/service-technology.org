@@ -4,7 +4,8 @@ TESTS = test_construction
 
 check_PROGRAMS = test_construction 
 
-test_construction_SOURCES = test_construction.cc
+test_construction_SOURCES = test_construction.cc sequence_normal.owfn \
+			sequence_unnormal.owfn strange_net.owfn
 
 # include test and api sources and libs
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src

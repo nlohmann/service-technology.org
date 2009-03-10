@@ -1,6 +1,7 @@
 #ifndef NDEBUG
 #include <iostream>
 #include "io.h"
+#include "component.h"
 using std::cout;
 using std::endl;
 #endif
@@ -37,6 +38,24 @@ namespace pnapi
     {
       children_.insert(l.clone());
       children_.insert(r.clone());
+
+
+#ifndef NDEBUG
+      // consistency check
+      const Proposition * child1 = NULL;
+      for (set<const Formula *>::iterator it = children_.begin(); 
+	   it != children_.end(); ++it)
+	{
+	  const Proposition * child2 = dynamic_cast<const Proposition *>(*it);
+	  if (child2 != NULL)
+	    {
+	      if (child1 != NULL)
+		assert(&child1->place().getPetriNet() == 
+		       &child2->place().getPetriNet());
+	      child1 = child2;
+	    }
+	}
+#endif
     }
 
     Operator::Operator(const set<const Formula *> & children,
@@ -45,6 +64,23 @@ namespace pnapi
       for (set<const Formula *>::const_iterator it = children.begin();
 	   it != children.end(); ++it)
 	children_.insert((*it)->clone(places));
+
+#ifndef NDEBUG
+      // consistency check
+      const Proposition * child1 = NULL;
+      for (set<const Formula *>::iterator it = children_.begin(); 
+	   it != children_.end(); ++it)
+	{
+	  const Proposition * child2 = dynamic_cast<const Proposition *>(*it);
+	  if (child2 != NULL)
+	    {
+	      if (child1 != NULL)
+		assert(&child1->place().getPetriNet() == 
+		       &child2->place().getPetriNet());
+	      child1 = child2;
+	    }
+	}
+#endif
     }
 
     Negation::Negation(const Formula & f) :

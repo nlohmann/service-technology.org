@@ -210,7 +210,7 @@ namespace pnapi
     bool wasInterface() const;
 
     /// merges two places
-    Place & merge(Place &, bool = true);
+    Place & merge(Place &, bool = true, bool = true);
 
     /// marks the place with token
     void mark(unsigned int = 1);

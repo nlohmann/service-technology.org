@@ -593,6 +593,12 @@ namespace pnapi
 
       /* data node construction */
 
+      Node::Node(Type type, string * str1, int number) :
+	type(type), string1(*str1), number(number)
+      {
+	delete str1;
+      }
+
       Node::Node(Type type, string * str1, string * str2) :
 	type(type), string1(*str1), string2(*str2), number(0)
       {
@@ -658,32 +664,34 @@ namespace pnapi
 
       /* visiting nodes */
 
+      Visitor::Visitor(map<string, PetriNet *> & nets) :
+	nets_(nets)
+      {
+      }
+
       void Visitor::beforeChildren(const Node & node)
       {
 	switch (node.type)
 	  {
 	  case INSTANCE:
 	    {
+	      string name = node.string1;
 	      PetriNet net;
-	      ifstream file(node.string2.c_str());
-	      file >> io::owfn >> io::meta(io::INPUTFILE, node.string2)
-		   >> net;
+	      if (nets_.find(name) != nets_.end())
+		net = *nets_[name];
 	      for (int i = 0; i < node.number; i++)
-		instances_[node.string1].push_back(net);
+		instances_[name].push_back(net);
 	      break;
 	    }
 
 	  case PLACE:
 	    {
-	      vector<Place *> places;
-	      for (vector<PetriNet>::iterator it =
-		     instances_[node.string1].begin();
-		   it != instances_[node.string1].end(); ++it)
-		{
-		  Place * p = it->findPlace(node.string2);
-		  node.check(p != NULL, node.string2, "unknown place");
-		  places.push_back(p);
-		}
+	      string netName = node.string1;
+	      string placeName = node.string2;
+	      vector<PlaceDescription> places;
+	      for (vector<PetriNet>::iterator it = instances_[netName].begin();
+		   it != instances_[netName].end(); ++it)
+		places.push_back(PlaceDescription(netName, *it, placeName));
 	      places_.push_back(places);
 	      break;
 	    }
@@ -699,20 +707,29 @@ namespace pnapi
 	  case ANY_WIRING:
 	  case ALL_WIRING:
 	    {
-	      vector<Place *> p1s = places_.front(); places_.pop_front();
-	      vector<Place *> p2s = places_.front(); places_.pop_front();
-	      for (vector<Place *>::iterator p1i = p1s.begin();
-		   p1i != p1s.end(); ++p1i)
-		for (vector<Place *>::iterator p2i = p2s.begin();
-		     p2i != p2s.end(); ++p2i)
+	      assert(places_.size() == 2);
+	      vector<PlaceDescription> p1s = 
+		places_.front(); places_.pop_front();
+	      vector<PlaceDescription> p2s = 
+		places_.front(); places_.pop_front();
+	      for (vector<PlaceDescription>::iterator p1i = 
+		     p1s.begin(); p1i != p1s.end(); ++p1i)
+		for (vector<PlaceDescription>::iterator p2i = 
+		       p2s.begin(); p2i != p2s.end(); ++p2i)
 		  {
-		    Place & p1 = **p1i;
-		    Place & p2 = **p2i;
-		    LinkNode * n1 = getLinkNode(p1, getLinkNodeMode(node.type));
-		    LinkNode * n2 = getLinkNode(p2, getLinkNodeMode(node.type));
+		    pair<Place *, bool> p1 = 
+		      getPlace(node, *p1i, Place::OUTPUT);
+		    pair<Place *, bool> p2 = 
+		      getPlace(node, *p2i, Place::INPUT);
+		    LinkNode * n1 = 
+		      getLinkNode(*p1.first, getLinkNodeMode(node.type), 
+				  !p1.second);
+		    LinkNode * n2 = 
+		      getLinkNode(*p2.first, getLinkNodeMode(node.type),
+				  !p2.second);
 		    n1->addLink(*n2);
-		    wiring_[&p1] = n1;
-		    wiring_[&p2] = n2;
+		    wiring_[p1.first] = n1;
+		    wiring_[p2.first] = n2;
 		  }
 	      break;
 	    }
@@ -721,13 +738,33 @@ namespace pnapi
 	  }
       }
 
-      LinkNode * Visitor::getLinkNode(Place & p, LinkNode::Mode mode)
+      pair<Place *, bool> Visitor::getPlace(const Node & node, 
+					    PlaceDescription & pd, 
+					    Place::Type type)
+      {
+	bool isNetGiven = nets_.find(pd.netName) != nets_.end();
+	Place * p = pd.instance->findPlace(pd.placeName);
+	bool createPlace = !isNetGiven && p == NULL;
+	if (createPlace)
+	  {
+	    p = &pd.instance->createPlace(pd.placeName, type);
+	    pd.instance->finalCondition().addProposition(*p == 0);
+	  }
+	node.check(p != NULL && p->getType() == type, 
+		   pd.netName + "." + pd.placeName, 
+		   (string)(type == Place::INPUT ? "input" : "output") + 
+		   (string)" place expected");
+	return pair<Place *, bool>(p, createPlace);
+      }
+
+      LinkNode * Visitor::getLinkNode(Place & p, LinkNode::Mode mode, 
+				      bool internalize)
       {
 	map<Place *, LinkNode *>::iterator it = wiring_.find(&p);
 	if (it != wiring_.end())
 	  return (*it).second;
 	else
-	  return new LinkNode(p, mode);
+	  return new LinkNode(p, mode, internalize);
       }
 
       LinkNode::Mode Visitor::getLinkNodeMode(Type type)

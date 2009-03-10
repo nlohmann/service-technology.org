@@ -323,6 +323,7 @@ namespace pnapi
 
       // forward declarations
       class Node;
+      class Visitor;
 
 
       /// BaseNode instantiation
@@ -385,6 +386,7 @@ namespace pnapi
 	Node(Node *, Node *);
 	Node(Node *, Node *, Node *);
 
+	Node(Type, std::string *, int);
 	Node(Type, std::string *, std::string *);
 	Node(Type, std::string *, std::string *, int);
 
@@ -406,6 +408,8 @@ namespace pnapi
       class Visitor : public parser::Visitor<Node>
       {
       public:
+	Visitor(std::map<std::string, PetriNet *> &);
+
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
 
@@ -413,12 +417,26 @@ namespace pnapi
 	const std::map<Place *, LinkNode *> & wiring();
 
       private:
+	struct PlaceDescription
+	{
+	  std::string netName;
+	  PetriNet * instance;
+	  std::string placeName;
+
+	  PlaceDescription(const std::string & net, PetriNet & inst, 
+			   const std::string & place) :
+	    netName(net), instance(&inst), placeName(place) {}
+	};
+
+	std::map<std::string, PetriNet *> & nets_;
 	std::map<std::string, std::vector<PetriNet> > instances_;
-	std::deque<std::vector<Place *> > places_;
+	std::deque<std::vector<PlaceDescription> > places_;
 	std::map<Place *, LinkNode *> wiring_;
 
-	LinkNode * getLinkNode(Place & p, LinkNode::Mode mode);
-	LinkNode::Mode getLinkNodeMode(Type type);
+	std::pair<Place *, bool> getPlace(const Node &, PlaceDescription &, 
+					  Place::Type);
+	LinkNode * getLinkNode(Place &, LinkNode::Mode, bool);
+	LinkNode::Mode getLinkNodeMode(Type);
       };
 
     } /* namespace onwd */

@@ -19,9 +19,12 @@
 #ifndef NDEBUG
 #include <iostream>
 #include <fstream>
+#include "io.h"
 using std::cout;
 using std::cerr;
 using std::endl;
+using pnapi::io::operator<<;
+using pnapi::io::util::operator<<;
 #endif
 
 #include <cassert>

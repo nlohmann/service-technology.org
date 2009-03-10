@@ -103,6 +103,10 @@ namespace pnapi
     std::istream & operator>>(std::istream &, const util::Manipulator<
 			      std::pair<MetaInformation, std::string> > &);
 
+    /// using Manipulators in input
+    template <typename T> 
+    std::istream & operator>>(std::istream &, const util::Manipulator<T>);
+
     /// %PetriNet output
     std::ostream & operator<<(std::ostream &, const PetriNet &);
 
@@ -146,6 +150,10 @@ namespace pnapi
     /// meta information manipulator
     util::Manipulator<std::pair<MetaInformation, std::string> >
     meta(MetaInformation, const std::string &);
+
+    /// manipulator for passing a Petri net collection to input
+    util::Manipulator<std::map<std::string, PetriNet *> >
+    nets(std::map<std::string, PetriNet *> &);
 
     //@}
 
@@ -232,6 +240,9 @@ namespace pnapi
       typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
       typedef Manipulator<std::pair<MetaInformation, std::string> >
               MetaManipulator;
+      typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
+      typedef Manipulator<std::map<std::string, PetriNet *> > 
+              PetriNetManipulator;
 
 
       /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
@@ -398,6 +409,17 @@ namespace pnapi
 	  }
       }
 
+    } /* namespace util */
+
+
+    /*!
+     * implementation of template function
+     */
+    template <typename T>
+    std::istream & operator>>(std::istream & is, const util::Manipulator<T> m)
+    {
+      util::StreamMetaData<T>::data(is) = m.data;
+      return is;
     }
 
   }

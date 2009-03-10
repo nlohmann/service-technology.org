@@ -69,10 +69,10 @@ instances: instance                     { $$ = new Node($1);     }
          | instances SYM_COMMA instance { $$ = $1->addChild($3); }
          ;
 
-instance: CL_IDENTIFIER SYM_COLON CL_STRING 
-                              { $$ = new Node(INSTANCE, $1, $3, 1); }
+instance: CL_IDENTIFIER /*SYM_COLON CL_STRING*/
+                                  { $$ = new Node(INSTANCE, $1, 1); }
         | CL_IDENTIFIER SYM_BRACKET_LEFT CL_NUMBER SYM_BRACKET_RIGHT 
-  	  SYM_COLON CL_STRING { $$ = new Node(INSTANCE, $1, $6, $3); }
+  	  /*SYM_COLON CL_STRING*/ { $$ = new Node(INSTANCE, $1, $3); }
         ;
 
 wirings: wiring                   { $$ = new Node($1);     }

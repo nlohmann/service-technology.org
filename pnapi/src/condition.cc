@@ -1,8 +1,12 @@
 #ifndef NDEBUG
 #include <iostream>
+#include "io.h"
 using std::cout;
 using std::endl;
+using pnapi::io::util::operator<<;
 #endif
+
+#include <cassert>
 
 #include "marking.h"
 #include "condition.h"
@@ -119,6 +123,8 @@ namespace pnapi
 
   Condition & Condition::operator=(const Formula & f)
   {
+    assert(formula_ != &f);
+    
     delete formula_;
     formula_ = f.clone();
     return *this;
@@ -130,6 +136,15 @@ namespace pnapi
     formula_ = formulaTrue ? (Formula*) new FormulaTrue
                            : (Formula*) new FormulaFalse;
     return *this;
+  }
+
+  void Condition::addProposition(const Proposition & p)
+  {
+    *this = formula() && p;
+    //Formula * oldFormula = formula_;
+    //formula_ = new Conjunction(*formula_, p);
+    //cout << *formula_ << endl;
+    //delete oldFormula;
   }
 
   void Condition::addMarking(const Marking & m)

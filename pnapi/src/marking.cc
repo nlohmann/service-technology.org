@@ -138,7 +138,7 @@ namespace pnapi
 
   unsigned int Marking::operator[](const Place & p) const
   {
-    FIXME: assert(m_.find(&p) != m_.end());
+    assert(m_.find(&p) != m_.end()); // FIXME?
 
     return m_.find(&p)->second;
   }

@@ -1,8 +1,10 @@
 #include <sstream>
 #include <fstream>
+#include <map>
 #include "test.h"
 #include "parser.h"
 
+using std::map;
 using std::ofstream;
 using std::ifstream;
 using std::stringstream;
@@ -10,6 +12,7 @@ using std::stringstream;
 using pnapi::io::owfn;
 using pnapi::io::dot;
 using pnapi::io::meta;
+using pnapi::io::nets;
 using pnapi::io::InputError;
 using pnapi::io::CREATOR;
 using pnapi::io::INPUTFILE;
@@ -79,8 +82,7 @@ int main(int argc, char * argv[])
 	<< "      INPUT a, b; "
 	<< "      OUTPUT c1, c2, d; "
 	<< "INITIALMARKING p1:   1; "
-	<< "FINALCONDITION NOT NOT (f1 = 1 AND f3 <= 2 AND f4 >= 1 AND f5 < 4 "
-	<< "                        AND f6 > 2); "
+	<< "FINALCONDITION p2 = 1 AND ALL_OTHER_PLACES_EMPTY; "
 	<< "TRANSITION t1 CONSUME p1: 1, a: 1; "
 	<< "              PRODUCE p2: 1, p3: 1, f1: 1, f4: 1; "
 	<< "TRANSITION t2 CONSUME p2: 1, f1: 1; "
@@ -97,8 +99,7 @@ int main(int argc, char * argv[])
 
   stringstream onwd;
   onwd << "INSTANCE"
-       << "  net1: \"test_input.net1.owfn\","
-       << "  net2: \"test_input.net2.owfn\";"
+       << "  net1, net2;"
        << "WIRING"
        << "  net1.c1->net2.c_in, net1.c2->net2.c_in, "
        << "  net1.d=>net2.d_in1, net1.d=>net2.d_in2;";
@@ -112,8 +113,16 @@ int main(int argc, char * argv[])
 
   /*
   begin_test("io::operator>>() [Petri net ONWD input]");
-  try { booking >> meta(pnapi::io::INPUTFILE, "../../booking.onwd") 
-		>> pnapi::io::onwd >> net; }
+  try 
+    { 
+      PetriNet net1;
+      owfn1 >> owfn >> net1;
+      map<string, PetriNet *> netsByName;
+      netsByName["net1"] = &net1;
+      onwd >> meta(pnapi::io::INPUTFILE, "<onwd>")
+	   >> nets(netsByName)
+	   >> pnapi::io::onwd >> net; 
+    }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
   cout << owfn << net;
   end_test();

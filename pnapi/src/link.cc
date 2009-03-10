@@ -17,10 +17,11 @@ namespace pnapi
    *          A new LinkNode for the interface place #place with 
    *          distribution mode #mode is created.
    */
-  LinkNode::LinkNode(Place & place, Mode mode) : 
+  LinkNode::LinkNode(Place & place, Mode mode, bool internalizePlace) : 
     place_(&place),
     type_(place.getType() == Place::OUTPUT ? SOURCE : TARGET), 
-    mode_(mode)
+    mode_(mode),
+    internalizePlace_(internalizePlace)
   {
     assert(place.getType() == Place::OUTPUT || place.getType() == Place::INPUT);
   }
@@ -50,11 +51,13 @@ namespace pnapi
    */
   void LinkNode::joinPlaces()
   {
+    PetriNet & net = place_->getPetriNet();
     LinkNode & partner = getPartner();
     assert(&partner.getPartner() == this);
-    assert(&place_->getPetriNet() == &partner.place_->getPetriNet());
+    assert(&net == &partner.place_->getPetriNet());
 
-    partner.place_->merge(*place_);
+    partner.place_->merge(*place_, true, partner.internalizePlace_);
+    net.finalCondition().addProposition(*partner.place_ == 0);
   }
 
 
@@ -73,7 +76,7 @@ namespace pnapi
 
     // construct a new pattern net with a "root" place (to be connected)
     PetriNet & net = place_->getPetriNet();
-    Place & place = place_->merge(net.createPlace());
+    Place & place = place_->merge(net.createPlace(), true, internalizePlace_);
     
 
     // broadcast (ALL) patterns have only one transition

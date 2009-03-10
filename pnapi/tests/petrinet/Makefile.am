@@ -27,7 +27,7 @@ LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.a
 
 DISTCLEANFILES = test_input.net1.owfn test_input.net2.owfn \
                  test_normalize.sequence_normal.owfn \
-                 test_normalize.sequence_normal.normalized.owfn \
+                 test_normalize.sequence_normal_normalized.owfn \
                  test_normalize.coffee_unnormal.owfn \
                  test_normalize.coffee_unnormal_normalized.owfn \
                  test_normalize.strange_unnormal.owfn \

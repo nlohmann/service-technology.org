@@ -92,10 +92,14 @@ namespace pnapi
     void merge(const Condition &,
 	       const std::map<const Place *, const Place *> &);
 
+    /// adds a proposition by conjunction
+    void addProposition(const formula::Proposition &);
+
     /// creates a condition for the given marking and adds it
     void addMarking(const Marking &);
 
     /// returns a set of place names, which are contained in the condition
+    /// (excluding empty places)
     std::set<const Place *> concerningPlaces() const;
 
 

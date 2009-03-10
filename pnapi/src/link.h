@@ -32,7 +32,7 @@ namespace pnapi
     /*** constructors & destructor ***/
 
     /// single constructor
-    LinkNode(Place &, Mode = ONE);
+    LinkNode(Place &, Mode = ONE, bool = true);
 
     /// destructor
     ~LinkNode();
@@ -71,6 +71,9 @@ namespace pnapi
 
     /// mode of this node
     const Mode mode_;
+
+    /// if the place may be internalized
+    const bool internalizePlace_;
 
     /// links to other nodes
     std::set<LinkNode *> links_;

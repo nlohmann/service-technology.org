@@ -19,6 +19,7 @@ using std::string;
 using std::ios_base;
 using std::ostream;
 using std::set;
+using std::map;
 
 using pnapi::formula::Formula;
 
@@ -62,6 +63,12 @@ namespace pnapi
     meta(MetaInformation i, const std::string & s)
     {
       return util::MetaManipulator(pair<MetaInformation, string>(i, s));
+    }
+
+    util::Manipulator<std::map<std::string, PetriNet *> >
+    nets(std::map<std::string, PetriNet *> & nets)
+    {
+      return util::PetriNetManipulator(nets);
     }
 
 
@@ -178,8 +185,9 @@ namespace pnapi
 
 	case util::ONWD:
 	  {
+	    map<string, PetriNet *> nets = util::PetriNetData::data(is);
 	    parser::onwd::Parser parser;
-	    parser::onwd::Visitor visitor;
+	    parser::onwd::Visitor visitor(nets);
 	    parser.parse(is).visit(visitor);
 	    net.createFromWiring(visitor.instances(), visitor.wiring());
 	    net.meta_ = util::MetaData::data(is);

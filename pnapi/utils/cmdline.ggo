@@ -10,7 +10,7 @@ section "Input and Output"
 option "input" i
   "Select the input file format"
   typestr="FORMAT"
-  values="owfn","onwd","lola","sa" enum
+  values="owfn","lola","sa" enum
   optional
   default="owfn"
 
@@ -21,6 +21,11 @@ option "output" o
   optional
   multiple
 
+option "wiring" w
+  "Read a wiring description"
+  typestr="FILE"
+  string
+  optional
 
 defmode "Check for Structural Properties"
 

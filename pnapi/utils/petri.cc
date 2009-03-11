@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <string>
 
 #include "pnapi.h"
@@ -16,6 +17,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::map;
 using std::string;
 using std::ifstream;
 using std::ofstream;
@@ -73,12 +75,6 @@ int main(int argc, char** argv) {
                         >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
                     break;
                 }
-                case(input_arg_onwd): {
-                    cin >> meta(io::INPUTFILE, "stdin")
-                        >> meta(io::CREATOR, PACKAGE_STRING)
-                        >> meta(io::INVOCATION, invocation) >> io::onwd >> net;
-                    break;
-                }
             }
         } catch (io::InputError error) {
             cerr << "petri:" << error << endl;
@@ -113,12 +109,6 @@ int main(int argc, char** argv) {
                             >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
                         break;
                     }
-                    case(input_arg_onwd): {
-                        infile >> meta(io::INPUTFILE, args_info.inputs[i])
-                            >> meta(io::CREATOR, PACKAGE_STRING)
-                            >> meta(io::INVOCATION, invocation) >> io::onwd >> net;
-                        break;
-                    }
                 }
             } catch (io::InputError error) {
                 cerr << "petri:" << error << endl;
@@ -136,6 +126,47 @@ int main(int argc, char** argv) {
             nets.push_back(net);
             names.push_back(args_info.inputs[i]);
         }
+    }
+
+
+    /*********
+    * WIRING *
+    **********/
+    if (args_info.wiring_given) {
+        // try to open file
+        ifstream infile(args_info.wiring_arg, ifstream::in);
+        if (!infile.is_open()) {
+            cerr << "petri: could not read from wiring file '" << args_info.wiring_arg << "'" << endl;
+            exit(EXIT_FAILURE);
+        }
+            
+        if (args_info.verbose_given) {
+            cerr << "petri: composing " << nets.size() << " nets according to '" << args_info.wiring_arg << "'" << endl;
+        }
+        
+        // collect parsed nets and store them in a mapping
+        map<string, PetriNet *> netsByName;
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+            netsByName[names[i]] = &nets[i];
+        }
+        
+        // create a new net consisting of the composed nets
+        PetriNet net;
+        infile >> meta(io::INPUTFILE, args_info.wiring_arg)
+            >> meta(io::CREATOR, PACKAGE_STRING)
+            >> meta(io::INVOCATION, invocation)
+            >> io::onwd >> pnapi::io::nets(netsByName) >> net;
+
+        if (args_info.verbose_given) {
+            cerr << "petri:" << args_info.wiring_arg << ".owfn: " << io::stat << net << endl;
+        }
+
+        // remove the parsed nets
+        names.clear();
+        nets.clear();
+        
+        nets.push_back(net);
+        names.push_back(args_info.wiring_arg);
     }
 
 

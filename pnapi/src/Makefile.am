@@ -32,4 +32,6 @@ AM_CXXFLAGS = @configured_CXXFLAGS@
 libpnapi_a_CPPFLAGS = -Wall
 
 # clean additional (generated) files
-MAINTAINERCLEANFILES = parser-owfn.h parser-onwd.h parser-petrify.h
+DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
+		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \
+		 parser-petrify.h parser-petrify.cc parser-petrify-lexer.cc

@@ -11,10 +11,11 @@ BUILT_SOURCES = cmdline.c
 AM_CPPFLAGS = -I$(top_srcdir)/src
 
 EXTRA_DIST = cmdline.ggo generator.cc
-MAINTAINERCLEANFILES = cmdline.c cmdline.h
+
+DISTCLEANFILES = cmdline.c cmdline.h
 
 ################################################################
 # use GNU gengetopt to create command line parser
 ################################################################
 cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo
+	$(GENGETOPT) --input=$(top_srcdir)/utils/cmdline.ggo

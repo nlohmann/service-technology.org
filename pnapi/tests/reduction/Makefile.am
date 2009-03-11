@@ -1,4 +1,5 @@
-TESTS           = test_unused_status_places \
+TESTS           = copy_owfns.sh \
+		  test_unused_status_places \
 		  test_suspicious_transitions \
 		  test_dead_nodes \
 		  test_initially_marked \
@@ -39,9 +40,9 @@ check_PROGRAMS  = test_unused_status_places \
 		  test_self_loop_transitions \
 		  test_equal_places 
 
-test_unused_status_places_SOURCES = test_unused_status_places.cc 
+test_unused_status_places_SOURCES = test_unused_status_places.cc
 test_suspicious_transitions_SOURCES = test_suspicious_transitions.cc
-test_dead_nodes_SOURCES = test_dead_nodes.cc
+test_dead_nodes_SOURCES = test_dead_nodes.cc 
 test_initially_marked_SOURCES = test_initially_marked.cc 
 test_starke_3p_SOURCES = test_starke_3p.cc 
 test_starke_3t_SOURCES = test_starke_3t.cc 
@@ -63,4 +64,9 @@ test_equal_places_SOURCES = test_equal_places.cc
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src
 LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.a
 
-EXTRA_DIST = test_dead_nodes.owfn
+TESTS_ENVIRONMENT = srcdir=$(srcdir) builddir=$(builddir)
+
+EXTRA_DIST = copy_owfns.sh \
+	     owfn/test_dead_nodes.owfn
+
+DISTCLEANFILES = test_dead_nodes.owfn

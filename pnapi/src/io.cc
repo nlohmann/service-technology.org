@@ -7,6 +7,7 @@ using std::endl;
 #endif
 
 #include <cassert>
+#include <sstream>
 
 #include "automaton.h"
 #include "petrinet.h"
@@ -20,6 +21,7 @@ using std::ios_base;
 using std::ostream;
 using std::set;
 using std::map;
+using std::stringstream;
 
 using pnapi::formula::Formula;
 
@@ -351,6 +353,60 @@ namespace pnapi
       }
 
 
+      // FIXME: remove dot prefix (when in dot namespace)
+      string dot_getNodeName(const Node & n, bool withSuffix = false)
+      {
+	static PetriNet * net = NULL;
+	static map<string, string> names;
+
+	if (net != &n.getPetriNet())
+	  {
+	    net = &n.getPetriNet();
+	    names.clear();
+
+	    int i = 0;
+	    set<Place *> places = net->getPlaces();
+	    for (set<Place *>::iterator it = places.begin(); 
+		 it != places.end(); ++it)
+	      {
+		stringstream ss; ss << "p" << ++i;
+		names[(*it)->getName()] = ss.str();
+	      }
+
+	    i = 0;
+	    set<Transition *> transitions = net->getTransitions();
+	    for (set<Transition *>::iterator it = transitions.begin(); 
+		 it != transitions.end(); ++it)
+	      {
+		stringstream ss; ss << "t" << ++i;
+		names[(*it)->getName()] = ss.str();
+	      }
+	  }
+
+	return names[n.getName()] + string(withSuffix ? "_l" : "");
+      }
+
+
+      // FIXME: remove dot prefix (when in dot namespace)
+      void dot_outputNode(ostream & os, const Node & n, const string & attr)
+      {
+	Mode mode = ModeData::data(os);
+	string dotName   = dot_getNodeName(n);
+	string dotName_l = dot_getNodeName(n, true);
+
+	os << dotName;
+
+	if (mode == NORMAL)
+	  os << "\t[" << attr << "]" << endl
+	     << " " << dotName_l << "\t[style=invis]" << endl
+	     << " " << dotName_l << " -> " << dotName
+	     << " [headlabel=\"" << n.getName() << "\"]";
+
+	if (mode == INNER)
+	  os << " " << dotName_l;
+      }
+
+
       ostream & operator<<(ostream & os, const pnapi::Place & p)
       {
 	switch (FormatData::data(os))
@@ -364,44 +420,35 @@ namespace pnapi
 
 
 	  case DOT:     /* PLACES: DOT     */
-	    switch (ModeData::data(os))
-	      {
-	      case ARC:
-		os << p.getName();
-		break;
+	    {
+	      // place attributes (used in NORMAL mode)
+	      stringstream attributes;
+	      if (p.getTokenCount() == 1)
+		attributes << "fillcolor=black peripheries=2 height=\".2\" "
+			   << "width=\".2\" ";
+	      else if (p.getTokenCount() > 1)
+		attributes << "label=\"" << p.getTokenCount() << "\" "
+			   << "fontcolor=black fontname=\"Helvetica\" ";
 
-	      case INNER:
-		os << p.getName();
-		if (p.getTokenCount() == 0)
-		  os << " " << p.getName() << "_l";
-		break;
+	      switch (p.getType())
+		{
+		case Node::INPUT:  
+		  attributes << "fillcolor=orange"; 
+		  break;
+		case Node::OUTPUT: 
+		  attributes << "fillcolor=yellow"; 
+		  break;
+		default: 
+		  if (p.wasInterface())
+		    attributes << "fillcolor=lightgoldenrod1";
+		  break;
+		}
 
-	      default:
-		os << " " << p.getName() << "\t[";
+	      // output the place as a node
+	      dot_outputNode(os, p, attributes.str());
+	      break;
+	    }
 
-		if (p.getTokenCount() == 1)
-		  os << "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
-		else if (p.getTokenCount() > 1)
-		  os << "label=\"" << p.getTokenCount() << "\" fontcolor=black "
-		     << "fontname=\"Helvetica\"";
-
-		switch (p.getType())
-		  {
-		  case (Node::INPUT):  os << "fillcolor=orange"; break;
-		  case (Node::OUTPUT): os << "fillcolor=yellow"; break;
-		  default:    break;
-		  }
-
-		if (p.wasInterface())
-		  os << "fillcolor=lightgoldenrod1";
-
-		os << "]" << endl
-
-		   << " " << p.getName() << "_l\t[style=invis]" << endl
-		   << " " << p.getName() << "_l -> " << p.getName()
-		   << " [headlabel=\"" << p.getName() << "\"]";
-	      }
-	    break;
 
 	  default: assert(false);   /* PLACES: <UNKNOWN> */
 	  }
@@ -429,42 +476,34 @@ namespace pnapi
 	       << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
 	    break;
 
+
 	  case DOT:     /* TRANSITIONS: DOT     */
-	    switch (ModeData::data(os))
-	      {
-	      case ARC:
-		os << t.getName();
-		break;
+	    {
+	      // transition attributes (used in NORMAL mode)
+	      stringstream attributes;
+	      switch(t.getType())
+		{
+		case(Node::INPUT):  attributes << "fillcolor=orange"; break;
+		case(Node::OUTPUT): attributes << "fillcolor=yellow"; break;
+		case(Node::INOUT):  attributes
+		    << "fillcolor=gold label=< <TABLE BORDER=\"1\""
+		    << " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
+		    << " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
+		    << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
+		    << " BGCOLOR=\"ORANGE\">"
+		    << "</TD></TR><TR>"
+		    << "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
+		    << " BGCOLOR=\"YELLOW\">"
+		    << "</TD></TR></TABLE> >";
+		  break;
+		default: break;
+		}
+	      
+	      // output the transition as a node
+	      dot_outputNode(os, t, attributes.str());
+	      break;
+	    }
 
-	      case INNER:
-		os << t.getName() << " " << t.getName() << "_l";
-		break;
-
-	      default:
-		os << " " << t.getName() << "\t[";
-		switch(t.getType())
-		  {
-		  case(Node::INPUT):  os << "fillcolor=orange"; break;
-		  case(Node::OUTPUT):	os << "fillcolor=yellow"; break;
-		  case(Node::INOUT):  os
-		      << "fillcolor=gold label=< <TABLE BORDER=\"1\""
-		      << " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
-		      << " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
-		      << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
-		      << " BGCOLOR=\"ORANGE\">"
-		      << "</TD></TR><TR>"
-		      << "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
-		      << " BGCOLOR=\"YELLOW\">"
-		      << "</TD></TR></TABLE> >";
-		    break;
-		  default: break;
-		  }
-		os << "]" << endl
-		   << " " << t.getName() << "_l\t[style=invis]" << endl
-		   << " " << t.getName() << "_l -> " << t.getName()
-		   << " [headlabel=\"" << t.getName() << "\"]";
-	      }
-	    break;
 
 	  default: assert(false);   /* TRANSITIONS: <UNKNOWN> */
 	  }

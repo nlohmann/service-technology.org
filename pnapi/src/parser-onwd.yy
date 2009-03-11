@@ -65,8 +65,8 @@ onwd: KEY_INSTANCE instances SYM_SEMICOLON
       KEY_WIRING   wirings   SYM_SEMICOLON 
       { node = new Node($2, $5); };
 
-instances: instance                     { $$ = new Node($1);     }
-         | instances SYM_COMMA instance { $$ = $1->addChild($3); }
+instances: instance                     { $$ = new Node(INSTANCES, $1); }
+         | instances SYM_COMMA instance { $$ = $1->addChild($3);        }
          ;
 
 instance: CL_IDENTIFIER /*SYM_COLON CL_STRING*/

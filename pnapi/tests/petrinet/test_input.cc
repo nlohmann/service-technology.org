@@ -111,10 +111,10 @@ int main(int argc, char * argv[])
   file1.close();
   file2.close();
 
-  /*
   begin_test("io::operator>>() [Petri net ONWD input]");
   try 
     { 
+      /*
       PetriNet net1;
       owfn1 >> owfn >> net1;
       map<string, PetriNet *> netsByName;
@@ -122,11 +122,32 @@ int main(int argc, char * argv[])
       onwd >> meta(pnapi::io::INPUTFILE, "<onwd>")
 	   >> nets(netsByName)
 	   >> pnapi::io::onwd >> net; 
+      */
+
+      /*
+      ifstream ifs;
+      map<string, PetriNet *> netsByName;
+
+      PetriNet airline;
+      ifs.open("airline.owfn");
+      ifs >> owfn >> airline;
+      ifs.close();
+      netsByName["airline"] = &airline;
+
+      PetriNet agency_traveler;
+      ifs.open("agency_traveler.owfn");
+      ifs >> owfn >> agency_traveler;
+      ifs.close();
+      netsByName["agency_traveler"] = &agency_traveler;
+
+      ifs.open("booking.onwd");
+      ifs >> onwd >> nets(netsByName) >> net;
+      ifs.close();
+      */
     }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
-  cout << owfn << net;
+  //cout << owfn << net;
   end_test();
-  */
 
   return 0;
 }

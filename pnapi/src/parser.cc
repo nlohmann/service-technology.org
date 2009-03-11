@@ -617,21 +617,13 @@ namespace pnapi
       /* typed node construction */
 
       Node::Node(Type type) :
-	type(type), number(0)
+	BaseNode(), type(type), number(0)
       {
       }
 
       Node::Node(Type type, Node * node) :
-	type(type), number(0)
+	BaseNode(node), type(type), number(0)
       {
-	assert(node != NULL);
-
-	if (node->type == DATA)
-	  mergeData(node);
-	else if (node->type == STRUCT)
-	  mergeChildren(node);
-	else
-	  addChild(node);
       }
 
       Node::Node(Type type, Node * node1, Node * node2) :
@@ -704,6 +696,13 @@ namespace pnapi
       {
 	switch (node.type)
 	  {
+	  case INSTANCES:
+	    for (map<string, PetriNet *>::iterator it = nets_.begin(); 
+		 it != nets_.end(); ++it)
+	      node.check(instances_.find(it->first) != instances_.end(), 
+			 it->first, "Petri net not declared as instance");
+	    break;
+
 	  case ANY_WIRING:
 	  case ALL_WIRING:
 	    {

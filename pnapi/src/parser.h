@@ -359,7 +359,7 @@ namespace pnapi
       enum Type 
 	{
 	  STRUCT, DATA, //< for simple structuring resp. data nodes
-	  INSTANCE, ANY_WIRING, ALL_WIRING, PLACE
+	  INSTANCES, INSTANCE, ANY_WIRING, ALL_WIRING, PLACE
 	};
 
 

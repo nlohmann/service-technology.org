@@ -147,15 +147,22 @@ int main(int argc, char** argv) {
         // collect parsed nets and store them in a mapping
         map<string, PetriNet *> netsByName;
         for (unsigned int i = 0; i < nets.size(); ++i) {
-            netsByName[names[i]] = &nets[i];
+            // strip extension
+            string name = names[i].substr(0, names[i].find_last_of("."));
+            netsByName[name] = &nets[i];
         }
         
         // create a new net consisting of the composed nets
         PetriNet net;
-        infile >> meta(io::INPUTFILE, args_info.wiring_arg)
-            >> meta(io::CREATOR, PACKAGE_STRING)
-            >> meta(io::INVOCATION, invocation)
-            >> io::onwd >> pnapi::io::nets(netsByName) >> net;
+        try {
+            infile >> meta(io::INPUTFILE, args_info.wiring_arg)
+                >> meta(io::CREATOR, PACKAGE_STRING)
+                >> meta(io::INVOCATION, invocation)
+                >> io::onwd >> pnapi::io::nets(netsByName) >> net;
+        } catch (io::InputError error) {
+            cerr << "petri:" << error << endl;
+            exit(EXIT_FAILURE);
+        }
 
         if (args_info.verbose_given) {
             cerr << "petri:" << args_info.wiring_arg << ".owfn: " << io::stat << net << endl;

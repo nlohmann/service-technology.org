@@ -29,6 +29,10 @@ namespace pnapi
      ***** Constructor() implementation
      **************************************************************************/
 
+    Operator::Operator()
+    {
+    }
+
     Operator::Operator(const Formula & f)
     {
       children_.insert(f.clone());
@@ -96,6 +100,11 @@ namespace pnapi
 
     Negation::Negation(const Negation & n) :
       Operator(n.children_)
+    {
+    }
+
+    Conjunction::Conjunction() :
+      Operator()
     {
     }
 

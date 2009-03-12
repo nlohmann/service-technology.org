@@ -372,6 +372,11 @@ namespace pnapi
 	      break;
 	    }
 
+	  case FORMULA_APE:
+	    formulas_.push(WildcardFormula(new Conjunction(), 
+					   (Places)&net_.getPlaces()));
+	    break;
+
 	  case FORMULA_AAOPE:
 	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getPlaces();
 	    // fallthrough intended

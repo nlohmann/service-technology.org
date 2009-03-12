@@ -42,6 +42,7 @@
 %token KEY_SYNCHRONIZE KEY_SYNCHRONOUS
 %token KEY_MARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
 %token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
+%token KEY_ALL_PLACES_EMPTY
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
 %token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
@@ -297,6 +298,7 @@ formula:
     LPAR formula RPAR      { $$ = $2;                            } 
   | KEY_TRUE               { $$ = new Node(FORMULA_TRUE);        }
   | KEY_FALSE              { $$ = new Node(FORMULA_FALSE);       }
+  | KEY_ALL_PLACES_EMPTY   { $$ = new Node(FORMULA_APE);         }
   | OP_NOT formula         { $$ = new Node(FORMULA_NOT, $2);     }
   | formula OP_OR formula  { $$ = new Node(FORMULA_OR, $1, $3);  }
   | formula OP_AND formula { $$ = new Node(FORMULA_AND, $1, $3); }

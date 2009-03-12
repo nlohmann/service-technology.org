@@ -55,6 +55,8 @@ namespace pnapi
     {
     public:
 
+      Operator();
+
       Operator(const Formula &);
 
       Operator(const Formula &, const Formula &);
@@ -102,6 +104,8 @@ namespace pnapi
     public:
 
       Conjunction(const Conjunction &);
+
+      Conjunction();
 
       Conjunction(const Formula &);
 

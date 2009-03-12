@@ -553,6 +553,8 @@ namespace pnapi
 		    else
 		      wildcard = " AND ALL_OTHER_PLACES_EMPTY";
 		  }
+		if (filteredChildren.empty() && !wildcard.empty())
+		  wildcard = "ALL_PLACES_EMPTY";
 		children = filteredChildren;
 	      }
 	  }

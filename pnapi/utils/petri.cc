@@ -258,6 +258,12 @@ int main(int argc, char** argv) {
                         outfile << io::owfn << nets[i];
                         break;
                     }
+                    
+                    // create LoLA output
+                    case (output_arg_lola): {
+                        outfile << io::lola << nets[i];
+                        break;
+                    }
 
                     // create automaton output
                     case (output_arg_sa): {

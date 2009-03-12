@@ -17,7 +17,7 @@ option "input" i
 option "output" o
   "Select the output file format(s)"
   typestr="FORMAT"
-  values="owfn","sa","dot","png","pdf","svg" enum
+  values="owfn","lola","sa","dot","png","pdf","svg" enum
   optional
   multiple
 

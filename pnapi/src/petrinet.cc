@@ -97,7 +97,9 @@ namespace pnapi
     // update pre- and postsets
     net_.arcs_.insert(&arc);
     arc.getTargetNode().preset_.insert(&arc.getSourceNode());
+    arc.getTargetNode().presetArcs_.insert(&arc);
     arc.getSourceNode().postset_.insert(&arc.getTargetNode());
+    arc.getSourceNode().postsetArcs_.insert(&arc);
 
     // update transition type
     arc.getTransition().updateType();
@@ -113,7 +115,9 @@ namespace pnapi
     // update pre- and postsets
     net_.arcs_.erase(&arc);
     arc.getTargetNode().preset_.erase(&arc.getSourceNode());
+    arc.getTargetNode().presetArcs_.erase(&arc);
     arc.getSourceNode().postset_.erase(&arc.getTargetNode());
+    arc.getSourceNode().postsetArcs_.erase(&arc);
 
     // update transition type
     arc.getTransition().updateType();

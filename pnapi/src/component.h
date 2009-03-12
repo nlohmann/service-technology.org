@@ -96,13 +96,13 @@ namespace pnapi
     const std::set<Node *> & getPreset() const;
 
     /// returns the arcs to the node's preset
-    std::set<Arc *> getPresetArcs() const;
+    const std::set<Arc *> & getPresetArcs() const;
 
     /// returns the node's postset
     const std::set<Node *> & getPostset() const;
 
     /// returns the arcs to the node's postset
-    std::set<Arc *> getPostsetArcs() const;
+    const std::set<Arc *> & getPostsetArcs() const;
 
 
   protected:
@@ -130,9 +130,15 @@ namespace pnapi
 
     /// the preset of this node
     std::set<Node*> preset_;
-
+    
+    /// the arcs to the preset of this node
+    std::set<Arc*> presetArcs_;
+    
     /// the postset of this node
     std::set<Node*> postset_;
+    
+    /// the arcs to the postset of this node
+    std::set<Arc*> postsetArcs_;
 
 
     /// no copying!

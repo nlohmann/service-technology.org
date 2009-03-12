@@ -87,13 +87,7 @@ using std::set;
 using namespace pnapi;
 
 
-#define __REDUCE_CHECK_FINAL(x) (__reduce_check_final(this,x))
-
-bool __reduce_check_final(PetriNet* net, Place* p)
-{
-  set<const Place*> concerningPlaces = net->finalCondition().concerningPlaces();
-  return (concerningPlaces.find(p) == concerningPlaces.end());
-}
+#define __REDUCE_CHECK_FINAL(x) (finalCondition().concerningPlaces().count(x) == 0)
 
 
 /******************************************************************************
@@ -243,7 +237,7 @@ unsigned int PetriNet::reduce_dead_nodes()
         {
           if((*a)->getWeight() <= (*p)->getTokenCount())	
           {
-            arcs=false; // the exists a transition that can fire
+            arcs=false; // there exists a transition that can fire
           }
         }
         if(arcs) // precondition 2
@@ -1656,7 +1650,9 @@ unsigned int PetriNet::reduce_identical_places()
   {
     if( (backupPlaces[*p1]) ||
         (!(__REDUCE_CHECK_FINAL(*p1))) ) // precondition 6
+    {
       continue;
+    }
     
     {
       // precondition 4
@@ -1665,23 +1661,29 @@ unsigned int PetriNet::reduce_identical_places()
       // check preset
       for(set<Arc*>::iterator a = (*p1)->getPresetArcs().begin();
            a != (*p1)->getPresetArcs().end(); ++a)
+      {
         if((*a)->getWeight() != 1)
         {
           precond4 = true;
           break;
         }
+      }
       
       // check postset
       for(set<Arc*>::iterator a = (*p1)->getPostsetArcs().begin();
            a != (*p1)->getPostsetArcs().end(); ++a)
+      {
         if(((*a)->getWeight() != 1) || (precond4))
         {
           precond4 = true;
           break;
         }
+      }
       
       if(precond4)
-        continue;      
+      {
+        continue;
+      }
     }
     
     

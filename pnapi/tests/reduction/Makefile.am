@@ -67,6 +67,10 @@ LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.a
 TESTS_ENVIRONMENT = srcdir=$(srcdir) builddir=$(builddir)
 
 EXTRA_DIST = copy_owfns.sh \
-	     owfn/test_dead_nodes.owfn
+	     owfn/test_dead_nodes.owfn \
+	     owfn/test_identical_places.owfn \
+	     owfn/test_unused_status_places.owfn
 
-DISTCLEANFILES = test_dead_nodes.owfn
+DISTCLEANFILES = test_dead_nodes.owfn \
+		 test_identical_places.owfn \
+		 test_unused_status_places.owfn

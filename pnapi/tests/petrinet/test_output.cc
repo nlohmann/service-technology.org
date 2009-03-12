@@ -7,6 +7,7 @@ using std::ostringstream;
 
 using pnapi::io::owfn;
 using pnapi::io::dot;
+using pnapi::io::lola;
 using pnapi::io::meta;
 using pnapi::io::INVOCATION;
 
@@ -26,6 +27,12 @@ int main(int argc, char * argv[])
   net.createArc(t2, p2);
   net.finalCondition() = p1 == 2 && p2 == 4 || p3 > 1;
   
+  /*
+  begin_test("io::operator<<() [Petri net LOLA output]");
+  cout << lola << net;
+  end_test();
+  */
+
   /*
   begin_test("io::operator<<() [Petri net OWFN output]");
   owfnResult << owfn << net;

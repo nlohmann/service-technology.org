@@ -15,6 +15,19 @@
  * \version $Revision$
  */
 
+
+/* 
+ * FOR IMPLEMENTORS:
+ *
+ * Some tasks are marked by keywords in the code, so you can jump/grep the files
+ * by looking for the keywords. They are:
+ *
+ * - FORMAT IMPLEMENTATION: where to add/change code when implementing a format
+ *
+ * Feel free to improve these helpers!
+ */
+
+
 #ifndef PNAPI_IO_H
 #define PNAPI_IO_H
 
@@ -28,7 +41,7 @@
 namespace pnapi
 {
 
-  // forward declaration
+  // forward declarations
   class PetriNet;
   class Condition;
   class Automaton;
@@ -119,6 +132,7 @@ namespace pnapi
 
     /// %Automaton output
     std::ostream & operator<<(std::ostream &, const Automaton &);
+
     /// %ServiceAutomaton output
     std::ostream & operator<<(std::ostream &, const ServiceAutomaton &);
 
@@ -131,6 +145,8 @@ namespace pnapi
      * changing format and meta information
      */
     //@{
+
+    /* FORMAT IMPLEMENTATION: add signature for format manipulator */
 
     /// Open WorkFlow Net (OWFN) file format
     std::ios_base & owfn(std::ios_base &);
@@ -147,6 +163,9 @@ namespace pnapi
     /// Service Automaton (SA) file format
     std::ostream & sa(std::ostream &);
 
+    /// LOLA file format
+    std::ostream & lola(std::ostream &);
+
     /// meta information manipulator
     util::Manipulator<std::pair<MetaInformation, std::string> >
     meta(MetaInformation, const std::string &);
@@ -162,7 +181,7 @@ namespace pnapi
 
 
   /*************************************************************************
-   ***** INTERNAL UTILITIES
+   ***** INTERNAL UTILITIES AND FORMAT IMPLEMENTATION
    *************************************************************************/
 
   // forward declarations
@@ -191,6 +210,23 @@ namespace pnapi
   namespace io
   {
 
+    /* FORMAT IMPLEMENTATION: add namespace with format specific functions */
+
+
+    /*!
+     * \brief   LOLA I/O implementation
+     */
+    namespace __lola
+    {
+
+      std::ostream & output(std::ostream &, const PetriNet &);
+      std::ostream & output(std::ostream &, const Arc &);
+      std::ostream & output(std::ostream &, const Place &);
+      std::ostream & output(std::ostream &, const Transition &);
+
+    } /* namespace __lola */
+
+
     /*!
      * \brief   Utility Classes and Functions for pnapi::io
      */
@@ -199,8 +235,10 @@ namespace pnapi
 
       /*** ENUM CONSTANTS ***/
 
+      /* FORMAT IMPLEMENTATION: add format constant */
+
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA };
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, LOLA };
 
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
@@ -256,6 +294,7 @@ namespace pnapi
 				    const formula::Formula *);
 
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
+      std::set<Arc *> filterInternalArcs(const std::set<Arc *> &);
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);
 
@@ -412,9 +451,6 @@ namespace pnapi
     } /* namespace util */
 
 
-    /*!
-     * implementation of template function
-     */
     template <typename T>
     std::istream & operator>>(std::istream & is, const util::Manipulator<T> m)
     {
@@ -422,8 +458,9 @@ namespace pnapi
       return is;
     }
 
-  }
 
-}
+  } /* namespace io */
+
+} /* namespace pnapi */
 
 #endif

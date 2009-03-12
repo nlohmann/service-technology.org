@@ -114,6 +114,7 @@ namespace pnapi
   void PetriNet::output_dot(ostream & os) const
   {
     bool interface = true;
+    string filename = getMetaInformation(os, io::INPUTFILE);
 
     os  //< output everything to this stream
 
@@ -124,8 +125,7 @@ namespace pnapi
       << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
       << " remincross=true label=\""
       //<< (reduced ? "structurally reduced " : "")
-      << "Petri net" 
-      //<< " generated from " << filename 
+      << "Petri net" << (filename.empty() ? "" : " generated from " + filename)
       << "\"]" 
       << endl
 
@@ -728,108 +728,6 @@ void PetriNet::output_apnn(ostream & os) const
   (*output) << endl;
 
   (*output) << "\\endnet" << endl;
-}
-
-
-
-
-
-/*!
- * \brief   LoLA-output
- *
- *          Outputs the net in LoLA-format.
- *
- * \param   output  output stream
- *
- * \pre     output != NULL
- *
- * \todo    Add syntax reference.
- */
-void PetriNet::output_lola(ostream & os) const
-{
-  ostream * output = &os;
-
-  assert(output != NULL);
-
-  //(*output) << "{ Petri net created by " << getPackageString() << " reading " << globals::filename << " }" << endl << endl;
-
-  {
-    /************************
-     * STANDARD LOLA FORMAT *
-     ************************/
-
-    // places (only internal)
-    (*output) << "PLACE" << endl;
-    unsigned int count = 1;
-    for (set<Place *>::iterator p = places_.begin(); p != places_.end(); count++, p++)
-    {
-      (*output) << "  " << (*p)->getName();
-
-      if (count < places_.size())
-        (*output) << "," << endl;
-    }
-    (*output) << endl << ";" << endl << endl << endl;
-  }
-
-
-  // from here on, both standard LoLA and I/O-annotated LoLA formats are equal
-
-
-  // initial marking
-  (*output) << "MARKING" << endl;
-  unsigned int count = 1;
-  for (set<Place *>::iterator p = places_.begin(); p != places_.end(); p++)
-  {
-    if ((*p)->getTokenCount() > 0)
-    {
-      if (count++ != 1)
-        (*output) << "," << endl;
-
-      (*output) << "  " << (*p)->getName() << ":\t" << (*p)->getTokenCount();
-    }
-  }
-  (*output) << endl << ";" << endl << endl << endl;
-
-
-  // transitions
-  for (set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-  {
-    (*output) << "TRANSITION " << (*t)->getName() << endl;
-
-    (*output) << "CONSUME" << endl;
-    count = 1;
-    for (set<Node *>::iterator pre = (*t)->getPreset().begin(); pre != (*t)->getPreset().end(); count++, pre++)
-    {
-      // ignore input places
-      // FIXME: if ( (*pre)->nodeType == PLACE )
-        if ( inputPlaces_.find(static_cast<Place*>(*pre)) != inputPlaces_.end())
-          continue;
-
-	(*output) << "  " << (*pre)->getName() << ":\t" << findArc(**pre, **t)->getWeight();
-
-      if (count < (*t)->getPreset().size())
-        (*output) << "," << endl;
-    }
-    (*output) << ";" << endl;
-
-    (*output) << "PRODUCE" << endl;
-    count = 1;
-    for (set<Node *>::iterator post = (*t)->getPostset().begin(); post != (*t)->getPostset().end(); count++, post++)
-    {
-      // ignore output places
-      //FIXME: if ( (*post)->nodeType == PLACE )
-        if ( outputPlaces_.find(static_cast<Place*>(*post)) != outputPlaces_.end())
-          continue;
-
-	(*output) << "  " << (*post)->getName() << ":\t" << findArc(**t, **post)->getWeight();
-
-      if (count < (*t)->getPostset().size())
-        (*output) << "," << endl;
-    }
-
-    (*output) << ";" << endl << endl;
-  }
-  (*output) << "{ END OF FILE }" << endl;
 }
 
 }

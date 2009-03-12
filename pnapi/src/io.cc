@@ -14,6 +14,7 @@ using std::endl;
 #include "parser.h"
 #include "formula.h"
 #include "io.h"
+#include "config.h"
 
 using std::pair;
 using std::string;
@@ -25,82 +26,100 @@ using std::stringstream;
 
 using pnapi::formula::Formula;
 
+using pnapi::io::util::mode;
+using pnapi::io::util::delim;
+using pnapi::io::util::ModeData;
+using pnapi::io::util::filterMarkedPlaces;
+using pnapi::io::util::filterInternalArcs;
+
 namespace pnapi
 {
 
   namespace io
   {
 
-    std::ios_base & owfn(std::ios_base & ios)
+    /*************************************************************************
+     ***** LOLA output
+     *************************************************************************/
+
+    std::ostream & lola(std::ostream & ios)
     {
-      util::FormatData::data(ios) = util::OWFN;
+      util::FormatData::data(ios) = util::LOLA;
       return ios;
     }
 
-    std::istream & onwd(std::istream & ios)
+
+    namespace __lola
     {
-      util::FormatData::data(ios) = util::ONWD;
-      return ios;
-    }
 
-    std::ostream & stat(std::ostream & ios)
-    {
-      util::FormatData::data(ios) = util::STAT;
-      return ios;
-    }
+      ostream & output(ostream & os, const PetriNet & net)
+      {
+	using util::operator<<;
 
-    std::ostream & dot(std::ostream & ios)
-    {
-      util::FormatData::data(ios) = util::DOT;
-      return ios;
-    }
+	string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
+	string inputfile = net.getMetaInformation(os, INPUTFILE);
 
-    std::ostream & sa(std::ostream &os)
-    {
-      util::FormatData::data(os) = util::SA;
-      return os;
-    }
+	return os //< output everything to this stream
+ 
+	  << "{ Petri net created by " << creator 
+	  << (inputfile.empty() ? "" : " reading " + inputfile)
+	  << " }" << endl 
+	  << endl
 
-    util::Manipulator<std::pair<MetaInformation, std::string> >
-    meta(MetaInformation i, const std::string & s)
-    {
-      return util::MetaManipulator(pair<MetaInformation, string>(i, s));
-    }
+	  << "PLACE" << mode(util::PLACE) << endl
+	  << "  " << delim(", ") << net.internalPlaces_ << ";" << endl
+	  << endl
 
-    util::Manipulator<std::map<std::string, PetriNet *> >
-    nets(std::map<std::string, PetriNet *> & nets)
-    {
-      return util::PetriNetManipulator(nets);
-    }
+	  << "MARKING" << mode(util::PLACE_TOKEN) << endl
+	  << "  " << filterMarkedPlaces(net.internalPlaces_) << ";" << endl
+	  << endl << endl
+
+	  // transitions
+	  << delim("\n") << net.transitions_ << endl
+	  << endl 
+	  
+	  << "{ END OF FILE }" << endl;
+      }
 
 
-    /*!
-     */
-    InputError::InputError(Type type, const string & filename, int line,
-			   const string & token, const string & msg) :
-      type(type), message(msg), token(token), line(line), filename(filename)
-    {
-    }
+      ostream & output(ostream & os, const Place & p)
+      {
+	os << p.getName();
+	if (ModeData::data(os) == util::PLACE_TOKEN && p.getTokenCount() != 1)
+	  os << ": " << p.getTokenCount();
+	return os;
+      }
 
 
-    /*!
-     */
-    std::ostream & operator<<(std::ostream & os, const io::InputError & e)
-    {
-      os << e.filename << ":" << e.line << ": error";
-      if (!e.token.empty())
-	switch (e.type)
-	  {
-	  case io::InputError::SYNTAX_ERROR:
-	    os << " near '" << e.token << "'";
-	    break;
-	  case io::InputError::SEMANTIC_ERROR:
-	    os << ": '" << e.token << "'";
-	    break;
-	  }
-      return os << ": " << e.message;
-    }
+      ostream & output(ostream & os, const Transition & t)
+      {
+	using util::operator<<;
 
+	return os 
+	  << "TRANSITION " << t.getName() << endl
+	  << delim(", ")
+	  << "  CONSUME " 
+	  << filterInternalArcs(t.getPresetArcs())  << ";" << endl
+	  << "  PRODUCE " 
+	  << filterInternalArcs(t.getPostsetArcs()) << ";" << endl;
+      }
+
+
+      ostream & output(ostream & os, const Arc & arc)
+      {
+	os << arc.getPlace().getName();
+	if (arc.getWeight() != 1)
+	  os << ":" << arc.getWeight();
+	return os;
+      }
+
+    } /* namespace __lola */
+
+
+
+    /*************************************************************************
+     ***** I/O implementation
+     *************************************************************************/
 
     /*!
      * Stream the PetriNet object to a given output stream, using the
@@ -108,24 +127,28 @@ namespace pnapi
      */
     std::ostream & operator<<(std::ostream & os, const PetriNet & net)
     {
-        switch (util::FormatData::data(os))
-        {
-            case util::OWFN:   net.output_owfn  (os); break;
-            case util::DOT:    net.output_dot   (os); break;
-            case util::GASTEX: net.output_gastex(os); break;
+      switch (util::FormatData::data(os))
+	{
+	  /* PETRINET FORMAT IMPLEMENTATION: add case label */
 
-            case util::STAT:
-                os << "|P|= "     << net.internalPlaces_.size()+net.inputPlaces_.size()+net.outputPlaces_.size() << "  ";
-                os << "|P_in|= "  << net.inputPlaces_.size()    << "  ";
-                os << "|P_out|= " << net.outputPlaces_.size()   << "  ";
-                os << "|T|= "     << net.transitions_.size()    << "  ";
-                os << "|F|= "     << net.arcs_.size();
-            break;
+	case util::LOLA:   __lola::output(os, net); break;
 
-            default: assert(false);
-        }
+	case util::OWFN:   net.output_owfn  (os); break;
+	case util::DOT:    net.output_dot   (os); break;
+	case util::GASTEX: net.output_gastex(os); break;
 
-        return os;
+	case util::STAT:
+	  os << "|P|= "     << net.places_.size()       << "  "
+	     << "|P_in|= "  << net.inputPlaces_.size()  << "  "
+	     << "|P_out|= " << net.outputPlaces_.size() << "  "
+	     << "|T|= "     << net.transitions_.size()  << "  "
+	     << "|F|= "     << net.arcs_.size();
+	  break;
+
+	default: assert(false);
+	}
+
+      return os;
     }
 
 
@@ -201,6 +224,77 @@ namespace pnapi
 	}
 
       return is;
+    }
+
+
+    std::ios_base & owfn(std::ios_base & ios)
+    {
+      util::FormatData::data(ios) = util::OWFN;
+      return ios;
+    }
+
+    std::istream & onwd(std::istream & ios)
+    {
+      util::FormatData::data(ios) = util::ONWD;
+      return ios;
+    }
+
+    std::ostream & stat(std::ostream & ios)
+    {
+      util::FormatData::data(ios) = util::STAT;
+      return ios;
+    }
+
+    std::ostream & dot(std::ostream & ios)
+    {
+      util::FormatData::data(ios) = util::DOT;
+      return ios;
+    }
+
+    std::ostream & sa(std::ostream &os)
+    {
+      util::FormatData::data(os) = util::SA;
+      return os;
+    }
+
+    util::Manipulator<std::pair<MetaInformation, std::string> >
+    meta(MetaInformation i, const std::string & s)
+    {
+      return util::MetaManipulator(pair<MetaInformation, string>(i, s));
+    }
+
+    util::Manipulator<std::map<std::string, PetriNet *> >
+    nets(std::map<std::string, PetriNet *> & nets)
+    {
+      return util::PetriNetManipulator(nets);
+    }
+
+
+    /*!
+     */
+    InputError::InputError(Type type, const string & filename, int line,
+			   const string & token, const string & msg) :
+      type(type), message(msg), token(token), line(line), filename(filename)
+    {
+    }
+
+
+    /*!
+     */
+    std::ostream & operator<<(std::ostream & os, const io::InputError & e)
+    {
+      os << e.filename << ":" << e.line << ": error";
+      if (!e.token.empty())
+	switch (e.type)
+	  {
+	  case io::InputError::SYNTAX_ERROR:
+	    os << " near '" << e.token << "'";
+	    break;
+	  case io::InputError::SEMANTIC_ERROR:
+	    os << ": '" << e.token << "'";
+	    break;
+	  }
+      return os << ": " << e.message;
     }
 
 
@@ -289,6 +383,16 @@ namespace pnapi
       }
 
 
+      set<Arc *> filterInternalArcs(const set<Arc *> & arcs)
+      {
+	set<Arc *> filtered;
+	for (set<Arc *>::iterator it = arcs.begin(); it != arcs.end(); ++it)
+	  if ((*it)->getPlace().getType() == Place::INTERNAL)
+	    filtered.insert(*it);
+	return filtered;
+      }
+
+
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const set<Place *> & places)
       {
@@ -319,6 +423,8 @@ namespace pnapi
 
 	switch (FormatData::data(os))
 	  {
+	  case LOLA: return __lola::output(os, arc);
+
 	  case OWFN:    /* ARCS: OWFN    */
 	    os << arc.getPlace().getName();
 	    if (arc.getWeight() != 1)
@@ -411,6 +517,8 @@ namespace pnapi
       {
 	switch (FormatData::data(os))
 	  {
+	  case LOLA: return __lola::output(os, p);
+
 	  case OWFN:    /* PLACES: OWFN    */
 	    os << p.getName();
 	    if (ModeData::data(os) == PLACE_TOKEN &&
@@ -460,6 +568,8 @@ namespace pnapi
       {
 	switch (FormatData::data(os))
 	  {
+	  case LOLA: return __lola::output(os, t);
+
 	  case OWFN:    /* TRANSITIONS: OWFN    */
 	    os << "TRANSITION " << t.getName() << endl;
 	    /*
@@ -630,8 +740,8 @@ namespace pnapi
         return os;
       }
 
-    }
+    } /* namespace util */
 
-  }
+  } /* namespace io */
 
-}
+} /* namespace pnapi */

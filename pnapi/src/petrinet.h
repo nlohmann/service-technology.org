@@ -100,6 +100,9 @@ namespace pnapi
     /// Petri net output, see pnapi::io
     friend std::ostream & io::operator<<(std::ostream &, const PetriNet &);
 
+    /// Petri net output, see pnapi::io
+    friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
+
     /// Petri net input, see pnapi::io
     friend std::istream & io::operator>>(std::istream &, PetriNet &) throw (io::InputError);
 
@@ -335,7 +338,7 @@ namespace pnapi
 
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
-			      const std::string & = "") const;
+				   const std::string & = "") const;
 
 
     /* petrify */

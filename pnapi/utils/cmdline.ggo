@@ -27,6 +27,7 @@ option "wiring" w
   string
   optional
 
+
 defmode "Check for Structural Properties"
 
 modeoption "isFreeChoice" -
@@ -65,6 +66,11 @@ modeoption "reduce" r
 
 modeoption "normalize" n
   "Normalize the Petri net, i.e. change to structure such that every transition is connected to at most one interface place."
+  mode="Modifications"
+  flag off
+
+modeoption "negate" N
+  "Negate the final condition of the net, i.e. every specified final marking is now non-final. The result is the 'anti open net'."
   mode="Modifications"
   flag off
 

@@ -190,6 +190,17 @@ int main(int argc, char** argv) {
             nets[i].normalize();
         }
     }
+    
+    if (args_info.negate_given) {
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+
+            if (args_info.verbose_given) {
+                cerr << "petri: negating the final condition of net '" << names[i] << "'..." << endl;
+            }
+
+            nets[i].finalCondition().negate();
+        }        
+    }
 
 
     /***********************

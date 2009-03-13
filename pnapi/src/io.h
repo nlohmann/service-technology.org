@@ -287,6 +287,17 @@ namespace pnapi
       std::ostream & output(std::ostream &, const Arc &);
       std::ostream & output(std::ostream &, const Place &);
       std::ostream & output(std::ostream &, const Transition &);
+      std::ostream & output(std::ostream &, const formula::Negation &);
+      std::ostream & output(std::ostream &, const formula::Conjunction &);
+      std::ostream & output(std::ostream &, const formula::Disjunction &);
+      std::ostream & output(std::ostream &, const formula::FormulaTrue &);
+      std::ostream & output(std::ostream &, const formula::FormulaFalse &);
+      std::ostream & output(std::ostream &, const formula::FormulaEqual &);
+      std::ostream & output(std::ostream &, const formula::FormulaNotEqual &);
+      std::ostream & output(std::ostream &, const formula::FormulaLess &);
+      std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
+      std::ostream & output(std::ostream &, const formula::FormulaGreater &);
+      std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
     } /* namespace __lola */
 
 
@@ -315,6 +326,17 @@ namespace pnapi
       std::ostream & output(std::ostream &, const Arc &);
       std::ostream & output(std::ostream &, const Place &);
       std::ostream & output(std::ostream &, const Transition &);
+      std::ostream & output(std::ostream &, const formula::Negation &);
+      std::ostream & output(std::ostream &, const formula::Conjunction &);
+      std::ostream & output(std::ostream &, const formula::Disjunction &);
+      std::ostream & output(std::ostream &, const formula::FormulaTrue &);
+      std::ostream & output(std::ostream &, const formula::FormulaFalse &);
+      std::ostream & output(std::ostream &, const formula::FormulaEqual &);
+      std::ostream & output(std::ostream &, const formula::FormulaNotEqual &);
+      std::ostream & output(std::ostream &, const formula::FormulaLess &);
+      std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
+      std::ostream & output(std::ostream &, const formula::FormulaGreater &);
+      std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
     }
 
 

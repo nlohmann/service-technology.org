@@ -1,3 +1,4 @@
+#include <cassert>
 #include <sstream>
 
 #include "config.h"
@@ -348,6 +349,10 @@ namespace pnapi
 	  // transitions
 	  << delim("\n") << net.transitions_ << endl
 	  << endl 
+
+	  << "FORMULA" << endl
+	  << "  EXPATH EVENTUALLY " << net.condition_ << endl
+	  << endl
 	  
 	  << "{ END OF FILE }" << endl;
       }
@@ -377,6 +382,85 @@ namespace pnapi
       ostream & output(ostream & os, const Arc & arc)
       {
 	return os << arc.getPlace().getName() << ":" << arc.getWeight();
+      }
+
+
+      ostream & output(ostream & os, const formula::Negation & f)
+      {
+	return os << "NOT (" << **f.children().begin() << ")";
+      }
+
+
+      ostream & output(ostream & os, const formula::Conjunction & f)
+      {
+	if (f.children().empty())
+	  return os << formula::FormulaTrue();
+	else
+	  return os << "(" << delim(" AND ") << f.children() << ")";
+      }
+
+
+      ostream & output(ostream & os, const formula::Disjunction & f)
+      {
+	if (f.children().empty())
+	  return os << formula::FormulaFalse();
+	else
+	  return os << "(" << delim(" OR ") << f.children() << ")";
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaTrue &)
+      {
+	// FIXME: how to represent TRUE in LOLA?
+	// suggestions: 
+	// - <empty formula>
+	// - p >= 0       (requires non-empty net and access to place reference)
+	assert(false);
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaFalse &)
+      {
+	// FIXME: how to represent FALSE in LOLA?
+	// suggestions:
+	// - p < 0       (requires non-empty net and access to place reference)
+	assert(false);
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaEqual & f)
+      {
+	return os << f.place().getName() << " = " << f.tokens();
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaNotEqual & f)
+      {
+	return os << f.place().getName() << " # " << f.tokens();
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaGreater & f)
+      {
+	return os << f.place().getName() << " > " << f.tokens();
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
+      {
+	return os << f.place().getName() << " >= " << f.tokens();
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaLess & f)
+      {
+	return os << f.place().getName() << " < " << f.tokens();
+      }
+
+
+      ostream & output(ostream & os, const formula::FormulaLessEqual & f)
+      {
+	return os << f.place().getName() << " <= " << f.tokens();
       }
 
     } /* namespace __lola */
@@ -478,19 +562,14 @@ namespace pnapi
 	return os;
       }
 
-    } /* namespace __owfn */
 
-    
-    namespace util  // formula output, only used by owfn so far
-    {
-
-      ostream & operator<<(ostream & os, const formula::Negation & f)
+      ostream & output(ostream & os, const formula::Negation & f)
       {
 	return os << "NOT (" << **f.children().begin() << ")";
       }
 
 
-      ostream & operator<<(ostream & os, const formula::Conjunction & f)
+      ostream & output(ostream & os, const formula::Conjunction & f)
       {
 	string wildcard;
 	set<const Formula *> children = f.children();
@@ -527,7 +606,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::Disjunction & f)
+      ostream & output(ostream & os, const formula::Disjunction & f)
       {
 	if (f.children().empty())
 	  return os << formula::FormulaFalse();
@@ -536,54 +615,54 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaTrue &)
+      ostream & output(ostream & os, const formula::FormulaTrue &)
       {
 	return os << "TRUE";
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaFalse &)
+      ostream & output(ostream & os, const formula::FormulaFalse &)
       {
 	return os << "FALSE";
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaEqual & f)
+      ostream & output(ostream & os, const formula::FormulaEqual & f)
       {
 	return os << f.place().getName() << " = " << f.tokens();
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaNotEqual & f)
+      ostream & output(ostream & os, const formula::FormulaNotEqual & f)
       {
 	return os << f.place().getName() << " != " << f.tokens();
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaGreater & f)
+      ostream & output(ostream & os, const formula::FormulaGreater & f)
       {
 	return os << f.place().getName() << " > " << f.tokens();
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaGreaterEqual & f)
+      ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
       {
 	return os << f.place().getName() << " >= " << f.tokens();
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaLess & f)
+      ostream & output(ostream & os, const formula::FormulaLess & f)
       {
 	return os << f.place().getName() << " < " << f.tokens();
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
+      ostream & output(ostream & os, const formula::FormulaLessEqual & f)
       {
 	return os << f.place().getName() << " <= " << f.tokens();
       }
 
-    } /* namespace util */
+    } /* namespace __owfn */
 
   } /* namespace io */
 

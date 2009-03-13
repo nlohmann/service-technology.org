@@ -164,8 +164,147 @@ namespace pnapi
       }
 
 
-      /* FORMAT IMPLEMENTATION: formula output is in io-format.cc (owfn) */
-      /*        should be split up like above if used in a second format */
+      ostream & operator<<(ostream & os, const formula::Negation & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::Conjunction & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::Disjunction & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaTrue & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaFalse & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaEqual & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaNotEqual & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaGreater & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaGreaterEqual & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaLess & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case LOLA: return __lola::output(os, f);
+	  case OWFN: return __owfn::output(os, f);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
 
 
     } /* namespace util */

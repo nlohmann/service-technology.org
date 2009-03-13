@@ -411,11 +411,11 @@ void parse_command_line(int argc, char* argv[]) {
             case 'h':
                 options[O_HELP] = true;
                 print_help();
-                setExitCode(0);
+                exit(0);
             case 'v':
                 options[O_VERSION] = true;
                 print_version();
-                setExitCode(0);
+                exit(0);
             case 'd':
                 options[O_DEBUG] = true;
                 if (string(optarg) == "1") {

@@ -79,6 +79,8 @@
 //#include "debug.h"		// (trace)
 
 using std::cerr;
+using std::cout;
+using std::flush;
 using std::endl;
 using std::list;
 using std::pair;
@@ -2150,8 +2152,8 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
              (!( (t1->getType() != Node::INTERNAL) && 
                  (t2->getType() != Node::INTERNAL) && 
                  (keepNormal)) ) && //precondition 4
-             ((*((*p)->getPresetArcs().begin()))->getWeight() != 1) && // precondition 5
-             ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) ) // precondition 5
+             ((*((*p)->getPresetArcs().begin()))->getWeight() == 1) && // precondition 5
+             ((*((*p)->getPostsetArcs().begin()))->getWeight() == 1) ) // precondition 5
         {
             uselessPlaces.insert(*p);
             seenTransitions[t1] = true;

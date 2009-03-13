@@ -69,8 +69,20 @@ TESTS_ENVIRONMENT = srcdir=$(srcdir) builddir=$(builddir)
 EXTRA_DIST = copy_owfns.sh \
 	     owfn/test_dead_nodes.owfn \
 	     owfn/test_identical_places.owfn \
+	     owfn/test_identical_transitions.owfn \
+	     owfn/test_series_places.owfn \
+	     owfn/test_series_transitions.owfn \
+	     owfn/test_series_transitions_keepnormal.owfn \
+	     owfn/test_self_loop_places.owfn \
+	     owfn/test_self_loop_transitions.owfn \
 	     owfn/test_unused_status_places.owfn
 
 DISTCLEANFILES = test_dead_nodes.owfn \
 		 test_identical_places.owfn \
+		 test_identical_transitions.owfn \
+		 test_series_places.owfn \
+		 test_series_transitions.owfn \
+		 test_series_transitions_keepnormal.owfn \
+		 test_self_loop_places.owfn \
+		 test_self_loop_transitions.owfn \
 		 test_unused_status_places.owfn

@@ -1,3 +1,7 @@
+/*
+ * Test net taken from [Pil08] Picture 3.3.
+ */
+
 #include <fstream>
 
 #include "test.h"

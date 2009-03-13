@@ -102,6 +102,9 @@ namespace pnapi
     /// (excluding empty places)
     std::set<const Place *> concerningPlaces() const;
 
+    /// negates the formula
+    void negate();
+
 
   private:
 

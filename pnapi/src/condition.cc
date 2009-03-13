@@ -169,4 +169,9 @@ namespace pnapi
     return formula_->places(true);
   }
 
+  void Condition::negate()
+  {
+    *this = !formula();
+  }
+
 }

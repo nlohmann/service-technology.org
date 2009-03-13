@@ -58,11 +58,12 @@ defmode "Modifications"
 
 modeoption "reduce" r
   "Apply structural reduction rules, i.e. reduce the structure of the net while preserving liveness and boundedness."
-  typestr="LEVEL" int
-  values="0","1","2","3","4","5"
+  typestr="RULES"
+  values="0","1","2","3","4","5","6","starke","pillat","dead_nodes","identical_places","identical_transitions","series_places","series_transitions","self_loop_places","self_loop_transitions","equal_places","starke3p","starke3t","starke4","starke5","starke6","starke7","starke8","starke9" enum
   default="0"
   mode="Modifications"
   optional
+  multiple
 
 modeoption "normalize" n
   "Normalize the Petri net, i.e. change to structure such that every transition is connected to at most one interface place."

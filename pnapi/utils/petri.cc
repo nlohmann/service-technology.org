@@ -206,14 +206,51 @@ int main(int argc, char** argv) {
     /***********************
     * STRUCTURAL REDUCTION *
     ***********************/
-    if (args_info.reduce_given && args_info.reduce_arg > 0) {
+    if (args_info.reduce_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
+
+            PetriNet::ReductionLevel level = PetriNet::NONE;
+            
+            // collect the chosen reduction rules
+            for (unsigned int j = 0; j < args_info.reduce_given; ++j) {
+                PetriNet::ReductionLevel newLevel = PetriNet::NONE;
+                
+                switch(args_info.reduce_arg[j]) {
+                    case(reduce_arg_1): newLevel = PetriNet::LEVEL_1; break;
+                    case(reduce_arg_2): newLevel = PetriNet::LEVEL_2; break;
+                    case(reduce_arg_3): newLevel = PetriNet::LEVEL_3; break;
+                    case(reduce_arg_4): newLevel = PetriNet::LEVEL_4; break;
+                    case(reduce_arg_5): newLevel = PetriNet::LEVEL_5; break;
+                    case(reduce_arg_6): newLevel = PetriNet::LEVEL_6; break;
+                    case(reduce_arg_starke): newLevel = PetriNet::SET_STARKE; break;
+                    case(reduce_arg_pillat): newLevel = PetriNet::SET_PILLAT; break;
+                    case(reduce_arg_dead_nodes): newLevel = PetriNet::DEAD_NODES; break;
+                    case(reduce_arg_identical_places): newLevel = PetriNet::IDENTICAL_PLACES; break;
+                    case(reduce_arg_identical_transitions): newLevel = PetriNet::IDENTICAL_TRANSITIONS; break;
+                    case(reduce_arg_series_places): newLevel = PetriNet::SERIES_PLACES; break;
+                    case(reduce_arg_series_transitions): newLevel = PetriNet::SERIES_TRANSITIONS; break;
+                    case(reduce_arg_self_loop_places): newLevel = PetriNet::SELF_LOOP_PLACES; break;
+                    case(reduce_arg_self_loop_transitions): newLevel = PetriNet::SELF_LOOP_TRANSITIONS; break;
+                    case(reduce_arg_equal_places): newLevel = PetriNet::EQUAL_PLACES; break;
+                    case(reduce_arg_starke3p): newLevel = PetriNet::STARKE_RULE_3_PLACES; break;
+                    case(reduce_arg_starke3t): newLevel = PetriNet::STARKE_RULE_3_TRANSITIONS; break;
+                    case(reduce_arg_starke4): newLevel = PetriNet::STARKE_RULE_4; break;
+                    case(reduce_arg_starke5): newLevel = PetriNet::STARKE_RULE_5; break;
+                    case(reduce_arg_starke6): newLevel = PetriNet::STARKE_RULE_6; break;
+                    case(reduce_arg_starke7): newLevel = PetriNet::STARKE_RULE_7; break;
+                    case(reduce_arg_starke8): newLevel = PetriNet::STARKE_RULE_8; break;
+                    case(reduce_arg_starke9): newLevel = PetriNet::STARKE_RULE_9; break;            
+                    default: /* do nothing */; break;                
+                }
+                
+                level = (PetriNet::ReductionLevel)(level | newLevel);                
+            }
 
             if (args_info.verbose_given) {
                 cerr << "petri: structurally reducing Petri net '" << names[i] << "'..." << endl;
             }
-
-            nets[i].reduce(args_info.reduce_arg);
+            
+            nets[i].reduce(level);
         }
     }
 

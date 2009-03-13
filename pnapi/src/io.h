@@ -46,7 +46,41 @@ namespace pnapi
   class Condition;
   class Automaton;
   class ServiceAutomaton;
+  class Node;
+  class Place;
+  class Transition;
+  class Arc;
+  class State;
+  template <class T> class Edge;
+  namespace formula
+  {
+    class Formula;
+    class Negation;
+    class Conjunction;
+    class Disjunction;
+    class FormulaEqual;
+    class FormulaNotEqual;
+    class FormulaGreater;
+    class FormulaGreaterEqual;
+    class FormulaLess;
+    class FormulaLessEqual;
+    class FormulaTrue;
+    class FormulaFalse;
+  }
+  namespace io
+  {
+    namespace util
+    {
+      template <typename T> class StreamMetaData;
+      template <typename T> class Manipulator;
+    }
+  }
 
+
+
+  /***************************************************************************
+   ***** PART I: Public I/O Interface
+   ***************************************************************************/
 
 
   /*!
@@ -176,64 +210,15 @@ namespace pnapi
 
     //@}
 
-  }
 
 
 
-  /*************************************************************************
-   ***** INTERNAL UTILITIES AND FORMAT IMPLEMENTATION
-   *************************************************************************/
+  /***************************************************************************
+   ***** PART II: (Internal) Format Specific Implementation
+   ***************************************************************************/
 
-  // forward declarations
-  class Node;
-  class Place;
-  class Transition;
-  class Arc;
-  namespace formula
-  {
-    class Formula;
-    class Negation;
-    class Conjunction;
-    class Disjunction;
-    class FormulaEqual;
-    class FormulaNotEqual;
-    class FormulaGreater;
-    class FormulaGreaterEqual;
-    class FormulaLess;
-    class FormulaLessEqual;
-    class FormulaTrue;
-    class FormulaFalse;
-  }
-  class State;
-  template <class T> class Edge;
-
-  namespace io
-  {
-
-    /* FORMAT IMPLEMENTATION: add namespace with format specific functions */
-
-
-    /*!
-     * \brief   LOLA I/O implementation
-     */
-    namespace __lola
-    {
-
-      std::ostream & output(std::ostream &, const PetriNet &);
-      std::ostream & output(std::ostream &, const Arc &);
-      std::ostream & output(std::ostream &, const Place &);
-      std::ostream & output(std::ostream &, const Transition &);
-
-    } /* namespace __lola */
-
-
-    /*!
-     * \brief   Utility Classes and Functions for pnapi::io
-     */
     namespace util
     {
-
-      /*** ENUM CONSTANTS ***/
 
       /* FORMAT IMPLEMENTATION: add format constant */
 
@@ -242,6 +227,109 @@ namespace pnapi
 
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
+
+    } /* namespace util */
+
+
+    /* FORMAT IMPLEMENTATION: add namespace with format specific functions */
+
+
+    //************************
+    //*** SA output format ***
+    //************************
+
+    namespace util
+    {
+      std::ostream & operator<<(std::ostream &, const State &);
+
+      template <class T>
+      std::ostream & operator<<(std::ostream &os, const Edge<T> &e)
+      {
+        os << e.getSource() << " -> " << e.getDestination() << " : ";
+        os << e.getLabel();
+
+        return os;
+      }
+    } /* namespace util */
+
+
+    //*************************
+    //*** ONWD input format ***
+    //*************************
+
+    namespace util
+    {
+      typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
+      typedef Manipulator<std::map<std::string, PetriNet *> > 
+              PetriNetManipulator;
+    } /* namespace util */
+
+
+    //**************************
+    //*** STAT output format ***
+    //**************************
+    namespace __stat
+    {
+      std::ostream & output(std::ostream &, const PetriNet &);
+    }
+
+
+    //**************************
+    //*** LOLA output format ***
+    //**************************
+
+    /*!
+     * \brief   LOLA I/O implementation
+     */
+    namespace __lola
+    {
+      std::ostream & output(std::ostream &, const PetriNet &);
+      std::ostream & output(std::ostream &, const Arc &);
+      std::ostream & output(std::ostream &, const Place &);
+      std::ostream & output(std::ostream &, const Transition &);
+    } /* namespace __lola */
+
+
+    //*************************
+    //*** DOT output format ***
+    //*************************
+
+    namespace __dot
+    {
+      std::ostream & output(std::ostream &, const PetriNet &);
+      std::ostream & output(std::ostream &, const Arc &);
+      std::ostream & output(std::ostream &, const Place &);
+      std::ostream & output(std::ostream &, const Transition &);
+      std::ostream & output(std::ostream &, const Node &, const std::string &);
+      std::string getNodeName(const Node &, bool withSuffix = false);
+    }
+
+
+    //**************************
+    //*** OWFN output format ***
+    //**************************
+    
+    namespace __owfn
+    {
+      std::ostream & output(std::ostream &, const PetriNet &);
+      std::ostream & output(std::ostream &, const Arc &);
+      std::ostream & output(std::ostream &, const Place &);
+      std::ostream & output(std::ostream &, const Transition &);
+    }
+
+
+
+
+  /***************************************************************************
+   ***** PART III: Internal Generic I/O Implementation
+   ***************************************************************************/
+
+
+    /*!
+     * \brief   Utility Classes and Functions for pnapi::io
+     */
+    namespace util
+    {
 
       /// delimiter type
       struct Delim { std::string delim; };
@@ -278,9 +366,6 @@ namespace pnapi
       typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
       typedef Manipulator<std::pair<MetaInformation, std::string> >
               MetaManipulator;
-      typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
-      typedef Manipulator<std::map<std::string, PetriNet *> > 
-              PetriNetManipulator;
 
 
       /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
@@ -325,19 +410,6 @@ namespace pnapi
       std::ostream & operator<<(std::ostream &, const formula::FormulaLess &);
       std::ostream & operator<<(std::ostream &,
 				const formula::FormulaLessEqual &);
-
-      /*** INTERNALS OF AUTOMATA ***/
-
-      std::ostream & operator<<(std::ostream &, const State &);
-
-      template <class T>
-      std::ostream & operator<<(std::ostream &os, const Edge<T> &e)
-      {
-        os << e.getSource() << " -> " << e.getDestination() << " : ";
-        os << e.getLabel();
-
-        return os;
-      }
 
 
       /*** TEMPLATE IMPLEMENTATION ***/

@@ -1,36 +1,12 @@
-#ifndef NDEBUG
-#include <iostream>
-#include <fstream>
-using std::cout;
-using std::cerr;
-using std::endl;
-#endif
-
 #include <cassert>
-#include <sstream>
 
-#include "automaton.h"
-#include "petrinet.h"
 #include "parser.h"
-#include "formula.h"
+#include "automaton.h"
 #include "io.h"
-#include "config.h"
 
-using std::pair;
-using std::string;
-using std::ios_base;
-using std::ostream;
-using std::set;
 using std::map;
-using std::stringstream;
-
-using pnapi::formula::Formula;
-
-using pnapi::io::util::mode;
-using pnapi::io::util::delim;
-using pnapi::io::util::ModeData;
-using pnapi::io::util::filterMarkedPlaces;
-using pnapi::io::util::filterInternalArcs;
+using std::string;
+using std::pair;
 
 namespace pnapi
 {
@@ -39,87 +15,11 @@ namespace pnapi
   {
 
     /*************************************************************************
-     ***** LOLA output
+     ***** Basic I/O Implementation
      *************************************************************************/
 
-    std::ostream & lola(std::ostream & ios)
-    {
-      util::FormatData::data(ios) = util::LOLA;
-      return ios;
-    }
+    /* FORMAT IMPLEMENTATION: add case label below */
 
-
-    namespace __lola
-    {
-
-      ostream & output(ostream & os, const PetriNet & net)
-      {
-	using util::operator<<;
-
-	string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
-	string inputfile = net.getMetaInformation(os, INPUTFILE);
-
-	return os //< output everything to this stream
- 
-	  << "{ Petri net created by " << creator 
-	  << (inputfile.empty() ? "" : " reading " + inputfile)
-	  << " }" << endl 
-	  << endl
-
-	  << "PLACE" << mode(util::PLACE) << endl
-	  << "  " << delim(", ") << net.internalPlaces_ << ";" << endl
-	  << endl
-
-	  << "MARKING" << mode(util::PLACE_TOKEN) << endl
-	  << "  " << filterMarkedPlaces(net.internalPlaces_) << ";" << endl
-	  << endl << endl
-
-	  // transitions
-	  << delim("\n") << net.transitions_ << endl
-	  << endl 
-	  
-	  << "{ END OF FILE }" << endl;
-      }
-
-
-      ostream & output(ostream & os, const Place & p)
-      {
-	os << p.getName();
-	if (ModeData::data(os) == util::PLACE_TOKEN && p.getTokenCount() != 1)
-	  os << ": " << p.getTokenCount();
-	return os;
-      }
-
-
-      ostream & output(ostream & os, const Transition & t)
-      {
-	using util::operator<<;
-
-	return os 
-	  << "TRANSITION " << t.getName() << endl
-	  << delim(", ")
-	  << "  CONSUME " 
-	  << filterInternalArcs(t.getPresetArcs())  << ";" << endl
-	  << "  PRODUCE " 
-	  << filterInternalArcs(t.getPostsetArcs()) << ";" << endl;
-      }
-
-
-      ostream & output(ostream & os, const Arc & arc)
-      {
-	os << arc.getPlace().getName();
-	if (arc.getWeight() != 1)
-	  os << ":" << arc.getWeight();
-	return os;
-      }
-
-    } /* namespace __lola */
-
-
-
-    /*************************************************************************
-     ***** I/O implementation
-     *************************************************************************/
 
     /*!
      * Stream the PetriNet object to a given output stream, using the
@@ -129,61 +29,13 @@ namespace pnapi
     {
       switch (util::FormatData::data(os))
 	{
-	  /* PETRINET FORMAT IMPLEMENTATION: add case label */
-
-	case util::LOLA:   __lola::output(os, net); break;
-
-	case util::OWFN:   net.output_owfn  (os); break;
-	case util::DOT:    net.output_dot   (os); break;
-	case util::GASTEX: net.output_gastex(os); break;
-
-	case util::STAT:
-	  os << "|P|= "     << net.places_.size()       << "  "
-	     << "|P_in|= "  << net.inputPlaces_.size()  << "  "
-	     << "|P_out|= " << net.outputPlaces_.size() << "  "
-	     << "|T|= "     << net.transitions_.size()  << "  "
-	     << "|F|= "     << net.arcs_.size();
-	  break;
+	case util::DOT:  return __dot::output(os, net);
+	case util::LOLA: return __lola::output(os, net);
+	case util::OWFN: return __owfn::output(os, net);
+	case util::STAT: return __stat::output(os, net);
 
 	default: assert(false);
 	}
-
-      return os;
-    }
-
-
-    /*!
-     * Stream the Automaton object to a given output stream using the stream
-     * format (see pnapi::io).
-     */
-    std::ostream & operator<<(std::ostream &os, const Automaton &sa)
-    {
-      switch (util::FormatData::data(os))
-      {
-      case      util::SA:  sa.output_sa(os);   break;
-      //case      util::STG: sa.output_stg(os);  break;
-      default:  assert(false);
-      }
-
-      return os;
-    }
-
-
-    /*!
-     * Second Automaton output has to be here because the ServiceAutomaton
-     * class can convert Petri nets into a service automaton, and the Automaton
-     * class can read automata from file (in .sa/.ig format).
-     */
-    std::ostream & operator<<(std::ostream &os, const ServiceAutomaton &sa)
-    {
-      switch (util::FormatData::data(os))
-      {
-      case      util::SA:   sa.output_sa(os);   break;
-      //case      util::STG:  sa.output_stg(os);  break;
-      default:  assert(false);
-      }
-
-      return os;
     }
 
 
@@ -227,35 +79,106 @@ namespace pnapi
     }
 
 
-    std::ios_base & owfn(std::ios_base & ios)
+    /*!
+     * Stream the Automaton object to a given output stream using the stream
+     * format (see pnapi::io).
+     */
+    std::ostream & operator<<(std::ostream &os, const Automaton &sa)
     {
-      util::FormatData::data(ios) = util::OWFN;
-      return ios;
-    }
+      switch (util::FormatData::data(os))
+      {
+      case      util::SA:  sa.output_sa(os);   break;
+      //case      util::STG: sa.output_stg(os);  break;
+      default:  assert(false);
+      }
 
-    std::istream & onwd(std::istream & ios)
-    {
-      util::FormatData::data(ios) = util::ONWD;
-      return ios;
-    }
-
-    std::ostream & stat(std::ostream & ios)
-    {
-      util::FormatData::data(ios) = util::STAT;
-      return ios;
-    }
-
-    std::ostream & dot(std::ostream & ios)
-    {
-      util::FormatData::data(ios) = util::DOT;
-      return ios;
-    }
-
-    std::ostream & sa(std::ostream &os)
-    {
-      util::FormatData::data(os) = util::SA;
       return os;
     }
+
+
+    /*!
+     * Second Automaton output has to be here because the ServiceAutomaton
+     * class can convert Petri nets into a service automaton, and the Automaton
+     * class can read automata from file (in .sa/.ig format).
+     */
+    std::ostream & operator<<(std::ostream &os, const ServiceAutomaton &sa)
+    {
+      switch (util::FormatData::data(os))
+      {
+      case      util::SA:   sa.output_sa(os);   break;
+      //case      util::STG:  sa.output_stg(os);  break;
+      default:  assert(false);
+      }
+
+      return os;
+    }
+
+
+
+    /*************************************************************************
+     ***** Internal I/O Implementation
+     *************************************************************************/
+
+    /* FORMAT IMPLEMENTATION: add case labels for entities you use */
+
+    namespace util
+    {
+
+      ostream & operator<<(ostream & os, const pnapi::Arc & arc)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case DOT:  return __dot::output(os, arc);
+	  case LOLA: return __lola::output(os, arc);
+	  case OWFN: return __owfn::output(os, arc);
+
+	  default: assert(false);
+	  }
+      }
+
+
+      ostream & operator<<(ostream & os, const pnapi::Place & p)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case DOT:  return __dot::output(os, p);
+	  case LOLA: return __lola::output(os, p);
+	  case OWFN: return __owfn::output(os, p);
+
+	  default: assert(false);
+	  }
+      }
+
+
+      ostream & operator<<(ostream & os, const pnapi::Transition & t)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case DOT:  return __dot::output(os, t);
+	  case LOLA: return __lola::output(os, t);
+	  case OWFN: return __owfn::output(os, t);
+
+	  default: assert(false);
+	  }
+	return os;
+      }
+
+
+      /* FORMAT IMPLEMENTATION: formula output is in io-format.cc (owfn) */
+      /*        should be split up like above if used in a second format */
+
+
+    } /* namespace util */
+
+
+
+
+    // What follows is generic code, that hopefully rarely needs to be touched.
+
+    
+    /*************************************************************************
+     ***** Generic I/O Implementation
+     *************************************************************************/
 
     util::Manipulator<std::pair<MetaInformation, std::string> >
     meta(MetaInformation i, const std::string & s)
@@ -263,15 +186,7 @@ namespace pnapi
       return util::MetaManipulator(pair<MetaInformation, string>(i, s));
     }
 
-    util::Manipulator<std::map<std::string, PetriNet *> >
-    nets(std::map<std::string, PetriNet *> & nets)
-    {
-      return util::PetriNetManipulator(nets);
-    }
 
-
-    /*!
-     */
     InputError::InputError(Type type, const string & filename, int line,
 			   const string & token, const string & msg) :
       type(type), message(msg), token(token), line(line), filename(filename)
@@ -279,8 +194,6 @@ namespace pnapi
     }
 
 
-    /*!
-     */
     std::ostream & operator<<(std::ostream & os, const io::InputError & e)
     {
       os << e.filename << ":" << e.line << ": error";
@@ -316,7 +229,7 @@ namespace pnapi
 
 
     /*************************************************************************
-     ***** INTERNAL UTILITIES
+     ***** Internal Generic I/O Implementation
      *************************************************************************/
 
     namespace util
@@ -417,38 +330,6 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::Arc & arc)
-      {
-	bool interface = true;
-
-	switch (FormatData::data(os))
-	  {
-	  case LOLA: return __lola::output(os, arc);
-
-	  case OWFN:    /* ARCS: OWFN    */
-	    os << arc.getPlace().getName();
-	    if (arc.getWeight() != 1)
-	      os << ":" << arc.getWeight();
-	    break;
-
-	  case DOT:     /* ARCS: DOT     */
-	    if (!interface && arc.getPlace().getType() != Place::INTERNAL)
-	      break;
-	    os << " " << arc.getSourceNode() << " -> " << arc.getTargetNode()
-	       << "\t[";
-	    if (arc.getWeight() != 1)
-	      os << "label=\"" << arc.getWeight() << "\"";
-	    if (arc.getPlace().getType() == Place::INTERNAL)
-	      os << "weight=10000.0";
-	    os << "]";
-	    break;
-
-	  default: assert(false);
-	  }
-	return os;
-      }
-
-
       ostream & operator<<(ostream & os, const pnapi::Node & node)
       {
 	const Place * p = dynamic_cast<const Place *>(&node);
@@ -456,168 +337,6 @@ namespace pnapi
 	  return os << *p;
 	else
 	  return os << *dynamic_cast<const Transition *>(&node);
-      }
-
-
-      // FIXME: remove dot prefix (when in dot namespace)
-      string dot_getNodeName(const Node & n, bool withSuffix = false)
-      {
-	static PetriNet * net = NULL;
-	static map<string, string> names;
-
-	if (net != &n.getPetriNet())
-	  {
-	    net = &n.getPetriNet();
-	    names.clear();
-
-	    int i = 0;
-	    set<Place *> places = net->getPlaces();
-	    for (set<Place *>::iterator it = places.begin(); 
-		 it != places.end(); ++it)
-	      {
-		stringstream ss; ss << "p" << ++i;
-		names[(*it)->getName()] = ss.str();
-	      }
-
-	    i = 0;
-	    set<Transition *> transitions = net->getTransitions();
-	    for (set<Transition *>::iterator it = transitions.begin(); 
-		 it != transitions.end(); ++it)
-	      {
-		stringstream ss; ss << "t" << ++i;
-		names[(*it)->getName()] = ss.str();
-	      }
-	  }
-
-	return names[n.getName()] + string(withSuffix ? "_l" : "");
-      }
-
-
-      // FIXME: remove dot prefix (when in dot namespace)
-      void dot_outputNode(ostream & os, const Node & n, const string & attr)
-      {
-	Mode mode = ModeData::data(os);
-	string dotName   = dot_getNodeName(n);
-	string dotName_l = dot_getNodeName(n, true);
-
-	os << dotName;
-
-	if (mode == NORMAL)
-	  os << "\t[" << attr << "]" << endl
-	     << " " << dotName_l << "\t[style=invis]" << endl
-	     << " " << dotName_l << " -> " << dotName
-	     << " [headlabel=\"" << n.getName() << "\"]";
-
-	if (mode == INNER)
-	  os << " " << dotName_l;
-      }
-
-
-      ostream & operator<<(ostream & os, const pnapi::Place & p)
-      {
-	switch (FormatData::data(os))
-	  {
-	  case LOLA: return __lola::output(os, p);
-
-	  case OWFN:    /* PLACES: OWFN    */
-	    os << p.getName();
-	    if (ModeData::data(os) == PLACE_TOKEN &&
-		p.getTokenCount() != 1)
-	      os << ": " << p.getTokenCount();
-	    break;
-
-
-	  case DOT:     /* PLACES: DOT     */
-	    {
-	      // place attributes (used in NORMAL mode)
-	      stringstream attributes;
-	      if (p.getTokenCount() == 1)
-		attributes << "fillcolor=black peripheries=2 height=\".2\" "
-			   << "width=\".2\" ";
-	      else if (p.getTokenCount() > 1)
-		attributes << "label=\"" << p.getTokenCount() << "\" "
-			   << "fontcolor=black fontname=\"Helvetica\" ";
-
-	      switch (p.getType())
-		{
-		case Node::INPUT:  
-		  attributes << "fillcolor=orange"; 
-		  break;
-		case Node::OUTPUT: 
-		  attributes << "fillcolor=yellow"; 
-		  break;
-		default: 
-		  if (p.wasInterface())
-		    attributes << "fillcolor=lightgoldenrod1";
-		  break;
-		}
-
-	      // output the place as a node
-	      dot_outputNode(os, p, attributes.str());
-	      break;
-	    }
-
-
-	  default: assert(false);   /* PLACES: <UNKNOWN> */
-	  }
-	return os;
-      }
-
-
-      ostream & operator<<(ostream & os, const pnapi::Transition & t)
-      {
-	switch (FormatData::data(os))
-	  {
-	  case LOLA: return __lola::output(os, t);
-
-	  case OWFN:    /* TRANSITIONS: OWFN    */
-	    os << "TRANSITION " << t.getName() << endl;
-	    /*
-	    switch (t.getType())
-	      {
-	      case Node::INTERNAL: os                        << endl; break;
-	      case Node::INPUT:    os << " { input }"        << endl; break;
-	      case Node::OUTPUT:   os << " { output }"       << endl; break;
-	      case Node::INOUT:    os << " { input/output }" << endl; break;
-	      }
-	    */
-	    os << delim(", ")
-	       << "  CONSUME " << t.getPresetArcs()  << ";" << endl
-	       << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
-	    break;
-
-
-	  case DOT:     /* TRANSITIONS: DOT     */
-	    {
-	      // transition attributes (used in NORMAL mode)
-	      stringstream attributes;
-	      switch(t.getType())
-		{
-		case(Node::INPUT):  attributes << "fillcolor=orange"; break;
-		case(Node::OUTPUT): attributes << "fillcolor=yellow"; break;
-		case(Node::INOUT):  attributes
-		    << "fillcolor=gold label=< <TABLE BORDER=\"1\""
-		    << " CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\""
-		    << " HEIGHT=\"21\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\"><TR>"
-		    << "<TD HEIGHT=\"11\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
-		    << " BGCOLOR=\"ORANGE\">"
-		    << "</TD></TR><TR>"
-		    << "<TD HEIGHT=\"10\" WIDTH=\"21\" FIXEDSIZE=\"TRUE\""
-		    << " BGCOLOR=\"YELLOW\">"
-		    << "</TD></TR></TABLE> >";
-		  break;
-		default: break;
-		}
-	      
-	      // output the transition as a node
-	      dot_outputNode(os, t, attributes.str());
-	      break;
-	    }
-
-
-	  default: assert(false);   /* TRANSITIONS: <UNKNOWN> */
-	  }
-	return os;
       }
 
 
@@ -632,113 +351,6 @@ namespace pnapi
 	return f.output(os);
       }
 
-
-      ostream & operator<<(ostream & os, const formula::Negation & f)
-      {
-	return os << "NOT (" << **f.children().begin() << ")";
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::Conjunction & f)
-      {
-	string wildcard;
-	set<const Formula *> children = f.children();
-
-	/* WILDCARD COLLAPSING */
-	set<const Place *> formulaPlaces = f.places();
-	if (!formulaPlaces.empty())
-	  {
-	    set<Place *> netPlaces =
-	      (*formulaPlaces.begin())->getPetriNet().getPlaces();
-	    if (formulaPlaces.size() == netPlaces.size())
-	      {
-		set<const Formula *> filteredChildren;
-		for (set<const Formula *>::iterator it = children.begin();
-		     it != children.end(); ++it)
-		  {
-		    const formula::FormulaEqual * f =
-		      dynamic_cast<const formula::FormulaEqual *>(*it);
-		    if (f == NULL || f->tokens() != 0)
-		      filteredChildren.insert(*it);
-		    else
-		      wildcard = " AND ALL_OTHER_PLACES_EMPTY";
-		  }
-		if (filteredChildren.empty() && !wildcard.empty())
-		  wildcard = "ALL_PLACES_EMPTY";
-		children = filteredChildren;
-	      }
-	  }
-
-	if (f.children().empty())
-	  return os << formula::FormulaTrue();
-	else
-	  return os << "(" << delim(" AND ") << children << wildcard << ")";
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::Disjunction & f)
-      {
-	if (f.children().empty())
-	  return os << formula::FormulaFalse();
-	else
-	  return os << "(" << delim(" OR ") << f.children() << ")";
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaTrue &)
-      {
-	return os << "TRUE";
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaFalse &)
-      {
-	return os << "FALSE";
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaEqual & f)
-      {
-	return os << f.place().getName() << " = " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaNotEqual & f)
-      {
-	return os << f.place().getName() << " != " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaGreater & f)
-      {
-	return os << f.place().getName() << " > " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaGreaterEqual & f)
-      {
-	return os << f.place().getName() << " >= " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaLess & f)
-      {
-	return os << f.place().getName() << " < " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
-      {
-	return os << f.place().getName() << " <= " << f.tokens();
-      }
-
-
-      ostream & operator<<(ostream &os, const State &s)
-      {
-        os << s.getName();
-
-        return os;
-      }
 
     } /* namespace util */
 

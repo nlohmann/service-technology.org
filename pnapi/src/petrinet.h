@@ -97,14 +97,21 @@ namespace pnapi
     /// needs to update internal structures
     friend class ComponentObserver;
 
+    /// Petri net input, see pnapi::io
+    friend std::istream & io::operator>>(std::istream &, PetriNet &) 
+      throw (io::InputError);
+
     /// Petri net output, see pnapi::io
-    friend std::ostream & io::operator<<(std::ostream &, const PetriNet &);
+    friend std::ostream & io::__dot::output(std::ostream &, const PetriNet &);
+
+    /// Petri net output, see pnapi::io
+    friend std::ostream & io::__owfn::output(std::ostream &, const PetriNet &);
+
+    /// Petri net output, see pnapi::io
+    friend std::ostream & io::__stat::output(std::ostream &, const PetriNet &);
 
     /// Petri net output, see pnapi::io
     friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
-
-    /// Petri net input, see pnapi::io
-    friend std::istream & io::operator>>(std::istream &, PetriNet &) throw (io::InputError);
 
 
   public:
@@ -356,39 +363,6 @@ namespace pnapi
     /// creates the net by assembling the given nets
     void createFromWiring(std::map<std::string, std::vector<PetriNet> > &,
 			  const std::map<Place *, LinkNode *> &);
-
-
-    /* output */
-
-    /// APNN (Abstract Petri Net Notation) output
-    void output_apnn(std::ostream &) const;
-
-    /// DOT (Graphviz) output
-    void output_dot(std::ostream &) const;
-
-    /// INA output
-    void output_ina(std::ostream &) const;
-
-    /// SPIN output
-    void output_spin(std::ostream &) const;
-
-    /// info file output
-    void output_info(std::ostream &) const;
-
-    /// LoLA-output
-    void output_lola(std::ostream &) const;
-
-    /// oWFN-output
-    void output_owfn(std::ostream &) const;
-
-    /// low-level PEP output
-    void output_pep(std::ostream &) const;
-
-    /// PNML (Petri Net Markup Language) output
-    void output_pnml(std::ostream &) const;
-
-    /// GasTeX output
-    void output_gastex(std::ostream &) const;
 
 
     /* reduction */

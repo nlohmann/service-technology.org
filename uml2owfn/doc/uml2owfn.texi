@@ -13,7 +13,7 @@
 
 This manual is for UML2oWFN, version @value{VERSION}, a tool to translate models of the IBM WebSphere Business Modeler to Petri nets, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2008 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
+Copyright @copyright{} 2008-2009 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
@@ -76,36 +76,47 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @node Overview
 @chapter Overview
 
-UML2oWFN translates the XML export of the IBM WebSphere Business Modeler into standard Petri net file formats. The translation can be targeted to a specific analysis like checking soundness, or for deriving contracts from business process specifications.
+@acronym{UML2oWFN} translates the XML export of the IBM WebSphere Business Modeler
+into standard Petri net file formats. The translation can be targeted to a specific
+analysis like checking soundness, or for deriving contracts from business process
+specifications.
 
 
 @section Usage
 
-To translate a process library @file{input.xml} into Petri nets and print render these nets as graphs, call
+To translate a process library @file{input.xml} into Petri nets and print render these
+nets as graphs, call
 
 @cartouche
 @code{uml2owfn -i @i{input.xml} -f dot -o}
 @end cartouche
 
-The translation creates one output file @file{input.<catalog-name>__<process-name>.png} per process of the library.
+The translation creates one output file @file{input.<catalog-name>__<process-name>.png}
+per process of the library.
 
 
 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/bom-anon} and download the latest version of BOM-Anonymizer, say @file{bom-anon-@value{VERSION}.tar.gz}. To setup and compile BOM-Anonymizer, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/uml2owfn} and download the latest
+version of @acronym{UML2oWFN}, say @file{uml2owfn-@value{VERSION}.tar.gz}. To setup and
+compile @acronym{UML2oWFN}, change into your download directory and type
 
 @cartouche
 @smallexample
-tar xfz bom-anon-@value{VERSION}.tar.gz
-cd bom-anon-@value{VERSION}
+tar xfz uml2owfn-@value{VERSION}.tar.gz
+cd uml2owfn-@value{VERSION}
 ./configure
 make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/bom-anon} is generated.@footnote{On Microsoft Windows, the file will be called @file{bom-anon.exe}.} If you experience any compiler warnings, don't panic: BOM-Anonymizer contains some generated or third party code. If an error occurs, please send the output to @email{niels.lohmann@@service-technology.org}.
+After compilation, two binaries @samp{src/uml2owfn} and @samp{src/anon/bom-anon} are
+generated.@footnote{On Microsoft Windows, these files will be called
+@file{uml2owfn.exe} and @file{bom-anon.exe}.} If you experience any compiler
+warnings, don't panic: @acronym{UML2oWFN} contains some generated or third party code.
+If an error occurs, please send the output to @email{dirk.fahland@@service-technology.org}.
 
 @item To install the binary and the documentation, type
 
@@ -123,7 +134,7 @@ If you need any further information, see file @file{INSTALL} for detailed instru
 
 @section Copyright
 
-UML2oWFN was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berlin.de}) Dirk Fahland (@email{dirk.fahland@@service-technology.org}), and Niels Lohmann (@email{niels.lohmann@@service-technology.org}).
+@acronym{UML2oWFN} was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berlin.de}), Dirk Fahland (@email{dirk.fahland@@service-technology.org}), and Niels Lohmann (@email{niels.lohmann@@service-technology.org}).
 
 @c ----------------------------------------------------------------------------
 
@@ -133,7 +144,8 @@ UML2oWFN was written by Martin Znamirowski (@email{znamirow@@informatik.hu-berli
 
 @section Command Line Options
 
-For an overview of the command line options, type @samp{uml2owfn -h} to see the following help screen:
+For an overview of the command line options, type @samp{uml2owfn -h} to see the
+following help screen:
 
 @smallexample
 @include cmdline.out
@@ -194,7 +206,7 @@ processes shall not be translated. @samp{PROP} can take the following values
 
 To prepare the soundness analysis you need three different binaries of the
 Low-Level Net Analyzer (LoLA, @url{http://www.service-technolorg.org/lola/},
-source-code available at @url{http://svn.gna.org/svn/service-tech/trunk/lola/})
+source-code releases available at @url{http://service-technology.org/files/lola})
 to be accessible from the command-line. 
 
 @itemize
@@ -212,47 +224,47 @@ files for these LOLA variants with this release. You can generate these LoLA
 executables as follows. 
 
 @enumerate
-@item Download LoLA and extract the source code files into its own directory, e.g.
-@file{<lola>}.
-
-@item In case you take the most recent version from our source-code repository at 
-@url{http://svn.gna.org/svn/service-tech/trunk/lola/} run
-@example
-cd <lola>
-autoreconf -i
+@item Go to @url{http://service-technology.org/files/lola}.
+@item Download @acronym{LoLA}, say @file{lola-1.11.tar.gz}, and extract the
+source code files into its own directory, and prepare
+@acronym{LoLA} for compilation.
+@cartouche
+@smallexample
+tar xfz lola-1.11.tar.gz
+cd lola-1.11
 ./configure
-@end example
+@end smallexample
+@end cartouche
 
-@item In the @file{<lola>} directory, @samp{make} should create a LoLA binary for
-your platform.
-
-@item Replace the @file{<lola>/userconfig.H} with the corresponding variant from
-@file{<uml2owfn>/lola/}, compile LoLA and rename the resulting file, e.g.
+@item Change to directory @file{<uml2owfn>/lola/} and call
 @example
-cd <lola>
-
-cp <uml2owfn>/lola/userconfig.H.liveprop ./userconfig.H
-make
-mv lola lola-lp
-
-cp <uml2owfn>/lola/userconfig.H.statepredicate ./userconfig.H
-make
-mv lola lola-sp
-
-cp <uml2owfn>/lola/userconfig.H.full-limited ./userconfig.H
-make
-mv lola lola-full-limited
-
-cp <uml2owfn>/lola/userconfig.H.modelchecking ./userconfig.H
-make
-mv lola lola-mc
+make LOLA_SRC_DIR=<lola-1.11-dir>/src
 @end example
+to automatically create the correct LoLA binaries for your platform. The variable
+@samp{LOLA_SRC_DIR} defaults to @samp{../../lola/src}, i.e., if you extract LoLA
+next to @acronym{UML2oWFN} like this
+@example
+<some-dir>
+  + uml2owfn (your uml2owfn directory)
+  |  + anon
+  |  + doc
+  |  + lola  (uml2owfn's lola directory)
+  |  |  + Makefile
+  |  |  + userconfig.H.full-limited
+  |  |  + userconfig.H.liveprop
+  |  |  ...
+  |  + scripts
+  |  ...
+  + lola  (your lola directory)
+  |  + doc
+  |  ...
+  |  + src
+ ... ...
+@end example
+you can call @samp{make} without any parameters.
 
-In case you work on Windows/Cygwin, you need to provide the @file{.exe} extension
-for the @samp{mv} command.
-
-@item Make all LoLA binaries available on your command-line, for instance
-by moving them to @file{/usr/local/bin/}.
+@item Make all LoLA binaries in @file{./uml2owfn/lola/} available on your
+command-line, for instance by copying them to @file{/usr/local/bin/}.
 @end enumerate
 
 
@@ -313,6 +325,7 @@ file) format containing information about each process. The column format is
 file name;correct syntax;structural properties;
 number of nodes;number of edges;
 average number of incoming edges;average number of outgoing edges;
+maximum number of incoming edges;maximum number of outgoing edges;
 Petri net properties
 @end example
 The column @samp{correct syntax} holds @samp{true} if the input process had
@@ -411,11 +424,8 @@ uml2owfn -i lib.xml -f lola -a soundness -a safe -a noData -p taskfile -o
  the net as in workflow Petri nets. The termination semantics assumes that the
  control-flow and data-flow terminate via an implicit OR-join of several terminal
  nodes. It computes an extension of the multi-terminal workflow net to a single
- terminal workflow net. This extension always preserves unsoundness of the net
- (i.e. an unsound multi-terminal net will also be unsound after the extension).
- For a specific class of processes, the extension also preserves soundness;
- generate a log file with parameter @samp{-p log} to see for which processes
- soundness is preserved. Choose
+ terminal workflow net. This extension equivalently preserves soundness and
+ unsoundness of the net. Choose
  @example
  -a soundness -a wfNet
  @end example
@@ -446,67 +456,6 @@ control-flow and data-flow terminate via an implicit OR-join. Choose
  -a safe
  @end example
  to the parameters. 
-
-
-@section Use Case: Soundness Analysis Using Tools for Workflow-Nets 
-
-Aalst et al. have established the notion of a @i{workflow net} to model workflows.
-Workflow nets are a special class of Petri nets that have a unique start place
-@samp{alpha} that is initially marked, and a uniqe end place @samp{omega} that
-is marked when the workflow has finished. Further, every place and transition
-lies on a path from @samp{alpha} to @samp{omega}. There are efficient soundness
-analysis algorithms for workflow nets.
-
-In order to analyse processes of the IBM WebSphere Business Modeler with such
-tools, the generated nets have to provide a unique @samp{alpha} place, and a unique
-@samp{omega} place. An equivalent translation of an arbitrary IBM WebSphere
-Business Modeler process into a workflow net requires knowledge about the reachable states
-of the process. However, for a specific class of processes, this transformation
-can be done on the structure of the process alone.
-
-The parameter @samp{-a wfNet} triggers the use of this structural translation,
-it must be used together with @samp{-a soundness} to become effective. Call
-
-@cartouche
-@example
-uml2owfn -i lib.xml -f tpn -a soundness -a wfNet -o
-@end example
-@end cartouche
-
-to translate each process of the library @file{lib.xml} into a Woflan @file{.tpn}
-file with workflow-net structure. Each file can be loaded into Woflan and
-analyzed for soundness.
-
-The workflow-net translation introduces a unique @samp{alpha} place that is
-initially marked, like in all other soundness analysis use cases. It computes a
-completion logic of transitions and places that cover the reachable final markings
-of the net and the produce on a new unique @samp{omega} place that has no outgoing
-arcs. 
-
-@c Each output pinset
-@c of the process produces on this omega place; the termination of the process via
-@c an output pinset requires that @i{all} end-nodes are marked. This effectively
-@c implements an AND-join at the end of the process. 
-
-@c Any process that is found to be unsound by this analysis, is also unsound in
-@c the original semantics. For cases, where the structure of the Petri net provides
-@c ambiguous information for computation of the completion logic, and for cases where
-@c there exists no such completion, a sound process can become unsound. These cases
-@c can be identified in the translation log (@samp{-p log}). For any other cases,
-@c soundness is preserved.
-
-The completion preserves soundness (and unsoundness) for free-choice Petri nets.
-Cases of non-free-choice nets can be identified in the translation log (@samp{-p log}). 
-
-You can use
-
-@example
-make translatewf
-@end example
-
-to automate the translation. The Makefile variable @samp{OUTPUT-FORMAT} allows
-you to set the output format of the translation of @acronym{UML2oWFN}, default
-value is @samp{lola}.
 
 
 @section Use Case: Anonymize the Processes
@@ -579,8 +528,30 @@ targets @samp{full}, @samp{table}, @samp{safeness}, @samp{soundness}, @samp{clea
 and @samp{veryclean} require the @samp{lola}-format.
 
 Use the parameter @samp{UML2OWFN-PARAM} for refining the translation with further
-command-line parameters of UML2oWFN if you need.
+command-line parameters of @acronym{UML2oWFN} if you need.
 
+You can immediately try this Makefile with the following setup. Create the
+necessary @acronym{LoLA} binaries with the @file{./lola/Makefile} as described
+above. Then execute the following commands in the root directory of @acronym{UML2oWFN}.
+
+@cartouche
+@smallexample
+make
+cd ./lola/
+make
+cd ../scripts/
+make translateor LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
+               LIBRARY=../tests/soundness/TestSuite_soundness
+make table LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
+           LIBRARY=../tests/soundness/TestSuite_soundness 
+@end smallexample
+@end cartouche
+
+This will translate and analyze the processes from our soundness test library in
+@file{./tests/soundness/TestSuite_soundness.xml}. The parameters @samp{LOLA_DIR}
+and @samp{UML2OWFN_DIR} point the Makefile to the just generated
+@acronym{UML2oWFN} and @acronym{LoLA} binaries. 
+ 
 
 @section Use Case: Verify Soundness via CTL properties
 
@@ -598,8 +569,8 @@ lola-mc lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
 @end example
 
 This line is automatically included in the verification script @file{check_lib.sh}.
-To use the @file{Makefile} to automate the compilation of results in this setting,
-you have to set two parameters:
+To use the Using the @file{./scripts/Makefile} to automate the compilation of
+results in this setting, you have to set two parameters:
 @example
 make translate UML2OWFN-PARAM="-p ctl"
 make table LOLA-LP=lola-mc
@@ -607,6 +578,56 @@ make table LOLA-LP=lola-mc
 The first line causes the translation to generate CTL properties, the second line
 switches the model-checker for the soundness analysis to the LoLA variant with
 model checking algorithms (that has to be compiled as described above).
+
+
+@section Use Case: Soundness Analysis Using Tools for Workflow-Nets 
+
+Aalst et al. have established the notion of a @i{workflow net} to model workflows.
+Workflow nets are a special class of Petri nets that have a unique start place
+@samp{alpha} that is initially marked, and a uniqe end place @samp{omega} that
+is marked when the workflow has finished. Further, every place and transition
+lies on a path from @samp{alpha} to @samp{omega}. There are efficient soundness
+analysis algorithms for workflow nets.
+
+In order to analyse processes of the IBM WebSphere Business Modeler with such
+tools, the generated nets have to provide a unique @samp{alpha} place, and a unique
+@samp{omega} place. An equivalent translation of an arbitrary IBM WebSphere
+Business Modeler process into a workflow net requires knowledge about the reachable states
+of the process. However, for a specific class of processes, this transformation
+can be done on the structure of the process alone.
+
+The parameter @samp{-a wfNet} triggers the use of this structural translation,
+it must be used together with @samp{-a soundness} to become effective. Call
+
+@cartouche
+@example
+uml2owfn -i lib.xml -f tpn -a soundness -a wfNet -o
+@end example
+@end cartouche
+
+to translate each process of the library @file{lib.xml} into a Woflan @file{.tpn}
+file with workflow-net structure. Each file can be loaded into Woflan and
+analyzed for soundness.
+
+The workflow-net translation introduces a unique @samp{alpha} place that is
+initially marked, like in all other soundness analysis use cases. It computes a
+completion logic of transitions and places that cover the reachable final markings
+of the net and the produce on a new unique @samp{omega} place that has no outgoing
+arcs. 
+
+The completion preserves soundness (and unsoundness) for free-choice Petri nets.
+Cases of non-free-choice nets can be identified in the translation log (@samp{-p log}). 
+
+Using the @file{./scripts/Makefile}, you can call
+
+@example
+make translatewf
+@end example
+
+to automate the translation. The Makefile variable @samp{OUTPUT-FORMAT} allows
+you to set the output format of the translation of @acronym{UML2oWFN}, default
+value is @samp{lola}.
+
 
 
 @section Use Case: Translate, Analyze, and Compile Reults of Several Large Process Suites
@@ -639,7 +660,8 @@ to learn about the other functionality provided by this script. Call
 make cleanall
 @end example
 
-to clean all generated files, leaving only the original process libraries.
+to clean all generated files, leaving only the original process libraries. The
+file @file{./scripts/repository/README} provides further details.
 
 
 @c ----------------------------------------------------------------------------

@@ -2,20 +2,21 @@ Documentation of the TestSuite for soundess of UML2oWFN
 
 The Test-Suite contains the following processes.
 
-TestSuite_soundness.BOMcncpt1__ProcessPinDisjointStopEnd_sound_stop
-TestSuite_soundness.BOMcncpt1__ProcessPinDisjoint_sound_ifStop
-TestSuite_soundness.BOMcncpt1__TaskCallPinDisjointProc_sound_stop
-TestSuite_soundness.BOMcncpt1__TaskCallPinDisjointProc_stop
-TestSuite_soundness.BOMcncpt1__TaskPinDisjointProc_sound_stop
-TestSuite_soundness.BOMcncpt1__TaskPinDisjointProc_stop
-TestSuite_soundness.BOMcncpt__ForkJoin_sound
-TestSuite_soundness.BOMcncpt__InclusiveOr2_sound
-TestSuite_soundness.BOMcncpt__InclusiveOr_sound_nonsafe
-TestSuite_soundness.BOMcncpt__ProcessSimple_sound
-TestSuite_soundness.BOMcncpt__Repository_sound
-TestSuite_soundness.StpvsEnd__StopvsEnd_1_nonsound
-TestSuite_soundness.StpvsEnd__StopvsEnd_1b_sound_nonsafe
-TestSuite_soundness.StpvsEnd__StopvsEnd_2_sound_ifStop
+TestSuite_soundness.UMLcncpt__XOR_sound
+TestSuite_soundness.UMLcncpt__ORsplit_sound
+TestSuite_soundness.UMLcncpt__ORsplit_uls
+TestSuite_soundness.UMLcncpt__ProcessSimple_sound
+TestSuite_soundness.UMLcncpt__Repository_sound
+
+TestSuite_soundness.UMLcncpt1__ProcessPinDisjointStopEnd_sound_stop
+TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop
+TestSuite_soundness.UMLcncpt1__ProcessPinOverlap_udl_stop
+TestSuite_soundness.UMLcncpt1__TaskCallPinDisjointProc_sound_stop
+TestSuite_soundness.UMLcncpt1__TaskPinDisjointProc_sound_stop
+
+TestSuite_soundness.UMLStpvsEnd__StopvsEnd_1_ull
+TestSuite_soundness.UMLStpvsEnd__StopvsEnd_1b_uls
+TestSuite_soundness.UMLStpvsEnd__StopvsEnd_2_sound_ifStop
 
 The names are meaningful with the following semantics:
 
@@ -36,12 +37,18 @@ is considered when checking soundness. Otherwise the process is probably
 not sound.
 
 
-_sound_nonsafe:
+_uls:
 
-The process satisfies reachability of the final state while having no tokens
-left in the inner of the process, but the process is not 1-safe.
+The proces is unsound because it has a lack of synchronization
+(i.e. the resulting Petri net is not safe).
 
 
-_nonsound:
+_udl:
 
-The process is not sound.
+The process is unsound, because it has a deadlock, i.e. the process cannot terminate.
+
+
+_ull:
+
+The process is unsound, because it has a livelock, i.e. the process cannot terminate
+but still performs actions in an infinite loop which it cannot leave.

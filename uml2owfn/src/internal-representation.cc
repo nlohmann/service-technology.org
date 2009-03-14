@@ -679,13 +679,31 @@ UmlProcessStatistics Process::getStatistics() const {
   stat.numNodes = flowContentNodes.size();
   stat.numEdges = flowContentConnections.size();
 
+  int countedNodes = 0;
+
   for (list<FlowContentNode*>::const_iterator child = flowContentNodes.begin(); child != flowContentNodes.end(); child++) {
+
+    /*
+    if ((*child)->getType() == NSTARTNODE ||
+        (*child)->getType() == NENDNODE ||
+        (*child)->getType() == NSTOPNODE) {
+      continue;
+    }
+     */
+
+    countedNodes++;
+
     stat.avgInDegree += (*child)->statistics_getInDegree();
     stat.avgOutDegree += (*child)->statistics_getOutDegree();
+
+    if (stat.maxInDegree < (*child)->statistics_getInDegree())
+    	stat.maxInDegree = (*child)->statistics_getInDegree();
+    if (stat.maxOutDegree < (*child)->statistics_getOutDegree())
+    	stat.maxOutDegree = (*child)->statistics_getOutDegree();
   }
 
-  stat.avgInDegree = stat.avgInDegree / (float)stat.numNodes;
-  stat.avgOutDegree = stat.avgOutDegree / (float)stat.numNodes;
+  stat.avgInDegree = stat.avgInDegree / (float)countedNodes;
+  stat.avgOutDegree = stat.avgOutDegree / (float)countedNodes;
 
   return stat;
 }

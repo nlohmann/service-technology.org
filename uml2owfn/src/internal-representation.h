@@ -73,6 +73,9 @@ class UmlProcessStatistics {
     int     numEdges;
     float   avgInDegree;
     float   avgOutDegree;
+    int     maxInDegree;
+    int   	maxOutDegree;
+
 
   public:
     /*!
@@ -85,6 +88,8 @@ class UmlProcessStatistics {
       numEdges = 0;
       avgInDegree = 0;
       avgOutDegree = 0;
+      maxInDegree = 0;
+      maxOutDegree = 0;
     }
 
     /*!
@@ -121,6 +126,8 @@ class UmlProcessStatistics {
       result << delim << numEdges;
       result << delim << avgInDegree;
       result << delim << avgOutDegree;
+      result << delim << maxInDegree;
+      result << delim << maxOutDegree;
 
       return result.str();
     }

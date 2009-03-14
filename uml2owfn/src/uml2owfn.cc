@@ -414,7 +414,7 @@ int main( int argc, char *argv[])
         }
 
         log_print("NET");
-        log_print(";COMPLEX SYNTAX (UML);SYNTAX FEATURES (UML);NUM NODES (UML);NUM EDGES (UML);AVG INDEGREE (UML); AVG OUTDEGREE (UML)");
+        log_print(";COMPLEX SYNTAX (UML);SYNTAX FEATURES (UML);NUM NODES (UML);NUM EDGES (UML);AVG INDEGREE (UML); AVG OUTDEGREE (UML);MAX INDEGREE (UML); MAX OUTDEGREE (UML)");
         log_println(";NET PROPERTIES (PN)");
 
         int processNum = 0;           // running number of processes

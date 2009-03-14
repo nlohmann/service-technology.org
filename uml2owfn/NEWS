@@ -6,8 +6,8 @@
                  http://www.service-technology.org/uml2owfn/
 
 
-Version 2.00-unreleased
-=======================
+Version 2.00
+============
 
 * Re-implementation of the compiler frontend.
 
@@ -60,6 +60,9 @@ Version 2.00-unreleased
   to control the use of debug and assert code
 
 * integrated BOM Anonymizer to UML2oWFN distribution (see directory `anon')
+
+* Added `./lola/Makefile' to automatically create all LoLA binaries needed
+  for soundness analysis. Prepared a sample translation and analysis scenario.
 
  
 See file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wbim:model xmlns:wbim="http://www.ibm.com/wbim/bomSchema1.0" schemaVersion="6.0.2">
+<wbim:model xmlns:wbim="http://www.ibm.com/wbim/bomSchema1.0" schemaVersion="6.2.0">
   <wbim:catalogs>
     <wbim:dataCatalogs>
       <wbim:catalog id="Bsnss32t" name="Business items"/>
@@ -12,9 +12,9 @@
     </wbim:organizationCatalogs>
     <wbim:processCatalogs>
       <wbim:catalog id="Prcsss" name="Processes">
-        <wbim:catalog id="StpvsEnd" name="StopvsEnd"/>
-        <wbim:catalog id="BOMcncpt" name="BOMconcepts"/>
-        <wbim:catalog id="BOMcncpt1" name="BOMconceptsPin"/>
+        <wbim:catalog id="UMLStpvs" name="UMLStopvsEnd"/>
+        <wbim:catalog id="UMLcncpt" name="UMLconcepts"/>
+        <wbim:catalog id="UMLcncpt1" name="UMLconceptsPin"/>
       </wbim:catalog>
     </wbim:processCatalogs>
     <wbim:classifierCatalogs>
@@ -34,7 +34,7 @@
   </wbim:resourceModel>
   <wbim:processModel>
     <wbim:processes>
-      <wbim:process name="StpvsEnd##StopvsEnd_1">
+      <wbim:process name="UMLStpvs##StopvsEnd_1" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -47,7 +47,42 @@
         </wbim:outputs>
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
+          <wbim:endNode name="End Node"/>
           <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
             <wbim:inputs>
               <wbim:input name="Input"/>
               <wbim:inputCriterion name="Input Criterion">
@@ -86,41 +121,6 @@
               <wbim:output name="Output:2"/>
             </wbim:outputBranch>
           </wbim:fork>
-          <wbim:task name="Task:2">
-            <wbim:inputs>
-              <wbim:input name="Input"/>
-              <wbim:inputCriterion name="Input Criterion">
-                <wbim:input name="Input"/>
-              </wbim:inputCriterion>
-            </wbim:inputs>
-            <wbim:outputs>
-              <wbim:output name="Output"/>
-              <wbim:outputCriterion name="Output Criterion">
-                <wbim:output name="Output"/>
-                <wbim:relatedInputCriteria>
-                  <wbim:inputCriterion name="Input Criterion"/>
-                </wbim:relatedInputCriteria>
-              </wbim:outputCriterion>
-            </wbim:outputs>
-          </wbim:task>
-          <wbim:task name="Task:3">
-            <wbim:inputs>
-              <wbim:input name="Input"/>
-              <wbim:inputCriterion name="Input Criterion">
-                <wbim:input name="Input"/>
-              </wbim:inputCriterion>
-            </wbim:inputs>
-            <wbim:outputs>
-              <wbim:output name="Output"/>
-              <wbim:outputCriterion name="Output Criterion">
-                <wbim:output name="Output"/>
-                <wbim:relatedInputCriteria>
-                  <wbim:inputCriterion name="Input Criterion"/>
-                </wbim:relatedInputCriteria>
-              </wbim:outputCriterion>
-            </wbim:outputs>
-          </wbim:task>
-          <wbim:endNode name="End Node"/>
           <wbim:connection name="Connection">
             <wbim:source node="Start Node"/>
             <wbim:target contactPoint="Input" node="Task"/>
@@ -151,7 +151,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="StpvsEnd##StopvsEnd_2">
+      <wbim:process name="UMLStpvs##StopvsEnd_2" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -166,6 +166,40 @@
           <wbim:startNode name="Start Node"/>
           <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
           <wbim:task name="Task">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:2">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
+          <wbim:task name="Task:3">
             <wbim:inputs>
               <wbim:input name="Input"/>
               <wbim:inputCriterion name="Input Criterion">
@@ -204,40 +238,6 @@
               <wbim:output name="Output:2"/>
             </wbim:outputBranch>
           </wbim:fork>
-          <wbim:task name="Task:2">
-            <wbim:inputs>
-              <wbim:input name="Input"/>
-              <wbim:inputCriterion name="Input Criterion">
-                <wbim:input name="Input"/>
-              </wbim:inputCriterion>
-            </wbim:inputs>
-            <wbim:outputs>
-              <wbim:output name="Output"/>
-              <wbim:outputCriterion name="Output Criterion">
-                <wbim:output name="Output"/>
-                <wbim:relatedInputCriteria>
-                  <wbim:inputCriterion name="Input Criterion"/>
-                </wbim:relatedInputCriteria>
-              </wbim:outputCriterion>
-            </wbim:outputs>
-          </wbim:task>
-          <wbim:task name="Task:3">
-            <wbim:inputs>
-              <wbim:input name="Input"/>
-              <wbim:inputCriterion name="Input Criterion">
-                <wbim:input name="Input"/>
-              </wbim:inputCriterion>
-            </wbim:inputs>
-            <wbim:outputs>
-              <wbim:output name="Output"/>
-              <wbim:outputCriterion name="Output Criterion">
-                <wbim:output name="Output"/>
-                <wbim:relatedInputCriteria>
-                  <wbim:inputCriterion name="Input Criterion"/>
-                </wbim:relatedInputCriteria>
-              </wbim:outputCriterion>
-            </wbim:outputs>
-          </wbim:task>
           <wbim:connection name="Connection">
             <wbim:source node="Start Node"/>
             <wbim:target contactPoint="Input" node="Task"/>
@@ -268,7 +268,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##MultipleChoice">
+      <wbim:process name="UMLcncpt##MultipleChoice" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -358,7 +358,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##ComplexProcess">
+      <wbim:process name="UMLcncpt##ComplexProcess" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:1"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -397,7 +397,7 @@
               <wbim:output name="Output:2"/>
             </wbim:outputBranch>
           </wbim:fork>
-          <wbim:callToProcess callSynchronously="true" name="MultipleChoice" process="BOMcncpt##MultipleChoice">
+          <wbim:callToProcess callSynchronously="true" name="MultipleChoice" process="UMLcncpt##MultipleChoice">
             <wbim:additionalInput name="Input:4">
               <wbim:inputCriterion name="Input Criterion"/>
             </wbim:additionalInput>
@@ -450,7 +450,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##ForkJoin">
+      <wbim:process name="UMLcncpt##ForkJoin" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -478,66 +478,6 @@
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
           <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
-          <wbim:decision isInclusive="false" name="Decision">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output:4"/>
-              <wbim:output name="Output:7"/>
-              <wbim:output name="Output"/>
-              <wbim:output name="Output:2"/>
-              <wbim:condition name="Output Condition"/>
-              <wbim:operationalData>
-                <wbim:probability>
-                  <wbim:literalValue>33.0</wbim:literalValue>
-                </wbim:probability>
-              </wbim:operationalData>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:5"/>
-              <wbim:output name="Output:8"/>
-              <wbim:condition name="Output Condition:2"/>
-              <wbim:operationalData>
-                <wbim:probability>
-                  <wbim:literalValue>34.0</wbim:literalValue>
-                </wbim:probability>
-              </wbim:operationalData>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 3">
-              <wbim:output name="Output:6"/>
-              <wbim:output name="Output:9"/>
-              <wbim:condition name="Output Condition:3"/>
-              <wbim:operationalData>
-                <wbim:probability>
-                  <wbim:literalValue>33.0</wbim:literalValue>
-                </wbim:probability>
-              </wbim:operationalData>
-            </wbim:outputBranch>
-          </wbim:decision>
-          <wbim:merge name="Merge">
-            <wbim:inputBranch name="Input Branch 1">
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:5"/>
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:8"/>
-              <wbim:input name="Input"/>
-              <wbim:input name="Input:4"/>
-            </wbim:inputBranch>
-            <wbim:inputBranch name="Input Branch 2">
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:6"/>
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:9"/>
-            </wbim:inputBranch>
-            <wbim:inputBranch name="Input Branch 3">
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:7"/>
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:10"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch ">
-              <wbim:output name="Output:2"/>
-              <wbim:output name="Output:3"/>
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-          </wbim:merge>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
@@ -609,6 +549,66 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
+          <wbim:decision isInclusive="false" name="Decision">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output:4"/>
+              <wbim:output name="Output:7"/>
+              <wbim:output name="Output"/>
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:5"/>
+              <wbim:output name="Output:8"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>34.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 3">
+              <wbim:output name="Output:6"/>
+              <wbim:output name="Output:9"/>
+              <wbim:condition name="Output Condition:3"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>33.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:5"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:8"/>
+              <wbim:input name="Input"/>
+              <wbim:input name="Input:4"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:6"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:9"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 3">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:7"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:10"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output:2"/>
+              <wbim:output name="Output:3"/>
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
           <wbim:connection name="Connection">
             <wbim:source node="Start Node"/>
             <wbim:target contactPoint="Input" node="Decision"/>
@@ -699,7 +699,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##InclusiveOr">
+      <wbim:process name="UMLcncpt##InclusiveOr" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -712,6 +712,7 @@
         </wbim:outputs>
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input name="Input"/>
@@ -834,7 +835,6 @@
               <wbim:output name="Output"/>
             </wbim:outputBranch>
           </wbim:merge>
-          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
           <wbim:connection name="Connection">
             <wbim:source node="Start Node"/>
             <wbim:target contactPoint="Input" node="Task"/>
@@ -877,7 +877,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##InclusiveOr2">
+      <wbim:process name="UMLcncpt##InclusiveOr2" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1027,7 +1027,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##ProcessSimple">
+      <wbim:process name="UMLcncpt##ProcessSimple" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:inputCriterion name="Input Criterion">
@@ -1107,7 +1107,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##SubprocessLocal">
+      <wbim:process name="UMLcncpt##SubprocessLocal" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1230,7 +1230,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_1_1">
+      <wbim:process name="UMLcncpt##Connection_1_1" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1300,7 +1300,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_1_N">
+      <wbim:process name="UMLcncpt##Connection_1_N" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1370,7 +1370,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_N_1">
+      <wbim:process name="UMLcncpt##Connection_N_1" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1440,7 +1440,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_N_N">
+      <wbim:process name="UMLcncpt##Connection_N_N" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1510,7 +1510,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_1_1_not">
+      <wbim:process name="UMLcncpt##Connection_1_1_not" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1576,7 +1576,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_1_N_not">
+      <wbim:process name="UMLcncpt##Connection_1_N_not" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1642,7 +1642,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_N_1_not">
+      <wbim:process name="UMLcncpt##Connection_N_1_not" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1708,7 +1708,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Connection_N_N_not">
+      <wbim:process name="UMLcncpt##Connection_N_N_not" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1774,7 +1774,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Repository">
+      <wbim:process name="UMLcncpt##Repository" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1788,6 +1788,7 @@
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
           <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node:2"/>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input name="Input"/>
@@ -1834,17 +1835,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:fork name="Fork">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:2"/>
-            </wbim:outputBranch>
-          </wbim:fork>
           <wbim:task name="Task:3">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input">
@@ -1868,7 +1858,17 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node:2"/>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
           <wbim:connection name="Connection">
             <wbim:source node="Start Node"/>
             <wbim:target contactPoint="Input" node="Task"/>
@@ -1896,7 +1896,7 @@
           <wbim:localRepository capacity="-1" isOrdered="false" isUnique="false" name="Local Information Repository" type="String"/>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##ProcessPinOverlap">
+      <wbim:process name="UMLcncpt1##ProcessPinOverlap" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In1"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In2"/>
@@ -1933,6 +1933,7 @@
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
           <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:endNode name="End Node"/>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="0" name="Input:2"/>
@@ -1975,26 +1976,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:fork name="Fork">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
-              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output:3"/>
-              <wbim:output name="Output:5"/>
-              <wbim:output name="Output:7"/>
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:4"/>
-              <wbim:output name="Output:6"/>
-              <wbim:output name="Output:8"/>
-              <wbim:output name="Output:2"/>
-            </wbim:outputBranch>
-          </wbim:fork>
           <wbim:task name="Task:2">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -2007,8 +1988,8 @@
                 <wbim:input name="Input"/>
               </wbim:inputCriterion>
               <wbim:inputCriterion name="Input Criterion:2">
-                <wbim:input name="Input:4"/>
                 <wbim:input name="Input:3"/>
+                <wbim:input name="Input:4"/>
                 <wbim:input name="Input"/>
               </wbim:inputCriterion>
             </wbim:inputs>
@@ -2035,6 +2016,26 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:3"/>
+              <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:4"/>
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output:3"/>
+              <wbim:output name="Output:5"/>
+              <wbim:output name="Output:7"/>
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:4"/>
+              <wbim:output name="Output:6"/>
+              <wbim:output name="Output:8"/>
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
           <wbim:join name="Join">
             <wbim:inputBranch name="Input Branch 1">
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
@@ -2060,7 +2061,6 @@
               <wbim:output name="Output"/>
             </wbim:outputBranch>
           </wbim:join>
-          <wbim:endNode name="End Node"/>
           <wbim:connection name="Connection:2">
             <wbim:source contactPoint="Output" node="Task"/>
             <wbim:target contactPoint="Input" node="Task2"/>
@@ -2155,7 +2155,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##ProcessPinDisjoint">
+      <wbim:process name="UMLcncpt1##ProcessPinDisjoint" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In1"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In2"/>
@@ -2189,6 +2189,8 @@
         </wbim:outputs>
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:endNode name="End Node"/>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -2263,18 +2265,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:endNode name="End Node"/>
-          <wbim:fork name="Fork">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:2"/>
-            </wbim:outputBranch>
-          </wbim:fork>
           <wbim:task name="Task:3">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -2300,7 +2290,17 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
           <wbim:connection name="Connection:2">
             <wbim:source contactPoint="Output" node="Task"/>
             <wbim:target contactPoint="Input" node="Task2"/>
@@ -2367,7 +2367,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##TaskPinDisjointProc">
+      <wbim:process name="UMLcncpt1##TaskPinDisjointProc" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -2381,40 +2381,6 @@
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
           <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
-          <wbim:decision isInclusive="false" name="Decision">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output"/>
-              <wbim:condition name="Output Condition"/>
-              <wbim:operationalData>
-                <wbim:probability>
-                  <wbim:literalValue>50.0</wbim:literalValue>
-                </wbim:probability>
-              </wbim:operationalData>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:2"/>
-              <wbim:condition name="Output Condition:2"/>
-              <wbim:operationalData>
-                <wbim:probability>
-                  <wbim:literalValue>50.0</wbim:literalValue>
-                </wbim:probability>
-              </wbim:operationalData>
-            </wbim:outputBranch>
-          </wbim:decision>
-          <wbim:merge name="Merge">
-            <wbim:inputBranch name="Input Branch 1">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:inputBranch name="Input Branch 2">
-              <wbim:input name="Input:2"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch ">
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-          </wbim:merge>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input name="Input"/>
@@ -2443,46 +2409,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:connection name="Connection">
-            <wbim:source node="Start Node"/>
-            <wbim:target contactPoint="Input" node="Decision"/>
-          </wbim:connection>
-          <wbim:connection name="Connection:2">
-            <wbim:source contactPoint="Output" node="Decision"/>
-            <wbim:target contactPoint="Input" node="Task"/>
-          </wbim:connection>
-          <wbim:connection name="Connection:3">
-            <wbim:source contactPoint="Output:2" node="Decision"/>
-            <wbim:target contactPoint="Input:2" node="Task"/>
-          </wbim:connection>
-          <wbim:connection name="Connection:4">
-            <wbim:source contactPoint="Output" node="Task"/>
-            <wbim:target contactPoint="Input" node="Merge"/>
-          </wbim:connection>
-          <wbim:connection name="Connection:5">
-            <wbim:source contactPoint="Output:2" node="Task"/>
-            <wbim:target contactPoint="Input:2" node="Merge"/>
-          </wbim:connection>
-          <wbim:connection name="Connection:6">
-            <wbim:source contactPoint="Output" node="Merge"/>
-            <wbim:target node="Stop Node"/>
-          </wbim:connection>
-        </wbim:flowContent>
-      </wbim:process>
-      <wbim:process name="BOMcncpt1##TaskCallPinDisjointProc">
-        <wbim:inputs>
-          <wbim:inputCriterion name="Input Criterion"/>
-        </wbim:inputs>
-        <wbim:outputs>
-          <wbim:outputCriterion name="Output Criterion">
-            <wbim:relatedInputCriteria>
-              <wbim:inputCriterion name="Input Criterion"/>
-            </wbim:relatedInputCriteria>
-          </wbim:outputCriterion>
-        </wbim:outputs>
-        <wbim:flowContent>
-          <wbim:startNode name="Start Node"/>
-          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
           <wbim:decision isInclusive="false" name="Decision">
             <wbim:inputBranch name="Input Branch ">
               <wbim:input name="Input"/>
@@ -2517,20 +2443,46 @@
               <wbim:output name="Output"/>
             </wbim:outputBranch>
           </wbim:merge>
-          <wbim:callToTask callSynchronously="true" name="TaskPinDisjoint" task="BOMcncpt1##TaskPinDisjoint">
-            <wbim:additionalInput name="Input">
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Decision"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="Output" node="Decision"/>
+            <wbim:target contactPoint="Input" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="Output:2" node="Decision"/>
+            <wbim:target contactPoint="Input:2" node="Task"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="Output" node="Task"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="Output:2" node="Task"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target node="Stop Node"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="UMLcncpt1##TaskCallPinDisjointProc" style="BPMN">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
               <wbim:inputCriterion name="Input Criterion"/>
-            </wbim:additionalInput>
-            <wbim:additionalInput name="Input:2">
-              <wbim:inputCriterion name="Input Criterion:2"/>
-            </wbim:additionalInput>
-            <wbim:additionalOutput name="Output">
-              <wbim:outputCriterion name="Output Criterion"/>
-            </wbim:additionalOutput>
-            <wbim:additionalOutput name="Output:2">
-              <wbim:outputCriterion name="Output Criterion:2"/>
-            </wbim:additionalOutput>
-          </wbim:callToTask>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node"/>
           <wbim:task name="Task:2">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -2607,6 +2559,54 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
+          <wbim:decision isInclusive="false" name="Decision">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="Output Condition"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="Output Condition:2"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:callToTask callSynchronously="true" name="TaskPinDisjoint" task="UMLcncpt1##TaskPinDisjoint">
+            <wbim:additionalInput name="Input">
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:additionalInput>
+            <wbim:additionalInput name="Input:2">
+              <wbim:inputCriterion name="Input Criterion:2"/>
+            </wbim:additionalInput>
+            <wbim:additionalOutput name="Output">
+              <wbim:outputCriterion name="Output Criterion"/>
+            </wbim:additionalOutput>
+            <wbim:additionalOutput name="Output:2">
+              <wbim:outputCriterion name="Output Criterion:2"/>
+            </wbim:additionalOutput>
+          </wbim:callToTask>
           <wbim:connection name="Connection:6">
             <wbim:source contactPoint="Output" node="Merge"/>
             <wbim:target node="Stop Node"/>
@@ -2665,7 +2665,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##ProcessPinDisjointStopEnd">
+      <wbim:process name="UMLcncpt1##ProcessPinDisjointStopEnd" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -2694,6 +2694,8 @@
         </wbim:outputs>
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
+          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node:2"/>
+          <wbim:endNode name="End Node"/>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
@@ -2732,6 +2734,25 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
+          <wbim:task name="Task:3">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:input name="Input:2"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+                <wbim:input name="Input:2"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+          </wbim:task>
           <wbim:decision isInclusive="false" name="Decision">
             <wbim:inputBranch name="Input Branch ">
               <wbim:input name="Input"/>
@@ -2755,27 +2776,6 @@
               </wbim:operationalData>
             </wbim:outputBranch>
           </wbim:decision>
-          <wbim:stopNode associatedOutputCriterion="Output Criterion" name="Stop Node:2"/>
-          <wbim:endNode name="End Node"/>
-          <wbim:task name="Task:3">
-            <wbim:inputs>
-              <wbim:input name="Input"/>
-              <wbim:input name="Input:2"/>
-              <wbim:inputCriterion name="Input Criterion">
-                <wbim:input name="Input"/>
-                <wbim:input name="Input:2"/>
-              </wbim:inputCriterion>
-            </wbim:inputs>
-            <wbim:outputs>
-              <wbim:output name="Output"/>
-              <wbim:outputCriterion name="Output Criterion">
-                <wbim:output name="Output"/>
-                <wbim:relatedInputCriteria>
-                  <wbim:inputCriterion name="Input Criterion"/>
-                </wbim:relatedInputCriteria>
-              </wbim:outputCriterion>
-            </wbim:outputs>
-          </wbim:task>
           <wbim:merge name="Merge">
             <wbim:inputBranch name="Input Branch 1">
               <wbim:input name="Input"/>
@@ -2835,7 +2835,7 @@
       </wbim:process>
     </wbim:processes>
     <wbim:tasks>
-      <wbim:task name="BOMcncpt1##TaskPinDisjoint">
+      <wbim:task name="UMLcncpt1##TaskPinDisjoint">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="InputA"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="InputB"/>
@@ -2866,3 +2866,4 @@
     </wbim:tasks>
   </wbim:processModel>
 </wbim:model>
+

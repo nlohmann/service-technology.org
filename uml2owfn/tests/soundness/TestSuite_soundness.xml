@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wbim:model xmlns:wbim="http://www.ibm.com/wbim/bomSchema1.0" schemaVersion="6.0.2">
+<wbim:model xmlns:wbim="http://www.ibm.com/wbim/bomSchema1.0" schemaVersion="6.2.0">
   <wbim:catalogs>
     <wbim:dataCatalogs>
       <wbim:catalog id="Bsnss32t" name="Business items"/>
@@ -12,9 +12,9 @@
     </wbim:organizationCatalogs>
     <wbim:processCatalogs>
       <wbim:catalog id="Prcsss" name="Processes">
-        <wbim:catalog id="StpvsEnd" name="StopvsEnd"/>
-        <wbim:catalog id="BOMcncpt" name="BOMconcepts"/>
-        <wbim:catalog id="BOMcncpt1" name="BOMconceptsPin"/>
+        <wbim:catalog id="UMLStpvs" name="UMLStopvsEnd"/>
+        <wbim:catalog id="UMLcncpt" name="UMLconcepts"/>
+        <wbim:catalog id="UMLcncpt1" name="UMLconceptsPin"/>
       </wbim:catalog>
     </wbim:processCatalogs>
     <wbim:classifierCatalogs>
@@ -34,7 +34,7 @@
   </wbim:resourceModel>
   <wbim:processModel>
     <wbim:processes>
-      <wbim:process name="StpvsEnd##StopvsEnd_1_nonsound">
+      <wbim:process name="UMLStpvs##StopvsEnd_1_ull" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -149,9 +149,13 @@
             <wbim:source contactPoint="Output" node="Task:3"/>
             <wbim:target node="End Node"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process cannot terminate although it has no deadlock and no lack of synchronization. Instead, it has a livelock.</wbim:annotationText>
+            <wbim:annotatedNode name="Merge"/>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="StpvsEnd##StopvsEnd_2_sound_ifStop">
+      <wbim:process name="UMLStpvs##StopvsEnd_2_sound_ifStop" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -266,9 +270,14 @@
             <wbim:source contactPoint="Output" node="Task:3"/>
             <wbim:target node="Stop Node"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process can terminate despite the inifinte loop because of the stop event which terminates the process by removing all tokens.</wbim:annotationText>
+            <wbim:annotatedNode name="Stop Node"/>
+            <wbim:annotatedNode name="Merge"/>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="StpvsEnd##StopvsEnd_1b_sound_nonsafe">
+      <wbim:process name="UMLStpvs##StopvsEnd_1b_uls" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -281,6 +290,8 @@
         </wbim:outputs>
         <wbim:flowContent>
           <wbim:startNode name="Start Node"/>
+          <wbim:endNode name="End Node:2"/>
+          <wbim:endNode name="End Node"/>
           <wbim:task name="Task">
             <wbim:inputs>
               <wbim:input name="Input"/>
@@ -332,28 +343,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:merge name="Merge">
-            <wbim:inputBranch name="Input Branch 1">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:inputBranch name="Input Branch 2">
-              <wbim:input name="Input:2"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch ">
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-          </wbim:merge>
-          <wbim:fork name="Fork">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:2"/>
-            </wbim:outputBranch>
-          </wbim:fork>
           <wbim:task name="Task:4">
             <wbim:inputs>
               <wbim:input name="Input"/>
@@ -371,7 +360,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:endNode name="End Node:2"/>
           <wbim:task name="Task:5">
             <wbim:inputs>
               <wbim:input name="Input"/>
@@ -389,17 +377,6 @@
               </wbim:outputCriterion>
             </wbim:outputs>
           </wbim:task>
-          <wbim:fork name="Fork:2">
-            <wbim:inputBranch name="Input Branch ">
-              <wbim:input name="Input"/>
-            </wbim:inputBranch>
-            <wbim:outputBranch name="Output Branch 1">
-              <wbim:output name="Output"/>
-            </wbim:outputBranch>
-            <wbim:outputBranch name="Output Branch 2">
-              <wbim:output name="Output:2"/>
-            </wbim:outputBranch>
-          </wbim:fork>
           <wbim:decision isInclusive="false" name="Decision">
             <wbim:inputBranch name="Input Branch ">
               <wbim:input name="Input"/>
@@ -423,6 +400,39 @@
               </wbim:operationalData>
             </wbim:outputBranch>
           </wbim:decision>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:fork name="Fork:2">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+            </wbim:outputBranch>
+          </wbim:fork>
           <wbim:join name="Join">
             <wbim:inputBranch name="Input Branch 1">
               <wbim:input name="Input"/>
@@ -434,7 +444,6 @@
               <wbim:output name="Output"/>
             </wbim:outputBranch>
           </wbim:join>
-          <wbim:endNode name="End Node"/>
           <wbim:connection name="Connection">
             <wbim:source node="Start Node"/>
             <wbim:target contactPoint="Input" node="Task"/>
@@ -491,9 +500,12 @@
             <wbim:source contactPoint="Output" node="Join"/>
             <wbim:target node="End Node"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has a lack of synchronization.</wbim:annotationText>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##ForkJoin_sound">
+      <wbim:process name="UMLcncpt##XOR_sound" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -742,7 +754,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##InclusiveOr_sound_nonsafe">
+      <wbim:process name="UMLcncpt##ORsplit_uls" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -918,9 +930,14 @@
             <wbim:source contactPoint="Output" node="Merge:2"/>
             <wbim:target node="Stop Node"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has a lack of synchronization at the XOR-join because the OR-split can send multiple tokens over the branches.</wbim:annotationText>
+            <wbim:annotatedNode name="Merge:2"/>
+            <wbim:annotatedNode name="Task"/>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##InclusiveOr2_sound">
+      <wbim:process name="UMLcncpt##ORsplit_sound" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1070,7 +1087,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##ProcessSimple_sound">
+      <wbim:process name="UMLcncpt##ProcessSimple_sound" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:inputCriterion name="Input Criterion">
@@ -1150,7 +1167,7 @@
           </wbim:connection>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt##Repository_sound">
+      <wbim:process name="UMLcncpt##Repository_sound" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1272,7 +1289,7 @@
           <wbim:localRepository capacity="-1" isOrdered="false" isUnique="false" name="Local Information Repository" type="String"/>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##ProcessPinOverlap_nonsound_stop">
+      <wbim:process name="UMLcncpt1##ProcessPinOverlap_udl_stop" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In1"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In2"/>
@@ -1529,9 +1546,14 @@
             <wbim:source contactPoint="Output:2" node="Join"/>
             <wbim:target contactPoint="Out3"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has multiple input and output pinsets. The pinsets are overlapping.&#xD;
+&#xD;
+The process has a deadlock on the first AND-split.</wbim:annotationText>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##ProcessPinDisjoint_sound_ifStop">
+      <wbim:process name="UMLcncpt1##ProcessPinDisjoint_sound_ifStop" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In1"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="In2"/>
@@ -1741,9 +1763,15 @@
             <wbim:source contactPoint="Output:4" node="Task:2"/>
             <wbim:target contactPoint="Out3"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has multiple input and output pinsets. The pinsets do not overlap.</wbim:annotationText>
+          </wbim:annotation>
+          <wbim:annotation>
+            <wbim:annotationText>The process only terminates properly, if this stop event is reached which removes ALL tokens from the process.</wbim:annotationText>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##TaskPinDisjointProc_sound_stop">
+      <wbim:process name="UMLcncpt1##TaskPinDisjointProc_sound_stop" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1843,9 +1871,12 @@
             <wbim:source contactPoint="Output" node="Merge"/>
             <wbim:target node="Stop Node"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has multiple input and output pinsets on one of its tasks. The pinsets do not overlap.</wbim:annotationText>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##TaskCallPinDisjointProc_sound_stop">
+      <wbim:process name="UMLcncpt1##TaskCallPinDisjointProc_sound_stop" style="BPMN">
         <wbim:inputs>
           <wbim:inputCriterion name="Input Criterion"/>
         </wbim:inputs>
@@ -1969,7 +2000,7 @@
               <wbim:output name="Output"/>
             </wbim:outputBranch>
           </wbim:merge>
-          <wbim:callToTask callSynchronously="true" name="TaskPinDisjoint" task="BOMcncpt1##TaskPinDisjoint">
+          <wbim:callToTask callSynchronously="true" name="TaskPinDisjoint" task="UMLcncpt1##TaskPinDisjoint">
             <wbim:additionalInput name="Input">
               <wbim:inputCriterion name="Input Criterion"/>
             </wbim:additionalInput>
@@ -2039,9 +2070,12 @@
             <wbim:source contactPoint="Output" node="Task:4"/>
             <wbim:target contactPoint="Input:2" node="Merge"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has multiple input and output pinsets on one of its tasks. The pinsets do not overlap.</wbim:annotationText>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
-      <wbim:process name="BOMcncpt1##ProcessPinDisjointStopEnd_sound_stop">
+      <wbim:process name="UMLcncpt1##ProcessPinDisjointStopEnd_sound_stop" style="BPMN">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="Input:2"/>
@@ -2207,11 +2241,14 @@
             <wbim:source contactPoint="Output:2" node="Task:2"/>
             <wbim:target contactPoint="Output:2"/>
           </wbim:connection>
+          <wbim:annotation>
+            <wbim:annotationText>This process has multiple input and output pinsets. The pinsets do not overlap.</wbim:annotationText>
+          </wbim:annotation>
         </wbim:flowContent>
       </wbim:process>
     </wbim:processes>
     <wbim:tasks>
-      <wbim:task name="BOMcncpt1##TaskPinDisjoint">
+      <wbim:task name="UMLcncpt1##TaskPinDisjoint">
         <wbim:inputs>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="InputA"/>
           <wbim:input associatedData="String" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="InputB"/>

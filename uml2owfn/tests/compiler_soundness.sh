@@ -18,7 +18,7 @@ echo "[strong termination and safeness, LoLA, taskfiles]"
 	$cmd &> /dev/null
 	result=$(($result | $?))
 	
-	if [ ! -f $builddir/TestSuite_soundness.BOMcncpt1__ProcessPinDisjoint_sound_ifStop.lola.fin.task -o ! -f $builddir/TestSuite_soundness.BOMcncpt1__ProcessPinDisjoint_sound_ifStop.lola.safe.task ] ; then
+	if [ ! -f $builddir/TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.fin.task -o ! -f $builddir/TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.safe.task ] ; then
 	  result=1
 	  echo "[fail] task files not generated"
 	fi
@@ -36,7 +36,7 @@ echo "[strong termination, LoLA, no taskfiles]"
 	$cmd &> /dev/null
 	result=$(($result | $?))
 	
-	if [ -f $builddir/TestSuite_soundness.BOMcncpt1__ProcessPinDisjoint_sound_ifStop.lola.fin.task -o -f $builddir/TestSuite_soundness.BOMcncpt1__ProcessPinDisjoint_sound_ifStop.lola.safe.task ] ; then
+	if [ -f $builddir/TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.fin.task -o -f $builddir/TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.safe.task ] ; then
 	  result=1
 	  echo "[fail] task files generated"
 	fi

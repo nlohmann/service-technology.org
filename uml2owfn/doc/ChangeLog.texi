@@ -1,4 +1,4 @@
-@heading Version 2.00-unreleased
+@heading Version 2.00
 @itemize
 @item Re-implementation of the compiler frontend.
 @item Local sub processes and loops are now treated as simple tasks in the parent process. Each subprocess and each loop is added as a process to the list of all output-processes.
@@ -26,6 +26,7 @@ The old parameter @samp{-p filter} remains for backwards compatibility and imple
 @item Extended the translation log file which now distinguishes properties of UML processes and of the Petri nets
 @item Added @samp{--enable-debug} and @samp{--disable-assert} to @file{./configure} parameters to control the use of debug and assert code
 @item integrated BOM Anonymizer to UML2oWFN distribution (see directory @file{anon})
+@item Added @file{./lola/Makefile} to automatically create all LoLA binaries needed for soundness analysis. Prepared a sample translation and analysis scenario.
 @end itemize
 
 @heading Version 1.11

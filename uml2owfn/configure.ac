@@ -1,4 +1,4 @@
-AC_INIT([UML2oWFN],[2.00-unreleased],[znamirow@informatik.hu-berlin.de],[uml2owfn])
+AC_INIT([UML2oWFN],[2.00],[znamirow@informatik.hu-berlin.de],[uml2owfn])
 
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.59)
@@ -144,6 +144,7 @@ AC_SUBST(configured_LDFLAGS)
 AC_CONFIG_FILES([src/Makefile \
                  tests/Makefile \
                  anon/Makefile \
+                 lola/Makefile \
                  doc/Makefile doc/Doxyfile \
                  Makefile])
 

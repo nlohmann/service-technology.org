@@ -3,7 +3,7 @@
 # variables. Type "make help" for help.
 
 LIBRARY           = b3
-SED               = gsed               # GNU sed
+SED               = sed                # sed
 LOLA-SP           = lola-sp            # LoLA with STATEPREDICATE
 LOLA-MC           = lola-mc            # LoLA with MODELCHECKING
 LOLA-LP           = lola-lp            # LoLA with LIVEPROP
@@ -14,6 +14,10 @@ REDUCTION-LEVEL   = 3                  # Petri net reduction level for the
 UML2OWFN-PARAM    = -p filter -p ctl   # additional UML2oWFN paramters
 OUTPUT-FORMAT     = lola               # output format to be produced by UML2oWFN
                                        # see uml2owfn -h for feasible options
+                                       
+LOLA_DIR          =
+UML2OWFN_DIR      =
+                                       
 ##########################################################################
 
 
@@ -46,13 +50,13 @@ full:      $(LOLAFILES:.lola=.lola.full.output)
 # analysis (safeness, soundness, full state space)
 ##########################################################################
 %.lola.safe.output: %.lola
-	-@$(LOLA-SP) $< -a $(<:.lola=.lola.safe.task) > $@ 2> $@ ; echo SAFENESS-RESULT: $$? >> $@
+	-@$(LOLA_DIR)$(LOLA-SP) $< -a$(<:.lola=.lola.safe.task) > $@ 2> $@ ; echo SAFENESS-RESULT: $$? >> $@
 
 %.lola.sound.output: %.lola
-	-@$(LOLA-MC) $< -a $(<:.lola=.lola.fin.task) > $@ 2> $@ ; echo SOUNDNESS-RESULT: $$? >> $@
+	-@$(LOLA_DIR)$(LOLA-MC) $< -a$(<:.lola=.lola.fin.task) > $@ 2> $@ ; echo SOUNDNESS-RESULT: $$? >> $@
 
 %.lola.full.output: %.lola
-	-@$(LOLA-FULL-LIMITED) $< > $@ 2> $@ || echo FULL-RESULT: $$? >> $@
+	-@$(LOLA_DIR)$(LOLA-FULL-LIMITED) $< > $@ 2> $@ || echo FULL-RESULT: $$? >> $@
 	@$(SED) -i 's/FULL-RESULT: 5/FULL-RESULT: 5\n>>>>> oo States/' $@
 
 
@@ -78,7 +82,7 @@ results.csv: safeness soundness
 	grep "States" *.sound.output | awk {'if ($$2 == 0) print $$6; else print $$2'} > result_STATES.log
 	grep "States" *.full.output | awk {'print $$2'} > result_STATES_FULL.log
 	# make a table out of the intermediate results
-	paste -d',' \
+	paste -d';' \
 		result_NAMES.log \
 		result_SOUNDNESS.log \
 		result_SAFENESS.log \
@@ -91,7 +95,7 @@ results.csv: safeness soundness
 	$(SED) -i 's/sound,unsafe/unsafe/;s/unsound,safe/unsound/;s/sound,safe/sound/;s/unsafe,unsafe/unsafe/' results.csv
 	$(SED) -i '1iProcess Name,Result,Places,Transitions,States seen,States total' results.csv
 	# table for comparison
-	paste -d',' \
+	paste -d';' \
 		result_NAMES.log \
 		result_SOUNDNESS.log \
 		result_SAFENESS.log \
@@ -111,16 +115,16 @@ results.csv: safeness soundness
 # create files
 ##########################################################################
 translate: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	$(UML2OWFN_DIR)uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 translateweak: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a noData -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	$(UML2OWFN_DIR)uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a noData -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 	
 translatewf: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	$(UML2OWFN_DIR)uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a wfNet -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 translateor: $(LIBRARY).xml
-	uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
+	$(UML2OWFN_DIR)uml2owfn -i $< -f ${OUTPUT-FORMAT} -a soundness -a safe -a orJoin -p taskfile -p log -r $(REDUCTION-LEVEL) $(UML2OWFN-PARAM) -o 2> translation.log
 
 
 ##########################################################################
@@ -132,7 +136,7 @@ clean:
 	-rm *.lola.full.output
 
 veryclean: clean
-	-rm *.lola *.task *.log results.csv results-comparison.csv
+	-rm *.lola *.task *.log check_*.sh results.csv results-comparison.csv
 
 
 ##########################################################################

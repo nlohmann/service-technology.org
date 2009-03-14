@@ -122,7 +122,7 @@ AC_SUBST(configured_LDFLAGS)
 # Set files to generate.
 AC_CONFIG_FILES([Makefile \
 	  doc/Makefile \
-	  src/Makefile src/Doxyfile \
+	  src/Makefile doc/Doxyfile \
 	  man/Makefile \
 	  tests/Makefile \
 	  gui/static_release.sh \

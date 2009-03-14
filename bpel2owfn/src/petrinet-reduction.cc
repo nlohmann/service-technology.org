@@ -898,7 +898,7 @@ void PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  *
  * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
  * \pre \f$ t \f$ is a transition in the postset of \f$ p \f$ but not in the preset of \f$ p \f$: \f$ p \in p^{\bullet}\setminus {^{\bullet}p} \f$
- * \pre \f$ t \f$ is the only transition in the postset of \f$ p \fS: \f$ p^\bullet = \{t\} \f$
+ * \pre \f$ t \f$ is the only transition in the postset of \f$ p \f$: \f$ p^\bullet = \{t\} \f$
  * \pre the preset of \f$ p \f$ must not be empty: \f$ {{^{bullet}}p}\neq\emptyset \f$
  * \pre the postset of the preset of \f$ p \f$ is again \f$ p \f$: \f$ ({^{\bullet}p}^{\bullet})=\{p\} \f$
  * \pre \f$ p \f$ must not be marked initially: \f$ M_0(p)=0 \f$
@@ -1065,9 +1065,9 @@ void PetriNet::reduce_esparzas_abstraction_rule() {
  *
  * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
  * \pre \f$ u \f$ is a transition in the preset of \f$ p \f$ but not in the postset of \f$ p \f$: \f$ p \in {^{\bullet}p}\setminus p^{\bullet}\f$
- * \pre \f$ u \f$ is the only transition in the preset of \f$ p \fS: \f$ {^\bullet}p = \{u\} \f$
+ * \pre \f$ u \f$ is the only transition in the preset of \f$ p \f$: \f$ {^\bullet}p = \{u\} \f$
  * \pre the preset of \f$ p \f$ must not be empty: \f$ {{^{bullet}}p}\neq\emptyset \f$
- * \pre the preset of the postset of \f$ p \f$ again is \f$ p \f$: \f$ {^{\bullet}(p^{\bullet})=\{p\} \f$
+ * \pre the preset of the postset of \f$ p \f$ again is \f$ p \f$: \f$ {}^{\bullet}(p^{\bullet})=\{p\} \f$
  * \pre \f$ p \f$ must not be marked initially: \f$ M_0(p)=0 \f$
  * \pre weights of all arcs form \f$ p \f$ to adjacent Transitions must be 1: \f$ \forall (p,t),(t,p)\in F\,:\,W((p,t))=W((t,p))=1  \f$
  * 

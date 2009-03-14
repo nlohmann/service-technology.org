@@ -17,6 +17,8 @@ svn-clean: maintainer-clean
 	-rm -f src/config.h.in
 	-rm -f tests/Makefile.in
 	-rm -f utils/Makefile.in
+	-rm -fr doc/doxygen
+	-rm -f doc/Doxyfile
 	-rm -f INSTALL
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter

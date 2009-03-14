@@ -10,6 +10,7 @@ svn-clean: maintainer-clean
 	  tests/Makefile.in doc/mdate-sh doc/Makefile.in src/.deps \
 	  src/config.H.in~ maintainer/Makefile.in utils/Makefile.in \
 	  utils/graph_syntax.h man/Makefile.in compile
+	-rm -fr doc/doxygen doc/Doxyfile
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"

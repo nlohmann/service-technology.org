@@ -79,7 +79,7 @@ AC_DEFINE_UNQUOTED(CONFIG_ENABLEUNIVERSAL, "$enable_universal", [whether to buil
 if test "$enable_universal" = "yes"; then
   if test "$enable_dependency_tracking" != no ; then
     AC_MSG_ERROR([Please re-run configure with these options:
-  ‘--disable-dependency-tracking --enable-universal’])
+  '--disable-dependency-tracking --enable-universal'])
   fi
   configured_CFLAGS=$configured_CFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
   configured_CXXFLAGS=$configured_CXXFLAGS" -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
@@ -137,18 +137,18 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile man/Makefile maintainer/Makefile tests/Makefile utils/Makefile Doxyfile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile maintainer/Makefile tests/Makefile utils/Makefile])
 
 AC_OUTPUT
 
 echo
 echo "------------------------------------------------------------------------------"
-echo " Please have a look at the documentation and edit the file ‘src/userconfig.H’"
-echo " according to your needs. Then, run ‘make’ to compile LoLA."
+echo " Please have a look at the documentation and edit the file 'src/userconfig.H'"
+echo " according to your needs. Then, run 'make' to compile LoLA."
 echo
 echo " Alternatively, you can compile a preconfigured version of LoLA using a"
-echo " configuration from directory ‘src/configs’. To use, for example, the"
-echo " configuration ‘src/configs/userconfig.H.deadlock’, run ‘make lola-deadlock’."
-echo " To compile all preconfigured versions, run ‘make all-configs’."
+echo " configuration from directory 'src/configs'. To use, for example, the"
+echo " configuration 'src/configs/userconfig.H.deadlock', run 'make lola-deadlock'."
+echo " To compile all preconfigured versions, run 'make all-configs'."
 echo "------------------------------------------------------------------------------"
 echo

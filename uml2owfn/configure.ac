@@ -144,7 +144,7 @@ AC_SUBST(configured_LDFLAGS)
 AC_CONFIG_FILES([src/Makefile \
                  tests/Makefile \
                  anon/Makefile \
-                 doc/Makefile \
+                 doc/Makefile doc/Doxyfile \
                  Makefile])
 
 AC_OUTPUT

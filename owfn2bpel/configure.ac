@@ -27,6 +27,6 @@ AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile src/Doxyfile man/Makefile doc/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile src/Doxyfile man/Makefile doc/Makefile doc/Doxyfile tests/Makefile])
 
 AC_OUTPUT

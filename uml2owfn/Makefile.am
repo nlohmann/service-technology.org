@@ -18,6 +18,7 @@ svn-clean: maintainer-clean
 	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~
 	rm -fr tests/Makefile.in tests/.DS_Store doc/Makefile.in anon/Makefile.in doc/mdate-sh
 	rm -fr maintainer/Makefile.in maintainer/.DS_Store
+	rm -fr doc/doxygen doc/Doxyfile
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  aclocal"

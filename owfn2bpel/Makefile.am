@@ -18,6 +18,7 @@ svn-clean: maintainer-clean
 	  config.guess config.h.in~ COPYING 
 	rm -fr doc/.DS_Store doc/Makefile.in doc/mdate-sh doc/figs/.DS_Store \
 	  doc/manual doc/owfn2bpel.pdf doc/texinfo.tex
+	-rm -fr doc/Doxyfile doc/doxygen
 	rm -fr man/Makefile.in
 	rm -fr src/.DS_Store src/Makefile.in src/config.h.in* src/doc
 	rm -fr tests/Makefile.in tests/.DS_Store

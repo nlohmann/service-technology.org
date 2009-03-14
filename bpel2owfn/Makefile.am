@@ -63,7 +63,7 @@ svn-clean: maintainer-clean
 	-rm -f man/Makefile.in
 	-rm -f src/Makefile.in
 	-rm -f src/config.h.in src/config.h.in~
-	-rm -f -r src/.deps src/doc
+	-rm -f -r src/.deps doc/doxygen
 	-rm -f tests/Makefile.in
 	-rm -f maintainer/gnu/Makefile.in
 	@echo "-----------------------------------------------------"

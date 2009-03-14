@@ -7,7 +7,7 @@ SUBDIRS = libs src tests man doc maintainer
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
-	-rm -f COPYING Doxyfile config.guess config.sub INSTALL
+	-rm -f COPYING config.guess config.sub INSTALL
 	-rm -f aclocal.m4 compile ylwrap
 	-rm -f configure
 	-rm -f depcomp
@@ -23,6 +23,8 @@ svn-clean: maintainer-clean
 	-rm -f src/config.h.in src/config.h.in~
 	-rm -f tests/Makefile.in tests/regression/Makefile.in tests/regression/Makefile
 	-rm -f maintainer/Makefile.in
+	-rm -f doc/Doxyfile
+	-rm -fr doc/doxygen
 	@echo -----------------------------------------------------
 	@echo "To recreate installation status enter"
 	@echo "  aclocal ; autoconf; autoheader; automake -a -c"

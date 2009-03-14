@@ -14,13 +14,13 @@ int main(int argc, char * argv[])
 {
   // read net
   PetriNet net;
-  fstream stream;
+  fstream stream1, stream2, stream3;
   
   begin_test("PetriNet::reduce_series_transitions()");
   
-  stream.open("test_series_transitions.owfn", std::ios_base::in);
+  stream1.open("test_series_transitions.owfn", std::ios_base::in);
   
-  if(!stream)
+  if(!stream1)
   {
     cout << endl << "Couldn't read test_series_transitions.owfn" << endl;
     assert(false);
@@ -28,7 +28,7 @@ int main(int argc, char * argv[])
   
   try
   {
-    stream >> owfn >> net;
+    stream1 >> owfn >> net;
   }
   catch (InputError e) 
   { 
@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
     assert(false); 
   }
   
-  stream.close();
+  stream1.close();
   
   assert(net.getPlaces().size() == 5); 
   assert(net.getTransitions().size() == 2);
@@ -54,9 +54,9 @@ int main(int argc, char * argv[])
   
   begin_test("PetriNet::reduce_series_transitions() [Don't keep normal]");
   
-  stream.open("test_series_transitions_keepnormal.owfn", std::ios_base::in);
+  stream2.open("test_series_transitions_keepnormal.owfn", std::ios_base::in);
   
-  if(!stream)
+  if(!stream2)
   {
     cout << endl << "Couldn't read test_series_transitions_keepnormal.owfn" << endl;
     assert(false);
@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
   
   try
   {
-    stream >> owfn >> net;
+    stream2 >> owfn >> net;
   }
   catch (InputError e) 
   { 
@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
     assert(false); 
   }
   
-  stream.close();
+  stream2.close();
     
   assert(net.getPlaces().size() == 5); 
   assert(net.getTransitions().size() == 2);
@@ -92,9 +92,9 @@ int main(int argc, char * argv[])
   
   begin_test("PetriNet::reduce_series_transitions() [Keep normal]");
     
-  stream.open("test_series_transitions_keepnormal.owfn", std::ios_base::in);
+  stream3.open("test_series_transitions_keepnormal.owfn", std::ios_base::in);
   
-  if(!stream)
+  if(!stream3)
   {
     cout << endl << "Couldn't read test_series_transitions_keepnormal.owfn" << endl;
     assert(false);
@@ -102,7 +102,7 @@ int main(int argc, char * argv[])
   
   try
   {
-    stream >> owfn >> net;
+    stream3 >> owfn >> net;
   }
   catch (InputError e) 
   { 
@@ -110,7 +110,7 @@ int main(int argc, char * argv[])
     assert(false); 
   }
   
-  stream.close();
+  stream3.close();
     
   assert(net.getPlaces().size() == 5); 
   assert(net.getTransitions().size() == 2);

@@ -8,6 +8,12 @@ SUBDIRS = src doc tests anon lola
 # maintainer - no maintainer directory yet
 
 #############################################################################
+# additional files
+#############################################################################
+
+EXTRA_DIST = scripts/Makefile
+
+#############################################################################
 # remove everything that can be re-built
 #############################################################################
 svn-clean: maintainer-clean

@@ -9,9 +9,9 @@ LOLA-MC           = lola-mc            # LoLA with MODELCHECKING
 LOLA-LP           = lola-lp            # LoLA with LIVEPROP
 LOLA-FULL-LIMITED = lola-full-limited  # LoLA with FULL
 
-REDUCTION-LEVEL   = 3                  # Petri net reduction level for the
+REDUCTION-LEVEL   = 0                  # Petri net reduction level for the
                                        # translation
-UML2OWFN-PARAM    = -p filter -p ctl   # additional UML2oWFN paramters
+UML2OWFN-PARAM    = -s empty -p ctl    # additional UML2oWFN paramters
 OUTPUT-FORMAT     = lola               # output format to be produced by UML2oWFN
                                        # see uml2owfn -h for feasible options
                                        
@@ -108,7 +108,7 @@ results.csv: safeness soundness
 	$(SED) -i 's/sound,unsafe/uls/'       results-comparison.csv
 	$(SED) -i 's/sound,safe/s/'           results-comparison.csv
 	# remove intermediate results
-	rm result_NAMES.log result_SOUNDNESS.log result_SAFENESS.log result_PLACE.log result_TRANSITION.log result_STATES.log result_STATES_FULL.log
+	#rm result_NAMES.log result_SOUNDNESS.log result_SAFENESS.log result_PLACE.log result_TRANSITION.log result_STATES.log result_STATES_FULL.log
 
 
 ##########################################################################

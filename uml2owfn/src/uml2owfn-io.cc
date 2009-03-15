@@ -627,7 +627,7 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
   if (isTaskFileAnalysis && taskFileWritten[an]) {
     scriptContents << "${1}" << lolaCommand << " "
       << getOutputFilename_net(F_LOLA)
-      << " -a " << getOutputFilename_net(F_LOLA) << taskFile_suffix << ".task"
+      << " -a" << getOutputFilename_net(F_LOLA) << taskFile_suffix << ".task"
       << " -P"
       << endl;
   } else {

@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wbim:model xmlns:wbim="http://www.ibm.com/wbim/bomSchema1.0" schemaVersion="6.2.0">
+  <wbim:catalogs>
+    <wbim:dataCatalogs>
+      <wbim:catalog id="Bsnss32t" name="Business items"/>
+    </wbim:dataCatalogs>
+    <wbim:resourceCatalogs>
+      <wbim:catalog id="Rsrcs" name="Resources"/>
+    </wbim:resourceCatalogs>
+    <wbim:organizationCatalogs>
+      <wbim:catalog id="Orgnztns" name="Organizations"/>
+    </wbim:organizationCatalogs>
+    <wbim:processCatalogs>
+      <wbim:catalog id="Prcsss" name="Processes"/>
+    </wbim:processCatalogs>
+    <wbim:classifierCatalogs>
+      <wbim:catalog id="Clssfrs" name="Classifiers"/>
+    </wbim:classifierCatalogs>
+    <wbim:businessServiceCatalogs>
+      <wbim:catalog id="Bsnss32s" name="Business services"/>
+    </wbim:businessServiceCatalogs>
+    <wbim:businessServiceObjectCatalogs>
+      <wbim:catalog id="Bsnss32s1" name="Business service objects"/>
+    </wbim:businessServiceObjectCatalogs>
+  </wbim:catalogs>
+  <wbim:dataModel>
+    <wbim:businessItems>
+      <wbim:businessItem name="Bsnss32t##Coffee Order">
+        <wbim:complexDataType/>
+      </wbim:businessItem>
+      <wbim:businessItem name="Bsnss32t##Euro">
+        <wbim:complexDataType/>
+      </wbim:businessItem>
+      <wbim:businessItem name="Bsnss32t##Tea Order">
+        <wbim:complexDataType/>
+      </wbim:businessItem>
+      <wbim:businessItem name="Bsnss32t##Coffee">
+        <wbim:complexDataType/>
+      </wbim:businessItem>
+      <wbim:businessItem name="Bsnss32t##Tea">
+        <wbim:complexDataType/>
+      </wbim:businessItem>
+    </wbim:businessItems>
+  </wbim:dataModel>
+  <wbim:resourceModel>
+    <wbim:roles>
+      <wbim:role name="Rsrcs##Customer"/>
+      <wbim:role name="Rsrcs##CoffeeMachine"/>
+    </wbim:roles>
+  </wbim:resourceModel>
+  <wbim:processModel>
+    <wbim:processes>
+      <wbim:process name="Prcsss##coffeeMachine_unsound" style="BPMN">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:decision isInclusive="false" name="choose beverage">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="tea"/>
+              <wbim:condition name="tea"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="coffee"/>
+              <wbim:condition name="coffee"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="pay"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="choose drink"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="insert coin">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Euro" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="euro"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="euro"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="push coffee button">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Coffee Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee order"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="coffee order"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="push tea button">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Tea Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea order"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="tea order"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:startNode name="Start Node:2"/>
+          <wbim:task name="await coin">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Euro" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="euro"/>
+              <wbim:input name="input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="euro"/>
+                <wbim:input name="input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:decision isInclusive="false" name="beverage selection">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="Output"/>
+              <wbim:condition name="tea"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="Output:2"/>
+              <wbim:condition name="coffee"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:task name="make tea">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Tea Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea order"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="tea order"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Tea" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="tea"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="make coffee">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Coffee Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee order"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="coffee order"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Coffee" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="coffee"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:join name="Join">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:join>
+          <wbim:task name="get coffee">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Coffee" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="coffee"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="get tea">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Tea" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="tea"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:endNode name="End Node:2"/>
+          <wbim:merge name="Merge:2">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:endNode name="End Node:3"/>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="choose drink" node="Fork"/>
+            <wbim:target contactPoint="Input" node="choose beverage"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="pay" node="Fork"/>
+            <wbim:target contactPoint="Input" node="insert coin"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="tea" node="choose beverage"/>
+            <wbim:target contactPoint="Input" node="push tea button"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="coffee" node="choose beverage"/>
+            <wbim:target contactPoint="Input" node="push coffee button"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="euro" node="insert coin"/>
+            <wbim:target contactPoint="euro" node="await coin"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output" node="beverage selection"/>
+            <wbim:target contactPoint="Input" node="make tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="Output:2" node="beverage selection"/>
+            <wbim:target contactPoint="Input" node="make coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:13">
+            <wbim:source contactPoint="Output" node="push coffee button"/>
+            <wbim:target contactPoint="Input" node="get coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:14">
+            <wbim:source contactPoint="Output" node="insert coin"/>
+            <wbim:target contactPoint="Input" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:15">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target contactPoint="Input:2" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:16">
+            <wbim:source contactPoint="Output" node="get coffee"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:12">
+            <wbim:source contactPoint="Output" node="push tea button"/>
+            <wbim:target contactPoint="Input" node="get tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:17">
+            <wbim:source contactPoint="Output" node="get tea"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:18">
+            <wbim:source contactPoint="Output" node="Join"/>
+            <wbim:target node="End Node:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source node="Start Node:2"/>
+            <wbim:target contactPoint="input" node="await coin"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="Output" node="await coin"/>
+            <wbim:target contactPoint="Input" node="beverage selection"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="tea order" node="push tea button"/>
+            <wbim:target contactPoint="tea order" node="make tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:19">
+            <wbim:source contactPoint="coffee order" node="push coffee button"/>
+            <wbim:target contactPoint="coffee order" node="make coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:20">
+            <wbim:source contactPoint="tea" node="make tea"/>
+            <wbim:target contactPoint="tea" node="get tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:21">
+            <wbim:source contactPoint="coffee" node="make coffee"/>
+            <wbim:target contactPoint="coffee" node="get coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:22">
+            <wbim:source contactPoint="Output" node="make tea"/>
+            <wbim:target contactPoint="Input" node="Merge:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:23">
+            <wbim:source contactPoint="Output" node="make coffee"/>
+            <wbim:target contactPoint="Input:2" node="Merge:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:24">
+            <wbim:source contactPoint="Output" node="Merge:2"/>
+            <wbim:target node="End Node:3"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+      <wbim:process name="Prcsss##coffeeMachine_sound" style="BPMN">
+        <wbim:inputs>
+          <wbim:inputCriterion name="Input Criterion"/>
+        </wbim:inputs>
+        <wbim:outputs>
+          <wbim:outputCriterion name="Output Criterion">
+            <wbim:relatedInputCriteria>
+              <wbim:inputCriterion name="Input Criterion"/>
+            </wbim:relatedInputCriteria>
+          </wbim:outputCriterion>
+        </wbim:outputs>
+        <wbim:flowContent>
+          <wbim:startNode name="Start Node"/>
+          <wbim:decision isInclusive="false" name="choose beverage">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="tea"/>
+              <wbim:condition name="tea"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="coffee"/>
+              <wbim:condition name="coffee"/>
+              <wbim:operationalData>
+                <wbim:probability>
+                  <wbim:literalValue>50.0</wbim:literalValue>
+                </wbim:probability>
+              </wbim:operationalData>
+            </wbim:outputBranch>
+          </wbim:decision>
+          <wbim:fork name="Fork">
+            <wbim:inputBranch name="Input Branch ">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch 1">
+              <wbim:output name="pay"/>
+            </wbim:outputBranch>
+            <wbim:outputBranch name="Output Branch 2">
+              <wbim:output name="choose drink"/>
+            </wbim:outputBranch>
+          </wbim:fork>
+          <wbim:task name="insert coin">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Euro" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="euro"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="euro"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="push coffee button">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Coffee Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee order"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="">
+                <wbim:output name="coffee order"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="push tea button">
+            <wbim:inputs>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Tea Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea order"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="">
+                <wbim:output name="tea order"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:startNode name="Start Node:2"/>
+          <wbim:task name="await coin">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Euro" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="euro"/>
+              <wbim:input name="input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="euro"/>
+                <wbim:input name="input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="make tea">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Tea Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea order"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="tea order"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Tea" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="">
+                <wbim:output name="tea"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="make coffee">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Coffee Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee order"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="coffee order"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Coffee" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee"/>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="">
+                <wbim:output name="coffee"/>
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:merge name="Merge">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:join name="Join">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:join>
+          <wbim:task name="get coffee">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Coffee" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="coffee"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:task name="get tea">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Tea" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="Input Criterion">
+                <wbim:input name="tea"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output name="Output"/>
+              <wbim:outputCriterion name="Output Criterion">
+                <wbim:output name="Output"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="Input Criterion"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##Customer" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:endNode name="End Node:2"/>
+          <wbim:merge name="Merge:2">
+            <wbim:inputBranch name="Input Branch 1">
+              <wbim:input name="Input"/>
+            </wbim:inputBranch>
+            <wbim:inputBranch name="Input Branch 2">
+              <wbim:input name="Input:2"/>
+            </wbim:inputBranch>
+            <wbim:outputBranch name="Output Branch ">
+              <wbim:output name="Output"/>
+            </wbim:outputBranch>
+          </wbim:merge>
+          <wbim:endNode name="End Node:3"/>
+          <wbim:task name="beverage selection">
+            <wbim:inputs>
+              <wbim:input associatedData="Bsnss32t##Tea Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea"/>
+              <wbim:input associatedData="Bsnss32t##Coffee Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee"/>
+              <wbim:input name="Input"/>
+              <wbim:inputCriterion name="pick tea">
+                <wbim:input name="tea"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+              <wbim:inputCriterion name="pick coffee">
+                <wbim:input name="coffee"/>
+                <wbim:input name="Input"/>
+              </wbim:inputCriterion>
+            </wbim:inputs>
+            <wbim:outputs>
+              <wbim:output associatedData="Bsnss32t##Tea Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="tea ordererd"/>
+              <wbim:output associatedData="Bsnss32t##Coffee Order" isOrdered="false" isUnique="false" maximum="1" minimum="1" name="coffee ordered"/>
+              <wbim:output name="Output Tea"/>
+              <wbim:output name="Output Coffee"/>
+              <wbim:outputCriterion name="">
+                <wbim:output name="tea ordererd"/>
+                <wbim:output name="Output Tea"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="pick tea"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+              <wbim:outputCriterion name="coffee chosen">
+                <wbim:output name="coffee ordered"/>
+                <wbim:output name="Output Coffee"/>
+                <wbim:relatedInputCriteria>
+                  <wbim:inputCriterion name="pick coffee"/>
+                </wbim:relatedInputCriteria>
+              </wbim:outputCriterion>
+            </wbim:outputs>
+            <wbim:resources>
+              <wbim:roleRequirement name="Role requirement:1" role="Rsrcs##CoffeeMachine" timeRequired="P0Y0M0DT0H0M0S">
+                <wbim:resourceQuantity unit="unit">1.0</wbim:resourceQuantity>
+              </wbim:roleRequirement>
+            </wbim:resources>
+          </wbim:task>
+          <wbim:connection name="Connection">
+            <wbim:source node="Start Node"/>
+            <wbim:target contactPoint="Input" node="Fork"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:2">
+            <wbim:source contactPoint="choose drink" node="Fork"/>
+            <wbim:target contactPoint="Input" node="choose beverage"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:3">
+            <wbim:source contactPoint="pay" node="Fork"/>
+            <wbim:target contactPoint="Input" node="insert coin"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:4">
+            <wbim:source contactPoint="tea" node="choose beverage"/>
+            <wbim:target contactPoint="Input" node="push tea button"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:5">
+            <wbim:source contactPoint="coffee" node="choose beverage"/>
+            <wbim:target contactPoint="Input" node="push coffee button"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:7">
+            <wbim:source contactPoint="euro" node="insert coin"/>
+            <wbim:target contactPoint="euro" node="await coin"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:13">
+            <wbim:source contactPoint="Output" node="push coffee button"/>
+            <wbim:target contactPoint="Input" node="get coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:14">
+            <wbim:source contactPoint="Output" node="insert coin"/>
+            <wbim:target contactPoint="Input" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:15">
+            <wbim:source contactPoint="Output" node="Merge"/>
+            <wbim:target contactPoint="Input:2" node="Join"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:16">
+            <wbim:source contactPoint="Output" node="get coffee"/>
+            <wbim:target contactPoint="Input:2" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:12">
+            <wbim:source contactPoint="Output" node="push tea button"/>
+            <wbim:target contactPoint="Input" node="get tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:17">
+            <wbim:source contactPoint="Output" node="get tea"/>
+            <wbim:target contactPoint="Input" node="Merge"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:18">
+            <wbim:source contactPoint="Output" node="Join"/>
+            <wbim:target node="End Node:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:6">
+            <wbim:source node="Start Node:2"/>
+            <wbim:target contactPoint="input" node="await coin"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:9">
+            <wbim:source contactPoint="tea order" node="push tea button"/>
+            <wbim:target contactPoint="tea" node="beverage selection"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:20">
+            <wbim:source contactPoint="tea" node="make tea"/>
+            <wbim:target contactPoint="tea" node="get tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:21">
+            <wbim:source contactPoint="coffee" node="make coffee"/>
+            <wbim:target contactPoint="coffee" node="get coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:22">
+            <wbim:source contactPoint="Output" node="make tea"/>
+            <wbim:target contactPoint="Input" node="Merge:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:23">
+            <wbim:source contactPoint="Output" node="make coffee"/>
+            <wbim:target contactPoint="Input:2" node="Merge:2"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:24">
+            <wbim:source contactPoint="Output" node="Merge:2"/>
+            <wbim:target node="End Node:3"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:8">
+            <wbim:source contactPoint="coffee order" node="push coffee button"/>
+            <wbim:target contactPoint="coffee" node="beverage selection"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:10">
+            <wbim:source contactPoint="Output" node="await coin"/>
+            <wbim:target contactPoint="Input" node="beverage selection"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:11">
+            <wbim:source contactPoint="tea ordererd" node="beverage selection"/>
+            <wbim:target contactPoint="tea order" node="make tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:19">
+            <wbim:source contactPoint="coffee ordered" node="beverage selection"/>
+            <wbim:target contactPoint="coffee order" node="make coffee"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:25">
+            <wbim:source contactPoint="Output Tea" node="beverage selection"/>
+            <wbim:target contactPoint="Input" node="make tea"/>
+          </wbim:connection>
+          <wbim:connection name="Connection:26">
+            <wbim:source contactPoint="Output Coffee" node="beverage selection"/>
+            <wbim:target contactPoint="Input" node="make coffee"/>
+          </wbim:connection>
+        </wbim:flowContent>
+      </wbim:process>
+    </wbim:processes>
+  </wbim:processModel>
+</wbim:model>

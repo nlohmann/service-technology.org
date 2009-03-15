@@ -25,7 +25,7 @@ ${LOLA_SP}: userconfig.H.statepredicate
 	@echo "-----------------------------------------------------"
 	-mv ${LOLA_SRC_DIR}/userconfig.H ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn
 	-cp $< ${LOLA_SRC_DIR}/userconfig.H
-	-(cd ${LOLA_SRC_DIR}/ && rm lola${EXEEXT} && make)
+	-(cd ${LOLA_SRC_DIR}/ && rm -f lola${EXEEXT} && make)
 	-cp ${LOLA_SRC_DIR}/lola${EXEEXT} $@
 	-mv ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn ${LOLA_SRC_DIR}/userconfig.H
 
@@ -35,7 +35,7 @@ ${LOLA_MC}: userconfig.H.modelchecking
 	@echo "-----------------------------------------------------"
 	-mv ${LOLA_SRC_DIR}/userconfig.H ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn
 	-cp $< ${LOLA_SRC_DIR}/userconfig.H
-	-(cd ${LOLA_SRC_DIR}/ && rm lola${EXEEXT} && make)
+	-(cd ${LOLA_SRC_DIR}/ && rm -f lola${EXEEXT} && make)
 	-cp ${LOLA_SRC_DIR}/lola${EXEEXT} ${LOLA_MC}
 	-mv ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn ${LOLA_SRC_DIR}/userconfig.H
 
@@ -45,7 +45,7 @@ ${LOLA_LP}: userconfig.H.liveprop
 	@echo "-----------------------------------------------------"
 	-mv ${LOLA_SRC_DIR}/userconfig.H ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn
 	-cp $< ${LOLA_SRC_DIR}/userconfig.H
-	-(cd ${LOLA_SRC_DIR}/ && rm lola${EXEEXT} && make)
+	-(cd ${LOLA_SRC_DIR}/ && rm -f lola${EXEEXT} && make)
 	-cp ${LOLA_SRC_DIR}/lola${EXEEXT} $@
 	-mv ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn ${LOLA_SRC_DIR}/userconfig.H
 
@@ -55,7 +55,7 @@ ${LOLA_FULL_LIMITED}: userconfig.H.full-limited
 	@echo "-----------------------------------------------------"
 	-mv ${LOLA_SRC_DIR}/userconfig.H ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn
 	-cp $< ${LOLA_SRC_DIR}/userconfig.H
-	-(cd ${LOLA_SRC_DIR}/ && rm lola${EXEEXT} && make)
+	-(cd ${LOLA_SRC_DIR}/ && rm -f lola${EXEEXT} && make)
 	-cp ${LOLA_SRC_DIR}/lola${EXEEXT} $@
 	-mv ${LOLA_SRC_DIR}/userconfig.H.by.uml2owfn ${LOLA_SRC_DIR}/userconfig.H
 	

@@ -130,7 +130,7 @@ void print_help()
 {
 	// 80 chars
 	//    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-	trace(string(PACKAGE_NAME) + " -- Translating BPEL Processes into Petri Net Models\n");
+	trace(string(PACKAGE_NAME) + " -- Translating UML Processes into Petri Net Models\n");
 	trace("\n");
 	trace("Usage: " + globals::program_name + " [OPTION]\n");
 	trace("\n");
@@ -193,8 +193,8 @@ void print_help()
   trace("                        place or output place), effective only with '-R'\n");
   trace("\n");
 	trace("Examples:\n");
-	trace("  uml2owfn -i library.xml -f owfn -o\n");
-	trace("  uml2owfn -i library.xml -f dot -p soundness -o\n");
+	trace("  uml2owfn -i library.xml -f dot -o\n");
+	trace("  uml2owfn -i library.xml -f lola -a soundness -o\n");
 	trace("\n");
 	//trace("Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
 }

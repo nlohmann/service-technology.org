@@ -121,6 +121,8 @@ extern std::list<std::string> covfiles;
 extern AnnotatedGraph* OGToParse;
 extern GraphFormulaCNF* covConstraint;
 
+extern std::string givenPortName;
+
 extern string STG2oWFN_main(vector<string> &, string, set<string>&, set<string>&);
 
 // will be filled during parsing
@@ -196,6 +198,23 @@ void readnet(const std::string& owfnfile) {
     owfn_yyparse();
 
     fclose(owfn_yyin);
+    
+    
+    // for autonomous controllability, the net has to be changed
+    // now is the time to do so
+    
+    if (parameters[P_AUTONOMOUS]) {
+        if (givenPortName == "") {
+            trace( "error: no port given\n\n");
+            exit(EXIT_FAILURE);
+        }
+        if (PN->ports[givenPortName].empty()) {
+            trace( "error: port not found\n\n");
+            exit(EXIT_FAILURE);
+        }
+        PN->restrictToPort(givenPortName);
+    }    
+    
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
         PN->CurrentMarking[i] = PN->getPlace(i)->initial_marking;
     }
@@ -689,10 +708,6 @@ InteractionGraph* computeIG(oWFN* PN, string& igFilename) {
             igFilename = IG->getFilename();
         }
 
-        if (!options[O_CALC_ALL_STATES]) {
-            igFilename += ".R";
-        }
-
         igFilename += ".ig";
 
         // the second parameter is true, since the oWFN this IG was generated
@@ -1017,10 +1032,6 @@ string computeOG(oWFN* PN) {
             ogFilename = outfilePrefix;
         } else {
             ogFilename = graph->getFilename();
-        }
-
-        if (!options[O_CALC_ALL_STATES]) {
-            ogFilename += ".R";
         }
 
         // the second parameter is true, since the oWFN this OG was generated
@@ -2198,7 +2209,7 @@ int main(int argc, char** argv) {
 
                 // [LUHME XV] verschieben
                 fileName = "";
-
+                
                 // start computation
                 if (parameters[P_IG]) {
                     reportOptionValues(); // adjust events_manual and print limit of considering events

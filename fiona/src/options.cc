@@ -61,6 +61,9 @@ std::string ogfileToMatch;
 std::string outfilePrefix;
 std::string adapterRulesFile;
 
+/// port name used for autonomous controllability
+std::string givenPortName = "";
+
 int events_manual;
 unsigned int messages_manual;
 int bdd_reordermethod;
@@ -95,10 +98,11 @@ static struct option longopts[] = {
     { "multipledeadlocks", no_argument,     NULL, 'M' },
     { "parameter",       required_argument, NULL, 'p' },
     { "adapterrules",    required_argument, NULL, 'a' },
+    { "port",            required_argument, NULL, 'P' },
     { NULL,              0,                 NULL, 0   }
 };
 
-const char* par_string = "hvd:t:m:e:ErRs:b:B:o:QMp:a:";
+const char* par_string = "hvd:t:m:e:ErRs:b:B:o:QMp:a:P:";
 
 
 // --------------------- functions for command line evaluation ------------------------
@@ -704,6 +708,16 @@ void parse_command_line(int argc, char* argv[]) {
                     adapterRulesFile = optarg;
                 } else {
                     cerr << "Error:\toutput filename prefix missing" << endl
+                         << "\tEnter \"fiona --help\" for more information.\n"
+                         << endl;
+                    setExitCode(EC_BAD_CALL);
+                }
+                break;
+            case 'P':
+                if (optarg) {
+                    givenPortName = std::string(optarg);
+                } else {
+                    cerr << "Error:\tport name is missing" << endl
                          << "\tEnter \"fiona --help\" for more information.\n"
                          << endl;
                     setExitCode(EC_BAD_CALL);

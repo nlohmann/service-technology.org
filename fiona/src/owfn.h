@@ -109,9 +109,6 @@ class oWFN {
         /// associates output places with their corresponding index in the output set 
         std::map<owfnPlace *, Places_t::size_type> outputPlaceIndices;
 
-        /// the ports
-        std::map<std::string, Places_t> ports;
-
         /// Contains all transitions of this oWFN.
         Transitions_t Transitions;
 
@@ -147,6 +144,9 @@ class oWFN {
         ~oWFN();
 
         string filename;
+
+        /// the ports
+        std::map<std::string, Places_t> ports;
 
         /// returns an array of transition pointers containing all quasi enabled transition
         owfnTransition ** quasiFirelist();

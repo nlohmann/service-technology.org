@@ -4904,6 +4904,11 @@ void oWFN::detachInterfacePlace(owfnPlace *p) {
             t->removeLeavingArc(a);
             p->removeArrivingArc(a);
 
+            // remember that this transition was connected to an output place of
+            // a port that has been detached (NECESSARY?)
+            t->isConnectedToOtherPort = true;
+            cerr << t->name << " is connected to the other port " << endl;
+
             delete a;
         }
     }

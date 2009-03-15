@@ -190,7 +190,7 @@ AC_SUBST(builddir)
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
 AC_CONFIG_FILES([Makefile
-                 Doxyfile
+                 doc/Doxyfile
                  src/Makefile
                  doc/Makefile
                  tests/Makefile

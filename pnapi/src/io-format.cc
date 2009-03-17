@@ -14,6 +14,7 @@ using std::stringstream;
 using pnapi::io::util::delim;
 using pnapi::io::util::filterMarkedPlaces;
 using pnapi::io::util::filterInternalArcs;
+using pnapi::io::util::filterInterfacePropositions;
 using pnapi::io::util::Mode;
 using pnapi::io::util::ModeData;
 
@@ -351,7 +352,7 @@ namespace pnapi
 	  << endl 
 
 	  << "FORMULA" << endl
-	  << "  EXPATH EVENTUALLY " << net.condition_ << endl
+	  << "  " << net.condition_ << endl
 	  << endl
 	  
 	  << "{ END OF FILE }" << endl;
@@ -387,44 +388,48 @@ namespace pnapi
 
       ostream & output(ostream & os, const formula::Negation & f)
       {
-	return os << "NOT (" << **f.children().begin() << ")";
+	set<const Formula *> children = 
+	  filterInterfacePropositions(f.children());
+	if (children.empty())
+	  assert(false); // FIXME: don't know what to do in this case
+	else
+	  return os << "NOT (" << **f.children().begin() << ")";
       }
 
 
       ostream & output(ostream & os, const formula::Conjunction & f)
       {
-	if (f.children().empty())
-	  return os << formula::FormulaTrue();
+	set<const Formula *> children = 
+	  filterInterfacePropositions(f.children());
+	if (children.empty())
+	  //return os << formula::FormulaTrue();
+	  assert(false); // FIXME: don't know what to do in this case
 	else
-	  return os << "(" << delim(" AND ") << f.children() << ")";
+	  return os << "(" << delim(" AND ") << children << ")";
       }
 
 
       ostream & output(ostream & os, const formula::Disjunction & f)
       {
-	if (f.children().empty())
-	  return os << formula::FormulaFalse();
+	set<const Formula *> children = 
+	  filterInterfacePropositions(f.children());
+	if (children.empty())
+	  //return os << formula::FormulaFalse();
+	  assert(false); // FIXME: don't know what to do in this case
 	else
-	  return os << "(" << delim(" OR ") << f.children() << ")";
+	  return os << "(" << delim(" OR ") << children << ")";
       }
 
 
       ostream & output(ostream & os, const formula::FormulaTrue &)
       {
-	// FIXME: how to represent TRUE in LOLA?
-	// suggestions: 
-	// - <empty formula>
-	// - p >= 0       (requires non-empty net and access to place reference)
-	assert(false);
+	return os << "TRUE";  // keyword not yet implemented in lola
       }
 
 
       ostream & output(ostream & os, const formula::FormulaFalse &)
       {
-	// FIXME: how to represent FALSE in LOLA?
-	// suggestions:
-	// - p < 0       (requires non-empty net and access to place reference)
-	assert(false);
+	return os << "FALSE"; // keyword not yet implemented in lola
       }
 
 
@@ -600,7 +605,8 @@ namespace pnapi
 	  }
 
 	if (f.children().empty())
-	  return os << formula::FormulaTrue();
+	  //return os << formula::FormulaTrue();
+	  assert(false); // FIXME: don't know what to do in this case
 	else
 	  return os << "(" << delim(" AND ") << children << wildcard << ")";
       }
@@ -609,7 +615,8 @@ namespace pnapi
       ostream & output(ostream & os, const formula::Disjunction & f)
       {
 	if (f.children().empty())
-	  return os << formula::FormulaFalse();
+	  //return os << formula::FormulaFalse();
+	  assert(false); // FIXME: don't know what to do in this case
 	else
 	  return os << "(" << delim(" OR ") << f.children() << ")";
       }

@@ -238,18 +238,26 @@ namespace pnapi
 	  case POSTSET: isPreset_ = false; break;
 
 	  case ARC:
-	    if (isPreset_)
-	      {
-		node.check(preset_.find(node.identifier) == preset_.end(),
-			   node.identifier, "place already used in preset");
-		preset_[node.identifier] = node.number;
-	      }
-	    else
-	      {
-		node.check(postset_.find(node.identifier) == postset_.end(),
-			   node.identifier, "place already used in postset");
-		postset_[node.identifier] = node.number;
-	      }
+	    {
+	      Place * place = net_.findPlace(node.identifier);
+	      node.check(place != NULL, node.identifier, "unknown place");
+	      if (isPreset_)
+		{
+		  node.check(preset_.find(node.identifier) == preset_.end(),
+			     node.identifier, "place already used in preset");
+		  node.check(place->getType() != Place::OUTPUT, node.identifier,
+			     "output place not allowed in preset");
+		  preset_[node.identifier] = node.number;
+		}
+	      else
+		{
+		  node.check(postset_.find(node.identifier) == postset_.end(),
+			     node.identifier, "place already used in postset");
+		  node.check(place->getType() != Place::INPUT, node.identifier,
+			     "input place not allowed in postset");
+		  postset_[node.identifier] = node.number;
+		}
+	    }
 	    break;
 
 	  case FORMULA_TRUE:
@@ -319,18 +327,10 @@ namespace pnapi
 	      Transition & trans = net_.createTransition(node.identifier);
 	      for (map<string, unsigned int>::iterator it = preset_.begin();
 		   it != preset_.end(); ++ it)
-		{
-		  Place * place = net_.findPlace(it->first);
-		  node.check(place != NULL, it->first, "unknown place");
-		  net_.createArc(*place, trans, it->second);
-		}
+		net_.createArc(*net_.findPlace(it->first), trans, it->second);
 	      for (map<string, unsigned int>::iterator it = postset_.begin();
 		   it != postset_.end(); ++ it)
-		{
-		  Place * place = net_.findPlace(it->first);
-		  node.check(place != NULL, it->first, "unknown place");
-		  net_.createArc(trans, *place, it->second);
-		}
+		net_.createArc(trans, *net_.findPlace(it->first), it->second);
 	      preset_.clear();
 	      postset_.clear();
 	      break;

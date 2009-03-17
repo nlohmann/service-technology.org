@@ -8,6 +8,9 @@ using std::map;
 using std::string;
 using std::pair;
 
+using pnapi::formula::Formula;
+using pnapi::formula::Proposition;
+
 namespace pnapi
 {
 
@@ -444,7 +447,22 @@ namespace pnapi
 	return filtered;
       }
 
+      
+      std::set<const Formula *> 
+      filterInterfacePropositions(const std::set<const Formula *> & formulas)
+      {
+	set<const Formula *> result;
+	for (set<const Formula *>::iterator it = formulas.begin();
+	     it != formulas.end(); ++it)
+	  {
+	    const Proposition * p = dynamic_cast<const Proposition *>(*it);
+	    if (!(p != NULL && p->place().getType() != Place::INTERNAL))
+	      result.insert(*it);
+	  }
+	return result;
+      }
 
+      
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const set<Place *> & places)
       {

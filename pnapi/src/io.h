@@ -402,6 +402,8 @@ namespace pnapi
 
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
       std::set<Arc *> filterInternalArcs(const std::set<Arc *> &);
+      std::set<const formula::Formula *> 
+      filterInterfacePropositions(const std::set<const formula::Formula *> &);
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);
 

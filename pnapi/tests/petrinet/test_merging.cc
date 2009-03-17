@@ -47,7 +47,8 @@ int main(int argc, char * argv[])
 
   begin_test("PetriNet::compose() [composition]");
   net1.compose(net2);
-  assert(net1.getPlaces().size() == 4);
+  //cout << pnapi::io::owfn << net1;
+  assert(net1.getPlaces().size() == 6);
   assert(net1.getInputPlaces().size() == 2);
   assert(net1.getOutputPlaces().empty());
   end_test();

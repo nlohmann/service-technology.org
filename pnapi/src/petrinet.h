@@ -212,6 +212,9 @@ namespace pnapi
     void compose(const PetriNet &, const std::string & = "net1",
 		 const std::string & = "net2");
 
+    /// compose the given nets into a new one
+    static PetriNet compose(const std::map<std::string, PetriNet *> &);
+
     /// normalizes the Petri net
     const std::map<Transition *, std::string> normalize(bool = false);
 
@@ -361,8 +364,12 @@ namespace pnapi
     /* wiring */
 
     /// creates the net by assembling the given nets
-    void createFromWiring(std::map<std::string, std::vector<PetriNet> > &,
-			  const std::map<Place *, LinkNode *> &);
+    PetriNet & createFromWiring(std::map<std::string, std::vector<PetriNet> > &,
+				const std::map<Place *, LinkNode *> &);
+
+    /// wires two nets implicitly
+    static void wire(const PetriNet &, const PetriNet &,
+		     std::map<Place *, LinkNode *> &);
 
 
     /* reduction */

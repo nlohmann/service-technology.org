@@ -392,6 +392,14 @@ namespace pnapi
   {
     assert(prefix != netPrefix);
 
+    map<string, PetriNet *> nets;
+    nets[prefix] = this;
+    nets[netPrefix] = const_cast<PetriNet *>(&net);
+
+    *this = compose(nets);
+
+
+    /* below the old implementation
     PetriNet tmpNet = net;  // copy the net to prefix it
 
     // find the interface places to be merged
@@ -425,13 +433,75 @@ namespace pnapi
 
     // merge final conditions
     condition_.merge(net.condition_, placeMapping);
+    */
   }
 
 
   /*!
    */
-  void PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
-				  const map<Place *, LinkNode *> & wiring)
+  PetriNet PetriNet::compose(const map<string, PetriNet *> & nets)
+  {
+    PetriNet result;
+    
+    // create instance map
+    typedef map<string, vector<PetriNet> > Instances;
+    Instances instances;
+    for (map<string, PetriNet *>::const_iterator it = nets.begin();
+	 it != nets.end(); ++it)
+      instances[it->first].push_back(*it->second);
+
+    // create wiring
+    typedef map<Place *, LinkNode *> Wiring;
+    Wiring wiring;
+    for (Instances::iterator it1 = instances.begin(); 
+	 it1 != instances.end(); ++it1)
+      {
+	string prefix = it1->first; assert(!prefix.empty());
+	PetriNet & net1 = *it1->second.begin();
+
+	for (Instances::iterator it2 = instances.begin();
+	     it2 != instances.end(); ++it2)
+	  {
+	    PetriNet & net2 = *it2->second.begin();
+	    wire(net1, net2, wiring);
+	  }
+      }
+
+    // create result net
+    return result.createFromWiring(instances, wiring);
+  }
+
+
+  /*!
+   */
+  void PetriNet::wire(const PetriNet & net1, const PetriNet & net2,
+		      map<Place *, LinkNode *> & wiring)
+  {
+    set<Place *> interface = net1.getInterfacePlaces();
+    for (set<Place *>::iterator it = interface.begin(); 
+	 it != interface.end(); ++it)
+      {
+	Place * p1 = *it;
+	Place * p2 = net2.findPlace(p1->getName());
+	if (p2 != NULL && p2->isComplementType(p1->getType()))
+	  {
+	    LinkNode * node1 = wiring[p1];
+	    if (node1 == NULL)
+	      wiring[p1] = node1 = new LinkNode(*p1, LinkNode::ANY);
+	    LinkNode * node2 = wiring[p2];
+	    if (node2 == NULL)
+	      wiring[p2] = node2 = new LinkNode(*p2, LinkNode::ANY);
+	    node1->addLink(*node2);
+	  }
+      }
+  }
+
+
+  /*!
+   */
+  PetriNet & 
+  PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
+			     const map<Place *, LinkNode *> & wiring)
   {
     vector<LinkNode *> wiredNodes;
     wiredNodes.reserve(wiring.size());
@@ -489,6 +559,8 @@ namespace pnapi
 	expanded.erase(it); delete *it;
 	expanded.erase(node); delete node;
       }
+
+    return *this;
   }
 
 

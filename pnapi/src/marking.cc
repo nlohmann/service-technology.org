@@ -15,6 +15,14 @@ namespace pnapi
    *** Class Marking Function Definitions
    ***************************************************************************/
 
+  /*!
+   * \brief   Standard Constructor
+   */
+  Marking::Marking() :
+    net_(*new PetriNet())
+  {
+  }
+
 
   /*!
    * \brief   Constructor for marking class

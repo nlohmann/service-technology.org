@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -75,7 +75,7 @@ typedef enum {
     P_SYNTHESIZE_PARTNER_OWFN,  //!< compute an oWFN from the IG/OG
     P_PRODUCTOG,                //!< compute the product of 2 OGs
     P_SIMULATES,                //!< Check whether an OG simulates another
-    P_EX,                       //!< check equivalence (former exchangability) of two OGs 
+    P_EX,                       //!< check equivalence (former exchangability) of two OGs
     P_EQ_R,                     //!< equivalence of two graphs (with -R and without -R), but the two graphs are computed automatically
     P_ADAPTER,                  //!< compute adapter (with OG) for given services
     P_SMALLADAPTER,             //!< compute small adapter (with IG) for given services
@@ -83,12 +83,12 @@ typedef enum {
     P_GASTEX,                   //!< read an annotated dot file and create a gastex tex file
     P_CHECK_FALSE_NODES,        //!< check false annotations in og
     P_REMOVE_FALSE_NODES,        //!< remove nodes with false annotations in og
-    P_CHECK_ACYCLIC,            //!< Check whether an OG is acyclic 
+    P_CHECK_ACYCLIC,            //!< Check whether an OG is acyclic
     P_COUNT_SERVICES,           //!< Compute the number of services characterized by an OG
     P_READ_OG,                  //!< only read an OG from a file
-    P_REDUCE,                   //!< reduce given oWFNs 
+    P_REDUCE,                   //!< reduce given oWFNs
     P_NORMALIZE,                //!< normalize given oWFNs
-    P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og. 
+    P_PARTNER_TEST,             //!< first synthesize a partner, then match it with the og.
     P_RESPONSIVE,               //!< generate responsive partners (IG/OG) using TSCCs
 
     P_SHOW_BLUE_NODES,          //!< show blue nodes only (empty node not shown though)
@@ -98,7 +98,7 @@ typedef enum {
     P_SHOW_STATES_PER_NODE,     //!< show all states in a node (aka "knowledge")
     P_SHOW_DEADLOCKS_PER_NODE,  //!< show deadlock states only
     P_COVERALL,                 //!< show all places and transitions covered in an OG node
-    
+
     P_NOPNG,                    //!< do not create a PNG output
     P_NODOT,                    //!< do not create any dot related output
     P_TEX,                      //!< create a gastex tex file in some other mode
@@ -121,13 +121,14 @@ extern void setExitCode(unsigned short int);
 const unsigned short int exitAtThisCode = 2;
 
 const unsigned short int EC_FILE_ERROR = 4;                 //!< An error occured with a file stream.
-const unsigned short int EC_NO_RULES_FILE = 4;              //!< Adapter: No rules file found.
-const unsigned short int EC_NO_CUDD_FILE = 4;               //!< No cudd file found.
-const unsigned short int EC_CAPACITY_EXCEEDED = 4;          //!< oWFN: Place capacity exceeded.
-const unsigned short int EC_BDD_ERROR = 1;                  //!< BDD: An error occured.
+const unsigned short int EC_NO_RULES_FILE = 41;             //!< Adapter: No rules file found.
+const unsigned short int EC_NO_CUDD_FILE = 42;              //!< No cudd file found.
+const unsigned short int EC_NO_COV_FILE = 43;               //!< No cov file given.
+const unsigned short int EC_CAPACITY_EXCEEDED = 44;         //!< oWFN: Place capacity exceeded.
+const unsigned short int EC_BDD_ERROR = 11;                 //!< BDD: An error occured.
 const unsigned short int EC_MEMORY_EXHAUSTED = 5;           //!< "new" was not possible -> memory is exhausted.
-const unsigned short int EC_UNREACHABLE_LINE = 1;           //!< An unreachable line in code was reached. 
-const unsigned short int EC_DOT_ERROR = 1;                  //!< Dot refused to work properly.
+const unsigned short int EC_UNREACHABLE_LINE = 12;          //!< An unreachable line in code was reached.
+const unsigned short int EC_DOT_ERROR = 13;                 //!< Dot refused to work properly.
 const unsigned short int EC_BAD_CALL = 2;                   //!< Fiona was called in an inappropriate way: Wrong mode/parameters.
 
 

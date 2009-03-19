@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -184,7 +184,6 @@ void GasTexGraph::makeGasTex(string texFileName) {
     fstream texFile(texFileName.c_str(), ios_base::out | ios_base::trunc);
     if (!texFile.good()) {
         texFile.close();
-        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
 
@@ -193,13 +192,13 @@ void GasTexGraph::makeGasTex(string texFileName) {
         texFile << texHeader[i];
     }
 
-    // there are two styles available, one for OG/IG and one for OWFN 
+    // there are two styles available, one for OG/IG and one for OWFN
     if (gastexGraph) {
         if (gastexGraph->style == STYLE_OG) {
             makeGasTexOfOG(texFile);
         } else if (gastexGraph->style == STYLE_OWFN) {
             makeGasTexOfOWFN(texFile);
-        } 
+        }
     }
 
     // end of gastex document (from dot2tex.h)
@@ -220,19 +219,19 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 
     for(set<GasTexNode*>::iterator iNode = gastexGraph->nodes.begin();
         iNode != gastexGraph->nodes.end(); ++iNode) {
-    
+
         vector<string> strVector;
-    
+
         // some preprocessing
         if ((*iNode)->label != "") {
             if (parameters[P_SHOW_STATES_PER_NODE]) {
 	            string::size_type pos;
-	            
+
 	            pos = 0;
 	            string newLabel = texFormat((*iNode)->label);
 
 	            newLabel.insert(0, "\\#");
-	            
+
 	            while ((pos = newLabel.find(":", 0)) != string::npos ) {
 	            	if (pos == 0) {
 	            		break;
@@ -242,7 +241,7 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 	            	// need a trim function here
 	            	newLabel.erase(0, pos+2);
 	            }
-	            
+
 	            (*iNode)->height = (5*strVector.size()) / charHeightRatio;
 	            float width = 0.0;
 	            for (vector<string>::iterator iter = strVector.begin(); iter != strVector.end(); iter++) {
@@ -251,10 +250,10 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 	            	}
 	            }
 	            (*iNode)->width = (width) / charWidthRatio + .3;
-        	} 
+        	}
         }
-    	
-    	
+
+
         texFile << ogNodeStmt[0];
         texFile << ogNodeStmt[1] << 5;
 
@@ -303,15 +302,15 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 	            currentDist = distStart;
 	            texFile << ogNodeStmt[11];
 	            texFile << ogNodeStmt[12];
-	            
+
 	            for (vector<string>::iterator iter = strVector.begin(); iter != strVector.end(); iter++) {
-	            	texFile << "\\nodelabel[NLangle=270,NLdist=" << currentDist << "](" 
-	            					<< (*iNode)->id << "){\\textsf{\\msf{" 
+	            	texFile << "\\nodelabel[NLangle=270,NLdist=" << currentDist << "]("
+	            					<< (*iNode)->id << "){\\textsf{\\msf{"
 	            					<< *iter << "}}}" << "\n";
 
 	            	currentDist += 5;	// subtract 5
 	            }
-	            
+
         	} else {
         		texFile << ogNodeStmt[11] << texFormat((*iNode)->label);
         		texFile << ogNodeStmt[12];
@@ -360,16 +359,16 @@ void GasTexGraph::makeGasTexOfOG(fstream& texFile) {
 void GasTexGraph::makeGasTexOfOWFN(fstream& texFile) {
 
     // drawing bounding boxes
-    for(set<BoundingBox*>::iterator iBB = gastexGraph->boundingBoxes.begin(); 
+    for(set<BoundingBox*>::iterator iBB = gastexGraph->boundingBoxes.begin();
         iBB != gastexGraph->boundingBoxes.end(); ++iBB) {
         if (iBB == gastexGraph->boundingBoxes.begin()) {
             continue;
         }
-        texFile << pnBoxStmt[0] << (int)((*iBB)->x * scaleFactor); 
-        texFile << pnBoxStmt[1] << (int)((*iBB)->y * scaleFactor); 
-        texFile << pnBoxStmt[2] << (int)((*iBB)->width * scaleFactor); 
-        texFile << pnBoxStmt[3] << (int)((*iBB)->height * scaleFactor); 
-        texFile << pnBoxStmt[4] << endl; 
+        texFile << pnBoxStmt[0] << (int)((*iBB)->x * scaleFactor);
+        texFile << pnBoxStmt[1] << (int)((*iBB)->y * scaleFactor);
+        texFile << pnBoxStmt[2] << (int)((*iBB)->width * scaleFactor);
+        texFile << pnBoxStmt[3] << (int)((*iBB)->height * scaleFactor);
+        texFile << pnBoxStmt[4] << endl;
     }
 
     // drawing nodes
@@ -400,7 +399,7 @@ void GasTexGraph::makeGasTexOfOWFN(fstream& texFile) {
         }
 
         if ((*iNode)->style == "invis") {
-            texFile << pnNodeStmt[3]; 
+            texFile << pnNodeStmt[3];
         }
 
         texFile << pnNodeStmt[4] << (*iNode)->id;
@@ -429,7 +428,7 @@ void GasTexGraph::makeGasTexOfOWFN(fstream& texFile) {
             if (label != "") {
                 texFile << texFormat(label);
             }
-        } 
+        }
 */
         texFile << pnNodeStmt[8] << endl;
     }
@@ -437,7 +436,7 @@ void GasTexGraph::makeGasTexOfOWFN(fstream& texFile) {
 
     texFile << endl;
 
-    // drawing edges 
+    // drawing edges
     if (pnEdgeStdStmt != "") {
         texFile << pnEdgeStdStmt;
     }
@@ -446,28 +445,28 @@ void GasTexGraph::makeGasTexOfOWFN(fstream& texFile) {
         for(set<GasTexEdge*>::iterator iEdge = (*iNode)->edges.begin();
             iEdge != (*iNode)->edges.end(); iEdge++) {
 
-            texFile << pnEdgeStmt[0]; 
+            texFile << pnEdgeStmt[0];
             if ((*iEdge)->srcNode->style == "invis" || (*iEdge)->destNode->style == "invis") {
                 texFile << pnEdgeStmt[1];
                 if ((*iEdge)->headlabel != "") {
                     texFile << pnEdgeStmt[2];
                 } else {
                     texFile << pnEdgeStmt[3];
-                } 
+                }
             }
-            texFile << pnEdgeStmt[4] << (*iEdge)->srcNode->id; 
+            texFile << pnEdgeStmt[4] << (*iEdge)->srcNode->id;
             texFile << pnEdgeStmt[5] << (*iEdge)->destNode->id;
-            texFile << pnEdgeStmt[6]; 
+            texFile << pnEdgeStmt[6];
 
             if ((*iEdge)->label != "") {
-                texFile << texFormat((*iEdge)->label); 
+                texFile << texFormat((*iEdge)->label);
             } else if ((*iEdge)->headlabel != "") {
-                texFile << texFormat((*iEdge)->headlabel); 
+                texFile << texFormat((*iEdge)->headlabel);
             } else if ((*iEdge)->taillabel != "") {
-                texFile << texFormat((*iEdge)->taillabel); 
+                texFile << texFormat((*iEdge)->taillabel);
             }
 
-            texFile << pnEdgeStmt[7] << endl; 
+            texFile << pnEdgeStmt[7] << endl;
         }
     }
 }

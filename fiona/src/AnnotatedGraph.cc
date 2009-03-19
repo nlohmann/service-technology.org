@@ -2521,7 +2521,6 @@ string AnnotatedGraph::createOGFile(const string& filenamePrefix, bool hasOWFN) 
 
     if (!ogFile.good()) {
             ogFile.close();
-            trace("Error: A file error occurred. Exit.");
             setExitCode(EC_FILE_ERROR);
     }
     if (hasNoRoot()) {
@@ -3384,7 +3383,6 @@ string AnnotatedGraph::printGraphToSTG(vector<string>& edgeLabels) {
     fstream STGFileStream(STGFileName.c_str(), ios_base::out | ios_base::trunc | ios_base::binary);
     if (!STGFileStream.good()) {
             STGFileStream.close();
-            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
     }
     STGFileStream << ".model Labeled_Transition_System" << "\n";

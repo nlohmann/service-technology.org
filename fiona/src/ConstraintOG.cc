@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -57,7 +57,7 @@ using namespace std;
 
 //! \brief constructor
 //! \param _PN underlying petri net
-ConstraintOG::ConstraintOG(oWFN *_PN) : OG(_PN) { 
+ConstraintOG::ConstraintOG(oWFN *_PN) : OG(_PN) {
 }
 
 
@@ -78,21 +78,21 @@ void ConstraintOG::computeCovConstraint() {
           iPlace != placesToCover.end(); ++iPlace) {
         GraphFormulaMultiaryOr *clause= new GraphFormulaMultiaryOr;
 
-        // all OG nodes are present in the clause whose knowledge 
+        // all OG nodes are present in the clause whose knowledge
         // contain this place
-        for (nodes_t::iterator iNode = setOfNodes.begin(); 
+        for (nodes_t::iterator iNode = setOfNodes.begin();
              iNode != setOfNodes.end(); ++iNode) {
-            if (knownPlaces[*iNode].find(*iPlace) !=  
+            if (knownPlaces[*iNode].find(*iPlace) !=
                 knownPlaces[*iNode].end()) {
-                GraphFormulaLiteral *literal = 
+                GraphFormulaLiteral *literal =
                     new GraphFormulaLiteral((*iNode)->getName());
                 clause->addSubFormula(literal);
             }
         }
-         
+
         cnf->addClause(clause);
     }
- 
+
     // every transition to be covered constitutes a disjunctive clause
     for (set<string>::iterator iTrans = transitionsToCover.begin();
          iTrans != transitionsToCover.end(); ++iTrans) {
@@ -100,11 +100,11 @@ void ConstraintOG::computeCovConstraint() {
 
         // all OG nodes are present in the clause whose knowledge
         // contain this transition
-        for (nodes_t::iterator iNode = setOfNodes.begin(); 
+        for (nodes_t::iterator iNode = setOfNodes.begin();
              iNode != setOfNodes.end(); ++iNode) {
-            if (knownTransitions[*iNode].find(*iTrans) != 
+            if (knownTransitions[*iNode].find(*iTrans) !=
                 knownTransitions[*iNode].end()) {
-                GraphFormulaLiteral *literal = 
+                GraphFormulaLiteral *literal =
                     new GraphFormulaLiteral((*iNode)->getName());
                 clause->addSubFormula(literal);
             }
@@ -148,9 +148,9 @@ void ConstraintOG::readCovConstraint(const string& filename) {
     cov_yyin = fopen(filename.c_str(), "r");
 
     if (!cov_yyin) {
-        cerr << "cannot open COV file '" << filename 
-             << "' for reading'\n" << endl;
-        setExitCode(4);
+    	cerr << "cannot open COV file '" << filename
+    	                 << "' for reading'\n" << endl;
+        setExitCode(EC_NO_COV_FILE);
     }
 
     PlacesToCover = new set<string>;
@@ -179,7 +179,7 @@ void ConstraintOG::buildGraph() {
     // for every blue OG node, compute its knowledge, and derive from the knowledge
     // the set of oWFN places and transitions that are seen and thus covered
     for(nodes_t::iterator iNode = setOfNodes.begin(); iNode != setOfNodes.end(); ++iNode) {
-        
+
         if ((*iNode)->isBlue()) {
             for (StateSet::iterator iState=(*iNode)->reachGraphStateSet.begin();
                 iState != (*iNode)->reachGraphStateSet.end(); ++iState) {
@@ -194,12 +194,12 @@ void ConstraintOG::buildGraph() {
                     }
                 }
 
-                // store all transitions within the reachability graph in 
+                // store all transitions within the reachability graph in
                 // the knowledge set
                 for(unsigned int i = 0; i < (*iState)->cardFireList; ++i) {
                     owfnTransition* transition = (*iState)->firelist[i];
                     knownTransitions[*iNode].insert(transition->name);
-                    for(unsigned int iArc = 0; 
+                    for(unsigned int iArc = 0;
                         iArc != transition->getLeavingArcsCount(); ++iArc) {
                         knownPlaces[*iNode].insert(transition->getLeavingArc(iArc)->Destination->name);
                     }
@@ -215,11 +215,11 @@ void ConstraintOG::buildGraph() {
 //! \brief Print ConstraintOG
 //! NOTE: this method is derived from AnnotatedGraph::printOGFile()
 //! \param filenamePrefix prefix of the output file
-//! \param hasOWFN gives true if this Annotated Graph is also a Communication 
+//! \param hasOWFN gives true if this Annotated Graph is also a Communication
 //! Graph that contains it's oWFN. Important to determine whether a true
 //! annotated node is the empty node or not.
 //! \return name of the created .covog file
-string ConstraintOG::createOGFile(const std::string& filenamePrefix, 
+string ConstraintOG::createOGFile(const std::string& filenamePrefix,
                                   bool hasOWFN) const {
     ofstream ogFile(addOGFileSuffix(filenamePrefix).c_str(), ios_base::out);
 
@@ -235,7 +235,7 @@ string ConstraintOG::createOGFile(const std::string& filenamePrefix,
                << "  0;" << endl << endl
                << "TRANSITIONS" << endl
                << "  ;" << endl;
-        
+
         ogFile  << "COVER" << endl
                 << "  ;" << endl << endl;
 
@@ -292,7 +292,7 @@ string ConstraintOG::createOGFile(const std::string& filenamePrefix,
             }
 
             ogFile << "  " << node->getName() << " -> "
-                   << edge->getDstNode()->getName() << " : " 
+                   << edge->getDstNode()->getName() << " : "
                    << edge->getLabel();
 
             printedFirstEdge = true;
@@ -300,96 +300,96 @@ string ConstraintOG::createOGFile(const std::string& filenamePrefix,
         delete iEdge;
     }
     ogFile << ';' << endl << endl;
-        
-    
+
+
     ogFile << "COVER" << endl;
-    
+
     // add places to be covered
     ogFile << "  Places to cover:";
-     
+
     if (placesToCover.empty()) {
         ogFile << " none," << endl;
-    } else {    
-        for (set<string>::iterator iSet = placesToCover.begin(); 
+    } else {
+        for (set<string>::iterator iSet = placesToCover.begin();
                             iSet != placesToCover.end(); ++iSet) {
-                                
+
             ogFile << " " << *iSet;
         }
         ogFile << "," << endl;
     }
-    
+
     // add transitions to be covered
     ogFile << "  Transitions to cover:";
-    
+
     if (transitionsToCover.empty()) {
         ogFile << " none," << endl;
     } else {
-        for (set<string>::iterator iSet = transitionsToCover.begin(); 
+        for (set<string>::iterator iSet = transitionsToCover.begin();
                             iSet != transitionsToCover.end(); ++iSet) {
-                                    
+
             ogFile << " " << *iSet;
         }
         ogFile << "," << endl;
     }
-    
+
     // add global constraint
-    ogFile  << "  Global Constraint: " << getCovConstraint()->asString() 
+    ogFile  << "  Global Constraint: " << getCovConstraint()->asString()
             << "," << endl << endl;
-    
+
     set<string> coveredNodes;
     bool first = true;
     bool empty = true;
-    
+
     // add covered places/transitions per node
-    for(nodes_t::const_iterator iNode = setOfNodes.begin(); 
-        iNode != setOfNodes.end(); ++iNode) { 
-        
+    for(nodes_t::const_iterator iNode = setOfNodes.begin();
+        iNode != setOfNodes.end(); ++iNode) {
+
         if (!first) {
             ogFile << "," << endl;
         } else {
             first = false;
         }
-        
+
         ogFile << "  " << (*iNode)->getName() << " :";
-        
+
         if (parameters[P_COVERALL]) {
             // add all covered places of this node
             coveredNodes = knownPlaces.find(*iNode)->second;
         } else {
             // add covered places of this node:
-            //      intersection of all covered places of this node 
+            //      intersection of all covered places of this node
             //      and places to be covered
-            coveredNodes = setIntersection(knownPlaces.find(*iNode)->second, 
+            coveredNodes = setIntersection(knownPlaces.find(*iNode)->second,
                                            placesToCover);
         }
-        
-        for (set<string>::iterator iSet = coveredNodes.begin(); 
+
+        for (set<string>::iterator iSet = coveredNodes.begin();
                         iSet != coveredNodes.end(); ++iSet) {
-                    
+
             ogFile << " " << *iSet;
         }
 
         empty &= coveredNodes.empty();
-        
+
         if (parameters[P_COVERALL]) {
             // add all covered transitions of this node
             coveredNodes = knownTransitions.find(*iNode)->second;
         } else {
             // add covered transitions of this node:
-            //      intersection of all covered transitions in this node 
+            //      intersection of all covered transitions in this node
             //      and transitions to be covered
             coveredNodes = setIntersection(knownTransitions.find(*iNode)->second,
                                            transitionsToCover);
         }
-                    
-        for (set<string>::iterator iSet = coveredNodes.begin(); 
+
+        for (set<string>::iterator iSet = coveredNodes.begin();
                         iSet != coveredNodes.end(); ++iSet) {
-                    
+
             ogFile << " " << *iSet;
         }
 
         empty &= coveredNodes.empty();
-        
+
         if (empty) {
             ogFile << " none";
         }
@@ -414,13 +414,13 @@ std::string ConstraintOG::addOGFileSuffix(const std::string& filePrefix) {
 
 
 //! \brief dfs through the graph printing each node and edge to the output stream
-//! NOTE: this method is derived from 
+//! NOTE: this method is derived from
 //! \param v current node in the iteration process
 //! \param os output stream
 //! \param visitedNodes maps nodes to Bools remembering already visited nodes
 void ConstraintOG::createDotFileRecursively(
         AnnotatedGraphNode* v, fstream& os,
-        std::map<AnnotatedGraphNode*, bool>& visitedNodes) const { 
+        std::map<AnnotatedGraphNode*, bool>& visitedNodes) const {
 
     if (v == NULL) {
         // print the empty OG...
@@ -436,9 +436,9 @@ void ConstraintOG::createDotFileRecursively(
         // add coversets
         os << "covered:";
 
-        set<string> covered = setUnion(knownPlaces.find(v)->second, 
+        set<string> covered = setUnion(knownPlaces.find(v)->second,
                                        knownTransitions.find(v)->second);
-        static set<string> tocover = 
+        static set<string> tocover =
             setUnion(placesToCover, transitionsToCover);
 
         if (!parameters[P_COVERALL]) {
@@ -493,8 +493,8 @@ void ConstraintOG::createDotFileRecursively(
 }
 
 
-//! \brief computes those oWFN places and transitions, which cannot be covered 
-//! from the set of oWFN places and transitions which shall be covered 
+//! \brief computes those oWFN places and transitions, which cannot be covered
+//! from the set of oWFN places and transitions which shall be covered
 set<string> ConstraintOG::computeUncoverables() {
 
     set<string> covered;
@@ -505,9 +505,9 @@ set<string> ConstraintOG::computeUncoverables() {
          iNode != setOfNodes.end(); ++iNode) {
 
         AnnotatedGraphNode* node = *iNode;
-       
-        covered = setUnion(covered, knownPlaces[node]); 
-        covered = setUnion(covered, knownTransitions[node]); 
+
+        covered = setUnion(covered, knownPlaces[node]);
+        covered = setUnion(covered, knownTransitions[node]);
     }
 
     tocover = setUnion(placesToCover, transitionsToCover);

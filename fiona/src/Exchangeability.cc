@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -35,7 +35,7 @@
  */
 
 #include "mynew.h"
-#include "options.h" 
+#include "options.h"
 #include "debug.h"
 #include <iostream>
 #include <string.h>
@@ -48,11 +48,11 @@ DdManager* Exchangeability::mgrAnn = NULL;
 int Exchangeability::nbrBdd = 0;
 
 int comparestr( const void* a, const void* b){
-    return strcmp( * (char**) a, *(char**) b);	
+    return strcmp( * (char**) a, *(char**) b);
 }
 
-//! \brief constructor  
-//! \param filename name of the fale to check exchangebility for  
+//! \brief constructor
+//! \param filename name of the fale to check exchangebility for
 //! \param heuristic Cudd Reorderding type
 Exchangeability::Exchangeability(string filename, Cudd_ReorderingType heuristic) {
     TRACE(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");
@@ -148,9 +148,6 @@ void Exchangeability::loadBdd(std::string filename) {
 
         if (fpMp == NULL || fpAnn == NULL) {
             cerr << "cannot open cudd-files of " << filename << "\n";
-            cerr << "\nTo check equivalence of two nets, the BDD representations of"
-                 << "\nthe corresponding OGs must have been computed before.\n"
-                 << "\nEnter \"fiona --help\" for more information" << endl;
             setExitCode(EC_NO_CUDD_FILE);
         }
     }
@@ -190,7 +187,7 @@ void Exchangeability::loadBdd(std::string filename) {
 
 
 //! \brief DESCRIPTION
-//! \param names DESCRIPTION 
+//! \param names DESCRIPTION
 //! \param nVars DESCRIPTION
 //! \param permids DESCRIPTION
 //! \param nSuppVars DESCRIPTION
@@ -204,7 +201,7 @@ void Exchangeability::loadHeader(FILE* fp,
     char** orderedVarNames;
     char** suppVarNames;
     int* ids;
-    int* auxids; 
+    int* auxids;
     int nRoots;
 
     Dddmp_cuddHeaderLoad (&ddType /* OUT: selects the proper decomp type */,
@@ -247,9 +244,9 @@ void Exchangeability::loadHeader(FILE* fp,
 
 
 //! \brief loads a good variable order to the BDD manager
-//! \param permids gives the optimal order 
+//! \param permids gives the optimal order
 //! \param size size of permids (=numer of BDD variables)
-//! \param maxId highest possible number in permids 
+//! \param maxId highest possible number in permids
 void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids, int maxId) {
     int length;
     if (size < Cudd_ReadSize(mgr)) {
@@ -273,7 +270,7 @@ void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids, i
 
 
 //! \brief DESCRPITION
-//! \param fp DESCRPITION 
+//! \param fp DESCRPITION
 //! \param mgr DESCRPITION
 //! \return DESCRPITION
 DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr) {
@@ -294,9 +291,9 @@ DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr) {
 
 
 //! \brief DESCRPITION
-//! \param filename DESCRPITION 
+//! \param filename DESCRPITION
 //! \param varNames DESCRPITION
-//! \param bddMp DESCRPITION 
+//! \param bddMp DESCRPITION
 //! \param bddAnn DESCRPITION
 //! \return DESCRPITION
 void Exchangeability::printDotFile(char* filename,

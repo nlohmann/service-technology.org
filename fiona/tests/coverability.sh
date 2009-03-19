@@ -100,8 +100,8 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
+    if [ $? -ne 1 ]; then
+        echo ... fiona exited with a return value other than 1 - although it should not
         result=1
     fi
 
@@ -175,8 +175,8 @@ if [ "$memcheck" = "yes" ]; then
 else
     echo running $cmd
     OUTPUT=`$cmd 2>&1`
-    if [ $? -ne 0 ]; then
-        echo ... fiona exited with nonzero return value although it should not
+    if [ $? -ne 1 ]; then
+        echo ... fiona exited with a return value other than 1 - although it should not
         result=1
     fi
 

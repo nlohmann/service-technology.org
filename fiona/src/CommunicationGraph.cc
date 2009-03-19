@@ -305,7 +305,6 @@ string CommunicationGraph::createDotFile(string& filenamePrefix, const string& d
         fstream dotFile(dotFileName.c_str(), ios_base::out | ios_base::trunc);
         if (!dotFile.good()) {
             dotFile.close();
-            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
         dotFile << "digraph g1 {\n";
@@ -484,7 +483,7 @@ void CommunicationGraph::createDotFileRecursively(AnnotatedGraphNode* v,
         		}
 
 //                cerr << "DEBUG-LEVEL: " << debug_level;
-        		
+
         		if (debug_level >= TRACE_3) {
         		    os << " (";
         		    // print the suffix (state type)

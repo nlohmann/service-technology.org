@@ -144,19 +144,37 @@ unsigned short int globalExitCode = 0;
 
 //! \brief sets the global exit code. Calls exit if exit code is greater equal
 //exitAtThisCode which is defined in options.h as a constant.
-//\param newExitCode an exit code as defined in options.h. 
+//\param newExitCode an exit code as defined in options.h.
 void setExitCode(unsigned short int newExitCode) {
-    
+
     if (newExitCode >= exitAtThisCode) {
+        switch ( newExitCode ) {
+        case EC_FILE_ERROR:
+            trace("Error: A file error occurred. Exit.");
+            break;
+        case EC_MEMORY_EXHAUSTED:
+            cerr << "new failed, memory exhausted"<< endl;
+            break;
+        case EC_DOT_ERROR:
+            trace( "error: Dot exited with non zero value! here\n\n");
+            break;
+        case EC_NO_CUDD_FILE:
+            cerr << "\nTo check equivalence of two nets, the BDD representations of"
+                 << "\nthe corresponding OGs must have been computed before.\n"
+                 << "\nEnter \"fiona --help\" for more information" << endl;
+            break;
+        case EC_NO_RULES_FILE:
+            cerr << "cannot open rules file '" << adapterRulesFile << "' for reading'\n" << endl;
+            break;
+        }
+
         exit(newExitCode);
     }
-
     globalExitCode = newExitCode;
 }
 
 //! \brief an exit function in case the memory is exhausted
 void myown_newhandler() {
-    cerr << "new failed, memory exhausted"<< endl;
     setExitCode(EC_MEMORY_EXHAUSTED);
 }
 
@@ -179,7 +197,6 @@ void readnet(const std::string& owfnfile) {
     }
     else owfn_yyin = fopen(owfnfile.c_str(), "r");
     if (!owfn_yyin) {
-        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
     // diagnosefilename = owfnfile;
@@ -198,11 +215,11 @@ void readnet(const std::string& owfnfile) {
     owfn_yyparse();
 
     fclose(owfn_yyin);
-    
-    
+
+
     // for autonomous controllability, the net has to be changed
     // now is the time to do so
-    
+
     if (parameters[P_AUTONOMOUS]) {
         if (givenPortName == "") {
             trace( "error: no port given\n\n");
@@ -213,8 +230,8 @@ void readnet(const std::string& owfnfile) {
             exit(EXIT_FAILURE);
         }
         PN->restrictToPort(givenPortName);
-    }    
-    
+    }
+
     for (unsigned int i = 0; i < PN->getPlaceCount(); i++) {
         PN->CurrentMarking[i] = PN->getPlace(i)->initial_marking;
     }
@@ -271,7 +288,6 @@ AnnotatedGraph* readog(const std::string& ogfile) {
     og_yyin = fopen(ogfile.c_str(), "r");
     if (!og_yyin) {
         cerr << "cannot open OG file '" << ogfile << "' for reading'\n" << endl;
-        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph();
@@ -299,7 +315,7 @@ AnnotatedGraph* readconstraintog(const std::string& ogfile, GraphFormulaCNF*& co
     covog_yyin = fopen(ogfile.c_str(), "r");
     if (!covog_yyin) {
         cerr << "cannot open constraint OG file '" << ogfile << "' for reading'\n" << endl;
-        setExitCode(4);
+        setExitCode(EC_FILE_ERROR);
     }
     OGToParse = new AnnotatedGraph;
     ogfileToParse = ogfile;
@@ -448,7 +464,6 @@ void makeGasTex(std::string myDotFile, std::string myFilePrefix,
     dot_yyin = fopen((dotFileName).c_str(), "r");
     if (!dot_yyin) {
         cerr << "cannot open dot file '" << dotFileName << "' for reading'\n" << endl;
-        trace("Error: A file error occured. Exit.");
         setExitCode(EC_FILE_ERROR);
     }
 
@@ -544,7 +559,6 @@ void outputPublicView(string graphName, Graph* pv, bool fromOWFN, set<string> in
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
         (output) << (*PVoWFN);
@@ -575,6 +589,7 @@ Graph* computePublicView(AnnotatedGraph* OG, string graphName, bool fromOWFN, bo
         } else {
             trace("\nThe given OG describes no partners. No PublicView will be generated.\n\n");
         }
+        setExitCode(1);
         return NULL;
     }
 
@@ -674,6 +689,7 @@ InteractionGraph* computeIG(oWFN* PN, string& igFilename) {
         trace( "YES\n\n");
     } else {
         trace( "NO\n\n");
+        setExitCode(1);
     }
 
     trace( "IG statistics:\n");
@@ -943,7 +959,10 @@ string computeOG(oWFN* PN) {
     trace( "    " + intToString((int) difftime(overAllTime_end, overAllTime_start)) + " s overall consumed for OG computation.\n\n");
 
     trace( "\nnet is controllable: ");
-    if (!graph->hasBlueRoot() ||            (parameters[P_COVER] && static_cast<ConstraintOG*>(graph)->getCovConstraint()->equals() == FALSE)) {        trace( "NO\n\n");    } else {
+    if (!graph->hasBlueRoot() ||            (parameters[P_COVER] && static_cast<ConstraintOG*>(graph)->getCovConstraint()->equals() == FALSE)) {
+        trace( "NO\n\n");
+        setExitCode(1);
+    } else {
         trace( "YES\n\n");
         controllable = true;
     }
@@ -1012,6 +1031,7 @@ string computeOG(oWFN* PN) {
                 trace( "MAYBE\n\n");
             } else {
                 trace( "NO\n\n");
+                setExitCode(1);
                 parameters[P_SHOW_ALL_NODES] = true;
             }
         }
@@ -1267,6 +1287,7 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace( "The first OG characterizes all strategies of the second one.\n\n");
     } else {
         TRACE(TRACE_1, "result: simulation holds: NO\n\n");
+        setExitCode(1);
         trace( "The second OG characterizes at least one strategy that is\n");
         trace( "not characterized by the first one.\n\n");
     }
@@ -1435,6 +1456,7 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         trace( " YES\n\n");
     } else {
         trace( " NO\n\n");
+        setExitCode(1);
     }
 
     overAllTime_end = time (NULL);
@@ -1498,7 +1520,6 @@ void makePNG(oWFN* PN) {
         // check whether the stream was succesfully created
         if (!out->is_open()) {
             trace( "File \"" + dotFileName + "\" could not be opened for writing access!\n");
-           trace("Error: A file error occured. Exit.");
            setExitCode(EC_FILE_ERROR);
         }
 
@@ -1518,7 +1539,6 @@ void makePNG(oWFN* PN) {
             if (exitvalue == 0) {
                 trace( (outFileName + ".dot generated\n\n"));
             } else {
-                trace( "error: Dot exited with non zero value! here\n\n");
                 setExitCode(EC_DOT_ERROR);
             }
 
@@ -1583,7 +1603,6 @@ void reduceOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(),ios::out);
         if (!output.good()) {
             output.close();
-            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
         (output) << (*PNapiNet);
@@ -1633,7 +1652,6 @@ oWFN* normalizeOWFN(oWFN* PN) {
         output.open (owfnOutput.c_str(), ios::out);
         if (!output.good()) {
             output.close();
-            trace("Error: A file error occured. Exit.");
             setExitCode(EC_FILE_ERROR);
         }
 
@@ -1685,6 +1703,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
                 TRACE(TRACE_1, "\n");
                 TRACE(TRACE_1, "Match failed: " + reasonForFailedMatch + "\n\n");
                 trace(((*OGToMatch)->getFilename()) + ": NO\n");
+                setExitCode(1);
             }
         } else {
             if ( coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
@@ -1694,6 +1713,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
                 TRACE(TRACE_1, "\n");
                 trace("Match failed: " + reasonForFailedMatch + "\n\n");
                 trace(((*OGToMatch)->getFilename()) + ": NO\n");
+                setExitCode(1);
             }
         }
         delete coreOWFN;
@@ -1899,6 +1919,7 @@ int main(int argc, char** argv) {
         if (ogfiles.begin() == ogfiles.end() && !(parameters[P_PV])) {
             trace("Error:  No OGs have been given for computation\n\n");
             trace("        Enter \"fiona --help\" for more information\n\n");
+            setExitCode(EC_BAD_CALL);
         }
 
         // iterate all input files
@@ -2139,6 +2160,7 @@ int main(int argc, char** argv) {
             trace( "YES\n\n");
         } else {
             trace( "NO\n\n");
+            setExitCode(1);
         }
         // return 0;
     }
@@ -2209,7 +2231,7 @@ int main(int argc, char** argv) {
 
                 // [LUHME XV] verschieben
                 fileName = "";
-                
+
                 // start computation
                 if (parameters[P_IG]) {
                     reportOptionValues(); // adjust events_manual and print limit of considering events

@@ -198,7 +198,7 @@ namespace pnapi
     std::ostream & sa(std::ostream &);
 
     /// LOLA file format
-    std::ostream & lola(std::ostream &);
+    std::ios_base & lola(std::ios_base &);
 
     /// meta information manipulator
     util::Manipulator<std::pair<MetaInformation, std::string> >

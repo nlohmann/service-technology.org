@@ -63,6 +63,16 @@ namespace pnapi
 	    break;
 	  }
 
+	case util::LOLA:
+	  {
+	    parser::lola::Parser parser;
+	    parser::owfn::Visitor visitor;
+	    parser.parse(is).visit(visitor);
+	    net = visitor.getPetriNet();
+	    net.meta_ = util::MetaData::data(is);
+	    break;
+	  }
+
 	case util::ONWD:
 	  {
 	    map<string, PetriNet *> nets = util::PetriNetData::data(is);

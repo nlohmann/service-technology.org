@@ -418,7 +418,22 @@ namespace pnapi
 	  return new Conjunction(*c, *wcf.second);
       }
 
-    }
+    } /* namespace owfn */
+
+
+
+    namespace lola
+    {
+      
+      Node * node;
+
+      Parser::Parser() :
+	parser::Parser<Node>(node, lola::parse)
+      {
+      }
+
+    } /* namespace lola */
+
 
 
     namespace petrify

@@ -10,6 +10,7 @@ using std::ifstream;
 using std::stringstream;
 
 using pnapi::io::owfn;
+using pnapi::io::lola;
 using pnapi::io::dot;
 using pnapi::io::meta;
 using pnapi::io::nets;
@@ -44,6 +45,23 @@ int main(int argc, char * argv[])
   test << owfn << net;
   cout << owfn << net;
   assert(stream.str() == test.str());
+  end_test();
+  */
+
+  /*
+  // the test doesn't work reliably because of set ordering
+  begin_test("io::operator>>() [Petri net LOLA input]");
+  extern int pnapi_lola_debug;
+  //pnapi_lola_debug = 1;
+  stringstream stream, test;
+  //stream << lola << net;
+  stream << "PLACE p1, p2; MARKING p1:4; TRANSITION t1 CONSUME ; PRODUCE p1:1; TRANSITION t2 CONSUME p1:1; PRODUCE ;";
+  cout << lola << net;
+  try { stream >> lola >> net; }
+  catch (InputError e) { cout << endl << e << endl; assert(false); }
+  //test << lola << net;
+  cout << lola << net;
+  //assert(stream.str() == test.str());
   end_test();
   */
 
@@ -111,10 +129,10 @@ int main(int argc, char * argv[])
   file1.close();
   file2.close();
 
+  /*
   begin_test("io::operator>>() [Petri net ONWD input]");
   try 
     { 
-      /*
       PetriNet net1;
       owfn1 >> owfn >> net1;
       map<string, PetriNet *> netsByName;
@@ -122,9 +140,7 @@ int main(int argc, char * argv[])
       onwd >> meta(pnapi::io::INPUTFILE, "<onwd>")
 	   >> nets(netsByName)
 	   >> pnapi::io::onwd >> net; 
-      */
 
-      /*
       ifstream ifs;
       map<string, PetriNet *> netsByName;
 
@@ -143,11 +159,11 @@ int main(int argc, char * argv[])
       ifs.open("booking.onwd");
       ifs >> onwd >> nets(netsByName) >> net;
       ifs.close();
-      */
     }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
   //cout << owfn << net;
   end_test();
+  */
 
   return 0;
 }

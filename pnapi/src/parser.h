@@ -310,6 +310,48 @@ namespace pnapi
 
 
     /*************************************************************************
+     ***** LOLA Parser
+     *************************************************************************/
+
+    /*!
+     * \brief   LOLA Parser
+     *
+     * Instantiation of the parser framework for parsing LOLA files.
+     */
+    namespace lola
+    {
+
+      // lola parser uses owfn nodes
+      typedef owfn::Node Node;
+
+
+      /// output node of parser
+      extern Node * node;
+
+      /// flex generated lexer function
+      int lex();
+
+      /// bison generated parser function
+      int parse();
+
+
+      /*!
+       * \brief   Encapsulation of the flex/bison LOLA parser
+       *
+       * Connects to the flex/bison implementation for parsing (#parse()) and 
+       * result retrieval (#visit()). Call the two functions in this order.
+       */
+      class Parser : public parser::Parser<Node>
+      {
+      public:
+	Parser();
+      };
+
+    }
+
+
+
+    /*************************************************************************
      ***** ONWD Parser
      *************************************************************************/
 

@@ -317,7 +317,7 @@ namespace pnapi
      ***** LOLA output
      *************************************************************************/
 
-    std::ostream & lola(std::ostream & ios)
+    std::ios_base & lola(std::ios_base & ios)
     {
       util::FormatData::data(ios) = util::LOLA;
       return ios;

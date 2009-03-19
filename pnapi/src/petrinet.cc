@@ -442,7 +442,7 @@ namespace pnapi
   PetriNet PetriNet::compose(const map<string, PetriNet *> & nets)
   {
     PetriNet result;
-    
+
     // create instance map
     typedef map<string, vector<PetriNet> > Instances;
     Instances instances;
@@ -453,7 +453,7 @@ namespace pnapi
     // create wiring
     typedef map<Place *, LinkNode *> Wiring;
     Wiring wiring;
-    for (Instances::iterator it1 = instances.begin(); 
+    for (Instances::iterator it1 = instances.begin();
 	 it1 != instances.end(); ++it1)
       {
 	string prefix = it1->first; assert(!prefix.empty());
@@ -478,7 +478,7 @@ namespace pnapi
 		      map<Place *, LinkNode *> & wiring)
   {
     set<Place *> interface = net1.getInterfacePlaces();
-    for (set<Place *>::iterator it = interface.begin(); 
+    for (set<Place *>::iterator it = interface.begin();
 	 it != interface.end(); ++it)
       {
 	Place * p1 = *it;
@@ -499,7 +499,7 @@ namespace pnapi
 
   /*!
    */
-  PetriNet & 
+  PetriNet &
   PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
 			     const map<Place *, LinkNode *> & wiring)
   {

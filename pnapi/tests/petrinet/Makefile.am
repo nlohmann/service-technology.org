@@ -3,7 +3,8 @@ TESTS           = test_construction   \
 			      test_merging        \
 			      test_output         \
 	 		      test_input          \
-	 		      test_normalize
+	 		      test_normalize      \
+			      test_markings
 
 
 check_PROGRAMS  = test_construction   \
@@ -11,7 +12,8 @@ check_PROGRAMS  = test_construction   \
 			      test_merging        \
 			      test_output         \
 			      test_input          \
-			      test_normalize
+			      test_normalize	  \
+			      test_markings
 
 
 test_construction_SOURCES   = test_construction.cc
@@ -20,6 +22,7 @@ test_merging_SOURCES        = test_merging.cc
 test_output_SOURCES         = test_output.cc
 test_input_SOURCES          = test_input.cc
 test_normalize_SOURCES      = test_normalize.cc
+test_markings_SOURCES	    = test_markings.cc
 
 
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src

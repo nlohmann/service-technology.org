@@ -1,3 +1,9 @@
+#ifndef NDEBUG
+#include <iostream>
+using std::cout;
+using std::endl;
+#endif
+
 #include <cassert>
 #include <set>
 
@@ -18,10 +24,12 @@ namespace pnapi
   /*!
    * \brief   Standard Constructor
    */
+  /*
   Marking::Marking() :
     net_(*new PetriNet())
   {
   }
+  */
 
 
   /*!
@@ -140,13 +148,13 @@ namespace pnapi
    */
   unsigned int & Marking::operator [](const Place & offset)
   {
-    return m_.find(&offset)->second;
+    return m_[&offset];
   }
 
 
   unsigned int Marking::operator[](const Place & p) const
   {
-    assert(m_.find(&p) != m_.end()); // FIXME?
+    assert(m_.find(&p) != m_.end());
 
     return m_.find(&p)->second;
   }

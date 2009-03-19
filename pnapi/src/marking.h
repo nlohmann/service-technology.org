@@ -24,7 +24,7 @@ namespace pnapi
   class Marking
   {
   public:
-    Marking();
+    //Marking();
     Marking(PetriNet &n, bool = false);
     Marking(const Marking &m);
     virtual ~Marking() {}

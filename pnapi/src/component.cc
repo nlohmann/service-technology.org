@@ -36,10 +36,15 @@ namespace pnapi {
 
   /*!
    */
-  Node::Node(PetriNet & net, ComponentObserver & observer, const Node & node) :
+  Node::Node(PetriNet & net, ComponentObserver & observer, const Node & node,
+	     const string & prefix) :
     net_(net), observer_(observer), type_(node.type_), history_(node.history_)
   {
     assert(&observer.getPetriNet() == &net);
+    if (!prefix.empty())
+      for (std::deque<string>::iterator it = history_.begin();
+	   it != history_.end(); ++it)
+	*it = prefix + *it;
   }
 
 
@@ -139,6 +144,7 @@ namespace pnapi {
    */
   void Node::prefixNameHistory(const string & prefix)
   {
+    assert(!prefix.empty());
     std::deque<string> oldHistory = history_;
     for (std::deque<string>::iterator it = history_.begin();
 	 it != history_.end(); ++it)
@@ -274,8 +280,8 @@ namespace pnapi {
   /*!
    */
   Place::Place(PetriNet & net, ComponentObserver & observer,
-	       const Place & place) :
-    Node(net, observer, place), tokens_(place.tokens_),
+	       const Place & place, const string & prefix) :
+    Node(net, observer, place, prefix), tokens_(place.tokens_),
     capacity_(place.capacity_), wasInterface_(place.wasInterface_),
     port_(place.port_)
   {
@@ -386,8 +392,8 @@ namespace pnapi {
   /*!
    */
   Transition::Transition(PetriNet & net, ComponentObserver & observer,
-			 const Transition & trans) :
-    Node(net, observer, trans)
+			 const Transition & trans, const string & prefix) :
+    Node(net, observer, trans, prefix)
   {
     observer_.updateTransitions(*this);
   }
@@ -486,6 +492,22 @@ namespace pnapi {
     assert(&observer.getPetriNet() == &net);
     assert(net.findNode(arc.source_.getName()) != NULL);
     assert(net.findNode(arc.target_.getName()) != NULL);
+
+    observer_.updateArcCreated(*this);
+  }
+
+
+  /*!
+   */
+  Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc, 
+	   Node & source, Node & target) :
+    net_(net), observer_(observer),
+    source_(source),
+    target_(target), weight_(arc.weight_)
+  {
+    assert(&observer.getPetriNet() == &net);
+    assert(net.containsNode(source));
+    assert(net.containsNode(target));
 
     observer_.updateArcCreated(*this);
   }

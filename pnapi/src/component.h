@@ -63,7 +63,7 @@ namespace pnapi
     Node(PetriNet &, ComponentObserver &, const std::string &, Type);
 
     /// copy constructor
-    Node(PetriNet &, ComponentObserver &, const Node &);
+    Node(PetriNet &, ComponentObserver &, const Node &, const std::string &);
 
     /// destructor
     virtual ~Node();
@@ -169,7 +169,8 @@ namespace pnapi
 	       const std::string &, Type = INTERNAL);
 
     /// copy constructor
-    Transition(PetriNet &, ComponentObserver &, const Transition &);
+    Transition(PetriNet &, ComponentObserver &, const Transition &, 
+	       const std::string &);
 
     /// help method for normalize method
     bool isNormal() const;
@@ -204,7 +205,7 @@ namespace pnapi
 	  unsigned int, const std::string &);
 
     /// copy constructor
-    Place(PetriNet &, ComponentObserver &, const Place &);
+    Place(PetriNet &, ComponentObserver &, const Place &, const std::string &);
 
     /// returns the number of tokens lying on this place
     unsigned int getTokenCount() const;
@@ -267,6 +268,9 @@ namespace pnapi
 
     /// copy constructor
     Arc(PetriNet &, ComponentObserver &, const Arc &);
+
+    /// copy constructor
+    Arc(PetriNet &, ComponentObserver &, const Arc &, Node &, Node &);
 
     /// destructor
     virtual ~Arc();

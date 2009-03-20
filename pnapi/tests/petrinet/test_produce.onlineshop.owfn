@@ -1,0 +1,63 @@
+PLACE
+  INTERNAL
+    final, initial, p1, p2, p3, p4, p5, p6, p7;
+
+  INPUT
+    card, cash, order;
+
+  OUTPUT
+    delivery, error, premium, regular, surcharge;
+
+INITIALMARKING
+  initial;
+
+FINALCONDITION
+  TRUE;
+
+
+TRANSITION t1
+  CONSUME cash, p2;
+  PRODUCE p5;
+
+TRANSITION t10
+  CONSUME card, p2;
+  PRODUCE p4;
+
+TRANSITION t11
+  CONSUME card, p3;
+  PRODUCE p6;
+
+TRANSITION t2
+  CONSUME cash, p3;
+  PRODUCE p7;
+
+TRANSITION t3
+  CONSUME p5;
+  PRODUCE delivery, final, surcharge;
+
+TRANSITION t4
+  CONSUME p7;
+  PRODUCE delivery, final, surcharge;
+
+TRANSITION t5
+  CONSUME p4;
+  PRODUCE delivery, final;
+
+TRANSITION t6
+  CONSUME p6;
+  PRODUCE error, final;
+
+TRANSITION t7
+  CONSUME initial, order;
+  PRODUCE p1;
+
+TRANSITION t8
+  CONSUME p1;
+  PRODUCE p2, premium;
+
+TRANSITION t9
+  CONSUME p1;
+  PRODUCE p3, regular;
+
+
+{ END OF FILE 'test_produce.onlineshop.lola.owfn' }

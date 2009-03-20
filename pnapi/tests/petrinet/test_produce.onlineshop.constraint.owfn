@@ -1,0 +1,24 @@
+PLACE                                                                           
+  INTERNAL                                                                      
+    final, initial, p;                                                          
+
+  INPUT
+    ;  
+
+  OUTPUT
+    ;   
+
+INITIALMARKING
+  initial;    
+
+FINALCONDITION
+  final = 1;  
+
+
+TRANSITION t8
+  CONSUME initial;
+  PRODUCE p;      
+
+TRANSITION t9
+  CONSUME p; 
+  PRODUCE final;

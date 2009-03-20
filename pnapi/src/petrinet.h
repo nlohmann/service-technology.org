@@ -261,8 +261,11 @@ namespace pnapi
                     STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9)
     };
 
-    /// produces a second constraint oWFN
-    void produce(const PetriNet &);
+    /// product with Constraint oWFN
+    void produce(const PetriNet &, 
+		 const std::map<Transition *, std::set<Transition *> > &,
+		 const std::string & = "net", 
+		 const std::string & = "constraint");
 
     //@}
 
@@ -331,20 +334,29 @@ namespace pnapi
 
     /* miscellaneous */
 
+    /// creates a transition as a copy of another one
+    Transition & createTransition(const Transition &, const std::string &);
+
+    /// creates arcs for a transition based on the arcs of another one
+    void createArcs(Transition &, Transition &, 
+		    const std::map<const Place *, const Place *> &);
+
     /// cleans up the net
     void clear();
 
     /// adds the structure of a second net
-    std::map<const Place *, const Place *> copyStructure(const PetriNet &);
+    std::map<const Place *, const Place *> 
+    copyStructure(const PetriNet &, const std::string & = "");
+
+    /// adds the places of a second net
+    std::map<const Place *, const Place *>
+    copyPlaces(const PetriNet &, const std::string &);
 
     /// returns a name for a node to be added
     std::string getUniqueNodeName(const std::string &) const;
 
     /// adds a given prefix to all nodes
     PetriNet & prefixNodeNames(const std::string &);
-
-    /// returns true if all arcs connecting to n have a weight of 1
-    bool sameweights(Node *n) const;
 
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,

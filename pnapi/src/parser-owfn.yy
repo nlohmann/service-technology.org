@@ -109,15 +109,18 @@ typed_places:
   ;
 
 input_places:
-  KEY_INPUT places SEMICOLON { $$ = new Node(INPUT, $2); }
+    KEY_INPUT places SEMICOLON { $$ = new Node(INPUT, $2); }
+  | /* empty */                { $$ = new Node();          }
   ;
 
 output_places:
-  KEY_OUTPUT places SEMICOLON { $$ = new Node(OUTPUT, $2); }
+    KEY_OUTPUT places SEMICOLON { $$ = new Node(OUTPUT, $2); }
+  | /* empty */                 { $$ = new Node();           }
   ;
 
 internal_places:
-  KEY_INTERNAL places SEMICOLON { $$ = new Node(INTERNAL, $2); }
+    KEY_INTERNAL places SEMICOLON { $$ = new Node(INTERNAL, $2); }
+  | /* empty */                   { $$ = new Node();             }
   ;
 
 lola_places: 

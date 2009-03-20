@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -53,77 +53,79 @@ enum placeType {INPUT, OUTPUT, INTERNAL}; //< type of place
 class owfnPlace : public Node {
     private:
         /// pointer to underlying petri net (needed for hash value)
-        oWFN * net; 
-        
+        oWFN * net;
+
         /// the port of this place
-        std::string port; 
+        std::string port;
 
     public:
         /// constructor
         owfnPlace(char *, placeType, oWFN *);
-        
+
         /// constructor
         owfnPlace(const std::string&, placeType, oWFN *);
 
         /// copy constructor
         owfnPlace(owfnPlace *, oWFN*);
-        
+
         /// basic deconstructor
         ~owfnPlace();
 
         /// type of place (input, output, internal)
-        placeType type; 
-        
+        placeType type;
+
         /// returns the label fitting for the communication graph
         std::string getLabelForCommGraph() const;
-        
+
         /// returns the label fitting for matching
         std::string getLabelForMatching() const;
-        
+
         /// returns the underlying owfn
         oWFN* getUnderlyingOWFN() const;
 
         /// initial marking of the place
         unsigned int initial_marking;
-        
+
         /// hashfactor of the place
         unsigned int hash_factor;
-        
+
         /// increment marking of place
-        void operator +=(unsigned int); 
-        
+        void operator +=(unsigned int);
+
         /// decrement marking of place
-        void operator -=(unsigned int); 
-        
+        void operator -=(unsigned int);
+
         /// test enabledness with respect to place
-        bool operator >=(unsigned int); 
-        
+        bool operator >=(unsigned int);
+
         /// define a factor for hash value calculation
-        void set_hash(unsigned int); 
-        
-        /// we remove isolated places 
-        unsigned int references; 
-        
+        void set_hash(unsigned int);
+
+        /// we remove isolated places
+        unsigned int references;
+
         /// maximum capacity
-        unsigned int capacity; 
-        
+        unsigned int capacity;
+
         /// nr of bits required for storing its marking (= log capacity)
-        int nrbits; 
-        
+        int nrbits;
+
         /// first bit representing this place in bit vector
-        int startbit; 
-        
+        int startbit;
+
         /// max occurrences of the node in its owfn
         int max_occurrence;
-        
+
         /// returns the type of the node
         placeType getType() const;
-        
+
         /// number of propositions in final condition that mention this place
-        unsigned int cardprop; 
-        
+        unsigned int cardprop;
+
         /// array of propositions in final condition that mention this place
-        formula ** proposition; 
+        formula ** proposition;
+
+        int propsize;
 
         /// void set_marking(unsigned int);   /// set initial 1marking of place;
         /// hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]

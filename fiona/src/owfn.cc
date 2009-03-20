@@ -2811,8 +2811,8 @@ set<string> oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode* n) {
                 NewState = binSearch(this);
 
                 if (NewState != NULL) {
-                    // Current marking already in bintree 
-                    TRACE(TRACE_5, "Current marking already in bintree \n"); 
+                    // Current marking already in bintree
+                    TRACE(TRACE_5, "Current marking already in bintree \n");
                     if (n->addState(NewState)) {
                         addSuccStatesToNode(n, NewState);
                         if (n->getColor() == RED) {
@@ -2838,12 +2838,12 @@ set<string> oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode* n) {
                     CurrentState->succ[CurrentState->current] = NewState;
                     (CurrentState->current)++;
                 } else {
-                    TRACE(TRACE_5, "Current marking new\n");	
+                    TRACE(TRACE_5, "Current marking new\n");
                     NewState = binInsert(this);
-                    
+
                     assert(CurrentState->succ[CurrentState -> current] == NULL);
                     CurrentState->succ[CurrentState -> current] = NewState;
-                    
+
                     // test current marking if message bound k reached
                     if (violatesMessageBound()) {
                         n->setColor(RED);
@@ -2854,7 +2854,7 @@ set<string> oWFN::calculateReachableStatesWithKnowledge(AnnotatedGraphNode* n) {
                         delete[] tempCurrentMarking;
                         return knowledge;
                     }
-                    
+
                     NewState->firelist = firelist();
                     NewState->cardFireList = CurrentCardFireList;
                     if (parameters[P_IG]) {
@@ -3173,7 +3173,7 @@ bool oWFN::isFinal() const {
 
         // give out a warning if a final state activates transitions
         if ((FinalCondition->value) && CurrentCardFireList  > 0) {
-            cerr << finalStateWarning; 
+            cerr << finalStateWarning;
             finalStateWarning = "";
         }
 
@@ -3192,7 +3192,7 @@ bool oWFN::isFinal() const {
             if (finalMarkingFits) {
                 // give out a warning if a final state activates transitions
                 if (CurrentCardFireList  > 0) {
-                    cerr << finalStateWarning; 
+                    cerr << finalStateWarning;
                     finalStateWarning = "";
                 }
 
@@ -3555,8 +3555,8 @@ bool oWFN::matchesWithOGRecursive(AnnotatedGraphNode* currentOGNode,
 //!        describing why the matching failed.
 //! \return true If this oWFN matches with given ConstraintOG.
 //!         retval false Otherwise.
-bool oWFN::matchesWithConstraintOG(const AnnotatedGraph* OG, 
-                                   const GraphFormulaCNF* covConstraint, 
+bool oWFN::matchesWithConstraintOG(const AnnotatedGraph* OG,
+                                   const GraphFormulaCNF* covConstraint,
                                    string& reasonForFailedMatch) {
     // check whether the initial marking violates the message bound
     if (violatesMessageBound()) {
@@ -3608,10 +3608,10 @@ bool oWFN::matchesWithConstraintOG(const AnnotatedGraph* OG,
 }
 
 
-//! \brief helper for matchesWithConstraintOG; 
+//! \brief helper for matchesWithConstraintOG;
 //! an assignment is passed, which stores all
 //! covered ConstraintOG nodes; it is then checked if the assignment satisfies the
-//! coverability constraint, thus meeting the proposed requirements to cover 
+//! coverability constraint, thus meeting the proposed requirements to cover
 //! certain oWFN places and transitions (of the underlying PN of the OG)
 //! \param currentOGNode current node in the ConstraintOG, so we know where we are
 //! \param currentState current oWFN state
@@ -3707,17 +3707,17 @@ bool oWFN::matchesWithConstraintOGRecursive(AnnotatedGraphNode* currentOGNode,
 
         // Determine whether we have already seen the state we just reached.
         State* newState = binSearch(this);
-        
-        // let's see if we have not yet checked the current state 
+
+        // let's see if we have not yet checked the current state
         // and if we have not yet checked the current state and the current node already
-        if ( newState != NULL && 
+        if ( newState != NULL &&
        	    (stateNodesAssoc[newState].find(currentOGNode->getNumber()) != stateNodesAssoc[newState].end())) {
 
         	TRACE(TRACE_2, "marking [" + getCurrentMarkingAsString() + "] already seen with node ");
         	TRACE(TRACE_2, currentOGNode->getName() + "\n");
         	TRACE(TRACE_2, "    backtracking from node " + currentOGNode->getName());
         	TRACE(TRACE_2, " with annotation " + currentOGNode->getAnnotationAsString() + "\n");
-            
+
             // We have already seen the state we just reaching by firing
             // the transition above. So we have to revert to the state that
             // the transition left from.
@@ -3777,7 +3777,7 @@ bool oWFN::matchesWithConstraintOGRecursive(AnnotatedGraphNode* currentOGNode,
             stateNodesAssoc[newState].insert(currentOGNode->getNumber());
             covAssignment.setToTrue(currentOGNode->getName());
             TRACE(TRACE_5, "og node " + currentOGNode->getName() + " set to true in coverability constraint\n");
-            
+
             // Check whether the initial marking violates the message bound
             // and exit with an error message if it does.
             if (violatesMessageBound()) {
@@ -4651,6 +4651,7 @@ oWFN* oWFN::returnNormalOWFN() {
         // atomic forumlae
         TRACE(TRACE_5, "copy existing final condition\n");
         result->FinalCondition = FinalCondition->reduced_copy( result );
+        result->FinalCondition->posate();
         result->FinalCondition->setstatic();
         // we don't compute a new finalConditionString and use
         // FinalCondition->getString() instead

@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -85,7 +85,7 @@ unsigned int booleanformula::counttype(FType t) {
 }
 
 
-//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by
 //!        a specified operator
 //! \param ty type of the operator
 //! \param subs array of subformulas to fill
@@ -97,7 +97,7 @@ unsigned int atomicformula::collectsubs(FType, formula** subs, unsigned int pos)
 }
 
 
-//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by
 //!        a specified operator
 //! \param ty type of the operator
 //! \param subs array of subformulas to fill
@@ -111,7 +111,7 @@ unsigned int unarybooleanformula::collectsubs(FType,
 }
 
 
-//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by
 //!        a specified operator
 //! \param ty type of the operator
 //! \param subs array of subformulas to fill
@@ -129,7 +129,7 @@ unsigned int binarybooleanformula::collectsubs(FType ty,
 }
 
 
-//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by 
+//! \brief returns an array of subformulas consisting of longest chain of subformulas connected by
 //!        a specified operator
 //! \param ty type of the operator
 //! \param subs array of subformulas to fill
@@ -221,15 +221,19 @@ binarybooleanformula::binarybooleanformula(FType t, formula* l, formula* r) {
 
 //! \brief deconstructor
 binarybooleanformula::~binarybooleanformula() {
+    TRACE(TRACE_5, "binarybooleanformula::~binarybooleanformula() : start\n");
+
     delete left;
     delete right;
+    TRACE(TRACE_5, "binarybooleanformula::~binarybooleanformula() : start\n");
+
 }
 
 //! \brief deconstructor
 booleanformula::~booleanformula() {
     TRACE(TRACE_5, "booleanformula::~booleanformula() : start\n");
     for (size_t isub = 0; isub != cardsub; ++isub) {
-        delete sub[isub];
+    	delete sub[isub];
     }
 
     delete[] sub;
@@ -429,6 +433,7 @@ booleanformula* booleanformula::reduced_copy(oWFN * net) {
 
     booleanformula* f = new booleanformula();
 
+
     formula ** newSubs = new formula* [cardsub];
     unsigned int j = 0;
 
@@ -449,6 +454,8 @@ booleanformula* booleanformula::reduced_copy(oWFN * net) {
     f->value = value;
     f->parent = parent;
     f->parentindex = parentindex;
+
+
     return f;
 }
 
@@ -740,8 +747,10 @@ formula* booleanformula::merge() {
 void atomicformula::setstatic() {
     if ( p->proposition == NULL ) {
         p->proposition = new formula* [p->cardprop];
+        p->propsize = p->cardprop;
         p->cardprop = 0;
     }
+
     p->proposition[p->cardprop] = this;
     p->cardprop++;
 }
@@ -881,7 +890,7 @@ void booleanformula::update(unsigned int m) {
 //! \brief remove negation in formulae without temporal
 //! \return returns the modified formula
 formula* atomicformula::posate() {
-    p->cardprop ++;
+	p->cardprop ++;
     return this;
 }
 

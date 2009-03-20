@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -49,7 +49,7 @@
 //! \param _net
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
     Node(name), type(_type), capacity(0), nrbits(0),
-            max_occurrence(1), cardprop(0), proposition(NULL) {
+            max_occurrence(1), cardprop(0), proposition(NULL),propsize(0) {
 
     references = initial_marking = hash_factor = 0;
     net = _net;
@@ -85,7 +85,8 @@ owfnPlace::owfnPlace(owfnPlace * original, oWFN * _net) :
     startbit( 0 ),       // startbit is set correctly in oWFN::initialize
     max_occurrence( original->max_occurrence ),
     cardprop(0),         // is set by formula::setstatic()
-    proposition(NULL)    // is set by formula::setstatic()
+    proposition(NULL),    // is set by formula::setstatic()
+    propsize(0)
 {
     net = _net;
     port = original->getPort();
@@ -96,11 +97,23 @@ owfnPlace::owfnPlace(owfnPlace * original, oWFN * _net) :
 owfnPlace::~owfnPlace() {
     TRACE(TRACE_5, "owfnPlace::~owfnPlace() : start\n");
 
-    // delete the array with all propositions (atomicformulas) which mention
+/*    // delete the array with all propositions (atomicformulas) which mention
     // this place. The propositions themselves are deleted by the class oWFN
     // that recursively deletes its FinalCondition.
-    delete[] proposition;
 
+    cerr << "deleting proposition of owfn place " << this->name << endl;
+
+    cerr << "Number of props " << this->propsize << " and cardprop is: " << this->propsize << endl;
+
+    for (int i = 0; i < this->cardprop; ++i) {
+    	cerr << "deleting prop " << i << ": " << proposition[i] << endl;
+    	delete proposition[i];
+    }
+
+
+    delete[] proposition;
+*/
+    delete proposition;
     TRACE(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }
 

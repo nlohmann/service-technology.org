@@ -81,8 +81,8 @@ PetriNet matrix2owfn(matrix &A) {
             if (A[i][j] == 1) {
                 string t_label = "t" + toString(i) + "_" + toString(j);
                 PN.createTransition(t_label);
-                PN.createArc(PN.findPlace("p" + toString(i)), PN.findTransition(t_label));
-                PN.createArc(PN.findTransition(t_label), PN.findPlace("p" + toString(j))); 
+                PN.createArc(*PN.findPlace("p" + toString(i)), *PN.findTransition(t_label));
+                PN.createArc(*PN.findTransition(t_label), *PN.findPlace("p" + toString(j))); 
             }
         }
     }
@@ -101,16 +101,17 @@ PetriNet matrix2owfn(matrix &A) {
     
     
     // connect interface
-    for (set<Transition *>::iterator t = PN.T.begin(); t != PN.T.end(); t++) {
+    set<Transition *> ts = PN.getTransitions();
+    for (set<Transition *>::iterator t = ts.begin(); t != ts.end(); t++) {
         unsigned int mode = rand() % (2 + A.size()/5);
         
         switch (mode) {
             case(0): {  /* input */
-                PN.createArc(PN.findPlace(inputLabels[rand() % (sizeof inputLabels)/(sizeof inputLabels[0])]), *t);
+                PN.createArc(*PN.findPlace(inputLabels[rand() % (sizeof inputLabels)/(sizeof inputLabels[0])]), **t);
                 break;
             }
             case(1): {  /* output */
-                PN.createArc(*t, PN.findPlace(outputLabels[rand() % (sizeof outputLabels)/(sizeof outputLabels[0])]));
+                PN.createArc(**t, *PN.findPlace(outputLabels[rand() % (sizeof outputLabels)/(sizeof outputLabels[0])]));
                 break;
             }
             default: {}  /* internal */
@@ -118,26 +119,31 @@ PetriNet matrix2owfn(matrix &A) {
     }
 
 
+    /* 
+     * FIXME: this is not possible, because we don't allow node deletion
+     * Is there a reduction rule? Hm, interface places, ...
+     *
     // remove unconnected interface places
     for (unsigned int i = 0; i < (sizeof inputLabels)/(sizeof inputLabels[0]); i++) {
         Place *p = PN.findPlace(inputLabels[i]);
-        if (PN.postset(p).empty()) {
+        if (p->getPostset().empty()) {
             PN.removePlace(p);
         }
     }
     for (unsigned int i = 0; i < (sizeof outputLabels)/(sizeof outputLabels[0]); i++) {
         Place *p = PN.findPlace(outputLabels[i]);
-        if (PN.preset(p).empty()) {
+        if (p->getPreset().empty()) {
             PN.removePlace(p);
         }
     }
+    */
     
     
-    // add final marking (the file petrinet-output.cc is modified such that
-    // final condition consists of the disjunction of all final places)
-    for (set<Place*>::iterator p = PN.P.begin(); p != PN.P.end(); p++) {
-        if (PN.postset(*p).empty())
-            (*p)->isFinal = true;
+    // add final marking
+    PN.finalCondition() = false;
+    for (set<Place*>::iterator p = PN.getInternalPlaces().begin(); p != PN.getInternalPlaces().end(); p++) {
+      if ((*p)->getPostset().empty())
+	PN.finalCondition().addProposition(**p == 1, false);
     }
     
     return PN;
@@ -170,7 +176,7 @@ int main(int argc, char** argv) {
                 
         PetriNet PN = matrix2owfn(adjacency);
         
-        if (!PN.P.empty() && !PN.T.empty()) {
+        if (!PN.getInternalPlaces().empty() && !PN.getTransitions().empty()) {
             string filename = "generated-" + toString(size) + "-" + format(toString(filecount++), nets) + ".owfn";
             ofstream fout(filename.c_str());
             fout << io::owfn << PN;

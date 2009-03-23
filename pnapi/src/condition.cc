@@ -138,13 +138,12 @@ namespace pnapi
     return *this;
   }
 
-  void Condition::addProposition(const Proposition & p)
+  void Condition::addProposition(const Proposition & p, bool conjunct)
   {
-    *this = formula() && p;
-    //Formula * oldFormula = formula_;
-    //formula_ = new Conjunction(*formula_, p);
-    //cout << *formula_ << endl;
-    //delete oldFormula;
+    if (conjunct)
+      *this = formula() && p;
+    else
+      *this = formula() || p;
   }
 
   void Condition::addMarking(const Marking & m)

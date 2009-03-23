@@ -1,10 +1,10 @@
-noinst_PROGRAMS = petri #generator
+noinst_PROGRAMS = petri generator
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h
-#generator_SOURCES = generator.cc
+generator_SOURCES = generator.cc
 
 petri_LDADD =  $(top_builddir)/src/libpnapi.a
-#generator_LDADD =  $(top_builddir)/src/libpnapi.a
+generator_LDADD =  $(top_builddir)/src/libpnapi.a
 
 BUILT_SOURCES = cmdline.c
 

@@ -93,7 +93,7 @@ namespace pnapi
 	       const std::map<const Place *, const Place *> &);
 
     /// adds a proposition by conjunction
-    void addProposition(const formula::Proposition &);
+    void addProposition(const formula::Proposition &, bool = true);
 
     /// creates a condition for the given marking and adds it
     void addMarking(const Marking &);

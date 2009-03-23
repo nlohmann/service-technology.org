@@ -991,27 +991,36 @@ namespace pnapi
 	if (label.empty())
 	  {
 	    Transition & trans = createTransition(netTrans, netPrefix);
-	    createArcs(trans, netTrans, placeMapping);
+	    createArcs(trans, netTrans, &placeMapping);
 	  }
       }
 
-    // handle product transitions
+    // create product transitions
+    Transitions labelTransitions;
     for (Labels::const_iterator it1 = labels.begin(); 
 	 it1 != labels.end(); ++it1)
       {
 	assert(it1->first != NULL);
-	Transition & netTrans = *it1->first; // t'
+	Transition & netTrans = *it1->first;             // t'
 	assert(net.containsNode(netTrans));
 	Transitions ts = it1->second;
 	for (Transitions::const_iterator it2 = ts.begin(); 
 	     it2 != ts.end(); ++it2)
 	  {
 	    assert(*it2 != NULL);
-	    Transition & trans = **it2;      // t -> (t, t')
+	    Transition & trans = **it2;                  // t
 	    assert(containsNode(trans));
-	    createArcs(trans, netTrans, placeMapping);
+	    labelTransitions.insert(&trans);
+	    Transition & prodTrans = createTransition(); // (t, t')
+	    createArcs(prodTrans, trans);
+	    createArcs(prodTrans, netTrans, &placeMapping);
 	  }
       }    
+
+    // remove label transitions
+    for (Transitions::iterator it = labelTransitions.begin();
+	 it != labelTransitions.end(); ++it)
+      deleteTransition(**it);
   }
 
 
@@ -1027,7 +1036,7 @@ namespace pnapi
   /*!
    */
   void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
-			 const map<const Place *, const Place *> & placeMapping)
+			 const map<const Place *, const Place *> * placeMapping)
   {
     typedef set<Arc *> Arcs;
 
@@ -1036,8 +1045,8 @@ namespace pnapi
     for (Arcs::iterator it = preset.begin(); it != preset.end(); ++it)
       {
 	Arc & arc = **it;
-	Place & place = 
-	  *const_cast<Place *>(placeMapping.find(&arc.getPlace())->second);
+	Place & place = placeMapping == NULL ? arc.getPlace() :
+	  *const_cast<Place *>(placeMapping->find(&arc.getPlace())->second);
 	new Arc(*this, observer_, arc, place, trans);
       }
 
@@ -1046,8 +1055,8 @@ namespace pnapi
     for (Arcs::iterator it = postset.begin(); it != postset.end(); ++it)
       {
 	Arc & arc = **it;
-	Place & place = 
-	  *const_cast<Place *>(placeMapping.find(&arc.getPlace())->second);
+	Place & place = placeMapping == NULL ? arc.getPlace() :
+	  *const_cast<Place *>(placeMapping->find(&arc.getPlace())->second);
 	new Arc(*this, observer_, arc, trans, place);
       }
   }

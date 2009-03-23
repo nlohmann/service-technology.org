@@ -339,7 +339,7 @@ namespace pnapi
 
     /// creates arcs for a transition based on the arcs of another one
     void createArcs(Transition &, Transition &, 
-		    const std::map<const Place *, const Place *> &);
+		    const std::map<const Place *, const Place *> * = NULL);
 
     /// cleans up the net
     void clear();

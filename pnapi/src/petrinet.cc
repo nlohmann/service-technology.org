@@ -113,7 +113,6 @@ namespace pnapi
     assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
 
     // update pre- and postsets
-    net_.arcs_.erase(&arc);
     arc.getTargetNode().preset_.erase(&arc.getSourceNode());
     arc.getTargetNode().presetArcs_.erase(&arc);
     arc.getSourceNode().postset_.erase(&arc.getTargetNode());
@@ -121,6 +120,15 @@ namespace pnapi
 
     // update transition type
     arc.getTransition().updateType();
+  }
+
+
+  void ComponentObserver::updateArcMirror(Arc & arc)
+  {
+    // you could check place type and pre-/postset here
+    // assert(...)
+
+    net_.arcs_.erase(&arc);
   }
 
 
@@ -1141,6 +1149,18 @@ namespace pnapi
       return true;
     else
       return false;
+  }
+
+
+  /*!
+   */
+  void PetriNet::mirror()
+  {
+    typedef set<Place *> Places;
+    Places interface = getInterfacePlaces();
+
+    for (Places::iterator it = interface.begin(); it != interface.end(); ++it)
+      (*it)->mirror();
   }
 
 

@@ -225,6 +225,9 @@ namespace pnapi
     /// returns the port this place belongs to
     std::string getPort() const;
 
+    /// swaps interface type
+    void mirror();
+
 
   private:
 
@@ -296,6 +299,9 @@ namespace pnapi
     /// merges another arc into this one
     void merge(Arc &);
 
+    /// swaps source and target node
+    void mirror();
+
 
   private:
 
@@ -306,10 +312,10 @@ namespace pnapi
     ComponentObserver & observer_;
 
     /// source node of the arc
-    Node & source_;
+    Node * source_;
 
     /// target node of the arc
-    Node & target_;
+    Node * target_;
 
     /// weight of the arc
     unsigned int weight_;

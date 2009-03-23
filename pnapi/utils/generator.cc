@@ -88,7 +88,7 @@ PetriNet matrix2owfn(matrix &A) {
     }
     
     // remove dead parts of the net
-    PN.reduce(1);
+    PN.reduce(PetriNet::LEVEL_1);
     
     
     // add communication places

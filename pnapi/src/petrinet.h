@@ -64,6 +64,7 @@ namespace pnapi
 
     void updateArcCreated(Arc &);
     void updateArcRemoved(Arc &);
+    void updateArcMirror(Arc &);
     void updateNodesMerged(Node &, Node &);
     void updateNodeNameHistory(Node &, const std::deque<std::string> &);
     void updatePlaces(Place &);
@@ -115,6 +116,47 @@ namespace pnapi
 
 
   public:
+
+    /// determines applied reduction rules
+    enum ReductionLevel {
+      NONE = 0,
+      UNUSED_STATUS_PLACES = 1 << 0,
+      SUSPICIOUS_TRANSITIONS = 1 << 1,
+      DEAD_NODES = 1 << 2,
+      INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES = 1 << 3,
+      STARKE_RULE_3_PLACES = 1 << 4,
+      STARKE_RULE_3_TRANSITIONS = 1 << 5,
+      STARKE_RULE_4 = 1 << 6,
+      STARKE_RULE_5 = 1 << 7,
+      STARKE_RULE_6 = 1 << 8,
+      STARKE_RULE_7 = 1 << 9,
+      STARKE_RULE_8 = 1 << 10,
+      STARKE_RULE_9 = 1 << 11,
+      IDENTICAL_PLACES = 1 << 12,
+      IDENTICAL_TRANSITIONS = 1 << 13,
+      SERIES_PLACES = 1 << 14,
+      SERIES_TRANSITIONS = 1 << 15,
+      SELF_LOOP_PLACES = 1 << 16,
+      SELF_LOOP_TRANSITIONS = 1 << 17,
+      EQUAL_PLACES = 1 << 18,
+      KEEP_NORMAL = 1 << 19,
+      LEVEL_1 = DEAD_NODES,
+      LEVEL_2 = (LEVEL_1 | UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS),
+      LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
+      LEVEL_4 = (LEVEL_3 | SERIES_PLACES | SERIES_TRANSITIONS),
+      LEVEL_5 = (LEVEL_4 | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
+                  INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
+      LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
+      SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
+                          DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
+      SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
+                    SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
+                    EQUAL_PLACES),
+      SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
+                    STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
+                    STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9)
+    };
+
 
     /// standard constructor
     PetriNet();
@@ -219,53 +261,16 @@ namespace pnapi
     const std::map<Transition *, std::string> normalize(bool = false);
 
     /// applies structral reduction rules
-    unsigned int reduce(unsigned int reduction_level = LEVEL_5);
-
-    /// determines applied reduction rules
-    enum ReductionLevel {
-      NONE = 0,
-      UNUSED_STATUS_PLACES = 1 << 0,
-      SUSPICIOUS_TRANSITIONS = 1 << 1,
-      DEAD_NODES = 1 << 2,
-      INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES = 1 << 3,
-      STARKE_RULE_3_PLACES = 1 << 4,
-      STARKE_RULE_3_TRANSITIONS = 1 << 5,
-      STARKE_RULE_4 = 1 << 6,
-      STARKE_RULE_5 = 1 << 7,
-      STARKE_RULE_6 = 1 << 8,
-      STARKE_RULE_7 = 1 << 9,
-      STARKE_RULE_8 = 1 << 10,
-      STARKE_RULE_9 = 1 << 11,
-      IDENTICAL_PLACES = 1 << 12,
-      IDENTICAL_TRANSITIONS = 1 << 13,
-      SERIES_PLACES = 1 << 14,
-      SERIES_TRANSITIONS = 1 << 15,
-      SELF_LOOP_PLACES = 1 << 16,
-      SELF_LOOP_TRANSITIONS = 1 << 17,
-      EQUAL_PLACES = 1 << 18,
-      KEEP_NORMAL = 1 << 19,
-      LEVEL_1 = DEAD_NODES,
-      LEVEL_2 = (LEVEL_1 | UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS),
-      LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
-      LEVEL_4 = (LEVEL_3 | SERIES_PLACES | SERIES_TRANSITIONS),
-      LEVEL_5 = (LEVEL_4 | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
-                  INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
-      LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
-      SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
-                          DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
-      SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
-                    SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
-                    EQUAL_PLACES),
-      SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
-                    STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
-                    STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9)
-    };
+    unsigned int reduce(unsigned int = LEVEL_5);
 
     /// product with Constraint oWFN
     void produce(const PetriNet &, 
 		 const std::map<Transition *, std::set<Transition *> > &,
 		 const std::string & = "net", 
 		 const std::string & = "constraint");
+
+    /// swaps input and output places
+    void mirror();
 
     //@}
 

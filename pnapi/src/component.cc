@@ -373,6 +373,33 @@ namespace pnapi {
   }
 
 
+  /*!
+   */
+  void Place::mirror()
+  {
+    typedef set<Arc *> Arcs;
+
+    assert(getType() != INTERNAL);
+
+    if (getType() == INPUT)
+      {
+	setType(OUTPUT);
+	assert(getPresetArcs().empty());
+	Arcs postset = getPostsetArcs();
+	for (Arcs::iterator it = postset.begin(); it != postset.end(); ++it)
+	  (*it)->mirror();
+      }
+    else
+      {
+	setType(INPUT);
+	assert(getPostsetArcs().empty());
+	Arcs preset = getPresetArcs();
+	for (Arcs::iterator it = preset.begin(); it != preset.end(); ++it)
+	  (*it)->mirror();
+      }
+  }
+
+
 
   /****************************************************************************
    *** Class Transition Function Definitions
@@ -473,7 +500,7 @@ namespace pnapi {
    */
   Arc::Arc(PetriNet & net, ComponentObserver & observer, Node & source,
 	   Node & target, unsigned int weight) :
-    net_(net), observer_(observer), source_(source), target_(target),
+    net_(net), observer_(observer), source_(&source), target_(&target),
     weight_(weight)
   {
     assert(&observer.getPetriNet() == &net);
@@ -486,12 +513,12 @@ namespace pnapi {
    */
   Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc) :
     net_(net), observer_(observer),
-    source_(*net.findNode(arc.source_.getName())),
-    target_(*net.findNode(arc.target_.getName())), weight_(arc.weight_)
+    source_(net.findNode(arc.source_->getName())),
+    target_(net.findNode(arc.target_->getName())), weight_(arc.weight_)
   {
     assert(&observer.getPetriNet() == &net);
-    assert(net.findNode(arc.source_.getName()) != NULL);
-    assert(net.findNode(arc.target_.getName()) != NULL);
+    assert(net.findNode(arc.source_->getName()) != NULL);
+    assert(net.findNode(arc.target_->getName()) != NULL);
 
     observer_.updateArcCreated(*this);
   }
@@ -502,8 +529,8 @@ namespace pnapi {
   Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc, 
 	   Node & source, Node & target) :
     net_(net), observer_(observer),
-    source_(source),
-    target_(target), weight_(arc.weight_)
+    source_(&source),
+    target_(&target), weight_(arc.weight_)
   {
     assert(&observer.getPetriNet() == &net);
     assert(net.containsNode(source));
@@ -518,7 +545,7 @@ namespace pnapi {
    */
   Arc::~Arc()
   {
-    assert(net_.findArc(source_, target_) == NULL);
+    assert(net_.findArc(*source_, *target_) == NULL);
 
     observer_.updateArcRemoved(*this);
   }
@@ -536,7 +563,7 @@ namespace pnapi {
    */
   Node & Arc::getSourceNode() const
   {
-    return source_;
+    return *source_;
   }
 
 
@@ -544,7 +571,7 @@ namespace pnapi {
    */
   Node & Arc::getTargetNode() const
   {
-    return target_;
+    return *target_;
   }
 
 
@@ -552,11 +579,11 @@ namespace pnapi {
    */
   Transition & Arc::getTransition() const
   {
-    Transition * t = dynamic_cast<Transition *>(&source_);
+    Transition * t = dynamic_cast<Transition *>(source_);
     if (t != NULL)
       return *t;
 
-    t = dynamic_cast<Transition *>(&target_);
+    t = dynamic_cast<Transition *>(target_);
     assert(t != NULL);
     return *t;
   }
@@ -566,11 +593,11 @@ namespace pnapi {
    */
   Place & Arc::getPlace() const
   {
-    Place * t = dynamic_cast<Place *>(&source_);
+    Place * t = dynamic_cast<Place *>(source_);
     if (t != NULL)
       return *t;
 
-    t = dynamic_cast<Place *>(&target_);
+    t = dynamic_cast<Place *>(target_);
     assert(t != NULL);
     return *t;
   }
@@ -589,6 +616,19 @@ namespace pnapi {
   void Arc::merge(Arc & arc)
   {
     weight_ += arc.weight_;
+  }
+
+
+  /*!
+   */
+  void Arc::mirror()
+  {
+    observer_.updateArcMirror(*this);
+    observer_.updateArcRemoved(*this);
+    Node * oldSource = source_;
+    source_ = target_;
+    target_ = oldSource;
+    observer_.updateArcCreated(*this);
   }
 
 }

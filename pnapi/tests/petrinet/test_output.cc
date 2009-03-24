@@ -15,10 +15,12 @@ int main(int argc, char * argv[])
 {
   std::ostringstream owfnResult("result.owfn"), owfnExpected("expected.owfn");
   PetriNet net;
-  Place & p1 = net.createPlace("in", Place::INPUT);
+  Place & p1 = net.createPlace("in", Place::INPUT, 0, 0, "port1");
   Place & p2 = net.createPlace("out", Place::OUTPUT, 0, 0, "port1");
   Place & p3 = net.createPlace("", Place::INTERNAL, 4, 8);
+  Place & p6 = net.createPlace("", Place::INTERNAL, 4, 6);
   Place & p4 = net.createPlace();
+  Place & p5 = net.createPlace();
   Transition & t1 = net.createTransition();
   Transition & t2 = net.createTransition();
   net.createArc(p1, t1, 3);
@@ -74,7 +76,8 @@ int main(int argc, char * argv[])
   begin_test("io::operator<<() [Petri net DOT output]");
   ostringstream dotResult, dotExpected;
   dotResult << dot << net;
-  //cout << dot << net;
+  cout << dot << net;
+  cout << owfn <<net;
   dotExpected 
     << "digraph N {" << endl
     << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\" "

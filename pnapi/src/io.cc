@@ -320,6 +320,30 @@ namespace pnapi
       }
 
 
+      ostream & operator<<(ostream & os, const pair<string, set<Place *> > & p)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case OWFN: return __owfn::output(os, p);
+	  case DOT:  return __dot::output(os, p);
+
+	  default: assert(false);
+	  }
+      }
+
+
+      ostream & operator<<(ostream & os, 
+			   const pair<unsigned int, set<Place *> > & p)
+      {
+	switch (FormatData::data(os))
+	  {
+	  case OWFN: return __owfn::output(os, p);
+
+	  default: assert(false);
+	  }
+      }
+
+
     } /* namespace util */
 
 
@@ -481,19 +505,6 @@ namespace pnapi
 	     ++it)
 	  grouped.insert(pair<unsigned int, Place *>((*it)->getCapacity(),*it));
 	return grouped;
-      }
-
-
-      void outputGroupPrefix(std::ostream & os, const std::string & s)
-      {
-	os << s << ": ";
-      }
-
-
-      void outputGroupPrefix(std::ostream & os, unsigned int capacity)
-      {
-	if (capacity > 0)
-	  os << "SAFE " << capacity << ": ";
       }
 
 

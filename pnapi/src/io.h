@@ -311,6 +311,8 @@ namespace pnapi
       std::ostream & output(std::ostream &, const Arc &);
       std::ostream & output(std::ostream &, const Place &);
       std::ostream & output(std::ostream &, const Transition &);
+      std::ostream & output(std::ostream &, 
+			    const std::pair<std::string, std::set<Place *> > &);
       std::ostream & output(std::ostream &, const Node &, const std::string &);
       std::string getNodeName(const Node &, bool withSuffix = false);
     }
@@ -336,7 +338,12 @@ namespace pnapi
       std::ostream & output(std::ostream &, const formula::FormulaLess &);
       std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
       std::ostream & output(std::ostream &, const formula::FormulaGreater &);
-      std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
+      std::ostream & output(std::ostream &, 
+			    const formula::FormulaGreaterEqual &);
+      std::ostream & output(std::ostream &, 
+			    const std::pair<std::string, std::set<Place *> > &);
+      std::ostream & output(std::ostream &, 
+			   const std::pair<unsigned int, std::set<Place *> > &);
     }
 
 
@@ -407,9 +414,6 @@ namespace pnapi
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);
 
-      void outputGroupPrefix(std::ostream &, const std::string &);
-      void outputGroupPrefix(std::ostream &, unsigned int);
-
       Manipulator<Mode> mode(Mode);
       Manipulator<Delim> delim(const std::string &);
 
@@ -434,6 +438,10 @@ namespace pnapi
       std::ostream & operator<<(std::ostream &, const formula::FormulaLess &);
       std::ostream & operator<<(std::ostream &,
 				const formula::FormulaLessEqual &);
+      std::ostream & operator<<(std::ostream &,
+			    const std::pair<std::string, std::set<Place *> > &);
+      std::ostream & operator<<(std::ostream &,
+			   const std::pair<unsigned int, std::set<Place *> > &);
 
 
       /*** TEMPLATE IMPLEMENTATION ***/
@@ -450,15 +458,6 @@ namespace pnapi
       std::ostream & outputContainerElement(std::ostream & os, const T * t)
       {
 	return os << *t;
-      }
-
-
-      template <typename T>
-      std::ostream & outputContainerElement(std::ostream & os,
-				     const std::pair<T, std::set<Place *> > & p)
-      {
-	outputGroupPrefix(os, p.first);
-	return os << delim(", ") << p.second;
       }
 
 
@@ -502,9 +501,16 @@ namespace pnapi
 	    for (typename std::multimap<T, Place *>::const_iterator subit = it;
 		 subit != places.upper_bound(it->first); ++subit)
 	      subset.insert(subit->second);
+	    //os << std::pair<T, std::set<Place *> >(it->first, subset);
 	    metaVector.push_back(std::pair<T, std::set<Place *> >(it->first, subset));
 	  }
-        return os << delim("; ") << metaVector;
+        //return os << metaVector;
+
+	std::string delim = DelimData::data(os).delim;
+	if (metaVector.empty()) return os;
+	for (typename std::vector<std::pair<T, std::set<Place *> > >::const_iterator it = metaVector.begin(); it != --metaVector.end(); ++it)
+	  os << *it << delim;
+	return os << *--metaVector.end();
       }
 
 

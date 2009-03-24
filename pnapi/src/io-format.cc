@@ -133,15 +133,9 @@ namespace pnapi
 	  << "digraph N {" << endl
 	  << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
 	  << " remincross=true label=\""
-	  //<< (reduced ? "structurally reduced " : "")
-	  << "Petri net" << (filename.empty() ? "" : " generated from " + filename)
-	  << "\"]" 
+	  << "Petri net" 
+	  << (filename.empty() ? "" : " generated from " + filename) << "\"]" 
 	  << endl
-
-	  // REMEMBER The table size of the INOUT transitions depends on the size 
-	  // of a node!
-	  // So a width of .3 (in) results in 21 pixel table width 
-	  // ( 0.3 in * 72 dpi ).
 	  << " node [fontname=\"Helvetica\" fixedsize width=\".3\""
 	  << " height=\".3\" label=\"\" style=filled fillcolor=white]" << endl
 	  << " edge [fontname=\"Helvetica\" color=white arrowhead=none"
@@ -166,8 +160,11 @@ namespace pnapi
 	  << " {" << endl
 	  << "  " << net.transitions_ << endl
 	  << "  " << net.internalPlaces_ << endl
-	  << "  label=\"\" style=" << (interface ? "\"dashed\"" : "invis") << endl
-	  << " }" << endl
+	  << "  label=\"\" style=" << (interface ? "\"dashed\"" : "invis") 
+	  << endl << " }" << endl
+	  << endl
+
+	  << net.interfacePlacesByPort_
 	  << endl
 
 	  << delim("\n")
@@ -308,6 +305,31 @@ namespace pnapi
 
 	return names[n.getName()] + string(withSuffix ? "_l" : "");
       }
+
+
+      std::ostream & output(std::ostream & os, 
+			  const std::pair<std::string, std::set<Place *> > & p)
+      {
+	string port = p.first;
+        return os 
+	  << " // cluster for port " << port << endl
+	  << " subgraph cluster_" << port << "\n {\n"
+	  << "  label=\"" << port << "\";" << endl
+	  << "  style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;" << endl
+	  << "  " << delim("\n  ") << p.second
+	  << endl << " }" << endl << endl;
+      }
+
+
+      void outputGroupPrefix(ostream & os, const string & port)
+      {
+      }
+
+
+      void outputGroupSuffix(ostream & os, const string & port)
+      {
+      }
+
 
     } /* namespace __dot */
 
@@ -502,7 +524,7 @@ namespace pnapi
 	  << "}" << endl 
 	  << endl
 
-	  << mode(io::util::PLACE)
+	  << mode(io::util::PLACE) << delim("; ")
 	  << "PLACE"      << endl
 	  << "  INTERNAL" << endl
 	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_) << ";"
@@ -515,12 +537,13 @@ namespace pnapi
 	  << endl << endl;
 
 	if (!net.interfacePlacesByPort_.empty())
-	  os << "PORTS" << endl
+	  os << delim("; ")
+	     << "PORTS" << endl
 	     << "  " << net.interfacePlacesByPort_ << ";" << endl
 	     << endl;
   
 	os
-	  << mode(io::util::PLACE_TOKEN)
+	  << mode(io::util::PLACE_TOKEN) << delim(", ")
 	  << "INITIALMARKING" << endl
 	  << "  " << io::util::filterMarkedPlaces(net.internalPlaces_) << ";" << endl 
 	  << endl
@@ -565,6 +588,22 @@ namespace pnapi
 	if (arc.getWeight() != 1)
 	  os << ":" << arc.getWeight();
 	return os;
+      }
+
+
+      std::ostream & output(std::ostream & os, 
+			  const std::pair<std::string, std::set<Place *> > & p)
+      {
+	return os << p.first << ": " << delim(", ") << p.second;
+      }
+
+
+      std::ostream & output(std::ostream & os, 
+			 const std::pair<unsigned int, std::set<Place *> > & p)
+      {
+	if (p.first > 0)
+	  os << "SAFE " << p.first << ": ";
+	return os << delim(", ") << p.second;
       }
 
 

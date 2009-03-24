@@ -57,8 +57,11 @@ namespace pnapi
     /// returns the Petri net
     PetriNet getPetriNet() const { return net_; }
 
-    /// Service automata output format (ig like) -- absolutely experimental!!
+    /// Service automata output format (ig like) -- absolutely temporary!!
     void output_sa(std::ostream &os) const;
+
+    /// stg output format -- absolutely temprary
+    void output_stg(std::ostream &os) const;
 
   protected:
     vector<T *> states_;
@@ -70,8 +73,7 @@ namespace pnapi
     /// Service automata output format (ig like)
     //void output_sa(std::ostream &os) const;
     /// stg output format
-    void output_stg(std::ostream &os) const;
-
+    //void output_stg(std::ostream &os) const;
 
   };
 
@@ -255,7 +257,34 @@ namespace pnapi
   template <class T>
   void AbstractAutomaton<T>::output_stg(std::ostream &os) const
   {
-
+    os << ".model Labeled_Transition_System\n";
+    os << ".dummy ";
+    std::set<string> seen;
+    seen.clear();
+    bool first = true;
+    for (unsigned int i = 0; i < edges_.size(); i++)
+    {
+      if (seen.count((*edges_[i]).getLabel()) > 0)
+        continue;
+      seen.insert((*edges_[i]).getLabel());
+      if (first)
+      {
+        first = false;
+        os << (*edges_[i]).getLabel();
+      }
+      else
+        os << ", " << (*edges_[i]).getLabel();
+    }
+    os << "\n";
+    os << ".state graph\n";
+    for (unsigned int i = 0; i < edges_.size(); i++)
+    {
+      os << edges_[i]->getSource().getName() << " ";
+      os << edges_[i]->getLabel() << " ";
+      os << edges_[i]->getDestination().getName() << "\n";
+    }
+    os << ".marking {" << states_[0]->getName() << "}\n";
+    os << ".end";
   }
 
 

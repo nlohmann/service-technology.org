@@ -43,6 +43,13 @@ namespace pnapi
     }
 
 
+    std::ostream & stg(std::ostream &os)
+    {
+      util::FormatData::data(os) = util::STG;
+      return os;
+    }
+
+
     namespace util
     {
 
@@ -90,7 +97,7 @@ namespace pnapi
     {
       ostream & output(ostream & os, const PetriNet & net)
       {
-	return os 
+	return os
 	  << "|P|= "     << net.places_.size()       << "  "
 	  << "|P_in|= "  << net.inputPlaces_.size()  << "  "
 	  << "|P_out|= " << net.outputPlaces_.size() << "  "
@@ -133,8 +140,8 @@ namespace pnapi
 	  << "digraph N {" << endl
 	  << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
 	  << " remincross=true label=\""
-	  << "Petri net" 
-	  << (filename.empty() ? "" : " generated from " + filename) << "\"]" 
+	  << "Petri net"
+	  << (filename.empty() ? "" : " generated from " + filename) << "\"]"
 	  << endl
 	  << " node [fontname=\"Helvetica\" fixedsize width=\".3\""
 	  << " height=\".3\" label=\"\" style=filled fillcolor=white]" << endl
@@ -160,7 +167,7 @@ namespace pnapi
 	  << " {" << endl
 	  << "  " << net.transitions_ << endl
 	  << "  " << net.internalPlaces_ << endl
-	  << "  label=\"\" style=" << (interface ? "\"dashed\"" : "invis") 
+	  << "  label=\"\" style=" << (interface ? "\"dashed\"" : "invis")
 	  << endl << " }" << endl
 	  << endl
 
@@ -175,7 +182,7 @@ namespace pnapi
 	  << net.arcs_
 	  << endl
 
-	  << "}" 
+	  << "}"
 	  << endl;
       }
 
@@ -193,13 +200,13 @@ namespace pnapi
 
 	switch (p.getType())
 	  {
-	  case Node::INPUT:  
-	    attributes << "fillcolor=orange"; 
+	  case Node::INPUT:
+	    attributes << "fillcolor=orange";
 	    break;
-	  case Node::OUTPUT: 
-	    attributes << "fillcolor=yellow"; 
+	  case Node::OUTPUT:
+	    attributes << "fillcolor=yellow";
 	    break;
-	  default: 
+	  default:
 	    if (p.wasInterface())
 	      attributes << "fillcolor=lightgoldenrod1";
 	    break;
@@ -231,7 +238,7 @@ namespace pnapi
 	    break;
 	  default: break;
 	  }
-	      
+
 	// output the transition as a node
 	return output(os, t, attributes.str());
       }
@@ -286,7 +293,7 @@ namespace pnapi
 
 	    int i = 0;
 	    set<Place *> places = net->getPlaces();
-	    for (set<Place *>::iterator it = places.begin(); 
+	    for (set<Place *>::iterator it = places.begin();
 		 it != places.end(); ++it)
 	      {
 		stringstream ss; ss << "p" << ++i;
@@ -295,7 +302,7 @@ namespace pnapi
 
 	    i = 0;
 	    set<Transition *> transitions = net->getTransitions();
-	    for (set<Transition *>::iterator it = transitions.begin(); 
+	    for (set<Transition *>::iterator it = transitions.begin();
 		 it != transitions.end(); ++it)
 	      {
 		stringstream ss; ss << "t" << ++i;
@@ -307,11 +314,11 @@ namespace pnapi
       }
 
 
-      std::ostream & output(std::ostream & os, 
+      std::ostream & output(std::ostream & os,
 			  const std::pair<std::string, std::set<Place *> > & p)
       {
 	string port = p.first;
-        return os 
+        return os
 	  << " // cluster for port " << port << endl
 	  << " subgraph cluster_" << port << "\n {\n"
 	  << "  label=\"" << port << "\";" << endl
@@ -355,10 +362,10 @@ namespace pnapi
 	string inputfile = net.getMetaInformation(os, INPUTFILE);
 
 	return os //< output everything to this stream
- 
-	  << "{ Petri net created by " << creator 
+
+	  << "{ Petri net created by " << creator
 	  << (inputfile.empty() ? "" : " reading " + inputfile)
-	  << " }" << endl 
+	  << " }" << endl
 	  << endl
 
 	  << "PLACE" << mode(util::PLACE) << endl
@@ -371,12 +378,12 @@ namespace pnapi
 
 	  // transitions
 	  << delim("\n") << net.transitions_ << endl
-	  << endl 
+	  << endl
 
 	  << "FORMULA" << endl
 	  << "  " << net.condition_ << endl
 	  << endl
-	  
+
 	  << "{ END OF FILE }" << endl;
       }
 
@@ -392,12 +399,12 @@ namespace pnapi
 
       ostream & output(ostream & os, const Transition & t)
       {
-	return os 
+	return os
 	  << "TRANSITION " << t.getName() << endl
 	  << delim(", ")
-	  << "  CONSUME " 
+	  << "  CONSUME "
 	  << filterInternalArcs(t.getPresetArcs())  << ";" << endl
-	  << "  PRODUCE " 
+	  << "  PRODUCE "
 	  << filterInternalArcs(t.getPostsetArcs()) << ";" << endl;
       }
 
@@ -410,7 +417,7 @@ namespace pnapi
 
       ostream & output(ostream & os, const formula::Negation & f)
       {
-	set<const Formula *> children = 
+	set<const Formula *> children =
 	  filterInterfacePropositions(f.children());
 	if (children.empty())
 	  assert(false); // FIXME: don't know what to do in this case
@@ -421,7 +428,7 @@ namespace pnapi
 
       ostream & output(ostream & os, const formula::Conjunction & f)
       {
-	set<const Formula *> children = 
+	set<const Formula *> children =
 	  filterInterfacePropositions(f.children());
 	if (children.empty())
 	  //return os << formula::FormulaTrue();
@@ -433,7 +440,7 @@ namespace pnapi
 
       ostream & output(ostream & os, const formula::Disjunction & f)
       {
-	set<const Formula *> children = 
+	set<const Formula *> children =
 	  filterInterfacePropositions(f.children());
 	if (children.empty())
 	  //return os << formula::FormulaFalse();
@@ -504,7 +511,7 @@ namespace pnapi
       return ios;
     }
 
-    
+
     namespace __owfn
     {
 
@@ -513,15 +520,15 @@ namespace pnapi
 	os  //< output everything to this stream
 
 	  << "{" << endl
-	  << "  generated by: " 
+	  << "  generated by: "
 	  << net.getMetaInformation(os, io::CREATOR, PACKAGE_STRING)  << endl
-	  << "  input file:   " 
+	  << "  input file:   "
 	  << net.getMetaInformation(os, io::INPUTFILE)                << endl
-	  << "  invocation:   " 
+	  << "  invocation:   "
 	  << net.getMetaInformation(os, io::INVOCATION)               << endl
-	  << "  net size:     " 
+	  << "  net size:     "
 	  << stat << net << owfn                                << endl
-	  << "}" << endl 
+	  << "}" << endl
 	  << endl
 
 	  << mode(io::util::PLACE) << delim("; ")
@@ -530,10 +537,10 @@ namespace pnapi
 	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_) << ";"
 	  << endl << endl << delim(", ")
 	  << "  INPUT"    << endl
-	  << "    " << net.inputPlaces_                                     << ";" 
+	  << "    " << net.inputPlaces_                                     << ";"
 	  << endl << endl
 	  << "  OUTPUT"   << endl
-	  << "    " << net.outputPlaces_                                    << ";" 
+	  << "    " << net.outputPlaces_                                    << ";"
 	  << endl << endl;
 
 	if (!net.interfacePlacesByPort_.empty())
@@ -541,20 +548,20 @@ namespace pnapi
 	     << "PORTS" << endl
 	     << "  " << net.interfacePlacesByPort_ << ";" << endl
 	     << endl;
-  
+
 	os
 	  << mode(io::util::PLACE_TOKEN) << delim(", ")
 	  << "INITIALMARKING" << endl
-	  << "  " << io::util::filterMarkedPlaces(net.internalPlaces_) << ";" << endl 
+	  << "  " << io::util::filterMarkedPlaces(net.internalPlaces_) << ";" << endl
 	  << endl
 
-	  << "FINALCONDITION" << endl 
-	  << "  " << net.condition_ << ";" << endl << endl 
+	  << "FINALCONDITION" << endl
+	  << "  " << net.condition_ << ";" << endl << endl
 	  << endl
 
 	  << delim("\n")
 	  << net.transitions_ << endl
-	  << endl 
+	  << endl
 
 	  << "{ END OF FILE '" << net.getMetaInformation(os, io::OUTPUTFILE) << "' }"
 	  << endl;
@@ -571,10 +578,10 @@ namespace pnapi
 	return os;
       }
 
- 
+
       ostream & output(ostream & os, const Transition & t)
       {
-	return os 
+	return os
 	  << "TRANSITION " << t.getName() << endl
 	  << delim(", ")
 	  << "  CONSUME " << t.getPresetArcs()  << ";" << endl
@@ -591,14 +598,14 @@ namespace pnapi
       }
 
 
-      std::ostream & output(std::ostream & os, 
+      std::ostream & output(std::ostream & os,
 			  const std::pair<std::string, std::set<Place *> > & p)
       {
 	return os << p.first << ": " << delim(", ") << p.second;
       }
 
 
-      std::ostream & output(std::ostream & os, 
+      std::ostream & output(std::ostream & os,
 			 const std::pair<unsigned int, std::set<Place *> > & p)
       {
 	if (p.first > 0)

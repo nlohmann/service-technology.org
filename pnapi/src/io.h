@@ -16,7 +16,7 @@
  */
 
 
-/* 
+/*
  * FOR IMPLEMENTORS:
  *
  * Some tasks are marked by keywords in the code, so you can jump/grep the files
@@ -151,7 +151,7 @@ namespace pnapi
 			      std::pair<MetaInformation, std::string> > &);
 
     /// using Manipulators in input
-    template <typename T> 
+    template <typename T>
     std::istream & operator>>(std::istream &, const util::Manipulator<T>);
 
     /// %PetriNet output
@@ -197,6 +197,9 @@ namespace pnapi
     /// Service Automaton (SA) file format
     std::ostream & sa(std::ostream &);
 
+    /// Service Automaton (STG) file format
+    std::ostream & stg(std::ostream &);
+
     /// LOLA file format
     std::ios_base & lola(std::ios_base &);
 
@@ -223,7 +226,7 @@ namespace pnapi
       /* FORMAT IMPLEMENTATION: add format constant */
 
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, LOLA };
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, STG, LOLA };
 
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
@@ -260,7 +263,7 @@ namespace pnapi
     namespace util
     {
       typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
-      typedef Manipulator<std::map<std::string, PetriNet *> > 
+      typedef Manipulator<std::map<std::string, PetriNet *> >
               PetriNetManipulator;
     } /* namespace util */
 
@@ -321,7 +324,7 @@ namespace pnapi
     //**************************
     //*** OWFN output format ***
     //**************************
-    
+
     namespace __owfn
     {
       std::ostream & output(std::ostream &, const PetriNet &);
@@ -409,7 +412,7 @@ namespace pnapi
 
       std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
       std::set<Arc *> filterInternalArcs(const std::set<Arc *> &);
-      std::set<const formula::Formula *> 
+      std::set<const formula::Formula *>
       filterInterfacePropositions(const std::set<const formula::Formula *> &);
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);

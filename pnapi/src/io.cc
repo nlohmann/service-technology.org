@@ -101,7 +101,7 @@ namespace pnapi
       switch (util::FormatData::data(os))
       {
       case      util::SA:  sa.output_sa(os);   break;
-      //case      util::STG: sa.output_stg(os);  break;
+      case      util::STG: sa.output_stg(os);  break;
       default:  assert(false);
       }
 
@@ -119,7 +119,7 @@ namespace pnapi
       switch (util::FormatData::data(os))
       {
       case      util::SA:   sa.output_sa(os);   break;
-      //case      util::STG:  sa.output_stg(os);  break;
+      case      util::STG:  sa.output_stg(os);  break;
       default:  assert(false);
       }
 
@@ -351,7 +351,7 @@ namespace pnapi
 
     // What follows is generic code, that hopefully rarely needs to be touched.
 
-    
+
     /*************************************************************************
      ***** Generic I/O Implementation
      *************************************************************************/
@@ -481,8 +481,8 @@ namespace pnapi
 	return filtered;
       }
 
-      
-      std::set<const Formula *> 
+
+      std::set<const Formula *>
       filterInterfacePropositions(const std::set<const Formula *> & formulas)
       {
 	set<const Formula *> result;
@@ -496,7 +496,7 @@ namespace pnapi
 	return result;
       }
 
-      
+
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const set<Place *> & places)
       {

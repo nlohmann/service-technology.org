@@ -338,7 +338,7 @@ namespace pnapi
     return *new (this) PetriNet(net);
   }
 
-  
+
   /*!
    */
   map<const Place *, const Place *>
@@ -948,9 +948,8 @@ namespace pnapi
     }
 
     if (makeInnerStructure)
-      for (set<Place *>::const_iterator p = interfacePlaces_.begin();
-          p != interfacePlaces_.end(); p++)
-        deletePlace(**p);
+      while (!interfacePlaces_.empty())
+        deletePlace(**interfacePlaces_.begin());
 
     return edgeLabels;
   }
@@ -963,7 +962,7 @@ namespace pnapi
    * \note  There is an error in definition 5: The arcs of the transitions
    *        with empty label are missing.
    */
-  void PetriNet::produce(const PetriNet & net, 
+  void PetriNet::produce(const PetriNet & net,
 			 const map<Transition *, set<Transition *> > & labels,
 			 const string & aPrefix, const string & aNetPrefix)
   {
@@ -977,7 +976,7 @@ namespace pnapi
     assert(net.inputPlaces_.empty());
     assert(net.outputPlaces_.empty());
 
-    string prefix = aPrefix + "."; 
+    string prefix = aPrefix + ".";
     string netPrefix = aNetPrefix + ".";
 
 
@@ -1005,14 +1004,14 @@ namespace pnapi
 
     // create product transitions
     Transitions labelTransitions;
-    for (Labels::const_iterator it1 = labels.begin(); 
+    for (Labels::const_iterator it1 = labels.begin();
 	 it1 != labels.end(); ++it1)
       {
 	assert(it1->first != NULL);
 	Transition & netTrans = *it1->first;             // t'
 	assert(net.containsNode(netTrans));
 	Transitions ts = it1->second;
-	for (Transitions::const_iterator it2 = ts.begin(); 
+	for (Transitions::const_iterator it2 = ts.begin();
 	     it2 != ts.end(); ++it2)
 	  {
 	    assert(*it2 != NULL);
@@ -1023,7 +1022,7 @@ namespace pnapi
 	    createArcs(prodTrans, trans);
 	    createArcs(prodTrans, netTrans, &placeMapping);
 	  }
-      }    
+      }
 
     // remove label transitions
     for (Transitions::iterator it = labelTransitions.begin();
@@ -1034,7 +1033,7 @@ namespace pnapi
 
   /*!
    */
-  Transition & PetriNet::createTransition(const Transition & t, 
+  Transition & PetriNet::createTransition(const Transition & t,
 					  const std::string & prefix)
   {
     return *new Transition(*this, observer_, t, prefix);
@@ -1198,6 +1197,8 @@ namespace pnapi
 
   void PetriNet::deletePlace(Place & place)
   {
+    std::cout << place.getName() << "\n";
+    std::cout << "before gettype\n" << std::flush;
     observer_.finalizePlaceType(place, place.getType());
     places_.erase(&place);
     deleteNode(place);

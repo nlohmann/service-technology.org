@@ -75,6 +75,12 @@ int main(int argc, char** argv) {
                         >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
                     break;
                 }
+                case(input_arg_lola): {
+                    cin >> meta(io::INPUTFILE, "stdin")
+                        >> meta(io::CREATOR, PACKAGE_STRING)
+                        >> meta(io::INVOCATION, invocation) >> io::lola >> net;
+                    break;
+                }
             }
         } catch (io::InputError error) {
             cerr << "petri:" << error << endl;
@@ -107,6 +113,12 @@ int main(int argc, char** argv) {
                         infile >> meta(io::INPUTFILE, args_info.inputs[i])
                             >> meta(io::CREATOR, PACKAGE_STRING)
                             >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+                        break;
+                    }
+                    case(input_arg_lola): {
+                        infile >> meta(io::INPUTFILE, args_info.inputs[i])
+                            >> meta(io::CREATOR, PACKAGE_STRING)
+                            >> meta(io::INVOCATION, invocation) >> io::lola >> net;
                         break;
                     }
                 }

@@ -1197,8 +1197,6 @@ namespace pnapi
 
   void PetriNet::deletePlace(Place & place)
   {
-    std::cout << place.getName() << "\n";
-    std::cout << "before gettype\n" << std::flush;
     observer_.finalizePlaceType(place, place.getType());
     places_.erase(&place);
     deleteNode(place);

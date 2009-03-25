@@ -10,7 +10,6 @@ using pnapi::io::owfn;
 
 int main(int argc, char * argv[])
 {
-  /*
   ifstream ifs;
 
   PetriNet net;
@@ -34,8 +33,9 @@ int main(int argc, char * argv[])
   ofstream ofs("test_produce.onlineshop.result.owfn");
   ofs << owfn << net;
   ofs.close();
-  end_test();
-  */
+  // FIXME: compare result to expected
+  //end_test();
+  cout << "Incomplete" << endl;
 
   return 0;
 }

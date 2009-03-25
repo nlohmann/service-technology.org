@@ -17,7 +17,7 @@ option "input" i
 option "output" o
   "Select the output file format(s)"
   typestr="FORMAT"
-  values="owfn","lola","sa","dot","png","pdf","svg" enum
+  values="owfn","lola","sa","dot","png","pdf","eps","svg" enum
   optional
   multiple
 
@@ -72,6 +72,11 @@ modeoption "normalize" n
 
 modeoption "negate" N
   "Negate the final condition of the net, i.e. every specified final marking is now non-final. The result is the 'anti open net'."
+  mode="Modifications"
+  flag off
+
+modeoption "mirror" M
+  "Mirror the interface, i.e. change the direction of communication"
   mode="Modifications"
   flag off
 

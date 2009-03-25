@@ -202,6 +202,17 @@ int main(int argc, char** argv) {
         }        
     }
 
+    if (args_info.mirror_given) {
+        for (unsigned int i = 0; i < nets.size(); ++i) {
+
+            if (args_info.verbose_given) {
+                cerr << "petri: mirroring the net '" << names[i] << "'..." << endl;
+            }
+
+            nets[i].mirror();
+        }        
+    }
+
 
     /***********************
     * STRUCTURAL REDUCTION *
@@ -301,6 +312,7 @@ int main(int argc, char** argv) {
                 outfile << meta(io::OUTPUTFILE, outname);
 
                 switch(args_info.output_arg[j]) {
+
                     // create oWFN output
                     case (output_arg_owfn): {
                         outfile << io::owfn << nets[i];
@@ -328,6 +340,7 @@ int main(int argc, char** argv) {
 
                     // create output using Graphviz dot
                     case (output_arg_png):
+                    case (output_arg_eps):
                     case (output_arg_pdf):
                     case (output_arg_svg): {
                         if (CONFIG_DOT == "not found") {

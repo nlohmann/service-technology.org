@@ -132,48 +132,65 @@ int main(int argc, char** argv) {
     /*********
     * WIRING *
     **********/
-    if (args_info.wiring_given) {
-        // try to open file
-        ifstream infile(args_info.wiring_arg, ifstream::in);
-        if (!infile.is_open()) {
-            cerr << "petri: could not read from wiring file '" << args_info.wiring_arg << "'" << endl;
-            exit(EXIT_FAILURE);
-        }
-            
-        if (args_info.verbose_given) {
-            cerr << "petri: composing " << nets.size() << " nets according to '" << args_info.wiring_arg << "'" << endl;
-        }
-        
+    if (args_info.wire_given) {
+
         // collect parsed nets and store them in a mapping
         map<string, PetriNet *> netsByName;
         for (unsigned int i = 0; i < nets.size(); ++i) {
-            // strip extension
+            // strip filename extension
             string name = names[i].substr(0, names[i].find_last_of("."));
             netsByName[name] = &nets[i];
         }
+
+        PetriNet net; // to store composition
+        string compositionName; // to store the name of the composition
         
-        // create a new net consisting of the composed nets
-        PetriNet net;
-        try {
-            infile >> meta(io::INPUTFILE, args_info.wiring_arg)
-                >> meta(io::CREATOR, PACKAGE_STRING)
-                >> meta(io::INVOCATION, invocation)
-                >> io::onwd >> pnapi::io::nets(netsByName) >> net;
-        } catch (io::InputError error) {
-            cerr << "petri:" << error << endl;
-            exit(EXIT_FAILURE);
+        if (args_info.wire_arg) {
+            compositionName = args_info.wire_arg;
+            
+            // try to open wiring file
+            ifstream infile(args_info.wire_arg, ifstream::in);
+            if (!infile.is_open()) {
+                cerr << "petri: could not read from wiring file '" << args_info.wire_arg << "'" << endl;
+                exit(EXIT_FAILURE);
+            }
+
+            if (args_info.verbose_given) {
+                cerr << "petri: composing " << nets.size() << " nets according to '" << args_info.wire_arg << "'" << endl;
+            }
+
+            // create a new net consisting of the composed nets
+            try {
+                infile >> meta(io::INPUTFILE, args_info.wire_arg)
+                    >> meta(io::CREATOR, PACKAGE_STRING)
+                    >> meta(io::INVOCATION, invocation)
+                    >> io::onwd >> pnapi::io::nets(netsByName) >> net;
+            } catch (io::InputError error) {
+                cerr << "petri:" << error << endl;
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            // no wiring file is given
+            compositionName = "composition"; //FIXME: choose a nicer name
+            
+            if (args_info.verbose_given) {
+                cerr << "petri: composing " << nets.size() << " nets using implicit wiring" << endl;
+            }
+            
+            // calling implicit composition
+            net = PetriNet::compose(netsByName);
         }
 
         if (args_info.verbose_given) {
-            cerr << "petri:" << args_info.wiring_arg << ".owfn: " << io::stat << net << endl;
+            cerr << "petri:" << compositionName << ".owfn: " << io::stat << net << endl;
         }
 
         // remove the parsed nets
         names.clear();
         nets.clear();
-        
+
         nets.push_back(net);
-        names.push_back(args_info.wiring_arg);
+        names.push_back(compositionName);
     }
 
 

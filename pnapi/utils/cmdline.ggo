@@ -21,10 +21,11 @@ option "output" o
   optional
   multiple
 
-option "wiring" w
-  "Read a wiring description"
+option "wire" w
+  "Wire (i.e., compose) the given nets. Either a wiring description is given or the interfaces are composed according to their names."
   typestr="FILE"
   string
+  argoptional
   optional
 
 

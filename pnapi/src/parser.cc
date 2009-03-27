@@ -129,6 +129,13 @@ namespace pnapi
 	mergeData(data);
       }
 
+      Node::Node(Type type, Node * data, Node * node1, Node * node2, 
+		 Node * node3) :
+	BaseNode(node1, node2, node3), type(type)
+      {
+	mergeData(data);
+      }
+
       Node & Node::operator=(const Node & node)
       {
 	number = node.number;
@@ -217,6 +224,10 @@ namespace pnapi
 	      p->second.port = port_;
 	      break;
 	    }
+
+	  case LABEL:
+	    labels_.insert(node.identifier);
+	    break;
 
 	  case INITIALMARKING:
 	    isInitial_ = true;
@@ -311,10 +322,16 @@ namespace pnapi
 	switch (node.type)
 	  {
 	  case INITIALMARKING:
+	    // create places
 	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
 		 it != places_.end(); ++it)
 	      net_.createPlace(it->first, it->second.type, it->second.marking,
 			       it->second.capacity, it->second.port);
+	    // add synchronous labels
+	    for (set<string>::iterator it = labels_.begin(); 
+		 it != labels_.end(); ++it)
+	      ; // do we really need the labels globally?
+	    labels_.clear();
 	    break;
 	  case FINALMARKING:
 	    net_.finalCondition().addMarking(finalMarking_);
@@ -324,7 +341,8 @@ namespace pnapi
 	    {
 	      node.check(!net_.containsNode(node.identifier), node.identifier,
 			 "node name already used");
-	      Transition & trans = net_.createTransition(node.identifier);
+	      Transition & trans = net_.createTransition(node.identifier, 
+							 labels_);
 	      for (map<string, unsigned int>::iterator it = preset_.begin();
 		   it != preset_.end(); ++ it)
 		net_.createArc(*net_.findPlace(it->first), trans, it->second);
@@ -333,6 +351,7 @@ namespace pnapi
 		net_.createArc(trans, *net_.findPlace(it->first), it->second);
 	      preset_.clear();
 	      postset_.clear();
+	      labels_.clear();
 	      break;
 	    }
 

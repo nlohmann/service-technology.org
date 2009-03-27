@@ -30,9 +30,9 @@ namespace pnapi
 
   // forward declarations
   class PetriNet;
-  class ComponentObserver;
   class Arc;
   class Marking;
+  namespace util { class ComponentObserver; }
 
 
   /*!
@@ -52,7 +52,7 @@ namespace pnapi
   {
 
     /// observer needs to update pre- and postsets
-    friend class ComponentObserver;
+    friend class util::ComponentObserver;
 
   public:
 
@@ -60,10 +60,10 @@ namespace pnapi
     enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
 
     /// constructor
-    Node(PetriNet &, ComponentObserver &, const std::string &, Type);
+    Node(PetriNet &, util::ComponentObserver &, const std::string &, Type);
 
     /// copy constructor
-    Node(PetriNet &, ComponentObserver &, const Node &, const std::string &);
+    Node(PetriNet &, util::ComponentObserver &, const Node &, const std::string &);
 
     /// destructor
     virtual ~Node();
@@ -111,7 +111,7 @@ namespace pnapi
     PetriNet & net_;
 
     /// petri net's observer for this node
-    ComponentObserver & observer_;
+    util::ComponentObserver & observer_;
 
     /// changes the type of this node
     virtual void setType(Type);
@@ -161,15 +161,16 @@ namespace pnapi
   {
 
     /// observer needs to update type
-    friend class ComponentObserver;
+    friend class util::ComponentObserver;
 
   public:
     /// constructor
-    Transition(PetriNet &, ComponentObserver &,
-	       const std::string &, Type = INTERNAL);
+    Transition(PetriNet &, util::ComponentObserver &,
+	       const std::string &, 
+	       const std::set<std::string> & = std::set<std::string>());
 
     /// copy constructor
-    Transition(PetriNet &, ComponentObserver &, const Transition &, 
+    Transition(PetriNet &, util::ComponentObserver &, const Transition &, 
 	       const std::string &);
 
     /// help method for normalize method
@@ -178,8 +179,18 @@ namespace pnapi
     /// merges another transition into this one
     void merge(Transition &, bool = true);
 
+    /// returns true, if the transition is associated to at least one label
+    bool isSynchronized() const;
+
+    /// the set of labels
+    const std::set<std::string> & getSynchronizeLabels() const;
+
 
   private:
+
+    /// synchronize labels
+    const std::set<std::string> labels_;
+
 
     /// no standard copying!
     Transition(const Transition &);
@@ -201,11 +212,11 @@ namespace pnapi
   public:
 
     /// constructor
-    Place(PetriNet &, ComponentObserver &, const std::string &, Type, unsigned int, 
+    Place(PetriNet &, util::ComponentObserver &, const std::string &, Type, unsigned int, 
 	  unsigned int, const std::string &);
 
     /// copy constructor
-    Place(PetriNet &, ComponentObserver &, const Place &, const std::string &);
+    Place(PetriNet &, util::ComponentObserver &, const Place &, const std::string &);
 
     /// returns the number of tokens lying on this place
     unsigned int getTokenCount() const;
@@ -267,13 +278,13 @@ namespace pnapi
   public:
 
     /// constructor
-    Arc(PetriNet &, ComponentObserver &, Node &, Node &, unsigned int = 1);
+    Arc(PetriNet &, util::ComponentObserver &, Node &, Node &, unsigned int = 1);
 
     /// copy constructor
-    Arc(PetriNet &, ComponentObserver &, const Arc &);
+    Arc(PetriNet &, util::ComponentObserver &, const Arc &);
 
     /// copy constructor
-    Arc(PetriNet &, ComponentObserver &, const Arc &, Node &, Node &);
+    Arc(PetriNet &, util::ComponentObserver &, const Arc &, Node &, Node &);
 
     /// destructor
     virtual ~Arc();
@@ -309,7 +320,7 @@ namespace pnapi
     PetriNet & net_;
 
     /// petri net's observer for this arc
-    ComponentObserver & observer_;
+    util::ComponentObserver & observer_;
 
     /// source node of the arc
     Node * source_;

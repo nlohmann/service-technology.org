@@ -1,0 +1,29 @@
+PLACE
+  INTERNAL
+    p2; SAFE 8: p1;
+
+  INPUT
+    in;
+
+  OUTPUT
+    out;
+
+  SYNCHRONOUS
+    label;
+
+
+INITIALMARKING
+  p1: 4;
+
+FINALCONDITION
+  ((p1 = 2 AND p2 = 4) OR p1 > 1);
+
+
+TRANSITION t1
+  CONSUME in:3;
+  PRODUCE p1;
+  SYNCHRONIZE label;
+
+TRANSITION t2
+  CONSUME p1;
+  PRODUCE out;

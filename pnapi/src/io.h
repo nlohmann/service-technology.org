@@ -402,6 +402,7 @@ namespace pnapi
 
       /*** NAMESPACE GLOBAL FUNCTIONS AND OPERATORS ***/
 
+      bool compareContainerElements(std::string, std::string);
       bool compareContainerElements(const Node *, const Node *);
       bool compareContainerElements(Place *, Place *);
       bool compareContainerElements(const Place *, const Place *);
@@ -416,6 +417,8 @@ namespace pnapi
       filterInterfacePropositions(const std::set<const formula::Formula *> &);
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);
+      std::set<std::string> 
+      collectSynchronizeLabels(const std::set<Transition *> &);
 
       Manipulator<Mode> mode(Mode);
       Manipulator<Delim> delim(const std::string &);
@@ -454,6 +457,17 @@ namespace pnapi
       {
 	StreamMetaData<T>::data(os) = m.data;
 	return os;
+      }
+
+
+      std::ostream & outputContainerElement(std::ostream &, const std::string &);
+
+
+      template <typename T>
+      std::ostream & outputContainerElement(std::ostream & os, 
+				     const std::pair<T, std::set<Place *> > & p)
+      {
+	return os << p;
       }
 
 
@@ -504,16 +518,9 @@ namespace pnapi
 	    for (typename std::multimap<T, Place *>::const_iterator subit = it;
 		 subit != places.upper_bound(it->first); ++subit)
 	      subset.insert(subit->second);
-	    //os << std::pair<T, std::set<Place *> >(it->first, subset);
 	    metaVector.push_back(std::pair<T, std::set<Place *> >(it->first, subset));
 	  }
-        //return os << metaVector;
-
-	std::string delim = DelimData::data(os).delim;
-	if (metaVector.empty()) return os;
-	for (typename std::vector<std::pair<T, std::set<Place *> > >::const_iterator it = metaVector.begin(); it != --metaVector.end(); ++it)
-	  os << *it << delim;
-	return os << *--metaVector.end();
+        return os << metaVector;
       }
 
 

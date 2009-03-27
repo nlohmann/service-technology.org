@@ -517,6 +517,9 @@ namespace pnapi
 
       ostream & output(ostream & os, const PetriNet & net)
       {
+	set<string> labels = 
+	  util::collectSynchronizeLabels(net.synchronizedTransitions_);
+
 	os  //< output everything to this stream
 
 	  << "{" << endl
@@ -534,14 +537,18 @@ namespace pnapi
 	  << mode(io::util::PLACE) << delim("; ")
 	  << "PLACE"      << endl
 	  << "  INTERNAL" << endl
-	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_) << ";"
-	  << endl << endl << delim(", ")
+	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_) 
+	  << ";" << endl << endl << delim(", ")
 	  << "  INPUT"    << endl
-	  << "    " << net.inputPlaces_                                     << ";"
-	  << endl << endl
+	  << "    " << net.inputPlaces_                                     
+	  << ";" << endl << endl
 	  << "  OUTPUT"   << endl
-	  << "    " << net.outputPlaces_                                    << ";"
-	  << endl << endl;
+	  << "    " << net.outputPlaces_                                    
+	  << ";" << endl << endl;
+	if (!labels.empty()) os
+	  << "  SYNCHRONOUS" << endl
+	  << "    " << labels 
+	  << ";" << endl << endl;
 
 	if (!net.interfacePlacesByPort_.empty())
 	  os << delim("; ")
@@ -581,11 +588,14 @@ namespace pnapi
 
       ostream & output(ostream & os, const Transition & t)
       {
-	return os
+	os 
 	  << "TRANSITION " << t.getName() << endl
 	  << delim(", ")
-	  << "  CONSUME " << t.getPresetArcs()  << ";" << endl
-	  << "  PRODUCE " << t.getPostsetArcs() << ";" << endl;
+	  << "  CONSUME "     << t.getPresetArcs()        << ";" << endl
+	  << "  PRODUCE "     << t.getPostsetArcs()       << ";" << endl;
+	if (t.isSynchronized()) os
+	  << "  SYNCHRONIZE " << t.getSynchronizeLabels() << ";" << endl;
+	return os;
       }
 
 

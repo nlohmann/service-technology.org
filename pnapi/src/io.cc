@@ -424,9 +424,22 @@ namespace pnapi
       }
 
 
+      std::ostream & outputContainerElement(std::ostream & os, 
+					    const std::string & s)
+      {
+	return os << s;
+      }
+
+      
+      bool compareContainerElements(string s1, string s2)
+      {
+	return s1 < s2;
+      }
+
+
       bool compareContainerElements(const Node * n1, const Node * n2)
       {
-	return n1->getName() < n2->getName();
+	return compareContainerElements(n1->getName(), n2->getName());
       }
 
 
@@ -505,6 +518,16 @@ namespace pnapi
 	     ++it)
 	  grouped.insert(pair<unsigned int, Place *>((*it)->getCapacity(),*it));
 	return grouped;
+      }
+
+
+      set<string> collectSynchronizeLabels(const set<Transition *> & ts)
+      {
+	set<string> labels;
+	for (set<Transition *>::iterator it = ts.begin(); it != ts.end(); ++it)
+	  labels.insert((*it)->getSynchronizeLabels().begin(),
+			(*it)->getSynchronizeLabels().end());
+	return labels;
       }
 
 

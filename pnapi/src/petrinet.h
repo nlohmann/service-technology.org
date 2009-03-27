@@ -42,6 +42,9 @@ namespace pnapi
   }
 
 
+  namespace util
+  {
+
   /*!
    * \brief   observes PetriNet components (Place, Transition, Arc)
    *
@@ -52,7 +55,7 @@ namespace pnapi
   class ComponentObserver
   {
     /// PetriNet may even do internal updates (on itself)
-    friend class PetriNet;
+    friend class pnapi::PetriNet;
 
   public:
 
@@ -84,6 +87,8 @@ namespace pnapi
 
   };
 
+  } /* namespace util */
+
 
   /*!
    * \brief   A Petri net
@@ -96,7 +101,7 @@ namespace pnapi
   {
 
     /// needs to update internal structures
-    friend class ComponentObserver;
+    friend class util::ComponentObserver;
 
     /// Petri net input, see pnapi::io
     friend std::istream & io::operator>>(std::istream &, PetriNet &) 
@@ -210,6 +215,8 @@ namespace pnapi
 
     const std::set<Transition *> & getTransitions() const;
 
+    const std::set<Transition *> & getSynchronizedTransitions() const;
+
     //@}
 
 
@@ -229,7 +236,8 @@ namespace pnapi
 			const std::string & = "");
 
     /// creates a Transition
-    Transition & createTransition(const std::string & = "");
+    Transition & createTransition(const std::string & = "",
+		       const std::set<std::string> & = std::set<std::string>());
 
     //@}
 
@@ -288,6 +296,9 @@ namespace pnapi
     /// all transitions
     std::set<Transition *> transitions_;
 
+    /// all synchronized transitions
+    std::set<Transition *> synchronizedTransitions_;
+
     /// all places
     std::set<Place *> places_;
 
@@ -313,7 +324,7 @@ namespace pnapi
     /* general properties */
 
     /// observer for nodes and arcs
-    ComponentObserver observer_;
+    util::ComponentObserver observer_;
 
     /// final condition
     Condition condition_;

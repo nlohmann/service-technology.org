@@ -19,6 +19,7 @@ test_markings_SOURCES	    = test_markings.cc
 test_produce_SOURCES	    = test_produce.cc
 
 EXTRA_DIST = $(TESTS) \
+	test_input.net.owfn \
 	test_produce.onlineshop.owfn \
 	test_produce.onlineshop.constraint.owfn
 

@@ -34,19 +34,12 @@ int main(int argc, char * argv[])
   net.createArc(t2, out);
   net.finalCondition() = p1 == 2 && p2 == 4 || p1 > 1;
 
-  /*
-  // the test doesn't work reliably because of set ordering
   begin_test("io::operator>>() [Petri net OWFN input]");
-  stringstream stream, test;
-  stream << owfn << net;
-  cout << owfn << net;
-  try { stream >> owfn >> net; }
+  ifstream ifs("test_input.net.owfn");
+  try { ifs >> owfn >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
-  test << owfn << net;
-  cout << owfn << net;
-  assert(stream.str() == test.str());
+  //cout << owfn << net;
   end_test();
-  */
 
   /*
   // the test doesn't work reliably because of set ordering

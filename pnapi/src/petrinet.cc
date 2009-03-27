@@ -44,6 +44,9 @@ using std::deque;
 namespace pnapi
 {
 
+  namespace util
+  {
+
   /****************************************************************************
    *** Class ComponentObserver Function Defintions
    ***************************************************************************/
@@ -144,6 +147,8 @@ namespace pnapi
   {
     updateNodes(trans);
     net_.transitions_.insert(&trans);
+    if (trans.isSynchronized())
+      net_.synchronizedTransitions_.insert(&trans);
   }
 
 
@@ -260,6 +265,8 @@ namespace pnapi
       default: break;
       }
   }
+
+  } /* namespace util */
 
 
 
@@ -615,9 +622,12 @@ namespace pnapi
   /*!
    * If an empty name is given, one is generated using getUniqueNodeName().
    */
-  Transition & PetriNet::createTransition(const string & name)
+  Transition & PetriNet::createTransition(const string & name,
+					  const std::set<std::string> & labels)
   {
-    return *new Transition(*this, observer_, name.empty() ? getUniqueNodeName("t") : name);
+    return *new Transition(*this, observer_, 
+			   name.empty() ? getUniqueNodeName("t") : name,
+			   labels);
   }
 
 
@@ -754,6 +764,14 @@ namespace pnapi
   const set<Transition *> & PetriNet::getTransitions() const
   {
     return transitions_;
+  }
+
+
+  /*!
+   */
+  const set<Transition *> & PetriNet::getSynchronizedTransitions() const
+  {
+    return synchronizedTransitions_;
   }
 
 
@@ -1205,6 +1223,8 @@ namespace pnapi
 
   void PetriNet::deleteTransition(Transition & trans)
   {
+    if (trans.isSynchronized())
+      synchronizedTransitions_.erase(&trans);
     transitions_.erase(&trans);
     deleteNode(trans);
   }

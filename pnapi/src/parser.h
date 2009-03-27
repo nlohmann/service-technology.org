@@ -216,7 +216,7 @@ namespace pnapi
 	{ 
 	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
 	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
-	  INITIALMARKING, FINALMARKING, MARK, CONDITION,
+	  INITIALMARKING, FINALMARKING, MARK, CONDITION, LABEL,
 	  TRANSITION, ARC, PRESET, POSTSET, 
 	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
 	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT, 
@@ -253,6 +253,7 @@ namespace pnapi
 	Node(Type, Node *, int);
 	Node(Type, Node *, Node *);
 	Node(Type, Node *, Node *, Node *);
+	Node(Type, Node *, Node *, Node *, Node *);
 
 	Node & operator=(const Node &);
 
@@ -293,6 +294,7 @@ namespace pnapi
 	Place::Type placeType_;
 	unsigned int capacity_;
 	std::string port_;
+	std::set<std::string> labels_;
 	std::map<std::string, PlaceAttributes> places_;
 	bool isPreset_;
 	std::map<std::string, unsigned int> preset_, postset_;

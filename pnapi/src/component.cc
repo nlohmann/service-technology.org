@@ -16,6 +16,8 @@ using std::set;
 
 namespace pnapi {
 
+  using util::ComponentObserver;
+
 
   /****************************************************************************
    *** Class Node Function Definitions
@@ -409,8 +411,8 @@ namespace pnapi {
   /*!
    */
   Transition::Transition(PetriNet & net, ComponentObserver & observer,
-			 const string & name, Type type) :
-    Node(net, observer, name, type)
+			 const string & name, const set<string> & labels) :
+    Node(net, observer, name, INTERNAL), labels_(labels)
   {
     observer_.updateTransitions(*this);
   }
@@ -420,7 +422,7 @@ namespace pnapi {
    */
   Transition::Transition(PetriNet & net, ComponentObserver & observer,
 			 const Transition & trans, const string & prefix) :
-    Node(net, observer, trans, prefix)
+    Node(net, observer, trans, prefix), labels_(trans.labels_)
   {
     observer_.updateTransitions(*this);
   }
@@ -487,6 +489,22 @@ namespace pnapi {
       }
 
     setType(newType);
+  }
+
+
+  /*!
+   */
+  bool Transition::isSynchronized() const
+  {
+    return !labels_.empty();
+  }
+
+
+  /*!
+   */
+  const set<string> & Transition::getSynchronizeLabels() const
+  {
+    return labels_;
   }
 
 

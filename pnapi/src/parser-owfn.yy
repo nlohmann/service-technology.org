@@ -73,6 +73,7 @@
 %type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
 %type <yt_node> markings marking marking_list initial final finalmarkings
 %type <yt_node>   finalmarking formula condition
+%type <yt_node> synchronous synchronize labels label
 
 %start petrinet
 
@@ -190,8 +191,8 @@ port_participant:
   ;
 
 interface:
-    input_places output_places synchronous { $$ = new Node($1, $2); }
-  | port_list_new                          { $$ = $1;               }
+    input_places output_places synchronous { $$ = new Node($1, $2, $3); }
+  | port_list_new                          { $$ = $1;                   }
   ;
 
 port_list_new:
@@ -201,17 +202,21 @@ port_list_new:
 
 port_definition_new:
   KEY_PORT node_name input_places output_places synchronous
-    { $$ = new Node(PORT, $2, new Node($3, $4)); }
+  { $$ = new Node(PORT, $2, new Node($3, $4, $5)); }
   ;
 
 synchronous:
-    KEY_SYNCHRONOUS labels SEMICOLON
-  | /* empty */
+    KEY_SYNCHRONOUS labels SEMICOLON { $$ = $2;         }
+  | /* empty */                      { $$ = new Node(); }
   ;
 
 labels:
-    node_name
-  | labels COMMA node_name
+    label              { $$ = new Node($1);     }
+  | labels COMMA label { $$ = $1->addChild($3); }
+  ;
+
+label:
+  node_name { $$ = new Node(LABEL, $1); }
   ;
 
 
@@ -226,7 +231,7 @@ transitions:
 
 transition: 
   KEY_TRANSITION node_name preset_arcs postset_arcs synchronize
-    { $$ = new Node(TRANSITION, $2, $3, $4); }
+  { $$ = new Node(TRANSITION, $2, $3, $4, $5); }
   ;
 
 preset_arcs:
@@ -249,8 +254,8 @@ arc:
   ;
 
 synchronize:
-    /* empty */
-  | KEY_SYNCHRONIZE
+    /* empty */                      { $$ = new Node(); }
+  | KEY_SYNCHRONIZE labels SEMICOLON { $$ = $2;         }
   ;
 
 

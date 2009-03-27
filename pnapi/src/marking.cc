@@ -181,4 +181,13 @@ namespace pnapi
   }
 
 
+  /*!
+   * \brief   clears the marking
+   */
+  void Marking::clear()
+  {
+    m_.clear();
+  }
+
+
 }

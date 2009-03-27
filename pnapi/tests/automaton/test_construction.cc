@@ -5,14 +5,17 @@
 #include <fstream>
 
 using std::ifstream;
+using std::cout;
+using std::endl;
 using namespace pnapi;
 
 int main(int argc, char *argv[])
 {
-  PetriNet net[3];
+  PetriNet net[4];
   ifstream ifstr;
 
   begin_test("Automaton::Automaton() [construction] with normal net");
+
   ifstr.open("sequence_normal.owfn", std::ios_base::in);
   try
   {
@@ -23,10 +26,11 @@ int main(int argc, char *argv[])
     std::cout << error << "\n";
   }
   ifstr.close();
-  cout << io::owfn << net[0];
+  cout << io::owfn << net[0] << std::endl;
   ServiceAutomaton sauto0(net[0]);
   cout << io::sa << sauto0;
-  /*ifstr.open("sequence_unnormal.owfn", std::ios_base::in);
+
+  ifstr.open("sequence_unnormal.owfn", std::ios_base::in);
   try
   {
   ifstr >> io::owfn >> net[1];
@@ -38,9 +42,9 @@ int main(int argc, char *argv[])
   ifstr.close();
   cout << io::owfn << net[1];
   ServiceAutomaton sauto1(net[1]);
-  cout << io::sa << sauto1;*/
+  cout << io::sa << sauto1;
 
-/*  ifstr.open("strange_net.owfn", std::ios_base::in);
+  ifstr.open("strange_net.owfn", std::ios_base::in);
   try
   {
   ifstr >> io::owfn >> net[2];
@@ -49,9 +53,24 @@ int main(int argc, char *argv[])
   catch (io::InputError error)
   {
     std::cout << error << "\n";
-  }*/
-//  pnapi::ServiceAutomaton sauto2(net[2]);
-//  cout << io::sa << sauto2;
+  }
+  cout << io::owfn << net[2];
+  pnapi::ServiceAutomaton sauto2(net[2]);
+  cout << io::sa << sauto2;
+
+  ifstr.open("safe_net.owfn", std::ios_base::in);
+  try
+  {
+  ifstr >> io::owfn >> net[3];
+  ifstr.close();
+  }
+  catch (io::InputError error)
+  {
+    std::cout << error << "\n";
+  }
+  cout << io::owfn << net[3];
+  pnapi::ServiceAutomaton sauto3(net[3]);
+  cout << io::sa << sauto3;
 
   end_test();
 

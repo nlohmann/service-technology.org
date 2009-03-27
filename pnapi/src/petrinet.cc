@@ -625,7 +625,7 @@ namespace pnapi
   Transition & PetriNet::createTransition(const string & name,
 					  const std::set<std::string> & labels)
   {
-    return *new Transition(*this, observer_, 
+    return *new Transition(*this, observer_,
 			   name.empty() ? getUniqueNodeName("t") : name,
 			   labels);
   }
@@ -829,7 +829,7 @@ namespace pnapi
   {
     for (set<Transition *>::const_iterator t = transitions_.begin();
         t != transitions_.end(); t++)
-      if (!(*t)->isNormal())
+      if ((*t)->getSynchronizeLabels().size() > 1 && !(*t)->isNormal())
         return false;
 
     return true;
@@ -843,6 +843,11 @@ namespace pnapi
    * each transition has only one adjacent interface
    * place.
    *
+   * \param   bool makeInnerStructure: if set true then the interface places
+   *          will be deleted
+   * \return  map<Transition *, string> a mapping representing the edge labels
+   *          of the later service automaton
+   *
    * For input places complementary places are introduced.
    */
   const std::map<Transition *, string> PetriNet::normalize(bool makeInnerStructure)
@@ -850,90 +855,91 @@ namespace pnapi
     static int in = 1;
     static int on = 1;
 
-    if (!isNormal())
+    std::set<Transition *> temp;
+    temp.clear();
+    for (set<Transition *>::const_iterator t = transitions_.begin();
+        t != transitions_.end(); t++)
     {
-      std::set<Transition *> temp;
-      temp.clear();
-      for (set<Transition *>::const_iterator t = transitions_.begin();
-          t != transitions_.end(); t++)
+      if ((*t)->isNormal())
+        continue;
+
+      /// adjacent output places of t
+      set<Place *> t_out;
+      for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
+          p != (*t)->getPostset().end(); p++)
+        if ((*p)->getType() == Node::OUTPUT)
+          t_out.insert(static_cast<Place *>(*p));
+
+      for (set<Place *>::const_iterator op = t_out.begin();
+          op != t_out.end(); op++)
       {
-        if (temp.count(*t) > 0)
-          continue;
+        /// if there are multiple new places with same name (maximum 10)
+        char c = (on++ % 10) + 48;
+        string nname = (**op).getName();
+        nname.push_back(c);
 
-        /// adjacent input places of t
-        set<Place *> t_inp;
-        for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
-            p != (*t)->getPreset().end(); p++)
-          if ((*p)->getType() == Node::INPUT)
-            t_inp.insert(static_cast<Place *>(*p));
+        /// new internal place
+        Place &nint = createPlace(nname+"_normalized");
+        /// new transition
+        Transition &ntrans = createTransition("t_"+nname);
+        /// creating arcs
+        createArc(*(*t), nint);
+        createArc(nint, ntrans);
+        createArc(ntrans, **op);
 
-        for (set<Place *>::const_iterator ip = t_inp.begin();
-            ip != t_inp.end(); ip++)
-        {
-          char c = (in++ % 10) + 48;
-          string nname = (**ip).getName();
-          nname.push_back(c);
-          /// new internal place
-          Place &nint = createPlace(nname+"_normalized");
-          /// complementary place
-          Place &ncomp = createPlace("comp_"+nname+"_normalized");
-          ncomp.mark(1);
-          /// new transition
-          Transition &ntrans = createTransition("t_"+nname);
-          /// creating arcs
-          createArc(**ip, ntrans);
-          createArc(ntrans, nint);
-          createArc(nint, **t);
-          createArc(ncomp, ntrans);
-          createArc(*(*t), ncomp);
+        temp.insert(&ntrans);
 
-          temp.insert(&ntrans);
+        condition_ = condition_.formula() && nint == 0;
 
-          condition_ = condition_.formula() && nint == 0 && ncomp == 1;
+        deleteArc(*findArc(**t, **op));
+      }
 
-          deleteArc(*findArc(**ip, **t));
-        }
+      /// adjacent input places of t
+      set<Place *> t_inp;
+      for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
+          p != (*t)->getPreset().end(); p++)
+        if ((*p)->getType() == Node::INPUT)
+          t_inp.insert(static_cast<Place *>(*p));
 
-        /// adjacent output places of t
-        set<Place *> t_out;
-        for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
-            p != (*t)->getPostset().end(); p++)
-          if ((*p)->getType() == Node::OUTPUT)
-            t_out.insert(static_cast<Place *>(*p));
+      for (set<Place *>::const_iterator ip = t_inp.begin();
+          ip != t_inp.end(); ip++)
+      {
+        /// if there are multiple new places with same name (maximum 10)
+        char c = (in++ % 10) + 48;
+        string nname = (*ip)->getName();
+        nname.push_back(c);
 
-        for (set<Place *>::const_iterator op = t_out.begin();
-            op != t_out.end(); op++)
-        {
-          char c = (on++ % 10) + 48;
-          string nname = (**op).getName();
-          nname.push_back(c);
-          /// new internal place
-          Place &nint = createPlace(nname+"_normalized");
-          /// new transition
-          Transition &ntrans = createTransition("t_"+nname);
-          /// creating arcs
-          createArc(*(*t), nint);
-          createArc(nint, ntrans);
-          createArc(ntrans, **op);
+        /// new internal place
+        Place &nint = createPlace(nname+"_normalized");
+        /// complementary place
+        Place &ncomp = createPlace("comp_"+nname+"_normalized");
+        ncomp.mark(1);
+        /// new transition
+        Transition &ntrans = createTransition("t_"+nname);
+        /// creating arcs
+        createArc(**ip, ntrans);
+        createArc(ntrans, nint);
+        createArc(nint, **t);
+        createArc(ncomp, ntrans);
+        createArc(*(*t), ncomp);
 
-          temp.insert(&ntrans);
+        condition_ = condition_.formula() && nint == 0 && ncomp == 1;
 
-          condition_ = condition_.formula() && nint == 0;
-
-          deleteArc(*findArc(**t, **op));
-        }
+        deleteArc(*findArc(**ip, **t));
       }
     }
 
-    std::map<Transition *, string> edgeLabels;
-    for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    std::map<Transition *, string> edgeLabels; ///< returning map
+    for (set<Transition *>::const_iterator t = transitions_.begin();
+        t != transitions_.end(); t++)
     {
       switch ((*t)->getType())
       {
       case Node::INPUT:
       {
         set<Arc *> preset = (*t)->getPresetArcs();
-        for (set<Arc *>::const_iterator f = preset.begin(); f != preset.end(); f++)
+        for (set<Arc *>::const_iterator f = preset.begin();
+            f != preset.end(); f++)
         {
           if ((*f)->getPlace().getType() == Node::INPUT)
           {
@@ -946,7 +952,8 @@ namespace pnapi
       case Node::OUTPUT:
       {
         set<Arc *> postset = (*t)->getPostsetArcs();
-        for (set<Arc *>::const_iterator f = postset.begin(); f != postset.end(); f++)
+        for (set<Arc *>::const_iterator f = postset.begin();
+            f != postset.end(); f++)
         {
           if ((*f)->getPlace().getType() == Node::OUTPUT)
           {

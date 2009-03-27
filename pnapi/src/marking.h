@@ -44,6 +44,8 @@ namespace pnapi
     bool operator==(const Marking &m) const;
     Marking & operator=(const Marking &m);
 
+    void clear();
+
   private:
     std::map<const Place *, unsigned int> m_;
     PetriNet &net_;

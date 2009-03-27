@@ -494,12 +494,12 @@ namespace pnapi
 	return filtered;
       }
 
-
-      std::set<const Formula *>
-      filterInterfacePropositions(const std::set<const Formula *> & formulas)
+      
+      std::set<const formula::Formula *> 
+      filterInterfacePropositions(const std::set<const formula::Formula *> & formulas)
       {
-	set<const Formula *> result;
-	for (set<const Formula *>::iterator it = formulas.begin();
+	set<const formula::Formula *> result;
+	for (set<const formula::Formula *>::iterator it = formulas.begin();
 	     it != formulas.end(); ++it)
 	  {
 	    const Proposition * p = dynamic_cast<const Proposition *>(*it);

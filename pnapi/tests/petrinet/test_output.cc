@@ -27,11 +27,11 @@ int main(int argc, char * argv[])
   net.createArc(t1, p3);
   net.createArc(p3, t2);
   net.createArc(t2, p2);
-  net.finalCondition() = p1 == 2 && p2 == 4 || p3 > 1;
-  
-  /*
+  net.finalCondition() = p1 == 2 && p4 == 4 || p3 > 1;
+
+  /*  
   begin_test("io::operator<<() [Petri net LOLA output]");
-  cout << lola << net;
+  cout << lola << pnapi::io::formula << net;
   end_test();
   */
 

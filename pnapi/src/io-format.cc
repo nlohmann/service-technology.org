@@ -353,6 +353,13 @@ namespace pnapi
     }
 
 
+    std::ostream & formula(std::ostream & os)
+    {
+      util::FormulaData::data(os).formula = true;
+      return os;
+    }
+
+
     namespace __lola
     {
 
@@ -361,7 +368,7 @@ namespace pnapi
 	string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
 	string inputfile = net.getMetaInformation(os, INPUTFILE);
 
-	return os //< output everything to this stream
+	os //< output everything to this stream
 
 	  << "{ Petri net created by " << creator
 	  << (inputfile.empty() ? "" : " reading " + inputfile)
@@ -378,12 +385,14 @@ namespace pnapi
 
 	  // transitions
 	  << delim("\n") << net.transitions_ << endl
-	  << endl
+	  << endl;
 
+	if (util::FormulaData::data(os).formula) os
 	  << "FORMULA" << endl
 	  << "  " << net.condition_ << endl
-	  << endl
+	  << endl;
 
+	return os
 	  << "{ END OF FILE }" << endl;
       }
 

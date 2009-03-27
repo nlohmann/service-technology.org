@@ -211,6 +211,9 @@ namespace pnapi
     util::Manipulator<std::map<std::string, PetriNet *> >
     nets(std::map<std::string, PetriNet *> &);
 
+    /// formula output manipulator
+    std::ostream & formula(std::ostream &);
+
     //@}
 
 
@@ -366,6 +369,13 @@ namespace pnapi
       /// delimiter type
       struct Delim { std::string delim; };
 
+      /// formula type
+      struct Formula 
+      { 
+	bool formula;
+	Formula() : formula(false) {}
+      };
+
 
       /*** TEMPLATE CLASSES ***/
 
@@ -395,6 +405,7 @@ namespace pnapi
       typedef StreamMetaData<Format> FormatData;
       typedef StreamMetaData<Mode> ModeData;
       typedef StreamMetaData<Delim> DelimData;
+      typedef StreamMetaData<Formula> FormulaData;
       typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
       typedef Manipulator<std::pair<MetaInformation, std::string> >
               MetaManipulator;

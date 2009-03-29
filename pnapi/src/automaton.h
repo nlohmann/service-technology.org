@@ -268,16 +268,20 @@ namespace pnapi
     bool first = true;
     for (unsigned int i = 0; i < edges_.size(); i++)
     {
-      if (seen.count((*edges_[i]).getLabel()) > 0)
+      std::string label = (*edges_[i]).getLabel();
+      if (seen.count(label) > 0)
         continue;
-      seen.insert((*edges_[i]).getLabel());
-      if (first)
+      seen.insert(label);
+      if (label == "tau")
       {
-        first = false;
-        os << (*edges_[i]).getLabel();
+        if (first)
+        {
+          first = false;
+          os << label;
+        }
+        else
+          os << ", " << label;
       }
-      else
-        os << ", " << (*edges_[i]).getLabel();
     }
     os << "\n";
     os << ".state graph\n";

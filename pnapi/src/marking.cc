@@ -45,7 +45,7 @@ namespace pnapi
    *                         instead of reading marking from n
    */
   Marking::Marking(PetriNet &n, bool empty) :
-    net_(n)
+    net_(&n)
   {
     for (set<Place *>::const_iterator p = n.getPlaces().begin(); p != n.getPlaces().end(); p++)
         m_[*p] = empty ? 0 : (*p)->getTokenCount();
@@ -64,6 +64,15 @@ namespace pnapi
 
 
   /*!
+   * \brief   Another constructor.
+   */
+  Marking::Marking(std::map<const Place *, unsigned int> m, PetriNet *net) :
+    m_(m), net_(net)
+  {
+  }
+
+
+  /*!
    * \brief   Returns the map..
    */
   const map<const Place *, unsigned int> & Marking::getMap() const
@@ -77,7 +86,7 @@ namespace pnapi
    */
   PetriNet & Marking::getPetriNet() const
   {
-    return net_;
+    return *net_;
   }
 
   map<const Place *, unsigned int>::const_iterator Marking::begin() const
@@ -134,10 +143,10 @@ namespace pnapi
     Marking &m = *new Marking(*this);
 
     for (set<Node *>::const_iterator p = Ppre.begin(); p != Ppre.end(); p++)
-      m[*static_cast<Place *>(*p)] -= net_.findArc(**p, t)->getWeight();
+      m[*static_cast<Place *>(*p)] -= net_->findArc(**p, t)->getWeight();
 
     for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); p++)
-      m[*static_cast<Place *>(*p)] += net_.findArc(t, **p)->getWeight();
+      m[*static_cast<Place *>(*p)] += net_->findArc(t, **p)->getWeight();
 
     return m;
   }

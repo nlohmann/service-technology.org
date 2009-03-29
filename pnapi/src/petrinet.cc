@@ -860,9 +860,6 @@ namespace pnapi
     for (set<Transition *>::const_iterator t = transitions_.begin();
         t != transitions_.end(); t++)
     {
-      if ((*t)->isNormal())
-        continue;
-
       /// adjacent output places of t
       set<Place *> t_out;
       for (set<Node *>::const_iterator p = (*t)->getPostset().begin();

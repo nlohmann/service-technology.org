@@ -27,6 +27,7 @@ namespace pnapi
     //Marking();
     Marking(PetriNet &n, bool = false);
     Marking(const Marking &m);
+    Marking(std::map<const Place *, unsigned int> m, PetriNet *net = NULL);
     virtual ~Marking() {}
 
     const std::map<const Place *, unsigned int> & getMap() const;
@@ -48,7 +49,7 @@ namespace pnapi
 
   private:
     std::map<const Place *, unsigned int> m_;
-    PetriNet &net_;
+    PetriNet *net_;
   };
 
 }

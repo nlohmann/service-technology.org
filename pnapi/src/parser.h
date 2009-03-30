@@ -72,6 +72,9 @@ namespace pnapi
       /// constructor
       BaseNode(T *, T *, T *);
 
+      /// constructor
+      BaseNode(T *, T *, T *, T *);
+
       /// destructor
       virtual ~BaseNode();
 
@@ -217,7 +220,7 @@ namespace pnapi
 	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
 	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
 	  INITIALMARKING, FINALMARKING, MARK, CONDITION, LABEL,
-	  TRANSITION, ARC, PRESET, POSTSET, 
+	  TRANSITION, ARC, PRESET, POSTSET, CONSTRAIN,
 	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
 	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT, 
 	  FORMULA_GE, FORMULA_LE , FORMULA_FALSE, FORMULA_TRUE, FORMULA_APE
@@ -245,6 +248,7 @@ namespace pnapi
 	Node(Node *);
 	Node(Node *, Node *);
 	Node(Node *, Node *, Node *);
+	Node(Node *, Node *, Node *, Node *);
 
 	Node(int);
 	Node(std::string *);
@@ -254,6 +258,7 @@ namespace pnapi
 	Node(Type, Node *, Node *);
 	Node(Type, Node *, Node *, Node *);
 	Node(Type, Node *, Node *, Node *, Node *);
+	Node(Type, Node *, Node *, Node *, Node *, Node *);
 
 	Node & operator=(const Node &);
 
@@ -273,7 +278,9 @@ namespace pnapi
       public:
 	Visitor();
 	
-	PetriNet getPetriNet() const;
+	const PetriNet & getPetriNet() const;
+	const std::map<Transition *, std::set<std::string> > & 
+	getConstraintLabels() const;
 	
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
@@ -294,10 +301,13 @@ namespace pnapi
 	Place::Type placeType_;
 	unsigned int capacity_;
 	std::string port_;
-	std::set<std::string> labels_;
 	std::map<std::string, PlaceAttributes> places_;
 	bool isPreset_;
 	std::map<std::string, unsigned int> preset_, postset_;
+	bool isSynchronize_;
+	std::set<std::string> synchronizeLabels_;
+	std::set<std::string> constrainLabels_;
+	std::map<Transition *, std::set<std::string> > constraintMap_;
 	std::stack<std::pair<formula::Formula *, 
 			     const std::set<const Place *> *> > formulas_;
 	bool isInitial_;
@@ -633,6 +643,23 @@ namespace pnapi
       addChild(node1);
       addChild(node2);
       addChild(node3);
+    }
+    
+    /*!
+     */
+    template <typename T>
+    BaseNode<T>::BaseNode(T * node1, T * node2, T * node3, T * node4) :
+      line(parser::line), token(parser::token), 
+      filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
+    {
+      assert(node1 != NULL);
+      assert(node2 != NULL);
+      assert(node3 != NULL);
+      assert(node4 != NULL);
+      addChild(node1);
+      addChild(node2);
+      addChild(node3);
+      addChild(node4);
     }
     
     /*!

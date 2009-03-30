@@ -39,7 +39,7 @@
   ****************************************************************************/
 
 %token KEY_SAFE KEY_INTERFACE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
-%token KEY_SYNCHRONIZE KEY_SYNCHRONOUS
+%token KEY_SYNCHRONIZE KEY_SYNCHRONOUS KEY_CONSTRAIN
 %token KEY_MARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
 %token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
 %token KEY_ALL_PLACES_EMPTY
@@ -73,7 +73,7 @@
 %type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
 %type <yt_node> markings marking marking_list initial final finalmarkings
 %type <yt_node>   finalmarking formula condition
-%type <yt_node> synchronous synchronize labels label
+%type <yt_node> synchronous synchronize labels label constrain
 
 %start petrinet
 
@@ -105,8 +105,9 @@ places_ports:
   ;
 
 typed_places: 
-    internal_places input_places output_places { $$ = new Node($1, $2, $3); }
-  | lola_places                                { $$ = $1;                   }
+    internal_places input_places output_places synchronous 
+                { $$ = new Node($1, $2, $3, $4); }
+  | lola_places { $$ = $1;                       }
   ;
 
 input_places:
@@ -230,8 +231,8 @@ transitions:
   ;
 
 transition: 
-  KEY_TRANSITION node_name preset_arcs postset_arcs synchronize
-  { $$ = new Node(TRANSITION, $2, $3, $4, $5); }
+  KEY_TRANSITION node_name preset_arcs postset_arcs synchronize constrain
+  { $$ = new Node(TRANSITION, $2, $3, $4, $5, $6); }
   ;
 
 preset_arcs:
@@ -256,6 +257,11 @@ arc:
 synchronize:
     /* empty */                      { $$ = new Node(); }
   | KEY_SYNCHRONIZE labels SEMICOLON { $$ = $2;         }
+  ;
+
+constrain:
+    /* empty */                    { $$ = new Node();              }
+  | KEY_CONSTRAIN labels SEMICOLON { $$ = new Node(CONSTRAIN, $2); }
   ;
 
 

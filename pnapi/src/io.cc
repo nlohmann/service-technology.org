@@ -59,6 +59,7 @@ namespace pnapi
 	    parser::owfn::Visitor visitor;
 	    parser.parse(is).visit(visitor);
 	    net = visitor.getPetriNet();
+	    net.setConstraintLabels(visitor.getConstraintLabels());
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }
@@ -372,7 +373,10 @@ namespace pnapi
 
     std::ostream & operator<<(std::ostream & os, const io::InputError & e)
     {
-      os << e.filename << ":" << e.line << ": error";
+      os << e.filename;
+      if (e.line > 0)
+	os << ":" << e.line;
+      os << ": error";
       if (!e.token.empty())
 	switch (e.type)
 	  {

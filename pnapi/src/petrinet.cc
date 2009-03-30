@@ -293,6 +293,7 @@ namespace pnapi
     condition_(net.condition_, copyStructure(net)),
     meta_(net.meta_)
   {
+    setConstraintLabels(net.constraints_);
   }
 
 
@@ -319,6 +320,7 @@ namespace pnapi
   void PetriNet::clear()
   {
     meta_.clear();
+    constraints_.clear();
     condition_ = true;
 
     // delete all places
@@ -984,9 +986,8 @@ namespace pnapi
    * \note  There is an error in definition 5: The arcs of the transitions
    *        with empty label are missing.
    */
-  void PetriNet::produce(const PetriNet & net,
-			 const map<Transition *, set<Transition *> > & labels,
-			 const string & aPrefix, const string & aNetPrefix)
+  void PetriNet::produce(const PetriNet & net, const string & aPrefix, 
+			 const string & aNetPrefix) throw (io::InputError)
   {
     typedef set<Transition *> Transitions;
     typedef map<Transition *, Transitions> Labels;
@@ -1000,6 +1001,7 @@ namespace pnapi
 
     string prefix = aPrefix + ".";
     string netPrefix = aNetPrefix + ".";
+    Labels labels = translateConstraintLabels(net);
 
 
     // add (internal) places
@@ -1050,6 +1052,55 @@ namespace pnapi
     for (Transitions::iterator it = labelTransitions.begin();
 	 it != labelTransitions.end(); ++it)
       deleteTransition(**it);
+  }
+
+
+  void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
+  {
+    constraints_.clear();
+    for (map<Transition *, set<string> >::const_iterator it = labels.begin(); 
+	 it != labels.end(); ++it)
+      {
+	Transition * t = findTransition(it->first->getName());
+	assert(t != NULL);
+	constraints_[t] = it->second;
+      }
+  }
+
+
+  map<Transition *, set<Transition *> > 
+  PetriNet::translateConstraintLabels(const PetriNet & net) 
+    throw (io::InputError)
+  {
+    typedef set<string> Labels;
+    typedef set<Transition *> Transitions;
+    typedef map<Transition *, Labels> OriginalLabels;
+    typedef map<Transition *, Transitions> ResultLabels;
+
+    OriginalLabels labels = net.constraints_;
+    ResultLabels result;
+    for (OriginalLabels::iterator it1 = labels.begin(); 
+	 it1 != labels.end(); ++it1)
+      {
+	assert(it1->first != NULL);
+	Transition & t = *it1->first;
+	for (Labels::iterator it2 = it1->second.begin(); 
+	     it2 != it1->second.end(); ++it2)
+	  {
+	    Transition * labelTrans = findTransition(*it2);
+	    if (labelTrans != NULL)
+	      result[&t].insert(labelTrans);
+	    else
+	      {
+		string filename = 
+		  net.meta_.find(io::INPUTFILE) != net.meta_.end() 
+		  ? net.meta_.find(io::INPUTFILE)->second : "";
+		throw io::InputError(io::InputError::SEMANTIC_ERROR, filename, 
+				     0, *it2, "unknown transition");
+	      }
+	  }
+      }
+    return result;
   }
 
 

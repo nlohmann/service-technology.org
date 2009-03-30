@@ -92,6 +92,7 @@ PORT                            { return KEY_PORT; }
 PORTS                           { return KEY_PORTS; }
 SYNCHRONOUS                     { return KEY_SYNCHRONOUS; }
 SYNCHRONIZE                     { return KEY_SYNCHRONIZE; }
+CONSTRAIN                       { return KEY_CONSTRAIN; }
 
  /* keywords for final conditions */
 ALL_PLACES_EMPTY                { return KEY_ALL_PLACES_EMPTY; }

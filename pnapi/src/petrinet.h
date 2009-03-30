@@ -272,10 +272,8 @@ namespace pnapi
     unsigned int reduce(unsigned int = LEVEL_5);
 
     /// product with Constraint oWFN
-    void produce(const PetriNet &, 
-		 const std::map<Transition *, std::set<Transition *> > &,
-		 const std::string & = "net", 
-		 const std::string & = "constraint");
+    void produce(const PetriNet &, const std::string & = "net", 
+		 const std::string & = "constraint") throw (io::InputError);
 
     /// swaps input and output places
     void mirror();
@@ -332,6 +330,9 @@ namespace pnapi
     /// meta information
     std::map<io::MetaInformation, std::string> meta_;
 
+    /// labels for constraint oWFNs
+    std::map<Transition *, std::set<std::string> > constraints_;
+
 
     /* structural changes */
 
@@ -378,6 +379,12 @@ namespace pnapi
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 				   const std::string & = "") const;
 
+    /// sets labels (and translates references)
+    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
+
+    /// translates constraint labels to transitions
+    std::map<Transition *, std::set<Transition *> >
+    translateConstraintLabels(const PetriNet &) throw (io::InputError);
 
     /* petrify */
 

@@ -8,8 +8,10 @@ PLACE
   OUTPUT
     out;
 
+{
   SYNCHRONOUS
     label;
+}
 
 
 INITIALMARKING

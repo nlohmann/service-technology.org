@@ -73,6 +73,11 @@ namespace pnapi
       {
       }
 
+      Node::Node(Node * node1, Node * node2, Node * node3, Node * node4) :
+	BaseNode(node1, node2, node3, node4), type(NO_DATA)
+      {
+      }
+
       Node::Node(int val) :
 	type(DATA_NUMBER), number(val)
       {
@@ -136,6 +141,13 @@ namespace pnapi
 	mergeData(data);
       }
 
+      Node::Node(Type type, Node * data, Node * node1, Node * node2, 
+		 Node * node3, Node * node4) :
+	BaseNode(node1, node2, node3, node4), type(type)
+      {
+	mergeData(data);
+      }
+
       Node & Node::operator=(const Node & node)
       {
 	number = node.number;
@@ -179,9 +191,15 @@ namespace pnapi
       {
       }
 
-      PetriNet Visitor::getPetriNet() const
+      const PetriNet & Visitor::getPetriNet() const
       {
 	return net_;
+      }
+
+      const std::map<Transition *, std::set<std::string> > & 
+      Visitor::getConstraintLabels() const
+      {
+	return constraintMap_;
       }
 
       void Visitor::beforeChildren(const Node & node)
@@ -226,7 +244,10 @@ namespace pnapi
 	    }
 
 	  case LABEL:
-	    labels_.insert(node.identifier);
+	    if (isSynchronize_)
+	      synchronizeLabels_.insert(node.identifier);
+	    else
+	      constrainLabels_.insert(node.identifier);
 	    break;
 
 	  case INITIALMARKING:
@@ -245,8 +266,9 @@ namespace pnapi
 	      finalMarking_[*net_.findPlace(node.identifier)] = node.number;
 	    break;
 
-	  case PRESET:  isPreset_ = true;  break;
-	  case POSTSET: isPreset_ = false; break;
+	  case PRESET:    isPreset_ = true;       break;
+	  case POSTSET:   isPreset_ = false;      break;
+	  case CONSTRAIN: isSynchronize_ = false; break;
 
 	  case ARC:
 	    {
@@ -328,10 +350,10 @@ namespace pnapi
 	      net_.createPlace(it->first, it->second.type, it->second.marking,
 			       it->second.capacity, it->second.port);
 	    // add synchronous labels
-	    for (set<string>::iterator it = labels_.begin(); 
-		 it != labels_.end(); ++it)
+	    for (set<string>::iterator it = synchronizeLabels_.begin(); 
+		 it != synchronizeLabels_.end(); ++it)
 	      ; // do we really need the labels globally?
-	    labels_.clear();
+	    synchronizeLabels_.clear();
 	    break;
 	  case FINALMARKING:
 	    net_.finalCondition().addMarking(finalMarking_);
@@ -342,16 +364,19 @@ namespace pnapi
 	      node.check(!net_.containsNode(node.identifier), node.identifier,
 			 "node name already used");
 	      Transition & trans = net_.createTransition(node.identifier, 
-							 labels_);
+							 synchronizeLabels_);
 	      for (map<string, unsigned int>::iterator it = preset_.begin();
 		   it != preset_.end(); ++ it)
 		net_.createArc(*net_.findPlace(it->first), trans, it->second);
 	      for (map<string, unsigned int>::iterator it = postset_.begin();
 		   it != postset_.end(); ++ it)
 		net_.createArc(trans, *net_.findPlace(it->first), it->second);
+	      constraintMap_[&trans] = constrainLabels_;
 	      preset_.clear();
 	      postset_.clear();
-	      labels_.clear();
+	      synchronizeLabels_.clear();
+	      constrainLabels_.clear();
+	      isSynchronize_ = true;
 	      break;
 	    }
 

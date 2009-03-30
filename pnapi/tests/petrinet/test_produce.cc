@@ -22,14 +22,9 @@ int main(int argc, char * argv[])
   ifs >> owfn >> constraint;
   ifs.close();
 
-  map<Transition *, set<Transition *> > labels;
-  labels[constraint.findTransition("t8")].insert(net.findTransition("t1"));
-  labels[constraint.findTransition("t8")].insert(net.findTransition("t2"));
-  labels[constraint.findTransition("t9")].insert(net.findTransition("t3"));
-  labels[constraint.findTransition("t9")].insert(net.findTransition("t4"));
-
   begin_test("PetriNet::produce() [product with constraint oWFN]");
-  net.produce(constraint, labels);
+  net.produce(constraint);
+  //cout << owfn << net;
   ofstream ofs("test_produce.onlineshop.result.owfn");
   ofs << owfn << net;
   ofs.close();

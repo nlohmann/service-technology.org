@@ -150,13 +150,13 @@ void setExitCode(unsigned short int newExitCode) {
     if (newExitCode >= exitAtThisCode) {
         switch ( newExitCode ) {
         case EC_FILE_ERROR:
-            trace("Error: A file error occurred. Exit.");
+            trace("\nError: A file error occurred. Exit.\n\n");
             break;
         case EC_MEMORY_EXHAUSTED:
             cerr << "new failed, memory exhausted"<< endl;
             break;
         case EC_DOT_ERROR:
-            trace( "error: Dot exited with non zero value! here\n\n");
+            trace( "\nerror: Dot exited with non zero value! here\n\n");
             break;
         case EC_NO_CUDD_FILE:
             cerr << "\nTo check equivalence of two nets, the BDD representations of"
@@ -1813,7 +1813,7 @@ int main(int argc, char** argv) {
         printf("- external dot:       %s\n", CONFIG_DOT);
         printf("- external Petrify:   %s\n", CONFIG_PETRIFY);
         printf("\n\n");
-        setExitCode(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
     }
 
 

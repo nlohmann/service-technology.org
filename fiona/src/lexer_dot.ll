@@ -77,6 +77,7 @@ id          {str}|{number}|{dq_str}|{html_str}
 
 [ \t]*      {}
 [\n]        { /* skip */}
+[\r]        { /* skip */}
 
 .           { std::cerr << "SCANNER "; dot_yyerror(""); exit(1);	}
 

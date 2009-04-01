@@ -43,6 +43,9 @@
 #include <map>
 #include <cstdlib>
 
+#include "options.h"
+#include "main.h"
+
 using std::cerr;
 using std::endl;
 using std::string;
@@ -68,7 +71,7 @@ int stg_yyerror(const char* msg)
 {
   cerr << msg << endl;
   cerr << "error in line " << stg_yylineno << ": token last read: `" << stg_yytext << "'" << endl;
-  exit(1);
+  setExitCode(EC_PARSE_ERROR);
 }
 
 // from flex

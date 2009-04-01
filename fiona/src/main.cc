@@ -147,8 +147,10 @@ unsigned short int globalExitCode = 0;
 //\param newExitCode an exit code as defined in options.h.
 void setExitCode(unsigned short int newExitCode) {
 
+	globalExitCode = newExitCode;
+
     if (newExitCode >= exitAtThisCode) {
-        switch ( newExitCode ) {
+        switch ( globalExitCode ) {
         case EC_FILE_ERROR:
             trace("\nError: A file error occurred. Exit.\n\n");
             break;
@@ -168,9 +170,9 @@ void setExitCode(unsigned short int newExitCode) {
             break;
         }
 
-        exit(newExitCode);
+        exit(globalExitCode);
     }
-    globalExitCode = newExitCode;
+
 }
 
 //! \brief an exit function in case the memory is exhausted
@@ -223,11 +225,11 @@ void readnet(const std::string& owfnfile) {
     if (parameters[P_AUTONOMOUS]) {
         if (givenPortName == "") {
             trace( "error: no port given\n\n");
-            exit(EXIT_FAILURE);
+            setExitCode(EC_NO_PORT_GIVEN);
         }
         if (PN->ports[givenPortName].empty()) {
             trace( "error: port not found\n\n");
-            exit(EXIT_FAILURE);
+            setExitCode(EC_PORT_NOT_FOUND);
         }
         PN->restrictToPort(givenPortName);
     }
@@ -1795,6 +1797,11 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
 int main(int argc, char** argv) {
 
+#ifdef LOG_NEW
+	// Add the at exit function for the newlogger
+	atexit(newloggerAtExit);
+#endif
+
     // print debug information about system variables, the current compilation
     // in case of unusal behavior of Fiona, with this information it might be easier
     // to track down the bug(s)
@@ -1813,7 +1820,8 @@ int main(int argc, char** argv) {
         printf("- external dot:       %s\n", CONFIG_DOT);
         printf("- external Petrify:   %s\n", CONFIG_PETRIFY);
         printf("\n\n");
-        exit(EXIT_SUCCESS);
+
+        exit(0);
     }
 
 
@@ -1897,7 +1905,8 @@ int main(int argc, char** argv) {
         if (parameters[P_EX] && !options[O_BDD]) {
             // equivalence on (explicit representation of) operating guidelines
             checkEquivalence(OGsFromFiles);
-            return 0;
+
+            return(globalExitCode);
         }
     }
 
@@ -2122,14 +2131,13 @@ int main(int argc, char** argv) {
         og_yylex_destroy();
 #endif
 
-// [LUHME XV] Warum an dieser Stelle?
-#ifdef LOG_NEW
-        NewLogger::printall();
-#endif
 
         // [LUHME XV] WTF?
         if (!parameters[P_PV] && !parameters[P_PNG]) {
-            return 0;
+        	// [LUHME XV] Warum an dieser Stelle?
+
+
+        	exit(globalExitCode);
         }
     } //// END OF OG INPUT
 
@@ -2310,11 +2318,7 @@ int main(int argc, char** argv) {
 
     } // end of petrinet dependant operations
 
-#ifdef LOG_NEW
-    NewLogger::printall();
-#endif
-
-    return globalExitCode;
+    return(globalExitCode);
 
 }
 

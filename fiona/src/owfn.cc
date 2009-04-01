@@ -4272,7 +4272,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
     assert(false);
     cerr << "You reached an unreachable line in function "
          << "owfnTransition ** oWFN::stubbornfirelistdeadlocks())"<< endl;
-    exit(EC_UNREACHABLE_LINE);
+    setExitCode(EC_UNREACHABLE_LINE);
 }
 #endif
 

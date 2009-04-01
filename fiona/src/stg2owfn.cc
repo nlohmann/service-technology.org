@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -85,11 +85,11 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
     extern int stg_yyparse();
     extern FILE *stg_yyin;
-    
+
     // call STG parser
     TRACE(TRACE_2, "        starting STG parser\n");
     stg_yyin = fopen(PNFileName.c_str(), "r");
-    
+
     stg_yyparse();
     fclose(stg_yyin);
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -99,30 +99,30 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 #endif
 
 
-    // create a petrinet object and create places 
+    // create a petrinet object and create places
     TRACE(TRACE_2, "        create places\n");
     PetriNet STGPN = PetriNet();
     for (set<string>::iterator p = places.begin(); p != places.end(); p++) {
         STGPN.newPlace(*p);
     }
-    
+
 
     // initially mark places
     TRACE(TRACE_2, "        initially mark places\n");
-    
+
     for (set<string>::iterator p = initialMarked.begin(); p != initialMarked.end(); p++) {
         STGPN.findPlace(*p)->mark();
     }
 
-    
+
     // create interface places out of dummy transitions
     TRACE(TRACE_2, "        create interface places\n");
 
     for (set<string>::iterator t = interface.begin(); t != interface.end(); t++) {
         string remapped = remap(*t, edgeLabels);
-    
+
         if (remapped.substr(0,5) != "FINAL") {
-        
+
             assert( remapped.find("/") == remapped.npos ); // petrify should not rename/create dummy transitions
 
             do {
@@ -147,7 +147,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
     // create transitions and arcs from/to interface places
     TRACE(TRACE_2, "        create transitions\n");
-    
+
     for (set<string>::iterator t = transitions.begin(); t != transitions.end(); t++) {
         string remapped = remap(*t, edgeLabels);
 
@@ -161,7 +161,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
             for (set<string>::iterator p = arcs[*t].begin(); p != arcs[*t].end(); p++) {
                 STGPN.newArc( transition, STGPN.findPlace(*p) );
             }
-        
+
             // create arcs t->interface and interface->t
             do {
                 // PRECONDITION: transitions are separated by ", "
@@ -173,7 +173,7 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
                 if ( remapped[0] == '?' ) {
                     if (place == NULL) place = STGPN.newPlace(placeName, IN);
-                    STGPN.newArc(place, transition); 
+                    STGPN.newArc(place, transition);
                 } else if ( remapped[0] == '!' ) {
                     if (place == NULL) place = STGPN.newPlace(placeName, OUT);
                     STGPN.newArc(transition, place);
@@ -190,10 +190,10 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
 
     // create arcs p->t
     TRACE(TRACE_2, "        create arcs\n");
-    
-    // Create a map of string sets for final condition creation. 
-    map<string, set<string> > finalCondMap; 
-        
+
+    // Create a map of string sets for final condition creation.
+    map<string, set<string> > finalCondMap;
+
     for (set<string>::iterator p = places.begin(); p != places.end(); p++) {
         for (set<string>::iterator t = arcs[*p].begin(); t != arcs[*p].end(); t++) {
             string transitionName = remap(*t, edgeLabels);
@@ -202,33 +202,33 @@ PetriNet STG2oWFN_init(vector<string> & edgeLabels, string PNFileName) {
                 STGPN.newArc(STGPN.findPlace(*p), STGPN.findTransition("t" + transitionName));
             } else {
                 // This place is the result of a final node
-                finalCondMap[transitionName].insert(*p);                                                                    
+                finalCondMap[transitionName].insert(*p);
             }
         }
     }
 
-        
-    // Get a reference to the final condition of the petri net.     
-    list< set< pair<Place *, unsigned int > > >& finalCondSet = STGPN.final_set_list;
-     
 
-    // For each transition found to be a final transition...    
+    // Get a reference to the final condition of the petri net.
+    list< set< pair<Place *, unsigned int > > >& finalCondSet = STGPN.final_set_list;
+
+
+    // For each transition found to be a final transition...
     for (map<string, set<string> >::iterator transIt = finalCondMap.begin(); transIt != finalCondMap.end(); ++transIt) {
-            
+
         // Create a set for the places having this transition in their post set.
         set< pair<Place *, unsigned int> > nextTrans;
-            
+
         // For each place in the post set...
         for (set<string>::iterator placesIt = (*transIt).second.begin(); placesIt != (*transIt).second.end(); ++placesIt) {
-                
+
             // Insert this place in the post set.
             nextTrans.insert(pair<Place *, unsigned int>(STGPN.findPlace(*placesIt), 1));
-                
-        }      
+
+        }
 
         // Add this clause to the final condition
         finalCondSet.push_back(nextTrans);
-            
+
     }
 
     return STGPN;
@@ -261,11 +261,11 @@ string STG2oWFN_main(vector<string>& edgeLabels,
     string netfile = PNFileName.substr(0, PNFileName.find(".owfn") );
     string filename = netfile + "-partner.owfn";
     ofstream *file = new ofstream(filename.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
-    
+
     if (!file->good()) {
         file->close();
-        trace("Error: A file error occured. Exit."); 
-        exit(EC_FILE_ERROR);
+        trace("Error: A file error occured. Exit.");
+        setExitCode(EC_FILE_ERROR);
     }
 
     STGPN.set_format(FORMAT_OWFN);
@@ -289,6 +289,6 @@ string STG2oWFN_main(vector<string>& edgeLabels,
         string systemcall = string(CONFIG_DOT) + " -q -Tpng -o\"" + netfile + "-partner.png\" "+ dotFilename;
         system(systemcall.c_str());
     }
-    
+
     return filename;
 }

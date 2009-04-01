@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -30,7 +30,7 @@
  * \file	debug.h
  *
  * \brief	Some debugging tools for Fiona
- * 
+ *
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  */
 
@@ -61,15 +61,15 @@ typedef enum {
                   like "is controllable" and size of IG/OG
              */
     TRACE_1, //!< notification with coarse granularity what Fiona is doing ("parsing file", "calculating IG/OG", etc.)
-    TRACE_2, //!< 
-    TRACE_3, //!< 
-    TRACE_4, //!< 
+    TRACE_2, //!<
+    TRACE_3, //!<
+    TRACE_4, //!<
     TRACE_5  //!< really everything
 } trace_level_fiona;
 
 extern trace_level_fiona debug_level;
 
-/// Provides output to stderr using different #trace_level_fiona 
+/// Provides output to stderr using different #trace_level_fiona
 /// (in order to regulate amount of output)
 void debug_trace(trace_level_fiona pTraceLevel, std::string message);
 
@@ -102,8 +102,17 @@ int og_yyerror(const char* msg);
 /// program exits after printing the error.
 int covog_yyerror(const char* msg);
 
-/// Prints an error that has been encountered while parsing an file containing a set 
+/// Prints an error that has been encountered while parsing an file containing a set
 /// of oWFN nodes to be covered. The program exits after printing the error.
 int cov_yyerror(const char* msg);
+
+
+/// Needed for atexit-function
+extern short unsigned int globalExitCode;
+
+#ifdef LOG_NEW
+	/// Prints the newlogger report
+	void newloggerAtExit(void);
+#endif
 
 #endif

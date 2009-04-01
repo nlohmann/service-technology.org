@@ -531,7 +531,7 @@ int dot_yyerror(string s) {
   
   cerr << "ERROR: " << s << " at symbol \"" << dot_yytext;
   cerr << "\" on line " << dot_yylineno << endl;
-  exit(1);
+  setExitCode(EC_PARSE_ERROR);
 }
 
 int yyerror(char const *s) {

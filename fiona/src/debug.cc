@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -30,7 +30,7 @@
  * \file	debug.cc
  *
  * \brief	Some debugging tools for Fiona
- * 
+ *
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  */
 
@@ -189,7 +189,7 @@ int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
         trace("-------------------------------------------------------------------------------\n");
     }
 
-    exit(1);
+    setExitCode(EC_PARSE_ERROR);
     return 1;
 }
 
@@ -218,7 +218,7 @@ int og_yyerror(const char* msg) {
 }
 
 //! \brief function needed for if an error occurs while parsing a .covog-file;
-//!        the msg is passed to yyerror 
+//!        the msg is passed to yyerror
 //! \param msg error message to print
 //! \return returns 1
 int covog_yyerror(const char* msg) {
@@ -230,7 +230,7 @@ int covog_yyerror(const char* msg) {
 }
 
 //! \brief function needed for if an error occurs while parsing a .cov-file;
-//!        the msg is passed to yyerror 
+//!        the msg is passed to yyerror
 //! \param msg error message to print
 //! \return returns 1
 int cov_yyerror(const char* msg) {
@@ -241,4 +241,10 @@ int cov_yyerror(const char* msg) {
     return yyerror(msg, cov_yylineno, cov_yytext, covfileToParse.c_str());
 }
 
-
+#ifdef LOG_NEW
+//! \brief prints the report of the newlogger, if the option was activated in userconfig.h
+void newloggerAtExit(void) {
+    NewLogger::printall();
+    //_exit(globalExitCode);
+}
+#endif

@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -119,7 +119,7 @@ void owfnTransition::setQuasiEnabled(bool isQuasiEnabled) {
 bool owfnTransition::isNormal() const {
 
     //trace(TRACE_5, "owfnTransition::isNormal() : start\n");
- 
+
     int countInterfacePlaces = 0;
 
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size() && countInterfacePlaces < 2; i++) {
@@ -283,12 +283,12 @@ void owfnTransition::initialize() {
 void owfnTransition::fire(oWFN * petrinet) {
 
     //trace(TRACE_5, "owfnTransition::fire(oWFN * petrinet) : start\n");
- 
+
     //cerr << "transition has " << intToString(IncrPlaces.size()) << " IncrPlaces\n" << endl;
     for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
         AdjacentPlace incrPlace = IncrPlaces[i];
         owfnPlace* incrOwfnPlace = incrPlace.getOwfnPlace();
-        
+
         petrinet->CurrentMarking[petrinet->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
         if(petrinet->CurrentMarking[petrinet->getPlaceIndex(incrOwfnPlace)] > incrOwfnPlace->capacity) {
@@ -313,7 +313,7 @@ void owfnTransition::fire(oWFN * petrinet) {
                     << decrPlace.getMultiplicity() << endl;
             cerr << "number of states calculated so far: "<< State::state_count
                     << endl;
-            exit(EC_CAPACITY_EXCEEDED);
+            setExitCode(EC_CAPACITY_EXCEEDED);
         } else {
             petrinet->CurrentMarking[petrinet->getPlaceIndex(decrOwfnPlace)] -= decrPlace.getMultiplicity();
         }
@@ -343,7 +343,7 @@ void owfnTransition::fire(oWFN * petrinet) {
     //			}
     //        }
     //    }
-    //    
+    //
     //    for(p = IncrPlaces; * p != NULL; p++) {
     //		unsigned int j;
     //        for(j=0; j < (* p) -> cardprop; j++) {
@@ -361,7 +361,7 @@ void owfnTransition::fire(oWFN * petrinet) {
 //{
 //  PN->placeHashValue -= hash_change;
 //  PN->placeHashValue %= HASHSIZE;
-// 
+//
 //}
 
 
@@ -495,7 +495,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
             PN->quasiEnabledTransitions.remove(this); // delete transition from list of quasi enabled transtions
         }
     }
-    
+
     //cout << "AFTER" << endl;
     //cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
     //cout << "transition " << name << "(" << this << ")" << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << isEnabled() << endl;

@@ -45,6 +45,8 @@
 #include <cstdlib>
 
 #include "adapter.h"
+#include "options.h"
+#include "main.h"
 
 using std::cerr;
 using std::endl;
@@ -72,7 +74,7 @@ int adapt_rules_yyerror(const char* msg)
 {
   cerr << msg << endl;
   cerr << "error in line " << adapt_rules_yylineno << ": token last read: `" << adapt_rules_yytext << "'" << endl;
-  exit(1);
+  setExitCode(EC_PARSE_ERROR);
 }
 
 %}

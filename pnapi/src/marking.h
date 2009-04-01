@@ -41,7 +41,7 @@ namespace pnapi
     Marking & successor(const Transition &t);
 
     unsigned int & operator[](const Place &);
-    unsigned int operator[](const Place &) const;
+    const unsigned int & operator[](const Place &) const;
     bool operator==(const Marking &m) const;
     Marking & operator=(const Marking &m);
 

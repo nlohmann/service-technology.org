@@ -34,7 +34,13 @@ namespace pnapi
   typedef AbstractAutomaton<StateOG> OG;
 
 
-  /// forward declaration of AbstractAutomaton
+  /*!
+   * \brief AbstractAutomaton
+   * 
+   * \note T must provide public method "isFinal()::bool".
+   * 
+   * \todo comment me!!!
+   */
   template <class T>
   class AbstractAutomaton
   {
@@ -62,6 +68,9 @@ namespace pnapi
 
     /// stg output format -- absolutely temprary
     void output_stg(std::ostream &os) const;
+    
+    /// transform an automaton to a state machine petri net
+    PetriNet & toStateMachine() const;
 
   protected:
     vector<T *> states_;
@@ -295,6 +304,68 @@ namespace pnapi
     os << ".end";
   }
 
+  /*!
+   * \brief Transforms the automaton to a state machine petri net.
+   * 
+   * States become places, edges become transitions, initial states
+   * will be initially marked and final states will be connected
+   * disjunctive in the final condition. 
+   * 
+   * \note  it is assumed that the first state in the state vector is
+   *        the initial state. 
+   */
+  template <class T>
+  PetriNet & AbstractAutomaton<T>::toStateMachine() const
+  {
+    PetriNet result_; // resulting net
+    std::map<T*,Place*> state2place_; // places by states
+    Condition final_ = false; // final places
+    
+    /* no comment */
+     
+    if (states_.empty())
+      return result_;
+    
+    // mark first state initially (see assumtion above)
+    state2place_[states_[0]] = &(result_.createPlace("",Node::INTERNAL,1));
+    if (states_[0]->isFinal())
+      final_ = final_ || (*(state2place_[states_[0]])) == 1;
+    
+    // generate places from states
+    for(int i=1; i < states_.size(); ++i)
+    {
+      Place* p = &(result_.createPlace());
+      state2place_[states_[i]] = p;
+      
+      /* 
+       * if the state is final then the according place 
+       * has to be in the final marking.
+       */ 
+      if(states_[i]->isFinal())
+        final_ = final_ || (*(state2place_[states_[i]])) == 1;
+    }  
+    
+    
+    // generate transitions from edges
+    for(int i=0; i < edges_.size(); ++i)
+    {
+      Transition* t = &(result_.createTransition());
+      
+      Place* p = state2place_[&(edges_[i]->getSource())];
+      result_.createArc(*p,*t);
+      
+      p = state2place_[&(edges_[i]->getDestination())];
+      result_.createArc(*t,*p);
+    }
+    
+    // generate final condition;
+    /// \todo addd all other places empty
+    result_.finalCondition() = final_;
+    
+    
+    return result_;
+  }
+  
 
   /// Automaton class which will be able to read SA format
   class Automaton : public AbstractAutomaton<State>

@@ -71,12 +71,17 @@ namespace pnapi
     
     /// transform an automaton to a state machine petri net
     PetriNet & toStateMachine() const;
+    
+    /// returns a set of states which are the initial states of the automaton
+    set<const T *> initialStates() const;
 
   protected:
+    /// set of states
     vector<T *> states_;
+    /// set of edges
     vector<Edge<T> *> edges_;
 
-    /// described PetriNet
+    /// described PetriNet -- needed by ServiceAutomaton
     PetriNet net_;
 
     /// Service automata output format (ig like)
@@ -131,6 +136,8 @@ namespace pnapi
 
   /*!
    * \brief   Finds a state in the set of states
+   *
+   * Finds a state by name.
    */
   template <class T>
   const T * AbstractAutomaton<T>::findState(const string name) const
@@ -144,7 +151,8 @@ namespace pnapi
 
 
   /*!
-   * \brief   Creates an automaton's edge from one state to another with a label
+   * \brief   Creates an automaton's edge from one state to 
+   *          another with a label
    */
   template <class T>
   void AbstractAutomaton<T>::createEdge(T &source, T &destination,
@@ -156,6 +164,9 @@ namespace pnapi
 
   /*!
    * \brief   Provides the SA output (IG like)
+   *
+   * Service Automaton format provides a single start node (initial state)
+   * and many final nodes (final states).
    */
   template <class T>
   void AbstractAutomaton<T>::output_sa(std::ostream &os) const
@@ -362,6 +373,25 @@ namespace pnapi
     
     
     return result_;
+  }
+  
+  
+  /*!
+   *  \brief    returns a set of initial states
+   *
+   *  An initial state is assumed to be a state with empty preset.
+   */
+  template <class T>
+  set<const T *> AbstractAutomaton<T>::initialStates() const
+  {
+    set<const T *> result;
+    result.clear();
+    
+    for (int i = 0; i < states_.size(); i++)
+      if (states_[i]->preset().empty())
+        result.insert(states_[i]);
+    
+    return result;
   }
   
 

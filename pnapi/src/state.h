@@ -42,6 +42,14 @@ namespace pnapi
   };
 
 
+  /*!
+   * \class   State
+   *
+   * The basic state class provides simple methods like names and
+   * the pre- and postsets. Each state can be set final. A state
+   * can compared to another one - 2 states are equal if the names,
+   * the pre-, and the postsets are equal.
+   */
   class State
   {
   public:
@@ -57,7 +65,9 @@ namespace pnapi
     // returns the postset
     set<State *> getPostset() const;
 
+    // switches the isFinal_ value of a state
     void final();
+    // checks the isFinal_ value
     bool isFinal() const;
 
     // comparison operator for states
@@ -75,6 +85,12 @@ namespace pnapi
   };
 
 
+  /*!
+   *  \class    StateB
+   *
+   *  These states are needed by automata creation from Petri net. They
+   *  provide an underlying marking and hash value retrieved from the marking.
+   */
   class StateB : public State
   {
   public:

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   onet21 << io::owfn << n2;
   end_test();
 
-  begin_test("normalize() with a strange unnormal net");
+ /* begin_test("normalize() with a strange unnormal net");
   PetriNet n3;
   Place &q1 = n3.createPlace("p1");
   Place &q2 = n3.createPlace("p2");
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   n3.normalize();
   ofstream onet31("test_normalize.strange_unnormal_normalized.owfn");
   onet31 << io::owfn << n3;
-  end_test();
+  end_test();*/
 
   return 0;
 }

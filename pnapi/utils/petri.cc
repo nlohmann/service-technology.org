@@ -27,6 +27,9 @@ using namespace pnapi;
 /// the command line parameters
 gengetopt_args_info args_info;
 
+/// a suffix for the output filename
+string suffix = "";
+
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -210,6 +213,7 @@ int main(int argc, char** argv) {
     * MODIFICATIONS *
     *****************/
     if (args_info.normalize_given) {
+        suffix += ".normalized";
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             if (args_info.verbose_given) {
@@ -221,6 +225,7 @@ int main(int argc, char** argv) {
     }
 
     if (args_info.negate_given) {
+        suffix += ".negated";
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             if (args_info.verbose_given) {
@@ -232,6 +237,7 @@ int main(int argc, char** argv) {
     }
 
     if (args_info.mirror_given) {
+        suffix += ".mirrored";
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             if (args_info.verbose_given) {
@@ -247,6 +253,7 @@ int main(int argc, char** argv) {
     * STRUCTURAL REDUCTION *
     ***********************/
     if (args_info.reduce_given) {
+        suffix += ".reduced";
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             PetriNet::ReductionLevel level = PetriNet::NONE;
@@ -327,7 +334,7 @@ int main(int argc, char** argv) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
             for (unsigned int j = 0; j < args_info.output_given; ++j) {
                 // try to open file to write
-                string outname = names[i] + "." + args_info.output_orig[j];
+                string outname = names[i] + suffix + "." + args_info.output_orig[j];
                 ofstream outfile(outname.c_str(), ofstream::trunc);
                 if (!outfile.is_open()) {
                     cerr << "petri: could not write to file '" << outname << "'" << endl;

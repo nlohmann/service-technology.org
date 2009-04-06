@@ -2,7 +2,6 @@ SUBDIRS = src tests utils
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
-	-rm -f COPYING
 	-rm -f compile
 	-rm -f aclocal.m4
 	-rm -f configure Doxyfile compile

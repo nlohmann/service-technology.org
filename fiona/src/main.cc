@@ -983,6 +983,8 @@ string computeOG(oWFN* PN) {
         }
     }
 
+//    sleep(100);
+
     // print statistics
     trace( "OG statistics:\n");
     graph->printGraphStatistics();
@@ -1819,6 +1821,11 @@ int main(int argc, char** argv) {
         printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
         printf("- external dot:       %s\n", CONFIG_DOT);
         printf("- external Petrify:   %s\n", CONFIG_PETRIFY);
+#ifdef LOG_NEW
+        printf("- use the newlogger:  yes\n");
+#else
+        printf("- use the newlogger:  no\n");
+#endif
         printf("\n\n");
 
         exit(0);

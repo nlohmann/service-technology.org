@@ -303,6 +303,9 @@ $(SINGLE_CHECK_TARGETS):
 $(SINGLE_CHECKLOUD_TARGETS):
 	-$(CHECKLOUD_ENVIRONMENT) ./$(@:check-%-loud=%.sh)
 
+check-regression:
+	$(MAKE) $(AM_MAKEFLAGS) check -C regression
+
 # Global memcheck target. Runs all tests under valgrind.
 memcheck:
 	$(MAKE) $(AM_MAKEFLAGS) $(MEMCHECK_ENVIRONMENT) check

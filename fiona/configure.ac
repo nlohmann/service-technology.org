@@ -38,6 +38,20 @@ CUDD_XFLAGS=""
 
 
 #############################################################################
+# check whether to use the new logger using the configure script parameter
+# "--enable-newlogger" and "--disable-newlogger" (standard)
+#############################################################################
+AC_ARG_ENABLE(newlogger,
+  AS_HELP_STRING([--enable-newlogger],[enable the new logger (disabled by default)]),
+  [enable_assert=${enableval}], [enable_newlogger=no])
+AC_MSG_CHECKING([whether to use the newlogger])
+AC_MSG_RESULT($enable_newlogger)
+if test "$enable_newlogger" = "yes"; then
+  AC_DEFINE(LOG_NEW,1,[Use the newlogger.])
+fi
+
+
+#############################################################################
 # check whether to use assertions using the configure script parameter
 # "--enable-assert" (standard) and "--disable-assert"
 #############################################################################
@@ -212,6 +226,7 @@ echo "compile for 64 bit...        $enable_64bit"
 echo "compile for Win32...         $enable_win32"
 echo "compile for Mac Universal... $enable_universal"
 echo "enable assertions...         $enable_assert"
+echo "use the newlogger...         $enable_newlogger"
 echo "dot:                         $DOT"
 echo "petrify:                     $PETRIFY"
 echo "-----------------------------------------------"

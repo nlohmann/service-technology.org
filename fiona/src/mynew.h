@@ -38,6 +38,7 @@
 #define MYNEW_H_ 
 
 #include "userconfig.h"
+#include "config.h"
 
 #ifdef LOG_NEW
 

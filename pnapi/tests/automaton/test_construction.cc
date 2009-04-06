@@ -5,6 +5,7 @@
 #include <fstream>
 
 using std::ifstream;
+using std::fstream;
 using std::cout;
 using std::endl;
 using namespace pnapi;
@@ -29,6 +30,12 @@ int main(int argc, char *argv[])
   cout << io::owfn << net[0] << std::endl;
   ServiceAutomaton sauto0(net[0]);
   cout << io::sa << sauto0;
+
+  fstream fstr;
+  fstr.open("net.stg", std::ios_base::out);
+  fstr << io::stg << sauto0;
+  fstr.close();
+
 
   ifstr.open("sequence_unnormal.owfn", std::ios_base::in);
   try

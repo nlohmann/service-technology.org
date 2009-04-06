@@ -156,10 +156,10 @@ int main(int argc, char** argv) {
 
         PetriNet net; // to store composition
         string compositionName; // to store the name of the composition
-        
+
         if (args_info.wire_arg) {
             compositionName = args_info.wire_arg;
-            
+
             // try to open wiring file
             ifstream infile(args_info.wire_arg, ifstream::in);
             if (!infile.is_open()) {
@@ -184,11 +184,11 @@ int main(int argc, char** argv) {
         } else {
             // no wiring file is given
             compositionName = "composition"; //FIXME: choose a nicer name
-            
+
             if (args_info.verbose_given) {
                 cerr << "petri: composing " << nets.size() << " nets using implicit wiring" << endl;
             }
-            
+
             // calling implicit composition
             net = PetriNet::compose(netsByName);
         }
@@ -219,7 +219,7 @@ int main(int argc, char** argv) {
             nets[i].normalize();
         }
     }
-    
+
     if (args_info.negate_given) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
             }
 
             nets[i].finalCondition().negate();
-        }        
+        }
     }
 
     if (args_info.mirror_given) {
@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
             }
 
             nets[i].mirror();
-        }        
+        }
     }
 
 
@@ -250,11 +250,11 @@ int main(int argc, char** argv) {
         for (unsigned int i = 0; i < nets.size(); ++i) {
 
             PetriNet::ReductionLevel level = PetriNet::NONE;
-            
+
             // collect the chosen reduction rules
             for (unsigned int j = 0; j < args_info.reduce_given; ++j) {
                 PetriNet::ReductionLevel newLevel = PetriNet::NONE;
-                
+
                 switch(args_info.reduce_arg[j]) {
                     case(reduce_arg_1): newLevel = PetriNet::LEVEL_1; break;
                     case(reduce_arg_2): newLevel = PetriNet::LEVEL_2; break;
@@ -279,17 +279,17 @@ int main(int argc, char** argv) {
                     case(reduce_arg_starke6): newLevel = PetriNet::STARKE_RULE_6; break;
                     case(reduce_arg_starke7): newLevel = PetriNet::STARKE_RULE_7; break;
                     case(reduce_arg_starke8): newLevel = PetriNet::STARKE_RULE_8; break;
-                    case(reduce_arg_starke9): newLevel = PetriNet::STARKE_RULE_9; break;            
-                    default: /* do nothing */; break;                
+                    case(reduce_arg_starke9): newLevel = PetriNet::STARKE_RULE_9; break;
+                    default: /* do nothing */; break;
                 }
-                
-                level = (PetriNet::ReductionLevel)(level | newLevel);                
+
+                level = (PetriNet::ReductionLevel)(level | newLevel);
             }
 
             if (args_info.verbose_given) {
                 cerr << "petri: structurally reducing Petri net '" << names[i] << "'..." << endl;
             }
-            
+
             nets[i].reduce(level);
         }
     }
@@ -347,7 +347,7 @@ int main(int argc, char** argv) {
                         outfile << io::owfn << nets[i];
                         break;
                     }
-                    
+
                     // create LoLA output
                     case (output_arg_lola): {
                         outfile << io::lola << nets[i];
@@ -358,6 +358,13 @@ int main(int argc, char** argv) {
                     case (output_arg_sa): {
                         ServiceAutomaton sauto(nets[i]);
                         outfile << io::sa << sauto;
+                        break;
+                    }
+
+                    // create automaton stg output
+                    case (output_arg_stg): {
+                        ServiceAutomaton sauto(nets[i]);
+                        outfile << io::stg << sauto;
                         break;
                     }
 

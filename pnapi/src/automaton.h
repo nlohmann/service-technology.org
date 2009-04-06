@@ -198,11 +198,9 @@ namespace pnapi
         {
           first = false;
           os << (*edges_[i]).getLabel();
-          //os << "!" << (*edges_[i]).getLabel();
         }
         else
           os << ", " << (*edges_[i]).getLabel();
-          //os << ", !" << (*edges_[i]).getLabel();
       }
       seen.insert((*edges_[i]).getLabel());
     }
@@ -246,15 +244,15 @@ namespace pnapi
     {
       os << "  " << (*edges_[i]).getSource().getName() << " -> ";
       os << (*edges_[i]).getDestination().getName() << " : ";
-      /*switch ((*edges_[i]).getType())
+      switch ((*edges_[i]).getType())
       {
       case pnapi::Node::INPUT:
-        os << "!";
+        os << "?";
         break;
       case pnapi::Node::OUTPUT:
-        os << "?";
+        os << "!";
       default: break;
-      }*/
+      }
       os << (*edges_[i]).getLabel();
       if (i == edges_.size()-1)
         os << ";\n";
@@ -301,7 +299,7 @@ namespace pnapi
       os << edges_[i]->getDestination().getName() << "\n";
     }
     os << ".marking {" << states_[0]->getName() << "}\n";
-    os << ".end";
+    os << ".end\n";
   }
 
   /*!

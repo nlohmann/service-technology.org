@@ -32,8 +32,14 @@ int InterfaceMarking::memory_max = 0;
  ******************/
 
 unsigned int InterfaceMarking::initialize(unsigned int m) {
-    // we use bytes to store the markings, so the message bound must not exceed 255
-    if (m >= UINT8_MAX) {
+    // only a positive message bound makes sense
+    if (m < 1) {
+        cerr << PACKAGE << ": message bound must be at least 1 -- aborting" << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    // we use bytes to store the markings, so the message bound must not exceed 255    
+    if (m > UINT8_MAX) {
         cerr << PACKAGE << ": message bound must not exceed " << UINT8_MAX << " -- aborting" << endl;
         exit(EXIT_FAILURE);
     }

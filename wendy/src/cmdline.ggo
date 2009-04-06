@@ -1,0 +1,31 @@
+args "--long-help --include-getopt --show-required"
+
+purpose "Wendy is a name generally given to females in English speaking countries. Its popularity is attributed to the character Wendy Darling from the play and novel 'Peter and Wendy' by J.M. Barrie."
+
+description "About Wendy:"
+
+section "Options"
+
+option "messagebound" m
+  "Set the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+
+
+section "Toggle optimizations"
+
+option "noDeadlockDetection" -
+  "Do not detect inevitable deadlocks during preprocessing."
+  flag off
+
+
+section "Debug"
+
+option "reportFrequency" r
+  "Report frequency for knowledge bubbles"
+  int
+  typestr="FREQ"
+  default="10000"
+  optional

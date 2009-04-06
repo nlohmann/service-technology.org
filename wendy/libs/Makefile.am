@@ -20,6 +20,9 @@ libpnapi_a_SOURCES = \
         marking.h marking.cc \
         io.h io.cc io-format.cc
 
+# to find Wendy's config.h header
+libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
+
 BUILT_SOURCES = parser-owfn.cc parser-petrify.cc
 
 EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h parser-lola.h

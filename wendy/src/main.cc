@@ -8,12 +8,20 @@
 #include "Knowledge.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
+#include "cmdline.h"
 
 using std::cerr;
 using std::endl;
 
 extern FILE *graph_in;
 extern int graph_parse();
+
+/// the command line parameters
+gengetopt_args_info args_info;
+
+/// report frequency for knowledge bubbles
+unsigned int reportFrequency = 10000;
+
 
 /*!
  \note possible optimization: don't create a copy for the last label but use
@@ -26,7 +34,7 @@ void calcRecursive(Knowledge *K, StoredKnowledge *SK) {
     
 //    cerr << *K << endl;
     
-    if (++calls % 10000 == 0) {
+    if (++calls % reportFrequency == 0) {
         fprintf(stderr, "%8d knowledges\n", StoredKnowledge::storedKnowledges);
     }
     
@@ -59,7 +67,35 @@ void calcRecursive(Knowledge *K, StoredKnowledge *SK) {
     }
 }
 
-int main() {
+
+/// evaluate the command line parameters
+void evaluateParameters(int argc, char** argv) {
+    // set default values
+    cmdline_parser_init(&args_info);
+
+    // initialize the parameters structure
+    struct cmdline_parser_params *params = cmdline_parser_params_create();
+
+    // call the cmdline parser
+    cmdline_parser(argc, argv, &args_info);
+
+
+    // initialize the report frequency
+    if (args_info.reportFrequency_arg < 1) {
+        fprintf(stderr, "%s: report frequency must be positive\n", PACKAGE);
+        exit(EXIT_FAILURE);
+    }
+    reportFrequency = args_info.reportFrequency_arg;
+
+
+    free(params);
+}
+
+
+int main(int argc, char** argv) {
+    // 0. parse the command line parameters
+    evaluateParameters(argc, argv);
+
     time_t start_time, end_time;
     
     // 1. parse oWFN
@@ -79,7 +115,8 @@ int main() {
 
     // 2. initialize labels and interface markings
     Label::initialize();
-    InterfaceMarking::initialize(1); // message bound
+    // initialize the interface markings with the given message bound
+    InterfaceMarking::initialize(args_info.messagebound_arg);
 
 
     // 3. convert oWFN to LoLA and write a file
@@ -88,23 +125,23 @@ int main() {
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
     
-
+    
     // 4. call LoLA and parse reachability graph
     time(&start_time);
-
-/*
+#if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)
+    // use a pipe
+    graph_in = popen("lola-full tmp.lola -M 2> /dev/null", "r");
+    graph_parse();
+    pclose(graph_in);
+    system("rm -f tmp.lola");
+#else
+    // use a file
     system("lola-full tmp.lola -m &> /dev/null");
     graph_in = fopen("tmp.graph", "r");
     graph_parse();
     fclose(graph_in);
     system("rm -f tmp.graph tmp.lola");
-*/
-
-    // 4. call LoLA and parse reachability graph using a pipe
-    graph_in = popen("lola-full tmp.lola -M 2> /dev/null", "r");
-    graph_parse();
-    pclose(graph_in);
-    system("rm -f tmp.lola");
+#endif
     time(&end_time);
 
 

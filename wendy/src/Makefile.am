@@ -7,15 +7,26 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 Label.h Label.cc \
                 InnerMarking.h InnerMarking.cc \
                 Knowledge.h Knowledge.cc \
-		StoredKnowledge.h StoredKnowledge.cc
+		StoredKnowledge.h StoredKnowledge.cc \
+		cmdline.c cmdline.h
 
 wendy_LDADD =  $(top_builddir)/libs/libpnapi.a
 
 wendy_CPPFLAGS = -I$(top_srcdir)/libs
 
-EXTRA_DIST = syntax_graph.h
+BUILT_SOURCES = cmdline.c syntax_graph.cc
 
-MAINTAINERCLEANFILES = syntax_graph.h
+EXTRA_DIST = syntax_graph.h cmdline.ggo
+
+MAINTAINERCLEANFILES = syntax_graph.h cmdline.c cmdline.h
+
+
+################################################################
+# use GNU gengetopt to create command line parser
+################################################################
+cmdline.c: cmdline.ggo
+	$(GENGETOPT) --input=cmdline.ggo
+
 
 doxygen:
 	cd ../doc ; doxygen

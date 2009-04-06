@@ -1,4 +1,8 @@
 #include "InnerMarking.h"
+#include "cmdline.h"
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 
 /******************
@@ -116,7 +120,10 @@ inline void InnerMarking::determineType() {
 
 //        assert(markingMap[successors[i]]); 
 // I had to switch off this assertion and add "markingMap[successors[i]] != NULL" to the if below.
-        if (markingMap[successors[i]] != NULL && deadlock_inevitable && !markingMap[successors[i]]->is_deadlock) {
+        if (!args_info.noDeadlockDetection_given &&
+            markingMap[successors[i]] != NULL &&
+            deadlock_inevitable &&
+            !markingMap[successors[i]]->is_deadlock) {
             deadlock_inevitable = false;
         }
         
@@ -136,7 +143,7 @@ inline void InnerMarking::determineType() {
     }
 
     // deadlock cannot be avoided any more -- treat this marking as deadlock
-    if (!is_final && deadlock_inevitable) {
+    if (!args_info.noDeadlockDetection_given && !is_final && deadlock_inevitable) {
         is_deadlock = 1;
         ++stats_inevitable_deadlocks;
     }

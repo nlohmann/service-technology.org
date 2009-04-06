@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="hub.top.seda.rcp"
+      label="Seda RCP"
+      version="1.0.5.qualifier"
+      provider-name="Service-Technology.org">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <url>
+      <update label="Seda" url="http://download.gna.org/service-tech/seda/updatesite/"/>
+      <discovery label="Seda" url="http://download.gna.org/service-tech/seda/updatesite/"/>
+   </url>
+
+   <includes
+         id="hub.top.seda.rcp.base"
+         version="0.0.0"
+         search-location="both"/>
+
+   <includes
+         id="hub.top.seda"
+         version="0.0.0"
+         search-location="both"/>
+
+   <includes
+         id="hub.top.seda.tef"
+         version="0.0.0"
+         search-location="both"/>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui.navigator"/>
+      <import plugin="org.eclipse.ui.navigator.resources"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.update.ui"/>
+      <import plugin="org.eclipse.update.core"/>
+      <import plugin="org.eclipse.update.configurator"/>
+      <import plugin="org.eclipse.ui.ide"/>
+   </requires>
+
+   <plugin
+         id="hub.top.seda.rcp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

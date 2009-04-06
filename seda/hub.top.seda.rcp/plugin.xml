@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            icon="icons/document.net.bw_2.16.png">
+         <run
+               class="hub.top.seda.rcp.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="hub.top.seda.rcp.Perspective"
+            icon="icons/document.net.bw_2.16.png"
+            id="hub.top.seda.rcp.perspective"
+            name="Service-Techology">
+      </perspective>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="hub.top.seda.rcp.application"
+            name="Seda">
+         <property
+               name="windowImages"
+               value="icons/document.net.bw_2.16.png,icons/document.net.bw3.32.png,icons/document.net.bw.64.png">
+         </property>
+         <property
+               name="appName"
+               value="Seda">
+         </property>
+         <property
+               name="aboutText"
+               value="Seda - Service-Technolog.org Editor Application">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/document.net.bw.64.png">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="icons/document.net.bw_2.16.png"
+            id="hub.top.seda.rcp.view.explorer"
+            name="Project Explorer">
+      </view>
+   </extension>
+      <extension
+         point="org.eclipse.ui.navigator.viewer">
+       <viewerActionBinding
+            viewerId="hub.top.seda.rcp.view.explorer">
+         <includes>
+             <actionExtension pattern="org.eclipse.ui.navigator.resources.*" />
+         </includes>
+       </viewerActionBinding>
+       <viewerContentBinding 
+            viewerId="hub.top.seda.rcp.view.explorer">
+          <includes>
+             <contentExtension pattern="org.eclipse.ui.navigator.resourceContent" />                  
+       <contentExtension pattern="org.eclipse.ui.navigator.resources.filters.*"/>
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper"/>
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.workingSets"/>
+          </includes>
+       </viewerContentBinding>
+   </extension>
+        <extension point="org.eclipse.ui.actionSets">
+          <actionSet label="Software Updates"
+                     visible="true"
+                     id="hub.top.seda.rcp.ui.softwareUpdates">
+            <menu label="&amp;Software Updates"
+                  path="help/helpEnd"
+                  id="hub.top.seda.rcp.ui.updateMenu">
+              <separator name="groupBeginUpdates"> </separator>
+              <separator name="groupEndUpdates"> </separator>
+            </menu>
+            <action
+                  class="hub.top.seda.rcp.ui.FindInstallAction"
+                  helpContextId="org.eclipse.update.ui.newUpdates"
+                  id="hub.top.seda.rcp.ui.newUpdates"
+                  label="&amp;Find and Install..."
+                  menubarPath="help/hub.top.seda.rcp.ui.updateMenu/BeginUpdates">
+            </action>
+            <action label="&amp;Manage Configuration..."
+                    helpContextId="org.eclipse.update.ui.newUpdates"
+                    class="hub.top.seda.rcp.ui.ManageConfigurationAction"
+                    menubarPath="help/hub.top.seda.rcp.ui.updateMenu/BeginUpdates"
+                    id="hub.top.seda.rcp.ui.configManager">
+            </action>
+            <!--
+            <action
+                  class="hub.top.seda.rcp.ui.UpdateAction"
+                  helpContextId="org.eclipse.update.ui.newUpdates"
+                  id="hub.top.seda.rcp.ui.updates"
+                  label="Check for Updates"
+                  menubarPath="help/hub.top.seda.rcp.ui.updateMenu/BeginUpdates">
+            </action>
+            <action
+                  class="hub.top.seda.rcp.ui.ExtensionAction"
+                  helpContextId="org.eclipse.update.ui.newExtensions"
+                  id="hub.top.seda.rcp.ui.extensions"
+                  label="Add new Features..."
+                  menubarPath="help/hub.top.seda.rcp.ui.updateMenu/BeginUpdates">
+            </action>
+            -->
+          </actionSet>
+        </extension>
+   
+
+</plugin>

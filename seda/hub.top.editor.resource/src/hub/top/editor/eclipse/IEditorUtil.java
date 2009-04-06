@@ -47,6 +47,18 @@ public interface IEditorUtil {
 	
 	public void refreshEditorView();
 	
+	/**
+	 * Generate a text-based representation of this editors model
+	 * using an external pretty printer.
+	 * 
+	 * @param pp
+	 * @return text representation of editor's content
+	 */
+	public String getCurrentText(PrettyPrinter pp);
+	
+	/**
+	 * @return text representation of editor's content
+	 */
 	public String getCurrentText();
 	
 	public String[] compatibleTextFileExtensions();

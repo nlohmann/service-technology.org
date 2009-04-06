@@ -7,7 +7,7 @@
     copyrightFields="false">
   <foreignModel>ptnetLoLA.ecore</foreignModel>
   <genPackages prefix="PtnetLoLA" basePackage="hub.top.editor" disposableProviderFactory="true"
-      contentTypeIdentifier="" ecorePackage="ptnetLoLA.ecore#/">
+      contentTypeIdentifier="" fileExtensions="ptnet" ecorePackage="ptnetLoLA.ecore#/">
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="ptnetLoLA.ecore#//NodeType">
       <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//NodeType/internal"/>
       <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//NodeType/input"/>
@@ -53,5 +53,17 @@
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//ArcToPlace"/>
     <genClasses ecoreClass="ptnetLoLA.ecore#//ArcToTransition"/>
+    <genClasses ecoreClass="ptnetLoLA.ecore#//TransitionExt">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/probability"/>
+    </genClasses>
+    <genClasses ecoreClass="ptnetLoLA.ecore#//PlaceExt">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//PlaceExt/probability"/>
+    </genClasses>
+    <genClasses ecoreClass="ptnetLoLA.ecore#//ArcToPlaceExt">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//ArcToPlaceExt/probability"/>
+    </genClasses>
+    <genClasses ecoreClass="ptnetLoLA.ecore#//ArcToTransitionExt">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//ArcToTransitionExt/probability"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

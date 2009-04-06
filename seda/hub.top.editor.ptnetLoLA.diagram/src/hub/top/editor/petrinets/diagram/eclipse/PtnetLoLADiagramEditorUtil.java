@@ -98,11 +98,11 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	}
 	
 	public String defaultFileExtension() {
-		return "ptnetlola_diagram";
+		return "ptnet_diagram";
 	}
 	
 	public String defaultModelFileExtension() {
-		return "ptnetlola";
+		return "ptnet";
 	}
 	
 	public boolean isCorrectRootElement(EObject obj) {

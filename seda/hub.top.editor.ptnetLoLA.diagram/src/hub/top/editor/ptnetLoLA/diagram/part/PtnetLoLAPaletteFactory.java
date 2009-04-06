@@ -37,6 +37,8 @@
 package hub.top.editor.ptnetLoLA.diagram.part;
 
 import hub.top.editor.petrinets.diagram.tool.FireTool;
+import hub.top.editor.ptnetLoLA.provider.PtnetLoLAEditPlugin;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.gef.Tool;
@@ -46,6 +48,9 @@ import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeConnectionTool;
 import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeCreationTool;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * @generated
@@ -136,8 +141,8 @@ public class PtnetLoLAPaletteFactory {
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_desc,
 				types);
 		entry
-				.setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
-						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001));
+				.setSmallIcon(AbstractUIPlugin.imageDescriptorFromPlugin(PtnetLoLAEditPlugin.ID, "icons/full/obj16/Arc.gif"));
+		
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}

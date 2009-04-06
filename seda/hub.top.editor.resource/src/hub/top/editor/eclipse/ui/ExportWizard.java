@@ -40,6 +40,7 @@ import hub.top.editor.eclipse.EditorHelper;
 import hub.top.editor.eclipse.IEditorUtil;
 import hub.top.editor.eclipse.IFrameWorkEditor;
 import hub.top.editor.eclipse.PluginHelper;
+import hub.top.editor.eclipse.PrettyPrinter;
 import hub.top.editor.resource.Activator;
 
 import java.io.PrintStream;
@@ -162,7 +163,7 @@ public class ExportWizard extends Wizard implements IExportWizard {
 	public boolean canFinish() {
 		return page1.isPageComplete() && !invalidEditor;
 	}
-
+	
 	/**
 	 * @see org.eclipse.jface.wizard.IWizard#performFinish()
 	 */
@@ -194,7 +195,13 @@ public class ExportWizard extends Wizard implements IExportWizard {
 			String targetFileName = page1.getEnteredTargetFileName();
 			
 			if (editorHelper != null) {
-				exportText = editorHelper.getEditorUtil().getCurrentText();
+				PrettyPrinter pp = chooseOutputFormatPrinter();
+				if (pp != null)
+					// there is a pretty printer to be used for export
+					exportText = editorHelper.getEditorUtil().getCurrentText(pp);
+				else
+					// no pretty printer, default exporting
+					exportText = editorHelper.getEditorUtil().getCurrentText();
 			}
 
 			if (exportText == null) {
@@ -217,5 +224,16 @@ public class ExportWizard extends Wizard implements IExportWizard {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Method to switch output format of generated output by choosing
+	 * a specific pretty printer. Override this method to include your
+	 * own pretty printer and switching logic.
+	 * 
+	 * @return pretty printer to be used in file export
+	 */
+	public PrettyPrinter chooseOutputFormatPrinter() {
+		return null;
 	}
 }

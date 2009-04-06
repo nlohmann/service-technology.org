@@ -15,7 +15,7 @@
       <editor
             class="hub.top.editor.lola.text.ModelEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            extensions="ptnetlola"
+            extensions="ptnet"
             icon="icons/document.l.16.png"
             id="hub.top.editor.lola.text.modeleditor"
             name="LoLA PT-Net Model Editor">
@@ -31,7 +31,7 @@
       <editor
             class="hub.top.editor.lola.text.ModelEditorTPN"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            extensions="ptnetlola"
+            extensions="ptnet"
             icon="icons/document.l.16.png"
             id="hub.top.editor.tpn.text.modeleditor"
             name="TPN PT-Net Model Editor">
@@ -50,7 +50,7 @@
       <editor
             class="hub.top.editor.lola.text.ModelEditorON"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            extensions="ptnetlola"
+            extensions="ptnet"
             icon="icons/document.o.16.png"
             id="hub.top.editor.opennet.text.modeleditor"
             name="Open Net Model Editor">

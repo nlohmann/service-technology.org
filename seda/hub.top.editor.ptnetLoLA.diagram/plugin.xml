@@ -6,20 +6,32 @@
       <?gmfgen generated="true"?>
       <fileTypes
          type="text"
-         extension="ptnetlola_diagram">
+         extension="ptnet_diagram">
       </fileTypes>
    </extension>
 
    <extension point="org.eclipse.emf.ecore.extension_parser">
       <?gmfgen generated="true"?>
       <parser
-         type="ptnetlola_diagram"
+         type="ptnet_diagram"
          class="org.eclipse.gmf.runtime.emf.core.resources.GMFResourceFactory">
       </parser>
    </extension>
 
    <extension point="org.eclipse.ui.editors">
       <?gmfgen generated="true"?>
+      <editor
+         id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID"
+         name="%editorName"
+         icon="icons/document.net.bw_2.16.png"
+         extensions="ptnet_diagram"
+         default="true"
+         class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditor"
+         matchingStrategy="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAMatchingStrategy"
+         contributorClass="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramActionBarContributor">
+      </editor>
+
+      <!-- for backwards compatibility -->
       <editor
          id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID"
          name="%editorName"
@@ -74,7 +86,7 @@
       <?gmfgen generated="true"?>
       <objectContribution
             id="hub.top.editor.ptnetLoLA.diagram.InitDiagram"
-            nameFilter="*.ptnetlola"
+            nameFilter="*.ptnet"
             objectClass="org.eclipse.core.resources.IFile">
          <action
                label="%initDiagramActionLabel"
@@ -84,7 +96,22 @@
                id="hub.top.editor.ptnetLoLA.diagram.InitDiagramAction">
          </action>
       </objectContribution>
-   </extension>
+   
+   	  <!-- for backwards compatibility -->
+      <objectContribution
+            id="hub.top.editor.ptnetLoLA.diagram.PtNetLoLARename"
+            nameFilter="*.ptnetlola"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="hub.top.editor.ui.actions.PtNetLoLARename"
+               enablesFor="1"
+               icon="icons/document.net.bw_2.convert.16.png"
+               id="hub.top.editor.ptnetLoLA.diagram.PtNetLoLARename"
+               label="Rename to .ptnet"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>   
 	
    <extension point="org.eclipse.gmf.runtime.common.ui.services.action.globalActionHandlerProviders">
       <?gmfgen generated="true"?>
@@ -338,14 +365,14 @@
 
    <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypeBindings">
       <?gmfgen generated="true"?>
-      <clientContext id="PtnetLoLAClientContext">
+      <clientContext id="hub.top.editor.ptnetLoLA.diagram.TypeContext">
          <enablement>
             <test
                property="org.eclipse.gmf.runtime.emf.core.editingDomain"
                value="hub.top.editor.ptnetLoLA.editingDomain"/>
          </enablement>
       </clientContext> 
-      <binding context="PtnetLoLAClientContext">
+      <binding context="hub.top.editor.ptnetLoLA.diagram.TypeContext">
          <elementType ref="hub.top.editor.ptnetLoLA.diagram.PtNet_1000"/>
          <elementType ref="hub.top.editor.ptnetLoLA.diagram.Transition_2001"/>
          <elementType ref="hub.top.editor.ptnetLoLA.diagram.Place_2002"/>
@@ -406,7 +433,7 @@
             <or>
 	           <and>
     	          <instanceof value="org.eclipse.core.resources.IFile"/>
-        	      <test property="org.eclipse.core.resources.extension" value="ptnetlola_diagram"/>
+        	      <test property="org.eclipse.core.resources.extension" value="ptnet_diagram"/>
                </and>
                <instanceof value="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem"/>
             </or>
@@ -423,7 +450,7 @@
                <or>
 	              <and>
     	             <instanceof value="org.eclipse.core.resources.IFile"/>
-        	         <test property="org.eclipse.core.resources.extension" value="ptnetlola_diagram"/>
+        	         <test property="org.eclipse.core.resources.extension" value="ptnet_diagram"/>
                   </and>
                   <instanceof value="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem"/>
                </or>
@@ -442,7 +469,7 @@
             <or>
 	           <and>
     	          <instanceof value="org.eclipse.core.resources.IFile"/>
-        	      <test property="org.eclipse.core.resources.extension" value="ptnetlola"/>
+        	      <test property="org.eclipse.core.resources.extension" value="ptnet"/>
                </and>
                <and>
                   <instanceof value="org.eclipse.emf.ecore.EObject"/>

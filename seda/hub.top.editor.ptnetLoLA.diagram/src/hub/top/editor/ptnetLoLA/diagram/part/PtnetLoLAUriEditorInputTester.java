@@ -17,7 +17,7 @@ public class PtnetLoLAUriEditorInputTester extends PropertyTester {
 			return false;
 		}
 		URIEditorInput editorInput = (URIEditorInput) receiver;
-		return "ptnetlola_diagram".equals(editorInput.getURI().fileExtension()); //$NON-NLS-1$
+		return "ptnet_diagram".equals(editorInput.getURI().fileExtension()); //$NON-NLS-1$
 	}
 
 }

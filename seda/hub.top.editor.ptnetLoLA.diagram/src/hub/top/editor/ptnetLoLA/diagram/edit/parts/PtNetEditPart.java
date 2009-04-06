@@ -180,9 +180,10 @@ public class PtNetEditPart extends DiagramEditPart {
       	if (needsBorder && netBounds != null) {
       		// draw the border rectangle
       		
-        	if (netBounds.equals(PtNetEditPart.this.getBorderFigure().getBounds()))
-          	// do not redraw if nothing has changed
+        	if (netBounds.equals(PtNetEditPart.this.getBorderFigure().getBounds())) {
+        		// do not redraw if nothing has changed
         		return;
+        	}
 
       		getBorderPrimaryShape().repositionAndShow(netBounds);
       	} else {
@@ -203,9 +204,9 @@ public class PtNetEditPart extends DiagramEditPart {
 	 */
 	protected NodeFigure createBorderFigure() {
 		DefaultSizeNodeFigure figure = new DefaultSizeNodeFigure(getMapMode()
-				.DPtoLP(100), getMapMode().DPtoLP(100));
+				.DPtoLP(0), getMapMode().DPtoLP(0));
 		
-		figure.setBounds(new Rectangle(10,10,100,100));
+		figure.setBounds(new Rectangle(0,0,0,0));
 		figure.setOpaque(false);
 		figure.setFocusTraversable(true);
 		figure.setLayoutManager(new StackLayout());
@@ -286,14 +287,22 @@ public class PtNetEditPart extends DiagramEditPart {
 		}
 		
 		public void repositionAndShow (Rectangle r) {
-  		setOutline(true);
-  		fHostFigure.setBounds(r);
-  		fHostFigure.repaint();
+	  		setOutline(true);
+	  		//setVisibility(true);
+	  		//setVisible(true);
+	  		fHostFigure.setBounds(r);
+	  		fHostFigure.repaint(r.x-1, r.y-1, r.width+1, r.height+1);
 		}
 		
 		public void hide () {
-  		setOutline(false);
-  		fHostFigure.repaint();
+	  		Rectangle oldR = fHostFigure.getBounds();
+	  		
+	  		setOutline(false);
+	  		//setVisibility(false);
+	  		//setVisible(false);
+	  		setSize(getMapMode().DPtoLP(0), getMapMode().DPtoLP(0));
+	  		fHostFigure.setBounds(new Rectangle(0,0,0,0));
+	  		fHostFigure.repaint(oldR.x-1, oldR.y-1, oldR.width+1, oldR.height+1);
 		}
 	}
 	

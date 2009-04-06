@@ -102,7 +102,7 @@ public class PtnetLoLACreationWizard extends Wizard implements INewWizard {
 	 */
 	public void addPages() {
 		diagramModelFilePage = new hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizardPage(
-				"DiagramModelFile", getSelection(), "ptnetlola_diagram"); //$NON-NLS-1$ //$NON-NLS-2$
+				"DiagramModelFile", getSelection(), "ptnet_diagram"); //$NON-NLS-1$ //$NON-NLS-2$
 		diagramModelFilePage
 				.setTitle(hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLACreationWizard_DiagramModelFilePageTitle);
 		diagramModelFilePage
@@ -110,15 +110,15 @@ public class PtnetLoLACreationWizard extends Wizard implements INewWizard {
 		addPage(diagramModelFilePage);
 
 		domainModelFilePage = new hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizardPage(
-				"DomainModelFile", getSelection(), "ptnetlola") { //$NON-NLS-1$ //$NON-NLS-2$
+				"DomainModelFile", getSelection(), "ptnet") { //$NON-NLS-1$ //$NON-NLS-2$
 
 			public void setVisible(boolean visible) {
 				if (visible) {
 					String fileName = diagramModelFilePage.getFileName();
 					fileName = fileName.substring(0, fileName.length()
-							- ".ptnetlola_diagram".length()); //$NON-NLS-1$
+							- ".ptnet_diagram".length()); //$NON-NLS-1$
 					setFileName(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
-							.getUniqueFileName(getContainerFullPath(), fileName, "ptnetlola")); //$NON-NLS-1$
+							.getUniqueFileName(getContainerFullPath(), fileName, "ptnet")); //$NON-NLS-1$
 				}
 				super.setVisible(visible);
 			}

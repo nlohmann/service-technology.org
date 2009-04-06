@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda.tef"
       label="TEF Runtime"
-      version="1.0.7.qualifier"
+      version="1.0.8.qualifier"
       provider-name="Service-Technology.org">
 
    <description>
@@ -703,10 +703,15 @@ Public License instead of this License.  But first, please read
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.emf.ecore.editor"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
       <import plugin="org.eclipse.emf.validation"/>
       <import plugin="org.eclipse.ui.navigator"/>
+      <import plugin="org.eclipse.emf.transaction"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.emf.edit.ui"/>
+      <import plugin="org.eclipse.emf.ecore.edit"/>
    </requires>
 
    <plugin

@@ -122,7 +122,7 @@ public class ModelEditorTPN extends hub.sam.tef.editor.model.ModelEditor impleme
 			 */
 			@Override
 			public String defaultFileExtension() {
-				return "ptnetlola";
+				return "ptnet";
 			}
 			
 			@Override

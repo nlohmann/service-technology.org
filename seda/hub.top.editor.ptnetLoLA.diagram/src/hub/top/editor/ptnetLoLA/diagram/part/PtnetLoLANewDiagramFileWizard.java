@@ -81,7 +81,7 @@ public class PtnetLoLANewDiagramFileWizard extends Wizard {
 		myFileCreationPage.setContainerFullPath(filePath);
 		myFileCreationPage
 				.setFileName(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil
-						.getUniqueFileName(filePath, fileName, "ptnetlola_diagram")); //$NON-NLS-1$
+						.getUniqueFileName(filePath, fileName, "ptnet_diagram")); //$NON-NLS-1$
 
 		diagramRootElementSelectionPage = new DiagramRootElementSelectionPage(
 				hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLANewDiagramFileWizard_RootSelectionPageName);

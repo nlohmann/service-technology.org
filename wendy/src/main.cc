@@ -2,19 +2,21 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
-#include <ctime>
 
 #include "InnerMarking.h"
 #include "Knowledge.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 #include "cmdline.h"
+#include "config.h"
 
-using std::cerr;
-using std::endl;
 
+/// the input file
 extern FILE *graph_in;
+
+/// the parser
 extern int graph_parse();
+
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -31,11 +33,12 @@ void calcRecursive(Knowledge *K, StoredKnowledge *SK) {
     assert(K);
     assert(SK);
     static unsigned int calls = 0;
+    static unsigned int edges = 0;
     
-//    cerr << *K << endl;
     
     if (++calls % reportFrequency == 0) {
-        fprintf(stderr, "%8d knowledges\n", StoredKnowledge::storedKnowledges);
+        fprintf(stderr, "%8d knowledges, %8d edges\n",
+            StoredKnowledge::storedKnowledges, edges);
     }
     
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
@@ -54,6 +57,7 @@ void calcRecursive(Knowledge *K, StoredKnowledge *SK) {
             
             // store an edge from the parent to this node
             SK->addSuccessor(l, SK_store);
+            ++edges;
             
             // if the node was new, check its successors
             if (SK_store == SK_new) {
@@ -82,10 +86,17 @@ void evaluateParameters(int argc, char** argv) {
 
     // initialize the report frequency
     if (args_info.reportFrequency_arg < 1) {
-        fprintf(stderr, "%s: report frequency must be positive\n", PACKAGE);
+        fprintf(stderr, "%s: report frequency must be positive -- aborting\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
     reportFrequency = args_info.reportFrequency_arg;
+
+
+    // check whether at most one file is given
+    if (args_info.inputs_num > 1) {
+        fprintf(stderr, "%s: at most one input file must be given -- aborting\n", PACKAGE);
+        exit(EXIT_FAILURE);
+    }
 
 
     free(params);
@@ -93,17 +104,28 @@ void evaluateParameters(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
-    // 0. parse the command line parameters
-    evaluateParameters(argc, argv);
-
     time_t start_time, end_time;
     
+    
+    // 0. parse the command line parameters
+    evaluateParameters(argc, argv);
+    
+        
     // 1. parse oWFN
     try {
-        std::cin >> pnapi::io::owfn >> *(InnerMarking::net);
+        // parse either from standard input or from a given file
+        if (args_info.inputs_num == 0) {
+            std::cin >> pnapi::io::owfn >> *(InnerMarking::net);
+        } else {
+            assert (args_info.inputs_num == 1);
+            std::ifstream inputStream;
+            inputStream.open(args_info.inputs[0]);
+            inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
+            inputStream.close();
+        }
         std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
     } catch (pnapi::io::InputError error) {
-        cerr << PACKAGE << error << endl;
+        std::cerr << PACKAGE << error << std::endl;
         exit(EXIT_FAILURE);
     }
     // only normal nets are supported so far

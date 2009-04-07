@@ -1,5 +1,6 @@
 #include "InnerMarking.h"
 #include "cmdline.h"
+#include "config.h"
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -42,12 +43,11 @@ void InnerMarking::initialize() {
             }
             
             if (SYNC(inner_markings[i]->labels[j])) {
-//                std::cerr << "marking m" << i << " has a sync successor: " << Label::id2name[inner_markings[i]->labels[j]] << " " << (unsigned)inner_markings[i]->labels[j] << std::endl;
                 sync[i].insert(inner_markings[i]->labels[j]);
             }
         }
     }
-        
+
     markingMap.clear();
 
     fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",

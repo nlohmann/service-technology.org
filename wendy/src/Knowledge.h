@@ -5,6 +5,7 @@
 #include <set>
 #include <vector>
 #include <queue>
+#include <ostream>
 
 #include "FullMarking.h"
 #include "InnerMarking.h"

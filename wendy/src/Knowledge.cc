@@ -1,4 +1,5 @@
 #include "Knowledge.h"
+#include "config.h"
 
 using std::map;
 using std::vector;

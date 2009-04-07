@@ -1,8 +1,9 @@
-args "--long-help --include-getopt --show-required"
+args "--long-help --include-getopt --show-required --unamed-opts=FILE"
 
 purpose "Wendy is a name generally given to females in English speaking countries. Its popularity is attributed to the character Wendy Darling from the play and novel 'Peter and Wendy' by J.M. Barrie."
 
 description "About Wendy:"
+
 
 section "Options"
 

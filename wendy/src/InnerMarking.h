@@ -23,22 +23,22 @@ class InnerMarking {
         static void initialize();
             
     public: /* static attributes */
-    
+
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;
-        
+
         /// an array of the inner markings
         static InnerMarking **inner_markings;
-        
+
         /// the number of inner markings (used as length for inner_markings)
         static InnerMarking_ID inner_marking_count;
-        
+
         /// a mapping from labels to inner markings that might receive this message
         static std::map<Label_ID, std::set<InnerMarking_ID> > receivers;
 
         /// a mapping from labels to inner markings that can synchronize
         static std::map<Label_ID, std::set<InnerMarking_ID> > sync;
-        
+
         /// the number of edges in the reachability graph (fired transitions)
         static unsigned int edges_count;
         

@@ -1,13 +1,10 @@
 #include <set>
 #include <string>
-#include <iostream>
 #include "config.h"
 #include "Label.h"
 #include "InnerMarking.h"
 
 using std::set;
-using std::endl;
-using std::cerr;
 using std::string;
 
 

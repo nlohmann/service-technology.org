@@ -1,4 +1,5 @@
 #include "StoredKnowledge.h"
+#include "config.h"
 
 using std::cerr;
 using std::endl;
@@ -272,7 +273,7 @@ unsigned int StoredKnowledge::addPredecessors() {
 }
 
 
-bool StoredKnowledge::sat() {
+bool StoredKnowledge::sat() const {
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL) {

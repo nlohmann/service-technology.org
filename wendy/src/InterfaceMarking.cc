@@ -2,15 +2,10 @@
 #define __STDC_LIMIT_MACROS
 
 #include <cmath>
-#include <iostream>
 #include <stdint.h>
-#include <algorithm>
 
 #include "config.h"
 #include "InterfaceMarking.h"
-
-using std::cerr;
-using std::endl;
 
 
 /******************
@@ -23,8 +18,8 @@ unsigned int InterfaceMarking::message_bound_bits = 0;
 unsigned int InterfaceMarking::bytes = 0;
 unsigned int InterfaceMarking::markings_per_byte = 0;
 
-int InterfaceMarking::memory_count = 0;
-int InterfaceMarking::memory_max = 0;
+unsigned int InterfaceMarking::memory_count = 0;
+unsigned int InterfaceMarking::memory_max = 0;
 
 
 /******************
@@ -34,13 +29,15 @@ int InterfaceMarking::memory_max = 0;
 unsigned int InterfaceMarking::initialize(unsigned int m) {
     // only a positive message bound makes sense
     if (m < 1) {
-        cerr << PACKAGE << ": message bound must be at least 1 -- aborting" << endl;
+        fprintf(stderr, "%s: message bound must be at least 1 -- aborting\n",
+            PACKAGE);
         exit(EXIT_FAILURE);
     }
     
     // we use bytes to store the markings, so the message bound must not exceed 255    
     if (m > UINT8_MAX) {
-        cerr << PACKAGE << ": message bound must not exceed " << UINT8_MAX << " -- aborting" << endl;
+        fprintf(stderr, "%s: message bound must not exceed %d -- aborting\n",
+            PACKAGE, UINT8_MAX);
         exit(EXIT_FAILURE);
     }
     
@@ -50,9 +47,8 @@ unsigned int InterfaceMarking::initialize(unsigned int m) {
     markings_per_byte = 8 / message_bound_bits;
     bytes = ceil((double)interface_length / (double)markings_per_byte);
     
-    cerr << PACKAGE << ": message bound set to " << m
-         << " (" << bytes << " bytes/interface marking, "
-         << message_bound_bits << " bits/event)" << endl;
+    fprintf(stderr, "%s: message bound set to %d (%d bytes/interface marking, %d bits/event)\n",
+        PACKAGE, message_bound, bytes, message_bound_bits);
 }
 
 
@@ -336,7 +332,7 @@ bool InterfaceMarking::dec(Label_ID label) {
  \return whether this is an empty interface marking
  \deprecated I'm not sure whether I need this function
  */
-bool InterfaceMarking::empty() {
+bool InterfaceMarking::empty() const {
     for (size_t i = 0; i < bytes; ++i) {
         if (storage[i] != 0) {
             return false;
@@ -346,7 +342,7 @@ bool InterfaceMarking::empty() {
     return true;
 }
 
-unsigned int InterfaceMarking::hash() {
+unsigned int InterfaceMarking::hash() const {
     unsigned int result = 0;
     
     for (unsigned int i = 0; i < bytes; ++i) {

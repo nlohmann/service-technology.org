@@ -62,7 +62,7 @@ class StoredKnowledge {
         hash_t hash() const;
         
         /// return whether this node fulfills its annotation
-        bool sat();
+        bool sat() const;
 
         /// adds a predecessor knowledge
         void addPredecessor(StoredKnowledge* k);

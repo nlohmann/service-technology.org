@@ -1,4 +1,4 @@
-#include <iostream>
+#include <ostream>
 #include "FullMarking.h"
 
 
@@ -37,7 +37,7 @@ bool FullMarking::operator!= (const FullMarking &other) const {
     if (inner != other.inner) {
         return true;
     }
-    
+
     // in case the inner markings are equal, compare interface markings
     return (interface != other.interface);
 }

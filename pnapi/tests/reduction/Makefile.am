@@ -1,88 +1,27 @@
-TESTS           = copy_owfns.sh \
-		  test_unused_status_places \
-		  test_suspicious_transitions \
-		  test_dead_nodes \
-		  test_initially_marked \
-		  test_starke_3p \
-		  test_starke_3t \
-		  test_starke_4 \
-		  test_starke_5 \
-		  test_starke_6 \
-		  test_starke_7 \
-		  test_starke_8 \
-		  test_starke_9 \
-		  test_identical_places \
-		  test_identical_transitions \
-		  test_series_places \
-		  test_series_transitions \
-		  test_self_loop_places \
-		  test_self_loop_transitions \
-		  test_equal_places 
+TESTS           = testsuit.sh 
+
+TESTS_ENVIRONMENT = srcdir=$(srcdir) builddir=$(builddir) \
+                    top_builddir=$(top_builddir)
+
+EXTRA_DIST = testsuit.sh \
+	     test_dead_nodes.net.owfn \
+	     test_identical_places.net.owfn \
+	     test_identical_transitions.net.owfn \
+	     test_series_places.net.owfn \
+	     test_series_transitions.net.owfn \
+	     test_series_transitions_keepnormal.net.owfn \
+	     test_self_loop_places.net.owfn \
+	     test_self_loop_transitions.net.owfn \
+	     test_unused_status_places.net.owfn
+
+DISTCLEANFILES =  test_dead_nodes.net.owfn.reduced.owfn \
+	     	  test_identical_places.net.owfn.reduced.owfn \
+	     	  test_identical_transitions.net.owfn.reduced.owfn \
+	     	  test_series_places.net.owfn.reduced.owfn \
+	     	  test_series_transitions.net.owfn.reduced.owfn \
+	     	  test_series_transitions_keepnormal.net.owfn.reduced.owfn \
+	     	  test_self_loop_places.net.owfn.reduced.owfn \
+	     	  test_self_loop_transitions.net.owfn.reduced.owfn \
+	     	  test_unused_status_places.net.owfn.reduced.owfn
 
 
-check_PROGRAMS  = test_unused_status_places \
-		  test_suspicious_transitions \
-		  test_dead_nodes \
-		  test_initially_marked \
-		  test_starke_3p \
-		  test_starke_3t \
-		  test_starke_4 \
-		  test_starke_5 \
-		  test_starke_6 \
-		  test_starke_7 \
-		  test_starke_8 \
-		  test_starke_9 \
-		  test_identical_places \
-		  test_identical_transitions \
-		  test_series_places \
-		  test_series_transitions \
-		  test_self_loop_places \
-		  test_self_loop_transitions \
-		  test_equal_places 
-
-test_unused_status_places_SOURCES = test_unused_status_places.cc
-test_suspicious_transitions_SOURCES = test_suspicious_transitions.cc
-test_dead_nodes_SOURCES = test_dead_nodes.cc 
-test_initially_marked_SOURCES = test_initially_marked.cc 
-test_starke_3p_SOURCES = test_starke_3p.cc 
-test_starke_3t_SOURCES = test_starke_3t.cc 
-test_starke_4_SOURCES = test_starke_4.cc
-test_starke_5_SOURCES = test_starke_5.cc
-test_starke_6_SOURCES = test_starke_6.cc
-test_starke_7_SOURCES = test_starke_7.cc
-test_starke_8_SOURCES = test_starke_8.cc
-test_starke_9_SOURCES = test_starke_9.cc
-test_identical_places_SOURCES = test_identical_places.cc 
-test_identical_transitions_SOURCES = test_identical_transitions.cc
-test_series_places_SOURCES = test_series_places.cc
-test_series_transitions_SOURCES = test_series_transitions.cc
-test_self_loop_places_SOURCES = test_self_loop_places.cc
-test_self_loop_transitions_SOURCES = test_self_loop_transitions.cc
-test_equal_places_SOURCES = test_equal_places.cc 
-
-
-AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src
-LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.a
-
-TESTS_ENVIRONMENT = srcdir=$(srcdir) builddir=$(builddir)
-
-EXTRA_DIST = copy_owfns.sh \
-	     owfn/test_dead_nodes.owfn \
-	     owfn/test_identical_places.owfn \
-	     owfn/test_identical_transitions.owfn \
-	     owfn/test_series_places.owfn \
-	     owfn/test_series_transitions.owfn \
-	     owfn/test_series_transitions_keepnormal.owfn \
-	     owfn/test_self_loop_places.owfn \
-	     owfn/test_self_loop_transitions.owfn \
-	     owfn/test_unused_status_places.owfn
-
-DISTCLEANFILES = test_dead_nodes.owfn \
-		 test_identical_places.owfn \
-		 test_identical_transitions.owfn \
-		 test_series_places.owfn \
-		 test_series_transitions.owfn \
-		 test_series_transitions_keepnormal.owfn \
-		 test_self_loop_places.owfn \
-		 test_self_loop_transitions.owfn \
-		 test_unused_status_places.owfn

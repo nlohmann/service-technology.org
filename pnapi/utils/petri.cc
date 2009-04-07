@@ -287,6 +287,7 @@ int main(int argc, char** argv) {
                     case(reduce_arg_starke7): newLevel = PetriNet::STARKE_RULE_7; break;
                     case(reduce_arg_starke8): newLevel = PetriNet::STARKE_RULE_8; break;
                     case(reduce_arg_starke9): newLevel = PetriNet::STARKE_RULE_9; break;
+                    case(reduce_arg_keep_normal): newLevel = PetriNet::KEEP_NORMAL; break;
                     default: /* do nothing */; break;
                 }
 

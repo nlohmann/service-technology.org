@@ -70,7 +70,7 @@ namespace pnapi
     void output_stg(std::ostream &os) const;
     
     /// transform an automaton to a state machine petri net
-    PetriNet & toStateMachine() const;
+    PetriNet toStateMachine() const;
     
     /// returns a set of states which are the initial states of the automaton
     set<const T *> initialStates() const;
@@ -324,36 +324,37 @@ namespace pnapi
    *        the initial state. 
    */
   template <class T>
-  PetriNet & AbstractAutomaton<T>::toStateMachine() const
+  PetriNet AbstractAutomaton<T>::toStateMachine() const
   {
     PetriNet result_; // resulting net
     std::map<T*,Place*> state2place_; // places by states
-    Condition final_ = false; // final places
+    
+    Condition final_;
+    final_ = false; // final places
     
     /* no comment */
-     
+    
     if (states_.empty())
       return result_;
     
     // mark first state initially (see assumtion above)
     state2place_[states_[0]] = &(result_.createPlace("",Node::INTERNAL,1));
     if (states_[0]->isFinal())
-      final_ = final_ || (*(state2place_[states_[0]])) == 1;
+      final_ = final_.formula() || (*(state2place_[states_[0]])) == 1;
     
     // generate places from states
     for(int i=1; i < states_.size(); ++i)
     {
       Place* p = &(result_.createPlace());
       state2place_[states_[i]] = p;
-      
+     
       /* 
        * if the state is final then the according place 
        * has to be in the final marking.
        */ 
       if(states_[i]->isFinal())
-        final_ = final_ || (*(state2place_[states_[i]])) == 1;
+        final_ = final_.formula() || (*(state2place_[states_[i]])) == 1;
     }  
-    
     
     // generate transitions from edges
     for(int i=0; i < edges_.size(); ++i)
@@ -369,8 +370,7 @@ namespace pnapi
     
     // generate final condition;
     /// \todo addd all other places empty
-    result_.finalCondition() = final_;
-    
+    result_.finalCondition() = final_.formula();
     
     return result_;
   }

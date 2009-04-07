@@ -279,7 +279,6 @@ final:
 
 multiplefinalmarkinglists:
 	{
-		/* [LUHME XV] WTF? member "finalMarkingString" durch Methode zum Erzeugen ersetzen*/
 		PN->finalMarkingString += "[";
 
 		finalMarking = new unsigned int [PlaceTable->getSize()];

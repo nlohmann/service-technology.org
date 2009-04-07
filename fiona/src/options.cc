@@ -857,6 +857,13 @@ void parse_command_line(int argc, char* argv[]) {
         setExitCode(EC_BAD_CALL);
     }
 
+    if ((parameters[P_ADAPTER] || parameters[P_SMALLADAPTER] || 
+         parameters[P_SYNTHESIZE_PARTNER_OWFN]) && options[O_NOOUTPUTFILES]) {
+        cerr << "Error: \t An adapter/partner cannot be generated without some output files." << endl;
+        cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
+        exit(EC_BAD_CALL);
+    }
+
     if (parameters[P_PNG] && netfiles.size() == 0 && ogfiles.size() == 0) {
         cerr << "Error: \t No oWFNs or OGs are given." << endl;
         cerr << "       \t Enter \"fiona --help\" for more information.\n" << endl;
@@ -910,7 +917,9 @@ void parse_command_line(int argc, char* argv[]) {
     }
 
     if (!parameters[P_PRODUCTOG] && !parameters[P_SIMULATES] &&
-        !parameters[P_EX] && options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
+        !parameters[P_EX] &&
+        !parameters[P_ADAPTER] && !parameters[P_SMALLADAPTER] &&
+        options[O_OUTFILEPREFIX] && (ogfiles.size() > 1 || netfiles.size() > 1)) {
         cerr << "Error: \t The output option cannot be used if multiple output files are to be created!\n" << endl;
         setExitCode(EC_BAD_CALL);
     }

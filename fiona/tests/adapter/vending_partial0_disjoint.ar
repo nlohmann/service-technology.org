@@ -1,0 +1,4 @@
+HIDDEN DEuro -> MEuro;
+-> MCoffeeButton;
+-> MTeaButton;
+HIDDEN MServedCoffee -> DServedCoffee;

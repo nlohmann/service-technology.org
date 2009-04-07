@@ -438,6 +438,23 @@ fi
 ############################################################################
 ## The following tests check the recursion inside the matching algorithm. ##
 ############################################################################
+
+# This is a workaround for bug #12901 (see https://gna.org/bugs/?12901).
+# Some tests rely on specific debug messages and if fiona was build without
+# them, these tests have to be skipped.
+check="$FIONA --bug"
+OUTPUT=`$check 2>&1`
+echo $OUTPUT | grep "config ASSERT:" | grep "yes" > /dev/null
+if [ $? -ne 0 ]; then
+  echo "Note: Fiona was built without assertions/debug messages, so we skip some tests!"
+  echo
+
+	# The exit 77 is the magic value which tells Automake's `make check'
+	# that this test was skipped.
+  exit 77
+fi
+
+############################################################################
 og="$DIR/cycle_1.og"
 ############################################################################
 

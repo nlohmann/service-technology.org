@@ -4444,10 +4444,8 @@ oWFN* oWFN::returnNormalOWFN() {
 
     // create all places from oWFN as places in normal oWFN
     for (Places_t::const_iterator place = Places.begin(); place != Places.end(); place++) {
-        //owfnPlace* newPlace = new owfnPlace( (*place)->getName(), (*place)->getType(), result );
         owfnPlace* newPlace = new owfnPlace( *place, result );
         assert(newPlace != NULL);
-        //newPlace->initial_marking = (*place)->initial_marking;
         result->addPlace(newPlace);
     }
 
@@ -4478,6 +4476,7 @@ oWFN* oWFN::returnNormalOWFN() {
                 owfnPlace* normalPlace = new owfnPlace(name + suffix, INTERNAL, result);
                 assert(normalPlace != NULL);
                 normalPlace->initial_marking = 0;
+                normalPlace->capacity = 1;
                 result->addPlace(normalPlace);
 
                 // create transition for normalisation
@@ -4532,6 +4531,7 @@ oWFN* oWFN::returnNormalOWFN() {
                 owfnPlace* normalPlace = new owfnPlace(name + suffix, INTERNAL, result);
                 assert(normalPlace != NULL);
                 normalPlace->initial_marking = 0;
+                normalPlace->capacity = 1;
                 result->addPlace(normalPlace);
 
                 // this special place is necessary for max occurrences of the output place
@@ -4549,6 +4549,7 @@ oWFN* oWFN::returnNormalOWFN() {
                     }
                 }
                 capacityPlace->initial_marking = maxCount;
+                capacityPlace->capacity = maxCount;
                 result->addPlace(capacityPlace);
 
                 // create transition for normalisation

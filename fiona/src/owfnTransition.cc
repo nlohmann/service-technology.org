@@ -292,7 +292,7 @@ void owfnTransition::fire(oWFN * petrinet) {
         petrinet->CurrentMarking[petrinet->getPlaceIndex(incrOwfnPlace)] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
         if(petrinet->CurrentMarking[petrinet->getPlaceIndex(incrOwfnPlace)] > incrOwfnPlace->capacity) {
-            TRACE(TRACE_2, "capacity of place " + incrOwfnPlace->name + " exceeded!\n") ;
+            TRACE(TRACE_2, "capacity " + intToString(incrOwfnPlace->capacity) + " of place " + incrOwfnPlace->name + " exceeded!\n") ;
             throw CapacityException(incrOwfnPlace->name);
             //_exit(4);
         }

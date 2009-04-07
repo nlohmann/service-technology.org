@@ -9,7 +9,8 @@ TESTS = slist.sh syntax.sh extrema.sh cyclic.sh messagebound.sh png.sh \
 	countservices.sh falseannos.sh oWFNreduction.sh \
         sim_og.sh coverability.sh \
 	matching.sh productog.sh samples.sh partner.sh \
-	minimize.sh bddtest.sh statesReduction.sh responsive.sh normalize.sh
+	minimize.sh bddtest.sh statesReduction.sh responsive.sh normalize.sh \
+    adapter.sh
 # public view not tested, since it is not correctly implemented yet
 # publicview.sh
 
@@ -56,6 +57,15 @@ EXTRA_DIST = regression/Makefile.am \
 	syntax/syntax_example_new_short.owfn \
 	syntax/formula.owfn \
 	syntax/formula.owfn.expected.og \
+    adapter/coffee_joint.owfn \
+    adapter/coffee_disjoint.owfn \
+    adapter/machine_joint.owfn \
+    adapter/machine_disjoint.owfn \
+    adapter/vending_joint.ar \
+    adapter/vending_disjoint.ar \
+    adapter/vending_partial0_disjoint.ar \
+    adapter/vending_partial1_disjoint.ar \
+    adapter/vending_partial2_disjoint.ar \
 	extrema/all_final_marking.owfn \
 	extrema/empty.owfn \
 	extrema/initial_marking_midways.owfn \

@@ -33,6 +33,9 @@
 %option yylineno
 %option nodefault
 
+/* a start condition to skip comments */
+%s COMMENT
+
 %{
 #include <cstring>
 #include <string>
@@ -50,15 +53,29 @@ name			{namestart}{namechar}*
 
 
 %%
- /* RULES */
 
-{name}	{ adapt_rules_yylval.str = strdup(adapt_rules_yytext);
-            return NAME; }
+ /* keywords */
+HIDDEN       { return RULE_HIDDEN;       }
+OBSERVABLE   { return RULE_OBSERVABLE;   }
+CONTROLLABLE { return RULE_CONTROLLABLE; }
+ /* rules for total communication flow don't need an extra keyword because */
+ /* they are the standard rules */
+ /* TOTAL        { return RULE_TOTAL;        } */
+
+ /* comments */
+"#"                             { BEGIN(COMMENT); }
+<COMMENT>[\n\r]                 { BEGIN(INITIAL); }
+<COMMENT>[^\n\r]*               { /* skip */ }
+
+ /* identifiers and other characters */
+{name}	{ adapt_rules_yylval.str = strdup(adapt_rules_yytext); return NAME; }
 "->"    { return ARROW; }
 ","     { return COMMA; }
 ";"     { return SEMICOLON; }
 
-[ \t\n\r]         { break; /* ignore whitespaces */ }
+
+ /* whitespaces */
+[ \t\n\r]         { break; /* skip */ }
 
 .             { adapt_rules_yyerror("lexical error"); }
 

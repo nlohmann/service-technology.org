@@ -828,8 +828,8 @@ string computeSmallPartner(oWFN* givenPN) {
 }
 
 
-//! \brief creates a small partner out of a given IG
-//! \param IG a pointer to an IG of an oWFN whose small partner will be computed
+//! \brief creates the most permissive partner out of a given OG
+//! \param OG a pointer to an OG of an oWFN whose most permissive partner will be computed
 //! \return a string containing the filename of the partner owfn.
 string computeMostPermissivePartner(AnnotatedGraph* OG) {
 
@@ -2182,9 +2182,8 @@ int main(int argc, char** argv) {
     else if (parameters[P_ADAPTER] || parameters[P_SMALLADAPTER]) {
 
         Adapter adapter;
-        // [LUHME XV] "generateAdapter()" in "generate()" umbenennen
         // [LUHME XV] Netze explizit übergeben
-        adapter.generateAdapter();
+        adapter.generate();
     }
     else if (parameters[P_IG] || parameters[P_OG] || parameters[P_MATCH] ||
              parameters[P_PNG] || parameters[P_REDUCE] || parameters[P_NORMALIZE] ||

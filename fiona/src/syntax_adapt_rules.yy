@@ -62,6 +62,9 @@ extern char* adapt_rules_yytext;
 extern int adapt_rules_yylineno;
 extern int adapt_rules_yylex();
 
+// defined in "debug.h"
+extern int adapt_rules_yyerror(const char*);
+
 
 namespace
 {
@@ -82,6 +85,7 @@ int adapt_rules_yyerror(const char* msg)
 // Bison options
 %name-prefix="adapt_rules_yy"
 
+%token RULE_HIDDEN RULE_OBSERVABLE RULE_CONTROLLABLE
 %token NAME ARROW COMMA SEMICOLON
 
 %token_table
@@ -96,16 +100,115 @@ int adapt_rules_yyerror(const char* msg)
 
 %%
 
-/*
- *
- * adapt_rules: ( adapt_rule ; )*
- *
- */
+/* adapter rules consist of rules for partial communication flow (hidden,
+** observable and controllable) and rules for total communication flow
+** (called standard rules or total rules) */
+
 adapt_rules:
-    adapt_rule
+    RULE_HIDDEN partial_rule
     {
-        adapter_rules.push_back(currentRule);
-        currentRule.first = list< string >();
+        hiddenRules.push_back(currentRule);
+
+        for ( list< string >::iterator channel = currentRule.first.begin(); channel != currentRule.first.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_HIDDEN ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_HIDDEN;
+        }
+
+        for ( list< string >::iterator channel = currentRule.second.begin(); channel != currentRule.second.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_HIDDEN ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_HIDDEN;
+        }
+
+        currentRule.first  = list< string >();
+        currentRule.second = list< string >();
+    }
+    SEMICOLON adapt_rules
+|
+    RULE_OBSERVABLE partial_rule
+    {
+        observableRules.push_back(currentRule);
+
+        for ( list< string >::iterator channel = currentRule.first.begin(); channel != currentRule.first.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_OBSERVABLE ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_OBSERVABLE;
+        }
+
+        for ( list< string >::iterator channel = currentRule.second.begin(); channel != currentRule.second.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_OBSERVABLE ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_OBSERVABLE;
+        }
+
+        currentRule.first  = list< string >();
+        currentRule.second = list< string >();
+    }
+    SEMICOLON adapt_rules
+|
+    RULE_CONTROLLABLE partial_rule
+    {
+        controllableRules.push_back(currentRule);
+
+        for ( list< string >::iterator channel = currentRule.first.begin(); channel != currentRule.first.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_CONTROLLABLE ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_CONTROLLABLE;
+        }
+
+        for ( list< string >::iterator channel = currentRule.second.begin(); channel != currentRule.second.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_CONTROLLABLE ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_CONTROLLABLE;
+        }
+
+        currentRule.first  = list< string >();
+        currentRule.second = list< string >();
+    }
+    SEMICOLON adapt_rules
+|
+    total_rule
+    {
+        totalRules.push_back(currentRule);
+
+        for ( list< string >::iterator channel = currentRule.first.begin(); channel != currentRule.first.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_TOTAL ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_TOTAL;
+        }
+
+        for ( list< string >::iterator channel = currentRule.second.begin(); channel != currentRule.second.end(); channel++) {
+            if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
+                 ruleTypePerChannel[*channel] != ADAPT_TOTAL ) {
+                string error = "Channel " + string(*channel) + " was used in different rule types!";
+                adapt_rules_yyerror(error.c_str());
+            }
+            ruleTypePerChannel[*channel] = ADAPT_TOTAL;
+        }
+
+        currentRule.first  = list< string >();
         currentRule.second = list< string >();
     }
     SEMICOLON adapt_rules
@@ -113,27 +216,68 @@ adapt_rules:
     /* empty */
 ;
 
-adapt_rule:
+/* partial rules cannot have optional channel lists */
+
+partial_rule:
+    channel_list 
+    {
+        currentRule.first = channelList;
+
+        map< string, bool > seen;
+        for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
+            if (!seen[*channel]) {
+                seen[*channel] = true;
+                consumeRulesPerChannel[*channel] += 1;
+            }
+        }
+
+        channelList.clear();
+    }
+    ARROW channel_list
+    {
+        currentRule.second = channelList;
+
+        map< string, bool > seen;
+        for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
+            if (!seen[*channel]) {
+                seen[*channel] = true;
+                //produceRulesPerChannel[*channel] += 1;
+            }
+        }
+
+        channelList.clear();
+    }
+;
+
+/* total rules can have optional channel lists */
+
+total_rule:
     opt_channel_list 
     {
         currentRule.first = channelList;
-        {
-            map< string, bool > seen;
-            for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++)
-            {
-                if (!seen[*channel])
-                {
-                    // count the number of rules in which current channel occurs
-                    seen[*channel] = true;
-                    rulesPerChannel[*channel] += 1;
-                }
+
+        map< string, bool > seen;
+        for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
+            if (!seen[*channel]) {
+                seen[*channel] = true;
+                consumeRulesPerChannel[*channel] += 1;
             }
         }
+
         channelList.clear();
     }
     ARROW opt_channel_list
     {
         currentRule.second = channelList;
+
+        map< string, bool > seen;
+        for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
+            if (!seen[*channel]) {
+                seen[*channel] = true;
+                //produceRulesPerChannel[*channel] += 1;
+            }
+        }
+
         channelList.clear();
     }
 ;

@@ -1,0 +1,4 @@
+CONTROLLABLE DEuro -> MEuro;
+-> MCoffeeButton;
+-> MTeaButton;
+CONTROLLABLE MServedCoffee -> DServedCoffee;

@@ -41,6 +41,7 @@
 #include <map>
 #include <string>
 #include "pnapi.h"
+#include "owfn.h"
 
 using namespace std;
 
@@ -48,8 +49,7 @@ class Adapter {
 	
 	private:
 		/// VARIABLES
-		/// list of internal places of the rewriter
-		list< string > internalPlaces;
+        /* none */
 
 
 		/// METHODS
@@ -65,18 +65,20 @@ class Adapter {
 		/// output given petri net as PNG
 		void outputPNasPNG(PNapi::PetriNet *, string);
 
-
 		/// read given services
 		PNapi::PetriNet * readService(string, string &);
 
-		/// read computed adapter control
-		PNapi::PetriNet * readControl(string);
-
 		/// expand given adapter rewriter by the rules for the interface of given service
-		void expandRules(PNapi::PetriNet *, PNapi::PetriNet *, std::string);
+		void expandRewriterWithInterface(PNapi::PetriNet *, PNapi::PetriNet *);
 
 		/// read given rules file and expand given adapter rewriter
-		void readRules(PNapi::PetriNet *);
+		void expandRewriterWithHiddenRules(PNapi::PetriNet *);
+		void expandRewriterWithObservableRules(PNapi::PetriNet *);
+		void expandRewriterWithControllableRules(PNapi::PetriNet *);
+		void expandRewriterWithTotalRules(PNapi::PetriNet *, int);
+
+        /// adapter reduction methods
+        void reduceRewriter(PNapi::PetriNet *, int);
 
 	public:
 		
@@ -87,7 +89,7 @@ class Adapter {
 		~Adapter();
 		
 		/// generate adapter
-		void generateAdapter();
+		void generate();
 };
 
 
@@ -96,8 +98,20 @@ class Adapter {
 // defines an adapter rule as pair of two string lists (channel lists)
 typedef std::pair< std::list< std::string >, std::list< std::string > > adapterRule;
 
-extern std::list< adapterRule > adapter_rules;
-extern std::map< std::string, unsigned int > rulesPerChannel;
+typedef enum {
+    ADAPT_HIDDEN,
+    ADAPT_OBSERVABLE,
+    ADAPT_CONTROLLABLE,
+    ADAPT_TOTAL
+} ruleType;
+
+extern std::list< adapterRule > hiddenRules;
+extern std::list< adapterRule > observableRules;
+extern std::list< adapterRule > controllableRules;
+extern std::list< adapterRule > totalRules;
+extern std::map< std::string, ruleType > ruleTypePerChannel;
+extern std::map< std::string, unsigned int > consumeRulesPerChannel;
+//extern std::map< std::string, unsigned int > produceRulesPerChannel;
 
 
 extern int adapt_rules_yylineno;

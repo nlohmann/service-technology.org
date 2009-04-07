@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -75,7 +75,7 @@ LogInfo::LogInfo(const string& type_, const string& filepos_) :
 }
 
 
-//! \brief Logs an allocation operation 
+//! \brief Logs an allocation operation
 //! \param mem specifies number of allocated bytes by to be logged operation.
 void LogInfo::logAllocation(size_t mem) {
     ++allocCallCount;
@@ -93,7 +93,7 @@ void LogInfo::logReallocation(size_t oldmemsize, size_t newmemsize) {
 }
 
 
-//! \brief Logs a deallocation operation 
+//! \brief Logs a deallocation operation
 //! \param mem specifies number of allocated bytes by to be logged operation.
 void LogInfo::logDeallocation(size_t mem) {
     ++deallocCallCount;
@@ -186,7 +186,7 @@ LogInfo* PointerInfo::getLogInfo() const {
 
 
 //! \brief Logs a reallocation operation for pointer associated with this
-//!        PointerInfo 
+//!        PointerInfo
 //! \param newsize newsize is the new size of the associated memory after
 ///        the reallocation operation.
 void PointerInfo::logReallocation(size_t newsize) {
@@ -247,6 +247,7 @@ void NewLogger::logAllocation(std::string type,
         << "Memory allocated at " << linfo.filepos << " was not freed."
         << endl;
     }
+
 
     pointerLog[pointer] = PointerInfo(size, log[key]);
 }
@@ -463,7 +464,7 @@ void NewLogger::printall_by_typesize() {
          << " allocs w/o matching deallocs" << endl;
 
 // debugging for memory leaks:
-    for (NewLogger::pointerLog_t::iterator pointer = pointerLog.begin(); pointer != pointerLog.end(); pointer++) 
+    for (NewLogger::pointerLog_t::iterator pointer = pointerLog.begin(); pointer != pointerLog.end(); pointer++)
     {
         PointerInfo pinfo = pointer->second;
         LogInfo linfo = *(pinfo.getLogInfo());
@@ -472,6 +473,17 @@ void NewLogger::printall_by_typesize() {
             << " (pointer: " << pointer->first << ")"
             << endl;
     }
+
+ //   cerr << "Clearing log: " << log.size() <<" entries" << endl;
+    log.clear();
+//    cerr << "Clearing pointerlog: " << pointerLog.size() <<" entries" << endl;
+    while (!pointerLog.empty()) {
+    	pointerLog.erase(pointerLog.begin());
+//    	cerr << "del" << endl;
+    }
+//   	cerr << "Clearing pointerlog: " << pointerLog.size() <<" entries" << endl;
+//    pointerLog.clear();
+
 
 }
 

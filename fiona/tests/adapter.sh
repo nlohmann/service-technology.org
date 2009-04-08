@@ -66,8 +66,10 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    # make copy of $input and work on it
-    cp $input $inputCopy
+    # make copy of input and work on it
+    cp $owfn1 $owfn1copy
+    cp $owfn2 $owfn2copy
+    cp $rules $rulescopy
 fi
 
 cmd="$FIONA -t smalladapter $owfn1copy $owfn2copy -a $rulescopy -o $outprefix -d 3"
@@ -158,8 +160,10 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    # make copy of $input and work on it
-    cp $input $inputCopy
+    # make copy of input and work on it
+    cp $owfn1 $owfn1copy
+    cp $owfn2 $owfn2copy
+    cp $rules $rulescopy
 fi
 
 cmd="$FIONA -t smalladapter $owfn1copy $owfn2copy -a $rulescopy -o $outprefix -d 3"
@@ -253,8 +257,10 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    # make copy of $input and work on it
-    cp $input $inputCopy
+    # make copy of input and work on it
+    cp $owfn1 $owfn1copy
+    cp $owfn2 $owfn2copy
+    cp $rules $rulescopy
 fi
 
 cmd="$FIONA -t smalladapter $owfn1copy $owfn2copy -a $rulescopy -o $outprefix -d 3"
@@ -337,8 +343,10 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    # make copy of $input and work on it
-    cp $input $inputCopy
+    # make copy of input and work on it
+    cp $owfn1 $owfn1copy
+    cp $owfn2 $owfn2copy
+    cp $rules $rulescopy
 fi
 
 cmd="$FIONA -t smalladapter $owfn1copy $owfn2copy -a $rulescopy -o $outprefix -d 3"
@@ -421,8 +429,10 @@ if [ "$testdir" != "$builddir" ]; then
         $MKDIR_P $builddir/$SUBDIR
     fi
 
-    # make copy of $input and work on it
-    cp $input $inputCopy
+    # make copy of input and work on it
+    cp $owfn1 $owfn1copy
+    cp $owfn2 $owfn2copy
+    cp $rules $rulescopy
 fi
 
 cmd="$FIONA -t smalladapter $owfn1copy $owfn2copy -a $rulescopy -o $outprefix -d 3"

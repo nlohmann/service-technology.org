@@ -1,10 +1,14 @@
 package hub.top.editor.ptnetLoLA.diagram.part;
 
+import java.util.HashMap;
+
 import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.ptnetLoLA.transaction.PtnetLoLAEditingDomainFactory;
+import hub.top.editor.ptnetLoLA.util.PtnetLoLAValidator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -13,9 +17,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.ui.URIEditorInput;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.gef.palette.PaletteRoot;
+import org.eclipse.gmf.runtime.common.ui.resources.IBookmark;
 import org.eclipse.gmf.runtime.common.ui.services.marker.MarkerNavigationService;
 import org.eclipse.gmf.runtime.diagram.core.preferences.PreferencesHint;
 import org.eclipse.gmf.runtime.diagram.ui.actions.ActionIds;
@@ -24,6 +31,7 @@ import org.eclipse.gmf.runtime.diagram.ui.resources.editor.document.IDocument;
 import org.eclipse.gmf.runtime.diagram.ui.resources.editor.document.IDocumentProvider;
 import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
 import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -171,6 +179,13 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 		return true;
 	}
 
+	@Override
+	public void doSave(IProgressMonitor progressMonitor) {
+		super.doSave(progressMonitor);
+		
+
+	}
+	
 	/**
 	 * @generated
 	 */
@@ -262,6 +277,29 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 			progressMonitor.setCanceled(!success);
 		}
 	}
+	
+	/**
+	 * Extended setInput method with validation upon loading
+	 * (non-Javadoc)
+	 * @see org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor#setInput(org.eclipse.ui.IEditorInput)
+	 */
+	@Override
+	public void setInput(IEditorInput input) {
+		super.setInput(input);
+		validateDocument();
+	}
+	
+	/**
+	 * Validate document after successful saving.
+	 * 
+	 * @see org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor#editorSaved()
+	 */
+	@Override
+	protected void editorSaved() {
+		super.editorSaved();
+		validateDocument();
+	}
+
 
 	/**
 	 * @generated
@@ -308,6 +346,77 @@ public class PtnetLoLADiagramEditor extends DiagramDocumentEditor implements
 	public EditorUtil getEditorUtil() {
 		// TODO Auto-generated method stub
 		return new hub.top.editor.petrinets.diagram.eclipse.PtnetLoLADiagramEditorUtil(this);
+	}
+	
+	/**
+	 * Validate current document of the editor
+	 */
+	public void validateDocument () {
+		IResource resource = (IResource)getEditorInput().getAdapter(IResource.class);
+
+		try {
+			resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+			resource.deleteMarkers(IBookmark.TYPE, true, IResource.DEPTH_INFINITE);
+			
+			if (getDiagram() != null) {
+				Diagram d = getDiagram();
+				
+				// Validate individual nodes of the diagram
+				for (Object o : d.getChildren()) {
+					View childView = (View)o;
+
+					XMLResource res = null;
+					if (childView.eResource() instanceof XMLResource)
+						res = (XMLResource)childView.eResource();
+
+					HashMap attribMap = new HashMap();
+
+					// validate places
+					if (childView.getElement() instanceof hub.top.editor.ptnetLoLA.Place) {
+						hub.top.editor.ptnetLoLA.Place p = (hub.top.editor.ptnetLoLA.Place)childView.getElement();
+						if (!PtnetLoLAValidator.validate(p)) {
+							
+							/* -- bookmark marker pointing to the node
+							marker = resource.createMarker(IBookmark.TYPE);
+							attribMap.put(IBookmark.ELEMENT_ID, res.getID(v));
+							marker.setAttributes(attribMap);
+							*/
+							
+							attribMap.put(IMarker.MESSAGE,  "Place name incompatible with LoLA file format.");
+							attribMap.put(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+							if (res != null) attribMap.put(IMarker.SOURCE_ID, res.getID(childView));
+							attribMap.put(IMarker.LOCATION, "place '"+p.getName()+"'");
+						}
+					}
+					
+					// validate transitions
+					if (childView.getElement() instanceof hub.top.editor.ptnetLoLA.Transition) {
+						hub.top.editor.ptnetLoLA.Transition t = (hub.top.editor.ptnetLoLA.Transition)childView.getElement();
+						if (!PtnetLoLAValidator.validate(t)) {
+							
+							/* -- bookmark marker pointing to the node
+							marker = resource.createMarker(IBookmark.TYPE);
+							attribMap.put(IBookmark.ELEMENT_ID, res.getID(v));
+							marker.setAttributes(attribMap);
+							*/
+							
+							attribMap.put(IMarker.MESSAGE,  "Transition name incompatible with LoLA file format.");
+							attribMap.put(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+							if (res != null) attribMap.put(IMarker.SOURCE_ID, res.getID(childView));
+							attribMap.put(IMarker.LOCATION, "transition '"+t.getName()+"'");
+						}
+					}
+					// collected attributes for a marker, so create one
+					if (attribMap.size() > 0) {
+						IMarker marker;
+						marker = resource.createMarker(IMarker.PROBLEM);
+						marker.setAttributes(attribMap);
+					}
+				} // end of validating individual nodes
+			}
+		} catch (Exception e) {
+			PtnetLoLADiagramEditorPlugin.getInstance().logError("Error", e);
+		}
 	}
 
 }

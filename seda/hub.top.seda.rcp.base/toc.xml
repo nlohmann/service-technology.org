@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Seda Table of Contents">
+	<topic label="Seda"  href="html/seda.html"> 
+		<topic label="Using Seda" href="html/subtopic.html"/> 
+	</topic>
+</toc>

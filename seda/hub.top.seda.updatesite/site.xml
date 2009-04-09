@@ -3,20 +3,28 @@
    <description url="http://download.gna.org/service-tech/seda/updatesite/">
       This site provides access to official releases of the Service-Technology.org Editor Application &quot;Seda&quot;.
    </description>
-   <feature url="features/hub.top.seda_1.0.3.jar" id="hub.top.seda" version="1.0.3" patch="true">
-      <category name="seda"/>
+   <feature url="features/hub.top.seda_1.0.5.200904091350.jar" id="hub.top.seda" version="1.0.5.200904091350">
+      <category name="Service-Technology.org Editor Application"/>
    </feature>
-   <feature url="features/hub.top.seda.tef_1.0.6.jar" id="hub.top.seda.tef" version="1.0.6" patch="true">
-      <category name="seda_tech_runtime"/>
+   <feature url="features/hub.top.seda.tef_1.0.8.200904091350.jar" id="hub.top.seda.tef" version="1.0.8.200904091350">
+      <category name="3rd-Party Seda Runtime Files"/>
    </feature>
-   <category-def name="seda" label="Service-Technology.org Editor Application">
+   <feature url="features/hub.top.seda.rcp_1.0.5.200904091350.jar" id="hub.top.seda.rcp" version="1.0.5.200904091350">
+      <category name="Seda Standalone"/>
+   </feature>
+   <category-def name="Service-Technology.org Editor Application" label="Service-Technology.org Editor Application">
       <description>
          The core of the Service-Technology.org Editor Application.
       </description>
    </category-def>
-   <category-def name="seda_tech_runtime" label="Additional Seda Runtime Files">
+   <category-def name="3rd-Party Seda Runtime Files" label="3rd-Party Seda Runtime Files">
       <description>
          Additional packages and programs that are required by Seda. Most of these packages can also be obtained from their original contributors. They are provided here for convenience and to ensure compatibility with the current release. Some original packages have been extended or modified to ensure compatibility.
+      </description>
+   </category-def>
+   <category-def name="Seda Standalone" label="Seda Standalone">
+      <description>
+         Packages and updates for the standalone Rich Client Platform application for Seda.
       </description>
    </category-def>
 </site>

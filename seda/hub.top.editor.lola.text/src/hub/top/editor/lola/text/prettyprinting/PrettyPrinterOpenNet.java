@@ -72,6 +72,17 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 			return " ";
 		}
 	}
+	
+	/**
+	 * Convert non-LoLA names to LoLA names
+	 * @param s
+	 * @return
+	 */
+	private String autoFormatIdent(String s) {
+		//String s2 = s.replace(' ', '_');
+		//return s2;
+		return s;
+	}
 
 	@Override
 	public PrettyPrintState print(EObject root) throws ModelCreatingException {
@@ -91,7 +102,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 				if (p.getType() == NodeType.INTERNAL) {
 					if (!first)	state.append(", ");
 					if (first) state.append(getWhiteSpace("indent"));
-					state.append(p.getName());
+					state.append(autoFormatIdent(p.getName()));
 					first = false;
 				}
 			}
@@ -105,7 +116,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 				if (p.getType() == NodeType.INPUT) {
 					if (!first) state.append(","+getWhiteSpace("statement"));
 					state.append(getWhiteSpace("indent"));
-					state.append(p.getName());
+					state.append(autoFormatIdent(p.getName()));
 					first = false;
 				}
 			}
@@ -119,7 +130,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 				if (p.getType() == NodeType.OUTPUT) {
 					if (!first) state.append(","+getWhiteSpace("statement"));
 					state.append(getWhiteSpace("indent"));
-					state.append(p.getName());
+					state.append(autoFormatIdent(p.getName()));
 					first = false;
 				}
 			}
@@ -133,7 +144,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 			for (RefMarkedPlace pRef : net.getInitialMarking().getPlaces()) {
 				if (!first)	state.append(", ");
 				if (first) state.append(getWhiteSpace("indent"));
-				state.append(pRef.getPlace().getName()+":"+pRef.getToken());
+				state.append(autoFormatIdent(pRef.getPlace().getName())+":"+pRef.getToken());
 				first = false;
 			}
 			state.append(";");
@@ -146,7 +157,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 				for (RefMarkedPlace pRef : net.getFinalMarking().getPlaces()) {
 					if (!first)	state.append(", ");
 					if (first) state.append(getWhiteSpace("indent"));
-					state.append(pRef.getPlace().getName()+":"+pRef.getToken());
+					state.append(autoFormatIdent(pRef.getPlace().getName())+":"+pRef.getToken());
 					first = false;
 				}
 				state.append(";");
@@ -155,7 +166,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 			state.append(getWhiteSpace("statement"));
 
 			for (Transition t : net.getTransitions()) {
-				state.append("TRANSITION "+t.getName());
+				state.append("TRANSITION "+autoFormatIdent(t.getName()));
 				state.append(getWhiteSpace("statement"));
 				
 				state.append("CONSUME");
@@ -164,7 +175,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 				for (Arc arc : t.getIncoming()) {
 					if (!first) state.append(","+getWhiteSpace("statement"));
 					state.append(getWhiteSpace("indent"));
-					state.append(arc.getSource().getName()+":"+arc.getWeight());
+					state.append(autoFormatIdent(arc.getSource().getName())+":"+arc.getWeight());
 					first = false;
 				}
 				state.append(";");
@@ -176,7 +187,7 @@ public class PrettyPrinterOpenNet extends hub.sam.tef.prettyprinting.PrettyPrint
 				for (Arc arc : t.getOutgoing()) {
 					if (!first) state.append(","+getWhiteSpace("statement"));
 					state.append(getWhiteSpace("indent"));
-					state.append(arc.getTarget().getName()+":"+arc.getWeight());
+					state.append(autoFormatIdent(arc.getTarget().getName())+":"+arc.getWeight());
 					first = false;
 				}
 				state.append(";");

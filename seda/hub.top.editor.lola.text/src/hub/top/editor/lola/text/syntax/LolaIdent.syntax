@@ -38,7 +38,7 @@
 Ascii ::= 0x20..0x7F
   ;
   
-DisallowedLola ::= ',' | ';' | ':' | '(' | ')' | '{' | '}' | `whitespace`
+DisallowedLola ::= ',' | ';' | ':' | '(' | ')' | '{' | '}' | ' ' | `whitespace`
   ;
 
 lolaident ::= (Ascii - DisallowedLola)+

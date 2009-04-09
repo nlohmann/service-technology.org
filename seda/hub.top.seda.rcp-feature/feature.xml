@@ -5,37 +5,75 @@
       version="1.0.5.qualifier"
       provider-name="Service-Technology.org">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://www.service-technology.org/">
+      Service-Technology.org Editor Application (standalone).
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright>
+      Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL2.0/LGPL2.1
+This package is part of the ServiceTechnolog.org - Service-Technology.org
+Editor Suite. This program and the accompanying materials are
+made available under the terms of the Eclipse Public License
+v1.0, or alternatively the GNU General Public License Version
+3 (or later), or alternatively the GNU Lesser General Public
+License Version 3 (or later), see LICENSE file.
+Copyright (c) 2008 Dirk Fahland.
+Dirk Fahland, Institut fuer Informatik,
+Lehrstuhl Theorie der Programmierung, Humboldt-Universitaet zu
+Berlin.
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license>
+      Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL2.0/LGPL2.1
+This package is part of the ServiceTechnolog.org - PetriNet Editor
+Framework.
+This program and the accompanying materials are made available
+under the terms of
+- the Eclipse Public License v1.0 (&quot;EPL&quot;), which accompanies
+this
+distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html,
+OR ALTERNATIVELY
+- the GNU General Public License Version 3 or later (&quot;GPL&quot;),
+which
+accompanies this distribution, and is available at
+http://www.gnu.org/licenses/gpl-3.0.html,
+OR ALTERNATIVELY
+- the GNU Lesser General Public License Version 3 or later (&quot;LGPL&quot;),
+which accompanies this distribution, and is available at
+http://www.gnu.org/licenses/lgpl.html.
+Software distributed under the License is distributed on an &quot;AS
+IS&quot; basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
+See the License for the specific language governing rights and
+limitations under the License.
+For Original Creators and Contributors, and the respective copyright
+ownership, see AUTHORS file. 
+If you wish to allow use of your version of this program only
+under the terms of either the GPL or the LGPL, and not to allow
+others to use your version of this file under the terms of the
+EPL, indicate your decision by deleting the provisions above
+and replace them with the notice and other provisions required
+by the GPL or the LGPL. If you do not delete the provisions above,
+a recipient may use your version of this file under the terms
+of any one of the EPL, the GPL or the LGPL.
    </license>
 
    <url>
       <update label="Seda" url="http://download.gna.org/service-tech/seda/updatesite/"/>
       <discovery label="Seda" url="http://download.gna.org/service-tech/seda/updatesite/"/>
+      <discovery label="EMF" url="http://download.eclipse.org/modeling/emf/updates/releases/"/>
+      <discovery label="GEF" url="http://download.eclipse.org/tools/gef/updates/releases/"/>
+      <discovery label="GMF" url="http://download.eclipse.org/modeling/gmf/updates/releases/"/>
+      <discovery label="Eclipse Platform" url="http://download.eclipse.org/eclipse/updates/3.4/"/>
    </url>
 
    <includes
-         id="hub.top.seda.rcp.base"
-         version="0.0.0"
-         search-location="both"/>
-
-   <includes
          id="hub.top.seda"
-         version="0.0.0"
-         search-location="both"/>
+         version="0.0.0"/>
 
    <includes
          id="hub.top.seda.tef"
-         version="0.0.0"
-         search-location="both"/>
+         version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>

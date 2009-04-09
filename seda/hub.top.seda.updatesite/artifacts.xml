@@ -1,0 +1,364 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository class='org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository' version='1.0.0'?>
+<repository name='Seda Updates' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
+  <properties size='2'>
+    <property name='p2.compressed' value='false'/>
+    <property name='p2.timestamp' value='1239277951031'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='52'>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.diagram' version='1.0.4.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='315973'/>
+        <property name='download.size' value='315973'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.lola.text' version='1.0.5.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='45124'/>
+        <property name='download.size' value='45124'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.edit' version='1.0.5.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='55818'/>
+        <property name='download.size' value='55818'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda' version='1.0.5.200904091332'>
+      <properties size='2'>
+        <property name='artifact.size' value='22204'/>
+        <property name='download.size' value='22204'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor' version='1.0.5.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='5472'/>
+        <property name='download.size' value='5472'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda' version='1.0.5.200904091323'>
+      <properties size='2'>
+        <property name='artifact.size' value='22204'/>
+        <property name='download.size' value='22204'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.tef' version='1.0.8.200904091323'>
+      <properties size='2'>
+        <property name='artifact.size' value='13270'/>
+        <property name='download.size' value='13270'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.rcp' version='1.0.5.200904091313'>
+      <properties size='2'>
+        <property name='artifact.size' value='1720'/>
+        <property name='download.size' value='1720'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.tef' version='1.0.8.200904091238'>
+      <properties size='2'>
+        <property name='artifact.size' value='13270'/>
+        <property name='download.size' value='13270'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.resource' version='1.0.5.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='42387'/>
+        <property name='download.size' value='42387'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.diagram' version='1.0.4.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='315974'/>
+        <property name='download.size' value='315974'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.edit' version='1.0.5.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='55818'/>
+        <property name='download.size' value='55818'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.rcp' version='1.0.5.200904091350'>
+      <properties size='2'>
+        <property name='artifact.size' value='1751'/>
+        <property name='download.size' value='1751'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor' version='1.0.5.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='5475'/>
+        <property name='download.size' value='5475'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.rcp' version='1.0.5.200904091332'>
+      <properties size='2'>
+        <property name='artifact.size' value='1720'/>
+        <property name='download.size' value='1720'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.resource' version='1.0.5.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='42387'/>
+        <property name='download.size' value='42387'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.seda.rcp' version='1.0.5.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='64759'/>
+        <property name='download.size' value='64759'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.resource' version='1.0.5.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='42388'/>
+        <property name='download.size' value='42388'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.rcp' version='1.0.5.200904091323'>
+      <properties size='2'>
+        <property name='artifact.size' value='1720'/>
+        <property name='download.size' value='1720'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA' version='1.0.5.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='77769'/>
+        <property name='download.size' value='77769'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.seda.rcp' version='1.0.5.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='64759'/>
+        <property name='download.size' value='64759'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.edit' version='1.0.5.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='55818'/>
+        <property name='download.size' value='55818'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda' version='1.0.5.200904091238'>
+      <properties size='2'>
+        <property name='artifact.size' value='22204'/>
+        <property name='download.size' value='22204'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.resource' version='1.0.5.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='42387'/>
+        <property name='download.size' value='42387'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.resource' version='1.0.5.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='42384'/>
+        <property name='download.size' value='42384'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA' version='1.0.5.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='77768'/>
+        <property name='download.size' value='77768'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.lola.text' version='1.0.5.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='45125'/>
+        <property name='download.size' value='45125'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.tef' version='1.0.8.200904091313'>
+      <properties size='2'>
+        <property name='artifact.size' value='13270'/>
+        <property name='download.size' value='13270'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.seda.rcp' version='1.0.5.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='64760'/>
+        <property name='download.size' value='64760'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.seda.rcp' version='1.0.5.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='64447'/>
+        <property name='download.size' value='64447'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor' version='1.0.5.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='5474'/>
+        <property name='download.size' value='5474'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.sam.tef' version='1.0.8'>
+      <properties size='3'>
+        <property name='artifact.size' value='438928'/>
+        <property name='download.size' value='438928'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.diagram' version='1.0.4.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='315974'/>
+        <property name='download.size' value='315974'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.lola.text' version='1.0.5.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='45124'/>
+        <property name='download.size' value='45124'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.edit' version='1.0.5.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='55818'/>
+        <property name='download.size' value='55818'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA' version='1.0.5.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='77768'/>
+        <property name='download.size' value='77768'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda' version='1.0.5.200904091350'>
+      <properties size='2'>
+        <property name='artifact.size' value='22204'/>
+        <property name='download.size' value='22204'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.edit' version='1.0.5.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='55818'/>
+        <property name='download.size' value='55818'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.lola.text' version='1.0.5.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='45124'/>
+        <property name='download.size' value='45124'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.lola.text' version='1.0.5.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='45125'/>
+        <property name='download.size' value='45125'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor' version='1.0.5.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='5474'/>
+        <property name='download.size' value='5474'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.diagram' version='1.0.4.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='315967'/>
+        <property name='download.size' value='315967'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.tef' version='1.0.8.200904091332'>
+      <properties size='2'>
+        <property name='artifact.size' value='13270'/>
+        <property name='download.size' value='13270'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda' version='1.0.5.200904091313'>
+      <properties size='2'>
+        <property name='artifact.size' value='22204'/>
+        <property name='download.size' value='22204'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.tef' version='1.0.8.200904091350'>
+      <properties size='2'>
+        <property name='artifact.size' value='13270'/>
+        <property name='download.size' value='13270'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.sam.tef.rcc' version='1.0.8'>
+      <properties size='3'>
+        <property name='artifact.size' value='330857'/>
+        <property name='download.size' value='330857'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA.diagram' version='1.0.4.200904091238'>
+      <properties size='3'>
+        <property name='artifact.size' value='315975'/>
+        <property name='download.size' value='315975'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor' version='1.0.5.200904091323'>
+      <properties size='3'>
+        <property name='artifact.size' value='5474'/>
+        <property name='download.size' value='5474'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA' version='1.0.5.200904091332'>
+      <properties size='3'>
+        <property name='artifact.size' value='77768'/>
+        <property name='download.size' value='77768'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.seda.rcp' version='1.0.5.200904091350'>
+      <properties size='3'>
+        <property name='artifact.size' value='64759'/>
+        <property name='download.size' value='64759'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='hub.top.editor.ptnetLoLA' version='1.0.5.200904091313'>
+      <properties size='3'>
+        <property name='artifact.size' value='77768'/>
+        <property name='download.size' value='77768'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='hub.top.seda.rcp' version='1.0.5.200904091238'>
+      <properties size='2'>
+        <property name='artifact.size' value='1720'/>
+        <property name='download.size' value='1720'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>

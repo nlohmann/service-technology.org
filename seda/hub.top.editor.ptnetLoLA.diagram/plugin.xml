@@ -595,6 +595,23 @@
          </partContribution>
       </contributionItemProvider>
    </extension>
-
    
+   <extension
+         id="hub.top.editor.ptnetLoLA.diagrams.tool.NodeDecoratorProvider"
+         name="NodeDecoratorProvider"
+         point="org.eclipse.gmf.runtime.diagram.ui.decoratorProviders">
+      <decoratorProvider
+            class="hub.top.editor.petrinets.diagram.graphics.NodeDecoratorProvider">
+         <Priority
+               name="Lowest">
+         </Priority>
+         <object
+               class="org.eclipse.gmf.runtime.notation.Node(org.eclipse.gmf.runtime.notation)"
+               id="NODE">
+         </object>
+         <context
+               decoratorTargets="NODE">
+         </context>
+      </decoratorProvider>
+   </extension>
 </plugin>

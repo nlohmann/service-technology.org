@@ -4,9 +4,9 @@
 #include <cmath>
 #include <stdint.h>
 
-#include "config.h"
 #include "cmdline.h"
 #include "InterfaceMarking.h"
+#include "Label.h"
 
 extern gengetopt_args_info args_info;
 
@@ -210,7 +210,7 @@ std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
  * MEMBER METHODS *
  ******************/
 
-uint8_t InterfaceMarking::get(Label_ID label) const {
+inline uint8_t InterfaceMarking::get(Label_ID label) const {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -261,7 +261,7 @@ bool InterfaceMarking::set(Label_ID label, uint8_t &v) {
 /*!
  \return whether the message bound was respected (false means violation)
  */
-bool InterfaceMarking::inc(Label_ID label) {
+inline bool InterfaceMarking::inc(Label_ID label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -297,7 +297,7 @@ bool InterfaceMarking::inc(Label_ID label) {
 /*!
  \return whether the result is positive (false means decrement of 0)
  */
-bool InterfaceMarking::dec(Label_ID label) {
+inline bool InterfaceMarking::dec(Label_ID label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -344,8 +344,8 @@ bool InterfaceMarking::empty() const {
     return true;
 }
 
-unsigned int InterfaceMarking::hash() const {
-    unsigned int result = 0;
+hash_t InterfaceMarking::hash() const {
+    hash_t result = 0;
     
     for (unsigned int i = 0; i < bytes; ++i) {
         result += (storage[i] << (7*i));

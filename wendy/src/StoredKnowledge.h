@@ -2,10 +2,7 @@
 #define _STOREDKNOWLEDGE_H
 
 #include "Knowledge.h"
-#include "InnerMarking.h"
-#include "Label.h"
 
-typedef uint16_t hash_t;
 
 /*!
  \brief knowledge (data structure for storing knowledges)

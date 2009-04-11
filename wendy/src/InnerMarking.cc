@@ -1,6 +1,6 @@
 #include "InnerMarking.h"
+#include "Label.h"
 #include "cmdline.h"
-#include "config.h"
 
 /// the command line parameters
 extern gengetopt_args_info args_info;

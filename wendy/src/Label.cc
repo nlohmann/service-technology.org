@@ -1,11 +1,11 @@
-#include <set>
-#include <string>
-#include "config.h"
 #include "Label.h"
 #include "InnerMarking.h"
 
 using std::set;
 using std::string;
+using pnapi::Node;
+using pnapi::Place;
+using pnapi::Transition;
 
 
 /******************
@@ -34,13 +34,13 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
     first_receive = 1;
     
-    const std::set<pnapi::Place*> outputPlaces = InnerMarking::net->getOutputPlaces();
-    for (set<pnapi::Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
+    const set<Place*> outputPlaces = InnerMarking::net->getOutputPlaces();
+    for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
         ++events;
         id2name[events] = "?" + (*p)->getName();
         
-        const std::set<pnapi::Node*> preset = (*p)->getPreset();
-        for (set<pnapi::Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
+        const set<Node*> preset = (*p)->getPreset();
+        for (set<Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
             name2id[(*t)->getName()] = events;
         }
     }
@@ -51,14 +51,14 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE SEND (!-step for us)
     first_send = events+1;
 
-    const std::set<pnapi::Place*> inputPlaces= InnerMarking::net->getInputPlaces();
+    const set<Place*> inputPlaces= InnerMarking::net->getInputPlaces();
 
-    for (set<pnapi::Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
+    for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
         ++events;
         id2name[events] = "!" + (*p)->getName();
 
-        const std::set<pnapi::Node*> postset = (*p)->getPostset();
-        for (set<pnapi::Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {
+        const set<Node*> postset = (*p)->getPostset();
+        for (set<Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {
             name2id[(*t)->getName()] = events;
         }
     }
@@ -70,9 +70,9 @@ void Label::initialize() {
     first_sync = events+1;
     std::map<string, Label_ID> sync_labels;
     
-    const std::set<pnapi::Transition*> trans = InnerMarking::net->getTransitions();
+    const set<Transition*> trans = InnerMarking::net->getTransitions();
     
-    for (std::set<pnapi::Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
+    for (set<Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
         if ((*t)->isSynchronized()) {
             if ((*t)->getSynchronizeLabels().size() > 1) {
                 fprintf(stderr, "%s: net is not normal!\n", PACKAGE);

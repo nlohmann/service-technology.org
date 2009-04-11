@@ -4,11 +4,9 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "config.h"
-#include "Label.h"
 #include "pnapi.h"
+#include "types.h"
 
-typedef uint32_t InnerMarking_ID;
 
 /*!
  \brief inner marking

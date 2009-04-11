@@ -3,9 +3,8 @@
 
 #include <map>
 #include <string>
-#include "config.h"
+#include "types.h"
 
-typedef uint8_t Label_ID;
 
 /*! \def SILENT(L)
     \brief shorthand notation to find out whether a label is tau */

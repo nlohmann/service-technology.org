@@ -3,12 +3,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "InnerMarking.h"
-#include "Knowledge.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 #include "cmdline.h"
-#include "config.h"
 
 
 /// the input file
@@ -158,7 +155,7 @@ int main(int argc, char** argv) {
     
     /*------------------------------------------.
     | 4. call LoLA and parse reachability graph |
-    `-------------------------------------------*/
+    `------------------------------------------*/
     time(&start_time);
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)
     // use a pipe

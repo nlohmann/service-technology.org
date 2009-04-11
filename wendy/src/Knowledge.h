@@ -1,16 +1,8 @@
 #ifndef _KNOWLEDGE_H
 #define _KNOWLEDGE_H
 
-#include <map>
-#include <set>
-#include <vector>
 #include <queue>
-#include <ostream>
-
 #include "FullMarking.h"
-#include "InnerMarking.h"
-#include "InterfaceMarking.h"
-#include "Label.h"
 
 
 /*!

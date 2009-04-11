@@ -1,5 +1,5 @@
 #include "Knowledge.h"
-#include "config.h"
+#include "Label.h"
 
 using std::map;
 using std::vector;

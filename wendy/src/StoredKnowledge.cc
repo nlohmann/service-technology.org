@@ -1,8 +1,7 @@
-#include <map>
 #include <set>
 #include <iostream>
 #include "StoredKnowledge.h"
-#include "config.h"
+#include "Label.h"
 
 using std::map;
 using std::cerr;
@@ -33,10 +32,10 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
     inner(NULL), interface(NULL), successors(NULL), predecessors(NULL),
     inDegree(0), predecessorCounter(0), is_final(0), is_sane(1)
 {
-
+    // make sure we copy from an existing object
     assert(K);
     
-    // reserve the necessary memory for the successors
+    // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         successors[l-1] = NULL;
@@ -60,6 +59,7 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
     // copy data structure to C-style arrays
     unsigned int count = 0;
 
+    // traverse the bubbles and copy the markings into the C arrays
     for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
         for (unsigned int i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking
@@ -113,11 +113,20 @@ std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
  * MEMBER FUNCTIONS *
  ********************/
 
+/*!
+ \return a pointer to a knowledge stored in the hash tree -- it is either
+         "this" if the knowledge was not found in the hash tree or a pointer
+         to a previously stored knowledge. In the latter case, the calling
+         function can detect the duplicate
+ */
 StoredKnowledge *StoredKnowledge::store() {
+    // get the element's hash value
     hash_t myHash = hash();
     
+    // check if we find a bucket with that hash value
     std::map<hash_t, std::vector<StoredKnowledge*> >::iterator el = hashTree.find(myHash);
     if (el != hashTree.end()) {
+        // we found an element with the same hash -- is it a collision?
         for (unsigned int i = 0; i < el->second.size(); ++i) {
             assert(el->second[i]);
             
@@ -133,12 +142,16 @@ StoredKnowledge *StoredKnowledge::store() {
                 
                 // compare the inner and interface markings
                 for (unsigned int j = 0; (j < size && found); ++j) {
-                    if (inner[j] != el->second[i]->inner[j] || *interface[j] != *el->second[i]->interface[j]) {
+                    if (inner[j] != el->second[i]->inner[j] ||
+                        *interface[j] != *el->second[i]->interface[j]) {
                         found = false;
                     }
                 }
 
+                // check if we found a previously stored knowledge
                 if (found) {
+                    // we found a previously stored element with the same
+                    // markings -> return a pointer to this element
                     return el->second[i];
                 }
             }
@@ -155,11 +168,13 @@ StoredKnowledge *StoredKnowledge::store() {
     hashTree[myHash].push_back(this);
     ++storedKnowledges;
 
+    // we return a pointer to the this object since it was newly stored
     return this;
 }
 
 
 void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge *knowledge) {
+    // make sure the knowledge to store exists
     assert(knowledge);
 
     // tau does not make sense here
@@ -171,12 +186,12 @@ void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge *knowledge) {
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
     
-    // increase the successor's indegree
-    ++knowledge->inDegree;
+    // increase the successor's indegree (needed for later predecessor relation)
+    ++(knowledge->inDegree);
 }
 
 
-hash_t StoredKnowledge::hash() const {
+inline hash_t StoredKnowledge::hash() const {
     // the empty knowledge has the hash value 0
     if (size == 0) {
         return 0;
@@ -391,18 +406,19 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 
 void StoredKnowledge::dot() {
     cout << "digraph G {" << endl;
-    
+
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (unsigned int i = 0; i < it->second.size(); ++i) {
             if (it->second[i]->is_sane) {
-            cout << "\"" << it->second[i] << "\" [label=\"" << *it->second[i] << "\"]" << endl;
-            for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
-                if (it->second[i]->successors[l-1] != NULL) {
-                    cout << "\"" << it->second[i] << "\" -> \"" << it->second[i]->successors[l-1] << "\" [label=\"" << Label::id2name[l] << "\"]" << endl;
+                cout << "\"" << it->second[i] << "\" [label=\"" << *it->second[i] << "\"]" << endl;
+                for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                    if (it->second[i]->successors[l-1] != NULL) {
+                        cout << "\"" << it->second[i] << "\" -> \"" << it->second[i]->successors[l-1] << "\" [label=\"" << Label::id2name[l] << "\"]" << endl;
+                    }
                 }
-            }}
+            }
         }
     }
-    
+
     cout << "}" << endl;
 }

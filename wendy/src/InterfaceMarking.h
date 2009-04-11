@@ -2,7 +2,8 @@
 #define _INTERFACEMARKING_H
 
 #include <ostream>
-#include "Label.h"
+#include "types.h"
+
 
 /*! 
   \brief an interface marking
@@ -70,6 +71,7 @@ class InterfaceMarking {
         /// destructor
         ~InterfaceMarking();
 
+
         /// comparison operator
         bool operator< (const InterfaceMarking &other) const;
 
@@ -99,7 +101,7 @@ class InterfaceMarking {
         bool empty() const;
 
         /// returns the hast value of this marking
-        unsigned int hash() const;
+        hash_t hash() const;
 
     private: /* member attributes */
 

@@ -37,9 +37,6 @@ class InterfaceMarking {
         /// initializes the class InterfaceMarking
         static unsigned int initialize(unsigned int);
         
-        static unsigned int memory_count;
-        static unsigned int memory_max;
-
     private: /* static attributes */
     
         /// the message bound

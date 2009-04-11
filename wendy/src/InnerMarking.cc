@@ -130,7 +130,7 @@ inline void InnerMarking::determineType() {
             deadlock_inevitable = false;
         }
         
-        if (labels[i] == 0) {
+        if (SILENT(labels[i])) {
             is_tau = true;
         } else {
             if (RECEIVING(labels[i])) {

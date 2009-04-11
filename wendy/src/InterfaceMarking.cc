@@ -21,9 +21,6 @@ unsigned int InterfaceMarking::message_bound_bits = 0;
 unsigned int InterfaceMarking::bytes = 0;
 unsigned int InterfaceMarking::markings_per_byte = 0;
 
-unsigned int InterfaceMarking::memory_count = 0;
-unsigned int InterfaceMarking::memory_max = 0;
-
 
 /******************
  * STATIC METHODS *
@@ -68,9 +65,6 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
     assert(bytes);
     assert(markings_per_byte);
 
-    ++memory_count;
-    memory_max = std::max(memory_count, memory_max);
-
     // reserve memory and initialize to 0
     storage = new uint8_t[bytes];
     for (size_t i = 0; i < bytes; ++i) {
@@ -87,9 +81,6 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
     assert(message_bound_bits);
     assert(bytes);
     assert(markings_per_byte);
-
-    ++memory_count;
-    memory_max = std::max(memory_count, memory_max);
 
     // reserve memory and copy values
     storage = new uint8_t[bytes];
@@ -128,9 +119,6 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label
     assert(markings_per_byte);
     assert(success);
 
-    ++memory_count;
-    memory_max = std::max(memory_count, memory_max);
-
     // reserve memory and copy values
     storage = new uint8_t[bytes];
     for (size_t i = 0; i < bytes; ++i) {
@@ -154,8 +142,6 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label
  **************/
 
 InterfaceMarking::~InterfaceMarking() {
-    --memory_count;
-
     delete[] storage;
 }
 

@@ -9,10 +9,6 @@
  \brief knowledge (data structure for building knowledges)
  */
 class Knowledge {
-    public: /* static attributes */
-        static int memory_count;
-        static int memory_max;
-    
     public: /* member functions */
 
         /// construct knowledge from (initial) inner marking

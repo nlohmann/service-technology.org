@@ -18,54 +18,6 @@ extern int graph_parse();
 /// the command line parameters
 gengetopt_args_info args_info;
 
-/// report frequency for knowledge bubbles
-unsigned int reportFrequency = 10000;
-
-
-/*!
- \note possible optimization: don't create a copy for the last label but use
-       the object itself
- */
-void calcRecursive(Knowledge *K, StoredKnowledge *SK) {
-    assert(K);
-    assert(SK);
-    static unsigned int calls = 0;
-    static unsigned int edges = 0;
-    
-    
-    if (++calls % reportFrequency == 0) {
-        fprintf(stderr, "%8d knowledges, %8d edges\n",
-            StoredKnowledge::storedKnowledges, edges);
-    }
-    
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        Knowledge *K_new = new Knowledge(K, l);
-        
-        // only process knowledges within the message bounds
-        if (K_new->is_sane) {
-            // create a compact version of the knowledge bubble
-            StoredKnowledge *SK_new = new StoredKnowledge(K_new);
-            
-            // add it to the knowledge tree
-            StoredKnowledge *SK_store = SK_new->store();
-            assert(SK_store);
-            
-            // store an edge from the parent to this node
-            SK->addSuccessor(l, SK_store);
-            ++edges;
-            
-            // if the node was new, check its successors
-            if (SK_store == SK_new) {
-                calcRecursive(K_new, SK_store);
-            } else {
-                delete SK_new;
-            }            
-        }
-        // we saw K_new's successors
-        delete K_new;
-    }
-}
-
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -84,7 +36,7 @@ void evaluateParameters(int argc, char** argv) {
         fprintf(stderr, "%s: report frequency must be positive -- aborting\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
-    reportFrequency = args_info.reportFrequency_arg;
+    StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;
 
 
     // check whether at most one file is given
@@ -105,8 +57,8 @@ int main(int argc, char** argv) {
     | 0. parse the command line parameters  |
     `--------------------------------------*/
     evaluateParameters(argc, argv);
-    
-        
+
+
     /*----------------------.
     | 1. parse the open net |
     `----------------------*/
@@ -151,8 +103,8 @@ int main(int argc, char** argv) {
     lolaFile.open("tmp.lola", std::ofstream::out | std::ofstream::trunc);
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
-    
-    
+
+
     /*------------------------------------------.
     | 4. call LoLA and parse reachability graph |
     `------------------------------------------*/
@@ -192,19 +144,15 @@ int main(int argc, char** argv) {
     StoredKnowledge *SK0 = new StoredKnowledge(K0);
     SK0->store();
 
-    calcRecursive(K0, SK0);
+    StoredKnowledge::calcRecursive(K0, SK0);
     delete K0;
     time(&end_time);
-    
+
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: stored %d knowledges [%.0f sec]\n",
             PACKAGE, StoredKnowledge::storedKnowledges, difftime(end_time, start_time));
         fprintf(stderr, "%s: used %d of %d hash buckets, maximal bucket size: %d\n",
             PACKAGE, StoredKnowledge::hashTree.size(), (1 << (8*sizeof(hash_t))), StoredKnowledge::maxBucketSize);
-    }
-
-    if (args_info.dot_given) {
-        StoredKnowledge::dot();
     }
 
 
@@ -233,8 +181,23 @@ int main(int argc, char** argv) {
             PACKAGE, redNodes, StoredKnowledge::iterations, difftime(end_time, start_time));
     }
 
+    // analyze root node
+    if (SK0->is_sane) {
+        fprintf(stderr, "%s: net is controllable: YES\n", PACKAGE);
+    } else {
+        fprintf(stderr, "%s: net is controllable: NO\n", PACKAGE);
+    }
 
-    // 9. add formulas
+
+    /*------------------.
+    | 9. output options |
+    `------------------*/
+
+    // dot output if requested
+    if (args_info.dot_given) {
+        StoredKnowledge::dot(args_info.showEmptyNode_given, args_info.formula_arg);
+    }
     
+
     return EXIT_SUCCESS;
 }

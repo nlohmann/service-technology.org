@@ -8,22 +8,11 @@ using std::cerr;
 using std::pair;
 
 
-/******************
- * STATIC MEMBERS *
- ******************/
-
-int Knowledge::memory_count = 0;
-int Knowledge::memory_max = 0;
-
-
 /***************
  * CONSTRUCTOR *
  ***************/
 
 Knowledge::Knowledge(InnerMarking_ID m) : is_sane(true), size(1) {   
-    ++memory_count;
-    memory_max = std::max(memory_count, memory_max);
-     
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     todo.push(FullMarking(m));
@@ -42,9 +31,6 @@ Knowledge::Knowledge(InnerMarking_ID m) : is_sane(true), size(1) {
        markings without interface markings.
 */
 Knowledge::Knowledge(Knowledge *parent, Label_ID label) : is_sane(true), size(0) {
-    ++memory_count;
-    memory_max = std::max(memory_count, memory_max);
-    
     // tau does not make sense here
     assert(label);
     
@@ -133,8 +119,7 @@ Knowledge::~Knowledge() {
         for (unsigned int i = 0; i < pos->second.size(); ++i) {
             delete pos->second[i];
         }
-    }    
-    --memory_count;
+    }
 }
 
 /*************

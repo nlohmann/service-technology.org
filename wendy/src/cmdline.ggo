@@ -12,13 +12,24 @@ option "dot" -
   flag off
 
 
-section "Optimizations"
+section "Options"
 
 option "messagebound" m
   "Set the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
   int
   typestr="BOUND"
   default="1"
+  optional
+
+option "showEmptyNode" e
+  "Show the empty node."
+  flag off
+
+option "formula" f
+  "Select the kind of formula to be used in outputs."
+  values="dnf","2bits","3bits" enum
+  typestr="STYLE"
+  default="dnf"
   optional
 
 

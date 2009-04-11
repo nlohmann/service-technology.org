@@ -45,8 +45,7 @@ states:
 
 state:
   KW_STATE NUMBER prog markings transitions
-    { InnerMarking::markingMap[$2] = new InnerMarking(currentLabels,
-                                                      currentSuccessors,
+    { InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
                                                       InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking)));
       currentLabels.clear();
       currentSuccessors.clear();

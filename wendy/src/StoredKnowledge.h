@@ -15,6 +15,12 @@ class StoredKnowledge {
     
         /// traverse the graph and add predecessors
         static unsigned int addPredecessors();
+        
+        /// detect red nodes
+        static unsigned int removeInsaneNodes();
+    
+        /// print a dot representation
+        static void dot();
     
     public: /* static attributes */
 
@@ -30,14 +36,11 @@ class StoredKnowledge {
         /// maximal size of a hash bucket (1 means no collisions)
         static size_t maxBucketSize;
 
-        /// number of currently stored objects
-        static int memory_count;
-
-        /// maximal number of concurrently stored objects
-        static int memory_max;
-
         /// number of markings stored
         static int entries_count;
+        
+        /// number of iterations needed to removed insane nodes
+        static unsigned int iterations;
 
     public: /* member functions */
 
@@ -47,8 +50,10 @@ class StoredKnowledge {
         /// destructor
         ~StoredKnowledge();
 
+
         /// stream output operator
         friend std::ostream& operator<< (std::ostream&, const StoredKnowledge&);
+
 
         /// stores this object in the hash tree and returns a pointer to the result
         StoredKnowledge *store();
@@ -56,33 +61,40 @@ class StoredKnowledge {
         /// adds a successor knowledge
         void addSuccessor(Label_ID, StoredKnowledge*);
         
+        /// return whether this node fulfills its annotation
+        bool sat();
+
     private: /* member functions */
 
         /// return the hash value of this object
         hash_t hash() const;
         
-        /// return whether this node fulfills its annotation
-        bool sat() const;
-
         /// adds a predecessor knowledge
         void addPredecessor(StoredKnowledge* k);
 
-    private: /* member attributes */
+    public: /* member attributes */
 
         /// whether this bubble contains a final marking
         unsigned is_final : 1;
 
-        /// an array of inner markings
-        InnerMarking_ID *inner;
+        /// whether this bubble is sane
+        unsigned is_sane : 1;
 
-        /// an array of interface markings
-        InterfaceMarking **interface;
+    private: /* member attributes */
 
         /// the number of markings stored in this knowledge
         unsigned int size;
 
-        /// the successors of this knowledge
+        /// an array of inner markings (length is size)
+        InnerMarking_ID *inner;
+
+        /// an array of interface markings (length is size)
+        InterfaceMarking **interface;
+
+
+        /// the successors of this knowledge (length is fixed by the labels)
         StoredKnowledge **successors;
+
 
         /// the number of predecessors
         unsigned int inDegree;

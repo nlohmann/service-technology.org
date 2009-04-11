@@ -34,7 +34,13 @@ namespace pnapi
   typedef AbstractAutomaton<StateOG> OG;
 
 
-  /// forward declaration of AbstractAutomaton
+  /*!
+   * \brief AbstractAutomaton
+   * 
+   * \note T must provide public method "isFinal()::bool".
+   * 
+   * \todo comment me!!!
+   */
   template <class T>
   class AbstractAutomaton
   {
@@ -62,12 +68,20 @@ namespace pnapi
 
     /// stg output format -- absolutely temprary
     void output_stg(std::ostream &os) const;
+    
+    /// transform an automaton to a state machine petri net
+    PetriNet toStateMachine() const;
+    
+    /// returns a set of states which are the initial states of the automaton
+    set<const T *> initialStates() const;
 
   protected:
+    /// set of states
     vector<T *> states_;
+    /// set of edges
     vector<Edge<T> *> edges_;
 
-    /// described PetriNet
+    /// described PetriNet -- needed by ServiceAutomaton
     PetriNet net_;
 
     /// Service automata output format (ig like)
@@ -122,6 +136,8 @@ namespace pnapi
 
   /*!
    * \brief   Finds a state in the set of states
+   *
+   * Finds a state by name.
    */
   template <class T>
   const T * AbstractAutomaton<T>::findState(const string name) const
@@ -135,7 +151,8 @@ namespace pnapi
 
 
   /*!
-   * \brief   Creates an automaton's edge from one state to another with a label
+   * \brief   Creates an automaton's edge from one state to 
+   *          another with a label
    */
   template <class T>
   void AbstractAutomaton<T>::createEdge(T &source, T &destination,
@@ -147,6 +164,9 @@ namespace pnapi
 
   /*!
    * \brief   Provides the SA output (IG like)
+   *
+   * Service Automaton format provides a single start node (initial state)
+   * and many final nodes (final states).
    */
   template <class T>
   void AbstractAutomaton<T>::output_sa(std::ostream &os) const
@@ -189,11 +209,9 @@ namespace pnapi
         {
           first = false;
           os << (*edges_[i]).getLabel();
-          //os << "!" << (*edges_[i]).getLabel();
         }
         else
           os << ", " << (*edges_[i]).getLabel();
-          //os << ", !" << (*edges_[i]).getLabel();
       }
       seen.insert((*edges_[i]).getLabel());
     }
@@ -237,15 +255,15 @@ namespace pnapi
     {
       os << "  " << (*edges_[i]).getSource().getName() << " -> ";
       os << (*edges_[i]).getDestination().getName() << " : ";
-      /*switch ((*edges_[i]).getType())
+      switch ((*edges_[i]).getType())
       {
       case pnapi::Node::INPUT:
-        os << "!";
+        os << "?";
         break;
       case pnapi::Node::OUTPUT:
-        os << "?";
+        os << "!";
       default: break;
-      }*/
+      }
       os << (*edges_[i]).getLabel();
       if (i == edges_.size()-1)
         os << ";\n";
@@ -292,9 +310,90 @@ namespace pnapi
       os << edges_[i]->getDestination().getName() << "\n";
     }
     os << ".marking {" << states_[0]->getName() << "}\n";
-    os << ".end";
+    os << ".end\n";
   }
 
+  /*!
+   * \brief Transforms the automaton to a state machine petri net.
+   * 
+   * States become places, edges become transitions, initial states
+   * will be initially marked and final states will be connected
+   * disjunctive in the final condition. 
+   * 
+   * \note  it is assumed that the first state in the state vector is
+   *        the initial state. 
+   */
+  template <class T>
+  PetriNet AbstractAutomaton<T>::toStateMachine() const
+  {
+    PetriNet result_; // resulting net
+    std::map<T*,Place*> state2place_; // places by states
+    
+    Condition final_;
+    final_ = false; // final places
+    
+    /* no comment */
+    
+    if (states_.empty())
+      return result_;
+    
+    // mark first state initially (see assumtion above)
+    state2place_[states_[0]] = &(result_.createPlace("",Node::INTERNAL,1));
+    if (states_[0]->isFinal())
+      final_ = final_.formula() || (*(state2place_[states_[0]])) == 1;
+    
+    // generate places from states
+    for(int i=1; i < states_.size(); ++i)
+    {
+      Place* p = &(result_.createPlace());
+      state2place_[states_[i]] = p;
+     
+      /* 
+       * if the state is final then the according place 
+       * has to be in the final marking.
+       */ 
+      if(states_[i]->isFinal())
+        final_ = final_.formula() || (*(state2place_[states_[i]])) == 1;
+    }  
+    
+    // generate transitions from edges
+    for(int i=0; i < edges_.size(); ++i)
+    {
+      Transition* t = &(result_.createTransition());
+      
+      Place* p = state2place_[&(edges_[i]->getSource())];
+      result_.createArc(*p,*t);
+      
+      p = state2place_[&(edges_[i]->getDestination())];
+      result_.createArc(*t,*p);
+    }
+    
+    // generate final condition;
+    /// \todo addd all other places empty
+    result_.finalCondition() = final_.formula();
+    
+    return result_;
+  }
+  
+  
+  /*!
+   *  \brief    returns a set of initial states
+   *
+   *  An initial state is assumed to be a state with empty preset.
+   */
+  template <class T>
+  set<const T *> AbstractAutomaton<T>::initialStates() const
+  {
+    set<const T *> result;
+    result.clear();
+    
+    for (int i = 0; i < states_.size(); i++)
+      if (states_[i]->preset().empty())
+        result.insert(states_[i]);
+    
+    return result;
+  }
+  
 
   /// Automaton class which will be able to read SA format
   class Automaton : public AbstractAutomaton<State>

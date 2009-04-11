@@ -5,7 +5,14 @@ purpose "Wendy is a name generally given to females in English speaking countrie
 description "About Wendy:"
 
 
-section "Options"
+section "Output"
+
+option "dot" -
+  "Graphviz dot output."
+  flag off
+
+
+section "Optimizations"
 
 option "messagebound" m
   "Set the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
@@ -23,6 +30,10 @@ option "noDeadlockDetection" -
 
 
 section "Debug"
+
+option "verbose" v
+  "Verbose output"
+  flag off
 
 option "reportFrequency" r
   "Report frequency for knowledge bubbles"

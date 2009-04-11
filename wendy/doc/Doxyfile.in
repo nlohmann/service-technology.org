@@ -645,7 +645,8 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = syntax_graph.* \
-                         lexic_graph.*
+                         lexic_graph.* \
+                         cmdline.*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 

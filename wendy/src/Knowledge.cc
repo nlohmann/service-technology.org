@@ -57,7 +57,6 @@ Knowledge::Knowledge(Knowledge *parent, Label_ID label) : is_sane(true), size(0)
                 // copy an interface marking from the parent and decrement it
                 bool result = true;
                 InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]), label, false, result);
-                assert(interface);
                 
                 // analyze the result of the copying
                 if (result) {
@@ -82,7 +81,6 @@ Knowledge::Knowledge(Knowledge *parent, Label_ID label) : is_sane(true), size(0)
                 // copy an interface marking from the parent and increment it
                 bool result = true;
                 InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]), label, true, result);
-                assert(interface);
                 
                 // analyze the result of the copying
                 if (result) {
@@ -114,7 +112,6 @@ Knowledge::Knowledge(Knowledge *parent, Label_ID label) : is_sane(true), size(0)
             if (InnerMarking::sync[label].find(pos->first) != InnerMarking::sync[label].end()) {
                 for (unsigned int i = 0; i < pos->second.size(); ++i) {
                     InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]));
-                    assert(interface);
 //                    cerr << *interface << " m" << pos->first << endl;
 //                    cerr << *interface << " m" << InnerMarking::inner_markings[pos->first]->successors[i] << endl;
                     bubble[InnerMarking::inner_markings[pos->first]->successors[i]].push_back(interface);

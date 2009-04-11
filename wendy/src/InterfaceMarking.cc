@@ -5,7 +5,10 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "cmdline.h"
 #include "InterfaceMarking.h"
+
+extern gengetopt_args_info args_info;
 
 
 /******************
@@ -47,8 +50,10 @@ unsigned int InterfaceMarking::initialize(unsigned int m) {
     markings_per_byte = 8 / message_bound_bits;
     bytes = ceil((double)interface_length / (double)markings_per_byte);
     
-    fprintf(stderr, "%s: message bound set to %d (%d bytes/interface marking, %d bits/event)\n",
-        PACKAGE, message_bound, bytes, message_bound_bits);
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: message bound set to %d (%d bytes/interface marking, %d bits/event)\n",
+            PACKAGE, message_bound, bytes, message_bound_bits);
+    }
 }
 
 
@@ -68,7 +73,6 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
 
     // reserve memory and initialize to 0
     storage = new uint8_t[bytes];
-    assert(storage);
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = 0;
     }
@@ -89,7 +93,6 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
 
     // reserve memory and copy values
     storage = new uint8_t[bytes];
-    assert(storage);
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = other.storage[i];
     }    
@@ -130,7 +133,6 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label
 
     // reserve memory and copy values
     storage = new uint8_t[bytes];
-    assert(storage);
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = other.storage[i];
     }

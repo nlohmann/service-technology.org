@@ -1,8 +1,14 @@
+#include <map>
+#include <set>
+#include <iostream>
 #include "StoredKnowledge.h"
 #include "config.h"
 
+using std::map;
 using std::cerr;
+using std::cout;
 using std::endl;
+using std::set;
 
 
 /******************
@@ -14,24 +20,24 @@ unsigned int StoredKnowledge::hashCollisions = 0;
 unsigned int StoredKnowledge::storedKnowledges = 0;
 size_t StoredKnowledge::maxBucketSize = 1; // sic!
 
-int StoredKnowledge::memory_count = 0;
-int StoredKnowledge::memory_max = 0;
 int StoredKnowledge::entries_count = 0;
+unsigned int StoredKnowledge::iterations = 0;
+
 
 
 /***************
  * CONSTRUCTOR *
  ***************/
 
-StoredKnowledge::StoredKnowledge(Knowledge *K) : inner(NULL), interface(NULL), successors(NULL), predecessors(NULL), inDegree(0), predecessorCounter(0), is_final(0) {
-    ++memory_count;
-    memory_max = std::max(memory_count, memory_max);
-    
+StoredKnowledge::StoredKnowledge(Knowledge *K) :
+    inner(NULL), interface(NULL), successors(NULL), predecessors(NULL),
+    inDegree(0), predecessorCounter(0), is_final(0), is_sane(1)
+{
+
     assert(K);
     
     // reserve the necessary memory for the successors
     successors = new StoredKnowledge*[Label::events];
-    assert(successors);
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         successors[l-1] = NULL;
     }
@@ -46,11 +52,9 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) : inner(NULL), interface(NULL), s
     
     // reserve the necessary memory for the internal markings
     inner = new InnerMarking_ID[size];
-    assert(inner);
 
     // reserve the necessary memory for the interface markings
     interface = new InterfaceMarking*[size];
-    assert(interface);
 
 
     // copy data structure to C-style arrays
@@ -62,7 +66,6 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) : inner(NULL), interface(NULL), s
             inner[count] = pos->first;
             // copy the interface marking
             interface[count] = new InterfaceMarking(*(pos->second[i]));
-            assert(interface[count]);
         }
     }
     
@@ -71,6 +74,7 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) : inner(NULL), interface(NULL), s
     // we must not forget a marking
     assert(size == count);
 }
+
 
 StoredKnowledge::~StoredKnowledge() {
     // delete the interface markings
@@ -81,14 +85,13 @@ StoredKnowledge::~StoredKnowledge() {
     
     delete[] inner;
 
-    --memory_count;
     entries_count -= this->size;
 }
+
 
 /*************
  * OPERATORS *
  *************/
-
 
 std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
     o << m.hash() << ":\t";
@@ -104,7 +107,6 @@ std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
 
     return o;
 }
-
 
 
 /********************
@@ -156,6 +158,7 @@ StoredKnowledge *StoredKnowledge::store() {
     return this;
 }
 
+
 void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge *knowledge) {
     assert(knowledge);
 
@@ -172,6 +175,7 @@ void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge *knowledge) {
     ++knowledge->inDegree;
 }
 
+
 hash_t StoredKnowledge::hash() const {
     // the empty knowledge has the hash value 0
     if (size == 0) {
@@ -186,7 +190,7 @@ hash_t StoredKnowledge::hash() const {
     
     // make sure that we don't accientially use 0 for a nonempty knowledge
     if (result == 0) {
-        ++result;
+        result = 1;
     }
     
     return result;
@@ -200,7 +204,6 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* k) {
     // when called for the first time, get some memory
     if (predecessors == NULL) {
         predecessors = new StoredKnowledge*[inDegree];
-        assert(predecessors);
         // set pointers to NULL to have a defined state
         for (unsigned int i = 0; i < inDegree; ++i) {
             predecessors[i] = NULL;
@@ -217,6 +220,10 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* k) {
 /*!
  \todo do not process the empty node as it has an ridiculously many
        predecessors
+ 
+ \todo must delete hash tree (needed by removeInsaneNodes())
+ 
+ \todo delete interface markings before setting them to NULL?
  */
 unsigned int StoredKnowledge::addPredecessors() {
     unsigned int result = 0;
@@ -227,14 +234,14 @@ unsigned int StoredKnowledge::addPredecessors() {
         for (size_t i = 0; i < it->second.size(); ++i) {
             assert(it->second[i]);
 
-//            cerr << *it->second[i] << endl;
-
             // check the stored markings and remove all transient states
             for (unsigned j = 0; j < it->second[i]->size; ++j) {
-                if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final && it->second[i]->interface[j]->empty()) {
+                if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final &&
+                    it->second[i]->interface[j]->empty()) {
                     // this knowledge contains a final marking
                     it->second[i]->is_final = 1;
                     it->second[i]->interface[j] = NULL;
+                    // delete the interface marking?
                 }
                 
                 if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
@@ -245,6 +252,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                             InnerMarking::receivers[it->second[i]->inner[j]].find(l) != InnerMarking::receivers[it->second[i]->inner[j]].end()) {
                             // this is a transient marking -- set interface marking to NULL
                             it->second[i]->interface[j] = NULL;
+                            // delete the interface marking?
                         }
                     }
                 }
@@ -253,8 +261,6 @@ unsigned int StoredKnowledge::addPredecessors() {
             /* now we know wheter this knowledge contains a final marking and
                that every marking with a non-NULL interface marking is a
                deadlock */
-
-//            cerr << it->second[i]->sat() << endl;
 
             // for each successor, register the predecessor
             for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
@@ -267,34 +273,136 @@ unsigned int StoredKnowledge::addPredecessors() {
     }
 
     // from now one, we don't need the hash tree any more
-    StoredKnowledge::hashTree.clear();
+    // StoredKnowledge::hashTree.clear();
     
     return result;
 }
 
 
-bool StoredKnowledge::sat() const {
+bool StoredKnowledge::sat() {
+//    cerr << this << ": checking sat ";
+    
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL) {
-//            cerr << "found a send successor: " << Label::id2name[l] << endl;
+//            cerr << "OK (send)" << endl;
             return true;
         }
     }
     
-    // now each deadlock must have ?-sucessors
+    // now each deadlock (a marking with NULL interface?) must have ?-sucessors
     for (unsigned int i = 0; i < size; ++i) {
         if (interface[i] != NULL) {
+            bool hasPendingMessage = false;
+            
             // we found a deadlock -- check whether for each marked output
             // place exists a respective receiving edge
             for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-                if (interface[i]->get(l) > 0 && successors[l-1] == NULL) {
-                    // found a marked place without successor
-                    return false;
+                if (interface[i]->get(l) > 0) {
+                    hasPendingMessage = true;
+                    if (successors[l-1] == NULL) {
+                        // found a marked place without successor
+//                        cerr << "not OK (missing receive)" << endl;
+                        is_sane = 0;
+                        return false;
+                    }
+                }
+            }
+            
+            if (!hasPendingMessage) {
+                for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+                    if (interface[i]->get(l) > 0 && (InnerMarking::inner_markings[inner[i]]->is_waitstate || InnerMarking::inner_markings[inner[i]]->is_final)) {
+//                        cerr << "not OK (covered deadlock) -- [m" << inner[i] << "," << *interface[i] << "] " << InnerMarking::inner_markings[inner[i]]->is_waitstate << endl;
+                        is_sane = 0;
+                        return false;
+                    }
                 }
             }
         }
     }
     
+    // if we reach this line, each deadlock was resolved
+//    cerr << "OK (else)" << endl;
     return true;
+}
+
+set<StoredKnowledge*> deletedNodes; // should be member
+
+unsigned int StoredKnowledge::removeInsaneNodes() {    
+    unsigned int result = 0;
+    
+    /// a set of nodes that need to be removed
+    std::set<StoredKnowledge*> insaneNodes;
+    
+    /// a set of nodes that need to be considered
+    std::set<StoredKnowledge*> affectedNodes;
+    
+    // initially, traverse all nodes
+    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+        for (unsigned int i = 0; i < it->second.size(); ++i) {
+            if (!it->second[i]->sat())
+                insaneNodes.insert(it->second[i]);
+        }
+    }
+    
+    // iteratively removed all insane nodes and check their predecessors
+    bool done = false;
+    while (!done) {
+        ++iterations;
+        while (!insaneNodes.empty()) {
+            StoredKnowledge *todo = (*insaneNodes.begin());
+            insaneNodes.erase(insaneNodes.begin());
+            assert(todo);
+
+            for (unsigned int i = 0; i < todo->inDegree; ++i) {
+                assert (todo->predecessors[i]);
+                affectedNodes.insert(todo->predecessors[i]);
+                
+                bool found = false;
+                for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                    if (todo->predecessors[i]->successors[l-1] == todo) {
+                        todo->predecessors[i]->successors[l-1] = NULL;
+                        found = true;
+                    }
+                }
+//                assert(found);
+            }
+            
+            ++result;
+            deletedNodes.insert(todo);
+//            delete todo;
+//            todo = NULL;
+        }
+
+        for (set<StoredKnowledge*>::iterator it = affectedNodes.begin(); it != affectedNodes.end(); ++it) {
+            if (!(*it)->sat()) {
+                if (deletedNodes.find(*it) == deletedNodes.end()) {
+                    insaneNodes.insert(*it);
+                }
+            }
+        }
+        
+        done = insaneNodes.empty();
+    }
+    
+    return result;
+}
+
+
+void StoredKnowledge::dot() {
+    cout << "digraph G {" << endl;
+    
+    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+        for (unsigned int i = 0; i < it->second.size(); ++i) {
+            if (it->second[i]->is_sane) {
+            cout << "\"" << it->second[i] << "\" [label=\"" << *it->second[i] << "\"]" << endl;
+            for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                if (it->second[i]->successors[l-1] != NULL) {
+                    cout << "\"" << it->second[i] << "\" -> \"" << it->second[i]->successors[l-1] << "\" [label=\"" << Label::id2name[l] << "\"]" << endl;
+                }
+            }}
+        }
+    }
+    
+    cout << "}" << endl;
 }

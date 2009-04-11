@@ -436,6 +436,9 @@ namespace pnapi {
    */
   bool Transition::isNormal() const
   {
+    if (getSynchronizeLabels().size() > 1)
+      return false;
+
     int counter = 0;
 
     for (set<Node *>::const_iterator p = getPreset().begin(); p != getPreset().end(); p++)
@@ -544,7 +547,7 @@ namespace pnapi {
 
   /*!
    */
-  Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc, 
+  Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc,
 	   Node & source, Node & target) :
     net_(net), observer_(observer),
     source_(&source),

@@ -4,12 +4,9 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <string>
 #include "config.h"
 #include "Label.h"
 #include "pnapi.h"
-
-using std::string;
 
 typedef uint32_t InnerMarking_ID;
 
@@ -67,20 +64,8 @@ class InnerMarking {
             
     public: /* member attributes */
     
-        /// whether this marking has a silent tau successor
-        unsigned is_tau : 1;
-        
         /// whether this marking is final
         unsigned is_final : 1;
-        
-        /// whether this marking can asynchronously receive
-        unsigned is_receive : 1;
-
-        /// whether this marking can asynchronously send
-        unsigned is_send : 1;
-        
-        /// whether this marking can synchronously communicate
-        unsigned is_sync : 1;
         
         /// whether this marking needs an external event to proceed
         unsigned is_waitstate : 1;

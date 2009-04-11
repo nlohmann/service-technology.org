@@ -7,13 +7,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: waltemath $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-03-30 15:06:18 +0200 (Mo, 30 Mär 2009) $
+ * \date    $Date: 2009-04-06 17:16:33 +0200 (Mo, 06 Apr 2009) $
  *
- * \version $Revision: 4034 $
+ * \version $Revision: 4042 $
  */
 
 #ifndef NDEBUG
@@ -831,7 +831,7 @@ namespace pnapi
   {
     for (set<Transition *>::const_iterator t = transitions_.begin();
         t != transitions_.end(); t++)
-      if ((*t)->getSynchronizeLabels().size() > 1 && !(*t)->isNormal())
+      if (!(*t)->isNormal())
         return false;
 
     return true;
@@ -854,14 +854,16 @@ namespace pnapi
    */
   const std::map<Transition *, string> PetriNet::normalize(bool makeInnerStructure)
   {
-    static int in = 1;
-    static int on = 1;
-
-    std::set<Transition *> temp;
+    std::set<Transition *> temp, transitions;
     temp.clear();
-    for (set<Transition *>::const_iterator t = transitions_.begin();
-        t != transitions_.end(); t++)
+    transitions = transitions_;
+
+    for (set<Transition *>::const_iterator t = transitions.begin();
+        t != transitions.end(); t++)
     {
+      if (temp.count(*t) > 0)
+        continue;
+
       /// adjacent output places of t
       set<Place *> t_out;
       for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
@@ -873,9 +875,8 @@ namespace pnapi
           op != t_out.end(); op++)
       {
         /// if there are multiple new places with same name (maximum 10)
-        char c = (on++ % 10) + 48;
-        string nname = (**op).getName();
-        nname.push_back(c);
+        string nname = getUniqueNodeName((*op)->getName());
+        cout << nname;
 
         /// new internal place
         Place &nint = createPlace(nname+"_normalized");
@@ -904,9 +905,8 @@ namespace pnapi
           ip != t_inp.end(); ip++)
       {
         /// if there are multiple new places with same name (maximum 10)
-        char c = (in++ % 10) + 48;
-        string nname = (*ip)->getName();
-        nname.push_back(c);
+        string nname = getUniqueNodeName((*ip)->getName());
+        cout << nname;
 
         /// new internal place
         Place &nint = createPlace(nname+"_normalized");
@@ -921,6 +921,8 @@ namespace pnapi
         createArc(nint, **t);
         createArc(ncomp, ntrans);
         createArc(*(*t), ncomp);
+
+        temp.insert(&ntrans);
 
         condition_ = condition_.formula() && nint == 0 && ncomp == 1;
 

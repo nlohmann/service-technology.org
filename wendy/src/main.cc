@@ -43,13 +43,11 @@ void calcRecursive(Knowledge *K, StoredKnowledge *SK) {
     
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         Knowledge *K_new = new Knowledge(K, l);
-        assert(K_new);
         
         // only process knowledges within the message bounds
         if (K_new->is_sane) {
             // create a compact version of the knowledge bubble
             StoredKnowledge *SK_new = new StoredKnowledge(K_new);
-            assert(SK_new);
             
             // add it to the knowledge tree
             StoredKnowledge *SK_store = SK_new->store();
@@ -106,12 +104,15 @@ void evaluateParameters(int argc, char** argv) {
 int main(int argc, char** argv) {
     time_t start_time, end_time;
     
-    
-    // 0. parse the command line parameters
+    /*--------------------------------------.
+    | 0. parse the command line parameters  |
+    `--------------------------------------*/
     evaluateParameters(argc, argv);
     
         
-    // 1. parse oWFN
+    /*----------------------.
+    | 1. parse the open net |
+    `----------------------*/
     try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
@@ -123,7 +124,9 @@ int main(int argc, char** argv) {
             inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
             inputStream.close();
         }
-        std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
+        if (args_info.verbose_given) {
+            std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
+        }
     } catch (pnapi::io::InputError error) {
         std::cerr << PACKAGE << error << std::endl;
         exit(EXIT_FAILURE);
@@ -135,20 +138,27 @@ int main(int argc, char** argv) {
     }
 
 
-    // 2. initialize labels and interface markings
+    /*--------------------------------------------.
+    | 2. initialize labels and interface markings |
+    `--------------------------------------------*/
+    // initialize labels
     Label::initialize();
     // initialize the interface markings with the given message bound
     InterfaceMarking::initialize(args_info.messagebound_arg);
 
 
-    // 3. convert oWFN to LoLA and write a file
+    /*--------------------------------------------.
+    | 3. write inner of the open net to LoLA file |
+    `--------------------------------------------*/
     std::ofstream lolaFile;
     lolaFile.open("tmp.lola", std::ofstream::out | std::ofstream::trunc);
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
     
     
-    // 4. call LoLA and parse reachability graph
+    /*------------------------------------------.
+    | 4. call LoLA and parse reachability graph |
+    `-------------------------------------------*/
     time(&start_time);
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)
     // use a pipe
@@ -167,43 +177,66 @@ int main(int argc, char** argv) {
     time(&end_time);
 
 
-    // 5. organize reachability graph
+    /*-------------------------------.
+    | 5. organize reachability graph |
+    `-------------------------------*/
     InnerMarking::initialize();
-    fprintf(stderr, " [%.0f sec]\n", difftime(end_time, start_time));
+    if (args_info.verbose_given) {
+        fprintf(stderr, " [%.0f sec]\n", difftime(end_time, start_time));
+    }
     delete InnerMarking::net;
 
 
-    // 6. construct Knowledge recursively
+    /*-------------------------------.
+    | 6. calculate knowledge bubbles |
+    `-------------------------------*/
     time(&start_time);
     Knowledge *K0 = new Knowledge(0);
-    assert(K0);
     StoredKnowledge *SK0 = new StoredKnowledge(K0);
-    assert(SK0);
     SK0->store();
 
     calcRecursive(K0, SK0);
     delete K0;
     time(&end_time);
     
-    fprintf(stderr, "%s: stored %d knowledges [%.0f sec]\n",
-        PACKAGE, StoredKnowledge::storedKnowledges, difftime(end_time, start_time));
-    fprintf(stderr, "%s: used %d of %d hash buckets, maximal bucket size: %d\n",
-        PACKAGE, StoredKnowledge::hashTree.size(), (1 << (8*sizeof(hash_t))), StoredKnowledge::maxBucketSize);
-    
-//    cerr << "  Knowledge: " << Knowledge::memory_count << " stored, " << Knowledge::memory_max << " maximal" << endl;
-//    cerr << "  StoredKnowledge: " << StoredKnowledge::memory_count << " stored, " << StoredKnowledge::memory_max << " maximal -- " << StoredKnowledge::entries_count << " markings stored" << endl;
-//    cerr << "  InterfaceMarking: " << InterfaceMarking::memory_count << " stored, " << InterfaceMarking::memory_max << " maximal -- " << InterfaceMarking::memory_count - StoredKnowledge::entries_count << " not deleted" << endl;
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: stored %d knowledges [%.0f sec]\n",
+            PACKAGE, StoredKnowledge::storedKnowledges, difftime(end_time, start_time));
+        fprintf(stderr, "%s: used %d of %d hash buckets, maximal bucket size: %d\n",
+            PACKAGE, StoredKnowledge::hashTree.size(), (1 << (8*sizeof(hash_t))), StoredKnowledge::maxBucketSize);
+    }
+
+    if (args_info.dot_given) {
+        StoredKnowledge::dot();
+    }
 
 
-    // 7. add predecessor relation
+    /*----------------------------.
+    | 7. add predecessor relation |
+    `----------------------------*/
     time(&start_time);
     unsigned int edges = StoredKnowledge::addPredecessors();
     time(&end_time);
-    fprintf(stderr, "%s: added predecessor relation (%d edges) [%.0f sec]\n",
-        PACKAGE, edges, difftime(end_time, start_time));
+
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: added predecessor relation (%d edges) [%.0f sec]\n",
+            PACKAGE, edges, difftime(end_time, start_time));
+    }
 
 
-    // 8. delete insane nodes
+    /*----------------------------------.
+    | 8. detect and delete insane nodes |
+    `----------------------------------*/
+    time(&start_time);
+    unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
+    time(&end_time);
+    
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: removed %d red nodes in %d iterations [%.0f sec]\n",
+            PACKAGE, redNodes, StoredKnowledge::iterations, difftime(end_time, start_time));
+    }
+
+
     // 9. add formulas
     
     return EXIT_SUCCESS;

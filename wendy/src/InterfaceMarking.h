@@ -64,12 +64,12 @@ class InterfaceMarking {
         /// copy constructor
         InterfaceMarking(const InterfaceMarking &);
 
-        /// destructor
-        ~InterfaceMarking();
-
         /// copy constructor with effect on given label
         InterfaceMarking(const InterfaceMarking &, Label_ID, bool, bool&);
         
+        /// destructor
+        ~InterfaceMarking();
+
         /// comparison operator
         bool operator< (const InterfaceMarking &other) const;
 

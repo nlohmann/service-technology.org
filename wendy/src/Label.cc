@@ -83,7 +83,7 @@ void Label::initialize() {
                 sync_labels[*(*t)->getSynchronizeLabels().begin()] = ++events;
             }
 
-            id2name[events] = "!?" + *(*t)->getSynchronizeLabels().begin();            
+            id2name[events] = "#" + *(*t)->getSynchronizeLabels().begin();            
             name2id[(*t)->getName()] = sync_labels[*(*t)->getSynchronizeLabels().begin()];
         }
     }

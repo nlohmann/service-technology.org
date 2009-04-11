@@ -7,20 +7,6 @@
   Copyright (C) 2005        Niels Lohmann and
 			    Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
-
-  GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
-
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
 /*!
@@ -32,11 +18,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: cas $
+ *          last changes of: \$Author: niels $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-03-13 01:31:33 +0100 (Fr, 13 MÃ¤r 2009) $
+ * \date    \$Date: 2009-04-06 22:53:06 +0200 (Mo, 06 Apr 2009) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -55,13 +41,11 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 3991 $
+ * \version \$Revision: 4046 $
  *
  * \ingroup petrinet
  */
 
-
-/// \todo: Fix the check for final places in each rule.
 
 
 /******************************************************************************
@@ -160,6 +144,7 @@ unsigned int PetriNet::reduce_unused_status_places()
  *
  * \pre t is a transition of the net
  * \pre t's preset or postset empty
+ * \pre t is not synchronized
  *
  * \post t is removed
  */
@@ -172,9 +157,13 @@ unsigned int PetriNet::reduce_suspicious_transitions()
   // find suspicious transitions
   for (set<Transition*>::iterator t = transitions_.begin(); 
         t != transitions_.end(); ++t)
+  {
+    if ((*t)->isSynchronized())
+      continue;
     if ( (*t)->getPostset().empty() || 
          (*t)->getPreset().empty() )
       suspiciousTransitions.insert(*t);
+  }
   
   // remove suspicious transitions
   for (set<Transition*>::iterator t = suspiciousTransitions.begin(); 
@@ -204,9 +193,10 @@ unsigned int PetriNet::reduce_suspicious_transitions()
  * that the arc weight from p to t is higher than 
  * the amount of tokens stored in p (precondition 2)
  * and p is not concerned by a final condition (precondition 3)
+ * and t is not synchronized (precondition 4)
  * then this place and its postset can be removed. 
  *
- * \post  t and its postset are removed 
+ * \post  p and its postset are removed 
  * 
  * \return  number of removed nodes
  * 
@@ -237,12 +227,13 @@ unsigned int PetriNet::reduce_dead_nodes()
         for(set<Arc*>::iterator a = (*p)->getPostsetArcs().begin(); 
               a != (*p)->getPostsetArcs().end(); ++a)
         {
-          if((*a)->getWeight() <= (*p)->getTokenCount())	
+          if( ((*a)->getWeight() <= (*p)->getTokenCount()) || // precondition 2
+              ((*a)->getTransition().isSynchronized()) ) // precondition 4
           {
-            arcs=false; // there exists a transition that can fire
+            arcs=false; // there exists a transition that can fire or is synchronized
           }
         }
-        if(arcs) // precondition 2
+        if(arcs) 
         {
           deadPlaces.insert(*p); // p is a dead place
 
@@ -316,7 +307,7 @@ unsigned int PetriNet::reduce_dead_nodes()
  * \note  This function is useful in BPEL2oWFN but need to be fixed.
  *        Hence this rule is temporally removed.
  * 
- * \todo comment me!
+ * \todo rewrite me, comment me and add synchronisation test!
  */
 unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
 {
@@ -507,6 +498,7 @@ unsigned int PetriNet::reduce_rule_3p()
  * 
  * If there exist two parallel transitions t1 and t2 (precondition 1)
  * one of them can be removed.
+ * Synchronized transitions will not be removed. (precondition 2)
  *  
  * A transition is removed by merging its history with this one of
  * the transition parallel to it.
@@ -514,6 +506,8 @@ unsigned int PetriNet::reduce_rule_3p()
  * \post  this rule preserves lifeness and boundedness according to [Sta90]
  * 
  * \return  number of removed transitions 
+ * 
+ * \note synchronisation test may be implemented properly.
  * 
  */
 unsigned int PetriNet::reduce_rule_3t()
@@ -542,7 +536,8 @@ unsigned int PetriNet::reduce_rule_3t()
       for (set<Node*>::iterator t2 = prePlace->getPostset().begin(); 
            t2 != prePlace->getPostset().end(); ++t2)
       {
-        if ((*t1)->isParallel(*(*t2))) // precondition 1
+        if ( ((*t1)->isParallel(*(*t2))) && // precondition 1
+             (!(static_cast<Transition*>(*t2)->isSynchronized())) ) // precondition 2
         {
           seenTransitions.insert(static_cast<Transition*>(*t2)); // mark transition as seen
           obsoleteTransitions.insert(static_cast<Transition*>(*t2));
@@ -569,7 +564,7 @@ unsigned int PetriNet::reduce_rule_3t()
     }
   }
   
-  // STEP 2: remove obsolete places
+  // STEP 2: remove obsolete transitions
   unsigned int result=0;
   for (set<Transition*>::iterator t1 = obsoleteTransitions.begin();
        t1 != obsoleteTransitions.end(); ++t1)
@@ -634,6 +629,7 @@ bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* 
  * from p1 and p2 in the same way (precondition 4)
  * and the preset of p1 and p2 respectively is not empty (precondition 5),
  * and p2 is not concerned by a final condition (precondition 6),
+ * and t2 is not synchronized (precondition 7),
  * then the following changes can be applied:
  * 1.: For each transition t in the preset of p2 add an arc
  *     of the same weight to p1. If such an arc already exist,
@@ -687,7 +683,8 @@ unsigned int PetriNet::reduce_rule_4()
       Transition* t1 = static_cast<Transition*>(*((*p1)->getPostset().begin()));
       Transition* t2 = static_cast<Transition*>(*((*p2)->getPostset().begin()));
       if( __REDUCE_CHECK_FINAL(*p2) && // precondition 6
-          (reduce_isEqual(t1,t2,*p1,*p2)) ) // precondition 4
+          (reduce_isEqual(t1,t2,*p1,*p2)) && // precondition 4
+          (!(t2->isSynchronized())) ) // precondition 7
       {
         equalPlaces.insert(pair<Place*,Place*>(*p1,*p2));
         seenPlaces.insert(*p2);
@@ -768,6 +765,7 @@ bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
  * If there exist a place p with a not empty preset t1 to tk (precondition 1),
  * a not empty postset t1' to tn' (precondition 2)
  * which are distinct (precondition 3)
+ * and not synchronized (precondition 3a)
  * and the postset's postset is not empty (precondition 4)
  * and the postsets preset is {p} (precondition 5)
  * and the arc weight from p to each transition of its postset is v (precondition 6)
@@ -864,15 +862,15 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
       }
     }
     
-    // check for seen transitions
+    // check for seen or synchronized (precondition 3a) transitions
     {
       bool seen = false;
       for(set<Node*>::iterator t = preset.begin();
           t != preset.end(); ++t)
-        seen = (seen || seenTransitions[*t]);
+        seen = (seen || seenTransitions[*t] || static_cast<Transition*>(*t)->isSynchronized());
       for(set<Node*>::iterator t = postset.begin();
           t != postset.end(); ++t)
-        seen = (seen || seenTransitions[*t]);
+        seen = (seen || seenTransitions[*t] || static_cast<Transition*>(*t)->isSynchronized());
       if(seen)
         continue;
     }
@@ -1033,6 +1031,8 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
   
   return result; 
 }
+
+/// \todo hier synchro
 
 /*!
  * \brief Fusion of transitions

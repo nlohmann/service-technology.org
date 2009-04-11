@@ -30,7 +30,6 @@ unsigned int InnerMarking::stats_final_markings = 0;
 void InnerMarking::initialize() {
     inner_marking_count = markingMap.size();
     inner_markings = new InnerMarking*[inner_marking_count];
-    assert(inner_markings);
 
     // copy data from mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < inner_marking_count; ++i) {
@@ -50,10 +49,12 @@ void InnerMarking::initialize() {
 
     markingMap.clear();
 
-    fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",
-        PACKAGE, stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
-    fprintf(stderr, "%s: stored %d inner markings and %d edges",
-        PACKAGE, inner_marking_count, edges_count);
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",
+            PACKAGE, stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
+        fprintf(stderr, "%s: stored %d inner markings and %d edges",
+            PACKAGE, inner_marking_count, edges_count);
+    }    
 }
 
 
@@ -64,8 +65,7 @@ void InnerMarking::initialize() {
 InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
                            const std::vector<InnerMarking_ID> &_successors,
                            bool _is_final) :
-                           is_tau(0), is_final(_is_final), is_receive(0),
-                           is_send(0), is_sync(0), is_waitstate(0), is_deadlock(0) {
+                           is_final(_is_final), is_waitstate(0), is_deadlock(0) {
 
     assert(_labels.size() == _successors.size());
     assert (_successors.size() < UCHAR_MAX);
@@ -74,11 +74,9 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
     edges_count += out_degree;
 
     labels = new Label_ID[out_degree];
-    assert(labels);
     std::copy(_labels.begin(), _labels.end(), labels);
 
     successors = new InnerMarking_ID[out_degree];
-    assert(successors);
     std::copy(_successors.begin(), _successors.end(), successors);
 
     // knowing all successors, we can determine the type of the marking
@@ -104,6 +102,11 @@ InnerMarking::~InnerMarking() {
  \todo check the switched off assertion
  */
 inline void InnerMarking::determineType() {
+    bool is_tau = false;
+    bool is_receive = false;
+    bool is_send = false;
+    bool is_sync = false;
+    
     // deadlock: no successor markings and not final
     if (out_degree == 0 && is_final != 1) {
         ++stats_deadlocks;
@@ -128,15 +131,15 @@ inline void InnerMarking::determineType() {
         }
         
         if (labels[i] == 0) {
-            is_tau = 1;
+            is_tau = true;
         } else {
-            if (labels[i] <= Label::first_receive) {
-                is_send = 1;
+            if (RECEIVING(labels[i])) {
+                is_send = true;
             } else {
-                if (labels[i] <= Label::first_send) {
-                    is_receive = 1;
+                if (SENDING(labels[i])) {
+                    is_receive = true;
                 } else {
-                    is_sync = 1;
+                    is_sync = true;
                 }
             }
         }

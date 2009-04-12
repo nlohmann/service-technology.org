@@ -97,7 +97,7 @@ class InterfaceMarking {
         /// returns whether this marking is empty
         bool empty() const;
 
-        /// returns the hast value of this marking
+        /// returns the hash value of this marking
         hash_t hash() const;
 
     private: /* member attributes */

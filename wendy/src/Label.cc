@@ -1,11 +1,14 @@
 #include "Label.h"
 #include "InnerMarking.h"
+#include "cmdline.h"
 
 using std::set;
 using std::string;
 using pnapi::Node;
 using pnapi::Place;
 using pnapi::Transition;
+
+extern gengetopt_args_info args_info;
 
 
 /******************
@@ -66,7 +69,7 @@ void Label::initialize() {
     last_send = events;
     
     
-    // SYNCHRONOUS EVENTS (!?-step for us)
+    // SYNCHRONOUS EVENTS (#-step for us)
     first_sync = events+1;
     std::map<string, Label_ID> sync_labels;
     
@@ -91,11 +94,12 @@ void Label::initialize() {
     /// \todo: events eins abziehen?
     
     last_sync = events;
-
     
     async_events = last_send;
     sync_events = last_sync - async_events;
-    
-//    fprintf(stderr, "%s: initialized labels for %d events (%d async, %d sync)\n",
-//        PACKAGE, events, async_events, sync_events);
+
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: initialized labels for %d events (%d async, %d sync)\n",
+            PACKAGE, events, async_events, sync_events);
+    }
 }

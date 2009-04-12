@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
         std::cerr << PACKAGE << error << std::endl;
         exit(EXIT_FAILURE);
     }
+    
     // only normal nets are supported so far
     if (!InnerMarking::net->isNormal()) {
         fprintf(stderr, "%s: the input open net must be normal -- aborting\n", PACKAGE);
@@ -130,10 +131,11 @@ int main(int argc, char** argv) {
     | 5. organize reachability graph |
     `-------------------------------*/
     InnerMarking::initialize();
+    delete InnerMarking::net;
+
     if (args_info.verbose_given) {
         fprintf(stderr, " [%.0f sec]\n", difftime(end_time, start_time));
     }
-    delete InnerMarking::net;
 
 
     /*-------------------------------.
@@ -141,10 +143,10 @@ int main(int argc, char** argv) {
     `-------------------------------*/
     time(&start_time);
     Knowledge *K0 = new Knowledge(0);
-    StoredKnowledge *SK0 = new StoredKnowledge(K0);
-    SK0->store();
+    StoredKnowledge::root = new StoredKnowledge(K0);
+    StoredKnowledge::root->store();
 
-    StoredKnowledge::calcRecursive(K0, SK0);
+    StoredKnowledge::calcRecursive(K0, StoredKnowledge::root);
     delete K0;
     time(&end_time);
 
@@ -182,20 +184,21 @@ int main(int argc, char** argv) {
     }
 
     // analyze root node
-    if (SK0->is_sane) {
-        fprintf(stderr, "%s: net is controllable: YES\n", PACKAGE);
-    } else {
-        fprintf(stderr, "%s: net is controllable: NO\n", PACKAGE);
-    }
+    fprintf(stderr, "%s: net is controllable: %s\n",
+        PACKAGE, (StoredKnowledge::root->is_sane)?"YES":"NO");
 
 
     /*------------------.
     | 9. output options |
     `------------------*/
-
-    // dot output if requested
+    // dot output
     if (args_info.dot_given) {
         StoredKnowledge::dot(args_info.showEmptyNode_given, args_info.formula_arg);
+    }
+    
+    // operating guidelines output
+    if (args_info.og_given) {
+        StoredKnowledge::OGoutput();
     }
     
 

@@ -22,6 +22,8 @@ class StoredKnowledge {
 
         /// print a dot representation
         static void dot(bool, enum_formula);
+        
+        static void OGoutput();
 
     public: /* static attributes */
 
@@ -40,14 +42,22 @@ class StoredKnowledge {
         /// maximal size of a hash bucket (1 means no collisions)
         static size_t maxBucketSize;
 
+        /// number of iterations needed to removed insane nodes
+        static unsigned int iterations;
+        
+        /// the root knowledge
+        static StoredKnowledge *root;
+
+    private: /* static attributes */
+
         /// number of markings stored
         static int entries_count;
-
+    
         /// nodes that should be deleted
         static std::set<StoredKnowledge*> deletedNodes;
 
-        /// number of iterations needed to removed insane nodes
-        static unsigned int iterations;
+        /// nodes that are reachable from the initial node
+        static std::set<StoredKnowledge*> seen;
 
     public: /* member functions */
 
@@ -57,10 +67,8 @@ class StoredKnowledge {
         /// destructor
         ~StoredKnowledge();
 
-
         /// stream output operator
         friend std::ostream& operator<< (std::ostream&, const StoredKnowledge&);
-
 
         /// stores this object in the hash tree and returns a pointer to the result
         StoredKnowledge *store();
@@ -80,10 +88,13 @@ class StoredKnowledge {
         void addPredecessor(StoredKnowledge* k);
 
         /// return a string representation of the knowledge's formula
-        std::string formula();
+        std::string formula() const;
 
         /// return a two-bit representation of the knowledge's formula
-        std::string twoBitFormula();
+        std::string twoBitFormula() const;
+        
+        /// traverse knowledges beginning from the root
+        void traverse();
 
     public: /* member attributes */
 

@@ -10,13 +10,25 @@
 
 /*!
  \brief inner marking
+ 
+ An inner marking only stores three bits about its nature (is_final,
+ is_deadlock, and is_waitstate -- see determineType()) and its successors.
+ The successors are stored in two C-style arrays: one consisting of the
+ identifiers of the successors and one consisting of the interface labels of
+ the respective transitions.
+ 
+ The reachability graph of the inner of the net is created by LoLA and then
+ parsed. The parser creates objects of this class and stores pointers to them
+ in the mapping markingMap together with an identifier (the depth-first
+ search number given by LoLA). After all markings are parsed, the function
+ initialize() is called to copy the markingMap into a C-style array.
  */
 class InnerMarking {
     public: /* static functions */
     
         /// copy markings from temporary storage to array
         static void initialize();
-            
+
     public: /* static attributes */
 
         /// a temporary storage used during parsing of the reachability graph
@@ -25,21 +37,14 @@ class InnerMarking {
         /// an array of the inner markings
         static InnerMarking **inner_markings;
 
-        /// the number of inner markings (used as length for inner_markings)
-        static InnerMarking_ID inner_marking_count;
-
         /// a mapping from labels to inner markings that might receive this message
         static std::map<Label_ID, std::set<InnerMarking_ID> > receivers;
 
-        /// a mapping from labels to inner markings that can synchronize
-        static std::map<Label_ID, std::set<InnerMarking_ID> > sync;
-
-        /// the number of edges in the reachability graph (fired transitions)
-        static unsigned int edges_count;
-        
         /// the open net that created these inner markings
         static pnapi::PetriNet *net;
-        
+
+    private: /* static attributes */
+
         /// the number of deadlocks
         static unsigned int stats_deadlocks;
 

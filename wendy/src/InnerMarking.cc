@@ -13,10 +13,7 @@ extern gengetopt_args_info args_info;
 std::map<InnerMarking_ID, InnerMarking*> InnerMarking::markingMap;
 pnapi::PetriNet *InnerMarking::net = new pnapi::PetriNet();
 InnerMarking **InnerMarking::inner_markings = NULL;
-InnerMarking_ID InnerMarking::inner_marking_count = 0;
-unsigned int InnerMarking::edges_count = 0;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
-std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::sync;
 
 unsigned int InnerMarking::stats_deadlocks = 0;
 unsigned int InnerMarking::stats_inevitable_deadlocks = 0;
@@ -27,8 +24,15 @@ unsigned int InnerMarking::stats_final_markings = 0;
  * STATIC METHODS *
  ******************/
 
+/*!
+ Copy the markings from the mapping markingMap to C-style arrays.
+ Additionally, a mapping is filled to quickly determine whether a marking can
+ become transient if a message with a given label was sent to the net.
+ 
+ \todo replace the mapping receivers by a two-dimensional C-style array
+ */
 void InnerMarking::initialize() {
-    inner_marking_count = markingMap.size();
+    unsigned int inner_marking_count = markingMap.size();
     inner_markings = new InnerMarking*[inner_marking_count];
 
     // copy data from mapping (used during parsing) to a C array
@@ -38,11 +42,7 @@ void InnerMarking::initialize() {
         // register markings that may become activated by sending a message to them
         for (unsigned int j = 0; j < inner_markings[i]->out_degree; ++j) {
             if (SENDING(inner_markings[i]->labels[j])) {
-                receivers[i].insert(inner_markings[i]->labels[j]);
-            }
-            
-            if (SYNC(inner_markings[i]->labels[j])) {
-                sync[i].insert(inner_markings[i]->labels[j]);
+                receivers[inner_markings[i]->labels[j]].insert(i);
             }
         }
     }
@@ -52,8 +52,8 @@ void InnerMarking::initialize() {
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",
             PACKAGE, stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
-        fprintf(stderr, "%s: stored %d inner markings and %d edges",
-            PACKAGE, inner_marking_count, edges_count);
+        fprintf(stderr, "%s: stored %d inner markings",
+            PACKAGE, inner_marking_count);
     }    
 }
 
@@ -65,13 +65,12 @@ void InnerMarking::initialize() {
 InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
                            const std::vector<InnerMarking_ID> &_successors,
                            bool _is_final) :
-                           is_final(_is_final), is_waitstate(0), is_deadlock(0) {
-
+                           is_final(_is_final), is_waitstate(0), is_deadlock(0)
+{
     assert(_labels.size() == _successors.size());
     assert (_successors.size() < UCHAR_MAX);
 
     out_degree = _successors.size();
-    edges_count += out_degree;
 
     labels = new Label_ID[out_degree];
     std::copy(_labels.begin(), _labels.end(), labels);
@@ -95,17 +94,31 @@ InnerMarking::~InnerMarking() {
 
 /*!
  The type is determined by checking the labels of the leaving transitions as
- well as the fact whether this marking is a final marking.
+ well as the fact whether this marking is a final marking. For the further
+ processing, it is sufficient to distinguish four types:
+ 
+ - the marking is a deadlock (is_deadlock) -- then a knowledge containing
+   this inner marking can immediately be considered insane
+ - the marking is a final marking (is_final) -- this is needed to distinguish
+   deadlocks from final markings
+ - the marking is a waitstate (is_waitstate) -- a waitstate is a marking of
+   the inner net that can only be left by firing a transition that is
+   connected to an input place
+   
+ This function also implements the detection of inevitable deadlocks. A
+ marking is an inevitable deadlock, if it is a deadlock or all is successor
+ markings are inevitable deadlocks. The detection exploits the way LoLA
+ returns the reachability graph: when a marking is returned, we know that
+ the only successors we have not considered yet (i.e. those markings where
+ successors[i] == NULL) are also predessessors of this marking and cannot be
+ a reason for this marking to be a deadlock. Hence, this marking is an
+ inevitable deadlock if we cannot find a non-deadlocking successor.
 
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
- \todo check the switched off assertion
  */
 inline void InnerMarking::determineType() {
-    bool is_tau = false;
-    bool is_receive = false;
-    bool is_send = false;
-    bool is_sync = false;
+    bool is_transient = false;
     
     // deadlock: no successor markings and not final
     if (out_degree == 0 && is_final != 1) {
@@ -120,9 +133,7 @@ inline void InnerMarking::determineType() {
     // variable to detect whether this marking has only deadlocking successors
     bool deadlock_inevitable = true;
     for (unsigned int i = 0; i < out_degree; ++i) {
-
-//        assert(markingMap[successors[i]]); 
-// I had to switch off this assertion and add "markingMap[successors[i]] != NULL" to the if below.
+        // if a single successor is not a deadlock, everything is OK
         if (!args_info.noDeadlockDetection_given &&
             markingMap[successors[i]] != NULL &&
             deadlock_inevitable &&
@@ -130,18 +141,9 @@ inline void InnerMarking::determineType() {
             deadlock_inevitable = false;
         }
         
-        if (SILENT(labels[i])) {
-            is_tau = true;
-        } else {
-            if (RECEIVING(labels[i])) {
-                is_send = true;
-            } else {
-                if (SENDING(labels[i])) {
-                    is_receive = true;
-                } else {
-                    is_sync = true;
-                }
-            }
+        // a tau or sending (sic!) transition makes this marking transient
+        if (SILENT(labels[i]) || RECEIVING(labels[i])) {
+            is_transient = true;
         }
     }
 
@@ -152,7 +154,7 @@ inline void InnerMarking::determineType() {
     }
     
     // draw some conclusions
-    if (!is_final && !is_tau && !is_send) {
+    if (!is_final && !is_transient) {
         is_waitstate = 1;
     }
 }

@@ -53,14 +53,14 @@ class Label {
         /// label of last send (!) event
         static Label_ID last_send;
 
-        /// label of first synchronous (!?) event
+        /// label of first synchronous (#) event
         static Label_ID first_sync;
-        /// label of last synchronous (!?) event
+        /// label of last synchronous (#) event
         static Label_ID last_sync;
 
         /// the number of asynchronous (? and !) events
         static Label_ID async_events;
-        /// the number of synchronous (?!) events
+        /// the number of synchronous (#) events
         static Label_ID sync_events;
         /// the number of all events
         static Label_ID events;

@@ -4,7 +4,6 @@
 #include "Label.h"
 
 using std::map;
-using std::cerr;
 using std::cout;
 using std::endl;
 using std::set;
@@ -18,11 +17,13 @@ std::map<hash_t, std::vector<StoredKnowledge*> > StoredKnowledge::hashTree;
 unsigned int StoredKnowledge::hashCollisions = 0;
 unsigned int StoredKnowledge::storedKnowledges = 0;
 size_t StoredKnowledge::maxBucketSize = 1; // sic!
-
+StoredKnowledge *StoredKnowledge::root = NULL;
 int StoredKnowledge::entries_count = 0;
 unsigned int StoredKnowledge::iterations = 0;
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
+std::set<StoredKnowledge*> StoredKnowledge::seen;
+
 
 
 /***************
@@ -62,7 +63,7 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
 
     // traverse the bubbles and copy the markings into the C arrays
     for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
-        for (unsigned int i = 0; i < pos->second.size(); ++i, ++count) {
+        for (size_t i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking
             inner[count] = pos->first;
             // copy the interface marking
@@ -77,6 +78,11 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
 }
 
 
+/*!
+ \note This destructor is only called during the building of the knowledges.
+       That said, neither successors nor predecessors need to be deleted by
+       this destructor.
+ */
 StoredKnowledge::~StoredKnowledge() {
     // delete the interface markings
     for (unsigned int i = 0; i < size; ++i) {
@@ -128,7 +134,7 @@ StoredKnowledge *StoredKnowledge::store() {
     std::map<hash_t, std::vector<StoredKnowledge*> >::iterator el = hashTree.find(myHash);
     if (el != hashTree.end()) {
         // we found an element with the same hash -- is it a collision?
-        for (unsigned int i = 0; i < el->second.size(); ++i) {
+        for (size_t i = 0; i < el->second.size(); ++i) {
             assert(el->second[i]);
             
             // compare the sizes
@@ -264,7 +270,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
                         if (it->second[i]->interface[j] != NULL &&
                             it->second[i]->interface[j]->get(l) > 0 &&
-                            InnerMarking::receivers[it->second[i]->inner[j]].find(l) != InnerMarking::receivers[it->second[i]->inner[j]].end()) {
+                            InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
                             // the DL is resolved -- set interface marking to NULL
                             it->second[i]->interface[j] = NULL;
                         }
@@ -356,9 +362,10 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
     
     // initially, traverse all nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
-        for (unsigned int i = 0; i < it->second.size(); ++i) {
-            if (!it->second[i]->sat())
+        for (size_t i = 0; i < it->second.size(); ++i) {
+            if (!it->second[i]->sat()) {
                 insaneNodes.insert(it->second[i]);
+            }
         }
     }
     
@@ -402,16 +409,25 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
         done = insaneNodes.empty();
     }
     
+    
+    // traverse all nodes reachable from the root
+    root->traverse();
+    
+    
+    
     return result;
 }
 
 
 void StoredKnowledge::dot(bool showTrue = false, enum_formula formulaStyle = formula_arg_dnf) {
     cout << "digraph G {" << endl;
+    cout << " node [fontname=\"Helvetica\" fontsize=10]" << endl;
+    cout << " edge [fontname=\"Helvetica\" fontsize=10]" << endl;
 
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
-        for (unsigned int i = 0; i < it->second.size(); ++i) {
+        for (size_t i = 0; i < it->second.size(); ++i) {
             if (it->second[i]->is_sane &&
+                (seen.find(it->second[i]) != seen.end()) &&
                 (showTrue || it->second[i]->size > 0)) {
                 
                 string formula;
@@ -425,6 +441,7 @@ void StoredKnowledge::dot(bool showTrue = false, enum_formula formulaStyle = for
 //                cout << "\"" << it->second[i] << "\" [label=\"" << it->second[i] << "\\n" << *it->second[i] << "\"]" << endl;
                 for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
                     if (it->second[i]->successors[l-1] != NULL &&
+                        (seen.find(it->second[i]->successors[l-1]) != seen.end()) &&
                         (showTrue || it->second[i]->successors[l-1]->size > 0)) {
                         cout << "\"" << it->second[i] << "\" -> \"" << it->second[i]->successors[l-1] << "\" [label=\"" << Label::id2name[l] << "\"]" << endl;
                     }
@@ -482,7 +499,19 @@ void StoredKnowledge::calcRecursive(Knowledge *K, StoredKnowledge *SK) {
 }
 
 
-string StoredKnowledge::formula() {
+/*!
+ Some effort has been put to only add parentheses unless absolutely necessary.
+
+ \return a string representation of the formula
+ 
+ \note This function is also used for an operating guidelines output for
+       Fiona.
+
+ \todo Check whether the "true" output is correct.
+ 
+ \todo "final" should be added as disjunction -- not done right now
+ */
+string StoredKnowledge::formula() const {
     // check if there is a deadlock at all
     bool containsDeadlock = false;
     for (unsigned int i = 0; i < size; ++i) {
@@ -544,11 +573,17 @@ string StoredKnowledge::formula() {
             if (it != receiveDisjunctions.begin() && result != "") {
                 result += " * ";
             }
+            if (it->size() > 1) {
+                result += "(";
+            }
             for (set<string>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
                 if (it2 != it->begin()) {
                     result += " + ";
                 }
                 result += *it2;
+            }
+            if (it->size() > 1) {
+                result += ")";
             }
         }
         if (!sendDisjunction.empty()) {
@@ -558,11 +593,7 @@ string StoredKnowledge::formula() {
 
     // add the final literal
     if (is_final) {
-        if (result != "") {
-            result += "final";
-        } else {
-            result = "final";
-        }
+        result += "final";
     }
     
     return result;
@@ -573,7 +604,7 @@ string StoredKnowledge::formula() {
  \return "S" if formula can only be satisfied by sending events; "F" if
          formula contains the "final" literal
  */
-string StoredKnowledge::twoBitFormula() {
+string StoredKnowledge::twoBitFormula() const {
     string result;
         
     if (is_final) {
@@ -601,4 +632,69 @@ string StoredKnowledge::twoBitFormula() {
     }
     
     return result;
+}
+
+void StoredKnowledge::traverse() {
+    if (seen.insert(this).second) {
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if (successors[l-1] != NULL && successors[l-1]->is_sane) {
+                successors[l-1]->traverse();
+            }
+        }
+    }    
+}
+
+void StoredKnowledge::OGoutput() {
+    cout << "INTERFACE" << endl;
+    cout << "  INPUT" << endl;
+    bool first = true;
+    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+        if (!first) {
+            cout << "," << endl;
+        }
+        first = first && false;
+        cout << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
+    }
+    cout << ";" << endl;
+
+    cout << "  OUTPUT" << endl;
+    first = true;
+    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+        if (!first) {
+            cout << "," << endl;
+        }
+        first = first && false;
+        cout << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
+    }
+    cout << ";" << endl << endl;
+    
+    cout << "NODES" << endl;
+    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        if (it != seen.begin()) {
+            cout << "," << endl;
+        }
+        
+        cout << "  " << reinterpret_cast<unsigned int>(*it) << " : (" << (*it)->formula() << ") : blue";
+        if ((*it)->is_final) {
+            cout << " : finalnode";
+        }
+    }
+    cout << ";" << endl << endl;
+    
+    cout << "INITIALNODE" << endl << "  " << reinterpret_cast<unsigned int>(root) << ";" << endl << endl;
+    
+    cout << "TRANSITIONS" << endl;
+    first = true;
+    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if ((*it)->successors[l-1] != NULL) {
+                if (!first) {
+                    cout << "," << endl;
+                }
+                first = first && false;
+                cout << "  " << reinterpret_cast<unsigned int>(*it) << " -> " << reinterpret_cast<unsigned int>((*it)->successors[l-1]) << " : " << Label::id2name[l];
+            }
+        }
+    }
+    cout << ";" << endl << endl;
 }

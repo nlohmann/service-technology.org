@@ -11,6 +11,10 @@ option "dot" -
   "Graphviz dot output."
   flag off
 
+option "og" -
+  "Operating guidelines output."
+  flag off
+
 
 section "Options"
 

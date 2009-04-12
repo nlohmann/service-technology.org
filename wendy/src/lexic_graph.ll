@@ -7,7 +7,6 @@
 #include <cstring>
 #include <string>
 #include "syntax_graph.h"
-#include "Label.h"
 #include "config.h"
 
 extern std::string NAME_token;
@@ -33,7 +32,7 @@ number    "-"?[0-9][0-9]*
 "->"                    { return ARROW; }
 
 {number}  { graph_lval.val = atoi(graph_text); return NUMBER; }
-{name}    { NAME_token=graph_text; return NAME; }
+{name}    { NAME_token = graph_text; return NAME; }
 
 [ \t\r\n]*   { /* skip */ }
 <<EOF>>      { return EOF; }

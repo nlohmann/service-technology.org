@@ -1,6 +1,5 @@
-%token KW_STATE KW_PROG COLON COMMA ARROW INDENT NUMBER NAME
+%token KW_STATE KW_PROG COLON COMMA ARROW NUMBER NAME
 
-%token_table
 %defines
 %name-prefix="graph_"
 
@@ -8,7 +7,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "pnapi.h"
 #include "InnerMarking.h"
 #include "Label.h"
 
@@ -26,12 +24,10 @@ std::map<const pnapi::Place*, unsigned int> marking;
 
 extern int graph_lex();
 extern int graph_error(const char *);
-
 %}
 
 %union {
   unsigned int val;
-  unsigned char name;
 }
 
 %type <val> NUMBER
@@ -67,6 +63,6 @@ markings:
 transitions:
   /* empty */
 | transitions NAME ARROW NUMBER
-      { currentLabels.push_back(Label::name2id[NAME_token]);
-        currentSuccessors.push_back($4); }
+    { currentLabels.push_back(Label::name2id[NAME_token]);
+      currentSuccessors.push_back($4); }
 ;

@@ -1672,11 +1672,14 @@ unsigned int PetriNet::reduce_identical_places()
 {
   // obsolete place and its "backup"-place 
   set<pair<Place*, Place*> > placePairs;
-  map<Node*,bool> backupPlaces; // these places must not be reduced
+  
+  // these places either already will be deleted or must not be deleted in this iteration
+  map<Node*,bool> seenPlaces;  
   
   for(set<Place*>::iterator p = internalPlaces_.begin();
         p != internalPlaces_.end(); ++p)
-    backupPlaces[*p] = false;
+    seenPlaces[*p] = false;
+  
   
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
   
@@ -1684,7 +1687,7 @@ unsigned int PetriNet::reduce_identical_places()
   for (set<Place*>::iterator p1 = internalPlaces_.begin(); 
         p1 != internalPlaces_.end(); ++p1)
   {
-    if( (backupPlaces[*p1]) ||
+    if( (seenPlaces[*p1]) ||
         (!(__REDUCE_CHECK_FINAL(*p1))) ) // precondition 6
     {
       continue;
@@ -1732,7 +1735,8 @@ unsigned int PetriNet::reduce_identical_places()
       // check its postset
       for (set<Node*>::iterator p2 = preTransition->getPostset().begin(); 
             p2 != preTransition->getPostset().end(); ++p2)
-        if ( (*p1 != *p2) &&   // precondition 1
+        if ( (!(seenPlaces[*p2])) &&
+             (*p1 != *p2) &&   // precondition 1
              ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
              ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
              ((*p1)->getTokenCount() == 0) && // precondition 5
@@ -1765,7 +1769,9 @@ unsigned int PetriNet::reduce_identical_places()
         
           // places fullfill the preconditions
           placePairs.insert(pair<Place*, Place*>(*p1, static_cast<Place*>(*p2)));
-          backupPlaces[*p2] = true; // mark p2 as backup place
+          seenPlaces[*p1] = true; // mark p1 as seen
+          seenPlaces[*p2] = true; // mark p2 as seen
+          break; // just one reduction at one iteration
         }
     }
     else // if there was no pretransition
@@ -1778,7 +1784,8 @@ unsigned int PetriNet::reduce_identical_places()
       {
         for (set<Node*>::iterator p2 = postTransition->getPreset().begin(); 
               p2 != postTransition->getPreset().end(); ++p2)
-          if ( (*p1 != *p2) &&     // precondition 1
+          if ( (!(seenPlaces[*p2])) &&
+               (*p1 != *p2) &&     // precondition 1
                ((*p2)->getPreset().empty()) && // precondition 2
                ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
                ((*p1)->getTokenCount() == 0) && // precondition 5
@@ -1801,7 +1808,9 @@ unsigned int PetriNet::reduce_identical_places()
             
             // places fullfill the preconditions
             placePairs.insert(pair<Place*, Place*>(*p1, static_cast<Place*>(*p2)));
-            backupPlaces[*p2] = true; // mark p2 as backup place
+            seenPlaces[*p1] = true; // mark p1 as seen
+            seenPlaces[*p2] = true; // mark p2 as seen
+            break; // just one reduction at one iteration
           }
       }
     

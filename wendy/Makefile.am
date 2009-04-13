@@ -5,3 +5,4 @@ svn-clean: maintainer-clean
 	       depcomp install-sh missing ylwrap
 	rm -fr src/config.h.in~ src/Makefile.in libs/Makefile.in src/config.h.in
 	rm -fr man/Makefile.in
+	rm -fr doc/doxygen

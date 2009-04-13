@@ -2,6 +2,9 @@
 #define __TYPES_H
 
 #include "config.h"
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 /// the range of hash values (max. 65535)
 typedef uint16_t hash_t;

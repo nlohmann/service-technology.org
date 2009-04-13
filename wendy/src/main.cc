@@ -2,7 +2,8 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
-
+#include <cassert>
+#include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 #include "cmdline.h"
@@ -177,7 +178,7 @@ int main(int argc, char** argv) {
     time(&start_time);
     unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
     time(&end_time);
-    
+
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: removed %d red nodes in %d iterations [%.0f sec]\n",
             PACKAGE, redNodes, StoredKnowledge::iterations, difftime(end_time, start_time));
@@ -200,7 +201,7 @@ int main(int argc, char** argv) {
     if (args_info.og_given) {
         StoredKnowledge::OGoutput();
     }
-    
+
 
     return EXIT_SUCCESS;
 }

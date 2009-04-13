@@ -16,10 +16,10 @@ class Knowledge {
 
         /// construct knowledge from a given knowledge and a label
         Knowledge(Knowledge*, Label_ID);
-        
+
         /// destructor
         ~Knowledge();
-        
+
         /// stream output operator
         friend std::ostream& operator<< (std::ostream&, const Knowledge&);
 
@@ -27,7 +27,7 @@ class Knowledge {
 
         /// whether this knowledge is sane
         unsigned is_sane : 1;
-        
+
         /// the number of markings stored in the bubble
         unsigned int size;
 

@@ -22,7 +22,8 @@ class StoredKnowledge {
 
         /// print a dot representation
         static void dot(bool, enum_formula);
-        
+
+        /// print the knowledges as Fiona OG
         static void OGoutput();
 
     public: /* static attributes */
@@ -44,7 +45,7 @@ class StoredKnowledge {
 
         /// number of iterations needed to removed insane nodes
         static unsigned int iterations;
-        
+
         /// the root knowledge
         static StoredKnowledge *root;
 
@@ -52,7 +53,7 @@ class StoredKnowledge {
 
         /// number of markings stored
         static int entries_count;
-    
+
         /// nodes that should be deleted
         static std::set<StoredKnowledge*> deletedNodes;
 
@@ -92,7 +93,7 @@ class StoredKnowledge {
 
         /// return a two-bit representation of the knowledge's formula
         std::string twoBitFormula() const;
-        
+
         /// traverse knowledges beginning from the root
         void traverse();
 

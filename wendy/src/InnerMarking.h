@@ -25,7 +25,7 @@
  */
 class InnerMarking {
     public: /* static functions */
-    
+
         /// copy markings from temporary storage to array
         static void initialize();
 
@@ -55,7 +55,7 @@ class InnerMarking {
         static unsigned int stats_final_markings;
 
     public: /* member functions */
-    
+
         /// constructor
         InnerMarking(const std::vector<Label_ID> &, const std::vector<InnerMarking_ID> &, bool);
 
@@ -64,26 +64,26 @@ class InnerMarking {
 
         /// determine the type of this marking
         void determineType();
-            
+
     public: /* member attributes */
-    
+
         /// whether this marking is final
         unsigned is_final : 1;
-        
+
         /// whether this marking needs an external event to proceed
         unsigned is_waitstate : 1;
-        
+
         /// whether this marking is an internal deadlock
         unsigned is_deadlock : 1;
-        
+
         /// the number of successor markings (size of successors and labels)
         uint8_t out_degree;
 
         /// the successor marking ids
         InnerMarking_ID *successors;
-        
+
         /// the successor label ids
-        Label_ID *labels;        
+        Label_ID *labels;
 };
 
 #endif

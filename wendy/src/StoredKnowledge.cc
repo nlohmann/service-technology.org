@@ -1,5 +1,7 @@
 #include <set>
 #include <iostream>
+#include <cassert>
+#include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 
@@ -36,7 +38,7 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
 {
     // make sure we copy from an existing object
     assert(K);
-    
+
     // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
@@ -50,7 +52,7 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
     if (size == 0) {
         return;
     }
-    
+
     // reserve the necessary memory for the internal markings
     inner = new InnerMarking_ID[size];
 
@@ -70,9 +72,9 @@ StoredKnowledge::StoredKnowledge(Knowledge *K) :
             interface[count] = new InterfaceMarking(*(pos->second[i]));
         }
     }
-    
+
     entries_count += count;
-    
+
     // we must not forget a marking
     assert(size == count);
 }
@@ -89,7 +91,7 @@ StoredKnowledge::~StoredKnowledge() {
         delete interface[i];
     }
     delete[] interface;
-    
+
     delete[] inner;
 
     entries_count -= this->size;
@@ -102,7 +104,7 @@ StoredKnowledge::~StoredKnowledge() {
 
 std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
     o << m.hash() << ":\t";
-    
+
     if (m.size == 0) {
         return o << "[]";
     }
@@ -136,17 +138,17 @@ StoredKnowledge *StoredKnowledge::store() {
         // we found an element with the same hash -- is it a collision?
         for (size_t i = 0; i < el->second.size(); ++i) {
             assert(el->second[i]);
-            
+
             // compare the sizes
             if (size == el->second[i]->size) {
                 if (size == 0) {
                     // only the empty node has the size 0 -- no collision here
                     return el->second[i];
                 }
-                
+
                 // if still true after the loop, we found previously stored knowledge
                 bool found = true;
-                
+
                 // compare the inner and interface markings
                 for (unsigned int j = 0; (j < size && found); ++j) {
                     if (inner[j] != el->second[i]->inner[j] ||
@@ -163,7 +165,7 @@ StoredKnowledge *StoredKnowledge::store() {
                 }
             }
         }
-        
+
         // this object was not found in the bucket -- this is a collision
         ++hashCollisions;
 
@@ -192,7 +194,7 @@ void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge *knowledge) {
 
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
-    
+
     // increase the successor's indegree (needed for later predecessor relation)
     ++(knowledge->inDegree);
 }
@@ -203,18 +205,18 @@ inline hash_t StoredKnowledge::hash() const {
     if (size == 0) {
         return 0;
     }
-    
+
     hash_t result = 1;
 
     for (unsigned int i = 0; i < size; ++i) {
         result += ((1 << i) * (inner[i]) + interface[i]->hash());
     }
-    
+
     // make sure that we don't accientially use 0 for a nonempty knowledge
     if (result == 0) {
         result = 1;
     }
-    
+
     return result;
 }
 
@@ -222,7 +224,7 @@ inline hash_t StoredKnowledge::hash() const {
 void StoredKnowledge::addPredecessor(StoredKnowledge* k) {
     assert(k);
     assert(inDegree > 0);
-    
+
     // when called for the first time, get some memory
     if (predecessors == NULL) {
         predecessors = new StoredKnowledge*[inDegree];
@@ -231,7 +233,7 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* k) {
             predecessors[i] = NULL;
         }
     }
-    
+
     // use the first free position and store this knowledge
     assert(predecessorCounter < inDegree);
     assert(predecessors[predecessorCounter] == NULL);
@@ -247,7 +249,7 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* k) {
  */
 unsigned int StoredKnowledge::addPredecessors() {
     unsigned int result = 0;
-    
+
     // traverse the hash buckets
     for (std::map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         // traverse the entries
@@ -263,7 +265,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                     it->second[i]->is_final = 1;
                     it->second[i]->interface[j] = NULL;
                 }
-                
+
                 // case 2: a resolved waitstate
                 if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
                     // check if DL is resolved by interface marking
@@ -284,7 +286,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                         it->second[i]->interface[j] = NULL;                        
                 }
             }
-            
+
             /* now we know wheter this knowledge contains a final marking and
                that every marking with a non-NULL interface marking is a
                deadlock that needs to be resolved */
@@ -320,12 +322,12 @@ bool StoredKnowledge::sat() {
             return true;
         }
     }
-    
+
     // now each deadlock (a marking with NULL interface) must have ?-sucessors
     for (unsigned int i = 0; i < size; ++i) {
         if (interface[i] != NULL) {
             bool resolved = false;
-            
+
             // we found a deadlock -- check whether for at least one marked
             // output place exists a respective receiving edge
             for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
@@ -334,12 +336,12 @@ bool StoredKnowledge::sat() {
                     break;
                 }
             }
-            
+
             // the deadlock is not resolved
             if (!resolved) {
                 is_sane = 0;
                 return false;
-            }            
+            }
         }
     }
     
@@ -353,13 +355,13 @@ bool StoredKnowledge::sat() {
 */
 unsigned int StoredKnowledge::removeInsaneNodes() {    
     unsigned int result = 0;
-    
+
     /// a set of nodes that need to be removed
     std::set<StoredKnowledge*> insaneNodes;
-    
+
     /// a set of nodes that need to be considered
     std::set<StoredKnowledge*> affectedNodes;
-    
+
     // initially, traverse all nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
@@ -368,7 +370,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
             }
         }
     }
-    
+
     // iteratively removed all insane nodes and check their predecessors
     bool done = false;
     while (!done) {
@@ -405,16 +407,14 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
                 }
             }
         }
-        
+
         done = insaneNodes.empty();
     }
-    
-    
+
+
     // traverse all nodes reachable from the root
     root->traverse();
-    
-    
-    
+
     return result;
 }
 
@@ -429,14 +429,14 @@ void StoredKnowledge::dot(bool showTrue = false, enum_formula formulaStyle = for
             if (it->second[i]->is_sane &&
                 (seen.find(it->second[i]) != seen.end()) &&
                 (showTrue || it->second[i]->size > 0)) {
-                
+
                 string formula;
                 switch (formulaStyle) {
                     case(formula_arg_dnf): formula = it->second[i]->formula(); break;
                     case(formula_arg_2bits): formula = it->second[i]->twoBitFormula(); break;
                     case(formula_arg_3bits): formula = it->second[i]->twoBitFormula(); break; // not implemented yet
                 }
-                
+
                 cout << "\"" << it->second[i] << "\" [label=\"" << formula << "\"]" << endl;
 //                cout << "\"" << it->second[i] << "\" [label=\"" << it->second[i] << "\\n" << *it->second[i] << "\"]" << endl;
                 for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
@@ -463,29 +463,29 @@ void StoredKnowledge::calcRecursive(Knowledge *K, StoredKnowledge *SK) {
     assert(SK);
     static unsigned int calls = 0;
     static unsigned int edges = 0;
-    
-    
+
+
     if (++calls % reportFrequency == 0) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
             StoredKnowledge::storedKnowledges, edges);
     }
-    
+
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         Knowledge *K_new = new Knowledge(K, l);
-        
+
         // only process knowledges within the message bounds
         if (K_new->is_sane) {
             // create a compact version of the knowledge bubble
             StoredKnowledge *SK_new = new StoredKnowledge(K_new);
-            
+
             // add it to the knowledge tree
             StoredKnowledge *SK_store = SK_new->store();
             assert(SK_store);
-            
+
             // store an edge from the parent to this node
             SK->addSuccessor(l, SK_store);
             ++edges;
-            
+
             // if the node was new, check its successors
             if (SK_store == SK_new) {
                 calcRecursive(K_new, SK_store);
@@ -519,7 +519,7 @@ string StoredKnowledge::formula() const {
             containsDeadlock = true;
         }
     }
-    
+
     // if there is no deadlock and the knowledge is not final, return true
     if (!containsDeadlock && !is_final) {
         return "true";
@@ -595,7 +595,7 @@ string StoredKnowledge::formula() const {
     if (is_final) {
         result += "final";
     }
-    
+
     return result;
 }
 
@@ -606,7 +606,7 @@ string StoredKnowledge::formula() const {
  */
 string StoredKnowledge::twoBitFormula() const {
     string result;
-        
+
     if (is_final) {
         result += "F";
     }
@@ -614,7 +614,7 @@ string StoredKnowledge::twoBitFormula() const {
     for (unsigned int i = 0; i < size; ++i) {
         if (interface[i] != NULL) {
             bool resolved = false;
-            
+
             // we found a deadlock -- check whether for at least one marked
             // output place exists a respective receiving edge
             for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
@@ -623,14 +623,14 @@ string StoredKnowledge::twoBitFormula() const {
                     break;
                 }
             }
-            
+
             // the deadlock is not resolved
             if (!resolved) {
                 return "S" + result;
-            }            
+            }
         }
     }
-    
+
     return result;
 }
 
@@ -641,7 +641,7 @@ void StoredKnowledge::traverse() {
                 successors[l-1]->traverse();
             }
         }
-    }    
+    }
 }
 
 void StoredKnowledge::OGoutput() {
@@ -667,22 +667,22 @@ void StoredKnowledge::OGoutput() {
         cout << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
     }
     cout << ";" << endl << endl;
-    
+
     cout << "NODES" << endl;
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         if (it != seen.begin()) {
             cout << "," << endl;
         }
-        
+
         cout << "  " << reinterpret_cast<unsigned int>(*it) << " : (" << (*it)->formula() << ") : blue";
         if ((*it)->is_final) {
             cout << " : finalnode";
         }
     }
     cout << ";" << endl << endl;
-    
+
     cout << "INITIALNODE" << endl << "  " << reinterpret_cast<unsigned int>(root) << ";" << endl << endl;
-    
+
     cout << "TRANSITIONS" << endl;
     first = true;
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {

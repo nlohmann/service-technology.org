@@ -2,8 +2,9 @@
 #define __STDC_LIMIT_MACROS
 
 #include <cmath>
-#include <stdint.h>
-
+#include <cstdlib>
+#include <cassert>
+#include "config.h"
 #include "cmdline.h"
 #include "InterfaceMarking.h"
 #include "Label.h"
@@ -26,6 +27,9 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
  * STATIC METHODS *
  ******************/
 
+/*!
+ \todo implement log2() as lookup macro
+ */
 unsigned int InterfaceMarking::initialize(unsigned int m) {
     // only a positive message bound makes sense
     if (m < 1) {
@@ -33,20 +37,20 @@ unsigned int InterfaceMarking::initialize(unsigned int m) {
             PACKAGE);
         exit(EXIT_FAILURE);
     }
-    
+
     // we use bytes to store the markings, so the message bound must not exceed 255    
     if (m > UINT8_MAX) {
         fprintf(stderr, "%s: message bound must not exceed %d -- aborting\n",
             PACKAGE, UINT8_MAX);
         exit(EXIT_FAILURE);
     }
-    
+
     message_bound = m;
-    interface_length = Label::async_events;    
+    interface_length = Label::async_events;
     message_bound_bits = ceil(log2((double)message_bound+1));
     markings_per_byte = 8 / message_bound_bits;
     bytes = ceil((double)interface_length / (double)markings_per_byte);
-    
+
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: message bound set to %d (%d bytes/interface marking, %d bits/event)\n",
             PACKAGE, message_bound, bytes, message_bound_bits);
@@ -58,6 +62,9 @@ unsigned int InterfaceMarking::initialize(unsigned int m) {
  * CONSTRUCTOR *
  ***************/
 
+/*!
+ \bug will not work in case the net has an empty interface
+ */
 InterfaceMarking::InterfaceMarking() : storage(NULL) {
     // initialize() must be called before first object is created
     assert(interface_length);
@@ -86,7 +93,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
     storage = new uint8_t[bytes];
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = other.storage[i];
-    }    
+    }
 }
 
 
@@ -124,7 +131,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = other.storage[i];
     }
-    
+
     if (increase) {
         if (!inc(label)) {
             success = false;
@@ -204,13 +211,13 @@ inline uint8_t InterfaceMarking::get(Label_ID label) const {
     unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
     unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
-    
+
     // first, create (2**message_bound_bits)-1, then shift it to the needed position
     uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
-        
+
     // get the result by masking the respective byte
     uint8_t result = storage[byte] & mask;
-    
+
     // shift back the result
     return (result >> offset);
 }
@@ -227,20 +234,20 @@ bool InterfaceMarking::set(Label_ID label, uint8_t &v) {
     unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
     unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
-    
+
     // create a mask to select the bits we want to modify:
     // (2**message_bound_bits)-1, then shift it to the needed position
     uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
-    
+
     // shift and mask the value to store
     uint8_t result = ((v << offset) & mask);
 
     // remove values of this label
     uint8_t crop = (storage[byte] & ~mask);
-    
+
     // combine set value and the stored byte
     storage[byte] = (crop | result);
-    
+
     return (v <= message_bound);
 }
 
@@ -266,10 +273,10 @@ inline bool InterfaceMarking::inc(Label_ID label) {
     // use the mask to get the current value from the byte,
     // then shift and increment the value
     uint8_t update = ((storage[byte] & mask) >> offset) + 1;
-    
+
     // shift back and mask the value to store
     uint8_t result = ((update << offset) & mask);
-    
+
     // remove values of this label
     uint8_t crop = (storage[byte] & ~mask);
 
@@ -291,7 +298,7 @@ inline bool InterfaceMarking::dec(Label_ID label) {
     unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
     unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
-    
+
     // create a mask to select the bits we want to modify:
     // (2**message_bound_bits)-1, then shift it to the needed position
     uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
@@ -326,16 +333,16 @@ bool InterfaceMarking::empty() const {
             return false;
         }
     }
-    
+
     return true;
 }
 
 hash_t InterfaceMarking::hash() const {
     hash_t result = 0;
-    
+
     for (unsigned int i = 0; i < bytes; ++i) {
         result += (storage[i] << (7*i));
     }
-    
+
     return result;
 }

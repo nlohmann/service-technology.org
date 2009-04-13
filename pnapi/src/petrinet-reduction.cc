@@ -659,9 +659,9 @@ unsigned int PetriNet::reduce_rule_4()
   for (set<Place*>::iterator p = internalPlaces_.begin(); 
        p != internalPlaces_.end(); ++p)
   {
-    if(( (*p)->getPostset().size()==1) && // precondition 2
-       ( (*((*p)->getPostsetArcs().begin()))->getWeight()==1 ) && // precondition 3
-       ( !((*p)->getPreset().empty()) ) ) // precondition 5
+    if( ( (*p)->getPostset().size()==1) && // precondition 2
+        ( (*((*p)->getPostsetArcs().begin()))->getWeight()==1 ) && // precondition 3
+        ( !((*p)->getPreset().empty()) ) ) // precondition 5
     {
       relevantPlaces.insert(*p);
     }
@@ -682,7 +682,8 @@ unsigned int PetriNet::reduce_rule_4()
     {
       Transition* t1 = static_cast<Transition*>(*((*p1)->getPostset().begin()));
       Transition* t2 = static_cast<Transition*>(*((*p2)->getPostset().begin()));
-      if( __REDUCE_CHECK_FINAL(*p2) && // precondition 6
+      if( (t1 != t2) &&
+          __REDUCE_CHECK_FINAL(*p2) && // precondition 6
           (reduce_isEqual(t1,t2,*p1,*p2)) && // precondition 4
           (!(t2->isSynchronized())) ) // precondition 7
       {
@@ -716,15 +717,16 @@ unsigned int PetriNet::reduce_rule_4()
     }
     
     // STEP 3.2: set marking
-    p1->mark(p1->getTokenCount()+p2->getTokenCount());
+    p1->mark(p1->getTokenCount() + p2->getTokenCount());
     
     // save history
     p1->mergeNameHistory(*p2);
-    (*(p1->getPostset().begin()))->mergeNameHistory(*(*(p1->getPostset().begin())));
+    (*(p1->getPostset().begin()))->mergeNameHistory(*(*(p2->getPostset().begin())));
     
     // STEP 3.3: remove place and transition
     deleteTransition(*(static_cast<Transition*>(*(p2->getPostset().begin()))));
     deletePlace(*p2);
+    
     ++result;
   }
   
@@ -1250,7 +1252,7 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
  * If there exists a place p with identical preset and postset (precondition 1)
  * and for each transition in the preset of p applies that the
  * arc weight from p to t equals the arc weight from t to p (precondition 2)
- * and this arc weight is less than the amount of tokens stored in p (precondition 3)
+ * and this arc weight is less or equal than the amount of tokens stored in p (precondition 3)
  * and p is not concerned by a final condition (precondition 4)
  * than this place can be removed as well as each transition
  * becoming isolated by this reduction, except those ones 
@@ -1284,7 +1286,7 @@ unsigned int PetriNet::reduce_rule_7()
     {
       Arc* a2 = findArc((**p),(*a1)->getSourceNode());
       if( ((*a1)->getWeight() != a2->getWeight()) || // precondition 2
-          (a2->getWeight() != m) ) // precondition 3
+          (a2->getWeight() > m) ) // precondition 3
       {
         precond = true;
         break;
@@ -1496,7 +1498,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
        p != internalPlaces_.end(); ++p)
   {
     { 
-      {
+      { 
         // precondition 8
         if(keepNormal)
         {
@@ -1518,7 +1520,9 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       }
       
       // check for seen or synchronized transitions (precondition 7)
-      bool seen = (seenTransitions[*((*p)->getPostset().begin())] || static_cast<Transition*>(*((*p)->getPostset().begin()))->isSynchronized());
+      bool seen = ((*p)->getPostset().begin() == (*p)->getPostset().end()) ?
+                   false : ( seenTransitions[*((*p)->getPostset().begin())] || 
+                    static_cast<Transition*>(*((*p)->getPostset().begin()))->isSynchronized());
       for(set<Node*>::iterator t = (*p)->getPreset().begin();
           t != (*p)->getPreset().end(); ++t)
       {
@@ -1548,7 +1552,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     seenTransitions[t] = true; // mark t as seen
     for(set<Node*>::iterator ti = (*p)->getPreset().begin();
           ti != (*p)->getPreset().end(); ++ti)
-      seenTransitions[*ti] = true; // mark preset of p as seen
+      seenTransitions[*ti] = true; // mark preset of p as seen    
   }
   
   // apply reduction  
@@ -1563,7 +1567,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     
     for(set<Arc*>::iterator a = t->getPostsetArcs().begin();
           a != t->getPostsetArcs().end(); ++a)
-    {
+    { 
       Place* pi = static_cast<Place*>(&((*a)->getTargetNode()));
       pi->mark(pi->getTokenCount() + ((*a)->getWeight() * tokens));
     }
@@ -1571,7 +1575,6 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     (*p)->mark(0);
     
     // STEP 2:
-    
     set<Node*> preset = (*p)->getPreset();
     
     // iterate preset of p
@@ -1630,7 +1633,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     {
       deleteTransition(*static_cast<Transition*>(*ti));
     }
-    
+     
     deleteTransition(*t);
     
     ++result;

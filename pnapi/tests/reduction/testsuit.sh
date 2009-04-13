@@ -154,7 +154,14 @@ if [ ${RET} != 0 ]
   else printf "OK\n"
 fi
 
-echo "Reduce: Starke 3 for transitions...SKIPPED"
+printf "Reduce: Starke 3 for transitions..."
+call_petri "./test_starke_3t.net.owfn" "5" "2" "10" "5" "1" "5" "starke3t"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
 
 printf "Reduce: Starke 4..."
 call_petri "./test_starke_4.net.owfn" "4" "4" "8" "3" "3" "6" "starke4"
@@ -183,8 +190,23 @@ if [ ${RET} != 0 ]
   else printf "OK\n"
 fi
 
-echo "Reduce: Starke 7...SKIPPED"
-echo "Reduce: Starke 8...SKIPPED"
+printf "Reduce: Starke 7..."
+call_petri "./test_starke_7.net.owfn" "3" "2" "6" "2" "1" "2" "starke7"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
+
+printf "Reduce: Starke 8..."
+call_petri "./test_starke_8.net.owfn" "4" "2" "10" "4" "1" "4" "starke8"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
 
 printf "Reduce: Starke 9..."
 call_petri "./test_starke_9.net.owfn" "5" "5" "15" "4" "4" "12" "starke9,once"

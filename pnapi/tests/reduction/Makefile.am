@@ -12,7 +12,15 @@ EXTRA_DIST = testsuit.sh \
 	     test_series_transitions_keepnormal.net.owfn \
 	     test_self_loop_places.net.owfn \
 	     test_self_loop_transitions.net.owfn \
-	     test_unused_status_places.net.owfn
+	     test_unused_status_places.net.owfn \
+	     test_starke_3p.net.owfn \
+	     test_starke_3t.net.owfn \
+	     test_starke_4.net.owfn \
+	     test_starke_5.net.owfn \
+	     test_starke_6.net.owfn \
+	     test_starke_7.net.owfn \
+	     test_starke_8.net.owfn \
+	     test_starke_9.net.owfn 
 
 DISTCLEANFILES =  test_dead_nodes.net.owfn.reduced.owfn \
 	     	  test_identical_places.net.owfn.reduced.owfn \
@@ -22,6 +30,13 @@ DISTCLEANFILES =  test_dead_nodes.net.owfn.reduced.owfn \
 	     	  test_series_transitions_keepnormal.net.owfn.reduced.owfn \
 	     	  test_self_loop_places.net.owfn.reduced.owfn \
 	     	  test_self_loop_transitions.net.owfn.reduced.owfn \
-	     	  test_unused_status_places.net.owfn.reduced.owfn
-
+	     	  test_unused_status_places.net.owfn.reduced.owfn \
+		  test_starke_3p.net.owfn.reduced.owfn \
+		  test_starke_3t.net.owfn.reduced.owfn \
+		  test_starke_4.net.owfn.reduced.owfn \
+		  test_starke_5.net.owfn.reduced.owfn \
+		  test_starke_6.net.owfn.reduced.owfn \
+		  test_starke_7.net.owfn.reduced.owfn \
+		  test_starke_8.net.owfn.reduced.owfn \
+		  test_starke_9.net.owfn.reduced.owfn
 

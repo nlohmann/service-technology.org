@@ -1032,7 +1032,6 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
   return result; 
 }
 
-/// \todo hier synchro
 
 /*!
  * \brief Fusion of transitions
@@ -1045,6 +1044,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
  * and all arcs to p or from p have the weight v (precondition 6)
  * and the amount of tokens stored in p is less than v (precondition 7)
  * and p is not concerned by a final condition (precondition 8)
+ * and the pre- and posttransitions of p are not synchronized (precondition 9)
  * then the following reduction can be applied:
  * 
  * 1.:  For each transition ti' from the postset of p add a new 
@@ -1058,7 +1058,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
  * 
  * If both t is an interface transition and the postset of p contains such
  * (i.e. transitons connected with interfac places) and keepNormal is true, 
- * the reduction will be prevented (precondition 8).
+ * the reduction will be prevented (precondition 10).
  * 
  * \param   keepNormal determines wether reduction of a normalized net should
  *          preserve normalization or not. If true, the reduction will be
@@ -1069,7 +1069,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
  *   
  */
 unsigned int PetriNet::reduce_rule_6(bool keepNormal)
-{
+{ 
   // search for places fullfilling the preconditions
   set<Place*> obsoletePlaces;
   
@@ -1083,7 +1083,6 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
   for (set<Place*>::iterator p = internalPlaces_.begin(); 
        p != internalPlaces_.end(); ++p)
   {
-    
     if ( ((*p)->getPreset().size() != 1) || // precondition 1
          (!(__REDUCE_CHECK_FINAL(*p))) ) // precondition 8
       continue;
@@ -1091,7 +1090,7 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
     Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
     
     {
-      // precondition 8
+      // precondition 10
       if(keepNormal)
       {
         bool precond10 = false;
@@ -1099,25 +1098,27 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         // check the postset
         for(set<Node*>::iterator n = (*p)->getPostset().begin();
               n != (*p)->getPostset().end(); ++n)
+        {
           if((*n)->getType() != Node::INTERNAL )
           {
             precond10 = true;
             break;
           }
+        }
         
-        if( (t->getType() != Node::INTERNAL ) && 
-            precond10 )
+        if( precond10 &&
+            (t->getType() != Node::INTERNAL ) ) 
           continue;
       }
     }
     
-    // check for seen transitions
+    // check for seen or synchronized transitions (precondition 9)
     {
-      bool seen = seenTransitions[t];
+      bool seen = (seenTransitions[t] || t->isSynchronized());
       
       for(set<Node*>::iterator n = (*p)->getPostset().begin();
           n != (*p)->getPostset().end(); ++n)
-        seen = (seen || seenTransitions[*n]);
+        seen = (seen || seenTransitions[*n] || static_cast<Transition*>(*n)->isSynchronized());
       
       if(seen)
         continue;
@@ -1128,21 +1129,24 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         ((*p)->getPostset().find(t) != (*p)->getPostset().end()) ) // precondition 4
       continue;
     
-    bool precond5 = false;
-    
-    for(set<Node*>::iterator n = t->getPreset().begin(); 
-          n != t->getPreset().end(); ++n)
+    // precondition 5
     {
-      if((*n)->getPostset().size() != 1)
+      bool precond5 = false;
+      
+      for(set<Node*>::iterator n = t->getPreset().begin(); 
+            n != t->getPreset().end(); ++n)
       {
-        precond5 = true;
-        break;
+        if((*n)->getPostset().size() != 1)
+        {
+          precond5 = true;
+          break;
+        }
       }
+      
+      if(precond5) 
+        continue;
     }
     
-    if(precond5) // precondition 5
-      continue;
-  
     unsigned int v = (*((*p)->getPresetArcs().begin()))->getWeight();
     bool precond6 = false;
     
@@ -1177,10 +1181,13 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
     // STEP 1:
     Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
     
-    for(set<Node*>::iterator t__ = (*p)->getPostset().begin();
-          t__ != (*p)->getPostset().end(); ++t__)
+    set<Node*> postset = (*p)->getPostset();
+    
+    for(set<Node*>::iterator t__ = postset.begin();
+          t__ != postset.end(); ++t__)
     {
       Transition* nt = &createTransition(); // get new transition
+      
       nt->mergeNameHistory(*t); // save history
       nt->mergeNameHistory(**p); // save history
       nt->mergeNameHistory(**t__); // save history
@@ -1199,6 +1206,8 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
       for(set<Arc*>::iterator a = (*t__)->getPresetArcs().begin();
             a != (*t__)->getPresetArcs().end(); ++a)
       {
+        if(&((*a)->getSourceNode()) == *p)
+          continue;
         preset.insert(&((*a)->getSourceNode()));
         weights[&((*a)->getSourceNode())] += (*a)->getWeight();
       }
@@ -1215,14 +1224,20 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         createArc(*nt,(*a)->getTargetNode(),(*a)->getWeight());
     }
     
+    
     // STEP 2:
     deleteTransition(*t);
     
-    for(set<Node*>::iterator n = (*p)->getPostset().begin();
-          n != (*p)->getPostset().end(); ++n)
-      deleteTransition(*static_cast<Transition*>(*n));
+    set<Node*> obsoleteTransitions = (*p)->getPostset();
     
     deletePlace(**p);
+    
+    for(set<Node*>::iterator n = obsoleteTransitions.begin();
+          n != obsoleteTransitions.end(); ++n)
+    {
+      deleteTransition(*static_cast<Transition*>(*n));
+    }
+    
     ++result;
   }
   
@@ -1237,8 +1252,9 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
  * arc weight from p to t equals the arc weight from t to p (precondition 2)
  * and this arc weight is less than the amount of tokens stored in p (precondition 3)
  * and p is not concerned by a final condition (precondition 4)
- * than this place can be removed as well as each transition 
- * becoming isolated by this reduction.
+ * than this place can be removed as well as each transition
+ * becoming isolated by this reduction, except those ones 
+ * that are synchronized (precondition 5).
  * 
  * \post  this rule preserves lifeness and boundedness according to [Sta90]
  * 
@@ -1305,7 +1321,11 @@ unsigned int PetriNet::reduce_rule_7()
   // clean transitions
   for(set<Transition*>::iterator t = obsoleteTransitions.begin();
         t != obsoleteTransitions.end(); ++t)
+  {
+    if((*t)->isSynchronized()) // precondition 5
+      continue;
     deleteTransition(**t);
+  }
   
   return result;
 }
@@ -1321,6 +1341,7 @@ unsigned int PetriNet::reduce_rule_7()
  * p is in the preset of t0 (precondition 4)
  * and the arc weight from p to t0 is greater than or equal to
  * the arc weight from p to t (precondition 5)
+ * ant t is not synchronized (precondition 6)
  * than t can be removed.
  * 
  * \post  this rule preserves lifeness and boundedness according to [Sta90]
@@ -1348,8 +1369,8 @@ unsigned int PetriNet::reduce_rule_8()
   for (set<Transition*>::iterator t = transitions_.begin(); 
        t != transitions_.end(); ++t)
   {
-    // check if t is a "backup"-transition
-    if(seenTransitions[*t])
+    if( (seenTransitions[*t]) || // check if t is a "backup"-transition
+        ((*t)->isSynchronized()) ) // precondition 6
       continue;
     
     if(!((*t)->getPreset() == (*t)->getPostset())) // precondition 1
@@ -1429,6 +1450,7 @@ unsigned int PetriNet::reduce_rule_8()
  * and the postset of t is not empty (precondition 4)
  * and p is not in the postset of t (precondition 5)
  * and p is not concerned by a final condition (precondition 6)
+ * and neither t nor the preset of p is synchronized (precondition 7)
  * then the following changes can be applied:
  * 
  * 1.:  Fire t until p stores 0 tokens.
@@ -1445,7 +1467,7 @@ unsigned int PetriNet::reduce_rule_8()
  * 
  * If both the preset of p contains interface transitions and t is an
  * interface transition (i.e. transitons connected with interfac places) 
- * and keepNormal is true, the reduction will be prevented (precondition 6).
+ * and keepNormal is true, the reduction will be prevented (precondition 8).
  * 
  * \param   keepNormal determines wether reduction of a normalized net should
  *          preserve normalization or not. If true, the reduction will be
@@ -1475,7 +1497,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
   {
     { 
       {
-        // precondition 6
+        // precondition 8
         if(keepNormal)
         {
           bool precond10 = false;
@@ -1489,18 +1511,18 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
               break;
             }
           
-          if( ((*((*p)->getPostset().begin()))->getType() != Node::INTERNAL ) && 
-              precond10 )
+          if( precond10 && 
+              ((*((*p)->getPostset().begin()))->getType() != Node::INTERNAL ) )
             continue;
         }
       }
       
-      // check for seen Transitions
-      bool seen = seenTransitions[*((*p)->getPostset().begin())];
+      // check for seen or synchronized transitions (precondition 7)
+      bool seen = (seenTransitions[*((*p)->getPostset().begin())] || static_cast<Transition*>(*((*p)->getPostset().begin()))->isSynchronized());
       for(set<Node*>::iterator t = (*p)->getPreset().begin();
           t != (*p)->getPreset().end(); ++t)
       {
-        seen = seen || seenTransitions[*t];
+        seen = seen || seenTransitions[*t] || static_cast<Transition*>(*t)->isSynchronized();
       }
       
       if(seen)
@@ -1529,8 +1551,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       seenTransitions[*ti] = true; // mark preset of p as seen
   }
   
-  // apply reduction
-  
+  // apply reduction  
   unsigned int result = 0;
   
   for(set<Place*>::iterator p = obsoletePlaces.begin();
@@ -1550,9 +1571,12 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     (*p)->mark(0);
     
     // STEP 2:
+    
+    set<Node*> preset = (*p)->getPreset();
+    
     // iterate preset of p
-    for(set<Node*>::iterator ti = (*p)->getPreset().begin();
-          ti != (*p)->getPreset().end(); ++ti)
+    for(set<Node*>::iterator ti = preset.begin();
+          ti != preset.end(); ++ti)
     {
       Transition* tj = &createTransition(); // create new Transition Tj
       
@@ -1575,6 +1599,9 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       for(set<Arc*>::iterator a = (*ti)->getPostsetArcs().begin();
             a != (*ti)->getPostsetArcs().end(); ++a)
       {
+        if(&((*a)->getTargetNode()) == *p)
+          continue;
+        
         np.insert(&((*a)->getTargetNode()));
         weights[&((*a)->getTargetNode())] += (*a)->getWeight();
       }
@@ -1596,11 +1623,15 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
     }
     
     // STEP 3:
-    for(set<Node*>::iterator ti = (*p)->getPreset().begin();
-          ti != (*p)->getPreset().end(); ++ti)
-      deleteTransition(*static_cast<Transition*>(*ti));
-    deleteTransition(*t);
     deletePlace(**p);
+    
+    for(set<Node*>::iterator ti = preset.begin();
+          ti != preset.end(); ++ti)
+    {
+      deleteTransition(*static_cast<Transition*>(*ti));
+    }
+    
+    deleteTransition(*t);
     
     ++result;
   }
@@ -1812,6 +1843,7 @@ unsigned int PetriNet::reduce_identical_places()
  * and postset (precondition 3) 
  * and none of them is connected to any arc with a weight 
  * other than 1 (precondition 4),
+ * and t1 is not synchronized (precondition 5),
  * then t1 can be removed and its history will be stored at t2.
  * 
  * \post  this rule preserves lifeness and k-boundedness
@@ -1836,7 +1868,8 @@ unsigned int PetriNet::reduce_identical_transitions()
   for (set<Transition*>::iterator t1 = transitions_.begin(); 
         t1 != transitions_.end(); ++t1)
   {
-    if(backupTransition[*t1])
+    if( (backupTransition[*t1]) || 
+        ((*t1)->isSynchronized()) ) // precondition 5
       continue;
     
     {
@@ -1995,6 +2028,7 @@ unsigned int PetriNet::reduce_identical_transitions()
  * and q is not initially marked (precondition 6),
  * and q is not concerned by a final condition (precondition f)
  * and none of these places is communicating (precondition 7)
+ * and t is not synchronized (precondition 8)
  * then the histories of t and q will be attached to p,
  * the postset of q will be connected with p in the same way it
  * was connected to q, and t and q will be removed.
@@ -2027,6 +2061,7 @@ unsigned int PetriNet::reduce_series_places()
     
     if ( (seenPlaces[prePlace]) ||
          (seenPlaces[postPlace]) || 
+         ((*t)->isSynchronized()) || // precondition 8
          (!(__REDUCE_CHECK_FINAL(postPlace))) ) // precondition f
       continue;
     
@@ -2096,6 +2131,7 @@ unsigned int PetriNet::reduce_series_places()
  * and if t2 has no other incoming arcs (precondition 3),
  * and if the postsets of t1 and t2 are distinct (precondition 4),
  * and the arc weight from t1 to p and from p to t2 is 1 (precondition 5),
+ * and neither t1 nor t2 are synchronized (precondition 6),
  * then the following reduction can be applied:
  * 1.:  A new transition t will be created and connected with the preset of
  *      t1 and the postsets of t1 and t2 according to the appropriate
@@ -2144,7 +2180,10 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
         Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
 
         // check for seen transitions
-        if( seenTransitions[t1] || seenTransitions[t2])
+        if( (seenTransitions[t1]) || 
+            (seenTransitions[t2]) ||
+            (t1->isSynchronized()) || // precondition 6
+            (t2->isSynchronized()) ) // precondition 6
           continue;
         
         if ( (t2->getPreset().size() == 1) && // precondition 3
@@ -2300,6 +2339,7 @@ unsigned int PetriNet::reduce_self_loop_places()
  * If there exists a transition t with singleton preset p (precondition 1),
  * where the preset is identical to the postset (precondition 2),
  * and the arc weights both of (p->t) and of (t->p) is equal to 1 (precondition 3),
+ * and t is not synchronized (precondition 4),
  * then this transition can be removed.
  * 
  * \todo: How to handle the history of removed transitions?
@@ -2318,7 +2358,8 @@ unsigned int PetriNet::reduce_self_loop_transitions()
     if ( ((*t)->getPreset().size() == 1) &&        // precondition 1
          ((*t)->getPreset() == (*t)->getPostset()) &&   // precondition 2
          ((*((*t)->getPresetArcs().begin()))->getWeight() == 1) &&  // precondition 3
-         ((*((*t)->getPostsetArcs().begin()))->getWeight() == 1) )  // precondition 3
+         ((*((*t)->getPostsetArcs().begin()))->getWeight() == 1) &&  // precondition 3
+         (!((*t)->isSynchronized())) ) // precondition 4
         self_loop_transitions.insert(*t);
   
   // remove useless transitions
@@ -2733,6 +2774,9 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
     {
       done += reduce_equal_places();    // RD1
     }
+    
+    if ((reduction_level & ONCE) == ONCE)
+      break;
   }
   
   return passes;

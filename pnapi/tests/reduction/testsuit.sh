@@ -7,8 +7,6 @@
 
 DIR="${top_builddir}"
 
-echo "${DIR}"
-
 # call_petri(owfn,preP,preT,preA,poP,poT,poA,rules)
 call_petri() {
   OWFN="$1"
@@ -145,14 +143,58 @@ if [ ${RET} != 0 ]
   else printf "OK\n"
 fi
 
-echo "Reduce: Starke 3 for places...SKIPPED"
+
+
+printf "Reduce: Starke 3 for places..."
+call_petri "./test_starke_3p.net.owfn" "2" "3" "6" "1" "3" "3" "starke3p"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
+
 echo "Reduce: Starke 3 for transitions...SKIPPED"
-echo "Reduce: Starke 4...SKIPPED"
-echo "Reduce: Starke 5...SKIPPED"
-echo "Reduce: Starke 6...SKIPPED"
+
+printf "Reduce: Starke 4..."
+call_petri "./test_starke_4.net.owfn" "4" "4" "8" "3" "3" "6" "starke4"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
+
+printf "Reduce: Starke 5..."
+call_petri "./test_starke_5.net.owfn" "4" "4" "9" "3" "3" "7" "starke5"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
+
+printf "Reduce: Starke 6..."
+call_petri "./test_starke_6.net.owfn" "5" "5" "12" "4" "4" "10" "starke6"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
+
 echo "Reduce: Starke 7...SKIPPED"
 echo "Reduce: Starke 8...SKIPPED"
-echo "Reduce: Starke 9...SKIPPED"
+
+printf "Reduce: Starke 9..."
+call_petri "./test_starke_9.net.owfn" "5" "5" "15" "4" "4" "12" "starke9,once"
+RET=$?
+RESULT=`expr ${RESULT} + ${RET}`
+if [ ${RET} != 0 ]
+    then printf "FAIL\n"
+  else printf "OK\n"
+fi
+
 echo "Reduce: Suspicious transitions...SKIPPED"
 echo "Reduce: Unused status places...SKIPPED"
 

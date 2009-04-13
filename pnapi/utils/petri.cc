@@ -288,6 +288,10 @@ int main(int argc, char** argv) {
                     case(reduce_arg_starke8): newLevel = PetriNet::STARKE_RULE_8; break;
                     case(reduce_arg_starke9): newLevel = PetriNet::STARKE_RULE_9; break;
                     case(reduce_arg_keep_normal): newLevel = PetriNet::KEEP_NORMAL; break;
+                    case(reduce_arg_once): newLevel = PetriNet::ONCE; break;
+                    case(reduce_arg_k_boundedness): newLevel = PetriNet::K_BOUNDEDNESS; break;
+                    case(reduce_arg_boundedness): newLevel = PetriNet::BOUNDEDNESS; break;
+                    case(reduce_arg_liveness): newLevel = PetriNet::LIVENESS; break;
                     default: /* do nothing */; break;
                 }
 

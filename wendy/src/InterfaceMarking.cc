@@ -12,6 +12,17 @@
 extern gengetopt_args_info args_info;
 
 
+/*! \def LOG2(i)
+    \brief base 2 logarithm as lookup */
+#define LOG2(i) ((i <   2) ? 1 : \
+                ((i <   4) ? 2 : \
+                ((i <   8) ? 3 : \
+                ((i <  16) ? 4 : \
+                ((i <  32) ? 5 : \
+                ((i <  64) ? 6 : \
+                ((i < 128) ? 7 : 8 )))))))
+
+
 /******************
  * STATIC MEMBERS *
  ******************/
@@ -27,9 +38,6 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
  * STATIC METHODS *
  ******************/
 
-/*!
- \todo implement log2() as lookup macro
- */
 unsigned int InterfaceMarking::initialize(unsigned int m) {
     // only a positive message bound makes sense
     if (m < 1) {
@@ -47,7 +55,7 @@ unsigned int InterfaceMarking::initialize(unsigned int m) {
 
     message_bound = m;
     interface_length = Label::async_events;
-    message_bound_bits = ceil(log2((double)message_bound+1));
+    message_bound_bits = LOG2(message_bound);
     markings_per_byte = 8 / message_bound_bits;
     bytes = ceil((double)interface_length / (double)markings_per_byte);
 
@@ -203,7 +211,7 @@ std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
  * MEMBER METHODS *
  ******************/
 
-inline uint8_t InterfaceMarking::get(Label_ID label) const {
+uint8_t InterfaceMarking::get(Label_ID label) const {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -254,7 +262,7 @@ bool InterfaceMarking::set(Label_ID label, uint8_t &v) {
 /*!
  \return whether the message bound was respected (false means violation)
  */
-inline bool InterfaceMarking::inc(Label_ID label) {
+bool InterfaceMarking::inc(Label_ID label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -290,7 +298,7 @@ inline bool InterfaceMarking::inc(Label_ID label) {
 /*!
  \return whether the result is positive (false means decrement of 0)
  */
-inline bool InterfaceMarking::dec(Label_ID label) {
+bool InterfaceMarking::dec(Label_ID label) {
     assert(label > 0);
     assert(label <= interface_length);
 

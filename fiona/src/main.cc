@@ -1223,29 +1223,29 @@ void checkSimulation(AnnotatedGraph::ogs_t& OGsFromFiles) {
         TRACE(TRACE_1, "finished building the graph\n");
         TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime_end, buildGraphTime_start)) + " s consumed.\n");
 
-        TRACE(TRACE_1, "computing graph statistics...\n");
-        graphStatsTime_start = time(NULL);
-        graph->computeGraphStatistics();
-        graphStatsTime_end = time(NULL);
-        TRACE(TRACE_1, "finished computing graph statistics\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime_end, graphStatsTime_end)) + " s consumed.\n");
-
-
-        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-            TRACE(TRACE_1, "removing false nodes...\n");
-            removeFalseNodesTime_start = time(NULL);
-            graph->removeReachableFalseNodes();
-            removeFalseNodesTime_end = time(NULL);
-            TRACE(TRACE_1, "finished removing false nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime_end, removeFalseNodesTime_start)) + " s consumed.\n");
-
-            TRACE(TRACE_1, "removing unreachable nodes...\n");
-            removeUnreachableNodesTime_start = time(NULL);
-            graph->removeUnreachableNodes();
-            removeUnreachableNodesTime_end = time(NULL);
-            TRACE(TRACE_1, "finished removing unreachable nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n");
-        }
+//        TRACE(TRACE_1, "computing graph statistics...\n");
+//        graphStatsTime_start = time(NULL);
+//        graph->computeGraphStatistics();
+//        graphStatsTime_end = time(NULL);
+//        TRACE(TRACE_1, "finished computing graph statistics\n");
+//        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime_end, graphStatsTime_end)) + " s consumed.\n");
+//
+//
+//        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+//            TRACE(TRACE_1, "removing false nodes...\n");
+//            removeFalseNodesTime_start = time(NULL);
+//            graph->removeReachableFalseNodes();
+//            removeFalseNodesTime_end = time(NULL);
+//            TRACE(TRACE_1, "finished removing false nodes\n");
+//            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime_end, removeFalseNodesTime_start)) + " s consumed.\n");
+//
+//            TRACE(TRACE_1, "removing unreachable nodes...\n");
+//            removeUnreachableNodesTime_start = time(NULL);
+//            graph->removeUnreachableNodes();
+//            removeUnreachableNodesTime_end = time(NULL);
+//            TRACE(TRACE_1, "finished removing unreachable nodes\n");
+//            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n");
+//        }
 
 
         overAllTime_end = time(NULL);
@@ -1388,29 +1388,29 @@ void checkEquivalence(AnnotatedGraph::ogs_t& OGsFromFiles) {
         TRACE(TRACE_1, "finished building the graph\n");
         TRACE(TRACE_2, "    " + intToString((int) difftime(buildGraphTime_end, buildGraphTime_start)) + " s consumed.\n\n");
 
-        TRACE(TRACE_1, "computing graph statistics...\n");
-        graphStatsTime_start = time(NULL);
-        graph->computeGraphStatistics();
-        graphStatsTime_end = time(NULL);
-        TRACE(TRACE_1, "finished computing graph statistics\n");
-        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime_end, graphStatsTime_end)) + " s consumed.\n\n");
-
-
-        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
-            TRACE(TRACE_1, "removing false nodes...\n");
-            removeFalseNodesTime_start = time(NULL);
-            graph->removeReachableFalseNodes();
-            removeFalseNodesTime_end = time(NULL);
-            TRACE(TRACE_1, "finished removing false nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime_end, removeFalseNodesTime_start)) + " s consumed.\n\n");
-
-            TRACE(TRACE_1, "removing unreachable nodes...\n");
-            removeUnreachableNodesTime_start = time(NULL);
-            graph->removeUnreachableNodes();
-            removeUnreachableNodesTime_end = time(NULL);
-            TRACE(TRACE_1, "finished removing unreachable nodes\n");
-            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n\n");
-        }
+//        TRACE(TRACE_1, "computing graph statistics...\n");
+//        graphStatsTime_start = time(NULL);
+//        graph->computeGraphStatistics();
+//        graphStatsTime_end = time(NULL);
+//        TRACE(TRACE_1, "finished computing graph statistics\n");
+//        TRACE(TRACE_2, "    " + intToString((int) difftime(graphStatsTime_end, graphStatsTime_end)) + " s consumed.\n\n");
+//
+//
+//        if (!parameters[P_SHOW_RED_NODES] && !parameters[P_SHOW_ALL_NODES]) {
+//            TRACE(TRACE_1, "removing false nodes...\n");
+//            removeFalseNodesTime_start = time(NULL);
+//            graph->removeReachableFalseNodes();
+//            removeFalseNodesTime_end = time(NULL);
+//            TRACE(TRACE_1, "finished removing false nodes\n");
+//            TRACE(TRACE_2, "    " + intToString((int) difftime(removeFalseNodesTime_end, removeFalseNodesTime_start)) + " s consumed.\n\n");
+//
+//            TRACE(TRACE_1, "removing unreachable nodes...\n");
+//            removeUnreachableNodesTime_start = time(NULL);
+//            graph->removeUnreachableNodes();
+//            removeUnreachableNodesTime_end = time(NULL);
+//            TRACE(TRACE_1, "finished removing unreachable nodes\n");
+//            TRACE(TRACE_2, "    " + intToString((int) difftime(removeUnreachableNodesTime_end, removeUnreachableNodesTime_end)) + " s consumed.\n\n");
+//        }
 
 
         overAllTime_end = time(NULL);

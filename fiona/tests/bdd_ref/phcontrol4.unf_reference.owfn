@@ -44,8 +44,8 @@ INITIALMARKING
     th_3 : 1,
     th_4 : 1;
 
-FINALMARKING
-    endzustand : 1;
+FINALCONDITION
+    endzustand = 1;
 
 TRANSITION r_y1
     CONSUME

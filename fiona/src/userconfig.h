@@ -27,10 +27,12 @@
 \*****************************************************************************/
 
 
+#include "config.h"
+
 // User configuration file for Fiona
 
 // specify whether each new operation shall be logged
-//#define LOG_NEW
+//#define LOG_NEW // <- do not enable newlogger here, but use ./configure --enable-newlogger instead
 
 // enable Fiona to detect (T)SCC, when computing the reachability graph of each marking
 // the states shown in the nodes of the graphic are then annotated with information

@@ -1697,6 +1697,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
     for (list<AnnotatedGraph*>::iterator OGToMatch = OGsToMatch.begin();
          OGToMatch != OGsToMatch.end(); ++OGToMatch) {
         // use only the labeled core
+
         oWFN* coreOWFN = normalOWFN->returnMatchingOWFN();
 
         if (parameters[P_COVER]) {
@@ -1710,7 +1711,7 @@ void checkMatching(list<AnnotatedGraph*>& OGsToMatch, oWFN* PN, GraphFormulaCNF*
                 setExitCode(1);
             }
         } else {
-            if ( coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
+            if (coreOWFN->matchesWithOG((*OGToMatch), reasonForFailedMatch) ) {
                 TRACE(TRACE_1, "\n");
                 trace(((*OGToMatch)->getFilename()) + ": YES\n");
             } else {
@@ -1800,8 +1801,8 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 int main(int argc, char** argv) {
 
 #ifdef LOG_NEW
-	// Add the at exit function for the newlogger
-	atexit(newloggerAtExit);
+    // Add the at exit function for the newlogger
+    atexit(newloggerAtExit);
 #endif
 
     // print debug information about system variables, the current compilation

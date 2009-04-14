@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -141,7 +141,7 @@ class GraphNode {
         /// Contains all leaving edges.
         LeavingEdges leavingEdges;
 
-        // Determindes whether the node is final
+        // Determines whether the node is final
         bool final;
 
     public:
@@ -195,7 +195,7 @@ class GraphNode {
 
         /// set the diagnosis color
         GraphNodeDiagnosisColor setDiagnosisColor(GraphNodeDiagnosisColor c);
-        
+
         /// Adds a leaving edge to this node.
         void addLeavingEdge(GraphEdge* edge);
 
@@ -213,10 +213,10 @@ class GraphNode {
 
         /// returns true iff a colored successor of v can be avoided
         bool coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const;
-        
+
         /// returns true iff edge e is possible in every state
         bool edgeEnforcable(GraphEdge* e) const;
-        
+
         /// returns true iff e changes the color of the common successors
         bool changes_color(GraphEdge* e) const;
 
@@ -235,7 +235,7 @@ class GraphNode {
         /// returns the destination node of the edge with the given label
         GraphNode* followEdgeWithLabel(const std::string&);
 
-        /// determines whether an assinment satisfies this node's annotation
+        /// determines whether an assignment satisfies this node's annotation
         bool assignmentSatisfiesAnnotation(const GraphFormulaAssignment&) const;
 
         /// returns the assignment that is imposed by present or absent arcs
@@ -247,7 +247,7 @@ class GraphNode {
 
         // set if the node is final
         void setFinal(bool final);
-        
+
         // return if the node is final
         bool isFinal();
 

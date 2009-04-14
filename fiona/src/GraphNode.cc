@@ -17,11 +17,11 @@
  terms of the GNU General Public License as published by the Free Software
  Foundation; either version 3 of the License, or (at your option) any later
  version.
- 
+
  Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
@@ -47,14 +47,14 @@ using namespace std;
  ************************/
 
 //! \brief constructor
-//! \param color initial colour value
+//! \param color initial color value
 GraphNodeColor::GraphNodeColor(GraphNodeColor_enum color) : color_(color) {
 }
 
 
-//! \brief converts this colour value to a string
-//! \return "blue" if this colour is blue, "red" if it's red,
-//!         "undefinded color" in any other case
+//! \brief converts this color value to a string
+//! \return "blue" if this color is blue, "red" if it's red,
+//!         "undefined color" in any other case
 std::string GraphNodeColor::toString() const {
     switch (color_) {
         case BLUE:
@@ -80,15 +80,15 @@ GraphNodeColor::operator GraphNodeColor_enum() const {
  *********************************/
 
 //! \brief constructor
-//! \param color initial colour value
+//! \param color initial color value
 GraphNodeDiagnosisColor::GraphNodeDiagnosisColor(GraphNodeDiagnosisColor_enum color) :
     diagnosis_color_(color) {
 
 }
 
 
-//! \brief converts this colour value into a string
-//! \return a string representation of this colour
+//! \brief converts this color value into a string
+//! \return a string representation of this color
 std::string GraphNodeDiagnosisColor::toString() const {
     switch (diagnosis_color_) {
         case DIAG_UNSET:
@@ -129,11 +129,11 @@ GraphNode::GraphNode() :
 
     eventsUsedInput = new int[PN->getInputPlaceCount()];
     eventsUsedOutput = new int[PN->getOutputPlaceCount()];
-    
+
     for (unsigned int i = 0; i < PN->getInputPlaceCount(); i++) {
         eventsUsedInput[i] = 0;
     }
-    
+
     for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
         eventsUsedOutput[i] = 0;
     }
@@ -143,39 +143,39 @@ GraphNode::GraphNode() :
 //! \brief constructor (three parameters)
 //! \param _name the name of this node
 //! \param _annotation the annotation of this node
-//! \param _color the colour of this node
+//! \param _color the color of this node
 //! \param _number the number of this node
 GraphNode::GraphNode(const std::string& _name,
                      GraphNodeColor _color,
                      unsigned int _number) :
     number(_number), name(_name), color(_color), eventsUsedInput(NULL),
     eventsUsedOutput(NULL) {
-        
+
 }
 
 
 //! \brief destructor
 GraphNode::~GraphNode() {
-    
+
     TRACE(TRACE_5, "GraphNode::~GraphNode() : start\n");
-    
+
     LeavingEdges::ConstIterator iEdge = getLeavingEdgesConstIterator();
     while (iEdge->hasNext()) {
         GraphEdge* edge = iEdge->getNext();
         delete edge;
     }
     delete iEdge;
-    
+
     if (eventsUsedInput != NULL) {
         delete[] eventsUsedInput;
     }
-    
+
     if (eventsUsedOutput != NULL) {
         delete[] eventsUsedOutput;
     }
-    
+
     numberDeletedVertices++;
-    
+
     TRACE(TRACE_5, "GraphNode::~GraphNode() : end\n");
 }
 
@@ -222,15 +222,15 @@ void GraphNode::setColor(GraphNodeColor c) {
 }
 
 
-//! \brief Is the node colour blue?
-//! \return true iff this node's colour is blue
+//! \brief Is the node color blue?
+//! \return true iff this node's color is blue
 bool GraphNode::isBlue() const {
     return getColor() == BLUE;
 }
 
 
-//! \brief Is the node colour ret?
-//! \return true iff this node's colour is red
+//! \brief Is the node color red?
+//! \return true iff this node's color is red
 bool GraphNode::isRed() const {
     return getColor() == RED;
 }
@@ -280,16 +280,16 @@ bool GraphNode::addState(State* s) {
 }
 
 
-//! \brief returns the diagnosis colour of the GraphNode
-//! \return the diagnosis colour
+//! \brief returns the diagnosis color of the GraphNode
+//! \return the diagnosis color
 GraphNodeDiagnosisColor GraphNode::getDiagnosisColor() const {
     return diagnosis_color;
 }
 
 
-//! \brief sets the colour of the GraphNode to the given colour
-//! \param c colour of GraphNode
-//! \return the new diagnosis colour
+//! \brief sets the color of the GraphNode to the given color
+//! \param c color of GraphNode
+//! \return the new diagnosis color
 GraphNodeDiagnosisColor GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) {
     diagnosis_color = c;
     return c;
@@ -301,21 +301,21 @@ GraphNodeDiagnosisColor GraphNode::setDiagnosisColor(GraphNodeDiagnosisColor c) 
 //! \return true iff there is either a sending edge to a differently colored
 //!         successor or, for each external deadlock, there exists a receiving
 //!         edge to a non-colored successor
-bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {    
+bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) const {
     // collect all edges to differently colored successor nodes
     set<GraphEdge*> edges_to_differently_colored_successors;
     bool colored_successor_present = false;
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge *element = edgeIter->getNext();
         GraphNode* vNext = element->getDstNode();
-        
+
         if (vNext == this)
             continue;
-        
+
         if (vNext->getDiagnosisColor() != color) {
-            // if there is a sending edge to a differently colored sucessor, take this edge;
+            // if there is a sending edge to a differently colored successor, take this edge;
             // otherwise: store this edge for future considerations
             if (element->getType() == SENDING ) {
                 delete edgeIter;
@@ -328,34 +328,34 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
         }
     }
     delete edgeIter;
-    
+
     // if there is no such colored successor, it can be clearly avoided
     if (!colored_successor_present) {
         return true;
     }
-    
+
     // if there are no differently colored successors, the colored successors can not be avoided
     if (edges_to_differently_colored_successors.empty() ) {
         return false;
     }
-    
+
     // last chance: look if each external deadlock "enables" a receiving edge
     // to a differently colored successor
     for (StateSet::const_iterator state = reachGraphStateSet.begin();
          state != reachGraphStateSet.end(); state++) {
         (*state)->decode(PN);
-        
+
         bool found_enabled_state = false;
-        
+
         if ((*state)->type == DEADLOCK) {
             for (set<GraphEdge*>::iterator edge = edges_to_differently_colored_successors.begin();
                  edge != edges_to_differently_colored_successors.end(); edge++) {
                 if ((*edge)->getType() == SENDING ) {
                     continue;
                 }
-                
+
                 string edge_label = (*edge)->getLabel().substr(1, (*edge)->getLabel().length());
-                
+
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
                         if (PN->CurrentMarking[PN->getPlaceIndex(PN->getOutputPlace(i))] > 0) {
@@ -365,14 +365,14 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
                     }
                 }
             }
-            
-            // looked at all edges but did not finde an enabling state
+
+            // looked at all edges but did not find an enabling state
             if (!found_enabled_state) {
                 return false;
             }
         }
     }
-    
+
     // looked at all edges but did not abort earlier
     return true;
 }
@@ -386,20 +386,20 @@ bool GraphNode::coloredSuccessorsAvoidable(GraphNodeDiagnosisColor_enum color) c
 //!         leaving this node.
 bool GraphNode::edgeEnforcable(GraphEdge* e) const {
     assert (e != NULL);
-    
+
     if (e->getType() == SENDING) {
         return true;
     } else {
         string edge_label = e->getLabel().substr(1, e->getLabel().length());
         bool edge_enforcable = true;
-        
+
         // iterate the states and look for deadlocks where the considered
         // message is not present: then, the receiving of this message can
         // not be enforced
         for (StateSet::const_iterator state = reachGraphStateSet.begin();
              state != reachGraphStateSet.end(); state++) {
             (*state)->decode(PN);
-            
+
             if ((*state)->type == DEADLOCK) {
                 for (unsigned int i = 0; i < PN->getOutputPlaceCount(); i++) {
                     if (PN->getOutputPlace(i)->name == edge_label) {
@@ -411,7 +411,7 @@ bool GraphNode::edgeEnforcable(GraphEdge* e) const {
                 }
             }
         }
-        
+
         return edge_enforcable;
     }
 }
@@ -423,19 +423,19 @@ bool GraphNode::edgeEnforcable(GraphEdge* e) const {
 //! \todo Whoever implemented me, please comment me!
 bool GraphNode::changes_color(GraphEdge* e) const {
     assert(e != NULL);
-    
+
     GraphNode* vNext = e->getDstNode();
-    
+
     if ( vNext->getDiagnosisColor() == DIAG_RED )
         return false;
-    
+
     if ( !edgeEnforcable(e) )
         return false;
-    
-    
+
+
     map< string, GraphEdge* > v_edges;
     map< string, GraphEdge* > vNext_edges;
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge* element = edgeIter->getNext();
@@ -448,22 +448,22 @@ bool GraphNode::changes_color(GraphEdge* e) const {
         vNext_edges[element->getLabel()] = element;
     }
     delete edgeIter;
-    
-    
+
+
     for (map< string, GraphEdge* >::const_iterator v_edge = v_edges.begin();
          v_edge != v_edges.end(); v_edge++) {
         GraphEdge* vNext_edge = vNext_edges[v_edge->first];
-        
+
         if (vNext_edge == NULL)
             continue;
-        
+
         if ( (vNext_edge->getDstNode()->getDiagnosisColor() != v_edge->second->getDstNode()->getDiagnosisColor()) &&
              (vNext_edge->getDstNode()->getDiagnosisColor() == DIAG_RED) &&
              (v_edge->second->getDstNode()->getDiagnosisColor() != DIAG_VIOLET) ) {
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -495,11 +495,11 @@ bool GraphNode::hasEdgeWithLabel(const std::string& edgeLabel) const {
 //! \param edgeLabel the label of the blue edge
 //! \return true iff this node has a blue edge with the given label
 bool GraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
-    
+
     GraphEdge* edge = getEdgeWithLabel(edgeLabel);
     if (edge == NULL)
         return false;
-    
+
     return edge->getDstNode()->isBlue();
 }
 
@@ -509,17 +509,17 @@ bool GraphNode::hasBlueEdgeWithLabel(const std::string& edgeLabel) const {
 //! \return a edge of this node with the given label, NULL if no such
 //!         edge exists
 GraphEdge* GraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
-    
+
     LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
     while (edgeIter->hasNext()) {
         GraphEdge* edge = edgeIter->getNext();
-        
+
         if (edge->getLabel() == edgeLabel) {
             delete edgeIter;
             return edge;
         }
     }
-    
+
     delete edgeIter;
     return NULL;
 }
@@ -531,16 +531,16 @@ GraphEdge* GraphNode::getEdgeWithLabel(const std::string& edgeLabel) const {
 //! \return the destination node of the labeled edge, NULL if the
 //!         edge could not be found
 GraphNode* GraphNode::followEdgeWithLabel(const std::string& edgeLabel) {
-    
+
     if (!(parameters[P_PV])) {
         assert(edgeLabel != GraphFormulaLiteral::TAU);
     }
-    
+
     GraphEdge* edge = getEdgeWithLabel(edgeLabel);
     if (edge == NULL) {
         return NULL;
     }
-    
+
     return edge->getDstNode();
 }
 
@@ -554,7 +554,7 @@ void GraphNode::removeEdgesToNode(const GraphNode* nodeToDelete) {
         if (edge->getDstNode() == nodeToDelete) {
             // -"ByHiding" does not work in the numberOfServices() function
             // since an OG without any strategies will become a single root
-            // node with the annotation "true", when calling the 
+            // node with the annotation "true", when calling the
             // removeFalseNodes() function beforehand
             // removeLiteralFromAnnotationByHiding(edge->getLabel());
             //removeLiteralFromAnnotation(edge->getLabel());

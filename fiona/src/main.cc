@@ -1800,11 +1800,6 @@ void checkAcyclicity(AnnotatedGraph* OG, string graphName) {
 
 int main(int argc, char** argv) {
 
-#ifdef LOG_NEW
-    // Add the at exit function for the newlogger
-    atexit(newloggerAtExit);
-#endif
-
     // print debug information about system variables, the current compilation
     // in case of unusal behavior of Fiona, with this information it might be easier
     // to track down the bug(s)
@@ -1839,6 +1834,11 @@ int main(int argc, char** argv) {
 
     // evaluate command line options
     parse_command_line(argc, argv);
+#ifdef LOG_NEW
+    // Add the at exit function for the newlogger
+    atexit(newloggerAtExit);
+#endif
+
 
 
     // **********************************************************************************
@@ -1886,9 +1886,6 @@ int main(int argc, char** argv) {
             trace( "HIT A KEY TO CONTINUE"); getchar();
 
             // only print OG size information
-#ifdef LOG_NEW
-            NewLogger::printall();
-#endif
             return 0;
         }
 */

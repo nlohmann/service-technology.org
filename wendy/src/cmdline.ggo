@@ -8,12 +8,18 @@ description "About Wendy:"
 section "Output"
 
 option "dot" -
-  "Graphviz dot output."
-  flag off
+  "Graphviz dot output. If no filename is given, '.dot' is appended to the input filename."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
 
 option "og" -
-  "Operating guidelines output."
-  flag off
+  "Operating guidelines output. If no filename is given, '.og' is appended to the input filename."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
 
 
 section "Options"

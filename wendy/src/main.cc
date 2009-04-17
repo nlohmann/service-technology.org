@@ -52,6 +52,7 @@ void evaluateParameters(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
+    string filename;
     time_t start_time, end_time;
     
     /*--------------------------------------.
@@ -67,8 +68,11 @@ int main(int argc, char** argv) {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
             std::cin >> pnapi::io::owfn >> *(InnerMarking::net);
+            // set a standard filename
+            filename = "wendy.owfn";
         } else {
             assert (args_info.inputs_num == 1);
+            filename = args_info.inputs[0];
             std::ifstream inputStream;
             inputStream.open(args_info.inputs[0]);
             inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
@@ -194,12 +198,22 @@ int main(int argc, char** argv) {
     `------------------*/
     // dot output
     if (args_info.dot_given) {
-        StoredKnowledge::dot(args_info.showEmptyNode_given, args_info.formula_arg);
+        string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
+        std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        StoredKnowledge::dot(dot_file, args_info.showEmptyNode_given, args_info.formula_arg);
+        if (args_info.verbose_given) {
+            fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
+        }
     }
     
     // operating guidelines output
     if (args_info.og_given) {
-        StoredKnowledge::OGoutput();
+        string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
+        std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        StoredKnowledge::OGoutput(og_file);
+        if (args_info.verbose_given) {
+            fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
+        }
     }
 
 

@@ -1,6 +1,7 @@
 #ifndef _STOREDKNOWLEDGE_H
 #define _STOREDKNOWLEDGE_H
 
+#include <fstream>
 #include "Knowledge.h"
 #include "cmdline.h"
 
@@ -21,10 +22,10 @@ class StoredKnowledge {
         static unsigned int removeInsaneNodes();
 
         /// print a dot representation
-        static void dot(bool, enum_formula);
+        static void dot(std::ofstream&, bool, enum_formula);
 
         /// print the knowledges as Fiona OG
-        static void OGoutput();
+        static void OGoutput(std::ofstream&);
 
     public: /* static attributes */
 

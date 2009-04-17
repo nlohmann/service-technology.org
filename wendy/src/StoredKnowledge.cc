@@ -464,7 +464,6 @@ void StoredKnowledge::calcRecursive(Knowledge *K, StoredKnowledge *SK) {
     static unsigned int calls = 0;
     static unsigned int edges = 0;
 
-
     if (++calls % reportFrequency == 0) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
             StoredKnowledge::storedKnowledges, edges);
@@ -491,7 +490,7 @@ void StoredKnowledge::calcRecursive(Knowledge *K, StoredKnowledge *SK) {
                 calcRecursive(K_new, SK_store);
             } else {
                 delete SK_new;
-            }            
+            }
         }
         // we saw K_new's successors
         delete K_new;

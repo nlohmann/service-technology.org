@@ -156,12 +156,6 @@ void Knowledge::closure() {
             // in any case, create a successor candidate -- it will be valid for transient transitions anyway
             FullMarking candidate(m->successors[i], current.interface);
 
-            // check if successor is a deadlock
-            if (InnerMarking::inner_markings[m->successors[i]]->is_deadlock) {
-                is_sane = false;
-                return;                
-            }
-
             // we receive -> the net sends
             if (RECEIVING(m->labels[i])) {
                 // message bound violation?
@@ -181,10 +175,18 @@ void Knowledge::closure() {
                 }
             }
 
-            // if we found a valid successor candidate, check if it is already stored
+            // check if the calculated candidate was already reachable
             if (!candidateReachable) {
                 continue;
             } else {
+
+                // check if successor is a deadlock
+                if (InnerMarking::inner_markings[m->successors[i]]->is_deadlock) {
+                    is_sane = false;
+                    return;                
+                }
+
+                // if we found a valid successor candidate, check if it is already stored
                 bool candidateFound = false;
                 for (size_t i = 0; i < bubble[candidate.inner].size(); ++i) {
                     if (*(bubble[candidate.inner][i]) == candidate.interface) {

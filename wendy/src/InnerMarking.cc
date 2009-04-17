@@ -124,7 +124,7 @@ inline void InnerMarking::determineType() {
     bool is_transient = false;
 
     // deadlock: no successor markings and not final
-    if (out_degree == 0 && is_final != 1) {
+    if (out_degree == 0 && !is_final) {
         ++stats_deadlocks;
         is_deadlock = 1;
     }
@@ -151,13 +151,13 @@ inline void InnerMarking::determineType() {
     }
 
     // deadlock cannot be avoided any more -- treat this marking as deadlock
-    if (!args_info.noDeadlockDetection_given && !is_final && deadlock_inevitable) {
+    if (!args_info.noDeadlockDetection_given && !is_final && !is_deadlock && deadlock_inevitable) {
         is_deadlock = 1;
         ++stats_inevitable_deadlocks;
     }
 
     // draw some conclusions
-    if (!is_final && !is_transient) {
+    if (!is_final && !is_transient && !is_deadlock) {
         is_waitstate = 1;
     }
 }

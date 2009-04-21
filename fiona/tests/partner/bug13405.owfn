@@ -1,0 +1,52 @@
+PLACE
+INTERNAL
+  p0,
+  p1,
+  p2,
+  p3;
+INPUT
+  a1,
+  a2,
+  b1,
+  b2;
+OUTPUT
+  ;
+
+INITIALMARKING
+  p0:   1;
+FINALMARKING
+  p3:   1;
+
+TRANSITION c2
+CONSUME
+  p0:    1,
+  a1:    1;
+PRODUCE
+  p1:    1;
+
+TRANSITION c99
+CONSUME
+  p1:    1;
+PRODUCE
+  p3:    1;
+
+TRANSITION c1
+CONSUME
+  p0:    1,
+  a2:    1;
+PRODUCE
+  p2:    1;
+
+TRANSITION c10
+CONSUME
+  p2:    1,
+  b1:    1;
+PRODUCE
+  p3:    1;
+
+TRANSITION c20
+CONSUME
+  p2:    1,
+  b2:    1;
+PRODUCE
+  p3:    1;

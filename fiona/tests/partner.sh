@@ -25,6 +25,10 @@ FIONA=fiona
 result=0
 
 #loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/bug13405.owfn.*
+rm -f $DIR/bug13405-partner.dot
+rm -f $DIR/bug13405-partner.owfn
+rm -f $DIR/bug13405-partner.png
 rm -f $DIR/sequence3.owfn.i*
 rm -f $DIR/sequence3.owfn.o*
 rm -f $DIR/sequence3-partner.dot
@@ -47,13 +51,65 @@ rm -f $DIR/coffee_extended-partner.owfn
 rm -f $DIR/coffee_extended-partner.png
 
 ############################################################################
-# Building most permissive partner for sequence3 out of oWFN               #
+# Building most permissive partner for bug13405 out of oWFN with allnodes  #
 ############################################################################
-#resultSingle=0
-input="$DIR/sequence3.owfn"
-inputCopy="$builddir/$SUBDIR/sequence3.owfn"
-output="$builddir/$SUBDIR/sequence3-partner.owfn"
-outputExpected="$testdir/$SUBDIR/sequence3-partner.expected.owfn"
+input="$DIR/bug13405.owfn"
+inputCopy="$builddir/$SUBDIR/bug13405.owfn"
+output="$builddir/$SUBDIR/bug13405-partner.owfn"
+outputExpected="$testdir/$SUBDIR/bug13405-partner.expected.owfn"
+
+
+# for make distcheck: create directory $builddir/$SUBDIR for writing output files to
+if [ "$testdir" != "$builddir" ]; then
+    if [ ! -e $builddir/$SUBDIR ]; then
+        $MKDIR_P $builddir/$SUBDIR
+    fi
+
+    # make copy of $input and work on it
+    cp $input $inputCopy
+fi
+
+cmd="$FIONA $inputCopy -t mostpermissivepartner -s allnodes"
+check="$FIONA $output $outputExpected -t equivalence"
+
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$input.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$(($result | $?))
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    fionaExitCode=$?
+    $evaluate $fionaExitCode
+    if [ $? -ne 0 ] 
+    then
+        result=1
+    else
+        echo running $check
+        OUTPUT=`$check 2>&1`
+        fionaExitCode=$?
+        $evaluate $fionaExitCode
+        if [ $? -ne 0 ] 
+        then
+            result=1
+        else
+            echo $OUTPUT | grep "are equivalent: YES" > /dev/null
+            if [ $? -ne 0 ]; then
+                let "result += 1"
+                echo ... computed partner not equivalent to expected partner.
+            fi
+        fi
+    fi
+fi
+
+
+############################################################################
+# Building most permissive partner for bug13405 out of oWFN               #
+############################################################################
+input="$DIR/bug13405.owfn"
+inputCopy="$builddir/$SUBDIR/bug13405.owfn"
+output="$builddir/$SUBDIR/bug13405-partner.owfn"
+outputExpected="$testdir/$SUBDIR/bug13405-partner.expected.owfn"
 
 
 # for make distcheck: create directory $builddir/$SUBDIR for writing output files to
@@ -94,33 +150,23 @@ else
             if [ $? -ne 0 ]; then
                 let "result += 1"
                 echo ... computed partner not equivalent to expected partner.
-            #else
-                #if ! diff "$output" "$outputExpected" >/dev/null ; then
-                #    echo "... failed: Output and expected output differ. Compare " \
-                #        "$output" "$outputExpected"
-                #    resultSingle=1
-                #fi
             fi
         fi
     fi
 fi
 
-#if [ $resultSingle -ne 0 ]; then
-#    result=1
-#fi
-
-#rm -f $DIR/sequence3.owfn.* we need the OG for the next test
-rm -f $DIR/sequence3-partner.dot
-rm -f $DIR/sequence3-partner.owfn
-rm -f $DIR/sequence3-partner.png
+#rm -f $DIR/bug13405.owfn.* we need the OG for the next test
+rm -f $DIR/bug13405-partner.dot
+rm -f $DIR/bug13405-partner.owfn
+rm -f $DIR/bug13405-partner.png
 
 ############################################################################
-# Building most permissive partner for sequence3 out of OG                 #
+# Building most permissive partner for bug13405 out of OG                 #
 ############################################################################
-input="$builddir/$SUBDIR/sequence3.owfn.og"
-inputCopy="$builddir/$SUBDIR/sequence3.owfn.og"
-output="$builddir/$SUBDIR/sequence3-partner.owfn"
-outputExpected="$testdir/$SUBDIR/sequence3-partner.expected.owfn"
+input="$builddir/$SUBDIR/bug13405.owfn.og"
+inputCopy="$builddir/$SUBDIR/bug13405.owfn.og"
+output="$builddir/$SUBDIR/bug13405-partner.owfn"
+outputExpected="$testdir/$SUBDIR/bug13405-partner.expected.owfn"
 
 
 if [ "$testdir" != "$builddir" ]; then

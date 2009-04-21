@@ -492,11 +492,11 @@ bool AnnotatedGraphNode::isToShow(const AnnotatedGraphNode* rootOfGraph, bool ha
 
 #undef TRUE
 
-    return ((parameters[P_SHOW_ALL_NODES]) ||
+    return ((parameters[P_SHOW_ALL_NODES] && !parameters[P_SYNTHESIZE_PARTNER_OWFN]) ||
             (getColor() == BLUE && (!hasOWFN ||
                                     reachGraphStateSet.size() != 0 ||
-                                    parameters[P_SHOW_EMPTY_NODE])) ||
-            (getColor() == RED && parameters[P_SHOW_RED_NODES]) ||
+                                    (parameters[P_SHOW_EMPTY_NODE] && !parameters[P_SYNTHESIZE_PARTNER_OWFN]))) ||
+            (getColor() == RED && parameters[P_SHOW_RED_NODES] && !parameters[P_SYNTHESIZE_PARTNER_OWFN]) ||
             (this == rootOfGraph));
 
 #define TRUE 1

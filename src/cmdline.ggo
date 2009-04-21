@@ -1,0 +1,11 @@
+args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+
+purpose "LINDA - Linda is not Dependency Analysis."
+
+description "Usage: "
+
+section "Debug"
+
+option "verbose" v
+  "Verbose output"
+  flag off

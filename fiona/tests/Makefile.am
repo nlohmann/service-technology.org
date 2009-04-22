@@ -205,6 +205,8 @@ EXTRA_DIST = regression/Makefile.am \
 	partner/coffee_extended.owfn \
 	partner/coffee_extended-partner.expected.owfn \
 	partner/sequence3.owfn \
+    partner/bug13405.owfn \
+    partner/bug13405-partner.expected.owfn \
 	minimize/nostrat.og \
 	minimize/final_non-final.og \
 	minimize/non-final_final.og \

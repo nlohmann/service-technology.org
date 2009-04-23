@@ -221,6 +221,8 @@ namespace pnapi
 
     const std::set<Transition *> & getSynchronizedTransitions() const;
 
+    std::set<std::string> getSynchronousLabels() const;
+
     //@}
 
 
@@ -322,6 +324,9 @@ namespace pnapi
     /// all arcs
     std::set<Arc *> arcs_;
 
+    /// all synchronous labels
+    std::set<std::string> labels_;
+
 
     /* general properties */
 
@@ -382,6 +387,9 @@ namespace pnapi
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 				   const std::string & = "") const;
+
+    /// sets synchronous labels
+    void setSynchronousLabels(const std::set<std::string> &);
 
     /// sets labels (and translates references)
     void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);

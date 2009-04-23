@@ -778,6 +778,22 @@ namespace pnapi
 
 
   /*!
+   */
+  std::set<std::string> PetriNet::getSynchronousLabels() const
+  {
+    return labels_;
+  }
+
+
+  /*!
+   */
+  void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
+  {
+    labels_ = ls;
+  }
+
+
+  /*!
    * \param   base  base name
    * \return  a string to be used as a name for a new node
    */

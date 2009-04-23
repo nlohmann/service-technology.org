@@ -526,8 +526,8 @@ namespace pnapi
 
       ostream & output(ostream & os, const PetriNet & net)
       {
-	set<string> labels = 
-	  util::collectSynchronizeLabels(net.synchronizedTransitions_);
+	set<string> labels = net.labels_;
+	//util::collectSynchronizeLabels(net.synchronizedTransitions_);
 
 	os  //< output everything to this stream
 

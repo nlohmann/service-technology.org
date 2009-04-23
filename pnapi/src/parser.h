@@ -220,7 +220,7 @@ namespace pnapi
 	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
 	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
 	  INITIALMARKING, FINALMARKING, MARK, CONDITION, LABEL,
-	  TRANSITION, ARC, PRESET, POSTSET, CONSTRAIN,
+	  TRANSITION, ARC, PRESET, POSTSET, CONSTRAIN, SYNCHRONOUS,
 	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE, 
 	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT, 
 	  FORMULA_GE, FORMULA_LE , FORMULA_FALSE, FORMULA_TRUE, FORMULA_APE
@@ -281,6 +281,7 @@ namespace pnapi
 	const PetriNet & getPetriNet() const;
 	const std::map<Transition *, std::set<std::string> > & 
 	getConstraintLabels() const;
+	const std::set<std::string> & getSynchronousLabels() const;
 	
 	void beforeChildren(const Node &);
 	void afterChildren(const Node &);
@@ -305,6 +306,7 @@ namespace pnapi
 	bool isPreset_;
 	std::map<std::string, unsigned int> preset_, postset_;
 	bool isSynchronize_;
+	std::set<std::string> synchronousLabels_;
 	std::set<std::string> synchronizeLabels_;
 	std::set<std::string> constrainLabels_;
 	std::map<Transition *, std::set<std::string> > constraintMap_;

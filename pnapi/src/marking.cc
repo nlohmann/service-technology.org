@@ -161,7 +161,7 @@ namespace pnapi
   }
 
 
-  const unsigned int & Marking::operator[](const Place & p) const
+  unsigned int Marking::operator[](const Place & p) const
   {
     if (m_.find(&p) == m_.end())
       return 0;

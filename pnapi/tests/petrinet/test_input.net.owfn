@@ -9,7 +9,7 @@ PLACE
     out;
 
   SYNCHRONOUS
-    label;
+    label, bla;
 
 
 INITIALMARKING

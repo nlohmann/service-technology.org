@@ -131,8 +131,9 @@ namespace pnapi
       {
 	bool interface = true;
 	string filename = net.getMetaInformation(os, io::INPUTFILE);
+	set<string> labels = net.labels_;
 
-	return os  //< output everything to this stream
+	os  //< output everything to this stream
 
 	  << delim("\n")
 	  << mode(io::util::NORMAL)
@@ -153,6 +154,17 @@ namespace pnapi
 	  << " node [shape=circle]" << endl
 	  << net.internalPlaces_ << endl
 	  << (interface ? net.interfacePlaces_ : set<Place *>()) << endl
+	  << endl
+
+	  << " // labels" << endl
+	  << " node [shape=box]" << endl;
+	for (set<string>::iterator it = labels.begin();
+	     it != labels.end(); ++it)
+	  os << " l" << *it << " [fillcolor=black width=.1]" << endl
+	     << " l" << *it << "_l [style=invis]" << endl
+	     << " l" << *it << "_l -> l" << *it << " [headlabel=\"" << *it 
+	     << "\"]" << endl;
+	return os
 	  << endl
 
 	  << " // transitions" << endl
@@ -240,7 +252,18 @@ namespace pnapi
 	  }
 
 	// output the transition as a node
-	return output(os, t, attributes.str());
+	output(os, t, attributes.str());
+
+	// output labels
+	set<string> labels = t.getSynchronizeLabels();
+	Mode mode = ModeData::data(os);
+	if (mode == util::NORMAL)
+	  for (set<string>::iterator it = labels.begin(); 
+	       it != labels.end(); ++it)
+	    os << endl << " l" << *it << " -> " << getNodeName(t) 
+	       << " [style=dashed color=black]";
+
+	return os;
       }
 
 

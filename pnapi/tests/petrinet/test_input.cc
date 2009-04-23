@@ -38,7 +38,7 @@ int main(int argc, char * argv[])
   ifstream ifs("test_input.net.owfn");
   try { ifs >> owfn >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
-  cout << owfn << net;
+  //cout << dot << net;
   end_test();
 
   /*

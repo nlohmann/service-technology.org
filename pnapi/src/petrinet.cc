@@ -289,6 +289,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
+    labels_(net.labels_),
     observer_(*this),
     condition_(net.condition_, copyStructure(net)),
     meta_(net.meta_)
@@ -319,6 +320,7 @@ namespace pnapi
 
   void PetriNet::clear()
   {
+    labels_.clear();
     meta_.clear();
     constraints_.clear();
     condition_ = true;

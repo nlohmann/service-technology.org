@@ -82,25 +82,25 @@ class InterfaceMarking {
         friend std::ostream& operator<< (std::ostream&, const InterfaceMarking&);
 
 
-        /// returns the marking value for the given label
-        uint8_t get(Label_ID) const;
-
-        /// sets the marking value for the given label to the given value
-        bool set(Label_ID, uint8_t&);
-
         /// increments the value at the given label
         bool inc(Label_ID);
 
         /// decrements the value at the given label
         bool dec(Label_ID);
 
-        /// returns whether this marking is empty
-        bool empty() const;
+        /// returns whether the whole interface is unmarked
+        bool unmarked() const;
+
+        /// returns whether the interface is markedat the given label
+        bool marked(Label_ID) const;
 
         /// returns the hash value of this marking
         hash_t hash() const;
 
     private: /* member attributes */
+
+        /// returns the marking value for the given label
+        uint8_t get(Label_ID) const;
 
         /// a byte array to store the interface markings
         uint8_t *storage;

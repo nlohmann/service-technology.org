@@ -4,7 +4,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <cassert>
-#include "config.h"
 #include "cmdline.h"
 #include "InterfaceMarking.h"
 #include "Label.h"
@@ -71,7 +70,7 @@ unsigned int InterfaceMarking::initialize(unsigned int m) {
  ***************/
 
 /*!
- \bug will not work in case the net has an empty interface
+ \note will not work in case the net has an empty interface
  */
 InterfaceMarking::InterfaceMarking() : storage(NULL) {
     // initialize() must be called before first object is created
@@ -87,9 +86,6 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
     }
 }
 
-/*!
-  \deprecated I'm not sure whether I need this function
- */
 InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
     // initialize() must be called before first object is created
     assert(interface_length);
@@ -141,11 +137,11 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label
     }
 
     if (increase) {
-        if (!inc(label)) {
+        if (not inc(label)) {
             success = false;
         }
     } else {
-        if (!dec(label)) {
+        if (not dec(label)) {
             success = false;
         }
     }
@@ -201,7 +197,7 @@ std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
         if (l != 1) {
             o << ",";
         }
-        o << (unsigned int)m.get(l);
+        o << static_cast<unsigned int>(m.get(l));
     }
     return o << "]";;
 }
@@ -228,35 +224,6 @@ uint8_t InterfaceMarking::get(Label_ID label) const {
 
     // shift back the result
     return (result >> offset);
-}
-
-/*!
- \return whether the message bound was respected (false means violation)
- \deprecated I'm not sure whether I need this function
- */
-bool InterfaceMarking::set(Label_ID label, uint8_t &v) {
-    assert(label > 0);
-    assert(label <= interface_length);
-
-    // the byte in which this interface is stored
-    unsigned int byte = (label-1) / markings_per_byte;
-    // the offset inside the byte, i.e. the starting position
-    unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
-
-    // create a mask to select the bits we want to modify:
-    // (2**message_bound_bits)-1, then shift it to the needed position
-    uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
-
-    // shift and mask the value to store
-    uint8_t result = ((v << offset) & mask);
-
-    // remove values of this label
-    uint8_t crop = (storage[byte] & ~mask);
-
-    // combine set value and the stored byte
-    storage[byte] = (crop | result);
-
-    return (v <= message_bound);
 }
 
 /*!
@@ -332,10 +299,9 @@ bool InterfaceMarking::dec(Label_ID label) {
 }
 
 /*!
- \return whether this is an empty interface marking
- \deprecated I'm not sure whether I need this function
+ \return whether the whole interface is unmarked
  */
-bool InterfaceMarking::empty() const {
+bool InterfaceMarking::unmarked() const {
     for (size_t i = 0; i < bytes; ++i) {
         if (storage[i] != 0) {
             return false;
@@ -344,6 +310,29 @@ bool InterfaceMarking::empty() const {
 
     return true;
 }
+
+/*
+ \return whether the interface is markedat the given label
+*/
+bool InterfaceMarking::marked(Label_ID label) const {
+    assert(label > 0);
+    assert(label <= interface_length);
+
+    // the byte in which this interface is stored
+    unsigned int byte = (label-1) / markings_per_byte;
+    // the offset inside the byte, i.e. the starting position
+    unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+
+    // first, create (2**message_bound_bits)-1, then shift it to the needed position
+    uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
+
+    // get the result by masking the respective byte
+    uint8_t result = storage[byte] & mask;
+
+    // shift back the result
+    return ((result >> offset) > 0);
+}
+
 
 hash_t InterfaceMarking::hash() const {
     hash_t result = 0;

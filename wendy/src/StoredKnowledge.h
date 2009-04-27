@@ -13,7 +13,7 @@ class StoredKnowledge {
     public: /* static functions */
 
         /// recursively calculate knowledge bubbles
-        static void calcRecursive(Knowledge*, StoredKnowledge*);
+        static void calcRecursive(const Knowledge* const, StoredKnowledge*);
 
         /// traverse the graph and add predecessors
         static unsigned int addPredecessors();
@@ -64,7 +64,7 @@ class StoredKnowledge {
     public: /* member functions */
 
         /// constructs an object from a Knowledge object
-        StoredKnowledge(Knowledge*);
+        StoredKnowledge(const Knowledge* const);
 
         /// destructor
         ~StoredKnowledge();
@@ -78,7 +78,7 @@ class StoredKnowledge {
     private: /* member functions */
 
         /// adds a successor knowledge
-        void addSuccessor(Label_ID, StoredKnowledge*);
+        void addSuccessor(Label_ID, StoredKnowledge* const);
 
         /// return whether this node fulfills its annotation
         bool sat();
@@ -87,7 +87,7 @@ class StoredKnowledge {
         hash_t hash() const;
 
         /// adds a predecessor knowledge
-        void addPredecessor(StoredKnowledge* k);
+        void addPredecessor(StoredKnowledge* const);
 
         /// return a string representation of the knowledge's formula
         std::string formula() const;
@@ -95,7 +95,7 @@ class StoredKnowledge {
         /// return a two-bit representation of the knowledge's formula
         std::string twoBitFormula() const;
 
-        /// traverse knowledges beginning from the root
+        /// traverse knowledges
         void traverse();
 
     public: /* member attributes */

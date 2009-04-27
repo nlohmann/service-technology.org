@@ -1,6 +1,5 @@
 #include <climits>
 #include <cassert>
-#include "config.h"
 #include "InnerMarking.h"
 #include "Label.h"
 #include "cmdline.h"
@@ -43,7 +42,7 @@ void InnerMarking::initialize() {
         inner_markings[i] = markingMap[i];
 
         // register markings that may become activated by sending a message to them
-        for (unsigned int j = 0; j < inner_markings[i]->out_degree; ++j) {
+        for (uint8_t j = 0; j < inner_markings[i]->out_degree; ++j) {
             if (SENDING(inner_markings[i]->labels[j])) {
                 receivers[inner_markings[i]->labels[j]].insert(i);
             }
@@ -124,7 +123,7 @@ inline void InnerMarking::determineType() {
     bool is_transient = false;
 
     // deadlock: no successor markings and not final
-    if (out_degree == 0 && !is_final) {
+    if (out_degree == 0 and not is_final) {
         ++stats_deadlocks;
         is_deadlock = 1;
     }
@@ -135,29 +134,33 @@ inline void InnerMarking::determineType() {
 
     // variable to detect whether this marking has only deadlocking successors
     bool deadlock_inevitable = true;
-    for (unsigned int i = 0; i < out_degree; ++i) {
+    for (uint8_t i = 0; i < out_degree; ++i) {
         // if a single successor is not a deadlock, everything is OK
-        if (!args_info.noDeadlockDetection_given &&
-            markingMap[successors[i]] != NULL &&
-            deadlock_inevitable &&
-            !markingMap[successors[i]]->is_deadlock) {
+        if (not args_info.noDeadlockDetection_given and
+            markingMap[successors[i]] != NULL and
+            deadlock_inevitable and
+            not markingMap[successors[i]]->is_deadlock) {
             deadlock_inevitable = false;
         }
 
         // a tau or sending (sic!) transition makes this marking transient
-        if (SILENT(labels[i]) || RECEIVING(labels[i])) {
+        if (SILENT(labels[i]) or RECEIVING(labels[i])) {
             is_transient = true;
         }
     }
 
     // deadlock cannot be avoided any more -- treat this marking as deadlock
-    if (!args_info.noDeadlockDetection_given && !is_final && !is_deadlock && deadlock_inevitable) {
+    if (not args_info.noDeadlockDetection_given and
+        not is_final and
+        not is_deadlock and
+        deadlock_inevitable) {
         is_deadlock = 1;
         ++stats_inevitable_deadlocks;
     }
 
     // draw some conclusions
-    if (!is_final && !is_transient && !is_deadlock) {
+    if (not (is_transient or is_deadlock)) {
+        assert(not is_transient);
         is_waitstate = 1;
     }
 }

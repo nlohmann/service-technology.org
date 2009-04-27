@@ -1,5 +1,4 @@
 #include <cassert>
-#include "config.h"
 #include "Knowledge.h"
 #include "Label.h"
 
@@ -24,9 +23,9 @@ Knowledge::Knowledge(InnerMarking_ID m) : is_sane(true), size(1) {
 /*!
  \note no action in this constructor can introduce a duplicate
 */
-Knowledge::Knowledge(Knowledge *parent, Label_ID label) : is_sane(true), size(0) {
+Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(true), size(0) {
     // tau does not make sense here
-    assert(!SILENT(label));
+    assert(not SILENT(label));
 
     assert(parent);
 
@@ -102,7 +101,7 @@ Knowledge::~Knowledge() {
  *************/
 
 std::ostream& operator<< (std::ostream &o, const Knowledge &m) {
-    if (!m.is_sane) {
+    if (not m.is_sane) {
         return o << "INSANE KNOWLEDGE";
     }
     
@@ -114,7 +113,7 @@ std::ostream& operator<< (std::ostream &o, const Knowledge &m) {
     for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = m.bubble.begin(); pos != m.bubble.end(); ++pos) {
         // traverse the interface markings
         for (size_t i = 0; i < pos->second.size(); ++i) {
-            o << "[m" << (unsigned int)pos->first << ", " << *pos->second[i] << "] ";
+            o << "[m" << static_cast<unsigned int>(pos->first) << ", " << *pos->second[i] << "] ";
         }
     }
     return o;
@@ -139,19 +138,19 @@ void Knowledge::closure() {
     // to collect markings that were/are already considered
     set<FullMarking> considered;
 
-    while(!todo.empty()) {
+    while(not todo.empty()) {
         FullMarking current = todo.front();
         todo.pop();
 
         // if this marking was already taken out of the todo queue, skip it this time
-        if (!considered.insert(current).second) {
+        if (not considered.insert(current).second) {
             continue;
         }
 
         // process successors of the current marking
         InnerMarking *m = InnerMarking::inner_markings[current.inner];
         assert(m);
-        for (unsigned int i = 0; i < m->out_degree; ++i) {
+        for (uint8_t i = 0; i < m->out_degree; ++i) {
 
             // in any case, create a successor candidate -- it will be valid for transient transitions anyway
             FullMarking candidate(m->successors[i], current.interface);
@@ -159,7 +158,7 @@ void Knowledge::closure() {
             // we receive -> the net sends
             if (RECEIVING(m->labels[i])) {
                 // message bound violation?
-                if (!candidate.interface.inc(m->labels[i])) {
+                if (not candidate.interface.inc(m->labels[i])) {
                     is_sane = false;
                     return;
                 }
@@ -170,13 +169,13 @@ void Knowledge::closure() {
 
             // we send -> the net receives
             if (SENDING(m->labels[i])) {
-                if (!candidate.interface.dec(m->labels[i])) {
+                if (not candidate.interface.dec(m->labels[i])) {
                     candidateReachable = false;
                 }
             }
 
             // check if the calculated candidate was already reachable
-            if (!candidateReachable) {
+            if (not candidateReachable) {
                 continue;
             } else {
 
@@ -194,7 +193,7 @@ void Knowledge::closure() {
                         break;
                     }
                 }
-                if (!candidateFound) {
+                if (not candidateFound) {
                     InterfaceMarking *copy = new InterfaceMarking(candidate.interface);
                     bubble[candidate.inner].push_back(copy);
                     ++size;

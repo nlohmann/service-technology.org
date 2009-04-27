@@ -22,7 +22,7 @@
  in the mapping markingMap together with an identifier (the depth-first
  search number given by LoLA). After all markings are parsed, the function
  initialize() is called to copy the markingMap into a C-style array.
- */
+*/
 class InnerMarking {
     public: /* static functions */
 

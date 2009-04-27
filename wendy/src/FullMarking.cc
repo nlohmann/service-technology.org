@@ -42,5 +42,5 @@ bool FullMarking::operator!= (const FullMarking &other) const {
 }
 
 std::ostream& operator<< (std::ostream &o, const FullMarking &m) {
-    return o << "[m" << (unsigned int)m.inner << ", " << m.interface << "]";
+    return o << "[m" << static_cast<unsigned int>(m.inner) << ", " << m.interface << "]";
 }

@@ -3,10 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>
-#include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
-#include "cmdline.h"
 
 
 /// the input file
@@ -87,7 +85,7 @@ int main(int argc, char** argv) {
     }
     
     // only normal nets are supported so far
-    if (!InnerMarking::net->isNormal()) {
+    if (not InnerMarking::net->isNormal()) {
         fprintf(stderr, "%s: the input open net must be normal -- aborting\n", PACKAGE);
         exit (EXIT_FAILURE);
     }

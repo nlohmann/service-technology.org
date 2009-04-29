@@ -9,3 +9,13 @@ section "Debug"
 option "verbose" v
   "Verbose output"
   flag off
+
+section "Message Profile Levels" 
+
+option "level-0" 0
+  "Level 0 Message Profile"
+  flag on
+  
+option "level-1" 1
+  "Level 1 Message Profile"
+  flag off

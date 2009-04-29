@@ -8,26 +8,25 @@
 #ifndef BOUNDS_H_
 #define BOUNDS_H_
 
-#include <iostream>
+#include <string>
 
-#define BOUND int
-#define UNBOUNDED -1
-
+#define LINDA_BOUND int
+#define LINDA_UNBOUNDED -1
 
 template <class T>
 class Bounds {
 public:
-	BOUND min;
-	BOUND max;
+	LINDA_BOUND min;
+	LINDA_BOUND max;
 	T key;
 
-	Bounds() { min = UNBOUNDED; max = UNBOUNDED;}
-	Bounds(T _key) { key = _key; min = UNBOUNDED; max = UNBOUNDED;}
+	Bounds() { min = LINDA_UNBOUNDED; max = LINDA_UNBOUNDED;}
+	Bounds(T _key) { key = _key; min = LINDA_UNBOUNDED; max = LINDA_UNBOUNDED;}
 
 	bool isExact() { return min == max; }
 
 };
 
-BOUND getBoundFromLPSolveString(std::string);
+LINDA_BOUND getBoundFromLPSolveString(std::string);
 
 #endif /* BOUNDS_H_ */

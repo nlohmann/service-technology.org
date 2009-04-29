@@ -1,56 +1,79 @@
 #include "helpers.h"
 
+
 const std::string intToStr(const int x) {
 	std::ostringstream o;
 	if (!(o << x)) return "ERROR";
 	return o.str();
 }
 
-std::string getText(FILE* solution) {
+void findMaxDependenciesR(EBV candidate, vector<EventSetBound>& results, set<PPS>& alreadyTested, lprec *lp, std::map<EVENT,unsigned int> EventID) {
 
-	char psBuffer[16];
-	std::string iresult = "";
+	static int counter = 0;
 
-	while( !feof( solution ) )
-	{
-		if( fgets( psBuffer, 16, solution ) != NULL )
-			iresult += psBuffer;
+	if (candidate.size() <= 1) return;
+
+	bool minUnbounded = false;
+	bool maxUnbounded = false;
+
+	int objCol[candidate.size()];
+	REAL objVal[candidate.size()];
+
+	PPS thisOne;
+
+	for (int i = 0; i < candidate.size(); ++i) {
+
+		thisOne.insert(candidate.at(i).key);
+
+		if (candidate.at(i).min == LINDA_UNBOUNDED) {
+			minUnbounded = true;
+		}
+		if (candidate.at(i).max == LINDA_UNBOUNDED) {
+			maxUnbounded = true;
+		}
+
+		objCol[i] = EventID[candidate.at(i).key];
+		objVal[i] = 1;
+
 	}
 
-	if ( iresult.find("infeasible") != std::string::npos ) {
-		std::cerr << "Not WT-controllable" << std::endl;
-		exit(EXIT_FAILURE);
+	if (alreadyTested.find(thisOne) != alreadyTested.end()) {
+		return;
+	} else {
+		alreadyTested.insert(thisOne);
+		++counter;
+		//std::cerr << "another test: " << counter << std::endl;
 	}
 
+	set_obj_fnex(lp, candidate.size(), objVal, objCol);
 
-	return iresult;
-}
+	int min = LINDA_UNBOUNDED;
+	int max = LINDA_UNBOUNDED;
+	set_minim(lp);
 
-void cleanstring(std::string& result) {
-
-	std::string::size_type pos = 0;
-	while ( (pos = result.find("Value of objective function: ")) != std::string::npos ) {
-		result.erase( pos, 29 );
+	int result = solve(lp);
+	if (result == 0) {
+		min = (int) get_objective(lp);
 	}
 
-	while ( (pos = result.find("This problem is ")) != std::string::npos ) {
-		result.erase( pos, 16 );
+	set_maxim(lp);
+	result = solve(lp);
+	if (result == 0) {
+		max = (int) get_objective(lp);
 	}
 
-	while ( (pos = result.find(".00000000")) != std::string::npos ) {
-		result.erase( pos, 9 );
-	}
+	EventSetBound b(thisOne);
+	b.min = min;
+	b.max = max;
+	results.push_back(b);
 
-	while ( (pos = result.find("\n")) != std::string::npos ) {
-		result.erase( pos, 1 );
-	}
+	if (candidate.size() == 2) return;
 
-	while ( (pos = result.find("\r")) != std::string::npos ) {
-		result.erase( pos, 1 );
-	}
+	// Step 2: Recursive call.
 
-	while ( (pos = result.find((char) 1)) != std::string::npos ) {
-		result.replace( pos, 1,"\n" );
+	for (int i = 0; i < candidate.size(); ++i) {
+		EBV newCandidate = candidate;
+		newCandidate.erase(newCandidate.begin()+i);
+		findMaxDependenciesR(newCandidate, results, alreadyTested, lp, EventID);
 	}
-
 }

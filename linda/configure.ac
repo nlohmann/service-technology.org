@@ -1,4 +1,4 @@
-AC_INIT(Linda, 0.1, jan.suermeli@service-technology.org)
+AC_INIT(Linda, 0.2, jan.suermeli@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -27,5 +27,5 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/Makefile src/Makefile doc/Doxyfile man/Makefile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile libs/lp_solve/Makefile  src/Makefile doc/Doxyfile man/Makefile])
 AC_OUTPUT

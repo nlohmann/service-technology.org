@@ -1,4 +1,4 @@
-SUBDIRS = libs src man
+SUBDIRS = libs/pnapi libs/lp_solve src man
 
 svn-clean: maintainer-clean
 	rm -fr COPYING INSTALL Makefile.in aclocal.m4 compile configure \

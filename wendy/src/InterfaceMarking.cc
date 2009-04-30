@@ -299,7 +299,7 @@ bool InterfaceMarking::dec(Label_ID label) {
 }
 
 /*!
- \return whether the whole interface is unmarked
+ \return whether the whole interface is unmarked
  */
 bool InterfaceMarking::unmarked() const {
     for (size_t i = 0; i < bytes; ++i) {
@@ -312,7 +312,7 @@ bool InterfaceMarking::unmarked() const {
 }
 
 /*
- \return whether the interface is markedat the given label
+ \return whether the interface is marked at the given label
 */
 bool InterfaceMarking::marked(Label_ID label) const {
     assert(label > 0);

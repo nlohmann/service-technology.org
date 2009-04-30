@@ -5,7 +5,6 @@
 #include "Label.h"
 
 using std::map;
-using std::cout;
 using std::endl;
 using std::set;
 
@@ -81,9 +80,6 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
 
 
 /*!
- \bug a case is missing here: a marking can be a waitstate _and_ final at the
-      same time
-
  \todo treat the deletions
 
  \todo do not process the empty node as it has an ridiculously many
@@ -314,7 +310,7 @@ void StoredKnowledge::OGoutput(std::ofstream &file) {
         }
 
         file << "  " << reinterpret_cast<unsigned int>(*it)
-             << " : (" << (*it)->formula() << ") : blue";
+             << " : " << (*it)->formula() << " : blue";
 
         if ((*it)->is_final) {
             file << " : finalnode";
@@ -340,7 +336,7 @@ void StoredKnowledge::OGoutput(std::ofstream &file) {
             }
         }
     }
-    file << ";" << endl << endl;
+    file << ";" << endl;
 }
 
 
@@ -592,13 +588,12 @@ bool StoredKnowledge::sat() {
 
             // the deadlock is not resolved (which can be OK for a final state)
             if (not resolved) {
-                
                 // new code
                 if (InnerMarking::inner_markings[inner[i]]->is_final and
                     interface[i]->unmarked()) {
-                        continue;
-                    }
-                
+                    continue;
+                }
+
                 is_sane = 0;
                 return false;
             }
@@ -611,32 +606,14 @@ bool StoredKnowledge::sat() {
 
 
 /*!
- Some effort has been put to only add parentheses unless absolutely necessary.
-
  \return a string representation of the formula
  
  \note This function is also used for an operating guidelines output for
        Fiona.
-
- \todo Check whether the "true" output is correct.
  */
 string StoredKnowledge::formula() const {
-    // check if there is a deadlock at all
-    bool containsDeadlock = false;
-    for (unsigned int i = 0; i < size; ++i) {
-        if (interface[i] != NULL) {
-            containsDeadlock = true;
-        }
-    }
-
-    // if there is no deadlock and the knowledge is not final, return true
-    if (not containsDeadlock and not is_final) {
-        return "true";
-    }
-
     set<string> sendDisjunction;
     set<set<string> > receiveDisjunctions;
-    string result;
 
     // collect !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
@@ -646,70 +623,55 @@ string StoredKnowledge::formula() const {
     }
 
     // collect ?-edges for the deadlocks
+    bool dl_found = false;
     for (unsigned int i = 0; i < size; ++i) {
         if (interface[i] != NULL) {
-            set<string> temp;
+            dl_found = true;
+            set<string> temp = sendDisjunction;
             for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
                 if (interface[i]->marked(l) and successors[l-1] != NULL) {
                     temp.insert(Label::id2name[l]);
                 }
             }
-            if (not temp.empty()) {
-                receiveDisjunctions.insert(temp);
+
+            if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
+                temp.insert("final");
             }
+
+            receiveDisjunctions.insert(temp);
         }
     }
 
-    // create a disjunction of the !-edges
-    if (not sendDisjunction.empty()) {
-        for (set<string>::iterator it = sendDisjunction.begin(); it != sendDisjunction.end(); ++it) {
-            if (it != sendDisjunction.begin()) {
-                result += " + ";
-            }
-            result += *it;
-        }
+    if (!dl_found) {
+        return "true";
     }
+
+    string formula;
 
     // create a disjunction of conjunction of ?-edges for each deadlock
     if (not receiveDisjunctions.empty()) {
-        if (result != "") {
-            result += " + ";
-        }
-        if (not sendDisjunction.empty()) {
-            result += "(";
-        }
         for (set<set<string> >::iterator it = receiveDisjunctions.begin(); it != receiveDisjunctions.end(); ++it) {
-            if (it != receiveDisjunctions.begin() and result != "") {
-                result += " * ";
+            if (it != receiveDisjunctions.begin()) {
+                formula += " * ";
             }
             if (it->size() > 1) {
-                result += "(";
+                formula += "(";
             }
             for (set<string>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
                 if (it2 != it->begin()) {
-                    result += " + ";
+                    formula += " + ";
                 }
-                result += *it2;
+                formula += *it2;
             }
             if (it->size() > 1) {
-                result += ")";
+                formula += ")";
             }
         }
-        if (not sendDisjunction.empty()) {
-            result += ")";
-        }
+    } else {
+        assert(false);
     }
 
-    // add the final literal
-    if (is_final) {
-        if (result == "") {
-            result = "final";
-        } else {
-            result += " + final";
-        }
-    }
-
-    return result;
+    return formula;
 }
 
 

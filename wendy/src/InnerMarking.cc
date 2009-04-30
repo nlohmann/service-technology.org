@@ -160,7 +160,6 @@ inline void InnerMarking::determineType() {
 
     // draw some conclusions
     if (not (is_transient or is_deadlock)) {
-        assert(not is_transient);
         is_waitstate = 1;
     }
 }

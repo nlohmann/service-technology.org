@@ -35,7 +35,7 @@ class InterfaceMarking {
     public: /* static functions */
     
         /// initializes the class InterfaceMarking
-        static unsigned int initialize(unsigned int);
+        static void initialize(unsigned int);
         
     private: /* static attributes */
     

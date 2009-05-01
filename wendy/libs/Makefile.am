@@ -30,4 +30,5 @@ EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h parser-lola.h
 # clean additional (generated) files
 DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
 		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \
+		 parser-lola.h parser-lola.cc parser-lola-lexer.cc \
 		 parser-petrify.h parser-petrify.cc parser-petrify-lexer.cc

@@ -77,11 +77,6 @@ void Label::initialize() {
 
     for (set<Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
         if ((*t)->isSynchronized()) {
-            if ((*t)->getSynchronizeLabels().size() > 1) {
-                fprintf(stderr, "%s: net is not normal!\n", PACKAGE);
-                exit (EXIT_FAILURE);
-            }
-
             if (sync_labels[*(*t)->getSynchronizeLabels().begin()] == 0) {
                 sync_labels[*(*t)->getSynchronizeLabels().begin()] = ++events;
             }
@@ -99,7 +94,7 @@ void Label::initialize() {
     sync_events = last_sync - async_events;
 
     if (args_info.verbose_given) {
-        fprintf(stderr, "%s: initialized labels for %d events (%d async, %d sync)\n",
+        fprintf(stderr, "%s: initialized labels for %d events (%d asynchronous, %d synchronous)\n",
             PACKAGE, events, async_events, sync_events);
     }
 }

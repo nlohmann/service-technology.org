@@ -1,4 +1,5 @@
 #include <cassert>
+#include "config.h"
 #include "Knowledge.h"
 #include "Label.h"
 

@@ -1,6 +1,3 @@
-// for UINT8_MAX
-#define __STDC_LIMIT_MACROS
-
 #include <cmath>
 #include <cstdlib>
 #include <cassert>
@@ -37,21 +34,7 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
  * STATIC METHODS *
  ******************/
 
-unsigned int InterfaceMarking::initialize(unsigned int m) {
-    // only a positive message bound makes sense
-    if (m < 1) {
-        fprintf(stderr, "%s: message bound must be at least 1 -- aborting\n",
-            PACKAGE);
-        exit(EXIT_FAILURE);
-    }
-
-    // we use bytes to store the markings, so the message bound must not exceed 255    
-    if (m > UINT8_MAX) {
-        fprintf(stderr, "%s: message bound must not exceed %d -- aborting\n",
-            PACKAGE, UINT8_MAX);
-        exit(EXIT_FAILURE);
-    }
-
+void InterfaceMarking::initialize(unsigned int m) {
     message_bound = m;
     interface_length = Label::async_events;
     message_bound_bits = LOG2(message_bound);
@@ -243,7 +226,7 @@ bool InterfaceMarking::inc(Label_ID label) {
     uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // before increment, the value for this label should be smaller than the message bound
-    bool OK = (( (storage[byte] & mask) >> offset ) < message_bound );
+    bool OK = ( ( (storage[byte] & mask) >> offset) < message_bound );
 
     // use the mask to get the current value from the byte,
     // then shift and increment the value

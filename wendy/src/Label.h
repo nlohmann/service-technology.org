@@ -68,7 +68,7 @@ class Label {
         /// given a communication label, returns a string representation
         static std::map<Label_ID, std::string> id2name;
         /// given a transition name, the communication label
-        static std::map<std::string, Label_ID> name2id;        
+        static std::map<std::string, Label_ID> name2id;
 };
 
 #endif

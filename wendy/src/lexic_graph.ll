@@ -8,8 +8,10 @@
 #include <string>
 #include "syntax_graph.h"
 #include "config.h"
+#include "cmdline.h"
 
 extern std::string NAME_token;
+extern gengetopt_args_info args_info;
 
 void graph_error(const char *);
 %}
@@ -22,17 +24,16 @@ number    "-"?[0-9][0-9]*
 
 {number}" Places"               { /* skip */ }
 {number}" Transitions"          { /* skip */ }
-{number}" significant places"   { /* skip */ }
 ">>>>> "{number}" States, "{number}" Edges, "{number}" Hash table entries" { /* skip */ }
 
-"STATE"                 { return KW_STATE; }
-"Prog:"                 { return KW_PROG; }
-":"                     { return COLON; }
-","                     { return COMMA; }
-"->"                    { return ARROW; }
+"STATE"      { return KW_STATE; }
+"Prog:"      { return KW_PROG; }
+":"          { return COLON; }
+","          { return COMMA; }
+"->"         { return ARROW; }
 
-{number}  { graph_lval.val = atoi(graph_text); return NUMBER; }
-{name}    { NAME_token = graph_text; return NAME; }
+{number}     { graph_lval.val = atoi(graph_text); return NUMBER; }
+{name}       { NAME_token = graph_text; return NAME; }
 
 [ \t\r\n]*   { /* skip */ }
 <<EOF>>      { return EOF; }
@@ -41,5 +42,9 @@ number    "-"?[0-9][0-9]*
 %%
 
 void graph_error(const char *msg) {
-  fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, graph_lineno, graph_text, msg);
+  if (args_info.verbose_given) {
+      fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, graph_lineno, graph_text, msg);
+  }
+  fprintf(stderr, "%s: error while parsing the reachability graph from LoLA -- aborting\n", PACKAGE);
+  exit(EXIT_FAILURE);
 }

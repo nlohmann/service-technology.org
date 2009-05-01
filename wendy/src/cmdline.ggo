@@ -1,4 +1,4 @@
-args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-error"
 
 purpose "Wendy is a name generally given to females in English speaking countries. Its popularity is attributed to the character Wendy Darling from the play and novel 'Peter and Wendy' by J.M. Barrie."
 
@@ -42,6 +42,11 @@ option "formula" f
   default="dnf"
   optional
 
+option "lola" l
+  "The LoLA binary that is compiled with the option 'FULL'."
+  string
+  typestr="PATH"
+  optional
 
 section "Toggle optimizations"
 

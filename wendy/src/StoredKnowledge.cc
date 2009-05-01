@@ -1,6 +1,7 @@
 #include <set>
 #include <iostream>
 #include <cassert>
+#include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 
@@ -348,8 +349,8 @@ void StoredKnowledge::OGoutput(std::ofstream &file) {
  \param[in] K  the knowledge to copy from
 */
 StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
-    inner(NULL), interface(NULL), successors(NULL), predecessors(NULL),
-    inDegree(0), predecessorCounter(0), is_final(0), is_sane(1)
+    is_final(0), is_sane(1), inner(NULL), interface(NULL), successors(NULL),
+    inDegree(0), predecessorCounter(0), predecessors(NULL)
 {
     // make sure we copy from an existing object
     assert(K);
@@ -526,11 +527,7 @@ inline hash_t StoredKnowledge::hash() const {
     }
 
     // make sure that we don't accientially use 0 for a nonempty knowledge
-    if (result == 0) {
-        result = 1;
-    }
-
-    return result;
+    return (result > 0) ? result : 1;
 }
 
 
@@ -549,6 +546,7 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
 
     // use the first free position and store this knowledge
     assert(predecessorCounter < inDegree);
+    assert(predecessors);
     assert(predecessors[predecessorCounter] == NULL);
     predecessors[predecessorCounter++] = k;
 }
@@ -556,9 +554,6 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
 
 /*!
  \return whether each deadlock in the knowledge is resolved
-
- \todo check whether this object is deleted or at least set to NULL in case
-       it is insane
 
  \pre the interface markings of each transient or final marking has to be set
       to NULL
@@ -586,16 +581,10 @@ bool StoredKnowledge::sat() {
                 }
             }
 
-            // the deadlock is not resolved (which can be OK for a final state)
-            if (not resolved) {
-                // new code
-                if (InnerMarking::inner_markings[inner[i]]->is_final and
-                    interface[i]->unmarked()) {
-                    continue;
-                }
-
+            // the deadlock is neither resolved nor a final marking
+            if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
                 is_sane = 0;
-                return false;
+                return false;                
             }
         }
     }
@@ -615,14 +604,14 @@ string StoredKnowledge::formula() const {
     set<string> sendDisjunction;
     set<set<string> > receiveDisjunctions;
 
-    // collect !-edges
+    // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL) {
             sendDisjunction.insert(Label::id2name[l]);
         }
     }
 
-    // collect ?-edges for the deadlocks
+    // collect outgoing ?-edges for the deadlocks
     bool dl_found = false;
     for (unsigned int i = 0; i < size; ++i) {
         if (interface[i] != NULL) {
@@ -646,9 +635,8 @@ string StoredKnowledge::formula() const {
         return "true";
     }
 
+    // create the formula
     string formula;
-
-    // create a disjunction of conjunction of ?-edges for each deadlock
     if (not receiveDisjunctions.empty()) {
         for (set<set<string> >::iterator it = receiveDisjunctions.begin(); it != receiveDisjunctions.end(); ++it) {
             if (it != receiveDisjunctions.begin()) {

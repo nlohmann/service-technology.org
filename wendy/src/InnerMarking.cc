@@ -1,5 +1,6 @@
 #include <climits>
 #include <cassert>
+#include "config.h"
 #include "InnerMarking.h"
 #include "Label.h"
 #include "cmdline.h"
@@ -51,12 +52,16 @@ void InnerMarking::initialize() {
 
     markingMap.clear();
 
+    if (stats_final_markings == 0) {
+        fprintf(stderr, "%s: warning: no final marking found\n", PACKAGE);
+    }
+
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",
             PACKAGE, stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
         fprintf(stderr, "%s: stored %d inner markings",
             PACKAGE, inner_marking_count);
-    }    
+    }
 }
 
 
@@ -83,6 +88,7 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
     // knowing all successors, we can determine the type of the marking
     determineType();
 }
+
 
 InnerMarking::~InnerMarking() {
     delete[] labels;
@@ -158,7 +164,7 @@ inline void InnerMarking::determineType() {
         ++stats_inevitable_deadlocks;
     }
 
-    // draw some conclusions
+    // draw some last conclusions
     if (not (is_transient or is_deadlock)) {
         is_waitstate = 1;
     }

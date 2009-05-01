@@ -7,17 +7,14 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 Label.h Label.cc \
                 InnerMarking.h InnerMarking.cc \
                 Knowledge.h Knowledge.cc \
-		StoredKnowledge.h StoredKnowledge.cc \
-		cmdline.c cmdline.h
-
-wendy_LDADD =  $(top_builddir)/libs/libpnapi.a
+                StoredKnowledge.h StoredKnowledge.cc \
+                cmdline.c cmdline.h
 
 wendy_CPPFLAGS = -I$(top_srcdir)/libs
+wendy_LDADD =  $(top_builddir)/libs/libpnapi.a
 
 BUILT_SOURCES = cmdline.c syntax_graph.cc
-
 EXTRA_DIST = syntax_graph.h cmdline.ggo
-
 MAINTAINERCLEANFILES = syntax_graph.h cmdline.c cmdline.h
 
 

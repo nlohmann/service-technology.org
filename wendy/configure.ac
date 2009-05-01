@@ -1,18 +1,25 @@
-AC_INIT(Wendy, 2.0, niels@service-technology.org)
+AC_INIT(Wendy, 1.0, niels@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE
 
-# Checks for programs.
+# check for programs needed to compile
 AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
-
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# search for LoLA
+AC_PATH_TOOL(LOLA, [lola-full], not found)
+if test "$LOLA" = "not found"; then
+  AC_MSG_WARN([LoLA was not found. You need to execute Wendy with the '--lola' parameter.])
+else
+  AC_DEFINE_UNQUOTED(BINARY_LOLA, "${LOLA}", [LoLA binary.])
+fi
 
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])

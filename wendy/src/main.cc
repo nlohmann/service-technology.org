@@ -1,3 +1,24 @@
+/*****************************************************************************\
+ Wendy -- Calculating Operating Guidelines
+ 
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ 
+ Wendy is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+
 // for UINT8_MAX
 #define __STDC_LIMIT_MACROS
 
@@ -65,6 +86,12 @@ void evaluateParameters(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
+    // evaluate Fiona's deprecated parameters
+    if (args_info.type_given and
+        (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG)) {
+        args_info.og_given = 1;
+    }
+
     free(params);
 }
 
@@ -92,6 +119,11 @@ int main(int argc, char** argv) {
             assert (args_info.inputs_num == 1);
             filename = args_info.inputs[0];
             std::ifstream inputStream(args_info.inputs[0]);
+            if (!inputStream) {
+                fprintf(stderr, "%s: could not open file '%s' -- aborting\n",
+                    PACKAGE, args_info.inputs[0]);
+                exit(EXIT_FAILURE);
+            }
             inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
             inputStream.close();
         }
@@ -135,9 +167,9 @@ int main(int argc, char** argv) {
 
     // choose the LoLA binary
 #ifdef BINARY_LOLA
-    string command_line = BINARY_LOLA;
+    string command_line(BINARY_LOLA);
 #else
-    string command_line = args_info.lola_arg;
+    string command_line(args_info.lola_arg);
 #endif
 
     // read from a pipe or from a file

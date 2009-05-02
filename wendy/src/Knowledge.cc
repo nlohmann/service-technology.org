@@ -1,3 +1,24 @@
+/*****************************************************************************\
+ Wendy -- Calculating Operating Guidelines
+ 
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ 
+ Wendy is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+
 #include <cassert>
 #include "config.h"
 #include "Knowledge.h"
@@ -140,7 +161,7 @@ void Knowledge::closure() {
     set<FullMarking> considered;
 
     while(not todo.empty()) {
-        FullMarking current = todo.front();
+        FullMarking current(todo.front());
         todo.pop();
 
         // if this marking was already taken out of the todo queue, skip it this time

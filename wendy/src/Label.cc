@@ -1,3 +1,24 @@
+/*****************************************************************************\
+ Wendy -- Calculating Operating Guidelines
+ 
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ 
+ Wendy is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+
 #include "Label.h"
 #include "InnerMarking.h"
 #include "cmdline.h"
@@ -37,12 +58,12 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
     first_receive = 1;
 
-    const set<Place*> outputPlaces = InnerMarking::net->getOutputPlaces();
+    const set<Place*> outputPlaces( InnerMarking::net->getOutputPlaces() );
     for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
         ++events;
         id2name[events] = "?" + (*p)->getName();
 
-        const set<Node*> preset = (*p)->getPreset();
+        const set<Node*> preset( (*p)->getPreset() );
         for (set<Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
             name2id[(*t)->getName()] = events;
         }
@@ -54,13 +75,13 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE SEND (!-step for us)
     first_send = events+1;
 
-    const set<Place*> inputPlaces= InnerMarking::net->getInputPlaces();
+    const set<Place*> inputPlaces( InnerMarking::net->getInputPlaces() );
 
     for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
         ++events;
         id2name[events] = "!" + (*p)->getName();
 
-        const set<Node*> postset = (*p)->getPostset();
+        const set<Node*> postset( (*p)->getPostset() );
         for (set<Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {
             name2id[(*t)->getName()] = events;
         }
@@ -73,7 +94,7 @@ void Label::initialize() {
     first_sync = events+1;
     std::map<string, Label_ID> sync_labels;
 
-    const set<Transition*> trans = InnerMarking::net->getTransitions();
+    const set<Transition*> trans( InnerMarking::net->getTransitions() );
 
     for (set<Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
         if ((*t)->isSynchronized()) {

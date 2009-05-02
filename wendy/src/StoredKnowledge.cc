@@ -1,3 +1,24 @@
+/*****************************************************************************\
+ Wendy -- Calculating Operating Guidelines
+ 
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ 
+ Wendy is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+
 #include <set>
 #include <iostream>
 #include <cassert>
@@ -160,6 +181,8 @@ unsigned int StoredKnowledge::addPredecessors() {
 
 /*!
  \todo Do I really need three sets?
+ 
+ \todo Understand and tidy up this.
 */
 unsigned int StoredKnowledge::removeInsaneNodes() {
     unsigned int result = 0;
@@ -251,7 +274,7 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
                 switch (formulaStyle) {
                     case(formula_arg_dnf): formula = it->second[i]->formula(); break;
                     case(formula_arg_2bits): formula = it->second[i]->twoBitFormula(); break;
-                    case(formula_arg_3bits): assert(false); // not implemented yet
+                    default: assert(false);
                 }
 
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\"]" << endl;
@@ -616,7 +639,7 @@ string StoredKnowledge::formula() const {
     for (unsigned int i = 0; i < size; ++i) {
         if (interface[i] != NULL) {
             dl_found = true;
-            set<string> temp = sendDisjunction;
+            set<string> temp(sendDisjunction);
             for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
                 if (interface[i]->marked(l) and successors[l-1] != NULL) {
                     temp.insert(Label::id2name[l]);

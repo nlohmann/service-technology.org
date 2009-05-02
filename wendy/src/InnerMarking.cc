@@ -1,3 +1,24 @@
+/*****************************************************************************\
+ Wendy -- Calculating Operating Guidelines
+ 
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ 
+ Wendy is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
+ the Free Software Foundation,Inc., 51 Franklin Street, Fifth
+ Floor, Boston, MA 02110-1301  USA.
+\*****************************************************************************/
+
+
 #include <climits>
 #include <cassert>
 #include "config.h"
@@ -32,7 +53,8 @@ unsigned int InnerMarking::stats_final_markings = 0;
  Additionally, a mapping is filled to quickly determine whether a marking can
  become transient if a message with a given label was sent to the net.
  
- \todo replace the mapping receivers by a two-dimensional C-style array
+ \todo replace the mapping receivers by a two-dimensional C-style array or do
+       this check in the constructor
  */
 void InnerMarking::initialize() {
     unsigned int inner_marking_count = markingMap.size();
@@ -124,6 +146,9 @@ InnerMarking::~InnerMarking() {
  
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
+ 
+ \bug the whole deadlock detection has to be overworked (see bug7) -- it
+      seems as if it is possible to loose/gain strategies there
  */
 inline void InnerMarking::determineType() {
     bool is_transient = false;
@@ -146,6 +171,12 @@ inline void InnerMarking::determineType() {
             markingMap[successors[i]] != NULL and
             deadlock_inevitable and
             not markingMap[successors[i]]->is_deadlock) {
+            deadlock_inevitable = false;
+        }
+
+        // set deadlock_inevitable to false in case there is a communicating
+        // successor
+        if (SENDING(labels[i]) or RECEIVING(labels[i])) {
             deadlock_inevitable = false;
         }
 

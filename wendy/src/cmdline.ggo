@@ -1,6 +1,6 @@
 args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-error"
 
-purpose "Wendy is a name generally given to females in English speaking countries. Its popularity is attributed to the character Wendy Darling from the play and novel 'Peter and Wendy' by J.M. Barrie."
+purpose "Calculating Operating Guidelines."
 
 description "About Wendy:"
 
@@ -21,6 +21,13 @@ option "og" -
   argoptional
   optional
 
+option "type" t
+  "Parameter for compatibility with Fiona."
+  string
+  typestr="TYPE"
+  values="og","OG" enum
+  optional
+  hidden
 
 section "Options"
 
@@ -37,7 +44,7 @@ option "showEmptyNode" e
 
 option "formula" f
   "Select the kind of formula to be used in outputs."
-  values="dnf","2bits","3bits" enum
+  values="dnf","2bits" enum
   typestr="STYLE"
   default="dnf"
   optional

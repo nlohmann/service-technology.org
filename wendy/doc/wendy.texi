@@ -1,0 +1,167 @@
+\input texinfo
+@setfilename wendy.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Wendy User's Manual
+
+@c --------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for Wendy, version @value{VERSION}, a tool to calculate operating guidelines, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2009 Niels Lohmann
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* wendy: (wendy).       Wendy.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+@titlepage
+
+@title Wendy
+
+@subtitle Calculating Operating Guidelines
+@subtitle @url{http://service-technology.org/wendy}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Niels Lohmann
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c --------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top Wendy
+@insertcopying
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@menu
+* First Steps::How to set up and install Wendy.
+* Command Line Options::How to run Wendy.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c --------------------------------------------------------------------------
+
+@node First Steps
+@chapter First Steps
+
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/wendy} and download the latest release version of Wendy, say @file{wendy-@value{VERSION}.tar.gz}. To setup and compile Wendy, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz wendy-@value{VERSION}.tar.gz
+cd wendy-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/wendy} is generated.@footnote{On Microsoft Windows, the file will be called @file{wendy.exe}.} If you experience any compiler warnings, don't panic: Wendy contains some generated or third party code that we cannot influence.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Wendy. The documentation can be created using @samp{make pdf}. Note you need to have Wendy properly installed before (see Installation description above).
+
+@item man
+The manpage of Wendy which can be displayed using @samp{man wendy} after having Wendy installed (see Installation description above).
+
+@item src
+The source code of Wendy.
+@end table
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking Wendy
+
+Wendy is a command line tool and does not come with a fancy GUI. However, Wendy can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{wendy -h} to see the following help screen:
+
+@smallexample
+@include cmdline.out
+@end smallexample
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+Wendy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+The most recent change log is available at Wendy's website at @url{http://service-technology.org/files/wendy/ChangeLog}.
+
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

@@ -10,14 +10,15 @@ AC_PROG_CXX
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
+AC_PROG_SED
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
-AC_PROG_SED
 
 # search for LoLA
 AC_PATH_TOOL(LOLA, [lola-full], not found)
 if test "$LOLA" = "not found"; then
-  AC_MSG_WARN([LoLA was not found. You need to execute Wendy with the '--lola' parameter.])
+  AC_MSG_WARN([LoLA was not found in the path.])
+  AC_MSG_WARN([You need to execute Wendy with the '--lola' parameter.])
 else
   AC_DEFINE_UNQUOTED(BINARY_LOLA, "${LOLA}", [LoLA binary.])
 fi
@@ -31,7 +32,7 @@ AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 AC_HEADER_ASSERT
 
 # check for functions
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Wendy cannot use UNIX pipes.]))
 
 # check for exact unsigned types
 AC_TYPE_UINT8_T

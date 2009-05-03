@@ -60,6 +60,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install Wendy.
 * Command Line Options::How to run Wendy.
+* Exit and Error Codes::What the error and exit codes of Wendy mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -90,6 +91,24 @@ make
 
 After compilation, a binary @samp{src/wendy} is generated.@footnote{On Microsoft Windows, the file will be called @file{wendy.exe}.} If you experience any compiler warnings, don't panic: Wendy contains some generated or third party code that we cannot influence.
 
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.}
+
+@smallexample
+===================
+All 12 tests passed
+===================
+@end smallexample
+
+If an error occurs, please send the output to @email{wendy@@service-technology.org}.
+
 @item To install the binary, the manpage, and the documentation, type
 
 @cartouche
@@ -110,13 +129,19 @@ The distribution contains several directories:
 
 @table @file
 @item doc
-The Texinfo documentation of Wendy. The documentation can be created using @samp{make pdf}. Note you need to have Wendy properly installed before (see Installation description above).
+The Texinfo documentation of Wendy. The documentation can be created using @samp{make pdf}. Note you need to have Wendy properly installed before (see installation description above).
+
+@item libs
+The Petri Net API used by Wendy to parse and organize the open net.
 
 @item man
-The manpage of Wendy which can be displayed using @samp{man wendy} after having Wendy installed (see Installation description above).
+The manpage of Wendy which can be displayed using @samp{man wendy} after having Wendy installed (see installation description above).
 
 @item src
 The source code of Wendy.
+
+@item tests
+Testcases for Rachel which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
 @end table
 
 
@@ -128,7 +153,7 @@ The source code of Wendy.
 @node Command Line Options
 @chapter Invoking Wendy
 
-Wendy is a command line tool and does not come with a fancy GUI. However, Wendy can be easily scripted and combined with other tools.
+Wendy is a command line tool and does not come with a fancy @acronym{GUI}. However, Wendy can be easily scripted and combined with other tools.
 
 @section Command Line Options
 
@@ -138,6 +163,127 @@ For an overview of the command line options, type @samp{wendy -h} to see the fol
 @include cmdline.out
 @end smallexample
 
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+
+
+@section Exit Codes
+
+Wendy will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, the reachability graph of the inner could be build, the operating guidelines could be calculated, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+Note that Wendy's exit code is @b{not} related to the result of the controllability result. The messages
+
+@smallexample
+@cartouche
+wendy: net is controllable: YES
+@end cartouche
+@end smallexample
+
+and
+
+@smallexample
+@cartouche
+wendy: net is controllable: NO
+@end cartouche
+@end smallexample
+
+both yield exit code @samp{0} (successful termination).
+
+
+@section Error Codes
+
+In case any error occurs, Wendy aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+@item #01
+Error opening the input open net or input file not found.
+
+@smallexample
+@cartouche
+wendy: could not open file `foo.owfn' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+Error parsing the input open net. Usually indicates the line of the error and some more or less helpful message on the parse error.
+
+@smallexample
+@cartouche
+wendy:13: error near `Place': syntax error, unexpected IDENT,
+          expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+The input open net is not normal. That is, it contains a transition that is connected to more than one interface place. Note that non-normal open net can be normalized using the frontend tool @samp{petri} of the Petri Net API.
+
+@smallexample
+@cartouche
+wendy: the input open net must be normal -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+At most one file can be read at once. If no input filename is given, the open net is read from standard input.
+
+@smallexample
+@cartouche
+wendy: at most one input file must be given -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+Wendy uses LoLA to build the reachability graph of the inner of the net. The configure script tries to find the executable @file{lola-full} in the system's path. If it was not found in the path, the executable must be given using the command-line option @samp{--lola}.
+
+@smallexample
+@cartouche
+wendy: LoLA executable was not found -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #06
+This error occurs in case Wendy could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{FULL} mode) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
+
+@smallexample
+@cartouche
+wendy: error while parsing the reachability -- aborting [#06]
+@end cartouche
+@end smallexample
+
+@item #07
+A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{wendy --help} for an overview of the valid command-line parameters.
+
+@smallexample
+@cartouche
+wendy: `--showEmptyNode' option depends on option `dot'
+wendy: invalid command-line parameter(s) -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #08
+The report frequency for built knowledges must be a positive number. To switch off reporting at all, use @samp{--reportFrequency=0}.
+
+@smallexample
+@cartouche
+wendy: report frequency must not be negative -- aborting [#08]
+@end cartouche
+@end smallexample
+
+@item #09
+Interface markings are stored in byte vectors, so the marking of each place has to be stored in one byte. Hence, the message bound must not exceed 255.
+
+@smallexample
+@cartouche
+wendy: message bound must be between 1 and 255 -- aborting [#09]
+@end cartouche
+@end smallexample
+
+@end table
 
 
 

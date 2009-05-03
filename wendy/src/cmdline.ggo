@@ -7,27 +7,28 @@ description "About Wendy:"
 
 section "Output"
 
-option "dot" -
-  "Graphviz dot output. If no filename is given, '.dot' is appended to the input filename."
+option "og" -
+  "Operating guidelines output. If no filename is given, the input filename's suffix is replaced by '.og'."
   string
   typestr="FILENAME"
   argoptional
   optional
 
-option "og" -
-  "Operating guidelines output. If no filename is given, '.og' is appended to the input filename."
+option "dot" -
+  "Graphviz dot output. If no filename is given, the input filename's suffix is replaced by '.dot'."
   string
   typestr="FILENAME"
   argoptional
   optional
 
 option "type" t
-  "Parameter for compatibility with Fiona."
+  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og'."
   string
   typestr="TYPE"
   values="og","OG" enum
   optional
   hidden
+
 
 section "Options"
 
@@ -38,22 +39,29 @@ option "messagebound" m
   default="1"
   optional
 
-option "showEmptyNode" e
-  "Show the empty node."
+option "showEmptyNode" -
+  "Show the empty node (dot only)."
+  dependon="dot"
   flag off
 
-option "formula" f
+option "showDeadlocks" -
+  "Show deadlocks (dot only)."
+  dependon="dot"
+  flag off
+
+option "formula" -
   "Select the kind of formula to be used in outputs."
   values="dnf","2bits" enum
   typestr="STYLE"
   default="dnf"
   optional
 
-option "lola" l
-  "The LoLA binary that is compiled with the option 'FULL'."
+option "lola" -
+  "The LoLA binary that is compiled with the option 'FULL' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using 'make lola-full'."
   string
   typestr="PATH"
   optional
+
 
 section "Toggle optimizations"
 
@@ -65,11 +73,11 @@ option "noDeadlockDetection" -
 section "Debug"
 
 option "verbose" v
-  "Verbose output"
+  "Verbose output."
   flag off
 
-option "reportFrequency" r
-  "Report frequency for knowledge bubbles"
+option "reportFrequency" -
+  "Report frequency for knowledge bubbles. To switch reporting off completely, set it to '0'."
   int
   typestr="FREQ"
   default="10000"

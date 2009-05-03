@@ -7,6 +7,6 @@ if test "$FIONA" = "not found"; then
 fi
 
 wendy bug3.owfn --og --verbose &> result.log
-fiona -tequivalence bug3.owfn.og bug3.fiona.og &>> result.log
+fiona -tequivalence bug3.og bug3.fiona.og &>> result.log
 
 exit $?

@@ -28,7 +28,8 @@ EXTRA_DIST += wrap.sh
 TESTDIR = $(abs_builddir)/tmp
 
 # variables passed to the testscripts
-TESTS_ENVIRONMENT = FIONA="$(FIONA)" testdir=$(TESTDIR) testroot=$(abs_srcdir) PATH=$(abs_top_builddir)/src:$$PATH $(srcdir)/wrap.sh
+TESTS_ENVIRONMENT = FIONA="$(FIONA)" testdir=$(TESTDIR) testroot=$(abs_srcdir) \
+                    PATH=$(abs_top_builddir)/src:$$PATH $(srcdir)/wrap.sh
 
 # "make clean" should delete the result of the tests
 CLEANFILES = -r $(TESTDIR)

@@ -1,21 +1,20 @@
 /*****************************************************************************\
  Wendy -- Calculating Operating Guidelines
- 
+
  Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
- 
- Wendy is free software; you can redistribute it and/or modify it under the
- terms of the GNU General Public License as published by the Free Software
- Foundation; either version 3 of the License, or (at your option) any later
- version.
- 
+
+ Wendy is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
  Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along with
- Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
- the Free Software Foundation,Inc., 51 Franklin Street, Fifth
- Floor, Boston, MA 02110-1301  USA.
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
 
@@ -45,6 +44,9 @@ gengetopt_args_info args_info;
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
+    // overwrite invokation for consistent error messages
+    argv[0] = PACKAGE;
+
     // set default values
     cmdline_parser_init(&args_info);
 
@@ -53,20 +55,20 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        fprintf(stderr, "%s: invalid command line parameter(s) -- aborting\n", PACKAGE);
+        fprintf(stderr, "%s: invalid command-line parameter(s) -- aborting [#07]\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
 
     // initialize the report frequency
-    if (args_info.reportFrequency_arg < 1) {
-        fprintf(stderr, "%s: report frequency must be positive -- aborting\n", PACKAGE);
+    if (args_info.reportFrequency_arg < 0) {
+        fprintf(stderr, "%s: report frequency must not be negative -- aborting [#08]\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
     StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;
 
     // check whether at most one file is given
     if (args_info.inputs_num > 1) {
-        fprintf(stderr, "%s: at most one input file must be given -- aborting\n", PACKAGE);
+        fprintf(stderr, "%s: at most one input file must be given -- aborting [#04]\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
 
@@ -74,14 +76,14 @@ void evaluateParameters(int argc, char** argv) {
     // with a command line parameter "--lola"
 #ifndef BINARY_LOLA
     if (!args_info.lola_given) {
-        fprintf(stderr, "%s: no LoLA executable was found -- aborting\n", PACKAGE);
+        fprintf(stderr, "%s: LoLA executable was not found -- aborting [#05]\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
 #endif
 
     // check the message bound
     if (args_info.messagebound_arg < 1 or args_info.messagebound_arg > UINT8_MAX) {
-        fprintf(stderr, "%s: message bound must be between 1 and %d -- aborting\n",
+        fprintf(stderr, "%s: message bound must be between 1 and %d -- aborting [#09]\n",
             PACKAGE, UINT8_MAX);
         exit(EXIT_FAILURE);
     }
@@ -97,7 +99,8 @@ void evaluateParameters(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
-    string filename;
+    // set a standard filename
+    string filename("wendy_output");
     time_t start_time, end_time;
     
     /*--------------------------------------.
@@ -113,14 +116,15 @@ int main(int argc, char** argv) {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
             std::cin >> pnapi::io::owfn >> *(InnerMarking::net);
-            // set a standard filename
-            filename = "wendy.owfn";
         } else {
             assert (args_info.inputs_num == 1);
-            filename = args_info.inputs[0];
+
+            // strip suffix from input filename
+            filename = string(args_info.inputs[0]).substr(0,string(args_info.inputs[0]).find_last_of("."));
+
             std::ifstream inputStream(args_info.inputs[0]);
             if (!inputStream) {
-                fprintf(stderr, "%s: could not open file '%s' -- aborting\n",
+                fprintf(stderr, "%s: could not open file '%s' -- aborting [#01]\n",
                     PACKAGE, args_info.inputs[0]);
                 exit(EXIT_FAILURE);
             }
@@ -131,13 +135,13 @@ int main(int argc, char** argv) {
             std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
         }
     } catch (pnapi::io::InputError error) {
-        std::cerr << PACKAGE << error << " -- aborting" << std::endl;
+        std::cerr << PACKAGE << error << " -- aborting [#02]" << std::endl;
         exit(EXIT_FAILURE);
     }
     
     // only normal nets are supported so far
     if (not InnerMarking::net->isNormal()) {
-        fprintf(stderr, "%s: the input open net must be normal -- aborting\n", PACKAGE);
+        fprintf(stderr, "%s: the input open net must be normal -- aborting [#03]\n", PACKAGE);
         exit(EXIT_FAILURE);
     }
 
@@ -259,7 +263,8 @@ int main(int argc, char** argv) {
     if (args_info.dot_given) {
         string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
         std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::dot(dot_file, args_info.showEmptyNode_given, args_info.formula_arg);
+        StoredKnowledge::dot(dot_file, args_info.showEmptyNode_given,
+                             args_info.showDeadlocks_given, args_info.formula_arg);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
         }

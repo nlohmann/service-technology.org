@@ -1,21 +1,20 @@
 /*****************************************************************************\
  Wendy -- Calculating Operating Guidelines
- 
+
  Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
- 
- Wendy is free software; you can redistribute it and/or modify it under the
- terms of the GNU General Public License as published by the Free Software
- Foundation; either version 3 of the License, or (at your option) any later
- version.
- 
+
+ Wendy is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
  Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along with
- Wendy (see file COPYING); if not, see http://www.gnu.org/licenses or write to
- the Free Software Foundation,Inc., 51 Franklin Street, Fifth
- Floor, Boston, MA 02110-1301  USA.
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
 
@@ -64,7 +63,7 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
     static unsigned int calls = 0;
     static unsigned int edges = 0;
 
-    if (++calls % reportFrequency == 0) {
+    if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
             StoredKnowledge::storedKnowledges, edges);
     }
@@ -258,6 +257,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
  \todo  Implement the possibility to show the markings of the knowledge.
 */
 void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
+                          bool showDeadlocks = false,
                           enum_formula formulaStyle = formula_arg_dnf)
 {
     file << "digraph G {" << endl;
@@ -277,7 +277,19 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
                     default: assert(false);
                 }
 
-                file << "\"" << it->second[i] << "\" [label=\"" << formula << "\"]" << endl;
+                file << "\"" << it->second[i] << "\" [label=\"" << formula;
+
+                if (showDeadlocks) {
+                    file << "\\n";
+                    for (unsigned int j = 0; j < it->second[i]->size; ++j) {
+                        if (it->second[i]->interface[i] != NULL) {
+                            file << "m" << static_cast<unsigned int>(it->second[i]->inner[i]) << " ";
+                            file << *(it->second[i]->interface[i]) << "\\n";
+                        }
+                    }
+                }
+
+                file << "\"]" << endl;
                 for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and

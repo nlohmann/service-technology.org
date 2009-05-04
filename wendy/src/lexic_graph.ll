@@ -27,11 +27,11 @@
 #include <cstring>
 #include <string>
 #include "syntax_graph.h"
-#include "config.h"
 #include "cmdline.h"
 
 extern std::string NAME_token;
 extern gengetopt_args_info args_info;
+extern void abort(unsigned int code, const char* format, ...);
 
 void graph_error(const char *);
 %}
@@ -44,6 +44,7 @@ number    "-"?[0-9][0-9]*
 
 {number}" Places"               { /* skip */ }
 {number}" Transitions"          { /* skip */ }
+{number}" significant places"   { /* skip */ }
 ">>>>> "{number}" States, "{number}" Edges, "{number}" Hash table entries" { /* skip */ }
 
 "STATE"      { return KW_STATE; }
@@ -65,6 +66,5 @@ void graph_error(const char *msg) {
   if (args_info.verbose_given) {
       fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, graph_lineno, graph_text, msg);
   }
-  fprintf(stderr, "%s: error while parsing the reachability -- aborting [#06]\n", PACKAGE);
-  exit(EXIT_FAILURE);
+  abort(6, "error while parsing the reachability");
 }

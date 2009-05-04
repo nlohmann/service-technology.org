@@ -8,5 +8,3 @@ fi
 
 wendy PO.owfn --og --verbose &> result.log
 fiona -tequivalence PO.og PO.fiona.og &>> result.log
-
-exit $?

@@ -103,7 +103,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 
 @smallexample
 ===================
-All 12 tests passed
+All 20 tests passed
 ===================
 @end smallexample
 

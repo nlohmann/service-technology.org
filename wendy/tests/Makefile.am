@@ -1,5 +1,7 @@
 # list all testscripts
 TESTS = bug1.sh bug2.sh bug3.sh bug4.sh bug5.sh bug6.sh bug7.sh \
+        error01.sh error02.sh error03.sh error04.sh \
+        error06.sh error07.sh error08.sh error09.sh \
         net-phils.sh net-purchase.sh net-sequence.sh net-travel.sh net-zeus.sh
 
 # list the testscripts and testfiles
@@ -11,6 +13,14 @@ EXTRA_DIST = $(TESTS) \
              bug5/bug5.owfn bug5/bug5.fiona.og \
              bug6/bug6.owfn bug6/bug6.fiona.og \
              bug7/bug7.owfn bug7/bug7.fiona.og \
+             error01/empty \
+             error02/error02.owfn \
+             error03/error03.owfn \
+             error04/error04-1.owfn error04/error04-2.owfn \
+             error06/error06.owfn \
+             error07/empty \
+             error08/empty \
+             error09/empty \
              net-phils/phcontrol3.unf.owfn net-phils/phcontrol3.unf.fiona.og \
              net-purchase/PO.owfn net-purchase/PO.fiona.og \
              net-sequence/sequence10.owfn net-sequence/sequence10.fiona.og \

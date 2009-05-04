@@ -8,5 +8,3 @@ fi
 
 wendy sequence10.owfn --og --verbose &> result.log
 fiona -tequivalence sequence10.og sequence10.fiona.og &>> result.log
-
-exit $?

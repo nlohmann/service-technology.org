@@ -252,6 +252,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 /*!
  \param[in,out] file  the output stream to write the dot representation to
  \param[in] showTrue  whether to show the true node with its adjacent arcs
+ \param[in] showDeadlocks  whether to print deadlocks in the knowledges
  \param[in] formulaStyle  which kind of formulas to print (explicit or 2 bit)
  
  \todo  Implement the possibility to show the markings of the knowledge.
@@ -393,6 +394,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        // initialization is necessary to detect absent edges
         successors[l-1] = NULL;
     }
 

@@ -8,5 +8,3 @@ fi
 
 wendy bug6.owfn --og --verbose &> result.log
 fiona -tequivalence bug6.og bug6.fiona.og &>> result.log
-
-exit $?

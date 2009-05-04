@@ -1,8 +1,27 @@
 args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-error"
 
 purpose "Calculating Operating Guidelines."
-
 description "About Wendy:"
+
+
+section "Fiona Compatibility"
+sectiondesc = "Wendy implements a subset of Fiona's functionality. These parameters were introduced to ease the transition from Fiona to Wendy. For instance, instead of calling 'fiona net.owfn -t og', you can call 'wendy net.owfn -t og'.\n"
+
+option "type" t
+  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og'."
+  string
+  typestr="TYPE"
+  values="og","OG" enum
+  optional
+  hidden
+
+option "show" s
+  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showDeadlocks' and '-s empty' is equivalent to '--showEmptyNode'."
+  string
+  typestr="PARAMETER"
+  values="deadlocks","empty" enum
+  optional
+  hidden  
 
 
 section "Output"
@@ -20,14 +39,6 @@ option "dot" -
   typestr="FILENAME"
   argoptional
   optional
-
-option "type" t
-  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og'."
-  string
-  typestr="TYPE"
-  values="og","OG" enum
-  optional
-  hidden
 
 
 section "Options"

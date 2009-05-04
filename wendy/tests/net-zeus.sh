@@ -8,5 +8,3 @@ fi
 
 wendy zeus.owfn --og --verbose &> result.log
 fiona -tequivalence zeus.og zeus.fiona.og &>> result.log
-
-exit $?

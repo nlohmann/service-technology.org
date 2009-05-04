@@ -21,9 +21,12 @@
 // for UINT8_MAX
 #define __STDC_LIMIT_MACROS
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <cassert>
 #include "config.h"
@@ -37,9 +40,34 @@ extern FILE *graph_in;
 /// the parser
 extern int graph_parse();
 
-
 /// the command line parameters
 gengetopt_args_info args_info;
+
+
+/*!
+ \brief abort with an error message and an error code
+ 
+ The codes are documented in Wendy's manual.
+ 
+ \param code    the error code
+ \param format  the error message formatted as printf string
+*/
+void abort(unsigned int code, const char* format, ...) {
+    fprintf(stderr, "%s: ", PACKAGE);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end (args);
+
+    fprintf(stderr, " -- aborting [#%02d]\n", code);
+
+    if (args_info.verbose_given) {
+        fprintf(stderr, "%s: see manual for a documentation of this error\n", PACKAGE);
+    }
+
+    exit(EXIT_FAILURE);
+}
 
 
 /// evaluate the command line parameters
@@ -55,43 +83,43 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        fprintf(stderr, "%s: invalid command-line parameter(s) -- aborting [#07]\n", PACKAGE);
-        exit(EXIT_FAILURE);
+        abort(7, "invalid command-line parameter(s)");
     }
 
     // initialize the report frequency
     if (args_info.reportFrequency_arg < 0) {
-        fprintf(stderr, "%s: report frequency must not be negative -- aborting [#08]\n", PACKAGE);
-        exit(EXIT_FAILURE);
+        abort(8, "report frequency must not be negative");
     }
     StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;
 
     // check whether at most one file is given
     if (args_info.inputs_num > 1) {
-        fprintf(stderr, "%s: at most one input file must be given -- aborting [#04]\n", PACKAGE);
-        exit(EXIT_FAILURE);
+        abort(4, "at most one input file must be given");
     }
 
     // check whether a LoLA executable is given either in file "config.h" or
     // with a command line parameter "--lola"
 #ifndef BINARY_LOLA
     if (!args_info.lola_given) {
-        fprintf(stderr, "%s: LoLA executable was not found -- aborting [#05]\n", PACKAGE);
-        exit(EXIT_FAILURE);
+        abort(5, "LoLA executable was not found");
     }
 #endif
 
     // check the message bound
-    if (args_info.messagebound_arg < 1 or args_info.messagebound_arg > UINT8_MAX) {
-        fprintf(stderr, "%s: message bound must be between 1 and %d -- aborting [#09]\n",
-            PACKAGE, UINT8_MAX);
-        exit(EXIT_FAILURE);
+    if ((args_info.messagebound_arg < 1) or (args_info.messagebound_arg > UINT8_MAX)) {
+        abort(9, "message bound must be between 1 and %d", UINT8_MAX);
     }
 
-    // evaluate Fiona's deprecated parameters
+    // evaluate Fiona's parameters
     if (args_info.type_given and
         (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG)) {
         args_info.og_given = 1;
+    }
+    if (args_info.show_given and args_info.show_arg == show_arg_empty) {
+        args_info.showEmptyNode_given = 1;
+    }
+    if (args_info.show_given and args_info.show_arg == show_arg_deadlocks) {
+        args_info.showDeadlocks_given = 1;
     }
 
     free(params);
@@ -102,7 +130,7 @@ int main(int argc, char** argv) {
     // set a standard filename
     string filename("wendy_output");
     time_t start_time, end_time;
-    
+
     /*--------------------------------------.
     | 0. parse the command line parameters  |
     `--------------------------------------*/
@@ -124,9 +152,7 @@ int main(int argc, char** argv) {
 
             std::ifstream inputStream(args_info.inputs[0]);
             if (!inputStream) {
-                fprintf(stderr, "%s: could not open file '%s' -- aborting [#01]\n",
-                    PACKAGE, args_info.inputs[0]);
-                exit(EXIT_FAILURE);
+                abort(1, "could not open file '%s'", args_info.inputs[0]);
             }
             inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
             inputStream.close();
@@ -135,23 +161,21 @@ int main(int argc, char** argv) {
             std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
         }
     } catch (pnapi::io::InputError error) {
-        std::cerr << PACKAGE << error << " -- aborting [#02]" << std::endl;
-        exit(EXIT_FAILURE);
+        std::stringstream temp;
+        temp << error;
+        abort(2, "\b\b%s", temp.str().c_str());
     }
-    
+
     // only normal nets are supported so far
     if (not InnerMarking::net->isNormal()) {
-        fprintf(stderr, "%s: the input open net must be normal -- aborting [#03]\n", PACKAGE);
-        exit(EXIT_FAILURE);
+        abort(3, "the input open net must be normal");
     }
 
 
     /*--------------------------------------------.
     | 2. initialize labels and interface markings |
     `--------------------------------------------*/
-    // initialize labels
     Label::initialize();
-    // initialize the interface markings with the given message bound
     InterfaceMarking::initialize(args_info.messagebound_arg);
 
 
@@ -171,7 +195,7 @@ int main(int argc, char** argv) {
 
     // choose the LoLA binary
 #ifdef BINARY_LOLA
-    string command_line(BINARY_LOLA);
+    string command_line(args_info.lola_given ? args_info.lola_arg : BINARY_LOLA);
 #else
     string command_line(args_info.lola_arg);
 #endif
@@ -269,7 +293,7 @@ int main(int argc, char** argv) {
             fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
         }
     }
-    
+
     // operating guidelines output
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";

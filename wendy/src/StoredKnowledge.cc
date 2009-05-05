@@ -311,12 +311,13 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
 
 /*!
  \param[in,out] file  the output stream to write the OG to
+ \param[in] formulaStyle  how formulas are represented
  
  \note  Fiona identifies node numbers by integers. To avoid numbering of
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
 */
-void StoredKnowledge::OGoutput(std::ofstream &file) {
+void StoredKnowledge::OGoutput(std::ofstream &file, enum_formula formulaStyle) {
     file << "INTERFACE" << endl;
     file << "  INPUT" << endl;
     bool first = true;
@@ -346,11 +347,23 @@ void StoredKnowledge::OGoutput(std::ofstream &file) {
             file << "," << endl;
         }
 
-        file << "  " << reinterpret_cast<unsigned int>(*it)
-             << " : " << (*it)->formula() << " : blue";
+        file << "  " << reinterpret_cast<unsigned int>(*it) << " : ";
 
-        if ((*it)->is_final) {
-            file << " : finalnode";
+        switch(formulaStyle) {
+            case(formula_arg_dnf): {
+                file << (*it)->formula() << " : blue";
+
+                if ((*it)->is_final) {
+                    file << " : finalnode";
+                }
+
+                break;
+            }
+
+            case(formula_arg_2bits): {
+                file << (*it)->twoBitFormula();
+                break;
+            }
         }
     }
     file << ";" << endl << endl;
@@ -703,16 +716,18 @@ string StoredKnowledge::formula() const {
 /*!
  \return "S" if formula can only be satisfied by sending events; "F" if
          formula contains the "final" literal
+
+ \pre  the node is sane, i.e. "sane()" would return true
  */
 string StoredKnowledge::twoBitFormula() const {
-    string result;
-
     if (is_final) {
-        result += "F";
+        // the formula contains final
+        return "F";
     }
 
     for (unsigned int i = 0; i < size; ++i) {
-        if (interface[i] != NULL) {
+        // check only the deadlocks
+        if (interface[i] != NULL and not (InnerMarking::inner_markings[inner[i]]->is_final) and interface[i]->unmarked()) {
             bool resolved = false;
 
             // we found a deadlock -- check whether for at least one marked
@@ -724,14 +739,15 @@ string StoredKnowledge::twoBitFormula() const {
                 }
             }
 
-            // the deadlock is not resolved
             if (not resolved) {
-                return "S" + result;
+                // the deadlock can not be resolved by receiving -> must send
+                return "S";
             }
         }
     }
 
-    return result;
+    // no bit needed
+    return "-";
 }
 
 

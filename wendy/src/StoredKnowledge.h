@@ -45,7 +45,7 @@ class StoredKnowledge {
         static void dot(std::ofstream&, bool, bool, enum_formula);
 
         /// print the knowledges as Fiona OG
-        static void OGoutput(std::ofstream&);
+        static void OGoutput(std::ofstream&, enum_formula);
 
     public: /* static attributes */
 

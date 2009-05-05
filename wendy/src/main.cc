@@ -298,7 +298,7 @@ int main(int argc, char** argv) {
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::OGoutput(og_file);
+        StoredKnowledge::OGoutput(og_file, args_info.formula_arg);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
         }

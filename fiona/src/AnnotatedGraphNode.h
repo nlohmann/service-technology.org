@@ -88,6 +88,23 @@ class AnnotatedGraphNode : public GraphNode {
         /// Destroys this AnnotatedGraphNode.
         virtual ~AnnotatedGraphNode();
 
+        // recolor inefficient successors with regard to partner synthesis
+        void recolorInefficientSuccessors(map< AnnotatedGraphNode*, list<AnnotatedGraphNode*> >&);
+
+        /// compute inefficient successors with regard to transitions cost
+        unsigned int computeInefficientSuccessors(map< AnnotatedGraphNode*, list<AnnotatedGraphNode*> >&);
+
+        /// compute cost minimal assignment(s)
+        unsigned int getCostMinimalAssignments( list< pair<string, unsigned int> >,
+                                                list< GraphFormulaAssignment >&);
+
+        /// recursive helper function for computing cost minimal assignment(s)
+        void getCostMinimalAssignmentsRecursively(list< pair<string, unsigned int> >,
+                                                  unsigned int,
+                                                  GraphFormulaAssignment,
+                                                  unsigned int&,
+                                                  list<GraphFormulaAssignment>&);
+
         /// get the annotation
         GraphFormulaCNF* getAnnotation() const;
 

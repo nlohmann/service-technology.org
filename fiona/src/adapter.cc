@@ -59,7 +59,7 @@ using namespace PNapi;
 list< adapterRule > hiddenRules;       // from parser: read rules for hidden communication
 list< adapterRule > observableRules;   // from parser: read rules for observable communication
 list< adapterRule > controllableRules; // from parser: read rules for controllable communication
-list< adapterRule > totalRules;        // from parser: read rules for total (observable and controllable) communication
+list< pair<adapterRule, unsigned int> > totalRules; // from parser: read rules for total (observable and controllable) communication
 map< string, ruleType > ruleTypePerChannel;         // from parser: ruleType per channel
 map< string, unsigned int > consumeRulesPerChannel; // from parser: number of rules which consume from channel
 //map< string, unsigned int > produceRulesPerChannel; // from parser: number of rules which produce for channel
@@ -456,7 +456,7 @@ void Adapter::expandRewriterWithTotalRules(PNapi::PetriNet * rewriter, int level
     // Then there is no need to control the execution of this rule, that means
     // we can abandon the corresponding interface places.
     unsigned int ruleNr = 0;
-    for(list<adapterRule>::iterator rule = totalRules.begin(); rule != totalRules.end(); rule++) {
+    for(list< pair<adapterRule, unsigned int> >::iterator rule = totalRules.begin(); rule != totalRules.end(); rule++) {
 
         // WARNING - Handle internal name creation with care:
         // - all service places are disjoint and we added a prefix
@@ -480,12 +480,12 @@ void Adapter::expandRewriterWithTotalRules(PNapi::PetriNet * rewriter, int level
         Transition * t = rewriter->newTransition("XT_standardRule" + intToString(ruleNr));
 
         // Optimization
-        bool conflictfree = (rule->first.size() > 0) ? true : false;
+        bool conflictfree = (rule->first.first.size() > 0) ? true : false;
 
 
         // handle first channel list of current adapter rule
         TRACE(TRACE_1, "handling rule:\t");
-        for(list<string>::iterator channel = rule->first.begin(); channel != rule->first.end(); channel++) {
+        for(list<string>::iterator channel = rule->first.first.begin(); channel != rule->first.first.end(); channel++) {
 
             // Optimization
             conflictfree = conflictfree && (consumeRulesPerChannel[*channel] <= 1);
@@ -516,7 +516,7 @@ void Adapter::expandRewriterWithTotalRules(PNapi::PetriNet * rewriter, int level
 
         // handle second channel list of current adapter rule
         TRACE(TRACE_1, " -> ");
-        for(list< string >::iterator channel = rule->second.begin(); channel != rule->second.end(); channel++) {
+        for(list< string >::iterator channel = rule->first.second.begin(); channel != rule->first.second.end(); channel++) {
 
             // handle a channel as internal place
             TRACE(TRACE_1, *channel + " ");
@@ -585,12 +585,12 @@ void Adapter::generate()
         serviceList.push_back(currentPN);
 
         // debug information
-        //if ( debug_level >= 4 ) {
-        //    outputPNasPNG( currentPN, intToString(prefix) + '_' + currentName );
-        //    if ( !options[O_OUTFILEPREFIX] ) {
-        //        TRACE(TRACE_4, "outputPrefix:\t" + outputPrefix + "\n\n");
-        //    }
-        //}
+        if ( debug_level >= 4 ) {
+            outputPNasPNG( currentPN, intToString(prefix) + '_' + currentName );
+            if ( !options[O_OUTFILEPREFIX] ) {
+                TRACE(TRACE_4, "outputPrefix:\t" + outputPrefix + "\n\n");
+            }
+        }
 
         prefix++;
     }
@@ -650,10 +650,10 @@ void Adapter::generate()
         expandRewriterWithInterface(adapterRewriter, *service);
 
         // debug information
-        //if ( debug_level >= 4 ) {
-        //    outputPNasOWFN(adapterRewriter, intToString(prefix) + '_' + "rewriter");
-        //    outputPNasPNG( adapterRewriter, intToString(prefix) + '_' + "rewriter");
-        //}
+        if ( debug_level >= 4 ) {
+            outputPNasOWFN(adapterRewriter, intToString(prefix) + '_' + "rewriter");
+            outputPNasPNG( adapterRewriter, intToString(prefix) + '_' + "rewriter");
+        }
 
         prefix++;
     }
@@ -669,19 +669,19 @@ void Adapter::generate()
     cerr << endl << difftime(secondsAfter, secondsBefor) << " s consumed for building rewriter" << endl << endl;
 
     // debug information
-    //if ( debug_level >= 4 ) {
-    //    outputPNasOWFN(adapterRewriter, intToString(prefix) + '_' + "rewriter");
-    //    outputPNasPNG( adapterRewriter, intToString(prefix) + '_' + "rewriter");
-    //}
+    if ( debug_level >= 4 ) {
+        outputPNasOWFN(adapterRewriter, intToString(prefix) + '_' + "rewriter");
+        outputPNasPNG( adapterRewriter, intToString(prefix) + '_' + "rewriter");
+    }
 
     // reduce complexity with pnapi reduction methods
     adapterRewriter->reduce(5);
     
     // debug information
-    //if ( debug_level >= 4 ) {
-    //    outputPNasOWFN(adapterRewriter, intToString(prefix) + intToString(prefix) + '_' + "rewriter");
-    //    outputPNasPNG( adapterRewriter, intToString(prefix) + intToString(prefix) + '_' + "rewriter");
-    //}
+    if ( debug_level >= 4 ) {
+        outputPNasOWFN(adapterRewriter, intToString(prefix) + intToString(prefix) + '_' + "rewriter");
+        outputPNasPNG( adapterRewriter, intToString(prefix) + intToString(prefix) + '_' + "rewriter");
+    }
     
     // reduce complexity with adapter rewriter reduction methods
     // will be implemented in new PNApi version
@@ -712,10 +712,10 @@ void Adapter::generate()
     	adapterComposed->compose(**service);
 
         // debug information
-        //if ( debug_level >= 4 ) {
-        //    outputPNasOWFN(adapterComposed, intToString(prefix) + '_' + "composed");
-        //    outputPNasPNG( adapterComposed, intToString(prefix) + '_' + "composed");
-        //}
+        if ( debug_level >= 4 ) {
+            outputPNasOWFN(adapterComposed, intToString(prefix) + '_' + "composed");
+            outputPNasPNG( adapterComposed, intToString(prefix) + '_' + "composed");
+        }
 
         prefix++;
     }
@@ -726,9 +726,9 @@ void Adapter::generate()
 
     // output composition
     outputPNasOWFN(adapterComposed, outputPrefix + "composed");
-    //if ( debug_level >= 4 ) {
-    //    outputPNasPNG(adapterComposed, outputPrefix + "composed");
-    //}
+    if ( debug_level >= 4 ) {
+        outputPNasPNG(adapterComposed, outputPrefix + "composed");
+    }
 
     // compute partner (adapter controller) with fiona
 	string systemcall = (parameters[P_SMALLADAPTER]) ?
@@ -738,6 +738,23 @@ void Adapter::generate()
     TRACE(TRACE_1, systemcall + "\n\n");
     system(systemcall.c_str());
 
+    // ############ prototyping for cost efficient adapters #####################
+
+    //if (parameters[P_SMALLADAPTER]) {
+    //    string systemcall = "fiona -t smallpartner -r -m" + toString(messages_manual) + " " + outputPrefix + "composed.owfn";
+    //    TRACE(TRACE_1, "Invoking fiona with the following options:\n");
+    //    TRACE(TRACE_1, systemcall + "\n\n");
+    //    system(systemcall.c_str());
+    //} else {
+    //    TRACE(TRACE_1, "Computing cost efficient adapter (prototype).\n");
+    //    assert(parameters[P_ADAPTER]);
+
+    //    // computing OG on my own
+
+    //}
+
+
+    // ############ prototyping for cost efficient adapters #####################
 
     delete adapterComposed;
     secondsAfter = time(NULL);

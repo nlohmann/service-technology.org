@@ -138,6 +138,9 @@ class owfnTransition : public Node {
         /// constructor
         owfnTransition(const std::string& name);
 
+        /// constructor
+        owfnTransition(const std::string& name, const unsigned int c); 
+
         /// destructor
         ~owfnTransition();
 
@@ -183,6 +186,10 @@ class owfnTransition : public Node {
         
         /// returns true if there is no tau label for matching
         bool hasNonTauLabelForMatching() const;
+
+        /// cost we have to pay for firing this transition
+        /// TODO implement this private and with getter/setter
+        unsigned int cost;
 
 #undef new
         /// Provides user defined operator new. Needed to trace all new

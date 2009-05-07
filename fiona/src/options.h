@@ -73,6 +73,7 @@ typedef enum {
     P_MINIMIZE_OG,              //!< minimize a given OG
     P_PV,                       //!< compute Public View Service Automaton
     P_SYNTHESIZE_PARTNER_OWFN,  //!< compute an oWFN from the IG/OG
+    P_EFFICIENT_PARTNER_OWFN,   //!< compute an oWFN from a worked OG
     P_PRODUCTOG,                //!< compute the product of 2 OGs
     P_SIMULATES,                //!< Check whether an OG simulates another
     P_EX,                       //!< check equivalence (former exchangability) of two OGs

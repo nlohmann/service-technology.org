@@ -69,7 +69,15 @@ unsigned int AdjacentPlace::getMultiplicity() const {
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name), labelForMatching(GraphFormulaLiteral::TAU), isEnabled_(false),
             isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0),
-            isConnectedToOtherPort(false), isConnectedToMyPort(false) {
+            isConnectedToOtherPort(false), isConnectedToMyPort(false), cost(0) {
+}
+
+
+//! \brief constructor
+owfnTransition::owfnTransition(const std::string& name, const unsigned int c) :
+    Node(name), labelForMatching(GraphFormulaLiteral::TAU), isEnabled_(false),
+            isQuasiEnabled_(false), quasiEnabledNr(0), enabledNr(0),
+            isConnectedToOtherPort(false), isConnectedToMyPort(false), cost(c) {
 }
 
 

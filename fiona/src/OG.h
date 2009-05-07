@@ -67,7 +67,8 @@ class OG : public CommunicationGraph {
         void add(AnnotatedGraphNode*,
                           AnnotatedGraphNode*,
                           oWFN::Places_t::size_type,
-                          GraphEdgeType); // for OG
+                          GraphEdgeType,
+                          unsigned int); // for OG
 
     public:
         /// constructor
@@ -81,6 +82,9 @@ class OG : public CommunicationGraph {
         /// Turns all blue nodes that should be red into red ones and
         /// simplifies their annotations by removing unneeded literals.
         void correctNodeColorsAndShortenAnnotations();
+
+        // implements cost efficient partner computation
+        void recolorInefficientNodes();
 
         /// Builds the OG of the associated PN
         virtual void buildGraph();

@@ -68,8 +68,9 @@ extern int adapt_rules_yyerror(const char*);
 
 namespace
 {
-    list< string > channelList;	// a list of names for input/output places (channels)
-    adapterRule currentRule;	// current read rule
+    list< string > channelList;	   // a list of names for input/output places (channels)
+    adapterRule currentRule;	  // current read rule
+    unsigned int currentRuleCost; // costs of current read rule
 }
 
 
@@ -86,16 +87,18 @@ int adapt_rules_yyerror(const char* msg)
 %name-prefix="adapt_rules_yy"
 
 %token RULE_HIDDEN RULE_OBSERVABLE RULE_CONTROLLABLE
-%token NAME ARROW COMMA SEMICOLON
+%token NAME NUMBER ARROW_BEGIN ARROW_END COMMA SEMICOLON
 
 %token_table
 
 %union {
   char *str;
+  unsigned int value;
 }
 
 /* the types of the non-terminal symbols */
 %type <str> NAME
+%type <str> NUMBER
 
 
 %%
@@ -188,7 +191,7 @@ adapt_rules:
 |
     total_rule
     {
-        totalRules.push_back(currentRule);
+        totalRules.push_back( make_pair(currentRule, currentRuleCost) );
 
         for ( list< string >::iterator channel = currentRule.first.begin(); channel != currentRule.first.end(); channel++) {
             if ( ruleTypePerChannel.find(*channel) != ruleTypePerChannel.end() &&
@@ -233,7 +236,7 @@ partial_rule:
 
         channelList.clear();
     }
-    ARROW channel_list
+    ARROW_END channel_list
     {
         currentRule.second = channelList;
 
@@ -266,9 +269,10 @@ total_rule:
 
         channelList.clear();
     }
-    ARROW opt_channel_list
+    ARROW_END opt_channel_list
     {
         currentRule.second = channelList;
+        currentRuleCost = 0;
 
         map< string, bool > seen;
         for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
@@ -280,6 +284,38 @@ total_rule:
 
         channelList.clear();
     }
+|
+    opt_channel_list 
+    {
+        currentRule.first = channelList;
+
+        map< string, bool > seen;
+        for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
+            if (!seen[*channel]) {
+                seen[*channel] = true;
+                consumeRulesPerChannel[*channel] += 1;
+            }
+        }
+
+        channelList.clear();
+    }
+    ARROW_BEGIN NUMBER ARROW_END opt_channel_list
+    {
+        currentRule.second = channelList;
+        sscanf($4,"%u",&currentRuleCost);
+        free($4);
+
+        map< string, bool > seen;
+        for ( list< string >::iterator channel = channelList.begin(); channel != channelList.end(); channel++) {
+            if (!seen[*channel]) {
+                seen[*channel] = true;
+                //produceRulesPerChannel[*channel] += 1;
+            }
+        }
+
+        channelList.clear();
+    }
+
 ;
 
 opt_channel_list:

@@ -162,6 +162,8 @@ void print_help() {
   trace("                                                 or all given OGs\n");
   trace("                                  smallpartner - generates a (small) partner for\n");
   trace("                                                 a given oWFN or IG\n");
+  trace("                              efficientpartner - generates an efficient partner for\n");
+  trace("                                                 a given oWFN\n");
   trace("                                   adapter     - calculate an adapter for a\n");
   trace("                                                 given set of services\n");
   trace("                                  smalladapter - calculate a small adapter for\n");
@@ -354,6 +356,7 @@ void parse_command_line(int argc, char* argv[]) {
     parameters[P_MINIMIZE_OG] = false;
     parameters[P_PV] = false;
     parameters[P_SYNTHESIZE_PARTNER_OWFN] = false;
+    parameters[P_EFFICIENT_PARTNER_OWFN] = false;
     parameters[P_PRODUCTOG] = false;
     parameters[P_SIMULATES] = false;
     parameters[P_EX] = false;
@@ -460,6 +463,12 @@ void parse_command_line(int argc, char* argv[]) {
                 } else if ((lc_optarg == "pv") || (lc_optarg == "publicview")) {
                     parameters[P_PV] = true;
                     parameters[P_IG] = false;
+                } else if (lc_optarg == "efficientpartner") {
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
+                    parameters[P_SHOW_EMPTY_NODE] = false;
+                    parameters[P_SYNTHESIZE_PARTNER_OWFN] = true;
+                    parameters[P_EFFICIENT_PARTNER_OWFN] = true;
                 } else if (lc_optarg == "smallpartner") {
                     parameters[P_OG] = false;
                     parameters[P_IG] = true;

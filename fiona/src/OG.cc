@@ -45,6 +45,8 @@
 #include "binDecision.h"
 
 #include <ctime>
+#include <queue>
+#include <stack>
 
 // #define TRUE 1 in cudd package can interfere with CommGraphLiteral::TRUE.
 // So, we undefine TRUE.
@@ -229,12 +231,12 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
                     addGraphNode(currentNode, newNode);
 
                     if (currentEvent->getType() == INPUT) {
-                        add(currentNode, newNode, PN->getInputPlaceIndex(currentEvent), SENDING);
+                        add(currentNode, newNode, PN->getInputPlaceIndex(currentEvent), SENDING, currentEvent->getCost());
 
                         // going down with sending event ...
                         buildGraph(newNode, your_progress);
                     } else if (currentEvent->getType() == OUTPUT) {
-                        add(currentNode, newNode, PN->getOutputPlaceIndex(currentEvent), RECEIVING);
+                        add(currentNode, newNode, PN->getOutputPlaceIndex(currentEvent), RECEIVING, currentEvent->getCost());
 
                         // going down with receiving event ...
                         buildGraph(newNode, 0);
@@ -254,7 +256,8 @@ void OG::buildGraph(AnnotatedGraphNode* currentNode, double progress_plus) {
 
                     // draw a new edge to the old node
                     string edgeLabel = currentEvent->getLabelForCommGraph();
-                    AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(found, edgeLabel);
+
+                    AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(found, edgeLabel, currentEvent->getCost());
 
                     // a new edge has been added to the graph, must be local to the OG
                     nEdges++;
@@ -371,7 +374,8 @@ void OG::addGraphNode(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* toAdd)
 void OG::add(AnnotatedGraphNode* sourceNode,
                       AnnotatedGraphNode* destNode,
                       oWFN::Places_t::size_type label,
-                      GraphEdgeType type) {
+                      GraphEdgeType type,
+                      unsigned int edgeCost) {
 
     TRACE(TRACE_5, "reachGraph::Add(AnnotatedGraphNode* sourceNode, AnnotatedGraphNode* destNode, unsigned int label, Type type): start\n");
 
@@ -390,7 +394,7 @@ void OG::add(AnnotatedGraphNode* sourceNode,
     }
 
     // add a new edge to the new node
-    AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(destNode, edgeLabel);
+    AnnotatedGraphEdge* newEdge = new AnnotatedGraphEdge(destNode, edgeLabel, edgeCost);
 
     // a new edge has been added to the graph, must be local to the OG
     nEdges++;
@@ -659,6 +663,20 @@ void OG::correctNodeColorsAndShortenAnnotations() {
         AnnotatedGraphNode* node = *iNode;
         node->removeUnneededLiteralsFromAnnotation();
     }
+}
+
+
+//! \brief recolor inefficient nodes for synthesizing a cost minimal partner
+void OG::recolorInefficientNodes() {
+
+    map< AnnotatedGraphNode*, list<AnnotatedGraphNode*> > inefficientSuccessors;
+
+    // compute cost and inefficient successors
+    getRoot()->computeInefficientSuccessors(inefficientSuccessors);
+
+    // recolor inefficient successors
+    getRoot()->recolorInefficientSuccessors(inefficientSuccessors);
+    inefficientSuccessors.clear();
 }
 
 

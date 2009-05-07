@@ -837,7 +837,7 @@ string computeMostPermissivePartner(AnnotatedGraph* OG) {
     trace( "\n\nComputing partner oWFN \n");
 
     // 1. step: was done before (computing the OG)
-    // 2. step: if the net is controllable create STG file for petrify out of computed IG
+    // 2. step: if the net is controllable create STG file for petrify out of computed OG
     string stgFilename = "";
     vector<string> edgeLabels; // renamend transitions
 
@@ -1063,6 +1063,17 @@ string computeOG(oWFN* PN) {
         graph->createOGFile(ogFilename, true);
         //vector<string> edgeLabels;                        // renamend transitions
         if (parameters[P_SYNTHESIZE_PARTNER_OWFN]) {
+            if (parameters[P_EFFICIENT_PARTNER_OWFN]) {
+
+                // recolor inefficient nodes for finding cost efficient partner
+                graph->recolorInefficientNodes();
+
+                // DEBUG
+                //string basefilename = options[O_OUTFILEPREFIX] ? outfilePrefix : PN->filename;
+                //basefilename += graph->getSuffix();
+                //createOutputFiles(graph, basefilename + "_recolored", "OG of " + PN->filename);
+                //graph->createOGFile(ogFilename + "_recolored", true);
+            }
             computeMostPermissivePartner(graph);
         }
 

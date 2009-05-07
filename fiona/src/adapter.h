@@ -108,7 +108,7 @@ typedef enum {
 extern std::list< adapterRule > hiddenRules;
 extern std::list< adapterRule > observableRules;
 extern std::list< adapterRule > controllableRules;
-extern std::list< adapterRule > totalRules;
+extern std::list< std::pair<adapterRule, unsigned int> > totalRules;
 extern std::map< std::string, ruleType > ruleTypePerChannel;
 extern std::map< std::string, unsigned int > consumeRulesPerChannel;
 //extern std::map< std::string, unsigned int > produceRulesPerChannel;

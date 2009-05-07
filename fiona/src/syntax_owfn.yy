@@ -152,7 +152,7 @@ InTransitionParsePosition inTransitionParsePosition;
 // [LUHME XV] Kommentare ergänzen, welche Felder werden überhaupt verwendet?
 %union {
 	char * str;
-	int value;
+	unsigned int value;
 	int * exl;          ///< expression list
 	arc_list * al;
 	owfnPlace * pl;
@@ -167,6 +167,7 @@ InTransitionParsePosition inTransitionParsePosition;
 %type <str> NEGATIVE_NUMBER
 %type <str> tname
 %type <str> nodeident
+%type <value> opt_transition_cost
 %type <al> arclist
 %type <al> arc
 %type <form> statepredicate
@@ -575,9 +576,9 @@ transitionlist: transitionlist transition
 | /* empty */
 ;
 
-transition: KEY_TRANSITION tname
+transition: KEY_TRANSITION tname opt_transition_cost
 	{
-		T = new owfnTransition($2);
+		T = new owfnTransition($2, $3);
 		if (!PN->addTransition(T))
 		{
 			string error = "Transition name " + string($2) + " was used twice!";
@@ -600,7 +601,7 @@ transition: KEY_TRANSITION tname
 	arc_list * current;
 
 	/* Schleife ueber alle eingehenden Boegen */
-	for(current = $6; current; current = current->next) {
+	for(current = $7; current; current = current->next) {
 		if (current->place->getPlace()->type == OUTPUT) {
 			string msg = string("Transition '") + T->name + "' consumes from "
 				"output place '" + current->place->getPlace()->name +
@@ -626,7 +627,7 @@ transition: KEY_TRANSITION tname
 
 
 	/* Schleife ueber alle ausgehenden Boegen */
-	for(current = $10; current; current = current->next) {
+	for(current = $11; current; current = current->next) {
 		if (current->place->getPlace()->type == INPUT) {
 			string msg = string("Transition '") + T->name + "' produces to an "
 				"input place '" + current->place->getPlace()->name +
@@ -656,8 +657,19 @@ opt_synchronize_label
 	free($2);
 
 	// delete arc_list because they are no longer used
-	delete $6;
-	delete $10;
+	delete $7;
+	delete $11;
+}
+;
+
+opt_transition_cost:
+  /* empty */ { $$ = 0; }
+| COLON NUMBER
+{
+    unsigned int i;
+	sscanf($2,"%u",&i);
+    $$ = i;
+    free($2);
 }
 ;
 

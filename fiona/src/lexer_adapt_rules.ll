@@ -68,10 +68,12 @@ CONTROLLABLE { return RULE_CONTROLLABLE; }
 <COMMENT>[^\n\r]*               { /* skip */ }
 
  /* identifiers and other characters */
-{name}	{ adapt_rules_yylval.str = strdup(adapt_rules_yytext); return NAME; }
-"->"    { return ARROW; }
-","     { return COMMA; }
-";"     { return SEMICOLON; }
+{name}	     { adapt_rules_yylval.str = strdup(adapt_rules_yytext); return NAME; }
+[0-9][0-9]*  { adapt_rules_yylval.str = strdup(adapt_rules_yytext); return NUMBER; }
+"--"         { return ARROW_BEGIN; }
+"->"         { return ARROW_END; }
+","          { return COMMA; }
+";"          { return SEMICOLON; }
 
 
  /* whitespaces */

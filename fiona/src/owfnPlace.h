@@ -83,6 +83,9 @@ class owfnPlace : public Node {
         /// returns the underlying owfn
         oWFN* getUnderlyingOWFN() const;
 
+        // returns cost of this place if its an interface place
+        unsigned int getCost();
+
         /// initial marking of the place
         unsigned int initial_marking;
 

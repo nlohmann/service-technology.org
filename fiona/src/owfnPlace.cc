@@ -39,6 +39,7 @@
 #include "owfn.h"
 #include "dimensions.h"
 #include "owfnPlace.h"
+#include "owfnTransition.h"
 #include "debug.h"
 #include <cassert>
 
@@ -219,4 +220,29 @@ void owfnPlace::setPort(const std::string my_port) {
 //! \return a string representing the port
 std::string owfnPlace::getPort() {
     return port;
+}
+
+//! \brief returns the cost of this place if its and interface place
+//! \return cost
+unsigned int owfnPlace::getCost() {
+
+    if ( type == INPUT && getLeavingArcsCount() > 0 ) {
+        unsigned int max = (getLeavingArc(0)->tr)->cost;
+        for (int i = 1; i < getLeavingArcsCount(); ++i) {
+            unsigned int currentCost = (getLeavingArc(i)->tr)->cost;
+            max = (currentCost > max) ? currentCost : max;
+        }
+        return max;
+    }
+
+    if ( type == OUTPUT && getArrivingArcsCount() > 0 ) {
+        unsigned int max = (getArrivingArc(0)->tr)->cost;
+        for (int i = 1; i < getArrivingArcsCount(); ++i) {
+            unsigned int currentCost = (getArrivingArc(i)->tr)->cost;
+            max = (currentCost > max) ? currentCost : max;
+        }
+        return max;
+    }
+
+    return 0;
 }

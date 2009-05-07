@@ -50,8 +50,16 @@ using namespace std;
 AnnotatedGraphEdge::AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP,
                                        const std::string& labelP) :
     GraphEdge(NULL,labelP),
-    dstNode(dstNodeP) {
+    dstNode(dstNodeP),
+    cost(0) {
+}
 
+
+AnnotatedGraphEdge::AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP,
+                                       const std::string& labelP, unsigned int c) :
+    GraphEdge(NULL,labelP),
+    dstNode(dstNodeP),
+    cost(c) {
 }
 
 

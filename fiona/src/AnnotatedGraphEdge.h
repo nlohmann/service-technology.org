@@ -55,6 +55,11 @@ public:
     /// Constructs a GraphEdge.
     AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP, const std::string& labelP);
 
+    AnnotatedGraphEdge(AnnotatedGraphNode* dstNodeP, const std::string& labelP, unsigned int c);
+
+    // cost of this edge
+    unsigned int cost;
+
     /// Returns the node this edge points to.
     AnnotatedGraphNode* getDstNode() const;
 

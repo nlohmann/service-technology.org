@@ -28,6 +28,9 @@
 using std::map;
 using std::set;
 
+extern gengetopt_args_info args_info;
+
+
 
 /******************
  * STATIC MEMBERS *
@@ -43,6 +46,7 @@ unsigned int StoredKnowledge::iterations = 0;
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
+std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
 
 
 /********************
@@ -107,7 +111,8 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
  
  \todo must delete hash tree (needed by removeInsaneNodes())
  
- \post interface only consists of deadlocking markings
+ \post interface only consists of deadlocking markings (unless --diagnosis
+       mode was needed)
  */
 unsigned int StoredKnowledge::addPredecessors() {
     unsigned int result = 0;
@@ -118,6 +123,11 @@ unsigned int StoredKnowledge::addPredecessors() {
         // traverse the entries
         for (size_t i = 0; i < it->second.size(); ++i) {
             assert(it->second[i]);
+
+            // store number of markings for diagnosis
+            if (args_info.diagnosis_given) {
+                allMarkings[it->second[i]] = it->second[i]->size;
+            }
 
             // for each successor, register the predecessor
             for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
@@ -139,10 +149,10 @@ unsigned int StoredKnowledge::addPredecessors() {
                 if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final and
                 it->second[i]->interface[j]->unmarked()) {
 
-                // remember that this knowledge contains a final marking
+                    // remember that this knowledge contains a final marking
                     it->second[i]->is_final = 1;
 
-                // only if the final marking is not a watistate, we're done
+                    // only if the final marking is not a watistate, we're done
                     if (not InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
                         transient = true;
                     }
@@ -151,7 +161,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                 // case 2: a resolved waitstate
                 if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
 
-                // check if DL is resolved by interface marking
+                    // check if DL is resolved by interface marking
                     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
                         if (it->second[i]->interface[j]->marked(l) and
                             InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
@@ -170,10 +180,10 @@ unsigned int StoredKnowledge::addPredecessors() {
                 if (transient) {
                     InnerMarking_ID temp_inner = it->second[i]->inner[j];
                     InterfaceMarking *temp_interface = it->second[i]->interface[j];
-                    
+
                     it->second[i]->inner[j] = it->second[i]->inner[ it->second[i]->size-1 ];
                     it->second[i]->interface[j] = it->second[i]->interface[ it->second[i]->size-1 ];
-                    
+
                     it->second[i]->inner[ it->second[i]->size-1 ] = temp_inner;
                     it->second[i]->interface[ it->second[i]->size-1 ] = temp_interface;
 
@@ -262,15 +272,8 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 
 /*!
  \param[in,out] file  the output stream to write the dot representation to
- \param[in] showTrue  whether to show the true node with its adjacent arcs
- \param[in] showDeadlocks  whether to print deadlocks in the knowledges
- \param[in] formulaStyle  which kind of formulas to print (explicit or 2 bit)
- 
- \todo  Implement the possibility to show the markings of the knowledge.
 */
-void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
-                          bool showDeadlocks = false,
-                          enum_formula formulaStyle = formula_arg_dnf)
+void StoredKnowledge::dot(std::ofstream &file)
 {
     file << "digraph G {\n"
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
@@ -280,22 +283,28 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
         for (size_t i = 0; i < it->second.size(); ++i) {
             if (it->second[i]->is_sane and
                 (seen.find(it->second[i]) != seen.end()) and
-                (showTrue or it->second[i]->size > 0)) {
+                (args_info.showEmptyNode_given or it->second[i]->size > 0)) {
 
                 string formula;
-                switch (formulaStyle) {
+                switch (args_info.formula_arg) {
                     case(formula_arg_dnf): formula = it->second[i]->formula(); break;
                     case(formula_arg_2bits): formula = it->second[i]->twoBitFormula(); break;
                     default: assert(false);
                 }
 
-                file << "\"" << it->second[i] << "\" [label=\"" << formula;
+                file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
-                if (showDeadlocks) {
-                    file << "\\n";
+                if (args_info.showDeadlocks_given) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
-                        file << "m" << static_cast<unsigned int>(it->second[i]->inner[i]) << " ";
-                        file << *(it->second[i]->interface[i]) << "\\n";
+                        file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
+                        file << *(it->second[i]->interface[j]) << " (dl)\\n";
+                    }
+                }
+
+                if (args_info.showTransients_given) {
+                    for (unsigned int j = it->second[i]->size; j < allMarkings[it->second[i]]; ++j) {
+                        file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
+                        file << *(it->second[i]->interface[j]) << " (tr)\\n";
                     }
                 }
 
@@ -304,7 +313,7 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
                 for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
-                        (showTrue or it->second[i]->successors[l-1]->size > 0)) {
+                        (args_info.showEmptyNode_given or it->second[i]->successors[l-1]->size > 0)) {
                         file << "\"" << it->second[i] << "\" -> \""
                              << it->second[i]->successors[l-1]
                              << "\" [label=\"" << Label::id2name[l]
@@ -321,13 +330,12 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
 
 /*!
  \param[in,out] file  the output stream to write the OG to
- \param[in] formulaStyle  how formulas are represented
  
  \note  Fiona identifies node numbers by integers. To avoid numbering of
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
 */
-void StoredKnowledge::OGoutput(std::ofstream &file, enum_formula formulaStyle) {
+void StoredKnowledge::OGoutput(std::ofstream &file) {
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
@@ -359,7 +367,7 @@ void StoredKnowledge::OGoutput(std::ofstream &file, enum_formula formulaStyle) {
 
         file << "  " << reinterpret_cast<unsigned int>(*it) << " : ";
 
-        switch(formulaStyle) {
+        switch(args_info.formula_arg) {
             case(formula_arg_dnf):   file << (*it)->formula(); break;
             case(formula_arg_2bits): file << (*it)->twoBitFormula(); break;
         }
@@ -535,7 +543,7 @@ StoredKnowledge *StoredKnowledge::store() {
         ++hashCollisions;
 
         // update maximal bucket size (we add 1 as we will store this object later)
-        maxBucketSize = std::max(maxBucketSize, hashTree[myHash].size()+1);        
+        maxBucketSize = std::max(maxBucketSize, hashTree[myHash].size() + 1);
     }
 
     // we need store this object
@@ -634,7 +642,7 @@ bool StoredKnowledge::sat() {
         // the deadlock is neither resolved nor a final marking
         if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
             is_sane = 0;
-            return false;                
+            return false;
         }
     }
 

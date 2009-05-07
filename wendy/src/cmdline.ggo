@@ -16,10 +16,10 @@ option "type" t
   hidden
 
 option "show" s
-  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showDeadlocks' and '-s empty' is equivalent to '--showEmptyNode'. Multiple values are allowed."
+  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showDeadlocks', '-s allstates' is equivalent to '--showDeadlocks --showTransients', and '-s empty' is equivalent to '--showEmptyNode'. Multiple values are allowed."
   string
   typestr="PARAMETER"
-  values="deadlocks","empty" enum
+  values="deadlocks","allstates","empty" enum
   optional
   multiple
   hidden  
@@ -61,6 +61,11 @@ option "showDeadlocks" -
   dependon="dot"
   flag off
 
+option "showTransients" -
+  "Show transient states (dot only). Note: implicitly sets '--diagnosis' flag."
+  dependon="dot"
+  flag off
+
 option "formula" -
   "Select the kind of formula to be used in outputs."
   values="dnf","2bits" enum
@@ -94,3 +99,7 @@ option "reportFrequency" -
   typestr="FREQ"
   default="10000"
   optional
+
+option "diagnosis" d
+  "Disable some optimizations to allow for diagnosis and debugging."
+  flag off

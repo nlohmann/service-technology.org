@@ -42,10 +42,10 @@ class StoredKnowledge {
         static unsigned int removeInsaneNodes();
 
         /// print a dot representation
-        static void dot(std::ofstream&, bool, bool, enum_formula);
+        static void dot(std::ofstream&);
 
         /// print the knowledges as Fiona OG
-        static void OGoutput(std::ofstream&, enum_formula);
+        static void OGoutput(std::ofstream&);
 
     public: /* static attributes */
 
@@ -80,6 +80,9 @@ class StoredKnowledge {
 
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
+
+        /// the number of all markings (deadlocks and transient markings)
+        static std::map<StoredKnowledge*, unsigned int> allMarkings;
 
     public: /* member functions */
 

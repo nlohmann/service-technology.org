@@ -110,17 +110,33 @@ void evaluateParameters(int argc, char** argv) {
         abort(9, "message bound must be between 1 and %d", UINT8_MAX);
     }
 
-    // evaluate Fiona's parameters
+    // evaluate Fiona's '--type/-t' parameter
     if (args_info.type_given and
         (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG)) {
         args_info.og_given = 1;
     }
 
+    // evaluate Fiona's '--show/-s' parameter
     for (unsigned int i = 0; i < args_info.show_given; ++i) {
         switch (args_info.show_arg[i]) {
-            case(show_arg_empty): args_info.showEmptyNode_given = 1; break;
-            case(show_arg_deadlocks): args_info.showDeadlocks_given = 1; break;
+            case(show_arg_empty):
+                args_info.showEmptyNode_given = 1;
+                break;
+
+            case(show_arg_deadlocks):
+                args_info.showDeadlocks_given = 1;
+                break;
+
+            case(show_arg_allstates):
+                args_info.showDeadlocks_given = 1;
+                args_info.showTransients_given = 1;
+                break;
         }
+    }
+
+    // the '--showTransients' parameter implies '--diagnosis'
+    if (args_info.showTransients_given) {
+        args_info.diagnosis_given = 1;
     }
 
     free(params);
@@ -288,8 +304,7 @@ int main(int argc, char** argv) {
     if (args_info.dot_given) {
         string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
         std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::dot(dot_file, args_info.showEmptyNode_given,
-                             args_info.showDeadlocks_given, args_info.formula_arg);
+        StoredKnowledge::dot(dot_file);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
         }
@@ -299,7 +314,7 @@ int main(int argc, char** argv) {
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::OGoutput(og_file, args_info.formula_arg);
+        StoredKnowledge::OGoutput(og_file);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
         }

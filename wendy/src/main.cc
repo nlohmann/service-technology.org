@@ -115,11 +115,12 @@ void evaluateParameters(int argc, char** argv) {
         (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG)) {
         args_info.og_given = 1;
     }
-    if (args_info.show_given and args_info.show_arg == show_arg_empty) {
-        args_info.showEmptyNode_given = 1;
-    }
-    if (args_info.show_given and args_info.show_arg == show_arg_deadlocks) {
-        args_info.showDeadlocks_given = 1;
+
+    for (unsigned int i = 0; i < args_info.show_given; ++i) {
+        switch (args_info.show_arg[i]) {
+            case(show_arg_empty): args_info.showEmptyNode_given = 1; break;
+            case(show_arg_deadlocks): args_info.showDeadlocks_given = 1; break;
+        }
     }
 
     free(params);

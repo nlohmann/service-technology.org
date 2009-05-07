@@ -26,7 +26,6 @@
 #include "Label.h"
 
 using std::map;
-using std::endl;
 using std::set;
 
 
@@ -107,6 +106,8 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
        predecessors
  
  \todo must delete hash tree (needed by removeInsaneNodes())
+ 
+ \post interface only consists of deadlocking markings
  */
 unsigned int StoredKnowledge::addPredecessors() {
     unsigned int result = 0;
@@ -118,57 +119,67 @@ unsigned int StoredKnowledge::addPredecessors() {
         for (size_t i = 0; i < it->second.size(); ++i) {
             assert(it->second[i]);
 
+            // for each successor, register the predecessor
+            for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                if (it->second[i]->successors[l-1] != NULL) {
+                    it->second[i]->successors[l-1]->addPredecessor(it->second[i]);
+                    ++result;
+                }
+            }
+
             // check the stored markings and remove all transient states
-            for (unsigned int j = 0; j < it->second[i]->size; ++j) {
+            unsigned int j = 0;
+            while (j < it->second[i]->size) {
+                assert(it->second[i]->interface[j]);
+
+                // find out whether marking is transient
+                bool transient = false;
 
                 // case 1: a final marking that is not a waitstate
                 if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final and
-                    it->second[i]->interface[j]->unmarked()) {
+                it->second[i]->interface[j]->unmarked()) {
 
-                    // remember that this knowledge contains a final marking
+                // remember that this knowledge contains a final marking
                     it->second[i]->is_final = 1;
-                    
-                    // only if the final marking is not a watistate, we're done
+
+                // only if the final marking is not a watistate, we're done
                     if (not InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
-                        it->second[i]->interface[j] = NULL;
-                        //todo delete it->second[i]->interface[j];
+                        transient = true;
                     }
                 }
 
                 // case 2: a resolved waitstate
                 if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
 
-                    // check if DL is resolved by interface marking
+                // check if DL is resolved by interface marking
                     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-                        if (it->second[i]->interface[j] != NULL and
-                            it->second[i]->interface[j]->marked(l) and
+                        if (it->second[i]->interface[j]->marked(l) and
                             InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
 
-                            // the DL is resolved -- set interface marking to NULL
-                            it->second[i]->interface[j] = NULL;
-                            //todo delete it->second[i]->interface[j];
-                            //continue?
+                            transient = true;
                         }
                     }
                 } else {
 
                     // case 3: a transient marking (was: !waitstate && !final)
-
-                    it->second[i]->interface[j] = NULL;   
-                    //todo delete it->second[i]->interface[j];                                         
+                    transient = true;
                 }
-            }
 
 
-            /* now we know wheter this knowledge contains a final marking and
-               that every marking with a non-NULL interface marking is a
-               deadlock that needs to be resolved */
+                // hide transient markings behind the end of the array
+                if (transient) {
+                    InnerMarking_ID temp_inner = it->second[i]->inner[j];
+                    InterfaceMarking *temp_interface = it->second[i]->interface[j];
+                    
+                    it->second[i]->inner[j] = it->second[i]->inner[ it->second[i]->size-1 ];
+                    it->second[i]->interface[j] = it->second[i]->interface[ it->second[i]->size-1 ];
+                    
+                    it->second[i]->inner[ it->second[i]->size-1 ] = temp_inner;
+                    it->second[i]->interface[ it->second[i]->size-1 ] = temp_interface;
 
-            // for each successor, register the predecessor
-            for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
-                if (it->second[i]->successors[l-1] != NULL) {
-                    it->second[i]->successors[l-1]->addPredecessor(it->second[i]);
-                    ++result;
+                    --(it->second[i]->size);
+                } else {
+                    ++j;
                 }
             }
         }
@@ -211,7 +222,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
             assert(todo);
 
             for (unsigned int i = 0; i < todo->inDegree; ++i) {
-                assert (todo->predecessors[i]);
+                assert(todo->predecessors[i]);
                 affectedNodes.insert(todo->predecessors[i]);
 
                 bool found = false;
@@ -261,9 +272,9 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
                           bool showDeadlocks = false,
                           enum_formula formulaStyle = formula_arg_dnf)
 {
-    file << "digraph G {" << endl;
-    file << " node [fontname=\"Helvetica\" fontsize=10]" << endl;
-    file << " edge [fontname=\"Helvetica\" fontsize=10]" << endl;
+    file << "digraph G {\n"
+         << " node [fontname=\"Helvetica\" fontsize=10]\n"
+         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
@@ -283,14 +294,13 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
                 if (showDeadlocks) {
                     file << "\\n";
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
-                        if (it->second[i]->interface[i] != NULL) {
-                            file << "m" << static_cast<unsigned int>(it->second[i]->inner[i]) << " ";
-                            file << *(it->second[i]->interface[i]) << "\\n";
-                        }
+                        file << "m" << static_cast<unsigned int>(it->second[i]->inner[i]) << " ";
+                        file << *(it->second[i]->interface[i]) << "\\n";
                     }
                 }
 
-                file << "\"]" << endl;
+                file << "\"]" << std::endl;
+
                 for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
@@ -298,14 +308,14 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
                         file << "\"" << it->second[i] << "\" -> \""
                              << it->second[i]->successors[l-1]
                              << "\" [label=\"" << Label::id2name[l]
-                             << "\"]" << endl;
+                             << "\"]\n";
                     }
                 }
             }
         }
     }
 
-    file << "}" << endl;
+    file << "}" << std::endl;
 }
 
 
@@ -318,66 +328,54 @@ void StoredKnowledge::dot(std::ofstream &file, bool showTrue = false,
         a valid numbering.
 */
 void StoredKnowledge::OGoutput(std::ofstream &file, enum_formula formulaStyle) {
-    file << "INTERFACE" << endl;
-    file << "  INPUT" << endl;
+    file << "INTERFACE\n";
+    file << "  INPUT\n";
     bool first = true;
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         if (not first) {
-            file << "," << endl;
+            file << ",\n";
         }
         first = first and false;
         file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
     }
-    file << ";" << endl;
+    file << ";\n";
 
-    file << "  OUTPUT" << endl;
+    file << "  OUTPUT\n";
     first = true;
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (not first) {
-            file << "," << endl;
+            file << ",\n";
         }
         first = first and false;
         file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
     }
-    file << ";" << endl << endl;
+    file << ";\n\n";
 
-    file << "NODES" << endl;
+    file << "NODES\n";
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         if (it != seen.begin()) {
-            file << "," << endl;
+            file << ",\n";
         }
 
         file << "  " << reinterpret_cast<unsigned int>(*it) << " : ";
 
         switch(formulaStyle) {
-            case(formula_arg_dnf): {
-                file << (*it)->formula() << " : blue";
-
-                if ((*it)->is_final) {
-                    file << " : finalnode";
-                }
-
-                break;
-            }
-
-            case(formula_arg_2bits): {
-                file << (*it)->twoBitFormula();
-                break;
-            }
+            case(formula_arg_dnf):   file << (*it)->formula(); break;
+            case(formula_arg_2bits): file << (*it)->twoBitFormula(); break;
         }
     }
-    file << ";" << endl << endl;
+    file << ";\n" << std::endl;
 
-    file << "INITIALNODE" << endl << "  "
-         << reinterpret_cast<unsigned int>(root) << ";" << endl << endl;
+    file << "INITIALNODE\n  "
+         << reinterpret_cast<unsigned int>(root) << ";\n\n";
 
-    file << "TRANSITIONS" << endl;
+    file << "TRANSITIONS\n";
     first = true;
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if ((*it)->successors[l-1] != NULL) {
                 if (not first) {
-                    file << "," << endl;
+                    file << ",\n";
                 }
                 first = (first and false);
                 file << "  " << reinterpret_cast<unsigned int>(*it) << " -> "
@@ -386,7 +384,7 @@ void StoredKnowledge::OGoutput(std::ofstream &file, enum_formula formulaStyle) {
             }
         }
     }
-    file << ";" << endl;
+    file << ";" << std::endl;
 }
 
 
@@ -447,6 +445,9 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
  \note This destructor is only called during the building of the knowledges.
        That said, neither successors nor predecessors need to be deleted by
        this destructor.
+
+ \bug  once addPredecessors() is called, size might be decremented and this
+       destructor cannot remove all markings any more
  */
 StoredKnowledge::~StoredKnowledge() {
     // delete the interface markings
@@ -619,23 +620,21 @@ bool StoredKnowledge::sat() {
 
     // now each deadlock (a marking with non-NULL interface) must have ?-sucessors
     for (unsigned int i = 0; i < size; ++i) {
-        if (interface[i] != NULL) {
-            bool resolved = false;
+        bool resolved = false;
 
-            // we found a deadlock -- check whether for at least one marked
-            // output place exists a respective receiving edge
-            for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-                if (interface[i]->marked(l) and successors[l-1] != NULL) {
-                    resolved = true;
-                    break;
-                }
+        // we found a deadlock -- check whether for at least one marked
+        // output place exists a respective receiving edge
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            if (interface[i]->marked(l) and successors[l-1] != NULL) {
+                resolved = true;
+                break;
             }
+        }
 
-            // the deadlock is neither resolved nor a final marking
-            if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
-                is_sane = 0;
-                return false;                
-            }
+        // the deadlock is neither resolved nor a final marking
+        if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
+            is_sane = 0;
+            return false;                
         }
     }
 
@@ -664,21 +663,19 @@ string StoredKnowledge::formula() const {
     // collect outgoing ?-edges for the deadlocks
     bool dl_found = false;
     for (unsigned int i = 0; i < size; ++i) {
-        if (interface[i] != NULL) {
-            dl_found = true;
-            set<string> temp(sendDisjunction);
-            for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-                if (interface[i]->marked(l) and successors[l-1] != NULL) {
-                    temp.insert(Label::id2name[l]);
-                }
+        dl_found = true;
+        set<string> temp(sendDisjunction);
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            if (interface[i]->marked(l) and successors[l-1] != NULL) {
+                temp.insert(Label::id2name[l]);
             }
-
-            if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
-                temp.insert("final");
-            }
-
-            receiveDisjunctions.insert(temp);
         }
+
+        if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
+            temp.insert("final");
+        }
+
+        receiveDisjunctions.insert(temp);
     }
 
     if (!dl_found) {
@@ -717,6 +714,7 @@ string StoredKnowledge::formula() const {
  \return "S" if formula can only be satisfied by sending events; "F" if
          formula contains the "final" literal
 
+ \pre  all markings are deadlocks
  \pre  the node is sane, i.e. "sane()" would return true
  */
 string StoredKnowledge::twoBitFormula() const {
@@ -726,8 +724,7 @@ string StoredKnowledge::twoBitFormula() const {
     }
 
     for (unsigned int i = 0; i < size; ++i) {
-        // check only the deadlocks
-        if (interface[i] != NULL and not (InnerMarking::inner_markings[inner[i]]->is_final) and interface[i]->unmarked()) {
+        if (not (InnerMarking::inner_markings[inner[i]]->is_final) and interface[i]->unmarked()) {
             bool resolved = false;
 
             // we found a deadlock -- check whether for at least one marked

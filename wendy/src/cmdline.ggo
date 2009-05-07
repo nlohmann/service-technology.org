@@ -16,11 +16,12 @@ option "type" t
   hidden
 
 option "show" s
-  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showDeadlocks' and '-s empty' is equivalent to '--showEmptyNode'."
+  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showDeadlocks' and '-s empty' is equivalent to '--showEmptyNode'. Multiple values are allowed."
   string
   typestr="PARAMETER"
   values="deadlocks","empty" enum
   optional
+  multiple
   hidden  
 
 

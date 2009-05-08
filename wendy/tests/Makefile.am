@@ -1,5 +1,5 @@
 # list all testscripts
-TESTS = bug1.sh bug2.sh bug3.sh bug4.sh bug5.sh bug6.sh bug7.sh \
+TESTS = bug1.sh bug2.sh bug3.sh bug4.sh bug5.sh bug6.sh bug7.sh bug8.sh \
         error01.sh error02.sh error03.sh error04.sh \
         error06.sh error07.sh error08.sh error09.sh \
         net-phils.sh net-purchase.sh net-sequence.sh net-travel.sh net-zeus.sh
@@ -13,6 +13,7 @@ EXTRA_DIST = $(TESTS) \
              bug5/bug5.owfn bug5/bug5.fiona.og \
              bug6/bug6.owfn bug6/bug6.fiona.og \
              bug7/bug7.owfn bug7/bug7.fiona.og \
+             bug8/bug8.owfn bug8/bug8.fiona.og \
              error01/empty \
              error02/error02.owfn \
              error03/error03.owfn \

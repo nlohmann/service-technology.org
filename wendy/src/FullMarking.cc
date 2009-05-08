@@ -59,6 +59,16 @@ bool FullMarking::operator!= (const FullMarking &other) const {
     return (interface != other.interface);
 }
 
+bool FullMarking::operator== (const FullMarking &other) const {
+    // first compare inner markings
+    if (inner != other.inner) {
+        return false;
+    }
+
+    // in case the inner markings are equal, compare interface markings
+    return (interface == other.interface);
+}
+
 std::ostream& operator<< (std::ostream &o, const FullMarking &m) {
     return o << "[m" << static_cast<unsigned int>(m.inner) << ", " << m.interface << "]";
 }

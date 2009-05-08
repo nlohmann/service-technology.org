@@ -42,6 +42,9 @@ class FullMarking {
         /// comparison operator
         bool operator!= (const FullMarking &other) const;
 
+        /// comparison operator
+        bool operator== (const FullMarking &other) const;
+
         /// stream output operator
         friend std::ostream& operator<< (std::ostream&, const FullMarking&);
 

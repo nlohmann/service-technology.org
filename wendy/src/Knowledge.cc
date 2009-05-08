@@ -62,6 +62,7 @@ Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(tr
                 if (result) {
                     // store this interface marking
                     bubble[pos->first].push_back(interface);
+//                    std::cout << this << " put " << FullMarking(pos->first, *interface) << " in bubble (after receiving)" << std::endl;
                     ++size;
                 } else {
                     // decrement failed -- remove this interface marking
@@ -87,13 +88,16 @@ Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(tr
                     // store this interface marking
                     bubble[pos->first].push_back(interface);
                     ++size;
+//                    std::cout << this << " put " << FullMarking(pos->first, *interface) << " in bubble (after sending)" << std::endl;
 
                     // success -- possibly, this marking became transient
                     if (receiver) {
+//                        std::cout << this << " added " << FullMarking(pos->first, *interface) << " to todo queue" << std::endl;
                         todo.push(FullMarking(pos->first, *interface));
                     }
                 } else {
                     // increment failed -- message bound violation
+//                    std::cout << this << " increment failed: " << FullMarking(pos->first, *interface) << "\n" << std::endl;
                     delete interface;
                     is_sane = false;
                     return;
@@ -154,6 +158,11 @@ std::ostream& operator<< (std::ostream &o, const Knowledge &m) {
  
  \todo comment me -- it was not entirely clear that markings added to todo
        are not automatically added to the bubble
+
+ \todo possible optimization: only call this function once for the empty node
+ 
+ \todo (important) fix the operator< for Fullmarking and use the insert()
+       statement to detect duplicates again
 */
 void Knowledge::closure() {
     // to collect markings that were/are already considered
@@ -164,9 +173,21 @@ void Knowledge::closure() {
         todo.pop();
 
         // if this marking was already taken out of the todo queue, skip it this time
-        if (not considered.insert(current).second) {
-            continue;
+        bool found = false;
+        for (set<FullMarking>::iterator it = considered.begin(); it != considered.end(); ++it) {
+            if (*it == current) {
+                found = true;
+            }
         }
+        
+        if (found) {
+//            std::cout << this << " closure: " << current << " has been seen in this bubble before (skip)" << std::endl;
+            continue;
+        } else {
+            considered.insert(current);
+//            std::cout << this << " closure: " << current << " has not been seen in this bubble yet (added)" << std::endl;
+        }
+//        std::cout << this << " closure: already considered: " << considered.size() << std::endl;
 
         // process successors of the current marking
         InnerMarking *m = InnerMarking::inner_markings[current.inner];
@@ -203,13 +224,14 @@ void Knowledge::closure() {
                 // check if successor is a deadlock
                 if (InnerMarking::inner_markings[m->successors[i]]->is_deadlock) {
                     is_sane = false;
+//                    std::cout << this << " insane; done\n" << std::endl;
                     return;                
                 }
 
                 // if we found a valid successor candidate, check if it is already stored
                 bool candidateFound = false;
-                for (size_t i = 0; i < bubble[candidate.inner].size(); ++i) {
-                    if (*(bubble[candidate.inner][i]) == candidate.interface) {
+                for (size_t j = 0; j < bubble[candidate.inner].size(); ++j) {
+                    if (*(bubble[candidate.inner][j]) == candidate.interface) {
                         candidateFound = true;
                         break;
                     }
@@ -217,11 +239,14 @@ void Knowledge::closure() {
                 if (not candidateFound) {
                     InterfaceMarking *copy = new InterfaceMarking(candidate.interface);
                     bubble[candidate.inner].push_back(copy);
+//                    std::cout << this << " closure: found " << candidate << " " << Label::id2name[m->labels[i]] << "-successor of " << current << std::endl;
                     ++size;
                     todo.push(candidate);
                 }
             }
         }
     }
+    
+//    std::cout << this << " done\n" << std::endl;
     /* sort bubble! */
 }

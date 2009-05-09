@@ -6,5 +6,5 @@ if test "$FIONA" = "not found"; then
   exit 77
 fi
 
-wendy phcontrol3.unf.owfn --og --verbose &> result.log
-fiona -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og &>> result.log
+wendy phcontrol3.unf.owfn --og --verbose &>result.log
+fiona -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og >>result.log 2>&1

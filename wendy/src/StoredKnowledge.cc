@@ -61,8 +61,6 @@ std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
        the object itself
  */
 void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* SK) {
-    assert(K);
-    assert(SK);
     static unsigned int calls = 0;
     static unsigned int edges = 0;
 
@@ -74,6 +72,12 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         Knowledge *K_new = new Knowledge(K, l);
 
+        // don't process the empty node
+        if (K_new->size == 0) {
+            delete K_new;
+            continue;
+        }
+
         // only process knowledges within the message bounds
         if (K_new->is_sane) {
             // create a compact version of the knowledge bubble
@@ -81,7 +85,6 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
 
             // add it to the knowledge tree
             StoredKnowledge *SK_store = SK_new->store();
-            assert(SK_store);
 
             // store an edge from the parent to this node
             SK->addSuccessor(l, SK_store);
@@ -106,9 +109,6 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
 /*!
  \todo treat the deletions
 
- \todo do not process the empty node as it has an ridiculously many
-       predecessors
- 
  \todo must delete hash tree (needed by removeInsaneNodes())
  
  \post interface only consists of deadlocking markings (unless --diagnosis
@@ -229,7 +229,6 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
         while (not insaneNodes.empty()) {
             StoredKnowledge *todo = (*insaneNodes.begin());
             insaneNodes.erase(insaneNodes.begin());
-            assert(todo);
 
             for (unsigned int i = 0; i < todo->inDegree; ++i) {
                 assert(todo->predecessors[i]);
@@ -242,13 +241,10 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
                         found = true;
                     }
                 }
-//                assert(found);
             }
             
             ++result;
             deletedNodes.insert(todo);
-//            delete todo;
-//            todo = NULL;
         }
 
         for (set<StoredKnowledge*>::iterator it = affectedNodes.begin(); it != affectedNodes.end(); ++it) {
@@ -272,6 +268,11 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 
 /*!
  \param[in,out] file  the output stream to write the dot representation to
+ 
+ \note  The empty node has the number 0 and is only drawn if the commandline
+        parameter "--showEmptyNode" was given. For each node and receiving
+        label, we add an edge to the empty node if this edge is not present
+        before.
 */
 void StoredKnowledge::dot(std::ofstream &file)
 {
@@ -279,19 +280,33 @@ void StoredKnowledge::dot(std::ofstream &file)
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
+    // draw the empty node if requested
+    if (args_info.showEmptyNode_given) {
+        file << "0 [label=\"";
+        if (args_info.formula_arg == formula_arg_dnf) {
+            file << "true";
+        } else {
+            file << "-";
+        }
+        file << "\"]\n";
+        
+        for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+            file << "0 -> 0 [label=\"" << Label::id2name[l] << "\"]\n";
+        }
+    }
+
+    // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if (it->second[i]->is_sane and
-                (seen.find(it->second[i]) != seen.end()) and
-                (args_info.showEmptyNode_given or it->second[i]->size > 0)) {
+                (seen.find(it->second[i]) != seen.end())) {
 
                 string formula;
                 switch (args_info.formula_arg) {
                     case(formula_arg_dnf): formula = it->second[i]->formula(); break;
-                    case(formula_arg_2bits): formula = it->second[i]->twoBitFormula(); break;
+                    case(formula_arg_2bits): formula = it->second[i]->bits(); break;
                     default: assert(false);
                 }
-
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
                 if (args_info.showDeadlocks_given) {
@@ -310,6 +325,7 @@ void StoredKnowledge::dot(std::ofstream &file)
 
                 file << "\"]" << std::endl;
 
+                // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
@@ -318,6 +334,14 @@ void StoredKnowledge::dot(std::ofstream &file)
                              << it->second[i]->successors[l-1]
                              << "\" [label=\"" << Label::id2name[l]
                              << "\"]\n";
+                    }
+
+                    // draw edges to the empty node if requested
+                    if (args_info.showEmptyNode_given and
+                        l <= Label::last_receive and
+                        it->second[i]->successors[l-1] == NULL) {
+                        file << "\"" << it->second[i] << "\" -> 0"
+                             << " [label=\"" << Label::id2name[l] << "\"]\n";
                     }
                 }
             }
@@ -335,7 +359,7 @@ void StoredKnowledge::dot(std::ofstream &file)
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
 */
-void StoredKnowledge::OGoutput(std::ofstream &file) {
+void StoredKnowledge::output(std::ofstream &file) {
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
@@ -360,17 +384,25 @@ void StoredKnowledge::OGoutput(std::ofstream &file) {
     file << ";\n\n";
 
     file << "NODES\n";
+
+    // the empty node
+    file << "  0 : ";
+    if (args_info.formula_arg == formula_arg_dnf) {
+        file << " true";
+    } else {
+        file << "-";
+    }
+
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        if (it != seen.begin()) {
-            file << ",\n";
-        }
+        file << ",\n  " << reinterpret_cast<unsigned int>(*it) << " : ";
 
-        file << "  " << reinterpret_cast<unsigned int>(*it) << " : ";
-
-        switch(args_info.formula_arg) {
-            case(formula_arg_dnf):   file << (*it)->formula(); break;
-            case(formula_arg_2bits): file << (*it)->twoBitFormula(); break;
+        string formula;
+        switch (args_info.formula_arg) {
+            case(formula_arg_dnf): formula = (*it)->formula(); break;
+            case(formula_arg_2bits): formula = (*it)->bits(); break;
+            default: assert(false);
         }
+        file << formula;
     }
     file << ";\n" << std::endl;
 
@@ -382,16 +414,39 @@ void StoredKnowledge::OGoutput(std::ofstream &file) {
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if ((*it)->successors[l-1] != NULL) {
-                if (not first) {
+                if (first) {
+                    first = false;
+                } else {
                     file << ",\n";
                 }
-                first = (first and false);
                 file << "  " << reinterpret_cast<unsigned int>(*it) << " -> "
                      << reinterpret_cast<unsigned int>((*it)->successors[l-1])
                      << " : " << Label::id2name[l];
+            } else {
+                // edges to the empty node
+                if (l <= Label::last_receive) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        file << ",\n";
+                    }
+                    file << "  " << reinterpret_cast<unsigned int>(*it) << " -> 0"
+                         << " : " << Label::id2name[l];
+                }
             }
         }
     }
+
+    // empty node loops
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        if (first) {
+            first = false;
+        } else {
+            file << ",\n";
+        }
+        file << "  0 -> 0 : " << Label::id2name[l];
+    }
+    
     file << ";" << std::endl;
 }
 
@@ -407,8 +462,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     is_final(0), is_sane(1), inner(NULL), interface(NULL), successors(NULL),
     inDegree(0), predecessorCounter(0), predecessors(NULL)
 {
-    // make sure we copy from an existing object
-    assert(K);
+    assert(K->size != 0);
 
     // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
@@ -420,11 +474,6 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     // get the number of markings to store
     size = K->size;
     
-    // if this is the empty node, we are done
-    if (size == 0) {
-        return;
-    }
-
     // reserve the necessary memory for the internal and interface markings
     inner = new InnerMarking_ID[size];
     interface = new InterfaceMarking*[size];
@@ -477,10 +526,6 @@ StoredKnowledge::~StoredKnowledge() {
 std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
     o << m.hash() << ":\t";
 
-    if (m.size == 0) {
-        return o << "[]";
-    }
-
     // traverse the bubble
     for (unsigned int i = 0; i < m.size; ++i) {
         o << "[m" << static_cast<unsigned int>(m.inner[i])
@@ -502,6 +547,8 @@ std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
          function can detect the duplicate
  */
 StoredKnowledge *StoredKnowledge::store() {
+    assert (size != 0);
+
     // get the element's hash value
     hash_t myHash = hash();
     
@@ -514,11 +561,6 @@ StoredKnowledge *StoredKnowledge::store() {
 
             // compare the sizes
             if (size == el->second[i]->size) {
-                if (size == 0) {
-                    // only the empty node has the size 0 -- no collision here
-                    return el->second[i];
-                }
-
                 // if still true after the loop, we found previously stored knowledge
                 bool found = true;
 
@@ -556,15 +598,6 @@ StoredKnowledge *StoredKnowledge::store() {
 
 
 void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge* const knowledge) {
-    // make sure the knowledge to store exists
-    assert(knowledge);
-
-    // tau does not make sense here
-    assert(not SILENT(label));
-
-    // never add a successor twice
-    assert(successors[label-1] == NULL);
-
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
 
@@ -574,24 +607,17 @@ void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge* const knowle
 
 
 inline hash_t StoredKnowledge::hash() const {
-    // the empty knowledge has the hash value 0
-    if (size == 0) {
-        return 0;
-    }
-
-    hash_t result = 1;
+    hash_t result = 0;
 
     for (unsigned int i = 0; i < size; ++i) {
         result += ((1 << i) * (inner[i]) + interface[i]->hash());
     }
 
-    // make sure that we don't accientially use 0 for a nonempty knowledge
-    return (result > 0) ? result : 1;
+    return result;
 }
 
 
 void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
-    assert(k);
     assert(inDegree > 0);
 
     // when called for the first time, get some memory
@@ -605,14 +631,12 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
 
     // use the first free position and store this knowledge
     assert(predecessorCounter < inDegree);
-    assert(predecessors);
-    assert(predecessors[predecessorCounter] == NULL);
     predecessors[predecessorCounter++] = k;
 }
 
 
 /*!
- \return whether each deadlock in the knowledge is resolved
+ \return whether each deadlock in the knowledge is resolved
 
  \pre the interface markings of each transient or final marking has to be set
       to NULL
@@ -725,7 +749,7 @@ string StoredKnowledge::formula() const {
  \pre  all markings are deadlocks
  \pre  the node is sane, i.e. "sane()" would return true
  */
-string StoredKnowledge::twoBitFormula() const {
+string StoredKnowledge::bits() const {
     if (is_final) {
         // the formula contains final
         return "F";

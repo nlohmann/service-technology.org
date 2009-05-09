@@ -40,9 +40,6 @@ class Knowledge {
         /// destructor
         ~Knowledge();
 
-        /// stream output operator
-        friend std::ostream& operator<< (std::ostream&, const Knowledge&);
-
     public: /* attributes */
 
         /// whether this knowledge is sane
@@ -57,12 +54,7 @@ class Knowledge {
     private: /* member functions */
 
         /// calculate the closure of this knowledge
-        void closure();
-
-    private: /* attributes */
-
-        /// a queue of recently added markings that might have successors
-        std::queue<FullMarking> todo;
+        void closure(std::queue<FullMarking> &);
 };
 
 #endif

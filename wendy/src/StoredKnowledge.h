@@ -45,7 +45,7 @@ class StoredKnowledge {
         static void dot(std::ofstream&);
 
         /// print the knowledges as Fiona OG
-        static void OGoutput(std::ofstream&);
+        static void output(std::ofstream&);
 
     public: /* static attributes */
 
@@ -116,7 +116,7 @@ class StoredKnowledge {
         std::string formula() const;
 
         /// return a two-bit representation of the knowledge's formula
-        std::string twoBitFormula() const;
+        std::string bits() const;
 
         /// traverse knowledges
         void traverse();

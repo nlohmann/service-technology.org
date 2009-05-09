@@ -59,7 +59,7 @@ void InterfaceMarking::initialize(unsigned int m) {
     interface_length = Label::async_events;
     message_bound_bits = LOG2(message_bound);
     markings_per_byte = 8 / message_bound_bits;
-    bytes = ceil((double)interface_length / (double)markings_per_byte);
+    bytes = (unsigned int)(ceil((double)interface_length / (double)markings_per_byte));
 
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: message bound set to %d (%d bytes/interface marking, %d bits/event)\n",
@@ -166,12 +166,12 @@ InterfaceMarking::~InterfaceMarking() {
 
 bool InterfaceMarking::operator< (const InterfaceMarking &other) const {
     for (size_t i = 0; i < bytes; ++i) {
-        if (storage[i] >= other.storage[i]) {
-            return false;
+        if (storage[i] < other.storage[i]) {
+            return true;
         }
     }
-    
-    return true;
+
+    return false;
 }
 
 bool InterfaceMarking::operator!= (const InterfaceMarking &other) const {
@@ -180,7 +180,7 @@ bool InterfaceMarking::operator!= (const InterfaceMarking &other) const {
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -190,7 +190,7 @@ bool InterfaceMarking::operator== (const InterfaceMarking &other) const {
             return false;
         }
     }
-    
+
     return true;
 }
 

@@ -82,6 +82,8 @@ class InnerMarking {
         /// destructor
         ~InnerMarking();
 
+    private: /* member functions */
+
         /// determine the type of this marking
         void determineType();
 

@@ -28,7 +28,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <cassert>
 #include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
@@ -162,8 +161,6 @@ int main(int argc, char** argv) {
         if (args_info.inputs_num == 0) {
             std::cin >> pnapi::io::owfn >> *(InnerMarking::net);
         } else {
-            assert (args_info.inputs_num == 1);
-
             // strip suffix from input filename
             filename = string(args_info.inputs[0]).substr(0,string(args_info.inputs[0]).find_last_of("."));
 
@@ -314,7 +311,7 @@ int main(int argc, char** argv) {
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::OGoutput(og_file);
+        StoredKnowledge::output(og_file);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
         }

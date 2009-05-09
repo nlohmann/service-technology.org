@@ -2,7 +2,8 @@
 TESTS = bug1.sh bug2.sh bug3.sh bug4.sh bug5.sh bug6.sh bug7.sh bug8.sh \
         error01.sh error02.sh error03.sh error04.sh \
         error06.sh error07.sh error08.sh error09.sh \
-        net-phils.sh net-purchase.sh net-sequence.sh net-travel.sh net-zeus.sh
+        net-phils.sh net-purchase.sh net-sequence.sh net-smtp.sh \
+        net-travel.sh net-zeus.sh
 
 # list the testscripts and testfiles
 EXTRA_DIST = $(TESTS) \
@@ -25,6 +26,7 @@ EXTRA_DIST = $(TESTS) \
              net-phils/phcontrol3.unf.owfn net-phils/phcontrol3.unf.fiona.og \
              net-purchase/PO.owfn net-purchase/PO.fiona.og \
              net-sequence/sequence10.owfn net-sequence/sequence10.fiona.og \
+             net-smtp/smtp3.owfn net-smtp/smtp3.fiona.og \
              net-travel/T2.owfn net-travel/T2.fiona.og \
              net-zeus/zeus.owfn net-zeus/zeus.fiona.og
 
@@ -39,7 +41,7 @@ EXTRA_DIST += wrap.sh
 TESTDIR = $(abs_builddir)/tmp
 
 # variables passed to the testscripts
-TESTS_ENVIRONMENT = FIONA="$(FIONA)" testdir=$(TESTDIR) testroot=$(abs_srcdir) \
+TESTS_ENVIRONMENT = FIONA="$(FIONA)" GREP="$(GREP)" testdir=$(TESTDIR) testroot=$(abs_srcdir) \
                     PATH=$(abs_top_builddir)/src:$$PATH $(srcdir)/wrap.sh
 
 # "make clean" should delete the result of the tests

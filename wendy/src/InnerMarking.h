@@ -60,6 +60,9 @@ class InnerMarking {
         /// a mapping from labels to inner markings that might receive this message
         static std::map<Label_ID, std::set<InnerMarking_ID> > receivers;
 
+        /// a mapping from labels to inner markings that can synchronize with this label
+        static std::map<Label_ID, std::set<InnerMarking_ID> > synchs;
+
         /// the open net that created these inner markings
         static pnapi::PetriNet *net;
 

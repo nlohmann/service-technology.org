@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 1.0, wendy@service-technology.org)
+AC_INIT(Wendy, 1.1-unreleased, wendy@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 

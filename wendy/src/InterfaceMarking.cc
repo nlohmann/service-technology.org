@@ -72,10 +72,12 @@ void InterfaceMarking::initialize(unsigned int m) {
  * CONSTRUCTOR *
  ***************/
 
-/*!
- \note will not work in case the net has an empty interface
- */
 InterfaceMarking::InterfaceMarking() : storage(NULL) {
+    // if no (asynchronous) events are present, we are done here
+    if (interface_length == 0) {
+        return;
+    }
+    
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -90,6 +92,11 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
 }
 
 InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
+    // if no (asynchronous) events are present, we are done here
+    if (interface_length == 0) {
+        return;
+    }
+
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -156,7 +163,9 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label
  **************/
 
 InterfaceMarking::~InterfaceMarking() {
-    delete[] storage;
+    if (interface_length > 0) {
+        delete[] storage;
+    }
 }
 
 

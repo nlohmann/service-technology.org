@@ -1,3 +1,10 @@
+@heading Version 1.1-unreleased
+@itemize
+@item renamed @option{--showDeadlocks} to @option{--showWaitstates}
+@item implemented synchronous communication
+@item the list of interface labels are printed when @option{--verbose} is used
+@end itemize
+
 @heading Version 1.0
 @itemize
 @item initial release of Wendy

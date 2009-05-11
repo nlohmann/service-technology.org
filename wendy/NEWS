@@ -7,15 +7,16 @@
                       http://service-technology.org/wendy
 
 
-Version 1.0
-===========
+Version 1.1-unreleased
+======================
 
-* initial release of Wendy
+* renamed `--showDeadlocks' to `--showWaitstates'
 
-* calculates the operating guidelines of a normal open net
+* implemented synchronous communication
 
-* result can be written in Fiona's OG format (with explicit formulae or 2 bit
-  representation)
+* the list of interface labels are printed when `--verbose' is used
 
 
+See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
+complete version history.
 

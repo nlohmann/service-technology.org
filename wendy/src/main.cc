@@ -123,11 +123,11 @@ void evaluateParameters(int argc, char** argv) {
                 break;
 
             case(show_arg_deadlocks):
-                args_info.showDeadlocks_given = 1;
+                args_info.showWaitstates_given = 1;
                 break;
 
             case(show_arg_allstates):
-                args_info.showDeadlocks_given = 1;
+                args_info.showWaitstates_given = 1;
                 args_info.showTransients_given = 1;
                 break;
         }

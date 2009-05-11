@@ -93,27 +93,26 @@ void Label::initialize() {
     first_sync = events+1;
     std::map<string, Label_ID> sync_labels;
 
-    const set<Transition*> trans( InnerMarking::net->getTransitions() );
+    const set<Transition*> trans( InnerMarking::net->getSynchronizedTransitions() );
 
     for (set<Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
-        if ((*t)->isSynchronized()) {
-            if (sync_labels[*(*t)->getSynchronizeLabels().begin()] == 0) {
-                sync_labels[*(*t)->getSynchronizeLabels().begin()] = ++events;
-            }
-
-            id2name[events] = "#" + *(*t)->getSynchronizeLabels().begin();            
-            name2id[(*t)->getName()] = sync_labels[*(*t)->getSynchronizeLabels().begin()];
+        if (sync_labels[*(*t)->getSynchronizeLabels().begin()] == 0) {
+            sync_labels[*(*t)->getSynchronizeLabels().begin()] = ++events;
         }
+
+        id2name[events] = "#" + *(*t)->getSynchronizeLabels().begin();
+        name2id[(*t)->getName()] = sync_labels[*(*t)->getSynchronizeLabels().begin()];
     }
 
-    /// \todo: events eins abziehen?
-
     last_sync = events;
-
     async_events = last_send;
     sync_events = last_sync - async_events;
 
     if (args_info.verbose_given) {
+        for (unsigned int i = first_receive; i <= last_sync; ++i) {
+            fprintf(stderr, "%s: label with id %2d is '%s'\n", PACKAGE, i, id2name[i].c_str());
+        }
+
         fprintf(stderr, "%s: initialized labels for %d events (%d asynchronous, %d synchronous)\n",
             PACKAGE, events, async_events, sync_events);
     }

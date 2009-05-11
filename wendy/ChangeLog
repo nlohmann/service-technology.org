@@ -7,6 +7,15 @@
                       http://service-technology.org/wendy
 
 
+Version 1.1-unreleased
+======================
+
+* renamed `--showDeadlocks' to `--showWaitstates'
+
+* implemented synchronous communication
+
+* the list of interface labels are printed when `--verbose' is used
+
 Version 1.0
 ===========
 

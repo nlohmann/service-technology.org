@@ -73,7 +73,7 @@ Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(1)
     // CASE 2: we send -- increment interface markings and calculate closure
     if (SENDING(label)) {
         std::queue<FullMarking> todo;
-        
+
         for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             bool receiver = (InnerMarking::receivers[label].find(pos->first) != InnerMarking::receivers[label].end());
@@ -104,6 +104,40 @@ Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(1)
 
         // calculate the closure
         closure(todo);
+    }
+
+    if (SYNC(label)) {
+        std::queue<FullMarking> todo;
+
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+            // check if this label makes the current inner marking possibly transient
+            if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
+
+                for (size_t i = 0; i < pos->second.size(); ++i) {
+                    // copy the interface marking
+                    InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]));
+
+                    InnerMarking *m = InnerMarking::inner_markings[pos->first];
+                    for (uint8_t j = 0; j < m->out_degree; ++j) {
+                        if (m->labels[j] == label) {
+                            if (InnerMarking::inner_markings[m->successors[j]]->is_deadlock) {
+                                delete interface;
+                                is_sane = 0;
+                                return;
+                            }
+                            
+                            todo.push(FullMarking(m->successors[j], *interface));
+                            // buggy and ad hoc
+                            bubble[m->successors[j]].push_back(interface);
+                            ++size;
+                        }
+                    }
+                }
+            }
+        }
+
+        // calculate the closure
+        closure(todo);        
     }
 }
 
@@ -152,6 +186,11 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
         // process successors of the current marking
         InnerMarking *m = InnerMarking::inner_markings[current.inner];
         for (uint8_t i = 0; i < m->out_degree; ++i) {
+
+            // a synchronization is impossible without the environment -- skip
+            if (SYNC(m->labels[i])) {
+                continue;
+            }
 
             // in any case, create a successor candidate -- it will be valid for transient transitions anyway
             FullMarking candidate(m->successors[i], current.interface);

@@ -16,7 +16,7 @@ option "type" t
   hidden
 
 option "show" s
-  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showDeadlocks', '-s allstates' is equivalent to '--showDeadlocks --showTransients', and '-s empty' is equivalent to '--showEmptyNode'. Multiple values are allowed."
+  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showWaitstates', '-s allstates' is equivalent to '--showWaitstates --showTransients', and '-s empty' is equivalent to '--showEmptyNode'. Multiple values are allowed."
   string
   typestr="PARAMETER"
   values="deadlocks","allstates","empty" enum
@@ -56,8 +56,8 @@ option "showEmptyNode" -
   dependon="dot"
   flag off
 
-option "showDeadlocks" -
-  "Show deadlocks (dot only)."
+option "showWaitstates" -
+  "Show waitstates (dot only)."
   dependon="dot"
   flag off
 

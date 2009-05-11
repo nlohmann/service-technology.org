@@ -37,6 +37,7 @@ std::map<InnerMarking_ID, InnerMarking*> InnerMarking::markingMap;
 pnapi::PetriNet *InnerMarking::net = new pnapi::PetriNet();
 InnerMarking **InnerMarking::inner_markings = NULL;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
+std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
 
 unsigned int InnerMarking::stats_deadlocks = 0;
 unsigned int InnerMarking::stats_inevitable_deadlocks = 0;
@@ -63,10 +64,14 @@ void InnerMarking::initialize() {
     for (InnerMarking_ID i = 0; i < inner_marking_count; ++i) {
         inner_markings[i] = markingMap[i];
 
-        // register markings that may become activated by sending a message to them
+        // register markings that may become activated by sending a message
+        // to them or by synchronization
         for (uint8_t j = 0; j < inner_markings[i]->out_degree; ++j) {
             if (SENDING(inner_markings[i]->labels[j])) {
                 receivers[inner_markings[i]->labels[j]].insert(i);
+            }
+            if (SYNC(inner_markings[i]->labels[j])) {
+                synchs[inner_markings[i]->labels[j]].insert(i);
             }
         }
     }
@@ -175,7 +180,7 @@ inline void InnerMarking::determineType() {
 
         // set deadlock_inevitable to false in case there is a communicating
         // successor
-        if (SENDING(labels[i]) or RECEIVING(labels[i])) {
+        if (SENDING(labels[i]) or RECEIVING(labels[i]) or SYNC(labels[i])) {
             deadlock_inevitable = false;
         }
 

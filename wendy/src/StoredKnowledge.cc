@@ -130,7 +130,7 @@ unsigned int StoredKnowledge::addPredecessors() {
             }
 
             // for each successor, register the predecessor
-            for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+            for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                 if (it->second[i]->successors[l-1] != NULL) {
                     it->second[i]->successors[l-1]->addPredecessor(it->second[i]);
                     ++result;
@@ -235,7 +235,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
                 affectedNodes.insert(todo->predecessors[i]);
 
                 bool found = false;
-                for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                     if (todo->predecessors[i]->successors[l-1] == todo) {
                         todo->predecessors[i]->successors[l-1] = NULL;
                         found = true;
@@ -290,7 +290,7 @@ void StoredKnowledge::dot(std::ofstream &file)
         }
         file << "\"]\n";
         
-        for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             file << "0 -> 0 [label=\"" << Label::id2name[l] << "\"]\n";
         }
     }
@@ -309,24 +309,24 @@ void StoredKnowledge::dot(std::ofstream &file)
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
-                if (args_info.showDeadlocks_given) {
+                if (args_info.showWaitstates_given) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
                         file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
-                        file << *(it->second[i]->interface[j]) << " (dl)\\n";
+                        file << *(it->second[i]->interface[j]) << " (w)\\n";
                     }
                 }
 
                 if (args_info.showTransients_given) {
                     for (unsigned int j = it->second[i]->size; j < allMarkings[it->second[i]]; ++j) {
                         file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
-                        file << *(it->second[i]->interface[j]) << " (tr)\\n";
+                        file << *(it->second[i]->interface[j]) << " (t)\\n";
                     }
                 }
 
                 file << "\"]" << std::endl;
 
                 // draw the edges
-                for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
                         (args_info.showEmptyNode_given or it->second[i]->successors[l-1]->size > 0)) {
@@ -338,7 +338,7 @@ void StoredKnowledge::dot(std::ofstream &file)
 
                     // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_given and
-                        l <= Label::last_receive and
+                        (l <= Label::last_receive or l >= Label::first_sync) and
                         it->second[i]->successors[l-1] == NULL) {
                         file << "\"" << it->second[i] << "\" -> 0"
                              << " [label=\"" << Label::id2name[l] << "\"]\n";
@@ -363,7 +363,7 @@ void StoredKnowledge::output(std::ofstream &file) {
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
-    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         if (not first) {
             file << ",\n";
         }
@@ -374,7 +374,7 @@ void StoredKnowledge::output(std::ofstream &file) {
 
     file << "  OUTPUT\n";
     first = true;
-    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+    for (Label_ID l = Label::first_send; l <= Label::last_sync; ++l) {
         if (not first) {
             file << ",\n";
         }
@@ -424,7 +424,7 @@ void StoredKnowledge::output(std::ofstream &file) {
                      << " : " << Label::id2name[l];
             } else {
                 // edges to the empty node
-                if (l <= Label::last_receive) {
+                if (l <= Label::last_receive or l >= Label::first_sync) {
                     if (first) {
                         first = false;
                     } else {
@@ -663,6 +663,15 @@ bool StoredKnowledge::sat() {
             }
         }
 
+        // check if a synchronous action can resolve this deadlock
+        for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+            if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
+                successors[l-1] != NULL) {
+                resolved = true;
+                break;
+            }
+        }
+
         // the deadlock is neither resolved nor a final marking
         if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
             is_sane = 0;
@@ -680,6 +689,9 @@ bool StoredKnowledge::sat() {
  
  \note This function is also used for an operating guidelines output for
        Fiona.
+ 
+ \todo Adjust comments and variable names to the fact that we also treat
+       synchronous communication.
  */
 string StoredKnowledge::formula() const {
     set<string> sendDisjunction;
@@ -692,13 +704,21 @@ string StoredKnowledge::formula() const {
         }
     }
 
-    // collect outgoing ?-edges for the deadlocks
+    // collect outgoing ?-edges and #-edges for the deadlocks
     bool dl_found = false;
     for (unsigned int i = 0; i < size; ++i) {
         dl_found = true;
         set<string> temp(sendDisjunction);
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
             if (interface[i]->marked(l) and successors[l-1] != NULL) {
+                temp.insert(Label::id2name[l]);
+            }
+        }
+
+        // synchronous communication
+        for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+            if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
+                successors[l-1] != NULL) {
                 temp.insert(Label::id2name[l]);
             }
         }
@@ -748,6 +768,9 @@ string StoredKnowledge::formula() const {
 
  \pre  all markings are deadlocks
  \pre  the node is sane, i.e. "sane()" would return true
+
+ \todo How about synchronous communication?
+ \todo Return empty string instead of "-".
  */
 string StoredKnowledge::bits() const {
     if (is_final) {

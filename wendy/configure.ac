@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 1.0-unreleased, wendy@service-technology.org)
+AC_INIT(Wendy, 1.0, wendy@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -40,5 +40,5 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile libs/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile tests/Makefile])
 AC_OUTPUT

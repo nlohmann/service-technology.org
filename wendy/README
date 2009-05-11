@@ -36,6 +36,15 @@ INSTALLATION
     Wendy can be easily compiled and installed. See file "INSTALL" for
     instructions.
     
+    Wendy uses LoLA to build a reachability graph. Wendy searches for a LoLA
+    binary "lola-full" during the configuration. A suitable LoLA binary can
+    be created as follows:
+     * download http://service-technology.org/files/lola/lola.tar.gz
+     * untar lola.tar.gz, configure
+     * call "make lola-full"
+     * copy the binary "src/lola-full" to a directory of your path
+       (e.g., /usr/local/bin)
+    
     Wendy uses a lot of generated code. If you want to make changes to the
     source code, you might need the following tools to regenerate the code:
      * Flex (http://flex.sourceforge.net)

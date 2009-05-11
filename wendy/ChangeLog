@@ -7,10 +7,15 @@
                       http://service-technology.org/wendy
 
 
-Version 1.0-unreleased
-======================
+Version 1.0
+===========
 
-* initial release
+* initial release of Wendy
+
+* calculates the operating guidelines of a normal open net
+
+* result can be written in Fiona's OG format (with explicit formulae or 2 bit
+  representation)
 
 
 

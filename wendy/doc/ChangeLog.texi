@@ -1,4 +1,6 @@
-@heading Version 1.0-unreleased
+@heading Version 1.0
 @itemize
-@item initial release
+@item initial release of Wendy
+@item calculates the operating guidelines of a normal open net
+@item result can be written in Fiona's OG format (with explicit formulae or 2 bit representation)
 @end itemize

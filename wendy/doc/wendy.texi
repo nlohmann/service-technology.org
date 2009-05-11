@@ -132,7 +132,7 @@ The distribution contains several directories:
 The Texinfo documentation of Wendy. The documentation can be created using @samp{make pdf}. Note you need to have Wendy properly installed before (see installation description above).
 
 @item libs
-The Petri Net API used by Wendy to parse and organize the open net.
+The Petri Net @acronym{API} used by Wendy to parse and organize the open net.
 
 @item man
 The manpage of Wendy which can be displayed using @samp{man wendy} after having Wendy installed (see installation description above).
@@ -162,6 +162,18 @@ For an overview of the command line options, type @samp{wendy -h} to see the fol
 @smallexample
 @include cmdline.out
 @end smallexample
+
+
+
+@section Compatibility to Fiona
+
+@multitable @columnfractions .5 .5
+@headitem Wendy @tab Fiona
+@item @code{wendy net.owfn} @tab @code{fiona net.owfn -t OG -Q}
+@item @code{wendy net.owfn --og} @tab @code{fiona net.owfn -t OG -p no-dot}
+@item @code{wendy net.owfn --og --dot} @tab @code{fiona net.owfn -t OG -p no-png}
+@end multitable
+
 
 
 
@@ -220,7 +232,7 @@ wendy:13: error near `Place': syntax error, unexpected IDENT,
 @end smallexample
 
 @item #03
-The input open net is not normal. That is, it contains a transition that is connected to more than one interface place. Note that non-normal open net can be normalized using the frontend tool @samp{petri} of the Petri Net API.
+The input open net is not normal. That is, it contains a transition that is connected to more than one interface place. Note that non-normal open net can be normalized using the frontend tool @samp{petri} of the Petri Net @acronym{API}.
 
 @smallexample
 @cartouche

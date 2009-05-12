@@ -207,8 +207,8 @@ port_definition_new:
   ;
 
 synchronous:
-    KEY_SYNCHRONOUS labels SEMICOLON { $$ = $2;         }
-  | /* empty */                      { $$ = new Node(); }
+    KEY_SYNCHRONOUS labels SEMICOLON { $$ = new Node(SYNCHRONOUS, $2); }
+  | /* empty */                      { $$ = new Node();                }
   ;
 
 labels:

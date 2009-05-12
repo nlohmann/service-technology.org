@@ -60,6 +60,7 @@ namespace pnapi
 	    parser.parse(is).visit(visitor);
 	    net = visitor.getPetriNet();
 	    net.setConstraintLabels(visitor.getConstraintLabels());
+	    net.setSynchronousLabels(visitor.getSynchronousLabels());
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }

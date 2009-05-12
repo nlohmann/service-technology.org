@@ -70,6 +70,9 @@ class StoredKnowledge {
         /// the root knowledge
         static StoredKnowledge *root;
 
+        /// the empty knowledge
+        static StoredKnowledge *empty;
+
     private: /* static attributes */
 
         /// number of markings stored

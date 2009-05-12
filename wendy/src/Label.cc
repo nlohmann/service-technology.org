@@ -91,16 +91,16 @@ void Label::initialize() {
 
     // SYNCHRONOUS EVENTS (#-step for us)
     first_sync = events+1;
+
     std::map<string, Label_ID> sync_labels;
+    const set<string> sync_label_names( InnerMarking::net->getSynchronousLabels() );
+    for (set<string>::const_iterator l = sync_label_names.begin(); l != sync_label_names.end(); ++l) {
+        sync_labels[*l] = ++events;
+        id2name[events] = "#" + *l;
+    }
 
     const set<Transition*> trans( InnerMarking::net->getSynchronizedTransitions() );
-
     for (set<Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
-        if (sync_labels[*(*t)->getSynchronizeLabels().begin()] == 0) {
-            sync_labels[*(*t)->getSynchronizeLabels().begin()] = ++events;
-        }
-
-        id2name[events] = "#" + *(*t)->getSynchronizeLabels().begin();
         name2id[(*t)->getName()] = sync_labels[*(*t)->getSynchronizeLabels().begin()];
     }
 

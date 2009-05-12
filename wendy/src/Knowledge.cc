@@ -114,20 +114,22 @@ Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(1)
             if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
 
                 for (size_t i = 0; i < pos->second.size(); ++i) {
-                    // copy the interface marking
+                    // copy the interface marking (won't change during synchronization)
                     InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]));
 
                     InnerMarking *m = InnerMarking::inner_markings[pos->first];
                     for (uint8_t j = 0; j < m->out_degree; ++j) {
                         if (m->labels[j] == label) {
+                            // check the marking reached by synchronization
                             if (InnerMarking::inner_markings[m->successors[j]]->is_deadlock) {
                                 delete interface;
                                 is_sane = 0;
                                 return;
                             }
-                            
+
+                            // the marking is OK, so add it to the bubble
+                            /// \bug this might introduce duplicates
                             todo.push(FullMarking(m->successors[j], *interface));
-                            // buggy and ad hoc
                             bubble[m->successors[j]].push_back(interface);
                             ++size;
                         }

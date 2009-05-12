@@ -150,9 +150,6 @@ InnerMarking::~InnerMarking() {
  
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
- 
- \bug the whole deadlock detection has to be overworked (see bug7) -- it
-      seems as if it is possible to loose/gain strategies there
  */
 inline void InnerMarking::determineType() {
     bool is_transient = false;
@@ -177,10 +174,8 @@ inline void InnerMarking::determineType() {
             not markingMap[successors[i]]->is_deadlock) {
             deadlock_inevitable = false;
         }
-
-        // set deadlock_inevitable to false in case there is a communicating
-        // successor
-        if (SENDING(labels[i]) or RECEIVING(labels[i]) or SYNC(labels[i])) {
+        // if we have not seen a successor yet, it can't be a deadlock
+        if (markingMap[successors[i]] == NULL) {
             deadlock_inevitable = false;
         }
 

@@ -41,6 +41,7 @@ unsigned int StoredKnowledge::hashCollisions = 0;
 unsigned int StoredKnowledge::storedKnowledges = 0;
 size_t StoredKnowledge::maxBucketSize = 1; // sic!
 StoredKnowledge* StoredKnowledge::root = NULL;
+StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
 int StoredKnowledge::entries_count = 0;
 unsigned int StoredKnowledge::iterations = 0;
 unsigned int StoredKnowledge::reportFrequency = 10000;
@@ -72,8 +73,11 @@ void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* S
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         Knowledge *K_new = new Knowledge(K, l);
 
-        // don't process the empty node
+        // process the empty node in a special way
         if (K_new->size == 0) {
+            if (K_new->is_sane) {
+                SK->addSuccessor(l, empty);
+            }
             delete K_new;
             continue;
         }
@@ -131,7 +135,7 @@ unsigned int StoredKnowledge::addPredecessors() {
 
             // for each successor, register the predecessor
             for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                if (it->second[i]->successors[l-1] != NULL) {
+                if (it->second[i]->successors[l-1] != NULL and it->second[i]->successors[l-1] != empty) {
                     it->second[i]->successors[l-1]->addPredecessor(it->second[i]);
                     ++result;
                 }
@@ -242,7 +246,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
                     }
                 }
             }
-            
+
             ++result;
             deletedNodes.insert(todo);
         }
@@ -327,7 +331,7 @@ void StoredKnowledge::dot(std::ofstream &file)
 
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (it->second[i]->successors[l-1] != NULL and
+                    if (it->second[i]->successors[l-1] != NULL and it->second[i]->successors[l-1] != empty and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
                         (args_info.showEmptyNode_given or it->second[i]->successors[l-1]->size > 0)) {
                         file << "\"" << it->second[i] << "\" -> \""
@@ -338,10 +342,9 @@ void StoredKnowledge::dot(std::ofstream &file)
 
                     // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_given and
-                        (l <= Label::last_receive or l >= Label::first_sync) and
-                        it->second[i]->successors[l-1] == NULL) {
+                        it->second[i]->successors[l-1] == empty) {
                         file << "\"" << it->second[i] << "\" -> 0"
-                             << " [label=\"" << Label::id2name[l] << "\"]\n";
+                            << " [label=\"" << Label::id2name[l] << "\"]\n";
                     }
                 }
             }
@@ -363,7 +366,7 @@ void StoredKnowledge::output(std::ofstream &file) {
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         if (not first) {
             file << ",\n";
         }
@@ -374,16 +377,27 @@ void StoredKnowledge::output(std::ofstream &file) {
 
     file << "  OUTPUT\n";
     first = true;
-    for (Label_ID l = Label::first_send; l <= Label::last_sync; ++l) {
+    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (not first) {
             file << ",\n";
         }
         first = first and false;
         file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
     }
-    file << ";\n\n";
-
-    file << "NODES\n";
+    file << ";\n";
+/*
+    file << "  SYNCHRONOUS\n";
+    first = true;
+    for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+        if (not first) {
+            file << ",\n";
+        }
+        first = first and false;
+        file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
+    }
+    file << ";\n";
+*/
+    file << "\nNODES\n";
 
     // the empty node
     file << "  0 : ";
@@ -413,7 +427,7 @@ void StoredKnowledge::output(std::ofstream &file) {
     first = true;
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((*it)->successors[l-1] != NULL) {
+            if ((*it)->successors[l-1] != NULL and (*it)->successors[l-1] != empty) {
                 if (first) {
                     first = false;
                 } else {
@@ -424,7 +438,7 @@ void StoredKnowledge::output(std::ofstream &file) {
                      << " : " << Label::id2name[l];
             } else {
                 // edges to the empty node
-                if (l <= Label::last_receive or l >= Label::first_sync) {
+                if ((*it)->successors[l-1] == empty) {
                     if (first) {
                         first = false;
                     } else {
@@ -446,7 +460,7 @@ void StoredKnowledge::output(std::ofstream &file) {
         }
         file << "  0 -> 0 : " << Label::id2name[l];
     }
-    
+
     file << ";" << std::endl;
 }
 
@@ -473,7 +487,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
 
     // get the number of markings to store
     size = K->size;
-    
+
     // reserve the necessary memory for the internal and interface markings
     inner = new InnerMarking_ID[size];
     interface = new InterfaceMarking*[size];
@@ -602,7 +616,9 @@ void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge* const knowle
     successors[label-1] = knowledge;
 
     // increase the successor's indegree (needed for later predecessor relation)
-    ++(knowledge->inDegree);
+    if (knowledge != empty) {
+        ++(knowledge->inDegree);
+    }
 }
 
 
@@ -645,19 +661,19 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
 bool StoredKnowledge::sat() {
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (successors[l-1] != NULL) {
+        if (successors[l-1] != NULL and successors[l-1] != empty) {
             return true;
         }
     }
 
-    // now each deadlock (a marking with non-NULL interface) must have ?-sucessors
+    // now each deadlock must have ?-sucessors
     for (unsigned int i = 0; i < size; ++i) {
         bool resolved = false;
 
         // we found a deadlock -- check whether for at least one marked
         // output place exists a respective receiving edge
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (interface[i]->marked(l) and successors[l-1] != NULL) {
+            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
                 resolved = true;
                 break;
             }
@@ -666,7 +682,7 @@ bool StoredKnowledge::sat() {
         // check if a synchronous action can resolve this deadlock
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
-                successors[l-1] != NULL) {
+                successors[l-1] != NULL and successors[l-1] != empty) {
                 resolved = true;
                 break;
             }
@@ -709,8 +725,10 @@ string StoredKnowledge::formula() const {
     for (unsigned int i = 0; i < size; ++i) {
         dl_found = true;
         set<string> temp(sendDisjunction);
+
+        // sending
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (interface[i]->marked(l) and successors[l-1] != NULL) {
+            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
                 temp.insert(Label::id2name[l]);
             }
         }
@@ -718,7 +736,7 @@ string StoredKnowledge::formula() const {
         // synchronous communication
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
-                successors[l-1] != NULL) {
+                successors[l-1] != NULL and successors[l-1] != empty) {
                 temp.insert(Label::id2name[l]);
             }
         }
@@ -785,7 +803,7 @@ string StoredKnowledge::bits() const {
             // we found a deadlock -- check whether for at least one marked
             // output place exists a respective receiving edge
             for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-                if (interface[i]->marked(l) and successors[l-1] != NULL) {
+                if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
                     resolved = true;
                     break;
                 }
@@ -806,7 +824,7 @@ string StoredKnowledge::bits() const {
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if (successors[l-1] != NULL and successors[l-1]->is_sane) {
+            if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
                 successors[l-1]->traverse();
             }
         }

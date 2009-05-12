@@ -187,7 +187,7 @@ namespace pnapi
       }
 
       Visitor::Visitor() :
-	finalMarking_(net_)
+	isSynchronize_(true), finalMarking_(net_)
       {
       }
 
@@ -200,6 +200,11 @@ namespace pnapi
       Visitor::getConstraintLabels() const
       {
 	return constraintMap_;
+      }
+
+      const std::set<std::string> & Visitor::getSynchronousLabels() const
+      {
+	return synchronousLabels_;
       }
 
       void Visitor::beforeChildren(const Node & node)
@@ -343,6 +348,11 @@ namespace pnapi
 
 	switch (node.type)
 	  {
+	  case SYNCHRONOUS:
+	    synchronousLabels_ = synchronizeLabels_;
+	    synchronizeLabels_.clear();
+	    break;
+
 	  case INITIALMARKING:
 	    // create places
 	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
@@ -363,6 +373,10 @@ namespace pnapi
 	    {
 	      node.check(!net_.containsNode(node.identifier), node.identifier,
 			 "node name already used");
+	      for (set<string>::iterator it = synchronizeLabels_.begin();
+		   it != synchronizeLabels_.end(); ++it)
+		node.check(synchronousLabels_.find(*it) != 
+			   synchronousLabels_.end(), *it, "undeclared label");
 	      Transition & trans = net_.createTransition(node.identifier, 
 							 synchronizeLabels_);
 	      for (map<string, unsigned int>::iterator it = preset_.begin();

@@ -7,13 +7,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: waltemath $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-04-06 17:16:33 +0200 (Mo, 06 Apr 2009) $
+ * \date    $Date: 2009-04-24 11:40:05 +0200 (Fr, 24 Apr 2009) $
  *
- * \version $Revision: 4042 $
+ * \version $Revision: 4097 $
  */
 
 #ifndef NDEBUG
@@ -289,6 +289,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
+    labels_(net.labels_),
     observer_(*this),
     condition_(net.condition_, copyStructure(net)),
     meta_(net.meta_)
@@ -319,6 +320,7 @@ namespace pnapi
 
   void PetriNet::clear()
   {
+    labels_.clear();
     meta_.clear();
     constraints_.clear();
     condition_ = true;
@@ -774,6 +776,22 @@ namespace pnapi
   const set<Transition *> & PetriNet::getSynchronizedTransitions() const
   {
     return synchronizedTransitions_;
+  }
+
+
+  /*!
+   */
+  std::set<std::string> PetriNet::getSynchronousLabels() const
+  {
+    return labels_;
+  }
+
+
+  /*!
+   */
+  void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
+  {
+    labels_ = ls;
   }
 
 

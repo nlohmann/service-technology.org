@@ -1,6 +1,5 @@
 #include "test.h"
 
-using namespace pnapi;
 
 int main(int argc, char *argv[])
 {

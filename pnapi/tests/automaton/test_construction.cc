@@ -27,15 +27,8 @@ int main(int argc, char *argv[])
     std::cout << error << "\n";
   }
   ifstr.close();
-  cout << io::owfn << net[0] << std::endl;
-  ServiceAutomaton sauto0(net[0]);
+  Automaton sauto0(net[0]);
   cout << io::sa << sauto0;
-
-  fstream fstr;
-  fstr.open("net.stg", std::ios_base::out);
-  fstr << io::stg << sauto0;
-  fstr.close();
-
 
   ifstr.open("sequence_unnormal.owfn", std::ios_base::in);
   try
@@ -47,8 +40,7 @@ int main(int argc, char *argv[])
     std::cout << error << "\n";
   }
   ifstr.close();
-  cout << io::owfn << net[1];
-  ServiceAutomaton sauto1(net[1]);
+  Automaton sauto1(net[1]);
   cout << io::sa << sauto1;
 
   ifstr.open("strange_net.owfn", std::ios_base::in);
@@ -61,23 +53,8 @@ int main(int argc, char *argv[])
   {
     std::cout << error << "\n";
   }
-  cout << io::owfn << net[2];
-  pnapi::ServiceAutomaton sauto2(net[2]);
+  pnapi::Automaton sauto2(net[2]);
   cout << io::sa << sauto2;
-
-  ifstr.open("safe_net.owfn", std::ios_base::in);
-  try
-  {
-  ifstr >> io::owfn >> net[3];
-  ifstr.close();
-  }
-  catch (io::InputError error)
-  {
-    std::cout << error << "\n";
-  }
-  cout << io::owfn << net[3];
-  pnapi::ServiceAutomaton sauto3(net[3]);
-  cout << io::sa << sauto3;
 
   end_test();
 

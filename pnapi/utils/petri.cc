@@ -368,15 +368,8 @@ int main(int argc, char** argv) {
 
                     // create automaton output
                     case (output_arg_sa): {
-                        ServiceAutomaton sauto(nets[i]);
+                        Automaton sauto(nets[i]);
                         outfile << io::sa << sauto;
-                        break;
-                    }
-
-                    // create automaton stg output
-                    case (output_arg_stg): {
-                        ServiceAutomaton sauto(nets[i]);
-                        outfile << io::stg << sauto;
                         break;
                     }
 

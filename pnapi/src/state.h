@@ -1,192 +1,134 @@
-// -*- C++ -*-
-
-#ifndef PNAPI_STATE_H
-#define PNAPI_STATE_H
+#ifndef STATE_H
+#define STATE_H
 
 #include <set>
 #include <string>
-
-#include "marking.h"
 #include "component.h"
+#include "io.h"
 
-using std::set;
-using std::string;
 
 namespace pnapi
 {
 
-  template <class T>
-  class Edge
-  {
-  public:
-    /// standard constructor
-    Edge(T &source, T &destination, const string label, pnapi::Node::Type type);
-    /// standard destructor
-    virtual ~Edge() {}
-
-    /// returns the label
-    string getLabel() const;
-    /// returns the source node (state)
-    T & getSource() const;
-    /// returns the destination node (state)
-    T & getDestination() const;
-    /// returns the type of the edge
-    Node::Type getType() const;
-
-  private:
-    string label_;
-    T &source_;
-    T &destination_;
-
-    Node::Type type_;
-  };
+  /// forward declarations
+  class Marking;
 
 
   /*!
    * \class   State
    *
-   * The basic state class provides simple methods like names and
-   * the pre- and postsets. Each state can be set final. A state
-   * can compared to another one - 2 states are equal if the names,
-   * the pre-, and the postsets are equal.
+   * The class State describes a state of an automaton. It represents a
+   * certain name, preset, and postset. If needed, there is the possibility
+   * to defina a Marking according to a Petri net such that one can compute
+   * a state's hash value.
    */
   class State
   {
+    friend std::ostream & io::__sa::output(std::ostream &, const State &);
+
   public:
-    // standard constructor
-    State(string name = "", bool isFinal = false);
-    // standard destructor
-    virtual ~State();
+    /// standard constructor
+    State();
+    /// standard constructor
+    State(const std::string name = "", bool isFinal = false);
+    /// standard constructor service automaton
+    State(Marking &m, const std::string name = "", bool isFinal = false);
+    /// standard copy constructor
+    State(const State &s);
+    /// standard destructor
+    virtual ~State() {}
 
-    // returns the name
-    const string & getName() const;
-    // returns the preset
-    set<State *> getPreset() const;
-    // returns the postset
-    set<State *> getPostset() const;
+    /// adding a state to the preset
+    void addPre(State &);
+    /// adding a state to the postset
+    void addPost(State &);
 
-    // switches the isFinal_ value of a state
-    void final();
-    // checks the isFinal_ value
+    /// method which returns the state's name
+    const std::string name() const;
+    /// method which returns the state's preset
+    const std::set<State *> preset() const;
+    /// method which returns the state's postset
+    const std::set<State *> postset() const;
+
+    /// method which returns the state's final property
     bool isFinal() const;
+    /// method which toggles the state's final property to true
+    void final();
 
-    // comparison operator for states
-    virtual bool operator ==(const State &m) const;
+    /// checks if 2 states are equal (by name, preset, and postset, or marking)
+    bool operator ==(const State &s2) const;
 
-  protected:
-    // name of the state
-    string name_;
-    // preset
-    set<State *> preset_;
-    // postset
-    set<State *> postset_;
-    // final
+    /// returns the state's marking
+    Marking * marking() const;
+    /// returns the state's hash value (only needed by service automaton)
+    const unsigned int hashValue();
+    /// returns the size of the represented marking
+    const unsigned int size() const;
+
+  private:
+    /// the state's name
+    std::string name_;
+    /// the state's preset
+    std::set<State *> preset_;
+    /// the state's postset
+    std::set<State *> postset_;
+    /// the state's final property
     bool isFinal_;
+
+    /*** optional properties ***/
+    /// the marking which is represented by the state (needed by service a.)
+    Marking *m_;
+    /// the hash value of the state (computed through the markings)
+    unsigned int hashValue_;
+    void setHashValue();
+
+    /// static counter for unique state names
+    static unsigned int counter_;
+
   };
 
 
   /*!
-   *  \class    StateB
+   * \class   Edge
    *
-   *  These states are needed by automata creation from Petri net. They
-   *  provide an underlying marking and hash value retrieved from the marking.
+   * This class provides a representation of automata edges. One edge
+   * consists of a source state and a destination state. Each state can have
+   * a label and a firing type (according to the types given in the
+   * transitions. This type is only needed by output methods which have
+   * to differ between input and output signals.
    */
-  class StateB : public State
+  class Edge
   {
+    friend std::ostream & io::__sa::output(std::ostream &, const Edge &);
+
   public:
-    /// Constructors & Destructor
-    StateB(Marking &m);
-    StateB(const StateB &s);
-    virtual ~StateB();
+    /// standard constructor
+    Edge(State &source, State &destination, const std::string label = "", const Node::Type type = Node::INTERNAL);
+    /// standard destructor
+    virtual ~Edge();
 
-    /// returns the marking represented by this StateB
-    Marking & getMarking() const;
-
-    /// returns the marking's size
-    unsigned int size() const;
-
-    unsigned int getHashValue();
-
-    bool operator ==(const StateB &m) const;
+    /// method which returns the edge's label
+    const std::string label() const;
+    /// method which returns the egde's source state
+    State &source() const;
+    /// method which returns the edge's destination state
+    State &destination() const;
+    /// method which returns the type according to the edge (sa)
+    Node::Type type() const;
 
   private:
-    /// the represented marking
-    Marking &m_;
-
-    /// pointer to the hash value
-    unsigned int *hashValue_;
-  };
-
-
-  class StateOG : public State
-  {
-  public:
-    // standard constructor
-    StateOG();
-    // standard destructor
-    virtual ~StateOG();
-
-    // comparison operator
-    bool operator ==(const StateOG &m) const;
-
-  private:
-    /// some type of formula
+    /// edge's label
+    std::string label_;
+    /// edge's source state
+    State &source_;
+    /// edge's destination state
+    State &destination_;
+    /// edge's type
+    Node::Type type_;
 
   };
 
+} /* END OF NAMESPACE pnapi */
 
-  /*** Edge<T> implementation ***/
+#endif
 
-  /*!
-   * \brief
-   */
-  template <class T>
-  Edge<T>::Edge(T &source, T &destination, const string label,
-      pnapi::Node::Type type) :
-    label_(label), source_(source), destination_(destination), type_(type)
-  {
-    source_.getPostset().insert(&destination_);
-    destination_.getPreset().insert(&source_);
-  }
-
-
-  /*!
-   * \brief
-   */
-  template <class T>
-  string Edge<T>::getLabel() const
-  {
-    return label_;
-  }
-
-
-  /*!
-   * \brief
-   */
-  template <class T>
-  T & Edge<T>::getSource() const
-  {
-    return source_;
-  }
-
-
-  /*!
-   * \brief
-   */
-  template <class T>
-  T & Edge<T>::getDestination() const
-  {
-    return destination_;
-  }
-
-
-  template <class T>
-  Node::Type Edge<T>::getType() const
-  {
-    return type_;
-  }
-
-
-}
-
-#endif /* State_H */

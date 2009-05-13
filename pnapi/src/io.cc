@@ -5,6 +5,7 @@
 #include "io.h"
 
 using std::map;
+using std::set;
 using std::string;
 using std::pair;
 
@@ -102,27 +103,8 @@ namespace pnapi
     {
       switch (util::FormatData::data(os))
       {
-      case      util::SA:  sa.output_sa(os);   break;
-      case      util::STG: sa.output_stg(os);  break;
-      default:  assert(false);
-      }
-
-      return os;
-    }
-
-
-    /*!
-     * Second Automaton output has to be here because the ServiceAutomaton
-     * class can convert Petri nets into a service automaton, and the Automaton
-     * class can read automata from file (in .sa/.ig format).
-     */
-    std::ostream & operator<<(std::ostream &os, const ServiceAutomaton &sa)
-    {
-      switch (util::FormatData::data(os))
-      {
-      case      util::SA:   sa.output_sa(os);   break;
-      case      util::STG:  sa.output_stg(os);  break;
-      default:  assert(false);
+      case      util::SA:  __sa::output(os, sa);   break;
+      default:  assert(false); // unsupported output format
       }
 
       return os;
@@ -139,7 +121,7 @@ namespace pnapi
     namespace util
     {
 
-      ostream & operator<<(ostream & os, const pnapi::Arc & arc)
+      std::ostream & operator<<(std::ostream & os, const pnapi::Arc & arc)
       {
 	switch (FormatData::data(os))
 	  {
@@ -152,7 +134,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::Place & p)
+      std::ostream & operator<<(std::ostream & os, const pnapi::Place & p)
       {
 	switch (FormatData::data(os))
 	  {
@@ -165,7 +147,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::Transition & t)
+      std::ostream & operator<<(std::ostream & os, const pnapi::Transition & t)
       {
 	switch (FormatData::data(os))
 	  {
@@ -179,7 +161,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::Negation & f)
+      std::ostream & operator<<(std::ostream & os, const formula::Negation & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -192,7 +174,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::Conjunction & f)
+      std::ostream & operator<<(std::ostream & os, const formula::Conjunction & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -205,7 +187,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::Disjunction & f)
+      std::ostream & operator<<(std::ostream & os, const formula::Disjunction & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -218,7 +200,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaTrue & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaTrue & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -231,7 +213,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaFalse & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaFalse & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -244,7 +226,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaEqual & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaEqual & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -257,7 +239,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaNotEqual & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaNotEqual & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -270,7 +252,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaGreater & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaGreater & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -283,7 +265,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaGreaterEqual & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaGreaterEqual & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -296,7 +278,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaLess & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaLess & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -309,7 +291,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const formula::FormulaLessEqual & f)
+      std::ostream & operator<<(std::ostream & os, const formula::FormulaLessEqual & f)
       {
 	switch (FormatData::data(os))
 	  {
@@ -322,7 +304,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pair<string, set<Place *> > & p)
+      std::ostream & operator<<(std::ostream & os, const pair<string, set<Place *> > & p)
       {
 	switch (FormatData::data(os))
 	  {
@@ -334,7 +316,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, 
+      std::ostream & operator<<(std::ostream & os,
 			   const pair<unsigned int, set<Place *> > & p)
       {
 	switch (FormatData::data(os))
@@ -429,13 +411,13 @@ namespace pnapi
       }
 
 
-      std::ostream & outputContainerElement(std::ostream & os, 
+      std::ostream & outputContainerElement(std::ostream & os,
 					    const std::string & s)
       {
 	return os << s;
       }
 
-      
+
       bool compareContainerElements(string s1, string s2)
       {
 	return s1 < s2;
@@ -499,8 +481,8 @@ namespace pnapi
 	return filtered;
       }
 
-      
-      std::set<const formula::Formula *> 
+
+      std::set<const formula::Formula *>
       filterInterfacePropositions(const std::set<const formula::Formula *> & formulas)
       {
 	set<const formula::Formula *> result;
@@ -536,7 +518,7 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::Node & node)
+      std::ostream & operator<<(std::ostream & os, const pnapi::Node & node)
       {
 	const Place * p = dynamic_cast<const Place *>(&node);
 	if (p != NULL)
@@ -546,13 +528,13 @@ namespace pnapi
       }
 
 
-      ostream & operator<<(ostream & os, const pnapi::Condition & c)
+      std::ostream & operator<<(std::ostream & os, const pnapi::Condition & c)
       {
 	return os << c.formula();
       }
 
 
-      ostream & operator<<(ostream & os, const formula::Formula & f)
+      std::ostream & operator<<(std::ostream & os, const formula::Formula & f)
       {
 	return f.output(os);
       }

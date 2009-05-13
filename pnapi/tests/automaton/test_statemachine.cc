@@ -11,9 +11,9 @@ int main(int argc, char * argv[])
   
   ifs >> pnapi::io::owfn >> net1;
   
-  pnapi::ServiceAutomaton sa(net1);
+  pnapi::Automaton sa(net1);
   
-  pnapi::PetriNet net2 = sa.toStateMachine();
+  pnapi::PetriNet net2 = sa.stateMachine();
   
   assert(net2.getPlaces().size() == 4);
   assert(net2.getTransitions().size() == 4);

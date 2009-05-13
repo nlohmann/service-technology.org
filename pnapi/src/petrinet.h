@@ -272,7 +272,10 @@ namespace pnapi
     static PetriNet compose(const std::map<std::string, PetriNet *> &);
 
     /// normalizes the Petri net
-    const std::map<Transition *, std::string> normalize(bool = false);
+    const std::map<Transition *, std::string> normalize();
+    
+    /// makes the inner structure of the Petri net (OWFN without interface)
+    void makeInnerStructure();
 
     /// applies structral reduction rules
     unsigned int reduce(unsigned int = LEVEL_5);
@@ -486,6 +489,14 @@ namespace pnapi
 
     /// elimination of identical places
     unsigned int reduce_equal_places();
+    
+    //*** normalization helper methods ***//
+    
+    /// classical normalization through expanding the interface
+    void normalize_classical();
+    
+    /// normalization after [Aalst07]
+    void normalize_rules();
 
   };
 

@@ -165,17 +165,13 @@ Knowledge::~Knowledge() {
 
  \note no action in this constructor can introduce a duplicate
 
- \todo do I need to copy the queue item to "current"?
-
  \todo sort bubble
-
- \todo comment me -- it was not entirely clear that markings added to todo
-       are not automatically added to the bubble
 */
 inline void Knowledge::closure(std::queue<FullMarking> &todo) {
     // to collect markings that were/are already considered
     set<FullMarking> considered;
 
+    // process the queue
     while(not todo.empty()) {
         FullMarking current(todo.front());
         todo.pop();
@@ -194,7 +190,8 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
                 continue;
             }
 
-            // in any case, create a successor candidate -- it will be valid for transient transitions anyway
+            // in any case, create a successor candidate -- it will be valid
+            // for transient transitions anyway
             FullMarking candidate(m->successors[i], current.interface);
 
             // we receive -> the net sends
@@ -217,7 +214,7 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
             // check if successor is a deadlock
             if (InnerMarking::inner_markings[m->successors[i]]->is_deadlock) {
                 is_sane = 0;
-                return;                
+                return;
             }
 
             // if we found a valid successor candidate, check if it is already stored

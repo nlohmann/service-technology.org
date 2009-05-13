@@ -129,24 +129,24 @@ InnerMarking::~InnerMarking() {
 /*!
  The type is determined by checking the labels of the leaving transitions as
  well as the fact whether this marking is a final marking. For the further
- processing, it is sufficient to distinguish four types:
+ processing, it is sufficient to distinguish three types:
  
  - the marking is a deadlock (is_deadlock) -- then a knowledge containing
    this inner marking can immediately be considered insane
  - the marking is a final marking (is_final) -- this is needed to distinguish
    deadlocks from final markings
  - the marking is a waitstate (is_waitstate) -- a waitstate is a marking of
-   the inner net that can only be left by firing a transition that is
+   the inner of the net that can only be left by firing a transition that is
    connected to an input place
  
  This function also implements the detection of inevitable deadlocks. A
- marking is an inevitable deadlock, if it is a deadlock or all is successor
+ marking is an inevitable deadlock, if it is a deadlock or all its successor
  markings are inevitable deadlocks. The detection exploits the way LoLA
  returns the reachability graph: when a marking is returned, we know that
  the only successors we have not considered yet (i.e. those markings where
  successors[i] == NULL) are also predessessors of this marking and cannot be
  a reason for this marking to be a deadlock. Hence, this marking is an
- inevitable deadlock if we cannot find a non-deadlocking successor.
+ inevitable deadlock if all known successsors are deadlocks.
  
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
@@ -167,16 +167,18 @@ inline void InnerMarking::determineType() {
     // variable to detect whether this marking has only deadlocking successors
     bool deadlock_inevitable = true;
     for (uint8_t i = 0; i < out_degree; ++i) {
-        // if a single successor is not a deadlock, everything is OK
-        if (not args_info.noDeadlockDetection_given and
-            markingMap[successors[i]] != NULL and
-            deadlock_inevitable and
-            not markingMap[successors[i]]->is_deadlock) {
-            deadlock_inevitable = false;
-        }
-        // if we have not seen a successor yet, it can't be a deadlock
-        if (markingMap[successors[i]] == NULL) {
-            deadlock_inevitable = false;
+        if (not args_info.noDeadlockDetection_given) {
+            // if a single successor is not a deadlock, everything is OK
+            if (markingMap[successors[i]] != NULL and
+                deadlock_inevitable and
+                not markingMap[successors[i]]->is_deadlock) {
+                deadlock_inevitable = false;
+            }
+
+            // if we have not seen a successor yet, we can't be a deadlock
+            if (markingMap[successors[i]] == NULL) {
+                deadlock_inevitable = false;
+            }
         }
 
         // a tau or sending (sic!) transition makes this marking transient

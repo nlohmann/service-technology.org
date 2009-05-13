@@ -42,7 +42,6 @@ unsigned int StoredKnowledge::storedKnowledges = 0;
 size_t StoredKnowledge::maxBucketSize = 1; // sic!
 StoredKnowledge* StoredKnowledge::root = NULL;
 StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
-int StoredKnowledge::entries_count = 0;
 unsigned int StoredKnowledge::iterations = 0;
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
@@ -180,7 +179,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                 }
 
 
-                // hide transient markings behind the end of the array
+                // "hide" transient markings behind the end of the array
                 if (transient) {
                     InnerMarking_ID temp_inner = it->second[i]->inner[j];
                     InterfaceMarking *temp_interface = it->second[i]->interface[j];
@@ -207,6 +206,9 @@ unsigned int StoredKnowledge::addPredecessors() {
  \todo Do I really need three sets?
  
  \todo Understand and tidy up this.
+ 
+ \todo Check if the nodes are deleted after sat() returns false -- in this
+       case, I don't need to acutally set is_sane each time.
 */
 unsigned int StoredKnowledge::removeInsaneNodes() {
     unsigned int result = 0;
@@ -221,6 +223,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if (not it->second[i]->sat()) {
+                it->second[i]->is_sane = 0;
                 insaneNodes.insert(it->second[i]);
             }
         }
@@ -253,6 +256,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 
         for (set<StoredKnowledge*>::iterator it = affectedNodes.begin(); it != affectedNodes.end(); ++it) {
             if (not (*it)->sat()) {
+                (*it)->is_sane = 0;
                 if (deletedNodes.find(*it) == deletedNodes.end()) {
                     insaneNodes.insert(*it);
                 }
@@ -361,6 +365,8 @@ void StoredKnowledge::dot(std::ofstream &file)
  \note  Fiona identifies node numbers by integers. To avoid numbering of
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
+
+ \todo The interface for synchronous communication.
 */
 void StoredKnowledge::output(std::ofstream &file) {
     file << "INTERFACE\n";
@@ -505,8 +511,6 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
         }
     }
 
-    entries_count += count;
-
     // we must not forget a marking
     assert(size == count);
 }
@@ -528,8 +532,6 @@ StoredKnowledge::~StoredKnowledge() {
     delete[] interface;
 
     delete[] inner;
-
-    entries_count -= this->size;
 }
 
 
@@ -654,11 +656,10 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
 /*!
  \return whether each deadlock in the knowledge is resolved
 
- \pre the interface markings of each transient or final marking has to be set
-      to NULL
- \post sets value is_sane to 0 in case false is returned
+ \pre the markings in the array (0 to size-1) are deadlocks -- all transient
+      states or unmarked final markings are removed from the marking array
 */
-bool StoredKnowledge::sat() {
+bool StoredKnowledge::sat() const {
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1] != empty) {
@@ -690,7 +691,6 @@ bool StoredKnowledge::sat() {
 
         // the deadlock is neither resolved nor a final marking
         if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
-            is_sane = 0;
             return false;
         }
     }
@@ -706,8 +706,8 @@ bool StoredKnowledge::sat() {
  \note This function is also used for an operating guidelines output for
        Fiona.
  
- \todo Adjust comments and variable names to the fact that we also treat
-       synchronous communication.
+ \todo Adjust comments and variable names to reflect the fact that we also
+       treat synchronous communication.
  */
 string StoredKnowledge::formula() const {
     set<string> sendDisjunction;
@@ -821,6 +821,9 @@ string StoredKnowledge::bits() const {
 }
 
 
+/*!
+ \todo Who needs this function?
+ */
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {

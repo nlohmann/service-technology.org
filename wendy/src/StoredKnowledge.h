@@ -107,7 +107,7 @@ class StoredKnowledge {
         void addSuccessor(Label_ID, StoredKnowledge* const);
 
         /// return whether this node fulfills its annotation
-        bool sat();
+        bool sat() const;
 
         /// return the hash value of this object
         hash_t hash() const;

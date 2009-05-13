@@ -297,16 +297,6 @@ int main(int argc, char** argv) {
     /*------------------.
     | 9. output options |
     `------------------*/
-    // dot output
-    if (args_info.dot_given) {
-        string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
-        std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::dot(dot_file);
-        if (args_info.verbose_given) {
-            fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
-        }
-    }
-
     // operating guidelines output
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
@@ -314,6 +304,17 @@ int main(int argc, char** argv) {
         StoredKnowledge::output(og_file);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
+        }
+    }
+
+
+    // dot output
+    if (args_info.dot_given) {
+        string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
+        std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        StoredKnowledge::dot(dot_file);
+        if (args_info.verbose_given) {
+            fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
         }
     }
 

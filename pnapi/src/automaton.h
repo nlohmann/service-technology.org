@@ -51,6 +51,8 @@ namespace pnapi
     const std::set<State *> initialStates() const;
     /// returning a set of states with no postset
     const std::set<State *> finalStates() const;
+    
+    static const unsigned int HASH_SIZE = 65535;
 
   private:
     /// vector of states
@@ -67,7 +69,6 @@ namespace pnapi
     PetriNet *net_;
     /// the hash table (optional) needed by PetriNet => Automaton
     std::vector<std::set<State *> > *hashTable_;
-    static const unsigned int HASH_SIZE = 65535;
 
     /// depth-first-search in the unknown automaton
     void dfs(State &);

@@ -1,4 +1,5 @@
 #include <sstream>
+#include "automaton.h"
 #include "marking.h"
 #include "state.h"
 
@@ -177,7 +178,7 @@ namespace pnapi
           m_->getMap().begin(); i != m_->getMap().end(); i++)
         hash += i->second;
 
-      hashValue_ = hash;
+      hashValue_ = hash % Automaton::HASH_SIZE;
     }
   }
 

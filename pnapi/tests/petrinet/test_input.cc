@@ -39,6 +39,12 @@ int main(int argc, char * argv[])
   try { ifs >> owfn >> net; }
   catch (InputError e) { cout << endl << e << endl; assert(false); }
   //cout << dot << net;
+  
+  // check transition costs
+  assert(net.findTransition("t1")->getCost() == 0);
+  assert(net.findTransition("t2")->getCost() == 0);
+  assert(net.findTransition("t3")->getCost() == 2);
+  
   end_test();
 
   /*

@@ -173,6 +173,12 @@ namespace pnapi
     Transition(PetriNet &, util::ComponentObserver &, const Transition &, 
 	       const std::string &);
 
+    /// set transition cost
+    void setCost(int);
+    
+    /// get transition cost
+    int getCost() const;
+    
     /// help method for normalize method
     bool isNormal() const;
 
@@ -188,6 +194,9 @@ namespace pnapi
 
   private:
 
+    /// transition cost
+    int cost_;
+    
     /// synchronize labels
     const std::set<std::string> labels_;
 

@@ -596,10 +596,10 @@ namespace pnapi
 	os
 	  << "TRANSITION " << t.getName() << endl;
 	
-	if(t.getCost() != 0)
-	  os << "COST " << t.getCost() << ";" << endl;
-	  
-	os  
+	if (t.getCost() != 0)
+	  os << "  COST " << t.getCost() << ";" << endl;
+
+	os
 	  << delim(", ")
 	  << "  CONSUME "     << t.getPresetArcs()        << ";" << endl
 	  << "  PRODUCE "     << t.getPostsetArcs()       << ";" << endl;

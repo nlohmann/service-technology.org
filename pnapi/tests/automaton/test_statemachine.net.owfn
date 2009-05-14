@@ -10,7 +10,7 @@ INITIALMARKING
   p1 : 1, q1 : 1;
 
 FINALCONDITION
-  (p2 = 0 AND q2 = 0);
+  (p1 = 0 AND q1 = 0);
 
 TRANSITION t1
   CONSUME p1;

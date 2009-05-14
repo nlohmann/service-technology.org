@@ -4,7 +4,7 @@
 
 int main(int argc, char * argv[])
 {
-  begin_test("Automaton::toStateMachine()");
+  begin_test("Automaton::stateMachine()");
   
   pnapi::PetriNet net1;
   std::ifstream ifs("test_statemachine.net.owfn");

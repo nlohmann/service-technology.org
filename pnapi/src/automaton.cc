@@ -42,6 +42,7 @@ namespace pnapi
     net_->makeInnerStructure();
 
     State &start = createState(*new Marking(*net_));
+    start.initial();
     dfs(start);
   }
 
@@ -212,7 +213,7 @@ namespace pnapi
     std::set<State *> result;
     result.clear();
     for (unsigned int i = 0; i < states_.size(); i++)
-      if (states_[i]->preset().empty())
+      if (states_[i]->isInitial())
         result.insert(states_[i]);
 
     return result;

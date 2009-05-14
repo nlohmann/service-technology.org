@@ -54,6 +54,10 @@ namespace pnapi
     bool isFinal() const;
     /// method which toggles the state's final property to true
     void final();
+    /// method which returns the state's initial property
+    bool isInitial() const;
+    /// method which toggles the state's initial property to true
+    void initial();
 
     /// checks if 2 states are equal (by name, preset, and postset, or marking)
     bool operator ==(const State &s2) const;
@@ -74,6 +78,8 @@ namespace pnapi
     std::set<State *> postset_;
     /// the state's final property
     bool isFinal_;
+    /// the state's initial property
+    bool isInitial_;
 
     /*** optional properties ***/
     /// the marking which is represented by the state (needed by service a.)

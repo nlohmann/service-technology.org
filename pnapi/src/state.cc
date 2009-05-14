@@ -22,7 +22,7 @@ namespace pnapi
    * of states: sX where X is a number.
    */
   State::State() :
-    isFinal_(false), m_(NULL), hashValue_(0)
+    isFinal_(false), isInitial_(false), m_(NULL), hashValue_(0)
   {
     std::string number;
     std::stringstream s;
@@ -36,7 +36,7 @@ namespace pnapi
   /*!
    */
   State::State(const std::string name, bool isFinal) :
-    isFinal_(isFinal)
+    isFinal_(isFinal), isInitial_(false)
   {
     if (name != "")
       name_ = name;
@@ -55,7 +55,7 @@ namespace pnapi
   /*!
    */
   State::State(Marking &m, const std::string name, bool isFinal) :
-    isFinal_(isFinal), m_(&m)
+    isFinal_(isFinal), isInitial_(false), m_(&m)
   {
     if (name != "")
       name_ = name;
@@ -76,7 +76,7 @@ namespace pnapi
   /*!
    */
   State::State(const State &s) :
-    name_(s.name_), preset_(s.preset_), postset_(s.postset_), isFinal_(s.isFinal_), m_(NULL), hashValue_(s.hashValue_)
+    name_(s.name_), preset_(s.preset_), postset_(s.postset_), isFinal_(s.isFinal_), isInitial_(s.isInitial_), m_(NULL), hashValue_(s.hashValue_)
   {
     if (s.m_ != NULL)
       m_ = new Marking(*s.m_);
@@ -120,6 +120,24 @@ namespace pnapi
   void State::final()
   {
     isFinal_ = true;
+  }
+
+
+  /*!
+   *
+   */
+  bool State::isInitial() const
+  {
+    return isInitial_;
+  }
+
+
+  /*!
+   *
+   */
+  void State::initial()
+  {
+    isInitial_ = true;
   }
 
 

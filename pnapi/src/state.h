@@ -28,11 +28,10 @@ namespace pnapi
 
   public:
     /// standard constructor
-    State();
-    /// standard constructor
-    State(const std::string name = "", bool isFinal = false);
+    State(unsigned int * = NULL, bool isFinal = false);
     /// standard constructor service automaton
-    State(Marking &m, const std::string name = "", bool isFinal = false);
+    State(Marking &m, std::map<const Place *, unsigned int> *,
+        unsigned int * = NULL, bool isFinal = false);
     /// standard copy constructor
     State(const State &s);
     /// standard destructor
@@ -86,10 +85,7 @@ namespace pnapi
     Marking *m_;
     /// the hash value of the state (computed through the markings)
     unsigned int hashValue_;
-    void setHashValue();
-
-    /// static counter for unique state names
-    static unsigned int counter_;
+    void setHashValue(std::map<const Place *, unsigned int> *);
 
   };
 
@@ -109,7 +105,8 @@ namespace pnapi
 
   public:
     /// standard constructor
-    Edge(State &source, State &destination, const std::string label = "", const Node::Type type = Node::INTERNAL);
+    Edge(State &source, State &destination, const std::string label = "",
+        const Node::Type type = Node::INTERNAL);
     /// standard destructor
     virtual ~Edge();
 

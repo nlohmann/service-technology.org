@@ -1,20 +1,22 @@
+#include <cstdlib>
+#include <ctime>
+
 #include "automaton.h"
 #include "component.h"
+#include "io.h"
 #include "marking.h"
 #include "petrinet.h"
 #include "state.h"
-
-#include <iostream>
-#include "io.h"
-
 
 namespace pnapi
 {
 
 
   /*!
+   * The result of the constructor is an emty automaton.
    */
-  Automaton::Automaton()
+  Automaton::Automaton() :
+    counter_(0)
   {
     /* do nothing */
   }
@@ -28,18 +30,29 @@ namespace pnapi
    * state. At last the DEPTH-FIRST-SEARCH is started and results in a fully
    * built automaton from a Petri Net.
    */
-  Automaton::Automaton(PetriNet &net)
+  Automaton::Automaton(PetriNet &net) :
+    counter_(0)
   {
     net_ = new PetriNet(net);
     edgeLabels_ = new std::map<Transition *, std::string>();
     edgeTypes_ = new std::map<Transition *, Node::Type>();
+    weights_ = new std::map<const Place *, unsigned int>();
     hashTable_ = new std::vector<std::set<State *> >(HASH_SIZE);
 
     (*edgeLabels_) = net_->normalize();
     for (std::set<Transition *>::iterator t = net_->getTransitions().begin();
         t != net_->getTransitions().end(); t++)
       (*edgeTypes_)[*t] = (**t).getType();
+
     net_->makeInnerStructure();
+
+    srand(time(NULL));
+    //unsigned int size = net_->getPlaces().size();
+    for (std::set<Place *>::iterator p = net_->getPlaces().begin();
+        p != net_->getPlaces().end(); p++)
+    {
+      (*weights_)[*p] = rand() % HASH_SIZE;
+    }
 
     State &start = createState(*new Marking(*net_));
     start.initial();
@@ -52,7 +65,7 @@ namespace pnapi
    * properties which marked as optional in the according header file.
    */
   Automaton::Automaton(const Automaton &a) :
-    states_(a.states_), edges_(a.edges_)
+    states_(a.states_), edges_(a.edges_), counter_(a.counter_+1)
   {
     if (net_ == NULL)
       net_ = NULL;
@@ -63,6 +76,8 @@ namespace pnapi
 
 
   /*!
+   * The standard destructor deletes the optional objects created
+   * while the transformation PetriNet => Automaton
    */
   Automaton::~Automaton()
   {
@@ -74,38 +89,40 @@ namespace pnapi
       delete edgeTypes_;
     if (hashTable_ != NULL)
       delete hashTable_;
+
+    //std::cerr << "|S| = " << states_.size() << std::endl;
   }
 
 
   /*!
+   * A state will be added to the set of states. The name given can be
+   * empty, so a standard name will be set.
+   *
+   * \param     const std::string name
+   * \return    State &s .. the newly created state
    */
-  State & Automaton::createState(const std::string name)
+  State & Automaton::createState()
   {
-    State *s = new State(name);
+    State *s = new State(&counter_);
     states_.push_back(s);
     return *s;
   }
 
 
   /*!
+   * A state will be added to the set of states. This state is based on
+   * a given marking, which is needed to calculate the state's hash value.
+   *
+   * \param     Marking &m
+   * \param     const std::string name
+   *
+   * \return    State &s .. the newly created state
    */
-  State & Automaton::createState(Marking &m, const std::string name)
+  State & Automaton::createState(Marking &m)
   {
-    State *s = new State(m, name);
+    State *s = new State(m, weights_, &counter_);
     states_.push_back(s);
     return *s;
-  }
-
-
-  /*!
-   */
-  State * Automaton::findState(const std::string name) const
-  {
-    for (unsigned int i = 0; i < states_.size(); i++)
-      if (states_[i]->name() == name)
-        return states_[i];
-
-    return NULL;
   }
 
 
@@ -142,7 +159,7 @@ namespace pnapi
 
 
   /*!
-   * \brief Transforms the automaton to a state machine petri net.
+   * \brief Transforms the automaton to a state machine Petri net.
    *
    * States become places, edges become transitions, initial states
    * will be initially marked and final states will be connected
@@ -162,7 +179,7 @@ namespace pnapi
     if (states_.empty())
       return *result_;
 
-    // mark first state initially (see assumtion above)
+    // mark first state initially (see assumption above)
     state2place_[states_[0]] = &(result_->createPlace("",Node::INTERNAL,1));
     if (states_[0]->isFinal())
       final_ = final_.formula() || (*(state2place_[states_[0]])) == 1;
@@ -194,7 +211,7 @@ namespace pnapi
     }
 
     // generate final condition;
-    /// \todo addd all other places empty
+    /// \todo add all other places empty
     result_->finalCondition() = final_.formula();
 
     return *result_;
@@ -323,6 +340,7 @@ namespace pnapi
         deleteState(&j);
         continue;
       }
+
       createEdge(start, j, (*edgeLabels_)[*t], (*edgeTypes_)[*t]);
 
       dfs(j);
@@ -351,4 +369,3 @@ namespace pnapi
 
 
 } /* END OF NAMESPACE pnapi */
-

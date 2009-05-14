@@ -13,70 +13,47 @@ namespace pnapi
   /*** class State ***/
 
 
-  unsigned int State::counter_ = 0;
-
-
   /*!
    * The state's name, marking, and hash value are set to default values. The
    * name is unique within the whole automaton class. Template for unique names
    * of states: sX where X is a number.
    */
-  State::State() :
-    isFinal_(false), isInitial_(false), m_(NULL), hashValue_(0)
+  State::State(unsigned int *counter, bool isFinal) :
+    isFinal_(isFinal), isInitial_(false), m_(NULL),
+    hashValue_(0)
   {
     std::string number;
     std::stringstream s;
-    s << counter_++;
+    s << (*counter)++;
     s >> number;
 
-    name_ = "s" + number;
+    name_ = number;
   }
 
 
   /*!
    */
-  State::State(const std::string name, bool isFinal) :
-    isFinal_(isFinal), isInitial_(false)
-  {
-    if (name != "")
-      name_ = name;
-    else
-    {
-      std::string number;
-      std::stringstream s;
-      s << counter_++;
-      s >> number;
-
-      name_ = "s" + number;
-    }
-  }
-
-
-  /*!
-   */
-  State::State(Marking &m, const std::string name, bool isFinal) :
+  State::State(Marking &m, std::map<const Place *, unsigned int> *pw,
+      unsigned int *counter, bool isFinal) :
     isFinal_(isFinal), isInitial_(false), m_(&m)
   {
-    if (name != "")
-      name_ = name;
-    else
-    {
-      std::string number;
-      std::stringstream s;
-      s << counter_++;
-      s >> number;
+    std::string number;
+    std::stringstream s;
+    s << (*counter)++;
+    s >> number;
 
-      name_ = "s" + number;
-    }
+    name_ = number;
 
-    setHashValue();
+    setHashValue(pw);
   }
 
 
   /*!
    */
   State::State(const State &s) :
-    name_(s.name_), preset_(s.preset_), postset_(s.postset_), isFinal_(s.isFinal_), isInitial_(s.isInitial_), m_(NULL), hashValue_(s.hashValue_)
+    name_(s.name_), preset_(s.preset_), postset_(s.postset_),
+    isFinal_(s.isFinal_), isInitial_(s.isInitial_), m_(NULL),
+    hashValue_(s.hashValue_)
   {
     if (s.m_ != NULL)
       m_ = new Marking(*s.m_);
@@ -187,14 +164,14 @@ namespace pnapi
 
   /*!
    */
-  void State::setHashValue()
+  void State::setHashValue(std::map<const Place *, unsigned int> *pw)
   {
     if (m_ != NULL)
     {
       unsigned int hash = 0;
       for (std::map<const Place *, unsigned int>::const_iterator i =
           m_->getMap().begin(); i != m_->getMap().end(); i++)
-        hash += i->second;
+        hash += (i->second * (*pw)[i->first]) % Automaton::HASH_SIZE;
 
       hashValue_ = hash % Automaton::HASH_SIZE;
     }

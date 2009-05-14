@@ -31,9 +31,9 @@ namespace pnapi
     virtual ~Automaton();
 
     /// creating a state
-    State & createState(const std::string = "");
+    State & createState();
     /// creating a state from given marking
-    State & createState(Marking &, const std::string = "");
+    State & createState(Marking &);
     /// finding a state by name
     State * findState(const std::string) const;
 
@@ -51,7 +51,7 @@ namespace pnapi
     const std::set<State *> initialStates() const;
     /// returning a set of states with no postset
     const std::set<State *> finalStates() const;
-    
+
     static const unsigned int HASH_SIZE = 65535;
 
   private:
@@ -64,11 +64,15 @@ namespace pnapi
     std::map<Transition *, std::string> *edgeLabels_;
     /// mapping from transitions to their types (optional)
     std::map<Transition *, Node::Type> *edgeTypes_;
+    /// mapping from places to their weight (optional)
+    std::map<const Place *, unsigned int> *weights_;
 
     /// underlying Petri net (optional)
     PetriNet *net_;
     /// the hash table (optional) needed by PetriNet => Automaton
     std::vector<std::set<State *> > *hashTable_;
+    /// state counter
+    unsigned int counter_;
 
     /// depth-first-search in the unknown automaton
     void dfs(State &);

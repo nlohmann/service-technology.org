@@ -56,7 +56,7 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
 
 void InterfaceMarking::initialize(unsigned int m) {
     message_bound = m;
-    interface_length = Label::async_events;
+    interface_length = Label::send_events + Label::receive_events;
     message_bound_bits = LOG2(message_bound);
     markings_per_byte = 8 / message_bound_bits;
     bytes = (unsigned int)(ceil((double)interface_length / (double)markings_per_byte));

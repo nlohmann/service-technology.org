@@ -113,6 +113,7 @@ void evaluateParameters(int argc, char** argv) {
     if (args_info.type_given and
         (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG)) {
         args_info.og_given = 1;
+        args_info.fionaFormat_given = 1;
     }
 
     // evaluate Fiona's '--show/-s' parameter
@@ -251,7 +252,7 @@ int main(int argc, char** argv) {
     StoredKnowledge::root = new StoredKnowledge(K0);
     StoredKnowledge::root->store();
 
-    StoredKnowledge::calcRecursive(K0, StoredKnowledge::root);
+    StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
     delete K0;
     time(&end_time);
 
@@ -301,7 +302,11 @@ int main(int argc, char** argv) {
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        StoredKnowledge::output(og_file);
+        if (args_info.fionaFormat_given) {
+            StoredKnowledge::output_old(og_file);
+        } else {
+            StoredKnowledge::output(og_file);            
+        }
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
         }

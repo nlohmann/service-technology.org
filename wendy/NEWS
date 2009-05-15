@@ -10,7 +10,10 @@
 Version 1.2-unreleased
 ======================
 
-*
+* implemented new OG file format - the deprecated format can still be used
+  with `--fionaFormat' parameter which is implicitly used in case `-t OG' is
+  used
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

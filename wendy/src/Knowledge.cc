@@ -106,6 +106,7 @@ Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(1)
         closure(todo);
     }
 
+    // CASE 3: synchronization
     if (SYNC(label)) {
         std::queue<FullMarking> todo;
 

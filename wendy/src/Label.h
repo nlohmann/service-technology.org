@@ -42,6 +42,10 @@
     \brief shorthand notation to find out whether a label belongs to a synchronous action */
 #define SYNC(L) (L >= Label::first_sync && L <= Label::last_sync)
 
+/*! \def PREFIX(L)
+    \brief the prefix of the given label, depending on the communication type */
+#define PREFIX(L) (SENDING(L) ? "!" : (RECEIVING(L) ? "?" : "#"))
+
 
 /*!
  \brief communication labels
@@ -78,8 +82,10 @@ class Label {
         /// label of last synchronous (#) event
         static Label_ID last_sync;
 
-        /// the number of asynchronous (? and !) events
-        static Label_ID async_events;
+        /// the number of asynchronous send (!) events
+        static Label_ID send_events;
+        /// the number of asynchronous receive (?) events
+        static Label_ID receive_events;
         /// the number of synchronous (#) events
         static Label_ID sync_events;
         /// the number of all events

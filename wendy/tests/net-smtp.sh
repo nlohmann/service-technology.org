@@ -6,5 +6,5 @@ if test "$FIONA" = "not found"; then
   exit 77
 fi
 
-wendy smtp3.owfn --og --verbose &>result.log
+wendy smtp3.owfn --fionaFormat --og --verbose &>result.log
 fiona -tequivalence smtp3.og smtp3.fiona.og >>result.log 2>&1

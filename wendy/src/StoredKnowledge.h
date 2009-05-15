@@ -32,8 +32,11 @@
 class StoredKnowledge {
     public: /* static functions */
 
+        /// generate the successor of a knowledge bubble given a label
+        static void process(const Knowledge* const, StoredKnowledge*, Label_ID);
+
         /// recursively calculate knowledge bubbles
-        static void calcRecursive(const Knowledge* const, StoredKnowledge*);
+        static void processRecursively(const Knowledge* const, StoredKnowledge*);
 
         /// traverse the graph and add predecessors
         static unsigned int addPredecessors();
@@ -44,8 +47,11 @@ class StoredKnowledge {
         /// print a dot representation
         static void dot(std::ofstream&);
 
-        /// print the knowledges as Fiona OG
+        /// print the knowledges as OG
         static void output(std::ofstream&);
+
+        /// print the knowledges as Fiona OG
+        static void output_old(std::ofstream&);
 
     public: /* static attributes */
 
@@ -57,6 +63,9 @@ class StoredKnowledge {
 
         /// the number of knowledges stored in the hash tree
         static unsigned int storedKnowledges;
+
+        /// the number of egdes stored overall
+        static unsigned int storedEdges;
 
         /// report every given knowledges
         static unsigned int reportFrequency;
@@ -114,6 +123,8 @@ class StoredKnowledge {
 
         /// adds a predecessor knowledge
         void addPredecessor(StoredKnowledge* const);
+
+        void print(std::ofstream&) const;
 
         /// return a string representation of the knowledge's formula
         std::string formula() const;

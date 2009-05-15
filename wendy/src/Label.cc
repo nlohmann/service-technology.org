@@ -41,7 +41,8 @@ Label_ID Label::first_send = 0;
 Label_ID Label::last_send = 0;
 Label_ID Label::first_sync = 0;
 Label_ID Label::last_sync = 0;
-Label_ID Label::async_events = 0;
+Label_ID Label::send_events = 0;
+Label_ID Label::receive_events = 0;
 Label_ID Label::sync_events = 0;
 Label_ID Label::events = 0;
 
@@ -60,7 +61,8 @@ void Label::initialize() {
     const set<Place*> outputPlaces( InnerMarking::net->getOutputPlaces() );
     for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
         ++events;
-        id2name[events] = "?" + (*p)->getName();
+        ++receive_events;
+        id2name[events] = (*p)->getName();
 
         const set<Node*> preset( (*p)->getPreset() );
         for (set<Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
@@ -78,7 +80,8 @@ void Label::initialize() {
 
     for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
         ++events;
-        id2name[events] = "!" + (*p)->getName();
+        ++send_events;
+        id2name[events] = (*p)->getName();
 
         const set<Node*> postset( (*p)->getPostset() );
         for (set<Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {
@@ -97,7 +100,7 @@ void Label::initialize() {
     const set<string> sync_label_names( InnerMarking::net->getSynchronousLabels() );
     for (set<string>::const_iterator l = sync_label_names.begin(); l != sync_label_names.end(); ++l) {
         sync_labels[*l] = ++events;
-        id2name[events] = "#" + *l;
+        id2name[events] = *l;
     }
 
     // collect the transitions with synchronous labels
@@ -108,8 +111,7 @@ void Label::initialize() {
 
 
     last_sync = events;
-    async_events = last_send;
-    sync_events = last_sync - async_events;
+    sync_events = last_sync - send_events - receive_events;
 
     if (args_info.verbose_given) {
         for (unsigned int i = first_receive; i <= last_sync; ++i) {
@@ -117,6 +119,6 @@ void Label::initialize() {
         }
 
         fprintf(stderr, "%s: initialized labels for %d events (%d asynchronous, %d synchronous)\n",
-            PACKAGE, events, async_events, sync_events);
+            PACKAGE, events, send_events+receive_events, sync_events);
     }
 }

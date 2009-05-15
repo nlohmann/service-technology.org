@@ -39,6 +39,7 @@ extern gengetopt_args_info args_info;
 std::map<hash_t, std::vector<StoredKnowledge*> > StoredKnowledge::hashTree;
 unsigned int StoredKnowledge::hashCollisions = 0;
 unsigned int StoredKnowledge::storedKnowledges = 0;
+unsigned int StoredKnowledge::storedEdges = 0;
 size_t StoredKnowledge::maxBucketSize = 1; // sic!
 StoredKnowledge* StoredKnowledge::root = NULL;
 StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
@@ -56,55 +57,65 @@ std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
 /*!
  \param[in] K   a knowledge bubble (explicitly stored)
  \param[in] SK  a knowledge bubble (compactly stored)
+ \param[in] l   a label
+ */
+inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, Label_ID l) {
+    Knowledge *K_new = new Knowledge(K, l);
+
+    // process the empty node in a special way
+    if (K_new->size == 0) {
+        if (K_new->is_sane) {
+            SK->addSuccessor(l, empty);
+        }
+        delete K_new;
+        return;
+    }
+
+    // only process knowledges within the message bounds
+    if (K_new->is_sane) {
+        // create a compact version of the knowledge bubble
+        StoredKnowledge *SK_new = new StoredKnowledge(K_new);
+
+        // add it to the knowledge tree
+        StoredKnowledge *SK_store = SK_new->store();
+
+        // store an edge from the parent to this node
+        SK->addSuccessor(l, SK_store);
+        ++storedEdges;
+
+        // evaluate the storage result
+        if (SK_store == SK_new) {
+            // the node was new, so check its successors
+            processRecursively(K_new, SK_store);
+        } else {
+            // we did not find new knowledge
+            delete SK_new;
+        }
+    }
+
+    // we saw K_new's successors (or K_new was not sane)
+    delete K_new;    
+}
+
+
+/*!
+ \param[in] K   a knowledge bubble (explicitly stored)
+ \param[in] SK  a knowledge bubble (compactly stored)
 
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::calcRecursive(const Knowledge* const K, StoredKnowledge* SK) {
+void StoredKnowledge::processRecursively(const Knowledge* const K, StoredKnowledge* SK) {
     static unsigned int calls = 0;
-    static unsigned int edges = 0;
 
     if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
-            StoredKnowledge::storedKnowledges, edges);
+            storedKnowledges, storedEdges);
     }
 
+    // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        Knowledge *K_new = new Knowledge(K, l);
-
-        // process the empty node in a special way
-        if (K_new->size == 0) {
-            if (K_new->is_sane) {
-                SK->addSuccessor(l, empty);
-            }
-            delete K_new;
-            continue;
-        }
-
-        // only process knowledges within the message bounds
-        if (K_new->is_sane) {
-            // create a compact version of the knowledge bubble
-            StoredKnowledge *SK_new = new StoredKnowledge(K_new);
-
-            // add it to the knowledge tree
-            StoredKnowledge *SK_store = SK_new->store();
-
-            // store an edge from the parent to this node
-            SK->addSuccessor(l, SK_store);
-            ++edges;
-
-            // evaluate the storage result
-            if (SK_store == SK_new) {
-                // the node was new, so check its successors
-                calcRecursive(K_new, SK_store);
-            } else {
-                // we did not find new knowledge
-                delete SK_new;
-            }
-        }
-
-        // we saw K_new's successors (or K_new was not sane)
-        delete K_new;
+        process(K, SK, l);
     }
 }
 
@@ -293,13 +304,11 @@ void StoredKnowledge::dot(std::ofstream &file)
         file << "0 [label=\"";
         if (args_info.formula_arg == formula_arg_dnf) {
             file << "true";
-        } else {
-            file << "-";
         }
         file << "\"]\n";
         
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            file << "0 -> 0 [label=\"" << Label::id2name[l] << "\"]\n";
+            file << "0 -> 0 [label=\"" << PREFIX(l) << Label::id2name[l] << "\"]\n";
         }
     }
 
@@ -340,15 +349,16 @@ void StoredKnowledge::dot(std::ofstream &file)
                         (args_info.showEmptyNode_given or it->second[i]->successors[l-1]->size > 0)) {
                         file << "\"" << it->second[i] << "\" -> \""
                              << it->second[i]->successors[l-1]
-                             << "\" [label=\"" << Label::id2name[l]
-                             << "\"]\n";
+                             << "\" [label=\"" << PREFIX(l)
+                             << Label::id2name[l] << "\"]\n";
                     }
 
                     // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_given and
                         it->second[i]->successors[l-1] == empty) {
                         file << "\"" << it->second[i] << "\" -> 0"
-                            << " [label=\"" << Label::id2name[l] << "\"]\n";
+                            << " [label=\"" << PREFIX(l)
+                            << Label::id2name[l] << "\"]\n";
                     }
                 }
             }
@@ -359,6 +369,116 @@ void StoredKnowledge::dot(std::ofstream &file)
 }
 
 
+void StoredKnowledge::print(std::ofstream &file) const {
+    file << "  " << reinterpret_cast<unsigned int>(this);
+
+    switch (args_info.formula_arg) {
+        case(formula_arg_dnf): {
+            file << " : " << formula();
+            break;
+        }
+        case(formula_arg_2bits): {
+            string form(bits());
+            if (form != "") {
+                file << " :: " << form;
+            }
+            break;
+        }
+        default: assert(false);
+    }
+
+    file << "\n";
+
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        if (successors[l-1] != NULL and successors[l-1] != empty) {
+            file << "    " << Label::id2name[l] << " -> "
+                 << reinterpret_cast<unsigned int>(successors[l-1])
+                 << "\n";
+        } else {
+            if (successors[l-1] == empty) {
+                file << "    " << Label::id2name[l] << " -> 0\n";
+            }
+        }
+    }
+}
+
+
+/*!
+ \param[in,out] file  the output stream to write the OG to
+ 
+ \note  Fiona identifies node numbers by integers. To avoid numbering of
+        nodes, the pointers are casted to integers. Though ugly, it still is
+        a valid numbering.
+*/
+void StoredKnowledge::output(std::ofstream &file) {
+    file << "INTERFACE\n";
+
+    if (Label::receive_events > 0) {
+        file << "  INPUT\n    ";
+        bool first = true;
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            if (not first) {
+                file << ", ";
+            }
+            first = false;
+            file << Label::id2name[l];
+        }
+        file << ";\n";
+    }
+
+    if (Label::send_events > 0) {
+        file << "  OUTPUT\n    ";
+        bool first = true;
+        for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+            if (not first) {
+                file << ", ";
+            }
+            first = false;
+            file << Label::id2name[l];
+        }
+        file << ";\n";
+    }
+
+    if (Label::sync_events > 0) {
+        file << "  SYNCHRONOUS\n    ";
+        bool first = true;
+        for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+            if (not first) {
+                file << ", ";
+            }
+            first = false;
+            file << Label::id2name[l];
+        }
+        file << ";\n";
+    }
+
+    file << "\nNODES\n";
+
+    // the root
+    root->print(file);
+
+    // all other nodes
+    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        if (*it != root) {
+            (*it)->print(file);
+        }
+    }
+
+    // the empty node
+    file << "  0";
+    if (args_info.formula_arg == formula_arg_dnf) {
+        file << " : true\n";
+    } else {
+        file << "\n";
+    }
+
+    // empty node loops
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        file << "    " << Label::id2name[l]  << " -> 0\n";
+    }
+}
+
+
 /*!
  \param[in,out] file  the output stream to write the OG to
  
@@ -366,9 +486,10 @@ void StoredKnowledge::dot(std::ofstream &file)
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
 
- \todo The interface for synchronous communication.
+ \deprecated This is the old OG file format -- it is only kept here for
+             compatibility reasons.
 */
-void StoredKnowledge::output(std::ofstream &file) {
+void StoredKnowledge::output_old(std::ofstream &file) {
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
@@ -376,8 +497,8 @@ void StoredKnowledge::output(std::ofstream &file) {
         if (not first) {
             file << ",\n";
         }
-        first = first and false;
-        file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
+        first = false;
+        file << "    " << Label::id2name[l];
     }
     file << ";\n";
 
@@ -387,22 +508,11 @@ void StoredKnowledge::output(std::ofstream &file) {
         if (not first) {
             file << ",\n";
         }
-        first = first and false;
-        file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
+        first = false;
+        file << "    " << Label::id2name[l];
     }
     file << ";\n";
-/*
-    file << "  SYNCHRONOUS\n";
-    first = true;
-    for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
-        if (not first) {
-            file << ",\n";
-        }
-        first = first and false;
-        file << "    " << Label::id2name[l].substr(1,Label::id2name[l].size());
-    }
-    file << ";\n";
-*/
+
     file << "\nNODES\n";
 
     // the empty node
@@ -421,6 +531,9 @@ void StoredKnowledge::output(std::ofstream &file) {
             case(formula_arg_dnf): formula = (*it)->formula(); break;
             case(formula_arg_2bits): formula = (*it)->bits(); break;
             default: assert(false);
+        }
+        if (formula == "") {
+            formula = "-";
         }
         file << formula;
     }
@@ -441,7 +554,7 @@ void StoredKnowledge::output(std::ofstream &file) {
                 }
                 file << "  " << reinterpret_cast<unsigned int>(*it) << " -> "
                      << reinterpret_cast<unsigned int>((*it)->successors[l-1])
-                     << " : " << Label::id2name[l];
+                     << " : " << PREFIX(l) << Label::id2name[l];
             } else {
                 // edges to the empty node
                 if ((*it)->successors[l-1] == empty) {
@@ -451,7 +564,7 @@ void StoredKnowledge::output(std::ofstream &file) {
                         file << ",\n";
                     }
                     file << "  " << reinterpret_cast<unsigned int>(*it) << " -> 0"
-                         << " : " << Label::id2name[l];
+                         << " : " << PREFIX(l) << Label::id2name[l];
                 }
             }
         }
@@ -464,7 +577,7 @@ void StoredKnowledge::output(std::ofstream &file) {
         } else {
             file << ",\n";
         }
-        file << "  0 -> 0 : " << Label::id2name[l];
+        file << "  0 -> 0 : " << PREFIX(l) << Label::id2name[l];
     }
 
     file << ";" << std::endl;
@@ -539,6 +652,9 @@ StoredKnowledge::~StoredKnowledge() {
  * OPERATORS *
  *************/
 
+/*!
+ \deprecated This function is only needed for debug purposes.
+ */
 std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
     o << m.hash() << ":\t";
 
@@ -716,7 +832,11 @@ string StoredKnowledge::formula() const {
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL) {
-            sendDisjunction.insert(Label::id2name[l]);
+            if (args_info.fionaFormat_given) {
+                sendDisjunction.insert(PREFIX(l) + Label::id2name[l]);
+            } else {
+                sendDisjunction.insert(Label::id2name[l]);
+            }
         }
     }
 
@@ -729,7 +849,11 @@ string StoredKnowledge::formula() const {
         // sending
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
             if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
-                temp.insert(Label::id2name[l]);
+                if (args_info.fionaFormat_given) {
+                    temp.insert(PREFIX(l) + Label::id2name[l]);
+                } else {
+                    temp.insert(Label::id2name[l]);
+                }
             }
         }
 
@@ -737,7 +861,11 @@ string StoredKnowledge::formula() const {
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
                 successors[l-1] != NULL and successors[l-1] != empty) {
-                temp.insert(Label::id2name[l]);
+                if (args_info.fionaFormat_given) {
+                    temp.insert(PREFIX(l) + Label::id2name[l]);
+                } else {
+                    temp.insert(Label::id2name[l]);
+                }
             }
         }
 
@@ -788,7 +916,6 @@ string StoredKnowledge::formula() const {
  \pre  the node is sane, i.e. "sane()" would return true
 
  \todo How about synchronous communication?
- \todo Return empty string instead of "-".
  */
 string StoredKnowledge::bits() const {
     if (is_final) {
@@ -817,7 +944,7 @@ string StoredKnowledge::bits() const {
     }
 
     // no bit needed
-    return "-";
+    return "";
 }
 
 

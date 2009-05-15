@@ -6,5 +6,5 @@ if test "$FIONA" = "not found"; then
   exit 77
 fi
 
-wendy zeus.owfn --og --verbose &>result.log
+wendy zeus.owfn --fionaFormat --og --verbose &>result.log
 fiona -tequivalence zeus.og zeus.fiona.og >>result.log 2>&1

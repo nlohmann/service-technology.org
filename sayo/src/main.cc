@@ -6,13 +6,13 @@
  * \brief   Jane Doe's main source
  *
  * \author  Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: cas $
+ *          last changes of: \$Author$
  * 
  * \since   2009-05-10
  *
- * \date    $Date: 2009-02-16 08:39:17 +0100 (Mo, 16 Feb 2009) $
+ * \date    $Date$
  *
- * \version $Revision: 3882 $
+ * \version $Revision$
  * 
  */
 

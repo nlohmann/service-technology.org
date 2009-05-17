@@ -1,0 +1,18 @@
+args ""
+
+purpose "Sayo (Service Automaton Yielded from Operating guidelines) is a converter of public view service automatons from 2-bit operating guidelines."
+
+description "About Sayo:"
+
+option "input" i
+  "Input file. If no file is given, the operating guideline will be read from standard in. "
+  string
+  typestr="OG"
+  optional
+
+option "output" o
+  "Output file. If no file is given, the service automaton will be written to standard out."
+  string
+  typestr="OG"
+  optional
+

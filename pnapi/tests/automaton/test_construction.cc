@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
   begin_test("Automaton::Automaton() [construction] with normal net");
 
-  ifstr.open("sequence_normal.owfn", std::ios_base::in);
+  ifstr.open("sequence_normal.net.owfn", std::ios_base::in);
   try
   {
   ifstr >> io::owfn >> net[0];
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
   Automaton sauto0(net[0]);
   cout << io::sa << sauto0;
 
-  ifstr.open("sequence_unnormal.owfn", std::ios_base::in);
+  ifstr.open("sequence_unnormal.net.owfn", std::ios_base::in);
   try
   {
   ifstr >> io::owfn >> net[1];
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   Automaton sauto1(net[1]);
   cout << io::sa << sauto1;
 
-  ifstr.open("strange_net.owfn", std::ios_base::in);
+  ifstr.open("strange_net.net.owfn", std::ios_base::in);
   try
   {
   ifstr >> io::owfn >> net[2];

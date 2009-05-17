@@ -13,6 +13,7 @@ AC_CONFIG_HEADERS(src/config.h)
 # check for generic programs
 AC_PROG_CXX
 AC_PROG_CPP
+AC_PROG_GREP
 AM_PROG_CC_C_O
 
 # flags set by the configure script

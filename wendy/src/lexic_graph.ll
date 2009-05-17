@@ -19,6 +19,7 @@
 
 
 %option noyywrap
+%option yylineno
 %option nodefault
 %option outfile="lex.yy.c"
 %option prefix="graph_"

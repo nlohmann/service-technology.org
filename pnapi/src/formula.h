@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include "marking.h"
 
 namespace pnapi
 {
@@ -14,7 +15,6 @@ namespace pnapi
   class PetriNet;
   class Place;
   class Node;
-  class Marking;
 
 
   /*!

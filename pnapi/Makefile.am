@@ -1,11 +1,10 @@
 SUBDIRS = src tests utils
 
-ACLOCAL_AMFLAGS= -I m4
-
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
-	-rm -f compile
+	-rm -f compile config.guess config.sub
 	-rm -f aclocal.m4
+	-rm -fr m4 ltmain.sh
 	-rm -f configure Doxyfile compile
 	-rm -f depcomp
 	-rm -f install-sh
@@ -22,10 +21,7 @@ svn-clean: maintainer-clean
 	-rm -f doc/Doxyfile
 	-rm -f INSTALL
 	@echo -----------------------------------------------------
-	@echo To recreate installation status enter
-	@echo   aclocal
-	@echo   autoconf
-	@echo   autoheader
-	@echo   automake -a -c
+	@echo "To recreate installation status enter"
+	@echo "  autoreconf -i"
 	@echo
 

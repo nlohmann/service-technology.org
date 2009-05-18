@@ -4,8 +4,8 @@ noinst_PROGRAMS = generator
 petri_SOURCES = petri.cc cmdline.c cmdline.h
 generator_SOURCES = generator.cc
 
-petri_LDADD =  $(top_builddir)/src/libpnapi.a
-generator_LDADD =  $(top_builddir)/src/libpnapi.a
+petri_LDADD =  $(top_builddir)/src/libpnapi.la
+generator_LDADD =  $(top_builddir)/src/libpnapi.la
 
 BUILT_SOURCES = cmdline.c
 

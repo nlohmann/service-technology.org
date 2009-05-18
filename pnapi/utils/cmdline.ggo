@@ -1,4 +1,4 @@
-args "--unamed-opts=FILE --show-required --no-handle-error"
+args "--unamed-opts=FILE --include-getopt --show-required --no-handle-error"
 
 package "petri"
 version "1.0"

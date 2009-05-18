@@ -1,6 +1,6 @@
-noinst_LIBRARIES = libpnapi.a
+lib_LTLIBRARIES = libpnapi.la
 
-libpnapi_a_SOURCES = \
+libpnapi_la_SOURCES = \
 	parser-owfn.yy    parser-owfn-lexer.ll \
 	parser-petrify.yy parser-petrify-lexer.ll \
 	parser-onwd.yy    parser-onwd-lexer.ll \
@@ -32,16 +32,12 @@ AM_CXXFLAGS = @configured_CXXFLAGS@
 libpnapi_a_CPPFLAGS = -Wall
 
 # information for libtool
-lib_LTLIBRARIES = libpnapi.la
-
-libpnapi_la_SOURCES = ${libpnapi_a_SOURCES}
-
 includedir = @includedir@/pnapi
 
 include_HEADERS = pnapi.h io.h condition.h petrinet.h \
 		  automaton.h formula.h component.h \
 		  parser.h util.h state.h \
- 		  marking.h link.h \
+		  marking.h link.h \
 		  parser-owfn.h parser-petrify.h \
 		  parser-onwd.h parser-lola.h
 
@@ -50,4 +46,3 @@ DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
 		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \
 		 parser-petrify.h parser-petrify.cc parser-petrify-lexer.cc \
 		 parser-lola.h parser-lola.cc parser-lola-lexer.cc
-

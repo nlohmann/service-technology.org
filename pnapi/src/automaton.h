@@ -52,6 +52,13 @@ namespace pnapi
     /// returning a set of states with no postset
     const std::set<State *> finalStates() const;
 
+    /// prints the automaton to an STG file (Automaton => Petri net)
+    std::string printToSTG(std::vector<std::string> &) const;
+    /// returning a set of input labels (after PetriNet => Automaton)
+    std::set<std::string> input() const;
+    /// returning a set of output labels (after PetriNet => Automaton)
+    std::set<std::string> output() const;
+
     static const unsigned int HASH_SIZE = 65535;
 
   private:
@@ -76,13 +83,12 @@ namespace pnapi
 
     /// depth-first-search in the unknown automaton
     void dfs(State &);
-    /// returning a set of input labels (after PetriNet => Automaton)
-    const std::set<std::string> input() const;
-    /// returning a set of output labels (after PetriNet => Automaton)
-    const std::set<std::string> output() const;
 
     /// deleting a state from the automaton
     void deleteState(State *);
+
+    void printToSTGRecursively(State *, std::ostringstream &,
+        std::map<State *, bool> &, std::vector<std::string> &) const;
 
   };
 

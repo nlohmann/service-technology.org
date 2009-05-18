@@ -43,7 +43,7 @@ namespace pnapi
     void addPost(State &);
 
     /// method which returns the state's name
-    const std::string name() const;
+    const unsigned int name() const;
     /// method which returns the state's preset
     const std::set<State *> preset() const;
     /// method which returns the state's postset
@@ -70,7 +70,7 @@ namespace pnapi
 
   private:
     /// the state's name
-    std::string name_;
+    unsigned int name_;
     /// the state's preset
     std::set<State *> preset_;
     /// the state's postset

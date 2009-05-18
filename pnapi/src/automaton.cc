@@ -1,5 +1,8 @@
+#include <cassert>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <sstream>
 
 #include "automaton.h"
 #include "component.h"
@@ -257,11 +260,11 @@ namespace pnapi
 
   /*!
    */
-  const std::set<std::string> Automaton::input() const
+  std::set<std::string> Automaton::input() const
   {
     std::set<std::string> result;
     result.clear();
-    for (std::map<Transition *, Node::Type>::const_iterator
+    for (std::map<Transition *, Node::Type>::iterator
         p = (*edgeTypes_).begin(); p != (*edgeTypes_).end(); p++)
       if (p->second == Node::INPUT)
         result.insert((*edgeLabels_)[p->first]);
@@ -272,11 +275,11 @@ namespace pnapi
 
   /*!
    */
-  const std::set<std::string> Automaton::output() const
+  std::set<std::string> Automaton::output() const
   {
     std::set<std::string> result;
     result.clear();
-    for (std::map<Transition *, Node::Type>::const_iterator
+    for (std::map<Transition *, Node::Type>::iterator
         p = (*edgeTypes_).begin(); p != (*edgeTypes_).end(); p++)
       if (p->second == Node::OUTPUT)
         result.insert((*edgeLabels_)[p->first]);
@@ -364,6 +367,119 @@ namespace pnapi
             states_[i] = states_[states_.size()-1];
             states_.pop_back();
           }
+    }
+  }
+
+
+  /*!
+   * \brief     creates a STG file of the graph
+   * \param     edgeLabels a reference to a vector of strings containing the old
+   *            label names from this graph
+   * \return    the filename of the created STG file
+   */
+  std::string Automaton::printToSTG(std::vector<std::string> &edgeLabels) const
+  {
+    // build STG file name
+    std::string STGFileName = "AutomatonToPetrinet.stg";
+
+    // create and fill stringstream for buffering graph information
+    std::map<State *, bool> visitedNodes; // visited nodes
+    State *rootNode = states_[0]; // root node
+    std::ostringstream STGStringStream; // used as buffer for graph information
+
+    STGStringStream << ".state graph" << "\n";
+    printToSTGRecursively(rootNode, STGStringStream, visitedNodes, edgeLabels);
+    STGStringStream << ".marking {p" << rootNode->name() << "}" << "\n";
+    STGStringStream << ".end";
+
+
+    // create STG file, print header, transition information and then
+    // add buffered graph information
+    std::fstream STGFileStream(STGFileName.c_str(), std::ios_base::out |
+        std::ios_base::trunc | std::ios_base::binary);
+    if (!STGFileStream.good())
+    {
+      STGFileStream.close();
+      exit(1);
+    }
+    STGFileStream << ".model Labeled_Transition_System" << "\n";
+    STGFileStream << ".dummy";
+    for (int i = 0; i < (int)edgeLabels.size(); i++)
+    {
+        STGFileStream << " t" << i;
+    }
+    std::string STGGraphString = STGStringStream.str();
+    STGFileStream << "\n" << STGGraphString << std::endl;
+    STGFileStream.close();
+
+    return STGFileName;
+  }
+
+
+  /*!
+   * \brief     depth-first-search through the graph printing each node and
+   *            edge to the output stream
+   *
+   * \param     v current node in the iteration process
+   * \param     os output stream
+   * \param     visitedNodes[] array of bool storing the nodes that we have
+   *            looked at so far
+   */
+  void Automaton::printToSTGRecursively(State *v,
+      std::ostringstream &os, std::map<State *, bool> &visitedNodes,
+      std::vector<std::string> &edgeLabels) const
+  {
+    assert(v != NULL);
+    visitedNodes[v] = true;             // mark current node as visited
+
+    // TODO: possibly buggy because for every final node is "FINAL" added?
+    if (v->isFinal())
+    {
+      // each label is mapped to his position in edgeLabes
+      std::string currentLabel = "FINAL";
+      currentLabel += v->name();
+      int foundPosition = (int)edgeLabels.size();
+      edgeLabels.push_back(currentLabel);
+      os << "p" << v->name() << " t" << foundPosition << " p00" << std::endl;
+    }
+
+    // go through all edges
+    for (unsigned int i = 0; i < edges_.size(); i++)
+    {
+      Edge *element = edges_[i];
+      if (&element->source() != v)
+        continue;
+      State *vNext = &element->destination();
+
+      // build label vector:
+      // each label is mapped to his position in edgeLabes
+      std::string currentLabel = element->label();
+      int foundPosition = -1;
+      for (int i = 0; i < (int)edgeLabels.size(); i++)
+      {
+          if (currentLabel == edgeLabels.at(i))
+          {
+              foundPosition = i;
+              break;
+          }
+      }
+      if (foundPosition == -1)
+      {
+          foundPosition = (int)edgeLabels.size();
+          edgeLabels.push_back(currentLabel);
+      }
+      assert(foundPosition >= 0);
+      assert(currentLabel == edgeLabels.at(foundPosition));
+
+      // print current transition to stream
+      os  << "p" << v->name() << " t" << foundPosition << " p"
+          << vNext->name() << std::endl;
+
+      // recursion
+      if ( vNext != v && visitedNodes.find(vNext) == visitedNodes.end())
+      {
+          printToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
+      }
     }
   }
 

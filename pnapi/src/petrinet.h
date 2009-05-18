@@ -104,7 +104,7 @@ namespace pnapi
     friend class util::ComponentObserver;
 
     /// Petri net input, see pnapi::io
-    friend std::istream & io::operator>>(std::istream &, PetriNet &) 
+    friend std::istream & io::operator>>(std::istream &, PetriNet &)
       throw (io::InputError);
 
     /// Petri net output, see pnapi::io
@@ -169,6 +169,9 @@ namespace pnapi
 
     /// standard constructor
     PetriNet();
+
+    /// constructor Automaton => Petri net
+    PetriNet(const Automaton &);
 
     /// destructor
     virtual ~PetriNet();
@@ -273,7 +276,7 @@ namespace pnapi
 
     /// normalizes the Petri net
     const std::map<Transition *, std::string> normalize();
-    
+
     /// makes the inner structure of the Petri net (OWFN without interface)
     void makeInnerStructure();
 
@@ -281,7 +284,7 @@ namespace pnapi
     unsigned int reduce(unsigned int = LEVEL_5);
 
     /// product with Constraint oWFN
-    void produce(const PetriNet &, const std::string & = "net", 
+    void produce(const PetriNet &, const std::string & = "net",
 		 const std::string & = "constraint") throw (io::InputError);
 
     /// swaps input and output places
@@ -367,14 +370,14 @@ namespace pnapi
     Transition & createTransition(const Transition &, const std::string &);
 
     /// creates arcs for a transition based on the arcs of another one
-    void createArcs(Transition &, Transition &, 
+    void createArcs(Transition &, Transition &,
 		    const std::map<const Place *, const Place *> * = NULL);
 
     /// cleans up the net
     void clear();
 
     /// adds the structure of a second net
-    std::map<const Place *, const Place *> 
+    std::map<const Place *, const Place *>
     copyStructure(const PetriNet &, const std::string & = "");
 
     /// adds the places of a second net
@@ -489,12 +492,12 @@ namespace pnapi
 
     /// elimination of identical places
     unsigned int reduce_equal_places();
-    
+
     //*** normalization helper methods ***//
-    
+
     /// classical normalization through expanding the interface
     void normalize_classical();
-    
+
     /// normalization after [Aalst07]
     void normalize_rules();
 

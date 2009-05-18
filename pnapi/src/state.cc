@@ -19,15 +19,9 @@ namespace pnapi
    * of states: sX where X is a number.
    */
   State::State(unsigned int *counter, bool isFinal) :
-    isFinal_(isFinal), isInitial_(false), m_(NULL),
+    name_((*counter)++), isFinal_(isFinal), isInitial_(false), m_(NULL),
     hashValue_(0)
   {
-    std::string number;
-    std::stringstream s;
-    s << (*counter)++;
-    s >> number;
-
-    name_ = number;
   }
 
 
@@ -35,15 +29,8 @@ namespace pnapi
    */
   State::State(Marking &m, std::map<const Place *, unsigned int> *pw,
       unsigned int *counter, bool isFinal) :
-    isFinal_(isFinal), isInitial_(false), m_(&m)
+    name_((*counter)++), isFinal_(isFinal), isInitial_(false), m_(&m)
   {
-    std::string number;
-    std::stringstream s;
-    s << (*counter)++;
-    s >> number;
-
-    name_ = number;
-
     setHashValue(pw);
   }
 
@@ -62,7 +49,7 @@ namespace pnapi
 
   /*!
    */
-  const std::string State::name() const
+  const unsigned int State::name() const
   {
     return name_;
   }

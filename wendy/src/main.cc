@@ -28,9 +28,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <string>
 #include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
+
+using std::string;
 
 
 /// the input file
@@ -41,6 +44,9 @@ extern int graph_parse();
 
 /// the command line parameters
 gengetopt_args_info args_info;
+
+/// the invocation string
+string invocation;
 
 
 /*!
@@ -73,6 +79,11 @@ void abort(unsigned int code, const char* format, ...) {
 void evaluateParameters(int argc, char** argv) {
     // overwrite invokation for consistent error messages
     argv[0] = PACKAGE;
+
+    // store invocation in a string for meta information in file output
+    for (int i = 0; i < argc; ++i) {
+        invocation += string(argv[i]) + " ";
+    }
 
     // set default values
     cmdline_parser_init(&args_info);
@@ -258,10 +269,12 @@ int main(int argc, char** argv) {
 
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: stored %d knowledges [%.0f sec]\n",
-            PACKAGE, StoredKnowledge::storedKnowledges, difftime(end_time, start_time));
+            PACKAGE, StoredKnowledge::stats_storedKnowledges, difftime(end_time, start_time));
         fprintf(stderr, "%s: used %d of %d hash buckets, maximal bucket size: %d\n",
             PACKAGE, static_cast<unsigned int>(StoredKnowledge::hashTree.size()),
-            (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::maxBucketSize));
+            (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats_maxBucketSize));
+        fprintf(stderr, "%s: at most %d interface markings per inner marking\n",
+            PACKAGE, StoredKnowledge::stats_maxInterfaceMarkings);
     }
 
 
@@ -287,7 +300,7 @@ int main(int argc, char** argv) {
 
     if (args_info.verbose_given) {
         fprintf(stderr, "%s: removed %d red nodes in %d iterations [%.0f sec]\n",
-            PACKAGE, redNodes, StoredKnowledge::iterations, difftime(end_time, start_time));
+            PACKAGE, redNodes, StoredKnowledge::stats_iterations, difftime(end_time, start_time));
     }
 
     // analyze root node

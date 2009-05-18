@@ -29,6 +29,7 @@ using pnapi::Place;
 using pnapi::Transition;
 
 extern gengetopt_args_info args_info;
+extern void abort(unsigned int, const char*, ...);
 
 
 /******************
@@ -120,5 +121,10 @@ void Label::initialize() {
 
         fprintf(stderr, "%s: initialized labels for %d events (%d asynchronous, %d synchronous)\n",
             PACKAGE, events, send_events+receive_events, sync_events);
+    }
+
+    // 2-bit annotations must not be used with synchronous communication
+    if (Label::sync_events > 0 and args_info.formula_arg == formula_arg_2bits) {
+        abort(10, "2-bit annotations must not be used with synchronous communication");
     }
 }

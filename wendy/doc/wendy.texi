@@ -295,6 +295,16 @@ wendy: message bound must be between 1 and 255 -- aborting [#09]
 @end cartouche
 @end smallexample
 
+@item #10
+The 2-bit annotations (@option{--formula=2bit}) currently do not support synchronous communication. Only operating guidelines with classical formulae (@option{--formula=dnf}) can be calculated if the open net uses synchronous communication.
+
+@smallexample
+@cartouche
+wendy: 2-bit annotations must not be used with
+       synchronous communication -- aborting [#10]
+@end cartouche
+@end smallexample
+
 @end table
 
 

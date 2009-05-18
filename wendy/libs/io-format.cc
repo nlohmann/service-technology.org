@@ -1,6 +1,7 @@
 #include <cassert>
 #include <sstream>
 
+#include "automaton.h"
 #include "config.h"
 #include "petrinet.h"
 #include "state.h"
@@ -9,6 +10,8 @@
 using std::endl;
 using std::map;
 using std::ostream;
+using std::set;
+using std::string;
 using std::stringstream;
 
 using pnapi::io::util::delim;
@@ -31,36 +34,6 @@ namespace pnapi
     /* FORMAT IMPLEMENTATION: add a corresponding section */
 
 
-
-    /*************************************************************************
-     ***** SA output
-     *************************************************************************/
-
-    std::ostream & sa(std::ostream &os)
-    {
-      util::FormatData::data(os) = util::SA;
-      return os;
-    }
-
-
-    std::ostream & stg(std::ostream &os)
-    {
-      util::FormatData::data(os) = util::STG;
-      return os;
-    }
-
-
-    namespace util
-    {
-
-      ostream & operator<<(ostream &os, const State &s)
-      {
-        os << s.getName();
-
-        return os;
-      }
-
-    }
 
 
 
@@ -162,7 +135,7 @@ namespace pnapi
 	     it != labels.end(); ++it)
 	  os << " l" << *it << " [fillcolor=black width=.1]" << endl
 	     << " l" << *it << "_l [style=invis]" << endl
-	     << " l" << *it << "_l -> l" << *it << " [headlabel=\"" << *it 
+	     << " l" << *it << "_l -> l" << *it << " [headlabel=\"" << *it
 	     << "\"]" << endl;
 	return os
 	  << endl
@@ -258,9 +231,9 @@ namespace pnapi
 	set<string> labels = t.getSynchronizeLabels();
 	Mode mode = ModeData::data(os);
 	if (mode == util::NORMAL)
-	  for (set<string>::iterator it = labels.begin(); 
+	  for (set<string>::iterator it = labels.begin();
 	       it != labels.end(); ++it)
-	    os << endl << " l" << *it << " -> " << getNodeName(t) 
+	    os << endl << " l" << *it << " -> " << getNodeName(t)
 	       << " [style=dashed color=black]";
 
 	return os;
@@ -569,17 +542,17 @@ namespace pnapi
 	  << mode(io::util::PLACE) << delim("; ")
 	  << "PLACE"      << endl
 	  << "  INTERNAL" << endl
-	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_) 
+	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_)
 	  << ";" << endl << endl << delim(", ")
 	  << "  INPUT"    << endl
-	  << "    " << net.inputPlaces_                                     
+	  << "    " << net.inputPlaces_
 	  << ";" << endl << endl
 	  << "  OUTPUT"   << endl
-	  << "    " << net.outputPlaces_                                    
+	  << "    " << net.outputPlaces_
 	  << ";" << endl << endl;
 	if (!labels.empty()) os
 	  << "  SYNCHRONOUS" << endl
-	  << "    " << labels 
+	  << "    " << labels
 	  << ";" << endl << endl;
 
 	if (!net.interfacePlacesByPort_.empty())
@@ -620,8 +593,13 @@ namespace pnapi
 
       ostream & output(ostream & os, const Transition & t)
       {
-	os 
-	  << "TRANSITION " << t.getName() << endl
+	os
+	  << "TRANSITION " << t.getName() << endl;
+	
+	if (t.getCost() != 0)
+	  os << "  COST " << t.getCost() << ";" << endl;
+
+	os
 	  << delim(", ")
 	  << "  CONSUME "     << t.getPresetArcs()        << ";" << endl
 	  << "  PRODUCE "     << t.getPostsetArcs()       << ";" << endl;
@@ -758,6 +736,133 @@ namespace pnapi
       }
 
     } /* namespace __owfn */
+
+
+    /*************************************************************************
+     ***** SA output
+     *************************************************************************/
+
+    std::ostream & sa(std::ostream &os)
+    {
+      util::FormatData::data(os) = util::SA;
+      return os;
+    }
+
+
+    namespace __sa
+    {
+      ostream & output(ostream &os, const Automaton &sa)
+      {
+        os  << "INTERFACE" << endl
+            << "  INPUT ";
+        output(os, sa.input());
+        os  << ";" << endl
+            << "  OUTPUT ";
+        output(os, sa.output());
+        os  << ";" << endl
+            << endl
+            << "NODES" << endl
+            << "  ";
+        output(os, sa.states_);
+        os  << ";" << endl
+            << endl
+            << "INITIALNODE" << endl
+            << "  ";
+        output(os, sa.initialStates());
+        os  << ";" << endl
+            << endl
+            << "FINALNODES" << endl
+            << "  ";
+        output(os, sa.finalStates());
+        os  << ";" << endl
+            << endl
+            << "TRANSITIONS" << endl
+            << "  ";
+        output (os, sa.edges_);
+        os  << ";" << endl;
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const State &s)
+      {
+        os
+
+        << s.name();
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const Edge &e)
+      {
+        output(os, e.source());
+        os  << " -> ";
+        output(os, e.destination());
+        os  << " : " << e.label();
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const std::vector<State *> &vs)
+      {
+        if (!vs.empty())
+        {
+          output(os, *vs[0]);
+          for (unsigned int i = 1; i < vs.size(); i++)
+          {
+            os << ", ";
+            output(os, *vs[i]);
+          }
+        }
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const std::vector<Edge *> &es)
+      {
+        if (!es.empty())
+        {
+          output(os, *es[0]);
+          for (unsigned int i = 1; i < es.size(); i++)
+          {
+            os << "," << endl << "  ";
+            output(os, *es[i]);
+          }
+        }
+
+        return os;
+      }
+
+      // FIXME: If any error, the mistake is here ...
+      ostream & output(ostream &os, const std::set<State *> &ss)
+      {
+        if (!ss.empty())
+        {
+          output(os, **ss.begin());
+          for (std::set<State *>::iterator s = ++ss.begin(); s != ss.end(); s++)
+          {
+            os << ", ";
+            output(os, **s);
+          }
+        }
+
+        return os;
+      }
+
+      // FIXME: ... or here!
+      ostream & output(ostream &os, const std::set<std::string> &ss)
+      {
+        if (!ss.empty())
+        {
+          os << *ss.begin();
+          for (std::set<std::string>::iterator s = ++ss.begin(); s != ss.end();
+              s++)
+            os << ", " << *s;
+        }
+
+        return os;
+      }
+    } /* namespace __sa */
 
   } /* namespace io */
 

@@ -86,6 +86,7 @@ INITIALMARKING                  { return KEY_MARKING; }
 FINALMARKING                    { return KEY_FINALMARKING; }
 NOFINALMARKING                  { return KEY_NOFINALMARKING; }
 FINALCONDITION                  { return KEY_FINALCONDITION; }
+COST                            { return KEY_COST; }
 CONSUME                         { return KEY_CONSUME; }
 PRODUCE                         { return KEY_PRODUCE; }
 PORT                            { return KEY_PORT; }

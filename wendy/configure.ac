@@ -15,6 +15,10 @@ AC_PROG_GREP
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# look up canonical build name and write it to config.h
+AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
+
 # search for LoLA
 AC_PATH_TOOL(LOLA, [lola-full], not found)
 if test "$LOLA" = "not found"; then

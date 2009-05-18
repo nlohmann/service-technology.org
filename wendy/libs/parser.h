@@ -259,6 +259,7 @@ namespace pnapi
 	Node(Type, Node *, Node *, Node *);
 	Node(Type, Node *, Node *, Node *, Node *);
 	Node(Type, Node *, Node *, Node *, Node *, Node *);
+	Node(Type, Node *, Node *, Node *, Node *, Node *, Node *);
 
 	Node & operator=(const Node &);
 

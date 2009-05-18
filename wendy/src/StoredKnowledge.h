@@ -59,22 +59,25 @@ class StoredKnowledge {
         static std::map<hash_t, std::vector<StoredKnowledge*> > hashTree;
 
         /// the number of hash collisions (distinct knowledges with the same hash value)
-        static unsigned int hashCollisions;
+        static unsigned int stats_hashCollisions;
 
         /// the number of knowledges stored in the hash tree
-        static unsigned int storedKnowledges;
+        static unsigned int stats_storedKnowledges;
 
         /// the number of egdes stored overall
-        static unsigned int storedEdges;
+        static unsigned int stats_storedEdges;
+
+        /// the maximal number of interface markings per inner marking
+        static unsigned int stats_maxInterfaceMarkings;
 
         /// report every given knowledges
         static unsigned int reportFrequency;
 
         /// maximal size of a hash bucket (1 means no collisions)
-        static size_t maxBucketSize;
+        static size_t stats_maxBucketSize;
 
         /// number of iterations needed to removed insane nodes
-        static unsigned int iterations;
+        static unsigned int stats_iterations;
 
         /// the root knowledge
         static StoredKnowledge *root;

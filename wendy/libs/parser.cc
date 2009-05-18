@@ -147,6 +147,25 @@ namespace pnapi
       {
 	mergeData(data);
       }
+      
+      /*!
+       * \brief constructor for transitions
+       * 
+       * This constructor has been added to implement transition costs
+       * and is needed for that purpose only.
+       * 
+       * If you use this for other purposes, you do this on own risk!
+       */
+      Node::Node(Type type, Node * data1, Node * data2, Node * node1, Node * node2, 
+     Node * node3, Node * node4) :
+  BaseNode(node1, node2, node3, node4), type(type)
+      {
+        mergeData(data1); // changes only the identifier
+        
+        // so number is free to store the transition costs
+        number = data2->number;
+        delete data2;
+      }
 
       Node & Node::operator=(const Node & node)
       {
@@ -379,6 +398,10 @@ namespace pnapi
 			   synchronousLabels_.end(), *it, "undeclared label");
 	      Transition & trans = net_.createTransition(node.identifier, 
 							 synchronizeLabels_);
+	      
+	      // set transition cost
+	      trans.setCost(node.number);
+	      
 	      for (map<string, unsigned int>::iterator it = preset_.begin();
 		   it != preset_.end(); ++ it)
 		net_.createArc(*net_.findPlace(it->first), trans, it->second);

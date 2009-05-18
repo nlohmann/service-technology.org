@@ -21,14 +21,19 @@
 #include <set>
 #include <iostream>
 #include <cassert>
+#include <string>
+#include <vector>
 #include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 
 using std::map;
 using std::set;
+using std::string;
+using std::vector;
 
 extern gengetopt_args_info args_info;
+extern string invocation;
 
 
 
@@ -37,13 +42,14 @@ extern gengetopt_args_info args_info;
  ******************/
 
 std::map<hash_t, std::vector<StoredKnowledge*> > StoredKnowledge::hashTree;
-unsigned int StoredKnowledge::hashCollisions = 0;
-unsigned int StoredKnowledge::storedKnowledges = 0;
-unsigned int StoredKnowledge::storedEdges = 0;
-size_t StoredKnowledge::maxBucketSize = 1; // sic!
+unsigned int StoredKnowledge::stats_hashCollisions = 0;
+unsigned int StoredKnowledge::stats_storedKnowledges = 0;
+unsigned int StoredKnowledge::stats_storedEdges = 0;
+unsigned int StoredKnowledge::stats_maxInterfaceMarkings = 0;
+size_t StoredKnowledge::stats_maxBucketSize = 1; // sic!
 StoredKnowledge* StoredKnowledge::root = NULL;
 StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
-unsigned int StoredKnowledge::iterations = 0;
+unsigned int StoredKnowledge::stats_iterations = 0;
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
@@ -59,7 +65,8 @@ std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, Label_ID l) {
+inline void StoredKnowledge::process(const Knowledge* const K,
+                                     StoredKnowledge *SK, Label_ID l) {
     Knowledge *K_new = new Knowledge(K, l);
 
     // process the empty node in a special way
@@ -81,7 +88,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
-        ++storedEdges;
+        ++stats_storedEdges;
 
         // evaluate the storage result
         if (SK_store == SK_new) {
@@ -105,12 +112,13 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::processRecursively(const Knowledge* const K, StoredKnowledge* SK) {
+void StoredKnowledge::processRecursively(const Knowledge* const K,
+                                         StoredKnowledge* SK) {
     static unsigned int calls = 0;
 
     if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
-            storedKnowledges, storedEdges);
+            stats_storedKnowledges, stats_storedEdges);
     }
 
     // traverse the labels of the interface and process K's successors
@@ -243,7 +251,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
     // iteratively removed all insane nodes and check their predecessors
     bool done = false;
     while (not done) {
-        ++iterations;
+        ++stats_iterations;
         while (not insaneNodes.empty()) {
             StoredKnowledge *todo = (*insaneNodes.begin());
             insaneNodes.erase(insaneNodes.begin());
@@ -292,9 +300,10 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
         parameter "--showEmptyNode" was given. For each node and receiving
         label, we add an edge to the empty node if this edge is not present
         before.
+ 
+ \todo  Only print empty node if it is actually reachable.
 */
-void StoredKnowledge::dot(std::ofstream &file)
-{
+void StoredKnowledge::dot(std::ofstream &file) {
     file << "digraph G {\n"
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
@@ -369,6 +378,9 @@ void StoredKnowledge::dot(std::ofstream &file)
 }
 
 
+/*!
+ \todo  Only print empty node if it is actually reachable.
+*/
 void StoredKnowledge::print(std::ofstream &file) const {
     file << "  " << reinterpret_cast<unsigned int>(this);
 
@@ -411,6 +423,10 @@ void StoredKnowledge::print(std::ofstream &file) const {
         a valid numbering.
 */
 void StoredKnowledge::output(std::ofstream &file) {
+    file << "{\n  generator:    " << PACKAGE_STRING
+         << " (" << CONFIG_BUILDSYSTEM ")"
+         << "\n  invocation:   " << invocation << "\n}\n\n";
+
     file << "INTERFACE\n";
 
     if (Label::receive_events > 0) {
@@ -490,6 +506,10 @@ void StoredKnowledge::output(std::ofstream &file) {
              compatibility reasons.
 */
 void StoredKnowledge::output_old(std::ofstream &file) {
+    file << "{\n  generator:    " << PACKAGE_STRING
+         << " (" << CONFIG_BUILDSYSTEM ")"
+         << "\n  invocation:   " << invocation << "\n}\n\n";
+
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
@@ -622,6 +642,8 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
             // copy the interface marking
             interface[count] = new InterfaceMarking(*(pos->second[i]));
         }
+
+        stats_maxInterfaceMarkings = std::max(stats_maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
     }
 
     // we must not forget a marking
@@ -683,7 +705,7 @@ StoredKnowledge *StoredKnowledge::store() {
 
     // get the element's hash value
     hash_t myHash = hash();
-    
+
     // check if we find a bucket with that hash value
     std::map<hash_t, std::vector<StoredKnowledge*> >::iterator el = hashTree.find(myHash);
     if (el != hashTree.end()) {
@@ -714,15 +736,15 @@ StoredKnowledge *StoredKnowledge::store() {
         }
 
         // this object was not found in the bucket -- this is a collision
-        ++hashCollisions;
+        ++stats_hashCollisions;
 
         // update maximal bucket size (we add 1 as we will store this object later)
-        maxBucketSize = std::max(maxBucketSize, hashTree[myHash].size() + 1);
+        stats_maxBucketSize = std::max(stats_maxBucketSize, hashTree[myHash].size() + 1);
     }
 
     // we need store this object
     hashTree[myHash].push_back(this);
-    ++storedKnowledges;
+    ++stats_storedKnowledges;
 
     // we return a pointer to the this object since it was newly stored
     return this;
@@ -915,7 +937,9 @@ string StoredKnowledge::formula() const {
  \pre  all markings are deadlocks
  \pre  the node is sane, i.e. "sane()" would return true
 
- \todo How about synchronous communication?
+ \note If the net contains synchronous communication channels, the main
+       method already aborts with an error as the 2-bit annotations are not
+       defined in this case.
  */
 string StoredKnowledge::bits() const {
     if (is_final) {
@@ -949,7 +973,8 @@ string StoredKnowledge::bits() const {
 
 
 /*!
- \todo Who needs this function?
+ \post All nodes that are reachable from the initial node are added to the
+       set "seen".
  */
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {

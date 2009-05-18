@@ -409,25 +409,44 @@ namespace pnapi {
 
 
   /*!
+   * \brief constructor
    */
   Transition::Transition(PetriNet & net, ComponentObserver & observer,
 			 const string & name, const set<string> & labels) :
     Node(net, observer, name, INTERNAL), labels_(labels)
   {
-    observer_.updateTransitions(*this);
+    cost_ = 0;
+		observer_.updateTransitions(*this);
   }
 
 
   /*!
+   * \brief copy constructor
    */
   Transition::Transition(PetriNet & net, ComponentObserver & observer,
 			 const Transition & trans, const string & prefix) :
     Node(net, observer, trans, prefix), labels_(trans.labels_)
   {
+    cost_ = trans.cost_;
     observer_.updateTransitions(*this);
   }
 
-
+  /*!
+   * \brief set transition cost
+   */
+  void Transition::setCost(int cost)
+  {
+    cost_ = cost;
+  }
+  
+  /*!
+   * \brief get transition cost
+   */
+  int Transition::getCost() const
+  {
+    return cost_;
+  }
+  
   /*!
    * \brief   checks if the transition is normal
    *

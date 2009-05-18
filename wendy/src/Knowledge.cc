@@ -19,12 +19,16 @@
 
 
 #include <cassert>
+#include <set>
+#include <string>
 #include "config.h"
 #include "Knowledge.h"
 #include "Label.h"
 
 using std::map;
 using std::vector;
+using std::set;
+using std::string;
 
 
 /***************

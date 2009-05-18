@@ -14,6 +14,9 @@ Version 1.2-unreleased
   with `--fionaFormat' parameter which is implicitly used in case `-t OG' is
   used
 
+* added "watermark" to generated operating guidelines (generator, platform,
+  invocation string)
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

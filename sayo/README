@@ -1,0 +1,48 @@
+                           ____
+                          / ___|  __ _ _   _  ___
+                          \___ \ / _` | | | |/ _ \
+                           ___) | (_| | |_| | (_) |
+                          |____/ \__,_|\__, |\___/
+                                       |___/
+                      http://service-technology.org/sayo
+
+
+PURPOSE
+    Sayo is a tool to calculate operating guidelines.
+
+
+COPYRIGHT
+    Copyright (c) 2009 Christian Sura
+
+
+AUTHOR
+    Sayo is is a converter of public view service automatons from 2-bit
+    operating guidelines.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Sayo is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Sayo.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Sayo can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+
+    Sayo uses a lot of generated code. If you want to make changes to the
+    source code, you might need the following tools to regenerate the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+     * Gengetopt (http://www.gnu.org/software/gengetopt)
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Sayo. It can also be
+    downloaded at <http://service-technology.org/files/sayo/sayo.pdf>.

@@ -1,5 +1,7 @@
 SUBDIRS = src tests utils
 
+ACLOCAL_AMFLAGS= -I m4
+
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
 	-rm -f compile
@@ -26,3 +28,4 @@ svn-clean: maintainer-clean
 	@echo   autoheader
 	@echo   automake -a -c
 	@echo
+

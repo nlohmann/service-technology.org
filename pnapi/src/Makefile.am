@@ -31,6 +31,20 @@ AM_CXXFLAGS = @configured_CXXFLAGS@
 # show all warnings
 libpnapi_a_CPPFLAGS = -Wall
 
+# information for libtool
+lib_LTLIBRARIES = libpnapi.la
+
+libpnapi_la_SOURCES = ${libpnapi_a_SOURCES}
+
+includedir = @includedir@/pnapi
+
+include_HEADERS = pnapi.h io.h condition.h petrinet.h \
+		  automaton.h formula.h component.h \
+		  parser.h util.h state.h \
+ 		  marking.h link.h \
+		  parser-owfn.h parser-petrify.h \
+		  parser-onwd.h parser-lola.h
+
 # clean additional (generated) files
 DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
 		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \

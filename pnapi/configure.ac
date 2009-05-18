@@ -15,6 +15,9 @@ AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_GREP
 AM_PROG_CC_C_O
+# check if we can handle dynamic libs
+AC_PROG_LIBTOOL
+AC_CONFIG_MACRO_DIR([m4])
 
 # flags set by the configure script
 configured_CFLAGS=""
@@ -68,14 +71,14 @@ AC_SUBST(PETRIFY)
 #############################################################################
 # check for the "ranlib" tool and signal an error if it is not found
 #############################################################################
-AC_PROG_RANLIB
-if test "$RANLIB" = ":"; then
-  AC_MSG_ERROR([ranlib was not found!])
-fi
-AC_CHECK_PROG(AR, ar, ar, not found)
-if test "$AR" = "not found"; then
-  AC_MSG_ERROR([ar was not found!])
-fi
+#AC_PROG_RANLIB
+#if test "$RANLIB" = ":"; then
+#  AC_MSG_ERROR([ranlib was not found!])
+#fi
+#AC_CHECK_PROG(AR, ar, ar, not found)
+#if test "$AR" = "not found"; then
+#  AC_MSG_ERROR([ar was not found!])
+#fi
 
 
 #############################################################################
@@ -157,3 +160,4 @@ AC_CONFIG_FILES([Makefile
 		 tests/reduction/Makefile
 		 utils/Makefile])
 AC_OUTPUT
+

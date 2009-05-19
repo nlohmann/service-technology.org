@@ -19,7 +19,8 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "cmdline.h"
 #include "config.h"

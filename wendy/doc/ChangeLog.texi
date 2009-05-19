@@ -2,6 +2,7 @@
 @itemize
 @item implemented new OG file format -- the deprecated format can still be used with @option{--fionaFormat} parameter which is implicitly used in case @option{-t OG} is used
 @item added "watermark" to generated operating guidelines (generator, platform, invocation string)
+@item using a @acronym{GNU} Autoconf's Autotest test suite
 @end itemize
 
 @heading Version 1.1

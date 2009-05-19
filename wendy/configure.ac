@@ -15,6 +15,10 @@ AC_PROG_GREP
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
+
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
@@ -44,5 +48,5 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile libs/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile tests/Makefile tests/package.m4])
 AC_OUTPUT

@@ -382,7 +382,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
  \todo  Only print empty node if it is actually reachable.
 */
 void StoredKnowledge::print(std::ofstream &file) const {
-    file << "  " << reinterpret_cast<unsigned int>(this);
+    file << "  " << reinterpret_cast<unsigned long>(this);
 
     switch (args_info.formula_arg) {
         case(formula_arg_dnf): {
@@ -404,7 +404,7 @@ void StoredKnowledge::print(std::ofstream &file) const {
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         if (successors[l-1] != NULL and successors[l-1] != empty) {
             file << "    " << Label::id2name[l] << " -> "
-                 << reinterpret_cast<unsigned int>(successors[l-1])
+                 << reinterpret_cast<unsigned long>(successors[l-1])
                  << "\n";
         } else {
             if (successors[l-1] == empty) {
@@ -544,7 +544,7 @@ void StoredKnowledge::output_old(std::ofstream &file) {
     }
 
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        file << ",\n  " << reinterpret_cast<unsigned int>(*it) << " : ";
+        file << ",\n  " << reinterpret_cast<unsigned long>(*it) << " : ";
 
         string formula;
         switch (args_info.formula_arg) {
@@ -560,7 +560,7 @@ void StoredKnowledge::output_old(std::ofstream &file) {
     file << ";\n" << std::endl;
 
     file << "INITIALNODE\n  "
-         << reinterpret_cast<unsigned int>(root) << ";\n\n";
+         << reinterpret_cast<unsigned long>(root) << ";\n\n";
 
     file << "TRANSITIONS\n";
     first = true;
@@ -572,8 +572,8 @@ void StoredKnowledge::output_old(std::ofstream &file) {
                 } else {
                     file << ",\n";
                 }
-                file << "  " << reinterpret_cast<unsigned int>(*it) << " -> "
-                     << reinterpret_cast<unsigned int>((*it)->successors[l-1])
+                file << "  " << reinterpret_cast<unsigned long>(*it) << " -> "
+                     << reinterpret_cast<unsigned long>((*it)->successors[l-1])
                      << " : " << PREFIX(l) << Label::id2name[l];
             } else {
                 // edges to the empty node
@@ -583,7 +583,7 @@ void StoredKnowledge::output_old(std::ofstream &file) {
                     } else {
                         file << ",\n";
                     }
-                    file << "  " << reinterpret_cast<unsigned int>(*it) << " -> 0"
+                    file << "  " << reinterpret_cast<unsigned long>(*it) << " -> 0"
                          << " : " << PREFIX(l) << Label::id2name[l];
                 }
             }

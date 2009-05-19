@@ -17,6 +17,8 @@ Version 1.2-unreleased
 * added "watermark" to generated operating guidelines (generator, platform,
   invocation string)
 
+* using a GNU Autoconf's Autotest test suite
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

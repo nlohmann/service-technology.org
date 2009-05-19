@@ -1694,7 +1694,7 @@ afterdownsearch:
    } //finally, we close that while loop around the dfs search
 #else
 #ifdef BITHASH
-   cout << "\nno conclusive result!\n");
+   cout << "\nno conclusive result!\n";
 #else
 #ifdef REACHABILITY
    cout << "\nstate is not reachable!\n";

@@ -1,17 +1,37 @@
+/*****************************************************************************\
+ Sayo -- Service Automatons Yielded from Operating guidelines
+
+ Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
+
+ Sayo is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Sayo is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Sayo.  If not, see <http://www.gnu.org/licenses/>. 
+\*****************************************************************************/
+
 %option outfile="lex.yy.c"
-%option prefix="ognew_yy"
+%option prefix="og_yy"
 %option noyywrap
 %option yylineno
 %option nodefault
 %option nounput
 
 %{
-#include <cstdio>
+#include <iostream>
 #include <cstring>
 
 #include "syntax_og.h"
+#include "config.h"
 
-extern int ognew_yyerror(char const *msg);
+extern int og_yyerror(char const *msg);
 %}
 
 %s COMMENT
@@ -51,16 +71,19 @@ number         [0-9]+
 ","                                     { return COMMA;                }
 "->"                                    { return ARROW;                }
 
-{number}       { ognew_yylval.value = atoi(ognew_yytext); return NUMBER;     }
-{identifier}   { ognew_yylval.str = strdup(ognew_yytext); return IDENT;              }
+{number}       { og_yylval.value = atoi(og_yytext); return NUMBER;  }
+{identifier}   { og_yylval.str = strdup(og_yytext); return IDENT;   }
 
 {whitespace}                            { /* do nothing */             }
 
-.                                       { ognew_yyerror("lexical error"); }
+.                                       { og_yyerror("lexical error"); }
 
 %%
 
-int ognew_yyerror(char const *msg) {
-    fprintf(stderr, "%d: error near '%s': %s\n", ognew_yylineno, ognew_yytext, msg);
+int og_yyerror(char const *msg) {
+    std::cerr << PACKAGE << ": " << og_yylineno
+              << ": ERROR near " << og_yytext 
+              << ": " << msg << std::endl;
     return EXIT_FAILURE;
 }
+

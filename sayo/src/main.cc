@@ -1,9 +1,26 @@
-// -*- C++ -*-
+/*****************************************************************************\
+ Sayo -- Service Automatons Yielded from Operating guidelines
+
+ Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
+
+ Sayo is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Sayo is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Sayo.  If not, see <http://www.gnu.org/licenses/>. 
+\*****************************************************************************/
 
 /*!
  * \file    main.cc
  *
- * \brief   Jane Doe's main source
+ * \brief   Sayo's main source
  *
  * \author  Christian Sura <christian.sura@uni-rostock.de>,
  *          last changes of: \$Author$
@@ -28,7 +45,6 @@
 using std::cerr;
 using std::cout;
 using std::endl;
-using std::flush;
 using std::map;
 using std::ofstream;
 
@@ -38,8 +54,8 @@ gengetopt_args_info args_info;
 
 
 /// lexer and parser
-extern int ognew_yyparse();
-extern FILE* ognew_yyin;
+extern int og_yyparse();
+extern FILE* og_yyin;
 
 
 /// output stream
@@ -72,43 +88,50 @@ int main(int argc, char** argv)
   evaluateParameters(argc,argv);
   
   // set output destination
-  if(args_info.output_given)
+  if(args_info.output_given) // if user set an output file
   {
-    ofs.open(args_info.output_arg);
-    if(ofs.bad())
+    ofs.open(args_info.output_arg); // open file
+    if(ofs.bad()) // if an error occurred on opening the file
     {
-      cerr << "ERROR: Can't open output file." << endl << flush;
+      cerr << PACKAGE << ": ERROR: Can't open output file." << endl;
       exit(EXIT_FAILURE);
     }
     
+    // else link output stream to file stream
     myOut = &ofs;
   }
   
   // set input source
-  bool useFile = false;
-  if(args_info.input_given)
+  bool useFile = false; // bool used for cleanup later
+  if(args_info.input_given) // if user set an input file
   {
-    ognew_yyin = fopen(args_info.input_arg, "r");
+    // open file and link input file pointer
+    og_yyin = fopen(args_info.input_arg, "r");
     
-    if(ognew_yyin == 0)
+    if(og_yyin == 0) // if an error occurred
     {
-      cerr << "ERROR: Can't open input file." << endl << flush;
+      cerr << PACKAGE << ": ERROR: Can't open input file." << endl;
       exit(EXIT_FAILURE);
     }
     
-    useFile = true;
+    useFile = true; // now a file is used that has to be closed later
   }
   
   /// actual parsing
-  ognew_yyparse();
+  og_yyparse();
   
   /// close input
-  if(useFile)
-    fclose(ognew_yyin);
+  if(useFile) // if a file is used
+    fclose(og_yyin); // close it
   
   /// close output
-  if(myOut == &ofs)
-    ofs.close();
+  /* 
+   * If output stream points to the adress of the file stream,
+   * i.e. if there has been opend an output file.
+   */
+  if(myOut == &ofs) 
+    ofs.close(); // close it
   
-  exit(EXIT_SUCCESS);
+  exit(EXIT_SUCCESS); // finished parsing
 }
+

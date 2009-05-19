@@ -8,7 +8,8 @@
 
 
 PURPOSE
-    Sayo is a tool to calculate operating guidelines.
+    Sayo is a tool to generate public view service automatons
+    from 2-bit operating guidelines.
 
 
 COPYRIGHT
@@ -16,9 +17,8 @@ COPYRIGHT
 
 
 AUTHOR
-    Sayo is is a converter of public view service automatons from 2-bit
-    operating guidelines.
-
+    Sayo is written and maintained by Christian Sura. See file "AUTHORS" for
+    more information.
 
 LICENSE
     License AGPLv3+: GNU Affero General Public License version 3 or later
@@ -46,3 +46,4 @@ INSTALLATION
 DOCUMENTATION
     The directory "doc" contains a documentation of Sayo. It can also be
     downloaded at <http://service-technology.org/files/sayo/sayo.pdf>.
+

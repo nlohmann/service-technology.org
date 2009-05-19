@@ -1,4 +1,4 @@
-args ""
+args "--include-getopt"
 
 purpose "Sayo (Service Automaton Yielded from Operating guidelines) is a converter of public view service automatons from 2-bit operating guidelines."
 
@@ -13,6 +13,6 @@ option "input" i
 option "output" o
   "Output file. If no file is given, the service automaton will be written to standard out."
   string
-  typestr="OG"
+  typestr="SA"
   optional
 

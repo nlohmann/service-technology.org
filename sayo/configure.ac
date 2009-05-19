@@ -1,4 +1,4 @@
-AC_INIT(sayo, 0.1, christian.sura@uni-rostock.de, sayo)
+AC_INIT(sayo, 0.2, sayo@service-technology.org, sayo)
 
 # the first line should be everything you will ever need to touch
 #############################################################################

@@ -85,15 +85,16 @@ int main(int argc, char** argv)
   ofstream ofs;
   
   // parse commandline
-  evaluateParameters(argc,argv);
+  evaluateParameters(argc, argv);
   
   // set output destination
   if(args_info.output_given) // if user set an output file
   {
-    ofs.open(args_info.output_arg); // open file
-    if(ofs.bad()) // if an error occurred on opening the file
+    ofs.open(args_info.output_arg, std::ios_base::trunc); // open file
+    if(!ofs) // if an error occurred on opening the file
     {
-      cerr << PACKAGE << ": ERROR: Can't open output file." << endl;
+      cerr << PACKAGE << ": ERROR: filed to open output file '"
+           << args_info.output_arg << "'" << endl;
       exit(EXIT_FAILURE);
     }
     
@@ -102,36 +103,23 @@ int main(int argc, char** argv)
   }
   
   // set input source
-  bool useFile = false; // bool used for cleanup later
   if(args_info.input_given) // if user set an input file
   {
     // open file and link input file pointer
     og_yyin = fopen(args_info.input_arg, "r");
-    
-    if(og_yyin == 0) // if an error occurred
+    if(!og_yyin) // if an error occurred
     {
-      cerr << PACKAGE << ": ERROR: Can't open input file." << endl;
+      cerr << PACKAGE << ": ERROR: failed to open input file '"
+           << args_info.input_arg << "'" << endl;
       exit(EXIT_FAILURE);
     }
-    
-    useFile = true; // now a file is used that has to be closed later
   }
   
   /// actual parsing
   og_yyparse();
   
-  /// close input
-  if(useFile) // if a file is used
-    fclose(og_yyin); // close it
+  // close input (output is closed by destructor)
+  fclose(og_yyin);
   
-  /// close output
-  /* 
-   * If output stream points to the adress of the file stream,
-   * i.e. if there has been opend an output file.
-   */
-  if(myOut == &ofs) 
-    ofs.close(); // close it
-  
-  exit(EXIT_SUCCESS); // finished parsing
+  return EXIT_SUCCESS; // finished parsing
 }
-

@@ -1,4 +1,4 @@
-AC_INIT(sayo, 0.2, sayo@service-technology.org, sayo)
+AC_INIT(Sayo, 0.2, sayo@service-technology.org)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -12,7 +12,6 @@ AC_CONFIG_HEADERS(src/config.h)
 
 # check for generic programs
 AC_PROG_CXX
-AC_PROG_CPP
 AM_PROG_CC_C_O
 AC_PROG_SED
 AC_PROG_GREP
@@ -21,9 +20,6 @@ AC_PROG_GREP
 configured_CFLAGS=""
 configured_CXXFLAGS=""
 configured_LDFLAGS=""
-
-# check for functions
-AC_CHECK_FUNCS([popen pclose])
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)

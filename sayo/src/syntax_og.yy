@@ -197,7 +197,7 @@ synchronous:
 | KEY_SYNCHRONOUS
   {
     // don't know what to do with synchronous transitions
-    std::cerr << PACKAGE << ": WARNING: OG uses synchronous communication. This is not supported." << std::endl;
+    og_yyerror("synchronous communication is not supported");
     return EXIT_FAILURE;
   }
   identlist SEMICOLON
@@ -342,10 +342,10 @@ node:
 
 annotation:
   /* empty */    { $$ = '-'; }
-| COLON formula  
+| COLON formula
   {
     // parsing 2-bit OGs there should be no formula
-    std::cerr << PACKAGE << ": WARNING: Found a formula. Can only read 2-bit OGs." << std::endl;
+    og_yyerror("read a formula; only 2-bit annotations are supported");
     return EXIT_FAILURE;
   } 
 | COLON BIT_S    { $$ = 's'; }
@@ -384,7 +384,3 @@ successors:
     free($2);
   }
 ;
-
-
-%%
-

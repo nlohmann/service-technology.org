@@ -4,6 +4,8 @@ purpose "Sayo (Service Automaton Yielded from Operating guidelines) is a convert
 
 description "About Sayo:"
 
+section "Input / Output"
+
 option "input" i
   "Input file. If no file is given, the operating guideline will be read from standard in. "
   string

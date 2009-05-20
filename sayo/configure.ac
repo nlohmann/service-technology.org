@@ -4,7 +4,7 @@ AC_INIT(sayo, 0.2, sayo@service-technology.org, sayo)
 #############################################################################
 
 AC_PREREQ(2.59)
-AM_INIT_AUTOMAKE #(gnits)
+AM_INIT_AUTOMAKE(gnits)
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/main.cc)
@@ -14,6 +14,8 @@ AC_CONFIG_HEADERS(src/config.h)
 AC_PROG_CXX
 AC_PROG_CPP
 AM_PROG_CC_C_O
+AC_PROG_SED
+AC_PROG_GREP
 
 # flags set by the configure script
 configured_CFLAGS=""
@@ -25,6 +27,12 @@ AC_CHECK_FUNCS([popen pclose])
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
+AM_MISSING_PROG(HELP2MAN, help2man)
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
+
 
 #############################################################################
 # search for Flex and Bison
@@ -102,7 +110,9 @@ AC_SUBST(configured_LDFLAGS)
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
 AC_CONFIG_FILES([Makefile
-                 doc/Doxyfile
+                 doc/Makefile doc/Doxyfile
                  src/Makefile
-                 tests/Makefile])
+                 maintainer/Makefile
+                 tests/Makefile tests/package.m4
+                 man/Makefile])
 AC_OUTPUT

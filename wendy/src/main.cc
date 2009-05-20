@@ -78,7 +78,7 @@ void abort(unsigned int code, const char* format, ...) {
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // overwrite invokation for consistent error messages
-    argv[0] = PACKAGE;
+    argv[0] = (char*)PACKAGE;
 
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {

@@ -141,7 +141,7 @@ The manpage of Wendy which can be displayed using @samp{man wendy} after having 
 The source code of Wendy.
 
 @item tests
-Testcases for Rachel which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
+Testcases for Wendy which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
 @end table
 
 

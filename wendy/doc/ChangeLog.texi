@@ -1,8 +1,9 @@
-@heading Version 1.2-unreleased
+@heading Version 1.2
 @itemize
 @item implemented new OG file format -- the deprecated format can still be used with @option{--fionaFormat} parameter which is implicitly used in case @option{-t OG} is used
 @item added "watermark" to generated operating guidelines (generator, platform, invocation string)
 @item using a @acronym{GNU} Autoconf's Autotest test suite
+@item the configure script checks if the Petri Net @acronym{API} was found and only compiles the local copy if necessary
 @end itemize
 
 @heading Version 1.1

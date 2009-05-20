@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 1.2-unreleased, wendy@service-technology.org)
+AC_INIT(Wendy, 1.2, wendy@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -42,6 +42,10 @@ AC_HEADER_ASSERT
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Wendy cannot use UNIX pipes.]))
+
+# check if the Petri Net API is already installed
+AC_CHECK_LIB(pnapi, main)
+AM_CONDITIONAL(COMPILE_PNAPI, [test "${LIBS}" = ""])
 
 # check for exact unsigned types
 AC_TYPE_UINT8_T

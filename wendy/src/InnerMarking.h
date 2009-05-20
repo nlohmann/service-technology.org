@@ -24,8 +24,13 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "pnapi.h"
 #include "types.h"
+#include "config.h"
+#ifdef HAVE_LIBPNAPI
+#include <pnapi/pnapi.h>
+#else
+#include "pnapi.h"
+#endif
 
 
 /*!

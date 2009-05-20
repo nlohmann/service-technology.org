@@ -13,12 +13,6 @@ svn-clean: maintainer-clean
 	-rm -fr doc/doxygen doc/Doxyfile
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
-	@echo "  aclocal"
-	@echo "  autoconf"
-	@echo "  autoheader"
-	@echo "  automake -ac"
-	@echo
-	@echo "or"
 	@echo "  autoreconf -i"
 	@echo
 

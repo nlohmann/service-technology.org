@@ -1,6 +1,7 @@
 .SUFFIXES = .ggo
 
-bin_PROGRAMS = lola
+# not bin_PROGRAMS as installation is handled manually
+noinst_PROGRAMS = lola
 
 #######################
 # the list of sources #
@@ -75,3 +76,21 @@ $(CONFIGS): clean-am
 	mv userconfig.H~ userconfig.H
 
 MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
+
+
+#############################################################################
+# "make install" installs all binaries called "lola" or "lola-xxx" (for a
+# configuration "xxx") into the configured destdir (usually "/usr/local/bin").
+#############################################################################
+
+install-am:
+	list='$(CONFIGS) lola'; for binary in $$list; do \
+	  if test -f "$$binary"; then \
+	    $(install_sh_PROGRAM) $$binary $(DESTDIR)$(bindir)/$$binary; \
+	  fi \
+	done;
+
+uninstall-hook:
+	list='$(CONFIGS) lola'; for binary in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/$$binary; \
+	done;

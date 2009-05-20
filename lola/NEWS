@@ -6,66 +6,14 @@
                      http://service-technology.org/lola
 
 
-Version 1.11
-============
+Version 1.12-unreleased
+=======================
 
-* fixed bug #12903 (`https://gna.org/bugs/?12903'): fixed problems regarding
-  `BOUNDEDNET' mode
-
-* fixed bug #12907 (`https://gna.org/bugs/?12907'): fixed problems regarding
-  `COVER' option
-
-* completed documentation
-
-* adapted code to avoid deprecation warnings of GCC 4.2
-
-* updated `-h' output
-
-* removed old manual `lola-old.ps' from documentation
-
-* adapted documentation to fix bug #12090 (`https://gna.org/bugs/?12090'):
-  syntax description deviated from implementation
-
-* small changes to the test scripts and the lexer to make LoLA compilable on
-  FreeBSD
-
-* added a directory `src/configs' containing some example configurations for
-  LoLA; for each file `userconfig.H.xxx' in directory `src/configs' exists a
-  Makefile target `lola-xxx' which compiles LoLA with that configuration
-
-* added Makefile target `all-configs' to compile all configurations in
-  directory `src/configs'
-
-* added maintainer scripts to create source and binary releases; the latter
-  contain binaries of all configurations in directory `src/configs'
-
-* added a directory `utils' for small helper tools: graph2dot creates a
-  graphical representation of a reachability graph created by LoLA (using
-  option `-G' or `-M')
-
-* command line options are now handled by GNU Gengetopt (see
-  `http://www.gnu.org/software/gengetopt')
-
-* added a manpage for LoLA using `help2man' tool (see
-  `http://www.gnu.org/software/help2man')
-
-* added `--enable-mpi' command line parameter for the `configure' script to
-  use MPI compiler wrappers instead of GCC (disabled by default)
-
-* added an option `MAXIMALSTATES' to `userconfig.H': by defining this option
-  to a value, say 100000, LoLA will abort as soon as more than 100000 states
-  are processed; the exit code will be 5
-
-* canonized LoLA's error messages
-
-* removed directory `patches': these options (show number of states after
-  capacity excess; limited state space generation) are now built into LoLA
-
-* added `--offspring' command line parameter that creates a file containing
-  all necessary information to compile a new binary with the same
-  configuration used for the calling binary. To compile this new binary, copy
-  the resulting file `userconfig.H.offspring' into the `src/configs'
-  directory of the source distribution and run `make lola-offspring'.
+* addressed bug #13538 (`https://gna.org/bugs/?13538'): `make install'
+  installs all binaries with the name `lola' or `lola-xxx' for a standard
+  configuration `userconfig.H.xxx' that are present in the `src' folder.
+  Likewise, `make uninstall' removes all installed binaries with the name
+  `lola' or `lola-xxx' for a standard configuration `userconfig.H.xxx'
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

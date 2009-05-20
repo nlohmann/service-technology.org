@@ -6,6 +6,15 @@
                      http://service-technology.org/lola
 
 
+Version 1.12-unreleased
+=======================
+
+* addressed bug #13538 (`https://gna.org/bugs/?13538'): `make install'
+  installs all binaries with the name `lola' or `lola-xxx' for a standard
+  configuration `userconfig.H.xxx' that are present in the `src' folder.
+  Likewise, `make uninstall' removes all installed binaries with the name
+  `lola' or `lola-xxx' for a standard configuration `userconfig.H.xxx'
+
 Version 1.11
 ============
 

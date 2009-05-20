@@ -1,3 +1,8 @@
+@heading Version 1.12-unreleased
+@itemize
+@item addressed bug #13538 (@url{https://gna.org/bugs/?13538}): @samp{make install} installs @i{all} binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx} that are present in the @file{src} folder. Likewise, @samp{make uninstall} removes all installed binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx}
+@end itemize
+
 @heading Version 1.11
 @itemize
 @item fixed bug #12903 (@url{https://gna.org/bugs/?12903}): fixed problems regarding @option{BOUNDEDNET} mode

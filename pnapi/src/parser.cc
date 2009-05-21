@@ -134,34 +134,34 @@ namespace pnapi
 	mergeData(data);
       }
 
-      Node::Node(Type type, Node * data, Node * node1, Node * node2, 
+      Node::Node(Type type, Node * data, Node * node1, Node * node2,
 		 Node * node3) :
 	BaseNode(node1, node2, node3), type(type)
       {
 	mergeData(data);
       }
 
-      Node::Node(Type type, Node * data, Node * node1, Node * node2, 
+      Node::Node(Type type, Node * data, Node * node1, Node * node2,
 		 Node * node3, Node * node4) :
 	BaseNode(node1, node2, node3, node4), type(type)
       {
 	mergeData(data);
       }
-      
+
       /*!
        * \brief constructor for transitions
-       * 
+       *
        * This constructor has been added to implement transition costs
        * and is needed for that purpose only.
-       * 
+       *
        * If you use this for other purposes, you do this on own risk!
        */
-      Node::Node(Type type, Node * data1, Node * data2, Node * node1, Node * node2, 
+      Node::Node(Type type, Node * data1, Node * data2, Node * node1, Node * node2,
      Node * node3, Node * node4) :
   BaseNode(node1, node2, node3, node4), type(type)
       {
         mergeData(data1); // changes only the identifier
-        
+
         // so number is free to store the transition costs
         number = data2->number;
         delete data2;
@@ -215,7 +215,7 @@ namespace pnapi
 	return net_;
       }
 
-      const std::map<Transition *, std::set<std::string> > & 
+      const std::map<Transition *, std::set<std::string> > &
       Visitor::getConstraintLabels() const
       {
 	return constraintMap_;
@@ -379,7 +379,7 @@ namespace pnapi
 	      net_.createPlace(it->first, it->second.type, it->second.marking,
 			       it->second.capacity, it->second.port);
 	    // add synchronous labels
-	    for (set<string>::iterator it = synchronizeLabels_.begin(); 
+	    for (set<string>::iterator it = synchronizeLabels_.begin();
 		 it != synchronizeLabels_.end(); ++it)
 	      ; // do we really need the labels globally?
 	    synchronizeLabels_.clear();
@@ -394,14 +394,14 @@ namespace pnapi
 			 "node name already used");
 	      for (set<string>::iterator it = synchronizeLabels_.begin();
 		   it != synchronizeLabels_.end(); ++it)
-		node.check(synchronousLabels_.find(*it) != 
+		node.check(synchronousLabels_.find(*it) !=
 			   synchronousLabels_.end(), *it, "undeclared label");
-	      Transition & trans = net_.createTransition(node.identifier, 
+	      Transition & trans = net_.createTransition(node.identifier,
 							 synchronizeLabels_);
-	      
+
 	      // set transition cost
 	      trans.setCost(node.number);
-	      
+
 	      for (map<string, unsigned int>::iterator it = preset_.begin();
 		   it != preset_.end(); ++ it)
 		net_.createArc(*net_.findPlace(it->first), trans, it->second);
@@ -454,7 +454,7 @@ namespace pnapi
 	    }
 
 	  case FORMULA_APE:
-	    formulas_.push(WildcardFormula(new Conjunction(), 
+	    formulas_.push(WildcardFormula(new Conjunction(),
 					   (Places)&net_.getPlaces()));
 	    break;
 
@@ -505,7 +505,7 @@ namespace pnapi
 
     namespace lola
     {
-      
+
       Node * node;
 
       Parser::Parser() :
@@ -514,147 +514,6 @@ namespace pnapi
       }
 
     } /* namespace lola */
-
-
-
-    namespace petrify
-    {
-
-      Node * node;
-
-      Node::Node(Type type) : type(type) {}
-
-      Node::Node(Type type, Node *child1, Node *child2, Node *child3, Node *child4) :
-        type(type)
-      {
-        if(child1!=NULL)
-        {
-          addChild(child1);
-        }
-
-        Node *n1 = new Node(CTRL1);
-        addChild(n1);
-
-        if(child2!=NULL)
-        {
-          addChild(child2);
-        }
-        if(child3!=NULL)
-        {
-          addChild(child3);
-        }
-
-        Node *n2 = new Node(CTRL2);
-        addChild(n2);
-
-        if(child4!=NULL)
-        {
-          addChild(child4);
-        }
-      }
-
-      Node::Node(Type type, string data, Node *child) :
-        type(type), data(data)
-      {
-        if(child != NULL)
-        {
-          addChild(child);
-        }
-      }
-
-      Node::Node(Type type, string data, Node *child1, Node *child2) :
-        type(type), data(data)
-      {
-        if(child1 != NULL)
-        {
-          addChild(child1);
-        }
-        if(child2 != NULL)
-        {
-          addChild(child2);
-        }
-      }
-
-      Visitor::Visitor()
-      {
-        in_marking_list=false;
-        in_arc_list=false;
-      }
-
-      Parser::Parser() :
-        parser::Parser<Node>(node, petrify::parse)
-      {
-      }
-
-      void Visitor::beforeChildren(const Node & node)
-      {
-        // erzeuge result_ aus Knoten hier ...
-        switch(node.type)
-        {
-        case Node::TLIST:
-          {
-            if(in_arc_list)
-            {
-              tempNodeSet.insert(node.data);
-              result_->transitions.insert(node.data);
-            } else
-            {
-              result_->interface.insert(node.data);
-            }
-            break;
-          }
-        case Node::PLIST:
-          {
-            result_->places.insert(node.data);
-            if (in_marking_list)
-              result_->initialMarked.insert(node.data);
-            else
-              tempNodeSet.insert(node.data);
-            break;
-          }
-        case Node::PT:
-        case Node::TP:
-          {
-            tempNodeStack.push(tempNodeSet);
-            tempNodeSet.clear();
-            break;
-          }
-        case Node::CTRL1:
-          {
-            in_arc_list = true;
-            break;
-          }
-        case Node::CTRL2:
-          {
-            in_marking_list = true;
-            break;
-          }
-        default: break;
-
-        }
-      }
-
-      void Visitor::afterChildren(const Node & node)
-      {
-        // ... und hier
-        switch(node.type)
-        {
-        case Node::PT:
-        case Node::TP:
-        {
-          result_->arcs[node.data] = tempNodeSet;
-          tempNodeSet.clear();
-          if(tempNodeStack.size() > 0)
-          {
-            tempNodeSet = tempNodeStack.top();
-            tempNodeStack.pop();
-          }
-        }
-        default: break;
-        }
-      }
-
-    }
 
 
     namespace onwd
@@ -798,9 +657,9 @@ namespace pnapi
 	switch (node.type)
 	  {
 	  case INSTANCES:
-	    for (map<string, PetriNet *>::iterator it = nets_.begin(); 
+	    for (map<string, PetriNet *>::iterator it = nets_.begin();
 		 it != nets_.end(); ++it)
-	      node.check(instances_.find(it->first) != instances_.end(), 
+	      node.check(instances_.find(it->first) != instances_.end(),
 			 it->first, "Petri net not declared as instance");
 	    break;
 
@@ -808,23 +667,23 @@ namespace pnapi
 	  case ALL_WIRING:
 	    {
 	      assert(places_.size() == 2);
-	      vector<PlaceDescription> p1s = 
+	      vector<PlaceDescription> p1s =
 		places_.front(); places_.pop_front();
-	      vector<PlaceDescription> p2s = 
+	      vector<PlaceDescription> p2s =
 		places_.front(); places_.pop_front();
-	      for (vector<PlaceDescription>::iterator p1i = 
+	      for (vector<PlaceDescription>::iterator p1i =
 		     p1s.begin(); p1i != p1s.end(); ++p1i)
-		for (vector<PlaceDescription>::iterator p2i = 
+		for (vector<PlaceDescription>::iterator p2i =
 		       p2s.begin(); p2i != p2s.end(); ++p2i)
 		  {
-		    pair<Place *, bool> p1 = 
+		    pair<Place *, bool> p1 =
 		      getPlace(node, *p1i, Place::OUTPUT);
-		    pair<Place *, bool> p2 = 
+		    pair<Place *, bool> p2 =
 		      getPlace(node, *p2i, Place::INPUT);
-		    LinkNode * n1 = 
-		      getLinkNode(*p1.first, getLinkNodeMode(node.type), 
+		    LinkNode * n1 =
+		      getLinkNode(*p1.first, getLinkNodeMode(node.type),
 				  !p1.second);
-		    LinkNode * n2 = 
+		    LinkNode * n2 =
 		      getLinkNode(*p2.first, getLinkNodeMode(node.type),
 				  !p2.second);
 		    n1->addLink(*n2);
@@ -838,8 +697,8 @@ namespace pnapi
 	  }
       }
 
-      pair<Place *, bool> Visitor::getPlace(const Node & node, 
-					    PlaceDescription & pd, 
+      pair<Place *, bool> Visitor::getPlace(const Node & node,
+					    PlaceDescription & pd,
 					    Place::Type type)
       {
 	bool isNetGiven = nets_.find(pd.netName) != nets_.end();
@@ -850,14 +709,14 @@ namespace pnapi
 	    p = &pd.instance->createPlace(pd.placeName, type);
 	    pd.instance->finalCondition().addProposition(*p == 0);
 	  }
-	node.check(p != NULL && p->getType() == type, 
-		   pd.netName + "." + pd.placeName, 
-		   (string)(type == Place::INPUT ? "input" : "output") + 
+	node.check(p != NULL && p->getType() == type,
+		   pd.netName + "." + pd.placeName,
+		   (string)(type == Place::INPUT ? "input" : "output") +
 		   (string)" place expected");
 	return pair<Place *, bool>(p, createPlace);
       }
 
-      LinkNode * Visitor::getLinkNode(Place & p, LinkNode::Mode mode, 
+      LinkNode * Visitor::getLinkNode(Place & p, LinkNode::Mode mode,
 				      bool internalize)
       {
 	map<Place *, LinkNode *>::iterator it = wiring_.find(&p);

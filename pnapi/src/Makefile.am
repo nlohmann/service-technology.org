@@ -14,7 +14,7 @@ libpnapi_la_SOURCES = \
 	formula.h formula.cc \
 	condition.h condition.cc \
 	petrinet-reduction.cc \
-	petrinet-petrify.cc \
+	petrinet-petrify.h petrinet-petrify.cc \
 	automaton.h automaton.cc\
 	state.h state.cc \
 	marking.h marking.cc \

@@ -6,30 +6,26 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
-#include <fstream>
-#include <map>
 #include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "automaton.h"
 #include "petrinet.h"
-#include "parser.h"
+#include "petrinet-petrify.h"
 #include "config.h"         // needed to use petrify
 
-using std::map;
-using std::set;
-using std::string;
 using std::cerr;
 using std::endl;
-using std::ofstream;
-using std::ifstream;
 using std::istringstream;
 using std::pair;
+using std::set;
+using std::string;
 using std::vector;
 
+
 using namespace pnapi;
-using pnapi::parser::petrify::PetrifyResult;
 
 
 /*!
@@ -96,22 +92,12 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
     assert(result == 0);
   }
 
-
   // parse generated file
-
-  parser::petrify::Parser parser;
-  parser::petrify::Visitor visitor;
-  ifstream is;
-  is.open(pnFileName.c_str(), ifstream::in);
-  parser.parse(is).visit(visitor);
-  is.close();
-  PetrifyResult result = visitor.getPetrifyResult();
-
-  set<string> pnapi_petrify_transitions = result.transitions;
-  set<string> pnapi_petrify_places = result.places;
-  set<string> pnapi_petrify_initialMarked = result.initialMarked;
-  set<string> pnapi_petrify_interface = result.interface;
-  map<string, set<string> > pnapi_petrify_arcs = result.arcs;
+  pnapi_petrify_yyin = fopen(pnFileName.c_str(), "r");
+  if (pnapi_petrify_yyin == NULL)
+    return; // TODO: error!!!
+  pnapi_petrify_yyparse();
+  fclose(pnapi_petrify_yyin);
 
 
   /* ---------------------------

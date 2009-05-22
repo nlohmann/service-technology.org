@@ -102,18 +102,17 @@ AT_KEYWORDS(reduction)
 AT_CLEANUP
 
 AT_SETUP([Removal of serial transitions (keep normal)])
-AT_XFAIL_IF(true)
 m4_define([NET], [test_series_transitions_keepnormal.net.owfn])
 m4_define([RED], [series_transitions])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 6" stderr])
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 1  |P_out|= 1  |T|= 2  |F|= 6" stderr])
 AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
 AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 1  |F|= 4" stderr])
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 1  |P_out|= 1  |T|= 1  |F|= 4" stderr])
 AT_CHECK([PETRI NET --reduce=RED,keep_normal --output=owfn],0,ignore,ignore)
 AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 6" stderr])
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 1  |P_out|= 1  |T|= 2  |F|= 6" stderr])
 AT_KEYWORDS(reduction)
 AT_CLEANUP
 

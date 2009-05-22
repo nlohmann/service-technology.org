@@ -4,13 +4,11 @@ SUBDIRS = src utils doc man maintainer tests
 # remove everything that can be rebuilt
 ##############################################################################
 svn-clean: maintainer-clean
-	-rm -f aclocal.m4 COPYING INSTALL depcomp configure Makefile.in \
-	  missing ylwrap install-sh config.guess config.sub \
-	  src/readnet-syntax.h src/Makefile.in src/config.H.in \
-	  tests/Makefile.in doc/mdate-sh doc/Makefile.in src/.deps \
-	  src/config.H.in~ maintainer/Makefile.in utils/Makefile.in \
-	  utils/graph_syntax.h man/Makefile.in compile
-	-rm -fr doc/doxygen doc/Doxyfile
+	rm -fr configure Makefile.in depcomp compile config.guess config.sub \
+	  INSTALL missing aclocal.m4 install-sh ylwrap utils/Makefile.in \
+	  tests/Makefile.in doc/Makefile.in doc/mdate-sh src/Makefile.in \
+	  src/config.h.in src/readnet-syntax.h maintainer/Makefile.in \
+	  man/Makefile.in
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  autoreconf -i"

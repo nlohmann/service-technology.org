@@ -1,6 +1,10 @@
-@heading Version 1.12-unreleased
+@heading Version 1.12
 @itemize
 @item addressed bug #13538 (@url{https://gna.org/bugs/?13538}): @samp{make install} installs @i{all} binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx} that are present in the @file{src} folder. Likewise, @samp{make uninstall} removes all installed binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx}
+
+@item adjusted the parser to cope with different line endings (CR, LF, CRLF)
+
+@item licensed LoLA under the @acronym{GNU} Affero General Public License (Affero @acronym{GPL}), see file @file{COPYING}
 @end itemize
 
 @heading Version 1.11
@@ -11,7 +15,7 @@
 
 @item completed documentation
 
-@item adapted code to avoid deprecation warnings of GCC 4.2
+@item adapted code to avoid deprecation warnings of @acronym{GCC} 4.2
 
 @item updated @option{-h} output
 
@@ -137,5 +141,5 @@
 @heading Version 1.00
 @itemize
 @item code of a version of Karsten Wolf that has not been officially released; this version is not a completely tested version and is only intended for internal purposes
-@item minor adjustments (only affecting the frontend) to use the GNU Autotools
+@item minor adjustments (only affecting the frontend) to use the @acronym{GNU} Autotools
 @end itemize

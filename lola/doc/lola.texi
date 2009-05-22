@@ -2003,7 +2003,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 
 @smallexample
 ==================
-All 8 tests passed
+All 9 tests passed
 ==================
 @end smallexample
 

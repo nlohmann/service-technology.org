@@ -5,8 +5,7 @@ TESTS = test_construction   \
 	test_input          \
 	test_normalize      \
 	test_markings       \
-	test_produce        \
-	test_criteria
+	test_produce
 
 check_PROGRAMS = $(TESTS)
 
@@ -18,15 +17,11 @@ test_input_SOURCES          = test_input.cc
 test_normalize_SOURCES      = test_normalize.cc
 test_markings_SOURCES	    = test_markings.cc
 test_produce_SOURCES	    = test_produce.cc
-test_criteria_SOURCES     = test_criteria.cc
 
 EXTRA_DIST = $(TESTS) \
 	test_input.net.owfn \
 	test_produce.onlineshop.owfn \
-	test_produce.onlineshop.constraint.owfn \
-	test_criteria.workflownet.owfn test_criteria.noworkflownet.owfn \
-	test_criteria.freechoice.owfn test_criteria.nofreechoice.owfn
-
+	test_produce.onlineshop.constraint.owfn
 
 
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src

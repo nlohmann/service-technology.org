@@ -1,7 +1,6 @@
 args "--unamed-opts=FILE --include-getopt --show-required --no-handle-error"
 
 package "petri"
-version "1.0"
 purpose "A command-line frontend for the Petri Net API"
 
 

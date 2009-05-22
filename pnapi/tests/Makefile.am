@@ -31,7 +31,12 @@ EXTRA_DIST = testsuite.at \
              testfiles/test_starke_6.net.owfn \
              testfiles/test_starke_7.net.owfn \
              testfiles/test_starke_8.net.owfn \
-             testfiles/test_starke_9.net.owfn
+             testfiles/test_starke_9.net.owfn \
+             testfiles/test_criteria.noworkflownet.owfn \
+             testfiles/test_criteria.workflownet.owfn \
+             testfiles/test_criteria.nofreechoice.owfn \
+             testfiles/test_criteria.freechoice.owfn
+
 
 check-local: atconfig $(TESTSUITE)
 	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)

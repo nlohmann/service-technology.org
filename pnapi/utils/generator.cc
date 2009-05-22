@@ -181,10 +181,10 @@ int main(int argc, char** argv) {
             ofstream fout(filename.c_str());
             fout << io::owfn << PN;
             fout.close();
-            cerr << "wrote oWFN '" << filename << "':\t" << PN << endl;
+            cerr << "wrote oWFN '" << filename << "':\t" << io::stat << PN << endl;
         }
             
     } while (filecount <= nets);
     
-    return 1;
+    return 0;
 }

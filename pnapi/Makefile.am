@@ -25,3 +25,5 @@ svn-clean: maintainer-clean
 	@echo "  autoreconf -i"
 	@echo
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = pnapi.pc

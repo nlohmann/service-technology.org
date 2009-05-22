@@ -1,4 +1,4 @@
-AC_INIT(Petri Net API, 2.00-unreleased, pnapi@service-technology.org, pnapi)
+AC_INIT(Petri Net API, 2.00, pnapi@service-technology.org, pnapi)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -17,6 +17,7 @@ AC_PROG_GREP
 AM_PROG_CC_C_O
 
 # check if we can handle dynamic libs
+AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -30,6 +31,10 @@ AC_CHECK_FUNCS([popen pclose])
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
 #############################################################################
 # search for Flex and Bison
@@ -140,12 +145,13 @@ AC_SUBST(configured_LDFLAGS)
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
 AC_CONFIG_FILES([Makefile
+                 pnapi.pc
                  doc/Doxyfile
                  src/Makefile
                  tests/Makefile
-		 tests/petrinet/Makefile
-		 tests/automaton/Makefile
-		 tests/reduction/Makefile
-		 utils/Makefile])
+                 tests/package.m4
+                 tests/petrinet/Makefile
+                 tests/automaton/Makefile
+                 utils/Makefile])
 AC_OUTPUT
 

@@ -33,7 +33,7 @@ class StoredKnowledge {
     public: /* static functions */
 
         /// generate the successor of a knowledge bubble given a label
-        static void process(const Knowledge* const, StoredKnowledge*, Label_ID);
+        static void process(const Knowledge* const, StoredKnowledge*, const Label_ID&);
 
         /// recursively calculate knowledge bubbles
         static void processRecursively(const Knowledge* const, StoredKnowledge*);
@@ -116,7 +116,7 @@ class StoredKnowledge {
     private: /* member functions */
 
         /// adds a successor knowledge
-        void addSuccessor(Label_ID, StoredKnowledge* const);
+        void addSuccessor(const Label_ID&, StoredKnowledge* const);
 
         /// return whether this node fulfills its annotation
         bool sat() const;

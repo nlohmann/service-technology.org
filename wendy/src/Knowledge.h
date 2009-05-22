@@ -35,10 +35,16 @@ class Knowledge {
         Knowledge(InnerMarking_ID);
 
         /// construct knowledge from a given knowledge and a label
-        Knowledge(const Knowledge* const, Label_ID);
+        Knowledge(const Knowledge* const, const Label_ID&);
 
         /// destructor
         ~Knowledge();
+
+        /// whether the knowledge contains a waitstate resolvable by l
+        bool resolvableWaitstate(const Label_ID&) const;
+
+        /// whether the knowledge's waitstates can be resolved by receiving
+        bool receivingHelps() const;
 
     public: /* attributes */
 
@@ -54,7 +60,7 @@ class Knowledge {
     private: /* member functions */
 
         /// calculate the closure of this knowledge
-        void closure(std::queue<FullMarking> &);
+        void closure(std::queue<FullMarking>&);
 };
 
 #endif

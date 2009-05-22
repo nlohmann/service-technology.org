@@ -21,6 +21,7 @@
 #include <cassert>
 #include <set>
 #include <string>
+#include <iostream>
 #include "config.h"
 #include "Knowledge.h"
 #include "Label.h"
@@ -49,7 +50,7 @@ Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1) {
 /*!
  \note no action in this constructor can introduce a duplicate
 */
-Knowledge::Knowledge(const Knowledge* const parent, Label_ID label) : is_sane(1), size(0) {
+Knowledge::Knowledge(const Knowledge* const parent, const Label_ID &label) : is_sane(1), size(0) {
     // tau does not make sense here
     assert(not SILENT(label));
 
@@ -240,4 +241,65 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
     }
 
     /* sort bubble! */
+}
+
+
+/*!
+ \return whether the knowledge contains a waitstate that can be resolved by
+         label l (synchronous or send)
+*/
+bool Knowledge::resolvableWaitstate(const Label_ID &l) const {
+    assert (not RECEIVING(l));
+
+    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+        if (InnerMarking::inner_markings[pos->first]->waitstate(l)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/*!
+ \return whether each waitstate in the knowledge marks and output place, i.e.
+         receiving these messages is sufficient and no sending is required
+*/
+bool Knowledge::receivingHelps() const {
+    // traverse the inner markings
+    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+
+        // only consider non-final waitstates
+        if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
+
+            // traverse the interface markings
+            for (size_t i = 0; i < pos->second.size(); ++i) {
+
+                // check if waitstate is resolved by interface marking
+                bool resolved = false;
+                for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+                    if (pos->second[i]->marked(l) and
+                        InnerMarking::receivers[l].find(pos->first) != InnerMarking::receivers[l].end()) {
+                        resolved = true;
+                        break;
+                    }
+                }
+                if (resolved) {
+                    continue;
+                }
+
+                // check if waitstate marks an output place
+                bool marked = false;
+                for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+                    if (pos->second[i]->marked(l)) {
+                        marked = true;
+                    }
+                }
+                if (not marked) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }

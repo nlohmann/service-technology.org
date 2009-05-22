@@ -38,7 +38,7 @@ class FullMarking {
         FullMarking(InnerMarking_ID, InterfaceMarking);
 
         /// comparison operator
-        bool operator< (const FullMarking &other) const;
+        bool operator< (const FullMarking&) const;
 
     public: /* member attributes */
 

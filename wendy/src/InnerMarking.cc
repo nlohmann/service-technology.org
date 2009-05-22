@@ -201,3 +201,20 @@ inline void InnerMarking::determineType() {
         is_waitstate = 1;
     }
 }
+
+
+bool InnerMarking::waitstate(const Label_ID &l) const {
+    assert(not RECEIVING(l));
+
+    if (not is_waitstate) {
+        return false;
+    }
+
+    for (uint8_t i = 0; i < out_degree; ++i) {
+        if (labels[i] == l) {
+            return true;
+        }
+    }
+
+    return false;
+}

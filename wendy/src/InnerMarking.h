@@ -85,10 +85,13 @@ class InnerMarking {
     public: /* member functions */
 
         /// constructor
-        InnerMarking(const std::vector<Label_ID> &, const std::vector<InnerMarking_ID> &, bool);
+        InnerMarking(const std::vector<Label_ID>&, const std::vector<InnerMarking_ID>&, bool);
 
         /// destructor
         ~InnerMarking();
+
+        // whether this marking is a waitstate resolveable by the given label
+        bool waitstate(const Label_ID&) const;
 
     private: /* member functions */
 

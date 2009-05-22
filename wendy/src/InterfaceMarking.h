@@ -80,39 +80,39 @@ class InterfaceMarking {
         InterfaceMarking();
 
         /// copy constructor
-        InterfaceMarking(const InterfaceMarking &);
+        InterfaceMarking(const InterfaceMarking&);
 
         /// copy constructor with effect on given label
-        InterfaceMarking(const InterfaceMarking &, Label_ID, bool, bool&);
+        InterfaceMarking(const InterfaceMarking&, const Label_ID&, const bool&, bool&);
 
         /// destructor
         ~InterfaceMarking();
 
 
         /// comparison operator
-        bool operator< (const InterfaceMarking &other) const;
+        bool operator< (const InterfaceMarking&) const;
 
         /// comparison operator
-        bool operator== (const InterfaceMarking &other) const;
+        bool operator== (const InterfaceMarking&) const;
 
         /// comparison operator
-        bool operator!= (const InterfaceMarking &other) const;
+        bool operator!= (const InterfaceMarking&) const;
 
         /// stream output operator
         friend std::ostream& operator<< (std::ostream&, const InterfaceMarking&);
 
 
         /// increments the value at the given label
-        bool inc(Label_ID);
+        bool inc(const Label_ID&);
 
         /// decrements the value at the given label
-        bool dec(Label_ID);
+        bool dec(const Label_ID&);
 
         /// returns whether the whole interface is unmarked
         bool unmarked() const;
 
         /// returns whether the interface is markedat the given label
-        bool marked(Label_ID) const;
+        bool marked(const Label_ID&) const;
 
         /// returns the hash value of this marking
         hash_t hash() const;
@@ -120,7 +120,7 @@ class InterfaceMarking {
     private: /* member attributes */
 
         /// returns the marking value for the given label
-        uint8_t get(Label_ID) const;
+        uint8_t get(const Label_ID&) const;
 
         /// a byte array to store the interface markings
         uint8_t *storage;

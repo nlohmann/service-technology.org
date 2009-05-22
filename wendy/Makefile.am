@@ -6,9 +6,7 @@ SUBDIRS = src man doc maintainer tests
 endif
 
 svn-clean: maintainer-clean
-	rm -fr INSTALL Makefile.in aclocal.m4 compile configure \
-	       depcomp install-sh missing ylwrap config.guess config.sub
-	rm -fr src/config.h.in~ src/Makefile.in libs/Makefile.in src/config.h.in
-	rm -fr man/Makefile.in maintainer/Makefile.in
-	rm -fr doc/doxygen doc/Makefile.in doc/mdate-sh
-	rm -fr tests/Makefile.in
+	rm -fr configure Makefile.in depcomp compile config.guess config.sub \
+               INSTALL missing aclocal.m4 install-sh ylwrap tests/Makefile.in \
+               doc/Makefile.in doc/mdate-sh src/Makefile.in src/config.h.in \
+               maintainer/Makefile.in libs/Makefile.in man/Makefile.in

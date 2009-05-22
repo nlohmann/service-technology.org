@@ -8,10 +8,10 @@ section "Fiona Compatibility"
 sectiondesc = "Wendy implements a subset of Fiona's functionality. These parameters were introduced to ease the transition from Fiona to Wendy. For instance, instead of calling 'fiona net.owfn -t og', you can call 'wendy net.owfn -t og'.\n"
 
 option "type" t
-  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og'."
+  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og' and '-t ig' is equivalent to '--waitstatesOnly'."
   string
   typestr="TYPE"
-  values="og","OG" enum
+  values="og","OG","ig","IG" enum
   optional
   hidden
 
@@ -32,6 +32,7 @@ option "fionaFormat" -
 
 
 section "Output"
+sectiondesc="When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines.\n"
 
 option "og" -
   "Operating guidelines output. If no filename is given, the input filename's suffix is replaced by '.og'."
@@ -90,6 +91,14 @@ section "Toggle optimizations"
 
 option "noDeadlockDetection" -
   "Do not detect inevitable deadlocks during preprocessing."
+  flag off
+
+option "waitstatesOnly" -
+  "Only consider waitstates when calculating successors (does not preserve all strategies, but will return a strategy if one exists)."
+  flag off
+
+option "receiveBeforeSend" -
+  "Only send if receiving does not resolve all waitstates (does not preserve all strategies, but will return a strategy if one exists)."
   flag off
 
 

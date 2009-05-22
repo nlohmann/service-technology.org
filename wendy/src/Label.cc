@@ -116,7 +116,8 @@ void Label::initialize() {
 
     if (args_info.verbose_given) {
         for (unsigned int i = first_receive; i <= last_sync; ++i) {
-            fprintf(stderr, "%s: label with id %2d is '%s'\n", PACKAGE, i, id2name[i].c_str());
+            fprintf(stderr, "%s: label with id %2d is '%s%s'\n",
+                PACKAGE, i, PREFIX(i), id2name[i].c_str());
         }
 
         fprintf(stderr, "%s: initialized labels for %d events (%d asynchronous, %d synchronous)\n",

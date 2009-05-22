@@ -121,10 +121,16 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // evaluate Fiona's '--type/-t' parameter
-    if (args_info.type_given and
-        (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG)) {
-        args_info.og_given = 1;
-        args_info.fionaFormat_given = 1;
+    if (args_info.type_given) {
+        if (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG) {
+            args_info.og_given = 1;
+            args_info.fionaFormat_given = 1;
+        }
+        if (args_info.type_arg == type_arg_ig or args_info.type_arg == type_arg_IG) {
+            args_info.og_given = 1;
+            args_info.waitstatesOnly_given = 1;
+            args_info.fionaFormat_given = 1;
+        }
     }
 
     // evaluate Fiona's '--show/-s' parameter
@@ -181,7 +187,6 @@ int main(int argc, char** argv) {
                 abort(1, "could not open file '%s'", args_info.inputs[0]);
             }
             inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
-            inputStream.close();
         }
         if (args_info.verbose_given) {
             std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
@@ -208,8 +213,10 @@ int main(int argc, char** argv) {
     /*--------------------------------------------.
     | 3. write inner of the open net to LoLA file |
     `--------------------------------------------*/
-    std::ofstream lolaFile;
-    lolaFile.open("tmp.lola", std::ofstream::out | std::ofstream::trunc);
+    std::ofstream lolaFile("tmp.lola", std::ofstream::out | std::ofstream::trunc);
+    if (!lolaFile) {
+        abort(11, "could not write to file 'tmp.lola'");
+    }
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
 
@@ -315,6 +322,9 @@ int main(int argc, char** argv) {
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        if (!og_file) {
+            abort(11, "could not write to file '%s'", og_filename.c_str());
+        }
         if (args_info.fionaFormat_given) {
             StoredKnowledge::output_old(og_file);
         } else {
@@ -330,6 +340,9 @@ int main(int argc, char** argv) {
     if (args_info.dot_given) {
         string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
         std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        if (!dot_file) {
+            abort(11, "could not write to file '%s'", dot_filename.c_str());
+        }
         StoredKnowledge::dot(dot_file);
         if (args_info.verbose_given) {
             fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());

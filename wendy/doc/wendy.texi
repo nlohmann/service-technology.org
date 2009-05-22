@@ -305,6 +305,15 @@ wendy: 2-bit annotations must not be used with
 @end cartouche
 @end smallexample
 
+@item #11
+Error opening a file to write. Usually, this error occurs in case Wendy is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola}.
+
+@smallexample
+@cartouche
+wendy: could not write to file `foo.og' -- aborting [#11]
+@end cartouche
+@end smallexample
+
 @end table
 
 

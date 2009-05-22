@@ -32,15 +32,15 @@
 
 /*! \def SENDING(L)
     \brief shorthand notation to find out whether a label belongs to a send action */
-#define SENDING(L) (L >= Label::first_send && L <= Label::last_send)
+#define SENDING(L) (L >= Label::first_send and L <= Label::last_send)
 
 /*! \def RECEIVING(L)
     \brief shorthand notation to find out whether a label belongs to a receive action */
-#define RECEIVING(L) (L >= Label::first_receive && L <= Label::last_receive)
+#define RECEIVING(L) (L >= Label::first_receive and L <= Label::last_receive)
 
 /*! \def SYNC(L)
     \brief shorthand notation to find out whether a label belongs to a synchronous action */
-#define SYNC(L) (L >= Label::first_sync && L <= Label::last_sync)
+#define SYNC(L) (L >= Label::first_sync and L <= Label::last_sync)
 
 /*! \def PREFIX(L)
     \brief the prefix of the given label, depending on the communication type */

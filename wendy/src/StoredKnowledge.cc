@@ -65,8 +65,7 @@ std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(const Knowledge* const K,
-                                     StoredKnowledge *SK, Label_ID l) {
+inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, const Label_ID &l) {
     Knowledge *K_new = new Knowledge(K, l);
 
     // process the empty node in a special way
@@ -123,6 +122,22 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+
+        // reduction rule: receive before send
+        if (args_info.receiveBeforeSend_given) {
+            // check if we're done receiving and each deadlock was resolved
+            if (l > Label::last_receive and K->receivingHelps()) {
+                return;
+            }
+        }
+
+        // reduction rule: only consider waitstates
+        if (args_info.waitstatesOnly_given) {
+            if (not RECEIVING(l) and not K->resolvableWaitstate(l)) {
+                continue;
+            }
+        }
+
         process(K, SK, l);
     }
 }
@@ -425,7 +440,12 @@ void StoredKnowledge::print(std::ofstream &file) const {
 void StoredKnowledge::output(std::ofstream &file) {
     file << "{\n  generator:    " << PACKAGE_STRING
          << " (" << CONFIG_BUILDSYSTEM ")"
-         << "\n  invocation:   " << invocation << "\n}\n\n";
+         << "\n  invocation:   " << invocation << "\n  events:       "
+         << static_cast<unsigned int>(Label::send_events) << " send, "
+         << static_cast<unsigned int>(Label::receive_events) << " receive, "
+         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
+         << "\n  statistics:   " << seen.size() << " nodes"
+         << "\n}\n\n";
 
     file << "INTERFACE\n";
 
@@ -508,7 +528,12 @@ void StoredKnowledge::output(std::ofstream &file) {
 void StoredKnowledge::output_old(std::ofstream &file) {
     file << "{\n  generator:    " << PACKAGE_STRING
          << " (" << CONFIG_BUILDSYSTEM ")"
-         << "\n  invocation:   " << invocation << "\n}\n\n";
+         << "\n  invocation:   " << invocation << "\n  events:       "
+         << static_cast<unsigned int>(Label::send_events) << " send, "
+         << static_cast<unsigned int>(Label::receive_events) << " receive, "
+         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
+         << "\n  statistics:   " << seen.size() << " nodes"
+         << "\n}\n\n";
 
     file << "INTERFACE\n";
     file << "  INPUT\n";
@@ -751,7 +776,7 @@ StoredKnowledge *StoredKnowledge::store() {
 }
 
 
-void StoredKnowledge::addSuccessor(Label_ID label, StoredKnowledge* const knowledge) {
+void StoredKnowledge::addSuccessor(const Label_ID &label, StoredKnowledge* const knowledge) {
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
 

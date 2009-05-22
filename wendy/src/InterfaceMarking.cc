@@ -132,7 +132,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
                           (message bound violation) or decrement (no message
                           present) 
  */
-InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, Label_ID label, bool increase, bool &success) {
+InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, const Label_ID &label, const bool &increase, bool &success) {
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -219,7 +219,7 @@ std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
  * MEMBER METHODS *
  ******************/
 
-uint8_t InterfaceMarking::get(Label_ID label) const {
+uint8_t InterfaceMarking::get(const Label_ID &label) const {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -241,7 +241,7 @@ uint8_t InterfaceMarking::get(Label_ID label) const {
 /*!
  \return whether the message bound was respected (false means violation)
  */
-bool InterfaceMarking::inc(Label_ID label) {
+bool InterfaceMarking::inc(const Label_ID &label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -277,7 +277,7 @@ bool InterfaceMarking::inc(Label_ID label) {
 /*!
  \return whether the result is positive (false means decrement of 0)
  */
-bool InterfaceMarking::dec(Label_ID label) {
+bool InterfaceMarking::dec(const Label_ID &label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -326,7 +326,7 @@ bool InterfaceMarking::unmarked() const {
 /*
  \return whether the interface is marked at the given label
 */
-bool InterfaceMarking::marked(Label_ID label) const {
+bool InterfaceMarking::marked(const Label_ID &label) const {
     assert(label > 0);
     assert(label <= interface_length);
 

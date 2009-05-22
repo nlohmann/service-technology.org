@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 1.2, wendy@service-technology.org)
+AC_INIT(Wendy, 1.3, wendy@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -14,6 +14,7 @@ AC_PROG_SED
 AC_PROG_GREP
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+AM_MISSING_PROG(PKG_CONFIG, pkg-config)
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)

@@ -749,6 +749,76 @@ namespace pnapi
 
     } /* namespace onwd */
 
+
+    namespace sa
+    {
+      Node *node;
+
+      Parser::Parser() :
+        parser::Parser<Node>(node, sa::parse)
+      {
+      }
+
+      Node::Node() :
+        BaseNode(), type_(NO_DATA), number_(0)
+      {
+      }
+
+      Node::Node(Node *node) :
+        BaseNode(node), type_(NO_DATA), number_(0)
+      {
+      }
+
+      Node::Node(Node *node1, Node *node2, Node *node3) :
+        BaseNode(node1, node2, node3), type_(NO_DATA), number_(0)
+      {
+      }
+
+      Node::Node(int number) :
+        BaseNode(), type_(NUM), number_(number)
+      {
+      }
+
+      Node::Node(std::string ident) :
+        BaseNode(), type_(ID), number_(0), identifier_(ident)
+      {
+      }
+
+      Node::Node(Type type) :
+        BaseNode(), type_(type), number_(0)
+      {
+      }
+
+      Node::Node(Type type, Node *node1, Node *node2) :
+        BaseNode(node1, node2), type_(type), number_(0)
+      {
+      }
+
+      Node::Node(Type type, Node *node1, Node *node2, Node *node3) :
+        BaseNode(node1, node2, node3), type_(type), number_(0)
+      {
+      }
+
+      Visitor::Visitor()
+      {
+        sa_ = new Automaton();
+      }
+
+      const Automaton & Visitor::getAutomaton() const
+      {
+        return *sa_;
+      }
+
+      void Visitor::beforeChildren(const Node &node)
+      {
+      }
+
+      void Visitor::afterChildren(const Node &node)
+      {
+      }
+
+    } /* namespace sa */
+
   } /* namespace parser */
 
 } /* namespace pnapi */

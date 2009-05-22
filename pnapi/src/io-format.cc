@@ -595,7 +595,7 @@ namespace pnapi
       {
 	os
 	  << "TRANSITION " << t.getName() << endl;
-	
+
 	if (t.getCost() != 0)
 	  os << "  COST " << t.getCost() << ";" << endl;
 
@@ -742,10 +742,10 @@ namespace pnapi
      ***** SA output
      *************************************************************************/
 
-    std::ostream & sa(std::ostream &os)
+    std::ios_base & sa(std::ios_base &base)
     {
-      util::FormatData::data(os) = util::SA;
-      return os;
+      util::FormatData::data(base) = util::SA;
+      return base;
     }
 
 
@@ -759,92 +759,47 @@ namespace pnapi
         os  << ";" << endl
             << "  OUTPUT ";
         output(os, sa.output());
-        os  << ";" << endl
-            << endl
+        os  << ";" << endl << endl
             << "NODES" << endl
             << "  ";
         output(os, sa.states_);
-        os  << ";" << endl
-            << endl
-            << "INITIALNODE" << endl
-            << "  ";
-        output(os, sa.initialStates());
-        os  << ";" << endl
-            << endl
-            << "FINALNODES" << endl
-            << "  ";
-        output(os, sa.finalStates());
-        os  << ";" << endl
-            << endl
-            << "TRANSITIONS" << endl
-            << "  ";
-        output (os, sa.edges_);
-        os  << ";" << endl;
 
         return os;
       }
 
       ostream & output(ostream &os, const State &s)
       {
-        os
-
-        << s.name();
-
-        return os;
-      }
-
-      ostream & output(ostream &os, const Edge &e)
-      {
-        output(os, e.source());
-        os  << " -> ";
-        output(os, e.destination());
-        os  << " : " << e.label();
+        os << s.name();
+        if (s.isInitial() || s.isFinal())
+        {
+          os << ": ";
+          if (s.isInitial() && s.isFinal())
+            os << "INITIAL, FINAL";
+          else
+            if (s.isInitial())
+              os << "INITIAL";
+            else
+              os << "FINAL";
+        }
+        os << endl;
+        output(os, s.postsetEdges());
+        os << endl;
 
         return os;
       }
 
       ostream & output(ostream &os, const std::vector<State *> &vs)
       {
-        if (!vs.empty())
-        {
-          output(os, *vs[0]);
-          for (unsigned int i = 1; i < vs.size(); i++)
-          {
-            os << ", ";
-            output(os, *vs[i]);
-          }
-        }
+        for (unsigned int i = 0; i < vs.size(); i++)
+          output(os, *vs[i]);
 
         return os;
       }
 
-      ostream & output(ostream &os, const std::vector<Edge *> &es)
+      ostream & output(ostream &os, const std::set<Edge *> &edges)
       {
-        if (!es.empty())
-        {
-          output(os, *es[0]);
-          for (unsigned int i = 1; i < es.size(); i++)
-          {
-            os << "," << endl << "  ";
-            output(os, *es[i]);
-          }
-        }
-
-        return os;
-      }
-
-      // FIXME: If any error, the mistake is here ...
-      ostream & output(ostream &os, const std::set<State *> &ss)
-      {
-        if (!ss.empty())
-        {
-          output(os, **ss.begin());
-          for (std::set<State *>::iterator s = ++ss.begin(); s != ss.end(); s++)
-          {
-            os << ", ";
-            output(os, **s);
-          }
-        }
+        for (std::set<Edge *>::iterator e = edges.begin(); e != edges.end(); e++)
+          os << "  " << (*e)->label() << " -> " << (*e)->destination().name() << endl;
 
         return os;
       }

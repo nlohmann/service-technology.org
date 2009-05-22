@@ -3,7 +3,6 @@
 
 #include <set>
 #include <string>
-#include "component.h"
 #include "io.h"
 
 
@@ -12,6 +11,7 @@ namespace pnapi
 
   /// forward declarations
   class Marking;
+  class Automaton;
 
 
   /*!
@@ -28,10 +28,10 @@ namespace pnapi
 
   public:
     /// standard constructor
-    State(unsigned int * = NULL, bool isFinal = false);
+    State(unsigned int * = NULL);
     /// standard constructor service automaton
     State(Marking &m, std::map<const Place *, unsigned int> *,
-        unsigned int * = NULL, bool isFinal = false);
+        unsigned int * = NULL);
     /// standard copy constructor
     State(const State &s);
     /// standard destructor
@@ -41,6 +41,8 @@ namespace pnapi
     void addPre(State &);
     /// adding a state to the postset
     void addPost(State &);
+    /// adding an edge to the postset edges
+    void addPostEdge(Edge &);
 
     /// method which returns the state's name
     const unsigned int name() const;
@@ -48,6 +50,8 @@ namespace pnapi
     const std::set<State *> preset() const;
     /// method which returns the state's postset
     const std::set<State *> postset() const;
+    /// method which returns the state's postset edges
+    const std::set<Edge *> postsetEdges() const;
 
     /// method which returns the state's final property
     bool isFinal() const;
@@ -75,6 +79,8 @@ namespace pnapi
     std::set<State *> preset_;
     /// the state's postset
     std::set<State *> postset_;
+    /// the state's postset edges
+    std::set<Edge *> postsetEdges_;
     /// the state's final property
     bool isFinal_;
     /// the state's initial property
@@ -101,12 +107,10 @@ namespace pnapi
    */
   class Edge
   {
-    friend std::ostream & io::__sa::output(std::ostream &, const Edge &);
-
   public:
     /// standard constructor
     Edge(State &source, State &destination, const std::string label = "",
-        const Node::Type type = Node::INTERNAL);
+        const Automaton::Type type = Automaton::TAU);
     /// standard destructor
     virtual ~Edge();
 
@@ -117,7 +121,7 @@ namespace pnapi
     /// method which returns the edge's destination state
     State &destination() const;
     /// method which returns the type according to the edge (sa)
-    Node::Type type() const;
+    Automaton::Type type() const;
 
   private:
     /// edge's label
@@ -127,7 +131,7 @@ namespace pnapi
     /// edge's destination state
     State &destination_;
     /// edge's type
-    Node::Type type_;
+    Automaton::Type type_;
 
   };
 

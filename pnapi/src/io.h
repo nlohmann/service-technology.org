@@ -166,6 +166,9 @@ namespace pnapi
     /// %Automaton output
     std::ostream & operator<<(std::ostream &, const Automaton &);
 
+    /// %Automaton input
+    std::istream & operator>>(std::istream &, Automaton &);
+
     //@}
 
 
@@ -191,7 +194,7 @@ namespace pnapi
     std::ostream & dot(std::ostream &);
 
     /// Service Automaton (SA) file format
-    std::ostream & sa(std::ostream &);
+    std::ios_base & sa(std::ios_base &);
 
     /// LOLA file format
     std::ios_base & lola(std::ios_base &);
@@ -335,11 +338,9 @@ namespace pnapi
     {
       std::ostream & output(std::ostream &, const Automaton &);
       std::ostream & output(std::ostream &, const State &);
-      std::ostream & output(std::ostream &, const Edge &);
 
       std::ostream & output(std::ostream &, const std::vector<State *> &);
-      std::ostream & output(std::ostream &, const std::vector<Edge *> &);
-      std::ostream & output(std::ostream &, const std::set<State *> &);
+      std::ostream & output(std::ostream &, const std::set<Edge *> &);
       std::ostream & output(std::ostream &, const std::set<std::string> &);
     }
 

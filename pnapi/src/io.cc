@@ -96,7 +96,7 @@ namespace pnapi
 
 
     /*!
-     * Stream the Automaton object to a given output stream using the stream
+     * Streams the Automaton object to a given output stream using the stream
      * format (see pnapi::io).
      */
     std::ostream & operator<<(std::ostream &os, const Automaton &sa)
@@ -108,6 +108,28 @@ namespace pnapi
       }
 
       return os;
+    }
+
+
+    /*!
+     * Reads an Automaton file and creates an object from it.
+     */
+    std::istream & operator>>(std::istream &is, Automaton &sa)
+    {
+      switch (util::FormatData::data(is))
+      {
+      case util::SA:
+      {
+        parser::sa::Parser parser;
+        parser::sa::Visitor visitor;
+        parser.parse(is).visit(visitor);
+        sa = visitor.getAutomaton();
+        break;
+      }
+      default: assert(false); /* unsupported format */
+      }
+
+      return is;
     }
 
 

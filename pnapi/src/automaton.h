@@ -4,7 +4,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "component.h"
 #include "io.h"
 
 
@@ -21,6 +20,7 @@ namespace pnapi
     friend std::ostream & io::__sa::output(std::ostream &, const Automaton &);
 
   public:
+    enum Type { INPUT, OUTPUT, TAU };
     /// standard constructor
     Automaton();
     /// constructor generating automaton from Petri net
@@ -35,14 +35,12 @@ namespace pnapi
     /// creating a state from given marking
     State & createState(Marking &);
     /// finding a state by name
-    State * findState(const std::string) const;
+    State * findState(const unsigned int) const;
 
     /// creating an edge from state 1 to state 2
     Edge & createEdge(State &, State &);
-    /// creating an edge with label
-    Edge & createEdge(State &, State &, const std::string);
-    /// creating an edge with label and transition's type
-    Edge & createEdge(State &, State &, const std::string, Node::Type);
+    /// creating an edge with label and type
+    Edge & createEdge(State &, State &, const std::string, Type = TAU);
 
     /// creates a state machine from automaton
     PetriNet & stateMachine() const;
@@ -70,7 +68,7 @@ namespace pnapi
     /// mapping from transitions to strings (their label) [optional]
     std::map<Transition *, std::string> *edgeLabels_;
     /// mapping from transitions to their types (optional)
-    std::map<Transition *, Node::Type> *edgeTypes_;
+    std::map<Transition *, Type> *edgeTypes_;
     /// mapping from places to their weight (optional)
     std::map<const Place *, unsigned int> *weights_;
 

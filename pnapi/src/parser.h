@@ -505,7 +505,7 @@ namespace pnapi
      ***** SA Parser
      *************************************************************************/
 
-    namespace sa
+    /*namespace sa
     {
 
       // forward declaration
@@ -527,18 +527,18 @@ namespace pnapi
       {
       public:
         Parser();
-      };
+      };*/
 
       /* Node Types */
-      enum Type
+      /*enum Type
       {
         STATE, FINAL, INITIAL, INIT_FINAL, EDGE, NO_DATA, ID, NUM
-      };
+      };*/
 
       /*
        * \brief Node of a SA AST
        */
-      class Node : public BaseNode
+      /*class Node : public BaseNode
       {
       public:
         const Type type_;
@@ -555,12 +555,12 @@ namespace pnapi
         Node(Type);
         Node(Type, Node *, Node *);
         Node(Type, Node *, Node *, Node *);
-      };
+      };*/
 
       /*
        * \brief Visitor of a SA AST
        */
-      class Visitor : public parser::Visitor<Node>
+      /*class Visitor : public parser::Visitor<Node>
       {
       public:
         Visitor();
@@ -574,7 +574,7 @@ namespace pnapi
         Automaton *sa_;
       };
 
-    } /* namespace sa */
+    }*/ /* namespace sa */
 
 
 

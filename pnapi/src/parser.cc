@@ -750,7 +750,7 @@ namespace pnapi
     } /* namespace onwd */
 
 
-    namespace sa
+    /*namespace sa
     {
       Node *node;
 
@@ -817,7 +817,7 @@ namespace pnapi
       {
       }
 
-    } /* namespace sa */
+    }*/ /* namespace sa */
 
   } /* namespace parser */
 

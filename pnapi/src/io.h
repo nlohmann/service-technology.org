@@ -243,8 +243,7 @@ namespace pnapi
     namespace util
     {
       typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
-      typedef Manipulator<std::map<std::string, PetriNet *> >
-              PetriNetManipulator;
+      typedef Manipulator<std::map<std::string, PetriNet *> > PetriNetManipulator;
     } /* namespace util */
 
 

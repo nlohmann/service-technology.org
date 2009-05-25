@@ -258,35 +258,6 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
    * ---------------------------
    */
 
-  /* ---------------------------
-   * BEGIN of STG2oWFN_main part
-   * ---------------------------
-   */
-
-
-  // complete interface with interface information from IG/OG
-   for (set<string>::const_iterator iter = inputPlacenames.begin(); iter != inputPlacenames.end(); iter++)
-   {
-       Place *inPlace = findPlace(*iter);
-       if (inPlace == NULL)
-       {
-         createPlace(*iter, Node::INPUT);
-       }
-   }
-   for (set<string>::const_iterator iter = outputPlacenames.begin(); iter != outputPlacenames.end(); iter++)
-   {
-       Place *outPlace = findPlace(*iter);
-       if (outPlace == NULL)
-       {
-         createPlace(*iter, Node::OUTPUT);
-       }
-   }
-
-   /* note: STG2oWFN_main would now write the STGPN to a file
-    * this can still be done there with the result of this function
-    * so it will not be done here.
-    */
-
   // cleaning up generated file
   remove(pnFileName.c_str());
 }

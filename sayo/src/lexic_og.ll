@@ -1,5 +1,5 @@
 /*****************************************************************************\
- Sayo -- Service Automatons Yielded from Operating guidelines
+ Sayo -- Service Automata Yielded from Operating guidelines
 
  Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
 
@@ -35,6 +35,7 @@ extern int og_yyerror(char const *msg);
 %}
 
 %s COMMENT
+%s BITS
 
 whitespace     [\n\r\t ]
 identifier     [^,;:()\t \n\r\{\}=]+
@@ -55,8 +56,8 @@ number         [0-9]+
 "OUTPUT"                                { return KEY_OUTPUT;           }
 "SYNCHRONOUS"                           { return KEY_SYNCHRONOUS;      }
 
-":"{whitespace}?"F"                     { return BIT_F;                }
-":"{whitespace}?"S"                     { return BIT_S;                }
+<BITS>"F"                               { BEGIN(INITIAL); return BIT_F; }
+<BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
 "TRUE"                                  { return KEY_TRUE;             }
 "FALSE"                                 { return KEY_FALSE;            }
 "FINAL"                                 { return KEY_FINAL;            }
@@ -66,6 +67,7 @@ number         [0-9]+
 "("                                     { return LPAR;                 }
 ")"                                     { return RPAR;                 }
 
+"::"                                    { BEGIN(BITS); return DOUBLECOLON;}
 ":"                                     { return COLON;                }
 ";"                                     { return SEMICOLON;            }
 ","                                     { return COMMA;                }

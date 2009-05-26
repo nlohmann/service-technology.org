@@ -1,5 +1,5 @@
 /*****************************************************************************\
- Sayo -- Service Automatons Yielded from Operating guidelines
+ Sayo -- Service Automata Yielded from Operating guidelines
 
  Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
 
@@ -97,6 +97,9 @@ enum IdentType
 /// global flag, determining whether we are reading input or output labels
 IdentType identType;
 
+/// global flag, for writing the initial state
+bool initialState;
+
 %}
 
 %name-prefix="og_yy"
@@ -106,7 +109,7 @@ IdentType identType;
 
 %token KEY_NODES
 %token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
-%token COMMA COLON SEMICOLON IDENT ARROW NUMBER
+%token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
 %token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
 %token LPAR RPAR
 
@@ -136,6 +139,9 @@ og:
      * at index 1, so a dummy has to be pushed.
      */
     inputLabels.push_back("");
+
+    // next read state will be initial
+    initialState = true;
   }
 
   KEY_INTERFACE input output synchronous 
@@ -273,7 +279,14 @@ node:
   NUMBER
   { 
     // read a node, write corresponding node
-    (*myOut) << "  " << mapNode($1) << "\n";
+    if(initialState)
+    {
+      (*myOut) << "  " << mapNode($1) << ": INITIAL\n";
+    }
+    else
+    {
+      (*myOut) << "  " << mapNode($1) << "\n";
+    }
 
     /*
      * Set node 0 as the successor of each input event.
@@ -323,7 +336,7 @@ node:
 
         // destine, whether the copy has to be final
         if($3 == 'f')
-          (*myOut) << " : FINALNODE";
+          (*myOut) << " : FINAL";
         
         (*myOut) << "\n";
 
@@ -348,8 +361,8 @@ annotation:
     og_yyerror("read a formula; only 2-bit annotations are supported");
     return EXIT_FAILURE;
   } 
-| COLON BIT_S    { $$ = 's'; }
-| COLON BIT_F    { $$ = 'f'; }
+| DOUBLECOLON BIT_S    { $$ = 's'; }
+| DOUBLECOLON BIT_F    { $$ = 'f'; }
 ;
 
 

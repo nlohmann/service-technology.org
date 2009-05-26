@@ -14,6 +14,7 @@ extern int ognew_yyerror(char const *msg);
 %}
 
 %s COMMENT
+%s BITS
 
 whitespace     [\n\r\t ]
 identifier     [^,;:()\t \n\r\{\}=]+
@@ -34,8 +35,8 @@ number         [0-9]+
 "OUTPUT"                                { return KEY_OUTPUT;           }
 "SYNCHRONOUS"                           { return KEY_SYNCHRONOUS;      }
 
-":"{whitespace}?"F"                     { return BIT_F;                }
-":"{whitespace}?"S"                     { return BIT_S;                }
+<BITS>"F"                               { BEGIN(INITIAL); return BIT_F; }
+<BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
 "TRUE"                                  { return KEY_TRUE;             }
 "FALSE"                                 { return KEY_FALSE;            }
 "FINAL"                                 { return KEY_FINAL;            }
@@ -46,6 +47,7 @@ number         [0-9]+
 ")"                                     { return RPAR;                 }
 
 ":"                                     { return COLON;                }
+"::"                                    { BEGIN(BITS); return DOUBLECOLON; }
 ";"                                     { return SEMICOLON;            }
 ","                                     { return COMMA;                }
 "->"                                    { return ARROW;                }

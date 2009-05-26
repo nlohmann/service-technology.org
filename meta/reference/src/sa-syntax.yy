@@ -1,19 +1,17 @@
 %{
-extern char* ognew_yytext;
-extern int ognew_yylex();
-extern int ognew_yyerror(char const *msg);
+extern char* sa_yytext;
+extern int sa_yylex();
+extern int sa_yyerror(char const *msg);
 %}
 
-%name-prefix="ognew_yy"
+%name-prefix="sa_yy"
 %error-verbose
 %token_table
 %defines
 
-%token KEY_NODES
+%token KEY_NODES KEY_INITIAL KEY_FINAL
 %token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
-%token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
-%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
-%token LPAR RPAR
+%token COLON COMMA SEMICOLON IDENT ARROW NUMBER
 
 %union {
     char *str;
@@ -23,15 +21,11 @@ extern int ognew_yyerror(char const *msg);
 %type <value> NUMBER
 %type <str>   IDENT
 
-%left OP_OR
-%left OP_AND
-%left OP_NOT
-
-%start og
+%start sa
 %%
 
 
-og:
+sa:
   KEY_INTERFACE input output synchronous KEY_NODES nodes
 ;
 
@@ -74,21 +68,9 @@ node:
 
 annotation:
   /* empty */
-| COLON formula
-| DOUBLECOLON BIT_S
-| DOUBLECOLON BIT_F
-;
-
-
-formula:
-  LPAR formula RPAR
-| formula OP_AND formula
-| formula OP_OR formula
-| OP_NOT formula
-| KEY_FINAL
-| KEY_TRUE
-| KEY_FALSE
-| IDENT
+| COLON KEY_INITIAL
+| COLON KEY_FINAL
+| COLON KEY_INITIAL COMMA KEY_FINAL
 ;
 
 
@@ -101,5 +83,5 @@ successors:
 %%
 
 int main() {
-    return ognew_yyparse();
+    return sa_yyparse();
 }

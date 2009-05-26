@@ -1,4 +1,3 @@
-AC_PREREQ([2.63])
 AC_INIT(syntax, 1.0, niels@service-technology.org, syntax)
 
 AC_CONFIG_SRCDIR([src/og-lexic.ll])

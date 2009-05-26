@@ -7,18 +7,10 @@
                       http://service-technology.org/wendy
 
 
-Version 1.3
-===========
+Version 1.4-unreleased
+======================
 
-* implemented the `receive before send' reduction rule
-  (`--receiveBeforeSend'): if the waitstates of a knowledge bubble can be
-  resolved by receiving, don't send - this reduction does not preserve all
-  strategies, but will return a strategy if one exists
-
-* implemented the `don't send in advance' reduction rule
-  (`--waitstatesOnly'): only send a message to a knowledge bubble if it
-  immediately resolves a waitstate - this reduction does not preserve all
-  strategies, but will return a strategy if one exists
+* ...
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

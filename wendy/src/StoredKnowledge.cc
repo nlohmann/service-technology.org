@@ -124,7 +124,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
         // reduction rule: receive before send
-        if (args_info.receiveBeforeSend_given) {
+        if (args_info.receiveBeforeSend_flag) {
             // check if we're done receiving and each deadlock was resolved
             if (l > Label::last_receive and K->receivingHelps()) {
                 return;
@@ -132,7 +132,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         }
 
         // reduction rule: only consider waitstates
-        if (args_info.waitstatesOnly_given) {
+        if (args_info.waitstatesOnly_flag) {
             if (not RECEIVING(l) and not K->resolvableWaitstate(l)) {
                 continue;
             }
@@ -162,7 +162,7 @@ unsigned int StoredKnowledge::addPredecessors() {
             assert(it->second[i]);
 
             // store number of markings for diagnosis
-            if (args_info.diagnosis_given) {
+            if (args_info.diagnosis_flag) {
                 allMarkings[it->second[i]] = it->second[i]->size;
             }
 
@@ -324,7 +324,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
     // draw the empty node if requested
-    if (args_info.showEmptyNode_given) {
+    if (args_info.showEmptyNode_flag) {
         file << "0 [label=\"";
         if (args_info.formula_arg == formula_arg_dnf) {
             file << "true";
@@ -350,14 +350,14 @@ void StoredKnowledge::dot(std::ofstream &file) {
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
-                if (args_info.showWaitstates_given) {
+                if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
                         file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (w)\\n";
                     }
                 }
 
-                if (args_info.showTransients_given) {
+                if (args_info.showTransients_flag) {
                     for (unsigned int j = it->second[i]->size; j < allMarkings[it->second[i]]; ++j) {
                         file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (t)\\n";
@@ -370,7 +370,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and it->second[i]->successors[l-1] != empty and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
-                        (args_info.showEmptyNode_given or it->second[i]->successors[l-1]->size > 0)) {
+                        (args_info.showEmptyNode_flag or it->second[i]->successors[l-1]->size > 0)) {
                         file << "\"" << it->second[i] << "\" -> \""
                              << it->second[i]->successors[l-1]
                              << "\" [label=\"" << PREFIX(l)
@@ -378,7 +378,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
                     }
 
                     // draw edges to the empty node if requested
-                    if (args_info.showEmptyNode_given and
+                    if (args_info.showEmptyNode_flag and
                         it->second[i]->successors[l-1] == empty) {
                         file << "\"" << it->second[i] << "\" -> 0"
                             << " [label=\"" << PREFIX(l)
@@ -879,7 +879,7 @@ string StoredKnowledge::formula() const {
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL) {
-            if (args_info.fionaFormat_given) {
+            if (args_info.fionaFormat_flag) {
                 sendDisjunction.insert(PREFIX(l) + Label::id2name[l]);
             } else {
                 sendDisjunction.insert(Label::id2name[l]);
@@ -896,7 +896,7 @@ string StoredKnowledge::formula() const {
         // sending
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
             if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
-                if (args_info.fionaFormat_given) {
+                if (args_info.fionaFormat_flag) {
                     temp.insert(PREFIX(l) + Label::id2name[l]);
                 } else {
                     temp.insert(Label::id2name[l]);
@@ -908,7 +908,7 @@ string StoredKnowledge::formula() const {
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
                 successors[l-1] != NULL and successors[l-1] != empty) {
-                if (args_info.fionaFormat_given) {
+                if (args_info.fionaFormat_flag) {
                     temp.insert(PREFIX(l) + Label::id2name[l]);
                 } else {
                     temp.insert(Label::id2name[l]);

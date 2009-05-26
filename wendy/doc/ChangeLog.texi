@@ -1,9 +1,16 @@
+@heading Version 1.4-unreleased
+@itemize
+@item ...
+@end itemize
+
+
 @heading Version 1.3
 @itemize
 @item implemented the `receive before send' reduction rule (@option{--receiveBeforeSend}): if the waitstates of a knowledge bubble can be resolved by receiving, don't send -- this reduction does not preserve all strategies, but will return a strategy if one exists
 
 @item implemented the `don't send in advance' reduction rule (@option{--waitstatesOnly}): only send a message to a knowledge bubble if it immediately resolves a waitstate -- this reduction does not preserve all strategies, but will return a strategy if one exists
 @end itemize
+
 
 @heading Version 1.2
 @itemize
@@ -16,6 +23,7 @@
 @item the configure script checks if the Petri Net @acronym{API} was found and only compiles the local copy if necessary
 @end itemize
 
+
 @heading Version 1.1
 @itemize
 @item implemented synchronous communication
@@ -24,6 +32,7 @@
 
 @item the list of interface labels are printed when @option{--verbose} is used
 @end itemize
+
 
 @heading Version 1.0
 @itemize

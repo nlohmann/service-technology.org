@@ -67,7 +67,7 @@ void abort(unsigned int code, const char* format, ...) {
 
     fprintf(stderr, " -- aborting [#%02d]\n", code);
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         fprintf(stderr, "%s: see manual for a documentation of this error\n", PACKAGE);
     }
 
@@ -120,40 +120,9 @@ void evaluateParameters(int argc, char** argv) {
         abort(9, "message bound must be between 1 and %d", UINT8_MAX);
     }
 
-    // evaluate Fiona's '--type/-t' parameter
-    if (args_info.type_given) {
-        if (args_info.type_arg == type_arg_og or args_info.type_arg == type_arg_OG) {
-            args_info.og_given = 1;
-            args_info.fionaFormat_given = 1;
-        }
-        if (args_info.type_arg == type_arg_ig or args_info.type_arg == type_arg_IG) {
-            args_info.og_given = 1;
-            args_info.waitstatesOnly_given = 1;
-            args_info.fionaFormat_given = 1;
-        }
-    }
-
-    // evaluate Fiona's '--show/-s' parameter
-    for (unsigned int i = 0; i < args_info.show_given; ++i) {
-        switch (args_info.show_arg[i]) {
-            case(show_arg_empty):
-                args_info.showEmptyNode_given = 1;
-                break;
-
-            case(show_arg_deadlocks):
-                args_info.showWaitstates_given = 1;
-                break;
-
-            case(show_arg_allstates):
-                args_info.showWaitstates_given = 1;
-                args_info.showTransients_given = 1;
-                break;
-        }
-    }
-
     // the '--showTransients' parameter implies '--diagnosis'
-    if (args_info.showTransients_given) {
-        args_info.diagnosis_given = 1;
+    if (args_info.showTransients_flag) {
+        args_info.diagnosis_flag = 1;
     }
 
     free(params);
@@ -188,7 +157,7 @@ int main(int argc, char** argv) {
             }
             inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
         }
-        if (args_info.verbose_given) {
+        if (args_info.verbose_flag) {
             std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
         }
     } catch (pnapi::io::InputError error) {
@@ -257,7 +226,7 @@ int main(int argc, char** argv) {
     InnerMarking::initialize();
     delete InnerMarking::net;
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         fprintf(stderr, " [%.0f sec]\n", difftime(end_time, start_time));
     }
 
@@ -274,7 +243,7 @@ int main(int argc, char** argv) {
     delete K0;
     time(&end_time);
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         fprintf(stderr, "%s: stored %d knowledges [%.0f sec]\n",
             PACKAGE, StoredKnowledge::stats_storedKnowledges, difftime(end_time, start_time));
         fprintf(stderr, "%s: used %d of %d hash buckets, maximal bucket size: %d\n",
@@ -292,7 +261,7 @@ int main(int argc, char** argv) {
     unsigned int edges = StoredKnowledge::addPredecessors();
     time(&end_time);
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         fprintf(stderr, "%s: added predecessor relation (%d edges) [%.0f sec]\n",
             PACKAGE, edges, difftime(end_time, start_time));
     }
@@ -305,7 +274,7 @@ int main(int argc, char** argv) {
     unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
     time(&end_time);
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         fprintf(stderr, "%s: removed %d red nodes in %d iterations [%.0f sec]\n",
             PACKAGE, redNodes, StoredKnowledge::stats_iterations, difftime(end_time, start_time));
     }
@@ -325,12 +294,12 @@ int main(int argc, char** argv) {
         if (!og_file) {
             abort(11, "could not write to file '%s'", og_filename.c_str());
         }
-        if (args_info.fionaFormat_given) {
+        if (args_info.fionaFormat_flag) {
             StoredKnowledge::output_old(og_file);
         } else {
             StoredKnowledge::output(og_file);            
         }
-        if (args_info.verbose_given) {
+        if (args_info.verbose_flag) {
             fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
         }
     }
@@ -344,7 +313,7 @@ int main(int argc, char** argv) {
             abort(11, "could not write to file '%s'", dot_filename.c_str());
         }
         StoredKnowledge::dot(dot_file);
-        if (args_info.verbose_given) {
+        if (args_info.verbose_flag) {
             fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
         }
     }

@@ -114,7 +114,7 @@ void Label::initialize() {
     last_sync = events;
     sync_events = last_sync - send_events - receive_events;
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         for (unsigned int i = first_receive; i <= last_sync; ++i) {
             fprintf(stderr, "%s: label with id %2d is '%s%s'\n",
                 PACKAGE, i, PREFIX(i), id2name[i].c_str());

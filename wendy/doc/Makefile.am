@@ -12,10 +12,10 @@ all: ../ChangeLog
 
 
 #############################################################################
-# run "wendy --full-help" to include output in documentation
+# run "wendy --help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/wendy --full-help > cmdline.out
+	$(top_srcdir)/src/wendy --help > cmdline.out
 
 
 #############################################################################

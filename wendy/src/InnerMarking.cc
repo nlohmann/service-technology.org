@@ -82,7 +82,7 @@ void InnerMarking::initialize() {
         fprintf(stderr, "%s: warning: no final marking found\n", PACKAGE);
     }
 
-    if (args_info.verbose_given) {
+    if (args_info.verbose_flag) {
         fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",
             PACKAGE, stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
         fprintf(stderr, "%s: stored %d inner markings",
@@ -167,7 +167,7 @@ inline void InnerMarking::determineType() {
     // variable to detect whether this marking has only deadlocking successors
     bool deadlock_inevitable = true;
     for (uint8_t i = 0; i < out_degree; ++i) {
-        if (not args_info.noDeadlockDetection_given) {
+        if (not args_info.noDeadlockDetection_flag) {
             // if a single successor is not a deadlock, everything is OK
             if (markingMap[successors[i]] != NULL and
                 deadlock_inevitable and
@@ -188,7 +188,7 @@ inline void InnerMarking::determineType() {
     }
 
     // deadlock cannot be avoided any more -- treat this marking as deadlock
-    if (not args_info.noDeadlockDetection_given and
+    if (not args_info.noDeadlockDetection_flag and
         not is_final and
         not is_deadlock and
         deadlock_inevitable) {

@@ -4,33 +4,6 @@ purpose "Calculating Operating Guidelines."
 description "About Wendy:"
 
 
-section "Fiona Compatibility"
-sectiondesc = "Wendy implements a subset of Fiona's functionality. These parameters were introduced to ease the transition from Fiona to Wendy. For instance, instead of calling 'fiona net.owfn -t og', you can call 'wendy net.owfn -t og'.\n"
-
-option "type" t
-  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og' and '-t ig' is equivalent to '--waitstatesOnly'."
-  string
-  typestr="TYPE"
-  values="og","OG","ig","IG" enum
-  optional
-  hidden
-
-option "show" s
-  "Parameter for compatibility with Fiona: the parameter '-s deadlocks' is equivalent to '--showWaitstates', '-s allstates' is equivalent to '--showWaitstates --showTransients', and '-s empty' is equivalent to '--showEmptyNode'. Multiple values are allowed."
-  string
-  typestr="PARAMETER"
-  values="deadlocks","allstates","empty" enum
-  optional
-  multiple
-  hidden  
-
-option "fionaFormat" -
-  "Use the deprecated Fiona OG file format."
-  dependon="og"
-  flag off
-  hidden
-
-
 section "Output"
 sectiondesc="When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines.\n"
 
@@ -47,6 +20,11 @@ option "dot" -
   typestr="FILENAME"
   argoptional
   optional
+
+option "fionaFormat" -
+  "Use the deprecated Fiona OG file format."
+  dependon="og"
+  flag off
 
 
 section "Options"

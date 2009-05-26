@@ -1,0 +1,42 @@
+            ____      _        _   _   _      _        _    ____ ___ 
+           |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
+           | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
+           |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
+           |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+                       http://service-technology.org/pnapi
+
+
+COPYRIGHT
+    Copyright (C) 2009       Stephan Mennicke, Christian Sura, and
+                             Robert Walthemath
+
+    Copyright (C) 2008       Niels Lohmann
+
+    Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds, and
+                             Martin Znamirowski
+
+    Copyright (C) 2005       Niels Lohmann and Christian Gierds
+
+
+AUTHOR
+    The Petri Net API is written by Stephan Mennicke, Christian Sura, and
+    Robert Waltemath, based on code taken from GNU BPEL2oWFN written by
+    Niels Lohmann, Christian Gierds, and Martin Znamirowski. See file
+    "AUTHORS" for more information.
+
+
+MAINTAINER
+    The Petri Net API is maintained by Niels Lohmann.
+
+
+CONTACT
+    Niels Lohmann
+    Institut fuer Informatik
+    Lehrstuhl Theorie der Programmiersprachen und Programmierung
+    Universitaet Rostock
+    18051 Rostock, Germany
+
+    Phone:  +49 381 498-7674
+    Skype:  nlohmann
+    WWW:    http://service-technology.org/pnapi
+    E-Mail: pnapi@service-technology.org

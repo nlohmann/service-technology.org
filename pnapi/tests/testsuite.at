@@ -258,6 +258,32 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([Service Automata])
+############################################################################
+
+AT_SETUP([Automaton generation from normal open net])
+m4_define([NET], [test_construction.sequence_normal.net.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa],0,ignore,ignore)
+AT_KEYWORDS([automaton])
+AT_CLEANUP
+
+AT_SETUP([Automaton generation from arbitrary open net])
+m4_define([NET], [test_construction.sequence_unnormal.net.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa],0,ignore,ignore)
+AT_KEYWORDS([automaton])
+AT_CLEANUP
+
+AT_SETUP([Automaton generation from arbitrary open net])
+m4_define([NET], [test_construction.strange_net.net.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa],0,ignore,ignore)
+AT_KEYWORDS([automaton])
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([Open Net Generator])
 ############################################################################
 
@@ -274,21 +300,3 @@ AT_CHECK([wc -l stderr],0,stdout)
 AT_CHECK([GREP -q "10" stdout])
 AT_KEYWORDS([generator])
 AT_CLEANUP
-
-############################################################################
-AT_BANNER([Service Automata])
-############################################################################
-
-AT_SETUP([Generation of 3 service automata])
-m4_define([NET1], [test_construction.sequence_normal.net.owfn])
-m4_define([NET2], [test_construction.sequence_unnormal.net.owfn])
-m4_define([NET3], [test_construction.strange_net.net.owfn])
-AT_CHECK([cp TESTFILES/NET1 .])
-AT_CHECK([cp TESTFILES/NET2 .])
-AT_CHECK([cp TESTFILES/NET3 .])
-AT_CHECK([PETRI NET1 -osa],0,ignore,stderr)
-AT_CHECK([PETRI NET2 -osa],0,ignore,stderr)
-AT_CHECK([PETRI NET3 -osa],0,ignore,stderr)
-AT_KEYWORDS([service automaton construction])
-AT_CLEANUP
-

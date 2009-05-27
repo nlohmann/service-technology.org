@@ -20,7 +20,7 @@ libpnapi_la_SOURCES = \
 	marking.h marking.cc \
 	io.h io.cc io-format.cc
 
-BUILT_SOURCES = parser-owfn.cc parser-petrify.cc
+BUILT_SOURCES = parser-owfn.cc parser-petrify.cc parser-onwd.cc parser-lola.cc
 
 EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h parser-lola.h
 

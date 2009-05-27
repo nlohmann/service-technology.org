@@ -30,6 +30,17 @@ gengetopt_args_info args_info;
 /// a suffix for the output filename
 string suffix = "";
 
+typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_AUTOMATON } objectType;
+
+struct FileObject {
+    objectType type;
+    string filename;
+
+    PetriNet net;
+
+    FileObject(string _filename) { filename = _filename; }
+};
+
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -52,8 +63,7 @@ void evaluateParameters(int argc, char** argv) {
 int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
 
-    vector<PetriNet> nets;
-    vector<string> names;
+    vector<FileObject> objects;
 
     // store invocation in a string for meta information in file output
     string invocation;
@@ -67,21 +77,25 @@ int main(int argc, char** argv) {
     ********/
     if (!args_info.inputs_num) {
         // read from stdin
-        PetriNet net;
+        FileObject current("stdin");
 
         // try to parse net
         try {
             switch (args_info.input_arg) {
                 case(input_arg_owfn): {
-                    cin >> meta(io::INPUTFILE, "stdin")
+                    cin >> meta(io::INPUTFILE, current.filename)
                         >> meta(io::CREATOR, PACKAGE_STRING)
-                        >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+                        >> meta(io::INVOCATION, invocation) >> io::owfn >> current.net;
+
+                    current.type = TYPE_OPENNET;
                     break;
                 }
                 case(input_arg_lola): {
-                    cin >> meta(io::INPUTFILE, "stdin")
+                    cin >> meta(io::INPUTFILE, current.filename)
                         >> meta(io::CREATOR, PACKAGE_STRING)
-                        >> meta(io::INVOCATION, invocation) >> io::lola >> net;
+                        >> meta(io::INVOCATION, invocation) >> io::lola >> current.net;
+
+                    current.type = TYPE_LOLANET;
                     break;
                 }
             }
@@ -91,16 +105,16 @@ int main(int argc, char** argv) {
         }
 
         if (args_info.verbose_given) {
-            cerr << "petri:<stdin>: " << io::stat << net << endl;
+            cerr << "petri:<stdin>: " << io::stat << current.net << endl;
         }
 
-        // store net
-        nets.push_back(net);
-        names.push_back("stdin");
+        // store object
+        objects.push_back(current);
     } else {
         // read from files
         for (unsigned int i = 0; i < args_info.inputs_num; ++i) {
-            PetriNet net;
+            // prepare a new object
+            FileObject current(args_info.inputs[i]);
 
             // try to open file
             ifstream infile(args_info.inputs[i], ifstream::in);
@@ -113,15 +127,19 @@ int main(int argc, char** argv) {
             try {
                 switch (args_info.input_arg) {
                     case(input_arg_owfn): {
-                        infile >> meta(io::INPUTFILE, args_info.inputs[i])
+                        infile >> meta(io::INPUTFILE, current.filename)
                             >> meta(io::CREATOR, PACKAGE_STRING)
-                            >> meta(io::INVOCATION, invocation) >> io::owfn >> net;
+                            >> meta(io::INVOCATION, invocation) >> io::owfn >> current.net;
+
+                        current.type = TYPE_OPENNET;
                         break;
                     }
                     case(input_arg_lola): {
-                        infile >> meta(io::INPUTFILE, args_info.inputs[i])
+                        infile >> meta(io::INPUTFILE, current.filename)
                             >> meta(io::CREATOR, PACKAGE_STRING)
-                            >> meta(io::INVOCATION, invocation) >> io::lola >> net;
+                            >> meta(io::INVOCATION, invocation) >> io::lola >> current.net;
+
+                        current.type = TYPE_LOLANET;
                         break;
                     }
                 }
@@ -134,12 +152,11 @@ int main(int argc, char** argv) {
             infile.close();
 
             if (args_info.verbose_given) {
-                cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << net << endl;
+                cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << current.net << endl;
             }
 
-            // store net
-            nets.push_back(net);
-            names.push_back(args_info.inputs[i]);
+            // store object
+            objects.push_back(current);
         }
     }
 
@@ -151,10 +168,10 @@ int main(int argc, char** argv) {
 
         // collect parsed nets and store them in a mapping
         map<string, PetriNet *> netsByName;
-        for (unsigned int i = 0; i < nets.size(); ++i) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
             // strip filename extension
-            string name = names[i].substr(0, names[i].find_last_of("."));
-            netsByName[name] = &nets[i];
+            string name = objects[i].filename.substr(0, objects[i].filename.find_last_of("."));
+            netsByName[name] = &(objects[i].net);
         }
 
         PetriNet net; // to store composition
@@ -171,7 +188,7 @@ int main(int argc, char** argv) {
             }
 
             if (args_info.verbose_given) {
-                cerr << "petri: composing " << nets.size() << " nets according to '" << args_info.wire_arg << "'" << endl;
+                cerr << "petri: composing " << objects.size() << " nets according to '" << args_info.wire_arg << "'" << endl;
             }
 
             // create a new net consisting of the composed nets
@@ -189,7 +206,7 @@ int main(int argc, char** argv) {
             compositionName = "composition"; //FIXME: choose a nicer name
 
             if (args_info.verbose_given) {
-                cerr << "petri: composing " << nets.size() << " nets using implicit wiring" << endl;
+                cerr << "petri: composing " << objects.size() << " nets using implicit wiring" << endl;
             }
 
             // calling implicit composition
@@ -200,12 +217,13 @@ int main(int argc, char** argv) {
             cerr << "petri:" << compositionName << ".owfn: " << io::stat << net << endl;
         }
 
-        // remove the parsed nets
-        names.clear();
-        nets.clear();
+        // remove the parsed objects
+        objects.clear();
 
-        nets.push_back(net);
-        names.push_back(compositionName);
+        FileObject current(compositionName);
+        current.type = TYPE_OPENNET;
+        current.net = net;        
+        objects.push_back(current);
     }
 
 
@@ -214,37 +232,37 @@ int main(int argc, char** argv) {
     *****************/
     if (args_info.normalize_given) {
         suffix += ".normalized";
-        for (unsigned int i = 0; i < nets.size(); ++i) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
 
             if (args_info.verbose_given) {
-                cerr << "petri: normalizing reducing Petri net '" << names[i] << "'..." << endl;
+                cerr << "petri: normalizing reducing Petri net '" << objects[i].filename << "'..." << endl;
             }
 
-            nets[i].normalize();
+            objects[i].net.normalize();
         }
     }
 
     if (args_info.negate_given) {
         suffix += ".negated";
-        for (unsigned int i = 0; i < nets.size(); ++i) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
 
             if (args_info.verbose_given) {
-                cerr << "petri: negating the final condition of net '" << names[i] << "'..." << endl;
+                cerr << "petri: negating the final condition of net '" << objects[i].filename << "'..." << endl;
             }
 
-            nets[i].finalCondition().negate();
+            objects[i].net.finalCondition().negate();
         }
     }
 
     if (args_info.mirror_given) {
         suffix += ".mirrored";
-        for (unsigned int i = 0; i < nets.size(); ++i) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
 
             if (args_info.verbose_given) {
-                cerr << "petri: mirroring the net '" << names[i] << "'..." << endl;
+                cerr << "petri: mirroring the net '" << objects[i].filename << "'..." << endl;
             }
 
-            nets[i].mirror();
+            objects[i].net.mirror();
         }
     }
 
@@ -254,7 +272,7 @@ int main(int argc, char** argv) {
     ***********************/
     if (args_info.reduce_given) {
         suffix += ".reduced";
-        for (unsigned int i = 0; i < nets.size(); ++i) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
 
             PetriNet::ReductionLevel level = PetriNet::NONE;
 
@@ -299,10 +317,10 @@ int main(int argc, char** argv) {
             }
 
             if (args_info.verbose_given) {
-                cerr << "petri: structurally reducing Petri net '" << names[i] << "'..." << endl;
+                cerr << "petri: structurally reducing Petri net '" << objects[i].filename << "'..." << endl;
             }
 
-            nets[i].reduce(level);
+            objects[i].net.reduce(level);
         }
     }
 
@@ -311,22 +329,22 @@ int main(int argc, char** argv) {
     * STRUCTURAL PROPERTIES *
     ************************/
     if (args_info.check_given || args_info.isFreeChoice_given || args_info.isNormal_given || args_info.isWorkflow_given) {
-        for (unsigned int i = 0; i < nets.size(); ++i) {
-            cerr << "petri:" << names[i] << ": ";
+        for (unsigned int i = 0; i < objects.size(); ++i) {
+            cerr << "petri:" << objects[i].filename << ": ";
 
             // check for free choice
             if (args_info.check_arg == check_arg_freechoice || args_info.isFreeChoice_given) {
-                cerr << nets[i].isFreeChoice() << endl;
+                cerr << objects[i].net.isFreeChoice() << endl;
             }
 
             // check for normality
             if (args_info.check_arg == check_arg_normal || args_info.isNormal_given) {
-                cerr << nets[i].isNormal() << endl;
+                cerr << objects[i].net.isNormal() << endl;
             }
 
             // check for workflow structure
             if (args_info.check_arg == check_arg_workflow || args_info.isWorkflow_given) {
-                cerr << nets[i].isWorkflow() << endl;
+                cerr << objects[i].net.isWorkflow() << endl;
             }
         }
     }
@@ -336,10 +354,10 @@ int main(int argc, char** argv) {
     * OUTPUT *
     *********/
     if (args_info.output_given) {
-        for (unsigned int i = 0; i < nets.size(); ++i) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
             for (unsigned int j = 0; j < args_info.output_given; ++j) {
                 // try to open file to write
-                string outname = names[i] + suffix + "." + args_info.output_orig[j];
+                string outname = objects[i].filename + suffix + "." + args_info.output_orig[j];
                 ofstream outfile(outname.c_str(), ofstream::trunc);
                 if (!outfile.is_open()) {
                     cerr << "petri: could not write to file '" << outname << "'" << endl;
@@ -356,26 +374,26 @@ int main(int argc, char** argv) {
 
                     // create oWFN output
                     case (output_arg_owfn): {
-                        outfile << io::owfn << nets[i];
+                        outfile << io::owfn << objects[i].net;
                         break;
                     }
 
                     // create LoLA output
                     case (output_arg_lola): {
-                        outfile << io::lola << nets[i];
+                        outfile << io::lola << objects[i].net;
                         break;
                     }
 
                     // create automaton output
                     case (output_arg_sa): {
-                        Automaton sauto(nets[i]);
+                        Automaton sauto(objects[i].net);
                         outfile << io::sa << sauto;
                         break;
                     }
 
                     // create dot output
                     case (output_arg_dot): {
-                        outfile << io::dot << nets[i];
+                        outfile << io::dot << objects[i].net;
                         break;
                     }
 
@@ -395,7 +413,7 @@ int main(int argc, char** argv) {
                         exit(EXIT_FAILURE);
 #endif
                         ostringstream d;
-                        d << io::dot << nets[i];
+                        d << io::dot << objects[i].net;
                         string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -o " + outname + " &> /dev/null";
                         FILE *s = popen(call.c_str(), "w");
                         assert(s);

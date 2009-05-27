@@ -26,6 +26,7 @@ option "wire" w
   string
   argoptional
   optional
+  hidden
 
 
 defmode "Check for Structural Properties"
@@ -60,7 +61,6 @@ modeoption "reduce" r
   "Apply structural reduction rules, i.e. reduce the structure of the net while preserving liveness and boundedness."
   typestr="RULES"
   values="0","1","2","3","4","5","6","starke","pillat","dead_nodes","identical_places","identical_transitions","series_places","series_transitions","self_loop_places","self_loop_transitions","equal_places","starke3p","starke3t","starke4","starke5","starke6","starke7","starke8","starke9","keep_normal","once","k_boundedness","boundedness","liveness" enum
-  default="0"
   mode="Modifications"
   optional
   multiple
@@ -86,3 +86,19 @@ section "Debugging"
 option "verbose" v
   "Show verbose output"
   flag off
+
+option "suffix_owfn" -
+  "Suffix for open net files"
+  typestr="SUFFIX"
+  string
+  multiple
+  optional
+  hidden
+
+option "suffix_sa" -
+  "Suffix for service automaton files"
+  typestr="SUFFIX"
+  string
+  multiple
+  optional
+  hidden

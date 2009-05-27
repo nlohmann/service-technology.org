@@ -16,6 +16,8 @@ MAINTAINERCLEANFILES = petrinet/Makefile.in \
 TESTSUITE = $(builddir)/testsuite
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 EXTRA_DIST = testsuite.at \
+             testfiles/test_input.owfn \
+             testfiles/test_input.lola \
              testfiles/test_dead_nodes.net.owfn \
              testfiles/test_identical_places.net.owfn \
              testfiles/test_identical_transitions.net.owfn \
@@ -35,7 +37,10 @@ EXTRA_DIST = testsuite.at \
              testfiles/test_criteria.noworkflownet.owfn \
              testfiles/test_criteria.workflownet.owfn \
              testfiles/test_criteria.nofreechoice.owfn \
-             testfiles/test_criteria.freechoice.owfn
+             testfiles/test_criteria.freechoice.owfn \
+             testfiles/test_construction.sequence_normal.net.owfn \
+             testfiles/test_construction.sequence_unnormal.net.owfn \
+             testfiles/test_construction.strange_net.net.owfn
 
 
 check-local: atconfig $(TESTSUITE)

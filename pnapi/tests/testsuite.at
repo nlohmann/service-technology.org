@@ -1,5 +1,8 @@
 AT_INIT
 
+# check if dot was found by the configure script
+m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
+
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])
 ############################################################################
@@ -12,6 +15,97 @@ AT_CLEANUP
 AT_SETUP([Version output])
 AT_CHECK([PETRI --version],0,ignore)
 AT_KEYWORDS([frontend])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Input])
+############################################################################
+
+AT_SETUP([Reading open net from file])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 132  |P_in|= 2  |P_out|= 9  |T|= 88  |F|= 314" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net from pipe])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 132  |P_in|= 2  |P_out|= 9  |T|= 88  |F|= 314" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading LoLA net from file])
+m4_define([NET], [test_input.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading LoLA net from pipe])
+m4_define([NET], [test_input.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose --input=lola < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Output])
+############################################################################
+
+AT_SETUP([Writing open net (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 132  |P_in|= 2  |P_out|= 9  |T|= 88  |F|= 314" stderr])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing LoLA net (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=lola],0)
+AT_CHECK([test -f NET.lola])
+AT_CHECK([PETRI NET.lola --input=lola --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 121  |P_in|= 0  |P_out|= 0  |T|= 88  |F|= 303" stderr])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing service automaton (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=sa],0)
+AT_CHECK([test -f NET.sa])
+# the generated service automaton is expected to have 71332 edges
+AT_CHECK([GREP "\->" NET.sa | wc -l | GREP -q 71332],0)
+AT_KEYWORDS([frontend output slow])
+AT_CLEANUP
+
+AT_SETUP([Writing Graphviz dot file (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=dot],0)
+AT_CHECK([test -f NET.dot])
+# the generated service automaton is expected to have 534 edges
+AT_CHECK([GREP "\->" NET.dot | wc -l | GREP -q 534],0)
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing PNG file (from open net)])
+AT_CHECK_DOT
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=png],0)
+AT_CHECK([test -f NET.png])
+AT_KEYWORDS([frontend output slow])
 AT_CLEANUP
 
 

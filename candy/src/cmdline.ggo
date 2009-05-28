@@ -1,21 +1,35 @@
+# What does the program?
+purpose "CANDY - Candy AiN't Done Yet\n
+Calculating a cost-efficient partner out of an operating guideline."
+
+# the description string will be printet with the help after usage
+description "I need to write a description."
+
+
+# arguments for gengetopt ... RICH do I need them?
 args "--long-help --include-getopt --show-required --unamed-opts=FILE"
 
-purpose "LINDA - Linda is not Dependency Analysis."
-
-description "Usage: "
 
 section "Debug"
+sectiondesc="optional section description\n"
 
 option "verbose" v
   "Verbose output"
   flag off
 
-section "Message Profile Levels" 
+section "Cost" 
+sectiondesc="optional section description\n"
 
-option "level-0" 0
-  "Level 0 Message Profile"
-  flag on
+option "opennet" o
+  "Use a given open net for the transition cost. If no filename is given, the OG filename's suffix is used for finding a '.owfn' file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
   
-option "level-1" 1
-  "Level 1 Message Profile"
-  flag off
+option "costfile" c
+  "Use a given cost file for the transition cost. If no filename is given, the OG filename's suffix is used for finding a '.cf' file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional

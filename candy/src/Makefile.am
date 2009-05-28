@@ -2,9 +2,6 @@
 bin_PROGRAMS = candy
 
 candy_SOURCES = main.cc \
-        helpers.h helpers.cc \
-        bounds.h  \
-        messageprofile.h  \
     	cmdline.c cmdline.h
 
 #linda_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a $(top_builddir)/libs/lp_solve/liblpsolve55.a

@@ -393,12 +393,12 @@ namespace pnapi
 
       /*** TYPE NAME SHORTCUTS ***/
 
-      typedef StreamMetaData<Format> FormatData;
-      typedef StreamMetaData<Mode> ModeData;
+      typedef StreamMetaData<io::util::Format> FormatData;
+      typedef StreamMetaData<io::util::Mode> ModeData;
       typedef StreamMetaData<Delim> DelimData;
       typedef StreamMetaData<Formula> FormulaData;
-      typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
-      typedef Manipulator<std::pair<MetaInformation, std::string> >
+      typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
+      typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> >
               MetaManipulator;
 
 
@@ -422,7 +422,7 @@ namespace pnapi
       std::set<std::string>
       collectSynchronizeLabels(const std::set<Transition *> &);
 
-      Manipulator<Mode> mode(Mode);
+      Manipulator<io::util::Mode> mode(io::util::Mode);
       Manipulator<Delim> delim(const std::string &);
 
       std::ostream & operator<<(std::ostream &, const Arc &);

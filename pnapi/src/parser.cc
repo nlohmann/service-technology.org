@@ -1,6 +1,7 @@
 #ifndef NDEBUG
 #include <iostream>
 using std::cout;
+using std::cerr;
 using std::endl;
 #endif
 
@@ -12,6 +13,7 @@ using std::endl;
 #include "parser.h"
 #include "io.h"
 #include "formula.h"
+#include "state.h"
 
 using std::ifstream;
 using std::stringstream;
@@ -750,7 +752,7 @@ namespace pnapi
     } /* namespace onwd */
 
 
-    /*namespace sa
+    namespace sa
     {
       Node *node;
 
@@ -779,13 +781,18 @@ namespace pnapi
       {
       }
 
-      Node::Node(std::string ident) :
-        BaseNode(), type_(ID), number_(0), identifier_(ident)
+      Node::Node(std::string *ident) :
+        BaseNode(), type_(ID), number_(0), identifier_(*ident)
       {
       }
 
       Node::Node(Type type) :
         BaseNode(), type_(type), number_(0)
+      {
+      }
+
+      Node::Node(Type type, Node *node) :
+        BaseNode(node), type_(type), number_(0)
       {
       }
 
@@ -811,13 +818,149 @@ namespace pnapi
 
       void Visitor::beforeChildren(const Node &node)
       {
+        switch (node.type_)
+        {
+        case sa::EDGE:
+        {
+          stack_.push(sa::EDGE);
+          break;
+        }
+        case sa::FINAL:
+        {
+          newState_.isFinal = true;
+          break;
+        }
+        case sa::ID:
+        {
+          switch (stack_.top())
+          {
+          case sa::INPUT:
+            input_.push_back(node.identifier_);
+            break;
+          case sa::OUTPUT:
+            output_.push_back(node.identifier_);
+            break;
+          case sa::EDGE:
+            newState_.edgeLabels.push_back(node.identifier_);
+            break;
+          default: assert(false); break;
+          }
+          break;
+        }
+        case sa::INITIAL:
+        {
+          newState_.isInitial = true;
+          break;
+        }
+        case sa::INIT_FINAL:
+        {
+          newState_.isFinal = true;
+          newState_.isInitial = true;
+        }
+        case sa::INPUT:
+        {
+          stack_.push(sa::INPUT);
+          break;
+        }
+        case sa::NUM:
+        {
+          switch (stack_.top())
+          {
+          case sa::EDGE:
+          {
+            newState_.targetNodes.push_back(node.number_);
+            break;
+          }
+          case sa::STATE:
+          {
+            newState_.name = node.number_;
+            break;
+          }
+          default: assert(false); break;
+          }
+        }
+        case sa::OUTPUT:
+        {
+          stack_.push(sa::OUTPUT);
+          break;
+        }
+        case sa::STATE:
+        {
+          stack_.push(sa::STATE);
+          break;
+        }
+        default: break;
+        }
       }
 
       void Visitor::afterChildren(const Node &node)
       {
+        switch (node.type_)
+        {
+        case sa::EDGE:
+        {
+          if (stack_.top() == sa::EDGE)
+            stack_.pop();
+          else
+            ;//assert(false);
+          break;
+        }
+        case sa::INPUT:
+        {
+          if (stack_.top() == sa::INPUT)
+            stack_.pop();
+          else
+            assert(false);
+          break;
+        }
+        case sa::OUTPUT:
+        {
+          if (stack_.top() == sa::OUTPUT)
+            stack_.pop();
+          else
+            assert(false);
+          break;
+        }
+        case sa::STATE:
+        {
+          State &s = sa_->createState(newState_.name);
+          if (newState_.isFinal)
+            s.final();
+          if (newState_.isInitial)
+            s.initial();
+          for (unsigned int i = 0; i < newState_.targetNodes.size(); i++)
+            sa_->createEdge(s, sa_->createState(newState_.targetNodes[i]),
+                newState_.edgeLabels[i], getType(newState_.edgeLabels[i]));
+
+          newState_.edgeLabels.clear();
+          newState_.isFinal = false;
+          newState_.isInitial = false;
+          newState_.name = 0;
+          newState_.targetNodes.clear();
+
+          if (stack_.top() == sa::STATE)
+            stack_.pop();
+          else
+            ;//assert(false);
+          break;
+        }
+        default: break;
+        }
       }
 
-    }*/ /* namespace sa */
+
+      Automaton::Type Visitor::getType(std::string label) const
+      {
+        for (int i = 0; i < (int) input_.size(); i++)
+          if (input_[i] == label)
+            return Automaton::INPUT;
+        for (int i = 0; i < (int) output_.size(); i++)
+          if (output_[i] == label)
+            return Automaton::OUTPUT;
+        return Automaton::TAU;
+      }
+
+    } /* namespace sa */
 
   } /* namespace parser */
 

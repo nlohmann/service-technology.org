@@ -89,7 +89,7 @@ PRODUCE                         { return KEY_PRODUCE; }
             pnapi_lola_lval.yt_int = atoi(yytext); return NUMBER; }
 "-"[0-9][0-9]*                  { 
             pnapi_lola_lval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]* { 
+[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { 
             pnapi_lola_lval.yt_string = new std::string(yytext); return IDENT; }
 
  /* whitespace */

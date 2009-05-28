@@ -1,5 +1,5 @@
- /***************************************************************************** 
-  * flex options 
+ /*****************************************************************************
+  * flex options
   ****************************************************************************/
 
 /* created lexer should be called "lex.yy.c" to make the ylwrap script work */
@@ -18,10 +18,14 @@
 %option yylineno
 
 
- /***************************************************************************** 
-  * C declarations 
+ /*****************************************************************************
+  * C declarations
   ****************************************************************************/
 %{
+
+#include <iostream>
+using std::cerr;
+using std::endl;
 
 #include "parser.h"
 #include "parser-sa.h"
@@ -48,7 +52,7 @@
 
 
  /*****************************************************************************
-  * regular expressions 
+  * regular expressions
   ****************************************************************************/
 
 
@@ -57,36 +61,49 @@
 
 %%
 
-/* comments */
+ /* comments */
 "{"                         { BEGIN(COMMENT); }
 <COMMENT>"}"                { BEGIN(INITIAL); }
 <COMMENT>[^}]*              { /* skip */      }
 
-/* interface part of SA format */
-"INTERFACE"                 { return KEY_INTERFACE; }
-"INPUT"                     { return KEY_INPUT;     }
-"OUTPUT"                    { return KEY_OUTPUT;    }
+ /* interface part of SA format */
+"INTERFACE"                 { cerr << "interface" << endl;
+                              return KEY_INTERFACE; }
+"INPUT"                     { cerr << "input" << endl;
+                              return KEY_INPUT;     }
+"OUTPUT"                    { cerr << "output" << endl;
+                              return KEY_OUTPUT;    }
 
-/* nodes part of SA format */
-"NODES"                     { return KEY_NODES;     }
-"TAU"                       { return KEY_TAU;       }
-"FINAL"                     { return KEY_FINAL;     }
-"INITIAL"                   { return KEY_INTERNAL;  }
+ /* nodes part of SA format */
+"NODES"                     { cerr << "nodes" << endl;
+                              return KEY_NODES;     }
+"TAU"                       { cerr << "tau" << endl;
+                              return KEY_TAU;       }
+"FINAL"                     { cerr << "final" << endl;
+                              return KEY_FINAL;     }
+"INITIAL"                   { cerr << "initial" << endl;
+                              return KEY_INITIAL;  }
 
-/* signs */
-","                         { return COMMA;     }
-":"                         { return COLON;     }
-";"                         { return SEMICOLON; }
-"->"                        { return ARC;       }
+ /* signs */
+","                         { cerr << "," << endl;
+                              return COMMA;     }
+":"                         { cerr << ":" << endl;
+                              return COLON;     }
+";"                         { cerr << ";" << endl;
+                              return SEMICOLON; }
+"->"                        { cerr << "->" << endl;
+                              return ARROW;     }
 
-/* identifiers */
+ /* identifiers */
 [0-9][0-9]*                 {
                 pnapi_sa_lval.yt_int = atoi(yytext); return NUMBER;
                             }
-[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*
-                            {
-                pnapi_sa_lval.yt_string = new std::string(yytext); return IDENT;
+[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*  {
+                pnapi_sa_lval.yt_string = (std::string *)(new std::string(yytext)); return IDENT;
                             }
                             
-/* anything else */
+[\t \n\r]*                  { /* remove whitespaces */ }
+
+ /* anything else */
 .                           { yyerror("unexpected lexical token"); }
+

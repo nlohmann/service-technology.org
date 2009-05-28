@@ -17,8 +17,12 @@
   ****************************************************************************/
 %{
 
+#include <iostream>
 #include <string>
 #include "parser.h"
+
+using std::cerr;
+using std::endl;
 
 #undef yylex
 #undef yyparse
@@ -37,7 +41,7 @@
   ****************************************************************************/
 
 %token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_NODES KEY_TAU KEY_FINAL KEY_INITIAL
-%token COMMA COLON SEMICOLON ARC NUMBER IDENT
+%token COMMA COLON SEMICOLON ARROW NUMBER IDENT
 
 %union 
 {
@@ -48,7 +52,7 @@
 
 %type <yt_int> NUMBER
 %type <yt_string> IDENT
-%type <yt_node> input_list output_list name
+%type <yt_node> input output ident_list name state_name
 %type <yt_node> node_list node node_attributes
 %type <yt_node> transition_list transition
 
@@ -62,29 +66,31 @@
 
 sa: 
   KEY_INTERFACE
-    KEY_INPUT input_list SEMICOLON
-    KEY_OUTPUT output_list SEMICOLON
+    input
+    output
   KEY_NODES
     node_list
   {
-    $$ = new Node($3, $6, $9);
+    node = new Node($2, $3, $5);
   }
 ;
-      
-input_list:
-  /* empty */             { /*$$ = new Node();*/        }
-| name                    { /*$$ = new Node($1);*/      }
-| input_list COMMA name   { /*$$ = $1->addChild($3);*/  }
+
+input:
+  /* empty */
+| KEY_INPUT ident_list SEMICOLON { $$ = new Node(pnapi::parser::sa::INPUT, $2); }
 ;
-          
-output_list: 
-  /* empty */             { /*$$ = new Node();*/        }
-| name                    { /*$$ = new Node($1);*/      }
-| output_list COMMA name  { /*$$ = $1->addChild($3);*/  }
+
+output:
+  /* empty */
+| KEY_OUTPUT ident_list SEMICOLON { $$ = new Node(pnapi::parser::sa::OUTPUT, $2); }
+      
+ident_list:
+  name                    { $$ = new Node($1); }
+| ident_list COMMA name   { $$ = $1->addChild($3); }
 ;
 
 name:
-  IDENT                   { $$ = new Node($1);      }
+  IDENT                   { cerr << *$1 << endl; $$ = new Node($1);      }
 ;
 
 node_list:
@@ -94,7 +100,7 @@ node_list:
 ;
 
 node:
-  NUMBER node_attributes transition_list
+  state_name node_attributes transition_list
     {
       $$ = new Node(pnapi::parser::sa::STATE, $1, $2, $3);
     }
@@ -102,10 +108,10 @@ node:
 
 node_attributes:
   /* empty */             { $$ = new Node();                              }
-| KEY_FINAL               { $$ = new Node(pnapi::parser::sa::FINAL);      }
-| KEY_INITIAL             { $$ = new Node(pnapi::parser::sa::INITIAL);    }
-| KEY_FINAL KEY_INITIAL   { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
-| KEY_INITIAL KEY_FINAL   { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
+| COLON KEY_FINAL               { $$ = new Node(pnapi::parser::sa::FINAL);      }
+| COLON KEY_INITIAL             { $$ = new Node(pnapi::parser::sa::INITIAL);    }
+| COLON KEY_FINAL COMMA KEY_INITIAL { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
+| COLON KEY_INITIAL COMMA KEY_FINAL { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
 ;
 
 transition_list:
@@ -117,5 +123,10 @@ transition_list:
 ;
 
 transition:
-  name ARC NUMBER         { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
+  name ARROW state_name  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
+;
+
+state_name:
+  NUMBER                  { cerr << $1 << endl;
+                            $$ = new Node($1); }
 ;

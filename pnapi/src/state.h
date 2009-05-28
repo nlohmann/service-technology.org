@@ -29,6 +29,8 @@ namespace pnapi
   public:
     /// standard constructor
     State(unsigned int * = NULL);
+    /// standard constructor
+    State(const unsigned int);
     /// standard constructor service automaton
     State(Marking &m, std::map<const Place *, unsigned int> *,
         unsigned int * = NULL);

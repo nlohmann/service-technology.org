@@ -114,12 +114,30 @@ namespace pnapi
    * A state will be added to the set of states. The name given can be
    * empty, so a standard name will be set.
    *
-   * \param     const std::string name
    * \return    State &s .. the newly created state
    */
   State & Automaton::createState()
   {
     State *s = new State(&counter_);
+    states_.push_back(s);
+    return *s;
+  }
+
+
+  /*!
+   * A state will be added to the set of states with a given name.
+   * If there exists a state with the given name, this state will
+   * be returned.
+   *
+   * \param     const unsigned int name.
+   * \return    State &s .. the newly created state.
+   */
+  State & Automaton::createState(const unsigned int name)
+  {
+    for (unsigned int i = 0; i < states_.size(); i++)
+      if (states_[i]->name() == name)
+        return *states_[i];
+    State *s = new State(name);
     states_.push_back(s);
     return *s;
   }

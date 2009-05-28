@@ -26,6 +26,15 @@ namespace pnapi
 
 
   /*!
+   *
+   */
+  State::State(const unsigned int name) :
+    name_(name), isFinal_(false), isInitial_(false), m_(NULL), hashValue_(0)
+  {
+  }
+
+
+  /*!
    */
   State::State(Marking &m, std::map<const Place *, unsigned int> *pw,
       unsigned int *counter) :

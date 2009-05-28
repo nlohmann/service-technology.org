@@ -16,6 +16,7 @@
 #include <stack>
 #include <istream>
 
+#include "io.h"
 #include "link.h"
 #include "automaton.h"
 #include "component.h"
@@ -505,7 +506,7 @@ namespace pnapi
      ***** SA Parser
      *************************************************************************/
 
-    /*namespace sa
+    namespace sa
     {
 
       // forward declaration
@@ -527,18 +528,19 @@ namespace pnapi
       {
       public:
         Parser();
-      };*/
+      };
 
       /* Node Types */
-      /*enum Type
+      enum Type
       {
-        STATE, FINAL, INITIAL, INIT_FINAL, EDGE, NO_DATA, ID, NUM
-      };*/
+        STATE, FINAL, INITIAL, INIT_FINAL, EDGE, NO_DATA, ID, NUM,
+        INPUT, OUTPUT
+      };
 
       /*
        * \brief Node of a SA AST
        */
-      /*class Node : public BaseNode
+      class Node : public BaseNode
       {
       public:
         const Type type_;
@@ -550,17 +552,18 @@ namespace pnapi
         Node(Node *, Node *, Node *);
 
         Node(int);
-        Node(std::string);
+        Node(std::string *);
 
         Node(Type);
+        Node(Type, Node *);
         Node(Type, Node *, Node *);
         Node(Type, Node *, Node *, Node *);
-      };*/
+      };
 
       /*
        * \brief Visitor of a SA AST
        */
-      /*class Visitor : public parser::Visitor<Node>
+      class Visitor : public parser::Visitor<Node>
       {
       public:
         Visitor();
@@ -572,9 +575,25 @@ namespace pnapi
 
       private:
         Automaton *sa_;
+
+        std::stack<sa::Type> stack_;
+
+        // temporary objects
+        struct AState
+        {
+          unsigned int name;
+          bool isFinal;
+          bool isInitial;
+          std::vector<std::string> edgeLabels;
+          std::vector<unsigned int> targetNodes;
+        } newState_;
+        std::vector<std::string> input_;
+        std::vector<std::string> output_;
+
+        Automaton::Type getType(std::string) const;
       };
 
-    }*/ /* namespace sa */
+    } /* namespace sa */
 
 
 

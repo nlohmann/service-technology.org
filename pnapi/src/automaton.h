@@ -32,6 +32,8 @@ namespace pnapi
 
     /// creating a state
     State & createState();
+    /// creating a state with a given name
+    State & createState(const unsigned int);
     /// creating a state from given marking
     State & createState(Marking &);
     /// finding a state by name

@@ -414,7 +414,7 @@ int main(int argc, char** argv) {
 #endif
                         ostringstream d;
                         d << io::dot << objects[i].net;
-                        string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -o " + outname + " &> /dev/null";
+                        string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + outname;;
                         FILE *s = popen(call.c_str(), "w");
                         assert(s);
                         fprintf(s, "%s\n", d.str().c_str());

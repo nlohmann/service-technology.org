@@ -522,6 +522,11 @@ unsigned int j;
 		Places[h]->significant = true;
 	}
 	Places[0]->NrSignificant = h+1;
+	// If we did not find a significant place, we set the number to 0 anyway
+	// to avoid subsequent problems.
+	if (Places[0]->NrSignificant) {
+        Places[0]->NrSignificant = 1;
+	}
 	cout << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
 	

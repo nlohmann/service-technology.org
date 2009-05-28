@@ -9,106 +9,94 @@ extern int og_yyerror(char const *msg);
 %token_table
 %defines
 
-%token key_nodes key_initialnode key_finalnode key_transitions
-%token key_interface key_input key_output
-%token key_red key_blue
-%token comma colon semicolon ident arrow number
-%token key_true key_false key_final
-%token lpar rpar
+%token KEY_NODES
+%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
+%token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
+%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
+%token LPAR RPAR
 
 %union {
     char *str;
     unsigned int value;
 }
 
-%type <value> number
-%type <str>   ident
+%type <value> NUMBER
+%type <str>   IDENT
 
-%left op_or
-%left op_and
+%left OP_OR
+%left OP_AND
+%left OP_NOT
 
 %start og
 %%
 
 
 og:
- interface nodes initialnode transitions
+  KEY_INTERFACE input output synchronous KEY_NODES nodes
 ;
 
 
-interface:
-  /* for backwards compatibility, the interface is optional */
-| key_interface key_input places_list semicolon
-  key_output places_list semicolon
-;
-
-
-places_list:
+input:
   /* empty */
-| places_list comma ident
-| ident
+| KEY_INPUT identlist SEMICOLON
+;
+
+
+output:
+  /* empty */
+| KEY_OUTPUT identlist SEMICOLON
+;
+
+
+synchronous:
+  /* empty */
+| KEY_SYNCHRONOUS identlist SEMICOLON
+;
+
+
+identlist:
+  /* empty */
+| IDENT
+| identlist COMMA IDENT
 ;
 
 
 nodes:
-  key_nodes nodes_list semicolon
-;
-
-
-nodes_list:
-  /* empty */
-| node
-| nodes_list comma node
+  node
+| nodes node
 ;
 
 
 node:
-  number
-| number colon formula
-| number colon key_finalnode
-| number colon formula colon color
-| number colon formula colon key_finalnode
-| number colon formula colon color colon key_finalnode
+  NUMBER annotation successors
+;
+
+
+annotation:
+  /* empty */
+| COLON formula
+| DOUBLECOLON BIT_S
+| DOUBLECOLON BIT_F
 ;
 
 
 formula:
-  lpar formula rpar
-| formula op_and formula
-| formula op_or formula
-| key_final
-| key_true
-| key_false
-| ident
+  LPAR formula RPAR
+| formula OP_AND formula
+| formula OP_OR formula
+| OP_NOT formula
+| KEY_FINAL
+| KEY_TRUE
+| KEY_FALSE
+| IDENT
 ;
 
 
-color:
-| key_blue
-| key_red
-;
-
-
-initialnode:
-  key_initialnode number semicolon
-;
-
-
-transitions:
-  key_transitions transitions_list semicolon
-;
-
-
-transitions_list:
+successors:
   /* empty */
-| transition
-| transitions_list comma transition
+| successors IDENT ARROW NUMBER
 ;
 
-
-transition:
-  number arrow number colon ident
-;
 
 %%
 

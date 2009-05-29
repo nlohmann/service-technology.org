@@ -16,6 +16,12 @@ AM_PROG_CC_C_O
 AC_PROG_SED
 AC_PROG_GREP
 
+# search for Fiona (nice to have for "make check")
+AC_CHECK_PROG(FIONA, fiona, fiona, not found)
+
+# search for Petri (nice to have for "make check")
+AC_CHECK_PROG(PETRI, petri, petri, not found)
+
 # flags set by the configure script
 configured_CFLAGS=""
 configured_CXXFLAGS=""

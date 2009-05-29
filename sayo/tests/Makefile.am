@@ -1,5 +1,7 @@
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at
+
+EXTRA_DIST = testsuite.at \
+             testfiles/zeus.o testfiles/zeus.og
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

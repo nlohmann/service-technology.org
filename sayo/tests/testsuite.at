@@ -23,20 +23,24 @@ AT_BANNER([I/O Tests])
 AT_SETUP([File In, File Out])
 AT_CHECK([cp TESTFILES/zeus.og .])
 AT_CHECK([SAYO --input=zeus.og --output=zeus.sa],0)
+AT_CHECK([test -f zeus.sa])
 AT_CLEANUP
 
 AT_SETUP([File In, Pipe Out])
 AT_CHECK([cp TESTFILES/zeus.og .])
 AT_CHECK([SAYO --input=zeus.og > zeus.sa],0)
+AT_CHECK([test -f zeus.sa])
 AT_CLEANUP
 
 AT_SETUP([Pipe In, File Out])
 AT_CHECK([cp TESTFILES/zeus.og .])
 AT_CHECK([cat zeus.og | SAYO --output=zeus.sa],0)
+AT_CHECK([test -f zeus.sa])
 AT_CLEANUP
 
 AT_SETUP([Pipe In, Pipe Out])
 AT_CHECK([cp TESTFILES/zeus.og .])
 AT_CHECK([cat zeus.og | SAYO > zeus.sa],0)
+AT_CHECK([test -f zeus.sa])
 AT_CLEANUP
 

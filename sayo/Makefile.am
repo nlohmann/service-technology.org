@@ -1,10 +1,10 @@
-SUBDIRS = src tests
+SUBDIRS = src tests doc man maintainer
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
 	-rm -f compile
 	-rm -f aclocal.m4
-	-rm -f configure Doxyfile compile
+	-rm -f configure
 	-rm -f depcomp
 	-rm -f install-sh
 	-rm -f Makefile.in
@@ -16,14 +16,14 @@ svn-clean: maintainer-clean
 	-rm -f src/config.h.in
 	-rm -f tests/Makefile.in
 	-rm -fr doc/doxygen
-	-rm -f doc/Doxyfile
+	-rm -f doc/Doxyfile doc/mdate-sh
+	-rm -f doc/Makefile.in
+	-rm -f man/Makefile.in
+	-rm -f maintainer/Makefile.in
 	-rm -f INSTALL
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter
-	@echo   aclocal
-	@echo   autoconf
-	@echo   autoheader
-	@echo   automake -a -c
+	@echo "  autoreconf -i"
 	@echo
 
 doxygen:

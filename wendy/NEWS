@@ -10,7 +10,8 @@
 Version 1.4-unreleased
 ======================
 
-* ...
+* versions of used programs are collected in `testsuite.log' when running
+  `make check'
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

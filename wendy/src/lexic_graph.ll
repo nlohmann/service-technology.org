@@ -67,5 +67,5 @@ void graph_error(const char *msg) {
   if (args_info.verbose_flag) {
       fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, graph_lineno, graph_text, msg);
   }
-  abort(6, "error while parsing the reachability");
+  abort(6, "error while parsing the reachability graph");
 }

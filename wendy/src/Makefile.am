@@ -26,7 +26,3 @@ MAINTAINERCLEANFILES = syntax_graph.h cmdline.c cmdline.h
 ################################################################
 cmdline.c: cmdline.ggo
 	$(GENGETOPT) --input=cmdline.ggo
-
-
-doxygen:
-	cd ../doc ; doxygen

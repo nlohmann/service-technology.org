@@ -1,6 +1,6 @@
 @heading Version 1.4-unreleased
 @itemize
-@item ...
+@item versions of used programs are collected in @file{testsuite.log} when running @samp{make check}
 @end itemize
 
 

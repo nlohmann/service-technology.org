@@ -1,5 +1,5 @@
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at \
+EXTRA_DIST = testsuite.at versions.sh \
 		testfiles/PO.fiona.og testfiles/PO.owfn \
 		testfiles/T2.fiona.og testfiles/T2.owfn \
 		testfiles/bug1.fiona.og testfiles/bug1.owfn \

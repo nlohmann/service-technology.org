@@ -263,7 +263,7 @@ This error occurs in case Wendy could not parse the reachability graph from LoLA
 
 @smallexample
 @cartouche
-wendy: error while parsing the reachability -- aborting [#06]
+wendy: error while parsing the reachability graph -- aborting [#06]
 @end cartouche
 @end smallexample
 

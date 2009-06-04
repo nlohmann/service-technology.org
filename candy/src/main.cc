@@ -4,7 +4,7 @@
 //#include <cassert>
 //#include <sstream>
 //#include <cstdio>
-//#include <cstdlib>
+#include <cstdlib>
 //#include "pnapi.h"
 
 // standard header for declaring objects that control reading from and writing to the standard streams 

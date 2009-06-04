@@ -8,6 +8,8 @@ linda_SOURCES = main.cc \
 
 linda_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a $(top_builddir)/libs/lp_solve/liblpsolve55.a
 
+linda_LDFLAGS = -ldl
+
 linda_CPPFLAGS = -I$(top_srcdir)/libs/pnapi -I$(top_srcdir)/libs/lp_solve
 
 BUILT_SOURCES = cmdline.c

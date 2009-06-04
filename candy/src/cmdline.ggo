@@ -1,35 +1,62 @@
-# What does the program?
+# the purpose of the program
 purpose "CANDY - Candy AiN't Done Yet\n
 Calculating a cost-efficient partner out of an operating guideline."
 
+
 # the description string will be printet with the help after usage
-description "I need to write a description."
+description "About Candy:"
 
 
-# arguments for gengetopt ... RICH do I need them?
-args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+# arguments for gengetopt ... what do they do?
+# --long-help: long usage line in help
+# --include-getopt: adds code for getopt_long in generated C file
+# --show-required: output of help will specify which options are mandatory
+# --unamed-opts=FILE: accept options without names
+#args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+args "--long-help --include-getopt --show-required"
 
 
+# -----------------------------------------------------------------
+section "Input and Output" 
+sectiondesc="This section explains where to get the operating guideline and where to write the calculated partner.\n"
+
+option "input" i
+  "The input file containing an operating guideline. If this option isn't used the operation guideline will be read from standard in."
+  string
+  typestr="FILENAME"
+  optional
+
+option "output" o
+  "The output file containing the calculated partner. If this option isn't used the partner will be written to standard out. If this option is used without giving a filename the input filename's prefix will be used as filename."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+
+# -----------------------------------------------------------------
+section "Cost" 
+sectiondesc="This section explains where to get the cost for calculating a cost-efficient partner. Exactly one out of these two options always has to be used.\n"
+
+option "costfile" c
+  "Use a given cost file for the transition cost. If no filename is given the input filename's prefix will be used for finding a '.cf' file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+option "netfile" n
+  "Use a given open net for the transition cost. If no filename is given the input filenames's prefix will be used for finding a '.owfn' file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+
+# -----------------------------------------------------------------
 section "Debug"
 sectiondesc="optional section description\n"
 
 option "verbose" v
   "Verbose output"
   flag off
-
-section "Cost" 
-sectiondesc="optional section description\n"
-
-option "opennet" o
-  "Use a given open net for the transition cost. If no filename is given, the OG filename's suffix is used for finding a '.owfn' file."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-  
-option "costfile" c
-  "Use a given cost file for the transition cost. If no filename is given, the OG filename's suffix is used for finding a '.cf' file."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional

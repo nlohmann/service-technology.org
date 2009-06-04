@@ -19,8 +19,9 @@ AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 
 AC_HEADER_ASSERT
 
-# check for dlopen library (required by lp_solve)
+# check for dlopen/ftime (required by lp_solve)
 AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
+AC_SEARCH_LIBS([ftime], [compat])
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))

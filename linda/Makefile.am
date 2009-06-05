@@ -1,4 +1,9 @@
+# process "libs/pnapi" directory only if the Petri Net API needs to be compiled
+if COMPILE_PNAPI
 SUBDIRS = libs/pnapi libs/lp_solve src man
+else
+SUBDIRS = libs/lp_solve src man
+endif
 
 svn-clean: maintainer-clean
 	rm -fr COPYING INSTALL Makefile.in aclocal.m4 compile configure \

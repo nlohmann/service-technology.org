@@ -4,12 +4,19 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <set>
+#include <vector>
 
-#include "pnapi.h"
+#include "config.h"
+#include <pnapi/pnapi.h>
+
 #include "lp_lib.h"
 
 #include "bounds.h"
 #include "messageprofile.h"
+
+using std::set;
+using std::vector;
 
 #define MIN_CALL popen("cat tmp.obj tmp.stub tmp.events tmp.known tmp.decl | lp_solve -S1 ","r");
 #define MAX_CALL popen("cat tmp.obj tmp.stub tmp.events tmp.known tmp.decl | lp_solve -S1 -max","r");

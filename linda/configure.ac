@@ -23,6 +23,10 @@ AC_HEADER_ASSERT
 AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
 AC_SEARCH_LIBS([ftime], [compat])
 
+# check if the Petri Net API is already installed
+AC_CHECK_LIB([pnapi], [main])
+AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
+
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 

@@ -8,7 +8,7 @@
 #ifndef MESSAGEPROFILE_H_
 #define MESSAGEPROFILE_H_
 
-#include "pnapi.h"
+#include "helpers.h"
 #include "bounds.h"
 
 #define EVENT pnapi::Place*

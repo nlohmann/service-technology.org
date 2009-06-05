@@ -1,3 +1,9 @@
+@heading Version 1.13-unreleased
+@itemize
+@item fixed a small bug in the @option{PREDUCTION} mode: nets without significant places are now analyzed instantly
+@end itemize
+
+
 @heading Version 1.12
 @itemize
 @item addressed bug #13538 (@url{https://gna.org/bugs/?13538}): @samp{make install} installs @i{all} binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx} that are present in the @file{src} folder. Likewise, @samp{make uninstall} removes all installed binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx}

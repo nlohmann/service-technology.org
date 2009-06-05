@@ -6,19 +6,11 @@
                      http://service-technology.org/lola
 
 
-Version 1.12
-============
+Version 1.13-unreleased
+=======================
 
-* addressed bug #13538 (`https://gna.org/bugs/?13538'): `make install'
-  installs all binaries with the name `lola' or `lola-xxx' for a standard
-  configuration `userconfig.H.xxx' that are present in the `src' folder.
-  Likewise, `make uninstall' removes all installed binaries with the name
-  `lola' or `lola-xxx' for a standard configuration `userconfig.H.xxx'
-
-* adjusted the parser to cope with different line endings (CR, LF, CRLF)
-
-* licensed LoLA under the GNU Affero General Public License (Affero GPL), see
-  file `COPYING'
+* fixed a small bug in the `PREDUCTION' mode: nets without significant places
+  are now analyzed instantly
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

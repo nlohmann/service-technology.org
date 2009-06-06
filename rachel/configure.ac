@@ -7,7 +7,6 @@ AC_INIT(Rachel, 1.13, rachel@service-technology.org, rachel)
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.61)
 AM_INIT_AUTOMAKE(gnits)
-AM_SILENT_RULES
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR([src/main.cc])

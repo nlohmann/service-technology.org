@@ -67,32 +67,21 @@ using std::endl;
 <COMMENT>[^}]*              { /* skip */      }
 
  /* interface part of SA format */
-"INTERFACE"                 { cerr << "interface" << endl;
-                              return KEY_INTERFACE; }
-"INPUT"                     { cerr << "input" << endl;
-                              return KEY_INPUT;     }
-"OUTPUT"                    { cerr << "output" << endl;
-                              return KEY_OUTPUT;    }
+"INTERFACE"                 { return KEY_INTERFACE; }
+"INPUT"                     { return KEY_INPUT;     }
+"OUTPUT"                    { return KEY_OUTPUT;    }
 
  /* nodes part of SA format */
-"NODES"                     { cerr << "nodes" << endl;
-                              return KEY_NODES;     }
-"TAU"                       { cerr << "tau" << endl;
-                              return KEY_TAU;       }
-"FINAL"                     { cerr << "final" << endl;
-                              return KEY_FINAL;     }
-"INITIAL"                   { cerr << "initial" << endl;
-                              return KEY_INITIAL;  }
+"NODES"                     { return KEY_NODES;     }
+"TAU"                       { return KEY_TAU;       }
+"FINAL"                     { return KEY_FINAL;     }
+"INITIAL"                   { return KEY_INITIAL;  }
 
  /* signs */
-","                         { cerr << "," << endl;
-                              return COMMA;     }
-":"                         { cerr << ":" << endl;
-                              return COLON;     }
-";"                         { cerr << ";" << endl;
-                              return SEMICOLON; }
-"->"                        { cerr << "->" << endl;
-                              return ARROW;     }
+","                         { return COMMA;     }
+":"                         { return COLON;     }
+";"                         { return SEMICOLON; }
+"->"                        { return ARROW;     }
 
  /* identifiers */
 [0-9][0-9]*                 {

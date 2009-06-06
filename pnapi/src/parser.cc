@@ -856,6 +856,7 @@ namespace pnapi
         {
           newState_.isFinal = true;
           newState_.isInitial = true;
+          break;
         }
         case sa::INPUT:
         {
@@ -878,6 +879,7 @@ namespace pnapi
           }
           default: assert(false); break;
           }
+          break;
         }
         case sa::OUTPUT:
         {
@@ -902,7 +904,7 @@ namespace pnapi
           if (stack_.top() == sa::EDGE)
             stack_.pop();
           else
-            ;//assert(false);
+            assert(false);
           break;
         }
         case sa::INPUT:
@@ -941,7 +943,7 @@ namespace pnapi
           if (stack_.top() == sa::STATE)
             stack_.pop();
           else
-            ;//assert(false);
+            assert(false);
           break;
         }
         default: break;

@@ -90,7 +90,7 @@ ident_list:
 ;
 
 name:
-  IDENT                   { cerr << *$1 << endl; $$ = new Node($1);      }
+  IDENT                   { $$ = new Node($1); }
 ;
 
 node_list:
@@ -115,7 +115,7 @@ node_attributes:
 ;
 
 transition_list:
-  /* empty */
+  /* empty */           { $$ = new Node(); }
 | transition_list transition
     { $$ = $1->addChild($2); }
 | transition
@@ -127,6 +127,5 @@ transition:
 ;
 
 state_name:
-  NUMBER                  { cerr << $1 << endl;
-                            $$ = new Node($1); }
+  NUMBER                  { $$ = new Node($1); }
 ;

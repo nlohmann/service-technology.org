@@ -1,4 +1,4 @@
-@heading Version 1.13-unreleased
+@heading Version 1.13
 @itemize
 @item the bit annotations are now written inside the nodes of the Graphviz dot annotation
 
@@ -19,6 +19,8 @@
 @item made adaptions to the Makefile options to be able to create Mac Universal binaries for 64 bit architectures (XCode 3.0 with SDK @samp{MacOSX10.5.sdk} is needed)
 
 @item if Graphviz dot has not been found by the configure script, the dependent tests are skipped instead of throwing an error
+
+@item tests are now organized by @acronym{GNU} Autotest
 @end itemize
 
 

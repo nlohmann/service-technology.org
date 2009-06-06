@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="rachel -a $testdir/testfiles/purchase_order.sa -o $testdir/testfiles/error-parser.og"
-echo ""
-echo "test: syntax error"
-echo "      $command"
-$command &> /dev/null

@@ -1,4 +1,4 @@
-AC_INIT(Rachel, 1.13-unreleased, rachel@service-technology.org, rachel)
+AC_INIT(Rachel, 1.13, rachel@service-technology.org, rachel)
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
@@ -7,6 +7,7 @@ AC_INIT(Rachel, 1.13-unreleased, rachel@service-technology.org, rachel)
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.61)
 AM_INIT_AUTOMAKE(gnits)
+AM_SILENT_RULES
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR([src/main.cc])
@@ -20,6 +21,10 @@ AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
@@ -141,6 +146,6 @@ AC_CONFIG_FILES([Makefile
                  maintainer/Makefile maintainer/debian/changelog.template
                  man/Makefile
                  src/Makefile
-                 tests/Makefile])
+                 tests/Makefile tests/package.m4])
 
 AC_OUTPUT

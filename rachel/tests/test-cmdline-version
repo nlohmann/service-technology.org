@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="rachel --version"
-echo ""
-echo "test: version output"
-echo "      $command"
-$command &> /dev/null

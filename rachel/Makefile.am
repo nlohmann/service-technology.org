@@ -16,12 +16,6 @@ svn-clean: maintainer-clean
 	maintainer/debian/README.Debian
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
-	@echo "  aclocal"
-	@echo "  autoconf"
-	@echo "  autoheader"
-	@echo "  automake -ac"
-	@echo
-	@echo "or"
 	@echo "  autoreconf -i"
 	@echo
 

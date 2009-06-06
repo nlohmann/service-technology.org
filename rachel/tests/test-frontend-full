@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="rachel -a $testdir/testfiles/purchase_order.sa -o $testdir/testfiles/full.og"
-echo ""
-echo "test: full input"
-echo "      $command"
-$command &> /dev/null

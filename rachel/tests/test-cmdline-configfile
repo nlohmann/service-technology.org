@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="rachel -a $testdir/testfiles/traveler.sa -o $testdir/testfiles/agency_airline.og -m simulation -c $testdir/testfiles/rachel.conf"
-echo ""
-echo "test: config file"
-echo "      $command"
-$command &> /dev/null

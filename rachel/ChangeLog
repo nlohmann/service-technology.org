@@ -6,8 +6,8 @@
                       http://service-technology.org/rachel
 
 
-Version 1.13-unreleased
-=======================
+Version 1.13
+============
 
 * the bit annotations are now written inside the nodes of the Graphviz dot
   annotation
@@ -40,6 +40,8 @@ Version 1.13-unreleased
 
 * if Graphviz dot has not been found by the configure script, the dependent
   tests are skipped instead of throwing an error
+
+* tests are now organized by GNU Autotest
 
 Version 1.12
 ============

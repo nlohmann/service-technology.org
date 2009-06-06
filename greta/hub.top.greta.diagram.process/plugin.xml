@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+Copyright (c) 2008, 2009. Manja Wolf, Dirk Fahland. EPL1.0/AGPL3.0
+All rights reserved.
+
+ServiceTechnolog.org - Greta
+                      (Graphical Runtime Environment for Adaptive Processes) 
+
+This program and the accompanying materials are made available under
+the terms of the Eclipse Public License v1.0, which accompanies this
+distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+for the specific language governing rights and limitations under the
+License.
+
+The Original Code is this file as it was released on June 6, 2009.
+The Initial Developer of the Original Code are
+		Manja Wolf, Dirk Fahland
+
+Portions created by the Initial Developer are Copyright (c) 2008, 2009
+the Initial Developer. All Rights Reserved.
+
+Contributor(s):
+
+Alternatively, the contents of this file may be used under the terms of
+the GNU Affero General Public License Version 3 or later (the "GPL") in
+which case the provisions of the AGPL are applicable instead of those above.
+If you wish to allow use of your version of this file only under the terms
+of the AGPL and not to allow others to use your version of this file under
+the terms of the EPL, indicate your decision by deleting the provisions
+above and replace them with the notice and other provisions required by the 
+AGPL. If you do not delete the provisions above, a recipient may use your
+version of this file under the terms of any one of the EPL or the AGPL.
+
+
+-->
+<plugin>
+
+   <extension point="org.eclipse.team.core.fileTypes">
+      <?gmfgen generated="true"?>
+      <fileTypes
+         type="text"
+         extension="adaptivesystem_process">
+      </fileTypes>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <?gmfgen generated="true"?>
+      <parser
+         type="adaptivesystem_process"
+         class="org.eclipse.gmf.runtime.emf.core.resources.GMFResourceFactory">
+      </parser>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <?gmfgen generated="true"?>
+      <editor
+         id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewerID"
+         name="%editorName"
+         icon="icons/obj16/AdaptiveProcessDiagramFile.gif"
+         extensions="adaptivesystem_process"
+         default="true"
+         class="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer"
+         matchingStrategy="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessMatchingStrategy"
+         contributorClass="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramActionBarContributor">
+      </editor>
+   </extension>
+   
+   <extension point="org.eclipse.ui.contexts">
+      <?gmfgen generated="true"?>
+      <context
+         description="%context.description"
+         id="hub.top.adaptiveProcess.diagram.ui.diagramContext"
+         name="%context.name"
+         parentId="org.eclipse.gmf.runtime.diagram.ui.diagramContext">
+      </context>
+   </extension>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <?gmfgen generated="true"?>
+  	  <wizard
+  	     name="%newWizardName"
+  	     icon="icons/obj16/AdaptiveProcessDiagramFile.gif"
+  	     category="org.eclipse.ui.Examples"
+  	     class="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessCreationWizard"
+  	     id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessCreationWizardID">
+  	  	 <description>%newWizardDesc</description>  
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.popupMenus">
+      <?gmfgen generated="true"?>
+      <objectContribution
+            adaptable="false"
+            id="hub.top.GRETA.diagram.process.LoadResource"
+            objectClass="hub.top.adaptiveSystem.diagram.edit.parts.AP_ProcessEditPart">
+         <action
+               class="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessLoadResourceAction"
+               enablesFor="1"
+               id="hub.top.GRETA.diagram.process.LoadResourceAction"
+               label="%loadResourceActionLabel"
+               menubarPath="additions">
+         </action>
+      </objectContribution>           
+   </extension>
+
+   <extension point="org.eclipse.ui.popupMenus">
+      <?gmfgen generated="true"?>
+      <objectContribution
+            id="hub.top.GRETA.diagram.process.InitDiagram"
+            nameFilter="*.adaptivesystem"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="%initDiagramActionLabel"
+               class="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessInitDiagramFileAction"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.GRETA.diagram.process.InitDiagramAction">
+         </action>
+      </objectContribution>
+   </extension>
+	
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.action.globalActionHandlerProviders">
+      <?gmfgen generated="true"?>
+      <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramGlobalActionHandlerProvider"
+         id="AdaptiveProcessPresentation">
+         <Priority name="Lowest"/>
+         <ViewId id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewerID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="delete"/>
+            </ElementType>
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart">
+               <GlobalActionId actionId="save"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.printing.render.providers.DiagramWithPrintGlobalActionHandlerProvider"
+         id="AdaptiveProcessPresentationPrint">
+         <Priority name="Lowest"/>
+         <ViewId id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewerID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="print"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.providers.ide.providers.DiagramIDEGlobalActionHandlerProvider"
+         id="AdaptiveProcessPresentationIDE">
+         <Priority name="Lowest"/>
+         <ViewId id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewerID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="bookmark"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
+            class="org.eclipse.gmf.runtime.diagram.ui.render.providers.DiagramUIRenderGlobalActionHandlerProvider"
+            id="AdaptiveProcessRender">
+         <Priority name="Lowest"/>
+         <ViewId id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewerID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="cut"/>
+               <GlobalActionId actionId="copy"/>
+               <GlobalActionId actionId="paste"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.action.contributionItemProviders">
+      <?gmfgen generated="true"?>
+      <contributionItemProvider class="hub.top.adaptiveProcess.diagram.providers.AdaptiveSystemContributionItemProvider">
+         <Priority name="Low"/>
+         <partContribution id="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewerID">
+            <partAction menubarPath="/file/print" id="printPreviewAction"/>
+         </partContribution>
+      </contributionItemProvider>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <?gmfgen generated="true"?>
+      <initializer class="hub.top.adaptiveProcess.diagram.preferences.DiagramPreferenceInitializer"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.preferencePages">
+      <?gmfgen generated="true"?>
+      <page
+            id="hub.top.GRETA.diagram.general"
+            name="%preference.page.title.hub.top.GRETA.diagram.general"
+            class="hub.top.adaptiveProcess.diagram.preferences.DiagramGeneralPreferencePage">
+      </page>
+      <page
+            id="hub.top.GRETA.diagram.appearance"
+            name="%preference.page.title.hub.top.GRETA.diagram.appearance"
+            category="hub.top.GRETA.diagram.general"
+            class="hub.top.adaptiveProcess.diagram.preferences.DiagramAppearancePreferencePage">
+      </page>
+      <page
+            id="hub.top.GRETA.diagram.connections"
+            name="%preference.page.title.hub.top.GRETA.diagram.connections"
+            category="hub.top.GRETA.diagram.general"
+            class="hub.top.adaptiveProcess.diagram.preferences.DiagramConnectionsPreferencePage">
+      </page>
+      <page
+            id="hub.top.GRETA.diagram.printing"
+            name="%preference.page.title.hub.top.GRETA.diagram.printing"
+            category="hub.top.GRETA.diagram.general"
+            class="hub.top.adaptiveProcess.diagram.preferences.DiagramPrintingPreferencePage">
+      </page>
+      <page
+            id="hub.top.GRETA.diagram.rulersAndGrid"
+            name="%preference.page.title.hub.top.GRETA.diagram.rulersAndGrid"
+            category="hub.top.GRETA.diagram.general"
+            class="hub.top.adaptiveProcess.diagram.preferences.DiagramRulersAndGridPreferencePage">
+      </page>
+      <page
+            id="hub.top.GRETA.diagram.pathmaps"
+            name="%preference.page.title.hub.top.GRETA.diagram.pathmaps"
+            category="hub.top.GRETA.diagram.general"
+            class="org.eclipse.gmf.runtime.emf.ui.preferences.PathmapsPreferencePage">
+      </page>
+   </extension>
+
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <?gmfgen generated="true"?>
+      <propertyContributor
+            contributorId="hub.top.GRETA.diagram.process"
+            labelProvider="hub.top.adaptiveProcess.diagram.sheet.AdaptiveSystemSheetLabelProvider">
+         <propertyCategory category="domain"/>
+         <propertyCategory category="visual"/>
+         <propertyCategory category="extra"/>
+      </propertyContributor>
+   </extension>
+
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <?gmfgen generated="true"?>   
+      <propertyTabs contributorId="hub.top.GRETA.diagram.process">
+         <propertyTab
+             category="visual"
+             id="property.tab.AppearancePropertySection"
+             label="%tab.appearance"/>
+          <propertyTab
+             category="visual"
+             id="property.tab.DiagramPropertySection"
+             label="%tab.diagram"/>
+          <propertyTab
+             category="domain"
+             id="property.tab.domain"
+             label="%tab.domain"/>
+      </propertyTabs>
+   </extension>
+
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <?gmfgen generated="true"?>   
+      <propertySections contributorId="hub.top.GRETA.diagram.process">
+         <propertySection id="property.section.ConnectorAppearancePropertySection" 
+            filter="org.eclipse.gmf.runtime.diagram.ui.properties.filters.ConnectionEditPartPropertySectionFilter" 
+            class="org.eclipse.gmf.runtime.diagram.ui.properties.sections.appearance.ConnectionAppearancePropertySection" 
+            tab="property.tab.AppearancePropertySection">
+         </propertySection>
+         <propertySection id="property.section.ShapeColorAndFontPropertySection" 
+            filter="org.eclipse.gmf.runtime.diagram.ui.properties.filters.ShapeEditPartPropertySectionFilter" 
+            class="org.eclipse.gmf.runtime.diagram.ui.properties.sections.appearance.ShapeColorsAndFontsPropertySection" 
+            tab="property.tab.AppearancePropertySection">
+         </propertySection> 
+         <propertySection id="property.section.DiagramColorsAndFontsPropertySection" 
+            filter="org.eclipse.gmf.runtime.diagram.ui.properties.filters.DiagramEditPartPropertySectionFilter" 
+            class="org.eclipse.gmf.runtime.diagram.ui.properties.sections.appearance.DiagramColorsAndFontsPropertySection" 
+            tab="property.tab.AppearancePropertySection">
+         </propertySection>     
+         <propertySection id="property.section.RulerGridPropertySection" 
+            filter="org.eclipse.gmf.runtime.diagram.ui.properties.filters.DiagramEditPartPropertySectionFilter" 
+            class="org.eclipse.gmf.runtime.diagram.ui.properties.sections.grid.RulerGridPropertySection" 
+            tab="property.tab.DiagramPropertySection">
+         </propertySection>     
+         <propertySection
+            id="property.section.domain" 
+            tab="property.tab.domain"
+            class="hub.top.adaptiveProcess.diagram.sheet.AdaptiveSystemPropertySection">
+            <input type="org.eclipse.gmf.runtime.notation.View"/>
+            <input type="org.eclipse.gef.EditPart"/>
+            <input type="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemAbstractNavigatorItem"/>
+         </propertySection>
+      </propertySections>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.diagram.core.viewProviders">
+      <?gmfgen generated="true"?>
+      <viewProvider class="hub.top.adaptiveProcess.diagram.providers.AdaptiveSystemViewProvider">
+         <Priority name="Lowest"/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Diagram" semanticHints="AdaptiveProcess"/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints=""/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Edge" semanticHints=""/>
+      </viewProvider>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.diagram.ui.editpartProviders">
+      <?gmfgen generated="true"?>
+      <editpartProvider class="hub.top.adaptiveProcess.diagram.providers.AdaptiveSystemEditPartProvider">
+         <Priority name="Lowest"/>
+      </editpartProvider>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.emf.ui.modelingAssistantProviders">
+      <?gmfgen generated="true"?>
+      <modelingAssistantProvider class="hub.top.adaptiveProcess.diagram.providers.AdaptiveSystemModelingAssistantProvider">
+         <Priority name="Lowest"/>
+      </modelingAssistantProvider>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.iconProviders">
+      <?gmfgen generated="true"?>
+      <IconProvider class="hub.top.adaptiveProcess.diagram.providers.AdaptiveSystemIconProvider">
+         <Priority name="Low"/>
+      </IconProvider>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.parserProviders">
+      <?gmfgen generated="true"?>
+      <ParserProvider class="hub.top.adaptiveProcess.diagram.providers.AdaptiveSystemParserProvider">
+         <Priority name="Lowest"/>
+      </ParserProvider>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypes">
+      <?gmfgen generated="true"?>
+      <metamodel nsURI="adaptiveSystem">
+         <metamodelType
+               id="hub.top.GRETA.diagram.process.AdaptiveProcess_1001"
+               name="%metatype.name.AdaptiveProcess_1001"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="AdaptiveProcess"
+               edithelper="hub.top.adaptiveSystem.diagram.edit.helpers.AdaptiveProcessEditHelper">
+            <param name="semanticHint" value="1001"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="adaptiveSystem">
+         <metamodelType
+               id="hub.top.GRETA.diagram.process.Condition_2001"
+               name="%metatype.name.Condition_2001"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="Condition"
+               edithelper="hub.top.adaptiveSystem.diagram.edit.helpers.ConditionAPEditHelper">
+            <param name="semanticHint" value="2001"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="adaptiveSystem">
+         <metamodelType
+               id="hub.top.GRETA.diagram.process.Event_2002"
+               name="%metatype.name.Event_2002"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="Event"
+               edithelper="hub.top.adaptiveSystem.diagram.edit.helpers.EventAPEditHelper">
+            <param name="semanticHint" value="2002"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="adaptiveSystem">
+         <metamodelType
+               id="hub.top.GRETA.diagram.process.ArcToCondition_3001"
+               name="%metatype.name.ArcToCondition_3001"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="ArcToCondition"
+               edithelper="hub.top.adaptiveSystem.diagram.edit.helpers.ArcToConditionEditHelper">
+            <param name="semanticHint" value="3001"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="adaptiveSystem">
+         <metamodelType
+               id="hub.top.GRETA.diagram.process.ArcToEvent_3002"
+               name="%metatype.name.ArcToEvent_3002"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="ArcToEvent"
+               edithelper="hub.top.adaptiveSystem.diagram.edit.helpers.ArcToEventEditHelper">
+            <param name="semanticHint" value="3002"/>
+         </metamodelType>
+      </metamodel>
+   </extension>
+
+   <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypeBindings">
+      <?gmfgen generated="true"?>
+      <clientContext id="hub.top.GRETA.diagram.process.TypeContext">
+         <enablement>
+            <test
+               property="org.eclipse.gmf.runtime.emf.core.editingDomain"
+               value="hub.top.GRETA.diagram.process.EditingDomain"/>
+         </enablement>
+      </clientContext> 
+      <binding context="hub.top.GRETA.diagram.process.TypeContext">
+         <elementType ref="hub.top.GRETA.diagram.process.AdaptiveProcess_1001"/>
+         <elementType ref="hub.top.GRETA.diagram.process.Condition_2001"/>
+         <elementType ref="hub.top.GRETA.diagram.process.Event_2002"/>
+         <elementType ref="hub.top.GRETA.diagram.process.ArcToCondition_3001"/>
+         <elementType ref="hub.top.GRETA.diagram.process.ArcToEvent_3002"/>
+         <advice ref="org.eclipse.gmf.runtime.diagram.core.advice.notationDepdendents"/>
+      </binding>
+   </extension>
+	   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <?gmfgen generated="true"?>
+       <propertyTester
+           id="hub.top.GRETA.diagram.process.URIEditorInputPropertyTester"
+           type="org.eclipse.emf.common.ui.URIEditorInput"
+           namespace="hub.top.GRETA.diagram.process"
+           properties="isURIEditorInput"
+           class="hub.top.adaptiveProcess.diagram.part.AdaptiveSystemUriEditorInputTester">
+       </propertyTester>
+   </extension>
+
+	   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <?gmfgen generated="true"?>
+       <propertyTester
+           id="hub.top.GRETA.diagram.process.DomainModelElementPropertyTester"
+           type="org.eclipse.emf.ecore.EObject"
+           namespace="hub.top.GRETA.diagram.process"
+           properties="isDomainModelElement"
+           class="hub.top.adaptiveProcess.diagram.part.AdaptiveSystemDomainModelElementTester">
+       </propertyTester>
+   </extension>
+
+	   <extension point="org.eclipse.ui.navigator.viewer">
+      <?gmfgen generated="true"?>
+      <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension pattern="hub.top.GRETA.diagram.process.resourceContent"/>
+			<contentExtension pattern="hub.top.GRETA.diagram.process.domainResourceContent"/>
+            <contentExtension pattern="hub.top.GRETA.diagram.process.navigatorLinkHelper"/>
+         </includes>
+      </viewerContentBinding>
+      <viewerActionBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <actionExtension pattern="hub.top.GRETA.diagram.process.navigatorActionProvider"/>
+         </includes>
+      </viewerActionBinding>
+   </extension>
+
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <?gmfgen generated="true"?>
+      <navigatorContent
+            id="hub.top.GRETA.diagram.process.resourceContent" 
+            name="%navigatorContentName" 
+            priority="normal" 
+            contentProvider="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemNavigatorContentProvider" 
+            labelProvider="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemNavigatorLabelProvider"
+            icon="icons/obj16/AdaptiveProcessDiagramFile.gif"
+            activeByDefault="true">
+         <triggerPoints>
+            <or>
+	           <and>
+    	          <instanceof value="org.eclipse.core.resources.IFile"/>
+        	      <test property="org.eclipse.core.resources.extension" value="adaptivesystem_process"/>
+               </and>
+               <instanceof value="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemAbstractNavigatorItem"/>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+         	   <instanceof value="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemAbstractNavigatorItem"/>
+            </or>
+         </possibleChildren>
+         <commonSorter 
+               id="hub.top.GRETA.diagram.process.navigatorSorter" 
+               class="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemNavigatorSorter">
+            <parentExpression>
+               <or>
+	              <and>
+    	             <instanceof value="org.eclipse.core.resources.IFile"/>
+        	         <test property="org.eclipse.core.resources.extension" value="adaptivesystem_process"/>
+                  </and>
+                  <instanceof value="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemAbstractNavigatorItem"/>
+               </or>
+            </parentExpression>
+         </commonSorter>
+      </navigatorContent>
+      <navigatorContent
+            id="hub.top.GRETA.diagram.process.domainResourceContent" 
+            name="%domainNavigatorContentName" 
+            priority="normal" 
+            contentProvider="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemDomainNavigatorContentProvider" 
+            labelProvider="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemDomainNavigatorLabelProvider"
+            icon="icons/obj16/AdaptiveProcessDiagramFile.gif"
+            activeByDefault="true">
+         <triggerPoints>
+            <or>
+	           <and>
+    	          <instanceof value="org.eclipse.core.resources.IFile"/>
+        	      <test property="org.eclipse.core.resources.extension" value="adaptivesystem"/>
+               </and>
+               <and>
+                  <instanceof value="org.eclipse.emf.ecore.EObject"/>
+                  <test property="hub.top.GRETA.diagram.process.isDomainModelElement"/>
+               </and>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <and>
+       	       <instanceof value="org.eclipse.emf.ecore.EObject"/>
+       	       <test property="hub.top.GRETA.diagram.process.isDomainModelElement"/>
+       	    </and>
+         </possibleChildren>
+      </navigatorContent>
+      <actionProvider
+            id="hub.top.GRETA.diagram.process.navigatorActionProvider"
+            class="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemNavigatorActionProvider">
+         <enablement>
+            <or>
+               <instanceof value="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemAbstractNavigatorItem"/>
+            </or>
+         </enablement>
+      </actionProvider>
+   </extension>
+   
+	   <extension point="org.eclipse.ui.navigator.linkHelper">
+      <?gmfgen generated="true"?>
+      <linkHelper
+            id="hub.top.GRETA.diagram.process.navigatorLinkHelper"
+            class="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemNavigatorLinkHelper">
+         <editorInputEnablement>
+            <and>
+               <instanceof value="org.eclipse.emf.common.ui.URIEditorInput"/>
+               <test property="hub.top.GRETA.diagram.process.isURIEditorInput"/>
+            </and>
+         </editorInputEnablement>
+         <selectionEnablement>
+            <instanceof value="hub.top.adaptiveProcess.diagram.navigator.AdaptiveSystemAbstractNavigatorItem"/>
+         </selectionEnablement>
+      </linkHelper>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+      <?gmfgen generated="true"?>
+      <command
+         categoryId="org.eclipse.ui.category.edit"
+         defaultHandler="hub.top.adaptiveProcess.diagram.part.AdaptiveSystemDiagramUpdateCommand"
+         description="%update.diagram.description"
+         id="hub.top.adaptiveProcess.diagram.updateDiagram"
+         name="%update.diagram.name"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.bindings">
+      <?gmfgen generated="true"?>
+      <key 
+         commandId="hub.top.adaptiveProcess.diagram.updateDiagram"
+         contextId="hub.top.adaptiveProcess.diagram.ui.diagramContext"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="F5"/>
+   </extension>
+</plugin>

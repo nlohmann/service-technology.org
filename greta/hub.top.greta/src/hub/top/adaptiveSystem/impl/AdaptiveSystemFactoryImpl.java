@@ -143,30 +143,33 @@ public class AdaptiveSystemFactoryImpl extends EFactoryImpl implements AdaptiveS
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated not
 	 */
 	public DoNet createDoNet() {
 		DoNetImpl doNet = new DoNetImpl();
+		doNet.setName("do");			// always set a name
 		return doNet;
 	}
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated not
 	 */
 	public PreNet createPreNet() {
 		PreNetImpl preNet = new PreNetImpl();
+		preNet.setName("pre");			// always set a name
 		return preNet;
 	}
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public AdaptiveProcess createAdaptiveProcess() {
 		AdaptiveProcessImpl adaptiveProcess = new AdaptiveProcessImpl();
+		adaptiveProcess.setName("ap");	// always set a name
 		return adaptiveProcess;
 	}
 

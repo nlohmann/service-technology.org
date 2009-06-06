@@ -1,0 +1,12 @@
+# Signature of the current package.
+m4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])
+m4_define([AT_PACKAGE_TARNAME],   [@PACKAGE_TARNAME@])
+m4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])
+m4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])
+m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
+
+m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+
+m4_define([RACHEL],               [@abs_top_builddir@/src/rachel])
+m4_define([GREP],                 [@GREP@])
+m4_define([DOT],                  [@DOT@])

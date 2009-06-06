@@ -1,0 +1,129 @@
+AT_INIT
+
+# define a macro to skip a test if Dot was not found by configure
+m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
+AT_TESTED(versions.sh)
+
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([RACHEL --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Full help output])
+AT_CHECK([RACHEL --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([RACHEL --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Bug output])
+AT_CHECK([RACHEL --bug],0,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+
+AT_SETUP([No command line parameters])
+AT_CHECK([RACHEL],1,ignore,ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Missing command line parameters])
+AT_CHECK([cp TESTFILES/traveler.sa .])
+AT_CHECK([RACHEL -a traveler.sa],1,ignore,ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Configuration file])
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og TESTFILES/rachel.conf .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m simulation -c rachel.conf],0,ignore,ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Configuration file missing])
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m simulation -c rachel.conf],1,ignore,ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Lexical error])
+AT_CHECK([cp TESTFILES/purchase_order.sa TESTFILES/error-lexer.og .])
+AT_CHECK([RACHEL -a purchase_order.sa -o error-lexer.og],1,ignore,ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Syntax error])
+AT_CHECK([cp TESTFILES/purchase_order.sa TESTFILES/error-parser.og .])
+AT_CHECK([RACHEL -a purchase_order.sa -o error-lexer.og],1,ignore,ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([File Input])
+############################################################################
+
+AT_SETUP([Full input])
+AT_CHECK([cp TESTFILES/purchase_order.sa TESTFILES/full.og .])
+AT_CHECK([RACHEL -a purchase_order.sa -o full.og],0,ignore,ignore)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Matching-based Edit Distance])
+############################################################################
+
+AT_SETUP([Matching])
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m matching],0,ignore,ignore)
+AT_KEYWORDS(matching)
+AT_CLEANUP
+
+AT_SETUP([Matching with threshold 0.2])
+AT_CHECK([cp TESTFILES/purchase_order.sa TESTFILES/purchase_order.og .])
+AT_CHECK([RACHEL -a purchase_order.sa -o purchase_order.og -m matching --threshold=0.2],0,ignore,ignore)
+AT_KEYWORDS(matching)
+AT_CLEANUP
+
+AT_SETUP([Matching with verbose output])
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m matching -v],0,ignore,ignore)
+AT_KEYWORDS(matching)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Simulation-based Edit Distance])
+############################################################################
+
+AT_SETUP([Simulation])
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m simulation],0,ignore,ignore)
+AT_KEYWORDS(simulation)
+AT_CLEANUP
+
+AT_SETUP([Simulation with dot output])
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m simulation -d],0,ignore,ignore)
+AT_CHECK([test -f traveler.sa_agency_airline.og_simulation.dot])
+AT_KEYWORDS(simulation)
+AT_CLEANUP
+
+AT_SETUP([Simulation with PNG output])
+AT_CHECK_DOT
+AT_CHECK([cp TESTFILES/traveler.sa TESTFILES/agency_airline.og .])
+AT_CHECK([RACHEL -a traveler.sa -o agency_airline.og -m simulation -d --png],0,ignore,ignore)
+AT_CHECK([test -f traveler.sa_agency_airline.og_simulation.dot])
+AT_CHECK([test -f traveler.sa_agency_airline.og_simulation.dot.png])
+AT_KEYWORDS(simulation)
+AT_CLEANUP

@@ -12,7 +12,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 # AUTOTEST
 TESTSUITE = $(builddir)/testsuite
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
-EXTRA_DIST = testsuite.at \
+EXTRA_DIST = testsuite.at versions.sh \
              testfiles/test_input.owfn \
              testfiles/test_input.lola \
              testfiles/test_dead_nodes.net.owfn \
@@ -37,7 +37,8 @@ EXTRA_DIST = testsuite.at \
              testfiles/test_criteria.freechoice.owfn \
              testfiles/test_construction.sequence_normal.net.owfn \
              testfiles/test_construction.sequence_unnormal.net.owfn \
-             testfiles/test_construction.strange_net.net.owfn
+             testfiles/test_construction.strange_net.net.owfn \
+             testfiles/test_myCoffee.sa
 
 
 check-local: atconfig $(TESTSUITE)

@@ -809,6 +809,8 @@ namespace pnapi
       Visitor::Visitor()
       {
         sa_ = new Automaton();
+        newState_.isFinal = false;
+        newState_.isInitial = false;
       }
 
       const Automaton & Visitor::getAutomaton() const

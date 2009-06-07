@@ -103,10 +103,8 @@ namespace pnapi
       delete edgeLabels_;
     if (edgeTypes_ != NULL)
       delete edgeTypes_;
-    if (hashTable_ != NULL)
-      delete hashTable_;
-
-    //std::cerr << "|S| = " << states_.size() << std::endl;
+    /*if (hashTable_ != NULL)
+      delete hashTable_;*/
   }
 
 

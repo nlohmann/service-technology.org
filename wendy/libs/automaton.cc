@@ -38,14 +38,27 @@ namespace pnapi
   {
     net_ = new PetriNet(net);
     edgeLabels_ = new std::map<Transition *, std::string>();
-    edgeTypes_ = new std::map<Transition *, Node::Type>();
+    edgeTypes_ = new std::map<Transition *, Type>();
     weights_ = new std::map<const Place *, unsigned int>();
     hashTable_ = new std::vector<std::set<State *> >(HASH_SIZE);
 
     (*edgeLabels_) = net_->normalize();
     for (std::set<Transition *>::iterator t = net_->getTransitions().begin();
         t != net_->getTransitions().end(); t++)
-      (*edgeTypes_)[*t] = (**t).getType();
+      switch((**t).getType())
+      {
+      case Node::INTERNAL:
+        (*edgeTypes_)[*t] = TAU;
+        break;
+      case Node::INPUT:
+        (*edgeTypes_)[*t] = INPUT;
+        break;
+      case Node::OUTPUT:
+        (*edgeTypes_)[*t] = OUTPUT;
+        break;
+      default:
+        break;
+      }
 
     net_->makeInnerStructure();
 
@@ -70,10 +83,10 @@ namespace pnapi
   Automaton::Automaton(const Automaton &a) :
     states_(a.states_), edges_(a.edges_), counter_(a.counter_+1)
   {
-    if (net_ == NULL)
+    if (a.net_ == NULL)
       net_ = NULL;
     else
-      net_ = new PetriNet(*net_);
+      net_ = new PetriNet(*a.net_);
     edgeTypes_ = NULL;
   }
 
@@ -90,10 +103,8 @@ namespace pnapi
       delete edgeLabels_;
     if (edgeTypes_ != NULL)
       delete edgeTypes_;
-    if (hashTable_ != NULL)
-      delete hashTable_;
-
-    //std::cerr << "|S| = " << states_.size() << std::endl;
+    /*if (hashTable_ != NULL)
+      delete hashTable_;*/
   }
 
 
@@ -101,12 +112,30 @@ namespace pnapi
    * A state will be added to the set of states. The name given can be
    * empty, so a standard name will be set.
    *
-   * \param     const std::string name
    * \return    State &s .. the newly created state
    */
   State & Automaton::createState()
   {
     State *s = new State(&counter_);
+    states_.push_back(s);
+    return *s;
+  }
+
+
+  /*!
+   * A state will be added to the set of states with a given name.
+   * If there exists a state with the given name, this state will
+   * be returned.
+   *
+   * \param     const unsigned int name.
+   * \return    State &s .. the newly created state.
+   */
+  State & Automaton::createState(const unsigned int name)
+  {
+    for (unsigned int i = 0; i < states_.size(); i++)
+      if (states_[i]->name() == name)
+        return *states_[i];
+    State *s = new State(name);
     states_.push_back(s);
     return *s;
   }
@@ -130,6 +159,18 @@ namespace pnapi
 
 
   /*!
+   * \brief     Finding a state by name.
+   */
+  State * Automaton::findState(const unsigned int name) const
+  {
+    for (unsigned int i = 0; i < states_.size(); i++)
+      if (states_[i]->name() == name)
+        return states_[i];
+    return NULL;
+  }
+
+
+  /*!
    */
   Edge & Automaton::createEdge(State &s1, State &s2)
   {
@@ -142,18 +183,7 @@ namespace pnapi
   /*!
    */
   Edge & Automaton::createEdge(State &s1, State &s2,
-    const std::string label)
-  {
-    Edge *e = new Edge(s1, s2, label);
-    edges_.push_back(e);
-    return *e;
-  }
-
-
-  /*!
-   */
-  Edge & Automaton::createEdge(State &s1, State &s2,
-    const std::string label, Node::Type type)
+    const std::string label, Type type)
   {
     Edge *e = new Edge(s1, s2, label, type);
     edges_.push_back(e);
@@ -214,7 +244,7 @@ namespace pnapi
     }
 
     // generate final condition;
-    /// \todo add all other places empty
+    /// TODO: add all other places empty
     result_->finalCondition() = final_.formula();
 
     return *result_;
@@ -264,10 +294,9 @@ namespace pnapi
   {
     std::set<std::string> result;
     result.clear();
-    for (std::map<Transition *, Node::Type>::iterator
-        p = (*edgeTypes_).begin(); p != (*edgeTypes_).end(); p++)
-      if (p->second == Node::INPUT)
-        result.insert((*edgeLabels_)[p->first]);
+    for (unsigned int i = 0; i < edges_.size(); i++)
+      if (edges_[i]->type() == Automaton::INPUT)
+        result.insert(edges_[i]->label());
 
     return result;
   }
@@ -279,10 +308,9 @@ namespace pnapi
   {
     std::set<std::string> result;
     result.clear();
-    for (std::map<Transition *, Node::Type>::iterator
-        p = (*edgeTypes_).begin(); p != (*edgeTypes_).end(); p++)
-      if (p->second == Node::OUTPUT)
-        result.insert((*edgeLabels_)[p->first]);
+    for (unsigned int i = 0; i < edges_.size(); i++)
+      if (edges_[i]->type() == Automaton::OUTPUT)
+        result.insert(edges_[i]->label());
 
     return result;
   }

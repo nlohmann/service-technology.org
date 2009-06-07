@@ -18,9 +18,18 @@ namespace pnapi
    * name is unique within the whole automaton class. Template for unique names
    * of states: sX where X is a number.
    */
-  State::State(unsigned int *counter, bool isFinal) :
-    name_((*counter)++), isFinal_(isFinal), isInitial_(false), m_(NULL),
+  State::State(unsigned int *counter) :
+    name_((*counter)++), isFinal_(false), isInitial_(false), m_(NULL),
     hashValue_(0)
+  {
+  }
+
+
+  /*!
+   *
+   */
+  State::State(const unsigned int name) :
+    name_(name), isFinal_(false), isInitial_(false), m_(NULL), hashValue_(0)
   {
   }
 
@@ -28,8 +37,8 @@ namespace pnapi
   /*!
    */
   State::State(Marking &m, std::map<const Place *, unsigned int> *pw,
-      unsigned int *counter, bool isFinal) :
-    name_((*counter)++), isFinal_(isFinal), isInitial_(false), m_(&m)
+      unsigned int *counter) :
+    name_((*counter)++), isFinal_(false), isInitial_(false), m_(&m)
   {
     setHashValue(pw);
   }
@@ -68,6 +77,15 @@ namespace pnapi
   const std::set<State *> State::postset() const
   {
     return postset_;
+  }
+
+
+  /*!
+   *
+   */
+  const std::set<Edge *> State::postsetEdges() const
+  {
+    return postsetEdges_;
   }
 
 
@@ -183,17 +201,27 @@ namespace pnapi
   }
 
 
+  /*!
+   *
+   */
+  void State::addPostEdge(Edge &e)
+  {
+    postsetEdges_.insert(&e);
+  }
+
+
 
   /*** class Edge ***/
 
 
   /*!
    */
-  Edge::Edge(State &source, State &destination, const std::string label, const Node::Type type) :
+  Edge::Edge(State &source, State &destination, const std::string label, const Automaton::Type type) :
     label_(label), source_(source), destination_(destination), type_(type)
   {
     source_.addPost(destination_);
     destination_.addPre(source_);
+    source_.addPostEdge(*this);
   }
 
 
@@ -234,7 +262,7 @@ namespace pnapi
   /*!
    * \return    Node::Type type_
    */
-  Node::Type Edge::type() const
+  Automaton::Type Edge::type() const
   {
     return type_;
   }

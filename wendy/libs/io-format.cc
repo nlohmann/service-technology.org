@@ -109,7 +109,7 @@ namespace pnapi
 	os  //< output everything to this stream
 
 	  << delim("\n")
-	  << mode(io::util::NORMAL)
+	  << util::mode(io::util::NORMAL)
 
 	  << "digraph N {" << endl
 	  << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
@@ -145,7 +145,7 @@ namespace pnapi
 	  << net.transitions_ << endl
 	  << endl
 
-	  << mode(io::util::INNER)
+	  << util::mode(io::util::INNER)
 	  << delim(" ")
 	  << " // inner cluster" << endl
 	  << " subgraph cluster1" << endl
@@ -160,7 +160,7 @@ namespace pnapi
 	  << endl
 
 	  << delim("\n")
-	  << mode(io::util::ARC)
+	  << util::mode(io::util::ARC)
 	  << " // arcs" << endl
 	  << " edge [fontname=\"Helvetica\" arrowhead=normal"
 	  << " color=black]" << endl
@@ -230,7 +230,7 @@ namespace pnapi
 	// output labels
 	set<string> labels = t.getSynchronizeLabels();
 	Mode mode = ModeData::data(os);
-	if (mode == util::NORMAL)
+	if (mode == io::util::NORMAL)
 	  for (set<string>::iterator it = labels.begin();
 	       it != labels.end(); ++it)
 	    os << endl << " l" << *it << " -> " << getNodeName(t)
@@ -264,13 +264,13 @@ namespace pnapi
 
 	os << dotName;
 
-	if (mode == util::NORMAL)
+	if (mode == io::util::NORMAL)
 	  os << "\t[" << attr << "]" << endl
 	     << " " << dotName_l << "\t[style=invis]" << endl
 	     << " " << dotName_l << " -> " << dotName
 	     << " [headlabel=\"" << n.getName() << "\"]";
 
-	if (mode == util::INNER)
+	if (mode == io::util::INNER)
 	  os << " " << dotName_l;
 
 	return os;
@@ -371,11 +371,11 @@ namespace pnapi
 	  << " }" << endl
 	  << endl
 
-	  << "PLACE" << mode(util::PLACE) << endl
+	  << "PLACE" << mode(io::util::PLACE) << endl
 	  << "  " << delim(", ") << net.internalPlaces_ << ";" << endl
 	  << endl
 
-	  << "MARKING" << mode(util::PLACE_TOKEN) << endl
+	  << "MARKING" << mode(io::util::PLACE_TOKEN) << endl
 	  << "  " << filterMarkedPlaces(net.internalPlaces_) << ";" << endl
 	  << endl << endl
 
@@ -396,7 +396,7 @@ namespace pnapi
       ostream & output(ostream & os, const Place & p)
       {
 	os << p.getName();
-	if (ModeData::data(os) == util::PLACE_TOKEN)
+	if (ModeData::data(os) == io::util::PLACE_TOKEN)
 	  os << ":" << p.getTokenCount();
 	return os;
       }
@@ -539,7 +539,7 @@ namespace pnapi
 	  << "}" << endl
 	  << endl
 
-	  << mode(io::util::PLACE) << delim("; ")
+	  << util::mode(io::util::PLACE) << delim("; ")
 	  << "PLACE"      << endl
 	  << "  INTERNAL" << endl
 	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_)
@@ -585,7 +585,7 @@ namespace pnapi
       ostream & output(ostream & os, const Place & p)
       {
 	os << p.getName();
-	if (ModeData::data(os) == util::PLACE_TOKEN && p.getTokenCount() != 1)
+	if (ModeData::data(os) == io::util::PLACE_TOKEN && p.getTokenCount() != 1)
 	  os << ": " << p.getTokenCount();
 	return os;
       }
@@ -595,7 +595,7 @@ namespace pnapi
       {
 	os
 	  << "TRANSITION " << t.getName() << endl;
-	
+
 	if (t.getCost() != 0)
 	  os << "  COST " << t.getCost() << ";" << endl;
 
@@ -742,10 +742,10 @@ namespace pnapi
      ***** SA output
      *************************************************************************/
 
-    std::ostream & sa(std::ostream &os)
+    std::ios_base & sa(std::ios_base &base)
     {
-      util::FormatData::data(os) = util::SA;
-      return os;
+      util::FormatData::data(base) = util::SA;
+      return base;
     }
 
 
@@ -759,92 +759,46 @@ namespace pnapi
         os  << ";" << endl
             << "  OUTPUT ";
         output(os, sa.output());
-        os  << ";" << endl
-            << endl
-            << "NODES" << endl
-            << "  ";
+        os  << ";" << endl << endl
+            << "NODES" << endl;
         output(os, sa.states_);
-        os  << ";" << endl
-            << endl
-            << "INITIALNODE" << endl
-            << "  ";
-        output(os, sa.initialStates());
-        os  << ";" << endl
-            << endl
-            << "FINALNODES" << endl
-            << "  ";
-        output(os, sa.finalStates());
-        os  << ";" << endl
-            << endl
-            << "TRANSITIONS" << endl
-            << "  ";
-        output (os, sa.edges_);
-        os  << ";" << endl;
 
         return os;
       }
 
       ostream & output(ostream &os, const State &s)
       {
-        os
-
-        << s.name();
-
-        return os;
-      }
-
-      ostream & output(ostream &os, const Edge &e)
-      {
-        output(os, e.source());
-        os  << " -> ";
-        output(os, e.destination());
-        os  << " : " << e.label();
+        os << s.name();
+        if (s.isInitial() || s.isFinal())
+        {
+          os << ": ";
+          if (s.isInitial() && s.isFinal())
+            os << "INITIAL, FINAL";
+          else
+            if (s.isInitial())
+              os << "INITIAL";
+            else
+              os << "FINAL";
+        }
+        os << endl;
+        output(os, s.postsetEdges());
+        os << endl;
 
         return os;
       }
 
       ostream & output(ostream &os, const std::vector<State *> &vs)
       {
-        if (!vs.empty())
-        {
-          output(os, *vs[0]);
-          for (unsigned int i = 1; i < vs.size(); i++)
-          {
-            os << ", ";
-            output(os, *vs[i]);
-          }
-        }
+        for (unsigned int i = 0; i < vs.size(); i++)
+          output(os, *vs[i]);
 
         return os;
       }
 
-      ostream & output(ostream &os, const std::vector<Edge *> &es)
+      ostream & output(ostream &os, const std::set<Edge *> &edges)
       {
-        if (!es.empty())
-        {
-          output(os, *es[0]);
-          for (unsigned int i = 1; i < es.size(); i++)
-          {
-            os << "," << endl << "  ";
-            output(os, *es[i]);
-          }
-        }
-
-        return os;
-      }
-
-      // FIXME: If any error, the mistake is here ...
-      ostream & output(ostream &os, const std::set<State *> &ss)
-      {
-        if (!ss.empty())
-        {
-          output(os, **ss.begin());
-          for (std::set<State *>::iterator s = ++ss.begin(); s != ss.end(); s++)
-          {
-            os << ", ";
-            output(os, **s);
-          }
-        }
+        for (std::set<Edge *>::iterator e = edges.begin(); e != edges.end(); e++)
+          os << "  " << (*e)->label() << " -> " << (*e)->destination().name() << endl;
 
         return os;
       }

@@ -10,9 +10,9 @@
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2009-05-13 23:14:09 +0200 (Mi, 13 Mai 2009) $
+ * \date    $Date: 2009-05-28 15:29:50 +0200 (Do, 28. Mai 2009) $
  *
- * \version $Revision: 4119 $
+ * \version $Revision: 4185 $
  */
 
 
@@ -166,6 +166,9 @@ namespace pnapi
     /// %Automaton output
     std::ostream & operator<<(std::ostream &, const Automaton &);
 
+    /// %Automaton input
+    std::istream & operator>>(std::istream &, Automaton &);
+
     //@}
 
 
@@ -191,7 +194,7 @@ namespace pnapi
     std::ostream & dot(std::ostream &);
 
     /// Service Automaton (SA) file format
-    std::ostream & sa(std::ostream &);
+    std::ios_base & sa(std::ios_base &);
 
     /// LOLA file format
     std::ios_base & lola(std::ios_base &);
@@ -240,8 +243,7 @@ namespace pnapi
     namespace util
     {
       typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
-      typedef Manipulator<std::map<std::string, PetriNet *> >
-              PetriNetManipulator;
+      typedef Manipulator<std::map<std::string, PetriNet *> > PetriNetManipulator;
     } /* namespace util */
 
 
@@ -335,11 +337,9 @@ namespace pnapi
     {
       std::ostream & output(std::ostream &, const Automaton &);
       std::ostream & output(std::ostream &, const State &);
-      std::ostream & output(std::ostream &, const Edge &);
 
       std::ostream & output(std::ostream &, const std::vector<State *> &);
-      std::ostream & output(std::ostream &, const std::vector<Edge *> &);
-      std::ostream & output(std::ostream &, const std::set<State *> &);
+      std::ostream & output(std::ostream &, const std::set<Edge *> &);
       std::ostream & output(std::ostream &, const std::set<std::string> &);
     }
 
@@ -393,12 +393,12 @@ namespace pnapi
 
       /*** TYPE NAME SHORTCUTS ***/
 
-      typedef StreamMetaData<Format> FormatData;
-      typedef StreamMetaData<Mode> ModeData;
+      typedef StreamMetaData<io::util::Format> FormatData;
+      typedef StreamMetaData<io::util::Mode> ModeData;
       typedef StreamMetaData<Delim> DelimData;
       typedef StreamMetaData<Formula> FormulaData;
-      typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
-      typedef Manipulator<std::pair<MetaInformation, std::string> >
+      typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
+      typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> >
               MetaManipulator;
 
 
@@ -422,7 +422,7 @@ namespace pnapi
       std::set<std::string>
       collectSynchronizeLabels(const std::set<Transition *> &);
 
-      Manipulator<Mode> mode(Mode);
+      Manipulator<io::util::Mode> mode(io::util::Mode);
       Manipulator<Delim> delim(const std::string &);
 
       std::ostream & operator<<(std::ostream &, const Arc &);

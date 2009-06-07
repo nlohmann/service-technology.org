@@ -1,7 +1,30 @@
-// -*- C++ -*-
+/*****************************************************************************\
+ Copyright (c) 2008  Robert Danitz, Christian Gierds, Niels Lohmann,
+                     Peter Massuthe, Richard Mu"ller, Janine Ott,
+                     Jan Su"rmeli, Daniela Weinberg, Karsten Wolf,
+                     Martin Znamirowski
 
-%name-prefix="pnapi_petrify_"
-%defines
+ Copyright (c) 2007  Jan Bretschneider, Robert Danitz, Christian Gierds,
+                     Kathrin Kaschner, Leonard Kern, Niels Lohmann,
+                     Peter Massuthe, Daniela Weinberg, Karsten Wolf
+
+ Copyright (c) 2006  Kathrin Kaschner, Peter Massuthe, Daniela Weinberg,
+                     Karsten Wolf
+
+ This file is part of Fiona, see <http://service-technology.org/fiona>.
+
+ Fiona is free software; you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ 
+ Fiona is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along with
+ Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
 
 %{
 // options for Bison
@@ -20,98 +43,121 @@
 #include <map>
 #include <cstdlib>
 
-#include "parser.h"
-
-
 using std::cerr;
 using std::endl;
 using std::string;
 using std::set;
 using std::map;
 
-using pnapi::parser::petrify::Node;
-using pnapi::parser::petrify::node;
+extern set<string> pnapi_petrify_transitions;
+extern set<string> pnapi_petrify_places;
+extern set<string> pnapi_petrify_initialMarked;
+extern set<string> pnapi_petrify_interface;
+extern map<string, set<string> > pnapi_petrify_arcs;
 
-#undef yylex
-#undef yyparse
-#undef yyerror
+extern int pnapi_petrify_yylineno;
 
-#define yyerror pnapi::parser::error
+set<string> tempNodeSet;
+bool in_marking_list = false;
+bool in_arc_list = false;
 
-#define yylex pnapi::parser::petrify::lex
-#define yyparse pnapi::parser::petrify::parse
+// from flex
+extern char* pnapi_petrify_yytext;
+extern int pnapi_petrify_yylex();
 
-extern char *yytext;
-extern int yylineno;
-
+int pnapi_petrify_yyerror(const char* msg)
+{
+  cerr << msg << endl;
+  cerr << "error in line " << pnapi_petrify_yylineno << ": token last read: `" << pnapi_petrify_yytext << "'" << endl;
+  exit(1);
+}
 %}
 
+// Bison options
+%name-prefix="pnapi_petrify_yy"
+
+%token PLACENAME TRANSITIONNAME IDENTIFIER
+%token K_MODEL K_DUMMY K_GRAPH K_MARKING K_END NEWLINE
+%token OPENBRACE CLOSEBRACE
+
+%defines
+
+%token_table
+
 %union {
-  char *str; 
-  pnapi::parser::petrify::Node * yt_node;
+  char *str;
 }
 
 /* the types of the non-terminal symbols */
 %type <str> TRANSITIONNAME
 %type <str> PLACENAME
 
-%type <yt_node> stg
-%type <yt_node> transition_list
-%type <yt_node> tp_list
-%type <yt_node> pt_list
-%type <yt_node> place_list
-
-%token PLACENAME TRANSITIONNAME IDENTIFIER
-%token K_MODEL K_DUMMY K_GRAPH K_MARKING K_END NEWLINE
-%token OPENBRACE CLOSEBRACE
-
-%start stg
 
 %%
 
 stg:
+    {
+      pnapi_petrify_transitions.clear(); pnapi_petrify_places.clear(); 
+      pnapi_petrify_initialMarked.clear(); pnapi_petrify_arcs.clear();
+      tempNodeSet.clear(); pnapi_petrify_interface.clear(); 
+      in_marking_list = false; in_arc_list = false;
+    }
   K_MODEL IDENTIFIER newline
   K_DUMMY transition_list newline
-  K_GRAPH newline
+  K_GRAPH newline { in_arc_list = true; }
   tp_list pt_list
-  K_MARKING OPENBRACE place_list CLOSEBRACE newline
-  K_END newline { node = new Node(Node::STG, $5, $9, $10, $13); }
+  K_MARKING { in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
+  K_END newline
 ;
 
 transition_list:
   TRANSITIONNAME transition_list
     { 
-      $$ = new Node(Node::TLIST, string($1), $2);
+      if (in_arc_list) 
+      {
+        tempNodeSet.insert(string($1));
+        pnapi_petrify_transitions.insert(string($1));
+      } 
+      else
+      {
+        pnapi_petrify_interface.insert(string($1));
+      }
+
       free($1);
     }
-| /* empty */ {$$ = NULL;}
+| /* empty */
 ;
 
 place_list:
   PLACENAME place_list
     { 
-      $$ = new Node(Node::PLIST, string($1), $2);
+      pnapi_petrify_places.insert(string($1));
+      if (in_marking_list)
+        pnapi_petrify_initialMarked.insert(string($1));
+      else
+        tempNodeSet.insert(string($1));
+        
       free($1);
     }
-| /* empty */ {$$ = NULL;}
+| /* empty */
 ;
 
 tp_list:
-  TRANSITIONNAME place_list newline tp_list
-  {
-    $$ = new Node(Node::TP, string($1), $2, $4);
-    free($1);
-  }
-| /* empty */ {$$ = NULL;}
+  TRANSITIONNAME place_list newline
+   { pnapi_petrify_arcs[string($1)] = tempNodeSet;
+     tempNodeSet.clear();
+     free($1);
+   } tp_list
+| /* empty */
 ;
 
 pt_list:
-  PLACENAME transition_list newline pt_list
-  {
-    $$ = new Node(Node::PT, string($1), $2, $4);
-    free($1);
-  }
-| /* empty */ {$$ = NULL;}
+  PLACENAME transition_list newline
+   { pnapi_petrify_arcs[string($1)] = tempNodeSet;
+     tempNodeSet.clear();
+     free($1);
+   } pt_list
+| /* empty */
 ;
 
 newline:

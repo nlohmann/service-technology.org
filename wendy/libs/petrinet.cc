@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-05-13 23:14:09 +0200 (Mi, 13 Mai 2009) $
+ * \date    $Date: 2009-06-07 18:57:03 +0200 (So, 07. Jun 2009) $
  *
- * \version $Revision: 4119 $
+ * \version $Revision: 4230 $
  */
 
 #ifndef NDEBUG
@@ -915,7 +915,7 @@ namespace pnapi
       }
       case Node::INTERNAL:
       {
-        edgeLabels[*t] = "tau";
+        edgeLabels[*t] = "TAU";
         break;
       }
       default: ;//assert(false);

@@ -282,6 +282,7 @@ node:
     if(initialState)
     {
       (*myOut) << "  " << mapNode($1) << ": INITIAL\n";
+      initialState = false;
     }
     else
     {

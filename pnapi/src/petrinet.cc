@@ -893,7 +893,7 @@ namespace pnapi
         {
           if ((*f)->getPlace().getType() == Node::INPUT)
           {
-            edgeLabels[*t] = "?"+(*f)->getPlace().getName();
+            edgeLabels[*t] = (*f)->getPlace().getName();
             break;
           }
         }
@@ -907,7 +907,7 @@ namespace pnapi
         {
           if ((*f)->getPlace().getType() == Node::OUTPUT)
           {
-            edgeLabels[*t] = "!"+(*f)->getPlace().getName();
+            edgeLabels[*t] = (*f)->getPlace().getName();
             break;
           }
         }

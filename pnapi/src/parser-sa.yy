@@ -76,12 +76,12 @@ sa:
 ;
 
 input:
-  /* empty */
+  /* empty */                     { $$ = new Node(); }
 | KEY_INPUT ident_list SEMICOLON { $$ = new Node(pnapi::parser::sa::INPUT, $2); }
 ;
 
 output:
-  /* empty */
+  /* empty */                     { $$ = new Node(); }
 | KEY_OUTPUT ident_list SEMICOLON { $$ = new Node(pnapi::parser::sa::OUTPUT, $2); }
       
 ident_list:
@@ -107,10 +107,9 @@ node:
 ;
 
 node_attributes:
-  /* empty */             { $$ = new Node();                              }
-| COLON KEY_FINAL               { $$ = new Node(pnapi::parser::sa::FINAL);      }
-| COLON KEY_INITIAL             { $$ = new Node(pnapi::parser::sa::INITIAL);    }
-| COLON KEY_FINAL COMMA KEY_INITIAL { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
+  /* empty */             { $$ = new Node(); }
+| COLON KEY_FINAL               { $$ = new Node(pnapi::parser::sa::FINAL); }
+| COLON KEY_INITIAL             { $$ = new Node(pnapi::parser::sa::INITIAL); }
 | COLON KEY_INITIAL COMMA KEY_FINAL { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
 ;
 
@@ -123,8 +122,8 @@ transition_list:
 ;
 
 transition:
-  name ARROW state_name  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
-| tau_node ARROW state_name { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
+  tau_node ARROW state_name { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
+| name ARROW state_name  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
 ;
 
 state_name:

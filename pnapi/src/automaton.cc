@@ -83,10 +83,10 @@ namespace pnapi
   Automaton::Automaton(const Automaton &a) :
     states_(a.states_), edges_(a.edges_), counter_(a.counter_+1)
   {
-    if (net_ == NULL)
+    if (a.net_ == NULL)
       net_ = NULL;
     else
-      net_ = new PetriNet(*net_);
+      net_ = new PetriNet(*a.net_);
     edgeTypes_ = NULL;
   }
 
@@ -246,7 +246,7 @@ namespace pnapi
     }
 
     // generate final condition;
-    /// \todo add all other places empty
+    /// TODO: add all other places empty
     result_->finalCondition() = final_.formula();
 
     return *result_;

@@ -134,13 +134,13 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         string transitionName = remapped.substr( 0, remapped.find(",") );
         remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( transitionName.size() + 2 ) : "";
 
-        string placeName = transitionName.substr( 1 );
-        if ( transitionName[0] == '?' )
+        string placeName = transitionName;
+        if ( inputPlacenames.count(transitionName) > 0 )
         {
           Place *inPlace = findPlace(placeName);
           if (inPlace == NULL) inPlace = &createPlace(placeName, Node::INPUT);
         }
-        else if ( transitionName[0] == '!' )
+        else if ( outputPlacenames.count(transitionName) > 0 )
         {
           Place *outPlace = findPlace(placeName);
           if (outPlace == NULL) outPlace = &createPlace(placeName, Node::OUTPUT);
@@ -176,17 +176,17 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
       {
         // PRECONDITION: transitions are separated by ", "
         string placeName = remapped.substr( 0, remapped.find(",") ); // take next placename
-        placeName = placeName.substr( 1 );                           // remove first ! or ?
         placeName = placeName.substr( 0, placeName.find("/") );      // remove possible /
 
         Place * place = findPlace(placeName);
+        assert(place != NULL);
 
-        if ( remapped[0] == '?' )
+        if ( inputPlacenames.count(placeName) > 0 )
         {
           if (place == NULL) place = &createPlace(placeName, Node::INPUT);
           createArc(*place, *transition);
         }
-        else if ( remapped[0] == '!' )
+        else if ( outputPlacenames.count(placeName) > 0 )
         {
           if (place == NULL) place = &createPlace(placeName, Node::OUTPUT);
           createArc(*transition, *place);

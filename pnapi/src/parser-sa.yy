@@ -52,7 +52,7 @@ using std::endl;
 
 %type <yt_int> NUMBER
 %type <yt_string> IDENT
-%type <yt_node> input output ident_list name state_name
+%type <yt_node> input output ident_list name state_name tau_node
 %type <yt_node> node_list node node_attributes
 %type <yt_node> transition_list transition
 
@@ -124,8 +124,13 @@ transition_list:
 
 transition:
   name ARROW state_name  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
+| tau_node ARROW state_name { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
 ;
 
 state_name:
   NUMBER                  { $$ = new Node($1); }
+;
+
+tau_node:
+  KEY_TAU     { $$ = new Node(new std::string("TAU")); }
 ;

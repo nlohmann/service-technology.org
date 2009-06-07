@@ -15,6 +15,8 @@
 #include "petrinet.h"
 #include "petrinet-petrify.h"
 #include "config.h"         // needed to use petrify
+#include "formula.h"
+#include "util.h"
 
 using std::cerr;
 using std::endl;
@@ -145,7 +147,7 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         }
         else
         {
-          cerr << "possible error in createFromSTG: found transition without ! or ? as first symbol" << endl;
+          //cerr << "possible error in createFromSTG: found transition without ! or ? as first symbol" << endl;
         }
       }
       while ( remapped != "" );
@@ -191,7 +193,7 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         }
         else
         {
-          cerr << "possible error in stg2owfn_init: found label without ! or ? as first symbol" << endl;
+          //cerr << "possible error in stg2owfn_init: found label without ! or ? as first symbol" << endl;
         }
 
         // remove first symbol (! or ?), placename (read above) and separators (", ") from remapped
@@ -227,30 +229,58 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
   }
 
 
-  // Get a reference to the final condition of the petri net.
-  //FIXME: list< set< pair<Place *, unsigned int > > >& finalCondSet = STGPN.final_set_list;
-
-
   // For each transition found to be a final transition...
   for (map<string, set<string> >::iterator transIt = finalCondMap.begin(); transIt != finalCondMap.end(); ++transIt)
   {
 
     // Create a set for the places having this transition in their post set.
-    set< pair<Place *, unsigned int> > nextTrans;
+    set<Place *> nextTrans;
 
     // For each place in the post set...
     for (set<string>::iterator placesIt = (*transIt).second.begin(); placesIt != (*transIt).second.end(); ++placesIt)
     {
-
       // Insert this place in the post set.
-      nextTrans.insert(pair<Place *, unsigned int>(findPlace(*placesIt), 1));
-
+      nextTrans.insert(findPlace(*placesIt));
     }
 
-    // Add this clause to the final condition
-    //FIXME: finalCondSet.push_back(nextTrans);
+    pnapi::formula::Disjunction *fd = NULL;
+    pnapi::formula::FormulaEqual *store = NULL;
+    // create clause for the final condition
+    for (set<Place *>::iterator p = nextTrans.begin(); p != nextTrans.end(); p++)
+    {
+      if (fd == NULL)
+      {
+        if (store == NULL)
+        {
+          store = new pnapi::formula::FormulaEqual(**p, 1);
+        }
+        else
+        {
+          fd = new pnapi::formula::Disjunction(*store, *new pnapi::formula::FormulaEqual(**p, 1));
+        }
+      }
+      else
+      {
+        fd = new pnapi::formula::Disjunction(*fd, *new pnapi::formula::FormulaEqual(**p, 1));
+      }
+    }
+    if (fd != NULL)
+      finalCondition() = finalCondition().formula() && *fd;
+    else
+      if (store != NULL)
+        finalCondition() = finalCondition().formula() && *store;
 
   }
+
+  // All other places empty
+  set<const Place *> concerning = finalCondition().concerningPlaces();
+  set<const Place *> places;
+  for (set<Place *>::iterator p = getPlaces().begin();
+      p != getPlaces().end(); p++)
+    places.insert(const_cast<Place *>(*p));
+  set<const Place *> empty = util::setDifference(places, concerning);
+  for (set<const Place *>::iterator p = empty.begin(); p != empty.end(); p++)
+    finalCondition() = finalCondition().formula() && **p == 0;
 
 
   /* ---------------------------

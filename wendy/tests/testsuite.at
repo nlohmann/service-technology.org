@@ -84,6 +84,12 @@ AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Simultaneous OG and SA output])
+AT_CHECK([WENDY --og --sa],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#12\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Regression Tests])
@@ -172,8 +178,17 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Standard Examples])
+AT_BANNER([Operating Guidelines])
 ############################################################################
+
+AT_SETUP([Coffee Automaton])
+AT_CHECK_FIONA
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.* .])
+AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --verbose],0,ignore,ignore)
+AT_CHECK([FIONA -tequivalence myCoffee.og myCoffee.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(example)
+AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
 AT_CHECK_FIONA
@@ -227,4 +242,39 @@ AT_CHECK([cp TESTFILES/zeus.* .])
 AT_CHECK([WENDY zeus.owfn --fionaFormat --og --verbose],0,ignore,ignore)
 AT_CHECK([FIONA -tequivalence zeus.og zeus.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(example)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Interaction Graph])
+############################################################################
+
+AT_SETUP([Reduction: none])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.owfn .])
+AT_CHECK([WENDY PO.owfn --sa --verbose],0,ignore,ignore)
+AT_CHECK([GREP -q "168 nodes" PO.sa])
+AT_CHECK([GREP -c "\->" PO.sa],0,[548
+])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: consider only waitstates])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.owfn .])
+AT_CHECK([WENDY PO.owfn --sa --verbose --waitstatesOnly],0,ignore,ignore)
+AT_CHECK([GREP -q "137 nodes" PO.sa])
+AT_CHECK([GREP -c "\->" PO.sa],0,[437
+])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: receive before send])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.owfn .])
+AT_CHECK([WENDY PO.owfn --sa --verbose --receiveBeforeSend],0,ignore,ignore)
+AT_CHECK([GREP -q "168 nodes" PO.sa])
+AT_CHECK([GREP -c "\->" PO.sa],0,[416
+])
+AT_KEYWORDS(ig)
 AT_CLEANUP

@@ -395,23 +395,38 @@ void StoredKnowledge::dot(std::ofstream &file) {
 
 /*!
  \todo  Only print empty node if it is actually reachable.
+ 
+ \bug   Final states must not have outgoing tau or sending events.
 */
 void StoredKnowledge::print(std::ofstream &file) const {
     file << "  " << reinterpret_cast<unsigned long>(this);
 
-    switch (args_info.formula_arg) {
-        case(formula_arg_dnf): {
-            file << " : " << formula();
-            break;
-        }
-        case(formula_arg_2bits): {
-            string form(bits());
-            if (form != "") {
-                file << " :: " << form;
+    if (args_info.sa_given) {
+        if (this == root and is_final) {
+            file << " : INITIAL, FINAL";
+        } else {
+            if (this == root) {
+                file << " : INITIAL";
             }
-            break;
+            if (is_final) {
+                file << " : FINAL";
+            }
         }
-        default: assert(false);
+    } else {
+        switch (args_info.formula_arg) {
+            case(formula_arg_dnf): {
+                file << " : " << formula();
+                break;
+            }
+            case(formula_arg_2bits): {
+                string form(bits());
+                if (form != "") {
+                    file << " :: " << form;
+                }
+                break;
+            }
+            default: assert(false);
+        }
     }
 
     file << "\n";
@@ -422,7 +437,7 @@ void StoredKnowledge::print(std::ofstream &file) const {
                  << reinterpret_cast<unsigned long>(successors[l-1])
                  << "\n";
         } else {
-            if (successors[l-1] == empty) {
+            if (successors[l-1] == empty and not args_info.sa_given) {
                 file << "    " << Label::id2name[l] << " -> 0\n";
             }
         }
@@ -500,17 +515,20 @@ void StoredKnowledge::output(std::ofstream &file) {
         }
     }
 
-    // the empty node
-    file << "  0";
-    if (args_info.formula_arg == formula_arg_dnf) {
-        file << " : true\n";
-    } else {
-        file << "\n";
-    }
+    // print empty node unless we print an automaton
+    if (not args_info.sa_given) {
+        // the empty node
+        file << "  0";
+        if (args_info.formula_arg == formula_arg_dnf) {
+            file << " : true\n";
+        } else {
+            file << "\n";
+        }
 
-    // empty node loops
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        file << "    " << Label::id2name[l]  << " -> 0\n";
+        // empty node loops
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            file << "    " << Label::id2name[l]  << " -> 0\n";
+        }
     }
 }
 

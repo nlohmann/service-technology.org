@@ -314,6 +314,15 @@ wendy: could not write to file `foo.og' -- aborting [#11]
 @end cartouche
 @end smallexample
 
+@item #12
+Wendy can either create operating guidelines or a service automaton. The options @option{--og} and @option{--sa} are mutually exclusive.
+
+@smallexample
+@cartouche
+wendy: '--og' and '--sa' parameter are mutually exclusive -- aborting [#12]
+@end cartouche
+@end smallexample
+
 @end table
 
 

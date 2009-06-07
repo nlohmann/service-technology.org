@@ -107,6 +107,10 @@ void evaluateParameters(int argc, char** argv) {
         abort(4, "at most one input file must be given");
     }
 
+    if (args_info.sa_given and args_info.og_given) {
+        abort(12, "'--og' and '--sa' parameter are mutually exclusive");
+    }
+
     // check whether a LoLA executable is given either in file "config.h" or
     // with a command line parameter "--lola"
 #ifndef BINARY_LOLA
@@ -304,6 +308,18 @@ int main(int argc, char** argv) {
         }
     }
 
+    // service automaton output
+    if (args_info.sa_given) {
+        string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
+        std::ofstream sa_file(sa_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        if (!sa_file) {
+            abort(11, "could not write to file '%s'", sa_filename.c_str());
+        }
+        StoredKnowledge::output(sa_file);
+        if (args_info.verbose_flag) {
+            fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, sa_filename.c_str());
+        }
+    }
 
     // dot output
     if (args_info.dot_given) {

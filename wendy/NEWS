@@ -13,6 +13,8 @@ Version 1.4-unreleased
 * versions of used programs are collected in `testsuite.log' when running
   `make check'
 
+* service automata (a.k.a. interaction graphs) can be created with `--sa'
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

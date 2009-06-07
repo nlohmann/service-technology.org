@@ -1,6 +1,8 @@
 @heading Version 1.4-unreleased
 @itemize
 @item versions of used programs are collected in @file{testsuite.log} when running @samp{make check}
+
+@item service automata (a.k.a. interaction graphs) can be created with @option{--sa}
 @end itemize
 
 

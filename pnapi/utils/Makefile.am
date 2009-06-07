@@ -1,5 +1,5 @@
-bin_PROGRAMS = petri
-noinst_PROGRAMS = generator sa2owfn
+bin_PROGRAMS = petri sa2owfn
+noinst_PROGRAMS = generator
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h
 generator_SOURCES = generator.cc cmdline.ggo

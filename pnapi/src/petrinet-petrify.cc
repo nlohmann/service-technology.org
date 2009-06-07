@@ -243,7 +243,8 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
       nextTrans.insert(findPlace(*placesIt));
     }
 
-    pnapi::formula::Disjunction *fd = NULL;
+    finalCondition() = false;
+    pnapi::formula::Conjunction *fd = NULL;
     pnapi::formula::FormulaEqual *store = NULL;
     // create clause for the final condition
     for (set<Place *>::iterator p = nextTrans.begin(); p != nextTrans.end(); p++)
@@ -256,19 +257,19 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         }
         else
         {
-          fd = new pnapi::formula::Disjunction(*store, *new pnapi::formula::FormulaEqual(**p, 1));
+          fd = new pnapi::formula::Conjunction(*store, *new pnapi::formula::FormulaEqual(**p, 1));
         }
       }
       else
       {
-        fd = new pnapi::formula::Disjunction(*fd, *new pnapi::formula::FormulaEqual(**p, 1));
+        fd = new pnapi::formula::Conjunction(*fd, *new pnapi::formula::FormulaEqual(**p, 1));
       }
     }
     if (fd != NULL)
-      finalCondition() = finalCondition().formula() && *fd;
+      finalCondition() = finalCondition().formula() || *fd;
     else
       if (store != NULL)
-        finalCondition() = finalCondition().formula() && *store;
+        finalCondition() = finalCondition().formula() || *store;
 
   }
 

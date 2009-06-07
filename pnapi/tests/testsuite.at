@@ -408,5 +408,7 @@ m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON .])
 AT_CHECK([SA2OWFN AUTOMATON AUTOMATON.owfn],0)
 AT_CHECK([test -f AUTOMATON.owfn])
+AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
 AT_KEYWORDS([synthesis])
 AT_CLEANUP

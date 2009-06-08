@@ -3,6 +3,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
+#include <set>
 
 #include "automaton.h"
 #include "component.h"
@@ -10,6 +11,7 @@
 #include "marking.h"
 #include "petrinet.h"
 #include "state.h"
+#include "util.h"
 
 namespace pnapi
 {
@@ -201,53 +203,77 @@ namespace pnapi
    */
   PetriNet & Automaton::stateMachine() const
   {
-    PetriNet *result_ = new PetriNet(); // resulting net
-    std::map<State*,Place*> state2place_; // places by states
+    PetriNet *result = new PetriNet(); // resulting net
+    std::map<State*,Place*> state2place; // places by states
 
-    Condition final_;
-    final_ = false; // final places
+    Condition final;
+    final = false; // final places
 
     /* no comment */
 
     if (states_.empty())
-      return *result_;
+      return *result;
 
     // mark first state initially (see assumption above)
-    state2place_[states_[0]] = &(result_->createPlace("",Node::INTERNAL,1));
-    if (states_[0]->isFinal())
-      final_ = final_.formula() || (*(state2place_[states_[0]])) == 1;
+    State *first = *initialStates().begin();
+    std::stringstream s;
+    std::string id;
+    s << first->name();
+    s >> id;
+    state2place[first] = &(result->createPlace("p"+id, Node::INTERNAL, 1));
+    if (first->isFinal())
+      final = final.formula() || (*(state2place[first])) == 1;
 
     // generate places from states
-    for(unsigned int i=1; i < states_.size(); ++i)
+    for(unsigned int i=0; i < states_.size(); ++i)
     {
-      Place* p = &(result_->createPlace());
-      state2place_[states_[i]] = p;
+      if (states_[i] == first)
+        continue;
+      std::stringstream s;
+      std::string id;
+      s << states_[i]->name();
+      s >> id;
+      Place* p = &(result->createPlace("p"+id));
+      state2place[states_[i]] = p;
 
       /*
        * if the state is final then the according place
        * has to be in the final marking.
        */
       if(states_[i]->isFinal())
-        final_ = final_.formula() || (*(state2place_[states_[i]])) == 1;
+        final = final.formula() || (*(state2place[states_[i]])) == 1;
     }
 
     // generate transitions from edges
     for(unsigned int i=0; i < edges_.size(); ++i)
     {
-      Transition* t = &(result_->createTransition());
+      Transition* t = &(result->createTransition());
 
-      Place* p = state2place_[&(edges_[i]->source())];
-      result_->createArc(*p,*t);
+      Place* p = state2place[&(edges_[i]->source())];
+      result->createArc(*p,*t);
 
-      p = state2place_[&(edges_[i]->destination())];
-      result_->createArc(*t,*p);
+      p = state2place[&(edges_[i]->destination())];
+      result->createArc(*t,*p);
+    }
+
+    // generate all other places empty
+    std::set<const Place *> concerning = final.concerningPlaces();
+    std::set<const Place *> places;
+    for (std::set<Place *>::iterator p = result->getPlaces().begin(); p != result->getPlaces().end(); p++)
+      places.insert(const_cast<Place *>(*p));
+    std::set<const Place *> difference = util::setDifference(places, concerning);
+    Condition empty;
+    empty = true;
+    for (std::set<const Place *>::iterator p = difference.begin();
+        p != difference.end(); p++)
+    {
+      empty = empty.formula() && (**p) == 0;
     }
 
     // generate final condition;
-    /// TODO: add all other places empty
-    result_->finalCondition() = final_.formula();
+    result->finalCondition() = final.formula() && empty.formula();
 
-    return *result_;
+    return *result;
   }
 
 

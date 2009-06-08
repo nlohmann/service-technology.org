@@ -73,6 +73,10 @@ else
 fi
 AC_SUBST(PETRIFY)
 
+# check for Fiona (would be used in test cases)
+AC_CHECK_PROGS(FIONA, [fiona], not found)
+AC_SUBST(FIONA)
+
 
 #############################################################################
 # In the following, command line paraemters for the configure script are

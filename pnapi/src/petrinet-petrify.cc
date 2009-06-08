@@ -179,7 +179,7 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         placeName = placeName.substr( 0, placeName.find("/") );      // remove possible /
 
         Place * place = findPlace(placeName);
-        assert(place != NULL);
+//        assert(place != NULL);
 
         if ( inputPlacenames.count(placeName) > 0 )
         {

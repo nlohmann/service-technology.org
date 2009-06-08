@@ -412,7 +412,7 @@ namespace pnapi
 
     // create and fill stringstream for buffering graph information
     std::map<State *, bool> visitedNodes; // visited nodes
-    State *rootNode = states_[0]; // root node
+    State *rootNode = *initialStates().begin(); // root node
     std::ostringstream STGStringStream; // used as buffer for graph information
 
     STGStringStream << ".state graph" << "\n";

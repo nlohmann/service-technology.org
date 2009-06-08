@@ -55,44 +55,37 @@ using std::endl;
   * regular expressions
   ****************************************************************************/
 
-
- /* a start condition to skip comments */
 %s COMMENT
+
+whitespace     [\n\r\t ]
+identifier     [^,;:()\t \n\r\{\}=]+
+number         [0-9]+
+
 
 %%
 
- /* comments */
-"{"                         { BEGIN(COMMENT); }
-<COMMENT>"}"                { BEGIN(INITIAL); }
-<COMMENT>[^}]*              { /* skip */      }
 
- /* interface part of SA format */
-"INTERFACE"                 { return KEY_INTERFACE; }
-"INPUT"                     { return KEY_INPUT;     }
-"OUTPUT"                    { return KEY_OUTPUT;    }
+"{"                                     { BEGIN(COMMENT);              }
+<COMMENT>"}"                            { BEGIN(INITIAL);              }
+<COMMENT>[^}]*                          { /* do nothing */             }
 
- /* nodes part of SA format */
-"NODES"                     { return KEY_NODES;     }
-"TAU"                       { return KEY_TAU;       }
-"FINAL"                     { return KEY_FINAL;     }
-"INITIAL"                   { return KEY_INITIAL;  }
+"NODES"                                 { return KEY_NODES;            }
+"INITIAL"                               { return KEY_INITIAL;          }
+"FINAL"                                 { return KEY_FINAL;            }
 
- /* signs */
-","                         { return COMMA;     }
-":"                         { return COLON;     }
-";"                         { return SEMICOLON; }
-"->"                        { return ARROW;     }
+"INTERFACE"                             { return KEY_INTERFACE;        }
+"INPUT"                                 { return KEY_INPUT;            }
+"OUTPUT"                                { return KEY_OUTPUT;           }
+"SYNCHRONOUS"                           { return KEY_SYNCHRONOUS;      }
 
- /* identifiers */
-[0-9][0-9]*                 {
-                pnapi_sa_lval.yt_int = atoi(yytext); return NUMBER;
-                            }
-[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*  {
-                pnapi_sa_lval.yt_string = (std::string *)(new std::string(yytext)); return IDENT;
-                            }
-                            
-[\t \n\r]*                  { /* remove whitespaces */ }
+":"                                     { return COLON;                }
+";"                                     { return SEMICOLON;            }
+","                                     { return COMMA;                }
+"->"                                    { return ARROW;                }
 
- /* anything else */
-.                           { yyerror("unexpected lexical token"); }
+{number}     { pnapi_sa_lval.yt_int = atoi(yytext); return NUMBER;             }
+{identifier} { pnapi_sa_lval.yt_string = new std::string(yytext); return IDENT;}
 
+{whitespace}                            { /* do nothing */             }
+
+.                                       { yyerror("lexical error"); }

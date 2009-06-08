@@ -15,6 +15,9 @@ Version 1.4-unreleased
 
 * service automata (a.k.a. interaction graphs) can be created with `--sa'
 
+* added a parameter `--im' to generate information for instance migration
+  (can be combined with `--sa' to also generate the most-permissive partner)
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

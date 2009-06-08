@@ -53,6 +53,9 @@ class StoredKnowledge {
         /// print the knowledges as Fiona OG
         static void output_old(std::ofstream&);
 
+        /// print informatio for instance migration
+        static void migration(std::ofstream&);
+
     public: /* static attributes */
 
         /// buckets of knowledges, indexed by hash values

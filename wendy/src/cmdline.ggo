@@ -28,6 +28,13 @@ option "dot" -
   argoptional
   optional
 
+option "im" -
+  "Instance migration information output. If no filename is given, the input filename's suffix is replaced by '.im'."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
 option "fionaFormat" -
   "Use the deprecated Fiona OG file format."
   dependon="og"

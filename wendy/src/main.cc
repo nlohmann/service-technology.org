@@ -124,8 +124,8 @@ void evaluateParameters(int argc, char** argv) {
         abort(9, "message bound must be between 1 and %d", UINT8_MAX);
     }
 
-    // the '--showTransients' parameter implies '--diagnosis'
-    if (args_info.showTransients_flag) {
+    // the '--showTransients' or '--migrate' parameter implies '--diagnosis'
+    if (args_info.showTransients_flag or args_info.im_given) {
         args_info.diagnosis_flag = 1;
     }
 
@@ -334,6 +334,23 @@ int main(int argc, char** argv) {
         }
     }
 
+    // migration output
+    if (args_info.im_given) {
+        string im_filename = args_info.im_arg ? args_info.im_arg : filename + ".im";
+        std::ofstream im_file(im_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        if (!im_file) {
+            abort(11, "could not write to file '%s'", im_filename.c_str());
+        }
+
+        time(&start_time);
+        StoredKnowledge::migration(im_file);
+        time(&end_time);
+
+        if (args_info.verbose_flag) {
+            fprintf(stderr, "%s: wrote migration information to file '%s' [%.0f sec]\n",
+                PACKAGE, im_filename.c_str(), difftime(end_time, start_time));
+        }
+    }
 
     return EXIT_SUCCESS;
 }

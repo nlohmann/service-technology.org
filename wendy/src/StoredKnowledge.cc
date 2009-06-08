@@ -1028,3 +1028,36 @@ void StoredKnowledge::traverse() {
         }
     }
 }
+
+
+void StoredKnowledge::migration(std::ofstream& o) {
+    map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > > migrationInfo;
+    
+    unsigned int c = 0;
+    for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        // traverse the bubble
+        for (unsigned int i = 0; i < allMarkings[*it]; ++i) {
+            InnerMarking_ID inner = (*it)->inner[i];
+            InterfaceMarking *interface = (*it)->interface[i];
+            StoredKnowledge *knowledge = *it;
+
+            migrationInfo[inner][knowledge].insert(interface);
+        }
+    }
+
+    // iterate the inner markings
+    for (map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > >::iterator it1 = migrationInfo.begin(); it1 != migrationInfo.end(); ++it1) {
+
+        // iterate the interface markings
+        for (map<StoredKnowledge*, set<InterfaceMarking*> >::iterator it2 = it1->second.begin(); it2 != it1->second.end(); ++it2) {
+
+            // iterate the knowledge bubbles
+            for (set<InterfaceMarking*>::iterator it3 = it2->second.begin(); it3 != it2->second.end(); ++it3) {
+                o << (unsigned int) it1->first << " " << (unsigned int) it2->first << " " << **it3 << "\n";
+            }
+        }
+        o << std::flush;
+    }
+
+    o << std::flush;
+}

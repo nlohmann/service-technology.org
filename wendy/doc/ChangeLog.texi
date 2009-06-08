@@ -3,6 +3,8 @@
 @item versions of used programs are collected in @file{testsuite.log} when running @samp{make check}
 
 @item service automata (a.k.a. interaction graphs) can be created with @option{--sa}
+
+@item added a parameter @option{--im} to generate information for instance migration (can be combined with @option{--sa} to also generate the most-permissive partner)
 @end itemize
 
 

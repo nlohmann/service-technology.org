@@ -329,15 +329,14 @@ namespace pnapi
 
   /*!
    */
-  std::set<std::string> & Automaton::input() const
+  std::set<std::string> Automaton::input() const
   {
-    std::set<std::string> &result = *new std::set<std::string>();
+    std::set<std::string> result;
     result.clear();
     for (unsigned int i = 0; i < edges_.size(); i++)
       if (edges_[i]->type() == Automaton::INPUT)
       {
         result.insert(edges_[i]->label());
-        std::cerr << "added " << edges_[i]->label() << std::endl;
       }
 
     return result;
@@ -346,15 +345,14 @@ namespace pnapi
 
   /*!
    */
-  std::set<std::string> & Automaton::output() const
+  std::set<std::string> Automaton::output() const
   {
-    std::set<std::string> &result = *new std::set<std::string>();
+    std::set<std::string> result;
     result.clear();
     for (unsigned int i = 0; i < edges_.size(); i++)
       if (edges_[i]->type() == Automaton::OUTPUT)
       {
         result.insert(edges_[i]->label());
-        std::cerr << "added " << edges_[i]->label() << std::endl;
       }
 
     return result;

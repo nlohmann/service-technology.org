@@ -403,15 +403,27 @@ AT_CLEANUP
 AT_BANNER([Net Synthesis])
 ############################################################################
 
-AT_SETUP([Translation from automaton to open net])
-AT_CHECK_PETRIFY
-AT_CHECK_FIONA
+AT_SETUP([Synthesis using Petrify])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
+AT_CHECK_PETRIFY
 AT_CHECK([SA2OWFN AUTOMATON AUTOMATON.owfn],0)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
+AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ignore)
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+
+AT_SETUP([Synthesis using state machine transition])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
+AT_CHECK([SA2SM AUTOMATON AUTOMATON.owfn],0)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
 AT_KEYWORDS([synthesis])
 AT_CLEANUP

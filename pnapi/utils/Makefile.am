@@ -1,13 +1,15 @@
-bin_PROGRAMS = petri sa2owfn
+bin_PROGRAMS = petri sa2owfn sa2sm
 noinst_PROGRAMS = generator
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h
 generator_SOURCES = generator.cc cmdline.ggo
 sa2owfn_SOURCES = sa2owfn.cc
+sa2sm_SOURCES = sa2sm.cc
 
 petri_LDADD =  $(top_builddir)/src/libpnapi.la
 generator_LDADD =  $(top_builddir)/src/libpnapi.la
 sa2owfn_LDADD =  $(top_builddir)/src/libpnapi.la
+sa2sm_LDADD =  $(top_builddir)/src/libpnapi.la
 
 BUILT_SOURCES = cmdline.c
 

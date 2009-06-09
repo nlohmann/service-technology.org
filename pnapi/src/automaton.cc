@@ -4,7 +4,6 @@
 #include <fstream>
 #include <sstream>
 #include <set>
-#include <iostream>
 
 #include "automaton.h"
 #include "component.h"

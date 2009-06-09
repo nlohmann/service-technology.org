@@ -291,4 +291,5 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
   // cleaning up generated file
   remove(pnFileName.c_str());
+  remove(fileName.c_str());
 }

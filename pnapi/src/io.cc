@@ -103,7 +103,9 @@ namespace pnapi
     {
       switch (util::FormatData::data(os))
       {
+      case      util::DOT: __dot::output(os, sa); break;
       case      util::SA:  __sa::output(os, sa);   break;
+      case      util::STAT: __stat::output(os, sa); break;
       default:  assert(false); // unsupported output format
       }
 

@@ -253,6 +253,8 @@ namespace pnapi
     namespace __stat
     {
       std::ostream & output(std::ostream &, const PetriNet &);
+
+      std::ostream & output(std::ostream &, const Automaton &);
     }
 
 
@@ -297,6 +299,8 @@ namespace pnapi
 			    const std::pair<std::string, std::set<Place *> > &);
       std::ostream & output(std::ostream &, const Node &, const std::string &);
       std::string getNodeName(const Node &, bool withSuffix = false);
+
+      std::ostream & output(std::ostream &, const Automaton &);
     }
 
 

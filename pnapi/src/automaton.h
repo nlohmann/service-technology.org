@@ -18,6 +18,8 @@ namespace pnapi
   class Automaton
   {
     friend std::ostream & io::__sa::output(std::ostream &, const Automaton &);
+    friend std::ostream & io::__stat::output(std::ostream &, const Automaton &);
+    friend std::ostream & io::__dot::output(std::ostream &, const Automaton &);
 
   public:
     enum Type { INPUT, OUTPUT, TAU };

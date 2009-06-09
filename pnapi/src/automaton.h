@@ -55,9 +55,9 @@ namespace pnapi
     /// prints the automaton to an STG file (Automaton => Petri net)
     std::string printToSTG(std::vector<std::string> &) const;
     /// returning a set of input labels (after PetriNet => Automaton)
-    std::set<std::string> input() const;
+    std::set<std::string> & input() const;
     /// returning a set of output labels (after PetriNet => Automaton)
-    std::set<std::string> output() const;
+    std::set<std::string> & output() const;
 
     static const unsigned int HASH_SIZE = 65535;
 

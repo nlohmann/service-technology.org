@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <iostream>
 
 #include "automaton.h"
 #include "component.h"
@@ -214,27 +215,28 @@ namespace pnapi
     if (states_.empty())
       return *result;
 
-    // mark first state initially (see assumption above)
-    State *first = *initialStates().begin();
-    std::stringstream s;
-    std::string id;
-    s << first->name();
-    s >> id;
-    state2place[first] = &(result->createPlace("p"+id, Node::INTERNAL, 1));
-    if (first->isFinal())
-      final = final.formula() || (*(state2place[first])) == 1;
+    std::set<std::string> in = input();
+    std::set<std::string> out = output();
+    for (std::set<std::string>::iterator i = in.begin(); i != in.end(); i++)
+    {
+      result->createPlace(*i, Node::INPUT);
+    }
+    for (std::set<std::string>::iterator o = out.begin(); o != out.end(); o++)
+    {
+      result->createPlace(*o, Node::OUTPUT);
+    }
 
     // generate places from states
     for(unsigned int i=0; i < states_.size(); ++i)
     {
-      if (states_[i] == first)
-        continue;
       std::stringstream s;
       std::string id;
       s << states_[i]->name();
       s >> id;
-      Place* p = &(result->createPlace("p"+id));
+      Place *p = &(result->createPlace("p"+id));
       state2place[states_[i]] = p;
+      if (states_[i]->isInitial())
+        p->mark();
 
       /*
        * if the state is final then the according place
@@ -248,6 +250,17 @@ namespace pnapi
     for(unsigned int i=0; i < edges_.size(); ++i)
     {
       Transition* t = &(result->createTransition());
+      switch (edges_[i]->type())
+      {
+      case Automaton::INPUT:
+        result->createArc(*result->findPlace(edges_[i]->label()), *t);
+        break;
+      case Automaton::OUTPUT:
+        result->createArc(*t, *result->findPlace(edges_[i]->label()));
+        break;
+      default:
+        break;
+      }
 
       Place* p = state2place[&(edges_[i]->source())];
       result->createArc(*p,*t);
@@ -316,13 +329,16 @@ namespace pnapi
 
   /*!
    */
-  std::set<std::string> Automaton::input() const
+  std::set<std::string> & Automaton::input() const
   {
-    std::set<std::string> result;
+    std::set<std::string> &result = *new std::set<std::string>();
     result.clear();
     for (unsigned int i = 0; i < edges_.size(); i++)
       if (edges_[i]->type() == Automaton::INPUT)
+      {
         result.insert(edges_[i]->label());
+        std::cerr << "added " << edges_[i]->label() << std::endl;
+      }
 
     return result;
   }
@@ -330,13 +346,16 @@ namespace pnapi
 
   /*!
    */
-  std::set<std::string> Automaton::output() const
+  std::set<std::string> & Automaton::output() const
   {
-    std::set<std::string> result;
+    std::set<std::string> &result = *new std::set<std::string>();
     result.clear();
     for (unsigned int i = 0; i < edges_.size(); i++)
       if (edges_[i]->type() == Automaton::OUTPUT)
+      {
         result.insert(edges_[i]->label());
+        std::cerr << "added " << edges_[i]->label() << std::endl;
+      }
 
     return result;
   }

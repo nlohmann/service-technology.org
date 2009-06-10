@@ -10,10 +10,12 @@ AT_BANNER([Standard Options])
 
 AT_SETUP([Help output])
 AT_CHECK([SAYO --help],0,ignore)
+AT_KEYWORDS(basic)
 AT_CLEANUP
 
 AT_SETUP([Version output])
 AT_CHECK([SAYO --version],0,ignore)
+AT_KEYWORDS(basic)
 AT_CLEANUP
 
 ############################################################################
@@ -24,87 +26,96 @@ AT_SETUP([File In, File Out])
 AT_CHECK([cp TESTFILES/zeus.wendy.og .])
 AT_CHECK([SAYO --input=zeus.wendy.og --output=zeus.sa],0)
 AT_CHECK([test -f zeus.sa])
+AT_KEYWORDS(io)
 AT_CLEANUP
 
 AT_SETUP([File In, Pipe Out])
 AT_CHECK([cp TESTFILES/zeus.wendy.og .])
 AT_CHECK([SAYO --input=zeus.wendy.og > zeus.sa],0)
 AT_CHECK([test -f zeus.sa])
+AT_KEYWORDS(io)
 AT_CLEANUP
 
 AT_SETUP([Pipe In, File Out])
 AT_CHECK([cp TESTFILES/zeus.wendy.og .])
 AT_CHECK([cat zeus.wendy.og | SAYO --output=zeus.sa],0)
 AT_CHECK([test -f zeus.sa])
+AT_KEYWORDS(io)
 AT_CLEANUP
 
 AT_SETUP([Pipe In, Pipe Out])
 AT_CHECK([cp TESTFILES/zeus.wendy.og .])
 AT_CHECK([cat zeus.wendy.og | SAYO > zeus.sa],0)
 AT_CHECK([test -f zeus.sa])
+AT_KEYWORDS(io)
 AT_CLEANUP
 
 ############################################################################
-AT_BANNER([Equivalence tests])
+AT_BANNER([Equivalence Tests])
 ############################################################################
 
-AT_SETUP([Test OG: myCoffee])
-AT_CHECK_FIONA
-AT_CHECK_SA2SM
+AT_SETUP([Coffee Automaton])
 AT_CHECK([cp TESTFILES/myCoffee.*.og .])
-AT_CHECK([SAYO --input=myCoffee.wendy.og > myCoffee.sa])
-AT_CHECK([SA2SM myCoffee.sa > myCoffee.owfn])
-AT_CHECK([FIONA -t equivalence myCoffee.owfn myCoffee.fiona.og > equi.log], 0, ignore, ignore)
-AT_CHECK([GREP -q "equivalent: YES" equi.log])
+AT_CHECK([SAYO --input=myCoffee.wendy.og --output=myCoffee.sa])
+AT_CHECK_SA2SM
+AT_CHECK([SA2SM myCoffee.sa myCoffee.owfn])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence myCoffee.owfn myCoffee.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
-AT_SETUP([Test OG: PhControl3])
-AT_CHECK_FIONA
-AT_CHECK_SA2SM
+AT_SETUP([Dining Philosophers])
 AT_CHECK([cp TESTFILES/phcontrol3.unf.*.og .])
-AT_CHECK([SAYO --input=phcontrol3.unf.wendy.og > phcontrol3.unf.sa])
-AT_CHECK([SA2SM phcontrol3.unf.sa > phcontrol3.unf.owfn])
-AT_CHECK([FIONA -t equivalence phcontrol3.unf.owfn phcontrol3.unf.fiona.og > equi.log], 0, ignore, ignore)
-AT_CHECK([GREP -q "equivalent: YES" equi.log])
+AT_CHECK([SAYO --input=phcontrol3.unf.wendy.og --output=phcontrol3.unf.sa])
+AT_CHECK_SA2SM
+AT_CHECK([SA2SM phcontrol3.unf.sa phcontrol3.unf.owfn])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence phcontrol3.unf.owfn phcontrol3.unf.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
-AT_SETUP([Test OG: PO])
-AT_CHECK_FIONA
-AT_CHECK_SA2SM
+AT_SETUP([Purchase Order Process])
 AT_CHECK([cp TESTFILES/PO.*.og .])
-AT_CHECK([SAYO --input=PO.wendy.og > PO.sa])
-AT_CHECK([SA2SM PO.sa > PO.owfn])
-AT_CHECK([FIONA -t equivalence PO.owfn PO.fiona.og > equi.log], 0, ignore, ignore)
-AT_CHECK([GREP -q "equivalent: YES" equi.log])
+AT_CHECK([SAYO --input=PO.wendy.og --output=PO.sa])
+AT_CHECK_SA2SM
+AT_CHECK([SA2SM PO.sa PO.owfn])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence PO.owfn PO.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
-AT_SETUP([Test OG: Sequence10])
-AT_CHECK_FIONA
-AT_CHECK_SA2SM
+AT_SETUP([Sequence])
 AT_CHECK([cp TESTFILES/sequence10.*.og .])
-AT_CHECK([SAYO --input=sequence10.wendy.og > sequence10.sa])
-AT_CHECK([SA2SM sequence10.sa > sequence10.owfn])
-AT_CHECK([FIONA -t equivalence sequence10.owfn sequence10.fiona.og > equi.log], 0, ignore, ignore)
-AT_CHECK([GREP -q "equivalent: YES" equi.log])
+AT_CHECK([SAYO --input=sequence10.wendy.og --output=sequence10.sa])
+AT_CHECK_SA2SM
+AT_CHECK([SA2SM sequence10.sa sequence10.owfn])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence sequence10.owfn sequence10.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
-AT_SETUP([Test OG: SMTP3])
-AT_CHECK_FIONA
-AT_CHECK_SA2SM
+AT_SETUP([SMTP Protocol])
 AT_CHECK([cp TESTFILES/smtp3.*.og .])
-AT_CHECK([SAYO --input=smtp3.wendy.og > smtp3.sa])
-AT_CHECK([SA2SM smtp3.sa > smtp3.owfn])
-AT_CHECK([FIONA -t equivalence smtp3.owfn smtp3.fiona.og > equi.log], 0, ignore, ignore)
-AT_CHECK([GREP -q "equivalent: YES" equi.log])
-AT_CLEANUP
-
-AT_SETUP([Test OG: Zeus])
-AT_CHECK_FIONA
+AT_CHECK([SAYO --input=smtp3.wendy.og --output=smtp3.sa])
 AT_CHECK_SA2SM
-AT_CHECK([cp TESTFILES/zeus.*.og .])
-AT_CHECK([SAYO --input=zeus.wendy.og > zeus.sa])
-AT_CHECK([SA2SM zeus.sa > zeus.owfn])
-AT_CHECK([FIONA -t equivalence zeus.owfn zeus.fiona.og > equi.log], 0, ignore, ignore)
-AT_CHECK([GREP -q "equivalent: YES" equi.log])
+AT_CHECK([SA2SM smtp3.sa smtp3.owfn])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence smtp3.owfn smtp3.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
+AT_SETUP([ZEUS Seller Service])
+AT_CHECK([cp TESTFILES/zeus.*.og .])
+AT_CHECK([SAYO --input=zeus.wendy.og --output=zeus.sa])
+AT_CHECK_SA2SM
+AT_CHECK([SA2SM zeus.sa zeus.owfn])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence zeus.owfn zeus.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
+AT_CLEANUP

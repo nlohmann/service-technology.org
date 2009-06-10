@@ -1,0 +1,15 @@
+args "--long-help --include-getopt --show-required --unamed-opts=FILES"
+
+purpose "Mia -- migrating instances"
+
+description "Usage: "
+
+section "Debug"
+
+option "verbose" v
+  "Verbose output"
+  flag off
+
+option "debug" d
+  "Debugging mode: do not delete temporary files."
+  flag off

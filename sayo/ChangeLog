@@ -7,6 +7,17 @@
                       http://service-technology.org/sayo
 
 
+Version 0.3
+===========
+
+* now ignoring "empty" node
+
+* fixed segfault
+
+* added testcases
+
+* added documentation
+
 Version 0.2
 ===========
 

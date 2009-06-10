@@ -1,5 +1,5 @@
 /*****************************************************************************\
- Sayo -- Service Automatons Yielded from Operating guidelines
+ Sayo -- Service Automata Yielded from Operating guidelines
 
  Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
 
@@ -123,3 +123,4 @@ int main(int argc, char** argv)
   
   return EXIT_SUCCESS; // finished parsing
 }
+

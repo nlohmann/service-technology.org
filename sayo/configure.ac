@@ -1,4 +1,4 @@
-AC_INIT(Sayo, 0.2, sayo@service-technology.org)
+AC_INIT(Sayo, 0.3, sayo@service-technology.org)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -19,8 +19,8 @@ AC_PROG_GREP
 # search for Fiona (nice to have for "make check")
 AC_CHECK_PROG(FIONA, fiona, fiona, not found)
 
-# search for Petri (nice to have for "make check")
-AC_CHECK_PROG(PETRI, petri, petri, not found)
+# search for sa2sm (nice to have for "make check")
+AC_CHECK_PROG(SA2SM, sa2sm, sa2sm, not found)
 
 # flags set by the configure script
 configured_CFLAGS=""
@@ -118,3 +118,4 @@ AC_CONFIG_FILES([Makefile
                  tests/Makefile tests/package.m4
                  man/Makefile])
 AC_OUTPUT
+

@@ -27,3 +27,4 @@ cmdline.c: cmdline.ggo
 
 doxygen:
 	cd ../doc ; doxygen
+

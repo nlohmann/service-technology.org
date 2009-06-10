@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for Sayo, version @value{VERSION}, a tool to generate public view service automatons from 2-bit operating guidelines, last updated @value{UPDATED}.
+This manual is for Sayo, version @value{VERSION}, a tool to generate public view service automata from 2-bit operating guidelines, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2009 Christian Sura
 
@@ -34,7 +34,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @title Sayo
 
-@subtitle Service Automatons Yielded from Operating guidelines
+@subtitle Service Automata Yielded from Operating guidelines
 @subtitle @url{http://service-technology.org/sayo}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}

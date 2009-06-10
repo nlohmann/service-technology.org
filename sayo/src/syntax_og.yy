@@ -100,6 +100,9 @@ IdentType identType;
 /// global flag, for writing the initial state
 bool initialState;
 
+/// bool, indicating, that the empty node is read
+bool emptyNode;
+
 %}
 
 %name-prefix="og_yy"
@@ -154,14 +157,14 @@ og:
     (*myOut) << "INTERFACE\n  INPUT ";
 
     // write input
-    for(int i=1; i<inputLabels.size()-1; ++i)
+    for(int i=1; i+1<inputLabels.size(); ++i)
       (*myOut) << inputLabels[i] << ", ";
     if(inputLabels.size() > 1)
       (*myOut) << inputLabels[inputLabels.size()-1];
     (*myOut) << ";\n  OUTPUT ";
 
     // write output
-    for(int i=0; i<outputLabels.size()-1; ++i)
+    for(int i=0; i+1<outputLabels.size(); ++i)
       (*myOut) << outputLabels[i] << ", ";
     if(!outputLabels.empty())
       (*myOut) << outputLabels[outputLabels.size()-1];
@@ -174,13 +177,13 @@ og:
     (*myOut) << "  0\n    TAU -> 1\n\n"
              << "  1\n\n";
   }
-  
+
   nodes
   
   {
     // cleanup
     delete inputSockets;
-  }
+  }  
 ;
 
 
@@ -278,6 +281,11 @@ nodes:
 node:
   NUMBER
   { 
+    // Don't copy the empty node, i.e. node 0 from the og.
+    emptyNode = ($1 == 0);
+    if(emptyNode)
+      break;
+
     // read a node, write corresponding node
     if(initialState)
     {
@@ -302,6 +310,10 @@ node:
   annotation successors
   
   {
+    // don't copy the empty node
+    if(emptyNode)
+       break;
+
     /*
      * Complete receive arcs, i.e. for each input event
      * still leading to node 0 write this transition
@@ -387,6 +399,10 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
+    // don't copy the empty node or arcs to the empty node
+    if( (emptyNode) || ($4 == 0) )
+       break;    
+
     // read an OG successor on an event
     // write corresponting SA successor on the same event
     (*myOut) << "    " << $2 << " -> " << mapNode($4) << "\n";
@@ -398,3 +414,4 @@ successors:
     free($2);
   }
 ;
+

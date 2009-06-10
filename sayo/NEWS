@@ -7,18 +7,15 @@
                       http://service-technology.org/sayo
 
 
-Version 0.2
+Version 0.3
 ===========
 
-* made Sayo Gnits compatible
+* now ignoring "empty" node
 
-* added manpage
+* fixed segfault
 
-* added maintainer scripts
+* added testcases
 
 * added documentation
 
-
-See file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for\ncomplete version history.\n

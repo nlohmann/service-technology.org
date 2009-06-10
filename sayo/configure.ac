@@ -22,6 +22,9 @@ AC_CHECK_PROG(FIONA, fiona, fiona, not found)
 # search for sa2sm (nice to have for "make check")
 AC_CHECK_PROG(SA2SM, sa2sm, sa2sm, not found)
 
+# search for Wendy (nice to have for "make check")
+AC_CHECK_PROG(WENDY, wendy, wendy, not found)
+
 # flags set by the configure script
 configured_CFLAGS=""
 configured_CXXFLAGS=""

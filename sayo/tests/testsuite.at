@@ -1,7 +1,8 @@
 AT_INIT
 
-# define macros to skip a test if Fiona or Petri was not found by configure
+# define macros to skip a test if the tools were not found by configure
 m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_SA2SM, [AT_CHECK([if test "SA2SM" == "not found"; then exit 77; fi])])
 
 ############################################################################
@@ -59,8 +60,10 @@ AT_CHECK([cp TESTFILES/myCoffee.*.og .])
 AT_CHECK([SAYO --input=myCoffee.wendy.og --output=myCoffee.sa])
 AT_CHECK_SA2SM
 AT_CHECK([SA2SM myCoffee.sa myCoffee.owfn])
+AT_CHECK_WENDY
+AT_CHECK([WENDY myCoffee.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK_FIONA
-AT_CHECK([FIONA -t equivalence myCoffee.owfn myCoffee.fiona.og], 0, stdout, ignore)
+AT_CHECK([FIONA -t equivalence myCoffee.og myCoffee.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
@@ -70,8 +73,10 @@ AT_CHECK([cp TESTFILES/phcontrol3.unf.*.og .])
 AT_CHECK([SAYO --input=phcontrol3.unf.wendy.og --output=phcontrol3.unf.sa])
 AT_CHECK_SA2SM
 AT_CHECK([SA2SM phcontrol3.unf.sa phcontrol3.unf.owfn])
+AT_CHECK_WENDY
+AT_CHECK([WENDY phcontrol3.unf.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK_FIONA
-AT_CHECK([FIONA -t equivalence phcontrol3.unf.owfn phcontrol3.unf.fiona.og], 0, stdout, ignore)
+AT_CHECK([FIONA -t equivalence phcontrol3.unf.og phcontrol3.unf.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
@@ -81,8 +86,10 @@ AT_CHECK([cp TESTFILES/PO.*.og .])
 AT_CHECK([SAYO --input=PO.wendy.og --output=PO.sa])
 AT_CHECK_SA2SM
 AT_CHECK([SA2SM PO.sa PO.owfn])
+AT_CHECK_WENDY
+AT_CHECK([WENDY PO.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK_FIONA
-AT_CHECK([FIONA -t equivalence PO.owfn PO.fiona.og], 0, stdout, ignore)
+AT_CHECK([FIONA -t equivalence PO.og PO.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
@@ -92,8 +99,10 @@ AT_CHECK([cp TESTFILES/sequence10.*.og .])
 AT_CHECK([SAYO --input=sequence10.wendy.og --output=sequence10.sa])
 AT_CHECK_SA2SM
 AT_CHECK([SA2SM sequence10.sa sequence10.owfn])
+AT_CHECK_WENDY
+AT_CHECK([WENDY sequence10.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK_FIONA
-AT_CHECK([FIONA -t equivalence sequence10.owfn sequence10.fiona.og], 0, stdout, ignore)
+AT_CHECK([FIONA -t equivalence sequence10.og sequence10.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
@@ -103,8 +112,10 @@ AT_CHECK([cp TESTFILES/smtp3.*.og .])
 AT_CHECK([SAYO --input=smtp3.wendy.og --output=smtp3.sa])
 AT_CHECK_SA2SM
 AT_CHECK([SA2SM smtp3.sa smtp3.owfn])
+AT_CHECK_WENDY
+AT_CHECK([WENDY smtp3.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK_FIONA
-AT_CHECK([FIONA -t equivalence smtp3.owfn smtp3.fiona.og], 0, stdout, ignore)
+AT_CHECK([FIONA -t equivalence smtp3.og smtp3.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
@@ -114,8 +125,10 @@ AT_CHECK([cp TESTFILES/zeus.*.og .])
 AT_CHECK([SAYO --input=zeus.wendy.og --output=zeus.sa])
 AT_CHECK_SA2SM
 AT_CHECK([SA2SM zeus.sa zeus.owfn])
+AT_CHECK_WENDY
+AT_CHECK([WENDY zeus.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK_FIONA
-AT_CHECK([FIONA -t equivalence zeus.owfn zeus.fiona.og], 0, stdout, ignore)
+AT_CHECK([FIONA -t equivalence zeus.og zeus.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP

@@ -10,6 +10,9 @@
 #include <cstdio>
 #include <set>
 
+#define YYDEBUG 1
+#define YYERROR_VERBOSE 1
+
 unsigned int stat_stateCount = 0;
 
 /// the current NAME token as string

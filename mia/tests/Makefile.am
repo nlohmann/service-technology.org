@@ -3,7 +3,8 @@ TESTSUITE = $(builddir)/testsuite
 EXTRA_DIST = testsuite.at \
              testfiles/reg_old.owfn testfiles/reg_new.owfn \
              testfiles/sequence5.owfn testfiles/sequence5-pv.owfn \
-             testfiles/ex1.owfn testfiles/ex2.owfn
+             testfiles/ex1.owfn testfiles/ex2.owfn \
+             testfiles/PO.owfn testfiles/PO-pv.owfn
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

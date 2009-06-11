@@ -9,6 +9,9 @@
 #include <vector>
 #include <map>
 
+#define YYDEBUG 1
+#define YYERROR_VERBOSE 1
+
 /// the tuples of the source (innermarking, mppstate, interfacemarking)
 std::map<unsigned, std::vector<std::vector<unsigned int> > > tuples_source;
 

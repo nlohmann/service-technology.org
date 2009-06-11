@@ -22,6 +22,24 @@ AT_CLEANUP
 AT_BANNER([Examples])
 ############################################################################
 
+AT_SETUP([Small example (1 -> 2)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ex1.owfn TESTFILES/ex2.owfn .])
+AT_CHECK([MIA ex1.owfn ex2.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[3
+],ignore)
+AT_CLEANUP
+
+AT_SETUP([Small example (2 -> 1)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ex1.owfn TESTFILES/ex2.owfn .])
+AT_CHECK([MIA ex2.owfn ex1.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[3
+],ignore)
+AT_CLEANUP
+
 AT_SETUP([Registration office service (old -> new)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
@@ -40,11 +58,29 @@ AT_CHECK([cat stdout | wc -l],0,[12
 ],ignore)
 AT_CLEANUP
 
-#AT_SETUP([Sequence 5 (public view -> original)])
-#AT_CHECK_WENDY
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/sequence5.owfn TESTFILES/sequence5-pv.owfn .])
-#AT_CHECK([MIA sequence5-pv.owfn sequence5.owfn],0,stdout,ignore)
-#AT_CHECK([cat stdout | wc -l],0,[12
-#],ignore)
-#AT_CLEANUP
+AT_SETUP([Sequence 5 (public view -> original)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/sequence5.owfn TESTFILES/sequence5-pv.owfn .])
+AT_CHECK([MIA sequence5-pv.owfn sequence5.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[12
+],ignore)
+AT_CLEANUP
+
+AT_SETUP([Purchase Order (original -> public view)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.owfn TESTFILES/PO-pv.owfn .])
+AT_CHECK([MIA PO.owfn PO-pv.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[429
+],ignore)
+AT_CLEANUP
+
+AT_SETUP([Purchase Order (public view -> original)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.owfn TESTFILES/PO-pv.owfn .])
+AT_CHECK([MIA PO-pv.owfn PO.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[429
+],ignore)
+AT_CLEANUP

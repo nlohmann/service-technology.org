@@ -25,15 +25,19 @@ AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 AC_HEADER_ASSERT
 
 # check for Wendy
-AC_CHECK_PROG(WENDY, wendy, wendy, not found)
+AC_PATH_TOOL(WENDY, [wendy], not found)
 if test "$WENDY" = "not found"; then
   AC_MSG_ERROR([Wendy was not found, but is needed by Mia.])
+else
+  AC_DEFINE_UNQUOTED(BINARY_WENDY, "${WENDY}", [Wendy binary.])
 fi
 
 # check for LoLA
-AC_CHECK_PROG(LOLA, lola-full, lola-full, not found)
+AC_PATH_TOOL(LOLA, [lola-full], not found)
 if test "$LOLA" = "not found"; then
   AC_MSG_ERROR([LoLA was not found, but is needed by Mia.])
+else
+  AC_DEFINE_UNQUOTED(BINARY_LOLA, "${LOLA}", [LoLA binary.])
 fi
 
 # check if the Petri Net API is already installed

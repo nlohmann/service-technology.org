@@ -99,20 +99,25 @@ int main(int argc, char** argv) {
     /*---------------------------------------------------------------.
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
-    string wendy_command = "wendy " + string(args_info.inputs[0]) + " --im=tmp.im --sa=tmp.sa";
-    std::stringstream s;
-    s << args_info.messagebound_arg;
-    wendy_command += " -m" + s.str() + " ";
-    wendy_command += (args_info.verbose_flag) ? " --verbose" : " &> /dev/null";
-    int wendyExit = system(wendy_command.c_str());
-    if (wendyExit != 0) {
-        abort(3, "Wendy failed");
+    string wendy_command = string(BINARY_WENDY) + " " + string(args_info.inputs[0]) + " --im=tmp.im --sa=tmp.sa";
+    if (args_info.messagebound_given) {
+        std::stringstream s;
+        s << args_info.messagebound_arg;
+        wendy_command += " -m" + s.str();
     }
+    wendy_command += ((args_info.verbose_flag) ? " --verbose" : " &> /dev/null");
+    if (args_info.verbose_flag) {
+        fprintf(stderr, "%s: executing '%s'\n", PACKAGE, wendy_command.c_str());
+    }
+    system(wendy_command.c_str());
 
     /*-------------------------------.
     | 2. parse migration information |
     `-------------------------------*/
     im_in = fopen("tmp.im", "r");
+    if (!im_in) {
+        abort(4, "could not read migration information");
+    }
     im_parse();
     fclose(im_in);
     if (args_info.verbose_flag) {
@@ -123,6 +128,9 @@ int main(int argc, char** argv) {
     | 3. parse most-permissive partner |
     `---------------------------------*/
     ifstream mpp_file("tmp.sa", ifstream::in);
+    if (not mpp_file) {
+        abort(5, "could not read most-permissive partner");
+    }
     Automaton *mpp_sa = new Automaton();
     mpp_file >> pnapi::io::sa >> *mpp_sa;
     mpp_file.close();
@@ -142,6 +150,9 @@ int main(int argc, char** argv) {
     | 5. parse target service |
     `------------------------*/
     ifstream target_file(args_info.inputs[1], ifstream::in);
+    if (not target_file) {
+        abort(6, "could not read target service '%s'", args_info.inputs[1]);
+    }
     PetriNet target;
     target_file >> pnapi::io::owfn >> target;
     target_file.close();
@@ -162,11 +173,20 @@ int main(int argc, char** argv) {
     | 7. generate and parse state space of composition |
     `-------------------------------------------------*/
     ofstream composition_lolafile("tmp.lola", ofstream::trunc);
+    if (not composition_lolafile) {
+        abort(7, "could not write composition");
+    }
     composition_lolafile << pnapi::io::lola << composition;
     composition_lolafile.close();
-    string lola_command = args_info.safe_flag ? "lola-full1" : "lola-full";
+    string lola_command = args_info.safe_flag ? "lola-full1" : string(BINARY_LOLA);
     lola_command += " tmp.lola -M 2> /dev/null";
+    if (args_info.verbose_flag) {
+        fprintf(stderr, "%s: executing '%s'\n", PACKAGE, lola_command.c_str());
+    }
     graph_in = popen(lola_command.c_str(), "r");
+    if (!graph_in) {
+        abort(8, "could not read state space of composition");
+    }
     graph_parse();
     pclose(graph_in);
     if (args_info.verbose_flag) {

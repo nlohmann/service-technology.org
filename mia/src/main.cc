@@ -32,6 +32,7 @@ extern map<string, set<vector<unsigned int> > > tuples_target;
 // statistics
 extern unsigned int stat_stateCount;
 extern unsigned int stat_tupleCount;
+extern unsigned int stat_tupleCountNew;
 
 // the input files
 extern FILE *graph_in;
@@ -191,11 +192,13 @@ int main(int argc, char** argv) {
     pclose(graph_in);
     if (args_info.verbose_flag) {
         fprintf(stderr, "%s: generated state space of composition: %d states\n", PACKAGE, stat_stateCount);
+        fprintf(stderr, "%s: %d tuples for target service found\n", PACKAGE, stat_tupleCountNew);
     }
 
     /*-------------------------.
     | 8. find migration states |
     `-------------------------*/
+    unsigned int jumperCount = 0;
     for (map<unsigned, vector<vector<unsigned int> > >::iterator q1 = tuples_source.begin(); q1 != tuples_source.end(); ++q1) {
         for (map<string, set<vector<unsigned int> > >::iterator q2 = tuples_target.begin(); q2 != tuples_target.end(); ++q2) {
             bool pos = true;
@@ -207,8 +210,12 @@ int main(int argc, char** argv) {
             }
             if (pos) {
                 fprintf(stdout, "m%d -> [%s]\n", q1->first, q2->first.c_str());
+                ++jumperCount;
             }
         }
+    }
+    if (args_info.verbose_flag) {
+        fprintf(stderr, "%s: %d migration points found\n", PACKAGE, jumperCount);
     }
 
     /*-----------.

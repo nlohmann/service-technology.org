@@ -14,6 +14,7 @@
 #define YYERROR_VERBOSE 1
 
 unsigned int stat_stateCount = 0;
+unsigned int stat_tupleCountNew = 0;
 
 /// the current NAME token as string
 std::string NAME_token;
@@ -60,7 +61,9 @@ state:
   markings transitions
     {
         if (not skip) {
-            tuples_target[statename].insert(currentTuple);
+            if (tuples_target[statename].insert(currentTuple).second) {
+                ++stat_tupleCountNew;
+            }
         }
         ++stat_stateCount;
     }

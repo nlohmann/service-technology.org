@@ -1045,6 +1045,16 @@ void StoredKnowledge::migration(std::ofstream& o) {
         }
     }
 
+    // print information on the interface
+    o << "INTERFACE [";
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        if (l > Label::first_receive) {
+            o << ",";
+        }
+        o << Label::id2name[l];
+    }
+    o << "]\n\n";
+
     // iterate the inner markings
     for (map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > >::iterator it1 = migrationInfo.begin(); it1 != migrationInfo.end(); ++it1) {
 

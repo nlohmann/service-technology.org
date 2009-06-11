@@ -3,42 +3,42 @@ args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handl
 purpose "Calculating Operating Guidelines."
 description "About Wendy:"
 
-
-section "Output"
-sectiondesc="When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines.\n"
+section "Input/Output"
+sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix ('.owfn') is replaced by the name of the respective option (e.g., '.og'). If the filename 'STDOUT' is given, Wendy will pipe the respective output to the standard output stream.\n"
 
 option "og" -
-  "Operating guidelines output. If no filename is given, the input filename's suffix is replaced by '.og'."
+  "Operating guidelines output."
   string
   typestr="FILENAME"
   argoptional
   optional
 
 option "sa" -
-  "Service automaton output. If no filename is given, the input filename's suffix is replaced by '.sa'."
+  "Service automaton output."
   string
   typestr="FILENAME"
   argoptional
   optional
 
 option "dot" -
-  "Graphviz dot output. If no filename is given, the input filename's suffix is replaced by '.dot'."
+  "Graphviz dot output."
   string
   typestr="FILENAME"
   argoptional
   optional
 
 option "im" -
-  "Instance migration information output. If no filename is given, the input filename's suffix is replaced by '.im'."
+  "Instance migration information output."
   string
   typestr="FILENAME"
   argoptional
   optional
 
 option "fionaFormat" -
-  "Use the deprecated Fiona OG file format."
+  "Use the deprecated Fiona OG file format (does not work with '--sa')."
   dependon="og"
   flag off
+  hidden
 
 
 section "Options"
@@ -49,6 +49,18 @@ option "messagebound" m
   typestr="BOUND"
   default="1"
   optional
+
+option "formula" -
+  "Select the kind of formula to be used in outputs."
+  values="dnf","2bits" enum
+  typestr="STYLE"
+  dependon="og"
+  default="dnf"
+  optional
+
+
+section "Dot Options"
+sectiondesc="These options control the graphical representation of the calculated operating guideline. It has no effect of other files.\n"
 
 option "showEmptyNode" -
   "Show the empty node (dot only)."
@@ -61,19 +73,12 @@ option "showWaitstates" -
   flag off
 
 option "showTransients" -
-  "Show transient states (dot only). Note: implicitly sets '--diagnosis' flag."
+  "Show transient states (dot only)."
   dependon="dot"
   flag off
 
-option "formula" -
-  "Select the kind of formula to be used in outputs."
-  values="dnf","2bits" enum
-  typestr="STYLE"
-  default="dnf"
-  optional
 
-
-section "Toggle optimizations"
+section "Optimizations"
 
 option "noDeadlockDetection" -
   "Do not detect inevitable deadlocks during preprocessing."
@@ -88,7 +93,7 @@ option "receiveBeforeSend" -
   flag off
 
 
-section "Debug"
+section "Debugging"
 
 option "verbose" v
   "Verbose output."
@@ -104,9 +109,11 @@ option "reportFrequency" -
 option "diagnosis" d
   "Disable some optimizations to allow for diagnosis and debugging."
   flag off
+  hidden
 
 option "lola" -
   "The LoLA binary that is compiled with the option 'FULL' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using 'make lola-full'."
   string
   typestr="PATH"
   optional
+  hidden

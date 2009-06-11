@@ -212,15 +212,15 @@ int main(int argc, char** argv) {
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
-    system("rm -f tmp.lola");
 #else
     command_line += " tmp.lola -m &> /dev/null";
     system(command_line.c_str());
     graph_in = fopen("tmp.graph", "r");
     graph_parse();
     fclose(graph_in);
-    system("rm -f tmp.graph tmp.lola");
+    remove("tmp.graph");
 #endif
+    remove("tmp.lola");
     time(&end_time);
 
 

@@ -30,6 +30,9 @@
 #include "InnerMarking.h"
 #include "Label.h"
 
+#define YYDEBUG 1
+#define YYERROR_VERBOSE 1
+
 /// the current NAME token as string
 std::string NAME_token;
 
@@ -74,7 +77,8 @@ prog:
 ;
 
 markings:
-  NAME COLON NUMBER
+  /* empty */
+| NAME COLON NUMBER
     { marking[InnerMarking::net->findPlace(NAME_token)] = $3; }
 | markings COMMA NAME COLON NUMBER
     { marking[InnerMarking::net->findPlace(NAME_token)] = $5; }

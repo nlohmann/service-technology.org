@@ -18,6 +18,9 @@ Version 1.4-unreleased
 * added a parameter `--im' to generate information for instance migration
   (can be combined with `--sa' to also generate the most-permissive partner)
 
+* fixed bug #13651 (`https://gna.org/bugs/?13651') - adjusted parser to
+  process empty markings
+
 Version 1.3
 ===========
 

@@ -1,8 +1,8 @@
 # process "libs/pnapi" directory only if the Petri Net API needs to be compiled
 if COMPILE_PNAPI
-SUBDIRS = libs/pnapi src man
+SUBDIRS = libs/pnapi src man tests
 else
-SUBDIRS = src man
+SUBDIRS = src man tests
 endif
 
 svn-clean: maintainer-clean
@@ -12,3 +12,5 @@ svn-clean: maintainer-clean
 	rm -fr man/Makefile.in
 	rm -fr doc/doxygen
 	rm -fr libs/pnapi/Makefile.in
+	rm -f tests/Makefile.in
+

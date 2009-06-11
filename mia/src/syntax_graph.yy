@@ -10,6 +10,8 @@
 #include <cstdio>
 #include <set>
 
+unsigned int stat_stateCount = 0;
+
 /// the current NAME token as string
 std::string NAME_token;
 std::string NAME_temp;
@@ -57,6 +59,7 @@ state:
         if (not skip) {
             tuples_target[statename].insert(currentTuple);
         }
+        ++stat_stateCount;
     }
 ;
 

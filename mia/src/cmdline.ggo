@@ -4,6 +4,20 @@ purpose "Mia -- migrating instances"
 
 description "Usage: "
 
+section "Options"
+
+option "safe" -
+  "Assume that the message bound 1 one and the target net is safe."
+  flag off
+
+option "messagebound" m
+  "Set the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+
+
 section "Debug"
 
 option "verbose" v

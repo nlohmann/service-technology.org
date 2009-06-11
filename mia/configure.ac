@@ -11,8 +11,13 @@ AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
 
+# check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
@@ -39,5 +44,5 @@ AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile man/Makefile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile man/Makefile tests/Makefile tests/package.m4])
 AC_OUTPUT

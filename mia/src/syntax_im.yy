@@ -14,6 +14,8 @@ std::map<unsigned, std::vector<std::vector<unsigned int> > > tuples_source;
 
 std::vector<unsigned int> currentTuple;
 
+unsigned int stat_tupleCount = 0;
+
 // mappings for the port name/id management
 std::map<unsigned int, std::string> id2name;
 std::map<std::string, unsigned int> name2id;
@@ -63,7 +65,7 @@ tuple:
   NUMBER NUMBER 
     { currentTuple[0] = $2; currentPos = 1; }
   LBRACKET vector RBRACKET
-    { tuples_source[$1].push_back(currentTuple); }
+    { tuples_source[$1].push_back(currentTuple); ++stat_tupleCount; }
 ;
 
 vector:

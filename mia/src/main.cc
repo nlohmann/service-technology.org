@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -27,6 +28,10 @@ gengetopt_args_info args_info;
 // the tuples
 extern map<unsigned, vector<vector<unsigned int> > > tuples_source;
 extern map<string, set<vector<unsigned int> > > tuples_target;
+
+// statistics
+extern unsigned int stat_stateCount;
+extern unsigned int stat_tupleCount;
 
 // the input files
 extern FILE *graph_in;
@@ -89,15 +94,20 @@ int main(int argc, char** argv) {
     `--------------------------------------*/
     evaluateParameters(argc, argv);
 
-    fprintf(stderr, "%s: source service is '%s'\n", PACKAGE, args_info.inputs[0]);
-    fprintf(stderr, "%s: target service is '%s'\n", PACKAGE, args_info.inputs[1]);
+    fprintf(stderr, "%s: migrating '%s' to '%s\n", PACKAGE, args_info.inputs[0], args_info.inputs[1]);
 
     /*---------------------------------------------------------------.
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
     string wendy_command = "wendy " + string(args_info.inputs[0]) + " --im=tmp.im --sa=tmp.sa";
+    std::stringstream s;
+    s << args_info.messagebound_arg;
+    wendy_command += " -m" + s.str() + " ";
     wendy_command += (args_info.verbose_flag) ? " --verbose" : " &> /dev/null";
-    system(wendy_command.c_str());
+    int wendyExit = system(wendy_command.c_str());
+    if (wendyExit != 0) {
+        abort(3, "Wendy failed");
+    }
 
     /*-------------------------------.
     | 2. parse migration information |
@@ -105,6 +115,9 @@ int main(int argc, char** argv) {
     im_in = fopen("tmp.im", "r");
     im_parse();
     fclose(im_in);
+    if (args_info.verbose_flag) {
+        fprintf(stderr, "%s: parsed migration information: %d tuples\n", PACKAGE, stat_tupleCount);
+    }
 
     /*---------------------------------.
     | 3. parse most-permissive partner |
@@ -113,12 +126,14 @@ int main(int argc, char** argv) {
     Automaton *mpp_sa = new Automaton();
     mpp_file >> pnapi::io::sa >> *mpp_sa;
     mpp_file.close();
+    if (args_info.verbose_flag) {
+        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp_sa << std::endl;
+    }
 
     /*-------------------------------------------------.
     | 4. transform most-permissive partner to open net |
     `-------------------------------------------------*/
     PetriNet mpp = mpp_sa->stateMachine();
-    delete mpp_sa;
     if (args_info.verbose_flag) {
         std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << mpp << std::endl;
     }
@@ -149,10 +164,14 @@ int main(int argc, char** argv) {
     ofstream composition_lolafile("tmp.lola", ofstream::trunc);
     composition_lolafile << pnapi::io::lola << composition;
     composition_lolafile.close();
-    string lola_command = "lola-full tmp.lola -M 2> /dev/null";
+    string lola_command = args_info.safe_flag ? "lola-full1" : "lola-full";
+    lola_command += " tmp.lola -M 2> /dev/null";
     graph_in = popen(lola_command.c_str(), "r");
     graph_parse();
     pclose(graph_in);
+    if (args_info.verbose_flag) {
+        fprintf(stderr, "%s: generated state space of composition: %d states\n", PACKAGE, stat_stateCount);
+    }
 
     /*-------------------------.
     | 8. find migration states |
@@ -167,7 +186,7 @@ int main(int argc, char** argv) {
                 }
             }
             if (pos) {
-                fprintf(stderr, "m%d -> [%s]\n", q1->first, q2->first.c_str());
+                fprintf(stdout, "m%d -> [%s]\n", q1->first, q2->first.c_str());
             }
         }
     }

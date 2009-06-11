@@ -1,0 +1,50 @@
+AT_INIT
+
+# define macros to skip a test if the tools were not found by configure
+m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == "not found"; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([MIA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([MIA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Examples])
+############################################################################
+
+AT_SETUP([Registration office service (old -> new)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/reg_old.owfn TESTFILES/reg_new.owfn .])
+AT_CHECK([MIA reg_old.owfn reg_new.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[9
+],ignore)
+AT_CLEANUP
+
+AT_SETUP([Sequence 5 (original -> public view)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/sequence5.owfn TESTFILES/sequence5-pv.owfn .])
+AT_CHECK([MIA sequence5.owfn sequence5-pv.owfn],0,stdout,ignore)
+AT_CHECK([cat stdout | wc -l],0,[12
+],ignore)
+AT_CLEANUP
+
+#AT_SETUP([Sequence 5 (public view -> original)])
+#AT_CHECK_WENDY
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/sequence5.owfn TESTFILES/sequence5-pv.owfn .])
+#AT_CHECK([MIA sequence5-pv.owfn sequence5.owfn],0,stdout,ignore)
+#AT_CHECK([cat stdout | wc -l],0,[12
+#],ignore)
+#AT_CLEANUP

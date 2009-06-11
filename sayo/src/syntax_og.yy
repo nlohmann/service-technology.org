@@ -157,17 +157,17 @@ og:
     (*myOut) << "INTERFACE\n  INPUT ";
 
     // write input
-    for(int i=1; i+1<inputLabels.size(); ++i)
-      (*myOut) << inputLabels[i] << ", ";
     if(inputLabels.size() > 1)
-      (*myOut) << inputLabels[inputLabels.size()-1];
+      (*myOut) << inputLabels[1];
+    for(int i=2; i<inputLabels.size(); ++i)
+      (*myOut) << ", " << inputLabels[i];
     (*myOut) << ";\n  OUTPUT ";
 
     // write output
-    for(int i=0; i+1<outputLabels.size(); ++i)
-      (*myOut) << outputLabels[i] << ", ";
     if(!outputLabels.empty())
-      (*myOut) << outputLabels[outputLabels.size()-1];
+      (*myOut) << outputLabels[0];
+    for(int i=1; i<outputLabels.size(); ++i)
+      (*myOut) << ", " << outputLabels[i];
     (*myOut) << ";\n\nNODES\n";
 
     // now the amount of input labels is known, so the array can be created

@@ -1,0 +1,27 @@
+{
+  generator:    Wendy 1.4-unreleased (i386-unknown-freebsd7.0)
+  invocation:   wendy --og --fionaFormat non_empty_true_node2.owfn 
+  events:       1 send, 1 receive, 0 synchronous
+  statistics:   2 nodes
+}
+
+INTERFACE
+  INPUT
+    b;
+  OUTPUT
+    a;
+
+NODES
+  0 :  true,
+  675311968 : true,
+  675312096 : final;
+
+INITIALNODE
+  675311968;
+
+TRANSITIONS
+  675311968 -> 0 : ?b,
+  675311968 -> 675312096 : !a,
+  675312096 -> 0 : ?b,
+  0 -> 0 : ?b,
+  0 -> 0 : !a;

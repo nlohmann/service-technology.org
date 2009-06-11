@@ -1,0 +1,41 @@
+{
+  generator:    Wendy 1.4-unreleased (i386-unknown-freebsd7.0)
+  invocation:   wendy --og --fionaFormat NonFinalTauNode2.owfn 
+  events:       0 send, 3 receive, 0 synchronous
+  statistics:   4 nodes
+}
+
+INTERFACE
+  INPUT
+    a,
+    b,
+    c;
+  OUTPUT
+;
+
+NODES
+  0 :  true,
+  675312064 : ?a * (?a + ?c) * ?b * (?b + ?c),
+  675312320 : ?a * ?b,
+  675312352 : ?c * final,
+  675312480 : final;
+
+INITIALNODE
+  675312064;
+
+TRANSITIONS
+  675312064 -> 675312352 : ?a,
+  675312064 -> 675312352 : ?b,
+  675312064 -> 675312320 : ?c,
+  675312320 -> 675312480 : ?a,
+  675312320 -> 675312480 : ?b,
+  675312320 -> 0 : ?c,
+  675312352 -> 0 : ?a,
+  675312352 -> 0 : ?b,
+  675312352 -> 675312480 : ?c,
+  675312480 -> 0 : ?a,
+  675312480 -> 0 : ?b,
+  675312480 -> 0 : ?c,
+  0 -> 0 : ?a,
+  0 -> 0 : ?b,
+  0 -> 0 : ?c;

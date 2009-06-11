@@ -79,7 +79,7 @@ AT_CLEANUP
 
 AT_SETUP([Synchronous channels and 2-bit annotations])
 AT_CHECK([cp TESTFILES/error10.* .])
-AT_CHECK([WENDY error10.owfn --lola= --formula=2bits],1,ignore,stderr)
+AT_CHECK([WENDY error10.owfn --lola= --formula=2bits --og],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

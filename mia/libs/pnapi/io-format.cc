@@ -1,6 +1,7 @@
 #include <cassert>
 #include <sstream>
 
+#include "automaton.h"
 #include "config.h"
 #include "petrinet.h"
 #include "state.h"
@@ -9,6 +10,8 @@
 using std::endl;
 using std::map;
 using std::ostream;
+using std::set;
+using std::string;
 using std::stringstream;
 
 using pnapi::io::util::delim;
@@ -31,36 +34,6 @@ namespace pnapi
     /* FORMAT IMPLEMENTATION: add a corresponding section */
 
 
-
-    /*************************************************************************
-     ***** SA output
-     *************************************************************************/
-
-    std::ostream & sa(std::ostream &os)
-    {
-      util::FormatData::data(os) = util::SA;
-      return os;
-    }
-
-
-    std::ostream & stg(std::ostream &os)
-    {
-      util::FormatData::data(os) = util::STG;
-      return os;
-    }
-
-
-    namespace util
-    {
-
-      ostream & operator<<(ostream &os, const State &s)
-      {
-        os << s.getName();
-
-        return os;
-      }
-
-    }
 
 
 
@@ -104,6 +77,14 @@ namespace pnapi
 	  << "|T|= "     << net.transitions_.size()  << "  "
 	  << "|F|= "     << net.arcs_.size();
       }
+
+
+      ostream & output(ostream & os, const Automaton & sa)
+      {
+        return os
+          << "|Q|= " << sa.states_.size() << "  "
+          << "|E|= " << sa.edges_.size();
+      }
     }
 
 
@@ -131,11 +112,12 @@ namespace pnapi
       {
 	bool interface = true;
 	string filename = net.getMetaInformation(os, io::INPUTFILE);
+	set<string> labels = net.labels_;
 
-	return os  //< output everything to this stream
+	os  //< output everything to this stream
 
 	  << delim("\n")
-	  << mode(io::util::NORMAL)
+	  << util::mode(io::util::NORMAL)
 
 	  << "digraph N {" << endl
 	  << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
@@ -155,12 +137,23 @@ namespace pnapi
 	  << (interface ? net.interfacePlaces_ : set<Place *>()) << endl
 	  << endl
 
+	  << " // labels" << endl
+	  << " node [shape=box]" << endl;
+	for (set<string>::iterator it = labels.begin();
+	     it != labels.end(); ++it)
+	  os << " l" << *it << " [fillcolor=black width=.1]" << endl
+	     << " l" << *it << "_l [style=invis]" << endl
+	     << " l" << *it << "_l -> l" << *it << " [headlabel=\"" << *it
+	     << "\"]" << endl;
+	return os
+	  << endl
+
 	  << " // transitions" << endl
 	  << " node [shape=box]" << endl
 	  << net.transitions_ << endl
 	  << endl
 
-	  << mode(io::util::INNER)
+	  << util::mode(io::util::INNER)
 	  << delim(" ")
 	  << " // inner cluster" << endl
 	  << " subgraph cluster1" << endl
@@ -175,7 +168,7 @@ namespace pnapi
 	  << endl
 
 	  << delim("\n")
-	  << mode(io::util::ARC)
+	  << util::mode(io::util::ARC)
 	  << " // arcs" << endl
 	  << " edge [fontname=\"Helvetica\" arrowhead=normal"
 	  << " color=black]" << endl
@@ -240,7 +233,18 @@ namespace pnapi
 	  }
 
 	// output the transition as a node
-	return output(os, t, attributes.str());
+	output(os, t, attributes.str());
+
+	// output labels
+	set<string> labels = t.getSynchronizeLabels();
+	Mode mode = ModeData::data(os);
+	if (mode == io::util::NORMAL)
+	  for (set<string>::iterator it = labels.begin();
+	       it != labels.end(); ++it)
+	    os << endl << " l" << *it << " -> " << getNodeName(t)
+	       << " [style=dashed color=black]";
+
+	return os;
       }
 
 
@@ -268,13 +272,13 @@ namespace pnapi
 
 	os << dotName;
 
-	if (mode == util::NORMAL)
+	if (mode == io::util::NORMAL)
 	  os << "\t[" << attr << "]" << endl
 	     << " " << dotName_l << "\t[style=invis]" << endl
 	     << " " << dotName_l << " -> " << dotName
 	     << " [headlabel=\"" << n.getName() << "\"]";
 
-	if (mode == util::INNER)
+	if (mode == io::util::INNER)
 	  os << " " << dotName_l;
 
 	return os;
@@ -338,6 +342,33 @@ namespace pnapi
       }
 
 
+      std::ostream & output(std::ostream &os, const Automaton &sa)
+      {
+        os
+          << "Digraph ServiceAutomaton {"
+          << "{" << std::endl
+          << "q0 [style=invis];" << std::endl;
+        for (int i = 0; i < (int) sa.states_.size(); i++)
+          if (sa.states_[i]->isFinal())
+            os << sa.states_[i]->name() << " [shape=doublecircle];" << std::endl;
+          else
+            os << sa.states_[i]->name() << ";" << std::endl;
+        os
+          << "}" << std::endl;
+        os
+          << "{" << std::endl
+          << "q0 -> " << (*sa.initialStates().begin())->name() << ";"
+          << std::endl;
+        for (int i = 0; i < (int) sa.edges_.size(); i++)
+          os << sa.edges_[i]->source().name() << " -> "
+             << sa.edges_[i]->destination().name() << " [label=\""
+             << sa.edges_[i]->label() <<"\"];" << std::endl;
+        return os
+          << "}" << std::endl
+          << "}" << std::endl;
+      }
+
+
     } /* namespace __dot */
 
 
@@ -375,11 +406,11 @@ namespace pnapi
 	  << " }" << endl
 	  << endl
 
-	  << "PLACE" << mode(util::PLACE) << endl
+	  << "PLACE" << mode(io::util::PLACE) << endl
 	  << "  " << delim(", ") << net.internalPlaces_ << ";" << endl
 	  << endl
 
-	  << "MARKING" << mode(util::PLACE_TOKEN) << endl
+	  << "MARKING" << mode(io::util::PLACE_TOKEN) << endl
 	  << "  " << filterMarkedPlaces(net.internalPlaces_) << ";" << endl
 	  << endl << endl
 
@@ -400,7 +431,7 @@ namespace pnapi
       ostream & output(ostream & os, const Place & p)
       {
 	os << p.getName();
-	if (ModeData::data(os) == util::PLACE_TOKEN)
+	if (ModeData::data(os) == io::util::PLACE_TOKEN)
 	  os << ":" << p.getTokenCount();
 	return os;
       }
@@ -526,8 +557,8 @@ namespace pnapi
 
       ostream & output(ostream & os, const PetriNet & net)
       {
-	set<string> labels = 
-	  util::collectSynchronizeLabels(net.synchronizedTransitions_);
+	set<string> labels = net.labels_;
+	//util::collectSynchronizeLabels(net.synchronizedTransitions_);
 
 	os  //< output everything to this stream
 
@@ -543,20 +574,20 @@ namespace pnapi
 	  << "}" << endl
 	  << endl
 
-	  << mode(io::util::PLACE) << delim("; ")
+	  << util::mode(io::util::PLACE) << delim("; ")
 	  << "PLACE"      << endl
 	  << "  INTERNAL" << endl
-	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_) 
+	  << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_)
 	  << ";" << endl << endl << delim(", ")
 	  << "  INPUT"    << endl
-	  << "    " << net.inputPlaces_                                     
+	  << "    " << net.inputPlaces_
 	  << ";" << endl << endl
 	  << "  OUTPUT"   << endl
-	  << "    " << net.outputPlaces_                                    
+	  << "    " << net.outputPlaces_
 	  << ";" << endl << endl;
 	if (!labels.empty()) os
 	  << "  SYNCHRONOUS" << endl
-	  << "    " << labels 
+	  << "    " << labels
 	  << ";" << endl << endl;
 
 	if (!net.interfacePlacesByPort_.empty())
@@ -589,7 +620,7 @@ namespace pnapi
       ostream & output(ostream & os, const Place & p)
       {
 	os << p.getName();
-	if (ModeData::data(os) == util::PLACE_TOKEN && p.getTokenCount() != 1)
+	if (ModeData::data(os) == io::util::PLACE_TOKEN && p.getTokenCount() != 1)
 	  os << ": " << p.getTokenCount();
 	return os;
       }
@@ -597,8 +628,13 @@ namespace pnapi
 
       ostream & output(ostream & os, const Transition & t)
       {
-	os 
-	  << "TRANSITION " << t.getName() << endl
+	os
+	  << "TRANSITION " << t.getName() << endl;
+
+	if (t.getCost() != 0)
+	  os << "  COST " << t.getCost() << ";" << endl;
+
+	os
 	  << delim(", ")
 	  << "  CONSUME "     << t.getPresetArcs()        << ";" << endl
 	  << "  PRODUCE "     << t.getPostsetArcs()       << ";" << endl;
@@ -735,6 +771,87 @@ namespace pnapi
       }
 
     } /* namespace __owfn */
+
+
+    /*************************************************************************
+     ***** SA output
+     *************************************************************************/
+
+    std::ios_base & sa(std::ios_base &base)
+    {
+      util::FormatData::data(base) = util::SA;
+      return base;
+    }
+
+
+    namespace __sa
+    {
+      ostream & output(ostream &os, const Automaton &sa)
+      {
+        os  << "INTERFACE" << endl
+            << "  INPUT ";
+        output(os, sa.input());
+        os  << ";" << endl
+            << "  OUTPUT ";
+        output(os, sa.output());
+        os  << ";" << endl << endl
+            << "NODES" << endl;
+        output(os, sa.states_);
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const State &s)
+      {
+        os << s.name();
+        if (s.isInitial() || s.isFinal())
+        {
+          os << ": ";
+          if (s.isInitial() && s.isFinal())
+            os << "INITIAL, FINAL";
+          else
+            if (s.isInitial())
+              os << "INITIAL";
+            else
+              os << "FINAL";
+        }
+        os << endl;
+        output(os, s.postsetEdges());
+        os << endl;
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const std::vector<State *> &vs)
+      {
+        for (unsigned int i = 0; i < vs.size(); i++)
+          output(os, *vs[i]);
+
+        return os;
+      }
+
+      ostream & output(ostream &os, const std::set<Edge *> &edges)
+      {
+        for (std::set<Edge *>::iterator e = edges.begin(); e != edges.end(); e++)
+          os << "  " << (*e)->label() << " -> " << (*e)->destination().name() << endl;
+
+        return os;
+      }
+
+      // FIXME: ... or here!
+      ostream & output(ostream &os, const std::set<std::string> &ss)
+      {
+        if (!ss.empty())
+        {
+          os << *ss.begin();
+          for (std::set<std::string>::iterator s = ++ss.begin(); s != ss.end();
+              s++)
+            os << ", " << *s;
+        }
+
+        return os;
+      }
+    } /* namespace __sa */
 
   } /* namespace io */
 

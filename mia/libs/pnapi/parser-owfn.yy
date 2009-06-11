@@ -42,7 +42,7 @@
 %token KEY_SYNCHRONIZE KEY_SYNCHRONOUS KEY_CONSTRAIN
 %token KEY_MARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
 %token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
-%token KEY_ALL_PLACES_EMPTY
+%token KEY_ALL_PLACES_EMPTY KEY_COST
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
 %token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
@@ -71,6 +71,7 @@
 %type <yt_node>   port_participant port_list lola_places interface port_list_new
 %type <yt_node>   port_definition_new
 %type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
+%type <yt_node> transition_cost
 %type <yt_node> markings marking marking_list initial final finalmarkings
 %type <yt_node>   finalmarking formula condition
 %type <yt_node> synchronous synchronize labels label constrain
@@ -207,8 +208,8 @@ port_definition_new:
   ;
 
 synchronous:
-    KEY_SYNCHRONOUS labels SEMICOLON { $$ = $2;         }
-  | /* empty */                      { $$ = new Node(); }
+    KEY_SYNCHRONOUS labels SEMICOLON { $$ = new Node(SYNCHRONOUS, $2); }
+  | /* empty */                      { $$ = new Node();                }
   ;
 
 labels:
@@ -231,9 +232,14 @@ transitions:
   ;
 
 transition: 
-  KEY_TRANSITION node_name preset_arcs postset_arcs synchronize constrain
-  { $$ = new Node(TRANSITION, $2, $3, $4, $5, $6); }
+  KEY_TRANSITION node_name transition_cost preset_arcs postset_arcs synchronize constrain
+  { $$ = new Node(TRANSITION, $2, $3, $4, $5, $6, $7); }
   ;
+
+transition_cost:
+    KEY_COST NUMBER SEMICOLON { $$ = new Node($2); }
+  | /*empty*/                 { $$ = new Node(0);  }
+;
 
 preset_arcs:
   KEY_CONSUME arcs SEMICOLON { $$ = new Node(PRESET, $2); }

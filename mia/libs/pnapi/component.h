@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: waltemath $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-03-27 07:39:58 +0100 (Fr, 27 Mär 2009) $
+ * \date    $Date: 2009-05-13 20:19:08 +0200 (Mi, 13. Mai 2009) $
  *
- * \version $Revision: 4027 $
+ * \version $Revision: 4118 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -173,6 +173,12 @@ namespace pnapi
     Transition(PetriNet &, util::ComponentObserver &, const Transition &, 
 	       const std::string &);
 
+    /// set transition cost
+    void setCost(int);
+    
+    /// get transition cost
+    int getCost() const;
+    
     /// help method for normalize method
     bool isNormal() const;
 
@@ -188,6 +194,9 @@ namespace pnapi
 
   private:
 
+    /// transition cost
+    int cost_;
+    
     /// synchronize labels
     const std::set<std::string> labels_;
 

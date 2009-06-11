@@ -5,11 +5,10 @@ mia_SOURCES = syntax_graph.yy lexic_graph.ll \
               main.cc \
               cmdline.c cmdline.h
 
-
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-mia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 mia_CPPFLAGS = -I$(top_srcdir)/libs
+mia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 BUILT_SOURCES = cmdline.c syntax_graph.cc syntax_im.cc

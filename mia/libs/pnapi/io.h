@@ -6,13 +6,13 @@
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: waltemath $
+ *          last changes of: $Author: stephan $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2009-03-27 07:42:40 +0100 (Fr, 27 Mär 2009) $
+ * \date    $Date: 2009-06-09 18:18:21 +0200 (Di, 09. Jun 2009) $
  *
- * \version $Revision: 4028 $
+ * \version $Revision: 4254 $
  */
 
 
@@ -44,14 +44,13 @@ namespace pnapi
   // forward declarations
   class PetriNet;
   class Condition;
-  class Automaton;
-  class ServiceAutomaton;
   class Node;
   class Place;
   class Transition;
   class Arc;
+  class Automaton;
   class State;
-  template <class T> class Edge;
+  class Edge;
   namespace formula
   {
     class Formula;
@@ -167,8 +166,8 @@ namespace pnapi
     /// %Automaton output
     std::ostream & operator<<(std::ostream &, const Automaton &);
 
-    /// %ServiceAutomaton output
-    std::ostream & operator<<(std::ostream &, const ServiceAutomaton &);
+    /// %Automaton input
+    std::istream & operator>>(std::istream &, Automaton &);
 
     //@}
 
@@ -195,10 +194,7 @@ namespace pnapi
     std::ostream & dot(std::ostream &);
 
     /// Service Automaton (SA) file format
-    std::ostream & sa(std::ostream &);
-
-    /// Service Automaton (STG) file format
-    std::ostream & stg(std::ostream &);
+    std::ios_base & sa(std::ios_base &);
 
     /// LOLA file format
     std::ios_base & lola(std::ios_base &);
@@ -229,7 +225,7 @@ namespace pnapi
       /* FORMAT IMPLEMENTATION: add format constant */
 
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, STG, LOLA };
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, LOLA };
 
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
@@ -240,25 +236,6 @@ namespace pnapi
     /* FORMAT IMPLEMENTATION: add namespace with format specific functions */
 
 
-    //************************
-    //*** SA output format ***
-    //************************
-
-    namespace util
-    {
-      std::ostream & operator<<(std::ostream &, const State &);
-
-      template <class T>
-      std::ostream & operator<<(std::ostream &os, const Edge<T> &e)
-      {
-        os << e.getSource() << " -> " << e.getDestination() << " : ";
-        os << e.getLabel();
-
-        return os;
-      }
-    } /* namespace util */
-
-
     //*************************
     //*** ONWD input format ***
     //*************************
@@ -266,8 +243,7 @@ namespace pnapi
     namespace util
     {
       typedef StreamMetaData<std::map<std::string, PetriNet *> > PetriNetData;
-      typedef Manipulator<std::map<std::string, PetriNet *> >
-              PetriNetManipulator;
+      typedef Manipulator<std::map<std::string, PetriNet *> > PetriNetManipulator;
     } /* namespace util */
 
 
@@ -277,6 +253,8 @@ namespace pnapi
     namespace __stat
     {
       std::ostream & output(std::ostream &, const PetriNet &);
+
+      std::ostream & output(std::ostream &, const Automaton &);
     }
 
 
@@ -317,10 +295,12 @@ namespace pnapi
       std::ostream & output(std::ostream &, const Arc &);
       std::ostream & output(std::ostream &, const Place &);
       std::ostream & output(std::ostream &, const Transition &);
-      std::ostream & output(std::ostream &, 
+      std::ostream & output(std::ostream &,
 			    const std::pair<std::string, std::set<Place *> > &);
       std::ostream & output(std::ostream &, const Node &, const std::string &);
       std::string getNodeName(const Node &, bool withSuffix = false);
+
+      std::ostream & output(std::ostream &, const Automaton &);
     }
 
 
@@ -344,12 +324,27 @@ namespace pnapi
       std::ostream & output(std::ostream &, const formula::FormulaLess &);
       std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
       std::ostream & output(std::ostream &, const formula::FormulaGreater &);
-      std::ostream & output(std::ostream &, 
+      std::ostream & output(std::ostream &,
 			    const formula::FormulaGreaterEqual &);
-      std::ostream & output(std::ostream &, 
+      std::ostream & output(std::ostream &,
 			    const std::pair<std::string, std::set<Place *> > &);
-      std::ostream & output(std::ostream &, 
+      std::ostream & output(std::ostream &,
 			   const std::pair<unsigned int, std::set<Place *> > &);
+    }
+
+
+    //**************************
+    //*** SA output format   ***
+    //**************************
+
+    namespace __sa
+    {
+      std::ostream & output(std::ostream &, const Automaton &);
+      std::ostream & output(std::ostream &, const State &);
+
+      std::ostream & output(std::ostream &, const std::vector<State *> &);
+      std::ostream & output(std::ostream &, const std::set<Edge *> &);
+      std::ostream & output(std::ostream &, const std::set<std::string> &);
     }
 
 
@@ -370,8 +365,8 @@ namespace pnapi
       struct Delim { std::string delim; };
 
       /// formula type
-      struct Formula 
-      { 
+      struct Formula
+      {
 	bool formula;
 	Formula() : formula(false) {}
       };
@@ -402,12 +397,12 @@ namespace pnapi
 
       /*** TYPE NAME SHORTCUTS ***/
 
-      typedef StreamMetaData<Format> FormatData;
-      typedef StreamMetaData<Mode> ModeData;
+      typedef StreamMetaData<io::util::Format> FormatData;
+      typedef StreamMetaData<io::util::Mode> ModeData;
       typedef StreamMetaData<Delim> DelimData;
       typedef StreamMetaData<Formula> FormulaData;
-      typedef StreamMetaData<std::map<MetaInformation, std::string> > MetaData;
-      typedef Manipulator<std::pair<MetaInformation, std::string> >
+      typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
+      typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> >
               MetaManipulator;
 
 
@@ -428,10 +423,10 @@ namespace pnapi
       filterInterfacePropositions(const std::set<const formula::Formula *> &);
       std::multimap<unsigned int, Place *>
       groupPlacesByCapacity(const std::set<Place *> &);
-      std::set<std::string> 
+      std::set<std::string>
       collectSynchronizeLabels(const std::set<Transition *> &);
 
-      Manipulator<Mode> mode(Mode);
+      Manipulator<io::util::Mode> mode(io::util::Mode);
       Manipulator<Delim> delim(const std::string &);
 
       std::ostream & operator<<(std::ostream &, const Arc &);
@@ -475,7 +470,7 @@ namespace pnapi
 
 
       template <typename T>
-      std::ostream & outputContainerElement(std::ostream & os, 
+      std::ostream & outputContainerElement(std::ostream & os,
 				     const std::pair<T, std::set<Place *> > & p)
       {
 	return os << p;

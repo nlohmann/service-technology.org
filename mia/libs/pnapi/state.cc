@@ -1,89 +1,95 @@
-#include <cmath>
-#include <map>
 #include <sstream>
-#include <string>
-
+#include "automaton.h"
+#include "marking.h"
 #include "state.h"
 
-using std::map;
-using std::string;
-using std::stringstream;
+#include <iostream>
 
 
 namespace pnapi
 {
 
-  /******************************************************************
-   *                      Basic Class State                         *
-   ******************************************************************/
+
+  /*** class State ***/
+
 
   /*!
-   * \brief   standard constructor
+   * The state's name, marking, and hash value are set to default values. The
+   * name is unique within the whole automaton class. Template for unique names
+   * of states: sX where X is a number.
    */
-  State::State(string name, bool isFinal) :
-    preset_(), postset_(), isFinal_(isFinal)
+  State::State(unsigned int *counter) :
+    name_((*counter)++), isFinal_(false), isInitial_(false), m_(NULL),
+    hashValue_(0)
   {
-    static unsigned int number = 1;
-    string snumber;
-    stringstream sstream;
-    sstream << number++;
-    sstream >> snumber;
-
-    if (name == "")
-      name_ = "s" + snumber;
-    else
-      name_ = name;
   }
 
 
   /*!
-   * \brief   destructor
+   *
    */
-  State::~State()
+  State::State(const unsigned int name) :
+    name_(name), isFinal_(false), isInitial_(false), m_(NULL), hashValue_(0)
   {
-    preset_.clear();
-    postset_.clear();
   }
 
 
   /*!
-   * \brief
    */
-  const string & State::getName() const
+  State::State(Marking &m, std::map<const Place *, unsigned int> *pw,
+      unsigned int *counter) :
+    name_((*counter)++), isFinal_(false), isInitial_(false), m_(&m)
+  {
+    setHashValue(pw);
+  }
+
+
+  /*!
+   */
+  State::State(const State &s) :
+    name_(s.name_), preset_(s.preset_), postset_(s.postset_),
+    isFinal_(s.isFinal_), isInitial_(s.isInitial_), m_(NULL),
+    hashValue_(s.hashValue_)
+  {
+    if (s.m_ != NULL)
+      m_ = new Marking(*s.m_);
+  }
+
+
+  /*!
+   */
+  const unsigned int State::name() const
   {
     return name_;
   }
 
 
   /*!
-   * \brief   returns the preset
    */
-  set<State *> State::getPreset() const
+  const std::set<State *> State::preset() const
   {
     return preset_;
   }
 
 
   /*!
-   * \brief   returns the postset
    */
-  set<State *> State::getPostset() const
+  const std::set<State *> State::postset() const
   {
     return postset_;
   }
 
 
   /*!
-   * \brief   toggles the isFinal_ property
+   *
    */
-  void State::final()
+  const std::set<Edge *> State::postsetEdges() const
   {
-    isFinal_ = !isFinal_;
+    return postsetEdges_;
   }
 
 
   /*!
-   * \brief   Returns the final value of the state
    */
   bool State::isFinal() const
   {
@@ -92,139 +98,174 @@ namespace pnapi
 
 
   /*!
-   * \brief   Comparison operater ==
+   */
+  void State::final()
+  {
+    isFinal_ = true;
+  }
+
+
+  /*!
    *
-   * \note    I don't know if two states are equal if all the
-   *          attributes are equal. Maybe it's enough to compare
-   *          the post- and presets.
    */
-  bool State::operator ==(const State &m) const
+  bool State::isInitial() const
   {
-    if (name_ == m.name_ && preset_ == m.preset_ && postset_ == m.postset_)
-      return true;
+    return isInitial_;
+  }
+
+
+  /*!
+   *
+   */
+  void State::initial()
+  {
+    isInitial_ = true;
+  }
+
+
+  /*!
+   * First, checks if a marking is given for this state and if so, the
+   * equality of both markings is the result of the check. If no marking
+   * is given, the equality is evaluated by the equality of both names.
+   *
+   * \return    true iff both markings are equal or their names are equal,
+   *            else false.
+   */
+  bool State::operator ==(const State &s2) const
+  {
+    if (m_ != NULL)
+      return (*m_) == (*s2.m_);
     else
-      return false;
-  }
-
-  /******************************************************************
-   *                      State Class Build                         *
-   ******************************************************************/
-
-
-  /*!
-   * \brief   Standard constructor taking a marking
-   */
-  StateB::StateB(Marking &m) :
-    m_(m), hashValue_(NULL)
-  {
+      return name_ == s2.name_;
   }
 
 
   /*!
-   * \brief   Copy constructor
    */
-  StateB::StateB(const StateB &s) :
-    m_(s.m_)
-  {
-    hashValue_ = new unsigned int(*s.hashValue_);
-  }
-
-
-  /*!
-   * \brief   Standard destructor
-   */
-  StateB::~StateB()
-  {
-  }
-
-
-  /*!
-   * \brief   Returns the representing marking
-   */
-  Marking & StateB::getMarking() const
+  Marking * State::marking() const
   {
     return m_;
   }
 
 
   /*!
-   * \brief   Returns the size of one state
-   *
-   * The state's size depends on the size of the marking vector.
    */
-  unsigned int StateB::size() const
+  const unsigned int State::hashValue()
   {
-    return m_.size();
+    return hashValue_;
   }
 
 
   /*!
-   * \brief   Returns the hash value of one state
-   *
-   * If there is already set a hash value, the method just returns
-   * it. If not, the method calculates one and writes it to the property
-   * hashValue_. Afterwards, it will be returned.
    */
-  unsigned int StateB::getHashValue()
+  const unsigned int State::size() const
   {
-    if (hashValue_ == NULL)
+    if (m_ != NULL)
+      return m_->size();
+
+    return 0;
+  }
+
+
+  /*!
+   */
+  void State::setHashValue(std::map<const Place *, unsigned int> *pw)
+  {
+    if (m_ != NULL)
     {
       unsigned int hash = 0;
-      for (map<const Place *, unsigned int>::const_iterator i = m_.getMap().begin();
-          i != m_.getMap().end(); i++)
-        hash += i->second;
+      for (std::map<const Place *, unsigned int>::const_iterator i =
+          m_->getMap().begin(); i != m_->getMap().end(); i++)
+        hash += (i->second * (*pw)[i->first]) % Automaton::HASH_SIZE;
 
-      hashValue_ = new unsigned int(hash);
+      hashValue_ = hash % Automaton::HASH_SIZE;
     }
-
-    return *hashValue_;
   }
 
 
   /*!
-   * \brief   Checks if two StateBs are equal
    *
-   * Two StateBs i and j are equal iff their markings
-   * they represent are equal.
+   */
+  void State::addPre(State &pre)
+  {
+    preset_.insert(&pre);
+  }
+
+
+  /*!
    *
-   * \param   StateB j
+   */
+  void State::addPost(State &post)
+  {
+    postset_.insert(&post);
+  }
+
+
+  /*!
    *
-   * \return  TRUE iff the condition is fulfilled.
    */
-  bool StateB::operator ==(const StateB &j) const
+  void State::addPostEdge(Edge &e)
   {
-    return m_ == j.m_;
+    postsetEdges_.insert(&e);
   }
 
 
-  /******************************************************************
-   *                      OG State Class                            *
-   ******************************************************************/
+
+  /*** class Edge ***/
 
 
   /*!
-   * \brief
    */
-  StateOG::StateOG()
+  Edge::Edge(State &source, State &destination, const std::string label, const Automaton::Type type) :
+    label_(label), source_(source), destination_(destination), type_(type)
   {
-  }
-
-
-  /*!
-   * \brief
-   */
-  StateOG::~StateOG()
-  {
+    source_.addPost(destination_);
+    destination_.addPre(source_);
+    source_.addPostEdge(*this);
   }
 
 
   /*!
-   * \brief
    */
-  bool StateOG::operator ==(const StateOG &m) const
+  Edge::~Edge()
   {
-    return false;
   }
 
 
-}
+  /*!
+   * \return    std::string label_
+   */
+  const std::string Edge::label() const
+  {
+    return label_;
+  }
+
+
+  /*!
+   * \return    State &source_ state of the edge
+   */
+  State & Edge::source() const
+  {
+    return source_;
+  }
+
+
+  /*!
+   * \return    State &destination_ state of the edge
+   */
+  State & Edge::destination() const
+  {
+    return destination_;
+  }
+
+
+  /*!
+   * \return    Node::Type type_
+   */
+  Automaton::Type Edge::type() const
+  {
+    return type_;
+  }
+
+} /* END OF NAMESPACE pnapi */
+

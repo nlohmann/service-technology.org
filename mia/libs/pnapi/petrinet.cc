@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-04-06 17:16:33 +0200 (Mo, 06 Apr 2009) $
+ * \date    $Date: 2009-06-07 18:57:03 +0200 (So, 07. Jun 2009) $
  *
- * \version $Revision: 4042 $
+ * \version $Revision: 4230 $
  */
 
 #ifndef NDEBUG
@@ -289,6 +289,7 @@ namespace pnapi
    * \note    The condition is standardly set to True.
    */
   PetriNet::PetriNet(const PetriNet & net) :
+    labels_(net.labels_),
     observer_(*this),
     condition_(net.condition_, copyStructure(net)),
     meta_(net.meta_)
@@ -319,6 +320,7 @@ namespace pnapi
 
   void PetriNet::clear()
   {
+    labels_.clear();
     meta_.clear();
     constraints_.clear();
     condition_ = true;
@@ -778,6 +780,22 @@ namespace pnapi
 
 
   /*!
+   */
+  std::set<std::string> PetriNet::getSynchronousLabels() const
+  {
+    return labels_;
+  }
+
+
+  /*!
+   */
+  void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
+  {
+    labels_ = ls;
+  }
+
+
+  /*!
    * \param   base  base name
    * \return  a string to be used as a name for a new node
    */
@@ -845,92 +863,23 @@ namespace pnapi
    * each transition has only one adjacent interface
    * place.
    *
-   * \param   bool makeInnerStructure: if set true then the interface places
-   *          will be deleted
    * \return  map<Transition *, string> a mapping representing the edge labels
-   *          of the later service automaton
-   *
-   * For input places complementary places are introduced.
+   *          of the later service automaton.
    */
-  const std::map<Transition *, string> PetriNet::normalize(bool makeInnerStructure)
+  const std::map<Transition *, string> PetriNet::normalize()
   {
-    std::set<Transition *> temp, transitions;
-    temp.clear();
-    transitions = transitions_;
-
-    for (set<Transition *>::const_iterator t = transitions.begin();
-        t != transitions.end(); t++)
+    if (!getSynchronizedTransitions().empty())
     {
-      if (temp.count(*t) > 0)
-        continue;
-
-      /// adjacent output places of t
-      set<Place *> t_out;
-      for (set<Node *>::const_iterator p = (*t)->getPostset().begin();
-          p != (*t)->getPostset().end(); p++)
-        if ((*p)->getType() == Node::OUTPUT)
-          t_out.insert(static_cast<Place *>(*p));
-
-      for (set<Place *>::const_iterator op = t_out.begin();
-          op != t_out.end(); op++)
-      {
-        /// if there are multiple new places with same name (maximum 10)
-        string nname = getUniqueNodeName((*op)->getName());
-        cout << nname;
-
-        /// new internal place
-        Place &nint = createPlace(nname+"_normalized");
-        /// new transition
-        Transition &ntrans = createTransition("t_"+nname);
-        /// creating arcs
-        createArc(*(*t), nint);
-        createArc(nint, ntrans);
-        createArc(ntrans, **op);
-
-        temp.insert(&ntrans);
-
-        condition_ = condition_.formula() && nint == 0;
-
-        deleteArc(*findArc(**t, **op));
-      }
-
-      /// adjacent input places of t
-      set<Place *> t_inp;
-      for (set<Node *>::const_iterator p = (*t)->getPreset().begin();
-          p != (*t)->getPreset().end(); p++)
-        if ((*p)->getType() == Node::INPUT)
-          t_inp.insert(static_cast<Place *>(*p));
-
-      for (set<Place *>::const_iterator ip = t_inp.begin();
-          ip != t_inp.end(); ip++)
-      {
-        /// if there are multiple new places with same name (maximum 10)
-        string nname = getUniqueNodeName((*ip)->getName());
-        cout << nname;
-
-        /// new internal place
-        Place &nint = createPlace(nname+"_normalized");
-        /// complementary place
-        Place &ncomp = createPlace("comp_"+nname+"_normalized");
-        ncomp.mark(1);
-        /// new transition
-        Transition &ntrans = createTransition("t_"+nname);
-        /// creating arcs
-        createArc(**ip, ntrans);
-        createArc(ntrans, nint);
-        createArc(nint, **t);
-        createArc(ncomp, ntrans);
-        createArc(*(*t), ncomp);
-
-        temp.insert(&ntrans);
-
-        condition_ = condition_.formula() && nint == 0 && ncomp == 1;
-
-        deleteArc(*findArc(**ip, **t));
-      }
+      normalize_classical();
+    }
+    else
+    {
+      normalize_rules();
     }
 
     std::map<Transition *, string> edgeLabels; ///< returning map
+    edgeLabels.clear();
+
     for (set<Transition *>::const_iterator t = transitions_.begin();
         t != transitions_.end(); t++)
     {
@@ -966,18 +915,27 @@ namespace pnapi
       }
       case Node::INTERNAL:
       {
-        edgeLabels[*t] = "tau";
+        edgeLabels[*t] = "TAU";
         break;
       }
-      default: assert(false);
+      default: ;//assert(false);
       }
     }
 
-    if (makeInnerStructure)
-      while (!interfacePlaces_.empty())
-        deletePlace(**interfacePlaces_.begin());
-
     return edgeLabels;
+  }
+
+
+  /*!
+   * Makes the inner structure of the net, which means to delete all
+   * interface places to simplify the firing rules when creating a
+   * service automaton.
+   */
+  void PetriNet::makeInnerStructure()
+  {
+    std::set<Place *> interface;
+    while (!(interface = getInterfacePlaces()).empty())
+      deletePlace(**interface.begin());
   }
 
 
@@ -988,7 +946,7 @@ namespace pnapi
    * \note  There is an error in definition 5: The arcs of the transitions
    *        with empty label are missing.
    */
-  void PetriNet::produce(const PetriNet & net, const string & aPrefix, 
+  void PetriNet::produce(const PetriNet & net, const string & aPrefix,
 			 const string & aNetPrefix) throw (io::InputError)
   {
     typedef set<Transition *> Transitions;
@@ -1060,7 +1018,7 @@ namespace pnapi
   void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
   {
     constraints_.clear();
-    for (map<Transition *, set<string> >::const_iterator it = labels.begin(); 
+    for (map<Transition *, set<string> >::const_iterator it = labels.begin();
 	 it != labels.end(); ++it)
       {
 	Transition * t = findTransition(it->first->getName());
@@ -1070,8 +1028,8 @@ namespace pnapi
   }
 
 
-  map<Transition *, set<Transition *> > 
-  PetriNet::translateConstraintLabels(const PetriNet & net) 
+  map<Transition *, set<Transition *> >
+  PetriNet::translateConstraintLabels(const PetriNet & net)
     throw (io::InputError)
   {
     typedef set<string> Labels;
@@ -1081,12 +1039,12 @@ namespace pnapi
 
     OriginalLabels labels = net.constraints_;
     ResultLabels result;
-    for (OriginalLabels::iterator it1 = labels.begin(); 
+    for (OriginalLabels::iterator it1 = labels.begin();
 	 it1 != labels.end(); ++it1)
       {
 	assert(it1->first != NULL);
 	Transition & t = *it1->first;
-	for (Labels::iterator it2 = it1->second.begin(); 
+	for (Labels::iterator it2 = it1->second.begin();
 	     it2 != it1->second.end(); ++it2)
 	  {
 	    Transition * labelTrans = findTransition(*it2);
@@ -1094,10 +1052,10 @@ namespace pnapi
 	      result[&t].insert(labelTrans);
 	    else
 	      {
-		string filename = 
-		  net.meta_.find(io::INPUTFILE) != net.meta_.end() 
+		string filename =
+		  net.meta_.find(io::INPUTFILE) != net.meta_.end()
 		  ? net.meta_.find(io::INPUTFILE)->second : "";
-		throw io::InputError(io::InputError::SEMANTIC_ERROR, filename, 
+		throw io::InputError(io::InputError::SEMANTIC_ERROR, filename,
 				     0, *it2, "unknown transition");
 	      }
 	  }
@@ -1320,6 +1278,76 @@ namespace pnapi
 
     arcs_.erase(&arc);
     delete &arc;
+  }
+
+
+  /*!
+   */
+  void PetriNet::normalize_classical()
+  {
+    if (isNormal())
+      return;
+
+    std::set<Place *> input = getInputPlaces();
+    std::set<Place *> output = getOutputPlaces();
+
+    for (std::set<Place *>::const_iterator p = input.begin();
+        p != input.end(); p++)
+    {
+      std::string name = (*p)->getName();
+
+      Place &intp = createPlace("normal_"+name);
+      Transition &intt = createTransition("t_"+name);
+      Place &comp = createPlace("comp_"+name);
+      comp.mark();
+
+      std::set<Arc *> postset = (*p)->getPostsetArcs();
+      for (std::set<Arc *>::const_iterator f = postset.begin();
+          f != postset.end(); f++)
+      {
+        createArc(intp, (*f)->getTransition());
+        createArc((*f)->getTransition(), comp);
+        deleteArc(**f);
+      }
+      createArc(**p, intt);
+      createArc(intt, intp);
+      createArc(comp, intt);
+
+      condition_ = condition_.formula() && intp == 0 && comp == 1;
+    }
+    for (std::set<Place *>::const_iterator p = output.begin();
+        p != output.end(); p++)
+    {
+      std::string name = (*p)->getName();
+
+      Place &intp = createPlace("normal_"+name);
+      Transition &intt = createTransition("t_"+name);
+
+      std::set<Arc *> preset = (*p)->getPresetArcs();
+      for (std::set<Arc *>::const_iterator f = preset.begin();
+          f != preset.end(); f++)
+      {
+        createArc((*f)->getTransition(), intp);
+        deleteArc(**f);
+      }
+      createArc(intt, **p);
+      createArc(intp, intt);
+
+      condition_ = condition_.formula() && intp == 0;
+    }
+  }
+
+
+  /*!
+   * This method detects sequences of transitions with interface
+   * communication. Then, it tries to normalize the net through
+   * the rules from [Aalst07].
+   *
+   * \todo     The rules from [Aalst07] will follow soon!
+   */
+  void PetriNet::normalize_rules()
+  {
+    normalize_classical();
   }
 
 }

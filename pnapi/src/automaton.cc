@@ -21,7 +21,7 @@ namespace pnapi
    * The result of the constructor is an emty automaton.
    */
   Automaton::Automaton() :
-    counter_(0)
+      net_(NULL), counter_(0)
   {
     /* do nothing */
   }

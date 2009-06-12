@@ -23,7 +23,3 @@ section "Debug"
 option "verbose" v
   "Verbose output"
   flag off
-
-option "debug" d
-  "Debugging mode: do not delete temporary files."
-  flag off

@@ -17,7 +17,7 @@ extern void abort(unsigned int code, const char* format, ...);
 void graph_error(const char *);
 %}
 
-name      [^,;:()\t \n\{\}.][^,;:()\t \n\{\}.]*
+name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
 number    "-"?[0-9][0-9]*
 
 
@@ -31,11 +31,13 @@ number    "-"?[0-9][0-9]*
 "STATE"      { return KW_STATE; }
 "Prog:"      { return KW_PROG; }
 ":"          { return COLON; }
-"."          { return DOT; }
 ","          { return COMMA; }
 "->"         { return ARROW; }
 
 {number}     { graph_lval.val = atoi(graph_text); return NUMBER; }
+"mpp[1]."{name} { NAME_token = (graph_text+7); return MPP_NAME; }
+"target[1]."{name} { NAME_token = (graph_text+10); return TGT_NAME; }
+
 {name}       { NAME_token = graph_text; return NAME; }
 
 [ \t\r\n]*   { /* skip */ }

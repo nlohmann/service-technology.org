@@ -97,10 +97,15 @@ int main(int argc, char** argv) {
 
     fprintf(stderr, "%s: migrating '%s' to '%s\n", PACKAGE, args_info.inputs[0], args_info.inputs[1]);
 
+    string tmpname(tmpnam(NULL));
+    string im_filename = tmpname + ".im";
+    string mpp_filename = tmpname + ".sa";
+    string lola_filename = tmpname + ".lola";
+
     /*---------------------------------------------------------------.
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
-    string wendy_command = string(BINARY_WENDY) + " " + string(args_info.inputs[0]) + " --im=tmp.im --sa=tmp.sa";
+    string wendy_command = string(BINARY_WENDY) + " " + string(args_info.inputs[0]) + " --im=" + im_filename + " --sa=" + mpp_filename;
     if (args_info.messagebound_given) {
         std::stringstream s;
         s << args_info.messagebound_arg;
@@ -115,7 +120,7 @@ int main(int argc, char** argv) {
     /*-------------------------------.
     | 2. parse migration information |
     `-------------------------------*/
-    im_in = fopen("tmp.im", "r");
+    im_in = fopen(im_filename.c_str(), "r");
     if (!im_in) {
         abort(4, "could not read migration information");
     }
@@ -128,7 +133,7 @@ int main(int argc, char** argv) {
     /*---------------------------------.
     | 3. parse most-permissive partner |
     `---------------------------------*/
-    ifstream mpp_file("tmp.sa", ifstream::in);
+    ifstream mpp_file(mpp_filename.c_str(), ifstream::in);
     if (not mpp_file) {
         abort(5, "could not read most-permissive partner");
     }
@@ -173,16 +178,18 @@ int main(int argc, char** argv) {
     /*-------------------------------------------------.
     | 7. generate and parse state space of composition |
     `-------------------------------------------------*/
-    ofstream composition_lolafile("tmp.lola", ofstream::trunc);
+    ofstream composition_lolafile(lola_filename.c_str(), ofstream::trunc);
     if (not composition_lolafile) {
         abort(7, "could not write composition");
     }
     composition_lolafile << pnapi::io::lola << composition;
     composition_lolafile.close();
     string lola_command = args_info.safe_flag ? "lola-full1" : string(BINARY_LOLA);
-    lola_command += " tmp.lola -M 2> /dev/null";
+    lola_command += " " + lola_filename + " -M";
     if (args_info.verbose_flag) {
         fprintf(stderr, "%s: executing '%s'\n", PACKAGE, lola_command.c_str());
+    } else {
+        lola_command += " 2> /dev/null";
     }
     graph_in = popen(lola_command.c_str(), "r");
     if (!graph_in) {
@@ -216,15 +223,6 @@ int main(int argc, char** argv) {
     }
     if (args_info.verbose_flag) {
         fprintf(stderr, "%s: %d migration points found\n", PACKAGE, jumperCount);
-    }
-
-    /*-----------.
-    | 9. tidy up |
-    `-----------*/
-    if (not args_info.debug_flag) {
-        remove("tmp.im");
-        remove("tmp.sa");
-        remove("tmp.lola");
     }
 
     return EXIT_SUCCESS;

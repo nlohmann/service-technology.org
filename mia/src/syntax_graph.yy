@@ -1,4 +1,4 @@
-%token KW_STATE KW_PROG COLON DOT COMMA ARROW NUMBER NAME
+%token KW_STATE KW_PROG COLON DOT COMMA ARROW NUMBER NAME TGT_NAME MPP_NAME
 
 %defines
 %name-prefix="graph_"
@@ -18,7 +18,6 @@ unsigned int stat_tupleCountNew = 0;
 
 /// the current NAME token as string
 std::string NAME_token;
-std::string NAME_temp;
 
 std::string statename;
 
@@ -82,26 +81,22 @@ markings:
 marking:
   NAME COLON NUMBER
     { skip = true; }
-| NAME DOT
-    { NAME_temp = NAME_token; }
-  NAME COLON NUMBER
+| MPP_NAME COLON NUMBER
     {
-        if (NAME_temp == "mpp[1]") {
-            if (name2id[NAME_token] == 0) {
-                std::string a = NAME_token.substr(1, NAME_token.length());
-                currentTuple[0] = atoi(a.c_str());
-            } else {
-                currentTuple[ name2id[NAME_token] ] = $6;
-            }
-            break;
+        if (name2id[NAME_token] == 0) {
+            std::string a = NAME_token.substr(1, NAME_token.length());
+            currentTuple[0] = atoi(a.c_str());
+        } else {
+            currentTuple[ name2id[NAME_token] ] = $3;
         }
-        if (NAME_temp == "target[1]") {
-            if (name2id[NAME_token] == 0) {
-                statename += NAME_token;
-            } else {
-                // we only look at interface markings with mpp prefix
-                skip = true;
-            }
+    }
+| TGT_NAME COLON NUMBER
+    {
+        if (name2id[NAME_token] == 0) {
+            statename += NAME_token;
+        } else {
+            // we only look at interface markings with mpp prefix
+            skip = true;
         }
     }
 ;
@@ -109,5 +104,6 @@ marking:
 transitions:
   /* empty */
 | transitions NAME ARROW NUMBER
-| transitions NAME DOT NAME ARROW NUMBER
+| transitions MPP_NAME ARROW NUMBER
+| transitions TGT_NAME ARROW NUMBER
 ;

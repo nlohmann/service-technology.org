@@ -531,7 +531,7 @@ namespace pnapi
    */
   PetriNet &
   PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
-			     const map<Place *, LinkNode *> & wiring)
+          const map<Place *, LinkNode *> & wiring)
   {
     vector<LinkNode *> wiredNodes;
     wiredNodes.reserve(wiring.size());
@@ -541,54 +541,56 @@ namespace pnapi
 
     // add structure of nets
     for (map<string, vector<PetriNet> >::iterator it = instances.begin();
-	 it != instances.end(); ++it)
+            it != instances.end(); ++it)
+    {
+      assert(!it->first.empty());
+
+      for (unsigned int i = 0; i < it->second.size(); i++)
       {
-	assert(!it->first.empty());
+        PetriNet & net = it->second[i];
+        stringstream ss; ss << i + 1;
+        map<const Place *, const Place *> placeMapping =
+        copyStructure(net.prefixNodeNames(it->first + "[" + ss.str() +
+                        "]."));
+        condition_.merge(net.condition_, placeMapping);
 
-	for (unsigned int i = 0; i < it->second.size(); i++)
-	  {
-	    PetriNet & net = it->second[i];
-	    stringstream ss; ss << i + 1;
-	    map<const Place *, const Place *> placeMapping =
-	      copyStructure(net.prefixNodeNames(it->first + "[" + ss.str() +
-						"]."));
-	    condition_.merge(net.condition_, placeMapping);
-
-	    // translate references in wiring
-	    for (map<Place *, LinkNode *>::const_iterator it = wiring.begin();
-		 it != wiring.end(); ++it)
-	      if (placeMapping.find(it->first) != placeMapping.end())
-		wiredNodes.push_back(&wiring.find(it->first)->second
-		 ->replacePlace(const_cast<Place &>(*placeMapping
-						    .find(it->first)->second)));
-	  }
+        // translate references in wiring
+        for (map<Place *, LinkNode *>::const_iterator it = wiring.begin();
+                it != wiring.end(); ++it)
+        if (placeMapping.find(it->first) != placeMapping.end())
+        wiredNodes.push_back(&wiring.find(it->first)->second
+                ->replacePlace(const_cast<Place &>(*placeMapping
+                                .find(it->first)->second)));
       }
+    }
 
     set<LinkNode *> expanded;
     vector<LinkNode *> result;
 
     // expand all nodes
     for (vector<LinkNode *>::iterator it = wiredNodes.begin();
-	 it != wiredNodes.end(); ++it)
-      {
-	result = (*it)->expand();
-	expanded.insert(result.begin(), result.end());
-	delete (*it);  // clean up
-      }
+            it != wiredNodes.end(); ++it)
+    {
+      result = (*it)->expand();
+      expanded.insert(result.begin(), result.end());
+      delete (*it); // clean up
+    }
 
     // join one-to-one links
     LinkNode * node;
     set<LinkNode *>::iterator it;
     while (!expanded.empty())
-      {
-	it = expanded.begin();
-	(*it)->joinPlaces();
+    {
+      it = expanded.begin();
+      (*it)->joinPlaces();
 
-	// clean up
-	node = &(*it)->getPartner();
-	expanded.erase(it); delete *it;
-	expanded.erase(node); delete node;
-      }
+      // clean up
+      node = &(*it)->getPartner();
+      delete *it;
+      expanded.erase(it);
+      delete node;
+      expanded.erase(node);
+    }
 
     return *this;
   }

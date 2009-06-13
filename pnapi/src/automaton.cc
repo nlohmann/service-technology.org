@@ -4,6 +4,10 @@
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <iostream>
+#include <cstdlib>
+using std::cout;
+using std::flush;
 
 #include "automaton.h"
 #include "component.h"
@@ -21,7 +25,7 @@ namespace pnapi
    * The result of the constructor is an emty automaton.
    */
   Automaton::Automaton() :
-      net_(NULL), counter_(0)
+      net_(NULL), hashTable_(NULL), counter_(0)
   {
     /* do nothing */
   }
@@ -83,7 +87,7 @@ namespace pnapi
    * properties which marked as optional in the according header file.
    */
   Automaton::Automaton(const Automaton &a) :
-    states_(a.states_), edges_(a.edges_), counter_(a.counter_+1)
+    states_(a.states_), edges_(a.edges_), hashTable_(NULL), counter_(a.counter_+1)
   {
     if (a.net_ == NULL)
       net_ = NULL;
@@ -105,8 +109,8 @@ namespace pnapi
       delete edgeLabels_;
     if (edgeTypes_ != NULL)
       delete edgeTypes_;
-    /*if (hashTable_ != NULL)
-      delete hashTable_;*/
+    if (hashTable_ != NULL)
+      delete hashTable_;
   }
 
 
@@ -189,6 +193,10 @@ namespace pnapi
   {
     Edge *e = new Edge(s1, s2, label, type);
     edges_.push_back(e);
+    if (type == INPUT)
+      addInput(label);
+    if (type == OUTPUT)
+      addOutput(label);
     return *e;
   }
 
@@ -203,11 +211,15 @@ namespace pnapi
    */
   PetriNet & Automaton::stateMachine() const
   {
+    cout << "Start stateMachine: " << flush;
+    system("date");
     PetriNet *result = new PetriNet(); // resulting net
     std::map<State*,Place*> state2place; // places by states
 
     Condition final;
     final = false; // final places
+    cout << "Initialization done: " << flush;
+    system("date");
 
     /* no comment */
 
@@ -224,6 +236,8 @@ namespace pnapi
     {
       result->createPlace(*o, Node::OUTPUT);
     }
+    cout << "created interface: " << flush;
+    system("date");
 
     // generate places from states
     for(unsigned int i=0; i < states_.size(); ++i)
@@ -244,6 +258,8 @@ namespace pnapi
       if(states_[i]->isFinal())
         final = final.formula() || (*(state2place[states_[i]])) == 1;
     }
+    cout << "generated places: " << flush;
+    system("date");
 
     // generate transitions from edges
     for(unsigned int i=0; i < edges_.size(); ++i)
@@ -267,6 +283,8 @@ namespace pnapi
       p = state2place[&(edges_[i]->destination())];
       result->createArc(*t,*p);
     }
+    cout << "created arcs: " << flush;
+    system("date");
 
     // generate all other places empty
     std::set<const Place *> concerning = final.concerningPlaces();
@@ -284,6 +302,8 @@ namespace pnapi
 
     // generate final condition;
     result->finalCondition() = final.formula() && empty.formula();
+    cout << "generated formula: " << flush;
+    system("date");
 
     return *result;
   }
@@ -330,15 +350,16 @@ namespace pnapi
    */
   std::set<std::string> Automaton::input() const
   {
-    std::set<std::string> result;
-    result.clear();
-    for (unsigned int i = 0; i < edges_.size(); i++)
-      if (edges_[i]->type() == Automaton::INPUT)
-      {
-        result.insert(edges_[i]->label());
-      }
+    return input_;
+  }
 
-    return result;
+
+  /*!
+   *
+   */
+  void Automaton::addInput(std::string label)
+  {
+    input_.insert(label);
   }
 
 
@@ -346,15 +367,16 @@ namespace pnapi
    */
   std::set<std::string> Automaton::output() const
   {
-    std::set<std::string> result;
-    result.clear();
-    for (unsigned int i = 0; i < edges_.size(); i++)
-      if (edges_[i]->type() == Automaton::OUTPUT)
-      {
-        result.insert(edges_[i]->label());
-      }
+    return output_;
+  }
 
-    return result;
+
+  /*!
+   *
+   */
+  void Automaton::addOutput(std::string label)
+  {
+    output_.insert(label);
   }
 
 

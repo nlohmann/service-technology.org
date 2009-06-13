@@ -1,16 +1,19 @@
 # process "libs/pnapi" directory only if the Petri Net API needs to be compiled
 if COMPILE_PNAPI
-SUBDIRS = libs/pnapi src man tests
+SUBDIRS = libs/pnapi src man tests doc
 else
-SUBDIRS = src man tests
+SUBDIRS = src man tests doc
 endif
+
+EXTRA_DIST = REQUIREMENTS
 
 svn-clean: maintainer-clean
 	rm -fr INSTALL Makefile.in aclocal.m4 compile configure \
 	       depcomp install-sh missing ylwrap
 	rm -fr src/config.h.in~ src/Makefile.in libs/Makefile.in src/config.h.in
 	rm -fr man/Makefile.in
-	rm -fr doc/doxygen
+	rm -fr doc/doxygen doc/mdate-sh
 	rm -fr libs/pnapi/Makefile.in
 	rm -f tests/Makefile.in
+	rm -f doc/Makefile.in
 

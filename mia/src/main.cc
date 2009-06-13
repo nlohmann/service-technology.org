@@ -97,7 +97,12 @@ int main(int argc, char** argv) {
 
     fprintf(stderr, "%s: migrating '%s' to '%s\n", PACKAGE, args_info.inputs[0], args_info.inputs[1]);
 
-    string tmpname(tmpnam(NULL));
+    // create a unique temporary file name
+    char tmp[] = "/tmp/mia-XXXXXX";
+    if (mkstemp(tmp) == -1) {
+        abort(9, "could not create a temporary file '%s'", tmp);
+    }
+    string tmpname(tmp);
     string im_filename = tmpname + ".im";
     string mpp_filename = tmpname + ".sa";
     string lola_filename = tmpname + ".lola";
@@ -111,7 +116,7 @@ int main(int argc, char** argv) {
         s << args_info.messagebound_arg;
         wendy_command += " -m" + s.str();
     }
-    wendy_command += ((args_info.verbose_flag) ? " --verbose" : " &> /dev/null");
+    wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> /dev/null");
     if (args_info.verbose_flag) {
         fprintf(stderr, "%s: executing '%s'\n", PACKAGE, wendy_command.c_str());
     }

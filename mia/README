@@ -5,3 +5,43 @@
                                |_|  |_|_|\__,_|
                       http://service-technology.org/mia
 
+
+PURPOSE
+    Mia is a tool to calculate migration information.
+
+
+COPYRIGHT
+    Copyright (c) 2009 Niels Lohmann
+
+
+AUTHOR
+    Mia is written and maintained by Niels Lohmann. See file "AUTHORS" for
+    more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Mia is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Mia.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Mia can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+
+    Mia uses a lot of generated code. If you want to make changes to the
+    source code, you might need the following tools to regenerate the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+     * Gengetopt (http://www.gnu.org/software/gengetopt)
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Mia. It can also be
+    downloaded at <http://service-technology.org/files/mia/mia.pdf>.

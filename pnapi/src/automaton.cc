@@ -211,15 +211,11 @@ namespace pnapi
    */
   PetriNet & Automaton::stateMachine() const
   {
-    cout << "Start stateMachine: " << flush;
-    system("date");
     PetriNet *result = new PetriNet(); // resulting net
     std::map<State*,Place*> state2place; // places by states
 
     Condition final;
     final = false; // final places
-    cout << "Initialization done: " << flush;
-    system("date");
 
     /* no comment */
 
@@ -236,8 +232,6 @@ namespace pnapi
     {
       result->createPlace(*o, Node::OUTPUT);
     }
-    cout << "created interface: " << flush;
-    system("date");
 
     // generate places from states
     for(unsigned int i=0; i < states_.size(); ++i)
@@ -258,8 +252,6 @@ namespace pnapi
       if(states_[i]->isFinal())
         final = final.formula() || (*(state2place[states_[i]])) == 1;
     }
-    cout << "generated places: " << flush;
-    system("date");
 
     // generate transitions from edges
     for(unsigned int i=0; i < edges_.size(); ++i)
@@ -283,8 +275,6 @@ namespace pnapi
       p = state2place[&(edges_[i]->destination())];
       result->createArc(*t,*p);
     }
-    cout << "created arcs: " << flush;
-    system("date");
 
     // generate all other places empty
     std::set<const Place *> concerning = final.concerningPlaces();
@@ -302,8 +292,6 @@ namespace pnapi
 
     // generate final condition;
     result->finalCondition() = final.formula() && empty.formula();
-    cout << "generated formula: " << flush;
-    system("date");
 
     return *result;
   }

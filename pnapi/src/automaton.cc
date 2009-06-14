@@ -383,10 +383,7 @@ namespace pnapi
 
     // final state
     if (net_->finalCondition().isSatisfied(m))
-    {
       start.final();
-      return;
-    }
 
     bool doubled;
     // iterate over all transitions to check if they can fire

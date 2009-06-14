@@ -17,6 +17,8 @@ EXTRA_DIST = testsuite.at \
              testfiles/PO.wendy.og \
              testfiles/complexPV.fiona.og \
              testfiles/complexPV.wendy.og \
+             testfiles/error1.og \
+             testfiles/error2.og \
              testfiles/myCoffee.fiona.og \
              testfiles/myCoffee.wendy.og \
              testfiles/non_empty_true_node2.fiona.og \

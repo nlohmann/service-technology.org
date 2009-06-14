@@ -60,15 +60,15 @@ extern int og_yyerror(char const *msg);
  *
  * Each node has a unique ID. This function generates "fresh" IDs,
  * i.e. IDs, that are not yet used in the generated service automaton.
- * Node 0 is the Node, all transitions, that have to lead to a deadlock,
- * will lead to, with the only successor 1, which has no successors.
- * These nodes are generated at the beginning, so the first free
- * ID is 2 and after each call of newNodeID() 
+ * Node 0 is the deadlock node, that all not allowed sending actions
+ * have to lead to.
+ * This node is generated at the beginning, so the first free
+ * ID is 1 and after each call of newNodeID() 
  * the next unused ID will be i+1.
  */
 unsigned int newNodeID()
 {
-  static unsigned int i=2; // initiate i with 2
+  static unsigned int i=1; // initiate i with 1
   return i++; // return i and increment for the next call
 }
 
@@ -174,8 +174,7 @@ og:
     inputSockets = new unsigned int[inputLabels.size()];
 
     // write dead-end nodes
-    (*myOut) << "  0\n    TAU -> 1\n\n"
-             << "  1\n\n";
+    (*myOut) << "  0\n\n";
   }
 
   nodes
@@ -207,7 +206,7 @@ synchronous:
   {
     // don't know what to do with synchronous transitions
     og_yyerror("synchronous communication is not supported");
-    return EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
   identlist SEMICOLON
 ;
@@ -372,7 +371,7 @@ annotation:
   {
     // parsing 2-bit OGs there should be no formula
     og_yyerror("read a formula; only 2-bit annotations are supported");
-    return EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   } 
 | DOUBLECOLON BIT_S    { $$ = 's'; }
 | DOUBLECOLON BIT_F    { $$ = 'f'; }

@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     ofs.open(args_info.output_arg, std::ios_base::trunc); // open file
     if(!ofs) // if an error occurred on opening the file
     {
-      cerr << PACKAGE << ": ERROR: filed to open output file '"
+      cerr << PACKAGE << ": ERROR: failed to open output file '"
            << args_info.output_arg << "'" << endl;
       exit(EXIT_FAILURE);
     }

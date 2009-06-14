@@ -52,6 +52,24 @@ AT_KEYWORDS(io)
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Error Cases])
+############################################################################
+
+AT_SETUP([Synchronous Communication])
+AT_CHECK([cp TESTFILES/error1.og .])
+AT_CHECK([SAYO --input=error1.og], 1, ignore, stderr)
+AT_CHECK([GREP -q "synchronous communication is not supported" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Formulae])
+AT_CHECK([cp TESTFILES/error2.og .])
+AT_CHECK([SAYO --input=error2.og], 1, ignore, stderr)
+AT_CHECK([GREP -q "read a formula; only 2-bit annotations are supported" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Fiona's Test Cases])
 ############################################################################
 

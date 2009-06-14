@@ -1,0 +1,8 @@
+INTERFACE
+  INPUT
+    a;
+  OUTPUT;
+ 
+NODES
+  0 : (final)
+    a -> 0;

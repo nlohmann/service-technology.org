@@ -307,11 +307,11 @@ Given the service description of a coffee automaton as open net
 
 @cartouche
 @smallexample
-{ coffee }
+@{ coffee @}
 
 PLACE
 INTERNAL
-  p0,  { initial }
+  p0,  @{ initial @}
   p1,		
   p2,
   p3,
@@ -331,42 +331,42 @@ FINALMARKING
   p4:	1
  ;
 
-TRANSITION t1	 { ?e }
+TRANSITION t1	 @{ ?e @}
 CONSUME
   p0:	1,
   e: 1;	 
 PRODUCE
   p1:	1;
 
-TRANSITION t2	 { ?c }
+TRANSITION t2	 @{ ?c @}
 CONSUME
   c:	1,
   p1: 1;
 PRODUCE
   p2:	1;
 
-TRANSITION t3	 { ?t }
+TRANSITION t3	 @{ ?t @}
 CONSUME
   p1:	1,
   t : 1;
 PRODUCE
   p3:	1;
 
-TRANSITION t4	 { !b1 }
+TRANSITION t4	 @{ !b1 @}
 CONSUME
   p2:	1;
 PRODUCE
   b:	1,
   p4 : 1;
  
-TRANSITION t5	 { !b2 }
+TRANSITION t5	 @{ !b2 @}
 CONSUME
   p3:	1;
 PRODUCE
   b:	1,
   p4 : 1;
 
-{ END OF FILE }
+@{ END OF FILE @}
 @end smallexample
 @end cartouche
 
@@ -471,7 +471,7 @@ NODES
 that can be translated to the following open net by sa2owfn@footnote{a tool provided by the Petri Net API}
 
 @cartouche
-@example
+@smallexample
 PLACE
   INTERNAL
     p0, p1, p2, p3, p4, p5, p6, p7;
@@ -528,11 +528,11 @@ TRANSITION tc/4
 TRANSITION tc/5
   CONSUME c, p3;
   PRODUCE p6;
-@end example
+@end smallexample
 @end cartouche
 
 @cartouche
-@example
+@smallexample
 TRANSITION tc/6
   CONSUME c, p0;
   PRODUCE p5, p6;
@@ -588,18 +588,18 @@ TRANSITION tt/4
 TRANSITION tt/5
   CONSUME p3, t;
   PRODUCE p6;
-@end example
+@end smallexample
 @end cartouche
 
 @cartouche
-@example
+@smallexample
 TRANSITION tt/6
   CONSUME p0, t;
   PRODUCE p5, p6;
 
 
-{ END OF FILE '' }
-@end example
+@{ END OF FILE '' @}
+@end smallexample
 @end cartouche
 
 

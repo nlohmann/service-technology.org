@@ -2,6 +2,7 @@ bin_PROGRAMS = mia
 
 mia_SOURCES = syntax_graph.yy lexic_graph.ll \
               syntax_im.yy lexic_im.ll \
+              syntax_mi.yy lexic_mi.ll \
               main.cc \
               cmdline.c cmdline.h
 
@@ -11,9 +12,9 @@ mia_CPPFLAGS = -I$(top_srcdir)/libs
 mia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-BUILT_SOURCES = cmdline.c syntax_graph.cc syntax_im.cc
-EXTRA_DIST = syntax_graph.h syntax_im.h cmdline.ggo
-MAINTAINERCLEANFILES = syntax_graph.h syntax_im.h cmdline.c cmdline.h
+BUILT_SOURCES = cmdline.c syntax_graph.cc syntax_im.cc syntax_mi.cc
+EXTRA_DIST = syntax_graph.h syntax_im.h syntax_mi.h cmdline.ggo
+MAINTAINERCLEANFILES = syntax_graph.h syntax_im.h syntax_mi.h cmdline.c cmdline.h
 
 
 ################################################################

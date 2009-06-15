@@ -29,6 +29,9 @@ gengetopt_args_info args_info;
 extern map<unsigned, vector<vector<unsigned int> > > tuples_source;
 extern map<string, set<vector<unsigned int> > > tuples_target;
 
+// the marking names
+extern std::map<unsigned int, std::string> id2marking;
+
 // statistics
 extern unsigned int stat_stateCount;
 extern unsigned int stat_tupleCount;
@@ -37,9 +40,11 @@ extern unsigned int stat_tupleCountNew;
 // the input files
 extern FILE *graph_in;
 extern FILE *im_in;
+extern FILE *mi_in;
 
 // the parsers
 extern int im_parse();
+extern int mi_parse();
 extern int graph_parse();
 
 
@@ -104,13 +109,15 @@ int main(int argc, char** argv) {
     }
     string tmpname(tmp);
     string im_filename = tmpname + ".im";
+    string mi_filename = tmpname + ".mi";
     string mpp_filename = tmpname + ".sa";
     string lola_filename = tmpname + ".lola";
 
     /*---------------------------------------------------------------.
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
-    string wendy_command = string(BINARY_WENDY) + " " + string(args_info.inputs[0]) + " --im=" + im_filename + " --sa=" + mpp_filename;
+    string wendy_command = string(BINARY_WENDY) + " " + string(args_info.inputs[0])
+        + " --im=" + im_filename + " --sa=" + mpp_filename + " --mi=" + mi_filename;
     if (args_info.messagebound_given) {
         std::stringstream s;
         s << args_info.messagebound_arg;
@@ -207,8 +214,18 @@ int main(int argc, char** argv) {
         fprintf(stderr, "%s: %d tuples for target service found\n", PACKAGE, stat_tupleCountNew);
     }
 
+    /*-----------------------------.
+    | 8. parse marking information |
+    `-----------------------------*/
+    mi_in = fopen(mi_filename.c_str(), "r");
+    if (!mi_in) {
+        abort(11, "could not read marking information");
+    }
+    mi_parse();
+    fclose(mi_in);
+
     /*-------------------------.
-    | 8. find migration states |
+    | 9. find migration states |
     `-------------------------*/
     unsigned int jumperCount = 0;
     for (map<unsigned, vector<vector<unsigned int> > >::iterator q1 = tuples_source.begin(); q1 != tuples_source.end(); ++q1) {
@@ -221,7 +238,7 @@ int main(int argc, char** argv) {
                 }
             }
             if (pos) {
-                fprintf(stdout, "m%d -> [%s]\n", q1->first, q2->first.c_str());
+                fprintf(stdout, "[%s] -> [%s]\n", id2marking[q1->first].c_str(), q2->first.c_str());
                 ++jumperCount;
             }
         }

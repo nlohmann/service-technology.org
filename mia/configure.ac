@@ -1,4 +1,4 @@
-AC_INIT(Mia, 0.1, niels.lohmann@service-technology.org)
+AC_INIT(Mia, 0.1, [mia@service-technology.org])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -31,7 +31,15 @@ AC_PATH_TOOL(WENDY, [wendy], not found)
 if test "$WENDY" = "not found"; then
   AC_MSG_ERROR([Wendy was not found, but is needed by Mia.])
 else
-  AC_DEFINE_UNQUOTED(BINARY_WENDY, "${WENDY}", [Wendy binary.])
+  AC_MSG_CHECKING([Wendy version])
+  WENDY_VERSION=`$WENDY --version | sed -e 's/wendy //'`
+  WENDY_VERSION_REQ="1.4"
+  AC_MSG_RESULT($WENDY_VERSION)
+  if test "$WENDY_VERSION" \< "$WENDY_VERSION_REQ"; then
+    AC_MSG_ERROR([Wendy version $WENDY_VERSION_REQ required, but $WENDY_VERSION found.])
+  else
+    AC_DEFINE_UNQUOTED(BINARY_WENDY, "${WENDY}", [Wendy binary.])
+  fi
 fi
 
 # check for LoLA

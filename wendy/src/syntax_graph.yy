@@ -24,6 +24,7 @@
 %name-prefix="graph_"
 
 %{
+#include <fstream>
 #include <vector>
 #include <string>
 #include <map>
@@ -44,6 +45,8 @@ std::vector<Label_ID> currentLabels;
 
 /// a marking of the PN API net
 std::map<const pnapi::Place*, unsigned int> marking;
+
+extern std::ofstream *markingfile;
 
 extern int graph_lex();
 extern int graph_error(const char *);
@@ -66,6 +69,18 @@ state:
   KW_STATE NUMBER prog markings transitions
     { InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
                                                       InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking)));
+
+      if (markingfile) {
+          *markingfile << $2 << ": ";
+          for (std::map<const pnapi::Place*, unsigned int>::iterator p = marking.begin(); p != marking.end(); ++p) {
+              if (p != marking.begin()) {
+                  *markingfile << ", ";
+              }
+              *markingfile << p->first->getName() << ":" << p->second;
+          }
+          *markingfile << std::endl;
+      }
+
       currentLabels.clear();
       currentSuccessors.clear();
       marking.clear(); }

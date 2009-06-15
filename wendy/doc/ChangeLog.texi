@@ -1,12 +1,14 @@
-@heading Version 1.4-unreleased
+@heading Version 1.4
 @itemize
 @item versions of used programs are collected in @file{testsuite.log} when running @samp{make check}
 
 @item service automata (a.k.a. interaction graphs) can be created with @option{--sa}
 
-@item added a parameter @option{--im} to generate information for instance migration (can be combined with @option{--sa} to also generate the most-permissive partner)
-
 @item fixed bug #13651 (@url{https://gna.org/bugs/?13651}) -- adjusted parser to process empty markings
+
+@item added parameter @option{--mi} to store a mapping between the inner marking identifiers (integers) to actual Petri net markings (multisets of place names)
+
+@item added a hidden parameter @option{--im} to store information needed by Mia (@url{http://service-technology.org/mia}) to calculate information for instance migration
 @end itemize
 
 

@@ -33,6 +33,14 @@ option "im" -
   typestr="FILENAME"
   argoptional
   optional
+  hidden
+
+option "mi" -
+  "Prints a mapping from marking identifiers to actual Petri net markings."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
 
 option "fionaFormat" -
   "Use the deprecated Fiona OG file format (does not work with '--sa')."

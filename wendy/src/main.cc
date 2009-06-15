@@ -48,6 +48,9 @@ gengetopt_args_info args_info;
 /// the invocation string
 string invocation;
 
+/// a file to store a mapping from marking ids to actual Petri net markings
+std::ofstream *markingfile;
+
 
 /*!
  \brief abort with an error message and an error code
@@ -205,6 +208,12 @@ int main(int argc, char** argv) {
 #else
     string command_line(args_info.lola_arg);
 #endif
+
+    // marking information output
+    if (args_info.mi_given) {
+        string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
+        markingfile = new std::ofstream(mi_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
 
     // read from a pipe or from a file
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)

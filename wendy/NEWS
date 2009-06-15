@@ -7,19 +7,24 @@
                       http://service-technology.org/wendy
 
 
-Version 1.4-unreleased
-======================
+Version 1.4
+===========
 
 * versions of used programs are collected in `testsuite.log' when running
   `make check'
 
 * service automata (a.k.a. interaction graphs) can be created with `--sa'
 
-* added a parameter `--im' to generate information for instance migration
-  (can be combined with `--sa' to also generate the most-permissive partner)
-
 * fixed bug #13651 (`https://gna.org/bugs/?13651') - adjusted parser to
   process empty markings
+
+* added parameter `--mi' to store a mapping between the inner marking
+  identifiers (integers) to actual Petri net markings (multisets of place
+  names)
+
+* added a hidden parameter `--im' to store information needed by Mia
+  (`http://service-technology.org/mia') to calculate information for instance
+  migration
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

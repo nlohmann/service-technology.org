@@ -350,7 +350,7 @@ namespace pnapi
           << "q0 [style=invis];" << std::endl;
         for (int i = 0; i < (int) sa.states_.size(); i++)
           if (sa.states_[i]->isFinal())
-            os << sa.states_[i]->name() << " [shape=doublecircle];" << std::endl;
+            os << sa.states_[i]->name() << " [];" << std::endl;
           else
             os << sa.states_[i]->name() << ";" << std::endl;
         os

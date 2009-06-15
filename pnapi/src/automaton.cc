@@ -6,7 +6,9 @@
 #include <set>
 #include <iostream>
 #include <cstdlib>
+using std::cerr;
 using std::cout;
+using std::endl;
 using std::flush;
 
 #include "automaton.h"
@@ -49,6 +51,13 @@ namespace pnapi
     hashTable_ = new std::vector<std::set<State *> >(HASH_SIZE);
 
     (*edgeLabels_) = net_->normalize();
+    for (std::set<Place *>::iterator p = net_->getInterfacePlaces().begin(); p != net_->getInterfacePlaces().end(); p++)
+    {
+      if ((*p)->getType() == Node::INPUT)
+        addInput((*p)->getName());
+      else
+        addOutput((*p)->getName());
+    }
     for (std::set<Transition *>::iterator t = net_->getTransitions().begin();
         t != net_->getTransitions().end(); t++)
       switch((**t).getType())
@@ -377,6 +386,7 @@ namespace pnapi
    */
   void Automaton::dfs(State &start)
   {
+    //cerr << "dfs on node " << start.name() << "..." << endl;
     (*hashTable_)[start.hashValue()].insert(&start);
     // assuming that each state has a marking
     Marking m = *start.marking();
@@ -393,11 +403,13 @@ namespace pnapi
     {
       if (!m.activates(**t))
         continue;
-
+      //cerr << "transition " << (*t)->getName() << " is activated..." << endl;
       State &j = createState(m.successor(**t));
+      //cerr << "created node " << j.name() << endl;
       if (start == j)
       {
         deleteState(&j);
+        createEdge(start, start, (*edgeLabels_)[*t], (*edgeTypes_)[*t]);
         continue;
       }
 

@@ -181,10 +181,11 @@ int main(int argc, char** argv) {
     /*------------------------------------------------------.
     | 6. compose most-permissive partner and target service |
     `------------------------------------------------------*/
-    PetriNet composition = mpp;
-    composition.compose(target, "mpp", "target");
+    // compse nets and add prefixes (if you wish to change them here, don't
+    // forget to also adjust the lexer lexic_graph.ll)
+    mpp.compose(target, "mpp[1].", "target[1].");
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": composition: " << pnapi::io::stat << composition << std::endl;
+        std::cerr << PACKAGE << ": composition: " << pnapi::io::stat << mpp << std::endl;
     }
 
     /*-------------------------------------------------.
@@ -194,7 +195,7 @@ int main(int argc, char** argv) {
     if (not composition_lolafile) {
         abort(7, "could not write composition");
     }
-    composition_lolafile << pnapi::io::lola << composition;
+    composition_lolafile << pnapi::io::lola << mpp;
     composition_lolafile.close();
     string lola_command = args_info.safe_flag ? "lola-full1" : string(BINARY_LOLA);
     lola_command += " " + lola_filename + " -M";

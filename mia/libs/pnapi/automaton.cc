@@ -4,6 +4,12 @@
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <iostream>
+#include <cstdlib>
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::flush;
 
 #include "automaton.h"
 #include "component.h"
@@ -21,7 +27,7 @@ namespace pnapi
    * The result of the constructor is an emty automaton.
    */
   Automaton::Automaton() :
-    counter_(0)
+      net_(NULL), hashTable_(NULL), counter_(0)
   {
     /* do nothing */
   }
@@ -45,6 +51,13 @@ namespace pnapi
     hashTable_ = new std::vector<std::set<State *> >(HASH_SIZE);
 
     (*edgeLabels_) = net_->normalize();
+    for (std::set<Place *>::iterator p = net_->getInterfacePlaces().begin(); p != net_->getInterfacePlaces().end(); p++)
+    {
+      if ((*p)->getType() == Node::INPUT)
+        addInput((*p)->getName());
+      else
+        addOutput((*p)->getName());
+    }
     for (std::set<Transition *>::iterator t = net_->getTransitions().begin();
         t != net_->getTransitions().end(); t++)
       switch((**t).getType())
@@ -83,7 +96,7 @@ namespace pnapi
    * properties which marked as optional in the according header file.
    */
   Automaton::Automaton(const Automaton &a) :
-    states_(a.states_), edges_(a.edges_), counter_(a.counter_+1)
+    states_(a.states_), edges_(a.edges_), hashTable_(NULL), counter_(a.counter_+1)
   {
     if (a.net_ == NULL)
       net_ = NULL;
@@ -105,8 +118,8 @@ namespace pnapi
       delete edgeLabels_;
     if (edgeTypes_ != NULL)
       delete edgeTypes_;
-    /*if (hashTable_ != NULL)
-      delete hashTable_;*/
+    if (hashTable_ != NULL)
+      delete hashTable_;
   }
 
 
@@ -189,6 +202,10 @@ namespace pnapi
   {
     Edge *e = new Edge(s1, s2, label, type);
     edges_.push_back(e);
+    if (type == INPUT)
+      addInput(label);
+    if (type == OUTPUT)
+      addOutput(label);
     return *e;
   }
 
@@ -330,15 +347,16 @@ namespace pnapi
    */
   std::set<std::string> Automaton::input() const
   {
-    std::set<std::string> result;
-    result.clear();
-    for (unsigned int i = 0; i < edges_.size(); i++)
-      if (edges_[i]->type() == Automaton::INPUT)
-      {
-        result.insert(edges_[i]->label());
-      }
+    return input_;
+  }
 
-    return result;
+
+  /*!
+   *
+   */
+  void Automaton::addInput(std::string label)
+  {
+    input_.insert(label);
   }
 
 
@@ -346,15 +364,16 @@ namespace pnapi
    */
   std::set<std::string> Automaton::output() const
   {
-    std::set<std::string> result;
-    result.clear();
-    for (unsigned int i = 0; i < edges_.size(); i++)
-      if (edges_[i]->type() == Automaton::OUTPUT)
-      {
-        result.insert(edges_[i]->label());
-      }
+    return output_;
+  }
 
-    return result;
+
+  /*!
+   *
+   */
+  void Automaton::addOutput(std::string label)
+  {
+    output_.insert(label);
   }
 
 
@@ -367,16 +386,14 @@ namespace pnapi
    */
   void Automaton::dfs(State &start)
   {
+    //cerr << "dfs on node " << start.name() << "..." << endl;
     (*hashTable_)[start.hashValue()].insert(&start);
     // assuming that each state has a marking
     Marking m = *start.marking();
 
     // final state
     if (net_->finalCondition().isSatisfied(m))
-    {
       start.final();
-      return;
-    }
 
     bool doubled;
     // iterate over all transitions to check if they can fire
@@ -386,11 +403,13 @@ namespace pnapi
     {
       if (!m.activates(**t))
         continue;
-
+      //cerr << "transition " << (*t)->getName() << " is activated..." << endl;
       State &j = createState(m.successor(**t));
+      //cerr << "created node " << j.name() << endl;
       if (start == j)
       {
         deleteState(&j);
+        createEdge(start, start, (*edgeLabels_)[*t], (*edgeTypes_)[*t]);
         continue;
       }
 

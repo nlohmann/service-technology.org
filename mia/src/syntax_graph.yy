@@ -21,8 +21,6 @@ std::string NAME_token;
 
 std::string statename;
 
-bool skip = false;
-
 /// the tuples of the target (innermarking, mppstate, interfacemarking)
 std::map<std::string, std::set<std::vector<unsigned int> > > tuples_target;
 
@@ -53,16 +51,13 @@ states:
 state:
   KW_STATE NUMBER prog
     {
-        skip = false;
         statename = "";
         currentTuple = std::vector<unsigned int>(interfaceLength, 0);
     }
   markings transitions
     {
-        if (not skip) {
-            if (tuples_target[statename].insert(currentTuple).second) {
-                ++stat_tupleCountNew;
-            }
+        if (tuples_target[statename].insert(currentTuple).second) {
+            ++stat_tupleCountNew;
         }
         ++stat_stateCount;
     }
@@ -80,24 +75,31 @@ markings:
 
 marking:
   NAME COLON NUMBER
-    { skip = true; }
+    {
+        // a name without prefix must be an interface name
+        assert(name2id[NAME_token] != 0);
+
+        // store the interface marking
+        currentTuple[ name2id[NAME_token] ] = $3;
+    }
 | MPP_NAME COLON NUMBER
     {
-        if (name2id[NAME_token] == 0) {
-            std::string a = NAME_token.substr(1, NAME_token.length());
-            currentTuple[0] = atoi(a.c_str());
-        } else {
-            currentTuple[ name2id[NAME_token] ] = $3;
-        }
+        // a name with MPP prefix must not be an interface name
+        assert(name2id[NAME_token] == 0);
+
+        // strip "p" prefix of place name to get state number of MPP
+        std::string a = NAME_token.substr(1, NAME_token.length());
+
+        // store the name of the MPP's state
+        currentTuple[0] = atoi(a.c_str());
     }
 | TGT_NAME COLON NUMBER
     {
-        if (name2id[NAME_token] == 0) {
-            statename += NAME_token;
-        } else {
-            // we only look at interface markings with mpp prefix
-            skip = true;
-        }
+        // a name with TGT prefix must not be an interface name
+        assert(name2id[NAME_token] == 0);
+
+        // collect the target service's state name
+        statename += NAME_token;
     }
 ;
 

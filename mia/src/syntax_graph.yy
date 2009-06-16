@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <cstdio>
+#include <cassert>
 #include <set>
 
 #define YYDEBUG 1

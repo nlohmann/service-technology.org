@@ -420,13 +420,156 @@ namespace pnapi
   void PetriNet::compose(const PetriNet & net, const string & prefix,
 			 const string & netPrefix)
   {
-    assert(prefix != netPrefix);
+    PetriNet result;
+    map<const Place *, const Place *> placeMap;
+
+    set<Place *> thisPlaces = getInternalPlaces();
+    set<Place *> netPlaces = net.getInternalPlaces();
+    for (set<Place *>::iterator p = thisPlaces.begin(); p != thisPlaces.end(); p++)
+      placeMap[*p] = &result.createPlace(prefix+(*p)->getName(), Node::INTERNAL, (*p)->getTokenCount());
+    for (set<Place *>::iterator p = netPlaces.begin(); p != netPlaces.end(); p++)
+      placeMap[*p] = &result.createPlace(netPrefix+(*p)->getName(), Node::INTERNAL, (*p)->getTokenCount());
+    set<Transition *> thisTransitions = getTransitions();
+    set<Transition *> netTransitions = net.getTransitions();
+    for (set<Transition *>::iterator t = thisTransitions.begin(); t != thisTransitions.end(); t++)
+    {
+      Transition &nt = result.createTransition(prefix+(*t)->getName());
+      set<Arc *> preset = (*t)->getPresetArcs();
+      set<Arc *> postset = (*t)->getPostsetArcs();
+      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
+      {
+        Place *p = result.findPlace(prefix+(*f)->getPlace().getName());
+        if (p != NULL)
+          result.createArc(*p, nt, (*f)->getWeight());
+      }
+      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
+      {
+        Place *p = result.findPlace(prefix+(*f)->getPlace().getName());
+        if (p != NULL)
+          result.createArc(nt, *p, (*f)->getWeight());
+      }
+    }
+    for (set<Transition *>::iterator t = netTransitions.begin(); t != netTransitions.end(); t++)
+    {
+      Transition &nt = result.createTransition(netPrefix+(*t)->getName());
+      set<Arc *> preset = (*t)->getPresetArcs();
+      set<Arc *> postset = (*t)->getPostsetArcs();
+      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
+      {
+        Place *p = result.findPlace(netPrefix+(*f)->getPlace().getName());
+        if (p != NULL)
+          result.createArc(*p, nt, (*f)->getWeight());
+      }
+      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
+      {
+        Place *p = result.findPlace(netPrefix+(*f)->getPlace().getName());
+        if (p != NULL)
+          result.createArc(nt, *p, (*f)->getWeight());
+      }
+    }
+
+    set<Place *> thisInput = getInputPlaces();
+    set<Place *> thisOutput = getOutputPlaces();
+    set<Place *> netInput = net.getInputPlaces();
+    set<Place *> netOutput = net.getOutputPlaces();
+
+    for (set<Place *>::iterator p = thisInput.begin(); p != thisInput.end(); p++)
+    {
+      Place *ip = NULL;
+      Place *opponent = net.findPlace((*p)->getName());
+      set<Arc *> postset = (*p)->getPostsetArcs();
+      set<Arc *> preset;
+
+      if (opponent == NULL)
+      {
+        ip = &result.createPlace(prefix+(*p)->getName(), Node::INPUT);
+      }
+      else
+      {
+        ip = &result.createPlace((*p)->getName());
+        if (opponent->getType() != Node::OUTPUT)
+          preset.clear();
+        else
+        {
+          netOutput.erase(opponent);
+          placeMap[opponent] = ip;
+          preset = opponent->getPresetArcs();
+        }
+      }
+      placeMap[*p] = ip;
+      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
+        result.createArc(*ip, *result.findTransition(prefix+(*f)->getTransition().getName()), (*f)->getWeight());
+      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
+        result.createArc(*result.findTransition(netPrefix+(*f)->getTransition().getName()), *ip, (*f)->getWeight());
+    }
+
+    for (set<Place *>::iterator p = thisOutput.begin(); p != thisOutput.end(); p++)
+    {
+      //cerr << "iterating output set: " << (*p)->getName() << endl;
+      Place *ip = NULL;
+      Place *opponent = net.findPlace((*p)->getName());
+      set<Arc *> postset;
+      set<Arc *> preset = (*p)->getPresetArcs();
+
+      if (opponent == NULL)
+      {
+        ip = &result.createPlace(prefix+(*p)->getName(), Node::OUTPUT);
+      }
+      else
+      {
+        ip = &result.createPlace((*p)->getName());
+        if (opponent->getType() != Node::INPUT)
+          postset.clear();
+        else
+        {
+          netInput.erase(opponent);
+          placeMap[opponent] = ip;
+          postset = opponent->getPostsetArcs();
+        }
+      }
+      placeMap[*p] = ip;
+      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
+        result.createArc(*ip, *result.findTransition(netPrefix+(*f)->getTransition().getName()), (*f)->getWeight());
+      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
+        result.createArc(*result.findTransition(prefix+(*f)->getTransition().getName()), *ip, (*f)->getWeight());
+    }
+
+    for (set<Place *>::iterator p = netInput.begin(); p != netInput.end(); p++)
+    {
+      Place *np = &result.createPlace((*p)->getName(), Node::INPUT);
+      placeMap[*p] = np;
+
+      set<Arc *> postset = (*p)->getPostsetArcs();
+      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
+        result.createArc(*np, *result.findTransition(netPrefix+(*f)->getTransition().getName()), (*f)->getWeight());
+    }
+
+    for (set<Place *>::iterator p = netOutput.begin(); p != netOutput.end(); p++)
+    {
+      Place *np = &result.createPlace((*p)->getName(), Node::OUTPUT);
+      placeMap[*p] = np;
+
+      set<Arc *> preset = (*p)->getPresetArcs();
+      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
+        result.createArc(*result.findTransition(netPrefix+(*f)->getTransition().getName()), *np, (*f)->getWeight());
+    }
+
+    result.finalCondition().merge(finalCondition(), placeMap);
+    result.finalCondition().merge(net.finalCondition(), placeMap);
+
+    /*cerr << io::owfn << *this;
+    cerr << io::owfn << net;
+    cerr << io::owfn << result;*/
+
+    *this = result;
+
+    /*assert(prefix != netPrefix);
 
     map<string, PetriNet *> nets;
     nets[prefix] = this;
     nets[netPrefix] = const_cast<PetriNet *>(&net);
 
-    *this = compose(nets);
+    *this = compose(nets);*/
 
 
     /* below the old implementation

@@ -1,9 +1,5 @@
-//#include <cassert>
-//#include <queue>
-//#include <utility>
 #include <iostream>
 #include "Graph.h"
-//#include "GraphNode.h"
 
 // used namespaces
 using std::map;
@@ -24,10 +20,25 @@ Graph::~Graph() {
     nodes.clear();
 }
 
+
+void Graph::recolorInefficientNodes() {
+
+    map< Node*, list<Node*> > inefficientSuccessors;
+
+    // compute cost and inefficient successors
+    root->computeInefficientSuccessors(inefficientSuccessors);
+
+    // recolor inefficient successors
+    root->recolorInefficientSuccessors(inefficientSuccessors);
+    inefficientSuccessors.clear();
+}
+
+
 void Graph::printToStdout() {
 
+    cout << "graph has " << nodes.size() << " nodes" << endl;
     cout << "root node is node id '";
-    if ( root == NULL ) cout << "NULL'" << endl; else cout << root->id << "'" << endl;
+    if ( root == NULL ) cout << "NULL'" << endl; else cout << root->getID() << "'" << endl;
 
     for (map<unsigned int, Node*>::iterator iter = nodes.begin();
          iter != nodes.end(); ++iter) {

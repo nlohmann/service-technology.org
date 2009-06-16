@@ -14,6 +14,8 @@
 // from configure, neccessary for PACKAGE
 #include "config.h"
 
+// hack: for Formula in parser union
+#include "Formula.h"
 // from parser
 #include "og-syntax.h"
 

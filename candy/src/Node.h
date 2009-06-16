@@ -1,40 +1,60 @@
 #ifndef Node_H_
 #define Node_H_
 
-//#include "state.h"
-//#include "SinglyLinkedList.h"
-//#include "GraphFormula.h"
-//#include "GraphEdge.h"
-//#include "mynew.h"
-//#include "debug.h"
-//#include "options.h"
 //#include <cassert>
 #include <list>
 #include <string>
+#include <map>
+#include "Formula.h"
+
 
 using std::list;
 using std::pair;
 using std::string;
+using std::map;
 
 
 class Node {
 
     public:
 
-        unsigned int id;
-
         /// successor nodes together with their corresponding edge labels
-        list< pair<Node*, string> > successors;
+        list< pair<string, Node*> > successors;
 
-        // TODO this node's formula
+        // this node's formula
+        Formula* formula;
 
         /// constructor
-        Node(unsigned int);
+        explicit Node(unsigned int);
 
         /// destructor
         ~Node();
 
+        // getter and setter for id
+        unsigned int getID() const { return id; }
+        void setID(unsigned int newID) { id = newID; }
+
+    void recolorInefficientSuccessors(map< Node*, list<Node*> >& );
+
+    unsigned int computeInefficientSuccessors(map< Node*, list<Node*> >& );
+
+    unsigned int getCostMinimalAssignments(
+        list< pair<string, unsigned int> >,
+        list< FormulaAssignment >& );
+
+    void getCostMinimalAssignmentsRecursively(
+        list< pair<string, unsigned int> > ,
+        unsigned int,
+        FormulaAssignment,
+        unsigned int&,
+        list< FormulaAssignment >&);
+
+        // for debugging
         void printToStdout();
+
+    private:
+
+        unsigned int id;
 };
 
 #endif /* Node_H_ */

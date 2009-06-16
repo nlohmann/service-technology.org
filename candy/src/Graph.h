@@ -1,8 +1,10 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
-#include <map>
 #include "Node.h"
+#include <map>
+
+using std::map;
 
 
 class Graph {
@@ -17,7 +19,9 @@ class Graph {
 
         Node* root;
 
-        std::map< unsigned int, Node* > nodes;
+        map< unsigned int, Node* > nodes;
+
+        void recolorInefficientNodes();
 
         void printToStdout();
 };

@@ -18,6 +18,8 @@ namespace pnapi
   class Automaton
   {
     friend std::ostream & io::__sa::output(std::ostream &, const Automaton &);
+    friend std::ostream & io::__stat::output(std::ostream &, const Automaton &);
+    friend std::ostream & io::__dot::output(std::ostream &, const Automaton &);
 
   public:
     enum Type { INPUT, OUTPUT, TAU };
@@ -56,8 +58,10 @@ namespace pnapi
     std::string printToSTG(std::vector<std::string> &) const;
     /// returning a set of input labels (after PetriNet => Automaton)
     std::set<std::string> input() const;
+    void addInput(std::string);
     /// returning a set of output labels (after PetriNet => Automaton)
     std::set<std::string> output() const;
+    void addOutput(std::string);
 
     static const unsigned int HASH_SIZE = 65535;
 
@@ -66,6 +70,10 @@ namespace pnapi
     std::vector<State *> states_;
     /// vector of edges
     std::vector<Edge *> edges_;
+    /// set of input labels
+    std::set<std::string> input_;
+    /// set of output labels
+    std::set<std::string> output_;
 
     /// mapping from transitions to strings (their label) [optional]
     std::map<Transition *, std::string> *edgeLabels_;

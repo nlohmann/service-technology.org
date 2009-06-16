@@ -77,6 +77,14 @@ namespace pnapi
 	  << "|T|= "     << net.transitions_.size()  << "  "
 	  << "|F|= "     << net.arcs_.size();
       }
+
+
+      ostream & output(ostream & os, const Automaton & sa)
+      {
+        return os
+          << "|Q|= " << sa.states_.size() << "  "
+          << "|E|= " << sa.edges_.size();
+      }
     }
 
 
@@ -331,6 +339,33 @@ namespace pnapi
 
       void outputGroupSuffix(ostream & os, const string & port)
       {
+      }
+
+
+      std::ostream & output(std::ostream &os, const Automaton &sa)
+      {
+        os
+          << "Digraph ServiceAutomaton {"
+          << "{" << std::endl
+          << "q0 [style=invis];" << std::endl;
+        for (int i = 0; i < (int) sa.states_.size(); i++)
+          if (sa.states_[i]->isFinal())
+            os << sa.states_[i]->name() << " [];" << std::endl;
+          else
+            os << sa.states_[i]->name() << ";" << std::endl;
+        os
+          << "}" << std::endl;
+        os
+          << "{" << std::endl
+          << "q0 -> " << (*sa.initialStates().begin())->name() << ";"
+          << std::endl;
+        for (int i = 0; i < (int) sa.edges_.size(); i++)
+          os << sa.edges_[i]->source().name() << " -> "
+             << sa.edges_[i]->destination().name() << " [label=\""
+             << sa.edges_[i]->label() <<"\"];" << std::endl;
+        return os
+          << "}" << std::endl
+          << "}" << std::endl;
       }
 
 

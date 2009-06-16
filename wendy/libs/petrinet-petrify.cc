@@ -179,7 +179,7 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         placeName = placeName.substr( 0, placeName.find("/") );      // remove possible /
 
         Place * place = findPlace(placeName);
-        assert(place != NULL);
+//        assert(place != NULL);
 
         if ( inputPlacenames.count(placeName) > 0 )
         {
@@ -227,6 +227,14 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
       }
     }
   }
+
+
+  for (set<string>::iterator input = inputPlacenames.begin(); input != inputPlacenames.end(); input++)
+    if (findPlace(*input) == NULL)
+      createPlace(*input, Node::INPUT);
+  for (set<string>::iterator output = outputPlacenames.begin(); output != outputPlacenames.end(); output++)
+    if (findPlace(*output) == NULL)
+      createPlace(*output, Node::OUTPUT);
 
 
   // For each transition found to be a final transition...
@@ -291,4 +299,5 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
   // cleaning up generated file
   remove(pnFileName.c_str());
+  remove(fileName.c_str());
 }

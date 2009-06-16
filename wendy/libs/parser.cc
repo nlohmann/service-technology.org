@@ -838,9 +838,11 @@ namespace pnapi
           {
           case sa::INPUT:
             input_.push_back(node.identifier_);
+            sa_->addInput(node.identifier_);
             break;
           case sa::OUTPUT:
             output_.push_back(node.identifier_);
+            sa_->addOutput(node.identifier_);
             break;
           case sa::EDGE:
             newState_.edgeLabels.push_back(node.identifier_);

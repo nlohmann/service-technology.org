@@ -232,6 +232,11 @@ int main(int argc, char** argv) {
     remove("tmp.lola");
     time(&end_time);
 
+    // close marking information output file
+    if (args_info.mi_given) {
+        markingfile->close();
+        delete markingfile;
+    }
 
     /*-------------------------------.
     | 5. organize reachability graph |

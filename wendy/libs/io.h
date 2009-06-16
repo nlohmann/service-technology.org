@@ -10,9 +10,9 @@
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2009-05-28 15:29:50 +0200 (Do, 28. Mai 2009) $
+ * \date    $Date: 2009-06-09 18:18:21 +0200 (Di, 09. Jun 2009) $
  *
- * \version $Revision: 4185 $
+ * \version $Revision: 4254 $
  */
 
 
@@ -253,6 +253,8 @@ namespace pnapi
     namespace __stat
     {
       std::ostream & output(std::ostream &, const PetriNet &);
+
+      std::ostream & output(std::ostream &, const Automaton &);
     }
 
 
@@ -297,6 +299,8 @@ namespace pnapi
 			    const std::pair<std::string, std::set<Place *> > &);
       std::ostream & output(std::ostream &, const Node &, const std::string &);
       std::string getNodeName(const Node &, bool withSuffix = false);
+
+      std::ostream & output(std::ostream &, const Automaton &);
     }
 
 

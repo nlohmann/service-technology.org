@@ -40,8 +40,8 @@ using std::endl;
   * types, tokens, start symbol
   ****************************************************************************/
 
-%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_NODES KEY_TAU KEY_FINAL KEY_INITIAL
-%token COMMA COLON SEMICOLON ARROW NUMBER IDENT
+%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_NODES KEY_FINAL KEY_INITIAL
+%token KEY_SYNCHRONOUS COMMA COLON SEMICOLON ARROW NUMBER IDENT
 
 %union 
 {
@@ -52,9 +52,10 @@ using std::endl;
 
 %type <yt_int> NUMBER
 %type <yt_string> IDENT
-%type <yt_node> input output ident_list name state_name tau_node
-%type <yt_node> node_list node node_attributes
-%type <yt_node> transition_list transition
+%type <yt_node> input output synchronous
+%type <yt_node> identlist identnode
+%type <yt_node> nodes node state annotation 
+%type <yt_node> successors successor
 
 %start sa
 
@@ -64,72 +65,93 @@ using std::endl;
   ****************************************************************************/
 %%
 
-sa: 
-  KEY_INTERFACE
-    input
-    output
-  KEY_NODES
-    node_list
-  {
-    node = new Node($2, $3, $5);
-  }
+sa:
+  KEY_INTERFACE input output synchronous KEY_NODES nodes
+  { node = new Node($2, $3, $6); }
 ;
+
 
 input:
-  /* empty */                     { $$ = new Node(); }
-| KEY_INPUT ident_list SEMICOLON { $$ = new Node(pnapi::parser::sa::INPUT, $2); }
+  /* empty */
+  { $$ = new Node(); }
+| KEY_INPUT identlist SEMICOLON
+  { $$ = new Node(pnapi::parser::sa::INPUT, $2); }
 ;
+
 
 output:
-  /* empty */                     { $$ = new Node(); }
-| KEY_OUTPUT ident_list SEMICOLON { $$ = new Node(pnapi::parser::sa::OUTPUT, $2); }
-      
-ident_list:
-  name                    { $$ = new Node($1); }
-| ident_list COMMA name   { $$ = $1->addChild($3); }
+  /* empty */
+  { $$ = new Node(); }
+| KEY_OUTPUT identlist SEMICOLON
+  { $$ = new Node(pnapi::parser::sa::OUTPUT, $2); }
 ;
 
-name:
-  IDENT                   { $$ = new Node($1); }
+
+synchronous:
+  /* empty */
+  { $$ = new Node(); }
+| KEY_SYNCHRONOUS identlist SEMICOLON
+  { $$ = new Node(/* TODO: implement synchronous part */); }
 ;
 
-node_list:
-  /* empty */             { $$ = new Node();        }
-| node_list node          { $$ = $1->addChild($2);  }
-| node                    { $$ = new Node($1);      }
+
+identlist:
+  /* empty */
+  { $$ = new Node(); }
+| IDENT
+  { $$ = new Node($1); }
+| identlist COMMA identnode
+  { $1->addChild($3); }
 ;
+
+
+identnode:
+  IDENT
+  { $$ = new Node($1); }
+;
+
+
+nodes:
+  node
+  { $$ = new Node($1); }
+| nodes node
+  { $1->addChild($2); }
+;
+
 
 node:
-  state_name node_attributes transition_list
-    {
-      $$ = new Node(pnapi::parser::sa::STATE, $1, $2, $3);
-    }
+  state annotation successors
+  { $$ = new Node(pnapi::parser::sa::STATE, $1, $2, $3); }
 ;
 
-node_attributes:
-  /* empty */             { $$ = new Node(); }
-| COLON KEY_FINAL               { $$ = new Node(pnapi::parser::sa::FINAL); }
-| COLON KEY_INITIAL             { $$ = new Node(pnapi::parser::sa::INITIAL); }
-| COLON KEY_INITIAL COMMA KEY_FINAL { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
+
+state:
+  NUMBER
+  { $$ = new Node($1); }
 ;
 
-transition_list:
-  /* empty */           { $$ = new Node(); }
-| transition_list transition
-    { $$ = $1->addChild($2); }
-| transition
-    { $$ = new Node($1); }
+
+annotation:
+  /* empty */
+  { $$ = new Node(); }
+| COLON KEY_INITIAL
+  { $$ = new Node(pnapi::parser::sa::INITIAL); }
+| COLON KEY_FINAL
+  { $$ = new Node(pnapi::parser::sa::FINAL); }
+| COLON KEY_INITIAL COMMA KEY_FINAL
+  { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
 ;
 
-transition:
-  tau_node ARROW state_name { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
-| name ARROW state_name  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
+
+successors:
+  /* empty */
+  { $$ = new Node(); }
+| successors successor
+  { $1->addChild($2); }
 ;
 
-state_name:
-  NUMBER                  { $$ = new Node($1); }
-;
 
-tau_node:
-  KEY_TAU     { $$ = new Node(new std::string("TAU")); }
+successor:
+  identnode ARROW state
+  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
 ;

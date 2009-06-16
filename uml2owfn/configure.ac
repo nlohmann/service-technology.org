@@ -37,7 +37,7 @@ AC_PROG_AWK
 AC_PROG_GREP
 
 # Dot
-AC_CHECK_PROG(DOT, dot, dot, not found)
+AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
  AC_MSG_WARN([Graphviz dot was not found.])
  AC_DEFINE(HAVE_DOT, 0, [Graphviz dot can not be used on this system.])

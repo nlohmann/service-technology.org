@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 1.4, wendy@service-technology.org)
+AC_INIT(Wendy, 1.4-unreleased, wendy@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -24,7 +24,7 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for LoLA
-AC_PATH_TOOL(LOLA, [lola-full], not found)
+AC_PATH_PROG(LOLA, [lola-full], not found)
 if test "$LOLA" = "not found"; then
   AC_MSG_WARN([LoLA was not found in the path.])
   AC_MSG_WARN([You need to execute Wendy with the '--lola' parameter.])
@@ -33,7 +33,7 @@ else
 fi
 
 # search for Fiona (nice to have for "make check")
-AC_CHECK_PROG(FIONA, fiona, fiona, not found)
+AC_PATH_PROG(FIONA, [fiona], not found)
 
 AC_HEADER_ASSERT
 

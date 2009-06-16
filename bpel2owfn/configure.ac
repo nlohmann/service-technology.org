@@ -23,7 +23,7 @@ AM_PROG_CC_C_O
 AM_MISSING_PROG(HELP2MAN, help2man)
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(KC, kc++)
-AC_CHECK_PROG(DOT, dot, dot, not found)
+AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
  AC_DEFINE(HAVE_DOT, 0, [Graphviz dot can not be used on this system.])
 else

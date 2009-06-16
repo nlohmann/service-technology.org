@@ -45,7 +45,7 @@ configured_LDFLAGS=""
 #############################################################################
 # search for Dot and Petrify and write results to file "src/config.h"
 #############################################################################
-AC_CHECK_PROG(DOT, dot, dot, not found)
+AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
   AC_MSG_WARN([Graphviz Dot was not found. See file README.])
   AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])

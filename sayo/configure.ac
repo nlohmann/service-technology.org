@@ -17,13 +17,13 @@ AC_PROG_SED
 AC_PROG_GREP
 
 # search for Fiona (nice to have for "make check")
-AC_CHECK_PROG(FIONA, fiona, fiona, not found)
+AC_PATH_PROG(FIONA, [fiona], not found)
 
 # search for sa2sm (nice to have for "make check")
-AC_CHECK_PROG(SA2SM, sa2sm, sa2sm, not found)
+AC_PATH_PROG(SA2SM, [sa2sm], not found)
 
 # search for Wendy (nice to have for "make check")
-AC_CHECK_PROG(WENDY, wendy, wendy, not found)
+AC_PATH_PROG(WENDY, [wendy], not found)
 
 # flags set by the configure script
 configured_CFLAGS=""

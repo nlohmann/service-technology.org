@@ -24,7 +24,7 @@ AC_CONFIG_TESTDIR(tests)
 AC_HEADER_ASSERT
 
 # check for Wendy
-AC_PATH_TOOL(WENDY, [wendy], not found)
+AC_PATH_PROG(WENDY, [wendy], not found)
 if test "$WENDY" = "not found"; then
   AC_MSG_ERROR([Wendy was not found, but is needed by Mia.])
 else
@@ -40,7 +40,7 @@ else
 fi
 
 # check for LoLA
-AC_PATH_TOOL(LOLA, [lola-full], not found)
+AC_PATH_PROG(LOLA, [lola-full], not found)
 if test "$LOLA" = "not found"; then
   AC_MSG_ERROR([LoLA was not found, but is needed by Mia.])
 else

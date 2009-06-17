@@ -77,6 +77,7 @@ AT_SETUP([Complex Public View])
 AT_CHECK_SA2SM
 AT_CHECK_WENDY
 AT_CHECK_FIONA
+AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/complexPV.*.og .])
 AT_CHECK([SAYO --input=complexPV.wendy.og --output=complexPV.sa])
 AT_CHECK([SA2SM complexPV.sa complexPV.owfn])
@@ -101,6 +102,7 @@ AT_SETUP([Non Empty True Node 2])
 AT_CHECK_SA2SM
 AT_CHECK_WENDY
 AT_CHECK_FIONA
+AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/non_empty_true_node2.*.og .])
 AT_CHECK([SAYO --input=non_empty_true_node2.wendy.og --output=non_empty_true_node2.sa])
 AT_CHECK([SA2SM non_empty_true_node2.sa non_empty_true_node2.owfn])
@@ -113,6 +115,7 @@ AT_SETUP([Non Empty True Node 3])
 AT_CHECK_SA2SM
 AT_CHECK_WENDY
 AT_CHECK_FIONA
+AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/non_empty_true_node3.*.og .])
 AT_CHECK([SAYO --input=non_empty_true_node3.wendy.og --output=non_empty_true_node3.sa])
 AT_CHECK([SA2SM non_empty_true_node3.sa non_empty_true_node3.owfn])

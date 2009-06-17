@@ -17,14 +17,14 @@ option "level-0" 0
   flag off
   
 option "random" r
-  "Random Message Profile"
-  int typestr="positive integer value"
+  "Random Message Profile from a specified number of terms."
+  int typestr="uint"
   optional 
   
 section "Advanced Options"
 
 option "bound" b
-  "A bound for the internal places of the open net."
-  int typestr="positive integer value"
+  "An artificial bound for the internal places of the open net."
+  int typestr="uint"
   default="10"
   optional

@@ -9,9 +9,8 @@
 
 std::vector<EventTerm*>* EventTerm::createBasicTermSet(pnapi::PetriNet* net) {
 
-	const std::set<pnapi::Place*> placeSet = net->getInterfacePlaces();
 	vector<EventTerm*>* result = new vector<EventTerm*>();
-	for (std::set<pnapi::Place*>::iterator it = placeSet.begin(); it != placeSet.end(); ++it) {
+	for (std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
 		BasicTerm* b = new BasicTerm((*it));
 		result->push_back(b);
 	}

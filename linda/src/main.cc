@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 			inputStream >> pnapi::io::owfn >> *(net);
 			inputStream.close();
 		}
-		if (args_info.verbose_given) {
+		if (args_info.verbose_flag) {
 			std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(net) << std::endl;
 		}
 	} catch (pnapi::io::InputError error) {
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
 	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(&(net->finalCondition().formula()),bound);
 
-	if (args_info.level_0_given) {
+	if (args_info.level_0_flag) {
 	
 	std::cout << "\nLevel 0 message profile:" << std::endl;
 	
@@ -91,6 +91,20 @@ int main(int argc, char** argv) {
 		`-----------------------------------*/
 	
 		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
+	
+		for (std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
+		for (std::set<pnapi::Place*>::iterator it2 = net->getInterfacePlaces().begin(); it2 != net->getInterfacePlaces().end(); ++it2) {
+			
+			if (*it == *it2) continue;
+			
+			BasicTerm* b1 = new BasicTerm((*it));
+			BasicTerm* b2 = new BasicTerm((*it2));
+			
+			AddTerm* a = new AddTerm(b1,b2);
+			
+			etermvec->push_back(a);
+		}
+		}
 	
 	
 		/*-------------------------------------------------.
@@ -104,7 +118,6 @@ int main(int argc, char** argv) {
 			std::cout << "Final marking: ";
 			
 			(*finalMarkingIt)->output();
-			
 	
 			ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
 			if (XSE->constructLP()) {
@@ -118,7 +131,6 @@ int main(int argc, char** argv) {
 		}
 	
 	}
-	
 	
 	
 	if (args_info.random_given) {
@@ -160,7 +172,10 @@ int main(int argc, char** argv) {
 	
 	}
 	
-		std::cout << "\n" << std::endl;
+	time(&end_time);
 	
+	if (args_info.verbose_flag) {
+		std::cerr << "\n" << PACKAGE << ": calculation took " << difftime( end_time,start_time) << " seconds" << std::endl << std::endl;
+	}
 	
 }

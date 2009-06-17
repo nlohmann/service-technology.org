@@ -1,4 +1,9 @@
+#include <typeinfo>
+#include <iostream>
 #include "setsOfFinalMarkings.h"
+
+using std::cout;
+using std::cerr;
 
 bool PartialMarking::isEquivalentTo(PartialMarking* other) {
 

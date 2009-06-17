@@ -44,9 +44,10 @@ void ExtendedStateEquation::constructLP() {
 
 		int value = (*placesIt).second;
 
+		int number_of_transitions_for_this_place = place->getPresetArcs().size() + place->getPostsetArcs().size();
 
-		int transCol[place->getPresetArcs().size() + place->getPostsetArcs().size() + 1];
-		REAL transVal[place->getPresetArcs().size() + place->getPostsetArcs().size() + 1];
+		int transCol[number_of_transitions_for_this_place];
+		REAL transVal[number_of_transitions_for_this_place];
 
 		int tr = 0;
 
@@ -55,45 +56,46 @@ void ExtendedStateEquation::constructLP() {
 		++pIt) {
 			pnapi::Transition& t = (*pIt)->getTransition();
 			// We add the transition, with the weight as a factor.
+			
+			assert(tr < number_of_transitions_for_this_place);
+			
 			transCol[tr] = START_TRANSITIONS + transitionID[&t];
-			transVal[tr++] = (*pIt)->getWeight();
+			transVal[tr] = (*pIt)->getWeight();
+			++tr;
 		}
 
 		// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
 		for (set<pnapi::Arc *>::iterator pIt = place->getPostsetArcs().begin(); pIt != place->getPostsetArcs().end(); ++pIt) {
 			pnapi::Transition& t = (*pIt)->getTransition();
+
+			assert(tr < number_of_transitions_for_this_place);
+
 			// We add the transition, with the weight as a factor.
 			transCol[tr] = START_TRANSITIONS + transitionID[&t];
-			transVal[tr++] = -1 * (int) (*pIt)->getWeight();
+			transVal[tr] = -1 * (int) (*pIt)->getWeight();
+			++tr;
 		}
 
 		int diffval = value;
 		int initialm = place->getTokenCount();
 		diffval -= initialm;
 
-		add_constraintex(lp, tr, transVal, transCol, EQ, diffval);
-
+		add_constraintex(lp, number_of_transitions_for_this_place, transVal, transCol, EQ, diffval);
 	}
 
 	// Now add all the events
 
 
-
-	set<pnapi::Place* > interfacePlaces = net->getInterfacePlaces();
-	pnapi::Place* EventPtr[interfacePlaces.size()];
-
 	int ev = 0;
 
 
-	for (set<pnapi::Place *>::iterator it = interfacePlaces.begin(); it != interfacePlaces.end(); ++it) {
+	for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
 
 		pnapi::Place* p = *it;
 
-		EventPtr[ev+START_EVENTS] = p;
 		EventID[p] = ev+START_EVENTS;
 
-
-		int transCol[p->getPresetArcs().size() + p->getPostsetArcs().size()+ 1];
+		int transCol[p->getPresetArcs().size() + p->getPostsetArcs().size() + 1];
 		REAL transVal[p->getPresetArcs().size() + p->getPostsetArcs().size() + 1];
 		int tr = 0;
 

@@ -11,7 +11,9 @@
 #ifndef PNAPI_PARSER_H
 #define PNAPI_PARSER_H
 
+#include "config.h"
 #include <cassert>
+
 #include <vector>
 #include <stack>
 #include <istream>

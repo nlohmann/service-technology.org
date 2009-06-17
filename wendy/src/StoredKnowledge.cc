@@ -18,12 +18,13 @@
 \*****************************************************************************/
 
 
+#include "config.h"
+#include <cassert>
+
 #include <set>
 #include <iostream>
-#include <cassert>
 #include <string>
 #include <vector>
-#include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 

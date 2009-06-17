@@ -18,9 +18,10 @@
 \*****************************************************************************/
 
 
-#include <climits>
-#include <cassert>
 #include "config.h"
+#include <cassert>
+
+#include <climits>
 #include "InnerMarking.h"
 #include "Label.h"
 #include "cmdline.h"

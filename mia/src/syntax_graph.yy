@@ -4,11 +4,13 @@
 %name-prefix="graph_"
 
 %{
+#include "config.h"
+#include <cassert>
+
 #include <string>
 #include <vector>
 #include <map>
 #include <cstdio>
-#include <cassert>
 #include <set>
 
 #define YYDEBUG 1

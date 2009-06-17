@@ -1,10 +1,12 @@
+#include "config.h"
+#include <cassert>
+
 #ifndef NDEBUG
 #include <iostream>
 using std::cout;
 using std::endl;
 #endif
 
-#include <cassert>
 #include <set>
 
 #include "petrinet.h"

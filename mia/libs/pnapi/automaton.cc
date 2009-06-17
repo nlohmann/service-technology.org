@@ -1,4 +1,6 @@
+#include "config.h"
 #include <cassert>
+
 #include <cstdlib>
 #include <ctime>
 #include <fstream>

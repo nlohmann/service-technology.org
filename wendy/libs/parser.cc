@@ -1,3 +1,6 @@
+#include "config.h"
+#include <cassert>
+
 #ifndef NDEBUG
 #include <iostream>
 using std::cout;
@@ -5,7 +8,6 @@ using std::cerr;
 using std::endl;
 #endif
 
-#include <cassert>
 #include <fstream>
 #include <sstream>
 #include <iostream>

@@ -16,6 +16,9 @@
  * \version $Revision: 4295 $
  */
 
+#include "config.h"
+#include <cassert>
+
 #ifndef NDEBUG
 #include <iostream>
 #include <fstream>
@@ -27,7 +30,6 @@ using pnapi::io::operator<<;
 using pnapi::io::util::operator<<;
 #endif
 
-#include <cassert>
 #include <sstream>
 
 #include "link.h"

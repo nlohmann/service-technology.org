@@ -1,6 +1,8 @@
+#include "config.h"
+#include <cassert>
+
 #include <cstdarg>
 #include <cstdlib>
-#include <cassert>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -9,7 +11,6 @@
 #include <map>
 #include <set>
 
-#include "config.h"
 #include "cmdline.h"
 #include "pnapi/pnapi.h"
 

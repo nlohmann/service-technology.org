@@ -78,23 +78,16 @@ AC_PATH_PROG(FIONA, [fiona], not found)
 AC_SUBST(FIONA)
 
 
+# organize assertions -- switch off by "--disable-assert"
+AC_HEADER_ASSERT
+
+
 #############################################################################
 # In the following, command line paraemters for the configure script are
 # defined. Each parameter is also written into a Makefile conditional to
 # later set compliler flags accordingly. Finally, the result is also written
 # into the configuration header "config.h".
 #############################################################################
-
-# parameter "--enable-assert"
-AC_ARG_ENABLE(assert,
-  AS_HELP_STRING([--disable-assert],[disable assertions and verbose debug messages (enabled by default)]),
-  [enable_assert=${enableval}], [enable_assert=yes])
-AC_MSG_CHECKING([whether to use assertions])
-AC_MSG_RESULT($enable_assert)
-
-if test "$enable_assert" = "no"; then
-  AC_DEFINE(NDEBUG,1,[Turn off assertions and verbose debug messages.])
-fi
 
 # parameter "--enable-64bit"
 AC_ARG_ENABLE(64bit,

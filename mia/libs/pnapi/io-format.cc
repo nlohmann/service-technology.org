@@ -1,8 +1,9 @@
+#include "config.h"
 #include <cassert>
+
 #include <sstream>
 
 #include "automaton.h"
-#include "config.h"
 #include "petrinet.h"
 #include "state.h"
 #include "io.h"

@@ -1,3 +1,6 @@
+#include "config.h"
+#include <cassert>
+
 #ifndef NDEBUG
 #include <iostream>
 #include "io.h"
@@ -5,7 +8,6 @@ using std::cout;
 using std::endl;
 #endif
 
-#include <cassert>
 #include <set>
 
 #include "util.h"

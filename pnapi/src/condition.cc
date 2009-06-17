@@ -1,3 +1,6 @@
+#include "config.h"
+#include <cassert>
+
 #ifndef NDEBUG
 #include <iostream>
 #include "io.h"
@@ -5,8 +8,6 @@ using std::cout;
 using std::endl;
 using pnapi::io::util::operator<<;
 #endif
-
-#include <cassert>
 
 #include "marking.h"
 #include "condition.h"

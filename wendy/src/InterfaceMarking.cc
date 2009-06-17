@@ -18,9 +18,11 @@
 \*****************************************************************************/
 
 
+#include "config.h"
+#include <cassert>
+
 #include <cmath>
 #include <cstdlib>
-#include <cassert>
 #include "cmdline.h"
 #include "InterfaceMarking.h"
 #include "Label.h"

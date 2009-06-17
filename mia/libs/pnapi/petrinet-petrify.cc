@@ -3,7 +3,9 @@
  * Headers
  *****************************************************************************/
 
+#include "config.h"
 #include <cassert>
+
 #include <cstdlib>
 #include <iostream>
 #include <set>
@@ -14,7 +16,6 @@
 #include "automaton.h"
 #include "petrinet.h"
 #include "petrinet-petrify.h"
-#include "config.h"         // needed to use petrify
 #include "formula.h"
 #include "util.h"
 

@@ -28,21 +28,27 @@ EventTerm* EventTerm::createRandomEventTerm(pnapi::PetriNet* net) {
 	EventTerm* e;
 	switch (decision) {
 	case 1 : // Basic Term
-		int nrOfEvents = net->getInterfacePlaces().size();
-		int chosen = rand() % (nrOfEvents);
-		for (int i = 0; i < chosen; ++i) {
-			++it;
+		{
+			int nrOfEvents = net->getInterfacePlaces().size();
+			int chosen = rand() % (nrOfEvents);
+			for (int i = 0; i < chosen; ++i) {
+				++it;
+			}
+			e = new BasicTerm(*it);
+			return e;
 		}
-		e = new BasicTerm(*it);
-		return e;
 	case 2 : // Multiply
-		int factor = rand() % 10 + 1;
-		if (rand() % 2 == 0) factor *= (-1);
-		e = new MultiplyTerm(createRandomEventTerm(net),factor);
-		return e;
+		{
+			int factor = rand() % 10 + 1;
+			if (rand() % 2 == 0) factor *= (-1);
+			e = new MultiplyTerm(createRandomEventTerm(net),factor);
+			return e;
+	    }
 	case 3 : // Add
-		e = new AddTerm(createRandomEventTerm(net),createRandomEventTerm(net));
-		return e;
+		{
+			e = new AddTerm(createRandomEventTerm(net),createRandomEventTerm(net));
+			return e;
+		}
 	}
 
 }

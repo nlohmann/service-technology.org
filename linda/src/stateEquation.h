@@ -24,7 +24,7 @@ public:
 		lp = NULL;
 	}
 
-	void constructLP();
+	bool constructLP();
 
 	void output() {
 		print_lp(lp);

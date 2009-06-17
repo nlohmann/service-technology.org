@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
 	`--------------------------------------*/
 
 	evaluateParameters(argc, argv);
-
-	std::cerr << PACKAGE << ": Processing" << args_info.inputs[0] << ".\n";
+	
+	std::cerr << PACKAGE << ": Processing " << args_info.inputs[0] << ".\n";
 
 	pnapi::PetriNet* net = new pnapi::PetriNet;
 
@@ -72,69 +72,95 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
+	/*----------------------------.
+	| 2. Calculate final markings |
+	`----------------------------*/
+
 
 	int bound = args_info.bound_arg;
 
-	//	std::cout << bound << "\n";
-
 	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(&(net->finalCondition().formula()),bound);
 
-	vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
-
-
-
-	/*
-	srand(time(NULL));
-
-	for (int i = 0; i < 20; ++i) {
-	EventTerm* rndEventTerm = EventTerm::createRandomEventTerm(net);
-	std::cout <<"vorher: "<< rndEventTerm->toString() << "\n";
-
-	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(rndEventTerm);
-	std::cout <<"nachher: ";
-	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
-		std::cout << (*it).first->getName() << " = " << (*it).second << "; ";
+	if (args_info.level_0_given) {
+	
+	std::cout << "\nLevel 0 message profile:" << std::endl;
+	
+	
+		/*-----------------------------------.
+		| Calculate and flatten event terms. |
+		`-----------------------------------*/
+	
+		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
+	
+	
+		/*-------------------------------------------------.
+		| For each final marking evaluate the event terms. |
+		`-------------------------------------------------*/
+	
+		for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
+		finalMarkingIt != fSet->partialMarkings.end();
+		++finalMarkingIt) {
+	
+			std::cout << "Final marking: ";
+			
+			(*finalMarkingIt)->output();
+			
+	
+			ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
+			if (XSE->constructLP()) {
+	
+			for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
+				XSE->evaluate((*it));
+			}
+			
+			}
+	
+		}
+	
 	}
-	std::cout << "\n\n";
-	}
+	
+	
+	
+	if (args_info.random_given) {
+	
+		std::cout << "\nRandom message profile (" <<  args_info.random_arg <<" terms):" << std::endl;
+	
+		srand(time(NULL));
+	
+		int number = args_info.random_arg;
 
-
-
-	for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
-		std::cout << (*it)->toString() << "; " ;
-	}
-
-	 */
-//	fSet->output();
-
-
-
-	/*--------------------.
-	| 2. Build the System |
-	`--------------------*/
-
-
-
-	for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
-	finalMarkingIt != fSet->partialMarkings.end();
-	++finalMarkingIt) {
-
-		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
-		XSE->constructLP();
-
-		for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
-			std::cout << "Evaluate..." << std::endl;
-
-			XSE->evaluate((*it));
-
-			std::cout << "...evaluated" << std::endl;
-
+		vector<EventTerm*>* randomvec = new vector<EventTerm*>();
+	
+		for (int i = 0; i < number; ++i) {
+			randomvec->push_back(EventTerm::createRandomEventTerm(net));
+		}
+		
+		for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
+		finalMarkingIt != fSet->partialMarkings.end();
+		++finalMarkingIt) {
+	
+			std::cout << "Final marking: ";
+			
+			(*finalMarkingIt)->output();
+			
+	
+			ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
+			if (XSE->constructLP()) {
+	
+			for (vector<EventTerm*>::iterator it = randomvec->begin(); it != randomvec->end(); ++it) {
+				XSE->evaluate((*it));
+			}
+			
+			}
+	
 		}
 
+			
+	
+	
 	}
-
-
-	std::cout << "Linda is done!" << std::endl;
-
-
+	
+		std::cout << "\n" << std::endl;
+	
+	
 }

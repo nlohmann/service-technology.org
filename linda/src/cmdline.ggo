@@ -14,11 +14,12 @@ section "Message Profile Levels"
 
 option "level-0" 0
   "Level 0 Message Profile"
-  flag on
-  
-option "level-1" 1
-  "Level 1 Message Profile"
   flag off
+  
+option "random" r
+  "Random Message Profile"
+  int typestr="positive integer value"
+  optional 
   
 section "Advanced Options"
 

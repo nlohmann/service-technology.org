@@ -7,7 +7,7 @@
 
 #include "stateEquation.h"
 
-void ExtendedStateEquation::constructLP() {
+bool ExtendedStateEquation::constructLP() {
 
 
 	const unsigned int NR_OF_COLS = net->getTransitions().size() + net->getInterfacePlaces().size();
@@ -122,23 +122,35 @@ void ExtendedStateEquation::constructLP() {
 	}
 
 	set_add_rowmode(lp, FALSE);
+	
+	int ret = solve(lp);
+
+	if (ret == INFEASIBLE) {
+		std::cout << "...Final marking not reachable from initial marking." << std::endl;
+		return false;
+	} 
 
 
 }
 
 void ExtendedStateEquation::evaluate(EventTerm* e) {
 
+	std::cout << e->toString() << " =" ;
+
 
 	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(e);
+	
 
 	int counter = 0;
 	double obj_row[map->size()];
 	int obj_cols[map->size()];
 
+
+
 	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
 
 
-		std::cout << (*it).first->getName() << " = " << (*it).second << "; ";
+		std::cout << " + " << "(" << (*it).second << "*" << (*it).first->getName()  << ")";
 
 
 		obj_row[counter] = (*it).second;
@@ -148,26 +160,21 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 
 	}
 
-	std::cout << "\n";
-
+	std::cout << " : ";
+	
 	int ret;
-
-	//			std::cout << "hier" << std::endl;
 
 	assert(set_obj_fnex(lp,map->size(),obj_row,obj_cols)== TRUE);
 
 	set_minim(lp);
 
-	//print_lp(lp);
-
 	ret = solve(lp);
 
-	if (ret == INFEASIBLE) {
-		std::cerr << "Final marking not reachable from initial marking." << std::endl;
-		exit(1);
+	if (ret == UNBOUNDED) {
+		std::cout << "min = unbounded; ";
+	} else {
+		std::cout << "min = " << get_objective(lp) << "; ";
 	}
-
-	std::cout << "min: " << ret << " = " << get_objective(lp) << " ;";
 
 	set_maxim(lp);
 
@@ -175,10 +182,13 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 
 	ret = solve(lp);
 
-	std::cout << "max: " << ret << " = " << get_objective(lp) << " ;";
+	if (ret == UNBOUNDED) {
+		std::cout << "max = unbounded; ";
+	} else {
+		std::cout << "max = " << get_objective(lp) << "; ";
+	}
 
 	std::cout << "\n";
-
 
 
 }

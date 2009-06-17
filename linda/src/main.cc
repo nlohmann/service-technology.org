@@ -6,6 +6,11 @@
 #include "cmdline.h"
 #include "helpers.h"
 #include "lp_lib.h"
+#include "setsOfFinalMarkings.h"
+#include <typeinfo>
+#include "eventTerm.h"
+#include "stateEquation.h"
+
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -40,7 +45,7 @@ int main(int argc, char** argv) {
 
 	evaluateParameters(argc, argv);
 
-	std::cerr << PACKAGE << "%s: Processing" << args_info.inputs[0] << ".\n";
+	std::cerr << PACKAGE << ": Processing" << args_info.inputs[0] << ".\n";
 
 	pnapi::PetriNet* net = new pnapi::PetriNet;
 
@@ -67,202 +72,69 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
+
+	int bound = args_info.bound_arg;
+
+	//	std::cout << bound << "\n";
+
+	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(&(net->finalCondition().formula()),bound);
+
+	vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
+
+
+
+	/*
+	srand(time(NULL));
+
+	for (int i = 0; i < 20; ++i) {
+	EventTerm* rndEventTerm = EventTerm::createRandomEventTerm(net);
+	std::cout <<"vorher: "<< rndEventTerm->toString() << "\n";
+
+	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(rndEventTerm);
+	std::cout <<"nachher: ";
+	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
+		std::cout << (*it).first->getName() << " = " << (*it).second << "; ";
+	}
+	std::cout << "\n\n";
+	}
+
+
+
+	for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
+		std::cout << (*it)->toString() << "; " ;
+	}
+
+	 */
+//	fSet->output();
+
+
+
 	/*--------------------.
 	| 2. Build the System |
 	`--------------------*/
 
-	// Trying to retrieve a final marking from the stored final condition.
-	// Basically, only conjunctions are supported by now.
-	const pnapi::formula::Conjunction* finalmarking = dynamic_cast<const pnapi::formula::Conjunction*> (&(net->finalCondition().formula()));
 
-	if (finalmarking == NULL) {
-		fprintf(stderr, "%s: Finalmarking not recognizable.\n", PACKAGE);
-		exit(EXIT_FAILURE);
-	}
 
-	// Create to arrays that represent the final marking:
-	// For each place that is specified in the final marking, we store the pointer and the number of tokens
-	const pnapi::Place* omegaPlaces[finalmarking->children().size()];
-	int omegaTokens[finalmarking->children().size()];
-	int om = 0; // Current index.
+	for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
+	finalMarkingIt != fSet->partialMarkings.end();
+	++finalMarkingIt) {
 
-	// Build a map for quick transition referencing
-	std::map<pnapi::Transition*, unsigned int> transitionID;
-	unsigned int current = 0;
-	for (std::set<pnapi::Transition*>::iterator tIt = net->getTransitions().begin(); tIt != net->getTransitions().end(); ++tIt) {
-		transitionID[*tIt] = current;
-	}
+		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
+		XSE->constructLP();
 
-	const unsigned int NR_OF_COLS = net->getTransitions().size() + net->getInterfacePlaces().size() + finalmarking->children().size();
-	const unsigned int START_TRANSITIONS = 1;
-	const unsigned int START_EVENTS = START_TRANSITIONS + net->getTransitions().size();
-	const unsigned int START_OMEGAS = START_EVENTS + net->getInterfacePlaces().size();
+		for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
+			std::cout << "Evaluate..." << std::endl;
 
-	if (args_info.verbose_given) {
-		fprintf(stderr, "%s: Number of columns: %i (%i transitions, %i events, %i final places)\n", PACKAGE, NR_OF_COLS, START_EVENTS-1, START_OMEGAS-START_EVENTS, NR_OF_COLS-START_OMEGAS+1);
-	}
+			XSE->evaluate((*it));
 
-	lprec *lp;
+			std::cout << "...evaluated" << std::endl;
 
-	lp = make_lp(0, NR_OF_COLS);
-
-	if(lp == NULL) {
-		fprintf(stderr, "Unable to create new LP model\n");
-		return(1);
-	}
-	set_verbose(lp,0);
-
-	set_add_rowmode(lp, TRUE);
-
-	// Go through the final marking and create an equation for each place specified
-	for (std::set<const pnapi::formula::Formula *>::iterator fIt = finalmarking->children().begin(); fIt != finalmarking->children().end(); ++fIt) {
-
-		// Retrieve the place.
-		const pnapi::formula::Formula& f = (**fIt);
-		const pnapi::formula::Proposition* p = dynamic_cast<const pnapi::formula::Proposition*> (&f);
-
-		if (p == NULL) {
-			fprintf(stderr, "%s: Finalmarking not recognizable.\n", PACKAGE);
-			exit(EXIT_FAILURE);
 		}
 
-		const pnapi::Place* place = &(p->place());
-
-		// Right now we are ignoring it, if an interface place is specified in the final marking.
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place *>(place)) == net->getInterfacePlaces().end()) {
-
-			// First, add the marking as a range for the corresponding place column.
-			omegaPlaces[om] = &(p->place());
-			omegaTokens[om] = p->tokens();
-			int intermediate = p->tokens() - p->place().getTokenCount();
-			set_bounds(lp,START_OMEGAS + om,intermediate,intermediate);
-
-			// Now, add the constraint for the place.
-			std::set<pnapi::Arc *> preset = p->place().getPresetArcs();
-			std::set<pnapi::Arc *> postset = p->place().getPostsetArcs();
-			int transCol[preset.size() + postset.size() + 1];
-			REAL transVal[preset.size() + postset.size() + 1];
-
-			int tr = 0;
-
-			// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
-			for (set<pnapi::Arc *>::iterator pIt = preset.begin(); pIt != preset.end();
-			++pIt) {
-				pnapi::Transition& t = (*pIt)->getTransition();
-				// We add the transition, with the weight as a factor.
-				transCol[tr] = START_TRANSITIONS + transitionID[&t];
-				transVal[tr++] = (*pIt)->getWeight();
-			}
-
-			// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
-			for (set<pnapi::Arc *>::iterator pIt = postset.begin(); pIt != postset.end(); ++pIt) {
-				pnapi::Transition& t = (*pIt)->getTransition();
-				// We add the transition, with the weight as a factor.
-				transCol[tr] = START_TRANSITIONS + transitionID[&t];
-				transVal[tr++] = -1 * (int) (*pIt)->getWeight();
-			}
-
-			// The corresponding final place
-			transCol[tr] = START_OMEGAS + om;
-			transVal[tr] = -1;
-
-			add_constraintex(lp, preset.size() + postset.size() + 1, transVal, transCol, EQ, 0);
-
-			++om;
-		}
 	}
 
 
-	// Now add all the events
+	std::cout << "Linda is done!" << std::endl;
 
-	pnapi::Place* EventPtr[net->getInterfacePlaces().size()];
-	std::map<EVENT,unsigned int> EventID;
 
-	int ev = 0;
-	for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-
-		pnapi::Place* p = *it;
-
-		EventPtr[ev+START_EVENTS] = p;
-		EventID[p] = ev+START_EVENTS;
-
-		std::set<pnapi::Arc *> preset = p->getPresetArcs();
-		std::set<pnapi::Arc *> postset = p->getPostsetArcs();
-
-		int transCol[preset.size() + postset.size() + 1];
-		REAL transVal[preset.size() + postset.size() + 1];
-		int tr = 0;
-
-		// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
-		for (set<pnapi::Arc *>::iterator pIt = preset.begin(); pIt != preset.end();
-		++pIt) {
-			pnapi::Transition& t = (*pIt)->getTransition();
-			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID[&t];
-			transVal[tr++] = (*pIt)->getWeight();
-		}
-
-		// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
-		for (set<pnapi::Arc *>::iterator pIt = postset.begin(); pIt != postset.end(); ++pIt) {
-			pnapi::Transition& t = (*pIt)->getTransition();
-			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID[&t];
-			transVal[tr++] = (*pIt)->getWeight();
-		}
-		transCol[tr] = START_EVENTS + ev++;
-		transVal[tr] = -1;
-		add_constraintex(lp, preset.size() + postset.size() + 1, transVal, transCol, EQ, 0);
-	}
-
-	set_add_rowmode(lp, FALSE);
-	for (int i = START_TRANSITIONS; i < START_OMEGAS; ++i) {
-		set_int(lp,i,'1');
-	}
-
-	L0MessageProfile mp(net->getInterfacePlaces().size());
-	EBV candidate;
-
-	for (int i = START_EVENTS; i < START_OMEGAS; ++i) {
-
-		int objCol[1];
-		REAL objVal[1];
-
-		objCol[0] = i;
-		objVal[0] = 1;
-		set_obj_fnex(lp, 1, objVal, objCol);
-
-		Bounds<EVENT> b(EventPtr[i]);
-		set_minim(lp);
-
-		int result = solve(lp);
-		if (result == 0) {
-			b.min = (int) get_objective(lp);
-		}
-
-		set_maxim(lp);
-		result = solve(lp);
-		if (result == 0) {
-			b.max = (int) get_objective(lp);
-		}
-
-		mp.bounds[i-START_EVENTS] = b;
-		candidate.push_back(b);
-	}
-
-	vector<EventSetBound> results;
-	set<PPS> alreadyTested;
-
-	if (args_info.level_1_given) {
-		findMaxDependenciesR(candidate, results, alreadyTested, lp, EventID);
-	}
-
-	delete_lp(lp);
-
-	time(&end_time);
-
-	mp.out();
-
-	if (args_info.verbose_given) {
-		fprintf(stderr, "%s: Calculation took %.0f seconds.\n", PACKAGE, difftime(end_time, start_time));
-	}
 }

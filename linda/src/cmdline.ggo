@@ -19,3 +19,11 @@ option "level-0" 0
 option "level-1" 1
   "Level 1 Message Profile"
   flag off
+  
+section "Advanced Options"
+
+option "bound" b
+  "A bound for the internal places of the open net."
+  int typestr="positive integer value"
+  default="10"
+  optional

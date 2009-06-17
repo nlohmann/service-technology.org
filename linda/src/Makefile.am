@@ -1,6 +1,9 @@
 bin_PROGRAMS = linda
 
 linda_SOURCES = main.cc \
+		setsOfFinalMarkings.cc setsOfFinalMarkings.h \
+		stateEquation.cc stateEquation.h \
+		eventTerm.cc eventTerm.h \
         helpers.h helpers.cc \
         bounds.h  \
         messageprofile.h  \

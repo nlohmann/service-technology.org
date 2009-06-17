@@ -160,9 +160,9 @@ int main(int argc, char** argv) {
     /*-------------------------------------------------.
     | 4. transform most-permissive partner to open net |
     `-------------------------------------------------*/
-    PetriNet mpp = mpp_sa->stateMachine();
+    PetriNet *mpp = new PetriNet(mpp_sa->stateMachine());
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << mpp << std::endl;
+        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp << std::endl;
     }
 
     /*------------------------.
@@ -172,11 +172,11 @@ int main(int argc, char** argv) {
     if (not target_file) {
         abort(6, "could not read target service '%s'", args_info.inputs[1]);
     }
-    PetriNet target;
-    target_file >> pnapi::io::owfn >> target;
+    PetriNet *target = new PetriNet();
+    target_file >> pnapi::io::owfn >> *target;
     target_file.close();
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": target: " << pnapi::io::stat << target << std::endl;
+        std::cerr << PACKAGE << ": target: " << pnapi::io::stat << *target << std::endl;
     }
 
     /*------------------------------------------------------.
@@ -184,9 +184,9 @@ int main(int argc, char** argv) {
     `------------------------------------------------------*/
     // compse nets and add prefixes (if you wish to change them here, don't
     // forget to also adjust the lexer lexic_graph.ll)
-    mpp.compose(target, "mpp[1].", "target[1].");
+    mpp->compose(*target, "mpp[1].", "target[1].");
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": composition: " << pnapi::io::stat << mpp << std::endl;
+        std::cerr << PACKAGE << ": composition: " << pnapi::io::stat << *mpp << std::endl;
     }
 
     /*-------------------------------------------------.
@@ -196,7 +196,7 @@ int main(int argc, char** argv) {
     if (not composition_lolafile) {
         abort(7, "could not write composition");
     }
-    composition_lolafile << pnapi::io::lola << mpp;
+    composition_lolafile << pnapi::io::lola << *mpp;
     composition_lolafile.close();
     string lola_command = args_info.safe_flag ? "lola-full1" : string(BINARY_LOLA);
     lola_command += " " + lola_filename + " -M";

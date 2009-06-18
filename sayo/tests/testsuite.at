@@ -77,7 +77,6 @@ AT_SETUP([Complex Public View])
 AT_CHECK_SA2SM
 AT_CHECK_WENDY
 AT_CHECK_FIONA
-AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/complexPV.*.og .])
 AT_CHECK([SAYO --input=complexPV.wendy.og --output=complexPV.sa])
 AT_CHECK([SA2SM complexPV.sa complexPV.owfn])

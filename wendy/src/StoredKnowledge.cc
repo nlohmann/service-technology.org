@@ -991,23 +991,21 @@ string StoredKnowledge::bits() const {
         return "F";
     }
 
+    // traverse the deadlocks
     for (unsigned int i = 0; i < size; ++i) {
-        if (not (InnerMarking::inner_markings[inner[i]]->is_final) and interface[i]->unmarked()) {
-            bool resolved = false;
+        bool resolved = false;
 
-            // we found a deadlock -- check whether for at least one marked
-            // output place exists a respective receiving edge
-            for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-                if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
-                    resolved = true;
-                    break;
-                }
+        // check whether receiving resolves this deadlock
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
+                resolved = true;
+                break;
             }
+        }
 
-            if (not resolved) {
-                // the deadlock can not be resolved by receiving -> must send
-                return "S";
-            }
+        if (not resolved) {
+            // the deadlock can not be resolved by receiving -> must send
+            return "S";
         }
     }
 

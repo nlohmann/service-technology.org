@@ -10,7 +10,7 @@
 Version 1.5-unreleased
 ======================
 
-* ...
+* fixed bug #13718 (`https://gna.org/bugs/?13651') - fixed bit annotations
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

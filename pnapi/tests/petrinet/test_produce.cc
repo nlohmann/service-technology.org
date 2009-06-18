@@ -1,8 +1,8 @@
 #include <fstream>
 #include <map>
+#include <cstdlib>
 #include "test.h"
 
-#define CHECK std::cerr << "check " << __FILE__ << "@" << __LINE__ << std::endl;
 
 using std::map;
 using std::ofstream;
@@ -26,19 +26,21 @@ int main(int argc, char * argv[])
   }
   ifs.close();
  
-  ifstream ifs2;
+  ifs.clear();
+  
+  //ifstream ifs2;
   PetriNet constraint;
-  ifs2.open("test_produce.onlineshop.constraint.owfn");
+  ifs.open("test_produce.onlineshop.constraint.owfn");
   try {
-    ifs2 >> owfn >> constraint;
+    ifs >> owfn >> constraint;
   }
   catch (pnapi::io::InputError error) 
   {
     std::cerr << "test_produce:" << error << endl;
-    ifs2.close();
+    ifs.close();
     exit(EXIT_FAILURE);
   }
-  ifs2.close();
+  ifs.close();
 
   begin_test("PetriNet::produce() [product with constraint oWFN]");
   net.produce(constraint);

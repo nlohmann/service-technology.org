@@ -73,7 +73,7 @@ public:
 	}
 	virtual EventTerm* flatten();
 	virtual EventTerm* multiplyWith(int);
-	BasicTerm::~BasicTerm();
+	~BasicTerm();
 };
 
 

@@ -27,6 +27,8 @@ public:
 	static std::map<pnapi::Place* const,int>* termToMap(EventTerm*);
 	static std::vector<EventTerm*>* createBasicTermSet(pnapi::PetriNet*);
 	static EventTerm* createRandomEventTerm(pnapi::PetriNet*);
+	static std::map<std::string,pnapi::Place*> events;
+	virtual ~EventTerm() {}
 };
 
 class AddTerm : public EventTerm {
@@ -40,6 +42,7 @@ public:
 	AddTerm(EventTerm* t1, EventTerm* t2) : term1(t1),term2(t2) {};
 	virtual EventTerm* flatten();
 	virtual EventTerm* multiplyWith(int);
+	virtual ~AddTerm();
 };
 
 class MultiplyTerm : public EventTerm {
@@ -53,6 +56,7 @@ public:
 	}
 	virtual EventTerm* flatten();
 	virtual EventTerm* multiplyWith(int);
+	virtual ~MultiplyTerm();
 };
 
 class BasicTerm : public EventTerm {
@@ -60,13 +64,16 @@ public:
 	virtual void collectR(std::map<pnapi::Place* const,int>*)  {};
 
 	BasicTerm(pnapi::Place* e) : event(e) {}
+	BasicTerm(std::string* s) : event(events[*s]) {	}
 
 	pnapi::Place* const event;
 	virtual std::string toString() {
+		if (event == 0) return "dummy";
 		return event->getName();
 	}
 	virtual EventTerm* flatten();
 	virtual EventTerm* multiplyWith(int);
+	BasicTerm::~BasicTerm();
 };
 
 

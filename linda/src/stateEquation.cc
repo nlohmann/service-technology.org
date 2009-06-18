@@ -24,6 +24,10 @@ bool ExtendedStateEquation::constructLP() {
 	}
 	lp = make_lp(0, NR_OF_COLS);
 
+	for (int i = 1; i <= NR_OF_COLS; ++i) {
+		set_int(lp,i,TRUE);
+	}
+
 	if(lp == NULL) {
 		fprintf(stderr, "Unable to create new LP model\n");
 		exit(1);
@@ -56,9 +60,9 @@ bool ExtendedStateEquation::constructLP() {
 		++pIt) {
 			pnapi::Transition& t = (*pIt)->getTransition();
 			// We add the transition, with the weight as a factor.
-			
+
 			assert(tr < number_of_transitions_for_this_place);
-			
+
 			transCol[tr] = START_TRANSITIONS + transitionID[&t];
 			transVal[tr] = (*pIt)->getWeight();
 			++tr;
@@ -122,24 +126,28 @@ bool ExtendedStateEquation::constructLP() {
 	}
 
 	set_add_rowmode(lp, FALSE);
-	
+
 	int ret = solve(lp);
 
 	if (ret == INFEASIBLE) {
-		std::cout << "...Final marking not reachable from initial marking." << std::endl;
+		std::cout << "Final marking not reachable from initial marking:" << std::endl;
+		std::cout << "\t";
+		omega->output();
 		return false;
-	} 
+	}
 
+	isFeasible = true;
+	isConstructed = true;
 
 }
 
 void ExtendedStateEquation::evaluate(EventTerm* e) {
 
-	std::cout << e->toString() << " =" ;
+	std::cout << "\t" << e->toString() << " =" ;
 
 
 	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(e);
-	
+
 
 	int counter = 0;
 	double obj_row[map->size()];
@@ -161,7 +169,7 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 	}
 
 	std::cout << " : ";
-	
+
 	int ret;
 
 	assert(set_obj_fnex(lp,map->size(),obj_row,obj_cols)== TRUE);

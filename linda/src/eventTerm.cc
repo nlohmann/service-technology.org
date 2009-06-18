@@ -7,6 +7,8 @@
 
 #include <eventTerm.h>
 
+std::map<std::string,pnapi::Place*> EventTerm::events;
+
 std::vector<EventTerm*>* EventTerm::createBasicTermSet(pnapi::PetriNet* net) {
 
 	vector<EventTerm*>* result = new vector<EventTerm*>();
@@ -52,21 +54,32 @@ EventTerm* EventTerm::createRandomEventTerm(pnapi::PetriNet* net) {
 
 }
 
+MultiplyTerm::~MultiplyTerm() {
+	delete term;
+}
+
+AddTerm::~AddTerm() {
+	delete term1;
+	delete term2;
+}
+
+BasicTerm::~BasicTerm() {
+	// Do nothing!!!
+}
+
+
 EventTerm* MultiplyTerm::flatten() {
-	term = term->flatten();
-	term = term->multiplyWith(this->factor);
-	return term;
+	EventTerm* result = term->flatten();
+	result = result->multiplyWith(this->factor);
+	return result;
 }
 
 EventTerm* AddTerm::flatten() {
-	term1 = term1->flatten();
-	term2 = term2->flatten();
-	return this;
+	return new AddTerm(term1->flatten(),term2->flatten());
 }
 
 EventTerm* BasicTerm::flatten() {
-	EventTerm* result = new MultiplyTerm(this,1);
-	return result;
+	return new MultiplyTerm(new BasicTerm(event),1);
 }
 
 EventTerm* MultiplyTerm::multiplyWith(int k) {

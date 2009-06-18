@@ -10,7 +10,7 @@ option "verbose" v
   "Verbose output"
   flag off
 
-section "Message Profile Levels" 
+section "Message Profile" 
 
 option "level-0" 0
   "Level 0 Message Profile"
@@ -20,6 +20,15 @@ option "random" r
   "Random Message Profile from a specified number of terms."
   int typestr="uint"
   optional 
+
+option "file" f
+  "Message Profile from a term file"
+  string typestr="path"
+  optional
+
+option "interactive" i
+  "Interactive Message Profile building"
+  flag off
   
 section "Advanced Options"
 

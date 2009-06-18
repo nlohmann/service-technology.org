@@ -22,15 +22,24 @@ public:
 		net = aNet;
 		omega = aFinalMarking;
 		lp = NULL;
+		isFeasible = false;
+		isConstructed = false;
 	}
 
 	bool constructLP();
+
+	bool isFeasible;
+	bool isConstructed;
 
 	void output() {
 		print_lp(lp);
 	}
 
 	void evaluate(EventTerm*);
+
+	~ExtendedStateEquation() {
+		delete_lp(lp);
+	}
 
 private:
 	std::map<EVENT,unsigned int> EventID;

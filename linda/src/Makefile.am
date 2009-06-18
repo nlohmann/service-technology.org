@@ -7,7 +7,8 @@ linda_SOURCES = main.cc \
         helpers.h helpers.cc \
         bounds.h  \
         messageprofile.h  \
-        cmdline.c cmdline.h
+        cmdline.c cmdline.h \
+        syntax_et.yy lexer_et.ll
 
 
 linda_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.a
@@ -19,11 +20,11 @@ linda_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 linda_CPPFLAGS += -I$(top_srcdir)/libs
 endif
 
-BUILT_SOURCES = cmdline.c
+BUILT_SOURCES = cmdline.c syntax_et.cc syntax_et.h lexer_et.cc
 
 EXTRA_DIST = cmdline.ggo
 
-MAINTAINERCLEANFILES = cmdline.c cmdline.h
+MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_et.cc syntax_et.h lexer_et.cc
 
 
 ################################################################

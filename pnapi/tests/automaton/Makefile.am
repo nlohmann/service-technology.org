@@ -11,11 +11,14 @@ test_statemachine_SOURCES = test_statemachine.cc
 # include test and api sources and libs
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src
 LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.la
+AM_CXXFLAGS = @configured_CXXFLAGS@
+AM_CFLAGS = @configured_CFLAGS@
+AM_LDFLAGS = @configured_LDFLAGS@
 
 EXTRA_DIST = $(TESTS) \
-             sequence_normal.net.owfn \
-             sequence_unnormal.net.owfn \
-             strange_net.net.owfn \
+             test_construction.sequence_normal_net.owfn \
+             test_construction.sequence_unnormal_net.owfn \
+             test_construction.strange_net.owfn \
 	     test_statemachine.net.owfn
 
 

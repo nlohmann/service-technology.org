@@ -6,3 +6,14 @@
                       http://service-technology.org/mia
 
 
+Version 1.0
+===========
+
+* initial release
+
+* Mia can calculate the jumper transitions to migrate instances
+
+* depends on Wendy 1.4+ and LoLA (compiled with `FULL' option)
+
+
+

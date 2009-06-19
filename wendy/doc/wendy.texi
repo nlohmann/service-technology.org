@@ -319,7 +319,16 @@ Wendy can either create operating guidelines or a service automaton. The options
 
 @smallexample
 @cartouche
-wendy: '--og' and '--sa' parameter are mutually exclusive -- aborting [#12]
+wendy: `--og' and `--sa' parameter are mutually exclusive -- aborting [#12]
+@end cartouche
+@end smallexample
+
+@item #13
+Wendy cannot create a temporary file @file{/tmp/wendy-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there.
+
+@smallexample
+@cartouche
+wendy: could not create a temporary file `/tmp/wendy-k4CS4x' -- aborting [#13]
 @end cartouche
 @end smallexample
 

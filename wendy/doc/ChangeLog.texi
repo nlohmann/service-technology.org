@@ -1,6 +1,8 @@
 @heading Version 1.5-unreleased
 @itemize
 @item fixed bug #13718 (@url{https://gna.org/bugs/?13651}) -- fixed bit annotations
+
+@item used @code{mkstemp} function to create temporary filenames
 @end itemize
 
 

@@ -189,13 +189,22 @@ int main(int argc, char** argv) {
     /*--------------------------------------------.
     | 3. write inner of the open net to LoLA file |
     `--------------------------------------------*/
-    std::ofstream lolaFile("tmp.lola", std::ofstream::out | std::ofstream::trunc);
+    // create a unique temporary file name
+    char tmp[] = "/tmp/wendy-XXXXXX";
+    if (mkstemp(tmp) == -1) {
+        abort(13, "could not create a temporary file '%s'", tmp);
+    }
+    std::string tmpname(tmp);
+
+    std::ofstream lolaFile((tmpname + ".lola").c_str(), std::ofstream::out | std::ofstream::trunc);
     if (!lolaFile) {
-        abort(11, "could not write to file 'tmp.lola'");
+        abort(11, "could not write to file '%s.lola'", tmpname.c_str());
     }
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
-
+    if (args_info.verbose_flag) {
+        fprintf(stderr, "%s: created file '%s.lola'\n", PACKAGE, tmpname.c_str());
+    }
 
     /*------------------------------------------.
     | 4. call LoLA and parse reachability graph |
@@ -217,19 +226,17 @@ int main(int argc, char** argv) {
 
     // read from a pipe or from a file
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)
-    command_line += " tmp.lola -M 2> /dev/null";
+    command_line += " " + tmpname + ".lola -M 2> /dev/null";
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
 #else
-    command_line += " tmp.lola -m &> /dev/null";
+    command_line += " " + tmpname + ".lola -m &> /dev/null";
     system(command_line.c_str());
-    graph_in = fopen("tmp.graph", "r");
+    graph_in = fopen((tmpname + ".graph").c_str(), "r");
     graph_parse();
     fclose(graph_in);
-    remove("tmp.graph");
 #endif
-    remove("tmp.lola");
     time(&end_time);
 
     // close marking information output file

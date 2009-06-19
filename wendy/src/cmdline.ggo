@@ -72,16 +72,19 @@ sectiondesc="These options control the graphical representation of the calculate
 
 option "showEmptyNode" -
   "Show the empty node (dot only)."
+  details="The empty node is a knowledge that is unreachable (hence empty), but plays an important rule when matching a service with the operating guidelines or decided substitutability. The empty node is always written to '.og' files, but is optional for '.dot' files.\n"
   dependon="dot"
   flag off
 
 option "showWaitstates" -
   "Show waitstates (dot only)."
+  details="A waitstate is a state that the net can only leave with an asynchronous receive event or a synchronous event. Waitstates help to understand how the CNF formulas are constructed.\n"
   dependon="dot"
   flag off
 
 option "showTransients" -
   "Show transient states (dot only)."
+  details="A transient state is a state that enables a transition.\n"
   dependon="dot"
   flag off
 
@@ -90,6 +93,7 @@ section "Optimizations"
 
 option "noDeadlockDetection" -
   "Do not detect inevitable deadlocks during preprocessing."
+  details="Inevitable deadlocks are detected while parsing the state space created by LoLA. This optimization does not change the calculated operating guidelines, but may help to speed up its calculation. Switching off this optimization is only provided for debugging and diagnosis purposes.\n"
   flag off
 
 option "waitstatesOnly" -

@@ -13,7 +13,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
 wendy_CPPFLAGS = -I$(top_srcdir)/libs
-wendy_LDADD =  $(top_builddir)/libs/libpnapi.a
+wendy_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 BUILT_SOURCES = cmdline.c syntax_graph.cc

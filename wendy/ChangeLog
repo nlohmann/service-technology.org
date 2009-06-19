@@ -12,6 +12,8 @@ Version 1.5-unreleased
 
 * fixed bug #13718 (`https://gna.org/bugs/?13651') - fixed bit annotations
 
+* used `mkstemp' function to create temporary filenames
+
 Version 1.4
 ===========
 

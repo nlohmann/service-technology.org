@@ -1,0 +1,31 @@
+# gengetopt input file
+
+args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+
+purpose "DIANE - Decomposition Into Atomic NEts."
+
+description "Diane cuts a Petri net into parts."
+
+section "Input and Output"
+
+option "input" i
+    "Specifies input file. If not specified DIANE will read from stdin."
+    string
+    typestr="FILENAME"
+    optional
+
+option "output" o
+    "Specifies the output files' prefix. If not specified DIANE will derive the output filenames from input filename."
+    string
+    typestr="FILEPREFIX"
+    optional
+    
+option "quiet" q
+    "No output file will be written by DIANE."
+    flag off
+    
+section "Debug Options"
+    
+option "verbose" v
+    "Verbose output."
+    flag off

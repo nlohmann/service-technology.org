@@ -1,0 +1,27 @@
+{ Petri net created by Petri Net API 2.00 reading zeus.owfn }
+
+PLACE
+  p1, p2, p3, p4;
+
+MARKING
+  p1:1;
+
+
+TRANSITION t1
+  CONSUME p1:1;
+  PRODUCE p2:1;
+
+TRANSITION t2
+  CONSUME p2:1;
+  PRODUCE p1:1;
+
+TRANSITION t3
+  CONSUME p2:1;
+  PRODUCE p3:1;
+
+TRANSITION t4
+  CONSUME p3:1;
+  PRODUCE p4:1;
+
+
+{ END OF FILE }

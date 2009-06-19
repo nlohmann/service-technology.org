@@ -20,8 +20,6 @@ using std::map;
 using std::vector;
 using std::ifstream;
 using std::ofstream;
-using pnapi::Automaton;
-using pnapi::PetriNet;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -44,9 +42,9 @@ extern FILE *im_in;
 extern FILE *mi_in;
 
 // the parsers
+extern int graph_parse();
 extern int im_parse();
 extern int mi_parse();
-extern int graph_parse();
 
 
 /*!
@@ -150,7 +148,7 @@ int main(int argc, char** argv) {
     if (not mpp_file) {
         abort(5, "could not read most-permissive partner");
     }
-    Automaton *mpp_sa = new Automaton();
+    pnapi::Automaton *mpp_sa = new pnapi::Automaton();
     mpp_file >> pnapi::io::sa >> *mpp_sa;
     mpp_file.close();
     if (args_info.verbose_flag) {
@@ -160,7 +158,7 @@ int main(int argc, char** argv) {
     /*-------------------------------------------------.
     | 4. transform most-permissive partner to open net |
     `-------------------------------------------------*/
-    PetriNet *mpp = new PetriNet(mpp_sa->stateMachine());
+    pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
     if (args_info.verbose_flag) {
         std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp << std::endl;
     }
@@ -172,7 +170,7 @@ int main(int argc, char** argv) {
     if (not target_file) {
         abort(6, "could not read target service '%s'", args_info.inputs[1]);
     }
-    PetriNet *target = new PetriNet();
+    pnapi::PetriNet *target = new pnapi::PetriNet();
     target_file >> pnapi::io::owfn >> *target;
     target_file.close();
     if (args_info.verbose_flag) {
@@ -226,9 +224,20 @@ int main(int argc, char** argv) {
     mi_parse();
     fclose(mi_in);
 
-    /*-------------------------.
-    | 9. find migration states |
-    `-------------------------*/
+    /*---------------------------.
+    | 9. find jumper transitions |
+    `---------------------------*/
+    FILE *outputfile = stdout;
+    if (args_info.output_given) {
+        outputfile = fopen(args_info.output_arg, "w");
+        if (!outputfile) {
+            abort(12, "could not write to file '%s'", args_info.output_arg);
+        }
+        if (args_info.verbose_flag) {
+            fprintf(stderr, "%s: writing jumper transitions to '%s'\n", PACKAGE, args_info.output_arg);
+        }
+    }
+
     unsigned int jumperCount = 0;
     for (map<unsigned, vector<vector<unsigned int> > >::iterator q1 = tuples_source.begin(); q1 != tuples_source.end(); ++q1) {
         for (map<string, set<vector<unsigned int> > >::iterator q2 = tuples_target.begin(); q2 != tuples_target.end(); ++q2) {
@@ -240,13 +249,13 @@ int main(int argc, char** argv) {
                 }
             }
             if (pos) {
-                fprintf(stdout, "[%s] -> [%s]\n", id2marking[q1->first].c_str(), q2->first.c_str());
+                fprintf(outputfile, "[%s] -> [%s]\n", id2marking[q1->first].c_str(), q2->first.c_str());
                 ++jumperCount;
             }
         }
     }
     if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: %d migration points found\n", PACKAGE, jumperCount);
+        fprintf(stderr, "%s: %d jumper transitions found\n", PACKAGE, jumperCount);
     }
 
     return EXIT_SUCCESS;

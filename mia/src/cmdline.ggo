@@ -4,11 +4,19 @@ purpose "Mia -- migrating instances"
 
 description "Usage: "
 
-section "Options"
 
-option "safe" -
-  "Assume that the message bound 1 one and the target net is safe."
-  flag off
+section "Input/Output"
+sectiondesc="Exactly two files have to be given as input.\n"
+
+option "output" o
+  "Write jumper transitions to file. If omitted, jumper transitions are written to standard output."
+  string
+  typestr="FILENAME"
+  optional
+
+
+section "Options"
+sectiondesc="These options control how the most-permissive partner and the composition is calculated.\n"
 
 option "messagebound" m
   "Set the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
@@ -16,6 +24,10 @@ option "messagebound" m
   typestr="BOUND"
   default="1"
   optional
+
+option "safe" s
+  "Assume that the message bound 1 one and the target net is safe."
+  flag off
 
 
 section "Debug"

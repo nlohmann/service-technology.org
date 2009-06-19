@@ -1,5 +1,6 @@
-@heading Version 0.1
+@heading Version 1.0
 @itemize
 @item initial release
-@item added Gnits compliance
+@item Mia can calculate the jumper transitions to migrate instances
+@item depends on Wendy 1.4+ and LoLA (compiled with @samp{FULL} option)
 @end itemize

@@ -5,12 +5,15 @@
                                |_|  |_|_|\__,_|
                       http://service-technology.org/mia
 
-Version 0.1
+
+Version 1.0
 ===========
 
 * initial release
 
-* added Gnits compliance
+* Mia can calculate the jumper transitions to migrate instances
+
+* depends on Wendy 1.4+ and LoLA (compiled with `FULL' option)
 
 
 

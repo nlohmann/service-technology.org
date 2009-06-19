@@ -14,11 +14,11 @@ candy_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a
 #linda_CPPFLAGS = -I$(top_srcdir)/libs/pnapi -I$(top_srcdir)/libs/lp_solve
 candy_CPPFLAGS = -I$(top_srcdir)/libs/pnapi
 
-BUILT_SOURCES = cmdline.c og-syntax.cc
+BUILT_SOURCES = cmdline.c og-syntax.cc cf-syntax.cc
 
-EXTRA_DIST = cmdline.ggo og-syntax.h
+EXTRA_DIST = cmdline.ggo og-syntax.h cf-syntax.h
 
-MAINTAINERCLEANFILES = cmdline.c cmdline.h og-syntax.h
+MAINTAINERCLEANFILES = cmdline.c cmdline.h og-syntax.h cf-syntax.h
 
 
 ################################################################

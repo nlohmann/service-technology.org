@@ -1,6 +1,9 @@
 #include "Node.h"
 #include <iostream>
-//#include <cassert>
+
+// if you need assertions, always include these headers in _this_ order
+#include "config.h"
+#include <cassert>
 
 using std::cout;
 using std::endl;

@@ -1,7 +1,10 @@
+// if you need assertions, always include these headers in _this_ order
+#include "config.h"
+#include <cassert>
+
 // TODO remove?
 // Merke: Header sind Case-Sensitiv
 //#include <ctime>
-//#include <cassert> für das assert Makro
 //#include <sstream>
 //#include <cstdio>
 //#include "pnapi.h"
@@ -18,8 +21,6 @@
 // header from gengetopt
 #include "cmdline.h"
 // header from configure
-#include "config.h"
-// header for graph class
 #include "Graph.h"
 
 

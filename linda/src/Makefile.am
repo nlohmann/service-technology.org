@@ -22,7 +22,7 @@ endif
 
 BUILT_SOURCES = cmdline.c syntax_et.cc syntax_et.h lexer_et.cc
 
-EXTRA_DIST = cmdline.ggo
+EXTRA_DIST = syntax_et.h cmdline.ggo
 
 MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_et.cc syntax_et.h lexer_et.cc
 

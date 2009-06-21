@@ -36,6 +36,15 @@ above and replace them with the notice and other provisions required by the
 AGPL. If you do not delete the provisions above, a recipient may use your
 version of this file under the terms of any one of the EPL or the AGPL.
 
+The following material is made available only under the terms of the EPL.
+  - all files in ./icons/ and its subdirectories
+  
+If you wish to redistributed this package or works that base on this
+package under terms which are not compatible with the EPL, please remove
+all aforementioned material that is only made available the terms of the
+EPL. 
+
+
 
 ==============================================================================
 

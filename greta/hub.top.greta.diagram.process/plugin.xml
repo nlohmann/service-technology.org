@@ -96,7 +96,7 @@ version of this file under the terms of any one of the EPL or the AGPL.
       <objectContribution
             adaptable="false"
             id="hub.top.GRETA.diagram.process.LoadResource"
-            objectClass="hub.top.adaptiveSystem.diagram.edit.parts.AP_ProcessEditPart">
+            objectClass="hub.top.adaptiveProcess.diagram.edit.parts.AP_ProcessEditPart">
          <action
                class="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessLoadResourceAction"
                enablesFor="1"

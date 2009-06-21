@@ -8,6 +8,17 @@
             label="Adaptive System Actions"
             visible="true">
          <action
+               class="hub.top.greta.run.actions.AdaptiveProcessSimulation"
+               disabledIcon="icons/full/dtool16/run_exc.gif"
+               icon="icons/full/etool16/run_exc.gif"
+               id="hub.top.GRETA.run.simulation"
+               label="start simulation"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               style="push"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               tooltip="start simulation of adaptive process">
+         </action>
+         <action
                class="hub.top.greta.run.actions.AdaptiveProcessStep"
                disabledIcon="icons/adaptiveProcessStepDisabled4.png"
                icon="icons/adaptiveProcessStepEnabled4.png"
@@ -17,6 +28,43 @@
                style="push"
                toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
                tooltip="go one step in adaptive process">
+         </action>
+         <!--
+         <action
+               class="hub.top.greta.run.actions.AdaptiveProcessChooseEvent"
+               disabledIcon="icons/FireEventDisabled.png"
+               icon="icons/FireEventEnabled2.png"
+               id="hub.top.GRETA.run.chooseEvent"
+               label="extend adaptive process"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               style="push"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               tooltip="extend adaptive process">
+         </action>
+         -->
+         <action
+               class="hub.top.greta.run.actions.AdaptiveProcessRun"
+               disabledIcon="icons/full/dlcl16/resume_co.gif"
+               icon="icons/full/elcl16/resume_co.gif"
+               id="hub.top.GRETA.run.process"
+               label="step in adaptive process"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               state="false"
+               style="push"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               tooltip="step in adaptive process">
+         </action>
+         <action
+               class="hub.top.greta.run.actions.AdaptiveProcessReset"
+               disabledIcon="icons/full/dlcl16/refresh.gif"
+               icon="icons/full/elcl16/refresh.gif"
+               id="hub.top.GRETA.run.reset"
+               label="reset current run"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               state="false"
+               style="push"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               tooltip="reset current run">
          </action>
          <action
                class="hub.top.greta.run.actions.CheckOclets"
@@ -45,6 +93,7 @@
                style="push"
                tooltip="build state space of the system">
          </action>
+         <!--
          <action
                class="hub.top.greta.run.actions.BuildBranchingProcess"
                id="hub.top.GRETA.run.buildBranchingProcess"
@@ -53,6 +102,15 @@
                style="push"
                tooltip="build branching process of the system">
          </action>
+         <action
+               class="hub.top.greta.run.actions.BuildBranchingProcess2"
+               id="hub.top.GRETA.run.buildBranchingProcess2"
+               label="build branching process (new)"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
+               style="push"
+               tooltip="build branching process of the system">
+         </action>
+         -->
          <action
                class="hub.top.greta.run.actions.InstantiateSystem"
                id="hub.top.GRETA.run.instantiateSystem"
@@ -101,5 +159,81 @@
          </menu>
       </menuContribution>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.GRETA.run.apDiagramFileActions"
+            nameFilter="*.adaptivesystem_diagram"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.GRETA.run.apDiagramMenu"
+               label="Adaptive Processes"
+               path="additions">
+            <separator
+                  name="maintenance">
+            </separator>
+            <separator
+                  name="analysis">
+            </separator>
+         </menu>
+         <action
+               class="hub.top.greta.run.actions.FixDiagramFile"
+               enablesFor="1"
+               id="hub.top.GRETA.run.fixDiagramFileAction"
+               label="Fix diagram file"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
+         </action>
+         <action
+               class="hub.top.greta.run.actions.BuildStateSpace"
+               enablesFor="1"
+               id="hub.top.GRETA.run.buildStateSpace"
+               label="build transition system"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
+         </action>
+         <!--
+         <action
+               class="hub.top.greta.run.actions.InitProcessSimulationView"
+               enablesFor="1"
+               id="hub.top.GRETA.run.initProcessSimulationViewAction"
+               label="Initialize Simulation View"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
+         </action>
+         -->
+      </objectContribution>
+      <!--
+      <objectContribution
+            id="hub.top.GRETA.run.apModelFileActions"
+            nameFilter="*.adaptivesystem"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.GRETA.run.apDiagramMenu"
+               label="Adaptive Processes"
+               path="additions">
+            <separator
+                  name="maintenance">
+            </separator>
+         </menu>
+         <action
+               class="hub.top.greta.run.actions.InitProcessSimulationView"
+               enablesFor="1"
+               id="hub.top.GRETA.run.initProcessSimulationViewAction"
+               label="Initialize Simulation View"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
+         </action>
+      </objectContribution>
+      -->
+   </extension>
+   <!--
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="hub.top.greta.run.editors.AdaptiveSystemMultiEditor"
+            contributorClass="hub.top.greta.run.editors.AdaptiveSystemMultiEditorContributor"
+            extensions="adaptivesystem_diagram"
+            icon="icons/sample.gif"
+            id="hub.top.greta.run.editors.AdaptiveSystemMultiEditor"
+            name="Adaptive System Editor">
+      </editor>
+   </extension>
+	-->
 </plugin>

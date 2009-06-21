@@ -79,7 +79,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_5YR-4s3FEd2mzJ5pcyHP7A"/>
     <element xmi:type="adaptiveSystem:AdaptiveProcess" href="phil3.adaptivesystem#_5YR-4M3FEd2mzJ5pcyHP7A"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5YR-483FEd2mzJ5pcyHP7A" x="5" y="5" width="551" height="731"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5YR-483FEd2mzJ5pcyHP7A" x="5" y="5" width="551" height="551"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_Wg3eoM3GEd2mzJ5pcyHP7A" type="1002">
     <children xmi:type="notation:Node" xmi:id="_Wg3eo83GEd2mzJ5pcyHP7A" type="4016"/>

@@ -19,8 +19,8 @@ The packages
 - hub.top.adaptiveProcess.diagram.view.factories
 
 and the classes
-- hub.top.adaptiveSystem.diagram.edit.parts.AP_AdaptiveSystemProcessEditPartFactory
-- hub.top.adaptiveSystem.diagram.edit.parts.AP_ProcessEditPart
+- hub.top.adaptiveProcess.diagram.edit.parts.AP_AdaptiveSystemProcessEditPartFactory
+- hub.top.adaptiveProcess.diagram.edit.parts.AP_ProcessEditPart
 
 received a separate naming to ensure that hub.top.GRETA.diagram.process
 runs safely in its own domain. All remaining classes
@@ -31,7 +31,7 @@ and Java class names match.
 By importing the dependency hub.top.GRETA.diagram into
 hub.top.GRETA.diagram.process, the classes of hub.top.GRETA.diagram are
 made available to hub.top.GRETA.diagram for re-use. For instance, the
-EditParts in hub.top.adaptiveSystem.diagram.edit.parts have been removed
+EditParts in hub.top.adaptiveProcess.diagram.edit.parts have been removed
 in this distributed, so the original Java classes with all non-generated
 modifications are used in the process viewer.
 

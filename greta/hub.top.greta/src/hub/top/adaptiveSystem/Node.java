@@ -5,6 +5,7 @@
  */
 package hub.top.adaptiveSystem;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -142,7 +143,7 @@ public interface Node extends EObject {
 	 * @generated
 	 */
 	void setTemp(Temp value);
-
+	
 	/**
 	 * Returns the value of the '<em><b>Disabled By Anti Oclet</b></em>' attribute.
 	 * The default value is <code>"false"</code>.
@@ -254,5 +255,19 @@ public interface Node extends EObject {
 	 * @author Manja Wolf
 	 */
 	public EObject eOldContainer();
+	
+	/**
+	 * @return a list of all predecessors of this node
+	 * @author Dirk Fahland
+	 * @generated NOT
+	 */
+	public EList<? extends Node> getPreSet();
+	
+	/**
+	 * @return a list of all successors of this node
+	 * @author Dirk Fahland
+	 * @generated NOT
+	 */	
+	public EList<? extends Node> getPostSet();
 
 } // Node

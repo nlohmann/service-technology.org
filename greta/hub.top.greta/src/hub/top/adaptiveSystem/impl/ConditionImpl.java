@@ -11,6 +11,7 @@ import hub.top.adaptiveSystem.ArcToEvent;
 import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.DoNet;
 import hub.top.adaptiveSystem.Event;
+import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.PreNet;
 
 import java.util.Collection;
@@ -499,4 +500,25 @@ public class ConditionImpl extends NodeImpl implements Condition {
 		return result.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see hub.top.adaptiveSystem.Node#getPreSet()
+	 * @author Dirk Fahland
+	 * @generated NOT
+	 */
+	public EList<? extends Node> getPreSet() {
+		return getPreEvents();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see hub.top.adaptiveSystem.Node#getPostSet()
+	 * @author Dirk Fahland
+	 * @generated NOT
+	 */
+	public EList<? extends Node> getPostSet() {
+		return getPostEvents();
+	}
+
+	
 } //ConditionImpl

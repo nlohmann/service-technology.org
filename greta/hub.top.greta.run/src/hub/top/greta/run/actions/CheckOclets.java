@@ -229,8 +229,12 @@ public class CheckOclets extends Action implements
 			if(!isWellformed(ocletNode)) return false;
 			
 			//8. fill the list of minimal nodes for check of cycles
-			if(ocletNode instanceof Condition 
-					&& ((Condition) ocletNode).getPreEvents().isEmpty()) {
+			if( (  ocletNode instanceof Condition
+				   && ((Condition) ocletNode).getPreEvents().isEmpty())
+				||
+				(  ocletNode instanceof Event
+				   && ((Event) ocletNode).getPreConditions().isEmpty()))
+			{
 				minimalNodeList.add(ocletNode);
 			}
 			
@@ -245,7 +249,7 @@ public class CheckOclets extends Action implements
 		//8. in oclet is no cycle allowed
 		for(Node node : minimalNodeList) {
 			if(findCycle(node)) {
-				System.out.println("  not well formed - there is a cycle in oclet.");
+				System.out.println("  not well formed - there is a cycle in oclet (start: "+node.getName()+")");
 				MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
@@ -258,7 +262,7 @@ public class CheckOclets extends Action implements
 		//if number of checked nodes is smaller as the number of oclet nodes 
 		//than there are not minimal nodes i can't reach from minimal nodes hence they are in a cycle.
 		if(cycleCheckMap.size() != oclet.getPreNet().getNodes().size() + oclet.getDoNet().getNodes().size()) {
-			System.out.println("  not well formed - there is a cycle in oclet.");
+			System.out.println("  not well formed - there is a cycle in oclet (wrong number of nodes).");
 			MessageDialog.openInformation(
 					shell,
 					"AdaptiveSystem - check wellformedness of oclets",
@@ -335,6 +339,7 @@ public class CheckOclets extends Action implements
 			}
 			
 			if(ocletNode instanceof Event) {
+				/*
 				//1. an events in preNet is not allowed to be minimal (without preSet)
 				if(((Event) ocletNode).getPreConditions().isEmpty()) {
 					System.out.println("  not well formed - event " + ocletNode.getName() + " is minimal. Only conditions are allowed to be minimal.");
@@ -344,6 +349,8 @@ public class CheckOclets extends Action implements
 						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one minimal event in preNet. Only conditions are allowed to be minimal.");
 					return false;					
 				}
+				*/
+				
 				//2. maximal events in preNet are not allowed
 				if(!((Event) ocletNode).getPostConditions().isEmpty()) {
 					for(Condition postCondition : ((Event) ocletNode).getPostConditions()) {
@@ -398,7 +405,8 @@ public class CheckOclets extends Action implements
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. There is at least one (forward-)conflict in doNet.");
+						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. "+
+						"There is at least one (forward-)conflict in doNet on condition '"+ocletNode.getName()+"'.");
 					return false;
 				}
 				//6. a doNet don't have conflicts, that means a condition has maximal one event in postEvents

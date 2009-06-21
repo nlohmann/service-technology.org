@@ -37,6 +37,8 @@
 
 package hub.top.greta.run.actions;
 
+import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
+import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor;
@@ -61,6 +63,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.XMLResource;
+import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -79,11 +82,54 @@ public class ActionHelper {
 		if (editor instanceof AdaptiveSystemDiagramEditor) {
 			AdaptiveSystemDiagramEditor adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) editor;
 			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
+			
 		} else if (editor instanceof AdaptiveSystemEditor) {
 			AdaptiveSystemEditor adaptiveSystemEditor = (AdaptiveSystemEditor)editor;
 			Resource r0 = adaptiveSystemEditor.getEditingDomain().getResourceSet().getResources().get(0);
 			if (r0.getContents().get(0) instanceof AdaptiveSystem) {
 				adaptiveSystem = (AdaptiveSystem)r0.getContents().get(0);
+			}
+		} else if (editor instanceof AdaptiveProcessDiagramViewer) {
+			AdaptiveProcessDiagramViewer apViewer = (AdaptiveProcessDiagramViewer)editor;
+			AdaptiveProcess ap = (AdaptiveProcess)apViewer.getDiagram().getElement();
+			adaptiveSystem = (AdaptiveSystem)ap.eContainer();
+		}
+		
+		return adaptiveSystem;
+	}
+	
+	/**
+	 * Retrieve {@link AdaptiveSystem} object from the resource at
+	 * the given uri if the resource stores an {@link AdaptiveSystem}.
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	public static AdaptiveSystem getAdaptiveSystem(URI uri) {
+		AdaptiveSystem adaptiveSystem = null;
+		
+		if (uri != null) {
+			ResourceSet rs = new ResourceSetImpl();
+			Resource r = rs.getResource(uri, true);
+			
+			// check the contents of the resource
+			if (r.getContents() != null && r.getContents().size() > 0) {
+				// first element only
+				EObject o = r.getContents().get(0);
+				if (o instanceof AdaptiveSystem) {
+					// the resource stores an adaptive system object, return it
+					adaptiveSystem = (AdaptiveSystem)o;
+				} else if (o instanceof Diagram) {
+					// the resource stores a diagram object
+					if ( ((Diagram)o).getElement() instanceof AdaptiveSystem ) {
+						// which refers to an adaptive system object, return that
+						adaptiveSystem = (AdaptiveSystem)((Diagram)o).getElement();
+					}  else if ( ((Diagram)o).getElement() instanceof AdaptiveProcess ) {
+						// which refers to an adaptive process object,
+						// which is contained in an adaptive process, return that
+						adaptiveSystem = (AdaptiveSystem)((Diagram)o).getElement().eContainer();
+					}
+				}
 			}
 		}
 		return adaptiveSystem;

@@ -1,3 +1,10 @@
+Greta v1.1.3
+------------
+
++ improved simulation controls and rendering of the simulated process in the editor
++ fixed bugs for improving stability of the editor and the simulation engine
+
+
 Greta v1.1.2
 ------------
 

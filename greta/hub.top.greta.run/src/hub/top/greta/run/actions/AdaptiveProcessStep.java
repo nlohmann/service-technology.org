@@ -37,7 +37,6 @@
 
 package hub.top.greta.run.actions;
 
-import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.AdaptiveSystemFactory;
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
@@ -49,12 +48,10 @@ import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.Orientation;
 import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessCompartmentEditPart;
-import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart;
-import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart;
 import hub.top.adaptiveSystem.diagram.edit.parts.EventAPEditPart;
-import hub.top.adaptiveSystem.diagram.edit.policies.AdaptiveSystemCanonicalEditPolicy;
-import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.greta.run.AdaptiveProcessSimulationView;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -69,19 +66,27 @@ import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.actions.ActionIds;
+import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CanonicalConnectionEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.requests.ArrangeRequest;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
+	
+	public static boolean option_checkCapacity = true;	// enable to set capacity of places to "1"
 
+
+	public static final String ID = "hub.top.GRETA.run.step";
+	
 	protected IWorkbenchWindow workbenchWindow;
-	protected AdaptiveSystemDiagramEditor adaptiveSystemDiagramEditor;
-	protected AdaptiveSystem adaptiveSystem; 
+	protected AdaptiveProcessSimulationView simView = new AdaptiveProcessSimulationView();
+	
 	
 	//checkedEvents contains during nodeMatch() the events that were found yet
 	//the Map is initial clear for every oclet
@@ -91,11 +96,12 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	//saves the activated anti oclets with all marked conditions in oclet, associated with matched adaptive process conditions
 	protected EList<EMap<Condition, Condition>> activatedAntiOclets = new BasicEList<EMap<Condition, Condition>>();
 	
-	protected AdaptiveProcess adaptiveProcess = null;
-	AdaptiveSystemEditPart asEditPart = null;
 	private boolean isInsertedOclets = false;
 	
 	protected EList<Event> activatedEvents = new BasicEList<Event>();
+	
+	// list of nodes that was newly created in the current step
+	protected EList<Node> newNodes = new BasicEList<Node>();
 	
 	public void dispose() {
 		// do nothing
@@ -107,63 +113,94 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	}
 
 	public void run(IAction action) {
+		
+		if (simView.processViewEditor == null)
+			return;
 
-		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor) {
-			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
-			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
-					
-			System.out.println("step!");
-			
-			adaptiveProcess = adaptiveSystem.getAdaptiveProcess();
-			//MW: cut is the list of markedConditions of adaptive process
-			EList<Condition> cut = adaptiveProcess.getMarkedConditions();
-			
-			asEditPart = (AdaptiveSystemEditPart) adaptiveSystemDiagramEditor.getDiagramEditPart();
-			AdaptiveProcessEditPart apEditPart = null;
-			for(Object object : asEditPart.getChildren()) {
-				if(object instanceof AdaptiveProcessEditPart) { 
-					apEditPart = (AdaptiveProcessEditPart) object;
-					break;
-				}
-			}
-			
-			//apply all activated oclets
-			//fill the two global lists of all activated normal oclets and anti oclets
-			getActivatedOclets(adaptiveSystem, cut);
-			
-			//insert all normal activated oclets in adaptiveProcess
-			insertActivatedNormalOclets();
-			//arrange all elements in adaptiveProcess
-			arrangeAllAdaptiveProcess(apEditPart);
-			
-			//apply all activated anti oclets on adaptive process
-			applyActivatedAntiOclets();
-			
-			//highlight activated events
-			getActivatedEvents(apEditPart);
-
-			isInsertedOclets = true;
-			
-			action.setEnabled(false);
+		if (!simView.apEditPart.isActive()) {
+			//action.setEnabled(false);
+			//workbenchWindow.getActivePage().reuseEditor(processViewEditor, processViewEditor.getEditorInput());
+			//processViewEditor.selectionChanged(processViewEditor, new StructuredSelection(apEditPart));
+			return;
 		}
+		
+		////System.out.println("step!");
+		
+		//MW: cut is the list of markedConditions of adaptive process
+		EList<Condition> cut = simView.adaptiveProcess.getMarkedConditions();
+		
+		//apply all activated oclets
+		//fill the two global lists of all activated normal oclets and anti oclets
+		getActivatedOclets(simView.adaptiveSystem, cut);
+		
+		//insert all normal activated oclets in adaptiveProcess
+		insertActivatedNormalOclets();
+		//arrange all elements in adaptiveProcess
+		arrangeAllAdaptiveProcess(simView.apEditPart, null);
+		newNodes.clear();	// clear the list of new nodes for next step
+		
+		//apply all activated anti oclets on adaptive process
+		applyActivatedAntiOclets();
+		
+		//highlight activated events
+		getActivatedEvents();
+
+		isInsertedOclets = true;
+		
+		action.setEnabled(false);
+
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
-				&& action.getId().equals("hub.top.GRETA.run.step")) { 
-			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
-			AdaptiveSystem oldAdaptiveSystem = adaptiveSystem;
-			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
-			
-			if(adaptiveSystem.isSetWellformednessToOclets()) {
+
+		boolean validContext = true;
+
+		if (!action.getId().equals(AdaptiveProcessStep.ID))
+			validContext = false;
+		
+		// set and check whether the current editor can handle this action
+		simView.setProcessViewEditor_andFields(workbenchWindow.getActivePage().getActiveEditor());
+		if (simView.processViewEditor == null)
+			validContext = false;
+		
+		if (validContext)
+		{
+			if (!AdaptiveProcessSimulation.isValidConfigOf(simView.adaptiveSystem)) {
+				// no simulation running or this view is not the current simulation
+				if (action.isEnabled()) {
+					action.setEnabled(false);
+				}
 				
-				if(oldAdaptiveSystem != null && !oldAdaptiveSystem.equals(adaptiveSystem)) isInsertedOclets = false;
+				if (!AdaptiveProcessSimulation.isSimuluationRunning()) {
+					this.isInsertedOclets = false;	// no simulation running: reset internal configuration
+				}
+
+				return;
+			}
+			
+			// changed the editor?
+			if (simView.processViewEditor != simView.oldProcessViewEditor) {
+				// reset action's internal state
+				isInsertedOclets = false;
+				simView.processViewEditor.getDiagramGraphicalViewer().select(simView.apEditPart);
+				return;
+			}
+			
+			// adaptiveSystem, adaptiveProcess, oldAdaptiveSystem, and  
+			// processViewEditor are set
+			if (simView.adaptiveSystem.isSetWellformednessToOclets()) {
+				// adaptive system/editor window has changed, reset internal value
+				if(simView.oldAdaptiveSystem != null && !simView.oldAdaptiveSystem.equals(simView.adaptiveSystem))
+					isInsertedOclets = false;
 				
 				//fire an event
 				if(isInsertedOclets && ((StructuredSelection) selection).getFirstElement() instanceof EventAPEditPart) {
-					Event event = (Event) ((org.eclipse.gmf.runtime.notation.Node) ((EventAPEditPart) ((StructuredSelection) selection).getFirstElement()).getModel()).getElement();
+					EventAPEditPart eventEP = (EventAPEditPart) ((StructuredSelection) selection).getFirstElement();
+					Event event = (Event) ((org.eclipse.gmf.runtime.notation.Node) eventEP.getModel()).getElement();
 					if(!activatedEvents.isEmpty() && activatedEvents.contains(event)) {
 						fireEvent(event);
+						
+						eventEP.getViewer().deselect(eventEP);	// auto-deselect the fired transition
 					}
 					return;
 				}
@@ -172,26 +209,20 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 					action.setEnabled(true);
 				}
 				
-			} 
-			else {
-				//wellformedness of oclets is not checked 
+			} else { // wellformedness of oclets is not checked 
 				if(action.isEnabled()) {
+					isInsertedOclets = false;
 					action.setEnabled(false);
 					return;
 				}
 			}
-		} else if((!(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor) 
-				|| !action.getId().equals("hub.top.GRETA.run.step"))
-				&& action.isEnabled()) {
-			/*
-			Shell shell = new Shell();
-			MessageDialog.openInformation(
-				shell,
-				"AdaptiveSystem - step selectionChanged()",
-				"This button is only enabled for *.adaptiveSystem_diagram files.");
-				*/
-			action.setEnabled(false);
-		} 
+		} else {	// invalid context
+
+			if (action.isEnabled()) {
+				isInsertedOclets = false;
+				action.setEnabled(false);
+			}
+		}
 
 	}
 	
@@ -203,22 +234,22 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * @return
 	 */
 	protected void getActivatedOclets(AdaptiveSystem ap, EList<Condition> cut) {
-		System.out.println("START getActivatedOclet()");
+		////System.out.println("START getActivatedOclet()");
 		
 		for (Oclet oclet : ap.getOclets()) {
-			System.out.println("checking "+ oclet.getName());
+			////System.out.println("checking "+ oclet.getName());
 			
 			if (oclet.isWellFormed()) {
-				System.out.println("  is well formed oclet.");			
+				////System.out.println("  is well formed oclet.");			
 				if(preSetSatfisfied(oclet, cut)) {
-					System.out.println("  is activated.");
+					////System.out.println("  is activated.");
 				} //else
 					//System.out.println("  not activated.");
 			}
-			else System.out.println("  isn't well formed oclet.");
+			////else System.out.println("  isn't well formed oclet.");
 			
 		}
-		System.out.println("END getActivatedOclet()");
+		////System.out.println("END getActivatedOclet()");
 	}
 
 	/**
@@ -241,7 +272,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		//start check of oclet with marked conditions of preNet
 		for (Condition ocletCondition : oclet.getPreNet().getMarkedConditions())
 		{
-			System.out.println("  preSetSatisfied() - check ocletCondition " + ocletCondition.getName());
+			////System.out.println("  preSetSatisfied() - check ocletCondition " + ocletCondition.getName());
 			for (Condition cutCondition : cut) {
 				//call matchingalgorithm
 				//System.out.println("  call nodeMatches() with ocletCondition " + ocletCondition.getName() + " and cutCondition " + cutCondition.getName());
@@ -250,11 +281,11 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 				//ODER-Verknüpfung -> beim ersten Erfolg Schleife beenden
 				if(isValidMatch) {
 					if(conditionLinkMap.containsValue(cutCondition)) {
-						System.out.println("  cutCondition " + cutCondition.getName() + " is in LinkMap yet.");
+						////System.out.println("  cutCondition " + cutCondition.getName() + " is in LinkMap yet.");
 						isValidMatch = false;
 						break;
 					}
-					System.out.println("  ocletCondition " + ocletCondition.getName() + " matched.");
+					////System.out.println("  ocletCondition " + ocletCondition.getName() + " matched.");
 					conditionLinkMap.put(ocletCondition, cutCondition);
 					break;
 				} 
@@ -263,7 +294,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			//OR there are minimum two ocletCondition with same label
 			//UND-Verknüpfung -> beim ersten Misserfolg Schleife beenden
 			if(!isValidMatch) {
-				System.out.println("  Oclet " + oclet.getName() + " not activated.");
+				////System.out.println("  Oclet " + oclet.getName() + " not activated.");
 				break;
 			}
 		} //END for ocletCondition
@@ -290,7 +321,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			//System.out.println("    ocletNode " + ocletNode.getName() + " is condition.");
 			//if ocletNode and adaptiveprocessNode from different kind it doesn't match
 			if(!(adaptiveprocessNode instanceof Condition)) {
-				System.out.println("    no match. - different kind of nodes. ocletNode " + ocletNode.getName() + " adaptiveprocessNode " + adaptiveprocessNode.getName());
+				////System.out.println("    no match. - different kind of nodes. ocletNode " + ocletNode.getName() + " adaptiveprocessNode " + adaptiveprocessNode.getName());
 				return false;
 			}
 			else {
@@ -303,7 +334,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 					//if there isn't a preEvent return true because the nodes match
 					//if there are preEvents check the preSets
 					if(ocletCondition.getPreEvents().isEmpty()) {
-						System.out.println("    matches ocletCondition " + ocletCondition.getName() + "! - no preSet of ocletCondition.");
+						////System.out.println("    matches ocletCondition " + ocletCondition.getName() + "! - no preSet of ocletCondition.");
 						return true;
 					}
 					else {
@@ -312,7 +343,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 						//check all nodes of the preSet of the ocletNode
 						for (Node ocletPreNode : ocletCondition.getPreEvents()) {
 							if(checkedEvents.containsKey(ocletPreNode) && checkedEvents.get(ocletPreNode)) {
-								System.out.println("    event " + ocletPreNode.getName() + (" was successfully checked further."));
+								////System.out.println("    event " + ocletPreNode.getName() + (" was successfully checked further."));
 								return true; //I checked this event further and it matches
 							}
 							for (Node adaptiveprocessPreNode : adaptiveprocessCondition.getPreEvents()) {
@@ -328,7 +359,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							if(!isMatch) return false; //for this oclet node there is no adaptive process node - no match
 						} //END for ocletPreNode
 						if(isMatch) {
-							System.out.println("    match ocletCondition " + ocletCondition.getName() + "! return true.");
+							////System.out.println("    match ocletCondition " + ocletCondition.getName() + "! return true.");
 							return true;
 						} 
 					} //END if preEvents empty
@@ -341,7 +372,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			//System.out.println("    ocletNode " + ocletNode.getName() + " is event.");
 			//if ocletNode and adaptiveprocessNode from different kind it doesn't match
 			if(!(adaptiveprocessNode instanceof Event)) {
-				System.out.println("    no match. - different kind of nodes. ocletNode " + ocletNode.getName() + " adaptiveprocessNode " + adaptiveprocessNode.getName());
+				////System.out.println("    no match. - different kind of nodes. ocletNode " + ocletNode.getName() + " adaptiveprocessNode " + adaptiveprocessNode.getName());
 				return false;
 			}
 			else {
@@ -353,7 +384,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 					//if the preConditions of ocletEvent are empty return true because the node matches
 					//otherwise check the preSet
 					if(ocletEvent.getPreConditions().isEmpty()) {
-						System.out.println("    matches! - no preSet of ocletEvent " + ocletEvent.getName() + " put to checkedEvents mit true");
+						////System.out.println("    matches! - no preSet of ocletEvent " + ocletEvent.getName() + " put to checkedEvents mit true");
 						checkedEvents.put(ocletEvent, true);
 						return true;
 					}
@@ -372,7 +403,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							if(!isMatch) return false; //for this oclet node there is no adaptive process node - no match
 						} //END for ocletPreNode
 						if(isMatch) {
-							System.out.println("    match ocletEvent " + ocletEvent.getName() + "! return true.");
+							////System.out.println("    match ocletEvent " + ocletEvent.getName() + "! return true.");
 							return true;
 						}
 					} //END if preConditions empty
@@ -389,21 +420,24 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * @param cut
 	 */
 	private void insertActivatedNormalOclets() {
-		System.out.println("START insertActivatedNormalOclets()");
+		////System.out.println("START insertActivatedNormalOclets()");
 		//get every activated normal oclet
 		for(EMap<Condition, Condition> currentInsertMap : activatedNormalOclets) {
 			if(currentInsertMap != null && !currentInsertMap.isEmpty()) {
-				System.out.println("insert normal oclet " + ((Oclet) ((Condition) currentInsertMap.get(0).getKey()).eContainer().eContainer()).getName());
+				////System.out.println("insert normal oclet " + ((Oclet) ((Condition) currentInsertMap.get(0).getKey()).eContainer().eContainer()).getName());
 				insertNodes(currentInsertMap);
-			} else
-				System.out.println("insert normal oclet " + currentInsertMap);
+			}
+			////else System.out.println("insert normal oclet " + currentInsertMap);
 			
 		}//END for - iterate all oclets
 		
 		activatedNormalOclets.clear();
 		
-		System.out.println("END insertActivatedNormalOclets()");
+		////System.out.println("END insertActivatedNormalOclets()");
 	}
+	
+	private int insertDepth = 0;
+	private boolean cancelInsert = false;
 	
 	/**
 	 * The method insert all events and their postConditions in adaptiveProcess if they don't exit.
@@ -413,7 +447,21 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * @param currentInsertMap
 	 */
 	public void insertNodes(EMap<Condition, Condition> currentInsertMap) {
-		System.out.println("   START - next level of insertNode()");
+		
+		insertDepth++;
+		
+		if (insertDepth > 20) {
+			if (!MessageDialog.openQuestion(workbenchWindow.getShell(), "Possibly unsafe process?",
+					"It might be that you are executing an unsafe process. Continue " +
+					"with the operation or cancel?"))
+			{
+				cancelInsert = true;
+			}
+		}
+		
+		if (cancelInsert) return;
+		
+		////System.out.println("   START - next level of insertNode()");
 		EMap<Node , Node> insertedMap = new BasicEMap<Node, Node>(); 
 		EMap<Condition, Condition> nextInsertMap = new BasicEMap<Condition, Condition>();
 		
@@ -423,7 +471,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			Condition oCondition = ctupel.getKey(); //oclet condition
 			Condition mpCondition = ctupel.getValue(); //adaptive process condition
 
-			System.out.println("   next condition from currentInsertMap : " + oCondition.getName());
+			////System.out.println("   next condition from currentInsertMap : " + oCondition.getName());
 			
 			if(!oCondition.getPostEvents().isEmpty()) {
 				//there is only one event in postSet, because of wellformedness of oclet (it is an occurrence net)
@@ -431,7 +479,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 				if(!mpCondition.getPostEvents().isEmpty()) {
 					//is on postSet of mpCondition an event with same label than on oPostEvent?
 					Event mpPostEvent = null;
-					System.out.println("   is there an event in adaptive process with same name than oclet event? mpCondition " + mpCondition.getName());
+					////System.out.println("   is there an event in adaptive process with same name than oclet event? mpCondition " + mpCondition.getName());
 					for(Event event : mpCondition.getPostEvents()) {
 						if(event.getName().equals(oPostEvent.getName())) {
 							mpPostEvent = event;
@@ -440,10 +488,10 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 					}
 					//YES, this event is in adaptive process
 					if(mpPostEvent != null) {
-						System.out.println("   YES. event " + oPostEvent.getName() + " is in adaptiveProcess.");
+						////System.out.println("   YES. event " + oPostEvent.getName() + " is in adaptiveProcess.");
 						// look for additional conditions in preSet of event (in oclet)
 						if(oPostEvent.getPreConditions().size() != mpPostEvent.getPreConditions().size()) {
-							System.out.println("   the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent");
+							////System.out.println("   the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent");
 							//INSERT CASE 2
 							//the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent
 							//therefore create a new event and connect with preSet
@@ -457,7 +505,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 									createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 								} else {
 									//the condition does not exist - should not occur
-									System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+									////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
 								}
 							} //END for - connect all preConditions with new adaptive process event
 							// create all postConditions on adaptive process event and connect them
@@ -485,7 +533,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 								}
 							}
 							if(isSamePreSet) {
-								System.out.println("   is same preSet. Don't create event.");
+								////System.out.println("   is same preSet. Don't create event.");
 								//INSERT CASE 3
 								//associate the ocletEvent with the adaptiveprocessEvent
 								insertedMap.put(oPostEvent, mpPostEvent);
@@ -527,7 +575,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 										createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
 									} else {
 										//the condition does not exist - should not occur
-										System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+										////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
 									}
 								} //END for - connect all preConditions with new adaptive process event
 								// create all postConditions on adaptive process event and connect them
@@ -557,7 +605,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							} else {
 								//the condition doesn't exist in adaptive process
 								//should not occur !!!
-								System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+								////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
 							}
 						}
 						//if the oPostEvent has postConditions create those conditions in adaptive process
@@ -597,7 +645,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 								} else {
 									//the condition doesn't exist in adaptive process
 									//should not occur !!!
-									System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+									////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
 								}
 							}
 							//if the oPostEvent has postConditions create those conditions in adaptive process
@@ -610,7 +658,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 						} else {
 							//event is in a future insert level
 							//put the condition in the nextLevelMap
-							System.out.println("      insert postEvent of oclet condition " + oCondition.getName() + " in next Level.");
+							////System.out.println("      insert postEvent of oclet condition " + oCondition.getName() + " in next Level.");
 							nextInsertMap.put(oCondition, mpCondition);
 						}
 					} else {
@@ -631,7 +679,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 							} else {
 								//the condition doesn't exist in adaptive process
 								//should not occur !!!
-								System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+								////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
 							}
 						}
 						//if the oPostEvent has postConditions create those conditions in adaptive process
@@ -646,7 +694,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 					
 				}
 			} else {
-				System.out.println("   no postEvent on oclet condition " + oCondition.getName() + " - nothing to do.");
+				////System.out.println("   no postEvent on oclet condition " + oCondition.getName() + " - nothing to do.");
 				//END actual insert level - CASE 1
 			}
 			
@@ -656,10 +704,14 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		//recursive call of insertNodes()
 		if(nextInsertMap != null && !nextInsertMap.isEmpty()) insertNodes(nextInsertMap);
 		
+		insertDepth--;
+		if (insertDepth <= 0)
+			cancelInsert = false;
+		
 		//clean the nextInsertMap and insertedMap for next insertLevel
 		nextInsertMap.clear();
 		insertedMap.clear();
-		System.out.println("   END - next level of insertNode()");
+		////System.out.println("   END - next level of insertNode()");
 	}
 	
 	/**
@@ -674,7 +726,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		Node copiedNode = null;
 		
 		if(ocletNode instanceof Condition) {
-			System.out.println("      create condition " + ocletNode.getName());
+			////System.out.println("      create condition " + ocletNode.getName());
 			Condition ocletCondition = (Condition) ocletNode;
 			Condition copiedCondition = AdaptiveSystemFactory.eINSTANCE.createCondition();
 			copiedCondition.unsetAbstract(); //TODO: fixme
@@ -683,15 +735,15 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			copiedCondition.setDisabledByAntiOclet(false);
 			copiedCondition.setDisabledByConflict(false);
 			
-			AddCommand cmd = new AddCommand(adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes(), copiedCondition);
+			AddCommand cmd = new AddCommand(simView.processViewEditor.getEditingDomain(), simView.adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes(), copiedCondition);
 			cmd.canExecute();
-			((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(cmd);			
+			((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(cmd);			
 			
 			//adaptiveProcess.getNodes().add(copiedCondition);
 			copiedNode = copiedCondition;
 		} else
 		if(ocletNode instanceof Event) {
-			System.out.println("      create event " + ocletNode.getName());
+			////System.out.println("      create event " + ocletNode.getName());
 			Event ocletEvent = (Event) ocletNode;
 			Event copiedEvent = AdaptiveSystemFactory.eINSTANCE.createEvent();
 			copiedEvent.unsetAbstract(); //TODO: fixme
@@ -700,12 +752,15 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 			copiedEvent.setDisabledByAntiOclet(false);
 			copiedEvent.setDisabledByConflict(false);
 			
-			AddCommand cmd = new AddCommand(adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes(), copiedEvent);
+			AddCommand cmd = new AddCommand(simView.processViewEditor.getEditingDomain(), simView.adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes(), copiedEvent);
 			cmd.canExecute();
-			((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(cmd);
+			((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(cmd);
 			
 			copiedNode = copiedEvent;
 		}
+		
+		if (copiedNode != null)
+			newNodes.add(copiedNode);	// remember all new nodes
 				
 		return copiedNode;
 	}
@@ -722,62 +777,65 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		
 		//create an arcToEvent
 		if(source instanceof Condition && target instanceof Event) {
-			System.out.println("      create arcToEvent with source " + source.getName() + " and target " + target.getName());
+			////System.out.println("      create arcToEvent with source " + source.getName() + " and target " + target.getName());
 			
 			ArcToEvent arc = AdaptiveSystemFactory.eINSTANCE.createArcToEvent();
 			EList<Command> cmdList = new BasicEList<Command>();
 			SetCommand cmdSource = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToEvent_Source(), (Condition) source);
+					simView.processViewEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToEvent_Source(), (Condition) source);
 			cmdSource.canExecute();
 			cmdList.add(cmdSource);
 			SetCommand cmdDestination = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToEvent_Destination(), (Event) target);
+					simView.processViewEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToEvent_Destination(), (Event) target);
 			cmdDestination.canExecute();
 			cmdList.add(cmdDestination);
 			
-			AddCommand cmdAdd = new AddCommand(adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Arcs(), arc);
+			AddCommand cmdAdd = new AddCommand(simView.processViewEditor.getEditingDomain(), simView.adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Arcs(), arc);
 			cmdAdd.canExecute();
 			cmdList.add(cmdAdd);
 			
 			CompoundCommand fireCmd = new CompoundCommand(cmdList);
 			// and execute it in a transactional editing domain (for undo/redo)
 			fireCmd.canExecute();
-			((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
+			((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
 
-			((AdaptiveSystemCanonicalEditPolicy) asEditPart.getEditPolicy("Canonical")).refresh();
+			EditPart asEditPart = simView.apEditPart.getParent();
+			((CanonicalConnectionEditPolicy) asEditPart.getEditPolicy("Canonical")).refresh();
 			
 			return true;
 		} else
 		//create an arcToCondition
 		if(source instanceof Event && target instanceof Condition) {
-			System.out.println("      create arcToCondition with source " + source.getName() + " and target " + target.getName());
+			////System.out.println("      create arcToCondition with source " + source.getName() + " and target " + target.getName());
 			ArcToCondition arc = AdaptiveSystemFactory.eINSTANCE.createArcToCondition();
 			EList<Command> cmdList = new BasicEList<Command>();
 			SetCommand cmdSource = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToCondition_Source(), (Event) source);
+					simView.processViewEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToCondition_Source(), (Event) source);
 			cmdSource.canExecute();
 			cmdList.add(cmdSource);
 			SetCommand cmdDestination = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToCondition_Destination(), (Condition) target);
+					simView.processViewEditor.getEditingDomain(), arc, AdaptiveSystemPackage.eINSTANCE.getArcToCondition_Destination(), (Condition) target);
 			cmdDestination.canExecute();
 			cmdList.add(cmdDestination);
 			
-			AddCommand cmdAdd = new AddCommand(adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Arcs(), arc);
+			AddCommand cmdAdd = new AddCommand(simView.processViewEditor.getEditingDomain(), simView.adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Arcs(), arc);
 			cmdAdd.canExecute();
 			cmdList.add(cmdAdd);
 			
 			CompoundCommand fireCmd = new CompoundCommand(cmdList);
 			// and execute it in a transactional editing domain (for undo/redo)
 			fireCmd.canExecute();
-			((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
+			((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
 			
-			((AdaptiveSystemCanonicalEditPolicy) asEditPart.getEditPolicy("Canonical")).refresh();
+			EditPart asEditPart = simView.apEditPart.getParent();
+			((CanonicalConnectionEditPolicy) asEditPart.getEditPolicy("Canonical")).refresh();
 			return true;
 		}
-		if(source != null && target != null)
-			System.out.print("      Arc couldn't create. Shouldn't occur!!! (source " + source.getName() + ", target " + target.getName());
-		else
-			System.out.print("      Arc couldn't create. Shouldn't occur!!! source or/and target == null.");
+		
+		////if(source != null && target != null)
+		////	System.out.print("      Arc couldn't create. Shouldn't occur!!! (source " + source.getName() + ", target " + target.getName());
+		////else
+		////	System.out.print("      Arc couldn't create. Shouldn't occur!!! source or/and target == null.");
 		
 		return false;
 	}
@@ -787,16 +845,40 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * Arrange all elements in adaptive process
 	 * 
 	 * @author Manja Wolf
+	 * 		   Dirk Fahland
+	 * 
 	 * @param apEditPart
+	 * @param nodesToArrange 
+	 * 				A list of Nodes. Only diagram nodes that have one of these
+	 *              nodes as model object will be arranged. The list can be
+	 *              <code>null</code>; then all nodes of the diagram will be arranged.
 	 */
 	@SuppressWarnings("unchecked")
-	private void arrangeAllAdaptiveProcess(AdaptiveProcessEditPart apEditPart) {
+	private void arrangeAllAdaptiveProcess(EditPart apEditPart, EList<Node> nodesToArrange) {
 		
 		AdaptiveProcessCompartmentEditPart mpcEditPart = (AdaptiveProcessCompartmentEditPart) apEditPart.getChildren().get(0);
-		List editParts = mpcEditPart.getChildren();
-		
-		ArrangeRequest request =  new ArrangeRequest(ActionIds.ACTION_ARRANGE_ALL);
-		request.setPartsToArrange(editParts);
+		 
+		List<EditPart> editPartsToArrange = null;
+		ArrangeRequest request = null;
+		if (nodesToArrange == null) {
+			request = new ArrangeRequest(ActionIds.ACTION_ARRANGE_ALL);
+			// arrange all nodes
+			editPartsToArrange = (List<EditPart>)mpcEditPart.getChildren();
+		} else {
+			request =  new ArrangeRequest(ActionIds.ACTION_ARRANGE_SELECTION);
+			editPartsToArrange = new LinkedList<EditPart>();
+			
+			// iterate over all edit parts to find those that represent nodes that shall be arranged
+			for (EditPart ep : (List<EditPart>)mpcEditPart.getChildren()) {
+				if (ep.getModel() instanceof org.eclipse.gmf.runtime.notation.Node) {
+					org.eclipse.gmf.runtime.notation.Node diagramNode =
+						(org.eclipse.gmf.runtime.notation.Node)ep.getModel();
+					if (nodesToArrange.contains(diagramNode.getElement()))
+						editPartsToArrange.add(ep);
+				}
+			}
+		}
+		request.setPartsToArrange(editPartsToArrange);		
 		org.eclipse.gef.commands.Command cmd = mpcEditPart.getCommand(request);
 		cmd.canExecute();
 		cmd.execute();
@@ -810,11 +892,11 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * @param cut
 	 */
 	private void applyActivatedAntiOclets() {
-		System.out.println("START insertActivatedAntiOclets()");
+		////System.out.println("START insertActivatedAntiOclets()");
 		//get every activated anti oclet
 		for(EMap<Condition, Condition> disableMap : activatedAntiOclets) {
 			if(disableMap != null && !disableMap.isEmpty()) {
-				System.out.println("apply anti oclet " + ((Oclet) ((Condition) disableMap.get(0).getKey()).eContainer().eContainer()).getName());
+				////System.out.println("apply anti oclet " + ((Oclet) ((Condition) disableMap.get(0).getKey()).eContainer().eContainer()).getName());
 				
 				//iterate over marked preNet conditions
 				for(ListIterator<Map.Entry<Condition, Condition>> li = disableMap.listIterator(); li.hasNext();) {
@@ -871,23 +953,21 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 								disableEvent(mpEventToDisable);
 							}
 						} else {
-							System.out.println("Do nothing. The Event is deeper in path and will be disabled by another event.");
+							////System.out.println("Do nothing. The Event is deeper in path and will be disabled by another event.");
 						}
 					} //END if postSet of oCondition is not empty
 					else {
-						System.out.println("Do nothing. Oclet condition " + oCondition.getName() + " has no postEvent.");
+						////System.out.println("Do nothing. Oclet condition " + oCondition.getName() + " has no postEvent.");
 					}
 				} //END for disableMap iterieren
-			} else
-				System.out.println("disabledMap is empty nothing to do.");
+			}
+			////else System.out.println("disabledMap is empty nothing to do.");
 			
 		}//END for - iterate all oclets
 		
 		activatedAntiOclets.clear();
 		 
-		System.out.println("END insertActivatedAntiOclets()");
-		
-	
+		////System.out.println("END insertActivatedAntiOclets()");
 	}
 
 	/**
@@ -900,12 +980,12 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	private void disableEvent(Event event) {
 		
 		if(!event.isSetDisabledByAntiOclet() || (event.isSetDisabledByAntiOclet() && !event.isDisabledByAntiOclet())) {
-			System.out.println("disable Event " + event.getName());
+			////System.out.println("disable Event " + event.getName());
 			SetCommand cmd = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getNode_DisabledByAntiOclet(), true);
+					simView.processViewEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getNode_DisabledByAntiOclet(), true);
 			cmd.setLabel("set attribute isDisabledByAntiOclet on event");
 			cmd.canExecute();
-			((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(cmd);	
+			((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(cmd);	
 		}
 				
 		
@@ -918,53 +998,50 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 	 * 
 	 * @author Manja Wolf
 	 */
-	private void getActivatedEvents(AdaptiveProcessEditPart apEditPart) {
+	private void getActivatedEvents() {
 
 		//find the saturated events - start with cut (all marked conditions)
-		for(Condition cutCondition : adaptiveProcess.getMarkedConditions()) {
+		for(Condition cutCondition : simView.adaptiveProcess.getMarkedConditions()) {
 			//check every postEvent of the cutCondition whether it is saturated and not disabled
 			for(Event event : cutCondition.getPostEvents()) {
 				if(!this.activatedEvents.contains(event)
 						&& event.isSaturated() 
 						&& (!event.isSetDisabledByAntiOclet() || (event.isSetDisabledByAntiOclet() && !event.isDisabledByAntiOclet())) 
-						&& (!event.isSetDisabledByConflict() || (event.isSetDisabledByConflict() && !event.isDisabledByConflict()))) {
-					if(event.getPostConditions().isEmpty()) {
-						//it lets the process save -> set the event enabled
-						if(!event.isEnabled()) {
-							SetCommand cmd = new SetCommand(
-									adaptiveSystemDiagramEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getEvent_Enabled(), true);
-							cmd.setLabel("set attribute enabled on event");
-							cmd.canExecute();
-							((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(cmd);
-						}
-						if(!activatedEvents.contains(event)) activatedEvents.add(event);
-					} else {
-						//check the postSet of the saturated, not disabled event whether the firing of this event makes the process unsave
+						&& (!event.isSetDisabledByConflict() || (event.isSetDisabledByConflict() && !event.isDisabledByConflict())))
+				{
+					boolean isActivatedEvent = true;
+
+					if (option_checkCapacity) {
+						// check the postSet of the saturated, not disabled event
+						// whether the firing of this event makes the process unsafe
 						for(Condition postCondition : event.getPostConditions()) {
 							
 							//if event makes net unsave -> not allowed to fire
-							boolean isActivatedEvent = true;
-							for(Condition cutCondition2 : adaptiveProcess.getMarkedConditions()){
-								if(cutCondition2.getName().equals(postCondition.getName())) {
-									System.out.println("Event " + event.getName() +  " makes the net unsave.");
+							for(Condition cutCondition2 : simView.adaptiveProcess.getMarkedConditions()){
+								if(    cutCondition2.getName().equals(postCondition.getName())
+									&& !event.getPreConditions().contains(cutCondition2))
+								{
+									////System.out.println("Event " + event.getName() +  " makes the net unsafe.");
 									isActivatedEvent = false;
 									break;
 								}
 							}
-							if(isActivatedEvent) {
-								System.out.println("Event " + event.getName() + " is activated.");
-								//it lets the process save -> set the event enabled
-								if(!event.isEnabled()) {
-									SetCommand cmd = new SetCommand(
-											adaptiveSystemDiagramEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getEvent_Enabled(), true);
-									cmd.setLabel("set attribute enabled on event");
-									cmd.canExecute();
-									((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(cmd);
-								}
-								if(!activatedEvents.contains(event)) activatedEvents.add(event);
-							} //END if unsave
 						} //END for check postSet of event
-					} //END else postSet of event is empty
+					}
+
+					if(isActivatedEvent) {
+						////System.out.println("Event " + event.getName() + " is activated.");
+						//it lets the process save -> set the event enabled
+						if(!event.isEnabled()) {
+							SetCommand cmd = new SetCommand(
+									simView.processViewEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getEvent_Enabled(), true);
+							cmd.setLabel("set attribute enabled on event");
+							cmd.canExecute();
+							((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(cmd);
+						}
+						if(!activatedEvents.contains(event)) activatedEvents.add(event);
+					} //END if isActivatedEvents
+
 				} //END if event is saturated and not disabled
 			} //END for check every postEvent of the cutCondition
 		} //END for check every cutCondition
@@ -985,33 +1062,29 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		for(ArcToEvent arcToEvent : firedEvent.getIncoming()) {
 			Condition source = arcToEvent.getSource();
 			SetCommand cmdConsume = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), source, AdaptiveSystemPackage.eINSTANCE.getCondition_Token(), source.getToken() - arcToEvent.getWeight());
+					simView.processViewEditor.getEditingDomain(), source, AdaptiveSystemPackage.eINSTANCE.getCondition_Token(), source.getToken() - arcToEvent.getWeight());
 			cmdConsume.canExecute();
 			cmdList.add(cmdConsume);
 		}
 		for(ArcToCondition arcToCondition : firedEvent.getOutgoing()) {
 			Condition destination = arcToCondition.getDestination();
 			SetCommand cmdProduce = new SetCommand(
-					adaptiveSystemDiagramEditor.getEditingDomain(), destination, AdaptiveSystemPackage.eINSTANCE.getCondition_Token(), destination.getToken() + arcToCondition.getWeight());
+					simView.processViewEditor.getEditingDomain(), destination, AdaptiveSystemPackage.eINSTANCE.getCondition_Token(), destination.getToken() + arcToCondition.getWeight());
 			cmdProduce.canExecute();
 			cmdList.add(cmdProduce);
 		}
-		
-		
-		
 		
 		//after firing event reset values
 		for(Event event : activatedEvents) {
 			if(event.isEnabled()) {
 				//set the event enabled
 				SetCommand cmd = new SetCommand(
-						adaptiveSystemDiagramEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getEvent_Enabled(), false);
+						simView.processViewEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getEvent_Enabled(), false);
 				cmd.setLabel("set attribute enabled on event");
 				cmd.canExecute();
 				cmdList.add(cmd);
 			}
 		}
-		
 		
 		//Set the events which where in conflict and wasn't fired to disabledByConflict
 		activatedEvents.remove(firedEvent);
@@ -1022,7 +1095,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 					//set the event disabledByConflict
 					if(!event.isSetDisabledByConflict() || (event.isSetDisabledByConflict() && !event.isDisabledByConflict())) {
 						SetCommand cmd = new SetCommand(
-								adaptiveSystemDiagramEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getNode_DisabledByConflict(), true);
+								simView.processViewEditor.getEditingDomain(), event, AdaptiveSystemPackage.eINSTANCE.getNode_DisabledByConflict(), true);
 						cmd.setLabel("set attribute disabledByConflict on event");
 						cmd.canExecute();
 						cmdList.add(cmd);
@@ -1038,7 +1111,7 @@ public class AdaptiveProcessStep implements IWorkbenchWindowActionDelegate {
 		CompoundCommand fireCmd = new CompoundCommand(cmdList);
 		// and execute it in a transactional editing domain (for undo/redo)
 		fireCmd.canExecute();
-		((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
+		((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
 		
 		isInsertedOclets = false;
 	}

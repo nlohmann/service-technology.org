@@ -1,9 +1,21 @@
 package hub.top.adaptiveSystem.diagram.edit.parts;
 
+import hub.top.adaptiveSystem.AdaptiveProcess;
+import hub.top.adaptiveSystem.AdaptiveSystemPackage;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.LayoutListener;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
@@ -11,19 +23,24 @@ import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CompoundCommand;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gef.requests.GroupRequest;
 import org.eclipse.gmf.runtime.diagram.ui.commands.CommandProxy;
 import org.eclipse.gmf.runtime.diagram.ui.commands.ICommandProxy;
+import org.eclipse.gmf.runtime.diagram.ui.commands.SetBoundsCommand;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeCompartmentEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
+import org.eclipse.gmf.runtime.diagram.ui.l10n.DiagramUIMessages;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
 import org.eclipse.gmf.runtime.emf.commands.core.command.CompositeTransactionalCommand;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
+import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.graphics.Color;
 
@@ -99,6 +116,80 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 	protected IFigure createNodeShape() {
 		AdaptiveProcessDescriptor figure = new AdaptiveProcessDescriptor();
 		return primaryShape = figure;
+	}
+	
+	@Override
+	public void activate() {
+		// retrieve figure
+		IFigure figure = getFigure();
+		IFigure parentFigure = figure.getParent();
+		
+		parentFigure.addLayoutListener(new LayoutListener.Stub() {
+			
+			@Override
+			public void postLayout(IFigure hostFigure) {
+
+				int minX = Integer.MAX_VALUE, maxX = 0;
+				int minY = Integer.MAX_VALUE, maxY = 0;
+
+				if (AdaptiveProcessEditPart.this.getChildren().size() > 0) {
+					AdaptiveProcessCompartmentEditPart apce =
+						(AdaptiveProcessCompartmentEditPart)AdaptiveProcessEditPart.this.getChildren().get(0);
+					Iterator it = apce.getChildren().iterator();
+					while (it.hasNext()) {
+						Object o2 = it.next();
+						if (o2 instanceof AbstractGraphicalEditPart) {
+							AbstractGraphicalEditPart child = (AbstractGraphicalEditPart)o2;
+							Rectangle bounds = child.getFigure().getBounds();
+
+							if (bounds.x < minX) minX = bounds.x;
+							if (bounds.x+bounds.width > maxX) maxX = bounds.x+bounds.width;
+
+							if (bounds.y < minY) minY = bounds.y;
+							if (bounds.y+bounds.height > maxY) maxY = bounds.y+bounds.height;
+						}
+					}
+				}
+				
+				int oldWidth = getSize().width;
+				int oldHeight = getSize().width;
+				
+				int oldX = getLocation().x;
+				int oldY = getLocation().y;
+
+				
+				maxX += 30; // safe distance to border (take care of scroll bars)
+				maxY += 30; // safe distance to border (take care of scroll bars)
+				
+				int newWidth = (maxX > oldWidth) ? maxX : oldWidth;
+				int newHeight = (maxY > oldHeight) ? maxY : oldHeight;
+				
+				int newX = oldX - (newWidth - oldWidth);
+				int newY = oldY;
+				
+				Point newLocation = new Point(getMapMode().DPtoLP(newX),
+						getMapMode().DPtoLP(newY));
+				Dimension newSize = new Dimension(getMapMode().DPtoLP(newWidth),
+						getMapMode().DPtoLP(newHeight));
+				
+				/*
+				System.out.println(
+						"("+oldX+","+oldY+","+(oldX+oldWidth)+","+(oldY+oldHeight)+")"
+						+" -> "
+						+"("+newX+","+newY+","+(newX+newWidth)+","+(newY+newHeight)+")");
+				 */	
+				
+				TransactionalEditingDomain editingDomain = AdaptiveProcessEditPart.this.getEditingDomain();
+				
+				SetBoundsCommand c = new SetBoundsCommand(editingDomain,
+						DiagramUIMessages.SetAutoSizeCommand_Label,
+						AdaptiveProcessEditPart.this, new Rectangle(newLocation,newSize));
+				AdaptiveProcessEditPart.this.getViewer().getEditDomain().getCommandStack().
+					execute(new ICommandProxy(c));
+			}
+		});
+
+		super.activate();
 	}
 
 	/**
@@ -221,6 +312,65 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 		return super.getContentPane();
 	}
 
+	@Override
+	protected void handleNotificationEvent(Notification notification) {
+		
+		if (notification.getNotifier() instanceof AdaptiveProcess) {
+			
+			// if removing nodes from the adaptive process,
+			// also remove all adjacent arcs
+			if (   notification.getEventType() == Notification.REMOVE_MANY
+				&& notification.getFeature().equals(AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes()))
+			{
+				// the set of arcs we have to remove from the model as well
+				HashSet<EditPart> arcEPtoRemove = new HashSet<EditPart>();
+				
+				// remove all adjacent arcs as well
+				if (notification.getOldValue() instanceof Collection) {
+					// the nodes that are going to be removed from this edit part
+					Collection toRemove = (Collection)notification.getOldValue();
+					ShapeCompartmentEditPart comp = (ShapeCompartmentEditPart)this.getChildren().get(0);
+					
+					// iterate over all child edit parts of this adaptive process to find the
+					// edit parts that represent the nodes that are about to be deleted
+					for (Object child : comp.getChildren()) {
+						if (child instanceof AbstractGraphicalEditPart
+							&& ((EditPart) child).getModel() instanceof Node)
+						{
+							// we found a node ...
+							AbstractGraphicalEditPart nodeEP = (AbstractGraphicalEditPart)child;
+							EObject modelElement = ((Node)(nodeEP).getModel()).getElement();
+							if (toRemove.contains(modelElement)) {
+								// ... that will be removed
+								// so remove all its outgoing arcs
+								for (Object arcEP : nodeEP.getSourceConnections()) {
+									if (arcEP instanceof ArcToEventEditPart ||
+										arcEP instanceof ArcToConditionEditPart)
+									{
+										arcEPtoRemove.add((EditPart)arcEP);
+									}
+								}
+								// and remove all its incoming arcs
+								for (Object arcEP : nodeEP.getTargetConnections()) {
+									if (arcEP instanceof ArcToEventEditPart ||
+										arcEP instanceof ArcToConditionEditPart)
+									{
+										arcEPtoRemove.add((EditPart)arcEP);
+									}
+								}
+							}
+						}
+					} // collected all arcs that need to be removed
+					
+					for (EditPart arcEP : arcEPtoRemove)
+						removeArc(arcEP);
+				}
+			}
+		}
+		
+		super.handleNotificationEvent(notification);
+	}
+	
 	/**
 	 * Arcs between different nets (main process and oclet or different oclets will be removed
 	 * @author Manja Wolf
@@ -299,6 +449,12 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 
 			this.add(fFigureAdaptiveProcessContent);
 
+		}
+		
+		@Override
+		public void repaint() {
+
+			super.repaint();
 		}
 
 		/**

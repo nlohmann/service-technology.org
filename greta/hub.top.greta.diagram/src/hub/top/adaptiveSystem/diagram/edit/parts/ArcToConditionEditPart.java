@@ -101,16 +101,22 @@ public class ArcToConditionEditPart extends ConnectionNodeEditPart implements
 	protected void handleNotificationEvent(Notification notification) {
 
 		if (notification.getNotifier() instanceof ArcToCondition) {
-			// if an arcToCondition is redirected into different oclet part,
-			// than oclets should be checked
-			if (((ArcToCondition) notification.getNotifier()).eContainer()
-					.eContainer() instanceof Oclet) {
-				// resetCheckOclets() if there is a reorientation of an arc in oclet 
-				resetCheckOclets();
-			}
-			// if disabled to referenced nodes is set, gray the arc
-			getPrimaryShape().refreshColor();
-
+			
+			ArcToCondition arc = (ArcToCondition)notification.getNotifier();
+			
+			// see if notifier is still part of the model, 
+			if (arc.eContainer() != null && arc.eContainer().eContainer() != null)
+			{
+				// if an arcToCondition is redirected into different oclet part,
+				// than oclets should be checked
+				if (((ArcToCondition) notification.getNotifier()).eContainer()
+						.eContainer() instanceof Oclet) {
+					// resetCheckOclets() if there is a reorientation of an arc in oclet 
+					resetCheckOclets();
+				}
+				// if disabled to referenced nodes is set, gray the arc
+				getPrimaryShape().refreshColor();
+			} // arc is no longer part of the model (just deleted), so ignore it
 		}
 
 		if (notification.getNotifier() instanceof Condition

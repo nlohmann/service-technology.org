@@ -47,6 +47,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -95,8 +97,37 @@ public class InstantiateSystem implements IWorkbenchWindowActionDelegate {
 		String parameter = fileName.substring(paramStart,paramEnd);
 		System.out.println("instantiating "+fileName+", parameter: "+parameter);
 		
-		int paramRange_min = 1;
-		int paramRange_max = 7;
+		
+		IInputValidator intValidator = new IInputValidator() {
+		
+			public String isValid(String newText) {
+				if (newText == null || newText.length() == 0)
+					return " ";
+				try {
+					int val = Integer.parseInt(newText);
+					if (val < Integer.MIN_VALUE) return "Number out of bounds.";
+					if (val > Integer.MAX_VALUE) return "Number out of bounds.";
+					return null;
+				} catch (NumberFormatException e) {
+					return "Please enter an integer number.";
+				}
+			}
+		};
+		
+		InputDialog minDiag = new InputDialog(workbenchWindow.getShell(),
+				"Instantiate parameter '"+parameter+"' in "+fileName,
+				"minimal value for '"+parameter+"'", "1", intValidator);
+		if (minDiag.open() == InputDialog.CANCEL)
+			return;
+		
+		InputDialog maxDiag = new InputDialog(workbenchWindow.getShell(), 
+				"Instantiate parameter '"+parameter+"' in "+fileName,
+				"maximal value for '"+parameter+"'", "1", intValidator);
+		if (maxDiag.open() == InputDialog.CANCEL)
+			return;
+		
+		int paramRange_min = Integer.parseInt(minDiag.getValue());
+		int paramRange_max = Integer.parseInt(maxDiag.getValue());
 	
 		AdaptiveSystem inst = AdaptiveSystemFactory.eINSTANCE.createAdaptiveSystem();
 		AdaptiveProcess ap = AdaptiveSystemFactory.eINSTANCE.createAdaptiveProcess();

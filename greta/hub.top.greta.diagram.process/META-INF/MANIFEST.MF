@@ -7,9 +7,12 @@ Bundle-ClassPath: .
 Bundle-Activator: hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramEditorPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Export-Package: hub.top.adaptiveSystem.diagram.edit.parts,
+Export-Package: hub.top.adaptiveProcess.diagram.edit.parts,
+ hub.top.adaptiveProcess.diagram.edit.policies,
  hub.top.adaptiveProcess.diagram.part,
- hub.top.adaptiveProcess.diagram.providers
+ hub.top.adaptiveProcess.diagram.providers,
+ hub.top.adaptiveSystem.diagram.edit.commands,
+ hub.top.adaptiveSystem.diagram.edit.helpers
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.expressions,
@@ -38,5 +41,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gmf.runtime.draw2d.ui;visibility:=reexport,
  org.eclipse.draw2d;visibility:=reexport,
  org.eclipse.gef;visibility:=reexport,
- hub.top.GRETA.diagram;bundle-version="1.1.2"
+ hub.top.GRETA.diagram;visibility:=reexport
 Eclipse-LazyStart: true
+Import-Package: hub.top.adaptiveSystem.diagram.edit.parts

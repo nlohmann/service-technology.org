@@ -48,8 +48,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -63,7 +65,10 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 	private IWorkbenchWindow workbenchWindow;
 
 	private AdaptiveSystem adaptiveSystem;
-
+	
+	// fields for tracking the selection in the explorer 
+	private IFile 	selectedFile = null;
+	private URI 	selectedURI = null;
 	
 	public void dispose() {
 		// TODO Auto-generated method stub
@@ -79,13 +84,25 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 		if (!action.getId().equals(BuildBranchingProcess.ID))
 			return;
 		
-		IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
-		adaptiveSystem = ActionHelper.getAdaptiveSystem(editor);
+		// seek system to check from a given URI
+		adaptiveSystem = ActionHelper.getAdaptiveSystem(selectedURI);
+		
+		// if there was no system at the given URI, check the current editor
+		if (adaptiveSystem == null) {
+			IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
+			adaptiveSystem = ActionHelper.getAdaptiveSystem(editor);
+			
+			// if this editor has input file, remember it
+			if (editor.getEditorInput() != null
+				&& editor.getEditorInput() instanceof IFileEditorInput)
+			{
+				selectedFile = ((IFileEditorInput)editor.getEditorInput()).getFile();
+			}
+		}
 		
 		if (adaptiveSystem == null)
 			return;
 			
-		final IEditorInput in = editor.getEditorInput();
 		final AdaptiveSystemBP bp = new AdaptiveSystemBP(adaptiveSystem);
 		
 		Job bpBuildJob = new Job("Constructing branching process") 
@@ -118,11 +135,9 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 				System.out.println(bp.getStatistics());
 
 				monitor.beginTask("Writing result files", 1);
-				if (in instanceof IFileEditorInput) {
-					IFile inputFile = ((IFileEditorInput)in).getFile();
-					
+				if (selectedFile != null) {
 					monitor.subTask("writing dot file");
-					writeDotFile(bp, inputFile);
+					writeDotFile(bp, selectedFile);
 					monitor.worked(1);
 				}
 				monitor.done();
@@ -139,8 +154,22 @@ public class BuildBranchingProcess implements IWorkbenchWindowActionDelegate {
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-
+	    selectedURI = null;
+	    selectedFile = null;
+	    action.setEnabled(false);
+	    if (selection instanceof IStructuredSelection == false
+	        || selection.isEmpty()) {
+	      return;
+	    }
+	    try {
+		    // store selection and URI, re-enable action
+		    selectedFile = (IFile) ((IStructuredSelection) selection).getFirstElement();
+		    selectedURI = URI.createPlatformResourceURI(selectedFile.getFullPath()
+		        .toString(), true);
+		    action.setEnabled(true);
+	    } catch (ClassCastException e) {
+	    	// just catch, do nothing
+	    }
 	}
 
 	private void writeDotFile (AdaptiveSystemBP bp, IFile inputFile) {

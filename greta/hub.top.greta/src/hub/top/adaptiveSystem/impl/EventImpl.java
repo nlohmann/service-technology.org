@@ -10,6 +10,7 @@ import hub.top.adaptiveSystem.ArcToCondition;
 import hub.top.adaptiveSystem.ArcToEvent;
 import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
+import hub.top.adaptiveSystem.Node;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -389,6 +390,26 @@ public class EventImpl extends NodeImpl implements Event {
 		result.append(enabled);
 		result.append(')');
 		return result.toString();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see hub.top.adaptiveSystem.Node#getPreSet()
+	 * @author Dirk Fahland
+	 * @generated NOT
+	 */
+	public EList<? extends Node> getPreSet() {
+		return getPreConditions();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see hub.top.adaptiveSystem.Node#getPostSet()
+	 * @author Dirk Fahland
+	 * @generated NOT
+	 */
+	public EList<? extends Node> getPostSet() {
+		return getPostConditions();
 	}
 
 } //EventImpl

@@ -76,7 +76,7 @@ void abort(unsigned int code, const char* format, ...) {
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // set default values
-    argv[0] = PACKAGE;
+    argv[0] = (char *)PACKAGE;
     cmdline_parser_init(&args_info);
 
     // initialize the parameters structure
@@ -128,6 +128,9 @@ int main(int argc, char** argv) {
     }
     system(wendy_command.c_str());
 
+
+
+
     /*-------------------------------.
     | 2. parse migration information |
     `-------------------------------*/
@@ -140,6 +143,16 @@ int main(int argc, char** argv) {
     if (args_info.verbose_flag) {
         fprintf(stderr, "%s: parsed migration information: %d tuples\n", PACKAGE, stat_tupleCount);
     }
+
+    /*-----------------------------.
+    | 8. parse marking information |
+    `-----------------------------*/
+    mi_in = fopen(mi_filename.c_str(), "r");
+    if (!mi_in) {
+        abort(11, "could not read marking information");
+    }
+    mi_parse();
+    fclose(mi_in);
 
     /*---------------------------------.
     | 3. parse most-permissive partner |
@@ -155,14 +168,6 @@ int main(int argc, char** argv) {
         std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp_sa << std::endl;
     }
 
-    /*-------------------------------------------------.
-    | 4. transform most-permissive partner to open net |
-    `-------------------------------------------------*/
-    pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
-    if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp << std::endl;
-    }
-
     /*------------------------.
     | 5. parse target service |
     `------------------------*/
@@ -175,6 +180,17 @@ int main(int argc, char** argv) {
     target_file.close();
     if (args_info.verbose_flag) {
         std::cerr << PACKAGE << ": target: " << pnapi::io::stat << *target << std::endl;
+    }
+
+
+
+
+    /*-------------------------------------------------.
+    | 4. transform most-permissive partner to open net |
+    `-------------------------------------------------*/
+    pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
+    if (args_info.verbose_flag) {
+        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp << std::endl;
     }
 
     /*------------------------------------------------------.
@@ -214,16 +230,6 @@ int main(int argc, char** argv) {
         fprintf(stderr, "%s: %d tuples for target service found\n", PACKAGE, stat_tupleCountNew);
     }
 
-    /*-----------------------------.
-    | 8. parse marking information |
-    `-----------------------------*/
-    mi_in = fopen(mi_filename.c_str(), "r");
-    if (!mi_in) {
-        abort(11, "could not read marking information");
-    }
-    mi_parse();
-    fclose(mi_in);
-
     /*---------------------------.
     | 9. find jumper transitions |
     `---------------------------*/
@@ -257,6 +263,7 @@ int main(int argc, char** argv) {
     if (args_info.verbose_flag) {
         fprintf(stderr, "%s: %d jumper transitions found\n", PACKAGE, jumperCount);
     }
+
 
     return EXIT_SUCCESS;
 }

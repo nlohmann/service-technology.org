@@ -1,11 +1,11 @@
 #ifndef Node_H_
 #define Node_H_
 
-//#include <cassert>
 #include <list>
 #include <string>
 #include <map>
 #include "Formula.h"
+#include "Event.h"
 
 
 using std::list;
@@ -18,38 +18,51 @@ class Node {
 
     public:
 
+    	/*-----------.
+		| attributes |
+		`-----------*/
+
         /// successor nodes together with their corresponding edge labels
         list< pair<string, Node*> > successors;
 
         // this node's formula
         Formula* formula;
 
-        /// constructor
+
+        /*--------.
+		| methods |
+		`--------*/
+
+        /// basic constructor
         explicit Node(unsigned int);
 
-        /// destructor
+        /// basic destructor
         ~Node();
 
         // getter and setter for id
         unsigned int getID() const { return id; }
         void setID(unsigned int newID) { id = newID; }
 
-    void recolorInefficientSuccessors(map< Node*, list<Node*> >& );
+        /// TODO comment
+        void recolorInefficientSuccessors(map< Node*, list<Node*> >& );
 
-    unsigned int computeInefficientSuccessors(map< Node*, list<Node*> >& );
+        /// TODO comment
+        unsigned int computeInefficientSuccessors(map< Node*, list<Node*> >& );
 
-    unsigned int getCostMinimalAssignments(
-        list< pair<string, unsigned int> >,
-        list< FormulaAssignment >& );
+        /// TODO comment
+        unsigned int getCostMinimalAssignments(
+        		list< pair<string, unsigned int> >,
+        		list< FormulaAssignment >& );
 
-    void getCostMinimalAssignmentsRecursively(
-        list< pair<string, unsigned int> > ,
-        unsigned int,
-        FormulaAssignment,
-        unsigned int&,
-        list< FormulaAssignment >&);
+        /// TODO comment
+        void getCostMinimalAssignmentsRecursively(
+        		list< pair<string, unsigned int> > ,
+        		unsigned int,
+        		FormulaAssignment,
+        		unsigned int&,
+        		list< FormulaAssignment >&);
 
-        // for debugging
+        /// print information about this node on std::cout
         void printToStdout();
 
     private:

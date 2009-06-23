@@ -7,15 +7,14 @@ using std::cout;
 using std::endl;
 
 
-//! \brief a basic constructor of AnnotadedGraph
+//! \brief a basic constructor of Graph
 Graph::Graph() :
     root(NULL) {
 }
 
 
-//! \brief a basic destructor of AnnotadedGraph
+//! \brief a basic destructor of Graph
 Graph::~Graph() {
-
     root = NULL;
     nodes.clear();
 }
@@ -28,7 +27,7 @@ void Graph::recolorInefficientNodes() {
     // compute cost and inefficient successors
     root->computeInefficientSuccessors(inefficientSuccessors);
 
-    // recolor inefficient successors
+    // recolors inefficient successors
     root->recolorInefficientSuccessors(inefficientSuccessors);
     inefficientSuccessors.clear();
 }
@@ -36,10 +35,17 @@ void Graph::recolorInefficientNodes() {
 
 void Graph::printToStdout() {
 
-    cout << "graph has " << nodes.size() << " nodes" << endl;
-    cout << "root node is node id '";
-    if ( root == NULL ) cout << "NULL'" << endl; else cout << root->getID() << "'" << endl;
+    cout << "graph has " << nodes.size() << " nodes and "
+         << (events.size()) << " events\n" << endl;
 
+    for (map<string, Event*>::const_iterator iter = events.begin();
+         iter != events.end(); ++iter) {
+    	Event* currentEvent = iter->second;
+    	currentEvent->printToStdout();
+    }
+
+    cout << "\nroot node is node id '";
+    if ( root == NULL ) cout << "NULL'" << endl; else cout << root->getID() << "'\n" << endl;
     for (map<unsigned int, Node*>::iterator iter = nodes.begin();
          iter != nodes.end(); ++iter) {
 

@@ -1,4 +1,5 @@
 // if you need assertions, always include these headers in _this_ order
+// header from configure
 #include "config.h"
 #include <cassert>
 
@@ -11,7 +12,7 @@
 
 // C Standard General Utilities Library: EXIT_SUCCESS, atoi(), etc.
 #include <cstdlib>
-// standard header for declaring objects that control reading from and writing to the standard streams 
+// standard header for declaring objects that control reading from and writing to the standard streams
 #include <iostream>
 // C++ strings library
 #include <string>
@@ -20,7 +21,7 @@
 
 // header from gengetopt
 #include "cmdline.h"
-// header from configure
+// header for graph structure
 #include "Graph.h"
 
 
@@ -40,10 +41,14 @@ extern int cf_yyparse();
 extern FILE* cf_yyin;
 
 // global variables for above parsers
-Graph* ogGraph;
-map< string, unsigned int > ogEdges;
+Graph* parsedOG;
 
 
+
+/// little helper method for message output
+void debug(string msg) {
+	cerr << "DEBUG: " << msg << endl;
+}
 
 /// main method
 int main(int argc, char** argv) {
@@ -62,25 +67,28 @@ int main(int argc, char** argv) {
     // call the command line parser from gengetopt
     // which will check for unused and unnamed paramters
     if (cmdline_parser(argc, argv, &args_info) != 0) {
+    	debug("error in commandline parser");
         exit(EXIT_FAILURE);
     }
 
     // set input og source
     string inputPrefix = "";
     if ( args_info.input_given ) {
+    	// get og prefix in case of missing costfile/open net prefix
         inputPrefix = string(args_info.input_arg);
         if ( inputPrefix.find(".") != string::npos ) {
             inputPrefix = inputPrefix.erase( inputPrefix.find(".") );
         }
         assert(inputPrefix != "");
-        cerr << "DEBUG: og file prefix is '" << inputPrefix << "'" << endl;
+        debug("og file prefix is '" + inputPrefix + "'");
 
         og_yyin = fopen(args_info.input_arg, "r");
         if ( !og_yyin ) {
-            cerr << PACKAGE << ": failed to open input file '"
-                 << args_info.input_arg << "'" << endl;
+            cerr << PACKAGE << ": failed to open input file '" << args_info.input_arg << "'" << endl;
             exit(EXIT_FAILURE);
         }
+    } else {
+    	// og_yyin reads from stdin per default
     }
 
     // set input cost source
@@ -88,18 +96,18 @@ int main(int argc, char** argv) {
         if ( args_info.costfile_arg != NULL ) {
             cf_yyin = fopen( args_info.costfile_arg, "r");
         } else {
-            cf_yyin = fopen( inputPrefix.c_str(), "r");
+        	string costfile = inputPrefix + ".cf";
+            cf_yyin = fopen( costfile.c_str(), "r");
         }
 
         if ( !cf_yyin ) {
-            cerr << PACKAGE << ": failed to open cost file '"
-                 << args_info.costfile_arg << "'" << endl;
+            cerr << PACKAGE << ": failed to open costfile '" << args_info.costfile_arg << "'" << endl;
             exit(EXIT_FAILURE);
         }
     } else if ( args_info.netfile_given ) {
-        // TODO read owfn
+        // TODO read open net
     } else {
-        cerr << PACKAGE << ": a cost file or a net file must be given" << endl;
+        cerr << PACKAGE << ": a costfile or a netfile must be given" << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -121,45 +129,42 @@ int main(int argc, char** argv) {
 	`---------------------------------*/
 
     if ( args_info.input_given ) {
-        cerr << "DEBUG: parse og file '" << args_info.input_arg << "'" << endl;
+    	debug("parse og file");
     } else {
-        cerr << "DEBUG: parse og from stdin" << endl;
+        debug("parse og from stdin");
     }
 
-    ogGraph = new Graph();
+    parsedOG = new Graph();
     og_yyparse();
     fclose(og_yyin);
-    
-    cerr << "DEBUG: finished og parsing, parsed following data:\n\n" << endl;
-    ogGraph->printToStdout();
+
+    debug("finished og parsing, parsed following data:\n\n");
+    parsedOG->printToStdout();
 
 
-	/*-------------------.
-	| 2. parse cost file |
-	`-------------------*/
+    /*---------------------.
+	| 2. parse cost source |
+	`---------------------*/
 
-    // TODO
-    if ( args_info.costfile_given ) {
-        cerr << "\nDEBUG: parse cf file '" << args_info.costfile_arg << "'" << endl;
-        cf_yyparse();
-        fclose(cf_yyin);
-    } else {
-        // TODO parse owfn
-    }
+	// parse costfile or netfile and fill map ogEdges
+	if ( args_info.costfile_given ) {
+		debug("parse costfile");
+		cf_yyparse();
+		fclose(cf_yyin);
+	} else {
+		debug("parse netfile");
+		// TODO parse netfile and close stream
+	}
 
-    cerr << "DEBUG: finished cost parsing, parsed following data:\n\n" << endl;
-    for ( map< string, unsigned int >::const_iterator iter = ogEdges.begin();
-          iter != ogEdges.end(); ++iter ) {
-
-        cerr << "'" << iter->first << "' with cost '" << iter->second << "'" << endl;
-    }
+	debug("finished cost parsing, parsed following data:\n\n");
+	parsedOG->printToStdout();
 
 
 	/*-----------------------------.
 	| 3. compute cost-efficient OG |
 	`-----------------------------*/
 
-    //ogGraph->flagInefficientNodes();
+    //parsedOG->flagInefficientNodes();
 
 
 	/*----------------------------------.
@@ -176,8 +181,7 @@ int main(int argc, char** argv) {
 
 
     // release memory for parsed OG
-    delete ogGraph;
-    ogEdges.clear();
+    delete parsedOG;
 
     return EXIT_SUCCESS;
 }

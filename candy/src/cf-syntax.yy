@@ -11,7 +11,7 @@
 
 
 // from main.cc
-extern map< string, unsigned int > ogEdges;
+extern Graph* parsedOG;
 
 
 // from flex
@@ -19,7 +19,6 @@ extern char* cf_yytext;
 extern int cf_yylex();
 extern int cf_yyerror(char const *msg);
 
-using std::pair;
 using std::string;
 
 
@@ -53,12 +52,13 @@ eventcost:
   /* empty */
 | eventcost IDENT NUMBER SEMICOLON
   {
-    // check and create new entry for edge
-    if ( ogEdges.find($2) != ogEdges.end() ) {
-        cf_yyerror("read an edge label twice");
-        return EXIT_FAILURE;
+    // check and set cost entry for current event
+    map< string, Event* >::iterator iter = parsedOG->events.find($2);
+    if ( iter != parsedOG->events.end() ) {
+        (iter->second)->cost = $3;
     } else {
-        ogEdges[$2] = $3;
+        cf_yyerror("read an event twice");
+        return EXIT_FAILURE;
     }
 
     free($2);

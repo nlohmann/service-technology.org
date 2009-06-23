@@ -9,10 +9,9 @@
 // header for graph class
 #include "Graph.h"
 
-#include "Formula.h"
 
 // from main.cc
-extern Graph* ogGraph;
+extern Graph* parsedOG;
 
 
 // from flex
@@ -28,6 +27,7 @@ bool foundRootNode;
 Node* currentNode;
 Node* currentSuccessor;
 Formula* currentFormula;
+EventType currentType;
 %}
 
 %name-prefix="og_yy"
@@ -60,7 +60,19 @@ Formula* currentFormula;
 
 
 og:
-  KEY_INTERFACE input output synchronous KEY_NODES
+  KEY_INTERFACE
+  {
+    currentType = T_INPUT;
+  }
+  input
+  {
+    currentType = T_OUTPUT;
+  }
+  output
+  {
+    currentType = T_SYNC;
+  }
+  synchronous KEY_NODES
   {
     foundRootNode = false;
     currentNode = NULL;
@@ -91,7 +103,51 @@ synchronous:
 identlist:
   /* empty */
 | IDENT
+  {
+    Event* newEvent = NULL;
+    if ( currentType == T_INPUT ) {
+        newEvent = new Event($1, 0, T_INPUT, false);
+    } else if ( currentType == T_OUTPUT ) {
+        newEvent = new Event($1, 0, T_OUTPUT, false);
+    } else if ( currentType == T_SYNC ) {
+        newEvent = new Event($1, 0, T_SYNC, false);
+    } else {
+        og_yyerror("read an event of unknown type");
+        return EXIT_FAILURE;
+    }
+    
+    if ( parsedOG->events.find($1) == parsedOG->events.end() ) {
+        parsedOG->events[$1] = newEvent;
+    } else {
+        og_yyerror("read an event twice");
+        return EXIT_FAILURE;
+    }
+    
+    free($1);
+  }
 | identlist COMMA IDENT
+  {
+    Event* newEvent = NULL;
+    if ( currentType == T_INPUT ) {
+        newEvent = new Event($3, 0, T_INPUT, false);
+    } else if ( currentType == T_OUTPUT ) {
+        newEvent = new Event($3, 0, T_OUTPUT, false);
+    } else if ( currentType == T_SYNC ) {
+        newEvent = new Event($3, 0, T_SYNC, false);
+    } else {
+        og_yyerror("read an event of unknown type");
+        return EXIT_FAILURE;
+    }
+    
+    if ( parsedOG->events.find($3) == parsedOG->events.end() ) {
+        parsedOG->events[$3] = newEvent;
+    } else {
+        og_yyerror("read an event twice");
+        return EXIT_FAILURE;
+    }
+    
+    free($3);
+  }
 ;
 
 
@@ -109,11 +165,17 @@ node:
   annotation successors
   {
     currentNode->formula = currentFormula;
-    ogGraph->nodes[$1] = currentNode;
-    if ( foundRootNode == false ) {
-        // first found node is per definition the root node
+    if ( parsedOG->nodes.find($1) == parsedOG->nodes.end() ) {
+        parsedOG->nodes[$1] = currentNode;
+    } else {
+        og_yyerror("read a node twice");
+        return EXIT_FAILURE;
+    }
+    
+    // first found node is per definition the root node
+    if ( !foundRootNode ) {
         foundRootNode = true;
-        ogGraph->root = currentNode;
+        parsedOG->root = currentNode;
     }
   }
 ;
@@ -156,6 +218,7 @@ formula:
 | OP_NOT formula
   {
     //$$ = new pnapi::formula::Negation(*$2);
+    // TODO implement negation
     $$ = NULL;
   }
 | KEY_FINAL
@@ -185,14 +248,21 @@ successors:
 | successors IDENT ARROW NUMBER
   {
     // find known successor node or create it
-    if ( ogGraph->nodes.find($4) != ogGraph->nodes.end() ) {
-        currentSuccessor = (ogGraph->nodes.find($4))->second;
+    map< unsigned int, Node* >::iterator iter = parsedOG->nodes.find($4);
+    if ( iter != parsedOG->nodes.end() ) {
+        currentSuccessor = iter->second;
     } else {
         currentSuccessor = new Node($4);
     }
 
     // register successor node as successor
-    currentNode->successors.push_back( pair<string, Node*>($2, currentSuccessor) );
+    //if ( currentNode->successors.find($2) == currentNode->successors.end() ) {
+        currentNode->successors.push_back( pair<string, Node*>($2, currentSuccessor) );
+    //} else {
+    //    og_yyerror("read a successor node twice");
+    //    return EXIT_FAILURE;
+    //}
+    
     free($2);
   }
 ;

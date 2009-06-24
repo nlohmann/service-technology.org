@@ -6,7 +6,7 @@ sayo_SOURCES =  syntax_og.yy lexic_og.ll \
 
 BUILT_SOURCES = cmdline.c syntax_og.cc
 
-EXTRA_DIST = cmdline.ggo syntax_og.h
+EXTRA_DIST = cmdline.ggo syntax_og.h publicview.sh
 
 MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_og.h
 

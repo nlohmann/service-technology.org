@@ -2,9 +2,25 @@ info_TEXINFOS = sayo.texi
 
 sayo_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
-TEXINFO_TEX = texinfo.tex
+TEXINFO_TEX = texinfo.tex \
+              examples/2bits.og \
+              examples/2bits.interface \
+              examples/2bits.nodes \
+              examples/coffee.owfn \
+              examples/coffee.og \
+              examples/coffee.sa \
+              examples/coffee.pv.owfn.part1 \
+              examples/coffee.pv.owfn.part2 
 
-EXTRA_DIST = cmdline.out 
+EXTRA_DIST = cmdline.out \
+             examples/2bits.og \
+             examples/2bits.interface \
+             examples/2bits.nodes \
+             examples/coffee.owfn \
+             examples/coffee.og \
+             examples/coffee.sa \
+             examples/coffee.pv.owfn.part1 \
+             examples/coffee.pv.owfn.part2 
 
 MAINTAINERCLEANFILES = cmdline.out
 

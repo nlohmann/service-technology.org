@@ -9,20 +9,19 @@
 // header for graph class
 #include "Graph.h"
 
+using std::pair;
+using std::string;
+
 
 // from main.cc
 extern Graph* parsedOG;
-
 
 // from flex
 extern char* og_yytext;
 extern int og_yylex();
 extern int og_yyerror(char const *msg);
 
-using std::pair;
-using std::string;
-
-
+// for parser
 bool foundRootNode;
 Node* currentNode;
 Node* currentSuccessor;
@@ -223,7 +222,9 @@ formula:
   }
 | KEY_FINAL
   {
+    currentNode->final = true;
     $$ = new FormulaLiteralFinal();
+    //$$ = NULL;
   }
 | KEY_TRUE
   {
@@ -248,20 +249,27 @@ successors:
 | successors IDENT ARROW NUMBER
   {
     // find known successor node or create it
-    map< unsigned int, Node* >::iterator iter = parsedOG->nodes.find($4);
-    if ( iter != parsedOG->nodes.end() ) {
-        currentSuccessor = iter->second;
+    map< unsigned int, Node* >::const_iterator i = parsedOG->nodes.find($4);
+    if ( i != parsedOG->nodes.end() ) {
+        currentSuccessor = i->second;
     } else {
         currentSuccessor = new Node($4);
     }
 
     // register successor node as successor
-    //if ( currentNode->successors.find($2) == currentNode->successors.end() ) {
-        currentNode->successors.push_back( pair<string, Node*>($2, currentSuccessor) );
-    //} else {
-    //    og_yyerror("read a successor node twice");
-    //    return EXIT_FAILURE;
-    //}
+    if ( currentNode->successors.find(currentSuccessor) == currentNode->successors.end() ) {
+        map< string, Event* >::const_iterator j = parsedOG->events.find($2);
+        if ( j != parsedOG->events.end() ) {
+            Event* successorEvent= j->second;
+            currentNode->successors[currentSuccessor] = successorEvent;
+        } else {
+            og_yyerror("read a successor with unknown event");
+            return EXIT_FAILURE;
+        }
+    } else {
+        og_yyerror("read a successor node twice");
+        return EXIT_FAILURE;
+    }
     
     free($2);
   }

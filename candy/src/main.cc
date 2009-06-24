@@ -164,13 +164,16 @@ int main(int argc, char** argv) {
 	| 3. compute cost-efficient OG |
 	`-----------------------------*/
 
-    //parsedOG->flagInefficientNodes();
+    //parsedOG->computeInefficientNodes();
+	debug("compute cost efficient OG");
+	(parsedOG->root)->computeEfficientSuccessors();
 
 
 	/*----------------------------------.
 	| 4. compute cost-efficient partner |
 	`----------------------------------*/
 
+	//parsedOG->printEfficientOG(stream);
 
 	/*-----------------------.
 	| N. collect the garbage |

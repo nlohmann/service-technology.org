@@ -12,7 +12,8 @@ using std::endl;
 //! \brief constructor (three parameters)
 //! \param _number the number of this node
 Node::Node(unsigned int _id) :
-    id(_id) {
+    id(_id),
+    final(false) {
 }
 
 
@@ -20,6 +21,7 @@ Node::Node(unsigned int _id) :
 Node::~Node() {
 
     successors.clear();
+    efficientSuccessors.clear();
 }
 
 
@@ -73,51 +75,42 @@ void Node::recolorInefficientSuccessors(map< Node*, list<Node*> >& inefficientSu
 //! \brief computes a list of inefficient successors for this node and the node's minimal cost
 //! \param inefficientSuccessors contains all reached nodes and their inefficient successors
 //! \return returns the minimal cost of this node
-unsigned int Node::computeInefficientSuccessors(map< Node*, list<Node*> >& inefficientSuccessors) {
+unsigned int Node::computeEfficientSuccessors() {
 
-
-    /*
     // if this node is a final node then we dont have to consider any leaving edge
-    //cerr << "DEBUG computing costs for node " << getNumber() << endl;
-    if ( isFinal() ) {
-        //cerr << "      node " << getNumber() << " is final, cost is 0" << endl;
+    cout << "DEBUG computing costs for node " << getID() << endl;
+    if ( final ) {
+        cout << "      node " << getID() << " is final, cost is 0" << endl;
         return 0;
     }
 
 
-    // first we have to compute the cost for all leaving edges which lead to
-    // non-empty blue nodes (these are the nodes used for partner synthesis)
-    list< pair<string, unsigned int> > labels;
-    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
-    while (edgeIter->hasNext()) {
-        AnnotatedGraphEdge* edge = edgeIter->getNext();
-        AnnotatedGraphNode* successor = edge->getDstNode();
+    // first we have to compute the cost for all successors
+    list< pair< pair<Node*, Event*>, unsigned int> > totalCost;
+    for ( map< Node*, Event* >::const_iterator iter = successors.begin();
+          iter != successors.end(); ++iter) {
 
-        // we skip the empty node and non-blue nodes
-        if ( successor->getAnnotation()->equals() != TRUE && successor->getColor() == BLUE ) {
+    	Node* successor = iter->first;
+		if (successor == this) {
+			// this should never happens as cost are defined for acyclic OGs
+			cout << "Cannot compute cost since the given OG is not acyclic\n\n" << endl;
+			return EXIT_FAILURE;
+		}
 
-            if (successor == this) {
-                // this should never happens as cost are defined for acyclic OGs
-                trace("Cannot compute cost since the given OG is not acyclic\n\n");
-                assert(false);
-            }
-
-            unsigned int successorCost = edge->cost + successor->computeInefficientSuccessors(inefficientSuccessors);
-            labels.push_back( make_pair(edge->getLabel(), successorCost) );
-            //cerr << "      node " << getNumber() << " has successor with cost " << successorCost << endl;
-        }
+		unsigned int successorCost = (iter->second)->cost + successor->computeEfficientSuccessors();
+		totalCost.push_back( pair<pair<Node*, Event*>, unsigned int>(*iter, successorCost) );
+		cout << "      node " << getID() << " has successor with cost " << successorCost << endl;
     }
-    delete edgeIter;
 
 
     // second we compute all cost minimal assignments for this node as well as
     // the minimal cost
-    list<GraphFormulaAssignment> minimalAssignments;
-    unsigned int minimalCost = getCostMinimalAssignments(labels, minimalAssignments);
-    labels.clear();
-    //cerr << "      node " << getNumber() << " has minimalAssignment with cost " << minimalCost << endl;
+    list<FormulaAssignment> minimalAssignments;
+    unsigned int minimalCost = getCostMinimalAssignments(totalCost, minimalAssignments);
+    cout << "      node " << getID() << " has minimalAssignment with cost " << minimalCost << endl;
 
 
+    /*
     // finally we compute a list of all inefficient successor nodes which are
     // reachable through leaving edges from this node
     list<AnnotatedGraphNode*> succ;
@@ -146,11 +139,10 @@ unsigned int Node::computeInefficientSuccessors(map< Node*, list<Node*> >& ineff
     }
     inefficientSuccessors[this] = succ;
     delete edgeIter;
+    */
 
 
     return minimalCost;
-    */
-    return 0;
 }
 
 
@@ -159,24 +151,20 @@ unsigned int Node::computeInefficientSuccessors(map< Node*, list<Node*> >& ineff
 //! \param minimalAssignments list of all found minimal assignments
 //! \return returns the minimal cost
 unsigned int Node::getCostMinimalAssignments(
-        list< pair<string, unsigned int> > labelCost,
+        list< pair< pair<Node*, Event*>, unsigned int> > totalCost,
         list< FormulaAssignment >& minimalAssignments) {
 
-    /*
     // temporary variables for recursion
-    GraphFormulaAssignment possibleAssignment = GraphFormulaAssignment();
+    FormulaAssignment possibleAssignment = FormulaAssignment();
     unsigned int minimalCost = UINT_MAX;
 
     // the literals "true" and "final" are always set to true in every assignment
     possibleAssignment.setToTrue("true");
     possibleAssignment.setToTrue("final");
 
-
     // compute minimal assignments with recursion
-    getCostMinimalAssignmentsRecursively(labelCost, 0, possibleAssignment, minimalCost, minimalAssignments);
+    getCostMinimalAssignmentsRecursively(totalCost, 0, possibleAssignment, minimalCost, minimalAssignments);
     return minimalCost;
-    */
-    return 0;
 }
 
 
@@ -187,32 +175,32 @@ unsigned int Node::getCostMinimalAssignments(
 //! \param minimalCost cost of found minimal assignment(s)
 //! \param minimalAssignments list of all found minimal assignments
 void Node::getCostMinimalAssignmentsRecursively(
-        list< pair<string, unsigned int> > labelCost, // edge label and edge cost
+        list< pair<pair<Node*, Event*>, unsigned int> > totalCost, // edge label and edge cost
         unsigned int currentCost,
         FormulaAssignment currentAssignment,
         unsigned int& minimalCost,
         list< FormulaAssignment >& minimalAssignments) {
 
-    /*
     // check if there are still labels to assign and if there is still the
     // chance of finding an assignment with lesser cost than the found minimal
     // assignment(s)
-    if (labelCost.empty() || currentCost > minimalCost ) {
+    if (totalCost.empty() || currentCost > minimalCost ) {
         return;
     }
 
     // get current label and current label's cost
     // the list labelCost is handled as queue
-    string currentLabel = labelCost.front().first;
-    unsigned int currentLabelCost = labelCost.front().second;
-    labelCost.pop_front();
+    pair<Node*, Event*> currentSuccessor = totalCost.front().first;
+    string currentLabel = (currentSuccessor.second)->name;
+    unsigned int currentLabelCost = totalCost.front().second;
+    totalCost.pop_front();
 
     // if this was the last label ...
-    if (labelCost.empty()) {
+    if (totalCost.empty()) {
 
         // set it to False ...
         currentAssignment.setToFalse(currentLabel);
-        if ( assignmentSatisfiesAnnotation(currentAssignment) ) {
+        if ( formula->satisfies(currentAssignment) ) {
 
             if ( currentCost < minimalCost ) {
                 // we found a minimal assignment with lesser cost
@@ -230,7 +218,7 @@ void Node::getCostMinimalAssignmentsRecursively(
             // set it to True
             // only for true labels the label's cost are added
             currentAssignment.setToTrue(currentLabel);
-            if ( assignmentSatisfiesAnnotation(currentAssignment) ) {
+            if ( formula->satisfies(currentAssignment) ) {
 
                 if ( currentCost + currentLabelCost < minimalCost ) {
                     // we found a minimal assignment with lesser cost
@@ -249,29 +237,30 @@ void Node::getCostMinimalAssignmentsRecursively(
 
         // set it to False
         currentAssignment.setToFalse(currentLabel);
-        getCostMinimalAssignmentsRecursively(labelCost, currentCost, currentAssignment, minimalCost, minimalAssignments);
+        getCostMinimalAssignmentsRecursively(totalCost, currentCost, currentAssignment, minimalCost, minimalAssignments);
 
         // set it to True
         currentAssignment.setToTrue(currentLabel);
-        getCostMinimalAssignmentsRecursively(labelCost, currentCost + currentLabelCost, currentAssignment, minimalCost, minimalAssignments);
+        getCostMinimalAssignmentsRecursively(totalCost, currentCost + currentLabelCost, currentAssignment, minimalCost, minimalAssignments);
     }
 
     // reinsert the label afterwards
-    labelCost.push_front( make_pair(currentLabel, currentLabelCost));
-    */
+    totalCost.push_front( pair<pair<Node*, Event*>, unsigned int>(currentSuccessor, currentLabelCost));
 }
 
 
 void Node::printToStdout() {
 
-    cout << "node id '" << id << "' with formula '" << formula->asString() << "' and successors" << endl;
-    for ( list< pair<string, Node*> >::iterator iter = successors.begin();
+    cout << "node id '" << id << "' with formula '" <<
+    (formula != NULL ? formula->asString() : "NULL") << "' and successors" << endl;
+    for ( map< Node*, Event* >::const_iterator iter = successors.begin();
           iter != successors.end(); ++iter ) {
 
-        Node* currentNode = iter->second;
-        //if ( currentNode != NULL ) {
-        if ( true ) {
-            cout << "\tnode id '" << currentNode->id << "' with edge label '" << iter->first << "'" << endl;
+        Node* currentNode = iter->first;
+        if ( currentNode != NULL ) {
+        //if ( true ) {
+            cout << "\tnode id '" << currentNode->id << "' with ";
+            (iter->second)->printToStdout();
         } else {
             cout << "\tnode NULL" << endl;
         }

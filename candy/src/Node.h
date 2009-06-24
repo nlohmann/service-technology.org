@@ -23,11 +23,13 @@ class Node {
 		`-----------*/
 
         /// successor nodes together with their corresponding edge labels
-        list< pair<string, Node*> > successors;
+        map< Node*, Event* > successors;
 
         // this node's formula
         Formula* formula;
 
+        bool final;
+        list< Node* > efficientSuccessors;
 
         /*--------.
 		| methods |
@@ -47,16 +49,16 @@ class Node {
         void recolorInefficientSuccessors(map< Node*, list<Node*> >& );
 
         /// TODO comment
-        unsigned int computeInefficientSuccessors(map< Node*, list<Node*> >& );
+        unsigned int computeEfficientSuccessors();
 
         /// TODO comment
         unsigned int getCostMinimalAssignments(
-        		list< pair<string, unsigned int> >,
+        		list< pair< pair<Node*, Event*>, unsigned int> >,
         		list< FormulaAssignment >& );
 
         /// TODO comment
         void getCostMinimalAssignmentsRecursively(
-        		list< pair<string, unsigned int> > ,
+        		list< pair< pair<Node*, Event*>, unsigned int> >,
         		unsigned int,
         		FormulaAssignment,
         		unsigned int&,

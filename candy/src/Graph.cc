@@ -25,7 +25,7 @@ void Graph::recolorInefficientNodes() {
     map< Node*, list<Node*> > inefficientSuccessors;
 
     // compute cost and inefficient successors
-    root->computeInefficientSuccessors(inefficientSuccessors);
+    root->computeEfficientSuccessors();
 
     // recolors inefficient successors
     root->recolorInefficientSuccessors(inefficientSuccessors);

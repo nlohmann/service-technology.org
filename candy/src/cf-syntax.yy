@@ -9,18 +9,19 @@
 // header for graph class
 #include "Graph.h"
 
+using std::string;
+
 
 // from main.cc
 extern Graph* parsedOG;
-
 
 // from flex
 extern char* cf_yytext;
 extern int cf_yylex();
 extern int cf_yyerror(char const *msg);
 
-using std::string;
-
+// for parser
+map< string, bool > parsedEvents;
 
 %}
 
@@ -45,6 +46,12 @@ using std::string;
 
 costfile:
   eventcost
+  {
+    if ( parsedEvents.size() != parsedOG->events.size() ) {
+        cf_yyerror("given costfile does not include all events from given OG");
+        return EXIT_FAILURE;
+    }
+  }
 ;
 
 
@@ -53,11 +60,17 @@ eventcost:
 | eventcost IDENT NUMBER SEMICOLON
   {
     // check and set cost entry for current event
-    map< string, Event* >::iterator iter = parsedOG->events.find($2);
-    if ( iter != parsedOG->events.end() ) {
-        (iter->second)->cost = $3;
+    if ( parsedEvents.find($2) == parsedEvents.end() ) {
+        map< string, Event* >::iterator iter = parsedOG->events.find($2);
+        if ( iter != parsedOG->events.end() ) {
+            (iter->second)->cost = $3;
+            parsedEvents[$2] = true;
+        } else {
+            cf_yyerror("read an event which is not used in given OG");
+            return EXIT_FAILURE;
+        }
     } else {
-        cf_yyerror("read an event twice");
+        cf_yyerror("read an event in given costfile twice");
         return EXIT_FAILURE;
     }
 

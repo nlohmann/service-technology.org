@@ -1,6 +1,6 @@
 TESTSUITE = $(builddir)/testsuite
 
-EXTRA_DIST = testsuite.at \
+EXTRA_DIST = testsuite.at wrap.sh \
              testfiles/NonFinalTauNode1.fiona.og \
              testfiles/NonFinalTauNode1.wendy.og \
              testfiles/NonFinalTauNode1not.fiona.og \

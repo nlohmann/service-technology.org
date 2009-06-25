@@ -7,24 +7,12 @@
                       http://service-technology.org/sayo
 
 
-Version 1.0
-===========
+Version 1.1-unreleased
+======================
 
-* initial release
-
-* now ignoring "empty" node
-
-* added testcases
-
-* added documentation
-
-* added manpage
-
-* added maintainer scripts
-
-* added documentation
-
-* made Sayo Gnits compatible
+* simplified testsuite by using wrapper script
 
 
+See file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for
+complete version history.
 

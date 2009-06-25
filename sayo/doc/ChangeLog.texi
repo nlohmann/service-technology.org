@@ -1,20 +1,11 @@
-@heading Version 0.3
+@heading Version 1.0
 @itemize
+@item initial release
 @item now ignoring "empty" node
-@item fixed segfault
 @item added testcases
 @item added documentation
-@end itemize
-
-@heading Version 0.2
-@itemize
-@item made Sayo Gnits compatible
 @item added manpage
 @item added maintainer scripts
 @item added documentation
-@end itemize
-
-@heading Version 0.1
-@itemize
-@item initial release
+@item made Sayo Gnits compatible
 @end itemize

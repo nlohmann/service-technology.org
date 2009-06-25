@@ -1,4 +1,4 @@
-AC_INIT(Sayo, 0.3, sayo@service-technology.org)
+AC_INIT(Sayo, 1.0, sayo@service-technology.org)
 
 # the first line should be everything you will ever need to touch
 #############################################################################

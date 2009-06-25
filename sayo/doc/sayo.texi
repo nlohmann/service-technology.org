@@ -60,8 +60,8 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install Sayo.
 * Command Line Options::How to run Sayo.
-* ChangeLog::Version history.
 * From Open Net to Public View::What Sayo is actually doing.
+* ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
@@ -160,23 +160,6 @@ For an overview of the command line options, type @samp{sayo -h} to see the foll
 @include cmdline.out
 @end smallexample
 
-
-
-
-@c --------------------------------------------------------------------------
-
-
-@node ChangeLog
-@chapter Version History
-
-Sayo is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
-
-@include ChangeLog.texi
-
-@sp 3
-
-The most recent change log is available at Sayo's website at 
-@url{http://service-technology.org/files/sayo/ChangeLog}.
 
 
 
@@ -305,6 +288,24 @@ that can be translated to the following open net by sa2owfn@footnote{a tool prov
 @include examples/coffee.pv.owfn.part2
 @end smallexample
 @end cartouche
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+Sayo is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+The most recent change log is available at Sayo's website at 
+@url{http://service-technology.org/files/sayo/ChangeLog}.
+
 
 
 

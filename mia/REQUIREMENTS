@@ -11,9 +11,12 @@ In order to run, compile, and develop Mia, several tools are required.
 Runtime
 =======
 
-   * Wendy
+   * Wendy (`http://service-technology.org/wendy'), at least version 1.4
 
-   * LoLA
+   * LoLA (`http://service-technology.org/lola'), compiled with the `FULL' option
+
+Mia's configure script checks whether these tools (with binaries `wendy' and
+`lola-full') are found in the path. If not, the configure script aborts.
 
 Compilation
 ===========

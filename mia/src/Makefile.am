@@ -4,6 +4,7 @@ mia_SOURCES = syntax_graph.yy lexic_graph.ll \
               syntax_im.yy lexic_im.ll \
               syntax_mi.yy lexic_mi.ll \
               main.cc \
+              verbose.cc verbose.h \
               cmdline.c cmdline.h
 
 # only add the local Petri net API if necessary

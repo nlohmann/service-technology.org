@@ -156,9 +156,12 @@ In order to run, compile, and develop Mia, several tools are required.
 
 @unnumberedsec Runtime
 @itemize
-@item Wendy
-@item LoLA
+@item Wendy (@url{http://service-technology.org/wendy}), at least version 1.4
+@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{FULL} option
 @end itemize
+
+Mia's configure script checks whether these tools (with binaries @file{wendy} and @file{lola-full}) are found in the path. If not, the configure script aborts.
+
 
 @unnumberedsec Compilation
 To compile the source code from a source distribution, the following tools are required.

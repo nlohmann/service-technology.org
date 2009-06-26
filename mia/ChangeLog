@@ -6,6 +6,13 @@
                       http://service-technology.org/mia
 
 
+Version 1.1-unreleased
+======================
+
+* moved verbose output functions to `verbose.*'
+
+* added GNU Affero GPL headers
+
 Version 1.0
 ===========
 

@@ -12,6 +12,7 @@
 
 extern std::string NAME_token;
 extern gengetopt_args_info args_info;
+extern void status(const char* format, ...);
 extern void abort(unsigned int code, const char* format, ...);
 
 void im_error(const char *);
@@ -38,8 +39,6 @@ number    [0-9][0-9]*
 %%
 
 void im_error(const char *msg) {
-  if (args_info.verbose_flag) {
-      fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, im_lineno, im_text, msg);
-  }
+  status("%d: error near '%s': %s", im_lineno, im_text, msg);
   abort(2, "error while parsing the migration information");
 }

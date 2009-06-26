@@ -29,7 +29,7 @@ if test "$WENDY" = "not found"; then
   AC_MSG_ERROR([Wendy was not found, but is needed by Mia.])
 else
   AC_MSG_CHECKING([Wendy version])
-  WENDY_VERSION=`$WENDY --version | sed -e 's/wendy //'`
+  WENDY_VERSION=`$WENDY --version | $SED -e 's/wendy //'`
   WENDY_VERSION_REQ="1.4"
   AC_MSG_RESULT($WENDY_VERSION)
   if test "$WENDY_VERSION" \< "$WENDY_VERSION_REQ"; then
@@ -72,5 +72,5 @@ fi
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile tests/Makefile tests/package.m4 maintainer/Makefile])
 AC_OUTPUT

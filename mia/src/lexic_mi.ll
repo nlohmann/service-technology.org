@@ -12,6 +12,7 @@
 
 extern std::string NAME_token;
 extern gengetopt_args_info args_info;
+extern void status(const char* format, ...);
 extern void abort(unsigned int code, const char* format, ...);
 
 void mi_error(const char *);
@@ -37,8 +38,6 @@ number    "-"?[0-9][0-9]*
 %%
 
 void mi_error(const char *msg) {
-  if (args_info.verbose_flag) {
-      fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, mi_lineno, mi_text, msg);
-  }
+  status("%d: error near '%s': %s", mi_lineno, mi_text, msg);
   abort(10, "error while parsing the marking information");
 }

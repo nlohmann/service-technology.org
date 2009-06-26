@@ -47,6 +47,23 @@ extern int im_parse();
 extern int mi_parse();
 
 
+
+void status(const char* format, ...) {
+    if (args_info.verbose_flag == 0) {
+        return;
+    }
+
+    fprintf(stderr, "%s: ", PACKAGE);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end (args);
+
+    fprintf(stderr, "\n");    
+}
+
+
 /*!
  \brief abort with an error message and an error code
  
@@ -65,9 +82,7 @@ void abort(unsigned int code, const char* format, ...) {
 
     fprintf(stderr, " -- aborting [#%02d]\n", code);
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: see manual for a documentation of this error\n", PACKAGE);
-    }
+    status("see manual for a documentation of this error");
 
     exit(EXIT_FAILURE);
 }
@@ -99,7 +114,7 @@ int main(int argc, char** argv) {
     `--------------------------------------*/
     evaluateParameters(argc, argv);
 
-    fprintf(stderr, "%s: migrating '%s' to '%s\n", PACKAGE, args_info.inputs[0], args_info.inputs[1]);
+    status("migrating '%s' to '%s", args_info.inputs[0], args_info.inputs[1]);
 
     // create a unique temporary file name
     char tmp[] = "/tmp/mia-XXXXXX";
@@ -123,13 +138,8 @@ int main(int argc, char** argv) {
         wendy_command += " -m" + s.str();
     }
     wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> /dev/null");
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: executing '%s'\n", PACKAGE, wendy_command.c_str());
-    }
+    status("executing '%s'", wendy_command.c_str());
     system(wendy_command.c_str());
-
-
-
 
     /*-------------------------------.
     | 2. parse migration information |
@@ -140,12 +150,10 @@ int main(int argc, char** argv) {
     }
     im_parse();
     fclose(im_in);
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: parsed migration information: %d tuples\n", PACKAGE, stat_tupleCount);
-    }
+    status("parsed migration information: %d tuples", stat_tupleCount);
 
     /*-----------------------------.
-    | 8. parse marking information |
+    | 3. parse marking information |
     `-----------------------------*/
     mi_in = fopen(mi_filename.c_str(), "r");
     if (!mi_in) {
@@ -155,7 +163,7 @@ int main(int argc, char** argv) {
     fclose(mi_in);
 
     /*---------------------------------.
-    | 3. parse most-permissive partner |
+    | 4. parse most-permissive partner |
     `---------------------------------*/
     ifstream mpp_file(mpp_filename.c_str(), ifstream::in);
     if (not mpp_file) {
@@ -182,11 +190,8 @@ int main(int argc, char** argv) {
         std::cerr << PACKAGE << ": target: " << pnapi::io::stat << *target << std::endl;
     }
 
-
-
-
     /*-------------------------------------------------.
-    | 4. transform most-permissive partner to open net |
+    | 6. transform most-permissive partner to open net |
     `-------------------------------------------------*/
     pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
     if (args_info.verbose_flag) {
@@ -194,7 +199,7 @@ int main(int argc, char** argv) {
     }
 
     /*------------------------------------------------------.
-    | 6. compose most-permissive partner and target service |
+    | 7. compose most-permissive partner and target service |
     `------------------------------------------------------*/
     // compse nets and add prefixes (if you wish to change them here, don't
     // forget to also adjust the lexer lexic_graph.ll)
@@ -204,7 +209,7 @@ int main(int argc, char** argv) {
     }
 
     /*-------------------------------------------------.
-    | 7. generate and parse state space of composition |
+    | 8. generate and parse state space of composition |
     `-------------------------------------------------*/
     ofstream composition_lolafile(lola_filename.c_str(), ofstream::trunc);
     if (not composition_lolafile) {
@@ -213,22 +218,21 @@ int main(int argc, char** argv) {
     composition_lolafile << pnapi::io::lola << *mpp;
     composition_lolafile.close();
     string lola_command = args_info.safe_flag ? "lola-full1" : string(BINARY_LOLA);
-    lola_command += " " + lola_filename + " -M";
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: executing '%s'\n", PACKAGE, lola_command.c_str());
-    } else {
+    lola_command += " " + lola_filename + " -M";    
+    if (!args_info.verbose_flag) {
         lola_command += " 2> /dev/null";
     }
+
+    status("executing '%s'", lola_command.c_str());
     graph_in = popen(lola_command.c_str(), "r");
     if (!graph_in) {
         abort(8, "could not read state space of composition");
     }
     graph_parse();
     pclose(graph_in);
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: generated state space of composition: %d states\n", PACKAGE, stat_stateCount);
-        fprintf(stderr, "%s: %d tuples for target service found\n", PACKAGE, stat_tupleCountNew);
-    }
+
+    status("generated state space of composition: %d states", stat_stateCount);
+    status("%d tuples for target service found", stat_tupleCountNew);
 
     /*---------------------------.
     | 9. find jumper transitions |
@@ -239,9 +243,7 @@ int main(int argc, char** argv) {
         if (!outputfile) {
             abort(12, "could not write to file '%s'", args_info.output_arg);
         }
-        if (args_info.verbose_flag) {
-            fprintf(stderr, "%s: writing jumper transitions to '%s'\n", PACKAGE, args_info.output_arg);
-        }
+        status("writing jumper transitions to '%s'", args_info.output_arg);
     }
 
     unsigned int jumperCount = 0;
@@ -260,9 +262,8 @@ int main(int argc, char** argv) {
             }
         }
     }
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: %d jumper transitions found\n", PACKAGE, jumperCount);
-    }
+
+    status("%d jumper transitions found", jumperCount);
 
 
     return EXIT_SUCCESS;

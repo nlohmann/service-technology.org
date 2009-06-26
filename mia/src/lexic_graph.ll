@@ -12,6 +12,7 @@
 
 extern std::string NAME_token;
 extern gengetopt_args_info args_info;
+extern void status(const char* format, ...);
 extern void abort(unsigned int code, const char* format, ...);
 
 void graph_error(const char *);
@@ -47,8 +48,6 @@ number    "-"?[0-9][0-9]*
 %%
 
 void graph_error(const char *msg) {
-  if (args_info.verbose_flag) {
-      fprintf(stderr, "%s:%d: error near '%s': %s\n", PACKAGE, graph_lineno, graph_text, msg);
-  }
+  status("%d: error near '%s': %s", graph_lineno, graph_text, msg);
   abort(3, "error while parsing the reachability graph");
 }

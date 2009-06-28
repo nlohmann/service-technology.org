@@ -28,6 +28,10 @@ Version 1.1-unreleased
 * added generic Makefile target (`bin' in `maintainer') to create a binary
   release for the running platform (using `uname')
 
+* added improved Petri Net API files (faster parsing and composition)
+
+* added output of runtimes of invoked tools and complex operations
+
 
 See file ChangeLog <http://service-technology.org/files/mia/ChangeLog> for
 complete version history.

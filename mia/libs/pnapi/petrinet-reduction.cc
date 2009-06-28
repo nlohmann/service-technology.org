@@ -18,11 +18,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: cas $
+ *          last changes of: \$Author: niels $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-04-13 21:39:09 +0200 (Mo, 13. Apr 2009) $
+ * \date    \$Date: 2009-06-17 10:21:04 +0200 (Mi, 17. Jun 2009) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 4066 $
+ * \version \$Revision: 4305 $
  *
  * \ingroup petrinet
  */

@@ -1,10 +1,18 @@
 @heading Version 1.1-unreleased
 @itemize
 @item moved verbose output functions to @file{verbose.*}
+
 @item added @acronym{GNU} Affero @acronym{GPL} headers
+
 @item added parameters @option{--lola-full}, @option{--lola-full1}, and @option{--wendy} to manually provide the paths of the required binaries
+
 @item Mia can be configured with a configuration file, provided by parameter @option{--config} (see @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information). A standard configuration is created by the configure script and written to @file{src/mia.conf}. When Mia is executed, it checks for the file @file{mia.conf} in the sysconfig folder (usually @file{/usr/local/etc}) and in the current directory. If neither file was found, Mia tries to rely on standard filenames.
+
 @item added generic Makefile target (@samp{bin} in @file{maintainer}) to create a binary release for the running platform (using @samp{uname})
+
+@item added improved Petri Net API files (faster parsing and composition)
+
+@item added output of runtimes of invoked tools and complex operations
 @end itemize
 
 @heading Version 1.0

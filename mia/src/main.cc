@@ -131,6 +131,8 @@ void evaluateParameters(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
+    time_t start_time, end_time;
+
     /*--------------------------------------.
     | 0. parse the command line parameters  |
     `--------------------------------------*/
@@ -162,8 +164,11 @@ int main(int argc, char** argv) {
         wendy_command += " -m" + s.str();
     }
     wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> /dev/null");
+    time(&start_time);
     status("executing '%s'", wendy_command.c_str());
     system(wendy_command.c_str());
+    time(&end_time);
+    status("Wendy done [%.0f sec]", difftime(end_time, start_time));
 
     /*-------------------------------.
     | 2. parse migration information |
@@ -217,20 +222,26 @@ int main(int argc, char** argv) {
     /*-------------------------------------------------.
     | 6. transform most-permissive partner to open net |
     `-------------------------------------------------*/
+    time(&start_time);
     pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
+    time(&end_time);
     if (args_info.verbose_flag) {
         std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp << std::endl;
     }
+    status("converting most-permissive partner done [%.0f sec]", difftime(end_time, start_time));
 
     /*------------------------------------------------------.
     | 7. compose most-permissive partner and target service |
     `------------------------------------------------------*/
     // compse nets and add prefixes (if you wish to change them here, don't
     // forget to also adjust the lexer lexic_graph.ll)
+    time(&start_time);
     mpp->compose(*target, "mpp[1].", "target[1].");
+    time(&end_time);
     if (args_info.verbose_flag) {
         std::cerr << PACKAGE << ": composition: " << pnapi::io::stat << *mpp << std::endl;
     }
+    status("composition done [%.0f sec]", difftime(end_time, start_time));
 
     /*-------------------------------------------------.
     | 8. generate and parse state space of composition |
@@ -248,13 +259,16 @@ int main(int argc, char** argv) {
     }
 
     status("executing '%s'", lola_command.c_str());
+    time(&start_time);
     graph_in = popen(lola_command.c_str(), "r");
     if (!graph_in) {
         abort(8, "could not read state space of composition");
     }
     graph_parse();
     pclose(graph_in);
+    time(&end_time);
 
+    status("LoLA done [%.0f sec]", difftime(end_time, start_time));
     status("generated state space of composition: %d states", stat_stateCount);
     status("%d tuples for target service found", stat_tupleCountNew);
 

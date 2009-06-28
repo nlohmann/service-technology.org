@@ -93,6 +93,15 @@
                style="push"
                tooltip="build state space of the system">
          </action>
+         <action
+               class="hub.top.greta.run.actions.VipWriteLPO"
+               id="hub.top.GRETA.run.export.vip.lpo"
+               label="export current run as VIP scenario"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
+               style="push"
+               tooltip="export current run as VIP scenario">
+         </action>
+         
          <!--
          <action
                class="hub.top.greta.run.actions.BuildBranchingProcess"
@@ -102,15 +111,16 @@
                style="push"
                tooltip="build branching process of the system">
          </action>
+         -->
          <action
                class="hub.top.greta.run.actions.BuildBranchingProcess2"
                id="hub.top.GRETA.run.buildBranchingProcess2"
-               label="build branching process (new)"
+               label="build branching process"
                menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
                style="push"
                tooltip="build branching process of the system">
          </action>
-         -->
+         
          <action
                class="hub.top.greta.run.actions.InstantiateSystem"
                id="hub.top.GRETA.run.instantiateSystem"

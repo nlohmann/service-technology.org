@@ -42,6 +42,7 @@ AC_C_BIGENDIAN
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Wendy cannot use UNIX pipes.]))
+AC_CHECK_FUNCS([mkstemp])
 
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])

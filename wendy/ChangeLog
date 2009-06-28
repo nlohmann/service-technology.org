@@ -14,6 +14,13 @@ Version 1.5-unreleased
 
 * used `mkstemp' function to create temporary filenames
 
+* a wrapper script checks whether binaries needed by test cases are present
+  and skips the test if necessary
+
+* added improved Petri Net API files (faster parsing)
+
+* update maintainer scripts
+
 Version 1.4
 ===========
 

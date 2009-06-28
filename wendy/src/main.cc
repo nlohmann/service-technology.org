@@ -191,9 +191,11 @@ int main(int argc, char** argv) {
     `--------------------------------------------*/
     // create a unique temporary file name
     char tmp[] = "/tmp/wendy-XXXXXX";
+#ifdef HAVE_MKSTEMP
     if (mkstemp(tmp) == -1) {
         abort(13, "could not create a temporary file '%s'", tmp);
     }
+#endif
     std::string tmpname(tmp);
 
     std::ofstream lolaFile((tmpname + ".lola").c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -338,7 +340,7 @@ int main(int argc, char** argv) {
         }
         StoredKnowledge::output(sa_file);
         if (args_info.verbose_flag) {
-            fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, sa_filename.c_str());
+            fprintf(stderr, "%s: wrote service automaton to file '%s'\n", PACKAGE, sa_filename.c_str());
         }
     }
 

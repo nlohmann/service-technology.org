@@ -1,10 +1,7 @@
 AT_INIT
 
-# define macros to skip a test if LoLA or Fiona was not found by configure
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 AT_TESTED(versions.sh)
-
 
 ############################################################################
 AT_BANNER([Standard Options])
@@ -96,7 +93,6 @@ AT_BANNER([Regression Tests])
 ############################################################################
 
 AT_SETUP([Bug 1])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug1.* .])
 AT_CHECK([WENDY bug1.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -105,7 +101,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 2])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug2.* .])
 AT_CHECK([WENDY bug2.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -114,7 +109,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 3])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug3.* .])
 AT_CHECK([WENDY bug3.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -123,7 +117,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 4])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug4.* .])
 AT_CHECK([WENDY bug4.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -132,7 +125,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 5])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug5.* .])
 AT_CHECK([WENDY bug5.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -141,7 +133,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 6])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug6.* .])
 AT_CHECK([WENDY bug6.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -150,7 +141,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 7])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug7.* .])
 AT_CHECK([WENDY bug7.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -159,7 +149,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 8])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug8.* .])
 AT_CHECK([WENDY bug8.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -168,7 +157,6 @@ AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 9])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug9.* .])
 AT_CHECK([WENDY bug9.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -200,7 +188,6 @@ AT_BANNER([Operating Guidelines])
 ############################################################################
 
 AT_SETUP([Coffee Automaton])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.* .])
 AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -209,7 +196,6 @@ AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
 AT_CHECK([WENDY phcontrol3.unf.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -218,7 +204,6 @@ AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Purchase Order Process])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
 AT_CHECK([WENDY PO.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -227,7 +212,6 @@ AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Sequence])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/sequence10.* .])
 AT_CHECK([WENDY sequence10.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -236,7 +220,6 @@ AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([SMTP Protocol])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smtp3.* .])
 AT_CHECK([WENDY smtp3.owfn --fionaFormat --og --verbose],0,ignore,ignore)
@@ -245,7 +228,6 @@ AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Travel Service])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/T2.* .])
 AT_CHECK([WENDY T2.owfn --fionaFormat --og --verbose --messagebound=2],0,ignore,ignore)
@@ -254,7 +236,6 @@ AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([ZEUS Seller Service])
-AT_CHECK_FIONA
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/zeus.* .])
 AT_CHECK([WENDY zeus.owfn --fionaFormat --og --verbose],0,ignore,ignore)

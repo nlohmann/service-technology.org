@@ -10,12 +10,19 @@ TEXINFO_TEX = texinfo.tex
 EXTRA_DIST = gendocs.sh gendocs_template\
 	docShop.owfn docShop.owfn.og fionaDocumentation.pdf
 
-all: ../ChangeLog
+
+#############################################################################
+# when a HTML is installed, the GIF figures are installed as well
+#############################################################################
+install-html-local:
+	test -z "$(pdfdir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)/figs"
+	$(INSTALL_DATA) -t $(DESTDIR)$(htmldir)/figs figs/*.gif
 
 
 #############################################################################
 # create ASCII ChangeLog/NEWS out of Texinfo (8 is height of header)
 #############################################################################
+all: ../ChangeLog
 ../ChangeLog: ChangeLog.texi
 	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=81 fiona.texi
 	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt

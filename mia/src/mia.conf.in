@@ -1,0 +1,26 @@
+# Configuration file for @PACKAGE_STRING@
+# @configure_input@
+
+# This file configures the paths to binaries needed by Mia. The configure
+# script already tried to suggest paths, but it entries might have been left
+# empty. In that case, you need to manually add the path to the respective
+# tool.
+
+# Mia needs a LoLA binary that builds complete unreduced state spaces. Such
+# a LoLA binary can be built by executing "make lola-full" using a recent
+# LoLA distribution, available at http://service-technology.org/files/lola.
+
+lola-full = @LOLA_FULL@
+
+# Mia can exploit the fact that the state space of a composition is safe by
+# design. Such a LoLA binary can be built by executing "make lola-full" using
+# a recent LoLA distribution, available at
+# http://service-technology.org/files/lola. You can also set 'lola-full1' to
+# the same value as 'lola-full'.
+
+lola-full1 = @LOLA_FULL1@
+
+# Mia needs a Wendy binary (version 1.4 and above). Recent distribtions can
+# are available at http://service-technology.org/files/wendy.
+
+wendy = @WENDY@

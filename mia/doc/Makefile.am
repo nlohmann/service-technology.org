@@ -12,10 +12,10 @@ all: ../ChangeLog ../REQUIREMENTS
 
 
 #############################################################################
-# run "mia --full" to include output in documentation
+# run "mia --full-help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/mia --help > cmdline.out
+	$(top_srcdir)/src/mia --full-help > cmdline.out
 
 
 #############################################################################

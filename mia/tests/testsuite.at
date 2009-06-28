@@ -1,5 +1,8 @@
 AT_INIT
 
+m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA_FULL" == ""; then exit 77; fi])])
+
 ############################################################################
 AT_BANNER([Standard Options])
 ############################################################################
@@ -19,6 +22,8 @@ AT_BANNER([Examples])
 ############################################################################
 
 AT_SETUP([Small example (1 -> 2)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/ex1.owfn TESTFILES/ex2.owfn .])
 AT_CHECK([MIA ex1.owfn ex2.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[3
@@ -26,6 +31,8 @@ AT_CHECK([GREP -c "\->" stdout],0,[3
 AT_CLEANUP
 
 AT_SETUP([Small example (2 -> 1)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/ex1.owfn TESTFILES/ex2.owfn .])
 AT_CHECK([MIA ex2.owfn ex1.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[3
@@ -33,6 +40,8 @@ AT_CHECK([GREP -c "\->" stdout],0,[3
 AT_CLEANUP
 
 AT_SETUP([Registration office service (old -> new)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/reg_old.owfn TESTFILES/reg_new.owfn .])
 AT_CHECK([MIA reg_old.owfn reg_new.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[9
@@ -40,6 +49,8 @@ AT_CHECK([GREP -c "\->" stdout],0,[9
 AT_CLEANUP
 
 AT_SETUP([Sequence 5 (original -> public view)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/sequence5.owfn TESTFILES/sequence5-pv.owfn .])
 AT_CHECK([MIA sequence5.owfn sequence5-pv.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[12
@@ -47,6 +58,8 @@ AT_CHECK([GREP -c "\->" stdout],0,[12
 AT_CLEANUP
 
 AT_SETUP([Sequence 5 (public view -> original)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/sequence5.owfn TESTFILES/sequence5-pv.owfn .])
 AT_CHECK([MIA sequence5-pv.owfn sequence5.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[12
@@ -54,6 +67,8 @@ AT_CHECK([GREP -c "\->" stdout],0,[12
 AT_CLEANUP
 
 AT_SETUP([Purchase Order (original -> public view)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/PO.owfn TESTFILES/PO-pv.owfn .])
 AT_CHECK([MIA PO.owfn PO-pv.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[429
@@ -61,6 +76,8 @@ AT_CHECK([GREP -c "\->" stdout],0,[429
 AT_CLEANUP
 
 AT_SETUP([Purchase Order (public view -> original)])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/PO.owfn TESTFILES/PO-pv.owfn .])
 AT_CHECK([MIA PO-pv.owfn PO.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[429

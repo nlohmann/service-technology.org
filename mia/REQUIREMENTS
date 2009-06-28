@@ -16,7 +16,8 @@ Runtime
    * LoLA (`http://service-technology.org/lola'), compiled with the `FULL' option
 
 Mia's configure script checks whether these tools (with binaries `wendy' and
-`lola-full') are found in the path. If not, the configure script aborts.
+`lola-full') are found in the path and adjusts the configuration file
+`src/mia.conf' accordingly.
 
 Compilation
 ===========

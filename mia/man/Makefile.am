@@ -10,4 +10,4 @@ $(PACKAGE).1: $(top_srcdir)/configure.ac
 		--output=$@ \
 		--manual="service-technology.org" \
 		--source="service-technology.org" \
-		--help-option="--help"
+		--help-option="--full-help"

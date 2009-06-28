@@ -23,29 +23,10 @@ AC_CONFIG_TESTDIR(tests)
 
 AC_HEADER_ASSERT
 
-# check for Wendy
-AC_PATH_PROG(WENDY, [wendy], not found)
-if test "$WENDY" = "not found"; then
-  AC_MSG_ERROR([Wendy was not found, but is needed by Mia.])
-else
-  AC_MSG_CHECKING([Wendy version])
-  WENDY_VERSION=`$WENDY --version | $SED -e 's/wendy //'`
-  WENDY_VERSION_REQ="1.4"
-  AC_MSG_RESULT($WENDY_VERSION)
-  if test "$WENDY_VERSION" \< "$WENDY_VERSION_REQ"; then
-    AC_MSG_ERROR([Wendy version $WENDY_VERSION_REQ required, but $WENDY_VERSION found.])
-  else
-    AC_DEFINE_UNQUOTED(BINARY_WENDY, "${WENDY}", [Wendy binary.])
-  fi
-fi
-
-# check for LoLA
-AC_PATH_PROG(LOLA, [lola-full], not found)
-if test "$LOLA" = "not found"; then
-  AC_MSG_ERROR([LoLA was not found, but is needed by Mia.])
-else
-  AC_DEFINE_UNQUOTED(BINARY_LOLA, "${LOLA}", [LoLA binary.])
-fi
+# check for required tools
+AC_PATH_PROG(LOLA_FULL, [lola-full], [])
+AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
+AC_PATH_PROG(WENDY, [wendy], [])
 
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
@@ -71,6 +52,16 @@ fi
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
+AC_CHECK_FUNCS([mkstemp])
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile tests/Makefile tests/package.m4 maintainer/Makefile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile src/mia.conf doc/Doxyfile doc/Makefile man/Makefile tests/Makefile tests/package.m4 maintainer/Makefile])
 AC_OUTPUT
+
+# display a warning in case a required tool has not been found
+if test "${LOLA_FULL}" = "" -o "${WENDY}" = ""; then
+  echo
+  echo "WARNING: Not all required tools have been found. Please read file"
+  echo "         REQUIREMENTS and edit the file src/mia.conf before"
+  echo "         using or installing Mia."
+  echo
+fi

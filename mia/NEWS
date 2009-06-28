@@ -13,6 +13,21 @@ Version 1.1-unreleased
 
 * added GNU Affero GPL headers
 
+* added parameters `--lola-full', `--lola-full1', and `--wendy' to manually
+  provide the paths of the required binaries
+
+* Mia can be configured with a configuration file, provided by parameter
+  `--config' (see
+  `http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files'
+  for more information). A standard configuration is created by the configure
+  script and written to `src/mia.conf'. When Mia is executed, it checks for
+  the file `mia.conf' in the sysconfig folder (usually `/usr/local/etc') and
+  in the current directory. If neither file was found, Mia tries to rely on
+  standard filenames.
+
+* added generic Makefile target (`bin' in `maintainer') to create a binary
+  release for the running platform (using `uname')
+
 
 See file ChangeLog <http://service-technology.org/files/mia/ChangeLog> for
 complete version history.

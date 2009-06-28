@@ -1,4 +1,4 @@
-args "--long-help --include-getopt --show-required --unamed-opts=FILES"
+args "--long-help --include-getopt --show-required --conf-parser --unamed-opts=FILES"
 
 purpose "Mia -- migrating instances"
 
@@ -35,3 +35,37 @@ section "Debug"
 option "verbose" v
   "Verbose output"
   flag off
+
+
+section "Configuration"
+sectiondesc="Mia relies on several other tools. These options configure Mia to find these tools.\n"
+
+option "lola-full" -
+  "Set the name of the LoLA binary used to build state spaces."
+  string
+  typestr="FILE"
+  default="lola-full"
+  optional
+  hidden
+
+option "lola-full1" -
+  "Set the name of the LoLA binary used to build state spaces (while assuming a safe net)."
+  string
+  typestr="FILE"
+  default="lola-full1"
+  optional
+  hidden
+
+option "wendy" -
+  "Set the name of the Wendy binary used to build most-permissive partners."
+  string
+  typestr="FILE"
+  default="wendy"
+  optional
+  hidden
+
+option "config" c
+  "Read configuration from file. If no file is given, Mia first tries to parse file 'mia.conf' from the sysconf directory (usually '/usr/local/etc'; written in case Mia was installed) and then from the current working directory. If neither file was found, the standard values for 'lola-full', 'lola-full1', and 'wendy' are assumed."
+  string
+  typestr="FILE"
+  optional

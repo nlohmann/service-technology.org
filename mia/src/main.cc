@@ -66,6 +66,16 @@ extern int im_parse();
 extern int mi_parse();
 
 
+bool fileExists(std::string filename) {
+    FILE *tmp = fopen(filename.c_str(), "r");
+    if (tmp) {
+        fclose(tmp);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -78,6 +88,39 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     cmdline_parser(argc, argv, &args_info);
+
+    // read a configuration file if necessary
+    if (args_info.config_given) {
+        // initialize the config file parser
+        params->initialize = 0;
+        params->override = 0;
+
+        // call the config file parser
+        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
+            abort(12, "error reading configuration file '%s'", args_info.config_arg);
+        } else {
+            status("using configuration file '%s'", args_info.config_arg);
+        }
+    } else {
+        // check for configuration files
+        string conf_filename = fileExists("mia.conf") ? "mia.conf" :
+                               (fileExists(string(SYSCONFDIR) + "/mia.conf") ?
+                               (string(SYSCONFDIR) + "/mia.conf") : "");
+
+        if (conf_filename != "") {
+            // initialize the config file parser
+            params->initialize = 0;
+            params->override = 0;
+            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
+                abort(12, "error reading configuration file '%s'", conf_filename.c_str());
+            } else {
+                status("using configuration file '%s'", conf_filename.c_str());
+            }
+        } else {
+            status("not using a configuration file");
+        }
+    }
+
 
     if (args_info.inputs_num != 2) {
         abort(1, "exactly two services have to be given");
@@ -97,9 +140,11 @@ int main(int argc, char** argv) {
 
     // create a unique temporary file name
     char tmp[] = "/tmp/mia-XXXXXX";
+#ifdef HAVE_MKSTEMP
     if (mkstemp(tmp) == -1) {
         abort(9, "could not create a temporary file '%s'", tmp);
     }
+#endif
     string tmpname(tmp);
     string im_filename = tmpname + ".im";
     string mi_filename = tmpname + ".mi";
@@ -109,7 +154,7 @@ int main(int argc, char** argv) {
     /*---------------------------------------------------------------.
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
-    string wendy_command = string(BINARY_WENDY) + " " + string(args_info.inputs[0])
+    string wendy_command = string(args_info.wendy_arg) + " " + args_info.inputs[0]
         + " --im=" + im_filename + " --sa=" + mpp_filename + " --mi=" + mi_filename;
     if (args_info.messagebound_given) {
         std::stringstream s;
@@ -196,7 +241,7 @@ int main(int argc, char** argv) {
     }
     composition_lolafile << pnapi::io::lola << *mpp;
     composition_lolafile.close();
-    string lola_command = args_info.safe_flag ? "lola-full1" : string(BINARY_LOLA);
+    string lola_command = args_info.safe_flag ? args_info.lola_full1_arg : args_info.lola_full_arg;
     lola_command += " " + lola_filename + " -M";    
     if (!args_info.verbose_flag) {
         lola_command += " 2> /dev/null";

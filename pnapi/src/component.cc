@@ -588,8 +588,6 @@ namespace pnapi {
   Arc::~Arc()
   {
     assert(net_.findArc(*source_, *target_) == NULL);
-
-    observer_.updateArcRemoved(*this);
   }
 
 

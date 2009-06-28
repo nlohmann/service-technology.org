@@ -110,12 +110,13 @@ namespace pnapi
     arc.getTransition().updateType();
   }
 
-
+  /*
+   * \pre Arc has to be removed from PetriNet::arcs_ before calling this
+   */
   void ComponentObserver::updateArcRemoved(Arc & arc)
   {
     assert(&arc.getPetriNet() == &net_);
     assert(net_.arcs_.find(&arc) == net_.arcs_.end());
-    assert(net_.findArc(arc.getSourceNode(), arc.getTargetNode()) == NULL);
 
     // update pre- and postsets
     arc.getTargetNode().preset_.erase(&arc.getSourceNode());
@@ -127,7 +128,11 @@ namespace pnapi
     arc.getTransition().updateType();
   }
 
-
+  /*
+   * \brief Only purpose of this function is erasing the original arc
+   *        by mirroring so that ComponentObserver::updateArcRemoved
+   *        can be called.
+   */
   void ComponentObserver::updateArcMirror(Arc & arc)
   {
     // you could check place type and pre-/postset here
@@ -837,11 +842,12 @@ namespace pnapi
    */
   Arc * PetriNet::findArc(const Node & source, const Node & target) const
   {
-    // use an arc cache to make this more efficient
-    for (set<Arc *>::iterator it = arcs_.begin(); it != arcs_.end(); ++it)
-      if (&(*it)->getSourceNode() == &source &&
-	  &(*it)->getTargetNode() == &target)
-	return *it;
+    for (set<Arc*>::iterator it = source.getPostsetArcs().begin();
+          it != source.getPostsetArcs().end(); ++it)
+    {
+      if ( &((*it)->getTargetNode()) == &target )
+        return *it;
+    }
 
     return NULL;
   }
@@ -1418,12 +1424,16 @@ namespace pnapi
 
 
   /*!
+   * \pre Net and Arc have the same observer
    */
   void PetriNet::deleteArc(Arc & arc)
   {
     assert(arcs_.find(&arc) != arcs_.end());
 
     arcs_.erase(&arc);
+
+    observer_.updateArcRemoved(arc);
+    
     delete &arc;
   }
 

@@ -1,3 +1,9 @@
+@heading Version 1.14-unreleased
+@itemize
+@item updated maintainer scripts
+@end itemize
+
+
 @heading Version 1.13
 @itemize
 @item the bit annotations are now written inside the nodes of the Graphviz dot annotation

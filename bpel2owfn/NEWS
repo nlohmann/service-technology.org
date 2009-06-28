@@ -9,6 +9,8 @@
 Version 2.04-unreleased
 =======================
 
+* updated maintainer scripts
+
 * fixed bug #12110 (`https://gna.org/bugs/?12110'): compilation errors using
   GCC 4.3.1
 
@@ -33,7 +35,7 @@ Version 2.04-unreleased
 * replaced previously patched files `getopt.c', `getopt.h', and `getopt1.c'
   by standard files from GNUlib
 
-* changed versioning scheme from `x.yz' to `x.yz' - next version ist 2.04
+* changed versioning scheme from `x.y.z' to `x.yz' - next version ist 2.04
 
 * completed task #6117 (`https://gna.org/task/?6117'): now using gengetopt to
   organize command line options

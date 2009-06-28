@@ -72,7 +72,7 @@ bin-generic:
 	mkdir local
 	$(MAKE) --directory=$(top_srcdir) distclean
 	cd $(top_srcdir); ./configure --disable-assert --prefix=$(abs_srcdir)/local --docdir=$(abs_srcdir)/local/doc sysconfdir=$(abs_srcdir)/local/bin $(EXTRA_CONFFLAGS)
-	$(MAKE) --directory=$(top_srcdir) $(TARGETS) install CXXFLAGS="-O3 $(EXTRA_CFLAGS)" CFLAGS="-O3 $(EXTRA_CFLAGS)" LDFLAGS="-O3 $(EXTRA_CFLAGS)"
+	$(MAKE) --directory=$(top_srcdir) $(TARGETS) install-strip CXXFLAGS="-O3 $(EXTRA_CFLAGS)" CFLAGS="-O3 $(EXTRA_CFLAGS)" LDFLAGS="-O3 $(EXTRA_CFLAGS)"
 	$(MAKE) --directory=$(top_srcdir) install-html install-pdf AM_MAKEINFOHTMLFLAGS="--no-split"
 	rm -fr local/share
 	-cp $(top_srcdir)/README $(top_srcdir)/COPYING $(top_srcdir)/REQUIREMENTS $(top_srcdir)/AUTHORS $(top_srcdir)/NEWS local

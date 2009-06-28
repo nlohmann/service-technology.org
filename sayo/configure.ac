@@ -18,6 +18,8 @@ AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_GREP
 
+AC_HEADER_ASSERT
+
 # search for Fiona, sa2sm and Wendy (nice to have for "make check")
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(SA2SM, [sa2sm], not found)

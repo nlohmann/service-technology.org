@@ -32,7 +32,7 @@ fi
 
 # check for libraries
 AC_CHECK_HEADERS([windows.h])
-AC_CHECK_LIB([lpsolve55], [solve])
+#AC_CHECK_LIB([lpsolve55], [solve])
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
@@ -126,6 +126,7 @@ AC_CONFIG_FILES([Makefile \
 	  man/Makefile \
 	  tests/Makefile \
 	  gui/static_release.sh \
+	  maintainer/Makefile
 	  maintainer/gnu/Makefile
 	  ])
 

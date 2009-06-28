@@ -37,45 +37,43 @@ upload: tarballname
 #############################################################################
 CLEANFILES = -fr $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) \
 	     $(tarballname) $(tarballname).sig ChangeLog $(PACKAGE).pdf \
-	     $(PACKAGE_TARNAME)_$(PACKAGE_VERSION)* \
-	     $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)* sftp-script
+	     $(PACKAGE_TARNAME)_$(PACKAGE_VERSION)* sftp-script local
 
 
 #############################################################################
 # binary builds
 #############################################################################
 
-# list the variants of LoLA (lola-deadlock, lola-full, ...)
-CONFIGS = $(patsubst $(top_srcdir)/src/configs/userconfig.H.%,src/lola-%,$(wildcard $(top_srcdir)/src/configs/userconfig.H.*))
+bin:
+	$(MAKE) bin-`uname` TARGETS="lola-full lola-full1 lola-deadlock lola-modelchecking lola-boundednet lola-deadlock1 lola-liveprop lola-liveprop1 lola-statepredicate lola-statepredicate1"
+	$(MAKE) --directory=$(top_srcdir) distclean
+	@echo "=============================================="
+	@echo "created binary distributions:"
+	@cd $(abs_top_srcdir); ls -1 $(PACKAGE)*.zip 
+	@echo "=============================================="
 
-bindist-linux:
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-linux-x86
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-64bit --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-linux-x86-64
+bin-SunOS:
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="solaris-sparc"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="solaris-sparc-64" EXTRA_CFLAGS="-m64"
 
-bindist-solaris:
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-solaris-sparc
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-64bit --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-solaris-sparc-64
+bin-Linux:
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86-64" EXTRA_CFLAGS="-m64"
 
-bindist-mac:
-	cd $(top_srcdir); CC=$(CC) CXX=$(CXX) ./configure --enable-universal --disable-dependency-tracking --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-mac-universal
-	cd $(top_srcdir); CC=$(CC) CXX=$(CXX) ./configure --enable-universal --enable-64bit --disable-dependency-tracking --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-mac-universal-64
+bin-CYGWIN_NT-5.1:
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="win32" EXTRA_CFLAGS="-mno-cygwin -U _WIN32"
 
-bindist-win:
-	cd $(top_srcdir); PATH=$$PATH:. CC=$(CC) CXX=$(CXX) ./configure --enable-win32 --disable-assert
-	$(MAKE) bindist BINDIRNAME=$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-win32	
+bin-Darwin:
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="mac-universal" EXTRA_CONFFLAGS="--disable-dependency-tracking" EXTRA_CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="mac-universal-64" EXTRA_CONFFLAGS="--disable-dependency-tracking" EXTRA_CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -m64"
 
-bindist:
-	$(MAKE) --directory=$(top_srcdir) CXXFLAGS=-O3 CFLAGS=-O3 LDFLAGS=-O3 clean all-configs
-	$(MAKE) --directory=$(top_srcdir)/utils CXXFLAGS=-O3 CFLAGS=-O3 LDFLAGS=-O3
-	wget http://download.gna.org/service-tech/$(PACKAGE)/$(PACKAGE).pdf -q
-	mkdir $(top_srcdir)/$(BINDIRNAME)
-	cd $(top_srcdir); cp $(CONFIGS) utils/graph2dot COPYING NEWS ChangeLog AUTHORS README maintainer/$(PACKAGE).pdf $(BINDIRNAME)
-	cd $(top_srcdir)/$(BINDIRNAME) ; file * > CONTENTS
-	cd $(top_srcdir); tar cfz $(BINDIRNAME).tar.gz $(BINDIRNAME)
-	rm -fr $(top_srcdir)/$(BINDIRNAME)
+bin-generic:
+	rm -fr local
+	mkdir local
+	$(MAKE) --directory=$(top_srcdir) distclean
+	cd $(top_srcdir); ./configure --disable-assert --prefix=$(abs_srcdir)/local --docdir=$(abs_srcdir)/local/doc sysconfdir=$(abs_srcdir)/local/bin $(EXTRA_CONFFLAGS)
+	$(MAKE) --directory=$(top_srcdir) $(TARGETS) install CXXFLAGS="-O3 $(EXTRA_CFLAGS)" CFLAGS="-O3 $(EXTRA_CFLAGS)" LDFLAGS="-O3 $(EXTRA_CFLAGS)"
+	$(MAKE) --directory=$(top_srcdir) install-html install-pdf AM_MAKEINFOHTMLFLAGS="--no-split"
+	rm -fr local/share
+	-cp $(top_srcdir)/README $(top_srcdir)/COPYING $(top_srcdir)/REQUIREMENTS $(top_srcdir)/AUTHORS $(top_srcdir)/NEWS local
+	cd local ; zip -r $(abs_top_srcdir)/$(PACKAGE)-$(PACKAGE_VERSION)-$(ARCH).zip *

@@ -12,6 +12,13 @@ Version 1.13-unreleased
 * fixed a small bug in the `PREDUCTION' mode: nets without significant places
   are now analyzed instantly
 
+* added new scripts to build binary releases
+
+* a binary release consists of the following pre-configured LoLAs: lola-full,
+  lola-full1, lola-deadlock, lola-deadlock1, lola-modelchecking,
+  lola-boundednet, lola-liveprop, lola-liveprop1, lola-statepredicate, and
+  lola-statepredicate1
+
 Version 1.12
 ============
 

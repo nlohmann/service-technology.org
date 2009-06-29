@@ -1523,10 +1523,6 @@ void PetriNet::output_owfn(ostream *output) const
       first_set = false;
     }
     (*output) << " )";
-
-#ifdef USING_BPEL2OWFN
-    (*output) << " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
-#endif
   }
   else
   {

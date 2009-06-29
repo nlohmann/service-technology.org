@@ -11,6 +11,8 @@ Version 2.04-unreleased
 
 * updated maintainer scripts
 
+* fixed oWFN output (problems with nested `ALL_OTHER_PLACES_EMPTY')
+
 * fixed bug #12110 (`https://gna.org/bugs/?12110'): compilation errors using
   GCC 4.3.1
 

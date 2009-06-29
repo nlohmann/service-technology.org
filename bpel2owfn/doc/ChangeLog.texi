@@ -3,6 +3,8 @@
 @itemize
 @item updated maintainer scripts
 
+@item fixed oWFN output (problems with nested @code{ALL_OTHER_PLACES_EMPTY})
+
 @item fixed bug #12110 (@url{https://gna.org/bugs/?12110}): compilation errors using GCC 4.3.1
 
 @item adapted the cleaning scripts

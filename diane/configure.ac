@@ -23,5 +23,5 @@ AC_HEADER_ASSERT
 AC_CHECK_LIB([pnapi], [main])
 AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile maintainer/Makefile])
 AC_OUTPUT

@@ -227,7 +227,7 @@ void parse_command_line(int argc, char* argv[])
   if (args_info.log_given) {
     options[O_LOG] = true;
     if (args_info.log_arg != NULL && args_info.log_arg != "")
-      log_filename = string(optarg);
+      log_filename = string(args_info.log_arg);
   }
   
   // DEBUG

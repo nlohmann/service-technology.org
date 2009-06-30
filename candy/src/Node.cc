@@ -81,26 +81,41 @@ unsigned int Node::computeEfficientSuccessors() {
 
     // if this node is a final node then we dont have to consider any leaving edge
     cout << "DEBUG computing costs for node " << getID() << endl;
+    printToStdout();
     if ( final ) {
-        cout << "      node " << getID() << " is final, cost is 0" << endl;
+        cout << "      node '" << getID() << "', " << this << " is final, cost is 0" << endl;
         return 0;
     }
 
 
     // first we have to compute the cost for all successors
     list< pair< pair<Node*, Event*>, unsigned int> > totalCost;
-    for ( map< Node*, Event* >::const_iterator iter = successors.begin();
-          iter != successors.end(); ++iter) {
+    cout << "      node " << getID() << " has " << successors.size() << " successors" << endl;
+    for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+          i != successors.end(); ++i) {
 
-    	Node* successor = iter->first;
+    	Node* successor = i->first;
 		if (successor == this) {
 			// this should never happens as cost are defined for acyclic OGs
 			cout << "Cannot compute cost since the given OG is not acyclic\n\n" << endl;
 			return EXIT_FAILURE;
 		}
 
-		unsigned int successorCost = (iter->second)->cost + successor->computeEfficientSuccessors();
-		totalCost.push_back( pair<pair<Node*, Event*>, unsigned int>(*iter, successorCost) );
+        Event* maxEvent = NULL;
+        unsigned int maxEventCost = 0;
+        for ( list<Event*>::const_iterator j = i->second.begin();
+              j != i->second.end(); ++j ) {
+
+            if ( maxEventCost < (*j)->cost ) {
+                maxEvent = *j;
+                maxEventCost = (*j)->cost;
+            }
+        }
+        assert( maxEvent != NULL );
+
+        cout << "bla" << endl;
+		unsigned int successorCost = maxEventCost + successor->computeEfficientSuccessors();
+		totalCost.push_back( pair< pair<Node*, Event*>, unsigned int >( pair<Node*, Event*>(successor, maxEvent) , successorCost) );
 		cout << "      node " << getID() << " has successor with cost " << successorCost << endl;
     }
 
@@ -253,18 +268,30 @@ void Node::getCostMinimalAssignmentsRecursively(
 
 void Node::printToStdout() {
 
-    cout << "node id '" << id << "' with formula '" <<
-    (formula != NULL ? formula->asString() : "NULL") << "' and successors" << endl;
-    for ( map< Node*, Event* >::const_iterator iter = successors.begin();
-          iter != successors.end(); ++iter ) {
+    cout << "node id '" << id << "', " << this << " with formula '" <<
+    (formula != NULL ? formula->asString() : "NULL") << "', final " << final << " and successors" << endl;
+    for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+          i != successors.end(); ++i ) {
 
-        Node* currentNode = iter->first;
+        Node* currentNode = i->first;
         if ( currentNode != NULL ) {
-        //if ( true ) {
-            cout << "\tnode id '" << currentNode->id << "' with ";
-            (iter->second)->printToStdout();
+            for ( list<Event*>::const_iterator j = i->second.begin();
+                  j != i->second.end(); ++j ) {
+
+                cout << "\tnode id '" << currentNode->id << "', " << currentNode << " with ";
+                (*j)->printToStdout();
+            }
         } else {
             cout << "\tnode NULL" << endl;
         }
+    }
+}
+
+void Node::printToStdoutRecursively() {
+    
+    printToStdout();
+    for ( map< Node*, list<Event*> >::const_iterator iter = successors.begin();
+          iter != successors.end(); ++iter ) {
+        (iter->first)->printToStdoutRecursively();
     }
 }

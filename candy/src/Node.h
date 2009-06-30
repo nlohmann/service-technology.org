@@ -22,8 +22,8 @@ class Node {
 		| attributes |
 		`-----------*/
 
-        /// successor nodes together with their corresponding edge labels
-        map< Node*, Event* > successors;
+        /// successor nodes together with their corresponding events
+        map< Node*, list<Event*> > successors;
 
         // this node's formula
         Formula* formula;
@@ -53,7 +53,7 @@ class Node {
 
         /// TODO comment
         unsigned int getCostMinimalAssignments(
-        		list< pair< pair<Node*, Event*>, unsigned int> >,
+        		list< pair< pair< Node*, Event*>, unsigned int> >,
         		list< FormulaAssignment >& );
 
         /// TODO comment
@@ -66,6 +66,7 @@ class Node {
 
         /// print information about this node on std::cout
         void printToStdout();
+        void printToStdoutRecursively();
 
     private:
 

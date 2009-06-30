@@ -159,6 +159,9 @@ int main(int argc, char** argv) {
 	debug("finished cost parsing, parsed following data:\n\n");
 	parsedOG->printToStdout();
 
+	debug("finished cost parsing, parsed following data (recursively):\n\n");
+	(parsedOG->root)->printToStdoutRecursively();
+
 
 	/*-----------------------------.
 	| 3. compute cost-efficient OG |

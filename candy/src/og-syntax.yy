@@ -3,6 +3,7 @@
 #include <map>
 // string library
 #include <string>
+#include <iostream>
 
 // header from configure
 #include "config.h"
@@ -11,6 +12,8 @@
 
 using std::pair;
 using std::string;
+using std::cerr;
+using std::endl;
 
 
 // from main.cc
@@ -157,18 +160,16 @@ nodes:
 
 
 node:
-  NUMBER
+  NUMBER 
   {
-    currentNode = new Node($1);
-  }
-  annotation successors
-  {
-    currentNode->formula = currentFormula;
-    if ( parsedOG->nodes.find($1) == parsedOG->nodes.end() ) {
-        parsedOG->nodes[$1] = currentNode;
+    // find known current node or create it
+    map< unsigned int, Node* >::const_iterator i = parsedOG->nodes.find($1);
+    if ( i != parsedOG->nodes.end() ) {
+        currentNode = i->second;
     } else {
-        og_yyerror("read a node twice");
-        return EXIT_FAILURE;
+        cerr << "PARSER: read new node '" << $1 << "' as new node" << endl;
+        currentNode = new Node($1);
+        parsedOG->nodes[$1] = currentNode;
     }
     
     // first found node is per definition the root node
@@ -177,6 +178,12 @@ node:
         parsedOG->root = currentNode;
     }
   }
+  annotation
+  {
+    // add parsed formula
+    currentNode->formula = currentFormula;
+  }
+  successors
 ;
 
 
@@ -222,6 +229,7 @@ formula:
   }
 | KEY_FINAL
   {
+    // TODO remove
     currentNode->final = true;
     $$ = new FormulaLiteralFinal();
     //$$ = NULL;
@@ -253,23 +261,27 @@ successors:
     if ( i != parsedOG->nodes.end() ) {
         currentSuccessor = i->second;
     } else {
+        cerr << "PARSER: read new node '" << $4 << "' as successor from '" << currentNode->getID() << "'" << endl;
         currentSuccessor = new Node($4);
+        parsedOG->nodes[$4] = currentSuccessor;
     }
 
     // register successor node as successor
-    if ( currentNode->successors.find(currentSuccessor) == currentNode->successors.end() ) {
+    // TODO do we allow more than one equal successors with different events?
+    // remember the empty node ...
+    //if ( currentNode->successors.find(currentSuccessor) == currentNode->successors.end() ) {
         map< string, Event* >::const_iterator j = parsedOG->events.find($2);
         if ( j != parsedOG->events.end() ) {
             Event* successorEvent= j->second;
-            currentNode->successors[currentSuccessor] = successorEvent;
+            currentNode->successors[currentSuccessor].push_back(successorEvent);
         } else {
             og_yyerror("read a successor with unknown event");
             return EXIT_FAILURE;
         }
-    } else {
-        og_yyerror("read a successor node twice");
-        return EXIT_FAILURE;
-    }
+    //} else {
+    //    og_yyerror("read a successor node twice");
+    //    return EXIT_FAILURE;
+    //}
     
     free($2);
   }

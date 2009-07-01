@@ -1,6 +1,8 @@
 @heading Version 2.04-unreleased
 
 @itemize
+@item fixed bug #1387 (@url{https://gna.org/bugs/?13837}): assertion failed if choreographies are used without @option{communicationonly} parameter
+
 @item updated maintainer scripts
 
 @item fixed oWFN output (problems with nested @code{ALL_OTHER_PLACES_EMPTY})

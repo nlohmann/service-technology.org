@@ -359,7 +359,12 @@ void parse_command_line(int argc, char* argv[])
   // TOPOLOGY
   if (args_info.topology_given) {
     options[O_TOPOLOGY] = true;
-    globals::choreography_filename = string(args_info.topology_arg);    
+    globals::choreography_filename = string(args_info.topology_arg);
+    if (!globals::parameters[P_COMMUNICATIONONLY]) {
+        trace(TRACE_ALWAYS, "Choreography support only works with parameter 'communicationonly'!\n");
+        cleanup();
+        exit(1);        
+    }
   }
 
   // WSDL

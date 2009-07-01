@@ -88,28 +88,6 @@ AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
-AT_SETUP([Non Empty True Node 2])
-AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/non_empty_true_node2.*.og .])
-AT_CHECK([SAYO --input=non_empty_true_node2.wendy.og --output=non_empty_true_node2.sa])
-AT_CHECK([SA2SM non_empty_true_node2.sa non_empty_true_node2.owfn])
-AT_CHECK([WENDY non_empty_true_node2.owfn --og --fionaFormat],0, ignore, ignore)
-AT_CHECK([FIONA -t equivalence non_empty_true_node2.og non_empty_true_node2.fiona.og], 0, stdout, ignore)
-AT_CHECK([GREP -q "equivalent: YES" stdout])
-AT_KEYWORDS(equivalence)
-AT_CLEANUP
-
-AT_SETUP([Non Empty True Node 3])
-AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/non_empty_true_node3.*.og .])
-AT_CHECK([SAYO --input=non_empty_true_node3.wendy.og --output=non_empty_true_node3.sa])
-AT_CHECK([SA2SM non_empty_true_node3.sa non_empty_true_node3.owfn])
-AT_CHECK([WENDY non_empty_true_node3.owfn --og --fionaFormat],0, ignore, ignore)
-AT_CHECK([FIONA -t equivalence non_empty_true_node3.og non_empty_true_node3.fiona.og], 0, stdout, ignore)
-AT_CHECK([GREP -q "equivalent: YES" stdout])
-AT_KEYWORDS(equivalence)
-AT_CLEANUP
-
 AT_SETUP([Non Final Tau Node 1])
 AT_CHECK([cp TESTFILES/NonFinalTauNode1.*.og .])
 AT_CHECK([SAYO --input=NonFinalTauNode1.wendy.og --output=NonFinalTauNode1.sa])
@@ -200,6 +178,32 @@ AT_CHECK([SAYO --input=zeus.wendy.og --output=zeus.sa])
 AT_CHECK([SA2SM zeus.sa zeus.owfn])
 AT_CHECK([WENDY zeus.owfn --og --fionaFormat],0, ignore, ignore)
 AT_CHECK([FIONA -t equivalence zeus.og zeus.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Known issues (bug #13712)])
+############################################################################
+
+AT_SETUP([Non Empty True Node 2])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/non_empty_true_node2.*.og .])
+AT_CHECK([SAYO --input=non_empty_true_node2.wendy.og --output=non_empty_true_node2.sa])
+AT_CHECK([SA2SM non_empty_true_node2.sa non_empty_true_node2.owfn])
+AT_CHECK([WENDY non_empty_true_node2.owfn --og --fionaFormat],0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence non_empty_true_node2.og non_empty_true_node2.fiona.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "equivalent: YES" stdout])
+AT_KEYWORDS(equivalence)
+AT_CLEANUP
+
+AT_SETUP([Non Empty True Node 3])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/non_empty_true_node3.*.og .])
+AT_CHECK([SAYO --input=non_empty_true_node3.wendy.og --output=non_empty_true_node3.sa])
+AT_CHECK([SA2SM non_empty_true_node3.sa non_empty_true_node3.owfn])
+AT_CHECK([WENDY non_empty_true_node3.owfn --og --fionaFormat],0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence non_empty_true_node3.og non_empty_true_node3.fiona.og], 0, stdout, ignore)
 AT_CHECK([GREP -q "equivalent: YES" stdout])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP

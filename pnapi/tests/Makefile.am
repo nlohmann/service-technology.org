@@ -1,4 +1,4 @@
-SUBDIRS = . petrinet automaton
+SUBDIRS = . petrinet
 
 check_LIBRARIES = libtest.a
 

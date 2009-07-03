@@ -214,9 +214,9 @@ synchronous:
 
 labels:
     node_name 
-    { labels_.insert(std::string(owfn_yyident)); } 
+    { labels_->insert(std::string(owfn_yyident)); } 
   | labels COMMA node_name 
-    { labels_.insert(std::string(owfn_yyident)); } 
+    { labels_->insert(std::string(owfn_yyident)); } 
   ;
 
 
@@ -278,8 +278,8 @@ arc:
 
 synchronize:
     /* empty */           
-  | KEY_SYNCHRONIZE { labels_.clear(); }
-    labels SEMICOLON { transition_->setSynchronizeLabels(labels_); }
+  | KEY_SYNCHRONIZE { labels_->clear(); }
+    labels SEMICOLON { transition_->setSynchronizeLabels(*labels_); }
   ;
 
 constrain:

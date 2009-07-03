@@ -190,6 +190,9 @@ namespace pnapi
 
     /// the set of labels
     const std::set<std::string> & getSynchronizeLabels() const;
+    
+    /// set the set of labels
+    void setSynchronizeLabels(const std::set<std::string> &);
 
 
   private:
@@ -198,7 +201,7 @@ namespace pnapi
     int cost_;
     
     /// synchronize labels
-    const std::set<std::string> labels_;
+    std::set<std::string> labels_;
 
 
     /// no standard copying!

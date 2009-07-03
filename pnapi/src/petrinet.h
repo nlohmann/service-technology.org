@@ -73,6 +73,7 @@ namespace pnapi
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
     void updateTransitions(Transition &);
+    void updateTransitionLabels(Transition &);
 
 
   private:

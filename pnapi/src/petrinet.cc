@@ -154,8 +154,20 @@ namespace pnapi
   {
     updateNodes(trans);
     net_.transitions_.insert(&trans);
+    updateTransitionLabels(trans);
+  }
+  
+
+  void ComponentObserver::updateTransitionLabels(Transition & trans)
+  {
     if (trans.isSynchronized())
+    {
       net_.synchronizedTransitions_.insert(&trans);
+    }
+    else  
+    {
+      net_.synchronizedTransitions_.erase(&trans);
+    }
   }
 
 

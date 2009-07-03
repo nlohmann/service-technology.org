@@ -36,6 +36,7 @@
 #include <iostream>
 
 extern int owfn_yyerror(char const *msg);
+extern std::string owfn_yyident;
 
 %}
 
@@ -73,7 +74,7 @@ INTERNAL                        { return KEY_INTERNAL; }
 INPUT                           { return KEY_INPUT; }
 OUTPUT                          { return KEY_OUTPUT; }
 TRANSITION                      { return KEY_TRANSITION; }
-INITIALMARKING                  { return KEY_MARKING; }
+INITIALMARKING                  { return KEY_INITIALMARKING; }
 FINALMARKING                    { return KEY_FINALMARKING; }
 NOFINALMARKING                  { return KEY_NOFINALMARKING; }
 FINALCONDITION                  { return KEY_FINALCONDITION; }
@@ -112,7 +113,7 @@ NOT                             { return OP_NOT; }
  /* identifiers */
 [0-9][0-9]*                     { owfn_yylval.yt_int = atoi(yytext); return NUMBER; }
 "-"[0-9][0-9]*                  { owfn_yylval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { owfn_yylval.yt_string = new std::string(yytext); return IDENT; }
+[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { owfn_yyident = yytext; return IDENT; }
 
  /* whitespace */
 [ \n\r\t]                          { /* skip */ }

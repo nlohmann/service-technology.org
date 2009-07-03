@@ -19,16 +19,37 @@
   ****************************************************************************/
 %{
 
+/// TODO: capacities, commands, ports, synchronous, marking, condition
+
 #include "pnapi.h"
+#include <string>
+#include <sstream>
+#include <map>
+#include <set>
 
 using namespace pnapi;
 
+/// generated petrinet
 PetriNet owfn_yynet;
 
 /// from flex
 extern char* owfn_yytext;
 extern int owfn_yylex();
 extern int owfn_yyerror(char const *msg);
+
+/// used for identifiers
+std::string owfn_yyident;
+
+/// temporary data
+std::map<std::string, Place*> places_; // mapping of names to places
+Transition* transition_; // recently read transition
+Place* place_;
+Node * * target_;
+Node * * source_;
+std::stringstream nodeName_;
+Node::Type placeType_; // type of recently read places
+std::set<std::string>* labels_;
+
 
 %}
 
@@ -39,7 +60,7 @@ extern int owfn_yyerror(char const *msg);
 
 %token KEY_SAFE KEY_INTERFACE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
 %token KEY_SYNCHRONIZE KEY_SYNCHRONOUS KEY_CONSTRAIN
-%token KEY_MARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
+%token KEY_INITIALMARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
 %token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
 %token KEY_ALL_PLACES_EMPTY KEY_COST
 %token KEY_ALL_OTHER_PLACES_EMPTY
@@ -56,11 +77,10 @@ extern int owfn_yyerror(char const *msg);
 %union 
 {
   int yt_int;
-  std::string * yt_string;
 }
 
-%type <yt_int> NUMBER NEGATIVE_NUMBER
-%type <yt_string> IDENT
+%type <yt_int> NUMBER NEGATIVE_NUMBER 
+%type <yt_int> capacity transition_cost
 
 %start petrinet
 
@@ -74,10 +94,6 @@ petrinet:
     places_ports markings transitions
   ;
 
-node_name:   
-    IDENT  
-  | NUMBER 
-  ;
 
 
  /**************/
@@ -85,58 +101,68 @@ node_name:
  /**************/
 
 places_ports: 
-    KEY_INTERFACE interface KEY_PLACE places SEMICOLON 
-  | KEY_PLACE typed_places ports                      
+    KEY_INTERFACE interface KEY_PLACE {placeType_ = Node::INTERNAL;} places SEMICOLON 
+  | KEY_PLACE {placeType_ = Node::INTERNAL;} typed_places ports
   ;
 
 typed_places: 
     internal_places input_places output_places synchronous 
-  | lola_places
+  | places SEMICOLON
   ;
 
 input_places:
     /* empty */
-  | KEY_INPUT places SEMICOLON                
+  | KEY_INPUT {placeType_ = Node::INPUT;} places SEMICOLON                
   ;
 
 output_places:
     /* empty */ 
-  | KEY_OUTPUT places SEMICOLON                 
+  | KEY_OUTPUT {placeType_ = Node::OUTPUT;} places SEMICOLON                 
   ;
 
 internal_places:
     /* empty */
-  | KEY_INTERNAL places SEMICOLON                   
-  ;
-
-lola_places: 
-  places SEMICOLON 
+  | KEY_INTERNAL {placeType_ = Node::INTERNAL;} places SEMICOLON                   
   ;
 
 places: 
-    capacity_place_list                 
-  | places SEMICOLON capacity_place_list
-  ;
-
-capacity_place_list:
-    capacity place_list 
+    capacity place_list                 
+  | places SEMICOLON capacity place_list
   ;
 
 capacity:
-    /* empty */      
-  | KEY_SAFE COLON   
-  | KEY_SAFE NUMBER COLON 
+    /* empty */           {$$ = 0; }
+  | KEY_SAFE COLON        {$$ = 1; }
+  | KEY_SAFE NUMBER COLON {$$ = $2;}
   ;
 
 place_list:  
     /* empty */           
-  | place                 
-  | place_list COMMA place 
+  | node_name controlcommands 
+    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_);} 
+  | place_list COMMA node_name controlcommands
+    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_);} 
   ;
 
-place: 
-    node_name controlcommands
+node_name:   
+    IDENT  
+    { 
+      // clear stringstream
+      nodeName_.str("");
+      nodeName_.clear();
+
+      nodeName_ << owfn_yyident; 
+    }
+  | NUMBER 
+    { 
+      // clear stringstream
+      nodeName_.str("");
+      nodeName_.clear();
+
+      nodeName_ << $1; 
+    }
   ;
+
 
 controlcommands:
     /* emtpy */
@@ -152,28 +178,24 @@ commands:
   | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
   ;
 
+
+
 ports:
     /* empty */         
   | KEY_PORTS port_list 
   ;
 
 port_list:
-    port_definition      
-  | port_list port_definition 
-  ;
-
-port_definition:
-    node_name COLON port_participants SEMICOLON 
+    node_name COLON port_participants SEMICOLON      
+  | port_list node_name COLON port_participants SEMICOLON 
   ;
 
 port_participants:
-    port_participant                         
-  | port_participants COMMA port_participant 
+    node_name                         
+  | port_participants COMMA node_name
   ;
 
-port_participant:
-    node_name 
-  ;
+
 
 interface:
     input_places output_places synchronous 
@@ -181,12 +203,8 @@ interface:
   ;
 
 port_list_new:
-    port_definition_new               
-  | port_list_new port_definition_new 
-  ;
-
-port_definition_new:
-    KEY_PORT node_name input_places output_places synchronous
+    KEY_PORT node_name input_places output_places synchronous              
+  | port_list_new KEY_PORT node_name input_places output_places synchronous
   ;
 
 synchronous:
@@ -195,12 +213,10 @@ synchronous:
   ;
 
 labels:
-    label             
-  | labels COMMA label
-  ;
-
-label:
     node_name 
+    { labels_.insert(std::string(owfn_yyident)); } 
+  | labels COMMA node_name 
+    { labels_.insert(std::string(owfn_yyident)); } 
   ;
 
 
@@ -214,36 +230,56 @@ transitions:
   ;
 
 transition: 
-    KEY_TRANSITION node_name transition_cost preset_arcs postset_arcs synchronize constrain
+    KEY_TRANSITION node_name transition_cost
+    { 
+      transition_ = & owfn_yynet.createTransition(nodeName_.str()); 
+      transition_->setCost($3);
+    }
+    KEY_CONSUME { target_ = (Node**)(&transition_); source_ = (Node**)(&place_); } arcs SEMICOLON 
+    KEY_PRODUCE { source_ = (Node**)(&transition_); target_ = (Node**)(&place_); } arcs SEMICOLON 
+    synchronize constrain
   ;
 
 transition_cost:
-    /*empty*/ 
-  | KEY_COST NUMBER SEMICOLON                 
+    /*empty*/                  { $$ = 0;  }
+  | KEY_COST NUMBER SEMICOLON  { $$ = $2; }
 ;
-
-preset_arcs:
-    KEY_CONSUME arcs SEMICOLON 
-  ;
-
-postset_arcs:
-    KEY_PRODUCE arcs SEMICOLON 
-  ;
 
 arcs: 
     /* empty */    
-  | arc            
+  | arc           
   | arcs COMMA arc 
   ;
 
 arc: 
     node_name COLON NUMBER
-  | node_name             
+    {
+      place_ = places_[nodeName_.str()];
+      if(place_ == 0)
+      {
+        std::string msg;
+        msg = "Place " + nodeName_.str() + " does not exist.";
+        owfn_yyerror(msg.c_str());
+      }
+      owfn_yynet.createArc(**source_, **target_, $3);
+    }
+  | node_name 
+    {
+      place_ = places_[nodeName_.str()];
+      if(place_ == 0)
+      {
+        std::string msg;
+        msg = "Place " + nodeName_.str() + " does not exist.";
+        owfn_yyerror(msg.c_str());
+      }
+      owfn_yynet.createArc(**source_, **target_);
+    }	    
   ;
 
 synchronize:
     /* empty */           
-  | KEY_SYNCHRONIZE labels SEMICOLON 
+  | KEY_SYNCHRONIZE { labels_.clear(); }
+    labels SEMICOLON { transition_->setSynchronizeLabels(labels_); }
   ;
 
 constrain:
@@ -257,11 +293,7 @@ constrain:
  /****************/
 
 markings:
-    initial final 
-  ;
-
-initial:
-    KEY_MARKING marking_list SEMICOLON 
+    KEY_INITIALMARKING marking_list SEMICOLON final 
   ;
 
 marking_list:
@@ -287,18 +319,14 @@ condition:
   ;
 
 finalmarkings:
-    finalmarking                         
-  | finalmarkings SEMICOLON finalmarking 
-  ;
-
-finalmarking:
-    marking_list 
+    marking_list                         
+  | finalmarkings SEMICOLON marking_list 
   ;
 
 formula: 
     LPAR formula RPAR 
-  | KEY_TRUE         
-  | KEY_FALSE            
+  | KEY_TRUE          
+  | KEY_FALSE         
   | KEY_ALL_PLACES_EMPTY 
   | OP_NOT formula       
   | formula OP_OR formula
@@ -313,3 +341,4 @@ formula:
   | node_name OP_GE NUMBER 
   | node_name OP_LE NUMBER 
   ;
+

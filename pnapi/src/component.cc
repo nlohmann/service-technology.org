@@ -530,6 +530,14 @@ namespace pnapi {
   {
     return labels_;
   }
+  
+  /*!
+   */
+  void Transition::setSynchronizeLabels(const std::set<std::string> & labels)
+  {
+    labels_ = labels;
+    observer_.updateTransitionLabels(*this);
+  }
 
 
 

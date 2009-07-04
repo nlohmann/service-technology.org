@@ -54,7 +54,7 @@ fi
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 AC_CHECK_FUNCS([mkstemp])
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile src/mia.conf doc/Doxyfile doc/Makefile man/Makefile tests/Makefile tests/package.m4 maintainer/Makefile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile src/mia.conf doc/Doxyfile doc/Makefile man/Makefile tests/Makefile tests/package.m4 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules])
 AC_OUTPUT
 
 # display a warning in case a required tool has not been found

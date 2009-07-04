@@ -27,5 +27,5 @@ MAINTAINERCLEANFILES = parser-owfn.h
 # use GNU gengetopt to create command line parser
 ################################################################
 cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo --set-version=$(VERSION)
+	$(GENGETOPT) --input=$(srcdir)/cmdline.ggo --set-version=$(VERSION)
 

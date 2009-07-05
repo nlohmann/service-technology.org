@@ -31,7 +31,7 @@ endif
 ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
-	./configure $(CROSS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
+	./configure $(CROSS) --disable-assert --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="-Wl,-z,defs $(LDFLAGS)"
 
 
 build: build-stamp
@@ -41,7 +41,7 @@ build-stamp:  config.status
 
 	# Add here commands to compile the package.
 	$(MAKE)
-	#docbook-to-man debian/bpel2owfn.sgml > bpel2owfn.1
+	#docbook-to-man debian/@PACKAGE_TARNAME@.sgml > @PACKAGE_TARNAME@.1
 
 	touch $@
 
@@ -59,19 +59,19 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_prep  
 	dh_installdirs
 
-	# Add here commands to install the package into debian/bpel2owfn.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/bpel2owfn install
+	# Add here commands to install the package into debian/@PACKAGE_TARNAME@.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/@PACKAGE_TARNAME@ install
 
 
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep: install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs ChangeLog
@@ -79,7 +79,7 @@ binary-arch: build install
 	dh_installexamples
 #	dh_install
 #	dh_installmenu
-#	dh_installdebconf	
+#	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam

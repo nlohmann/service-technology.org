@@ -126,7 +126,7 @@ AC_CONFIG_FILES([Makefile \
 	  man/Makefile \
 	  tests/Makefile \
 	  gui/static_release.sh \
-	  maintainer/Makefile
+	  maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules
 	  maintainer/gnu/Makefile
 	  ])
 

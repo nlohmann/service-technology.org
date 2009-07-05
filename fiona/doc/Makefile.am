@@ -8,7 +8,7 @@ fiona_TEXINFOS = fdl.texi ChangeLog.texi \
 TEXINFO_TEX = texinfo.tex
 
 EXTRA_DIST = gendocs.sh gendocs_template\
-	docShop.owfn docShop.owfn.og fionaDocumentation.pdf
+	docShop.owfn docShop.owfn.og fionaDocumentation.pdf epsf.tex
 
 
 #############################################################################

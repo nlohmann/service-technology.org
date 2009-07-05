@@ -10,6 +10,7 @@ AC_PROG_CXX
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
+AC_PROG_SED
 
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
@@ -38,5 +39,5 @@ else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile maintainer/Makefile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules])
 AC_OUTPUT

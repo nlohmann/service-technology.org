@@ -19,7 +19,7 @@
   ****************************************************************************/
 %{
 
-/// TODO: commands, marking, condition
+/// TODO: commands, TESTS!!
 
 #include "pnapi.h"
 #include <string>
@@ -52,6 +52,8 @@ std::set<std::string> labels_;
 int capacity_;
 std::string port_;
 std::map<Transition*, std::set<std::string> > constrains_;
+bool markInitial_;
+Marking* finalMarking_;
 
 %}
 
@@ -79,10 +81,12 @@ std::map<Transition*, std::set<std::string> > constrains_;
 %union 
 {
   int yt_int;
+  pnapi::formula::Formula * yt_formula;
 }
 
 %type <yt_int> NUMBER NEGATIVE_NUMBER 
 %type <yt_int> transition_cost
+%type <yt_formula> condition formula
 
 %start petrinet
 
@@ -319,7 +323,8 @@ constrain:
  /****************/
 
 markings:
-    KEY_INITIALMARKING marking_list SEMICOLON final 
+    KEY_INITIALMARKING { markInitial_ = true; } 
+    marking_list SEMICOLON {markInitial_ = false; } final
   ;
 
 marking_list:
@@ -330,41 +335,174 @@ marking_list:
 
 marking: 
     node_name COLON NUMBER 
+    { 
+      Place* p = places_[nodeName_.str()];
+      if (p == 0 )
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }      
+      
+      if(markInitial_)
+      {  
+        p->mark($3);
+      }
+      else
+      {
+        (*finalMarking_)[*p] = $3;
+      }
+    }
   | node_name              
+    { 
+      Place* p = places_[nodeName_.str()];
+      if (p == 0 )
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }      
+      
+      if(markInitial_)
+      {  
+        p->mark(1);
+      }
+      else
+      {
+        (*finalMarking_)[*p] = 1;
+      }
+    }
   ;
 
 final:
-    KEY_FINALMARKING finalmarkings SEMICOLON 
-  | condition                                
-  ;
-
-condition:
-    KEY_NOFINALMARKING                       
-  | KEY_FINALCONDITION SEMICOLON             
-  | KEY_FINALCONDITION formula SEMICOLON     
+    KEY_FINALMARKING { finalMarking_ = new Marking(owfn_yynet, true); } 
+    finalmarkings SEMICOLON 
+  | condition 
+    {
+      owfn_yynet.finalCondition() = (*$1);
+      delete $1; 
+    }
   ;
 
 finalmarkings:
-    marking_list                         
+    marking_list
+    {
+      owfn_yynet.finalCondition().addMarking(*finalMarking_);
+      delete finalMarking_;
+      finalMarking_ = new Marking(owfn_yynet, true);
+    }
   | finalmarkings SEMICOLON marking_list 
+    {
+      owfn_yynet.finalCondition().addMarking(*finalMarking_);
+      delete finalMarking_;
+      finalMarking_ = new Marking(owfn_yynet, true);
+    }
+  ;
+
+condition:
+    KEY_NOFINALMARKING { $$ = new formula::FormulaTrue(); }
+  | KEY_FINALCONDITION SEMICOLON { $$ = new formula::FormulaFalse(); }
+  | KEY_FINALCONDITION formula SEMICOLON { $$ = $2; }
   ;
 
 formula: 
-    LPAR formula RPAR 
-  | KEY_TRUE          
-  | KEY_FALSE         
+    LPAR formula RPAR { $$ = $2; }
+  | KEY_TRUE          { $$ = new formula::FormulaTrue(); }
+  | KEY_FALSE         { $$ = new formula::FormulaFalse(); }
   | KEY_ALL_PLACES_EMPTY 
-  | OP_NOT formula       
+    { 
+      formula::Conjunction c;
+      $$ = new formula::Conjunction(c, *((std::set<const Place*>*)&owfn_yynet.getPlaces())); 
+    }
+  | OP_NOT formula
+    { 
+      $$ = new formula::Negation(*$2);
+      delete $2;
+    }
   | formula OP_OR formula
+    {
+      $$ = new formula::Disjunction(*$1, *$3);
+      delete $1;
+      delete $3;
+    }
   | formula OP_AND formula 
+    {
+      $$ = new formula::Conjunction(*$1, *$3);
+      delete $1;
+      delete $3;
+    }
   | formula OP_AND KEY_ALL_OTHER_PLACES_EMPTY
+    {
+      $$ = new formula::Conjunction(*$1, *((std::set<const Place*>*)&owfn_yynet.getPlaces()));
+      delete $1;
+    }
   | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
+    {
+      $$ = new formula::Conjunction(*$1, *((std::set<const Place*>*)&owfn_yynet.getInternalPlaces()));
+      delete $1;
+    }
   | formula OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
-  | node_name OP_EQ NUMBER 
+    {
+      $$ = new formula::Conjunction(*$1, *((std::set<const Place*>*)&owfn_yynet.getInterfacePlaces()));
+      delete $1;
+    }
+  | node_name OP_EQ NUMBER
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      $$ = new formula::FormulaEqual(*p, $3);
+    }
   | node_name OP_NE NUMBER 
-  | node_name OP_LT NUMBER 
-  | node_name OP_GT NUMBER 
-  | node_name OP_GE NUMBER 
-  | node_name OP_LE NUMBER 
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      $$ = new formula::Negation(formula::FormulaEqual(*p, $3));
+    }
+  | node_name OP_LT NUMBER
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      $$ = new formula::FormulaLess(*p, $3);
+    }
+  | node_name OP_GT NUMBER
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      $$ = new formula::FormulaGreater(*p, $3);
+    } 
+  | node_name OP_GE NUMBER
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      $$ = new formula::FormulaGreaterEqual(*p, $3);
+    }
+  | node_name OP_LE NUMBER
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      $$ = new formula::FormulaLessEqual(*p, $3);
+    }
   ;
 

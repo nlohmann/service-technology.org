@@ -6,7 +6,7 @@ EXTRA_DIST = debian/compat \
 
 MAINTAINERCLEANFILES = debian/README.Debian
 
-.PHONY: debian/changelog debian/README.Debian
+.PHONY: debian/changelog debian/README.Debian macport
 
 
 #############################################################################
@@ -62,6 +62,23 @@ deb: tarballname debian/control debian/changelog debian/README.Debian
 
 
 #############################################################################
+# create a Portfile for MacPorts (assume a tarball lies at ../..)
+#############################################################################
+macport:
+	test -f $(abs_top_srcdir)/../$(tarballname)
+	$(MKDIR_P) macports/science/$(PACKAGE)-$(PACKAGE_VERSION)
+	cp macports/Portfile .
+	openssl md5 $(abs_top_srcdir)/../$(tarballname) | awk '{print $$2}' > md5.tmp
+	openssl sha1 $(abs_top_srcdir)/../$(tarballname) | awk '{print $$2}' > sha1.tmp
+	openssl rmd160 $(abs_top_srcdir)/../$(tarballname) | awk '{print $$2}' > rmd160.tmp
+	$(SED) --in-place=.tmp "s/@MD5_CHECKSUM@/`cat md5.tmp`/" Portfile
+	$(SED) --in-place=.tmp "s/@SHA1_CHECKSUM@/`cat sha1.tmp`/" Portfile
+	$(SED) --in-place=.tmp "s/@RMD160_CHECKSUM@/`cat rmd160.tmp`/" Portfile
+	rm -f *.tmp
+	mv Portfile macports/science/$(PACKAGE)-$(PACKAGE_VERSION)
+
+
+#############################################################################
 # upload distribution to gna.org and set symbolic link to current version
 #############################################################################
 upload: tarballname
@@ -82,7 +99,8 @@ upload: tarballname
 CLEANFILES = -fr $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) \
 	     $(tarballname) $(tarballname).sig ChangeLog $(PACKAGE).pdf \
 	     $(PACKAGE_TARNAME)_$(PARACKE_VERSION)* *.deb *.rpm \
-	     $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)* sftp-script
+	     $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)* sftp-script \
+	     macports/science
 
 
 #############################################################################

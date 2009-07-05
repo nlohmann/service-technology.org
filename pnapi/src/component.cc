@@ -329,6 +329,15 @@ namespace pnapi {
     return port_;
   }
 
+  
+  /*!
+   * \todo  maybe private
+   */
+  void Place::setPort(string & port)
+  {
+    port_ = port;
+  }
+  
 
   /*!
    */

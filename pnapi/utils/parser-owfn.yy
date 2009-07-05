@@ -19,7 +19,7 @@
   ****************************************************************************/
 %{
 
-/// TODO: capacities, commands, ports, synchronous, marking, condition
+/// TODO: commands, marking, condition
 
 #include "pnapi.h"
 #include <string>
@@ -49,7 +49,9 @@ Node * * source_;
 std::stringstream nodeName_;
 Node::Type placeType_; // type of recently read places
 std::set<std::string> labels_;
-
+int capacity_;
+std::string port_;
+std::map<Transition*, std::set<std::string> > constrains_;
 
 %}
 
@@ -80,7 +82,7 @@ std::set<std::string> labels_;
 }
 
 %type <yt_int> NUMBER NEGATIVE_NUMBER 
-%type <yt_int> capacity transition_cost
+%type <yt_int> transition_cost
 
 %start petrinet
 
@@ -91,7 +93,9 @@ std::set<std::string> labels_;
 %%
 
 petrinet: 
+    { port_ = ""; }
     places_ports markings transitions
+    { owfn_yynet.setConstraintLabels(constrains_); }
   ;
 
 
@@ -126,22 +130,22 @@ internal_places:
   ;
 
 places: 
-    capacity place_list                 
-  | places SEMICOLON capacity place_list
+    capacity place_list { capacity_ = 0; }
+  | places SEMICOLON capacity place_list { capacity_ = 0; }
   ;
 
 capacity:
-    /* empty */           {$$ = 0; }
-  | KEY_SAFE COLON        {$$ = 1; }
-  | KEY_SAFE NUMBER COLON {$$ = $2;}
+    /* empty */           
+  | KEY_SAFE COLON        {capacity_ = 1; }
+  | KEY_SAFE NUMBER COLON {capacity_ = $2;}
   ;
 
 place_list:  
     /* empty */           
   | node_name controlcommands 
-    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_);} 
+    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_, 0, capacity_, port_);} 
   | place_list COMMA node_name controlcommands
-    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_);} 
+    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_, 0, capacity_, port_);} 
   ;
 
 node_name:   
@@ -186,13 +190,31 @@ ports:
   ;
 
 port_list:
-    node_name COLON port_participants SEMICOLON      
-  | port_list node_name COLON port_participants SEMICOLON 
+    node_name COLON { port_ = nodeName_.str(); } port_participants SEMICOLON
+  | port_list node_name COLON { port_ = nodeName_.str(); } port_participants SEMICOLON 
   ;
 
-port_participants:
-    node_name                         
+port_participants: 
+    node_name 
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      p->setPort(port_);
+    } 
   | port_participants COMMA node_name
+    {
+      Place* p = places_[nodeName_.str()];
+      if (p == 0)
+      {
+        owfn_yyerror("Unknown place");
+        exit(EXIT_FAILURE);
+      }
+      p->setPort(port_);
+    } 
   ;
 
 
@@ -203,13 +225,16 @@ interface:
   ;
 
 port_list_new:
-    KEY_PORT node_name input_places output_places synchronous              
-  | port_list_new KEY_PORT node_name input_places output_places synchronous
+    KEY_PORT node_name { port_ = nodeName_.str(); } 
+    input_places output_places synchronous              
+  | port_list_new KEY_PORT node_name { port_ = nodeName_.str(); }
+    input_places output_places synchronous
   ;
 
 synchronous:
     /* empty */ 
-  | KEY_SYNCHRONOUS labels SEMICOLON                      
+  | KEY_SYNCHRONOUS { labels_.clear(); } labels SEMICOLON
+    { owfn_yynet.setSynchronousLabels(labels_); }
   ;
 
 labels:
@@ -284,7 +309,8 @@ synchronize:
 
 constrain:
     /* empty */                    
-  | KEY_CONSTRAIN labels SEMICOLON 
+  | KEY_CONSTRAIN { labels_.clear(); } labels SEMICOLON 
+    { constrains_[transition_] = labels_; }
   ;
 
 

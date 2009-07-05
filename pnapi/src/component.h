@@ -247,6 +247,9 @@ namespace pnapi
 
     /// returns the port this place belongs to
     std::string getPort() const;
+    
+    /// returns the port this place belongs to
+    void setPort(std::string &);
 
     /// swaps interface type
     void mirror();

@@ -290,6 +290,12 @@ namespace pnapi
 
     /// swaps input and output places
     void mirror();
+    
+    /// sets synchronous labels
+    void setSynchronousLabels(const std::set<std::string> &);
+    
+    /// sets labels (and translates references)
+    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 
     //@}
 
@@ -394,12 +400,6 @@ namespace pnapi
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 				   const std::string & = "") const;
-
-    /// sets synchronous labels
-    void setSynchronousLabels(const std::set<std::string> &);
-
-    /// sets labels (and translates references)
-    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 
     /// translates constraint labels to transitions
     std::map<Transition *, std::set<Transition *> >

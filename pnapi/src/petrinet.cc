@@ -953,6 +953,7 @@ namespace pnapi
 
 
   /*!
+   * \todo  Maybe make private again.
    */
   void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
   {
@@ -1180,6 +1181,9 @@ namespace pnapi
   }
 
 
+  /*
+   * \todo  maybe private again
+   */
   void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
   {
     constraints_.clear();

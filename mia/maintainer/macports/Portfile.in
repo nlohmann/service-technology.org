@@ -10,9 +10,6 @@ long_description     Mia is a tool to calculate operating guidelines.
 # the target to be made before installation ("all" is standard)
 build.target         all
 
-# dependencies
-depends_run          port:lola port:wendy
-
 ############################################################################
 # everything below is generic or will be generated
 ############################################################################

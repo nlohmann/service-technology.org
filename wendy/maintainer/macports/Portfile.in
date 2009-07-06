@@ -11,9 +11,6 @@ long_description     Wendy implements an improved algorithm to calculate\
 # the target to be made before installation ("all" is standard)
 build.target         all
 
-# dependencies
-depends_run          port:lola
-
 ############################################################################
 # everything below is generic or will be generated
 ############################################################################

@@ -71,5 +71,5 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile tests/Makefile tests/package.m4])
 AC_OUTPUT

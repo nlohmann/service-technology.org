@@ -142,7 +142,7 @@ AC_SUBST(configured_LDFLAGS)
 AC_CONFIG_FILES([Makefile
                  doc/Doxyfile doc/Doxydetails doc/Makefile
                  exp/Makefile
-                 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules
+                 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile
                  man/Makefile
                  src/Makefile
                  tests/Makefile tests/package.m4])

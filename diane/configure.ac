@@ -39,5 +39,5 @@ else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
 AC_OUTPUT

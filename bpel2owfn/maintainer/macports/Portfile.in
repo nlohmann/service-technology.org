@@ -1,0 +1,52 @@
+# this has to be the first entry
+PortSystem           1.0
+
+# a one-sentence description of the port
+description          BPEL2oWFN translates BPEL processes into Petri nets.
+
+# a long description (break long lines with escaped newlines)
+long_description     BPEL2oWFN is a tool translating business processes \
+                     described in BPEL to open workflow nets (oWFN). This \
+                     oWFN can be used to (1) check for controllability or \
+                     generate the operating guideline using the tool Fiona \
+                     or Wendy, (2) check for deadlocks or any other Petri \
+                     net property using the tool LoLA, or (3) check any \
+                     temporal logic formula with a variety of model \
+                     checking tools. Furthermore, BPEL2oWFN can translate \
+                     a BPEL4Chor choreography to a Petri net model. This \
+                     model can be used to analyze properties of a complete \
+                     choreography or to synthesize a fitting service for \
+                     an incomplete choreography. BPEL2oWFN uses static \
+                     analysis to make the generated Petri net model as \
+                     compact as possible to analyze a chosen property. \
+                     This is called flexible model generation. Furthermore, \
+                     several design flaws can be detected using control and \
+                     data flow analysis.
+
+
+# the target to be made before installation ("all" is standard)
+build.target         all
+
+
+############################################################################
+# everything below is generic or will be generated
+############################################################################
+
+name                 @PACKAGE_TARNAME@
+version              @PACKAGE_VERSION@
+categories           science service-technology.org
+maintainers          niels.lohmann@uni-rostock.de
+homepage             http://service-technology.org/@PACKAGE_TARNAME@
+platforms            darwin freebsd
+master_sites         http://esla.informatik.uni-rostock.de/service-tech/sources/
+checksums            md5 @MD5_CHECKSUM@ \
+                     sha1 @SHA1_CHECKSUM@ \
+                     rmd160 @RMD160_CHECKSUM@
+
+use_configure        yes
+configure.args       --disable-assert
+
+build.type           gnu
+
+test.run             yes
+test.target          check

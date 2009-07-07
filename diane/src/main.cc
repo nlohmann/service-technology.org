@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -18,6 +19,8 @@ using std::endl;
 using std::ifstream;
 using std::map;
 using std::ofstream;
+using std::setfill;
+using std::setw;
 using std::string;
 using std::stringstream;
 using std::vector;
@@ -149,8 +152,8 @@ int main(int argc, char *argv[])
 
     int netnumber = 0;
 
-    int digits, z;
-    string digits_s, num, zs;
+    int digits;
+    string digits_s;
     stringstream ds;
     ds << n;
     ds >> digits_s;
@@ -162,18 +165,16 @@ int main(int argc, char *argv[])
       else
       {
         stringstream ss;
-        ss << netnumber;
-        ss >> num;
+        string num;
         /// leading zeros
-        z = digits-num.length();
-        while (z-- > 0)
-          zs += "0";
+        int z = digits-num.length();
+        ss << setfill('0') << setw(z) << netnumber;
+        ss >> num;
 
-        outputfiles[netnumber].open((fileprefix+zs+num+filepostfix).c_str());
+        outputfiles[netnumber].open((fileprefix+num+filepostfix).c_str());
         outputfiles[netnumber] << pnapi::io::owfn << *nets[i];
         outputfiles[netnumber].close();
         netnumber++;
-        zs.clear();
       }
   }
 

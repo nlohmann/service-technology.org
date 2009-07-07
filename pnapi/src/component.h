@@ -253,6 +253,12 @@ namespace pnapi
 
     /// swaps interface type
     void mirror();
+    
+    /// set the maximum occurrence
+    void setMaxOccurrence(int);
+    
+    /// get the maximum occurrence
+    int getMaxOccurrence();
 
 
   private:
@@ -268,6 +274,9 @@ namespace pnapi
 
     /// port this place belongs to
     std::string port_;
+    
+    /// maximum occurrence
+    int maxOccurrence_;
 
 
     /// no standard copying!

@@ -19,8 +19,6 @@
   ****************************************************************************/
 %{
 
-/// TODO: commands, TESTS!!
-
 #include "pnapi.h"
 #include <string>
 #include <sstream>
@@ -109,7 +107,12 @@ petrinet:
  /**************/
 
 places_ports: 
-    KEY_INTERFACE interface KEY_PLACE {placeType_ = Node::INTERNAL;} places SEMICOLON 
+    KEY_INTERFACE interface KEY_PLACE 
+    {
+     placeType_ = Node::INTERNAL;
+     port_ = "";
+    } 
+    places SEMICOLON 
   | KEY_PLACE {placeType_ = Node::INTERNAL;} typed_places ports
   ;
 
@@ -146,10 +149,18 @@ capacity:
 
 place_list:  
     /* empty */           
-  | node_name controlcommands 
-    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_, 0, capacity_, port_);} 
-  | place_list COMMA node_name controlcommands
-    {places_[nodeName_.str()] = & owfn_yynet.createPlace(nodeName_.str(), placeType_, 0, capacity_, port_);} 
+  | node_name 
+    {
+     place_ = & owfn_yynet.createPlace(nodeName_.str(), placeType_, 0, capacity_, port_);
+     places_[nodeName_.str()] = place_;
+    } 
+    controlcommands
+  | place_list COMMA node_name
+    {
+     place_ = & owfn_yynet.createPlace(nodeName_.str(), placeType_, 0, capacity_, port_);
+     places_[nodeName_.str()] = place_;
+    } 
+    controlcommands
   ;
 
 node_name:   
@@ -182,8 +193,12 @@ commands:
   | KEY_MAX_UNIQUE_EVENTS OP_EQ NUMBER commands
   | KEY_ON_LOOP OP_EQ KEY_TRUE commands
   | KEY_ON_LOOP OP_EQ KEY_FALSE commands
-  | KEY_MAX_OCCURRENCES OP_EQ NUMBER commands
-  | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER commands
+  | KEY_MAX_OCCURRENCES OP_EQ NUMBER 
+    { place_->setMaxOccurrence($3); }
+    commands
+  | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER 
+    { place_->setMaxOccurrence($3); }
+    commands
   ;
 
 

@@ -278,6 +278,7 @@ namespace pnapi {
 
     observer_.updatePlaces(*this);
     setType(type);
+    maxOccurrence_ = -1;
   }
 
 
@@ -412,6 +413,22 @@ namespace pnapi {
       }
   }
 
+  /*!
+   * \brief set the maximum occurrence
+   */
+  void Place::setMaxOccurrence(int maxOccurrence)
+  {
+    maxOccurrence_ = maxOccurrence;
+  }
+  
+  /*!
+   * \brief get the maximum occurrence
+   */
+  int Place::getMaxOccurrence()
+  {
+    return maxOccurrence_;
+  }
+  
 
 
   /****************************************************************************

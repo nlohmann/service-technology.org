@@ -38,7 +38,12 @@ EXTRA_DIST = testsuite.at versions.sh \
              testfiles/test_construction.sequence_normal.net.owfn \
              testfiles/test_construction.sequence_unnormal.net.owfn \
              testfiles/test_construction.strange_net.net.owfn \
-             testfiles/test_myCoffee.sa testfiles/test_myCoffee-sm.owfn testfiles/test_myCoffee-syn.owfn
+             testfiles/test_myCoffee.sa testfiles/test_myCoffee-sm.owfn testfiles/test_myCoffee-syn.owfn \
+	     testfiles/syntax_example.owfn \
+	     testfiles/syntax_example_new.owfn \
+	     testfiles/syntax_example_new_short.owfn \
+	     testfiles/syntax_formula.owfn \
+	     testfiles/syntax_max_occurrence.owfn 
 
 
 check-local: atconfig $(TESTSUITE)

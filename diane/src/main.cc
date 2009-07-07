@@ -146,21 +146,34 @@ int main(int argc, char *argv[])
       }
       else
         fileprefix += "netpart";
+
     int netnumber = 0;
+
+    int digits, z;
+    string digits_s, num, zs;
+    stringstream ds;
+    ds << n;
+    ds >> digits_s;
+    digits = digits_s.length();
+
     for (int i = 0; i < (int) nets.size(); i++)
       if (nets[i] == NULL)
         continue;
       else
       {
-        // TODO: provide leading zeros
-        string num;
         stringstream ss;
         ss << netnumber;
         ss >> num;
-        outputfiles[netnumber].open((fileprefix+num+filepostfix).c_str());
+        /// leading zeros
+        z = digits-num.length();
+        while (z-- > 0)
+          zs += "0";
+
+        outputfiles[netnumber].open((fileprefix+zs+num+filepostfix).c_str());
         outputfiles[netnumber] << pnapi::io::owfn << *nets[i];
         outputfiles[netnumber].close();
         netnumber++;
+        zs.clear();
       }
   }
 

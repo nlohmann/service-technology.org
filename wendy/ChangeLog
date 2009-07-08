@@ -12,6 +12,9 @@ Version 1.5-unreleased
 
 * fixed bug #13718 (`https://gna.org/bugs/?13651') - fixed bit annotations
 
+* fixed bug #13903 (`https://gna.org/bugs/?13903') - filename of the
+  temporary files can be passed to Wendy using the `--tmpfile' parameter
+
 * used `mkstemp' function to create temporary filenames
 
 * a wrapper script checks whether binaries needed by test cases are present
@@ -19,7 +22,7 @@ Version 1.5-unreleased
 
 * added improved Petri Net API files (faster parsing)
 
-* update maintainer scripts
+* updated maintainer scripts
 
 Version 1.4
 ===========

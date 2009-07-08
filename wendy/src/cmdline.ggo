@@ -129,3 +129,11 @@ option "lola" -
   typestr="PATH"
   optional
   hidden
+
+option "tmpfile" -
+  "The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with 'XXXXXX' which is replaced at runtime with a random string."
+  string
+  typestr="FILENAME"
+  default="/tmp/wendy-XXXXXX"
+  optional
+  hidden

@@ -2,13 +2,15 @@
 @itemize
 @item fixed bug #13718 (@url{https://gna.org/bugs/?13651}) -- fixed bit annotations
 
+@item fixed bug #13903 (@url{https://gna.org/bugs/?13903}) -- filename of the temporary files can be passed to Wendy using the @option{--tmpfile} parameter
+
 @item used @code{mkstemp} function to create temporary filenames
 
 @item a wrapper script checks whether binaries needed by test cases are present and skips the test if necessary
 
 @item added improved Petri Net API files (faster parsing)
 
-@item update maintainer scripts
+@item updated maintainer scripts
 @end itemize
 
 

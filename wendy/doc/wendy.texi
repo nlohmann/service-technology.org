@@ -324,7 +324,7 @@ wendy: `--og' and `--sa' parameter are mutually exclusive -- aborting [#12]
 @end smallexample
 
 @item #13
-Wendy cannot create a temporary file @file{/tmp/wendy-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there.
+Wendy cannot create a temporary file @file{/tmp/wendy-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running Wendy under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter.
 
 @smallexample
 @cartouche

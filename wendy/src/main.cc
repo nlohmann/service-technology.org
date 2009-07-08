@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     | 3. write inner of the open net to LoLA file |
     `--------------------------------------------*/
     // create a unique temporary file name
-    char tmp[] = "/tmp/wendy-XXXXXX";
+    char *tmp = args_info.tmpfile_arg;
 #ifdef HAVE_MKSTEMP
     if (mkstemp(tmp) == -1) {
         abort(13, "could not create a temporary file '%s'", tmp);

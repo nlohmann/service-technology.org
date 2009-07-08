@@ -21,6 +21,7 @@
 #include "Label.h"
 #include "InnerMarking.h"
 #include "cmdline.h"
+#include "verbose.h"
 
 using std::set;
 using std::string;
@@ -29,7 +30,6 @@ using pnapi::Place;
 using pnapi::Transition;
 
 extern gengetopt_args_info args_info;
-extern void abort(unsigned int, const char*, ...);
 
 
 /******************

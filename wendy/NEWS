@@ -24,6 +24,15 @@ Version 1.5-unreleased
 
 * updated maintainer scripts
 
+* Wendy can be configured with a configuration file, provided by parameter
+  `--config' (see
+  `http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files'
+  for more information). A standard configuration is created by the configure
+  script and written to `src/wendy.conf'. When Wendy is executed, it checks
+  for the file `wendy.conf' in the sysconfig folder (usually
+  `/usr/local/etc') and in the current directory. If neither file was found,
+  Wendy tries to rely on standard options.
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

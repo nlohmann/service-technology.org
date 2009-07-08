@@ -24,13 +24,7 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for LoLA
-AC_PATH_PROG(LOLA, [lola-full], not found)
-if test "$LOLA" = "not found"; then
-  AC_MSG_WARN([LoLA was not found in the path.])
-  AC_MSG_WARN([You need to execute Wendy with the '--lola' parameter.])
-else
-  AC_DEFINE_UNQUOTED(BINARY_LOLA, "${LOLA}", [LoLA binary.])
-fi
+AC_PATH_PROG(LOLA, [lola-full], [])
 
 # search for Fiona (nice to have for "make check")
 AC_PATH_PROG(FIONA, [fiona], not found)
@@ -71,5 +65,14 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile tests/Makefile tests/package.m4])
 AC_OUTPUT
+
+# display a warning in case a required tool has not been found
+if test "${LOLA}" = ""; then
+  echo
+  echo "WARNING: Not all required tools have been found. Please read file"
+  echo "         REQUIREMENTS and edit the file src/wendy.conf before"
+  echo "         using or installing Wendy."
+  echo
+fi

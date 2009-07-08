@@ -29,10 +29,10 @@
 #include <string>
 #include "syntax_graph.h"
 #include "cmdline.h"
+#include "verbose.h"
 
 extern std::string NAME_token;
 extern gengetopt_args_info args_info;
-extern void abort(unsigned int code, const char* format, ...);
 
 void graph_error(const char *);
 %}

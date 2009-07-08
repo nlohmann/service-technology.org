@@ -1,0 +1,19 @@
+# Configuration file for @PACKAGE_STRING@
+# @configure_input@
+
+# This file configures the paths to binaries needed by Wendy. The configure
+# script already tried to suggest paths, but it entries might have been left
+# empty. In that case, you need to manually add the path to the respective
+# tool.
+
+# Wendy needs a LoLA binary that builds complete unreduced state spaces. Such
+# a LoLA binary can be built by executing "make lola-full" using a recent
+# LoLA distribution, available at http://service-technology.org/files/lola.
+
+lola = @LOLA@
+
+# Wendy needs to create a temporary file to pass it to LoLA. The filename
+# Wendy should use can be specified below. The filename should end with
+# 'XXXXXX' which is replaced at runtime with a random string.
+
+tmpfile = /tmp/wendy-XXXXXX

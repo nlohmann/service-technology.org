@@ -32,6 +32,7 @@
 #include "config.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
+#include "verbose.h"
 
 using std::string;
 
@@ -52,29 +53,14 @@ string invocation;
 std::ofstream *markingfile;
 
 
-/*!
- \brief abort with an error message and an error code
- 
- The codes are documented in Wendy's manual.
- 
- \param code    the error code
- \param format  the error message formatted as printf string
-*/
-void abort(unsigned int code, const char* format, ...) {
-    fprintf(stderr, "%s: ", PACKAGE);
-
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end (args);
-
-    fprintf(stderr, " -- aborting [#%02d]\n", code);
-
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: see manual for a documentation of this error\n", PACKAGE);
+bool fileExists(std::string filename) {
+    FILE *tmp = fopen(filename.c_str(), "r");
+    if (tmp) {
+        fclose(tmp);
+        return true;
+    } else {
+        return false;
     }
-
-    exit(EXIT_FAILURE);
 }
 
 
@@ -99,6 +85,38 @@ void evaluateParameters(int argc, char** argv) {
         abort(7, "invalid command-line parameter(s)");
     }
 
+    // read a configuration file if necessary
+    if (args_info.config_given) {
+        // initialize the config file parser
+        params->initialize = 0;
+        params->override = 0;
+
+        // call the config file parser
+        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
+            abort(12, "error reading configuration file '%s'", args_info.config_arg);
+        } else {
+            status("using configuration file '%s'", args_info.config_arg);
+        }
+    } else {
+        // check for configuration files
+        string conf_filename = fileExists("wendy.conf") ? "wendy.conf" :
+                               (fileExists(string(SYSCONFDIR) + "/wendy.conf") ?
+                               (string(SYSCONFDIR) + "/wendy.conf") : "");
+
+        if (conf_filename != "") {
+            // initialize the config file parser
+            params->initialize = 0;
+            params->override = 0;
+            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
+                abort(12, "error reading configuration file '%s'", conf_filename.c_str());
+            } else {
+                status("using configuration file '%s'", conf_filename.c_str());
+            }
+        } else {
+            status("not using a configuration file");
+        }
+    }
+
     // initialize the report frequency
     if (args_info.reportFrequency_arg < 0) {
         abort(8, "report frequency must not be negative");
@@ -116,11 +134,11 @@ void evaluateParameters(int argc, char** argv) {
 
     // check whether a LoLA executable is given either in file "config.h" or
     // with a command line parameter "--lola"
-#ifndef BINARY_LOLA
-    if (!args_info.lola_given) {
-        abort(5, "LoLA executable was not found");
-    }
-#endif
+//#ifndef BINARY_LOLA
+//    if (!args_info.lola_given) {
+//        abort(5, "LoLA executable was not found");
+//    }
+//#endif
 
     // check the message bound
     if ((args_info.messagebound_arg < 1) or (args_info.messagebound_arg > UINT8_MAX)) {
@@ -213,13 +231,6 @@ int main(int argc, char** argv) {
     `------------------------------------------*/
     time(&start_time);
 
-    // choose the LoLA binary
-#ifdef BINARY_LOLA
-    string command_line(args_info.lola_given ? args_info.lola_arg : BINARY_LOLA);
-#else
-    string command_line(args_info.lola_arg);
-#endif
-
     // marking information output
     if (args_info.mi_given) {
         string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
@@ -228,12 +239,14 @@ int main(int argc, char** argv) {
 
     // read from a pipe or from a file
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)
-    command_line += " " + tmpname + ".lola -M 2> /dev/null";
+    string command_line = string(args_info.lola_arg) + " " + tmpname + ".lola -M 2> /dev/null";
+    status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
 #else
-    command_line += " " + tmpname + ".lola -m &> /dev/null";
+    string command_line = string(args_info.lola_arg) + " " + tmpname + ".lola -m &> /dev/null";
+    status("calling LoLA by calling '%s'", command_line.c_str());
     system(command_line.c_str());
     graph_in = fopen((tmpname + ".graph").c_str(), "r");
     graph_parse();

@@ -1,4 +1,4 @@
-args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-error"
+args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 purpose "Calculating Operating Guidelines."
 description "About Wendy:"
@@ -123,10 +123,15 @@ option "diagnosis" d
   flag off
   hidden
 
+
+section "Configuration"
+sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"
+
 option "lola" -
   "The LoLA binary that is compiled with the option 'FULL' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using 'make lola-full'."
   string
-  typestr="PATH"
+  typestr="FILENAME"
+  default="lola-full"
   optional
   hidden
 
@@ -137,3 +142,10 @@ option "tmpfile" -
   default="/tmp/wendy-XXXXXX"
   optional
   hidden
+
+option "config" c
+  "Read configuration from file. If no file is given, Wendy first tries to parse file 'wendy.conf' from the sysconf directory (usually '/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for 'lola' are assumed."
+  string
+  typestr="FILE"
+  optional
+

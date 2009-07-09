@@ -123,7 +123,7 @@ NOT                             { return OP_NOT; }
             pnapi_owfn_lval.yt_int = atoi(yytext); return NUMBER; }
 "-"[0-9][0-9]*                  { 
             pnapi_owfn_lval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}]* { 
+[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { 
             pnapi_owfn_lval.yt_string = new std::string(yytext); return IDENT; }
 
  /* whitespace */

@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-06-28 20:03:39 +0200 (So, 28. Jun 2009) $
+ * \date    $Date: 2009-07-05 02:39:09 +0200 (So, 05. Jul 2009) $
  *
- * \version $Revision: 4372 $
+ * \version $Revision: 4392 $
  */
 
 #include "config.h"
@@ -154,8 +154,20 @@ namespace pnapi
   {
     updateNodes(trans);
     net_.transitions_.insert(&trans);
+    updateTransitionLabels(trans);
+  }
+  
+
+  void ComponentObserver::updateTransitionLabels(Transition & trans)
+  {
     if (trans.isSynchronized())
+    {
       net_.synchronizedTransitions_.insert(&trans);
+    }
+    else  
+    {
+      net_.synchronizedTransitions_.erase(&trans);
+    }
   }
 
 
@@ -941,6 +953,7 @@ namespace pnapi
 
 
   /*!
+   * \todo  Maybe make private again.
    */
   void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
   {
@@ -1168,6 +1181,9 @@ namespace pnapi
   }
 
 
+  /*
+   * \todo  maybe private again
+   */
   void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
   {
     constraints_.clear();

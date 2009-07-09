@@ -277,3 +277,18 @@ AT_CHECK([GREP -c "\->" PO.sa],0,[416
 ])
 AT_KEYWORDS(ig)
 AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Synchronous Communication])
+############################################################################
+
+AT_SETUP([5 Philosophers])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/phil5.owfn .])
+AT_CHECK([WENDY phil5.owfn --og --verbose],0,ignore,ignore)
+AT_CHECK([GREP -q "721 nodes" phil5.og])
+AT_CHECK([GREP -c "\->" phil5.og],0,[7200
+])
+AT_KEYWORDS(synchronous)
+AT_CLEANUP

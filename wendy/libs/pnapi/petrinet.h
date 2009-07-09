@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-05-18 13:37:32 +0200 (Mo, 18. Mai 2009) $
+ * \date    $Date: 2009-07-05 02:39:09 +0200 (So, 05. Jul 2009) $
  *
- * \version $Revision: 4131 $
+ * \version $Revision: 4392 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -73,6 +73,7 @@ namespace pnapi
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
     void updateTransitions(Transition &);
+    void updateTransitionLabels(Transition &);
 
 
   private:
@@ -289,6 +290,12 @@ namespace pnapi
 
     /// swaps input and output places
     void mirror();
+    
+    /// sets synchronous labels
+    void setSynchronousLabels(const std::set<std::string> &);
+    
+    /// sets labels (and translates references)
+    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 
     //@}
 
@@ -393,12 +400,6 @@ namespace pnapi
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 				   const std::string & = "") const;
-
-    /// sets synchronous labels
-    void setSynchronousLabels(const std::set<std::string> &);
-
-    /// sets labels (and translates references)
-    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 
     /// translates constraint labels to transitions
     std::map<Transition *, std::set<Transition *> >

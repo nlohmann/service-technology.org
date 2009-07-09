@@ -7,3 +7,6 @@
                       http://service-technology.org/wendy
 
 
+ACKNOWLEDGEMENTS
+  * Thanks to Marc Voorhoeve for reporting some bugs running Wendy in a
+    native (non-Cygwin) Windows environment.

@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-05-13 20:19:08 +0200 (Mi, 13. Mai 2009) $
+ * \date    $Date: 2009-07-08 01:04:33 +0200 (Mi, 08. Jul 2009) $
  *
- * \version $Revision: 4118 $
+ * \version $Revision: 4408 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -190,6 +190,9 @@ namespace pnapi
 
     /// the set of labels
     const std::set<std::string> & getSynchronizeLabels() const;
+    
+    /// set the set of labels
+    void setSynchronizeLabels(const std::set<std::string> &);
 
 
   private:
@@ -198,7 +201,7 @@ namespace pnapi
     int cost_;
     
     /// synchronize labels
-    const std::set<std::string> labels_;
+    std::set<std::string> labels_;
 
 
     /// no standard copying!
@@ -244,9 +247,18 @@ namespace pnapi
 
     /// returns the port this place belongs to
     std::string getPort() const;
+    
+    /// returns the port this place belongs to
+    void setPort(std::string &);
 
     /// swaps interface type
     void mirror();
+    
+    /// set the maximum occurrence
+    void setMaxOccurrence(int);
+    
+    /// get the maximum occurrence
+    int getMaxOccurrence();
 
 
   private:
@@ -262,6 +274,9 @@ namespace pnapi
 
     /// port this place belongs to
     std::string port_;
+    
+    /// maximum occurrence
+    int maxOccurrence_;
 
 
     /// no standard copying!

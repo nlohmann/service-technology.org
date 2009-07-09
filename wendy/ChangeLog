@@ -7,8 +7,8 @@
                       http://service-technology.org/wendy
 
 
-Version 1.5-unreleased
-======================
+Version 1.5
+===========
 
 * fixed bug #13718 (`https://gna.org/bugs/?13651') - fixed bit annotations
 

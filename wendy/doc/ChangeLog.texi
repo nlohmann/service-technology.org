@@ -1,4 +1,4 @@
-@heading Version 1.5-unreleased
+@heading Version 1.5
 @itemize
 @item fixed bug #13718 (@url{https://gna.org/bugs/?13651}) -- fixed bit annotations
 

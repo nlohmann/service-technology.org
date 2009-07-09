@@ -7,6 +7,11 @@
                       http://service-technology.org/wendy
 
 
+Version 1.6-unreleased
+======================
+
+* added more test cases for synchronous communication
+
 Version 1.5
 ===========
 

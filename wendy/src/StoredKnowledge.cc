@@ -149,8 +149,8 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
  \todo must delete hash tree (needed by removeInsaneNodes())
  
- \post interface only consists of deadlocking markings (unless --diagnosis
-       mode was needed)
+ \post interface only consists of deadlocking markings (unless --im or
+       --showTransients mode was chosen)
  */
 unsigned int StoredKnowledge::addPredecessors() {
     unsigned int result = 0;
@@ -162,8 +162,8 @@ unsigned int StoredKnowledge::addPredecessors() {
         for (size_t i = 0; i < it->second.size(); ++i) {
             assert(it->second[i]);
 
-            // store number of markings for diagnosis
-            if (args_info.diagnosis_flag) {
+            // store number of markings if necessary
+            if (args_info.showTransients_flag or args_info.im_given) {
                 allMarkings[it->second[i]] = it->second[i]->size;
             }
 

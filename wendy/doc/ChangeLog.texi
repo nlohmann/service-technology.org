@@ -1,3 +1,8 @@
+@heading Version 1.6-unreleased
+@itemize
+@item added more test cases for synchronous communication
+@end itemize
+
 @heading Version 1.5
 @itemize
 @item fixed bug #13718 (@url{https://gna.org/bugs/?13651}) -- fixed bit annotations

@@ -132,22 +132,9 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--og' and '--sa' parameter are mutually exclusive");
     }
 
-    // check whether a LoLA executable is given either in file "config.h" or
-    // with a command line parameter "--lola"
-//#ifndef BINARY_LOLA
-//    if (!args_info.lola_given) {
-//        abort(5, "LoLA executable was not found");
-//    }
-//#endif
-
     // check the message bound
     if ((args_info.messagebound_arg < 1) or (args_info.messagebound_arg > UINT8_MAX)) {
         abort(9, "message bound must be between 1 and %d", UINT8_MAX);
-    }
-
-    // the '--showTransients' or '--migrate' parameter implies '--diagnosis'
-    if (args_info.showTransients_flag or args_info.im_given) {
-        args_info.diagnosis_flag = 1;
     }
 
     free(params);

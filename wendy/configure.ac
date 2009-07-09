@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 1.5, wendy@service-technology.org)
+AC_INIT(Wendy, 1.6-unreleased, wendy@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -31,9 +31,6 @@ AC_PATH_PROG(FIONA, [fiona], not found)
 
 AC_HEADER_ASSERT
 
-# experimental (might be used for binary file formats)
-AC_C_BIGENDIAN
-
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Wendy cannot use UNIX pipes.]))
 AC_CHECK_FUNCS([mkstemp])
@@ -65,7 +62,13 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile doc/Doxyfile man/Makefile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([
+	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
+	doc/Doxyfile man/Makefile maintainer/Makefile
+	maintainer/debian/changelog.template maintainer/debian/info
+	maintainer/debian/README.Debian.template maintainer/debian/rules
+	maintainer/macports/Portfile tests/Makefile tests/package.m4
+])
 AC_OUTPUT
 
 # display a warning in case a required tool has not been found

@@ -250,6 +250,8 @@ wendy: at most one input file must be given -- aborting [#04]
 @end smallexample
 
 @item #05
+@b{This parameter is deprecated since version 1.5.}
+
 Wendy uses LoLA to build the reachability graph of the inner of the net. The configure script tries to find the executable @file{lola-full} in the system's path. If it was not found in the path, the executable must be given using the command-line option @samp{--lola}.
 
 @smallexample

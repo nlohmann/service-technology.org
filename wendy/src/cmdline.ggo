@@ -28,7 +28,7 @@ option "dot" -
   optional
 
 option "im" -
-  "Instance migration information output."
+  "Instance migration information output. This option is used when Mia calls Wendy."
   string
   typestr="FILENAME"
   argoptional
@@ -117,11 +117,6 @@ option "reportFrequency" -
   typestr="FREQ"
   default="10000"
   optional
-
-option "diagnosis" d
-  "Disable some optimizations to allow for diagnosis and debugging."
-  flag off
-  hidden
 
 
 section "Configuration"

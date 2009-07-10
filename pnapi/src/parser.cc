@@ -123,6 +123,14 @@ namespace pnapi
         // call the parser
         owfn::parse();
         
+        // clean up global variables
+        ident.clear();
+        places_.clear();
+        nodeName_.clear();
+        labels_.clear();
+        constrains_.clear();
+        placeSet_.clear();
+
         return pnapi_owfn_yynet;
       }
     } /* namespace owfn */
@@ -190,6 +198,12 @@ namespace pnapi
         // call the parser
         lola::parse();
         
+        // clean up global variables
+        ident.clear();
+        places_.clear();
+        nodeName_.clear();
+        placeSet_.clear();
+
         return pnapi_lola_yynet;
       }
 

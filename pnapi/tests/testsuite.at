@@ -118,35 +118,35 @@ AT_BANNER([oWFN Syntax])
 AT_SETUP([Syntax Example 1])
 m4_define([NET], [syntax_example.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([OWFN2BOOL NET],0,ignore,stderr)
+AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([syntax])
 AT_CLEANUP
 
 AT_SETUP([Syntax Example 2])
 m4_define([NET], [syntax_example_new.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([OWFN2BOOL NET],0,ignore,stderr)
+AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([syntax])
 AT_CLEANUP
 
 AT_SETUP([Syntax Example 3])
 m4_define([NET], [syntax_example_new_short.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([OWFN2BOOL NET],0,ignore,stderr)
+AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([syntax])
 AT_CLEANUP
 
 AT_SETUP([Syntax Formula])
 m4_define([NET], [syntax_formula.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([OWFN2BOOL NET],0,ignore,stderr)
+AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([syntax])
 AT_CLEANUP
 
 AT_SETUP([Syntax Maximum Occurrence])
 m4_define([NET], [syntax_max_occurrence.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([OWFN2BOOL NET],0,ignore,stderr)
+AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([syntax])
 AT_CLEANUP
 

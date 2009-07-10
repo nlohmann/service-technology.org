@@ -58,11 +58,8 @@ namespace pnapi
 	case util::OWFN:
 	  {
 	    parser::owfn::Parser parser;
-	    parser::owfn::Visitor visitor;
-	    parser.parse(is).visit(visitor);
-	    net = visitor.getPetriNet();
-	    net.setConstraintLabels(visitor.getConstraintLabels());
-	    net.setSynchronousLabels(visitor.getSynchronousLabels());
+	    net = parser.parse(is);
+	    
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }
@@ -70,9 +67,8 @@ namespace pnapi
 	case util::LOLA:
 	  {
 	    parser::lola::Parser parser;
-	    parser::owfn::Visitor visitor;
-	    parser.parse(is).visit(visitor);
-	    net = visitor.getPetriNet();
+	    net = parser.parse(is);
+	    
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }

@@ -14,6 +14,10 @@ TESTSUITE = $(builddir)/testsuite
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 EXTRA_DIST = testsuite.at versions.sh \
              testfiles/test_input.owfn \
+             testfiles/test_input.net1.owfn \
+             testfiles/test_input.net2.owfn \
+             testfiles/test_input.net3.owfn \
+             testfiles/test_input.net4.owfn \
              testfiles/test_input.lola \
              testfiles/test_dead_nodes.net.owfn \
              testfiles/test_identical_places.net.owfn \

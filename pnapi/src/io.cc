@@ -120,9 +120,7 @@ namespace pnapi
       case util::SA:
       {
         parser::sa::Parser parser;
-        parser::sa::Visitor visitor;
-        parser.parse(is).visit(visitor);
-        sa = visitor.getAutomaton();
+        sa =parser.parse(is);
         break;
       }
       default: assert(false); /* unsupported format */

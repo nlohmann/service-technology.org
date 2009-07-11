@@ -3,7 +3,7 @@
   ****************************************************************************/
 
 /* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_sa_"
+%name-prefix="pnapi_sa_yy"
 
 /* write tokens to parser-sa.h for use by scanner */
 %defines
@@ -20,9 +20,9 @@
 #include <iostream>
 #include <string>
 #include "parser.h"
+#include "state.h"
 
-using std::cerr;
-using std::endl;
+using namespace pnapi;
 
 #undef yylex
 #undef yyparse
@@ -47,15 +47,10 @@ using std::endl;
 {
   int yt_int;
   std::string * yt_string;
-  pnapi::parser::sa::Node * yt_node;
 }
 
 %type <yt_int> NUMBER
 %type <yt_string> IDENT
-%type <yt_node> input output synchronous
-%type <yt_node> identlist identnode
-%type <yt_node> nodes node state annotation 
-%type <yt_node> successors successor
 
 %start sa
 
@@ -67,91 +62,102 @@ using std::endl;
 
 sa:
   KEY_INTERFACE input output synchronous KEY_NODES nodes
-  { node = new Node($2, $3, $6); }
 ;
 
 
 input:
   /* empty */
-  { $$ = new Node(); }
 | KEY_INPUT identlist SEMICOLON
-  { $$ = new Node(pnapi::parser::sa::INPUT, $2); }
+  { 
+    for (int i = 0; i < identlist.size(); i++)
+      pnapi_sa_yyautomaton.addInput(identlist[i]);
+    identlist.clear();
+  }
 ;
 
 
 output:
   /* empty */
-  { $$ = new Node(); }
 | KEY_OUTPUT identlist SEMICOLON
-  { $$ = new Node(pnapi::parser::sa::OUTPUT, $2); }
+  { 
+    for (int i = 0; i < identlist.size(); i++)
+      pnapi_sa_yyautomaton.addOutput(identlist[i]);
+    identlist.clear();
+  }
 ;
 
 
 synchronous:
   /* empty */
-  { $$ = new Node(); }
 | KEY_SYNCHRONOUS identlist SEMICOLON
-  { $$ = new Node(/* TODO: implement synchronous part */); }
 ;
 
 
 identlist:
   /* empty */
-  { $$ = new Node(); }
-| IDENT
-  { $$ = new Node($1); }
-| identlist COMMA identnode
-  { $1->addChild($3); }
-;
-
-
-identnode:
-  IDENT
-  { $$ = new Node($1); }
+| IDENT                    { identlist.push_back(*$1); delete $1; }
+| identlist COMMA IDENT    { identlist.push_back(*$3); delete $3; }
 ;
 
 
 nodes:
-  node
-  { $$ = new Node($1); }
-| nodes node
-  { $1->addChild($2); }
-;
-
-
-node:
-  state annotation successors
-  { $$ = new Node(pnapi::parser::sa::STATE, $1, $2, $3); }
-;
-
-
-state:
-  NUMBER
-  { $$ = new Node($1); }
+  /* empty */
+| nodes NUMBER annotation successors
+  {
+    if (states_.count($2) == 0)
+    {
+    	state_ = &pnapi_sa_yyautomaton.createState($2);
+      states_[$2] = state_;
+    }
+    else
+      state_ = states_[$2];
+    if (initial_)
+      state_->initial();
+    if (final_)
+      state_->final();
+    
+    for (int i = 0; i < succState_.size(); i++)
+      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
+    
+    final_ = false;
+    initial_ = false;
+    succState_.clear();
+    succLabel_.clear();
+    succType_.clear();
+  }
 ;
 
 
 annotation:
   /* empty */
-  { $$ = new Node(); }
-| COLON KEY_INITIAL
-  { $$ = new Node(pnapi::parser::sa::INITIAL); }
-| COLON KEY_FINAL
-  { $$ = new Node(pnapi::parser::sa::FINAL); }
-| COLON KEY_INITIAL COMMA KEY_FINAL
-  { $$ = new Node(pnapi::parser::sa::INIT_FINAL); }
+| COLON KEY_INITIAL                  { initial_ = true; }
+| COLON KEY_FINAL                    { final_ = true; }
+| COLON KEY_INITIAL COMMA KEY_FINAL  { initial_ = final_ = true; }
 ;
 
 
 successors:
   /* empty */
-  { $$ = new Node(); }
-| successors successor
-  { $1->addChild($2); }
+| successors IDENT ARROW NUMBER
+  {
+    if (states_.count($4) == 0)
+    {
+      edgeState_ = &pnapi_sa_yyautomaton.createState($4);
+      states_[$4] = edgeState_;
+    }
+    else
+      edgeState_ = states_[$4];
+
+    edgeLabel_ = *$2;
+    delete $2;
+    edgeType_ = Automaton::TAU;
+    if (pnapi_sa_yyautomaton.input().count(edgeLabel_) > 0)
+      edgeType_ = Automaton::INPUT;
+    if (pnapi_sa_yyautomaton.output().count(edgeLabel_) > 0)
+      edgeType_ = Automaton::OUTPUT;
+    succState_.push_back($4);
+    succLabel_.push_back(edgeLabel_);
+    succType_.push_back(edgeType_);
+  }
 ;
 
-
-successor:
-  identnode ARROW state
-  { $$ = new Node(pnapi::parser::sa::EDGE, $1, $3); }
-;

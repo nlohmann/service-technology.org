@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <stack>
+#include <string>
 #include <istream>
 
 #include "io.h"
@@ -460,89 +461,37 @@ namespace pnapi
 
     namespace sa
     {
-
-      // forward declaration
-      class Node;
-
-      /// BaseNode instantiation
-      typedef BaseNode<Node> BaseNode;
-
-      // parser node
-      extern Node *node;
-
       // flex lexer
       int lex();
 
       // bison parser
       int parse();
 
-      class Parser : public parser::Parser<Node>
+      using namespace pnapi;
+
+      extern Automaton pnapi_sa_yyautomaton;
+
+      extern std::vector<std::string> identlist;
+
+      extern State *state_;
+      extern bool final_;
+      extern bool initial_;
+      extern std::vector<unsigned int> succState_;
+      extern std::vector<std::string> succLabel_;
+      extern std::vector<Automaton::Type> succType_;
+
+      extern State *edgeState_;
+      extern std::string edgeLabel_;
+      extern Automaton::Type edgeType_;
+
+      extern std::map<int, State *> states_;
+
+      class Parser
       {
       public:
         Parser();
-      };
 
-      /* Node Types */
-      enum Type
-      {
-        STATE, FINAL, INITIAL, INIT_FINAL, EDGE, NO_DATA, ID, NUM,
-        INPUT, OUTPUT
-      };
-
-      /*
-       * \brief Node of a SA AST
-       */
-      class Node : public BaseNode
-      {
-      public:
-        const Type type_;
-        const int number_;
-        const std::string identifier_;
-
-        Node();
-        Node(Node *);
-        Node(Node *, Node *, Node *);
-
-        Node(int);
-        Node(std::string *);
-
-        Node(Type);
-        Node(Type, Node *);
-        Node(Type, Node *, Node *);
-        Node(Type, Node *, Node *, Node *);
-      };
-
-      /*
-       * \brief Visitor of a SA AST
-       */
-      class Visitor : public parser::Visitor<Node>
-      {
-      public:
-        Visitor();
-
-        const Automaton & getAutomaton() const;
-
-        void beforeChildren(const Node &);
-        void afterChildren(const Node &);
-
-      private:
-        Automaton *sa_;
-
-        std::stack<sa::Type> stack_;
-
-        // temporary objects
-        struct AState
-        {
-          unsigned int name;
-          bool isFinal;
-          bool isInitial;
-          std::vector<std::string> edgeLabels;
-          std::vector<unsigned int> targetNodes;
-        } newState_;
-        std::vector<std::string> input_;
-        std::vector<std::string> output_;
-
-        Automaton::Type getType(std::string) const;
+        const Automaton & parse(std::istream &);
       };
 
     } /* namespace sa */

@@ -19,6 +19,7 @@
 #include "condition.h"
 #include "petrinet.h"
 #include "automaton.h"
+#include "state.h"
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;

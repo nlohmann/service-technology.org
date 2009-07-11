@@ -4,6 +4,7 @@
 #include <set>
 #include <string>
 #include "io.h"
+#include "parser.h"
 
 
 namespace pnapi
@@ -25,6 +26,10 @@ namespace pnapi
   class State
   {
     friend std::ostream & io::__sa::output(std::ostream &, const State &);
+    friend int pnapi::parser::sa::parse();
+
+    friend class Automaton;
+    friend class Edge;
 
   public:
     /// standard constructor
@@ -38,13 +43,6 @@ namespace pnapi
     State(const State &s);
     /// standard destructor
     virtual ~State() {}
-
-    /// adding a state to the preset
-    void addPre(State &);
-    /// adding a state to the postset
-    void addPost(State &);
-    /// adding an edge to the postset edges
-    void addPostEdge(Edge &);
 
     /// method which returns the state's name
     const unsigned int name() const;
@@ -63,6 +61,7 @@ namespace pnapi
     bool isInitial() const;
     /// method which toggles the state's initial property to true
     void initial();
+
 
     /// checks if 2 states are equal (by name, preset, and postset, or marking)
     bool operator ==(const State &s2) const;
@@ -87,6 +86,13 @@ namespace pnapi
     bool isFinal_;
     /// the state's initial property
     bool isInitial_;
+
+    /// adding a state to the preset
+    void addPre(State &);
+    /// adding a state to the postset
+    void addPost(State &);
+    /// adding an edge to the postset edges
+    void addPostEdge(Edge &);
 
     /*** optional properties ***/
     /// the marking which is represented by the state (needed by service a.)

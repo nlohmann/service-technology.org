@@ -196,6 +196,9 @@ namespace pnapi
     /// Service Automaton (SA) file format
     std::ios_base & sa(std::ios_base &);
 
+    /// Service Automaton (SA) to State-Machine
+    std::istream & sa2sm(std::istream &);
+
     /// LOLA file format
     std::ios_base & lola(std::ios_base &);
 
@@ -225,7 +228,7 @@ namespace pnapi
       /* FORMAT IMPLEMENTATION: add format constant */
 
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, LOLA };
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, SA2SM, LOLA };
 
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };

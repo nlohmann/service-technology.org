@@ -470,8 +470,11 @@ namespace pnapi
       using namespace pnapi;
 
       extern Automaton pnapi_sa_yyautomaton;
+      extern PetriNet pnapi_sa_yynet;
 
       extern std::vector<std::string> identlist;
+      extern std::set<std::string> input_;
+      extern std::set<std::string> output_;
 
       extern State *state_;
       extern bool final_;
@@ -486,12 +489,22 @@ namespace pnapi
 
       extern std::map<int, State *> states_;
 
+      extern bool sa2sm;
+
+      extern std::map<std::string, Place *> label2places_;
+      extern std::map<int, Place *> places_;
+      extern Place *place_;
+      extern Place *edgePlace_;
+
+      extern std::vector<Place *> finalPlaces_;
+
       class Parser
       {
       public:
         Parser();
 
         const Automaton & parse(std::istream &);
+        const PetriNet & parseSA2SM(std::istream &);
       };
 
     } /* namespace sa */

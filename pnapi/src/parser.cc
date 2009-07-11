@@ -454,8 +454,11 @@ namespace pnapi
        * Global variables for flex+bison
        */
       Automaton pnapi_sa_yyautomaton;
+      PetriNet pnapi_sa_yynet;
 
       std::vector<std::string> identlist;
+      std::set<std::string> input_;
+      std::set<std::string> output_;
 
       State *state_;
       bool final_;
@@ -470,6 +473,15 @@ namespace pnapi
 
       std::map<int, State *> states_;
 
+      bool sa2sm;
+
+      std::map<std::string, Place *> label2places_;
+      std::map<int, Place *> places_;
+      Place *place_;
+      Place *edgePlace_;
+
+      std::vector<Place *> finalPlaces_;
+
       const Automaton & Parser::parse(std::istream &is)
       {
         stream = &is;
@@ -478,11 +490,48 @@ namespace pnapi
 
         pnapi_sa_yyautomaton = Automaton();
 
+        sa2sm = false;
         sa::parse();
 
         // clean up global variables
+        states_.clear();
 
         return pnapi_sa_yyautomaton;
+      }
+
+      const PetriNet & Parser::parseSA2SM(std::istream &is)
+      {
+        Condition final;
+        Condition empty;
+        final = false;
+        empty = true;
+
+        stream = &is;
+
+        line = 1;
+
+        pnapi_sa_yynet = PetriNet();
+
+        sa2sm = true;
+        sa::parse();
+
+        std::set<Place *> places = pnapi_sa_yynet.getPlaces();
+        for (int i = 0; i < (int) finalPlaces_.size(); i++)
+        {
+          final = final.formula() || *finalPlaces_[i] == 1;
+          places.erase(finalPlaces_[i]);
+        }
+        for (std::set<Place *>::iterator p = places.begin(); p != places.end(); p++)
+          empty = empty.formula() && **p == 0;
+
+        pnapi_sa_yynet.finalCondition() = final.formula() && empty.formula();
+
+        // clean up global variables
+        label2places_.clear();
+        places_.clear();
+        finalPlaces_.clear();
+
+        return pnapi_sa_yynet;
       }
 
     } /* namespace sa */

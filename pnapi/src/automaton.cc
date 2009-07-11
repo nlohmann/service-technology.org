@@ -29,7 +29,7 @@ namespace pnapi
    * The result of the constructor is an emty automaton.
    */
   Automaton::Automaton() :
-      net_(NULL), hashTable_(NULL), edgeLabels_(NULL), edgeTypes_(NULL), counter_(0)
+      edgeLabels_(NULL), edgeTypes_(NULL), net_(NULL), hashTable_(NULL), counter_(0)
   {
     /* do nothing */
   }
@@ -98,7 +98,7 @@ namespace pnapi
    * properties which marked as optional in the according header file.
    */
   Automaton::Automaton(const Automaton &a) :
-    states_(a.states_), edges_(a.edges_), hashTable_(NULL), edgeLabels_(NULL), counter_(a.counter_+1)
+    states_(a.states_), edges_(a.edges_), edgeLabels_(NULL), hashTable_(NULL), counter_(a.counter_+1)
   {
     if (a.net_ == NULL)
       net_ = NULL;

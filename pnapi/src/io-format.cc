@@ -785,6 +785,13 @@ namespace pnapi
     }
 
 
+    std::istream & sa2sm(std::istream &is)
+    {
+      util::FormatData::data(is) = util::SA2SM;
+      return is;
+    }
+
+
     namespace __sa
     {
       ostream & output(ostream &os, const Automaton &sa)

@@ -84,6 +84,13 @@ namespace pnapi
 	    break;
 	  }
 
+	case util::SA2SM:
+	  {
+	    parser::sa::Parser parser;
+	    net = parser.parseSA2SM(is);
+
+	    break;
+	  }
 	default:
 	  assert(false);  // unsupported input format
 	}
@@ -120,7 +127,7 @@ namespace pnapi
       case util::SA:
       {
         parser::sa::Parser parser;
-        sa =parser.parse(is);
+        sa = parser.parse(is);
         break;
       }
       default: assert(false); /* unsupported format */

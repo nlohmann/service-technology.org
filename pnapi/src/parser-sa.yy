@@ -18,9 +18,10 @@
 %{
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "parser.h"
-#include "state.h"
+#include "pnapi.h"
 
 using namespace pnapi;
 
@@ -68,9 +69,18 @@ sa:
 input:
   /* empty */
 | KEY_INPUT identlist SEMICOLON
-  { 
+  {
     for (int i = 0; i < identlist.size(); i++)
-      pnapi_sa_yyautomaton.addInput(identlist[i]);
+    {
+      if (sa2sm)
+      {
+        Place *p = &pnapi_sa_yynet.createPlace(identlist[i], Node::INPUT);
+        label2places_[identlist[i]] = p;
+      }
+      else
+        pnapi_sa_yyautomaton.addInput(identlist[i]);
+      input_.insert(identlist[i]);
+    }
     identlist.clear();
   }
 ;
@@ -81,7 +91,16 @@ output:
 | KEY_OUTPUT identlist SEMICOLON
   { 
     for (int i = 0; i < identlist.size(); i++)
-      pnapi_sa_yyautomaton.addOutput(identlist[i]);
+    {
+      if (sa2sm)
+      {
+        Place *p = &pnapi_sa_yynet.createPlace(identlist[i], Node::OUTPUT);
+        label2places_[identlist[i]] = p;
+      }
+      else
+        pnapi_sa_yyautomaton.addOutput(identlist[i]);
+      output_.insert(identlist[i]);
+    }
     identlist.clear();
   }
 ;
@@ -104,26 +123,67 @@ nodes:
   /* empty */
 | nodes NUMBER annotation successors
   {
-    if (states_.count($2) == 0)
+    if (sa2sm)
     {
-    	state_ = &pnapi_sa_yyautomaton.createState($2);
-      states_[$2] = state_;
+      if (places_.count($2) == 0)
+      {
+        std::stringstream ss;
+        std::string num;
+        ss << $2;
+        ss >> num;
+        place_ = &pnapi_sa_yynet.createPlace("p"+num);
+        places_[$2] = place_;
+      }
+      else
+        place_ = places_[$2];
+      if (initial_)
+        place_->mark();
+      if (final_)
+      {
+        finalPlaces_.push_back(place_);
+      }
+        
+      for (int i = 0; i < succState_.size(); i++)
+      {
+        Transition *t = &pnapi_sa_yynet.createTransition();
+        if (succType_[i] == Automaton::INPUT)
+          pnapi_sa_yynet.createArc(*label2places_[succLabel_[i]], *t);
+        if (succType_[i] == Automaton::OUTPUT)
+          pnapi_sa_yynet.createArc(*t, *label2places_[succLabel_[i]]);
+          
+        pnapi_sa_yynet.createArc(*place_, *t);
+        pnapi_sa_yynet.createArc(*t, *places_[succState_[i]]);
+      }
+      
+      final_ = false;
+      initial_ = false;
+      succState_.clear();
+      succLabel_.clear();
+      succType_.clear();
     }
     else
-      state_ = states_[$2];
-    if (initial_)
-      state_->initial();
-    if (final_)
-      state_->final();
-    
-    for (int i = 0; i < succState_.size(); i++)
-      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
-    
-    final_ = false;
-    initial_ = false;
-    succState_.clear();
-    succLabel_.clear();
-    succType_.clear();
+    {
+	    if (states_.count($2) == 0)
+	    {
+	    	state_ = &pnapi_sa_yyautomaton.createState($2);
+	      states_[$2] = state_;
+	    }
+	    else
+	      state_ = states_[$2];
+	    if (initial_)
+	      state_->initial();
+	    if (final_)
+	      state_->final();
+	    
+	    for (int i = 0; i < succState_.size(); i++)
+	      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
+	    
+	    final_ = false;
+	    initial_ = false;
+	    succState_.clear();
+	    succLabel_.clear();
+	    succType_.clear();
+	  }
   }
 ;
 
@@ -140,20 +200,33 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    if (states_.count($4) == 0)
+    if (sa2sm)
     {
-      edgeState_ = &pnapi_sa_yyautomaton.createState($4);
-      states_[$4] = edgeState_;
+      if (places_.count($4) == 0)
+      {
+        std::stringstream ss;
+        std::string num;
+        ss << $4;
+        ss >> num;
+        edgePlace_ = &pnapi_sa_yynet.createPlace("p"+num);
+        places_[$4] = edgePlace_;
+      }
     }
     else
-      edgeState_ = states_[$4];
+    {
+	    if (states_.count($4) == 0)
+	    {
+	      edgeState_ = &pnapi_sa_yyautomaton.createState($4);
+	      states_[$4] = edgeState_;
+	    }
+	  }
 
     edgeLabel_ = *$2;
     delete $2;
     edgeType_ = Automaton::TAU;
-    if (pnapi_sa_yyautomaton.input().count(edgeLabel_) > 0)
+    if (input_.count(edgeLabel_) > 0)
       edgeType_ = Automaton::INPUT;
-    if (pnapi_sa_yyautomaton.output().count(edgeLabel_) > 0)
+    if (output_.count(edgeLabel_) > 0)
       edgeType_ = Automaton::OUTPUT;
     succState_.push_back($4);
     succLabel_.push_back(edgeLabel_);

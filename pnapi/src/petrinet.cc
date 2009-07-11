@@ -163,10 +163,24 @@ namespace pnapi
     if (trans.isSynchronized())
     {
       net_.synchronizedTransitions_.insert(&trans);
+      for (std::set<std::string>::iterator label = trans.getSynchronizeLabels().begin(); label != trans.getSynchronizeLabels().end(); label++)
+        net_.labels_.insert(*label);
     }
     else  
     {
       net_.synchronizedTransitions_.erase(&trans);
+
+      std::set<Transition *> transitions = net_.getTransitions();
+      transitions.erase(&trans);
+      std::set<std::string> allLabels; //< all labels but trans's
+      for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
+      {
+        allLabels = util::setUnion(allLabels, (*t)->getSynchronizeLabels());
+      }
+      std::set<std::string> intersection = util::setIntersection(trans.getSynchronizeLabels(), allLabels);
+      std::set<std::string> diff = util::setDifference(trans.getSynchronizeLabels(), intersection);
+      for (std::set<std::string>::iterator l = diff.begin(); l != diff.end(); l++)
+        net_.labels_.erase(*l);
     }
   }
 

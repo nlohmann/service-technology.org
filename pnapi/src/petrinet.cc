@@ -155,6 +155,11 @@ namespace pnapi
     updateNodes(trans);
     net_.transitions_.insert(&trans);
     updateTransitionLabels(trans);
+
+    net_.labels_.clear();
+    for (std::set<Transition *>::iterator t = net_.transitions_.begin(); t != net_.transitions_.end(); t++)
+      for (std::set<std::string>::iterator l = (*t)->getSynchronizeLabels().begin(); l != (*t)->getSynchronizeLabels().end(); l++)
+        net_.labels_.insert(*l);
   }
   
 
@@ -163,8 +168,6 @@ namespace pnapi
     if (trans.isSynchronized())
     {
       net_.synchronizedTransitions_.insert(&trans);
-      for (std::set<std::string>::iterator label = trans.getSynchronizeLabels().begin(); label != trans.getSynchronizeLabels().end(); label++)
-        net_.labels_.insert(*label);
     }
     else  
     {
@@ -1413,17 +1416,10 @@ namespace pnapi
       synchronizedTransitions_.erase(&trans);
     transitions_.erase(&trans);
 
-    // removing synchronize labels which are no longer needed
-    std::set<Transition *> transitions = getTransitions();
-    std::set<std::string> allLabels; //< all labels but trans's
-    for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
-    {
-      allLabels = util::setUnion(allLabels, (*t)->getSynchronizeLabels());
-    }
-    std::set<std::string> intersection = util::setIntersection(trans.getSynchronizeLabels(), allLabels);
-    std::set<std::string> diff = util::setDifference(trans.getSynchronizeLabels(), intersection);
-    for (std::set<std::string>::iterator l = diff.begin(); l != diff.end(); l++)
-      labels_.erase(*l);
+    labels_.clear();
+    for (std::set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+      for (std::set<std::string>::iterator l = (*t)->getSynchronizeLabels().begin(); l != (*t)->getSynchronizeLabels().end(); l++)
+        labels_.insert(*l);
 
     deleteNode(trans);
   }

@@ -1,6 +1,7 @@
 @heading Version 1.6-unreleased
 @itemize
 @item added more test cases for synchronous communication
+@item added a utility to minimize operating guidelines (see @file{utils/minimize}) -- this is currently an adjusted branch of Rachel which needs some polishing towards the new file formats
 @end itemize
 
 @heading Version 1.5

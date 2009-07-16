@@ -64,7 +64,7 @@ AC_TYPE_UINT32_T
 
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
-	doc/Doxyfile man/Makefile maintainer/Makefile
+	doc/Doxyfile man/Makefile maintainer/Makefile utils/Makefile
 	maintainer/debian/changelog.template maintainer/debian/info
 	maintainer/debian/README.Debian.template maintainer/debian/rules
 	maintainer/macports/Portfile tests/Makefile tests/package.m4

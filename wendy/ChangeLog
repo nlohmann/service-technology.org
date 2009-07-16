@@ -12,6 +12,10 @@ Version 1.6-unreleased
 
 * added more test cases for synchronous communication
 
+* added a utility to minimize operating guidelines (see `utils/minimize') -
+  this is currently an adjusted branch of Rachel which needs some polishing
+  towards the new file formats
+
 Version 1.5
 ===========
 

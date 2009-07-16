@@ -1,7 +1,7 @@
 noinst_PROGRAMS = minimize
 
 minimize_SOURCES = syntax_og.yy lexer_og.ll \
-                   main.cc config.h \
+                   main.cc \
                    Node.h Node.cc \
                    Graph.h Graph.cc \
                    Formula.h Formula.cc \

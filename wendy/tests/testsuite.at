@@ -293,6 +293,16 @@ AT_CHECK([GREP -c "\->" phil5.og],0,[7200
 AT_KEYWORDS(synchronous)
 AT_CLEANUP
 
+AT_SETUP([Car Reservation])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/carreservation_with_engine.owfn .])
+AT_CHECK([WENDY carreservation_with_engine.owfn --og --verbose],0,ignore,ignore)
+AT_CHECK([GREP -q "309 nodes" carreservation_with_engine.og])
+AT_CHECK([GREP -c "\->" carreservation_with_engine.og],0,[6510
+])
+AT_KEYWORDS(synchronous)
+AT_CLEANUP
+
 AT_SETUP([Test net])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test-sync.owfn .])

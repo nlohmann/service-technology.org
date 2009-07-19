@@ -69,3 +69,5 @@ option "config" c
   string
   typestr="FILE"
   optional
+
+text "\nReport bugs to mia@service-technology.org\nMia's home page: http://service-technology.org/mia"

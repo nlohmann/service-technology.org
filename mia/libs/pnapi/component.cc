@@ -278,6 +278,7 @@ namespace pnapi {
 
     observer_.updatePlaces(*this);
     setType(type);
+    maxOccurrence_ = -1;
   }
 
 
@@ -329,6 +330,15 @@ namespace pnapi {
     return port_;
   }
 
+  
+  /*!
+   * \todo  maybe private
+   */
+  void Place::setPort(string & port)
+  {
+    port_ = port;
+  }
+  
 
   /*!
    */
@@ -403,6 +413,22 @@ namespace pnapi {
       }
   }
 
+  /*!
+   * \brief set the maximum occurrence
+   */
+  void Place::setMaxOccurrence(int maxOccurrence)
+  {
+    maxOccurrence_ = maxOccurrence;
+  }
+  
+  /*!
+   * \brief get the maximum occurrence
+   */
+  int Place::getMaxOccurrence()
+  {
+    return maxOccurrence_;
+  }
+  
 
 
   /****************************************************************************
@@ -529,6 +555,14 @@ namespace pnapi {
   const set<string> & Transition::getSynchronizeLabels() const
   {
     return labels_;
+  }
+  
+  /*!
+   */
+  void Transition::setSynchronizeLabels(const std::set<std::string> & labels)
+  {
+    labels_ = labels;
+    observer_.updateTransitionLabels(*this);
   }
 
 

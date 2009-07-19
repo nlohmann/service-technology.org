@@ -8,14 +8,7 @@ endif
 EXTRA_DIST = REQUIREMENTS
 
 svn-clean: maintainer-clean
-	rm -fr INSTALL Makefile.in aclocal.m4 compile configure \
-	       depcomp install-sh missing ylwrap
-	rm -fr src/config.h.in~ src/Makefile.in libs/Makefile.in src/config.h.in \
-	       src/mia.conf
-	rm -fr man/Makefile.in
-	rm -fr doc/doxygen doc/mdate-sh
-	rm -fr libs/pnapi/Makefile.in
-	rm -f tests/Makefile.in
-	rm -f maintainer/Makefile.in
-	rm -f doc/Makefile.in
-
+	rm -fr configure Makefile.in depcomp compile INSTALL missing \
+	aclocal.m4 install-sh ylwrap src/Makefile.in src/config.h.in \
+	maintainer/Makefile.in libs/pnapi/Makefile.in tests/Makefile.in \
+	doc/Makefile.in doc/mdate-sh man/Makefile.in src/config-log.h

@@ -208,7 +208,7 @@ Mia is a command line tool and does not come with a fancy @acronym{GUI}. However
 For an overview of the command line options, type @samp{mia --help} to see the following help screen:
 
 @smallexample
-@include cmdline.out
+@verbatiminclude cmdline.out
 @end smallexample
 
 

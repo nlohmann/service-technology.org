@@ -23,7 +23,7 @@ Version 1.1-unreleased
   script and written to `src/mia.conf'. When Mia is executed, it checks for
   the file `mia.conf' in the sysconfig folder (usually `/usr/local/etc') and
   in the current directory. If neither file was found, Mia tries to rely on
-  standard filenames.
+  standard options.
 
 * added generic Makefile target (`bin' in `maintainer') to create a binary
   release for the running platform (using `uname')
@@ -31,6 +31,8 @@ Version 1.1-unreleased
 * added improved Petri Net API files (faster parsing and composition)
 
 * added output of runtimes of invoked tools and complex operations
+
+* added `--bug' option to create debug output
 
 Version 1.0
 ===========

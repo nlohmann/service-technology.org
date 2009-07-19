@@ -185,146 +185,71 @@ namespace pnapi
     namespace owfn
     {
 
-      // forward declarations
-      class Node;
-
-
-      /// BaseNode instantiation
-      typedef BaseNode<Node> BaseNode;
-
-
-      /// output node of parser
-      extern Node * node;
-
       /// flex generated lexer function
       int lex();
 
       /// bison generated parser function
       int parse();
 
+      /// "assertion"
+      void check(bool, const std::string &);
 
+      /******************************************\
+       *  "global" variables for flex and bison *
+      \******************************************/
+      
+      /// parsed ident
+      extern std::string ident; 
+      /// generated petrinet
+      extern PetriNet pnapi_owfn_yynet;
+      
+      /// mapping of names to places
+      extern std::map<std::string, Place*> places_;
+      /// recently read transition
+      extern Transition* transition_;
+      /// all purpose place pointer
+      extern Place* place_;
+      /// target of an arc
+      extern Node * * target_;
+      /// source of an arc
+      extern Node * * source_;
+      /// converts NUMBER and IDENT in string
+      extern std::stringstream nodeName_;
+      /// type of recently read places
+      extern Node::Type placeType_;
+      /// labels for synchronous communication
+      extern std::set<std::string> labels_;
+      /// read capacity
+      extern int capacity_;
+      /// used port
+      extern std::string port_;
+      /// constrains
+      extern std::map<Transition*, std::set<std::string> > constrains_;
+      /// whether read marking is the initial marking or a final marking
+      extern bool markInitial_;
+      /// pointer to a final marking
+      extern Marking* finalMarking_;
+      /// preset/postset label for parse exception
+      extern bool placeSetType_;
+      /// precet/postset for fast checks
+      extern std::set<Place*> placeSet_;
+      /// whether to check labels
+      extern bool checkLabels_;
+      
       /*!
        * \brief   Encapsulation of the flex/bison OWFN parser
        *
-       * Connects to the flex/bison implementation for parsing (#parse()) and
-       * result retrieval (#visit()). Call the two functions in this order.
+       * Connects to the flex/bison implementation for parsing.
        */
-      class Parser : public parser::Parser<Node>
+      class Parser
       {
       public:
-	Parser();
+	      Parser();
+	      
+	      /// parses stream contents with the associated parser
+        const PetriNet & parse(std::istream &);
       };
-
-
-      /*!
-       * \brief   Node types
-       */
-      enum Type
-	{
-	  NO_DATA, DATA_NUMBER, DATA_IDENTIFIER,
-	  INPUT, OUTPUT, INTERNAL, PLACE, CAPACITY, PORT, PORT_PLACE,
-	  INITIALMARKING, FINALMARKING, MARK, CONDITION, LABEL,
-	  TRANSITION, ARC, PRESET, POSTSET, CONSTRAIN, SYNCHRONOUS,
-	  FORMULA_NOT, FORMULA_OR, FORMULA_AND, FORMULA_AAOPE, FORMULA_AAOIPE,
-	  FORMULA_AAOEPE, FORMULA_EQ, FORMULA_NE, FORMULA_LT, FORMULA_GT,
-	  FORMULA_GE, FORMULA_LE , FORMULA_FALSE, FORMULA_TRUE, FORMULA_APE
-	};
-
-
-      /*!
-       * \brief   Node of an OWFN AST
-       *
-       * Each Node has a Type which is the first parameter in a variety of
-       * constructors. Furthermore other data collected during the parsing
-       * process (a #petriNet, an #identifier and a #value) may be stored. Node
-       * parameters in a constructor result in the nodes being added as
-       * children.
-       */
-      class Node : public BaseNode
-      {
-      public:
-
-	const Type type;
-	int number;
-	std::string identifier;
-
-	Node();
-	Node(Node *);
-	Node(Node *, Node *);
-	Node(Node *, Node *, Node *);
-	Node(Node *, Node *, Node *, Node *);
-
-	Node(int);
-	Node(std::string *);
-	Node(Type);
-	Node(Type, Node *);
-	Node(Type, Node *, int);
-	Node(Type, Node *, Node *);
-	Node(Type, Node *, Node *, Node *);
-	Node(Type, Node *, Node *, Node *, Node *);
-	Node(Type, Node *, Node *, Node *, Node *, Node *);
-	Node(Type, Node *, Node *, Node *, Node *, Node *, Node *);
-
-	Node & operator=(const Node &);
-
-	void mergeData(Node *);
-	void mergeChildren(Node *);
-      };
-
-
-      /*!
-       * \brief   Visitor for OWFN AST nodes
-       *
-       * Constructs a PetriNet (#getPetriNet()) during traversal via
-       * Parser::visit().
-       */
-      class Visitor : public parser::Visitor<Node>
-      {
-      public:
-	Visitor();
-
-	const PetriNet & getPetriNet() const;
-	const std::map<Transition *, std::set<std::string> > &
-	getConstraintLabels() const;
-	const std::set<std::string> & getSynchronousLabels() const;
-
-	void beforeChildren(const Node &);
-	void afterChildren(const Node &);
-
-      private:
-
-	struct PlaceAttributes
-	{
-	  Place::Type type;
-	  unsigned int marking;
-	  unsigned int capacity;
-	  std::string port;
-
-	  PlaceAttributes() : type(Place::INTERNAL), marking(0), capacity(0) {}
-	};
-
-	PetriNet net_;
-	Place::Type placeType_;
-	unsigned int capacity_;
-	std::string port_;
-	std::map<std::string, PlaceAttributes> places_;
-	bool isPreset_;
-	std::map<std::string, unsigned int> preset_, postset_;
-	bool isSynchronize_;
-	std::set<std::string> synchronousLabels_;
-	std::set<std::string> synchronizeLabels_;
-	std::set<std::string> constrainLabels_;
-	std::map<Transition *, std::set<std::string> > constraintMap_;
-	std::stack<std::pair<formula::Formula *,
-			     const std::set<const Place *> *> > formulas_;
-	bool isInitial_;
-	Marking finalMarking_;
-
-	formula::Formula * integrateWildcard(std::pair<formula::Formula *,
-					     const std::set<const Place *> *>);
-      };
-
-    }
+    };
 
 
 
@@ -339,34 +264,59 @@ namespace pnapi
      */
     namespace lola
     {
-
-      // lola parser uses owfn nodes
-      typedef owfn::Node Node;
-
-
-      /// output node of parser
-      extern Node * node;
-
+      
       /// flex generated lexer function
       int lex();
 
       /// bison generated parser function
       int parse();
 
+      /// "assertion"
+      void check(bool, const std::string &);
 
+      /******************************************\
+       *  "global" variables for flex and bison *
+      \******************************************/
+      
+      /// parsed ident
+      extern std::string ident; 
+      /// generated petrinet
+      extern PetriNet pnapi_lola_yynet;
+      
+      /// mapping of names to places
+      extern std::map<std::string, Place*> places_;
+      /// recently read transition
+      extern Transition* transition_;
+      /// all purpose place pointer
+      extern Place* place_;
+      /// target of an arc
+      extern Node * * target_;
+      /// source of an arc
+      extern Node * * source_;
+      /// converts NUMBER and IDENT in string
+      extern std::stringstream nodeName_;
+      /// read capacity
+      extern int capacity_;
+      /// precet/postset for fast checks
+      extern std::set<Place*> placeSet_;
+      /// preset/postset label for parse exception
+      extern bool placeSetType_;
+      
+      
       /*!
-       * \brief   Encapsulation of the flex/bison LOLA parser
+       * \brief   Encapsulation of the flex/bison OWFN parser
        *
-       * Connects to the flex/bison implementation for parsing (#parse()) and
-       * result retrieval (#visit()). Call the two functions in this order.
+       * Connects to the flex/bison implementation for parsing.
        */
-      class Parser : public parser::Parser<Node>
+      class Parser
       {
       public:
-	Parser();
+        Parser();
+        
+        /// parses stream contents with the associated parser
+        const PetriNet & parse(std::istream &);
       };
-
-    }
+    };
 
 
 

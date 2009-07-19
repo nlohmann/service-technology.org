@@ -30,6 +30,7 @@
 #include <set>
 
 #include "cmdline.h"
+#include "config-log.h"
 #include "pnapi/pnapi.h"
 #include "verbose.h"
 
@@ -81,6 +82,16 @@ bool fileExists(std::string filename) {
 void evaluateParameters(int argc, char** argv) {
     // set default values
     argv[0] = (char *)PACKAGE;
+
+    // debug option
+    if (argc > 0 and std::string(argv[1]) == "--bug") {
+        FILE *debug_output = fopen("bug.log", "w");
+        fprintf(debug_output, "%s\n", CONFIG_LOG);
+        fclose(debug_output);
+        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
+        exit(EXIT_SUCCESS);
+    }
+
     cmdline_parser_init(&args_info);
 
     // initialize the parameters structure

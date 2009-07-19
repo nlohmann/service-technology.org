@@ -9,7 +9,7 @@ mia_SOURCES = syntax_graph.yy lexic_graph.ll \
 
 sysconf_DATA = mia.conf
 
-# pass the sysconfdir to Mia
+# pass the sysconfdir to Mia (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 mia_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 # only add the local Petri net API if necessary
@@ -18,9 +18,17 @@ mia_CPPFLAGS += -I$(top_srcdir)/libs
 mia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-BUILT_SOURCES = cmdline.c syntax_graph.cc syntax_im.cc syntax_mi.cc
+BUILT_SOURCES = cmdline.c syntax_graph.cc syntax_im.cc syntax_mi.cc config-log.h
 EXTRA_DIST = syntax_graph.h syntax_im.h syntax_mi.h cmdline.ggo mia.conf
 MAINTAINERCLEANFILES = syntax_graph.h syntax_im.h syntax_mi.h cmdline.c cmdline.h
+DISTCLEANFILES = config-log.h
+
+# copy the content of the config.log file to a C header (for debugging purposes)
+config-log.h: $(top_srcdir)/config.log
+	echo "#define CONFIG_LOG \\" > config-log.h
+	$(SED) -e '/^|/d' $(top_srcdir)/config.log | $(SED) -e 's/\\/\\\\/g' | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\"",$$0,"\\n\"\\"}' >> config-log.h
+	echo '""' >> config-log.h
+	echo "" >> config-log.h
 
 
 ################################################################

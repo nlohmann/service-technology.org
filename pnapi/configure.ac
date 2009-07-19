@@ -31,6 +31,7 @@ AC_CHECK_FUNCS([popen pclose])
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
+AM_MISSING_PROG(HELP2MAN, help2man)
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
@@ -145,6 +146,7 @@ AC_CONFIG_FILES([Makefile
                  pnapi.pc
                  doc/Doxyfile
                  src/Makefile
+                 man/Makefile
                  tests/Makefile
                  tests/package.m4
                  tests/petrinet/Makefile

@@ -1,26 +1,11 @@
-SUBDIRS = src tests utils
+SUBDIRS = src tests utils man
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
-	-rm -f compile config.guess config.sub
-	-rm -f aclocal.m4
-	-rm -fr m4 ltmain.sh
-	-rm -f configure Doxyfile compile
-	-rm -f depcomp
-	-rm -f install-sh
-	-rm -f Makefile.in
-	-rm -f missing
-	-rm -f ylwrap
-	-rm -f -r autom4te.cache
-	-rm -f src/Makefile.in
-	-rm -f -r src/.deps
-	-rm -f src/config.h.in
-	-rm -f tests/Makefile.in
-	-rm -f tests/petrinet/Makefile.in tests/automaton/Makefile.in 
-	-rm -f utils/Makefile.in
-	-rm -fr doc/doxygen
-	-rm -f doc/Doxyfile
-	-rm -f INSTALL
+	rm -fr m4 configure Makefile.in depcomp compile config.guess \
+	ltmain.sh config.sub INSTALL missing aclocal.m4 install-sh ylwrap \
+	man/Makefile.in utils/Makefile.in tests/Makefile.in \
+	tests/petrinet/Makefile.in src/Makefile.in src/config.h.in
 	@echo -----------------------------------------------------
 	@echo "To recreate installation status enter"
 	@echo "  autoreconf -i"

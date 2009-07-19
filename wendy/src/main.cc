@@ -30,6 +30,7 @@
 #include <fstream>
 #include <string>
 #include "config.h"
+#include "config-log.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 #include "verbose.h"
@@ -68,6 +69,15 @@ bool fileExists(std::string filename) {
 void evaluateParameters(int argc, char** argv) {
     // overwrite invokation for consistent error messages
     argv[0] = (char*)PACKAGE;
+
+    // debug option
+    if (argc > 0 and std::string(argv[1]) == "--bug") {
+        FILE *debug_output = fopen("bug.log", "w");
+        fprintf(debug_output, "%s\n", CONFIG_LOG);
+        fclose(debug_output);
+        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
+        exit(EXIT_SUCCESS);
+    }
 
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {
@@ -167,7 +177,8 @@ int main(int argc, char** argv) {
             if (!inputStream) {
                 abort(1, "could not open file '%s'", args_info.inputs[0]);
             }
-            inputStream >> pnapi::io::owfn >> *(InnerMarking::net);
+            inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+                        >> pnapi::io::owfn >> *(InnerMarking::net);
         }
         if (args_info.verbose_flag) {
             std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
@@ -175,7 +186,7 @@ int main(int argc, char** argv) {
     } catch (pnapi::io::InputError error) {
         std::stringstream temp;
         temp << error;
-        abort(2, "\b\b%s", temp.str().c_str());
+        abort(2, "\b%s", temp.str().c_str());
     }
 
     // only normal nets are supported so far
@@ -209,9 +220,7 @@ int main(int argc, char** argv) {
     }
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: created file '%s.lola'\n", PACKAGE, tmpname.c_str());
-    }
+    status("created file '%s.lola'", tmpname.c_str());
 
     /*------------------------------------------.
     | 4. call LoLA and parse reachability graph |
@@ -253,9 +262,7 @@ int main(int argc, char** argv) {
     InnerMarking::initialize();
     delete InnerMarking::net;
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, " [%.0f sec]\n", difftime(end_time, start_time));
-    }
+    status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
 
 
     /*-------------------------------.
@@ -270,15 +277,13 @@ int main(int argc, char** argv) {
     delete K0;
     time(&end_time);
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: stored %d knowledges [%.0f sec]\n",
-            PACKAGE, StoredKnowledge::stats_storedKnowledges, difftime(end_time, start_time));
-        fprintf(stderr, "%s: used %d of %d hash buckets, maximal bucket size: %d\n",
-            PACKAGE, static_cast<unsigned int>(StoredKnowledge::hashTree.size()),
-            (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats_maxBucketSize));
-        fprintf(stderr, "%s: at most %d interface markings per inner marking\n",
-            PACKAGE, StoredKnowledge::stats_maxInterfaceMarkings);
-    }
+    status("stored %d knowledges [%.0f sec]",
+        StoredKnowledge::stats_storedKnowledges, difftime(end_time, start_time));
+    status("used %d of %d hash buckets, maximal bucket size: %d",
+        static_cast<unsigned int>(StoredKnowledge::hashTree.size()),
+        (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats_maxBucketSize));
+    status("at most %d interface markings per inner marking",
+        StoredKnowledge::stats_maxInterfaceMarkings);
 
 
     /*----------------------------.
@@ -288,10 +293,8 @@ int main(int argc, char** argv) {
     unsigned int edges = StoredKnowledge::addPredecessors();
     time(&end_time);
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: added predecessor relation (%d edges) [%.0f sec]\n",
-            PACKAGE, edges, difftime(end_time, start_time));
-    }
+    status("added predecessor relation (%d edges) [%.0f sec]",
+        edges, difftime(end_time, start_time));
 
 
     /*----------------------------------.
@@ -301,10 +304,8 @@ int main(int argc, char** argv) {
     unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
     time(&end_time);
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: removed %d red nodes in %d iterations [%.0f sec]\n",
-            PACKAGE, redNodes, StoredKnowledge::stats_iterations, difftime(end_time, start_time));
-    }
+    status("removed %d red nodes in %d iterations [%.0f sec]",
+        redNodes, StoredKnowledge::stats_iterations, difftime(end_time, start_time));
 
     // analyze root node
     fprintf(stderr, "%s: net is controllable: %s\n",
@@ -326,9 +327,7 @@ int main(int argc, char** argv) {
         } else {
             StoredKnowledge::output(og_file);            
         }
-        if (args_info.verbose_flag) {
-            fprintf(stderr, "%s: wrote OG to file '%s'\n", PACKAGE, og_filename.c_str());
-        }
+        status("wrote OG to file '%s'", og_filename.c_str());
     }
 
     // service automaton output
@@ -339,9 +338,7 @@ int main(int argc, char** argv) {
             abort(11, "could not write to file '%s'", sa_filename.c_str());
         }
         StoredKnowledge::output(sa_file);
-        if (args_info.verbose_flag) {
-            fprintf(stderr, "%s: wrote service automaton to file '%s'\n", PACKAGE, sa_filename.c_str());
-        }
+        status("wrote service automaton to file '%s'", sa_filename.c_str());
     }
 
     // dot output
@@ -352,9 +349,7 @@ int main(int argc, char** argv) {
             abort(11, "could not write to file '%s'", dot_filename.c_str());
         }
         StoredKnowledge::dot(dot_file);
-        if (args_info.verbose_flag) {
-            fprintf(stderr, "%s: wrote dot representation to file '%s'\n", PACKAGE, dot_filename.c_str());
-        }
+        status("wrote dot representation to file '%s'", dot_filename.c_str());
     }
 
     // migration output
@@ -369,10 +364,8 @@ int main(int argc, char** argv) {
         StoredKnowledge::migration(im_file);
         time(&end_time);
 
-        if (args_info.verbose_flag) {
-            fprintf(stderr, "%s: wrote migration information to file '%s' [%.0f sec]\n",
-                PACKAGE, im_filename.c_str(), difftime(end_time, start_time));
-        }
+        status("wrote migration information to file '%s' [%.0f sec]",
+            im_filename.c_str(), difftime(end_time, start_time));
     }
 
     return EXIT_SUCCESS;

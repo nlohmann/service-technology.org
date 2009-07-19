@@ -18,6 +18,7 @@ using std::endl;
 #include "state.h"
 
 using std::ifstream;
+using std::istream;
 using std::stringstream;
 using std::string;
 using std::map;
@@ -51,458 +52,87 @@ namespace pnapi
 
     namespace owfn
     {
-
-      typedef const set<const Place *> * Places;
-      typedef pair<Formula *, const set<const Place *> *> WildcardFormula;
-
-      Node * node;
-
-      Node::Node() :
-	BaseNode(), type(NO_DATA)
+      /******************************************\
+       *  "global" variables for flex and bison *
+      \******************************************/
+      
+      /// parsed ident
+      string ident; 
+      /// generated petrinet
+      PetriNet pnapi_owfn_yynet;
+      
+      /// mapping of names to places
+      std::map<std::string, Place*> places_;
+      /// recently read transition
+      Transition* transition_;
+      /// all purpose place pointer
+      Place* place_;
+      /// target of an arc
+      Node * * target_;
+      /// source of an arc
+      Node * * source_;
+      /// converts NUMBER and IDENT in string
+      std::stringstream nodeName_;
+      /// type of recently read places
+      Node::Type placeType_;
+      /// labels for synchronous communication
+      std::set<std::string> labels_;
+      /// read capacity
+      int capacity_;
+      /// used port
+      std::string port_;
+      /// constrains
+      std::map<Transition*, std::set<std::string> > constrains_;
+      /// whether read marking is the initial marking or a final marking
+      bool markInitial_;
+      /// pointer to a final marking
+      Marking* finalMarking_;
+      /// whether pre- or postset is read
+      bool placeSetType_;
+      /// precet/postset for fast checks
+      set<Place*> placeSet_;
+      /// whether to check labels
+      bool checkLabels_;
+        
+      /// "assertion"
+      void check(bool condition, const std::string & msg)
       {
+        if (!condition)
+          throw io::InputError(io::InputError::SEMANTIC_ERROR, 
+              io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                       parser::line, parser::token, msg);
       }
-
-      Node::Node(Node * node) :
-	BaseNode(node), type(NO_DATA)
-      {
-      }
-
-      Node::Node(Node * node1, Node * node2) :
-	BaseNode(node1, node2), type(NO_DATA)
-      {
-      }
-
-      Node::Node(Node * node1, Node * node2, Node * node3) :
-	BaseNode(node1, node2, node3), type(NO_DATA)
-      {
-      }
-
-      Node::Node(Node * node1, Node * node2, Node * node3, Node * node4) :
-	BaseNode(node1, node2, node3, node4), type(NO_DATA)
-      {
-      }
-
-      Node::Node(int val) :
-	type(DATA_NUMBER), number(val)
-      {
-      }
-
-      Node::Node(string * str) :
-	type(DATA_IDENTIFIER), identifier(*str)
-      {
-	delete str;
-      }
-
-      Node::Node(Type type) :
-	type(type)
-      {
-      }
-
-      Node::Node(Type type, Node * node) :
-	type(type)
-      {
-	assert(node != NULL);
-
-	if (node->type == DATA_NUMBER || node->type == DATA_IDENTIFIER)
-	  mergeData(node);
-	else if (node->type == NO_DATA)
-	  mergeChildren(node);
-	else
-	  addChild(node);
-      }
-
-      Node::Node(Type type, Node * node, int number) :
-	type(type), number(number)
-      {
-	mergeData(node);
-      }
-
-      Node::Node(Type type, Node * node1, Node * node2) :
-	type(type)
-      {
-	if (type == FORMULA_OR || type == FORMULA_AND)
-	  {
-	    addChild(node1);
-	    addChild(node2);
-	  }
-	else
-	  {
-	    mergeData(node1);
-	    mergeChildren(node2);
-	  }
-      }
-
-      Node::Node(Type type, Node * data, Node * node1, Node * node2) :
-	BaseNode(node1, node2), type(type)
-      {
-	mergeData(data);
-      }
-
-      Node::Node(Type type, Node * data, Node * node1, Node * node2,
-		 Node * node3) :
-	BaseNode(node1, node2, node3), type(type)
-      {
-	mergeData(data);
-      }
-
-      Node::Node(Type type, Node * data, Node * node1, Node * node2,
-		 Node * node3, Node * node4) :
-	BaseNode(node1, node2, node3, node4), type(type)
-      {
-	mergeData(data);
-      }
-
+    
       /*!
-       * \brief constructor for transitions
-       *
-       * This constructor has been added to implement transition costs
-       * and is needed for that purpose only.
-       *
-       * If you use this for other purposes, you do this on own risk!
+       * \brief Constructor
        */
-      Node::Node(Type type, Node * data1, Node * data2, Node * node1, Node * node2,
-     Node * node3, Node * node4) :
-  BaseNode(node1, node2, node3, node4), type(type)
-      {
-        mergeData(data1); // changes only the identifier
-
-        // so number is free to store the transition costs
-        number = data2->number;
-        delete data2;
-      }
-
-      Node & Node::operator=(const Node & node)
-      {
-	number = node.number;
-	identifier = node.identifier;
-	return *this;
-      }
-
-      void Node::mergeData(Node * node)
-      {
-	assert(node != NULL);
-	assert(node->type == DATA_NUMBER || node->type == DATA_IDENTIFIER);
-
-	if (type == CAPACITY)
-	  *this = *node;
-	else
-	  if (node->type != DATA_NUMBER)
-	    identifier = node->identifier;
-	  else
-	    { stringstream ss; ss << node->number; identifier = ss.str(); }
-
-	delete node;
-      }
-
-      void Node::mergeChildren(Node * node)
-      {
-	assert(node != NULL);
-	assert(node->type == NO_DATA);
-
-	children_ = node->children_;
-	node->children_.clear();
-	delete node;
-      }
-
-      Parser::Parser() :
-	parser::Parser<Node>(node, owfn::parse)
+      Parser::Parser()
       {
       }
-
-      Visitor::Visitor() :
-	isSynchronize_(true), finalMarking_(net_)
+      
+      const PetriNet & Parser::parse(istream & is)
       {
+        // assign lexer input stream
+        stream = &is;
+
+        // reset line counter
+        line = 1;
+        
+        pnapi_owfn_yynet = PetriNet();
+        
+        // call the parser
+        owfn::parse();
+        
+        // clean up global variables
+        ident.clear();
+        places_.clear();
+        nodeName_.clear();
+        labels_.clear();
+        constrains_.clear();
+        placeSet_.clear();
+
+        return pnapi_owfn_yynet;
       }
-
-      const PetriNet & Visitor::getPetriNet() const
-      {
-	return net_;
-      }
-
-      const std::map<Transition *, std::set<std::string> > &
-      Visitor::getConstraintLabels() const
-      {
-	return constraintMap_;
-      }
-
-      const std::set<std::string> & Visitor::getSynchronousLabels() const
-      {
-	return synchronousLabels_;
-      }
-
-      void Visitor::beforeChildren(const Node & node)
-      {
-	switch (node.type)
-	  {
-	  case INPUT:    placeType_ = Place::INPUT;    break;
-	  case OUTPUT:   placeType_ = Place::OUTPUT;   break;
-	  case INTERNAL: placeType_ = Place::INTERNAL; break;
-
-	  case CAPACITY: capacity_  = node.number;     break;
-	  case PORT:     port_      = node.identifier; break;
-
-	  case PLACE:
-	    node.check(places_.find(node.identifier) == places_.end(),
-		       node.identifier, "node name already used");
-	    places_[node.identifier].type = placeType_;
-	    places_[node.identifier].capacity = capacity_;
-	    if (!port_.empty())
-	      {
-		node.check(placeType_ != Place::INTERNAL,
-			   node.identifier, "interface place expected");
-		node.check(places_[node.identifier].port.empty(),
-			   node.identifier, "place already assigned to port '" +
-			   places_[node.identifier].port + "'");
-		places_[node.identifier].port = port_;
-	      }
-	    break;
-	  case PORT_PLACE:
-	    {
-	      map<string, PlaceAttributes>::iterator p =
-		places_.find(node.identifier);
-	      node.check(p != places_.end(),
-			 node.identifier, "unknown place");
-	      node.check(p->second.type != Place::INTERNAL,
-			 node.identifier, "interface place expected");
-	      node.check(p->second.port.empty(),
-			 node.identifier, "place already assigned to port '" +
-			 p->second.port + "'");
-	      p->second.port = port_;
-	      break;
-	    }
-
-	  case LABEL:
-	    if (isSynchronize_)
-	      synchronizeLabels_.insert(node.identifier);
-	    else
-	      constrainLabels_.insert(node.identifier);
-	    break;
-
-	  case INITIALMARKING:
-	    isInitial_ = true;
-	    break;
-	  case FINALMARKING:
-	    isInitial_ = false;
-	    finalMarking_ = Marking(net_, true);
-	    break;
-	  case MARK:
-	    node.check(places_.find(node.identifier) != places_.end(),
-		       node.identifier, "unknown place");
-	    if (isInitial_)
-	      places_[node.identifier].marking = node.number;
-	    else
-	      finalMarking_[*net_.findPlace(node.identifier)] = node.number;
-	    break;
-
-	  case PRESET:    isPreset_ = true;       break;
-	  case POSTSET:   isPreset_ = false;      break;
-	  case CONSTRAIN: isSynchronize_ = false; break;
-
-	  case ARC:
-	    {
-	      Place * place = net_.findPlace(node.identifier);
-	      node.check(place != NULL, node.identifier, "unknown place");
-	      if (isPreset_)
-		{
-		  node.check(preset_.find(node.identifier) == preset_.end(),
-			     node.identifier, "place already used in preset");
-		  node.check(place->getType() != Place::OUTPUT, node.identifier,
-			     "output place not allowed in preset");
-		  preset_[node.identifier] = node.number;
-		}
-	      else
-		{
-		  node.check(postset_.find(node.identifier) == postset_.end(),
-			     node.identifier, "place already used in postset");
-		  node.check(place->getType() != Place::INPUT, node.identifier,
-			     "input place not allowed in postset");
-		  postset_[node.identifier] = node.number;
-		}
-	    }
-	    break;
-
-	  case FORMULA_TRUE:
-	    formulas_.push(WildcardFormula(new FormulaTrue, NULL));
-	    break;
-	  case FORMULA_FALSE:
-	    formulas_.push(WildcardFormula(new FormulaFalse, NULL));
-	    break;
-
-	  case FORMULA_EQ:
-	  case FORMULA_NE:
-	  case FORMULA_LT:
-	  case FORMULA_GT:
-	  case FORMULA_GE:
-	  case FORMULA_LE:
-	    {
-	      Place * place;
-	      unsigned int nTokens;
-	      Formula * formula;
-	      place = net_.findPlace(node.identifier);
-	      nTokens = node.number;
-	      switch (node.type)
-		{
-		case FORMULA_EQ:
-		  formula = new FormulaEqual(*place, nTokens); break;
-		case FORMULA_NE:
-		  formula = new Negation(FormulaEqual(*place, nTokens));
-		  break;
-		case FORMULA_LT:
-		  formula = new FormulaLess(*place, nTokens); break;
-		case FORMULA_GT:
-		  formula = new FormulaGreater(*place, nTokens); break;
-		case FORMULA_GE:
-		  formula = new FormulaGreaterEqual(*place, nTokens); break;
-		case FORMULA_LE:
-		  formula = new FormulaLessEqual(*place, nTokens); break;
-		default: assert(false);
-		}
-	      formulas_.push(WildcardFormula(formula, NULL));
-	      break;
-	    }
-
-	  default: /* empty */ ;
-	  }
-      }
-
-      void Visitor::afterChildren(const Node & node)
-      {
-	const set<const Place *> * wcPlaces = NULL;
-
-	switch (node.type)
-	  {
-	  case SYNCHRONOUS:
-	    synchronousLabels_ = synchronizeLabels_;
-	    synchronizeLabels_.clear();
-	    break;
-
-	  case INITIALMARKING:
-	    // create places
-	    for (map<string, PlaceAttributes>::iterator it = places_.begin();
-		 it != places_.end(); ++it)
-	      net_.createPlace(it->first, it->second.type, it->second.marking,
-			       it->second.capacity, it->second.port);
-	    // add synchronous labels
-	    for (set<string>::iterator it = synchronizeLabels_.begin();
-		 it != synchronizeLabels_.end(); ++it)
-	      ; // do we really need the labels globally?
-	    synchronizeLabels_.clear();
-	    break;
-	  case FINALMARKING:
-	    net_.finalCondition().addMarking(finalMarking_);
-	    break;
-
-	  case TRANSITION:
-	    {
-	      node.check(!net_.containsNode(node.identifier), node.identifier,
-			 "node name already used");
-	      for (set<string>::iterator it = synchronizeLabels_.begin();
-		   it != synchronizeLabels_.end(); ++it)
-		node.check(synchronousLabels_.find(*it) !=
-			   synchronousLabels_.end(), *it, "undeclared label");
-	      Transition & trans = net_.createTransition(node.identifier,
-							 synchronizeLabels_);
-
-	      // set transition cost
-	      trans.setCost(node.number);
-
-	      for (map<string, unsigned int>::iterator it = preset_.begin();
-		   it != preset_.end(); ++ it)
-		net_.createArc(*net_.findPlace(it->first), trans, it->second);
-	      for (map<string, unsigned int>::iterator it = postset_.begin();
-		   it != postset_.end(); ++ it)
-		net_.createArc(trans, *net_.findPlace(it->first), it->second);
-	      constraintMap_[&trans] = constrainLabels_;
-	      preset_.clear();
-	      postset_.clear();
-	      synchronizeLabels_.clear();
-	      constrainLabels_.clear();
-	      isSynchronize_ = true;
-	      break;
-	    }
-
-	  case FORMULA_NOT:
-	    {
-	      assert(formulas_.size() > 0);
-	      WildcardFormula wcf = formulas_.top(); formulas_.pop();
-	      Formula * iwcf = integrateWildcard(wcf);
-	      Formula * f = new Negation(*iwcf); delete iwcf;
-	      formulas_.push(WildcardFormula(f, NULL));
-	      delete wcf.first;
-	      break;
-	    }
-	  case FORMULA_AND:
-	  case FORMULA_OR:
-	    {
-	      assert(formulas_.size() > 1);
-	      WildcardFormula op2 = formulas_.top(); formulas_.pop();
-	      WildcardFormula op1 = formulas_.top(); formulas_.pop();
-	      Formula * f;
-	      if (node.type == FORMULA_AND)
-		{
-		  node.check(op1.second == NULL, "",
-			     "wildcard must be last AND operand");
-		  f = new Conjunction(*op1.first, *op2.first);
-		  formulas_.push(WildcardFormula(f, op2.second));
-		}
-	      else
-		{
-		  Formula * f1 = integrateWildcard(op1);
-		  Formula * f2 = integrateWildcard(op2);
-		  f = new Disjunction(*f1, *f2); delete f1; delete f2;
-		  formulas_.push(WildcardFormula(f, NULL));
-		}
-	      delete op1.first;
-	      delete op2.first;
-	      break;
-	    }
-
-	  case FORMULA_APE:
-	    formulas_.push(WildcardFormula(new Conjunction(),
-					   (Places)&net_.getPlaces()));
-	    break;
-
-	  case FORMULA_AAOPE:
-	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getPlaces();
-	    // fallthrough intended
-	  case FORMULA_AAOIPE:
-	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getInternalPlaces();
-	    // fallthrough intended
-	  case FORMULA_AAOEPE:
-	    wcPlaces = wcPlaces ? wcPlaces : (Places)&net_.getInterfacePlaces();
-	    // fallthrough intended
-	    {
-	      assert(formulas_.size() > 0);
-	      node.check(formulas_.top().second == NULL, "",
-			 "wildcard must be last AND operand");
-	      Formula * f = new Conjunction(*formulas_.top().first);
-	      delete formulas_.top().first; formulas_.pop();
-	      formulas_.push(WildcardFormula(f, wcPlaces));
-	    }
-	    break;
-
-	  case CONDITION:
-	    {
-	      assert(formulas_.size() == 1);
-	      Formula * f = integrateWildcard(formulas_.top());
-	      net_.finalCondition() = *f; delete f;
-	      delete formulas_.top().first;
-	      break;
-	    }
-
-	  default: /* empty */ ;
-	  }
-      }
-
-      Formula * Visitor::integrateWildcard(WildcardFormula wcf)
-      {
-	Conjunction * c = dynamic_cast<Conjunction *>(wcf.first);
-	if (c == NULL || wcf.second == NULL)
-	  return wcf.first->clone();
-	else
-	  return new Conjunction(*c, *wcf.second);
-      }
-
     } /* namespace owfn */
 
 
@@ -510,11 +140,71 @@ namespace pnapi
     namespace lola
     {
 
-      Node * node;
-
-      Parser::Parser() :
-	parser::Parser<Node>(node, lola::parse)
+      /// "assertion"
+      void check(bool condition, const std::string & msg)
       {
+        if (!condition)
+          throw io::InputError(io::InputError::SEMANTIC_ERROR, 
+              io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                       parser::line, parser::token, msg);
+      }
+    
+      /******************************************\
+       *  "global" variables for flex and bison *
+      \******************************************/
+      
+      /// parsed ident
+      string ident; 
+      /// generated petrinet
+      PetriNet pnapi_lola_yynet;
+      
+      /// mapping of names to places
+      map<std::string, Place*> places_;
+      /// recently read transition
+      Transition* transition_;
+      /// all purpose place pointer
+      Place* place_;
+      /// target of an arc
+      Node * * target_;
+      /// source of an arc
+      Node * * source_;
+      /// converts NUMBER and IDENT in string
+      std::stringstream nodeName_;
+      /// read capacity
+      int capacity_;
+      /// precet/postset for fast checks
+      set<Place*> placeSet_;
+      /// preset/postset label for parse exception
+      bool placeSetType_;
+      
+      
+      /*!
+       * \brief Constructor
+       */
+      Parser::Parser()
+      {
+      }
+      
+      const PetriNet & Parser::parse(istream & is)
+      {
+        // assign lexer input stream
+        stream = &is;
+
+        // reset line counter
+        line = 1;
+        
+        pnapi_lola_yynet = PetriNet();
+        
+        // call the parser
+        lola::parse();
+        
+        // clean up global variables
+        ident.clear();
+        places_.clear();
+        nodeName_.clear();
+        placeSet_.clear();
+
+        return pnapi_lola_yynet;
       }
 
     } /* namespace lola */

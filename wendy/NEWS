@@ -16,6 +16,12 @@ Version 1.6-unreleased
   this is currently an adjusted branch of Rachel which needs some polishing
   towards the new file formats
 
+* added `--bug' option to create debug output
+
+* using generic functions to display verbose status messages
+
+* added status messages for nets with large inner state space
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

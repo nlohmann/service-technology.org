@@ -69,6 +69,9 @@ class InnerMarking {
 
     private: /* static attributes */
 
+        /// the number of total markings
+        static unsigned int stats_markings;
+
         /// the number of deadlocks
         static unsigned int stats_deadlocks;
 

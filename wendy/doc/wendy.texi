@@ -160,7 +160,7 @@ Wendy is a command line tool and does not come with a fancy @acronym{GUI}. Howev
 For an overview of the command line options, type @samp{wendy -h} to see the following help screen:
 
 @smallexample
-@include cmdline.out
+@verbatiminclude cmdline.out
 @end smallexample
 
 

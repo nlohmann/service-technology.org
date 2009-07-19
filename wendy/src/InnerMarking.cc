@@ -25,6 +25,7 @@
 #include "InnerMarking.h"
 #include "Label.h"
 #include "cmdline.h"
+#include "verbose.h"
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -40,6 +41,7 @@ InnerMarking **InnerMarking::inner_markings = NULL;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
 
+unsigned int InnerMarking::stats_markings = 0;
 unsigned int InnerMarking::stats_deadlocks = 0;
 unsigned int InnerMarking::stats_inevitable_deadlocks = 0;
 unsigned int InnerMarking::stats_final_markings = 0;
@@ -58,11 +60,11 @@ unsigned int InnerMarking::stats_final_markings = 0;
        this check in the constructor
  */
 void InnerMarking::initialize() {
-    unsigned int inner_marking_count = markingMap.size();
-    inner_markings = new InnerMarking*[inner_marking_count];
+    assert(stats_markings == markingMap.size());
+    inner_markings = new InnerMarking*[stats_markings];
 
     // copy data from mapping (used during parsing) to a C array
-    for (InnerMarking_ID i = 0; i < inner_marking_count; ++i) {
+    for (InnerMarking_ID i = 0; i < stats_markings; ++i) {
         inner_markings[i] = markingMap[i];
 
         // register markings that may become activated by sending a message
@@ -83,12 +85,9 @@ void InnerMarking::initialize() {
         fprintf(stderr, "%s: warning: no final marking found\n", PACKAGE);
     }
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: found %d final markings, %d deadlocks, and %d inevitable deadlocks\n",
-            PACKAGE, stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
-        fprintf(stderr, "%s: stored %d inner markings",
-            PACKAGE, inner_marking_count);
-    }
+    status("found %d final markings, %d deadlocks, and %d inevitable deadlocks",
+        stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
+    status("stored %d inner markings", stats_markings);
 }
 
 
@@ -101,6 +100,11 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
                            bool _is_final) :
                            is_final(_is_final), is_waitstate(0), is_deadlock(0)
 {
+    ++stats_markings;
+    if (stats_markings % 50000 == 0) {
+        fprintf(stderr, "%8d inner markings\n", stats_markings);
+    }
+
     assert(_labels.size() == _successors.size());
     assert (_successors.size() < UCHAR_MAX);
 

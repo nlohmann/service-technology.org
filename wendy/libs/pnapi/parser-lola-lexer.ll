@@ -8,7 +8,7 @@
 %option outfile="lex.yy.c"
 
 /* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_lola_"
+%option prefix="pnapi_lola_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -28,6 +28,8 @@
 #include "parser.h"
 #include "parser-lola.h"
 
+#include <string>
+
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token
@@ -45,6 +47,8 @@
 /* hack to overwrite YY_FATAL_ERROR behavior */
 #define fprintf(file,fmt,msg) \
    yyerror(msg);
+
+using pnapi::parser::lola::ident;
 
 %}
 
@@ -85,16 +89,12 @@ PRODUCE                         { return KEY_PRODUCE; }
 ,                               { return COMMA; }
 
  /* identifiers */
-[0-9][0-9]*                     { 
-            pnapi_lola_lval.yt_int = atoi(yytext); return NUMBER; }
-"-"[0-9][0-9]*                  { 
-            pnapi_lola_lval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]* { 
-            pnapi_lola_lval.yt_string = new std::string(yytext); return IDENT; }
+[0-9]+          { pnapi_lola_yylval.yt_int = atoi(yytext); return NUMBER; }
+"-"[0-9]+       { pnapi_lola_yylval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
+[^,;:()\t \n\r\{\}]+ { ident = yytext; return IDENT; }
 
  /* whitespace */
-[\n\r]                          { /* skip */ }
-[ \t]                           { /* skip */ }
+[ \n\r\t]                          { /* skip */ }
 
  /* anything else */
 .                               { yyerror("unexpected lexical token"); }

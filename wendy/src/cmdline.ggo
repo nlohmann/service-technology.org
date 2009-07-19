@@ -144,3 +144,4 @@ option "config" c
   typestr="FILE"
   optional
 
+text "\nReport bugs to wendy@service-technology.org\nWendy's home page: http://service-technology.org/wendy"

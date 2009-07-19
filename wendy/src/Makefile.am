@@ -13,7 +13,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
 
 sysconf_DATA = wendy.conf
 
-# pass the sysconfdir to Wendy
+# pass the sysconfdir to Wendy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 wendy_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 # only add the local Petri net API if necessary
@@ -22,9 +22,17 @@ wendy_CPPFLAGS += -I$(top_srcdir)/libs
 wendy_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-BUILT_SOURCES = cmdline.c syntax_graph.cc
+BUILT_SOURCES = cmdline.c syntax_graph.cc config-log.h
 EXTRA_DIST = syntax_graph.h cmdline.ggo
 MAINTAINERCLEANFILES = syntax_graph.h cmdline.c cmdline.h
+DISTCLEANFILES = config-log.h
+
+# copy the content of the config.log file to a C header (for debugging purposes)
+config-log.h: $(top_srcdir)/config.log
+	echo "#define CONFIG_LOG \\" > config-log.h
+	$(SED) -e '/^|/d' $(top_srcdir)/config.log | $(SED) -e 's/\\/\\\\/g' | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\"",$$0,"\\n\"\\"}' >> config-log.h
+	echo '""' >> config-log.h
+	echo "" >> config-log.h
 
 
 ################################################################

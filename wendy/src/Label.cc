@@ -114,15 +114,11 @@ void Label::initialize() {
     last_sync = events;
     sync_events = last_sync - send_events - receive_events;
 
-    if (args_info.verbose_flag) {
-        for (unsigned int i = first_receive; i <= last_sync; ++i) {
-            fprintf(stderr, "%s: label with id %2d is '%s%s'\n",
-                PACKAGE, i, PREFIX(i), id2name[i].c_str());
-        }
-
-        fprintf(stderr, "%s: initialized labels for %d events (%d asynchronous, %d synchronous)\n",
-            PACKAGE, events, send_events+receive_events, sync_events);
+    for (unsigned int i = first_receive; i <= last_sync; ++i) {
+        status("label with id %2d is '%s%s'", i, PREFIX(i), id2name[i].c_str());
     }
+    status("initialized labels for %d events (%d asynchronous, %d synchronous)",
+        events, send_events+receive_events, sync_events);
 
     // 2-bit annotations must not be used with synchronous communication
     if (Label::sync_events > 0 and args_info.formula_arg == formula_arg_2bits) {

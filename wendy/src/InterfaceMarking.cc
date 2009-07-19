@@ -26,6 +26,7 @@
 #include "cmdline.h"
 #include "InterfaceMarking.h"
 #include "Label.h"
+#include "verbose.h"
 
 extern gengetopt_args_info args_info;
 
@@ -63,10 +64,8 @@ void InterfaceMarking::initialize(unsigned int m) {
     markings_per_byte = 8 / message_bound_bits;
     bytes = (unsigned int)(ceil((double)interface_length / (double)markings_per_byte));
 
-    if (args_info.verbose_flag) {
-        fprintf(stderr, "%s: message bound set to %d (%d bytes/interface marking, %d bits/event)\n",
-            PACKAGE, message_bound, bytes, message_bound_bits);
-    }
+    status("message bound set to %d (%d bytes/interface marking, %d bits/event)",
+        message_bound, bytes, message_bound_bits);
 }
 
 

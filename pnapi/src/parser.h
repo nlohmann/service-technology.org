@@ -250,7 +250,7 @@ namespace pnapi
 	      /// parses stream contents with the associated parser
         const PetriNet & parse(std::istream &);
       };
-    };
+    }
 
 
 
@@ -317,7 +317,7 @@ namespace pnapi
         /// parses stream contents with the associated parser
         const PetriNet & parse(std::istream &);
       };
-    };
+    }
 
 
 

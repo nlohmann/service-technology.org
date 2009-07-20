@@ -542,6 +542,48 @@ namespace pnapi
 	  }
     }
 
-  }
 
-}
+  /***************************************************************************
+   ******** removeProposition
+   ***************************************************************************/
+
+    bool Operator::removeProposition(const Place *p)
+    {
+      for (std::set<const Formula *>::iterator f = children_.begin(); f != children_.end(); f++)
+      {
+        Formula *ff = const_cast<Formula *>(*f);
+        if (ff->removeProposition(p))
+        {
+          children_.erase(f);
+        }
+      }
+
+      simplifyChildren();
+
+      return false;
+    }
+
+
+    bool Proposition::removeProposition(const Place *p)
+    {
+      if (p == &place_)
+        return true;
+      else
+        return false;
+    }
+
+
+    bool FormulaTrue::removeProposition(const Place *p)
+    {
+      return false;
+    }
+
+
+    bool FormulaFalse::removeProposition(const Place *p)
+    {
+      return false;
+    }
+
+  } /* namespace formula */
+
+} /* namespace pnapi */

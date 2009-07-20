@@ -1405,6 +1405,8 @@ namespace pnapi
   void PetriNet::deletePlace(Place & place)
   {
     observer_.finalizePlaceType(place, place.getType());
+    formula::Formula *f = const_cast<formula::Formula *>(&condition_.formula());
+    f->removeProposition(&place);
     places_.erase(&place);
     deleteNode(place);
   }

@@ -43,6 +43,9 @@ namespace pnapi
       /// set of concerning places
       virtual std::set<const Place *> places(bool excludeEmpty = false) const;
 
+      /// removes all propositions with Place p
+      virtual bool removeProposition(const Place *) =0;
+
     };
 
 
@@ -69,6 +72,8 @@ namespace pnapi
       const std::set<const Formula *> & children() const;
 
       std::set<const Place *> places(bool excludeEmpty = false) const;
+
+      bool removeProposition(const Place *);
 
     protected:
       std::set<const Formula *> children_;
@@ -169,6 +174,8 @@ namespace pnapi
 
       std::set<const Place *> places(bool excludeEmpty = false) const;
 
+      bool removeProposition(const Place *);
+
     protected:
       const Place & place_;
       const unsigned int tokens_;
@@ -185,6 +192,9 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+      bool removeProposition(const Place *);
+
     };
 
 
@@ -197,6 +207,8 @@ namespace pnapi
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
+      bool removeProposition(const Place *);
     };
 
 

@@ -1,0 +1,23 @@
+AT_INIT
+
+# define macros to skip a test if LoLA or Fiona was not found by configure
+#m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == "not found"; then exit 77; fi])])
+#m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
+AT_TESTED(versions.sh)
+
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([MARLENE --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([MARLENE --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+

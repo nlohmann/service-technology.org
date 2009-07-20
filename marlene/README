@@ -1,0 +1,48 @@
+                       __        __             _       
+                       \ \      / /__ _ __   __| |_   _ 
+                        \ \ /\ / / _ \ '_ \ / _` | | | |
+                         \ V  V /  __/ | | | (_| | |_| |
+                          \_/\_/ \___|_| |_|\__,_|\__, |
+                                                  |___/
+                      http://service-technology.org/wendy
+
+
+PURPOSE
+    Wendy is a tool to calculate operating guidelines.
+
+
+COPYRIGHT
+    Copyright (c) 2009 Niels Lohmann
+
+
+AUTHOR
+    Wendy is written and maintained by Niels Lohmann. See file "AUTHORS" for
+    more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Wendy is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Wendy.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Wendy can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+    
+    Wendy uses a lot of generated code. If you want to make changes to the
+    source code, you might need the following tools to regenerate the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+     * Gengetopt (http://www.gnu.org/software/gengetopt)
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Wendy. It can also be
+    downloaded at <http://service-technology.org/files/wendy/wendy.pdf>.

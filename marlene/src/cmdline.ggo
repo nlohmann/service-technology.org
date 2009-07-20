@@ -1,0 +1,67 @@
+args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-version --conf-parser"
+
+purpose "Synthesizing behavioral adapters."
+description "About Marlene:"
+
+section "Core parameters"
+
+option "type" t
+  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og'."
+  string
+  typestr="TYPE"
+  values="og","OG" enum
+  optional
+  hidden
+
+option "rulefile" r
+  "File containing rules for building the rewriter part of the adapter"
+  string
+  typestr="FILE"
+  optional
+
+section "Output"
+
+section "Options"
+
+option "messagebound" m
+  "Sets the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+
+option "asyncif" a
+  "Creates an asynchronous interface between adapter engine and controller. (Default is synchronous.)"
+  flag off
+
+option "complementplaces" p
+  "Creates complementary places in the engine part of the adapter (only in an intermediate state), in order to avoid unbounded places. Capacity of the places is influenced by the message bound."
+  flag on
+
+section "Debug"
+
+option "verbose" v
+  "Verbose output."
+  flag off
+
+option "veryverbose" w
+  "Prints a lot of code information. Has only an effect on debug builds!"
+  flag off
+
+section "Configuration"
+sectiondesc="Marlene relies on some other tools. These options configure Marlene to find these tools.\n"
+
+option "wendy" -
+  "Set the name of the Wendy binary used to build most-permissive partners."
+  string
+  typestr="FILE"
+  default="wendy"
+  optional
+  hidden
+
+option "config" c
+  "Read configuration from file. If no file is given, Marlene first tries to parse file 'marlene.conf' from the sysconf directory (usually '/usr/local/etc'; written in case Marlene was installed) and then from the current working directory. If neither file was found, the standard value for 'wendy' is assumed."
+  string
+  typestr="FILE"
+  optional  
+

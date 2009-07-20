@@ -1,0 +1,13 @@
+# Configuration file for @PACKAGE_STRING@
+# @configure_input@
+
+# This file configures the paths to binaries needed by Marlene. The configure
+# script already tried to suggest paths, but it entries might have been left
+# empty. In that case, you need to manually add the path to the respective
+# tool.
+
+# Marlene needs a Wendy binary (version 1.4 and above). Recent distribtions
+# are available at http://service-technology.org/files/wendy.
+
+wendy = @WENDY@
+

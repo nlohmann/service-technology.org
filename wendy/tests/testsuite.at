@@ -185,8 +185,8 @@ AT_CLEANUP
 AT_SETUP([Bug 13903 (https://gna.org/bugs/?13903)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --verbose --og --tmpfile=foo.tmp],0,ignore,ignore)
-AT_CHECK([test -f foo.tmp])
+AT_CHECK([WENDY myCoffee.owfn --verbose --og --tmpfile=foo-XXXXXX],0,ignore,ignore)
+AT_CHECK([test -f foo-*.lola])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 

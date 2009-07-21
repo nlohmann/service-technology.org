@@ -2,7 +2,7 @@
 # @configure_input@
 
 # This file configures the paths to binaries needed by Marlene. The configure
-# script already tried to suggest paths, but it entries might have been left
+# script already tried to suggest paths, but its entries might have been left
 # empty. In that case, you need to manually add the path to the respective
 # tool.
 

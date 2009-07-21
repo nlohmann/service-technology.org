@@ -108,7 +108,7 @@ class RuleSet {
                 
                 enum cfMode { AR_NORMAL, AR_HIDDEN, AR_OBSERVABLE, AR_CONTROLLABLE };
 
-                AdapterRule(rulepair & rule, cfMode & modus = AR_NORMAL); 
+                AdapterRule(rulepair & rule, cfMode modus = AR_NORMAL); 
 
                 ~AdapterRule();
                 

@@ -171,7 +171,7 @@ const pnapi::PetriNet * Adapter::buildController()
         }
         
         // finally reduce the strucure of the net as far as possible
-        composed->reduce(pnapi::PetriNet::LEVEL_4);
+        //composed->reduce(pnapi::PetriNet::LEVEL_4);
     
         if (_contType == ASYNCHRONOUS)
         {
@@ -577,7 +577,7 @@ unsigned int RuleSet::getIdForMessage(std::string message)
     }
 }
 
-RuleSet::AdapterRule::AdapterRule(std::pair< std::list<unsigned int>, std::list<unsigned int> > & rule, cfMode & modus) :
+RuleSet::AdapterRule::AdapterRule(std::pair< std::list<unsigned int>, std::list<unsigned int> > & rule, cfMode modus) :
     _rule(rule), _modus(modus)
 {   
     FUNCIN

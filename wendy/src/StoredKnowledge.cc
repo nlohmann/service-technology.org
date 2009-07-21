@@ -656,8 +656,8 @@ void StoredKnowledge::output_old(std::ofstream &file) {
  \param[in] K  the knowledge to copy from
 */
 StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
-    is_final(0), is_sane(1), inner(NULL), interface(NULL), successors(NULL),
-    inDegree(0), predecessorCounter(0), predecessors(NULL)
+    is_final(0), is_sane(K->is_sane), inner(NULL), interface(NULL),
+    successors(NULL), inDegree(0), predecessorCounter(0), predecessors(NULL)
 {
     assert(K->size != 0);
 

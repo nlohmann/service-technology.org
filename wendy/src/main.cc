@@ -103,7 +103,7 @@ void evaluateParameters(int argc, char** argv) {
 
         // call the config file parser
         if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
-            abort(12, "error reading configuration file '%s'", args_info.config_arg);
+            abort(14, "error reading configuration file '%s'", args_info.config_arg);
         } else {
             status("using configuration file '%s'", args_info.config_arg);
         }
@@ -118,7 +118,7 @@ void evaluateParameters(int argc, char** argv) {
             params->initialize = 0;
             params->override = 0;
             if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
-                abort(12, "error reading configuration file '%s'", conf_filename.c_str());
+                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());
             }

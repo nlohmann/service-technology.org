@@ -182,6 +182,22 @@ AT_CHECK([GREP -c ":: F" bug13718.og],0,[4
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
+AT_SETUP([Bug 13994 (https://gna.org/bugs/?13994), test 1])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug13994-1.owfn .])
+AT_CHECK([WENDY bug13994-1.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr],0)
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+AT_SETUP([Bug 13994 (https://gna.org/bugs/?13994), test 2])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug13994-2.owfn .])
+AT_CHECK([WENDY bug13994-2.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr],0)
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Operating Guidelines])

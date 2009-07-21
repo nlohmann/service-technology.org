@@ -1,5 +1,7 @@
-@heading Version 1.6-unreleased
+@heading Version 1.6
 @itemize
+@item fixed bug #13994 (@url{https://gna.org/bugs/?13994}) -- malicious root node (i.e., a root not with reachable deadlocks or message bound violation) was not detected
+
 @item added more test cases for synchronous communication
 
 @item added a utility to minimize operating guidelines (see @file{utils/minimize}) -- this is currently an adjusted branch of Rachel which needs some polishing towards the new file formats
@@ -9,6 +11,7 @@
 
 @item added status messages for nets with large inner state space
 @end itemize
+
 
 @heading Version 1.5
 @itemize

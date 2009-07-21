@@ -164,6 +164,29 @@ For an overview of the command line options, type @samp{wendy -h} to see the fol
 @end smallexample
 
 
+@section Configuration Files
+
+The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+
+@cartouche
+@smallexample
+wendy net.owfn --config=myconf.conf
+@end smallexample
+@end cartouche
+
+A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+
+The configure script creates a default configuration file @file{wendy.conf} which located in the @file{src} folder. When installing Wendy, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+
+When Wendy is executed, it evaluates parameters as follows:
+@enumerate
+@item When a configuration file is given via @option{--config}, it is used.
+@item Otherwise, the configuration file @file{wendy.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{wendy.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, no configuration file is used.
+@end enumerate
+Parameters given via command-line will overwrite parameters given via configuration files.
+
 
 @section Compatibility to Fiona
 
@@ -331,6 +354,16 @@ Wendy cannot create a temporary file @file{/tmp/wendy-XXXXXX}, where @samp{XXXXX
 @smallexample
 @cartouche
 wendy: could not create a temporary file `/tmp/wendy-k4CS4x' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
+Wendy cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/wendy.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
+
+@smallexample
+@cartouche
+wendy: Error opening configuration file `myconf.conf'
+wendy: error reading configuration file `myconf.conf' -- aborting [#14]
 @end cartouche
 @end smallexample
 

@@ -353,14 +353,14 @@ void StoredKnowledge::dot(std::ofstream &file) {
 
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
-                        file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
+                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (w)\\n";
                     }
                 }
 
                 if (args_info.showTransients_flag) {
                     for (unsigned int j = it->second[i]->size; j < allMarkings[it->second[i]]; ++j) {
-                        file << "m" << static_cast<unsigned int>(it->second[i]->inner[j]) << " ";
+                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (t)\\n";
                     }
                 }
@@ -1062,7 +1062,7 @@ void StoredKnowledge::migration(std::ofstream& o) {
 
             // iterate the knowledge bubbles
             for (set<InterfaceMarking*>::iterator it3 = it2->second.begin(); it3 != it2->second.end(); ++it3) {
-                o << (unsigned int) it1->first << " " << (unsigned int) it2->first << " " << **it3 << "\n";
+                o << (unsigned long) it1->first << " " << (unsigned long) it2->first << " " << **it3 << "\n";
             }
         }
         o << std::flush;

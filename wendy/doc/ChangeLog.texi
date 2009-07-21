@@ -1,3 +1,11 @@
+@heading Version 1.7-unreleased
+@itemize
+@item added test case for bug #13903 (@url{https://gna.org/bugs/?13903})
+
+@item small fix to allow compilation under x86_64 architectures
+@end itemize
+
+
 @heading Version 1.6
 @itemize
 @item fixed bug #13994 (@url{https://gna.org/bugs/?13994}) -- malicious root node (i.e., a root not with reachable deadlocks or message bound violation) was not detected

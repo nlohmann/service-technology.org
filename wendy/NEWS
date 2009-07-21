@@ -7,24 +7,12 @@
                       http://service-technology.org/wendy
 
 
-Version 1.6
-===========
+Version 1.7-unreleased
+======================
 
-* fixed bug #13994 (`https://gna.org/bugs/?13994') - malicious root node
-  (i.e., a root not with reachable deadlocks or message bound violation) was
-  not detected
+* added test case for bug #13903 (`https://gna.org/bugs/?13903')
 
-* added more test cases for synchronous communication
-
-* added a utility to minimize operating guidelines (see `utils/minimize') -
-  this is currently an adjusted branch of Rachel which needs some polishing
-  towards the new file formats
-
-* added `--bug' option to create debug output
-
-* using generic functions to display verbose status messages
-
-* added status messages for nets with large inner state space
+* small fix to allow compilation under x86_64 architectures
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

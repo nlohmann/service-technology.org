@@ -41,6 +41,8 @@ public:
 		delete_lp(lp);
 	}
 
+	std::map<EventTerm*,EventTermBound*> calculated;
+
 private:
 	std::map<EVENT,unsigned int> EventID;
 

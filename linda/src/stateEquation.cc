@@ -6,6 +6,9 @@
  */
 
 #include "stateEquation.h"
+#include "cmdline.h"
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 bool ExtendedStateEquation::constructLP() {
 
@@ -13,6 +16,7 @@ bool ExtendedStateEquation::constructLP() {
 	const unsigned int NR_OF_COLS = net->getTransitions().size() + net->getInterfacePlaces().size();
 	const unsigned int START_TRANSITIONS = 1;
 	const unsigned int START_EVENTS = START_TRANSITIONS + net->getTransitions().size();
+	const unsigned int START_SYNCHRO = START_EVENTS + net->getSynchronizedTransitions().size();
 
 	// Build a map for quick transition referencing
 	std::map<pnapi::Transition*, unsigned int> transitionID;
@@ -143,34 +147,36 @@ bool ExtendedStateEquation::constructLP() {
 
 void ExtendedStateEquation::evaluate(EventTerm* e) {
 
-	std::cout << "\t" << e->toString() << " =" ;
 
 
+	string term = e->toString();
 	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(e);
-
 
 	int counter = 0;
 	double obj_row[map->size()];
 	int obj_cols[map->size()];
 
-
+	std::string normalformterm = "";
 
 	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
 
-
-		std::cout << " + " << "(" << (*it).second << "*" << (*it).first->getName()  << ")";
-
+		if ((*it).second > 0) {
+			normalformterm += " +";
+		} else {
+			normalformterm += " ";
+		}
+		normalformterm += intToStr((*it).second);
+		normalformterm += "*";
+		normalformterm += (*it).first->getName();
 
 		obj_row[counter] = (*it).second;
 		obj_cols[counter] = EventID[(*it).first];
 		++counter;
-
-
 	}
 
-	std::cout << " : ";
-
 	int ret;
+
+	EventTermBound* bound = new EventTermBound();
 
 	assert(set_obj_fnex(lp,map->size(),obj_row,obj_cols)== TRUE);
 
@@ -178,10 +184,15 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 
 	ret = solve(lp);
 
+//	std::cout << "\t";
+
 	if (ret == UNBOUNDED) {
-		std::cout << "min = unbounded; ";
+//		std::cout << "unbounded <= ";
+		bound->lowerBounded = false;
 	} else {
-		std::cout << "min = " << get_objective(lp) << "; ";
+//		std::cout << get_objective(lp) << " <= ";
+		bound->lowerBounded = true;
+		bound->lowerBound = get_objective(lp);
 	}
 
 	set_maxim(lp);
@@ -191,12 +202,15 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 	ret = solve(lp);
 
 	if (ret == UNBOUNDED) {
-		std::cout << "max = unbounded; ";
+//		std::cout << " <= unbounded; ";
+		bound->upperBounded = false;
 	} else {
-		std::cout << "max = " << get_objective(lp) << "; ";
+//		std::cout << " <= " << get_objective(lp) << "; ";
+		bound->upperBounded = true;
+		bound->upperBound = get_objective(lp);
 	}
 
-	std::cout << "\n";
+	calculated[e] = bound;
 
-
+//	std::cout << "\n";
 }

@@ -25,6 +25,7 @@ public:
 	virtual EventTerm* flatten() = 0;
 	virtual EventTerm* multiplyWith(int) = 0;
 	static std::map<pnapi::Place* const,int>* termToMap(EventTerm*);
+	static string toPrettyString(EventTerm*);
 	static std::vector<EventTerm*>* createBasicTermSet(pnapi::PetriNet*);
 	static EventTerm* createRandomEventTerm(pnapi::PetriNet*);
 	static std::map<std::string,pnapi::Place*> events;
@@ -76,10 +77,124 @@ public:
 	~BasicTerm();
 };
 
+class EventTermBound {
+public:
+	bool lowerBounded;
+	bool upperBounded;
+	int lowerBound;
+	int upperBound;
+	EventTermBound() {lowerBounded = false; upperBounded = false;}
+	EventTermBound(bool lowerBounded,bool upperBounded,int lowerBound,int upperBound) {
+		this->lowerBounded = lowerBounded;
+		this->upperBounded = upperBounded;
+		this->lowerBound = lowerBound;
+		this->upperBound = upperBound;
+	}
+	bool intersectionEmpty (EventTermBound* other) {
+		if ((!lowerBounded && !upperBounded) || (!other->upperBounded && !other->lowerBounded)) return false;
+		return (other->upperBounded && lowerBounded && lowerBound > other->upperBound) || (other->lowerBounded && upperBounded && upperBound < other->lowerBound);
+	}
+
+	bool contains(EventTermBound* other) {
+		return 	(!lowerBounded || (other->lowerBounded && lowerBound <= other->lowerBound)) && (!upperBounded || (other->upperBounded && upperBound >= other->upperBound));
+	}
+
+	bool isDecided () {
+		if (lowerBounded && upperBounded && lowerBound == upperBound) return true;
+
+		return false;
+	}
+
+	void output () {
+		if (lowerBounded) {
+			std::cout << "Lower bound is: " << lowerBound << "; ";
+		} else {
+			std::cout << "No lower Bound" << "; ";
+		}
+		if (upperBounded) {
+			std::cout << "Upper bound is: " << upperBound << "; ";
+		} else {
+			std::cout << "No upper Bound" << "; ";
+		}
+		std::cout << "\n";
+	}
+
+	std::string getLowerBoundString() {
+		if (lowerBounded) {
+			return intToStr(lowerBound);
+		} else {
+			return "unbounded";
+		}
+	}
+	std::string getUpperBoundString() {
+		if (upperBounded) {
+			return intToStr(upperBound);
+		} else {
+			return "unbounded";
+		}
+	}
+
+};
+
+class EventTermConstraint {
+public:
+	EventTermBound* vals;
+	EventTerm* e;
+	EventTermConstraint(EventTerm* e, EventTermBound* vals) {
+		this->vals = vals;
+		this->e = e;
+	}
+
+	EventTerm* getEventTerm() {
+		return e;
+	}
+
+// vals 0 <= bla <= 0
+// toCheck -5 <= blubb <= 10
+
+	bool contradicts(EventTermBound* toCheck) {
+		return toCheck->intersectionEmpty(vals);
+	}
+
+	static const int is_true = 1;
+	static const int is_false = 0;
+	static const int is_maybe = -1;
+
+
+	unsigned int holds(EventTermBound* toCheck) {
 
 
 
 
+		if (toCheck->intersectionEmpty(vals)) {
+			return is_false;
+		}
+		if (vals->contains(toCheck)) {
+			return is_true;
+		}
+		return is_maybe;
+	}
+
+
+
+	string toString() {
+		string result = "";
+		if (vals->lowerBounded) {
+			result += intToStr(vals->lowerBound);
+		} else {
+			result += "unbounded";
+		}
+		result += " <= " + e->toString() + " <= ";
+		if (vals->upperBounded) {
+			result += intToStr(vals->upperBound);
+		} else {
+			result += "unbounded";
+		}
+		return result;
+	}
+
+
+};
 
 
 #endif /* EVENTTERM_H_ */

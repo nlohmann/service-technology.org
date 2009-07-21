@@ -38,6 +38,7 @@ void evaluateParameters(int argc, char** argv) {
 
 /// the parser vector
 std::vector<EventTerm*>* term_vec = 0;
+std::vector<EventTermConstraint*>* constraint_vec = 0;
 bool stop_interaction = false;
 
 extern int et_yylineno;
@@ -49,6 +50,19 @@ extern int et_yyparse();
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int et_yylex_destroy();
+#endif
+
+
+
+extern int etc_yylineno;
+extern int etc_yydebug;
+extern int etc_yy_flex_debug;
+extern FILE* etc_yyin;
+extern int etc_yyerror();
+extern int etc_yyparse();
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+extern int etc_yylex_destroy();
 #endif
 
 
@@ -106,6 +120,9 @@ int main(int argc, char** argv) {
 		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
 		if (XSE->constructLP()) {
 			systems.push_back(std::pair<PartialMarking*,ExtendedStateEquation*>(*finalMarkingIt,XSE));
+			if (args_info.show_lp_flag) {
+				print_lp(XSE->lp);
+			}
 		}
 	}
 
@@ -124,17 +141,17 @@ int main(int argc, char** argv) {
 		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
 
 		for (std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-			for (std::set<pnapi::Place*>::iterator it2 = net->getInterfacePlaces().begin(); it2 != net->getInterfacePlaces().end(); ++it2) {
+			//			for (std::set<pnapi::Place*>::iterator it2 = net->getInterfacePlaces().begin(); it2 != net->getInterfacePlaces().end(); ++it2) {
 
-				if (*it == *it2) continue;
+			//				if (*it == *it2) continue;
 
-				BasicTerm* b1 = new BasicTerm((*it));
-				BasicTerm* b2 = new BasicTerm((*it2));
+			BasicTerm* b1 = new BasicTerm((*it));
+			//				BasicTerm* b2 = new BasicTerm((*it2));
 
-				AddTerm* a = new AddTerm(b1,b2);
+			//				AddTerm* a = new AddTerm(b1,b2);
 
-				etermvec->push_back(a);
-			}
+			etermvec->push_back(b1);
+			//			}
 		}
 
 
@@ -146,12 +163,21 @@ int main(int argc, char** argv) {
 		systemsIt != systems.end();
 		++systemsIt) {
 
-			std::cout << "Final marking: ";
+			std::cout << "\nFinal marking: ";
 
 			(*systemsIt).first->output();
 
 			for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
 				(*systemsIt).second->evaluate((*it));
+				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+				std::cout << "\t" << b->getLowerBoundString() << " <= ";
+				if (args_info.show_terms_as_given_flag) {
+					std::cout << (*it)->toString();
+				} else {
+					std::cout << EventTerm::toPrettyString(*it);
+				}
+				std::cout << " <= "<< b->getUpperBoundString() << "\n";
+
 			}
 
 
@@ -184,16 +210,94 @@ int main(int argc, char** argv) {
 		systemsIt != systems.end();
 		++systemsIt) {
 
-			std::cout << "Final marking: ";
+			std::cout << "\nFinal marking: ";
 
 			(*systemsIt).first->output();
 
 			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 				(*systemsIt).second->evaluate((*it));
+				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+				std::cout << "\t" << b->getLowerBoundString() << " <= ";
+				if (args_info.show_terms_as_given_flag) {
+					std::cout << (*it)->toString();
+				} else {
+					std::cout << EventTerm::toPrettyString(*it);
+				}
+				std::cout << " <= "<< b->getUpperBoundString() << "\n";
+
 			}
 		}
 
 	}
+
+
+	if (args_info.constraint_file_given) {
+
+		etc_yylineno = 1;
+		etc_yydebug = 0;
+		etc_yy_flex_debug = 0;
+
+		etc_yyin = fopen(args_info.constraint_file_arg, "r");
+		if (!etc_yyin) {
+			std::cerr << "cannot open ETC file '" << args_info.constraint_file_arg << "' for reading'\n" << std::endl;
+		}
+		constraint_vec = new std::vector<EventTermConstraint*>();
+
+		EventTerm::events.clear();
+		for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
+			(EventTerm::events)[(*it)->getName()] = (*it);
+		}
+
+		etc_yyparse();
+		fclose(etc_yyin);
+
+		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
+		systemsIt != systems.end();
+		++systemsIt) {
+
+			std::cout << "\nFinal marking: ";
+
+			(*systemsIt).first->output();
+
+			std::vector<EventTermConstraint*> maybes;
+			int holds = EventTermConstraint::is_true;
+
+			for (std::vector<EventTermConstraint*>::iterator it = constraint_vec->begin(); it != constraint_vec->end(); ++it) {
+				(*systemsIt).second->evaluate((*it)->getEventTerm());
+				EventTermBound* b = (*systemsIt).second->calculated[(*it)->getEventTerm()];
+
+				if ((*it)->holds(b) == EventTermConstraint::is_false) {
+					std::cout << "\tConstraint " << (*it)->toString() << " violated." << std::endl;
+					holds = holds*EventTermConstraint::is_false;
+				} else if ((*it)->holds(b) == EventTermConstraint::is_true) {
+					std::cout << "\tConstraint " << (*it)->toString() << " verified." << std::endl;
+					holds = holds*EventTermConstraint::is_true;
+				} else if ((*it)->holds(b) == EventTermConstraint::is_maybe) {
+					std::cout << "\tConstraint " << (*it)->toString() << " could not be verified, but might hold." << std::endl;
+					maybes.push_back((*it));
+					holds = holds*EventTermConstraint::is_maybe;
+				}
+
+			}
+
+			std::cout << "\n\n" << "Overall result:";
+
+			if (holds == EventTermConstraint::is_true) {
+				std::cout << "Verified.";
+			} else if (holds == EventTermConstraint::is_false) {
+				std::cout << "Violated.";
+			} else if (holds == EventTermConstraint::is_maybe) {
+				std::cout << "Verified iff all of the following constraints hold: \n";
+				for (std::vector<EventTermConstraint*>::iterator it = maybes.begin(); it != maybes.end(); ++it) {
+					std::cout  << "\t"<< (*it)->toString()<< "\n";
+				}
+			}
+			std::cout << "\n\n";
+
+		}
+
+	}
+
 
 
 	if (args_info.random_given) {
@@ -214,12 +318,21 @@ int main(int argc, char** argv) {
 		systemsIt != systems.end();
 		++systemsIt) {
 
-			std::cout << "Final marking: ";
+			std::cout << "\nFinal marking: ";
 
 			(*systemsIt).first->output();
 
 			for (vector<EventTerm*>::iterator it = randomvec->begin(); it != randomvec->end(); ++it) {
 				(*systemsIt).second->evaluate((*it));
+				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+				std::cout << "\t" << b->getLowerBoundString() << " <= ";
+				if (args_info.show_terms_as_given_flag) {
+					std::cout << (*it)->toString();
+				} else {
+					std::cout << EventTerm::toPrettyString(*it);
+				}
+				std::cout << " <= "<< b->getUpperBoundString() << "\n";
+
 			}
 
 		}
@@ -236,41 +349,51 @@ int main(int argc, char** argv) {
 
 		while (!stop_interaction) {
 
-				std::cerr << "Enter a number of terms, seperated by <;> or <:q> to quit the interaction mode." << std::endl;
+			std::cerr << "Enter a number of terms, seperated by <;> or <:q> to quit the interaction mode." << std::endl;
 
-				et_yylineno = 1;
-				et_yydebug = 0;
-				et_yy_flex_debug = 0;
+			et_yylineno = 1;
+			et_yydebug = 0;
+			et_yy_flex_debug = 0;
 
-				et_yyin = stdin;
+			et_yyin = stdin;
 
-				delete term_vec;
+			delete term_vec;
 
-				term_vec = new std::vector<EventTerm*>();
+			term_vec = new std::vector<EventTerm*>();
 
-				EventTerm::events.clear();
-				for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-					(EventTerm::events)[(*it)->getName()] = (*it);
-				}
+			EventTerm::events.clear();
+			for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
+				(EventTerm::events)[(*it)->getName()] = (*it);
+			}
 
-				et_yyparse();
+			et_yyparse();
 
-				if (term_vec->size() == 0) {
-					continue;
-				}
+			if (term_vec->size() == 0) {
+				continue;
+			}
 
-				for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
-				systemsIt != systems.end();
-				++systemsIt) {
+			for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
+			systemsIt != systems.end();
+			++systemsIt) {
 
-					std::cout << "Final marking: ";
+				std::cout << "\nFinal marking: ";
 
-					(*systemsIt).first->output();
+				(*systemsIt).first->output();
 
-					for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
-						(*systemsIt).second->evaluate((*it));
+				for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
+					(*systemsIt).second->evaluate((*it));
+					EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+					std::cout << "\t" << b->getLowerBoundString() << " <= ";
+					if (args_info.show_terms_as_given_flag) {
+						std::cout << (*it)->toString();
+					} else {
+						std::cout << EventTerm::toPrettyString(*it);
 					}
+					std::cout << " <= "<< b->getUpperBoundString() << "\n";
+
+
 				}
+			}
 
 		}
 

@@ -26,10 +26,27 @@ option "file" f
   string typestr="path"
   optional
 
+option "constraint-file" c
+  "Verify constraints"
+  string typestr="path"
+  optional
+
+
 option "interactive" i
   "Interactive Message Profile building"
   flag off
-  
+
+section "Output options"
+
+option "show-lp" l
+	"Show linear programs."
+	flag off
+
+option "show-terms-as-given" g
+	"Show terms as given in user input instead of internal normal form."
+	flag off
+
+
 section "Advanced Options"
 
 option "bound" b

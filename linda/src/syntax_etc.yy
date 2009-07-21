@@ -13,22 +13,22 @@
 #define YYINITDEPTH 10000
 
 // from flex
-extern char* et_yytext;
-extern int et_yylineno;
-extern int et_yylex();
+extern char* etc_yytext;
+extern int etc_yylineno;
+extern int etc_yylex();
 
 #include "eventTerm.h"
 #include <iostream>
 #include <string>
 #include <vector>
 
-extern std::vector<EventTerm*>* term_vec;
+extern std::vector<EventTermConstraint*>* constraint_vec;
 extern bool stop_interaction;
 
-int et_yyerror(const char* msg)
+int etc_yyerror(const char* msg)
 {
   std::cerr << msg << std::endl;
-  std::cerr << "error in line " << et_yylineno << ": token last read: `" << et_yytext << "'" << std::endl;
+  std::cerr << "error in line " << etc_yylineno << ": token last read: `" << etc_yytext << "'" << std::endl;
   exit(1);
 }
 
@@ -37,10 +37,10 @@ int et_yyerror(const char* msg)
 
 
 // Bison options
-%name-prefix="et_yy"
+%name-prefix="etc_yy"
 %defines
 
-%token LPAR RPAR NUMBER NEW_TERM ADD MULT IDENT QUIT MINUS
+%token LPAR RPAR NUMBER NEW_TERM ADD MULT IDENT QUIT MINUS EQUALS GT LT
 
 %token_table
 
@@ -49,23 +49,40 @@ int et_yyerror(const char* msg)
   int yt_int;
   std::string* yt_string;
   EventTerm* yt_term;
+  EventTermConstraint* yt_constraint;
+  EventTermBound* yt_bounds;
 }
 
 
 %type <yt_int> NUMBER
+%type <yt_int> val
+%type <yt_string> IDENT
+%type <yt_term> term
+%type <yt_constraint> constraint_def
+%type <yt_bounds> bounds
 %type <yt_int> vorzeichen
 %type <yt_term> summe
 %type <yt_term> produkt
-%type <yt_string> IDENT
-
 %%
 
-terms:  QUIT {stop_interaction = true; return 0;}
-        | term terms
-        | 
-;
+constraints: QUIT {stop_interaction = true; return 0;}
+| constraint constraints
+| ;
 
-term: summe NEW_TERM {term_vec->push_back($1);};
+constraint: constraint_def NEW_TERM {constraint_vec->push_back($1);}
+    ;
+
+constraint_def: term bounds { $$ = new EventTermConstraint($1,$2); }
+            ;
+
+bounds: val NEW_TERM val {$$ = new EventTermBound(true,true,$1,$3); }
+        ; 
+
+val:    vorzeichen NUMBER {$$ = $1*$2;}
+        | NUMBER {$$ = $1;}
+        ;
+
+term: summe NEW_TERM {$$ = $1;};
 
 summe: produkt {$$ = $1;}
        | produkt summe {$$ = new AddTerm($1,$2);} 

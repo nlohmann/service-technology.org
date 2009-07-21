@@ -124,3 +124,13 @@ void AddTerm::collectR(std::map<pnapi::Place* const,int>* map) {
 	term2->collectR(map);
 }
 
+
+std::string EventTerm::toPrettyString(EventTerm* e) {
+	std::string result = "";
+	std::map<pnapi::Place* const,int>* map = termToMap(e);
+	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
+		if ((*it).second >= 0) result += "+";
+		result += intToStr((*it).second) + "*" + (*it).first->getName();
+	}
+	return result;
+}

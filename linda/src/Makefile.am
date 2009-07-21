@@ -8,7 +8,9 @@ linda_SOURCES = main.cc \
         bounds.h  \
         messageprofile.h  \
         cmdline.c cmdline.h \
-        syntax_et.yy lexer_et.ll
+    	syntax_etc.yy lexer_etc.ll \
+        syntax_et.yy lexer_et.ll 
+
 
 
 linda_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.a

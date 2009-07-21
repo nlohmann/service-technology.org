@@ -6,8 +6,8 @@
                       http://service-technology.org/mia
 
 
-Version 1.1-unreleased
-======================
+Version 1.1
+===========
 
 * moved verbose output functions to `verbose.*'
 

@@ -26,7 +26,7 @@ DISTCLEANFILES = config-log.h
 # copy the content of the config.log file to a C header (for debugging purposes)
 config-log.h: $(top_srcdir)/config.log
 	echo "#define CONFIG_LOG \\" > config-log.h
-	$(SED) -e '/^|/d' $(top_srcdir)/config.log | $(SED) -e 's/\\/\\\\/g' | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\"",$$0,"\\n\"\\"}' >> config-log.h
+	$(SED) -e 's/\\/\\\\/g' $(top_builddir)/config.log | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\""$$0"\\n\"\\"}' >> config-log.h
 	echo '""' >> config-log.h
 	echo "" >> config-log.h
 

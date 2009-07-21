@@ -22,9 +22,9 @@ linda_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 linda_CPPFLAGS += -I$(top_srcdir)/libs
 endif
 
-BUILT_SOURCES = cmdline.c syntax_et.cc syntax_et.h lexer_et.cc
+BUILT_SOURCES = cmdline.c syntax_et.cc syntax_et.h lexer_et.cc lexer_etc.cc syntax_etc.cc syntax_etc.h 
 
-EXTRA_DIST = syntax_et.h cmdline.ggo
+EXTRA_DIST = syntax_et.h syntax_etc.h cmdline.ggo
 
 MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_et.cc syntax_et.h lexer_et.cc
 

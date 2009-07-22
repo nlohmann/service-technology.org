@@ -1,0 +1,14 @@
+args "--long-help --include-getopt --show-required"
+
+purpose "Rebecca -- choreography realization"
+
+description "Usage: "
+
+
+section "Debug"
+
+option "verbose" v
+  "Verbose output"
+  flag off
+
+text "\nReport bugs to rebecca@service-technology.org\nRebecca's home page: http://service-technology.org/rebecca"

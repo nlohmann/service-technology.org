@@ -358,11 +358,15 @@ namespace pnapi
 
     /* structural changes */
 
+  public:
+
     /// deletes a place (used by e.g. merging and reduction rules)
     void deletePlace(Place &);
 
     /// deletes a transition (used by e.g. merging and reduction rules)
     void deleteTransition(Transition &);
+
+  private:
 
     /// deletes a node
     void deleteNode(Node &);

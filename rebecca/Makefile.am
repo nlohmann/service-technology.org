@@ -5,3 +5,5 @@ svn-clean: maintainer-clean
 	INSTALL missing aclocal.m4 install-sh ylwrap src/Makefile.in \
 	src/config.h.in maintainer/Makefile.in tests/Makefile.in \
 	doc/Makefile.in doc/mdate-sh man/Makefile.in src/config-log.h
+
+EXTRA_DIST = REQUIREMENTS

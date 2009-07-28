@@ -1,0 +1,93 @@
+@heading Version 1.7-unreleased
+@itemize
+@item added test case for bug #13903 (@url{https://gna.org/bugs/?13903})
+
+@item small fix to allow compilation under x86_64 architectures
+@end itemize
+
+
+@heading Version 1.6
+@itemize
+@item fixed bug #13994 (@url{https://gna.org/bugs/?13994}) -- malicious root node (i.e., a root not with reachable deadlocks or message bound violation) was not detected
+
+@item added more test cases for synchronous communication
+
+@item added a utility to minimize operating guidelines (see @file{utils/minimize}) -- this is currently an adjusted branch of Rachel which needs some polishing towards the new file formats
+@item added @option{--bug} option to create debug output
+
+@item using generic functions to display verbose status messages
+
+@item added status messages for nets with large inner state space
+@end itemize
+
+
+@heading Version 1.5
+@itemize
+@item fixed bug #13718 (@url{https://gna.org/bugs/?13651}) -- fixed bit annotations
+
+@item fixed bug #13903 (@url{https://gna.org/bugs/?13903}) -- filename of the temporary files can be passed to Wendy using the @option{--tmpfile} parameter
+
+@item used @code{mkstemp} function to create temporary filenames
+
+@item a wrapper script checks whether binaries needed by test cases are present and skips the test if necessary
+
+@item added improved Petri Net API files (faster parsing)
+
+@item updated maintainer scripts
+
+@item Wendy can be configured with a configuration file, provided by parameter @option{--config} (see @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information). A standard configuration is created by the configure script and written to @file{src/wendy.conf}. When Wendy is executed, it checks for the file @file{wendy.conf} in the sysconfig folder (usually @file{/usr/local/etc}) and in the current directory. If neither file was found, Wendy tries to rely on standard options.
+@end itemize
+
+
+@heading Version 1.4
+@itemize
+@item versions of used programs are collected in @file{testsuite.log} when running @samp{make check}
+
+@item service automata (a.k.a. interaction graphs) can be created with @option{--sa}
+
+@item fixed bug #13651 (@url{https://gna.org/bugs/?13651}) -- adjusted parser to process empty markings
+
+@item added parameter @option{--mi} to store a mapping between the inner marking identifiers (integers) to actual Petri net markings (multisets of place names)
+
+@item added a hidden parameter @option{--im} to store information needed by Mia (@url{http://service-technology.org/mia}) to calculate information for instance migration
+@end itemize
+
+
+@heading Version 1.3
+@itemize
+@item implemented the `receive before send' reduction rule (@option{--receiveBeforeSend}): if the waitstates of a knowledge bubble can be resolved by receiving, don't send -- this reduction does not preserve all strategies, but will return a strategy if one exists
+
+@item implemented the `don't send in advance' reduction rule (@option{--waitstatesOnly}): only send a message to a knowledge bubble if it immediately resolves a waitstate -- this reduction does not preserve all strategies, but will return a strategy if one exists
+@end itemize
+
+
+@heading Version 1.2
+@itemize
+@item implemented new OG file format -- the deprecated format can still be used with @option{--fionaFormat} parameter which is implicitly used in case @option{-t OG} is used
+
+@item added "watermark" to generated operating guidelines (generator, platform, invocation string)
+
+@item using a @acronym{GNU} Autoconf's Autotest test suite
+
+@item the configure script checks if the Petri Net @acronym{API} was found and only compiles the local copy if necessary
+@end itemize
+
+
+@heading Version 1.1
+@itemize
+@item implemented synchronous communication
+
+@item renamed @option{--showDeadlocks} to @option{--showWaitstates}
+
+@item the list of interface labels are printed when @option{--verbose} is used
+@end itemize
+
+
+@heading Version 1.0
+@itemize
+@item initial release of Wendy
+
+@item calculates the operating guidelines of a normal open net
+
+@item result can be written in Fiona's OG format (with explicit formulae or 2 bit representation)
+@end itemize

@@ -320,22 +320,11 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
  \todo  Only print empty node if it is actually reachable.
 */
 void StoredKnowledge::dot(std::ofstream &file) {
+    bool emptyNodeReachable = false;
+    
     file << "digraph G {\n"
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
-
-    // draw the empty node if requested
-    if (args_info.showEmptyNode_flag) {
-        file << "0 [label=\"";
-        if (args_info.formula_arg == formula_arg_cnf) {
-            file << "true";
-        }
-        file << "\"]\n";
-        
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            file << "0 -> 0 [label=\"" << PREFIX(l) << Label::id2name[l] << "\"]\n";
-        }
-    }
 
     // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
@@ -381,12 +370,26 @@ void StoredKnowledge::dot(std::ofstream &file) {
                     // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_flag and
                         it->second[i]->successors[l-1] == empty) {
+                        emptyNodeReachable = true;
                         file << "\"" << it->second[i] << "\" -> 0"
                             << " [label=\"" << PREFIX(l)
                             << Label::id2name[l] << "\"]\n";
                     }
                 }
             }
+        }
+    }
+
+    // draw the empty node if it is requested and reachable
+    if (args_info.showEmptyNode_flag and emptyNodeReachable) {
+        file << "0 [label=\"";
+        if (args_info.formula_arg == formula_arg_cnf) {
+            file << "true";
+        }
+        file << "\"]\n";
+
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            file << "0 -> 0 [label=\"" << PREFIX(l) << Label::id2name[l] << "\"]\n";
         }
     }
 

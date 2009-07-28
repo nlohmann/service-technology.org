@@ -369,9 +369,9 @@ void StoredKnowledge::dot(std::ofstream &file) {
 
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (it->second[i]->successors[l-1] != NULL and it->second[i]->successors[l-1] != empty and
+                    if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
-                        (args_info.showEmptyNode_flag or it->second[i]->successors[l-1]->size > 0)) {
+                        (args_info.showEmptyNode_flag or it->second[i]->successors[l-1] != empty)) {
                         file << "\"" << it->second[i] << "\" -> \""
                              << it->second[i]->successors[l-1]
                              << "\" [label=\"" << PREFIX(l)

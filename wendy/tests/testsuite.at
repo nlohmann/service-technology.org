@@ -206,6 +206,15 @@ AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr],0)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
+AT_SETUP([Bug 14025 (https://gna.org/bugs/?14025)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14025.owfn .])
+AT_CHECK([WENDY bug14025.owfn --verbose --dot --og],0,ignore,ignore)
+AT_CHECK([GREP -c "\->" bug14025.dot],0,[5
+])
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Operating Guidelines])

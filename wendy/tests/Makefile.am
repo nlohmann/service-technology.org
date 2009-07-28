@@ -15,6 +15,7 @@ EXTRA_DIST = testsuite.at versions.sh wrap.sh \
 		testfiles/bug13651.owfn \
 		testfiles/bug13718.owfn \
 		testfiles/bug13994-1.owfn testfiles/bug13994-2.owfn \
+		testfiles/bug14025.owfn \
 		testfiles/error02.owfn \
 		testfiles/error03.owfn \
 		testfiles/error04-1.owfn testfiles/error04-2.owfn \

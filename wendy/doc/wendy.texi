@@ -150,6 +150,56 @@ Testcases for Wendy which check the generated binary. Some test scripts use Fion
 @c --------------------------------------------------------------------------
 
 
+@section Requirements
+
+In order to run, compile, and develop Wendy, several tools are required.
+
+@unnumberedsec Runtime
+@itemize
+@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{FULL} option. A suitable LoLA binary can be created as follows:
+@enumerate
+@item download @url{http://service-technology.org/files/lola/lola.tar.gz}
+@item untar @file{lola.tar.gz}, configure
+@item call @samp{make lola-full}
+@item copy the binary @file{src/lola-full} to a directory of your path
+(e.g., @file{/usr/local/bin}) or call @samp{make install}
+@end enumerate
+@end itemize
+
+Wendy's configure script checks whether LoLA (with binary @file{lola-full}) is found in the path and adjusts the configuration file @file{src/wendy.conf} accordingly.
+
+
+@unnumberedsec Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+@unnumberedsec Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Wendy.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+
+
+
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+
+@c --------------------------------------------------------------------------
+
+
 @node Command Line Options
 @chapter Invoking Wendy
 

@@ -12,6 +12,13 @@ Version 1.7-unreleased
 
 * added test case for bug #13903 (`https://gna.org/bugs/?13903')
 
+* fixed bug #14025 (`https://gna.org/bugs/?14025'): the Dot output had
+  problems with nonempty knowledge with true annotation
+
+* added details to the man page; a PDF version of the man page can be
+  created with `make man-pdf' in the `man' directory (requires groff and
+  ps2pdf)
+
 * small fix to allow compilation under x86_64 architectures
 
 Version 1.6
@@ -53,9 +60,9 @@ Version 1.5
 * Wendy can be configured with a configuration file, provided by parameter
   `--config' (see
   `http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files'
-  for more information). A standard configuration is created by the configure
-  script and written to `src/wendy.conf'. When Wendy is executed, it checks
-  for the file `wendy.conf' in the sysconfig folder (usually
+  for more information). A standard configuration is created by the
+  configure script and written to `src/wendy.conf'. When Wendy is executed,
+  it checks for the file `wendy.conf' in the sysconfig folder (usually
   `/usr/local/etc') and in the current directory. If neither file was found,
   Wendy tries to rely on standard options.
 
@@ -75,8 +82,8 @@ Version 1.4
   names)
 
 * added a hidden parameter `--im' to store information needed by Mia
-  (`http://service-technology.org/mia') to calculate information for instance
-  migration
+  (`http://service-technology.org/mia') to calculate information for
+  instance migration
 
 Version 1.3
 ===========
@@ -122,8 +129,8 @@ Version 1.0
 
 * calculates the operating guidelines of a normal open net
 
-* result can be written in Fiona's OG format (with explicit formulae or 2 bit
-  representation)
+* result can be written in Fiona's OG format (with explicit formulae or 2
+  bit representation)
 
 
 

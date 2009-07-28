@@ -2,6 +2,10 @@
 @itemize
 @item added test case for bug #13903 (@url{https://gna.org/bugs/?13903})
 
+@item fixed bug #14025 (@url{https://gna.org/bugs/?14025}): the Dot output had problems with nonempty knowledge with true annotation
+
+@item added details to the man page; a PDF version of the man page can be created with @samp{make man-pdf} in the @file{man} directory (requires groff and ps2pdf)
+
 @item small fix to allow compilation under x86_64 architectures
 @end itemize
 

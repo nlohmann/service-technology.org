@@ -12,6 +12,13 @@ Version 1.7-unreleased
 
 * added test case for bug #13903 (`https://gna.org/bugs/?13903')
 
+* fixed bug #14025 (`https://gna.org/bugs/?14025'): the Dot output had
+  problems with nonempty knowledge with true annotation
+
+* added details to the man page; a PDF version of the man page can be
+  created with `make man-pdf' in the `man' directory (requires groff and
+  ps2pdf)
+
 * small fix to allow compilation under x86_64 architectures
 
 

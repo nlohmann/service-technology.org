@@ -35,5 +35,11 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile doc/Doxyfile man/Makefile])
+AC_CONFIG_FILES([Makefile 
+				libs/pnapi/Makefile 
+				libs/lp_solve/Makefile 
+				src/Makefile 
+				doc/Makefile 
+				man/Makefile
+				maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
 AC_OUTPUT

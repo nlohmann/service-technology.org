@@ -1,0 +1,28 @@
+[EXIT STATUS]
+Wendy exits with 0 on success, and with >0 if an error occurs. See Texinfo manual for detailed information. Note that the exit code is not correlated to the controllability result.
+
+[EXAMPLES]
+To calculate the operating guidelines of a service `service.owfn', execute
+.IP
+wendy service.owfn --og
+.PP
+The operating guidelines will be written to the file `service.og'.
+
+[FILES]
+Unless a configuration file is explicitly given using the
+.B --config
+parameter, Wendy first tries to parse file
+.B wendy.conf
+from the sysconf directory (usually `/usr/local/etc') and then from the current working directory.
+
+[BUGS]
+See https://gna.org/bugs/?group=service-tech for open bugs.
+
+[AUTHOR]
+Wendy is written and maintained by Niels Lohmann.
+
+[COPYRIGHT]
+Copyright (c) 2009 Niels Lohmann
+
+[SEE ALSO]
+lola(1), mia(1)

@@ -1,10 +1,10 @@
-args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
-purpose "Calculating Operating Guidelines."
 description "About Wendy:"
+purpose "Wendy is a tool to calculate the operating guidelines of a service."
 
 section "Input/Output"
-sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix ('.owfn') is replaced by the name of the respective option (e.g., '.og'). If the filename 'STDOUT' is given, Wendy will pipe the respective output to the standard output stream.\n"
+sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `STDOUT' is given, Wendy will pipe the respective output to the standard output stream.\n"
 
 option "og" -
   "Operating guidelines output."
@@ -43,27 +43,30 @@ option "mi" -
   optional
 
 option "fionaFormat" -
-  "Use the deprecated Fiona OG file format (does not work with '--sa')."
+  "Use the deprecated Fiona OG file format (does not work with `--sa')."
   dependon="og"
   flag off
   hidden
 
 
-section "Options"
+section "General Options"
+sectiondesc="These options control the calculation of the operating guidelines as well as the style the operating guidelines are represented.\n"
 
 option "messagebound" m
-  "Set the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
+  "Set the message bound (i.e., the maximal number of messages per channel)."
+  details="Values from the range 1..255 are allowed.\n"
   int
   typestr="BOUND"
   default="1"
   optional
 
 option "formula" -
-  "Select the kind of formula to be used in outputs."
-  values="dnf","2bits" enum
+  "Select the style of formula to be used in outputs."
+  details="Choose between either standard formulae in conjunctive normal form (`cnf') or a compact 2-bit-representation (`2bits'). Note that the 2-bit-representation cannot be used if synchronous communication occurs in the input file.\n"
+  values="cnf","2bits" enum
   typestr="STYLE"
   dependon="og"
-  default="dnf"
+  default="cnf"
   optional
 
 
@@ -71,19 +74,19 @@ section "Dot Options"
 sectiondesc="These options control the graphical representation of the calculated operating guideline. It has no effect of other files.\n"
 
 option "showEmptyNode" -
-  "Show the empty node (dot only)."
-  details="The empty node is a knowledge that is unreachable (hence empty), but plays an important rule when matching a service with the operating guidelines or decided substitutability. The empty node is always written to '.og' files, but is optional for '.dot' files.\n"
+  "Show the empty node in Dot output."
+  details="The empty node is a knowledge that is unreachable (hence empty), but plays an important rule when matching a service with the operating guidelines or decided substitutability. The empty node is always written to `.og' files, but is optional for `.dot' files.\n"
   dependon="dot"
   flag off
 
 option "showWaitstates" -
-  "Show waitstates (dot only)."
+  "Show waitstates in Dot output."
   details="A waitstate is a state that the net can only leave with an asynchronous receive event or a synchronous event. Waitstates help to understand how the CNF formulas are constructed.\n"
   dependon="dot"
   flag off
 
 option "showTransients" -
-  "Show transient states (dot only)."
+  "Show transient states in Dot output."
   details="A transient state is a state that enables a transition.\n"
   dependon="dot"
   flag off
@@ -98,13 +101,13 @@ option "noDeadlockDetection" -
   flag off
 
 option "waitstatesOnly" -
-  "Only consider waitstates when calculating successors (does not preserve all strategies, but will return a strategy if one exists)."
-  details="This rule avoids asynchronous 'sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent.\n"
+  "Only consider waitstates when calculating successors."
+  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
 
 option "receiveBeforeSend" -
-  "Only send if receiving does not resolve all waitstates (does not preserve all strategies, but will return a strategy if one exists)."
-  details="This rule will only send asynchronous messages if absolutely necessary. That is, using this rules will create 'arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise."
+  "Only send if receiving does not resolve all waitstates."
+  details="This rule will only send asynchronous messages if absolutely necessary. That is, using this rules will create `arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
 
 
@@ -112,11 +115,13 @@ section "Debugging"
 sectiondesc="These options control how much debug output Wendy creates. The more debug output is used, the slower Wendy runs.\n"
 
 option "verbose" v
-  "Verbose output: give information on the several intermediate steps of Wendy."
+  "Show verbose information on the several intermediate steps"
+  details="Note this option might slow down the execution.\n"
   flag off
 
 option "reportFrequency" -
-  "Report frequency for knowledge bubbles. To switch reporting off completely, set it to '0'."
+  "Report frequency for knowledge bubbles."
+  details="Note that small values might slow down the execution. To switch reporting off completely, set it to `0'.\n"
   int
   typestr="FREQ"
   default="10000"
@@ -127,7 +132,7 @@ section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"
 
 option "lola" -
-  "The LoLA binary that is compiled with the option 'FULL' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using 'make lola-full'."
+  "The LoLA binary that is compiled with the option `FULL' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-full'."
   string
   typestr="FILENAME"
   default="lola-full"
@@ -135,7 +140,7 @@ option "lola" -
   hidden
 
 option "tmpfile" -
-  "The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with 'XXXXXX' which is replaced at runtime with a random string."
+  "The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string."
   string
   typestr="FILENAME"
   default="/tmp/wendy-XXXXXX"
@@ -143,9 +148,11 @@ option "tmpfile" -
   hidden
 
 option "config" c
-  "Read configuration from file. If no file is given, Wendy first tries to parse file 'wendy.conf' from the sysconf directory (usually '/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for 'lola' are assumed."
+  "Read configuration from file."
+  details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed."
   string
   typestr="FILE"
   optional
 
-text "\nReport bugs to wendy@service-technology.org\nWendy's home page: http://service-technology.org/wendy"
+
+text "Report bugs to wendy@service-technology.org. Wendy's home page: http://service-technology.org/wendy"

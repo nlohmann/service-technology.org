@@ -327,7 +327,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
     // draw the empty node if requested
     if (args_info.showEmptyNode_flag) {
         file << "0 [label=\"";
-        if (args_info.formula_arg == formula_arg_dnf) {
+        if (args_info.formula_arg == formula_arg_cnf) {
             file << "true";
         }
         file << "\"]\n";
@@ -345,7 +345,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
 
                 string formula;
                 switch (args_info.formula_arg) {
-                    case(formula_arg_dnf): formula = it->second[i]->formula(); break;
+                    case(formula_arg_cnf): formula = it->second[i]->formula(); break;
                     case(formula_arg_2bits): formula = it->second[i]->bits(); break;
                     default: assert(false);
                 }
@@ -415,7 +415,7 @@ void StoredKnowledge::print(std::ofstream &file) const {
         }
     } else {
         switch (args_info.formula_arg) {
-            case(formula_arg_dnf): {
+            case(formula_arg_cnf): {
                 file << " : " << formula();
                 break;
             }
@@ -520,7 +520,7 @@ void StoredKnowledge::output(std::ofstream &file) {
     if (not args_info.sa_given) {
         // the empty node
         file << "  0";
-        if (args_info.formula_arg == formula_arg_dnf) {
+        if (args_info.formula_arg == formula_arg_cnf) {
             file << " : true\n";
         } else {
             file << "\n";
@@ -581,7 +581,7 @@ void StoredKnowledge::output_old(std::ofstream &file) {
 
     // the empty node
     file << "  0 : ";
-    if (args_info.formula_arg == formula_arg_dnf) {
+    if (args_info.formula_arg == formula_arg_cnf) {
         file << " true";
     } else {
         file << "-";
@@ -592,7 +592,7 @@ void StoredKnowledge::output_old(std::ofstream &file) {
 
         string formula;
         switch (args_info.formula_arg) {
-            case(formula_arg_dnf): formula = (*it)->formula(); break;
+            case(formula_arg_cnf): formula = (*it)->formula(); break;
             case(formula_arg_2bits): formula = (*it)->bits(); break;
             default: assert(false);
         }

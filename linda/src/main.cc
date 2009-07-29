@@ -30,9 +30,15 @@ void evaluateParameters(int argc, char** argv) {
 
 	// check whether at most one file is given
 	if (args_info.inputs_num > 1) {
-		fprintf(stderr, "%s: at most one input file must be given -- aborting\n", PACKAGE);
+		fprintf(stderr, "%s: at most one input file (open net) must be given -- aborting\n", PACKAGE);
 		exit(EXIT_FAILURE);
 	}
+	// check whether at least one file is given
+	if (args_info.inputs_num != 1) {
+		fprintf(stderr, "%s: Exactly one input file (open net) must be given -- aborting\n", PACKAGE);
+		exit(EXIT_FAILURE);
+	}
+
 	free(params);
 }
 

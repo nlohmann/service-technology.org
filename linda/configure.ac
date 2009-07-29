@@ -17,7 +17,7 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 
-AC_HEADER_ASSERT
+#AC_HEADER_ASSERT
 
 # check for dlopen/ftime (required by lp_solve)
 AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
@@ -31,9 +31,9 @@ AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 
 # check for exact unsigned types
-AC_TYPE_UINT8_T
-AC_TYPE_UINT16_T
-AC_TYPE_UINT32_T
+#AC_TYPE_UINT8_T
+#AC_TYPE_UINT16_T
+#AC_TYPE_UINT32_T
 
 AC_CONFIG_FILES([Makefile 
 				libs/pnapi/Makefile 
@@ -41,5 +41,6 @@ AC_CONFIG_FILES([Makefile
 				src/Makefile 
 				doc/Makefile 
 				man/Makefile
-				maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
+				maintainer/Makefile 
+                maintainer/macports/Portfile])
 AC_OUTPUT

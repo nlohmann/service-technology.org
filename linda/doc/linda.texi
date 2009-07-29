@@ -1,9 +1,9 @@
 \input texinfo
-@setfilename wendy.info
+@setfilename linda.info
 @include version.texi
 @afourpaper
 @finalout
-@settitle Wendy User's Manual
+@settitle linda User's Manual
 
 @c --------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for Wendy, version @value{VERSION}, a tool to calculate operating guidelines, last updated @value{UPDATED}.
+This manual is for linda, version @value{VERSION}, a tool to calculate operating guidelines, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2009 Niels Lohmann
 
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* wendy: (wendy).       Wendy.
+* linda: (linda).       linda.
 @end direntry
 
 
@@ -32,10 +32,10 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @titlepage
 
-@title Wendy
+@title linda
 
 @subtitle Calculating Operating Guidelines
-@subtitle @url{http://service-technology.org/wendy}
+@subtitle @url{http://service-technology.org/linda}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
@@ -51,16 +51,16 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @ifnottex
 @node Top
-@top Wendy
+@top linda
 @insertcopying
 @end ifnottex
 
 @c --------------------------------------------------------------------------
 
 @menu
-* First Steps::How to set up and install Wendy.
-* Command Line Options::How to run Wendy.
-* Exit and Error Codes::What the error and exit codes of Wendy mean.
+* First Steps::How to set up and install linda.
+* Command Line Options::How to run linda.
+* Exit and Error Codes::What the error and exit codes of linda mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -78,18 +78,18 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/wendy} and download the latest release version of Wendy, say @file{wendy-@value{VERSION}.tar.gz}. To setup and compile Wendy, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/linda} and download the latest release version of linda, say @file{linda-@value{VERSION}.tar.gz}. To setup and compile linda, change into your download directory and type
 
 @cartouche
 @smallexample
-tar xfz wendy-@value{VERSION}.tar.gz
-cd wendy-@value{VERSION}
+tar xfz linda-@value{VERSION}.tar.gz
+cd linda-@value{VERSION}
 ./configure
 make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/wendy} is generated.@footnote{On Microsoft Windows, the file will be called @file{wendy.exe}.} If you experience any compiler warnings, don't panic: Wendy contains some generated or third party code that we cannot influence.
+After compilation, a binary @samp{src/linda} is generated.@footnote{On Microsoft Windows, the file will be called @file{linda.exe}.} If you experience any compiler warnings, don't panic: linda contains some generated or third party code that we cannot influence.
 
 @item To test whether everything went fine, type
 
@@ -107,7 +107,7 @@ All 20 tests passed
 ===================
 @end smallexample
 
-If an error occurs, please send the output to @email{wendy@@service-technology.org}.
+If an error occurs, please send the output to @email{linda@@service-technology.org}.
 
 @item To install the binary, the manpage, and the documentation, type
 
@@ -129,19 +129,19 @@ The distribution contains several directories:
 
 @table @file
 @item doc
-The Texinfo documentation of Wendy. The documentation can be created using @samp{make pdf}. Note you need to have Wendy properly installed before (see installation description above).
+The Texinfo documentation of linda. The documentation can be created using @samp{make pdf}. Note you need to have linda properly installed before (see installation description above).
 
 @item libs
-The Petri Net @acronym{API} used by Wendy to parse and organize the open net.
+The Petri Net @acronym{API} used by linda to parse and organize the open net.
 
 @item man
-The manpage of Wendy which can be displayed using @samp{man wendy} after having Wendy installed (see installation description above).
+The manpage of linda which can be displayed using @samp{man linda} after having linda installed (see installation description above).
 
 @item src
-The source code of Wendy.
+The source code of linda.
 
 @item tests
-Testcases for Wendy which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
+Testcases for linda which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
 @end table
 
 
@@ -151,13 +151,13 @@ Testcases for Wendy which check the generated binary. Some test scripts use Fion
 
 
 @node Command Line Options
-@chapter Invoking Wendy
+@chapter Invoking linda
 
-Wendy is a command line tool and does not come with a fancy @acronym{GUI}. However, Wendy can be easily scripted and combined with other tools.
+linda is a command line tool and does not come with a fancy @acronym{GUI}. However, linda can be easily scripted and combined with other tools.
 
 @section Command Line Options
 
-For an overview of the command line options, type @samp{wendy -h} to see the following help screen:
+For an overview of the command line options, type @samp{linda -h} to see the following help screen:
 
 @smallexample
 @verbatiminclude cmdline.out
@@ -170,19 +170,19 @@ The parameters can also be controlled using a configuration file that can be rea
 
 @cartouche
 @smallexample
-wendy net.owfn --config=myconf.conf
+linda net.owfn --config=myconf.conf
 @end smallexample
 @end cartouche
 
 A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
 
-The configure script creates a default configuration file @file{wendy.conf} which located in the @file{src} folder. When installing Wendy, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+The configure script creates a default configuration file @file{linda.conf} which located in the @file{src} folder. When installing linda, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
 
-When Wendy is executed, it evaluates parameters as follows:
+When linda is executed, it evaluates parameters as follows:
 @enumerate
 @item When a configuration file is given via @option{--config}, it is used.
-@item Otherwise, the configuration file @file{wendy.conf} in the local directory is used if present.
-@item Otherwise, the configuration file @file{wendy.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, the configuration file @file{linda.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{linda.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
 @item Otherwise, no configuration file is used.
 @end enumerate
 Parameters given via command-line will overwrite parameters given via configuration files.
@@ -191,10 +191,10 @@ Parameters given via command-line will overwrite parameters given via configurat
 @section Compatibility to Fiona
 
 @multitable @columnfractions .5 .5
-@headitem Wendy @tab Fiona
-@item @code{wendy net.owfn} @tab @code{fiona net.owfn -t OG -Q}
-@item @code{wendy net.owfn --og} @tab @code{fiona net.owfn -t OG -p no-dot}
-@item @code{wendy net.owfn --og --dot} @tab @code{fiona net.owfn -t OG -p no-png}
+@headitem linda @tab Fiona
+@item @code{linda net.owfn} @tab @code{fiona net.owfn -t OG -Q}
+@item @code{linda net.owfn --og} @tab @code{fiona net.owfn -t OG -p no-dot}
+@item @code{linda net.owfn --og --dot} @tab @code{fiona net.owfn -t OG -p no-png}
 @end multitable
 
 
@@ -209,13 +209,13 @@ Parameters given via command-line will overwrite parameters given via configurat
 
 @section Exit Codes
 
-Wendy will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, the reachability graph of the inner could be build, the operating guidelines could be calculated, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+linda will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, the reachability graph of the inner could be build, the operating guidelines could be calculated, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
 
-Note that Wendy's exit code is @b{not} related to the result of the controllability result. The messages
+Note that linda's exit code is @b{not} related to the result of the controllability result. The messages
 
 @smallexample
 @cartouche
-wendy: net is controllable: YES
+linda: net is controllable: YES
 @end cartouche
 @end smallexample
 
@@ -223,7 +223,7 @@ and
 
 @smallexample
 @cartouche
-wendy: net is controllable: NO
+linda: net is controllable: NO
 @end cartouche
 @end smallexample
 
@@ -232,7 +232,7 @@ both yield exit code @samp{0} (successful termination).
 
 @section Error Codes
 
-In case any error occurs, Wendy aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+In case any error occurs, linda aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
 
 @table @asis
 @item #01
@@ -240,7 +240,7 @@ Error opening the input open net or input file not found.
 
 @smallexample
 @cartouche
-wendy: could not open file `foo.owfn' -- aborting [#01]
+linda: could not open file `foo.owfn' -- aborting [#01]
 @end cartouche
 @end smallexample
 
@@ -249,7 +249,7 @@ Error parsing the input open net. Usually indicates the line of the error and so
 
 @smallexample
 @cartouche
-wendy:13: error near `Place': syntax error, unexpected IDENT,
+linda:13: error near `Place': syntax error, unexpected IDENT,
           expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
 @end cartouche
 @end smallexample
@@ -259,7 +259,7 @@ The input open net is not normal. That is, it contains a transition that is conn
 
 @smallexample
 @cartouche
-wendy: the input open net must be normal -- aborting [#03]
+linda: the input open net must be normal -- aborting [#03]
 @end cartouche
 @end smallexample
 
@@ -268,37 +268,37 @@ At most one file can be read at once. If no input filename is given, the open ne
 
 @smallexample
 @cartouche
-wendy: at most one input file must be given -- aborting [#04]
+linda: at most one input file must be given -- aborting [#04]
 @end cartouche
 @end smallexample
 
 @item #05
 @b{This parameter is deprecated since version 1.5.}
 
-Wendy uses LoLA to build the reachability graph of the inner of the net. The configure script tries to find the executable @file{lola-full} in the system's path. If it was not found in the path, the executable must be given using the command-line option @samp{--lola}.
+linda uses LoLA to build the reachability graph of the inner of the net. The configure script tries to find the executable @file{lola-full} in the system's path. If it was not found in the path, the executable must be given using the command-line option @samp{--lola}.
 
 @smallexample
 @cartouche
-wendy: LoLA executable was not found -- aborting [#05]
+linda: LoLA executable was not found -- aborting [#05]
 @end cartouche
 @end smallexample
 
 @item #06
-This error occurs in case Wendy could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{FULL} mode) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
+This error occurs in case linda could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{FULL} mode) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
 
 @smallexample
 @cartouche
-wendy: error while parsing the reachability graph -- aborting [#06]
+linda: error while parsing the reachability graph -- aborting [#06]
 @end cartouche
 @end smallexample
 
 @item #07
-A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{wendy --help} for an overview of the valid command-line parameters.
+A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{linda --help} for an overview of the valid command-line parameters.
 
 @smallexample
 @cartouche
-wendy: `--showEmptyNode' option depends on option `dot'
-wendy: invalid command-line parameter(s) -- aborting [#07]
+linda: `--showEmptyNode' option depends on option `dot'
+linda: invalid command-line parameter(s) -- aborting [#07]
 @end cartouche
 @end smallexample
 
@@ -307,7 +307,7 @@ The report frequency for built knowledges must be a positive number. To switch o
 
 @smallexample
 @cartouche
-wendy: report frequency must not be negative -- aborting [#08]
+linda: report frequency must not be negative -- aborting [#08]
 @end cartouche
 @end smallexample
 
@@ -316,7 +316,7 @@ Interface markings are stored in byte vectors, so the marking of each place has 
 
 @smallexample
 @cartouche
-wendy: message bound must be between 1 and 255 -- aborting [#09]
+linda: message bound must be between 1 and 255 -- aborting [#09]
 @end cartouche
 @end smallexample
 
@@ -325,45 +325,45 @@ The 2-bit annotations (@option{--formula=2bit}) currently do not support synchro
 
 @smallexample
 @cartouche
-wendy: 2-bit annotations must not be used with
+linda: 2-bit annotations must not be used with
        synchronous communication -- aborting [#10]
 @end cartouche
 @end smallexample
 
 @item #11
-Error opening a file to write. Usually, this error occurs in case Wendy is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola}.
+Error opening a file to write. Usually, this error occurs in case linda is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola}.
 
 @smallexample
 @cartouche
-wendy: could not write to file `foo.og' -- aborting [#11]
+linda: could not write to file `foo.og' -- aborting [#11]
 @end cartouche
 @end smallexample
 
 @item #12
-Wendy can either create operating guidelines or a service automaton. The options @option{--og} and @option{--sa} are mutually exclusive.
+linda can either create operating guidelines or a service automaton. The options @option{--og} and @option{--sa} are mutually exclusive.
 
 @smallexample
 @cartouche
-wendy: `--og' and `--sa' parameter are mutually exclusive -- aborting [#12]
+linda: `--og' and `--sa' parameter are mutually exclusive -- aborting [#12]
 @end cartouche
 @end smallexample
 
 @item #13
-Wendy cannot create a temporary file @file{/tmp/wendy-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running Wendy under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter.
+linda cannot create a temporary file @file{/tmp/linda-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running linda under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter.
 
 @smallexample
 @cartouche
-wendy: could not create a temporary file `/tmp/wendy-k4CS4x' -- aborting [#13]
+linda: could not create a temporary file `/tmp/linda-k4CS4x' -- aborting [#13]
 @end cartouche
 @end smallexample
 
 @item #14
-Wendy cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/wendy.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
+linda cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/linda.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
 
 @smallexample
 @cartouche
-wendy: Error opening configuration file `myconf.conf'
-wendy: error reading configuration file `myconf.conf' -- aborting [#14]
+linda: Error opening configuration file `myconf.conf'
+linda: error reading configuration file `myconf.conf' -- aborting [#14]
 @end cartouche
 @end smallexample
 
@@ -377,13 +377,13 @@ wendy: error reading configuration file `myconf.conf' -- aborting [#14]
 @node ChangeLog
 @chapter Version History
 
-Wendy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+linda is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 
 @sp 3
 
-The most recent change log is available at Wendy's website at @url{http://service-technology.org/files/wendy/ChangeLog}.
+The most recent change log is available at linda's website at @url{http://service-technology.org/files/linda/ChangeLog}.
 
 
 

@@ -1,8 +1,8 @@
 # process "libs/pnapi" directory only if the Petri Net API needs to be compiled
 if COMPILE_PNAPI
-SUBDIRS = libs/pnapi libs/lp_solve src man
+SUBDIRS = libs/pnapi libs/lp_solve src man doc maintainer
 else
-SUBDIRS = libs/lp_solve src man
+SUBDIRS = libs/lp_solve src man doc maintainer
 endif
 
 svn-clean: maintainer-clean

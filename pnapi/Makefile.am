@@ -13,3 +13,9 @@ svn-clean: maintainer-clean
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = pnapi.pc
+
+# target to create an executable that is independet of Cygwin
+win32: clean
+	$(top_srcdir)/configure --enable-win32
+	$(MAKE) $(AM_MAKEFLAGS)
+

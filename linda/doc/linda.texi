@@ -3,7 +3,7 @@
 @include version.texi
 @afourpaper
 @finalout
-@settitle linda User's Manual
+@settitle Linda User's Manual
 
 @c --------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for linda, version @value{VERSION}, a tool to calculate operating guidelines, last updated @value{UPDATED}.
+This manual is for linda, version @value{VERSION}, a tool to compute profiles for open nets, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2009 Niels Lohmann
 
@@ -32,14 +32,14 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @titlepage
 
-@title linda
+@title Linda
 
-@subtitle Calculating Operating Guidelines
+@subtitle Computing Profiles for Open Nets
 @subtitle @url{http://service-technology.org/linda}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
-@author Niels Lohmann
+@author Jan Suermeli
 @page
 
 
@@ -58,9 +58,8 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @c --------------------------------------------------------------------------
 
 @menu
-* First Steps::How to set up and install linda.
-* Command Line Options::How to run linda.
-* Exit and Error Codes::What the error and exit codes of linda mean.
+* First Steps::How to set up and install Linda.
+* Command Line Options::How to run Linda.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -91,23 +90,8 @@ make
 
 After compilation, a binary @samp{src/linda} is generated.@footnote{On Microsoft Windows, the file will be called @file{linda.exe}.} If you experience any compiler warnings, don't panic: linda contains some generated or third party code that we cannot influence.
 
-@item To test whether everything went fine, type
 
-@cartouche
-@smallexample
-make check
-@end smallexample
-@end cartouche
-
-to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.}
-
-@smallexample
-===================
-All 20 tests passed
-===================
-@end smallexample
-
-If an error occurs, please send the output to @email{linda@@service-technology.org}.
+If an error occurs, please send the output to @email{jan.suermeli@@service-technology.org}.
 
 @item To install the binary, the manpage, and the documentation, type
 
@@ -121,31 +105,6 @@ You might need superuser permissions to do so.
 @end enumerate
 
 If you need any further information, see file @file{INSTALL} for detailed instructions.
-
-
-@section Contents of the Distribution
-
-The distribution contains several directories:
-
-@table @file
-@item doc
-The Texinfo documentation of linda. The documentation can be created using @samp{make pdf}. Note you need to have linda properly installed before (see installation description above).
-
-@item libs
-The Petri Net @acronym{API} used by linda to parse and organize the open net.
-
-@item man
-The manpage of linda which can be displayed using @samp{man linda} after having linda installed (see installation description above).
-
-@item src
-The source code of linda.
-
-@item tests
-Testcases for linda which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
-@end table
-
-
-
 
 @c --------------------------------------------------------------------------
 
@@ -164,213 +123,6 @@ For an overview of the command line options, type @samp{linda -h} to see the fol
 @end smallexample
 
 
-@section Configuration Files
-
-The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
-
-@cartouche
-@smallexample
-linda net.owfn --config=myconf.conf
-@end smallexample
-@end cartouche
-
-A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
-
-The configure script creates a default configuration file @file{linda.conf} which located in the @file{src} folder. When installing linda, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
-
-When linda is executed, it evaluates parameters as follows:
-@enumerate
-@item When a configuration file is given via @option{--config}, it is used.
-@item Otherwise, the configuration file @file{linda.conf} in the local directory is used if present.
-@item Otherwise, the configuration file @file{linda.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
-@item Otherwise, no configuration file is used.
-@end enumerate
-Parameters given via command-line will overwrite parameters given via configuration files.
-
-
-@section Compatibility to Fiona
-
-@multitable @columnfractions .5 .5
-@headitem linda @tab Fiona
-@item @code{linda net.owfn} @tab @code{fiona net.owfn -t OG -Q}
-@item @code{linda net.owfn --og} @tab @code{fiona net.owfn -t OG -p no-dot}
-@item @code{linda net.owfn --og --dot} @tab @code{fiona net.owfn -t OG -p no-png}
-@end multitable
-
-
-
-
-@c --------------------------------------------------------------------------
-
-
-@node Exit and Error Codes
-@chapter Exit and Error Codes
-
-
-@section Exit Codes
-
-linda will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, the reachability graph of the inner could be build, the operating guidelines could be calculated, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
-
-Note that linda's exit code is @b{not} related to the result of the controllability result. The messages
-
-@smallexample
-@cartouche
-linda: net is controllable: YES
-@end cartouche
-@end smallexample
-
-and
-
-@smallexample
-@cartouche
-linda: net is controllable: NO
-@end cartouche
-@end smallexample
-
-both yield exit code @samp{0} (successful termination).
-
-
-@section Error Codes
-
-In case any error occurs, linda aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
-
-@table @asis
-@item #01
-Error opening the input open net or input file not found.
-
-@smallexample
-@cartouche
-linda: could not open file `foo.owfn' -- aborting [#01]
-@end cartouche
-@end smallexample
-
-@item #02
-Error parsing the input open net. Usually indicates the line of the error and some more or less helpful message on the parse error.
-
-@smallexample
-@cartouche
-linda:13: error near `Place': syntax error, unexpected IDENT,
-          expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
-@end cartouche
-@end smallexample
-
-@item #03
-The input open net is not normal. That is, it contains a transition that is connected to more than one interface place. Note that non-normal open net can be normalized using the frontend tool @samp{petri} of the Petri Net @acronym{API}.
-
-@smallexample
-@cartouche
-linda: the input open net must be normal -- aborting [#03]
-@end cartouche
-@end smallexample
-
-@item #04
-At most one file can be read at once. If no input filename is given, the open net is read from standard input.
-
-@smallexample
-@cartouche
-linda: at most one input file must be given -- aborting [#04]
-@end cartouche
-@end smallexample
-
-@item #05
-@b{This parameter is deprecated since version 1.5.}
-
-linda uses LoLA to build the reachability graph of the inner of the net. The configure script tries to find the executable @file{lola-full} in the system's path. If it was not found in the path, the executable must be given using the command-line option @samp{--lola}.
-
-@smallexample
-@cartouche
-linda: LoLA executable was not found -- aborting [#05]
-@end cartouche
-@end smallexample
-
-@item #06
-This error occurs in case linda could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{FULL} mode) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
-
-@smallexample
-@cartouche
-linda: error while parsing the reachability graph -- aborting [#06]
-@end cartouche
-@end smallexample
-
-@item #07
-A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{linda --help} for an overview of the valid command-line parameters.
-
-@smallexample
-@cartouche
-linda: `--showEmptyNode' option depends on option `dot'
-linda: invalid command-line parameter(s) -- aborting [#07]
-@end cartouche
-@end smallexample
-
-@item #08
-The report frequency for built knowledges must be a positive number. To switch off reporting at all, use @samp{--reportFrequency=0}.
-
-@smallexample
-@cartouche
-linda: report frequency must not be negative -- aborting [#08]
-@end cartouche
-@end smallexample
-
-@item #09
-Interface markings are stored in byte vectors, so the marking of each place has to be stored in one byte. Hence, the message bound must not exceed 255.
-
-@smallexample
-@cartouche
-linda: message bound must be between 1 and 255 -- aborting [#09]
-@end cartouche
-@end smallexample
-
-@item #10
-The 2-bit annotations (@option{--formula=2bit}) currently do not support synchronous communication. Only operating guidelines with classical formulae (@option{--formula=dnf}) can be calculated if the open net uses synchronous communication.
-
-@smallexample
-@cartouche
-linda: 2-bit annotations must not be used with
-       synchronous communication -- aborting [#10]
-@end cartouche
-@end smallexample
-
-@item #11
-Error opening a file to write. Usually, this error occurs in case linda is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola}.
-
-@smallexample
-@cartouche
-linda: could not write to file `foo.og' -- aborting [#11]
-@end cartouche
-@end smallexample
-
-@item #12
-linda can either create operating guidelines or a service automaton. The options @option{--og} and @option{--sa} are mutually exclusive.
-
-@smallexample
-@cartouche
-linda: `--og' and `--sa' parameter are mutually exclusive -- aborting [#12]
-@end cartouche
-@end smallexample
-
-@item #13
-linda cannot create a temporary file @file{/tmp/linda-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running linda under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter.
-
-@smallexample
-@cartouche
-linda: could not create a temporary file `/tmp/linda-k4CS4x' -- aborting [#13]
-@end cartouche
-@end smallexample
-
-@item #14
-linda cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/linda.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
-
-@smallexample
-@cartouche
-linda: Error opening configuration file `myconf.conf'
-linda: error reading configuration file `myconf.conf' -- aborting [#14]
-@end cartouche
-@end smallexample
-
-@end table
-
-
-
 @c --------------------------------------------------------------------------
 
 
@@ -384,7 +136,6 @@ linda is developed under the ``Release Early, Release Often'' maxime (see @url{h
 @sp 3
 
 The most recent change log is available at linda's website at @url{http://service-technology.org/files/linda/ChangeLog}.
-
 
 
 @c --------------------------------------------------------------------------

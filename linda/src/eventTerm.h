@@ -14,6 +14,7 @@
 #include <vector>
 #include <set>
 #include <ctime>
+#include <string>
 
 enum TermType {TypeAbstract,TypeAddTerm,TypeMultiplyTerm,TypeBasicTerm};
 
@@ -25,7 +26,7 @@ public:
 	virtual EventTerm* flatten() = 0;
 	virtual EventTerm* multiplyWith(int) = 0;
 	static std::map<pnapi::Place* const,int>* termToMap(EventTerm*);
-	static string toPrettyString(EventTerm*);
+	static std::string toPrettyString(EventTerm*);
 	static std::vector<EventTerm*>* createBasicTermSet(pnapi::PetriNet*);
 	static EventTerm* createRandomEventTerm(pnapi::PetriNet*);
 	static std::map<std::string,pnapi::Place*> events;
@@ -173,8 +174,8 @@ public:
 
 
 
-	string toString() {
-		string result = "";
+	std::string toString() {
+		std::string result = "";
 		if (vals->lowerBounded) {
 			result += intToStr(vals->lowerBound);
 		} else {

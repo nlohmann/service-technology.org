@@ -6,7 +6,7 @@ AC_INIT([Candy], [0.1-unreleased], [richard.mueller@service-technology.org])
 AC_PREREQ(2.59)
 
 # initialize automake
-AM_INIT_AUTOMAKE(gnits)
+AM_INIT_AUTOMAKE #(gnits)
 
 # checks for specific files (random sample)
 AC_CONFIG_SRCDIR([src/main.cc])

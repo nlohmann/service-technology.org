@@ -1,6 +1,6 @@
 info_TEXINFOS = candy.texi
 
-candy = fdl.texi cmdline.out ChangeLog.texi
+candy_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex
 

@@ -54,13 +54,13 @@ option "netfile" n
   
 
 # -----------------------------------------------------------------
-#section "Information"
-#sectiondesc="This section explains options which give additional information about what candy is doing.\n"
-#
-#option "verbose" v
-#  "Verbose output"
-#  flag off
-#
-#option "debug" d
-#  "Debug output"
-#  flag off
+section "Information"
+sectiondesc="This section explains options which give additional information about what candy is doing.\n"
+
+option "verbose" v
+  "Verbose output"
+  flag off
+
+option "debug" d
+  "Debug output"
+  flag off

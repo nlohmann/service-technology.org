@@ -6,3 +6,6 @@ svn-clean: maintainer-clean
 	rm -fr src/Makefile.in src/config.h.in~ src/config.h.in
 	rm -fr man/Makefile.in
 	rm -fr doc/doxygen doc/Doxyfile doc/mdate-sh doc/Makefile.in
+
+doxygen:
+	cd doc ; doxygen

@@ -45,16 +45,21 @@ extern FILE* cf_yyin;
 Graph* parsedOG;
 // global variable for program invocation
 string invocation;
-
+// command line parameters
+gengetopt_args_info args_info;
 
 
 /// little helper methods for message output
 void debug(string msg) {
-	cerr << "DEBUG: " << msg << endl;
+    if ( args_info.debug_flag ) {
+        cerr << "DEBUG: " << msg << endl;
+    }
 }
 
 void info(string msg) {
-    cout << msg << endl;
+    if ( args_info.verbose_flag ) {
+        cout << msg << endl;
+    }
 }
 
 /// main method
@@ -65,7 +70,6 @@ int main(int argc, char** argv) {
 	`--------------------------------------*/
 
     // the command line parameters filled with default values
-    gengetopt_args_info args_info;
 	cmdline_parser_init(&args_info);
 
     // call the command line parser from gengetopt

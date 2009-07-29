@@ -1,4 +1,4 @@
-AC_INIT(Linda, 0.2, jan.suermeli@service-technology.org)
+AC_INIT(Linda, 0.5-unreleased, jan.suermeli@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -10,6 +10,8 @@ AC_PROG_CXX
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
+AC_PROG_SED
+AC_PROG_GREP
 
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)

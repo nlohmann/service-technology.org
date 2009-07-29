@@ -26,13 +26,13 @@ tarballname:
 upload: tarballname
 	$(MAKE) $(AM_MAKEFLAGS) $(top_srcdir)/ChangeLog -C $(top_srcdir)/doc
 	$(MAKE) $(AM_MAKEFLAGS) pdf -C $(top_srcdir)
-	- gpg --detach $(tarballname)
+	-gpg --detach $(tarballname)
 	scp -C $(tarballname) $(tarballname).sig $(top_srcdir)/ChangeLog $(top_srcdir)/doc/$(PACKAGE_TARNAME).pdf $(gnauser)@download.gna.org:/upload/service-tech/$(PACKAGE_TARNAME)
-    echo "cd /upload/service-tech/$(PACKAGE_TARNAME)" > sftp-script
-    echo "-rm $(PACKAGE_TARNAME).tar.gz" >> sftp-script
-    echo "ln $(tarballname) $(PACKAGE_TARNAME).tar.gz" >> sftp-script
-    echo "exit" >> sftp-script
-    sftp -b sftp-script $(gnauser)@download.gna.org
+	echo "cd /upload/service-tech/$(PACKAGE_TARNAME)" > sftp-script
+	echo "-rm $(PACKAGE_TARNAME).tar.gz" >> sftp-script
+	echo "ln $(tarballname) $(PACKAGE_TARNAME).tar.gz" >> sftp-script
+	echo "exit" >> sftp-script
+	sftp -b sftp-script $(gnauser)@download.gna.org
 
 
 #############################################################################

@@ -1,9 +1,10 @@
+#include "config.h"
+#include <cassert>
+
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
-#include <cassert>
 #include <sstream>
-#include "config.h"
 #include "cmdline.h"
 #include "helpers.h"
 #include "lp_lib.h"

@@ -6,9 +6,11 @@ SUBDIRS = libs/lp_solve src tests man doc maintainer
 endif
 
 svn-clean: maintainer-clean
-	rm -fr COPYING INSTALL Makefile.in aclocal.m4 compile configure \
+	rm -fr INSTALL Makefile.in aclocal.m4 compile configure \
 	       depcomp install-sh missing ylwrap
 	rm -fr src/config.h.in~ src/Makefile.in libs/Makefile.in src/config.h.in
 	rm -fr man/Makefile.in
 	rm -fr doc/doxygen
 	rm -fr libs/lp_solve/Makefile.in libs/pnapi/Makefile.in
+	rm -fr tests/Makefile.in doc/Makefile.in doc/mdate-sh maintainer/Makefile.in
+

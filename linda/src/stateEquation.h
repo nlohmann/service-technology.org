@@ -8,10 +8,12 @@
 #ifndef STATEEQUATION_H_
 #define STATEEQUATION_H_
 
+#include "config.h"
+#include <cassert>
+
 #include "helpers.h"
 #include "eventTerm.h"
 #include "setsOfFinalMarkings.h"
-#include <cassert>
 
 class ExtendedStateEquation {
 public:

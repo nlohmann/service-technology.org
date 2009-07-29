@@ -11,6 +11,7 @@
 #include "helpers.h"
 #include "eventTerm.h"
 #include "setsOfFinalMarkings.h"
+#include <cassert>
 
 class ExtendedStateEquation {
 public:

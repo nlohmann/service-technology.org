@@ -1,0 +1,17 @@
+AT_INIT
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([LINDA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([LINDA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+

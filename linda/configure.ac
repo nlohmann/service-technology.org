@@ -1,4 +1,4 @@
-AC_INIT(Linda, 0.5-unreleased, jan.suermeli@service-technology.org)
+AC_INIT(Linda, 0.5, linda@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -15,6 +15,10 @@ AC_PROG_GREP
 
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
@@ -44,5 +48,6 @@ AC_CONFIG_FILES([Makefile
 				doc/Makefile 
 				man/Makefile
 				maintainer/Makefile 
-                maintainer/macports/Portfile])
+                maintainer/macports/Portfile
+				tests/Makefile tests/package.m4])
 AC_OUTPUT

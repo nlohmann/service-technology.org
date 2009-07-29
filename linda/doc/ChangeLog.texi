@@ -1,4 +1,5 @@
-@heading Version 0.5-unreleased
+@heading Version 0.5
 @itemize
 @item First public beta version of Linda. 
 @end itemize
+

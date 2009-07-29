@@ -40,7 +40,7 @@ class Graph {
         /// print information about this graph on std::cout
         void printToStdout();
 
-        void output(std::ofstream&);
+        void output(std::ostream&);
 };
 
 #endif /* GRAPH_H_ */

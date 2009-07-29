@@ -3,13 +3,6 @@
 #include "config.h"
 #include <cassert>
 
-// TODO remove?
-// Merke: Header sind Case-Sensitiv
-//#include <ctime>
-//#include <sstream>
-//#include <cstdio>
-//#include "pnapi.h"
-
 // C Standard General Utilities Library: EXIT_SUCCESS, atoi(), etc.
 #include <cstdlib>
 // standard header for declaring objects that control reading from and writing to the standard streams
@@ -26,12 +19,13 @@
 #include "Graph.h"
 
 
+
 // used namespaces
 using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
-using std::ofstream;
+
 
 
 /// og lexer and parser
@@ -42,21 +36,29 @@ extern FILE* og_yyin;
 extern int cf_yyparse();
 extern FILE* cf_yyin;
 
-// global variables for above parsers
+/// nf lexer and parser
+// TODO
+
+
+
+// global variable for above parsers
 Graph* parsedOG;
+// global variable for program invocation
+string invocation;
 
 
 
-/// little helper method for message output
+/// little helper methods for message output
 void debug(string msg) {
 	cerr << "DEBUG: " << msg << endl;
 }
 
+void info(string msg) {
+    cout << msg << endl;
+}
+
 /// main method
 int main(int argc, char** argv) {
-
-	//time_t start_time, end_time;
-	//time(&start_time);
 
 	/*--------------------------------------.
 	| 0. parse the command line parameters  |
@@ -73,17 +75,27 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
+    // store invocation in a string for meta information in file output
+    for (int i = 0; i < argc; ++i) {
+        invocation += string(argv[i]) + " ";
+    }
+
+
+
     // set input og source
     string inputPrefix = "";
     if ( args_info.input_given ) {
-    	// get og prefix in case of missing costfile/open net prefix
+
+        info("og will be read from file");
+
+    	// get ogfile prefix
         inputPrefix = string(args_info.input_arg);
         if ( inputPrefix.find(".") != string::npos ) {
             inputPrefix = inputPrefix.erase( inputPrefix.find(".") );
         }
-        assert(inputPrefix != "");
         debug("og file prefix is '" + inputPrefix + "'");
 
+        // open filestream
         og_yyin = fopen(args_info.input_arg, "r");
         if ( !og_yyin ) {
             cerr << PACKAGE << ": failed to open input file '" << args_info.input_arg << "'" << endl;
@@ -91,122 +103,137 @@ int main(int argc, char** argv) {
         }
     } else {
     	// og_yyin reads from stdin per default
+        info("og will be read from stdin");
     }
+
+
 
     // set input cost source
     if ( args_info.costfile_given ) {
-        if ( args_info.costfile_arg != NULL ) {
-            cf_yyin = fopen( args_info.costfile_arg, "r");
-        } else {
-        	string costfile = inputPrefix + ".cf";
-            cf_yyin = fopen( costfile.c_str(), "r");
-        }
 
+        info("cost will be read from costfile");
+
+        // get costfile name
+        string costfile = ( args_info.costfile_arg != NULL ? args_info.costfile_arg : inputPrefix + ".cf" );
+        assert(costfile != "");
+
+        // open filestream
+        cf_yyin = fopen( costfile.c_str(), "r");
         if ( !cf_yyin ) {
-            cerr << PACKAGE << ": failed to open costfile '" << args_info.costfile_arg << "'" << endl;
+            cerr << PACKAGE << ": failed to open costfile '" << costfile << "'" << endl;
             exit(EXIT_FAILURE);
         }
     } else if ( args_info.netfile_given ) {
+
+        info("cost will be read from netfile");
         // TODO read open net
+        cerr << PACKAGE << ": reading a netfile is not implemented" << endl;
+        exit(EXIT_FAILURE);
+
     } else {
+
         cerr << PACKAGE << ": a costfile or a netfile must be given" << endl;
         exit(EXIT_FAILURE);
     }
 
-    // set output source
-    std::ostream* candyOut = &cout;
+
+
+    // set output og source
+    std::ostream* outputStream = &cout;
+    std::ofstream ofs;
     if (args_info.output_given) {
 
-        // TODO
-        //if (args_info.output_arg != NULL) {
-        //    candyOut.open(args_info.output_arg, std::ios_base::trunc);
-        //} else {
-        //    candyOut.open(args_info.input_arg + ".owfn", std::ios_base::trunc);
-        //}
+        info("efficient og will be written to file");
+
+        // get ouput filename
+        string outfile = ( args_info.output_arg != NULL ? args_info.output_arg : inputPrefix + "_efficient.og" );
+        assert(outfile != "");
+
+        // open outputstream
+        ofs.open( outfile.c_str(), std::ios_base::trunc);
+        if( !ofs ) {
+            cerr << PACKAGE << ": failed to open output file '" << outfile << "'" << endl;
+            exit(EXIT_FAILURE);
+        }
+        outputStream = &ofs;
+    } else {
+        // efficient og will be written to stdout
+        info("efficient og will be written to stdout");
     }
+
 
 
 	/*---------------------------------.
 	| 1. parse the operating guideline |
 	`---------------------------------*/
 
-    if ( args_info.input_given ) {
-    	debug("parse og file");
-    } else {
-        debug("parse og from stdin");
-    }
-
+    info("reading og ...");
     parsedOG = new Graph();
     og_yyparse();
     fclose(og_yyin);
 
-    debug("finished og parsing, parsed following data:\n\n");
-    parsedOG->printToStdout();
+    //debug("finished og parsing, parsed following data:\n\n");
+    //parsedOG->printToStdout();
+
 
 
     /*---------------------.
 	| 2. parse cost source |
 	`---------------------*/
 
-	// parse costfile or netfile and fill map ogEdges
+    info("reading cost ...");
 	if ( args_info.costfile_given ) {
-		debug("parse costfile");
 		cf_yyparse();
 		fclose(cf_yyin);
 	} else {
-		debug("parse netfile");
 		// TODO parse netfile and close stream
+        //nf_yyparse();
+        //fclose(nf_yyin);
 	}
 
-	debug("finished cost parsing, parsed following data:\n\n");
-	parsedOG->printToStdout();
+	//debug("finished cost parsing, parsed following data:\n\n");
+	//parsedOG->printToStdout();
+	//debug("finished cost parsing, parsed following data (recursively):\n\n");
+	//(parsedOG->root)->printToStdoutRecursively();
 
-	debug("finished cost parsing, parsed following data (recursively):\n\n");
-	(parsedOG->root)->printToStdoutRecursively();
 
 
 	/*-----------------------------.
-	| 3. compute cost efficient OG |
+	| 3. compute cost efficient og |
 	`-----------------------------*/
 
-    //parsedOG->computeInefficientNodes();
-	debug("compute cost efficient OG");
+	info("computing cost efficient og ...");
 	(parsedOG->root)->computeEfficientSuccessors();
 
-	debug("finished computing cost efficient OG, current OG:\n\n");
-	parsedOG->printToStdout();
+	//debug("finished computing cost efficient og, current og:\n\n");
+	//parsedOG->printToStdout();
+	//debug("finished computing cost efficient og, current og (recursively):\n\n");
+	//(parsedOG->root)->printToStdoutRecursively();
 
-	debug("finished computing cost efficient OG, current OG (recursively):\n\n");
-	(parsedOG->root)->printToStdoutRecursively();
 
 
 	/*----------------------------------------.
-	| 4. output cost efficient OG as OG or SA |
+	| 4. output cost efficient og as og or sa |
 	`----------------------------------------*/
 
-    // TODO refactor
-    string outfile = inputPrefix + "_red.og";
-    ofstream ofs;
-    ofs.open( outfile.c_str(), std::ios_base::trunc); // open file
-    // if an error occurred on opening the file
-    if(!ofs) {
-        cerr << PACKAGE << ": ERROR: failed to open output file '"
-           << args_info.output_arg << "'" << endl;
-        exit(EXIT_FAILURE);
-    }
-	parsedOG->output(ofs);
+    info("writing cost efficient og ...");
+	parsedOG->output( *outputStream );
+
 
 
 	/*-----------------------.
 	| N. collect the garbage |
 	`-----------------------*/
 
+    info("closing down program ...");
+
     // release from parser allocated memory
     cmdline_parser_free(&args_info);
 
-
-    // release memory for parsed OG
+    // release memory for parsed og
     delete parsedOG;
+
+
 
     return EXIT_SUCCESS;
 }

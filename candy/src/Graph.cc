@@ -9,6 +9,9 @@ using std::cout;
 using std::endl;
 using std::ofstream;
 
+// program invocation declared in main.cc
+extern string invocation;
+
 
 //! \brief a basic constructor of Graph
 Graph::Graph() :
@@ -57,15 +60,15 @@ void Graph::printToStdout() {
     }
 }
 
-void Graph::output(std::ofstream& file) {
+void Graph::output(std::ostream& file) {
 
     file << "{\n  generator:    " << PACKAGE_STRING
-         //<< " (" << CONFIG_BUILDSYSTEM ")"
-         //<< "\n  invocation:   " << invocation << "\n  events:       "
+         << " (" << CONFIG_BUILDSYSTEM << ")"
+         << "\n  invocation:   " << invocation << "\n  events:       "
          //<< static_cast<unsigned int>(Label::send_events) << " send, "
          //<< static_cast<unsigned int>(Label::receive_events) << " receive, "
          //<< static_cast<unsigned int>(Label::sync_events) << " synchronous"
-         //<< "\n  statistics:   " << seen.size() << " nodes"
+         << "\n  statistics:   " << nodes.size() << " nodes"
          << "\n}\n\n";
 
     file << "INTERFACE\n";

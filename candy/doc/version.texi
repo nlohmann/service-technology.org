@@ -1,0 +1,4 @@
+@set UPDATED 29 July 2009
+@set UPDATED-MONTH July 2009
+@set EDITION 0.1-unreleased
+@set VERSION 0.1-unreleased

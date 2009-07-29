@@ -1,0 +1,4 @@
+@heading Version 0.5 Public Beta
+@itemize
+@item First public beta version of Candy. 
+@end itemize

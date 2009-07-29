@@ -301,7 +301,7 @@ void Node::printToStdoutRecursively() {
     }
 }
 
-void Node::output(std::ofstream& file) {
+void Node::output(std::ostream& file) {
 
     file << "  " << id << " : " << (formula != NULL ? formula->asString() : "NULL") << endl;
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();

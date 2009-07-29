@@ -1,46 +1,45 @@
-# RICH überprüft autoconf version
+# initial data for autoconf
+AC_INIT([Candy], [0.1-unreleased], [richard.mueller@service-technology.org])
+
+##########################################################################################
+# checks for autoconf version 2.59
 AC_PREREQ(2.59)
 
-# RICH initiale Daten für autoconf
-AC_INIT([Candy], [0.1], [richard.mueller@service-technology.org])
+# initialize automake
+AM_INIT_AUTOMAKE(gnits)
 
-# RICH überprüft ob bestimmte Dateien vorhanden sind (Stichprobe)
+# checks for specific files (random sample)
 AC_CONFIG_SRCDIR([src/main.cc])
 
-# RICH Testergebnisse werden als #defines in header geschrieben
+# write test results as #defines into header file
 AC_CONFIG_HEADERS([src/config.h])
 
-# RICH automake initialisieren
-AM_INIT_AUTOMAKE
+# checks whether to enable assertions in the style of assert.h
+AC_HEADER_ASSERT
 
-# RICH checks for programs
-AM_PROG_CC_C_O
+# checks for programs
 AC_PROG_CXX
+AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_RANLIB
+AC_PROG_SED
+AC_PROG_GREP
 
-# RICH checks for programs
+# checks for programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
-# RICH needed for the Petri Net API
-AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
+# look up canonical build name and write it to config.h
+AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
-# RICH checks whether to enable assertions in the style of assert.h
-AC_HEADER_ASSERT
-
-# RICH check for functions
+# check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 
-# RICH brauch ich nicht
-# check for exact unsigned types
-#AC_TYPE_UINT8_T
-#AC_TYPE_UINT16_T
-#AC_TYPE_UINT32_T
-
-# RICH zu konfigurierende Dateien
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile man/Makefile])
-
-# RICH los gehts
+##########################################################################################
+# write files
+AC_CONFIG_FILES([Makefile
+                 src/Makefile
+                 doc/Makefile doc/Doxyfile
+                 man/Makefile])
 AC_OUTPUT

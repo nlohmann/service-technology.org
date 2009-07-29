@@ -2,16 +2,12 @@ bin_PROGRAMS = candy
 
 candy_SOURCES = og-syntax.yy og-lexic.ll \
                 cf-syntax.yy cf-lexic.ll \
-                Graph.cc Graph.h Node.cc Node.h Event.h \
+                Graph.cc Graph.h \
+                Node.cc Node.h \
                 Formula.cc Formula.h \
+                Event.h \
                 main.cc config.h \
                 cmdline.c cmdline.h
-
-#linda_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a $(top_builddir)/libs/lp_solve/liblpsolve55.a
-candy_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a
-
-#linda_CPPFLAGS = -I$(top_srcdir)/libs/pnapi -I$(top_srcdir)/libs/lp_solve
-candy_CPPFLAGS = -I$(top_srcdir)/libs/pnapi
 
 BUILT_SOURCES = cmdline.c og-syntax.cc cf-syntax.cc
 

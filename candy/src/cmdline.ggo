@@ -1,6 +1,6 @@
 # the purpose of the program
 purpose "CANDY - Candy AiN't Done Yet\n
-Calculating a cost-efficient partner out of an operating guideline."
+Calculating a cost efficient partner out of an operating guideline."
 
 
 # the description string will be printet with the help after usage
@@ -27,7 +27,7 @@ option "input" i
   optional
 
 option "output" o
-  "The output file containing the calculated partner. If this option isn't used the partner will be written to standard out. If this option is used without giving a filename the input filename's prefix will be used as filename."
+  "The output file containing the calculated partner. If this option isn't used the partner will be written to standard out. If this option is used without giving a filename the input filename's prefix will be used for writing a '_efficient.og' file."
   string
   typestr="FILENAME"
   argoptional
@@ -36,7 +36,7 @@ option "output" o
 
 # -----------------------------------------------------------------
 section "Cost" 
-sectiondesc="This section explains where to get the cost for calculating a cost-efficient partner. Exactly one out of these two options always has to be used.\n"
+sectiondesc="This section explains where to get the cost for calculating a cost efficient partner. Exactly one out of these two options always has to be used.\n"
 
 option "costfile" c
   "Use a given cost file for the transition cost. If no filename is given the input filename's prefix will be used for finding a '.cf' file."
@@ -54,9 +54,13 @@ option "netfile" n
   
 
 # -----------------------------------------------------------------
-section "Debug"
-sectiondesc="optional section description\n"
-
-option "verbose" v
-  "Verbose output"
-  flag off
+#section "Information"
+#sectiondesc="This section explains options which give additional information about what candy is doing.\n"
+#
+#option "verbose" v
+#  "Verbose output"
+#  flag off
+#
+#option "debug" d
+#  "Debug output"
+#  flag off

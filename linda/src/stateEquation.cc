@@ -149,7 +149,7 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 
 
 
-	string term = e->toString();
+	std::string term = e->toString();
 	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(e);
 
 	int counter = 0;

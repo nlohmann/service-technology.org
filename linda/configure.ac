@@ -2,7 +2,7 @@ AC_INIT(Linda, 0.5-unreleased, jan.suermeli@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(gnits)
 
 # Checks for programs.
 AM_PROG_CC_C_O

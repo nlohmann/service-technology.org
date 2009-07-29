@@ -105,18 +105,14 @@ public:
 		return false;
 	}
 
-	void output () {
-		if (lowerBounded) {
-			std::cout << "Lower bound is: " << lowerBound << "; ";
+	void output (EventTerm* term, bool as_given) {
+		std::cout << "\t" << getLowerBoundString() << " <= ";
+		if (as_given) {
+			std::cout << term->toString();
 		} else {
-			std::cout << "No lower Bound" << "; ";
+			std::cout << EventTerm::toPrettyString(term);
 		}
-		if (upperBounded) {
-			std::cout << "Upper bound is: " << upperBound << "; ";
-		} else {
-			std::cout << "No upper Bound" << "; ";
-		}
-		std::cout << "\n";
+		std::cout << " <= "<< getUpperBoundString() << "\n";
 	}
 
 	std::string getLowerBoundString() {

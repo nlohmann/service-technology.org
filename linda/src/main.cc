@@ -65,6 +65,12 @@ extern int etc_yyparse();
 extern int etc_yylex_destroy();
 #endif
 
+void initialize_et_parser() {
+	et_yylineno = 1;
+	et_yydebug = 0;
+	et_yy_flex_debug = 0;
+
+}
 
 int main(int argc, char** argv) {
 	time_t start_time, end_time;
@@ -99,14 +105,14 @@ int main(int argc, char** argv) {
 			std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(net) << std::endl;
 		}
 	} catch (pnapi::io::InputError error) {
-		std::cerr << PACKAGE << error << std::endl;
+		std::cerr << PACKAGE << ": " << error << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
 
 	/*----------------------------.
 	| 2. Calculate final markings |
 	`----------------------------*/
-
 
 	int bound = args_info.bound_arg;
 
@@ -120,8 +126,13 @@ int main(int argc, char** argv) {
 		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
 		if (XSE->constructLP()) {
 			systems.push_back(std::pair<PartialMarking*,ExtendedStateEquation*>(*finalMarkingIt,XSE));
+
+			// If flag is on, output the lps.
+
 			if (args_info.show_lp_flag) {
-				print_lp(XSE->lp);
+				std::cout << "\nFinal marking:";
+				(*finalMarkingIt)->output();
+				XSE->output();
 			}
 		}
 	}
@@ -131,33 +142,15 @@ int main(int argc, char** argv) {
 
 	if (args_info.level_0_flag) {
 
-		std::cout << "\nLevel 0 message profile:" << std::endl;
-
-
-		/*-----------------------------------.
-		| Calculate and flatten event terms. |
-		`-----------------------------------*/
+		std::cerr << PACKAGE << ": Minimum and maximum occurence of single events." << std::endl;
 
 		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
 
 		for (std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-			//			for (std::set<pnapi::Place*>::iterator it2 = net->getInterfacePlaces().begin(); it2 != net->getInterfacePlaces().end(); ++it2) {
-
-			//				if (*it == *it2) continue;
-
 			BasicTerm* b1 = new BasicTerm((*it));
-			//				BasicTerm* b2 = new BasicTerm((*it2));
-
-			//				AddTerm* a = new AddTerm(b1,b2);
-
 			etermvec->push_back(b1);
-			//			}
 		}
 
-
-		/*-----------------------------------------------------------.
-		| For each REACHABLE final marking evaluate the event terms. |
-		`-----------------------------------------------------------*/
 
 		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
 		systemsIt != systems.end();
@@ -170,14 +163,7 @@ int main(int argc, char** argv) {
 			for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
 				(*systemsIt).second->evaluate((*it));
 				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
-				std::cout << "\t" << b->getLowerBoundString() << " <= ";
-				if (args_info.show_terms_as_given_flag) {
-					std::cout << (*it)->toString();
-				} else {
-					std::cout << EventTerm::toPrettyString(*it);
-				}
-				std::cout << " <= "<< b->getUpperBoundString() << "\n";
-
+				b->output(*it,args_info.show_terms_as_given_flag);
 			}
 
 
@@ -188,11 +174,11 @@ int main(int argc, char** argv) {
 
 	if (args_info.file_given) {
 
-		et_yylineno = 1;
-		et_yydebug = 0;
-		et_yy_flex_debug = 0;
+		std::cerr << PACKAGE << ": Event term file <" << args_info.file_arg << ">" << std::endl;
 
+		initialize_et_parser();
 		et_yyin = fopen(args_info.file_arg, "r");
+
 		if (!et_yyin) {
 			std::cerr << "cannot open ET file '" << args_info.file_arg << "' for reading'\n" << std::endl;
 		}
@@ -217,14 +203,7 @@ int main(int argc, char** argv) {
 			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 				(*systemsIt).second->evaluate((*it));
 				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
-				std::cout << "\t" << b->getLowerBoundString() << " <= ";
-				if (args_info.show_terms_as_given_flag) {
-					std::cout << (*it)->toString();
-				} else {
-					std::cout << EventTerm::toPrettyString(*it);
-				}
-				std::cout << " <= "<< b->getUpperBoundString() << "\n";
-
+				b->output(*it,args_info.show_terms_as_given_flag);
 			}
 		}
 
@@ -232,6 +211,8 @@ int main(int argc, char** argv) {
 
 
 	if (args_info.constraint_file_given) {
+
+		std::cerr << PACKAGE << ": Constraint file <" << args_info.constraint_file_arg << ">" << std::endl;
 
 		etc_yylineno = 1;
 		etc_yydebug = 0;
@@ -302,7 +283,8 @@ int main(int argc, char** argv) {
 
 	if (args_info.random_given) {
 
-		std::cout << "\nRandom message profile (" <<  args_info.random_arg <<" terms):" << std::endl;
+		std::cerr << PACKAGE << ": " << args_info.random_arg << " event terms." << std::endl;
+
 
 		srand(time(NULL));
 
@@ -325,14 +307,7 @@ int main(int argc, char** argv) {
 			for (vector<EventTerm*>::iterator it = randomvec->begin(); it != randomvec->end(); ++it) {
 				(*systemsIt).second->evaluate((*it));
 				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
-				std::cout << "\t" << b->getLowerBoundString() << " <= ";
-				if (args_info.show_terms_as_given_flag) {
-					std::cout << (*it)->toString();
-				} else {
-					std::cout << EventTerm::toPrettyString(*it);
-				}
-				std::cout << " <= "<< b->getUpperBoundString() << "\n";
-
+				b->output(*it,args_info.show_terms_as_given_flag);
 			}
 
 		}
@@ -345,15 +320,14 @@ int main(int argc, char** argv) {
 
 	if (args_info.interactive_flag) {
 
+		std::cerr << PACKAGE << ": " << "Interactive mode." << std::endl;
 		stop_interaction = false;
 
 		while (!stop_interaction) {
 
 			std::cerr << "Enter a number of terms, seperated by <;> or <:q> to quit the interaction mode." << std::endl;
 
-			et_yylineno = 1;
-			et_yydebug = 0;
-			et_yy_flex_debug = 0;
+			initialize_et_parser();
 
 			et_yyin = stdin;
 
@@ -383,14 +357,7 @@ int main(int argc, char** argv) {
 				for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 					(*systemsIt).second->evaluate((*it));
 					EventTermBound* b = (*systemsIt).second->calculated[(*it)];
-					std::cout << "\t" << b->getLowerBoundString() << " <= ";
-					if (args_info.show_terms_as_given_flag) {
-						std::cout << (*it)->toString();
-					} else {
-						std::cout << EventTerm::toPrettyString(*it);
-					}
-					std::cout << " <= "<< b->getUpperBoundString() << "\n";
-
+					b->output(*it,args_info.show_terms_as_given_flag);
 
 				}
 			}

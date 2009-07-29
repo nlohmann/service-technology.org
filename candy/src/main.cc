@@ -14,6 +14,7 @@
 #include <cstdlib>
 // standard header for declaring objects that control reading from and writing to the standard streams
 #include <iostream>
+#include <fstream>
 // C++ strings library
 #include <string>
 // using Map container
@@ -30,6 +31,7 @@ using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
+using std::ofstream;
 
 
 /// og lexer and parser
@@ -164,19 +166,36 @@ int main(int argc, char** argv) {
 
 
 	/*-----------------------------.
-	| 3. compute cost-efficient OG |
+	| 3. compute cost efficient OG |
 	`-----------------------------*/
 
     //parsedOG->computeInefficientNodes();
 	debug("compute cost efficient OG");
 	(parsedOG->root)->computeEfficientSuccessors();
 
+	debug("finished computing cost efficient OG, current OG:\n\n");
+	parsedOG->printToStdout();
 
-	/*----------------------------------.
-	| 4. compute cost-efficient partner |
-	`----------------------------------*/
+	debug("finished computing cost efficient OG, current OG (recursively):\n\n");
+	(parsedOG->root)->printToStdoutRecursively();
 
-	//parsedOG->printEfficientOG(stream);
+
+	/*----------------------------------------.
+	| 4. output cost efficient OG as OG or SA |
+	`----------------------------------------*/
+
+    // TODO refactor
+    string outfile = inputPrefix + "_red.og";
+    ofstream ofs;
+    ofs.open( outfile.c_str(), std::ios_base::trunc); // open file
+    // if an error occurred on opening the file
+    if(!ofs) {
+        cerr << PACKAGE << ": ERROR: failed to open output file '"
+           << args_info.output_arg << "'" << endl;
+        exit(EXIT_FAILURE);
+    }
+	parsedOG->output(ofs);
+
 
 	/*-----------------------.
 	| N. collect the garbage |

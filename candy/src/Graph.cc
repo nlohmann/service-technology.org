@@ -1,10 +1,13 @@
+#include "config.h"
 #include <iostream>
+#include <fstream>
 #include "Graph.h"
 
 // used namespaces
 using std::map;
 using std::cout;
 using std::endl;
+using std::ofstream;
 
 
 //! \brief a basic constructor of Graph
@@ -52,4 +55,74 @@ void Graph::printToStdout() {
         Node* currentNode = iter->second;
         currentNode->printToStdout();
     }
+}
+
+void Graph::output(std::ofstream& file) {
+
+    file << "{\n  generator:    " << PACKAGE_STRING
+         //<< " (" << CONFIG_BUILDSYSTEM ")"
+         //<< "\n  invocation:   " << invocation << "\n  events:       "
+         //<< static_cast<unsigned int>(Label::send_events) << " send, "
+         //<< static_cast<unsigned int>(Label::receive_events) << " receive, "
+         //<< static_cast<unsigned int>(Label::sync_events) << " synchronous"
+         //<< "\n  statistics:   " << seen.size() << " nodes"
+         << "\n}\n\n";
+
+    file << "INTERFACE\n";
+
+    if ( true) {
+        file << "  INPUT\n    ";
+        bool first = true;
+        for ( map<string, Event*>::const_iterator i = events.begin();
+            i != events.end(); ++i ) {
+
+            if ( (i->second)->type == T_INPUT ) {
+                if ( not first ) {
+                    file << ", ";
+                }
+                first = false;
+                file << (i->second)->name;
+            }
+        }
+        file << ";\n";
+    }
+
+    if ( true) {
+        file << "  OUTPUT\n    ";
+        bool first = true;
+        for ( map<string, Event*>::const_iterator i = events.begin();
+            i != events.end(); ++i ) {
+
+            if ( (i->second)->type == T_OUTPUT ) {
+                if ( not first ) {
+                    file << ", ";
+                }
+                first = false;
+                file << (i->second)->name;
+            }
+        }
+        file << ";\n";
+    }
+
+    if ( true) {
+        file << "  SYNCHRONOUS\n    ";
+        bool first = true;
+        for ( map<string, Event*>::const_iterator i = events.begin();
+            i != events.end(); ++i ) {
+
+            if ( (i->second)->type == T_SYNC ) {
+                if ( not first ) {
+                    file << ", ";
+                }
+                first = false;
+                file << (i->second)->name;
+            }
+        }
+        file << ";\n";
+    }
+
+    file << "\nNODES\n";
+
+    // the root
+    root->output(file);
 }

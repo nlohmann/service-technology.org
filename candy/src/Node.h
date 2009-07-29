@@ -67,6 +67,8 @@ class Node {
         /// print information about this node on std::cout
         void printToStdout();
         void printToStdoutRecursively();
+        void output(std::ofstream&);
+
 
     private:
 

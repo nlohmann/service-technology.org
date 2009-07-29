@@ -1,5 +1,6 @@
 #include "Node.h"
 #include <iostream>
+#include <fstream>
 
 // if you need assertions, always include these headers in _this_ order
 #include "config.h"
@@ -9,6 +10,7 @@
 
 using std::cout;
 using std::endl;
+using std::ofstream;
 
 
 //! \brief constructor (three parameters)
@@ -101,8 +103,8 @@ unsigned int Node::computeEfficientSuccessors() {
 			return EXIT_FAILURE;
 		}
 
-        Event* maxEvent = NULL;
-        unsigned int maxEventCost = 0;
+        Event* maxEvent = i->second.front();
+        unsigned int maxEventCost = maxEvent->cost;
         for ( list<Event*>::const_iterator j = i->second.begin();
               j != i->second.end(); ++j ) {
 
@@ -127,36 +129,39 @@ unsigned int Node::computeEfficientSuccessors() {
     cout << "      node " << getID() << " has minimalAssignment with cost " << minimalCost << endl;
 
 
-    /*
-    // finally we compute a list of all inefficient successor nodes which are
-    // reachable through leaving edges from this node
-    list<AnnotatedGraphNode*> succ;
-    edgeIter = getLeavingEdgesConstIterator();
-    while (edgeIter->hasNext()) {
-        AnnotatedGraphEdge* edge = edgeIter->getNext();
-        AnnotatedGraphNode* successor = edge->getDstNode();
+    // finally we cut the connection to all inefficient successor nodes
+    for ( map< Node*, list<Event*> >::iterator i = successors.begin();
+          i != successors.end(); ++i) {
 
-        // we skip the empty node and non-blue nodes
-        if ( successor->getAnnotation()->equals() != TRUE && successor->getColor() == BLUE ) {
+        Node* currentSuccessor = i->first;
 
-            // a successor is inefficient iff it's edge label is assigned with
-            // False in all minimal assignments
-            bool inefficient = true;
-            for (list<GraphFormulaAssignment>::iterator i = minimalAssignments.begin();
-                 inefficient && i != minimalAssignments.end(); ++i ) {
+        Event* maxEvent = i->second.front();
+        unsigned int maxEventCost = maxEvent->cost;
+        for ( list<Event*>::const_iterator j = i->second.begin();
+              j != i->second.end(); ++j ) {
 
-                inefficient = !i->get( edge->getLabel() );
-            }
-
-            if ( inefficient ) {
-                succ.push_back(successor);
-                //cerr << "      node " << successor->getNumber() << " marked as inefficient from node " << this->getNumber() << endl;
+            if ( maxEventCost < (*j)->cost ) {
+                maxEvent = *j;
+                maxEventCost = (*j)->cost;
             }
         }
+        assert( maxEvent != NULL );
+
+        // a successor is inefficient iff it's edge label is assigned with
+        // False in all minimal assignments
+        bool inefficient = true;
+        for (list<FormulaAssignment>::const_iterator j = minimalAssignments.begin();
+             inefficient && j != minimalAssignments.end(); ++j ) {
+
+            inefficient = not j->get( maxEvent->name );
+        }
+
+        if ( inefficient ) {
+
+            successors.erase( i );
+            cout << "      node " << getID() << " has lost successor " << currentSuccessor->getID() << endl;
+        }
     }
-    inefficientSuccessors[this] = succ;
-    delete edgeIter;
-    */
 
 
     return minimalCost;
@@ -293,5 +298,29 @@ void Node::printToStdoutRecursively() {
     for ( map< Node*, list<Event*> >::const_iterator iter = successors.begin();
           iter != successors.end(); ++iter ) {
         (iter->first)->printToStdoutRecursively();
+    }
+}
+
+void Node::output(std::ofstream& file) {
+
+    file << "  " << id << " : " << (formula != NULL ? formula->asString() : "NULL") << endl;
+    for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+          i != successors.end(); ++i ) {
+
+        Node* currentNode = i->first;
+        if ( currentNode != NULL ) {
+            for ( list<Event*>::const_iterator j = i->second.begin();
+                  j != i->second.end(); ++j ) {
+
+                file << "    " << (*j)->name << " -> " << currentNode->id << endl;
+            }
+        } else {
+            file << "\tnode NULL" << endl;
+        }
+    }
+
+    for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+          i != successors.end(); ++i ) {
+        (i->first)->output(file);
     }
 }

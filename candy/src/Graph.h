@@ -39,6 +39,8 @@ class Graph {
 
         /// print information about this graph on std::cout
         void printToStdout();
+
+        void output(std::ofstream&);
 };
 
 #endif /* GRAPH_H_ */

@@ -1,4 +1,4 @@
-args "--unamed-opts=FILE --include-getopt --show-required --no-handle-error"
+args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error"
 
 package "petri"
 purpose "A command-line frontend for the Petri Net API"

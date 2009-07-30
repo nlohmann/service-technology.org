@@ -74,6 +74,18 @@ void PartialMarking::output() {
 
 }
 
+string PartialMarking::toString() {
+
+	string result = "";
+
+	for (std::map<const pnapi::Place*,int>::iterator it = values.begin(); it != values.end(); ++it) {
+		result += (*it).first->getName() + "=" + intToStr((*it).second) + ", ";
+	}
+
+	return result.substr(0,result.length()-2) + ";";
+}
+
+
 
 void SetOfPartialMarkings::output() {
 

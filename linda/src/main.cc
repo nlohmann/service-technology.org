@@ -12,6 +12,7 @@
 #include <typeinfo>
 #include "eventTerm.h"
 #include "stateEquation.h"
+#include "files.h"
 
 
 
@@ -146,17 +147,11 @@ int main(int argc, char** argv) {
 
 
 
-
 	if (args_info.level_0_flag) {
 
 		std::cerr << PACKAGE << ": Minimum and maximum occurence of single events." << std::endl;
 
 		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
-
-		for (std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-			BasicTerm* b1 = new BasicTerm((*it));
-			etermvec->push_back(b1);
-		}
 
 
 		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
@@ -374,6 +369,18 @@ int main(int argc, char** argv) {
 	}
 
 	time(&end_time);
+
+	if (args_info.output_given) {
+
+	std::ofstream file;
+	file.open(args_info.output_arg);
+	ProfileFile* outputFile = new ProfileFile(&systems);
+	outputFile->output(file,args_info.show_terms_as_given_flag);
+
+	file.close();
+    std::cerr << "\n" << PACKAGE << ": Output file " << args_info.output_arg << " created." << std::endl << std::endl;
+
+	}
 
 	if (args_info.verbose_flag) {
 		std::cerr << "\n" << PACKAGE << ": calculation took " << difftime( end_time,start_time) << " seconds" << std::endl << std::endl;

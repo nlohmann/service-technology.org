@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 #include <pnapi/pnapi.h>
+#include "helpers.h"
+
 
 class PartialMarking {
 public:
@@ -16,6 +18,7 @@ public:
 	static PartialMarking* merge(PartialMarking* m1,PartialMarking* m2);
 
 	void output();
+	string toString();
 
 };
 

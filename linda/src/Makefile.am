@@ -9,7 +9,8 @@ linda_SOURCES = main.cc \
         messageprofile.h  \
         cmdline.c cmdline.h \
     	syntax_etc.yy lexer_etc.ll \
-        syntax_et.yy lexer_et.ll 
+        syntax_et.yy lexer_et.ll \
+        files.h files.cc
 
 
 

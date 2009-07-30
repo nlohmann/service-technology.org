@@ -192,7 +192,7 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 	} else {
 //		std::cout << get_objective(lp) << " <= ";
 		bound->lowerBounded = true;
-		bound->lowerBound = get_objective(lp);
+		bound->lowerBound = (int) get_objective(lp);
 	}
 
 	set_maxim(lp);
@@ -207,10 +207,11 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 	} else {
 //		std::cout << " <= " << get_objective(lp) << "; ";
 		bound->upperBounded = true;
-		bound->upperBound = get_objective(lp);
+		bound->upperBound = (int) get_objective(lp);
 	}
 
 	calculated[e] = bound;
+
 
 //	std::cout << "\n";
 }

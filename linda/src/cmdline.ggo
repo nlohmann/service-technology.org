@@ -4,12 +4,6 @@ purpose "LINDA - Linda is not Dependency Analysis."
 
 description "Usage: "
 
-section "Debug"
-
-option "verbose" v
-  "Verbose output"
-  flag off
-
 section "Message Profile" 
 
 option "level-0" 0
@@ -38,12 +32,23 @@ option "interactive" i
 
 section "Output options"
 
-option "show-lp" l
-	"Show linear programs."
-	flag off
+option "output" o
+  "Output results to file."
+  string typestr="path"
+  optional
 
 option "show-terms-as-given" g
 	"Show terms as given in user input instead of internal normal form."
+	flag off
+
+section "Debug"
+
+option "verbose" v
+  "Verbose output"
+  flag off
+
+option "show-lp" l
+	"Show linear programs."
 	flag off
 
 

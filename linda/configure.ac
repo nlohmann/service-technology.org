@@ -1,4 +1,4 @@
-AC_INIT(Linda, 0.5, linda@service-technology.org)
+AC_INIT(Linda, 0.6-unreleased, linda@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 

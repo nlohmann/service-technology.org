@@ -4,6 +4,7 @@
 
 using std::cout;
 using std::cerr;
+using std::string;
 
 bool PartialMarking::isEquivalentTo(PartialMarking* other) {
 

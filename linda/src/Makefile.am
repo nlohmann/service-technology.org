@@ -4,13 +4,13 @@ linda_SOURCES = main.cc \
 		setsOfFinalMarkings.cc setsOfFinalMarkings.h \
 		stateEquation.cc stateEquation.h \
 		eventTerm.cc eventTerm.h \
-        helpers.h helpers.cc \
-        bounds.h  \
-        messageprofile.h  \
-        cmdline.c cmdline.h \
-    	syntax_etc.yy lexer_etc.ll \
-        syntax_et.yy lexer_et.ll \
-        files.h files.cc
+		helpers.h helpers.cc \
+		bounds.h  \
+		messageprofile.h  \
+		cmdline.c cmdline.h \
+		syntax_etc.yy lexer_etc.ll \
+		syntax_et.yy lexer_et.ll \
+		files.h files.cc
 
 
 

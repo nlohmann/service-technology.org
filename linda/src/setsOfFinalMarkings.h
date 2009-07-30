@@ -18,7 +18,7 @@ public:
 	static PartialMarking* merge(PartialMarking* m1,PartialMarking* m2);
 
 	void output();
-	string toString();
+	std::string toString();
 
 };
 

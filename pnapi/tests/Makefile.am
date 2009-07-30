@@ -18,6 +18,7 @@ EXTRA_DIST = testsuite.at versions.sh \
              testfiles/syntax_example2.owfn \
              testfiles/syntax_example3.owfn \
              testfiles/syntax_example4.owfn \
+	     testfiles/syntax_transition_name.owfn \
              testfiles/test_input.lola \
              testfiles/test_dead_nodes.net.owfn \
              testfiles/test_identical_places.net.owfn \

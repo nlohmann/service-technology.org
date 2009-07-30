@@ -178,6 +178,13 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([frontend input])
 AT_CLEANUP
 
+AT_SETUP([Testing "=" in transition name])
+m4_define([NET], [syntax_transition_name.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

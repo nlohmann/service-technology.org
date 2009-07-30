@@ -60,6 +60,12 @@ using pnapi::parser::owfn::ident;
  /* a start condition to skip comments */
 %s COMMENT
 
+/* 
+ * The state "IDENT2" is used for transition identifier.
+ * Unlike place identifier these can contain the char "=",
+ */
+%s IDENT2
+
 %%
 
  /* control comments */ 
@@ -85,7 +91,12 @@ INTERFACE                       { return KEY_INTERFACE; }
 INTERNAL                        { return KEY_INTERNAL; }
 INPUT                           { return KEY_INPUT; }
 OUTPUT                          { return KEY_OUTPUT; }
-TRANSITION                      { return KEY_TRANSITION; }
+
+TRANSITION                      { BEGIN(IDENT2); return KEY_TRANSITION; }
+<IDENT2>[ \n\r\t]               { /* skip whitespaces */ }
+<IDENT2>[^,;:()\t \n\r\{\}]+    { BEGIN(INITIAL); ident = yytext; return IDENT; }
+<IDENT2>.                       { yyerror("Unexpected symbol at transition identifier"); }
+
 INITIALMARKING                  { return KEY_INITIALMARKING; }
 FINALMARKING                    { return KEY_FINALMARKING; }
 NOFINALMARKING                  { return KEY_NOFINALMARKING; }

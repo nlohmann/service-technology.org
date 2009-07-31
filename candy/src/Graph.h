@@ -1,13 +1,10 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
+#include "settings.h"
 #include "Node.h"
 #include "Event.h"
-#include <map>
-#include <string>
 
-using std::map;
-using std::string;
 
 
 class Graph {

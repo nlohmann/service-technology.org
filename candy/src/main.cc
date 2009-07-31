@@ -1,30 +1,7 @@
-// if you need assertions, always include these headers in _this_ order
-// header from configure
-#include "config.h"
-#include <cassert>
-
-// C Standard General Utilities Library: EXIT_SUCCESS, atoi(), etc.
-#include <cstdlib>
-// standard header for declaring objects that control reading from and writing to the standard streams
-#include <iostream>
-#include <fstream>
-// C++ strings library
-#include <string>
-// using Map container
-#include <map>
-
-// header from gengetopt
-#include "cmdline.h"
+// global headers and DEBUG INFO END macros
+#include "settings.h"
 // header for graph structure
 #include "Graph.h"
-
-
-
-// used namespaces
-using std::cerr;
-using std::cout;
-using std::endl;
-using std::string;
 
 
 
@@ -45,22 +22,10 @@ extern FILE* cf_yyin;
 Graph* parsedOG;
 // global variable for program invocation
 string invocation;
-// command line parameters
+// global variable for command line parameters
 gengetopt_args_info args_info;
 
 
-/// little helper methods for message output
-void debug(string msg) {
-    if ( args_info.debug_flag ) {
-        cerr << "DEBUG: " << msg << endl;
-    }
-}
-
-void info(string msg) {
-    if ( args_info.verbose_flag ) {
-        cout << msg << endl;
-    }
-}
 
 /// main method
 int main(int argc, char** argv) {
@@ -74,8 +39,9 @@ int main(int argc, char** argv) {
 
     // call the command line parser from gengetopt
     // which will check for unused and unnamed paramters
+    // this will set the correct flags for the macros from settings.h
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-    	debug("error in commandline parser");
+    	DEBUG "error in commandline parser" END
         exit(EXIT_FAILURE);
     }
 
@@ -90,14 +56,14 @@ int main(int argc, char** argv) {
     string inputPrefix = "";
     if ( args_info.input_given ) {
 
-        info("og will be read from file");
+        INFO "og will be read from file" END
 
     	// get ogfile prefix
         inputPrefix = string(args_info.input_arg);
         if ( inputPrefix.find(".") != string::npos ) {
             inputPrefix = inputPrefix.erase( inputPrefix.find(".") );
         }
-        debug("og file prefix is '" + inputPrefix + "'");
+        DEBUG "og file prefix is '" + inputPrefix + "'" END
 
         // open filestream
         og_yyin = fopen(args_info.input_arg, "r");
@@ -107,7 +73,7 @@ int main(int argc, char** argv) {
         }
     } else {
     	// og_yyin reads from stdin per default
-        info("og will be read from stdin");
+        INFO "og will be read from stdin" END
     }
 
 
@@ -115,7 +81,7 @@ int main(int argc, char** argv) {
     // set input cost source
     if ( args_info.costfile_given ) {
 
-        info("cost will be read from costfile");
+        INFO "cost will be read from costfile" END
 
         // get costfile name
         string costfile = ( args_info.costfile_arg != NULL ? args_info.costfile_arg : inputPrefix + ".cf" );
@@ -129,7 +95,8 @@ int main(int argc, char** argv) {
         }
     } else if ( args_info.netfile_given ) {
 
-        info("cost will be read from netfile");
+        INFO "cost will be read from netfile" END
+
         // TODO read open net
         cerr << PACKAGE << ": reading a netfile is not implemented" << endl;
         exit(EXIT_FAILURE);
@@ -147,7 +114,7 @@ int main(int argc, char** argv) {
     std::ofstream ofs;
     if (args_info.output_given) {
 
-        info("efficient og will be written to file");
+        INFO "efficient og will be written to file" END
 
         // get ouput filename
         string outfile = ( args_info.output_arg != NULL ? args_info.output_arg : inputPrefix + "_efficient.og" );
@@ -162,7 +129,7 @@ int main(int argc, char** argv) {
         outputStream = &ofs;
     } else {
         // efficient og will be written to stdout
-        info("efficient og will be written to stdout");
+        INFO "efficient og will be written to stdout" END
     }
 
 
@@ -171,7 +138,7 @@ int main(int argc, char** argv) {
 	| 1. parse the operating guideline |
 	`---------------------------------*/
 
-    info("reading og ...");
+    INFO "reading og ..." END
     parsedOG = new Graph();
     og_yyparse();
     fclose(og_yyin);
@@ -185,7 +152,7 @@ int main(int argc, char** argv) {
 	| 2. parse cost source |
 	`---------------------*/
 
-    info("reading cost ...");
+    INFO "reading cost ..." END
 	if ( args_info.costfile_given ) {
 		cf_yyparse();
 		fclose(cf_yyin);
@@ -206,7 +173,7 @@ int main(int argc, char** argv) {
 	| 3. compute cost efficient og |
 	`-----------------------------*/
 
-	info("computing cost efficient og ...");
+	INFO "computing cost efficient og ..." END
 	(parsedOG->root)->computeEfficientSuccessors();
 
 	//debug("finished computing cost efficient og, current og:\n\n");
@@ -220,7 +187,7 @@ int main(int argc, char** argv) {
 	| 4. output cost efficient og as og or sa |
 	`----------------------------------------*/
 
-    info("writing cost efficient og ...");
+    INFO "writing cost efficient og ..." END
 	parsedOG->output( *outputStream );
 
 
@@ -229,7 +196,7 @@ int main(int argc, char** argv) {
 	| N. collect the garbage |
 	`-----------------------*/
 
-    info("closing down program ...");
+    INFO "closing down program ..." END
 
     // release from parser allocated memory
     cmdline_parser_free(&args_info);

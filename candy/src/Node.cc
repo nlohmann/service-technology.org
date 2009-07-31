@@ -1,16 +1,5 @@
-#include "config.h"
-#include <cassert>
-#include <iostream>
-#include <fstream>
+#include "settings.h"
 #include "Node.h"
-
-#include <cstdlib>
-#include <climits>
-#include "cmdline.h"
-
-using std::cout;
-using std::endl;
-using std::ofstream;
 
 extern gengetopt_args_info args_info;
 

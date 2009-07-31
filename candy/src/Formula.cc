@@ -1,5 +1,4 @@
-#include "config.h"
-#include <cassert>
+#include "settings.h"
 #include "Formula.h"
 
 using namespace std;

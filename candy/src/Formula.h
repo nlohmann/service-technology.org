@@ -1,10 +1,8 @@
 #ifndef Formula_H_
 #define Formula_H_
 
-#include <string>
+#include "settings.h"
 #include <set>
-#include <list>
-#include <map>
 
 
 // TRUE and FALSE #defined in cudd package may interfere with

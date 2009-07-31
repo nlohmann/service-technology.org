@@ -2,6 +2,7 @@ bin_PROGRAMS = candy
 
 candy_SOURCES = og-syntax.yy og-lexic.ll \
                 cf-syntax.yy cf-lexic.ll \
+                settings.h \
                 Graph.cc Graph.h \
                 Node.cc Node.h \
                 Formula.cc Formula.h \

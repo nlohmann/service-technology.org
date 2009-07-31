@@ -1,17 +1,10 @@
 #ifndef Node_H_
 #define Node_H_
 
-#include <list>
-#include <string>
-#include <map>
+#include "settings.h"
 #include "Formula.h"
 #include "Event.h"
 
-
-using std::list;
-using std::pair;
-using std::string;
-using std::map;
 
 
 class Node {

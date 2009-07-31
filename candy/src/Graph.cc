@@ -1,14 +1,5 @@
-#include "config.h"
-#include <cassert>
-#include <iostream>
-#include <fstream>
+#include "settings.h"
 #include "Graph.h"
-
-// used namespaces
-using std::map;
-using std::cout;
-using std::endl;
-using std::ofstream;
 
 // program invocation declared in main.cc
 extern string invocation;

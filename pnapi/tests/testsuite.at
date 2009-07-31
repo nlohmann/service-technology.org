@@ -178,11 +178,15 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([frontend input])
 AT_CLEANUP
 
-AT_SETUP([Testing "=" in transition name])
-m4_define([NET], [syntax_transition_name.owfn])
+############################################################################
+AT_BANNER([Regression Tests])
+############################################################################
+
+AT_SETUP([Bug 13579 (https://gna.org/bugs/?13579)])
+m4_define([NET], [bug13579.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([frontend input])
+AT_KEYWORDS([bug])
 AT_CLEANUP
 
 ############################################################################

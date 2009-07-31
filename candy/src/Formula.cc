@@ -1,8 +1,6 @@
-#include "Formula.h"
-
-// if you need assertions, always include these headers in _this_ order
 #include "config.h"
 #include <cassert>
+#include "Formula.h"
 
 using namespace std;
 
@@ -13,7 +11,6 @@ using namespace std;
 
 
 const std::string FormulaLiteral::FINAL = std::string("final");
-const std::string FormulaLiteral::TAU = std::string("tau");
 const std::string FormulaLiteral::TRUE = std::string("true");
 const std::string FormulaLiteral::FALSE = std::string("false");
 
@@ -48,14 +45,19 @@ void FormulaAssignment::setToFalse(const std::string& literal) {
 //! \param literal Literal whose truth value should be determined.
 //! \returns Truth value of the given literal.
 bool FormulaAssignment::get(const std::string& literal) const {
-    literal2bool_t::const_iterator
-            literal2bool_iter = literal2bool.find(literal);
+    literal2bool_t::const_iterator literal2bool_iter = literal2bool.find(literal);
 
-    if (literal2bool_iter == literal2bool.end())
+    if (literal2bool_iter == literal2bool.end()) {
         return false;
-
-    return literal2bool_iter->second;
+    } else {
+    	return literal2bool_iter->second;
+    }
 }
+
+
+// ****************************************************************************
+// Formula
+// ****************************************************************************
 
 
 //! \brief Determines whether this Formula satisfies the given
@@ -95,158 +97,11 @@ int Formula::getSubFormulaSize() const {
 void Formula::removeLiteralByHiding(const std::string&) {
 }
 
-// [LUHME XV] Funktionsname umbenennen in "gibt einen Wert einer 3-Wertigen Logik zurück"
-// [LUHME XV] nicht mit dynamic_cast, sondern mit virtual Funktionen realisieren
-//! \brief computes and returns the value of the formula without an assigment
-//! \return returns unknown, true or false
-threeValueLogic Formula::equals() {
 
-    if (dynamic_cast<FormulaLiteral*>(this)) {
-      // [LUHME XV] WTF? der Rückgabewert wird über einen Stringvergleich mit
-      // [LUHME XV] String-Repräsentationen der Werte der Logik während des
-      // [LUHME XV] Aufbau des Zustandsraumes ermittelt
-      // [LUHME XV] sinnvoller Lösungsansatz: Funktionalität Formel-Auswerten
-      // [LUHME XV] und -Reduzieren von String-Darstellung trennen
-        if (asString() == FormulaLiteral::TRUE) {
-            return TRUE;
-        } else if (asString() == FormulaLiteral::FALSE) {
-            return FALSE;
-        } else {
-            return UNKNOWN;
-        }
-    }
+// ****************************************************************************
+// FormulaMultiary
+// ****************************************************************************
 
-    // assert: this is no FormulaLiteral.
-
-    if (dynamic_cast<FormulaMultiaryOr*>(this)) {
-        bool unknownFound = false;
-        for (FormulaMultiaryOr::iterator
-             i = dynamic_cast<FormulaMultiaryOr*>(this)->begin();
-             i != dynamic_cast<FormulaMultiaryOr*>(this)->end(); i++) {
-
-            if (dynamic_cast<Formula*>(*i)->equals() == TRUE) {
-                return TRUE;
-            }
-
-            if (dynamic_cast<Formula*>(*i)->equals() == UNKNOWN) {
-                unknownFound = true;
-            }
-        }
-
-        return unknownFound ? UNKNOWN : FALSE;
-    }
-
-    if (dynamic_cast<FormulaMultiaryAnd*>(this)) {
-        bool noUnknownFound = true;
-        for (FormulaMultiaryAnd::iterator
-             i = dynamic_cast<FormulaMultiaryAnd*>(this)->begin();
-             i != dynamic_cast<FormulaMultiaryAnd*>(this)->end(); i++) {
-
-            if (dynamic_cast<Formula*>(*i)->equals() == FALSE) {
-                return FALSE;
-            }
-
-            if (dynamic_cast<Formula*>(*i)->equals() == UNKNOWN) {
-                noUnknownFound = false;
-            }
-        }
-        return noUnknownFound ? TRUE : UNKNOWN;
-    }
-
-    assert(false);
-    return UNKNOWN;
-}
-
-
-//! \brief Returns this formula in conjunctive normal form. The caller is
-//!        responsible for deleting the newly created and returned formula.
-/// \return returns the CNF
-FormulaCNF* Formula::getCNF() {
-
-    // CNF(literal) = literal
-    if (dynamic_cast<FormulaLiteral*>(this)) {
-        FormulaMultiaryOr* clause = new FormulaMultiaryOr;
-
-        clause->addSubFormula(this->getDeepCopy());
-        FormulaCNF* cnf = new FormulaCNF;
-        cnf->addClause(clause);
-        return cnf;
-    }
-
-    // CNF(cnf) = cnf
-    if (dynamic_cast<FormulaCNF*>(this)) {
-        return dynamic_cast<FormulaCNF*>(this)->getDeepCopy();
-    }
-
-    // CNF(phi AND psi) = CNF(phi) AND CNF(psi)
-    if (dynamic_cast<FormulaMultiaryAnd*>(this)) {
-        FormulaCNF* cnf = new FormulaCNF;
-        for (FormulaMultiaryAnd::iterator
-             i = dynamic_cast<FormulaMultiaryAnd*>(this)->begin();
-             i != dynamic_cast<FormulaMultiaryAnd*>(this)->end(); i++) {
-
-            FormulaCNF *temp = dynamic_cast<Formula*>(*i)->getCNF();
-            for (FormulaCNF::iterator j = temp->begin(); j != temp->end(); j++) {
-                cnf->addClause(dynamic_cast<FormulaMultiaryOr*>(*j)->getDeepCopy());
-            }
-            delete temp;
-        }
-        return cnf;
-    }
-
-    // CNF(phi OR psi) = ...  things becoming ugly
-    if (dynamic_cast<FormulaMultiaryOr*>(this)) {
-        FormulaCNF* cnf = new FormulaCNF;
-        FormulaMultiaryOr* temp = dynamic_cast<FormulaMultiaryOr*>(this);
-        FormulaMultiaryAnd *clause;
-        //FormulaCNF *conj = new FormulaCNF;
-        bool final = true;
-
-        // first of all, merge all top-level OR's
-        temp = temp->merge();
-
-        // all SubFormulas shoud now be either Literal or MultiaryAnd
-
-        // iterate over the MultiaryOr
-        for (FormulaMultiaryOr::iterator i = temp->begin(); i != temp->end(); ++i) {
-            // CNF((phi1 AND phi2) OR psi) = CNF(phi1 OR psi) AND CNF(phi2 OR psi)
-            if (dynamic_cast<FormulaMultiaryAnd*>(*i)) {
-                clause = dynamic_cast<FormulaMultiaryAnd*>(*i);
-                final = false;
-
-                for (FormulaMultiaryAnd::iterator j = clause->begin();
-                     j != clause->end(); ++j) {
-
-                    FormulaMultiaryOr *disj = new FormulaMultiaryOr;
-                    disj->addSubFormula(dynamic_cast<Formula*>(*j)->getDeepCopy());
-
-                    for (FormulaMultiaryOr::iterator k = temp->begin();
-                         k != temp->end(); ++k) {
-
-                        if (k != i) {
-                            disj->addSubFormula(dynamic_cast<Formula*>(*k)->getDeepCopy());
-                        }
-                    }
-
-                    FormulaCNF *temp_cnf = disj->getCNF();
-                    for (FormulaMultiaryAnd::iterator
-                         l = temp_cnf->begin(); l != temp_cnf->end(); ++l) {
-                        cnf->addClause(dynamic_cast<FormulaMultiaryOr*>(*l)->getDeepCopy());
-                    }
-                    delete temp_cnf;
-                }
-            }
-        }
-        if (final) {
-            cnf->addClause(temp->getDeepCopy());
-        } else {
-        }
-        delete temp;
-        return cnf;
-    }
-
-    return NULL; // should not happen! probably new derivate of Formula
-}
 
 //! \brief basic constructor
 FormulaMultiary::FormulaMultiary() :
@@ -551,6 +406,11 @@ int FormulaMultiary::size() const {
 }
 
 
+// ****************************************************************************
+// FormulaMultiaryAnd
+// ****************************************************************************
+
+
 //! \brief basic constructor
 FormulaMultiaryAnd::FormulaMultiaryAnd() {
 }
@@ -636,6 +496,12 @@ const FormulaFixed FormulaMultiaryAnd::emptyFormulaEquivalent = FormulaTrue();
 const FormulaFixed& FormulaMultiaryAnd::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
 }
+
+
+// ****************************************************************************
+// FormulaMultiaryOr
+// ****************************************************************************
+
 
 //! \brief basic constructor
 FormulaMultiaryOr::FormulaMultiaryOr() {
@@ -729,34 +595,6 @@ FormulaMultiaryOr* FormulaMultiaryOr::merge() {
 }
 
 
-//! \brief tests if a given formula is already implied in this one,
-//!        shall only be used for clauses within cnf!
-//! \param op the formula that could be implied
-//! \return returns true if the given formula is implied, else false
-bool FormulaMultiaryOr::implies(FormulaMultiaryOr *op) {
-    bool result;
-
-
-    // FormulaCNF::simplify() depends on this if clause to remove superfluous
-    // true-clauses.
-    if (op->equals() == TRUE) {
-        return true;
-    }
-
-    for (FormulaMultiaryOr::iterator i = this->begin(); i != this->end(); i++) {
-        result = false;
-        for (FormulaMultiaryOr::iterator j = op->begin(); j != op->end(); j++) {
-            result |= (dynamic_cast<FormulaLiteral*>(*i)->asString() == dynamic_cast<FormulaLiteral*>(*j)->asString());
-        }
-        if (!result) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
 //! \brief return an empty formula Equivalent as false
 //! \return true empty formula Equivalent
 const FormulaFixed FormulaMultiaryOr::emptyFormulaEquivalent = FormulaFalse();
@@ -769,102 +607,9 @@ const FormulaFixed& FormulaMultiaryOr::getEmptyFormulaEquivalent() const {
 }
 
 
-//! \brief basic constructor
-FormulaCNF::FormulaCNF() {
-}
-
-
-//! \brief Constructs a CNF formula containing a clause
-//! \param clause_ clause to be added
-FormulaCNF::FormulaCNF(FormulaMultiaryOr* clause_) :
-    FormulaMultiaryAnd(clause_) {
-}
-
-
-//! \brief Constructs a CNF formula containing the two given clauses
-//! \param clause1_ first clause
-//! \param clause2_ second clause
-FormulaCNF::FormulaCNF(FormulaMultiaryOr* clause1_,
-                                 FormulaMultiaryOr* clause2_) :
-    FormulaMultiaryAnd(clause1_, clause2_) {
-}
-
-
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaCNF* FormulaCNF::getDeepCopy() const {
-    FormulaMultiaryAnd* newFormula =FormulaMultiaryAnd::getDeepCopy();
-
-    return static_cast<FormulaCNF*>(newFormula);
-}
-
-
-//! \brief adds a clause to the CNF
-//! \param clause clause to be addded
-void FormulaCNF::addClause(FormulaMultiaryOr* clause) {
-    addSubFormula(clause);
-}
-
-
-//! \brief checks whether the current CNF formula implies the given one via op
-//! \param op the rhs of the implication
-//! \fn bool FormulaCNF::implies(FormulaCNF *op)
-//! Note: all literals have to occur non-negated!
-bool FormulaCNF::implies(FormulaCNF *op) {
-    bool result;
-
-    if (op == NULL) {
-        return false;
-    }
-
-
-    if (this->equals() == FALSE)
-        return true;
-    if (op->equals() == TRUE)
-        return true;
-
-    for (FormulaCNF::iterator i = op->begin(); i != op->end(); i++) {
-        // iterate over rhs operand
-        if ((dynamic_cast<Formula*>(*i)->asString() != "final") &&(dynamic_cast<Formula*>(*i)->asString() != "true")&&(dynamic_cast<Formula*>(*i)->asString() != "false")) {
-            result = false;
-
-            for (FormulaCNF::iterator j = begin(); j != end(); j++) {
-                // iterate over lhs operand
-                result |= (dynamic_cast<FormulaMultiaryOr*>(*j)->implies(dynamic_cast<FormulaMultiaryOr*>(*i)));
-            }
-            if (!result) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-
-//! \brief Simplifies the formula by removing redundant clauses.
-void FormulaCNF::simplify() {
-    for (FormulaCNF::const_iterator iLhs = begin(); iLhs != end(); ++iLhs) {
-        FormulaMultiaryOr* lhs =dynamic_cast<FormulaMultiaryOr*>(*iLhs);
-        assert(lhs != NULL);
-        FormulaCNF::iterator iRhs = begin();
-        while (iRhs != end()) {
-            if (iLhs == iRhs) {
-                ++iRhs;
-                continue;
-            }
-
-            FormulaMultiaryOr* rhs =dynamic_cast<FormulaMultiaryOr*>(*iRhs);
-            assert(rhs != NULL);
-            if (lhs->implies(rhs)) {
-                delete *iRhs;
-                iRhs = removeSubFormula(iRhs);
-            } else {
-                ++iRhs;
-            }
-        }
-    }
-}
+// ****************************************************************************
+// FormulaFixed
+// ****************************************************************************
 
 
 //! \brief Creates a formula with a given fixed value and string reprensentation.
@@ -934,22 +679,6 @@ bool FormulaLiteral::value(const FormulaAssignment& assignment) const {
 //! \return name of the literal
 std::string FormulaLiteral::asString() const {
     return literal;
-}
-
-
-//! \brief adds this literal to the given set
-//! \param events set of strings to fill
-void FormulaLiteral::getEventLiterals(set<string>& events)  {
-
-    // If this literal represent an event, copy it into the set of events
-    if (literal != FormulaLiteral::TRUE &&
-        literal != FormulaLiteral::FALSE &&
-        literal != FormulaLiteral::FINAL &&
-        literal != FormulaLiteral::TAU) {
-
-        string copy(literal);
-        events.insert(copy);
-    }
 }
 
 

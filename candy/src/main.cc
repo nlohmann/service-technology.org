@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
     fclose(og_yyin);
 
     //debug("finished og parsing, parsed following data:\n\n");
-    //parsedOG->printToStdout();
+    //parsedOG->outputDebug(stdout);
 
 
 
@@ -196,7 +196,7 @@ int main(int argc, char** argv) {
 	}
 
 	//debug("finished cost parsing, parsed following data:\n\n");
-	//parsedOG->printToStdout();
+	//parsedOG->outputDebug();
 	//debug("finished cost parsing, parsed following data (recursively):\n\n");
 	//(parsedOG->root)->printToStdoutRecursively();
 
@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
 	(parsedOG->root)->computeEfficientSuccessors();
 
 	//debug("finished computing cost efficient og, current og:\n\n");
-	//parsedOG->printToStdout();
+	//parsedOG->outputDebug();
 	//debug("finished computing cost efficient og, current og (recursively):\n\n");
 	//(parsedOG->root)->printToStdoutRecursively();
 

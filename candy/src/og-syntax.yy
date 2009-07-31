@@ -167,7 +167,7 @@ node:
     if ( i != parsedOG->nodes.end() ) {
         currentNode = i->second;
     } else {
-        cerr << "PARSER: read new node '" << $1 << "' as new node" << endl;
+        //cerr << "PARSER: read new node '" << $1 << "' as new node" << endl;
         currentNode = new Node($1);
         parsedOG->nodes[$1] = currentNode;
     }
@@ -261,7 +261,7 @@ successors:
     if ( i != parsedOG->nodes.end() ) {
         currentSuccessor = i->second;
     } else {
-        cerr << "PARSER: read new node '" << $4 << "' as successor from '" << currentNode->getID() << "'" << endl;
+        //cerr << "PARSER: read new node '" << $4 << "' as successor from '" << currentNode->getID() << "'" << endl;
         currentSuccessor = new Node($4);
         parsedOG->nodes[$4] = currentSuccessor;
     }

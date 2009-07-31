@@ -12,10 +12,6 @@
 #undef TRUE
 #undef FALSE
 
-//! used, for instance, for evaluating node annotation where not all successors
-//! are known yet
-enum threeValueLogic {FALSE, TRUE, UNKNOWN};
-
 #define TRUE 1
 #define FALSE 0
 
@@ -83,8 +79,8 @@ class Formula {
 
         /// fills the given set of strings with all event-representing literals
         /// from the formula
-        virtual void getEventLiterals(std::set<std::string>& events);        
-        
+        virtual void getEventLiterals(std::set<std::string>& events);
+
         /// removes a literal from the whole formula
         virtual void removeLiteral(const std::string&);
 
@@ -98,17 +94,9 @@ class Formula {
 
         /// copies and returns this Formula
         virtual Formula* getDeepCopy() const = 0;
-        
-        /// returns the value of the formula without an assignment
-        threeValueLogic equals();
 
         /// returns the number of subformulas
         virtual int getSubFormulaSize() const;
-
-
-        /// Returns this formula in conjunctive normal form. The caller is
-        /// responsible for deleting the newly created and returned formula.
-        FormulaCNF *getCNF();
 };
 
 
@@ -169,14 +157,14 @@ class FormulaMultiary : public Formula {
 
         /// adds a given subformula to this multiary
         void addSubFormula(Formula* subformula);
-        
+
         /// removes the subformula at the given iterator
         iterator removeSubFormula(iterator subformula);
 
         /// fills the given set of strings with all event-representing literals
         /// from the formula
-        virtual void getEventLiterals(std::set<std::string>& events);        
-        
+        virtual void getEventLiterals(std::set<std::string>& events);
+
         /// removes a literal from this formula
         virtual void removeLiteral(const std::string&);
 
@@ -232,7 +220,7 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         FormulaMultiaryAnd(Formula* subformula_);
         FormulaMultiaryAnd(Formula* lhs, Formula* rhs);
 
-        /// Returns the merged equivalent to this formula. 
+        /// Returns the merged equivalent to this formula.
         FormulaMultiaryAnd* merge();
 
         /// deep copies the formula
@@ -243,7 +231,7 @@ class FormulaMultiaryAnd : public FormulaMultiary {
 
         /// returns the fitting operator
         virtual std::string getOperator() const;
-        
+
         /// returns a constant empty formula equivalent
         virtual const FormulaFixed& getEmptyFormulaEquivalent() const;
 };
@@ -269,59 +257,21 @@ class FormulaMultiaryOr : public FormulaMultiary {
         /// caller is responsible for deleting the returned newly created formula.
         FormulaMultiaryOr* merge();
 
-        /// checks whether the given formula is already implied by this one
-        bool implies(FormulaMultiaryOr *);
-        
         /// returns a deep copy of this formula
         virtual FormulaMultiaryOr* getDeepCopy() const;
 
         /// Destroys this FormulaMultiaryOr and all its subformulas
         virtual ~FormulaMultiaryOr() { };
-        
+
         /// returns "+"
         virtual std::string getOperator() const;
-        
+
         /// returns an empty formula equivalent
         virtual const FormulaFixed& getEmptyFormulaEquivalent() const;
-        
+
         /// intelligently adds a new subformula to the clause, if exactly the same
         /// subformula already exists, the new one is not added
         virtual void addSubFormula(Formula*);
-};
-
-
-/**
- * A multiary conjunction of \link Formula CommFormulasMultiaryOr.\endlink
- * Each disjunction is called "clause" and has a set of literals.
- * This class exists for special function "addClause", etc.
- */
-class FormulaCNF : public FormulaMultiaryAnd {
-    private:
-    public:
-        /// basic constructor
-        FormulaCNF();
-        
-        /// constructs a new CNF and adds the clause to the CNF
-        FormulaCNF(FormulaMultiaryOr* clause);
-
-        /// constructs a new CNF and adds two clauses to the CNF
-        FormulaCNF(FormulaMultiaryOr* clause1,
-                        FormulaMultiaryOr* clause2);
-
-        /// destroys the CNF and all its clauses
-        virtual ~FormulaCNF() { };
-
-        /// deep copies this formula
-        virtual FormulaCNF* getDeepCopy() const;
-
-        /// adds a clause to the CNF
-        void addClause(FormulaMultiaryOr* clause);
-
-        /// checks whether the given CNF is implied by this one
-        bool implies(FormulaCNF *);
-
-        /// Simplifies the formula by removing redundant clauses.
-        void simplify();
 };
 
 
@@ -333,8 +283,6 @@ class FormulaLiteral : public Formula {
         /// The string representation of this literal.
         std::string literal;
     public:
-        /// Reserved literal TAU is used for edges in OGs denoting internal steps.
-        static const std::string TAU;
 
         /// Reserved literal FINAL is used notations of nodes in OGs to denote
         /// possible final states.
@@ -350,22 +298,18 @@ class FormulaLiteral : public Formula {
         static const std::string FALSE;
 #define FALSE 0
 
-        /// fills the given set of strings with all event-representing literals
-        /// from the formula
-        void getEventLiterals(std::set<std::string>& events);        
-
         /// Constructs a literal with the given string representation.
         FormulaLiteral(const std::string& literal);
 
         /// returns a deep copy of this formula
         virtual FormulaLiteral* getDeepCopy() const;
-        
+
         /// basic deconstructor
         virtual ~FormulaLiteral();
-        
+
         /// returns the value of the literal in the given asisgnment
         virtual bool value(const FormulaAssignment& assignment) const;
-        
+
         /// returns the name of the literal
         virtual std::string asString() const;
 };
@@ -392,7 +336,7 @@ class FormulaFixed : public FormulaLiteral {
         /// Destroys this FormulaFixed.
         virtual ~FormulaFixed() {
         };
-        
+
         /// returns the prefixed value of this formula
         virtual bool value(const FormulaAssignment& assignment) const;
 };
@@ -433,7 +377,7 @@ class FormulaLiteralFinal : public FormulaLiteral {
     public:
         /// Constructs a literal with the given string representation.
         FormulaLiteralFinal();
-        
+
         /// basic deconstructor
         virtual ~FormulaLiteralFinal() {
         };

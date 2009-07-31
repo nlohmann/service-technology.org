@@ -1,4 +1,5 @@
 #include "config.h"
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include "Graph.h"
@@ -26,22 +27,9 @@ Graph::~Graph() {
 }
 
 
-void Graph::recolorInefficientNodes() {
+void Graph::outputDebug(std::ostream& file) {
 
-    map< Node*, list<Node*> > inefficientSuccessors;
-
-    // compute cost and inefficient successors
-    root->computeEfficientSuccessors();
-
-    // recolors inefficient successors
-    root->recolorInefficientSuccessors(inefficientSuccessors);
-    inefficientSuccessors.clear();
-}
-
-
-void Graph::printToStdout() {
-
-    cout << "graph has " << nodes.size() << " nodes and "
+	file << "graph has " << nodes.size() << " nodes and "
          << (events.size()) << " events\n" << endl;
 
     for (map<string, Event*>::const_iterator iter = events.begin();
@@ -50,8 +38,8 @@ void Graph::printToStdout() {
     	currentEvent->printToStdout();
     }
 
-    cout << "\nroot node is node id '";
-    if ( root == NULL ) cout << "NULL'" << endl; else cout << root->getID() << "'\n" << endl;
+    file << "\nroot node is node id '";
+    if ( root == NULL ) file << "NULL'" << endl; else file << root->getID() << "'\n" << endl;
     for (map<unsigned int, Node*>::iterator iter = nodes.begin();
          iter != nodes.end(); ++iter) {
 

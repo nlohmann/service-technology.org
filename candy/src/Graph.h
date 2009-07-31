@@ -34,12 +34,10 @@ class Graph {
 		/// basic deconstructor
 		~Graph();
 
-		/// TODO comment
-        void recolorInefficientNodes();
+        /// output this graph as debug information
+        void outputDebug(std::ostream&);
 
-        /// print information about this graph on std::cout
-        void printToStdout();
-
+        /// output this graph in og format
         void output(std::ostream&);
 };
 

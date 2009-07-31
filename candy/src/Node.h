@@ -29,7 +29,6 @@ class Node {
         Formula* formula;
 
         bool final;
-        list< Node* > efficientSuccessors;
 
         /*--------.
 		| methods |
@@ -44,9 +43,6 @@ class Node {
         // getter and setter for id
         unsigned int getID() const { return id; }
         void setID(unsigned int newID) { id = newID; }
-
-        /// TODO comment
-        void recolorInefficientSuccessors(map< Node*, list<Node*> >& );
 
         /// TODO comment
         unsigned int computeEfficientSuccessors();

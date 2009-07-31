@@ -1,16 +1,18 @@
-#include "Node.h"
-#include <iostream>
-#include <fstream>
-
-// if you need assertions, always include these headers in _this_ order
 #include "config.h"
 #include <cassert>
+#include <iostream>
+#include <fstream>
+#include "Node.h"
+
 #include <cstdlib>
 #include <climits>
+#include "cmdline.h"
 
 using std::cout;
 using std::endl;
 using std::ofstream;
+
+extern gengetopt_args_info args_info;
 
 
 //! \brief constructor (three parameters)
@@ -25,54 +27,6 @@ Node::Node(unsigned int _id) :
 Node::~Node() {
 
     successors.clear();
-    efficientSuccessors.clear();
-}
-
-
-//! \brief set the color of all inefficient reachable nodes to red
-//! \param inefficientSuccessors contains all reached nodes and their inefficient successors
-void Node::recolorInefficientSuccessors(map< Node*, list<Node*> >& inefficientSuccessors) {
-
-    /*
-    map< AnnotatedGraphNode*, list<AnnotatedGraphNode*> >::iterator iter = inefficientSuccessors.find(this);
-
-    if ( iter != inefficientSuccessors.end() ) {
-
-        list<AnnotatedGraphNode*> succ = iter->second;
-        inefficientSuccessors.erase(iter);
-
-        for (list<AnnotatedGraphNode*>::iterator i = succ.begin(); i != succ.end(); ++i) {
-
-            // current successor
-            AnnotatedGraphNode* node = *i;
-
-            // all non-efficient nodes are marked RED
-            node->setColor(RED);
-            //cerr << "      node " << node->getNumber() << " was marked RED" << endl;
-        }
-
-        removeUnneededLiteralsFromAnnotation();
-    }
-
-    LeavingEdges::ConstIterator edgeIter = getLeavingEdgesConstIterator();
-    while (edgeIter->hasNext()) {
-        AnnotatedGraphEdge* edge = edgeIter->getNext();
-        AnnotatedGraphNode* successor = edge->getDstNode();
-
-        // we skip the empty node and non-blue nodes
-        if ( successor->getAnnotation()->equals() != TRUE && successor->getColor() == BLUE ) {
-
-            if (successor == this) {
-                // this should never happens as cost is defined for acyclic OGs
-                trace("Cannot compute cost since the given OG is not acyclic\n\n");
-                assert(false);
-            }
-
-            successor->recolorInefficientSuccessors(inefficientSuccessors);
-        }
-    }
-    delete edgeIter;
-    */
 }
 
 
@@ -82,24 +36,24 @@ void Node::recolorInefficientSuccessors(map< Node*, list<Node*> >& inefficientSu
 unsigned int Node::computeEfficientSuccessors() {
 
     // if this node is a final node then we dont have to consider any leaving edge
-    cout << "DEBUG computing costs for node " << getID() << endl;
-    printToStdout();
+    if (args_info.debug_flag) cout << "DEBUG computing costs for node " << getID() << endl;
+    if (args_info.debug_flag) printToStdout();
     if ( final ) {
-        cout << "      node '" << getID() << "', " << this << " is final, cost is 0" << endl;
+    	if (args_info.debug_flag) cout << "      node '" << getID() << "', " << this << " is final, cost is 0" << endl;
         return 0;
     }
 
 
     // first we have to compute the cost for all successors
     list< pair< pair<Node*, Event*>, unsigned int> > totalCost;
-    cout << "      node " << getID() << " has " << successors.size() << " successors" << endl;
+    if (args_info.debug_flag) cout << "      node " << getID() << " has " << successors.size() << " successors" << endl;
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
           i != successors.end(); ++i) {
 
     	Node* successor = i->first;
 		if (successor == this) {
 			// this should never happens as cost are defined for acyclic OGs
-			cout << "Cannot compute cost since the given OG is not acyclic\n\n" << endl;
+			if (args_info.debug_flag) cout << "Cannot compute cost since the given OG is not acyclic\n\n" << endl;
 			return EXIT_FAILURE;
 		}
 
@@ -115,10 +69,11 @@ unsigned int Node::computeEfficientSuccessors() {
         }
         assert( maxEvent != NULL );
 
-        cout << "bla" << endl;
+        if (args_info.debug_flag) cout << "bla" << endl;
+        assert(successor != NULL);
 		unsigned int successorCost = maxEventCost + successor->computeEfficientSuccessors();
 		totalCost.push_back( pair< pair<Node*, Event*>, unsigned int >( pair<Node*, Event*>(successor, maxEvent) , successorCost) );
-		cout << "      node " << getID() << " has successor with cost " << successorCost << endl;
+		if (args_info.debug_flag) cout << "      node " << getID() << " has successor with cost " << successorCost << endl;
     }
 
 
@@ -126,16 +81,19 @@ unsigned int Node::computeEfficientSuccessors() {
     // the minimal cost
     list<FormulaAssignment> minimalAssignments;
     unsigned int minimalCost = getCostMinimalAssignments(totalCost, minimalAssignments);
-    cout << "      node " << getID() << " has minimalAssignment with cost " << minimalCost << endl;
+    if (args_info.debug_flag) cout << "      node " << getID() << " has minimalAssignment with cost " << minimalCost << endl;
 
 
     // finally we cut the connection to all inefficient successor nodes
     for ( map< Node*, list<Event*> >::iterator i = successors.begin();
-          i != successors.end(); ++i) {
+          i != successors.end(); ) { //increment inside because of erase
 
         Node* currentSuccessor = i->first;
+        assert(currentSuccessor != NULL);
+        if (args_info.debug_flag) cout << "      node " << getID() << " is checking successor " << currentSuccessor->getID() << endl;
 
         Event* maxEvent = i->second.front();
+        assert(maxEvent != NULL);
         unsigned int maxEventCost = maxEvent->cost;
         for ( list<Event*>::const_iterator j = i->second.begin();
               j != i->second.end(); ++j ) {
@@ -158,8 +116,11 @@ unsigned int Node::computeEfficientSuccessors() {
 
         if ( inefficient ) {
 
-            successors.erase( i );
-            cout << "      node " << getID() << " has lost successor " << currentSuccessor->getID() << endl;
+            successors.erase( i++ ); // erase returns incremented iterator, which is invalid for last element
+            formula->removeLiteralForReal( maxEvent->name );
+            if (args_info.debug_flag) cout << "      node " << getID() << " has lost successor " << currentSuccessor->getID() << endl;
+        } else {
+        	++i;
         }
     }
 
@@ -293,7 +254,7 @@ void Node::printToStdout() {
 }
 
 void Node::printToStdoutRecursively() {
-    
+
     printToStdout();
     for ( map< Node*, list<Event*> >::const_iterator iter = successors.begin();
           iter != successors.end(); ++iter ) {

@@ -4,12 +4,12 @@ AT_INIT([standard tests])
 AT_BANNER([Standard Options])
 ############################################################################
 
-AT_SETUP([Help output])
+AT_SETUP([help output])
 AT_CHECK([CANDY --help], 0, ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-AT_SETUP([Version output])
+AT_SETUP([version output])
 AT_CHECK([CANDY --version], 0, ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
@@ -18,34 +18,63 @@ AT_CLEANUP
 AT_BANNER([I/O Tests])
 ############################################################################
 
-AT_SETUP([File In, File Out])
+AT_SETUP([output shortcut])
 AT_CHECK([cp TESTFILES/costOG1.og .])
 AT_CHECK([cp TESTFILES/costOG1.cf .])
-AT_CHECK([CANDY --input=costOG1.og --output=costOG1_efficient.og --costfile=costOG1.cf],0)
+AT_CHECK([CANDY --input=costOG1.og -o --costfile=costOG1.cf], 0)
 AT_CHECK([test -f costOG1_efficient.og])
 AT_KEYWORDS(io)
 AT_CLEANUP
 
-#AT_SETUP([File In, Pipe Out])
-#AT_CHECK([cp TESTFILES/zeus.wendy.og .])
-#AT_CHECK([SAYO --input=zeus.wendy.og > zeus.sa],0)
-#AT_CHECK([test -f zeus.sa])
-#AT_KEYWORDS(io)
-#AT_CLEANUP
-#
-#AT_SETUP([Pipe In, File Out])
-#AT_CHECK([cp TESTFILES/zeus.wendy.og .])
-#AT_CHECK([cat zeus.wendy.og | SAYO --output=zeus.sa],0)
-#AT_CHECK([test -f zeus.sa])
-#AT_KEYWORDS(io)
-#AT_CLEANUP
-#
-#AT_SETUP([Pipe In, Pipe Out])
-#AT_CHECK([cp TESTFILES/zeus.wendy.og .])
-#AT_CHECK([cat zeus.wendy.og | SAYO > zeus.sa],0)
-#AT_CHECK([test -f zeus.sa])
-#AT_KEYWORDS(io)
-#AT_CLEANUP
+AT_SETUP([costfile shortcut])
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.cf .])
+AT_CHECK([CANDY --input=costOG1.og -o -c], 0)
+AT_CHECK([test -f costOG1_efficient.og])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([netfile shortcut])
+# xfail because not implemented
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.owfn .])
+AT_CHECK([CANDY --input=costOG1.og -o -n], 0)
+AT_CHECK([test -f costOG1_efficient.og])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([file in, file out])
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.cf .])
+AT_CHECK([CANDY --input=costOG1.og --output=c.og --costfile=costOG1.cf], 0)
+AT_CHECK([test -f c.og])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([file in, pipe out])
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.cf .])
+AT_CHECK([CANDY --input=costOG1.og --costfile=costOG1.cf > c.og], 0)
+AT_CHECK([test -f c.og])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([pipe in, file out])
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.cf .])
+AT_CHECK([cat costOG1.og | CANDY --output=c.og --costfile=costOG1.cf], 0)
+AT_CHECK([test -f c.og])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([pipe in, pipe out])
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.cf .])
+AT_CHECK([cat costOG1.og | CANDY --costfile=costOG1.cf > c.og], 0)
+AT_CHECK([test -f c.og])
+AT_KEYWORDS(io)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Error Cases])
@@ -152,6 +181,29 @@ AT_BANNER([Fiona's Test Cases])
 ############################################################################
 AT_BANNER([Equivalence Tests])
 ############################################################################
+
+AT_SETUP([costOG1])
+AT_CHECK([cp TESTFILES/costOG1.og .])
+AT_CHECK([cp TESTFILES/costOG1.cf .])
+AT_CHECK([cp TESTFILES/costOG1_expected.og .])
+AT_CHECK([CANDY --input=costOG1.og --output=c.og --costfile=costOG1.cf], 0)
+# cut off first 7 lines which hold comments about invocation etc.
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og costOG1_expected.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "modified" stdout], 1, ignore)
+AT_KEYWORDS(equivalence)
+AT_CLEANUP
+
+AT_SETUP([costOG2])
+AT_CHECK([cp TESTFILES/costOG2.og .])
+AT_CHECK([cp TESTFILES/costOG2.cf .])
+AT_CHECK([cp TESTFILES/costOG2_expected.og .])
+AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=costOG2.cf], 0)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og costOG2_expected.og], 0, stdout, ignore)
+AT_CHECK([GREP -q "modified" stdout], 1, ignore)
+AT_KEYWORDS(equivalence)
+AT_CLEANUP
 
 #AT_SETUP([Dining Philosophers])
 #AT_CHECK([cp TESTFILES/phcontrol3.unf.*.og .])

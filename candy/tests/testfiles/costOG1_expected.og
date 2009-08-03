@@ -1,0 +1,18 @@
+INTERFACE
+  INPUT
+    ;
+  OUTPUT
+    a1, a2;
+  SYNCHRONOUS
+    ;
+
+NODES
+  890016 : (a1 + a2)
+    a1 -> 921960
+    a2 -> 922200
+  921960 : a2
+    a2 -> 921980
+  921980 : final
+  922200 : a1
+    a1 -> 940168
+  940168 : final

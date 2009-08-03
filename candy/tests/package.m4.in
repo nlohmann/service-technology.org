@@ -8,6 +8,7 @@ m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
 
 m4_define([GREP],                 [@GREP@])
+m4_define([SED],                  [@SED@])
 m4_define([CANDY],                [@abs_top_builddir@/src/candy])
 m4_define([FIONA],                [wrap.sh @FIONA@])
 m4_define([WENDY],                [wrap.sh @WENDY@])

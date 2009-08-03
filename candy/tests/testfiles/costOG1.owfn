@@ -1,0 +1,29 @@
+PLACE
+INTERNAL
+  p0,
+  p1,
+  pa1;
+INPUT
+  a1,
+  b1;
+OUTPUT
+  ;
+
+INITIALMARKING
+  p0:   1;
+FINALMARKING
+  p1:   1;
+
+TRANSITION ca1 : 1
+CONSUME
+  p0:    1,
+  a1:    1;
+PRODUCE
+  pa1:   1;
+
+TRANSITION cb1 : 2
+CONSUME
+  pa1:   1,
+  b1:    1;
+PRODUCE
+  p1:    1;

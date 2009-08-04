@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include <cassert>
+#include <iostream>
 
 #ifndef NDEBUG
 #include <fstream>
@@ -29,7 +30,6 @@ using pnapi::io::operator<<;
 using pnapi::io::util::operator<<;
 #endif
 
-#include <iostream>
 #include <sstream>
 
 #include "link.h"

@@ -1,5 +1,6 @@
 #include "config.h"
 #include <cassert>
+#include <iostream>
 
 #ifndef NDEBUG
 #include "myio.h"
@@ -7,8 +8,6 @@
 using std::cout;
 using std::endl;
 #endif
-
-#include <iostream>
 
 #include "marking.h"
 #include "formula.h"

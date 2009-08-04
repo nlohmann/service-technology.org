@@ -267,27 +267,6 @@ unsigned int PetriNet::reduce_dead_nodes()
       deleteTransition(**t);
       ++result;
     }
-            
-           
-    // remove isolated communication places
-    set<Place*> uselessInterfacePlaces;
-    
-    for (set<Place*>::iterator p = inputPlaces_.begin(); 
-          p != inputPlaces_.end(); ++p)
-      if ((*p)->getPostset().empty())
-        uselessInterfacePlaces.insert(*p);
-    
-    for (set<Place*>::iterator p = outputPlaces_.begin(); 
-           p != outputPlaces_.end(); ++p)
-      if ((*p)->getPreset().empty())
-        uselessInterfacePlaces.insert(*p);
-    
-    for (set<Place*>::iterator p = uselessInterfacePlaces.begin(); 
-           p != uselessInterfacePlaces.end(); ++p)
-    {
-      deletePlace(**p);
-      ++result;
-    }
   }
   
   /*

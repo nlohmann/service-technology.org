@@ -9,12 +9,12 @@ EXTRA_DIST = testsuite.at wrap.sh \
              testfiles/costOG2.cf \
              testfiles/costOG2.owfn \
              testfiles/costOG2_expected.og \
-             testfiles/incomplete.cf \
-             testfiles/overfull.cf \
+             testfiles/error_incomplete.cf \
+             testfiles/error_overfull.cf \
              testfiles/error_repetitions.cf \
-             testfiles/incomplete.owfn \
-             testfiles/overfull.owfn \
-             testfiles/error_weigths.owfn \
+             testfiles/error_incomplete.owfn \
+             testfiles/error_overfull.owfn \
+             testfiles/error_weights.owfn \
              testfiles/error_shared.owfn \
              testfiles/error_nonnormal.owfn
 

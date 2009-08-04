@@ -88,16 +88,16 @@ AT_CLEANUP
 
 AT_SETUP([incomplete costfile])
 AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/incomplete.cf .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=incomplete.cf], 1, ignore, stderr)
+AT_CHECK([cp TESTFILES/error_incomplete.cf .])
+AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_incomplete.cf], 1, ignore, stderr)
 AT_CHECK([GREP -q "given costfile does not include all events from given OG" stderr], 0, ignore)
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([overfull costfile])
 AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/overfull.cf .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=overfull.cf], 1, ignore, stderr)
+AT_CHECK([cp TESTFILES/error_overfull.cf .])
+AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_overfull.cf], 1, ignore, stderr)
 AT_CHECK([GREP -q "given costfile includes events which are not used in given OG" stderr], 0, ignore)
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -112,16 +112,16 @@ AT_CLEANUP
 
 AT_SETUP([incomplete netfile])
 AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/incomplete.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=incomplete.owfn], 1, ignore, stderr)
+AT_CHECK([cp TESTFILES/error_incomplete.owfn .])
+AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_incomplete.owfn], 1, ignore, stderr)
 AT_CHECK([GREP -q "given netfile does not include all events from given OG" stderr], 0, ignore)
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([overfull netfile])
 AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/overfull.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=overfull.owfn], 1, ignore, stderr)
+AT_CHECK([cp TESTFILES/error_overfull.owfn .])
+AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_overfull.owfn], 1, ignore, stderr)
 AT_CHECK([GREP -q "given netfile includes events which are not used in given OG" stderr], 0, ignore)
 AT_KEYWORDS(error)
 AT_CLEANUP

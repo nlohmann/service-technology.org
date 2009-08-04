@@ -15,7 +15,7 @@ using std::flush;
 
 #include "automaton.h"
 #include "component.h"
-#include "io.h"
+#include "myio.h"
 #include "marking.h"
 #include "petrinet.h"
 #include "state.h"

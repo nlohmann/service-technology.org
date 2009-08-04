@@ -15,6 +15,11 @@ BUILT_SOURCES = cmdline.c
 
 EXTRA_DIST = cmdline.ggo
 
+# get flags from configure script
+AM_LDFLAGS  = @configured_LDFLAGS@
+AM_CXXFLAGS = @configured_CXXFLAGS@
+AM_CFLAGS = @configured_CXXFLAGS@ 
+
 AM_CPPFLAGS = -I$(top_srcdir)/src
 
 DISTCLEANFILES = cmdline.c cmdline.h

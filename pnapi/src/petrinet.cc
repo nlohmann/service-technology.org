@@ -22,7 +22,7 @@
 #ifndef NDEBUG
 #include <iostream>
 #include <fstream>
-#include "io.h"
+#include "myio.h"
 using std::cout;
 using std::cerr;
 using std::endl;

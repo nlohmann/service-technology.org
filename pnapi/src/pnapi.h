@@ -15,7 +15,7 @@
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
-#include "io.h"
+#include "myio.h"
 #include "condition.h"
 #include "petrinet.h"
 #include "automaton.h"

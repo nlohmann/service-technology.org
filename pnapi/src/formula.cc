@@ -3,7 +3,7 @@
 
 #ifndef NDEBUG
 #include <iostream>
-#include "io.h"
+#include "myio.h"
 #include "component.h"
 using std::cout;
 using std::endl;
@@ -11,7 +11,7 @@ using std::endl;
 
 #include "marking.h"
 #include "formula.h"
-#include "io.h"
+#include "myio.h"
 #include "petrinet.h"
 #include "util.h"
 

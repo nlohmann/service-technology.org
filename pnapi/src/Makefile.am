@@ -19,7 +19,7 @@ libpnapi_la_SOURCES = \
 	automaton.h automaton.cc\
 	state.h state.cc \
 	marking.h marking.cc \
-	io.h io.cc io-format.cc
+	myio.h myio.cc io-format.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
                 parser-petrify.cc parser-petrify.h parser-petrify-lexer.cc \
@@ -40,7 +40,7 @@ libpnapi_a_CPPFLAGS = -Wall
 # information for libtool
 includedir = @includedir@/pnapi
 
-include_HEADERS = pnapi.h io.h condition.h petrinet.h \
+include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
 		  automaton.h formula.h component.h \
 		  parser.h util.h state.h \
 		  marking.h link.h \

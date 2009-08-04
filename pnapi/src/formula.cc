@@ -321,6 +321,8 @@ namespace pnapi
       std::set<const Place *> formulaPlaces = places();
       std::set<Place *> netPlaces = m.getPetriNet().getPlaces();
       for (std::set<Place *>::iterator p = netPlaces.begin(); p != netPlaces.end(); p++)
+      {
+        bool count = formulaPlaces.count(*p) == 0;
         switch (flag_)
         {
         case ALL_PLACES_EMPTY:
@@ -330,19 +332,20 @@ namespace pnapi
             return false;
           break;
         case ALL_OTHER_PLACES_EMPTY:
-          if (formulaPlaces.count(*p) == 0 && m[**p] != 0)
+          if (count && m[**p] != 0)
             return false;
           break;
         case ALL_OTHER_EXTERNAL_PLACES_EMPTY:
-          if ((*p)->getType() != Node::INTERNAL && m[**p] != 0)
+          if (count && (*p)->getType() != Node::INTERNAL && m[**p] != 0)
             return false;
           break;
         case ALL_OTHER_INTERNAL_PLACES_EMPTY:
-          if ((*p)->getType() == Node::INTERNAL && m[**p] != 0)
+          if (count && (*p)->getType() == Node::INTERNAL && m[**p] != 0)
             return false;
           break;
         default: break;
         }
+      }
 
       return true;
     }

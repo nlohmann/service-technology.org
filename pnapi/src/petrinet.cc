@@ -157,7 +157,7 @@ namespace pnapi
     updateTransitionLabels(trans);
 
     net_.labels_.clear();
-    for (std::set<Transition *>::iterator t = net_.transitions_.begin(); t != net_.transitions_.end(); t++)
+    for (std::set<Transition *>::iterator t = net_.synchronizedTransitions_.begin(); t != net_.synchronizedTransitions_.end(); t++)
       for (std::set<std::string>::iterator l = (*t)->getSynchronizeLabels().begin(); l != (*t)->getSynchronizeLabels().end(); l++)
         net_.labels_.insert(*l);
   }

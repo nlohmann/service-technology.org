@@ -6,6 +6,7 @@ EXTRA_DIST = testsuite.at wrap.sh \
              testfiles/costOG1.owfn \
              testfiles/costOG1_expected.og \
              testfiles/costOG2.og \
+             testfiles/costOG2.og2 \
              testfiles/costOG2.cf \
              testfiles/costOG2.owfn \
              testfiles/costOG2_expected.og \

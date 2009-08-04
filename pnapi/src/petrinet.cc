@@ -1436,9 +1436,14 @@ namespace pnapi
 
   void PetriNet::deletePlace(Place & place)
   {
+    if (finalCondition().concerningPlaces().count(&place) > 0)
+    {
+      std::cerr << PACKAGE_STRING << ": place '" << place.getName()
+        << "' occurs in the final condition. Please rewrite the final condition first."
+        << " (the place was not deleted)" << std::endl;
+      return;
+    }
     observer_.finalizePlaceType(place, place.getType());
-    formula::Formula *f = const_cast<formula::Formula *>(&condition_.formula());
-    f->removeProposition(&place);
     places_.erase(&place);
     deleteNode(place);
   }

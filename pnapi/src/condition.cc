@@ -72,6 +72,11 @@ namespace pnapi
     return Conjunction(f1, f2);
   }
 
+  Conjunction operator&&(const Formula & f, const formula::AllOtherPlaces v)
+  {
+    return Conjunction(f, v);
+  }
+
   Disjunction operator||(const Formula & f1, const Formula & f2)
   {
     return Disjunction(f1, f2);
@@ -131,6 +136,14 @@ namespace pnapi
     return *this;
   }
 
+  Condition & Condition::operator=(const formula::AllOtherPlaces v)
+  {
+    delete formula_;
+    formula_ = new formula::Conjunction(v);
+
+    return *this;
+  }
+
   Condition & Condition::operator=(bool formulaTrue)
   {
     delete formula_;
@@ -166,7 +179,7 @@ namespace pnapi
 
   std::set<const Place *> Condition::concerningPlaces() const
   {
-    return formula_->places(true);
+    return formula_->places();
   }
 
   void Condition::negate()

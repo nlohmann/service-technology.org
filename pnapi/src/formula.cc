@@ -12,6 +12,7 @@ using std::endl;
 #include "marking.h"
 #include "formula.h"
 #include "io.h"
+#include "petrinet.h"
 #include "util.h"
 
 using std::map;
@@ -104,13 +105,13 @@ namespace pnapi
     {
     }
 
-    Conjunction::Conjunction() :
-      Operator()
+    Conjunction::Conjunction(const AllOtherPlaces v) :
+      Operator(), flag_(v)
     {
     }
 
-    Conjunction::Conjunction(const Formula & f) :
-      Operator(f)
+    Conjunction::Conjunction(const Formula & f, const AllOtherPlaces v) :
+      Operator(f), flag_(v)
     {
       simplifyChildren();
     }
@@ -135,14 +136,15 @@ namespace pnapi
     }
 
     Conjunction::Conjunction(const set<const Formula *> & children,
-			     const map<const Place *, const Place *> * places) :
-      Operator(children, places)
+			     const map<const Place *, const Place *> * places,
+			     AllOtherPlaces v) :
+      Operator(children, places), flag_(v)
     {
       simplifyChildren();
     }
 
     Conjunction::Conjunction(const Conjunction & c) :
-      Operator(c.children_)
+      Operator(c.children_), flag_(c.flag_)
     {
       simplifyChildren();
     }
@@ -234,13 +236,14 @@ namespace pnapi
 
     Negation * Negation::clone(const map<const Place *, const Place *> * places) const
     {
-      return new Negation(children_, places);
+      Negation *f = new Negation(children_, places);
+      return f;
     }
 
     Conjunction * Conjunction::clone(const map<const Place *,
 				         const Place *> * places) const
     {
-      return new Conjunction(children_, places);
+      return new Conjunction(children_, places, flag_);
     }
 
     Disjunction * Disjunction::clone(const map<const Place *,
@@ -314,6 +317,33 @@ namespace pnapi
 	   f != children_.end(); f++)
 	if (!(*f)->isSatisfied(m))
 	  return false;
+
+      std::set<const Place *> formulaPlaces = places();
+      std::set<Place *> netPlaces = m.getPetriNet().getPlaces();
+      for (std::set<Place *>::iterator p = netPlaces.begin(); p != netPlaces.end(); p++)
+        switch (flag_)
+        {
+        case ALL_PLACES_EMPTY:
+          if (!formulaPlaces.empty())
+            std::cerr << PACKAGE_STRING << ": Warning: ALL_PLACES_EMPTY implies that there is no place named in the formula.\n";
+          if (m[**p] != 0)
+            return false;
+          break;
+        case ALL_OTHER_PLACES_EMPTY:
+          if (formulaPlaces.count(*p) == 0 && m[**p] != 0)
+            return false;
+          break;
+        case ALL_OTHER_EXTERNAL_PLACES_EMPTY:
+          if ((*p)->getType() != Node::INTERNAL && m[**p] != 0)
+            return false;
+          break;
+        case ALL_OTHER_INTERNAL_PLACES_EMPTY:
+          if ((*p)->getType() == Node::INTERNAL && m[**p] != 0)
+            return false;
+          break;
+        default: break;
+        }
+
       return true;
     }
 
@@ -453,35 +483,27 @@ namespace pnapi
      ***** concerning places implementation
      **************************************************************************/
 
-    set<const Place *> Formula::places(bool excludeEmpty) const
+    set<const Place *> Formula::places() const
     {
       return set<const Place *>();
     }
 
-    set<const Place *> Operator::places(bool excludeEmpty) const
+    set<const Place *> Operator::places() const
     {
       set<const Place *> places;
       for (set<const Formula *>::const_iterator it = children_.begin();
 	   it != children_.end(); ++it)
 	{
-	  set<const Place *> childCps = (*it)->places(excludeEmpty);
+	  set<const Place *> childCps = (*it)->places();
 	  places.insert(childCps.begin(), childCps.end());
 	}
       return places;
     }
 
-    set<const Place *> Proposition::places(bool excludeEmpty) const
+    set<const Place *> Proposition::places() const
     {
       set<const Place *> places;
       places.insert(&place_);
-      return places;
-    }
-
-    set<const Place *> FormulaEqual::places(bool excludeEmpty) const
-    {
-      set<const Place *> places;
-      if (!excludeEmpty || tokens_ > 0)
-        places.insert(&place_);
       return places;
     }
 
@@ -497,91 +519,49 @@ namespace pnapi
     void Conjunction::simplifyChildren()
     {
       set<const Formula *> children = children_;
-      for (set<const Formula *>::iterator it = children.begin();
-	   it != children.end(); ++it)
-	if (dynamic_cast<const FormulaTrue *>(*it) != NULL)
-	  {
-	    children_.erase(*it);
-	    delete *it;
-	  }
-	else
-	  {
-	    const Operator * o = dynamic_cast<const Conjunction *>(*it);
-	    if (o != NULL)
-	      {
-		for (set<const Formula *>::const_iterator it =
-		       o->children().begin(); it != o->children().end(); ++it)
-		  children_.insert((*it)->clone());
-		children_.erase(o);
-		delete o;
-	      }
-	  }
+      for (set<const Formula *>::iterator it = children.begin(); it
+          != children.end(); ++it)
+        if (dynamic_cast<const FormulaTrue *> (*it) != NULL)
+        {
+          children_.erase(*it);
+          delete *it;
+        }
+        else
+        {
+          const Operator * o = dynamic_cast<const Conjunction *> (*it);
+          if (o != NULL)
+          {
+            for (set<const Formula *>::const_iterator it =
+                o->children().begin(); it != o->children().end(); ++it)
+              children_.insert((*it)->clone());
+            children_.erase(o);
+            delete o;
+          }
+        }
     }
 
     void Disjunction::simplifyChildren()
     {
       set<const Formula *> children = children_;
-      for (set<const Formula *>::iterator it = children.begin();
-	   it != children.end(); ++it)
-	if (dynamic_cast<const FormulaFalse *>(*it) != NULL)
-	  {
-	    children_.erase(*it);
-	    delete *it;
-	  }
-	else
-	  {
-	    const Operator * o = dynamic_cast<const Disjunction *>(*it);
-	    if (o != NULL)
-	      {
-		for (set<const Formula *>::const_iterator it =
-		       o->children().begin(); it != o->children().end(); ++it)
-		  children_.insert((*it)->clone());
-		children_.erase(o);
-		delete o;
-	      }
-	  }
-    }
-
-
-  /***************************************************************************
-   ******** removeProposition
-   ***************************************************************************/
-
-    bool Operator::removeProposition(const Place *p)
-    {
-      for (std::set<const Formula *>::iterator f = children_.begin(); f != children_.end(); f++)
-      {
-        Formula *ff = const_cast<Formula *>(*f);
-        if (ff->removeProposition(p))
+      for (set<const Formula *>::iterator it = children.begin(); it
+          != children.end(); ++it)
+        if (dynamic_cast<const FormulaFalse *> (*it) != NULL)
         {
-          children_.erase(f);
+          children_.erase(*it);
+          delete *it;
         }
-      }
-
-      simplifyChildren();
-
-      return false;
-    }
-
-
-    bool Proposition::removeProposition(const Place *p)
-    {
-      if (p == &place_)
-        return true;
-      else
-        return false;
-    }
-
-
-    bool FormulaTrue::removeProposition(const Place *p)
-    {
-      return false;
-    }
-
-
-    bool FormulaFalse::removeProposition(const Place *p)
-    {
-      return false;
+        else
+        {
+          const Operator * o = dynamic_cast<const Disjunction *> (*it);
+          if (o != NULL)
+          {
+            for (set<const Formula *>::const_iterator it =
+                o->children().begin(); it != o->children().end(); ++it)
+              children_.insert((*it)->clone());
+            children_.erase(o);
+            delete o;
+          }
+        }
     }
 
   } /* namespace formula */

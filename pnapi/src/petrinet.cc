@@ -1536,7 +1536,7 @@ namespace pnapi
       createArc(intt, intp);
       createArc(comp, intt);
 
-      condition_ = condition_.formula() && intp == 0 && comp == 1;
+      condition_ = condition_.formula() && comp == 1;
     }
     for (std::set<Place *>::const_iterator p = output.begin();
         p != output.end(); p++)
@@ -1555,9 +1555,8 @@ namespace pnapi
       }
       createArc(intt, **p);
       createArc(intp, intt);
-
-      condition_ = condition_.formula() && intp == 0;
     }
+    finalCondition() = finalCondition().formula() && formula::ALL_OTHER_PLACES_EMPTY;
   }
 
 

@@ -46,13 +46,16 @@ namespace pnapi
   Automaton::Automaton(PetriNet &net) :
     counter_(0)
   {
+    // initializing private variables
     net_ = new PetriNet(net);
     edgeLabels_ = new std::map<Transition *, std::string>();
     edgeTypes_ = new std::map<Transition *, Type>();
     weights_ = new std::map<const Place *, unsigned int>();
     hashTable_ = new std::vector<std::set<State *> >(HASH_SIZE);
 
+    // normalizing the copied net and retrieving the edge labels
     (*edgeLabels_) = net_->normalize();
+    // preparing input and output labels
     for (std::set<Place *>::iterator p = net_->getInterfacePlaces().begin(); p != net_->getInterfacePlaces().end(); p++)
     {
       if ((*p)->getType() == Node::INPUT)
@@ -60,6 +63,7 @@ namespace pnapi
       else
         addOutput((*p)->getName());
     }
+    // giving each transition its type
     for (std::set<Transition *>::iterator t = net_->getTransitions().begin();
         t != net_->getTransitions().end(); t++)
       switch((**t).getType())
@@ -76,9 +80,10 @@ namespace pnapi
       default:
         break;
       }
-
+    // deleting all interface places
     net_->makeInnerStructure();
 
+    // making a marking's hash value more random
     srand(time(NULL));
     //unsigned int size = net_->getPlaces().size();
     for (std::set<Place *>::iterator p = net_->getPlaces().begin();
@@ -87,8 +92,10 @@ namespace pnapi
       (*weights_)[*p] = rand() % HASH_SIZE;
     }
 
+    // creating initial state
     State &start = createState(*new Marking(*net_));
     start.initial();
+    // beginning to find follow-up states
     dfs(start);
   }
 
@@ -295,22 +302,8 @@ namespace pnapi
       result->createArc(*t,*p);
     }
 
-    // generate all other places empty
-    std::set<const Place *> concerning = final.concerningPlaces();
-    std::set<const Place *> places;
-    for (std::set<Place *>::iterator p = result->getPlaces().begin(); p != result->getPlaces().end(); p++)
-      places.insert(const_cast<Place *>(*p));
-    std::set<const Place *> difference = util::setDifference(places, concerning);
-    Condition empty;
-    empty = true;
-    for (std::set<const Place *>::iterator p = difference.begin();
-        p != difference.end(); p++)
-    {
-      empty = empty.formula() && (**p) == 0;
-    }
-
-    // generate final condition;
-    result->finalCondition() = final.formula() && empty.formula();
+    // generate final condition
+    result->finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
 
     return *result;
   }

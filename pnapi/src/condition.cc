@@ -165,12 +165,13 @@ namespace pnapi
     set<const Formula *> propositions;
     for (map<const Place *, unsigned int>::const_iterator it = m.begin();
 	 it != m.end(); ++it)
-      propositions.insert(new FormulaEqual(*it->first, it->second));
+      if (it->second != 0)
+        propositions.insert(new FormulaEqual(*it->first, it->second));
 
     if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
-      *this = Conjunction(propositions);
+      *this = Conjunction(propositions, NULL, formula::ALL_OTHER_PLACES_EMPTY);
     else
-      *this = formula() || Conjunction(propositions);
+      *this = formula() || Conjunction(propositions, NULL, formula::ALL_OTHER_PLACES_EMPTY);
 
     for (set<const Formula *>::iterator it = propositions.begin();
 	 it != propositions.end(); ++it)

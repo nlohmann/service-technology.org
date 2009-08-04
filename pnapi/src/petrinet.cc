@@ -437,154 +437,186 @@ namespace pnapi
 
 
   /*!
-   * Given a second Petri net #net, the internal structure is added and input
-   * and output places are connected appropriatly (if an input and an output
-   * place name of the two nets match).
+   * \brief Merges this net with a second net.
+   * 
+   * Given a second Petri net #net, a resulting net is created
+   * by applying the following steps:
+   * 
+   * 1.: Internal places of this net and #net are prefixed and copied
+   *     in the resulting net
+   * 2.: Input and output places are connected appropriatly 
+   *     (if an input and an output place name of the two nets match)
+   *     or copied (without a prefix!).
+   * 3.: Unlabled transitions of #net are copied in this net; 
+   *     labeled Transitions  are merged with the appropiate
+   *     transitions of #net.
+   * 
    */
   void PetriNet::compose(const PetriNet & net, const string & prefix,
 			 const string & netPrefix)
   {
     PetriNet result;
+    // mapping from source nets' places to result net's places
     map<const Place *, const Place *> placeMap;
 
+    // ------------ STEP 1 -----------------------------
+    
+    // sets of internalplaces
     set<Place *> thisPlaces = getInternalPlaces();
     set<Place *> netPlaces = net.getInternalPlaces();
-    for (set<Place *>::iterator p = thisPlaces.begin(); p != thisPlaces.end(); p++)
+    
+    // copy internal places of this net
+    for (set<Place *>::iterator p = thisPlaces.begin(); 
+           p != thisPlaces.end(); ++p)
+    {
       placeMap[*p] = &result.createPlace(prefix+(*p)->getName(), Node::INTERNAL, (*p)->getTokenCount());
-    for (set<Place *>::iterator p = netPlaces.begin(); p != netPlaces.end(); p++)
+    }
+    
+    // copy internal places of #net
+    for (set<Place *>::iterator p = netPlaces.begin(); 
+            p != netPlaces.end(); ++p)
+    {
       placeMap[*p] = &result.createPlace(netPrefix+(*p)->getName(), Node::INTERNAL, (*p)->getTokenCount());
-    set<Transition *> thisTransitions = getTransitions();
-    set<Transition *> netTransitions = net.getTransitions();
-    for (set<Transition *>::iterator t = thisTransitions.begin(); t != thisTransitions.end(); t++)
-    {
-      Transition &nt = result.createTransition(prefix+(*t)->getName());
-      set<Arc *> preset = (*t)->getPresetArcs();
-      set<Arc *> postset = (*t)->getPostsetArcs();
-      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
-      {
-        Place *p = result.findPlace(prefix+(*f)->getPlace().getName());
-        if (p != NULL)
-          result.createArc(*p, nt, (*f)->getWeight());
-      }
-      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
-      {
-        Place *p = result.findPlace(prefix+(*f)->getPlace().getName());
-        if (p != NULL)
-          result.createArc(nt, *p, (*f)->getWeight());
-      }
     }
-    for (set<Transition *>::iterator t = netTransitions.begin(); t != netTransitions.end(); t++)
-    {
-      Transition &nt = result.createTransition(netPrefix+(*t)->getName());
-      set<Arc *> preset = (*t)->getPresetArcs();
-      set<Arc *> postset = (*t)->getPostsetArcs();
-      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
-      {
-        Place *p = result.findPlace(netPrefix+(*f)->getPlace().getName());
-        if (p != NULL)
-          result.createArc(*p, nt, (*f)->getWeight());
-      }
-      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
-      {
-        Place *p = result.findPlace(netPrefix+(*f)->getPlace().getName());
-        if (p != NULL)
-          result.createArc(nt, *p, (*f)->getWeight());
-      }
-    }
-
+    
+    // ------------ STEP 2 -----------------------------
+    
+    // sets of interface places
     set<Place *> thisInput = getInputPlaces();
     set<Place *> thisOutput = getOutputPlaces();
     set<Place *> netInput = net.getInputPlaces();
     set<Place *> netOutput = net.getOutputPlaces();
 
-    for (set<Place *>::iterator p = thisInput.begin(); p != thisInput.end(); p++)
+    // iterate through this nets input places
+    for (set<Place *>::iterator p = thisInput.begin(); 
+            p != thisInput.end(); ++p)
     {
-      Place *ip = NULL;
-      Place *opponent = net.findPlace((*p)->getName());
-      set<Arc *> postset = (*p)->getPostsetArcs();
-      set<Arc *> preset;
+      Place *rp = NULL; // place in result net
+      Place *opponent = net.findPlace((*p)->getName()); // place in #net
 
-      if (opponent == NULL)
+      if ( (opponent == NULL) || // if this place doesn't occur in #net
+           (opponent->getType() != Node::OUTPUT) ) // if the found place is no matching output place
       {
-        ip = &result.createPlace(prefix+(*p)->getName(), Node::INPUT);
+        // then the resulting place remains an interface place
+        rp = &result.createPlace((*p)->getName(), Node::INPUT);
       }
-      else
+      else // if there is a matching output place
       {
-        ip = &result.createPlace((*p)->getName());
-        if (opponent->getType() != Node::OUTPUT)
-          preset.clear();
-        else
-        {
-          netOutput.erase(opponent);
-          placeMap[opponent] = ip;
-          preset = opponent->getPresetArcs();
-        }
+        // the resulting place becomes an internal place
+        rp = &result.createPlace((*p)->getName());
+        
+        /* places are already merged, so the corresponding
+         * output place can be removed from #net's output set. */ 
+        netOutput.erase(opponent);
+        
+        placeMap[opponent] = rp;
       }
-      placeMap[*p] = ip;
-      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
-        result.createArc(*ip, *result.findTransition(prefix+(*f)->getTransition().getName()), (*f)->getWeight());
-      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
-        result.createArc(*result.findTransition(netPrefix+(*f)->getTransition().getName()), *ip, (*f)->getWeight());
+      
+      placeMap[*p] = rp;
     }
 
-    for (set<Place *>::iterator p = thisOutput.begin(); p != thisOutput.end(); p++)
+    // iterate through this net's output places
+    for (set<Place *>::iterator p = thisOutput.begin(); 
+            p != thisOutput.end(); ++p)
     {
-      //cerr << "iterating output set: " << (*p)->getName() << endl;
-      Place *ip = NULL;
-      Place *opponent = net.findPlace((*p)->getName());
-      set<Arc *> postset;
-      set<Arc *> preset = (*p)->getPresetArcs();
+      Place *rp = NULL; // place in result net
+      Place *opponent = net.findPlace((*p)->getName()); // place in #net
 
-      if (opponent == NULL)
+      if ( (opponent == NULL) || // if this place doesn't occur in #net
+           (opponent->getType() != Node::INPUT) ) // if the found place is no matching input place
       {
-        ip = &result.createPlace(prefix+(*p)->getName(), Node::OUTPUT);
+        // then the resulting place remains an interface place
+        rp = &result.createPlace((*p)->getName(), Node::OUTPUT);
       }
-      else
+      else // if there is a matching input place
       {
-        ip = &result.createPlace((*p)->getName());
-        if (opponent->getType() != Node::INPUT)
-          postset.clear();
-        else
-        {
-          netInput.erase(opponent);
-          placeMap[opponent] = ip;
-          postset = opponent->getPostsetArcs();
-        }
+        // the resulting place becomes an internal place
+        rp = &result.createPlace((*p)->getName());
+        
+        /* places are already merged, so the corresponding
+         * input place can be removed from #net's input set. */ 
+        netInput.erase(opponent);
+        
+        placeMap[opponent] = rp;
       }
-      placeMap[*p] = ip;
-      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
-        result.createArc(*ip, *result.findTransition(netPrefix+(*f)->getTransition().getName()), (*f)->getWeight());
-      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
-        result.createArc(*result.findTransition(prefix+(*f)->getTransition().getName()), *ip, (*f)->getWeight());
+      
+      placeMap[*p] = rp;
     }
 
-    for (set<Place *>::iterator p = netInput.begin(); p != netInput.end(); p++)
+    /* 
+     * all matching interface places have been merged, so the remaining
+     * places are also interface places in the resulting net
+     */
+    
+    // iterate #net's input places
+    for (set<Place *>::iterator p = netInput.begin(); 
+            p != netInput.end(); ++p)
     {
       Place *np = &result.createPlace((*p)->getName(), Node::INPUT);
       placeMap[*p] = np;
-
-      set<Arc *> postset = (*p)->getPostsetArcs();
-      for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); f++)
-        result.createArc(*np, *result.findTransition(netPrefix+(*f)->getTransition().getName()), (*f)->getWeight());
     }
 
-    for (set<Place *>::iterator p = netOutput.begin(); p != netOutput.end(); p++)
+    // iterate #net's output places
+    for (set<Place *>::iterator p = netOutput.begin(); 
+            p != netOutput.end(); ++p)
     {
       Place *np = &result.createPlace((*p)->getName(), Node::OUTPUT);
       placeMap[*p] = np;
-
-      set<Arc *> preset = (*p)->getPresetArcs();
-      for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); f++)
-        result.createArc(*result.findTransition(netPrefix+(*f)->getTransition().getName()), *np, (*f)->getWeight());
     }
 
+    // ------------ STEP 3 -----------------------------
+    
+    // iterate through this net's transitions
+    for (set<Transition *>::iterator t = getTransitions().begin(); 
+            t != getTransitions().end(); ++t)
+    {
+      // create a prefixed transition in the resulting net
+      Transition &nt = result.createTransition(prefix+(*t)->getName());
+      
+      // copy preset arcs
+      for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+              f != (*t)->getPresetArcs().end(); ++f)
+      {
+        result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), nt, (*f)->getWeight());
+      }
+      
+      // copy postset arcs
+      for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+              f != (*t)->getPostsetArcs().end(); ++f)
+      {
+        result.createArc(nt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+      }
+    }
+    
+    // iterate through #net's transitions
+    for (set<Transition *>::iterator t = net.getTransitions().begin(); 
+            t != net.getTransitions().end(); ++t)
+    {
+      // create a prefixed transition in the resulting net
+      Transition &nt = result.createTransition(netPrefix+(*t)->getName());
+      
+      // copy preset arcs
+      for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+              f != (*t)->getPresetArcs().end(); ++f)
+      {
+        result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), nt, (*f)->getWeight());
+      }
+      
+      // copy postset arcs
+      for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+              f != (*t)->getPostsetArcs().end(); ++f)
+      {
+        result.createArc(nt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+      }
+    }
+    
+    /*!
+     * \todo check me!
+     */
     result.finalCondition().merge(finalCondition(), placeMap);
     result.finalCondition().merge(net.finalCondition(), placeMap);
 
-    /*cerr << io::owfn << *this;
-    cerr << io::owfn << net;
-    cerr << io::owfn << result;*/
-
+    // overwrite this net with the resulting net
     *this = result;
 
     /*assert(prefix != netPrefix);

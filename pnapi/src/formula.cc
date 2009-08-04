@@ -2,12 +2,13 @@
 #include <cassert>
 
 #ifndef NDEBUG
-#include <iostream>
 #include "myio.h"
 #include "component.h"
 using std::cout;
 using std::endl;
 #endif
+
+#include <iostream>
 
 #include "marking.h"
 #include "formula.h"

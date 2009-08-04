@@ -20,7 +20,6 @@
 #include <cassert>
 
 #ifndef NDEBUG
-#include <iostream>
 #include <fstream>
 #include "myio.h"
 using std::cout;
@@ -30,6 +29,7 @@ using pnapi::io::operator<<;
 using pnapi::io::util::operator<<;
 #endif
 
+#include <iostream>
 #include <sstream>
 
 #include "link.h"

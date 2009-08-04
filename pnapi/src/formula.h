@@ -7,6 +7,7 @@
 #include <set>
 #include <string>
 #include "marking.h"
+#include "myio.h"
 
 namespace pnapi
 {

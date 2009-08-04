@@ -115,14 +115,14 @@ identlist:
         newEvent = new Event($1, 0, T_SYNC, false);
     } else {
         og_yyerror("read an event of unknown type");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
     
     if ( parsedOG->events.find($1) == parsedOG->events.end() ) {
         parsedOG->events[$1] = newEvent;
     } else {
         og_yyerror("read an event twice");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
     
     free($1);
@@ -138,14 +138,14 @@ identlist:
         newEvent = new Event($3, 0, T_SYNC, false);
     } else {
         og_yyerror("read an event of unknown type");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
     
     if ( parsedOG->events.find($3) == parsedOG->events.end() ) {
         parsedOG->events[$3] = newEvent;
     } else {
         og_yyerror("read an event twice");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
     
     free($3);
@@ -197,13 +197,13 @@ annotation:
   {
     // parsing 2-bit OGs is not supported
     og_yyerror("read a 2-bit annotation; only formulae are supported");
-    return EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
 | DOUBLECOLON BIT_F
   {
     // parsing 2-bit OGs is not supported
     og_yyerror("read a 2-bit annotation; only formulae are supported");
-    return EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
 ;
 
@@ -276,7 +276,7 @@ successors:
             currentNode->successors[currentSuccessor].push_back(successorEvent);
         } else {
             og_yyerror("read a successor with unknown event");
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         }
     //} else {
     //    og_yyerror("read a successor node twice");

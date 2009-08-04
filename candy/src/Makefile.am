@@ -2,6 +2,7 @@ bin_PROGRAMS = candy
 
 candy_SOURCES = og-syntax.yy og-lexic.ll \
                 cf-syntax.yy cf-lexic.ll \
+                nf-syntax.yy nf-lexic.ll \
                 settings.h \
                 Graph.cc Graph.h \
                 Node.cc Node.h \
@@ -10,11 +11,11 @@ candy_SOURCES = og-syntax.yy og-lexic.ll \
                 main.cc config.h \
                 cmdline.c cmdline.h
 
-BUILT_SOURCES = cmdline.c og-syntax.cc cf-syntax.cc
+BUILT_SOURCES = cmdline.c og-syntax.cc cf-syntax.cc nf-syntax.cc
 
-EXTRA_DIST = cmdline.ggo og-syntax.h cf-syntax.h
+EXTRA_DIST = cmdline.ggo og-syntax.h cf-syntax.h nf-syntax.h
 
-MAINTAINERCLEANFILES = cmdline.c cmdline.h og-syntax.h cf-syntax.h
+MAINTAINERCLEANFILES = cmdline.c cmdline.h og-syntax.h cf-syntax.h nf-syntax.h
 
 
 ################################################################

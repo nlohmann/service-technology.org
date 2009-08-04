@@ -1,26 +1,23 @@
 {
   generator:    Wendy 1.4-unreleased (sparc-sun-solaris2.9)
-  invocation:   wendy costOG2.owfn --lola=lola-full --og 
-  events:       6 send, 0 receive, 0 synchronous
-  statistics:   11 nodes
-
-  modified
+  invocation:   wendy costOG1.owfn --lola=lola-full --og 
+  events:       2 send, 0 receive, 0 synchronous
+  statistics:   4 nodes
 }
 
 INTERFACE
   OUTPUT
-    a1, a2;
+    a1, b1;
 
 NODES
-  890016 : (a1 + a2)
-    a1 -> 921960
-    a2 -> 922200
-  922200 : a1
-    a1 -> 940168
-  940168 : FINAL
-  921960 : a2
-    a2 -> 921980
-  921980 : FINAL
+  889736 : (a1 + b1)
+    a1 -> 889616
+    b1 -> 889416
+  888976 : final
+  889416 : a1
+    a1 -> 888976
+  889616 : b1
+    b1 -> 888976
   0 : true
     a1 -> 0
-    a2 -> 0
+    b1 -> 0

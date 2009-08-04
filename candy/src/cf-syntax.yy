@@ -21,8 +21,7 @@ extern int cf_yylex();
 extern int cf_yyerror(char const *msg);
 
 // for parser
-map< string, bool > parsedEvents;
-
+map< string, bool > parsedEventsCF;
 %}
 
 %name-prefix="cf_yy"
@@ -44,12 +43,13 @@ map< string, bool > parsedEvents;
 %%
 
 
+
 costfile:
   eventcost
   {
-    if ( parsedEvents.size() != parsedOG->events.size() ) {
+    if ( parsedEventsCF.size() != parsedOG->events.size() ) {
         cf_yyerror("given costfile does not include all events from given OG");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
   }
 ;
@@ -60,18 +60,18 @@ eventcost:
 | eventcost IDENT NUMBER SEMICOLON
   {
     // check and set cost entry for current event
-    if ( parsedEvents.find($2) == parsedEvents.end() ) {
+    if ( parsedEventsCF.find($2) == parsedEventsCF.end() ) {
         map< string, Event* >::iterator iter = parsedOG->events.find($2);
         if ( iter != parsedOG->events.end() ) {
             (iter->second)->cost = $3;
-            parsedEvents[$2] = true;
+            parsedEventsCF[$2] = true;
         } else {
-            cf_yyerror("read an event which is not used in given OG");
-            return EXIT_FAILURE;
+            cf_yyerror("given costfile includes events which are not used in given OG");
+            exit(EXIT_FAILURE);
         }
     } else {
-        cf_yyerror("read an event in given costfile twice");
-        return EXIT_FAILURE;
+        cf_yyerror("given costfile includes events several times");
+        exit(EXIT_FAILURE);
     }
 
     free($2);

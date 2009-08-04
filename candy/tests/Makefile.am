@@ -8,7 +8,15 @@ EXTRA_DIST = testsuite.at wrap.sh \
              testfiles/costOG2.og \
              testfiles/costOG2.cf \
              testfiles/costOG2.owfn \
-             testfiles/costOG2_expected.og
+             testfiles/costOG2_expected.og \
+             testfiles/incomplete.cf \
+             testfiles/overfull.cf \
+             testfiles/error_repetitions.cf \
+             testfiles/incomplete.owfn \
+             testfiles/overfull.owfn \
+             testfiles/error_weigths.owfn \
+             testfiles/error_shared.owfn \
+             testfiles/error_nonnormal.owfn
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

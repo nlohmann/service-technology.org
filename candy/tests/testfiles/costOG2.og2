@@ -1,0 +1,44 @@
+{
+  generator:    Wendy 1.4-unreleased (sparc-sun-solaris2.9)
+  invocation:   wendy costOG2.owfn --lola=lola-full --og=costOG2.og2 --formula=2bits 
+  events:       6 send, 0 receive, 0 synchronous
+  statistics:   11 nodes
+}
+
+INTERFACE
+  OUTPUT
+    a1, a2, b1, b2, b3, b4;
+
+NODES
+  890016 :: S
+    a1 -> 889896
+    a2 -> 942672
+    b1 -> 942632
+    b2 -> 922216
+    b3 -> 921856
+    b4 -> 921976
+  889016 :: F
+  889896 :: S
+    b1 -> 889016
+    b2 -> 942272
+  921376 :: F
+  921856
+    a2 -> 921376
+  921936 :: F
+  921976
+    a2 -> 921936
+  922216
+    a1 -> 942272
+  942272 :: F
+  942632
+    a1 -> 889016
+  942672 :: S
+    b3 -> 921376
+    b4 -> 921936
+  0
+    a1 -> 0
+    a2 -> 0
+    b1 -> 0
+    b2 -> 0
+    b3 -> 0
+    b4 -> 0

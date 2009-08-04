@@ -14,14 +14,16 @@ INITIALMARKING
 FINALMARKING
   p1:   1;
 
-TRANSITION ca1 : 1
+TRANSITION ca1
+COST 1;
 CONSUME
   p0:    1,
   a1:    1;
 PRODUCE
   pa1:   1;
 
-TRANSITION cb1 : 2
+TRANSITION cb1
+COST 2;
 CONSUME
   pa1:   1,
   b1:    1;

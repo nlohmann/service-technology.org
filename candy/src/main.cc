@@ -14,7 +14,8 @@ extern int cf_yyparse();
 extern FILE* cf_yyin;
 
 /// nf lexer and parser
-// TODO
+extern int nf_yyparse();
+extern FILE* nf_yyin;
 
 
 
@@ -97,10 +98,16 @@ int main(int argc, char** argv) {
 
         INFO "cost will be read from netfile" END
 
-        // TODO read open net
-        cerr << PACKAGE << ": reading a netfile is not implemented" << endl;
-        exit(EXIT_FAILURE);
+        // get netfile name
+        string netfile = ( args_info.netfile_arg != NULL ? args_info.netfile_arg : inputPrefix + ".owfn" );
+        assert(netfile != "");
 
+        // open filestream
+        nf_yyin = fopen( netfile.c_str(), "r");
+        if ( !nf_yyin ) {
+            cerr << PACKAGE << ": failed to open netfile '" << netfile << "'" << endl;
+            exit(EXIT_FAILURE);
+        }
     } else {
 
         cerr << PACKAGE << ": a costfile or a netfile must be given" << endl;
@@ -157,15 +164,14 @@ int main(int argc, char** argv) {
 		cf_yyparse();
 		fclose(cf_yyin);
 	} else {
-		// TODO parse netfile and close stream
-        //nf_yyparse();
-        //fclose(nf_yyin);
+        nf_yyparse();
+        fclose(nf_yyin);
 	}
 
-	//debug("finished cost parsing, parsed following data:\n\n");
-	//parsedOG->outputDebug();
-	//debug("finished cost parsing, parsed following data (recursively):\n\n");
-	//(parsedOG->root)->printToStdoutRecursively();
+	DEBUG "finished cost parsing, parsed following data:\n\n" END
+    if (args_info.debug_flag) parsedOG->outputDebug( cout );
+	DEBUG "finished cost parsing, parsed following data (recursively):\n\n" END
+    if (args_info.debug_flag) (parsedOG->root)->printToStdoutRecursively();
 
 
 
@@ -176,10 +182,10 @@ int main(int argc, char** argv) {
 	INFO "computing cost efficient og ..." END
 	(parsedOG->root)->computeEfficientSuccessors();
 
-	//debug("finished computing cost efficient og, current og:\n\n");
-	//parsedOG->outputDebug();
-	//debug("finished computing cost efficient og, current og (recursively):\n\n");
-	//(parsedOG->root)->printToStdoutRecursively();
+	DEBUG "finished computing cost efficient og, current og:\n\n" END
+    if (args_info.debug_flag) parsedOG->outputDebug( cout );
+	DEBUG "finished computing cost efficient og, current og (recursively):\n\n" END
+    if (args_info.debug_flag) (parsedOG->root)->printToStdoutRecursively();
 
 
 

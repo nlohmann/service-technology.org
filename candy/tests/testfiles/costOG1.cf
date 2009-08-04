@@ -2,7 +2,7 @@
     this cost file was written manually
 }
 
-a1 2;
-a2 4;
+a1 1;
+b1 2;
 
 { comment }

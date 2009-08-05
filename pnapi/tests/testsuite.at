@@ -189,6 +189,15 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14064 (https://gna.org/bugs/?14064)])
+m4_define([NET], [bug14064.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn -rdead_nodes NET -oowfn],0,ignore,stderr)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P_in|= 3  |P_out|= 3" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

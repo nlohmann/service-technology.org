@@ -19,7 +19,8 @@ libpnapi_la_SOURCES = \
 	automaton.h automaton.cc\
 	state.h state.cc \
 	marking.h marking.cc \
-	myio.h myio.cc io-format.cc
+	myio.h myio.cc io-format.cc \
+	errorhandling.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
                 parser-petrify.cc parser-petrify.h parser-petrify-lexer.cc \

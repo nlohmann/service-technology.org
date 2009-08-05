@@ -2,12 +2,6 @@
 #.PHONY : subversion.h
 #endif
 
-if FROMSVN
-V=1
-else
-V=0
-endif
-
 AM_CXXFLAGS=@configured_CXXFLAGS@
 AM_CFLAGS=@configured_CFLAGS@
 AM_LDFLAGS=@configured_LDFLAGS@

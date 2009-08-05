@@ -3,7 +3,7 @@ AC_INIT(Marlene, 0.5-unreleased, christian.gierds@service-technology.org)
 AC_CONFIG_SRCDIR([src/marlene.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE([gnits dist-bzip2 silent-rules])
+AM_INIT_AUTOMAKE([gnits])
 
 # look up canonical build name and write it to the config header
 AC_CANONICAL_BUILD

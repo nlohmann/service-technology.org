@@ -19,7 +19,7 @@
 #include <string>
 #include <istream>
 
-#include "io.h"
+#include "myio.h"
 #include "link.h"
 #include "automaton.h"
 #include "component.h"

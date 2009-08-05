@@ -7,15 +7,15 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2009-07-11 09:35:43 +0200 (Sa, 11. Jul 2009) $
+ * \date    $Date: 2009-08-04 16:59:49 +0200 (Di, 04. Aug 2009) $
  *
- * \version $Revision: 4424 $
+ * \version $Revision: 4511 $
  */
 
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
-#include "io.h"
+#include "myio.h"
 #include "condition.h"
 #include "petrinet.h"
 #include "automaton.h"

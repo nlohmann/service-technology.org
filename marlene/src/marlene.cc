@@ -1,5 +1,5 @@
 /*****************************************************************************\
- Marlene -- Synthesis of behavioral adapters
+ Marlene -- synthesizing behavioral adapters
 
  Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
 
@@ -35,7 +35,6 @@
 
 // include PN Api headers
 #include "pnapi/pnapi.h"
-// #include "pnapi/parser.h"
 
 int main(int argc, char* argv[])
 {
@@ -75,10 +74,13 @@ int main(int argc, char* argv[])
     for (int i = 0; i < argc; ++i) {
         invocation += std::string(argv[i]) + " ";
     }
-    
+
+    time_t start_time, end_time;
+
     /******************\
     * Reading all nets *
     \******************/
+    time(&start_time);
     // if nets given as arguments read from files
     if ( args_info.inputs_num > 0 )
     {
@@ -86,7 +88,7 @@ int main(int argc, char* argv[])
         {
             pnapi::PetriNet * net = new pnapi::PetriNet();
             std::string filename = args_info.inputs[i];
-            std::cerr << "file: " << filename << std::endl;
+            status("reading open net from file \"%s\"", filename.c_str());
             try {
                 std::ifstream inputfile(filename.c_str(), std::ios_base::in);
                 if (inputfile.good())
@@ -116,6 +118,7 @@ int main(int argc, char* argv[])
         pnapi::PetriNet * net = new pnapi::PetriNet();
         nets.push_back(net);
         try {
+            status("reading open net from STDIN");
             std::cin >> pnapi::io::owfn >> *net;
         } catch (pnapi::io::InputError error) {
             std::cerr << PACKAGE << ":" << error << std::endl;
@@ -124,6 +127,8 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
+    time(&end_time);
+    status("reading all input nets done [%.0f sec]", difftime(end_time, start_time));
     
     /*************************\
     * All necessary variables *
@@ -132,10 +137,12 @@ int main(int argc, char* argv[])
     //! #rs contains a RuleSet that is provided for the adapter
     RuleSet rs;
     //! #adapter
-    Adapter adapter(nets, rs, contType, messageBound);
+    Adapter adapter(nets, rs, contType, messageBound, useCompPlaces);
 
     if ( args_info.rulefile_given )
     {
+        time(&start_time);
+        status("reading transformation rules from file \"%s\"", args_info.rulefile_arg);
         FILE * rulefile (NULL);
         if((rulefile = fopen(args_info.rulefile_arg,"r")))
         {
@@ -147,10 +154,31 @@ int main(int argc, char* argv[])
         {
             abort(2, "Rule file %s could not be opened for reading", args_info.rulefile_arg);
         }
+        time(&end_time);
+        status("reading all rules file done [%.0f sec]", difftime(end_time, start_time));
     }
     
+    /*********************\
+    * Building the engine *
+    \*********************/
+    
+    time(&start_time);
     pnapi::PetriNet engine (*adapter.buildEngine());
+    time(&end_time);
+    status("engine built [%.0f sec]", difftime(end_time, start_time));
+    
+    /*************************\
+    * Building the controller *
+    \*************************/
+    
+    time(&start_time);
     pnapi::PetriNet controller (*adapter.buildController());
+    time(&end_time);
+    status("controller built [%.0f sec]", difftime(end_time, start_time));
+    
+    /*******************************************************************\
+    * Composing engine and controller in order to get the final adapter *
+    \*******************************************************************/
     
     engine.compose(controller, "engine", "controller");
     

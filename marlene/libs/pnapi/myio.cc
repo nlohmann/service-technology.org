@@ -3,7 +3,7 @@
 
 #include "parser.h"
 #include "automaton.h"
-#include "io.h"
+#include "myio.h"
 
 using std::map;
 using std::set;

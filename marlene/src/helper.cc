@@ -1,3 +1,21 @@
+/*****************************************************************************\
+ Marlene -- synthesizing behavioral adapters
+
+ Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
+
+ Marlene is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Marlene is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+\*****************************************************************************/
 
 #include <cstdarg>
 #include <cstdio>
@@ -18,6 +36,7 @@ gengetopt_args_info args_info;
 // some initial values, which are the default values
 Adapter::ControllerType contType = Adapter::SYNCHRONOUS;
 unsigned int messageBound = 1;
+bool useCompPlaces = true;
 bool veryverbose = false;
 unsigned int veryverboseindent = 0;
 
@@ -79,7 +98,7 @@ void status(const char* format, ...) {
 void evaluate_command_line(int argc, char* argv[])
 {
     // overwrite invokation for consistent error messages
-    argv[0] = PACKAGE;
+    // argv[0] = PACKAGE;
 
     // set default values
     cmdline_parser_init(&args_info);
@@ -105,6 +124,11 @@ void evaluate_command_line(int argc, char* argv[])
         messageBound = args_info.messagebound_arg;
     }
     
+    if (args_info.nocomplementplaces_given)
+    {
+        useCompPlaces = (args_info.nocomplementplaces_flag == 0);
+    }
+
     if (args_info.asyncif_given && args_info.asyncif_flag)
     {
         contType = Adapter::ASYNCHRONOUS;

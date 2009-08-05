@@ -3,7 +3,7 @@ AC_INIT(Marlene, 0.5-unreleased, christian.gierds@service-technology.org)
 AC_CONFIG_SRCDIR([src/marlene.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE(gnits)
+AM_INIT_AUTOMAKE([gnits color-tests dist-bzip2 silent-rules])
 
 # look up canonical build name and write it to the config header
 AC_CANONICAL_BUILD
@@ -45,9 +45,18 @@ AC_CONFIG_TESTDIR(tests)
 #AC_PATH_PROG(LOLA_FULL, [lola-full], [])
 #AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
+AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
+if test "$PETRIFY" = "not found"; then
+  AC_MSG_WARN([Petrify was not found. See file README.])
+  AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
+fi
+AC_SUBST(PETRIFY)
+
 
 # needed for the Petri Net API
-AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
+#AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,
@@ -173,7 +182,10 @@ AC_CONFIG_FILES([Makefile
                  src/marlene.conf
                  src/Makefile
                  tests/Makefile
-                 tests/package.m4])
+                 tests/package.m4
+                 doc/Doxyfile
+                 doc/Makefile
+                 man/Makefile])
 AC_OUTPUT
 
 #############################################################################

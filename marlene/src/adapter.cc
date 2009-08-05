@@ -1,35 +1,21 @@
-/*****************************************************************************
- * Copyright 2008 Christian Gierds                                           *
- *                                                                           *
- * This file is part of Fiona.                                               *
- *                                                                           *
- * Fiona is free software; you can redistribute it and/or modify it          *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
- *****************************************************************************/
+/*****************************************************************************\
+ Marlene -- synthesizing behavioral adapters
 
-/*!
- * \file    adapter.cc
- *
- * \brief   all functionality for adapter generation
- *
- * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *
- * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitaet zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
- *
- */
+ Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
+
+ Marlene is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Marlene is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+\*****************************************************************************/
 
 #include <iostream>
 #include <fstream>
@@ -43,20 +29,19 @@
 #include "pnapi/pnapi.h"
 
 
-//! \brief a basic constructor of Adapter
+/* For documentation of the following functions, please see header file. */
+
 Adapter::Adapter(std::vector< pnapi::PetriNet *> & nets, RuleSet & rs,
-                ControllerType contType, unsigned int messageBound) :
+                ControllerType contType, unsigned int messageBound, 
+                bool useCompPlaces) :
     _engine(new pnapi::PetriNet), _nets(nets), _rs(rs), _contType(contType),
-                    _messageBound(messageBound)
+                    _messageBound(messageBound), _useCompPlaces(useCompPlaces)
 {
     FUNCIN
-    //createEngineInterface();
-    //createRuleTransitions();
+    /* empty */
     FUNCOUT
 }
 
-
-//! \brief a basic destructor of Adapter
 Adapter::~Adapter()
 {
     FUNCIN
@@ -72,12 +57,18 @@ Adapter::~Adapter()
 const pnapi::PetriNet * Adapter::buildEngine()
 {
     FUNCIN
+    // create engine and transitions for the transformation rules
     createEngineInterface();
     createRuleTransitions();
+
     // adapter specific reduction should take place here
+    removeUnnecessaryRules();
+    findConflictFreeTransitions();
     
+    // reduce engine with standard PNAPI methods
     _engine->reduce(pnapi::PetriNet::LEVEL_4);
     
+    // set final condition
     pnapi::Condition & finalCond = _engine->finalCondition();
     finalCond.addMarking(*(new pnapi::Marking(*_engine)));
 
@@ -91,6 +82,7 @@ const pnapi::PetriNet * Adapter::buildController()
 
     using namespace pnapi;
 
+    // _engine should exist here 
     if (_engine != NULL)
     {
         // we make a copy of the engine, #_engine is needed for the result
@@ -98,13 +90,21 @@ const pnapi::PetriNet * Adapter::buildController()
         PetriNet * _enginecopy = new PetriNet(*_engine);
         
         // create complementary places for the engine's internal places
-        Adapter::createComplementaryPlaces(_enginecopy);
+        if (_useCompPlaces)
+        {
+            Adapter::createComplementaryPlaces(*_enginecopy);
+        }
+        else
+        {
+            status("skipping creation of complementary places once ..");
+        }
     
         // compose nets and engine
         std::map< std::string, pnapi::PetriNet * > nets;
 
         PetriNet * composed = new PetriNet(*_enginecopy);
 
+        // compose engine with nets
         for ( unsigned int i = 0; i < _nets.size(); i++)
         {
             if ( i == 0 )
@@ -115,63 +115,72 @@ const pnapi::PetriNet * Adapter::buildController()
             {
                 composed->compose(*_nets[i], std::string(""), std::string("net" + toString(i+1) + "." ));
             }
-                
         }
-    
-        Condition & finalCond = composed->finalCondition();
-    
-        
-        // add complementary places to former interface.
-        for ( unsigned int i = 0; i < _nets.size(); i++)
-        {
-            const std::set< Place * > & ifPlaces = _nets[i]->getInterfacePlaces();
-            std::set< Place * >::const_iterator placeIter = ifPlaces.begin();
-            while ( placeIter != ifPlaces.end() )
-            {
-                std::string placeName = (*placeIter)->getName();
-                std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
-                
-                Place * place = composed->findPlace(placeName);
-                if (place == NULL)
-                {
-                    place = composed->findPlace(placeName2);
-                    placeName = placeName2;
-                }
-                assert (place);
-    
-                Place * compPlace = &composed->createPlace("comp_" + placeName,
-                    Node::INTERNAL, _messageBound+1, _messageBound+1);
-    
-                formula::FormulaEqual * prop = new formula::FormulaEqual(*compPlace,_messageBound);
-                finalCond.addProposition(*prop);
-                
-                std::set< Node * > postSet = place->getPostset();
-                std::set< Node * >::iterator nodeIter = postSet.begin();
-                while ( nodeIter != postSet.end() )
-                {
-                    composed->createArc(**nodeIter, *compPlace);
-                    nodeIter++;
-                }
 
-                std::set< Node * > preSet = place->getPreset();
-                nodeIter = preSet.begin();
-                while ( nodeIter != preSet.end() )
+        // add complementary places for the now internal former interface places
+        if (_useCompPlaces)
+        {
+            Condition & finalCond = composed->finalCondition();
+
+            for (unsigned int i = 0; i < _nets.size(); i++)
+            {
+                const std::set< Place *> & ifPlaces =
+                                _nets[i]->getInterfacePlaces();
+                std::set< Place *>::const_iterator placeIter = ifPlaces.begin();
+                while (placeIter != ifPlaces.end() )
                 {
-                    composed->createArc(*compPlace, **nodeIter);
-                    
-                    // deadlock transition for message bound violation of former interface
-                    Transition * dlTrans = &composed->createTransition("dl_" + placeName);
-                    composed->createArc(*place, *dlTrans, _messageBound + 1);
-                    
-                    nodeIter++;
+                    std::string placeName = (*placeIter)->getName();
+                    std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
+
+                    Place * place = composed->findPlace(placeName);
+                    if (place == NULL)
+                    {
+                        place = composed->findPlace(placeName2);
+                        placeName = placeName2;
+                    }
+                    assert(place);
+
+                    Place * compPlace = &composed->createPlace("comp_"
+                                    + placeName, Node::INTERNAL, _messageBound
+                                    +1, _messageBound+1);
+
+                    formula::FormulaEqual * prop = new formula::FormulaEqual(*compPlace,_messageBound + 1);
+                    finalCond.addProposition(*prop);
+
+                    std::set< Node *> postSet = place->getPostset();
+                    std::set< Node *>::iterator nodeIter = postSet.begin();
+                    while (nodeIter != postSet.end() )
+                    {
+                        composed->createArc(**nodeIter, *compPlace);
+                        nodeIter++;
+                    }
+
+                    std::set< Node *> preSet = place->getPreset();
+                    nodeIter = preSet.begin();
+                    while (nodeIter != preSet.end() )
+                    {
+                        composed->createArc(*compPlace, **nodeIter);
+
+                        // deadlock transition for message bound violation of former interface
+                        Transition * dlTrans =
+                                        &composed->createTransition("dl_"
+                                                        + placeName);
+                        composed->createArc(*place, *dlTrans, _messageBound + 1);
+
+                        nodeIter++;
+                    }
+
+                    placeIter++;
                 }
-                
-                placeIter++;
             }
+        }
+        else
+        {
+            status("skipping creation of complementary places twice ..");
         }
         
         // finally reduce the strucure of the net as far as possible
-        //composed->reduce(pnapi::PetriNet::LEVEL_4);
+        composed->reduce(pnapi::PetriNet::LEVEL_4);
     
         if (_contType == ASYNCHRONOUS)
         {
@@ -231,21 +240,28 @@ const pnapi::PetriNet * Adapter::buildController()
         * transform most-permissive partner to open net *
         \***********************************************/
         time(&start_time);
-        pnapi::PetriNet * controller = new pnapi::PetriNet(mpp_sa->stateMachine());
+        pnapi::PetriNet * controller;
+        if (std::string(CONFIG_PETRIFY) != "not found")
+        {
+            controller = new pnapi::PetriNet(*mpp_sa);
+        }
+        else
+        {
+            controller = new pnapi::PetriNet(mpp_sa->stateMachine());
+        }
         time(&end_time);
+        
         if (args_info.verbose_flag) {
             std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *controller << std::endl;
         }
         status("converting most-permissive partner done [%.0f sec]", difftime(end_time, start_time));
-        
-        return controller;
+
         FUNCOUT
-        
-        
+        return controller;
     }
     
-    return NULL;
     FUNCOUT
+    return NULL;
 }
     
 /**
@@ -353,7 +369,7 @@ void Adapter::createRuleTransitions()
     {
         const RuleSet::AdapterRule & rule = **ruleIter;
         
-        std::string transName = "rule_" + toString(transNumber);
+        std::string transName (Adapter::getRuleName(transNumber));
         
         // create rule transition
         
@@ -440,46 +456,209 @@ void Adapter::createRuleTransitions()
     FUNCOUT
 }
 
-void Adapter::createComplementaryPlaces(pnapi::PetriNet * net)
+void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
 {
     FUNCIN
     
     using namespace pnapi;
     
-    std::set< Place * > intPlaces = net->getInternalPlaces();
+    std::set< Place * > intPlaces = net.getInternalPlaces();
     std::set< Place * >::iterator placeIter = intPlaces.begin();
     
     while ( placeIter != intPlaces.end() )
     {
-        Place * place = *placeIter;
-        Place * compPlace = &net->createPlace("comp_" + place->getName(),
-            Node::INTERNAL, place->getCapacity(), place->getCapacity());
+        Place & place = **placeIter;
+        Place & compPlace = net.createPlace("comp_" + place.getName(),
+            Node::INTERNAL, place.getCapacity(), place.getCapacity());
         
         // update final condition
-        Condition & finalCond = net->finalCondition();
+        Condition & finalCond = net.finalCondition();
 
-        formula::FormulaEqual * prop = new formula::FormulaEqual(*compPlace, place->getCapacity());
+        formula::FormulaEqual * prop = new formula::FormulaEqual(compPlace, place.getCapacity());
         finalCond.addProposition(*prop);
 
-        std::set< Node * > preSet = place->getPreset();
+        std::set< Node * > preSet = place.getPreset();
         std::set< Node * >::iterator nodeIter = preSet.begin();
         while ( nodeIter != preSet.end() )
         {
-            net->createArc(*compPlace, **nodeIter);
+            net.createArc(compPlace, **nodeIter);
             nodeIter++;
         }
         
-        std::set< Node * > postSet = place->getPostset();
+        std::set< Node * > postSet = place.getPostset();
         nodeIter = postSet.begin();
         while ( nodeIter != postSet.end() )
         {
-            net->createArc(**nodeIter, *compPlace);
+            net.createArc(**nodeIter, compPlace);
             nodeIter++;
         }
         
         placeIter++;
     }
     
+    FUNCOUT
+}
+
+void Adapter::removeUnnecessaryRules()
+{
+    FUNCIN
+
+    using namespace pnapi;
+
+    std::set<Place *> possibleDeadPlaces = _engine->getInternalPlaces();
+
+    while ( !possibleDeadPlaces.empty() )
+    {
+        // find all place with an empty preset (so places are structually dead
+
+        std::set<Place *>::iterator placeIter = possibleDeadPlaces.begin();
+
+        std::list<Place *> placeDeletionList;
+
+        while (placeIter != possibleDeadPlaces.end() )
+        {
+            if ((*placeIter)->getPreset().empty() )
+            {
+                //status("Place %s is dead.", (*placeIter)->getName().c_str());
+                placeDeletionList.push_back(*placeIter);
+            }
+            placeIter++;
+        }
+
+        possibleDeadPlaces.clear();
+        
+        // delete dead places and all depending nodes
+        std::list<Place *>::iterator place2Delete = placeDeletionList.begin();
+
+        while (place2Delete != placeDeletionList.end() )
+        {
+            Place * p = *place2Delete;
+            //status("Deleting post set of place %s.", p->getName().c_str());
+
+            std::set<Node *> postset = p->getPostset();
+
+            std::set<Node *>::iterator nodeIter = postset.begin();
+
+            while (nodeIter != postset.end() )
+            {
+                if (_contType == ASYNCHRONOUS)
+                {
+                    status("Deleting transition %s.", (*nodeIter)->getName().c_str());
+
+                    std::string controlplacename = "control_" + (*nodeIter)->getName();
+                    std::string observeplacename = "observe_" + (*nodeIter)->getName();
+
+                    Place * p;
+
+                    p = _engine->findPlace(controlplacename);
+
+                    if (p != NULL)
+                    {
+                        _engine->deletePlace(*p);
+                    }
+
+                    p = _engine->findPlace(observeplacename);
+
+                    if (p != NULL)
+                    {
+                        _engine->deletePlace(*p);
+                    }
+
+                }
+
+                std::set< Node * > deadCandidates = (*nodeIter)->getPostset();
+                std::set< Node * >::const_iterator cand = deadCandidates.begin();
+                
+                while ( cand != deadCandidates.end() )
+                {
+                    possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
+                    cand++;
+                }
+                
+
+                _engine->deleteTransition(*(dynamic_cast<Transition*>(*nodeIter)));
+                // deleting adjacent interface places, if they exist
+
+                nodeIter++;
+            }
+
+            //status("Deleting place %s.", p->getName().c_str());
+            _engine->deletePlace(*p);
+
+            place2Delete++;
+        }
+    }
+    FUNCOUT
+}
+
+void Adapter::findConflictFreeTransitions()
+{
+    FUNCIN
+    using namespace pnapi;
+
+    for (unsigned int i = 1; i <= _rs.getRules().size(); i++)
+    {
+        // get the name of the transition
+        std::string transname(Adapter::getRuleName(i));
+
+        Transition * trans = _engine->findTransition(transname);
+        // does it still exist
+        if (trans != NULL)
+        {
+            // check every pre place, if it is conflict free
+            std::set< Node *> preset = trans->getPreset();
+            std::set< Node *>::iterator placeIter = preset.begin();
+
+            while (placeIter != preset.end() )
+            {
+                if ( (*placeIter)->getType() == pnapi::Place::INTERNAL && (*placeIter)->getPostset().size() == 1)
+                {
+                    // if controller type is synchronous remove label
+                    if (_contType == SYNCHRONOUS)
+                    {
+                        std::set< std::string> labels =
+                                        trans->getSynchronizeLabels();
+                        labels.erase("sync_" + transname);
+                        trans->setSynchronizeLabels(labels);
+                    } 
+                    else // remove interface places
+                    {
+                        std::string controlplacename = "control_" + transname;
+                        std::string observeplacename = "observe_" + transname;
+
+                        pnapi::Place * p;
+
+                        p = _engine->findPlace(controlplacename);
+
+                        if (p != NULL)
+                        {
+                            _engine->deletePlace(*p);
+                        }
+
+                        p = _engine->findPlace(observeplacename);
+
+                        if (p != NULL)
+                        {
+                            _engine->deletePlace(*p);
+                        }
+
+                    }
+                    placeIter = preset.end();
+                } else
+                {
+                    placeIter++;
+                }
+            }
+        }
+    }
+    FUNCOUT
+}
+
+//! returns the name for the rule with index i
+inline std::string Adapter::getRuleName(unsigned int i)
+{
+    FUNCIN
+    return "rule_" + toString(i);
     FUNCOUT
 }
 

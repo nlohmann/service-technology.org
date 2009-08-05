@@ -419,8 +419,7 @@ formula:
   | KEY_FALSE         { $$ = new formula::FormulaFalse(); }
   | KEY_ALL_PLACES_EMPTY 
     { 
-      formula::Conjunction c;
-      $$ = new formula::Conjunction(c, *((std::set<const Place*>*)&pnapi_owfn_yynet.getPlaces())); 
+      $$ = new formula::Conjunction(formula::ALL_PLACES_EMPTY); 
     }
   | OP_NOT formula
     { 
@@ -441,17 +440,17 @@ formula:
     }
   | formula OP_AND KEY_ALL_OTHER_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, *((std::set<const Place*>*)&pnapi_owfn_yynet.getPlaces()));
+      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_PLACES_EMPTY);
       delete $1;
     }
   | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, *((std::set<const Place*>*)&pnapi_owfn_yynet.getInternalPlaces()));
+      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_INTERNAL_PLACES_EMPTY);
       delete $1;
     }
   | formula OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, *((std::set<const Place*>*)&pnapi_owfn_yynet.getInterfacePlaces()));
+      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_EXTERNAL_PLACES_EMPTY);
       delete $1;
     }
   | node_name OP_EQ NUMBER

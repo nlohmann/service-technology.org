@@ -1,10 +1,14 @@
-                      http://service-technology.org/marlene
+                      __  __            _
+                     |  \/  | __ _ _ __| | ___ _ __   ___
+                     | |\/| |/ _` | '__| |/ _ \ '_ \ / _ \
+                     | |  | | (_| | |  | |  __/ | | |  __/
+                     |_|  |_|\__,_|_|  |_|\___|_| |_|\___|
+                     http://service-technology.org/marlene
 
 
-Version 0.5-unreleased
-======================
+Marlene 0.5-unreleased
+----------------------
 
-* initial release, reduction is still missing
-
+This is the initial release. Features are:
 
 

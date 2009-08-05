@@ -1,0 +1,9 @@
+@heading Version 0.5-unreleased
+@itemize
+
+@item initial release
+
+@item choice whether to use synchronous/asynchronous interface between controller and engine
+
+@end itemize
+

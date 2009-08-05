@@ -2,6 +2,12 @@
 #.PHONY : subversion.h
 #endif
 
+if FROMSVN
+V=1
+else
+V=0
+endif
+
 AM_CXXFLAGS=@configured_CXXFLAGS@
 AM_CFLAGS=@configured_CFLAGS@
 AM_LDFLAGS=@configured_LDFLAGS@
@@ -30,7 +36,7 @@ endif
 BUILT_SOURCES = parser_adapt_rules.cc lexer_adapt_rules.cc \
 		subversion.h cmdline.c
 
-EXTRA_DIST = parser_adapt_rules.h cmdline.ggo
+EXTRA_DIST = parser_adapt_rules.h cmdline.ggo subversion.h
 
 MAINTAINERCLEANFILES = parser_adapt_rules.h parser_adapt_rules.cc \
 		       lexer_adapt_rules.cc \
@@ -45,16 +51,20 @@ cmdline.c: cmdline.ggo
 # automatically add SVN revision to a header file
 if FROMSVN
 svnrevision = \#define SVNREV \"`svnversion -c`\"
-else
-svnrevision =
-endif
 
 subversion.h: $(marlene_SOURCES)
 	@echo "#ifndef SUBVERSION_H" > subversion.h
 	@echo "#define SUBVERSION_H" >> subversion.h
 	@echo "$(svnrevision)" >> subversion.h
 	@echo "#endif" >>subversion.h
+else
+svnrevision =
 
+subversion.h:
+	@echo "#ifndef SUBVERSION_H" > subversion.h
+	@echo "#define SUBVERSION_H" >> subversion.h
+	@echo "#endif" >>subversion.h
+endif
 
 doxygen:
 	cd ../doc ; doxygen

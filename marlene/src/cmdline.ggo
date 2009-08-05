@@ -34,9 +34,9 @@ option "asyncif" a
   "Creates an asynchronous interface between adapter engine and controller. (Default is synchronous.)"
   flag off
 
-option "complementplaces" p
+option "nocomplementplaces" n
   "Creates complementary places in the engine part of the adapter (only in an intermediate state), in order to avoid unbounded places. Capacity of the places is influenced by the message bound."
-  flag on
+  flag off
 
 section "Debug"
 
@@ -46,6 +46,7 @@ option "verbose" v
 
 option "veryverbose" w
   "Prints a lot of code information. Has only an effect on debug builds!"
+  dependon="verbose"
   flag off
 
 section "Configuration"

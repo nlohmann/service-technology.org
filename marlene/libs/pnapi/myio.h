@@ -6,13 +6,13 @@
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: niels $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2009-07-11 11:14:24 +0200 (Sa, 11. Jul 2009) $
+ * \date    $Date: 2009-08-04 16:59:49 +0200 (Di, 04. Aug 2009) $
  *
- * \version $Revision: 4425 $
+ * \version $Revision: 4511 $
  */
 
 

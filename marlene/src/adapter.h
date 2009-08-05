@@ -1,22 +1,21 @@
-/*****************************************************************************
- * Copyright 2008 Christian Gierds                                           *
- *                                                                           *
- * This file is part of Fiona.                                               *
- *                                                                           *
- * Fiona is free software; you can redistribute it and/or modify it          *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
- *****************************************************************************/
+/*****************************************************************************\
+ Marlene -- synthesizing behavioral adapters
+
+ Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
+
+ Marlene is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Marlene is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+\*****************************************************************************/
 
 /*!
  * \file    adapter.h
@@ -24,10 +23,6 @@
  * \brief   all functionality for adapter generation
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *
- * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitaet zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
 
@@ -43,8 +38,12 @@ class Adapter;
 class RuleSet;
 
 /**
+ * \brief Given nets and rules creates engine, controller and finally an 
+ *        adapter.
  * 
- * 
+ * Typical usage of this class is to read the input nets and a rule set, which 
+ * are given to the constructor of this class, and then run 
+ * Adapter::buildEngine() and Adapter::buildController().
  */
 
 class Adapter
@@ -55,23 +54,49 @@ class Adapter
         //! type of interface between engine and controller
         enum ControllerType {SYNCHRONOUS, ASYNCHRONOUS};
         
-        //! constructor
+        /*! 
+         * \brief Given a vector of nets, a rule set, the type of the controller 
+         *        and a message bound initializes the adapter.
+         * 
+         * \param nets          a vector of nets that shall be adapted
+         * \param rs            a set of message transformation rules
+         * \param contType      sets the interface between engine and controller
+         *                      to be SYNCHRONOUS or ASYNCHRONOUS
+         * \param useCompPlaces flag, whether to use complementary places in the
+         *                      engine
+         * \param messagebound  the messagebound of the nets
+         */ 
         Adapter(std::vector< pnapi::PetriNet *> & nets, RuleSet & rs,
                         ControllerType contType = SYNCHRONOUS,
-                        unsigned int messagebound = 1);
+                        unsigned int messagebound = 1, 
+                        bool useCompPlace = true);
 
-        //! basic destructor
+        /*!
+         * \brief Destroys the adapter, also deletes Adapter::_engine.
+         */
         ~Adapter();
         
-        //! actually build the engine
+        /*!
+         * \brief Actually builds the engine.
+         * 
+         * \return pointer to the engine containing appropriate interface and 
+         *         rule transitions
+         */
         const pnapi::PetriNet * buildEngine();
         
-        //! actually build the controller
+        /*!
+         * \brief Actually builds the controller.
+         * 
+         * \note Should only be called after Adapter::buildEngine()
+         * 
+         * \return pointer to the controller of Adapter::_engine composed with 
+         *         Adapter::_nets, NULL if no controller could be built 
+         */
         const pnapi::PetriNet * buildController();
 
     private:
         
-        //! #pnapi::PetriNet containing the engine part of the adapter
+        //! pnapi::PetriNet containing the engine part of the adapter
         pnapi::PetriNet * _engine;
         
         //! vector of all nets being adapted
@@ -86,66 +111,188 @@ class Adapter
         //! message bound on interface, neccesary for complement places
         unsigned int _messageBound;
 
-        //! given the #_nets, creates the interface for #_engine
+        //! flag indicating, whether to use complementary places or not
+        bool _useCompPlaces;
+        
+        /*!
+         * \brief Given the #_nets, creates the interface for #_engine.
+         */
         void createEngineInterface();
         
-        //! given the #_rs rule set, creates the transitions handling the rule for #_engine
+        /*!
+         * \brief Given the rule set #_rs, creates the transitions handling the 
+         *        rules for #_engine.
+         */
         void createRuleTransitions();
         
-        //! creates complementary places for all internal places
-        static void createComplementaryPlaces(pnapi::PetriNet * net);
+        /*!
+         * \brief Creates complementary places for all internal places.
+         * 
+         * \param net pointer to the net, for which complementary places shall be created
+         */
+        static void createComplementaryPlaces(pnapi::PetriNet & net);
+        
+        /*!
+         * \brief Removes rules that hinder reaching the controller goal, or are just superfluous.
+         */
+        void removeUnnecessaryRules();
+        
+        /*!
+         * \brief Finds transitions that have atleast one place in their preset
+         *        without any confict, and removes these transitions' interface
+         *        to the controller.
+         */
+        void findConflictFreeTransitions();
+        
+        /*! 
+         * \brief Returns the name for the rule with index i.
+         * 
+         * \param i index of the rule (so its number)
+         * 
+         * \return string representing the rule's for using as transition name
+         */ 
+        static inline std::string getRuleName(unsigned int i);
         
 
 };
 
+/*!
+ * \brief Contains a set of message transformation rules.
+ * 
+ * Typical usage of this class is to create an object of it and to add rules by
+ * calling addRules().
+ */ 
 class RuleSet {
     public:
         
+        /*!
+         * \brief Represents exactly one rule.
+         */
         class AdapterRule {
             
             public:
+                //! type of a rule pair
                 typedef std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair;
                 
-                enum cfMode { AR_NORMAL, AR_HIDDEN, AR_OBSERVABLE, AR_CONTROLLABLE };
+                /*! 
+                 * \brief Modus of a transformation rule
+                 *
+                 * Normally a transformation rule is observable and 
+                 * controllable. So, the rule must be triggered, in order to 
+                 * apply it (controllable) and it can be observed, if the rule
+                 * was actually applied.
+                 * For sake of expressiveness this behavior can be restricted.
+                 */
+                enum cfMode { 
+                    AR_NORMAL,      //!< rule is observable and controllable
+                    AR_HIDDEN,      //!< rule is neither observable nor controllable
+                    AR_OBSERVABLE,  //!< rule is observable, but not contrallable
+                    AR_CONTROLLABLE //!< rule is controllable, but not obserable
+                    };
 
+                /*!
+                 * \brief Given a #rulepair and a modus for the transformation
+                 *        rule create an adapter rule.
+                 * 
+                 * \param rule  a reference to a #rulepair
+                 * \param modus modus of the transformation rule
+                 */
                 AdapterRule(rulepair & rule, cfMode modus = AR_NORMAL); 
 
+                /*!
+                 * \brief basic destructor, nothing happens here
+                 */
                 ~AdapterRule();
                 
+                /*!
+                 * \brief Returns the #rulepair associated with the object.
+                 * 
+                 * \return the associated #rulepair
+                 */
                 inline const rulepair & getRule() const;
+                
+                /*!
+                 * \brief Returns the modus of the transformation rule.
+                 * 
+                 * \return the transformation rule's modus
+                 */
                 inline const cfMode & getMode() const;
             
             private:
+                
+                /*! 
+                 * \brief a std::pair of unsigned int lists containing the 
+                 *        consumed (left) and produced (right) messages of
+                 *        a transformation rule
+                 * 
+                 * \note messages are referenced by their internal id
+                 *       (see RuleSet::getMessageForId)
+                 */
                 const std::pair< std::list< unsigned int >, std::list< unsigned int > > _rule;
+                
+                //! modus of the commnunication flow for this rule
                 const cfMode _modus;
             
         };
 
-        /// basic constructor
+        //! basic constructor
         RuleSet();
         
-        /// basic destructor
+        //! basic destructor
         ~RuleSet();
         
-        /// adds rules to #rules from a given input stream #is 
-        void addRules(FILE *);
+        /*! 
+         * \brief Adds rules to #_adapterRules from a given input file.
+         * 
+         * \param inputStream a file pointer to the file containing the transformation rules
+         */ 
+        void addRules(FILE * inputStream);
         
-        /// returns a const reference to the rules
+        /*!
+         * \brief Returns a const reference to the transformation rules.
+         * 
+         * \return list of transformation rules
+         */
         inline const std::list< AdapterRule * > getRules() const;
         
-        /// returns the message name for an id
-        inline const std::string getMessageForId(const unsigned int) const; 
+        /*!
+         * \brief Returns the message name for an ID.
+         * 
+         * \param id the id of message we want the name for
+         * 
+         * \return the message name connected to an ID
+         */
+        inline const std::string getMessageForId(const unsigned int id) const; 
 
     private:
+        //! a mapping from IDs to message names (contrary of #_messageId)
         std::map< unsigned int, std::string > _messageIndex;
+        
+        //! a mapping from message names to IDs (contrary of #_messageIndex)
         std::map< std::string, unsigned int > _messageId;
+        
+        //! a list of message transformation rules
         std::list< AdapterRule * > _adapterRules;
         
+        //! the highest used ID for a message name, is increased by getIdForMessage()
         unsigned int _maxId;
 
-        //! returns a unique id for a message name
+        /*! 
+         * \brief Returns a unique ID for a message name.
+         * 
+         * \note Increases #_maxId, if a new ID is assigned
+         * 
+         * \param message the message you want an ID for
+         * 
+         * \return the unique ID
+         */
         unsigned int getIdForMessage(std::string message);
                 
+        /*! 
+         * \brief Reference to the rules file parser, which shall have access to this classes members.
+         * 
+         * \return error code
+         */
         friend int adapt_rules_yyparse();
         
 };

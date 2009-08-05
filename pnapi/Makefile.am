@@ -1,7 +1,5 @@
 SUBDIRS = src tests utils man
 
-ACLOCAL_AMFLAGS = -I m4
-
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
 	rm -fr m4 configure Makefile.in depcomp compile config.guess \

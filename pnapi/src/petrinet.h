@@ -124,7 +124,7 @@ namespace pnapi
       UnknownTransitionError();
     };
     
-  }; /* namespace exceptions */
+  } /* namespace exceptions */
 
   /*!
    * \brief   A Petri net

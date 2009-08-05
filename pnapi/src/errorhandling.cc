@@ -40,5 +40,6 @@ namespace pnapi
   {
   }
   
-  }; /* namespace exceptions */
-}; /* namespace pnapi */
+  } /* namespace exceptions */
+} /* namespace pnapi */
+

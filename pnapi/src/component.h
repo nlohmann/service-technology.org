@@ -190,6 +190,7 @@ namespace pnapi
 
     /// the set of labels
     const std::set<std::string> & getSynchronizeLabels() const;
+    //std::set<std::string> getSynchronizeLabels() const;
     
     /// set the set of labels
     void setSynchronizeLabels(const std::set<std::string> &);

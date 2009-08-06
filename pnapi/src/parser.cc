@@ -459,6 +459,7 @@ namespace pnapi
       std::vector<std::string> identlist;
       std::set<std::string> input_;
       std::set<std::string> output_;
+      std::set<std::string> synchronous_;
 
       State *state_;
       bool final_;
@@ -466,6 +467,7 @@ namespace pnapi
       std::vector<unsigned int> succState_;
       std::vector<std::string> succLabel_;
       std::vector<Automaton::Type> succType_;
+      std::map<Transition *, std::set<std::string> > synchlabel;
 
       State *edgeState_;
       std::string edgeLabel_;
@@ -502,9 +504,7 @@ namespace pnapi
       const PetriNet & Parser::parseSA2SM(std::istream &is)
       {
         Condition final;
-        Condition empty;
         final = false;
-        empty = true;
 
         stream = &is;
 
@@ -515,21 +515,18 @@ namespace pnapi
         sa2sm = true;
         sa::parse();
 
-        std::set<Place *> places = pnapi_sa_yynet.getPlaces();
         for (int i = 0; i < (int) finalPlaces_.size(); i++)
         {
           final = final.formula() || *finalPlaces_[i] == 1;
-          places.erase(finalPlaces_[i]);
         }
-        for (std::set<Place *>::iterator p = places.begin(); p != places.end(); p++)
-          empty = empty.formula() && **p == 0;
 
-        pnapi_sa_yynet.finalCondition() = final.formula() && empty.formula();
+        pnapi_sa_yynet.finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
 
         // clean up global variables
         label2places_.clear();
         places_.clear();
         finalPlaces_.clear();
+        synchlabel.clear();
 
         return pnapi_sa_yynet;
       }

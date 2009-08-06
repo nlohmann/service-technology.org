@@ -125,10 +125,14 @@ namespace pnapi
       const Conjunction *cl = dynamic_cast<const Conjunction *>(fl);
       if (cl != NULL)
         v1 = cl->flag_;
+      else
+        v1 = NONE;
       const Formula *fr = &r;
       const Conjunction *cr = dynamic_cast<const Conjunction *>(fr);
       if (cr != NULL)
         v2 = cr->flag_;
+      else
+        v2 = NONE;
 
       if (v1/v2==2 || v2/v1==2)
         flag_ = ALL_OTHER_PLACES_EMPTY;

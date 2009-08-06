@@ -25,8 +25,10 @@ int main(int argc, char *argv[])
     }
 
     Automaton source;
+    //PetriNet target;
     std::ifstream file(input_filename.c_str(), std::ios_base::in);
     file >> io::sa >> source;
+    //file >> io::sa2sm >> target;
 
     PetriNet target = source.stateMachine();
 

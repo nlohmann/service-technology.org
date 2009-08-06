@@ -149,6 +149,7 @@ namespace pnapi
   State & Automaton::createState()
   {
     State *s = new State(&counter_);
+    assert(s != NULL);
     states_.push_back(s);
     return *s;
   }
@@ -168,6 +169,7 @@ namespace pnapi
       if (states_[i]->name() == name)
         return *states_[i];
     State *s = new State(name);
+    assert(s != NULL);
     states_.push_back(s);
     return *s;
   }
@@ -185,6 +187,7 @@ namespace pnapi
   State & Automaton::createState(Marking &m)
   {
     State *s = new State(m, weights_, &counter_);
+    assert(s != NULL);
     states_.push_back(s);
     return *s;
   }
@@ -223,6 +226,8 @@ namespace pnapi
       addInput(label);
     if (type == OUTPUT)
       addOutput(label);
+    if (type == SYNCHRONOUS)
+      labels_.insert(label);
     return *e;
   }
 
@@ -279,6 +284,8 @@ namespace pnapi
         final = final.formula() || (*(state2place[states_[i]])) == 1;
     }
 
+    // map synchlabel : T -> {string}
+    std::map<Transition *, std::set<std::string> > synchlabel;
     // generate transitions from edges
     for(unsigned int i=0; i < edges_.size(); ++i)
     {
@@ -291,6 +298,11 @@ namespace pnapi
       case Automaton::OUTPUT:
         result->createArc(*t, *result->findPlace(edges_[i]->label()));
         break;
+      case Automaton::SYNCHRONOUS:
+      {
+        synchlabel[t].insert(edges_[i]->label());
+        break;
+      }
       default:
         break;
       }
@@ -300,6 +312,22 @@ namespace pnapi
 
       p = state2place[&(edges_[i]->destination())];
       result->createArc(*t,*p);
+    }
+
+    std::set<Transition *> transitions = result->getTransitions();
+    for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
+    {
+      // FIXME: the easy way seems not to be working
+      // FIXME: THIS IS THE EASY WAY: (*t)->setSynchronizeLabels(synchlabel[*t]);
+
+      // making a copy of all transitions and give them the labels
+      Transition &tt = result->createTransition("", synchlabel[*t]);
+      for (std::set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); f != (*t)->getPresetArcs().end(); f++)
+        result->createArc((*f)->getPlace(), tt, (*f)->getWeight());
+      for (std::set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); f != (*t)->getPostsetArcs().end(); f++)
+        result->createArc(tt, (*f)->getPlace(), (*f)->getWeight());
+
+      result->deleteTransition(**t);
     }
 
     // generate final condition
@@ -573,6 +601,24 @@ namespace pnapi
           printToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
       }
     }
+  }
+
+
+  /*!
+   * This method sets the synchronous labels of the automaton.
+   */
+  void Automaton::setSynchronousLabels(const std::set<std::string> & labels)
+  {
+    labels_ = labels;
+  }
+
+
+  /*!
+   * Returning the set of synchronous labels.
+   */
+  std::set<std::string> Automaton::getSynchronousLabels() const
+  {
+    return labels_;
   }
 
 

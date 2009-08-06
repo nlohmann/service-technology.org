@@ -1,0 +1,1266 @@
+{
+  generator:    Wendy 1.6-unreleased (i686-pc-cygwin)
+  invocation:   wendy -v --sa 
+  events:       0 send, 0 receive, 21 synchronous
+  statistics:   309 nodes
+}
+
+INTERFACE
+  SYNCHRONOUS
+    sync_rule_1, sync_rule_2, sync_rule_3, sync_rule_4, sync_rule_5, sync_rule_6, sync_rule_7, sync_t_receive_CPayment, sync_t_receive_CRental_Request, sync_t_receive_RAsk_for_Rental_Dates_and_Locations, sync_t_receive_RCharge_Customer, sync_t_receive_RCustomer_Welcome, sync_t_receive_RNegociate_CarGroup, sync_t_receive_RRental_Reservation, sync_t_receive_RSelect_Payment_Type, sync_t_send_CAsk_for_Rental_Dates_and_Locations, sync_t_send_CInvoice, sync_t_send_CNegociate_CarGroup, sync_t_send_CRental_Reservation, sync_t_send_RPayment, sync_t_send_RRental_Request;
+
+NODES
+  22677488 : INITIAL
+    sync_t_receive_CRental_Request -> 22797560
+  22766336
+    sync_t_receive_RCharge_Customer -> 23503688
+    sync_t_receive_RSelect_Payment_Type -> 23526944
+    sync_t_send_CNegociate_CarGroup -> 23599560
+  22769080
+    sync_rule_1 -> 22960072
+    sync_t_receive_RCharge_Customer -> 23492672
+    sync_t_receive_RNegociate_CarGroup -> 22991896
+    sync_t_receive_RSelect_Payment_Type -> 23140464
+  22797560
+    sync_rule_3 -> 22834288
+  22799984
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23248832
+    sync_t_receive_RCharge_Customer -> 23476352
+    sync_t_receive_RCustomer_Welcome -> 23523328
+    sync_t_receive_RNegociate_CarGroup -> 23534920
+    sync_t_receive_RSelect_Payment_Type -> 23418744
+  22825352
+    sync_rule_7 -> 23667184
+    sync_t_receive_RCharge_Customer -> 23490440
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23059904
+  22830808
+    sync_t_receive_RCharge_Customer -> 23521088
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23641944
+  22834288
+    sync_t_send_RRental_Request -> 22799984
+  22960072
+    sync_t_receive_RCharge_Customer -> 23496632
+    sync_t_receive_RNegociate_CarGroup -> 22972008
+    sync_t_receive_RSelect_Payment_Type -> 23078248
+  22972008
+    sync_rule_7 -> 22766336
+    sync_t_receive_RCharge_Customer -> 23497896
+    sync_t_receive_RSelect_Payment_Type -> 23059904
+  22991896
+    sync_rule_1 -> 22972008
+    sync_rule_7 -> 23144872
+    sync_t_receive_RCharge_Customer -> 23468560
+    sync_t_receive_RSelect_Payment_Type -> 23437216
+  23000992
+    sync_rule_1 -> 23626432
+    sync_t_receive_RCharge_Customer -> 23461776
+    sync_t_receive_RSelect_Payment_Type -> 23136960
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23157232
+  23002776
+    sync_rule_1 -> 22825352
+    sync_rule_7 -> 23120544
+    sync_t_receive_RCharge_Customer -> 23461432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23437216
+  23016840
+    sync_rule_1 -> 23543224
+    sync_rule_7 -> 23116512
+    sync_t_receive_RCharge_Customer -> 23475624
+    sync_t_receive_RSelect_Payment_Type -> 23002776
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 22991896
+  23033016
+    sync_rule_1 -> 23352112
+    sync_rule_6 -> 23449168
+    sync_t_receive_RNegociate_CarGroup -> 23118720
+    sync_t_receive_RSelect_Payment_Type -> 23352472
+  23034792
+    sync_rule_6 -> 23074200
+    sync_t_receive_RCharge_Customer -> 23367832
+    sync_t_receive_RCustomer_Welcome -> 23141472
+    sync_t_receive_RSelect_Payment_Type -> 23750624
+  23045096
+    sync_t_receive_RCharge_Customer -> 23456520
+    sync_t_receive_RCustomer_Welcome -> 23140464
+    sync_t_receive_RNegociate_CarGroup -> 23706208
+  23047336
+    sync_rule_1 -> 23090216
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23343608
+    sync_t_send_CInvoice -> 23319320
+  23049832
+    sync_rule_1 -> 23088720
+    sync_rule_2 -> 23298832
+    sync_rule_7 -> 23053488
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23147664
+  23049960
+    sync_rule_1 -> 23419088
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23081784
+    sync_t_receive_RSelect_Payment_Type -> 23051144
+  23050000
+    sync_rule_1 -> 23097240
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23344920
+    sync_t_send_CInvoice -> 23327616
+    sync_t_send_CNegociate_CarGroup -> 23047336
+  23050904
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23349872
+    sync_t_receive_RNegociate_CarGroup -> 23089720
+    sync_t_send_CInvoice -> 23053912
+  23051144
+    sync_rule_1 -> 23088032
+    sync_rule_2 -> 23047336
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23351752
+  23053488
+    sync_rule_1 -> 23094976
+    sync_rule_2 -> 23050000
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23129328
+    sync_t_send_CNegociate_CarGroup -> 23051144
+  23053912
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23371464
+    sync_t_receive_RNegociate_CarGroup -> 23390424
+  23059904
+    sync_rule_7 -> 23526944
+    sync_t_receive_RCharge_Customer -> 23508224
+  23066368
+    sync_rule_2 -> 23357816
+    sync_rule_6 -> 23521088
+  23066848
+    sync_rule_1 -> 23369920
+    sync_rule_6 -> 23016840
+    sync_rule_7 -> 23340312
+    sync_t_receive_RCharge_Customer -> 23118720
+    sync_t_receive_RSelect_Payment_Type -> 23342184
+  23066888
+    sync_rule_6 -> 23512424
+    sync_rule_7 -> 23119296
+    sync_t_send_CInvoice -> 23365944
+  23072120
+    sync_rule_6 -> 23626832
+    sync_t_receive_RCustomer_Welcome -> 23353640
+    sync_t_receive_RNegociate_CarGroup -> 23390768
+  23074200
+    sync_t_receive_RCharge_Customer -> 23504920
+    sync_t_receive_RCustomer_Welcome -> 23000992
+    sync_t_receive_RSelect_Payment_Type -> 23114968
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23918808
+  23074760
+    sync_rule_7 -> 23117400
+    sync_t_receive_RCharge_Customer -> 23540728
+    sync_t_receive_RCustomer_Welcome -> 23002776
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23706208
+  23078248
+    sync_t_receive_RCharge_Customer -> 23169416
+    sync_t_receive_RNegociate_CarGroup -> 23059904
+  23080304
+    sync_rule_1 -> 23359112
+    sync_rule_6 -> 23188352
+    sync_t_send_CNegociate_CarGroup -> 23351120
+  23081064
+    sync_rule_6 -> 23430728
+    sync_t_receive_RCharge_Customer -> 23341016
+    sync_t_receive_RCustomer_Welcome -> 23340312
+    sync_t_receive_RSelect_Payment_Type -> 23409192
+    sync_t_send_CNegociate_CarGroup -> 23034792
+  23081784
+    sync_rule_1 -> 23363704
+    sync_rule_6 -> 23461776
+    sync_t_receive_RSelect_Payment_Type -> 23351752
+  23084336
+    sync_t_receive_RCharge_Customer -> 23575928
+    sync_t_receive_RCustomer_Welcome -> 23144872
+    sync_t_receive_RSelect_Payment_Type -> 23625664
+    sync_t_send_CNegociate_CarGroup -> 23918808
+  23088032
+    sync_rule_2 -> 23090216
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23066368
+  23088720
+    sync_rule_2 -> 23089720
+    sync_rule_7 -> 23094976
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23353280
+  23089024
+    sync_rule_1 -> 23090520
+    sync_rule_7 -> 23304424
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23118720
+    sync_t_receive_RSelect_Payment_Type -> 23049832
+  23089720
+    sync_rule_7 -> 23097240
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23066888
+    sync_t_send_CInvoice -> 23390424
+  23090216
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23357816
+    sync_t_send_CInvoice -> 23384888
+  23090520
+    sync_rule_7 -> 23092408
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23354960
+    sync_t_receive_RSelect_Payment_Type -> 23088720
+  23092408
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23364512
+    sync_t_receive_RSelect_Payment_Type -> 23094976
+    sync_t_send_CNegociate_CarGroup -> 23419088
+  23094976
+    sync_rule_2 -> 23097240
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23358408
+    sync_t_send_CNegociate_CarGroup -> 23088032
+  23095648
+    sync_rule_1 -> 23338976
+    sync_rule_2 -> 23298064
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23352472
+    sync_t_receive_RNegociate_CarGroup -> 23049832
+  23097240
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23119296
+    sync_t_send_CInvoice -> 23097912
+    sync_t_send_CNegociate_CarGroup -> 23090216
+  23097912
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23359112
+    sync_t_send_CNegociate_CarGroup -> 23384888
+  23101064
+    sync_rule_6 -> 23677264
+    sync_t_receive_RCustomer_Welcome -> 23343608
+    sync_t_send_CInvoice -> 23392480
+  23102776
+    sync_rule_2 -> 23339680
+    sync_rule_6 -> 23532008
+    sync_t_receive_RCustomer_Welcome -> 23129328
+    sync_t_send_CNegociate_CarGroup -> 23394360
+  23106280
+    sync_rule_6 -> 23626432
+    sync_t_receive_RCharge_Customer -> 23363704
+    sync_t_receive_RSelect_Payment_Type -> 23412848
+  23106816
+    sync_rule_6 -> 23667184
+    sync_t_receive_RCharge_Customer -> 23358408
+    sync_t_send_CNegociate_CarGroup -> 23412848
+  23107472
+    sync_rule_6 -> 22825352
+    sync_rule_7 -> 23106816
+    sync_t_receive_RCharge_Customer -> 23353280
+  23111040
+    sync_rule_1 -> 23066888
+    sync_rule_6 -> 23472008
+    sync_rule_7 -> 23344920
+    sync_t_send_CInvoice -> 23128736
+  23112928
+    sync_rule_1 -> 23133288
+    sync_rule_6 -> 23620576
+    sync_t_receive_RCharge_Customer -> 23352472
+    sync_t_receive_RNegociate_CarGroup -> 23342184
+  23114968
+    sync_t_receive_RCharge_Customer -> 23517800
+    sync_t_receive_RCustomer_Welcome -> 23136960
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23456056
+  23116512
+    sync_rule_1 -> 23579216
+    sync_t_receive_RCharge_Customer -> 23174584
+    sync_t_receive_RSelect_Payment_Type -> 23120544
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23144872
+    sync_t_send_CNegociate_CarGroup -> 23000992
+  23117400
+    sync_t_receive_RCharge_Customer -> 23532008
+    sync_t_receive_RCustomer_Welcome -> 23120544
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23625664
+    sync_t_send_CNegociate_CarGroup -> 23114968
+  23118488
+    sync_rule_1 -> 23364512
+    sync_rule_6 -> 23174584
+    sync_t_receive_RSelect_Payment_Type -> 23129328
+    sync_t_send_CNegociate_CarGroup -> 23081784
+  23118720
+    sync_rule_1 -> 23354960
+    sync_rule_6 -> 23475624
+    sync_rule_7 -> 23118488
+    sync_t_receive_RSelect_Payment_Type -> 23147664
+  23119296
+    sync_rule_6 -> 23488424
+    sync_t_send_CInvoice -> 23359112
+    sync_t_send_CNegociate_CarGroup -> 23357816
+  23120544
+    sync_rule_1 -> 23667184
+    sync_t_receive_RCharge_Customer -> 23175088
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23122208
+    sync_t_send_CNegociate_CarGroup -> 23136960
+  23122208
+    sync_rule_1 -> 23526944
+    sync_t_receive_RCharge_Customer -> 23191176
+    sync_t_send_CNegociate_CarGroup -> 23126240
+  23123448
+    sync_rule_1 -> 23130072
+    sync_rule_6 -> 23506616
+    sync_t_receive_RCharge_Customer -> 23033016
+    sync_t_receive_RNegociate_CarGroup -> 23066848
+    sync_t_receive_RSelect_Payment_Type -> 23112928
+  23126240
+    sync_rule_1 -> 23641944
+    sync_t_receive_RCharge_Customer -> 23191696
+  23128736
+    sync_rule_1 -> 23365944
+    sync_rule_6 -> 23468920
+    sync_rule_7 -> 23080304
+  23129328
+    sync_rule_1 -> 23358408
+    sync_rule_2 -> 23344920
+    sync_rule_6 -> 23175088
+    sync_t_send_CNegociate_CarGroup -> 23351752
+  23130072
+    sync_rule_6 -> 23434976
+    sync_t_receive_RCharge_Customer -> 23352112
+    sync_t_receive_RNegociate_CarGroup -> 23369920
+    sync_t_receive_RSelect_Payment_Type -> 23133288
+  23133288
+    sync_rule_6 -> 23561968
+    sync_t_receive_RCharge_Customer -> 23355320
+    sync_t_receive_RNegociate_CarGroup -> 23107472
+  23136960
+    sync_rule_1 -> 22830808
+    sync_t_receive_RCharge_Customer -> 23193416
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23126240
+  23140464
+    sync_rule_1 -> 23078248
+    sync_t_receive_RCharge_Customer -> 23516120
+    sync_t_receive_RNegociate_CarGroup -> 23437216
+  23141472
+    sync_rule_1 -> 23106280
+    sync_rule_6 -> 23000992
+    sync_t_receive_RCharge_Customer -> 23081784
+    sync_t_receive_RSelect_Payment_Type -> 23144488
+  23144488
+    sync_rule_1 -> 23412848
+    sync_rule_6 -> 23136960
+    sync_t_receive_RCharge_Customer -> 23351752
+  23144872
+    sync_rule_1 -> 22766336
+    sync_t_receive_RCharge_Customer -> 23193904
+    sync_t_receive_RSelect_Payment_Type -> 23122208
+    sync_t_send_CNegociate_CarGroup -> 23157232
+  23147664
+    sync_rule_1 -> 23353280
+    sync_rule_2 -> 23111040
+    sync_rule_6 -> 23461432
+    sync_rule_7 -> 23129328
+  23151560
+    sync_rule_2 -> 23384152
+    sync_rule_6 -> 23469328
+    sync_t_receive_RCustomer_Welcome -> 23352472
+    sync_t_receive_RNegociate_CarGroup -> 23152912
+  23152912
+    sync_rule_2 -> 23818424
+    sync_rule_6 -> 23540728
+    sync_rule_7 -> 23102776
+    sync_t_receive_RCustomer_Welcome -> 23147664
+  23155776
+    sync_rule_6 -> 23485048
+    sync_rule_7 -> 23341016
+    sync_t_receive_RCustomer_Welcome -> 23118720
+    sync_t_receive_RSelect_Payment_Type -> 23152912
+  23156400
+    sync_rule_6 -> 23493016
+  23157232
+    sync_rule_1 -> 23599560
+    sync_t_receive_RCharge_Customer -> 23195432
+    sync_t_receive_RSelect_Payment_Type -> 23126240
+  23169416
+    sync_rule_2 -> 23529032
+    sync_t_receive_RNegociate_CarGroup -> 23508224
+  23171976
+    sync_rule_7 -> 23714248
+    sync_t_receive_RCustomer_Welcome -> 23468920
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23650128
+  23174584
+    sync_rule_1 -> 23477664
+    sync_t_receive_RSelect_Payment_Type -> 23175088
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23193904
+    sync_t_send_CNegociate_CarGroup -> 23461776
+  23175088
+    sync_rule_1 -> 23481072
+    sync_rule_2 -> 23175432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23191176
+    sync_t_send_CNegociate_CarGroup -> 23193416
+  23175432
+    sync_rule_1 -> 23488424
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23175776
+    sync_t_send_CInvoice -> 23188352
+    sync_t_send_CNegociate_CarGroup -> 23190640
+  23175776
+    sync_rule_1 -> 23479296
+    sync_t_send_CInvoice -> 23176440
+    sync_t_send_CNegociate_CarGroup -> 23186696
+  23176440
+    sync_rule_1 -> 23487240
+    sync_t_send_CNegociate_CarGroup -> 23178320
+  23178320
+    sync_rule_1 -> 23500696
+    sync_t_receive_CPayment -> 23183912
+  23183912
+    sync_rule_1 -> 23537880
+    sync_rule_4 -> 23184256
+  23184256
+    sync_rule_1 -> 23540368
+    sync_t_send_RPayment -> 23184600
+  23184600
+    sync_rule_1 -> 23555728
+    sync_t_receive_RRental_Reservation -> 23185608
+  23185608
+    sync_rule_1 -> 23548408
+    sync_rule_5 -> 23185864
+  23185864
+    sync_rule_1 -> 23551712
+    sync_t_send_CRental_Reservation -> 23186120
+  23186120
+    sync_rule_1 -> 23554560
+  23186696
+    sync_rule_1 -> 23569920
+    sync_t_send_CInvoice -> 23178320
+  23188352
+    sync_rule_1 -> 23540024
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23176440
+    sync_t_send_CNegociate_CarGroup -> 23188920
+  23188920
+    sync_rule_1 -> 23493016
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23178320
+  23190640
+    sync_rule_1 -> 23552072
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23186696
+    sync_t_send_CInvoice -> 23188920
+  23191176
+    sync_rule_1 -> 23537160
+    sync_rule_2 -> 23175776
+    sync_t_send_CNegociate_CarGroup -> 23191696
+  23191696
+    sync_rule_1 -> 23495160
+    sync_rule_2 -> 23186696
+  23193416
+    sync_rule_1 -> 23521088
+    sync_rule_2 -> 23190640
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23191696
+  23193904
+    sync_rule_1 -> 23503688
+    sync_t_receive_RSelect_Payment_Type -> 23191176
+    sync_t_send_CNegociate_CarGroup -> 23195432
+  23195432
+    sync_rule_1 -> 23506976
+    sync_t_receive_RSelect_Payment_Type -> 23191696
+  23248832
+    sync_rule_6 -> 23327976
+    sync_t_receive_RCharge_Customer -> 23532536
+    sync_t_receive_RCustomer_Welcome -> 23123448
+    sync_t_receive_RNegociate_CarGroup -> 23534216
+    sync_t_receive_RSelect_Payment_Type -> 23451408
+  23266112
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23081064
+    sync_t_receive_RCharge_Customer -> 23595568
+    sync_t_receive_RCustomer_Welcome -> 23308416
+    sync_t_receive_RSelect_Payment_Type -> 23690848
+    sync_t_send_CNegociate_CarGroup -> 23923280
+  23278144
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23130072
+    sync_t_receive_RCharge_Customer -> 23297720
+    sync_t_receive_RNegociate_CarGroup -> 23342456
+    sync_t_receive_RSelect_Payment_Type -> 23673992
+  23292976
+    sync_rule_2 -> 23309048
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23151560
+    sync_t_receive_RCustomer_Welcome -> 23095648
+    sync_t_receive_RNegociate_CarGroup -> 23640544
+  23294224
+    sync_rule_1 -> 23297720
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23033016
+    sync_t_receive_RNegociate_CarGroup -> 23089024
+    sync_t_receive_RSelect_Payment_Type -> 23095648
+  23297720
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23352112
+    sync_t_receive_RNegociate_CarGroup -> 23090520
+    sync_t_receive_RSelect_Payment_Type -> 23338976
+  23298064
+    sync_rule_1 -> 23050904
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23342920
+    sync_t_receive_RNegociate_CarGroup -> 23298832
+    sync_t_send_CInvoice -> 23341824
+  23298832
+    sync_rule_1 -> 23089720
+    sync_rule_7 -> 23050000
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23111040
+    sync_t_send_CInvoice -> 23302920
+  23302920
+    sync_rule_1 -> 23390424
+    sync_rule_7 -> 23327616
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23128736
+  23304424
+    sync_rule_1 -> 23092408
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23118488
+    sync_t_receive_RSelect_Payment_Type -> 23053488
+    sync_t_send_CNegociate_CarGroup -> 23049960
+  23308416
+    sync_rule_1 -> 23341424
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23340312
+    sync_t_receive_RCharge_Customer -> 23304424
+    sync_t_receive_RSelect_Payment_Type -> 23815512
+    sync_t_send_CNegociate_CarGroup -> 23721320
+  23309048
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23384152
+    sync_t_receive_RCustomer_Welcome -> 23298064
+    sync_t_receive_RNegociate_CarGroup -> 23382152
+    sync_t_send_CInvoice -> 23596272
+  23319320
+    sync_rule_1 -> 23384888
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23351120
+  23326808
+    sync_rule_7 -> 23595568
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23155776
+    sync_t_receive_RCustomer_Welcome -> 23089024
+    sync_t_receive_RSelect_Payment_Type -> 23640544
+  23327616
+    sync_rule_1 -> 23097912
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23080304
+    sync_t_send_CNegociate_CarGroup -> 23319320
+  23327976
+    sync_t_receive_RCharge_Customer -> 23422664
+    sync_t_receive_RCustomer_Welcome -> 23506616
+    sync_t_receive_RNegociate_CarGroup -> 23479904
+    sync_t_receive_RSelect_Payment_Type -> 23462752
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23594040
+  23334504
+    sync_rule_1 -> 23106816
+    sync_rule_6 -> 23120544
+    sync_t_receive_RCharge_Customer -> 23129328
+    sync_t_send_CNegociate_CarGroup -> 23144488
+  23336816
+    sync_rule_6 -> 23074760
+    sync_rule_7 -> 23409192
+    sync_t_receive_RCharge_Customer -> 23152912
+    sync_t_receive_RCustomer_Welcome -> 23342184
+  23338976
+    sync_rule_2 -> 23050904
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23355320
+    sync_t_receive_RNegociate_CarGroup -> 23088720
+  23339680
+    sync_rule_6 -> 23554216
+    sync_t_receive_RCustomer_Welcome -> 23344920
+    sync_t_send_CInvoice -> 23364064
+    sync_t_send_CNegociate_CarGroup -> 23101064
+  23340312
+    sync_rule_1 -> 23375480
+    sync_rule_6 -> 23116512
+    sync_t_receive_RCharge_Customer -> 23118488
+    sync_t_receive_RSelect_Payment_Type -> 23334504
+    sync_t_send_CNegociate_CarGroup -> 23141472
+  23341016
+    sync_rule_6 -> 23458520
+    sync_t_receive_RCustomer_Welcome -> 23118488
+    sync_t_receive_RSelect_Payment_Type -> 23102776
+    sync_t_send_CNegociate_CarGroup -> 23367832
+  23341424
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23375480
+    sync_t_receive_RCharge_Customer -> 23092408
+    sync_t_receive_RSelect_Payment_Type -> 23640136
+    sync_t_send_CNegociate_CarGroup -> 23683880
+  23341824
+    sync_rule_1 -> 23053912
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23353640
+    sync_t_receive_RNegociate_CarGroup -> 23302920
+  23342184
+    sync_rule_1 -> 23107472
+    sync_rule_6 -> 23002776
+    sync_rule_7 -> 23334504
+    sync_t_receive_RCharge_Customer -> 23147664
+  23342456
+    sync_rule_7 -> 23341424
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23369920
+    sync_t_receive_RCharge_Customer -> 23090520
+    sync_t_receive_RSelect_Payment_Type -> 23366664
+  23342920
+    sync_rule_1 -> 23349872
+    sync_rule_6 -> 23470728
+    sync_t_receive_RNegociate_CarGroup -> 23111040
+    sync_t_send_CInvoice -> 23353640
+  23343608
+    sync_rule_1 -> 23357816
+    sync_rule_6 -> 23190640
+    sync_t_send_CInvoice -> 23351120
+  23344920
+    sync_rule_1 -> 23119296
+    sync_rule_6 -> 23175432
+    sync_t_send_CInvoice -> 23080304
+    sync_t_send_CNegociate_CarGroup -> 23343608
+  23349872
+    sync_rule_6 -> 23520728
+    sync_t_receive_RNegociate_CarGroup -> 23066888
+    sync_t_send_CInvoice -> 23371464
+  23351120
+    sync_rule_1 -> 23156400
+    sync_rule_6 -> 23188920
+  23351752
+    sync_rule_1 -> 23066368
+    sync_rule_2 -> 23343608
+    sync_rule_6 -> 23193416
+  23352112
+    sync_rule_6 -> 23466072
+    sync_t_receive_RNegociate_CarGroup -> 23354960
+    sync_t_receive_RSelect_Payment_Type -> 23355320
+  23352472
+    sync_rule_1 -> 23355320
+    sync_rule_2 -> 23342920
+    sync_rule_6 -> 23541896
+    sync_t_receive_RNegociate_CarGroup -> 23147664
+  23353280
+    sync_rule_2 -> 23066888
+    sync_rule_6 -> 23490440
+    sync_rule_7 -> 23358408
+  23353640
+    sync_rule_1 -> 23371464
+    sync_rule_6 -> 23506256
+    sync_t_receive_RNegociate_CarGroup -> 23128736
+  23354960
+    sync_rule_6 -> 23477304
+    sync_rule_7 -> 23364512
+    sync_t_receive_RSelect_Payment_Type -> 23353280
+  23355320
+    sync_rule_2 -> 23349872
+    sync_rule_6 -> 23481776
+    sync_t_receive_RNegociate_CarGroup -> 23353280
+  23357816
+    sync_rule_6 -> 23552072
+    sync_t_send_CInvoice -> 23156400
+  23358408
+    sync_rule_2 -> 23119296
+    sync_rule_6 -> 23481072
+    sync_t_send_CNegociate_CarGroup -> 23066368
+  23359112
+    sync_rule_6 -> 23540024
+    sync_t_send_CNegociate_CarGroup -> 23156400
+  23363344
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23339680
+    sync_t_receive_RCustomer_Welcome -> 23050000
+    sync_t_send_CInvoice -> 23378536
+    sync_t_send_CNegociate_CarGroup -> 23648520
+  23363704
+    sync_rule_6 -> 23484344
+    sync_t_receive_RSelect_Payment_Type -> 23066368
+  23364064
+    sync_rule_6 -> 23714248
+    sync_t_receive_RCustomer_Welcome -> 23080304
+    sync_t_send_CNegociate_CarGroup -> 23392480
+  23364512
+    sync_rule_6 -> 23477664
+    sync_t_receive_RSelect_Payment_Type -> 23358408
+    sync_t_send_CNegociate_CarGroup -> 23363704
+  23365944
+    sync_rule_6 -> 23514824
+    sync_rule_7 -> 23359112
+  23366664
+    sync_rule_7 -> 23640136
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23107472
+    sync_t_receive_RCharge_Customer -> 23088720
+  23367832
+    sync_rule_6 -> 23504920
+    sync_t_receive_RCustomer_Welcome -> 23081784
+    sync_t_receive_RSelect_Payment_Type -> 23394360
+  23369920
+    sync_rule_6 -> 23543224
+    sync_rule_7 -> 23375480
+    sync_t_receive_RCharge_Customer -> 23354960
+    sync_t_receive_RSelect_Payment_Type -> 23107472
+  23371464
+    sync_rule_6 -> 23505896
+    sync_t_receive_RNegociate_CarGroup -> 23365944
+  23375480
+    sync_rule_6 -> 23579216
+    sync_t_receive_RCharge_Customer -> 23364512
+    sync_t_receive_RSelect_Payment_Type -> 23106816
+    sync_t_send_CNegociate_CarGroup -> 23106280
+  23378536
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23364064
+    sync_t_receive_RCustomer_Welcome -> 23327616
+    sync_t_send_CNegociate_CarGroup -> 23697824
+  23382152
+    sync_rule_7 -> 23363344
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23818424
+    sync_t_receive_RCustomer_Welcome -> 23298832
+    sync_t_send_CInvoice -> 23401624
+  23384152
+    sync_rule_6 -> 23580208
+    sync_t_receive_RCustomer_Welcome -> 23342920
+    sync_t_receive_RNegociate_CarGroup -> 23818424
+    sync_t_send_CInvoice -> 23072120
+  23384888
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23156400
+  23390424
+    sync_rule_7 -> 23097912
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23365944
+  23390768
+    sync_rule_6 -> 23171976
+    sync_rule_7 -> 23364064
+    sync_t_receive_RCustomer_Welcome -> 23128736
+  23392480
+    sync_rule_6 -> 23510744
+    sync_t_receive_RCustomer_Welcome -> 23351120
+  23394360
+    sync_rule_2 -> 23101064
+    sync_rule_6 -> 23517800
+    sync_t_receive_RCustomer_Welcome -> 23351752
+  23401624
+    sync_rule_7 -> 23378536
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23390768
+    sync_t_receive_RCustomer_Welcome -> 23302920
+  23404536
+    sync_rule_2 -> 23363344
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23102776
+    sync_t_receive_RCustomer_Welcome -> 23053488
+    sync_t_send_CNegociate_CarGroup -> 23669328
+  23407040
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23367832
+    sync_t_receive_RCustomer_Welcome -> 23049960
+    sync_t_receive_RSelect_Payment_Type -> 23669328
+  23409192
+    sync_rule_6 -> 23117400
+    sync_t_receive_RCharge_Customer -> 23102776
+    sync_t_receive_RCustomer_Welcome -> 23334504
+    sync_t_send_CNegociate_CarGroup -> 23750624
+  23412848
+    sync_rule_6 -> 22830808
+    sync_t_receive_RCharge_Customer -> 23066368
+  23418744
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23451408
+    sync_t_receive_RCharge_Customer -> 23292976
+    sync_t_receive_RCustomer_Welcome -> 23427040
+    sync_t_receive_RNegociate_CarGroup -> 23926128
+  23419088
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23363704
+    sync_t_receive_RSelect_Payment_Type -> 23088032
+  23422664
+    sync_t_receive_RCustomer_Welcome -> 23449168
+    sync_t_receive_RNegociate_CarGroup -> 23485048
+    sync_t_receive_RSelect_Payment_Type -> 23469328
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23482752
+  23427040
+    sync_rule_1 -> 23673992
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23112928
+    sync_t_receive_RCharge_Customer -> 23095648
+    sync_t_receive_RNegociate_CarGroup -> 23573720
+  23430728
+    sync_t_receive_RCharge_Customer -> 23458520
+    sync_t_receive_RCustomer_Welcome -> 23116512
+    sync_t_receive_RSelect_Payment_Type -> 23117400
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23084336
+    sync_t_send_CNegociate_CarGroup -> 23074200
+  23434976
+    sync_t_receive_RCharge_Customer -> 23466072
+    sync_t_receive_RNegociate_CarGroup -> 23543224
+    sync_t_receive_RSelect_Payment_Type -> 23561968
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 22960072
+  23437216
+    sync_rule_1 -> 23059904
+    sync_rule_7 -> 23122208
+    sync_t_receive_RCharge_Customer -> 23466880
+  23441592
+    sync_rule_1 -> 23342456
+    sync_rule_7 -> 23308416
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23066848
+    sync_t_receive_RCharge_Customer -> 23089024
+    sync_t_receive_RSelect_Payment_Type -> 23573720
+  23449168
+    sync_rule_1 -> 23466072
+    sync_t_receive_RNegociate_CarGroup -> 23475624
+    sync_t_receive_RSelect_Payment_Type -> 23541896
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23492672
+  23451408
+    sync_rule_6 -> 23462752
+    sync_t_receive_RCharge_Customer -> 23151560
+    sync_t_receive_RCustomer_Welcome -> 23112928
+    sync_t_receive_RNegociate_CarGroup -> 23336816
+  23456056
+    sync_t_receive_RCharge_Customer -> 23525200
+    sync_t_receive_RCustomer_Welcome -> 23126240
+  23456520
+    sync_rule_2 -> 23662352
+    sync_t_receive_RCustomer_Welcome -> 23516120
+    sync_t_receive_RNegociate_CarGroup -> 23688296
+  23458520
+    sync_t_receive_RCustomer_Welcome -> 23174584
+    sync_t_receive_RSelect_Payment_Type -> 23532008
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23575928
+    sync_t_send_CNegociate_CarGroup -> 23504920
+  23460200
+    sync_rule_7 -> 23554216
+    sync_t_receive_RCustomer_Welcome -> 23472008
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23519032
+    sync_t_send_CInvoice -> 23171976
+  23461432
+    sync_rule_1 -> 23490440
+    sync_rule_2 -> 23472008
+    sync_rule_7 -> 23175088
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23466880
+  23461776
+    sync_rule_1 -> 23484344
+    sync_t_receive_RSelect_Payment_Type -> 23193416
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23195432
+  23462752
+    sync_t_receive_RCharge_Customer -> 23469328
+    sync_t_receive_RCustomer_Welcome -> 23620576
+    sync_t_receive_RNegociate_CarGroup -> 23074760
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23045096
+  23464720
+    sync_rule_1 -> 23482408
+    sync_rule_7 -> 23175776
+    sync_t_send_CInvoice -> 23502008
+  23465352
+    sync_rule_1 -> 23529032
+    sync_t_receive_RNegociate_CarGroup -> 23464720
+    sync_t_send_CInvoice -> 23523688
+  23466072
+    sync_t_receive_RNegociate_CarGroup -> 23477304
+    sync_t_receive_RSelect_Payment_Type -> 23481776
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23496632
+  23466880
+    sync_rule_1 -> 23508224
+    sync_rule_2 -> 23464720
+    sync_rule_7 -> 23191176
+  23468560
+    sync_rule_1 -> 23497896
+    sync_rule_7 -> 23193904
+    sync_t_receive_RSelect_Payment_Type -> 23466880
+  23468920
+    sync_rule_1 -> 23514824
+    sync_rule_7 -> 23188352
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23502008
+  23469328
+    sync_rule_2 -> 23580208
+    sync_t_receive_RCustomer_Welcome -> 23541896
+    sync_t_receive_RNegociate_CarGroup -> 23540728
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23456520
+  23470728
+    sync_rule_1 -> 23520728
+    sync_t_receive_RNegociate_CarGroup -> 23472008
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23465352
+    sync_t_send_CInvoice -> 23506256
+  23472008
+    sync_rule_1 -> 23512424
+    sync_rule_7 -> 23175432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23464720
+    sync_t_send_CInvoice -> 23468920
+  23475624
+    sync_rule_1 -> 23477304
+    sync_rule_7 -> 23174584
+    sync_t_receive_RSelect_Payment_Type -> 23461432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23468560
+  23476352
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23532536
+    sync_t_receive_RCustomer_Welcome -> 23294224
+    sync_t_receive_RNegociate_CarGroup -> 23326808
+    sync_t_receive_RSelect_Payment_Type -> 23292976
+  23477304
+    sync_rule_7 -> 23477664
+    sync_t_receive_RSelect_Payment_Type -> 23490440
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23497896
+  23477664
+    sync_t_receive_RSelect_Payment_Type -> 23481072
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23503688
+    sync_t_send_CNegociate_CarGroup -> 23484344
+  23479296
+    sync_t_send_CInvoice -> 23487240
+    sync_t_send_CNegociate_CarGroup -> 23569920
+  23479904
+    sync_rule_7 -> 23430728
+    sync_t_receive_RCharge_Customer -> 23485048
+    sync_t_receive_RCustomer_Welcome -> 23016840
+    sync_t_receive_RSelect_Payment_Type -> 23074760
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23919152
+  23481072
+    sync_rule_2 -> 23488424
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23537160
+    sync_t_send_CNegociate_CarGroup -> 23521088
+  23481776
+    sync_rule_2 -> 23520728
+    sync_t_receive_RNegociate_CarGroup -> 23490440
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23169416
+  23482408
+    sync_rule_7 -> 23479296
+    sync_t_send_CInvoice -> 23487784
+  23482752
+    sync_t_receive_RCustomer_Welcome -> 23492672
+    sync_t_receive_RNegociate_CarGroup -> 23585912
+    sync_t_receive_RSelect_Payment_Type -> 23456520
+  23484344
+    sync_t_receive_RSelect_Payment_Type -> 23521088
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23506976
+  23485048
+    sync_rule_7 -> 23458520
+    sync_t_receive_RCustomer_Welcome -> 23475624
+    sync_t_receive_RSelect_Payment_Type -> 23540728
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23585912
+  23487240
+    sync_t_send_CNegociate_CarGroup -> 23500696
+  23487784
+    sync_rule_7 -> 23487240
+  23488424
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23479296
+    sync_t_send_CInvoice -> 23540024
+    sync_t_send_CNegociate_CarGroup -> 23552072
+  23490440
+    sync_rule_2 -> 23512424
+    sync_rule_7 -> 23481072
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23508224
+  23491080
+    sync_t_receive_RNegociate_CarGroup -> 23487784
+  23492672
+    sync_rule_1 -> 23496632
+    sync_t_receive_RNegociate_CarGroup -> 23468560
+    sync_t_receive_RSelect_Payment_Type -> 23516120
+  23493016
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23500696
+  23495160
+    sync_rule_2 -> 23569920
+  23496632
+    sync_t_receive_RNegociate_CarGroup -> 23497896
+    sync_t_receive_RSelect_Payment_Type -> 23169416
+  23497896
+    sync_rule_7 -> 23503688
+    sync_t_receive_RSelect_Payment_Type -> 23508224
+  23500696
+    sync_t_receive_CPayment -> 23537880
+  23502008
+    sync_rule_1 -> 23487784
+    sync_rule_7 -> 23176440
+  23503688
+    sync_t_receive_RSelect_Payment_Type -> 23537160
+    sync_t_send_CNegociate_CarGroup -> 23506976
+  23504216
+    sync_t_receive_RCustomer_Welcome -> 23175776
+    sync_t_send_CInvoice -> 23534560
+    sync_t_send_CNegociate_CarGroup -> 23704696
+  23504920
+    sync_t_receive_RCustomer_Welcome -> 23461776
+    sync_t_receive_RSelect_Payment_Type -> 23517800
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23509216
+  23505896
+    sync_t_receive_RNegociate_CarGroup -> 23514824
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23491080
+  23506256
+    sync_rule_1 -> 23505896
+    sync_t_receive_RNegociate_CarGroup -> 23468920
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23523688
+  23506616
+    sync_rule_1 -> 23434976
+    sync_t_receive_RCharge_Customer -> 23449168
+    sync_t_receive_RNegociate_CarGroup -> 23016840
+    sync_t_receive_RSelect_Payment_Type -> 23620576
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 22769080
+  23506976
+    sync_t_receive_RSelect_Payment_Type -> 23495160
+  23508224
+    sync_rule_2 -> 23482408
+    sync_rule_7 -> 23537160
+  23509216
+    sync_t_receive_RCustomer_Welcome -> 23195432
+    sync_t_receive_RSelect_Payment_Type -> 23525200
+  23510744
+    sync_t_receive_RCustomer_Welcome -> 23188920
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23579848
+  23512424
+    sync_rule_7 -> 23488424
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23482408
+    sync_t_send_CInvoice -> 23514824
+  23514824
+    sync_rule_7 -> 23540024
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23487784
+  23516120
+    sync_rule_1 -> 23169416
+    sync_rule_2 -> 23465352
+    sync_t_receive_RNegociate_CarGroup -> 23466880
+  23517800
+    sync_rule_2 -> 23677264
+    sync_t_receive_RCustomer_Welcome -> 23193416
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23525200
+  23519032
+    sync_rule_7 -> 23504216
+    sync_t_receive_RCustomer_Welcome -> 23464720
+    sync_t_send_CInvoice -> 23650128
+  23520728
+    sync_t_receive_RNegociate_CarGroup -> 23512424
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23529032
+    sync_t_send_CInvoice -> 23505896
+  23521088
+    sync_rule_2 -> 23552072
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23495160
+  23523328
+    sync_rule_1 -> 23278144
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23123448
+    sync_t_receive_RCharge_Customer -> 23294224
+    sync_t_receive_RNegociate_CarGroup -> 23441592
+    sync_t_receive_RSelect_Payment_Type -> 23427040
+  23523688
+    sync_rule_1 -> 23491080
+    sync_t_receive_RNegociate_CarGroup -> 23502008
+  23525200
+    sync_rule_2 -> 23704696
+    sync_t_receive_RCustomer_Welcome -> 23191696
+  23526944
+    sync_t_receive_RCharge_Customer -> 23537160
+    sync_t_send_CNegociate_CarGroup -> 23641944
+  23529032
+    sync_t_receive_RNegociate_CarGroup -> 23482408
+    sync_t_send_CInvoice -> 23491080
+  23532008
+    sync_rule_2 -> 23554216
+    sync_t_receive_RCustomer_Welcome -> 23175088
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23700104
+    sync_t_send_CNegociate_CarGroup -> 23517800
+  23532536
+    sync_rule_6 -> 23422664
+    sync_t_receive_RCustomer_Welcome -> 23033016
+    sync_t_receive_RNegociate_CarGroup -> 23155776
+    sync_t_receive_RSelect_Payment_Type -> 23151560
+  23534216
+    sync_rule_6 -> 23479904
+    sync_rule_7 -> 23081064
+    sync_t_receive_RCharge_Customer -> 23155776
+    sync_t_receive_RCustomer_Welcome -> 23066848
+    sync_t_receive_RSelect_Payment_Type -> 23336816
+  23534560
+    sync_t_receive_RCustomer_Welcome -> 23176440
+    sync_t_send_CNegociate_CarGroup -> 23579848
+  23534920
+    sync_rule_7 -> 23266112
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23534216
+    sync_t_receive_RCharge_Customer -> 23326808
+    sync_t_receive_RCustomer_Welcome -> 23441592
+    sync_t_receive_RSelect_Payment_Type -> 23926128
+  23535728
+    sync_t_receive_RCustomer_Welcome -> 23523688
+    sync_t_receive_RNegociate_CarGroup -> 23650128
+  23537160
+    sync_rule_2 -> 23479296
+    sync_t_send_CNegociate_CarGroup -> 23495160
+  23537880
+    sync_rule_4 -> 23540368
+  23540024
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23487240
+    sync_t_send_CNegociate_CarGroup -> 23493016
+  23540368
+    sync_t_send_RPayment -> 23555728
+  23540728
+    sync_rule_2 -> 23460200
+    sync_rule_7 -> 23532008
+    sync_t_receive_RCustomer_Welcome -> 23461432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23688296
+  23541896
+    sync_rule_1 -> 23481776
+    sync_rule_2 -> 23470728
+    sync_t_receive_RNegociate_CarGroup -> 23461432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23516120
+  23543224
+    sync_rule_7 -> 23579216
+    sync_t_receive_RCharge_Customer -> 23477304
+    sync_t_receive_RSelect_Payment_Type -> 22825352
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 22972008
+  23548408
+    sync_rule_5 -> 23551712
+  23551712
+    sync_t_send_CRental_Reservation -> 23554560
+  23552072
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23569920
+    sync_t_send_CInvoice -> 23493016
+  23554216
+    sync_t_receive_RCustomer_Welcome -> 23175432
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23504216
+    sync_t_send_CInvoice -> 23714248
+    sync_t_send_CNegociate_CarGroup -> 23677264
+  23554560 : FINAL
+  23555728
+    sync_t_receive_RRental_Reservation -> 23548408
+  23561968
+    sync_t_receive_RCharge_Customer -> 23481776
+    sync_t_receive_RNegociate_CarGroup -> 22825352
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23078248
+  23569920
+    sync_t_send_CInvoice -> 23500696
+  23573720
+    sync_rule_1 -> 23366664
+    sync_rule_7 -> 23815512
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23342184
+    sync_t_receive_RCharge_Customer -> 23049832
+  23575928
+    sync_t_receive_RCustomer_Welcome -> 23193904
+    sync_t_receive_RSelect_Payment_Type -> 23700104
+    sync_t_send_CNegociate_CarGroup -> 23509216
+  23579216
+    sync_t_receive_RCharge_Customer -> 23477664
+    sync_t_receive_RSelect_Payment_Type -> 23667184
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 22766336
+    sync_t_send_CNegociate_CarGroup -> 23626432
+  23579848
+    sync_t_receive_CPayment -> 23676200
+    sync_t_receive_RCustomer_Welcome -> 23178320
+  23580208
+    sync_t_receive_RCustomer_Welcome -> 23470728
+    sync_t_receive_RNegociate_CarGroup -> 23460200
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23662352
+    sync_t_send_CInvoice -> 23626832
+  23585912
+    sync_rule_7 -> 23575928
+    sync_t_receive_RCustomer_Welcome -> 23468560
+    sync_t_receive_RSelect_Payment_Type -> 23688296
+  23594040
+    sync_t_receive_RCharge_Customer -> 23482752
+    sync_t_receive_RCustomer_Welcome -> 22769080
+    sync_t_receive_RNegociate_CarGroup -> 23919152
+    sync_t_receive_RSelect_Payment_Type -> 23045096
+  23595568
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23341016
+    sync_t_receive_RCustomer_Welcome -> 23304424
+    sync_t_receive_RSelect_Payment_Type -> 23404536
+    sync_t_send_CNegociate_CarGroup -> 23407040
+  23596272
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23072120
+    sync_t_receive_RCustomer_Welcome -> 23341824
+    sync_t_receive_RNegociate_CarGroup -> 23401624
+  23599560
+    sync_t_receive_RCharge_Customer -> 23506976
+    sync_t_receive_RSelect_Payment_Type -> 23641944
+  23620576
+    sync_rule_1 -> 23561968
+    sync_t_receive_RCharge_Customer -> 23541896
+    sync_t_receive_RNegociate_CarGroup -> 23002776
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23140464
+  23625664
+    sync_t_receive_RCharge_Customer -> 23700104
+    sync_t_receive_RCustomer_Welcome -> 23122208
+    sync_t_send_CNegociate_CarGroup -> 23456056
+  23626432
+    sync_t_receive_RCharge_Customer -> 23484344
+    sync_t_receive_RSelect_Payment_Type -> 22830808
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23599560
+  23626832
+    sync_t_receive_RCustomer_Welcome -> 23506256
+    sync_t_receive_RNegociate_CarGroup -> 23171976
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23535728
+  23640136
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23106816
+    sync_t_receive_RCharge_Customer -> 23094976
+    sync_t_send_CNegociate_CarGroup -> 23681032
+  23640544
+    sync_rule_2 -> 23382152
+    sync_rule_7 -> 23404536
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23152912
+    sync_t_receive_RCustomer_Welcome -> 23049832
+  23641944
+    sync_t_receive_RCharge_Customer -> 23495160
+  23648520
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23101064
+    sync_t_receive_RCustomer_Welcome -> 23047336
+    sync_t_send_CInvoice -> 23697824
+  23650128
+    sync_rule_7 -> 23534560
+    sync_t_receive_RCustomer_Welcome -> 23502008
+  23662352
+    sync_t_receive_RCustomer_Welcome -> 23465352
+    sync_t_receive_RNegociate_CarGroup -> 23519032
+    sync_t_send_CInvoice -> 23535728
+  23667184
+    sync_t_receive_RCharge_Customer -> 23481072
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23526944
+    sync_t_send_CNegociate_CarGroup -> 22830808
+  23669328
+    sync_rule_2 -> 23648520
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23394360
+    sync_t_receive_RCustomer_Welcome -> 23051144
+  23673992
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23133288
+    sync_t_receive_RCharge_Customer -> 23338976
+    sync_t_receive_RNegociate_CarGroup -> 23366664
+  23676200
+    sync_rule_4 -> 23682008
+    sync_t_receive_RCustomer_Welcome -> 23183912
+  23677264
+    sync_t_receive_RCustomer_Welcome -> 23190640
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23704696
+    sync_t_send_CInvoice -> 23510744
+  23681032
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23412848
+    sync_t_receive_RCharge_Customer -> 23088032
+  23682008
+    sync_t_receive_RCustomer_Welcome -> 23184256
+    sync_t_send_RPayment -> 23685304
+  23683880
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23106280
+    sync_t_receive_RCharge_Customer -> 23419088
+    sync_t_receive_RSelect_Payment_Type -> 23681032
+  23685304
+    sync_t_receive_RCustomer_Welcome -> 23184600
+    sync_t_receive_RRental_Reservation -> 23698824
+  23688296
+    sync_rule_2 -> 23519032
+    sync_rule_7 -> 23700104
+    sync_t_receive_RCustomer_Welcome -> 23466880
+  23690848
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23409192
+    sync_t_receive_RCharge_Customer -> 23404536
+    sync_t_receive_RCustomer_Welcome -> 23815512
+    sync_t_send_CNegociate_CarGroup -> 23867104
+  23697824
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23392480
+    sync_t_receive_RCustomer_Welcome -> 23319320
+  23698824
+    sync_rule_5 -> 23703016
+    sync_t_receive_RCustomer_Welcome -> 23185608
+  23700104
+    sync_rule_2 -> 23504216
+    sync_t_receive_RCustomer_Welcome -> 23191176
+    sync_t_send_CNegociate_CarGroup -> 23525200
+  23703016
+    sync_t_receive_RCustomer_Welcome -> 23185864
+    sync_t_send_CRental_Reservation -> 23705760
+  23704696
+    sync_t_receive_RCustomer_Welcome -> 23186696
+    sync_t_send_CInvoice -> 23579848
+  23705760
+    sync_t_receive_RCustomer_Welcome -> 23186120
+  23706208
+    sync_rule_7 -> 23625664
+    sync_t_receive_RCharge_Customer -> 23688296
+    sync_t_receive_RCustomer_Welcome -> 23437216
+  23714248
+    sync_t_receive_RCustomer_Welcome -> 23188352
+    sync_t_send_CAsk_for_Rental_Dates_and_Locations -> 23534560
+    sync_t_send_CNegociate_CarGroup -> 23510744
+  23721320
+    sync_rule_1 -> 23683880
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23141472
+    sync_t_receive_RCharge_Customer -> 23049960
+    sync_t_receive_RSelect_Payment_Type -> 23753488
+  23750624
+    sync_rule_6 -> 23114968
+    sync_t_receive_RCharge_Customer -> 23394360
+    sync_t_receive_RCustomer_Welcome -> 23144488
+  23753488
+    sync_rule_1 -> 23681032
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23144488
+    sync_t_receive_RCharge_Customer -> 23051144
+  23815512
+    sync_rule_1 -> 23640136
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23334504
+    sync_t_receive_RCharge_Customer -> 23053488
+    sync_t_send_CNegociate_CarGroup -> 23753488
+  23818424
+    sync_rule_6 -> 23460200
+    sync_rule_7 -> 23339680
+    sync_t_receive_RCustomer_Welcome -> 23111040
+    sync_t_send_CInvoice -> 23390768
+  23867104
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23750624
+    sync_t_receive_RCharge_Customer -> 23669328
+    sync_t_receive_RCustomer_Welcome -> 23753488
+  23918808
+    sync_t_receive_RCharge_Customer -> 23509216
+    sync_t_receive_RCustomer_Welcome -> 23157232
+    sync_t_receive_RSelect_Payment_Type -> 23456056
+  23919152
+    sync_rule_7 -> 23084336
+    sync_t_receive_RCharge_Customer -> 23585912
+    sync_t_receive_RCustomer_Welcome -> 22991896
+    sync_t_receive_RSelect_Payment_Type -> 23706208
+  23923280
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23034792
+    sync_t_receive_RCharge_Customer -> 23407040
+    sync_t_receive_RCustomer_Welcome -> 23721320
+    sync_t_receive_RSelect_Payment_Type -> 23867104
+  23926128
+    sync_rule_7 -> 23690848
+    sync_t_receive_RAsk_for_Rental_Dates_and_Locations -> 23336816
+    sync_t_receive_RCharge_Customer -> 23640544
+    sync_t_receive_RCustomer_Welcome -> 23573720

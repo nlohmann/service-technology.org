@@ -475,6 +475,7 @@ namespace pnapi
       extern std::vector<std::string> identlist;
       extern std::set<std::string> input_;
       extern std::set<std::string> output_;
+      extern std::set<std::string> synchronous_;
 
       extern State *state_;
       extern bool final_;
@@ -482,6 +483,7 @@ namespace pnapi
       extern std::vector<unsigned int> succState_;
       extern std::vector<std::string> succLabel_;
       extern std::vector<Automaton::Type> succType_;
+      extern std::map<Transition *, std::set<std::string> > synchlabel;
 
       extern State *edgeState_;
       extern std::string edgeLabel_;

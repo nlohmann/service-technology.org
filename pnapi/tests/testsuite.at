@@ -198,6 +198,13 @@ AT_CHECK([GREP -q "|P_in|= 3  |P_out|= 3" stderr])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968)])
+m4_define([NET], [bug13968_sa2sm.sa])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([SA2SM NET NET.owfn], 0, ignore, stderr)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

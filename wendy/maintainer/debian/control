@@ -11,5 +11,5 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: graphviz
 Description: a tool to calculate operating guidelines
- Wendy is a tool to calculate operating guidelines.
+  Wendy is a tool to calculate operating guidelines.
 

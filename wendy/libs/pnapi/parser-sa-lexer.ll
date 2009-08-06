@@ -6,7 +6,7 @@
 %option outfile="lex.yy.c"
 
 /* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_sa_"
+%option prefix="pnapi_sa_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -83,8 +83,8 @@ number         [0-9]+
 ","                                     { return COMMA;                }
 "->"                                    { return ARROW;                }
 
-{number}     { pnapi_sa_lval.yt_int = atoi(yytext); return NUMBER;             }
-{identifier} { pnapi_sa_lval.yt_string = new std::string(yytext); return IDENT;}
+{number}     { pnapi_sa_yylval.yt_int = atoi(yytext); return NUMBER;             }
+{identifier} { pnapi_sa_yylval.yt_string = new std::string(yytext); return IDENT;}
 
 {whitespace}                            { /* do nothing */             }
 

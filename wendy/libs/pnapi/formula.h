@@ -7,6 +7,7 @@
 #include <set>
 #include <string>
 #include "marking.h"
+#include "myio.h"
 
 namespace pnapi
 {
@@ -21,6 +22,11 @@ namespace pnapi
    * \brief   Final Condition Formulas
    */
   namespace formula {
+
+
+    typedef enum { NONE, ALL_PLACES_EMPTY, ALL_OTHER_PLACES_EMPTY,
+      ALL_OTHER_INTERNAL_PLACES_EMPTY, ALL_OTHER_EXTERNAL_PLACES_EMPTY
+    } AllOtherPlaces;
 
 
     class Formula
@@ -41,7 +47,7 @@ namespace pnapi
       virtual std::ostream & output(std::ostream &) const =0;
 
       /// set of concerning places
-      virtual std::set<const Place *> places(bool excludeEmpty = false) const;
+      virtual std::set<const Place *> places() const;
 
     };
 
@@ -68,7 +74,7 @@ namespace pnapi
 
       const std::set<const Formula *> & children() const;
 
-      std::set<const Place *> places(bool excludeEmpty = false) const;
+      std::set<const Place *> places() const;
 
     protected:
       std::set<const Formula *> children_;
@@ -101,20 +107,24 @@ namespace pnapi
 
     class Conjunction : public Operator
     {
+      friend std::ostream & pnapi::io::__owfn::output(std::ostream &, const Conjunction &);
+
     public:
 
       Conjunction(const Conjunction &);
 
-      Conjunction();
+      Conjunction(const AllOtherPlaces = NONE);
 
-      Conjunction(const Formula &);
+      Conjunction(const Formula &, const AllOtherPlaces = NONE);
 
       Conjunction(const Formula &, const Formula &);
 
+      // FIXME: obsolete wildcard implementation
       Conjunction(const Formula &, const std::set<const Place *> &);
 
       Conjunction(const std::set<const Formula *> &,
-		  const std::map<const Place *, const Place *> * = NULL);
+		  const std::map<const Place *, const Place *> * = NULL,
+		  const AllOtherPlaces = NONE);
 
       bool isSatisfied(const Marking &) const;
 
@@ -124,7 +134,13 @@ namespace pnapi
       std::ostream & output(std::ostream &) const;
 
     protected:
+
       void simplifyChildren();
+
+    private:
+
+      AllOtherPlaces flag_;
+
     };
 
 
@@ -167,7 +183,7 @@ namespace pnapi
 
       unsigned int tokens() const;
 
-      std::set<const Place *> places(bool excludeEmpty = false) const;
+      std::set<const Place *> places() const;
 
     protected:
       const Place & place_;
@@ -185,6 +201,7 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
     };
 
 
@@ -197,6 +214,7 @@ namespace pnapi
 			      = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+
     };
 
 
@@ -213,8 +231,6 @@ namespace pnapi
 			   = NULL) const;
 
       std::ostream & output(std::ostream &) const;
-
-      std::set<const Place *> places(bool excludeEmpty = false) const;
     };
 
 

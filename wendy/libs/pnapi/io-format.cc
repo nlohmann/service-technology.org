@@ -6,7 +6,7 @@
 #include "automaton.h"
 #include "petrinet.h"
 #include "state.h"
-#include "io.h"
+#include "myio.h"
 
 using std::endl;
 using std::map;
@@ -679,46 +679,39 @@ namespace pnapi
       ostream & output(ostream & os, const formula::Conjunction & f)
       {
 	string wildcard;
-	set<const Formula *> children = f.children();
 
-	/* WILDCARD COLLAPSING */
-	set<const Place *> formulaPlaces = f.places();
-	if (!formulaPlaces.empty())
-	  {
-	    set<Place *> netPlaces =
-	      (*formulaPlaces.begin())->getPetriNet().getPlaces();
-	    if (formulaPlaces.size() == netPlaces.size())
-	      {
-		set<const Formula *> filteredChildren;
-		for (set<const Formula *>::iterator it = children.begin();
-		     it != children.end(); ++it)
-		  {
-		    const formula::FormulaEqual * f =
-		      dynamic_cast<const formula::FormulaEqual *>(*it);
-		    if (f == NULL || f->tokens() != 0)
-		      filteredChildren.insert(*it);
-		    else
-		      wildcard = " AND ALL_OTHER_PLACES_EMPTY";
-		  }
-		if (filteredChildren.empty() && !wildcard.empty())
-		  wildcard = "ALL_PLACES_EMPTY";
-		children = filteredChildren;
-	      }
-	  }
+	switch (f.flag_)
+	{
+	case formula::ALL_PLACES_EMPTY:
+	  wildcard = "ALL_PLACES_EMPTY";
+	  break;
+	case formula::ALL_OTHER_PLACES_EMPTY:
+	  wildcard = " AND ALL_OTHER_PLACES_EMPTY";
+	  break;
+	case formula::ALL_OTHER_INTERNAL_PLACES_EMPTY:
+	  wildcard = " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";
+	  break;
+	case formula::ALL_OTHER_EXTERNAL_PLACES_EMPTY:
+	  wildcard = " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
+	  break;
+	case formula::NONE:
+	default: break;
+	}
 
-	if (f.children().empty())
-	  //return os << formula::FormulaTrue();
-	  assert(false); // FIXME: don't know what to do in this case
+	if (f.children().empty() && f.flag_ == formula::ALL_PLACES_EMPTY)
+	  return os << wildcard;
 	else
-	  return os << "(" << delim(" AND ") << children << wildcard << ")";
+	  if (f.children().empty())
+	    return os << formula::FormulaTrue();
+	  else
+	    return os << "(" << delim(" AND ") << f.children() << wildcard << ")";
       }
 
 
       ostream & output(ostream & os, const formula::Disjunction & f)
       {
 	if (f.children().empty())
-	  //return os << formula::FormulaFalse();
-	  assert(false); // FIXME: don't know what to do in this case
+	  return os << formula::FormulaFalse();
 	else
 	  return os << "(" << delim(" OR ") << f.children() << ")";
       }
@@ -782,6 +775,13 @@ namespace pnapi
     {
       util::FormatData::data(base) = util::SA;
       return base;
+    }
+
+
+    std::istream & sa2sm(std::istream &is)
+    {
+      util::FormatData::data(is) = util::SA2SM;
+      return is;
     }
 
 

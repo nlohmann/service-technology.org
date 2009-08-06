@@ -1,25 +1,26 @@
 noinst_LIBRARIES = libpnapi.a
 
 libpnapi_a_SOURCES = \
-	parser-owfn.yy    parser-owfn-lexer.ll \
-	parser-petrify.yy parser-petrify-lexer.ll \
-	parser-onwd.yy    parser-onwd-lexer.ll \
-	parser-lola.yy    parser-lola-lexer.ll \
-	parser-sa.yy	  parser-sa-lexer.ll \
-	pnapi.h \
-	link.h link.cc \
-	component.h component.cc \
-	petrinet.h petrinet.cc \
-	parser.h parser.cc \
-	util.h util.cc \
-	formula.h formula.cc \
-	condition.h condition.cc \
-	petrinet-reduction.cc \
-	petrinet-petrify.h petrinet-petrify.cc \
-	automaton.h automaton.cc\
-	state.h state.cc \
-	marking.h marking.cc \
-	io.h io.cc io-format.cc
+		parser-owfn.yy    parser-owfn-lexer.ll \
+		parser-petrify.yy parser-petrify-lexer.ll \
+		parser-onwd.yy    parser-onwd-lexer.ll \
+		parser-lola.yy    parser-lola-lexer.ll \
+		parser-sa.yy	  parser-sa-lexer.ll \
+		pnapi.h \
+		link.h link.cc \
+		component.h component.cc \
+		petrinet.h petrinet.cc \
+		parser.h parser.cc \
+		util.h util.cc \
+		formula.h formula.cc \
+		condition.h condition.cc \
+		petrinet-reduction.cc \
+		petrinet-petrify.h petrinet-petrify.cc \
+		automaton.h automaton.cc\
+		state.h state.cc \
+		marking.h marking.cc \
+		myio.h myio.cc io-format.cc \
+		errorhandling.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-petrify.cc parser-onwd.cc parser-lola.cc \
 		parser-sa.cc

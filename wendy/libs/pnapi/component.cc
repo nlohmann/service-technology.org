@@ -3,7 +3,7 @@
 
 #ifndef NDEBUG
 #include <iostream>
-#include "io.h"
+#include "myio.h"
 using std::cout;
 using std::endl;
 #endif

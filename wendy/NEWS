@@ -15,6 +15,9 @@ Version 1.7-unreleased
 * fixed bug #14025 (`https://gna.org/bugs/?14025'): the Dot output had
   problems with nonempty knowledge with true annotation
 
+* fixed bug #14067 (`https://gna.org/bugs/?14067'): a change in the Petri
+  Net API broke the evaluation of final conditions
+
 * added details to the man page; a PDF version of the man page can be
   created with `make man-pdf' in the `man' directory (requires groff and
   ps2pdf)

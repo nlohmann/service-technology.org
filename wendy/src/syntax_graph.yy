@@ -68,7 +68,7 @@ states:
 state:
   KW_STATE NUMBER prog markings transitions
     { InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
-                                                      InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking)));
+                                          InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
       if (markingfile) {
           *markingfile << $2 << ": ";

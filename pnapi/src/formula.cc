@@ -119,19 +119,34 @@ namespace pnapi
     Conjunction::Conjunction(const Formula & l, const Formula & r) :
       Operator(l, r)
     {
+      // taking ALL[_OTHER][_EXTERNAL|_INTERNAL]_PLACES to the new Conjunction
+      AllOtherPlaces v1, v2;
+      const Formula *fl = &l;
+      const Conjunction *cl = dynamic_cast<const Conjunction *>(fl);
+      if (cl != NULL)
+        v1 = cl->flag_;
+      const Formula *fr = &r;
+      const Conjunction *cr = dynamic_cast<const Conjunction *>(fr);
+      if (cr != NULL)
+        v2 = cr->flag_;
+
+      if (v1/v2==2 || v2/v1==2)
+        flag_ = ALL_OTHER_PLACES_EMPTY;
+      else
+        if (v1 > v2)
+          flag_ = v1;
+        else
+          flag_ = v2;
+
+
       simplifyChildren();
     }
 
     Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
       Operator(f)
     {
-      set<const Place *> cps = places();
-
-      for (set<const Place *>::const_iterator it = wc.begin(); it != wc.end();
-	   ++it)
-	if (cps.find(*it) == cps.end())
-	  children_.insert(new FormulaEqual(**it, 0));
-
+      std::cerr << "This method is no longer necessary!" << std::endl;
+      assert(false);
       simplifyChildren();
     }
 

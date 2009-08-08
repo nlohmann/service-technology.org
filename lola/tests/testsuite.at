@@ -1,0 +1,103 @@
+AT_INIT
+
+AT_TESTED(versions.sh)
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([LOLA_BOUNDEDNET --help],0,ignore)
+AT_CHECK([LOLA_DEADLOCK --help],0,ignore)
+AT_CHECK([LOLA_FULLLIMITED --help],0,ignore)
+AT_CHECK([LOLA_LIVEPROP --help],0,ignore)
+AT_CHECK([LOLA_MODELCHECKING --help],0,ignore)
+AT_CHECK([LOLA_STATEPREDICATE1 --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([LOLA_BOUNDEDNET --version],0,ignore)
+AT_CHECK([LOLA_DEADLOCK --version],0,ignore)
+AT_CHECK([LOLA_FULLLIMITED --version],0,ignore)
+AT_CHECK([LOLA_LIVEPROP --version],0,ignore)
+AT_CHECK([LOLA_MODELCHECKING --version],0,ignore)
+AT_CHECK([LOLA_STATEPREDICATE1 --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Deadlock Check (lola-deadlock)])
+############################################################################
+
+AT_SETUP([Choreography])
+AT_CHECK([cp TESTFILES/choreography.lola .])
+AT_CHECK([LOLA_DEADLOCK choreography.lola],1,stdout)
+AT_CHECK([GREP -q "net does not have deadlocks!" stdout],0)
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+AT_SETUP([Dining Philosophers])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola],0,stdout)
+AT_CHECK([GREP -q "dead state found!" stdout],0)
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Limited State Space (lola-fulllimited)])
+############################################################################
+
+AT_SETUP([Echo Algorithm])
+AT_CHECK([cp TESTFILES/echo.lola .])
+AT_CHECK([LOLA_FULLLIMITED echo.lola],5,ignore,stderr)
+AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
+AT_KEYWORDS(fulllimited)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([State Predicate (lola-statepredicate1)])
+############################################################################
+
+AT_SETUP([AI Planning Problem])
+AT_CHECK([cp TESTFILES/planner.lola .])
+AT_CHECK([cp TESTFILES/planner.task .])
+AT_CHECK([LOLA_STATEPREDICATE1 planner.lola -aplanner.task],0,stdout)
+AT_CHECK([GREP -q "state found!" stdout],0)
+AT_KEYWORDS(statepredicate1)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([CTL Model Checking (lola-modelchecking)])
+############################################################################
+
+AT_SETUP([Business Process])
+AT_CHECK([cp TESTFILES/process.lola .])
+AT_CHECK([cp TESTFILES/process.task .])
+AT_CHECK([LOLA_MODELCHECKING process.lola -aprocess.task],1,stdout)
+AT_CHECK([GREP -q "result: false" stdout],0)
+AT_KEYWORDS(modelchecking)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Liveprop (lola-liveprop)])
+############################################################################
+
+AT_SETUP([UML Activity Diagram])
+AT_CHECK([cp TESTFILES/umlprocess.lola .])
+AT_CHECK([LOLA_LIVEPROP umlprocess.lola],1,stdout)
+AT_CHECK([GREP -q "predicate not live: not satisfiable beyond reported state" stdout],0)
+AT_KEYWORDS(liveprop)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Boundedness Check (lola-boundednet)])
+############################################################################
+
+AT_SETUP([Unbounded Net])
+AT_CHECK([cp TESTFILES/unbounded.lola .])
+AT_CHECK([LOLA_BOUNDEDNET unbounded.lola],0,stdout)
+AT_CHECK([GREP -q "net is unbounded!" stdout],0)
+AT_KEYWORDS(boundednet)
+AT_CLEANUP

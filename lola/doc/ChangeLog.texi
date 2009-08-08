@@ -1,8 +1,12 @@
 @heading Version 1.13-unreleased
 @itemize
 @item fixed a small bug in the @option{PREDUCTION} mode: nets without significant places are now analyzed instantly
+
 @item added new scripts to build binary releases
+
 @item a binary release consists of the following pre-configured LoLAs: lola-full, lola-full1, lola-deadlock, lola-deadlock1, lola-modelchecking, lola-boundednet, lola-liveprop, lola-liveprop1, lola-statepredicate, and lola-statepredicate1
+
+@item changed the way tests are run (using GNU Autotest now)
 @end itemize
 
 

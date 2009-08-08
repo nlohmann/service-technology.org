@@ -1,14 +1,24 @@
-# test_init MUST be the first, and test_tidy MUST be the last test case
-TESTS = test_init \
-	test_phils \
-	test_process \
-	test_planner \
-	test_choreography \
-	test_umlprocess \
-	test_unbounded \
-	test_limited \
-	test_tidy
+binaries:
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-deadlock
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-fulllimited
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-modelchecking
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-statepredicate1
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-liveprop
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-boundednet
 
-EXTRA_DIST = nets $(TESTS)
+TESTSUITE = $(builddir)/testsuite
+EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+		testfiles
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests MAKE=$(MAKE)
+DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
+
+# check-local should build the binaries
+check-local: atconfig $(TESTSUITE) binaries
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
+
+clean-local:
+	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
+
+$(TESTSUITE): $(srcdir)/testsuite.at
+	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	mv $@.tmp $@

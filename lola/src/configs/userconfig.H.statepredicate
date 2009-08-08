@@ -6,7 +6,7 @@
 
 // REDUCTION TECHNIQUES
 #define STUBBORN
-#define PREDUCTION
+//#define PREDUCTION // due to bug #12922 (http://gna.org/bugs/?12922)
 
 // GRAPH EXPLORATION STRATEGY
 #define DEPTH_FIRST

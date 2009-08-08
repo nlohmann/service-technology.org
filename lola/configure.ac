@@ -26,6 +26,10 @@ AC_PROG_INSTALL
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
+
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
@@ -138,7 +142,7 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile maintainer/Makefile maintainer/macports/Portfile tests/Makefile utils/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile maintainer/Makefile maintainer/macports/Portfile tests/Makefile tests/package.m4 utils/Makefile])
 
 AC_OUTPUT
 

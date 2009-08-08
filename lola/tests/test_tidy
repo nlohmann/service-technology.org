@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-echo "TEST: test_tidy"
-
-echo "  [1/1] removing LoLA test sources"
-rm -fr ../lola.tar.gz
-rm -fr lola
-
-exit 0

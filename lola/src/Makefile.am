@@ -66,16 +66,19 @@ lola_LDFLAGS = @configured_LDFLAGS@
 # "configs" directory. The created binaries are cleaned with "make clean".
 #############################################################################
 
-CONFIGS = $(patsubst configs/userconfig.H.%,lola-%,$(wildcard configs/userconfig.H.*))
+CONFIGS = $(patsubst $(srcdir)/configs/userconfig.H.%,lola-%,$(wildcard $(srcdir)/configs/userconfig.H.*))
 
-$(CONFIGS): clean-am
-	mv userconfig.H userconfig.H~
-	cp configs/userconfig.H.$(patsubst lola-%,%,$@) userconfig.H
+$(CONFIGS): $@$(EXEEXT)
+	$(MAKE) clean-am
+	chmod 777 $(srcdir)/userconfig.H
+	cp $(srcdir)/userconfig.H /tmp/userconfig.H~
+	cp $(srcdir)/configs/userconfig.H.$(patsubst lola-%,%,$@) $(srcdir)/userconfig.H
 	$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am
-	mv lola$(EXEEXT) $@$(EXEEXT)
-	mv userconfig.H~ userconfig.H
+	mv $(builddir)/lola$(EXEEXT) $(builddir)/$@$(EXEEXT)
+	cp /tmp/userconfig.H~ $(srcdir)/userconfig.H
 
 MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
+DISTCLEANFILES = $(CONFIGS)$(EXEEXT)
 
 
 #############################################################################

@@ -19,6 +19,8 @@ Version 1.13-unreleased
   lola-boundednet, lola-liveprop, lola-liveprop1, lola-statepredicate, and
   lola-statepredicate1
 
+* changed the way tests are run (using GNU Autotest now)
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

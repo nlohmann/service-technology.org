@@ -1,0 +1,30 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Safira:"
+purpose "Safira: Set Algebra for Service Behavior."
+
+option "complment" p
+  "Complements the extended annotated service automaton"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+option "output" o
+  "Select the output file format(s)"
+  typestr="FORMAT"
+  values="og","dot","png","pdf","eps" enum
+  optional
+  multiple
+
+option "config" c
+  "Read configuration from file."
+  details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed."
+  string
+  typestr="FILE"
+  optional
+
+option "verbose" v
+  "Show verbose output"
+  flag off
+  

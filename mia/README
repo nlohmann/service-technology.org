@@ -33,13 +33,8 @@ LICENSE
 
 INSTALLATION
     Mia can be easily compiled and installed. See file "INSTALL" for
-    instructions.
-
-    Mia uses a lot of generated code. If you want to make changes to the
-    source code, you might need the following tools to regenerate the code:
-     * Flex (http://flex.sourceforge.net)
-     * Bison (http://www.gnu.org/software/bison)
-     * Gengetopt (http://www.gnu.org/software/gengetopt)
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Mia.
 
 
 DOCUMENTATION

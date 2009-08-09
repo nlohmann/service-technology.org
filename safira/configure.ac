@@ -28,7 +28,9 @@ else
 fi
 AC_SUBST(DOT)
 
+# Minisat needs the Zlib library
+AC_CHECK_LIB([z], [main], , AC_MSG_ERROR([Zlib was not found!]))
 
-AC_CONFIG_FILES([Makefile src/Makefile minisat/src/Makefile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile src/Makefile minisat/Makefile tests/Makefile tests/package.m4])
 
 AC_OUTPUT

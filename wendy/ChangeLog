@@ -7,8 +7,8 @@
                       http://service-technology.org/wendy
 
 
-Version 1.7-unreleased
-======================
+Version 1.7
+===========
 
 * added test case for bug #13903 (`https://gna.org/bugs/?13903')
 
@@ -17,6 +17,12 @@ Version 1.7-unreleased
 
 * fixed bug #14067 (`https://gna.org/bugs/?14067'): a change in the Petri
   Net API broke the evaluation of final conditions
+
+* added new version of the Petri Net API (after fixing bug #13844
+  (`http://gna.org/bugs/?13844')
+
+* made some adjustments which allow for a native Windows compilation
+  (independent of `cygwin1.dll')
 
 * added details to the man page; a PDF version of the man page can be
   created with `make man-pdf' in the `man' directory (requires groff and

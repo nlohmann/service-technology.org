@@ -29,11 +29,19 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <libgen.h>
 #include "config.h"
 #include "config-log.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
 #include "verbose.h"
+
+// detect MinGW compilation under Cygwin
+#ifdef WIN32
+#ifndef _WIN32
+#define CYGWIN_MINGW
+#endif
+#endif
 
 using std::string;
 
@@ -212,6 +220,10 @@ int main(int argc, char** argv) {
         abort(13, "could not create a temporary file '%s'", tmp);
     }
 #endif
+#ifdef CYGWIN_MINGW
+    status("setting tempfile name for MinGW to 'wendy.tmp'");
+    tmp = "wendy.tmp";
+#endif
     std::string tmpname(tmp);
 
     std::ofstream lolaFile((tmpname + ".lola").c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -234,15 +246,19 @@ int main(int argc, char** argv) {
     }
 
     // read from a pipe or from a file
-#if defined(HAVE_POPEN) && defined(HAVE_PCLOSE)
+#if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(CYGWIN_MINGW)
     string command_line = string(args_info.lola_arg) + " " + tmpname + ".lola -M 2> /dev/null";
     status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
 #else
+#ifdef CYGWIN_MINGW
+    string command_line = string(basename(args_info.lola_arg)) + " " + tmpname + ".lola -m";
+#else
     string command_line = string(args_info.lola_arg) + " " + tmpname + ".lola -m &> /dev/null";
-    status("calling LoLA by calling '%s'", command_line.c_str());
+#endif
+    status("calling LoLA with '%s'", command_line.c_str());
     system(command_line.c_str());
     graph_in = fopen((tmpname + ".graph").c_str(), "r");
     graph_parse();

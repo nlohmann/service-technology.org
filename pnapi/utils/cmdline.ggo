@@ -20,10 +20,20 @@ option "output" o
   optional
   multiple
 
-option "wire" w
+defgroup "Composition"
+
+groupoption "compose" -
+  "Compose each net given in the input section with this net."
+  typestr="NET"
+  string
+  group="Composition"
+  optional
+
+groupoption "wire" w
   "Wire (i.e., compose) the given nets. Either a wiring description is given or the interfaces are composed according to their names."
   typestr="FILE"
   string
+  group="Composition"
   argoptional
   optional
   hidden

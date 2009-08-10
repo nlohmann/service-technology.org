@@ -189,19 +189,33 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968)])
+m4_define([NET], [bug13968_sa2sm.sa])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([SA2SM NET NET.owfn], 0, ignore, stderr)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 13990 (https://gna.org/bugs/?13990)])
+m4_define([NET1], [bug13990.1.owfn])
+m4_define([NET2], [bug13990.2.owfn])
+m4_define([NET3], [bug13990.3.owfn])
+AT_CHECK([cp TESTFILES/NET1 .])
+AT_CHECK([cp TESTFILES/NET2 .])
+AT_CHECK([cp TESTFILES/NET3 .])
+AT_CHECK([PETRI -iowfn -oowfn --compose=NET2 NET1], 0, ignore, stderr)
+AT_CHECK([PETRI -iowfn -oowfn --compose=NET3 NET1.composed.owfn], 0, ignore, stderr)
+AT_CHECK([PETRI -v -iowfn NET1.composed.owfn.composed.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 6  |P_in|= 0  |P_out|= 0  |T|= 4" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 AT_SETUP([Bug 14064 (https://gna.org/bugs/?14064)])
 m4_define([NET], [bug14064.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -iowfn -rdead_nodes NET -oowfn],0,ignore,stderr)
 AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P_in|= 3  |P_out|= 3" stderr])
-AT_KEYWORDS([bug])
-AT_CLEANUP
-
-AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968)])
-m4_define([NET], [bug13968_sa2sm.sa])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([SA2SM NET NET.owfn], 0, ignore, stderr)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 

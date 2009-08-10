@@ -310,7 +310,7 @@ namespace pnapi
 		 const std::string & = "net2");
 
     /// compose the given nets into a new one
-    static PetriNet compose(const std::map<std::string, PetriNet *> &);
+    static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
     /// normalizes the Petri net
     const std::map<Transition *, std::string> normalize();

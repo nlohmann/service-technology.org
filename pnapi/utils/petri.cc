@@ -251,7 +251,7 @@ int main(int argc, char** argv) {
             }
 
             // calling implicit composition
-            net = PetriNet::compose(netsByName);
+            net = PetriNet::composeByWiring(netsByName);
         }
 
         if (args_info.verbose_given) {
@@ -265,6 +265,35 @@ int main(int argc, char** argv) {
         current.type = TYPE_OPENNET;
         current.net = new PetriNet(net);        
         objects.push_back(current);
+    }
+    
+    
+    /***************
+     * COMPOSITION *
+     ***************/
+    if(args_info.compose_given)
+    {
+      // try to open file
+      ifstream infile(args_info.compose_arg, ifstream::in);
+      if (!infile.is_open()) {
+          cerr << "petri: could not read from file '" << args_info.compose_arg << "'" << endl;
+          exit(EXIT_FAILURE);
+      }
+      
+      PetriNet secondNet; // to store composition "partner"
+      string secondNetName = args_info.compose_arg;
+      
+      // read net
+      infile >> meta(io::INPUTFILE, secondNetName)
+             >> meta(io::CREATOR, PACKAGE_STRING)
+             >> meta(io::INVOCATION, invocation) >> io::owfn >> secondNet;
+
+      // compose nets
+      for(int i=0; i < objects.size(); ++i)
+      {
+        objects[i].net->compose(secondNet, objects[i].filename, secondNetName);
+        objects[i].filename += ".composed"; 
+      }
     }
 
 

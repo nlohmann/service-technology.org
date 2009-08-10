@@ -1,0 +1,30 @@
+PLACE
+  INTERNAL
+    p;
+
+  INPUT
+    a;
+
+  OUTPUT
+    b;
+
+  SYNCHRONOUS
+    x;
+
+INITIALMARKING
+  p:1;
+
+FINALCONDITION
+  TRUE;
+
+
+TRANSITION t1
+  CONSUME a;
+  PRODUCE p;
+  SYNCHRONIZE x;
+
+TRANSITION t2
+  CONSUME p;
+  PRODUCE b;
+
+{ END OF FILE '' }

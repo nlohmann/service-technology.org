@@ -186,16 +186,20 @@ const pnapi::PetriNet * Adapter::buildController()
         {
             composed->normalize();
         }
+        composed->reduce(pnapi::PetriNet::LEVEL_4);
 
         /***********************************\
         * calculate most permissive partner *
         \***********************************/
         // create a unique temporary file name
+#if defined(HAVE_MKSTEMP) && not defined(__MINGW32__)
         char tmp[] = "/tmp/marlene-XXXXXX";
-#ifdef HAVE_MKSTEMP
         if (mkstemp(tmp) == -1) {
             abort(9, "could not create a temporary file '%s'", tmp);
         }
+#else
+        status("setting tempfile name for MinGW to 'marlene.tmp'");
+        char tmp[] = "marlene.tmp";
 #endif
 
         std::string tmpname(tmp);
@@ -241,11 +245,13 @@ const pnapi::PetriNet * Adapter::buildController()
         \***********************************************/
         time(&start_time);
         pnapi::PetriNet * controller;
+/*
         if (std::string(CONFIG_PETRIFY) != "not found")
         {
             controller = new pnapi::PetriNet(*mpp_sa);
         }
         else
+*/
         {
             controller = new pnapi::PetriNet(mpp_sa->stateMachine());
         }

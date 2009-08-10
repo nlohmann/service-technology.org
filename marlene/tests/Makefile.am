@@ -1,5 +1,6 @@
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh
+EXTRA_DIST = testsuite.at versions.sh \
+	     testfiles/test.owfn testfiles/test.ar
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

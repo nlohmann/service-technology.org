@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: gierds $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-08-05 10:20:55 +0200 (Mi, 05. Aug 2009) $
+ * \date    $Date: 2009-08-10 04:17:17 +0200 (Mo, 10. Aug 2009) $
  *
- * \version $Revision: 4517 $
+ * \version $Revision: 4532 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -310,7 +310,7 @@ namespace pnapi
 		 const std::string & = "net2");
 
     /// compose the given nets into a new one
-    static PetriNet compose(const std::map<std::string, PetriNet *> &);
+    static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
     /// normalizes the Petri net
     const std::map<Transition *, std::string> normalize();

@@ -18,6 +18,7 @@
 %{
 
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include "parser.h"
@@ -63,6 +64,24 @@ using namespace pnapi;
 
 sa:
   KEY_INTERFACE input output synchronous KEY_NODES nodes
+  {
+    if (sa2sm)
+    {
+      std::set<Transition *> transitions = pnapi_sa_yynet.getTransitions();
+      for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
+      {
+        // same reason as in automaton.cc method stateMachine (see FIXME)
+        // making a copy of all transitions and give them the labels
+        Transition &tt = pnapi_sa_yynet.createTransition("", synchlabel[*t]);
+        for (std::set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); f != (*t)->getPresetArcs().end(); f++)
+          pnapi_sa_yynet.createArc((*f)->getPlace(), tt, (*f)->getWeight());
+        for (std::set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); f != (*t)->getPostsetArcs().end(); f++)
+          pnapi_sa_yynet.createArc(tt, (*f)->getPlace(), (*f)->getWeight());
+  
+        pnapi_sa_yynet.deleteTransition(**t);
+      }
+    } 
+  }
 ;
 
 
@@ -109,6 +128,11 @@ output:
 synchronous:
   /* empty */
 | KEY_SYNCHRONOUS identlist SEMICOLON
+  {
+    for (int i = 0; i < identlist.size(); i++)
+      synchronous_.insert(identlist[i]);
+    identlist.clear();
+  }
 ;
 
 
@@ -150,9 +174,14 @@ nodes:
           pnapi_sa_yynet.createArc(*label2places_[succLabel_[i]], *t);
         if (succType_[i] == Automaton::OUTPUT)
           pnapi_sa_yynet.createArc(*t, *label2places_[succLabel_[i]]);
+        if (succType_[i] == Automaton::SYNCHRONOUS)
+        {
+          synchlabel[t].insert(succLabel_[i]);
+        }
           
         pnapi_sa_yynet.createArc(*place_, *t);
         pnapi_sa_yynet.createArc(*t, *places_[succState_[i]]);
+        t = NULL;
       }
       
       final_ = false;
@@ -228,6 +257,8 @@ successors:
       edgeType_ = Automaton::INPUT;
     if (output_.count(edgeLabel_) > 0)
       edgeType_ = Automaton::OUTPUT;
+    if (synchronous_.count(edgeLabel_) > 0)
+      edgeType_ = Automaton::SYNCHRONOUS;
     succState_.push_back($4);
     succLabel_.push_back(edgeLabel_);
     succType_.push_back(edgeType_);

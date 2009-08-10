@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-07-08 01:04:33 +0200 (Mi, 08. Jul 2009) $
+ * \date    $Date: 2009-08-06 22:41:15 +0200 (Do, 06. Aug 2009) $
  *
- * \version $Revision: 4408 $
+ * \version $Revision: 4526 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -190,6 +190,7 @@ namespace pnapi
 
     /// the set of labels
     const std::set<std::string> & getSynchronizeLabels() const;
+    //std::set<std::string> getSynchronizeLabels() const;
     
     /// set the set of labels
     void setSynchronizeLabels(const std::set<std::string> &);

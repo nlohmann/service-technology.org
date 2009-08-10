@@ -558,6 +558,14 @@ namespace pnapi {
   }
   
   /*!
+   *
+   */
+  /*set<string> Transition::getSynchronizeLabels() const
+  {
+    return labels_;
+  }*/
+
+  /*!
    */
   void Transition::setSynchronizeLabels(const std::set<std::string> & labels)
   {

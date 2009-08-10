@@ -1,9 +1,13 @@
 AT_INIT
 
 # define macros to skip a test if LoLA or Fiona was not found by configure
-#m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA_FULL" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
 #m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
+
 AT_TESTED(versions.sh)
+#AT_TESTED(WENDY)
+#AT_TESTED(LOLA_FULL)
 
 
 ############################################################################
@@ -20,4 +24,23 @@ AT_CHECK([MARLENE --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Small examples])
+############################################################################
+
+AT_SETUP([Small test (synchronous)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
+AT_CHECK([MARLENE test.owfn -r test.ar],0,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (asynchronous)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
+AT_CHECK([MARLENE test.owfn -r test.ar -a],0,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
 

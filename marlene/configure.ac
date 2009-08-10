@@ -42,7 +42,7 @@ AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
 
 # check for required tools
-#AC_PATH_PROG(LOLA_FULL, [lola-full], [])
+AC_PATH_PROG(LOLA_FULL, [lola-full], [])
 #AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)

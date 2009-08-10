@@ -180,7 +180,7 @@ int main(int argc, char* argv[])
     * Composing engine and controller in order to get the final adapter *
     \*******************************************************************/
     
-    engine.compose(controller, "engine", "controller");
+    engine.compose(controller, "engine.", "controller.");
     
     engine.reduce(pnapi::PetriNet::LEVEL_4);
     std::cout << pnapi::io::owfn << engine;

@@ -68,7 +68,7 @@ lola_LDFLAGS = @configured_LDFLAGS@
 
 CONFIGS = $(patsubst $(srcdir)/configs/userconfig.H.%,lola-%,$(wildcard $(srcdir)/configs/userconfig.H.*))
 
-$(CONFIGS): $@$(EXEEXT)
+$(CONFIGS): $@
 	$(MAKE) clean-am
 	chmod 777 $(srcdir)/userconfig.H
 	cp $(srcdir)/userconfig.H /tmp/userconfig.H~
@@ -79,6 +79,7 @@ $(CONFIGS): $@$(EXEEXT)
 
 MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
 DISTCLEANFILES = $(CONFIGS)$(EXEEXT)
+CLEANFILES = $(CONFIGS)
 
 
 #############################################################################

@@ -56,7 +56,9 @@ class Node {
         /// print information about this node on std::cout
         void printToStdout();
         void printToStdoutRecursively();
-        void output(std::ostream&);
+
+        /// TODO comment
+        void output(std::ostream&, bool);
 
 
     private:

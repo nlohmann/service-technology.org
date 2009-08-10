@@ -193,8 +193,8 @@ int main(int argc, char** argv) {
 	| 4. output cost efficient og as og or sa |
 	`----------------------------------------*/
 
-    INFO "writing cost efficient og ..." END
-	parsedOG->output( *outputStream );
+    INFO "writing cost efficient " << ( args_info.automata_given ? " service automata ..." : " og ..." ) END
+    parsedOG->output( *outputStream );
 
 
 

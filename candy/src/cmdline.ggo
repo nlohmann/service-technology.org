@@ -33,6 +33,10 @@ option "output" o
   argoptional
   optional
 
+option "automata" a
+  "The output should be a service automata."
+  flag off
+
 
 # -----------------------------------------------------------------
 section "Cost" 

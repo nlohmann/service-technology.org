@@ -242,6 +242,7 @@ void Node::printToStdout() {
     }
 }
 
+
 void Node::printToStdoutRecursively() {
 
     printToStdout();
@@ -251,9 +252,37 @@ void Node::printToStdoutRecursively() {
     }
 }
 
-void Node::output(std::ostream& file) {
 
-    file << "  " << id << " : " << (formula != NULL ? formula->asString() : "NULL") << endl;
+// WARNING: fails for cyclic og
+void Node::output(std::ostream& file, bool isRootNode) {
+
+    assert(formula != NULL);
+
+    file << "  " << id;
+    if ( args_info.automata_given ) {
+
+        if ( isRootNode ) {
+            if ( final ) {
+                file << " : INITIAL, FINAL" << endl;
+            } else {
+                file << " : INITIAL" << endl;
+            }
+        } else {
+            if ( final ) {
+                file << " : FINAL" << endl;
+            } else {
+                file << endl;
+            }
+        }
+    } else {
+
+        if ( final ) {
+            file << " : FINAL" << endl;
+        } else {
+            file << " : " << formula->asString() << endl;
+        }
+    }
+
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
           i != successors.end(); ++i ) {
 
@@ -271,6 +300,7 @@ void Node::output(std::ostream& file) {
 
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
           i != successors.end(); ++i ) {
-        (i->first)->output(file);
+        // no other node is a root node
+        (i->first)->output(file, false);
     }
 }

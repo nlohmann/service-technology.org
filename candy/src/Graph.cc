@@ -39,6 +39,7 @@ void Graph::outputDebug(std::ostream& file) {
     }
 }
 
+
 void Graph::output(std::ostream& file) {
 
     file << "{\n  generator:    " << PACKAGE_STRING
@@ -105,6 +106,6 @@ void Graph::output(std::ostream& file) {
 
     file << "\nNODES\n";
 
-    // the root
-    root->output(file);
+    // print all nodes beginning from the root
+    root->output(file, true);
 }

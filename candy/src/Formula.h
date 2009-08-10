@@ -5,13 +5,13 @@
 #include <set>
 
 
+// TODO clear
 // TRUE and FALSE #defined in cudd package may interfere with
 // FormulaLiteral::TRUE and ...::FALSE.
-#undef TRUE
-#undef FALSE
-
-#define TRUE 1
-#define FALSE 0
+//#undef TRUE
+//#undef FALSE
+//#define TRUE 1
+//#define FALSE 0
 
 class FormulaFixed;
 class FormulaCNF;
@@ -287,14 +287,14 @@ class FormulaLiteral : public Formula {
         static const std::string FINAL;
 
         /// Reserved literal TRUE is used for the value 'true'.
-#undef TRUE /* TRUE may interfere with macro in cudd package. */
+//#undef TRUE /* TRUE may interfere with macro in cudd package. */
         static const std::string TRUE;
-#define TRUE 1
+//#define TRUE 1
 
         /// Reserved literal FALSE is used for the value 'false'.
-#undef FALSE /* FALSE may interfere with macro in cudd package. */
+//#undef FALSE /* FALSE may interfere with macro in cudd package. */
         static const std::string FALSE;
-#define FALSE 0
+//#define FALSE 0
 
         /// Constructs a literal with the given string representation.
         FormulaLiteral(const std::string& literal);

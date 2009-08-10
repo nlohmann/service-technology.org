@@ -5,13 +5,17 @@ using namespace std;
 
 // TRUE and FALSE #defined in cudd package may interfere with
 // FormulaLiteral::TRUE and ...::FALSE.
-#undef TRUE
-#undef FALSE
+//#undef TRUE
+//#undef FALSE
 
 
-const std::string FormulaLiteral::FINAL = std::string("final");
-const std::string FormulaLiteral::TRUE = std::string("true");
-const std::string FormulaLiteral::FALSE = std::string("false");
+const std::string FormulaLiteral::FINAL = std::string("FINAL");
+const std::string FormulaLiteral::TRUE = std::string("TRUE");
+const std::string FormulaLiteral::FALSE = std::string("FALSE");
+
+// ****************************************************************************
+// FormulaAssignment
+// ****************************************************************************
 
 
 //! \brief  Sets the given literal to the given truth value within this

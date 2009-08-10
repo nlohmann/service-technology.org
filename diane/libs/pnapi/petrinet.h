@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-05-18 13:37:32 +0200 (Mon, 18 May 2009) $
+ * \date    $Date: 2009-08-10 04:17:17 +0200 (Mon, 10 Aug 2009) $
  *
- * \version $Revision: 4131 $
+ * \version $Revision: 4532 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -23,7 +23,7 @@
 
 #include <vector>
 
-#include "io.h"
+#include "myio.h"
 #include "condition.h"
 #include "component.h"
 
@@ -73,6 +73,7 @@ namespace pnapi
     void updatePlaces(Place &);
     void updatePlaceType(Place &, Node::Type);
     void updateTransitions(Transition &);
+    void updateTransitionLabels(Transition &);
 
 
   private:
@@ -89,6 +90,41 @@ namespace pnapi
 
   } /* namespace util */
 
+  /*!
+   * \brief
+   */
+  namespace exceptions
+  {
+    /*!
+     * \brief general exception class
+     */
+    class GeneralException
+    {
+    public:
+      GeneralException(std::string);
+      const std::string msg_;
+    private:
+    };
+    
+    /*!
+     * \brief exception class thrown by PetriNet::compose()
+     */
+    class ComposeError : public GeneralException
+    {
+    public:
+      ComposeError(std::string);
+    };
+    
+    /*!
+     * \brief exception class thrown by PetriNet::getSynchronizedTransitions(std::string)
+     */
+    class UnknownTransitionError : public GeneralException
+    {
+    public:
+      UnknownTransitionError();
+    };
+    
+  } /* namespace exceptions */
 
   /*!
    * \brief   A Petri net
@@ -223,6 +259,8 @@ namespace pnapi
     const std::set<Transition *> & getTransitions() const;
 
     const std::set<Transition *> & getSynchronizedTransitions() const;
+    
+    const std::set<Transition *> & getSynchronizedTransitions(const std::string & label) const;
 
     std::set<std::string> getSynchronousLabels() const;
 
@@ -272,7 +310,7 @@ namespace pnapi
 		 const std::string & = "net2");
 
     /// compose the given nets into a new one
-    static PetriNet compose(const std::map<std::string, PetriNet *> &);
+    static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
     /// normalizes the Petri net
     const std::map<Transition *, std::string> normalize();
@@ -289,6 +327,12 @@ namespace pnapi
 
     /// swaps input and output places
     void mirror();
+    
+    /// sets synchronous labels
+    void setSynchronousLabels(const std::set<std::string> &);
+    
+    /// sets labels (and translates references)
+    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 
     //@}
 
@@ -308,6 +352,9 @@ namespace pnapi
 
     /// all synchronized transitions
     std::set<Transition *> synchronizedTransitions_;
+    
+    /// synchronized transitions by label
+    std::map<std::string, std::set<Transition *> > transitionsByLabel_; 
 
     /// all places
     std::set<Place *> places_;
@@ -351,11 +398,15 @@ namespace pnapi
 
     /* structural changes */
 
+  public:
+
     /// deletes a place (used by e.g. merging and reduction rules)
     void deletePlace(Place &);
 
     /// deletes a transition (used by e.g. merging and reduction rules)
     void deleteTransition(Transition &);
+
+  private:
 
     /// deletes a node
     void deleteNode(Node &);
@@ -393,12 +444,6 @@ namespace pnapi
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 				   const std::string & = "") const;
-
-    /// sets synchronous labels
-    void setSynchronousLabels(const std::set<std::string> &);
-
-    /// sets labels (and translates references)
-    void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 
     /// translates constraint labels to transitions
     std::map<Transition *, std::set<Transition *> >

@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-05-13 20:19:08 +0200 (Wed, 13 May 2009) $
+ * \date    $Date: 2009-08-06 22:41:15 +0200 (Thu, 06 Aug 2009) $
  *
- * \version $Revision: 4118 $
+ * \version $Revision: 4526 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -190,6 +190,10 @@ namespace pnapi
 
     /// the set of labels
     const std::set<std::string> & getSynchronizeLabels() const;
+    //std::set<std::string> getSynchronizeLabels() const;
+    
+    /// set the set of labels
+    void setSynchronizeLabels(const std::set<std::string> &);
 
 
   private:
@@ -198,7 +202,7 @@ namespace pnapi
     int cost_;
     
     /// synchronize labels
-    const std::set<std::string> labels_;
+    std::set<std::string> labels_;
 
 
     /// no standard copying!
@@ -244,9 +248,18 @@ namespace pnapi
 
     /// returns the port this place belongs to
     std::string getPort() const;
+    
+    /// returns the port this place belongs to
+    void setPort(std::string &);
 
     /// swaps interface type
     void mirror();
+    
+    /// set the maximum occurrence
+    void setMaxOccurrence(int);
+    
+    /// get the maximum occurrence
+    int getMaxOccurrence();
 
 
   private:
@@ -262,6 +275,9 @@ namespace pnapi
 
     /// port this place belongs to
     std::string port_;
+    
+    /// maximum occurrence
+    int maxOccurrence_;
 
 
     /// no standard copying!

@@ -3,7 +3,7 @@
 
 #include "parser.h"
 #include "automaton.h"
-#include "io.h"
+#include "myio.h"
 
 using std::map;
 using std::set;
@@ -58,11 +58,8 @@ namespace pnapi
 	case util::OWFN:
 	  {
 	    parser::owfn::Parser parser;
-	    parser::owfn::Visitor visitor;
-	    parser.parse(is).visit(visitor);
-	    net = visitor.getPetriNet();
-	    net.setConstraintLabels(visitor.getConstraintLabels());
-	    net.setSynchronousLabels(visitor.getSynchronousLabels());
+	    net = parser.parse(is);
+	    
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }
@@ -70,9 +67,8 @@ namespace pnapi
 	case util::LOLA:
 	  {
 	    parser::lola::Parser parser;
-	    parser::owfn::Visitor visitor;
-	    parser.parse(is).visit(visitor);
-	    net = visitor.getPetriNet();
+	    net = parser.parse(is);
+	    
 	    net.meta_ = util::MetaData::data(is);
 	    break;
 	  }
@@ -88,6 +84,13 @@ namespace pnapi
 	    break;
 	  }
 
+	case util::SA2SM:
+	  {
+	    parser::sa::Parser parser;
+	    net = parser.parseSA2SM(is);
+
+	    break;
+	  }
 	default:
 	  assert(false);  // unsupported input format
 	}
@@ -124,9 +127,7 @@ namespace pnapi
       case util::SA:
       {
         parser::sa::Parser parser;
-        parser::sa::Visitor visitor;
-        parser.parse(is).visit(visitor);
-        sa = visitor.getAutomaton();
+        sa = parser.parse(is);
         break;
       }
       default: assert(false); /* unsupported format */

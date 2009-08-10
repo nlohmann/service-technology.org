@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 #include <fstream>
 #include <sstream>
 #include <set>
@@ -12,10 +13,11 @@ using std::cerr;
 using std::cout;
 using std::endl;
 using std::flush;
+using std::bad_alloc;
 
 #include "automaton.h"
 #include "component.h"
-#include "io.h"
+#include "myio.h"
 #include "marking.h"
 #include "petrinet.h"
 #include "state.h"
@@ -29,7 +31,7 @@ namespace pnapi
    * The result of the constructor is an emty automaton.
    */
   Automaton::Automaton() :
-      net_(NULL), hashTable_(NULL), counter_(0)
+      edgeLabels_(NULL), edgeTypes_(NULL), net_(NULL), hashTable_(NULL), counter_(0)
   {
     /* do nothing */
   }
@@ -46,13 +48,16 @@ namespace pnapi
   Automaton::Automaton(PetriNet &net) :
     counter_(0)
   {
+    // initializing private variables
     net_ = new PetriNet(net);
     edgeLabels_ = new std::map<Transition *, std::string>();
     edgeTypes_ = new std::map<Transition *, Type>();
     weights_ = new std::map<const Place *, unsigned int>();
     hashTable_ = new std::vector<std::set<State *> >(HASH_SIZE);
 
+    // normalizing the copied net and retrieving the edge labels
     (*edgeLabels_) = net_->normalize();
+    // preparing input and output labels
     for (std::set<Place *>::iterator p = net_->getInterfacePlaces().begin(); p != net_->getInterfacePlaces().end(); p++)
     {
       if ((*p)->getType() == Node::INPUT)
@@ -60,6 +65,7 @@ namespace pnapi
       else
         addOutput((*p)->getName());
     }
+    // giving each transition its type
     for (std::set<Transition *>::iterator t = net_->getTransitions().begin();
         t != net_->getTransitions().end(); t++)
       switch((**t).getType())
@@ -76,9 +82,10 @@ namespace pnapi
       default:
         break;
       }
-
+    // deleting all interface places
     net_->makeInnerStructure();
 
+    // making a marking's hash value more random
     srand(time(NULL));
     //unsigned int size = net_->getPlaces().size();
     for (std::set<Place *>::iterator p = net_->getPlaces().begin();
@@ -87,8 +94,10 @@ namespace pnapi
       (*weights_)[*p] = rand() % HASH_SIZE;
     }
 
+    // creating initial state
     State &start = createState(*new Marking(*net_));
     start.initial();
+    // beginning to find follow-up states
     dfs(start);
   }
 
@@ -98,7 +107,7 @@ namespace pnapi
    * properties which marked as optional in the according header file.
    */
   Automaton::Automaton(const Automaton &a) :
-    states_(a.states_), edges_(a.edges_), hashTable_(NULL), counter_(a.counter_+1)
+    states_(a.states_), edges_(a.edges_), edgeLabels_(NULL), hashTable_(NULL), counter_(a.counter_+1)
   {
     if (a.net_ == NULL)
       net_ = NULL;
@@ -115,13 +124,21 @@ namespace pnapi
   Automaton::~Automaton()
   {
     if (net_ != NULL)
+    {
       delete net_;
+    }
     if (edgeLabels_ != NULL)
+    {
       delete edgeLabels_;
+    }
     if (edgeTypes_ != NULL)
+    {
       delete edgeTypes_;
+    }
     if (hashTable_ != NULL)
+    {
       delete hashTable_;
+    }
   }
 
 
@@ -133,9 +150,17 @@ namespace pnapi
    */
   State & Automaton::createState()
   {
-    State *s = new State(&counter_);
-    states_.push_back(s);
-    return *s;
+    try
+    {
+      State *s = new State(&counter_);
+      states_.push_back(s);
+      return *s;
+    }
+    catch (bad_alloc&)
+    {
+      std::cerr << PACKAGE_STRING << ": Error allocating memory. Possibly the Petri net is unbounded." << std::endl;
+      throw "Aborting.";
+    }
   }
 
 
@@ -152,9 +177,18 @@ namespace pnapi
     for (unsigned int i = 0; i < states_.size(); i++)
       if (states_[i]->name() == name)
         return *states_[i];
-    State *s = new State(name);
-    states_.push_back(s);
-    return *s;
+    try
+    {
+      State *s = new State(name);
+
+      states_.push_back(s);
+      return *s;
+    }
+    catch (bad_alloc&)
+    {
+      std::cerr << PACKAGE_STRING << ": Error allocating memory. Possibly the Petri net is unbounded." << std::endl;
+      throw "Aborting.";
+    }
   }
 
 
@@ -169,9 +203,18 @@ namespace pnapi
    */
   State & Automaton::createState(Marking &m)
   {
-    State *s = new State(m, weights_, &counter_);
-    states_.push_back(s);
-    return *s;
+    try
+    {
+      State *s = new State(m, weights_, &counter_);
+
+      states_.push_back(s);
+      return *s;
+    }
+    catch (bad_alloc&)
+    {
+      std::cerr << PACKAGE_STRING << ": Error allocating memory. Possibly the Petri net is unbounded." << std::endl;
+      throw "Aborting.";
+    }
   }
 
 
@@ -208,6 +251,8 @@ namespace pnapi
       addInput(label);
     if (type == OUTPUT)
       addOutput(label);
+    if (type == SYNCHRONOUS)
+      labels_.insert(label);
     return *e;
   }
 
@@ -264,6 +309,8 @@ namespace pnapi
         final = final.formula() || (*(state2place[states_[i]])) == 1;
     }
 
+    // map synchlabel : T -> {string}
+    std::map<Transition *, std::set<std::string> > synchlabel;
     // generate transitions from edges
     for(unsigned int i=0; i < edges_.size(); ++i)
     {
@@ -276,6 +323,11 @@ namespace pnapi
       case Automaton::OUTPUT:
         result->createArc(*t, *result->findPlace(edges_[i]->label()));
         break;
+      case Automaton::SYNCHRONOUS:
+      {
+        synchlabel[t].insert(edges_[i]->label());
+        break;
+      }
       default:
         break;
       }
@@ -287,22 +339,24 @@ namespace pnapi
       result->createArc(*t,*p);
     }
 
-    // generate all other places empty
-    std::set<const Place *> concerning = final.concerningPlaces();
-    std::set<const Place *> places;
-    for (std::set<Place *>::iterator p = result->getPlaces().begin(); p != result->getPlaces().end(); p++)
-      places.insert(const_cast<Place *>(*p));
-    std::set<const Place *> difference = util::setDifference(places, concerning);
-    Condition empty;
-    empty = true;
-    for (std::set<const Place *>::iterator p = difference.begin();
-        p != difference.end(); p++)
+    std::set<Transition *> transitions = result->getTransitions();
+    for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
     {
-      empty = empty.formula() && (**p) == 0;
+      // FIXME: the easy way seems not to be working
+      // FIXME: THIS IS THE EASY WAY: (*t)->setSynchronizeLabels(synchlabel[*t]);
+
+      // making a copy of all transitions and give them the labels
+      Transition &tt = result->createTransition("", synchlabel[*t]);
+      for (std::set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); f != (*t)->getPresetArcs().end(); f++)
+        result->createArc((*f)->getPlace(), tt, (*f)->getWeight());
+      for (std::set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); f != (*t)->getPostsetArcs().end(); f++)
+        result->createArc(tt, (*f)->getPlace(), (*f)->getWeight());
+
+      result->deleteTransition(**t);
     }
 
-    // generate final condition;
-    result->finalCondition() = final.formula() && empty.formula();
+    // generate final condition
+    result->finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
 
     return *result;
   }
@@ -572,6 +626,24 @@ namespace pnapi
           printToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
       }
     }
+  }
+
+
+  /*!
+   * This method sets the synchronous labels of the automaton.
+   */
+  void Automaton::setSynchronousLabels(const std::set<std::string> & labels)
+  {
+    labels_ = labels;
+  }
+
+
+  /*!
+   * Returning the set of synchronous labels.
+   */
+  std::set<std::string> Automaton::getSynchronousLabels() const
+  {
+    return labels_;
   }
 
 

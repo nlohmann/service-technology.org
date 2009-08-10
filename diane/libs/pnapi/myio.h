@@ -6,13 +6,13 @@
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: niels $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2009-06-09 18:18:21 +0200 (Tue, 09 Jun 2009) $
+ * \date    $Date: 2009-08-04 16:59:49 +0200 (Tue, 04 Aug 2009) $
  *
- * \version $Revision: 4254 $
+ * \version $Revision: 4511 $
  */
 
 
@@ -196,6 +196,9 @@ namespace pnapi
     /// Service Automaton (SA) file format
     std::ios_base & sa(std::ios_base &);
 
+    /// Service Automaton (SA) to State-Machine
+    std::istream & sa2sm(std::istream &);
+
     /// LOLA file format
     std::ios_base & lola(std::ios_base &);
 
@@ -225,7 +228,7 @@ namespace pnapi
       /* FORMAT IMPLEMENTATION: add format constant */
 
       /// possible I/O formats
-      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, LOLA };
+      enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, SA2SM, LOLA };
 
       /// I/O (sub-)mode
       enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };

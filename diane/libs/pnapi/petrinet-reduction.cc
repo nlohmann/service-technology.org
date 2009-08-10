@@ -18,11 +18,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: niels $
+ *          last changes of: \$Author: cas $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-06-17 10:21:04 +0200 (Wed, 17 Jun 2009) $
+ * \date    \$Date: 2009-08-04 19:49:59 +0200 (Tue, 04 Aug 2009) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 4305 $
+ * \version \$Revision: 4512 $
  *
  * \ingroup petrinet
  */
@@ -265,27 +265,6 @@ unsigned int PetriNet::reduce_dead_nodes()
           t != deadTransitions.end(); ++t)
     {
       deleteTransition(**t);
-      ++result;
-    }
-            
-           
-    // remove isolated communication places
-    set<Place*> uselessInterfacePlaces;
-    
-    for (set<Place*>::iterator p = inputPlaces_.begin(); 
-          p != inputPlaces_.end(); ++p)
-      if ((*p)->getPostset().empty())
-        uselessInterfacePlaces.insert(*p);
-    
-    for (set<Place*>::iterator p = outputPlaces_.begin(); 
-           p != outputPlaces_.end(); ++p)
-      if ((*p)->getPreset().empty())
-        uselessInterfacePlaces.insert(*p);
-    
-    for (set<Place*>::iterator p = uselessInterfacePlaces.begin(); 
-           p != uselessInterfacePlaces.end(); ++p)
-    {
-      deletePlace(**p);
       ++result;
     }
   }

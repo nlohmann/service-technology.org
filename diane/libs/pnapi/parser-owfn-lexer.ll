@@ -8,7 +8,7 @@
 %option outfile="lex.yy.c"
 
 /* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_owfn_"
+%option prefix="pnapi_owfn_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -28,6 +28,8 @@
 #include "parser.h"
 #include "parser-owfn.h"
 
+#include <string>
+
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token
@@ -46,6 +48,8 @@
 #define fprintf(file,fmt,msg) \
    yyerror(msg);
 
+using pnapi::parser::owfn::ident;
+
 %}
 
 
@@ -55,6 +59,12 @@
 
  /* a start condition to skip comments */
 %s COMMENT
+
+/* 
+ * The state "IDENT2" is used for transition identifier.
+ * Unlike place identifier these can contain the char "=",
+ */
+%s IDENT2
 
 %%
 
@@ -81,8 +91,13 @@ INTERFACE                       { return KEY_INTERFACE; }
 INTERNAL                        { return KEY_INTERNAL; }
 INPUT                           { return KEY_INPUT; }
 OUTPUT                          { return KEY_OUTPUT; }
-TRANSITION                      { return KEY_TRANSITION; }
-INITIALMARKING                  { return KEY_MARKING; }
+
+TRANSITION                      { BEGIN(IDENT2); return KEY_TRANSITION; }
+<IDENT2>[ \n\r\t]               { /* skip whitespaces */ }
+<IDENT2>[^,;:()\t \n\r\{\}]+    { BEGIN(INITIAL); ident = yytext; return IDENT; }
+<IDENT2>.                       { yyerror("Unexpected symbol at transition identifier"); }
+
+INITIALMARKING                  { return KEY_INITIALMARKING; }
 FINALMARKING                    { return KEY_FINALMARKING; }
 NOFINALMARKING                  { return KEY_NOFINALMARKING; }
 FINALCONDITION                  { return KEY_FINALCONDITION; }
@@ -119,16 +134,14 @@ NOT                             { return OP_NOT; }
 ,                               { return COMMA; }
 
  /* identifiers */
-[0-9][0-9]*                     { 
-            pnapi_owfn_lval.yt_int = atoi(yytext); return NUMBER; }
-"-"[0-9][0-9]*                  { 
-            pnapi_owfn_lval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]* { 
-            pnapi_owfn_lval.yt_string = new std::string(yytext); return IDENT; }
+[0-9]+                          { pnapi_owfn_yylval.yt_int = atoi(yytext); return NUMBER; }
+"-"[0-9]+                       { pnapi_owfn_yylval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
+[^,;:()\t \n\r\{\}=]+           { ident = yytext; return IDENT; }
 
  /* whitespace */
-[\n\r]                          { /* skip */ }
-[ \t]                           { /* skip */ }
+[ \n\r\t]                       { /* skip */ }
 
  /* anything else */
 .                               { yyerror("unexpected lexical token"); }
+
+%%

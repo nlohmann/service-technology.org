@@ -19,10 +19,14 @@ libpnapi_a_SOURCES = \
 	automaton.h automaton.cc\
 	state.h state.cc \
 	marking.h marking.cc \
-	io.h io.cc io-format.cc
+	myio.h myio.cc io-format.cc \
+	errorhandling.cc
 
-BUILT_SOURCES = parser-owfn.cc parser-petrify.cc parser-onwd.cc parser-lola.cc \
-		parser-sa.cc
+BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
+                parser-petrify.cc parser-petrify.h parser-petrify-lexer.cc \
+		parser-onwd.cc parser-onwd.h parser-onwd-lexer.cc \
+		parser-lola.cc parser-lola.h parser-lola-lexer.cc \
+		parser-sa.cc parser-sa.h parser-sa-lexer.cc
 
 EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h parser-lola.h \
 	     parser-sa.h

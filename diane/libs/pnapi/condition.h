@@ -37,6 +37,10 @@ namespace pnapi
   formula::Conjunction operator&&(const formula::Formula &,
 				  const formula::Formula &);
 
+  /// formula construction operator (empty places)
+  formula::Conjunction operator&&(const formula::Formula &,
+		  const formula::AllOtherPlaces);
+
   /// formula construction operator
   formula::Disjunction operator||(const formula::Formula &,
 				  const formula::Formula &);
@@ -81,6 +85,9 @@ namespace pnapi
 
     /// standard assignment operator
     Condition & operator=(const formula::Formula &);
+
+    /// standard assignment operator for flag settings
+    Condition & operator=(const formula::AllOtherPlaces);
 
     /// standard assignment operator for boolean values
     Condition & operator=(bool);

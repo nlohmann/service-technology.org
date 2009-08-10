@@ -4,7 +4,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "io.h"
+#include "myio.h"
 
 
 namespace pnapi
@@ -22,7 +22,7 @@ namespace pnapi
     friend std::ostream & io::__dot::output(std::ostream &, const Automaton &);
 
   public:
-    enum Type { INPUT, OUTPUT, TAU };
+    enum Type { INPUT, OUTPUT, TAU, SYNCHRONOUS };
     /// standard constructor
     Automaton();
     /// constructor generating automaton from Petri net
@@ -63,6 +63,11 @@ namespace pnapi
     std::set<std::string> output() const;
     void addOutput(std::string);
 
+    /// sets all synchronous labels
+    void setSynchronousLabels(const std::set<std::string> &);
+    /// returns the set of all synchronous labels
+    std::set<std::string> getSynchronousLabels() const;
+
     static const unsigned int HASH_SIZE = 65535;
 
   private:
@@ -74,6 +79,8 @@ namespace pnapi
     std::set<std::string> input_;
     /// set of output labels
     std::set<std::string> output_;
+    /// set of all synchronous labels
+    std::set<std::string> labels_;
 
     /// mapping from transitions to strings (their label) [optional]
     std::map<Transition *, std::string> *edgeLabels_;

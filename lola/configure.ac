@@ -1,4 +1,4 @@
-AC_INIT([LoLA],[1.13-unreleased],[lola@service-technology.org])
+AC_INIT(LoLA, 1.13-unreleased, lola@service-technology.org, lola, http://service-technology.org/lola)
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
@@ -29,6 +29,9 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
+
+# store the SVN revision number
+AC_DEFINE_UNQUOTED(VERSION_SVN, "`svnversion -n 2> /dev/null`", [The SVN revision.])
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD

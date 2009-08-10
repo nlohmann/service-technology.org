@@ -79,7 +79,6 @@ $(CONFIGS): $@
 
 MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
 DISTCLEANFILES = $(CONFIGS)$(EXEEXT)
-CLEANFILES = $(CONFIGS)
 
 
 #############################################################################

@@ -28,6 +28,56 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([Debug Options])
+############################################################################
+
+AT_SETUP([Offspring generation])
+AT_CHECK([LOLA_BOUNDEDNET --offspring=boundednet],0,ignore,ignore)
+AT_CHECK([LOLA_DEADLOCK --offspring=deadlock],0,ignore,ignore)
+AT_CHECK([LOLA_FULLLIMITED --offspring=fulllimited],0,ignore,ignore)
+AT_CHECK([LOLA_LIVEPROP --offspring=liveprop],0,ignore,ignore)
+AT_CHECK([LOLA_MODELCHECKING --offspring=modelchecking],0,ignore,ignore)
+AT_CHECK([LOLA_STATEPREDICATE1 --offspring=statepredicate1],0,ignore,ignore)
+AT_CHECK([test -f userconfig.H.boundednet])
+AT_CHECK([test -f userconfig.H.deadlock])
+AT_CHECK([test -f userconfig.H.fulllimited])
+AT_CHECK([test -f userconfig.H.liveprop])
+AT_CHECK([test -f userconfig.H.modelchecking])
+AT_CHECK([test -f userconfig.H.statepredicate1])
+AT_KEYWORDS(debug)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([High-level Net Unfolding])
+############################################################################
+
+AT_SETUP([Data])
+AT_CHECK([cp TESTFILES/data.lola .])
+AT_CHECK([LOLA_DEADLOCK data.lola -n],1,stdout)
+AT_CHECK([test -f data.llnet])
+AT_CHECK([test -f data.pnml])
+AT_KEYWORDS(unfolding)
+AT_CLEANUP
+
+AT_SETUP([Dining Philosophers])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -n],0,stdout)
+AT_CHECK([test -f phils.llnet])
+AT_CHECK([test -f phils.pnml])
+AT_KEYWORDS(unfolding)
+AT_CLEANUP
+
+AT_SETUP([Echo Algorithm])
+AT_CHECK([cp TESTFILES/echo.lola .])
+AT_CHECK([LOLA_DEADLOCK echo.lola -n],0,stdout)
+AT_CHECK([test -f echo.llnet])
+AT_CHECK([test -f echo.pnml])
+AT_KEYWORDS(unfolding)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([Deadlock Check (lola-deadlock)])
 ############################################################################
 
@@ -35,6 +85,20 @@ AT_SETUP([Choreography])
 AT_CHECK([cp TESTFILES/choreography.lola .])
 AT_CHECK([LOLA_DEADLOCK choreography.lola],1,stdout)
 AT_CHECK([GREP -q "net does not have deadlocks!" stdout],0)
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+AT_SETUP([Data])
+AT_CHECK([cp TESTFILES/data.lola .])
+AT_CHECK([LOLA_DEADLOCK data.lola],1,stdout)
+AT_CHECK([GREP -q "net does not have deadlocks!" stdout],0)
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+AT_SETUP([Echo Algorithm])
+AT_CHECK([cp TESTFILES/echo.lola .])
+AT_CHECK([LOLA_DEADLOCK echo.lola],0,stdout)
+AT_CHECK([GREP -q "dead state found!" stdout],0)
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
@@ -55,6 +119,21 @@ AT_CHECK([LOLA_FULLLIMITED echo.lola],5,ignore,stderr)
 AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
 AT_KEYWORDS(fulllimited)
 AT_CLEANUP
+
+AT_SETUP([Garavel's Challenge])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA_FULLLIMITED garavel.lola],5,ignore,stderr)
+AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
+AT_KEYWORDS(fulllimited)
+AT_CLEANUP
+
+AT_SETUP([Unbounded Net])
+AT_CHECK([cp TESTFILES/unbounded.lola .])
+AT_CHECK([LOLA_FULLLIMITED unbounded.lola],5,ignore,stderr)
+AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
+AT_KEYWORDS(fulllimited)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([State Predicate (lola-statepredicate1)])
@@ -94,6 +173,48 @@ AT_CLEANUP
 ############################################################################
 AT_BANNER([Boundedness Check (lola-boundednet)])
 ############################################################################
+
+AT_SETUP([Business Process])
+AT_CHECK([cp TESTFILES/process.lola .])
+AT_CHECK([LOLA_BOUNDEDNET process.lola],1,stdout)
+AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_KEYWORDS(boundednet)
+AT_CLEANUP
+
+#AT_SETUP([Choreography])
+#AT_CHECK([cp TESTFILES/choreography.lola .])
+#AT_CHECK([LOLA_BOUNDEDNET choreography.lola],1,stdout)
+#AT_CHECK([GREP -q "net is bounded!" stdout],0)
+#AT_KEYWORDS(boundednet)
+A#T_CLEANUP
+
+AT_SETUP([Data])
+AT_CHECK([cp TESTFILES/data.lola .])
+AT_CHECK([LOLA_BOUNDEDNET data.lola],1,stdout)
+AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_KEYWORDS(boundednet)
+AT_CLEANUP
+
+#AT_SETUP([Dining Philosophers])
+#AT_CHECK([cp TESTFILES/phils.lola .])
+#AT_CHECK([LOLA_BOUNDEDNET phils.lola],1,stdout)
+#AT_CHECK([GREP -q "net is bounded!" stdout],0)
+#AT_KEYWORDS(boundednet)
+#AT_CLEANUP
+
+AT_SETUP([Garavel's Challenge])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA_BOUNDEDNET garavel.lola],1,stdout)
+AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_KEYWORDS(boundednet)
+AT_CLEANUP
+
+AT_SETUP([UML Activity Diagram])
+AT_CHECK([cp TESTFILES/umlprocess.lola .])
+AT_CHECK([LOLA_BOUNDEDNET umlprocess.lola],1,stdout)
+AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_KEYWORDS(boundednet)
+AT_CLEANUP
 
 AT_SETUP([Unbounded Net])
 AT_CHECK([cp TESTFILES/unbounded.lola .])

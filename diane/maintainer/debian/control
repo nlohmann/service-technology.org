@@ -11,5 +11,5 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: graphviz
 Description: a tool to decompose nets
- Diane decomposes nets into smaller nets
+  Diane decomposes nets.
 

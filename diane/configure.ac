@@ -1,8 +1,8 @@
-AC_INIT(Diane, 0.9, diane@service-technology.org, diane, http://service-technology.org/diane)
+AC_INIT(Diane, 1.0-unreleased, diane@service-technology.org, diane, http://service-technology.org/diane)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(gnits)
 
 # Checks for programs.
 AM_PROG_CC_C_O
@@ -49,5 +49,5 @@ else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile man/Makefile tests/Makefile tests/package.m4 doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile doc/Makefile src/Makefile man/Makefile tests/Makefile tests/package.m4 doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
 AC_OUTPUT

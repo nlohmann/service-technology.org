@@ -1,0 +1,18 @@
+[EXIT STATUS]
+Diane exits with 0 on success, and with >0 if an error occurs. See Texinfo manual for detailed information.
+
+[EXAMPLES]
+To decompose all nets in a given directory, execute
+.IP
+diane *.lola
+.PP
+The filenames of the components will be derived from the input nets.
+
+[BUGS]
+See https://gna.org/bugs/?group=service-tech for open bugs.
+
+[AUTHOR]
+Diane is written and maintained by Stephan Mennicke.
+
+[COPYRIGHT]
+Copyright (c) 2009 Stephan Mennicke

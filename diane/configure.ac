@@ -1,4 +1,4 @@
-AC_INIT(Diane, 0.9, stephan.mennicke@service-technology.org)
+AC_INIT(Diane, 0.9, diane@service-technology.org, diane, http://service-technology.org/diane)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -12,13 +12,23 @@ AC_PROG_YACC
 AC_PROG_RANLIB
 AC_PROG_SED
 
+# check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
-# needed for the Petri Net API
-AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
+# store the SVN revision number
+AC_DEFINE_UNQUOTED(VERSION_SVN, "`svnversion -n 2> /dev/null`", [The SVN revision.])
+
+# allow the configure script to control assertions
 AC_HEADER_ASSERT
+
+# look up canonical build name and write it to config.h
+AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,
@@ -39,5 +49,5 @@ else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile man/Makefile tests/Makefile tests/package.m4 doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
 AC_OUTPUT

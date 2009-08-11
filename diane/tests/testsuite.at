@@ -1,0 +1,3 @@
+AT_INIT
+
+AT_TESTED(versions.sh)

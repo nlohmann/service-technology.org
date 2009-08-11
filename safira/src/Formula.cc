@@ -6,6 +6,7 @@
 #include <set>
 #include <map>
 #include <list>
+#include <sys/wait.h>
 #include "Formula.h"
 #include "types.h"
 #include "helpers.h"
@@ -124,9 +125,9 @@ bool Formula::isSatisfiable(int fVar){
 //    status("executing '%s'", s.c_str());
 	//int result = system("echo 'p cnf 1 2 -1 0 -1 0' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null");
 	int result = system(s.c_str());
-
+    result = WEXITSTATUS(result);
     // shift result 
-	result = result>>8;
+//	result = result>>8;
 	
     //   0 = error
     //   1 = could not open file

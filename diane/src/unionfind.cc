@@ -7,6 +7,7 @@
 
 #include <map>
 #include <set>
+#include "cmdline.h"
 #include "unionfind.h"
 
 using pnapi::Arc;
@@ -14,6 +15,8 @@ using pnapi::Place;
 using pnapi::Transition;
 using std::map;
 using std::set;
+
+extern gengetopt_args_info args_info;
 
 
 void unionfind::MakeSet(int x, int *tree)
@@ -53,24 +56,19 @@ int unionfind::Find(int x, int *tree)
 
 int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, int psize, map<int, Node *> &reremap)
 {
-  // getting start time
-  //***
-
   // map to remap the integers to the Petri net's nodes
   map<Node *, int> remap;
 
   // init MakeSet calls
   int q = 0;
-  set<Place *> places = net.getPlaces();
-  for (set<Place *>::iterator it = places.begin(); it != places.end(); it++)
+  for (set<Place *>::iterator it = net.getPlaces().begin(); it != net.getPlaces().end(); it++)
   {
     remap[*it] = q;
     reremap[q] = *it;
     MakeSet(q, tree);
     q++;
   }
-  set<Transition *> transitions = net.getTransitions();
-  for (set<Transition *>::iterator it = transitions.begin(); it != transitions.end(); it++)
+  for (set<Transition *>::iterator it = net.getTransitions().begin(); it != net.getTransitions().end(); it++)
   {
     remap[*it] = q;
     reremap[q] = *it;
@@ -78,8 +76,20 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
     q++;
   }
 
+  if (args_info.service_flag)
+  {
+    for (set<Place *>::iterator it = net.getInternalPlaces().begin(); it != net.getInternalPlaces().end(); it++)
+      if ((*it)->getTokenCount())
+      {
+        for (set<Node *>::iterator t = (*it)->getPreset().begin(); t != (*it)->getPreset().end(); t++)
+          Union(remap[*it], remap[*t], tree);
+        for (set<Node *>::iterator t = (*it)->getPostset().begin(); t != (*it)->getPostset().end(); t++)
+          Union(remap[*it], remap[*t], tree);
+      }
+  }
+
   // usage of rules 1 and 2
-  for (set<Place *>::iterator p = places.begin(); p != places.end(); p++)
+  for (set<Place *>::iterator p = net.getPlaces().begin(); p != net.getPlaces().end(); p++)
   {
     set<Node *> preset = (*p)->getPreset();
     set<Node *>::iterator first = preset.begin();
@@ -102,7 +112,7 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
   do
   {
     hasChanged = false;
-    for (set<Place *>::iterator p = places.begin(); p != places.end(); p++)
+    for (set<Place *>::iterator p = net.getPlaces().begin(); p != net.getPlaces().end(); p++)
     {
       set<Node *> preset = (*p)->getPreset();
       set<Node *> postset = (*p)->getPostset();
@@ -137,9 +147,6 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
   for (int i = psize; i < size; i++)
     if (tree[i] < 0)
       n++;
-
-  // getting end time
-  //***
 
   return n;
 }

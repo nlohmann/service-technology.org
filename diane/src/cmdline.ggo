@@ -15,7 +15,7 @@ option "mode" m
 	optional
 	
 option "service" -
-	"Sets DIANE into service mode."
+	"Makes the result interpretable as services."
 	flag off
 
 section "Input and Output"

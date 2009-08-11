@@ -6,6 +6,7 @@
 #include <set>
 #include <map>
 #include <list>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include "Formula.h"
 #include "types.h"
@@ -108,8 +109,7 @@ bool Formula::isSatisfiable(int fVar){
 	for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
 			s = s + clauseToString(*n) + "0 ";
 	}
-//	s = s +  " ' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null";
-    s = s +  " ' | " + args_info.minisat_arg + " &> /dev/null";
+    s = s +  " ' | " + args_info.minisat_arg + " >/dev/null 2>&1";
 
 //	cout << "in function isSatisfiable: \n";
 //	cout << "max. number of the Variables in the formula: " << fVar << endl;
@@ -124,16 +124,15 @@ bool Formula::isSatisfiable(int fVar){
 
 //    status("executing '%s'", s.c_str());
 	//int result = system("echo 'p cnf 1 2 -1 0 -1 0' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null");
+
 	int result = system(s.c_str());
     result = WEXITSTATUS(result);
-    // shift result 
-//	result = result>>8;
 	
     //   0 = error
     //   1 = could not open file
     //   3 = parse error
-    //  10 = formula satisfiable
-    //  20 = formula unsatisfiable
+    //  10 = formula satisfiable (GOOD)
+    //  20 = formula unsatisfiable (GOOD)
     // 128 = binary not found (comes from shell)
 
 	if (result != 20 and result != 10) {

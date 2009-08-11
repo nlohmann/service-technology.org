@@ -264,6 +264,8 @@ namespace pnapi
 
     std::set<std::string> getSynchronousLabels() const;
 
+    const std::set<Arc *> & getArcs() const;
+
     //@}
 
 

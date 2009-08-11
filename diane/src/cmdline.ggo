@@ -7,23 +7,21 @@ purpose "DIANE - Decomposition Into Atomic NEts."
 description "Diane cuts a Petri net into parts."
 
 option "mode" m
-	"Specifies a certain mode in which DIANE will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net, and 'freechoice' finds service parts by manipulating free-choice cluster."
+	"Specifies a certain mode in which DIANE will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net (input: LoLA format), and 'freechoice' finds service parts by manipulating free-choice cluster (input: oWFN format)."
 	string
 	values="standard","freechoice" enum
 	default="standard"
 	typestr="MODE"
 	optional
+	
+option "service" -
+	"Sets DIANE into service mode."
+	flag off
 
 section "Input and Output"
 
-option "input" i
-	"Specifies input file. If not specified DIANE will read from stdin."
-	string
-	typestr="FILENAME"
-	optional
-
 option "output" o
-	"Specifies the output files' prefix. If not specified DIANE will derive the output filenames from input filename."
+	"Specifies the output files' prefix. If not specified DIANE will derive the output filenames from the input filename."
 	string
 	typestr="FILEPREFIX"
 	optional
@@ -35,5 +33,10 @@ option "quiet" q
 section "Debug Options"
 
 option "verbose" v
-	"Verbose output."
+	"Verbose output: Statistical output."
+	flag off
+	
+option "csv" -
+	"Writes the statistical output to 'stdout' in CSV format. The column heads are given on 'stderr'."
+	dependon="verbose"
 	flag off

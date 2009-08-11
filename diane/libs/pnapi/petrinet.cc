@@ -1132,6 +1132,15 @@ namespace pnapi
 
 
   /*!
+   *
+   */
+  const set<Arc *> & PetriNet::getArcs() const
+  {
+    return arcs_;
+  }
+
+
+  /*!
    */
   const set<Transition *> & PetriNet::getSynchronizedTransitions() const
   {

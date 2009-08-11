@@ -53,6 +53,9 @@ int unionfind::Find(int x, int *tree)
 
 int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, int psize, map<int, Node *> &reremap)
 {
+  // getting start time
+  //***
+
   // map to remap the integers to the Petri net's nodes
   map<Node *, int> remap;
 
@@ -66,7 +69,6 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
     MakeSet(q, tree);
     q++;
   }
-  //assert(q == psize);
   set<Transition *> transitions = net.getTransitions();
   for (set<Transition *>::iterator it = transitions.begin(); it != transitions.end(); it++)
   {
@@ -75,7 +77,6 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
     MakeSet(q, tree);
     q++;
   }
-  //assert(q == size);
 
   // usage of rules 1 and 2
   for (set<Place *>::iterator p = places.begin(); p != places.end(); p++)
@@ -136,6 +137,9 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
   for (int i = psize; i < size; i++)
     if (tree[i] < 0)
       n++;
+
+  // getting end time
+  //***
 
   return n;
 }

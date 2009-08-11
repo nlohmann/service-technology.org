@@ -22,7 +22,6 @@ gengetopt_args_info args_info;
 
 using namespace std;
 
-char* progName = "cog";
 string invocation;
 
 // lexer and parser
@@ -168,6 +167,7 @@ void evaluateParameters(int argc, char** argv) {
     // overwrite invokation for consistent error messages
     argv[0] = (char*)PACKAGE;
 
+/*
     // debug option
     if (argc > 0 and std::string(argv[1]) == "--bug") {
         FILE *debug_output = fopen("bug.log", "w");
@@ -176,6 +176,7 @@ void evaluateParameters(int argc, char** argv) {
         fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
         exit(EXIT_SUCCESS);
     }
+*/
 
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {
@@ -207,9 +208,9 @@ void evaluateParameters(int argc, char** argv) {
         }
     } else {
         // check for configuration files
-        string conf_filename = fileExists("cog.conf") ? "cog.conf" :
-                               (fileExists(string(SYSCONFDIR) + "/cog.conf") ?
-                               (string(SYSCONFDIR) + "/cog.conf") : "");
+        string conf_filename = fileExists("safira.conf") ? "safira.conf" :
+                               (fileExists(string(SYSCONFDIR) + "/safira.conf") ?
+                               (string(SYSCONFDIR) + "/safira.conf") : "");
 
         if (conf_filename != "") {
             // initialize the config file parser

@@ -17,6 +17,13 @@ option "output" o
   optional
   multiple
 
+option "minisat" -
+  "Path to Minisat"
+  string
+  typestr="FILE"
+  default="minisat"
+  optional
+
 option "config" c
   "Read configuration from file."
   details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed."

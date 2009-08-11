@@ -13,6 +13,3 @@ AT_CHECK([SAFIRA spec_klein.og],0,stdout)
 AT_CHECK([diff stdout erg.txt])
 AT_KEYWORDS(basic)
 AT_CLEANUP
-
-
-

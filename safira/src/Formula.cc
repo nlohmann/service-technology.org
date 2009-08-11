@@ -9,7 +9,11 @@
 #include "Formula.h"
 #include "types.h"
 #include "helpers.h"
+#include "cmdline.h"
+#include "verbose.h"
 
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 extern map<int, string> id2label;
 extern map<string, int> label2id;
@@ -100,12 +104,11 @@ bool Formula::isSatisfiable(int fVar){
 
 	string s = "echo 'p cnf " + sVar_Clauses;
 
-	string test;
 	for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
 			s = s + clauseToString(*n) + "0 ";
 	}
 //	s = s +  " ' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null";
-	s = s +  " ' | /Users/niels/Documents/6Tools/service-tech/safira/minisat/src/minisat &> /dev/null";
+    s = s +  " ' | " + args_info.minisat_arg + " &> /dev/null";
 
 //	cout << "in function isSatisfiable: \n";
 //	cout << "max. number of the Variables in the formula: " << fVar << endl;
@@ -118,25 +121,25 @@ bool Formula::isSatisfiable(int fVar){
 //	}
 //	cout << s << endl;
 
-	int result = system(s.c_str());
+//    status("executing '%s'", s.c_str());
 	//int result = system("echo 'p cnf 1 2 -1 0 -1 0' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null");
+	int result = system(s.c_str());
 
-	//FILE *fp;
-	//fp = popen("/Users/kathrin/5_Projekte/minisat/core/minisat", "w");
-	//fprintf(fp, s.c_str());
-	//pclose(fp);
-
+    // shift result 
 	result = result>>8;
-	assert(result != 3); //3 == unexpected char
-	if (20 == result){   // Unsatisfiable
-		//cout << "Formula is NOT satisfiable" << endl;
-		return false;
+	
+    //   0 = error
+    //   1 = could not open file
+    //   3 = parse error
+    //  10 = formula satisfiable
+    //  20 = formula unsatisfiable
+    // 128 = binary not found (comes from shell)
+
+	if (result != 20 and result != 10) {
+        abort(7, "minisat exited with code '%d'", result);
 	}
-	else {
-		assert(result == 0); //Satisfiable
-		//cout << "Formula is satisfiable" << endl;
-		return true;
-	}
+
+    return (result == 10);
 }
 
 

@@ -258,6 +258,8 @@ namespace pnapi
 
     const std::set<Transition *> & getTransitions() const;
 
+    const std::set<Arc *> & getArcs() const;
+
     const std::set<Transition *> & getSynchronizedTransitions() const;
     
     const std::set<Transition *> & getSynchronizedTransitions(const std::string & label) const;

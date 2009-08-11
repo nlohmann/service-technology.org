@@ -41,14 +41,15 @@ struct Statistics {
   int netF_;
 
   // biggest fragment
-  int biggestNodes_;
-  int biggestP_;
-  int biggestT_;
-  int biggestF_;
-  int biggestPi_;
-  int biggestPo_;
+  int largestNodes_;
+  int largestP_;
+  int largestT_;
+  int largestF_;
+  int largestPi_;
+  int largestPo_;
 
   // average fragment
+  // each must be devided by #fragments
   int averageP_;
   int averageT_;
   int averageF_;
@@ -63,10 +64,10 @@ struct Statistics {
   {
     t_total_ = t_computingComponents_ = t_buildingComponents_ = 0;
     netP_ = netT_ = netF_ = 0;
-    biggestP_ = biggestT_ = biggestF_ = biggestPi_ = biggestPo_ = 0;
+    largestP_ = largestT_ = largestF_ = largestPi_ = largestPo_ = 0;
     averageP_ = averageT_ = averageF_ = averagePi_ = averagePo_ = 0;
     trivialN_ = 0;
-    biggestNodes_ = 0;
+    largestNodes_ = 0;
   }
 } statistics;
 
@@ -244,14 +245,14 @@ int main(int argc, char *argv[])
         {
           if (nets[j] == NULL)
             continue;
-          if (nets[j]->getNodes().size() > statistics.biggestNodes_)
+          if (nets[j]->getNodes().size() > statistics.largestNodes_)
           {
-            statistics.biggestNodes_ = nets[j]->getNodes().size();
-            statistics.biggestP_ = nets[j]->getPlaces().size();
-            statistics.biggestT_ = nets[j]->getTransitions().size();
-            statistics.biggestF_ = nets[j]->getArcs().size();
-            statistics.biggestPi_ = nets[j]->getInputPlaces().size();
-            statistics.biggestPo_ = nets[j]->getOutputPlaces().size();
+            statistics.largestNodes_ = nets[j]->getNodes().size();
+            statistics.largestP_ = nets[j]->getPlaces().size();
+            statistics.largestT_ = nets[j]->getTransitions().size();
+            statistics.largestF_ = nets[j]->getArcs().size();
+            statistics.largestPi_ = nets[j]->getInputPlaces().size();
+            statistics.largestPo_ = nets[j]->getOutputPlaces().size();
           }
 
           if (nets[j]->getNodes().size()-nets[j]->getInterfacePlaces().size() == 1)
@@ -274,19 +275,17 @@ int main(int argc, char *argv[])
           cout << "*******************************************************" << endl;
           cout << "* Petri net Statistics:" << endl;
           cout << "*   |P|= " << net.getPlaces().size()
-               << " |P_in|= " << net.getInputPlaces().size()
-               << " |P_out|= " << net.getOutputPlaces().size()
                << " |T|= " << net.getTransitions().size()
                << " |F|= " << net.getArcs().size() << endl;
           cout << "*******************************************************" << endl;
           cout << "* Number of fragments:         " << n << endl;
           cout << "* Number of trivial fragments: " << statistics.trivialN_ << endl;
-          cout << "* Biggest fragment:" << endl;
-          cout << "*   |P|= " << statistics.biggestP_
-               << " |P_in|= " << statistics.biggestPi_
-               << " |P_out|= " << statistics.biggestPo_
-               << " |T|= " << statistics.biggestT_
-               << " |F|= " << statistics.biggestF_ << endl;
+          cout << "* Largest fragment:" << endl;
+          cout << "*   |P|= " << statistics.largestP_
+               << " |P_in|= " << statistics.largestPi_
+               << " |P_out|= " << statistics.largestPo_
+               << " |T|= " << statistics.largestT_
+               << " |F|= " << statistics.largestF_ << endl;
           cout << "* Average fragment:" << endl;
           cout << "*   |P|= " << std::setprecision(2) << (float) statistics.averageP_/n
                << " |P_in|= " << std::setprecision(2) << (float) statistics.averagePi_/n
@@ -303,7 +302,34 @@ int main(int argc, char *argv[])
         }
         else
         {
-          ;
+          /*
+           * filename,|P| net,|T| net,|F| net,#fragments,#trivial fragments,
+           * |P| lf, |P_in| lf, |P_out| lf, |T| lf, |F| lf,
+           * |P| af, |P_in| af, |P_out| af, |T| af, |F| af,
+           * total runtime, computing runtime, building runtime
+           *
+           * where lf = largest fragment, af = average fragment
+           */
+          cout << args_info.inputs[i] << ","
+               << net.getPlaces().size() << ","
+               << net.getTransitions().size() << ","
+               << net.getArcs().size() << ","
+               << n << ","
+               << statistics.trivialN_ << ","
+               << statistics.largestP_ << ","
+               << statistics.largestPi_ << ","
+               << statistics.largestPo_ << ","
+               << statistics.largestT_ << ","
+               << statistics.largestF_ << ","
+               << statistics.averageP_ << ","
+               << statistics.averagePi_ << ","
+               << statistics.averagePo_ << ","
+               << statistics.averageT_ << ","
+               << statistics.averageF_ << ","
+               << statistics.t_total_ << ","
+               << statistics.t_computingComponents_ << ","
+               << statistics.t_buildingComponents_
+               << endl;
         }
       }
     }

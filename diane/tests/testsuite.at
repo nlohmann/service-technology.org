@@ -15,3 +15,44 @@ AT_SETUP([Version output])
 AT_CHECK([DIANE --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+
+AT_SETUP([Input file not found])
+AT_CHECK([DIANE foo.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Input file not parsed])
+AT_CHECK([cp TESTFILES/PO.owfn .])
+AT_CHECK([DIANE PO.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+############################################################################
+#AT_BANNER([Regression Tests])
+############################################################################
+
+############################################################################
+AT_BANNER([Components])
+############################################################################
+
+AT_SETUP([Number of Components])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([DIANE phils.lola -q | GREP -q "number of components: 20"],0,ignore,stderr)
+AT_KEYWORDS(components)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Service Flag])
+############################################################################
+
+AT_SETUP([Number of Service Components])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([DIANE phils.lola -q --service | GREP -q "number of components: 1"],0,ignore,stderr)
+AT_KEYWORDS(service)
+AT_CLEANUP

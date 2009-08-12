@@ -1,6 +1,7 @@
 TESTSUITE = $(builddir)/testsuite
 EXTRA_DIST = testsuite.at versions.sh wrap.sh \
 		testfiles/PO.owfn.lola \
+		testfiles/PO.owfn \
 		testfiles/T2.owfn.lola \
 		testfiles/choreography.lola \
 		testfiles/phils.lola \

@@ -107,7 +107,17 @@ option "waitstatesOnly" -
 
 option "receiveBeforeSend" -
   "Only send if receiving does not resolve all waitstates."
-  details="This rule will only send asynchronous messages if absolutely necessary. That is, using this rules will create `arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="This rule will only send asynchronous messages if absolutely necessary. That is, using this rule will create `arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  flag off
+
+option "seqReceivingEvents" -
+  "Sequentialize receiving events."
+  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstates. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  flag off
+
+option "succeedingSendingEvent" -
+  "One succeeding sending event is enough."
+  details="If there exists one sending event such that the current knowledge is satisfied no more (sending event) successor knowledges are calculated. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
 
 

@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -45,6 +45,9 @@ class Knowledge {
 
         /// whether the knowledge's waitstates can be resolved by receiving
         bool receivingHelps() const;
+
+        /// calculate those receiving events that are essential to resolve each and every waitstate
+        void sequentializeReceivingEvents(std::map<Label_ID, bool> &) const;
 
     public: /* attributes */
 

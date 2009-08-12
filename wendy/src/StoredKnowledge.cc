@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -101,7 +101,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
     }
 
     // we saw K_new's successors (or K_new was not sane)
-    delete K_new;    
+    delete K_new;
 }
 
 
@@ -121,8 +121,22 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
             stats_storedKnowledges, stats_storedEdges);
     }
 
+    // reduction rule: sequentialize receiving events
+    map<Label_ID, bool> consideredReceivingEvents;
+
+	if (args_info.seqReceivingEvents_flag) {
+		// calculate those receiving events that are essential to resolve each and every waitstate
+		K->sequentializeReceivingEvents(consideredReceivingEvents);
+	}
+
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+
+    	// reduction rule: sequentialize receiving events
+    	// if current receiving event is not to be considered, continue
+    	if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not consideredReceivingEvents[l]) {
+    		continue;
+    	}
 
         // reduction rule: receive before send
         if (args_info.receiveBeforeSend_flag) {
@@ -140,6 +154,12 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         }
 
         process(K, SK, l);
+
+        // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
+        // TODO what about synchronous events?
+        if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat()) {
+        	l = Label::first_sync;
+        }
     }
 }
 
@@ -148,7 +168,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
  \todo treat the deletions
 
  \todo must delete hash tree (needed by removeInsaneNodes())
- 
+
  \post interface only consists of deadlocking markings (unless --im or
        --showTransients mode was chosen)
  */
@@ -239,11 +259,11 @@ unsigned int StoredKnowledge::addPredecessors() {
 
 /*!
  \todo Do I really need three sets?
- 
+
  \todo Understand and tidy up this.
- 
+
  \todo Check if the nodes are deleted after sat() returns false -- in this
-       case, I don't need to acutally set is_sane each time.
+       case, I don't need to actually set is_sane each time.
 */
 unsigned int StoredKnowledge::removeInsaneNodes() {
     unsigned int result = 0;
@@ -311,17 +331,17 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 
 /*!
  \param[in,out] file  the output stream to write the dot representation to
- 
- \note  The empty node has the number 0 and is only drawn if the commandline
+
+ \note  The empty node has the number 0 and is only drawn if the command line
         parameter "--showEmptyNode" was given. For each node and receiving
         label, we add an edge to the empty node if this edge is not present
         before.
- 
+
  \todo  Only print empty node if it is actually reachable.
 */
 void StoredKnowledge::dot(std::ofstream &file) {
     bool emptyNodeReachable = false;
-    
+
     file << "digraph G {\n"
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
@@ -339,6 +359,9 @@ void StoredKnowledge::dot(std::ofstream &file) {
                     default: assert(false);
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
+
+                // show knowledge id
+                file << it->second[i] << "\\n";
 
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
@@ -399,7 +422,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
 
 /*!
  \todo  Only print empty node if it is actually reachable.
- 
+
  \bug   Final states must not have outgoing tau or sending events.
 */
 void StoredKnowledge::print(std::ofstream &file) const {
@@ -451,7 +474,7 @@ void StoredKnowledge::print(std::ofstream &file) const {
 
 /*!
  \param[in,out] file  the output stream to write the OG to
- 
+
  \note  Fiona identifies node numbers by integers. To avoid numbering of
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
@@ -539,7 +562,7 @@ void StoredKnowledge::output(std::ofstream &file) {
 
 /*!
  \param[in,out] file  the output stream to write the OG to
- 
+
  \note  Fiona identifies node numbers by integers. To avoid numbering of
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
@@ -852,7 +875,7 @@ bool StoredKnowledge::sat() const {
         }
     }
 
-    // now each deadlock must have ?-sucessors
+    // now each deadlock must have ?-successors
     for (unsigned int i = 0; i < size; ++i) {
         bool resolved = false;
 
@@ -887,10 +910,10 @@ bool StoredKnowledge::sat() const {
 
 /*!
  \return a string representation of the formula
- 
+
  \note This function is also used for an operating guidelines output for
        Fiona.
- 
+
  \todo Adjust comments and variable names to reflect the fact that we also
        treat synchronous communication.
  */
@@ -1034,7 +1057,7 @@ void StoredKnowledge::traverse() {
 
 void StoredKnowledge::migration(std::ofstream& o) {
     map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > > migrationInfo;
-    
+
     unsigned int c = 0;
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         // traverse the bubble

@@ -27,7 +27,11 @@ EXTRA_DIST = testsuite.at versions.sh wrap.sh \
 		testfiles/zeus.fiona.og testfiles/zeus.owfn \
 		testfiles/phil5.owfn \
 		testfiles/test-sync.owfn \
-		testfiles/carreservation_with_engine.owfn
+		testfiles/carreservation_with_engine.owfn \
+		testfiles/seqTest1.owfn \
+		testfiles/seqTest2.owfn \
+		testfiles/seqTest3.owfn \
+		testfiles/sequence20.owfn
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

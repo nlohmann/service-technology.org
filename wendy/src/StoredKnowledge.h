@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -67,7 +67,7 @@ class StoredKnowledge {
         /// the number of knowledges stored in the hash tree
         static unsigned int stats_storedKnowledges;
 
-        /// the number of egdes stored overall
+        /// the number of edges stored overall
         static unsigned int stats_storedEdges;
 
         /// the maximal number of interface markings per inner marking

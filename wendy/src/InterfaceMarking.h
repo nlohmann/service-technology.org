@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -25,7 +25,7 @@
 #include "types.h"
 
 
-/*! 
+/*!
   \brief an interface marking
 
   Interface markings are stored as a mapping from an input/output label to
@@ -111,7 +111,7 @@ class InterfaceMarking {
         /// returns whether the whole interface is unmarked
         bool unmarked() const;
 
-        /// returns whether the interface is markedat the given label
+        /// returns whether the interface is marked at the given label
         bool marked(const Label_ID&) const;
 
         /// returns the hash value of this marking

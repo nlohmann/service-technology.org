@@ -306,6 +306,45 @@ AT_CHECK([GREP -c "\->" PO.sa],0,[416
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
+AT_SETUP([Reduction: sequentialize receiving events])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/seqTest1.owfn .])
+AT_CHECK([WENDY seqTest1.owfn --sa --verbose --seqReceivingEvents],0,ignore,ignore)
+AT_CHECK([GREP -q "5 nodes" seqTest1.sa])
+AT_CHECK([GREP -c "\->" seqTest1.sa],0,[5
+])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: sequentialize receiving events])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/seqTest2.owfn .])
+AT_CHECK([WENDY seqTest2.owfn --sa --verbose --seqReceivingEvents],0,ignore,ignore)
+AT_CHECK([GREP -q "8 nodes" seqTest2.sa])
+AT_CHECK([GREP -c "\->" seqTest2.sa],0,[10
+])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: sequentialize receiving events])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/seqTest3.owfn .])
+AT_CHECK([WENDY seqTest3.owfn --sa --verbose --seqReceivingEvents],0,ignore,ignore)
+AT_CHECK([GREP -q "4 nodes" seqTest3.sa])
+AT_CHECK([GREP -c "\->" seqTest3.sa],0,[4
+])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: Succeeding Sending Event])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/sequence20.owfn .])
+AT_CHECK([WENDY sequence20.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
+AT_CHECK([GREP -q "21 nodes" sequence20.sa])
+AT_CHECK([GREP -c "\->" sequence20.sa],0,[20
+])
+AT_KEYWORDS(ig)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Synchronous Communication])

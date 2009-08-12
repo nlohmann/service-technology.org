@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -146,7 +146,7 @@ Knowledge::Knowledge(const Knowledge* const parent, const Label_ID &label) : is_
         }
 
         // calculate the closure
-        closure(todo);        
+        closure(todo);
     }
 }
 
@@ -303,4 +303,107 @@ bool Knowledge::receivingHelps() const {
     }
 
     return true;
+}
+
+
+/*!
+ \param  consideredReceivingEvents remember only those receiving event which are essential to resolve each and every waitstate
+ \brief  before traversing through each and every receiving event, we first check
+	     which receiving events are essentially needed to resolve every waitstate of the current bubble
+*/
+void Knowledge::sequentializeReceivingEvents(map<Label_ID, bool> & consideredReceivingEvents) const {
+
+	// count the number that a receiving event is activated
+	map<Label_ID, unsigned int> occuranceOfReceivingEvent;
+
+	// remember to consider this state again; actually we only need to take a look at its interface
+	map<vector<InterfaceMarking*>, bool> visitStateAgain;
+
+	// traverse the inner markings
+    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+
+        // only consider non-final waitstates
+        if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
+
+            // traverse the interface markings
+            for (size_t i = 0; i < pos->second.size(); ++i) {
+
+                // check if waitstate marks an output place
+            	Label_ID marked = 0;
+            	Label_ID consideredReceivingEvent = 0;
+
+                for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+                    if (pos->second[i]->marked(l)) {
+                    	// remember that current receiving event is activated in a waitstate
+                    	occuranceOfReceivingEvent[l] += 1;
+                    	// remember this event in case the current waitstate activates only one receiving event
+                    	consideredReceivingEvent = l;
+                    	marked++;
+                    }
+                }
+                // check if waitstate activates only a single receiving event
+                if (marked == 1) {
+
+                	// this receiving event has to be considered
+					consideredReceivingEvents[consideredReceivingEvent] = true;
+
+                }
+                // remember to visit this state again; we only store the interface here, we don't need more information later on
+                visitStateAgain[pos->second] = true;
+            }
+        }
+    }
+
+    // now traverse through all states that we remembered to consider again
+    for (map<vector<InterfaceMarking*>, bool>::const_iterator currenState = visitStateAgain.begin();
+																	currenState != visitStateAgain.end(); currenState++) {
+
+    	// remember the receiving event that will resolve this waitstate
+    	Label_ID consideredReceivingEvent = 0;
+
+    	// we need to remember if the value stored in consideredReceivingEvent is a real one
+    	bool realEvent = false;
+
+    	// current state is resolved, so we consider the next one
+    	bool considerNewState = false;
+
+    	// traverse the interface markings
+        for (size_t i = 0; i < currenState->first.size(); ++i) {
+
+            // check if a receiving event is activated that we have remembered already
+            for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+				// receiving event will resolve this waitstate
+            	if (currenState->first[i]->marked(l)) {
+
+            		// it will be considered, so continue with the next waitstate
+            		if (consideredReceivingEvents[l]) {
+
+            			considerNewState = true;
+            			break;
+            		}
+            		// if currently considered activated receiving event is not the currently considered one
+            		if (!realEvent || l > consideredReceivingEvent) {
+            			// check if the currently considered activated receiving event is activated by more
+            			// waitstates than the currently considered one
+            			if (!realEvent || occuranceOfReceivingEvent[l] > occuranceOfReceivingEvent[consideredReceivingEvent]) {
+            				// yes, so we will (temporarily) consider the current receiving event to be essential to
+            				// resolve the waitstate
+            				consideredReceivingEvent = l;
+
+            				// the value stored in consideredReceivingEvent is a real event
+            				realEvent = true;
+            			}
+            		}
+            	} // end if, receiving event is activated
+            } // end for, traverse through receiving interface
+            if (considerNewState) {
+            	break;
+            }
+        } // end for, traverse the interface markings
+
+        // consider the temporal receiving event for real
+        if (realEvent) {
+        	consideredReceivingEvents[consideredReceivingEvent] = true;
+        }
+    } // end for, traverse through states
 }

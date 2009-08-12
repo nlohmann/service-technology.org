@@ -14,8 +14,13 @@
 //#define FALSE 0
 
 class FormulaFixed;
-class FormulaCNF;
+//class FormulaCNF;
 
+
+
+// ****************************************************************************
+// Assignment
+// ****************************************************************************
 
 /**
  * Assignment of literals to truth values to determine the truth value of a
@@ -24,27 +29,37 @@ class FormulaCNF;
  */
 class FormulaAssignment {
     private:
-        /// Type of the container that maps literals to their truth values.
-        typedef std::map<std::string, bool> literal2bool_t;
-
         /// Maps literals to their truth values.
-        literal2bool_t literal2bool;
+        map< string, bool > literalValues;
 
     public:
         /// sets the given literal to the given truth value
-        void set(const std::string& literal, bool value);
+        void set(const string& literal, bool value) {
+        	literalValues[literal] = value;
+        }
 
         /// sets the given literal to true
-        void setToTrue(const std::string& literal);
+        void setToTrue(const string& literal) {
+        	set(literal, true);
+        }
 
         /// sets the given literal to false
-        void setToFalse(const std::string& literal);
+        void setToFalse(const string& literal) {
+        	set(literal, false);;
+        }
 
         /// returns the bool value of a literal
-        bool get(const std::string& literal) const;
-
+        bool get(const string& literal) const {
+        	map< string, bool >::const_iterator i = literalValues.find( literal );
+        	return i == literalValues.end() ? false : i->second;
+        }
 };
 
+
+
+// ****************************************************************************
+// Formula
+// ****************************************************************************
 
 /**
  * A formula to be used as an annotation for a state in an OG or IG. This is an
@@ -97,6 +112,11 @@ class Formula {
         virtual int getSubFormulaSize() const;
 };
 
+
+
+// ****************************************************************************
+// Multiary Formulas
+// ****************************************************************************
 
 /**
  * Base class for all multiary \link Formula
@@ -225,7 +245,7 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         virtual FormulaMultiaryAnd* getDeepCopy() const;
 
         /// Destroys this FormulaMultiaryAnd and all its subformulas. */
-        virtual ~FormulaMultiaryAnd() { };
+        virtual ~FormulaMultiaryAnd() {};
 
         /// returns the fitting operator
         virtual std::string getOperator() const;
@@ -259,7 +279,7 @@ class FormulaMultiaryOr : public FormulaMultiary {
         virtual FormulaMultiaryOr* getDeepCopy() const;
 
         /// Destroys this FormulaMultiaryOr and all its subformulas
-        virtual ~FormulaMultiaryOr() { };
+        virtual ~FormulaMultiaryOr() {};
 
         /// returns "+"
         virtual std::string getOperator() const;
@@ -273,43 +293,40 @@ class FormulaMultiaryOr : public FormulaMultiary {
 };
 
 
+
+// ****************************************************************************
+// Literals and Constants
+// ****************************************************************************
+
 /**
  * A literal within a Formula.
  */
 class FormulaLiteral : public Formula {
     private:
         /// The string representation of this literal.
-        std::string literal;
+        string _literal;
     public:
 
-        /// Reserved literal FINAL is used notations of nodes in OGs to denote
-        /// possible final states.
-        static const std::string FINAL;
-
-        /// Reserved literal TRUE is used for the value 'true'.
-//#undef TRUE /* TRUE may interfere with macro in cudd package. */
-        static const std::string TRUE;
-//#define TRUE 1
-
-        /// Reserved literal FALSE is used for the value 'false'.
-//#undef FALSE /* FALSE may interfere with macro in cudd package. */
-        static const std::string FALSE;
-//#define FALSE 0
-
         /// Constructs a literal with the given string representation.
-        FormulaLiteral(const std::string& literal);
-
-        /// returns a deep copy of this formula
-        virtual FormulaLiteral* getDeepCopy() const;
+        FormulaLiteral(const string& literal) : _literal(literal) {};
 
         /// basic deconstructor
-        virtual ~FormulaLiteral();
+		virtual ~FormulaLiteral() {};
+
+        /// returns a deep copy of this formula
+        virtual FormulaLiteral* getDeepCopy() const {
+        	return new FormulaLiteral(*this);
+        }
 
         /// returns the value of the literal in the given asisgnment
-        virtual bool value(const FormulaAssignment& assignment) const;
+        virtual bool value(const FormulaAssignment& assignment) const {
+        	return assignment.get(_literal);
+        }
 
         /// returns the name of the literal
-        virtual std::string asString() const;
+        virtual string asString() const {
+        	return _literal;
+        }
 };
 
 
@@ -326,45 +343,46 @@ class FormulaFixed : public FormulaLiteral {
         bool _value;
     public:
         /// Creates a formula with a given fixed value and string reprensentation.
-        FormulaFixed(bool value, const std::string& asString);
-
-        /// returns a deep copy of this formula
-        virtual FormulaFixed* getDeepCopy() const;
+        FormulaFixed(bool value, const string& asString) : FormulaLiteral(asString), _value(value) {};
 
         /// Destroys this FormulaFixed.
-        virtual ~FormulaFixed() {
-        };
+		virtual ~FormulaFixed() {};
+
+        /// returns a deep copy of this formula
+        virtual FormulaFixed* getDeepCopy() const {
+        	return new FormulaFixed(*this);
+        }
 
         /// returns the prefixed value of this formula
-        virtual bool value(const FormulaAssignment& assignment) const;
+        virtual bool value(const FormulaAssignment& assignment) const {
+        	return _value;
+        }
 };
 
 
 /**
- * The constant formula 'true'.
+ * The constant formula 'TRUE'.
  */
 class FormulaTrue : public FormulaFixed {
     public:
         /// basic constructor
-        FormulaTrue();
+        FormulaTrue() : FormulaFixed(true, "TRUE") {};
 
         /// basic deconstructor
-        virtual ~FormulaTrue() {
-        };
+        virtual ~FormulaTrue() {};
 };
 
 
 /**
- * The constant formula 'false'.
+ * The constant formula 'FALSE'.
  */
 class FormulaFalse : public FormulaFixed {
     public:
         /// basic constructor
-        FormulaFalse();
+        FormulaFalse() : FormulaFixed(false, "FALSE") {};
 
         /// basic deconstructor
-        virtual ~FormulaFalse() {
-        };
+        virtual ~FormulaFalse() {};
 };
 
 
@@ -374,12 +392,10 @@ class FormulaFalse : public FormulaFixed {
 class FormulaLiteralFinal : public FormulaLiteral {
     public:
         /// Constructs a literal with the given string representation.
-        FormulaLiteralFinal();
+        FormulaLiteralFinal() : FormulaLiteral("FINAL") {};
 
         /// basic deconstructor
-        virtual ~FormulaLiteralFinal() {
-        };
+        virtual ~FormulaLiteralFinal() {};
 };
-
 
 #endif

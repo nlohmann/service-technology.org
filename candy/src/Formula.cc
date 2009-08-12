@@ -3,59 +3,6 @@
 
 using namespace std;
 
-// TRUE and FALSE #defined in cudd package may interfere with
-// FormulaLiteral::TRUE and ...::FALSE.
-//#undef TRUE
-//#undef FALSE
-
-
-const std::string FormulaLiteral::FINAL = std::string("FINAL");
-const std::string FormulaLiteral::TRUE = std::string("TRUE");
-const std::string FormulaLiteral::FALSE = std::string("FALSE");
-
-// ****************************************************************************
-// FormulaAssignment
-// ****************************************************************************
-
-
-//! \brief  Sets the given literal to the given truth value within this
-//!         FormulaAssignment.
-//! \param literal Literal whose truth value should be set.
-//! \param value Truth value the given literal should be set to.
-void FormulaAssignment::set(const std::string& literal, bool value) {
-    literal2bool[literal] = value;
-}
-
-
-//! \brief Sets the given literal to true within this FormulaAssignment.
-//! \param literal Literal which should be set to true.
-void FormulaAssignment::setToTrue(const std::string& literal) {
-    set(literal, true);
-}
-
-
-//! \brief Sets the given literal to false within this FormulaAssignment.
-//! \param literal Literal which should be set to false.
-void FormulaAssignment::setToFalse(const std::string& literal) {
-    set(literal, false);
-}
-
-
-//! \brief Gets the truth value of the given literal within this
-//!        FormulaAssignment. If no truth value was previously set for
-//!        this literal by set() or setToTrue(), then the truth value of the given
-//!        literal is implicetly false.
-//! \param literal Literal whose truth value should be determined.
-//! \returns Truth value of the given literal.
-bool FormulaAssignment::get(const std::string& literal) const {
-    literal2bool_t::const_iterator literal2bool_iter = literal2bool.find(literal);
-
-    if (literal2bool_iter == literal2bool.end()) {
-        return false;
-    } else {
-    	return literal2bool_iter->second;
-    }
-}
 
 
 // ****************************************************************************
@@ -99,6 +46,7 @@ int Formula::getSubFormulaSize() const {
 //! \brief Placeholder for a virtual function
 void Formula::removeLiteralByHiding(const std::string&) {
 }
+
 
 
 // ****************************************************************************
@@ -409,6 +357,7 @@ int FormulaMultiary::size() const {
 }
 
 
+
 // ****************************************************************************
 // FormulaMultiaryAnd
 // ****************************************************************************
@@ -499,6 +448,7 @@ const FormulaFixed FormulaMultiaryAnd::emptyFormulaEquivalent = FormulaTrue();
 const FormulaFixed& FormulaMultiaryAnd::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
 }
+
 
 
 // ****************************************************************************
@@ -607,85 +557,4 @@ const FormulaFixed FormulaMultiaryOr::emptyFormulaEquivalent = FormulaFalse();
 //! \return empty formula Equivalent
 const FormulaFixed& FormulaMultiaryOr::getEmptyFormulaEquivalent() const {
     return emptyFormulaEquivalent;
-}
-
-
-// ****************************************************************************
-// FormulaFixed
-// ****************************************************************************
-
-
-//! \brief Creates a formula with a given fixed value and string reprensentation.
-//! \param value Fixed truth value of this formula.
-//! \param asString String representation of this formula.
-FormulaFixed::FormulaFixed(bool value, const std::string& asString) :
-    FormulaLiteral(asString), _value(value) {
-}
-
-
-//! \brief returns the fixed value of the formula
-//! \param FormulaAssignment An assignment to keep the structure of value
-//! \return returns the fixed value
-bool FormulaFixed::value(const FormulaAssignment&) const {
-    return _value;
-}
-
-
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaFixed* FormulaFixed::getDeepCopy() const {
-    return new FormulaFixed(*this);
-}
-
-
-//! \brief constructs the constant true formula
-FormulaTrue::FormulaTrue() :
-    FormulaFixed(true, FormulaLiteral::TRUE) {
-}
-
-
-//! \brief constructs the constant false formula
-FormulaFalse::FormulaFalse() :
-    FormulaFixed(false, FormulaLiteral::FALSE) {
-}
-
-
-//! \brief constructs an atomic literal formula
-//! \param literal_ a reference to a string containing the name of the literal
-FormulaLiteral::FormulaLiteral(const std::string& literal_) :
-    literal(literal_) {
-}
-
-
-//! \brief deconstructor
-FormulaLiteral::~FormulaLiteral() {
-
-}
-
-
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaLiteral* FormulaLiteral::getDeepCopy() const {
-    return new FormulaLiteral(*this);
-}
-
-
-//! \brief returns the value of this literal under the given assignment
-//! \param assignment an assignment
-//! \return true if the literal is true under the assginment, else false
-bool FormulaLiteral::value(const FormulaAssignment& assignment) const {
-    return assignment.get(literal);
-}
-
-
-//! \brief returns the name of the literal
-//! \return name of the literal
-std::string FormulaLiteral::asString() const {
-    return literal;
-}
-
-
-//! \brief basic constructor
-FormulaLiteralFinal::FormulaLiteralFinal() :
-    FormulaLiteral(FormulaLiteral::FINAL) {
 }

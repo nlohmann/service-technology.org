@@ -360,9 +360,6 @@ void StoredKnowledge::dot(std::ofstream &file) {
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
-                // show knowledge id
-                file << it->second[i] << "\\n";
-
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
                         file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";

@@ -6,3 +6,37 @@
                      http://service-technology.org/safira
 
 
+PURPOSE
+    Safira implements set algebra for service behavior.
+
+
+COPYRIGHT
+    Copyright (c) 2009 Kathrin Kaschner
+
+
+AUTHOR
+    Safira is written and maintained by Kathrin Kaschner. See file "AUTHORS"
+    for more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Safira is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Safira.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Safira can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Safira.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Safira. It can also be
+    downloaded at <http://service-technology.org/files/safira/safira.pdf>.

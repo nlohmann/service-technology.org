@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT([Safira], [0.1], [safira@service-technology.org])
+AC_INIT(Safira, 0.1, safira@service-technology.org, safira, http://service-technology.org/safira)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src/main.cc])
@@ -12,8 +12,10 @@ AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_GREP
+AC_PROG_LN_S
 
 AM_MISSING_PROG(GENGETOPT, gengetopt)
+AM_MISSING_PROG(HELP2MAN, help2man)
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
@@ -31,6 +33,6 @@ AC_SUBST(DOT)
 # Minisat needs the Zlib library
 AC_CHECK_LIB([z], [main], , AC_MSG_ERROR([Zlib was not found!]))
 
-AC_CONFIG_FILES([Makefile src/Makefile minisat/Makefile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile src/Makefile minisat/Makefile tests/Makefile tests/package.m4 man/Makefile doc/Makefile])
 
 AC_OUTPUT

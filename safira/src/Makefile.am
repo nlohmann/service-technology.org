@@ -15,6 +15,11 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
                  
 sysconf_DATA = safira.conf
 
+all: minisat
+
+minisat:
+	$(LN_S) $(top_builddir)/minisat/minisat minisat
+
 # pass the sysconfdir to safira (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 safira_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
@@ -22,6 +27,7 @@ BUILT_SOURCES = cmdline.c og_syntax.cc config-log.h
 EXTRA_DIST = og_syntax.h cmdline.ggo safira.conf
 MAINTAINERCLEANFILES = og_syntax.h cmdline.c cmdline.h
 DISTCLEANFILES = config-log.h
+CLEANFILES = minisat
 
 # copy the content of the config.log file to a C header (for debugging purposes)
 config-log.h: $(top_srcdir)/config.log

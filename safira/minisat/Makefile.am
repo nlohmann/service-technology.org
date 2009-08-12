@@ -1,4 +1,4 @@
-noinst_PROGRAMS = minisat
+bin_PROGRAMS = minisat
 
 minisat_SOURCES = Vec.h Sort.h Solver.h SolverTypes.h Solver.C Main.C Heap.h Alg.h
 

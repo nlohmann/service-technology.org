@@ -16,6 +16,14 @@ AT_CHECK([DIANE --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+AT_SETUP([Bug information output])
+AT_CHECK([DIANE --bug],0,ignore,[Please send file 'bug.log' to diane@service-technology.org.
+])
+AT_CHECK([test -f bug.log])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
 ############################################################################
 AT_BANNER([Errors])
 ############################################################################

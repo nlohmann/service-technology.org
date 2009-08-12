@@ -28,6 +28,7 @@
 #include <vector>
 #include "cmdline.h"
 #include "config.h"
+#include "config-log.h"
 #include "decomposition.h"
 #include "pnapi/pnapi.h"
 #include "verbose.h"
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
     {
       abort(2, "could not parse file '%s': %s", args_info.inputs[i], e.message.c_str());
     }
-    status("read file '%s' (%d of %d)", args_info.inputs[i], i, args_info.inputs_num);
+    status("read file '%s' (%d of %d)", args_info.inputs[i], i+1, args_info.inputs_num);
 
     /*
      * 2. Determine the mode and compute the service parts.
@@ -258,6 +259,15 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     cmdline_parser(argc, argv, &args_info);
+
+    // debug option
+    if (args_info.bug_flag) {
+        FILE *debug_output = fopen("bug.log", "w");
+        fprintf(debug_output, "%s\n", CONFIG_LOG);
+        fclose(debug_output);
+        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
+        exit(EXIT_SUCCESS);
+    }
 
     free(params);
 }

@@ -33,7 +33,13 @@ section "Debug Options"
 option "verbose" v
 	"Verbose output."
 	flag off
-	
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
 section "Statistical Options"
 	
 option "statistics" s

@@ -1,5 +1,3 @@
-# gengetopt input file
-
 args "--long-help --include-getopt --show-required --unamed-opts=FILE"
 
 purpose "DIANE - Decomposition Into Atomic NEts."

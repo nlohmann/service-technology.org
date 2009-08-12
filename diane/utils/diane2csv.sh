@@ -6,7 +6,7 @@ TEMP="${DIRNAME}.temp"
 BASEDIR=`pwd`
 
 cd $1
-diane -v --csv -q *.lola >> "${BASEDIR}/${TEMP}"
+diane --statistics --csv -q *.lola >> "${BASEDIR}/${TEMP}"
 #insert head
 cd ${BASEDIR}
 cat ${TEMP} > ${OUTPUT}

@@ -1,3 +1,23 @@
+/*****************************************************************************\
+ Diane -- Decomposition of Petri nets.
+
+ Copyright (C) 2009  Stephan Mennicke <stephan.mennicke@uni-rostock.de>
+
+ Diane is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Diane is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Diane.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
+
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -10,7 +30,7 @@
 #include "config.h"
 #include "decomposition.h"
 #include "pnapi/pnapi.h"
-
+#include "verbose.h"
 
 using std::cerr;
 using std::cin;
@@ -27,7 +47,7 @@ using std::vector;
 using pnapi::PetriNet;
 
 
-///
+/// statistics structure
 struct Statistics {
   // runtime
   time_t t_total_;
@@ -85,15 +105,12 @@ void statistics(int, PetriNet &, vector<PetriNet *> &);
 int main(int argc, char *argv[])
 {
   evaluateParameters(argc, argv);
-  // array checked after execution to decide whether all input nets
-  // ran through without errors.
-  bool *exit_failure = new bool[args_info.inputs_num];
+  // initial clearing
   _statistics.clear();
 
   for (unsigned int i = 0; i < args_info.inputs_num; i++)
   {
     time_t start_total = time(NULL);
-    exit_failure[i] = false;
     /*
      * 1. Reading Petri net via PNAPI
      */
@@ -102,6 +119,8 @@ int main(int argc, char *argv[])
     {
       ifstream inputfile;
       inputfile.open(args_info.inputs[i]);
+      if (inputfile.fail())
+        abort(1, "could not open file '%s'", args_info.inputs[i]);
       switch (args_info.mode_arg)
       {
       case (mode_arg_standard):
@@ -116,10 +135,9 @@ int main(int argc, char *argv[])
     }
     catch (pnapi::io::InputError e)
     {
-      cerr << PACKAGE << e << endl;
-      exit_failure[i] = true;
-      continue;
+      abort(2, "could not parse file '%s': %s", args_info.inputs[i], e.message.c_str());
     }
+    status("read file '%s' (%d of %d)", args_info.inputs[i], i, args_info.inputs_num);
 
     /*
      * 2. Determine the mode and compute the service parts.
@@ -145,6 +163,7 @@ int main(int argc, char *argv[])
     }
     time_t finish_computing = time(NULL);
     _statistics.t_computingComponents_ = finish_computing - start_computing;
+    status("computed components of net '%s'", args_info.inputs[i]);
 
     /*
      * 3. Build Fragments.
@@ -167,6 +186,7 @@ int main(int argc, char *argv[])
     // save the finish time and make statistics
     time_t finish_building = time(NULL);
     _statistics.t_buildingComponents_ = finish_building - start_building;
+    status("created net fragments of '%s'", args_info.inputs[i]);
 
     /*
      * 4. Write output files.
@@ -221,10 +241,6 @@ int main(int argc, char *argv[])
     delete [] tree;
     _statistics.clear();
   }
-
-  for (int i = 0; i < args_info.inputs_num; i++)
-    if (exit_failure[i])
-      exit(EXIT_FAILURE);
 
   exit(EXIT_SUCCESS);
 }
@@ -292,8 +308,8 @@ void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
     if (!args_info.csv_flag)
     {
       cout << "*******************************************************" << endl;
-      cout << "* " << PACKAGE_STRING << endl;
-      cout << "* Statistics: " << args_info.inputs[i] << endl;
+      cout << "* " << PACKAGE << ": " << args_info.inputs[i] << endl;
+      cout << "* Statistics:" << endl;
       cout << "*******************************************************" << endl;
       cout << "* Petri net Statistics:" << endl;
       cout << "*   |P|= " << net.getPlaces().size()
@@ -356,6 +372,8 @@ void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
   }
   else
   {
-    ;
+    cout << PACKAGE << ": " << args_info.inputs[i]
+         << " - number of components: " << _statistics.fragments_
+         << endl;
   }
 }

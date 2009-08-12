@@ -2,6 +2,7 @@ bin_PROGRAMS = diane
 
 diane_SOURCES =  main.cc \
                  decomposition.cc decomposition.h \
+                 verbose.cc verbose.h \
                  cmdline.c cmdline.h
 
 # only add the local Petri net API if necessary

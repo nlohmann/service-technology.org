@@ -51,7 +51,8 @@ AT_BANNER([Components])
 
 AT_SETUP([Number of Components])
 AT_CHECK([cp TESTFILES/phils.lola .])
-AT_CHECK([DIANE phils.lola -q | GREP -q "number of components: 20"],0,ignore,stderr)
+AT_CHECK([DIANE phils.lola -q],0,stdout)
+AT_CHECK([GREP -q "number of components: 20" stdout],0)
 AT_KEYWORDS(components)
 AT_CLEANUP
 
@@ -61,6 +62,7 @@ AT_BANNER([Service Flag])
 
 AT_SETUP([Number of Service Components])
 AT_CHECK([cp TESTFILES/phils.lola .])
-AT_CHECK([DIANE phils.lola -q --service | GREP -q "number of components: 1"],0,ignore,stderr)
+AT_CHECK([DIANE phils.lola -q --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 1" stdout],0)
 AT_KEYWORDS(service)
 AT_CLEANUP

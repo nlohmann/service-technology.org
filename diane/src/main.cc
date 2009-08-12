@@ -109,6 +109,12 @@ int main(int argc, char *argv[])
   // initial clearing
   _statistics.clear();
 
+  string invocation;
+  // store invocation in a string for meta information in file output
+  for (int i = 0; i < argc; ++i) {
+    invocation += string(argv[i]) + " ";
+  }
+
   for (unsigned int i = 0; i < args_info.inputs_num; i++)
   {
     time_t start_total = time(NULL);
@@ -222,9 +228,12 @@ int main(int argc, char *argv[])
           int z = digits-num.length();
           ss << setfill('0') << setw(z) << netnumber;
           ss >> num;
-
           outputfiles[netnumber].open((fileprefix+num+filepostfix).c_str());
-          outputfiles[netnumber] << pnapi::io::owfn << *nets[j];
+          outputfiles[netnumber] << pnapi::io::owfn
+              << meta(pnapi::io::INPUTFILE, args_info.inputs[i])
+              << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+              << meta(pnapi::io::INVOCATION, invocation)
+              << *nets[j];
           outputfiles[netnumber].close();
           netnumber++;
         }

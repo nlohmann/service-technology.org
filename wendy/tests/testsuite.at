@@ -17,6 +17,13 @@ AT_CHECK([WENDY --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+AT_SETUP([Bug information output])
+AT_CHECK([WENDY --bug],0,ignore,[Please send file 'bug.log' to wendy@service-technology.org.
+])
+AT_CHECK([test -f bug.log])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Errors])
@@ -81,9 +88,35 @@ AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Cannot write to file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.* .])
+AT_CHECK([touch myCoffee.og])
+AT_CHECK([chmod a-w myCoffee.og])
+AT_CHECK([WENDY myCoffee.owfn --og --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 AT_SETUP([Simultaneous OG and SA output])
 AT_CHECK([WENDY --og --sa],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#12\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot create tempfile])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.* .])
+AT_CHECK([touch foo])
+AT_CHECK([chmod a-w foo])
+AT_CHECK([WENDY myCoffee.owfn --verbose --tmpfile=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#13\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Missing configuration file])
+AT_CHECK([WENDY --config=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 

@@ -5,8 +5,8 @@
  *      Author: stephan
  */
 
-#ifndef UNIONFIND_H
-#define UNIONFIND_H
+#ifndef DECOMPOSITION_H
+#define DECOMPOSITION_H
 
 #include <map>
 #include <vector>
@@ -18,7 +18,7 @@ using std::map;
 using std::vector;
 
 
-namespace unionfind
+namespace decomposition
 {
 
   /// makes a singleton set of the given element
@@ -35,6 +35,6 @@ namespace unionfind
 
   void createOpenNetComponentsByUnionFind(vector<PetriNet *> &, int *, int, int, map<int, Node *> &);
 
-} /* namespace unionfind */
+} /* namespace decomposition */
 
-#endif /* UNIONFIND_H */
+#endif /* DECOMPOSITION_H */

@@ -8,7 +8,7 @@
 #include <map>
 #include <set>
 #include "cmdline.h"
-#include "unionfind.h"
+#include "decomposition.h"
 
 using pnapi::Arc;
 using pnapi::Place;
@@ -19,14 +19,14 @@ using std::set;
 extern gengetopt_args_info args_info;
 
 
-void unionfind::MakeSet(int x, int *tree)
+void decomposition::MakeSet(int x, int *tree)
 {
   // makes singleton sets of all x given
   tree[x] = -1;
 }
 
 
-void unionfind::Union(int x, int y, int *tree)
+void decomposition::Union(int x, int y, int *tree)
 {
   int xr = Find(x, tree); // finding x's root
   int yr = Find(y, tree); // finding y's root
@@ -44,7 +44,7 @@ void unionfind::Union(int x, int y, int *tree)
 }
 
 
-int unionfind::Find(int x, int *tree)
+int decomposition::Find(int x, int *tree)
 {
   if (tree[x] >= 0)
     tree[x] = Find(tree[x], tree);
@@ -54,7 +54,7 @@ int unionfind::Find(int x, int *tree)
 }
 
 
-int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, int psize, map<int, Node *> &reremap)
+int decomposition::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, int psize, map<int, Node *> &reremap)
 {
   // map to remap the integers to the Petri net's nodes
   map<Node *, int> remap;
@@ -152,7 +152,7 @@ int unionfind::computeComponentsByUnionFind(PetriNet &net, int *tree, int size, 
 }
 
 
-void unionfind::createOpenNetComponentsByUnionFind(vector<PetriNet *> &nets, int *tree, int size, int psize, map<int, Node *> &reremap)
+void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet *> &nets, int *tree, int size, int psize, map<int, Node *> &reremap)
 {
   for (int i = 0; i < psize; i++)
   {

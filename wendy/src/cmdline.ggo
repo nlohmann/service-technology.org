@@ -137,6 +137,11 @@ option "reportFrequency" -
   default="10000"
   optional
 
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
 
 section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"

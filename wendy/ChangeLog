@@ -7,6 +7,21 @@
                       http://service-technology.org/wendy
 
 
+Version 1.8-unreleased
+======================
+
+* implemented reduction rule "sequentializing receiving events" (parameter:
+  `--seqReceivingEvents'): instead of receiving messages in any order, only
+  one sequentialization is considered. (A similar rule is implemented in
+  Fiona where receiving events where combined rather than sequentialized.)
+
+* implemented reduction rule "succeeding sending event" (parameter:
+  `--succeedingSendingEvent'): once a sending event has led from the current
+  knowledge to a valid successor knowledge, we do not consider any other
+  sending event leaving the current knowledge
+
+* fixed `--bug' parameter which caused segmentation faults on some machines
+
 Version 1.7
 ===========
 

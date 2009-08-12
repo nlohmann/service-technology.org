@@ -336,7 +336,7 @@ AT_CHECK([GREP -c "\->" seqTest3.sa],0,[4
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: Succeeding Sending Event])
+AT_SETUP([Reduction: succeeding sending event])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/sequence20.owfn .])
 AT_CHECK([WENDY sequence20.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)

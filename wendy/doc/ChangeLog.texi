@@ -1,3 +1,12 @@
+@heading Version 1.8-unreleased
+@itemize
+@item implemented reduction rule ``sequentializing receiving events'' (parameter: @option{--seqReceivingEvents}): instead of receiving messages in any order, only one sequentialization is considered. (A similar rule is implemented in Fiona where receiving events where combined rather than sequentialized.)
+
+@item implemented reduction rule ``succeeding sending event'' (parameter: @option{--succeedingSendingEvent}): once a sending event has led from the current knowledge to a valid successor knowledge, we do not consider any other sending event leaving the current knowledge
+
+@item fixed @option{--bug} parameter which caused segmentation faults on some machines
+@end itemize
+
 @heading Version 1.7
 @itemize
 @item added test case for bug #13903 (@url{https://gna.org/bugs/?13903})

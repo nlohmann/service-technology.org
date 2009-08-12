@@ -7,28 +7,20 @@
                       http://service-technology.org/wendy
 
 
-Version 1.7
-===========
+Version 1.8-unreleased
+======================
 
-* added test case for bug #13903 (`https://gna.org/bugs/?13903')
+* implemented reduction rule "sequentializing receiving events" (parameter:
+  `--seqReceivingEvents'): instead of receiving messages in any order, only
+  one sequentialization is considered. (A similar rule is implemented in
+  Fiona where receiving events where combined rather than sequentialized.)
 
-* fixed bug #14025 (`https://gna.org/bugs/?14025'): the Dot output had
-  problems with nonempty knowledge with true annotation
+* implemented reduction rule "succeeding sending event" (parameter:
+  `--succeedingSendingEvent'): once a sending event has led from the current
+  knowledge to a valid successor knowledge, we do not consider any other
+  sending event leaving the current knowledge
 
-* fixed bug #14067 (`https://gna.org/bugs/?14067'): a change in the Petri
-  Net API broke the evaluation of final conditions
-
-* added new version of the Petri Net API (after fixing bug #13844
-  (`http://gna.org/bugs/?13844')
-
-* made some adjustments which allow for a native Windows compilation
-  (independent of `cygwin1.dll')
-
-* added details to the man page; a PDF version of the man page can be
-  created with `make man-pdf' in the `man' directory (requires groff and
-  ps2pdf)
-
-* small fix to allow compilation under x86_64 architectures
+* fixed `--bug' parameter which caused segmentation faults on some machines
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

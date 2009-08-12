@@ -78,15 +78,6 @@ void evaluateParameters(int argc, char** argv) {
     // overwrite invokation for consistent error messages
     argv[0] = (char*)PACKAGE;
 
-    // debug option
-    if (argc > 0 and std::string(argv[1]) == "--bug") {
-        FILE *debug_output = fopen("bug.log", "w");
-        fprintf(debug_output, "%s\n", CONFIG_LOG);
-        fclose(debug_output);
-        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
-        exit(EXIT_SUCCESS);
-    }
-
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {
         invocation += string(argv[i]) + " ";
@@ -101,6 +92,15 @@ void evaluateParameters(int argc, char** argv) {
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
         abort(7, "invalid command-line parameter(s)");
+    }
+
+    // debug option
+    if (args_info.bug_flag) {
+        FILE *debug_output = fopen("bug.log", "w");
+        fprintf(debug_output, "%s\n", CONFIG_LOG);
+        fclose(debug_output);
+        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
+        exit(EXIT_SUCCESS);
     }
 
     // read a configuration file if necessary

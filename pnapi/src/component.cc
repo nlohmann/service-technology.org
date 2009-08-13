@@ -483,19 +483,36 @@ namespace pnapi {
    */
   bool Transition::isNormal() const
   {
-    if (getSynchronizeLabels().size() > 1)
+    if (getSynchronizeLabels().size() > 1) {
       return false;
+    }
 
+    // counts interface places in the transitions preset and postset
     int counter = 0;
 
-    for (set<Node *>::const_iterator p = getPreset().begin(); p != getPreset().end(); p++)
-      if ((*p)->getType() != Node::INTERNAL)
-        counter++;
-    for (set<Node *>::const_iterator p = getPostset().begin(); p != getPostset().end(); p++)
-      if ((*p)->getType() != Node::INTERNAL)
-        counter++;
+    for (set<Node *>::const_iterator p = getPreset().begin(); p != getPreset().end(); p++) {    
+      if ((*p)->getType() != Node::INTERNAL) {
+        // if the arc from the interface place has a weigth != 1, return false
+        if ( net_.findArc(**p, *this)->getWeight() != 1 ) {
+          return false;
+        } else {
+          ++counter;
+        }
+      }
+    }
 
-    return counter <= 1;
+    for (set<Node *>::const_iterator p = getPostset().begin(); p != getPostset().end(); p++) {
+      if ((*p)->getType() != Node::INTERNAL) {
+        // if the arc to the interface place has a weigth != 1, return false
+        if ( net_.findArc(*this, **p)->getWeight() != 1 ) {
+          return false;
+        } else {
+          ++counter;
+        }
+      }
+    }
+
+    return (counter <= 1);
   }
 
 

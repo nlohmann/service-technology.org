@@ -339,45 +339,109 @@ AT_CHECK([GREP -c "\->" PO.sa],0,[416
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: sequentialize receiving events])
+AT_SETUP([Reduction: sequentializing receiving events])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/seqTest1.owfn .])
-AT_CHECK([WENDY seqTest1.owfn --sa --verbose --seqReceivingEvents],0,ignore,ignore)
-AT_CHECK([GREP -q "5 nodes" seqTest1.sa])
-AT_CHECK([GREP -c "\->" seqTest1.sa],0,[5
-])
+AT_CHECK([cp TESTFILES/seqTest1.* .])
+AT_CHECK([WENDY seqTest1.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
+AT_CHECK([SA2SM seqTest1.sa seqTest1.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch seqTest1.sa.owfn seqTest1.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: sequentialize receiving events])
+AT_SETUP([Reduction: sequentializing receiving events])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/seqTest2.owfn .])
-AT_CHECK([WENDY seqTest2.owfn --sa --verbose --seqReceivingEvents],0,ignore,ignore)
-AT_CHECK([GREP -q "8 nodes" seqTest2.sa])
-AT_CHECK([GREP -c "\->" seqTest2.sa],0,[10
-])
+AT_CHECK([cp TESTFILES/seqTest2.* .])
+AT_CHECK([WENDY seqTest2.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
+AT_CHECK([SA2SM seqTest2.sa seqTest2.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch seqTest2.sa.owfn seqTest2.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: sequentialize receiving events])
+AT_SETUP([Reduction: sequentializing receiving events])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/seqTest3.owfn .])
-AT_CHECK([WENDY seqTest3.owfn --sa --verbose --seqReceivingEvents],0,ignore,ignore)
-AT_CHECK([GREP -q "4 nodes" seqTest3.sa])
-AT_CHECK([GREP -c "\->" seqTest3.sa],0,[4
-])
+AT_CHECK([cp TESTFILES/seqTest3.* .])
+AT_CHECK([WENDY seqTest3.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
+AT_CHECK([SA2SM seqTest3.sa seqTest3.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch seqTest3.sa.owfn seqTest3.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+
+# TOO slow!
+#AT_SETUP([Reduction: sequentializing receiving events])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/QR.* .])
+#AT_CHECK([WENDY QR.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
+#AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
+#AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
+#AT_CHECK([GREP -q "YES" stdout])
+#AT_KEYWORDS(ig)
+#AT_CLEANUP
+
+AT_SETUP([Reduction: sequentializing receiving events])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.* .])
+AT_CHECK([WENDY PO.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
+AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
 AT_SETUP([Reduction: succeeding sending event])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/sequence20.owfn .])
-AT_CHECK([WENDY sequence20.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
-AT_CHECK([GREP -q "21 nodes" sequence20.sa])
-AT_CHECK([GREP -c "\->" sequence20.sa],0,[20
-])
+AT_CHECK([cp TESTFILES/sequence10.* .])
+AT_CHECK([WENDY sequence10.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
+AT_CHECK([SA2SM sequence10.sa sequence10.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch sequence10.sa.owfn sequence10.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
+
+#AT_SETUP([Reduction: succeeding sending event])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/QR.* .])
+#AT_CHECK([WENDY QR.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
+#AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
+#AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
+#AT_CHECK([GREP -q "YES" stdout])
+#AT_KEYWORDS(ig)
+#AT_CLEANUP
+
+AT_SETUP([Reduction: succeeding sending event])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.* .])
+AT_CHECK([WENDY PO.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
+AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: combining sequentialize receiving events and succeeding sending event])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/QR.* .])
+AT_CHECK([WENDY QR.owfn --sa --verbose --succeedingSendingEvent --seqReceivingEvents],0,ignore,ignore)
+AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+AT_SETUP([Reduction: combining sequentialize receiving events and succeeding sending event])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/PO.* .])
+AT_CHECK([WENDY PO.owfn --sa --verbose --succeedingSendingEvent --seqReceivingEvents],0,ignore,ignore)
+AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
+AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
+AT_CHECK([GREP -q "YES" stdout])
+AT_KEYWORDS(ig)
+AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([Synchronous Communication])

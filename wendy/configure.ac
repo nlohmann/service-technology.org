@@ -36,6 +36,7 @@ AC_PATH_PROG(LOLA, [lola-full], [])
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)
+AC_PATH_PROG(SA2SM, [sa2sm], not found)
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,

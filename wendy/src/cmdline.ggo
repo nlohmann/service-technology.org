@@ -54,6 +54,7 @@ option "cover" -
   string
   typestr="FILENAME"
   optional
+  hidden
 
 
 section "General Options"
@@ -61,7 +62,7 @@ sectiondesc="These options control the calculation of the operating guidelines a
 
 option "messagebound" m
   "Set the message bound (i.e., the maximal number of messages per channel)."
-  details="Values from the range 1..255 are allowed.\n"
+  details="Values within the range of 1..255 are allowed.\n"
   int
   typestr="BOUND"
   default="1"
@@ -78,11 +79,11 @@ option "formula" -
 
 
 section "Dot Options"
-sectiondesc="These options control the graphical representation of the calculated operating guideline. It has no effect of other files.\n"
+sectiondesc="These options control the graphical representation of the calculated operating guideline. It has no effect on other files.\n"
 
 option "showEmptyNode" -
   "Show the empty node in Dot output."
-  details="The empty node is a knowledge that is unreachable (hence empty), but plays an important rule when matching a service with the operating guidelines or decided substitutability. The empty node is always written to `.og' files, but is optional for `.dot' files.\n"
+  details="The empty node is a knowledge that is unreachable (hence empty), but plays an important role when matching a service with the operating guidelines or deciding substitutability. The empty node is always written to `.og' files, but is optional for `.dot' files.\n"
   dependon="dot"
   flag off
 
@@ -114,17 +115,17 @@ option "waitstatesOnly" -
 
 option "receiveBeforeSend" -
   "Only send if receiving does not resolve all waitstates."
-  details="This rule will only send asynchronous messages if absolutely necessary. That is, using this rule will create `arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="This rule will consider exactly those sending events that are absolutely necessary. That is, using this rule will create `arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
 
 option "seqReceivingEvents" -
   "Sequentialize receiving events."
-  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstates. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstate. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
 
 option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
-  details="If there exists one sending event such that the current knowledge is satisfied no more (sending event) successor knowledges are calculated. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
 
 

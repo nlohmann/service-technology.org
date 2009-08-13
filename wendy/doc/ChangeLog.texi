@@ -5,7 +5,10 @@
 @item implemented reduction rule ``succeeding sending event'' (parameter: @option{--succeedingSendingEvent}): once a sending event has led from the current knowledge to a valid successor knowledge, we do not consider any other sending event leaving the current knowledge
 
 @item fixed @option{--bug} parameter which caused segmentation faults on some machines
+
+@item imported fixed Petri Net API: bug #14116 (@url{https://gna.org/bugs/?14116}) yielded incorrect results, because Wendy did not recognize unnormal input files
 @end itemize
+
 
 @heading Version 1.7
 @itemize

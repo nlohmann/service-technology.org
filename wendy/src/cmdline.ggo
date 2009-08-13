@@ -48,6 +48,13 @@ option "fionaFormat" -
   flag off
   hidden
 
+option "cover" -
+  "Generate a Cover-OG, covering the nodes specified in the given file."
+  dependon="og"
+  string
+  typestr="FILENAME"
+  optional
+
 
 section "General Options"
 sectiondesc="These options control the calculation of the operating guidelines as well as the style the operating guidelines are represented.\n"

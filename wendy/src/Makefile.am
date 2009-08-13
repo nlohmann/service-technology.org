@@ -1,6 +1,7 @@
 bin_PROGRAMS = wendy
 
 wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
+		syntax_cover.yy lexic_cover.ll \
                 main.cc types.h \
                 FullMarking.h FullMarking.cc \
                 InterfaceMarking.h InterfaceMarking.cc \
@@ -8,6 +9,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 InnerMarking.h InnerMarking.cc \
                 Knowledge.h Knowledge.cc \
                 StoredKnowledge.h StoredKnowledge.cc \
+		Cover.h Cover.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h
 
@@ -22,9 +24,11 @@ wendy_CPPFLAGS += -I$(top_srcdir)/libs
 wendy_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-BUILT_SOURCES = cmdline.c syntax_graph.cc config-log.h
-EXTRA_DIST = syntax_graph.h cmdline.ggo
-MAINTAINERCLEANFILES = syntax_graph.h cmdline.c cmdline.h
+BUILT_SOURCES = cmdline.c syntax_graph.cc \
+		syntax_cover.cc config-log.h 
+EXTRA_DIST = syntax_graph.h syntax_cover.h cmdline.ggo
+MAINTAINERCLEANFILES = syntax_graph.h syntax_cover.h \
+		       cmdline.c cmdline.h
 DISTCLEANFILES = config-log.h
 
 # copy the content of the config.log file to a C header (for debugging purposes)

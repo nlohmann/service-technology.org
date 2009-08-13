@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include "StoredKnowledge.h"
+#include "Cover.h"
 #include "Label.h"
 
 using std::map;
@@ -715,6 +716,11 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
 
     // we must not forget a marking
     assert(size == count);
+    
+    // check this knowledge for covering nodes
+    if(args_info.cover_given)
+      Cover::checkKnowledge(this, K->bubble);
+    
 }
 
 

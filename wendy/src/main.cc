@@ -34,6 +34,7 @@
 #include "config-log.h"
 #include "StoredKnowledge.h"
 #include "Label.h"
+#include "Cover.h"
 #include "verbose.h"
 
 // detect MinGW compilation under Cygwin
@@ -46,11 +47,15 @@
 using std::string;
 
 
-/// the input file
+/// input files
 extern FILE *graph_in;
+extern FILE *cover_in;
 
-/// the parser
+/// the graph parser
 extern int graph_parse();
+
+/// the cover parser
+extern int cover_parse();
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -211,7 +216,20 @@ int main(int argc, char** argv) {
 
 
     /*--------------------------------------------.
-    | 3. write inner of the open net to LoLA file |
+    | 3. read cover file if given                 |
+    `--------------------------------------------*/
+    if(args_info.cover_given)
+    {
+      cover_in = fopen(args_info.cover_arg, "r");
+      if(cover_in == NULL)
+        abort(15, "could not open cover file '%s'", args_info.cover_arg);
+      cover_parse();
+      fclose(cover_in);
+    }
+    
+    
+    /*--------------------------------------------.
+    | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
     // create a unique temporary file name
     char *tmp = args_info.tmpfile_arg;
@@ -235,7 +253,7 @@ int main(int argc, char** argv) {
     status("created file '%s.lola'", tmpname.c_str());
 
     /*------------------------------------------.
-    | 4. call LoLA and parse reachability graph |
+    | 5. call LoLA and parse reachability graph |
     `------------------------------------------*/
     time(&start_time);
 
@@ -273,16 +291,18 @@ int main(int argc, char** argv) {
     }
 
     /*-------------------------------.
-    | 5. organize reachability graph |
+    | 6. organize reachability graph |
     `-------------------------------*/
     InnerMarking::initialize();
     delete InnerMarking::net;
+    if(args_info.cover_given)
+      Cover::clear();
 
     status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
 
 
     /*-------------------------------.
-    | 6. calculate knowledge bubbles |
+    | 7. calculate knowledge bubbles |
     `-------------------------------*/
     time(&start_time);
     Knowledge *K0 = new Knowledge(0);
@@ -303,7 +323,7 @@ int main(int argc, char** argv) {
 
 
     /*----------------------------.
-    | 7. add predecessor relation |
+    | 8. add predecessor relation |
     `----------------------------*/
     time(&start_time);
     unsigned int edges = StoredKnowledge::addPredecessors();
@@ -314,7 +334,7 @@ int main(int argc, char** argv) {
 
 
     /*----------------------------------.
-    | 8. detect and delete insane nodes |
+    | 9. detect and delete insane nodes |
     `----------------------------------*/
     time(&start_time);
     unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
@@ -327,13 +347,19 @@ int main(int argc, char** argv) {
     fprintf(stderr, "%s: net is controllable: %s\n",
         PACKAGE, (StoredKnowledge::root->is_sane) ? "YES" : "NO");
 
+    /*------------------------------.
+    | 10. calculate cover contraint |
+    `-------------------------------*/
+    if(args_info.cover_given)
+      Cover::calculate(StoredKnowledge::seen);
 
-    /*------------------.
-    | 9. output options |
-    `------------------*/
+    /*-------------------.
+    | 11. output options |
+    `-------------------*/
     // operating guidelines output
     if (args_info.og_given) {
-        string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
+        string og_filename = args_info.og_arg ? args_info.og_arg : 
+                             filename + (args_info.cover_given ? ".covog" : ".og");
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
         if (!og_file) {
             abort(11, "could not write to file '%s'", og_filename.c_str());
@@ -343,6 +369,10 @@ int main(int argc, char** argv) {
         } else {
             StoredKnowledge::output(og_file);            
         }
+        
+        if(args_info.cover_given)
+          Cover::write(og_file);
+        
         status("wrote OG to file '%s'", og_filename.c_str());
     }
 

@@ -87,6 +87,9 @@ class StoredKnowledge {
 
         /// the empty knowledge
         static StoredKnowledge *empty;
+        
+        /// nodes that are reachable from the initial node
+        static std::set<StoredKnowledge*> seen;
 
     private: /* static attributes */
 
@@ -95,9 +98,6 @@ class StoredKnowledge {
 
         /// nodes that should be deleted
         static std::set<StoredKnowledge*> deletedNodes;
-
-        /// nodes that are reachable from the initial node
-        static std::set<StoredKnowledge*> seen;
 
         /// the number of all markings (deadlocks and transient markings)
         static std::map<StoredKnowledge*, unsigned int> allMarkings;

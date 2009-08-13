@@ -417,6 +417,26 @@ wendy: error reading configuration file `myconf.conf' -- aborting [#14]
 @end cartouche
 @end smallexample
 
+@item #15
+Wendy cannot find the cover file given by @file{--cover} parameter or it has syntax errors. 
+
+@smallexample
+@cartouche
+wendy: could not open cover file 'foo.cov' -- aborting [#15]
+wendy: error while parsing the cover file -- aborting [#15]
+@end cartouche
+@end smallexample
+
+@item #16
+A node that has to be covered does not occur in the given net.
+
+@smallexample
+@cartouche
+wendy: unknown place 'p' -- aborting [#16]
+wendy: unknown transition 't' -- aborting [#16]
+@end cartouche
+@end smallexample
+
 @end table
 
 

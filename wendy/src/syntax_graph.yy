@@ -30,6 +30,8 @@
 #include <map>
 #include "InnerMarking.h"
 #include "Label.h"
+#include "Cover.h"
+#include "cmdline.h"
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
@@ -43,10 +45,16 @@ std::vector<InnerMarking_ID> currentSuccessors;
 /// the labels of the outgoing edges of the current marking
 std::vector<Label_ID> currentLabels;
 
+/// names of transitions, that are enabled under the current marking (needed for cover)
+std::set<std::string> currentTransitions;
+
 /// a marking of the PN API net
 std::map<const pnapi::Place*, unsigned int> marking;
 
 extern std::ofstream *markingfile;
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 extern int graph_lex();
 extern int graph_error(const char *);
@@ -81,7 +89,13 @@ state:
           *markingfile << std::endl;
       }
 
+      if (args_info.cover_given)
+      {
+        Cover::checkInnerMarking($2, marking, currentTransitions);
+      }
+
       currentLabels.clear();
+      currentTransitions.clear();
       currentSuccessors.clear();
       marking.clear(); }
 ;
@@ -103,5 +117,6 @@ transitions:
   /* empty */
 | transitions NAME ARROW NUMBER
     { currentLabels.push_back(Label::name2id[NAME_token]);
+      currentTransitions.insert(NAME_token); // needed by cover
       currentSuccessors.push_back($4); }
 ;

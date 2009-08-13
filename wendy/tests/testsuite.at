@@ -306,10 +306,10 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Interaction Graph])
+AT_BANNER([Interaction Graph Reduction])
 ############################################################################
 
-AT_SETUP([Reduction: none])
+AT_SETUP([No reduction])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])
 AT_CHECK([WENDY PO.owfn --sa --verbose],0,ignore,ignore)
@@ -319,7 +319,7 @@ AT_CHECK([GREP -c "\->" PO.sa],0,[548
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: consider only waitstates])
+AT_SETUP([Consider only waitstates])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])
 AT_CHECK([WENDY PO.owfn --sa --verbose --waitstatesOnly],0,ignore,ignore)
@@ -329,7 +329,7 @@ AT_CHECK([GREP -c "\->" PO.sa],0,[437
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: receive before send])
+AT_SETUP([Receive before send])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])
 AT_CHECK([WENDY PO.owfn --sa --verbose --receiveBeforeSend],0,ignore,ignore)
@@ -339,7 +339,7 @@ AT_CHECK([GREP -c "\->" PO.sa],0,[416
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: sequentializing receiving events])
+AT_SETUP([Sequentializing receiving events])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/seqTest1.* .])
 AT_CHECK([WENDY seqTest1.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
@@ -349,7 +349,7 @@ AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: sequentializing receiving events])
+AT_SETUP([Sequentializing receiving events])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/seqTest2.* .])
 AT_CHECK([WENDY seqTest2.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
@@ -359,7 +359,7 @@ AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: sequentializing receiving events])
+AT_SETUP([Sequentializing receiving events])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/seqTest3.* .])
 AT_CHECK([WENDY seqTest3.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
@@ -371,7 +371,7 @@ AT_CLEANUP
 
 
 # TOO slow!
-#AT_SETUP([Reduction: sequentializing receiving events])
+#AT_SETUP([Sequentializing receiving events])
 #AT_CHECK_LOLA
 #AT_CHECK([cp TESTFILES/QR.* .])
 #AT_CHECK([WENDY QR.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
@@ -381,7 +381,7 @@ AT_CLEANUP
 #AT_KEYWORDS(ig)
 #AT_CLEANUP
 
-AT_SETUP([Reduction: sequentializing receiving events])
+AT_SETUP([Sequentializing receiving events])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
 AT_CHECK([WENDY PO.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
@@ -391,7 +391,7 @@ AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: succeeding sending event])
+AT_SETUP([Succeeding sending event])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/sequence10.* .])
 AT_CHECK([WENDY sequence10.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
@@ -401,7 +401,7 @@ AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-#AT_SETUP([Reduction: succeeding sending event])
+#AT_SETUP([Succeeding sending event])
 #AT_CHECK_LOLA
 #AT_CHECK([cp TESTFILES/QR.* .])
 #AT_CHECK([WENDY QR.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
@@ -411,7 +411,7 @@ AT_CLEANUP
 #AT_KEYWORDS(ig)
 #AT_CLEANUP
 
-AT_SETUP([Reduction: succeeding sending event])
+AT_SETUP([Succeeding sending event])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
 AT_CHECK([WENDY PO.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore)
@@ -421,7 +421,7 @@ AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: combining sequentialize receiving events and succeeding sending event])
+AT_SETUP([succeedingSendingEvent + seqReceivingEvents])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/QR.* .])
 AT_CHECK([WENDY QR.owfn --sa --verbose --succeedingSendingEvent --seqReceivingEvents],0,ignore,ignore)
@@ -431,7 +431,7 @@ AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(ig)
 AT_CLEANUP
 
-AT_SETUP([Reduction: combining sequentialize receiving events and succeeding sending event])
+AT_SETUP([succeedingSendingEvent + seqReceivingEvents])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
 AT_CHECK([WENDY PO.owfn --sa --verbose --succeedingSendingEvent --seqReceivingEvents],0,ignore,ignore)

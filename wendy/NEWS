@@ -7,8 +7,8 @@
                       http://service-technology.org/wendy
 
 
-Version 1.8-unreleased
-======================
+Version 1.8
+===========
 
 * implemented reduction rule "sequentializing receiving events" (parameter:
   `--seqReceivingEvents'): instead of receiving messages in any order, only
@@ -21,6 +21,8 @@ Version 1.8-unreleased
   sending event leaving the current knowledge
 
 * fixed `--bug' parameter which caused segmentation faults on some machines
+
+* added test cases for the reduction rules
 
 * imported fixed Petri Net API: bug #14116 (`https://gna.org/bugs/?14116')
   yielded incorrect results, because Wendy did not recognize unnormal input

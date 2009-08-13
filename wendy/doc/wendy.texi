@@ -102,9 +102,11 @@ make check
 to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.}
 
 @smallexample
-===================
-All 20 tests passed
-===================
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 51 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{wendy@@service-technology.org}.

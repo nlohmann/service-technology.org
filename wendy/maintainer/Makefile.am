@@ -105,6 +105,8 @@ bin-Linux:
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86"
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86-64" EXTRA_CFLAGS="-m64"
 
+bin-CYGWIN_NT-6.0: bin-CYGWIN_NT-5.1
+
 bin-CYGWIN_NT-5.1:
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="win32" EXTRA_CFLAGS="-mno-cygwin -U _WIN32"
 
@@ -116,7 +118,7 @@ bin-generic:
 	rm -fr local
 	mkdir local
 	$(MAKE) --directory=$(top_srcdir) distclean
-	cd $(top_srcdir); CXXFLAGS="-O3 $(EXTRA_CFLAGS)" CFLAGS="-O3 $(EXTRA_CFLAGS)" LDFLAGS="-O3 $(EXTRA_CFLAGS)" ./configure --disable-assert --prefix=$(abs_srcdir)/local --docdir=$(abs_srcdir)/local/doc sysconfdir=$(abs_srcdir)/local/bin $(EXTRA_CONFFLAGS)
+	cd $(top_srcdir); CXXFLAGS="-O3 $(EXTRA_CFLAGS)" CFLAGS="-O3 $(EXTRA_CFLAGS)" LDFLAGS="$(EXTRA_LDFLAGS)" ./configure --disable-assert --prefix=$(abs_srcdir)/local --docdir=$(abs_srcdir)/local/doc sysconfdir=$(abs_srcdir)/local/bin $(EXTRA_CONFFLAGS)
 	$(MAKE) --directory=$(top_srcdir) $(TARGETS) install
 	$(MAKE) --directory=$(top_srcdir) install-html install-pdf AM_MAKEINFOHTMLFLAGS="--no-split"
 	rm -fr local/share

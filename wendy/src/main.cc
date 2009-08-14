@@ -51,10 +51,8 @@ using std::string;
 extern FILE *graph_in;
 extern FILE *cover_in;
 
-/// the graph parser
+/// the parsers
 extern int graph_parse();
-
-/// the cover parser
 extern int cover_parse();
 
 /// the command line parameters
@@ -215,21 +213,21 @@ int main(int argc, char** argv) {
     InterfaceMarking::initialize(args_info.messagebound_arg);
 
 
-    /*--------------------------------------------.
-    | 3. read cover file if given                 |
-    `--------------------------------------------*/
-    if(args_info.cover_given)
-    {
-      cover_in = fopen(args_info.cover_arg, "r");
-      if(cover_in == NULL)
-        abort(15, "could not open cover file '%s'", args_info.cover_arg);
-      cover_parse();
-      fclose(cover_in);
-      
-      status("read cover file '%s'", args_info.cover_arg);
+    /*----------------------------.
+    | 3. read cover file if given |
+    `----------------------------*/
+    if(args_info.cover_given) {
+        cover_in = fopen(args_info.cover_arg, "r");
+        if(cover_in == NULL) {
+            abort(15, "could not open cover file '%s'", args_info.cover_arg);
+        }
+        cover_parse();
+        fclose(cover_in);
+
+        status("read cover file '%s'", args_info.cover_arg);
     }
-    
-    
+
+
     /*--------------------------------------------.
     | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
@@ -253,6 +251,7 @@ int main(int argc, char** argv) {
     lolaFile << pnapi::io::lola << *(InnerMarking::net);
     lolaFile.close();
     status("created file '%s.lola'", tmpname.c_str());
+
 
     /*------------------------------------------.
     | 5. call LoLA and parse reachability graph |
@@ -297,8 +296,9 @@ int main(int argc, char** argv) {
     `-------------------------------*/
     InnerMarking::initialize();
     delete InnerMarking::net;
-    if(args_info.cover_given)
-      Cover::clear();
+    if(args_info.cover_given) {
+        Cover::clear();
+    }
 
     status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
 
@@ -352,12 +352,11 @@ int main(int argc, char** argv) {
     /*------------------------------.
     | 10. calculate cover contraint |
     `-------------------------------*/
-    if(args_info.cover_given)
-    {
-      Cover::calculate(StoredKnowledge::seen);
-    
-      fprintf(stderr, "%s: cover constraint is satisfiable: %s\n",
-          PACKAGE, (Cover::satisfiable) ? "YES" : "NO");
+    if(args_info.cover_given) {
+        Cover::calculate(StoredKnowledge::seen);
+
+        fprintf(stderr, "%s: cover constraint is satisfiable: %s\n",
+            PACKAGE, (Cover::satisfiable) ? "YES" : "NO");
     }
 
     /*-------------------.
@@ -373,13 +372,13 @@ int main(int argc, char** argv) {
         if (args_info.fionaFormat_flag) {
             StoredKnowledge::output_old(og_file);
         } else {
-            StoredKnowledge::output(og_file);            
+            StoredKnowledge::output(og_file);
         }
-        
         status("wrote OG to file '%s'", og_filename.c_str());
-        
-        if(args_info.cover_given)
-          Cover::write(og_filename + ".cover");  
+
+        if(args_info.cover_given) {
+            Cover::write(og_filename + ".cover");
+        }
     }
 
     // service automaton output

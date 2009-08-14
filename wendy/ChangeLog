@@ -7,6 +7,13 @@
                       http://service-technology.org/wendy
 
 
+Version 1.9-unreleased
+======================
+
+* implemented cover constraints for operating guidelines (see
+  `http://wwwteo.informatik.uni-rostock.de/ls_tpp/staff/publications-complete.htm#StahlW_2008_bpm'
+  for more information)
+
 Version 1.8
 ===========
 

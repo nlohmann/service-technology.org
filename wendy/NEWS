@@ -7,26 +7,12 @@
                       http://service-technology.org/wendy
 
 
-Version 1.8
-===========
+Version 1.9-unreleased
+======================
 
-* implemented reduction rule "sequentializing receiving events" (parameter:
-  `--seqReceivingEvents'): instead of receiving messages in any order, only
-  one sequentialization is considered. (A similar rule is implemented in
-  Fiona where receiving events where combined rather than sequentialized.)
-
-* implemented reduction rule "succeeding sending event" (parameter:
-  `--succeedingSendingEvent'): once a sending event has led from the current
-  knowledge to a valid successor knowledge, we do not consider any other
-  sending event leaving the current knowledge
-
-* fixed `--bug' parameter which caused segmentation faults on some machines
-
-* added test cases for the reduction rules
-
-* imported fixed Petri Net API: bug #14116 (`https://gna.org/bugs/?14116')
-  yielded incorrect results, because Wendy did not recognize unnormal input
-  files
+* implemented cover constraints for operating guidelines (see
+  `http://wwwteo.informatik.uni-rostock.de/ls_tpp/staff/publications-complete.htm#StahlW_2008_bpm'
+  for more information)
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

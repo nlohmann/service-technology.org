@@ -1,3 +1,9 @@
+@heading Version 1.9-unreleased
+@itemize
+@item implemented cover constraints for operating guidelines (see @url{http://wwwteo.informatik.uni-rostock.de/ls_tpp/staff/publications-complete.htm#StahlW_2008_bpm} for more information)
+@end itemize
+
+
 @heading Version 1.8
 @itemize
 @item implemented reduction rule ``sequentializing receiving events'' (parameter: @option{--seqReceivingEvents}): instead of receiving messages in any order, only one sequentialization is considered. (A similar rule is implemented in Fiona where receiving events where combined rather than sequentialized.)

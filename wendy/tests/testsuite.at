@@ -4,7 +4,7 @@ m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 AT_TESTED(versions.sh)
 
 ############################################################################
-AT_BANNER([Standard Options])
+AT_BANNER([Basic Options])
 ############################################################################
 
 AT_SETUP([Help output])
@@ -17,11 +17,43 @@ AT_CHECK([WENDY --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cat myCoffee.owfn | WENDY --verbose --og],0,ignore,ignore)
+AT_CHECK([test -f wendy_output.og],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Given output filenames])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og=foo.og --dot=bar.dot --mi=baz.mi --verbose],0,ignore,ignore)
+AT_CHECK([test -f foo.og],0)
+AT_CHECK([test -f bar.dot],0)
+AT_CHECK([test -f baz.mi],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Given tempname])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --tmpfile=foo --verbose],0,ignore,ignore)
+AT_CHECK([test -f foo],0)
+AT_CHECK([test -f foo.lola],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Bug information output])
 AT_CHECK([WENDY --bug],0,ignore,[Please send file 'bug.log' to wendy@service-technology.org.
 ])
 AT_CHECK([test -f bug.log])
-AT_KEYWORDS(basic)
+AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 

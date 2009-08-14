@@ -5,18 +5,6 @@
 #include <set>
 
 
-// TODO clear
-// TRUE and FALSE #defined in cudd package may interfere with
-// FormulaLiteral::TRUE and ...::FALSE.
-//#undef TRUE
-//#undef FALSE
-//#define TRUE 1
-//#define FALSE 0
-
-class FormulaFixed;
-//class FormulaCNF;
-
-
 
 // ****************************************************************************
 // Assignment
@@ -69,17 +57,12 @@ class FormulaAssignment {
 class Formula {
     public:
         /// Destroys the given Formula and all its subformulas.
-        virtual ~Formula() { };
+        virtual ~Formula() {};
 
-        virtual bool satisfies(const FormulaAssignment& assignment) const;
-
-        /// Formats and returns this Formula as a string. This string is
-        /// suitable for showing the user and for the OG output format. The string
-        /// representation for the AND and OR operators are determined by
-        /// FormulaMultiaryAnd::getOperator() and
-        /// FormulaMultiaryOr::getOperator().
+        /// Formats and returns this formula as a string. This string is
+        /// suitable for showing the user and for the OG output format.
         /// returns The string representation for this Formula.
-        virtual std::string asString() const = 0;
+        virtual string asString() const = 0;
 
         /// Returns the truth value of this Formula under the given
         /// FormulaAssignment.
@@ -90,26 +73,17 @@ class Formula {
         ///  FormulaAssignment.
         virtual bool value(const FormulaAssignment& assignment) const = 0;
 
-        /// fills the given set of strings with all event-representing literals
-        /// from the formula
-        virtual void getEventLiterals(std::set<std::string>& events);
-
-        /// removes a literal from the whole formula
-        virtual void removeLiteral(const std::string&);
+        /// returns the number of subformulas
+        virtual int size() const = 0;
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
         /// this function is used in the IG reduction
-        virtual void removeLiteralForReal(const std::string&);
-
-        /// removes a literal from the whole formula by hiding
-        virtual void removeLiteralByHiding(const std::string&);
+        virtual void removeLiteral(const string&) {};
 
         /// copies and returns this Formula
         virtual Formula* getDeepCopy() const = 0;
 
-        /// returns the number of subformulas
-        virtual int getSubFormulaSize() const;
 };
 
 
@@ -123,9 +97,7 @@ class Formula {
  * CommFormulas\endlink, such as FormulaMultiaryAnd and
  * FormulaMultiaryOr. This class exists because the classes
  * FormulaMultiaryAnd and FormulaMultiaryOr share
- * functionality which should be implemented only once, e.g., the truth of a
- * multiary conjunction is computed analogously to the truth value of a
- * multiary disjunction.
+ * functionality which should be implemented only once.
  */
 class FormulaMultiary : public Formula {
     public:
@@ -144,79 +116,42 @@ class FormulaMultiary : public Formula {
 
     public:
         /// basic constructor
-        FormulaMultiary();
+        FormulaMultiary() : Formula() {};
 
-        FormulaMultiary(Formula* newformula);
+        /// constructor with one new formula
+        FormulaMultiary(Formula* newformula) {
+            subFormulas.push_back(newformula);
+        };
 
-        FormulaMultiary(Formula* lhs, Formula* rhs);
+        /// binary constructor
+        FormulaMultiary(Formula* lhs, Formula* rhs) {
+            subFormulas.push_back(lhs);
+            subFormulas.push_back(rhs);
+        };
 
         /// Destroys this FormulaMultiary and all its subformulas.
         virtual ~FormulaMultiary();
 
-        /// returns a string of this formula
-        virtual std::string asString() const;
-
-        /// Returns the string representation of this multiary formula's operator.
-        /// This representation is used to return the string representation of the
-        /// whole multiary formula (asString()).
-        /// @returns The string representation of this multiary formula's operator.
-        virtual std::string getOperator() const = 0;
-
-        /// returns the value of this formula under the given assignment
-        virtual bool value(const FormulaAssignment& assignment) const;
-
-        /// Returns a formula that is equivalent to this multiary formula if it is
-        /// empty. For instance, an empty disjunction is equivalent to false, an
-        /// empty conjunction is equivalent to true.
-        /// @remarks Using this equivalent formula we can implement value() for
-        /// FormulaMultiaryAnd and FormulaMultiaryOr in a single
-        /// method here.
-        virtual const FormulaFixed& getEmptyFormulaEquivalent() const = 0;
-
         /// adds a given subformula to this multiary
-        void addSubFormula(Formula* subformula);
+        void addSubFormula(Formula* subformula) {
+            subFormulas.push_back( subformula );
+        };
 
         /// removes the subformula at the given iterator
-        iterator removeSubFormula(iterator subformula);
-
-        /// fills the given set of strings with all event-representing literals
-        /// from the formula
-        virtual void getEventLiterals(std::set<std::string>& events);
-
-        /// removes a literal from this formula
-        virtual void removeLiteral(const std::string&);
+        iterator removeSubFormula(iterator subformula) {
+            return subFormulas.erase( subformula );
+        };
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
         /// this function is used in the IG reduction
-        virtual void removeLiteralForReal(const std::string&);
-
-        /// removes a literal from the formula by hiding
-        virtual void removeLiteralByHiding(const std::string&);
-
-        /// returns the number of subformulas
-        virtual int getSubFormulaSize() const;
+        virtual void removeLiteral(const std::string&);
 
         /// copies te private members of this multiary to a given formula
         void deepCopyMultiaryPrivateMembersToNewFormula(FormulaMultiary* newFormula) const;
 
-        /// Returns an iterator to the first subformula.
-        iterator begin();
-
-        /// Returns an iterator to the first subformula.
-        const_iterator begin() const;
-
-        /// Returns an iterator to one past the last subformula.
-        iterator end();
-
-        /// Returns an iterator to one past the last subformula.
-        const_iterator end() const;
-
-        /// Returns true iff this formula has no subformulas.
-        bool empty() const;
-
         /// Returns the the number of formulas, the multiary formula consists of.
-        int size() const;
+        virtual int size() const;
 };
 
 
@@ -225,33 +160,26 @@ class FormulaMultiary : public Formula {
  * have arbitrarily many subformulas, even none.
  */
 class FormulaMultiaryAnd : public FormulaMultiary {
-    private:
-        /// Holds a Formula that is equivalent to this
-        /// FormulaMultiaryAnd if it is empty. This is FormulaTrue
-        /// because an empty conjunction evaluates to true. Used to implement
-        /// value() for all \link FormulaMultiary multiary functions
-        /// \endlink in a single method (FormulaMultiary::value()).
-        static const FormulaFixed emptyFormulaEquivalent;
     public:
-        /// See FormulaMultiary()
-        FormulaMultiaryAnd();
-        FormulaMultiaryAnd(Formula* subformula_);
-        FormulaMultiaryAnd(Formula* lhs, Formula* rhs);
-
-        /// Returns the merged equivalent to this formula.
-        FormulaMultiaryAnd* merge();
-
-        /// deep copies the formula
-        virtual FormulaMultiaryAnd* getDeepCopy() const;
+        /// constructors
+        FormulaMultiaryAnd() : FormulaMultiary() {};
+        FormulaMultiaryAnd(Formula* sub) : FormulaMultiary(sub) {};
+        FormulaMultiaryAnd(Formula* lhs, Formula* rhs) : FormulaMultiary(lhs, rhs) {};
 
         /// Destroys this FormulaMultiaryAnd and all its subformulas. */
         virtual ~FormulaMultiaryAnd() {};
 
-        /// returns the fitting operator
-        virtual std::string getOperator() const;
+        /// returns the formula as a string
+        virtual string asString() const;
 
-        /// returns a constant empty formula equivalent
-        virtual const FormulaFixed& getEmptyFormulaEquivalent() const;
+        /// returns the value of this formula under given assignment
+        virtual bool value(const FormulaAssignment& assignment) const;
+
+        /// Returns the merged equivalent to this formula.
+        virtual FormulaMultiaryAnd* merge();
+
+        /// deep copies the formula
+        virtual FormulaMultiaryAnd* getDeepCopy() const;
 };
 
 
@@ -260,36 +188,28 @@ class FormulaMultiaryAnd : public FormulaMultiary {
  * have arbitrarily many subformulas, even none.
  */
 class FormulaMultiaryOr : public FormulaMultiary {
-    private:
-        /// Analog to FormulaMultiaryOr::emptyFormulaEquivalent. Except: an
-        /// empty multiary disjunction evaluates to false.
-        static const FormulaFixed emptyFormulaEquivalent;
     public:
-        /// See FormulaMultiary()
-        FormulaMultiaryOr();
-        FormulaMultiaryOr(Formula* subformula_);
-        FormulaMultiaryOr(Formula* lhs, Formula* rhs);
-
-        /// Returns the merged equivalent to this formula. Merging gets rid of
-        /// unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
-        /// caller is responsible for deleting the returned newly created formula.
-        FormulaMultiaryOr* merge();
-
-        /// returns a deep copy of this formula
-        virtual FormulaMultiaryOr* getDeepCopy() const;
+        /// constructors
+        FormulaMultiaryOr() : FormulaMultiary() {};
+        FormulaMultiaryOr(Formula* sub) : FormulaMultiary(sub) {};
+        FormulaMultiaryOr(Formula* lhs, Formula* rhs) : FormulaMultiary(lhs, rhs) {};
 
         /// Destroys this FormulaMultiaryOr and all its subformulas
         virtual ~FormulaMultiaryOr() {};
 
-        /// returns "+"
-        virtual std::string getOperator() const;
+        /// returns the formula as a string
+        virtual string asString() const;
 
-        /// returns an empty formula equivalent
-        virtual const FormulaFixed& getEmptyFormulaEquivalent() const;
+        /// returns the value of this formula under given assignment
+        virtual bool value(const FormulaAssignment& assignment) const;
 
-        /// intelligently adds a new subformula to the clause, if exactly the same
-        /// subformula already exists, the new one is not added
-        virtual void addSubFormula(Formula*);
+        /// Returns the merged equivalent to this formula. Merging gets rid of
+        /// unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
+        /// caller is responsible for deleting the returned newly created formula.
+        virtual FormulaMultiaryOr* merge();
+
+        /// returns a deep copy of this formula
+        virtual FormulaMultiaryOr* getDeepCopy() const;
 };
 
 
@@ -326,6 +246,11 @@ class FormulaLiteral : public Formula {
         /// returns the name of the literal
         virtual string asString() const {
         	return _literal;
+        }
+
+        /// returns the size of this formula
+        virtual int size() const {
+            return 1;
         }
 };
 

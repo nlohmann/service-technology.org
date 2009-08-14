@@ -1,7 +1,6 @@
 #include "settings.h"
 #include "Node.h"
 
-extern gengetopt_args_info args_info;
 
 
 //! \brief constructor (three parameters)
@@ -25,24 +24,24 @@ Node::~Node() {
 unsigned int Node::computeEfficientSuccessors() {
 
     // if this node is a final node then we dont have to consider any leaving edge
-    if (args_info.debug_flag) cout << "DEBUG computing costs for node " << getID() << endl;
+    DEBUG "DEBUG computing costs for node " << getID() END
     if (args_info.debug_flag) printToStdout();
     if ( final ) {
-    	if (args_info.debug_flag) cout << "      node '" << getID() << "', " << this << " is final, cost is 0" << endl;
+    	DEBUG "      node '" << getID() << "', " << this << " is final, cost is 0" END
         return 0;
     }
 
 
     // first we have to compute the cost for all successors
     list< pair< pair<Node*, Event*>, unsigned int> > totalCost;
-    if (args_info.debug_flag) cout << "      node " << getID() << " has " << successors.size() << " successors" << endl;
+    DEBUG "      node " << getID() << " has " << successors.size() << " successors" END
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
           i != successors.end(); ++i) {
 
     	Node* successor = i->first;
 		if (successor == this) {
 			// this should never happens as cost are defined for acyclic OGs
-			if (args_info.debug_flag) cout << "Cannot compute cost since the given OG is not acyclic\n\n" << endl;
+			DEBUG "Cannot compute cost since the given OG is not acyclic\n\n" END
 			return EXIT_FAILURE;
 		}
 
@@ -58,11 +57,11 @@ unsigned int Node::computeEfficientSuccessors() {
         }
         assert( maxEvent != NULL );
 
-        if (args_info.debug_flag) cout << "bla" << endl;
+        DEBUG "bla" END
         assert(successor != NULL);
 		unsigned int successorCost = maxEventCost + successor->computeEfficientSuccessors();
 		totalCost.push_back( pair< pair<Node*, Event*>, unsigned int >( pair<Node*, Event*>(successor, maxEvent) , successorCost) );
-		if (args_info.debug_flag) cout << "      node " << getID() << " has successor with cost " << successorCost << endl;
+		DEBUG "      node " << getID() << " has successor with cost " << successorCost END
     }
 
 
@@ -70,7 +69,7 @@ unsigned int Node::computeEfficientSuccessors() {
     // the minimal cost
     list<FormulaAssignment> minimalAssignments;
     unsigned int minimalCost = getCostMinimalAssignments(totalCost, minimalAssignments);
-    if (args_info.debug_flag) cout << "      node " << getID() << " has minimalAssignment with cost " << minimalCost << endl;
+    DEBUG "      node " << getID() << " has minimalAssignment with cost " << minimalCost END
 
 
     // finally we cut the connection to all inefficient successor nodes
@@ -79,7 +78,7 @@ unsigned int Node::computeEfficientSuccessors() {
 
         Node* currentSuccessor = i->first;
         assert(currentSuccessor != NULL);
-        if (args_info.debug_flag) cout << "      node " << getID() << " is checking successor " << currentSuccessor->getID() << endl;
+        DEBUG "      node " << getID() << " is checking successor " << currentSuccessor->getID() END
 
         Event* maxEvent = i->second.front();
         assert(maxEvent != NULL);
@@ -105,13 +104,18 @@ unsigned int Node::computeEfficientSuccessors() {
 
         if ( inefficient ) {
 
-            successors.erase( i++ ); // erase returns incremented iterator, which is invalid for last element
-            formula->removeLiteralForReal( maxEvent->name );
-            if (args_info.debug_flag) cout << "      node " << getID() << " has lost successor " << currentSuccessor->getID() << endl;
+            // the erase returns incremented iterator, which is invalid for last element
+            successors.erase( i++ );
+
+            // remove unnecessary literal
+            formula->removeLiteral( maxEvent->name );
+            DEBUG "      node " << getID() << " has lost successor " << currentSuccessor->getID() END
         } else {
         	++i;
         }
     }
+
+    // TODO simplify formula
 
 
     return minimalCost;
@@ -172,7 +176,7 @@ void Node::getCostMinimalAssignmentsRecursively(
 
         // set it to False ...
         currentAssignment.setToFalse(currentLabel);
-        if ( formula->satisfies(currentAssignment) ) {
+        if ( formula->value(currentAssignment) == true ) {
 
             if ( currentCost < minimalCost ) {
                 // we found a minimal assignment with lesser cost
@@ -190,7 +194,7 @@ void Node::getCostMinimalAssignmentsRecursively(
             // set it to True
             // only for true labels the label's cost are added
             currentAssignment.setToTrue(currentLabel);
-            if ( formula->satisfies(currentAssignment) ) {
+            if ( formula->value(currentAssignment) == true ) {
 
                 if ( currentCost + currentLabelCost < minimalCost ) {
                     // we found a minimal assignment with lesser cost
@@ -276,11 +280,12 @@ void Node::output(std::ostream& file, bool isRootNode) {
         }
     } else {
 
-        if ( final ) {
-            file << " : FINAL" << endl;
-        } else {
+        // TODO correct?
+        //if ( final ) {
+        //    file << " : FINAL" << endl;
+        //} else {
             file << " : " << formula->asString() << endl;
-        }
+        //}
     }
 
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();

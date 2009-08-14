@@ -5,6 +5,7 @@
 extern string invocation;
 
 
+
 //! \brief a basic constructor of Graph
 Graph::Graph() :
     root(NULL) {
@@ -53,6 +54,7 @@ void Graph::output(std::ostream& file) {
 
     file << "INTERFACE\n";
 
+    // TODO wtf?
     if ( true) {
         file << "  INPUT\n    ";
         bool first = true;

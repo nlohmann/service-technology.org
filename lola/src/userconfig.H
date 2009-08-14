@@ -150,7 +150,7 @@
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-//#define FULL
+#define FULL
 //#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
@@ -158,7 +158,7 @@
 //#define FAIRPROP
 //#define STABLEPROP
 //#define EVENTUALLYPROP
-#define STATESPACE
+//#define STATESPACE
 
 // EXTENDEDCTL enables the use of transition formulae for restricting the scope of
 // path quantifiers in CTL formulae. If disabled, transition formulae may appear in

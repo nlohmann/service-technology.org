@@ -40,15 +40,6 @@ AT_CHECK([test -f baz.mi],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Given tempname])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --tmpfile=foo --verbose],0,ignore,ignore)
-AT_CHECK([test -f foo],0)
-AT_CHECK([test -f foo.lola],0)
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
 AT_SETUP([Bug information output])
 AT_CHECK([WENDY --bug],0,ignore,[Please send file 'bug.log' to wendy@service-technology.org.
 ])

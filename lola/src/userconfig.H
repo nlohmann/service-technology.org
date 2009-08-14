@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -33,12 +33,12 @@
 // space construction reaches a state with more tokens on a place
 // than specified.
 
-//#define CHECKCAPACITY 
+//#define CHECKCAPACITY
 //#define CAPACITY 1
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
-// Progress messages are written during graph generation 
+// Progress messages are written during graph generation
 // after every REPORTFREQUENCY transition occurrences and during
 // symmetry calculation after passing a search depth that is
 // a multiple of REOPRTFREQUENCY. If  REPORTFREQUENCY is not
@@ -58,24 +58,24 @@
 
 #define MAXPATH 3000000
 
-// HASHSIZE is the number of entries in the table that hashes the 
+// HASHSIZE is the number of entries in the table that hashes the
 // reachable states.  Larger values should speed up search but
 // consume more memory. This variable must be set to a power of 2
 
 #define HASHSIZE 65536
 
-// Defining any set of options among STUBBORN, COVER, SYMMETRY, CYCLE, SMALLSTATE, 
+// Defining any set of options among STUBBORN, COVER, SYMMETRY, CYCLE, SMALLSTATE,
 // BITHASH, DISTRIBUTE, and PREDCUTION enables the joint application of the
-// corresponding reduction techniques. 
+// corresponding reduction techniques.
 // If a reduction technique does not fit to the analysis task, the reduction
 // technique will be switched off automatically. There is a few combinations
 // of reduction techniques where a joint application is impossible independently
 // of the property. In those cases, LoLA disables as few as possible
-// reduction techniques. Call lola -h to see which reduction techniques are 
+// reduction techniques. Call lola -h to see which reduction techniques are
 // finally applied in the exectuable program.
 
-#define COVER
-#define STUBBORN
+//#define COVER
+//#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
 //#define PREDUCTION
@@ -90,7 +90,7 @@
 // In connection with STATEPREDICATE (below), there exist two versions of
 // stubborn set. RELAXED selects the Kristensen/Valmari method (Petri net
 // conference 2000). Without RELAXED, the Schmidt method (Petri net conference
-// 1999) is selected. Kristensen/Valmari behaves significantly better for 
+// 1999) is selected. Kristensen/Valmari behaves significantly better for
 // non-satisfiable predicates while Schmidt tends to approach target states more
 // directly if there exist any. Without STUBBORN, or without STATEPREDICATE,
 // setting or removing RELAXED does not influence anything.
@@ -150,7 +150,7 @@
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-#define FULL
+//#define FULL
 //#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
@@ -158,6 +158,7 @@
 //#define FAIRPROP
 //#define STABLEPROP
 //#define EVENTUALLYPROP
+#define STATESPACE
 
 // EXTENDEDCTL enables the use of transition formulae for restricting the scope of
 // path quantifiers in CTL formulae. If disabled, transition formulae may appear in

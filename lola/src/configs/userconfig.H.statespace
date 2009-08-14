@@ -5,10 +5,10 @@
 #define HASHSIZE 65536
 
 // REDUCTION TECHNIQUES
-//#define PREDUCTION
+// #define PREDUCTION  // has to be turned off until bug 12922 has been fixed
 
 // GRAPH EXPLORATION STRATEGY
 #define DEPTH_FIRST
 
 // VERIFICATION PROBLEM
-#define FULL
+#define STATESPACE

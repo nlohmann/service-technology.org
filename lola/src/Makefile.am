@@ -47,7 +47,8 @@ EXTRA_DIST = readnet-syntax.h cmdline.ggo \
              configs/userconfig.H.modelchecking \
              configs/userconfig.H.none \
              configs/userconfig.H.statepredicate \
-             configs/userconfig.H.statepredicate1
+             configs/userconfig.H.statepredicate1 \
+	     configs/userconfig.H.statespace 
 
 lola_CFLAGS = @configured_CFLAGS@
 lola_CXXFLAGS = @configured_CXXFLAGS@

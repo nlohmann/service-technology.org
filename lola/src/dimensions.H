@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -27,6 +27,23 @@
 #include "userconfig.H"
 #include <iostream>
 #include <limits.h>
+
+
+#ifdef STATESPACE
+#define FULL
+#define FULLTARJAN
+#define TARJAN
+#define SHOWLOWLINK
+#undef COVER
+#undef STUBBORN
+#undef SYMMETRY
+#undef CYCLE
+#undef PREDUCTION
+#undef SMALLSTATE
+#undef BITHASH
+#undef DISTRIBUTE
+#undef SWEEP
+#endif
 
 #undef APPROXIMATE_CANONIZATION
 // TARJAN=evaluate dfs and min for detecting terminal scc
@@ -113,13 +130,13 @@
 
 #ifdef FINDPATH
 #define FP 1
-#else 
+#else
 #define FP 0
 #endif
 
 #ifdef FULL
 #define FU 1
-#else 
+#else
 #define FU 0
 #endif
 
@@ -212,7 +229,7 @@
 #endif
 
 #undef RC
-#undef BP 
+#undef BP
 #undef MC
 #undef DT
 #undef RV
@@ -429,7 +446,7 @@
 #define SEARCHPROC canonical_representitive
 #define INSERTPROC binInsert
 //#define INSERTPROC insert_marking
-#else 
+#else
 #define SEARCHPROC canonical_representitive_on_the_fly
 #define INSERTPROC insert_marking
 #endif
@@ -724,7 +741,7 @@
 #undef EXTENDEDCTL
 #endif
 
-#ifndef MAXATTEMPT 
+#ifndef MAXATTEMPT
 #define MAXATTEMPT 0
 #endif
 

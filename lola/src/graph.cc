@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -69,8 +69,8 @@ char rapportstring[] = "search";
 
   unsigned int NrOfStates;
   unsigned int Edges;
-  
-  
+
+
 void statistics(unsigned int s, unsigned int e, unsigned int h)
 {
    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
@@ -905,7 +905,9 @@ if(i >= Places[0]->cnt) // target_marking found!
   CurrentState -> succ = new State * [CardFireList+1];
   CurrentState -> dfs = CurrentState -> min = 0;
 #ifdef FULLTARJAN
+#ifndef STATESPACE
    CurrentState -> phi = F -> value;
+#endif
    CurrentState -> nexttar = CurrentState -> prevtar = CurrentState;
    TarStack = CurrentState;
 #endif
@@ -1167,7 +1169,9 @@ if(!NewOmegas) smallerstate = (State *) 0;
          checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
 #endif
 #ifdef FULLTARJAN
+#ifndef STATESPACE
       NewState -> phi = F -> value;
+#endif
 #ifdef EVENTUALLYPROP
    if(!F -> value)
    {
@@ -1424,7 +1428,13 @@ if(i >= Places[0]->cnt) // target_marking found!
 #ifdef TARJAN
    if(gmflg)
    {
-     (*graphstream) << "STATE " << CurrentState ->dfs << " Prog: " << CurrentState -> progress_value;
+     (*graphstream) << "STATE " << CurrentState ->dfs;
+#ifdef SHOWLOWLINK
+     (*graphstream) << " Lowlink: " << CurrentState ->min;
+#endif
+
+     (*graphstream) << " Prog: " << CurrentState -> progress_value;
+
      if(CurrentState -> persistent) (*graphstream) << " persistent ";
      int j=0;
      if(graphformat == 'm')
@@ -1457,6 +1467,9 @@ if(i >= Places[0]->cnt) // target_marking found!
    if(GMflg)
    {
      cout << "STATE " << CurrentState ->dfs;
+#ifdef SHOWLOWLINK
+     cout << " Lowlink: " << CurrentState ->min;
+#endif
      int j=0;
      if(graphformat == 'm')
      {

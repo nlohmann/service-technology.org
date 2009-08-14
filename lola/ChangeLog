@@ -21,6 +21,10 @@ Version 1.13-unreleased
 
 * changed the way tests are run (using GNU Autotest now)
 
+* added mode called STATESPACE which ensures that FULLTARJAN is switched on
+  and the lowlink values generated during the Tarjan algorithm are printed out;
+  furthermore no reduction techniques will be applied
+
 Version 1.12
 ============
 

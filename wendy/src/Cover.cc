@@ -24,6 +24,8 @@
 #include "Label.h"
 #include "verbose.h"
 
+extern gengetopt_args_info args_info;
+
 /******************
  * STATIC MEMBERS *
  ******************/
@@ -45,6 +47,7 @@ std::vector<StoredKnowledge*>* Cover::coveringInternalTransitions = NULL;
 std::vector<StoredKnowledge*>* Cover::coveringInterfaceTransitions = NULL;
 Label_ID* Cover::interfacePlaceLabels = NULL;
 std::map<std::string, Label_ID> Cover::labelCache;
+bool Cover::satisfiable = true;
 
 /******************
  * STATIC METHODS *
@@ -67,7 +70,8 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
   {
     pnapi::Place* p = InnerMarking::net->findPlace(placeNames[i]);
     if(p == NULL)
-      abort(16, "unknown place '%s'", placeNames[i].c_str());
+      abort(16, "unknown place '%s' in file '%s'", 
+              placeNames[i].c_str(), args_info.cover_arg);
     
     if(p->getType() == pnapi::Node::INTERNAL)
       inP.push_back(p);
@@ -83,7 +87,8 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
   {
     pnapi::Transition* t = InnerMarking::net->findTransition(transitionNames[i]);
     if(t == NULL)
-      abort(16, "unknown transition '%s'", transitionNames[i].c_str());
+      abort(16, "unknown transition '%s' in file '%s'", 
+              transitionNames[i].c_str(), args_info.cover_arg);
     
     if(t->getType() != pnapi::Node::INPUT)
       inT.push_back(t);
@@ -292,15 +297,50 @@ void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
       }
     }
   }
+  
+  /// check for empty clauses
+  for(int i=0; i<4; ++i)
+  {
+    std::vector<StoredKnowledge*>* current;
+    unsigned int currentCount;
+    switch(i)
+    {
+    case 0: 
+      current = coveringInternalPlaces;
+      currentCount = internalPlaceCount;
+      break;
+    case 1: 
+      current = coveringInterfacePlaces;
+      currentCount = interfacePlaceCount;
+      break;
+    case 2: 
+      current = coveringInternalTransitions;
+      currentCount = internalTransitionCount;
+      break;
+    case 3: 
+      current = coveringInterfaceTransitions;
+      currentCount = interfaceTransitionCount;
+      break;
+    default: /* ??? */ ;
+    }
+    
+    for(unsigned int j=0; j<currentCount; ++j)
+    {
+      satisfiable = satisfiable && (!current[j].empty());
+    }
+  }
+  
 }
 
 /*!
  * \brief writes the contraint in an output stream
  */
-void Cover::write(std::ostream& os)
+void Cover::write(const std::string & filename)
 {
+  std::ofstream os(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+  
   os << "\nCOVER\n"
-     << "  PLACES:\n";
+     << "  PLACES\n";
   
   if(internalPlaceCount > 0)
   {
@@ -321,7 +361,7 @@ void Cover::write(std::ostream& os)
   for(unsigned int i=1; i<interfacePlaceCount; ++i)
     os << ",\n    " << interfacePlaces[i];
   
-  os << ";\n  TRANSITIONS:\n";
+  os << ";\n  TRANSITIONS\n";
   
   if(internalTransitionCount > 0)
   {
@@ -342,56 +382,63 @@ void Cover::write(std::ostream& os)
   for(unsigned int i=1; i<interfaceTransitionCount; ++i)
     os << ",\n    " << interfaceTransitions[i];
   
-  os << ";\n  CONSTRAINT:\n  (\n";
+  os << ";\n  CONSTRAINT\n";
   
-  unsigned int lastClause = internalPlaceCount + interfacePlaceCount
-                          + internalTransitionCount + interfaceTransitionCount;
-  
-  /// for each node a clause
-  for(int i=0; i<4; ++i)
+  if(!satisfiable)
+    os << "FALSE;\n";
+  else
   {
-    std::vector<StoredKnowledge*>* current;
-    unsigned int currentCount;
-    switch(i)
-    {
-    case 0: 
-      current = coveringInternalPlaces;
-      currentCount = internalPlaceCount;
-      break;
-    case 1: 
-      current = coveringInterfacePlaces; 
-      currentCount = interfacePlaceCount;
-      break;
-    case 2: 
-      current = coveringInternalTransitions; 
-      currentCount = internalTransitionCount;
-      break;
-    case 3: 
-      current = coveringInterfaceTransitions; 
-      currentCount = interfaceTransitionCount;
-      break;
-    default: /* ??? */ ;
-    }
+    os << "(\n";
     
-    for(unsigned int j=0; j<currentCount; ++j)
+    unsigned int lastClause = internalPlaceCount + interfacePlaceCount
+                            + internalTransitionCount + interfaceTransitionCount;
+    
+    /// for each node a clause
+    for(int i=0; i<4; ++i)
     {
-      os << "    (";
-      
-      if(current[j].size() > 0)
-        os << reinterpret_cast<unsigned long>(current[j][0]);
-      for(unsigned int k=1; k<current[j].size(); ++k)
+      std::vector<StoredKnowledge*>* current;
+      unsigned int currentCount;
+      switch(i)
       {
-        os << " + " << reinterpret_cast<unsigned long>(current[j][k]); 
+      case 0: 
+        current = coveringInternalPlaces;
+        currentCount = internalPlaceCount;
+        break;
+      case 1: 
+        current = coveringInterfacePlaces; 
+        currentCount = interfacePlaceCount;
+        break;
+      case 2: 
+        current = coveringInternalTransitions; 
+        currentCount = internalTransitionCount;
+        break;
+      case 3: 
+        current = coveringInterfaceTransitions; 
+        currentCount = interfaceTransitionCount;
+        break;
+      default: /* ??? */ ;
       }
       
-      if(--lastClause > 0)
-        os << ") *\n";
-      else
-        os << ")\n";
+      for(unsigned int j=0; j<currentCount; ++j)
+      {
+        os << "    (";
+        
+        if(current[j].size() > 0)
+          os << reinterpret_cast<unsigned long>(current[j][0]);
+        for(unsigned int k=1; k<current[j].size(); ++k)
+        {
+          os << " + " << reinterpret_cast<unsigned long>(current[j][k]); 
+        }
+        
+        if(--lastClause > 0)
+          os << ") *\n";
+        else
+          os << ")\n";
+      }
     }
+    
+    os << "  );\n\n";
   }
-  
-  os << "  );\n\n";
   
   /// verbose output
   bool firstBubble = true;
@@ -445,4 +492,6 @@ void Cover::write(std::ostream& os)
   }
   
   os << ";\n";
+  
+  status("wrote cover constraint to '%s'", filename.c_str());
 }

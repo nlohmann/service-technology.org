@@ -225,6 +225,8 @@ int main(int argc, char** argv) {
         abort(15, "could not open cover file '%s'", args_info.cover_arg);
       cover_parse();
       fclose(cover_in);
+      
+      status("read cover file '%s'", args_info.cover_arg);
     }
     
     
@@ -351,15 +353,19 @@ int main(int argc, char** argv) {
     | 10. calculate cover contraint |
     `-------------------------------*/
     if(args_info.cover_given)
+    {
       Cover::calculate(StoredKnowledge::seen);
+    
+      fprintf(stderr, "%s: cover constraint is satisfiable: %s\n",
+          PACKAGE, (Cover::satisfiable) ? "YES" : "NO");
+    }
 
     /*-------------------.
     | 11. output options |
     `-------------------*/
     // operating guidelines output
     if (args_info.og_given) {
-        string og_filename = args_info.og_arg ? args_info.og_arg : 
-                             filename + (args_info.cover_given ? ".covog" : ".og");
+        string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
         std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
         if (!og_file) {
             abort(11, "could not write to file '%s'", og_filename.c_str());
@@ -370,10 +376,10 @@ int main(int argc, char** argv) {
             StoredKnowledge::output(og_file);            
         }
         
-        if(args_info.cover_given)
-          Cover::write(og_file);
-        
         status("wrote OG to file '%s'", og_filename.c_str());
+        
+        if(args_info.cover_given)
+          Cover::write(og_filename + ".cover");  
     }
 
     // service automaton output

@@ -111,12 +111,15 @@ public: /* static methods */
   static void calculate(const std::set<StoredKnowledge*>&);
   
   /// writes the contraint in an output stream
-  static void write(std::ostream&);
+  static void write(const std::string&);
   
 public: /* static attributs */
   
   /// label cache; filled in Label::initialize()
   static std::map<std::string, Label_ID> labelCache;
+  
+  /// whether the constraint is satisfiable
+  static bool satisfiable;
   
 };
 

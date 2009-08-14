@@ -92,10 +92,10 @@ state:
       if (args_info.cover_given)
       {
         Cover::checkInnerMarking($2, marking, currentTransitions);
+        currentTransitions.clear();
       }
 
       currentLabels.clear();
-      currentTransitions.clear();
       currentSuccessors.clear();
       marking.clear(); }
 ;
@@ -116,7 +116,10 @@ markings:
 transitions:
   /* empty */
 | transitions NAME ARROW NUMBER
-    { currentLabels.push_back(Label::name2id[NAME_token]);
-      currentTransitions.insert(NAME_token); // needed by cover
-      currentSuccessors.push_back($4); }
+    { 
+      currentLabels.push_back(Label::name2id[NAME_token]);
+      if(args_info.cover_given)
+        currentTransitions.insert(NAME_token);
+      currentSuccessors.push_back($4); 
+    }
 ;

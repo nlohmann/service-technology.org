@@ -50,7 +50,7 @@ if test "$enable_pnapi" = "yes"; then
   AC_CHECK_LIB(pnapi, main)
   if test "${ac_cv_lib_pnapi_main}" = "no"; then
     AC_MSG_WARN([Petri Net API was not found!])
-    AC_MSG_WARN([Using shiped version from libs/pnapi.])
+    AC_MSG_WARN([Using shipped version from libs/pnapi.])
   fi
   AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
 else

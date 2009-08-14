@@ -434,8 +434,8 @@ A node that has to be covered does not occur in the given net.
 
 @smallexample
 @cartouche
-wendy: unknown place 'p' -- aborting [#16]
-wendy: unknown transition 't' -- aborting [#16]
+wendy: unknown place 'p' in file 'foo.cov' -- aborting [#16]
+wendy: unknown transition 't' in file 'foo.cov' -- aborting [#16]
 @end cartouche
 @end smallexample
 

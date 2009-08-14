@@ -50,6 +50,7 @@ number    "-"?[0-9][0-9]*
 
 "STATE"      { return KW_STATE; }
 "Prog:"      { return KW_PROG; }
+"Lowlink:"   { return KW_LOWLINK; }
 ":"          { return COLON; }
 ","          { return COMMA; }
 "->"         { return ARROW; }

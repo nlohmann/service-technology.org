@@ -18,7 +18,7 @@
 \*****************************************************************************/
 
 
-%token KW_STATE KW_PROG COLON COMMA ARROW NUMBER NAME
+%token KW_STATE KW_PROG KW_LOWLINK COLON COMMA ARROW NUMBER NAME
 
 %defines
 %name-prefix="graph_"
@@ -74,8 +74,9 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER prog markings transitions
-    { InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
+  KW_STATE NUMBER prog lowlink markings transitions
+    { 
+      InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
                                           InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
       if (markingfile) {
@@ -89,20 +90,28 @@ state:
           *markingfile << std::endl;
       }
 
-      if (args_info.cover_given)
-      {
+      if (args_info.cover_given) {
         Cover::checkInnerMarking($2, marking, currentTransitions);
         currentTransitions.clear();
       }
 
       currentLabels.clear();
       currentSuccessors.clear();
-      marking.clear(); }
+      marking.clear(); 
+   }
 ;
 
 prog:
   /* empty */
 | KW_PROG NUMBER
+;
+
+lowlink:
+  /* empty */
+| KW_LOWLINK NUMBER
+	{
+		/* do something with Tarjan's lowlink value (needed for generating livelock free partners) */	
+	}
 ;
 
 markings:

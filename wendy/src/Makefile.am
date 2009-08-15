@@ -13,7 +13,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 StoredKnowledge.h StoredKnowledge.cc \
                 Cover.h Cover.cc \
                 verbose.cc verbose.h \
-                cmdline.ggo
+                cmdline.c cmdline.h
 
 # the configuration files
 sysconf_DATA = wendy.conf
@@ -64,7 +64,7 @@ DISTCLEANFILES += config-log.h
 #----------------------------------------------------------#
 .ggo.c:
 	$(GENGETOPT) --input=$<
-GENGETOPT_FILES = $(filter %.ggo,$(wendy_SOURCES))
+GENGETOPT_FILES = cmdline.ggo
 BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
-EXTRA_DIST += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
+EXTRA_DIST += $(GENGETOPT_FILES)
 MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)

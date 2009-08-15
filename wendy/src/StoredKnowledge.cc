@@ -680,10 +680,10 @@ void StoredKnowledge::output_old(std::ofstream &file) {
  \param[in] K  the knowledge to copy from
 */
 StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
-    is_final(0), is_sane(K->is_sane), inner(NULL), interface(NULL),
+    is_final(0), is_sane(K->is_sane), size(K->size), inner(NULL), interface(NULL),
     successors(NULL), inDegree(0), predecessorCounter(0), predecessors(NULL)
 {
-    assert(K->size != 0);
+    assert(size != 0);
 
     // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
@@ -691,9 +691,6 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
         // initialization is necessary to detect absent edges
         successors[l-1] = NULL;
     }
-
-    // get the number of markings to store
-    size = K->size;
 
     // reserve the necessary memory for the internal and interface markings
     inner = new InnerMarking_ID[size];
@@ -1061,7 +1058,6 @@ void StoredKnowledge::traverse() {
 void StoredKnowledge::migration(std::ofstream& o) {
     map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > > migrationInfo;
 
-    unsigned int c = 0;
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         // traverse the bubble
         for (unsigned int i = 0; i < allMarkings[*it]; ++i) {

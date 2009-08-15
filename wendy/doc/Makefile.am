@@ -35,6 +35,7 @@ wendy_TEXINFOS += cmdline.out
 #-----------------------------------------------------------#
 all: $(top_srcdir)/ChangeLog $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
 wendy_TEXINFOS += ChangeLog.texi
+EXTRA_DIST += $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
 
 $(top_srcdir)/ChangeLog: ChangeLog.texi
 	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=79 $(srcdir)/$(PACKAGE).texi

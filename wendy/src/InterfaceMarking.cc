@@ -256,7 +256,7 @@ bool InterfaceMarking::inc(const Label_ID &label) {
     uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // before increment, the value for this label should be smaller than the message bound
-    bool OK = ( ( (storage[byte] & mask) >> offset) < message_bound );
+    bool OK = ( (unsigned)( (storage[byte] & mask) >> offset) < message_bound );
 
     // use the mask to get the current value from the byte,
     // then shift and increment the value

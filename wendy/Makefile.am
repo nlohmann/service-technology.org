@@ -5,8 +5,6 @@ else
 SUBDIRS = src utils man doc maintainer tests
 endif
 
-EXTRA_DIST = REQUIREMENTS THEORY
-
 svn-clean: maintainer-clean
 	rm -fr configure Makefile.in depcomp compile config.guess config.sub \
 	INSTALL missing aclocal.m4 install-sh ylwrap src/Makefile.in \

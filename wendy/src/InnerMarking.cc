@@ -98,17 +98,15 @@ void InnerMarking::initialize() {
 InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
                            const std::vector<InnerMarking_ID> &_successors,
                            bool _is_final) :
-                           is_final(_is_final), is_waitstate(0), is_deadlock(0)
+    is_final(_is_final), is_waitstate(0), is_deadlock(0), out_degree(_successors.size())
 {
     ++stats_markings;
     if (stats_markings % 50000 == 0) {
         fprintf(stderr, "%8d inner markings\n", stats_markings);
     }
 
-    assert(_labels.size() == _successors.size());
-    assert (_successors.size() < UCHAR_MAX);
-
-    out_degree = _successors.size();
+    assert(_labels.size() == out_degree);
+    assert (out_degree < UCHAR_MAX);
 
     labels = new Label_ID[out_degree];
     std::copy(_labels.begin(), _labels.end(), labels);

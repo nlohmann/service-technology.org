@@ -1,0 +1,80 @@
+                       __        __             _       
+                       \ \      / /__ _ __   __| |_   _ 
+                        \ \ /\ / / _ \ '_ \ / _` | | | |
+                         \ V  V /  __/ | | | (_| | |_| |
+                          \_/\_/ \___|_| |_|\__,_|\__, |
+                                                  |___/
+                      http://service-technology.org/wendy
+
+
+Wendy implements several algorithms and result published in several scientific
+articles.
+
+Operating Guidelines
+====================
+
+General Algorithm
+.................
+
+     Niels Lohmann, Peter Massuthe, and Karsten Wolf. Operating Guidelines for
+     Finite-State Services. In Jetty Kleijn and Alex Yakovlev, editors, 28th
+     International Conference on Applications and Theory of Petri Nets and
+     Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29,
+     2007, Proceedings, volume 4546 of Lecture Notes in Computer Science,
+     pages 321-341, June 2007. Springer-Verlag
+
+Cover Constraints
+.................
+
+     Christian Stahl and Karsten Wolf. Covering Places and Transitions in Open
+     Nets. In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors,
+     Business Process Management, 6th International Conference, BPM 2008,
+     Milan, Italy, September 1-4, 2008, Proceedings, volume 5240 of Lecture
+     Notes in Computer Science, pages 116-131, September 2008. Springer-Verlag.
+
+2-Bit Formulae
+..............
+
+     Niels Lohmann and Karsten Wolf. Petrifying Operating Guidelines for
+     Services. In Stephen Edwards and Walter Vogler, editors, Ninth
+     International Conference on Application of Concurrency to System Design
+     (ACSD 2009), 1-3 July 2009, Augsburg, Germany, June 2009. IEEE Computer
+     Society.
+
+Interaction Graphs
+==================
+
+General Algorithm
+.................
+
+     Karsten Wolf. Does my service have partners?. LNCS ToPNoC,
+     5460(II):152-171, March 2009. Special Issue on Concurrency in
+     Process-Aware Information Systems.
+
+Reduction Rules
+...............
+
+     Daniela Weinberg. Efficient Controllability Analysis of Open Nets. In
+     Roberto Bruni and Karsten Wolf, editors, Web Services and Formal Methods,
+     Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4-5,
+     2008, Proceedings, Lecture Notes in Computer Science, September 2008.
+     Springer-Verlag.
+
+Other Features
+==============
+
+Runtime Migration
+.................
+
+     Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. Another
+     Approach to Service Instance Migration. In Luciano Baresi, Chi-Hung Chi,
+     and Jun Suzuki, editors, Service-Oriented Computing - ICSOC 2009, 7th
+     International Conference, Stockholm, Sweden, November 24-27, 2009.
+     Proceedings, Lecture Notes in Computer Science, November 2009.
+     Springer-Verlag.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
+

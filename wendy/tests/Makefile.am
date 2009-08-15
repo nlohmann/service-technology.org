@@ -1,41 +1,53 @@
+#############################################################################
+# You need to perform three steps to add a test case:
+#   1.) edit the file `testsuite.at' and add you test case
+#   2.) add the files you need for the test to the `testfile' directory
+#   3.) add these files (without path) to the `TESTFILES' list
+# Do not forget to add your test files to the repository!
+#############################################################################
+
+# the files needed by the test cases (without `testfile/' directory)
+TESTFILES = bug1.fiona.og bug1.owfn \
+            bug2.fiona.og bug2.owfn \
+            bug3.fiona.og bug3.owfn \
+            bug4.fiona.og bug4.owfn \
+            bug5.fiona.og bug5.owfn \
+            bug6.fiona.og bug6.owfn \
+            bug7.fiona.og bug7.owfn \
+            bug8.fiona.og bug8.owfn \
+            bug9.fiona.og bug9.owfn \
+            bug13651.owfn \
+            bug13718.owfn \
+            bug13994-1.owfn bug13994-2.owfn \
+            bug14025.owfn \
+            carreservation_with_engine.owfn \
+            error02.owfn \
+            error03.owfn \
+            error04-1.owfn error04-2.owfn \
+            error06.owfn \
+            error10.owfn \
+            myCoffee.fiona.og myCoffee.owfn \
+            phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
+            phil5.owfn \
+            PO.fiona.og PO.owfn \
+            QR.fiona.og QR.owfn \
+            seqTest1.fiona.og seqTest1.owfn \
+            seqTest2.fiona.og seqTest2.owfn \
+            seqTest3.fiona.og  seqTest3.owfn \
+            sequence10.fiona.og sequence10.owfn \
+            smtp3.fiona.og smtp3.owfn \
+            T2.fiona.og T2.owfn \
+            test-sync.owfn \
+            zeus.fiona.og zeus.owfn
+
+
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
+
 TESTSUITE = $(builddir)/testsuite
 EXTRA_DIST = testsuite.at versions.sh wrap.sh \
-		testfiles/myCoffee.fiona.og testfiles/myCoffee.owfn \
-		testfiles/PO.fiona.og testfiles/PO.owfn \
-		testfiles/T2.fiona.og testfiles/T2.owfn \
-		testfiles/bug1.fiona.og testfiles/bug1.owfn \
-		testfiles/bug2.fiona.og testfiles/bug2.owfn \
-		testfiles/bug3.fiona.og testfiles/bug3.owfn \
-		testfiles/bug4.fiona.og testfiles/bug4.owfn \
-		testfiles/bug5.fiona.og testfiles/bug5.owfn \
-		testfiles/bug6.fiona.og testfiles/bug6.owfn \
-		testfiles/bug7.fiona.og testfiles/bug7.owfn \
-		testfiles/bug8.fiona.og testfiles/bug8.owfn \
-		testfiles/bug9.fiona.og testfiles/bug9.owfn \
-		testfiles/bug13651.owfn \
-		testfiles/bug13718.owfn \
-		testfiles/bug13994-1.owfn testfiles/bug13994-2.owfn \
-		testfiles/bug14025.owfn \
-		testfiles/error02.owfn \
-		testfiles/error03.owfn \
-		testfiles/error04-1.owfn testfiles/error04-2.owfn \
-		testfiles/error06.owfn \
-		testfiles/error10.owfn \
-		testfiles/phcontrol3.unf.fiona.og testfiles/phcontrol3.unf.owfn \
-		testfiles/sequence10.fiona.og testfiles/sequence10.owfn \
-		testfiles/smtp3.fiona.og testfiles/smtp3.owfn \
-		testfiles/zeus.fiona.og testfiles/zeus.owfn \
-		testfiles/phil5.owfn \
-		testfiles/test-sync.owfn \
-		testfiles/carreservation_with_engine.owfn \
-		testfiles/seqTest1.owfn \
-		testfiles/seqTest2.owfn \
-		testfiles/seqTest3.owfn \
-		testfiles/seqTest1.fiona.og \
-		testfiles/seqTest2.fiona.og \
-		testfiles/seqTest3.fiona.og \
-		testfiles/QR.owfn \
-		testfiles/QR.fiona.og
+             $(addprefix testfiles/,$(TESTFILES))
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

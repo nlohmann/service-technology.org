@@ -10,7 +10,7 @@
 In order to run, compile, and develop Wendy, several tools are required.
 
 Runtime
-=======
+-------
 
    * LoLA (`http://service-technology.org/lola'), compiled with the `FULL'
      option. A suitable LoLA binary can be created as follows:
@@ -23,11 +23,12 @@ Runtime
        4. copy the binary `src/lola-full' to a directory of your path (e.g.,
           `/usr/local/bin') or call `make install'
 
-Wendy's configure script checks whether LoLA (with binary `lola-full') is found
-in the path and adjusts the configuration file `src/wendy.conf' accordingly.
+Wendy's configure script checks whether LoLA (with binary `lola-full') is
+found in the path and adjusts the configuration file `src/wendy.conf'
+accordingly.
 
 Compilation
-===========
+-----------
 
 To compile the source code from a source distribution, the following tools are
 required.
@@ -37,7 +38,7 @@ required.
    * GNU Make (`http://www.gnu.org/software/make/')
 
 Development
-===========
+-----------
 
 In case you want to make changes to the source code, the following tools are
 required to reconfigure and compile Wendy.
@@ -55,6 +56,9 @@ required to reconfigure and compile Wendy.
    * help2man, `http://www.gnu.org/software/help2man/'
 
    * Texinfo, `http://www.gnu.org/software/texinfo/'
+
+
+
 
 Please check our nightly build server at
 `http://service-technology.org/nightly' for the versions we use during

@@ -1,6 +1,10 @@
 @heading Version 1.9-unreleased
 @itemize
-@item implemented cover constraints for operating guidelines (see @url{http://wwwteo.informatik.uni-rostock.de/ls_tpp/staff/publications-complete.htm#StahlW_2008_bpm} for more information)
+@item added file @file{THEORY} listing the scientific algorithms and results implemented in Wendy
+
+@item implemented cover constraints for operating guidelines (parameter @option{--cover}); see file @file{THEORY} for more information
+
+@item canonized Makefiles and indicated which parts are purely generic
 @end itemize
 
 

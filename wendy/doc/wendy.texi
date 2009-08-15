@@ -60,6 +60,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install Wendy.
 * Command Line Options::How to run Wendy.
+* Theory::The theory behind Wendy.
 * Exit and Error Codes::What the error and exit codes of Wendy mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
@@ -106,7 +107,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 51 tests were successful.
+All 53 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{wendy@@service-technology.org}.
@@ -154,9 +155,10 @@ Testcases for Wendy which check the generated binary. Some test scripts use Fion
 
 @section Requirements
 
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 In order to run, compile, and develop Wendy, several tools are required.
 
-@unnumberedsec Runtime
+@subsection Runtime
 @itemize
 @item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{FULL} option. A suitable LoLA binary can be created as follows:
 @enumerate
@@ -171,7 +173,7 @@ In order to run, compile, and develop Wendy, several tools are required.
 Wendy's configure script checks whether LoLA (with binary @file{lola-full}) is found in the path and adjusts the configuration file @file{src/wendy.conf} accordingly.
 
 
-@unnumberedsec Compilation
+@subsection Compilation
 To compile the source code from a source distribution, the following tools are required.
 
 @itemize
@@ -179,7 +181,8 @@ To compile the source code from a source distribution, the following tools are r
 @item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
 @end itemize
 
-@unnumberedsec Development
+
+@subsection Development
 In case you want to make changes to the source code, the following tools are required to reconfigure and compile Wendy.
 
 @itemize
@@ -193,8 +196,9 @@ In case you want to make changes to the source code, the following tools are req
 @end itemize
 
 
+@sp 3
 
-
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
 
 
@@ -249,6 +253,64 @@ Parameters given via command-line will overwrite parameters given via configurat
 @item @code{wendy net.owfn --og --dot} @tab @code{fiona net.owfn -t OG -p no-png}
 @end multitable
 
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Wendy implements several algorithms and result published in several scientific articles.
+
+@section Operating Guidelines
+
+@subsubheading General Algorithm
+
+@quotation
+Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating Guidelines for Finite-State Services}. In Jetty Kleijn and Alex Yakovlev, editors, @i{28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings}, volume 4546 of Lecture Notes in Computer Science, pages 321-341, June 2007. Springer-Verlag 
+@end quotation
+
+@subsubheading Cover Constraints
+
+@quotation
+Christian Stahl and Karsten Wolf. @b{Covering Places and Transitions in Open Nets}. In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1-4, 2008, Proceedings}, volume 5240 of Lecture Notes in Computer Science, pages 116-131, September 2008. Springer-Verlag. 
+@end quotation
+
+@subsubheading 2-Bit Formulae
+
+@quotation
+Niels Lohmann and Karsten Wolf. @b{Petrifying Operating Guidelines for Services}. In Stephen Edwards and Walter Vogler, editors, @i{Ninth International Conference on Application of Concurrency to System Design (ACSD 2009), 1-3 July 2009, Augsburg, Germany}, June 2009. IEEE Computer Society. 
+@end quotation
+
+
+@section Interaction Graphs
+
+@subsubheading General Algorithm
+
+@quotation
+Karsten Wolf. @b{Does my service have partners?}. @i{LNCS ToPNoC}, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems.
+@end quotation
+
+@subsubheading Reduction Rules
+
+@quotation
+Daniela Weinberg. @b{Efficient Controllability Analysis of Open Nets}. In Roberto Bruni and Karsten Wolf, editors, @i{Web Services and Formal Methods, Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4--5, 2008, Proceedings}, Lecture Notes in Computer Science, September 2008. Springer-Verlag.
+@end quotation
+
+
+@section Other Features
+
+@subsubheading Runtime Migration
+
+@quotation
+Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. @b{Another Approach to Service Instance Migration}. In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, @i{Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings}, Lecture Notes in Computer Science, November 2009. Springer-Verlag.
+@end quotation
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
 
 
 
@@ -420,22 +482,22 @@ wendy: error reading configuration file `myconf.conf' -- aborting [#14]
 @end smallexample
 
 @item #15
-Wendy cannot find the cover file given by @file{--cover} parameter or it has syntax errors. 
+Wendy cannot find the cover file given by @option{--cover} parameter or it has syntax errors. 
 
 @smallexample
 @cartouche
-wendy: could not open cover file 'foo.cov' -- aborting [#15]
+wendy: could not open cover file `foo.cov' -- aborting [#15]
 wendy: error while parsing the cover file -- aborting [#15]
 @end cartouche
 @end smallexample
 
 @item #16
-A node that has to be covered does not occur in the given net.
+A node that has to be covered (by using the @option{--cover} parameter) does not occur in the given net.
 
 @smallexample
 @cartouche
-wendy: unknown place 'p' in file 'foo.cov' -- aborting [#16]
-wendy: unknown transition 't' in file 'foo.cov' -- aborting [#16]
+wendy: unknown place `p' in file `foo.cov' -- aborting [#16]
+wendy: unknown transition `t' in file `foo.cov' -- aborting [#16]
 @end cartouche
 @end smallexample
 
@@ -449,12 +511,14 @@ wendy: unknown transition 't' in file 'foo.cov' -- aborting [#16]
 @node ChangeLog
 @chapter Version History
 
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Wendy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 
 @sp 3
 
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 The most recent change log is available at Wendy's website at @url{http://service-technology.org/files/wendy/ChangeLog}.
 
 

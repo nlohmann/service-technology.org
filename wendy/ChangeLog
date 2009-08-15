@@ -10,9 +10,13 @@
 Version 1.9-unreleased
 ======================
 
-* implemented cover constraints for operating guidelines (see
-  `http://wwwteo.informatik.uni-rostock.de/ls_tpp/staff/publications-complete.htm#StahlW_2008_bpm'
-  for more information)
+* added file `THEORY' listing the scientific algorithms and results
+  implemented in Wendy
+
+* implemented cover constraints for operating guidelines (parameter
+  `--cover'); see file `THEORY' for more information
+
+* canonized Makefiles and indicated which parts are purely generic
 
 Version 1.8
 ===========
@@ -23,9 +27,9 @@ Version 1.8
   Fiona where receiving events where combined rather than sequentialized.)
 
 * implemented reduction rule "succeeding sending event" (parameter:
-  `--succeedingSendingEvent'): once a sending event has led from the current
-  knowledge to a valid successor knowledge, we do not consider any other
-  sending event leaving the current knowledge
+  `--succeedingSendingEvent'): once a sending event has led from the
+  current knowledge to a valid successor knowledge, we do not consider any
+  other sending event leaving the current knowledge
 
 * fixed `--bug' parameter which caused segmentation faults on some machines
 
@@ -62,8 +66,8 @@ Version 1.6
 ===========
 
 * fixed bug #13994 (`https://gna.org/bugs/?13994') - malicious root node
-  (i.e., a root not with reachable deadlocks or message bound violation) was
-  not detected
+  (i.e., a root not with reachable deadlocks or message bound violation)
+  was not detected
 
 * added more test cases for synchronous communication
 
@@ -100,8 +104,8 @@ Version 1.5
   for more information). A standard configuration is created by the
   configure script and written to `src/wendy.conf'. When Wendy is executed,
   it checks for the file `wendy.conf' in the sysconfig folder (usually
-  `/usr/local/etc') and in the current directory. If neither file was found,
-  Wendy tries to rely on standard options.
+  `/usr/local/etc') and in the current directory. If neither file was
+  found, Wendy tries to rely on standard options.
 
 Version 1.4
 ===========
@@ -139,8 +143,8 @@ Version 1.2
 ===========
 
 * implemented new OG file format - the deprecated format can still be used
-  with `--fionaFormat' parameter which is implicitly used in case `-t OG' is
-  used
+  with `--fionaFormat' parameter which is implicitly used in case `-t OG'
+  is used
 
 * added "watermark" to generated operating guidelines (generator, platform,
   invocation string)

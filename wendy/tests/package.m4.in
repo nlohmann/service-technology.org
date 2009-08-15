@@ -1,3 +1,4 @@
+# @configure_input@
 # Signature of the current package.
 m4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])
 m4_define([AT_PACKAGE_TARNAME],   [@PACKAGE_TARNAME@])

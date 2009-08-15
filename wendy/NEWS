@@ -10,9 +10,13 @@
 Version 1.9-unreleased
 ======================
 
-* implemented cover constraints for operating guidelines (see
-  `http://wwwteo.informatik.uni-rostock.de/ls_tpp/staff/publications-complete.htm#StahlW_2008_bpm'
-  for more information)
+* added file `THEORY' listing the scientific algorithms and results
+  implemented in Wendy
+
+* implemented cover constraints for operating guidelines (parameter
+  `--cover'); see file `THEORY' for more information
+
+* canonized Makefiles and indicated which parts are purely generic
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

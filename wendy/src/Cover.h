@@ -107,6 +107,9 @@ public: /* static methods */
   /// checks for a given knowledge, which nodes are covered
   static void checkKnowledge(StoredKnowledge*, const std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > &);
   
+  /// removes knowledges when deleted
+  static void removeKnowledge(StoredKnowledge*);
+  
   /// calculates the global contraint
   static void calculate(const std::set<StoredKnowledge*>&);
   
@@ -120,6 +123,12 @@ public: /* static attributs */
   
   /// whether the constraint is satisfiable
   static bool satisfiable;
+  
+  /// nodes to cover
+  static unsigned int nodeCount;
+  
+  /// synchronous labels
+  static std::vector<std::string> synchronousLabels;
   
 };
 

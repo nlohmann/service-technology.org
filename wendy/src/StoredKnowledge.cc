@@ -737,6 +737,9 @@ StoredKnowledge::~StoredKnowledge() {
     delete[] interface;
 
     delete[] inner;
+    
+    if(args_info.cover_given)
+      Cover::removeKnowledge(this);
 }
 
 

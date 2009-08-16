@@ -18,7 +18,7 @@
 \*****************************************************************************/
 
 
-%token KEY_PLACES KEY_TRANSITIONS COMMA SEMICOLON NAME
+%token KEY_PLACES KEY_TRANSITIONS KEY_SYNCHRONOUS COMMA SEMICOLON NAME
 
 %defines
 %name-prefix="cover_"
@@ -34,8 +34,12 @@
 /// the current NAME token as string
 std::string cover_NAME_token;
 
-/// whether recent names are places
-bool readPlaces;
+/* Type of read labels:
+ * 0 - places
+ * 1 - transition
+ * 2 - synchronous labels
+ */
+unsigned short labelType;
 
 /// places to cover
 std::vector<std::string> cover_placeNames;
@@ -50,10 +54,7 @@ extern int cover_error(const char *);
 %%
 
 cover:
-  { readPlaces = true; }
-  KEY_PLACES names SEMICOLON 
-  { readPlaces = false; }
-  KEY_TRANSITIONS names SEMICOLON
+  places transitions synchronous
   {
     Cover::initialize(cover_placeNames, cover_transitionNames);
     cover_placeNames.clear();
@@ -61,21 +62,42 @@ cover:
   }
 ;
 
+places:
+  /* empty */
+| KEY_PLACES { labelType = 0; } names SEMICOLON
+;
+
+transitions:
+  /* empty */
+| KEY_TRANSITIONS { labelType = 1; } names SEMICOLON
+;
+
+synchronous:
+  /* empty */
+| KEY_SYNCHRONOUS { labelType = 2; } names SEMICOLON
+;
+
 names:
   /* empty */
 | NAME
   {
-    if (readPlaces)
-      cover_placeNames.push_back(cover_NAME_token);
-    else
-      cover_transitionNames.push_back(cover_NAME_token);
+    switch(labelType)
+    {
+    case 0: cover_placeNames.push_back(cover_NAME_token); break;
+    case 1: cover_transitionNames.push_back(cover_NAME_token); break;
+    case 2: Cover::synchronousLabels.push_back(cover_NAME_token); break;
+    default: /* ignore */ ;
+    }
   }
 | names COMMA NAME
   {
-    if (readPlaces)
-      cover_placeNames.push_back(cover_NAME_token);
-    else
-      cover_transitionNames.push_back(cover_NAME_token);
+    switch(labelType)
+    {
+    case 0: cover_placeNames.push_back(cover_NAME_token); break;
+    case 1: cover_transitionNames.push_back(cover_NAME_token); break;
+    case 2: Cover::synchronousLabels.push_back(cover_NAME_token); break;
+    default: /* ignore */ ;
+    }
   }
 ;
 

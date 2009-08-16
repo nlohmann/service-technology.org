@@ -24,6 +24,7 @@
 #include "Label.h"
 #include "verbose.h"
 
+
 extern gengetopt_args_info args_info;
 
 /******************
@@ -48,6 +49,8 @@ std::vector<StoredKnowledge*>* Cover::coveringInterfaceTransitions = NULL;
 Label_ID* Cover::interfacePlaceLabels = NULL;
 std::map<std::string, Label_ID> Cover::labelCache;
 bool Cover::satisfiable = true;
+unsigned int Cover::nodeCount = 0;
+std::vector<std::string> Cover::synchronousLabels;
 
 /******************
  * STATIC METHODS *
@@ -137,6 +140,9 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
   coveringInterfacePlaces = new std::vector<StoredKnowledge*>[interfacePlaceCount];
   coveringInternalTransitions = new std::vector<StoredKnowledge*>[internalTransitionCount];
   coveringInterfaceTransitions = new std::vector<StoredKnowledge*>[interfaceTransitionCount];
+  
+  nodeCount = internalPlaceCount + interfacePlaceCount
+            + internalTransitionCount + interfaceTransitionCount;
 }
 
 /*!
@@ -230,7 +236,6 @@ void Cover::checkKnowledge(StoredKnowledge* K,
           coveredNodes[3].insert(inner2CD[current->first].comT[j]);
       }
     }
-    
   }
   
   /// copy temporary data
@@ -241,7 +246,7 @@ void Cover::checkKnowledge(StoredKnowledge* K,
     {
     case 0: current = &(knowledge2CD[K].inP); break;
     case 1: current = &(knowledge2CD[K].comP); break;
-    case 2: current = &(knowledge2CD[K].inT); break;
+    case 2: current = &(knowledge2CD[K].inT);  break;
     case 3: current = &(knowledge2CD[K].comT); break;
     default: /* ??? */ ;
     }
@@ -252,6 +257,14 @@ void Cover::checkKnowledge(StoredKnowledge* K,
       current->push_back(*it);
     }
   }
+}
+
+/*!
+ * \brief removes knowledges when deleted
+ */
+void Cover::removeKnowledge(StoredKnowledge* K)
+{
+  knowledge2CD.erase(K);
 }
 
 /*!
@@ -339,6 +352,9 @@ void Cover::write(const std::string & filename)
 {
   std::ofstream os(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
   
+  if (!os)
+    abort(11, "could not write to file '%s'", filename.c_str());
+  
   os << "\nCOVER\n"
      << "  PLACES\n";
   
@@ -388,7 +404,7 @@ void Cover::write(const std::string & filename)
     os << "FALSE;\n";
   else
   {
-    os << "(\n";
+    os << "  (\n";
     
     unsigned int lastClause = internalPlaceCount + interfacePlaceCount
                             + internalTransitionCount + interfaceTransitionCount;
@@ -437,7 +453,13 @@ void Cover::write(const std::string & filename)
       }
     }
     
-    os << "  );\n\n";
+    os << "  )";
+    
+    /// synchronous labels
+    for(unsigned int i=0; i<synchronousLabels.size(); ++i)
+      os << " *\n  #" << synchronousLabels[i];
+      
+    os << ";\n\n";
   }
   
   /// verbose output
@@ -493,5 +515,5 @@ void Cover::write(const std::string & filename)
   
   os << ";\n";
   
-  status("wrote cover constraint to '%s'", filename.c_str());
+  status("wrote cover constraint to file '%s'", filename.c_str());
 }

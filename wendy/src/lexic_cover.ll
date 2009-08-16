@@ -41,6 +41,7 @@ name      [^,;:()\t \n\{\}]+
 
 "PLACES"        { return KEY_PLACES;                    }
 "TRANSITIONS"   { return KEY_TRANSITIONS;               }
+"SYNCHRONOUS"   { return KEY_SYNCHRONOUS;               }
 ","             { return COMMA;                         }
 ";"             { return SEMICOLON;                     }
 

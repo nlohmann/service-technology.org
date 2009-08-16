@@ -499,3 +499,20 @@ AT_CHECK([GREP -c "\->" test-sync.og],0,[154
 ])
 AT_KEYWORDS(synchronous)
 AT_CLEANUP
+
+
+
+############################################################################
+AT_BANNER([Cover Constraints])
+############################################################################
+
+AT_SETUP([cover interface places])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/regist-priv.owfn .])
+AT_CHECK([cp TESTFILES/regist-priv.owfn.cov .])
+AT_CHECK([WENDY regist-priv.owfn --og --cover=regist-priv.owfn.cov --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q -e "([[0-9]]\+ + [[0-9]]\+ + [[0-9]]\+ + [[0-9]]\+)" regist-priv.og.cover])
+AT_CHECK([GREP -q -e "([[0-9]]\+ + [[0-9]]\+ + [[0-9]]\+)" regist-priv.og.cover])
+AT_CHECK([GREP -q "cover constraint is satisfiable: YES" stderr])
+AT_KEYWORDS(cover)
+AT_CLEANUP

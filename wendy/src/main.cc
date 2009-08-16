@@ -225,6 +225,7 @@ int main(int argc, char** argv) {
         fclose(cover_in);
 
         status("read cover file '%s'", args_info.cover_arg);
+        status("%d nodes to cover", Cover::nodeCount);
     }
 
 

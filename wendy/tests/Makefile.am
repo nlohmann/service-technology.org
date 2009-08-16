@@ -31,6 +31,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             phil5.owfn \
             PO.fiona.og PO.owfn \
             QR.fiona.og QR.owfn \
+	    regist-priv.owfn regist-priv.owfn.cov \
             seqTest1.fiona.og seqTest1.owfn \
             seqTest2.fiona.og seqTest2.owfn \
             seqTest3.fiona.og  seqTest3.owfn \

@@ -1,0 +1,92 @@
+PLACE
+INTERNAL
+  p17,
+  p18,
+  p19,
+  p20,
+  p21,
+  p22,
+  p23,
+  p24,
+  p25;
+
+INPUT
+  creditCard,
+  bankCard,
+  photo,
+  noPhoto;
+
+OUTPUT
+  makeCard,
+  terms;
+
+INITIALMARKING
+  p17:	1
+ ;
+
+FINALCONDITION
+  (p25=1 AND ALL_OTHER_PLACES_EMPTY);
+
+TRANSITION split	 { split }
+CONSUME
+  p17:	1;
+PRODUCE
+  p18 : 1,
+  p19 : 1;
+
+TRANSITION t19	 { ?photo }
+CONSUME
+  photo : 1,
+  p18:	1;
+PRODUCE
+  p22 : 1;
+
+TRANSITION t20	 { ?noPhoto }
+CONSUME
+  noPhoto : 1,
+  p18:	1;
+PRODUCE
+  p22 : 1;
+
+TRANSITION t21	 { ?bankCard }
+CONSUME
+  bankCard : 1,
+  p19:	1;
+PRODUCE
+  p20 : 1;
+
+TRANSITION t22	 { ?creditCard }
+CONSUME
+  creditCard: 1,
+  p19:	1;
+PRODUCE
+  p21 : 1;
+
+TRANSITION t23	 { !terms }
+CONSUME
+  p20:	1;
+PRODUCE
+  p23 : 1,
+  terms : 1;
+
+TRANSITION t24	 { !terms }
+CONSUME
+  p21:	1;
+PRODUCE
+  terms : 1,
+  p23 : 1;
+
+TRANSITION join	 { join }
+CONSUME
+  p23:	1,
+  p22 : 1;
+PRODUCE
+  p24 : 1;
+
+TRANSITION t25	 { !makeCard }
+CONSUME
+  p24:	1;
+PRODUCE
+  makeCard : 1,
+  p25 : 1;
+

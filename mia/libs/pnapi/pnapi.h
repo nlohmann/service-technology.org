@@ -7,18 +7,19 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2009-02-16 08:39:17 +0100 (Mo, 16. Feb 2009) $
+ * \date    $Date: 2009-08-04 16:59:49 +0200 (Di, 04. Aug 2009) $
  *
- * \version $Revision: 3882 $
+ * \version $Revision: 4511 $
  */
 
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
-#include "io.h"
+#include "myio.h"
 #include "condition.h"
 #include "petrinet.h"
 #include "automaton.h"
+#include "state.h"
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;

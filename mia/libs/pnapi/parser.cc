@@ -13,7 +13,7 @@ using std::endl;
 #include <iostream>
 
 #include "parser.h"
-#include "io.h"
+#include "myio.h"
 #include "formula.h"
 #include "state.h"
 
@@ -446,216 +446,92 @@ namespace pnapi
 
     namespace sa
     {
-      Node *node;
-
-      Parser::Parser() :
-        parser::Parser<Node>(node, sa::parse)
+      Parser::Parser()
       {
       }
 
-      Node::Node() :
-        BaseNode(), type_(NO_DATA), number_(0)
+      /*!
+       * Global variables for flex+bison
+       */
+      Automaton pnapi_sa_yyautomaton;
+      PetriNet pnapi_sa_yynet;
+
+      std::vector<std::string> identlist;
+      std::set<std::string> input_;
+      std::set<std::string> output_;
+
+      State *state_;
+      bool final_;
+      bool initial_;
+      std::vector<unsigned int> succState_;
+      std::vector<std::string> succLabel_;
+      std::vector<Automaton::Type> succType_;
+
+      State *edgeState_;
+      std::string edgeLabel_;
+      Automaton::Type edgeType_;
+
+      std::map<int, State *> states_;
+
+      bool sa2sm;
+
+      std::map<std::string, Place *> label2places_;
+      std::map<int, Place *> places_;
+      Place *place_;
+      Place *edgePlace_;
+
+      std::vector<Place *> finalPlaces_;
+
+      const Automaton & Parser::parse(std::istream &is)
       {
+        stream = &is;
+
+        line = 1;
+
+        pnapi_sa_yyautomaton = Automaton();
+
+        sa2sm = false;
+        sa::parse();
+
+        // clean up global variables
+        states_.clear();
+
+        return pnapi_sa_yyautomaton;
       }
 
-      Node::Node(Node *node) :
-        BaseNode(node), type_(NO_DATA), number_(0)
+      const PetriNet & Parser::parseSA2SM(std::istream &is)
       {
-      }
+        Condition final;
+        Condition empty;
+        final = false;
+        empty = true;
 
-      Node::Node(Node *node1, Node *node2, Node *node3) :
-        BaseNode(node1, node2, node3), type_(NO_DATA), number_(0)
-      {
-      }
+        stream = &is;
 
-      Node::Node(int number) :
-        BaseNode(), type_(NUM), number_(number)
-      {
-      }
+        line = 1;
 
-      Node::Node(std::string *ident) :
-        BaseNode(), type_(ID), number_(0), identifier_(*ident)
-      {
-      }
+        pnapi_sa_yynet = PetriNet();
 
-      Node::Node(Type type) :
-        BaseNode(), type_(type), number_(0)
-      {
-      }
+        sa2sm = true;
+        sa::parse();
 
-      Node::Node(Type type, Node *node) :
-        BaseNode(node), type_(type), number_(0)
-      {
-      }
+        std::set<Place *> places = pnapi_sa_yynet.getPlaces();
+        for (int i = 0; i < (int) finalPlaces_.size(); i++)
+        {
+          final = final.formula() || *finalPlaces_[i] == 1;
+          places.erase(finalPlaces_[i]);
+        }
+        for (std::set<Place *>::iterator p = places.begin(); p != places.end(); p++)
+          empty = empty.formula() && **p == 0;
 
-      Node::Node(Type type, Node *node1, Node *node2) :
-        BaseNode(node1, node2), type_(type), number_(0)
-      {
-      }
+        pnapi_sa_yynet.finalCondition() = final.formula() && empty.formula();
 
-      Node::Node(Type type, Node *node1, Node *node2, Node *node3) :
-        BaseNode(node1, node2, node3), type_(type), number_(0)
-      {
-      }
+        // clean up global variables
+        label2places_.clear();
+        places_.clear();
+        finalPlaces_.clear();
 
-      Visitor::Visitor()
-      {
-        sa_ = new Automaton();
-        newState_.isFinal = false;
-        newState_.isInitial = false;
-      }
-
-      const Automaton & Visitor::getAutomaton() const
-      {
-        return *sa_;
-      }
-
-      void Visitor::beforeChildren(const Node &node)
-      {
-        switch (node.type_)
-        {
-        case sa::EDGE:
-        {
-          stack_.push(sa::EDGE);
-          break;
-        }
-        case sa::FINAL:
-        {
-          newState_.isFinal = true;
-          break;
-        }
-        case sa::ID:
-        {
-          switch (stack_.top())
-          {
-          case sa::INPUT:
-            input_.push_back(node.identifier_);
-            sa_->addInput(node.identifier_);
-            break;
-          case sa::OUTPUT:
-            output_.push_back(node.identifier_);
-            sa_->addOutput(node.identifier_);
-            break;
-          case sa::EDGE:
-            newState_.edgeLabels.push_back(node.identifier_);
-            break;
-          default: assert(false); break;
-          }
-          break;
-        }
-        case sa::INITIAL:
-        {
-          newState_.isInitial = true;
-          break;
-        }
-        case sa::INIT_FINAL:
-        {
-          newState_.isFinal = true;
-          newState_.isInitial = true;
-          break;
-        }
-        case sa::INPUT:
-        {
-          stack_.push(sa::INPUT);
-          break;
-        }
-        case sa::NUM:
-        {
-          switch (stack_.top())
-          {
-          case sa::EDGE:
-          {
-            newState_.targetNodes.push_back(node.number_);
-            break;
-          }
-          case sa::STATE:
-          {
-            newState_.name = node.number_;
-            break;
-          }
-          default: assert(false); break;
-          }
-          break;
-        }
-        case sa::OUTPUT:
-        {
-          stack_.push(sa::OUTPUT);
-          break;
-        }
-        case sa::STATE:
-        {
-          stack_.push(sa::STATE);
-          break;
-        }
-        default: break;
-        }
-      }
-
-      void Visitor::afterChildren(const Node &node)
-      {
-        switch (node.type_)
-        {
-        case sa::EDGE:
-        {
-          if (stack_.top() == sa::EDGE)
-            stack_.pop();
-          else
-            assert(false);
-          break;
-        }
-        case sa::INPUT:
-        {
-          if (stack_.top() == sa::INPUT)
-            stack_.pop();
-          else
-            assert(false);
-          break;
-        }
-        case sa::OUTPUT:
-        {
-          if (stack_.top() == sa::OUTPUT)
-            stack_.pop();
-          else
-            assert(false);
-          break;
-        }
-        case sa::STATE:
-        {
-          State &s = sa_->createState(newState_.name);
-          if (newState_.isFinal)
-            s.final();
-          if (newState_.isInitial)
-            s.initial();
-          for (unsigned int i = 0; i < newState_.targetNodes.size(); i++)
-            sa_->createEdge(s, sa_->createState(newState_.targetNodes[i]),
-                newState_.edgeLabels[i], getType(newState_.edgeLabels[i]));
-
-          newState_.edgeLabels.clear();
-          newState_.isFinal = false;
-          newState_.isInitial = false;
-          newState_.name = 0;
-          newState_.targetNodes.clear();
-
-          if (stack_.top() == sa::STATE)
-            stack_.pop();
-          else
-            assert(false);
-          break;
-        }
-        default: break;
-        }
-      }
-
-
-      Automaton::Type Visitor::getType(std::string label) const
-      {
-        for (int i = 0; i < (int) input_.size(); i++)
-          if (input_[i] == label)
-            return Automaton::INPUT;
-        for (int i = 0; i < (int) output_.size(); i++)
-          if (output_[i] == label)
-            return Automaton::OUTPUT;
-        return Automaton::TAU;
+        return pnapi_sa_yynet;
       }
 
     } /* namespace sa */

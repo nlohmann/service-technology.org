@@ -1,3 +1,11 @@
+@heading Version 1.2-unreleased
+@itemize
+@item update Petri Net API
+
+@item canonized Makefiles
+@end itemize
+
+
 @heading Version 1.1
 @itemize
 @item moved verbose output functions to @file{verbose.*}
@@ -16,6 +24,7 @@
 
 @item added @option{--bug} option to create debug output
 @end itemize
+
 
 @heading Version 1.0
 @itemize

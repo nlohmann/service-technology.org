@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-07-05 02:39:09 +0200 (So, 05. Jul 2009) $
+ * \date    $Date: 2009-08-05 10:20:55 +0200 (Mi, 05. Aug 2009) $
  *
- * \version $Revision: 4392 $
+ * \version $Revision: 4517 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -23,7 +23,7 @@
 
 #include <vector>
 
-#include "io.h"
+#include "myio.h"
 #include "condition.h"
 #include "component.h"
 
@@ -90,6 +90,41 @@ namespace pnapi
 
   } /* namespace util */
 
+  /*!
+   * \brief
+   */
+  namespace exceptions
+  {
+    /*!
+     * \brief general exception class
+     */
+    class GeneralException
+    {
+    public:
+      GeneralException(std::string);
+      const std::string msg_;
+    private:
+    };
+    
+    /*!
+     * \brief exception class thrown by PetriNet::compose()
+     */
+    class ComposeError : public GeneralException
+    {
+    public:
+      ComposeError(std::string);
+    };
+    
+    /*!
+     * \brief exception class thrown by PetriNet::getSynchronizedTransitions(std::string)
+     */
+    class UnknownTransitionError : public GeneralException
+    {
+    public:
+      UnknownTransitionError();
+    };
+    
+  } /* namespace exceptions */
 
   /*!
    * \brief   A Petri net
@@ -224,6 +259,8 @@ namespace pnapi
     const std::set<Transition *> & getTransitions() const;
 
     const std::set<Transition *> & getSynchronizedTransitions() const;
+    
+    const std::set<Transition *> & getSynchronizedTransitions(const std::string & label) const;
 
     std::set<std::string> getSynchronousLabels() const;
 
@@ -315,6 +352,9 @@ namespace pnapi
 
     /// all synchronized transitions
     std::set<Transition *> synchronizedTransitions_;
+    
+    /// synchronized transitions by label
+    std::map<std::string, std::set<Transition *> > transitionsByLabel_; 
 
     /// all places
     std::set<Place *> places_;
@@ -358,11 +398,15 @@ namespace pnapi
 
     /* structural changes */
 
+  public:
+
     /// deletes a place (used by e.g. merging and reduction rules)
     void deletePlace(Place &);
 
     /// deletes a transition (used by e.g. merging and reduction rules)
     void deleteTransition(Transition &);
+
+  private:
 
     /// deletes a node
     void deleteNode(Node &);

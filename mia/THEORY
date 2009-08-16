@@ -1,0 +1,26 @@
+                                __  __ _       
+                               |  \/  (_) __ _ 
+                               | |\/| | |/ _` |
+                               | |  | | | (_| |
+                               |_|  |_|_|\__,_|
+                      http://service-technology.org/mia
+
+
+Mia implements several algorithms and result published in several scientific
+articles.
+
+Runtime Migration
+=================
+
+     Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. Another
+     Approach to Service Instance Migration. In Luciano Baresi, Chi-Hung Chi,
+     and Jun Suzuki, editors, Service-Oriented Computing - ICSOC 2009, 7th
+     International Conference, Stockholm, Sweden, November 24-27, 2009.
+     Proceedings, Lecture Notes in Computer Science, November 2009.
+     Springer-Verlag.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
+

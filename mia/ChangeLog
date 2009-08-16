@@ -6,6 +6,13 @@
                       http://service-technology.org/mia
 
 
+Version 1.2-unreleased
+======================
+
+* update Petri Net API
+
+* canonized Makefiles
+
 Version 1.1
 ===========
 
@@ -19,11 +26,11 @@ Version 1.1
 * Mia can be configured with a configuration file, provided by parameter
   `--config' (see
   `http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files'
-  for more information). A standard configuration is created by the configure
-  script and written to `src/mia.conf'. When Mia is executed, it checks for
-  the file `mia.conf' in the sysconfig folder (usually `/usr/local/etc') and
-  in the current directory. If neither file was found, Mia tries to rely on
-  standard options.
+  for more information). A standard configuration is created by the
+  configure script and written to `src/mia.conf'. When Mia is executed, it
+  checks for the file `mia.conf' in the sysconfig folder (usually
+  `/usr/local/etc') and in the current directory. If neither file was
+  found, Mia tries to rely on standard options.
 
 * added generic Makefile target (`bin' in `maintainer') to create a binary
   release for the running platform (using `uname')

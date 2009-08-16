@@ -60,6 +60,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install Mia.
 * Command Line Options::How to run Mia.
+* Theory::The theory behind Mia.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -212,6 +213,28 @@ For an overview of the command line options, type @samp{mia --help} to see the f
 @end smallexample
 
 
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Mia implements several algorithms and result published in several scientific articles.
+
+@section Runtime Migration
+
+@quotation
+Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. @b{Another Approach to Service Instance Migration}. In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, @i{Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings}, Lecture Notes in Computer Science, November 2009. Springer-Verlag.
+@end quotation
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
 
 
 @c --------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 
 #ifndef NDEBUG
 #include <iostream>
-#include "io.h"
+#include "myio.h"
 using std::cout;
 using std::endl;
 using pnapi::io::util::operator<<;
@@ -72,6 +72,11 @@ namespace pnapi
     return Conjunction(f1, f2);
   }
 
+  Conjunction operator&&(const Formula & f, const formula::AllOtherPlaces v)
+  {
+    return Conjunction(f, v);
+  }
+
   Disjunction operator||(const Formula & f1, const Formula & f2)
   {
     return Disjunction(f1, f2);
@@ -131,6 +136,14 @@ namespace pnapi
     return *this;
   }
 
+  Condition & Condition::operator=(const formula::AllOtherPlaces v)
+  {
+    delete formula_;
+    formula_ = new formula::Conjunction(v);
+
+    return *this;
+  }
+
   Condition & Condition::operator=(bool formulaTrue)
   {
     delete formula_;
@@ -152,12 +165,13 @@ namespace pnapi
     set<const Formula *> propositions;
     for (map<const Place *, unsigned int>::const_iterator it = m.begin();
 	 it != m.end(); ++it)
-      propositions.insert(new FormulaEqual(*it->first, it->second));
+      if (it->second != 0)
+        propositions.insert(new FormulaEqual(*it->first, it->second));
 
     if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
-      *this = Conjunction(propositions);
+      *this = Conjunction(propositions, NULL, formula::ALL_OTHER_PLACES_EMPTY);
     else
-      *this = formula() || Conjunction(propositions);
+      *this = formula() || Conjunction(propositions, NULL, formula::ALL_OTHER_PLACES_EMPTY);
 
     for (set<const Formula *>::iterator it = propositions.begin();
 	 it != propositions.end(); ++it)
@@ -166,7 +180,7 @@ namespace pnapi
 
   std::set<const Place *> Condition::concerningPlaces() const
   {
-    return formula_->places(true);
+    return formula_->places();
   }
 
   void Condition::negate()

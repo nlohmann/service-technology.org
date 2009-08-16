@@ -1,4 +1,4 @@
-AC_INIT(Mia, 1.1, mia@service-technology.org)
+AC_INIT(Mia, 1.2-unreleased, mia@service-technology.org, mia, http://service-technology.org/mia)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -12,6 +12,7 @@ AC_PROG_YACC
 AC_PROG_RANLIB
 AC_PROG_SED
 AC_PROG_GREP
+AC_PROG_AWK
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)

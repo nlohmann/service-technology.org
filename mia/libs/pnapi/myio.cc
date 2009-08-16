@@ -3,7 +3,7 @@
 
 #include "parser.h"
 #include "automaton.h"
-#include "io.h"
+#include "myio.h"
 
 using std::map;
 using std::set;
@@ -84,6 +84,13 @@ namespace pnapi
 	    break;
 	  }
 
+	case util::SA2SM:
+	  {
+	    parser::sa::Parser parser;
+	    net = parser.parseSA2SM(is);
+
+	    break;
+	  }
 	default:
 	  assert(false);  // unsupported input format
 	}
@@ -120,9 +127,7 @@ namespace pnapi
       case util::SA:
       {
         parser::sa::Parser parser;
-        parser::sa::Visitor visitor;
-        parser.parse(is).visit(visitor);
-        sa = visitor.getAutomaton();
+        sa = parser.parse(is);
         break;
       }
       default: assert(false); /* unsupported format */

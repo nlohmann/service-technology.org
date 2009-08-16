@@ -13,7 +13,8 @@ Runtime
 
    * Wendy (`http://service-technology.org/wendy'), at least version 1.4
 
-   * LoLA (`http://service-technology.org/lola'), compiled with the `FULL' option
+   * LoLA (`http://service-technology.org/lola'), compiled with the `FULL'
+     option
 
 Mia's configure script checks whether these tools (with binaries `wendy' and
 `lola-full') are found in the path and adjusts the configuration file
@@ -49,6 +50,7 @@ required to reconfigure and compile Mia.
 
    * Texinfo, `http://www.gnu.org/software/texinfo/'
 
-Please check our nightly build server at `http://service-technology.org/nightly'
-for the versions we use during development.
+Please check our nightly build server at
+`http://service-technology.org/nightly' for the versions we use during
+development.
 

@@ -60,6 +60,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install Diane.
 * Command Line Options::How to run Diane.
+* Exit and Error Codes::Which results Diane has.
 * Decomposition::What Diane is actually doing.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.

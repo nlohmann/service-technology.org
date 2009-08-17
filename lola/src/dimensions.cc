@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -62,11 +62,11 @@ void reportconfiguration()
 #endif
 #ifdef HOME
 	cout << "  HOME: check if the net has home states" << endl;
-#endif 
+#endif
 #ifdef REVERSIBILITY
 	cout << "  REVERSIBILITY: check if the net is reversible" << endl;
 #endif
-#ifdef MODELCHECKING 
+#ifdef MODELCHECKING
 #ifdef EXTENDEDCTL
 	cout << "  MODELCHECKING+EXTENDEDCTL: verify an ECTL-formula" << endl;
 #else
@@ -77,10 +77,14 @@ void reportconfiguration()
 	cout << "  FINDPATH: simulate the net repeatedly to find a marking" << endl;
 	cout << "            that satisfies a given state predicate" << endl;
 #endif
-#ifdef FULL 
+#ifdef FULL
 	cout << "  FULL: compute a graph without evaluating any property" << endl;
 #endif
-#ifdef NONE 
+#ifdef STATESPACE
+	cout << "  STATESPACE: compute a graph with information about" << endl;
+	cout << "              strongly connected components" << endl;
+#endif
+#ifdef NONE
 	cout << "  NONE: do not compute any graph" << endl;
 #endif
 #if defined(STATEPREDICATE) && !defined(LIVEPROP)
@@ -101,7 +105,7 @@ void reportconfiguration()
 #endif
 #endif
 	cout << endl << "* Reduction techniques applied:" << endl;
-#ifdef STUBBORN 
+#ifdef STUBBORN
 	cout << "  STUBBORN   : partial order reduction using stubborn sets" << endl;
 #endif
 #ifdef STATEPREDICATE
@@ -183,6 +187,7 @@ void reportconfiguration()
 #ifdef MAXIMALSTATES
   cout << "  MAXIMALSTATES   : " << "generate at most " << MAXIMALSTATES << " states" << endl;
 #endif
+
 }
 
 
@@ -191,21 +196,21 @@ void reportconfiguration()
 
 /*!
  \brief write a userconfig.H that would create the same LoLA binary
- 
+
  In contrast to the result of reportconfiguration(), this function generates
  pure C code that can directly used to compile a LoLA binary.
- 
+
  This function can be handy if binaries need to be transfered to a different
  operating system or architecture.
- 
+
  \param suffix  a suffix used to create the file `userconfig.H.suffix', the
-                suffix is set by the command line paramter `--offspring'        
+                suffix is set by the command line paramter `--offspring'
  */
 void createUserconfigFile(char *suffix)
 {
   assert(suffix);
   std::string filename = "userconfig.H." + std::string(suffix);
-  
+
   // open file
   FILE *userconfig = fopen(filename.c_str(), "w");
   if (!userconfig) {
@@ -213,7 +218,7 @@ void createUserconfigFile(char *suffix)
     fprintf(stderr, "      no output written\n");
     exit(4);
   }
-  
+
   // print header
   fprintf(userconfig, "// This file 'userconfig.H.%s' was created by %s.\n", suffix, PACKAGE_STRING);
   fprintf(userconfig, "// To compile a binary with this configuration, copy this file into the folder\n");
@@ -373,7 +378,11 @@ void createUserconfigFile(char *suffix)
 #ifdef EVENTUALLYPROP
   fprintf(userconfig, "#define EVENTUALLYPROP\n");
 #endif
-  
+
+#ifdef STATESPACE
+  fprintf(userconfig, "#define STATESPACE\n");
+#endif
+
   fprintf(stderr, "lola: successfully wrote userconfig offspring file '%s'\n", filename.c_str());
   fclose(userconfig);
 }

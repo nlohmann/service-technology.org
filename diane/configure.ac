@@ -2,7 +2,8 @@ AC_INIT(Diane, 1.0-unreleased, diane@service-technology.org, diane, http://servi
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE(gnits)
+AM_INIT_AUTOMAKE
+#AM_INIT_AUTOMAKE(gnits)
 
 # Checks for programs.
 AM_PROG_CC_C_O

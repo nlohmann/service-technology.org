@@ -13,7 +13,6 @@ AT_BANNER([Basic Options])
 ############################################################################
 
 AT_SETUP([Help output])
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([WENDY --help],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP

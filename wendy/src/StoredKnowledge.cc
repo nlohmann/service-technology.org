@@ -153,6 +153,19 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
 		// it is new, so put it on the Tarjan stack
 		tarjanStack.push_back(SK);
+
+	    // traverse the current knowledge to find out if this knowledge is final
+	    for (unsigned int i = 0; i < SK->size; i++) {
+			if (InnerMarking::inner_markings[SK->inner[i]]->is_final) {
+				bool interfaceUnmarked = true;
+				if (not SK->interface[i]->unmarked()) {
+					interfaceUnmarked = false;
+				}
+		    	if (interfaceUnmarked) {
+		    		SK->is_final_reachable = 1;
+		    	}
+			}
+	    }
     }
 
     // reduction rule: sequentialize receiving events
@@ -208,7 +221,9 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
         // TODO what about synchronous events?
         if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat()) {
-        	l = Label::first_sync;
+        	if (not args_info.lf_flag or SK->is_final_reachable) {
+        		l = Label::first_sync;
+        	}
         }
     }
 
@@ -246,6 +261,8 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
 		} while (SK != poppedSK);
 	}
+
+	//printf("DEBUG: knowledge %d has lowlink %d, final reachable: %d\n", SK->dfs, SK->lowlink, SK->is_final_reachable);
 }
 
 
@@ -372,6 +389,8 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
             if (args_info.lf_flag and not it->second[i]->is_final_reachable) {
                 it->second[i]->is_sane = 0;
                 insaneNodes.insert(it->second[i]);
+
+                //printf("DEBUG: final knowledge not reachable from %d\n", it->second[i]->dfs);
             }
         }
     }
@@ -799,13 +818,6 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
             inner[count] = pos->first;
             // copy the interface marking
             interface[count] = new InterfaceMarking(*(pos->second[i]));
-
-            // LIVELOCK FREEDOM
-            // find out if this knowledge is potentially final
-            // TODO: check, if this is enough?!
-            if (args_info.lf_flag and interface[count]->unmarked() and InnerMarking::inner_markings[inner[count]]->is_final) {
-                is_final_reachable = 1;
-            }
         }
 
         stats_maxInterfaceMarkings = std::max(stats_maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
@@ -818,7 +830,6 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     if (args_info.cover_given) {
       Cover::checkKnowledge(this, K->bubble);
     }
-
 }
 
 

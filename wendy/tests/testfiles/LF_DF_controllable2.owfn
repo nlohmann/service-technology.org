@@ -1,0 +1,56 @@
+
+PLACE
+INTERNAL
+  p1,
+  p2,
+  p3,
+  p4;
+
+INPUT
+  a,
+  c,
+  b;
+
+
+INITIALMARKING
+  p1:	1
+ ;
+
+FINALCONDITION
+  (p2=1 AND ALL_OTHER_PLACES_EMPTY)
+ ;
+
+TRANSITION t1	 { ?a }
+CONSUME
+  p1:	1,
+  a: 1;
+PRODUCE
+  p2 : 1;
+
+TRANSITION t2	 { ?b }
+CONSUME
+  p2:	1,
+  b: 1;
+PRODUCE
+  p1 : 1;
+
+TRANSITION t3	 { ?c }
+CONSUME
+  p1:	1,
+  c: 1;
+PRODUCE
+  p3 : 1;
+
+TRANSITION t4	 { ?a }
+CONSUME
+  p3:	1,
+  a: 1;
+PRODUCE
+  p4 : 1;
+
+TRANSITION t5	 { ?b }
+CONSUME
+  p4:	1,
+  b: 1;
+PRODUCE
+  p3 : 1;

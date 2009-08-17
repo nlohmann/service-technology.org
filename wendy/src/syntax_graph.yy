@@ -131,7 +131,6 @@ state:
             /* first put current marking on the Tarjan stack */
             tarjanStack.push_front(currentDFS);
     
-            /* current marking does not activate any transitions and thus does not have any successors */ 
             if (currentSuccessors.empty()) {
                 
                 //status("... no successors");
@@ -154,8 +153,9 @@ state:
                 tarjanStack.pop_back();                
                 
             } else {
-                
-                if (!(InnerMarking::markingMap[$2])->is_final_marking_reachable) {
+                if (InnerMarking::markingMap[$2]->is_final) {
+                    (InnerMarking::markingMap[$2])->is_final_marking_reachable = 1;
+                } else if (!(InnerMarking::markingMap[$2])->is_final_marking_reachable) {
                     /* if current marking is not yet marked with "final marking is reachable", traverse through current markings successsors */
                     for (uint8_t i = 0; i < (InnerMarking::markingMap[$2])->out_degree; i++) {
                     
@@ -174,6 +174,8 @@ state:
                                 /* found one, so get out of the for loop */   
                                 break;
                             } else {
+                                //status("... from which no final marking is reachable");
+                                
                                 (InnerMarking::markingMap[$2])->is_final_marking_reachable = 0;
                             }
                         }   
@@ -190,12 +192,12 @@ state:
                     
                     do {
                         /* get last marking from the Tarjan stack */
-                        poppedMarking = tarjanStack.back();
+                        poppedMarking = tarjanStack.front();
                         
                         //status("... together with %d", poppedMarking);
                         
                         /* actually delete it from stack */
-                        tarjanStack.pop_back();
+                        tarjanStack.pop_front();
                         
                         /* if from representative a final marking is reachable, then from all markings of the current */
                         /* strongly connected component a final marking is reachable as well */
@@ -207,6 +209,8 @@ state:
                         } else {
                             /* if no final marking is reachable from the representative, then no final marking is reachable */
                             /* from the markings of the strongly connected component */
+                            
+                            //status("... from which no final marking is reachable");
                             
                             (InnerMarking::markingMap[poppedMarking])->is_final_marking_reachable = 0; 
                         }

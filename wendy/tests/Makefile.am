@@ -1,6 +1,6 @@
 #############################################################################
 # You need to perform three steps to add a test case:
-#   1.) edit the file `testsuite.at' and add you test case
+#   1.) edit the file `testsuite.at' and add your test case
 #   2.) add the files you need for the test to the `testfile' directory
 #   3.) add these files (without path) to the `TESTFILES' list
 # Do not forget to add your test files to the repository!
@@ -41,7 +41,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             test-sync.owfn \
             zeus.fiona.og zeus.owfn \
 	    LF_DF_controllable.owfn \
-	    nLF_DF_controllable.owfn
+	    nLF_DF_controllable.owfn \
+	    LF_DF_controllable2.owfn
 
 
 #############################################################################

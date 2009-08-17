@@ -33,7 +33,7 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for required tools
-AC_PATH_PROG(LOLA, [lola-full], [])
+AC_PATH_PROGS(LOLA, [lola-statespace lola-full], [])
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)

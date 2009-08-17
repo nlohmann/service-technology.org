@@ -21,6 +21,14 @@ Version 1.9-unreleased
 * refined statistics on the nodes: how many nodes were deleted and how many
   nodes remained? - adjusted test cases accordingly
 
+* implemented the generation of livelock free partners (not yet operating
+  guidelines); here, LoLA has to be configured appropriately by using
+  directive STATESPACE rather than FULL (make lola-statespace) and the
+  configuration file of Wendy has to be adjusted accordingly
+
+* added test cases for livelock freedom
+
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

@@ -1,6 +1,11 @@
 AT_INIT
 
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_LOLASTATESPACE, [
+  AT_CHECK([echo "" | LOLA -h],3,stdout,ignore)
+  AT_CHECK([if `GREP -q "STATESPACE" stdout`; then true; else exit 77; fi])
+])
+
 AT_TESTED(versions.sh)
 
 ############################################################################
@@ -8,6 +13,7 @@ AT_BANNER([Basic Options])
 ############################################################################
 
 AT_SETUP([Help output])
+AT_CHECK_LOLASTATESPACE
 AT_CHECK([WENDY --help],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
@@ -543,16 +549,18 @@ AT_BANNER([Livelock Freedom])
 
 AT_SETUP([livelock free controllable])
 AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/LF_DF_controllable.owfn .])
-AT_CHECK([WENDY LF_DF_controllable.owfn --lf --verbose],0,ignore,stderr)
+AT_CHECK([WENDY LF_DF_controllable.owfn --lf --verbose --lola=LOLA],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
 AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP
 
 AT_SETUP([not livelock free controllable])
 AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/nLF_DF_controllable.owfn .])
-AT_CHECK([WENDY nLF_DF_controllable.owfn --lf --verbose],0,ignore,stderr)
+AT_CHECK([WENDY nLF_DF_controllable.owfn --lf --verbose --lola=LOLA],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP

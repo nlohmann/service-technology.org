@@ -7,6 +7,11 @@
 @item canonized Makefiles and indicated which parts are purely generic
 
 @item refined statistics on the nodes: how many nodes were deleted and how many nodes remained? -- adjusted test cases accordingly
+
+@item implemented the generation of livelock free partners (not yet operating guidelines); here, LoLA has to be configured appropriately by using directive STATESPACE rather than FULL (make lola-statespace) and the configuration file of Wendy has to be adjusted accordingly 
+
+@item added test cases for livelock freedom
+
 @end itemize
 
 

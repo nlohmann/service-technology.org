@@ -56,18 +56,37 @@ unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
 std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
+std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
 
+
+#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
 
 /********************
  * STATIC FUNCTIONS *
  ********************/
 
 /*!
+ *  \brief check if given knowledge is on the Tarjan stack
+ *  \param SK pointer to the knowledge that is to be checked
+ *  \return true, if knowledge is on the stack; false otherwise
+ */
+inline bool StoredKnowledge::findKnowledgeInTarjanStack(StoredKnowledge *SK) {
+
+	for(std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
+		if(SK == *it) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*!
  \param[in] K   a knowledge bubble (explicitly stored)
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, const Label_ID &l) {
+inline StoredKnowledge * StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, const Label_ID &l) {
     Knowledge *K_new = new Knowledge(K, l);
 
     // process the empty node in a special way
@@ -76,8 +95,10 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
             SK->addSuccessor(l, empty);
         }
         delete K_new;
-        return;
+        return NULL;
     }
+
+    StoredKnowledge *SK_store = NULL;
 
     // only process knowledges within the message bounds
     if (K_new->is_sane) {
@@ -85,7 +106,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         StoredKnowledge *SK_new = new StoredKnowledge(K_new);
 
         // add it to the knowledge tree
-        StoredKnowledge *SK_store = SK_new->store();
+        SK_store = SK_new->store();
 
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
@@ -93,16 +114,19 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
         // evaluate the storage result
         if (SK_store == SK_new) {
-            // the node was new, so check its successors
+        	// the node was new, so check its successors
             processRecursively(K_new, SK_store);
         } else {
-            // we did not find new knowledge
+        	// we did not find new knowledge
             delete SK_new;
         }
     }
 
-    // we saw K_new's successors (or K_new was not sane)
+    // we saw K_new's successors
     delete K_new;
+
+    // return new knowledge
+    return SK_store;
 }
 
 
@@ -120,6 +144,15 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
     if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
             stats_storedKnowledges, stats_storedEdges);
+    }
+
+    // LIVELOCK FREEDOM
+    if (args_info.lf_flag) {
+    	// save Tarjan's values
+    	SK->dfs = SK->lowlink = stats_storedKnowledges;
+
+		// it is new, so put it on the Tarjan stack
+		tarjanStack.push_back(SK);
     }
 
     // reduction rule: sequentialize receiving events
@@ -154,7 +187,23 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
             }
         }
 
-        process(K, SK, l);
+        StoredKnowledge * SK_new = process(K, SK, l);
+
+        // LIVELOCK FREEDOM
+        // a sane knowledge has been found
+        if (args_info.lf_flag and SK_new != NULL) {
+        	// new node's successor has been computed, so adjust Tarjan values of current node
+        	if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
+        		SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
+        	} else {
+				SK->lowlink = MINIMUM(SK->lowlink, SK_new->lowlink);
+        	}
+
+        	// from successor knowledge a final knowledge is reachable
+        	if (SK_new->is_final_reachable) {
+        		SK->is_final_reachable = 1;
+        	}
+        }
 
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
         // TODO what about synchronous events?
@@ -162,6 +211,41 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         	l = Label::first_sync;
         }
     }
+
+    // LIVELOCK FREEDOM
+	// we have traversed through the reachability graph of the current knowledge
+	// check, if the current knowledge is a representative of a SCC
+	// if so, get all knowledges within the SCC
+	if (args_info.lf_flag and SK->lowlink == SK->dfs) {
+
+		// if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
+		if (not SK->is_final_reachable) {
+			// TODO: current knowledge is not sane, so delete it right here
+		}
+
+		// node which has just been popped from Tarjan stack
+		StoredKnowledge * poppedSK;
+
+		do {
+			if (tarjanStack.empty()) {
+				continue;
+			}
+			// get last element
+			poppedSK = tarjanStack.back();
+			// delete last element from stack
+			tarjanStack.pop_back();
+
+			// propagate that a final knowledge is reachable from the current knowledge to the members of the current SCC
+			if (SK->is_final_reachable) {
+				poppedSK->is_final_reachable = 1;
+			} else {
+				poppedSK->is_final_reachable = 0;
+
+				// TODO: current knowledge is not sane, so delete it right here
+			}
+
+		} while (SK != poppedSK);
+	}
 }
 
 
@@ -282,6 +366,13 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
                 it->second[i]->is_sane = 0;
                 insaneNodes.insert(it->second[i]);
             }
+
+            // LIVELOCK FREEDOM
+            // check if from current knowledge a final knowledge is reachable
+            if (args_info.lf_flag and not it->second[i]->is_final_reachable) {
+                it->second[i]->is_sane = 0;
+                insaneNodes.insert(it->second[i]);
+            }
         }
     }
 
@@ -360,6 +451,8 @@ void StoredKnowledge::dot(std::ofstream &file) {
                     default: assert(false);
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
+
+                //file << it->second[i]->dfs << " (" << it->second[i]->lowlink << ") f:" << it->second[i]->is_final_reachable << "\\n";
 
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
@@ -681,7 +774,7 @@ void StoredKnowledge::output_old(std::ofstream &file) {
 */
 StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     is_final(0), is_sane(K->is_sane), size(K->size), inner(NULL), interface(NULL),
-    successors(NULL), inDegree(0), predecessorCounter(0), predecessors(NULL)
+    successors(NULL), inDegree(0), predecessorCounter(0), predecessors(NULL), is_final_reachable(0)
 {
     assert(size != 0);
 
@@ -699,13 +792,20 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     // finally copy data structure to C-style arrays
     size_t count = 0;
 
-    // traverse the bubbles and copy the markings into the C arrays
+    // traverse the bubble and copy the markings into the C arrays
     for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
         for (size_t i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking
             inner[count] = pos->first;
             // copy the interface marking
             interface[count] = new InterfaceMarking(*(pos->second[i]));
+
+            // LIVELOCK FREEDOM
+            // find out if this knowledge is potentially final
+            // TODO: check, if this is enough?!
+            if (args_info.lf_flag and interface[count]->unmarked() and InnerMarking::inner_markings[inner[count]]->is_final) {
+                is_final_reachable = 1;
+            }
         }
 
         stats_maxInterfaceMarkings = std::max(stats_maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
@@ -713,11 +813,12 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
 
     // we must not forget a marking
     assert(size == count);
-    
+
     // check this knowledge for covering nodes
-    if(args_info.cover_given)
+    if (args_info.cover_given) {
       Cover::checkKnowledge(this, K->bubble);
-    
+    }
+
 }
 
 
@@ -737,7 +838,7 @@ StoredKnowledge::~StoredKnowledge() {
     delete[] interface;
 
     delete[] inner;
-    
+
     if(args_info.cover_given)
       Cover::removeKnowledge(this);
 }
@@ -815,8 +916,9 @@ StoredKnowledge *StoredKnowledge::store() {
         stats_maxBucketSize = std::max(stats_maxBucketSize, hashTree[myHash].size() + 1);
     }
 
-    // we need store this object
+    // we need to store this object
     hashTree[myHash].push_back(this);
+
     ++stats_storedKnowledges;
 
     // we return a pointer to the this object since it was newly stored

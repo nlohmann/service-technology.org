@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -55,7 +55,7 @@ unsigned int InnerMarking::stats_final_markings = 0;
  Copy the markings from the mapping markingMap to C-style arrays.
  Additionally, a mapping is filled to quickly determine whether a marking can
  become transient if a message with a given label was sent to the net.
- 
+
  \todo replace the mapping receivers by a two-dimensional C-style array or do
        this check in the constructor
  */
@@ -94,12 +94,19 @@ void InnerMarking::initialize() {
 /***************
  * CONSTRUCTOR *
  ***************/
- 
+
 InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
                            const std::vector<InnerMarking_ID> &_successors,
                            bool _is_final) :
-    is_final(_is_final), is_waitstate(0), is_deadlock(0), out_degree(_successors.size())
+               is_final(_is_final), is_waitstate(0), is_deadlock(0),
+               out_degree(_successors.size()), is_final_marking_reachable(1)
 {
+
+    // property is_final_marking_reachable is only used in case of generating livelock free partners
+    if (args_info.lf_flag and not is_final) {
+    	is_final_marking_reachable = 0;
+    }
+
     ++stats_markings;
     if (stats_markings % 50000 == 0) {
         fprintf(stderr, "%8d inner markings\n", stats_markings);
@@ -133,7 +140,7 @@ InnerMarking::~InnerMarking() {
  The type is determined by checking the labels of the leaving transitions as
  well as the fact whether this marking is a final marking. For the further
  processing, it is sufficient to distinguish three types:
- 
+
  - the marking is a deadlock (is_deadlock) -- then a knowledge containing
    this inner marking can immediately be considered insane
  - the marking is a final marking (is_final) -- this is needed to distinguish
@@ -141,7 +148,7 @@ InnerMarking::~InnerMarking() {
  - the marking is a waitstate (is_waitstate) -- a waitstate is a marking of
    the inner of the net that can only be left by firing a transition that is
    connected to an input place
- 
+
  This function also implements the detection of inevitable deadlocks. A
  marking is an inevitable deadlock, if it is a deadlock or all its successor
  markings are inevitable deadlocks. The detection exploits the way LoLA
@@ -150,7 +157,7 @@ InnerMarking::~InnerMarking() {
  successors[i] == NULL) are also predessessors of this marking and cannot be
  a reason for this marking to be a deadlock. Hence, this marking is an
  inevitable deadlock if all known successsors are deadlocks.
- 
+
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
  */

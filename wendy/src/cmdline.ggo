@@ -3,6 +3,14 @@ args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --co
 description "About Wendy:"
 purpose "Wendy is a tool to calculate the operating guidelines of a service."
 
+section "Analysis Task"
+sectiondesc="Wendy is able to handle two different analysis tasks. It generates the operating guidelines (or partners in general) with respect to (1) deadlock freedom or (2) livelock freedom. By default, Wendy will consider deadlock freedom.\n"
+
+option "lf" -
+  "Livelock freedom."
+  details="The operating guidelines and reduced partners are generated with respect to livelock freedom. This means, that the composition of the currently analyzed service and the generated partner(s) do not run into a livelock from which no final marking is reachable anymore.\n"
+  flag off
+
 section "Input/Output"
 sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `STDOUT' is given, Wendy will pipe the respective output to the standard output stream.\n"
 
@@ -127,7 +135,6 @@ option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
   details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
   flag off
-
 
 section "Debugging"
 sectiondesc="These options control how much debug output Wendy creates. The more debug output is used, the slower Wendy runs.\n"

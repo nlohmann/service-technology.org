@@ -32,12 +32,14 @@ using std::vector;
 using std::set;
 using std::string;
 
+extern gengetopt_args_info args_info;
 
 /***************
  * CONSTRUCTOR *
  ***************/
 
 Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1) {
+
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     std::queue<FullMarking> todo;
@@ -165,6 +167,7 @@ Knowledge::~Knowledge() {
  * MEMBER FUNCTIONS *
  ********************/
 
+
 /*!
  \param todo  a queue of markings to process (will be altered by this function)
 
@@ -190,6 +193,7 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
 
         // process successors of the current marking
         InnerMarking *m = InnerMarking::inner_markings[current.inner];
+
         for (uint8_t i = 0; i < m->out_degree; ++i) {
 
             // a synchronization is impossible without the environment -- skip
@@ -222,6 +226,13 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
             if (InnerMarking::inner_markings[m->successors[i]]->is_deadlock) {
                 is_sane = 0;
                 return;
+            }
+
+            // in case of livelock freedom:
+            // check, if from successor a final marking is still reachable
+            if (not InnerMarking::inner_markings[m->successors[i]]->is_final_marking_reachable) {
+            	is_sane = 0;
+            	return;
             }
 
             // if we found a valid successor candidate, check if it is already stored

@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -31,13 +31,13 @@
 
 /*!
  \brief inner marking
- 
+
  An inner marking only stores three bits about its nature (is_final,
  is_deadlock, and is_waitstate -- see determineType()) and its successors.
  The successors are stored in two C-style arrays: one consisting of the
  identifiers of the successors and one consisting of the interface labels of
  the respective transitions.
- 
+
  The reachability graph of the inner of the net is created by LoLA and then
  parsed. The parser creates objects of this class and stores pointers to them
  in the mapping markingMap together with an identifier (the depth-first
@@ -75,7 +75,7 @@ class InnerMarking {
         /// the number of deadlocks
         static unsigned int stats_deadlocks;
 
-        /// the number markings that will reach a deadlock
+        /// the number of markings that will reach a deadlock
         static unsigned int stats_inevitable_deadlocks;
 
         /// the number of final markings
@@ -107,6 +107,9 @@ class InnerMarking {
 
         /// whether this marking is an internal deadlock
         unsigned is_deadlock : 1;
+
+        /// whether from this marking a final marking is reachable
+        unsigned is_final_marking_reachable : 1;
 
         /// the number of successor markings (size of successors and labels)
         uint8_t out_degree;

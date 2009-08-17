@@ -33,7 +33,7 @@ class StoredKnowledge {
     public: /* static functions */
 
         /// generate the successor of a knowledge bubble given a label
-        static void process(const Knowledge* const, StoredKnowledge*, const Label_ID&);
+        static StoredKnowledge * process(const Knowledge* const, StoredKnowledge*, const Label_ID&);
 
         /// recursively calculate knowledge bubbles
         static void processRecursively(const Knowledge* const, StoredKnowledge*);
@@ -87,7 +87,7 @@ class StoredKnowledge {
 
         /// the empty knowledge
         static StoredKnowledge *empty;
-        
+
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
 
@@ -101,6 +101,16 @@ class StoredKnowledge {
 
         /// the number of all markings (deadlocks and transient markings)
         static std::map<StoredKnowledge*, unsigned int> allMarkings;
+
+        /// LIVELOCK FREEDOM
+        /// stack of StoredKnowledge for Tarjan's algorithm
+        static std::vector<StoredKnowledge *> tarjanStack;
+
+    private: /* static functions */
+
+    	/// LIVELOCK FREEDOM
+    	/// finds a knowledge in Tarjan stack
+    	static bool findKnowledgeInTarjanStack(StoredKnowledge *);
 
     public: /* member functions */
 
@@ -146,10 +156,18 @@ class StoredKnowledge {
         /// whether this bubble contains a final marking
         unsigned is_final : 1;
 
+        /// LIVELOCK FREEDOM
+        /// whether from this bubble a final bubble is reachable
+        unsigned is_final_reachable : 1;
+
         /// whether this bubble is sane
         unsigned is_sane : 1;
 
     private: /* member attributes */
+
+        /// for livelock freedom the Tarjan algorithm is needed
+    	unsigned int lowlink;
+    	unsigned int dfs;
 
         /// the number of markings stored in this knowledge
         unsigned int size;
@@ -160,10 +178,8 @@ class StoredKnowledge {
         /// an array of interface markings (length is size)
         InterfaceMarking **interface;
 
-
         /// the successors of this knowledge (length is fixed by the labels)
         StoredKnowledge **successors;
-
 
         /// the number of predecessors
         unsigned int inDegree;

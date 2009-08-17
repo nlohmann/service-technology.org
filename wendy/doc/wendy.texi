@@ -501,6 +501,22 @@ wendy: unknown transition `t' in file `foo.cov' -- aborting [#16]
 @end cartouche
 @end smallexample
 
+@item #17
+In case of generating livelock-free partners (by using the @option{--lf} parameter), Wendy expects LoLA to be compiled with the directive STATESPACE.
+@smallexample
+@cartouche
+make lola-statespace
+@end cartouche
+@end smallexample
+
+If the statespace lola is not provided Wendy exits with error code 17.
+
+@smallexample
+@cartouche
+wendy: LoLA has not been configured appropriately -- aborting [#17]
+@end cartouche
+@end smallexample
+
 @end table
 
 

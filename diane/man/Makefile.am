@@ -1,7 +1,12 @@
+# the help option that should be used in the manpage
+HELPOPTION = --detailed-help
+
+
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
 man_MANS = $(PACKAGE).1
-
 MAINTAINERCLEANFILES = $(man_MANS) $(PACKAGE).pdf
-
 EXTRA_DIST = $(man_MANS) extra
 
 $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
@@ -11,7 +16,7 @@ $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
 		--output=$@ \
 		--manual="service-technology.org" \
 		--source="service-technology.org" \
-		--help-option="--help" \
+		--help-option="$(HELPOPTION)" \
 		--opt-include=extra
 
 man-pdf: $(PACKAGE).1

@@ -7,28 +7,48 @@ diane_SOURCES =  main.cc \
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-diane_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 diane_CPPFLAGS = -I$(top_srcdir)/libs
+diane_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-BUILT_SOURCES = cmdline.c config-log.h
-EXTRA_DIST = cmdline.ggo
-MAINTAINERCLEANFILES = cmdline.c cmdline.h
-DISTCLEANFILES = config-log.h
 
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
 
-# copy the content of the config.log file to a C header (for debugging purposes)
-config-log.h: $(top_srcdir)/config.log
-	echo "#define CONFIG_LOG \\" > config-log.h
-	$(SED) -e 's/\\/\\\\/g' $(top_builddir)/config.log | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\""$$0"\\n\"\\"}' >> config-log.h
-	echo '""' >> config-log.h
-	echo "" >> config-log.h
+#---------------------------------------------------#
+# GENERIC: initialization for other generic targets #
+#---------------------------------------------------#
+BUILT_SOURCES =
+EXTRA_DIST =
+MAINTAINERCLEANFILES =
+DISTCLEANFILES = 
 
-################################################################
-# use GNU gengetopt to create command line parser
-################################################################
-cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo
-  
-doxygen:
-	cd ../doc ; doxygen
+#--------------------------------------------------------------#
+# GENERIC: organize distribution and cleaning of Bison sources #
+#--------------------------------------------------------------#
+BISON_FILES = $(filter %.yy,$(diane_SOURCES))
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+
+#----------------------------------------------------------------#
+# GENERIC: copy the content of the config.log file to a C header #
+#----------------------------------------------------------------#
+config-log.h: $(top_builddir)/config.log
+	echo "#define CONFIG_LOG \\" > $@
+	$(SED) -e 's/\\/\\\\/g' $< | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\""$$0"\\n\"\\"}' >> $@
+	echo '""' >> $@
+	echo "" >> $@
+BUILT_SOURCES += config-log.h
+DISTCLEANFILES += config-log.h
+
+#----------------------------------------------------------#
+# GENERIC: use GNU gengetopt to create command line parser #
+#----------------------------------------------------------#
+.ggo.c:
+	$(GENGETOPT) --input=$<
+GENGETOPT_FILES = cmdline.ggo
+BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
+EXTRA_DIST += $(GENGETOPT_FILES)
+MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)

@@ -1,4 +1,4 @@
-@heading Version 1.0-unreleased
+@heading Version 1.0
 @itemize
 @item initial release
 @item made Diane Gnits compatible

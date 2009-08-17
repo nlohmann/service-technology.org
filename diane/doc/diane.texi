@@ -61,7 +61,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * First Steps::How to set up and install Diane.
 * Command Line Options::How to run Diane.
 * Exit and Error Codes::Which results Diane has.
-* Decomposition::What Diane is actually doing.
+* Theory::The theory behind Diane.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -143,6 +143,44 @@ Testcases for Diane which check the generated binary.
 @end table
 
 
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Diane, several tools are required.
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Diane.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+
 
 
 @c --------------------------------------------------------------------------
@@ -203,7 +241,7 @@ calculated by Diane.
 
 @section Error Codes
 
-In case any error occurs, Wendy aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+In case any error occurs, Diane aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
 
 @table @asis
 @item #01
@@ -231,16 +269,32 @@ diane: could not parse file `foo.lola' -- aborting [#02]
 @c --------------------------------------------------------------------------
 
 
+@node Theory
+@chapter Theory
 
-@node Decomposition
-@chapter Decomposition
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Diane implements several algorithms and result published in several scientific articles.
 
-todo
+@section Decomposition of a Petri net into services
+
+@quotation
+Stephan Mennicke, Olivia Oanea, and Karsten Wolf. @b{Decomposition into open nets}. In @i{16th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2009, Karlsruhe, Germany, September 25-26, 2009, Proceedings}, September 2009. 
+@end quotation
+
+@section Decomposition of an open nets into its free choice conflict clusters
+
+@quotation
+Niels Lohmann. @b{Decompositional Calculation of Operating Guidelines Using Free Choice Conflicts}. In Niels Lohmann and Karsten Wolf, editors, @i{15th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008, Rostock, Germany, September 26-27, 2008, Proceedings}, volume 380 of CEUR Workshop Proceedings, pages 63-68, September 2008. CEUR-WS.org.
+@end quotation
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
 
 
 
 @c --------------------------------------------------------------------------
-
 
 @node ChangeLog
 @chapter Version History

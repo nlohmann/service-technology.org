@@ -1,0 +1,33 @@
+                           ____  _                  
+                          |  _ \(_) __ _ _ __   ___ 
+                          | | | | |/ _` | '_ \ / _ \
+                          | |_| | | (_| | | | |  __/
+                          |____/|_|\__,_|_| |_|\___|
+                     http://service-technology.org/diane
+
+
+Diane implements several algorithms and result published in several scientific
+articles.
+
+Decomposition of a Petri net into services
+==========================================
+
+     Stephan Mennicke, Olivia Oanea, and Karsten Wolf. Decomposition into open
+     nets. In 16th German Workshop on Algorithms and Tools for Petri Nets,
+     AWPN 2009, Karlsruhe, Germany, September 25-26, 2009, Proceedings,
+     September 2009.
+
+Decomposition of an open nets into its free choice conflict clusters
+====================================================================
+
+     Niels Lohmann. Decompositional Calculation of Operating Guidelines Using
+     Free Choice Conflicts. In Niels Lohmann and Karsten Wolf, editors, 15th
+     German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008,
+     Rostock, Germany, September 26-27, 2008, Proceedings, volume 380 of CEUR
+     Workshop Proceedings, pages 63-68, September 2008. CEUR-WS.org.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
+

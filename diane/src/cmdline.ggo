@@ -1,11 +1,11 @@
 args "--long-help --include-getopt --show-required --unamed-opts=FILE"
 
-purpose "DIANE - Decomposition Into Atomic NEts."
+purpose "Diane - Decomposition Into Atomic NEts."
 
 description "Diane cuts a Petri net into parts."
 
 option "mode" m
-	"Specifies a certain mode in which DIANE will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net (input: LoLA format), and 'freechoice' finds service parts by manipulating free-choice cluster (input: oWFN format)."
+	"Specifies a certain mode in which Diane will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net (input: LoLA format), and 'freechoice' finds service parts by manipulating free-choice cluster (input: oWFN format)."
 	string
 	values="standard","freechoice" enum
 	default="standard"
@@ -19,13 +19,13 @@ option "service" -
 section "Input and Output"
 
 option "prefix" p
-	"Specifies the output files' prefix. If not specified DIANE will derive the output filenames from the input filename."
+	"Specifies the output files' prefix. If not specified Diane will derive the output filenames from the input filename."
 	string
 	typestr="FILEPREFIX"
 	optional
 
 option "quiet" q
-	"No output file will be written by DIANE."
+	"No output file will be written by Diane."
 	flag off
 
 section "Debug Options"

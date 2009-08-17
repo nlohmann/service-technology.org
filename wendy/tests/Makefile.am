@@ -39,7 +39,9 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             smtp3.fiona.og smtp3.owfn \
             T2.fiona.og T2.owfn \
             test-sync.owfn \
-            zeus.fiona.og zeus.owfn
+            zeus.fiona.og zeus.owfn \
+	    LF_DF_controllable.owfn \
+	    nLF_DF_controllable.owfn
 
 
 #############################################################################

@@ -18,7 +18,7 @@ option "service" -
 
 section "Input and Output"
 
-option "output" o
+option "prefix" p
 	"Specifies the output files' prefix. If not specified DIANE will derive the output filenames from the input filename."
 	string
 	typestr="FILEPREFIX"

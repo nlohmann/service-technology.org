@@ -204,8 +204,8 @@ int main(int argc, char *argv[])
       string fileprefix;
       string filepostfix = ".owfn";
       ofstream outputfiles[_statistics.fragments_];
-      if (args_info.output_given)
-        fileprefix += args_info.output_arg;
+      if (args_info.prefix_given)
+        fileprefix += args_info.prefix_arg;
       fileprefix += args_info.inputs[i];
 
       int netnumber = 0;
@@ -391,7 +391,7 @@ void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
   }
   else
   {
-    cout << PACKAGE << ": " << args_info.inputs[i]
+    cout << PACKAGE_NAME << ": " << args_info.inputs[i]
          << " - number of components: " << _statistics.fragments_
          << endl;
   }

@@ -5,6 +5,8 @@
 @item implemented cover constraints for operating guidelines (parameter @option{--cover}); see file @file{THEORY} for more information
 
 @item canonized Makefiles and indicated which parts are purely generic
+
+@item refined statistics on the nodes: how many nodes were deleted and how many nodes remained? -- adjusted test cases accordingly
 @end itemize
 
 

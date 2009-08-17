@@ -343,8 +343,11 @@ int main(int argc, char** argv) {
     unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
     time(&end_time);
 
-    status("removed %d red nodes in %d iterations [%.0f sec]",
-        redNodes, StoredKnowledge::stats_iterations, difftime(end_time, start_time));
+    status("removed %d insane nodes (%3.2f%%) in %d iterations [%.0f sec]",
+        redNodes, 100.0 * ((double)redNodes / (double)StoredKnowledge::stats_storedKnowledges),
+        StoredKnowledge::stats_iterations, difftime(end_time, start_time));
+
+    status("%d nodes left", StoredKnowledge::seen.size());
 
     // analyze root node
     fprintf(stderr, "%s: net is controllable: %s\n",

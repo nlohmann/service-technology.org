@@ -18,6 +18,9 @@ Version 1.9-unreleased
 
 * canonized Makefiles and indicated which parts are purely generic
 
+* refined statistics on the nodes: how many nodes were deleted and how many
+  nodes remained? - adjusted test cases accordingly
+
 Version 1.8
 ===========
 

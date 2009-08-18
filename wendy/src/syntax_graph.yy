@@ -51,20 +51,14 @@ std::vector<Label_ID> currentLabels;
 /// names of transitions, that are enabled under the current marking (needed for cover)
 std::set<std::string> currentTransitions;
 
-/// the depth first search number (dfs) of current marking
-InnerMarking_ID currentDFS;
-
 /// the Tarjan lowlink value of the current marking
 InnerMarking_ID currentLowlink;
-
-/// current marking is a representative of a (terminal) strongly connected components
-bool currentMarkingIsRepresentative;
 
 /// a marking of the PN API net
 std::map<const pnapi::Place*, unsigned int> marking;
 
 /// a Tarjan stack for storing markings in order to detect (terminal) strongly connected components
-std::deque<InnerMarking_ID> tarjanStack;
+std::priority_queue<InnerMarking_ID> tarjanStack;
 
 extern std::ofstream *markingfile;
 
@@ -115,74 +109,58 @@ state:
         /* ================================================================================= */
 
         if (args_info.lf_flag) {
+            
+            /* in contrast to deadock freedom, we now suppose that from each marking no final marking is reachable initially */ 
+            InnerMarking::markingMap[$2]->is_final_marking_reachable = 0;
+
+            /* the depth first search number (dfs) of current marking (is just the number given behind the KW_STATE token) */
+            InnerMarking_ID currentDFS = $2;
+
+            /* current marking is a representative of a (terminal) strongly connected components */
+            bool currentMarkingIsRepresentative = (currentDFS == currentLowlink);
 
             //status("current dfs: %d, lowlink: %d", $2, currentLowlink);
 
-            /*  check, if current marking is a representative of a strongly connected component */
-            if ($2 == currentLowlink) {
-                currentMarkingIsRepresentative = true;
-            } else {
-                currentMarkingIsRepresentative = false;
-            }    
-        
-            /* current marking's dfs is just the number given behind the KW_STATE token */
-            currentDFS = $2;
-            
-            /* first put current marking on the Tarjan stack */
-            tarjanStack.push_front(currentDFS);
-    
             if (currentSuccessors.empty()) {
-                
-                //status("... no successors");
-            
-                /* check if current marking is not final */
-                if (!(InnerMarking::markingMap[$2])->is_final) {
-                    /* then, from current marking no final marking is reachable and it is an internal deadlock */
-                    (InnerMarking::markingMap[$2])->is_deadlock = true;
-                    (InnerMarking::markingMap[$2])->is_final_marking_reachable = 0;
-                    
-                    //status("... is internal deadlock");
-                    
-                } else {
-                    (InnerMarking::markingMap[$2])->is_final_marking_reachable = 1;
-                    
-                    //status("... final marking is reachable");
-                }
-                
-                /* actually delete it from stack */
-                tarjanStack.pop_back();                
-                
-            } else {
+                /* check if current marking is final */
                 if (InnerMarking::markingMap[$2]->is_final) {
-                    (InnerMarking::markingMap[$2])->is_final_marking_reachable = 1;
-                } else if (!(InnerMarking::markingMap[$2])->is_final_marking_reachable) {
-                    /* if current marking is not yet marked with "final marking is reachable", traverse through current markings successsors */
-                    for (uint8_t i = 0; i < (InnerMarking::markingMap[$2])->out_degree; i++) {
+                    InnerMarking::markingMap[$2]->is_final_marking_reachable = 1;
+                } 
+            } else {     /* current marking has successors */
+                
+                /* first put current marking on the Tarjan stack */
+                tarjanStack.push(currentDFS);                
+                
+                InnerMarking::markingMap[$2]->is_final_marking_reachable = (InnerMarking::markingMap[$2]->is_final_marking_reachable or
+                                                                                                        InnerMarking::markingMap[$2]->is_final); 
+                
+                /* if current marking is not yet marked with "final marking is reachable", traverse through current markings successsors */
+                if (not InnerMarking::markingMap[$2]->is_final_marking_reachable) {
                     
-                        //status("... found successor %d", (InnerMarking::markingMap[$2])->successors[i]);
+                    bool pathToFinalMarkingFound = false;
                     
-                        InnerMarking_ID successor = (InnerMarking::markingMap[$2])->successors[i];
+                    for (uint8_t i = 0; i < InnerMarking::markingMap[$2]->out_degree; i++) {
                     
-                        /* check if from currently considered successor a final marking is reachable or if it is final itself*/
+                        //status("... found successor %d", InnerMarking::markingMap[$2]->successors[i]);
+                    
+                        InnerMarking_ID successor = InnerMarking::markingMap[$2]->successors[i];
+                    
+                        /* check if from currently considered successor either a final marking is reachable or if it is final itself */
                         if (InnerMarking::markingMap[successor]) {
-                            if ((InnerMarking::markingMap[successor])->is_final_marking_reachable || (InnerMarking::markingMap[successor])->is_final) {
-                                /* yes, it is */
-                                
-                                //status("... from which a final marking is reachable");
-                                
-                                (InnerMarking::markingMap[$2])->is_final_marking_reachable = 1;
-                                /* found one, so get out of the for loop */   
+                            if (InnerMarking::markingMap[successor]->is_final_marking_reachable or InnerMarking::markingMap[successor]->is_final) {
+                                pathToFinalMarkingFound = true;
                                 break;
-                            } else {
-                                //status("... from which no final marking is reachable");
-                                
-                                (InnerMarking::markingMap[$2])->is_final_marking_reachable = 0;
                             }
                         }   
                     }
+                    
+                    /* if there exists any successor from which a final marking is reachable */
+                    if (pathToFinalMarkingFound) {
+                        InnerMarking::markingMap[$2]->is_final_marking_reachable = 1;
+                    }
                 }
     
-                /* current marking is a representative, so fetch all members of the strongly connected components from stack */
+                /* current marking is a representative of a (T)SCC, so fetch all members of the strongly connected components from stack */
                 if (currentMarkingIsRepresentative) {
                     
                     //status("... is representative of a (T)SCC");
@@ -192,27 +170,17 @@ state:
                     
                     do {
                         /* get last marking from the Tarjan stack */
-                        poppedMarking = tarjanStack.front();
+                        poppedMarking = tarjanStack.top();
                         
                         //status("... together with %d", poppedMarking);
                         
                         /* actually delete it from stack */
-                        tarjanStack.pop_front();
+                        tarjanStack.pop();
                         
-                        /* if from representative a final marking is reachable, then from all markings of the current */
-                        /* strongly connected component a final marking is reachable as well */
-                        if ((InnerMarking::markingMap[$2])->is_final_marking_reachable) {
-                            
-                            //status("... from which a final marking is reachable");
+                        /* if a final marking is reachable from the representative, then a final marking is reachable */
+                        /* from all markings within the strongly connected component */
+                        if (InnerMarking::markingMap[$2]->is_final_marking_reachable) {
                             (InnerMarking::markingMap[poppedMarking])->is_final_marking_reachable = 1; 
-                            
-                        } else {
-                            /* if no final marking is reachable from the representative, then no final marking is reachable */
-                            /* from the markings of the strongly connected component */
-                            
-                            //status("... from which no final marking is reachable");
-                            
-                            (InnerMarking::markingMap[poppedMarking])->is_final_marking_reachable = 0; 
                         }
                     } while ($2 != poppedMarking);
                 } 
@@ -233,7 +201,7 @@ prog:
 lowlink:
     {
         if (args_info.lf_flag) {
-            // livelock freedom is activated, but lola does not provide necessary lowlink value
+            /* livelock freedom is activated, but lola does not provide necessary lowlink value */
             abort(17, "LoLA has not been configured appropriately");
         }
     }

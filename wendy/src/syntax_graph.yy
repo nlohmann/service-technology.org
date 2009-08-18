@@ -85,6 +85,9 @@ states:
 state:
   KW_STATE NUMBER prog lowlink markings transitions
     { 
+    
+        //status("DEBUG: current DFS: %d\n", $2);
+    
         InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
@@ -105,65 +108,22 @@ state:
         }
 
         /* ================================================================================= */
-        /* code for generating livelock free partners */
+        /* generating livelock free partners */
         /* ================================================================================= */
 
         if (args_info.lf_flag) {
             
-            /* in contrast to deadock freedom, we now suppose that from each marking no final marking is reachable initially */ 
-            InnerMarking::markingMap[$2]->is_final_marking_reachable = 0;
-
-            /* the depth first search number (dfs) of current marking (is just the number given behind the KW_STATE token) */
-            InnerMarking_ID currentDFS = $2;
-
-            /* current marking is a representative of a (terminal) strongly connected components */
-            bool currentMarkingIsRepresentative = (currentDFS == currentLowlink);
-
             //status("current dfs: %d, lowlink: %d", $2, currentLowlink);
 
-            if (currentSuccessors.empty()) {
-                /* check if current marking is final */
-                if (InnerMarking::markingMap[$2]->is_final) {
-                    InnerMarking::markingMap[$2]->is_final_marking_reachable = 1;
-                } 
-            } else {     /* current marking has successors */
+            if (!currentSuccessors.empty()) { /* current marking has successors */
                 
                 /* first put current marking on the Tarjan stack */
-                tarjanStack.push(currentDFS);                
+                tarjanStack.push($2);                
                 
-                InnerMarking::markingMap[$2]->is_final_marking_reachable = (InnerMarking::markingMap[$2]->is_final_marking_reachable or
-                                                                                                        InnerMarking::markingMap[$2]->is_final); 
-                
-                /* if current marking is not yet marked with "final marking is reachable", traverse through current markings successsors */
-                if (not InnerMarking::markingMap[$2]->is_final_marking_reachable) {
-                    
-                    bool pathToFinalMarkingFound = false;
-                    
-                    for (uint8_t i = 0; i < InnerMarking::markingMap[$2]->out_degree; i++) {
-                    
-                        //status("... found successor %d", InnerMarking::markingMap[$2]->successors[i]);
-                    
-                        InnerMarking_ID successor = InnerMarking::markingMap[$2]->successors[i];
-                    
-                        /* check if from currently considered successor either a final marking is reachable or if it is final itself */
-                        if (InnerMarking::markingMap[successor]) {
-                            if (InnerMarking::markingMap[successor]->is_final_marking_reachable or InnerMarking::markingMap[successor]->is_final) {
-                                pathToFinalMarkingFound = true;
-                                break;
-                            }
-                        }   
-                    }
-                    
-                    /* if there exists any successor from which a final marking is reachable */
-                    if (pathToFinalMarkingFound) {
-                        InnerMarking::markingMap[$2]->is_final_marking_reachable = 1;
-                    }
-                }
-    
                 /* current marking is a representative of a (T)SCC, so fetch all members of the strongly connected components from stack */
-                if (currentMarkingIsRepresentative) {
+                if ($2 == currentLowlink) {
                     
-                    //status("... is representative of a (T)SCC");
+                    //status("m%d is representative of a (T)SCC", $2);
                     
                     /* last popped marking */
                     InnerMarking_ID poppedMarking;
@@ -172,7 +132,7 @@ state:
                         /* get last marking from the Tarjan stack */
                         poppedMarking = tarjanStack.top();
                         
-                        //status("... together with %d", poppedMarking);
+                        //status("... together with m%d", poppedMarking);
                         
                         /* actually delete it from stack */
                         tarjanStack.pop();
@@ -182,6 +142,19 @@ state:
                         if (InnerMarking::markingMap[$2]->is_final_marking_reachable) {
                             (InnerMarking::markingMap[poppedMarking])->is_final_marking_reachable = 1; 
                         }
+                        
+                        if (args_info.smartSendingEvent_flag) {
+                            /* ... the same is true for reachable sending events */
+                            for (uint8_t e = 0; e < Label::send_events; e++) {
+                                InnerMarking::markingMap[poppedMarking]->reachableSendingEvents[e] =
+                                        InnerMarking::markingMap[poppedMarking]->reachableSendingEvents[e] or InnerMarking::markingMap[$2]->reachableSendingEvents[e];    
+                            
+                                if (InnerMarking::markingMap[poppedMarking]->reachableSendingEvents[e]) {
+                                    //status("DEBUG: (2) from m%d sending event %s is reachable\n", poppedMarking, Label::id2name[e+Label::last_receive + 1].c_str());
+                                }
+                            }
+                        }
+                                                
                     } while ($2 != poppedMarking);
                 } 
             } /* end else, successors is empty */

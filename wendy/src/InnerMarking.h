@@ -89,8 +89,11 @@ class InnerMarking {
         /// destructor
         ~InnerMarking();
 
-        // whether this marking is a waitstate resolveable by the given label
+        /// whether this marking is a waitstate resolveable by the given label
         bool waitstate(const Label_ID&) const;
+
+        /// determines which receiving transitions are potentially reachable from this marking
+        void calcReachableSendingEvents();
 
     private: /* member functions */
 
@@ -119,6 +122,10 @@ class InnerMarking {
 
         /// the successor label ids
         Label_ID *labels;
+
+        /// receiving transitions that are potentially reachable
+        bool *reachableSendingEvents;
+
 };
 
 #endif

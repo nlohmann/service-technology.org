@@ -205,6 +205,13 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
             }
         }
 
+        // reduction rule: send leads to insane node
+        if (args_info.smartSendingEvent_flag) {
+        	if (SENDING(l) and K->sendLeadsToInsaneNode(l)) {
+            	continue;
+        	}
+        }
+
         StoredKnowledge * SK_new = process(K, SK, l);
 
         // LIVELOCK FREEDOM
@@ -317,7 +324,7 @@ unsigned int StoredKnowledge::addPredecessors() {
                     // remember that this knowledge contains a final marking
                     it->second[i]->is_final = 1;
 
-                    // only if the final marking is not a watistate, we're done
+                    // only if the final marking is not a waitstate, we're done
                     if (not InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
                         transient = true;
                     }
@@ -401,7 +408,8 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
     }
 
     // iteratively removed all insane nodes and check their predecessors
-    bool done = false;
+    bool done = args_info.diagnose_flag;
+
     while (not done) {
         ++stats_iterations;
         while (not insaneNodes.empty()) {
@@ -463,7 +471,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
     // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
-            if (it->second[i]->is_sane and
+            if ((it->second[i]->is_sane or args_info.diagnose_flag) and
                 (seen.find(it->second[i]) != seen.end())) {
 
                 string formula;
@@ -1116,6 +1124,10 @@ string StoredKnowledge::formula() const {
         assert(false);
     }
 
+    if (formula.empty()) {
+    	formula = "false";
+    }
+
     return formula;
 }
 
@@ -1167,7 +1179,7 @@ string StoredKnowledge::bits() const {
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
+            if (successors[l-1] != NULL and successors[l-1] != empty and (successors[l-1]->is_sane or args_info.diagnose_flag)) {
                 successors[l-1]->traverse();
             }
         }

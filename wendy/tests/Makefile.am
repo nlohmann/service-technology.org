@@ -43,7 +43,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             zeus.fiona.og zeus.owfn \
 	    LF_DF_controllable.owfn \
 	    nLF_DF_controllable.owfn \
-	    LF_DF_controllable2.owfn
+	    LF_DF_controllable2.owfn \
+	    smartSendingEvent.owfn smartSendingEvent.fiona.og
 
 
 #############################################################################

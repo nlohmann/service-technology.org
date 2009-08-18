@@ -1,0 +1,55 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  p1,		
+  p2,
+  p3,
+  p4,
+  p5;
+
+INPUT
+  a;
+
+OUTPUT
+  b,
+  c;
+
+INITIALMARKING
+  p1:	1
+ ;
+
+FINALCONDITION
+  (p4=1 AND ALL_OTHER_PLACES_EMPTY) OR (p5=1 AND ALL_OTHER_PLACES_EMPTY)
+ ;
+
+TRANSITION t1	 { ?a }
+CONSUME
+  p1:	1,
+  a: 1;	 
+PRODUCE
+  p2:	1;
+
+TRANSITION t2	 { !c }
+CONSUME
+  p2: 1;
+PRODUCE
+  p4:	1,
+  c: 1;
+
+TRANSITION t3	 { !b }
+CONSUME
+  p1:	1;
+PRODUCE
+  p3:	1,
+  b: 1;
+
+TRANSITION t4	 { !c }
+CONSUME
+  p3:	1;
+PRODUCE
+  c:	1,
+  p5 : 1;
+ 
+
+{ END OF FILE }

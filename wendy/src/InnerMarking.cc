@@ -111,7 +111,6 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
     if (stats_markings % 50000 == 0) {
         fprintf(stderr, "%8d inner markings\n", stats_markings);
     }
-
     assert(_labels.size() == out_degree);
     assert (out_degree < UCHAR_MAX);
 
@@ -123,6 +122,18 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
 
     // knowing all successors, we can determine the type of the marking
     determineType();
+
+    // and we can make an approximation of the receiving transitions that are reachable from here
+    if (args_info.smartSendingEvent_flag) {
+		// we reserve a boolean value for each sending event possible
+		reachableSendingEvents = new bool[1 + Label::last_send - Label::first_send];
+
+		for (uint8_t i = 0; i < Label::send_events; i++) {
+			reachableSendingEvents[i] = not args_info.lf_flag;
+		}
+
+		calcReachableSendingEvents();
+    }
 }
 
 
@@ -191,6 +202,15 @@ inline void InnerMarking::determineType() {
             }
         }
 
+        if (args_info.lf_flag) {
+            is_final_marking_reachable = is_final;
+
+            if (not is_final_marking_reachable and markingMap[successors[i]] != NULL and markingMap[successors[i]]->is_final_marking_reachable) {
+            	is_final_marking_reachable = 1;
+			}
+
+        }
+
         // a tau or sending (sic!) transition makes this marking transient
         if (SILENT(labels[i]) or RECEIVING(labels[i])) {
             is_transient = true;
@@ -227,4 +247,47 @@ bool InnerMarking::waitstate(const Label_ID &l) const {
     }
 
     return false;
+}
+
+
+/*
+ * \brief determines which sending events are potentially reachable from this marking
+ */
+void InnerMarking::calcReachableSendingEvents() {
+
+	assert(args_info.smartSendingEvent_flag);
+
+	if (out_degree > 0) {
+		/* traverse successors */
+
+		/* traverse through list of sending events */
+		for (Label_ID e = 0; e < Label::send_events; e++) {
+
+			bool foundIt = false;
+
+			/* check if there exists at least one successor from which this sending event is reachable */
+			for (uint8_t i = 0; i < out_degree; i++) {
+
+				InnerMarking_ID successor = successors[i];
+
+				uint8_t currentLabel = labels[i] - (Label::last_receive + 1);
+
+				if (InnerMarking::markingMap[successor]->reachableSendingEvents[e] or currentLabel == e) {
+					foundIt = true;
+					break;
+				}
+			}
+
+			/* no, this sending event is not reachable */
+			if (foundIt) {
+				reachableSendingEvents[e] = true;
+			} else {
+				reachableSendingEvents[e] = false;
+			}
+	   }
+	} else if (not args_info.lf_flag){    /* no successors, no receiving transitions reachable */
+		for (uint8_t e = 0; e < Label::send_events; e++) {
+			reachableSendingEvents[e] = false;
+		}
+	}
 }

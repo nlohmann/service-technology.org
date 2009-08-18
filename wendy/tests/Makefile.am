@@ -20,6 +20,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             bug13718.owfn \
             bug13994-1.owfn bug13994-2.owfn \
             bug14025.owfn \
+            bug14150.owfn \
             carreservation_with_engine.owfn \
             error02.owfn \
             error03.owfn \

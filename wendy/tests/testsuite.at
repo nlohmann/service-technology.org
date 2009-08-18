@@ -30,7 +30,7 @@ AT_SETUP([Piping from stdin])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([cat myCoffee.owfn | WENDY --verbose --og],0,ignore,ignore)
-AT_CHECK([test -f wendy_output.og],0)
+AT_CHECK([test -f wendy_output.og])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -38,9 +38,9 @@ AT_SETUP([Given output filenames])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([WENDY myCoffee.owfn --og=foo.og --dot=bar.dot --mi=baz.mi --verbose],0,ignore,ignore)
-AT_CHECK([test -f foo.og],0)
-AT_CHECK([test -f bar.dot],0)
-AT_CHECK([test -f baz.mi],0)
+AT_CHECK([test -f foo.og])
+AT_CHECK([test -f bar.dot])
+AT_CHECK([test -f baz.mi])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -156,7 +156,7 @@ AT_SETUP([Bug 1])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug1.* .])
 AT_CHECK([WENDY bug1.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug1.og bug1.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -165,7 +165,7 @@ AT_SETUP([Bug 2])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug2.* .])
 AT_CHECK([WENDY bug2.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 1 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug2.og bug2.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -174,7 +174,7 @@ AT_SETUP([Bug 3])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug3.* .])
 AT_CHECK([WENDY bug3.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 1 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug3.og bug3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -183,7 +183,7 @@ AT_SETUP([Bug 4])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug4.* .])
 AT_CHECK([WENDY bug4.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 3 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 3 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug4.og bug4.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -192,7 +192,7 @@ AT_SETUP([Bug 5])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug5.* .])
 AT_CHECK([WENDY bug5.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 4 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 4 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug5.og bug5.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -201,7 +201,7 @@ AT_SETUP([Bug 6])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug6.* .])
 AT_CHECK([WENDY bug6.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 1 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug6.og bug6.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -226,7 +226,7 @@ AT_SETUP([Bug 9])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug9.* .])
 AT_CHECK([WENDY bug9.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 13 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 13 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence bug9.og bug9.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -235,7 +235,7 @@ AT_SETUP([Bug 13651 (https://gna.org/bugs/?13651)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13651.owfn .])
 AT_CHECK([WENDY bug13651.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -243,7 +243,7 @@ AT_SETUP([Bug 13718 (https://gna.org/bugs/?13718)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13718.owfn .])
 AT_CHECK([WENDY bug13718.owfn --verbose --og --formula=2],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 8 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 8 nodes left" stderr])
 AT_CHECK([GREP -c ":: S" bug13718.og],0,[4
 ])
 AT_CHECK([GREP -c ":: F" bug13718.og],0,[4
@@ -255,7 +255,7 @@ AT_SETUP([Bug 13903 (https://gna.org/bugs/?13903)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([WENDY myCoffee.owfn --verbose --og --tmpfile=foo-XXXXXX],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 7 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 7 nodes left" stderr])
 AT_CHECK([test -f foo-*.lola])
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -264,12 +264,12 @@ AT_SETUP([Bug 13994 (https://gna.org/bugs/?13994)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13994-1.owfn .])
 AT_CHECK([WENDY bug13994-1.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr],0)
-AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr],0)
+AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr])
 AT_CHECK([cp TESTFILES/bug13994-2.owfn .])
 AT_CHECK([WENDY bug13994-2.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr],0)
-AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr],0)
+AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -277,9 +277,24 @@ AT_SETUP([Bug 14025 (https://gna.org/bugs/?14025)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug14025.owfn .])
 AT_CHECK([WENDY bug14025.owfn --verbose --dot --og],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 5 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 5 nodes left" stderr])
 AT_CHECK([GREP -c "\->" bug14025.dot],0,[5
 ])
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Known Bugs])
+############################################################################
+
+AT_SETUP([Bug 14150 (https://gna.org/bugs/?14150)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14150.owfn .])
+AT_CHECK([WENDY bug14150.owfn --verbose --og],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -q "0 : true" bug14150.og],1)
+AT_XFAIL_IF(true)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -292,7 +307,7 @@ AT_SETUP([Coffee Automaton])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.* .])
 AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 7 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 7 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence myCoffee.og myCoffee.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -301,7 +316,7 @@ AT_SETUP([Dining Philosophers])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
 AT_CHECK([WENDY phcontrol3.unf.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 67 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 67 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -310,7 +325,7 @@ AT_SETUP([Purchase Order Process])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
 AT_CHECK([WENDY PO.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 168 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 168 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence PO.og PO.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -319,7 +334,7 @@ AT_SETUP([Sequence])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/sequence10.* .])
 AT_CHECK([WENDY sequence10.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 1024 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 1024 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence sequence10.og sequence10.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -328,7 +343,7 @@ AT_SETUP([SMTP Protocol])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smtp3.* .])
 AT_CHECK([WENDY smtp3.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 474 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 474 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence smtp3.og smtp3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -337,7 +352,7 @@ AT_SETUP([Travel Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/T2.* .])
 AT_CHECK([WENDY T2.owfn --fionaFormat --og --verbose --messagebound=2],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 192 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 192 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence T2.og T2.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -346,7 +361,7 @@ AT_SETUP([ZEUS Seller Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/zeus.* .])
 AT_CHECK([WENDY zeus.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 6 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 6 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence zeus.og zeus.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -498,7 +513,7 @@ AT_SETUP([Philosophers])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/phil5.owfn .])
 AT_CHECK([WENDY phil5.owfn --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 721 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 721 nodes left" stderr])
 AT_CHECK([GREP -c "\->" phil5.og],0,[7200
 ])
 AT_KEYWORDS(synchronous)
@@ -508,7 +523,7 @@ AT_SETUP([Car Reservation])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/carreservation_with_engine.owfn .])
 AT_CHECK([WENDY carreservation_with_engine.owfn --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 309 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 309 nodes left" stderr])
 AT_CHECK([GREP -c "\->" carreservation_with_engine.og],0,[6510
 ])
 AT_KEYWORDS(synchronous)
@@ -518,7 +533,7 @@ AT_SETUP([Test net])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test-sync.owfn .])
 AT_CHECK([WENDY test-sync.owfn --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 13 nodes left" stderr],0)
+AT_CHECK([GREP -q "wendy: 13 nodes left" stderr])
 AT_CHECK([GREP -c "\->" test-sync.og],0,[154
 ])
 AT_KEYWORDS(synchronous)

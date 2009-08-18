@@ -12,6 +12,7 @@
 
 @item added test cases for livelock freedom
 
+@item fixed bug #14150 (@url{https://gna.org/bugs/?14150}): empty node is only printed if it is reachable from the initial node
 @end itemize
 
 

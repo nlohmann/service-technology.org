@@ -93,11 +93,14 @@ class StoredKnowledge {
 
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
-
+        
     private: /* static attributes */
 
         /// number of markings stored
         static int entries_count;
+
+        /// whether the empty node is reachable from the initial node
+        static bool emptyNodeReachable;
 
         /// nodes that should be deleted
         static std::set<StoredKnowledge*> deletedNodes;

@@ -28,6 +28,8 @@ Version 1.9-unreleased
 
 * added test cases for livelock freedom
 
+* fixed bug #14150 (`https://gna.org/bugs/?14150'): empty node is only
+  printed if it is reachable from the initial node
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

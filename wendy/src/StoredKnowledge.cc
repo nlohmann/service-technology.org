@@ -58,6 +58,7 @@ std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
 std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
 std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
+bool StoredKnowledge::emptyNodeReachable = false;
 
 
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
@@ -455,8 +456,6 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
  \todo  Only print empty node if it is actually reachable.
 */
 void StoredKnowledge::dot(std::ofstream &file) {
-    bool emptyNodeReachable = false;
-
     file << "digraph G {\n"
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
@@ -579,6 +578,7 @@ void StoredKnowledge::print(std::ofstream &file) const {
                  << "\n";
         } else {
             if (successors[l-1] == empty and not args_info.sa_given) {
+                emptyNodeReachable = true;
                 file << "    " << Label::id2name[l] << " -> 0\n";
             }
         }
@@ -657,7 +657,7 @@ void StoredKnowledge::output(std::ofstream &file) {
     }
 
     // print empty node unless we print an automaton
-    if (not args_info.sa_given) {
+    if (not args_info.sa_given and emptyNodeReachable) {
         // the empty node
         file << "  0";
         if (args_info.formula_arg == formula_arg_cnf) {

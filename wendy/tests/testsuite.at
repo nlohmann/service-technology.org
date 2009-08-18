@@ -2,8 +2,7 @@ AT_INIT
 
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_LOLASTATESPACE, [
-  AT_CHECK([echo "" | LOLA -h],3,stdout,ignore)
-  AT_CHECK([if `GREP -q "STATESPACE" stdout`; then true; else exit 77; fi])
+  AT_CHECK([if `echo "" | LOLA -h | GREP -q "STATESPACE"`; then true; else exit 77; fi],0,ignore,ignore)
 ])
 
 AT_TESTED(versions.sh)

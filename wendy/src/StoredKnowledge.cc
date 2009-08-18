@@ -48,6 +48,7 @@ unsigned int StoredKnowledge::stats_hashCollisions = 0;
 unsigned int StoredKnowledge::stats_storedKnowledges = 0;
 unsigned int StoredKnowledge::stats_storedEdges = 0;
 unsigned int StoredKnowledge::stats_maxInterfaceMarkings = 0;
+unsigned int StoredKnowledge::stats_builtInsaneNodes = 0;
 size_t StoredKnowledge::stats_maxBucketSize = 1; // sic!
 StoredKnowledge* StoredKnowledge::root = NULL;
 StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
@@ -72,13 +73,13 @@ std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
  */
 inline bool StoredKnowledge::findKnowledgeInTarjanStack(StoredKnowledge *SK) {
 
-	for(std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
-		if(SK == *it) {
-			return true;
-		}
-	}
+    for(std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
+        if(SK == *it) {
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 /*!
@@ -114,12 +115,15 @@ inline StoredKnowledge * StoredKnowledge::process(const Knowledge* const K, Stor
 
         // evaluate the storage result
         if (SK_store == SK_new) {
-        	// the node was new, so check its successors
+            // the node was new, so check its successors
             processRecursively(K_new, SK_store);
         } else {
-        	// we did not find new knowledge
+            // we did not find new knowledge
             delete SK_new;
         }
+    } else {
+        // the node was not sane -- count it
+        ++stats_builtInsaneNodes;
     }
 
     // we saw K_new's successors
@@ -148,42 +152,42 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
     // LIVELOCK FREEDOM
     if (args_info.lf_flag) {
-    	// save Tarjan's values
-    	SK->dfs = SK->lowlink = stats_storedKnowledges;
+        // save Tarjan's values
+        SK->dfs = SK->lowlink = stats_storedKnowledges;
 
-		// it is new, so put it on the Tarjan stack
-		tarjanStack.push_back(SK);
+        // it is new, so put it on the Tarjan stack
+        tarjanStack.push_back(SK);
 
-	    // traverse the current knowledge to find out if this knowledge is final
-	    for (unsigned int i = 0; i < SK->size; i++) {
-			if (InnerMarking::inner_markings[SK->inner[i]]->is_final) {
-				bool interfaceUnmarked = true;
-				if (not SK->interface[i]->unmarked()) {
-					interfaceUnmarked = false;
-				}
-		    	if (interfaceUnmarked) {
-		    		SK->is_final_reachable = 1;
-		    	}
-			}
-	    }
+        // traverse the current knowledge to find out if this knowledge is final
+        for (unsigned int i = 0; i < SK->size; i++) {
+            if (InnerMarking::inner_markings[SK->inner[i]]->is_final) {
+                bool interfaceUnmarked = true;
+                if (not SK->interface[i]->unmarked()) {
+                    interfaceUnmarked = false;
+                }
+                if (interfaceUnmarked) {
+                    SK->is_final_reachable = 1;
+                }
+            }
+        }
     }
 
     // reduction rule: sequentialize receiving events
     map<Label_ID, bool> consideredReceivingEvents;
 
-	if (args_info.seqReceivingEvents_flag) {
-		// calculate those receiving events that are essential to resolve each and every waitstate
-		K->sequentializeReceivingEvents(consideredReceivingEvents);
-	}
+    if (args_info.seqReceivingEvents_flag) {
+        // calculate those receiving events that are essential to resolve each and every waitstate
+        K->sequentializeReceivingEvents(consideredReceivingEvents);
+    }
 
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
-    	// reduction rule: sequentialize receiving events
-    	// if current receiving event is not to be considered, continue
-    	if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not consideredReceivingEvents[l]) {
-    		continue;
-    	}
+        // reduction rule: sequentialize receiving events
+        // if current receiving event is not to be considered, continue
+        if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not consideredReceivingEvents[l]) {
+            continue;
+        }
 
         // reduction rule: receive before send
         if (args_info.receiveBeforeSend_flag) {
@@ -205,64 +209,64 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         // LIVELOCK FREEDOM
         // a sane knowledge has been found
         if (args_info.lf_flag and SK_new != NULL) {
-        	// new node's successor has been computed, so adjust Tarjan values of current node
-        	if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
-        		SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
-        	} else {
-				SK->lowlink = MINIMUM(SK->lowlink, SK_new->lowlink);
-        	}
+            // new node's successor has been computed, so adjust Tarjan values of current node
+            if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
+                SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
+            } else {
+                SK->lowlink = MINIMUM(SK->lowlink, SK_new->lowlink);
+            }
 
-        	// from successor knowledge a final knowledge is reachable
-        	if (SK_new->is_final_reachable) {
-        		SK->is_final_reachable = 1;
-        	}
+            // from successor knowledge a final knowledge is reachable
+            if (SK_new->is_final_reachable) {
+                SK->is_final_reachable = 1;
+            }
         }
 
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
         // TODO what about synchronous events?
         if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat()) {
-        	if (not args_info.lf_flag or SK->is_final_reachable) {
-        		l = Label::first_sync;
-        	}
+            if (not args_info.lf_flag or SK->is_final_reachable) {
+                l = Label::first_sync;
+            }
         }
     }
 
     // LIVELOCK FREEDOM
-	// we have traversed through the reachability graph of the current knowledge
-	// check, if the current knowledge is a representative of a SCC
-	// if so, get all knowledges within the SCC
-	if (args_info.lf_flag and SK->lowlink == SK->dfs) {
+    // we have traversed through the reachability graph of the current knowledge
+    // check, if the current knowledge is a representative of a SCC
+    // if so, get all knowledges within the SCC
+    if (args_info.lf_flag and SK->lowlink == SK->dfs) {
 
-		// if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
-		if (not SK->is_final_reachable) {
-			// TODO: current knowledge is not sane, so delete it right here
-		}
+        // if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
+        if (not SK->is_final_reachable) {
+            // TODO: current knowledge is not sane, so delete it right here
+        }
 
-		// node which has just been popped from Tarjan stack
-		StoredKnowledge * poppedSK;
+        // node which has just been popped from Tarjan stack
+        StoredKnowledge * poppedSK;
 
-		do {
-			if (tarjanStack.empty()) {
-				continue;
-			}
-			// get last element
-			poppedSK = tarjanStack.back();
-			// delete last element from stack
-			tarjanStack.pop_back();
+        do {
+            if (tarjanStack.empty()) {
+                continue;
+            }
+            // get last element
+            poppedSK = tarjanStack.back();
+            // delete last element from stack
+            tarjanStack.pop_back();
 
-			// propagate that a final knowledge is reachable from the current knowledge to the members of the current SCC
-			if (SK->is_final_reachable) {
-				poppedSK->is_final_reachable = 1;
-			} else {
-				poppedSK->is_final_reachable = 0;
+            // propagate that a final knowledge is reachable from the current knowledge to the members of the current SCC
+            if (SK->is_final_reachable) {
+                poppedSK->is_final_reachable = 1;
+            } else {
+                poppedSK->is_final_reachable = 0;
 
-				// TODO: current knowledge is not sane, so delete it right here
-			}
+                // TODO: current knowledge is not sane, so delete it right here
+            }
 
-		} while (SK != poppedSK);
-	}
+        } while (SK != poppedSK);
+    }
 
-	//printf("DEBUG: knowledge %d has lowlink %d, final reachable: %d\n", SK->dfs, SK->lowlink, SK->is_final_reachable);
+    //printf("DEBUG: knowledge %d has lowlink %d, final reachable: %d\n", SK->dfs, SK->lowlink, SK->is_final_reachable);
 }
 
 

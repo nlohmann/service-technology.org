@@ -346,7 +346,11 @@ int main(int argc, char** argv) {
     status("removed %d insane nodes (%3.2f%%) in %d iterations [%.0f sec]",
         redNodes, 100.0 * ((double)redNodes / (double)StoredKnowledge::stats_storedKnowledges),
         StoredKnowledge::stats_iterations, difftime(end_time, start_time));
-
+    if (redNodes != 0) {
+        status("%d insane nodes (%3.2f%%) were prematurely detected",
+            StoredKnowledge::stats_builtInsaneNodes,
+            100.0 * ((double)StoredKnowledge::stats_builtInsaneNodes / (double)redNodes));
+    }
     status("%d nodes left", StoredKnowledge::seen.size());
 
     // analyze root node

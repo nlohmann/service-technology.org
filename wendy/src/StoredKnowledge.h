@@ -73,6 +73,9 @@ class StoredKnowledge {
         /// the maximal number of interface markings per inner marking
         static unsigned int stats_maxInterfaceMarkings;
 
+        /// the number of nodes that were built, but immediately detected insane
+        static unsigned int stats_builtInsaneNodes;
+
         /// report every given knowledges
         static unsigned int reportFrequency;
 

@@ -232,9 +232,6 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
             // LIVELOCK FREEDOM
             // check, if from successor a final marking is still reachable
             if (not InnerMarking::inner_markings[m->successors[i]]->is_final_marking_reachable) {
-
-            	//printf("DEBUG: from %d no final marking is reachable\n", m->successors[i]);
-
             	is_sane = 0;
             	return;
             }
@@ -286,11 +283,13 @@ bool Knowledge::sendLeadsToInsaneNode(const Label_ID &l) const {
     for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
     	Label_ID labelID = l - (Label::last_receive + 1);
         if (not InnerMarking::inner_markings[pos->first]->reachableSendingEvents[labelID]) {
+
             return true;
         }
     }
     return false;
 }
+
 
 /*!
  \return whether each waitstate in the knowledge marks and output place, i.e.

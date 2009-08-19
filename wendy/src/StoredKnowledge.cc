@@ -104,6 +104,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
     // only process knowledges within the message bounds
     if (K_new->is_sane) {
+
         // create a compact version of the knowledge bubble
         StoredKnowledge *SK_new = new StoredKnowledge(K_new);
 
@@ -112,26 +113,30 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
+
         ++stats_storedEdges;
 
         // evaluate the storage result
         if (SK_store == SK_new) {
+
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
 
+            // LIVELOCK FREEDOM
             if (args_info.lf_flag) {
-                // LIVELOCK FREEDOM
                 // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
                 adjustLowlinkValue(SK, SK_store);
-
-                // from successor knowledge a final knowledge is reachable
-                if (SK_new->is_final_reachable) {
-                    SK->is_final_reachable = 1;
-                }
             }
         } else {
             // we did not find new knowledge
             delete SK_new;
+        }
+        // LIVELOCK FREEDOM
+        if (args_info.lf_flag) {
+            // from successor knowledge a final knowledge is reachable
+            if (SK_store->is_final_reachable) {
+                SK->is_final_reachable = 1;
+            }
         }
     } else {
         // the node was not sane -- count it
@@ -140,6 +145,29 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
     // we saw K_new's successors
     delete K_new;
+}
+
+/*
+ LIVELOCK FREEDOM
+
+ \brief set all values needed for Tarjan algorithm and livelock freedom analysis
+ \param SK current knowledge
+ \note has to be called right after SK is created
+*/
+void StoredKnowledge::setTarjanValues() {
+
+    // save Tarjan's values
+    dfs = lowlink = stats_storedKnowledges;
+
+    // it is new, so put it on the Tarjan stack
+    tarjanStack.push_back(this);
+
+    // traverse the current knowledge to find out if this knowledge is final
+    for (unsigned int i = 0; i < size; i++) {
+        if (InnerMarking::inner_markings[inner[i]]->is_final) {
+            is_final_reachable = interface[i]->unmarked();
+        }
+    }
 }
 
 
@@ -171,7 +199,7 @@ inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
 
     // check, if the current knowledge is a representative of a SCC
     // if so, get all knowledges within the SCC
-    if (args_info.lf_flag and SK->lowlink == SK->dfs) {
+    if (SK->lowlink == SK->dfs) {
 
         // if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
         if (not SK->is_final_reachable) {
@@ -218,28 +246,6 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
     if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
             stats_storedKnowledges, stats_storedEdges);
-    }
-
-    // LIVELOCK FREEDOM
-    if (args_info.lf_flag) {
-        // save Tarjan's values
-        SK->dfs = SK->lowlink = stats_storedKnowledges;
-
-        // it is new, so put it on the Tarjan stack
-        tarjanStack.push_back(SK);
-
-        // traverse the current knowledge to find out if this knowledge is final
-        for (unsigned int i = 0; i < SK->size; i++) {
-            if (InnerMarking::inner_markings[SK->inner[i]]->is_final) {
-                bool interfaceUnmarked = true;
-                if (not SK->interface[i]->unmarked()) {
-                    interfaceUnmarked = false;
-                }
-                if (interfaceUnmarked) {
-                    SK->is_final_reachable = 1;
-                }
-            }
-        }
     }
 
     // reduction rule: sequentialize receiving events
@@ -505,7 +511,10 @@ void StoredKnowledge::dot(std::ofstream &file) {
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
-                //file << it->second[i]->dfs << " (" << it->second[i]->lowlink << ") f:" << it->second[i]->is_final_reachable << "\\n";
+//                file << it->second[i]->dfs
+//                     << ", l:" << it->second[i]->lowlink
+//                     << ", f:" << it->second[i]->is_final_reachable
+//                     << "\\n";
 
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->size; ++j) {
@@ -965,6 +974,11 @@ StoredKnowledge *StoredKnowledge::store() {
 
     // we need to store this object
     hashTree[myHash].push_back(this);
+
+    // LIVELOCK FREEDOM
+    if (args_info.lf_flag) {
+        setTarjanValues();
+    }
 
     ++stats_storedKnowledges;
 

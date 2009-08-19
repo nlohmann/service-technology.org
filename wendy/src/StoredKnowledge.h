@@ -139,6 +139,10 @@ class StoredKnowledge {
         /// stores this object in the hash tree and returns a pointer to the result
         StoredKnowledge *store();
 
+        /// LIVELOCK FREEDOM
+        // set values needed for Tarjan algorithm and livelock freedom analysis
+        void setTarjanValues();
+
     private: /* member functions */
 
         /// adds a successor knowledge

@@ -840,7 +840,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
 
     // check this knowledge for covering nodes
     if (args_info.cover_given) {
-      Cover::checkKnowledge(this, K->bubble);
+        Cover::checkKnowledge(this, K->bubble);
     }
 }
 
@@ -862,8 +862,9 @@ StoredKnowledge::~StoredKnowledge() {
 
     delete[] inner;
 
-    if(args_info.cover_given)
-      Cover::removeKnowledge(this);
+    if(args_info.cover_given) {
+        Cover::removeKnowledge(this);
+    }
 }
 
 
@@ -1124,8 +1125,11 @@ string StoredKnowledge::formula() const {
         assert(false);
     }
 
+
+    // required for diagnose mode in which a non-final node might have no
+    // successors
     if (formula.empty()) {
-    	formula = "false";
+        formula = "false";
     }
 
     return formula;

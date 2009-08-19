@@ -198,8 +198,9 @@ transitions:
 | transitions NAME ARROW NUMBER
     { 
       currentLabels.push_back(Label::name2id[NAME_token]);
-      if(args_info.cover_given)
-        currentTransitions.insert(NAME_token);
+      if(args_info.cover_given) {
+          currentTransitions.insert(NAME_token);
+      }
       currentSuccessors.push_back($4); 
     }
 ;

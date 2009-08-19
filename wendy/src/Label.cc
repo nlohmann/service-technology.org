@@ -65,8 +65,9 @@ void Label::initialize() {
         ++events;
         ++receive_events;
         id2name[events] = (*p)->getName();
-        if(args_info.cover_given)
-          Cover::labelCache[(*p)->getName()] = events;
+        if (args_info.cover_given) {
+            Cover::labelCache[(*p)->getName()] = events;
+        }
 
         const set<Node*> preset( (*p)->getPreset() );
         for (set<Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
@@ -86,8 +87,9 @@ void Label::initialize() {
         ++events;
         ++send_events;
         id2name[events] = (*p)->getName();
-        if(args_info.cover_given)
-          Cover::labelCache[(*p)->getName()] = events;
+        if (args_info.cover_given) {
+            Cover::labelCache[(*p)->getName()] = events;
+        }
 
         const set<Node*> postset( (*p)->getPostset() );
         for (set<Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {

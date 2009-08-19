@@ -26,6 +26,7 @@
 #include <iostream>
 #include "Knowledge.h"
 #include "Label.h"
+#include "cmdline.h"
 
 using std::map;
 using std::vector;

@@ -37,19 +37,6 @@ void Graph::removeInefficientNodesAndEvents() {
             ++i;
         }
     }
-
-    // remove unused events
-    for ( map< string, Event* >::iterator i = events.begin();
-          i != events.end(); ) { // increment inside because of erase
-
-        // remove non-flaged event
-        if ( not (i->second)->flag ) {
-            // the erase returns incremented iterator, which is invalid for last element
-            events.erase( i++ );
-        } else {
-            ++i;
-        }
-    }
 }
 
 

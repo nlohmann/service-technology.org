@@ -3,23 +3,7 @@
 
 
 
-//! \brief constructor (three parameters)
-//! \param _number the number of this node
-//Node::Node(unsigned int _id) :
-//    id(_id),
-//    final(false),
-//    flag(false) {
-//}
-
-
-//! \brief destructor
-//Node::~Node() {
-//
-//    successors.clear();
-//}
-
-
-// TODO rename
+// set flag for this node and all successor nodes
 void Node::setFlagRecursively(bool _flag) {
 
     flag = _flag;
@@ -27,12 +11,6 @@ void Node::setFlagRecursively(bool _flag) {
           i != successors.end(); ++i ) {
 
         if ( (i->first)->flag != _flag ) {
-
-            for ( list<Event*>::const_iterator j = i->second.begin();
-                  j != i->second.end(); ++j ) {
-
-                (*j)->flag = _flag;
-            }
 
             (i->first)->setFlagRecursively(_flag);
         }

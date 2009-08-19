@@ -105,6 +105,7 @@ void PossibleSendEvents::operator&=(const PossibleSendEvents &other) {
 
 void PossibleSendEvents::labelPossible(Label_ID l) {
     assert(storage != NULL);
+    assert(SENDING(l));
 
     unsigned int myByte = (l - Label::first_send) / 8;
     unsigned int myBit  = (l - Label::first_send) % 8;

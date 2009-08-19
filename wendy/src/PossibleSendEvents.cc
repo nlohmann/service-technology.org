@@ -18,6 +18,9 @@
 \*****************************************************************************/
 
 
+#include "config.h"
+#include <cassert>
+
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
 #include "Label.h"

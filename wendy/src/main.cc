@@ -33,6 +33,7 @@
 #include "config.h"
 #include "config-log.h"
 #include "StoredKnowledge.h"
+#include "PossibleSendEvents.h"
 #include "Label.h"
 #include "Cover.h"
 #include "verbose.h"
@@ -211,6 +212,7 @@ int main(int argc, char** argv) {
     `--------------------------------------------*/
     Label::initialize();
     InterfaceMarking::initialize(args_info.messagebound_arg);
+    PossibleSendEvents::initialize();
 
 
     /*----------------------------.
@@ -426,6 +428,7 @@ int main(int argc, char** argv) {
         status("wrote migration information to file '%s' [%.0f sec]",
             im_filename.c_str(), difftime(end_time, start_time));
     }
+
 
     return EXIT_SUCCESS;
 }

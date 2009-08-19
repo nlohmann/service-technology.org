@@ -11,6 +11,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 InnerMarking.h InnerMarking.cc \
                 Knowledge.h Knowledge.cc \
                 StoredKnowledge.h StoredKnowledge.cc \
+                PossibleSendEvents.h PossibleSendEvents.cc \
                 Cover.h Cover.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h

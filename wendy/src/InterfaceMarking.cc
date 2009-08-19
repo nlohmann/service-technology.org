@@ -31,16 +31,6 @@
 extern gengetopt_args_info args_info;
 
 
-/*! \def LOG2(i)
-    \brief base 2 logarithm as lookup */
-#define LOG2(i) ((i <   2) ? 1 : \
-                ((i <   4) ? 2 : \
-                ((i <   8) ? 3 : \
-                ((i <  16) ? 4 : \
-                ((i <  32) ? 5 : \
-                ((i <  64) ? 6 : \
-                ((i < 128) ? 7 : 8 )))))))
-
 
 /******************
  * STATIC MEMBERS *

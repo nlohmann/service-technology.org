@@ -1,23 +1,67 @@
+/*****************************************************************************\
+ Wendy -- Calculating Operating Guidelines
+
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+
+ Wendy is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
+
+#ifndef _POSSIBLESENDEVENTS_H
+#define _POSSIBLESENDEVENTS_H
 
 #include "Label.h"
 
 class PossibleSendEvents {
+    public: /* static functions */
 
-private:
+        /// initializes the class PossibleSendEvents
+        static void initialize();
 
-    /// a byte array to store the possible sending events
-    uint8_t *storage;
+    private: /* static attributes */
 
-public:
+        /// the number of bytes needed
+        static unsigned int bytes;
 
-	PossibleSendEvents operator&& (const PossibleSendEvents &);
+    public: /* member functions */
 
-	/// returns array of all sending events (possible or not)
-	char * decode();
+        /// constructor
+        PossibleSendEvents();
 
-	/// constructor; initially, all sending events are not reachable
-	PossibleSendEvents();
+        /// copy constructor
+        PossibleSendEvents(const PossibleSendEvents &);
 
-	void labelPossible(Label_ID l);
+        /// destructor; also cleans decodedLabels
+        ~PossibleSendEvents();
 
+        /// overloaded bit-wise AND operator
+        void operator&=(const PossibleSendEvents &);
+
+        /// set a label to be possible
+        void labelPossible(Label_ID l);
+
+        /// returns array of all sending events (possible or not)
+        char * decode();
+
+    private: /* member functions */
+
+        /// a byte array to store the possible sending events
+        uint8_t *storage;
+
+        /// array of all sending events (possible or not); built by decode()
+        char * decodedLabels;
 };
+
+#endif
+

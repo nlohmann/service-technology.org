@@ -86,6 +86,38 @@ AT_CHECK([GREP -q "read a 2-bit annotation; only formulae are supported" stderr]
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([ogfile with incomplete interface])
+AT_CHECK([cp TESTFILES/error_incomplete_interface.og .])
+AT_CHECK([cp TESTFILES/costOG2.cf .])
+AT_CHECK([CANDY --input=error_incomplete_interface.og --output=c.og --costfile=costOG2.cf], 1, ignore, stderr)
+AT_CHECK([GREP -q "read a successor with unknown event" stderr], 0, ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+# this is no problem
+AT_SETUP([ogfile with overfull interface])
+AT_CHECK([cp TESTFILES/error_overfull_interface.og .])
+AT_CHECK([cp TESTFILES/error_overfull.cf .])
+AT_CHECK([CANDY --input=error_overfull_interface.og --output=c.og --costfile=error_overfull.cf], 0, ignore, stderr)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([ogfile with incomplete nodes])
+AT_CHECK([cp TESTFILES/error_incomplete_nodes.og .])
+AT_CHECK([cp TESTFILES/costOG2.cf .])
+AT_CHECK([CANDY --input=error_incomplete_nodes.og --output=c.og --costfile=costOG2.cf], 1, ignore, stderr)
+AT_CHECK([GREP -q "read a successor which is not declared" stderr], 0, ignore)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+# this is no problem
+AT_SETUP([ogfile with overfull nodes])
+AT_CHECK([cp TESTFILES/error_overfull_nodes.og .])
+AT_CHECK([cp TESTFILES/costOG2.cf .])
+AT_CHECK([CANDY --input=error_overfull_nodes.og --output=c.og --costfile=costOG2.cf], 0, ignore, stderr)
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 AT_SETUP([incomplete costfile])
 AT_CHECK([cp TESTFILES/costOG2.og .])
 AT_CHECK([cp TESTFILES/error_incomplete.cf .])

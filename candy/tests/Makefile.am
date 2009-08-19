@@ -10,6 +10,10 @@ EXTRA_DIST = testsuite.at wrap.sh \
              testfiles/costOG2.cf \
              testfiles/costOG2.owfn \
              testfiles/costOG2_expected.og \
+             testfiles/error_incomplete_interface.og \
+             testfiles/error_overfull_interface.og \
+             testfiles/error_incomplete_nodes.og \
+             testfiles/error_overfull_nodes.og \
              testfiles/error_incomplete.cf \
              testfiles/error_overfull.cf \
              testfiles/error_repetitions.cf \

@@ -7,7 +7,7 @@
 
 INTERFACE
   OUTPUT
-    a1, a2, b1, b2, b3, b4;
+    a1, b1, b2, b3, b4; { event a2 is missing }
 
 NODES
   890016 : (a1 + a2 + b1 + b2 + b3 + b4)

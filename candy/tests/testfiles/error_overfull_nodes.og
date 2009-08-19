@@ -42,3 +42,7 @@ NODES
     b2 -> 0
     b3 -> 0
     b4 -> 0
+  1 : true { unused nodes }
+  2 : false
+  3 : true + false
+  4 : true * false

@@ -81,6 +81,18 @@ og:
     currentSuccessor = NULL;
   }
   nodes
+  {
+    for ( map< unsigned int, Node* >::const_iterator i = parsedOG->nodes.begin();
+          i != parsedOG->nodes.end(); ++i ) {
+
+        // if a successor node was created but not declared
+        // it has no formula thanks to the node's constructor
+        if ( (i->second)->formula == NULL ) {
+            og_yyerror("read a successor which is not declared");
+            exit(EXIT_FAILURE);
+        }
+    }
+  }
 ;
 
 
@@ -173,7 +185,7 @@ node:
     }
     
     // first found node is per definition the root node
-    if ( !foundRootNode ) {
+    if ( not foundRootNode ) {
         foundRootNode = true;
         parsedOG->root = currentNode;
     }
@@ -261,13 +273,14 @@ successors:
     if ( i != parsedOG->nodes.end() ) {
         currentSuccessor = i->second;
     } else {
+        // we create the successor as new node with formula NULL
         //cerr << "PARSER: read new node '" << $4 << "' as successor from '" << currentNode->getID() << "'" << endl;
         currentSuccessor = new Node($4);
         parsedOG->nodes[$4] = currentSuccessor;
     }
 
     // register successor node as successor
-    // TODO do we allow more than one equal successors with different events?
+    // we allow more than one equal successors with different events, just
     // remember the empty node ...
     //if ( currentNode->successors.find(currentSuccessor) == currentNode->successors.end() ) {
         map< string, Event* >::const_iterator j = parsedOG->events.find($2);

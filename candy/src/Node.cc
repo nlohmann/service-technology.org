@@ -267,7 +267,6 @@ void Node::outputDebugRecursively(std::ostream& file, map<Node*, bool>& printed)
 }
 
 
-// WARNING: fails for cyclic og
 void Node::output(std::ostream& file, map<Node*, bool>& printed, bool isRootNode) {
 
     assert(formula != NULL);

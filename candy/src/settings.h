@@ -50,4 +50,5 @@ extern gengetopt_args_info args_info;
 // macros for debugging purposes
 #define DEBUG if (args_info.debug_flag) { cerr <<
 #define INFO if (args_info.verbose_flag) { cout <<
+#define ERROR { cerr <<
 #define END << endl; }

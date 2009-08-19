@@ -1,12 +1,8 @@
 #ifndef EVENT_H_
 #define EVENT_H_
 
-#include <iostream>
-#include <string>
+#include "settings.h"
 
-using std::cout;
-using std::endl;
-using std::string;
 
 
 /// TODO comment
@@ -44,16 +40,18 @@ class Event {
         ~Event() {};
 
         /// print information about this event on std::cout
-        void printToStdout() {
-        	cout << "event '" << name << "', " << cost << ", ";
+        void outputDebug(std::ostream& file) {
+        	file << "event '" << name << "', " << cost << ", ";
         	if ( type == T_INPUT ) {
-        		cout << "input";
+        		file << "input";
         	} else if ( type == T_OUTPUT ) {
-        		cout << "output";
+        		file << "output";
+        	} else if ( type == T_SYNC ) {
+        		file << "sync";
         	} else {
-        		cout << "sync";
-        	}
-        	cout << ", " << (written ? "true" : "false") << endl;
+                file << "invalid";
+            }
+        	file << ", " << (written ? "true" : "false") << endl;
         };
 
 };

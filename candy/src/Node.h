@@ -54,11 +54,11 @@ class Node {
         		list< FormulaAssignment >&);
 
         /// print information about this node on std::cout
-        void printToStdout();
-        void printToStdoutRecursively();
+        void outputDebug(std::ostream&);
+        void outputDebugRecursively(std::ostream&, map<Node*, bool>&);
 
         /// TODO comment
-        void output(std::ostream&, bool);
+        void output(std::ostream&, map<Node*, bool>&, bool);
 
 
     private:

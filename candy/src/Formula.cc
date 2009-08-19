@@ -80,9 +80,7 @@ void FormulaMultiary::removeLiteral(const std::string& name) {
         // now we remove the clause that we have stored before from the formula
         // otherwise we would get a (false) when evaluating this formula -> this is not our intention
         subFormulas.erase(*iterOfListOfFormulaIterator);
-
     }
-
 }
 
 
@@ -132,17 +130,35 @@ void FormulaMultiary::deepCopyMultiaryPrivateMembersToNewFormula(FormulaMultiary
 }
 
 
-//! \brief returns the number of
-//! \return iterator to the begin of the subformula list
-int FormulaMultiary::size() const {
-    return subFormulas.size();
-}
-
-
 
 // ****************************************************************************
 // FormulaMultiaryAnd
 // ****************************************************************************
+
+//! \brief deep copies this formula
+//! \return returns copy
+FormulaMultiaryAnd* FormulaMultiaryAnd::getDeepCopy() const {
+
+    FormulaMultiaryAnd* newFormula = new FormulaMultiaryAnd(*this);
+    deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
+    return newFormula;
+}
+
+
+//! \brief computes and returns the value of this formula under the given
+//!        assignment
+//! \param assignment an assignment for the formulas literals
+//! \return true if the formula is true under the assginment, else false
+bool FormulaMultiaryAnd::value(const FormulaAssignment& assignment) const {
+    for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
+         currentFormula != subFormulas.end(); ++currentFormula) {
+        if ((*currentFormula)->value(assignment) != true ) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
 //! \brief turns the formula into a string
@@ -171,68 +187,79 @@ string FormulaMultiaryAnd::asString() const {
         return formulaString + ')';
     }
 }
-//! \brief computes and returns the value of this formula under the given
-//!        assignment
-//! \param assignment an assignment for the formulas literals
-//! \return true if the formula is true under the assginment, else false
-bool FormulaMultiaryAnd::value(const FormulaAssignment& assignment) const {
-    for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
-         currentFormula != subFormulas.end(); ++currentFormula) {
-        if ((*currentFormula)->value(assignment) != true ) {
-            return false;
-        }
-    }
-
-    return true;
-}
 
 
 //! \brief Returns the merged equivalent to this formula. Merging gets rid of
 //!        unnecessary nesting of subformulas. (a*(b*c)) becomes (a*b*c). The
 //!        caller is responsible for deleting the returned newly created formula.
 //! \return returns the merged equivalent
-FormulaMultiaryAnd* FormulaMultiaryAnd::merge() {
-    bool final = true;
+FormulaMultiaryAnd* FormulaMultiaryAnd::simplify() {
+
+    cerr << "in AND simplify of: '" << asString() << "'" << endl;
     FormulaMultiaryAnd *result = new FormulaMultiaryAnd;
 
-    for (FormulaMultiaryAnd::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
-        if (dynamic_cast<FormulaMultiaryAnd*>(*i)) {
-            final = false;
-            FormulaMultiaryAnd* temp = dynamic_cast<FormulaMultiaryAnd*>(*i);
-            for (FormulaMultiaryAnd::iterator j = temp->subFormulas.begin();
-                 j != temp->subFormulas.end(); j++) {
-                result->addSubFormula(dynamic_cast<Formula*>(*j)->getDeepCopy());
+    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
+
+        // simplify subformula
+        Formula* simplifiedSub = (*i)->simplify();
+
+        // check if subformula is a conjunction
+        FormulaMultiaryAnd* checkSub = dynamic_cast<FormulaMultiaryAnd*> (simplifiedSub);
+        if ( checkSub != NULL ) {
+
+            // copy all subformulas
+            for (subFormulas_t::iterator j = checkSub->subFormulas.begin(); j != checkSub->subFormulas.end(); j++) {
+                result->subFormulas.push_back( dynamic_cast<Formula*> (*j)->getDeepCopy() );
             }
+
+            // delete old simplified subformula
+            delete simplifiedSub;
+
         } else {
-            result->addSubFormula(dynamic_cast<Formula*>(*i)->getDeepCopy());
+
+            // adopt simplified subformula
+            result->subFormulas.push_back( simplifiedSub );
         }
     }
 
-    if (final) {
-        return result;
-    }
-
-    FormulaMultiaryAnd* oldResult = result;
-    result = result->merge();
-    delete oldResult;
     return result;
 }
 
 
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaMultiaryAnd* FormulaMultiaryAnd::getDeepCopy() const {
-
-    FormulaMultiaryAnd* newFormula = new FormulaMultiaryAnd(*this);
-    deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
-    return newFormula;
-}
+//FormulaMultiaryAnd* FormulaMultiaryAnd::simplify() {
+//    return merge();
+//}
 
 
 
 // ****************************************************************************
 // FormulaMultiaryOr
 // ****************************************************************************
+
+//! \brief deep copies this formula
+//! \return returns copy
+FormulaMultiaryOr* FormulaMultiaryOr::getDeepCopy() const {
+
+    FormulaMultiaryOr* newFormula =new FormulaMultiaryOr(*this);
+    deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
+    return newFormula;
+}
+
+
+//! \brief computes and returns the value of this formula under the given
+//!        assignment
+//! \param assignment an assignment for the formulas literals
+//! \return true if the formula is true under the assginment, else false
+bool FormulaMultiaryOr::value(const FormulaAssignment& assignment) const {
+    for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
+         currentFormula != subFormulas.end(); ++currentFormula) {
+        if ( (*currentFormula)->value(assignment) ) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 
 //! \brief turns the formula into a string
@@ -261,59 +288,73 @@ string FormulaMultiaryOr::asString() const {
 }
 
 
-//! \brief computes and returns the value of this formula under the given
-//!        assignment
-//! \param assignment an assignment for the formulas literals
-//! \return true if the formula is true under the assginment, else false
-bool FormulaMultiaryOr::value(const FormulaAssignment& assignment) const {
-    for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
-         currentFormula != subFormulas.end(); ++currentFormula) {
-        if ( (*currentFormula)->value(assignment) ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
 //! \brief Returns the merged equivalent to this formula. Merging gets rid of
 //!        unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
 //!        caller is responsible for deleting the returned newly created formula.
 //! \return returns the merged equivalent
-FormulaMultiaryOr* FormulaMultiaryOr::merge() {
-    bool final = true;
+//FormulaMultiaryOr* FormulaMultiaryOr::simplify() {
+//    bool final = true;
+//    FormulaMultiaryOr *result = new FormulaMultiaryOr;
+//
+//    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
+//        if ( dynamic_cast<FormulaMultiaryOr*>(*i) ) {
+//            final = false;
+//            FormulaMultiaryOr* temp = dynamic_cast<FormulaMultiaryOr*>(*i);
+//            for (subFormulas_t::iterator j = temp->subFormulas.begin();
+//                 j != temp->subFormulas.end(); j++) {
+//                result->subFormulas.push_back( dynamic_cast<Formula*> (*j)->getDeepCopy() );
+//            }
+//        } else {
+//            result->subFormulas.push_back( dynamic_cast<Formula*> (*i)->getDeepCopy() );
+//        }
+//    }
+//
+//    if (final) {
+//        return result;
+//    }
+//
+//    //FormulaMultiaryOr* oldResult = result;
+//    //result = result->merge();
+//    //delete oldResult;
+//    return result;
+//}
+
+
+FormulaMultiaryOr* FormulaMultiaryOr::simplify() {
+
+    cerr << "in OR simplify of: '" << asString() << "'" << endl;
     FormulaMultiaryOr *result = new FormulaMultiaryOr;
 
-    for (FormulaMultiaryOr::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
-        if (dynamic_cast<FormulaMultiaryOr*>(*i)) {
-            final = false;
-            FormulaMultiaryOr* temp = dynamic_cast<FormulaMultiaryOr*>(*i);
-            for (FormulaMultiaryOr::iterator j = temp->subFormulas.begin();
-                 j != temp->subFormulas.end(); j++) {
-                result->addSubFormula(dynamic_cast<Formula*>(*j)->getDeepCopy());
+    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
+
+        // simplify subformula
+        Formula* simplifiedSub = (*i)->simplify();
+
+        // check if subformula is a disjunction
+        FormulaMultiaryOr* checkSub = dynamic_cast<FormulaMultiaryOr*> (simplifiedSub);
+        if ( checkSub != NULL ) {
+
+            // copy all subformulas
+            for (subFormulas_t::iterator j = checkSub->subFormulas.begin(); j != checkSub->subFormulas.end(); j++) {
+                result->subFormulas.push_back( dynamic_cast<Formula*> (*j)->getDeepCopy() );
             }
+
+            // delete old simplified subformula
+            delete simplifiedSub;
+
         } else {
-            result->addSubFormula(dynamic_cast<Formula*>(*i)->getDeepCopy());
+
+            // adopt simplified subformula
+            result->subFormulas.push_back( simplifiedSub );
         }
     }
 
-    if (final) {
+    // TODO implement correct
+    //if ( result->size() == 1 ) {
+    //    FormulaMultiaryOr* newResult =  dynamic_cast<FormulaMultiaryOr*> (*(result->subFormulas).begin())->getDeepCopy();
+    //    delete result;
+    //    return newResult;
+    //} else {
         return result;
-    }
-
-    FormulaMultiaryOr* oldResult = result;
-    result = result->merge();
-    delete oldResult;
-    return result;
-}
-
-
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaMultiaryOr* FormulaMultiaryOr::getDeepCopy() const {
-
-    FormulaMultiaryOr* newFormula =new FormulaMultiaryOr(*this);
-    deepCopyMultiaryPrivateMembersToNewFormula(newFormula);
-    return newFormula;
+    //}
 }

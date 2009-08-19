@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     // which will check for unused and unnamed paramters
     // this will set the correct flags for the macros from settings.h
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-    	DEBUG "error in commandline parser" END
+    	ERROR "error in commandline parser" END
         exit(EXIT_FAILURE);
     }
 
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
         // open filestream
         og_yyin = fopen(args_info.input_arg, "r");
         if ( !og_yyin ) {
-            cerr << PACKAGE << ": failed to open input file '" << args_info.input_arg << "'" << endl;
+            ERROR "failed to open input file '" << args_info.input_arg << "'" END
             exit(EXIT_FAILURE);
         }
     } else {
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
         // open filestream
         cf_yyin = fopen( costfile.c_str(), "r");
         if ( !cf_yyin ) {
-            cerr << PACKAGE << ": failed to open costfile '" << costfile << "'" << endl;
+            ERROR "failed to open costfile '" << costfile << "'" END
             exit(EXIT_FAILURE);
         }
     } else if ( args_info.netfile_given ) {
@@ -105,12 +105,12 @@ int main(int argc, char** argv) {
         // open filestream
         nf_yyin = fopen( netfile.c_str(), "r");
         if ( !nf_yyin ) {
-            cerr << PACKAGE << ": failed to open netfile '" << netfile << "'" << endl;
+            ERROR "failed to open netfile '" << netfile << "'" END
             exit(EXIT_FAILURE);
         }
     } else {
 
-        cerr << PACKAGE << ": a costfile or a netfile must be given" << endl;
+        ERROR "a costfile or a netfile must be given" END
         exit(EXIT_FAILURE);
     }
 
@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
         // open outputstream
         ofs.open( outfile.c_str(), std::ios_base::trunc);
         if( !ofs ) {
-            cerr << PACKAGE << ": failed to open output file '" << outfile << "'" << endl;
+            ERROR "failed to open output file '" << outfile << "'" END
             exit(EXIT_FAILURE);
         }
         outputStream = &ofs;
@@ -150,8 +150,8 @@ int main(int argc, char** argv) {
     og_yyparse();
     fclose(og_yyin);
 
-    //debug("finished og parsing, parsed following data:\n\n");
-    //parsedOG->outputDebug(stdout);
+    DEBUG "finished og parsing, parsed following data:\n\n" END
+    if (args_info.debug_flag) parsedOG->outputDebug( cout);
 
 
 
@@ -171,7 +171,11 @@ int main(int argc, char** argv) {
 	DEBUG "finished cost parsing, parsed following data:\n\n" END
     if (args_info.debug_flag) parsedOG->outputDebug( cout );
 	DEBUG "finished cost parsing, parsed following data (recursively):\n\n" END
-    if (args_info.debug_flag) (parsedOG->root)->printToStdoutRecursively();
+    if (args_info.debug_flag) {
+        map<Node*, bool> printed;
+        (parsedOG->root)->outputDebugRecursively( cout, printed );
+        printed.clear();
+    }
 
 
 
@@ -185,7 +189,11 @@ int main(int argc, char** argv) {
 	DEBUG "finished computing cost efficient og, current og:\n\n" END
     if (args_info.debug_flag) parsedOG->outputDebug( cout );
 	DEBUG "finished computing cost efficient og, current og (recursively):\n\n" END
-    if (args_info.debug_flag) (parsedOG->root)->printToStdoutRecursively();
+    if (args_info.debug_flag) {
+        map<Node*, bool> printed;
+        (parsedOG->root)->outputDebugRecursively( cout, printed );
+        printed.clear();
+    }
 
 
 

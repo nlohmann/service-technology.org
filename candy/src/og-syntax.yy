@@ -231,7 +231,7 @@ formula:
   {
     // TODO remove
     currentNode->final = true;
-    $$ = new FormulaLiteralFinal();
+    $$ = new FormulaFinal();
     //$$ = NULL;
   }
 | KEY_TRUE

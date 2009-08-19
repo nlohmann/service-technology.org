@@ -25,7 +25,7 @@ unsigned int Node::computeEfficientSuccessors() {
 
     // if this node is a final node then we dont have to consider any leaving edge
     DEBUG "DEBUG computing costs for node " << getID() END
-    if (args_info.debug_flag) printToStdout();
+    if (args_info.debug_flag) outputDebug( cout );
     if ( final ) {
     	DEBUG "      node '" << getID() << "', " << this << " is final, cost is 0" END
         return 0;
@@ -41,8 +41,8 @@ unsigned int Node::computeEfficientSuccessors() {
     	Node* successor = i->first;
 		if (successor == this) {
 			// this should never happens as cost are defined for acyclic OGs
-			DEBUG "Cannot compute cost since the given OG is not acyclic\n\n" END
-			return EXIT_FAILURE;
+			ERROR "Cannot compute cost since the given OG is not acyclic\n\n" END
+			exit(EXIT_FAILURE);
 		}
 
         Event* maxEvent = i->second.front();
@@ -57,7 +57,6 @@ unsigned int Node::computeEfficientSuccessors() {
         }
         assert( maxEvent != NULL );
 
-        DEBUG "bla" END
         assert(successor != NULL);
 		unsigned int successorCost = maxEventCost + successor->computeEfficientSuccessors();
 		totalCost.push_back( pair< pair<Node*, Event*>, unsigned int >( pair<Node*, Event*>(successor, maxEvent) , successorCost) );
@@ -109,14 +108,20 @@ unsigned int Node::computeEfficientSuccessors() {
 
             // remove unnecessary literal
             formula->removeLiteral( maxEvent->name );
+
             DEBUG "      node " << getID() << " has lost successor " << currentSuccessor->getID() END
         } else {
         	++i;
         }
     }
 
-    // TODO simplify formula
-
+    // simplify this node's formula
+    DEBUG "      node " << getID() << " get a simplified formula" END
+    DEBUG "      old formula: " << formula->asString() END
+    Formula* oldFormula = formula;
+    formula = formula->simplify();
+    delete oldFormula;
+    DEBUG "      new formula: " << formula->asString() END
 
     return minimalCost;
 }
@@ -225,9 +230,9 @@ void Node::getCostMinimalAssignmentsRecursively(
 }
 
 
-void Node::printToStdout() {
+void Node::outputDebug(std::ostream& file) {
 
-    cout << "node id '" << id << "', " << this << " with formula '" <<
+    file << "node id '" << id << "', " << this << " with formula '" <<
     (formula != NULL ? formula->asString() : "NULL") << "', final " << final << " and successors" << endl;
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
           i != successors.end(); ++i ) {
@@ -238,7 +243,7 @@ void Node::printToStdout() {
                   j != i->second.end(); ++j ) {
 
                 cout << "\tnode id '" << currentNode->id << "', " << currentNode << " with ";
-                (*j)->printToStdout();
+                (*j)->outputDebug(file);
             }
         } else {
             cout << "\tnode NULL" << endl;
@@ -247,20 +252,26 @@ void Node::printToStdout() {
 }
 
 
-void Node::printToStdoutRecursively() {
+void Node::outputDebugRecursively(std::ostream& file, map<Node*, bool>& printed) {
 
-    printToStdout();
+    outputDebug( cout );
+    printed[this] = true;
+
     for ( map< Node*, list<Event*> >::const_iterator iter = successors.begin();
           iter != successors.end(); ++iter ) {
-        (iter->first)->printToStdoutRecursively();
+
+        if ( printed.find( iter->first ) == printed.end() ) {
+            (iter->first)->outputDebugRecursively(file, printed);
+        }
     }
 }
 
 
 // WARNING: fails for cyclic og
-void Node::output(std::ostream& file, bool isRootNode) {
+void Node::output(std::ostream& file, map<Node*, bool>& printed, bool isRootNode) {
 
     assert(formula != NULL);
+    printed[this] = true;
 
     file << "  " << id;
     if ( args_info.automata_given ) {
@@ -279,13 +290,7 @@ void Node::output(std::ostream& file, bool isRootNode) {
             }
         }
     } else {
-
-        // TODO correct?
-        //if ( final ) {
-        //    file << " : FINAL" << endl;
-        //} else {
-            file << " : " << formula->asString() << endl;
-        //}
+        file << " : " << formula->asString() << endl;
     }
 
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
@@ -303,9 +308,13 @@ void Node::output(std::ostream& file, bool isRootNode) {
         }
     }
 
+    // print all successor nodes which were not printed yet
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
           i != successors.end(); ++i ) {
-        // no other node is a root node
-        (i->first)->output(file, false);
+
+        if ( printed.find( i->first ) == printed.end() ) {
+            // no other node is a root node
+            (i->first)->output(file, printed, false);
+        }
     }
 }

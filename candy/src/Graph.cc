@@ -27,7 +27,7 @@ void Graph::outputDebug(std::ostream& file) {
     for (map<string, Event*>::const_iterator iter = events.begin();
          iter != events.end(); ++iter) {
     	Event* currentEvent = iter->second;
-    	currentEvent->printToStdout();
+    	currentEvent->outputDebug(file);
     }
 
     file << "\nroot node is node id '";
@@ -36,7 +36,7 @@ void Graph::outputDebug(std::ostream& file) {
          iter != nodes.end(); ++iter) {
 
         Node* currentNode = iter->second;
-        currentNode->printToStdout();
+        currentNode->outputDebug(file);
     }
 }
 
@@ -109,5 +109,7 @@ void Graph::output(std::ostream& file) {
     file << "\nNODES\n";
 
     // print all nodes beginning from the root
-    root->output(file, true);
+    map<Node*, bool> printed;
+    root->output(file, printed, true);
+    printed.clear();
 }

@@ -2,7 +2,7 @@
 #define Formula_H_
 
 #include "settings.h"
-#include <set>
+//#include <set>
 
 
 
@@ -16,9 +16,12 @@
  * labels of IGs and OGs.
  */
 class FormulaAssignment {
+    public:
+        typedef map<string, bool> literalValues_t;
+
     private:
         /// Maps literals to their truth values.
-        map< string, bool > literalValues;
+        literalValues_t literalValues;
 
     public:
         /// sets the given literal to the given truth value
@@ -38,7 +41,7 @@ class FormulaAssignment {
 
         /// returns the bool value of a literal
         bool get(const string& literal) const {
-        	map< string, bool >::const_iterator i = literalValues.find( literal );
+        	literalValues_t::const_iterator i = literalValues.find( literal );
         	return i == literalValues.end() ? false : i->second;
         }
 };
@@ -59,10 +62,8 @@ class Formula {
         /// Destroys the given Formula and all its subformulas.
         virtual ~Formula() {};
 
-        /// Formats and returns this formula as a string. This string is
-        /// suitable for showing the user and for the OG output format.
-        /// returns The string representation for this Formula.
-        virtual string asString() const = 0;
+        /// copies and returns this Formula
+        virtual Formula* getDeepCopy() const = 0;
 
         /// Returns the truth value of this Formula under the given
         /// FormulaAssignment.
@@ -73,16 +74,20 @@ class Formula {
         ///  FormulaAssignment.
         virtual bool value(const FormulaAssignment& assignment) const = 0;
 
+        /// Formats and returns this formula as a string. This string is
+        /// suitable for showing the user and for the OG output format.
+        /// returns The string representation for this Formula.
+        virtual string asString() const = 0;
+
         /// returns the number of subformulas
         virtual int size() const = 0;
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
-        /// this function is used in the IG reduction
         virtual void removeLiteral(const string&) {};
 
-        /// copies and returns this Formula
-        virtual Formula* getDeepCopy() const = 0;
+        /// returns a simplified version of this formula
+        virtual Formula* simplify() = 0;
 
 };
 
@@ -102,13 +107,7 @@ class Formula {
 class FormulaMultiary : public Formula {
     public:
         /// Type of the container holding all subformula of this multiary formula.
-        typedef std::list<Formula*> subFormulas_t;
-
-        /// Type of the iterator over subformulas.
-        typedef subFormulas_t::iterator iterator;
-
-        /// Type of the const iterator over subformulas.
-        typedef subFormulas_t::const_iterator const_iterator;
+        typedef list<Formula*> subFormulas_t;
 
     protected:
         /// Holds all subformulas of this multiary formula.
@@ -119,12 +118,12 @@ class FormulaMultiary : public Formula {
         FormulaMultiary() : Formula() {};
 
         /// constructor with one new formula
-        FormulaMultiary(Formula* newformula) {
+        FormulaMultiary(Formula* newformula) : Formula() {
             subFormulas.push_back(newformula);
         };
 
         /// binary constructor
-        FormulaMultiary(Formula* lhs, Formula* rhs) {
+        FormulaMultiary(Formula* lhs, Formula* rhs) : Formula() {
             subFormulas.push_back(lhs);
             subFormulas.push_back(rhs);
         };
@@ -132,14 +131,9 @@ class FormulaMultiary : public Formula {
         /// Destroys this FormulaMultiary and all its subformulas.
         virtual ~FormulaMultiary();
 
-        /// adds a given subformula to this multiary
-        void addSubFormula(Formula* subformula) {
-            subFormulas.push_back( subformula );
-        };
-
-        /// removes the subformula at the given iterator
-        iterator removeSubFormula(iterator subformula) {
-            return subFormulas.erase( subformula );
+        /// Returns the the number of formulas, the multiary formula consists of.
+        virtual int size() const {
+            return subFormulas.size();
         };
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
@@ -147,11 +141,9 @@ class FormulaMultiary : public Formula {
         /// this function is used in the IG reduction
         virtual void removeLiteral(const std::string&);
 
+        // TODO necessary?
         /// copies te private members of this multiary to a given formula
         void deepCopyMultiaryPrivateMembersToNewFormula(FormulaMultiary* newFormula) const;
-
-        /// Returns the the number of formulas, the multiary formula consists of.
-        virtual int size() const;
 };
 
 
@@ -169,17 +161,19 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         /// Destroys this FormulaMultiaryAnd and all its subformulas. */
         virtual ~FormulaMultiaryAnd() {};
 
-        /// returns the formula as a string
-        virtual string asString() const;
+        /// deep copies the formula
+        virtual FormulaMultiaryAnd* getDeepCopy() const;
 
         /// returns the value of this formula under given assignment
         virtual bool value(const FormulaAssignment& assignment) const;
 
-        /// Returns the merged equivalent to this formula.
-        virtual FormulaMultiaryAnd* merge();
+        /// returns the formula as a string
+        virtual string asString() const;
 
-        /// deep copies the formula
-        virtual FormulaMultiaryAnd* getDeepCopy() const;
+        /// Returns the merged equivalent to this formula.
+        //virtual FormulaMultiaryAnd* merge();
+
+        virtual FormulaMultiaryAnd* simplify();
 };
 
 
@@ -197,19 +191,22 @@ class FormulaMultiaryOr : public FormulaMultiary {
         /// Destroys this FormulaMultiaryOr and all its subformulas
         virtual ~FormulaMultiaryOr() {};
 
-        /// returns the formula as a string
-        virtual string asString() const;
+        /// returns a deep copy of this formula
+        virtual FormulaMultiaryOr* getDeepCopy() const;
 
         /// returns the value of this formula under given assignment
         virtual bool value(const FormulaAssignment& assignment) const;
 
+        /// returns the formula as a string
+        virtual string asString() const;
+
         /// Returns the merged equivalent to this formula. Merging gets rid of
         /// unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
         /// caller is responsible for deleting the returned newly created formula.
-        virtual FormulaMultiaryOr* merge();
+        //virtual FormulaMultiaryOr* merge();
 
-        /// returns a deep copy of this formula
-        virtual FormulaMultiaryOr* getDeepCopy() const;
+        // TODO implement
+        virtual FormulaMultiaryOr* simplify();
 };
 
 
@@ -252,6 +249,12 @@ class FormulaLiteral : public Formula {
         virtual int size() const {
             return 1;
         }
+
+        // TODO necessary?
+        /// returns a simplified version of this formula
+        virtual FormulaLiteral* simplify() {
+        	return new FormulaLiteral(*this);
+        }
 };
 
 
@@ -281,6 +284,12 @@ class FormulaFixed : public FormulaLiteral {
         /// returns the prefixed value of this formula
         virtual bool value(const FormulaAssignment& assignment) const {
         	return _value;
+        }
+
+        // TODO necessary?
+        /// returns a simplified version of this formula
+        virtual FormulaFixed* simplify() {
+            return new FormulaFixed(*this);
         }
 };
 
@@ -314,13 +323,13 @@ class FormulaFalse : public FormulaFixed {
 /**
  * A special literal FINAL.
  */
-class FormulaLiteralFinal : public FormulaLiteral {
+class FormulaFinal : public FormulaLiteral {
     public:
         /// Constructs a literal with the given string representation.
-        FormulaLiteralFinal() : FormulaLiteral("FINAL") {};
+        FormulaFinal() : FormulaLiteral("FINAL") {};
 
         /// basic deconstructor
-        virtual ~FormulaLiteralFinal() {};
+        virtual ~FormulaFinal() {};
 };
 
 #endif

@@ -86,7 +86,7 @@ state:
   KW_STATE NUMBER prog lowlink markings transitions
     { 
     
-        //status("DEBUG: current DFS: %d\n", $2);
+       // status("\nDEBUG: current DFS: m%d", $2);
     
         InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));

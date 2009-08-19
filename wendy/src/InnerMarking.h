@@ -124,7 +124,7 @@ class InnerMarking {
         Label_ID *labels;
 
         /// receiving transitions that are potentially reachable
-        bool *reachableSendingEvents;
+        char *reachableSendingEvents;
 
 };
 

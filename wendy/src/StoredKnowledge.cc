@@ -88,7 +88,7 @@ inline bool StoredKnowledge::findKnowledgeInTarjanStack(StoredKnowledge *SK) {
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline StoredKnowledge * StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, const Label_ID &l) {
+inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, const Label_ID &l) {
     Knowledge *K_new = new Knowledge(K, l);
 
     // process the empty node in a special way
@@ -97,7 +97,7 @@ inline StoredKnowledge * StoredKnowledge::process(const Knowledge* const K, Stor
             SK->addSuccessor(l, empty);
         }
         delete K_new;
-        return NULL;
+        return;
     }
 
     StoredKnowledge *SK_store = NULL;
@@ -118,6 +118,17 @@ inline StoredKnowledge * StoredKnowledge::process(const Knowledge* const K, Stor
         if (SK_store == SK_new) {
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
+
+            if (args_info.lf_flag) {
+                // LIVELOCK FREEDOM
+                // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
+                adjustLowlinkValue(SK, SK_store);
+
+                // from successor knowledge a final knowledge is reachable
+                if (SK_new->is_final_reachable) {
+                    SK->is_final_reachable = 1;
+                }
+            }
         } else {
             // we did not find new knowledge
             delete SK_new;
@@ -129,9 +140,67 @@ inline StoredKnowledge * StoredKnowledge::process(const Knowledge* const K, Stor
 
     // we saw K_new's successors
     delete K_new;
+}
 
-    // return new knowledge
-    return SK_store;
+
+/*
+ LIVELOCK FREEDOM
+
+ \brief adjust lowlink value of stored knowledge object according to Tarjan algorithm
+ \param SK current knowledge
+ \param SK_new the successor of the current knowledge whose successors have all been calculated already
+*/
+inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK, StoredKnowledge* SK_new) {
+
+    if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
+        SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
+    } else {
+        SK->lowlink = MINIMUM(SK->lowlink, SK_new->lowlink);
+    }
+}
+
+
+/*
+ LIVELOCK FREEDOM
+
+ \brief if current knowledge is representative of an SCC then evaluate current SCC and adjusts the is_final_reachable value of all
+        members of the SCC
+ \param SK current knowledge
+*/
+inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
+
+    // check, if the current knowledge is a representative of a SCC
+    // if so, get all knowledges within the SCC
+    if (args_info.lf_flag and SK->lowlink == SK->dfs) {
+
+        // if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
+        if (not SK->is_final_reachable) {
+            // TODO: current knowledge SK is not sane, so delete it right here
+        }
+
+        // node which has just been popped from Tarjan stack
+        StoredKnowledge * poppedSK;
+
+        do {
+            if (tarjanStack.empty()) {
+                continue;
+            }
+            // get last element
+            poppedSK = tarjanStack.back();
+            // delete last element from stack
+            tarjanStack.pop_back();
+
+            // propagate that a final knowledge is reachable from the current knowledge to the members of the current SCC
+            if (SK->is_final_reachable) {
+                poppedSK->is_final_reachable = 1;
+            } else {
+                poppedSK->is_final_reachable = 0;
+
+                // TODO: current knowledge poppedSK is not sane, so delete it right here
+            }
+
+        } while (SK != poppedSK);
+    }
 }
 
 
@@ -212,23 +281,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         	}
         }
 
-        StoredKnowledge * SK_new = process(K, SK, l);
-
-        // LIVELOCK FREEDOM
-        // a sane knowledge has been found
-        if (args_info.lf_flag and SK_new != NULL) {
-            // new node's successor has been computed, so adjust Tarjan values of current node
-            if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
-                SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
-            } else {
-                SK->lowlink = MINIMUM(SK->lowlink, SK_new->lowlink);
-            }
-
-            // from successor knowledge a final knowledge is reachable
-            if (SK_new->is_final_reachable) {
-                SK->is_final_reachable = 1;
-            }
-        }
+        process(K, SK, l);
 
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
         // TODO what about synchronous events?
@@ -239,39 +292,9 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         }
     }
 
-    // LIVELOCK FREEDOM
     // we have traversed through the reachability graph of the current knowledge
-    // check, if the current knowledge is a representative of a SCC
-    // if so, get all knowledges within the SCC
-    if (args_info.lf_flag and SK->lowlink == SK->dfs) {
-
-        // if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
-        if (not SK->is_final_reachable) {
-            // TODO: current knowledge is not sane, so delete it right here
-        }
-
-        // node which has just been popped from Tarjan stack
-        StoredKnowledge * poppedSK;
-
-        do {
-            if (tarjanStack.empty()) {
-                continue;
-            }
-            // get last element
-            poppedSK = tarjanStack.back();
-            // delete last element from stack
-            tarjanStack.pop_back();
-
-            // propagate that a final knowledge is reachable from the current knowledge to the members of the current SCC
-            if (SK->is_final_reachable) {
-                poppedSK->is_final_reachable = 1;
-            } else {
-                poppedSK->is_final_reachable = 0;
-
-                // TODO: current knowledge is not sane, so delete it right here
-            }
-
-        } while (SK != poppedSK);
+    if (args_info.lf_flag) {
+        evaluateCurrentSCC(SK);
     }
 
     //printf("DEBUG: knowledge %d has lowlink %d, final reachable: %d\n", SK->dfs, SK->lowlink, SK->is_final_reachable);

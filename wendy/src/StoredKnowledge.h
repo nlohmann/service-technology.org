@@ -33,7 +33,7 @@ class StoredKnowledge {
     public: /* static functions */
 
         /// generate the successor of a knowledge bubble given a label
-        static StoredKnowledge * process(const Knowledge* const, StoredKnowledge*, const Label_ID&);
+        static void process(const Knowledge* const, StoredKnowledge*, const Label_ID&);
 
         /// recursively calculate knowledge bubbles
         static void processRecursively(const Knowledge* const, StoredKnowledge*);
@@ -55,6 +55,13 @@ class StoredKnowledge {
 
         /// print information for instance migration
         static void migration(std::ofstream&);
+
+        /// LIVELOCK FREEDOM
+        /// adjust lowlink values of the stored knowledge
+        static void adjustLowlinkValue(StoredKnowledge*, StoredKnowledge*);
+
+        /// evaluates the current strongly connected components and adjusts the is_final_reachable value
+        static void evaluateCurrentSCC(StoredKnowledge*);
 
     public: /* static attributes */
 
@@ -93,7 +100,7 @@ class StoredKnowledge {
 
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
-        
+
     private: /* static attributes */
 
         /// number of markings stored

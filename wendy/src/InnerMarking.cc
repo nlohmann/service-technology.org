@@ -126,7 +126,7 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
     // and we can make an approximation of the receiving transitions that are reachable from here
     if (args_info.smartSendingEvent_flag) {
 		// we reserve a boolean value for each sending event possible
-		reachableSendingEvents = new bool[1 + Label::last_send - Label::first_send];
+		reachableSendingEvents = new char[Label::send_events];
 
 		for (uint8_t i = 0; i < Label::send_events; i++) {
 			reachableSendingEvents[i] = not args_info.lf_flag;
@@ -257,37 +257,38 @@ void InnerMarking::calcReachableSendingEvents() {
 
 	assert(args_info.smartSendingEvent_flag);
 
+	// traverse successors
 	if (out_degree > 0) {
-		/* traverse successors */
 
-		/* traverse through list of sending events */
+		// traverse through list of sending events
 		for (Label_ID e = 0; e < Label::send_events; e++) {
 
-			bool foundIt = false;
+			// sending event is not reachable unless we find a witness by one of the successors or leaving edges
+			reachableSendingEvents[e] = 0;
 
-			/* check if there exists at least one successor from which this sending event is reachable */
+			// check if there exists at least one successor from which this sending event is reachable
 			for (uint8_t i = 0; i < out_degree; i++) {
-
-				InnerMarking_ID successor = successors[i];
 
 				uint8_t currentLabel = labels[i] - (Label::last_receive + 1);
 
-				if (InnerMarking::markingMap[successor]->reachableSendingEvents[e] or currentLabel == e) {
-					foundIt = true;
-					break;
+				// either sending event is reachable via successor or the current edge is labeled with this sending event
+				if (not args_info.lf_flag){		// deadlock freedom
+					if (currentLabel == e or InnerMarking::markingMap[successors[i]] == 0 or InnerMarking::markingMap[successors[i]]->reachableSendingEvents[e]) {
+						reachableSendingEvents[e] = 1;
+						break;
+					}
+				} else {	// livelock freedom
+					if (currentLabel == e or (InnerMarking::markingMap[successors[i]] and InnerMarking::markingMap[successors[i]]->reachableSendingEvents[e])) {
+						reachableSendingEvents[e] = 1;
+						break;
+					}
 				}
-			}
 
-			/* no, this sending event is not reachable */
-			if (foundIt) {
-				reachableSendingEvents[e] = true;
-			} else {
-				reachableSendingEvents[e] = false;
 			}
 	   }
-	} else if (not args_info.lf_flag){    /* no successors, no receiving transitions reachable */
+	} else if (not args_info.lf_flag){    // no successors, no receiving transitions reachable
 		for (uint8_t e = 0; e < Label::send_events; e++) {
-			reachableSendingEvents[e] = false;
+			reachableSendingEvents[e] = 0;
 		}
 	}
 }

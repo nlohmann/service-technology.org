@@ -19,6 +19,40 @@ Graph::~Graph() {
 }
 
 
+// use this after computing efficient nodes
+void Graph::removeInefficientNodesAndEvents() {
+
+    // flag all efficient nodes and events
+    root->setFlagRecursively(true);
+
+    // remove unused nodes
+    for ( map< unsigned int, Node* >::iterator i = nodes.begin();
+          i != nodes.end(); ) { // increment inside because of erase
+
+        // remove non-flaged node
+        if ( not (i->second)->flag ) {
+            // the erase returns incremented iterator, which is invalid for last element
+            nodes.erase( i++ );
+        } else {
+            ++i;
+        }
+    }
+
+    // remove unused events
+    for ( map< string, Event* >::iterator i = events.begin();
+          i != events.end(); ) { // increment inside because of erase
+
+        // remove non-flaged event
+        if ( not (i->second)->flag ) {
+            // the erase returns incremented iterator, which is invalid for last element
+            events.erase( i++ );
+        } else {
+            ++i;
+        }
+    }
+}
+
+
 void Graph::outputDebug(std::ostream& file) {
 
 	file << "graph has " << nodes.size() << " nodes and "
@@ -43,72 +77,85 @@ void Graph::outputDebug(std::ostream& file) {
 
 void Graph::output(std::ostream& file) {
 
-    file << "{\n  generator:    " << PACKAGE_STRING
-         << " (" << CONFIG_BUILDSYSTEM << ")"
-         << "\n  invocation:   " << invocation << "\n  events:       "
-         //<< static_cast<unsigned int>(Label::send_events) << " send, "
-         //<< static_cast<unsigned int>(Label::receive_events) << " receive, "
-         //<< static_cast<unsigned int>(Label::sync_events) << " synchronous"
-         << "\n  statistics:   " << nodes.size() << " nodes"
-         << "\n}\n\n";
+    unsigned int send = 0;
+    unsigned int receive = 0;
+    unsigned int synchronous = 0;
+
+    for ( map< string, Event* >::const_iterator i = events.begin();
+          i != events.end(); ++i) {
+
+        if ( (i->second)->type == T_INPUT ) {
+            ++receive;
+        } else if ( (i->second)->type == T_OUTPUT ) {
+            ++send;
+        } else if ( (i->second)->type == T_SYNC ) {
+            ++synchronous;
+        } else {
+            assert(false);
+        }
+    }
+
+    file << "{\n"
+         << "  generator:    " << PACKAGE_STRING << " (" << CONFIG_BUILDSYSTEM << ")\n"
+         << "  invocation:   " << invocation << "\n"
+         << "  events:       " << send << " send, "
+                               << receive << " receive, "
+                               << synchronous << " synchronous\n"
+         << "  statistics:   " << nodes.size() << " nodes\n"
+         << "}\n\n";
 
     file << "INTERFACE\n";
 
-    // TODO wtf?
-    if ( true) {
-        file << "  INPUT\n    ";
-        bool first = true;
-        for ( map<string, Event*>::const_iterator i = events.begin();
-            i != events.end(); ++i ) {
+    // output input events
+    file << "  INPUT\n    ";
+    bool first = true;
+    for ( map<string, Event*>::const_iterator i = events.begin();
+        i != events.end(); ++i ) {
 
-            if ( (i->second)->type == T_INPUT ) {
-                if ( not first ) {
-                    file << ", ";
-                }
-                first = false;
-                file << (i->second)->name;
+        if ( (i->second)->type == T_INPUT ) {
+            if ( not first ) {
+                file << ", ";
             }
+            first = false;
+            file << (i->second)->name;
         }
-        file << ";\n";
     }
+    file << ";\n";
 
-    if ( true) {
-        file << "  OUTPUT\n    ";
-        bool first = true;
-        for ( map<string, Event*>::const_iterator i = events.begin();
-            i != events.end(); ++i ) {
+    // output output events
+    file << "  OUTPUT\n    ";
+    first = true;
+    for ( map<string, Event*>::const_iterator i = events.begin();
+        i != events.end(); ++i ) {
 
-            if ( (i->second)->type == T_OUTPUT ) {
-                if ( not first ) {
-                    file << ", ";
-                }
-                first = false;
-                file << (i->second)->name;
+        if ( (i->second)->type == T_OUTPUT ) {
+            if ( not first ) {
+                file << ", ";
             }
+            first = false;
+            file << (i->second)->name;
         }
-        file << ";\n";
     }
+    file << ";\n";
 
-    if ( true) {
-        file << "  SYNCHRONOUS\n    ";
-        bool first = true;
-        for ( map<string, Event*>::const_iterator i = events.begin();
-            i != events.end(); ++i ) {
+    // output synchronous events
+    file << "  SYNCHRONOUS\n    ";
+    first = true;
+    for ( map<string, Event*>::const_iterator i = events.begin();
+        i != events.end(); ++i ) {
 
-            if ( (i->second)->type == T_SYNC ) {
-                if ( not first ) {
-                    file << ", ";
-                }
-                first = false;
-                file << (i->second)->name;
+        if ( (i->second)->type == T_SYNC ) {
+            if ( not first ) {
+                file << ", ";
             }
+            first = false;
+            file << (i->second)->name;
         }
-        file << ";\n";
     }
-
-    file << "\nNODES\n";
+    file << ";\n";
 
     // print all nodes beginning from the root
+    file << "\nNODES\n";
     map<Node*, bool> printed;
     root->output(file, printed, true);
     printed.clear();

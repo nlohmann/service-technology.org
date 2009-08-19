@@ -31,6 +31,9 @@ class Graph {
 		/// basic deconstructor
 		~Graph();
 
+        /// remove inefficient nodes and events
+        void removeInefficientNodesAndEvents();
+
         /// output this graph as debug information
         void outputDebug(std::ostream&);
 

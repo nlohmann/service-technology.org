@@ -195,7 +195,7 @@ string FormulaMultiaryAnd::asString() const {
 //! \return returns the merged equivalent
 FormulaMultiaryAnd* FormulaMultiaryAnd::simplify() {
 
-    cerr << "in AND simplify of: '" << asString() << "'" << endl;
+    //cerr << "in AND simplify of: '" << asString() << "'" << endl;
     FormulaMultiaryAnd *result = new FormulaMultiaryAnd;
 
     for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
@@ -322,7 +322,7 @@ string FormulaMultiaryOr::asString() const {
 
 FormulaMultiaryOr* FormulaMultiaryOr::simplify() {
 
-    cerr << "in OR simplify of: '" << asString() << "'" << endl;
+    //cerr << "in OR simplify of: '" << asString() << "'" << endl;
     FormulaMultiaryOr *result = new FormulaMultiaryOr;
 
     for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {

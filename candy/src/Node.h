@@ -22,30 +22,36 @@ class Node {
         Formula* formula;
 
         bool final;
+        bool flag;
 
         /*--------.
 		| methods |
 		`--------*/
 
         /// basic constructor
-        explicit Node(unsigned int);
+        explicit Node(unsigned int _id) : id(_id), final(false), flag(false) {};
 
         /// basic destructor
-        ~Node();
+        virtual ~Node() {
+            successors.clear();
+        };
 
         // getter and setter for id
         unsigned int getID() const { return id; }
         void setID(unsigned int newID) { id = newID; }
 
-        /// TODO comment
+        /// set flag for this node and all successor nodes
+        void setFlagRecursively(bool);
+
+        /// cut connections to inefficient successor nodes
         unsigned int computeEfficientSuccessors();
 
-        /// TODO comment
+        /// compute a list of cost minimal assignments for this node
         unsigned int getCostMinimalAssignments(
         		list< pair< pair< Node*, Event*>, unsigned int> >,
         		list< FormulaAssignment >& );
 
-        /// TODO comment
+        /// helper function for getCostMinimalAssignments
         void getCostMinimalAssignmentsRecursively(
         		list< pair< pair<Node*, Event*>, unsigned int> >,
         		unsigned int,
@@ -53,11 +59,11 @@ class Node {
         		unsigned int&,
         		list< FormulaAssignment >&);
 
-        /// print information about this node on std::cout
+        /// print debug information about this node
         void outputDebug(std::ostream&);
         void outputDebugRecursively(std::ostream&, map<Node*, bool>&);
 
-        /// TODO comment
+        /// print this node
         void output(std::ostream&, map<Node*, bool>&, bool);
 
 

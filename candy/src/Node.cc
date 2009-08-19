@@ -5,16 +5,38 @@
 
 //! \brief constructor (three parameters)
 //! \param _number the number of this node
-Node::Node(unsigned int _id) :
-    id(_id),
-    final(false) {
-}
+//Node::Node(unsigned int _id) :
+//    id(_id),
+//    final(false),
+//    flag(false) {
+//}
 
 
 //! \brief destructor
-Node::~Node() {
+//Node::~Node() {
+//
+//    successors.clear();
+//}
 
-    successors.clear();
+
+// TODO rename
+void Node::setFlagRecursively(bool _flag) {
+
+    flag = _flag;
+    for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+          i != successors.end(); ++i ) {
+
+        if ( (i->first)->flag != _flag ) {
+
+            for ( list<Event*>::const_iterator j = i->second.begin();
+                  j != i->second.end(); ++j ) {
+
+                (*j)->flag = _flag;
+            }
+
+            (i->first)->setFlagRecursively(_flag);
+        }
+    }
 }
 
 

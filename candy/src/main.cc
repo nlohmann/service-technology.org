@@ -185,6 +185,7 @@ int main(int argc, char** argv) {
 
 	INFO "computing cost efficient og ..." END
 	(parsedOG->root)->computeEfficientSuccessors();
+    parsedOG->removeInefficientNodesAndEvents();
 
 	DEBUG "finished computing cost efficient og, current og:\n\n" END
     if (args_info.debug_flag) parsedOG->outputDebug( cout );

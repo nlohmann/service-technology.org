@@ -6,12 +6,12 @@
                      http://service-technology.org/diane
 
 
-Version 1.0
-===========
+Version 1.1-unreleased
+======================
 
-* initial release
-
-* made Diane Gnits compatible
+* updated maintainer scripts
 
 
+See file ChangeLog <http://service-technology.org/files/diane/ChangeLog> for
+complete version history.
 

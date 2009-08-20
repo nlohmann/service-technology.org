@@ -1,4 +1,4 @@
-AC_INIT(Diane, 1.0, diane@service-technology.org, diane, http://service-technology.org/diane)
+AC_INIT(Diane, 1.1-unreleased, diane@service-technology.org, diane, http://service-technology.org/diane)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -23,7 +23,8 @@ AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
 
 # store the SVN revision number
-AC_DEFINE_UNQUOTED(VERSION_SVN, "`svnversion -n 2> /dev/null`", [The SVN revision.])
+AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
+AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
 
 # allow the configure script to control assertions
 AC_HEADER_ASSERT

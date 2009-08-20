@@ -1,4 +1,4 @@
-@PACKAGE_TARNAME@ (@PACKAGE_VERSION@-1) hardy; urgency=low
+@PACKAGE_TARNAME@ (YYYYYYYY-1) hardy; urgency=low
 
   * Maintainer package release. See file ChangeLog
     <http://service-technology.org/files/@PACKAGE_TARNAME@/ChangeLog>

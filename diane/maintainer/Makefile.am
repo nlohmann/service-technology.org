@@ -53,7 +53,7 @@ upload: tarballname
 # Debian stuff #
 ################
 EXTRA_DIST = debian/compat debian/control debian/copyright debian/dirs debian/docs
-MAINTAINERCLEANFILES = debian/README.Debian
+MAINTAINERCLEANFILES = debian/README.Debian debian/changelog
 .PHONY: debian/changelog debian/README.Debian
 
 #--------------------------------------------------------------------------#

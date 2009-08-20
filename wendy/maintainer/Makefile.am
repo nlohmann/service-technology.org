@@ -10,6 +10,9 @@ BINTARGETS="all"
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
 #############################################################################
 
+# version number including svn revision (without "-unreleased")
+MICROVERSION = $(subst -unreleased,,$(PACKAGE_VERSION)).$(VERSION_SVN)
+
 #-------------------#
 # organize cleaning #
 #-------------------#
@@ -67,6 +70,7 @@ debian/control: ../README
 debian/changelog: debian/changelog.template
 	cp debian/changelog.template debian/changelog
 	-$(SED) -i "s/XXXXXXXX/`date -R`/" debian/changelog
+	-$(SED) -i "s/YYYYYYYY/$(MICROVERSION)/" debian/changelog
 
 debian/README.Debian: debian/README.Debian.template
 	cp debian/README.Debian.template debian/README.Debian
@@ -84,6 +88,15 @@ deb: tarballname debian/control debian/changelog debian/README.Debian
 	-cd $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) ; dpkg-buildpackage -S
 	rm -fr $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
 	fakeroot alien --to-rpm --keep-version $(PACKAGE_TARNAME)_$(PACKAGE_VERSION)*.deb
+
+#---------------------------------------------------------#
+# create Debian source package and upload it to launchpad #
+#---------------------------------------------------------#
+launchpad: debian/control debian/changelog debian/README.Debian
+	$(MAKE) $(AM_MAKEFLAGS) dist -C $(top_srcdir)
+	mv $(top_srcdir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz $(top_srcdir)/$(PACKAGE_TARNAME)_$(MICROVERSION).orig.tar.gz
+	debuild -S -sa
+	cd $(top_srcdir) ; echo dput st-ppa $(PACKAGE_TARNAME)_$(MICROVERSION)-1_source.changes
 
 
 #################

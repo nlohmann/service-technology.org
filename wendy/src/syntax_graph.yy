@@ -20,6 +20,7 @@
 
 %token KW_STATE KW_PROG KW_LOWLINK COLON COMMA ARROW NUMBER NAME
 
+%expect 1
 %defines
 %name-prefix="graph_"
 
@@ -179,10 +180,10 @@ lowlink:
         }
     }
 | KW_LOWLINK NUMBER
-	{
-		/* do something with Tarjan's lowlink value (needed for generating livelock free partners) */	
-		currentLowlink = $2;
-	}
+    {
+        /* do something with Tarjan's lowlink value (needed for generating livelock free partners) */   
+        currentLowlink = $2;
+    }
 ;
 
 markings:

@@ -96,7 +96,7 @@ launchpad: debian/control debian/changelog debian/README.Debian
 	$(MAKE) $(AM_MAKEFLAGS) dist -C $(top_srcdir)
 	mv $(top_srcdir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz $(top_srcdir)/$(PACKAGE_TARNAME)_$(MICROVERSION).orig.tar.gz
 	debuild -S -sa
-	cd $(top_srcdir) ; echo dput st-ppa $(PACKAGE_TARNAME)_$(MICROVERSION)-1_source.changes
+	cd $(top_srcdir) ; dput st-ppa $(PACKAGE_TARNAME)_$(MICROVERSION)-1_source.changes
 
 
 #################

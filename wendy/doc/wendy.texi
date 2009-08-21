@@ -502,7 +502,7 @@ wendy: unknown transition `t' in file `foo.cov' -- aborting [#16]
 @end smallexample
 
 @item #17
-In case of generating livelock-free partners (by using the @option{--lf} parameter), Wendy expects LoLA to be compiled with the directive STATESPACE.
+In case of generating livelock-free partners (by using the @option{--lf} parameter) or for reduction rule smart sending event (by using the @option{--smartSendingEvent} parameter), Wendy expects LoLA to be compiled with the directive STATESPACE.
 @smallexample
 @cartouche
 make lola-statespace

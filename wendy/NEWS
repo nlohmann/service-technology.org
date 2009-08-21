@@ -8,42 +8,10 @@
                       http://service-technology.org/wendy
 
 
-Version 1.9-unreleased
+Version 2.0-unreleased
 ======================
 
-* added file `THEORY' listing the scientific algorithms and results
-  implemented in Wendy
-
-* implemented cover constraints for operating guidelines (parameter
-  `--cover'); see file `THEORY' for more information
-
-* canonized Makefiles and indicated which parts are purely generic
-
-* refined statistics on the nodes: how many nodes were deleted and how many
-  nodes remained? - adjusted test cases accordingly
-
-* implemented the generation of livelock free partners (not yet operating
-  guidelines); here, LoLA has to be configured appropriately by using
-  directive STATESPACE rather than FULL (make lola-statespace) and the
-  configuration file of Wendy has to be adjusted accordingly
-
-* added test cases for livelock freedom
-
-* fixed bug #14150 (`https://gna.org/bugs/?14150'): empty node is only
-  printed if it is reachable from the initial node
-
-* updated maintainer scripts to support Launchpad
-
-* implemented reduction rule "smart sending event" (parameter:
-  `--smartSendingEvent'): a sending event is only considered if from the
-  inner markings within the current knowledge (1) in case of deadlock
-  freedom, some (inner) marking is reachable; (2) in case of livelock
-  freedom, a final (inner) marking is reachable.
-
-* added test cases for reduction rule "smart sending event"
-
-* updated author/copyright information
-
+*
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

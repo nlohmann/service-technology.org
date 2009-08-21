@@ -8,8 +8,12 @@
                       http://service-technology.org/wendy
 
 
-Version 1.9-unreleased
+Version 2.0-unreleased
 ======================
+
+*
+Version 1.9
+===========
 
 * added file `THEORY' listing the scientific algorithms and results
   implemented in Wendy
@@ -43,6 +47,12 @@ Version 1.9-unreleased
 * added test cases for reduction rule "smart sending event"
 
 * updated author/copyright information
+
+* enhanced early insane node detection when reduction rule "smart sending
+  event" is switched on; here for each full marking contained within a
+  knowledge it is checked whether from the corresponding inner marking a
+  transition is reachable that will consume an input message lying on the
+  interface
 
 Version 1.8
 ===========

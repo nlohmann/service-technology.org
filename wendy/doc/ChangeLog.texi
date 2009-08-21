@@ -1,4 +1,10 @@
-@heading Version 1.9-unreleased
+@heading Version 2.0-unreleased
+@itemize
+@item 
+@end itemize
+
+
+@heading Version 1.9
 @itemize
 @item added file @file{THEORY} listing the scientific algorithms and results implemented in Wendy
 

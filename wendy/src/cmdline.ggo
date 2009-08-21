@@ -3,6 +3,7 @@ args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --co
 description "About Wendy:"
 purpose "Wendy is a tool to synthesize partners for services."
 
+
 section "Analysis Task"
 sectiondesc="Wendy is able to handle two different analysis tasks. It generates the operating guidelines (or partners in general) with respect to (1) deadlock freedom or (2) livelock freedom. By default, Wendy will consider deadlock freedom.\n"
 
@@ -10,6 +11,7 @@ option "lf" -
   "Livelock freedom."
   details="The operating guidelines and reduced partners are generated with respect to livelock freedom. This means, that the composition of the currently analyzed service and the generated partner(s) do not run into a livelock from which no final marking is reachable anymore.\n"
   flag off
+
 
 section "Input/Output"
 sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `STDOUT' is given, Wendy will pipe the respective output to the standard output stream.\n"
@@ -141,6 +143,7 @@ option "smartSendingEvent" -
   details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, strategies which will send messages that will never be consumed get lost. In case of livelock freedom no strategies will be lost.\n"
   flag off
 
+
 section "Debugging"
 sectiondesc="These options control how much debug output Wendy creates. The more debug output is used, the slower Wendy runs.\n"
 
@@ -167,6 +170,7 @@ option "bug" -
   details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
   flag off
   hidden
+
 
 section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"

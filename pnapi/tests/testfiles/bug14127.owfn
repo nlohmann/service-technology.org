@@ -1,0 +1,62 @@
+PLACE
+  INTERNAL
+    controller.p21975824, controller.p22002320, controller.p22122360, engine.MBevC_int, engine.MCB_int, engine.MEuro_int, engine.MTB_int, engine.TBevT_int, engine.TEuro_int;
+
+  INPUT
+    MBevC, TEuro;
+
+  OUTPUT
+    MCB, MEuro, TBevT, TRet;
+
+INITIALMARKING
+  controller.p21975824;
+
+FINALCONDITION
+  ((controller.p22122360 = 1 OR controller.p21975824 = 1) AND ALL_OTHER_PLACES_EMPTY);
+
+
+TRANSITION engine.rule_1
+  CONSUME engine.TEuro_int;
+  PRODUCE engine.MEuro_int;
+  SYNCHRONIZE sync_rule_1;
+
+TRANSITION engine.rule_2
+  CONSUME ;
+  PRODUCE engine.MCB_int;
+  SYNCHRONIZE sync_rule_2;
+
+TRANSITION engine.rule_3
+  CONSUME ;
+  PRODUCE engine.MTB_int;
+  SYNCHRONIZE sync_rule_3;
+
+TRANSITION engine.t_receive_MBevC
+  CONSUME MBevC;
+  PRODUCE engine.MBevC_int;
+  SYNCHRONIZE sync_t_receive_MBevC;
+
+TRANSITION engine.t_send_MCB
+  CONSUME engine.MCB_int;
+  PRODUCE MCB;
+  SYNCHRONIZE sync_t_send_MCB;
+
+TRANSITION engine.t_send_MEuro
+  CONSUME engine.MEuro_int;
+  PRODUCE MEuro;
+  SYNCHRONIZE sync_t_send_MEuro;
+
+TRANSITION engine.t_send_TBevT
+  CONSUME engine.TBevT_int;
+  PRODUCE TBevT;
+  SYNCHRONIZE sync_t_send_TBevT;
+
+TRANSITION t1
+  CONSUME controller.p22002320, engine.TEuro_int;
+  PRODUCE TRet, controller.p22122360;
+
+TRANSITION t_receive_TEurocontroller.t3
+  CONSUME TEuro, controller.p21975824;
+  PRODUCE controller.p22002320, engine.TEuro_int;
+
+
+{ END OF FILE '' }

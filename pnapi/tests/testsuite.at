@@ -227,6 +227,24 @@ AT_CHECK([GREP -q "petri:bug14116.owfn: 0" stderr],0)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14127 (https://gna.org/bugs/?14127)])
+m4_define([NET],[bug14127.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn -v NET], 1, ignore, stderr)
+AT_CHECK([GREP -q "undeclared label" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14128 (https://gna.org/bugs/?14128)])
+m4_define([NET1],[bug14128.1.owfn])
+m4_define([NET2],[bug14128.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 .])
+AT_CHECK([cp TESTFILES/NET2 .])
+AT_CHECK([PETRI -iowfn -oowfn --compose=NET2 NET1], 0, ignore, stderr)
+AT_CHECK([GREP -q "v, z;" NET1.composed.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

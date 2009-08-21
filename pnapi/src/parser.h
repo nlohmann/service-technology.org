@@ -208,6 +208,8 @@ namespace pnapi
       extern std::map<std::string, Place*> places_;
       /// recently read transition
       extern Transition* transition_;
+      /// cache of synchronous labels
+      extern std::set<std::string> synchronousLabels_;
       /// all purpose place pointer
       extern Place* place_;
       /// target of an arc

@@ -25,6 +25,9 @@ EXTRA_DIST = testsuite.at versions.sh \
 	     testfiles/bug13990.3.owfn \
 	     testfiles/bug14064.owfn \
 	     testfiles/bug14116.owfn \
+	     testfiles/bug14127.owfn \
+	     testfiles/bug14128.1.owfn \
+	     testfiles/bug14128.2.owfn \
              testfiles/test_input.lola \
              testfiles/test_dead_nodes.net.owfn \
              testfiles/test_identical_places.net.owfn \

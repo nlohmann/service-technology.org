@@ -65,6 +65,8 @@ namespace pnapi
       std::map<std::string, Place*> places_;
       /// recently read transition
       Transition* transition_;
+      /// cache of synchronous labels
+      std::set<std::string> synchronousLabels_;
       /// all purpose place pointer
       Place* place_;
       /// target of an arc

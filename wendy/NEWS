@@ -16,6 +16,9 @@ Version 2.0-unreleased
 * reorganized internal livelock detection; avoided additional bit to be
   stored for each internal marking
 
+* fixed bug #14166 (`https://gna.org/bugs/?14166'): adding dead dummy
+  transition
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

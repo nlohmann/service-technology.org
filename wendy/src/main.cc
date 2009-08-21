@@ -201,6 +201,13 @@ int main(int argc, char** argv) {
         abort(2, "\b%s", temp.str().c_str());
     }
 
+    // "fix" the net in order to avoid parse errors from LoLA
+    if (InnerMarking::net->getTransitions().empty()) {
+        status("net has no transitions -- adding dead dummy transition");
+        InnerMarking::net->createArc(InnerMarking::net->createPlace(),
+                                     InnerMarking::net->createTransition());
+    }
+
     // only normal nets are supported so far
     if (not InnerMarking::net->isNormal()) {
         abort(3, "the input open net must be normal");
@@ -213,23 +220,6 @@ int main(int argc, char** argv) {
     Label::initialize();
     InterfaceMarking::initialize(args_info.messagebound_arg);
     PossibleSendEvents::initialize();
-
-//    PossibleSendEvents *a = new PossibleSendEvents(true, 1);
-//    PossibleSendEvents *b = new PossibleSendEvents();
-//
-//    //a->labelPossible(4);
-//    b->labelPossible(8);
-//
-//    //*a |= *b;
-//
-//
-//    a = b;
-//
-//    char *foo = a->decode();
-//    for (Label_ID l = 0; l < Label::send_events; ++l) {
-//        fprintf(stderr, "%d", foo[l]);
-//    }
-//    fprintf(stderr, "\n");
 
 
     /*----------------------------.
@@ -331,7 +321,9 @@ int main(int argc, char** argv) {
     StoredKnowledge::root = new StoredKnowledge(K0);
     StoredKnowledge::root->store();
 
-    StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
+    if (StoredKnowledge::root->is_sane) {
+        StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
+    }
     delete K0;
     time(&end_time);
 

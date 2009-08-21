@@ -46,6 +46,12 @@ Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1) {
     std::queue<FullMarking> todo;
     todo.push(FullMarking(m));
 
+    // check if initial marking is already bad
+    if (InnerMarking::inner_markings[m]->is_bad) {
+        is_sane = 0;
+        return;
+    }
+
     // calculate the closure
     closure(todo);
 }

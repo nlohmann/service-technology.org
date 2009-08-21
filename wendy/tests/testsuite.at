@@ -235,7 +235,7 @@ AT_SETUP([Bug 13651 (https://gna.org/bugs/?13651)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13651.owfn .])
 AT_CHECK([WENDY bug13651.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -264,11 +264,11 @@ AT_SETUP([Bug 13994 (https://gna.org/bugs/?13994)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13994-1.owfn .])
 AT_CHECK([WENDY bug13994-1.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
 AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr])
 AT_CHECK([cp TESTFILES/bug13994-2.owfn .])
 AT_CHECK([WENDY bug13994-2.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
 AT_CHECK([GREP -q "wendy: net is controllable: NO" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -289,6 +289,16 @@ AT_CHECK([cp TESTFILES/bug14150.owfn .])
 AT_CHECK([WENDY bug14150.owfn --verbose --og],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
 AT_CHECK([GREP -q "0 : true" bug14150.og],1)
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+AT_SETUP([Bug 14166 (https://gna.org/bugs/?14166)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14166.owfn .])
+AT_CHECK([WENDY bug14166.owfn --verbose --og],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: net has no transitions -- adding dead dummy transition" stderr])
+AT_CHECK([GREP -q "wendy: 1 nodes left" stderr])
+AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 

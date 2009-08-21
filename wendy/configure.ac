@@ -73,7 +73,7 @@ AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
 	doc/Doxyfile man/Makefile maintainer/Makefile utils/Makefile
 	maintainer/debian/changelog.template maintainer/debian/info
-	maintainer/debian/rules
+	maintainer/debian/rules tests/cover.sh
 	maintainer/macports/Portfile tests/Makefile tests/package.m4])
 AC_OUTPUT
 

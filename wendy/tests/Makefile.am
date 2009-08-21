@@ -54,6 +54,10 @@ TESTFILES = bug1.fiona.og bug1.owfn \
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
 #############################################################################
 
+################
+# GNU autotest #
+################
+
 TESTSUITE = $(builddir)/testsuite
 EXTRA_DIST = testsuite.at versions.sh wrap.sh \
              $(addprefix testfiles/,$(TESTFILES))
@@ -69,3 +73,45 @@ clean-local:
 $(TESTSUITE): $(srcdir)/testsuite.at
 	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
 	mv $@.tmp $@
+	-chmod a+x cover.sh
+
+
+######################
+# LCOV test coverage #
+######################
+
+# the lcov scripts
+EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov
+
+# compile the code for code coverage
+cover-prepare:
+	$(MAKE) --directory=$(top_srcdir)/src clean
+	$(MAKE) --directory=$(top_srcdir)/src all \
+	  CXXFLAGS="-fprofile-arcs -ftest-coverage" \
+	  CFLAGS="-fprofile-arcs -ftest-coverage" \
+	  LDFLAGS="-lgcov"
+
+# get descriptions from testsuite
+cover-desc:
+	$(SHELL) '$(TESTSUITE)' -l > descriptions.txt
+	$(SED) -i '1,5d;n;d;' descriptions.txt
+	$(SED) -i 's/:[ \t]*testsuite.at:[0-9]*[ \t]*/ /;s/^[ \t]*//' descriptions.txt
+	$(SED) -i 's/^\([1-9]\) /0\1 /' descriptions.txt
+	$(SED) -i 's/ /\n\t/' descriptions.txt
+	lcov/gendesc descriptions.txt -o descriptions
+
+# execute tests using coverage
+cover-test: cover-prepare $(TESTSUITE)
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=TRUE
+
+# create a HTML table with results from LCOV
+cover: cover-desc cover-test
+	lcov/genhtml *.info \
+	   --output-directory output --title "$(PACKAGE_STRING)" \
+	   --show-details --legend --description-file descriptions --sort --function-coverage
+	@echo see `pwd`/output/index.html for a coverage report
+
+# clean also the temp files in the src directory
+CLEANFILES = -fr descriptions descriptions.txt \
+             $(top_builddir)/src/*.gcno $(top_builddir)/src/*.gcda *.info
+MAINTAINERCLEANFILES = -fr output

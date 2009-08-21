@@ -18,7 +18,7 @@
 \*****************************************************************************/
 
 
-%token KW_STATE KW_PROG KW_LOWLINK COLON COMMA ARROW NUMBER NAME
+%token KW_STATE KW_LOWLINK COLON COMMA ARROW NUMBER NAME
 
 %expect 1
 %defines
@@ -85,7 +85,7 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER prog lowlink markings transitions
+  KW_STATE NUMBER lowlink markings transitions
     { 
     
 //        status("\nDEBUG: current DFS: m%d", $2);
@@ -159,11 +159,6 @@ state:
         currentSuccessors.clear();
         marking.clear(); 
    }
-;
-
-prog:
-  /* empty */
-| KW_PROG NUMBER
 ;
 
 lowlink:

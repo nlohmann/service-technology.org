@@ -1,0 +1,35 @@
+#!/bin/sh
+# @configure_input@
+
+#############################################################################
+# This script has two modes:
+#
+#  - if the environment variable COVER is set to TRUE, LCOV from the Linux
+#    Test project (http://ltp.sourceforge.net/coverage/lcov.php) is used to
+#    collect test case coverage results for the given executable
+#
+#  - otherwise, the given executable is called without LCOV
+#############################################################################
+
+# evaluate COVER variable
+if test "$COVER" != "TRUE"; then
+	$*
+	exit $?
+fi
+
+# derive test name from current directory (assuming GNU Autotest)
+dir=`pwd`
+testname=`basename $dir`
+
+# reset counters for LCOV
+@abs_srcdir@/lcov/lcov --zerocounters --quiet --directory @abs_top_builddir@/src &> /dev/null
+
+# execute executable and remember exit code
+$*
+result=$?
+
+# evaluate coverage result of LCOV
+@abs_srcdir@/lcov/lcov --capture --directory @abs_top_builddir@/src --output-file @abs_builddir@/$testname.info --test-name $testname  &> /dev/null
+
+# exit with executable's exit code
+exit $result

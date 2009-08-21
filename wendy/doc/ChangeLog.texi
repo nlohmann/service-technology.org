@@ -5,6 +5,16 @@
 @item reorganized internal livelock detection; avoided additional bit to be stored for each internal marking
 
 @item fixed bug #14166 (@url{https://gna.org/bugs/?14166}): adding dead dummy transition to avoid parser errors from LoLA
+
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+
+@item current test case coverage:
+@itemize
+@item lines: 73.6% (3094 of 4202 lines)
+@item functions: 82.0% (1967 of 2398 functions)
+@end itemize
+
+@item refined test cases to increase test case coverage
 @end itemize
 
 

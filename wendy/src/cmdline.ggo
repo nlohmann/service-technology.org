@@ -172,7 +172,7 @@ section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"
 
 option "lola" -
-  "The LoLA binary that is compiled with the option `FULL' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-full'."
+  "The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'."
   string
   typestr="FILENAME"
   default="lola-full"

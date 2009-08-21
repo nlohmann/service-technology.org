@@ -7,7 +7,7 @@
 # tool.
 
 # Wendy needs a LoLA binary that builds complete unreduced state spaces. Such
-# a LoLA binary can be built by executing "make lola-full" using a recent
+# a LoLA binary can be built by executing "make lola-statspace" using a recent
 # LoLA distribution, available at http://service-technology.org/files/lola.
 
 lola = @LOLA@

@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for Wendy, version @value{VERSION}, a tool to calculate operating guidelines, last updated @value{UPDATED}.
+This manual is for Wendy, version @value{VERSION}, a tool to synthesize partners for services, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2009 Niels Lohmann
 
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* wendy: (wendy).       Wendy.
+* Wendy: (wendy).       synthesizing partners for services.
 @end direntry
 
 
@@ -34,7 +34,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @title Wendy
 
-@subtitle Calculating Operating Guidelines
+@subtitle Synthesizing Partners for Services
 @subtitle @url{http://service-technology.org/wendy}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
@@ -107,7 +107,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 53 tests were successful.
+All 61 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{wendy@@service-technology.org}.
@@ -154,18 +154,19 @@ Testcases for Wendy which check the generated binary. Some test scripts use Fion
 
 
 @section Requirements
+@anchor{Requirements}
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 In order to run, compile, and develop Wendy, several tools are required.
 
 @subsection Runtime
 @itemize
-@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{FULL} option. A suitable LoLA binary can be created as follows:
+@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{STATESPACE} option. A suitable LoLA binary can be created as follows:
 @enumerate
 @item download @url{http://service-technology.org/files/lola/lola.tar.gz}
 @item untar @file{lola.tar.gz}, configure
-@item call @samp{make lola-full}
-@item copy the binary @file{src/lola-full} to a directory of your path
+@item call @samp{make lola-statespace}
+@item copy the binary @file{src/lola-statespace} to a directory of your path
 (e.g., @file{/usr/local/bin}) or call @samp{make install}
 @end enumerate
 @end itemize
@@ -502,14 +503,7 @@ wendy: unknown transition `t' in file `foo.cov' -- aborting [#16]
 @end smallexample
 
 @item #17
-In case of generating livelock-free partners (by using the @option{--lf} parameter) or for reduction rule smart sending event (by using the @option{--smartSendingEvent} parameter), Wendy expects LoLA to be compiled with the directive STATESPACE.
-@smallexample
-@cartouche
-make lola-statespace
-@end cartouche
-@end smallexample
-
-If the statespace lola is not provided Wendy exits with error code 17.
+In case of generating livelock-free partners (by using the @option{--lf} parameter) or for reduction rule smart sending event (by using the @option{--smartSendingEvent} parameter), Wendy expects LoLA to be compiled with the directive @samp{STATESPACE}, see @ref{Requirements}. If this LoLA was not found Wendy exits with this code.
 
 @smallexample
 @cartouche

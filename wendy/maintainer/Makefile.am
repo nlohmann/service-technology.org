@@ -53,16 +53,16 @@ upload: tarballname
 # Debian stuff #
 ################
 EXTRA_DIST = debian/compat debian/control debian/copyright debian/dirs debian/docs
-MAINTAINERCLEANFILES = debian/README.Debian
-.PHONY: debian/changelog debian/README.Debian
+MAINTAINERCLEANFILES = debian/changelog
+.PHONY: debian/changelog
 
 #--------------------------------------------------------------------------#
 # move the "PURPOSE" section from the README file to Debian's control file #
 #--------------------------------------------------------------------------#
-debian/control: ../README
-	$(SED) -n '1,/Description:/ p' debian/control > debian/control~
-	cat ../README | $(SED) -n '/PURPOSE/,/COPYRIGHT/ p' | $(SED) 'N;$$!P;$$!D;$$d;$$d' | $(SED) '1d' | $(SED) 's/^  //' >> debian/control~
-	mv debian/control~ debian/control
+#debian/control: ../README
+#	$(SED) -n '1,/Description:/ p' debian/control > debian/control~
+#	cat ../README | $(SED) -n '/PURPOSE/,/COPYRIGHT/ p' | $(SED) 'N;$$!P;$$!D;$$d;$$d' | $(SED) '1d' | $(SED) 's/^  //' >> debian/control~
+#	mv debian/control~ debian/control
 
 #------------------------------------------------------------------#
 # add the current date to the changelog and the README.Debian file #
@@ -72,17 +72,12 @@ debian/changelog: debian/changelog.template
 	-$(SED) -i "s/XXXXXXXX/`date -R`/" debian/changelog
 	-$(SED) -i "s/YYYYYYYY/$(MICROVERSION)/" debian/changelog
 
-debian/README.Debian: debian/README.Debian.template
-	cp debian/README.Debian.template debian/README.Debian
-	-$(SED) -i "s/XXXXXXXX/`date -R`/" debian/README.Debian
-
 #--------------------------------------------------------------------#
 # create Debian package (source and binary) and RPM package (binary) #
 #--------------------------------------------------------------------#
-deb: tarballname debian/control debian/changelog debian/README.Debian
+deb: tarballname debian/changelog
 	tar xfz $(tarballname)
 	-cp -R debian $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
-	chmod a+x $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian/rules
 	-cd $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) ; CFLAGS="-O3" CXXFLAGS="-O3" LDFLAGS="-O3" dpkg-buildpackage
 	-cd $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) ; CFLAGS="-O3 -m64" CXXFLAGS="-O3 -m64" LDFLAGS="-O3 -m64" dpkg-buildpackage -aamd64
 	-cd $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) ; dpkg-buildpackage -S
@@ -90,9 +85,9 @@ deb: tarballname debian/control debian/changelog debian/README.Debian
 	fakeroot alien --to-rpm --keep-version $(PACKAGE_TARNAME)_$(PACKAGE_VERSION)*.deb
 
 #---------------------------------------------------------#
-# create Debian source package and upload it to launchpad #
+# create Debian source package and upload it to Launchpad #
 #---------------------------------------------------------#
-launchpad: debian/control debian/changelog debian/README.Debian
+launchpad: debian/changelog
 	$(MAKE) $(AM_MAKEFLAGS) dist -C $(top_srcdir)
 	mv $(top_srcdir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz $(top_srcdir)/$(PACKAGE_TARNAME)_$(MICROVERSION).orig.tar.gz
 	debuild -S -sa

@@ -4,6 +4,7 @@
                          \ V  V /  __/ | | | (_| | |_| |
                           \_/\_/ \___|_| |_|\__,_|\__, |
                                                   |___/
+                      synthesizing partners for services
                       http://service-technology.org/wendy
 
 
@@ -41,5 +42,9 @@ Version 1.9-unreleased
 
 * added test cases for reduction rule "smart sending event"
 
+* updated author/copyright information
 
-\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
+complete version history.
+

@@ -1,7 +1,7 @@
 /*****************************************************************************\
- Wendy -- Calculating Operating Guidelines
+ Wendy -- Synthesizing Partners for Services
 
- Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
  Wendy is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free

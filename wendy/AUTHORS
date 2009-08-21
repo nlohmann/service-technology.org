@@ -4,15 +4,27 @@
                          \ V  V /  __/ | | | (_| | |_| |
                           \_/\_/ \___|_| |_|\__,_|\__, |
                                                   |___/
+                      synthesizing partners for services
                       http://service-technology.org/wendy
 
 
 COPYRIGHT
-    Copyright (c) 2009 Niels Lohmann
+    Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
 
-AUTHOR/MAINTAINER
-    Wendy is written and maintained by Niels Lohmann
+AUTHORS
+    Niels Lohmann
+        implemented the original core functionality of Wendy (operating
+        guidelines)
+    Daniela Weinberg
+        implemented reduction techniques as well as the synthesis of livelock
+        free strategies
+    Christian Sura
+        implemented the functions to cover open nets nodes
+
+
+MAINTAINER
+    Wendy is maintained by Niels Lohmann.
 
 
 CONTACT

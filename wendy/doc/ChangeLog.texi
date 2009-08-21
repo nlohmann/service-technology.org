@@ -20,6 +20,7 @@
 
 @item added test cases for reduction rule ``smart sending event''
 
+@item updated author/copyright information
 @end itemize
 
 

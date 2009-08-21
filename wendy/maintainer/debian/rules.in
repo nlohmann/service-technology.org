@@ -7,7 +7,7 @@
 # This special exception was added by Craig Small in version 0.37 of dh-make.
 
 # Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+export DH_VERBOSE=1
 
 
 # These are used for cross-compiling and for saving the configure script
@@ -31,7 +31,7 @@ endif
 ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
-	./configure $(CROSS) --disable-assert --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="-Wl,-z,defs $(LDFLAGS)"
+	./configure $(CROSS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
 
 
 build: build-stamp
@@ -40,8 +40,8 @@ build-stamp:  config.status
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE)
-	#docbook-to-man debian/@PACKAGE_TARNAME@.sgml > @PACKAGE_TARNAME@.1
+	$(MAKE) all
+	#docbook-to-man debian/@PACKAGE@.sgml > @PACKAGE@.1
 
 	touch $@
 
@@ -59,11 +59,11 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-#	dh_prep  
+#	dh_prep
 	dh_installdirs
 
-	# Add here commands to install the package into debian/@PACKAGE_TARNAME@.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/@PACKAGE_TARNAME@ install
+	# Add here commands to install the package into debian/@PACKAGE@.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/@PACKAGE@ install
 
 
 # Build architecture-independent files here.

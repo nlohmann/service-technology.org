@@ -1,7 +1,7 @@
 /*****************************************************************************\
- Wendy -- Calculating Operating Guidelines
+ Wendy -- Synthesizing Partners for Services
 
- Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
+ Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
  Wendy is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
@@ -16,6 +16,7 @@
  You should have received a copy of the GNU Affero General Public License
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
+
 
 #ifndef VERBOSE_H
 #define VERBOSE_H

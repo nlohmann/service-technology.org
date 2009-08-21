@@ -4,6 +4,7 @@
                          \ V  V /  __/ | | | (_| | |_| |
                           \_/\_/ \___|_| |_|\__,_|\__, |
                                                   |___/
+                      synthesizing partners for services
                       http://service-technology.org/wendy
 
 
@@ -12,16 +13,16 @@ In order to run, compile, and develop Wendy, several tools are required.
 Runtime
 -------
 
-   * LoLA (`http://service-technology.org/lola'), compiled with the `FULL'
-     option. A suitable LoLA binary can be created as follows:
+   * LoLA (`http://service-technology.org/lola'), compiled with the
+     `STATESPACE' option. A suitable LoLA binary can be created as follows:
        1. download `http://service-technology.org/files/lola/lola.tar.gz'
 
        2. untar `lola.tar.gz', configure
 
-       3. call `make lola-full'
+       3. call `make lola-statespace'
 
-       4. copy the binary `src/lola-full' to a directory of your path (e.g.,
-          `/usr/local/bin') or call `make install'
+       4. copy the binary `src/lola-statespace' to a directory of your path
+          (e.g., `/usr/local/bin') or call `make install'
 
 Wendy's configure script checks whether LoLA (with binary `lola-full') is
 found in the path and adjusts the configuration file `src/wendy.conf'

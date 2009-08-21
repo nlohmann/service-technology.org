@@ -4,20 +4,21 @@
                          \ V  V /  __/ | | | (_| | |_| |
                           \_/\_/ \___|_| |_|\__,_|\__, |
                                                   |___/
+                      synthesizing partners for services
                       http://service-technology.org/wendy
 
 
 PURPOSE
-    Wendy is a tool to calculate operating guidelines.
+    Wendy is a tool to synthesize partners for services. This includes a
+    finite characterization of all partners (called "operating guidelines").
 
 
 COPYRIGHT
-    Copyright (c) 2009 Niels Lohmann
+    Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
 
-AUTHOR
-    Wendy is written and maintained by Niels Lohmann. See file "AUTHORS" for
-    more information.
+AUTHORS
+    See file "AUTHORS" for details.
 
 
 LICENSE

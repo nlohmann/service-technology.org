@@ -79,7 +79,7 @@ bool fileExists(std::string filename) {
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
-    // overwrite invokation for consistent error messages
+    // overwrite invocation for consistent error messages
     argv[0] = (char*)PACKAGE;
 
     // store invocation in a string for meta information in file output
@@ -213,6 +213,23 @@ int main(int argc, char** argv) {
     Label::initialize();
     InterfaceMarking::initialize(args_info.messagebound_arg);
     PossibleSendEvents::initialize();
+
+//    PossibleSendEvents *a = new PossibleSendEvents(true, 1);
+//    PossibleSendEvents *b = new PossibleSendEvents();
+//
+//    //a->labelPossible(4);
+//    b->labelPossible(8);
+//
+//    //*a |= *b;
+//
+//
+//    a = b;
+//
+//    char *foo = a->decode();
+//    for (Label_ID l = 0; l < Label::send_events; ++l) {
+//        fprintf(stderr, "%d", foo[l]);
+//    }
+//    fprintf(stderr, "\n");
 
 
     /*----------------------------.

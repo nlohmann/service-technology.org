@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "PossibleSendEvents.h"
 #include "InnerMarking.h"
 #include "Label.h"
 #include "Cover.h"
@@ -87,7 +88,9 @@ state:
   KW_STATE NUMBER prog lowlink markings transitions
     { 
     
-       // status("\nDEBUG: current DFS: m%d", $2);
+//        status("\nDEBUG: current DFS: m%d", $2);
+  
+//        fprintf(stderr, "dfs: %d, l: %d.... ", $2, currentLowlink);
     
         InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
@@ -109,12 +112,10 @@ state:
         }
 
         /* ================================================================================= */
-        /* generating livelock free partners */
+        /* calculate strongly connected components and do some evaluation on its members     */
         /* ================================================================================= */
 
-        if (args_info.lf_flag) {
-            
-            //status("current dfs: %d, lowlink: %d", $2, currentLowlink);
+        if (args_info.smartSendingEvent_flag or args_info.lf_flag) {
 
             if (!currentSuccessors.empty()) { /* current marking has successors */
                 
@@ -124,7 +125,7 @@ state:
                 /* current marking is a representative of a (T)SCC, so fetch all members of the strongly connected components from stack */
                 if ($2 == currentLowlink) {
                     
-                    //status("m%d is representative of a (T)SCC", $2);
+                   // status("m%d is representative of a (T)SCC", $2);
                     
                     /* last popped marking */
                     InnerMarking_ID poppedMarking;
@@ -133,29 +134,22 @@ state:
                         /* get last marking from the Tarjan stack */
                         poppedMarking = tarjanStack.top();
                         
-                        //status("... together with m%d", poppedMarking);
-                        
                         /* actually delete it from stack */
                         tarjanStack.pop();
                         
+                       // status("... together with m%d", poppedMarking);
+                        
                         /* if a final marking is reachable from the representative, then a final marking is reachable */
                         /* from all markings within the strongly connected component */
-                        if (InnerMarking::markingMap[$2]->is_final_marking_reachable) {
-                            (InnerMarking::markingMap[poppedMarking])->is_final_marking_reachable = 1; 
-                        }
+                        InnerMarking::markingMap[poppedMarking]->is_final_marking_reachable = InnerMarking::markingMap[$2]->is_final_marking_reachable;
                         
                         if (args_info.smartSendingEvent_flag) {
-                            /* ... the same is true for reachable sending events */
-                            for (uint8_t e = 0; e < Label::send_events; e++) {
-                                InnerMarking::markingMap[poppedMarking]->reachableSendingEvents[e] =
-                                        InnerMarking::markingMap[poppedMarking]->reachableSendingEvents[e] or InnerMarking::markingMap[$2]->reachableSendingEvents[e];    
-                            
-                                if (InnerMarking::markingMap[poppedMarking]->reachableSendingEvents[e]) {
-                                    //status("DEBUG: (2) from m%d sending event %s is reachable\n", poppedMarking, Label::id2name[e+Label::last_receive + 1].c_str());
-                                }
-                            }
+                            /* ... the same is true for possible sending events */
+
+                            // LOLA does not give correct lowlink yet !!!!!!!!!!!!!!!!!!!! if it does uncomment the following lines
+                           // InnerMarking::markingMap[poppedMarking]->possibleSendEvents = InnerMarking::markingMap[$2]->possibleSendEvents;
                         }
-                                                
+
                     } while ($2 != poppedMarking);
                 } 
             } /* end else, successors is empty */
@@ -174,10 +168,10 @@ prog:
 
 lowlink:
     {
-        if (args_info.lf_flag) {
-            /* livelock freedom is activated, but lola does not provide necessary lowlink value */
+        if (args_info.smartSendingEvent_flag or args_info.lf_flag) {
+            /* livelock freedom or reduction by smart sending event is activated, but lola does not provide necessary lowlink value */
             abort(17, "LoLA has not been configured appropriately");
-        }
+        } 
     }
 | KW_LOWLINK NUMBER
     {

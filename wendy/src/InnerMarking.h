@@ -26,6 +26,7 @@
 #include <set>
 #include "types.h"
 #include "config.h"
+#include "PossibleSendEvents.h"
 #include <pnapi/pnapi.h>
 
 
@@ -124,7 +125,7 @@ class InnerMarking {
         Label_ID *labels;
 
         /// receiving transitions that are potentially reachable
-        char *reachableSendingEvents;
+        PossibleSendEvents *possibleSendEvents;
 
 };
 

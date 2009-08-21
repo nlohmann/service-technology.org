@@ -43,9 +43,6 @@ class Knowledge {
         /// whether the knowledge contains a waitstate resolvable by l
         bool resolvableWaitstate(const Label_ID&) const;
 
-        /// whether sending l will lead to insane node
-        bool sendLeadsToInsaneNode(const Label_ID &) const;
-
         /// whether the knowledge's waitstates can be resolved by receiving
         bool receivingHelps() const;
 

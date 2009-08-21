@@ -100,8 +100,6 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         return;
     }
 
-    StoredKnowledge *SK_store = NULL;
-
     // only process knowledges within the message bounds
     if (K_new->is_sane) {
 
@@ -109,7 +107,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         StoredKnowledge *SK_new = new StoredKnowledge(K_new);
 
         // add it to the knowledge tree
-        SK_store = SK_new->store();
+        StoredKnowledge *SK_store = SK_new->store();
 
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
@@ -147,27 +145,36 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
     delete K_new;
 }
 
+
 /*
  LIVELOCK FREEDOM
 
- \brief set all values needed for Tarjan algorithm and livelock freedom analysis
- \param SK current knowledge
- \note has to be called right after SK is created
+ \brief finds out if current knowledge is final, if so the appropriate attribute is set
 */
-void StoredKnowledge::setTarjanValues() {
-
-    // save Tarjan's values
-    dfs = lowlink = stats_storedKnowledges;
-
-    // it is new, so put it on the Tarjan stack
-    tarjanStack.push_back(this);
-
+inline void StoredKnowledge::isFinal() {
     // traverse the current knowledge to find out if this knowledge is final
     for (unsigned int i = 0; i < size; i++) {
         if (InnerMarking::inner_markings[inner[i]]->is_final) {
             is_final_reachable = interface[i]->unmarked();
         }
     }
+}
+
+
+/*
+ LIVELOCK FREEDOM
+
+ \brief set all values needed for Tarjan algorithm and livelock freedom analysis
+ \param SK current knowledge
+ \note Attention: has to be called right after SK is stored! (because dfs and lowlink value depend on stats_storedKnowledges)
+*/
+inline void StoredKnowledge::setTarjanValues() {
+
+    // save Tarjan's values
+    dfs = lowlink = stats_storedKnowledges;
+
+    // it is new, so put it on the Tarjan stack
+    tarjanStack.push_back(this);
 }
 
 
@@ -256,8 +263,42 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         K->sequentializeReceivingEvents(consideredReceivingEvents);
     }
 
+//    printf("DEBUG: ===============================================================\n");
+//    printf("DEBUG: consider knowledge %d\n", SK->dfs);
+
+
+    PossibleSendEvents * posSendEvents;
+    char * posSendEventsDecoded;
+
+    if (args_info.smartSendingEvent_flag) {
+        posSendEvents = new PossibleSendEvents(true, 1);
+
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
+            *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
+
+//            char * posSendEventsDecoded2 = InnerMarking::inner_markings[pos->first]->possibleSendEvents->decode();
+//            printf("DEBUG: in marking m%d (f: %d)... ", pos->first, InnerMarking::inner_markings[pos->first]->is_final_marking_reachable);
+//            for (Label_ID l = 0; l < Label::send_events; ++l) {
+//                printf("%d", posSendEventsDecoded2[l]);
+//            }
+//            printf("\n");
+
+        }
+        posSendEventsDecoded = posSendEvents->decode();
+    }
+
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+
+        // reduction rule: send leads to insane node
+        if (args_info.smartSendingEvent_flag) {
+            if (SENDING(l) and not posSendEventsDecoded[l - Label::first_send]) {
+
+//                printf("DEBUG: in knowledge %d sending event !%s is blocked\n", SK->dfs, Label::id2name[l].c_str());
+
+                continue;
+            }
+        }
 
         // reduction rule: sequentialize receiving events
         // if current receiving event is not to be considered, continue
@@ -280,13 +321,6 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
             }
         }
 
-        // reduction rule: send leads to insane node
-        if (args_info.smartSendingEvent_flag) {
-        	if (SENDING(l) and K->sendLeadsToInsaneNode(l)) {
-            	continue;
-        	}
-        }
-
         process(K, SK, l);
 
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
@@ -299,6 +333,11 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
     }
 
     // we have traversed through the reachability graph of the current knowledge
+
+    if (args_info.smartSendingEvent_flag) {
+        delete posSendEvents;
+    }
+
     if (args_info.lf_flag) {
         evaluateCurrentSCC(SK);
     }
@@ -978,6 +1017,7 @@ StoredKnowledge *StoredKnowledge::store() {
     // LIVELOCK FREEDOM
     if (args_info.lf_flag) {
         setTarjanValues();
+        isFinal();
     }
 
     ++stats_storedKnowledges;

@@ -39,6 +39,9 @@ class PossibleSendEvents {
         /// constructor
         PossibleSendEvents();
 
+        /// constructor with initialization
+        PossibleSendEvents(bool, Label_ID);
+
         /// copy constructor
         PossibleSendEvents(const PossibleSendEvents &);
 
@@ -47,6 +50,9 @@ class PossibleSendEvents {
 
         /// overloaded bit-wise AND operator
         void operator&=(const PossibleSendEvents &);
+
+        /// overloaded bit-wise OR operator
+        void operator|=(const PossibleSendEvents &);
 
         /// set a label to be possible
         void labelPossible(Label_ID l);

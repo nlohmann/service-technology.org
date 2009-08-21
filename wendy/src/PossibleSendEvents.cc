@@ -50,6 +50,9 @@ void PossibleSendEvents::initialize() {
  * CONSTRUCTOR *
  ***************/
 
+/*
+    \brief all values are initialized with 0
+*/
 PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
     assert(bytes > 0);
 
@@ -61,6 +64,33 @@ PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
     }
 }
 
+/*
+    \param allValues all sending events are to be initialized with label (0 or 1)
+    \param label in case allValues is set to true, then it has to be 0 or 1; otherwise if allValues is set to false,
+                 label represents the label that is to be set to one, all others are initialized with 0
+ */
+PossibleSendEvents::PossibleSendEvents(bool allValues, Label_ID label) : decodedLabels(NULL) {
+    assert(bytes > 0);
+    assert((allValues and label <= 1) or (not allValues and SENDING(label)));
+
+    // reserve memory
+    storage = new uint8_t[bytes];
+    for (size_t i = 0; i < bytes; ++i) {
+        // if allValues is set, initially all sending events are reachable
+        // otherwise they are set to 1
+        storage[i] = allValues ? 255 : 0;
+    }
+
+    // set one particular label to 1
+    if (not allValues) {
+        labelPossible(label);
+    }
+}
+
+/*
+    \brief the values of other are copied into current storage
+    \param other the values of the other storage to be copied into the current one
+*/
 PossibleSendEvents::PossibleSendEvents(const PossibleSendEvents &other) : decodedLabels(NULL) {
     assert(bytes > 0);
 
@@ -95,6 +125,14 @@ void PossibleSendEvents::operator&=(const PossibleSendEvents &other) {
 
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] &= other.storage[i];
+    }
+}
+
+void PossibleSendEvents::operator|=(const PossibleSendEvents &other) {
+    assert(bytes > 0);
+
+    for (size_t i = 0; i < bytes; ++i) {
+        storage[i] |= other.storage[i];
     }
 }
 

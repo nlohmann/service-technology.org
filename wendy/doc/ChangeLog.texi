@@ -15,6 +15,11 @@
 @item fixed bug #14150 (@url{https://gna.org/bugs/?14150}): empty node is only printed if it is reachable from the initial node
 
 @item updated maintainer scripts to support Launchpad
+
+@item implemented reduction rule ``smart sending event'' (parameter: @option{--smartSendingEvent}): a sending event is only considered if from the inner markings within the current knowledge (1) in case of deadlock freedom, some (inner) marking is reachable; (2) in case of livelock freedom, a final (inner) marking is reachable.
+
+@item added test cases for reduction rule ``smart sending event''
+
 @end itemize
 
 

@@ -33,7 +33,13 @@ Version 1.9-unreleased
 
 * updated maintainer scripts to support Launchpad
 
+* implemented reduction rule "smart sending event" (parameter:
+  `--smartSendingEvent'): a sending event is only considered if from the
+  inner markings within the current knowledge (1) in case of deadlock
+  freedom, some (inner) marking is reachable; (2) in case of livelock
+  freedom, a final (inner) marking is reachable.
 
-See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
-complete version history.
+* added test cases for reduction rule "smart sending event"
 
+
+\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n

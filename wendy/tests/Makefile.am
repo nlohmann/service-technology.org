@@ -44,7 +44,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
 	    LF_DF_controllable.owfn \
 	    nLF_DF_controllable.owfn \
 	    LF_DF_controllable2.owfn \
-	    smartSendingEvent.owfn smartSendingEvent.fiona.og
+	    smartSendingEvent.owfn smartSendingEvent.fiona.og \
+	    06-03-23_BPM06_shop_sect_6.owfn 06-03-23_BPM06_shop_sect_6.fiona.og
 
 
 #############################################################################

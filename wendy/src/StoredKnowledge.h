@@ -140,6 +140,8 @@ class StoredKnowledge {
         StoredKnowledge *store();
 
         /// LIVELOCK FREEDOM
+        void isFinal();
+
         // set values needed for Tarjan algorithm and livelock freedom analysis
         void setTarjanValues();
 

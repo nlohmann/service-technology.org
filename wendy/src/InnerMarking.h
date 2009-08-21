@@ -35,7 +35,7 @@
  \brief inner marking
 
  An inner marking only stores three bits about its nature (is_final,
- is_deadlock, and is_waitstate -- see determineType()) and its successors.
+ is_bad, and is_waitstate -- see determineType()) and its successors.
  The successors are stored in two C-style arrays: one consisting of the
  identifiers of the successors and one consisting of the interface labels of
  the respective transitions.
@@ -57,6 +57,9 @@ class InnerMarking {
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;
 
+        /// a temporary storage used to detect internal livelocks
+        static std::map<InnerMarking_ID, bool> finalMarkingReachableMap;
+
         /// an array of the inner markings
         static InnerMarking **inner_markings;
 
@@ -74,8 +77,8 @@ class InnerMarking {
         /// the number of total markings
         static unsigned int stats_markings;
 
-        /// the number of deadlocks
-        static unsigned int stats_deadlocks;
+        /// the number of internal bad states
+        static unsigned int stats_bad_states;
 
         /// the number of markings that will reach a deadlock
         static unsigned int stats_inevitable_deadlocks;
@@ -86,7 +89,7 @@ class InnerMarking {
     public: /* member functions */
 
         /// constructor
-        InnerMarking(const std::vector<Label_ID>&, const std::vector<InnerMarking_ID>&, bool);
+        InnerMarking(const InnerMarking_ID&, const std::vector<Label_ID>&, const std::vector<InnerMarking_ID>&, bool);
 
         /// destructor
         ~InnerMarking();
@@ -103,7 +106,7 @@ class InnerMarking {
     private: /* member functions */
 
         /// determine the type of this marking
-        void determineType();
+        void determineType(const InnerMarking_ID&);
 
     public: /* member attributes */
 
@@ -113,11 +116,8 @@ class InnerMarking {
         /// whether this marking needs an external event to proceed
         unsigned is_waitstate : 1;
 
-        /// whether this marking is an internal deadlock
-        unsigned is_deadlock : 1;
-
-        /// whether from this marking a final marking is reachable
-        unsigned is_final_marking_reachable : 1;
+        /// whether this marking is an internal deadlock or livelock
+        unsigned is_bad : 1;
 
         /// the number of successor markings (size of successors and labels)
         uint8_t out_degree;

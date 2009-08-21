@@ -1,6 +1,8 @@
 @heading Version 2.0-unreleased
 @itemize
-@item 
+@item removed parameter @samp{--noDeadlockDetection}
+
+@item reorganized internal livelock detection; avoided additional bit to be stored for each internal marking
 @end itemize
 
 

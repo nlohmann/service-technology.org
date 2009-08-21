@@ -297,6 +297,15 @@ AT_CLEANUP
 AT_BANNER([Operating Guidelines])
 ############################################################################
 
+AT_SETUP([BPM 2006, Section 6])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/06-03-23_BPM06_shop_sect_6.* .])
+AT_CHECK([WENDY 06-03-23_BPM06_shop_sect_6.owfn --og --fionaFormat --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 7 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence 06-03-23_BPM06_shop_sect_6.og 06-03-23_BPM06_shop_sect_6.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(og)
+AT_CLEANUP
+
 AT_SETUP([Coffee Automaton])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.* .])
@@ -362,32 +371,20 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Graph Reduction])
+AT_BANNER([Smart Sending Event])
 ############################################################################
 
-AT_SETUP([Smart Sending Event])
+AT_SETUP([Generic Example])
 AT_CHECK_LOLA
 AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/smartSendingEvent.* .])
 AT_CHECK([WENDY smartSendingEvent.owfn --og --fionaFormat --verbose --lola=LOLA --smartSendingEvent],0,ignore,ignore)
 AT_CHECK([FIONA -tequivalence smartSendingEvent.og smartSendingEvent.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(reduction)
+AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
-AT_SETUP([Smart Sending Event (Dining Philosophers)])
-AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
-AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
-AT_CHECK([WENDY phcontrol3.unf.owfn --og --fionaFormat --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: stored 67 knowledges" stderr])
-AT_CHECK([GREP -q "wendy: 67 nodes left" stderr])
-AT_CHECK([FIONA -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og],0,stdout,ignore)
-AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(reduction)
-AT_CLEANUP
-
-AT_SETUP([Smart Sending Event (BPM 6)])
+AT_SETUP([BPM 2006, Section 6])
 AT_CHECK_LOLA
 AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/06-03-23_BPM06_shop_sect_6.* .])
@@ -396,7 +393,84 @@ AT_CHECK([GREP -q "wendy: stored 13 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 7 nodes left" stderr])
 AT_CHECK([FIONA -tequivalence 06-03-23_BPM06_shop_sect_6.og 06-03-23_BPM06_shop_sect_6.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(reduction)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([Coffee Automaton])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/myCoffee.* .])
+AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 8 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 7 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence myCoffee.og myCoffee.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([Dining Philosophers])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
+AT_CHECK([WENDY phcontrol3.unf.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 67 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 67 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([Purchase Order Process])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/PO.* .])
+AT_CHECK([WENDY PO.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 168 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 168 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence PO.og PO.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([Sequence])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/sequence10.* .])
+AT_CHECK([WENDY sequence10.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 1024 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 1024 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence sequence10.og sequence10.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([SMTP Protocol])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/smtp3.* .])
+AT_CHECK([WENDY smtp3.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 1354 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 474 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence smtp3.og smtp3.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([Travel Service])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/T2.* .])
+AT_CHECK([WENDY T2.owfn --fionaFormat --og --verbose --smartSendingEvent --lola=LOLA --messagebound=2],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 351 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 192 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence T2.og T2.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
+AT_CLEANUP
+
+AT_SETUP([ZEUS Seller Service])
+AT_CHECK_LOLA
+AT_CHECK_LOLASTATESPACE
+AT_CHECK([cp TESTFILES/zeus.* .])
+AT_CHECK([WENDY zeus.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: stored 6 knowledges" stderr])
+AT_CHECK([GREP -q "wendy: 6 nodes left" stderr])
+AT_CHECK([FIONA -tequivalence zeus.og zeus.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 
@@ -577,7 +651,7 @@ AT_CLEANUP
 AT_BANNER([Cover Constraints])
 ############################################################################
 
-AT_SETUP([cover interface places])
+AT_SETUP([Cover interface places])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/regist-priv.owfn .])
 AT_CHECK([cp TESTFILES/regist-priv.owfn.cov .])

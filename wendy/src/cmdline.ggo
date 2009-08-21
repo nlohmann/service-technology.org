@@ -110,13 +110,17 @@ option "showTransients" -
   flag off
 
 
-section "Optimizations / Reductions"
-sectiondesc="These options control the optimizations and reductions Wendy uses while computing operating guidelines. Note that reduction rules do not necessarily preserve all strategies, but return a strategy if one exists.\n"
+section "Optimizations"
+sectiondesc="These options control the optimizations Wendy uses while synthesizing partners.\n"
 
-option "noDeadlockDetection" -
-  "Do not detect inevitable deadlocks during preprocessing."
-  details="Inevitable deadlocks are detected while parsing the state space created by LoLA. This optimization does not change the calculated operating guidelines, but may help to speed up its calculation. Switching off this optimization is only provided for debugging and diagnosis purposes.\n"
+option "smartSendingEvent" -
+  "Send only if no marking within current knowledge is found that will definitely not consume the message sent."
+  details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, strategies which will send messages that will never be consumed get lost. In case of livelock freedom no strategies will be lost.\n"
   flag off
+
+
+section "Reductions"
+sectiondesc="These options control the reductions Wendy uses while synthesizing partners. Note that reduction rules do not necessarily preserve all strategies, but return a strategy if one exists.\n"
 
 option "waitstatesOnly" -
   "Only consider waitstates when calculating successors."
@@ -136,11 +140,6 @@ option "seqReceivingEvents" -
 option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
   details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
-  flag off
-
-option "smartSendingEvent" -
-  "Send only if no marking within current knowledge is found that will definitely not consume the message sent."
-  details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, strategies which will send messages that will never be consumed get lost. In case of livelock freedom no strategies will be lost.\n"
   flag off
 
 

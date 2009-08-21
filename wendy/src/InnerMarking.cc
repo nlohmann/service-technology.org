@@ -36,13 +36,14 @@ extern gengetopt_args_info args_info;
  ******************/
 
 std::map<InnerMarking_ID, InnerMarking*> InnerMarking::markingMap;
+std::map<InnerMarking_ID, bool> InnerMarking::finalMarkingReachableMap;
 pnapi::PetriNet *InnerMarking::net = new pnapi::PetriNet();
 InnerMarking **InnerMarking::inner_markings = NULL;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
 
 unsigned int InnerMarking::stats_markings = 0;
-unsigned int InnerMarking::stats_deadlocks = 0;
+unsigned int InnerMarking::stats_bad_states = 0;
 unsigned int InnerMarking::stats_inevitable_deadlocks = 0;
 unsigned int InnerMarking::stats_final_markings = 0;
 
@@ -66,6 +67,7 @@ void InnerMarking::initialize() {
     // copy data from mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < stats_markings; ++i) {
         inner_markings[i] = markingMap[i];
+        inner_markings[i]->is_bad = (inner_markings[i]->is_bad or (not finalMarkingReachableMap[i]));
 
         // register markings that may become activated by sending a message
         // to them or by synchronization
@@ -79,14 +81,16 @@ void InnerMarking::initialize() {
         }
     }
 
+    // destroy temporary STL mappings
     markingMap.clear();
+    finalMarkingReachableMap.clear();
 
     if (stats_final_markings == 0) {
         fprintf(stderr, "%s: warning: no final marking found\n", PACKAGE);
     }
 
-    status("found %d final markings, %d deadlocks, and %d inevitable deadlocks",
-        stats_final_markings, stats_deadlocks, stats_inevitable_deadlocks);
+    status("found %d final markings, %d bad states, and %d inevitable deadlocks",
+        stats_final_markings, stats_bad_states, stats_inevitable_deadlocks);
     status("stored %d inner markings", stats_markings);
 }
 
@@ -95,18 +99,13 @@ void InnerMarking::initialize() {
  * CONSTRUCTOR *
  ***************/
 
-InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
+InnerMarking::InnerMarking(const InnerMarking_ID &myId,
+                           const std::vector<Label_ID> &_labels,
                            const std::vector<InnerMarking_ID> &_successors,
                            bool _is_final) :
-               is_final(_is_final), is_waitstate(0), is_deadlock(0),
-               out_degree(_successors.size()), is_final_marking_reachable(1)
+               is_final(_is_final), is_waitstate(0), is_bad(0),
+               out_degree(_successors.size())
 {
-
-    // property is_final_marking_reachable is only used in case of generating livelock free partners
-    if (args_info.lf_flag and not is_final) {
-    	is_final_marking_reachable = 0;
-    }
-
     ++stats_markings;
     if (stats_markings % 50000 == 0) {
         fprintf(stderr, "%8d inner markings\n", stats_markings);
@@ -121,15 +120,15 @@ InnerMarking::InnerMarking(const std::vector<Label_ID> &_labels,
     std::copy(_successors.begin(), _successors.end(), successors);
 
     // knowing all successors, we can determine the type of the marking
-    determineType();
+    determineType(myId);
 
     // and we can make an approximation of the receiving transitions that are reachable from here
     if (args_info.smartSendingEvent_flag) {
 
-        // we reserve a boolean value for each sending event possible
+        // we reserve a Boolean value for each sending event possible
         possibleSendEvents = new PossibleSendEvents();
 
-		calcReachableSendingEvents();
+        calcReachableSendingEvents();
     }
 }
 
@@ -151,7 +150,7 @@ InnerMarking::~InnerMarking() {
  well as the fact whether this marking is a final marking. For the further
  processing, it is sufficient to distinguish three types:
 
- - the marking is a deadlock (is_deadlock) -- then a knowledge containing
+ - the marking is a bad state (is_bad) -- then a knowledge containing
    this inner marking can immediately be considered insane
  - the marking is a final marking (is_final) -- this is needed to distinguish
    deadlocks from final markings
@@ -171,45 +170,41 @@ InnerMarking::~InnerMarking() {
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
  */
-inline void InnerMarking::determineType() {
+inline void InnerMarking::determineType(const InnerMarking_ID &myId) {
     bool is_transient = false;
 
     // deadlock: no successor markings and not final
     if (out_degree == 0 and not is_final) {
-        ++stats_deadlocks;
-        is_deadlock = 1;
+        ++stats_bad_states;
+        is_bad = 1;
     }
 
     if (is_final) {
         ++stats_final_markings;
     }
 
-    if (args_info.lf_flag) {
-        is_final_marking_reachable = is_final;
-    }
+    // when only deadlocks are considered, we don't care about final markings
+    finalMarkingReachableMap[myId] = args_info.lf_flag ? is_final : true;
 
     // variable to detect whether this marking has only deadlocking successors
     bool deadlock_inevitable = true;
     for (uint8_t i = 0; i < out_degree; ++i) {
-        if (not args_info.noDeadlockDetection_flag) {
-            // if a single successor is not a deadlock, everything is OK
-            if (markingMap[successors[i]] != NULL and
-                deadlock_inevitable and
-                not markingMap[successors[i]]->is_deadlock) {
-                deadlock_inevitable = false;
-            }
+        // if a single successor is not a deadlock, everything is OK
+        if (markingMap[successors[i]] != NULL and
+            deadlock_inevitable and
+            not markingMap[successors[i]]->is_bad) {
+            deadlock_inevitable = false;
+        }
 
-            // if we have not seen a successor yet, we can't be a deadlock
-            if (markingMap[successors[i]] == NULL) {
-                deadlock_inevitable = false;
-            }
+        // if we have not seen a successor yet, we can't be a deadlock
+        if (markingMap[successors[i]] == NULL) {
+            deadlock_inevitable = false;
         }
 
         if (args_info.lf_flag) {
-            if (not is_final_marking_reachable and
-                    markingMap[successors[i]] != NULL and
-                    markingMap[successors[i]]->is_final_marking_reachable) {
-                is_final_marking_reachable = 1;
+            if (markingMap[successors[i]] != NULL and
+                finalMarkingReachableMap[successors[i]]) {
+                finalMarkingReachableMap[myId] = true;
             }
         }
 
@@ -220,16 +215,15 @@ inline void InnerMarking::determineType() {
     }
 
     // deadlock cannot be avoided any more -- treat this marking as deadlock
-    if (not args_info.noDeadlockDetection_flag and
-        not is_final and
-        not is_deadlock and
+    if (not is_final and
+        not is_bad and
         deadlock_inevitable) {
-        is_deadlock = 1;
+        is_bad = 1;
         ++stats_inevitable_deadlocks;
     }
 
     // draw some last conclusions
-    if (not (is_transient or is_deadlock)) {
+    if (not (is_transient or is_bad)) {
         is_waitstate = 1;
     }
 }
@@ -292,7 +286,7 @@ void InnerMarking::calcReachableSendingEvents() {
 
             // if successor exists and if it leads to a final marking
             if (markingMap[successors[i]] != NULL and
-                markingMap[successors[i]]->is_final_marking_reachable) {
+                finalMarkingReachableMap[successors[i]]) {
 
                 // direct successor reachable by sending event
                 if (SENDING(labels[i]) and not consideredLabels[labels[i]]) {

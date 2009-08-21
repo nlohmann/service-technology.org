@@ -11,7 +11,11 @@
 Version 2.0-unreleased
 ======================
 
-*
+* removed parameter `--noDeadlockDetection'
+
+* reorganized internal livelock detection; avoided additional bit to be
+  stored for each internal marking
+
 Version 1.9
 ===========
 

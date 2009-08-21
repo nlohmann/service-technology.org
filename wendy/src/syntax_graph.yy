@@ -92,7 +92,7 @@ state:
   
 //        fprintf(stderr, "dfs: %d, l: %d.... ", $2, currentLowlink);
     
-        InnerMarking::markingMap[$2] = new InnerMarking(currentLabels, currentSuccessors,
+        InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
         if (markingfile) {
@@ -141,7 +141,7 @@ state:
                         
                         /* if a final marking is reachable from the representative, then a final marking is reachable */
                         /* from all markings within the strongly connected component */
-                        InnerMarking::markingMap[poppedMarking]->is_final_marking_reachable = InnerMarking::markingMap[$2]->is_final_marking_reachable;
+                        InnerMarking::finalMarkingReachableMap[poppedMarking] = InnerMarking::finalMarkingReachableMap[$2];
                         
                         if (args_info.smartSendingEvent_flag) {
                             /* ... the same is true for possible sending events */

@@ -131,7 +131,7 @@ Knowledge::Knowledge(const Knowledge* const parent, const Label_ID &label) : is_
                     for (uint8_t j = 0; j < m->out_degree; ++j) {
                         if (m->labels[j] == label) {
                             // check the marking reached by synchronization
-                            if (InnerMarking::inner_markings[m->successors[j]]->is_deadlock) {
+                            if (InnerMarking::inner_markings[m->successors[j]]->is_bad) {
                                 delete interface;
                                 is_sane = 0;
                                 return;
@@ -229,17 +229,10 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
                 }
             }
 
-            // check if successor is a deadlock
-            if (InnerMarking::inner_markings[m->successors[i]]->is_deadlock) {
+            // check if successor is a deadlock or livelock
+            if (InnerMarking::inner_markings[m->successors[i]]->is_bad) {
                 is_sane = 0;
                 return;
-            }
-
-            // LIVELOCK FREEDOM
-            // check, if from successor a final marking is still reachable
-            if (not InnerMarking::inner_markings[m->successors[i]]->is_final_marking_reachable) {
-            	is_sane = 0;
-            	return;
             }
 
             // if we found a valid successor candidate, check if it is already stored

@@ -1,7 +1,7 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Wendy:"
-purpose "Wendy is a tool to calculate the operating guidelines of a service."
+purpose "Wendy is a tool to synthesize partners for services."
 
 section "Analysis Task"
 sectiondesc="Wendy is able to handle two different analysis tasks. It generates the operating guidelines (or partners in general) with respect to (1) deadlock freedom or (2) livelock freedom. By default, Wendy will consider deadlock freedom.\n"

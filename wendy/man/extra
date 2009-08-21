@@ -1,5 +1,5 @@
 [EXIT STATUS]
-Wendy exits with 0 on success, and with >0 if an error occurs. See Texinfo manual for detailed information. Note that the exit code is not correlated to the controllability result.
+Wendy exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information. Note that the exit code is not correlated to the controllability result.
 
 [EXAMPLES]
 To calculate the operating guidelines of a service `service.owfn', execute
@@ -18,11 +18,8 @@ from the sysconf directory (usually `/usr/local/etc') and then from the current 
 [BUGS]
 See https://gna.org/bugs/?group=service-tech for open bugs.
 
-[AUTHOR]
-Wendy is written and maintained by Niels Lohmann.
-
 [COPYRIGHT]
-Copyright (c) 2009 Niels Lohmann
+Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
 [SEE ALSO]
 lola(1), mia(1)

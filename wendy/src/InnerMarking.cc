@@ -251,10 +251,33 @@ bool InnerMarking::waitstate(const Label_ID &l) const {
     return false;
 }
 
+/*!
+  checks if each (input) message lying on the interface of the current marking will be ever be consumed, that is if from the
+  current inner marking a receiving transition is reachable that will consume this message
 
-/*
- * \brief determines which sending events are potentially reachable from this marking
- */
+  \param[in] interface the interface that corresponds to the current inner marking being part of a certain knowledge
+  \return true if all (input) messages of the interface will be consumed later on; false, otherwise
+*/
+bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) {
+
+    char * possibleSendEventsDecoded = possibleSendEvents->decode();
+
+    // iterate over all possible input messages
+    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+        // if input message is on the interface, but message can not be consumed by any marking being reached from the current one
+        // return with false
+        if (interface.marked(l) and not possibleSendEventsDecoded[l - Label::first_send]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+/*!
+  determines which sending events are potentially reachable from this marking
+*/
 void InnerMarking::calcReachableSendingEvents() {
 
     assert(args_info.smartSendingEvent_flag);

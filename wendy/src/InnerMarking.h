@@ -27,6 +27,7 @@
 #include "types.h"
 #include "config.h"
 #include "PossibleSendEvents.h"
+#include "InterfaceMarking.h"
 #include <pnapi/pnapi.h>
 
 
@@ -92,6 +93,9 @@ class InnerMarking {
 
         /// whether this marking is a waitstate resolveable by the given label
         bool waitstate(const Label_ID&) const;
+
+        /// checks if all input messages will be consumed later on
+        bool sentMessagesConsumed(const InterfaceMarking&);
 
         /// determines which receiving transitions are potentially reachable from this marking
         void calcReachableSendingEvents();

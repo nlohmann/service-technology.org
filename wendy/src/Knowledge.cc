@@ -195,6 +195,12 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
         // process successors of the current marking
         InnerMarking *m = InnerMarking::inner_markings[current.inner];
 
+        // check, if each sent message contained on the interface of this marking will ever be consumed
+        if (args_info.smartSendingEvent_flag and not m->sentMessagesConsumed(current.interface)) {
+            is_sane = 0;
+            return;
+        }
+
         for (uint8_t i = 0; i < m->out_degree; ++i) {
 
             // a synchronization is impossible without the environment -- skip

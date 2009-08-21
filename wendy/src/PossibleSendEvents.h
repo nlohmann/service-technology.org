@@ -23,6 +23,9 @@
 
 #include "Label.h"
 
+/*!
+ \brief storage for sending events reachable by an inner marking, every possible sending event is either set to 0 or 1
+ */
 class PossibleSendEvents {
     public: /* static functions */
 

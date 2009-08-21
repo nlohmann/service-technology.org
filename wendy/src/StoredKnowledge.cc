@@ -68,10 +68,10 @@ bool StoredKnowledge::emptyNodeReachable = false;
  ********************/
 
 /*!
- *  \brief check if given knowledge is on the Tarjan stack
- *  \param SK pointer to the knowledge that is to be checked
- *  \return true, if knowledge is on the stack; false otherwise
- */
+ check if given knowledge is on the Tarjan stack
+ \param SK pointer to the knowledge that is to be checked
+ \return true, if knowledge is on the stack; false otherwise
+*/
 inline bool StoredKnowledge::findKnowledgeInTarjanStack(StoredKnowledge *SK) {
 
     for(std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
@@ -146,10 +146,8 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 }
 
 
-/*
- LIVELOCK FREEDOM
-
- \brief finds out if current knowledge is final, if so the appropriate attribute is set
+/*!
+ (LIVELOCK FREEDOM) finds out if current knowledge is final, if so the appropriate attribute is set
 */
 inline void StoredKnowledge::isFinal() {
     // traverse the current knowledge to find out if this knowledge is final
@@ -161,10 +159,8 @@ inline void StoredKnowledge::isFinal() {
 }
 
 
-/*
- LIVELOCK FREEDOM
-
- \brief set all values needed for Tarjan algorithm and livelock freedom analysis
+/*!
+ (LIVELOCK FREEDOM) set all values needed for Tarjan algorithm and livelock freedom analysis
  \param SK current knowledge
  \note Attention: has to be called right after SK is stored! (because dfs and lowlink value depend on stats_storedKnowledges)
 */
@@ -178,10 +174,8 @@ inline void StoredKnowledge::setTarjanValues() {
 }
 
 
-/*
- LIVELOCK FREEDOM
-
- \brief adjust lowlink value of stored knowledge object according to Tarjan algorithm
+/*!
+ (LIVELOCK FREEDOM) adjust lowlink value of stored knowledge object according to Tarjan algorithm
  \param SK current knowledge
  \param SK_new the successor of the current knowledge whose successors have all been calculated already
 */
@@ -195,11 +189,9 @@ inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK, StoredKnowl
 }
 
 
-/*
- LIVELOCK FREEDOM
-
- \brief if current knowledge is representative of an SCC then evaluate current SCC and adjusts the is_final_reachable value of all
-        members of the SCC
+/*!
+ (LIVELOCK FREEDOM) if current knowledge is representative of an SCC then evaluate current SCC and adjusts
+ the is_final_reachable value of all members of the SCC
  \param SK current knowledge
 */
 inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {

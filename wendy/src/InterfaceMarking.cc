@@ -18,6 +18,9 @@
 \*****************************************************************************/
 
 
+// for UINT8_MAX
+#define __STDC_LIMIT_MACROS
+
 #include "config.h"
 #include <cassert>
 
@@ -58,6 +61,11 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
  ******************/
 
 void InterfaceMarking::initialize(unsigned int m) {
+    // check the message bound
+    if ((m < 1) or (m > UINT8_MAX)) {
+        abort(9, "message bound must be between 1 and %d", UINT8_MAX);
+    }
+
     message_bound = m;
     interface_length = Label::send_events + Label::receive_events;
     message_bound_bits = LOG2(message_bound);

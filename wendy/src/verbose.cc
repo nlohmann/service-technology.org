@@ -26,11 +26,13 @@
 
 extern gengetopt_args_info args_info;
 
-void status(const char* format, ...) {
-    if (args_info.verbose_flag == 0) {
-        return;
-    }
 
+/*!
+ \param format  the error message formatted as printf string
+ 
+ \note use this function rather sparsely in order not to spam the output
+*/
+void message(const char* format, ...) {
     fprintf(stderr, "%s: ", PACKAGE);
 
     va_list args;
@@ -38,17 +40,34 @@ void status(const char* format, ...) {
     vfprintf(stderr, format, args);
     va_end (args);
 
-    fprintf(stderr, "\n");    
+    fprintf(stderr, "\n");
 }
 
 
 /*!
- \brief abort with an error message and an error code
- 
- The codes are documented in Wendy's manual.
- 
+ \param format  the error message formatted as printf string
+*/
+void status(const char* format, ...) {
+    if (args_info.verbose_flag == 0) {
+        return;
+    }
+    
+    fprintf(stderr, "%s: ", PACKAGE);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end (args);
+
+    fprintf(stderr, "\n");
+}
+
+
+/*!
  \param code    the error code
  \param format  the error message formatted as printf string
+
+ \note The codes should be documented in the manual.
 */
 void abort(unsigned int code, const char* format, ...) {
     fprintf(stderr, "%s: ", PACKAGE);

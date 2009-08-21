@@ -21,6 +21,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             bug13994-1.owfn bug13994-2.owfn \
             bug14025.owfn \
             bug14150.owfn \
+            bug14158.owfn \
             bug14166.owfn \
             carreservation_with_engine.owfn \
             error02.owfn \
@@ -33,7 +34,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             phil5.owfn \
             PO.fiona.og PO.owfn \
             QR.fiona.og QR.owfn \
-	    regist-priv.owfn regist-priv.owfn.cov \
+            regist-priv.owfn regist-priv.owfn.cov \
             seqTest1.fiona.og seqTest1.owfn \
             seqTest2.fiona.og seqTest2.owfn \
             seqTest3.fiona.og  seqTest3.owfn \
@@ -42,11 +43,11 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             T2.fiona.og T2.owfn \
             test-sync.owfn \
             zeus.fiona.og zeus.owfn \
-	    LF_DF_controllable.owfn \
-	    nLF_DF_controllable.owfn \
-	    LF_DF_controllable2.owfn \
-	    smartSendingEvent.owfn smartSendingEvent.fiona.og \
-	    06-03-23_BPM06_shop_sect_6.owfn 06-03-23_BPM06_shop_sect_6.fiona.og
+            LF_DF_controllable.owfn \
+            nLF_DF_controllable.owfn \
+            LF_DF_controllable2.owfn \
+            smartSendingEvent.owfn smartSendingEvent.fiona.og \
+            06-03-23_BPM06_shop_sect_6.owfn 06-03-23_BPM06_shop_sect_6.fiona.og
 
 
 #############################################################################

@@ -45,7 +45,7 @@ AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Bug information output])
-AT_CHECK([WENDY --bug],0,ignore,[Please send file 'bug.log' to wendy@service-technology.org.
+AT_CHECK([WENDY --bug],0,ignore,[wendy: please send file 'bug.log' to wendy@service-technology.org!
 ])
 AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
@@ -102,8 +102,9 @@ AT_CHECK([GREP -q "aborting \[[#08\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Message bound violation])
-AT_CHECK([WENDY --messagebound=400 --lola=],1,ignore,stderr)
+AT_SETUP([Message bound violation])#
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --messagebound=400 --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#09\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -133,7 +134,7 @@ AT_CLEANUP
 
 AT_SETUP([Cannot create tempfile])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.* .])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([touch foo])
 AT_CHECK([chmod a-w foo])
 AT_CHECK([WENDY myCoffee.owfn --verbose --tmpfile=foo],1,ignore,stderr)
@@ -289,6 +290,15 @@ AT_CHECK([cp TESTFILES/bug14150.owfn .])
 AT_CHECK([WENDY bug14150.owfn --verbose --og],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
 AT_CHECK([GREP -q "0 : true" bug14150.og],1)
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+AT_SETUP([Bug 14166 (https://gna.org/bugs/?14158)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/14158.owfn .])
+AT_CHECK([WENDY bug14158.owfn --verbose --og],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: NO" stderr])
+AT_XFAIL_IF(true)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 

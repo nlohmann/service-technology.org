@@ -18,9 +18,6 @@
 \*****************************************************************************/
 
 
-// for UINT8_MAX
-#define __STDC_LIMIT_MACROS
-
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -103,7 +100,7 @@ void evaluateParameters(int argc, char** argv) {
         FILE *debug_output = fopen("bug.log", "w");
         fprintf(debug_output, "%s\n", CONFIG_LOG);
         fclose(debug_output);
-        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
+        message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
         exit(EXIT_SUCCESS);
     }
 
@@ -154,11 +151,6 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--og' and '--sa' parameter are mutually exclusive");
     }
 
-    // check the message bound
-    if ((args_info.messagebound_arg < 1) or (args_info.messagebound_arg > UINT8_MAX)) {
-        abort(9, "message bound must be between 1 and %d", UINT8_MAX);
-    }
-
     free(params);
 }
 
@@ -201,7 +193,7 @@ int main(int argc, char** argv) {
         abort(2, "\b%s", temp.str().c_str());
     }
 
-    // "fix" the net in order to avoid parse errors from LoLA
+    // "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
     if (InnerMarking::net->getTransitions().empty()) {
         status("net has no transitions -- adding dead dummy transition");
         InnerMarking::net->createArc(InnerMarking::net->createPlace(),
@@ -301,6 +293,7 @@ int main(int argc, char** argv) {
         delete markingfile;
     }
 
+
     /*-------------------------------.
     | 6. organize reachability graph |
     `-------------------------------*/
@@ -327,6 +320,7 @@ int main(int argc, char** argv) {
     delete K0;
     time(&end_time);
 
+    // statistics output
     status("stored %d knowledges [%.0f sec]",
         StoredKnowledge::stats_storedKnowledges, difftime(end_time, start_time));
     status("used %d of %d hash buckets, maximal bucket size: %d",
@@ -354,6 +348,7 @@ int main(int argc, char** argv) {
     unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
     time(&end_time);
 
+    // statistics output
     status("removed %d insane nodes (%3.2f%%) in %d iterations [%.0f sec]",
         redNodes, 100.0 * ((double)redNodes / (double)StoredKnowledge::stats_storedKnowledges),
         StoredKnowledge::stats_iterations, difftime(end_time, start_time));
@@ -364,19 +359,19 @@ int main(int argc, char** argv) {
     }
     status("%d nodes left", StoredKnowledge::seen.size());
 
-    // analyze root node
-    fprintf(stderr, "%s: net is controllable: %s\n",
-        PACKAGE, (StoredKnowledge::root->is_sane) ? "YES" : "NO");
+    // analyze root node and print result
+    message("net is controllable: %s", (StoredKnowledge::root->is_sane) ? "YES" : "NO");
 
-    /*------------------------------.
-    | 10. calculate cover contraint |
-    `-------------------------------*/
+
+    /*-------------------------------.
+    | 10. calculate cover constraint |
+    `--------------------------------*/
     if(args_info.cover_given) {
         Cover::calculate(StoredKnowledge::seen);
 
-        fprintf(stderr, "%s: cover constraint is satisfiable: %s\n",
-            PACKAGE, (Cover::satisfiable) ? "YES" : "NO");
+        message("cover constraint is satisfiable: %s", (Cover::satisfiable) ? "YES" : "NO");
     }
+
 
     /*-------------------.
     | 11. output options |

@@ -175,7 +175,7 @@ lowlink:
     }
 | KW_LOWLINK NUMBER
     {
-        /* do something with Tarjan's lowlink value (needed for generating livelock free partners) */   
+        /* do something with Tarjan's lowlink value (needed for generating livelock free partners or reduction rule smart sending event) */   
         currentLowlink = $2;
     }
 ;

@@ -137,8 +137,8 @@ option "succeedingSendingEvent" -
   flag off
 
 option "smartSendingEvent" -
-  "Send only if no marking is found that will definitely not consume the message sent."
-  details="Send only if no marking is found within the current knowledge that will definitely not consume the message sent.\n"
+  "Send only if no marking within current knowledge is found that will definitely not consume the message sent."
+  details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, strategies which will send messages that will never be consumed get lost. In case of livelock freedom no strategies will be lost.\n"
   flag off
 
 section "Debugging"

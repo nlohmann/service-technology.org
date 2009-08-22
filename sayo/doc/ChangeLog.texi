@@ -1,6 +1,7 @@
 @heading Version 1.1-unreleased
 @itemize
 @item simplified testsuite by using wrapper script
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize
 
 @heading Version 1.0

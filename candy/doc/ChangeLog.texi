@@ -1,4 +1,6 @@
 @heading Version 0.5 Public Beta
 @itemize
 @item First public beta version of Candy. 
+
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize

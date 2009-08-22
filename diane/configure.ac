@@ -53,4 +53,5 @@ else
 fi
 
 AC_CONFIG_FILES([Makefile libs/pnapi/Makefile doc/Makefile src/Makefile man/Makefile tests/Makefile tests/package.m4 doc/Doxyfile maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

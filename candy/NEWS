@@ -1,1 +1,10 @@
-Syntax: head [-n #] [-#] [Dateiname...]
+Version 0.5 Public Beta
+=======================
+
+* First public beta version of Candy.
+
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
+
+
+

@@ -7,7 +7,7 @@ m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 
 m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
 
-m4_define([MARLENE],              [@abs_top_builddir@/src/marlene])
+m4_define([MARLENE],              [cover.sh @abs_top_builddir@/src/marlene])
 m4_define([WENDY],                [@WENDY@])
 #m4_define([FIONA],               [@FIONA@])
 m4_define([LOLA_FULL],            [@LOLA_FULL@])

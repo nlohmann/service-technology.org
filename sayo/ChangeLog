@@ -12,6 +12,9 @@ Version 1.1-unreleased
 
 * simplified testsuite by using wrapper script
 
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
+
 Version 1.0
 ===========
 

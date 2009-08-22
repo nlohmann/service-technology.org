@@ -11,6 +11,10 @@ Version 1.1-unreleased
 
 * updated maintainer scripts
 
+* added scripts to use LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
+  coverage (use `make cover' in `tests' directory)
+
 Version 1.0
 ===========
 

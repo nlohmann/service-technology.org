@@ -13,6 +13,10 @@ Version 1.2-unreleased
 
 * canonized Makefiles
 
+* added scripts to use LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
+  coverage (use `make cover' in `tests' directory)
+
 
 See file ChangeLog <http://service-technology.org/files/mia/ChangeLog> for
 complete version history.

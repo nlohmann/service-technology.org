@@ -1,6 +1,8 @@
 @heading Version 1.14-unreleased
 @itemize
 @item updated maintainer scripts
+
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize
 
 

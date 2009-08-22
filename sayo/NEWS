@@ -12,6 +12,9 @@ Version 1.1-unreleased
 
 * simplified testsuite by using wrapper script
 
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
+
 
 See file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for
 complete version history.

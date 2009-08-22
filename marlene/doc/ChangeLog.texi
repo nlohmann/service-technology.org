@@ -5,5 +5,6 @@
 
 @item choice whether to use synchronous/asynchronous interface between controller and engine
 
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize
 

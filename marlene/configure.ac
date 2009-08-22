@@ -186,6 +186,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Doxyfile
                  doc/Makefile
                  man/Makefile])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 
 #############################################################################

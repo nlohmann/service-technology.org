@@ -63,6 +63,7 @@ AC_CONFIG_FILES([
 	maintainer/Makefile maintainer/debian/changelog.template
 	maintainer/debian/info maintainer/debian/README.Debian.template
 	maintainer/debian/rules maintainer/macports/Portfile])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 
 # display a warning in case a required tool has not been found

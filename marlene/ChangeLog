@@ -6,7 +6,6 @@
                      http://service-technology.org/marlene
 
 
-PURPOSE
 Version 0.5-unreleased
 ======================
 
@@ -15,6 +14,8 @@ Version 0.5-unreleased
 * choice whether to use synchronous/asynchronous interface between controller
   and engine
 
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
 
 
 

@@ -61,4 +61,5 @@ AC_CONFIG_FILES([Makefile
                  tests/Makefile tests/package.m4
                  doc/Makefile doc/Doxyfile
                  man/Makefile])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

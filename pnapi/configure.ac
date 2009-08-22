@@ -151,5 +151,6 @@ AC_CONFIG_FILES([Makefile
                  tests/package.m4
                  tests/petrinet/Makefile
                  utils/Makefile])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

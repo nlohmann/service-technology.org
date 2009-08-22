@@ -40,9 +40,10 @@ AC_CONFIG_FILES([Makefile
 		libs/pnapi/Makefile 
 		libs/lp_solve/Makefile 
 		src/Makefile 
-		doc/Makefile 
+		doc/Makefile doc/Doxyfile
 		man/Makefile
 		maintainer/Makefile 
-                maintainer/macports/Portfile
+		maintainer/macports/Portfile
 		tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

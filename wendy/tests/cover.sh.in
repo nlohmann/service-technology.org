@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # @configure_input@
 
 #############################################################################
@@ -17,19 +17,30 @@ if test "$COVER" != "TRUE"; then
 	exit $?
 fi
 
-# derive test name from current directory (assuming GNU Autotest)
+#############################################################################
+
+# LCOV should always be quiet
+LCOV="@abs_builddir@/lcov/lcov --quiet"
+
+# derive test name from current directory (assuming GNU Autotest); the
+# info filename is suffixed with a random number to allow for multiple
+# invokations of this script for the same test
 dir=`pwd`
-testname=`basename $dir`
+TESTNAME=`basename $dir`
+INFOFILE=@abs_builddir@/cover/$TESTNAME-$RANDOM.info
 
 # reset counters for LCOV
-@abs_srcdir@/lcov/lcov --zerocounters --quiet --directory @abs_top_builddir@/src &> /dev/null
+$LCOV --zerocounters -directory @abs_top_builddir@
 
 # execute executable and remember exit code
 $*
 result=$?
 
 # evaluate coverage result of LCOV
-@abs_srcdir@/lcov/lcov --capture --directory @abs_top_builddir@/src --output-file @abs_builddir@/$testname.info --test-name $testname  &> /dev/null
+$LCOV --capture --directory @abs_top_builddir@ --output-file $INFOFILE --test-name $TESTNAME
+
+# remove profile information on C++ sources and headers
+$LCOV --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE
 
 # exit with executable's exit code
 exit $result

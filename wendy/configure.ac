@@ -73,8 +73,9 @@ AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
 	doc/Doxyfile man/Makefile maintainer/Makefile utils/Makefile
 	maintainer/debian/changelog.template maintainer/debian/info
-	maintainer/debian/rules tests/cover.sh
+	maintainer/debian/rules
 	maintainer/macports/Portfile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 
 # display a warning in case a required tool has not been found

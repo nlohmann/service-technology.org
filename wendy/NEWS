@@ -23,13 +23,6 @@ Version 2.0-unreleased
   (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
   coverage (use `make cover' in `tests' directory)
 
-* current test case coverage:
-     * lines: 73.6% (3094 of 4202 lines)
-
-     * functions: 82.0% (1967 of 2398 functions)
-
-* refined test cases to increase test case coverage
-
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

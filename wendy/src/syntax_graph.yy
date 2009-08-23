@@ -18,7 +18,7 @@
 \*****************************************************************************/
 
 
-%token KW_STATE KW_LOWLINK COLON COMMA ARROW NUMBER NAME
+%token KW_STATE KW_PROG KW_LOWLINK COLON COMMA ARROW NUMBER NAME
 
 %expect 1
 %defines
@@ -32,6 +32,7 @@
 #include "PossibleSendEvents.h"
 #include "InnerMarking.h"
 #include "Label.h"
+#include "Output.h"
 #include "Cover.h"
 #include "cmdline.h"
 #include "types.h"
@@ -62,7 +63,8 @@ std::map<const pnapi::Place*, unsigned int> marking;
 /// a Tarjan stack for storing markings in order to detect (terminal) strongly connected components
 std::priority_queue<InnerMarking_ID> tarjanStack;
 
-extern std::ofstream *markingfile;
+/// a file to store a mapping from marking ids to actual Petri net markings
+extern Output *markingoutput;
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -85,7 +87,7 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER lowlink markings transitions
+  KW_STATE NUMBER prog lowlink markings transitions
     { 
     
 //        status("\nDEBUG: current DFS: m%d", $2);
@@ -95,15 +97,15 @@ state:
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
-        if (markingfile) {
-            *markingfile << $2 << ": ";
+        if (markingoutput != NULL) {
+            markingoutput->os << $2 << ": ";
             for (std::map<const pnapi::Place*, unsigned int>::iterator p = marking.begin(); p != marking.end(); ++p) {
                 if (p != marking.begin()) {
-                    *markingfile << ", ";
+                    markingoutput->os << ", ";
                 }
-                *markingfile << p->first->getName() << ":" << p->second;
+                markingoutput->os << p->first->getName() << ":" << p->second;
             }
-            *markingfile << std::endl;
+            markingoutput->os << std::endl;
         }
 
         if (args_info.cover_given) {
@@ -159,6 +161,11 @@ state:
         currentSuccessors.clear();
         marking.clear(); 
    }
+;
+
+prog:
+  /* empty */
+| KW_PROG NUMBER
 ;
 
 lowlink:

@@ -33,6 +33,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
             phil5.owfn \
             PO.fiona.og PO.owfn \
+            mia-PO.owfn mia-PO-pv.owfn \
+            mia-reg_new.owfn mia-reg_old.owfn \
             QR.fiona.og QR.owfn \
             regist-priv.owfn regist-priv.owfn.cov \
             seqTest1.fiona.og seqTest1.owfn \
@@ -57,7 +59,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.c
+NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.*
 
 
 

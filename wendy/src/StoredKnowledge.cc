@@ -523,7 +523,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
 
  \todo  Only print empty node if it is actually reachable.
 */
-void StoredKnowledge::dot(std::ofstream &file) {
+void StoredKnowledge::dot(std::ostream &file) {
     file << "digraph G {\n"
          << " node [fontname=\"Helvetica\" fontsize=10]\n"
          << " edge [fontname=\"Helvetica\" fontsize=10]\n";
@@ -609,7 +609,7 @@ void StoredKnowledge::dot(std::ofstream &file) {
 
  \bug   Final states must not have outgoing tau or sending events.
 */
-void StoredKnowledge::print(std::ofstream &file) const {
+void StoredKnowledge::print(std::ostream &file) const {
     file << "  " << reinterpret_cast<unsigned long>(this);
 
     if (args_info.sa_given) {
@@ -664,7 +664,7 @@ void StoredKnowledge::print(std::ofstream &file) const {
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
 */
-void StoredKnowledge::output(std::ofstream &file) {
+void StoredKnowledge::output(std::ostream &file) {
     file << "{\n  generator:    " << PACKAGE_STRING
          << " (" << CONFIG_BUILDSYSTEM ")"
          << "\n  invocation:   " << invocation << "\n  events:       "
@@ -755,7 +755,7 @@ void StoredKnowledge::output(std::ofstream &file) {
  \deprecated This is the old OG file format -- it is only kept here for
              compatibility reasons.
 */
-void StoredKnowledge::output_old(std::ofstream &file) {
+void StoredKnowledge::output_old(std::ostream &file) {
     file << "{\n  generator:    " << PACKAGE_STRING
          << " (" << CONFIG_BUILDSYSTEM ")"
          << "\n  invocation:   " << invocation << "\n  events:       "
@@ -1260,7 +1260,7 @@ void StoredKnowledge::traverse() {
 }
 
 
-void StoredKnowledge::migration(std::ofstream& o) {
+void StoredKnowledge::migration(std::ostream& o) {
     map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > > migrationInfo;
 
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {

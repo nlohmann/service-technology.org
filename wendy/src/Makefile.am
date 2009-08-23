@@ -14,7 +14,8 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 PossibleSendEvents.h PossibleSendEvents.cc \
                 Cover.h Cover.cc \
                 verbose.cc verbose.h \
-                cmdline.c cmdline.h
+                cmdline.c cmdline.h \
+                Output.cc Output.h
 
 # the configuration files
 sysconf_DATA = wendy.conf

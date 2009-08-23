@@ -21,7 +21,7 @@
 #ifndef _STOREDKNOWLEDGE_H
 #define _STOREDKNOWLEDGE_H
 
-#include <fstream>
+#include <iostream>
 #include "Knowledge.h"
 #include "cmdline.h"
 
@@ -45,16 +45,16 @@ class StoredKnowledge {
         static unsigned int removeInsaneNodes();
 
         /// print a dot representation
-        static void dot(std::ofstream&);
+        static void dot(std::ostream&);
 
         /// print the knowledges as OG
-        static void output(std::ofstream&);
+        static void output(std::ostream&);
 
         /// print the knowledges as Fiona OG
-        static void output_old(std::ofstream&);
+        static void output_old(std::ostream&);
 
         /// print information for instance migration
-        static void migration(std::ofstream&);
+        static void migration(std::ostream&);
 
         /// LIVELOCK FREEDOM
         /// adjust lowlink values of the stored knowledge
@@ -159,7 +159,7 @@ class StoredKnowledge {
         /// adds a predecessor knowledge
         void addPredecessor(StoredKnowledge* const);
 
-        void print(std::ofstream&) const;
+        void print(std::ostream&) const;
 
         /// return a string representation of the knowledge's formula
         std::string formula() const;

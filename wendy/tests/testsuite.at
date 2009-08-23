@@ -36,21 +36,34 @@ AT_CHECK([test -f wendy_output.og])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Given output filenames])
+AT_SETUP([Piping to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og=foo.og --dot=bar.dot --mi=baz.mi --im=42.im --verbose],0,ignore,ignore)
-AT_CHECK([test -f foo.og])
-AT_CHECK([test -f bar.dot])
-AT_CHECK([test -f baz.mi])
-AT_CHECK([test -f 42.im])
+AT_CHECK([WENDY myCoffee.owfn --verbose --og=-],0,stdout,ignore)
+AT_CHECK([GREP -q "3 send, 1 receive, 0 synchronous" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot output])
+AT_SETUP([Piping from stdin to stdout])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cat myCoffee.owfn | WENDY --verbose --og=-],0,stdout,ignore)
+AT_CHECK([GREP -q "3 send, 1 receive, 0 synchronous" stdout])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot output (CNF formulae)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([WENDY myCoffee.owfn --dot --showEmptyNode --showWaitstates --showTransients --verbose],0,ignore,ignore)
+AT_CHECK([test -f myCoffee.dot])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot output (2-bit formulae)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og --dot --showEmptyNode --showWaitstates --showTransients --formula=2bits --verbose],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -71,10 +84,57 @@ AT_CHECK([test -f myCoffee.og])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([OG output (Fiona format)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og --fionaFormat],0,ignore,ignore)
+AT_CHECK([test -f myCoffee.og])
+AT_CHECK([GREP -q "TRANSITIONS" myCoffee.og])
+AT_CHECK([GREP -q "true" myCoffee.og])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Service automaton output])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --sa],0,ignore,ignore)
+AT_CHECK([test -f myCoffee.sa])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Given output filenames])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og=foo.og --dot=bar.dot --mi=baz.mi --im=42.im --verbose],0,ignore,ignore)
+AT_CHECK([test -f foo.og])
+AT_CHECK([test -f bar.dot])
+AT_CHECK([test -f baz.mi])
+AT_CHECK([test -f 42.im])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Bug information output])
-AT_CHECK([WENDY --bug],0,ignore,[wendy: please send file 'bug.log' to wendy@service-technology.org!
-])
+AT_CHECK([WENDY --bug],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: please send file 'bug.log' to wendy@service-technology.org!" stderr])
 AT_CHECK([test -f bug.log])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Cleaning temporary files])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og --clean --tmpfile=wendy-XXXXXX],0,ignore,ignore)
+AT_CHECK([test -f wendy-*],1)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using a configuration file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_DATA([wendy.conf], [verbose
+])
+AT_CHECK([WENDY --config=wendy.conf --og myCoffee.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'wendy.conf'" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -145,10 +205,16 @@ AT_CLEANUP
 
 AT_SETUP([Cannot write to file])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.* .])
-AT_CHECK([touch myCoffee.og])
-AT_CHECK([chmod a-w myCoffee.og])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([touch myCoffee.og myCoffee.dot myCoffee.sa myCoffee.im])
+AT_CHECK([chmod a-w myCoffee.og myCoffee.dot myCoffee.sa myCoffee.im])
 AT_CHECK([WENDY myCoffee.owfn --og --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+AT_CHECK([WENDY myCoffee.owfn --sa --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+AT_CHECK([WENDY myCoffee.owfn --im --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+AT_CHECK([WENDY myCoffee.owfn --dot --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -284,7 +350,7 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([WENDY myCoffee.owfn --verbose --og --tmpfile=foo-XXXXXX],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 7 nodes left" stderr])
-AT_CHECK([test -f foo-*.lola])
+AT_CHECK([test -f foo-*])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -320,9 +386,9 @@ AT_CHECK([GREP -q "0 : true" bug14150.og],1)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
-AT_SETUP([Bug 14166 (https://gna.org/bugs/?14158)])
+AT_SETUP([Bug 14158 (https://gna.org/bugs/?14158)])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/14158.owfn .])
+AT_CHECK([cp TESTFILES/bug14158.owfn .])
 AT_CHECK([WENDY bug14158.owfn --verbose --og],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_XFAIL_IF(true)
@@ -658,7 +724,6 @@ AT_KEYWORDS(ig)
 AT_CLEANUP
 
 
-
 ############################################################################
 AT_BANNER([Synchronous Communication])
 ############################################################################
@@ -739,5 +804,43 @@ AT_CHECK([cp TESTFILES/nLF_DF_controllable.owfn .])
 AT_CHECK([WENDY nLF_DF_controllable.owfn --lf --verbose --lola=LOLA],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_KEYWORDS(livelock-freedom)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Integration into Mia])
+############################################################################
+
+AT_SETUP([Registration office service (old -> new)])
+AT_CHECK_LOLA
+AT_DATA([mia.conf], [wendy="WENDY"
+])
+AT_CHECK([cp TESTFILES/mia-reg_old.owfn TESTFILES/mia-reg_new.owfn .])
+AT_CHECK([MIA --config=mia.conf mia-reg_old.owfn mia-reg_new.owfn --verbose],0,stdout,ignore)
+AT_CHECK([GREP -c "\->" stdout],0,[9
+],ignore)
+AT_KEYWORDS(mia)
+AT_CLEANUP
+
+AT_SETUP([Purchase Order (original -> public view)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/mia-PO.owfn TESTFILES/mia-PO-pv.owfn .])
+AT_DATA([mia.conf], [wendy="WENDY"
+])
+AT_CHECK([MIA --config=mia.conf mia-PO.owfn mia-PO-pv.owfn --verbose],0,stdout,ignore)
+AT_CHECK([GREP -c "\->" stdout],0,[429
+],ignore)
+AT_KEYWORDS(mia)
+AT_CLEANUP
+
+AT_SETUP([Purchase Order (public view -> original)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/mia-PO.owfn TESTFILES/mia-PO-pv.owfn .])
+AT_DATA([mia.conf], [wendy="WENDY"
+])
+AT_CHECK([MIA --config=mia.conf mia-PO-pv.owfn mia-PO.owfn --verbose],0,stdout,ignore)
+AT_CHECK([GREP -c "\->" stdout],0,[429
+],ignore)
+AT_KEYWORDS(mia)
 AT_CLEANUP
 

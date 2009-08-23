@@ -24,7 +24,6 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <string>
 #include <libgen.h>
 #include "config.h"
@@ -32,13 +31,16 @@
 #include "StoredKnowledge.h"
 #include "PossibleSendEvents.h"
 #include "Label.h"
+#include "Output.h"
 #include "Cover.h"
 #include "verbose.h"
 
 // detect MinGW compilation under Cygwin
+#ifndef CYGWIN_MINGW
 #ifdef WIN32
 #ifndef _WIN32
-#define CYGWIN_MINGW
+#define CYGWIN_MINGW 1
+#endif
 #endif
 #endif
 
@@ -60,7 +62,7 @@ gengetopt_args_info args_info;
 string invocation;
 
 /// a file to store a mapping from marking ids to actual Petri net markings
-std::ofstream *markingfile;
+Output *markingoutput = NULL;
 
 
 bool fileExists(std::string filename) {
@@ -233,26 +235,8 @@ int main(int argc, char** argv) {
     /*--------------------------------------------.
     | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
-    // create a unique temporary file name
-    char *tmp = args_info.tmpfile_arg;
-#ifdef HAVE_MKSTEMP
-    if (mkstemp(tmp) == -1) {
-        abort(13, "could not create a temporary file '%s'", tmp);
-    }
-#endif
-#ifdef CYGWIN_MINGW
-    status("setting tempfile name for MinGW to 'wendy.tmp'");
-    tmp = "wendy.tmp";
-#endif
-    std::string tmpname(tmp);
-
-    std::ofstream lolaFile((tmpname + ".lola").c_str(), std::ofstream::out | std::ofstream::trunc);
-    if (!lolaFile) {
-        abort(11, "could not write to file '%s.lola'", tmpname.c_str());
-    }
-    lolaFile << pnapi::io::lola << *(InnerMarking::net);
-    lolaFile.close();
-    status("created file '%s.lola'", tmpname.c_str());
+    Output temp;
+    temp.os << pnapi::io::lola << *(InnerMarking::net);
 
 
     /*------------------------------------------.
@@ -263,25 +247,33 @@ int main(int argc, char** argv) {
     // marking information output
     if (args_info.mi_given) {
         string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
-        markingfile = new std::ofstream(mi_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+        markingoutput = new Output(mi_filename, "marking information");
     }
 
-    // read from a pipe or from a file
+    // select LoLA binary
+#if defined(CYGWIN_MINGW)
+    // MinGW does not understand pathnames with "/"
+    string lola_command = basename(args_info.lola_arg);
+#else
+    string lola_command = args_info.lola_arg;
+#endif
+
+    // read from a pipe or from a file (MinGW cannot pipe)
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(CYGWIN_MINGW)
-    string command_line = string(args_info.lola_arg) + " " + tmpname + ".lola -M 2> /dev/null";
+    string command_line = lola_command + " " + temp.filename + " -M 2> /dev/null";
     status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
 #else
-#ifdef CYGWIN_MINGW
-    string command_line = string(basename(args_info.lola_arg)) + " " + tmpname + ".lola -m";
-#else
-    string command_line = string(args_info.lola_arg) + " " + tmpname + ".lola -m &> /dev/null";
+    string command_line = lola_command + " " + temp.filename + " -m";
+#if !defined(CYGWIN_MINGW)
+    // MinGW cannot pipe
+    command_line += " &> /dev/null";
 #endif
     status("calling LoLA with '%s'", command_line.c_str());
     system(command_line.c_str());
-    graph_in = fopen((tmpname + ".graph").c_str(), "r");
+    graph_in = fopen((temp.filename + ".graph").c_str(), "r");
     graph_parse();
     fclose(graph_in);
 #endif
@@ -289,8 +281,7 @@ int main(int argc, char** argv) {
 
     // close marking information output file
     if (args_info.mi_given) {
-        markingfile->close();
-        delete markingfile;
+        delete markingoutput;
     }
 
 
@@ -379,16 +370,13 @@ int main(int argc, char** argv) {
     // operating guidelines output
     if (args_info.og_given) {
         string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
-        std::ofstream og_file(og_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        if (!og_file) {
-            abort(11, "could not write to file '%s'", og_filename.c_str());
-        }
+        Output output(og_filename, "operating guidelines");
+
         if (args_info.fionaFormat_flag) {
-            StoredKnowledge::output_old(og_file);
+            StoredKnowledge::output_old(output.os);
         } else {
-            StoredKnowledge::output(og_file);
+            StoredKnowledge::output(output.os);
         }
-        status("wrote OG to file '%s'", og_filename.c_str());
 
         if(args_info.cover_given) {
             Cover::write(og_filename + ".cover");
@@ -398,35 +386,24 @@ int main(int argc, char** argv) {
     // service automaton output
     if (args_info.sa_given) {
         string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
-        std::ofstream sa_file(sa_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        if (!sa_file) {
-            abort(11, "could not write to file '%s'", sa_filename.c_str());
-        }
-        StoredKnowledge::output(sa_file);
-        status("wrote service automaton to file '%s'", sa_filename.c_str());
+        Output output(sa_filename, "service automaton");
+        StoredKnowledge::output(output.os);
     }
 
     // dot output
     if (args_info.dot_given) {
         string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
-        std::ofstream dot_file(dot_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        if (!dot_file) {
-            abort(11, "could not write to file '%s'", dot_filename.c_str());
-        }
-        StoredKnowledge::dot(dot_file);
-        status("wrote dot representation to file '%s'", dot_filename.c_str());
+        Output output(dot_filename, "dot representation");
+        StoredKnowledge::dot(output.os);
     }
 
     // migration output
     if (args_info.im_given) {
         string im_filename = args_info.im_arg ? args_info.im_arg : filename + ".im";
-        std::ofstream im_file(im_filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-        if (!im_file) {
-            abort(11, "could not write to file '%s'", im_filename.c_str());
-        }
+        Output output(im_filename, "migration information");
 
         time(&start_time);
-        StoredKnowledge::migration(im_file);
+        StoredKnowledge::migration(output.os);
         time(&end_time);
 
         status("wrote migration information to file '%s' [%.0f sec]",

@@ -7,6 +7,14 @@
 @item fixed bug #14166 (@url{https://gna.org/bugs/?14166}): adding dead dummy transition to avoid parser errors from LoLA
 
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+
+@item added test cases to test Wendy's integration into Mia (@url{http://service-technology.org/mia})
+
+@item solved task #6701 (@url{https://gna.org/task/?6701}): output files (including temporary files) are now organized by dedicated class; @samp{mktemp} function is used due to portability issues
+
+@item output can be piped to standard output (@code{stdout}) by using the filename @file{-}; example: @samp{wendy file.owfn --og=-}
+
+@item generated temporary files are deleted if the @option{--clean} parameter is given
 @end itemize
 
 

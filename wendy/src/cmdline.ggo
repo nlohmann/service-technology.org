@@ -14,7 +14,7 @@ option "lf" -
 
 
 section "Input/Output"
-sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `STDOUT' is given, Wendy will pipe the respective output to the standard output stream.\n"
+sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `-' is given, Wendy will pipe the respective output to the standard output stream.\n"
 
 option "og" -
   "Operating guidelines output."
@@ -22,6 +22,12 @@ option "og" -
   typestr="FILENAME"
   argoptional
   optional
+
+option "fionaFormat" -
+  "Use the deprecated Fiona OG file format (does not work with `--sa')."
+  dependon="og"
+  flag off
+  hidden
 
 option "sa" -
   "Service automaton output."
@@ -51,12 +57,6 @@ option "mi" -
   typestr="FILENAME"
   argoptional
   optional
-
-option "fionaFormat" -
-  "Use the deprecated Fiona OG file format (does not work with `--sa')."
-  dependon="og"
-  flag off
-  hidden
 
 option "cover" -
   "Generate a Cover-OG, covering the nodes specified in the given file."
@@ -174,6 +174,13 @@ option "bug" -
 section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"
 
+option "config" c
+  "Read configuration from file."
+  details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed."
+  string
+  typestr="FILE"
+  optional
+
 option "lola" -
   "The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'."
   string
@@ -190,12 +197,10 @@ option "tmpfile" -
   optional
   hidden
 
-option "config" c
-  "Read configuration from file."
-  details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed."
-  string
-  typestr="FILE"
-  optional
+option "clean" -
+  "Any temporary files created by Wendy are deleted once they are not used any more."
+  flag off
+  hidden
 
 
 text "Report bugs to wendy@service-technology.org. Wendy's home page: http://service-technology.org/wendy"

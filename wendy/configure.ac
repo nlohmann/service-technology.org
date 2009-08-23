@@ -39,6 +39,7 @@ AC_PATH_PROGS(LOLA, [lola-statespace lola-full], [])
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(SA2SM, [sa2sm], not found)
+AC_PATH_PROG(MIA, [mia], not found)
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,
@@ -60,8 +61,8 @@ else
 fi
 
 # check for functions
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
-AC_CHECK_FUNCS([mkstemp vfprintf],,AC_MSG_WARN([cannot use required functions]))
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes -- expect bad performance]))
+AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
 # check for exact unsigned types
 AC_TYPE_UINT8_T

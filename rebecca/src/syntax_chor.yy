@@ -6,8 +6,10 @@
 %name-prefix="chor_"
 
 %{
+#include "peerautomaton.h"
 #include "config.h"
 #include <cassert>
+#include "peer.h"
 
 #include <string>
 
@@ -16,6 +18,11 @@
 
 /// the current NAME token as string
 std::string NAME_token;
+
+extern PeerAutomaton * chor;
+Peer *currentPeer;
+bool input;
+int state;
 
 extern int chor_lex();
 extern int chor_error(const char *);
@@ -39,22 +46,39 @@ peers:
 ;
 
 peer:
-  KEY_PEER NAME inputs outputs
+  KEY_PEER NAME { currentPeer = new Peer(NAME_token); } inputs outputs
+  {
+  	chor->pushPeer(currentPeer);
+  }
 ;
 
 inputs:
   /* empty */
-| KEY_IN label_list SEMICOLON
+| KEY_IN { input = true; } label_list SEMICOLON
 ;
 
 outputs:
   /* empty */
-| KEY_OUT label_list SEMICOLON
+| KEY_OUT { input = false; } label_list SEMICOLON
 ;
 
 label_list:
   NAME
+  {
+    if (input)
+  	  currentPeer->pushInput(NAME_token);
+  	else
+  	  currentPeer->pushOutput(NAME_token);
+  	chor->pushEvent(NAME_token);
+  }
 | label_list COMMA NAME
+  {
+    if (input)
+      currentPeer->pushInput(NAME_token);
+    else
+      currentPeer->pushOutput(NAME_token);
+  	chor->pushEvent(NAME_token);
+  }
 ;
 
 nodes:
@@ -63,19 +87,38 @@ nodes:
 ;
 
 node:
-  NUMBER annotation successors
+  NUMBER { state = $1; chor->pushState(state); } annotation successors
 ;
 
 annotation:
   /* empty */
 | COLON KEY_INITIAL
+  {
+    chor->setInitialState(state);
+  }
 | COLON KEY_FINAL
+  {
+    chor->pushFinalState(state);
+  }
 | COLON KEY_INITIAL COMMA KEY_FINAL
+  {
+    chor->setInitialState(state);
+    chor->pushFinalState(state);
+  }
 ;
 
 successors:
   /* empty */
 | successors SENDLABEL ARROW NUMBER
+  {
+    chor->createTransition(state, NAME_token.substr(1,NAME_token.size()), $4, SND);
+  }
 | successors RCVLABEL ARROW NUMBER
+  {
+    chor->createTransition(state, NAME_token.substr(1,NAME_token.size()), $4, RCV);
+  }
 | successors SYNCLABEL ARROW NUMBER
+  {
+    chor->createTransition(state, NAME_token.substr(1,NAME_token.size()), $4, SYN);
+  }
 ;

@@ -2,8 +2,12 @@ bin_PROGRAMS = rebecca
 
 rebecca_SOURCES = syntax_chor.yy lexic_chor.ll \
                   main.cc \
+                  peer.cc peer.h \
+                  peerautomaton.cc peerautomaton.h \
+                  io.cc io.h \
                   verbose.cc verbose.h \
-                  cmdline.c cmdline.h
+                  cmdline.c cmdline.h \
+                  types.h
 
 BUILT_SOURCES = cmdline.c syntax_chor.cc config-log.h
 EXTRA_DIST = syntax_chor.h cmdline.ggo

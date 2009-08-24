@@ -1,0 +1,13 @@
+PEER A
+  OUT x;
+
+PEER B
+  IN x;
+  OUT y;
+
+NODES
+  1 : INITIAL
+    ?x -> 2
+  2
+    !x -> 3
+  3 : FINAL

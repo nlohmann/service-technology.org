@@ -348,13 +348,8 @@ void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
 /*!
  * \brief writes the contraint in an output stream
  */
-void Cover::write(const std::string & filename)
+void Cover::write(std::ostream &os)
 {
-  std::ofstream os(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-  
-  if (!os)
-    abort(11, "could not write to file '%s'", filename.c_str());
-  
   os << "\nCOVER\n"
      << "  PLACES\n";
   
@@ -514,6 +509,4 @@ void Cover::write(const std::string & filename)
   }
   
   os << ";\n";
-  
-  status("wrote cover constraint to file '%s'", filename.c_str());
 }

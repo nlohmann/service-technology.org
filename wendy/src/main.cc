@@ -379,7 +379,9 @@ int main(int argc, char** argv) {
         }
 
         if(args_info.cover_given) {
-            Cover::write(og_filename + ".cover");
+            string cover_filename = og_filename + ".cover";
+            Output cover_output(cover_filename, "cover constraint");
+            Cover::write(cover_output.os);
         }
     }
 

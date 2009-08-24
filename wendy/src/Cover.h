@@ -114,8 +114,8 @@ public: /* static methods */
   /// calculates the global contraint
   static void calculate(const std::set<StoredKnowledge*>&);
   
-  /// writes the contraint in an output stream
-  static void write(const std::string&);
+  /// writes the contraint to an output stream
+  static void write(std::ostream&);
   
 public: /* static attributs */
   

@@ -1,4 +1,14 @@
 @heading Version 1.0-unreleased
 @itemize
 @item initial release
+@item classes for peers and (multi and single) peer automata are implemented
+@item output methods for choreographies and single peer automata are implemented
+@item sanity check for choreographies implemented
+@item resolution of dependencies
+@enumerate
+@item check for distant messages implemented
+@item resolution of dependencies: if a disables b implemented
+@item resolution of dependencies: if a enables b implemented
+@end enumerate
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize

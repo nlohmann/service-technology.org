@@ -11,5 +11,21 @@ Version 1.0-unreleased
 
 * initial release
 
+* classes for peers and (multi and single) peer automata are implemented
+
+* output methods for choreographies and single peer automata are implemented
+
+* sanity check for choreographies implemented
+
+* resolution of dependencies
+    1. check for distant messages implemented
+
+    2. resolution of dependencies: if a disables b implemented
+
+    3. resolution of dependencies: if a enables b implemented
+
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
+
 
 

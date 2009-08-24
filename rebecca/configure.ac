@@ -12,6 +12,7 @@ AC_PROG_YACC
 AC_PROG_RANLIB
 AC_PROG_SED
 AC_PROG_GREP
+AC_PROG_AWK
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
@@ -36,5 +37,6 @@ AC_CHECK_FUNCS([mkstemp vfprintf],,AC_MSG_WARN([cannot use required functions]))
 
 # write files
 AC_CONFIG_FILES([
-	Makefile src/Makefile man/Makefile tests/Makefile doc/Makefile tests/package.m4])
+	Makefile src/Makefile man/Makefile tests/Makefile doc/Makefile doc/Doxyfile tests/package.m4])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

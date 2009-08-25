@@ -86,6 +86,6 @@ int og_yyerror(char const *msg) {
     std::cerr << PACKAGE << ": " << og_yylineno
               << ": ERROR near '" << og_yytext 
               << "': " << msg << std::endl;
-    return EXIT_FAILURE;
+    exit(EXIT_FAILURE);
 }
 

@@ -66,6 +66,27 @@ AT_CHECK([GREP -q "read a formula; only 2-bit annotations are supported" stderr]
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Input Error])
+AT_CHECK([SAYO --input=nofile.og], 1, ignore, stderr)
+AT_CHECK([GREP -q "ERROR: failed to open input file" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Output Error])
+AT_CHECK([mkdir foo])
+AT_CHECK([chmod a-w foo])
+AT_CHECK([SAYO --output=foo/bar.sa], 1, ignore, stderr)
+AT_CHECK([GREP -q "ERROR: failed to open output file" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Lexical Error])
+AT_CHECK([cp TESTFILES/error3.og .])
+AT_CHECK([SAYO --input=error3.og], 1, ignore, stderr)
+AT_CHECK([GREP -q "lexical error" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Fiona's Test Cases])
 ############################################################################

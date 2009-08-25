@@ -25,6 +25,7 @@ TESTFILES = NonFinalTauNode1.fiona.og \
             complexPV.wendy.og \
             error1.og \
             error2.og \
+	    error3.og \
             myCoffee.fiona.og \
             myCoffee.wendy.og \
             non_empty_true_node2.fiona.og \

@@ -15,6 +15,8 @@
 @item output can be piped to standard output (@code{stdout}) by using the filename @file{-}; example: @samp{wendy file.owfn --og=-}
 
 @item generated temporary files are deleted if the @option{--clean} parameter is given
+
+@item fixed bug #14158 (@url{https://gna.org/bugs/?14158}): removed conflicts in graph grammar
 @end itemize
 
 

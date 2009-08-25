@@ -20,7 +20,7 @@
 
 %token KW_STATE KW_PROG KW_LOWLINK COLON COMMA ARROW NUMBER NAME
 
-%expect 1
+%expect 0
 %defines
 %name-prefix="graph_"
 
@@ -87,7 +87,7 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER prog lowlink markings transitions
+  KW_STATE NUMBER prog lowlink markings_or_transitions
     { 
     
 //        status("\nDEBUG: current DFS: m%d", $2);
@@ -182,22 +182,35 @@ lowlink:
     }
 ;
 
-markings:
+markings_or_transitions:
   /* empty */
-| NAME COLON NUMBER
+| markings
+| transitions
+| markings transitions
+;
+
+markings:
+  marking
+| markings COMMA marking
+;
+
+marking:
+  NAME COLON NUMBER
     { marking[InnerMarking::net->findPlace(NAME_token)] = $3; }
-| markings COMMA NAME COLON NUMBER
-    { marking[InnerMarking::net->findPlace(NAME_token)] = $5; }
 ;
 
 transitions:
-  /* empty */
-| transitions NAME ARROW NUMBER
+  transition
+| transitions transition
+;
+
+transition:
+  NAME ARROW NUMBER
     { 
       currentLabels.push_back(Label::name2id[NAME_token]);
       if(args_info.cover_given) {
           currentTransitions.insert(NAME_token);
       }
-      currentSuccessors.push_back($4); 
+      currentSuccessors.push_back($3); 
     }
 ;

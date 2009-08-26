@@ -49,6 +49,7 @@ number    "-"?[0-9][0-9]*
 
 "STATE"      { return KW_STATE; }
 "Lowlink:"   { return KW_LOWLINK; }
+"SCC:"       { return KW_SCC; }
 ":"          { return COLON; }
 ","          { return COMMA; }
 "->"         { return ARROW; }

@@ -14,11 +14,11 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
-%token KW_STATE KW_LOWLINK COLON COMMA ARROW NUMBER NAME
+%token KW_STATE KW_LOWLINK KW_SCC COLON COMMA ARROW NUMBER NAME
 
 %expect 0
 %defines
@@ -60,8 +60,8 @@ InnerMarking_ID currentLowlink;
 /// a marking of the PN API net
 std::map<const pnapi::Place*, unsigned int> marking;
 
-/// a Tarjan stack for storing markings in order to detect (terminal) strongly connected components
-std::priority_queue<InnerMarking_ID> tarjanStack;
+/// storage for current (terminal) strongly connected component
+std::vector<InnerMarking_ID> currentSCC;
 
 /// a file to store a mapping from marking ids to actual Petri net markings
 extern Output *markingoutput;
@@ -87,13 +87,12 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER lowlink markings_or_transitions
-    { 
-    
+  KW_STATE NUMBER lowlink scc markings_or_transitions
+    {
 //        status("\nDEBUG: current DFS: m%d", $2);
-  
+
 //        fprintf(stderr, "dfs: %d, l: %d.... ", $2, currentLowlink);
-    
+
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
@@ -118,53 +117,62 @@ state:
         /* ================================================================================= */
 
         if (args_info.smartSendingEvent_flag or args_info.lf_flag) {
+            /* current marking is representative */
+            while (not currentSCC.empty()) {
+                /* last popped marking */
+                InnerMarking_ID poppedMarking;
 
-            if (!currentSuccessors.empty()) { /* current marking has successors */
-                
-                /* first put current marking on the Tarjan stack */
-                tarjanStack.push($2);                
-                
-                /* current marking is a representative of a (T)SCC, so fetch all members of the strongly connected components from stack */
-                if ($2 == currentLowlink) {
-                    
-                   // status("m%d is representative of a (T)SCC", $2);
-                    
-                    /* last popped marking */
-                    InnerMarking_ID poppedMarking;
-                    
-                    do {
-                        /* get last marking from the Tarjan stack */
-                        poppedMarking = tarjanStack.top();
-                        
-                        /* actually delete it from stack */
-                        tarjanStack.pop();
-                        
-                       // status("... together with m%d", poppedMarking);
-                        
-                        /* if a final marking is reachable from the representative, then a final marking is reachable */
-                        /* from all markings within the strongly connected component */
-                        InnerMarking::finalMarkingReachableMap[poppedMarking] = InnerMarking::finalMarkingReachableMap[$2];
-                        
-                        if (args_info.smartSendingEvent_flag) {
-                            /* ... the same is true for possible sending events */
-                            InnerMarking::markingMap[poppedMarking]->possibleSendEvents = InnerMarking::markingMap[$2]->possibleSendEvents;
-                        }
+                /* get marking from current SCC */
+                poppedMarking = currentSCC.back();
 
-                    } while ($2 != poppedMarking);
-                } 
-            } /* end else, successors is empty */
+                /* actually delete it from vector */
+                currentSCC.pop_back();
+
+               // status("... together with m%d", poppedMarking);
+
+                /* if a final marking is reachable from the representative, then a final marking is reachable */
+                /* from all markings within the strongly connected component */
+                InnerMarking::finalMarkingReachableMap[poppedMarking] = InnerMarking::finalMarkingReachableMap[$2];
+
+                if (args_info.smartSendingEvent_flag) {
+                    /* ... the same is true for possible sending events */
+                    InnerMarking::markingMap[poppedMarking]->possibleSendEvents->copy(*InnerMarking::markingMap[$2]->possibleSendEvents);
+                }
+            }
         } /* end if, livelock freedom */
 
         currentLabels.clear();
         currentSuccessors.clear();
-        marking.clear(); 
+        marking.clear();
    }
 ;
+
+
+scc:
+/* empty */
+| KW_SCC scc_members
+{
+
+}
+;
+
+scc_member:
+    NUMBER
+    {
+        currentSCC.push_back($1);
+    }
+;
+
+scc_members:
+  scc_member
+| scc_members scc_member
+;
+
 
 lowlink:
   KW_LOWLINK NUMBER
     {
-        /* do something with Tarjan's lowlink value (needed for generating livelock free partners or reduction rule smart sending event) */   
+        /* do something with Tarjan's lowlink value (needed for generating livelock free partners or reduction rule smart sending event) */
         currentLowlink = $2;
     }
 ;
@@ -193,11 +201,11 @@ transitions:
 
 transition:
   NAME ARROW NUMBER
-    { 
+    {
       currentLabels.push_back(Label::name2id[NAME_token]);
       if(args_info.cover_given) {
           currentTransitions.insert(NAME_token);
       }
-      currentSuccessors.push_back($3); 
+      currentSuccessors.push_back($3);
     }
 ;

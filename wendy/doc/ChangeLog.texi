@@ -1,6 +1,6 @@
 @heading Version 2.1-unreleased
 @itemize
-@item 
+@item integrated LoLA SCCs detection within inner markings
 @end itemize
 
 

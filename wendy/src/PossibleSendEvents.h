@@ -45,9 +45,6 @@ class PossibleSendEvents {
         /// constructor with initialization
         PossibleSendEvents(bool, Label_ID);
 
-        /// copy constructor
-        PossibleSendEvents(const PossibleSendEvents &);
-
         /// destructor; also cleans decodedLabels
         ~PossibleSendEvents();
 
@@ -56,6 +53,9 @@ class PossibleSendEvents {
 
         /// overloaded bit-wise OR operator
         void operator|=(const PossibleSendEvents &);
+
+        /// copies storage
+        void copy(const PossibleSendEvents &);
 
         /// set a label to be possible
         void labelPossible(Label_ID l);

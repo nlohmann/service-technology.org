@@ -2982,35 +2982,63 @@ unsigned int compute_scc()
    {
      // close state and return to previous state
 
+          bool nonTrivialSCC = false;
+
+          if(gmflg)
+          {
+            (*graphstream) << "STATE " << CurrentState ->dfs;
+            (*graphstream) << " Lowlink: " << CurrentState ->min;
+          }
+          if(GMflg)
+          {
+            cout << "STATE " << CurrentState ->dfs;
+            cout << " Lowlink: " << CurrentState ->min;
+          }
+
 
       if(CurrentState ->dfs == CurrentState -> min)
       {
          // unlink scc
-         if(CurrentState != TarStack -> nexttar) // current != bottom(stack)
-         {
-            State * newroot;
-            newroot = CurrentState -> prevtar;
-            newroot -> nexttar = TarStack -> nexttar;
-            TarStack -> nexttar -> prevtar = newroot;
-            TarStack -> nexttar = CurrentState;
-            CurrentState -> prevtar = TarStack;
-            TarStack = newroot;
-         }
-         State * s;
-            for(s = CurrentState ; s -> nexttar != CurrentState; s = s -> nexttar)
-            {
-                  s -> tarlevel = 1;
-            }
-            s -> tarlevel = 1;
+          if(CurrentState != TarStack -> nexttar) // current != bottom(stack)
+          {
+                State * newroot;
+                newroot = CurrentState -> prevtar;
+                newroot -> nexttar = TarStack -> nexttar;
+                TarStack -> nexttar -> prevtar = newroot;
+                TarStack -> nexttar = CurrentState;
+                CurrentState -> prevtar = TarStack;
+                TarStack = newroot;
+          }
+          State * s;
 
+          // print out SCC
+
+          for(s = CurrentState ; s -> nexttar != CurrentState; s = s -> nexttar) {
+
+              if (not nonTrivialSCC) {
+                  if(gmflg) {
+                    (*graphstream) << " SCC:";
+                  }
+                  if(GMflg) {
+                      cout << " SCC:";
+                  }
+              }
+                nonTrivialSCC = true;
+
+                if(gmflg) {
+                  (*graphstream) << " " << s->nexttar->dfs;
+                }
+                if(GMflg) {
+                    cout << " " << s->nexttar->dfs;
+                }
+
+                s -> tarlevel = 1;
+          }
+          s -> tarlevel = 1;
       }
 
    if(gmflg)
    {
-     (*graphstream) << "STATE " << CurrentState ->dfs;
-     (*graphstream) << " Lowlink: " << CurrentState ->min;
-
-     (*graphstream) << " Prog: " << CurrentState -> progress_value;
 
      if(CurrentState -> persistent) (*graphstream) << " persistent ";
      int j=0;
@@ -3043,8 +3071,7 @@ unsigned int compute_scc()
    }
    if(GMflg)
    {
-     cout << "STATE " << CurrentState ->dfs;
-     cout << " Lowlink: " << CurrentState ->min;
+
      int j=0;
      if(graphformat == 'm')
      {

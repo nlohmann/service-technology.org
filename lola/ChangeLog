@@ -6,6 +6,12 @@
                      http://service-technology.org/lola
 
 
+Version 1.14-unreleased
+=======================
+
+* whenever a SCC representative is found, all members (excluding the
+  representative) of SCC are now printed out when directive STATESPACE is used
+
 Version 1.13
 ============
 

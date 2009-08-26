@@ -171,7 +171,7 @@ In order to run, compile, and develop Wendy, several tools are required.
 @end enumerate
 @end itemize
 
-Wendy's configure script checks whether LoLA (with binary @file{lola-full}) is found in the path and adjusts the configuration file @file{src/wendy.conf} accordingly.
+Wendy's configure script checks whether LoLA (with binary @file{lola-statespace}) is found in the path and adjusts the configuration file @file{src/wendy.conf} accordingly.
 
 
 @subsection Compilation
@@ -388,18 +388,10 @@ wendy: at most one input file must be given -- aborting [#04]
 @end smallexample
 
 @item #05
-@b{This parameter is deprecated since version 1.5.}
-
-Wendy uses LoLA to build the reachability graph of the inner of the net. The configure script tries to find the executable @file{lola-full} in the system's path. If it was not found in the path, the executable must be given using the command-line option @samp{--lola}.
-
-@smallexample
-@cartouche
-wendy: LoLA executable was not found -- aborting [#05]
-@end cartouche
-@end smallexample
+@i{This parameter is deprecated since version 1.5.}
 
 @item #06
-This error occurs in case Wendy could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{FULL} mode) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
+This error occurs in case Wendy could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{STATESPACE} mode, see @ref{Requirements}) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
 
 @smallexample
 @cartouche
@@ -499,15 +491,6 @@ A node that has to be covered (by using the @option{--cover} parameter) does not
 @cartouche
 wendy: unknown place `p' in file `foo.cov' -- aborting [#16]
 wendy: unknown transition `t' in file `foo.cov' -- aborting [#16]
-@end cartouche
-@end smallexample
-
-@item #17
-In case of generating livelock-free partners (by using the @option{--lf} parameter) or for reduction rule smart sending event (by using the @option{--smartSendingEvent} parameter), Wendy expects LoLA to be compiled with the directive @samp{STATESPACE}, see @ref{Requirements}. If this LoLA was not found Wendy exits with this code.
-
-@smallexample
-@cartouche
-wendy: LoLA has not been configured appropriately -- aborting [#17]
 @end cartouche
 @end smallexample
 

@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 2.0-unreleased
-======================
+Version 2.0
+===========
 
 * removed parameter `--noDeadlockDetection'
 

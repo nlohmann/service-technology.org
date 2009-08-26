@@ -59,12 +59,11 @@ option "mi" -
   optional
 
 option "cover" -
-  "Generate a Cover-OG, covering the nodes specified in the given file."
+  "Generate cover operating guidelines, reading a specification from a given file."
   dependon="og"
   string
   typestr="FILENAME"
   optional
-  hidden
 
 
 section "General Options"
@@ -140,11 +139,13 @@ option "seqReceivingEvents" -
 option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
   details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  hidden
   flag off
 
 option "quitAsSoonAsPossible" -
   "Once all waitstates of a knowledge are resolved no more successor knowledges are calculated."
   details="Once all waitstates of a knowledge are resolved no more successor knowledges are calculated. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  hidden
   flag off
 
 
@@ -190,7 +191,7 @@ option "lola" -
   "The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'."
   string
   typestr="FILENAME"
-  default="lola-full"
+  default="lola-statespace"
   optional
   hidden
 
@@ -205,7 +206,6 @@ option "tmpfile" -
 option "clean" -
   "Any temporary files created by Wendy are deleted once they are not used any more."
   flag off
-  hidden
 
 
 text "Report bugs to wendy@service-technology.org. Wendy's home page: http://service-technology.org/wendy"

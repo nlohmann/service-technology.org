@@ -24,8 +24,8 @@ Runtime
        4. copy the binary `src/lola-statespace' to a directory of your path
           (e.g., `/usr/local/bin') or call `make install'
 
-Wendy's configure script checks whether LoLA (with binary `lola-full') is
-found in the path and adjusts the configuration file `src/wendy.conf'
+Wendy's configure script checks whether LoLA (with binary `lola-statespace')
+is found in the path and adjusts the configuration file `src/wendy.conf'
 accordingly.
 
 Compilation

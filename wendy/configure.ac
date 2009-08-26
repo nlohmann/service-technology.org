@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 2.0-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT(Wendy, 2.0, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -34,7 +34,7 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for required tools
-AC_PATH_PROGS(LOLA, [lola-statespace lola-full], [])
+AC_PATH_PROGS(LOLA, [lola-statespace], [])
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)

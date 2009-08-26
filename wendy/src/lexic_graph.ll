@@ -40,7 +40,6 @@ void graph_error(const char *);
 name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
 number    "-"?[0-9][0-9]*
 
-
 %%
 
 {number}" Places"               { /* skip */ }
@@ -49,7 +48,6 @@ number    "-"?[0-9][0-9]*
 ">>>>> "{number}" States, "{number}" Edges, "{number}" Hash table entries" { /* skip */ }
 
 "STATE"      { return KW_STATE; }
-"Prog:"      { return KW_PROG; }
 "Lowlink:"   { return KW_LOWLINK; }
 ":"          { return COLON; }
 ","          { return COMMA; }

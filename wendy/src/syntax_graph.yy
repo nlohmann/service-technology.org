@@ -18,7 +18,7 @@
 \*****************************************************************************/
 
 
-%token KW_STATE KW_PROG KW_LOWLINK COLON COMMA ARROW NUMBER NAME
+%token KW_STATE KW_LOWLINK COLON COMMA ARROW NUMBER NAME
 
 %expect 0
 %defines
@@ -87,7 +87,7 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER prog lowlink markings_or_transitions
+  KW_STATE NUMBER lowlink markings_or_transitions
     { 
     
 //        status("\nDEBUG: current DFS: m%d", $2);
@@ -161,19 +161,8 @@ state:
    }
 ;
 
-prog:
-  /* empty */
-| KW_PROG NUMBER
-;
-
 lowlink:
-    {
-        if (args_info.smartSendingEvent_flag or args_info.lf_flag) {
-            /* livelock freedom or reduction by smart sending event is activated, but lola does not provide necessary lowlink value */
-            abort(17, "LoLA has not been configured appropriately");
-        } 
-    }
-| KW_LOWLINK NUMBER
+  KW_LOWLINK NUMBER
     {
         /* do something with Tarjan's lowlink value (needed for generating livelock free partners or reduction rule smart sending event) */   
         currentLowlink = $2;

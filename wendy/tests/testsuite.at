@@ -1,9 +1,6 @@
 AT_INIT
 
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
-m4_define(AT_CHECK_LOLASTATESPACE, [
-  AT_CHECK([if `echo "" | LOLA -h | GREP -q "STATESPACE"`; then true; else exit 77; fi],0,ignore,ignore)
-])
 
 AT_TESTED(versions.sh)
 
@@ -488,7 +485,6 @@ AT_BANNER([Smart Sending Event])
 
 AT_SETUP([Generic Example])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/smartSendingEvent.* .])
 AT_CHECK([WENDY smartSendingEvent.owfn --og --fionaFormat --verbose --lola=LOLA --smartSendingEvent],0,ignore,ignore)
 AT_CHECK([FIONA -tequivalence smartSendingEvent.og smartSendingEvent.fiona.og],0,stdout,ignore)
@@ -498,7 +494,6 @@ AT_CLEANUP
 
 AT_SETUP([BPM 2006, Section 6])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/06-03-23_BPM06_shop_sect_6.* .])
 AT_CHECK([WENDY 06-03-23_BPM06_shop_sect_6.owfn --og --fionaFormat --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 13 knowledges" stderr])
@@ -510,7 +505,6 @@ AT_CLEANUP
 
 AT_SETUP([Coffee Automaton])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/myCoffee.* .])
 AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 8 knowledges" stderr])
@@ -521,7 +515,6 @@ AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
 AT_CHECK([WENDY phcontrol3.unf.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 67 knowledges" stderr])
@@ -532,7 +525,6 @@ AT_CLEANUP
 
 AT_SETUP([Purchase Order Process])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/PO.* .])
 AT_CHECK([WENDY PO.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 168 knowledges" stderr])
@@ -543,7 +535,6 @@ AT_CLEANUP
 
 AT_SETUP([Sequence])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/sequence10.* .])
 AT_CHECK([WENDY sequence10.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 1024 knowledges" stderr])
@@ -554,7 +545,6 @@ AT_CLEANUP
 
 AT_SETUP([SMTP Protocol])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/smtp3.* .])
 AT_CHECK([WENDY smtp3.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 1354 knowledges" stderr])
@@ -565,7 +555,6 @@ AT_CLEANUP
 
 AT_SETUP([Travel Service])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/T2.* .])
 AT_CHECK([WENDY T2.owfn --fionaFormat --og --verbose --smartSendingEvent --lola=LOLA --messagebound=2],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 351 knowledges" stderr])
@@ -576,7 +565,6 @@ AT_CLEANUP
 
 AT_SETUP([ZEUS Seller Service])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/zeus.* .])
 AT_CHECK([WENDY zeus.owfn --fionaFormat --og --smartSendingEvent --lola=LOLA --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 6 knowledges" stderr])
@@ -776,12 +764,22 @@ AT_CHECK([GREP -c "\->" carreservation_with_engine.og],0,[6510
 AT_KEYWORDS(synchronous)
 AT_CLEANUP
 
-AT_SETUP([Test net])
+AT_SETUP([Test net 1])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test-sync.owfn .])
 AT_CHECK([WENDY test-sync.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 13 nodes left" stderr])
 AT_CHECK([GREP -c "\->" test-sync.og],0,[154
+])
+AT_KEYWORDS(synchronous)
+AT_CLEANUP
+
+AT_SETUP([Test net 2])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/sync_deadlock.owfn .])
+AT_CHECK([WENDY sync_deadlock.owfn --og --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 2 nodes left" stderr])
+AT_CHECK([GREP -c "\->" sync_deadlock.og],0,[5
 ])
 AT_KEYWORDS(synchronous)
 AT_CLEANUP
@@ -809,7 +807,6 @@ AT_BANNER([Livelock Freedom])
 
 AT_SETUP([livelock free controllable])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/LF_DF_controllable.owfn .])
 AT_CHECK([WENDY LF_DF_controllable.owfn --lf --verbose --lola=LOLA],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
@@ -818,7 +815,6 @@ AT_CLEANUP
 
 AT_SETUP([livelock free controllable])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/LF_DF_controllable2.owfn .])
 AT_CHECK([WENDY LF_DF_controllable2.owfn --lf --verbose --lola=LOLA],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
@@ -827,7 +823,6 @@ AT_CLEANUP
 
 AT_SETUP([not livelock free controllable])
 AT_CHECK_LOLA
-AT_CHECK_LOLASTATESPACE
 AT_CHECK([cp TESTFILES/nLF_DF_controllable.owfn .])
 AT_CHECK([WENDY nLF_DF_controllable.owfn --lf --verbose --lola=LOLA],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])

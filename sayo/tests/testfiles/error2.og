@@ -4,5 +4,5 @@ INTERFACE
   OUTPUT;
  
 NODES
-  0 : ( ~(TRUE * FALSE) + FINAL )
+  0 : ( ~(TRUE * FALSE) + FINAL + ident )
     a -> 0;

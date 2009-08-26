@@ -206,7 +206,6 @@ synchronous:
   {
     // don't know what to do with synchronous transitions
     og_yyerror("synchronous communication is not supported");
-    exit(EXIT_FAILURE);
   }
   identlist SEMICOLON
 ;
@@ -371,7 +370,6 @@ annotation:
   {
     // parsing 2-bit OGs there should be no formula
     og_yyerror("read a formula; only 2-bit annotations are supported");
-    exit(EXIT_FAILURE);
   } 
 | DOUBLECOLON BIT_S    { $$ = 's'; }
 | DOUBLECOLON BIT_F    { $$ = 'f'; }

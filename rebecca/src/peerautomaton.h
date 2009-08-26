@@ -32,6 +32,8 @@ private:
   // event messages
   std::vector<std::string> events_;
 
+  std::vector<std::vector<int> > * equivalenceClasses_;
+
   PeerAutomatonType type_;
 
 public:
@@ -67,6 +69,8 @@ public:
   int initialState() const;
 
   const std::set<int> findStateSet(int) const;
+  const int findState(int, int) const;
+  const int findState(int, const std::string &) const;
   const int findState(int, int, int) const;
 
   // checks sanity of collaboration

@@ -17,7 +17,7 @@ using std::vector;
 
 
 PeerAutomaton::PeerAutomaton(PeerAutomatonType type) :
-  type_(type)
+  type_(type), equivalenceClasses_(NULL)
 {
   switch (type_)
   {
@@ -41,6 +41,23 @@ PeerAutomaton::PeerAutomaton(PeerAutomatonType type) :
 
 PeerAutomaton::~PeerAutomaton()
 {
+  switch (type_)
+  {
+  case CHOREOGRAPHY:
+    delete states_;
+    delete initialState_;
+    delete finalStates_;
+    delete edges_;
+    break;
+  case PROJECTION:
+    delete stateSets_;
+    delete initialStateSet_;
+    delete finalStateSets_;
+    delete pEdges_;
+    break;
+  default:
+    abort(11, "unknown peer automaton type");
+  }
 }
 
 
@@ -208,19 +225,43 @@ const set<int> PeerAutomaton::findStateSet(int sq) const
 
 
 /*
- * This method finds a state qab with q -a-> qa -b-> qab
+ * This method finds a state qa with q -a-> qa
  */
-const int PeerAutomaton::findState(int q, int a, int b) const
+const int PeerAutomaton::findState(int q, int a) const
 {
   set<Edge *> qE = edges(q);
   for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
     if ((*e)->label == events_[a])
-    {
-      set<Edge *> qaE = edges((*e)->destination);
-      for (set<Edge *>::iterator ee = qaE.begin(); ee != qaE.end(); ee++)
-        if ((*ee)->label == events_[b])
-          return (*ee)->destination;
-    }
+      return (*e)->destination;
+  return -1;
+}
+
+
+/*
+ * See PeerAutomaton::findState(int q, int a) const
+ */
+const int PeerAutomaton::findState(int q, const string & a) const
+{
+  set<Edge *> qE = edges(q);
+  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+    if ((*e)->label == a)
+      return (*e)->destination;
+  return -1;
+}
+
+
+/*
+ * This method finds a state qab with q -a-> qa -b-> qab
+ */
+const int PeerAutomaton::findState(int q, int a, int b) const
+{
+  int qa = findState(q, a);
+  if (qa == -1)
+    return -1;
+  set<Edge *> qaE = edges(qa);
+  for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); e++)
+    if ((*e)->label == events_[b])
+      return (*e)->destination;
   return -1;
 }
 
@@ -527,7 +568,34 @@ bool PeerAutomaton::disables(int state, int a, int b) const
 
 bool PeerAutomaton::equivalent(int qa, int qb) const
 {
-  return false;
+  /// Basis:
+  if (qa == qb)
+    return true;
+
+  if ((finalStates_->count(qa) && !finalStates_->count(qb))
+      || (finalStates_->count(qb) && !finalStates_->count(qa)))
+    return false;
+
+  /// Induction:
+  bool result = true;
+  set<string> seen;
+  set<Edge *> Eqa = edges(qa);
+  for (set<Edge *>::iterator e = Eqa.begin(); e != Eqa.end(); e++)
+  {
+    int qax = (*e)->destination;
+    int qbx = findState(qb, (*e)->label);
+    seen.insert((*e)->label);
+    if (qbx == -1)
+      return false;
+    result = result && equivalent(qax, qbx);
+  }
+  set<Edge *> Eqb = edges(qb);
+  for (set<Edge *>::iterator e = Eqb.begin(); e != Eqb.end(); e++)
+  {
+    if (!seen.count((*e)->label))
+      return false;
+  }
+  return result;
 }
 
 

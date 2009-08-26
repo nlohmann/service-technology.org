@@ -98,7 +98,14 @@ int main(int argc, char** argv) {
             chor->deleteState(qab);
           }
           /// 3.3 if q_ab and q_ba are not equivalent
-
+          {
+            int qab = chor->findState(q, a, b);
+            int qba = chor->findState(q, b, a);
+            if (qab != -1 && qba != -1 && !chor->equivalent(qab, qba))
+            {
+              // TODO
+            }
+          }
         }
     std::cout << *chor;
 

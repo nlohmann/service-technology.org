@@ -6,8 +6,8 @@
                      http://service-technology.org/lola
 
 
-Version 1.13-unreleased
-=======================
+Version 1.13
+============
 
 * fixed a small bug in the `PREDUCTION' mode: nets without significant places
   are now analyzed instantly
@@ -20,10 +20,6 @@ Version 1.13-unreleased
   lola-statepredicate1
 
 * changed the way tests are run (using GNU Autotest now)
-
-* added mode called STATESPACE which ensures that FULLTARJAN is switched on
-  and the lowlink values generated during the Tarjan algorithm are printed out;
-  furthermore no reduction techniques will be applied
 
 Version 1.12
 ============

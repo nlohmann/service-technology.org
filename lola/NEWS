@@ -6,8 +6,8 @@
                      http://service-technology.org/lola
 
 
-Version 1.13-unreleased
-=======================
+Version 1.13
+============
 
 * fixed a small bug in the `PREDUCTION' mode: nets without significant places
   are now analyzed instantly

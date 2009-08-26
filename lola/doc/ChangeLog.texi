@@ -1,4 +1,4 @@
-@heading Version 1.13-unreleased
+@heading Version 1.13
 @itemize
 @item fixed a small bug in the @option{PREDUCTION} mode: nets without significant places are now analyzed instantly
 

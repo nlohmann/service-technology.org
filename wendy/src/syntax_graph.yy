@@ -147,9 +147,7 @@ state:
                         
                         if (args_info.smartSendingEvent_flag) {
                             /* ... the same is true for possible sending events */
-
-                            // LOLA does not give correct lowlink yet !!!!!!!!!!!!!!!!!!!! if it does uncomment the following lines
-                           // InnerMarking::markingMap[poppedMarking]->possibleSendEvents = InnerMarking::markingMap[$2]->possibleSendEvents;
+                            InnerMarking::markingMap[poppedMarking]->possibleSendEvents = InnerMarking::markingMap[$2]->possibleSendEvents;
                         }
 
                     } while ($2 != poppedMarking);

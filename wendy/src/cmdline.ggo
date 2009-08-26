@@ -115,31 +115,36 @@ sectiondesc="These options control the optimizations Wendy uses while synthesizi
 
 option "smartSendingEvent" -
   "Send only if no marking within current knowledge is found that will definitely not consume the message sent."
-  details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, strategies which will send messages that will never be consumed get lost. In case of livelock freedom no strategies will be lost.\n"
+  details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, partners which will send messages that will never be consumed get lost. In case of livelock freedom no partners will be lost.\n"
   flag off
 
 
 section "Reductions"
-sectiondesc="These options control the reductions Wendy uses while synthesizing partners. Note that reduction rules do not necessarily preserve all strategies, but return a strategy if one exists.\n"
+sectiondesc="These options control the reductions Wendy uses while synthesizing partners. Note that reduction rules do not necessarily preserve all partners, but return a partner if one exists.\n"
 
 option "waitstatesOnly" -
   "Only consider waitstates when calculating successors."
-  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
   flag off
 
 option "receiveBeforeSend" -
   "Only send if receiving does not resolve all waitstates."
-  details="This rule will consider exactly those sending events that are absolutely necessary. That is, using this rule will create `arrogant' strategies which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="This rule will consider exactly those sending events that are absolutely necessary. That is, using this rule will create `arrogant' partners which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
   flag off
 
 option "seqReceivingEvents" -
   "Sequentialize receiving events."
-  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstate. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstate. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
   flag off
 
 option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
-  details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all strategies, but will return a strategy if one exists.\n"
+  details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  flag off
+
+option "quitAsSoonAsPossible" -
+  "Once all waitstates of a knowledge are resolved no more successor knowledges are calculated."
+  details="Once all waitstates of a knowledge are resolved no more successor knowledges are calculated. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
   flag off
 
 

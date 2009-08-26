@@ -150,6 +150,9 @@ class StoredKnowledge {
         /// adds a successor knowledge
         void addSuccessor(const Label_ID&, StoredKnowledge* const);
 
+        /// returns whether all waitstates are resolved with the current set of successors
+        bool allWaitstatesResolved() const;
+
         /// return whether this node fulfills its annotation
         bool sat() const;
 

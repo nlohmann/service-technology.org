@@ -119,18 +119,16 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
-
-            // LIVELOCK FREEDOM
-            if (args_info.lf_flag) {
-                // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
-                adjustLowlinkValue(SK, SK_store);
-            }
         } else {
             // we did not find new knowledge
             delete SK_new;
         }
+
         // LIVELOCK FREEDOM
         if (args_info.lf_flag) {
+            // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
+            adjustLowlinkValue(SK, SK_store);
+
             // from successor knowledge a final knowledge is reachable
             if (SK_store->is_final_reachable) {
                 SK->is_final_reachable = 1;
@@ -315,9 +313,14 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
         process(K, SK, l);
 
+        // reduction rule: quit once all waitstates are resolved
+        if (args_info.quitAsSoonAsPossible_flag and SK->allWaitstatesResolved()) {
+            return ;
+        }
+
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
         // TODO what about synchronous events?
-        if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat()) {
+        if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->allWaitstatesResolved()) {
             if (not args_info.lf_flag or SK->is_final_reachable) {
                 l = Label::first_sync;
             }
@@ -541,6 +544,10 @@ void StoredKnowledge::dot(std::ostream &file) {
                     default: assert(false);
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
+
+                if (args_info.diagnose_flag and not it->second[i]->is_sane) {
+                    file << "is not sane\\n";
+                }
 
 //                file << it->second[i]->dfs
 //                     << ", l:" << it->second[i]->lowlink
@@ -1056,6 +1063,55 @@ void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
     // use the first free position and store this knowledge
     assert(predecessorCounter < inDegree);
     predecessors[predecessorCounter++] = k;
+}
+
+
+/*!
+ in contrast to sat() this method does not require anything to be done in advance, it purely
+ checks each marking of the current knowledge if, in case it is a waitstate, it is resolved by some
+ event that leads to a sane successor
+*/
+bool StoredKnowledge::allWaitstatesResolved() const {
+    std::vector<Label_ID> goodLabels;
+
+    // find all events that lead to a good successor knowlegde
+    for (Label_ID l = Label::first_receive; l < Label::last_sync; ++l) {
+        if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
+            goodLabels.push_back(l);
+        }
+    }
+
+    // traverse through all markings
+    for (unsigned int m = 0; m < size; m++) {
+        bool isResolved = false;
+
+        // we consider waitstates only
+        if (not InnerMarking::inner_markings[inner[m]]->is_waitstate or
+                (InnerMarking::inner_markings[inner[m]]->is_final and interface[m]->unmarked())) {
+            continue;
+        }
+
+        // check if waitstates is resolved by some event
+        for (std::vector<Label_ID>::iterator iter = goodLabels.begin(); iter < goodLabels.end(); ++iter) {
+            if (SENDING(*iter) and InnerMarking::inner_markings[inner[m]]->waitstate(*iter)) {
+                isResolved = true;
+                break;
+            }
+            if (RECEIVING(*iter)) {
+                if (interface[m]->marked(*iter)) {
+                    isResolved = true;
+                    break;
+                }
+            }
+        }
+
+        // found a waitstates that was not resolved so quit and return false
+        if (not isResolved) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 

@@ -1,4 +1,10 @@
-@heading Version 2.0
+@heading Version 2.1-unreleased
+@itemize
+@item 
+@end itemize
+
+
+@heading Version 2.0 (26 August 2009)
 @itemize
 @item removed parameter @samp{--noDeadlockDetection}
 
@@ -20,7 +26,7 @@
 @end itemize
 
 
-@heading Version 1.9
+@heading Version 1.9 (21 August 2009)
 @itemize
 @item added file @file{THEORY} listing the scientific algorithms and results implemented in Wendy
 
@@ -48,7 +54,7 @@
 @end itemize
 
 
-@heading Version 1.8
+@heading Version 1.8 (13 August 2009)
 @itemize
 @item implemented reduction rule ``sequentializing receiving events'' (parameter: @option{--seqReceivingEvents}): instead of receiving messages in any order, only one sequentialization is considered. (A similar rule is implemented in Fiona where receiving events where combined rather than sequentialized.)
 
@@ -62,7 +68,7 @@
 @end itemize
 
 
-@heading Version 1.7
+@heading Version 1.7 (10 August 2009)
 @itemize
 @item added test case for bug #13903 (@url{https://gna.org/bugs/?13903})
 
@@ -80,7 +86,7 @@
 @end itemize
 
 
-@heading Version 1.6
+@heading Version 1.6 (21 July 2009)
 @itemize
 @item fixed bug #13994 (@url{https://gna.org/bugs/?13994}) -- malicious root node (i.e., a root not with reachable deadlocks or message bound violation) was not detected
 
@@ -95,7 +101,7 @@
 @end itemize
 
 
-@heading Version 1.5
+@heading Version 1.5 (9 July 2009)
 @itemize
 @item fixed bug #13718 (@url{https://gna.org/bugs/?13651}) -- fixed bit annotations
 
@@ -113,7 +119,7 @@
 @end itemize
 
 
-@heading Version 1.4
+@heading Version 1.4 (15 June 2009)
 @itemize
 @item versions of used programs are collected in @file{testsuite.log} when running @samp{make check}
 
@@ -127,7 +133,7 @@
 @end itemize
 
 
-@heading Version 1.3
+@heading Version 1.3 (22 May 2009)
 @itemize
 @item implemented the `receive before send' reduction rule (@option{--receiveBeforeSend}): if the waitstates of a knowledge bubble can be resolved by receiving, don't send -- this reduction does not preserve all strategies, but will return a strategy if one exists
 
@@ -135,7 +141,7 @@
 @end itemize
 
 
-@heading Version 1.2
+@heading Version 1.2 (20 May 2009)
 @itemize
 @item implemented new OG file format -- the deprecated format can still be used with @option{--fionaFormat} parameter which is implicitly used in case @option{-t OG} is used
 
@@ -147,7 +153,7 @@
 @end itemize
 
 
-@heading Version 1.1
+@heading Version 1.1 (12 May 2009)
 @itemize
 @item implemented synchronous communication
 
@@ -157,7 +163,7 @@
 @end itemize
 
 
-@heading Version 1.0
+@heading Version 1.0 (11 May 2009)
 @itemize
 @item initial release of Wendy
 

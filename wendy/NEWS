@@ -8,36 +8,10 @@
                       http://service-technology.org/wendy
 
 
-Version 2.0
-===========
+Version 2.1-unreleased
+======================
 
-* removed parameter `--noDeadlockDetection'
-
-* reorganized internal livelock detection; avoided additional bit to be
-  stored for each internal marking
-
-* fixed bug #14166 (`https://gna.org/bugs/?14166'): adding dead dummy
-  transition to avoid parser errors from LoLA
-
-* added scripts to use LCOV
-  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
-  coverage (use `make cover' in `tests' directory)
-
-* added test cases to test Wendy's integration into Mia
-  (`http://service-technology.org/mia')
-
-* solved task #6701 (`https://gna.org/task/?6701'): output files (including
-  temporary files) are now organized by dedicated class; `mktemp' function
-  is used due to portability issues
-
-* output can be piped to standard output (`stdout') by using the filename
-  `-'; example: `wendy file.owfn --og=-'
-
-* generated temporary files are deleted if the `--clean' parameter is given
-
-* fixed bug #14158 (`https://gna.org/bugs/?14158'): removed conflicts in
-  graph grammar
-
+*
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

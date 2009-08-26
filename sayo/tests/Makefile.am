@@ -97,15 +97,15 @@ cover-prepare:
 # get descriptions from the testsuite
 descriptions: $(TESTSUITE)
 	$(SHELL) '$(TESTSUITE)' -l > descriptions.txt
-	$(SED) -i '1,5d;n;d;' descriptions.txt
-	$(SED) -i 's/:[ \t]*testsuite.at:[0-9]*[ \t]*/ /;s/^[ \t]*//' descriptions.txt
-	$(SED) -i 's/ /\n\t/' descriptions.txt
+	$(SED) '1,5d;n;d;' descriptions.txt > descriptions.txt
+	$(SED) 's/:[ \t]*testsuite.at:[0-9]*[ \t]*/ /;s/^[ \t]*//' descriptions.txt > descriptions.txt
+	$(SED) 's/ /\n\t/' descriptions.txt > descriptions.txt
 	lcov/gendesc descriptions.txt -o descriptions1
 	cp descriptions1 descriptions10
 	cp descriptions1 descriptions100
-	$(SED) -i 's/^TN: \([1-9]\)$$/TN: 0\1/' descriptions10
-	$(SED) -i 's/^TN: \([1-9]\)$$/TN: 00\1/' descriptions100
-	$(SED) -i 's/^TN: \([1-9][1-9]\)$$/TN: 0\1/' descriptions100
+	$(SED) 's/^TN: \([1-9]\)$$/TN: 0\1/' descriptions10 > descriptions10
+	$(SED) 's/^TN: \([1-9]\)$$/TN: 00\1/' descriptions100 > descriptions100
+	$(SED) 's/^TN: \([1-9][1-9]\)$$/TN: 0\1/' descriptions100 > descriptions100
 	cat descriptions1 descriptions10 descriptions100 > descriptions
 	rm descriptions1 descriptions10 descriptions100 descriptions.txt
 

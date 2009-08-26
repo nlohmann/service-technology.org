@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -102,12 +102,12 @@ char * reserve;
 #ifdef MAXIMALSTATES
 /*!
  \brief abort LoLA if more than MAXIMALSTATES states are processed
- 
+
         This function makes LoLA abort with exit code 5 if the number of
         currently processed states exceeds the number of states defined as
         MAXIMALSTATES in file userconfig.H. This function is invoked from
         files check.cc, graph.cc, and sweep.cc.
- 
+
  \param states the number of currently processed states
  \return exit LoLA with exit code 5 if states exceed MAXIMALSTATES
 */
@@ -161,7 +161,7 @@ void processCommandLine(int argc, char **argv) {
     fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
-  
+
   // check if output parameters are given at most once
   if (args_info.Net_given + args_info.net_given > 1) {
     fprintf(stderr, "lola: more than one '-n' / '-N' option given\n");
@@ -193,20 +193,20 @@ void processCommandLine(int argc, char **argv) {
     fprintf(stderr, "      see 'lola --help' for more information\n");
     exit(4);
   }
-  
-  
+
+
   // process --offspring option
   if (args_info.offspring_given) {
     if (!strcmp(args_info.offspring_arg, "")) {
       fprintf(stderr, "lola: option '--offspring' must not have an empty argument\n");
       fprintf(stderr, "      see 'lola --help' for more information\n");
-      exit(4);      
+      exit(4);
     }
     createUserconfigFile(args_info.offspring_arg);
     exit(EXIT_SUCCESS);
   }
-  
-  
+
+
   // set LoLA's flag variables
   hflg = args_info.userconfig_given;
   Nflg = args_info.Net_given;
@@ -222,7 +222,7 @@ void processCommandLine(int argc, char **argv) {
   GMflg = args_info.Graph_given + args_info.Marking_given;
   gmflg = args_info.graph_given + args_info.marking_given;
   cflg = args_info.Master_given;
-  
+
   // set graph format
   if (args_info.Graph_given || args_info.graph_given) {
     graphformat = 'g';
@@ -230,13 +230,13 @@ void processCommandLine(int argc, char **argv) {
   if (args_info.Marking_given || args_info.marking_given) {
     graphformat = 'm';
   }
-  
+
   // determine net file name and its basename
   if (args_info.inputs_num == 1) {
     string temp = string(args_info.inputs[0]);
     netfile = (char*)realloc(netfile, temp.size()+1);
     strcpy(netfile, temp.c_str());
-    
+
     temp = temp.substr(0, temp.find_last_of("."));
     netbasename = (char*)realloc(netbasename, temp.size()+1);
     strcpy(netbasename, temp.c_str());
@@ -264,7 +264,7 @@ void processCommandLine(int argc, char **argv) {
       strcpy(pnmlfile, temp.c_str());
     }
   }
-  
+
   // set input filename for "-a" option
   if (args_info.analysis_given) {
     if (args_info.analysis_arg) {
@@ -277,7 +277,7 @@ void processCommandLine(int argc, char **argv) {
       strcpy(analysefile, temp.c_str());
     }
   }
-  
+
   // set output filename for "-p" option
   if (args_info.path_given) {
     if (args_info.path_arg) {
@@ -322,19 +322,19 @@ void processCommandLine(int argc, char **argv) {
     if (args_info.graph_arg) {
       string temp = string(args_info.graph_arg);
       graphfile = (char*)realloc(graphfile, temp.size()+1);
-      strcpy(graphfile, temp.c_str());          
+      strcpy(graphfile, temp.c_str());
     } else {
       if (args_info.marking_arg) {
         string temp = string(args_info.marking_arg);
         graphfile = (char*)realloc(graphfile, temp.size()+1);
-        strcpy(graphfile, temp.c_str());      
+        strcpy(graphfile, temp.c_str());
       } else {
         string temp = string(netbasename) + ".graph";
         graphfile = (char*)realloc(graphfile, temp.size()+1);
-        strcpy(graphfile, temp.c_str());      
+        strcpy(graphfile, temp.c_str());
       }
     }
-  }  
+  }
 
   // release memory
   cmdline_parser_free (&args_info);
@@ -379,7 +379,7 @@ int main(int argc, char ** argv){
 
 	if (hflg)
 	  reportconfiguration();
-  
+
   // 2. Initialisierung
   NonEmptyHash = 0;
   try {
@@ -529,7 +529,7 @@ unsigned int j;
 	}
 	cout << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
-	
+
   }
   catch(overflow)
   {
@@ -650,18 +650,21 @@ unsigned int j;
 	if(F)
 	{
 		checkstart = new unsigned int[F->card+5];
-		for(i=0;i<F->card;i++) 
+		for(i=0;i<F->card;i++)
 		{
 			checkstart[i] = 0;
 		}
 	}
 #endif
 
-		
+
 	try{
 //siphontrapproperty();
 #ifdef NONE
 	return 0;
+#endif
+#ifdef STATESPACE
+	return compute_scc();
 #endif
 #ifdef SWEEP
 	return 1 - sweep();
@@ -679,7 +682,7 @@ return liveproperty();
 #ifdef REVERSIBILITY
 return reversibility();
 #endif
-#if defined(HOME) && defined(TWOPHASE) 
+#if defined(HOME) && defined(TWOPHASE)
 return home();
 #endif
 #ifdef FINDPATH
@@ -723,7 +726,7 @@ catch(overflow)
 
 /*!
  \brief remove isolated places from the net
- 
+
  \note The places are actually copied to the end of the array "Places" and
        made unaccessible by decreasing the place count.
 */
@@ -758,7 +761,7 @@ void findcyclingtransitions()
  	// use Node::parent pointer as stack, pos[0] = current succ, pos[1] for status info
 	// 0 - never seen, 1 - on stack, 2 - explored, x+4 - already selected as cyclic
  	// x+8 - transition
-		
+
 Node * currentnode, * newnode, * maxnode, * searchnode;
 unsigned int maxfan;
 Transition * currenttransition;
@@ -777,7 +780,7 @@ bool IsTransition ;
 	{
 		// is there another successor ?
 		newnode = (Node *) 0;
-		if(currentnode->pos[1] < 8) 
+		if(currentnode->pos[1] < 8)
 		{
 			// successor of place
 			for(;currentnode->pos[0] < currentnode -> NrOfLeaving;currentnode -> pos[0]++)
@@ -820,7 +823,7 @@ bool IsTransition ;
 					}
 				}
 				if(currenttransition->pos[0] < Transitions[0]->cnt)
-				{	
+				{
 					newnode = Transitions[currenttransition->pos[0]];
 					IsTransition = true;
 				}
@@ -838,13 +841,13 @@ bool IsTransition ;
 				newnode -> parent = currentnode;
 				newnode -> pos[0] = 0;
 				currentnode = newnode; //explore newnode
-			break;	
+			break;
 			case 1: // newnode on stack
 				maxfan = 0;
 				for(searchnode = currentnode;searchnode !=newnode;searchnode = searchnode -> parent)
-				{	
+				{
 					if(searchnode -> pos[1] < 8) continue; // jump over places
-					if(searchnode -> pos[1] > 11) 
+					if(searchnode -> pos[1] > 11)
 					{
 						//already selected
 						maxnode = searchnode;
@@ -867,7 +870,7 @@ bool IsTransition ;
 				currentnode -> pos[0] ++; // check next succ
 			break;
 			}
-			
+
 		}
 		else
 		{
@@ -881,7 +884,7 @@ bool IsTransition ;
 	{
 		if(Transitions[j]-> cyclic)
 		{
-			cerr << "\n" << Transitions[j] -> name; 
+			cerr << "\n" << Transitions[j] -> name;
 		}
 	}
 }

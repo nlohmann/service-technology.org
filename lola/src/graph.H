@@ -1756,5 +1756,6 @@ inline State * binInsert()
 
 }
 void print_path(State *);
+unsigned int compute_scc();
 	
 #endif

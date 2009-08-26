@@ -28,21 +28,10 @@
 #include <iostream>
 #include <limits.h>
 
-
 #ifdef STATESPACE
 #define FULL
 #define FULLTARJAN
 #define TARJAN
-#define SHOWLOWLINK
-#undef COVER
-#undef STUBBORN
-#undef SYMMETRY
-#undef CYCLE
-#undef PREDUCTION
-#undef SMALLSTATE
-#undef BITHASH
-#undef DISTRIBUTE
-#undef SWEEP
 #endif
 
 #undef APPROXIMATE_CANONIZATION

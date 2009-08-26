@@ -104,6 +104,14 @@ void reportconfiguration()
 	cout << "  BREADTH_FIRST: breadth first search order" << endl;
 #endif
 #endif
+
+#ifdef TARJAN
+	cout << "  TARJAN" << endl;
+#endif
+#ifdef FULLTARJAN
+	cout << "  FULLTARJAN" << endl;
+#endif
+
 	cout << endl << "* Reduction techniques applied:" << endl;
 #ifdef STUBBORN
 	cout << "  STUBBORN   : partial order reduction using stubborn sets" << endl;

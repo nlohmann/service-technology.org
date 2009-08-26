@@ -1429,10 +1429,6 @@ if(i >= Places[0]->cnt) // target_marking found!
    if(gmflg)
    {
      (*graphstream) << "STATE " << CurrentState ->dfs;
-#ifdef SHOWLOWLINK
-     (*graphstream) << " Lowlink: " << CurrentState ->min;
-#endif
-
      (*graphstream) << " Prog: " << CurrentState -> progress_value;
 
      if(CurrentState -> persistent) (*graphstream) << " persistent ";
@@ -1467,9 +1463,6 @@ if(i >= Places[0]->cnt) // target_marking found!
    if(GMflg)
    {
      cout << "STATE " << CurrentState ->dfs;
-#ifdef SHOWLOWLINK
-     cout << " Lowlink: " << CurrentState ->min;
-#endif
      int j=0;
      if(graphformat == 'm')
      {
@@ -2912,4 +2905,186 @@ void print_binDec(binDecision * d, int indent)
    print_binDec(d -> nextnew,indent+1);
 }
 
+#ifdef STATESPACE
+unsigned int compute_scc()
+{
+  ofstream * graphstream;
+  unsigned int i;
+  State * NewState;
+  // init initial marking and hash table
+  if(gmflg)
+  {
+   graphstream = new ofstream(graphfile);
+   if(!*graphstream)
+   {
+      fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
+      fprintf(stderr, "      no output written\n");
+      gmflg = false;
+   }
+  }
+  for(i = 0; i < HASHSIZE;i++)
+    {
+      binHashTable[i] = (binDecision *) 0;
+    }
+  if(SEARCHPROC()) cerr << "Sollte eigentlich nicht vorkommen";
+   NrOfStates = 1;
+   Edges = 0;
+
+  CurrentState = INSERTPROC();
+        CurrentState -> firelist = FIRELIST();
+  CurrentState -> current = 0;
+  CurrentState -> parent = (State *) 0;
+
+  CurrentState -> succ = new State * [CardFireList+1];
+  CurrentState -> dfs = CurrentState -> min = 0;
+   CurrentState -> nexttar = CurrentState -> prevtar = CurrentState;
+   TarStack = CurrentState;
+
+  // process marking until returning from initial state
+
+  while(CurrentState)
+    {
+      if(CurrentState -> firelist[CurrentState -> current])
+   {
+     // there is a next state that needs to be explored
+     Edges ++;
+         if(!(Edges % REPORTFREQUENCY))
+      {
+              cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+      }
+     CurrentState -> firelist[CurrentState -> current] -> fire();
+     if(NewState = SEARCHPROC())
+       {
+        // State exists! (or, at least, I am not responsible for it (in the moment))
+         CurrentState -> firelist[CurrentState -> current] -> backfire();
+         CurrentState -> succ[CurrentState -> current] = NewState;
+   if(!(NewState -> tarlevel))
+         CurrentState -> min = MIN(CurrentState -> min, NewState -> dfs);
+         (CurrentState -> current) ++;
+       }
+     else
+       {
+         NewState = INSERTPROC();
+         NewState -> firelist = FIRELIST();
+         NewState -> dfs = NewState -> min = NrOfStates++;
+      NewState -> prevtar = TarStack;
+      NewState -> nexttar = TarStack -> nexttar;
+      TarStack = TarStack -> nexttar = NewState;
+      NewState -> nexttar -> prevtar = NewState;
+         NewState -> current = NewState -> tarlevel = 0;
+         NewState -> parent = CurrentState;
+         NewState -> succ =  new State * [CardFireList+1];
+         CurrentState -> succ[CurrentState -> current] = NewState;
+         CurrentState = NewState;
+       }
+   }
+      else
+   {
+     // close state and return to previous state
+
+
+      if(CurrentState ->dfs == CurrentState -> min)
+      {
+         // unlink scc
+         if(CurrentState != TarStack -> nexttar) // current != bottom(stack)
+         {
+            State * newroot;
+            newroot = CurrentState -> prevtar;
+            newroot -> nexttar = TarStack -> nexttar;
+            TarStack -> nexttar -> prevtar = newroot;
+            TarStack -> nexttar = CurrentState;
+            CurrentState -> prevtar = TarStack;
+            TarStack = newroot;
+         }
+         State * s;
+            for(s = CurrentState ; s -> nexttar != CurrentState; s = s -> nexttar)
+            {
+                  s -> tarlevel = 1;
+            }
+            s -> tarlevel = 1;
+
+      }
+
+   if(gmflg)
+   {
+     (*graphstream) << "STATE " << CurrentState ->dfs;
+     (*graphstream) << " Lowlink: " << CurrentState ->min;
+
+     (*graphstream) << " Prog: " << CurrentState -> progress_value;
+
+     if(CurrentState -> persistent) (*graphstream) << " persistent ";
+     int j=0;
+     if(graphformat == 'm')
+     {
+       for(i=0;i<Places[0]->cnt;i++)
+       {
+          if(CurrentMarking[i])
+          {
+             if(CurrentMarking[i] == VERYLARGE)
+             {
+
+             (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+             }
+             else
+             {
+             (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i];
+             }
+             }
+       }
+
+     }
+     (*graphstream) << "\n\n";
+     for(i=0; CurrentState ->firelist[i];i++)
+     {
+      (*graphstream) << CurrentState -> firelist[i]->name << " -> " <<
+      CurrentState -> succ[i]->dfs << "\n";
+      }
+     (*graphstream) << endl;
+   }
+   if(GMflg)
+   {
+     cout << "STATE " << CurrentState ->dfs;
+     cout << " Lowlink: " << CurrentState ->min;
+     int j=0;
+     if(graphformat == 'm')
+     {
+       for(i=0;i<Places[0]->cnt;i++)
+       {
+          if(CurrentMarking[i])
+          {
+             if(CurrentMarking[i] == VERYLARGE)
+             {
+             cout << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+             }
+             else
+             {
+             cout << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i];
+             }
+          }
+       }
+
+     }
+     cout << "\n\n";
+     for(i=0; CurrentState ->firelist[i];i++)
+     {
+      cout << CurrentState -> firelist[i]->name << " -> " <<
+      CurrentState -> succ[i]->dfs << "\n";
+      }
+     cout << "\n";
+   }
+         if(CurrentState -> parent) CurrentState -> parent -> min = MIN(CurrentState -> min, CurrentState-> parent -> min);
+
+     CurrentState = CurrentState -> parent;
+//**     delete TmpState;
+     if(CurrentState)
+       {
+         CurrentState -> firelist[CurrentState -> current] -> backfire();
+         CurrentState -> current ++;
+       }
+   }
+   }
+   statistics(NrOfStates,Edges,NonEmptyHash);
+   return 0;
+}
+#endif
 #endif

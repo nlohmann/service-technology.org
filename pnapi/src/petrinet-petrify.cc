@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <set>
 #include <sstream>

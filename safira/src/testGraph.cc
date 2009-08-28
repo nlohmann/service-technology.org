@@ -6,6 +6,10 @@
 #include <iostream>
 #include "Formula.h"
 #include "Node.h"
+#include "cmdline.h"
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 using std::map;
 using std::string;
@@ -95,9 +99,6 @@ void testGraphClass(){
 
 	g->makeTotal();
 	g->makeComplete();
-
-
-
 
 	delete g;
 	cout << "testGraphClass... \t passed" << endl;

@@ -226,14 +226,5 @@ void printMap(map<TKey,TValue> *theMap){
 	}
 }
 
-void printNodes(map<int, Node*> *nodeMap){
-/*    for (map<int, Node*>::const_iterator n = nodeMap->begin(); n != nodeMap->end(); ++n){
-		cout << "\nNodeNumber: " << n->first << "   Formula: " << n->second->formula->toString();
-		
-		for (int i = 0; i < cntLabels; ++i){
-			cout << "Number of " << id2label[i] << " successors: ";
-			cout << n->second->outEdges[i]->size() << endl;
-		}
-	}*/
-}
+
 

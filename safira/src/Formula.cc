@@ -23,6 +23,8 @@ extern map<string, int> label2id;
 /****************************************************************************
  * constructors
  ***************************************************************************/
+Formula::Formula(){
+}
 
 FormulaAND::FormulaAND(const Formula *_left, const Formula *_right) :
     left(_left), right(_right)
@@ -69,6 +71,90 @@ FormulaFinal::FormulaFinal(){
 	formulaType = FINAL;
 }
 
+
+Formula* FormulaAND::getCopy() const {
+	return (new FormulaAND(*this));
+}
+
+Formula* FormulaOR::getCopy() const {
+	return (new FormulaOR(*this));
+}
+
+Formula* FormulaNOT::getCopy() const {
+	return (new FormulaNOT(*this));
+}
+
+Formula* FormulaLit::getCopy() const {
+	return (new FormulaLit(*this));
+}
+
+Formula* FormulaNUM::getCopy() const {
+	return (new FormulaNUM(*this));
+}
+
+Formula* FormulaTrue::getCopy() const {
+	return (new FormulaTrue(*this));
+}
+
+Formula* FormulaFalse::getCopy() const {
+	return (new FormulaFalse(*this));
+}
+
+Formula* FormulaFinal::getCopy() const {
+	return (new FormulaFinal(*this));
+}
+
+/****************************************************************************
+ * copy constructors
+ ***************************************************************************/
+Formula::Formula(const Formula &formula) : 	formulaType(formula.formulaType){
+	//cout << "formulaType: " << formulaType << endl;
+}
+
+
+FormulaAND::FormulaAND(const FormulaAND &formula):
+    Formula(formula) ,
+    left(formula.left->getCopy()),
+    right(formula.right->getCopy()){
+}
+
+FormulaOR::FormulaOR(const FormulaOR &formula) :
+	Formula(formula),
+	left(formula.left->getCopy()),
+	right(formula.right->getCopy()){
+}
+
+FormulaNOT::FormulaNOT(const FormulaNOT &formula) :
+	Formula(formula),
+	f(formula.f->getCopy()){
+}
+
+FormulaLit::FormulaLit(const FormulaLit &formula) :
+	Formula(formula), number(formula.number){
+}
+
+FormulaNUM::FormulaNUM(const FormulaNUM &formula) :
+	Formula(formula), number(formula.number){
+}
+
+/****************************************************************************
+ * operator =
+ ***************************************************************************/
+//FormulaAND& FormulaAND::operator = (const FormulaAND &formula){
+//	left = formula.left;
+//	right = formula.right;
+//}
+//
+//FormulaOR& FormulaOR::operator = (const FormulaOR &formula){
+//	left = formula.left;
+//	right = formula.right;
+//}
+//
+//FormulaNOT& FormulaNOT::operator = (const FormulaNOT &formula){
+//	f = formula.f;
+//}
+
+
 /****************************************************************************
  * deconstructors
  ***************************************************************************/
@@ -92,7 +178,9 @@ FormulaNOT::~FormulaNOT() {
 
 //fVar: number of Variables in the formula to be checked
 bool Formula::isSatisfiable(int fVar){
-	list<Clause> clauses = moveNegation()->toCNF(fVar+1,fVar+1);
+	Formula* h = moveNegation();
+	list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
+	delete h;
 
 	int cntVar = fVar + clauses.size(); //TODO: das müsste eine Abschätzung nach oben sein für die Anzahl der Variablen
 	string sVar_Clauses;
@@ -122,7 +210,7 @@ bool Formula::isSatisfiable(int fVar){
 //	}
 //	cout << s << endl;
 
-//    status("executing '%s'", s.c_str());
+    status("executing '%s'", s.c_str());
 	//int result = system("echo 'p cnf 1 2 -1 0 -1 0' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null");
 
 	int result = system(s.c_str());
@@ -133,7 +221,7 @@ bool Formula::isSatisfiable(int fVar){
     //   3 = parse error
     //  10 = formula satisfiable (GOOD)
     //  20 = formula unsatisfiable (GOOD)
-    // 128 = binary not found (comes from shell)
+    // 127 = binary not found (comes from shell)
 
 	if (result != 20 and result != 10) {
         abort(7, "minisat exited with code '%d'", result);

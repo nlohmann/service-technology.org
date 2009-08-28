@@ -9,6 +9,10 @@
 #include <string>
 #include "Formula.h"
 #include "Node.h"
+#include "cmdline.h"
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 using namespace std;
 extern map<string, unsigned int> label2id;

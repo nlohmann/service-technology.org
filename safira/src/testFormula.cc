@@ -7,6 +7,10 @@
 #include "testFormula.h"
 #include "Formula.h"
 #include "helpers.h"
+#include "cmdline.h"
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 using namespace std;
 extern map<string, unsigned int> label2id;
@@ -17,7 +21,6 @@ void testFormulaClass(){
 
 	string s = intToString(23);
 	assert (s == "23");
-
 
 	testTRUE();
 	testFALSE();
@@ -78,6 +81,9 @@ void testTRUE(){
 	list<Clause> clauses = f1->toCNF();
 	assert(clauses.size() == 0);
 
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
 	/*
 	 * g = NOT(true)
 	 */
@@ -89,6 +95,9 @@ void testTRUE(){
 	assert(g1->toString() == "false");
 	assert(g1->toStringCNF() == "false");
 	assert(g->isSatisfiable(label2id.size()) == false);
+
+	Formula* g_clone = g->getCopy();
+	assert(g_clone->toString() == g->toString());
 
 	clauses = g1->toCNF();
 	assert(clauses.size() == 2);
@@ -107,6 +116,8 @@ void testTRUE(){
 	delete f;
 	delete g1;
 	delete g;
+	delete f_clone;
+	delete g_clone;
 
 	cout << "testTRUE... \t passed." << endl;
 }
@@ -123,6 +134,9 @@ void testFALSE(){
 	assert (f1->toString() == "false");
 	assert (f1->toStringCNF() == "false");
 	assert (f->isSatisfiable(label2id.size()) == false);
+
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
 
 	list<Clause> clauses = f1->toCNF();
 	assert(clauses.size() == 2);
@@ -150,6 +164,9 @@ void testFALSE(){
 	assert(g1->toStringCNF() == "true");
 	assert(g->isSatisfiable(label2id.size()) == true);
 
+	Formula* g_clone = g->getCopy();
+	assert(g_clone->toString() == g->toString());
+
 	clauses = g1->toCNF();
     assert(clauses.size() == 0);
 
@@ -157,6 +174,8 @@ void testFALSE(){
     delete f;
     delete g1;
 	delete g;
+	delete f_clone;
+	delete g_clone;
 
     cout << "testFALSE... \t passed." << endl;
 }
@@ -171,6 +190,9 @@ void testFINAL(){
 	assert (f1->toStringCNF() == "final");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
 	list<Clause> clauses = f1->toCNF();
 	assert(clauses.size() == 1);
 
@@ -180,6 +202,7 @@ void testFINAL(){
 
 	delete f1;
 	delete f;
+	delete f_clone;
 
 	cout << "testFINAL... \t passed." << endl;
 }
@@ -194,6 +217,9 @@ void testNUM(){
 	assert (f1->toStringCNF() == "42");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
 	list<Clause> clauses = f1->toCNF();
 	assert(clauses.size() == 1);
 
@@ -203,6 +229,7 @@ void testNUM(){
 
 	delete f1;
 	delete f;
+	delete f_clone;
 
 	cout << "testINT... \t passed." << endl;
 }
@@ -217,6 +244,9 @@ void testLIT(){
 	assert (f1->toStringCNF() == "7");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
 	list<Clause> clauses = f1->toCNF();
 	assert(clauses.size() == 1);
 
@@ -226,6 +256,7 @@ void testLIT(){
 
 	delete f1;
 	delete f;
+	delete f_clone;
 
 	cout << "testLIT... \t passed." << endl;
 }
@@ -244,6 +275,9 @@ void testNOT(){
 	assert (f1->toStringCNF() == "-7");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
 	list<Clause> clauses = f1->toCNF();
 	assert(clauses.size() == 1);
 
@@ -253,6 +287,7 @@ void testNOT(){
 
 	delete f1;
 	delete f;
+	delete f_clone;
 
 	/*double NOT*/
 	Formula *a = new FormulaLit(label2id["R"]);
@@ -260,6 +295,8 @@ void testNOT(){
 	Formula *c = new FormulaNOT(b);
 	Formula *c1 = c->moveNegation();
 
+	Formula* c_clone = c->getCopy();
+	assert(c_clone->toString() == c->toString());
 
 	assert (c->toString() == "~(~(R))");
 	assert (c1->toString() == "R");
@@ -275,6 +312,7 @@ void testNOT(){
 
 	delete c1;
 	delete c;
+	delete c_clone;
 
 	cout << "testNOT... \t passed." << endl;
 }
@@ -296,6 +334,9 @@ void testAND(){
 	assert (c1->toStringCNF(maxId+1,maxId+1) == "(9<->7*6)");
 	assert (c->isSatisfiable(label2id.size()) == true);
 
+	Formula* c_clone = c->getCopy();
+	assert(c_clone->toString() == c->toString());
+
 	list<Clause> clauses = c1->toCNF(maxId+1,maxId+1);
 	assert(clauses.size() == 3);
 
@@ -314,6 +355,7 @@ void testAND(){
 
 	delete c1;
 	delete c;
+	delete c_clone;
 
 	/*****************
 	 * complex AND 1:  (I*R)*A
@@ -330,6 +372,9 @@ void testAND(){
 	assert (e1->toString() == "((I * R) * A)");
 	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->10*5) * (10<->7*6)");
 	assert (e->isSatisfiable(label2id.size()) == true);
+
+	Formula* e_clone = e->getCopy();
+	assert(e_clone->toString() == e->toString());
 
 	clauses = e1->toCNF(maxId+1,maxId+1);
 
@@ -362,6 +407,7 @@ void testAND(){
 
 	delete e1;
 	delete e;
+	delete e_clone;
 
 	/*****************
 	 * complex AND 2:  O*(I*R)
@@ -378,6 +424,9 @@ void testAND(){
 	assert (e1->toString() == "(O * (I * R))");
 	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->8*10) * (10<->7*6)");
 	assert (e->isSatisfiable(label2id.size()) == true);
+
+	e_clone = e->getCopy();
+	assert(e_clone->toString() == e->toString());
 
 	clauses = e1->toCNF(maxId+1,maxId+1);
 
@@ -411,6 +460,7 @@ void testAND(){
 
 	delete e1;
 	delete e;
+	delete e_clone;
 
 	/*****************
 	 * complex AND 2:  (O*A)*(I*R)
@@ -429,6 +479,9 @@ void testAND(){
 	assert (h1->toString() == "((O * A) * (I * R))");
 	assert (h1->toStringCNF(maxId+1,maxId+1) == "(9<->10*11) * (10<->8*5) * (11<->7*6)");
 	assert (h->isSatisfiable(label2id.size()) == true);
+
+	Formula* h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
 
 	clauses = h1->toCNF(maxId+1,maxId+1);
 
@@ -473,6 +526,7 @@ void testAND(){
 
 	delete h1;
 	delete h;
+	delete h_clone;
 	cout << "testAND... \t passed." << endl;
 
 }
@@ -495,6 +549,9 @@ void testAND_NOT(){
 	assert (d1->toStringCNF(maxId+1,maxId+1) == "(9<->-7+-6)");
 	assert (d->isSatisfiable(label2id.size()) == true);
 
+	Formula* d_clone = d->getCopy();
+	assert(d_clone->toString() == d->toString());
+
 	list<Clause> clauses = d1->toCNF(maxId+1,maxId+1);
 	assert(clauses.size() == 3);
 
@@ -513,6 +570,7 @@ void testAND_NOT(){
 
 	delete d1;
 	delete d;
+	delete d_clone;
 
 	/**************
 	 * ~(~(I*R))
@@ -529,6 +587,9 @@ void testAND_NOT(){
 	assert (k1->toString() == "(I * R)");
 	assert (k1->toStringCNF(maxId+1,maxId+1) == "(9<->7*6)");
 	assert (k->isSatisfiable(label2id.size()) == true);
+
+	Formula* k_clone = k->getCopy();
+	assert(k_clone->toString() == k->toString());
 
 	clauses = k1->toCNF(maxId+1,maxId+1);
 	assert(clauses.size() == 3);
@@ -548,6 +609,7 @@ void testAND_NOT(){
 
 	delete k1;
 	delete k;
+	delete k_clone;
 
 	cout << "testAND_NOT... \t passed."<< endl;
 }
@@ -568,6 +630,9 @@ void testOR(){
 	assert (c1->toString() == "(I + R)");
 	assert (c1->toStringCNF(maxId+1,maxId+1) == "(9<->7+6)");
 
+	Formula* c_clone = c->getCopy();
+	assert(c_clone->toString() == c->toString());
+
 	list<Clause> clauses = c1->toCNF(maxId+1,maxId+1);
 	assert(clauses.size() == 3);
 
@@ -586,6 +651,7 @@ void testOR(){
 
 	delete c1;
 	delete c;
+	delete c_clone;
 
 	/*****************
 	 * complex AND 1:  (I+R)+A
@@ -601,6 +667,9 @@ void testOR(){
 	assert (e->toString() == "((I + R) + A)");
 	assert (e1->toString() == "((I + R) + A)");
 	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->10+5) * (10<->7+6)");
+
+	Formula* e_clone = e->getCopy();
+	assert(e_clone->toString() == e->toString());
 
 	clauses = e1->toCNF(maxId+1,maxId+1);
 
@@ -633,6 +702,7 @@ void testOR(){
 
 	delete e1;
 	delete e;
+	delete e_clone;
 
 	/*****************
 	 * complex OR 2:  O+(I+R)
@@ -648,6 +718,9 @@ void testOR(){
 	assert (e->toString() == "(O + (I + R))");
 	assert (e1->toString() == "(O + (I + R))");
 	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->8+10) * (10<->7+6)");
+
+	e_clone = e->getCopy();
+	assert(e_clone->toString() == e->toString());
 
 	clauses = e1->toCNF(maxId+1,maxId+1);
 
@@ -680,6 +753,7 @@ void testOR(){
 
 	delete e1;
 	delete e;
+	delete e_clone;
 
 	/*****************
 	 * complex AND 2:  (O+A)+(I+R)
@@ -697,6 +771,9 @@ void testOR(){
 	assert (h->toString() == "((O + A) + (I + R))");
 	assert (h1->toString() == "((O + A) + (I + R))");
 	assert (h1->toStringCNF(maxId+1,maxId+1) == "(9<->10+11) * (10<->8+5) * (11<->7+6)");
+
+	Formula* h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
 
 	clauses = h1->toCNF(maxId+1,maxId+1);
 
@@ -742,6 +819,7 @@ void testOR(){
 	cout << "testOR... \t passed." << endl;
 	delete h1;
 	delete h;
+	delete h_clone;
 
 }
 
@@ -765,6 +843,9 @@ void testAND_OR_NOT(){
 	assert (i->toString() == "~(((A * ~(R)) + ~(~(A))))");
 	assert (i1->toString() == "((~(A) + R) * ~(A))");
 	assert (i1->toStringCNF(maxId+1,maxId+1) == "(9<->10*-5) * (10<->-5+6)");
+
+	Formula* i_clone = i->getCopy();
+	assert(i_clone->toString() == i->toString());
 
 	list<Clause> clauses = i1->toCNF(maxId+1,maxId+1);
 	assert(clauses.size() == 6);
@@ -796,6 +877,7 @@ void testAND_OR_NOT(){
 
 	delete i1;
 	delete i;
+	delete i_clone;
 
 	/*
 	 * (final + true) * ~false
@@ -813,6 +895,9 @@ void testAND_OR_NOT(){
 	assert (p1->toString() == "((final + true) * true)");
 	assert (p1->toStringCNF(maxId+1,maxId+1) == "(9<->10*true) * (10<->final+true)");
 
+	Formula* p_clone = p->getCopy();
+	assert(p_clone->toString() == p->toString());
+
 	clauses = p1->toCNF(maxId+1,maxId+1);
 	assert(clauses.size() == 2);
 
@@ -827,6 +912,7 @@ void testAND_OR_NOT(){
 
 	delete p1;
 	delete p;
+	delete p_clone;
 	
 	//false * f/A
 	//f/A* false

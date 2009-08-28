@@ -48,12 +48,14 @@ void evaluateParameters(int argc, char** argv);
 bool fileExists(string filename);
 
 int main(int argc, char **argv) {
+	evaluateParameters(argc, argv);
+
 //	testFormulaClass();
 //	testNodeClass();
 //	testGraphClass();
-//	cout << "finished" << endl << endl;
+//	cout << "test finished" << endl << endl;
 
-	evaluateParameters(argc, argv);
+
 
 	if (args_info.inputs_num > 1) {
 		//fehler
@@ -117,7 +119,10 @@ int main(int argc, char **argv) {
 		}
 	}
 
-//	delete g;
+	delete g;
+
+//	free(args_info.minisat_arg);
+	cmdline_parser_free(&args_info);
     return EXIT_SUCCESS;
 }
 

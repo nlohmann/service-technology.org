@@ -3,7 +3,7 @@
 #include <cassert>
 #include "Node.h"
 #include "map"
-
+#include <iostream>
 
 int Node::maxId = 0;
 extern int currentIdPos;
@@ -21,6 +21,7 @@ Node::Node(Formula *_formula, int _id) : formula(_formula), id(_id) {
 }
 
 Node::Node(Formula *_formula) : formula(_formula){
+	assert(formula);
 	id = ++maxId;
 	outEdges = new list<Node*>[label2id.size()];
 }
@@ -28,7 +29,6 @@ Node::Node(Formula *_formula) : formula(_formula){
 
 /// destructor
 Node::~Node() {
-
 	delete formula;
 	delete[] outEdges;
 }

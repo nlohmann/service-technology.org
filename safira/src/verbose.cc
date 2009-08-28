@@ -61,5 +61,6 @@ void abort(unsigned int code, const char* format, ...) {
 
     status("see manual for a documentation of this error");
 
+	cmdline_parser_free(&args_info);
     exit(EXIT_FAILURE);
 }

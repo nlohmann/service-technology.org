@@ -40,6 +40,9 @@ class Graph {
         /// Fiona OG output
         void print() const;
 
+        /// print the node numbers of the given map
+        void printNodes(map<int, Node*> nodeMap);
+
 //        /// adds a label to the graphs
 //        void addLabel(string label, unsigned int id);
 //

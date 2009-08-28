@@ -20,6 +20,11 @@ public:
 	/// fVar: number of Variables in the formula to be checked
 	bool isSatisfiable(int fVar);
 
+	Formula();
+	Formula (const Formula & formula);
+	virtual Formula * getCopy() const = 0;
+	//virtual Formula& operator = (const Formula &formula);
+
 	/// destructor
 	//virtual ~Formula() {};
 	virtual ~Formula();
@@ -47,6 +52,9 @@ private:
 
 public:
 	FormulaAND(const Formula *left, const Formula *right);
+	FormulaAND(const FormulaAND &formula);
+	virtual Formula * getCopy() const;
+//	FormulaAND& operator = (const FormulaAND &formula);
 	~FormulaAND();
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
@@ -63,7 +71,10 @@ private:
 
 public:
 	FormulaOR(const Formula *left, const Formula *right);
+	FormulaOR(const FormulaOR &formula);
+//	FormulaOR& operator = (const FormulaOR &formula);
 	~FormulaOR();
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -78,7 +89,10 @@ private:
 
 public:
 	FormulaNOT(const Formula *f);
+	FormulaNOT(const FormulaNOT &formula);
+	//FormulaNOT& operator = (const FormulaNOT &formula);
 	~FormulaNOT();
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -92,7 +106,9 @@ private:
 
 public:
 	FormulaLit(const int _number);
+	FormulaLit(const FormulaLit &formula);
 	~FormulaLit(){};
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -107,7 +123,9 @@ private:
 
 public:
 	FormulaNUM(const int literal);
+	FormulaNUM(const FormulaNUM &formula);
 	~FormulaNUM(){};
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -120,6 +138,7 @@ class FormulaTrue :public Formula {
 public:
 	FormulaTrue();
 	~FormulaTrue(){};
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -132,6 +151,7 @@ protected:
 public:
 	FormulaFalse();
 	~FormulaFalse(){};
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -143,6 +163,7 @@ class FormulaFinal : public Formula {
 public:
 	FormulaFinal();
 	~FormulaFinal(){};
+	virtual Formula * getCopy() const;
 	string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;

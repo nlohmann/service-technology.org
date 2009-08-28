@@ -18,7 +18,7 @@ sysconf_DATA = safira.conf
 all: minisat
 
 minisat:
-	$(LN_S) $(top_builddir)/minisat/minisat minisat
+	$(LN_S) $(abs_top_builddir)/minisat/minisat minisat
 
 # pass the sysconfdir to safira (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 safira_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"

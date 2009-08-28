@@ -35,6 +35,7 @@ Graph::Graph(){
 
 ///destructor
 Graph::~Graph(){
+
 	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
 		delete n->second;
 	}
@@ -148,19 +149,20 @@ void Graph::makeComplete() {
 			if (n->second->outEdges[i].size() > 0){
 				for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
 					if (n->second->outEdges[i].begin() == s){ //first formula
-						f = (*s)->formula;
+						f = (*s)->formula->getCopy();
 					}
 					else{
-						Formula *h = new FormulaOR(f, (*s)->formula) ;
+						Formula *g = (*s)->formula->getCopy();
+						Formula *h = new FormulaOR(f, g) ;
 						f = h;
 					}
 				}
 
 				Formula *h = new FormulaNOT(f); //f is the disjunction over all x successors of p
+
 				f = h;
 				assert(f);
 				if(f->isSatisfiable(id2label.size()+1) == true){ //TODO: das ist nur eine AbschŠtzung nach oben
-				//if (f->isSatisfiable(100) == true){
 				//if(f->toString() != "~(true)"){
 					//generate new node q with the formula f and add edge with label i to it
 					Node *q = new Node(f);
@@ -174,6 +176,10 @@ void Graph::makeComplete() {
 
 					//printf("added: %d -%s-> %d   forumula: %s\n", n->second->id, id2label[i].c_str(),q->id, q->formula->toString().c_str());
 				}
+				else {
+					delete f;
+				}
+
 			}
 		}
 	}
@@ -318,6 +324,17 @@ void Graph::print() const{
 	}
 }
 
+void Graph::printNodes(map<int, Node*> nodeMap){
+	cout << "\nsize of map: " << nodeMap.size() << endl;
+	for (map<int, Node*>::const_iterator n = nodeMap.begin(); n != nodeMap.end(); ++n){
+		cout << "NodeNumber: " << n->first << "   Formula: " << n->second->formula->toString() << endl;
+
+//		for (int i = 0; i < cntLabels; ++i){
+//			cout << "Number of " << id2label[i] << " successors: ";
+//			cout << n->second->outEdges[i]->size() << endl;
+//		}
+	}
+}
 
 //
 ///// adds a label to the graphs

@@ -174,6 +174,9 @@ class RuleSet {
                 //! type of a rule pair
                 typedef std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair;
                 
+                //! type of a list of sync channels
+                typedef std::list< unsigned int > syncList;
+                
                 /*! 
                  * \brief Modus of a transformation rule
                  *
@@ -197,7 +200,7 @@ class RuleSet {
                  * \param rule  a reference to a #rulepair
                  * \param modus modus of the transformation rule
                  */
-                AdapterRule(rulepair & rule, cfMode modus = AR_NORMAL); 
+                AdapterRule(rulepair & rule, syncList & slist, cfMode modus = AR_NORMAL); 
 
                 /*!
                  * \brief basic destructor, nothing happens here
@@ -210,6 +213,13 @@ class RuleSet {
                  * \return the associated #rulepair
                  */
                 inline const rulepair & getRule() const;
+                
+                /*!
+                 * \brief Returns the #syncList associated with the object.
+                 * 
+                 * \return the associated #syncList
+                 */
+                inline const syncList & getSyncList() const;
                 
                 /*!
                  * \brief Returns the modus of the transformation rule.
@@ -229,6 +239,12 @@ class RuleSet {
                  *       (see RuleSet::getMessageForId)
                  */
                 const std::pair< std::list< unsigned int >, std::list< unsigned int > > _rule;
+                
+                /*!
+                 * \brief a list of unsigned int containing the channels to
+                 *        synchronize with when applying this rule
+                 */
+                const std::list< unsigned int > _syncList;
                 
                 //! modus of the commnunication flow for this rule
                 const cfMode _modus;

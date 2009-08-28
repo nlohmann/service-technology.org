@@ -52,6 +52,14 @@ AT_CHECK([MARLENE test-n.owfn -r test-n.ar -n],0,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
+AT_SETUP([Small test (control of rules)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn -r td.ar],0,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Special options])
 ############################################################################

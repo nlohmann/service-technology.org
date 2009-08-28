@@ -56,7 +56,7 @@ int adapt_rules_yyerror(const char* msg)
 %name-prefix="adapt_rules_yy"
 
 %token RULE_HIDDEN RULE_OBSERVABLE RULE_CONTROLLABLE
-%token NAME ARROW COMMA SEMICOLON
+%token NAME ARROW COMMA SEMICOLON DMINUS
 
 %token_table
 
@@ -110,10 +110,23 @@ partial_rule:
     ARROW channel_list
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, cfmodus);
+        std::list< unsigned int > * slist = new std::list< unsigned int >();
+        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist, cfmodus);
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
+    }
+|
+    channel_list 
+    DMINUS channel_list
+    ARROW channel_list
+    {
+        std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
+        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *$3, cfmodus);
+        workingSet->_adapterRules.push_back(rule);
+        delete $1;
+        delete $3;
+        delete $5;
     }
 ;
 
@@ -124,10 +137,23 @@ total_rule:
     ARROW opt_channel_list
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, cfmodus);
+        std::list< unsigned int > * slist = new std::list< unsigned int >();
+        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist);
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
+    }
+|    
+    opt_channel_list 
+    DMINUS channel_list
+    ARROW opt_channel_list
+    {
+        std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
+        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *$3);
+        workingSet->_adapterRules.push_back(rule);
+        delete $1;
+        delete $3;
+        delete $5;
     }
 ;
 

@@ -66,6 +66,7 @@ CONTROLLABLE { return RULE_CONTROLLABLE; }
  /* identifiers and other characters */
 {name}	{ adapt_rules_yylval.str = strdup(adapt_rules_yytext); return NAME; }
 "->"    { return ARROW; }
+"--"    { return DMINUS; }
 ","     { return COMMA; }
 ";"     { return SEMICOLON; }
 

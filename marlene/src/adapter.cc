@@ -358,6 +358,12 @@ void Adapter::createEngineInterface()
                 }
             }
         }
+        
+        std::set< std::string > ifLabels(_nets[netindex]->getSynchronousLabels());
+        std::set< std::string > engineLabels(_engine->getSynchronousLabels());
+        engineLabels.insert(ifLabels.begin(), ifLabels.end());
+        _engine->setSynchronousLabels(engineLabels);
+        
     }
     FUNCOUT
 }
@@ -437,10 +443,22 @@ void Adapter::createRuleTransitions()
             messageIter++;
         }
         
+        // get synchronouns labels for this rule.
+        std::set< std::string > syncLabel;
+        messageList = rule.getSyncList();
+        messageIter = messageList.begin();
+        while ( messageIter != messageList.end() )
+        {
+            // get label name and insert it into label list for transition
+            std::string labelName = _rs.getMessageForId(*messageIter);
+            syncLabel.insert(labelName);
+            
+            messageIter++;
+        }
+        
         // if we have a synchronous interface, create label for transition
         if (_contType == SYNCHRONOUS)
         {
-            std::set< std::string > syncLabel;
             syncLabel.insert("sync_" + transName);
             trans->setSynchronizeLabels(syncLabel);
         }
@@ -450,12 +468,19 @@ void Adapter::createRuleTransitions()
             std::string controlplacename = "control_" + transName;
             std::string observeplacename = "observe_" + transName;
             
-            //if (rule.getMode() == )
-            Place & controlplace = _engine->createPlace( controlplacename, Node::INPUT, 0, _messageBound);
-            _engine->createArc(controlplace, *trans);
+            if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
+                            || rule.getMode() == RuleSet::AdapterRule::AR_CONTROLLABLE)
+            {
+                Place & controlplace = _engine->createPlace( controlplacename, Node::INPUT, 0, _messageBound);
+                _engine->createArc(controlplace, *trans);
+            }
             
-            Place & observeplace = _engine->createPlace( observeplacename, Node::OUTPUT, 0, _messageBound);
-            _engine->createArc(*trans, observeplace);
+            if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
+                            || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE)
+            {
+                Place & observeplace = _engine->createPlace( observeplacename, Node::OUTPUT, 0, _messageBound);
+                _engine->createArc(*trans, observeplace);
+            }
 
         }
         // next Tansition
@@ -769,8 +794,8 @@ unsigned int RuleSet::getIdForMessage(std::string message)
     }
 }
 
-RuleSet::AdapterRule::AdapterRule(std::pair< std::list<unsigned int>, std::list<unsigned int> > & rule, cfMode modus) :
-    _rule(rule), _modus(modus)
+RuleSet::AdapterRule::AdapterRule(rulepair & rule, syncList & slist, cfMode modus) :
+    _rule(rule), _syncList(slist), _modus(modus)
 {   
     FUNCIN
     /* empty */
@@ -789,6 +814,13 @@ inline const RuleSet::AdapterRule::rulepair & RuleSet::AdapterRule::getRule() co
     FUNCIN
     FUNCOUT
     return _rule; 
+}
+
+inline const RuleSet::AdapterRule::syncList & RuleSet::AdapterRule::getSyncList() const 
+{
+    FUNCIN
+    FUNCOUT
+    return _syncList; 
 }
 
 inline const RuleSet::AdapterRule::cfMode & RuleSet::AdapterRule::getMode() const

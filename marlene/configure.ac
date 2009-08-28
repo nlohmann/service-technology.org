@@ -1,4 +1,4 @@
-AC_INIT(Marlene, 0.5-unreleased, christian.gierds@service-technology.org)
+AC_INIT(Marlene, 1.0-unreleased, christian.gierds@service-technology.org)
 
 AC_CONFIG_SRCDIR([src/marlene.cc])
 AC_CONFIG_HEADERS([src/config.h])

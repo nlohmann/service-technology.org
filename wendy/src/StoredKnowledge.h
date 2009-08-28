@@ -30,6 +30,7 @@
  \brief knowledge (data structure for storing knowledges)
  */
 class StoredKnowledge {
+
     public: /* static functions */
 
         /// generate the successor of a knowledge bubble given a label
@@ -56,55 +57,52 @@ class StoredKnowledge {
         /// print information for instance migration
         static void migration(std::ostream&);
 
-        /// LIVELOCK FREEDOM
-        /// adjust lowlink values of the stored knowledge
-        static void adjustLowlinkValue(StoredKnowledge*, StoredKnowledge*);
-
-        /// evaluates the current strongly connected components and adjusts the is_final_reachable value
-        static void evaluateCurrentSCC(StoredKnowledge*);
-
     public: /* static attributes */
+
+        /// struct combining the statistics on the class StoredKnowledge
+        static struct _stats {
+            public:
+                /// constructor
+                _stats();
+
+                /// the number of hash collisions (distinct knowledges with the same hash value)
+                unsigned int hashCollisions;
+
+                /// the number of edges stored overall
+                unsigned int storedEdges;
+
+                /// the maximal number of interface markings per inner marking
+                unsigned int maxInterfaceMarkings;
+
+                /// the number of nodes that were built, but immediately detected insane
+                unsigned int builtInsaneNodes;
+
+                /// maximal size of a hash bucket (1 means no collisions)
+                size_t maxBucketSize;
+
+                /// the number of knowledges stored in the hash tree
+                unsigned int storedKnowledges;
+
+                /// number of iterations needed to removed insane nodes
+                unsigned int iterations;
+        } stats;
 
         /// buckets of knowledges, indexed by hash values
         static std::map<hash_t, std::vector<StoredKnowledge*> > hashTree;
 
-        /// the number of hash collisions (distinct knowledges with the same hash value)
-        static unsigned int stats_hashCollisions;
-
-        /// the number of knowledges stored in the hash tree
-        static unsigned int stats_storedKnowledges;
-
-        /// the number of edges stored overall
-        static unsigned int stats_storedEdges;
-
-        /// the maximal number of interface markings per inner marking
-        static unsigned int stats_maxInterfaceMarkings;
-
-        /// the number of nodes that were built, but immediately detected insane
-        static unsigned int stats_builtInsaneNodes;
-
         /// report every given knowledges
         static unsigned int reportFrequency;
 
-        /// maximal size of a hash bucket (1 means no collisions)
-        static size_t stats_maxBucketSize;
-
-        /// number of iterations needed to removed insane nodes
-        static unsigned int stats_iterations;
-
         /// the root knowledge
         static StoredKnowledge *root;
-
-        /// the empty knowledge
-        static StoredKnowledge *empty;
 
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
 
     private: /* static attributes */
 
-        /// number of markings stored
-        static int entries_count;
+        /// the empty knowledge
+        static StoredKnowledge *empty;
 
         /// whether the empty node is reachable from the initial node
         static bool emptyNodeReachable;
@@ -121,9 +119,15 @@ class StoredKnowledge {
 
     private: /* static functions */
 
-    	/// LIVELOCK FREEDOM
-    	/// finds a knowledge in Tarjan stack
-    	static bool findKnowledgeInTarjanStack(StoredKnowledge *);
+        // LIVELOCK FREEDOM
+        /// finds a knowledge in Tarjan stack
+        static bool findKnowledgeInTarjanStack(StoredKnowledge *);
+
+        /// adjust lowlink values of the stored knowledge
+        static void adjustLowlinkValue(StoredKnowledge*, StoredKnowledge*);
+
+        /// evaluates the current strongly connected components and adjusts the is_final_reachable value
+        static void evaluateCurrentSCC(StoredKnowledge*);
 
     public: /* member functions */
 
@@ -139,13 +143,13 @@ class StoredKnowledge {
         /// stores this object in the hash tree and returns a pointer to the result
         StoredKnowledge *store();
 
+    private: /* member functions */
+
         /// LIVELOCK FREEDOM
         void isFinal();
 
-        // set values needed for Tarjan algorithm and livelock freedom analysis
+        /// set values needed for Tarjan algorithm and livelock freedom analysis
         void setTarjanValues();
-
-    private: /* member functions */
 
         /// adds a successor knowledge
         void addSuccessor(const Label_ID&, StoredKnowledge* const);
@@ -162,6 +166,7 @@ class StoredKnowledge {
         /// adds a predecessor knowledge
         void addPredecessor(StoredKnowledge* const);
 
+        /// print knowledge
         void print(std::ostream&) const;
 
         /// return a string representation of the knowledge's formula
@@ -188,8 +193,8 @@ class StoredKnowledge {
     private: /* member attributes */
 
         /// for livelock freedom the Tarjan algorithm is needed
-    	unsigned int lowlink;
-    	unsigned int dfs;
+        unsigned int lowlink;
+        unsigned int dfs;
 
         /// the number of markings stored in this knowledge
         unsigned int size;

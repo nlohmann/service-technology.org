@@ -252,7 +252,7 @@ bool InnerMarking::waitstate(const Label_ID &l) const {
   \param[in] interface the interface that corresponds to the current inner marking being part of a certain knowledge
   \return true if all (input) messages of the interface will be consumed later on; false, otherwise
 */
-bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) {
+bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const {
 
     char * possibleSendEventsDecoded = possibleSendEvents->decode();
 

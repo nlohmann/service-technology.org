@@ -187,7 +187,9 @@ int main(int argc, char** argv) {
                         >> pnapi::io::owfn >> *(InnerMarking::net);
         }
         if (args_info.verbose_flag) {
-            std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(InnerMarking::net) << std::endl;
+            std::ostringstream s;
+            s << pnapi::io::stat << *InnerMarking::net;
+            status("read net: %s", s.str().c_str());
         }
     } catch (pnapi::io::InputError error) {
         std::stringstream temp;
@@ -236,7 +238,7 @@ int main(int argc, char** argv) {
     | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
     Output temp;
-    temp.os << pnapi::io::lola << *(InnerMarking::net);
+    temp.os << pnapi::io::lola << *InnerMarking::net;
 
 
     /*------------------------------------------.
@@ -252,7 +254,7 @@ int main(int argc, char** argv) {
 
     // select LoLA binary
 #if defined(CYGWIN_MINGW)
-    // MinGW does not understand pathnames with "/"
+    // MinGW does not understand pathnames with "/", so we use the basename
     string lola_command = basename(args_info.lola_arg);
 #else
     string lola_command = args_info.lola_arg;
@@ -313,12 +315,12 @@ int main(int argc, char** argv) {
 
     // statistics output
     status("stored %d knowledges [%.0f sec]",
-        StoredKnowledge::stats_storedKnowledges, difftime(end_time, start_time));
+        StoredKnowledge::stats.storedKnowledges, difftime(end_time, start_time));
     status("used %d of %d hash buckets, maximal bucket size: %d",
         static_cast<unsigned int>(StoredKnowledge::hashTree.size()),
-        (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats_maxBucketSize));
+        (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats.maxBucketSize));
     status("at most %d interface markings per inner marking",
-        StoredKnowledge::stats_maxInterfaceMarkings);
+        StoredKnowledge::stats.maxInterfaceMarkings);
 
 
     /*----------------------------.
@@ -341,12 +343,12 @@ int main(int argc, char** argv) {
 
     // statistics output
     status("removed %d insane nodes (%3.2f%%) in %d iterations [%.0f sec]",
-        redNodes, 100.0 * ((double)redNodes / (double)StoredKnowledge::stats_storedKnowledges),
-        StoredKnowledge::stats_iterations, difftime(end_time, start_time));
+        redNodes, 100.0 * ((double)redNodes / (double)StoredKnowledge::stats.storedKnowledges),
+        StoredKnowledge::stats.iterations, difftime(end_time, start_time));
     if (redNodes != 0) {
         status("%d insane nodes (%3.2f%%) were prematurely detected",
-            StoredKnowledge::stats_builtInsaneNodes,
-            100.0 * ((double)StoredKnowledge::stats_builtInsaneNodes / (double)redNodes));
+            StoredKnowledge::stats.builtInsaneNodes,
+            100.0 * ((double)StoredKnowledge::stats.builtInsaneNodes / (double)redNodes));
     }
     status("%d nodes left", StoredKnowledge::seen.size());
 

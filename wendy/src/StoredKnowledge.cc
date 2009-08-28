@@ -38,34 +38,32 @@ extern gengetopt_args_info args_info;
 extern string invocation;
 
 
-
 /******************
  * STATIC MEMBERS *
  ******************/
 
 std::map<hash_t, std::vector<StoredKnowledge*> > StoredKnowledge::hashTree;
-unsigned int StoredKnowledge::stats_hashCollisions = 0;
-unsigned int StoredKnowledge::stats_storedKnowledges = 0;
-unsigned int StoredKnowledge::stats_storedEdges = 0;
-unsigned int StoredKnowledge::stats_maxInterfaceMarkings = 0;
-unsigned int StoredKnowledge::stats_builtInsaneNodes = 0;
-size_t StoredKnowledge::stats_maxBucketSize = 1; // sic!
 StoredKnowledge* StoredKnowledge::root = NULL;
 StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
-unsigned int StoredKnowledge::stats_iterations = 0;
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
 std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
 std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
 bool StoredKnowledge::emptyNodeReachable = false;
-
+StoredKnowledge::_stats StoredKnowledge::stats;
 
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+
 
 /********************
  * STATIC FUNCTIONS *
  ********************/
+
+/// constructor for the _stats struct
+StoredKnowledge::_stats::_stats() :
+    maxBucketSize(1) // sic!
+{}
 
 /*!
  check if given knowledge is on the Tarjan stack
@@ -73,9 +71,8 @@ bool StoredKnowledge::emptyNodeReachable = false;
  \return true, if knowledge is on the stack; false otherwise
 */
 inline bool StoredKnowledge::findKnowledgeInTarjanStack(StoredKnowledge *SK) {
-
-    for(std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
-        if(SK == *it) {
+    for (std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
+        if (SK == *it) {
             return true;
         }
     }
@@ -112,7 +109,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
 
-        ++stats_storedEdges;
+        ++stats.storedEdges;
 
         // evaluate the storage result
         if (SK_store == SK_new) {
@@ -136,7 +133,7 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         }
     } else {
         // the node was not sane -- count it
-        ++stats_builtInsaneNodes;
+        ++stats.builtInsaneNodes;
     }
 
     // we saw K_new's successors
@@ -160,12 +157,11 @@ inline void StoredKnowledge::isFinal() {
 /*!
  (LIVELOCK FREEDOM) set all values needed for Tarjan algorithm and livelock freedom analysis
  \param SK current knowledge
- \note Attention: has to be called right after SK is stored! (because dfs and lowlink value depend on stats_storedKnowledges)
+ \note Attention: has to be called right after SK is stored! (because dfs and lowlink value depend on stats.storedKnowledges)
 */
 inline void StoredKnowledge::setTarjanValues() {
-
     // save Tarjan's values
-    dfs = lowlink = stats_storedKnowledges;
+    dfs = lowlink = stats.storedKnowledges;
 
     // it is new, so put it on the Tarjan stack
     tarjanStack.push_back(this);
@@ -178,7 +174,6 @@ inline void StoredKnowledge::setTarjanValues() {
  \param SK_new the successor of the current knowledge whose successors have all been calculated already
 */
 inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK, StoredKnowledge* SK_new) {
-
     if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
         SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
     } else {
@@ -193,7 +188,6 @@ inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK, StoredKnowl
  \param SK current knowledge
 */
 inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
-
     // check, if the current knowledge is a representative of a SCC
     // if so, get all knowledges within the SCC
     if (SK->lowlink == SK->dfs) {
@@ -242,7 +236,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
     if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
-            stats_storedKnowledges, stats_storedEdges);
+            stats.storedKnowledges, stats.storedEdges);
     }
 
     // reduction rule: sequentialize receiving events
@@ -315,7 +309,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
         // reduction rule: quit once all waitstates are resolved
         if (args_info.quitAsSoonAsPossible_flag and SK->allWaitstatesResolved()) {
-            return ;
+            return;
         }
 
         // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
@@ -474,7 +468,7 @@ unsigned int StoredKnowledge::removeInsaneNodes() {
     bool done = args_info.diagnose_flag;
 
     while (not done) {
-        ++stats_iterations;
+        ++stats.iterations;
         while (not insaneNodes.empty()) {
             StoredKnowledge *todo = (*insaneNodes.begin());
             insaneNodes.erase(insaneNodes.begin());
@@ -902,7 +896,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
             interface[count] = new InterfaceMarking(*(pos->second[i]));
         }
 
-        stats_maxInterfaceMarkings = std::max(stats_maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
+        stats.maxInterfaceMarkings = std::max(stats.maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
     }
 
     // we must not forget a marking
@@ -932,7 +926,7 @@ StoredKnowledge::~StoredKnowledge() {
 
     delete[] inner;
 
-    if(args_info.cover_given) {
+    if (args_info.cover_given) {
         Cover::removeKnowledge(this);
     }
 }
@@ -1004,10 +998,10 @@ StoredKnowledge *StoredKnowledge::store() {
         }
 
         // this object was not found in the bucket -- this is a collision
-        ++stats_hashCollisions;
+        ++stats.hashCollisions;
 
         // update maximal bucket size (we add 1 as we will store this object later)
-        stats_maxBucketSize = std::max(stats_maxBucketSize, hashTree[myHash].size() + 1);
+        stats.maxBucketSize = std::max(stats.maxBucketSize, hashTree[myHash].size() + 1);
     }
 
     // we need to store this object
@@ -1019,7 +1013,7 @@ StoredKnowledge *StoredKnowledge::store() {
         isFinal();
     }
 
-    ++stats_storedKnowledges;
+    ++stats.storedKnowledges;
 
     // we return a pointer to the this object since it was newly stored
     return this;

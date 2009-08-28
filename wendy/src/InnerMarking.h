@@ -98,7 +98,7 @@ class InnerMarking {
         bool waitstate(const Label_ID&) const;
 
         /// checks if all input messages will be consumed later on
-        bool sentMessagesConsumed(const InterfaceMarking&);
+        bool sentMessagesConsumed(const InterfaceMarking&) const;
 
         /// determines which receiving transitions are potentially reachable from this marking
         void calcReachableSendingEvents();
@@ -130,7 +130,6 @@ class InnerMarking {
 
         /// receiving transitions that are potentially reachable
         PossibleSendEvents *possibleSendEvents;
-
 };
 
 #endif

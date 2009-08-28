@@ -44,3 +44,4 @@ $LCOV --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE
 
 # exit with executable's exit code
 exit $result
+

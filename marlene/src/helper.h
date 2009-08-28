@@ -38,6 +38,8 @@ extern void evaluate_command_line(int argc, char* argv[]);
 
 extern void status(const char* format, ...);
 
+extern bool fileExists(std::string filename);
+
 extern std::string toString(int i);
 
 #endif

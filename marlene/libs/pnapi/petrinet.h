@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-08-10 04:17:17 +0200 (Mo, 10. Aug 2009) $
+ * \date    $Date: 2009-08-11 13:33:51 +0200 (Di, 11. Aug 2009) $
  *
- * \version $Revision: 4532 $
+ * \version $Revision: 4544 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -257,6 +257,8 @@ namespace pnapi
     std::set<Place *> getInterfacePlaces(const std::string &) const;
 
     const std::set<Transition *> & getTransitions() const;
+
+    const std::set<Arc *> & getArcs() const;
 
     const std::set<Transition *> & getSynchronizedTransitions() const;
     

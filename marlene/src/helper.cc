@@ -24,7 +24,8 @@
 #include <sstream>
 
 #include "config.h"
-#include "subversion.h"
+#include "config-log.h"
+//#include "subversion.h"
 
 #include "helper.h"
 #include "macros.h"
@@ -42,8 +43,8 @@ unsigned int veryverboseindent = 0;
 
 void print_version (void)
 {
-#if defined(SVNREV)
-  printf ("%s %s (rev. %s)\n", PACKAGE, VERSION, SVNREV);
+#if defined(VERSION_SVN)
+  printf ("%s %s (rev. %s)\n", PACKAGE, VERSION, VERSION_SVN);
 #else
   printf ("%s %s\n", PACKAGE, VERSION);
 #endif
@@ -111,6 +112,47 @@ void evaluate_command_line(int argc, char* argv[])
         abort(7, "invalid command-line parameter(s)");
     }
 
+    // debug option
+    if (args_info.bug_flag) {
+        FILE *debug_output = fopen("bug.log", "w");
+        fprintf(debug_output, "%s\n", CONFIG_LOG);
+        fclose(debug_output);
+        fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
+        exit(EXIT_SUCCESS);
+    }
+
+    // read a configuration file if necessary
+    if (args_info.config_given) {
+        // initialize the config file parser
+        params->initialize = 0;
+        params->override = 0;
+
+        // call the config file parser
+        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
+            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+        } else {
+            status("using configuration file '%s'", args_info.config_arg);
+        }
+    } else {
+        // check for configuration files
+        std::string conf_filename = fileExists("marlene.conf") ? "marlene.conf" :
+                               (fileExists(std::string(SYSCONFDIR) + "/marlene.conf") ?
+                               (std::string(SYSCONFDIR) + "/marlene.conf") : "");
+
+        if (conf_filename != "") {
+            // initialize the config file parser
+            params->initialize = 0;
+            params->override = 0;
+            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
+                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+            } else {
+                status("using configuration file '%s'", conf_filename.c_str());
+            }
+        } else {
+            status("not using a configuration file");
+        }
+    }
+
     if (args_info.version_given)
     {
         print_version();
@@ -142,6 +184,18 @@ void evaluate_command_line(int argc, char* argv[])
     free(params);
     
 }
+
+bool fileExists(std::string filename) {
+    FILE *tmp = fopen(filename.c_str(), "r");
+    if (tmp) {
+        fclose(tmp);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
 
 /*!
  * Converts a C++ int to a C++ string object.

@@ -35,7 +35,7 @@ option "asyncif" a
   flag off
 
 option "nocomplementplaces" n
-  "Creates complementary places in the engine part of the adapter (only in an intermediate state), in order to avoid unbounded places. Capacity of the places is influenced by the message bound."
+  "Do not create complementary places in the engine part of the adapter (only in an intermediate state), in order to avoid unbounded places. Capacity of the places is influenced by the message bound."
   flag off
 
 section "Debug"
@@ -47,6 +47,10 @@ option "verbose" v
 option "veryverbose" w
   "Prints a lot of code information. Has only an effect on debug builds!"
   dependon="verbose"
+  flag off
+
+option "bug" -
+  "Creates a file called 'bug.log' that can be sent to the developer. Program will exit immediately after creating this file."
   flag off
 
 section "Configuration"

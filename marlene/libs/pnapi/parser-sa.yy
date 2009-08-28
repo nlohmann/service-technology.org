@@ -89,7 +89,7 @@ input:
   /* empty */
 | KEY_INPUT identlist SEMICOLON
   {
-    for (int i = 0; i < identlist.size(); i++)
+    for (int i = 0; i < (int) identlist.size(); i++)
     {
       if (sa2sm)
       {
@@ -109,7 +109,7 @@ output:
   /* empty */
 | KEY_OUTPUT identlist SEMICOLON
   { 
-    for (int i = 0; i < identlist.size(); i++)
+    for (int i = 0; i < (int) identlist.size(); i++)
     {
       if (sa2sm)
       {
@@ -129,7 +129,7 @@ synchronous:
   /* empty */
 | KEY_SYNCHRONOUS identlist SEMICOLON
   {
-    for (int i = 0; i < identlist.size(); i++)
+    for (int i = 0; i < (int) identlist.size(); i++)
       synchronous_.insert(identlist[i]);
     identlist.clear();
   }
@@ -167,7 +167,7 @@ nodes:
         finalPlaces_.push_back(place_);
       }
         
-      for (int i = 0; i < succState_.size(); i++)
+      for (int i = 0; i < (int) succState_.size(); i++)
       {
         Transition *t = &pnapi_sa_yynet.createTransition();
         if (succType_[i] == Automaton::INPUT)
@@ -204,7 +204,7 @@ nodes:
 	    if (final_)
 	      state_->final();
 	    
-	    for (int i = 0; i < succState_.size(); i++)
+	    for (int i = 0; i < (int) succState_.size(); i++)
 	      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
 	    
 	    final_ = false;

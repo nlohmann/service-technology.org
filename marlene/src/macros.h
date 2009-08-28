@@ -27,7 +27,7 @@
 extern bool veryverbose;
 extern unsigned int veryverboseindent;
 
-#define INDENT for (unsigned int i = 0; i < veryverboseindent; i++) { std::cerr << " "; }
+#define INDENT { for (unsigned int i = 0; i < veryverboseindent; i++) { std::cerr << " "; } }
 #define INDENTP veryverboseindent++;
 #define INDENTM if (veryverboseindent > 0) { veryverboseindent--; }
 #define CHECK INDENT std::cerr << PACKAGE << ": check " << __FILE__ << "@" << __LINE__ << std::endl;
@@ -48,5 +48,11 @@ extern unsigned int veryverboseindent;
 #define FUNCOUT 
 #endif
 
+// detect MinGW compilation under Cygwin
+#ifdef WIN32
+#ifndef _WIN32
+#define CYGWIN_MINGW
+#endif
+#endif
 
 #endif

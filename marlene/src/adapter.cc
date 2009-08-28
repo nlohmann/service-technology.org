@@ -131,7 +131,7 @@ const pnapi::PetriNet * Adapter::buildController()
                 {
                     std::string placeName = (*placeIter)->getName();
                     std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
-
+                    
                     Place * place = composed->findPlace(placeName);
                     if (place == NULL)
                     {
@@ -160,15 +160,14 @@ const pnapi::PetriNet * Adapter::buildController()
                     while (nodeIter != preSet.end() )
                     {
                         composed->createArc(*compPlace, **nodeIter);
-
-                        // deadlock transition for message bound violation of former interface
-                        Transition * dlTrans =
-                                        &composed->createTransition("dl_"
-                                                        + placeName);
-                        composed->createArc(*place, *dlTrans, _messageBound + 1);
-
                         nodeIter++;
                     }
+
+                    // deadlock transition for message bound violation of former interface
+                    Transition * dlTrans =
+                                    &composed->createTransition("dl_"
+                                                    + placeName);
+                    composed->createArc(*place, *dlTrans, _messageBound + 1);
 
                     placeIter++;
                 }
@@ -200,13 +199,17 @@ const pnapi::PetriNet * Adapter::buildController()
 #else
         status("setting tempfile name for MinGW to 'marlene.tmp'");
         char tmp[] = "marlene.tmp";
+        
+        //std::cerr << std::string(tmp) << std::endl;
 #endif
 
         std::string tmpname(tmp);
         std::string owfn_filename = tmpname + ".owfn";
         std::string sa_filename = tmpname + ".sa";
+        std::string og_filename = tmpname + ".og";
 
         {
+            //std::cerr << owfn_filename << std::endl;
             std::ofstream owfn_file(owfn_filename.c_str(), std::ios_base::out);
             if (! owfn_file)
             {
@@ -217,7 +220,7 @@ const pnapi::PetriNet * Adapter::buildController()
         }
 
         std::string wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
-             + " --sa=" + sa_filename;
+             + " --sa=" + sa_filename; // + " --og=" + og_filename;
         wendy_command += " -m" + toString(_messageBound);
         
         time_t start_time, end_time;
@@ -577,7 +580,11 @@ void Adapter::removeUnnecessaryRules()
                 
                 while ( cand != deadCandidates.end() )
                 {
-                    possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
+                    // only internal places are appropriate for removal
+                    if ( (*cand)->getType() == Node::INTERNAL )
+                    {
+                        possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
+                    }
                     cand++;
                 }
                 

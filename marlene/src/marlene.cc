@@ -27,7 +27,6 @@
 
 // include Marlene's own headers
 #include "config.h"
-#include "subversion.h"
 #include "cmdline.h"
 #include "helper.h"
 #include "macros.h"
@@ -43,29 +42,6 @@ int main(int argc, char* argv[])
     /*************************************************\
     * Parsing the command line and evaluation options *
     \*************************************************/
-    // print debug information about system variables, the current compilation
-    // in case of unusal behavior of Fiona, with this information it might be 
-    // easier to track down the bug(s)
-    if (argc == 2 && std::string(argv[1]) == "--bug") {
-        printf("\n\n");
-        printf("Please email the following information to %s:\n", PACKAGE_BUGREPORT);
-        printf("- tool:               %s\n", PACKAGE_NAME);
-        printf("- version:            %s\n", PACKAGE_VERSION);
-        printf("- compilation date:   %s\n", __DATE__);
-        printf("- compiler version:   %s\n", __VERSION__);
-        printf("- platform:           %s\n", CONFIG_BUILDSYSTEM);
-#if defined(SVNREV)
-        printf("- SVN revision:       %s\n", SVNREV);
-#endif
-        //printf("- config ASSERT:      %s\n", CONFIG_ENABLEASSERT);
-        //printf("- config UNIVERSAL:   %s\n", CONFIG_ENABLEUNIVERSAL);
-        //printf("- config ENABLE64BIT: %s\n", CONFIG_ENABLE64BIT);
-        //printf("- config WIN32:       %s\n", CONFIG_ENABLEWIN32);
-//      printf("- external dot:       %s\n", CONFIG_DOT);
-        printf("\n\n");
-
-        exit(0);
-    }
     // evaluate command line options
     evaluate_command_line(argc, argv);
 
@@ -87,6 +63,7 @@ int main(int argc, char* argv[])
         for ( unsigned i = 0; i < args_info.inputs_num; ++i )
         {
             pnapi::PetriNet * net = new pnapi::PetriNet();
+            
             std::string filename = args_info.inputs[i];
             status("reading open net from file \"%s\"", filename.c_str());
             try {
@@ -96,6 +73,9 @@ int main(int argc, char* argv[])
                     inputfile >> meta(pnapi::io::INPUTFILE, filename)
                     >> meta(pnapi::io::CREATOR, PACKAGE_STRING)
                     >> meta(pnapi::io::INVOCATION, invocation) >> pnapi::io::owfn >> *net;
+
+                    // adding a prefix to the net
+                    
                     nets.push_back(net);
                     //std::cout << pnapi::io::dot << *net;
 
@@ -183,7 +163,8 @@ int main(int argc, char* argv[])
     engine.compose(controller, "engine.", "controller.");
     
     engine.reduce(pnapi::PetriNet::LEVEL_4);
-    std::cout << pnapi::io::owfn << engine;
+    std::cout << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
+        << meta(pnapi::io::INVOCATION, invocation) << engine;
 
     /*******************\
     * Deleting all nets *

@@ -1,7 +1,3 @@
-AM_CXXFLAGS=@configured_CXXFLAGS@
-AM_CFLAGS=@configured_CFLAGS@
-# AM_LDFLAGS=@configured_LDFLAGS@
-
 
 noinst_LIBRARIES = libpnapi.a
 

@@ -1,0 +1,35 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2;
+INPUT
+  MTeaButton;
+OUTPUT
+  bla;
+
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p2:   1;
+
+TRANSITION t1    { ?e }
+CONSUME
+  p0:   1;
+PRODUCE
+  p1:   1,
+  bla:  1;
+
+TRANSITION t2    { ?e }
+CONSUME
+  p1:   1,
+  MTeaButton: 1;
+PRODUCE
+  p2:   1;
+
+
+{ END OF FILE }

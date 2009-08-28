@@ -11,7 +11,8 @@
 Version 2.1-unreleased
 ======================
 
-*
+* integrated LoLA SCCs detection within inner markings
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

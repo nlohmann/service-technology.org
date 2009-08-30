@@ -59,10 +59,11 @@ option "mi" -
   optional
 
 option "cover" -
-  "Generate cover operating guidelines, reading a specification from a given file."
+  "Generate cover operating guidelines, reading a specification from a given file. If no file is given, all nodes will be covered."
   dependon="og"
   string
   typestr="FILENAME"
+  argoptional
   optional
 
 

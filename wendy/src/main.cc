@@ -222,6 +222,7 @@ int main(int argc, char** argv) {
     | 3. read cover file if given |
     `----------------------------*/
     if(args_info.cover_given) {
+      if(args_info.cover_arg) {
         cover_in = fopen(args_info.cover_arg, "r");
         if(cover_in == NULL) {
             abort(15, "could not open cover file '%s'", args_info.cover_arg);
@@ -230,9 +231,15 @@ int main(int argc, char** argv) {
         fclose(cover_in);
 
         status("read cover file '%s'", args_info.cover_arg);
-        status("%d nodes to cover", Cover::nodeCount);
+      }
+      else
+      {
+        Cover::coverAll();
+        status("covering all nodes");
+      }
+      status("%d nodes to cover", Cover::nodeCount);
     }
-
+    
 
     /*--------------------------------------------.
     | 4. write inner of the open net to LoLA file |

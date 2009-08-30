@@ -1,0 +1,8 @@
+
+PLACES
+;
+
+TRANSITIONS
+t5, t6;  { it is possible that a credit request has to be examined }
+         { by an employee if the customer is not fixed in his      }
+         { credit control decision }

@@ -24,11 +24,19 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             bug14158.owfn \
             bug14166.owfn \
             carreservation_with_engine.owfn \
+	    coverFiona_Nc1.owfn \
+	    coverFiona_Nc1.owfn.cov\
+	    coverFiona_Nc2.owfn \
+	    coverFiona_Nc2.owfn.cov \
+	    coverFiona_Nc3.owfn \
+	    coverFiona_Nc3.owfn.cov \
             error02.owfn \
             error03.owfn \
             error04-1.owfn error04-2.owfn \
             error06.owfn \
             error10.owfn \
+	    error16.1.cov \
+	    error16.2.cov \
             myCoffee.fiona.og myCoffee.owfn \
             phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
             phil5.owfn \

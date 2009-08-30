@@ -17,7 +17,6 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-
 #ifndef COVER_H_
 #define COVER_H_
 
@@ -98,6 +97,11 @@ public: /* static methods */
   
   /// fill the set of places and transitions to cover
   static void initialize(const std::vector<std::string>&, const std::vector<std::string>&);
+  static void initialize(const std::vector<pnapi::Place*>&, const std::vector<pnapi::Place*>&,
+                         const std::vector<pnapi::Transition*>&, const std::vector<pnapi::Transition*>&);
+  
+  /// cover all nodes of the given net
+  static void coverAll();
   
   /// checks for a given inner marking, which nodes are covered
   static void checkInnerMarking(InnerMarking_ID, std::map<const pnapi::Place*, unsigned int>&, const std::set<std::string>&);

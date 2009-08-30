@@ -238,6 +238,35 @@ AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Missing cover file])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og --cover=foo.cov], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong cover file])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og --cover=myCoffee.owfn], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Unknown place in cover file])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/error16.1.cov .])
+AT_CHECK([WENDY myCoffee.owfn --og --cover=error16.1.cov], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting \[[#16\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Unknown transition in cover file])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/error16.2.cov .])
+AT_CHECK([WENDY myCoffee.owfn --og --cover=error16.2.cov], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting \[[#16\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Regression Tests])
@@ -800,6 +829,43 @@ AT_CHECK([GREP -q "cover constraint is satisfiable: YES" stderr])
 AT_KEYWORDS(cover)
 AT_CLEANUP
 
+AT_SETUP([Fiona Test 1])
+AT_CHECK_LOLA
+m4_define([NET], [coverFiona_Nc1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cp TESTFILES/NET.cov .])
+AT_CHECK([WENDY NET --og --cover=NET.cov --verbose], 0, ignore, stderr)
+AT_CHECK([GREP -q "cover constraint is satisfiable: YES" stderr])
+AT_KEYWORDS(cover fiona)
+AT_CLEANUP
+
+AT_SETUP([Fiona Test 2])
+AT_CHECK_LOLA
+m4_define([NET], [coverFiona_Nc2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cp TESTFILES/NET.cov .])
+AT_CHECK([WENDY NET --og --cover=NET.cov --verbose], 0, ignore, stderr)
+AT_CHECK([GREP -q "cover constraint is satisfiable: YES" stderr])
+AT_KEYWORDS(cover fiona)
+AT_CLEANUP
+
+AT_SETUP([Fiona Test 3])
+AT_CHECK_LOLA
+m4_define([NET], [coverFiona_Nc3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cp TESTFILES/NET.cov .])
+AT_CHECK([WENDY NET --og --cover=NET.cov --verbose], 0, ignore, stderr)
+AT_CHECK([GREP -q "cover constraint is satisfiable: NO" stderr])
+AT_KEYWORDS(cover fiona)
+AT_CLEANUP
+
+AT_SETUP([Cover All])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --og --cover --verbose], 0, ignore, stderr)
+AT_CHECK([GREP -q "cover constraint is satisfiable: YES" stderr])
+AT_KEYWORDS(cover)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Livelock Freedom])

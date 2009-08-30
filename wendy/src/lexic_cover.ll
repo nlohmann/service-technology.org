@@ -35,9 +35,17 @@ extern std::string cover_NAME_token;
 void cover_error(const char *);
 %}
 
+/* comments */
+%s COMMENT
+
 name      [^,;:()\t \n\{\}]+
 
 %%
+
+  /* comments */
+"{"             { BEGIN(COMMENT);                       }
+<COMMENT>"}"    { BEGIN(INITIAL);                       }
+<COMMENT>[^}]*  { /* skip */                            }
 
 "PLACES"        { return KEY_PLACES;                    }
 "TRANSITIONS"   { return KEY_TRANSITIONS;               }

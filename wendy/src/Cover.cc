@@ -60,7 +60,7 @@ std::vector<std::string> Cover::synchronousLabels;
  * \brief fill the set of places and transitions to cover
  * 
  * Given two sets of labels this method searches for the named
- * places and transitions and stores their adresses in two arrays.
+ * nodes and stores their adresses in four arrays.
  */
 void Cover::initialize(const std::vector<std::string> & placeNames, 
                        const std::vector<std::string> & transitionNames)
@@ -99,6 +99,18 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
       comT.push_back(t);
   }
   
+  initialize(inP, comP, inT, comT); 
+}
+
+/*!
+ * \brief Given all nodes to cover, seperated by type,
+ *        this function initializes the arrays.
+ */
+void Cover::initialize(const std::vector<pnapi::Place*>& inP,
+                  const std::vector<pnapi::Place*>& comP,
+                  const std::vector<pnapi::Transition*>& inT,
+                  const std::vector<pnapi::Transition*>& comT)
+{
   /// fill arrays
   internalPlaceCount = inP.size();
   internalPlaces = new std::string[internalPlaceCount];
@@ -143,6 +155,46 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
   
   nodeCount = internalPlaceCount + interfacePlaceCount
             + internalTransitionCount + interfaceTransitionCount;
+}
+
+/*!
+ * \brief covers all nodes
+ */
+void Cover::coverAll()
+{
+  std::vector<pnapi::Place*> inP;    // internal places
+  std::vector<pnapi::Place*> comP;   // interface places
+  std::vector<pnapi::Transition*> inT;    // internal transitions
+  std::vector<pnapi::Transition*> comT;   // interface transitions
+  
+  // determine place types 
+  for(std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInternalPlaces().begin();
+        p != InnerMarking::net->getInternalPlaces().end(); ++p)
+  {
+    inP.push_back(*p);
+  }
+  
+  for(std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInterfacePlaces().begin();
+        p != InnerMarking::net->getInterfacePlaces().end(); ++p)
+  {
+    comP.push_back(*p);
+  }
+  
+  // determine transition types
+  for(std::set<pnapi::Transition*>::iterator t = InnerMarking::net->getTransitions().begin();
+        t != InnerMarking::net->getTransitions().end(); ++t)
+  {
+    if((*t)->getType() == pnapi::Node::INPUT)
+    {
+      comT.push_back(*t);
+    }
+    else
+    {
+      inT.push_back(*t);
+    }
+  }
+  
+  initialize(inP, comP, inT, comT);
 }
 
 /*!

@@ -161,17 +161,17 @@ FormulaNUM::FormulaNUM(const FormulaNUM &formula) :
 Formula::~Formula() {}
 
 FormulaAND::~FormulaAND() {
-    delete left;
-    delete right;
+	delete left;
+	delete right;
 }
 
 FormulaOR::~FormulaOR(){
-    delete left;
-    delete right;
+	delete left;
+	delete right;
 }
 
 FormulaNOT::~FormulaNOT() {
-    delete f;
+	delete f;
 }
 
 

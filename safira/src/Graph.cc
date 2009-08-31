@@ -90,9 +90,6 @@ void Graph::makeTotal(){
 		}
 		//printf("new formula for node %d: %s\n", n->second->id, n->second->formula->toString().c_str());
 	}
-//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
-//		nodes[n->second->id] = n->second;
-//	}
 }
 
 void Graph::makeComplete() {
@@ -115,7 +112,9 @@ void Graph::makeComplete() {
 	 */
 	list<int> addedInitialNodes;
 	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
-		Formula *f = new FormulaNOT((nodes[*n])->formula);
+		Formula *g = nodes[*n]->formula->getCopy();
+		Formula *f = new FormulaNOT(g);
+		//Formula *f = new FormulaNOT((nodes[*n])->formula);
 		if(f->isSatisfiable(id2label.size()+1) == true){ //TODO: das ist nur eine AbschŠtzung nach oben
 		//if(f->toString() != "~(true)"){
 			Node *q = new Node(f);
@@ -124,6 +123,9 @@ void Graph::makeComplete() {
 			for (int l = firstLabelId; l <= lastLabelId; ++l){
 				q->addEdge(l,trap); //edge from q to trap state
 			}
+		}
+		else {
+			delete f;
 		}
 	}
 
@@ -158,7 +160,9 @@ void Graph::makeComplete() {
 					}
 				}
 
-				Formula *h = new FormulaNOT(f); //f is the disjunction over all x successors of p
+
+				//Formula* g = f->getCopy(); //f is the disjunction over all x successors of p
+				Formula *h = new FormulaNOT(f);
 
 				f = h;
 				assert(f);

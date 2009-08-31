@@ -1,6 +1,7 @@
 #include "peerautomaton.h"
 #include "verbose.h"
 
+#include <climits>
 #include <set>
 #include <sstream>
 
@@ -97,6 +98,10 @@ Edge * PeerAutomaton::createTransition(int source, string label,
   e->destination = destination;
   e->type = type;
 
+  for (set<Edge *>::iterator ee = edges_->begin(); ee != edges_->end(); ee++)
+    if (e->source == (*ee)->source && e->destination == (*ee)->destination &&
+        e->label == (*ee)->label && e->type == (*ee)->type)
+      return e;
   edges_->insert(e);
 
   return e;
@@ -111,6 +116,10 @@ PEdge * PeerAutomaton::createTransition(set<int> source, string label,
   e->destination = destination;
   e->type = type;
 
+  for (set<PEdge *>::iterator ee = pEdges_->begin(); ee != pEdges_->end(); ee++)
+    if (e->source == (*ee)->source && e->destination == (*ee)->destination &&
+        e->label == (*ee)->label && e->type == (*ee)->type)
+      return e;
   pEdges_->insert(e);
 
   return e;
@@ -229,7 +238,7 @@ const set<int> PeerAutomaton::findStateSet(int sq) const
  */
 const int PeerAutomaton::findState(int q, int a) const
 {
-  set<Edge *> qE = edges(q);
+  set<Edge *> qE = edgesFrom(q);
   for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
     if ((*e)->label == events_[a])
       return (*e)->destination;
@@ -242,7 +251,7 @@ const int PeerAutomaton::findState(int q, int a) const
  */
 const int PeerAutomaton::findState(int q, const string & a) const
 {
-  set<Edge *> qE = edges(q);
+  set<Edge *> qE = edgesFrom(q);
   for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
     if ((*e)->label == a)
       return (*e)->destination;
@@ -258,7 +267,7 @@ const int PeerAutomaton::findState(int q, int a, int b) const
   int qa = findState(q, a);
   if (qa == -1)
     return -1;
-  set<Edge *> qaE = edges(qa);
+  set<Edge *> qaE = edgesFrom(qa);
   for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); e++)
     if ((*e)->label == events_[b])
       return (*e)->destination;
@@ -280,6 +289,8 @@ bool PeerAutomaton::distant(string a, string b) const
 
 int PeerAutomaton::initialState() const
 {
+  if (!initialState_)
+    return INT_MIN;
   return *initialState_;
 }
 
@@ -349,7 +360,7 @@ const set<Edge *> PeerAutomaton::edges() const
 }
 
 
-const set<Edge *> PeerAutomaton::edges(int source) const
+const set<Edge *> PeerAutomaton::edgesFrom(int source) const
 {
   static map<int, set<Edge *> > cache;
   if (cache.size() == 0)
@@ -359,7 +370,7 @@ const set<Edge *> PeerAutomaton::edges(int source) const
     cache.clear();
     cache[-1] = *edges_;
   }
-  if (cache.count(source) > 0)
+  if (cache.count(source))
     return cache[source];
 
   set<Edge *> result;
@@ -372,12 +383,35 @@ const set<Edge *> PeerAutomaton::edges(int source) const
 }
 
 
+const set<Edge *> PeerAutomaton::edgesTo(int destination) const
+{
+  static map<int, set<Edge *> > cache;
+  if (cache.size() == 0)
+    cache[-1] = *edges_;
+  if (cache[-1] != *edges_)
+  {
+    cache.clear();
+    cache[-1] = *edges_;
+  }
+  if (cache.count(destination))
+    return cache[destination];
+
+  set<Edge *> result;
+  for (set<Edge *>::iterator e = edges_->begin(); e != edges_->end(); e++)
+    if ((*e)->destination == destination)
+      result.insert(*e);
+
+  cache[destination] = result;
+  return result;
+}
+
+
 const set<Edge *> PeerAutomaton::edges(set<int> sources) const
 {
   set<Edge *> result;
   for (set<int>::iterator q = sources.begin(); q != sources.end(); q++)
   {
-    set<Edge *> E = edges(*q);
+    set<Edge *> E = edgesFrom(*q);
     for (set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
       result.insert(*e);
   }
@@ -419,16 +453,15 @@ const vector<const Peer *> & PeerAutomaton::collaboration() const
 }
 
 
-#include "io.h"
 set<int> & PeerAutomaton::closure(set<int> & S, int peer)
 {
   const Peer * p = collaboration_[peer];
   for (set<int>::iterator q = S.begin(); q != S.end(); q++)
   {
-    set<Edge *> E = edges(*q);
+    set<Edge *> E = edgesFrom(*q);
     for (set<Edge *>::iterator eq = E.begin(); eq != E.end(); eq++)
-      if (S.count((*eq)->destination) == 0 && p->input().count((*eq)->label)
-          == 0 && p->output().count((*eq)->label) == 0)
+      if (!S.count((*eq)->destination) && !p->input().count((*eq)->label)
+          && !p->output().count((*eq)->label))
       {
         S.insert((*eq)->destination);
         S = closure(S, peer);
@@ -525,7 +558,7 @@ bool PeerAutomaton::haveSynchronous() const
  */
 bool PeerAutomaton::enables(int state, int a, int b) const
 {
-  set<Edge *> qE = edges(state);
+  set<Edge *> qE = edgesFrom(state);
   bool qabExists = false;
   for(set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
   {
@@ -534,7 +567,7 @@ bool PeerAutomaton::enables(int state, int a, int b) const
 
     if ((*e)->label == events_[a])
     {
-      set<Edge *> qaE = edges((*e)->destination);
+      set<Edge *> qaE = edgesFrom((*e)->destination);
       for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ea++)
         if ((*ea)->label == events_[b])
           qabExists = true;
@@ -546,7 +579,7 @@ bool PeerAutomaton::enables(int state, int a, int b) const
 
 bool PeerAutomaton::disables(int state, int a, int b) const
 {
-  set<Edge *> qE = edges(state);
+  set<Edge *> qE = edgesFrom(state);
   bool qaExists, qbExists;
   qaExists = qbExists = false;
   for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
@@ -554,7 +587,7 @@ bool PeerAutomaton::disables(int state, int a, int b) const
     if ((*e)->label == events_[a])
     {
       qaExists = true;
-      set<Edge *> qaE = edges((*e)->destination);
+      set<Edge *> qaE = edgesFrom((*e)->destination);
       for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ea++)
         if ((*ea)->label == events_[b])
           return false;
@@ -579,7 +612,7 @@ bool PeerAutomaton::equivalent(int qa, int qb) const
   /// Induction:
   bool result = true;
   set<string> seen;
-  set<Edge *> Eqa = edges(qa);
+  set<Edge *> Eqa = edgesFrom(qa);
   for (set<Edge *>::iterator e = Eqa.begin(); e != Eqa.end(); e++)
   {
     int qax = (*e)->destination;
@@ -589,7 +622,7 @@ bool PeerAutomaton::equivalent(int qa, int qb) const
       return false;
     result = result && equivalent(qax, qbx);
   }
-  set<Edge *> Eqb = edges(qb);
+  set<Edge *> Eqb = edgesFrom(qb);
   for (set<Edge *>::iterator e = Eqb.begin(); e != Eqb.end(); e++)
   {
     if (!seen.count((*e)->label))
@@ -611,6 +644,51 @@ void PeerAutomaton::deleteState(int q)
   states_->erase(q);
   set<Edge *> E = *edges_;
   for (set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
-    if ((*e)->destination == q)
+    if ((*e)->destination == q || (*e)->source == q)
       deleteTransition(*e);
+  if (*initialState_ == q)
+    initialState_ = NULL;
+}
+
+
+void PeerAutomaton::unite(int qa, int qb)
+{
+  set<Edge *> qaE = edgesFrom(qa);
+  set<Edge *> qbE = edgesFrom(qb);
+  set<Edge *> rm;
+  for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); e++)
+    rm.insert(*e);
+  for (set<Edge *>::iterator e = qbE.begin(); e != qbE.end(); e++)
+  {
+    bool found = false;
+    for (set<Edge *>::iterator ee = rm.begin(); ee != rm.end(); ee++)
+      if ((*e)->label == (*ee)->label)
+      {
+        rm.erase(ee);
+        found = true;
+      }
+    if (!found)
+      rm.insert(*e);
+  }
+  for (set<Edge *>::iterator e = rm.begin(); e != rm.end(); e++)
+  {
+    deleteTransition(*e);
+  }
+  // recursive call
+  qaE = edgesFrom(qa);
+  qbE = edgesFrom(qb);
+  for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ea++)
+    for (set<Edge *>::iterator eb = qbE.begin(); eb != qbE.end(); eb++)
+      if ((*ea)->label == (*eb)->label)
+      {
+        unite((*ea)->destination, (*eb)->destination);
+        break;
+      }
+  // merge qa and qb
+  set<Edge *> qbEt = edgesTo(qb);
+  for (set<Edge *>::iterator e = qbEt.begin(); e != qbEt.end(); e++)
+  {
+    createTransition((*e)->source, (*e)->label, qa, (*e)->type);
+  }
+  deleteState(qb);
 }

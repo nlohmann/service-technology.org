@@ -4,7 +4,7 @@ rebecca_SOURCES = syntax_chor.yy lexic_chor.ll \
                   main.cc \
                   peer.cc peer.h \
                   peerautomaton.cc peerautomaton.h \
-                  io.cc io.h \
+                  rebeccaio.cc rebeccaio.h \
                   verbose.cc verbose.h \
                   cmdline.c cmdline.h \
                   types.h

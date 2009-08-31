@@ -1,10 +1,11 @@
+#include <climits>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include "cmdline.h"
-#include "io.h"
+#include "rebeccaio.h"
 #include "peerautomaton.h"
 #include "verbose.h"
 
@@ -57,57 +58,89 @@ int main(int argc, char** argv) {
     | 2. prepare data structures  |
     `----------------------------*/
     // * check whether choreography is sane (each input has an output)
-    status("check whether choreography is sane (each input has an output)");
+    status("checking whether input model is a choreography");
     if (!chor->isSane())
-      abort(10, "collaboration not sane");
-    status("choreography is sane");
+      abort(10, "choreography definition violated");
+    status("input model is a choreography");
     // * create an array to quickly check whether two events are distant
-    status("create an array to quickly check whether two events are distant");
+    status("creating an array to quickly check whether two events are distant");
     bool ** distantMessages = chor->distantMessages();
+
+    bool complete = true;
+    bool partial = true;
+    bool distributed = true;
 
     /*---------------------------------------------.
     | 3. main algorithm: resolution of dependency  |
     `---------------------------------------------*/
-    for (int q = 0; q < (int) chor->states().size(); q++)
-      for (int a = 0; a < (int) chor->events().size(); a++)
-        for (int b = 0; b < (int) chor->events().size(); b++)
-        {
-          if (!distantMessages[a][b])
-            continue;
-          /// 3.1 if a disables b
-          if (chor->disables(q, a, b))
+    bool changed = true;
+    while (changed)
+    {
+      changed = false;
+      /// 3.1 if a disables b
+      for (int q = 0; q < (int) chor->states().size(); q++)
+        for (int a = 0; a < (int) chor->events().size(); a++)
+          for (int b = 0; b < (int) chor->events().size(); b++)
           {
-            int qa = chor->createState();
-            int qb = chor->createState();
-            std::set<Edge *> qE = chor->edges(q);
-            for (std::set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+            if (!distantMessages[a][b])
+              continue;
+            if (chor->disables(q, a, b))
             {
-              if ((*e)->label != chor->events()[a])
-                chor->createTransition(qa, (*e)->label, (*e)->destination, (*e)->type);
-              if ((*e)->label != chor->events()[b])
-                chor->createTransition(qb, (*e)->label, (*e)->destination, (*e)->type);
-              chor->deleteTransition(*e);
+              complete = false;
+              changed = true;
+              int qa = chor->createState();
+              int qb = chor->createState();
+              std::set<Edge *> qE = chor->edgesFrom(q);
+              for (std::set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+              {
+                if ((*e)->label != chor->events()[a])
+                  chor->createTransition(qa, (*e)->label, (*e)->destination, (*e)->type);
+                if ((*e)->label != chor->events()[b])
+                  chor->createTransition(qb, (*e)->label, (*e)->destination, (*e)->type);
+                chor->deleteTransition(*e);
+              }
+              chor->createTransition(q, "", qa, CHI);
+              chor->createTransition(q, "", qb, CHI);
             }
-            chor->createTransition(q, "", qa, CHI);
-            chor->createTransition(q, "", qb, CHI);
           }
-          /// 3.2 if a enables b
-          if (chor->enables(q, a, b))
+      /// 3.2 if a enables b
+      for (int q = 0; q < (int) chor->states().size(); q++)
+        for (int a = 0; a < (int) chor->events().size(); a++)
+          for (int b = 0; b < (int) chor->events().size(); b++)
           {
-            int qab = chor->findState(q, a, b);
-            chor->deleteState(qab);
+            if (!distantMessages[a][b])
+              continue;
+            if (chor->enables(q, a, b))
+            {
+              complete = distributed = false;
+              changed = true;
+              int qab = chor->findState(q, a, b);
+              chor->deleteState(qab);
+            }
           }
-          /// 3.3 if q_ab and q_ba are not equivalent
+      /// 3.3 if q_ab and q_ba are not equivalent
+      for (int q = 0; q < (int) chor->states().size(); q++)
+        for (int a = 0; a < (int) chor->events().size(); a++)
+          for (int b = 0; b < (int) chor->events().size(); b++)
           {
+            if (!distantMessages[a][b])
+              continue;
+            complete = distributed = false;
             int qab = chor->findState(q, a, b);
             int qba = chor->findState(q, b, a);
             if (qab != -1 && qba != -1 && !chor->equivalent(qab, qba))
             {
-              // TODO
+              changed = true;
+              chor->unite(qab, qba);
             }
           }
-        }
-    std::cout << *chor;
+    }
+    if (chor->initialState() == INT_MIN)
+      partial = false;
+    std::cout << "The input choreography is" << std::endl
+              << "  COMPLETELY REALIZABLE:    " << (complete ? "YES" : "NO") << std::endl
+              << "  PARTIALLY REALIZABLE:     " << (partial ? "YES" : "NO") << std::endl
+              << "  DISTRIBUTEDLY REALIZABLE: " << (distributed ? "YES" : "NO") << std::endl;
 
     /*--------------------------------.
     | 4. final step: peer projection  |
@@ -159,18 +192,24 @@ int main(int argc, char** argv) {
       projected.push_back(a);
     }
 
+
     /*----------------.
     | 5. file output  |
     `----------------*/
-    // set file prefix
-    std::string fprefix = "auto_";
-    std::ofstream file;
-    for (int i = 0; i < (int) projected.size(); i++)
+    if (!args_info.quiet_flag)
     {
-      std::string filename = fprefix+chor->collaboration()[i]->name()+".sa";
-      file.open(filename.c_str());
-      file << *projected[i];
-      file.close();
+      // set file prefix
+      std::string fprefix = "";
+      if (args_info.prefix_given)
+        fprefix = args_info.prefix_arg;
+      std::ofstream file;
+      for (int i = 0; i < (int) projected.size(); i++)
+      {
+        std::string filename = fprefix+".peer"+chor->collaboration()[i]->name()+".sa";
+        file.open(filename.c_str());
+        file << *projected[i];
+        file.close();
+      }
     }
 
     /*-------------.

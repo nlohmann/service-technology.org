@@ -1,4 +1,4 @@
-#include "io.h"
+#include "rebeccaio.h"
 
 
 using std::endl;
@@ -31,7 +31,7 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
           if (pa.isFinal(*q))
             os << " : FINAL";
         os << endl;
-        set<Edge *> E = pa.edges(*q);
+        set<Edge *> E = pa.edgesFrom(*q);
         for (set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
         {
           string pre = (*e)->type == SND ? "!" : (*e)->type == RCV ? "?" : (*e)->type == SYN ? "#" : "CHI";
@@ -49,6 +49,7 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
         {
           os << "  INPUT ";
           bool first = true;
+          set<string> seen;
           for (set<PEdge *>::iterator e = pa.pEdges_->begin(); e != pa.pEdges_->end(); e++)
           {
             if ((*e)->type == RCV)
@@ -56,10 +57,15 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
               if (first)
               {
                 os << (*e)->label;
+                seen.insert((*e)->label);
                 first = false;
               }
               else
-                os << "," << (*e)->label;
+                if (!seen.count((*e)->label))
+                {
+                  os << "," << (*e)->label;
+                  seen.insert((*e)->label);
+                }
             }
           }
           os << ";" << endl;
@@ -68,6 +74,7 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
         {
           os << "  OUTPUT ";
           bool first = true;
+          set<string> seen;
           for (set<PEdge *>::iterator e = pa.pEdges_->begin(); e != pa.pEdges_->end(); e++)
           {
             if ((*e)->type == SND)
@@ -75,10 +82,15 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
               if (first)
               {
                 os << (*e)->label;
+                seen.insert((*e)->label);
                 first = false;
               }
               else
-                os << "," << (*e)->label;
+                if (!seen.count((*e)->label))
+                {
+                  os << "," << (*e)->label;
+                  seen.insert((*e)->label);
+                }
             }
           }
           os << ";" << endl;
@@ -87,6 +99,7 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
         {
           os << "  SYNCHRONOUS ";
           bool first = true;
+          set<string> seen;
           for (set<PEdge *>::iterator e = pa.pEdges_->begin(); e != pa.pEdges_->end(); e++)
           {
             if ((*e)->type == SYN)
@@ -94,10 +107,15 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
               if (first)
               {
                 os << (*e)->label;
+                seen.insert((*e)->label);
                 first = false;
               }
               else
-                os << "," << (*e)->label;
+                if (!seen.count((*e)->label))
+                {
+                  os << "," << (*e)->label;
+                  seen.insert((*e)->label);
+                }
             }
           }
           os << ";" << endl;

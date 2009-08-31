@@ -61,7 +61,8 @@ public:
   std::set<int> & states() const;
   std::set<std::set<int> > & stateSets() const;
   const std::set<Edge *> edges() const;
-  const std::set<Edge *> edges(int) const;
+  const std::set<Edge *> edgesFrom(int) const;
+  const std::set<Edge *> edgesTo(int) const;
   const std::set<Edge *> edges(std::set<int>) const;
   const std::set<PEdge *> pEdges(std::set<int>) const;
   const std::vector<std::string> & events() const;
@@ -92,6 +93,8 @@ public:
   bool haveInput() const;
   bool haveOutput() const;
   bool haveSynchronous() const;
+
+  void unite(int, int);
 
 private:
   bool distant(std::string, std::string) const;

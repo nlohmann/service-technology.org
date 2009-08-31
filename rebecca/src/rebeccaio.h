@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef REBECCAIO_H
+#define REBECCAIO_H
 
 #include <ostream>
 #include <set>
@@ -12,4 +12,4 @@ std::ostream & operator <<(std::ostream &, const PeerAutomaton &);
 std::ostream & operator <<(std::ostream &, const std::set<std::string> &);
 std::ostream & operator <<(std::ostream &, const std::set<int> &);
 
-#endif /* IO_H */
+#endif /* REBECCAIO_H */

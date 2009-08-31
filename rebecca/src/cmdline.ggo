@@ -1,9 +1,22 @@
-args "--long-help --include-getopt --show-required"
-
+package "Rebecca"
+version "1.0-unreleased"
 purpose "Rebecca -- choreography realization"
-
+usage ""
 description "Usage: "
 
+args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+
+section "Input/Output"
+
+option "prefix" p
+  "Specifies output prefix for output automata files. If not given the default value is the <input filename> + '.peerX.sa' where X is the name of the peer specified within the choreography."
+  string
+  typestr="PREFIX"
+  optional
+  
+option "quiet" q
+  "If selected, no automaton file will be written to file system."
+  flag off
 
 section "Debug"
 

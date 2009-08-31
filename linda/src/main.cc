@@ -374,7 +374,7 @@ int main(int argc, char** argv) {
 
 	std::ofstream file;
 	file.open(args_info.output_arg);
-	ProfileFile* outputFile = new ProfileFile(&systems);
+	ProfileFile* outputFile = new ProfileFile(&systems,net);
 	outputFile->output(file,args_info.show_terms_as_given_flag);
 
 	file.close();

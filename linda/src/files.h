@@ -17,8 +17,10 @@
 class ProfileFile {
 public:
 	std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >* systems;
-	ProfileFile(std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >* s) {
+	pnapi::PetriNet* net;
+	ProfileFile(std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >* s, pnapi::PetriNet* n) {
 		systems = s;
+		net = n;
 	}
 	void output(std::ofstream& file,bool termsAsGiven);
 

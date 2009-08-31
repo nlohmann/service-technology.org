@@ -9,7 +9,72 @@
 
 void ProfileFile::output(std::ofstream& file,bool termsAsGiven) {
 
-	file << "FINALMARKINGS";
+
+	file << "PLACE";
+	file << "\n  INTERNAL\n    ";
+
+	bool first = true;
+
+	for (set<pnapi::Place *>::iterator it = net->getInternalPlaces().begin(); it != net->getInternalPlaces().end(); ++it) {
+
+		if (first) {
+			first = false;
+		} else {
+			file << ",";
+		}
+
+		file << (*it)->getName();
+
+	}
+
+	file << ";";
+
+
+	file << "\n  INPUT";
+
+	first = true;
+
+	for (set<pnapi::Place *>::iterator it = net->getInputPlaces().begin(); it != net->getInputPlaces().end(); ++it) {
+
+
+		if (first) {
+			first = false;
+		} else {
+			file << ",";
+		}
+
+		file << "\n    ";
+
+		file << (*it)->getName() ;
+
+	}
+
+	file << ";";
+	file << "\n  OUTPUT";
+
+	first = true;
+
+	for (set<pnapi::Place *>::iterator it = net->getOutputPlaces().begin(); it != net->getOutputPlaces().end(); ++it) {
+
+
+		if (first) {
+			first = false;
+		} else {
+			file << ",";
+		}
+
+		file << "\n    ";
+
+		file << (*it)->getName() ;
+
+	}
+
+	file << ";";
+
+
+
+
+	file << "\n\nFINALMARKINGS";
 
 	int counter = 1;
 

@@ -18,7 +18,7 @@ using std::vector;
 
 
 PeerAutomaton::PeerAutomaton(PeerAutomatonType type) :
-  type_(type), equivalenceClasses_(NULL)
+  equivalenceClasses_(NULL), type_(type)
 {
   switch (type_)
   {
@@ -33,6 +33,9 @@ PeerAutomaton::PeerAutomaton(PeerAutomatonType type) :
     initialStateSet_ = new set<int>();
     finalStateSets_ = new set<set<int> >();
     pEdges_ = new set<PEdge *>();
+    input_ = new set<string>();
+    output_ = new set<string>();
+    synchronous_ = new set<string>();
     break;
   default:
     abort(11, "unknown peer automaton type");
@@ -165,9 +168,10 @@ void PeerAutomaton::pushEvent(const string & event)
 }
 
 
-bool PeerAutomaton::isSane() const
+bool PeerAutomaton::isChoreography() const
 {
   set<string> inChannels, outChannels;
+  bool isChor = false;
   for (int i = 0; i < (int) collaboration_.size(); i++)
   {
     for (set<string>::iterator in = collaboration_[i]->input().begin(); in
@@ -185,7 +189,7 @@ bool PeerAutomaton::isSane() const
   }
 
   if (inChannels.empty() && outChannels.empty())
-    return true;
+    isChor = true;
   else
   {
     for (set<string>::iterator in = inChannels.begin(); in != inChannels.end();
@@ -196,7 +200,9 @@ bool PeerAutomaton::isSane() const
       status("'%s' has no appropriate input event", out->c_str());
   }
 
-  return false;
+  // TODO: conversation check is missing
+
+  return isChor;
 }
 
 
@@ -323,6 +329,7 @@ bool PeerAutomaton::isFinal(set<int> q) const
   default:
     abort(11, "unknown peer automaton type");
   }
+  return false;
 }
 
 
@@ -460,12 +467,35 @@ set<int> & PeerAutomaton::closure(set<int> & S, int peer)
   {
     set<Edge *> E = edgesFrom(*q);
     for (set<Edge *>::iterator eq = E.begin(); eq != E.end(); eq++)
-      if (!S.count((*eq)->destination) && !p->input().count((*eq)->label)
-          && !p->output().count((*eq)->label))
-      {
-        S.insert((*eq)->destination);
-        S = closure(S, peer);
-      }
+      if (!S.count((*eq)->destination))
+        switch ((*eq)->type)
+        {
+        case RCV:
+          {
+            if (!p->input().count((*eq)->label))
+            {
+              S.insert((*eq)->destination);
+              S = closure(S, peer);
+            }
+            break;
+          }
+        case SND:
+          {
+            if (!p->output().count((*eq)->label))
+            {
+              S.insert((*eq)->destination);
+              S = closure(S, peer);
+            }
+            break;
+          }
+        case SYN:
+        default:
+          {
+            S.insert((*eq)->destination);
+            S = closure(S, peer);
+            break;
+          }
+        }
   }
   return S;
 }
@@ -473,82 +503,19 @@ set<int> & PeerAutomaton::closure(set<int> & S, int peer)
 
 bool PeerAutomaton::haveInput() const
 {
-  static bool *result = NULL;
-  if (result != NULL)
-    return *result;
-  switch (type_)
-  {
-  case CHOREOGRAPHY:
-    break;
-  case PROJECTION:
-    {
-      for (set<PEdge *>::iterator e = pEdges_->begin(); e != pEdges_->end(); e++)
-        if ((*e)->type == RCV)
-        {
-          result = new bool(true);
-          return true;
-        }
-      break;
-    }
-  default:
-    break;
-  }
-  result = new bool(false);
-  return false;
+  return !input_->empty();
 }
 
 
 bool PeerAutomaton::haveOutput() const
 {
-  static bool *result = NULL;
-  if (result != NULL)
-    return *result;
-  switch (type_)
-  {
-  case CHOREOGRAPHY:
-    break;
-  case PROJECTION:
-    {
-      for (set<PEdge *>::iterator e = pEdges_->begin(); e != pEdges_->end(); e++)
-        if ((*e)->type == RCV)
-        {
-          result = new bool(true);
-          return true;
-        }
-      break;
-    }
-  default:
-    break;
-  }
-  result = new bool(false);
-  return false;
+  return !output_->empty();
 }
 
 
 bool PeerAutomaton::haveSynchronous() const
 {
-  static bool *result = NULL;
-  if (result != NULL)
-    return *result;
-  switch (type_)
-  {
-  case CHOREOGRAPHY:
-    break;
-  case PROJECTION:
-    {
-      for (set<PEdge *>::iterator e = pEdges_->begin(); e != pEdges_->end(); e++)
-        if ((*e)->type == SYN)
-        {
-          result = new bool(true);
-          return true;
-        }
-      break;
-    }
-  default:
-    break;
-  }
-  result = new bool(false);
-  return false;
+  return !synchronous_->empty();
 }
 
 
@@ -691,4 +658,40 @@ void PeerAutomaton::unite(int qa, int qb)
     createTransition((*e)->source, (*e)->label, qa, (*e)->type);
   }
   deleteState(qb);
+}
+
+
+void PeerAutomaton::pushInput(const string & in)
+{
+  input_->insert(in);
+}
+
+
+const set<string> & PeerAutomaton::input() const
+{
+  return *input_;
+}
+
+
+void PeerAutomaton::pushOutput(const string & out)
+{
+  output_->insert(out);
+}
+
+
+const set<string> & PeerAutomaton::output() const
+{
+  return *output_;
+}
+
+
+void PeerAutomaton::pushSynchronous(const string & syn)
+{
+  synchronous_->insert(syn);
+}
+
+
+const set<string> & PeerAutomaton::synchronous() const
+{
+  return *synchronous_;
 }

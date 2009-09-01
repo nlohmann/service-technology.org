@@ -18,15 +18,24 @@ private:
   // set of states
   std::set<int> * states_;
   std::set<std::set<int> > * stateSets_;
+
   // initial state
   int * initialState_;
   std::set<int> * initialStateSet_;
+
   // set of final states
   std::set<int> * finalStates_;
   std::set<std::set<int> > * finalStateSets_;
+
   // transition relation
   std::set<Edge *> * edges_;
   std::set<PEdge *> * pEdges_;
+
+  // interface for projection
+  std::set<std::string> * input_;
+  std::set<std::string> * output_;
+  std::set<std::string> * synchronous_;
+
   // peers
   std::vector<const Peer *> collaboration_;
   // event messages
@@ -75,7 +84,7 @@ public:
   const int findState(int, int, int) const;
 
   // checks sanity of collaboration
-  bool isSane() const;
+  bool isChoreography() const;
 
   bool isState(int) const;
 
@@ -93,6 +102,13 @@ public:
   bool haveInput() const;
   bool haveOutput() const;
   bool haveSynchronous() const;
+
+  void pushInput(const std::string &);
+  void pushOutput(const std::string &);
+  void pushSynchronous(const std::string &);
+  const std::set<std::string> & input() const;
+  const std::set<std::string> & output() const;
+  const std::set<std::string> & synchronous() const;
 
   void unite(int, int);
 

@@ -47,78 +47,21 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
         os << "INTERFACE" << endl;
         if (pa.haveInput())
         {
-          os << "  INPUT ";
-          bool first = true;
-          set<string> seen;
-          for (set<PEdge *>::iterator e = pa.pEdges_->begin(); e != pa.pEdges_->end(); e++)
-          {
-            if ((*e)->type == RCV)
-            {
-              if (first)
-              {
-                os << (*e)->label;
-                seen.insert((*e)->label);
-                first = false;
-              }
-              else
-                if (!seen.count((*e)->label))
-                {
-                  os << "," << (*e)->label;
-                  seen.insert((*e)->label);
-                }
-            }
-          }
-          os << ";" << endl;
+          os << "  INPUT "
+             << pa.input()
+             << ";" << endl;
         }
         if (pa.haveOutput())
         {
-          os << "  OUTPUT ";
-          bool first = true;
-          set<string> seen;
-          for (set<PEdge *>::iterator e = pa.pEdges_->begin(); e != pa.pEdges_->end(); e++)
-          {
-            if ((*e)->type == SND)
-            {
-              if (first)
-              {
-                os << (*e)->label;
-                seen.insert((*e)->label);
-                first = false;
-              }
-              else
-                if (!seen.count((*e)->label))
-                {
-                  os << "," << (*e)->label;
-                  seen.insert((*e)->label);
-                }
-            }
-          }
-          os << ";" << endl;
+          os << "  OUTPUT "
+             << pa.output()
+             << ";" << endl;
         }
         if (pa.haveSynchronous())
         {
-          os << "  SYNCHRONOUS ";
-          bool first = true;
-          set<string> seen;
-          for (set<PEdge *>::iterator e = pa.pEdges_->begin(); e != pa.pEdges_->end(); e++)
-          {
-            if ((*e)->type == SYN)
-            {
-              if (first)
-              {
-                os << (*e)->label;
-                seen.insert((*e)->label);
-                first = false;
-              }
-              else
-                if (!seen.count((*e)->label))
-                {
-                  os << "," << (*e)->label;
-                  seen.insert((*e)->label);
-                }
-            }
-          }
-          os << ";" << endl;
+          os << "  SYNCHRONOUS "
+             << pa.synchronous()
+             << ";" << endl;
         }
       }
       os << endl;

@@ -25,7 +25,7 @@ extern int chor_parse();
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // set default values
-    argv[0] = (char *)PACKAGE;
+    //argv[0] = (char *)PACKAGE;
 
     cmdline_parser_init(&args_info);
 
@@ -59,12 +59,46 @@ int main(int argc, char** argv) {
     `----------------------------*/
     // * check whether choreography is sane (each input has an output)
     status("checking whether input model is a choreography");
-    if (!chor->isSane())
+    if (!chor->isChoreography())
       abort(10, "choreography definition violated");
     status("input model is a choreography");
     // * create an array to quickly check whether two events are distant
     status("creating an array to quickly check whether two events are distant");
     bool ** distantMessages = chor->distantMessages();
+
+    std::vector<PeerAutomaton *> projected;
+    for (int i = 0; i < (int) chor->collaboration().size(); i++)
+    {
+      PeerAutomaton * at = new PeerAutomaton(PROJECTION);
+      for (int a = 0; a < (int) chor->events().size(); a++)
+      {
+        if (chor->collaboration()[i]->input().count(chor->events()[a]))
+        {
+          for (std::set<Edge *>::iterator e = chor->edges().begin(); e != chor->edges().end(); e++)
+            if ((*e)->label == chor->events()[a])
+            {
+              if ((*e)->type == SYN)
+                at->pushSynchronous(chor->events()[a]);
+              else
+                at->pushInput(chor->events()[a]);
+              break;
+            }
+        }
+        if (chor->collaboration()[i]->output().count(chor->events()[a]))
+        {
+          for (std::set<Edge *>::iterator e = chor->edges().begin(); e != chor->edges().end(); e++)
+            if ((*e)->label == chor->events()[a])
+            {
+              if ((*e)->type == SYN)
+                at->pushSynchronous(chor->events()[a]);
+              else
+                at->pushOutput(chor->events()[a]);
+              break;
+            }
+        }
+      }
+      projected.push_back(at);
+    }
 
     bool complete = true;
     bool partial = true;
@@ -125,11 +159,11 @@ int main(int argc, char** argv) {
           {
             if (!distantMessages[a][b])
               continue;
-            complete = distributed = false;
             int qab = chor->findState(q, a, b);
             int qba = chor->findState(q, b, a);
             if (qab != -1 && qba != -1 && !chor->equivalent(qab, qba))
             {
+              complete = distributed = false;
               changed = true;
               chor->unite(qab, qba);
             }
@@ -145,10 +179,9 @@ int main(int argc, char** argv) {
     /*--------------------------------.
     | 4. final step: peer projection  |
     `--------------------------------*/
-    std::vector<PeerAutomaton *> projected;
     for (int i = 0; i < (int) chor->collaboration().size(); i++)
     {
-      PeerAutomaton *a = new PeerAutomaton(PROJECTION);
+      PeerAutomaton * a = projected[i];
       /*
        * 4.1 calculate q0
        */
@@ -186,10 +219,6 @@ int main(int argc, char** argv) {
             a->pushFinalState(qprime);
         }
       }
-      /*
-       * 4.3 add peer automaton to projected peer automata
-       */
-      projected.push_back(a);
     }
 
 
@@ -201,11 +230,14 @@ int main(int argc, char** argv) {
       // set file prefix
       std::string fprefix = "";
       if (args_info.prefix_given)
+      {
         fprefix = args_info.prefix_arg;
+        fprefix.push_back('.');
+      }
       std::ofstream file;
       for (int i = 0; i < (int) projected.size(); i++)
       {
-        std::string filename = fprefix+".peer"+chor->collaboration()[i]->name()+".sa";
+        std::string filename = fprefix+"peer"+chor->collaboration()[i]->name()+".sa";
         file.open(filename.c_str());
         file << *projected[i];
         file.close();

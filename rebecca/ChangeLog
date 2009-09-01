@@ -24,10 +24,12 @@ Version 1.0-unreleased
 
     3. resolution of dependencies: if a enables b implemented
 
+    4. resolution of dependencies: q_ab and q_ba are not equivalent (implemented)
+
 * added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
   to determine test case coverage (use `make cover' in `tests' directory)
   
 * implemented equivalence check for states
 
-
+* implemented output on stdout
 

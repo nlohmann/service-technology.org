@@ -11,7 +11,7 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
                  testNode.h testNode.cc \
                  types.h \
                  cmdline.c cmdline.h \
-                 verbose.h verbose.cc
+                 verbose.h verbose.cc 
                  
 sysconf_DATA = safira.conf
 

@@ -170,7 +170,7 @@ gformula:
 | KEY_FINAL
 	{ $$ = new FormulaFinal(); }
 | KEY_TRUE
-	{ $$ = new FormulaTrue(); }
+	{ $$ = new FormulaTrue();}
 | KEY_FALSE
 	{ $$ = new FormulaFalse(); }
 | NUMBER
@@ -196,7 +196,7 @@ formula:
 | IDENT 
 	{ if (label2id.find(string($1)) == label2id.end()){
 	  	 og_yyerror("could not find the literal");}
-	  $$ = new FormulaLit(label2id[string($1)]); /*$$ = new FormulaLit(string($1), label2id[string($1)]);*/ }
+	  $$ = new FormulaLit(label2id[string($1)]); }
 ;
 
 

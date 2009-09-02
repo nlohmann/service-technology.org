@@ -55,8 +55,6 @@ int main(int argc, char **argv) {
 //	testGraphClass();
 //	cout << "test finished" << endl << endl;
 
-
-
 	if (args_info.inputs_num > 1) {
 		//fehler
 	}
@@ -82,15 +80,26 @@ int main(int argc, char **argv) {
 
 	initGlobalVariables();
 
+	time_t parsingTime_start = time(NULL);
+
     //parse
     if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
 
     fclose(og_yyin);
 
+//    time_t parsingTime_end = time(NULL);
+//    cout << "number of labels: " << label2id.size()-4 << endl;
+//    cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
+//    cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+//    time_t buildOG_start = time(NULL);
+
 	g->makeTotal();
 	g->makeComplete();
 	g->print();
 
+//	time_t buildOG_end = time(NULL);
+//	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
+//	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
 
 	for (int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {
@@ -104,7 +113,6 @@ int main(int argc, char **argv) {
 				cerr << "       necessary for option '--output=owfn'" << endl;
 				exit(EXIT_FAILURE);
 			}
-
 
 			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename+ "." + args_info.output_orig[j];
 			FILE *s = popen(call.c_str(), "w");
@@ -137,7 +145,10 @@ void initGlobalVariables(){
     addLabel("tau", 4);
 
 	currentIdPos = 4;
+//	currentIdPos = 3;
 	firstLabelId = 4;
+
+
 
 }
 

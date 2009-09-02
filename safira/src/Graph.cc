@@ -9,6 +9,7 @@
 #include <iostream>
 //#include "cmdline.h"
 #include "Graph.h"
+#include <time.h>
 
 /// the command line parameters
 //extern gengetopt_args_info args_info;
@@ -93,7 +94,6 @@ void Graph::makeTotal(){
 }
 
 void Graph::makeComplete() {
-//	map<int, Node*> addedNodes;
 
 	if (NULL == trap){
 		//add trap state (with formula true and a self loop for every label) to the graph
@@ -114,9 +114,8 @@ void Graph::makeComplete() {
 	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
 		Formula *g = nodes[*n]->formula->getCopy();
 		Formula *f = new FormulaNOT(g);
-		//Formula *f = new FormulaNOT((nodes[*n])->formula);
-		if(f->isSatisfiable(id2label.size()+1) == true){ //TODO: das ist nur eine Abschätzung nach oben
-		//if(f->toString() != "~(true)"){
+
+		if(f->isSatisfiable(id2label.size()+1) == true){ 	//TODO: das ist nur eine Abschätzung nach oben
 			Node *q = new Node(f);
 			addedNodes[q->id] = q;
 			addedInitialNodes.push_back(q->id);
@@ -124,6 +123,7 @@ void Graph::makeComplete() {
 				q->addEdge(l,trap); //edge from q to trap state
 			}
 		}
+
 		else {
 			delete f;
 		}
@@ -150,9 +150,11 @@ void Graph::makeComplete() {
 			//assert(n->second->outEdges[i].size() > 0); //holds if the graph is total
 			if (n->second->outEdges[i].size() > 0){
 				for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+
 					if (n->second->outEdges[i].begin() == s){ //first formula
 						f = (*s)->formula->getCopy();
 					}
+
 					else{
 						Formula *g = (*s)->formula->getCopy();
 						Formula *h = new FormulaOR(f, g) ;
@@ -160,14 +162,12 @@ void Graph::makeComplete() {
 					}
 				}
 
-
-				//Formula* g = f->getCopy(); //f is the disjunction over all x successors of p
-				Formula *h = new FormulaNOT(f);
+				Formula *h = new FormulaNOT(f); //f is the disjunction over all x successors of p
 
 				f = h;
 				assert(f);
+
 				if(f->isSatisfiable(id2label.size()+1) == true){ //TODO: das ist nur eine Abschätzung nach oben
-				//if(f->toString() != "~(true)"){
 					//generate new node q with the formula f and add edge with label i to it
 					Node *q = new Node(f);
 					addedNodes[q->id] = q;
@@ -199,16 +199,11 @@ void Graph::makeComplete() {
 			Formula *h = new FormulaAND(globalFormula, g) ;
 			globalFormula = h;
 	}
-
-	//cout << "Complexity: " << globalFormula->complexity << endl;
-	//cout << "Negation nach innen: " << (globalFormula->moveNegation())->toString() << endl;
-	//cout << "KNF-String: " << (globalFormula->moveNegation())->toStringCNF(nodes.size()+1,nodes.size()+1) << endl; //TODO: das ist nur eine Abschätuung nach oben
-	//globalFormula->isSatisfiable(nodes.size()); //TODO: das ist nur eine Abschätuung nach oben
 }
 
 
 //! \brief creates a dot output of the graph
-//! \param title a string containing the title for the graph to be shown in the image
+//! \param title: a string containing the title for the graph to be shown in the image
 void Graph::toDot(FILE* out, string title) const {
 //void Graph::toDot(string filename, string title) const {
 
@@ -338,6 +333,10 @@ void Graph::printNodes(map<int, Node*> nodeMap){
 //			cout << n->second->outEdges[i]->size() << endl;
 //		}
 	}
+}
+
+int Graph::getSizeOfAddedNodes(){
+	return addedNodes.size();
 }
 
 //

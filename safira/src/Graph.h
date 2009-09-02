@@ -43,6 +43,9 @@ class Graph {
         /// print the node numbers of the given map
         void printNodes(map<int, Node*> nodeMap);
 
+        /// get the number of new nodes in the complement
+        int getSizeOfAddedNodes();
+
 //        /// adds a label to the graphs
 //        void addLabel(string label, unsigned int id);
 //

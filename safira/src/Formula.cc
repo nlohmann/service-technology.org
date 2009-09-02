@@ -215,15 +215,16 @@ bool Formula::isSatisfiable(int fVar){
 
 	int result = system(s.c_str());
     result = WEXITSTATUS(result);
-	
-    //   0 = error
-    //   1 = could not open file
-    //   3 = parse error
-    //  10 = formula satisfiable (GOOD)
-    //  20 = formula unsatisfiable (GOOD)
-    // 127 = binary not found (comes from shell)
 
-	if (result != 20 and result != 10) {
+/* 0 = error
+ * 1 = could not open file
+ * 3 = parse error
+ * 10 = formula satisfiable (GOOD)
+ * 20 = formula unsatisfiable (GOOD)
+ * 127 = binary not found (comes from shell)
+ */
+
+    if (result != 20 and result != 10) {
         abort(7, "minisat exited with code '%d'", result);
 	}
 

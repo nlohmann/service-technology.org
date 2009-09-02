@@ -35,3 +35,7 @@ option "verbose" v
   "Show verbose output"
   flag off
   
+option "clean" -
+  "Any temporary files created by Wendy are deleted once they are not used any more."
+  flag off 
+  

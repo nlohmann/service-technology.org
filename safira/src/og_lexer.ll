@@ -38,9 +38,9 @@ number         [0-9]+
 
 ":"{whitespace}?"F"                     { return BIT_F;                }
 ":"{whitespace}?"S"                     { return BIT_S;                }
-"TRUE"                                  { return KEY_TRUE;             }
-"FALSE"                                 { return KEY_FALSE;            }
-"FINAL"                                 { return KEY_FINAL;            }
+"true"                                  { return KEY_TRUE;             }
+"false"                                 { return KEY_FALSE;            }
+"final"                                 { return KEY_FINAL;            }
 "~"                                     { return OP_NOT;               }
 "*"                                     { return OP_AND;               }
 "+"                                     { return OP_OR;                }

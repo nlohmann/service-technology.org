@@ -140,10 +140,11 @@ inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK,
     // successor node is not new
     if (not newNode) {
         if (SK_new->is_on_tarjan_stack) {
+            // but it is still on the stack, compare lowlink and dfs value
             tarjanMapping[SK].second = MINIMUM(tarjanMapping[SK].second, tarjanMapping[SK_new].first);
         }
     } else {
-        // successor node is new
+        // successor node is new, compare lowlink values
         tarjanMapping[SK].second = MINIMUM(tarjanMapping[SK].second, tarjanMapping[SK_new].second);
     }
 }
@@ -476,11 +477,11 @@ void StoredKnowledge::dot(std::ostream &file) {
                     file << "is not sane\\n";
                 }
 
-                file << tarjanMapping[it->second[i]].first
-                     << ", l:" << tarjanMapping[it->second[i]].second
-                     << ", f:" << it->second[i]->is_final_reachable
-                     << ", s:" << it->second[i]->is_sane
-                     << "\\n";
+//                file << tarjanMapping[it->second[i]].first
+//                     << ", l:" << tarjanMapping[it->second[i]].second
+//                     << ", f:" << it->second[i]->is_final_reachable
+//                     << ", s:" << it->second[i]->is_sane
+//                     << "\\n";
 
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {

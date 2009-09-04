@@ -1,5 +1,13 @@
 @heading Version 2.1-unreleased
 @itemize
+@item fixed (known) issues concerning reduction rule ``succeeding sending event'' (parameter: @option{--succeedingSendingEvent}) 
+
+@item issues on the hidden parameter ``quit as soon as possible'' (parameter: @option{--succeedingSendingEvent}) have been fixed
+
+@item implemented on-the-fly knowledge analysis
+
+@item added test case with insane nontrivial TSCC
+
 @item integrated LoLA SCCs detection within inner markings
 @end itemize
 

@@ -14,14 +14,13 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
 #ifndef _FULLMARKING_H
 #define _FULLMARKING_H
 
-#include <ostream>
 #include "InnerMarking.h"
 #include "InterfaceMarking.h"
 

@@ -48,10 +48,13 @@ StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
-std::map<StoredKnowledge*, unsigned int> StoredKnowledge::allMarkings;
 std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
+std::map<StoredKnowledge* , std::set<StoredKnowledge*> > StoredKnowledge::tempPredecessors;
+unsigned int StoredKnowledge::bookmarkTSCC = 0;
 bool StoredKnowledge::emptyNodeReachable = false;
 StoredKnowledge::_stats StoredKnowledge::stats;
+std::map<StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredKnowledge::tarjanMapping;
+
 
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
 
@@ -62,30 +65,19 @@ StoredKnowledge::_stats StoredKnowledge::stats;
 
 /// constructor for the _stats struct
 StoredKnowledge::_stats::_stats() :
-    maxBucketSize(1) // sic!
+    maxBucketSize(1), // sic!
+    maxSCCSize(0),
+    numberOfNonTrivialSCCs(0),
+    numberOfTrivialSCCs(0)
 {}
 
-/*!
- check if given knowledge is on the Tarjan stack
- \param SK pointer to the knowledge that is to be checked
- \return true, if knowledge is on the stack; false otherwise
-*/
-inline bool StoredKnowledge::findKnowledgeInTarjanStack(StoredKnowledge *SK) {
-    for (std::vector<StoredKnowledge *>::iterator it = tarjanStack.begin(); it != tarjanStack.end(); it++){
-        if (SK == *it) {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 /*!
  \param[in] K   a knowledge bubble (explicitly stored)
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *SK, const Label_ID &l) {
+inline void StoredKnowledge::process(Knowledge* K, StoredKnowledge *SK, const Label_ID &l) {
     Knowledge *K_new = new Knowledge(K, l);
 
     // process the empty node in a special way
@@ -96,6 +88,8 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         delete K_new;
         return;
     }
+
+    bool newNode = false;
 
     // only process knowledges within the message bounds
     if (K_new->is_sane) {
@@ -109,10 +103,10 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
 
-        ++stats.storedEdges;
-
         // evaluate the storage result
         if (SK_store == SK_new) {
+
+            newNode = true;
 
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
@@ -121,16 +115,8 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
             delete SK_new;
         }
 
-        // LIVELOCK FREEDOM
-        if (args_info.lf_flag) {
-            // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
-            adjustLowlinkValue(SK, SK_store);
-
-            // from successor knowledge a final knowledge is reachable
-            if (SK_store->is_final_reachable) {
-                SK->is_final_reachable = 1;
-            }
-        }
+        // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
+        adjustLowlinkValue(SK, SK_store, newNode);
     } else {
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
@@ -142,83 +128,154 @@ inline void StoredKnowledge::process(const Knowledge* const K, StoredKnowledge *
 
 
 /*!
- (LIVELOCK FREEDOM) finds out if current knowledge is final, if so the appropriate attribute is set
+ adjust lowlink value of stored knowledge object according to Tarjan algorithm
+ \param[in,out] K       a knowledge bubble (explicitly stored)
+ \param[in]     K_new   successor knowledge bubble (explicitly stored)
+ \param[in]     SK_new  successor knowledge bubble (compactly stored)
+ \param newNode K_new   is brand new
 */
-inline void StoredKnowledge::isFinal() {
-    // traverse the current knowledge to find out if this knowledge is final
-    for (unsigned int i = 0; i < size; i++) {
-        if (InnerMarking::inner_markings[inner[i]]->is_final) {
-            is_final_reachable = interface[i]->unmarked();
+inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK,
+                                                StoredKnowledge* SK_new,
+                                                bool newNode) {
+    // successor node is not new
+    if (not newNode) {
+        if (SK_new->is_on_tarjan_stack) {
+            tarjanMapping[SK].second = MINIMUM(tarjanMapping[SK].second, tarjanMapping[SK_new].first);
+        }
+    } else {
+        // successor node is new
+        tarjanMapping[SK].second = MINIMUM(tarjanMapping[SK].second, tarjanMapping[SK_new].second);
+    }
+}
+
+
+/*!
+ create the predecessor relation of all knowledges contained in the given set
+*/
+inline void StoredKnowledge::createPredecessorRelation(std::set<StoredKnowledge *> & knowledgeSet) {
+    // if it is not a TSCC, we have to evaluate each member of the SCC
+    // first, we generate the predecessor relation between the members
+    for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
+        // for each successor which is part of the current SCC, register the predecessor
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if ((*iScc)->successors[l-1] != NULL and (*iScc)->successors[l-1] != empty and
+                knowledgeSet.find((*iScc)->successors[l-1]) != knowledgeSet.end()) {
+
+                tempPredecessors[(*iScc)->successors[l-1]].insert(*iScc);
+            }
         }
     }
 }
 
 
 /*!
- (LIVELOCK FREEDOM) set all values needed for Tarjan algorithm and livelock freedom analysis
- \param SK current knowledge
- \note Attention: has to be called right after SK is stored! (because dfs and lowlink value depend on stats.storedKnowledges)
+ evaluate each member of the given set of knowledges and propagate the property of being insane accordingly
 */
-inline void StoredKnowledge::setTarjanValues() {
-    // save Tarjan's values
-    dfs = lowlink = stats.storedKnowledges;
+inline void StoredKnowledge::evaluateKnowledgeSet(std::set<StoredKnowledge *> & knowledgeSet) {
+    // evaluate each member
+    while (not knowledgeSet.empty()) {
+        StoredKnowledge * currentKnowledge = (*knowledgeSet.begin());
+        knowledgeSet.erase(knowledgeSet.begin());
 
-    // it is new, so put it on the Tarjan stack
-    tarjanStack.push_back(this);
-}
+        if (currentKnowledge->is_sane and not currentKnowledge->sat()) {
+            currentKnowledge->is_sane = 0;
 
+            // tell each predecessor of current knowledge that this knowledge switched its status to insane
+            for (std::set<StoredKnowledge* >::const_iterator iter = tempPredecessors[currentKnowledge].begin();
+                                                             iter != tempPredecessors[currentKnowledge].end(); ++iter) {
 
-/*!
- (LIVELOCK FREEDOM) adjust lowlink value of stored knowledge object according to Tarjan algorithm
- \param SK current knowledge
- \param SK_new the successor of the current knowledge whose successors have all been calculated already
-*/
-inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK, StoredKnowledge* SK_new) {
-    if (SK_new->dfs < SK->dfs and findKnowledgeInTarjanStack(SK_new)) {
-        SK->lowlink = MINIMUM(SK->lowlink, SK_new->dfs);
-    } else {
-        SK->lowlink = MINIMUM(SK->lowlink, SK_new->lowlink);
+                knowledgeSet.insert(*iter);
+            }
+        } else if (args_info.lf_flag) {
+            currentKnowledge->is_final_reachable = 1;
+        }
     }
 }
 
 
 /*!
- (LIVELOCK FREEDOM) if current knowledge is representative of an SCC then evaluate current SCC and adjusts
- the is_final_reachable value of all members of the SCC
- \param SK current knowledge
+ if current knowledge is representative of an SCC then evaluate current SCC
+ \param[in,out] SK  a knowledge bubble (compactly stored)
+ \param[in]     K   a knowledge bubble (explicitly stored)
 */
 inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
+
+    if (tarjanStack.empty()) {
+        return;
+    }
+
     // check, if the current knowledge is a representative of a SCC
     // if so, get all knowledges within the SCC
-    if (SK->lowlink == SK->dfs) {
+    if (tarjanMapping[SK].first == tarjanMapping[SK].second) {
 
-        // if from current knowledge no final knowledge is reachable, we know that this knowledge is not sane
-        if (not SK->is_final_reachable) {
-            // TODO: current knowledge SK is not sane, so delete it right here
-        }
+        unsigned int numberOfSccElements = 0;
 
         // node which has just been popped from Tarjan stack
         StoredKnowledge * poppedSK;
 
+        // set of knowledges
+        // first used to store the whole SCC, then it is used as a set storing those
+        // knowledges that have to be evaluated again
+        std::set<StoredKnowledge *> knowledgeSet;
+
+        bool TSCC = false;
+
+        // found a TSCC
+        if (tarjanMapping[SK].first > StoredKnowledge::bookmarkTSCC) {
+            StoredKnowledge::bookmarkTSCC = tarjanMapping[SK].first;
+            TSCC = true;
+        }
+
+        // get (T)SCC
         do {
-            if (tarjanStack.empty()) {
-                continue;
-            }
             // get last element
             poppedSK = tarjanStack.back();
+
+            // remember that we removed this knowledge from the Tarjan stack
+            poppedSK->is_on_tarjan_stack = 0;
+
+            // tarjanMapping.erase(poppedSK);
+
             // delete last element from stack
             tarjanStack.pop_back();
 
-            // propagate that a final knowledge is reachable from the current knowledge to the members of the current SCC
-            if (SK->is_final_reachable) {
-                poppedSK->is_final_reachable = 1;
-            } else {
-                poppedSK->is_final_reachable = 0;
+            // remember this knowledge to be part of the current (T)SCC
+            knowledgeSet.insert(poppedSK);
 
-                // TODO: current knowledge poppedSK is not sane, so delete it right here
-            }
-
+            numberOfSccElements++;
         } while (SK != poppedSK);
+
+
+//        printf("DEBUG: found SCC with %d elements, it is a TSCC %d\n", numberOfSccElements, TSCC);
+
+        // check if (T)SCC is trivial
+        if (numberOfSccElements == 1) {
+            // check if every deadlock is resolved -> if not, this knowledge is definitely not sane
+            // deadlock freedom or livelock freedom will be treated in sat()
+            (*knowledgeSet.begin())->is_sane = (*knowledgeSet.begin())->sat();
+        } else if (numberOfSccElements > 1){
+
+            printf("DEBUG: SK %d is rep\n", tarjanMapping[SK].first);
+
+            assert(tempPredecessors.empty());
+
+            createPredecessorRelation(knowledgeSet);
+
+            evaluateKnowledgeSet(knowledgeSet);
+
+            // make sure to clear the set of predecessors again
+            tempPredecessors.clear();
+        }
+
+        // statistics
+        if (numberOfSccElements == 1) {
+            StoredKnowledge::stats.numberOfTrivialSCCs++;
+        } else {
+            if (StoredKnowledge::stats.maxSCCSize < numberOfSccElements) {
+                StoredKnowledge::stats.maxSCCSize = numberOfSccElements;
+            }
+            StoredKnowledge::stats.numberOfNonTrivialSCCs++;
+        }
     }
 }
 
@@ -230,7 +287,7 @@ inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::processRecursively(const Knowledge* const K,
+void StoredKnowledge::processRecursively(Knowledge* K,
                                          StoredKnowledge* SK) {
     static unsigned int calls = 0;
 
@@ -247,10 +304,6 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         K->sequentializeReceivingEvents(consideredReceivingEvents);
     }
 
-//    printf("DEBUG: ===============================================================\n");
-//    printf("DEBUG: consider knowledge %d\n", SK->dfs);
-
-
     PossibleSendEvents * posSendEvents;
     char * posSendEventsDecoded;
 
@@ -259,14 +312,6 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
         for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
             *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
-
-//            char * posSendEventsDecoded2 = InnerMarking::inner_markings[pos->first]->possibleSendEvents->decode();
-//            printf("DEBUG: in marking m%d (f: %d)... ", pos->first, InnerMarking::inner_markings[pos->first]->is_final_marking_reachable);
-//            for (Label_ID l = 0; l < Label::send_events; ++l) {
-//                printf("%d", posSendEventsDecoded2[l]);
-//            }
-//            printf("\n");
-
         }
         posSendEventsDecoded = posSendEvents->decode();
     }
@@ -277,9 +322,6 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         // reduction rule: send leads to insane node
         if (args_info.smartSendingEvent_flag) {
             if (SENDING(l) and not posSendEventsDecoded[l - Label::first_send]) {
-
-//                printf("DEBUG: in knowledge %d sending event !%s is blocked\n", SK->dfs, Label::id2name[l].c_str());
-
                 continue;
             }
         }
@@ -294,7 +336,7 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         if (args_info.receiveBeforeSend_flag) {
             // check if we're done receiving and each deadlock was resolved
             if (l > Label::last_receive and K->receivingHelps()) {
-                return;
+                break;
             }
         }
 
@@ -307,14 +349,16 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
 
         process(K, SK, l);
 
-        // reduction rule: quit once all waitstates are resolved
-        if (args_info.quitAsSoonAsPossible_flag and SK->allWaitstatesResolved()) {
-            return;
+        // reduction rule: quit, once all waitstates are resolved
+        if (args_info.quitAsSoonAsPossible_flag and SK->sat(true)) {
+            break;
         }
 
-        // reduction rule: stop considering another sending event, if the latest sending event considered succeeded
+        // reduction rule: stop considering another sending event, if the latest sending event
+        //                 considered succeeded
         // TODO what about synchronous events?
-        if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->allWaitstatesResolved()) {
+        if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat(true)) {
+
             if (not args_info.lf_flag or SK->is_final_reachable) {
                 l = Label::first_sync;
             }
@@ -327,186 +371,75 @@ void StoredKnowledge::processRecursively(const Knowledge* const K,
         delete posSendEvents;
     }
 
-    if (args_info.lf_flag) {
-        evaluateCurrentSCC(SK);
-    }
-
-    //printf("DEBUG: knowledge %d has lowlink %d, final reachable: %d\n", SK->dfs, SK->lowlink, SK->is_final_reachable);
+    evaluateCurrentSCC(SK);
 }
 
 
 /*!
- \todo treat the deletions
+  move all transient markings to the end of the array and adjust size of the markings array
 
- \todo must delete hash tree (needed by removeInsaneNodes())
-
- \post interface only consists of deadlocking markings (unless --im or
-       --showTransients mode was chosen)
+  \post all deadlock markings can be found between index 0 and sizeDeadlockMarkings
  */
-unsigned int StoredKnowledge::addPredecessors() {
-    unsigned int result = 0;
+void StoredKnowledge::rearrangeKnowledgeBubble() {
 
-    // traverse the hash buckets
-    for (std::map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+    // check the stored markings and remove all transient states
+    unsigned int j = 0;
 
-        // traverse the entries
-        for (size_t i = 0; i < it->second.size(); ++i) {
-            assert(it->second[i]);
+    while (j < sizeDeadlockMarkings) {
+        assert(interface[j]);
 
-            // store number of markings if necessary
-            if (args_info.showTransients_flag or args_info.im_given) {
-                allMarkings[it->second[i]] = it->second[i]->size;
+        // find out whether marking is transient
+        bool transient = false;
+
+        // case 1: a final marking that is not a waitstate
+        if (InnerMarking::inner_markings[inner[j]]->is_final and interface[j]->unmarked()) {
+
+            // remember that this knowledge contains a final marking
+            is_final = 1;
+
+            // for analyzing wrt livelock freedom remember that from this knowledge a final knowledge is
+            // reachable ;-)
+            is_final_reachable = 1;
+
+            // only if the final marking is not a waitstate, we're done
+            if (not InnerMarking::inner_markings[inner[j]]->is_waitstate) {
+                transient = true;
             }
+        }
 
-            // for each successor, register the predecessor
-            for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                if (it->second[i]->successors[l-1] != NULL and it->second[i]->successors[l-1] != empty) {
-                    it->second[i]->successors[l-1]->addPredecessor(it->second[i]);
-                    ++result;
-                }
-            }
+        // case 2: a resolved waitstate
+        if (InnerMarking::inner_markings[inner[j]]->is_waitstate) {
 
-            // check the stored markings and remove all transient states
-            unsigned int j = 0;
-            while (j < it->second[i]->size) {
-                assert(it->second[i]->interface[j]);
+            // check if DL is resolved by interface marking
+            for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+                if (interface[j]->marked(l) and
+                    InnerMarking::receivers[l].find(inner[j]) != InnerMarking::receivers[l].end()) {
 
-                // find out whether marking is transient
-                bool transient = false;
-
-                // case 1: a final marking that is not a waitstate
-                if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final and
-                it->second[i]->interface[j]->unmarked()) {
-
-                    // remember that this knowledge contains a final marking
-                    it->second[i]->is_final = 1;
-
-                    // only if the final marking is not a waitstate, we're done
-                    if (not InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
-                        transient = true;
-                    }
-                }
-
-                // case 2: a resolved waitstate
-                if (InnerMarking::inner_markings[it->second[i]->inner[j]]->is_waitstate) {
-
-                    // check if DL is resolved by interface marking
-                    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-                        if (it->second[i]->interface[j]->marked(l) and
-                            InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
-
-                            transient = true;
-                        }
-                    }
-                } else {
-
-                    // case 3: a transient marking (was: !waitstate && !final)
                     transient = true;
                 }
-
-
-                // "hide" transient markings behind the end of the array
-                if (transient) {
-                    InnerMarking_ID temp_inner = it->second[i]->inner[j];
-                    InterfaceMarking *temp_interface = it->second[i]->interface[j];
-
-                    it->second[i]->inner[j] = it->second[i]->inner[ it->second[i]->size-1 ];
-                    it->second[i]->interface[j] = it->second[i]->interface[ it->second[i]->size-1 ];
-
-                    it->second[i]->inner[ it->second[i]->size-1 ] = temp_inner;
-                    it->second[i]->interface[ it->second[i]->size-1 ] = temp_interface;
-
-                    --(it->second[i]->size);
-                } else {
-                    ++j;
-                }
             }
+        } else {
+
+            // case 3: a transient marking (was: !waitstate && !final)
+            transient = true;
+        }
+
+        // "hide" transient markings behind the end of the array
+        if (transient) {
+            InnerMarking_ID temp_inner = inner[j];
+            InterfaceMarking *temp_interface = interface[j];
+
+            inner[j] = inner[ sizeDeadlockMarkings-1 ];
+            interface[j] = interface[ sizeDeadlockMarkings-1 ];
+
+            inner[ sizeDeadlockMarkings-1 ] = temp_inner;
+            interface[ sizeDeadlockMarkings-1 ] = temp_interface;
+
+            --(sizeDeadlockMarkings);
+        } else {
+            ++j;
         }
     }
-
-    return result;
-}
-
-
-/*!
- \todo Do I really need three sets?
-
- \todo Understand and tidy up this.
-
- \todo Check if the nodes are deleted after sat() returns false -- in this
-       case, I don't need to actually set is_sane each time.
-*/
-unsigned int StoredKnowledge::removeInsaneNodes() {
-    unsigned int result = 0;
-
-    /// a set of nodes that need to be removed
-    std::set<StoredKnowledge*> insaneNodes;
-
-    /// a set of nodes that need to be considered
-    std::set<StoredKnowledge*> affectedNodes;
-
-    // initially, traverse all nodes
-    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
-        for (size_t i = 0; i < it->second.size(); ++i) {
-            if (not it->second[i]->sat()) {
-                it->second[i]->is_sane = 0;
-                insaneNodes.insert(it->second[i]);
-            }
-
-            // LIVELOCK FREEDOM
-            // check if from current knowledge a final knowledge is reachable
-            if (args_info.lf_flag and not it->second[i]->is_final_reachable) {
-                it->second[i]->is_sane = 0;
-                insaneNodes.insert(it->second[i]);
-
-                //printf("DEBUG: final knowledge not reachable from %d\n", it->second[i]->dfs);
-            }
-        }
-    }
-
-    // iteratively removed all insane nodes and check their predecessors
-    bool done = args_info.diagnose_flag;
-
-    while (not done) {
-        ++stats.iterations;
-        while (not insaneNodes.empty()) {
-            StoredKnowledge *todo = (*insaneNodes.begin());
-            insaneNodes.erase(insaneNodes.begin());
-
-            for (unsigned int i = 0; i < todo->inDegree; ++i) {
-                assert(todo->predecessors[i]);
-                affectedNodes.insert(todo->predecessors[i]);
-
-                bool found = false;
-                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (todo->predecessors[i]->successors[l-1] == todo) {
-                        todo->predecessors[i]->successors[l-1] = NULL;
-                        found = true;
-                    }
-                }
-            }
-
-            ++result;
-            deletedNodes.insert(todo);
-        }
-
-        for (set<StoredKnowledge*>::iterator it = affectedNodes.begin(); it != affectedNodes.end(); ++it) {
-            if (not (*it)->sat()) {
-                (*it)->is_sane = 0;
-                if (deletedNodes.find(*it) == deletedNodes.end()) {
-                    insaneNodes.insert(*it);
-                }
-            }
-        }
-
-        done = insaneNodes.empty();
-    }
-
-
-    // traverse all nodes reachable from the root
-    root->traverse();
-
-    return result;
 }
 
 
@@ -543,20 +476,21 @@ void StoredKnowledge::dot(std::ostream &file) {
                     file << "is not sane\\n";
                 }
 
-//                file << it->second[i]->dfs
-//                     << ", l:" << it->second[i]->lowlink
-//                     << ", f:" << it->second[i]->is_final_reachable
-//                     << "\\n";
+                file << tarjanMapping[it->second[i]].first
+                     << ", l:" << tarjanMapping[it->second[i]].second
+                     << ", f:" << it->second[i]->is_final_reachable
+                     << ", s:" << it->second[i]->is_sane
+                     << "\\n";
 
                 if (args_info.showWaitstates_flag) {
-                    for (unsigned int j = 0; j < it->second[i]->size; ++j) {
+                    for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
                         file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (w)\\n";
                     }
                 }
 
                 if (args_info.showTransients_flag) {
-                    for (unsigned int j = it->second[i]->size; j < allMarkings[it->second[i]]; ++j) {
+                    for (unsigned int j = it->second[i]->sizeDeadlockMarkings; j < it->second[i]->sizeAllMarkings; ++j) {
                         file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (t)\\n";
                     }
@@ -644,7 +578,9 @@ void StoredKnowledge::print(std::ostream &file) const {
     file << "\n";
 
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        if (successors[l-1] != NULL and successors[l-1] != empty) {
+        if (successors[l-1] != NULL and
+            successors[l-1] != empty and
+            (seen.find(successors[l-1]) != seen.end())) {
             file << "    " << Label::id2name[l] << " -> "
                  << reinterpret_cast<unsigned long>(successors[l-1])
                  << "\n";
@@ -822,7 +758,10 @@ void StoredKnowledge::output_old(std::ostream &file) {
     first = true;
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((*it)->successors[l-1] != NULL and (*it)->successors[l-1] != empty) {
+            if ((*it)->successors[l-1] != NULL and
+                (*it)->successors[l-1] != empty and
+                (seen.find((*it)->successors[l-1]) != seen.end())) {
+
                 if (first) {
                     first = false;
                 } else {
@@ -833,7 +772,7 @@ void StoredKnowledge::output_old(std::ostream &file) {
                      << " : " << PREFIX(l) << Label::id2name[l];
             } else {
                 // edges to the empty node
-                if ((*it)->successors[l-1] == empty) {
+                if ((*it)->successors[l-1] != NULL and (*it)->successors[l-1] == empty) {
                     if (first) {
                         first = false;
                     } else {
@@ -868,10 +807,11 @@ void StoredKnowledge::output_old(std::ostream &file) {
  \param[in] K  the knowledge to copy from
 */
 StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
-    is_final(0), is_sane(K->is_sane), size(K->size), inner(NULL), interface(NULL),
-    successors(NULL), inDegree(0), predecessorCounter(0), predecessors(NULL), is_final_reachable(0)
+    is_final(0), is_sane(K->is_sane), sizeDeadlockMarkings(K->size), sizeAllMarkings(K->size), inner(NULL), interface(NULL),
+    successors(NULL), is_on_tarjan_stack(1),
+    is_final_reachable(0)
 {
-    assert(size != 0);
+    assert(sizeAllMarkings != 0);
 
     // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
@@ -881,8 +821,8 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     }
 
     // reserve the necessary memory for the internal and interface markings
-    inner = new InnerMarking_ID[size];
-    interface = new InterfaceMarking*[size];
+    inner = new InnerMarking_ID[sizeAllMarkings];
+    interface = new InterfaceMarking*[sizeAllMarkings];
 
     // finally copy data structure to C-style arrays
     size_t count = 0;
@@ -900,12 +840,14 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     }
 
     // we must not forget a marking
-    assert(size == count);
+    assert(sizeAllMarkings == count);
 
     // check this knowledge for covering nodes
     if (args_info.cover_given) {
         Cover::checkKnowledge(this, K->bubble);
     }
+
+    rearrangeKnowledgeBubble();
 }
 
 
@@ -913,13 +855,10 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
  \note This destructor is only called during the building of the knowledges.
        That said, neither successors nor predecessors need to be deleted by
        this destructor.
-
- \bug  once addPredecessors() is called, size might be decremented and this
-       destructor cannot remove all markings any more
  */
 StoredKnowledge::~StoredKnowledge() {
     // delete the interface markings
-    for (unsigned int i = 0; i < size; ++i) {
+    for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
         delete interface[i];
     }
     delete[] interface;
@@ -929,6 +868,8 @@ StoredKnowledge::~StoredKnowledge() {
     if (args_info.cover_given) {
         Cover::removeKnowledge(this);
     }
+
+    tarjanMapping.erase(this);
 }
 
 
@@ -943,7 +884,7 @@ std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
     o << m.hash() << ":\t";
 
     // traverse the bubble
-    for (unsigned int i = 0; i < m.size; ++i) {
+    for (unsigned int i = 0; i < m.sizeAllMarkings; ++i) {
         o << "[m" << static_cast<unsigned int>(m.inner[i])
           << ", " << *(m.interface[i]) << "] ";
     }
@@ -957,13 +898,13 @@ std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
  ********************/
 
 /*!
-Â \return a pointer to a knowledge stored in the hash tree -- it is either
+  \return a pointer to a knowledge stored in the hash tree -- it is either
          "this" if the knowledge was not found in the hash tree or a pointer
          to a previously stored knowledge. In the latter case, the calling
          function can detect the duplicate
  */
 StoredKnowledge *StoredKnowledge::store() {
-    assert (size != 0);
+    assert (sizeAllMarkings != 0);
 
     // get the element's hash value
     hash_t myHash = hash();
@@ -976,12 +917,12 @@ StoredKnowledge *StoredKnowledge::store() {
             assert(el->second[i]);
 
             // compare the sizes
-            if (size == el->second[i]->size) {
+            if (sizeAllMarkings == el->second[i]->sizeAllMarkings) {
                 // if still true after the loop, we found previously stored knowledge
                 bool found = true;
 
                 // compare the inner and interface markings
-                for (unsigned int j = 0; (j < size and found); ++j) {
+                for (unsigned int j = 0; (j < sizeAllMarkings and found); ++j) {
                     if (inner[j] != el->second[i]->inner[j] or
                         *interface[j] != *el->second[i]->interface[j]) {
                         found = false;
@@ -992,6 +933,7 @@ StoredKnowledge *StoredKnowledge::store() {
                 if (found) {
                     // we found a previously stored element with the same
                     // markings -> return a pointer to this element
+
                     return el->second[i];
                 }
             }
@@ -1007,11 +949,10 @@ StoredKnowledge *StoredKnowledge::store() {
     // we need to store this object
     hashTree[myHash].push_back(this);
 
-    // LIVELOCK FREEDOM
-    if (args_info.lf_flag) {
-        setTarjanValues();
-        isFinal();
-    }
+    tarjanMapping[this].first = tarjanMapping[this].second = stats.storedKnowledges;
+
+    // put knowledge on the Tarjan stack
+    tarjanStack.push_back(this);
 
     ++stats.storedKnowledges;
 
@@ -1020,21 +961,18 @@ StoredKnowledge *StoredKnowledge::store() {
 }
 
 
-void StoredKnowledge::addSuccessor(const Label_ID &label, StoredKnowledge* const knowledge) {
+inline void StoredKnowledge::addSuccessor(const Label_ID &label, StoredKnowledge* const knowledge) {
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
 
-    // increase the successor's indegree (needed for later predecessor relation)
-    if (knowledge != empty) {
-        ++(knowledge->inDegree);
-    }
+    ++stats.storedEdges;
 }
 
 
 inline hash_t StoredKnowledge::hash() const {
     hash_t result = 0;
 
-    for (unsigned int i = 0; i < size; ++i) {
+    for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
         result += ((1 << i) * (inner[i]) + interface[i]->hash());
     }
 
@@ -1042,95 +980,52 @@ inline hash_t StoredKnowledge::hash() const {
 }
 
 
-void StoredKnowledge::addPredecessor(StoredKnowledge* const k) {
-    assert(inDegree > 0);
-
-    // when called for the first time, get some memory
-    if (predecessors == NULL) {
-        predecessors = new StoredKnowledge*[inDegree];
-        // set pointers to NULL to have a defined state
-        for (unsigned int i = 0; i < inDegree; ++i) {
-            predecessors[i] = NULL;
-        }
-    }
-
-    // use the first free position and store this knowledge
-    assert(predecessorCounter < inDegree);
-    predecessors[predecessorCounter++] = k;
-}
-
-
-/*!
- in contrast to sat() this method does not require anything to be done in advance, it purely
- checks each marking of the current knowledge if, in case it is a waitstate, it is resolved by some
- event that leads to a sane successor
-*/
-bool StoredKnowledge::allWaitstatesResolved() const {
-    std::vector<Label_ID> goodLabels;
-
-    // find all events that lead to a good successor knowlegde
-    for (Label_ID l = Label::first_receive; l < Label::last_sync; ++l) {
-        if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
-            goodLabels.push_back(l);
-        }
-    }
-
-    // traverse through all markings
-    for (unsigned int m = 0; m < size; m++) {
-        bool isResolved = false;
-
-        // we consider waitstates only
-        if (not InnerMarking::inner_markings[inner[m]]->is_waitstate or
-                (InnerMarking::inner_markings[inner[m]]->is_final and interface[m]->unmarked())) {
-            continue;
-        }
-
-        // check if waitstates is resolved by some event
-        for (std::vector<Label_ID>::iterator iter = goodLabels.begin(); iter < goodLabels.end(); ++iter) {
-            if (SENDING(*iter) and InnerMarking::inner_markings[inner[m]]->waitstate(*iter)) {
-                isResolved = true;
-                break;
-            }
-            if (RECEIVING(*iter)) {
-                if (interface[m]->marked(*iter)) {
-                    isResolved = true;
-                    break;
-                }
-            }
-        }
-
-        // found a waitstates that was not resolved so quit and return false
-        if (not isResolved) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
 /*!
  \return whether each deadlock in the knowledge is resolved
 
- \pre the markings in the array (0 to size-1) are deadlocks -- all transient
+ \param checkStack in case of reduction rules "quit as soon as possible" and "succeeding sending event"
+                   it has to be ensured that the successor node has been completely analyzed and thus
+                   is off the Tarjan stack
+
+ \pre the markings in the array (0 to sizeDeadlockMarkings-1) are deadlocks -- all transient
       states or unmarked final markings are removed from the marking array
 */
-bool StoredKnowledge::sat() const {
+bool StoredKnowledge::sat(const bool checkStack) const {
+
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (successors[l-1] != NULL and successors[l-1] != empty) {
+        if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
+
+            if (checkStack and successors[l-1]->is_on_tarjan_stack) {
+                continue;
+            }
+
+            if (args_info.lf_flag and not successors[l-1]->is_final_reachable) {
+                continue;
+            }
+
             return true;
         }
     }
 
     // now each deadlock must have ?-successors
-    for (unsigned int i = 0; i < size; ++i) {
+    for (unsigned int i = 0; i < sizeDeadlockMarkings; ++i) {
         bool resolved = false;
 
         // we found a deadlock -- check whether for at least one marked
         // output place exists a respective receiving edge
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
+            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty and
+                successors[l-1]->is_sane) {
+
+                if (checkStack and successors[l-1]->is_on_tarjan_stack) {
+                    continue;
+                }
+
+                if (args_info.lf_flag and not successors[l-1]->is_final_reachable) {
+                    continue;
+                }
+
                 resolved = true;
                 break;
             }
@@ -1139,7 +1034,16 @@ bool StoredKnowledge::sat() const {
         // check if a synchronous action can resolve this deadlock
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
-                successors[l-1] != NULL and successors[l-1] != empty) {
+                successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
+
+                if (checkStack and successors[l-1]->is_on_tarjan_stack) {
+                    continue;
+                }
+
+                if (args_info.lf_flag and not successors[l-1]->is_final_reachable) {
+                    continue;
+                }
+
                 resolved = true;
                 break;
             }
@@ -1171,7 +1075,7 @@ string StoredKnowledge::formula() const {
 
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (successors[l-1] != NULL) {
+        if (successors[l-1] != NULL and successors[l-1]->is_sane) {
             if (args_info.fionaFormat_flag) {
                 sendDisjunction.insert(PREFIX(l) + Label::id2name[l]);
             } else {
@@ -1182,13 +1086,16 @@ string StoredKnowledge::formula() const {
 
     // collect outgoing ?-edges and #-edges for the deadlocks
     bool dl_found = false;
-    for (unsigned int i = 0; i < size; ++i) {
+    for (unsigned int i = 0; i < sizeDeadlockMarkings; ++i) {
         dl_found = true;
         set<string> temp(sendDisjunction);
 
         // sending
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
+            if (interface[i]->marked(l) and
+                successors[l-1] != NULL and successors[l-1] != empty and
+                successors[l-1]->is_sane) {
+
                 if (args_info.fionaFormat_flag) {
                     temp.insert(PREFIX(l) + Label::id2name[l]);
                 } else {
@@ -1200,7 +1107,8 @@ string StoredKnowledge::formula() const {
         // synchronous communication
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
-                successors[l-1] != NULL and successors[l-1] != empty) {
+                successors[l-1] != NULL and successors[l-1] != empty and
+                successors[l-1]->is_sane) {
                 if (args_info.fionaFormat_flag) {
                     temp.insert(PREFIX(l) + Label::id2name[l]);
                 } else {
@@ -1273,12 +1181,14 @@ string StoredKnowledge::bits() const {
     }
 
     // traverse the deadlocks
-    for (unsigned int i = 0; i < size; ++i) {
+    for (unsigned int i = 0; i < sizeDeadlockMarkings; ++i) {
         bool resolved = false;
 
         // check whether receiving resolves this deadlock
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty) {
+            if (interface[i]->marked(l) and
+                successors[l-1] != NULL and successors[l-1] != empty and
+                successors[l-1]->is_sane) {
                 resolved = true;
                 break;
             }
@@ -1302,7 +1212,8 @@ string StoredKnowledge::bits() const {
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if (successors[l-1] != NULL and successors[l-1] != empty and (successors[l-1]->is_sane or args_info.diagnose_flag)) {
+            if (successors[l-1] != NULL and successors[l-1] != empty and
+                (successors[l-1]->is_sane or args_info.diagnose_flag)) {
                 successors[l-1]->traverse();
             }
         }
@@ -1315,7 +1226,7 @@ void StoredKnowledge::migration(std::ostream& o) {
 
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         // traverse the bubble
-        for (unsigned int i = 0; i < allMarkings[*it]; ++i) {
+        for (unsigned int i = 0; i < (*it)->sizeAllMarkings; ++i) {
             InnerMarking_ID inner = (*it)->inner[i];
             InterfaceMarking *interface = (*it)->interface[i];
             StoredKnowledge *knowledge = *it;

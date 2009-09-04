@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
       }
       status("%d nodes to cover", Cover::nodeCount);
     }
-    
+
 
     /*--------------------------------------------.
     | 4. write inner of the open net to LoLA file |
@@ -328,43 +328,22 @@ int main(int argc, char** argv) {
         (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats.maxBucketSize));
     status("at most %d interface markings per inner marking",
         StoredKnowledge::stats.maxInterfaceMarkings);
+    status("calculated %d trivial sccs",
+        StoredKnowledge::stats.numberOfTrivialSCCs);
+    status("calculated %d non-trivial sccs, at most %d members in nontrivial scc",
+        StoredKnowledge::stats.numberOfNonTrivialSCCs, StoredKnowledge::stats.maxSCCSize);
 
-
-    /*----------------------------.
-    | 8. add predecessor relation |
-    `----------------------------*/
-    time(&start_time);
-    unsigned int edges = StoredKnowledge::addPredecessors();
-    time(&end_time);
-
-    status("added predecessor relation (%d edges) [%.0f sec]",
-        edges, difftime(end_time, start_time));
-
-
-    /*----------------------------------.
-    | 9. detect and delete insane nodes |
-    `----------------------------------*/
-    time(&start_time);
-    unsigned int redNodes = StoredKnowledge::removeInsaneNodes();
-    time(&end_time);
-
-    // statistics output
-    status("removed %d insane nodes (%3.2f%%) in %d iterations [%.0f sec]",
-        redNodes, 100.0 * ((double)redNodes / (double)StoredKnowledge::stats.storedKnowledges),
-        StoredKnowledge::stats.iterations, difftime(end_time, start_time));
-    if (redNodes != 0) {
-        status("%d insane nodes (%3.2f%%) were prematurely detected",
-            StoredKnowledge::stats.builtInsaneNodes,
-            100.0 * ((double)StoredKnowledge::stats.builtInsaneNodes / (double)redNodes));
-    }
+    // traverse all nodes reachable from the root
+    StoredKnowledge::root->traverse();
     status("%d nodes left", StoredKnowledge::seen.size());
+
 
     // analyze root node and print result
     message("net is controllable: %s", (StoredKnowledge::root->is_sane) ? "YES" : "NO");
 
 
     /*-------------------------------.
-    | 10. calculate cover constraint |
+    | 8. calculate cover constraint |
     `--------------------------------*/
     if(args_info.cover_given) {
         Cover::calculate(StoredKnowledge::seen);
@@ -374,7 +353,7 @@ int main(int argc, char** argv) {
 
 
     /*-------------------.
-    | 11. output options |
+    | 9. output options |
     `-------------------*/
     // operating guidelines output
     if (args_info.og_given) {
@@ -420,7 +399,6 @@ int main(int argc, char** argv) {
         status("wrote migration information to file '%s' [%.0f sec]",
             im_filename.c_str(), difftime(end_time, start_time));
     }
-
 
     return EXIT_SUCCESS;
 }

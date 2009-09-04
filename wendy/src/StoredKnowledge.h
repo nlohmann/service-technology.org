@@ -34,16 +34,10 @@ class StoredKnowledge {
     public: /* static functions */
 
         /// generate the successor of a knowledge bubble given a label
-        static void process(const Knowledge* const, StoredKnowledge*, const Label_ID&);
+        static void process(Knowledge*, StoredKnowledge*, const Label_ID&);
 
         /// recursively calculate knowledge bubbles
-        static void processRecursively(const Knowledge* const, StoredKnowledge*);
-
-        /// traverse the graph and add predecessors
-        static unsigned int addPredecessors();
-
-        /// detect red nodes
-        static unsigned int removeInsaneNodes();
+        static void processRecursively(Knowledge*, StoredKnowledge*);
 
         /// print a dot representation
         static void dot(std::ostream&);
@@ -83,8 +77,14 @@ class StoredKnowledge {
                 /// the number of knowledges stored in the hash tree
                 unsigned int storedKnowledges;
 
-                /// number of iterations needed to removed insane nodes
-                unsigned int iterations;
+                /// maximum number of scc components
+                unsigned int maxSCCSize;
+
+                /// total number of SCCs
+                unsigned int numberOfNonTrivialSCCs;
+
+                /// number of trivial SCCs
+                unsigned int numberOfTrivialSCCs;
         } stats;
 
         /// buckets of knowledges, indexed by hash values
@@ -99,6 +99,9 @@ class StoredKnowledge {
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
 
+        /// maps dfs (first) and lowlink (second) number to a stored knowledge which is still on the Tarjan stack
+        static std::map<StoredKnowledge*, std::pair<unsigned int, unsigned int> > tarjanMapping;
+
     private: /* static attributes */
 
         /// the empty knowledge
@@ -110,21 +113,26 @@ class StoredKnowledge {
         /// nodes that should be deleted
         static std::set<StoredKnowledge*> deletedNodes;
 
-        /// the number of all markings (deadlocks and transient markings)
-        static std::map<StoredKnowledge*, unsigned int> allMarkings;
-
         /// LIVELOCK FREEDOM
         /// stack of StoredKnowledge for Tarjan's algorithm
         static std::vector<StoredKnowledge *> tarjanStack;
 
+        /// needed for TSCC detection within Tarjan's algorithm
+        static unsigned int bookmarkTSCC;
+
+        /// remember predecessor of a stored knowledge in case we evaluate a (T)SCC
+        static std::map<StoredKnowledge* , std::set<StoredKnowledge*> > tempPredecessors;
+
     private: /* static functions */
 
-        // LIVELOCK FREEDOM
-        /// finds a knowledge in Tarjan stack
-        static bool findKnowledgeInTarjanStack(StoredKnowledge *);
-
         /// adjust lowlink values of the stored knowledge
-        static void adjustLowlinkValue(StoredKnowledge*, StoredKnowledge*);
+        static void adjustLowlinkValue(StoredKnowledge*, StoredKnowledge*, bool);
+
+        /// create the predecessor relation of all knowledges contained in the given set
+        static void createPredecessorRelation(std::set<StoredKnowledge *> &);
+
+        /// evaluate each member of the given set of knowledges and propagate the property of being insane accordingly
+        static void evaluateKnowledgeSet(std::set<StoredKnowledge *> &);
 
         /// evaluates the current strongly connected components and adjusts the is_final_reachable value
         static void evaluateCurrentSCC(StoredKnowledge*);
@@ -143,28 +151,22 @@ class StoredKnowledge {
         /// stores this object in the hash tree and returns a pointer to the result
         StoredKnowledge *store();
 
+        /// traverse knowledges
+        void traverse();
+
     private: /* member functions */
-
-        /// LIVELOCK FREEDOM
-        void isFinal();
-
-        /// set values needed for Tarjan algorithm and livelock freedom analysis
-        void setTarjanValues();
 
         /// adds a successor knowledge
         void addSuccessor(const Label_ID&, StoredKnowledge* const);
 
-        /// returns whether all waitstates are resolved with the current set of successors
-        bool allWaitstatesResolved() const;
-
         /// return whether this node fulfills its annotation
-        bool sat() const;
+        bool sat(const bool = false) const;
 
         /// return the hash value of this object
         hash_t hash() const;
 
-        /// adds a predecessor knowledge
-        void addPredecessor(StoredKnowledge* const);
+        /// move all transient markings to the end of the array and adjust size of the markings array
+        void rearrangeKnowledgeBubble();
 
         /// print knowledge
         void print(std::ostream&) const;
@@ -174,9 +176,6 @@ class StoredKnowledge {
 
         /// return a two-bit representation of the knowledge's formula
         std::string bits() const;
-
-        /// traverse knowledges
-        void traverse();
 
     public: /* member attributes */
 
@@ -190,14 +189,16 @@ class StoredKnowledge {
         /// whether this bubble is sane
         unsigned is_sane : 1;
 
+        /// whether this bubble is still on the Tarjan stack
+        unsigned is_on_tarjan_stack : 1;
+
     private: /* member attributes */
 
-        /// for livelock freedom the Tarjan algorithm is needed
-        unsigned int lowlink;
-        unsigned int dfs;
+        /// the number of markings stored in this knowledge
+        unsigned int sizeDeadlockMarkings;
 
         /// the number of markings stored in this knowledge
-        unsigned int size;
+        unsigned int sizeAllMarkings;
 
         /// an array of inner markings (length is size)
         InnerMarking_ID *inner;
@@ -207,15 +208,6 @@ class StoredKnowledge {
 
         /// the successors of this knowledge (length is fixed by the labels)
         StoredKnowledge **successors;
-
-        /// the number of predecessors
-        unsigned int inDegree;
-
-        /// a counter to stored the next position of a predecessor
-        unsigned int predecessorCounter;
-
-        /// an array of predecessors (length is "inDegree")
-        StoredKnowledge** predecessors;
 };
 
 #endif

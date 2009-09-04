@@ -11,9 +11,16 @@
 Version 2.1-unreleased
 ======================
 
+* fixed (known) issues concerning reduction rule "succeeding sending event"
+  (parameter: `--succeedingSendingEvent')
+
+* issues on the hidden parameter "quit as soon as possible" (parameter:
+  `--succeedingSendingEvent') have been fixed
+
+* implemented on-the-fly knowledge analysis
+
+* added test case with insane nontrivial TSCC
+
 * integrated LoLA SCCs detection within inner markings
 
-
-See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n

@@ -29,6 +29,18 @@
  \brief knowledge (data structure for building knowledges)
  */
 class Knowledge {
+    public: /* static attributes */
+        /// struct combining the statistics on the class Knowledge
+        static struct _stats {
+            public:
+                /// constructor
+                _stats();
+
+                /// the number of knowledges calculated so far
+//                unsigned int calculatedKnowledges;
+        } stats;
+
+
     public: /* member functions */
 
         /// construct knowledge from (initial) inner marking

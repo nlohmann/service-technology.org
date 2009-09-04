@@ -35,6 +35,17 @@ using std::string;
 
 extern gengetopt_args_info args_info;
 
+Knowledge::_stats Knowledge::stats;
+
+
+/********************
+ * STATIC FUNCTIONS *
+ ********************/
+
+/// constructor for the _stats struct
+Knowledge::_stats::_stats() {}
+
+
 /***************
  * CONSTRUCTOR *
  ***************/

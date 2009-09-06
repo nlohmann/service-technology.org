@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 2.1-unreleased
-======================
+Version 2.1 (6 September 2009)
+==============================
 
 * fixed (known) issues concerning reduction rule "succeeding sending event"
   (parameter: `--succeedingSendingEvent')
@@ -23,4 +23,20 @@ Version 2.1-unreleased
 
 * integrated LoLA SCCs detection within inner markings
 
-\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n
+* generated temporary files are always deleted unless the `--noClean'
+  parameter is given; removed parameter `--clean'
+
+* fixed 64-bit support: Wendy natively supports 32 and 64 bit compilations
+  using GCC's switches `-m32' and `-m64', respectively. To successfully
+  execute `make check', you need to compile the Petri Net API and Mia with
+  the same options.
+
+* allocated memory can be released using the (undocumented) parameter
+  `--finalize'; fixed most memory leaks
+
+* simplified interface to `Output' class managing file output
+
+
+See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
+complete version history.
+

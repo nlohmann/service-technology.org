@@ -60,6 +60,7 @@
  - synchronous events have labels first_sync to last_sync
  */
 class Label {
+
     public: /* static functions */
 
         /// initialize the interface labels and prepare the necessary mappings

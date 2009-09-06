@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 2.1-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT(Wendy, 2.1, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -68,6 +68,11 @@ AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
+
+AC_CHECK_SIZEOF([void*])
+AC_CHECK_SIZEOF([unsigned int])
+AC_CHECK_SIZEOF([unsigned long])
+AC_CHECK_SIZEOF([size_t])
 
 # write files
 AC_CONFIG_FILES([

@@ -23,6 +23,7 @@
 #include "InnerMarking.h"
 #include "Label.h"
 #include "verbose.h"
+#include "types.h"
 
 
 extern gengetopt_args_info args_info;
@@ -487,10 +488,10 @@ void Cover::write(std::ostream &os)
         os << "    (";
         
         if(current[j].size() > 0)
-          os << reinterpret_cast<unsigned long>(current[j][0]);
+          os << reinterpret_cast<size_t>(current[j][0]);
         for(unsigned int k=1; k<current[j].size(); ++k)
         {
-          os << " + " << reinterpret_cast<unsigned long>(current[j][k]); 
+          os << " + " << reinterpret_cast<size_t>(current[j][k]); 
         }
         
         if(--lastClause > 0)
@@ -519,7 +520,7 @@ void Cover::write(std::ostream &os)
     else
       firstBubble = false;
     
-    os << "  " << reinterpret_cast<unsigned long>(it->first) << " :";
+    os << "  " << reinterpret_cast<size_t>(it->first) << " :";
     if( it->second.inP.empty() && 
         it->second.comP.empty() &&
         it->second.inT.empty() &&

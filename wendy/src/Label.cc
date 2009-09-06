@@ -121,9 +121,10 @@ void Label::initialize() {
     last_sync = events;
     sync_events = last_sync - send_events - receive_events;
 
-    for (unsigned int i = first_receive; i <= last_sync; ++i) {
-        status("label with id %2d is '%s%s'", i, PREFIX(i), id2name[i].c_str());
-    }
+/// \todo The label output should be moved to "--mi" (after adjusting Mia)
+//    for (unsigned int i = first_receive; i <= last_sync; ++i) {
+//        status("label with id %2d is '%s%s'", i, PREFIX(i), id2name[i].c_str());
+//    }
     status("initialized labels for %d events (%d asynchronous, %d synchronous)",
         events, send_events+receive_events, sync_events);
 

@@ -65,23 +65,23 @@ void InterfaceMarking::initialize(unsigned int m) {
  ***************/
 
 InterfaceMarking::InterfaceMarking() :
-    storage() {
+    in_queue(), out_queue() {
 }
 
 InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) :
-    storage(other.storage) {
+    in_queue(other.in_queue), out_queue(other.out_queue) {
 }
 
 InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, const Label_ID label, const bool &increase, bool &success) :
-    storage(other.storage) {
+    in_queue(other.in_queue), out_queue(other.out_queue) {
     assert(success);
 
     if (increase) {
-        if (not inc(label)) {
+        if (not inc(label)) { // call incIn
             success = false;
         }
     } else {
-        if (not dec(label)) {
+        if (not dec(label)) { // call decOut
             success = false;
         }
     }
@@ -101,31 +101,42 @@ InterfaceMarking::~InterfaceMarking() {
  *************/
 
 bool InterfaceMarking::operator< (const InterfaceMarking &other) const {
-    return (storage < other.storage);
+    return (in_queue < other.in_queue and out_queue < other.out_queue);
 }
 
 bool InterfaceMarking::operator!= (const InterfaceMarking &other) const {
-    return (storage != other.storage);
+    return (in_queue != other.in_queue and out_queue != other.out_queue);
 }
 
 bool InterfaceMarking::operator== (const InterfaceMarking &other) const {
-    return (storage == other.storage);
+    return (in_queue == other.in_queue and out_queue == other.out_queue);
 }
 
 std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
-    std::queue<Label_ID> temp(m.storage);
-    
+    std::queue<Label_ID> in_queue(m.in_queue);
+    std::queue<Label_ID> out_queue(m.out_queue);
+
     o << "<";
-    
-    while (not temp.empty()) {
-        o << Label::id2name[temp.front()];
-        temp.pop();
-        if (not temp.empty()) {
+    while (not in_queue.empty()) {
+        o << Label::id2name[in_queue.front()];
+        in_queue.pop();
+        if (not in_queue.empty()) {
             o << ",";
         }
     }
-    
-    return o << ">";;
+    o << ">";
+
+    o << "<";
+    while (not out_queue.empty()) {
+        o << Label::id2name[out_queue.front()];
+        out_queue.pop();
+        if (not out_queue.empty()) {
+            o << ",";
+        }
+    }
+    o << ">";
+
+    return o;
 }
 
 
@@ -137,17 +148,38 @@ std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
  \return whether the message bound was respected (false means violation)
  */
 bool InterfaceMarking::inc(const Label_ID label) {
-    storage.push(label);
+    out_queue.push(label);
 
-    return (storage.size() <= message_bound);
+    return (out_queue.size() <= message_bound);
+}
+
+/*!
+ \return whether the message bound was respected (false means violation)
+ */
+bool InterfaceMarking::incIn(const Label_ID label) {
+    in_queue.push(label);
+
+    return (in_queue.size() <= message_bound);
 }
 
 /*!
  \return whether the result is positive (false means decrement of 0)
  */
 bool InterfaceMarking::dec(const Label_ID label) {
-    if (not storage.empty() and storage.front() == label) {
-        storage.pop();
+    if (not in_queue.empty() and in_queue.front() == label) {
+        in_queue.pop();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/*!
+ \return whether the result is positive (false means decrement of 0)
+ */
+bool InterfaceMarking::decOut(const Label_ID label) {
+    if (not out_queue.empty() and out_queue.front() == label) {
+        out_queue.pop();
         return true;
     } else {
         return false;
@@ -158,14 +190,18 @@ bool InterfaceMarking::dec(const Label_ID label) {
  \return whether the whole interface is unmarked
  */
 bool InterfaceMarking::unmarked() const {
-    return storage.empty();
+    return in_queue.empty() and out_queue.empty();
 }
 
 /*
  \return whether the interface is marked at the given label
 */
 bool InterfaceMarking::marked(const Label_ID label) const {
-    return (storage.front() == label);
+    if (SENDING(label)) {
+        return (in_queue.front() == label);        
+    } else {
+        return (out_queue.front() == label);
+    }
 }
 
 

@@ -52,6 +52,7 @@
         especially using preprocessor macros
 */
 class InterfaceMarking {
+
     public: /* static functions */
 
         /// initializes the class InterfaceMarking
@@ -123,7 +124,7 @@ class InterfaceMarking {
         uint8_t get(const Label_ID&) const;
 
         /// a byte array to store the interface markings
-        uint8_t *storage;
+        uint8_t* storage;
 };
 
 #endif

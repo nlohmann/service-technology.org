@@ -28,6 +28,7 @@
 #include "StoredKnowledge.h"
 #include "Cover.h"
 #include "Label.h"
+#include "verbose.h"
 
 using std::map;
 using std::set;
@@ -44,31 +45,32 @@ extern string invocation;
 
 std::map<hash_t, std::vector<StoredKnowledge*> > StoredKnowledge::hashTree;
 StoredKnowledge* StoredKnowledge::root = NULL;
-StoredKnowledge* StoredKnowledge::empty = (StoredKnowledge*)1; // experiment
+StoredKnowledge* StoredKnowledge::empty = reinterpret_cast<StoredKnowledge*>(1); // experiment
 unsigned int StoredKnowledge::reportFrequency = 10000;
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
 std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
-std::map<StoredKnowledge* , std::set<StoredKnowledge*> > StoredKnowledge::tempPredecessors;
 unsigned int StoredKnowledge::bookmarkTSCC = 0;
 bool StoredKnowledge::emptyNodeReachable = false;
 StoredKnowledge::_stats StoredKnowledge::stats;
-std::map<StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredKnowledge::tarjanMapping;
+std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredKnowledge::tarjanMapping;
 
 
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+#define MAXIMUM(X,Y) ((X) > (Y) ? (X) : (Y))
 
 
 /********************
  * STATIC FUNCTIONS *
  ********************/
 
-/// constructor for the _stats struct
+/*!
+ \note maxBucketSize must be initialized to 1
+ */
 StoredKnowledge::_stats::_stats() :
-    maxBucketSize(1), // sic!
-    maxSCCSize(0),
-    numberOfNonTrivialSCCs(0),
-    numberOfTrivialSCCs(0)
+    hashCollisions(0), storedEdges(0), maxInterfaceMarkings(0),
+    builtInsaneNodes(0), maxBucketSize(1), storedKnowledges(0),
+    maxSCCSize(0), numberOfNonTrivialSCCs(0), numberOfTrivialSCCs(0)
 {}
 
 
@@ -77,37 +79,32 @@ StoredKnowledge::_stats::_stats() :
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(Knowledge* K, StoredKnowledge *SK, const Label_ID &l) {
-    Knowledge *K_new = new Knowledge(K, l);
+inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const SK, const Label_ID& l) {
+    // create a new knowledge for the given label
+    Knowledge K_new(K, l);
 
-    // process the empty node in a special way
-    if (K_new->size == 0) {
-        if (K_new->is_sane) {
+    // do not store and process the empty node explicitly
+    if (K_new.size == 0) {
+        if (K_new.is_sane) {
             SK->addSuccessor(l, empty);
         }
-        delete K_new;
         return;
     }
 
-    bool newNode = false;
-
     // only process knowledges within the message bounds
-    if (K_new->is_sane) {
+    if (K_new.is_sane) {
 
         // create a compact version of the knowledge bubble
-        StoredKnowledge *SK_new = new StoredKnowledge(K_new);
+        StoredKnowledge* SK_new = new StoredKnowledge(K_new);
 
         // add it to the knowledge tree
-        StoredKnowledge *SK_store = SK_new->store();
+        StoredKnowledge* SK_store = SK_new->store();
 
         // store an edge from the parent to this node
         SK->addSuccessor(l, SK_store);
 
         // evaluate the storage result
         if (SK_store == SK_new) {
-
-            newNode = true;
-
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
         } else {
@@ -116,167 +113,10 @@ inline void StoredKnowledge::process(Knowledge* K, StoredKnowledge *SK, const La
         }
 
         // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
-        adjustLowlinkValue(SK, SK_store, newNode);
+        SK->adjustLowlinkValue(SK_store);
     } else {
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
-    }
-
-    // we saw K_new's successors
-    delete K_new;
-}
-
-
-/*!
- adjust lowlink value of stored knowledge object according to Tarjan algorithm
- \param[in,out] K       a knowledge bubble (explicitly stored)
- \param[in]     K_new   successor knowledge bubble (explicitly stored)
- \param[in]     SK_new  successor knowledge bubble (compactly stored)
- \param newNode K_new   is brand new
-*/
-inline void StoredKnowledge::adjustLowlinkValue(StoredKnowledge* SK,
-                                                StoredKnowledge* SK_new,
-                                                bool newNode) {
-    // successor node is not new
-    if (not newNode) {
-        if (SK_new->is_on_tarjan_stack) {
-            // but it is still on the stack, compare lowlink and dfs value
-            tarjanMapping[SK].second = MINIMUM(tarjanMapping[SK].second, tarjanMapping[SK_new].first);
-        }
-    } else {
-        // successor node is new, compare lowlink values
-        tarjanMapping[SK].second = MINIMUM(tarjanMapping[SK].second, tarjanMapping[SK_new].second);
-    }
-}
-
-
-/*!
- create the predecessor relation of all knowledges contained in the given set
-*/
-inline void StoredKnowledge::createPredecessorRelation(std::set<StoredKnowledge *> & knowledgeSet) {
-    // if it is not a TSCC, we have to evaluate each member of the SCC
-    // first, we generate the predecessor relation between the members
-    for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
-        // for each successor which is part of the current SCC, register the predecessor
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((*iScc)->successors[l-1] != NULL and (*iScc)->successors[l-1] != empty and
-                knowledgeSet.find((*iScc)->successors[l-1]) != knowledgeSet.end()) {
-
-                tempPredecessors[(*iScc)->successors[l-1]].insert(*iScc);
-            }
-        }
-    }
-}
-
-
-/*!
- evaluate each member of the given set of knowledges and propagate the property of being insane accordingly
-*/
-inline void StoredKnowledge::evaluateKnowledgeSet(std::set<StoredKnowledge *> & knowledgeSet) {
-    // evaluate each member
-    while (not knowledgeSet.empty()) {
-        StoredKnowledge * currentKnowledge = (*knowledgeSet.begin());
-        knowledgeSet.erase(knowledgeSet.begin());
-
-        if (currentKnowledge->is_sane and not currentKnowledge->sat()) {
-            currentKnowledge->is_sane = 0;
-
-            // tell each predecessor of current knowledge that this knowledge switched its status to insane
-            for (std::set<StoredKnowledge* >::const_iterator iter = tempPredecessors[currentKnowledge].begin();
-                                                             iter != tempPredecessors[currentKnowledge].end(); ++iter) {
-
-                knowledgeSet.insert(*iter);
-            }
-        } else if (args_info.lf_flag) {
-            currentKnowledge->is_final_reachable = 1;
-        }
-    }
-}
-
-
-/*!
- if current knowledge is representative of an SCC then evaluate current SCC
- \param[in,out] SK  a knowledge bubble (compactly stored)
- \param[in]     K   a knowledge bubble (explicitly stored)
-*/
-inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
-
-    if (tarjanStack.empty()) {
-        return;
-    }
-
-    // check, if the current knowledge is a representative of a SCC
-    // if so, get all knowledges within the SCC
-    if (tarjanMapping[SK].first == tarjanMapping[SK].second) {
-
-        unsigned int numberOfSccElements = 0;
-
-        // node which has just been popped from Tarjan stack
-        StoredKnowledge * poppedSK;
-
-        // set of knowledges
-        // first used to store the whole SCC, then it is used as a set storing those
-        // knowledges that have to be evaluated again
-        std::set<StoredKnowledge *> knowledgeSet;
-
-        bool TSCC = false;
-
-        // found a TSCC
-        if (tarjanMapping[SK].first > StoredKnowledge::bookmarkTSCC) {
-            StoredKnowledge::bookmarkTSCC = tarjanMapping[SK].first;
-            TSCC = true;
-        }
-
-        // get (T)SCC
-        do {
-            // get last element
-            poppedSK = tarjanStack.back();
-
-            // remember that we removed this knowledge from the Tarjan stack
-            poppedSK->is_on_tarjan_stack = 0;
-
-            // tarjanMapping.erase(poppedSK);
-
-            // delete last element from stack
-            tarjanStack.pop_back();
-
-            // remember this knowledge to be part of the current (T)SCC
-            knowledgeSet.insert(poppedSK);
-
-            numberOfSccElements++;
-        } while (SK != poppedSK);
-
-
-//        printf("DEBUG: found SCC with %d elements, it is a TSCC %d\n", numberOfSccElements, TSCC);
-
-        // check if (T)SCC is trivial
-        if (numberOfSccElements == 1) {
-            // check if every deadlock is resolved -> if not, this knowledge is definitely not sane
-            // deadlock freedom or livelock freedom will be treated in sat()
-            (*knowledgeSet.begin())->is_sane = (*knowledgeSet.begin())->sat();
-        } else if (numberOfSccElements > 1){
-
-            printf("DEBUG: SK %d is rep\n", tarjanMapping[SK].first);
-
-            assert(tempPredecessors.empty());
-
-            createPredecessorRelation(knowledgeSet);
-
-            evaluateKnowledgeSet(knowledgeSet);
-
-            // make sure to clear the set of predecessors again
-            tempPredecessors.clear();
-        }
-
-        // statistics
-        if (numberOfSccElements == 1) {
-            StoredKnowledge::stats.numberOfTrivialSCCs++;
-        } else {
-            if (StoredKnowledge::stats.maxSCCSize < numberOfSccElements) {
-                StoredKnowledge::stats.maxSCCSize = numberOfSccElements;
-            }
-            StoredKnowledge::stats.numberOfNonTrivialSCCs++;
-        }
     }
 }
 
@@ -288,34 +128,38 @@ inline void StoredKnowledge::evaluateCurrentSCC(StoredKnowledge* SK) {
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::processRecursively(Knowledge* K,
-                                         StoredKnowledge* SK) {
+void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* const SK) {
     static unsigned int calls = 0;
 
-    if ((reportFrequency > 0) and (++calls % reportFrequency == 0)) {
+    // statistics output
+    if ((++calls % reportFrequency == 0) and (reportFrequency > 0)) {
         fprintf(stderr, "%8d knowledges, %8d edges\n",
             stats.storedKnowledges, stats.storedEdges);
     }
+
 
     // reduction rule: sequentialize receiving events
     map<Label_ID, bool> consideredReceivingEvents;
 
     if (args_info.seqReceivingEvents_flag) {
         // calculate those receiving events that are essential to resolve each and every waitstate
-        K->sequentializeReceivingEvents(consideredReceivingEvents);
+        K.sequentializeReceivingEvents(consideredReceivingEvents);
     }
 
-    PossibleSendEvents * posSendEvents;
-    char * posSendEventsDecoded;
+    // reduction rule: smart send events
+    PossibleSendEvents* posSendEvents;
+    char* posSendEventsDecoded;
 
+    /// \todo Daniela, please document me
     if (args_info.smartSendingEvent_flag) {
         posSendEvents = new PossibleSendEvents(true, 1);
 
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = K.bubble.begin(); pos != K.bubble.end(); ++pos) {
             *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
         }
         posSendEventsDecoded = posSendEvents->decode();
     }
+
 
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
@@ -336,19 +180,22 @@ void StoredKnowledge::processRecursively(Knowledge* K,
         // reduction rule: receive before send
         if (args_info.receiveBeforeSend_flag) {
             // check if we're done receiving and each deadlock was resolved
-            if (l > Label::last_receive and K->receivingHelps()) {
+            if (l > Label::last_receive and K.receivingHelps()) {
                 break;
             }
         }
 
         // reduction rule: only consider waitstates
         if (args_info.waitstatesOnly_flag) {
-            if (not RECEIVING(l) and not K->resolvableWaitstate(l)) {
+            if (not RECEIVING(l) and not K.resolvableWaitstate(l)) {
                 continue;
             }
         }
 
+
+        // recursion
         process(K, SK, l);
+
 
         // reduction rule: quit, once all waitstates are resolved
         if (args_info.quitAsSoonAsPossible_flag and SK->sat(true)) {
@@ -357,9 +204,8 @@ void StoredKnowledge::processRecursively(Knowledge* K,
 
         // reduction rule: stop considering another sending event, if the latest sending event
         //                 considered succeeded
-        // TODO what about synchronous events?
+        /// \todo what about synchronous events?
         if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat(true)) {
-
             if (not args_info.lf_flag or SK->is_final_reachable) {
                 l = Label::first_sync;
             }
@@ -372,16 +218,67 @@ void StoredKnowledge::processRecursively(Knowledge* K,
         delete posSendEvents;
     }
 
-    evaluateCurrentSCC(SK);
+    SK->evaluateCurrentSCC();
 }
 
 
 /*!
-  move all transient markings to the end of the array and adjust size of the markings array
+ create the predecessor relation of all knowledges contained in the given set
+ and then evaluate each member of the given set of knowledges and propagate
+ the property of being insane accordingly
+ 
+ \pre  knowledgeSet contains all nodes of the current SCC
+ \post knowledgeSet is empty
+ 
+ \todo I think the name of this function is missleading, because the
+       "KnowledgeSet" is a SCC and we already have a function
+       evaluateCurrentSCC()
+*/
+inline void StoredKnowledge::evaluateKnowledgeSet(std::set<StoredKnowledge*>& knowledgeSet) {
+    // a temporary data structure to store the predecessor relation
+    std::map<StoredKnowledge*, std::set<StoredKnowledge*> > tempPredecessors;
+    
+    // if it is not a TSCC, we have to evaluate each member of the SCC
+    // first, we generate the predecessor relation between the members
+    for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
+        // for each successor which is part of the current SCC, register the predecessor
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if ((*iScc)->successors[l-1] != NULL and (*iScc)->successors[l-1] != empty and
+                knowledgeSet.find((*iScc)->successors[l-1]) != knowledgeSet.end()) {
+
+                tempPredecessors[(*iScc)->successors[l-1]].insert(*iScc);
+            }
+        }
+    }
+    
+    
+    // evaluate each member
+    while (not knowledgeSet.empty()) {
+        StoredKnowledge* currentKnowledge = *knowledgeSet.begin();
+        knowledgeSet.erase(knowledgeSet.begin());
+
+        if (currentKnowledge->is_sane and not currentKnowledge->sat()) {
+            currentKnowledge->is_sane = 0;
+
+            // tell each predecessor of current knowledge that this knowledge switched its status to insane
+            for (std::set<StoredKnowledge*>::const_iterator iter = tempPredecessors[currentKnowledge].begin();
+                                                            iter != tempPredecessors[currentKnowledge].end(); ++iter) {
+                knowledgeSet.insert(*iter);
+            }
+        } else if (args_info.lf_flag) {
+            currentKnowledge->is_final_reachable = 1;
+        }
+    }
+}
+
+
+/*!
+  move all transient markings to the end of the array and adjust size of the
+  markings array
 
   \post all deadlock markings can be found between index 0 and sizeDeadlockMarkings
  */
-void StoredKnowledge::rearrangeKnowledgeBubble() {
+inline void StoredKnowledge::rearrangeKnowledgeBubble() {
 
     // check the stored markings and remove all transient states
     unsigned int j = 0;
@@ -396,11 +293,7 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
         if (InnerMarking::inner_markings[inner[j]]->is_final and interface[j]->unmarked()) {
 
             // remember that this knowledge contains a final marking
-            is_final = 1;
-
-            // for analyzing wrt livelock freedom remember that from this knowledge a final knowledge is
-            // reachable ;-)
-            is_final_reachable = 1;
+            is_final = is_final_reachable = 1;
 
             // only if the final marking is not a waitstate, we're done
             if (not InnerMarking::inner_markings[inner[j]]->is_waitstate) {
@@ -421,14 +314,14 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
             }
         } else {
 
-            // case 3: a transient marking (was: !waitstate && !final)
+            // case 3: a transient marking
             transient = true;
         }
 
         // "hide" transient markings behind the end of the array
         if (transient) {
             InnerMarking_ID temp_inner = inner[j];
-            InterfaceMarking *temp_interface = interface[j];
+            InterfaceMarking* temp_interface = interface[j];
 
             inner[j] = inner[ sizeDeadlockMarkings-1 ];
             interface[j] = interface[ sizeDeadlockMarkings-1 ];
@@ -436,7 +329,7 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
             inner[ sizeDeadlockMarkings-1 ] = temp_inner;
             interface[ sizeDeadlockMarkings-1 ] = temp_interface;
 
-            --(sizeDeadlockMarkings);
+            --sizeDeadlockMarkings;
         } else {
             ++j;
         }
@@ -444,375 +337,19 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
 }
 
 
-/*!
- \param[in,out] file  the output stream to write the dot representation to
-
- \note  The empty node has the number 0 and is only drawn if the command line
-        parameter "--showEmptyNode" was given. For each node and receiving
-        label, we add an edge to the empty node if this edge is not present
-        before.
-
- \todo  Only print empty node if it is actually reachable.
-*/
-void StoredKnowledge::dot(std::ostream &file) {
-    file << "digraph G {\n"
-         << " node [fontname=\"Helvetica\" fontsize=10]\n"
-         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
-
-    // draw the nodes
-    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
-        for (size_t i = 0; i < it->second.size(); ++i) {
-            if ((it->second[i]->is_sane or args_info.diagnose_flag) and
-                (seen.find(it->second[i]) != seen.end())) {
-
-                string formula;
-                switch (args_info.formula_arg) {
-                    case(formula_arg_cnf): formula = it->second[i]->formula(); break;
-                    case(formula_arg_2bits): formula = it->second[i]->bits(); break;
-                    default: assert(false);
-                }
-                file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
-
-                if (args_info.diagnose_flag and not it->second[i]->is_sane) {
-                    file << "is not sane\\n";
-                }
-
-//                file << tarjanMapping[it->second[i]].first
-//                     << ", l:" << tarjanMapping[it->second[i]].second
-//                     << ", f:" << it->second[i]->is_final_reachable
-//                     << ", s:" << it->second[i]->is_sane
-//                     << "\\n";
-
-                if (args_info.showWaitstates_flag) {
-                    for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
-                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
-                        file << *(it->second[i]->interface[j]) << " (w)\\n";
-                    }
-                }
-
-                if (args_info.showTransients_flag) {
-                    for (unsigned int j = it->second[i]->sizeDeadlockMarkings; j < it->second[i]->sizeAllMarkings; ++j) {
-                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
-                        file << *(it->second[i]->interface[j]) << " (t)\\n";
-                    }
-                }
-
-                file << "\"]" << std::endl;
-
-                // draw the edges
-                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (it->second[i]->successors[l-1] != NULL and
-                        (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
-                        (args_info.showEmptyNode_flag or it->second[i]->successors[l-1] != empty)) {
-                        file << "\"" << it->second[i] << "\" -> \""
-                             << it->second[i]->successors[l-1]
-                             << "\" [label=\"" << PREFIX(l)
-                             << Label::id2name[l] << "\"]\n";
-                    }
-
-                    // draw edges to the empty node if requested
-                    if (args_info.showEmptyNode_flag and
-                        it->second[i]->successors[l-1] == empty) {
-                        emptyNodeReachable = true;
-                        file << "\"" << it->second[i] << "\" -> 0"
-                            << " [label=\"" << PREFIX(l)
-                            << Label::id2name[l] << "\"]\n";
-                    }
-                }
-            }
-        }
-    }
-
-    // draw the empty node if it is requested and reachable
-    if (args_info.showEmptyNode_flag and emptyNodeReachable) {
-        file << "0 [label=\"";
-        if (args_info.formula_arg == formula_arg_cnf) {
-            file << "true";
-        }
-        file << "\"]\n";
-
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            file << "0 -> 0 [label=\"" << PREFIX(l) << Label::id2name[l] << "\"]\n";
-        }
-    }
-
-    file << "}" << std::endl;
-}
-
-
-/*!
- \todo  Only print empty node if it is actually reachable.
-
- \bug   Final states must not have outgoing tau or sending events.
-*/
-void StoredKnowledge::print(std::ostream &file) const {
-    file << "  " << reinterpret_cast<unsigned long>(this);
-
-    if (args_info.sa_given) {
-        if (this == root and is_final) {
-            file << " : INITIAL, FINAL";
-        } else {
-            if (this == root) {
-                file << " : INITIAL";
-            }
-            if (is_final) {
-                file << " : FINAL";
-            }
-        }
-    } else {
-        switch (args_info.formula_arg) {
-            case(formula_arg_cnf): {
-                file << " : " << formula();
-                break;
-            }
-            case(formula_arg_2bits): {
-                string form(bits());
-                if (form != "") {
-                    file << " :: " << form;
-                }
-                break;
-            }
-            default: assert(false);
-        }
-    }
-
-    file << "\n";
-
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        if (successors[l-1] != NULL and
-            successors[l-1] != empty and
-            (seen.find(successors[l-1]) != seen.end())) {
-            file << "    " << Label::id2name[l] << " -> "
-                 << reinterpret_cast<unsigned long>(successors[l-1])
-                 << "\n";
-        } else {
-            if (successors[l-1] == empty and not args_info.sa_given) {
-                emptyNodeReachable = true;
-                file << "    " << Label::id2name[l] << " -> 0\n";
-            }
-        }
-    }
-}
-
-
-/*!
- \param[in,out] file  the output stream to write the OG to
-
- \note  Fiona identifies node numbers by integers. To avoid numbering of
-        nodes, the pointers are casted to integers. Though ugly, it still is
-        a valid numbering.
-*/
-void StoredKnowledge::output(std::ostream &file) {
-    file << "{\n  generator:    " << PACKAGE_STRING
-         << " (" << CONFIG_BUILDSYSTEM ")"
-         << "\n  invocation:   " << invocation << "\n  events:       "
-         << static_cast<unsigned int>(Label::send_events) << " send, "
-         << static_cast<unsigned int>(Label::receive_events) << " receive, "
-         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-         << "\n  statistics:   " << seen.size() << " nodes"
-         << "\n}\n\n";
-
-    file << "INTERFACE\n";
-
-    if (Label::receive_events > 0) {
-        file << "  INPUT\n    ";
-        bool first = true;
-        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (not first) {
-                file << ", ";
-            }
-            first = false;
-            file << Label::id2name[l];
-        }
-        file << ";\n";
-    }
-
-    if (Label::send_events > 0) {
-        file << "  OUTPUT\n    ";
-        bool first = true;
-        for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-            if (not first) {
-                file << ", ";
-            }
-            first = false;
-            file << Label::id2name[l];
-        }
-        file << ";\n";
-    }
-
-    if (Label::sync_events > 0) {
-        file << "  SYNCHRONOUS\n    ";
-        bool first = true;
-        for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
-            if (not first) {
-                file << ", ";
-            }
-            first = false;
-            file << Label::id2name[l];
-        }
-        file << ";\n";
-    }
-
-    file << "\nNODES\n";
-
-    // the root
-    root->print(file);
-
-    // all other nodes
-    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        if (*it != root) {
-            (*it)->print(file);
-        }
-    }
-
-    // print empty node unless we print an automaton
-    if (not args_info.sa_given and emptyNodeReachable) {
-        // the empty node
-        file << "  0";
-        if (args_info.formula_arg == formula_arg_cnf) {
-            file << " : true\n";
-        } else {
-            file << "\n";
-        }
-
-        // empty node loops
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            file << "    " << Label::id2name[l]  << " -> 0\n";
-        }
-    }
-}
-
-
-/*!
- \param[in,out] file  the output stream to write the OG to
-
- \note  Fiona identifies node numbers by integers. To avoid numbering of
-        nodes, the pointers are casted to integers. Though ugly, it still is
-        a valid numbering.
-
- \deprecated This is the old OG file format -- it is only kept here for
-             compatibility reasons.
-*/
-void StoredKnowledge::output_old(std::ostream &file) {
-    file << "{\n  generator:    " << PACKAGE_STRING
-         << " (" << CONFIG_BUILDSYSTEM ")"
-         << "\n  invocation:   " << invocation << "\n  events:       "
-         << static_cast<unsigned int>(Label::send_events) << " send, "
-         << static_cast<unsigned int>(Label::receive_events) << " receive, "
-         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-         << "\n  statistics:   " << seen.size() << " nodes"
-         << "\n}\n\n";
-
-    file << "INTERFACE\n";
-    file << "  INPUT\n";
-    bool first = true;
-    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-        if (not first) {
-            file << ",\n";
-        }
-        first = false;
-        file << "    " << Label::id2name[l];
-    }
-    file << ";\n";
-
-    file << "  OUTPUT\n";
-    first = true;
-    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (not first) {
-            file << ",\n";
-        }
-        first = false;
-        file << "    " << Label::id2name[l];
-    }
-    file << ";\n";
-
-    file << "\nNODES\n";
-
-    // the empty node
-    file << "  0 : ";
-    if (args_info.formula_arg == formula_arg_cnf) {
-        file << " true";
-    } else {
-        file << "-";
-    }
-
-    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        file << ",\n  " << reinterpret_cast<unsigned long>(*it) << " : ";
-
-        string formula;
-        switch (args_info.formula_arg) {
-            case(formula_arg_cnf): formula = (*it)->formula(); break;
-            case(formula_arg_2bits): formula = (*it)->bits(); break;
-            default: assert(false);
-        }
-        if (formula == "") {
-            formula = "-";
-        }
-        file << formula;
-    }
-    file << ";\n" << std::endl;
-
-    file << "INITIALNODE\n  "
-         << reinterpret_cast<unsigned long>(root) << ";\n\n";
-
-    file << "TRANSITIONS\n";
-    first = true;
-    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((*it)->successors[l-1] != NULL and
-                (*it)->successors[l-1] != empty and
-                (seen.find((*it)->successors[l-1]) != seen.end())) {
-
-                if (first) {
-                    first = false;
-                } else {
-                    file << ",\n";
-                }
-                file << "  " << reinterpret_cast<unsigned long>(*it) << " -> "
-                     << reinterpret_cast<unsigned long>((*it)->successors[l-1])
-                     << " : " << PREFIX(l) << Label::id2name[l];
-            } else {
-                // edges to the empty node
-                if ((*it)->successors[l-1] != NULL and (*it)->successors[l-1] == empty) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        file << ",\n";
-                    }
-                    file << "  " << reinterpret_cast<unsigned long>(*it) << " -> 0"
-                         << " : " << PREFIX(l) << Label::id2name[l];
-                }
-            }
-        }
-    }
-
-    // empty node loops
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        if (first) {
-            first = false;
-        } else {
-            file << ",\n";
-        }
-        file << "  0 -> 0 : " << PREFIX(l) << Label::id2name[l];
-    }
-
-    file << ";" << std::endl;
-}
-
-
-/***************
- * CONSTRUCTOR *
- ***************/
+/******************************************
+ * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
+ ******************************************/
 
 /*!
  \param[in] K  the knowledge to copy from
 */
-StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
-    is_final(0), is_sane(K->is_sane), sizeDeadlockMarkings(K->size), sizeAllMarkings(K->size), inner(NULL), interface(NULL),
-    successors(NULL), is_on_tarjan_stack(1),
-    is_final_reachable(0)
+StoredKnowledge::StoredKnowledge(Knowledge& K) :
+    is_final(0), is_final_reachable(0), is_sane(K.is_sane),
+    is_on_tarjan_stack(1), sizeDeadlockMarkings(K.size),
+    sizeAllMarkings(K.size), inner(NULL), interface(NULL), successors(NULL)
 {
-    assert(sizeAllMarkings != 0);
+    assert(sizeAllMarkings > 0);
 
     // reserve the necessary memory for the successors (fixed)
     successors = new StoredKnowledge*[Label::events];
@@ -829,7 +366,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
     size_t count = 0;
 
     // traverse the bubble and copy the markings into the C arrays
-    for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
+    for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K.bubble.begin(); pos != K.bubble.end(); ++pos) {
         for (size_t i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking
             inner[count] = pos->first;
@@ -837,7 +374,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
             interface[count] = new InterfaceMarking(*(pos->second[i]));
         }
 
-        stats.maxInterfaceMarkings = std::max(stats.maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
+        stats.maxInterfaceMarkings = MAXIMUM(stats.maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
     }
 
     // we must not forget a marking
@@ -845,9 +382,10 @@ StoredKnowledge::StoredKnowledge(const Knowledge* const K) :
 
     // check this knowledge for covering nodes
     if (args_info.cover_given) {
-        Cover::checkKnowledge(this, K->bubble);
+        Cover::checkKnowledge(this, K.bubble);
     }
 
+    // move waitstates to front of bubble
     rearrangeKnowledgeBubble();
 }
 
@@ -865,12 +403,27 @@ StoredKnowledge::~StoredKnowledge() {
     delete[] interface;
 
     delete[] inner;
+    delete[] successors;
 
     if (args_info.cover_given) {
         Cover::removeKnowledge(this);
     }
 
     tarjanMapping.erase(this);
+}
+
+
+void StoredKnowledge::finalize() {
+    unsigned int count = 0;
+
+    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+        for (size_t i = 0; i < it->second.size(); ++i) {
+            delete it->second[i];
+            ++count;
+        }
+    }
+
+    status("StoredKnowledge: deleted %d objects", count);
 }
 
 
@@ -881,7 +434,7 @@ StoredKnowledge::~StoredKnowledge() {
 /*!
  \deprecated This function is only needed for debug purposes.
  */
-std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
+std::ostream& operator<< (std::ostream& o, const StoredKnowledge& m) {
     o << m.hash() << ":\t";
 
     // traverse the bubble
@@ -899,12 +452,98 @@ std::ostream& operator<< (std::ostream &o, const StoredKnowledge &m) {
  ********************/
 
 /*!
-  \return a pointer to a knowledge stored in the hash tree -- it is either
+ adjust lowlink value of stored knowledge object according to Tarjan algorithm
+
+ \todo Daniela, please comment me
+*/
+inline void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK_store) const {
+    // successor node is not new
+    if (this != SK_store) {
+        if (SK_store->is_on_tarjan_stack) {
+            // but it is still on the stack, compare lowlink and dfs value
+            tarjanMapping[this].second = MINIMUM(tarjanMapping[this].second, tarjanMapping[SK_store].first);
+        }
+    } else {
+        // successor node is new, compare lowlink values
+        tarjanMapping[this].second = MINIMUM(tarjanMapping[this].second, tarjanMapping[SK_store].second);
+    }
+}
+
+
+/*!
+ if current knowledge is representative of an SCC then evaluate current SCC
+
+ \todo It seems as if the statistics can be integrated into the if after the
+       "check if (T)SCC is trivial" comment
+*/
+inline void StoredKnowledge::evaluateCurrentSCC() {
+    if (tarjanStack.empty()) {
+        return;
+    }
+
+    // check, if the current knowledge is a representative of a SCC
+    // if so, get all knowledges within the SCC
+    if (tarjanMapping[this].first == tarjanMapping[this].second) {
+
+        unsigned int numberOfSccElements = 0;
+
+        // node which has just been popped from Tarjan stack
+        StoredKnowledge* poppedSK;
+
+        // set of knowledges
+        // first used to store the whole SCC, then it is used as a set storing those
+        // knowledges that have to be evaluated again
+        std::set<StoredKnowledge*> knowledgeSet;
+
+        // found a TSCC
+        if (tarjanMapping[this].first > StoredKnowledge::bookmarkTSCC) {
+            StoredKnowledge::bookmarkTSCC = tarjanMapping[this].first;
+        }
+
+        // get (T)SCC
+        do {
+            // get and delete last element from stack
+            poppedSK = tarjanStack.back();
+            tarjanStack.pop_back();
+
+            // remember that we removed this knowledge from the Tarjan stack
+            poppedSK->is_on_tarjan_stack = 0;
+
+            // remember this knowledge to be part of the current (T)SCC
+            knowledgeSet.insert(poppedSK);
+
+            ++numberOfSccElements;
+        } while (this != poppedSK);
+
+
+        // check if (T)SCC is trivial
+        if (numberOfSccElements == 1) {
+            // check if every deadlock is resolved -> if not, this knowledge is definitely not sane
+            // deadlock freedom or livelock freedom will be treated in sat()
+            (*knowledgeSet.begin())->is_sane = (*knowledgeSet.begin())->sat();
+        } else if (numberOfSccElements > 1){
+            evaluateKnowledgeSet(knowledgeSet);
+        }
+
+        // statistics
+        if (numberOfSccElements == 1) {
+            ++stats.numberOfTrivialSCCs;
+        } else {
+            stats.maxSCCSize = MAXIMUM(stats.maxSCCSize, numberOfSccElements);
+            ++stats.numberOfNonTrivialSCCs;
+        }
+    }
+}
+
+
+/*!
+ \return a pointer to a knowledge stored in the hash tree -- it is either
          "this" if the knowledge was not found in the hash tree or a pointer
          to a previously stored knowledge. In the latter case, the calling
          function can detect the duplicate
  */
-StoredKnowledge *StoredKnowledge::store() {
+StoredKnowledge* StoredKnowledge::store() {
+    // we do not want to store the empty node
     assert (sizeAllMarkings != 0);
 
     // get the element's hash value
@@ -944,29 +583,20 @@ StoredKnowledge *StoredKnowledge::store() {
         ++stats.hashCollisions;
 
         // update maximal bucket size (we add 1 as we will store this object later)
-        stats.maxBucketSize = std::max(stats.maxBucketSize, hashTree[myHash].size() + 1);
+        stats.maxBucketSize = MAXIMUM(stats.maxBucketSize, hashTree[myHash].size() + 1);
     }
 
     // we need to store this object
     hashTree[myHash].push_back(this);
+    ++stats.storedKnowledges;
 
     tarjanMapping[this].first = tarjanMapping[this].second = stats.storedKnowledges;
 
     // put knowledge on the Tarjan stack
     tarjanStack.push_back(this);
 
-    ++stats.storedKnowledges;
-
     // we return a pointer to the this object since it was newly stored
     return this;
-}
-
-
-inline void StoredKnowledge::addSuccessor(const Label_ID &label, StoredKnowledge* const knowledge) {
-    // we will never store label 0 (tau) -- hence decrease the label
-    successors[label-1] = knowledge;
-
-    ++stats.storedEdges;
 }
 
 
@@ -978,6 +608,14 @@ inline hash_t StoredKnowledge::hash() const {
     }
 
     return result;
+}
+
+
+inline void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const knowledge) {
+    // we will never store label 0 (tau) -- hence decrease the label
+    successors[label-1] = knowledge;
+
+    ++stats.storedEdges;
 }
 
 
@@ -1058,6 +696,285 @@ bool StoredKnowledge::sat(const bool checkStack) const {
 
     // if we reach this line, every deadlock was resolved
     return true;
+}
+
+
+/*!
+ \post All nodes that are reachable from the initial node are added to the
+       set "seen".
+ */
+void StoredKnowledge::traverse() {
+    if (seen.insert(this).second) {
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if (successors[l-1] != NULL and successors[l-1] != empty and
+                (successors[l-1]->is_sane or args_info.diagnose_flag)) {
+                successors[l-1]->traverse();
+            }
+        }
+    }
+}
+
+
+/****************************************
+ * OUTPUT FUNCTIONS (STATIC AND MEMBER) *
+ ****************************************/
+
+/*!
+  \param[in,out] file  the output stream to write the OG to
+
+  \note Fiona identifies node numbers by integers. To avoid numbering of
+        nodes, the pointers are casted to integers. Though ugly, it still is
+        a valid numbering.
+ */
+void StoredKnowledge::output_og(std::ostream& file) {
+    file << "{\n  generator:    " << PACKAGE_STRING
+        << " (" << CONFIG_BUILDSYSTEM ")"
+        << "\n  invocation:   " << invocation << "\n  events:       "
+        << static_cast<unsigned int>(Label::send_events) << " send, "
+        << static_cast<unsigned int>(Label::receive_events) << " receive, "
+        << static_cast<unsigned int>(Label::sync_events) << " synchronous"
+        << "\n  statistics:   " << seen.size() << " nodes"
+        << "\n}\n\n";
+
+    file << "INTERFACE\n";
+
+    if (Label::receive_events > 0) {
+        file << "  INPUT\n    ";
+        bool first = true;
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            if (not first) {
+                file << ", ";
+            }
+            first = false;
+            file << Label::id2name[l];
+        }
+        file << ";\n";
+    }
+
+    if (Label::send_events > 0) {
+        file << "  OUTPUT\n    ";
+        bool first = true;
+        for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+            if (not first) {
+                file << ", ";
+            }
+            first = false;
+            file << Label::id2name[l];
+        }
+        file << ";\n";
+    }
+
+    if (Label::sync_events > 0) {
+        file << "  SYNCHRONOUS\n    ";
+        bool first = true;
+        for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+            if (not first) {
+                file << ", ";
+            }
+            first = false;
+            file << Label::id2name[l];
+        }
+        file << ";\n";
+    }
+
+    file << "\nNODES\n";
+
+     // the root
+    root->print(file);
+
+     // all other nodes
+    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        if (*it != root) {
+            (*it)->print(file);
+        }
+    }
+
+     // print empty node unless we print an automaton
+    if (not args_info.sa_given and emptyNodeReachable) {
+         // the empty node
+        file << "  0";
+        if (args_info.formula_arg == formula_arg_cnf) {
+            file << " : true\n";
+        } else {
+            file << "\n";
+        }
+
+         // empty node loops
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            file << "    " << Label::id2name[l]  << " -> 0\n";
+        }
+    }
+}
+
+
+/*!
+  \param[in,out] file  the output stream to write the OG to
+
+  \note Fiona identifies node numbers by integers. To avoid numbering of
+        nodes, the pointers are casted to integers. Though ugly, it still is
+        a valid numbering.
+
+  \deprecated This is the old OG file format -- it is only kept here for
+              compatibility reasons and to test generated operating
+              guidelines.
+ */
+void StoredKnowledge::output_ogold(std::ostream& file) {
+    file << "{\n  generator:    " << PACKAGE_STRING
+        << " (" << CONFIG_BUILDSYSTEM ")"
+        << "\n  invocation:   " << invocation << "\n  events:       "
+        << static_cast<unsigned int>(Label::send_events) << " send, "
+        << static_cast<unsigned int>(Label::receive_events) << " receive, "
+        << static_cast<unsigned int>(Label::sync_events) << " synchronous"
+        << "\n  statistics:   " << seen.size() << " nodes"
+        << "\n}\n\n";
+
+    file << "INTERFACE\n";
+    file << "  INPUT\n";
+    bool first = true;
+    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+        if (not first) {
+            file << ",\n";
+        }
+        first = false;
+        file << "    " << Label::id2name[l];
+    }
+    file << ";\n";
+
+    file << "  OUTPUT\n";
+    first = true;
+    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+        if (not first) {
+            file << ",\n";
+        }
+        first = false;
+        file << "    " << Label::id2name[l];
+    }
+    file << ";\n";
+
+    file << "\nNODES\n";
+
+     // the empty node
+    file << "  0 : ";
+    if (args_info.formula_arg == formula_arg_cnf) {
+        file << " true";
+    } else {
+        file << "-";
+    }
+
+    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        file << ",\n  " << reinterpret_cast<size_t>(*it) << " : ";
+
+        string formula;
+        switch (args_info.formula_arg) {
+            case(formula_arg_cnf): formula = (*it)->formula(); break;
+            case(formula_arg_2bits): formula = (*it)->bits(); break;
+            default: assert(false);
+        }
+        if (formula == "") {
+            formula = "-";
+        }
+        file << formula;
+    }
+    file << ";\n" << std::endl;
+
+    file << "INITIALNODE\n  "
+        << reinterpret_cast<size_t>(root) << ";\n\n";
+
+    file << "TRANSITIONS\n";
+    first = true;
+    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if ((*it)->successors[l-1] != NULL and
+                (*it)->successors[l-1] != empty and
+            (seen.find((*it)->successors[l-1]) != seen.end())) {
+
+                if (first) {
+                    first = false;
+                } else {
+                    file << ",\n";
+                }
+                file << "  " << reinterpret_cast<size_t>(*it) << " -> "
+                    << reinterpret_cast<size_t>((*it)->successors[l-1])
+                    << " : " << PREFIX(l) << Label::id2name[l];
+            } else {
+                // edges to the empty node
+                if ((*it)->successors[l-1] != NULL and (*it)->successors[l-1] == empty) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        file << ",\n";
+                    }
+                    file << "  " << reinterpret_cast<size_t>(*it) << " -> 0"
+                        << " : " << PREFIX(l) << Label::id2name[l];
+                }
+            }
+        }
+    }
+
+    // empty node loops
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        if (first) {
+            first = false;
+        } else {
+            file << ",\n";
+        }
+        file << "  0 -> 0 : " << PREFIX(l) << Label::id2name[l];
+    }
+
+    file << ";" << std::endl;
+}
+
+
+/*!
+  \bug Final states should not have outgoing tau or sending events.
+ */
+void StoredKnowledge::print(std::ostream& file) const {
+    file << "  " << reinterpret_cast<size_t>(this);
+
+    if (args_info.sa_given) {
+        if (this == root and is_final) {
+            file << " : INITIAL, FINAL";
+        } else {
+            if (this == root) {
+                file << " : INITIAL";
+            }
+            if (is_final) {
+                file << " : FINAL";
+            }
+        }
+    } else {
+        switch (args_info.formula_arg) {
+            case(formula_arg_cnf): {
+                file << " : " << formula();
+                break;
+            }
+            case(formula_arg_2bits): {
+                string form(bits());
+                if (form != "") {
+                    file << " :: " << form;
+                }
+                break;
+            }
+            default: assert(false);
+        }
+    }
+
+    file << "\n";
+
+    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+        if (successors[l-1] != NULL and
+            successors[l-1] != empty and
+        (seen.find(successors[l-1]) != seen.end())) {
+            file << "    " << Label::id2name[l] << " -> "
+                << reinterpret_cast<size_t>(successors[l-1])
+                << "\n";
+        } else {
+            if (successors[l-1] == empty and not args_info.sa_given) {
+                emptyNodeReachable = true;
+                file << "    " << Label::id2name[l] << " -> 0\n";
+            }
+        }
+    }
 }
 
 
@@ -1207,30 +1124,102 @@ string StoredKnowledge::bits() const {
 
 
 /*!
- \post All nodes that are reachable from the initial node are added to the
-       set "seen".
- */
-void StoredKnowledge::traverse() {
-    if (seen.insert(this).second) {
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if (successors[l-1] != NULL and successors[l-1] != empty and
-                (successors[l-1]->is_sane or args_info.diagnose_flag)) {
-                successors[l-1]->traverse();
+  \param[in,out] file  the output stream to write the dot representation to
+
+  \note  The empty node has the number 0 and is only drawn if the command line
+         parameter "--showEmptyNode" was given. For each node and receiving
+         label, we add an edge to the empty node if this edge is not present
+         before.
+*/
+void StoredKnowledge::output_dot(std::ostream& file) {
+    file << "digraph G {\n"
+        << " node [fontname=\"Helvetica\" fontsize=10]\n"
+        << " edge [fontname=\"Helvetica\" fontsize=10]\n";
+
+     // draw the nodes
+    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+        for (size_t i = 0; i < it->second.size(); ++i) {
+            if ((it->second[i]->is_sane or args_info.diagnose_flag) and
+            (seen.find(it->second[i]) != seen.end())) {
+
+                string formula;
+                switch (args_info.formula_arg) {
+                    case(formula_arg_cnf): formula = it->second[i]->formula(); break;
+                    case(formula_arg_2bits): formula = it->second[i]->bits(); break;
+                    default: assert(false);
+                }
+                file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
+
+                if (args_info.diagnose_flag and not it->second[i]->is_sane) {
+                    file << "is not sane\\n";
+                }
+
+                if (args_info.showWaitstates_flag) {
+                    for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
+                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
+                        file << *(it->second[i]->interface[j]) << " (w)\\n";
+                    }
+                }
+
+                if (args_info.showTransients_flag) {
+                    for (unsigned int j = it->second[i]->sizeDeadlockMarkings; j < it->second[i]->sizeAllMarkings; ++j) {
+                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
+                        file << *(it->second[i]->interface[j]) << " (t)\\n";
+                    }
+                }
+
+                file << "\"]" << std::endl;
+
+                 // draw the edges
+                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+                    if (it->second[i]->successors[l-1] != NULL and
+                        (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
+                    (args_info.showEmptyNode_flag or it->second[i]->successors[l-1] != empty)) {
+                        file << "\"" << it->second[i] << "\" -> \""
+                            << it->second[i]->successors[l-1]
+                            << "\" [label=\"" << PREFIX(l)
+                            << Label::id2name[l] << "\"]\n";
+                    }
+
+                     // draw edges to the empty node if requested
+                    if (args_info.showEmptyNode_flag and
+                    it->second[i]->successors[l-1] == empty) {
+                        emptyNodeReachable = true;
+                        file << "\"" << it->second[i] << "\" -> 0"
+                            << " [label=\"" << PREFIX(l)
+                            << Label::id2name[l] << "\"]\n";
+                    }
+                }
             }
         }
     }
+
+     // draw the empty node if it is requested and reachable
+    if (args_info.showEmptyNode_flag and emptyNodeReachable) {
+        file << "0 [label=\"";
+        if (args_info.formula_arg == formula_arg_cnf) {
+            file << "true";
+        }
+        file << "\"]\n";
+
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            file << "0 -> 0 [label=\"" << PREFIX(l) << Label::id2name[l] << "\"]\n";
+        }
+    }
+
+    file << "}" << std::endl;
 }
 
 
-void StoredKnowledge::migration(std::ostream& o) {
+void StoredKnowledge::output_migration(std::ostream& o) {
     map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > > migrationInfo;
 
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         // traverse the bubble
         for (unsigned int i = 0; i < (*it)->sizeAllMarkings; ++i) {
             InnerMarking_ID inner = (*it)->inner[i];
-            InterfaceMarking *interface = (*it)->interface[i];
-            StoredKnowledge *knowledge = *it;
+            InterfaceMarking* interface = (*it)->interface[i];
+            StoredKnowledge* knowledge = *it;
 
             migrationInfo[inner][knowledge].insert(interface);
         }
@@ -1254,7 +1243,7 @@ void StoredKnowledge::migration(std::ostream& o) {
 
             // iterate the knowledge bubbles
             for (set<InterfaceMarking*>::iterator it3 = it2->second.begin(); it3 != it2->second.end(); ++it3) {
-                o << (unsigned long) it1->first << " " << (unsigned long) it2->first << " " << **it3 << "\n";
+                o << (size_t) it1->first << " " << (size_t) it2->first << " " << **it3 << "\n";
             }
         }
         o << std::flush;
@@ -1262,3 +1251,4 @@ void StoredKnowledge::migration(std::ostream& o) {
 
     o << std::flush;
 }
+

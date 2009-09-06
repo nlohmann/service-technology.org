@@ -22,28 +22,14 @@
 #include <cassert>
 
 #include <set>
-#include <string>
-#include <iostream>
 #include "Knowledge.h"
-#include "Label.h"
 #include "cmdline.h"
 
 using std::map;
 using std::vector;
 using std::set;
-using std::string;
 
 extern gengetopt_args_info args_info;
-
-Knowledge::_stats Knowledge::stats;
-
-
-/********************
- * STATIC FUNCTIONS *
- ********************/
-
-/// constructor for the _stats struct
-Knowledge::_stats::_stats() {}
 
 
 /***************
@@ -51,7 +37,6 @@ Knowledge::_stats::_stats() {}
  ***************/
 
 Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1) {
-
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     std::queue<FullMarking> todo;
@@ -71,17 +56,17 @@ Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1) {
 /*!
  \note no action in this constructor can introduce a duplicate
 */
-Knowledge::Knowledge(const Knowledge* const parent, const Label_ID &label) : is_sane(1), size(0) {
+Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1), size(0) {
     // tau does not make sense here
     assert(not SILENT(label));
 
     // CASE 1: we receive -- decrement interface markings
     if (RECEIVING(label)) {
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
             for (size_t i = 0; i < pos->second.size(); ++i) {
                 // copy an interface marking from the parent and decrement it
                 bool result = true;
-                InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]), label, false, result);
+                InterfaceMarking* interface = new InterfaceMarking(*(pos->second[i]), label, false, result);
 
                 // analyze the result of the copying
                 if (result) {
@@ -100,14 +85,14 @@ Knowledge::Knowledge(const Knowledge* const parent, const Label_ID &label) : is_
     if (SENDING(label)) {
         std::queue<FullMarking> todo;
 
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             bool receiver = (InnerMarking::receivers[label].find(pos->first) != InnerMarking::receivers[label].end());
 
             for (size_t i = 0; i < pos->second.size(); ++i) {
                 // copy an interface marking from the parent and increment it
                 bool result = true;
-                InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]), label, true, result);
+                InterfaceMarking* interface = new InterfaceMarking(*(pos->second[i]), label, true, result);
 
                 // analyze the result of the copying
                 if (result) {
@@ -136,15 +121,15 @@ Knowledge::Knowledge(const Knowledge* const parent, const Label_ID &label) : is_
     if (SYNC(label)) {
         std::queue<FullMarking> todo;
 
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
 
                 for (size_t i = 0; i < pos->second.size(); ++i) {
                     // copy the interface marking (won't change during synchronization)
-                    InterfaceMarking *interface = new InterfaceMarking(*(pos->second[i]));
+                    InterfaceMarking* interface = new InterfaceMarking(*(pos->second[i]));
 
-                    InnerMarking *m = InnerMarking::inner_markings[pos->first];
+                    InnerMarking* m = InnerMarking::inner_markings[pos->first];
                     for (uint8_t j = 0; j < m->out_degree; ++j) {
                         if (m->labels[j] == label) {
                             // check the marking reached by synchronization
@@ -195,7 +180,7 @@ Knowledge::~Knowledge() {
 
  \todo sort bubble
 */
-inline void Knowledge::closure(std::queue<FullMarking> &todo) {
+inline void Knowledge::closure(std::queue<FullMarking>& todo) {
     // to collect markings that were/are already considered
     set<FullMarking> considered;
 
@@ -210,7 +195,7 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
         }
 
         // process successors of the current marking
-        InnerMarking *m = InnerMarking::inner_markings[current.inner];
+        InnerMarking* m = InnerMarking::inner_markings[current.inner];
 
         // check, if each sent message contained on the interface of this marking will ever be consumed
         if (args_info.smartSendingEvent_flag and not m->sentMessagesConsumed(current.interface)) {
@@ -261,7 +246,7 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
                 }
             }
             if (not candidateFound) {
-                InterfaceMarking *copy = new InterfaceMarking(candidate.interface);
+                InterfaceMarking* copy = new InterfaceMarking(candidate.interface);
                 bubble[candidate.inner].push_back(copy);
                 ++size;
                 todo.push(candidate);
@@ -277,7 +262,7 @@ inline void Knowledge::closure(std::queue<FullMarking> &todo) {
  \return whether the knowledge contains a waitstate that can be resolved by
          label l (synchronous or send)
 */
-bool Knowledge::resolvableWaitstate(const Label_ID &l) const {
+bool Knowledge::resolvableWaitstate(const Label_ID& l) const {
     assert (not RECEIVING(l));
 
     for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
@@ -335,11 +320,14 @@ bool Knowledge::receivingHelps() const {
 
 
 /*!
- \param  consideredReceivingEvents remember only those receiving event which are essential to resolve each and every waitstate
- \brief  before traversing through each and every receiving event, we first check
-         which receiving events are essentially needed to resolve every waitstate of the current bubble
+ before traversing through each and every receiving event, we first check
+ which receiving events are essentially needed to resolve every waitstate
+ of the current bubble
+
+ \param  consideredReceivingEvents remember only those receiving event which
+         are essential to resolve each and every waitstate
 */
-void Knowledge::sequentializeReceivingEvents(map<Label_ID, bool> & consideredReceivingEvents) const {
+void Knowledge::sequentializeReceivingEvents(std::map<Label_ID, bool>& consideredReceivingEvents) const {
 
     // count the number that a receiving event is activated
     map<Label_ID, unsigned int> occuranceOfReceivingEvent;

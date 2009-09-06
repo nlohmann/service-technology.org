@@ -174,7 +174,7 @@ int main(int argc, char** argv) {
     try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
-            std::cin >> pnapi::io::owfn >> *(InnerMarking::net);
+            std::cin >> pnapi::io::owfn >> *InnerMarking::net;
         } else {
             // strip suffix from input filename
             filename = string(args_info.inputs[0]).substr(0,string(args_info.inputs[0]).find_last_of("."));
@@ -184,7 +184,7 @@ int main(int argc, char** argv) {
                 abort(1, "could not open file '%s'", args_info.inputs[0]);
             }
             inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-                        >> pnapi::io::owfn >> *(InnerMarking::net);
+                        >> pnapi::io::owfn >> *InnerMarking::net;
         }
         if (args_info.verbose_flag) {
             std::ostringstream s;
@@ -192,9 +192,9 @@ int main(int argc, char** argv) {
             status("read net: %s", s.str().c_str());
         }
     } catch (pnapi::io::InputError error) {
-        std::stringstream temp;
-        temp << error;
-        abort(2, "\b%s", temp.str().c_str());
+        std::stringstream s;
+        s << error;
+        abort(2, "\b%s", s.str().c_str());
     }
 
     // "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
@@ -221,23 +221,21 @@ int main(int argc, char** argv) {
     /*----------------------------.
     | 3. read cover file if given |
     `----------------------------*/
-    if(args_info.cover_given) {
-      if(args_info.cover_arg) {
-        cover_in = fopen(args_info.cover_arg, "r");
-        if(cover_in == NULL) {
-            abort(15, "could not open cover file '%s'", args_info.cover_arg);
-        }
-        cover_parse();
-        fclose(cover_in);
+    if (args_info.cover_given) {
+        if (args_info.cover_arg) {
+            cover_in = fopen(args_info.cover_arg, "r");
+            if (cover_in == NULL) {
+                abort(15, "could not open cover file '%s'", args_info.cover_arg);
+            }
+            cover_parse();
+            fclose(cover_in);
 
-        status("read cover file '%s'", args_info.cover_arg);
-      }
-      else
-      {
-        Cover::coverAll();
-        status("covering all nodes");
-      }
-      status("%d nodes to cover", Cover::nodeCount);
+            status("read cover file '%s'", args_info.cover_arg);
+        } else {
+            Cover::coverAll();
+            status("covering all nodes");
+        }
+        status("%d nodes to cover", Cover::nodeCount);
     }
 
 
@@ -245,7 +243,7 @@ int main(int argc, char** argv) {
     | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
     Output temp;
-    temp.os << pnapi::io::lola << *InnerMarking::net;
+    temp.stream() << pnapi::io::lola << *InnerMarking::net;
 
 
     /*------------------------------------------.
@@ -269,7 +267,7 @@ int main(int argc, char** argv) {
 
     // read from a pipe or from a file (MinGW cannot pipe)
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(CYGWIN_MINGW)
-    string command_line = lola_command + " " + temp.filename + " -M 2> /dev/null";
+    string command_line = lola_command + " " + temp.name() + " -M 2> /dev/null";
     status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
@@ -298,8 +296,7 @@ int main(int argc, char** argv) {
     | 6. organize reachability graph |
     `-------------------------------*/
     InnerMarking::initialize();
-    delete InnerMarking::net;
-    if(args_info.cover_given) {
+    if (args_info.cover_given) {
         Cover::clear();
     }
 
@@ -310,14 +307,15 @@ int main(int argc, char** argv) {
     | 7. calculate knowledge bubbles |
     `-------------------------------*/
     time(&start_time);
-    Knowledge *K0 = new Knowledge(0);
-    StoredKnowledge::root = new StoredKnowledge(K0);
-    StoredKnowledge::root->store();
+    {
+        Knowledge K0(0);
+        StoredKnowledge::root = new StoredKnowledge(K0);
 
-    if (StoredKnowledge::root->is_sane) {
-        StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
+        if (StoredKnowledge::root->is_sane) {
+            StoredKnowledge::root->store();
+            StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
+        }
     }
-    delete K0;
     time(&end_time);
 
     // statistics output
@@ -328,14 +326,14 @@ int main(int argc, char** argv) {
         (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats.maxBucketSize));
     status("at most %d interface markings per inner marking",
         StoredKnowledge::stats.maxInterfaceMarkings);
-    status("calculated %d trivial sccs",
+    status("calculated %d trivial SCCs",
         StoredKnowledge::stats.numberOfTrivialSCCs);
-    status("calculated %d non-trivial sccs, at most %d members in nontrivial scc",
+    status("calculated %d non-trivial SCCs, at most %d members in nontrivial SCC",
         StoredKnowledge::stats.numberOfNonTrivialSCCs, StoredKnowledge::stats.maxSCCSize);
 
     // traverse all nodes reachable from the root
     StoredKnowledge::root->traverse();
-    status("%d nodes left", StoredKnowledge::seen.size());
+    status("%d sane nodes reachable", StoredKnowledge::seen.size());
 
 
     // analyze root node and print result
@@ -345,7 +343,7 @@ int main(int argc, char** argv) {
     /*-------------------------------.
     | 8. calculate cover constraint |
     `--------------------------------*/
-    if(args_info.cover_given) {
+    if (args_info.cover_given) {
         Cover::calculate(StoredKnowledge::seen);
 
         message("cover constraint is satisfiable: %s", (Cover::satisfiable) ? "YES" : "NO");
@@ -361,15 +359,15 @@ int main(int argc, char** argv) {
         Output output(og_filename, "operating guidelines");
 
         if (args_info.fionaFormat_flag) {
-            StoredKnowledge::output_old(output.os);
+            StoredKnowledge::output_ogold(output);
         } else {
-            StoredKnowledge::output(output.os);
+            StoredKnowledge::output_og(output);
         }
 
-        if(args_info.cover_given) {
+        if (args_info.cover_given) {
             string cover_filename = og_filename + ".cover";
             Output cover_output(cover_filename, "cover constraint");
-            Cover::write(cover_output.os);
+            Cover::write(cover_output);
         }
     }
 
@@ -377,14 +375,14 @@ int main(int argc, char** argv) {
     if (args_info.sa_given) {
         string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
         Output output(sa_filename, "service automaton");
-        StoredKnowledge::output(output.os);
+        StoredKnowledge::output_og(output);
     }
 
     // dot output
     if (args_info.dot_given) {
         string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
         Output output(dot_filename, "dot representation");
-        StoredKnowledge::dot(output.os);
+        StoredKnowledge::output_dot(output);
     }
 
     // migration output
@@ -393,11 +391,24 @@ int main(int argc, char** argv) {
         Output output(im_filename, "migration information");
 
         time(&start_time);
-        StoredKnowledge::migration(output.os);
+        StoredKnowledge::output_migration(output);
         time(&end_time);
 
         status("wrote migration information to file '%s' [%.0f sec]",
             im_filename.c_str(), difftime(end_time, start_time));
+    }
+
+
+    /*-------------------.
+    | 10. release memory |
+    `-------------------*/
+    if (args_info.finalize_flag) {
+        time(&start_time);
+        cmdline_parser_free(&args_info);
+        InnerMarking::finalize();
+        StoredKnowledge::finalize();
+        time(&end_time);
+        status("released memory [%.0f sec]", difftime(end_time, start_time));
     }
 
     return EXIT_SUCCESS;

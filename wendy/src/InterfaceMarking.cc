@@ -86,7 +86,7 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
     if (interface_length == 0) {
         return;
     }
-    
+
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -100,7 +100,7 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
     }
 }
 
-InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
+InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) {
     // if no (asynchronous) events are present, we are done here
     if (interface_length == 0) {
         return;
@@ -141,7 +141,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking &other) {
                           (message bound violation) or decrement (no message
                           present) 
  */
-InterfaceMarking::InterfaceMarking(const InterfaceMarking &other, const Label_ID &label, const bool &increase, bool &success) {
+InterfaceMarking::InterfaceMarking(const InterfaceMarking& other, const Label_ID& label, const bool& increase, bool& success) {
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -182,7 +182,7 @@ InterfaceMarking::~InterfaceMarking() {
  * OPERATORS *
  *************/
 
-bool InterfaceMarking::operator< (const InterfaceMarking &other) const {
+bool InterfaceMarking::operator< (const InterfaceMarking& other) const {
     for (size_t i = 0; i < bytes; ++i) {
         if (storage[i] < other.storage[i]) {
             return true;
@@ -192,7 +192,7 @@ bool InterfaceMarking::operator< (const InterfaceMarking &other) const {
     return false;
 }
 
-bool InterfaceMarking::operator!= (const InterfaceMarking &other) const {
+bool InterfaceMarking::operator!= (const InterfaceMarking& other) const {
     for (size_t i = 0; i < bytes; ++i) {
         if (storage[i] != other.storage[i]) {
             return true;
@@ -202,7 +202,7 @@ bool InterfaceMarking::operator!= (const InterfaceMarking &other) const {
     return false;
 }
 
-bool InterfaceMarking::operator== (const InterfaceMarking &other) const {
+bool InterfaceMarking::operator== (const InterfaceMarking& other) const {
     for (size_t i = 0; i < bytes; ++i) {
         if (storage[i] != other.storage[i]) {
             return false;
@@ -212,7 +212,7 @@ bool InterfaceMarking::operator== (const InterfaceMarking &other) const {
     return true;
 }
 
-std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
+std::ostream& operator<< (std::ostream& o, const InterfaceMarking& m) {
     o << "[";
     for (Label_ID l = 1; l <= m.interface_length; ++l) {
         if (l != 1) {
@@ -228,7 +228,7 @@ std::ostream& operator<< (std::ostream &o, const InterfaceMarking &m) {
  * MEMBER METHODS *
  ******************/
 
-uint8_t InterfaceMarking::get(const Label_ID &label) const {
+uint8_t InterfaceMarking::get(const Label_ID& label) const {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -250,7 +250,7 @@ uint8_t InterfaceMarking::get(const Label_ID &label) const {
 /*!
  \return whether the message bound was respected (false means violation)
  */
-bool InterfaceMarking::inc(const Label_ID &label) {
+bool InterfaceMarking::inc(const Label_ID& label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -286,7 +286,7 @@ bool InterfaceMarking::inc(const Label_ID &label) {
 /*!
  \return whether the result is positive (false means decrement of 0)
  */
-bool InterfaceMarking::dec(const Label_ID &label) {
+bool InterfaceMarking::dec(const Label_ID& label) {
     assert(label > 0);
     assert(label <= interface_length);
 
@@ -335,7 +335,7 @@ bool InterfaceMarking::unmarked() const {
 /*
  \return whether the interface is marked at the given label
 */
-bool InterfaceMarking::marked(const Label_ID &label) const {
+bool InterfaceMarking::marked(const Label_ID& label) const {
     assert(label > 0);
     assert(label <= interface_length);
 

@@ -1,7 +1,7 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Wendy:"
-purpose "Wendy is a tool to synthesize partners for services."
+purpose "Wendy is a tool to synthesize partners for services.\n\n  Report bugs to wendy@service-technology.org.\n  Visit Wendy's home page at http://service-technology.org/wendy"
 
 
 section "Analysis Task"
@@ -38,13 +38,15 @@ option "sa" -
 
 option "dot" -
   "Graphviz dot output."
+  details="You can pipe directly into dot by calling `wendy net.owfn --dot=- | dot'\n"
   string
   typestr="FILENAME"
   argoptional
   optional
 
 option "im" -
-  "Instance migration information output. This option is used when Mia calls Wendy."
+  "Instance migration information output."
+  details="This option is used when Mia calls Wendy.\n"
   string
   typestr="FILENAME"
   argoptional
@@ -58,7 +60,7 @@ option "mi" -
   argoptional
   optional
 
-option "cover" -
+  option "cover" -
   "Generate cover operating guidelines, reading a specification from a given file. If no file is given, all nodes will be covered."
   dependon="og"
   string
@@ -71,15 +73,15 @@ section "General Options"
 sectiondesc="These options control the calculation of the operating guidelines as well as the style the operating guidelines are represented.\n"
 
 option "messagebound" m
-  "Set the message bound (i.e., the maximal number of messages per channel)."
-  details="Values within the range of 1..255 are allowed.\n"
+  "Set the message bound."
+  details="The message bound sets the maximal number of messages per channel. Values within the range of 1..255 are allowed.\n"
   int
   typestr="BOUND"
   default="1"
   optional
 
 option "formula" -
-  "Select the style of formula to be used in outputs."
+  "Set the formula style for outputs."
   details="Choose between either standard formulae in conjunctive normal form (`cnf') or a compact 2-bit-representation (`2bits'). Note that the 2-bit-representation cannot be used if synchronous communication occurs in the input file.\n"
   values="cnf","2bits" enum
   typestr="STYLE"
@@ -92,19 +94,19 @@ section "Dot Options"
 sectiondesc="These options control the graphical representation of the calculated operating guideline. It has no effect on other files.\n"
 
 option "showEmptyNode" -
-  "Show the empty node in Dot output."
+  "Show the empty node."
   details="The empty node is a knowledge that is unreachable (hence empty), but plays an important role when matching a service with the operating guidelines or deciding substitutability. The empty node is always written to `.og' files, but is optional for `.dot' files.\n"
   dependon="dot"
   flag off
 
 option "showWaitstates" -
-  "Show waitstates in Dot output."
+  "Show waitstates."
   details="A waitstate is a state that the net can only leave with an asynchronous receive event or a synchronous event. Waitstates help to understand how the CNF formulas are constructed.\n"
   dependon="dot"
   flag off
 
 option "showTransients" -
-  "Show transient states in Dot output."
+  "Show transient states."
   details="A transient state is a state that enables a transition.\n"
   dependon="dot"
   flag off
@@ -124,28 +126,28 @@ sectiondesc="These options control the reductions Wendy uses while synthesizing 
 
 option "waitstatesOnly" -
   "Only consider waitstates when calculating successors."
-  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent.\n"
   flag off
 
 option "receiveBeforeSend" -
   "Only send if receiving does not resolve all waitstates."
-  details="This rule will consider exactly those sending events that are absolutely necessary. That is, using this rule will create `arrogant' partners which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  details="This rule will consider exactly those sending events that are absolutely necessary. That is, using this rule will create `arrogant' partners which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise.\n"
   flag off
 
 option "seqReceivingEvents" -
   "Sequentialize receiving events."
-  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstate. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  details="This rule determines which activated receiving events will actually be considered and thus might lessen the number of receiving events followed at a particular knowledge. It is ensured that the set of activated receiving events will resolve every waitstate.\n"
   flag off
 
 option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
-  details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated.\n"
   hidden
   flag off
 
 option "quitAsSoonAsPossible" -
   "Once all waitstates of a knowledge are resolved no more successor knowledges are calculated."
-  details="Once all waitstates of a knowledge are resolved no more successor knowledges are calculated. Note this rule does not preserve all partners, but will return a partner if one exists.\n"
+  details="Once all waitstates of a knowledge are resolved no more successor knowledges are calculated.\n"
   hidden
   flag off
 
@@ -154,8 +156,8 @@ section "Debugging"
 sectiondesc="These options control how much debug output Wendy creates. The more debug output is used, the slower Wendy runs.\n"
 
 option "verbose" v
-  "Show verbose information on the several intermediate steps"
-  details="Note this option might slow down the execution.\n"
+  "Show verbose messages."
+  details="Show verbose information on the several intermediate steps. Note this option might slow down the execution.\n"
   flag off
 
 option "diagnose" -
@@ -177,19 +179,26 @@ option "bug" -
   flag off
   hidden
 
+option "finalize" -
+  "Release all allocated memory."
+  details="This option calls the destructors of all objects that have been created by Wendy. This is usually not necessary, because the operating system cleans up once Wendy terminates. However, this option can be used to detect memory leaks.\n"
+  flag off
+  hidden
+
 
 section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"
 
 option "config" c
   "Read configuration from file."
-  details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed."
+  details="If no file is given, Wendy first tries to parse file `wendy.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Wendy was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed.\n"
   string
   typestr="FILE"
   optional
 
 option "lola" -
-  "The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'."
+  "Set the path and binary of LoLA."
+  details="The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'.\n"
   string
   typestr="FILENAME"
   default="lola-statespace"
@@ -197,16 +206,15 @@ option "lola" -
   hidden
 
 option "tmpfile" -
-  "The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string."
+  "Set the path and name of temporary files"
+  details="The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
   default="/tmp/wendy-XXXXXX"
   optional
   hidden
 
-option "clean" -
-  "Any temporary files created by Wendy are deleted once they are not used any more."
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
   flag off
-
-
-text "Report bugs to wendy@service-technology.org. Wendy's home page: http://service-technology.org/wendy"

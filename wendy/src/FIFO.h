@@ -84,6 +84,12 @@ class InterfaceMarking {
         /// decrements the value at the given label
         bool dec(const Label_ID);
 
+        /// increments the value at the given label
+        bool incIn(const Label_ID);
+
+        /// decrements the value at the given label
+        bool decOut(const Label_ID);
+
         /// returns whether the whole interface is unmarked
         bool unmarked() const;
 
@@ -96,7 +102,10 @@ class InterfaceMarking {
     private: /* member attributes */
 
         /// the InterfaceMarking queue
-        std::queue<Label_ID> storage;
+        std::queue<Label_ID> in_queue;
+
+        /// the InterfaceMarking queue
+        std::queue<Label_ID> out_queue;
 };
 
 #endif

@@ -21,12 +21,13 @@
 #ifndef _POSSIBLESENDEVENTS_H
 #define _POSSIBLESENDEVENTS_H
 
-#include "Label.h"
+#include "types.h"
 
 /*!
  \brief storage for sending events reachable by an inner marking, every possible sending event is either set to 0 or 1
  */
 class PossibleSendEvents {
+
     public: /* static functions */
 
         /// initializes the class PossibleSendEvents
@@ -61,15 +62,15 @@ class PossibleSendEvents {
         void labelPossible(Label_ID l);
 
         /// returns array of all sending events (possible or not)
-        char * decode();
+        char* decode();
 
     private: /* member functions */
 
         /// a byte array to store the possible sending events
-        uint8_t *storage;
+        uint8_t* storage;
 
         /// array of all sending events (possible or not); built by decode()
-        char * decodedLabels;
+        char* decodedLabels;
 };
 
 #endif

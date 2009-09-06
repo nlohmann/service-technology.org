@@ -36,7 +36,7 @@ FullMarking::FullMarking(InnerMarking_ID _inner, InterfaceMarking _interface) :
  * OPERATORS *
  *************/
 
-bool FullMarking::operator< (const FullMarking &other) const {
+bool FullMarking::operator< (const FullMarking& other) const {
     // first compare inner markings
     if (inner < other.inner) {
         return true;

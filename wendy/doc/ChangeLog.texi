@@ -1,4 +1,4 @@
-@heading Version 2.1-unreleased
+@heading Version 2.1 (6 September 2009)
 @itemize
 @item fixed (known) issues concerning reduction rule ``succeeding sending event'' (parameter: @option{--succeedingSendingEvent}) 
 
@@ -6,15 +6,23 @@
 
 @item implemented on-the-fly knowledge analysis
 
-@item added test case with insane nontrivial TSCC
+@item added test case with insane nontrivial @acronym{TSCC}
 
-@item integrated LoLA SCCs detection within inner markings
+@item integrated LoLA @acronym{SCC}s detection within inner markings
+
+@item generated temporary files are always deleted unless the @option{--noClean} parameter is given; removed parameter @option{--clean}
+
+@item fixed 64-bit support: Wendy natively supports 32 and 64 bit compilations using GCC's switches @option{-m32} and @option{-m64}, respectively. To successfully execute @samp{make check}, you need to compile the Petri Net API and Mia with the same options.
+
+@item allocated memory can be released using the (undocumented) parameter @option{--finalize}; fixed most memory leaks
+
+@item simplified interface to @samp{Output} class managing file output
 @end itemize
 
 
 @heading Version 2.0 (26 August 2009)
 @itemize
-@item removed parameter @samp{--noDeadlockDetection}
+@item removed parameter @option{--noDeadlockDetection}
 
 @item reorganized internal livelock detection; avoided additional bit to be stored for each internal marking
 

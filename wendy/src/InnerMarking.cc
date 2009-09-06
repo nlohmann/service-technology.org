@@ -37,15 +37,11 @@ extern gengetopt_args_info args_info;
 
 std::map<InnerMarking_ID, InnerMarking*> InnerMarking::markingMap;
 std::map<InnerMarking_ID, bool> InnerMarking::finalMarkingReachableMap;
-pnapi::PetriNet *InnerMarking::net = new pnapi::PetriNet();
-InnerMarking **InnerMarking::inner_markings = NULL;
+pnapi::PetriNet* InnerMarking::net = new pnapi::PetriNet();
+InnerMarking** InnerMarking::inner_markings = NULL;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
-
-unsigned int InnerMarking::stats_markings = 0;
-unsigned int InnerMarking::stats_bad_states = 0;
-unsigned int InnerMarking::stats_inevitable_deadlocks = 0;
-unsigned int InnerMarking::stats_final_markings = 0;
+InnerMarking::_stats InnerMarking::stats;
 
 
 /******************
@@ -61,11 +57,11 @@ unsigned int InnerMarking::stats_final_markings = 0;
        this check in the constructor
  */
 void InnerMarking::initialize() {
-    assert(stats_markings == markingMap.size());
-    inner_markings = new InnerMarking*[stats_markings];
+    assert(stats.markings == markingMap.size());
+    inner_markings = new InnerMarking*[stats.markings];
 
     // copy data from mapping (used during parsing) to a C array
-    for (InnerMarking_ID i = 0; i < stats_markings; ++i) {
+    for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         inner_markings[i] = markingMap[i];
         inner_markings[i]->is_bad = (inner_markings[i]->is_bad or (not finalMarkingReachableMap[i]));
 
@@ -85,13 +81,26 @@ void InnerMarking::initialize() {
     markingMap.clear();
     finalMarkingReachableMap.clear();
 
-    if (stats_final_markings == 0) {
-        fprintf(stderr, "%s: warning: no final marking found\n", PACKAGE);
+    delete net;
+
+    if (stats.final_markings == 0) {
+        message("warning: no final marking found");
     }
 
     status("found %d final markings, %d bad states, and %d inevitable deadlocks",
-        stats_final_markings, stats_bad_states, stats_inevitable_deadlocks);
-    status("stored %d inner markings", stats_markings);
+        stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
+    status("stored %d inner markings", stats.markings);
+}
+
+
+void InnerMarking::finalize() {
+    for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
+        delete inner_markings[i];
+    }
+
+    delete[] inner_markings;
+
+    status("InnerMarking: deleted %d objects", stats.markings);
 }
 
 
@@ -99,16 +108,16 @@ void InnerMarking::initialize() {
  * CONSTRUCTOR *
  ***************/
 
-InnerMarking::InnerMarking(const InnerMarking_ID &myId,
-                           const std::vector<Label_ID> &_labels,
-                           const std::vector<InnerMarking_ID> &_successors,
+InnerMarking::InnerMarking(const InnerMarking_ID& myId,
+                           const std::vector<Label_ID>& _labels,
+                           const std::vector<InnerMarking_ID>& _successors,
                            bool _is_final) :
                is_final(_is_final), is_waitstate(0), is_bad(0),
-               out_degree(_successors.size())
+               out_degree(_successors.size()), possibleSendEvents(NULL)
 {
-    ++stats_markings;
-    if (stats_markings % 50000 == 0) {
-        fprintf(stderr, "%8d inner markings\n", stats_markings);
+    ++stats.markings;
+    if (stats.markings % 50000 == 0) {
+        fprintf(stderr, "%8d inner markings\n", stats.markings);
     }
     assert(_labels.size() == out_degree);
     assert (out_degree < UCHAR_MAX);
@@ -137,7 +146,9 @@ InnerMarking::~InnerMarking() {
     delete[] labels;
     delete[] successors;
 
-    delete possibleSendEvents;
+    if (possibleSendEvents != NULL) {
+        delete possibleSendEvents;
+    }
 }
 
 
@@ -170,17 +181,17 @@ InnerMarking::~InnerMarking() {
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
  */
-inline void InnerMarking::determineType(const InnerMarking_ID &myId) {
+inline void InnerMarking::determineType(const InnerMarking_ID& myId) {
     bool is_transient = false;
 
     // deadlock: no successor markings and not final
     if (out_degree == 0 and not is_final) {
-        ++stats_bad_states;
+        ++stats.bad_states;
         is_bad = 1;
     }
 
     if (is_final) {
-        ++stats_final_markings;
+        ++stats.final_markings;
     }
 
     // when only deadlocks are considered, we don't care about final markings
@@ -219,7 +230,7 @@ inline void InnerMarking::determineType(const InnerMarking_ID &myId) {
         not is_bad and
         deadlock_inevitable) {
         is_bad = 1;
-        ++stats_inevitable_deadlocks;
+        ++stats.inevitable_deadlocks;
     }
 
     // draw some last conclusions
@@ -229,7 +240,7 @@ inline void InnerMarking::determineType(const InnerMarking_ID &myId) {
 }
 
 
-bool InnerMarking::waitstate(const Label_ID &l) const {
+bool InnerMarking::waitstate(const Label_ID& l) const {
     assert(not RECEIVING(l));
 
     if (not is_waitstate) {
@@ -254,7 +265,7 @@ bool InnerMarking::waitstate(const Label_ID &l) const {
 */
 bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const {
 
-    char * possibleSendEventsDecoded = possibleSendEvents->decode();
+    char* possibleSendEventsDecoded = possibleSendEvents->decode();
 
     // iterate over all possible input messages
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
@@ -292,7 +303,7 @@ void InnerMarking::calcReachableSendingEvents() {
                 if (SENDING(labels[i]) and not consideredLabels[labels[i]]) {
 
                     // add current sending event
-                    PossibleSendEvents *tempPossibleSendEvents = new PossibleSendEvents(false, labels[i]);
+                    PossibleSendEvents* tempPossibleSendEvents = new PossibleSendEvents(false, labels[i]);
                     *possibleSendEvents |= *tempPossibleSendEvents;
 
                     delete tempPossibleSendEvents;

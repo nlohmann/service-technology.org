@@ -22,24 +22,22 @@
 #define _KNOWLEDGE_H
 
 #include <queue>
+#include <vector>
+#include <map>
+#include "types.h"
+#include "Label.h"
 #include "FullMarking.h"
+#include "InnerMarking.h"
 
 
 /*!
  \brief knowledge (data structure for building knowledges)
+
+ This class is used to build knowledges. Its main focus is runtime
+ optimization. A later translation into StoredKnowledge objects removes any
+ unneccessary information, yielding a compact representation.
  */
 class Knowledge {
-    public: /* static attributes */
-        /// struct combining the statistics on the class Knowledge
-        static struct _stats {
-            public:
-                /// constructor
-                _stats();
-
-                /// the number of knowledges calculated so far
-//                unsigned int calculatedKnowledges;
-        } stats;
-
 
     public: /* member functions */
 
@@ -47,7 +45,7 @@ class Knowledge {
         Knowledge(InnerMarking_ID);
 
         /// construct knowledge from a given knowledge and a label
-        Knowledge(const Knowledge* const, const Label_ID&);
+        Knowledge(Knowledge const&, const Label_ID&);
 
         /// destructor
         ~Knowledge();
@@ -59,7 +57,7 @@ class Knowledge {
         bool receivingHelps() const;
 
         /// calculate those receiving events that are essential to resolve each and every waitstate
-        void sequentializeReceivingEvents(std::map<Label_ID, bool> &) const;
+        void sequentializeReceivingEvents(std::map<Label_ID, bool>&) const;
 
     public: /* attributes */
 

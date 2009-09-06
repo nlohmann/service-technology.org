@@ -47,10 +47,14 @@
  initialize() is called to copy the markingMap into a C-style array.
 */
 class InnerMarking {
+
     public: /* static functions */
 
         /// copy markings from temporary storage to array
         static void initialize();
+
+        /// destroy all objects of this class
+        static void finalize();
 
     public: /* static attributes */
 
@@ -61,7 +65,7 @@ class InnerMarking {
         static std::map<InnerMarking_ID, bool> finalMarkingReachableMap;
 
         /// an array of the inner markings
-        static InnerMarking **inner_markings;
+        static InnerMarking** inner_markings;
 
         /// a mapping from labels to inner markings that might receive this message
         static std::map<Label_ID, std::set<InnerMarking_ID> > receivers;
@@ -70,21 +74,24 @@ class InnerMarking {
         static std::map<Label_ID, std::set<InnerMarking_ID> > synchs;
 
         /// the open net that created these inner markings
-        static pnapi::PetriNet *net;
+        static pnapi::PetriNet* net;
 
     private: /* static attributes */
 
-        /// the number of total markings
-        static unsigned int stats_markings;
+        /// struct combining the statistics on the class InnerMarking
+        static struct _stats {
+            /// the number of total markings
+            unsigned int markings;
 
-        /// the number of internal bad states
-        static unsigned int stats_bad_states;
+            /// the number of internal bad states
+            unsigned int bad_states;
 
-        /// the number of markings that will reach a deadlock
-        static unsigned int stats_inevitable_deadlocks;
+            /// the number of markings that will reach a deadlock
+            unsigned int inevitable_deadlocks;
 
-        /// the number of final markings
-        static unsigned int stats_final_markings;
+            /// the number of final markings
+            unsigned int final_markings;
+        } stats;
 
     public: /* member functions */
 
@@ -123,13 +130,13 @@ class InnerMarking {
         uint8_t out_degree;
 
         /// the successor marking ids
-        InnerMarking_ID *successors;
+        InnerMarking_ID* successors;
 
         /// the successor label ids
-        Label_ID *labels;
+        Label_ID* labels;
 
         /// receiving transitions that are potentially reachable
-        PossibleSendEvents *possibleSendEvents;
+        PossibleSendEvents* possibleSendEvents;
 };
 
 #endif

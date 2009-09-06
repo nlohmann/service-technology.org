@@ -28,7 +28,7 @@ extern gengetopt_args_info args_info;
 
 
 /*!
- \param format  the error message formatted as printf string
+ \param format  the status message formatted as printf string
  
  \note use this function rather sparsely in order not to spam the output
 */
@@ -45,7 +45,7 @@ void message(const char* format, ...) {
 
 
 /*!
- \param format  the error message formatted as printf string
+ \param format  the status message formatted as printf string
 */
 void status(const char* format, ...) {
     if (args_info.verbose_flag == 0) {

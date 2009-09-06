@@ -28,6 +28,7 @@
  \brief full marking (a pair of an inner and an interface marking)
  */
 class FullMarking {
+
     public: /* member functions */
 
         /// constructor

@@ -58,15 +58,13 @@ std::string Output::stdout_filename = "-";
 */
 Output::Output() :
 #if defined(CYGWIN_MINGW)
-    os(*(new std::ofstream( mktemp(temp = basename(args_info.tmpfile_arg)), std::ofstream::out | std::ofstream::trunc))),
+    os(*(new std::ofstream(mktemp(temp = basename(args_info.tmpfile_arg)), std::ofstream::out | std::ofstream::trunc))),
 #else
-    os(*(new std::ofstream( mktemp(temp = args_info.tmpfile_arg), std::ofstream::out | std::ofstream::trunc))),
+    os(*(new std::ofstream(mktemp(temp = args_info.tmpfile_arg), std::ofstream::out | std::ofstream::trunc))),
 #endif
-    kind("")
+    filename(temp), kind("")
 {
-    filename = temp;
-
-    if (!os.good() or filename == "") {
+    if (not os.good() or filename == "") {
         abort(13, "could not create to temporary file '%s'", filename.c_str());
     }
 
@@ -78,16 +76,14 @@ Output::Output() :
  filename matches the symbol stored in "stdout_filename", no file is created,
  but std::cout is used as output.
 */
-Output::Output(std::string &str, std::string kind) :
-    temp(NULL),
-    kind(kind),
+Output::Output(std::string& str, std::string kind) :
     os((!str.compare(stdout_filename)) ?
         std::cout :
         *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
     ),
-    filename(str)
+    filename(str), temp(NULL), kind(kind)
 {
-    if (!os.good()) {
+    if (not os.good()) {
         abort(11, "could not write to file '%s'", str.c_str());
     }
 
@@ -104,8 +100,8 @@ Output::Output(std::string &str, std::string kind) :
  **************/
 
 /*!
- In case the "--clean" parameter is given, temporary files are deleted after
- closing.
+ This destructor closes the associated file. Unless the "--noClean" parameter
+ is given, temporary files are deleted after closing.
  */
 Output::~Output() {
     if (&os != &std::cout) {
@@ -113,15 +109,41 @@ Output::~Output() {
         if (!temp) {
             status("closed file '%s'", filename.c_str());
         } else {
-            if (args_info.clean_flag) {
+            if (args_info.noClean_flag) {
+                status("closed temporary file '%s'", filename.c_str());
+            } else {
                 if (remove(filename.c_str()) == 0) {
                     status("closed and deleted temporary file '%s'", filename.c_str());
                 } else {
                     status("closed, but could not delete temporary file '%s'", filename.c_str());
                 }
-            } else {
-                status("closed temporary file '%s'", filename.c_str());
             }
         }
     }
+}
+
+
+/************
+ * OPERATOR *
+ ************/
+
+/*!
+ This implicit conversation operator allows to use Output objects like
+ ostream streams.
+*/
+Output::operator std::ostream&() {
+    return os;
+}
+
+
+/********************
+ * MEMBER FUNCTIONS *
+ ********************/
+
+std::string Output::name() const {
+    return filename;
+}
+
+std::ostream& Output::stream() const {
+    return os;
 }

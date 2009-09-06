@@ -89,22 +89,18 @@ states:
 state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
     {
-//        status("\nDEBUG: current DFS: m%d", $2);
-
-//        fprintf(stderr, "dfs: %d, l: %d.... ", $2, currentLowlink);
-
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
                                                 InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
         if (markingoutput != NULL) {
-            markingoutput->os << $2 << ": ";
+            markingoutput->stream() << $2 << ": ";
             for (std::map<const pnapi::Place*, unsigned int>::iterator p = marking.begin(); p != marking.end(); ++p) {
                 if (p != marking.begin()) {
-                    markingoutput->os << ", ";
+                    markingoutput->stream() << ", ";
                 }
-                markingoutput->os << p->first->getName() << ":" << p->second;
+                markingoutput->stream() << p->first->getName() << ":" << p->second;
             }
-            markingoutput->os << std::endl;
+            markingoutput->stream() << std::endl;
         }
 
         if (args_info.cover_given) {
@@ -128,10 +124,9 @@ state:
                 /* actually delete it from vector */
                 currentSCC.pop_back();
 
-               // status("... together with m%d", poppedMarking);
-
-                /* if a final marking is reachable from the representative, then a final marking is reachable */
-                /* from all markings within the strongly connected component */
+                /* if a final marking is reachable from the representative,
+                   then a final marking is reachable from all markings within
+                   the strongly connected component */
                 InnerMarking::finalMarkingReachableMap[poppedMarking] = InnerMarking::finalMarkingReachableMap[$2];
 
                 if (args_info.smartSendingEvent_flag) {
@@ -149,18 +144,13 @@ state:
 
 
 scc:
-/* empty */
+  /* empty */
 | KW_SCC scc_members
-{
-
-}
 ;
 
 scc_member:
-    NUMBER
-    {
-        currentSCC.push_back($1);
-    }
+  NUMBER
+    { currentSCC.push_back($1); }
 ;
 
 scc_members:
@@ -172,7 +162,8 @@ scc_members:
 lowlink:
   KW_LOWLINK NUMBER
     {
-        /* do something with Tarjan's lowlink value (needed for generating livelock free partners or reduction rule smart sending event) */
+        /* do something with Tarjan's lowlink value (needed for generating
+           livelock free partners or reduction rule smart sending event) */
         currentLowlink = $2;
     }
 ;

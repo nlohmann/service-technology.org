@@ -51,7 +51,7 @@ void PossibleSendEvents::initialize() {
  ***************/
 
 /*
-    \brief all values are initialized with 0
+  \brief all values are initialized with 0
 */
 PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
     assert(bytes > 0);
@@ -65,9 +65,11 @@ PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
 }
 
 /*
-    \param allValues all sending events are to be initialized with label (0 or 1)
-    \param label in case allValues is set to true, then it has to be 0 or 1; otherwise if allValues is set to false,
-                 label represents the label that is to be set to one, all others are initialized with 0
+  \param allValues all sending events are to be initialized with label (0 or 1)
+  \param label in case allValues is set to true, then it has to be 0 or 1;
+                 otherwise if allValues is set to false, label represents the
+                 label that is to be set to one, all others are initialized
+                 with 0
  */
 PossibleSendEvents::PossibleSendEvents(bool allValues, Label_ID label) : decodedLabels(NULL) {
     assert(bytes > 0);
@@ -126,10 +128,9 @@ void PossibleSendEvents::operator|=(const PossibleSendEvents &other) {
  * MEMBER METHODS *
  ******************/
 
-
-/*
-    \brief the values of other are copied into current storage
-    \param other the values of the other storage to be copied into the current one
+/*!
+  the values of other are copied into current storage
+  \param other the values of the other storage to be copied into the current one
 */
 void PossibleSendEvents::copy(const PossibleSendEvents &other) {
     assert(bytes > 0);

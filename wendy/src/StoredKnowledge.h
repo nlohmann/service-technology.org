@@ -22,6 +22,11 @@
 #define _STOREDKNOWLEDGE_H
 
 #include <iostream>
+#include <map>
+#include <set>
+#include <vector>
+#include "types.h"
+#include "InterfaceMarking.h"
 #include "Knowledge.h"
 #include "cmdline.h"
 
@@ -33,23 +38,26 @@ class StoredKnowledge {
 
     public: /* static functions */
 
+        /// destroy all objects of this class
+        static void finalize();
+
         /// generate the successor of a knowledge bubble given a label
-        static void process(Knowledge*, StoredKnowledge*, const Label_ID&);
+        static void process(const Knowledge&, StoredKnowledge* const, const Label_ID&);
 
         /// recursively calculate knowledge bubbles
-        static void processRecursively(Knowledge*, StoredKnowledge*);
+        static void processRecursively(const Knowledge&, StoredKnowledge* const);
 
         /// print a dot representation
-        static void dot(std::ostream&);
+        static void output_dot(std::ostream&);
 
         /// print the knowledges as OG
-        static void output(std::ostream&);
+        static void output_og(std::ostream&);
 
         /// print the knowledges as Fiona OG
-        static void output_old(std::ostream&);
+        static void output_ogold(std::ostream&);
 
         /// print information for instance migration
-        static void migration(std::ostream&);
+        static void output_migration(std::ostream&);
 
     public: /* static attributes */
 
@@ -94,18 +102,18 @@ class StoredKnowledge {
         static unsigned int reportFrequency;
 
         /// the root knowledge
-        static StoredKnowledge *root;
+        static StoredKnowledge* root;
 
         /// nodes that are reachable from the initial node
         static std::set<StoredKnowledge*> seen;
 
-        /// maps dfs (first) and lowlink (second) number to a stored knowledge which is still on the Tarjan stack
-        static std::map<StoredKnowledge*, std::pair<unsigned int, unsigned int> > tarjanMapping;
-
     private: /* static attributes */
 
-        /// the empty knowledge
-        static StoredKnowledge *empty;
+        /// maps dfs (first) and lowlink (second) number to a stored knowledge which is still on the Tarjan stack
+        static std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > tarjanMapping;
+
+        /// the empty knowledge (just a placeholder, no object!)
+        static StoredKnowledge* empty;
 
         /// whether the empty node is reachable from the initial node
         static bool emptyNodeReachable;
@@ -113,34 +121,21 @@ class StoredKnowledge {
         /// nodes that should be deleted
         static std::set<StoredKnowledge*> deletedNodes;
 
-        /// LIVELOCK FREEDOM
-        /// stack of StoredKnowledge for Tarjan's algorithm
-        static std::vector<StoredKnowledge *> tarjanStack;
+        /// stack of StoredKnowledge for Tarjan's algorithm (LIVELOCK FREEDOM)
+        static std::vector<StoredKnowledge*> tarjanStack;
 
         /// needed for TSCC detection within Tarjan's algorithm
         static unsigned int bookmarkTSCC;
 
-        /// remember predecessor of a stored knowledge in case we evaluate a (T)SCC
-        static std::map<StoredKnowledge* , std::set<StoredKnowledge*> > tempPredecessors;
-
     private: /* static functions */
 
-        /// adjust lowlink values of the stored knowledge
-        static void adjustLowlinkValue(StoredKnowledge*, StoredKnowledge*, bool);
-
-        /// create the predecessor relation of all knowledges contained in the given set
-        static void createPredecessorRelation(std::set<StoredKnowledge *> &);
-
         /// evaluate each member of the given set of knowledges and propagate the property of being insane accordingly
-        static void evaluateKnowledgeSet(std::set<StoredKnowledge *> &);
-
-        /// evaluates the current strongly connected components and adjusts the is_final_reachable value
-        static void evaluateCurrentSCC(StoredKnowledge*);
+        static void evaluateKnowledgeSet(std::set<StoredKnowledge*>&);
 
     public: /* member functions */
 
         /// constructs an object from a Knowledge object
-        StoredKnowledge(const Knowledge* const);
+        StoredKnowledge(Knowledge&);
 
         /// destructor
         ~StoredKnowledge();
@@ -149,7 +144,7 @@ class StoredKnowledge {
         friend std::ostream& operator<< (std::ostream&, const StoredKnowledge&);
 
         /// stores this object in the hash tree and returns a pointer to the result
-        StoredKnowledge *store();
+        StoredKnowledge* store();
 
         /// traverse knowledges
         void traverse();
@@ -168,6 +163,12 @@ class StoredKnowledge {
         /// move all transient markings to the end of the array and adjust size of the markings array
         void rearrangeKnowledgeBubble();
 
+        /// adjust lowlink values of the stored knowledge
+        void adjustLowlinkValue(const StoredKnowledge* const) const;
+
+        /// evaluates the current SCC components and adjusts the is_final_reachable value
+        void evaluateCurrentSCC();
+
         /// print knowledge
         void print(std::ostream&) const;
 
@@ -182,8 +183,7 @@ class StoredKnowledge {
         /// whether this bubble contains a final marking
         unsigned is_final : 1;
 
-        /// LIVELOCK FREEDOM
-        /// whether from this bubble a final bubble is reachable
+        /// whether from this bubble a final bubble is reachable (LIVELOCK FREEDOM)
         unsigned is_final_reachable : 1;
 
         /// whether this bubble is sane
@@ -200,14 +200,14 @@ class StoredKnowledge {
         /// the number of markings stored in this knowledge
         unsigned int sizeAllMarkings;
 
-        /// an array of inner markings (length is size)
-        InnerMarking_ID *inner;
+        /// an array of inner markings (length is sizeAllMarkings)
+        InnerMarking_ID* inner;
 
-        /// an array of interface markings (length is size)
-        InterfaceMarking **interface;
+        /// an array of interface markings (length is sizeAllMarkings)
+        InterfaceMarking** interface;
 
         /// the successors of this knowledge (length is fixed by the labels)
-        StoredKnowledge **successors;
+        StoredKnowledge** successors;
 };
 
 #endif

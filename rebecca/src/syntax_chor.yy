@@ -6,11 +6,12 @@
 %name-prefix="chor_"
 
 %{
-#include "peerautomaton.h"
+#include "choreography.h"
 #include "config.h"
 #include <cassert>
 #include "peer.h"
 
+#include <set>
 #include <string>
 
 #define YYDEBUG 1
@@ -19,10 +20,11 @@
 /// the current NAME token as string
 std::string NAME_token;
 
-extern PeerAutomaton * chor;
+extern Choreography * chor;
 Peer *currentPeer;
 bool input;
 int state;
+std::set<std::string> asynchronous, synchronous;
 
 extern int chor_lex();
 extern int chor_error(const char *);
@@ -38,6 +40,21 @@ extern int chor_error(const char *);
 
 chorography:
   peers KEY_NODES nodes
+  {
+    for (std::set<std::string>::iterator l = asynchronous.begin(); l != asynchronous.end(); l++)
+    {
+      chor->pushEvent("!"+*l);
+      chor->pushEvent("?"+*l);
+      for (int i = 0; i < (int) chor->collaboration().size(); i++)
+        chor->collaboration()[i]->deriveEvent(*l, ASYNCH);
+    }
+    for (std::set<std::string>::iterator l = synchronous.begin(); l != synchronous.end(); l++)
+    {
+      chor->pushEvent("#"+*l);
+      for (int i = 0; i < (int) chor->collaboration().size(); i++)
+        chor->collaboration()[i]->deriveEvent(*l, SYNCH);
+    }
+  }
 ;
 
 peers:
@@ -66,18 +83,16 @@ label_list:
   NAME
   {
     if (input)
-  	  currentPeer->pushInput(NAME_token);
+  	  currentPeer->pushIn(NAME_token);
   	else
-  	  currentPeer->pushOutput(NAME_token);
-  	chor->pushEvent(NAME_token);
+  	  currentPeer->pushOut(NAME_token);
   }
 | label_list COMMA NAME
   {
     if (input)
-      currentPeer->pushInput(NAME_token);
+      currentPeer->pushIn(NAME_token);
     else
-      currentPeer->pushOutput(NAME_token);
-  	chor->pushEvent(NAME_token);
+      currentPeer->pushOut(NAME_token);
   }
 ;
 
@@ -111,14 +126,17 @@ successors:
   /* empty */
 | successors SENDLABEL ARROW NUMBER
   {
-    chor->createTransition(state, NAME_token.substr(1,NAME_token.size()), $4, SND);
+  	asynchronous.insert(NAME_token.substr(1,NAME_token.size()));
+    chor->createEdge(state, NAME_token, $4, SND);
   }
 | successors RCVLABEL ARROW NUMBER
   {
-    chor->createTransition(state, NAME_token.substr(1,NAME_token.size()), $4, RCV);
+  	asynchronous.insert(NAME_token.substr(1,NAME_token.size()));
+    chor->createEdge(state, NAME_token, $4, RCV);
   }
 | successors SYNCLABEL ARROW NUMBER
   {
-    chor->createTransition(state, NAME_token.substr(1,NAME_token.size()), $4, SYN);
+  	synchronous.insert(NAME_token.substr(1,NAME_token.size()));
+    chor->createEdge(state, NAME_token, $4, SYN);
   }
 ;

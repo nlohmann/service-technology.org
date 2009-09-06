@@ -50,6 +50,7 @@ AT_SETUP([Partial Realizability])
 AT_CHECK([cp TESTFILES/fig4d.chor .])
 AT_CHECK([REBECCA < fig4d.chor -q],0,stdout)
 AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    NO" stdout],0)
+AT_CHECK([GREP -q "DISTRIBUTEDLY REALIZABLE: NO" stdout],0)
 AT_CHECK([GREP -q "PARTIALLY REALIZABLE:     YES" stdout],0)
 AT_KEYWORDS(realizability)
 AT_CLEANUP

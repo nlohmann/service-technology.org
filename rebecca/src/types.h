@@ -1,19 +1,24 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <set>
 #include <string>
 
 
-enum EventType_enum
+enum EventType
 {
   SND, RCV, SYN, CHI
 };
 /// where SND = send, RCV = receive, and SYN = synchrone
 
-typedef enum EventType_enum EventType;
+
+enum CommunicationType
+{
+  SYNCH, ASYNCH
+};
 
 
-struct Edge_struct
+struct Edge
 {
   int source;
   int destination;
@@ -21,25 +26,13 @@ struct Edge_struct
   EventType type;
 };
 
-typedef Edge_struct Edge;
 
-
-struct PEdge_struct
+struct PEdge
 {
   std::set<int> source;
   std::set<int> destination;
   std::string label;
   EventType type;
 };
-
-typedef PEdge_struct PEdge;
-
-
-enum PeerAutomatonType_enum
-{
-  CHOREOGRAPHY, PROJECTION
-};
-
-typedef enum PeerAutomatonType_enum PeerAutomatonType;
 
 #endif

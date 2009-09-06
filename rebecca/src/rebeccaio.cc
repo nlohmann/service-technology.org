@@ -7,89 +7,82 @@ using std::set;
 using std::string;
 
 
+ostream & operator <<(ostream & os, const Choreography & chor)
+{
+  for (int i = 0; i < (int) chor.collaboration_.size(); i++)
+    os << "PEER " << chor.collaboration_[i]->name() << endl
+       << "  IN " << chor.collaboration_[i]->in() << ";" << endl
+       << "  OUT " << chor.collaboration_[i]->out() << ";" << endl << endl;
+  os << "NODES" << endl;
+  for (set<int>::iterator q = chor.states_.begin(); q != chor.states_.end(); q++)
+  {
+    os << "  " << *q;
+    if (chor.initialState_ == *q)
+    {
+      os << " : INITIAL";
+      if (chor.isFinal(*q))
+        os << ", FINAL";
+    }
+    else
+      if (chor.isFinal(*q))
+        os << " : FINAL";
+    os << endl;
+    set<Edge *> E = chor.edgesFrom(*q);
+    for (set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
+    {
+      string pre = (*e)->type == CHI ? "CHI" : "";
+      os << "    " << pre << (*e)->label << " -> " << (*e)->destination << endl;
+    }
+  }
+  return os;
+}
+
+
 ostream & operator <<(ostream & os, const PeerAutomaton & pa)
 {
-  switch (pa.type_)
+  if (pa.haveInput() || pa.haveOutput() || pa.haveSynchronous())
   {
-  case CHOREOGRAPHY:
+    os << "INTERFACE" << endl;
+    if (pa.haveInput())
     {
-      for (int i = 0; i < (int) pa.collaboration_.size(); i++)
-        os << "PEER " << pa.collaboration_[i]->name() << endl
-           << "  IN " << pa.collaboration_[i]->input() << ";" << endl
-           << "  OUT " << pa.collaboration_[i]->output() << ";" << endl << endl;
-      os << "NODES" << endl;
-      for (set<int>::iterator q = pa.states_->begin(); q != pa.states_->end(); q++)
-      {
-        os << "  " << *q;
-        if (*pa.initialState_ == *q)
-        {
-          os << " : INITIAL";
-          if (pa.isFinal(*q))
-            os << ", FINAL";
-        }
-        else
-          if (pa.isFinal(*q))
-            os << " : FINAL";
-        os << endl;
-        set<Edge *> E = pa.edgesFrom(*q);
-        for (set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
-        {
-          string pre = (*e)->type == SND ? "!" : (*e)->type == RCV ? "?" : (*e)->type == SYN ? "#" : "CHI";
-          os << "    " << pre << (*e)->label << " -> " << (*e)->destination << endl;
-        }
-      }
-      break;
+      os << "  INPUT "
+         << pa.input()
+         << ";" << endl;
     }
-  case PROJECTION:
+    if (pa.haveOutput())
     {
-      if (pa.haveInput() || pa.haveOutput() || pa.haveSynchronous())
-      {
-        os << "INTERFACE" << endl;
-        if (pa.haveInput())
-        {
-          os << "  INPUT "
-             << pa.input()
-             << ";" << endl;
-        }
-        if (pa.haveOutput())
-        {
-          os << "  OUTPUT "
-             << pa.output()
-             << ";" << endl;
-        }
-        if (pa.haveSynchronous())
-        {
-          os << "  SYNCHRONOUS "
-             << pa.synchronous()
-             << ";" << endl;
-        }
-      }
-      os << endl;
-      os << "NODES" << endl;
-      for (set<set<int> >::iterator q = pa.stateSets_->begin(); q != pa.stateSets_->end(); q++)
-      {
-        os << "  " << *q;
-        if (*pa.initialStateSet_ == *q)
-        {
-          os << " : INITIAL";
-          if (pa.isFinal(*q))
-            os << ",FINAL";
-        }
-        else
-          if (pa.isFinal(*q))
-            os << " : FINAL";
-        os << endl;
-        set<PEdge *> E = pa.pEdges(*q);
-        for (set<PEdge *>::iterator e = E.begin(); e != E.end(); e++)
-          os << "    " << (*e)->label << " -> " << (*e)->destination << endl;
-        os << endl;
-      }
-      os << endl;
-      break;
+      os << "  OUTPUT "
+         << pa.output()
+         << ";" << endl;
     }
-  default:
-    break;
+    if (pa.haveSynchronous())
+    {
+      os << "  SYNCHRONOUS "
+         << pa.synchronous()
+         << ";" << endl;
+    }
   }
+  os << endl;
+  os << "NODES" << endl;
+  for (set<set<int> >::iterator q = pa.states_.begin(); q != pa.states_.end(); q++)
+  {
+    os << "  " << *q;
+    if (pa.initialState_ == *q)
+    {
+      os << " : INITIAL";
+      if (pa.isFinal(*q))
+        os << ",FINAL";
+    }
+    else
+      if (pa.isFinal(*q))
+        os << " : FINAL";
+    os << endl;
+    set<PEdge *> E = pa.edgesFrom(*q);
+    for (set<PEdge *>::iterator e = E.begin(); e != E.end(); e++)
+      os << "    " << (*e)->label << " -> " << (*e)->destination << endl;
+    os << endl;
+  }
+  os << endl;
 
   return os;
 }

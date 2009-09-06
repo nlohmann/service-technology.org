@@ -2,6 +2,7 @@ bin_PROGRAMS = rebecca
 
 rebecca_SOURCES = syntax_chor.yy lexic_chor.ll \
                   main.cc \
+                  choreography.cc choreography.h \
                   peer.cc peer.h \
                   peerautomaton.cc peerautomaton.h \
                   rebeccaio.cc rebeccaio.h \

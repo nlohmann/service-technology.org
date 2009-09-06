@@ -12,6 +12,18 @@ Peer::Peer(const string & name) :
 }
 
 
+void Peer::pushIn(const string & inLabel)
+{
+  in_.insert(inLabel);
+}
+
+
+void Peer::pushOut(const string & outLabel)
+{
+  out_.insert(outLabel);
+}
+
+
 void Peer::pushInput(const string & inputLabel)
 {
   input_.insert(inputLabel);
@@ -30,6 +42,18 @@ const string Peer::name() const
 }
 
 
+const set<string> & Peer::in() const
+{
+  return in_;
+}
+
+
+const set<string> & Peer::out() const
+{
+  return out_;
+}
+
+
 const set<string> & Peer::input() const
 {
   return input_;
@@ -39,4 +63,30 @@ const set<string> & Peer::input() const
 const set<string> & Peer::output() const
 {
   return output_;
+}
+
+
+void Peer::deriveEvent(const string & label, CommunicationType t)
+{
+  switch (t)
+  {
+  case SYNCH:
+    {
+      if (in_.count(label))
+        input_.insert("#"+label);
+      if (out_.count(label))
+        output_.insert("#"+label);
+      break;
+    }
+  case ASYNCH:
+    {
+      if (in_.count(label))
+        input_.insert("?"+label);
+      if (out_.count(label))
+        output_.insert("!"+label);
+      break;
+    }
+  default:
+    break;
+  }
 }

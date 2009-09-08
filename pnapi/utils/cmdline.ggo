@@ -19,6 +19,10 @@ option "output" o
   values="owfn","lola","sa","dot","png","pdf","eps","svg" enum
   optional
   multiple
+  
+option "formula" f
+  "Places a final condition at the end of LoLA files. Has no effect to other output formats."
+  flag off
 
 defgroup "Composition"
 

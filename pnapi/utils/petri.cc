@@ -453,7 +453,10 @@ int main(int argc, char** argv) {
 
                     // create LoLA output
                     case (output_arg_lola): {
-                        outfile << io::lola << *(objects[i].net);
+                        if (args_info.formula_flag)
+                          outfile << io::lola << io::formula << *(objects[i].net);
+                        else
+                          outfile << io::lola << *(objects[i].net);
                         break;
                     }
 

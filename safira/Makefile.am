@@ -1,4 +1,4 @@
-SUBDIRS = src minisat tests man doc
+SUBDIRS = src minisat tests man doc maintainer
 
 #############################################################################
 # remove everything that cannot be built

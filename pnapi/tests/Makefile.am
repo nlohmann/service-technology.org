@@ -29,7 +29,7 @@ TESTFILES = test_input.owfn \
             bug14127.owfn \
             bug14128.1.owfn \
             bug14128.2.owfn \
-	    bug14106.lola \
+	    bug14206.lola \
             test_input.lola \
             test_dead_nodes.net.owfn \
             test_identical_places.net.owfn \

@@ -35,6 +35,7 @@ extern gengetopt_args_info args_info;
 #ifdef WIN32
 #ifndef _WIN32
 #define CYGWIN_MINGW 1
+//not defined(__MINGW32__)
 #endif
 #endif
 #endif

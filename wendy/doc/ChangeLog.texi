@@ -1,3 +1,8 @@
+@heading Version 2.2-unreleased
+@itemize
+@item added test cases to test Wendy's integration into Marlene
+@end itemize
+
 @heading Version 2.1 (6 September 2009)
 @itemize
 @item fixed (known) issues concerning reduction rule ``succeeding sending event'' (parameter: @option{--succeedingSendingEvent}) 

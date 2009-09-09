@@ -1,0 +1,44 @@
+PLACE
+ INTERNAL
+  p0,p1,p2,p3;
+ INPUT
+  MEuro,MTB,MCB;
+ OUTPUT
+  MBevT,MBevC;
+
+INITIALMARKING
+  p0;
+
+FINALMARKING
+  p0;
+
+TRANSITION t0 { ?MEuro }
+ CONSUME
+  p0, MEuro;
+ PRODUCE
+  p1;
+
+TRANSITION t1 { ?MTB }
+ CONSUME
+  p1, MTB;
+ PRODUCE
+  p2;
+
+TRANSITION t2 { ?MCB }
+ CONSUME
+  p1, MCB;
+ PRODUCE
+  p3;
+
+TRANSITION t3 { ?MBevT }
+ CONSUME
+  p2;
+ PRODUCE
+  p0, MBevT;
+
+TRANSITION t4 { ?MBevC }
+ CONSUME
+  p3;
+ PRODUCE
+  p0, MBevC;
+

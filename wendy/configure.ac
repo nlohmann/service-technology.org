@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 2.1, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT(Wendy, 2.2-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -40,6 +40,7 @@ AC_PATH_PROGS(LOLA, [lola-statespace], [])
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(SA2SM, [sa2sm], not found)
 AC_PATH_PROG(MIA, [mia], not found)
+AC_PATH_PROG(MARLENE, [marlene], not found)
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,

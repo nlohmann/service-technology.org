@@ -8,6 +8,11 @@
                       http://service-technology.org/wendy
 
 
+Version 2.2-unreleased
+======================
+
+* added test cases to test Wendy's integration into Marlene
+
 Version 2.1 (6 September 2009)
 ==============================
 

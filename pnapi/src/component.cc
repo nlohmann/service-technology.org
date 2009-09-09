@@ -709,6 +709,12 @@ namespace pnapi {
     return weight_;
   }
 
+  /*!
+   */
+  void Arc::setWeight(unsigned int weight)
+  {
+    weight_ = weight;
+  }
 
   /*!
    */

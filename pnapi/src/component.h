@@ -331,6 +331,9 @@ namespace pnapi
 
     /// weight
     unsigned int getWeight() const;
+    
+    /// set the weight
+    void setWeight(unsigned int);
 
     /// merges another arc into this one
     void merge(Arc &);

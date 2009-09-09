@@ -300,9 +300,7 @@ namespace pnapi
       extern std::stringstream nodeName_;
       /// read capacity
       extern int capacity_;
-      /// precet/postset for fast checks
-      extern std::set<Place*> placeSet_;
-      /// preset/postset label for parse exception
+      /// whether reading preset or postset places
       extern bool placeSetType_;
       
       

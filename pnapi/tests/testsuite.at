@@ -245,6 +245,14 @@ AT_CHECK([GREP -q "v, z;" NET1.composed.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14206 (https://gna.org/bugs/?14206)])
+m4_define([NET],[bug14206.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -ilola -olola NET])
+AT_CHECK([GREP -q "p:2" NET.lola])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

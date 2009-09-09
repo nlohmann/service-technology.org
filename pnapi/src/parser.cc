@@ -174,9 +174,7 @@ namespace pnapi
       std::stringstream nodeName_;
       /// read capacity
       int capacity_;
-      /// precet/postset for fast checks
-      set<Place*> placeSet_;
-      /// preset/postset label for parse exception
+      /// whether reading preset or postset places
       bool placeSetType_;
       
       
@@ -204,7 +202,6 @@ namespace pnapi
         ident.clear();
         places_.clear();
         nodeName_.clear();
-        placeSet_.clear();
 
         return pnapi_lola_yynet;
       }

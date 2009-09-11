@@ -13,6 +13,9 @@ Version 2.2-unreleased
 
 * added test cases to test Wendy's integration into Marlene
 
+* no output files are created in case of uncontrollability (unless
+  `--diagnose' is given)
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

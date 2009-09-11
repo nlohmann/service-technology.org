@@ -1,6 +1,8 @@
 @heading Version 2.2-unreleased
 @itemize
 @item added test cases to test Wendy's integration into Marlene
+
+@item no output files are created in case of uncontrollability (unless @option{--diagnose} is given)
 @end itemize
 
 @heading Version 2.1 (6 September 2009)

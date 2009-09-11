@@ -337,7 +337,8 @@ int main(int argc, char** argv) {
 
 
     // analyze root node and print result
-    message("net is controllable: %s", (StoredKnowledge::root->is_sane) ? "YES" : "NO");
+    bool controllable = (StoredKnowledge::root->is_sane);
+    message("net is controllable: %s", controllable ? "YES" : "NO");
 
 
     /*-------------------------------.
@@ -353,51 +354,53 @@ int main(int argc, char** argv) {
     /*-------------------.
     | 9. output options |
     `-------------------*/
-    // operating guidelines output
-    if (args_info.og_given) {
-        string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
-        Output output(og_filename, "operating guidelines");
+    if (controllable or args_info.diagnose_flag) {
 
-        if (args_info.fionaFormat_flag) {
-            StoredKnowledge::output_ogold(output);
-        } else {
+        // operating guidelines output
+        if (args_info.og_given) {
+            string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
+            Output output(og_filename, "operating guidelines");
+
+            if (args_info.fionaFormat_flag) {
+                StoredKnowledge::output_ogold(output);
+            } else {
+                StoredKnowledge::output_og(output);
+            }
+
+            if (args_info.cover_given) {
+                string cover_filename = og_filename + ".cover";
+                Output cover_output(cover_filename, "cover constraint");
+                Cover::write(cover_output);
+            }
+        }
+
+        // service automaton output
+        if (args_info.sa_given) {
+            string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
+            Output output(sa_filename, "service automaton");
             StoredKnowledge::output_og(output);
         }
 
-        if (args_info.cover_given) {
-            string cover_filename = og_filename + ".cover";
-            Output cover_output(cover_filename, "cover constraint");
-            Cover::write(cover_output);
+        // dot output
+        if (args_info.dot_given) {
+            string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
+            Output output(dot_filename, "dot representation");
+            StoredKnowledge::output_dot(output);
+        }
+
+        // migration output
+        if (args_info.im_given) {
+            string im_filename = args_info.im_arg ? args_info.im_arg : filename + ".im";
+            Output output(im_filename, "migration information");
+
+            time(&start_time);
+            StoredKnowledge::output_migration(output);
+            time(&end_time);
+
+            status("wrote migration information to file '%s' [%.0f sec]",
+                im_filename.c_str(), difftime(end_time, start_time));
         }
     }
-
-    // service automaton output
-    if (args_info.sa_given) {
-        string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
-        Output output(sa_filename, "service automaton");
-        StoredKnowledge::output_og(output);
-    }
-
-    // dot output
-    if (args_info.dot_given) {
-        string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
-        Output output(dot_filename, "dot representation");
-        StoredKnowledge::output_dot(output);
-    }
-
-    // migration output
-    if (args_info.im_given) {
-        string im_filename = args_info.im_arg ? args_info.im_arg : filename + ".im";
-        Output output(im_filename, "migration information");
-
-        time(&start_time);
-        StoredKnowledge::output_migration(output);
-        time(&end_time);
-
-        status("wrote migration information to file '%s' [%.0f sec]",
-            im_filename.c_str(), difftime(end_time, start_time));
-    }
-
 
     /*-------------------.
     | 10. release memory |

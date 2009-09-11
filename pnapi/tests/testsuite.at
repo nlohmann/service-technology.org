@@ -253,6 +253,15 @@ AT_CHECK([GREP -q "p:2" NET.lola])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14208 (https://gna.org/bugs/?14208)])
+m4_define([NET1],[bug14208.1.owfn])
+m4_define([NET2],[bug14208.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 .])
+AT_CHECK([cp TESTFILES/NET2 .])
+AT_CHECK([PETRI -iowfn -oowfn NET1 --compose=NET2])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

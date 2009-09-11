@@ -456,9 +456,20 @@ namespace pnapi
    * 2.: Input and output places are connected appropriatly 
    *     (if an input and an output place name of the two nets match)
    *     or copied (without a prefix!).
-   * 3.: Unlabled transitions of #net are copied in this net; 
-   *     labeled Transitions  are merged with the appropiate
-   *     transitions of #net.
+   * 3.: Transitions are arranged by the following rules:
+   *     a) Labels, appearing in both this and the other net (from now
+   *     called "common labels"), will be synchronized; each transition 
+   *     not containing such a common label will be prefixed and copied.
+   *     b) If a transition t1 of this net and a transition t2 of the other
+   *     net share at least one label, a transition t' will be created in
+   *     the resulting net. The preset/postset of t' is the union of the
+   *     presets/postsets of t1 and t2. The Labels of t' is the difference
+   *     of the union of the labels of t1 and t2 and the intersection of 
+   *     their labels. Transitions, labeled with a "common label" but
+   *     without a matching transition in the other net are copied.
+   *     c) If there remains transitions in the resulting net with
+   *     "common labels", the will be "killed" by adding an new, unmarked
+   *     place to their preset. 
    * 
    */
   void PetriNet::compose(const PetriNet & net, const string & prefix,
@@ -590,7 +601,7 @@ namespace pnapi
             t != getTransitions().end(); ++t)
     {
       if ( (!(*t)->isSynchronized()) || // this transition is not labeled
-           (sharedLabels.find(*(*t)->getSynchronizeLabels().begin()) == sharedLabels.end()) ) // label does not occur in other net
+           (util::setIntersection((*t)->getSynchronizeLabels(), sharedLabels).empty()) ) // transition has no shared label
       {
         // create a prefixed transition in the resulting net
         Transition & rt = result.createTransition(prefix+(*t)->getName(), (*t)->getSynchronizeLabels());
@@ -620,7 +631,7 @@ namespace pnapi
             t != net.getTransitions().end(); ++t)
     {
       if ( (!(*t)->isSynchronized()) || // this transition is not labeled
-           (sharedLabels.find(*(*t)->getSynchronizeLabels().begin()) == sharedLabels.end()) ) // label does not occur in this net
+          (util::setIntersection((*t)->getSynchronizeLabels(), sharedLabels).empty()) ) // transition has no shared label
       {
         // create a prefixed transition in the resulting net
         Transition & rt = result.createTransition(netPrefix+(*t)->getName(), (*t)->getSynchronizeLabels());
@@ -645,122 +656,144 @@ namespace pnapi
       }
     }
     
+    /// transitions without a partner
+    set<Transition*> lonelyTransitions1;
+    set<Transition*> lonelyTransitions2 = mergeOther;
+    
+    /* 
+     * Transitions of the other net are assumed as "lonely".
+     * If such a transition gets a partner, it is removed from this set.
+     * Own transitions are assumed as not "lonely". If such a transition
+     * remains without a partner, it is added to this set.
+     */ 
+    
+    /// transitions that must be killed
+    set<Transition*> doomedTransitions;
+    
     /// merge matching synchronous transitions
-    for(set<string>::iterator l = sharedLabels.begin(); 
-          l != sharedLabels.end(); ++l)
+    for(set<Transition*>::iterator t1 = mergeThis.begin();
+          t1 != mergeThis.end(); ++t1)
     {
-      set<Transition*>* deadTransitions = NULL; // transitions, that have to be killed
-      set<Transition*> thisTransitions;
-      set<Transition*> otherTransitions;
-      
-      // find dead transitions
-      try
+      bool stayLonely = true; // if t1 finds a partner
+      for(set<Transition*>::iterator t2 = mergeOther.begin();
+            t2 != mergeOther.end(); ++t2)
       {
-        thisTransitions = getSynchronizedTransitions(*l);
-        otherTransitions = net.getSynchronizedTransitions(*l);
-      }
-      catch(exceptions::UnknownTransitionError & e1)
-      {
-        try
-        {
-          otherTransitions = net.getSynchronizedTransitions(*l);
-          deadTransitions = &otherTransitions;
-        }
-        catch(exceptions::UnknownTransitionError & e2) 
-        {
-          deadTransitions = &thisTransitions;
-        }
-      }
-      
-      if(deadTransitions == NULL)
-      {
-        // do NOT merge twice!
-        thisTransitions = util::setIntersection(thisTransitions, mergeThis);
-        otherTransitions = util::setIntersection(otherTransitions, mergeOther);
+        set<string> t1Labels = (*t1)->getSynchronizeLabels();
+        set<string> t2Labels = (*t2)->getSynchronizeLabels();
+        set<string> t12Labels = util::setIntersection(t1Labels, t2Labels); 
         
-        for(set<Transition*>::iterator t1 = thisTransitions.begin();
-              t1 != thisTransitions.end(); ++t1)
+        if(!t12Labels.empty()) // if t1 and t2 share at least one label
         {
-          for(set<Transition*>::iterator t2 = otherTransitions.begin();
-               t2 != otherTransitions.end(); ++t2)
-          {
-            // two transitions either share all labels or noe
-            if((*t1)->getSynchronizeLabels() != (*t2)->getSynchronizeLabels())
-            {
-              string msg = "Labels of transitions " + (*t1)->getName() 
-                         + " and " + (*t2)->getName() + " match partially";
-              throw exceptions::ComposeError(msg);
-            }
-            
-            // create a new transition by merging both transitions
-            Transition & rt = result.createTransition((*t1)->getName()+netPrefix+(*t2)->getName());
-              
-            // copy preset arcs
-            for (set<Arc *>::iterator f = (*t1)->getPresetArcs().begin(); 
-                    f != (*t1)->getPresetArcs().end(); ++f)
-            {
-              result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
-            }
-            
-            // copy postset arcs
-            for (set<Arc *>::iterator f = (*t1)->getPostsetArcs().begin(); 
-                    f != (*t1)->getPostsetArcs().end(); ++f)
-            {
-              result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
-            }
-            
-            // copy #net's preset arcs
-            for (set<Arc *>::iterator f = (*t2)->getPresetArcs().begin(); 
-                    f != (*t2)->getPresetArcs().end(); ++f)
-            {
-              result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
-            }
-            
-            // copy #net's postset arcs
-            for (set<Arc *>::iterator f = (*t2)->getPostsetArcs().begin(); 
-                    f != (*t2)->getPostsetArcs().end(); ++f)
-            {
-              result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
-            }
-          }
-        }
-        
-        // clean remaining merge candidats
-        mergeThis = util::setDifference(mergeThis, thisTransitions);
-        mergeOther = util::setDifference(mergeOther, otherTransitions);
-      }
-      else
-      {
-        /* synchronize label does appear in both nets, but these
-         * labeled transitions have no partner to match
-         * therefore they must be dead
-         */
-        for(set<Transition*>::iterator dt = deadTransitions->begin();
-              dt != deadTransitions->end(); ++dt)
-        {
-          // create a prefixed transition in the resulting net
-          Transition & rt = result.createTransition((deadTransitions == &thisTransitions) ?
-                              prefix + (*dt)->getName() : netPrefix+(*dt)->getName());
+          set<string> labelUnion = util::setUnion(t1Labels, t2Labels);
+          set<string> rtLabels = util::setDifference(labelUnion, sharedLabels);
+          
+          // create new transition by merging
+          Transition & rt = result.createTransition((*t1)->getName() + netPrefix + (*t2)->getName(), rtLabels);
           
           // copy preset arcs
-          for (set<Arc *>::iterator f = (*dt)->getPresetArcs().begin(); 
-                  f != (*dt)->getPresetArcs().end(); ++f)
+          for (set<Arc *>::iterator f = (*t1)->getPresetArcs().begin(); 
+                  f != (*t1)->getPresetArcs().end(); ++f)
           {
             result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
           }
           
           // copy postset arcs
-          for (set<Arc *>::iterator f = (*dt)->getPostsetArcs().begin(); 
-                  f != (*dt)->getPostsetArcs().end(); ++f)
+          for (set<Arc *>::iterator f = (*t1)->getPostsetArcs().begin(); 
+                  f != (*t1)->getPostsetArcs().end(); ++f)
           {
             result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
           }
           
-          // kill transition
-          Place & dp = result.createPlace();
-          result.createArc(dp, rt);
+          // copy #net's preset arcs
+          for (set<Arc *>::iterator f = (*t2)->getPresetArcs().begin(); 
+                  f != (*t2)->getPresetArcs().end(); ++f)
+          {
+            result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
+          }
+          
+          // copy #net's postset arcs
+          for (set<Arc *>::iterator f = (*t2)->getPostsetArcs().begin(); 
+                  f != (*t2)->getPostsetArcs().end(); ++f)
+          {
+            result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+          }
+          
+          // both transitions found a partner
+          stayLonely = false;
+          lonelyTransitions2.erase(*t2);
+          
+          // if one transition keeps a "common label"
+          if(util::setDifference(labelUnion, t12Labels) != rtLabels)
+          {
+            // then this transition has to be killed
+            doomedTransitions.insert(&rt);
+            
+            //TODO: partial matching may be handled different
+          }
         }
       }
+      if(stayLonely)
+        lonelyTransitions1.insert(*t1);
+    }
+    
+    // copy lonely transitions
+    for(set<Transition*>::iterator t = lonelyTransitions1.begin();
+          t != lonelyTransitions1.end(); ++t)
+    {
+      set<string> rtLabels = util::setDifference((*t)->getSynchronizeLabels(), sharedLabels);
+                
+      // create new transition by merging
+      Transition & rt = result.createTransition(prefix + (*t)->getName(), rtLabels);
+      
+      // copy preset arcs
+      for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+              f != (*t)->getPresetArcs().end(); ++f)
+      {
+        result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
+      }
+      
+      // copy postset arcs
+      for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+              f != (*t)->getPostsetArcs().end(); ++f)
+      {
+        result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+      }
+      
+      // this transition is dead
+      doomedTransitions.insert(&rt);
+    }
+    for(set<Transition*>::iterator t = lonelyTransitions2.begin();
+              t != lonelyTransitions2.end(); ++t)
+    {
+      set<string> rtLabels = util::setDifference((*t)->getSynchronizeLabels(), sharedLabels);
+                
+      // create new transition by merging
+      Transition & rt = result.createTransition(netPrefix + (*t)->getName(), rtLabels);
+      
+      // copy preset arcs
+      for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+              f != (*t)->getPresetArcs().end(); ++f)
+      {
+        result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
+      }
+      
+      // copy postset arcs
+      for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+              f != (*t)->getPostsetArcs().end(); ++f)
+      {
+        result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+      }
+      
+      // this transition is dead
+      doomedTransitions.insert(&rt);
+    }
+    
+    // kill doomed transitions
+    for(set<Transition*>::iterator t = doomedTransitions.begin();
+          t != doomedTransitions.end(); ++t)
+    {
+      Place & p = result.createPlace();
+      result.createArc(p, **t);
     }
     
 

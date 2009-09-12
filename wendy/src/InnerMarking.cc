@@ -53,14 +53,14 @@ InnerMarking::_stats InnerMarking::stats;
  Additionally, a mapping is filled to quickly determine whether a marking can
  become transient if a message with a given label was sent to the net.
 
- \todo replace the mapping receivers by a two-dimensional C-style array or do
-       this check in the constructor
+ \todo replace the mapping receivers and synchs by a single two-dimensional
+       C-style array or do this check in the constructor
  */
 void InnerMarking::initialize() {
     assert(stats.markings == markingMap.size());
     inner_markings = new InnerMarking*[stats.markings];
 
-    // copy data from mapping (used during parsing) to a C array
+    // copy data from STL mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         inner_markings[i] = markingMap[i];
         inner_markings[i]->is_bad = (inner_markings[i]->is_bad or (not finalMarkingReachableMap[i]));
@@ -97,7 +97,6 @@ void InnerMarking::finalize() {
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         delete inner_markings[i];
     }
-
     delete[] inner_markings;
 
     status("InnerMarking: deleted %d objects", stats.markings);
@@ -115,28 +114,25 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
                is_final(_is_final), is_waitstate(0), is_bad(0),
                out_degree(_successors.size()), possibleSendEvents(NULL)
 {
-    ++stats.markings;
-    if (stats.markings % 50000 == 0) {
-        fprintf(stderr, "%8d inner markings\n", stats.markings);
-    }
     assert(_labels.size() == out_degree);
     assert (out_degree < UCHAR_MAX);
 
+    if (++stats.markings % 50000 == 0) {
+        fprintf(stderr, "%8d inner markings\n", stats.markings);
+    }
+
+    // copy given STL vectors to C arrays
     labels = new Label_ID[out_degree];
     std::copy(_labels.begin(), _labels.end(), labels);
-
     successors = new InnerMarking_ID[out_degree];
     std::copy(_successors.begin(), _successors.end(), successors);
 
-    // knowing all successors, we can determine the type of the marking
+    // knowing all successors, we can determine the type of the marking...
     determineType(myId);
 
-    // and we can make an approximation of the receiving transitions that are reachable from here
+    // ...and we can make an approximation of the receiving transitions that
+    // are reachable from here
     if (args_info.smartSendingEvent_flag) {
-
-        // we reserve a Boolean value for each sending event possible
-        possibleSendEvents = new PossibleSendEvents();
-
         calcReachableSendingEvents();
     }
 }
@@ -257,19 +253,22 @@ bool InnerMarking::waitstate(const Label_ID& l) const {
 }
 
 /*!
-  checks if each (input) message lying on the interface of the current marking will be ever be consumed, that is if from the
-  current inner marking a receiving transition is reachable that will consume this message
+  checks if each (input) message lying on the interface of the current
+  marking will be ever be consumed, that is if from the current inner marking
+  a receiving transition is reachable that will consume this message
 
-  \param[in] interface the interface that corresponds to the current inner marking being part of a certain knowledge
-  \return true if all (input) messages of the interface will be consumed later on; false, otherwise
+  \param[in] interface the interface that corresponds to the current inner
+             marking being part of a certain knowledge
+  \return true if all (input) messages of the interface will be consumed
+          later on; false, otherwise
 */
 bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const {
-
     char* possibleSendEventsDecoded = possibleSendEvents->decode();
 
     // iterate over all possible input messages
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        // if input message is on the interface, but message can not be consumed by any marking being reached from the current one
+        // if input message is on the interface, but message can not be
+        // consumed by any marking being reached from the current one,
         // return with false
         if (interface.marked(l) and not possibleSendEventsDecoded[l - Label::first_send]) {
             return false;
@@ -284,29 +283,26 @@ bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const
   determines which sending events are potentially reachable from this marking
 */
 void InnerMarking::calcReachableSendingEvents() {
+    // never call this function more than once
+    assert(possibleSendEvents == NULL);
 
-    assert(args_info.smartSendingEvent_flag);
+    // we reserve a Boolean value for each sending event possible
+    possibleSendEvents = new PossibleSendEvents();
 
     if (out_degree > 0) {
-
         // remember which directly reachable sending events (edges) we have considered already
         std::map<Label_ID, bool> consideredLabels;
 
         // traverse successors
         for (uint8_t i = 0; i < out_degree; i++) {
-
             // if successor exists and if it leads to a final marking
             if (markingMap[successors[i]] != NULL and
                 finalMarkingReachableMap[successors[i]]) {
 
                 // direct successor reachable by sending event
                 if (SENDING(labels[i]) and not consideredLabels[labels[i]]) {
-
                     // add current sending event
-                    PossibleSendEvents* tempPossibleSendEvents = new PossibleSendEvents(false, labels[i]);
-                    *possibleSendEvents |= *tempPossibleSendEvents;
-
-                    delete tempPossibleSendEvents;
+                    *possibleSendEvents |= PossibleSendEvents(false, labels[i]);
 
                     consideredLabels[labels[i]] = true;
                 }

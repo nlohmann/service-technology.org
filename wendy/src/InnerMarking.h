@@ -107,10 +107,10 @@ class InnerMarking {
         /// checks if all input messages will be consumed later on
         bool sentMessagesConsumed(const InterfaceMarking&) const;
 
+    private: /* member functions */
+
         /// determines which receiving transitions are potentially reachable from this marking
         void calcReachableSendingEvents();
-
-    private: /* member functions */
 
         /// determine the type of this marking
         void determineType(const InnerMarking_ID&);

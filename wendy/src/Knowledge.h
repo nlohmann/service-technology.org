@@ -36,6 +36,13 @@
  This class is used to build knowledges. Its main focus is runtime
  optimization. A later translation into StoredKnowledge objects removes any
  unneccessary information, yielding a compact representation.
+ 
+ \todo It seems that many of the functions that organized reduction
+       techniques traverse all markings the knowledge bubble. Hence,
+       efficiency could be imporoved by making the respective check while
+       building the bubble to avoid repeated traversion. Then, it might be
+       cheaper to precompute the results and store them as members than
+       actually making a function call.
  */
 class Knowledge {
 

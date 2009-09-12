@@ -152,7 +152,11 @@ void PossibleSendEvents::labelPossible(Label_ID l) {
     storage[myByte] += (1 << myBit);
 }
 
-char * PossibleSendEvents::decode() {
+/*!
+ \todo Check if this function is actually called more than once. If not, then
+       we can skip the first if and make this a const function.
+*/
+char* PossibleSendEvents::decode() {
     assert(bytes > 0);
 
     // only reserve memory on first decoding

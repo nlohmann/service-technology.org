@@ -49,15 +49,20 @@
 
 /*!
  \brief communication labels
- 
+
  Communication labels are described from the point of view of the environment;
  that is, not from the point of view of the net. If the net sends a message,
  the respective communication label for us would be to receive.
- 
+
  - silent action (tau) has label 0
  - asynchronous receive events have labels first_receive (=1) to last_receive
  - asynchronous send events have labels first_send to last_send
  - synchronous events have labels first_sync to last_sync
+
+ \note This class is a static helper class from which no objects are built.
+
+ \todo The id2name and name2id mappings could be replaced by C-style string
+       vectors in order to improve runtime.
  */
 class Label {
 

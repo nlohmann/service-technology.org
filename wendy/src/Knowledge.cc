@@ -351,20 +351,20 @@ void Knowledge::sequentializeReceivingEvents(std::map<Label_ID, bool>& considere
                 for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
                     if (pos->second[i]->marked(l)) {
                         // remember that current receiving event is activated in a waitstate
-                        occuranceOfReceivingEvent[l] += 1;
+                        ++occuranceOfReceivingEvent[l];
                         // remember this event in case the current waitstate activates only one receiving event
                         consideredReceivingEvent = l;
-                        marked++;
+                        ++marked;
                     }
                 }
                 // check if waitstate activates only a single receiving event
                 if (marked == 1) {
-
                     // this receiving event has to be considered
                     consideredReceivingEvents[consideredReceivingEvent] = true;
-
                 }
-                // remember to visit this state again; we only store the interface here, we don't need more information later on
+
+                // remember to visit this state again; we only store the
+                // interface here, we don't need more information later on
                 visitStateAgain[pos->second] = true;
             }
         }
@@ -398,10 +398,10 @@ void Knowledge::sequentializeReceivingEvents(std::map<Label_ID, bool>& considere
                         break;
                     }
                     // if currently considered activated receiving event is not the currently considered one
-                    if (!realEvent || l > consideredReceivingEvent) {
+                    if (not realEvent or l > consideredReceivingEvent) {
                         // check if the currently considered activated receiving event is activated by more
                         // waitstates than the currently considered one
-                        if (!realEvent || occuranceOfReceivingEvent[l] > occuranceOfReceivingEvent[consideredReceivingEvent]) {
+                        if (not realEvent or occuranceOfReceivingEvent[l] > occuranceOfReceivingEvent[consideredReceivingEvent]) {
                             // yes, so we will (temporarily) consider the current receiving event to be essential to
                             // resolve the waitstate
                             consideredReceivingEvent = l;

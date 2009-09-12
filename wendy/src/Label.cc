@@ -56,6 +56,11 @@ std::map<string, Label_ID> Label::name2id;
  * STATIC METHODS *
  ******************/
 
+/*!
+ This function traverses the Petri net nodes and extracts the labels of the
+ communication events (asynchronous send and receive events as well as
+ synchronous events). Each event then gets a unique identifier.
+ */
 void Label::initialize() {
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
     first_receive = 1;

@@ -25,7 +25,6 @@
 #include <map>
 #include <set>
 #include "types.h"
-#include "config.h"
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
 #include <pnapi/pnapi.h>
@@ -96,7 +95,8 @@ class InnerMarking {
     public: /* member functions */
 
         /// constructor
-        InnerMarking(const InnerMarking_ID&, const std::vector<Label_ID>&, const std::vector<InnerMarking_ID>&, bool);
+        InnerMarking(const InnerMarking_ID&, const std::vector<Label_ID>&,
+                     const std::vector<InnerMarking_ID>&, bool);
 
         /// destructor
         ~InnerMarking();

@@ -36,7 +36,10 @@ extern gengetopt_args_info args_info;
  * CONSTRUCTOR *
  ***************/
 
-Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1) {
+Knowledge::Knowledge() : is_sane(1), size(1) {
+    // calculate knowledge for the initial marking
+    InnerMarking_ID m = 0;
+
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     std::queue<FullMarking> todo;

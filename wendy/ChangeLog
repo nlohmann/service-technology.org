@@ -16,6 +16,9 @@ Version 2.2-unreleased
 * no output files are created in case of uncontrollability (unless
   `--diagnose' is given)
 
+* implemented parameter `--stats' to display information on runtime and
+  memory consumption (the latter uses `ps' and does not work under Cygwin)
+
 Version 2.1 (6 September 2009)
 ==============================
 
@@ -264,7 +267,7 @@ Version 1.1 (12 May 2009)
 Version 1.0 (11 May 2009)
 =========================
 
-* initial release of Wendy
+* first official release of Wendy
 
 * calculates the operating guidelines of a normal open net
 

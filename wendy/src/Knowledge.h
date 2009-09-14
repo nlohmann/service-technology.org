@@ -48,8 +48,8 @@ class Knowledge {
 
     public: /* member functions */
 
-        /// construct knowledge from (initial) inner marking
-        Knowledge(InnerMarking_ID);
+        /// construct knowledge from the initial inner marking
+        Knowledge();
 
         /// construct knowledge from a given knowledge and a label
         Knowledge(Knowledge const&, const Label_ID&);
@@ -71,7 +71,8 @@ class Knowledge {
         /// whether this knowledge is sane
         unsigned is_sane : 1;
 
-        /// the number of markings stored in the bubble
+        /// \brief the number of markings stored in the bubble
+        /// \todo Do we need to have unsigned ints here? Maybe short is enough.
         unsigned int size;
 
         /// primary data structure

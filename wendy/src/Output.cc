@@ -30,23 +30,6 @@
 
 extern gengetopt_args_info args_info;
 
-// detect MinGW compilation under Cygwin
-#ifndef CYGWIN_MINGW
-#ifdef WIN32
-#ifndef _WIN32
-#define CYGWIN_MINGW 1
-//not defined(__MINGW32__)
-#endif
-#endif
-#endif
-
-
-/******************
- * STATIC MEMBERS *
- ******************/
-
-std::string Output::stdout_filename = "-";
-
 
 /***************
  * CONSTRUCTOR *
@@ -58,7 +41,7 @@ std::string Output::stdout_filename = "-";
  basename has to be used to avoid problems with path names.
 */
 Output::Output() :
-#if defined(CYGWIN_MINGW)
+#if defined(__MINGW32__)
     os(*(new std::ofstream(mktemp(temp = basename(args_info.tmpfile_arg)), std::ofstream::out | std::ofstream::trunc))),
 #else
     os(*(new std::ofstream(mktemp(temp = args_info.tmpfile_arg), std::ofstream::out | std::ofstream::trunc))),
@@ -74,11 +57,10 @@ Output::Output() :
 
 /*!
  This constructor creates a file with the given filename. In case the
- filename matches the symbol stored in "stdout_filename", no file is created,
- but std::cout is used as output.
+ filename matches "-", no file is created, but std::cout is used as output.
 */
 Output::Output(std::string& str, std::string kind) :
-    os((!str.compare(stdout_filename)) ?
+    os((!str.compare("-")) ?
         std::cout :
         *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
     ),
@@ -88,7 +70,7 @@ Output::Output(std::string& str, std::string kind) :
         abort(11, "could not write to file '%s'", str.c_str());
     }
 
-    if (str.compare(stdout_filename)) {
+    if (str.compare("-")) {
         status("writing %s to file '%s'", kind.c_str(), filename.c_str());
     } else {
         status("writing %s to standard output", kind.c_str());

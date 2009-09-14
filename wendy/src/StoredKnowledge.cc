@@ -29,6 +29,7 @@
 #include "Cover.h"
 #include "Label.h"
 #include "verbose.h"
+#include "cmdline.h"
 
 using std::map;
 using std::set;
@@ -93,7 +94,6 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
 
     // only process knowledges within the message bounds
     if (K_new.is_sane) {
-
         // create a compact version of the knowledge bubble
         StoredKnowledge* SK_new = new StoredKnowledge(K_new);
 
@@ -279,7 +279,6 @@ inline void StoredKnowledge::evaluateKnowledgeSet(std::set<StoredKnowledge*>& kn
   \post all deadlock markings can be found between index 0 and sizeDeadlockMarkings
  */
 inline void StoredKnowledge::rearrangeKnowledgeBubble() {
-
     // check the stored markings and remove all transient states
     unsigned int j = 0;
 
@@ -291,7 +290,6 @@ inline void StoredKnowledge::rearrangeKnowledgeBubble() {
 
         // case 1: a final marking that is not a waitstate
         if (InnerMarking::inner_markings[inner[j]]->is_final and interface[j]->unmarked()) {
-
             // remember that this knowledge contains a final marking
             is_final = is_final_reachable = 1;
 
@@ -303,17 +301,14 @@ inline void StoredKnowledge::rearrangeKnowledgeBubble() {
 
         // case 2: a resolved waitstate
         if (InnerMarking::inner_markings[inner[j]]->is_waitstate) {
-
             // check if DL is resolved by interface marking
             for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
                 if (interface[j]->marked(l) and
                     InnerMarking::receivers[l].find(inner[j]) != InnerMarking::receivers[l].end()) {
-
                     transient = true;
                 }
             }
         } else {
-
             // case 3: a transient marking
             transient = true;
         }
@@ -368,9 +363,8 @@ StoredKnowledge::StoredKnowledge(Knowledge& K) :
     // traverse the bubble and copy the markings into the C arrays
     for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K.bubble.begin(); pos != K.bubble.end(); ++pos) {
         for (size_t i = 0; i < pos->second.size(); ++i, ++count) {
-            // copy the inner marking
+            // copy the inner marking and the interface marking
             inner[count] = pos->first;
-            // copy the interface marking
             interface[count] = new InterfaceMarking(*(pos->second[i]));
         }
 
@@ -390,11 +384,6 @@ StoredKnowledge::StoredKnowledge(Knowledge& K) :
 }
 
 
-/*!
- \note This destructor is only called during the building of the knowledges.
-       That said, neither successors nor predecessors need to be deleted by
-       this destructor.
- */
 StoredKnowledge::~StoredKnowledge() {
     // delete the interface markings
     for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
@@ -544,13 +533,13 @@ inline void StoredKnowledge::evaluateCurrentSCC() {
  */
 StoredKnowledge* StoredKnowledge::store() {
     // we do not want to store the empty node
-    assert (sizeAllMarkings != 0);
+    assert(sizeAllMarkings != 0);
 
     // get the element's hash value
     hash_t myHash = hash();
 
     // check if we find a bucket with that hash value
-    std::map<hash_t, std::vector<StoredKnowledge*> >::iterator el = hashTree.find(myHash);
+    std::map<hash_t, std::vector<StoredKnowledge*> >::const_iterator el = hashTree.find(myHash);
     if (el != hashTree.end()) {
         // we found an element with the same hash -- is it a collision?
         for (size_t i = 0; i < el->second.size(); ++i) {
@@ -566,6 +555,7 @@ StoredKnowledge* StoredKnowledge::store() {
                     if (inner[j] != el->second[i]->inner[j] or
                         *interface[j] != *el->second[i]->interface[j]) {
                         found = false;
+                        break;
                     }
                 }
 
@@ -573,7 +563,6 @@ StoredKnowledge* StoredKnowledge::store() {
                 if (found) {
                     // we found a previously stored element with the same
                     // markings -> return a pointer to this element
-
                     return el->second[i];
                 }
             }
@@ -590,6 +579,7 @@ StoredKnowledge* StoredKnowledge::store() {
     hashTree[myHash].push_back(this);
     ++stats.storedKnowledges;
 
+    // \todo Daniela, please comment this line
     tarjanMapping[this].first = tarjanMapping[this].second = stats.storedKnowledges;
 
     // put knowledge on the Tarjan stack
@@ -1136,7 +1126,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
         << " node [fontname=\"Helvetica\" fontsize=10]\n"
         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
-     // draw the nodes
+    // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if ((it->second[i]->is_sane or args_info.diagnose_flag) and
@@ -1170,7 +1160,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
                 file << "\"]" << std::endl;
 
-                 // draw the edges
+                // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
                         (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
@@ -1181,7 +1171,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                             << Label::id2name[l] << "\"]\n";
                     }
 
-                     // draw edges to the empty node if requested
+                    // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_flag and
                     it->second[i]->successors[l-1] == empty) {
                         emptyNodeReachable = true;
@@ -1194,7 +1184,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
         }
     }
 
-     // draw the empty node if it is requested and reachable
+    // draw the empty node if it is requested and reachable
     if (args_info.showEmptyNode_flag and emptyNodeReachable) {
         file << "0 [label=\"";
         if (args_info.formula_arg == formula_arg_cnf) {

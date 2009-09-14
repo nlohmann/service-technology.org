@@ -22,7 +22,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <libgen.h>
@@ -31,18 +31,10 @@
 #include "StoredKnowledge.h"
 #include "PossibleSendEvents.h"
 #include "Label.h"
+#include "cmdline.h"
 #include "Output.h"
 #include "Cover.h"
 #include "verbose.h"
-
-// detect MinGW compilation under Cygwin
-#ifndef CYGWIN_MINGW
-#ifdef WIN32
-#ifndef _WIN32
-#define CYGWIN_MINGW 1
-#endif
-#endif
-#endif
 
 using std::string;
 
@@ -64,6 +56,9 @@ string invocation;
 /// a file to store a mapping from marking ids to actual Petri net markings
 Output *markingoutput = NULL;
 
+/// a variable holding the time of the call
+clock_t start_clock = clock();
+
 
 bool fileExists(std::string filename) {
     FILE *tmp = fopen(filename.c_str(), "r");
@@ -79,7 +74,7 @@ bool fileExists(std::string filename) {
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // overwrite invocation for consistent error messages
-    argv[0] = (char*)PACKAGE;
+    argv[0] = basename(argv[0]);
 
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {
@@ -120,9 +115,10 @@ void evaluateParameters(int argc, char** argv) {
         }
     } else {
         // check for configuration files
-        string conf_filename = fileExists("wendy.conf") ? "wendy.conf" :
-                               (fileExists(string(SYSCONFDIR) + "/wendy.conf") ?
-                               (string(SYSCONFDIR) + "/wendy.conf") : "");
+        string conf_generic_filename = string(PACKAGE) + ".conf";
+        string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
+                               (fileExists(string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+                               (string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
 
         if (conf_filename != "") {
             // initialize the config file parser
@@ -157,16 +153,41 @@ void evaluateParameters(int argc, char** argv) {
 }
 
 
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // release memory (used to detect memory leaks)
+    if (args_info.finalize_flag) {
+        time_t start_time, end_time;
+        time(&start_time);
+        cmdline_parser_free(&args_info);
+        InnerMarking::finalize();
+        StoredKnowledge::finalize();
+        time(&end_time);
+        status("released memory [%.0f sec]", difftime(end_time, start_time));
+    }
+
+    // print statistics
+    if (args_info.stats_flag) {
+        message("runtime: %.2f sec", (double(clock()) - double(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+        system((string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
+
+
 int main(int argc, char** argv) {
-    // set a standard filename
-    string filename("wendy_output");
     time_t start_time, end_time;
+
+    // set the function to call on normal termination
+    atexit(terminationHandler);
+
+    // set a standard filename
+    string filename = string(PACKAGE) + "_output";
 
     /*--------------------------------------.
     | 0. parse the command line parameters  |
     `--------------------------------------*/
     evaluateParameters(argc, argv);
-
 
     /*----------------------.
     | 1. parse the open net |
@@ -258,7 +279,7 @@ int main(int argc, char** argv) {
     }
 
     // select LoLA binary
-#if defined(CYGWIN_MINGW)
+#if defined(__MINGW32__)
     // MinGW does not understand pathnames with "/", so we use the basename
     string lola_command = basename(args_info.lola_arg);
 #else
@@ -266,7 +287,7 @@ int main(int argc, char** argv) {
 #endif
 
     // read from a pipe or from a file (MinGW cannot pipe)
-#if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(CYGWIN_MINGW)
+#if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(__MINGW32__)
     string command_line = lola_command + " " + temp.name() + " -M 2> /dev/null";
     status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
@@ -274,7 +295,7 @@ int main(int argc, char** argv) {
     pclose(graph_in);
 #else
     string command_line = lola_command + " " + temp.filename + " -m";
-#if !defined(CYGWIN_MINGW)
+#if !defined(__MINGW32__)
     // MinGW cannot pipe
     command_line += " &> /dev/null";
 #endif
@@ -308,7 +329,7 @@ int main(int argc, char** argv) {
     `-------------------------------*/
     time(&start_time);
     {
-        Knowledge K0(0);
+        Knowledge K0;
         StoredKnowledge::root = new StoredKnowledge(K0);
 
         if (StoredKnowledge::root->is_sane) {
@@ -402,17 +423,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    /*-------------------.
-    | 10. release memory |
-    `-------------------*/
-    if (args_info.finalize_flag) {
-        time(&start_time);
-        cmdline_parser_free(&args_info);
-        InnerMarking::finalize();
-        StoredKnowledge::finalize();
-        time(&end_time);
-        status("released memory [%.0f sec]", difftime(end_time, start_time));
-    }
 
     return EXIT_SUCCESS;
 }

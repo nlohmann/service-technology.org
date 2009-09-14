@@ -28,7 +28,6 @@
 #include "types.h"
 #include "InterfaceMarking.h"
 #include "Knowledge.h"
-#include "cmdline.h"
 
 
 /*!
@@ -194,16 +193,19 @@ class StoredKnowledge {
 
     private: /* member attributes */
 
-        /// the number of markings stored in this knowledge
+        /// \brief the number of markings stored in this knowledge
+        /// \todo Do we need to have unsigned ints here? Maybe short is enough.
         unsigned int sizeDeadlockMarkings;
 
-        /// the number of markings stored in this knowledge
+        /// \brief the number of markings stored in this knowledge
+        /// \todo Do we need to have unsigned ints here? Maybe short is enough.
         unsigned int sizeAllMarkings;
 
         /// an array of inner markings (length is sizeAllMarkings)
         InnerMarking_ID* inner;
 
-        /// an array of interface markings (length is sizeAllMarkings)
+        /// \brief an array of interface markings (length is sizeAllMarkings)
+        /// \todo Do we need an array to pointers here? Maybe explicit objects are enough.
         InterfaceMarking** interface;
 
         /// the successors of this knowledge (length is fixed by the labels)

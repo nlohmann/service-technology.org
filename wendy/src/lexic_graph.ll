@@ -21,6 +21,7 @@
 %option noyywrap
 %option yylineno
 %option nodefault
+%option nounput
 %option outfile="lex.yy.c"
 %option prefix="graph_"
 
@@ -28,11 +29,9 @@
 #include <cstring>
 #include <string>
 #include "syntax_graph.h"
-#include "cmdline.h"
 #include "verbose.h"
 
 extern std::string NAME_token;
-extern gengetopt_args_info args_info;
 
 void graph_error(const char *);
 %}

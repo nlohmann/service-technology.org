@@ -25,7 +25,7 @@
  ************/
 #include "config.h"
 #include <pnapi/pnapi.h>
-#include <fstream>
+#include <iostream>
 #include "InnerMarking.h"
 #include "StoredKnowledge.h"
 #include "types.h"

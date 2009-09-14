@@ -4,7 +4,7 @@ AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE(gnits)
 
-# check for programs needed to compile
+# check for standard programs needed to compile
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
@@ -14,9 +14,13 @@ AC_PROG_SED
 AC_PROG_GREP
 AC_PROG_AWK
 
-# check for additional programs
+# check for additional programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# export tools needed to determine memory consumption
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
@@ -34,7 +38,7 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for required tools
-AC_PATH_PROGS(LOLA, [lola-statespace], [])
+AC_PATH_PROG(LOLA, [lola-statespace], [])
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)
@@ -70,6 +74,7 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
+# check length of pointers and integer data types
 AC_CHECK_SIZEOF([void*])
 AC_CHECK_SIZEOF([unsigned int])
 AC_CHECK_SIZEOF([unsigned long])

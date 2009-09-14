@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # @configure_input@
 
 #############################################################################
@@ -13,7 +13,7 @@
 
 # evaluate COVER variable
 if test "$COVER" != "TRUE"; then
-	$*
+	eval $*
 	exit $?
 fi
 
@@ -33,7 +33,7 @@ INFOFILE=@abs_builddir@/cover/$TESTNAME-$RANDOM.info
 $LCOV --zerocounters -directory @abs_top_builddir@
 
 # execute executable and remember exit code
-$*
+eval $*
 result=$?
 
 # evaluate coverage result of LCOV

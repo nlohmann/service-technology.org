@@ -36,18 +36,12 @@
  description of the output (for verbose messages). To create a temporary
  file, call the constructor without arguments. Temporary files will be
  deleted when the object is destroyed unless the paramter '--noClean' is
- given. To redirect to standard output, use the the filename stored in
- stdout_filename (usually "-").
+ given. To redirect to standard output, use the the filename "-".
 
  The quite tricky constructor was taken from the Ubuntu Forums at
  http://ubuntuforums.org/showthread.php?p=5929211
  */
 class Output {
-
-    private: /* static attributes */
-
-        /// if this name is given as filename, std::cout will be used as output
-        static std::string stdout_filename;
 
     public: /* member functions */
 

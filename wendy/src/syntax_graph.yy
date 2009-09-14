@@ -29,7 +29,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "PossibleSendEvents.h"
 #include "InnerMarking.h"
 #include "Label.h"
 #include "Output.h"

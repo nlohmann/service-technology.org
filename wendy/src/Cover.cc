@@ -17,14 +17,11 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-#include "config.h"
 #include "Cover.h"
-#include <pnapi/pnapi.h>
-#include "InnerMarking.h"
 #include "Label.h"
 #include "verbose.h"
 #include "types.h"
-
+#include "cmdline.h"
 
 extern gengetopt_args_info args_info;
 

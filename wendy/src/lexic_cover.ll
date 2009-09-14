@@ -21,6 +21,7 @@
 %option noyywrap
 %option yylineno
 %option nodefault
+%option nounput
 %option outfile="lex.yy.c"
 %option prefix="cover_"
 

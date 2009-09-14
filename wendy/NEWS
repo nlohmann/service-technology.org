@@ -16,6 +16,9 @@ Version 2.2-unreleased
 * no output files are created in case of uncontrollability (unless
   `--diagnose' is given)
 
+* implemented parameter `--stats' to display information on runtime and
+  memory consumption (the latter uses `ps' and does not work under Cygwin)
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

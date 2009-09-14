@@ -3,7 +3,10 @@
 @item added test cases to test Wendy's integration into Marlene
 
 @item no output files are created in case of uncontrollability (unless @option{--diagnose} is given)
+
+@item implemented parameter @option{--stats} to display information on runtime and memory consumption (the latter uses @code{ps} and does not work under Cygwin)
 @end itemize
+
 
 @heading Version 2.1 (6 September 2009)
 @itemize
@@ -188,7 +191,7 @@
 
 @heading Version 1.0 (11 May 2009)
 @itemize
-@item initial release of Wendy
+@item first official release of Wendy
 
 @item calculates the operating guidelines of a normal open net
 

@@ -29,9 +29,9 @@ TESTFILES = test_input.owfn \
             bug14127.owfn \
             bug14128.1.owfn \
             bug14128.2.owfn \
-	    bug14206.lola \
-	    bug14208.1.owfn \
-	    bug14208.2.owfn \
+            bug14206.lola \
+            bug14208.1.owfn \
+            bug14208.2.owfn \
             test_input.lola \
             test_dead_nodes.net.owfn \
             test_identical_places.net.owfn \
@@ -61,7 +61,9 @@ TESTFILES = test_input.owfn \
             syntax_example_new.owfn \
             syntax_example_new_short.owfn \
             syntax_formula.owfn \
-            syntax_max_occurrence.owfn
+            syntax_max_occurrence.owfn \
+            test_produce.onlineshop.constraint.owfn \
+            test_produce.onlineshop.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

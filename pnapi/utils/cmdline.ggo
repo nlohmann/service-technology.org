@@ -24,74 +24,71 @@ option "formula" f
   "Places a final condition at the end of LoLA files. Has no effect to other output formats."
   flag off
 
-defgroup "Composition"
 
-groupoption "compose" -
+section "Composition and Product"
+
+option "compose" -
   "Compose each net given in the input section with this net."
   typestr="NET"
   string
-  group="Composition"
   optional
 
-groupoption "wire" w
+option "wire" w
   "Wire (i.e., compose) the given nets. Either a wiring description is given or the interfaces are composed according to their names."
   typestr="FILE"
   string
-  group="Composition"
   argoptional
   optional
   hidden
 
+option "produce" -
+  "Calculate the product."
+  typestr="CONSTRAINT"
+  string
+  optional
 
-defmode "Check for Structural Properties"
 
-modeoption "isFreeChoice" -
+section "Check for Structural Properties"
+
+option "isFreeChoice" -
   "Check if the Petri net is free choice, i.e. if conflicting transitions share all pre-places."
   flag off
-  mode="Check for Structural Properties"
 
-modeoption "isNormal" -
+option "isNormal" -
   "Check if the Petri net is normal, i.e. every transition is connect to at most one interface place."
   flag off
-  mode="Check for Structural Properties"
 
-modeoption "isWorkflow" -
+option "isWorkflow" -
   "Check if the Petri net has workflow structure, i.e. it (i) has a distinct source place, (ii) has a district sink place, and (iii) every node lays on a path between the source place and the sink place."
   flag off
-  mode="Check for Structural Properties"
 
-modeoption "check" c
+option "check" c
   "Check a structural property of the Petri net, see `isFreeChoice', `isNormal', and `isWorkflow' for details."
   typestr="PROPERTY"
   values="freechoice","normal","workflow" enum
-  mode="Check for Structural Properties"
   optional
   hidden
 
 
-defmode "Modifications"
+section "Modifications"
 
-modeoption "reduce" r
+option "reduce" r
   "Apply structural reduction rules, i.e. reduce the structure of the net while preserving liveness and boundedness."
   typestr="RULES"
   values="0","1","2","3","4","5","6","starke","pillat","dead_nodes","identical_places","identical_transitions","series_places","series_transitions","self_loop_places","self_loop_transitions","equal_places","starke3p","starke3t","starke4","starke5","starke6","starke7","starke8","starke9","keep_normal","once","k_boundedness","boundedness","liveness" enum
-  mode="Modifications"
   optional
   multiple
 
-modeoption "normalize" n
+option "normalize" n
   "Normalize the Petri net, i.e. change to structure such that every transition is connected to at most one interface place."
-  mode="Modifications"
   flag off
 
-modeoption "negate" N
+option "negate" N
   "Negate the final condition of the net, i.e. every specified final marking is now non-final. The result is the 'anti open net'."
-  mode="Modifications"
   flag off
 
-modeoption "mirror" M
+option "mirror" M
   "Mirror the interface, i.e. change the direction of communication"
-  mode="Modifications"
   flag off
 
 

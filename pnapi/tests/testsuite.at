@@ -20,7 +20,6 @@ AT_CHECK([PETRI --version],0,ignore)
 AT_KEYWORDS([frontend])
 AT_CLEANUP
 
-
 ############################################################################
 AT_BANNER([Input])
 ############################################################################
@@ -110,6 +109,22 @@ AT_CHECK([PETRI NET --output=png],0,ignore,ignore)
 AT_CHECK([test -f NET.png])
 AT_KEYWORDS([frontend output slow])
 AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Composition and Product])
+############################################################################
+
+AT_SETUP([Product with constraint net])
+AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
+AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
+AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
+AT_CHECK([GREP -q "(constraint.final = 1 AND net.final = 1 AND ALL_OTHER_PLACES_EMPTY);" test_produce.onlineshop.owfn.owfn])
+#AT_CHECK_FIONA
+#AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn.owfn test_produce.onlineshop.owfn -sempty],0,ignore,ignore)
+AT_KEYWORDS([composition])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([oWFN Syntax])

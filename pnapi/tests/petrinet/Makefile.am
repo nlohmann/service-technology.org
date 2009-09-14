@@ -1,16 +1,12 @@
 TESTS = test_merging        \
-	test_normalize      \
-	test_produce
+	test_normalize
 
 check_PROGRAMS = $(TESTS)
 
 test_merging_SOURCES        = test_merging.cc
 test_normalize_SOURCES      = test_normalize.cc
-test_produce_SOURCES	    = test_produce.cc
 
-EXTRA_DIST = $(TESTS) \
-	test_produce.onlineshop.owfn \
-	test_produce.onlineshop.constraint.owfn
+EXTRA_DIST = $(TESTS)
 
 
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src

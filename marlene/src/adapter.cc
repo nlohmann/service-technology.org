@@ -248,13 +248,12 @@ const pnapi::PetriNet * Adapter::buildController()
         \***********************************************/
         time(&start_time);
         pnapi::PetriNet * controller;
-/*
-        if (std::string(CONFIG_PETRIFY) != "not found")
+
+        if (std::string(CONFIG_PETRIFY) != "not found" && _contType == ASYNCHRONOUS)
         {
             controller = new pnapi::PetriNet(*mpp_sa);
         }
         else
-*/
         {
             controller = new pnapi::PetriNet(mpp_sa->stateMachine());
         }
@@ -300,61 +299,56 @@ void Adapter::createEngineInterface()
                             ((*place)->getType() == Node::INPUT) ? Node::OUTPUT
                             : Node::INPUT, 0, _messageBound);
             
-            if (!_engine->findPlace(internalname))
+            Place * intplace = _engine->findPlace(internalname);
+            if (intplace == NULL)
             {
                 //! the internal place which is a copy of the interface place
-                Place & intplace = _engine->createPlace(internalname,
+                intplace = &_engine->createPlace(internalname,
                                 Node::INTERNAL, 0, _messageBound);
                 
-                //! name of sending/receiving transition
-                std::string inttransname(( ((*place)->getType() == Node::INPUT ) ? "t_send_"
-                                : "t_receive_") + ifname);
-                
-                //! transition which moves the token between the interface place and its copy
-                Transition & inttrans =_engine->createTransition( inttransname );
-                
-                // create arcs between the internal place, the transition 
-                // and the interface place
+            }
+            //! name of sending/receiving transition
+            std::string inttransname(( ((*place)->getType() == Node::INPUT ) ? "t_send_"
+                            : "t_receive_") + ifname);
+            
+            //! transition which moves the token between the interface place and its copy
+            Transition & inttrans =_engine->createTransition( inttransname );
+            
+            // create arcs between the internal place, the transition 
+            // and the interface place
+            if ((*place)->getType() == Node::INPUT)
+            {
+                _engine->createArc(*intplace, inttrans);
+                _engine->createArc(inttrans, ifplace);
+            }
+            else
+            {
+                _engine->createArc(ifplace, inttrans);
+                _engine->createArc(inttrans, *intplace);
+            }
+            
+            // if we have a synchronous interface, create label for transition
+            if (_contType == SYNCHRONOUS)
+            {
+                std::set< std::string> syncLabel;
+                syncLabel.insert("sync_" + inttransname);
+                inttrans.setSynchronizeLabels(syncLabel);
+            }
+            // else create interface place to the controller
+            else
+            {
+                std::string contplacename = (((*place)->getType() == Node::INPUT) ? "send_"
+                    : "receive_") + ifname;
+                Place & contplace =
+                                _engine->createPlace(contplacename, ((*place)->getType()
+                                                == Node::INPUT) ? Node::INPUT
+                                    : Node::OUTPUT, 0, _messageBound);
                 if ((*place)->getType() == Node::INPUT)
                 {
-                    _engine->createArc(intplace, inttrans);
-                    _engine->createArc(inttrans, ifplace);
-                }
-                else
+                    _engine->createArc(contplace, inttrans);
+                } else
                 {
-                    _engine->createArc(ifplace, inttrans);
-                    _engine->createArc(inttrans, intplace);
-                }
-                
-                // if we have a synchronous interface, create label for transition
-                if (_contType == SYNCHRONOUS)
-                {
-                    std::set< std::string > syncLabel;
-                    syncLabel.insert("sync_" + inttransname);
-                    inttrans.setSynchronizeLabels(syncLabel);
-                }
-                // else create interface place to the controller
-                else
-                {
-                    std::string contplacename =
-                                    (((*place)->getType()
-                                                    == Node::INPUT) ? "send_"
-                                        : "receive_") + ifname;
-                    Place
-                                    & contplace =
-                                                    _engine->createPlace(
-                                                        contplacename,
-                                                        ((*place)->getType()
-                                                                        == Node::INPUT) ? Node::INPUT
-                                                            : Node::OUTPUT, 0,
-                                                        _messageBound);
-                    if ((*place)->getType() == Node::INPUT)
-                    {
-                        _engine->createArc(contplace, inttrans);
-                    } else
-                    {
-                        _engine->createArc(inttrans, contplace);
-                    }
+                    _engine->createArc(inttrans, contplace);
                 }
             }
         }

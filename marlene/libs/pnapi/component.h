@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-08-06 22:41:15 +0200 (Do, 06. Aug 2009) $
+ * \date    $Date: 2009-09-09 23:49:23 +0200 (Mi, 09. Sep 2009) $
  *
- * \version $Revision: 4526 $
+ * \version $Revision: 4694 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -331,6 +331,9 @@ namespace pnapi
 
     /// weight
     unsigned int getWeight() const;
+    
+    /// set the weight
+    void setWeight(unsigned int);
 
     /// merges another arc into this one
     void merge(Arc &);

@@ -1,5 +1,7 @@
 @heading Version 2.2-unreleased
 @itemize
+@item added test cases for checking synchronous communication together with livelock freedom and reduction rule ``quit as soon as possible'' (parameter: @option{--quitAsSoonAsPossible})
+
 @item added test cases to test Wendy's integration into Marlene
 
 @item no output files are created in case of uncontrollability (unless @option{--diagnose} is given)
@@ -12,7 +14,7 @@
 @itemize
 @item fixed (known) issues concerning reduction rule ``succeeding sending event'' (parameter: @option{--succeedingSendingEvent}) 
 
-@item issues on the hidden parameter ``quit as soon as possible'' (parameter: @option{--succeedingSendingEvent}) have been fixed
+@item issues on the hidden parameter ``quit as soon as possible'' (parameter: @option{--quitAsSoonAsPossible}) have been fixed
 
 @item implemented on-the-fly knowledge analysis
 

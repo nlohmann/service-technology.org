@@ -128,8 +128,8 @@ class StoredKnowledge {
 
     private: /* static functions */
 
-        /// evaluate each member of the given set of knowledges and propagate the property of being insane accordingly
-        static void evaluateKnowledgeSet(std::set<StoredKnowledge*>&);
+        /// evaluate each member of the given (T)SCC and propagate the property of being insane accordingly
+        static void analyzeSCCOfKnowledges(std::set<StoredKnowledge*>&);
 
     public: /* member functions */
 
@@ -163,10 +163,10 @@ class StoredKnowledge {
         void rearrangeKnowledgeBubble();
 
         /// adjust lowlink values of the stored knowledge
-        void adjustLowlinkValue(const StoredKnowledge* const) const;
+        void adjustLowlinkValue(const StoredKnowledge* const, const bool) const;
 
-        /// evaluates the current SCC components and adjusts the is_final_reachable value
-        void evaluateCurrentSCC();
+        /// evaluates the current knowledge bubble with respect to (T)SCCs
+        void evaluateKnowledge();
 
         /// print knowledge
         void print(std::ostream&) const;

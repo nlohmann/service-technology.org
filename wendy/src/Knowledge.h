@@ -36,7 +36,7 @@
  This class is used to build knowledges. Its main focus is runtime
  optimization. A later translation into StoredKnowledge objects removes any
  unneccessary information, yielding a compact representation.
- 
+
  \todo It seems that many of the functions that organized reduction
        techniques traverse all markings the knowledge bubble. Hence,
        efficiency could be imporoved by making the respective check while
@@ -48,8 +48,8 @@ class Knowledge {
 
     public: /* member functions */
 
-        /// construct knowledge from the initial inner marking
-        Knowledge();
+        /// construct knowledge from (initial) inner marking
+        Knowledge(InnerMarking_ID);
 
         /// construct knowledge from a given knowledge and a label
         Knowledge(Knowledge const&, const Label_ID&);
@@ -64,7 +64,11 @@ class Knowledge {
         bool receivingHelps() const;
 
         /// calculate those receiving events that are essential to resolve each and every waitstate
-        void sequentializeReceivingEvents(std::map<Label_ID, bool>&) const;
+        void sequentializeReceivingEvents();
+
+        bool considerReceivingEvent(Label_ID) const;
+
+        bool considerSendingEvent(Label_ID) const;
 
     public: /* attributes */
 
@@ -80,8 +84,25 @@ class Knowledge {
 
     private: /* member functions */
 
+    	/// initialze member attributes
+    	void initialize();
+
         /// calculate the closure of this knowledge
         void closure(std::queue<FullMarking>&);
+
+    private: /* attributes */
+
+        /// reduction rule: smart send events; pointer to possible sending events data structure
+        PossibleSendEvents* posSendEvents;
+
+        /// reduction rule: smart send events; array of sending events that are either possible or not
+        char* posSendEventsDecoded;
+
+        /// reduction rule: sequentialize receiving events; remember only those receiving events
+        ///                 which are essential to resolve each and every waitstate
+        std::map<Label_ID, bool> consideredReceivingEvents;
+
+
 };
 
 #endif

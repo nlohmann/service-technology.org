@@ -60,7 +60,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             smartSendingEvent.owfn smartSendingEvent.fiona.og \
             06-03-23_BPM06_shop_sect_6.owfn 06-03-23_BPM06_shop_sect_6.fiona.og \
             genericNonTrivialSCC.owfn \
-            marlene-ca.owfn marlene-td.ar marlene-td.owfn
+            marlene-ca.owfn marlene-td.ar marlene-td.owfn \
+	    genericSynchLFQAP.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

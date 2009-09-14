@@ -94,6 +94,9 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
 
     // only process knowledges within the message bounds
     if (K_new.is_sane) {
+    	// remember whether SK_new is new
+    	bool newKnowledge = false;
+
         // create a compact version of the knowledge bubble
         StoredKnowledge* SK_new = new StoredKnowledge(K_new);
 
@@ -105,6 +108,8 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
 
         // evaluate the storage result
         if (SK_store == SK_new) {
+
+        	newKnowledge = true;
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
         } else {
@@ -113,7 +118,7 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
         }
 
         // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
-        SK->adjustLowlinkValue(SK_store);
+        SK->adjustLowlinkValue(SK_store, newKnowledge);
     } else {
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
@@ -137,43 +142,19 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
             stats.storedKnowledges, stats.storedEdges);
     }
 
-
-    // reduction rule: sequentialize receiving events
-    map<Label_ID, bool> consideredReceivingEvents;
-
-    if (args_info.seqReceivingEvents_flag) {
-        // calculate those receiving events that are essential to resolve each and every waitstate
-        K.sequentializeReceivingEvents(consideredReceivingEvents);
-    }
-
-    // reduction rule: smart send events
-    PossibleSendEvents* posSendEvents;
-    char* posSendEventsDecoded;
-
-    /// \todo Daniela, please document me
-    if (args_info.smartSendingEvent_flag) {
-        posSendEvents = new PossibleSendEvents(true, 1);
-
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = K.bubble.begin(); pos != K.bubble.end(); ++pos) {
-            *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
-        }
-        posSendEventsDecoded = posSendEvents->decode();
-    }
-
-
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
         // reduction rule: send leads to insane node
         if (args_info.smartSendingEvent_flag) {
-            if (SENDING(l) and not posSendEventsDecoded[l - Label::first_send]) {
+            if (SENDING(l) and not K.considerSendingEvent(l - Label::first_send)) {
                 continue;
             }
         }
 
         // reduction rule: sequentialize receiving events
         // if current receiving event is not to be considered, continue
-        if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not consideredReceivingEvents[l]) {
+        if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not K.considerReceivingEvent(l)) {
             continue;
         }
 
@@ -192,10 +173,8 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
             }
         }
 
-
         // recursion
         process(K, SK, l);
-
 
         // reduction rule: quit, once all waitstates are resolved
         if (args_info.quitAsSoonAsPossible_flag and SK->sat(true)) {
@@ -212,13 +191,7 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
         }
     }
 
-    // we have traversed through the reachability graph of the current knowledge
-
-    if (args_info.smartSendingEvent_flag) {
-        delete posSendEvents;
-    }
-
-    SK->evaluateCurrentSCC();
+    SK->evaluateKnowledge();
 }
 
 
@@ -226,18 +199,14 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
  create the predecessor relation of all knowledges contained in the given set
  and then evaluate each member of the given set of knowledges and propagate
  the property of being insane accordingly
- 
- \pre  knowledgeSet contains all nodes of the current SCC
+
+ \pre  knowledgeSet contains all nodes (knowledges) of the current SCC
  \post knowledgeSet is empty
- 
- \todo I think the name of this function is missleading, because the
-       "KnowledgeSet" is a SCC and we already have a function
-       evaluateCurrentSCC()
 */
-inline void StoredKnowledge::evaluateKnowledgeSet(std::set<StoredKnowledge*>& knowledgeSet) {
+inline void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowledgeSet) {
     // a temporary data structure to store the predecessor relation
     std::map<StoredKnowledge*, std::set<StoredKnowledge*> > tempPredecessors;
-    
+
     // if it is not a TSCC, we have to evaluate each member of the SCC
     // first, we generate the predecessor relation between the members
     for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
@@ -250,8 +219,7 @@ inline void StoredKnowledge::evaluateKnowledgeSet(std::set<StoredKnowledge*>& kn
             }
         }
     }
-    
-    
+
     // evaluate each member
     while (not knowledgeSet.empty()) {
         StoredKnowledge* currentKnowledge = *knowledgeSet.begin();
@@ -443,32 +411,29 @@ std::ostream& operator<< (std::ostream& o, const StoredKnowledge& m) {
 /*!
  adjust lowlink value of stored knowledge object according to Tarjan algorithm
 
- \todo Daniela, please comment me
+ \param SK           new knowledge whose successors have been calculated completely
+ \param newKnowledge SK has been newly created in calling function process()
 */
-inline void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK_store) const {
+inline void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK, const bool newKnowledge) const {
     // successor node is not new
-    if (this != SK_store) {
-        if (SK_store->is_on_tarjan_stack) {
+    if (not newKnowledge) {
+        if (SK->is_on_tarjan_stack) {
             // but it is still on the stack, compare lowlink and dfs value
-            tarjanMapping[this].second = MINIMUM(tarjanMapping[this].second, tarjanMapping[SK_store].first);
+            tarjanMapping[this].second = MINIMUM(tarjanMapping[this].second, tarjanMapping[SK].first);
         }
     } else {
         // successor node is new, compare lowlink values
-        tarjanMapping[this].second = MINIMUM(tarjanMapping[this].second, tarjanMapping[SK_store].second);
+        tarjanMapping[this].second = MINIMUM(tarjanMapping[this].second, tarjanMapping[SK].second);
     }
 }
 
 
 /*!
- if current knowledge is representative of an SCC then evaluate current SCC
-
- \todo It seems as if the statistics can be integrated into the if after the
-       "check if (T)SCC is trivial" comment
+ if current knowledge is representative of an SCC (of knowledges) then evaluate current SCC
 */
-inline void StoredKnowledge::evaluateCurrentSCC() {
-    if (tarjanStack.empty()) {
-        return;
-    }
+inline void StoredKnowledge::evaluateKnowledge() {
+
+	assert(not tarjanStack.empty());
 
     // check, if the current knowledge is a representative of a SCC
     // if so, get all knowledges within the SCC
@@ -510,14 +475,11 @@ inline void StoredKnowledge::evaluateCurrentSCC() {
             // check if every deadlock is resolved -> if not, this knowledge is definitely not sane
             // deadlock freedom or livelock freedom will be treated in sat()
             (*knowledgeSet.begin())->is_sane = (*knowledgeSet.begin())->sat();
-        } else if (numberOfSccElements > 1){
-            evaluateKnowledgeSet(knowledgeSet);
-        }
 
-        // statistics
-        if (numberOfSccElements == 1) {
             ++stats.numberOfTrivialSCCs;
-        } else {
+        } else if (numberOfSccElements > 1){
+            analyzeSCCOfKnowledges(knowledgeSet);
+
             stats.maxSCCSize = MAXIMUM(stats.maxSCCSize, numberOfSccElements);
             ++stats.numberOfNonTrivialSCCs;
         }
@@ -579,7 +541,7 @@ StoredKnowledge* StoredKnowledge::store() {
     hashTree[myHash].push_back(this);
     ++stats.storedKnowledges;
 
-    // \todo Daniela, please comment this line
+    // set Tarjan values (first == dfs; second == lowlink)
     tarjanMapping[this].first = tarjanMapping[this].second = stats.storedKnowledges;
 
     // put knowledge on the Tarjan stack
@@ -612,20 +574,20 @@ inline void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge
 /*!
  \return whether each deadlock in the knowledge is resolved
 
- \param checkStack in case of reduction rules "quit as soon as possible" and "succeeding sending event"
-                   it has to be ensured that the successor node has been completely analyzed and thus
-                   is off the Tarjan stack
+ \param checkOnTarjanStack in case of reduction rules "quit as soon as possible" and "succeeding sending event"
+						   it has to be ensured that the successor node has been completely analyzed and thus
+						   is off the Tarjan stack
 
  \pre the markings in the array (0 to sizeDeadlockMarkings-1) are deadlocks -- all transient
       states or unmarked final markings are removed from the marking array
 */
-bool StoredKnowledge::sat(const bool checkStack) const {
+bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
 
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
 
-            if (checkStack and successors[l-1]->is_on_tarjan_stack) {
+            if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
                 continue;
             }
 
@@ -647,7 +609,7 @@ bool StoredKnowledge::sat(const bool checkStack) const {
             if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
 
-                if (checkStack and successors[l-1]->is_on_tarjan_stack) {
+                if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
                     continue;
                 }
 
@@ -665,7 +627,7 @@ bool StoredKnowledge::sat(const bool checkStack) const {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
                 successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
 
-                if (checkStack and successors[l-1]->is_on_tarjan_stack) {
+                if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
                     continue;
                 }
 

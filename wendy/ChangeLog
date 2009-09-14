@@ -11,6 +11,10 @@
 Version 2.2-unreleased
 ======================
 
+* added test cases for checking synchronous communication together with
+  livelock freedom and reduction rule "quit as soon as possible"
+  (parameter: `--quitAsSoonAsPossible')
+
 * added test cases to test Wendy's integration into Marlene
 
 * no output files are created in case of uncontrollability (unless
@@ -26,7 +30,7 @@ Version 2.1 (6 September 2009)
   (parameter: `--succeedingSendingEvent')
 
 * issues on the hidden parameter "quit as soon as possible" (parameter:
-  `--succeedingSendingEvent') have been fixed
+  `--quitAsSoonAsPossible') have been fixed
 
 * implemented on-the-fly knowledge analysis
 

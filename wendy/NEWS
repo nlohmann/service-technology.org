@@ -11,6 +11,10 @@
 Version 2.2-unreleased
 ======================
 
+* added test cases for checking synchronous communication together with
+  livelock freedom and reduction rule "quit as soon as possible"
+  (parameter: `--quitAsSoonAsPossible')
+
 * added test cases to test Wendy's integration into Marlene
 
 * no output files are created in case of uncontrollability (unless
@@ -19,7 +23,4 @@ Version 2.2-unreleased
 * implemented parameter `--stats' to display information on runtime and
   memory consumption (the latter uses `ps' and does not work under Cygwin)
 
-
-See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n

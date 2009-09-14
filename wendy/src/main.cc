@@ -329,7 +329,7 @@ int main(int argc, char** argv) {
     `-------------------------------*/
     time(&start_time);
     {
-        Knowledge K0;
+        Knowledge K0(0);
         StoredKnowledge::root = new StoredKnowledge(K0);
 
         if (StoredKnowledge::root->is_sane) {

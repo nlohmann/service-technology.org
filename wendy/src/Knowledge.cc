@@ -36,9 +36,7 @@ extern gengetopt_args_info args_info;
  * CONSTRUCTOR *
  ***************/
 
-Knowledge::Knowledge() : is_sane(1), size(1) {
-    // calculate knowledge for the initial marking
-    InnerMarking_ID m = 0;
+Knowledge::Knowledge(InnerMarking_ID m) : is_sane(1), size(1), posSendEvents(NULL), posSendEventsDecoded(NULL) {
 
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
@@ -53,13 +51,15 @@ Knowledge::Knowledge() : is_sane(1), size(1) {
 
     // calculate the closure
     closure(todo);
+
+    initialize();
 }
 
 
 /*!
  \note no action in this constructor can introduce a duplicate
 */
-Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1), size(0) {
+Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1), size(0), posSendEvents(NULL), posSendEventsDecoded(NULL) {
     // tau does not make sense here
     assert(not SILENT(label));
 
@@ -156,6 +156,8 @@ Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1
         // calculate the closure
         closure(todo);
     }
+
+    initialize();
 }
 
 
@@ -166,12 +168,44 @@ Knowledge::~Knowledge() {
             delete pos->second[i];
         }
     }
+
+    if (args_info.smartSendingEvent_flag) {
+    	delete posSendEvents;
+    }
 }
 
 
 /********************
  * MEMBER FUNCTIONS *
  ********************/
+
+/*!
+ initialize current knowledge's member attributes appropriately
+*/
+inline void Knowledge::initialize() {
+    // reduction rule: sequentialize receiving events
+    if (args_info.seqReceivingEvents_flag) {
+        // calculate those receiving events that are essential to resolve each and every waitstate
+        sequentializeReceivingEvents();
+    }
+
+    // reduction rule: smart sending event
+    // create array of those sending events that are possible in _all_ markings of the current bubble
+    if (args_info.smartSendingEvent_flag) {
+    	// initially, every sending event is possible
+        posSendEvents = new PossibleSendEvents(true, 1);
+
+        // traverse each marking of the current bubble
+        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+        	// use boolean AND to detect which sending event is possible in each and every marking of the current bubble
+            *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
+        }
+
+        // create array to be used when traversing all events
+        posSendEventsDecoded = posSendEvents->decode();
+    }
+}
+
 
 
 /*!
@@ -326,11 +360,8 @@ bool Knowledge::receivingHelps() const {
  before traversing through each and every receiving event, we first check
  which receiving events are essentially needed to resolve every waitstate
  of the current bubble
-
- \param  consideredReceivingEvents remember only those receiving event which
-         are essential to resolve each and every waitstate
 */
-void Knowledge::sequentializeReceivingEvents(std::map<Label_ID, bool>& consideredReceivingEvents) const {
+void Knowledge::sequentializeReceivingEvents() {
 
     // count the number that a receiving event is activated
     map<Label_ID, unsigned int> occuranceOfReceivingEvent;
@@ -395,8 +426,7 @@ void Knowledge::sequentializeReceivingEvents(std::map<Label_ID, bool>& considere
                 if (currenState->first[i]->marked(l)) {
 
                     // it will be considered, so continue with the next waitstate
-                    if (consideredReceivingEvents[l]) {
-
+                    if (consideredReceivingEvents.find(l) != consideredReceivingEvents.end()) {
                         considerNewState = true;
                         break;
                     }
@@ -425,4 +455,36 @@ void Knowledge::sequentializeReceivingEvents(std::map<Label_ID, bool>& considere
             consideredReceivingEvents[consideredReceivingEvent] = true;
         }
     } // end for, traverse through states
+}
+
+
+/*!
+ if map consideredReceivingEvents has been set, return whether to consider the current
+ receiving event or not
+
+ \pre reduction rule seguentialize receiving events is used
+
+ \param label current receiving event
+*/
+bool Knowledge::considerReceivingEvent(Label_ID label) const {
+
+	assert(args_info.seqReceivingEvents_flag == true);
+
+	return consideredReceivingEvents.find(label) != consideredReceivingEvents.end();
+}
+
+
+/*!
+ sending event is reachable
+
+ \pre reduction rule smart sending event is used
+
+ \param label current sending event
+*/
+bool Knowledge::considerSendingEvent(Label_ID label) const {
+
+	assert(args_info.smartSendingEvent_flag == true);
+	assert(posSendEventsDecoded != NULL);
+
+	return posSendEventsDecoded[label] == 1;
 }

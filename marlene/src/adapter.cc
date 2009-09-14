@@ -26,6 +26,7 @@
 #include "adapter.h"
 #include "macros.h"
 #include "helper.h"
+#include "cmdline.h"
 #include "pnapi/pnapi.h"
 
 
@@ -185,7 +186,7 @@ const pnapi::PetriNet * Adapter::buildController()
         {
             composed->normalize();
         }
-        composed->reduce(pnapi::PetriNet::LEVEL_4);
+        composed->reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
 
         /***********************************\
         * calculate most permissive partner *
@@ -219,9 +220,28 @@ const pnapi::PetriNet * Adapter::buildController()
             owfn_file.close();
         }
 
-        std::string wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
-             + " --sa=" + sa_filename; // + " --og=" + og_filename;
+        std::string wendy_command;
+        
+        if (args_info.diagnosis_flag)
+        {
+            wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
+                + " --diagnose --im --mi --og=" + og_filename;
+        }
+        else
+        {
+            wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
+                + " --smart --sa=" + sa_filename; // + " --og=" + og_filename;
+        }
         wendy_command += " -m" + toString(_messageBound);
+        
+        if (args_info.chatty_flag)
+        {
+            wendy_command += " --succeedingSendingEvent";
+        }
+        else if (args_info.arrogant_flag)
+        {
+            wendy_command += " --receiveBeforeSend";
+        }
         
         time_t start_time, end_time;
 

@@ -38,6 +38,22 @@ option "nocomplementplaces" n
   "Do not create complementary places in the engine part of the adapter (only in an intermediate state), in order to avoid unbounded places. Capacity of the places is influenced by the message bound."
   flag off
 
+
+option "chatty" -
+  "Adapter should send messages as early as possible."
+  dependon="asyncif"
+  flag off
+
+option "arrogant" -
+  "Adapter should send messages as late as possible."
+  dependon="asyncif"
+  flag off
+
+option "diagnosis" -
+  "Output diagnostic information in case adapter is not controllable"
+  flag off
+
+
 section "Debug"
 
 option "verbose" v

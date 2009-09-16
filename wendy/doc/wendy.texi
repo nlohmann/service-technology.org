@@ -107,7 +107,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 94 tests were successful.
+All 100 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{wendy@@service-technology.org}.

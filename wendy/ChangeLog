@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 2.2-unreleased
-======================
+Version 2.2 (16 September 2009)
+===============================
 
 * added test cases for checking synchronous communication together with
   livelock freedom and reduction rule "quit as soon as possible"

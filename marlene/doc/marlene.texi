@@ -39,7 +39,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
-@author Niels Lohmann
+@author Christian Gierds
 @page
 
 

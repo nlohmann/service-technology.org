@@ -6,6 +6,13 @@
                      http://service-technology.org/marlene
 
 
+Version 1.1-unreleased
+======================
+
+* changed behavior concerning prefixes: default is no prefixes added to the
+  nets, `--with-prefix' adds a unique prefix to each read net.
+
+
 Version 1.0
 ===========
 

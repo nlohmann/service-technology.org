@@ -78,7 +78,10 @@ int main(int argc, char* argv[])
                     >> meta(pnapi::io::INVOCATION, invocation) >> pnapi::io::owfn >> *net;
 
                     // adding a prefix to the net
-                    net->prefixNodeNames(toString(i) + ".", false);
+                    if (args_info.with_prefix_flag)
+                    {
+                        net->prefixNodeNames(toString(i) + ".", false);
+                    }
                     
                     nets.push_back(net);
                     //std::cout << pnapi::io::dot << *net;
@@ -105,7 +108,10 @@ int main(int argc, char* argv[])
             status("reading open net from STDIN");
             std::cin >> pnapi::io::owfn >> *net;
             // adding a prefix to the net
-            net->prefixNodeNames("0.", false);
+            if (args_info.with_prefix_flag)
+            {
+                net->prefixNodeNames("0.", false);
+            }
         } catch (pnapi::io::InputError error) {
             std::cerr << PACKAGE << ":" << error << std::endl;
             abort(2, " ");

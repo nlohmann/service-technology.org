@@ -6,25 +6,11 @@
                      http://service-technology.org/marlene
 
 
-Version 1.0
-===========
+Version 1.1-unreleased
+======================
 
-* choice whether to use synchronous/asynchronous interface between controller
-  and engine
-
-* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
-  to determine test case coverage (use `make cover' in `tests' directory)
-
-* support for asynchronouns and synchrouns services (so adapter rules can
-  handle message transformation and synchronization)
-
-* open nets can be read several times in one adaptation step, each read net
-  gets a unique id as prefix
-
-* added support for chatty and arrogant adapter (`--chatty'/`--arrogant')
-
-* it is possible to only return the controller part of the adapter
-  (`--controlleronly')
+* changed behavior concerning prefixes: default is no prefixes added to the
+  nets, `--with-prefix' adds a unique prefix to each read net.
 
 
 \nSee file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for\ncomplete version history.\n

@@ -312,7 +312,15 @@ void Adapter::createEngineInterface()
             // get interface name
             const std::string & ifname = (*place)->getName();
             // internal name
-            const std::string internalname ((*place)->getName().substr((*place)->getName().find_first_of(".") + 1) + "_int");
+            std::string internalname;
+            if (args_info.with_prefix_flag)
+            {
+                internalname  = ((*place)->getName().substr((*place)->getName().find_first_of(".") + 1) + "_int");
+            }
+            else
+            {
+                internalname  = ((*place)->getName() + "_int");
+            }
             
             // create interface place for a service's interface place
             Place & ifplace = _engine->createPlace(ifname, 

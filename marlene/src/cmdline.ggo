@@ -57,6 +57,12 @@ option "diagnosis" -
   "Output diagnostic information in case adapter is not controllable"
   flag off
 
+option "with-prefix" -
+  "Adds a unique prefix to each read net."
+  details="In order to read one net multiple time, a prefix to the net's nodes
+  is needed. This options adds this prefix."
+  flag off
+
 
 section "Debug"
 

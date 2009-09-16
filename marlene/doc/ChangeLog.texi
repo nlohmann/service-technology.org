@@ -1,3 +1,10 @@
+@heading Version 1.1-unreleased
+@itemize
+
+@item changed behavior concerning prefixes: default is no prefixes added to the nets, @samp{--with-prefix} adds a unique prefix to each read net.
+
+@end itemize
+
 @heading Version 1.0
 @itemize
 

@@ -119,9 +119,8 @@ AT_SETUP([Product with constraint net])
 AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
 AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
 AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
-AT_CHECK([GREP -q "(constraint.final = 1 AND net.final = 1 AND ALL_OTHER_PLACES_EMPTY);" test_produce.onlineshop.owfn.owfn])
-#AT_CHECK_FIONA
-#AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn.owfn test_produce.onlineshop.owfn -sempty],0,ignore,ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn test_produce.onlineshop.owfn.owfn -sempty],0,ignore,ignore)
 AT_KEYWORDS([composition])
 AT_CLEANUP
 

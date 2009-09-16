@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
     graph_parse();
     pclose(graph_in);
 #else
-    string command_line = lola_command + " " + temp.filename + " -m";
+    string command_line = lola_command + " " + temp.name() + " -m";
 #if !defined(__MINGW32__)
     // MinGW cannot pipe
     if (not args_info.verbose_flag) {
@@ -306,7 +306,7 @@ int main(int argc, char** argv) {
 #endif
     status("calling LoLA with '%s'", command_line.c_str());
     system(command_line.c_str());
-    graph_in = fopen((temp.filename + ".graph").c_str(), "r");
+    graph_in = fopen((temp.name() + ".graph").c_str(), "r");
     graph_parse();
     fclose(graph_in);
 #endif

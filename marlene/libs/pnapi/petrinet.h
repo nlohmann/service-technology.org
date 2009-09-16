@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-08-11 13:33:51 +0200 (Di, 11. Aug 2009) $
+ * \date    $Date: 2009-09-16 03:27:41 +0200 (Mi, 16. Sep 2009) $
  *
- * \version $Revision: 4544 $
+ * \version $Revision: 4706 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -326,7 +326,10 @@ namespace pnapi
     /// product with Constraint oWFN
     void produce(const PetriNet &, const std::string & = "net",
 		 const std::string & = "constraint") throw (io::InputError);
-
+    
+    /// adds a given prefix to all nodes
+    PetriNet & prefixNodeNames(const std::string &, bool = false);
+    
     /// swaps input and output places
     void mirror();
     
@@ -439,9 +442,6 @@ namespace pnapi
 
     /// returns a name for a node to be added
     std::string getUniqueNodeName(const std::string &) const;
-
-    /// adds a given prefix to all nodes
-    PetriNet & prefixNodeNames(const std::string &);
 
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,

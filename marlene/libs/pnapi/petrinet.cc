@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-09-11 02:08:37 +0200 (Fr, 11. Sep 2009) $
+ * \date    $Date: 2009-09-16 03:27:41 +0200 (Mi, 16. Sep 2009) $
  *
- * \version $Revision: 4696 $
+ * \version $Revision: 4706 $
  */
 
 #include "config.h"
@@ -1393,7 +1393,7 @@ namespace pnapi
 
 
     // add (internal) places
-    prefixNodeNames(prefix);
+    prefixNodeNames(prefix, true); // prefix only internal nodes
     PlaceMapping placeMapping = copyPlaces(net, netPrefix);
 
     // merge final conditions
@@ -1650,11 +1650,31 @@ namespace pnapi
    * All Places and Transitions of the net are prefixed.
    *
    * \param   prefix  the prefix to be added
+   * \param   noInterface  whether interface places should not be prefixed
    */
-  PetriNet & PetriNet::prefixNodeNames(const string & prefix)
+  PetriNet & PetriNet::prefixNodeNames(const string & prefix, bool noInterface)
   {
-    for (set<Node *>::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
-      (*it)->prefixNameHistory(prefix);
+    if(noInterface)
+    {
+      for (set<Node *>::iterator it = nodes_.begin(); 
+            it != nodes_.end(); ++it)
+      {
+        Place * p = dynamic_cast<Place*>(*it);
+        if( (p != NULL) && // recent node is a place
+            ((p->getType() == Node::INPUT) || (p->getType() == Node::OUTPUT)) ) // and its an interface place
+          continue; // do not prefix this node
+        
+        (*it)->prefixNameHistory(prefix);
+      }
+    }
+    else
+    {
+      for (set<Node *>::iterator it = nodes_.begin(); 
+            it != nodes_.end(); ++it)
+      {
+        (*it)->prefixNameHistory(prefix);
+      }
+    }
     return *this;
   }
 

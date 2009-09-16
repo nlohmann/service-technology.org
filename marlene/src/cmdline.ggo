@@ -49,6 +49,10 @@ option "arrogant" -
   dependon="asyncif"
   flag off
 
+option "controlleronly" -
+  "Only return the controller, not the whole adapter"
+  flag off
+
 option "diagnosis" -
   "Output diagnostic information in case adapter is not controllable"
   flag off

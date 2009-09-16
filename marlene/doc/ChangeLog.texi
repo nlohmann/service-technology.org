@@ -1,10 +1,25 @@
-@heading Version 0.5-unreleased
+@heading Version 1.0
 @itemize
-
-@item initial release
 
 @item choice whether to use synchronous/asynchronous interface between controller and engine
 
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+
+@item support for asynchronouns and synchrouns services (so adapter rules can
+  handle message transformation and synchronization)
+
+@item open nets can be read several times in one adaptation step, each read net gets a unique id as prefix
+
+@item added support for chatty and arrogant adapter (@samp{--chatty}/@samp{--arrogant})
+
+@item it is possible to only return the controller part of the adapter (@samp{--controlleronly})
+
+@end itemize
+
+@heading Version 0.5
+@itemize
+
+@item initial release
+
 @end itemize
 

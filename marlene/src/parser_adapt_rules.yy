@@ -32,6 +32,7 @@
 #include <string>
 #include <list>
 #include "adapter.h"
+#include "config.h"
 
 // from flex
 extern char* adapt_rules_yytext;
@@ -44,6 +45,7 @@ RuleSet::AdapterRule::cfMode cfmodus = RuleSet::AdapterRule::AR_NORMAL;
 
 int adapt_rules_yyerror(const char* msg)
 {
+  std::cerr << PACKAGE << ": error while reading adapter rules" << std::endl;
   std::cerr << msg << std::endl;
   std::cerr << "error in line " << adapt_rules_yylineno << ": token last read: `" << adapt_rules_yytext << "'" << std::endl;
   exit(EXIT_FAILURE);

@@ -24,6 +24,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdlib>
+#include <libgen.h>
 
 // include Marlene's own headers
 #include "config.h"
@@ -37,6 +38,8 @@
 
 int main(int argc, char* argv[])
 {
+    argv[0]=basename(argv[0]);
+    
     std::vector< pnapi::PetriNet * > nets;
     
     /*************************************************\
@@ -75,7 +78,7 @@ int main(int argc, char* argv[])
                     >> meta(pnapi::io::INVOCATION, invocation) >> pnapi::io::owfn >> *net;
 
                     // adding a prefix to the net
-                    net->prefixNodeNames(toString(i+1) + ".", false);
+                    net->prefixNodeNames(toString(i) + ".", false);
                     
                     nets.push_back(net);
                     //std::cout << pnapi::io::dot << *net;
@@ -102,7 +105,7 @@ int main(int argc, char* argv[])
             status("reading open net from STDIN");
             std::cin >> pnapi::io::owfn >> *net;
             // adding a prefix to the net
-            net->prefixNodeNames("1.", false);
+            net->prefixNodeNames("0.", false);
         } catch (pnapi::io::InputError error) {
             std::cerr << PACKAGE << ":" << error << std::endl;
             abort(2, " ");
@@ -158,6 +161,15 @@ int main(int argc, char* argv[])
     pnapi::PetriNet controller (*adapter.buildController());
     time(&end_time);
     status("controller built [%.0f sec]", difftime(end_time, start_time));
+
+    if (args_info.controlleronly_flag)
+    {
+        std::cout << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
+            << meta(pnapi::io::INVOCATION, invocation) << controller;
+        
+        //quit
+        return 0;
+    }
     
     /*******************************************************************\
     * Composing engine and controller in order to get the final adapter *
@@ -172,12 +184,13 @@ int main(int argc, char* argv[])
     /*******************\
     * Deleting all nets *
     \*******************/
+/*
     for ( unsigned int index = 0; index < nets.size(); ++index)
     {
         delete nets[index];
     }
     nets.clear();
-    
+*/    
     return 0;
 }
 

@@ -7,6 +7,8 @@
 @item no output files are created in case of uncontrollability (unless @option{--diagnose} is given)
 
 @item implemented parameter @option{--stats} to display information on runtime and memory consumption (the latter uses @code{ps} and does not work under Cygwin)
+
+@item @option{--verbose} is passed to LoLA
 @end itemize
 
 

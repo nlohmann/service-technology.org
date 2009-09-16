@@ -288,7 +288,10 @@ int main(int argc, char** argv) {
 
     // read from a pipe or from a file (MinGW cannot pipe)
 #if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(__MINGW32__)
-    string command_line = lola_command + " " + temp.name() + " -M 2> /dev/null";
+    string command_line = lola_command + " " + temp.name() + " -M";
+    if (not args_info.verbose_flag) {
+        command_line += " 2> /dev/null";
+    }
     status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
@@ -297,7 +300,9 @@ int main(int argc, char** argv) {
     string command_line = lola_command + " " + temp.filename + " -m";
 #if !defined(__MINGW32__)
     // MinGW cannot pipe
-    command_line += " &> /dev/null";
+    if (not args_info.verbose_flag) {
+        command_line += " &> /dev/null";
+    }
 #endif
     status("calling LoLA with '%s'", command_line.c_str());
     system(command_line.c_str());

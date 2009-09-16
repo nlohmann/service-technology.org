@@ -23,6 +23,8 @@ Version 2.2-unreleased
 * implemented parameter `--stats' to display information on runtime and
   memory consumption (the latter uses `ps' and does not work under Cygwin)
 
+* `--verbose' is passed to LoLA
+
 Version 2.1 (6 September 2009)
 ==============================
 

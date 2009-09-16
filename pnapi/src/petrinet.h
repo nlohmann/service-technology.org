@@ -326,7 +326,10 @@ namespace pnapi
     /// product with Constraint oWFN
     void produce(const PetriNet &, const std::string & = "net",
 		 const std::string & = "constraint") throw (io::InputError);
-
+    
+    /// adds a given prefix to all nodes
+    PetriNet & prefixNodeNames(const std::string &, bool = false);
+    
     /// swaps input and output places
     void mirror();
     
@@ -439,9 +442,6 @@ namespace pnapi
 
     /// returns a name for a node to be added
     std::string getUniqueNodeName(const std::string &) const;
-
-    /// adds a given prefix to all nodes
-    PetriNet & prefixNodeNames(const std::string &);
 
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,

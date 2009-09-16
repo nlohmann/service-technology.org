@@ -45,7 +45,7 @@ CLEANFILES = -fr $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) \
 #############################################################################
 
 bin:
-	$(MAKE) bin-`uname` TARGETS="lola-full lola-full1 lola-deadlock lola-modelchecking lola-boundednet lola-deadlock1 lola-liveprop lola-liveprop1 lola-statepredicate lola-statepredicate1"
+	$(MAKE) bin-`uname` TARGETS="lola-full lola-full1 lola-deadlock lola-modelchecking lola-boundednet lola-deadlock1 lola-liveprop lola-liveprop1 lola-statepredicate lola-statepredicate1 lola-statespace"
 	$(MAKE) --directory=$(top_srcdir) distclean
 	@echo "=============================================="
 	@echo "created binary distributions:"

@@ -253,7 +253,7 @@ const pnapi::PetriNet * Adapter::buildController()
         time(&start_time);
         pnapi::PetriNet * controller;
 
-        if (std::string(CONFIG_PETRIFY) != "not found" && _contType == ASYNCHRONOUS)
+        if (std::string(CONFIG_PETRIFY) != "not found") // && _contType == ASYNCHRONOUS)
         {
             controller = new pnapi::PetriNet(*mpp_sa);
         }

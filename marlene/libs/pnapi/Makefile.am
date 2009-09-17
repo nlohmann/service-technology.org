@@ -20,6 +20,7 @@ libpnapi_a_SOURCES = \
                 automaton.h automaton.cc\
                 state.h state.cc \
                 marking.h marking.cc \
+		Output.h Output.cc \
                 myio.h myio.cc io-format.cc \
 		errorhandling.cc
 

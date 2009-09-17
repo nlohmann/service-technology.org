@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "myio.h"
+#include "Output.h"
 
 
 namespace pnapi
@@ -55,7 +56,7 @@ namespace pnapi
     const std::set<State *> finalStates() const;
 
     /// prints the automaton to an STG file (Automaton => Petri net)
-    std::string printToSTG(std::vector<std::string> &) const;
+    void printToSTG(std::vector<std::string> &, util::Output &) const;
     /// returning a set of input labels (after PetriNet => Automaton)
     std::set<std::string> input() const;
     void addInput(std::string);
@@ -101,9 +102,6 @@ namespace pnapi
 
     /// deleting a state from the automaton
     void deleteState(State *);
-
-    void printToSTGRecursively(State *, std::ostringstream &,
-        std::map<State *, bool> &, std::vector<std::string> &) const;
 
   };
 

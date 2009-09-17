@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-09-16 03:27:41 +0200 (Mi, 16. Sep 2009) $
+ * \date    $Date: 2009-09-17 13:33:43 +0200 (Thu, 17. Sep 2009) $
  *
- * \version $Revision: 4706 $
+ * \version $Revision: 4718 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -455,7 +455,7 @@ namespace pnapi
 
     /// crates a petri net from an STG file
     void createFromSTG(std::vector<std::string> &, const std::string &,
-		       std::set<std::string> &, std::set<std::string> &);
+		       std::set<std::string> &, std::set<std::string> &, std::set<std::string> &);
 
     /// helper function for STG2oWFN
     std::string remap(std::string edge, std::vector<std::string> & edgeLabels);

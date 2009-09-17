@@ -20,6 +20,7 @@ using std::flush;
 #include "petrinet.h"
 #include "state.h"
 #include "util.h"
+#include "Output.h"
 
 namespace pnapi
 {
@@ -347,7 +348,7 @@ namespace pnapi
   const std::set<State *> Automaton::initialStates() const
   {
     std::set<State *> result;
-    result.clear();
+    result.clear(); ///TODO: <- ???
     for (unsigned int i = 0; i < states_.size(); i++)
       if (states_[i]->isInitial())
         result.insert(states_[i]);
@@ -495,112 +496,71 @@ namespace pnapi
    * \brief     creates a STG file of the graph
    * \param     edgeLabels a reference to a vector of strings containing the old
    *            label names from this graph
-   * \return    the filename of the created STG file
+   * \param     out a reference to the output class handleing the temporary file
    */
-  std::string Automaton::printToSTG(std::vector<std::string> &edgeLabels) const
+  void Automaton::printToSTG(std::vector<std::string> & edgeLabels, util::Output & out) const
   {
-    // build STG file name
-    std::string STGFileName = "AutomatonToPetrinet.stg";
-
     // create and fill stringstream for buffering graph information
-    std::map<State *, bool> visitedNodes; // visited nodes
-    State *rootNode = *initialStates().begin(); // root node
     std::ostringstream STGStringStream; // used as buffer for graph information
-
+    
     STGStringStream << ".state graph" << "\n";
-    printToSTGRecursively(rootNode, STGStringStream, visitedNodes, edgeLabels);
-    STGStringStream << ".marking {p" << rootNode->name() << "}" << "\n";
-    STGStringStream << ".end";
-
-
-    // create STG file, print header, transition information and then
-    // add buffered graph information
-    std::fstream STGFileStream(STGFileName.c_str(), std::ios_base::out |
-        std::ios_base::trunc | std::ios_base::binary);
-    if (!STGFileStream.good())
+    
+    // copy edges
+    for(unsigned int i = 0; i < edges_.size(); ++i)
     {
-      STGFileStream.close();
-      exit(1);
-    }
-    STGFileStream << ".model Labeled_Transition_System" << "\n";
-    STGFileStream << ".dummy";
-    for (int i = 0; i < (int)edgeLabels.size(); i++)
-    {
-        STGFileStream << " t" << i;
-    }
-    std::string STGGraphString = STGStringStream.str();
-    STGFileStream << "\n" << STGGraphString << std::endl;
-    STGFileStream.close();
-
-    return STGFileName;
-  }
-
-
-  /*!
-   * \brief     depth-first-search through the graph printing each node and
-   *            edge to the output stream
-   *
-   * \param     v current node in the iteration process
-   * \param     os output stream
-   * \param     visitedNodes[] array of bool storing the nodes that we have
-   *            looked at so far
-   */
-  void Automaton::printToSTGRecursively(State *v,
-      std::ostringstream &os, std::map<State *, bool> &visitedNodes,
-      std::vector<std::string> &edgeLabels) const
-  {
-    assert(v != NULL);
-    visitedNodes[v] = true;             // mark current node as visited
-
-    // TODO: possibly buggy because for every final node is "FINAL" added?
-    if (v->isFinal())
-    {
-      // each label is mapped to his position in edgeLabes
-      std::string currentLabel = "FINAL";
-      currentLabel += v->name();
-      int foundPosition = (int)edgeLabels.size();
-      edgeLabels.push_back(currentLabel);
-      os << "p" << v->name() << " t" << foundPosition << " p00" << std::endl;
-    }
-
-    // go through all edges
-    for (unsigned int i = 0; i < edges_.size(); i++)
-    {
-      Edge *element = edges_[i];
-      if (&element->source() != v)
-        continue;
-      State *vNext = &element->destination();
-
+      Edge * edge = edges_[i];
+      
       // build label vector:
       // each label is mapped to his position in edgeLabes
-      std::string currentLabel = element->label();
       int foundPosition = -1;
-      for (int i = 0; i < (int)edgeLabels.size(); i++)
+      for(int j = 0; j < (int)edgeLabels.size(); ++j)
       {
-          if (currentLabel == edgeLabels.at(i))
-          {
-              foundPosition = i;
-              break;
-          }
+        if (edge->label() == edgeLabels[j])
+        {
+            foundPosition = j;
+            break;
+        }
       }
       if (foundPosition == -1)
       {
           foundPosition = (int)edgeLabels.size();
-          edgeLabels.push_back(currentLabel);
+          edgeLabels.push_back(edge->label());
       }
-      assert(foundPosition >= 0);
-      assert(currentLabel == edgeLabels.at(foundPosition));
-
+      
       // print current transition to stream
-      os  << "p" << v->name() << " t" << foundPosition << " p"
-          << vNext->name() << std::endl;
-
-      // recursion
-      if ( vNext != v && visitedNodes.find(vNext) == visitedNodes.end())
+      STGStringStream  << "p" << edge->source().name() << " t" << foundPosition 
+                       << " p" << edge->destination().name() << "\n";
+    }
+    
+    // mark final states
+    for(unsigned int i = 0; i < states_.size(); ++i)
+    {
+      // TODO: possibly buggy because for every final node is "FINAL" added?
+      if (states_[i]->isFinal())
       {
-          printToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
+        // each label is mapped to his position in edgeLabes
+        std::string currentLabel = "FINAL";
+        currentLabel += states_[i]->name();
+        int foundPosition = (int)edgeLabels.size();
+        edgeLabels.push_back(currentLabel);
+        STGStringStream << "p" << states_[i]->name() << " t" << foundPosition << " p00" << "\n";
       }
     }
+    
+    STGStringStream << ".marking {p" << (*initialStates().begin())->name() << "}" << "\n";
+    STGStringStream << ".end" << std::flush;
+
+
+    // create STG file, print header, transition information and then
+    // add buffered graph information
+    out.stream() << ".model Labeled_Transition_System" << "\n";
+    out.stream() << ".dummy";
+    for (int i = 0; i < (int)edgeLabels.size(); i++)
+    {
+      out.stream() << " t" << i;
+    }
+    std::string STGGraphString = STGStringStream.str();
+    out.stream() << "\n" << STGGraphString << std::endl;
   }
 
 

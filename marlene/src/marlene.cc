@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
                     >> meta(pnapi::io::INVOCATION, invocation) >> pnapi::io::owfn >> *net;
 
                     // adding a prefix to the net
-                    if (args_info.with_prefix_flag)
+                    if (args_info.withprefix_flag)
                     {
                         net->prefixNodeNames(toString(i) + ".", false);
                     }
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
             status("reading open net from STDIN");
             std::cin >> pnapi::io::owfn >> *net;
             // adding a prefix to the net
-            if (args_info.with_prefix_flag)
+            if (args_info.withprefix_flag)
             {
                 net->prefixNodeNames("0.", false);
             }
@@ -159,6 +159,17 @@ int main(int argc, char* argv[])
     pnapi::PetriNet engine (*adapter.buildEngine());
     time(&end_time);
     status("engine built [%.0f sec]", difftime(end_time, start_time));
+
+    if (args_info.engineonly_flag)
+    {
+        std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
+        Output outfile(filename, std::string("engine"));
+        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
+            << meta(pnapi::io::INVOCATION, invocation) << engine;
+        
+        //quit
+        return 0;
+    }
     
     /*************************\
     * Building the controller *

@@ -2,6 +2,9 @@
 @itemize
 
 @item changed behavior concerning prefixes: default is no prefixes added to the nets, @samp{--with-prefix} adds a unique prefix to each read net.
+      (parameter for invoking prefixes is @samp{--withprefix})
+
+@item added parameter @samp{--engineonly} to get only the engine part of an adapter
 
 @end itemize
 

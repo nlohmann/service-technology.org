@@ -53,11 +53,15 @@ option "controlleronly" -
   "Only return the controller, not the whole adapter"
   flag off
 
+option "engineonly" -
+  "Only return the engine part of the adapter"
+  flag off
+
 option "diagnosis" -
   "Output diagnostic information in case adapter is not controllable"
   flag off
 
-option "with-prefix" -
+option "withprefix" -
   "Adds a unique prefix to each read net."
   details="In order to read one net multiple time, a prefix to the net's nodes
   is needed. This options adds this prefix."

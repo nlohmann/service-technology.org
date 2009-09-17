@@ -11,6 +11,9 @@ Version 1.1-unreleased
 
 * changed behavior concerning prefixes: default is no prefixes added to the
   nets, `--with-prefix' adds a unique prefix to each read net.
+  (parameter for invoking prefixes is `--withprefix')
+
+* added parameter `--engineonly' to get only the engine part of an adapter
 
 
 Version 1.0

@@ -74,6 +74,16 @@ const pnapi::PetriNet * Adapter::buildEngine()
     pnapi::Condition & finalCond = _engine->finalCondition();
     finalCond.addMarking(*(new pnapi::Marking(*_engine)));
 
+    // create complementary places for the engine's internal places
+    if (_useCompPlaces)
+    {
+        Adapter::createComplementaryPlaces(*_engine);
+    }
+    else
+    {
+        status("skipping creation of complementary places once ..");
+    }
+
     FUNCOUT
     return _engine;
 }
@@ -91,19 +101,6 @@ const pnapi::PetriNet * Adapter::buildController()
         // #_enginecopy for the synthesis of the controller
         PetriNet * _enginecopy = new PetriNet(*_engine);
         
-        // create complementary places for the engine's internal places
-        if (_useCompPlaces)
-        {
-            Adapter::createComplementaryPlaces(*_enginecopy);
-        }
-        else
-        {
-            status("skipping creation of complementary places once ..");
-        }
-    
-        // compose nets and engine
-        std::map< std::string, pnapi::PetriNet * > nets;
-
         PetriNet * composed = new PetriNet(*_enginecopy);
 
         // compose engine with nets
@@ -182,7 +179,7 @@ const pnapi::PetriNet * Adapter::buildController()
         
         // finally reduce the strucure of the net as far as possible
         composed->reduce(pnapi::PetriNet::LEVEL_4);
-    
+
         if (_contType == ASYNCHRONOUS)
         {
             composed->normalize();
@@ -300,7 +297,7 @@ void Adapter::createEngineInterface()
             const std::string & ifname = (*place)->getName();
             // internal name
             std::string internalname;
-            if (args_info.with_prefix_flag)
+            if (args_info.withprefix_flag)
             {
                 internalname  = ((*place)->getName().substr((*place)->getName().find_first_of(".") + 1) + "_int");
             }

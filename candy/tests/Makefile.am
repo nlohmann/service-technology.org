@@ -10,12 +10,12 @@
 TESTFILES = costOG1.og \
             costOG1.cf \
             costOG1.owfn \
-            costOG1_expected.og \
+            costOG1.expected.og \
             costOG2.og \
             costOG2.og2 \
             costOG2.cf \
             costOG2.owfn \
-            costOG2_expected.og \
+            costOG2.expected.og \
             error_incomplete_interface.og \
             error_overfull_interface.og \
             error_incomplete_nodes.og \
@@ -27,7 +27,14 @@ TESTFILES = costOG1.og \
             error_overfull.owfn \
             error_weights.owfn \
             error_shared.owfn \
-            error_nonnormal.owfn
+            error_nonnormal.owfn \
+            formula_merge_and.og \
+            formula_merge_and.expected.og \
+            formula_merge_or.og \
+            formula_merge_or.expected.og \
+            formula_merge_andor.og \
+            formula_merge_andor.expected.og \
+            formula_merge.cf
 
 
 # Below you can list all the files you do not want to have counted in the

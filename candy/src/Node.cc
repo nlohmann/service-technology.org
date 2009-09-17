@@ -121,7 +121,7 @@ unsigned int Node::computeEfficientSuccessors() {
     Formula* oldFormula = formula;
     formula = formula->simplify();
     delete oldFormula;
-    DEBUG "      new formula: " << formula->asString() END
+    DEBUG "      new formula: " << (formula != NULL ? formula->asString() : "NULL") END
 
     return minimalCost;
 }

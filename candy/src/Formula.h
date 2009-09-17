@@ -129,7 +129,11 @@ class FormulaMultiary : public Formula {
         };
 
         /// Destroys this FormulaMultiary and all its subformulas.
-        virtual ~FormulaMultiary();
+        virtual ~FormulaMultiary() {
+            for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
+                delete *i;
+            }
+        };
 
         /// Returns the the number of formulas, the multiary formula consists of.
         virtual int size() const {
@@ -140,10 +144,6 @@ class FormulaMultiary : public Formula {
         /// the clause gets removed as well
         /// this function is used in the IG reduction
         virtual void removeLiteral(const std::string&);
-
-        // TODO necessary?
-        /// copies te private members of this multiary to a given formula
-        void deepCopyMultiaryPrivateMembersToNewFormula(FormulaMultiary* newFormula) const;
 };
 
 
@@ -173,7 +173,7 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         /// Returns the merged equivalent to this formula.
         //virtual FormulaMultiaryAnd* merge();
 
-        virtual FormulaMultiaryAnd* simplify();
+        virtual Formula* simplify();
 };
 
 
@@ -206,7 +206,7 @@ class FormulaMultiaryOr : public FormulaMultiary {
         //virtual FormulaMultiaryOr* merge();
 
         // TODO implement
-        virtual FormulaMultiaryOr* simplify();
+        virtual Formula* simplify();
 };
 
 
@@ -252,7 +252,7 @@ class FormulaLiteral : public Formula {
 
         // TODO necessary?
         /// returns a simplified version of this formula
-        virtual FormulaLiteral* simplify() {
+        virtual Formula* simplify() {
         	return new FormulaLiteral(*this);
         }
 };
@@ -288,7 +288,7 @@ class FormulaFixed : public FormulaLiteral {
 
         // TODO necessary?
         /// returns a simplified version of this formula
-        virtual FormulaFixed* simplify() {
+        virtual Formula* simplify() {
             return new FormulaFixed(*this);
         }
 };

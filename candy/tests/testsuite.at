@@ -2,6 +2,8 @@ AT_INIT([standard tests])
 
 AT_TESTED(versions.sh)
 
+
+
 ############################################################################
 AT_BANNER([Standard Options])
 ############################################################################
@@ -15,6 +17,8 @@ AT_SETUP([version output])
 AT_CHECK([CANDY --version], 0, ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([I/O Tests])
@@ -75,6 +79,8 @@ AT_CHECK([cat costOG1.og | CANDY --costfile=costOG1.cf > c.og], 0, ignore, ignor
 AT_CHECK([test -f c.og])
 AT_KEYWORDS(io)
 AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([Error Cases])
@@ -187,6 +193,47 @@ AT_CHECK([GREP -q "cannot compute cost for event from non-normal transition" std
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+
+
+############################################################################
+AT_BANNER([Formulae Tests])
+############################################################################
+
+AT_SETUP([Merge AND])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/formula_merge_and.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_and.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_and.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_and.expected.og], 0, ignore)
+AT_KEYWORDS(formulae)
+AT_CLEANUP
+
+AT_SETUP([Merge OR])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/formula_merge_or.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_or.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_or.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_or.expected.og], 0, ignore)
+AT_KEYWORDS(formulae)
+AT_CLEANUP
+
+AT_SETUP([Merge AND/OR])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/formula_merge_andor.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_andor.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_andor.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_andor.expected.og], 0, ignore)
+AT_KEYWORDS(formulae)
+AT_CLEANUP
+
+
+
 ############################################################################
 AT_BANNER([Fiona's Test Cases])
 ############################################################################
@@ -231,6 +278,8 @@ AT_BANNER([Fiona's Test Cases])
 #AT_KEYWORDS(equivalence)
 #AT_CLEANUP
 
+
+
 ############################################################################
 AT_BANNER([Equivalence Tests])
 ############################################################################
@@ -239,15 +288,15 @@ AT_SETUP([costOG1])
 AT_CHECK([cp TESTFILES/costOG1.og .])
 AT_CHECK([cp TESTFILES/costOG1.cf .])
 AT_CHECK([cp TESTFILES/costOG1.owfn .])
-AT_CHECK([cp TESTFILES/costOG1_expected.og .])
+AT_CHECK([cp TESTFILES/costOG1.expected.og .])
 # test with costfile
 AT_CHECK([CANDY --input=costOG1.og --output=c.og --costfile=costOG1.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og costOG1_expected.og], 0, ignore)
+AT_CHECK([diff sed.og costOG1.expected.og], 0, ignore)
 # test with netfile
 AT_CHECK([CANDY --input=costOG1.og --output=c.og --netfile=costOG1.owfn], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og costOG1_expected.og], 0, ignore)
+AT_CHECK([diff sed.og costOG1.expected.og], 0, ignore)
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
@@ -255,15 +304,15 @@ AT_SETUP([costOG2])
 AT_CHECK([cp TESTFILES/costOG2.og .])
 AT_CHECK([cp TESTFILES/costOG2.cf .])
 AT_CHECK([cp TESTFILES/costOG2.owfn .])
-AT_CHECK([cp TESTFILES/costOG2_expected.og .])
+AT_CHECK([cp TESTFILES/costOG2.expected.og .])
 # test with costfile
 AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=costOG2.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og costOG2_expected.og], 0, ignore)
+AT_CHECK([diff sed.og costOG2.expected.og], 0, ignore)
 # test with netfile
 AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=costOG2.owfn], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og costOG2_expected.og], 0, ignore)
+AT_CHECK([diff sed.og costOG2.expected.og], 0, ignore)
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 

@@ -179,10 +179,11 @@ bool SetOfPartialMarkings::protectedInsert(PartialMarking* partialMarking) {
 SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula* const src,unsigned int bound) {
 	SetOfPartialMarkings* result = new SetOfPartialMarkings();
 
+	std::cerr << "Typeid is: " << typeid(*src).name() << std::endl;
 
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::Disjunction).name() << "..." << std::endl;
 	if (typeid(*src) ==  typeid(pnapi::formula::Disjunction)) {
-
-
+	std::cerr << "Equal! " << std::endl;
 
 		const pnapi::formula::Disjunction* const castedSrc = dynamic_cast<const pnapi::formula::Disjunction* const>(src);
 
@@ -190,7 +191,11 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 			SetOfPartialMarkings* current = create((*cIt),bound);
 			result->add(current);
 		}
-	} else if (typeid(*src) ==  typeid(pnapi::formula::Conjunction)) {
+	}
+
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::Conjunction).name() << "..." << std::endl;
+	if (typeid(*src) ==  typeid(pnapi::formula::Conjunction)) {
+		std::cerr << "Equal! " << std::endl;
 
 
 		const pnapi::formula::Conjunction* const castedSrc = dynamic_cast<const pnapi::formula::Conjunction* const >(src);
@@ -213,7 +218,11 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 		result = last;
 
 
-	} 	else if (typeid(*src) ==  typeid(pnapi::formula::FormulaEqual)) {
+	}
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaEqual).name() << "..." << std::endl;
+	
+	if (typeid(*src) ==  typeid(pnapi::formula::FormulaEqual)) {
+	std::cerr << "Equal! " << std::endl;
 
 		const pnapi::formula::FormulaEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaEqual* const >(src);
 
@@ -223,7 +232,12 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 
 //		m->output();
 
-	} else if (typeid(*src) ==  typeid(pnapi::formula::FormulaGreater)) {
+	} 
+	
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaGreater).name() << "..." << std::endl;
+	
+	if (typeid(*src) ==  typeid(pnapi::formula::FormulaGreater)) {
+	std::cerr << "Equal! " << std::endl;
 
 		const pnapi::formula::FormulaGreater* const castedSrc = dynamic_cast<const pnapi::formula::FormulaGreater* const>(src);
 
@@ -234,7 +248,11 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 			result->partialMarkings.push_back(m);
 		}
 
-	} else if (typeid(*src) ==  typeid(pnapi::formula::FormulaGreaterEqual)) {
+	} 
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaGreaterEqual).name() << "..." << std::endl;
+	
+	if (typeid(*src) ==  typeid(pnapi::formula::FormulaGreaterEqual)) {
+	std::cerr << "Equal! " << std::endl;
 
 		const pnapi::formula::FormulaGreaterEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaGreaterEqual* const >(src);
 
@@ -246,7 +264,11 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 		}
 
 
-	} else if (typeid(*src) ==  typeid(pnapi::formula::FormulaLess)) {
+	} 
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaLess).name() << "..." << std::endl;
+	
+	if (typeid(*src) ==  typeid(pnapi::formula::FormulaLess)) {
+	std::cerr << "Equal! " << std::endl;
 		const pnapi::formula::FormulaLess* const castedSrc = dynamic_cast<const pnapi::formula::FormulaLess* const >(src);
 
 		for (unsigned int i = 0; i < castedSrc->tokens(); ++i) {
@@ -255,7 +277,11 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 			result->partialMarkings.push_back(m);
 		}
 
-	} else if (typeid(*src) ==  typeid(pnapi::formula::FormulaLessEqual)) {
+	} 
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaLessEqual).name() << "..." << std::endl;
+	
+	if (typeid(*src) ==  typeid(pnapi::formula::FormulaLessEqual)) {
+	std::cerr << "Equal! " << std::endl;
 		const pnapi::formula::FormulaLessEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaLessEqual* const>(src);
 
 		for (unsigned int i = 0; i <= castedSrc->tokens(); ++i) {
@@ -264,7 +290,10 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(const pnapi::formula::Formula
 			result->partialMarkings.push_back(m);
 		}
 
-	} else if (typeid(*src) ==  typeid(pnapi::formula::FormulaNotEqual)) {
+	} 
+	std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaNotEqual).name() << "..." << std::endl;
+	if (typeid(*src) ==  typeid(pnapi::formula::FormulaNotEqual)) {
+	std::cerr << "Equal! " << std::endl;
 		const pnapi::formula::FormulaNotEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaNotEqual* const >(src);
 
 

@@ -21,6 +21,7 @@
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <libgen.h>
 #include <unistd.h>
 #include "config.h"

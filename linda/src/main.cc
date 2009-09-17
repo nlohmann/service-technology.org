@@ -143,20 +143,26 @@ int main(int argc, char** argv) {
 				XSE->output();
 			}
 		} else {
-			std::cerr << "Construction of a system failed!" << std::endl;
+			std::cerr << PACKAGE << ": WARNING: Construction of a system failed!" << std::endl;
 
 		}
 	}
 
-
-	std::cerr << "number of systems: " << systems.size() << std::endl;
+	if (args_info.verbose_flag) {
+		std::cerr << PACKAGE << ": Number of lp systems: " << systems.size() << std::endl;
+	}
 
 	if (args_info.level_0_flag) {
 
 		std::cerr << PACKAGE << ": Minimum and maximum occurence of single events." << std::endl;
 
 		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
-		std::cerr << "number of basic terms: " << etermvec->size() << std::endl;
+
+		if (args_info.verbose_flag) {
+
+			std::cerr << PACKAGE << ": Number of basic terms: " << etermvec->size() << std::endl;
+
+		}
 
 		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
 		systemsIt != systems.end();

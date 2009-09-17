@@ -455,7 +455,7 @@ namespace pnapi
 
     /// crates a petri net from an STG file
     void createFromSTG(std::vector<std::string> &, const std::string &,
-		       std::set<std::string> &, std::set<std::string> &);
+		       std::set<std::string> &, std::set<std::string> &, std::set<std::string> &);
 
     /// helper function for STG2oWFN
     std::string remap(std::string edge, std::vector<std::string> & edgeLabels);

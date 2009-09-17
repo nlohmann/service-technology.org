@@ -511,8 +511,48 @@ namespace pnapi
 
     } /* namespace sa */
 
+    
+    /*************************************************************************
+     ***** Petrify Parser
+     *************************************************************************/
 
+    namespace petrify
+    {
+      // flex lexer
+      int lex();
 
+      // bison parser
+      int parse();
+    
+      extern std::set<std::string> transitions_;
+      extern std::set<std::string> places_;
+      extern std::map<std::string, unsigned int> initialMarked_;
+      extern std::set<std::string> interface_;
+      extern std::map<std::string, std::set<std::string> > arcs_;
+      extern std::string ident;
+      extern std::string ident2; // backup
+      extern std::set<std::string> tempNodeSet_;
+      extern bool in_marking_list;
+      extern bool in_arc_list;
+      
+      /*!
+       * \brief   Encapsulation of the flex/bison petrify parser
+       *
+       * Connects to the flex/bison implementation for parsing.
+       */
+      class Parser
+      {
+      public:
+        Parser();
+        
+        /// parses stream contents with the associated parser
+        void parse(std::istream &);
+        /// cleans global variables
+        void clean();
+      };
+    } /* namespace petrify */
+
+    
     /*************************************************************************
      ***** Template Implementation
      *************************************************************************/

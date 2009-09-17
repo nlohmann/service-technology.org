@@ -15,12 +15,13 @@ libpnapi_la_SOURCES = \
 	formula.h formula.cc \
 	condition.h condition.cc \
 	petrinet-reduction.cc \
-	petrinet-petrify.h petrinet-petrify.cc \
+	petrinet-petrify.cc \
 	automaton.h automaton.cc\
 	state.h state.cc \
 	marking.h marking.cc \
 	myio.h myio.cc io-format.cc \
-	errorhandling.cc
+	errorhandling.cc \
+	Output.h Output.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
                 parser-petrify.cc parser-petrify.h parser-petrify-lexer.cc \
@@ -47,7 +48,8 @@ include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
 		  marking.h link.h \
 		  parser-owfn.h parser-petrify.h \
 		  parser-onwd.h parser-lola.h \
-		  parser-sa.h
+		  parser-sa.h \
+		  Output.h
 
 # clean additional (generated) files
 DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \

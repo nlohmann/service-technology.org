@@ -531,6 +531,51 @@ namespace pnapi
       }
 
     } /* namespace sa */
+    
+    namespace petrify
+    {
+      std::set<string> transitions_;
+      std::set<string> places_;
+      std::map<string, unsigned int> initialMarked_;
+      std::set<string> interface_;
+      std::map<string, set<string> > arcs_;
+      std::string ident;
+      std::string ident2; // backup
+      std::set<string> tempNodeSet_;
+      bool in_marking_list = false;
+      bool in_arc_list = false;
+      
+      /*!
+       * \brief Constructor
+       */
+      Parser::Parser()
+      {
+      }
+      
+      void Parser::parse(istream & is)
+      {
+        // assign lexer input stream
+        stream = &is;
+
+        // reset line counter
+        line = 1;
+        
+        // call the parser
+        petrify::parse();
+      }
+      
+      void Parser::clean()
+      {
+        transitions_.clear();
+        places_.clear();
+        initialMarked_.clear();
+        interface_.clear();
+        arcs_.clear();
+        in_marking_list = false;
+        in_arc_list = false;
+        tempNodeSet_.clear();
+      }
+    } /* namespace petrify */
 
   } /* namespace parser */
 

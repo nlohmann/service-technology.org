@@ -20,7 +20,7 @@ TESTFILES = test_input.owfn \
             syntax_example3.owfn \
             syntax_example4.owfn \
             bug13579.owfn \
-            bug13968_sa2sm.sa \
+            bug13968.sa \
             bug13990.1.owfn \
             bug13990.2.owfn \
             bug13990.3.owfn \

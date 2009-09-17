@@ -38,8 +38,8 @@ using namespace pnapi;
 /*!
  * The constructor transforming an automaton to a Petri net.
  */
-PetriNet::PetriNet(const Automaton &sa) :
-  observer_(*this)
+PetriNet::PetriNet(const Automaton &sa, std::string petrify) :
+  observer_(*this), pathToPetrify(petrify)
 {
   util::Output out;
   std::vector<std::string> edgeLabels;
@@ -99,11 +99,11 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
     
   // preparing system call of petrify
   string pnFileName = fileName + ".pn"; // add .pn to the output file
-  string systemcall = string(CONFIG_PETRIFY) + " " + fileName +
+  string systemcall = string(pathToPetrify) + " " + fileName +
                       " -dead -ip -nolog -o " + pnFileName;
 
   // calling petrify if possible
-  if (string(CONFIG_PETRIFY) != "not found")
+  if (pathToPetrify != "not found")
   {
     int result = system(systemcall.c_str());
     assert(result == 0);

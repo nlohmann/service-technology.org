@@ -143,6 +143,7 @@ bool ExtendedStateEquation::constructLP() {
 	isFeasible = true;
 	isConstructed = true;
 
+	return true;
 }
 
 void ExtendedStateEquation::evaluate(EventTerm* e) {

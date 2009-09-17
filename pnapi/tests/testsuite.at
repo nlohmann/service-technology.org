@@ -287,6 +287,17 @@ AT_CHECK([PETRI -iowfn -oowfn NET1 --compose=NET2])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14335 (https://gna.org/bugs/?14335)])
+m4_define([NET],[bug14335.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn -osa NET])
+AT_CHECK([GREP -q "SYNCHRONOUS x" NET.sa])
+AT_CHECK([GREP -q "x ->" NET.sa])
+AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################
@@ -554,6 +565,25 @@ AT_CHECK([PETRI NET -osa],0,ignore,ignore)
 AT_KEYWORDS([automaton])
 AT_CLEANUP
 
+AT_SETUP([Behavior preservation (asynchronous, sa2owfn)])
+m4_define([NET], [test_automaton_behavior_async.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK([SA2OWFN NET.sa NET.sa.owfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
+AT_KEYWORDS([automaton synthesis])
+AT_CLEANUP
+
+AT_SETUP([Behavior preservation (asynchronous, sa2sm)])
+m4_define([NET], [test_automaton_behavior_async.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
+AT_KEYWORDS([automaton synthesis])
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Open Net Generator])

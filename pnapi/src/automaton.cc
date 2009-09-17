@@ -70,7 +70,7 @@ namespace pnapi
       switch((**t).getType())
       {
       case Node::INTERNAL:
-        (*edgeTypes_)[*t] = TAU;
+        (*edgeTypes_)[*t] = ((*t)->isSynchronized()) ? SYNCHRONOUS : TAU;
         break;
       case Node::INPUT:
         (*edgeTypes_)[*t] = INPUT;

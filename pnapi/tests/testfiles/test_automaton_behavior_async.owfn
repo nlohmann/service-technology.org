@@ -1,0 +1,73 @@
+{
+ Net contains:
+ * concurrency
+ * dead interface places
+ * cycles
+ * final states with successors on receive events
+ * conflicts (order of send events is significant)
+}
+
+PLACE
+  INTERNAL
+    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15;
+
+  INPUT
+    a, b, c_dead;
+
+  OUTPUT
+    x, y, z, z_dead;
+
+INITIALMARKING
+  p1, p8, p15;
+
+FINALCONDITION
+  (
+    ((p13 = 1) AND (p9 = 1) AND (p10 = 1) AND ALL_OTHER_PLACES_EMPTY) OR
+    ((p13 = 1) AND (p14 = 1) AND ALL_OTHER_PLACES_EMPTY)
+  );
+
+
+TRANSITION t_initial
+  CONSUME p1;
+  PRODUCE p2, p3, p4;
+
+TRANSITION t_circle_1
+  CONSUME p4;
+  PRODUCE p7;
+
+TRANSITION t_circle_2
+  CONSUME p7;
+  PRODUCE p4;
+
+TRANSITION t_end_circle
+  CONSUME p7;
+  PRODUCE p10;
+
+TRANSITION t_concurrency_1
+  CONSUME p2;
+  PRODUCE x, p5;
+
+TRANSITION t_concurrency_2
+  CONSUME p3;
+  PRODUCE y, p6;
+
+TRANSITION t_conflict_1
+  CONSUME p5, p6, p8;
+  PRODUCE z, p9;
+
+TRANSITION t_conflict_2
+  CONSUME p8, p11;
+  PRODUCE p12;
+
+TRANSITION t_conflict_3
+  CONSUME a, p15;
+  PRODUCE p11;
+
+TRANSITION t_conflict_4
+  CONSUME p11;
+  PRODUCE p13;
+
+TRANSITION t_continue
+  CONSUME p9, p10, b;
+  PRODUCE p14;
+

@@ -1343,7 +1343,7 @@ namespace pnapi
       }
       case Node::INTERNAL:
       {
-        edgeLabels[*t] = "TAU";
+        edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
         break;
       }
       default: ;//assert(false);

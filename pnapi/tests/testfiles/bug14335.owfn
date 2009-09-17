@@ -1,0 +1,25 @@
+PLACE
+  INTERNAL
+    p1, p2;
+
+  INPUT
+    ;
+
+  OUTPUT
+    ;
+
+  SYNCHRONOUS
+    x;
+
+INITIALMARKING
+  p1:1;
+
+FINALCONDITION
+  (p2 = 1);
+
+
+TRANSITION t
+  CONSUME p1;
+  PRODUCE p2;
+  SYNCHRONIZE x;
+

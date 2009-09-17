@@ -12,6 +12,7 @@ marlene_SOURCES = parser_adapt_rules.yy lexer_adapt_rules.ll \
 		  helper.h helper.cc \
 		  adapter.h adapter.cc\
 		  cmdline.c cmdline.h \
+		  Output.h Output.cc \
 		  macros.h #subversion.h 
 
 sysconf_DATA = marlene.conf

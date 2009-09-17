@@ -82,11 +82,26 @@ option "bug" -
 section "Configuration"
 sectiondesc="Marlene relies on some other tools. These options configure Marlene to find these tools.\n"
 
+option "output" o
+  "Write output to FILE"
+  string
+  typestr="FILE"
+  default="result.owfn"
+  optional
+  
 option "wendy" -
   "Set the name of the Wendy binary used to build most-permissive partners."
   string
   typestr="FILE"
   default="wendy"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the name of the standard temp file."
+  string
+  typestr="FILE"
+  default="/tmp/marlene-XXXXXX"
   optional
   hidden
 
@@ -96,3 +111,7 @@ option "config" c
   typestr="FILE"
   optional  
 
+option "noClean" -
+  "Do not remove temporary files after computation."
+  flag off
+  hidden

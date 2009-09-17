@@ -32,6 +32,7 @@
 #include "helper.h"
 #include "macros.h"
 #include "adapter.h"
+#include "Output.h"
 
 // include PN Api headers
 #include "pnapi/pnapi.h"
@@ -170,7 +171,9 @@ int main(int argc, char* argv[])
 
     if (args_info.controlleronly_flag)
     {
-        std::cout << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
+        std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
+        Output outfile(filename, std::string("controller"));
+        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
             << meta(pnapi::io::INVOCATION, invocation) << controller;
         
         //quit
@@ -184,8 +187,12 @@ int main(int argc, char* argv[])
     engine.compose(controller, "engine.", "controller.");
     
     engine.reduce(pnapi::PetriNet::LEVEL_4);
-    std::cout << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
-        << meta(pnapi::io::INVOCATION, invocation) << engine;
+    {
+        std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
+        Output outfile(filename, std::string("final adapter"));
+        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
+            << meta(pnapi::io::INVOCATION, invocation) << engine;
+    }
 
     /*******************\
     * Deleting all nets *

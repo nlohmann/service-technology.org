@@ -27,6 +27,7 @@
 #include "macros.h"
 #include "helper.h"
 #include "cmdline.h"
+#include "Output.h"
 #include "pnapi/pnapi.h"
 
 
@@ -192,60 +193,46 @@ const pnapi::PetriNet * Adapter::buildController()
         * calculate most permissive partner *
         \***********************************/
         // create a unique temporary file name
-#if defined(HAVE_MKSTEMP) && not defined(__MINGW32__)
-        char tmp[] = "/tmp/marlene-XXXXXX";
-        if (mkstemp(tmp) == -1) {
-            abort(9, "could not create a temporary file '%s'", tmp);
-        }
-#else
-        status("setting tempfile name for MinGW to 'marlene.tmp'");
-        char tmp[] = "marlene.tmp";
-        
-        //std::cerr << std::string(tmp) << std::endl;
-#endif
+        Output temp;
 
-        std::string tmpname(tmp);
-        std::string owfn_filename = tmpname + ".owfn";
+        std::string tmpname(temp.name());
+        std::string owfn_filename = tmpname;
         std::string sa_filename = tmpname + ".sa";
         std::string og_filename = tmpname + ".og";
 
-        {
-            //std::cerr << owfn_filename << std::endl;
-            std::ofstream owfn_file(owfn_filename.c_str(), std::ios_base::out);
-            if (! owfn_file)
-            {
-                abort(5, "could not create open net file");
-            }
-            owfn_file << pnapi::io::owfn << *composed;
-            owfn_file.close();
-        }
+        temp.stream() << pnapi::io::owfn << *composed;
 
         std::string wendy_command;
-        
+
         if (args_info.diagnosis_flag)
         {
-            wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
-                + " --diagnose --im --mi --og=" + og_filename;
-        }
-        else
+            wendy_command = std::string(args_info.wendy_arg) + " "
+                            + owfn_filename + " --diagnose --im --mi --og="
+                            + og_filename;
+        } else
         {
-            wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
-                + " --smart --sa=" + sa_filename; // + " --og=" + og_filename;
+            wendy_command = std::string(args_info.wendy_arg) + " "
+                            + owfn_filename + " --smart --sa=" + sa_filename; // + " --og=" + og_filename;
         }
         wendy_command += " -m" + toString(_messageBound);
-        
+
         if (args_info.chatty_flag)
         {
             wendy_command += " --succeedingSendingEvent";
-        }
-        else if (args_info.arrogant_flag)
+        } else if (args_info.arrogant_flag)
         {
             wendy_command += " --receiveBeforeSend";
         }
-        
+
         time_t start_time, end_time;
 
-        wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> /dev/null");
+#ifdef __MINGW32__
+        wendy_command += ((args_info.verbose_flag) ? " --verbose"
+            : " 2> NUL");        
+#else
+        wendy_command += ((args_info.verbose_flag) ? " --verbose"
+            : " 2> /dev/null");
+#endif
         time(&start_time);
         status("executing '%s'", wendy_command.c_str());
         system(wendy_command.c_str());

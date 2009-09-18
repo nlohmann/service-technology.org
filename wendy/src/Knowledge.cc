@@ -110,13 +110,8 @@ Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1
                 } else {
                     // increment failed -- message bound violation
                     is_sane = 0;
-                    if (not args_info.diagnose_given) {
-                        delete interface;
-                        return;
-                    } else {
-                        bubble[pos->first].push_back(interface);
-                        ++size;
-                    }
+                    delete interface;
+                    return;
                 }
             }
         }

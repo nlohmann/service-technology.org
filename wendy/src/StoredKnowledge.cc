@@ -119,21 +119,6 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
         // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
         SK->adjustLowlinkValue(SK_store, newKnowledge);
     } else {
-        if (args_info.diagnose_given) {
-            // create a compact version of the knowledge bubble
-            StoredKnowledge* SK_new = new StoredKnowledge(K_new);
-
-            // add it to the knowledge tree
-            StoredKnowledge* SK_store = SK_new->store();
-
-            // store an edge from the parent to this node
-            SK->addSuccessor(l, SK_store);
-
-            if (SK_store != SK_new) {
-                delete SK_new;
-            }
-        }
-
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
     }
@@ -395,26 +380,6 @@ void StoredKnowledge::finalize() {
     }
 
     status("StoredKnowledge: deleted %d objects", count);
-}
-
-
-/*************
- * OPERATORS *
- *************/
-
-/*!
- \deprecated This function is only needed for debug purposes.
- */
-std::ostream& operator<< (std::ostream& o, const StoredKnowledge& m) {
-    o << m.hash() << ":\t";
-
-    // traverse the bubble
-    for (unsigned int i = 0; i < m.sizeAllMarkings; ++i) {
-        o << "[m" << static_cast<unsigned int>(m.inner[i])
-          << ", " << *(m.interface[i]) << "] ";
-    }
-
-    return o;
 }
 
 
@@ -820,31 +785,14 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
     file << "\nNODES\n";
 
      // the empty node
-    file << "  0 : ";
-    if (args_info.formula_arg == formula_arg_cnf) {
-        file << " true";
-    } else {
-        file << "-";
-    }
+    file << "  0 : true";
 
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        file << ",\n  " << reinterpret_cast<size_t>(*it) << " : ";
-
-        string formula;
-        switch (args_info.formula_arg) {
-            case(formula_arg_cnf): formula = (*it)->formula(); break;
-            case(formula_arg_2bits): formula = (*it)->bits(); break;
-            default: assert(false);
-        }
-        if (formula == "") {
-            formula = "-";
-        }
-        file << formula;
+        file << ",\n  " << reinterpret_cast<size_t>(*it) << " : " << (*it)->formula();
     }
     file << ";\n" << std::endl;
 
-    file << "INITIALNODE\n  "
-        << reinterpret_cast<size_t>(root) << ";\n\n";
+    file << "INITIALNODE\n  " << reinterpret_cast<size_t>(root) << ";\n\n";
 
     file << "TRANSITIONS\n";
     first = true;
@@ -852,7 +800,7 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if ((*it)->successors[l-1] != NULL and
                 (*it)->successors[l-1] != empty and
-            (seen.find((*it)->successors[l-1]) != seen.end())) {
+                (seen.find((*it)->successors[l-1]) != seen.end())) {
 
                 if (first) {
                     first = false;
@@ -921,7 +869,6 @@ void StoredKnowledge::print(std::ostream& file) const {
                 }
                 break;
             }
-            default: assert(false);
         }
     }
 
@@ -1008,7 +955,7 @@ string StoredKnowledge::formula() const {
         receiveDisjunctions.insert(temp);
     }
 
-    if (!dl_found) {
+    if (not dl_found) {
         return "true";
     }
 
@@ -1032,10 +979,7 @@ string StoredKnowledge::formula() const {
                 formula += ")";
             }
         }
-    } else {
-        assert(false);
     }
-
 
     // required for diagnose mode in which a non-final node might have no
     // successors
@@ -1112,7 +1056,6 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                 switch (args_info.formula_arg) {
                     case(formula_arg_cnf): formula = it->second[i]->formula(); break;
                     case(formula_arg_2bits): formula = it->second[i]->bits(); break;
-                    default: assert(false);
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
@@ -1206,7 +1149,6 @@ void StoredKnowledge::output_diagnosedot(std::ostream& file) {
                     bool inner_dead = InnerMarking::inner_markings[it->second[i]->inner[j]]->is_bad;
                     bool interface_empty = it->second[i]->interface[j]->unmarked();
                     bool interface_sane = it->second[i]->interface[j]->sane();
-                    bool interface_pendingInput = it->second[i]->interface[j]->pendingInput();
                     bool interface_pendingOutput = it->second[i]->interface[j]->pendingOutput();
 
                     file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
@@ -1219,9 +1161,6 @@ void StoredKnowledge::output_diagnosedot(std::ostream& file) {
                     }
                     if (not interface_sane) {
                         reason += " (mb)";
-                    }
-                    if (inner_waitstate and inner_final and interface_pendingInput) {
-                        reason += " (cf)";
                     }
 
                     if (not reason.empty()) {

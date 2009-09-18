@@ -384,15 +384,6 @@ bool InterfaceMarking::sane() const {
     return true;
 }
 
-bool InterfaceMarking::pendingInput() const {
-    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (marked(l)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool InterfaceMarking::pendingOutput() const {
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         if (marked(l)) {

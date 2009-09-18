@@ -121,9 +121,6 @@ class InterfaceMarking {
         /// returns whether message bound is respected
         bool sane() const;
 
-        /// returns whether input messages are pending
-        bool pendingInput() const;
-
         /// returns whether output messages are pending
         bool pendingOutput() const;
 

@@ -142,9 +142,6 @@ class StoredKnowledge {
         /// destructor
         ~StoredKnowledge();
 
-        /// stream output operator
-        friend std::ostream& operator<< (std::ostream&, const StoredKnowledge&);
-
         /// stores this object in the hash tree and returns a pointer to the result
         StoredKnowledge* store();
 

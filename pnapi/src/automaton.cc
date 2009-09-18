@@ -319,8 +319,8 @@ namespace pnapi
     std::set<Transition *> transitions = result->getTransitions();
     for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
     {
-      // FIXME: the easy way seems not to be working
-      // FIXME: THIS IS THE EASY WAY: (*t)->setSynchronizeLabels(synchlabel[*t]);
+      // the easy way seems not to be working
+      // THIS WOULD BE THE EASY WAY: (*t)->setSynchronizeLabels(synchlabel[*t]);
 
       // making a copy of all transitions and give them the labels
       Transition &tt = result->createTransition("", synchlabel[*t]);
@@ -347,12 +347,11 @@ namespace pnapi
    * In basic service automata there is only one state which
    * is called the initial state.
    *
-   * \return    std::set<State *> result - set of initial states
+   * \return    result  set of initial states
    */
   const std::set<State *> Automaton::initialStates() const
   {
     std::set<State *> result;
-    result.clear(); ///TODO: <- ???
     for (unsigned int i = 0; i < states_.size(); i++)
       if (states_[i]->isInitial())
         result.insert(states_[i]);
@@ -365,12 +364,11 @@ namespace pnapi
    * The final states are those which are flagged as final. You can trigger
    * this flag by calling State::final() on a state object.
    *
-   * \return    std::set<State *> result - set of final states
+   * \return    result - set of final states
    */
   const std::set<State *> Automaton::finalStates() const
   {
     std::set<State *> result;
-    result.clear();
     for (unsigned int i = 0; i < states_.size(); i++)
       if (states_[i]->isFinal())
         result.insert(states_[i]);
@@ -418,7 +416,7 @@ namespace pnapi
    * from Petri net. It's a recursive method which takes a State (named
    * start) and then tries to find its successors.
    *
-   * \param     State &start
+   * \param     start
    */
   void Automaton::dfs(State &start)
   {

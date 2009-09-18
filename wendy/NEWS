@@ -8,22 +8,13 @@
                       http://service-technology.org/wendy
 
 
-Version 2.2 (16 September 2009)
-===============================
+Version 2.3-unreleased
+======================
 
-* added test cases for checking synchronous communication together with
-  livelock freedom and reduction rule "quit as soon as possible"
-  (parameter: `--quitAsSoonAsPossible')
+* knowledge bubbles are finally sorted to avoid duplicates
 
-* added test cases to test Wendy's integration into Marlene
-
-* no output files are created in case of uncontrollability (unless
-  `--diagnose' is given)
-
-* implemented parameter `--stats' to display information on runtime and
-  memory consumption (the latter uses `ps' and does not work under Cygwin)
-
-* `--verbose' is passed to LoLA
+* implemented first diagnosis functions: the `--diagnosis' parameter
+  creates a Dot file which indicates the blacklisted markings
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

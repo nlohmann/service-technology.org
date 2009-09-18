@@ -8,6 +8,14 @@
                       http://service-technology.org/wendy
 
 
+Version 2.3-unreleased
+======================
+
+* knowledge bubbles are finally sorted to avoid duplicates
+
+* implemented first diagnosis functions: the `--diagnosis' parameter
+  creates a Dot file which indicates the blacklisted markings
+
 Version 2.2 (16 September 2009)
 ===============================
 

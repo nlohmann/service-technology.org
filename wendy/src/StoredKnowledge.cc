@@ -94,8 +94,8 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
 
     // only process knowledges within the message bounds
     if (K_new.is_sane) {
-    	// remember whether SK_new is new
-    	bool newKnowledge = false;
+        // remember whether SK_new is new
+        bool newKnowledge = false;
 
         // create a compact version of the knowledge bubble
         StoredKnowledge* SK_new = new StoredKnowledge(K_new);
@@ -108,8 +108,7 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
 
         // evaluate the storage result
         if (SK_store == SK_new) {
-
-        	newKnowledge = true;
+            newKnowledge = true;
             // the node was new, so check its successors
             processRecursively(K_new, SK_store);
         } else {
@@ -120,6 +119,21 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
         // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
         SK->adjustLowlinkValue(SK_store, newKnowledge);
     } else {
+        if (args_info.diagnose_given) {
+            // create a compact version of the knowledge bubble
+            StoredKnowledge* SK_new = new StoredKnowledge(K_new);
+
+            // add it to the knowledge tree
+            StoredKnowledge* SK_store = SK_new->store();
+
+            // store an edge from the parent to this node
+            SK->addSuccessor(l, SK_store);
+
+            if (SK_store != SK_new) {
+                delete SK_new;
+            }
+        }
+
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
     }
@@ -659,7 +673,7 @@ void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if (successors[l-1] != NULL and successors[l-1] != empty and
-                (successors[l-1]->is_sane or args_info.diagnose_flag)) {
+                (successors[l-1]->is_sane or args_info.diagnose_given)) {
                 successors[l-1]->traverse();
             }
         }
@@ -1091,8 +1105,8 @@ void StoredKnowledge::output_dot(std::ostream& file) {
     // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
-            if ((it->second[i]->is_sane or args_info.diagnose_flag) and
-            (seen.find(it->second[i]) != seen.end())) {
+            if ((it->second[i]->is_sane or args_info.diagnose_given) and
+                (seen.find(it->second[i]) != seen.end())) {
 
                 string formula;
                 switch (args_info.formula_arg) {
@@ -1102,7 +1116,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 
-                if (args_info.diagnose_flag and not it->second[i]->is_sane) {
+                if (args_info.diagnose_given and not it->second[i]->is_sane) {
                     file << "is not sane\\n";
                 }
 
@@ -1161,6 +1175,116 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
     file << "}" << std::endl;
 }
+
+
+/*!
+  \param[in,out] file  the output stream to write the dot representation to
+ */
+void StoredKnowledge::output_diagnosedot(std::ostream& file) {
+    file << "digraph G {\n"
+        << " node [fontname=\"Helvetica\" fontsize=10]\n"
+        << " edge [fontname=\"Helvetica\" fontsize=10]\n";
+
+    // draw the nodes
+    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+        for (size_t i = 0; i < it->second.size(); ++i) {
+            if (seen.find(it->second[i]) != seen.end()) {
+
+                file << "\"" << it->second[i] << "\" [label=<";
+
+                bool blacklisted = false;
+
+                // collect possible send events for the waitstates
+                PossibleSendEvents p = PossibleSendEvents(true, 1);
+                for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
+                    p &= *InnerMarking::inner_markings[it->second[i]->inner[j]]->possibleSendEvents;
+                }
+
+                for (unsigned int j = 0; j < it->second[i]->sizeAllMarkings; ++j) {
+                    bool inner_waitstate = (j < it->second[i]->sizeDeadlockMarkings);
+                    bool inner_final = InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final;
+                    bool inner_dead = InnerMarking::inner_markings[it->second[i]->inner[j]]->is_bad;
+                    bool interface_empty = it->second[i]->interface[j]->unmarked();
+                    bool interface_sane = it->second[i]->interface[j]->sane();
+                    bool interface_pendingInput = it->second[i]->interface[j]->pendingInput();
+                    bool interface_pendingOutput = it->second[i]->interface[j]->pendingOutput();
+
+                    file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
+                    file << *(it->second[i]->interface[j]);
+
+                    string reason;
+
+                    if (inner_dead) {
+                        reason += " (dl)";
+                    }
+                    if (not interface_sane) {
+                        reason += " (mb)";
+                    }
+                    if (inner_waitstate and inner_final and interface_pendingInput) {
+                        reason += " (cf)";
+                    }
+
+                    if (not reason.empty()) {
+                        blacklisted = true;
+                        file << " <FONT COLOR=\"RED\">" << reason << "</FONT>";
+                    } else {
+                        if (inner_final and interface_empty) {
+                            file << " <FONT COLOR=\"GREEN\">(f)</FONT>";
+                        } else {
+                            if (inner_waitstate and not interface_pendingOutput) {
+                                // check who can resolve this waitstate
+                                vector<Label_ID> resolvers, disallowedResolvers;
+                                for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+                                    if (InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
+                                        resolvers.push_back(l);
+                                    }
+                                }
+
+                                for (unsigned int l = 0; l < resolvers.size(); ++l) {
+                                    char *a = p.decode();
+                                    if (a[resolvers[l]-Label::first_send] == 0) {
+                                        disallowedResolvers.push_back(resolvers[l]);
+                                    }
+                                }
+                                if (disallowedResolvers.size() == resolvers.size()) {
+                                    blacklisted = true;
+                                    file << " <FONT COLOR=\"RED\">(uw)</FONT>";
+                                } else {
+                                    file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
+                                }
+                            } else {
+                                file << " (t)";
+                            }
+                        }
+                    }
+
+                    file << "<BR/>";
+                }
+
+                file << ">";
+
+                if (blacklisted) {
+                    file << " color=red";
+                }
+                file << "]" << std::endl;
+
+                // draw the edges
+                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+                    if (it->second[i]->successors[l-1] != NULL and
+                        (seen.find(it->second[i]->successors[l-1]) != seen.end())) {
+                        file << "\"" << it->second[i] << "\" -> \""
+                            << it->second[i]->successors[l-1]
+                            << "\" [label=\"" << PREFIX(l)
+                            << Label::id2name[l] << "\"]\n";
+                    }
+                }
+            }
+        }
+    }
+
+    file << "}" << std::endl;
+}
+
 
 
 void StoredKnowledge::output_migration(std::ostream& o) {

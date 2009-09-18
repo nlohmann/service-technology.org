@@ -109,9 +109,14 @@ Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1
                     }
                 } else {
                     // increment failed -- message bound violation
-                    delete interface;
                     is_sane = 0;
-                    return;
+                    if (not args_info.diagnose_given) {
+                        delete interface;
+                        return;
+                    } else {
+                        bubble[pos->first].push_back(interface);
+                        ++size;
+                    }
                 }
             }
         }
@@ -137,9 +142,14 @@ Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1
                         if (m->labels[j] == label) {
                             // check the marking reached by synchronization
                             if (InnerMarking::inner_markings[m->successors[j]]->is_bad) {
-                                delete interface;
                                 is_sane = 0;
-                                return;
+                                if (not args_info.diagnose_given) {
+                                    delete interface;
+                                    return;
+                                } else {
+                                    bubble[pos->first].push_back(interface);
+                                    ++size;
+                                }
                             }
 
                             // the marking is OK, so add it to the bubble
@@ -192,12 +202,12 @@ inline void Knowledge::initialize() {
     // reduction rule: smart sending event
     // create array of those sending events that are possible in _all_ markings of the current bubble
     if (args_info.smartSendingEvent_flag) {
-    	// initially, every sending event is possible
+        // initially, every sending event is possible
         posSendEvents = new PossibleSendEvents(true, 1);
 
         // traverse each marking of the current bubble
         for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
-        	// use boolean AND to detect which sending event is possible in each and every marking of the current bubble
+            // use boolean AND to detect which sending event is possible in each and every marking of the current bubble
             *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
         }
 
@@ -207,15 +217,14 @@ inline void Knowledge::initialize() {
 }
 
 
-
 /*!
  \param todo  a queue of markings to process (will be altered by this function)
 
  \post queue is empty
 
  \note no action in this constructor can introduce a duplicate
-
- \todo sort bubble
+ \note In case the --diagnose flag is given, the insane marking is added to
+       the knowledge before the function is left.
 */
 inline void Knowledge::closure(std::queue<FullMarking>& todo) {
     // to collect markings that were/are already considered
@@ -256,7 +265,9 @@ inline void Knowledge::closure(std::queue<FullMarking>& todo) {
                 // message bound violation?
                 if (not candidate.interface.inc(m->labels[i])) {
                     is_sane = 0;
-                    return;
+                    if (not args_info.diagnose_given) {
+                        return;
+                    }
                 }
             }
 
@@ -271,7 +282,9 @@ inline void Knowledge::closure(std::queue<FullMarking>& todo) {
             // check if successor is a deadlock or livelock
             if (InnerMarking::inner_markings[m->successors[i]]->is_bad) {
                 is_sane = 0;
-                return;
+                if (not args_info.diagnose_given) {
+                    return;
+                }
             }
 
             // if we found a valid successor candidate, check if it is already stored
@@ -287,11 +300,18 @@ inline void Knowledge::closure(std::queue<FullMarking>& todo) {
                 bubble[candidate.inner].push_back(copy);
                 ++size;
                 todo.push(candidate);
+
+                // sort bubble using STL algorithms
+                if (bubble[candidate.inner].size() > 1) {
+                    sort(bubble[candidate.inner].begin(), bubble[candidate.inner].end(), InterfaceMarking::sort_cmp);
+                }
+
+                if (not is_sane) {
+                    return;
+                }
             }
         }
     }
-
-    /* sort bubble! */
 }
 
 
@@ -362,7 +382,6 @@ bool Knowledge::receivingHelps() const {
  of the current bubble
 */
 void Knowledge::sequentializeReceivingEvents() {
-
     // count the number that a receiving event is activated
     map<Label_ID, unsigned int> occuranceOfReceivingEvent;
 
@@ -467,10 +486,9 @@ void Knowledge::sequentializeReceivingEvents() {
  \param label current receiving event
 */
 bool Knowledge::considerReceivingEvent(Label_ID label) const {
+    assert(args_info.seqReceivingEvents_flag == true);
 
-	assert(args_info.seqReceivingEvents_flag == true);
-
-	return consideredReceivingEvents.find(label) != consideredReceivingEvents.end();
+    return consideredReceivingEvents.find(label) != consideredReceivingEvents.end();
 }
 
 
@@ -482,9 +500,8 @@ bool Knowledge::considerReceivingEvent(Label_ID label) const {
  \param label current sending event
 */
 bool Knowledge::considerSendingEvent(Label_ID label) const {
+    assert(args_info.smartSendingEvent_flag == true);
+    assert(posSendEventsDecoded != NULL);
 
-	assert(args_info.smartSendingEvent_flag == true);
-	assert(posSendEventsDecoded != NULL);
-
-	return posSendEventsDecoded[label] == 1;
+    return posSendEventsDecoded[label] == 1;
 }

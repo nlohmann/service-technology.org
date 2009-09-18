@@ -16,6 +16,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             bug7.fiona.og bug7.owfn \
             bug8.fiona.og bug8.owfn \
             bug9.fiona.og bug9.owfn \
+            bug10.owfn \
             bug13651.owfn \
             bug13718.owfn \
             bug13994-1.owfn bug13994-2.owfn \
@@ -61,7 +62,11 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             06-03-23_BPM06_shop_sect_6.owfn 06-03-23_BPM06_shop_sect_6.fiona.og \
             genericNonTrivialSCC.owfn \
             marlene-ca.owfn marlene-td.ar marlene-td.owfn \
-	    genericSynchLFQAP.owfn
+            genericSynchLFQAP.owfn \
+            dead.owfn \
+            mb.owfn \
+            nlc.owfn
+
 
 
 # Below you can list all the files you do not want to have counted in the

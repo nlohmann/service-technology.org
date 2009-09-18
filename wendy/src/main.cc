@@ -149,6 +149,12 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--og' and '--sa' parameter are mutually exclusive");
     }
 
+    // --diagnose only works with --smartSendingEvent and --waitstatesOnly
+    if (args_info.diagnose_given) {
+        args_info.smartSendingEvent_flag = 1;
+        args_info.waitstatesOnly_flag = 1;
+    }
+
     free(params);
 }
 
@@ -340,6 +346,11 @@ int main(int argc, char** argv) {
         if (StoredKnowledge::root->is_sane) {
             StoredKnowledge::root->store();
             StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
+        } else {
+            // store insane root in case of diagnosis
+            if (args_info.diagnose_given) {
+                StoredKnowledge::root->store();
+            }
         }
     }
     time(&end_time);
@@ -365,6 +376,9 @@ int main(int argc, char** argv) {
     // analyze root node and print result
     bool controllable = (StoredKnowledge::root->is_sane);
     message("net is controllable: %s", controllable ? "YES" : "NO");
+    if (not controllable and not args_info.diagnose_given) {
+        message("use '--diagnose' option for diagnosis information");
+    }
 
 
     /*-------------------------------.
@@ -372,7 +386,6 @@ int main(int argc, char** argv) {
     `--------------------------------*/
     if (args_info.cover_given) {
         Cover::calculate(StoredKnowledge::seen);
-
         message("cover constraint is satisfiable: %s", (Cover::satisfiable) ? "YES" : "NO");
     }
 
@@ -380,7 +393,7 @@ int main(int argc, char** argv) {
     /*-------------------.
     | 9. output options |
     `-------------------*/
-    if (controllable or args_info.diagnose_flag) {
+    if (controllable or args_info.diagnose_given) {
 
         // operating guidelines output
         if (args_info.og_given) {
@@ -425,6 +438,13 @@ int main(int argc, char** argv) {
 
             status("wrote migration information to file '%s' [%.0f sec]",
                 im_filename.c_str(), difftime(end_time, start_time));
+        }
+
+        // diagnose output
+        if (args_info.diagnose_given) {
+            string diag_filename = args_info.diagnose_arg ? args_info.diagnose_arg : filename + ".diag.dot";
+            Output output(diag_filename, "diagnosis information");
+            StoredKnowledge::output_diagnosedot(output);
         }
     }
 

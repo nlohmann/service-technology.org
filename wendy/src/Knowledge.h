@@ -84,8 +84,8 @@ class Knowledge {
 
     private: /* member functions */
 
-    	/// initialze member attributes
-    	void initialize();
+        /// initialze member attributes
+        void initialize();
 
         /// calculate the closure of this knowledge
         void closure(std::queue<FullMarking>&);

@@ -69,12 +69,32 @@ void InterfaceMarking::initialize(unsigned int m) {
     message_bound = m;
     interface_length = Label::send_events + Label::receive_events;
     message_bound_bits = LOG2(message_bound);
+    
+    // allow to store a larger interface marking to display diagnosis results
+    if (args_info.diagnose_given) {
+        ++message_bound_bits;
+    }
+    
     markings_per_byte = 8 / message_bound_bits;
     bytes = (unsigned int)(ceil((double)interface_length / (double)markings_per_byte));
 
     status("message bound set to %d (%d bytes/interface marking, %d bits/event)",
         message_bound, bytes, message_bound_bits);
 }
+
+
+/*!
+ This function is necessary to sort vectors or sets of pointers to
+ InterfaceMarking objects using sort functions from the STL Algorithms. The
+ result must be any ordering.
+ */
+bool InterfaceMarking::sort_cmp(const InterfaceMarking* a, const InterfaceMarking* b) {
+    assert(a);
+    assert(b);
+
+    return (*a < *b);
+}
+
 
 
 /***************
@@ -354,6 +374,33 @@ bool InterfaceMarking::marked(const Label_ID& label) const {
     return ((result >> offset) > 0);
 }
 
+
+bool InterfaceMarking::sane() const {
+    for (Label_ID l = 1; l <= interface_length; ++l) {
+        if (get(l) > message_bound) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool InterfaceMarking::pendingInput() const {
+    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+        if (marked(l)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InterfaceMarking::pendingOutput() const {
+    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+        if (marked(l)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 hash_t InterfaceMarking::hash() const {
     hash_t result = 0;

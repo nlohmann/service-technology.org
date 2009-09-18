@@ -161,9 +161,12 @@ option "verbose" v
   flag off
 
 option "diagnose" -
-  "Insane nodes are not deleted."
-  details="Insane nodes are not deleted and thus dot output shows insane nodes as well.\n"
-  flag off
+  "Create a Dot file with diagnosis information."
+  details="Creates a Dot file with diagnosis information which should help to understand the reasons why a net is uncontrollable.\n"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
 
 option "reportFrequency" -
   "Report frequency for knowledge bubbles."

@@ -49,6 +49,9 @@ class StoredKnowledge {
         /// print a dot representation
         static void output_dot(std::ostream&);
 
+        /// print a dot representation for diagnosis
+        static void output_diagnosedot(std::ostream&);
+
         /// print the knowledges as OG
         static void output_og(std::ostream&);
 

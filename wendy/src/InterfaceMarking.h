@@ -58,6 +58,9 @@ class InterfaceMarking {
         /// initializes the class InterfaceMarking
         static void initialize(unsigned int);
 
+        /// comparison function to use std::sort
+        static bool sort_cmp(const InterfaceMarking*, const InterfaceMarking*);
+
     private: /* static attributes */
 
         /// the message bound
@@ -114,6 +117,15 @@ class InterfaceMarking {
 
         /// returns whether the interface is marked at the given label
         bool marked(const Label_ID&) const;
+
+        /// returns whether message bound is respected
+        bool sane() const;
+
+        /// returns whether input messages are pending
+        bool pendingInput() const;
+
+        /// returns whether output messages are pending
+        bool pendingOutput() const;
 
         /// returns the hash value of this marking
         hash_t hash() const;

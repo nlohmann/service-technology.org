@@ -107,7 +107,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 100 tests were successful.
+All 104 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{wendy@@service-technology.org}.
@@ -301,6 +301,12 @@ Daniela Weinberg. @b{Efficient Controllability Analysis of Open Nets}. In Robert
 
 
 @section Other Features
+
+@subsubheading Diagnosis of uncontrollable nets
+
+@quotation
+Niels Lohmann. @b{Why does my service have no partners?}. In Roberto Bruni and Karsten Wolf, editors, @i{Web Services and Formal Methods, 5th International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008, Revised Selected Papers}, volume 5387 of Lecture Notes in Computer Science, pages 191-206, April 2009. Springer-Verlag.
+@end quotation
 
 @subsubheading Runtime Migration
 

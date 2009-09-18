@@ -64,6 +64,15 @@ Reduction Rules
 Other Features
 ==============
 
+Diagnosis of uncontrollable nets
+................................
+
+     Niels Lohmann. Why does my service have no partners?. In Roberto Bruni
+     and Karsten Wolf, editors, Web Services and Formal Methods, 5th
+     International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008,
+     Revised Selected Papers, volume 5387 of Lecture Notes in Computer
+     Science, pages 191-206, April 2009. Springer-Verlag.
+
 Runtime Migration
 .................
 

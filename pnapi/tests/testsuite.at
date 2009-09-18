@@ -209,6 +209,7 @@ AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([SA2SM NET NET.owfn], 0, ignore, stderr)
 AT_CHECK([GREP -q "SYNCHRONOUS" NET.owfn])
 AT_CHECK([GREP -q "SYNCHRONIZE sync_rule_1" NET.owfn])
+AT_CHECK([GREP -q "myUnknownLabel" NET.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
@@ -218,6 +219,7 @@ AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([SA2OWFN NET NET.owfn], 0, ignore, stderr)
 AT_CHECK([GREP -q "SYNCHRONOUS" NET.owfn])
 AT_CHECK([GREP -q "SYNCHRONIZE sync_rule_1" NET.owfn])
+AT_CHECK([GREP -q "myUnknownLabel" NET.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 

@@ -7,7 +7,7 @@
 
 INTERFACE
   SYNCHRONOUS
-    sync_rule_1, sync_rule_2, sync_rule_3, sync_rule_4, sync_rule_5, sync_rule_6, sync_rule_7, sync_t_receive_CPayment, sync_t_receive_CRental_Request, sync_t_receive_RAsk_for_Rental_Dates_and_Locations, sync_t_receive_RCharge_Customer, sync_t_receive_RCustomer_Welcome, sync_t_receive_RNegociate_CarGroup, sync_t_receive_RRental_Reservation, sync_t_receive_RSelect_Payment_Type, sync_t_send_CAsk_for_Rental_Dates_and_Locations, sync_t_send_CInvoice, sync_t_send_CNegociate_CarGroup, sync_t_send_CRental_Reservation, sync_t_send_RPayment, sync_t_send_RRental_Request;
+    sync_rule_1, sync_rule_2, sync_rule_3, sync_rule_4, sync_rule_5, sync_rule_6, sync_rule_7, sync_t_receive_CPayment, sync_t_receive_CRental_Request, sync_t_receive_RAsk_for_Rental_Dates_and_Locations, sync_t_receive_RCharge_Customer, sync_t_receive_RCustomer_Welcome, sync_t_receive_RNegociate_CarGroup, sync_t_receive_RRental_Reservation, sync_t_receive_RSelect_Payment_Type, sync_t_send_CAsk_for_Rental_Dates_and_Locations, sync_t_send_CInvoice, sync_t_send_CNegociate_CarGroup, sync_t_send_CRental_Reservation, sync_t_send_RPayment, sync_t_send_RRental_Request, myUnknownLabel;
 
 NODES
   22677488 : INITIAL

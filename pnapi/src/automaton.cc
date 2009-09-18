@@ -240,6 +240,7 @@ namespace pnapi
    * will be initially marked and final states will be connected
    * disjunctive in the final condition.
    *
+   * \todo clean me!
    */
   PetriNet & Automaton::stateMachine() const
   {
@@ -334,6 +335,9 @@ namespace pnapi
     // generate final condition
     result->finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
 
+    // copy synchronous interface (how did this ever work before???)
+    result->setSynchronousLabels(labels_);
+    
     return *result;
   }
 

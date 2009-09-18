@@ -40,6 +40,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             error16.2.cov \
             myCoffee.fiona.og myCoffee.owfn \
             phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
+            phcontrol9.unf.owfn \
             phil5.owfn \
             PO.fiona.og PO.owfn \
             mia-PO.owfn mia-PO-pv.owfn \

@@ -1032,12 +1032,11 @@ AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn --rulefi
 AT_KEYWORDS(marlene)
 AT_CLEANUP
 
-AT_SETUP([Coffee Vending Machine (asynchronous)])
-AT_SKIP_IF([true])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/marlene-ca.owfn TESTFILES/marlene-td.owfn TESTFILES/marlene-td.ar .])
-AT_DATA([marlene.conf], [wendy="WENDY"
-])
-AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn --rulefile=marlene-td.ar --asyncif --verbose],0,ignore,ignore)
-AT_KEYWORDS(marlene)
-AT_CLEANUP
+#AT_SETUP([Coffee Vending Machine (asynchronous)])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/marlene-ca.owfn TESTFILES/marlene-td.owfn #TESTFILES/marlene-td.ar .])
+#AT_DATA([marlene.conf], [wendy="WENDY"
+#])
+#AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn #--rulefile=marlene-td.ar --asyncif --verbose],0,ignore,ignore)
+#AT_KEYWORDS(marlene)
+#AT_CLEANUP

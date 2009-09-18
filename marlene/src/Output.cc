@@ -41,11 +41,7 @@ extern gengetopt_args_info args_info;
  basename has to be used to avoid problems with path names.
 */
 Output::Output() :
-#if defined(__MINGW32__)
-    os(*(new std::ofstream(mktemp(temp = basename(args_info.tmpfile_arg)), std::ofstream::out | std::ofstream::trunc))),
-#else
     os(*(new std::ofstream(mktemp(temp = args_info.tmpfile_arg), std::ofstream::out | std::ofstream::trunc))),
-#endif
     filename(temp), kind("")
 {
     if (not os.good() or filename == "") {

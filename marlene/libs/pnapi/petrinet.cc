@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-09-16 03:27:41 +0200 (Mi, 16. Sep 2009) $
+ * \date    $Date: 2009-09-17 17:34:46 +0200 (Do, 17. Sep 2009) $
  *
- * \version $Revision: 4706 $
+ * \version $Revision: 4726 $
  */
 
 #include "config.h"
@@ -1343,7 +1343,7 @@ namespace pnapi
       }
       case Node::INTERNAL:
       {
-        edgeLabels[*t] = "TAU";
+        edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
         break;
       }
       default: ;//assert(false);

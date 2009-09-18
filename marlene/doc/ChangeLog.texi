@@ -1,10 +1,14 @@
-@heading Version 1.1-unreleased
+@heading Version 1.1
 @itemize
 
 @item changed behavior concerning prefixes: default is no prefixes added to the nets, @samp{--with-prefix} adds a unique prefix to each read net.
       (parameter for invoking prefixes is @samp{--withprefix})
 
 @item added parameter @samp{--engineonly} to get only the engine part of an adapter
+
+@item composition of controller and engine works now (see bug #13968, @url{https://gna.org/bugs/?13968})
+
+@item switched off redution rule `conflictfree transitions' due to counterexamples by Arjan
 
 @end itemize
 

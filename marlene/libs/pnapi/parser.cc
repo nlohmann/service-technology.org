@@ -494,6 +494,9 @@ namespace pnapi
         sa2sm = false;
         sa::parse();
 
+        // copy synchronous interface
+        pnapi_sa_yyautomaton.setSynchronousLabels(synchronous_);
+        
         // clean up global variables
         states_.clear();
 
@@ -520,7 +523,8 @@ namespace pnapi
         }
 
         pnapi_sa_yynet.finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
-
+        pnapi_sa_yynet.setSynchronousLabels(synchronous_);
+        
         // clean up global variables
         label2places_.clear();
         places_.clear();

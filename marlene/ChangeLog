@@ -6,14 +6,20 @@
                      http://service-technology.org/marlene
 
 
-Version 1.1-unreleased
-======================
+Version 1.1
+===========
 
 * changed behavior concerning prefixes: default is no prefixes added to the
   nets, `--with-prefix' adds a unique prefix to each read net.
   (parameter for invoking prefixes is `--withprefix')
 
 * added parameter `--engineonly' to get only the engine part of an adapter
+
+* composition of controller and engine works now (see bug #13968,
+  `https://gna.org/bugs/?13968')
+
+* switched off redution rule `conflictfree transitions' due to
+  counterexamples by Arjan
 
 
 Version 1.0

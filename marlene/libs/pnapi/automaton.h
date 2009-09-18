@@ -23,7 +23,13 @@ namespace pnapi
     friend std::ostream & io::__dot::output(std::ostream &, const Automaton &);
 
   public:
-    enum Type { INPUT, OUTPUT, TAU, SYNCHRONOUS };
+    enum Type 
+    { 
+      INPUT, 
+      OUTPUT, 
+      TAU, 
+      SYNCHRONOUS 
+    };
     /// standard constructor
     Automaton();
     /// constructor generating automaton from Petri net

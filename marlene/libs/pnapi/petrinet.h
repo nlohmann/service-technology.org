@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-09-17 13:33:43 +0200 (Thu, 17. Sep 2009) $
+ * \date    $Date: 2009-09-17 16:42:01 +0200 (Do, 17. Sep 2009) $
  *
- * \version $Revision: 4718 $
+ * \version $Revision: 4725 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -26,6 +26,7 @@
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
+#include "config.h"
 
 namespace pnapi
 {
@@ -154,7 +155,9 @@ namespace pnapi
 
     /// Petri net output, see pnapi::io
     friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
-
+    
+    /// path to Petrify, can be set with setPetrify() externally
+    std::string pathToPetrify;
 
   public:
 
@@ -207,7 +210,7 @@ namespace pnapi
     PetriNet();
 
     /// constructor Automaton => Petri net
-    PetriNet(const Automaton &);
+    PetriNet(const Automaton &, std::string petrify = std::string(CONFIG_PETRIFY));
 
     /// destructor
     virtual ~PetriNet();
@@ -222,7 +225,10 @@ namespace pnapi
     Condition & finalCondition();
     const Condition & finalCondition() const;
 
-
+    /// setting path to Petrify
+    inline void setPetrify(std::string petrify = CONFIG_PETRIFY)
+                            { pathToPetrify = petrify; }  
+    
     /*!
      * \name   Querying Structural Properties
      *

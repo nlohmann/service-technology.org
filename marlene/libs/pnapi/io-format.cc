@@ -795,6 +795,9 @@ namespace pnapi
         os  << ";" << endl
             << "  OUTPUT ";
         output(os, sa.output());
+        os  << ";" << endl
+            << "  SYNCHRONOUS ";
+        output(os, sa.getSynchronousLabels());
         os  << ";" << endl << endl
             << "NODES" << endl;
         output(os, sa.states_);
@@ -825,7 +828,7 @@ namespace pnapi
 
       ostream & output(ostream &os, const std::vector<State *> &vs)
       {
-        for (unsigned int i = 0; i < vs.size(); i++)
+        for (unsigned int i = 0; i < vs.size(); ++i)
           output(os, *vs[i]);
 
         return os;
@@ -839,14 +842,13 @@ namespace pnapi
         return os;
       }
 
-      // FIXME: ... or here!
       ostream & output(ostream &os, const std::set<std::string> &ss)
       {
         if (!ss.empty())
         {
           os << *ss.begin();
-          for (std::set<std::string>::iterator s = ++ss.begin(); s != ss.end();
-              s++)
+          for (std::set<std::string>::iterator s = ++ss.begin(); 
+                 s != ss.end(); ++s)
             os << ", " << *s;
         }
 

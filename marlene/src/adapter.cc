@@ -65,7 +65,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
 
     // adapter specific reduction should take place here
     removeUnnecessaryRules();
-    findConflictFreeTransitions();
+    // findConflictFreeTransitions();
     
     // reduce engine with standard PNAPI methods
     _engine->reduce(pnapi::PetriNet::LEVEL_4);
@@ -253,9 +253,10 @@ const pnapi::PetriNet * Adapter::buildController()
         time(&start_time);
         pnapi::PetriNet * controller;
 
-        if (std::string(CONFIG_PETRIFY) != "not found") // && _contType == ASYNCHRONOUS)
+        if (std::string(args_info.petrify_arg) != "not found") // && _contType == ASYNCHRONOUS)
         {
-            controller = new pnapi::PetriNet(*mpp_sa);
+            std::string petrify = std::string(args_info.petrify_arg);
+            controller = new pnapi::PetriNet(*mpp_sa, petrify);
         }
         else
         {

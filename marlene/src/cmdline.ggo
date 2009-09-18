@@ -101,6 +101,14 @@ option "wendy" -
   optional
   hidden
 
+option "petrify" -
+  "Set the name of the Petrify binary for transformation of service automata to open nets."
+  string
+  typestr="FILE"
+  default="petrify"
+  optional
+  hidden
+
 option "tmpfile" -
   "Set the name of the standard temp file."
   string

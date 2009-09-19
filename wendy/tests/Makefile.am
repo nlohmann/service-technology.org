@@ -42,6 +42,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
             phcontrol9.unf.owfn \
             phil5.owfn \
+            small.owfn \
             PO.fiona.og PO.owfn \
             mia-PO.owfn mia-PO-pv.owfn \
             mia-reg_new.owfn mia-reg_old.owfn \

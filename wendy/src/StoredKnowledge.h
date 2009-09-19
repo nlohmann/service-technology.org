@@ -131,6 +131,9 @@ class StoredKnowledge {
 
     private: /* static functions */
 
+        /// returns the header for output files
+        static void fileHeader(std::ostream&);
+
         /// evaluate each member of the given (T)SCC and propagate the property of being insane accordingly
         static void analyzeSCCOfKnowledges(std::set<StoredKnowledge*>&);
 

@@ -145,10 +145,8 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
         // reduction rule: send leads to insane node
-        if (args_info.smartSendingEvent_flag) {
-            if (SENDING(l) and not K.considerSendingEvent(l - Label::first_send)) {
-                continue;
-            }
+        if (args_info.smartSendingEvent_flag and SENDING(l) and not K.considerSendingEvent(l)) {
+            continue;
         }
 
         // reduction rule: sequentialize receiving events
@@ -166,10 +164,8 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
         }
 
         // reduction rule: only consider waitstates
-        if (args_info.waitstatesOnly_flag) {
-            if (not RECEIVING(l) and not K.resolvableWaitstate(l)) {
-                continue;
-            }
+        if (args_info.waitstatesOnly_flag and not RECEIVING(l) and not K.resolvableWaitstate(l)) {
+            continue;
         }
 
         // recursion
@@ -411,8 +407,7 @@ inline void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK,
  if current knowledge is representative of an SCC (of knowledges) then evaluate current SCC
 */
 inline void StoredKnowledge::evaluateKnowledge() {
-
-	assert(not tarjanStack.empty());
+    assert(not tarjanStack.empty());
 
     // check, if the current knowledge is a representative of a SCC
     // if so, get all knowledges within the SCC
@@ -554,8 +549,8 @@ inline void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge
  \return whether each deadlock in the knowledge is resolved
 
  \param checkOnTarjanStack in case of reduction rules "quit as soon as possible" and "succeeding sending event"
-						   it has to be ensured that the successor node has been completely analyzed and thus
-						   is off the Tarjan stack
+                           it has to be ensured that the successor node has been completely analyzed and thus
+                           is off the Tarjan stack
 
  \pre the markings in the array (0 to sizeDeadlockMarkings-1) are deadlocks -- all transient
       states or unmarked final markings are removed from the marking array
@@ -650,6 +645,17 @@ void StoredKnowledge::traverse() {
  * OUTPUT FUNCTIONS (STATIC AND MEMBER) *
  ****************************************/
 
+void StoredKnowledge::fileHeader(std::ostream &file) {
+    file << "{\n  generator:    " << PACKAGE_STRING
+        << " (" << CONFIG_BUILDSYSTEM ")"
+        << "\n  invocation:   " << invocation << "\n  events:       "
+        << static_cast<unsigned int>(Label::send_events) << " send, "
+        << static_cast<unsigned int>(Label::receive_events) << " receive, "
+        << static_cast<unsigned int>(Label::sync_events) << " synchronous"
+        << "\n  statistics:   " << seen.size() << " nodes"
+        << "\n}\n\n";    
+}
+
 /*!
   \param[in,out] file  the output stream to write the OG to
 
@@ -658,15 +664,7 @@ void StoredKnowledge::traverse() {
         a valid numbering.
  */
 void StoredKnowledge::output_og(std::ostream& file) {
-    file << "{\n  generator:    " << PACKAGE_STRING
-        << " (" << CONFIG_BUILDSYSTEM ")"
-        << "\n  invocation:   " << invocation << "\n  events:       "
-        << static_cast<unsigned int>(Label::send_events) << " send, "
-        << static_cast<unsigned int>(Label::receive_events) << " receive, "
-        << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-        << "\n  statistics:   " << seen.size() << " nodes"
-        << "\n}\n\n";
-
+    fileHeader(file);
     file << "INTERFACE\n";
 
     if (Label::receive_events > 0) {
@@ -710,17 +708,17 @@ void StoredKnowledge::output_og(std::ostream& file) {
 
     file << "\nNODES\n";
 
-     // the root
+    // the root
     root->print(file);
 
-     // all other nodes
+    // all other nodes
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         if (*it != root) {
             (*it)->print(file);
         }
     }
 
-     // print empty node unless we print an automaton
+    // print empty node unless we print an automaton
     if (not args_info.sa_given and emptyNodeReachable) {
          // the empty node
         file << "  0";
@@ -730,7 +728,7 @@ void StoredKnowledge::output_og(std::ostream& file) {
             file << "\n";
         }
 
-         // empty node loops
+        // empty node loops
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             file << "    " << Label::id2name[l]  << " -> 0\n";
         }
@@ -750,15 +748,7 @@ void StoredKnowledge::output_og(std::ostream& file) {
               guidelines.
  */
 void StoredKnowledge::output_ogold(std::ostream& file) {
-    file << "{\n  generator:    " << PACKAGE_STRING
-        << " (" << CONFIG_BUILDSYSTEM ")"
-        << "\n  invocation:   " << invocation << "\n  events:       "
-        << static_cast<unsigned int>(Label::send_events) << " send, "
-        << static_cast<unsigned int>(Label::receive_events) << " receive, "
-        << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-        << "\n  statistics:   " << seen.size() << " nodes"
-        << "\n}\n\n";
-
+    fileHeader(file);
     file << "INTERFACE\n";
     file << "  INPUT\n";
     bool first = true;
@@ -784,7 +774,7 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
 
     file << "\nNODES\n";
 
-     // the empty node
+    // the empty node
     file << "  0 : true";
 
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {

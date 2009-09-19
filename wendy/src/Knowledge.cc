@@ -493,10 +493,12 @@ bool Knowledge::considerReceivingEvent(Label_ID label) const {
  \pre reduction rule smart sending event is used
 
  \param label current sending event
+
+ \note given label must be adjusted such that first send event has label 0
 */
 bool Knowledge::considerSendingEvent(Label_ID label) const {
-    assert(args_info.smartSendingEvent_flag == true);
+    assert(args_info.smartSendingEvent_flag);
     assert(posSendEventsDecoded != NULL);
 
-    return posSendEventsDecoded[label] == 1;
+    return posSendEventsDecoded[label - Label::first_send] == 1;
 }

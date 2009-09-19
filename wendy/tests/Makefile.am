@@ -65,9 +65,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             genericNonTrivialSCC.owfn \
             marlene-ca.owfn marlene-td.ar marlene-td.owfn \
             genericSynchLFQAP.owfn \
-            dead.owfn \
-            mb.owfn \
-            nlc.owfn
+            dead.owfn mb.owfn nlc.owfn uncontrollable.owfn
 
 
 
@@ -78,7 +76,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.*
+NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.*
 
 
 

@@ -144,11 +144,11 @@ AT_CLEANUP
 AT_SETUP([Releasing allocated memory])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])
-AT_CHECK([WENDY PO.owfn --verbose --finalize],0,ignore,stderr)
+AT_CHECK([WENDY PO.owfn --verbose --smartSendingEvent --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "stored 402 inner markings" stderr])
-AT_CHECK([GREP -q "stored 1024 knowledges" stderr])
+AT_CHECK([GREP -q "stored 168 knowledges" stderr])
 AT_CHECK([GREP -q "InnerMarking: deleted 402 objects" stderr])
-AT_CHECK([GREP -q "StoredKnowledge: deleted 1024 objects" stderr])
+AT_CHECK([GREP -q "StoredKnowledge: deleted 168 objects" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -972,9 +972,11 @@ AT_BANNER([Diagnosis of uncontrollable services])
 AT_SETUP([Non-local choice])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/nlc.owfn .])
-AT_CHECK([WENDY nlc.owfn --verbose --diagnose],0,ignore,stderr)
+AT_CHECK([WENDY nlc.owfn --verbose --diagnose --dot],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_CHECK([GREP -q "(uw)" nlc.diag.dot])
+AT_CHECK([GREP -q "false" nlc.dot])
+AT_CHECK([GREP -q "is not sane" nlc.dot])
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
@@ -993,6 +995,17 @@ AT_CHECK([cp TESTFILES/mb.owfn .])
 AT_CHECK([WENDY mb.owfn --verbose --diagnose],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_CHECK([GREP -q "(mb)" mb.diag.dot])
+AT_KEYWORDS(diagnosis)
+AT_CLEANUP
+
+AT_SETUP([Multiple reasons])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/uncontrollable.owfn .])
+AT_CHECK([WENDY uncontrollable.owfn --verbose --diagnose],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: NO" stderr])
+AT_CHECK([GREP -q "(mb)" uncontrollable.diag.dot])
+AT_CHECK([GREP -q "(uw)" uncontrollable.diag.dot])
+AT_CHECK([GREP -q "(dl)" uncontrollable.diag.dot])
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 

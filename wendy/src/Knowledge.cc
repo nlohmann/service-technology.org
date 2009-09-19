@@ -141,9 +141,6 @@ Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label) : is_sane(1
                                 if (not args_info.diagnose_given) {
                                     delete interface;
                                     return;
-                                } else {
-                                    bubble[pos->first].push_back(interface);
-                                    ++size;
                                 }
                             }
 
@@ -175,7 +172,7 @@ Knowledge::~Knowledge() {
     }
 
     if (args_info.smartSendingEvent_flag) {
-    	delete posSendEvents;
+        delete posSendEvents;
     }
 }
 

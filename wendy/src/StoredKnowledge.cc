@@ -93,7 +93,7 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
     }
 
     // only process knowledges within the message bounds
-    if (K_new.is_sane) {
+    if (K_new.is_sane or args_info.diagnose_given) {
         // remember whether SK_new is new
         bool newKnowledge = false;
 
@@ -109,8 +109,10 @@ inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const 
         // evaluate the storage result
         if (SK_store == SK_new) {
             newKnowledge = true;
-            // the node was new, so check its successors
-            processRecursively(K_new, SK_store);
+            if (K_new.is_sane) {
+                // the node was new and sane, so check its successors
+                processRecursively(K_new, SK_store);
+            }
         } else {
             // we did not find new knowledge
             delete SK_new;
@@ -1112,6 +1114,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
 /*!
   \param[in,out] file  the output stream to write the dot representation to
+  \bug synchronous events are ignored when evaluating waitstates
  */
 void StoredKnowledge::output_diagnosedot(std::ostream& file) {
     file << "digraph G {\n"

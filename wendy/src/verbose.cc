@@ -20,6 +20,8 @@
 
 #include <cstdarg>
 #include <cstdlib>
+#include <cerrno>
+#include <cstring>
 
 #include "config.h"
 #include "cmdline.h"
@@ -80,6 +82,10 @@ void abort(unsigned int code, const char* format, ...) {
     fprintf(stderr, " -- aborting [#%02d]\n", code);
 
     status("see manual for a documentation of this error");
+
+    if (errno != 0) {
+        status("last error message: %s", strerror(errno));
+    }
 
     exit(EXIT_FAILURE);
 }

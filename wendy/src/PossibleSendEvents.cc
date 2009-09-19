@@ -41,7 +41,6 @@ unsigned int PossibleSendEvents::bytes = 0;
 
 void PossibleSendEvents::initialize() {
     bytes = ((Label::send_events-1) / 8) +1;
-
     status("send event detection requires %d bytes per inner marking", bytes);
 }
 
@@ -148,28 +147,28 @@ void PossibleSendEvents::labelPossible(Label_ID l) {
 
     unsigned int myByte = (l - Label::first_send) / 8;
     unsigned int myBit  = (l - Label::first_send) % 8;
-
     storage[myByte] += (1 << myBit);
 }
 
 /*!
  \todo Check if this function is actually called more than once. If not, then
        we can skip the first if and make this a const function.
+ \todo Check if decode() would ever return different values. Otherwise, the
+       implementation is wrong and should be reverted to revision 4731.
 */
 char* PossibleSendEvents::decode() {
     assert(bytes > 0);
 
-    // only reserve memory on first decoding
+    // only reserve memory and encode on first decoding
     if (decodedLabels == NULL) {
         decodedLabels = new char[Label::send_events];
-    }
 
-    // decode and store values
-    for (Label_ID l = 0; l < Label::send_events; ++l) {
-        unsigned int myByte = l / 8;
-        unsigned int myBit  = l % 8;
-
-        decodedLabels[l] = (storage[myByte] & (1 << myBit)) >> myBit;
+        // decode and store values
+        for (Label_ID l = 0; l < Label::send_events; ++l) {
+            unsigned int myByte = l / 8;
+            unsigned int myBit  = l % 8;
+            decodedLabels[l] = (storage[myByte] & (1 << myBit)) >> myBit;
+        }
     }
 
     return decodedLabels;

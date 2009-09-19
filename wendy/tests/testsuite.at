@@ -131,12 +131,22 @@ AT_CHECK([test -f wendy-*],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Using a configuration file])
+AT_SETUP([Using a given configuration file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_DATA([my_wendy.conf], [verbose
+])
+AT_CHECK([WENDY --config=my_wendy.conf --og myCoffee.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'my_wendy.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using a present configuration file])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_DATA([wendy.conf], [verbose
 ])
-AT_CHECK([WENDY --config=wendy.conf --og myCoffee.owfn],0,ignore,stderr)
+AT_CHECK([WENDY --og myCoffee.owfn],0,ignore,stderr)
 AT_CHECK([GREP -q "using configuration file 'wendy.conf'" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP

@@ -69,12 +69,12 @@ void InterfaceMarking::initialize(unsigned int m) {
     message_bound = m;
     interface_length = Label::send_events + Label::receive_events;
     message_bound_bits = LOG2(message_bound);
-    
+
     // allow to store a larger interface marking to display diagnosis results
     if (args_info.diagnose_given) {
         ++message_bound_bits;
     }
-    
+
     markings_per_byte = 8 / message_bound_bits;
     bytes = (unsigned int)(ceil((double)interface_length / (double)markings_per_byte));
 
@@ -101,7 +101,7 @@ bool InterfaceMarking::sort_cmp(const InterfaceMarking* a, const InterfaceMarkin
  * CONSTRUCTOR *
  ***************/
 
-InterfaceMarking::InterfaceMarking() : storage(NULL) {
+InterfaceMarking::InterfaceMarking() {
     // if no (asynchronous) events are present, we are done here
     if (interface_length == 0) {
         return;

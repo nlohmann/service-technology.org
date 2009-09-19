@@ -25,12 +25,10 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             bug14158.owfn \
             bug14166.owfn \
             carreservation_with_engine.owfn \
-            coverFiona_Nc1.owfn \
-            coverFiona_Nc1.owfn.cov\
-            coverFiona_Nc2.owfn \
-            coverFiona_Nc2.owfn.cov \
-            coverFiona_Nc3.owfn \
-            coverFiona_Nc3.owfn.cov \
+            coverFiona_Nc1.owfn coverFiona_Nc1.owfn.cov\
+            coverFiona_Nc2.owfn coverFiona_Nc2.owfn.cov \
+            coverFiona_Nc3.owfn coverFiona_Nc3.owfn.cov \
+            sync_cover.owfn sync_cover.owfn.cov \
             error02.owfn \
             error03.owfn \
             error04-1.owfn error04-2.owfn \

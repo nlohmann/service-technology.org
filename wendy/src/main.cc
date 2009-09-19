@@ -60,14 +60,9 @@ Output *markingoutput = NULL;
 clock_t start_clock = clock();
 
 
-bool fileExists(std::string filename) {
-    FILE *tmp = fopen(filename.c_str(), "r");
-    if (tmp) {
-        fclose(tmp);
-        return true;
-    } else {
-        return false;
-    }
+inline bool fileExists(std::string filename) {
+    std::ifstream tmp(filename.c_str(), std::ios_base::in);
+    return tmp.good();
 }
 
 
@@ -94,9 +89,8 @@ void evaluateParameters(int argc, char** argv) {
 
     // debug option
     if (args_info.bug_flag) {
-        FILE *debug_output = fopen("bug.log", "w");
-        fprintf(debug_output, "%s\n", CONFIG_LOG);
-        fclose(debug_output);
+        { Output debug_output("bug.log", "configuration information");
+          debug_output.stream() << CONFIG_LOG << std::flush; }
         message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
         exit(EXIT_SUCCESS);
     }

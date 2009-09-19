@@ -59,7 +59,7 @@ Output::Output() :
  This constructor creates a file with the given filename. In case the
  filename matches "-", no file is created, but std::cout is used as output.
 */
-Output::Output(std::string& str, std::string kind) :
+Output::Output(std::string str, std::string kind) :
     os((!str.compare("-")) ?
         std::cout :
         *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))

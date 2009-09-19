@@ -49,7 +49,7 @@ class Output {
         Output();
 
         /// constructor (opens named stream or directs to std::cout)
-        Output(std::string&, std::string);
+        Output(std::string, std::string);
 
         /// destructor (closes stream)
         ~Output();

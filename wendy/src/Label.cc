@@ -18,6 +18,7 @@
 \*****************************************************************************/
 
 
+#include <set>
 #include "Label.h"
 #include "InnerMarking.h"
 #include "Cover.h"
@@ -65,40 +66,40 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
     first_receive = 1;
 
-    const set<Place*> outputPlaces( InnerMarking::net->getOutputPlaces() );
+    const set<Place*> outputPlaces(InnerMarking::net->getOutputPlaces());
     for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
         ++events;
         ++receive_events;
-        id2name[events] = (*p)->getName();
+        id2name[events] = (**p).getName();
         if (args_info.cover_given) {
-            Cover::labelCache[(*p)->getName()] = events;
+            Cover::labelCache[(**p).getName()] = events;
         }
 
-        const set<Node*> preset( (*p)->getPreset() );
+        const set<Node*> preset((**p).getPreset());
         for (set<Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
-            name2id[(*t)->getName()] = events;
+            name2id[(**t).getName()] = events;
         }
     }
-    
+
     last_receive = events;
 
 
     // ASYNCHRONOUS RECEIVE SEND (!-step for us)
     first_send = events+1;
 
-    const set<Place*> inputPlaces( InnerMarking::net->getInputPlaces() );
+    const set<Place*> inputPlaces(InnerMarking::net->getInputPlaces());
 
     for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
         ++events;
         ++send_events;
-        id2name[events] = (*p)->getName();
+        id2name[events] = (**p).getName();
         if (args_info.cover_given) {
-            Cover::labelCache[(*p)->getName()] = events;
+            Cover::labelCache[(**p).getName()] = events;
         }
 
-        const set<Node*> postset( (*p)->getPostset() );
+        const set<Node*> postset((**p).getPostset());
         for (set<Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {
-            name2id[(*t)->getName()] = events;
+            name2id[(**t).getName()] = events;
         }
     }
 
@@ -110,16 +111,16 @@ void Label::initialize() {
 
     // collect the labels
     std::map<string, Label_ID> sync_labels;
-    const set<string> sync_label_names( InnerMarking::net->getSynchronousLabels() );
+    const set<string> sync_label_names(InnerMarking::net->getSynchronousLabels());
     for (set<string>::const_iterator l = sync_label_names.begin(); l != sync_label_names.end(); ++l) {
         sync_labels[*l] = ++events;
         id2name[events] = *l;
     }
 
     // collect the transitions with synchronous labels
-    const set<Transition*> trans( InnerMarking::net->getSynchronizedTransitions() );
+    const set<Transition*> trans(InnerMarking::net->getSynchronizedTransitions());
     for (set<Transition*>::const_iterator t = trans.begin(); t != trans.end(); ++t) {
-        name2id[(*t)->getName()] = sync_labels[*(*t)->getSynchronizeLabels().begin()];
+        name2id[(**t).getName()] = sync_labels[*(**t).getSynchronizeLabels().begin()];
     }
 
 

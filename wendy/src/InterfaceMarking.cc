@@ -42,7 +42,7 @@ extern gengetopt_args_info args_info;
                 ((i <  16) ? 4 : \
                 ((i <  32) ? 5 : \
                 ((i <  64) ? 6 : \
-                ((i < 128) ? 7 : 8 )))))))
+                ((i < 128) ? 7 : 8)))))))
 
 
 /******************
@@ -62,7 +62,7 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
 
 void InterfaceMarking::initialize(unsigned int m) {
     // check the message bound
-    if ((m < 1) or (m > UINT8_MAX)) {
+    if (m < 1 or m > UINT8_MAX) {
         abort(9, "message bound must be between 1 and %d", UINT8_MAX);
     }
 
@@ -76,7 +76,8 @@ void InterfaceMarking::initialize(unsigned int m) {
     }
 
     markings_per_byte = 8 / message_bound_bits;
-    bytes = (unsigned int)(ceil((double)interface_length / (double)markings_per_byte));
+    bytes = static_cast<unsigned int>(
+      ceil(static_cast<double>(interface_length) / static_cast<double>(markings_per_byte)));
 
     status("message bound set to %d (%d bytes/interface marking, %d bits/event)",
         message_bound, bytes, message_bound_bits);
@@ -120,7 +121,8 @@ InterfaceMarking::InterfaceMarking() {
     }
 }
 
-InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) {
+InterfaceMarking::InterfaceMarking(const InterfaceMarking& other)
+        : storage(NULL) {
     // if no (asynchronous) events are present, we are done here
     if (interface_length == 0) {
         return;
@@ -161,7 +163,8 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) {
                           (message bound violation) or decrement (no message
                           present) 
  */
-InterfaceMarking::InterfaceMarking(const InterfaceMarking& other, const Label_ID& label, const bool& increase, bool& success) {
+InterfaceMarking::InterfaceMarking(const InterfaceMarking& other, const Label_ID& label,
+                                   const bool& increase, bool& success) {
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -240,7 +243,7 @@ std::ostream& operator<< (std::ostream& o, const InterfaceMarking& m) {
         }
         o << static_cast<unsigned int>(m.get(l));
     }
-    return o << "]";;
+    return o << "]";
 }
 
 
@@ -320,7 +323,7 @@ bool InterfaceMarking::dec(const Label_ID& label) {
     uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // before decrement, the value for this label should be positive
-    bool OK = (( (storage[byte] & mask) >> offset ) > 0 );
+    bool OK = (((storage[byte] & mask) >> offset) > 0);
 
     // use the mask to get the current value from the byte,
     // then shift and increment the value

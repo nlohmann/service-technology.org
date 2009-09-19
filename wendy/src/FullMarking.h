@@ -28,18 +28,15 @@
  \brief full marking (a pair of an inner and an interface marking)
  */
 class FullMarking {
-
     public: /* member functions */
-
         /// constructor
-        FullMarking(InnerMarking_ID);
+        explicit FullMarking(InnerMarking_ID);
 
         /// constructor
         FullMarking(InnerMarking_ID, InterfaceMarking);
 
         /// comparison operator
         bool operator< (const FullMarking&) const;
-
     public: /* member attributes */
 
         /// an inner marking

@@ -22,10 +22,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <libgen.h>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <libgen.h>
 #include "config.h"
 #include "config-log.h"
 #include "StoredKnowledge.h"
@@ -102,7 +102,7 @@ void evaluateParameters(int argc, char** argv) {
         params->override = 0;
 
         // call the config file parser
-        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
+        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
             abort(14, "error reading configuration file '%s'", args_info.config_arg);
         } else {
             status("using configuration file '%s'", args_info.config_arg);
@@ -118,7 +118,7 @@ void evaluateParameters(int argc, char** argv) {
             // initialize the config file parser
             params->initialize = 0;
             params->override = 0;
-            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
+            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
                 abort(14, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());
@@ -132,7 +132,6 @@ void evaluateParameters(int argc, char** argv) {
     if (args_info.reportFrequency_arg < 0) {
         abort(8, "report frequency must not be negative");
     }
-    StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;
 
     // check whether at most one file is given
     if (args_info.inputs_num > 1) {
@@ -168,7 +167,7 @@ void terminationHandler() {
 
     // print statistics
     if (args_info.stats_flag) {
-        message("runtime: %.2f sec", (double(clock()) - double(start_clock)) / CLOCKS_PER_SEC);
+        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
         system((string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
@@ -198,7 +197,7 @@ int main(int argc, char** argv) {
             std::cin >> pnapi::io::owfn >> *InnerMarking::net;
         } else {
             // strip suffix from input filename
-            filename = string(args_info.inputs[0]).substr(0,string(args_info.inputs[0]).find_last_of("."));
+            filename = string(args_info.inputs[0]).substr(0, string(args_info.inputs[0]).find_last_of("."));
 
             std::ifstream inputStream(args_info.inputs[0]);
             if (!inputStream) {
@@ -212,7 +211,7 @@ int main(int argc, char** argv) {
             s << pnapi::io::stat << *InnerMarking::net;
             status("read net: %s", s.str().c_str());
         }
-    } catch (pnapi::io::InputError error) {
+    } catch(pnapi::io::InputError error) {
         std::stringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());
@@ -366,7 +365,6 @@ int main(int argc, char** argv) {
     StoredKnowledge::root->traverse();
     status("%d sane nodes reachable", StoredKnowledge::seen.size());
 
-
     // analyze root node and print result
     bool controllable = (StoredKnowledge::root->is_sane);
     message("net is controllable: %s", controllable ? "YES" : "NO");
@@ -388,7 +386,6 @@ int main(int argc, char** argv) {
     | 9. output options |
     `-------------------*/
     if (controllable or args_info.diagnose_given) {
-
         // operating guidelines output
         if (args_info.og_given) {
             string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";

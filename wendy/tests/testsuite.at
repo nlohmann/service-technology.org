@@ -274,11 +274,19 @@ AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Invalid configuration file])
+AT_DATA([wendy.conf], [invalid="PARAMETER"
+])
+AT_CHECK([WENDY -v],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 AT_SETUP([Missing or wrong cover file])
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --cover=foo.cov], 1, ignore, stderr)
+AT_CHECK([WENDY myCoffee.owfn --og --cover=foo.cov --verbose], 1, ignore, stderr)
 AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
-AT_CHECK([WENDY myCoffee.owfn --og --cover=myCoffee.owfn], 1, ignore, stderr)
+AT_CHECK([WENDY myCoffee.owfn --og --cover=myCoffee.owfn --verbose], 1, ignore, stderr)
 AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -383,6 +391,14 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug10.owfn .])
 AT_CHECK([WENDY bug10.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 4 sane nodes reachable" stderr])
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+AT_SETUP([Bug 11])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug11.owfn .])
+AT_CHECK([WENDY bug11.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 2 sane nodes reachable" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 

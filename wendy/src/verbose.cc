@@ -40,7 +40,7 @@ void message(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
-    va_end (args);
+    va_end(args);
 
     fprintf(stderr, "\n");
 }
@@ -53,13 +53,13 @@ void status(const char* format, ...) {
     if (args_info.verbose_flag == 0) {
         return;
     }
-    
+
     fprintf(stderr, "%s: ", PACKAGE);
 
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
-    va_end (args);
+    va_end(args);
 
     fprintf(stderr, "\n");
 }
@@ -77,7 +77,7 @@ void abort(unsigned int code, const char* format, ...) {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
-    va_end (args);
+    va_end(args);
 
     fprintf(stderr, " -- aborting [#%02d]\n", code);
 

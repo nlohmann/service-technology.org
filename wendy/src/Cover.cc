@@ -67,14 +67,14 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
   std::vector<pnapi::Place*> inP;    // internal places
   std::vector<pnapi::Place*> comP;   // interface places
   
-  for(unsigned int i=0; i<placeNames.size(); ++i)
+  for (unsigned int i=0; i<placeNames.size(); ++i)
   {
     pnapi::Place* p = InnerMarking::net->findPlace(placeNames[i]);
-    if(p == NULL)
+    if (p == NULL)
       abort(16, "unknown place '%s' in file '%s'", 
               placeNames[i].c_str(), args_info.cover_arg);
     
-    if(p->getType() == pnapi::Node::INTERNAL)
+    if (p->getType() == pnapi::Node::INTERNAL)
       inP.push_back(p);
     else
       comP.push_back(p);
@@ -84,14 +84,14 @@ void Cover::initialize(const std::vector<std::string> & placeNames,
   std::vector<pnapi::Transition*> inT;    // internal transitions
   std::vector<pnapi::Transition*> comT;   // interface transitions
   
-  for(unsigned int i=0; i<transitionNames.size(); ++i)
+  for (unsigned int i=0; i<transitionNames.size(); ++i)
   {
     pnapi::Transition* t = InnerMarking::net->findTransition(transitionNames[i]);
-    if(t == NULL)
+    if (t == NULL)
       abort(16, "unknown transition '%s' in file '%s'", 
               transitionNames[i].c_str(), args_info.cover_arg);
     
-    if(t->getType() != pnapi::Node::INPUT)
+    if (t->getType() != pnapi::Node::INPUT)
       inT.push_back(t);
     else
       comT.push_back(t);
@@ -113,7 +113,7 @@ void Cover::initialize(const std::vector<pnapi::Place*>& inP,
   internalPlaceCount = inP.size();
   internalPlaces = new std::string[internalPlaceCount];
   internalPlaceCache = new pnapi::Place*[internalPlaceCount];
-  for(unsigned int i=0; i<internalPlaceCount; ++i)
+  for (unsigned int i=0; i<internalPlaceCount; ++i)
   {
     internalPlaces[i] = inP[i]->getName();
     internalPlaceCache[i] = inP[i];
@@ -122,7 +122,7 @@ void Cover::initialize(const std::vector<pnapi::Place*>& inP,
   interfacePlaceCount = comP.size();
   interfacePlaces = new std::string[interfacePlaceCount];
   interfacePlaceLabels = new Label_ID[interfacePlaceCount];
-  for(unsigned int i=0; i<interfacePlaceCount; ++i)
+  for (unsigned int i=0; i<interfacePlaceCount; ++i)
   {
     interfacePlaces[i] = comP[i]->getName();
     interfacePlaceLabels[i] = labelCache[interfacePlaces[i]];
@@ -130,14 +130,14 @@ void Cover::initialize(const std::vector<pnapi::Place*>& inP,
   
   internalTransitionCount = inT.size();
   internalTransitions = new std::string[internalTransitionCount];
-  for(unsigned int i=0; i<internalTransitionCount; ++i)
+  for (unsigned int i=0; i<internalTransitionCount; ++i)
   {
     internalTransitions[i] = inT[i]->getName();
   }
   
   interfaceTransitionCount = comT.size();
   interfaceTransitions = new std::string[interfaceTransitionCount];
-  for(unsigned int i=0; i<interfaceTransitionCount; ++i)
+  for (unsigned int i=0; i<interfaceTransitionCount; ++i)
   {
     interfaceTransitions[i] = comT[i]->getName();
   }
@@ -166,23 +166,23 @@ void Cover::coverAll()
   std::vector<pnapi::Transition*> comT;   // interface transitions
   
   // determine place types 
-  for(std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInternalPlaces().begin();
+  for (std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInternalPlaces().begin();
         p != InnerMarking::net->getInternalPlaces().end(); ++p)
   {
     inP.push_back(*p);
   }
   
-  for(std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInterfacePlaces().begin();
+  for (std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInterfacePlaces().begin();
         p != InnerMarking::net->getInterfacePlaces().end(); ++p)
   {
     comP.push_back(*p);
   }
   
   // determine transition types
-  for(std::set<pnapi::Transition*>::iterator t = InnerMarking::net->getTransitions().begin();
+  for (std::set<pnapi::Transition*>::iterator t = InnerMarking::net->getTransitions().begin();
         t != InnerMarking::net->getTransitions().end(); ++t)
   {
-    if((*t)->getType() == pnapi::Node::INPUT)
+    if ((**t).getType() == pnapi::Node::INPUT)
     {
       comT.push_back(*t);
     }
@@ -203,23 +203,23 @@ void Cover::checkInnerMarking(InnerMarking_ID im,
                               const std::set<std::string> & t)
 {
   /// check internal places
-  for(unsigned int i=0; i<internalPlaceCount; ++i)
+  for (unsigned int i=0; i<internalPlaceCount; ++i)
   {
-    if(m[internalPlaceCache[i]] > 0)
+    if (m[internalPlaceCache[i]] > 0)
       inner2CD[im].inP.push_back(i);
   }
   
   /// check internal transitions
-  for(unsigned int i=0; i<internalTransitionCount; ++i)
+  for (unsigned int i=0; i<internalTransitionCount; ++i)
   {
-    if(t.find(internalTransitions[i]) != t.end())
+    if (t.find(internalTransitions[i]) != t.end())
       inner2CD[im].inT.push_back(i);
   }
   
   /// check interface transitions
-  for(unsigned int i=0; i<interfaceTransitionCount; ++i)
+  for (unsigned int i=0; i<interfaceTransitionCount; ++i)
   {
-    if(t.find(interfaceTransitions[i]) != t.end())
+    if (t.find(interfaceTransitions[i]) != t.end())
       inner2CD[im].comT.push_back(i);
   }
 }
@@ -258,50 +258,49 @@ void Cover::checkKnowledge(StoredKnowledge* K,
   std::set<unsigned int> coveredNodes[4]; 
   
   /// iterate through the knowledge bubble
-  for(std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator current = bubble.begin();
+  for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator current = bubble.begin();
         current != bubble.end(); ++current)
   {
     /// copy internal places
-    for(unsigned int i=0; i<inner2CD[current->first].inP.size(); ++i)
+    for (unsigned int i=0; i<inner2CD[current->first].inP.size(); ++i)
       coveredNodes[0].insert(inner2CD[current->first].inP[i]);
     
     /// copy internal transitions
-    for(unsigned int i=0; i<inner2CD[current->first].inT.size(); ++i)
+    for (unsigned int i=0; i<inner2CD[current->first].inT.size(); ++i)
       coveredNodes[2].insert(inner2CD[current->first].inT[i]);
     
     /// check interface markings
-    for(unsigned int i=0; i<current->second.size(); ++i)
+    for (unsigned int i=0; i<current->second.size(); ++i)
     {
       /// check interface places
-      for(unsigned int j=0; j<interfacePlaceCount; ++j)
+      for (unsigned int j=0; j<interfacePlaceCount; ++j)
       {
-        if(current->second[i]->marked(interfacePlaceLabels[j]))
+        if (current->second[i]->marked(interfacePlaceLabels[j]))
           coveredNodes[1].insert(j);
       }
       
       /// check interface transitions
-      for(unsigned int j=0; j<inner2CD[current->first].comT.size(); ++j)
+      for (unsigned int j=0; j<inner2CD[current->first].comT.size(); ++j)
       {
-        if(current->second[i]->marked(Label::name2id[interfaceTransitions[inner2CD[current->first].comT[j]]]))
+        if (current->second[i]->marked(Label::name2id[interfaceTransitions[inner2CD[current->first].comT[j]]]))
           coveredNodes[3].insert(inner2CD[current->first].comT[j]);
       }
     }
   }
   
   /// copy temporary data
-  for(int i=0; i<4; ++i)
+  for (int i=0; i<4; ++i)
   {
     std::vector<unsigned int>* current;
-    switch(i)
+    switch (i)
     {
     case 0: current = &(knowledge2CD[K].inP); break;
     case 1: current = &(knowledge2CD[K].comP); break;
     case 2: current = &(knowledge2CD[K].inT);  break;
     case 3: current = &(knowledge2CD[K].comT); break;
-    default: /* ??? */ ;
     }
     
-    for(std::set<unsigned int>::iterator it = coveredNodes[i].begin();
+    for (std::set<unsigned int>::iterator it = coveredNodes[i].begin();
          it != coveredNodes[i].end(); ++it)
     {
       current->push_back(*it);
@@ -326,14 +325,14 @@ void Cover::removeKnowledge(StoredKnowledge* K)
 void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
 {
   /// iterate over all knowledge bubbles
-  for(std::set<StoredKnowledge*>::iterator K = knowledges.begin();
+  for (std::set<StoredKnowledge*>::iterator K = knowledges.begin();
         K != knowledges.end(); ++K)
   {
-    for(int i=0; i<4; ++i)
+    for (int i=0; i<4; ++i)
     {
       std::vector<unsigned int>* currentSource;
       std::vector<StoredKnowledge*>* currentTarget;
-      switch(i)
+      switch (i)
       {
       case 0: 
         currentSource = &(knowledge2CD[*K].inP);
@@ -351,10 +350,9 @@ void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
         currentSource = &(knowledge2CD[*K].comT);
         currentTarget = coveringInterfaceTransitions;
         break;
-      default: /* ??? */ ;
       }
       
-      for(unsigned int j=0; j<currentSource->size(); ++j)
+      for (unsigned int j=0; j<currentSource->size(); ++j)
       {
         currentTarget[(*currentSource)[j]].push_back(*K);
       }
@@ -362,11 +360,11 @@ void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
   }
   
   /// check for empty clauses
-  for(int i=0; i<4; ++i)
+  for (int i=0; i<4; ++i)
   {
     std::vector<StoredKnowledge*>* current;
     unsigned int currentCount;
-    switch(i)
+    switch (i)
     {
     case 0: 
       current = coveringInternalPlaces;
@@ -384,10 +382,9 @@ void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
       current = coveringInterfaceTransitions;
       currentCount = interfaceTransitionCount;
       break;
-    default: /* ??? */ ;
     }
     
-    for(unsigned int j=0; j<currentCount; ++j)
+    for (unsigned int j=0; j<currentCount; ++j)
     {
       satisfiable = satisfiable && (!current[j].empty());
     }
@@ -403,49 +400,49 @@ void Cover::write(std::ostream &os)
   os << "\nCOVER\n"
      << "  PLACES\n";
   
-  if(internalPlaceCount > 0)
+  if (internalPlaceCount > 0)
   {
     os << "    " << internalPlaces[0];
-    if(interfacePlaceCount > 0)
+    if (interfacePlaceCount > 0)
       os << ",\n    " << interfacePlaces[0];
   } 
   else
   {
-    if(interfacePlaceCount > 0)
+    if (interfacePlaceCount > 0)
       os << "    " << interfacePlaces[0];
     else
       os << "    NONE";
   }
   
-  for(unsigned int i=1; i<internalPlaceCount; ++i)
+  for (unsigned int i=1; i<internalPlaceCount; ++i)
     os << ",\n    " << internalPlaces[i];
-  for(unsigned int i=1; i<interfacePlaceCount; ++i)
+  for (unsigned int i=1; i<interfacePlaceCount; ++i)
     os << ",\n    " << interfacePlaces[i];
   
   os << ";\n  TRANSITIONS\n";
   
-  if(internalTransitionCount > 0)
+  if (internalTransitionCount > 0)
   {
     os << "    " << internalTransitions[0];
-    if(interfaceTransitionCount > 0)
+    if (interfaceTransitionCount > 0)
       os << ",\n    " << interfaceTransitions[0];
   } 
   else
   {
-    if(interfaceTransitionCount > 0)
+    if (interfaceTransitionCount > 0)
       os << "    " << interfaceTransitions[0];
     else
       os << "    NONE";
   }
   
-  for(unsigned int i=1; i<internalTransitionCount; ++i)
+  for (unsigned int i=1; i<internalTransitionCount; ++i)
     os << ",\n    " << internalTransitions[i];
-  for(unsigned int i=1; i<interfaceTransitionCount; ++i)
+  for (unsigned int i=1; i<interfaceTransitionCount; ++i)
     os << ",\n    " << interfaceTransitions[i];
   
   os << ";\n  CONSTRAINT\n";
   
-  if(!satisfiable)
+  if (!satisfiable)
     os << "FALSE;\n";
   else
   {
@@ -455,11 +452,11 @@ void Cover::write(std::ostream &os)
                             + internalTransitionCount + interfaceTransitionCount;
     
     /// for each node a clause
-    for(int i=0; i<4; ++i)
+    for (int i=0; i<4; ++i)
     {
       std::vector<StoredKnowledge*>* current;
       unsigned int currentCount;
-      switch(i)
+      switch (i)
       {
       case 0: 
         current = coveringInternalPlaces;
@@ -477,21 +474,20 @@ void Cover::write(std::ostream &os)
         current = coveringInterfaceTransitions; 
         currentCount = interfaceTransitionCount;
         break;
-      default: /* ??? */ ;
       }
       
-      for(unsigned int j=0; j<currentCount; ++j)
+      for (unsigned int j=0; j<currentCount; ++j)
       {
         os << "    (";
         
-        if(current[j].size() > 0)
+        if (current[j].size() > 0)
           os << reinterpret_cast<size_t>(current[j][0]);
-        for(unsigned int k=1; k<current[j].size(); ++k)
+        for (unsigned int k=1; k<current[j].size(); ++k)
         {
           os << " + " << reinterpret_cast<size_t>(current[j][k]); 
         }
         
-        if(--lastClause > 0)
+        if (--lastClause > 0)
           os << ") *\n";
         else
           os << ")\n";
@@ -501,7 +497,7 @@ void Cover::write(std::ostream &os)
     os << "  )";
     
     /// synchronous labels
-    for(unsigned int i=0; i<synchronousLabels.size(); ++i)
+    for (unsigned int i=0; i<synchronousLabels.size(); ++i)
       os << " *\n  #" << synchronousLabels[i];
       
     os << ";\n\n";
@@ -509,27 +505,27 @@ void Cover::write(std::ostream &os)
   
   /// verbose output
   bool firstBubble = true;
-  for(std::map<StoredKnowledge*, CoverData>::iterator it = knowledge2CD.begin();
+  for (std::map<StoredKnowledge*, CoverData>::iterator it = knowledge2CD.begin();
         it != knowledge2CD.end(); ++it)
   {
-    if(!firstBubble)
+    if (!firstBubble)
       os << ",\n";
     else
       firstBubble = false;
     
     os << "  " << reinterpret_cast<size_t>(it->first) << " :";
-    if( it->second.inP.empty() && 
+    if ( it->second.inP.empty() && 
         it->second.comP.empty() &&
         it->second.inT.empty() &&
         it->second.comT.empty() )
       os << " none";
     else
     {
-      for(int i=0; i<4; ++i)
+      for (int i=0; i<4; ++i)
       {
         std::vector<unsigned int>* current;
         std::string* currentName;
-        switch(i)
+        switch (i)
         {
         case 0: 
           current = &(it->second.inP); 
@@ -547,10 +543,9 @@ void Cover::write(std::ostream &os)
           current = &(it->second.comT); 
           currentName = interfaceTransitions;
           break;
-        default: /* ??? */ ;
         }
         
-        for(unsigned int j=0; j<current->size(); ++j)
+        for (unsigned int j=0; j<current->size(); ++j)
         {
           os << " " << currentName[(*current)[j]];
         }

@@ -25,11 +25,11 @@
  * CONSTRUCTOR *
  ***************/
 
-FullMarking::FullMarking(InnerMarking_ID _inner) :
-    inner(_inner), interface() {}
+FullMarking::FullMarking(InnerMarking_ID _inner)
+        : inner(_inner), interface() {}
 
-FullMarking::FullMarking(InnerMarking_ID _inner, InterfaceMarking _interface) :
-    inner(_inner), interface(_interface) {}
+FullMarking::FullMarking(InnerMarking_ID _inner, InterfaceMarking _interface)
+        : inner(_inner), interface(_interface) {}
 
 
 /*************

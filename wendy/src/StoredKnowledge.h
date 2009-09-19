@@ -25,6 +25,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <string>
 #include "types.h"
 #include "InterfaceMarking.h"
 #include "Knowledge.h"
@@ -34,9 +35,7 @@
  \brief knowledge (data structure for storing knowledges)
  */
 class StoredKnowledge {
-
     public: /* static functions */
-
         /// destroy all objects of this class
         static void finalize();
 
@@ -62,7 +61,6 @@ class StoredKnowledge {
         static void output_migration(std::ostream&);
 
     public: /* static attributes */
-
         /// struct combining the statistics on the class StoredKnowledge
         static struct _stats {
             public:
@@ -100,9 +98,6 @@ class StoredKnowledge {
         /// buckets of knowledges, indexed by hash values
         static std::map<hash_t, std::vector<StoredKnowledge*> > hashTree;
 
-        /// report every given knowledges
-        static unsigned int reportFrequency;
-
         /// the root knowledge
         static StoredKnowledge* root;
 
@@ -110,7 +105,6 @@ class StoredKnowledge {
         static std::set<StoredKnowledge*> seen;
 
     private: /* static attributes */
-
         /// maps dfs (first) and lowlink (second) number to a stored knowledge which is still on the Tarjan stack
         static std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > tarjanMapping;
 
@@ -130,7 +124,6 @@ class StoredKnowledge {
         static unsigned int bookmarkTSCC;
 
     private: /* static functions */
-
         /// returns the header for output files
         static void fileHeader(std::ostream&);
 
@@ -138,9 +131,8 @@ class StoredKnowledge {
         static void analyzeSCCOfKnowledges(std::set<StoredKnowledge*>&);
 
     public: /* member functions */
-
         /// constructs an object from a Knowledge object
-        StoredKnowledge(Knowledge&);
+        explicit StoredKnowledge(Knowledge&);
 
         /// destructor
         ~StoredKnowledge();
@@ -152,7 +144,6 @@ class StoredKnowledge {
         void traverse();
 
     private: /* member functions */
-
         /// adds a successor knowledge
         void addSuccessor(const Label_ID&, StoredKnowledge* const);
 
@@ -181,7 +172,6 @@ class StoredKnowledge {
         std::string bits() const;
 
     public: /* member attributes */
-
         /// whether this bubble contains a final marking
         unsigned is_final : 1;
 
@@ -195,7 +185,6 @@ class StoredKnowledge {
         unsigned is_on_tarjan_stack : 1;
 
     private: /* member attributes */
-
         /// \brief the number of markings stored in this knowledge
         /// \todo Do we need to have unsigned ints here? Maybe short is enough.
         unsigned int sizeDeadlockMarkings;

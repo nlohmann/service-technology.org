@@ -65,14 +65,11 @@
        vectors in order to improve runtime.
  */
 class Label {
-
     public: /* static functions */
-
         /// initialize the interface labels and prepare the necessary mappings
         static void initialize();
 
     public: /* static attributes */
-
         /// label of first receive (?) event
         static Label_ID first_receive;
         /// label of last receive (?) event

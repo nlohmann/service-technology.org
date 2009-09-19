@@ -52,9 +52,7 @@
         especially using preprocessor macros
 */
 class InterfaceMarking {
-
     public: /* static functions */
-
         /// initializes the class InterfaceMarking
         static void initialize(unsigned int);
 
@@ -62,7 +60,6 @@ class InterfaceMarking {
         static bool sort_cmp(const InterfaceMarking*, const InterfaceMarking*);
 
     private: /* static attributes */
-
         /// the message bound
         static unsigned int message_bound;
 
@@ -79,7 +76,6 @@ class InterfaceMarking {
         static unsigned int markings_per_byte;
 
     public: /* member functions */
-
         /// constructor
         InterfaceMarking();
 
@@ -127,11 +123,11 @@ class InterfaceMarking {
         /// returns the hash value of this marking
         hash_t hash() const;
 
-    private: /* member attributes */
-
+    private: /* member functions */
         /// returns the marking value for the given label
         uint8_t get(const Label_ID&) const;
 
+    private: /* member attributes */
         /// a byte array to store the interface markings
         uint8_t* storage;
 };

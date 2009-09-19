@@ -21,13 +21,13 @@
 #ifndef _INNERMARKING_H
 #define _INNERMARKING_H
 
+#include <pnapi/pnapi.h>
 #include <vector>
 #include <map>
 #include <set>
 #include "types.h"
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
-#include <pnapi/pnapi.h>
 
 
 /*!
@@ -46,9 +46,7 @@
  initialize() is called to copy the markingMap into a C-style array.
 */
 class InnerMarking {
-
     public: /* static functions */
-
         /// copy markings from temporary storage to array
         static void initialize();
 
@@ -56,7 +54,6 @@ class InnerMarking {
         static void finalize();
 
     public: /* static attributes */
-
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;
 
@@ -76,7 +73,6 @@ class InnerMarking {
         static pnapi::PetriNet* net;
 
     private: /* static attributes */
-
         /// struct combining the statistics on the class InnerMarking
         static struct _stats {
             /// the number of total markings
@@ -93,7 +89,6 @@ class InnerMarking {
         } stats;
 
     public: /* member functions */
-
         /// constructor
         InnerMarking(const InnerMarking_ID&, const std::vector<Label_ID>&,
                      const std::vector<InnerMarking_ID>&, bool);
@@ -108,7 +103,6 @@ class InnerMarking {
         bool sentMessagesConsumed(const InterfaceMarking&) const;
 
     private: /* member functions */
-
         /// determines which receiving transitions are potentially reachable from this marking
         void calcReachableSendingEvents();
 
@@ -116,7 +110,6 @@ class InnerMarking {
         void determineType(const InnerMarking_ID&);
 
     public: /* member attributes */
-
         /// whether this marking is final
         unsigned is_final : 1;
 

@@ -13,6 +13,7 @@ AC_PROG_RANLIB
 AC_PROG_SED
 AC_PROG_GREP
 AC_PROG_AWK
+AC_C_INLINE
 
 # check for additional programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)
@@ -73,12 +74,7 @@ AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
-
-# check length of pointers and integer data types
-AC_CHECK_SIZEOF([void*])
-AC_CHECK_SIZEOF([unsigned int])
-AC_CHECK_SIZEOF([unsigned long])
-AC_CHECK_SIZEOF([size_t])
+AC_TYPE_SIZE_T
 
 # write files
 AC_CONFIG_FILES([

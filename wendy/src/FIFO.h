@@ -21,9 +21,9 @@
 #ifndef _INTERFACEMARKING_H
 #define _INTERFACEMARKING_H
 
+#include <ostream>
 #include <queue>
 #include <map>
-#include <ostream>
 #include "types.h"
 
 

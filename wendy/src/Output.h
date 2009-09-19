@@ -42,9 +42,7 @@
  http://ubuntuforums.org/showthread.php?p=5929211
  */
 class Output {
-
     public: /* member functions */
-
         /// constructor (creates temp file)
         Output();
 
@@ -64,9 +62,8 @@ class Output {
         std::ostream& stream() const;
 
     private: /* member attributes */
-
         /// the stream itself
-        std::ostream& os; 
+        std::ostream& os;
 
         /// filename of the output stream
         std::string filename;

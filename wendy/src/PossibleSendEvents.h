@@ -21,25 +21,22 @@
 #ifndef _POSSIBLESENDEVENTS_H
 #define _POSSIBLESENDEVENTS_H
 
+#include <algorithm>
 #include "types.h"
 
 /*!
  \brief storage for sending events reachable by an inner marking, every possible sending event is either set to 0 or 1
  */
 class PossibleSendEvents {
-
     public: /* static functions */
-
         /// initializes the class PossibleSendEvents
         static void initialize();
 
     private: /* static attributes */
-
         /// the number of bytes needed
         static unsigned int bytes;
 
     public: /* member functions */
-
         /// constructor
         PossibleSendEvents();
 
@@ -65,7 +62,6 @@ class PossibleSendEvents {
         char* decode();
 
     private: /* member functions */
-
         /// a byte array to store the possible sending events
         uint8_t* storage;
 
@@ -74,4 +70,3 @@ class PossibleSendEvents {
 };
 
 #endif
-

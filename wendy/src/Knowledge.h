@@ -45,11 +45,9 @@
        actually making a function call.
  */
 class Knowledge {
-
     public: /* member functions */
-
         /// construct knowledge from (initial) inner marking
-        Knowledge(InnerMarking_ID);
+        explicit Knowledge(InnerMarking_ID);
 
         /// construct knowledge from a given knowledge and a label
         Knowledge(Knowledge const&, const Label_ID&);
@@ -66,12 +64,13 @@ class Knowledge {
         /// calculate those receiving events that are essential to resolve each and every waitstate
         void sequentializeReceivingEvents();
 
+        /// \todo Daniela, please comment me
         bool considerReceivingEvent(Label_ID) const;
 
+        /// \todo Daniela, please comment me
         bool considerSendingEvent(Label_ID) const;
 
     public: /* attributes */
-
         /// whether this knowledge is sane
         unsigned is_sane : 1;
 
@@ -83,7 +82,6 @@ class Knowledge {
         std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > bubble;
 
     private: /* member functions */
-
         /// initialze member attributes
         void initialize();
 
@@ -91,7 +89,6 @@ class Knowledge {
         void closure(std::queue<FullMarking>&);
 
     private: /* attributes */
-
         /// reduction rule: smart send events; pointer to possible sending events data structure
         PossibleSendEvents* posSendEvents;
 
@@ -101,8 +98,6 @@ class Knowledge {
         /// reduction rule: sequentialize receiving events; remember only those receiving events
         ///                 which are essential to resolve each and every waitstate
         std::map<Label_ID, bool> consideredReceivingEvents;
-
-
 };
 
 #endif

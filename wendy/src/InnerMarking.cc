@@ -22,6 +22,7 @@
 #include <cassert>
 
 #include <climits>
+#include <algorithm>
 #include "InnerMarking.h"
 #include "Label.h"
 #include "cmdline.h"
@@ -63,7 +64,7 @@ void InnerMarking::initialize() {
     // copy data from STL mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         inner_markings[i] = markingMap[i];
-        inner_markings[i]->is_bad = (inner_markings[i]->is_bad or (not finalMarkingReachableMap[i]));
+        inner_markings[i]->is_bad = (inner_markings[i]->is_bad or not finalMarkingReachableMap[i]);
 
         // register markings that may become activated by sending a message
         // to them or by synchronization
@@ -110,12 +111,11 @@ void InnerMarking::finalize() {
 InnerMarking::InnerMarking(const InnerMarking_ID& myId,
                            const std::vector<Label_ID>& _labels,
                            const std::vector<InnerMarking_ID>& _successors,
-                           bool _is_final) :
-               is_final(_is_final), is_waitstate(0), is_bad(0),
-               out_degree(_successors.size()), possibleSendEvents(NULL)
-{
+                           bool _is_final)
+        : is_final(_is_final), is_waitstate(0), is_bad(0),
+          out_degree(_successors.size()), possibleSendEvents(NULL) {
     assert(_labels.size() == out_degree);
-    assert (out_degree < UCHAR_MAX);
+    assert(out_degree < UCHAR_MAX);
 
     if (++stats.markings % 50000 == 0) {
         fprintf(stderr, "%8d inner markings\n", stats.markings);
@@ -230,7 +230,7 @@ inline void InnerMarking::determineType(const InnerMarking_ID& myId) {
     }
 
     // draw some last conclusions
-    if (not (is_transient or is_bad)) {
+    if (not(is_transient or is_bad)) {
         is_waitstate = 1;
     }
 }
@@ -296,9 +296,7 @@ void InnerMarking::calcReachableSendingEvents() {
         // traverse successors
         for (uint8_t i = 0; i < out_degree; i++) {
             // if successor exists and if it leads to a final marking
-            if (markingMap[successors[i]] != NULL and
-                finalMarkingReachableMap[successors[i]]) {
-
+            if (markingMap[successors[i]] != NULL and finalMarkingReachableMap[successors[i]]) {
                 // direct successor reachable by sending event
                 if (SENDING(labels[i]) and not consideredLabels[labels[i]]) {
                     // add current sending event
@@ -307,7 +305,8 @@ void InnerMarking::calcReachableSendingEvents() {
                     consideredLabels[labels[i]] = true;
                 }
 
-                // everything that is possible for the successor is possible for the current marking as well
+                // everything that is possible for the successor is possible
+                // for the current marking as well
                 *possibleSendEvents |= *(markingMap[successors[i]]->possibleSendEvents);
             }
         }

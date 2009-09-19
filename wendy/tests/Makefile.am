@@ -17,6 +17,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             bug8.fiona.og bug8.owfn \
             bug9.fiona.og bug9.owfn \
             bug10.owfn \
+            bug11.owfn \
             bug13651.owfn \
             bug13718.owfn \
             bug13994-1.owfn bug13994-2.owfn \

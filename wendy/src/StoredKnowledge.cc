@@ -46,8 +46,7 @@ extern string invocation;
 
 std::map<hash_t, std::vector<StoredKnowledge*> > StoredKnowledge::hashTree;
 StoredKnowledge* StoredKnowledge::root = NULL;
-StoredKnowledge* StoredKnowledge::empty = reinterpret_cast<StoredKnowledge*>(1); // experiment
-unsigned int StoredKnowledge::reportFrequency = 10000;
+StoredKnowledge* StoredKnowledge::empty = reinterpret_cast<StoredKnowledge*>(1);
 std::set<StoredKnowledge*> StoredKnowledge::deletedNodes;
 std::set<StoredKnowledge*> StoredKnowledge::seen;
 std::vector<StoredKnowledge *> StoredKnowledge::tarjanStack;
@@ -57,8 +56,8 @@ StoredKnowledge::_stats StoredKnowledge::stats;
 std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredKnowledge::tarjanMapping;
 
 
-#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
-#define MAXIMUM(X,Y) ((X) > (Y) ? (X) : (Y))
+#define MINIMUM(X, Y) ((X) < (Y) ? (X) : (Y))
+#define MAXIMUM(X, Y) ((X) > (Y) ? (X) : (Y))
 
 
 /********************
@@ -68,11 +67,10 @@ std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredK
 /*!
  \note maxBucketSize must be initialized to 1
  */
-StoredKnowledge::_stats::_stats() :
-    hashCollisions(0), storedEdges(0), maxInterfaceMarkings(0),
-    builtInsaneNodes(0), maxBucketSize(1), storedKnowledges(0),
-    maxSCCSize(0), numberOfNonTrivialSCCs(0), numberOfTrivialSCCs(0)
-{}
+StoredKnowledge::_stats::_stats()
+        : hashCollisions(0), storedEdges(0), maxInterfaceMarkings(0),
+          builtInsaneNodes(0), maxBucketSize(1), storedKnowledges(0),
+          maxSCCSize(0), numberOfNonTrivialSCCs(0), numberOfTrivialSCCs(0) {}
 
 
 /*!
@@ -80,7 +78,9 @@ StoredKnowledge::_stats::_stats() :
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(const Knowledge& K, StoredKnowledge* const SK, const Label_ID& l) {
+inline void StoredKnowledge::process(const Knowledge& K,
+                                     StoredKnowledge* const SK,
+                                     const Label_ID& l) {
     // create a new knowledge for the given label
     Knowledge K_new(K, l);
 
@@ -138,9 +138,8 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
     static unsigned int calls = 0;
 
     // statistics output
-    if ((++calls % reportFrequency == 0) and (reportFrequency > 0)) {
-        fprintf(stderr, "%8d knowledges, %8d edges\n",
-            stats.storedKnowledges, stats.storedEdges);
+    if (++calls % args_info.reportFrequency_arg == 0 and args_info.reportFrequency_arg > 0) {
+        fprintf(stderr, "%8d knowledges, %8d edges\n", stats.storedKnowledges, stats.storedEdges);
     }
 
     // traverse the labels of the interface and process K's successors
@@ -178,8 +177,8 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
             break;
         }
 
-        // reduction rule: stop considering another sending event, if the latest sending event
-        //                 considered succeeded
+        // reduction rule: stop considering another sending event, if the
+        // latest sending event considered succeeded
         /// \todo what about synchronous events?
         if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat(true)) {
             if (not args_info.lf_flag or SK->is_final_reachable) {
@@ -209,10 +208,10 @@ inline void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& 
     for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
         // for each successor which is part of the current SCC, register the predecessor
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((*iScc)->successors[l-1] != NULL and (*iScc)->successors[l-1] != empty and
-                knowledgeSet.find((*iScc)->successors[l-1]) != knowledgeSet.end()) {
+            if ((**iScc).successors[l-1] != NULL and (**iScc).successors[l-1] != empty and
+                knowledgeSet.find((**iScc).successors[l-1]) != knowledgeSet.end()) {
 
-                tempPredecessors[(*iScc)->successors[l-1]].insert(*iScc);
+                tempPredecessors[(**iScc).successors[l-1]].insert(*iScc);
             }
         }
     }
@@ -304,11 +303,11 @@ inline void StoredKnowledge::rearrangeKnowledgeBubble() {
 /*!
  \param[in] K  the knowledge to copy from
 */
-StoredKnowledge::StoredKnowledge(Knowledge& K) :
-    is_final(0), is_final_reachable(0), is_sane(K.is_sane),
-    is_on_tarjan_stack(1), sizeDeadlockMarkings(K.size),
-    sizeAllMarkings(K.size), inner(NULL), interface(NULL), successors(NULL)
-{
+StoredKnowledge::StoredKnowledge(Knowledge& K)
+        : is_final(0), is_final_reachable(0), is_sane(K.is_sane),
+          is_on_tarjan_stack(1), sizeDeadlockMarkings(K.size),
+          sizeAllMarkings(K.size), inner(NULL), interface(NULL),
+          successors(NULL) {
     assert(sizeAllMarkings > 0);
 
     // reserve the necessary memory for the successors (fixed)
@@ -450,10 +449,10 @@ inline void StoredKnowledge::evaluateKnowledge() {
         if (numberOfSccElements == 1) {
             // check if every deadlock is resolved -> if not, this knowledge is definitely not sane
             // deadlock freedom or livelock freedom will be treated in sat()
-            (*knowledgeSet.begin())->is_sane = (*knowledgeSet.begin())->sat();
+            (**knowledgeSet.begin()).is_sane = (**knowledgeSet.begin()).sat();
 
             ++stats.numberOfTrivialSCCs;
-        } else if (numberOfSccElements > 1){
+        } else if (numberOfSccElements > 1) {
             analyzeSCCOfKnowledges(knowledgeSet);
 
             stats.maxSCCSize = MAXIMUM(stats.maxSCCSize, numberOfSccElements);
@@ -617,7 +616,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
         }
 
         // the deadlock is neither resolved nor a final marking
-        if (not resolved and not (InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
+        if (not resolved and not(InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
             return false;
         }
     }
@@ -655,7 +654,7 @@ void StoredKnowledge::fileHeader(std::ostream &file) {
         << static_cast<unsigned int>(Label::receive_events) << " receive, "
         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
         << "\n  statistics:   " << seen.size() << " nodes"
-        << "\n}\n\n";    
+        << "\n}\n\n";
 }
 
 /*!
@@ -716,7 +715,7 @@ void StoredKnowledge::output_og(std::ostream& file) {
     // all other nodes
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         if (*it != root) {
-            (*it)->print(file);
+            (**it).print(file);
         }
     }
 
@@ -780,7 +779,7 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
     file << "  0 : true";
 
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        file << ",\n  " << reinterpret_cast<size_t>(*it) << " : " << (*it)->formula();
+        file << ",\n  " << reinterpret_cast<size_t>(*it) << " : " << (**it).formula();
     }
     file << ";\n" << std::endl;
 
@@ -790,9 +789,9 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
     first = true;
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((*it)->successors[l-1] != NULL and
-                (*it)->successors[l-1] != empty and
-                (seen.find((*it)->successors[l-1]) != seen.end())) {
+            if ((**it).successors[l-1] != NULL and
+                (**it).successors[l-1] != empty and
+                (seen.find((**it).successors[l-1]) != seen.end())) {
 
                 if (first) {
                     first = false;
@@ -800,11 +799,11 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
                     file << ",\n";
                 }
                 file << "  " << reinterpret_cast<size_t>(*it) << " -> "
-                    << reinterpret_cast<size_t>((*it)->successors[l-1])
+                    << reinterpret_cast<size_t>((**it).successors[l-1])
                     << " : " << PREFIX(l) << Label::id2name[l];
             } else {
                 // edges to the empty node
-                if ((*it)->successors[l-1] != NULL and (*it)->successors[l-1] == empty) {
+                if ((**it).successors[l-1] != NULL and (**it).successors[l-1] == empty) {
                     if (first) {
                         first = false;
                     } else {
@@ -1057,14 +1056,14 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
                 if (args_info.showWaitstates_flag) {
                     for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
-                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
+                        file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (w)\\n";
                     }
                 }
 
                 if (args_info.showTransients_flag) {
                     for (unsigned int j = it->second[i]->sizeDeadlockMarkings; j < it->second[i]->sizeAllMarkings; ++j) {
-                        file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
+                        file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (t)\\n";
                     }
                 }
@@ -1144,7 +1143,7 @@ void StoredKnowledge::output_diagnosedot(std::ostream& file) {
                     bool interface_sane = it->second[i]->interface[j]->sane();
                     bool interface_pendingOutput = it->second[i]->interface[j]->pendingOutput();
 
-                    file << "m" << static_cast<unsigned long>(it->second[i]->inner[j]) << " ";
+                    file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
                     file << *(it->second[i]->interface[j]);
 
                     string reason;
@@ -1224,9 +1223,9 @@ void StoredKnowledge::output_migration(std::ostream& o) {
 
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         // traverse the bubble
-        for (unsigned int i = 0; i < (*it)->sizeAllMarkings; ++i) {
-            InnerMarking_ID inner = (*it)->inner[i];
-            InterfaceMarking* interface = (*it)->interface[i];
+        for (unsigned int i = 0; i < (**it).sizeAllMarkings; ++i) {
+            InnerMarking_ID inner = (**it).inner[i];
+            InterfaceMarking* interface = (**it).interface[i];
             StoredKnowledge* knowledge = *it;
 
             migrationInfo[inner][knowledge].insert(interface);

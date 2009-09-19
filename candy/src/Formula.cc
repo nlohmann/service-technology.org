@@ -332,35 +332,199 @@ Formula* FormulaMultiaryOr::simplify() {
 
 
 
-//! \brief Returns the merged equivalent to this formula. Merging gets rid of
-//!        unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
-//!        caller is responsible for deleting the returned newly created formula.
-//! \return returns the merged equivalent
-//FormulaMultiaryOr* FormulaMultiaryOr::simplify() {
-//    bool final = true;
-//    FormulaMultiaryOr *result = new FormulaMultiaryOr;
-//
-//    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
-//        if ( dynamic_cast<FormulaMultiaryOr*>(*i) ) {
-//            final = false;
-//            FormulaMultiaryOr* temp = dynamic_cast<FormulaMultiaryOr*>(*i);
-//            for (subFormulas_t::iterator j = temp->subFormulas.begin();
-//                 j != temp->subFormulas.end(); j++) {
-//                result->subFormulas.push_back( dynamic_cast<Formula*> (*j)->getDeepCopy() );
-//            }
-//        } else {
-//            result->subFormulas.push_back( dynamic_cast<Formula*> (*i)->getDeepCopy() );
-//        }
-//    }
-//
-//    if (final) {
-//        return result;
-//    }
-//
-//    //FormulaMultiaryOr* oldResult = result;
-//    //result = result->merge();
-//    //delete oldResult;
-//    return result;
-//}
+// ****************************************************************************
+// flatten
+// ****************************************************************************
+
+void FormulaMultiaryAnd::flatten() {
+
+    cerr << "AND flatten START: '" << asString() << "'" << endl;
+    // ATTENTION: increment iterator inside because of erase
+    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
+
+        // flatten subformula
+        cerr << "\tAND flatten: current formula '" << (*i)->asString() << "'" << endl;
+        (*i)->flatten();
+
+        // check if subformula is a conjunction
+        cerr << "\tAND flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
+        FormulaMultiaryAnd* checkAnd = dynamic_cast<FormulaMultiaryAnd*> ( *i );
+        if ( checkAnd != NULL ) {
+
+            // take subsubformulae, insert them before current subformula and
+            // erase old subformula
+            for ( subFormulas_t::const_iterator j = checkAnd->subFormulas.begin(); j != checkAnd->subFormulas.end(); ++j ) {
+                subFormulas.insert( i, *j );
+            }
+            subFormulas.erase( i++ );
+            cerr << "\t\tAND flatten: subformulas taken, result is '" << asString() << "'" << endl;
+
+        } else {
+
+            // check if subformula is a size one disjunction
+            FormulaMultiaryOr* checkOr = dynamic_cast<FormulaMultiaryOr*> ( *i );
+            if ( checkOr != NULL && checkOr->size() == 1 ) {
+
+                // take only subformula
+                subFormulas.insert( i, checkOr->getFront() );
+                subFormulas.erase( i++ );
+                cerr << "\t\tAND flatten: size one OR flattened, result is '" << asString() << "'" << endl;
+            } else {
+
+                // adopt flattened subformula
+                ++i;
+                cerr << "\t\tAND flatten: flattened used, result is '" << asString() << "'" << endl;
+            }
+        }
+    }
+    cerr << "AND flatten END: '" << asString() << "'" << endl;
+}
+
+void FormulaMultiaryOr::flatten() {
+
+    cerr << "OR flatten START: '" << asString() << "'" << endl;
+    // ATTENTION: increment iterator inside because of erase
+    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
+
+        // flatten subformula
+        cerr << "\tOR flatten: current formula '" << (*i)->asString() << "'" << endl;
+        (*i)->flatten();
+
+        // check if subformula is a disjunction
+        cerr << "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
+        FormulaMultiaryOr* checkOr = dynamic_cast<FormulaMultiaryOr*> ( *i );
+        if ( checkOr != NULL ) {
+
+            // take subsubformulae, insert them before current subformula and
+            // erase old subformula
+            for ( subFormulas_t::const_iterator j = checkOr->subFormulas.begin(); j != checkOr->subFormulas.end(); ++j ) {
+                subFormulas.insert( i, *j );
+            }
+            subFormulas.erase( i++ );
+            cerr << "\t\tOR flatten: subformulas taken, result is '" << asString() << "'" << endl;
+
+        } else {
+
+            // check if subformula is a size one conjunction
+            FormulaMultiaryAnd* checkAnd = dynamic_cast<FormulaMultiaryAnd*> ( *i );
+            if ( checkAnd != NULL && checkAnd->size() == 1 ) {
+
+                // take only subformula
+                subFormulas.insert( i, checkAnd->getFront() );
+                subFormulas.erase( i++ );
+                cerr << "\t\tOR flatten: size one AND flattened, result is '" << asString() << "'" << endl;
+            } else {
+
+                // adopt flattened subformula
+                ++i;
+                cerr << "\t\tOR flatten: flattened used, result is '" << asString() << "'" << endl;
+            }
+        }
+    }
+    cerr << "OR flatten END: '" << asString() << "'" << endl;
+}
 
 
+
+// ****************************************************************************
+// merge
+// ****************************************************************************
+
+void FormulaMultiaryAnd::merge() {
+
+    // iterate over all subformulas twice: first we determine the current
+    // assumption and then we check all subformulae for being a conclusion
+    for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ++assumption ) {
+
+        for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ) {
+
+            // check if we have the same subformula as assumption and
+            // conclusion: this has to be skipped because it would be a
+            // trivial implication
+            if ( assumption == conclusion ) {
+                ++conclusion;
+            } else {
+
+                // check if assumption implies conclusion, which means in a
+                // CONJUNCTION the conclusion is redundant
+                if ( (*assumption)->implies(*conclusion) ) {
+                    subFormulas.erase( conclusion++ );
+                } else {
+                    ++conclusion;
+                }
+            }
+        }
+    }
+}
+
+void FormulaMultiaryOr::merge() {
+
+    // iterate over all subformulas twice: first we determine the current
+    // conclusion and then we check all subformulae for being an assumption
+    for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ++conclusion ) {
+
+        for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ) {
+
+            // check if we have the same subformula as assumption and
+            // conclusion: this has to be skipped because it would be a
+            // trivial implication
+            if ( assumption == conclusion ) {
+                ++assumption;
+            } else {
+
+                // check if assumption implies conclusion, which means in a
+                // DISJUNCTION the assumption is redundant
+                if ( (*assumption)->implies(*conclusion) ) {
+                    subFormulas.erase( assumption++ );
+                } else {
+                    ++assumption;
+                }
+            }
+        }
+    }
+}
+
+
+
+// ****************************************************************************
+// implies
+// ****************************************************************************
+
+
+bool FormulaMultiaryAnd::implies(Formula* conclusion) const {
+    return false;
+}
+
+bool FormulaMultiaryOr::implies(Formula* conclusion) const {
+
+    // check if the conclusion is a literal
+    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( conclusion );
+    if ( checkLiteral != NULL ) {
+
+        for ( subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+
+            if ( not (*i)->implies(checkLiteral) ) {
+                return false;
+            }
+        }
+        return true;
+
+    } else {
+        // TODO fuck
+        return false;
+    }
+}
+
+bool FormulaLiteral::implies(Formula* conclusion) const {
+
+    // check if the conclusion is a literal
+    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( conclusion );
+    if ( checkLiteral != NULL ) {
+
+        return ( _literal.compare(checkLiteral->_literal) == 0 );
+    } else {
+        // TODO stimmt das auch for AND und OR?
+        // a literal doesn't imply anything differant than a literal
+        return false;
+    }
+}

@@ -196,40 +196,38 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Formulae Tests])
+AT_BANNER([Formula Tests])
 ############################################################################
 
-AT_SETUP([Merge AND])
-AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/formula_merge_and.og .])
-AT_CHECK([cp TESTFILES/formula_merge.cf .])
-AT_CHECK([cp TESTFILES/formula_merge_and.expected.og .])
-AT_CHECK([CANDY --input=formula_merge_and.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_SETUP([Flatten AND])
+AT_CHECK([cp TESTFILES/formula_flatten_and.og .])
+AT_CHECK([cp TESTFILES/formula_flatten.cf .])
+AT_CHECK([cp TESTFILES/formula_flatten_and.expected.og .])
+AT_CHECK([CANDY --input=formula_flatten_and.og --output=c.og --costfile=formula_flatten.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og formula_merge_and.expected.og], 0, ignore)
-AT_KEYWORDS(formulae)
+AT_CHECK([diff sed.og formula_flatten_and.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Merge OR])
-AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/formula_merge_or.og .])
-AT_CHECK([cp TESTFILES/formula_merge.cf .])
-AT_CHECK([cp TESTFILES/formula_merge_or.expected.og .])
-AT_CHECK([CANDY --input=formula_merge_or.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_SETUP([Flatten OR])
+AT_CHECK([cp TESTFILES/formula_flatten_or.og .])
+AT_CHECK([cp TESTFILES/formula_flatten.cf .])
+AT_CHECK([cp TESTFILES/formula_flatten_or.expected.og .])
+AT_CHECK([CANDY --input=formula_flatten_or.og --output=c.og --costfile=formula_flatten.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og formula_merge_or.expected.og], 0, ignore)
-AT_KEYWORDS(formulae)
+AT_CHECK([diff sed.og formula_flatten_or.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Merge AND/OR])
+AT_SETUP([Flatten AND/OR])
 AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/formula_merge_andor.og .])
-AT_CHECK([cp TESTFILES/formula_merge.cf .])
-AT_CHECK([cp TESTFILES/formula_merge_andor.expected.og .])
-AT_CHECK([CANDY --input=formula_merge_andor.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([cp TESTFILES/formula_flatten_andor.og .])
+AT_CHECK([cp TESTFILES/formula_flatten.cf .])
+AT_CHECK([cp TESTFILES/formula_flatten_andor.expected.og .])
+AT_CHECK([CANDY --input=formula_flatten_andor.og --output=c.og --costfile=formula_flatten.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og formula_merge_andor.expected.og], 0, ignore)
-AT_KEYWORDS(formulae)
+AT_CHECK([diff sed.og formula_flatten_andor.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
 AT_CLEANUP
 
 

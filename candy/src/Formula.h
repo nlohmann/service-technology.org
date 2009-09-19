@@ -84,10 +84,15 @@ class Formula {
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
-        virtual void removeLiteral(const string&) {};
+        virtual void removeLiteral(const string& literal) {};
 
         /// returns a simplified version of this formula
         virtual Formula* simplify() = 0;
+
+        virtual void flatten() = 0;
+        virtual void merge() = 0;
+        virtual void clear() {};
+        virtual bool implies(Formula* conclusion) const = 0;
 
 };
 
@@ -130,6 +135,13 @@ class FormulaMultiary : public Formula {
 
         /// Destroys this FormulaMultiary and all its subformulas.
         virtual ~FormulaMultiary() {
+            // WARNING remove later to avoid memory leaks
+            //for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
+            //    delete *i;
+            //}
+        };
+
+        virtual void clear() {
             for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
                 delete *i;
             }
@@ -139,6 +151,10 @@ class FormulaMultiary : public Formula {
         virtual int size() const {
             return subFormulas.size();
         };
+
+        virtual Formula* getFront() {
+            return subFormulas.front();
+        }
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
@@ -174,6 +190,9 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         //virtual FormulaMultiaryAnd* merge();
 
         virtual Formula* simplify();
+        virtual void flatten();
+        virtual void merge();
+        virtual bool implies(Formula* conclusion) const;
 };
 
 
@@ -207,6 +226,9 @@ class FormulaMultiaryOr : public FormulaMultiary {
 
         // TODO implement
         virtual Formula* simplify();
+        virtual void flatten();
+        virtual void merge();
+        virtual bool implies(Formula* conclusion) const;
 };
 
 
@@ -255,6 +277,11 @@ class FormulaLiteral : public Formula {
         virtual Formula* simplify() {
         	return new FormulaLiteral(*this);
         }
+
+        virtual void flatten() {};
+        virtual void merge() {};
+        // TODO implement for true and false
+        virtual bool implies(Formula* conclusion) const;
 };
 
 

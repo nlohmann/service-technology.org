@@ -28,13 +28,13 @@ TESTFILES = costOG1.og \
             error_weights.owfn \
             error_shared.owfn \
             error_nonnormal.owfn \
-            formula_merge_and.og \
-            formula_merge_and.expected.og \
-            formula_merge_or.og \
-            formula_merge_or.expected.og \
-            formula_merge_andor.og \
-            formula_merge_andor.expected.og \
-            formula_merge.cf
+            formula_flatten_and.og \
+            formula_flatten_and.expected.og \
+            formula_flatten_or.og \
+            formula_flatten_or.expected.og \
+            formula_flatten_andor.og \
+            formula_flatten_andor.expected.og \
+            formula_flatten.cf
 
 
 # Below you can list all the files you do not want to have counted in the

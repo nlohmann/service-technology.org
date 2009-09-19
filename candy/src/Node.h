@@ -33,6 +33,8 @@ class Node {
 
         /// basic destructor
         virtual ~Node() {
+
+            formula->clear();
             successors.clear();
         };
 

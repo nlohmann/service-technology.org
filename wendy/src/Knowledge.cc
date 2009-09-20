@@ -18,9 +18,7 @@
 \*****************************************************************************/
 
 
-#include "config.h"
-#include <cassert>
-
+#include <config.h>
 #include <set>
 #include <algorithm>
 #include "Knowledge.h"

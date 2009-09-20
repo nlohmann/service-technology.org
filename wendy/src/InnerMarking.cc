@@ -18,9 +18,7 @@
 \*****************************************************************************/
 
 
-#include "config.h"
-#include <cassert>
-
+#include <config.h>
 #include <climits>
 #include <algorithm>
 #include "InnerMarking.h"

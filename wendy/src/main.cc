@@ -26,11 +26,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "config.h"
+#include <config.h>
 #include "config-log.h"
 #include "StoredKnowledge.h"
 #include "PossibleSendEvents.h"
-#include "Label.h"
 #include "cmdline.h"
 #include "Output.h"
 #include "Cover.h"

@@ -22,8 +22,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
-
-#include "config.h"
+#include <config.h>
 #include "cmdline.h"
 
 extern gengetopt_args_info args_info;

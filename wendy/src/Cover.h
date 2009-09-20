@@ -30,8 +30,7 @@
 #include <vector>
 #include <set>
 #include <iostream>
-#include "config.h"
-#include "InnerMarking.h"
+#include <config.h>
 #include "StoredKnowledge.h"
 #include "types.h"
 

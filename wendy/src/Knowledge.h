@@ -24,10 +24,9 @@
 #include <queue>
 #include <vector>
 #include <map>
-#include "types.h"
 #include "Label.h"
-#include "FullMarking.h"
 #include "InnerMarking.h"
+#include "FullMarking.h"
 
 
 /*!

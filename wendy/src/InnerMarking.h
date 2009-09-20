@@ -25,7 +25,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "types.h"
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
 

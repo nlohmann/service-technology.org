@@ -21,8 +21,7 @@
 // for UINT8_MAX
 #define __STDC_LIMIT_MACROS
 
-#include "config.h"
-#include <cassert>
+#include <config.h>
 #include <cstdlib>
 
 #include "cmdline.h"

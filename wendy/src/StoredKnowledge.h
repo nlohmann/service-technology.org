@@ -26,8 +26,6 @@
 #include <set>
 #include <vector>
 #include <string>
-#include "types.h"
-#include "InterfaceMarking.h"
 #include "Knowledge.h"
 
 

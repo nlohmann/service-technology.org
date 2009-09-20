@@ -21,11 +21,14 @@
 #ifndef _FULLMARKING_H
 #define _FULLMARKING_H
 
-#include "InnerMarking.h"
 #include "InterfaceMarking.h"
 
 /*!
  \brief full marking (a pair of an inner and an interface marking)
+
+ This whole class could be equivalently replaced by a standard STL
+ std::pair<InnerMarking_ID, InterfaceMarking> container, but this would
+ result in less readable code in the class Knowledge.
  */
 class FullMarking {
     public: /* member functions */
@@ -35,15 +38,13 @@ class FullMarking {
         /// constructor
         FullMarking(InnerMarking_ID, InterfaceMarking);
 
-        /// comparison operator
-        bool operator< (const FullMarking&) const;
     public: /* member attributes */
-
         /// an inner marking
         InnerMarking_ID inner;
 
         /// an interface marking
         InterfaceMarking interface;
 };
+
 
 #endif

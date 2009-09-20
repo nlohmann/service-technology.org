@@ -21,7 +21,7 @@
 #ifndef __TYPES_H
 #define __TYPES_H
 
-#include "config.h"
+#include <config.h>
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif

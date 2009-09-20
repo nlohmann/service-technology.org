@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include <libgen.h>
 #include <unistd.h>
-#include "config.h"
+#include <config.h>
 #include "verbose.h"
 #include "Output.h"
 #include "cmdline.h"

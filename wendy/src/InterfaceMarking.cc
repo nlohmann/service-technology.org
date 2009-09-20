@@ -18,12 +18,7 @@
 \*****************************************************************************/
 
 
-// for UINT8_MAX
-#define __STDC_LIMIT_MACROS
-
-#include "config.h"
-#include <cassert>
-
+#include <config.h>
 #include <cmath>
 #include <cstdlib>
 #include "cmdline.h"
@@ -62,8 +57,8 @@ unsigned int InterfaceMarking::markings_per_byte = 0;
 
 void InterfaceMarking::initialize(unsigned int m) {
     // check the message bound
-    if (m < 1 or m > UINT8_MAX) {
-        abort(9, "message bound must be between 1 and %d", UINT8_MAX);
+    if (m < 1 or m > 255) {
+        abort(9, "message bound must be between 1 and %d", 255);
     }
 
     message_bound = m;

@@ -13,7 +13,6 @@ AC_PROG_RANLIB
 AC_PROG_SED
 AC_PROG_GREP
 AC_PROG_AWK
-AC_C_INLINE
 
 # check for additional programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)
@@ -31,8 +30,13 @@ AC_CONFIG_TESTDIR(tests)
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
 AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
 
-# allow the configure script to control assertions
+# allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
@@ -67,10 +71,10 @@ else
 fi
 
 # check for functions
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes -- expect bad performance]))
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes]))
 AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
-# check for exact unsigned types
+# check and set exact unsigned types
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
@@ -81,8 +85,8 @@ AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
 	doc/Doxyfile man/Makefile maintainer/Makefile utils/Makefile
 	maintainer/debian/changelog.template maintainer/debian/info
-	maintainer/debian/rules
-	maintainer/macports/Portfile tests/Makefile tests/package.m4])
+	maintainer/debian/rules maintainer/macports/Portfile tests/Makefile
+	tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

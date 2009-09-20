@@ -122,9 +122,9 @@ unsigned int Node::computeEfficientSuccessors() {
     //formula = formula->simplify();
     //delete oldFormula;
     formula->flatten();
-    if ( formula->size() > 1 ) {
+    //if ( formula->size() > 1 ) {
         formula->merge();
-    }
+    //}
     DEBUG "      new formula: " << (formula != NULL ? formula->asString() : "NULL") END
 
     return minimalCost;

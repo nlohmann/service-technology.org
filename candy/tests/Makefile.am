@@ -34,6 +34,11 @@ TESTFILES = costOG1.og \
             formula_flatten_or.expected.og \
             formula_flatten_andor.og \
             formula_flatten_andor.expected.og \
+            formula_flatten_sizezero.og \
+            formula_flatten_sizezero.expected.og \
+            formula_flatten_sizeone.og \
+            formula_flatten_sizeone.expected.og \
+            formula_flatten_sizetwo.og \
             formula_flatten.cf
 
 

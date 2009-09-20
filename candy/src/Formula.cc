@@ -346,8 +346,20 @@ void FormulaMultiaryAnd::flatten() {
         cerr << "\tAND flatten: current formula '" << (*i)->asString() << "'" << endl;
         (*i)->flatten();
 
-        // check if subformula is a conjunction
+        // check if subformula is a size one multiary formula
         cerr << "\tAND flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
+        FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
+        if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
+
+        	// a size one multiary formula is useless, so erase it and redirect
+        	// the iterator to the new current subformula
+			subFormulas.insert( i, checkMultiary->getFront() );
+			subFormulas.erase( i++ );
+			--i;
+			cerr << "\t\tAND flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
+        }
+
+        // check if subformula is a conjunction
         FormulaMultiaryAnd* checkAnd = dynamic_cast<FormulaMultiaryAnd*> ( *i );
         if ( checkAnd != NULL ) {
 
@@ -361,20 +373,9 @@ void FormulaMultiaryAnd::flatten() {
 
         } else {
 
-            // check if subformula is a size one disjunction
-            FormulaMultiaryOr* checkOr = dynamic_cast<FormulaMultiaryOr*> ( *i );
-            if ( checkOr != NULL && checkOr->size() == 1 ) {
-
-                // take only subformula
-                subFormulas.insert( i, checkOr->getFront() );
-                subFormulas.erase( i++ );
-                cerr << "\t\tAND flatten: size one OR flattened, result is '" << asString() << "'" << endl;
-            } else {
-
-                // adopt flattened subformula
-                ++i;
-                cerr << "\t\tAND flatten: flattened used, result is '" << asString() << "'" << endl;
-            }
+			// adopt flattened subformula
+			++i;
+			cerr << "\t\tAND flatten: flattened used, result is '" << asString() << "'" << endl;
         }
     }
     cerr << "AND flatten END: '" << asString() << "'" << endl;
@@ -389,6 +390,19 @@ void FormulaMultiaryOr::flatten() {
         // flatten subformula
         cerr << "\tOR flatten: current formula '" << (*i)->asString() << "'" << endl;
         (*i)->flatten();
+
+        // check if subformula is a size one multiary formula
+		cerr << "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
+		FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
+		if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
+
+			// a size one multiary formula is useless, so erase it and redirect
+			// the iterator to the new current subformula
+			subFormulas.insert( i, checkMultiary->getFront() );
+			subFormulas.erase( i++ );
+			--i;
+			cerr << "\t\tOR flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
+		}
 
         // check if subformula is a disjunction
         cerr << "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
@@ -405,20 +419,9 @@ void FormulaMultiaryOr::flatten() {
 
         } else {
 
-            // check if subformula is a size one conjunction
-            FormulaMultiaryAnd* checkAnd = dynamic_cast<FormulaMultiaryAnd*> ( *i );
-            if ( checkAnd != NULL && checkAnd->size() == 1 ) {
-
-                // take only subformula
-                subFormulas.insert( i, checkAnd->getFront() );
-                subFormulas.erase( i++ );
-                cerr << "\t\tOR flatten: size one AND flattened, result is '" << asString() << "'" << endl;
-            } else {
-
-                // adopt flattened subformula
-                ++i;
-                cerr << "\t\tOR flatten: flattened used, result is '" << asString() << "'" << endl;
-            }
+			// adopt flattened subformula
+			++i;
+			cerr << "\t\tOR flatten: flattened used, result is '" << asString() << "'" << endl;
         }
     }
     cerr << "OR flatten END: '" << asString() << "'" << endl;
@@ -431,6 +434,16 @@ void FormulaMultiaryOr::flatten() {
 // ****************************************************************************
 
 void FormulaMultiaryAnd::merge() {
+
+	cerr << "AND merge START: '" << asString() << "'" << endl;
+
+	// merge all subformula and flatten them
+	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+
+		// merge recursively all subformula
+		cerr << "\tAND merge: current formula '" << (*i)->asString() << "'" << endl;
+		(*i)->merge();
+	}
 
     // iterate over all subformulas twice: first we determine the current
     // assumption and then we check all subformulae for being a conclusion
@@ -448,16 +461,37 @@ void FormulaMultiaryAnd::merge() {
                 // check if assumption implies conclusion, which means in a
                 // CONJUNCTION the conclusion is redundant
                 if ( (*assumption)->implies(*conclusion) ) {
+                	cerr << "\tAND merge: erase formula '" << (*conclusion)->asString() << "'" << endl;
                     subFormulas.erase( conclusion++ );
                 } else {
+                	cerr << "\tAND merge: skipped formula '" << (*conclusion)->asString() << "'" << endl;
                     ++conclusion;
                 }
             }
         }
     }
+
+    cerr << "AND merge END: '" << asString() << "'" << endl;
 }
 
 void FormulaMultiaryOr::merge() {
+
+	cerr << "OR merge START: '" << asString() << "'" << endl;
+	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+
+		// merge recursively all subformula first
+		(*i)->merge();
+
+		// check if subformula is a size one conjunction
+		FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
+		if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
+
+			// take only subformula and insert it before current subformula
+			subFormulas.insert( i, checkMultiary->getFront() );
+			subFormulas.erase( i++ );
+			cerr << "\t\tOR merge: size one MULTIARY merged, result is '" << asString() << "'" << endl;
+		}
+	}
 
     // iterate over all subformulas twice: first we determine the current
     // conclusion and then we check all subformulae for being an assumption
@@ -475,13 +509,16 @@ void FormulaMultiaryOr::merge() {
                 // check if assumption implies conclusion, which means in a
                 // DISJUNCTION the assumption is redundant
                 if ( (*assumption)->implies(*conclusion) ) {
+                	cerr << "\tOR merge: erase formula '" << (*assumption)->asString() << "'" << endl;
                     subFormulas.erase( assumption++ );
                 } else {
+                	cerr << "\tOR merge: skipped formula '" << (*assumption)->asString() << "'" << endl;
                     ++assumption;
                 }
             }
         }
     }
+    cerr << "OR merge END: '" << asString() << "'" << endl;
 }
 
 

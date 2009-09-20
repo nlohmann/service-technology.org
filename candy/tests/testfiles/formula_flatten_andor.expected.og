@@ -2,7 +2,7 @@ INTERFACE
   INPUT
     ;
   OUTPUT
-    a, b, c;
+    a, b, c, d;
   SYNCHRONOUS
     ;
 

@@ -38,11 +38,11 @@
 using std::string;
 
 
-/// input files
+// input files
 extern FILE *graph_in;
 extern FILE *cover_in;
 
-/// the parsers
+// the parsers
 extern int graph_parse();
 extern int cover_parse();
 
@@ -59,6 +59,7 @@ Output *markingoutput = NULL;
 clock_t start_clock = clock();
 
 
+/// check if a file exists and can be opened for reading
 inline bool fileExists(std::string filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);
     return tmp.good();
@@ -263,52 +264,31 @@ int main(int argc, char** argv) {
     `--------------------------------------------*/
     Output temp;
     temp.stream() << pnapi::io::lola << *InnerMarking::net;
-
-
-    /*------------------------------------------.
-    | 5. call LoLA and parse reachability graph |
-    `------------------------------------------*/
-    time(&start_time);
-
     // marking information output
     if (args_info.mi_given) {
         string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
         markingoutput = new Output(mi_filename, "marking information");
     }
 
-    // select LoLA binary
+    /*------------------------------------------.
+    | 5. call LoLA and parse reachability graph |
+    `------------------------------------------*/
+    // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     // MinGW does not understand pathnames with "/", so we use the basename
-    string lola_command = basename(args_info.lola_arg);
+    string command_line = string(basename(args_info.lola_arg)) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    string lola_command = args_info.lola_arg;
+    string command_line = string(args_info.lola_arg) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
-    // read from a pipe or from a file (MinGW cannot pipe)
-#if defined(HAVE_POPEN) && defined(HAVE_PCLOSE) && !defined(__MINGW32__)
-    string command_line = lola_command + " " + temp.name() + " -M";
-    if (not args_info.verbose_flag) {
-        command_line += " 2> /dev/null";
-    }
+    // call LoLA
     status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
+    time(&start_time);
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
-#else
-    string command_line = lola_command + " " + temp.name() + " -m";
-#if !defined(__MINGW32__)
-    // MinGW cannot pipe
-    if (not args_info.verbose_flag) {
-        command_line += " &> /dev/null";
-    }
-#endif
-    status("calling LoLA with '%s'", command_line.c_str());
-    system(command_line.c_str());
-    graph_in = fopen((temp.name() + ".graph").c_str(), "r");
-    graph_parse();
-    fclose(graph_in);
-#endif
     time(&end_time);
+    status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
 
     // close marking information output file
     if (args_info.mi_given) {
@@ -323,8 +303,6 @@ int main(int argc, char** argv) {
     if (args_info.cover_given) {
         Cover::clear();
     }
-
-    status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
 
 
     /*-------------------------------.

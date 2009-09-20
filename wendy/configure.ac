@@ -70,9 +70,8 @@ else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
 
-# check for functions
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes]))
-AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
+# check for required functions and die if they are not found
+AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
 # check and set exact unsigned types
 AC_TYPE_UINT8_T

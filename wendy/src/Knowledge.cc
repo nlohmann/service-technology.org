@@ -230,20 +230,16 @@ inline void Knowledge::initialize() {
 inline void Knowledge::closure(std::queue<FullMarking>& todo) {
     // process the queue
     while (not todo.empty()) {
-        FullMarking current(todo.front());
-        todo.pop();
-
         // process successors of the current marking
-        InnerMarking* m = InnerMarking::inner_markings[current.inner];
+        InnerMarking* m = InnerMarking::inner_markings[todo.front().inner];
 
         // check, if each sent message contained on the interface of this marking will ever be consumed
-        if (args_info.smartSendingEvent_flag and not m->sentMessagesConsumed(current.interface)) {
+        if (args_info.smartSendingEvent_flag and not m->sentMessagesConsumed(todo.front().interface)) {
             is_sane = 0;
             return;
         }
 
         for (uint8_t i = 0; i < m->out_degree; ++i) {
-
             // a synchronization is impossible without the environment -- skip
             if (SYNC(m->labels[i])) {
                 continue;
@@ -251,7 +247,7 @@ inline void Knowledge::closure(std::queue<FullMarking>& todo) {
 
             // in any case, create a successor candidate -- it will be valid
             // for transient transitions anyway
-            FullMarking candidate(m->successors[i], current.interface);
+            FullMarking candidate(m->successors[i], todo.front().interface);
 
             // we receive -> the net sends
             if (RECEIVING(m->labels[i])) {
@@ -304,6 +300,7 @@ inline void Knowledge::closure(std::queue<FullMarking>& todo) {
                 }
             }
         }
+        todo.pop();
     }
 }
 

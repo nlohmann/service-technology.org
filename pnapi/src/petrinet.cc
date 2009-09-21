@@ -1762,6 +1762,13 @@ namespace pnapi
     for (std::set<Place *>::const_iterator p = input.begin();
         p != input.end(); p++)
     {
+      bool normal = true;
+      for (std::set<Node *>::const_iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
+        if (!static_cast<Transition *>(*t)->isNormal())
+          normal = false;
+      if (normal)
+        continue;
+
       std::string name = (*p)->getName();
 
       Place &intp = createPlace("normal_"+name);
@@ -1773,6 +1780,8 @@ namespace pnapi
       for (std::set<Arc *>::const_iterator f = postset.begin();
           f != postset.end(); f++)
       {
+        if ((*f)->getTransition().isNormal())
+          continue;
         createArc(intp, (*f)->getTransition());
         createArc((*f)->getTransition(), comp);
         deleteArc(**f);
@@ -1786,6 +1795,13 @@ namespace pnapi
     for (std::set<Place *>::const_iterator p = output.begin();
         p != output.end(); p++)
     {
+      bool normal = true;
+      for (std::set<Node *>::const_iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
+        if (!static_cast<Transition *>(*t)->isNormal())
+          normal = false;
+      if (normal)
+        continue;
+
       std::string name = (*p)->getName();
 
       Place &intp = createPlace("normal_"+name);
@@ -1795,6 +1811,8 @@ namespace pnapi
       for (std::set<Arc *>::const_iterator f = preset.begin();
           f != preset.end(); f++)
       {
+        if ((*f)->getTransition().isNormal())
+          continue;
         createArc((*f)->getTransition(), intp);
         deleteArc(**f);
       }

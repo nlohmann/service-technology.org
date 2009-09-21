@@ -94,14 +94,14 @@ bool ExtendedStateEquation::constructLP() {
 	// Now add all the events
 
 
-	int ev = 0;
+	//int ev = 0;
 
 
-	for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
+	for (int i = 0; i < NR_OF_EVENTS; ++i) {
 
-		pnapi::Place* p = *it;
+		pnapi::Place* p = EVENT_PLACES[i];
 
-		EventID[p] = ev+START_EVENTS;
+		//EventID[p] = ev+START_EVENTS;
 
 		int transCol[p->getPresetArcs().size() + p->getPostsetArcs().size() + 1];
 		REAL transVal[p->getPresetArcs().size() + p->getPostsetArcs().size() + 1];
@@ -124,7 +124,7 @@ bool ExtendedStateEquation::constructLP() {
 			transVal[tr++] = (*pIt)->getWeight();
 		}
 
-		transCol[tr] = START_EVENTS + ev++;
+		transCol[tr] = START_EVENTS + i;
 		transVal[tr] = -1;
 		add_constraintex(lp, tr+1, transVal, transCol, EQ, 0);
 	}
@@ -146,40 +146,42 @@ bool ExtendedStateEquation::constructLP() {
 	return true;
 }
 
-void ExtendedStateEquation::evaluate(EventTerm* e) {
+EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 
 
 
 	std::string term = e->toString();
-	std::map<pnapi::Place* const, int>* map = EventTerm::termToMap(e);
+	int* map = EventTerm::termToMap(e);
 
-	int counter = 0;
-	double obj_row[map->size()];
-	int obj_cols[map->size()];
+	const unsigned int START_TRANSITIONS = 1;
+	const unsigned int START_EVENTS = START_TRANSITIONS + net->getTransitions().size();
+
+
+	double obj_row[NR_OF_EVENTS];
+	int obj_cols[NR_OF_EVENTS];
 
 	std::string normalformterm = "";
 
-	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
+	for (int i = 0; i < NR_OF_EVENTS; ++i) {
 
-		if ((*it).second > 0) {
+		if (map[i] > 0) {
 			normalformterm += " +";
 		} else {
 			normalformterm += " ";
 		}
-		normalformterm += intToStr((*it).second);
+		normalformterm += map[i];
 		normalformterm += "*";
-		normalformterm += (*it).first->getName();
+		normalformterm += EVENT_STRINGS[i];
 
-		obj_row[counter] = (*it).second;
-		obj_cols[counter] = EventID[(*it).first];
-		++counter;
+		obj_row[i] = map[i];
+		obj_cols[i] = START_EVENTS + i;
 	}
 
 	int ret;
 
 	EventTermBound* bound = new EventTermBound();
 
-	assert(set_obj_fnex(lp,map->size(),obj_row,obj_cols)== TRUE);
+	assert(set_obj_fnex(lp,NR_OF_EVENTS,obj_row,obj_cols)== TRUE);
 
 	set_minim(lp);
 
@@ -211,8 +213,10 @@ void ExtendedStateEquation::evaluate(EventTerm* e) {
 		bound->upperBound = (int) get_objective(lp);
 	}
 
-	calculated[e] = bound;
+	calculatedBounds.push_back(bound);
+	calculatedEventTerms.push_back(e);
 
+	return bound;
 
 //	std::cout << "\n";
 }

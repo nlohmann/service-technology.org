@@ -89,13 +89,13 @@ void ProfileFile::output(std::ofstream& file,bool termsAsGiven) {
 
 	file << "\n\nTERMS";
 
-	for (std::map<EventTerm*,EventTermBound*>::iterator termsIt = (*systems->begin()).second->calculated.begin(); termsIt != (*systems->begin()).second->calculated.end();
+	for (std::vector<EventTerm*>::iterator termsIt = (*systems->begin()).second->calculatedEventTerms.begin(); termsIt != (*systems->begin()).second->calculatedEventTerms.end();
 	++termsIt) {
 		file << "\n    T" << counter << ": ";
 		if (termsAsGiven) {
-			file << (*termsIt).first->toString();
+			file << (*termsIt)->toString();
 		} else {
-			file << EventTerm::toPrettyString((*termsIt).first);
+			file << EventTerm::toPrettyString((*termsIt));
 		}
 		file << ";";
 		++counter;
@@ -111,10 +111,10 @@ void ProfileFile::output(std::ofstream& file,bool termsAsGiven) {
 		++systemsIt2) {
 
 
-				for (std::map<EventTerm*,EventTermBound*>::iterator termsIt = (*systemsIt2).second->calculated.begin(); termsIt != (*systemsIt2).second->calculated.end();
+				for (std::vector<EventTermBound*>::iterator termsIt = (*systemsIt2).second->calculatedBounds.begin(); termsIt != (*systemsIt2).second->calculatedBounds.end();
 					++termsIt) {
 					file << "\n    F" << fCounter << ",T" << tCounter << ": ";
-					file << (*termsIt).second->getLowerBoundString() << "," <<(*termsIt).second->getUpperBoundString() << ";";
+					file << (*termsIt)->getLowerBoundString() << "," <<(*termsIt)->getUpperBoundString() << ";";
 
 					++tCounter;
 				}

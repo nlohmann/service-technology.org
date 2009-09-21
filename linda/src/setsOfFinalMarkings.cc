@@ -8,13 +8,6 @@ using std::string;
 
 bool PartialMarking::isEquivalentTo(PartialMarking* other) {
 
-/*	for (std::map<const pnapi::Place*,int>::iterator it = values.begin(); it != values.end(); ++it) {
-		if ((other->defines((*it).first)) && (other->values[(*it).first] != (*it).second)) {
-			return false;
-		}
-	}
-*/
-
 	for (std::map<const pnapi::Place*,int>::iterator it = values.begin(); it != values.end(); ++it) {
 
 		if (!(other->defines((*it).first))) {
@@ -69,9 +62,9 @@ PartialMarking* PartialMarking::merge(PartialMarking* m1,PartialMarking* m2) {
 void PartialMarking::output() {
 
 	for (std::map<const pnapi::Place*,int>::iterator it = values.begin(); it != values.end(); ++it) {
-		std::cout << (*it).first->getName() << "=" << (*it).second << "; ";
+		std::cerr << (*it).first->getName() << "=" << (*it).second << "; ";
 	}
-	std::cout << "\n";
+	std::cerr << "\n";
 
 }
 
@@ -96,36 +89,6 @@ void SetOfPartialMarkings::output() {
 		(*it)->output();
 	}
 
-}
-
-
-SetOfPartialMarkings* SetOfPartialMarkings::unite(std::vector<SetOfPartialMarkings*>& sets) {
-
-	SetOfPartialMarkings* result = new SetOfPartialMarkings();
-
-	for (std::vector<SetOfPartialMarkings*>::iterator setIt = sets.begin(); setIt != sets.end(); ++setIt) {
-		for (std::vector<PartialMarking*>::iterator mIt = (*setIt)->partialMarkings.begin(); mIt != (*setIt)->partialMarkings.end(); ++mIt) {
-			result->protectedInsert(*mIt);
-		}
-	}
-
-	return result;
-}
-
-SetOfPartialMarkings* SetOfPartialMarkings::unite(SetOfPartialMarkings* set1, SetOfPartialMarkings* set2) {
-
-	SetOfPartialMarkings* result = new SetOfPartialMarkings();
-
-	for (std::vector<PartialMarking*>::iterator mIt = set1->partialMarkings.begin(); mIt != set1->partialMarkings.end(); ++mIt) {
-		result->partialMarkings.push_back(*mIt);
-	}
-
-	for (std::vector<PartialMarking*>::iterator mIt = set2->partialMarkings.begin(); mIt != set2->partialMarkings.end(); ++mIt) {
-		result->protectedInsert(*mIt);
-	}
-
-
-	return result;
 }
 
 

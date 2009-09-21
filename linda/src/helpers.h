@@ -12,8 +12,6 @@
 
 #include "lp_lib.h"
 
-#include "bounds.h"
-#include "messageprofile.h"
 
 using std::set;
 using std::vector;
@@ -22,16 +20,10 @@ using std::vector;
 #define MAX_CALL popen("cat tmp.obj tmp.stub tmp.events tmp.known tmp.decl | lp_solve -S1 -max","r");
 
 const std::string intToStr(const int);
-std::string getText(FILE*);
 
-typedef set<pnapi::Place* >  PPS;
-typedef vector<pnapi::Place* >  PPV;
-typedef Bounds<pnapi::Place* > EventBound;
-typedef Bounds<PPS> EventSetBound;
-typedef Bounds<PPV> EventVectorBound;
-typedef vector<EventBound>  EBV;
+extern int NR_OF_EVENTS;
+extern std::string* EVENT_STRINGS;
+extern pnapi::Place** EVENT_PLACES;
 
-void findMaxDependenciesR(EBV candidate, vector<EventSetBound>& results, set<PPS>& alreadyTested, lprec *lp, std::map<EVENT,unsigned int> EventID);
-
-
+extern int GET_EVENT_ID(std::string* s);
 #endif /* HELPERS_H */

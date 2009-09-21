@@ -14,6 +14,17 @@
 #include "stateEquation.h"
 #include "files.h"
 
+int NR_OF_EVENTS = 0;
+std::string* EVENT_STRINGS = 0;
+pnapi::Place** EVENT_PLACES = 0;
+int GET_EVENT_ID(std::string* s) {
+	for (int i = 0; i < NR_OF_EVENTS; ++i) {
+		if (EVENT_STRINGS[i] == *s) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 
 /// the command line parameters
@@ -80,6 +91,8 @@ void initialize_et_parser() {
 
 }
 
+
+
 int main(int argc, char** argv) {
 	time_t start_time, end_time;
 
@@ -117,6 +130,21 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
+	/*
+	 * Set up the event <-> nat mapping.
+	 */
+
+	NR_OF_EVENTS = net->getInterfacePlaces().size();
+	EVENT_STRINGS = new std::string[NR_OF_EVENTS]();
+	EVENT_PLACES = new pnapi::Place*[NR_OF_EVENTS]();
+
+	int counter = 0;
+
+	for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
+		EVENT_STRINGS[counter] = (*it)->getName();
+		EVENT_PLACES[counter] = (*it);
+		++counter;
+	}
 
 	/*----------------------------.
 	| 2. Calculate final markings |
@@ -127,6 +155,18 @@ int main(int argc, char** argv) {
 	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(&(net->finalCondition().formula()),bound);
 
 	std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> > systems;
+
+	if (args_info.verbose_flag) {
+		std::cerr << PACKAGE << ": Final markings:\n";
+		for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
+		finalMarkingIt != fSet->partialMarkings.end();
+		++finalMarkingIt) {
+			std::cerr << "    ";
+			(*finalMarkingIt)->output();
+		}
+	}
+
+
 
 	for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
 	finalMarkingIt != fSet->partialMarkings.end();
@@ -173,11 +213,9 @@ int main(int argc, char** argv) {
 			(*systemsIt).first->output();
 
 			for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
-				(*systemsIt).second->evaluate((*it));
-				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+				EventTermBound* b = (*systemsIt).second->evaluate((*it));
 				b->output(*it,args_info.show_terms_as_given_flag);
 			}
-
 
 		}
 
@@ -196,11 +234,6 @@ int main(int argc, char** argv) {
 		}
 		term_vec = new std::vector<EventTerm*>();
 
-		EventTerm::events.clear();
-		for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-			(EventTerm::events)[(*it)->getName()] = (*it);
-		}
-
 		et_yyparse();
 		fclose(et_yyin);
 
@@ -213,8 +246,7 @@ int main(int argc, char** argv) {
 			(*systemsIt).first->output();
 
 			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
-				(*systemsIt).second->evaluate((*it));
-				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+				EventTermBound* b = (*systemsIt).second->evaluate((*it));
 				b->output(*it,args_info.show_terms_as_given_flag);
 			}
 		}
@@ -236,11 +268,6 @@ int main(int argc, char** argv) {
 		}
 		constraint_vec = new std::vector<EventTermConstraint*>();
 
-		EventTerm::events.clear();
-		for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-			(EventTerm::events)[(*it)->getName()] = (*it);
-		}
-
 		etc_yyparse();
 		fclose(etc_yyin);
 
@@ -256,8 +283,7 @@ int main(int argc, char** argv) {
 			int holds = EventTermConstraint::is_true;
 
 			for (std::vector<EventTermConstraint*>::iterator it = constraint_vec->begin(); it != constraint_vec->end(); ++it) {
-				(*systemsIt).second->evaluate((*it)->getEventTerm());
-				EventTermBound* b = (*systemsIt).second->calculated[(*it)->getEventTerm()];
+				EventTermBound* b = (*systemsIt).second->evaluate((*it)->getEventTerm());
 
 				if ((*it)->holds(b) == EventTermConstraint::is_false) {
 					std::cout << "\tConstraint " << (*it)->toString() << " violated." << std::endl;
@@ -293,42 +319,6 @@ int main(int argc, char** argv) {
 
 
 
-	if (args_info.random_given) {
-
-		std::cerr << PACKAGE << ": " << args_info.random_arg << " event terms." << std::endl;
-
-
-		srand(time(NULL));
-
-		int number = args_info.random_arg;
-
-		vector<EventTerm*>* randomvec = new vector<EventTerm*>();
-
-		for (int i = 0; i < number; ++i) {
-			randomvec->push_back(EventTerm::createRandomEventTerm(net));
-		}
-
-		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
-		systemsIt != systems.end();
-		++systemsIt) {
-
-			std::cout << "\nFinal marking: ";
-
-			(*systemsIt).first->output();
-
-			for (vector<EventTerm*>::iterator it = randomvec->begin(); it != randomvec->end(); ++it) {
-				(*systemsIt).second->evaluate((*it));
-				EventTermBound* b = (*systemsIt).second->calculated[(*it)];
-				b->output(*it,args_info.show_terms_as_given_flag);
-			}
-
-		}
-
-
-
-
-	}
-
 
 	if (args_info.interactive_flag) {
 
@@ -347,10 +337,6 @@ int main(int argc, char** argv) {
 
 			term_vec = new std::vector<EventTerm*>();
 
-			EventTerm::events.clear();
-			for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-				(EventTerm::events)[(*it)->getName()] = (*it);
-			}
 
 			et_yyparse();
 
@@ -367,8 +353,7 @@ int main(int argc, char** argv) {
 				(*systemsIt).first->output();
 
 				for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
-					(*systemsIt).second->evaluate((*it));
-					EventTermBound* b = (*systemsIt).second->calculated[(*it)];
+					EventTermBound* b = (*systemsIt).second->evaluate((*it));
 					b->output(*it,args_info.show_terms_as_given_flag);
 
 				}
@@ -382,13 +367,13 @@ int main(int argc, char** argv) {
 
 	if (args_info.output_given) {
 
-	std::ofstream file;
-	file.open(args_info.output_arg);
-	ProfileFile* outputFile = new ProfileFile(&systems,net);
-	outputFile->output(file,args_info.show_terms_as_given_flag);
+		std::ofstream file;
+		file.open(args_info.output_arg);
+		ProfileFile* outputFile = new ProfileFile(&systems,net);
+		outputFile->output(file,args_info.show_terms_as_given_flag);
 
-	file.close();
-    std::cerr << "\n" << PACKAGE << ": Output file " << args_info.output_arg << " created." << std::endl << std::endl;
+		file.close();
+		std::cerr << "\n" << PACKAGE << ": Output file " << args_info.output_arg << " created." << std::endl << std::endl;
 
 	}
 

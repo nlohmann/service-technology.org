@@ -32,9 +32,7 @@ public:
 	bool contains(PartialMarking* partialMarking);
 	void add(SetOfPartialMarkings* aSet);
 
-	static SetOfPartialMarkings* unite(std::vector<SetOfPartialMarkings*>& sets);
 	static SetOfPartialMarkings* intersect(SetOfPartialMarkings* set1, SetOfPartialMarkings* set2);
-	static SetOfPartialMarkings* unite(SetOfPartialMarkings* set1, SetOfPartialMarkings* set2);
 	static SetOfPartialMarkings* create(const pnapi::formula::Formula* const src, unsigned int bound);
 
 	void output();

@@ -12,8 +12,14 @@ Version 0.6-unreleased
 
 * Added an option for output file creation.
 
+* Removed random event term mode (-r).
+
+* Code refactoring towards more efficient data structures.
+
 * added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
   to determine test case coverage (use `make cover' in `tests' directory)
+
+* Added test cases.
 
 Version 0.5
 ===========

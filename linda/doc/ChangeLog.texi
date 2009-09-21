@@ -1,8 +1,10 @@
 @heading Version 0.6-unreleased
 @itemize
 @item Added an option for output file creation.
-
+@item Removed random event term mode (-r).
+@item Code refactoring towards more efficient data structures.
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+@item Added test cases.
 @end itemize
 
 @heading Version 0.5

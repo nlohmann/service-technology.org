@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = 
+TESTFILES = accrej.owfn accrej.output.check
 
 
 # Below you can list all the files you do not want to have counted in the

@@ -38,16 +38,17 @@ public:
 		print_lp(lp);
 	}
 
-	void evaluate(EventTerm*);
+	EventTermBound* evaluate(EventTerm*);
 
 	~ExtendedStateEquation() {
 		delete_lp(lp);
 	}
 
-	std::map<EventTerm*,EventTermBound*> calculated;
+	std::vector<EventTerm*> calculatedEventTerms;
+	std::vector<EventTermBound*> calculatedBounds;
 
-private:
-	std::map<EVENT,unsigned int> EventID;
+//private:
+//	std::map<EVENT,unsigned int> EventID;
 
 };
 

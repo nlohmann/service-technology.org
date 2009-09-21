@@ -7,50 +7,16 @@
 
 #include <eventTerm.h>
 
-std::map<std::string,pnapi::Place*> EventTerm::events;
 
 std::vector<EventTerm*>* EventTerm::createBasicTermSet(pnapi::PetriNet* net) {
 
 	vector<EventTerm*>* result = new vector<EventTerm*>();
-	for (std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-		BasicTerm* b = new BasicTerm((*it));
+	for (int i = 0; i < NR_OF_EVENTS; ++i) {
+		BasicTerm* b = new BasicTerm(i);
 		result->push_back(b);
 	}
 
 	return result;
-
-}
-
-EventTerm* EventTerm::createRandomEventTerm(pnapi::PetriNet* net) {
-
-
-	int decision = rand() % 3 + 1;
-	std::set<pnapi::Place*>::iterator it = net->getInterfacePlaces().begin();
-	EventTerm* e;
-	switch (decision) {
-	case 1 : // Basic Term
-		{
-			int nrOfEvents = net->getInterfacePlaces().size();
-			int chosen = rand() % (nrOfEvents);
-			for (int i = 0; i < chosen; ++i) {
-				++it;
-			}
-			e = new BasicTerm(*it);
-			return e;
-		}
-	case 2 : // Multiply
-		{
-			int factor = rand() % 10 + 1;
-			if (rand() % 2 == 0) factor *= (-1);
-			e = new MultiplyTerm(createRandomEventTerm(net),factor);
-			return e;
-	    }
-	case 3 : // Add
-		{
-			e = new AddTerm(createRandomEventTerm(net),createRandomEventTerm(net));
-			return e;
-		}
-	}
 
 }
 
@@ -98,28 +64,24 @@ EventTerm* BasicTerm::multiplyWith(int k) {
 	return result;
 }
 
-std::map<pnapi::Place* const,int>* EventTerm::termToMap(EventTerm* e) {
+int* EventTerm::termToMap(EventTerm* e) {
 	EventTerm* temp = e->flatten();
-	std::map<pnapi::Place* const,int>* result = new std::map<pnapi::Place* const,int>();
+	int* result = new int[NR_OF_EVENTS]();
+	for (int i = 0; i < NR_OF_EVENTS; ++i) {
+		result[i] = 0;
+	}
 	temp->collectR(result);
 	return result;
 }
 
 
 
-void MultiplyTerm::collectR(std::map<pnapi::Place* const,int>* map) {
+void MultiplyTerm::collectR(int* map) {
 	BasicTerm* b = dynamic_cast<BasicTerm*>(term);
-
-	std::map<pnapi::Place* const,int>& mapRef = *map;
-
-	if (map->find(b->event) != map->end()) {
-		mapRef[b->event] += factor;
-	} else {
-		mapRef[b->event] = factor;
-	}
+	map[b->event] += factor;
 }
 
-void AddTerm::collectR(std::map<pnapi::Place* const,int>* map) {
+void AddTerm::collectR(int* map) {
 	term1->collectR(map);
 	term2->collectR(map);
 }
@@ -127,10 +89,17 @@ void AddTerm::collectR(std::map<pnapi::Place* const,int>* map) {
 
 std::string EventTerm::toPrettyString(EventTerm* e) {
 	std::string result = "";
-	std::map<pnapi::Place* const,int>* map = termToMap(e);
-	for (std::map<pnapi::Place* const,int>::iterator it = map->begin(); it != map->end(); ++it) {
-		if ((*it).second >= 0) result += "+";
-		result += intToStr((*it).second) + "*" + (*it).first->getName();
+	int* map = termToMap(e);
+	for (int i = 0; i < NR_OF_EVENTS; ++i) {
+		if (map[i] != 0) {
+			if (map[i] >= 0) {
+				result += "+";
+			}
+			result += intToStr(map[i]);
+			result += "*";
+			result += EVENT_STRINGS[i];
+		}
+
 	}
 	return result;
 }

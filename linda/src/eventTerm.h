@@ -21,21 +21,19 @@ enum TermType {TypeAbstract,TypeAddTerm,TypeMultiplyTerm,TypeBasicTerm};
 class EventTerm {
 protected:
 public:
-	virtual void collectR(std::map<pnapi::Place* const,int>*) = 0;
+	virtual void collectR(int*) = 0;
 	virtual std::string toString() = 0;
 	virtual EventTerm* flatten() = 0;
 	virtual EventTerm* multiplyWith(int) = 0;
-	static std::map<pnapi::Place* const,int>* termToMap(EventTerm*);
+	static int* termToMap(EventTerm*);
 	static std::string toPrettyString(EventTerm*);
 	static std::vector<EventTerm*>* createBasicTermSet(pnapi::PetriNet*);
-	static EventTerm* createRandomEventTerm(pnapi::PetriNet*);
-	static std::map<std::string,pnapi::Place*> events;
 	virtual ~EventTerm() {}
 };
 
 class AddTerm : public EventTerm {
 public:
-	virtual void collectR(std::map<pnapi::Place* const,int>*);
+	virtual void collectR(int*);
 	EventTerm* term1;
 	EventTerm* term2;
 	std::string toString() {
@@ -49,7 +47,7 @@ public:
 
 class MultiplyTerm : public EventTerm {
 public:
-	virtual void collectR(std::map<pnapi::Place* const,int>*);
+	virtual void collectR(int*);
 	EventTerm* term;
 	int factor;
 	MultiplyTerm(EventTerm* t, int f) : term(t),factor(f) {};
@@ -63,15 +61,19 @@ public:
 
 class BasicTerm : public EventTerm {
 public:
-	virtual void collectR(std::map<pnapi::Place* const,int>*)  {};
+	virtual void collectR(int*)  {};
 
-	BasicTerm(pnapi::Place* e) : event(e) {}
-	BasicTerm(std::string* s) : event(events[*s]) {	}
+	BasicTerm(std::string* s) : event(GET_EVENT_ID(s)) {
+		if (event == -1) {
+			std::cerr << PACKAGE << ": An unspecified event label has been used: \"" << *s <<  "\" ! Cancel." << std::endl;
+			exit(1);
+		}
+	}
+	BasicTerm(int i) : event(i) {	}
 
-	pnapi::Place* const event;
+	int event;
 	virtual std::string toString() {
-		if (event == 0) return "dummy";
-		return event->getName();
+		return EVENT_STRINGS[event];
 	}
 	virtual EventTerm* flatten();
 	virtual EventTerm* multiplyWith(int);
@@ -146,8 +148,6 @@ public:
 		return e;
 	}
 
-// vals 0 <= bla <= 0
-// toCheck -5 <= blubb <= 10
 
 	bool contradicts(EventTermBound* toCheck) {
 		return toCheck->intersectionEmpty(vals);

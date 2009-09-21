@@ -10,11 +10,6 @@ option "level-0" 0
   "Level 0 Message Profile"
   flag off
   
-option "random" r
-  "Random Message Profile from a specified number of terms."
-  int typestr="uint"
-  optional 
-
 option "file" f
   "Message Profile from a term file"
   string typestr="path"

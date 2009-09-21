@@ -1,0 +1,8 @@
+getinfo - info;0;0;
+sugg - rej - acc;0;1;
+sugg - rej - finalrej;0;1;
+sugg - rej - acc - finalrej;0;0;
+check + getinfo;1;1;
+check + info;1;1;
+sugg + info;1;1;
+rej - feedback;0;0;

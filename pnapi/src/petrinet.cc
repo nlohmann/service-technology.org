@@ -1796,7 +1796,7 @@ namespace pnapi
         p != output.end(); p++)
     {
       bool normal = true;
-      for (std::set<Node *>::const_iterator t = (*p)->getPostset().begin(); t != (*p)->getPostset().end(); t++)
+      for (std::set<Node *>::const_iterator t = (*p)->getPreset().begin(); t != (*p)->getPreset().end(); t++)
         if (!static_cast<Transition *>(*t)->isNormal())
           normal = false;
       if (normal)

@@ -26,6 +26,8 @@ TESTFILES = test_input.owfn \
             bug13990.3.owfn \
             bug14064.owfn \
             bug14116.owfn \
+	    bug14119.1.owfn \
+	    bug14119.2.owfn \
             bug14127.owfn \
             bug14128.1.owfn \
             bug14128.2.owfn \
@@ -65,7 +67,18 @@ TESTFILES = test_input.owfn \
             syntax_max_occurrence.owfn \
             test_produce.onlineshop.constraint.owfn \
             test_produce.onlineshop.owfn \
-	    test_automaton_behavior_async.owfn
+            test_automaton_behavior_async.owfn \
+            fiona_abnormal_both.normalized.expected.owfn \
+            fiona_abnormal_both.owfn \
+            fiona_abnormal_both2.normalized.expected.owfn \
+            fiona_abnormal_both2.owfn \
+            fiona_abnormal_input.normalized.expected.owfn \
+            fiona_abnormal_input.owfn \
+            fiona_abnormal_output.normalized.expected.owfn \
+            fiona_abnormal_output.owfn \
+            fiona_coffee.normalized.expected.owfn \
+            fiona_coffee.owfn
+	    
 
 
 # Below you can list all the files you do not want to have counted in the

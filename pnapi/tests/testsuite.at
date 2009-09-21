@@ -254,6 +254,21 @@ AT_CHECK([GREP -q "petri:bug14116.owfn: 0" stderr],0)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14119 (https://gna.org/bugs/?14119) [[1]]])
+m4_define([NET], [bug14119.1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -n NET -oowfn], 0, ignore, ignore)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14119 (https://gna.org/bugs/?14119) [[2]]])
+m4_define([NET], [bug14119.2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK([PETRI -n NET -osa], 0, ignore, ignore)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 AT_SETUP([Bug 14127 (https://gna.org/bugs/?14127)])
 m4_define([NET],[bug14127.owfn])
 AT_CHECK([cp TESTFILES/NET .])
@@ -541,6 +556,59 @@ AT_CHECK([GREP -q "petri:NET: 0" stderr])
 AT_KEYWORDS([frontend criteria])
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Normalize])
+############################################################################
+
+AT_SETUP([Fiona: Abnormal Input])
+m4_define([NET], [fiona_abnormal_input])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Abnormal Output])
+m4_define([NET], [fiona_abnormal_output])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Abnormal Input and Output])
+m4_define([NET], [fiona_abnormal_both])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Abnormal Input and Output])
+m4_define([NET], [fiona_abnormal_both2])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Coffee Automaton])
+m4_define([NET], [fiona_coffee])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Service Automata])

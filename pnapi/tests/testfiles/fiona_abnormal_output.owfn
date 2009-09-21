@@ -1,0 +1,30 @@
+{ abnormal net }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1;
+
+INPUT
+  ;
+
+OUTPUT
+  x,
+  y;
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p1:   1;
+
+
+TRANSITION t1    { !x, !y }
+CONSUME
+  p0:   1;
+PRODUCE
+  p1:   1,
+  x:		1,
+  y:		1;
+
+{ END OF FILE }

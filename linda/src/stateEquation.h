@@ -47,9 +47,6 @@ public:
 	std::vector<EventTerm*> calculatedEventTerms;
 	std::vector<EventTermBound*> calculatedBounds;
 
-//private:
-//	std::map<EVENT,unsigned int> EventID;
-
 };
 
 #endif /* STATEEQUATION_H_ */

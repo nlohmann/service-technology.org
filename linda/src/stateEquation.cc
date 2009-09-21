@@ -19,12 +19,12 @@ bool ExtendedStateEquation::constructLP() {
 	const unsigned int START_SYNCHRO = START_EVENTS + net->getSynchronizedTransitions().size();
 
 	// Build a map for quick transition referencing
-	std::map<pnapi::Transition*, unsigned int> transitionID;
+	BinaryTree<pnapi::Transition*, unsigned int> transitionID;
 	unsigned int current = 0;
 
 
 	for (std::set<pnapi::Transition*>::iterator tIt = net->getTransitions().begin(); tIt != net->getTransitions().end(); ++tIt) {
-		transitionID[*tIt] = current++;
+		transitionID.insert(*tIt,current++,false);
 	}
 	lp = make_lp(0, NR_OF_COLS);
 
@@ -42,15 +42,16 @@ bool ExtendedStateEquation::constructLP() {
 
 	set_add_rowmode(lp, TRUE);
 
-	for (std::map<const pnapi::Place*,int>::iterator placesIt = omega->values.begin(); placesIt != omega->values.end(); ++placesIt) {
 
-		const pnapi::Place* place = (*placesIt).first;
+	for (BinaryTreeIterator<const pnapi::Place*,int>* placesIt = omega->values.begin(); placesIt->valid(); placesIt->next()) {
+
+		const pnapi::Place* place = placesIt->getKey();
 
 		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(place)) != net->getInterfacePlaces().end()) {
 			continue;
 		}
 
-		int value = (*placesIt).second;
+		int value = placesIt->getValue();
 
 		int number_of_transitions_for_this_place = place->getPresetArcs().size() + place->getPostsetArcs().size();
 
@@ -67,7 +68,7 @@ bool ExtendedStateEquation::constructLP() {
 
 			assert(tr < number_of_transitions_for_this_place);
 
-			transCol[tr] = START_TRANSITIONS + transitionID[&t];
+			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
 			transVal[tr] = (*pIt)->getWeight();
 			++tr;
 		}
@@ -79,7 +80,7 @@ bool ExtendedStateEquation::constructLP() {
 			assert(tr < number_of_transitions_for_this_place);
 
 			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID[&t];
+			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
 			transVal[tr] = -1 * (int) (*pIt)->getWeight();
 			++tr;
 		}
@@ -112,7 +113,7 @@ bool ExtendedStateEquation::constructLP() {
 		++pIt) {
 			pnapi::Transition& t = (*pIt)->getTransition();
 			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID[&t];
+			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
 			transVal[tr++] = (*pIt)->getWeight();
 		}
 
@@ -120,7 +121,7 @@ bool ExtendedStateEquation::constructLP() {
 		for (set<pnapi::Arc *>::iterator pIt = p->getPostsetArcs().begin(); pIt != p->getPostsetArcs().end(); ++pIt) {
 			pnapi::Transition& t = (*pIt)->getTransition();
 			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID[&t];
+			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
 			transVal[tr++] = (*pIt)->getWeight();
 		}
 

@@ -11,8 +11,8 @@
 class PartialMarking {
 public:
 
-	std::map<const pnapi::Place*,int> values;
-	bool defines(const pnapi::Place* place) {return values.find(place) != values.end();}
+	BinaryTree<const pnapi::Place*,int> values;
+	bool defines(const pnapi::Place* place) {return values.find(place) != 0;}
 	bool isEquivalentTo(PartialMarking* other);
 
 	static PartialMarking* merge(PartialMarking* m1,PartialMarking* m2);

@@ -12,98 +12,49 @@ using namespace std;
 //! \brief removes the given literal from the formula, if this literal is the
 //!        only one of a clause, the clause gets removed as well
 //! \param name name of the literal to be removed
-void FormulaMultiary::removeLiteral(const std::string& name) {
+void FormulaMultiary::removeLiteral(const string& literal) {
 
+    cerr << "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" << endl;
 
-    subFormulas_t::iterator iCurrentFormula;
-
-    std::list<subFormulas_t::iterator> listOfFormulaIterator;
-
-    std::list<subFormulas_t::iterator>::iterator iterOfListOfFormulaIterator;
-
-    //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
-    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;
-
-    for (iCurrentFormula = subFormulas.begin(); iCurrentFormula != subFormulas.end(); ) {
+    for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
 
         // if the considered current formula is a literal, then remove it;
         // call the function recursively, otherwise
-        FormulaLiteral* currentFormula = dynamic_cast<FormulaLiteral*> (*iCurrentFormula);
-        if (currentFormula != NULL) {
+    	cerr << "\t removeLiteral: current formula '" << (*i)->asString() << "'" << endl;
+        FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> (*i);
+        if (checkLiteral != NULL) {
 
-            // the current formula is a literal
-            if (currentFormula->asString() == name) {
-                // the literal has the right name, so remove it
-                delete *iCurrentFormula;
-                iCurrentFormula = subFormulas.erase(iCurrentFormula);
+            // the current formula is a literal, so delete it if it matches
+            if ( literal.compare( checkLiteral->asString() ) == 0 ) {
+            	subFormulas.erase( i++ );
             } else {
-                iCurrentFormula++;
+                ++i;
             }
+
         } else {
 
-            if ((*iCurrentFormula)->size() > 0) {
+			// the current formula is no literal, so call removeLiteral again
+			(*i)->removeLiteral( literal );
 
-                // the current formula is no literal, so call removeLiteral again
-                (*iCurrentFormula)->removeLiteral(name);
-                if ((*iCurrentFormula)->size() == 0) {
-                    // this clause just got empty, so we store it in a temporary list
-                    // later on we want to remove this clause from the formula
-                    listOfFormulaIterator.push_back(iCurrentFormula);
+			FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
+			if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
 
+				// a size zero multiary formula is useless, so erase it and redirect
+				// the iterator to the new current subformula
+				subFormulas.erase( i++ );
+				cerr << "\t removeLiteral: size zero MULTIARY flattened, result is '" << asString() << "'" << endl;
 
-                    // TODO why not this
-                    //delete *iCurrentFormula;
-                    //iCurrentFormula = subFormulas.erase( iCurrentFormula );
-                }
-            }
-            // TODO check with above
-            iCurrentFormula++;
+			} else {
+
+				// adopt flattened subformula
+				++i;
+				cerr << "\t removeLiteral: nothing to flatten, result is '" << asString() << "'" << endl;
+			}
         }
     }
 
-    for (iterOfListOfFormulaIterator = listOfFormulaIterator.begin();
-            iterOfListOfFormulaIterator != listOfFormulaIterator.end();
-            iterOfListOfFormulaIterator++) {
-
-        // now we remove the clause that we have stored before from the formula
-        // otherwise we would get a (false) when evaluating this formula -> this is not our intention
-        subFormulas.erase(*iterOfListOfFormulaIterator);
-    }
+    cerr << "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" << endl;
 }
-
-
-//    subFormulas_t::iterator iCurrentFormula;
-//    //cout << "\tanzahl von klauseln: " << subFormulas.size() << endl; int i = 1;
-//    //cout << "\tremoving literal " << name << " from clause nr " << i++ << endl;
-//
-//    for (iCurrentFormula = subFormulas.begin();
-//         iCurrentFormula != subFormulas.end();) {
-//
-//        // if the considered current formula is a literal, then remove it;
-//        // call the function recursively, otherwise
-//        FormulaLiteral* currentFormula = dynamic_cast<FormulaLiteral*> (*iCurrentFormula);
-//        if (currentFormula != NULL) {
-//            // the current formula is a literal
-//            if (currentFormula->asString() == name) {
-//                // the literal has the right name, so remove it
-//                delete *iCurrentFormula;
-//                iCurrentFormula = subFormulas.erase(iCurrentFormula);
-//            } else {
-//                iCurrentFormula++;
-//            }
-//        } else {
-//            // the current formula is no literal, so call removeLiteral again
-//            (*iCurrentFormula)->removeLiteralByHiding(name);
-//            if ( (dynamic_cast<FormulaMultiary*>(*iCurrentFormula))->size() == 0 ) {
-//                delete *iCurrentFormula;
-//                iCurrentFormula = subFormulas.erase(iCurrentFormula);
-//            } else {
-//                iCurrentFormula++;
-//            }
-//        }
-//    }
-//
-//}
 
 
 
@@ -236,127 +187,27 @@ string FormulaMultiaryOr::asString() const {
 
 
 // ****************************************************************************
-// simplify
-// ****************************************************************************
-
-//! \brief Returns the merged equivalent to this formula. Merging gets rid of
-//!        unnecessary nesting of subformulas. (a*(b*c)) becomes (a*b*c). The
-//!        caller is responsible for deleting the returned newly created formula.
-//! \return returns the merged equivalent
-Formula* FormulaMultiaryAnd::simplify() {
-
-    cerr << "AND simplify START: '" << asString() << "'" << endl;
-    FormulaMultiaryAnd *result = new FormulaMultiaryAnd;
-
-    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
-
-        // simplify subformula
-        cerr << "\tAND simplify: current formula '" << (*i)->asString() << "'" << endl;
-        Formula* simplifiedSub = (*i)->simplify();
-
-        // check if subformula is a conjunction
-        cerr << "\tAND simplify: simplified current formula '" << simplifiedSub->asString() << "'" << endl;
-        FormulaMultiaryAnd* checkSub = dynamic_cast<FormulaMultiaryAnd*> (simplifiedSub);
-        if ( checkSub != NULL ) {
-
-            // copy all subformulas
-            for (subFormulas_t::iterator j = checkSub->subFormulas.begin(); j != checkSub->subFormulas.end(); j++) {
-                result->subFormulas.push_back( dynamic_cast<Formula*> (*j)->getDeepCopy() );
-            }
-
-            // delete old simplified subformula
-            delete simplifiedSub;
-            cerr << "\t\tAND simplify: subformulas copied, result is '" << result->asString() << "'" << endl;
-
-        } else {
-
-            // adopt simplified subformula
-            result->subFormulas.push_back( simplifiedSub );
-            cerr << "\t\tAND simplify: simplified used, result is '" << result->asString() << "'" << endl;
-        }
-    }
-
-    cerr << "AND simplify END: '" << result->asString() << "'" << endl;
-    return result;
-}
-
-Formula* FormulaMultiaryOr::simplify() {
-
-    cerr << "OR simplify START: '" << asString() << "'" << endl;
-    FormulaMultiaryOr *result = new FormulaMultiaryOr;
-
-    for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); i++) {
-
-        // simplify subformula
-        cerr << "\tOR simplify: current formula '" << (*i)->asString() << "'" << endl;
-        Formula* simplifiedSub = (*i)->simplify();
-
-        // check if subformula is a disjunction
-        cerr << "\tOR simplify: simplified current formula '" << simplifiedSub->asString() << "'" << endl;
-        FormulaMultiaryOr* checkSub = dynamic_cast<FormulaMultiaryOr*> (simplifiedSub);
-        if ( checkSub != NULL ) {
-
-            // copy all subformulas
-            for ( subFormulas_t::const_iterator j = checkSub->subFormulas.begin(); j != checkSub->subFormulas.end(); ++j ) {
-                //result->subFormulas.push_back( dynamic_cast<Formula*> (*j)->getDeepCopy() );
-                result->subFormulas.push_back( (*j)->getDeepCopy() );
-            }
-
-            // delete old simplified subformula
-            delete simplifiedSub;
-            cerr << "\t\tOR simplify: subformulas copied, result is '" << result->asString() << "'" << endl;
-
-        } else {
-
-            // adopt simplified subformula
-            result->subFormulas.push_back( simplifiedSub );
-            cerr << "\t\tOR simplify: simplified used, result is '" << result->asString() << "'" << endl;
-        }
-    }
-
-    if ( result->size() == 1 ) {
-
-        Formula* newResult = (*(result->subFormulas).begin())->getDeepCopy();
-        delete result;
-
-        cerr << "OR simplify END: '" << newResult->asString() << "'" << endl;
-        return newResult;
-    } else {
-
-        cerr << "OR simplify END: '" << result->asString() << "'" << endl;
-        return result;
-    }
-
-    // TODO implies aus fiona implementieren und für simplify nutzen
-}
-
-
-
-// ****************************************************************************
 // flatten
 // ****************************************************************************
 
 void FormulaMultiaryAnd::flatten() {
 
-    cerr << "AND flatten START: '" << asString() << "'" << endl;
+    cerr << "\tAND flatten START: '" << asString() << "'" << endl;
+
     // ATTENTION: increment iterator inside because of erase
     for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
 
-        // flatten subformula
-        cerr << "\tAND flatten: current formula '" << (*i)->asString() << "'" << endl;
-        (*i)->flatten();
-
         // check if subformula is a size one multiary formula
-        cerr << "\tAND flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
+    	cerr << "\tAND flatten: current formula '" << (*i)->asString() << "'" << endl;
         FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
         if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
 
         	// a size one multiary formula is useless, so erase it and redirect
         	// the iterator to the new current subformula
-			subFormulas.insert( i, checkMultiary->getFront() );
+			subFormulas.insert( i, checkMultiary->subFormulas.front() );
 			subFormulas.erase( i++ );
 			--i;
-			cerr << "\t\tAND flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
+			cerr << "\tAND flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
         }
 
         // check if subformula is a conjunction
@@ -369,39 +220,37 @@ void FormulaMultiaryAnd::flatten() {
                 subFormulas.insert( i, *j );
             }
             subFormulas.erase( i++ );
-            cerr << "\t\tAND flatten: subformulas taken, result is '" << asString() << "'" << endl;
+            cerr << "\tAND flatten: subformulas taken, result is '" << asString() << "'" << endl;
 
         } else {
 
 			// adopt flattened subformula
 			++i;
-			cerr << "\t\tAND flatten: flattened used, result is '" << asString() << "'" << endl;
+			cerr << "\tAND flatten: flattened used, result is '" << asString() << "'" << endl;
         }
     }
-    cerr << "AND flatten END: '" << asString() << "'" << endl;
+
+    cerr << "\tAND flatten END: '" << asString() << "'" << endl;
 }
 
 void FormulaMultiaryOr::flatten() {
 
-    cerr << "OR flatten START: '" << asString() << "'" << endl;
+    cerr << "\tOR flatten START: '" << asString() << "'" << endl;
+
     // ATTENTION: increment iterator inside because of erase
     for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
 
-        // flatten subformula
-        cerr << "\tOR flatten: current formula '" << (*i)->asString() << "'" << endl;
-        (*i)->flatten();
-
         // check if subformula is a size one multiary formula
-		cerr << "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
+    	cerr << "\tOR flatten: current formula '" << (*i)->asString() << "'" << endl;
 		FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
 		if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
 
 			// a size one multiary formula is useless, so erase it and redirect
 			// the iterator to the new current subformula
-			subFormulas.insert( i, checkMultiary->getFront() );
+			subFormulas.insert( i, checkMultiary->subFormulas.front() );
 			subFormulas.erase( i++ );
 			--i;
-			cerr << "\t\tOR flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
+			cerr << "\tOR flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
 		}
 
         // check if subformula is a disjunction
@@ -415,16 +264,17 @@ void FormulaMultiaryOr::flatten() {
                 subFormulas.insert( i, *j );
             }
             subFormulas.erase( i++ );
-            cerr << "\t\tOR flatten: subformulas taken, result is '" << asString() << "'" << endl;
+            cerr << "\tOR flatten: subformulas taken, result is '" << asString() << "'" << endl;
 
         } else {
 
 			// adopt flattened subformula
 			++i;
-			cerr << "\t\tOR flatten: flattened used, result is '" << asString() << "'" << endl;
+			cerr << "\tOR flatten: flattened used, result is '" << asString() << "'" << endl;
         }
     }
-    cerr << "OR flatten END: '" << asString() << "'" << endl;
+
+    cerr << "\tOR flatten END: '" << asString() << "'" << endl;
 }
 
 
@@ -435,89 +285,123 @@ void FormulaMultiaryOr::flatten() {
 
 void FormulaMultiaryAnd::merge() {
 
-	cerr << "AND merge START: '" << asString() << "'" << endl;
+	cerr << "\tAND merge START: '" << asString() << "'" << endl;
 
-	// merge all subformula and flatten them
-	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+	// iterate over all subformulas twice: first we determine the current
+	// assumption and then we check all subformulae for being an conclusion
+	for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ++assumption ) {
 
-		// merge recursively all subformula
-		cerr << "\tAND merge: current formula '" << (*i)->asString() << "'" << endl;
-		(*i)->merge();
+		cerr << "\tAND merge: current formula '" << (*assumption)->asString() << "'" << endl;
+		for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ) {
+
+			// check if we have the same subformula as assumption and
+			// conclusion: this has to be skipped because it would be a
+			// trivial implication
+			if ( assumption == conclusion ) {
+				++conclusion;
+			} else {
+
+				// check if assumption implies conclusion, which means in a
+				// CONJUNCTION the conclusion is redundant
+				if ( (*assumption)->implies(*conclusion) ) {
+					cerr << "\tAND merge: erase formula '" << (*conclusion)->asString() << "'" << endl;
+					subFormulas.erase( conclusion++ );
+				} else {
+					cerr << "\tAND merge: skipped formula '" << (*conclusion)->asString() << "'" << endl;
+					++conclusion;
+				}
+			}
+		}
 	}
 
-    // iterate over all subformulas twice: first we determine the current
-    // assumption and then we check all subformulae for being a conclusion
-    for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ++assumption ) {
-
-        for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ) {
-
-            // check if we have the same subformula as assumption and
-            // conclusion: this has to be skipped because it would be a
-            // trivial implication
-            if ( assumption == conclusion ) {
-                ++conclusion;
-            } else {
-
-                // check if assumption implies conclusion, which means in a
-                // CONJUNCTION the conclusion is redundant
-                if ( (*assumption)->implies(*conclusion) ) {
-                	cerr << "\tAND merge: erase formula '" << (*conclusion)->asString() << "'" << endl;
-                    subFormulas.erase( conclusion++ );
-                } else {
-                	cerr << "\tAND merge: skipped formula '" << (*conclusion)->asString() << "'" << endl;
-                    ++conclusion;
-                }
-            }
-        }
-    }
-
-    cerr << "AND merge END: '" << asString() << "'" << endl;
+	cerr << "\tAND merge END: '" << asString() << "'" << endl;
 }
 
 void FormulaMultiaryOr::merge() {
 
-	cerr << "OR merge START: '" << asString() << "'" << endl;
-	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+	cerr << "\tOR merge START: '" << asString() << "'" << endl;
 
-		// merge recursively all subformula first
-		(*i)->merge();
+	// iterate over all subformulas twice: first we determine the current
+	// conclusion and then we check all subformulae for being an assumption
+	for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ++conclusion ) {
 
-		// check if subformula is a size one conjunction
-		FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
-		if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
+		cerr << "\tOR merge: current formula '" << (*conclusion)->asString() << "'" << endl;
+		for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ) {
 
-			// take only subformula and insert it before current subformula
-			subFormulas.insert( i, checkMultiary->getFront() );
-			subFormulas.erase( i++ );
-			cerr << "\t\tOR merge: size one MULTIARY merged, result is '" << asString() << "'" << endl;
+			// check if we have the same subformula as assumption and
+			// conclusion: this has to be skipped because it would be a
+			// trivial implication
+			if ( assumption == conclusion ) {
+				++assumption;
+			} else {
+
+				// check if assumption implies conclusion, which means in a
+				// DISJUNCTION the assumption is redundant
+				if ( (*assumption)->implies(*conclusion) ) {
+					cerr << "\tOR merge: erase formula '" << (*assumption)->asString() << "'" << endl;
+					subFormulas.erase( assumption++ );
+				} else {
+					cerr << "\tOR merge: skipped formula '" << (*assumption)->asString() << "'" << endl;
+					++assumption;
+				}
+			}
 		}
 	}
 
-    // iterate over all subformulas twice: first we determine the current
-    // conclusion and then we check all subformulae for being an assumption
-    for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ++conclusion ) {
+	cerr << "\tOR merge END: '" << asString() << "'" << endl;
+}
 
-        for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ) {
 
-            // check if we have the same subformula as assumption and
-            // conclusion: this has to be skipped because it would be a
-            // trivial implication
-            if ( assumption == conclusion ) {
-                ++assumption;
-            } else {
 
-                // check if assumption implies conclusion, which means in a
-                // DISJUNCTION the assumption is redundant
-                if ( (*assumption)->implies(*conclusion) ) {
-                	cerr << "\tOR merge: erase formula '" << (*assumption)->asString() << "'" << endl;
-                    subFormulas.erase( assumption++ );
-                } else {
-                	cerr << "\tOR merge: skipped formula '" << (*assumption)->asString() << "'" << endl;
-                    ++assumption;
-                }
-            }
-        }
-    }
+// ****************************************************************************
+// simplify
+// ****************************************************************************
+
+void FormulaMultiaryAnd::simplify() {
+
+	cerr << "AND simplify START: '" << asString() << "'" << endl;
+
+	// simplify recursively all subformula first
+	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+		cerr << "\tAND simplify: current formula '" << (*i)->asString() << "'" << endl;
+		(*i)->simplify();
+		cerr << "\tAND simplify: simplified current formula '" << (*i)->asString() << "'" << endl;
+	}
+
+    // step 1: merge
+	// iterate over all subformulas twice: first we determine the current
+    // assumption and then we check all subformulae for being a conclusion
+	merge();
+
+    // step 2: flatten
+    // iterate over all subformula and check them for being a size one mulitary
+    // formula, a conjunction or a double negation
+	flatten();
+
+    cerr << "AND simplify END: '" << asString() << "'" << endl;
+}
+
+void FormulaMultiaryOr::simplify() {
+
+	cerr << "OR merge START: '" << asString() << "'" << endl;
+
+	// simplify recursively all subformula first
+	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+		cerr << "\tOR simplify: current formula '" << (*i)->asString() << "'" << endl;
+		(*i)->simplify();
+		cerr << "\tOR simplify: simplified current formula '" << (*i)->asString() << "'" << endl;
+	}
+
+	// step 1: merge
+	// iterate over all subformulas twice: first we determine the current
+	// assumption and then we check all subformulae for being a conclusion
+	merge();
+
+	// step 2: flatten
+	// iterate over all subformula and check them for being a size one mulitary
+	// formula, a disjunction or a double negation
+	flatten();
+
     cerr << "OR merge END: '" << asString() << "'" << endl;
 }
 
@@ -527,41 +411,97 @@ void FormulaMultiaryOr::merge() {
 // implies
 // ****************************************************************************
 
-
 bool FormulaMultiaryAnd::implies(Formula* conclusion) const {
-    return false;
+
+	assert( conclusion != NULL );
+
+	// a literal is implied by a conjunction A iff some subformula of A implies the literal
+	FormulaLiteral* literal = dynamic_cast<FormulaLiteral*> ( conclusion );
+	if ( literal != NULL ) {
+		for ( subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+			if ( (*i)->implies(literal) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// a conjunction A is implied by this iff every subformula of A is implied by this
+	FormulaMultiaryAnd* conjunction = dynamic_cast<FormulaMultiaryAnd*> ( conclusion );
+	if ( conjunction != NULL ) {
+		for ( subFormulas_t::const_iterator i = conjunction->subFormulas.begin(); i != conjunction->subFormulas.end(); ++i ) {
+			if ( not this->implies(*i) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// a disjunction A is implied by this iff some subformula of A is implied by this
+	FormulaMultiaryOr* disjunction = dynamic_cast<FormulaMultiaryOr*> ( conclusion );
+	if ( disjunction != NULL ) {
+		for ( subFormulas_t::const_iterator i = disjunction->subFormulas.begin(); i != disjunction->subFormulas.end(); ++i ) {
+			if ( this->implies(*i) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// this implies only literals, conjunctions and disjunctions
+	return false;
 }
 
 bool FormulaMultiaryOr::implies(Formula* conclusion) const {
 
-    // check if the conclusion is a literal
-    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( conclusion );
-    if ( checkLiteral != NULL ) {
+	assert( conclusion != NULL );
 
-        for ( subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+	// a literal is implied by a disjunction A iff all subformula of A imply the literal
+	FormulaLiteral* literal = dynamic_cast<FormulaLiteral*> ( conclusion );
+	if ( literal != NULL ) {
+		for ( subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
+			if ( not (*i)->implies(literal) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-            if ( not (*i)->implies(checkLiteral) ) {
-                return false;
-            }
-        }
-        return true;
+	// a conjunction A is implied by this iff every subformula of A is implied by this
+	FormulaMultiaryAnd* conjunction = dynamic_cast<FormulaMultiaryAnd*> ( conclusion );
+	if ( conjunction != NULL ) {
+		for ( subFormulas_t::const_iterator i = conjunction->subFormulas.begin(); i != conjunction->subFormulas.end(); ++i ) {
+			if ( not this->implies(*i) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-    } else {
-        // TODO fuck
-        return false;
-    }
+	// a disjunction A is implied by this iff some subformula of A is implied by this
+	FormulaMultiaryOr* disjunction = dynamic_cast<FormulaMultiaryOr*> ( conclusion );
+	if ( disjunction != NULL ) {
+		for ( subFormulas_t::const_iterator i = disjunction->subFormulas.begin(); i != disjunction->subFormulas.end(); ++i ) {
+			if ( this->implies(*i) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// this implies only literals, conjunctions and disjunctions
+	return false;
 }
 
 bool FormulaLiteral::implies(Formula* conclusion) const {
 
-    // check if the conclusion is a literal
-    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( conclusion );
-    if ( checkLiteral != NULL ) {
+	assert( conclusion != NULL );
 
-        return ( _literal.compare(checkLiteral->_literal) == 0 );
-    } else {
-        // TODO stimmt das auch for AND und OR?
-        // a literal doesn't imply anything differant than a literal
-        return false;
-    }
+	// a literal implies a literal only
+	FormulaLiteral* literal = dynamic_cast<FormulaLiteral*> ( conclusion );
+	if ( literal != NULL ) {
+		return _literal.compare( literal->_literal ) == 0;
+	} else {
+		return false;
+	}
 }

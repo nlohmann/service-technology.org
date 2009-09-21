@@ -2,7 +2,6 @@
 #define Formula_H_
 
 #include "settings.h"
-//#include <set>
 
 
 
@@ -59,8 +58,11 @@ class FormulaAssignment {
  */
 class Formula {
     public:
-        /// Destroys the given Formula and all its subformulas.
+        /// destroys the given formula
         virtual ~Formula() {};
+
+        /// destroys all subformulas of this formula
+        virtual void clear() {};
 
         /// copies and returns this Formula
         virtual Formula* getDeepCopy() const = 0;
@@ -86,14 +88,11 @@ class Formula {
         /// the clause gets removed as well
         virtual void removeLiteral(const string& literal) {};
 
-        /// returns a simplified version of this formula
-        virtual Formula* simplify() = 0;
+        /// simplifies the formula
+        virtual void simplify() {};
 
-        virtual void flatten() = 0;
-        virtual void merge() = 0;
-        virtual void clear() {};
+        /// returns true iff this formula implies the given formula
         virtual bool implies(Formula* conclusion) const = 0;
-
 };
 
 
@@ -114,7 +113,6 @@ class FormulaMultiary : public Formula {
         /// Type of the container holding all subformula of this multiary formula.
         typedef list<Formula*> subFormulas_t;
 
-    protected:
         /// Holds all subformulas of this multiary formula.
         subFormulas_t subFormulas;
 
@@ -133,14 +131,10 @@ class FormulaMultiary : public Formula {
             subFormulas.push_back(rhs);
         };
 
-        /// Destroys this FormulaMultiary and all its subformulas.
-        virtual ~FormulaMultiary() {
-            // WARNING remove later to avoid memory leaks
-            //for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
-            //    delete *i;
-            //}
-        };
+        /// destroys this FormulaMultiary
+        virtual ~FormulaMultiary() {};
 
+        /// destroys all subformulas of this FormulaMultiary
         virtual void clear() {
             for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
                 delete *i;
@@ -151,10 +145,6 @@ class FormulaMultiary : public Formula {
         virtual int size() const {
             return subFormulas.size();
         };
-
-        virtual Formula* getFront() {
-            return subFormulas.front();
-        }
 
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
@@ -174,7 +164,7 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         FormulaMultiaryAnd(Formula* sub) : FormulaMultiary(sub) {};
         FormulaMultiaryAnd(Formula* lhs, Formula* rhs) : FormulaMultiary(lhs, rhs) {};
 
-        /// Destroys this FormulaMultiaryAnd and all its subformulas. */
+        /// destroys this FormulaMultiaryAnd
         virtual ~FormulaMultiaryAnd() {};
 
         /// deep copies the formula
@@ -186,12 +176,16 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         /// returns the formula as a string
         virtual string asString() const;
 
-        /// Returns the merged equivalent to this formula.
-        //virtual FormulaMultiaryAnd* merge();
+        /// simplifies the formula
+        virtual void simplify();
 
-        virtual Formula* simplify();
-        virtual void flatten();
-        virtual void merge();
+        /// flattens this multiary formula
+        void flatten();
+
+        /// merge this multiary formula
+        void merge();
+
+        /// returns true iff this formula implies the given formula
         virtual bool implies(Formula* conclusion) const;
 };
 
@@ -207,7 +201,7 @@ class FormulaMultiaryOr : public FormulaMultiary {
         FormulaMultiaryOr(Formula* sub) : FormulaMultiary(sub) {};
         FormulaMultiaryOr(Formula* lhs, Formula* rhs) : FormulaMultiary(lhs, rhs) {};
 
-        /// Destroys this FormulaMultiaryOr and all its subformulas
+        /// destroys this FormulaMultiaryOr
         virtual ~FormulaMultiaryOr() {};
 
         /// returns a deep copy of this formula
@@ -219,22 +213,23 @@ class FormulaMultiaryOr : public FormulaMultiary {
         /// returns the formula as a string
         virtual string asString() const;
 
-        /// Returns the merged equivalent to this formula. Merging gets rid of
-        /// unnecessary nesting of subformulas. (a+(b+c)) becomes (a+b+c). The
-        /// caller is responsible for deleting the returned newly created formula.
-        //virtual FormulaMultiaryOr* merge();
+        /// simplifies the formula
+        virtual void simplify();
 
-        // TODO implement
-        virtual Formula* simplify();
-        virtual void flatten();
-        virtual void merge();
+        /// flattens this multiary formula
+        void flatten();
+
+        /// merge this multiary formula
+		void merge();
+
+		/// returns true iff this formula implies the given formula
         virtual bool implies(Formula* conclusion) const;
 };
 
 
 
 // ****************************************************************************
-// Literals and Constants
+// Literals
 // ****************************************************************************
 
 /**
@@ -272,78 +267,59 @@ class FormulaLiteral : public Formula {
             return 1;
         }
 
-        // TODO necessary?
-        /// returns a simplified version of this formula
-        virtual Formula* simplify() {
-        	return new FormulaLiteral(*this);
-        }
-
-        virtual void flatten() {};
-        virtual void merge() {};
-        // TODO implement for true and false
+        /// returns true iff this formula implies the given formula
         virtual bool implies(Formula* conclusion) const;
 };
 
 
-/**
- * Base class for all formulas that have a fixed value, i.e., a value that does
- * not depend on an assignment. This class exists, because FormulaTrue
- * and FormulaFalse need a common base class, so we can use them to
- * implement FormulaMultiary::value() uniformly for all multiary
- * formulas.
- */
-class FormulaFixed : public FormulaLiteral {
-    private:
-        /// Fixed truth value of this FormulaFixed.
-        bool _value;
-    public:
-        /// Creates a formula with a given fixed value and string reprensentation.
-        FormulaFixed(bool value, const string& asString) : FormulaLiteral(asString), _value(value) {};
 
-        /// Destroys this FormulaFixed.
-		virtual ~FormulaFixed() {};
-
-        /// returns a deep copy of this formula
-        virtual FormulaFixed* getDeepCopy() const {
-        	return new FormulaFixed(*this);
-        }
-
-        /// returns the prefixed value of this formula
-        virtual bool value(const FormulaAssignment& assignment) const {
-        	return _value;
-        }
-
-        // TODO necessary?
-        /// returns a simplified version of this formula
-        virtual Formula* simplify() {
-            return new FormulaFixed(*this);
-        }
-};
-
+// ****************************************************************************
+// Constants
+// ****************************************************************************
 
 /**
  * The constant formula 'TRUE'.
  */
-class FormulaTrue : public FormulaFixed {
+class FormulaTrue : public FormulaLiteral {
     public:
         /// basic constructor
-        FormulaTrue() : FormulaFixed(true, "TRUE") {};
+        FormulaTrue() : FormulaLiteral("TRUE") {};
 
         /// basic deconstructor
         virtual ~FormulaTrue() {};
+
+        /// returns a deep copy of this formula
+		virtual FormulaTrue* getDeepCopy() const {
+			return new FormulaTrue(*this);
+		}
+
+		/// returns the prefixed value of this formula
+		virtual bool value(const FormulaAssignment& assignment) const {
+			return true;
+		}
 };
 
 
 /**
  * The constant formula 'FALSE'.
  */
-class FormulaFalse : public FormulaFixed {
+class FormulaFalse : public FormulaLiteral {
     public:
         /// basic constructor
-        FormulaFalse() : FormulaFixed(false, "FALSE") {};
+        FormulaFalse() : FormulaLiteral("FALSE") {};
 
         /// basic deconstructor
         virtual ~FormulaFalse() {};
+
+        /// returns a deep copy of this formula
+		virtual FormulaFalse* getDeepCopy() const {
+			return new FormulaFalse(*this);
+		}
+
+		/// returns the prefixed value of this formula
+		virtual bool value(const FormulaAssignment& assignment) const {
+			return false;
+		}
 };
 
 
@@ -357,6 +333,11 @@ class FormulaFinal : public FormulaLiteral {
 
         /// basic deconstructor
         virtual ~FormulaFinal() {};
+
+        /// returns a deep copy of this formula
+		virtual FormulaFinal* getDeepCopy() const {
+			return new FormulaFinal(*this);
+		}
 };
 
 #endif

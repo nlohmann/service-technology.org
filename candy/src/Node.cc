@@ -118,13 +118,7 @@ unsigned int Node::computeEfficientSuccessors() {
     // simplify this node's formula
     DEBUG "      node " << getID() << " get a simplified formula" END
     DEBUG "      old formula: " << formula->asString() END
-    //Formula* oldFormula = formula;
-    //formula = formula->simplify();
-    //delete oldFormula;
-    formula->flatten();
-    //if ( formula->size() > 1 ) {
-        formula->merge();
-    //}
+    formula->simplify();
     DEBUG "      new formula: " << (formula != NULL ? formula->asString() : "NULL") END
 
     return minimalCost;

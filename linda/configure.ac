@@ -20,6 +20,9 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
 
+# check for diff (needed by testsuite)
+AC_PATH_PROG(DIFF, [diff], not found)
+
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 

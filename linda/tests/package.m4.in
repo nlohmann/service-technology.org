@@ -8,5 +8,6 @@ m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
 
 m4_define([GREP],                 [@GREP@])
+m4_define([DIFF],                 [wrap.sh @DIFF@])
 m4_define([LINDA],                [cover.sh @abs_top_builddir@/src/linda])
 

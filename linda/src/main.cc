@@ -94,9 +94,9 @@ void initialize_et_parser() {
 
 
 int main(int argc, char** argv) {
-	time_t start_time, end_time;
 
-	time(&start_time);
+	clock_t start_clock = clock();
+
 	/*--------------------------------------.
 	| 0. parse the command line parameters  |
 	`--------------------------------------*/
@@ -152,8 +152,7 @@ int main(int argc, char** argv) {
 
 	int bound = args_info.bound_arg;
 
-	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(&(net->finalCondition().formula()),bound);
-
+	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(net,&(net->finalCondition().formula()),bound);
 	std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> > systems;
 
 	if (args_info.verbose_flag) {
@@ -162,7 +161,7 @@ int main(int argc, char** argv) {
 		finalMarkingIt != fSet->partialMarkings.end();
 		++finalMarkingIt) {
 			std::cerr << "    ";
-			(*finalMarkingIt)->output();
+			(*finalMarkingIt)->output(std::cerr);
 		}
 	}
 
@@ -179,7 +178,7 @@ int main(int argc, char** argv) {
 
 			if (args_info.show_lp_flag) {
 				std::cout << "\nFinal marking:";
-				(*finalMarkingIt)->output();
+				(*finalMarkingIt)->output(std::cout);
 				XSE->output();
 			}
 		} else {
@@ -188,20 +187,22 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	delete ExtendedStateEquation::lines;
+	if (!args_info.output_given) { delete net; }
+
 	if (args_info.verbose_flag) {
 		std::cerr << PACKAGE << ": Number of lp systems: " << systems.size() << std::endl;
 	}
+
+
 
 	if (args_info.level_0_flag) {
 
 		std::cerr << PACKAGE << ": Minimum and maximum occurence of single events." << std::endl;
 
-		vector<EventTerm*>* etermvec = EventTerm::createBasicTermSet(net);
 
 		if (args_info.verbose_flag) {
-
-			std::cerr << PACKAGE << ": Number of basic terms: " << etermvec->size() << std::endl;
-
+			std::cerr << PACKAGE << ": Number of basic terms: " << NR_OF_EVENTS << std::endl;
 		}
 
 		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
@@ -210,11 +211,12 @@ int main(int argc, char** argv) {
 
 			std::cout << "\nFinal marking: ";
 
-			(*systemsIt).first->output();
+			(*systemsIt).first->output(std::cout);
 
-			for (vector<EventTerm*>::iterator it = etermvec->begin(); it != etermvec->end(); ++it) {
-				EventTermBound* b = (*systemsIt).second->evaluate((*it));
-				b->output(*it,args_info.show_terms_as_given_flag);
+			for (int i = 0; i < NR_OF_EVENTS; ++i) {
+				BasicTerm* bt = new BasicTerm(i);
+				EventTermBound* b = (*systemsIt).second->evaluate(bt);
+				b->output(bt,args_info.show_terms_as_given_flag);
 			}
 
 		}
@@ -243,7 +245,7 @@ int main(int argc, char** argv) {
 
 			std::cout << "\nFinal marking: ";
 
-			(*systemsIt).first->output();
+			(*systemsIt).first->output(std::cout);
 
 			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 				EventTermBound* b = (*systemsIt).second->evaluate((*it));
@@ -277,7 +279,7 @@ int main(int argc, char** argv) {
 
 			std::cout << "\nFinal marking: ";
 
-			(*systemsIt).first->output();
+			(*systemsIt).first->output(std::cout);
 
 			std::vector<EventTermConstraint*> maybes;
 			int holds = EventTermConstraint::is_true;
@@ -315,6 +317,8 @@ int main(int argc, char** argv) {
 
 		}
 
+		delete constraint_vec;
+
 	}
 
 
@@ -350,7 +354,7 @@ int main(int argc, char** argv) {
 
 				std::cout << "\nFinal marking: ";
 
-				(*systemsIt).first->output();
+				(*systemsIt).first->output(std::cout);
 
 				for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 					EventTermBound* b = (*systemsIt).second->evaluate((*it));
@@ -360,10 +364,8 @@ int main(int argc, char** argv) {
 			}
 
 		}
-
+		delete term_vec;
 	}
-
-	time(&end_time);
 
 	if (args_info.output_given) {
 
@@ -373,12 +375,16 @@ int main(int argc, char** argv) {
 		outputFile->output(file,args_info.show_terms_as_given_flag);
 
 		file.close();
+		delete outputFile;
+		delete net;
 		std::cerr << "\n" << PACKAGE << ": Output file " << args_info.output_arg << " created." << std::endl << std::endl;
 
 	}
 
 	if (args_info.verbose_flag) {
-		std::cerr << "\n" << PACKAGE << ": calculation took " << difftime( end_time,start_time) << " seconds" << std::endl << std::endl;
+		fprintf(stderr, "%s: runtime: %.2f sec\n", PACKAGE, (double(clock()) - double(start_clock)) / CLOCKS_PER_SEC);
+		fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+		system((string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	}
 
 }

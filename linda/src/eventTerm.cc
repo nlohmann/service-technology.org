@@ -8,17 +8,7 @@
 #include <eventTerm.h>
 
 
-std::vector<EventTerm*>* EventTerm::createBasicTermSet(pnapi::PetriNet* net) {
 
-	vector<EventTerm*>* result = new vector<EventTerm*>();
-	for (int i = 0; i < NR_OF_EVENTS; ++i) {
-		BasicTerm* b = new BasicTerm(i);
-		result->push_back(b);
-	}
-
-	return result;
-
-}
 
 MultiplyTerm::~MultiplyTerm() {
 	delete term;

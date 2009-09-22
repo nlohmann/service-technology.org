@@ -27,7 +27,6 @@ public:
 	virtual EventTerm* multiplyWith(int) = 0;
 	static int* termToMap(EventTerm*);
 	static std::string toPrettyString(EventTerm*);
-	static std::vector<EventTerm*>* createBasicTermSet(pnapi::PetriNet*);
 	virtual ~EventTerm() {}
 };
 

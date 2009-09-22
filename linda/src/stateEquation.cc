@@ -10,6 +10,10 @@
 /// the command line parameters
 extern gengetopt_args_info args_info;
 
+
+BinaryTree<const pnapi::Place*,std::pair<int*,REAL*> >* ExtendedStateEquation::lines = new BinaryTree<const pnapi::Place*,std::pair<int*,REAL*> >();
+
+
 bool ExtendedStateEquation::constructLP() {
 
 
@@ -47,44 +51,52 @@ bool ExtendedStateEquation::constructLP() {
 
 		const pnapi::Place* place = placesIt->getKey();
 
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(place)) != net->getInterfacePlaces().end()) {
-			continue;
+		int* transCol;
+		REAL* transVal;
+			int value = placesIt->getValue();
+
+			int number_of_transitions_for_this_place = place->getPresetArcs().size() + place->getPostsetArcs().size();
+
+		BinaryTreeNode<const pnapi::Place*,std::pair<int*,REAL*> >* line = lines->find(place);
+		if (line == 0) {
+
+			transCol = new int[number_of_transitions_for_this_place]();
+			transVal = new REAL[number_of_transitions_for_this_place]();
+
+			int tr = 0;
+
+			// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
+			for (set<pnapi::Arc *>::iterator pIt = place->getPresetArcs().begin(); pIt != place->getPresetArcs().end();
+			++pIt) {
+				pnapi::Transition& t = (*pIt)->getTransition();
+				// We add the transition, with the weight as a factor.
+
+				assert(tr < number_of_transitions_for_this_place);
+
+				transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
+				transVal[tr] = (*pIt)->getWeight();
+				++tr;
+			}
+
+			// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
+			for (set<pnapi::Arc *>::iterator pIt = place->getPostsetArcs().begin(); pIt != place->getPostsetArcs().end(); ++pIt) {
+				pnapi::Transition& t = (*pIt)->getTransition();
+
+				assert(tr < number_of_transitions_for_this_place);
+
+				// We add the transition, with the weight as a factor.
+				transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
+				transVal[tr] = -1 * (int) (*pIt)->getWeight();
+				++tr;
+			}
+
+
+			lines->insert(place,std::pair<int*,REAL*>(transCol,transVal),false);
+
+		} else {
+			transCol = line->value.first;
+			transVal = line->value.second;
 		}
-
-		int value = placesIt->getValue();
-
-		int number_of_transitions_for_this_place = place->getPresetArcs().size() + place->getPostsetArcs().size();
-
-		int transCol[number_of_transitions_for_this_place];
-		REAL transVal[number_of_transitions_for_this_place];
-
-		int tr = 0;
-
-		// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
-		for (set<pnapi::Arc *>::iterator pIt = place->getPresetArcs().begin(); pIt != place->getPresetArcs().end();
-		++pIt) {
-			pnapi::Transition& t = (*pIt)->getTransition();
-			// We add the transition, with the weight as a factor.
-
-			assert(tr < number_of_transitions_for_this_place);
-
-			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
-			transVal[tr] = (*pIt)->getWeight();
-			++tr;
-		}
-
-		// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
-		for (set<pnapi::Arc *>::iterator pIt = place->getPostsetArcs().begin(); pIt != place->getPostsetArcs().end(); ++pIt) {
-			pnapi::Transition& t = (*pIt)->getTransition();
-
-			assert(tr < number_of_transitions_for_this_place);
-
-			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
-			transVal[tr] = -1 * (int) (*pIt)->getWeight();
-			++tr;
-		}
-
 		int diffval = value;
 		int initialm = place->getTokenCount();
 		diffval -= initialm;
@@ -137,7 +149,7 @@ bool ExtendedStateEquation::constructLP() {
 	if (ret == INFEASIBLE) {
 		std::cout << "Final marking not reachable from initial marking:" << std::endl;
 		std::cout << "\t";
-		omega->output();
+		omega->output(std::cout);
 		return false;
 	}
 
@@ -188,13 +200,13 @@ EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 
 	ret = solve(lp);
 
-//	std::cout << "\t";
+	//	std::cout << "\t";
 
 	if (ret == UNBOUNDED) {
-//		std::cout << "unbounded <= ";
+		//		std::cout << "unbounded <= ";
 		bound->lowerBounded = false;
 	} else {
-//		std::cout << get_objective(lp) << " <= ";
+		//		std::cout << get_objective(lp) << " <= ";
 		bound->lowerBounded = true;
 		bound->lowerBound = (int) get_objective(lp);
 	}
@@ -206,10 +218,10 @@ EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 	ret = solve(lp);
 
 	if (ret == UNBOUNDED) {
-//		std::cout << " <= unbounded; ";
+		//		std::cout << " <= unbounded; ";
 		bound->upperBounded = false;
 	} else {
-//		std::cout << " <= " << get_objective(lp) << "; ";
+		//		std::cout << " <= " << get_objective(lp) << "; ";
 		bound->upperBounded = true;
 		bound->upperBound = (int) get_objective(lp);
 	}
@@ -219,5 +231,5 @@ EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 
 	return bound;
 
-//	std::cout << "\n";
+	//	std::cout << "\n";
 }

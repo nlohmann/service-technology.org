@@ -17,7 +17,7 @@ public:
 
 	static PartialMarking* merge(PartialMarking* m1,PartialMarking* m2);
 
-	void output();
+	void output(std::ostream&);
 	std::string toString();
 
 };
@@ -33,7 +33,7 @@ public:
 	void add(SetOfPartialMarkings* aSet);
 
 	static SetOfPartialMarkings* intersect(SetOfPartialMarkings* set1, SetOfPartialMarkings* set2);
-	static SetOfPartialMarkings* create(const pnapi::formula::Formula* const src, unsigned int bound);
+	static SetOfPartialMarkings* create(pnapi::PetriNet* net, const pnapi::formula::Formula* const src, unsigned int bound);
 
 	void output();
 

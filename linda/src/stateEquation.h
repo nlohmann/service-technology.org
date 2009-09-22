@@ -17,6 +17,7 @@
 
 class ExtendedStateEquation {
 public:
+	static BinaryTree<const pnapi::Place*,std::pair<int*,REAL*> >* lines;
 	lprec* lp;
 	pnapi::PetriNet* net;
 	PartialMarking* omega;

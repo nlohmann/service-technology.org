@@ -6,6 +6,6 @@ AC_HEADER_ASSERT
 
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES(Makefile)
-AC_CONFIG_SUBDIRS([../../bpel2owfn ../../candy ../../diane ../../fiona ../../linda ../../mia ../../owfn2bpel ../../pnapi ../../rachel ../../sayo ../../uml2owfn ../../wendy])
+AC_CONFIG_SUBDIRS([../../bpel2owfn ../../candy ../../diane ../../fiona ../../linda ../../marlene ../../mia ../../owfn2bpel ../../pnapi ../../rachel ../../rebecca ../../sayo ../../uml2owfn ../../wendy])
 
 AC_OUTPUT

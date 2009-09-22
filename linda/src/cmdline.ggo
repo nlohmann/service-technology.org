@@ -27,6 +27,10 @@ option "interactive" i
 
 section "Output options"
 
+option "quiet" q
+	"No output to stdout, stderr."
+	flag off
+
 option "output" o
   "Output results to file."
   string typestr="path"

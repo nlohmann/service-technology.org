@@ -93,6 +93,9 @@ void initialize_et_parser() {
 
 
 
+
+
+
 int main(int argc, char** argv) {
 
 	clock_t start_clock = clock();
@@ -102,6 +105,15 @@ int main(int argc, char** argv) {
 	`--------------------------------------*/
 
 	evaluateParameters(argc, argv);
+	if (args_info.quiet_flag) {
+
+		std::cerr.rdbuf(0);
+		std::cout.rdbuf(0);
+
+		args_info.verbose_flag = 0;
+
+	}
+
 
 	std::cerr << PACKAGE << ": Processing " << args_info.inputs[0] << ".\n";
 
@@ -188,6 +200,7 @@ int main(int argc, char** argv) {
 	}
 
 	delete ExtendedStateEquation::lines;
+
 	if (!args_info.output_given) { delete net; }
 
 	if (args_info.verbose_flag) {
@@ -382,9 +395,8 @@ int main(int argc, char** argv) {
 	}
 
 	if (args_info.verbose_flag) {
-		fprintf(stderr, "%s: runtime: %.2f sec\n", PACKAGE, (double(clock()) - double(start_clock)) / CLOCKS_PER_SEC);
-		fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-		system((string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+		std::cerr << PACKAGE << ": runtime: " << ((double(clock()) - double(start_clock)) / CLOCKS_PER_SEC) << " sec\n";
+		std::cerr << PACKAGE << ": memory consumption: "; system((string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	}
 
 }

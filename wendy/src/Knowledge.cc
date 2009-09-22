@@ -236,7 +236,9 @@ inline void Knowledge::closure(std::queue<FullMarking>& todo) {
         // check, if each sent message contained on the interface of this marking will ever be consumed
         if (args_info.smartSendingEvent_flag and not m->sentMessagesConsumed(todo.front().interface)) {
             is_sane = 0;
-            return;
+            if (not args_info.diagnose_given) {
+                return;
+            }
         }
 
         for (uint8_t i = 0; i < m->out_degree; ++i) {
@@ -478,7 +480,7 @@ void Knowledge::sequentializeReceivingEvents() {
 bool Knowledge::considerReceivingEvent(Label_ID label) const {
     assert(args_info.seqReceivingEvents_flag == true);
 
-    return consideredReceivingEvents.find(label) != consideredReceivingEvents.end();
+    return (consideredReceivingEvents.find(label) != consideredReceivingEvents.end());
 }
 
 
@@ -495,5 +497,5 @@ bool Knowledge::considerSendingEvent(Label_ID label) const {
     assert(args_info.smartSendingEvent_flag);
     assert(posSendEventsDecoded != NULL);
 
-    return posSendEventsDecoded[label - Label::first_send] == 1;
+    return (posSendEventsDecoded[label - Label::first_send] == 1);
 }

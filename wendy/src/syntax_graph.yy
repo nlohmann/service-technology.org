@@ -114,11 +114,8 @@ state:
         if (args_info.smartSendingEvent_flag or args_info.lf_flag) {
             /* current marking is representative */
             while (not currentSCC.empty()) {
-                /* last popped marking */
-                InnerMarking_ID poppedMarking;
-
                 /* get marking from current SCC */
-                poppedMarking = currentSCC.back();
+                InnerMarking_ID poppedMarking = currentSCC.back();
 
                 /* actually delete it from vector */
                 currentSCC.pop_back();

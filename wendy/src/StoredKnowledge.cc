@@ -650,8 +650,7 @@ void StoredKnowledge::fileHeader(std::ostream &file) {
         << static_cast<unsigned int>(Label::send_events) << " send, "
         << static_cast<unsigned int>(Label::receive_events) << " receive, "
         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-        << "\n  statistics:   " << seen.size() << " nodes"
-        << "\n}\n\n";
+        << "\n  statistics:   " << seen.size() << " nodes\n}\n\n";
 }
 
 /*!

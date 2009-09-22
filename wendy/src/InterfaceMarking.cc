@@ -216,7 +216,6 @@ bool InterfaceMarking::operator!= (const InterfaceMarking& other) const {
             return true;
         }
     }
-
     return false;
 }
 
@@ -226,7 +225,6 @@ bool InterfaceMarking::operator== (const InterfaceMarking& other) const {
             return false;
         }
     }
-
     return true;
 }
 
@@ -346,7 +344,6 @@ bool InterfaceMarking::unmarked() const {
             return false;
         }
     }
-
     return true;
 }
 

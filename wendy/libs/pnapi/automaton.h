@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "myio.h"
+#include "Output.h"
 
 
 namespace pnapi
@@ -22,7 +23,13 @@ namespace pnapi
     friend std::ostream & io::__dot::output(std::ostream &, const Automaton &);
 
   public:
-    enum Type { INPUT, OUTPUT, TAU };
+    enum Type 
+    { 
+      INPUT, 
+      OUTPUT, 
+      TAU, 
+      SYNCHRONOUS 
+    };
     /// standard constructor
     Automaton();
     /// constructor generating automaton from Petri net
@@ -55,13 +62,18 @@ namespace pnapi
     const std::set<State *> finalStates() const;
 
     /// prints the automaton to an STG file (Automaton => Petri net)
-    std::string printToSTG(std::vector<std::string> &) const;
+    void printToSTG(std::vector<std::string> &, util::Output &) const;
     /// returning a set of input labels (after PetriNet => Automaton)
     std::set<std::string> input() const;
     void addInput(std::string);
     /// returning a set of output labels (after PetriNet => Automaton)
     std::set<std::string> output() const;
     void addOutput(std::string);
+
+    /// sets all synchronous labels
+    void setSynchronousLabels(const std::set<std::string> &);
+    /// returns the set of all synchronous labels
+    std::set<std::string> getSynchronousLabels() const;
 
     static const unsigned int HASH_SIZE = 65535;
 
@@ -74,6 +86,8 @@ namespace pnapi
     std::set<std::string> input_;
     /// set of output labels
     std::set<std::string> output_;
+    /// set of all synchronous labels
+    std::set<std::string> labels_;
 
     /// mapping from transitions to strings (their label) [optional]
     std::map<Transition *, std::string> *edgeLabels_;
@@ -94,9 +108,6 @@ namespace pnapi
 
     /// deleting a state from the automaton
     void deleteState(State *);
-
-    void printToSTGRecursively(State *, std::ostringstream &,
-        std::map<State *, bool> &, std::vector<std::string> &) const;
 
   };
 

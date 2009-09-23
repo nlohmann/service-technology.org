@@ -20,6 +20,7 @@ using std::flush;
 #include "petrinet.h"
 #include "state.h"
 #include "util.h"
+#include "Output.h"
 
 namespace pnapi
 {
@@ -69,7 +70,7 @@ namespace pnapi
       switch((**t).getType())
       {
       case Node::INTERNAL:
-        (*edgeTypes_)[*t] = TAU;
+        (*edgeTypes_)[*t] = ((*t)->isSynchronized()) ? SYNCHRONOUS : TAU;
         break;
       case Node::INPUT:
         (*edgeTypes_)[*t] = INPUT;
@@ -149,6 +150,7 @@ namespace pnapi
   State & Automaton::createState()
   {
     State *s = new State(&counter_);
+    assert(s != NULL);
     states_.push_back(s);
     return *s;
   }
@@ -168,6 +170,7 @@ namespace pnapi
       if (states_[i]->name() == name)
         return *states_[i];
     State *s = new State(name);
+    assert(s != NULL);
     states_.push_back(s);
     return *s;
   }
@@ -185,6 +188,7 @@ namespace pnapi
   State & Automaton::createState(Marking &m)
   {
     State *s = new State(m, weights_, &counter_);
+    assert(s != NULL);
     states_.push_back(s);
     return *s;
   }
@@ -223,6 +227,8 @@ namespace pnapi
       addInput(label);
     if (type == OUTPUT)
       addOutput(label);
+    if (type == SYNCHRONOUS)
+      labels_.insert(label);
     return *e;
   }
 
@@ -234,6 +240,7 @@ namespace pnapi
    * will be initially marked and final states will be connected
    * disjunctive in the final condition.
    *
+   * \todo clean me!
    */
   PetriNet & Automaton::stateMachine() const
   {
@@ -279,6 +286,8 @@ namespace pnapi
         final = final.formula() || (*(state2place[states_[i]])) == 1;
     }
 
+    // map synchlabel : T -> {string}
+    std::map<Transition *, std::set<std::string> > synchlabel;
     // generate transitions from edges
     for(unsigned int i=0; i < edges_.size(); ++i)
     {
@@ -291,6 +300,11 @@ namespace pnapi
       case Automaton::OUTPUT:
         result->createArc(*t, *result->findPlace(edges_[i]->label()));
         break;
+      case Automaton::SYNCHRONOUS:
+      {
+        synchlabel[t].insert(edges_[i]->label());
+        break;
+      }
       default:
         break;
       }
@@ -302,9 +316,28 @@ namespace pnapi
       result->createArc(*t,*p);
     }
 
+    std::set<Transition *> transitions = result->getTransitions();
+    for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
+    {
+      // the easy way seems not to be working
+      // THIS WOULD BE THE EASY WAY: (*t)->setSynchronizeLabels(synchlabel[*t]);
+
+      // making a copy of all transitions and give them the labels
+      Transition &tt = result->createTransition("", synchlabel[*t]);
+      for (std::set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); f != (*t)->getPresetArcs().end(); f++)
+        result->createArc((*f)->getPlace(), tt, (*f)->getWeight());
+      for (std::set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); f != (*t)->getPostsetArcs().end(); f++)
+        result->createArc(tt, (*f)->getPlace(), (*f)->getWeight());
+
+      result->deleteTransition(**t);
+    }
+
     // generate final condition
     result->finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
 
+    // copy synchronous interface (how did this ever work before???)
+    result->setSynchronousLabels(labels_);
+    
     return *result;
   }
 
@@ -314,12 +347,11 @@ namespace pnapi
    * In basic service automata there is only one state which
    * is called the initial state.
    *
-   * \return    std::set<State *> result - set of initial states
+   * \return    result  set of initial states
    */
   const std::set<State *> Automaton::initialStates() const
   {
     std::set<State *> result;
-    result.clear();
     for (unsigned int i = 0; i < states_.size(); i++)
       if (states_[i]->isInitial())
         result.insert(states_[i]);
@@ -332,12 +364,11 @@ namespace pnapi
    * The final states are those which are flagged as final. You can trigger
    * this flag by calling State::final() on a state object.
    *
-   * \return    std::set<State *> result - set of final states
+   * \return    result - set of final states
    */
   const std::set<State *> Automaton::finalStates() const
   {
     std::set<State *> result;
-    result.clear();
     for (unsigned int i = 0; i < states_.size(); i++)
       if (states_[i]->isFinal())
         result.insert(states_[i]);
@@ -385,7 +416,7 @@ namespace pnapi
    * from Petri net. It's a recursive method which takes a State (named
    * start) and then tries to find its successors.
    *
-   * \param     State &start
+   * \param     start
    */
   void Automaton::dfs(State &start)
   {
@@ -467,112 +498,89 @@ namespace pnapi
    * \brief     creates a STG file of the graph
    * \param     edgeLabels a reference to a vector of strings containing the old
    *            label names from this graph
-   * \return    the filename of the created STG file
+   * \param     out a reference to the output class handleing the temporary file
    */
-  std::string Automaton::printToSTG(std::vector<std::string> &edgeLabels) const
+  void Automaton::printToSTG(std::vector<std::string> & edgeLabels, util::Output & out) const
   {
-    // build STG file name
-    std::string STGFileName = "AutomatonToPetrinet.stg";
-
     // create and fill stringstream for buffering graph information
-    std::map<State *, bool> visitedNodes; // visited nodes
-    State *rootNode = *initialStates().begin(); // root node
     std::ostringstream STGStringStream; // used as buffer for graph information
-
+    
     STGStringStream << ".state graph" << "\n";
-    printToSTGRecursively(rootNode, STGStringStream, visitedNodes, edgeLabels);
-    STGStringStream << ".marking {p" << rootNode->name() << "}" << "\n";
-    STGStringStream << ".end";
-
-
-    // create STG file, print header, transition information and then
-    // add buffered graph information
-    std::fstream STGFileStream(STGFileName.c_str(), std::ios_base::out |
-        std::ios_base::trunc | std::ios_base::binary);
-    if (!STGFileStream.good())
+    
+    // copy edges
+    for(unsigned int i = 0; i < edges_.size(); ++i)
     {
-      STGFileStream.close();
-      exit(1);
-    }
-    STGFileStream << ".model Labeled_Transition_System" << "\n";
-    STGFileStream << ".dummy";
-    for (int i = 0; i < (int)edgeLabels.size(); i++)
-    {
-        STGFileStream << " t" << i;
-    }
-    std::string STGGraphString = STGStringStream.str();
-    STGFileStream << "\n" << STGGraphString << std::endl;
-    STGFileStream.close();
-
-    return STGFileName;
-  }
-
-
-  /*!
-   * \brief     depth-first-search through the graph printing each node and
-   *            edge to the output stream
-   *
-   * \param     v current node in the iteration process
-   * \param     os output stream
-   * \param     visitedNodes[] array of bool storing the nodes that we have
-   *            looked at so far
-   */
-  void Automaton::printToSTGRecursively(State *v,
-      std::ostringstream &os, std::map<State *, bool> &visitedNodes,
-      std::vector<std::string> &edgeLabels) const
-  {
-    assert(v != NULL);
-    visitedNodes[v] = true;             // mark current node as visited
-
-    // TODO: possibly buggy because for every final node is "FINAL" added?
-    if (v->isFinal())
-    {
-      // each label is mapped to his position in edgeLabes
-      std::string currentLabel = "FINAL";
-      currentLabel += v->name();
-      int foundPosition = (int)edgeLabels.size();
-      edgeLabels.push_back(currentLabel);
-      os << "p" << v->name() << " t" << foundPosition << " p00" << std::endl;
-    }
-
-    // go through all edges
-    for (unsigned int i = 0; i < edges_.size(); i++)
-    {
-      Edge *element = edges_[i];
-      if (&element->source() != v)
-        continue;
-      State *vNext = &element->destination();
-
+      Edge * edge = edges_[i];
+      
       // build label vector:
       // each label is mapped to his position in edgeLabes
-      std::string currentLabel = element->label();
       int foundPosition = -1;
-      for (int i = 0; i < (int)edgeLabels.size(); i++)
+      for(int j = 0; j < (int)edgeLabels.size(); ++j)
       {
-          if (currentLabel == edgeLabels.at(i))
-          {
-              foundPosition = i;
-              break;
-          }
+        if (edge->label() == edgeLabels[j])
+        {
+            foundPosition = j;
+            break;
+        }
       }
       if (foundPosition == -1)
       {
           foundPosition = (int)edgeLabels.size();
-          edgeLabels.push_back(currentLabel);
+          edgeLabels.push_back(edge->label());
       }
-      assert(foundPosition >= 0);
-      assert(currentLabel == edgeLabels.at(foundPosition));
-
+      
       // print current transition to stream
-      os  << "p" << v->name() << " t" << foundPosition << " p"
-          << vNext->name() << std::endl;
-
-      // recursion
-      if ( vNext != v && visitedNodes.find(vNext) == visitedNodes.end())
+      STGStringStream  << "p" << edge->source().name() << " t" << foundPosition 
+                       << " p" << edge->destination().name() << "\n";
+    }
+    
+    // mark final states
+    for(unsigned int i = 0; i < states_.size(); ++i)
+    {
+      // TODO: possibly buggy because for every final node is "FINAL" added?
+      if (states_[i]->isFinal())
       {
-          printToSTGRecursively(vNext, os, visitedNodes, edgeLabels);
+        // each label is mapped to his position in edgeLabes
+        std::string currentLabel = "FINAL";
+        currentLabel += states_[i]->name();
+        int foundPosition = (int)edgeLabels.size();
+        edgeLabels.push_back(currentLabel);
+        STGStringStream << "p" << states_[i]->name() << " t" << foundPosition << " p00" << "\n";
       }
     }
+    
+    STGStringStream << ".marking {p" << (*initialStates().begin())->name() << "}" << "\n";
+    STGStringStream << ".end" << std::flush;
+
+
+    // create STG file, print header, transition information and then
+    // add buffered graph information
+    out.stream() << ".model Labeled_Transition_System" << "\n";
+    out.stream() << ".dummy";
+    for (int i = 0; i < (int)edgeLabels.size(); i++)
+    {
+      out.stream() << " t" << i;
+    }
+    std::string STGGraphString = STGStringStream.str();
+    out.stream() << "\n" << STGGraphString << std::endl;
+  }
+
+
+  /*!
+   * This method sets the synchronous labels of the automaton.
+   */
+  void Automaton::setSynchronousLabels(const std::set<std::string> & labels)
+  {
+    labels_ = labels;
+  }
+
+
+  /*!
+   * Returning the set of synchronous labels.
+   */
+  std::set<std::string> Automaton::getSynchronousLabels() const
+  {
+    return labels_;
   }
 
 

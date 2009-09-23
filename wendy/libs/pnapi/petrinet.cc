@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-08-05 02:07:21 +0200 (Mi, 05. Aug 2009) $
+ * \date    $Date: 2009-09-21 22:28:11 +0200 (Mo, 21. Sep 2009) $
  *
- * \version $Revision: 4516 $
+ * \version $Revision: 4748 $
  */
 
 #include "config.h"
@@ -156,7 +156,7 @@ namespace pnapi
     net_.transitions_.insert(&trans);
     updateTransitionLabels(trans);
 
-    net_.labels_.clear();
+    //net_.labels_.clear();
     net_.transitionsByLabel_.clear();
     
     for (set<Transition *>::iterator t = net_.synchronizedTransitions_.begin(); 
@@ -165,7 +165,7 @@ namespace pnapi
       for (set<string>::iterator l = (*t)->getSynchronizeLabels().begin(); 
                    l != (*t)->getSynchronizeLabels().end(); ++l)
       {
-        net_.labels_.insert(*l);
+        //net_.labels_.insert(*l);
         net_.transitionsByLabel_[*l].insert(*t);
       }
     }
@@ -456,9 +456,20 @@ namespace pnapi
    * 2.: Input and output places are connected appropriatly 
    *     (if an input and an output place name of the two nets match)
    *     or copied (without a prefix!).
-   * 3.: Unlabled transitions of #net are copied in this net; 
-   *     labeled Transitions  are merged with the appropiate
-   *     transitions of #net.
+   * 3.: Transitions are arranged by the following rules:
+   *     a) Labels, appearing in both this and the other net (from now
+   *     called "common labels"), will be synchronized; each transition 
+   *     not containing such a common label will be prefixed and copied.
+   *     b) If a transition t1 of this net and a transition t2 of the other
+   *     net share at least one label, a transition t' will be created in
+   *     the resulting net. The preset/postset of t' is the union of the
+   *     presets/postsets of t1 and t2. The Labels of t' is the difference
+   *     of the union of the labels of t1 and t2 and the intersection of 
+   *     their labels. Transitions, labeled with a "common label" but
+   *     without a matching transition in the other net are copied.
+   *     c) If there remains transitions in the resulting net with
+   *     "common labels", the will be "killed" by adding an new, unmarked
+   *     place to their preset. 
    * 
    */
   void PetriNet::compose(const PetriNet & net, const string & prefix,
@@ -575,99 +586,55 @@ namespace pnapi
 
     // ------------ STEP 3 -----------------------------
     
-    // iterate through this net's transitions
+    // arrange label sets
+    const set<string> & labels1 = labels_;
+    const set<string> & labels2 = net.getSynchronousLabels();
+    set<string> sharedLabels = util::setIntersection(labels1,labels2);
+    result.labels_ = util::setDifference(util::setUnion(labels1,labels2),sharedLabels);
+    
+    // sets of transitions to be merged
+    set<Transition*> mergeThis;
+    set<Transition*> mergeOther;
+    
+    // iterate through this net's transitions and copy transitions
     for (set<Transition *>::iterator t = getTransitions().begin(); 
             t != getTransitions().end(); ++t)
     {
-      if ((*t)->isSynchronized()) // if this transition is labeled
+      if ( (!(*t)->isSynchronized()) || // this transition is not labeled
+           (util::setIntersection((*t)->getSynchronizeLabels(), sharedLabels).empty()) ) // transition has no shared label
       {
-        set<Transition*> matchingTransitions; // transitions of #net
+        // create a prefixed transition in the resulting net
+        Transition & rt = result.createTransition(prefix+(*t)->getName(), (*t)->getSynchronizeLabels());
         
-        // check all labels
-        for(set<string>::iterator l = (*t)->getSynchronizeLabels().begin();
-               l != (*t)->getSynchronizeLabels().end(); ++l)
+        // copy preset arcs
+        for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+                f != (*t)->getPresetArcs().end(); ++f)
         {
-          try
-          {
-            for(set<Transition*>::iterator nt = net.getSynchronizedTransitions(*l).begin();
-                   nt != net.getSynchronizedTransitions(*l).end(); ++nt)
-            {
-              if ( (*t)->getSynchronizeLabels() != (*nt)->getSynchronizeLabels() )
-              {
-                // two transitions must share all labels or no label
-                string msg = "Labels of transitions " + (*t)->getName() 
-                           + " and " + (*nt)->getName() + " match partially";
-                throw exceptions::ComposeError(msg);
-              }
-              
-              matchingTransitions.insert(*nt);
-            }
-          }
-          catch (exceptions::UnknownTransitionError & e) { /* ignore */ }
+          result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
         }
         
-        if (matchingTransitions.empty())
+        // copy postset arcs
+        for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+                f != (*t)->getPostsetArcs().end(); ++f)
         {
-          // copy transition prefixed with its labels
-          Transition & rt = result.createTransition(prefix+(*t)->getName(), (*t)->getSynchronizeLabels());
-          
-          // copy preset arcs
-          for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
-                  f != (*t)->getPresetArcs().end(); ++f)
-          {
-            result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
-          }
-          
-          // copy postset arcs
-          for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
-                  f != (*t)->getPostsetArcs().end(); ++f)
-          {
-            result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
-          }
-        }
-        else
-        {
-          // merge transition with matching other transitions
-          for(set<Transition*>::iterator nt = matchingTransitions.begin();
-                 nt != matchingTransitions.end(); ++nt)
-          {
-            // create a new transition by merging this one with a matching transition
-            Transition & rt = result.createTransition((*t)->getName()+netPrefix+(*nt)->getName());
-              
-            // copy preset arcs
-            for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
-                    f != (*t)->getPresetArcs().end(); ++f)
-            {
-              result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
-            }
-            
-            // copy postset arcs
-            for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
-                    f != (*t)->getPostsetArcs().end(); ++f)
-            {
-              result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
-            }
-            
-            // copy #net's preset arcs
-            for (set<Arc *>::iterator f = (*nt)->getPresetArcs().begin(); 
-                    f != (*nt)->getPresetArcs().end(); ++f)
-            {
-              result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
-            }
-            
-            // copy #net's postset arcs
-            for (set<Arc *>::iterator f = (*nt)->getPostsetArcs().begin(); 
-                    f != (*nt)->getPostsetArcs().end(); ++f)
-            {
-              result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
-            }
-          }
+          result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
         }
       }
       else
       {
+        mergeThis.insert(*t);
+      }
+    }
+    
+    // iterate through #net's transitions and copy transitions
+    for (set<Transition *>::iterator t = net.getTransitions().begin(); 
+            t != net.getTransitions().end(); ++t)
+    {
+      if ( (!(*t)->isSynchronized()) || // this transition is not labeled
+          (util::setIntersection((*t)->getSynchronizeLabels(), sharedLabels).empty()) ) // transition has no shared label
+      {
         // create a prefixed transition in the resulting net
-        Transition & rt = result.createTransition(prefix+(*t)->getName());
+        Transition & rt = result.createTransition(netPrefix+(*t)->getName(), (*t)->getSynchronizeLabels());
         
         // copy preset arcs
         for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -683,82 +650,153 @@ namespace pnapi
           result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
         }
       }
+      else
+      {
+        mergeOther.insert(*t);
+      }
     }
     
-    // iterate through #net's transitions
-    for (set<Transition *>::iterator t = net.getTransitions().begin(); 
-            t != net.getTransitions().end(); ++t)
+    /// transitions without a partner
+    set<Transition*> lonelyTransitions1;
+    set<Transition*> lonelyTransitions2 = mergeOther;
+    
+    /* 
+     * Transitions of the other net are assumed as "lonely".
+     * If such a transition gets a partner, it is removed from this set.
+     * Own transitions are assumed as not "lonely". If such a transition
+     * remains without a partner, it is added to this set.
+     */ 
+    
+    /// transitions that must be killed
+    set<Transition*> doomedTransitions;
+    
+    /// merge matching synchronous transitions
+    for(set<Transition*>::iterator t1 = mergeThis.begin();
+          t1 != mergeThis.end(); ++t1)
     {
-      if ((*t)->isSynchronized()) // if this transition is labeled
+      bool stayLonely = true; // if t1 finds a partner
+      for(set<Transition*>::iterator t2 = mergeOther.begin();
+            t2 != mergeOther.end(); ++t2)
       {
-        // whether there exist a matching transition in this net
-        bool matchingTransition = false; 
-                
-        // check all labels
-        for(set<string>::iterator l = (*t)->getSynchronizeLabels().begin();
-               l != (*t)->getSynchronizeLabels().end(); ++l)
-        {
-          try
-          {
-            for(set<Transition*>::iterator nt = getSynchronizedTransitions(*l).begin();
-                   nt != getSynchronizedTransitions(*l).end(); ++nt)
-            {
-              if ( (*t)->getSynchronizeLabels() != (*nt)->getSynchronizeLabels() )
-              {
-                // two transitions must share all labels or no label
-                string msg = "Labels of transitions " + (*nt)->getName() 
-                           + " and " + (*t)->getName() + " match partially";
-                throw exceptions::ComposeError(msg);
-              }
-              
-              matchingTransition = true;
-            }
-          }
-          catch (exceptions::UnknownTransitionError & e){ /* ignore */ }
-        }
+        set<string> t1Labels = (*t1)->getSynchronizeLabels();
+        set<string> t2Labels = (*t2)->getSynchronizeLabels();
+        set<string> t12Labels = util::setIntersection(t1Labels, t2Labels); 
         
-        if (!matchingTransition) // if recent transition has no matching transition in this net
+        if(!t12Labels.empty()) // if t1 and t2 share at least one label
         {
-          // copy transition prefixed with its labels
-          Transition & rt = result.createTransition(netPrefix+(*t)->getName(), (*t)->getSynchronizeLabels());
+          set<string> labelUnion = util::setUnion(t1Labels, t2Labels);
+          set<string> rtLabels = util::setDifference(labelUnion, sharedLabels);
+          
+          // create new transition by merging
+          Transition & rt = result.createTransition((*t1)->getName() + netPrefix + (*t2)->getName(), rtLabels);
           
           // copy preset arcs
-          for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
-                  f != (*t)->getPresetArcs().end(); ++f)
+          for (set<Arc *>::iterator f = (*t1)->getPresetArcs().begin(); 
+                  f != (*t1)->getPresetArcs().end(); ++f)
           {
             result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
           }
           
           // copy postset arcs
-          for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
-                  f != (*t)->getPostsetArcs().end(); ++f)
+          for (set<Arc *>::iterator f = (*t1)->getPostsetArcs().begin(); 
+                  f != (*t1)->getPostsetArcs().end(); ++f)
           {
             result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
           }
+          
+          // copy #net's preset arcs
+          for (set<Arc *>::iterator f = (*t2)->getPresetArcs().begin(); 
+                  f != (*t2)->getPresetArcs().end(); ++f)
+          {
+            result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
+          }
+          
+          // copy #net's postset arcs
+          for (set<Arc *>::iterator f = (*t2)->getPostsetArcs().begin(); 
+                  f != (*t2)->getPostsetArcs().end(); ++f)
+          {
+            result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+          }
+          
+          // both transitions found a partner
+          stayLonely = false;
+          lonelyTransitions2.erase(*t2);
+          
+          // if one transition keeps a "common label"
+          if(util::setDifference(labelUnion, t12Labels) != rtLabels)
+          {
+            // then this transition has to be killed
+            doomedTransitions.insert(&rt);
+            
+            //TODO: partial matching may be handled different
+          }
         }
-        // else: do nothing; transitions already have been merged
       }
-      else // transition is not synchronized
-      {
-        // create a prefixed transition in the resulting net
-        Transition & rt = result.createTransition(netPrefix+(*t)->getName());
-        
-        // copy preset arcs
-        for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
-                f != (*t)->getPresetArcs().end(); ++f)
-        {
-          result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
-        }
-        
-        // copy postset arcs
-        for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
-                f != (*t)->getPostsetArcs().end(); ++f)
-        {
-          result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
-        }
-      }
+      if(stayLonely)
+        lonelyTransitions1.insert(*t1);
     }
     
+    // copy lonely transitions
+    for(set<Transition*>::iterator t = lonelyTransitions1.begin();
+          t != lonelyTransitions1.end(); ++t)
+    {
+      set<string> rtLabels = util::setDifference((*t)->getSynchronizeLabels(), sharedLabels);
+                
+      // create new transition by merging
+      Transition & rt = result.createTransition(prefix + (*t)->getName(), rtLabels);
+      
+      // copy preset arcs
+      for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+              f != (*t)->getPresetArcs().end(); ++f)
+      {
+        result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
+      }
+      
+      // copy postset arcs
+      for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+              f != (*t)->getPostsetArcs().end(); ++f)
+      {
+        result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+      }
+      
+      // this transition is dead
+      doomedTransitions.insert(&rt);
+    }
+    for(set<Transition*>::iterator t = lonelyTransitions2.begin();
+              t != lonelyTransitions2.end(); ++t)
+    {
+      set<string> rtLabels = util::setDifference((*t)->getSynchronizeLabels(), sharedLabels);
+                
+      // create new transition by merging
+      Transition & rt = result.createTransition(netPrefix + (*t)->getName(), rtLabels);
+      
+      // copy preset arcs
+      for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
+              f != (*t)->getPresetArcs().end(); ++f)
+      {
+        result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
+      }
+      
+      // copy postset arcs
+      for (set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); 
+              f != (*t)->getPostsetArcs().end(); ++f)
+      {
+        result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
+      }
+      
+      // this transition is dead
+      doomedTransitions.insert(&rt);
+    }
+    
+    // kill doomed transitions
+    for(set<Transition*>::iterator t = doomedTransitions.begin();
+          t != doomedTransitions.end(); ++t)
+    {
+      Place & p = result.createPlace();
+      result.createArc(p, **t);
+    }
+    
+
     /*!
      * \todo check me!
      */
@@ -767,7 +805,7 @@ namespace pnapi
 
     // overwrite this net with the resulting net
     *this = result;
-
+    
     /*assert(prefix != netPrefix);
 
     map<string, PetriNet *> nets;
@@ -817,33 +855,37 @@ namespace pnapi
 
   /*!
    */
-  PetriNet PetriNet::compose(const map<string, PetriNet *> & nets)
+  PetriNet PetriNet::composeByWiring(const map<string, PetriNet *> & nets)
   {
     PetriNet result;
 
     // create instance map
     typedef map<string, vector<PetriNet> > Instances;
     Instances instances;
+    
     for (map<string, PetriNet *>::const_iterator it = nets.begin();
-	 it != nets.end(); ++it)
+           it != nets.end(); ++it)
+    {
       instances[it->first].push_back(*it->second);
+    }
 
     // create wiring
     typedef map<Place *, LinkNode *> Wiring;
     Wiring wiring;
+    
     for (Instances::iterator it1 = instances.begin();
-	 it1 != instances.end(); ++it1)
-      {
-	string prefix = it1->first; assert(!prefix.empty());
-	PetriNet & net1 = *it1->second.begin();
+           it1 != instances.end(); ++it1)
+    {
+      string prefix = it1->first; assert(!prefix.empty());
+      PetriNet & net1 = *it1->second.begin();
 
-	for (Instances::iterator it2 = instances.begin();
-	     it2 != instances.end(); ++it2)
-	  {
-	    PetriNet & net2 = *it2->second.begin();
-	    wire(net1, net2, wiring);
-	  }
+      for (Instances::iterator it2 = instances.begin();
+            it2 != instances.end(); ++it2)
+      {
+        PetriNet & net2 = *it2->second.begin();
+        wire(net1, net2, wiring);
       }
+    }
 
     // create result net
     return result.createFromWiring(instances, wiring);
@@ -856,22 +898,27 @@ namespace pnapi
 		      map<Place *, LinkNode *> & wiring)
   {
     set<Place *> interface = net1.getInterfacePlaces();
+    
     for (set<Place *>::iterator it = interface.begin();
-	 it != interface.end(); ++it)
+          it != interface.end(); ++it)
+    {
+      Place * p1 = *it;
+      Place * p2 = net2.findPlace(p1->getName());
+      
+      if ( (p2 != NULL) && 
+           (p2->isComplementType(p1->getType())) )
       {
-	Place * p1 = *it;
-	Place * p2 = net2.findPlace(p1->getName());
-	if (p2 != NULL && p2->isComplementType(p1->getType()))
-	  {
-	    LinkNode * node1 = wiring[p1];
-	    if (node1 == NULL)
-	      wiring[p1] = node1 = new LinkNode(*p1, LinkNode::ANY);
-	    LinkNode * node2 = wiring[p2];
-	    if (node2 == NULL)
-	      wiring[p2] = node2 = new LinkNode(*p2, LinkNode::ANY);
-	    node1->addLink(*node2);
-	  }
+        LinkNode * node1 = wiring[p1];
+        if (node1 == NULL)
+          wiring[p1] = node1 = new LinkNode(*p1, LinkNode::ANY);
+        
+        LinkNode * node2 = wiring[p2];
+        if (node2 == NULL)
+          wiring[p2] = node2 = new LinkNode(*p2, LinkNode::ANY);
+        
+        node1->addLink(*node2);
       }
+    }
   }
 
 
@@ -1123,6 +1170,15 @@ namespace pnapi
 
 
   /*!
+   *
+   */
+  const set<Arc *> & PetriNet::getArcs() const
+  {
+    return arcs_;
+  }
+
+
+  /*!
    */
   const set<Transition *> & PetriNet::getSynchronizedTransitions() const
   {
@@ -1250,48 +1306,37 @@ namespace pnapi
     }
 
     std::map<Transition *, string> edgeLabels; ///< returning map
-    edgeLabels.clear();
-
-    for (set<Transition *>::const_iterator t = transitions_.begin();
-        t != transitions_.end(); t++)
+    
+    // get input labels
+    for(set<Place*>::iterator p = inputPlaces_.begin();
+          p != inputPlaces_.end(); ++p)
     {
-      switch ((*t)->getType())
+      for(set<Node*>::iterator t = (*p)->getPostset().begin();
+            t != (*p)->getPostset().end(); ++t)
       {
-      case Node::INPUT:
+        edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
+      }
+    }
+    
+    // get output labels
+    for(set<Place*>::iterator p = outputPlaces_.begin();
+          p != outputPlaces_.end(); ++p)
+    {
+      for(set<Node*>::iterator t = (*p)->getPreset().begin();
+            t != (*p)->getPreset().end(); ++t)
       {
-        set<Arc *> preset = (*t)->getPresetArcs();
-        for (set<Arc *>::const_iterator f = preset.begin();
-            f != preset.end(); f++)
-        {
-          if ((*f)->getPlace().getType() == Node::INPUT)
-          {
-            edgeLabels[*t] = (*f)->getPlace().getName();
-            break;
-          }
-        }
-        break;
+        edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
       }
-      case Node::OUTPUT:
-      {
-        set<Arc *> postset = (*t)->getPostsetArcs();
-        for (set<Arc *>::const_iterator f = postset.begin();
-            f != postset.end(); f++)
-        {
-          if ((*f)->getPlace().getType() == Node::OUTPUT)
-          {
-            edgeLabels[*t] = (*f)->getPlace().getName();
-            break;
-          }
-        }
-        break;
-      }
-      case Node::INTERNAL:
-      {
-        edgeLabels[*t] = "TAU";
-        break;
-      }
-      default: ;//assert(false);
-      }
+    }
+    
+    // get synchronous and TAU labels
+    for (set<Transition*>::iterator t = transitions_.begin();
+          t != transitions_.end(); ++t)
+    {
+      if((*t)->getType() != Node::INTERNAL)
+        continue;
+        
+      edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
     }
 
     return edgeLabels;
@@ -1337,7 +1382,7 @@ namespace pnapi
 
 
     // add (internal) places
-    prefixNodeNames(prefix);
+    prefixNodeNames(prefix, true); // prefix only internal nodes
     PlaceMapping placeMapping = copyPlaces(net, netPrefix);
 
     // merge final conditions
@@ -1594,11 +1639,31 @@ namespace pnapi
    * All Places and Transitions of the net are prefixed.
    *
    * \param   prefix  the prefix to be added
+   * \param   noInterface  whether interface places should not be prefixed
    */
-  PetriNet & PetriNet::prefixNodeNames(const string & prefix)
+  PetriNet & PetriNet::prefixNodeNames(const string & prefix, bool noInterface)
   {
-    for (set<Node *>::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
-      (*it)->prefixNameHistory(prefix);
+    if(noInterface)
+    {
+      for (set<Node *>::iterator it = nodes_.begin(); 
+            it != nodes_.end(); ++it)
+      {
+        Place * p = dynamic_cast<Place*>(*it);
+        if( (p != NULL) && // recent node is a place
+            ((p->getType() == Node::INPUT) || (p->getType() == Node::OUTPUT)) ) // and its an interface place
+          continue; // do not prefix this node
+        
+        (*it)->prefixNameHistory(prefix);
+      }
+    }
+    else
+    {
+      for (set<Node *>::iterator it = nodes_.begin(); 
+            it != nodes_.end(); ++it)
+      {
+        (*it)->prefixNameHistory(prefix);
+      }
+    }
     return *this;
   }
 
@@ -1677,55 +1742,96 @@ namespace pnapi
    */
   void PetriNet::normalize_classical()
   {
-    if (isNormal())
-      return;
-
-    std::set<Place *> input = getInputPlaces();
-    std::set<Place *> output = getOutputPlaces();
-
-    for (std::set<Place *>::const_iterator p = input.begin();
-        p != input.end(); p++)
+    // transitions may to synchronize
+    set<Transition*> candidates = synchronizedTransitions_;
+    // complement places generated during normalisation
+    set<Place*> complementPlaces;
+    
+    // fill candidates
+    for(set<Place*>::iterator p = inputPlaces_.begin();
+         p != inputPlaces_.end(); ++p)
     {
-      std::string name = (*p)->getName();
-
-      Place &intp = createPlace("normal_"+name);
-      Transition &intt = createTransition("t_"+name);
-      Place &comp = createPlace("comp_"+name);
-      comp.mark();
-
-      std::set<Arc *> postset = (*p)->getPostsetArcs();
-      for (std::set<Arc *>::const_iterator f = postset.begin();
-          f != postset.end(); f++)
+      for(set<Node*>::iterator t = (*p)->getPostset().begin();
+           t != (*p)->getPostset().end(); ++t)
       {
-        createArc(intp, (*f)->getTransition());
-        createArc((*f)->getTransition(), comp);
-        deleteArc(**f);
+        candidates.insert(static_cast<Transition*>(*t));
       }
-      createArc(**p, intt);
-      createArc(intt, intp);
-      createArc(comp, intt);
-
-      condition_ = condition_.formula() && comp == 1;
     }
-    for (std::set<Place *>::const_iterator p = output.begin();
-        p != output.end(); p++)
+    for(set<Place*>::iterator p = outputPlaces_.begin();
+         p != outputPlaces_.end(); ++p)
     {
-      std::string name = (*p)->getName();
-
-      Place &intp = createPlace("normal_"+name);
-      Transition &intt = createTransition("t_"+name);
-
-      std::set<Arc *> preset = (*p)->getPresetArcs();
-      for (std::set<Arc *>::const_iterator f = preset.begin();
-          f != preset.end(); f++)
+      for(set<Node*>::iterator t = (*p)->getPreset().begin();
+           t != (*p)->getPreset().end(); ++t)
       {
-        createArc((*f)->getTransition(), intp);
-        deleteArc(**f);
+        candidates.insert(static_cast<Transition*>(*t));
       }
-      createArc(intt, **p);
-      createArc(intp, intt);
     }
-    finalCondition() = finalCondition().formula() && formula::ALL_OTHER_PLACES_EMPTY;
+    
+    for(set<Transition*>::iterator t = candidates.begin();
+         t != candidates.end(); ++t)
+    {
+      if( ((*t)->isNormal()) || // already normal; nothing to do
+          ((*t)->getSynchronizeLabels().size() > 1) ) // can't normalize this transition
+        continue;
+      
+      // check neighbor arcs
+      set<Arc*> possiblyEvilArcs = util::setUnion((*t)->getPresetArcs(),(*t)->getPostsetArcs());
+      for(set<Arc*>::iterator a = possiblyEvilArcs.begin(); 
+           a != possiblyEvilArcs.end(); ++a)
+      {
+        if((*a)->getPlace().getType() == Node::INTERNAL)
+          continue;
+        // arcs reaching this line are evil
+        
+        Place & p = (*a)->getPlace();
+        if(p.getType() == Node::INPUT)
+        {
+          for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
+          {
+            stringstream ss;
+            ss << i;
+            
+            Place & np = createPlace("normal" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
+            Place & cp = createPlace("complement" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
+            cp.mark(1);
+            complementPlaces.insert(&cp);
+            Transition & nt = createTransition("t_in" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
+            
+            createArc(p, nt);
+            createArc(nt, np);
+            createArc(cp, nt);
+            createArc(np, **t);
+            createArc(**t, cp);
+          }
+        }
+        else
+        {
+          for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
+          {
+            stringstream ss;
+            ss << i;
+            
+            Place & np = createPlace("p" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
+            Transition & nt = createTransition("t_out" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
+            
+            createArc(nt, p);
+            createArc(np, nt);
+            createArc(**t, np);
+          }
+        }
+        
+        // remove arc
+        deleteArc(**a);
+      }
+    }
+
+    for(set<Place*>::iterator p = complementPlaces.begin();
+         p != complementPlaces.end(); ++p)
+    {
+      condition_ = condition_.formula() && ((**p) == 1);
+    }
+    
+    condition_ = condition_.formula() && formula::ALL_OTHER_PLACES_EMPTY;
   }
 
 

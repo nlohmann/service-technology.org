@@ -77,9 +77,19 @@ using namespace pnapi::parser::owfn;
 %%
 
 petrinet: 
-    { port_ = ""; }
+    { 
+      // clean up from previous parsing
+      port_ = "";
+      places_.clear();
+      synchronousLabels_.clear();
+      constrains_.clear();
+      placeSet_.clear();
+    }
     places_ports markings transitions
-    { pnapi_owfn_yynet.setConstraintLabels(constrains_); }
+    { 
+      pnapi_owfn_yynet.setConstraintLabels(constrains_); 
+      pnapi_owfn_yynet.setSynchronousLabels(synchronousLabels_);
+    }
   ;
 
 
@@ -235,19 +245,19 @@ port_list_new:
 synchronous:
     /* empty */ 
   | KEY_SYNCHRONOUS { labels_.clear(); checkLabels_ = false; } labels SEMICOLON
-    { pnapi_owfn_yynet.setSynchronousLabels(labels_); }
+    { synchronousLabels_ = labels_; }
   ;
 
 labels:
     node_name 
     { 
-      check(!(checkLabels_ && (pnapi_owfn_yynet.getSynchronousLabels().find(ident) == pnapi_owfn_yynet.getSynchronousLabels().end())),
+      check(!(checkLabels_ && (synchronousLabels_.find(ident) == synchronousLabels_.end())),
              "undeclared label");
       labels_.insert(std::string(ident)); 
     } 
   | labels COMMA node_name 
     {
-      check(!(checkLabels_ && (pnapi_owfn_yynet.getSynchronousLabels().find(ident) == pnapi_owfn_yynet.getSynchronousLabels().end())),
+      check(!(checkLabels_ && (synchronousLabels_.find(ident) == synchronousLabels_.end())),
              "undeclared label"); 
       labels_.insert(std::string(ident)); 
     } 

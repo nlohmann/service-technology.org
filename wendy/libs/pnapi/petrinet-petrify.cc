@@ -6,9 +6,10 @@
 #include "config.h"
 #include <cassert>
 
-#include <cstdio>
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <set>
 #include <sstream>
 #include <string>
@@ -16,13 +17,15 @@
 
 #include "automaton.h"
 #include "petrinet.h"
-#include "petrinet-petrify.h"
+#include "parser.h"
 #include "formula.h"
 #include "util.h"
+#include "Output.h"
 
 using std::cerr;
 using std::endl;
 using std::istringstream;
+using std::ifstream;
 using std::pair;
 using std::set;
 using std::string;
@@ -35,15 +38,20 @@ using namespace pnapi;
 /*!
  * The constructor transforming an automaton to a Petri net.
  */
-PetriNet::PetriNet(const Automaton &sa) :
-  observer_(*this)
+PetriNet::PetriNet(const Automaton &sa, std::string petrify) :
+  observer_(*this), pathToPetrify(petrify)
 {
+  util::Output out;
   std::vector<std::string> edgeLabels;
-  std::string fname = sa.printToSTG(edgeLabels);
+  
+  sa.printToSTG(edgeLabels, out);
+  
   std::set<std::string> input = sa.input();
   std::set<std::string> output = sa.output();
+  std::set<std::string> synchronous = sa.getSynchronousLabels();
 
-  createFromSTG(edgeLabels, fname, input, output);
+  createFromSTG(edgeLabels, out.name(), input, output, synchronous);
+  setSynchronousLabels(synchronous);
 }
 
 
@@ -65,13 +73,13 @@ string PetriNet::remap(string edge, vector<string> & edgeLabels)
     indexStream >> index;
 
 
-    return edgeLabels.at(index) + affix;
+    return edgeLabels[index] + affix;
 }
 
 
 
 /*!
- * \brief   creates a petri net from an STG file by overwriting the existing one
+ * \brief   creates a petri net from an STG file
  *
  * \param   fileName location of the STG file
  *
@@ -82,143 +90,120 @@ string PetriNet::remap(string edge, vector<string> & edgeLabels)
 void PetriNet::createFromSTG(vector<string> &edgeLabels,
                              const string &fileName,
                              std::set<std::string> &inputPlacenames,
-                             std::set<std::string> &outputPlacenames)
+                             std::set<std::string> &outputPlacenames,
+                             std::set<std::string> &synchronizeLabels)
 {
-#ifndef CONFIG_PETRIFY
-#define CONFIG_PETRIFY "not found"
-#endif
-    
   // preparing system call of petrify
   string pnFileName = fileName + ".pn"; // add .pn to the output file
-  string systemcall = string(CONFIG_PETRIFY) + " " + fileName +
+  string systemcall = string(pathToPetrify) + " " + fileName +
                       " -dead -ip -nolog -o " + pnFileName;
 
   // calling petrify if possible
-  if (string(CONFIG_PETRIFY) != "not found")
+  if (pathToPetrify != "not found")
   {
     int result = system(systemcall.c_str());
     assert(result == 0);
   }
 
   // parse generated file
-  pnapi_petrify_yyin = fopen(pnFileName.c_str(), "r");
-  if (pnapi_petrify_yyin == NULL)
+  ifstream ifs(pnFileName.c_str(), ifstream::in);
+  if (!ifs.good())
     return; // TODO: error!!!
-  pnapi_petrify_yyparse();
-  fclose(pnapi_petrify_yyin);
+  parser::petrify::Parser parser;
+  parser.parse(ifs);
+  ifs.close();
 
+  using parser::petrify::places_;
+  using parser::petrify::transitions_;
+  using parser::petrify::arcs_;
+  using parser::petrify::interface_;
+  using parser::petrify::initialMarked_;
 
-  /* ---------------------------
-   * BEGIN of STG2oWFN_init part
-   * ---------------------------
-   */
-
-  for (set<string>::iterator p = pnapi_petrify_places.begin(); p != pnapi_petrify_places.end(); p++)
+  // create places
+  for (set<string>::iterator p = places_.begin(); p != places_.end(); ++p)
   {
-    createPlace(*p);
-  }
-
-  // initially mark places
-  for (set<string>::iterator p = pnapi_petrify_initialMarked.begin(); p != pnapi_petrify_initialMarked.end(); p++)
-  {
-    findPlace(*p)->mark(1);
+    createPlace(*p, Node::INTERNAL, initialMarked_[*p]);
   }
 
   // create interface places out of dummy transitions
-  for (set<string>::iterator t = pnapi_petrify_interface.begin(); t != pnapi_petrify_interface.end(); t++)
+  for (set<string>::iterator t = interface_.begin(); t != interface_.end(); ++t)
   {
     string remapped = remap(*t, edgeLabels);
 
     if (remapped.substr(0,5) != "FINAL")
     {
-
       assert( remapped.find("/") == remapped.npos ); // petrify should not rename/create dummy transitions
 
-      do
+      if ( inputPlacenames.count(remapped) > 0 )
       {
-        // PRECONDITION: transitions are separated by ", "
-        string transitionName = remapped.substr( 0, remapped.find(",") );
-        remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( transitionName.size() + 2 ) : "";
-
-        string placeName = transitionName;
-        if ( inputPlacenames.count(transitionName) > 0 )
-        {
-          Place *inPlace = findPlace(placeName);
-          if (inPlace == NULL) inPlace = &createPlace(placeName, Node::INPUT);
-        }
-        else if ( outputPlacenames.count(transitionName) > 0 )
-        {
-          Place *outPlace = findPlace(placeName);
-          if (outPlace == NULL) outPlace = &createPlace(placeName, Node::OUTPUT);
-        }
-        else
-        {
-          //cerr << "possible error in createFromSTG: found transition without ! or ? as first symbol" << endl;
-        }
+        Place *inPlace = findPlace(remapped);
+        if (inPlace == NULL) 
+          createPlace(remapped, Node::INPUT);
       }
-      while ( remapped != "" );
+      else if ( outputPlacenames.count(remapped) > 0 )
+      {
+        Place *outPlace = findPlace(remapped);
+        if (outPlace == NULL) 
+          createPlace(remapped, Node::OUTPUT);
+      }
+      // else must be TAU or a synchronize label
     }
   }
 
-  for (set<string>::iterator t = pnapi_petrify_transitions.begin(); t != pnapi_petrify_transitions.end(); t++)
+  // create transitions
+  for (set<string>::iterator t = transitions_.begin(); t != transitions_.end(); ++t)
   {
-
     string remapped = remap(*t, edgeLabels);
 
     if (remapped.substr(0, 5) != "FINAL")
     {
       // create transition if necessary
       Transition * transition = findTransition("t" + remapped);
-      if (transition == NULL) transition = &createTransition("t" + remapped);
+      if (transition == NULL) 
+        transition = &createTransition("t" + remapped);
 
       // create arcs t->p
-      for (set<string>::iterator p = pnapi_petrify_arcs[*t].begin(); p != pnapi_petrify_arcs[*t].end(); p++)
+      for (set<string>::iterator p = arcs_[*t].begin(); p != arcs_[*t].end(); ++p)
       {
-        createArc( *transition, *findPlace(*p) );
+        createArc(*transition, *findPlace(*p));
       }
 
       // create arcs t->interface and interface->t
-      do
+      string placeName = remapped.substr( 0, remapped.find("/") );      // remove possible /
+
+      Place * place = findPlace(placeName);
+
+      if (inputPlacenames.count(placeName) > 0)
       {
-        // PRECONDITION: transitions are separated by ", "
-        string placeName = remapped.substr( 0, remapped.find(",") ); // take next placename
-        placeName = placeName.substr( 0, placeName.find("/") );      // remove possible /
-
-        Place * place = findPlace(placeName);
-//        assert(place != NULL);
-
-        if ( inputPlacenames.count(placeName) > 0 )
-        {
-          if (place == NULL) place = &createPlace(placeName, Node::INPUT);
-          createArc(*place, *transition);
-        }
-        else if ( outputPlacenames.count(placeName) > 0 )
-        {
-          if (place == NULL) place = &createPlace(placeName, Node::OUTPUT);
-          createArc(*transition, *place);
-        }
-        else
-        {
-          //cerr << "possible error in stg2owfn_init: found label without ! or ? as first symbol" << endl;
-        }
-
-        // remove first symbol (! or ?), placename (read above) and separators (", ") from remapped
-        remapped = (remapped.find(",") != remapped.npos) ? remapped.substr( remapped.find(",") + 2 ) : "";
+        if (place == NULL) 
+          place = &createPlace(placeName, Node::INPUT);
+        createArc(*place, *transition);
       }
-      while ( remapped != "" );
+      else if (outputPlacenames.count(placeName) > 0)
+      {
+        if (place == NULL) 
+          place = &createPlace(placeName, Node::OUTPUT);
+        createArc(*transition, *place);
+      }
+      else if (synchronizeLabels.count(placeName) > 0)
+      {
+        // this is not an interface place but a synchronize label
+        set<string> labelSet;
+        labelSet.insert(placeName);
+        transition->setSynchronizeLabels(labelSet);
+      }
+      // else it was a TAU transition
     }
   }
-
-
 
   // create arcs p->t
 
   // Create a map of string sets for final condition creation.
   map<string, set<string> > finalCondMap;
 
-  for (set<string>::iterator p = pnapi_petrify_places.begin(); p != pnapi_petrify_places.end(); p++)
+  for (set<string>::iterator p = places_.begin(); p != places_.end(); ++p)
   {
-    for (set<string>::iterator t = pnapi_petrify_arcs[*p].begin(); t != pnapi_petrify_arcs[*p].end(); t++)
+    for (set<string>::iterator t = arcs_[*p].begin(); t != arcs_[*p].end(); ++t)
     {
       string transitionName = remap(*t, edgeLabels);
 
@@ -234,34 +219,38 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
     }
   }
 
-
-  for (set<string>::iterator input = inputPlacenames.begin(); input != inputPlacenames.end(); input++)
+  // fill interface places not occurring in the automaton
+  for (set<string>::iterator input = inputPlacenames.begin(); 
+         input != inputPlacenames.end(); ++input)
     if (findPlace(*input) == NULL)
       createPlace(*input, Node::INPUT);
-  for (set<string>::iterator output = outputPlacenames.begin(); output != outputPlacenames.end(); output++)
+  for (set<string>::iterator output = outputPlacenames.begin(); 
+         output != outputPlacenames.end(); ++output)
     if (findPlace(*output) == NULL)
       createPlace(*output, Node::OUTPUT);
 
-
+  // initialize final condition
+  finalCondition() = false;
+  
   // For each transition found to be a final transition...
-  for (map<string, set<string> >::iterator transIt = finalCondMap.begin(); transIt != finalCondMap.end(); ++transIt)
+  for (map<string, set<string> >::iterator transIt = finalCondMap.begin(); 
+         transIt != finalCondMap.end(); ++transIt)
   {
-
     // Create a set for the places having this transition in their post set.
     set<Place *> nextTrans;
 
-    // For each place in the post set...
-    for (set<string>::iterator placesIt = (*transIt).second.begin(); placesIt != (*transIt).second.end(); ++placesIt)
+    // For each place in the preset...
+    for (set<string>::iterator placesIt = transIt->second.begin(); 
+           placesIt != transIt->second.end(); ++placesIt)
     {
-      // Insert this place in the post set.
+      // Insert this place in the preset.
       nextTrans.insert(findPlace(*placesIt));
     }
 
-    finalCondition() = false;
     pnapi::formula::Conjunction *fd = NULL;
     pnapi::formula::FormulaEqual *store = NULL;
     // create clause for the final condition
-    for (set<Place *>::iterator p = nextTrans.begin(); p != nextTrans.end(); p++)
+    for (set<Place *>::iterator p = nextTrans.begin(); p != nextTrans.end(); ++p)
     {
       if (fd == NULL)
       {
@@ -271,39 +260,45 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         }
         else
         {
-          fd = new pnapi::formula::Conjunction(*store, *new pnapi::formula::FormulaEqual(**p, 1));
+          pnapi::formula::FormulaEqual * tmpF = new pnapi::formula::FormulaEqual(**p, 1);
+          fd = new pnapi::formula::Conjunction(*store, *tmpF);
+          delete tmpF;
+          delete store;
+          store = NULL;
         }
       }
       else
       {
-        fd = new pnapi::formula::Conjunction(*fd, *new pnapi::formula::FormulaEqual(**p, 1));
+        pnapi::formula::FormulaEqual * tmpF1 = new pnapi::formula::FormulaEqual(**p, 1);
+        pnapi::formula::Conjunction * tmpF2 = new pnapi::formula::Conjunction(*fd, *tmpF1);
+        delete fd;
+        delete tmpF1;
+        fd = tmpF2;
       }
     }
     if (fd != NULL)
+    {
       finalCondition() = finalCondition().formula() || *fd;
+      delete fd;
+    }
     else
+    {
       if (store != NULL)
+      {
         finalCondition() = finalCondition().formula() || *store;
-
+        delete store;
+      }
+    }
   }
 
-  // All other places empty
-  set<const Place *> concerning = finalCondition().concerningPlaces();
-  set<const Place *> places;
-  for (set<Place *>::iterator p = getPlaces().begin();
-      p != getPlaces().end(); p++)
-    places.insert(const_cast<Place *>(*p));
-  set<const Place *> empty = util::setDifference(places, concerning);
-  for (set<const Place *>::iterator p = empty.begin(); p != empty.end(); p++)
-    finalCondition() = finalCondition().formula() && **p == 0;
-
-
-  /* ---------------------------
-   * END of STG2oWFN_init part
-   * ---------------------------
-   */
-
-  // cleaning up generated file
+  // make interface places empty
+  for(set<Place*>::iterator p = interfacePlaces_.begin();
+       p != interfacePlaces_.end(); ++p)
+  {
+    finalCondition() = finalCondition().formula() && (**p == 0); 
+  }
+ 
+  // cleaning up
+  parser.clean();
   remove(pnFileName.c_str());
-  remove(fileName.c_str());
 }

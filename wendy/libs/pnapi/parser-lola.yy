@@ -144,20 +144,18 @@ transitions:
 transition: 
     KEY_TRANSITION node_name 
     { 
-      check(!pnapi_lola_yynet.containsNode(ident), "node name already used");
+      check(!pnapi_lola_yynet.containsNode(nodeName_.str()), "node name already used");
       transition_ = & pnapi_lola_yynet.createTransition(nodeName_.str()); 
     }
     KEY_CONSUME 
     { 
       target_ = (Node**)(&transition_); source_ = (Node**)(&place_); 
-      placeSet_.clear();
       placeSetType_ = true;
     } 
     arcs SEMICOLON
     KEY_PRODUCE 
     { 
       source_ = (Node**)(&transition_); target_ = (Node**)(&place_); 
-      placeSet_.clear();
       placeSetType_ = false;
     }
     arcs SEMICOLON 
@@ -174,11 +172,18 @@ arc:
     {
       place_ = places_[nodeName_.str()];
       check(place_ != 0, "unknown place");
-      check(placeSet_.find(place_) == placeSet_.end(), placeSetType_ ? "place already in preset" : "place already in postset");
-      check(!(placeSetType_ && (place_->getType() == Place::OUTPUT)), "output places are not allowed in preset");
-      check(!(!placeSetType_ && (place_->getType() == Place::INPUT)), "input places are not allowed in postset");
+
+      Arc * a = pnapi_lola_yynet.findArc(**source_, **target_);
+      if(a != NULL)
+      {
+        a->setWeight(a->getWeight() + $3);
+      }
+      else
+      {
+        check(!(placeSetType_ && (place_->getType() == Place::OUTPUT)), "output places are not allowed in preset");
+        check(!(!placeSetType_ && (place_->getType() == Place::INPUT)), "input places are not allowed in postset");
       
-      pnapi_lola_yynet.createArc(**source_, **target_, $3);
-      placeSet_.insert(place_);
+        pnapi_lola_yynet.createArc(**source_, **target_, $3);
+      }
     }
   ;

@@ -65,6 +65,8 @@ namespace pnapi
       std::map<std::string, Place*> places_;
       /// recently read transition
       Transition* transition_;
+      /// cache of synchronous labels
+      std::set<std::string> synchronousLabels_;
       /// all purpose place pointer
       Place* place_;
       /// target of an arc
@@ -172,9 +174,7 @@ namespace pnapi
       std::stringstream nodeName_;
       /// read capacity
       int capacity_;
-      /// precet/postset for fast checks
-      set<Place*> placeSet_;
-      /// preset/postset label for parse exception
+      /// whether reading preset or postset places
       bool placeSetType_;
       
       
@@ -202,7 +202,6 @@ namespace pnapi
         ident.clear();
         places_.clear();
         nodeName_.clear();
-        placeSet_.clear();
 
         return pnapi_lola_yynet;
       }
@@ -459,6 +458,7 @@ namespace pnapi
       std::vector<std::string> identlist;
       std::set<std::string> input_;
       std::set<std::string> output_;
+      std::set<std::string> synchronous_;
 
       State *state_;
       bool final_;
@@ -466,6 +466,7 @@ namespace pnapi
       std::vector<unsigned int> succState_;
       std::vector<std::string> succLabel_;
       std::vector<Automaton::Type> succType_;
+      std::map<Transition *, std::set<std::string> > synchlabel;
 
       State *edgeState_;
       std::string edgeLabel_;
@@ -493,6 +494,9 @@ namespace pnapi
         sa2sm = false;
         sa::parse();
 
+        // copy synchronous interface
+        pnapi_sa_yyautomaton.setSynchronousLabels(synchronous_);
+        
         // clean up global variables
         states_.clear();
 
@@ -502,9 +506,7 @@ namespace pnapi
       const PetriNet & Parser::parseSA2SM(std::istream &is)
       {
         Condition final;
-        Condition empty;
         final = false;
-        empty = true;
 
         stream = &is;
 
@@ -515,26 +517,69 @@ namespace pnapi
         sa2sm = true;
         sa::parse();
 
-        std::set<Place *> places = pnapi_sa_yynet.getPlaces();
         for (int i = 0; i < (int) finalPlaces_.size(); i++)
         {
           final = final.formula() || *finalPlaces_[i] == 1;
-          places.erase(finalPlaces_[i]);
         }
-        for (std::set<Place *>::iterator p = places.begin(); p != places.end(); p++)
-          empty = empty.formula() && **p == 0;
 
-        pnapi_sa_yynet.finalCondition() = final.formula() && empty.formula();
-
+        pnapi_sa_yynet.finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
+        pnapi_sa_yynet.setSynchronousLabels(synchronous_);
+        
         // clean up global variables
         label2places_.clear();
         places_.clear();
         finalPlaces_.clear();
+        synchlabel.clear();
 
         return pnapi_sa_yynet;
       }
 
     } /* namespace sa */
+    
+    namespace petrify
+    {
+      std::set<string> transitions_;
+      std::set<string> places_;
+      std::map<string, unsigned int> initialMarked_;
+      std::set<string> interface_;
+      std::map<string, set<string> > arcs_;
+      std::string ident;
+      std::string ident2; // backup
+      std::set<string> tempNodeSet_;
+      bool in_marking_list = false;
+      bool in_arc_list = false;
+      
+      /*!
+       * \brief Constructor
+       */
+      Parser::Parser()
+      {
+      }
+      
+      void Parser::parse(istream & is)
+      {
+        // assign lexer input stream
+        stream = &is;
+
+        // reset line counter
+        line = 1;
+        
+        // call the parser
+        petrify::parse();
+      }
+      
+      void Parser::clean()
+      {
+        transitions_.clear();
+        places_.clear();
+        initialMarked_.clear();
+        interface_.clear();
+        arcs_.clear();
+        in_marking_list = false;
+        in_arc_list = false;
+        tempNodeSet_.clear();
+      }
+    } /* namespace petrify */
 
   } /* namespace parser */
 

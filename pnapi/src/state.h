@@ -38,11 +38,11 @@ namespace pnapi
     State(const unsigned int);
     /// standard constructor service automaton
     State(Marking &m, std::map<const Place *, unsigned int> *,
-        unsigned int * = NULL);
+        unsigned int &);
     /// standard copy constructor
     State(const State &s);
     /// standard destructor
-    virtual ~State() {}
+    ~State();
 
     /// method which returns the state's name
     const unsigned int name() const;
@@ -72,6 +72,10 @@ namespace pnapi
     const unsigned int hashValue();
     /// returns the size of the represented marking
     const unsigned int size() const;
+    
+    /// copy a state from one automaton to another one
+    static State * copy(const State &, PetriNet* = NULL, 
+                        std::map<const Place*, const Place*>* = NULL);
 
   private:
     /// the state's name

@@ -303,6 +303,5 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
   }
  
   // cleaning up
-  parser.clean();
   remove(pnFileName.c_str());
 }

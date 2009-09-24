@@ -36,6 +36,8 @@ namespace pnapi
     Automaton(PetriNet &);
     /// standard copy constructor
     Automaton(const Automaton &);
+    /// "=" operator
+    Automaton & operator=(const Automaton &);
     /// standard destructor
     virtual ~Automaton();
 
@@ -54,7 +56,7 @@ namespace pnapi
     Edge & createEdge(State &, State &, const std::string, Type = TAU);
 
     /// creates a state machine from automaton
-    PetriNet & stateMachine() const;
+    PetriNet stateMachine() const;
 
     /// returning a set of states with no preset
     const std::set<State *> initialStates() const;

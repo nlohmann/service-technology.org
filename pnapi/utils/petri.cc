@@ -528,6 +528,17 @@ int main(int argc, char** argv) {
             }
         }
     }
+    
+    /**********
+    * CLEANUP *
+    **********/
+    for (unsigned int i = 0; i < objects.size(); ++i) {
+      if(objects[i].net != NULL) {
+        delete (objects[i].net);
+      } else {
+        delete (objects[i].sa);
+      }
+    }
 
 
     return EXIT_SUCCESS;

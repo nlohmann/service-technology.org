@@ -211,6 +211,7 @@ namespace pnapi
 
   void ComponentObserver::initializeNodeNameHistory(Node & node)
   {
+    /*
     deque<string> history = node.getNameHistory();
     deque<string>::iterator it = history.begin();
     //for (deque<string>::iterator it = history.begin(); it != history.end();
@@ -218,8 +219,16 @@ namespace pnapi
     {
       assert((net_.nodesByName_.find(*it))->second == &node ||
 	     net_.nodesByName_.find(*it) == net_.nodesByName_.end());
+      
       net_.nodesByName_[*it] = &node;
     }
+    //*/
+    
+    string name = node.getName();
+    assert( (net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
+            ((net_.nodesByName_.find(name))->second == &node) );
+    
+    net_.nodesByName_[name] = &node;
   }
 
 

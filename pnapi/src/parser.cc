@@ -64,15 +64,15 @@ namespace pnapi
       /// mapping of names to places
       std::map<std::string, Place*> places_;
       /// recently read transition
-      Transition* transition_;
+      Transition* transition_ = NULL;
       /// cache of synchronous labels
       std::set<std::string> synchronousLabels_;
       /// all purpose place pointer
-      Place* place_;
+      Place* place_ = NULL;
       /// target of an arc
-      Node * * target_;
+      Node * * target_ = NULL;
       /// source of an arc
-      Node * * source_;
+      Node * * source_ = NULL;
       /// converts NUMBER and IDENT in string
       std::stringstream nodeName_;
       /// type of recently read places
@@ -88,7 +88,7 @@ namespace pnapi
       /// whether read marking is the initial marking or a final marking
       bool markInitial_;
       /// pointer to a final marking
-      Marking* finalMarking_;
+      Marking* finalMarking_ = NULL;
       /// whether pre- or postset is read
       bool placeSetType_;
       /// precet/postset for fast checks
@@ -112,6 +112,23 @@ namespace pnapi
       {
       }
       
+      /*!
+       * \brief Destructor
+       * \note  Just used to call clean() automaticly
+       */
+      Parser::~Parser()
+      {
+        clean();
+      }
+      
+      /*!
+       * \brief Overwrites read net with empty net to free memory.
+       */
+      void Parser::clean()
+      {
+        pnapi_owfn_yynet = PetriNet();
+      }
+      
       const PetriNet & Parser::parse(istream & is)
       {
         // assign lexer input stream
@@ -128,6 +145,10 @@ namespace pnapi
         // clean up global variables
         ident.clear();
         places_.clear();
+        transition_ = NULL;
+        synchronousLabels_.clear();
+        place_ = NULL;
+        source_ = target_ = NULL;
         nodeName_.clear();
         labels_.clear();
         constrains_.clear();
@@ -163,13 +184,13 @@ namespace pnapi
       /// mapping of names to places
       map<std::string, Place*> places_;
       /// recently read transition
-      Transition* transition_;
+      Transition* transition_ = NULL;
       /// all purpose place pointer
-      Place* place_;
+      Place* place_ = NULL;
       /// target of an arc
-      Node * * target_;
+      Node * * target_ = NULL;
       /// source of an arc
-      Node * * source_;
+      Node * * source_ = NULL;
       /// converts NUMBER and IDENT in string
       std::stringstream nodeName_;
       /// read capacity
@@ -183,6 +204,23 @@ namespace pnapi
        */
       Parser::Parser()
       {
+      }
+      
+      /*!
+       * \brief Destructor
+       * \note  Just used to call clean() automaticly
+       */
+      Parser::~Parser()
+      {
+        clean();
+      }
+      
+      /*!
+       * \brief Overwrites read net with empty net to free memory.
+       */
+      void Parser::clean()
+      {
+        pnapi_lola_yynet = PetriNet();
       }
       
       const PetriNet & Parser::parse(istream & is)
@@ -201,6 +239,9 @@ namespace pnapi
         // clean up global variables
         ident.clear();
         places_.clear();
+        transition_ = NULL;
+        place_ = NULL;
+        source_ = target_ = NULL;
         nodeName_.clear();
 
         return pnapi_lola_yynet;
@@ -554,6 +595,15 @@ namespace pnapi
        */
       Parser::Parser()
       {
+      }
+      
+      /*!
+       * \brief Destructor
+       * \note  Just used to call clean() automaticly
+       */
+      Parser::~Parser()
+      {
+        clean();
       }
       
       void Parser::parse(istream & is)

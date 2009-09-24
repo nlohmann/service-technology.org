@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-08-04 19:49:59 +0200 (Di, 04. Aug 2009) $
+ * \date    \$Date: 2009-09-24 04:18:37 +0200 (Do, 24. Sep 2009) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 4512 $
+ * \version \$Revision: 4756 $
  *
  * \ingroup petrinet
  */
@@ -402,7 +402,7 @@ unsigned int PetriNet::reduce_rule_3p()
     
     // get a transition of the preset
     Node* preTransition = *((*p1)->getPreset().begin());
-    if(preTransition != 0)
+    if(preTransition != NULL)
     {
       for (set<Node*>::iterator p2 = preTransition->getPostset().begin(); 
            p2 != preTransition->getPostset().end(); ++p2)
@@ -460,7 +460,7 @@ unsigned int PetriNet::reduce_rule_3p()
   }
   
   // STEP 3: remove obsolete places
-  unsigned int result=0;
+  unsigned int result=NULL;
   for (set<Place*>::iterator p1 = obsoletePlaces.begin();
        p1 != obsoletePlaces.end(); ++p1)
   {
@@ -512,7 +512,7 @@ unsigned int PetriNet::reduce_rule_3t()
     
     // get a place of the preset
     Node* prePlace = *((*t1)->getPreset().begin());
-    if(prePlace != 0)
+    if(prePlace != NULL)
     {
       for (set<Node*>::iterator t2 = prePlace->getPostset().begin(); 
            t2 != prePlace->getPostset().end(); ++t2)
@@ -531,7 +531,7 @@ unsigned int PetriNet::reduce_rule_3t()
     {
       // get a place of the postset
       Node* postPlace = *((*t1)->getPostset().begin());
-      if(postPlace != 0)
+      if(postPlace != NULL)
       {
         for (set<Node*>::iterator t2 = postPlace->getPreset().begin(); 
              t2 != postPlace->getPreset().end(); ++t2)
@@ -689,7 +689,7 @@ unsigned int PetriNet::reduce_rule_4()
     {
       int weight = (*a)->getWeight();
       Arc* a2 = findArc((*a)->getSourceNode(),*p1);
-      if(a2!=0)
+      if(a2 != NULL)
       {
         weight += a2->getWeight();
         deleteArc(*a2);
@@ -1387,7 +1387,7 @@ unsigned int PetriNet::reduce_rule_8()
             a1 != (*t)->getPresetArcs().end(); ++a1)
       {
         Arc* a2 = findArc((*a1)->getSourceNode(),(**t0));
-        if ( (a2 == 0) || // precondition 4 
+        if ( (a2 == NULL) || // precondition 4 
              (a2->getWeight() < (*a1)->getWeight()) ) //precondition 5
         {
           precond45 = true;
@@ -1711,7 +1711,7 @@ unsigned int PetriNet::reduce_identical_places()
     Node* preTransition = *((*p1)->getPreset().begin());
     
     // test for null-pointer
-    if(preTransition != 0)
+    if(preTransition != NULL)
     {
       // check its postset
       for (set<Node*>::iterator p2 = preTransition->getPostset().begin(); 
@@ -1761,7 +1761,7 @@ unsigned int PetriNet::reduce_identical_places()
       Node* postTransition = *((*p1)->getPostset().begin());
       
       // check for null-pointer
-      if(postTransition != 0)
+      if(postTransition != NULL)
       {
         for (set<Node*>::iterator p2 = postTransition->getPreset().begin(); 
               p2 != postTransition->getPreset().end(); ++p2)
@@ -1896,7 +1896,7 @@ unsigned int PetriNet::reduce_identical_transitions()
     Node* prePlace = *((*t1)->getPreset().begin());
     
     // check for null-pointer
-    if(prePlace != 0)
+    if(prePlace != NULL)
     {
       for (set<Node*>::iterator t2 = prePlace->getPostset().begin(); 
             t2 != prePlace->getPostset().end(); ++t2)
@@ -1942,7 +1942,7 @@ unsigned int PetriNet::reduce_identical_transitions()
       Node* postPlace = *((*t1)->getPostset().begin());
       
       // check for null-pointer
-      if(postPlace != 0)
+      if(postPlace != NULL)
       {
         for (set<Node*>::iterator t2 = postPlace->getPreset().begin(); 
               t2 != postPlace->getPreset().end(); ++t2)

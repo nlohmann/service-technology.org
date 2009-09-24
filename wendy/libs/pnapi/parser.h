@@ -248,6 +248,11 @@ namespace pnapi
       {
       public:
 	      Parser();
+	      /// used to call clean() automaticly
+	      ~Parser();
+	      
+	      /// cleans global net
+	      void clean();
 	      
 	      /// parses stream contents with the associated parser
         const PetriNet & parse(std::istream &);
@@ -313,6 +318,11 @@ namespace pnapi
       {
       public:
         Parser();
+        /// used to call clean() automaticly
+        ~Parser();
+        
+        /// cleans global net
+        void clean();
         
         /// parses stream contents with the associated parser
         const PetriNet & parse(std::istream &);
@@ -544,6 +554,8 @@ namespace pnapi
       {
       public:
         Parser();
+        /// used to call clean() automaticly
+        ~Parser();
         
         /// parses stream contents with the associated parser
         void parse(std::istream &);

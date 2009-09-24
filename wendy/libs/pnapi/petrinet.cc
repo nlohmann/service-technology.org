@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-09-21 22:28:11 +0200 (Mo, 21. Sep 2009) $
+ * \date    $Date: 2009-09-24 04:18:37 +0200 (Do, 24. Sep 2009) $
  *
- * \version $Revision: 4748 $
+ * \version $Revision: 4756 $
  */
 
 #include "config.h"
@@ -211,6 +211,7 @@ namespace pnapi
 
   void ComponentObserver::initializeNodeNameHistory(Node & node)
   {
+    /*
     deque<string> history = node.getNameHistory();
     deque<string>::iterator it = history.begin();
     //for (deque<string>::iterator it = history.begin(); it != history.end();
@@ -218,8 +219,16 @@ namespace pnapi
     {
       assert((net_.nodesByName_.find(*it))->second == &node ||
 	     net_.nodesByName_.find(*it) == net_.nodesByName_.end());
+      
       net_.nodesByName_[*it] = &node;
     }
+    //*/
+    
+    string name = node.getName();
+    assert( (net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
+            ((net_.nodesByName_.find(name))->second == &node) );
+    
+    net_.nodesByName_[name] = &node;
   }
 
 

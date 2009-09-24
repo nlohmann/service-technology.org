@@ -10,6 +10,16 @@ AM_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
 
+# check for standard programs needed to compile
+AM_MISSING_PROG(GENGETOPT, gengetopt)
+
+# store the SVN revision number
+AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
+AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
+
+# search for required tools
+AC_PATH_PROG(LOLA, [lola-statespace], [])
+
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,
   AS_HELP_STRING([--enable-pnapi],[use installed Petri Net API (disabled by default)]),
@@ -41,3 +51,12 @@ AC_TYPE_UINT32_T
 AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile])
 
 AC_OUTPUT
+
+# display a warning in case a required tool has not been found
+if test "${LOLA}" = ""; then
+  echo
+  echo "WARNING: Not all required tools have been found. Please read file"
+  echo "         REQUIREMENTS and edit the file src/wendy.conf before"
+  echo "         using or installing Wendy."
+  echo
+fi

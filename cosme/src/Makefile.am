@@ -2,15 +2,14 @@ bin_PROGRAMS = cosme
 
 cosme_SOURCES = og-syntax.yy og-lexic.ll \
 							graph-syntax.yy graph-lexic.ll \
-							BitSetC.cc BitSetC.h \
-							Label.cc Label.h \
-							OperatingGuideline.cc OperatingGuideline.h \
-							Service.cc Service.h \
-							RBTreeStack.cc RBTreeStack.h \
-							main.cc \
-							types.h
+							BitSetC.cc \
+							Label.cc \
+						  OperatingGuideline.cc Service.cc \
+						  RBTreeStack.cc \
+							cmdline.c cmdline.h \
+							main.cc
 
-EXTRA_DIST = og-syntax.h graph-syntax.h
+EXTRA_DIST = og-syntax.h
 
 MAINTAINERCLEANFILES = og-syntax.cc og-syntax.h og-lexic.cc
 

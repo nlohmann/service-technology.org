@@ -1,0 +1,58 @@
+args "--include-getopt"
+
+purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivalence) is a tool for 2-bit operating guidelines."
+
+description "About Cosme:"
+
+section "Input"
+
+option "input OG A" a
+  "Input file for first OG. "
+  string
+  typestr="FILENAME"
+
+option "input OG B" b
+  "Input file for second OG. "
+  string
+  typestr="FILENAME"
+  optional
+
+option "input Service C" c
+  "Input file for service. "
+  string
+  typestr="FILENAME"
+  optional
+
+section "Tasks"
+
+option "task" -
+  "Set the task."
+  details="Choose between 'matching' (service and og), 'simulation' (two ogs) and 'equivalence' (two ogs).\n"
+  values="matching","simulation","equivalence" enum
+  typestr="STYLE"
+
+section "Configuration"
+sectiondesc="Cosme relies on several other tools. These options configure Cosme to find these tools.\n"
+
+option "lola" -
+  "Set the path and binary of LoLA."
+  details="The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'.\n"
+  string
+  typestr="FILENAME"
+  default="lola-statespace"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Cosme should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/cosme-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Cosme is kept after Cosme terminates.\n"
+  flag off

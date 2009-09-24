@@ -93,10 +93,6 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
                              std::set<std::string> &outputPlacenames,
                              std::set<std::string> &synchronizeLabels)
 {
-#ifndef CONFIG_PETRIFY
-#define CONFIG_PETRIFY "not found"
-#endif
-    
   // preparing system call of petrify
   string pnFileName = fileName + ".pn"; // add .pn to the output file
   string systemcall = string(pathToPetrify) + " " + fileName +

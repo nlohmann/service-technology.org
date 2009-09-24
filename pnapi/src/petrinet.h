@@ -28,6 +28,10 @@
 #include "component.h"
 #include "config.h"
 
+#ifndef CONFIG_PETRIFY
+#define CONFIG_PETRIFY "not found"
+#endif
+
 namespace pnapi
 {
 

@@ -44,7 +44,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {
-        invocation += string(argv[i]) + " ";
+      invocation += string(argv[i]) + " ";
     }
 
     // set default values
@@ -55,72 +55,20 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        //abort(7, "invalid command-line parameter(s)");
-				cerr << PACKAGE << ": ERROR: invalid command-line parameter(s)" << endl;
+			cerr << PACKAGE << ": ERROR: invalid command-line parameter(s)" << endl;
     }
 
-		/*
-    // debug option
-    if (args_info.bug_flag) {
-        { Output debug_output("bug.log", "configuration information");
-          debug_output.stream() << CONFIG_LOG << std::flush; }
-        message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
-        exit(EXIT_SUCCESS);
+    // check whether two files are given
+    if (args_info.task_arg == task_arg_matching) {
+			if (!args_info.ServiceC_given or !args_info.OGA_given) {
+				cerr << PACKAGE << ": ERROR: for matching a service and an operating guideline must be given" << endl;
+			}
     }
-
-    // read a configuration file if necessary
-    if (args_info.config_given) {
-        // initialize the config file parser
-        params->initialize = 0;
-        params->override = 0;
-
-        // call the config file parser
-        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
-        } else {
-            status("using configuration file '%s'", args_info.config_arg);
-        }
-    } else {
-        // check for configuration files
-        string conf_generic_filename = string(PACKAGE) + ".conf";
-        string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
-                               (fileExists(string(SYSCONFDIR) + "/" + conf_generic_filename) ?
-                               (string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
-
-        if (conf_filename != "") {
-            // initialize the config file parser
-            params->initialize = 0;
-            params->override = 0;
-            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
-            } else {
-                status("using configuration file '%s'", conf_filename.c_str());
-            }
-        } else {
-            status("not using a configuration file");
-        }
-    }
-
-    // initialize the report frequency
-    if (args_info.reportFrequency_arg < 0) {
-        abort(8, "report frequency must not be negative");
-    }
-
-    // check whether at most one file is given
-    if (args_info.inputs_num > 1) {
-        abort(4, "at most one input file must be given");
-    }
-
-    if (args_info.sa_given and args_info.og_given) {
-        abort(12, "'--og' and '--sa' parameter are mutually exclusive");
-    }
-
-    // --diagnose only works with --smartSendingEvent and --waitstatesOnly
-    if (args_info.diagnose_given) {
-        args_info.smartSendingEvent_flag = 1;
-        args_info.waitstatesOnly_flag = 1;
-    }
-		*/
+		else {
+			if (!args_info.OGA_given or !args_info.OGB_given) {
+				cerr << PACKAGE << ": ERROR: for simulation/equivalence two operating guidelines must be given" << endl;
+			}
+		}
 	
     free(params);
 }
@@ -214,25 +162,21 @@ Service* parseService(char* file) {
 	//TODO: auf Pipes umstellen
 	std::ofstream OutputStream("myFile.lola");
 	if (!OutputStream) {
-		cerr << PACKAGE << ": ERROR: failed to open output file '"
-         << "myFile.lola" << "'" << endl;
+		cerr << PACKAGE << ": ERROR: failed to open output file 'myFile.lola'" << endl;
 		return NULL;
 	}
 
 	OutputStream << pnapi::io::lola << tmpNet;
 	OutputStream.close();
 
-	cout << "\ncalling LoLA\n";
 	int ret;
 	//TODO: Aufruf flexibler machen
-	ret = system("lola-statespace myFile.lola -m");
-	cout << "\nLoLa called\n";
+	ret = system("src/lola-statespace myFile.lola -m >/dev/null");
 
 	graph_yyin = fopen("myFile.graph", "r");	
 	if(!graph_yyin) // if an error occurred
   {
-    cerr << PACKAGE << ": ERROR: failed to open input file '"
-         << "myFile.graph" << "'" << endl;
+    cerr << PACKAGE << ": ERROR: failed to open input file 'myFile.graph'" << endl;
 		return NULL;
   }
   graph_yyparse();
@@ -250,16 +194,54 @@ Service* parseService(char* file) {
 int main(int argc, char** argv)
 {
 	
-	//TODO: cmdline-parser einbinden
 	evaluateParameters(argc, argv);
 
-	if (argc < 3) {
-		cout << "usage: " << endl;
-		cout << " o A.og B.og (check simulation/equivalence)" << endl;
-		cout << " s C.owfn B.og (check matching)" << endl;
-		return EXIT_FAILURE;
+	if (args_info.task_arg == task_arg_matching) {
+		Service* C;
+		OperatingGuideline *A;
+
+		C = parseService(args_info.ServiceC_arg);
+		if (C == NULL) return EXIT_FAILURE;
+		A = parseOG(args_info.OGA_arg);
+		if (A == NULL) return EXIT_FAILURE;
+
+		C->calculateBitSets(GlobalLabels);
+		A->calculateBitSets(GlobalLabels);
+
+		if (A->isMatching(*C)) 
+			cout << "\nObjective completed\n" << endl;
+		else
+			cout << "\nObjective failed\n" << endl;
+
+		delete A;
+		delete C;
+	}
+	else if ((args_info.task_arg == task_arg_simulation) or (args_info.task_arg == task_arg_equivalence)) {
+		OperatingGuideline *A, *B;
+
+		A = parseOG(args_info.OGA_arg);
+		if (A == NULL) return EXIT_FAILURE;
+		B = parseOG(args_info.OGB_arg);
+		if (B == NULL) return EXIT_FAILURE;
+		
+		if (args_info.task_arg == task_arg_simulation) {
+			if (A->isSimulation(*B))
+				cout << "\nObjective completed\n" << endl;
+			else
+				cout << "\nObjective failed\n" << endl;
+		}
+		else {
+			if (A->isEquivalent(*B))
+				cout << "\nObjective completed\n" << endl;
+			else
+				cout << "\nObjective failed\n" << endl;
+		}
+		
+		delete A;
+		delete B;
 	}
 
+	/*
 	if (argv[1][0] == 'o') {
 		OperatingGuideline *A, *B;
 
@@ -307,25 +289,13 @@ int main(int argc, char** argv)
 		//cout << C->toString() << "\n";
 		//cout << A->toString() << "\n";
 
-		/*
-		cout << "\n\nTransition-Labels:\n";
-		for (std::map <std::string, label_id_t>::iterator it = TransitionLabels.begin();
-						it != TransitionLabels.end(); it++)
-				cout << "  " << it->first << " : " << static_cast<unsigned int>(it->second) << "\n";
-		*/
-
 		cout << "\nTests:\n";
 		if (A->isMatching(*C)) cout << "C matches A\n";
 
 		delete A;
 		delete C;
 	}
-	else {
-		cout << "usage: " << endl;
-		cout << " o A.og B.og (check simulation/equivalence)" << endl;
-		cout << " s C.owfn B.og (check matching)" << endl;
-		return EXIT_FAILURE;
-	}
+	*/
 
   return EXIT_SUCCESS;
 }

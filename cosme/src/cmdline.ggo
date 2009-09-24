@@ -6,12 +6,12 @@ purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivale
 section "Input"
 
 option "OGA" a
-  "Input file for first OG. "
+  "Input file for first OG (smaller one). "
   string
   typestr="FILENAME"
 
 option "OGB" b
-  "Input file for second OG. "
+  "Input file for second OG (assumed bigger one). "
   string
   typestr="FILENAME"
   optional

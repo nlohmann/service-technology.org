@@ -4,11 +4,14 @@ AC_CONFIG_SRCDIR([src/og-lexic.ll])
 AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE
-
+AM_PROG_CC_C_O
 AC_PROG_CXX
 AM_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
+AC_PROG_SED
+AC_PROG_GREP
+AC_PROG_AWK
 
 # check for standard programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)
@@ -48,7 +51,7 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile maintainer/Makefile])
 
 AC_OUTPUT
 

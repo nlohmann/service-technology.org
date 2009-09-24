@@ -1,23 +1,22 @@
 args "--include-getopt"
 
-purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivalence) is a tool for 2-bit operating guidelines."
-
 description "About Cosme:"
+purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivalence) is a tool for 2-bit operating guidelines."
 
 section "Input"
 
-option "input OG A" a
+option "OGA" a
   "Input file for first OG. "
   string
   typestr="FILENAME"
 
-option "input OG B" b
+option "OGB" b
   "Input file for second OG. "
   string
   typestr="FILENAME"
   optional
 
-option "input Service C" c
+option "ServiceC" c
   "Input file for service. "
   string
   typestr="FILENAME"

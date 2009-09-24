@@ -6,8 +6,8 @@ cosme_SOURCES = og-syntax.yy og-lexic.ll \
 							Label.cc \
 						  OperatingGuideline.cc Service.cc \
 						  RBTreeStack.cc \
-							cmdline.c cmdline.h \
-							main.cc
+							main.cc \
+							cmdline.c cmdline.h
 
 EXTRA_DIST = og-syntax.h
 
@@ -18,3 +18,9 @@ if COMPILE_PNAPI
 cosme_CPPFLAGS = -I$(top_srcdir)/libs
 cosme_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
+
+################################################################
+# use GNU gengetopt to create command line parser
+################################################################
+cmdline.c: cmdline.ggo
+	$(GENGETOPT) --input=cmdline.ggo

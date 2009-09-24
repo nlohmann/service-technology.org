@@ -4,9 +4,11 @@
 #include <map>
 #include <cstdio>
 #include <cstdlib>
+#include <libgen.h>
 #include "Label.h"
 #include "Service.h"
 #include "OperatingGuideline.h"
+#include "cmdline.h"
 //TODO: anders einbinden?!
 #include <../libs/pnapi/pnapi.h>
 
@@ -21,6 +23,11 @@ extern int graph_yyparse();
 extern FILE* og_yyin;
 extern FILE* graph_yyin;
 
+// the command line parameters
+gengetopt_args_info args_info;
+// the invocation string
+string invocation;
+
 Label GlobalLabels;
 std::map <std::string, label_id_t> TransitionLabels;
 std::set<label_id_t> OGInterface;
@@ -29,6 +36,94 @@ std::map<og_service_index_t, OGMarking*> OGMarkings;
 std::map<og_service_index_t, ServiceMarking*> ServiceMarkings;
 
 pnapi::PetriNet tmpNet;
+
+/// evaluate the command line parameters
+void evaluateParameters(int argc, char** argv) {
+    // overwrite invocation for consistent error messages
+    argv[0] = basename(argv[0]);
+
+    // store invocation in a string for meta information in file output
+    for (int i = 0; i < argc; ++i) {
+        invocation += string(argv[i]) + " ";
+    }
+
+    // set default values
+    cmdline_parser_init(&args_info);
+
+    // initialize the parameters structure
+    struct cmdline_parser_params *params = cmdline_parser_params_create();
+
+    // call the cmdline parser
+    if (cmdline_parser(argc, argv, &args_info) != 0) {
+        //abort(7, "invalid command-line parameter(s)");
+				cerr << PACKAGE << ": ERROR: invalid command-line parameter(s)" << endl;
+    }
+
+		/*
+    // debug option
+    if (args_info.bug_flag) {
+        { Output debug_output("bug.log", "configuration information");
+          debug_output.stream() << CONFIG_LOG << std::flush; }
+        message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
+        exit(EXIT_SUCCESS);
+    }
+
+    // read a configuration file if necessary
+    if (args_info.config_given) {
+        // initialize the config file parser
+        params->initialize = 0;
+        params->override = 0;
+
+        // call the config file parser
+        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
+            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+        } else {
+            status("using configuration file '%s'", args_info.config_arg);
+        }
+    } else {
+        // check for configuration files
+        string conf_generic_filename = string(PACKAGE) + ".conf";
+        string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
+                               (fileExists(string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+                               (string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+
+        if (conf_filename != "") {
+            // initialize the config file parser
+            params->initialize = 0;
+            params->override = 0;
+            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
+                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+            } else {
+                status("using configuration file '%s'", conf_filename.c_str());
+            }
+        } else {
+            status("not using a configuration file");
+        }
+    }
+
+    // initialize the report frequency
+    if (args_info.reportFrequency_arg < 0) {
+        abort(8, "report frequency must not be negative");
+    }
+
+    // check whether at most one file is given
+    if (args_info.inputs_num > 1) {
+        abort(4, "at most one input file must be given");
+    }
+
+    if (args_info.sa_given and args_info.og_given) {
+        abort(12, "'--og' and '--sa' parameter are mutually exclusive");
+    }
+
+    // --diagnose only works with --smartSendingEvent and --waitstatesOnly
+    if (args_info.diagnose_given) {
+        args_info.smartSendingEvent_flag = 1;
+        args_info.waitstatesOnly_flag = 1;
+    }
+		*/
+	
+    free(params);
+}
 
 OperatingGuideline* parseOG(char* file) {
 	og_yyin = fopen(file, "r");
@@ -156,6 +251,7 @@ int main(int argc, char** argv)
 {
 	
 	//TODO: cmdline-parser einbinden
+	evaluateParameters(argc, argv);
 
 	if (argc < 3) {
 		cout << "usage: " << endl;

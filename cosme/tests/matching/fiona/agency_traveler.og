@@ -1,0 +1,124 @@
+{
+  generator:    Wendy 2.3-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --og --formula=2bits ../../matching/agency_traveler.owfn --lola=../../Studienarbeit/lola/src/lola-statespace 
+  events:       3 send, 2 receive, 0 synchronous
+  statistics:   24 nodes
+}
+
+INTERFACE
+  INPUT
+    ticketOrder.instance_1, trip.instance_1;
+  OUTPUT
+    eTicket.instance_1, confirmation.instance_1, price.instance_1;
+
+NODES
+  151106256
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151071064
+    eTicket.instance_1 -> 151158776
+    confirmation.instance_1 -> 151157984
+    price.instance_1 -> 151165024
+  151065408 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    confirmation.instance_1 -> 151159040
+  151068112
+    ticketOrder.instance_1 -> 151158040
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 151147480
+    confirmation.instance_1 -> 151157704
+  151070600 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    confirmation.instance_1 -> 151111904
+    price.instance_1 -> 151147480
+  151070856 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 151111904
+    price.instance_1 -> 151157704
+  151071064 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 151070600
+    confirmation.instance_1 -> 151070856
+    price.instance_1 -> 151068112
+  151111904 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    price.instance_1 -> 151169224
+  151147480
+    ticketOrder.instance_1 -> 151065408
+    trip.instance_1 -> 0
+    confirmation.instance_1 -> 151169224
+  151148152
+    ticketOrder.instance_1 -> 151162624
+    trip.instance_1 -> 151157704
+    eTicket.instance_1 -> 151169368
+  151148640
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151111904
+    price.instance_1 -> 151169368
+  151155360
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151159040
+  151156296
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151158040
+    eTicket.instance_1 -> 151170296
+    confirmation.instance_1 -> 151162624
+  151157704
+    ticketOrder.instance_1 -> 151158176
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 151169224
+  151157984
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151070856
+    eTicket.instance_1 -> 151148640
+    price.instance_1 -> 151148152
+  151158040 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 151065408
+    confirmation.instance_1 -> 151158176
+  151158176 :: S
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 151159040
+  151158776
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151070600
+    confirmation.instance_1 -> 151148640
+    price.instance_1 -> 151166336
+  151159040 :: F
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+  151162624
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151158176
+    eTicket.instance_1 -> 151155360
+  151165024
+    ticketOrder.instance_1 -> 151156296
+    trip.instance_1 -> 151068112
+    eTicket.instance_1 -> 151166336
+    confirmation.instance_1 -> 151148152
+  151166336
+    ticketOrder.instance_1 -> 151170296
+    trip.instance_1 -> 151147480
+    confirmation.instance_1 -> 151169368
+  151169224
+    ticketOrder.instance_1 -> 151159040
+    trip.instance_1 -> 0
+  151169368
+    ticketOrder.instance_1 -> 151155360
+    trip.instance_1 -> 151169224
+  151170296
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 151065408
+    confirmation.instance_1 -> 151155360
+  0
+    ticketOrder.instance_1 -> 0
+    trip.instance_1 -> 0
+    eTicket.instance_1 -> 0
+    confirmation.instance_1 -> 0
+    price.instance_1 -> 0

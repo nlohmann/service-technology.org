@@ -1,0 +1,66 @@
+{
+  generator:    Wendy 1.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --lola=../../lola/src/lola --og --formula=2bits ../testal/RE.owfn 
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   10 nodes
+}
+
+INTERFACE
+  INPUT
+    a, b, c;
+  OUTPUT
+    x, y, z;
+
+NODES
+  167298616 :: S
+    a -> 0
+    b -> 0
+    c -> 0
+    x -> 167323712
+  167288872
+    a -> 0
+    b -> 167289040
+    c -> 0
+  167289040 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+  167319152
+    a -> 167289040
+    b -> 0
+    c -> 0
+  167322088 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+  167323320 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+    z -> 167322088
+  167323376 :: S
+    a -> 0
+    b -> 0
+    c -> 0
+    y -> 167289040
+  167323712
+    a -> 167362760
+    b -> 167362672
+    c -> 167323320
+  167362672
+    a -> 167323376
+    b -> 0
+    c -> 0
+    y -> 167319152
+  167362760
+    a -> 0
+    b -> 167323376
+    c -> 0
+    y -> 167288872
+  0
+    a -> 0
+    b -> 0
+    c -> 0
+    x -> 0
+    y -> 0
+    z -> 0

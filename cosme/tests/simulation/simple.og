@@ -1,0 +1,18 @@
+{
+  generator:    Wendy 1.8 (i386-apple-darwin9.8.0)
+  invocation:   wendy net1.owfn --og --formula=2 
+  events:       2 send, 0 receive, 0 synchronous
+  statistics:   2 nodes
+}
+
+INTERFACE
+  OUTPUT
+    a, b;
+
+NODES
+  1051168 :: S
+    a -> 1049888
+  1049888 :: F
+  0
+    a -> 0
+    b -> 0

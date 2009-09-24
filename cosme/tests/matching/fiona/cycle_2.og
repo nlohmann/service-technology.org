@@ -1,0 +1,24 @@
+{
+  generator:    Wendy 2.3-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --og --formula=2bits ../../matching/cycle_2.owfn --lola=../../Studienarbeit/lola/src/lola-statespace 
+  events:       1 send, 1 receive, 0 synchronous
+  statistics:   3 nodes
+}
+
+INTERFACE
+  INPUT
+    A;
+  OUTPUT
+    B;
+
+NODES
+  154545336
+    A -> 154578648
+  154578648 :: S
+    A -> 0
+    B -> 154584648
+  154584648
+    A -> 154578648
+  0
+    A -> 0
+    B -> 0

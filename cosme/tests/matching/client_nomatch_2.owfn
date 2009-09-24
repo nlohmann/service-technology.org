@@ -1,0 +1,66 @@
+{ Customer that should NOT match with 06-03-23_BPM06_shop_sect_3.owfn.a.og. }
+
+PLACE
+  INTERNAL
+    p0,
+    p1,
+    p2,
+    p3,
+    p4,
+    p5,
+    p6,
+    p7,
+    p8;
+
+  INPUT
+    out.client.onlineshop.confirm,
+    out.client.onlineshop.deliver,
+    out.client.onlineshop.invoice;
+
+  OUTPUT
+    in.client.onlineshop.login,
+    in.client.onlineshop.order,
+    in.client.onlineshop.terms;
+
+INITIALMARKING
+    p0: 1;
+
+FINALMARKING
+    p7: 1;
+
+
+TRANSITION order
+CONSUME p0: 1;
+PRODUCE p1: 1, in.client.onlineshop.order: 1;
+
+TRANSITION login
+CONSUME p1: 1;
+PRODUCE p2: 1, in.client.onlineshop.login: 1;
+
+{ Change to make this oWFN not matching is here. This transition consumes 2
+  tokens from p2 instead of 1. So, the assignment in node #25 of OG is not
+  satisfied. }
+TRANSITION invoice_1
+CONSUME p2: 2, out.client.onlineshop.invoice: 1;
+PRODUCE p3: 1;
+
+TRANSITION deliver_1
+CONSUME p3: 1, out.client.onlineshop.deliver: 1;
+PRODUCE p7: 1;
+
+TRANSITION confirm
+CONSUME p2: 1, out.client.onlineshop.confirm: 1;
+PRODUCE p4: 1;
+
+TRANSITION terms
+CONSUME p4: 1;
+PRODUCE p5: 1, in.client.onlineshop.terms: 1;
+
+TRANSITION deliver_2
+CONSUME p5: 1, out.client.onlineshop.deliver: 1;
+PRODUCE p6: 1;
+
+TRANSITION invoice_2
+CONSUME p6: 1, out.client.onlineshop.invoice: 1;
+PRODUCE p7: 1;
+

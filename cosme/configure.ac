@@ -20,6 +20,14 @@ AM_MISSING_PROG(GENGETOPT, gengetopt)
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
 AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
 
+# allow the configure script to control assertions (just include config.h)
+AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
+
 # search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])
 

@@ -1,11 +1,11 @@
 #ifndef _LABEL_H
 #define _LABEL_H
 
+#include <config.h>
 #include <map>
 #include <string>
 #include <sstream>
 #include <iostream>
-#include "assert.h"
 #include "types.h"
 
 using std::map;

@@ -9,8 +9,7 @@
 #include "Service.h"
 #include "OperatingGuideline.h"
 #include "cmdline.h"
-//TODO: anders einbinden?!
-#include <../libs/pnapi/pnapi.h>
+#include <pnapi/pnapi.h>
 
 using std::cerr;
 using std::cout;

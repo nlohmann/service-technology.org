@@ -1,10 +1,10 @@
 #ifndef __BITSETC_H
 #define __BITSETC_H
 
+#include <config.h>
 #include <limits>
 #include <string>
 #include <sstream>
-#include <assert.h>
 
 //TODO: wieder löschen
 #include <iostream>

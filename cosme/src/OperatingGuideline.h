@@ -1,9 +1,9 @@
 #ifndef _OPERATINGGUIDELINE_H
 #define _OPERATINGGUIDELINE_H
 
+#include <config.h>
 #include <map>
 #include <set>
-#include <assert.h>
 #include <string>
 #include <sstream>
 #include <iostream>

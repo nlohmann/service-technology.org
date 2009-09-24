@@ -1,12 +1,12 @@
 #ifndef __RBTREESTACK_H
 #define __RBTREESTACK_H
 
+#include <config.h>
 #include <limits>
 #include <iostream>
-#include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include "types.h"
 
 typedef struct rbts_node_key_t {

@@ -1,9 +1,9 @@
 #ifndef _SERVICE_H
 #define _SERVICE_H
 
+#include <config.h>
 #include <map>
 #include <set>
-#include <assert.h>
 #include <sstream>
 #include <iostream>
 #include "types.h"

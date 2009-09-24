@@ -12,7 +12,7 @@
 #include "Label.h"
 #include "types.h"
 #include "Service.h"
-#include <../libs/pnapi/pnapi.h>
+#include <pnapi/pnapi.h>
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1

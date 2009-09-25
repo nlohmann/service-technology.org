@@ -28,16 +28,15 @@ gengetopt_args_info args_info;
 /// a suffix for the output filename
 string suffix = "";
 
-typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_AUTOMATON } objectType;
+typedef enum { TYPE_OPENNET, TYPE_LOLANET } objectType;
 
 struct FileObject {
     objectType type;
     string filename;
 
     PetriNet *net;
-    Automaton *sa;
 
-    FileObject(string f) : filename(f), net(NULL), sa(NULL) { }
+    FileObject(string f) : filename(f), net(NULL) { }
 };
 
 
@@ -100,12 +99,13 @@ int main(int argc, char** argv) {
                     break;
                 }
                 case(input_arg_sa): {
-                    current.sa = new Automaton();
+                    Automaton sa;
                     std::cin >> meta(io::INPUTFILE, current.filename)
                         >> meta(io::CREATOR, PACKAGE_STRING)
-                        >> meta(io::INVOCATION, invocation) >> io::sa >> *(current.sa);
+                        >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
+                    current.net = (CONFIG_PETRIFY == "not found") ? (new PetriNet(sa.stateMachine())) : (new PetriNet(sa));
                     
-                    current.type = TYPE_AUTOMATON;
+                    current.type = TYPE_OPENNET;
                     break;
                 }
             }
@@ -115,17 +115,7 @@ int main(int argc, char** argv) {
         }
 
         if (args_info.verbose_given) {
-            switch (current.type) {
-                case(TYPE_OPENNET):
-                case(TYPE_LOLANET): {
-                    cerr << "petri:<stdin>: " << io::stat << *(current.net) << endl;
-                    break;
-                }
-                case(TYPE_AUTOMATON): {
-                    cerr << "petri:<stdin>:" << endl;
-                    break;
-                }
-            }
+          cerr << "petri:<stdin>: " << io::stat << *(current.net) << endl;
         }
 
         // store object
@@ -165,12 +155,13 @@ int main(int argc, char** argv) {
                         break;
                     }
                     case(input_arg_sa): {
-                        current.sa = new Automaton();
+                        Automaton sa;
                         infile >> meta(io::INPUTFILE, current.filename)
                             >> meta(io::CREATOR, PACKAGE_STRING)
-                            >> meta(io::INVOCATION, invocation) >> io::sa >> *(current.sa);
+                            >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
+                        current.net = (CONFIG_PETRIFY == "not found") ? (new PetriNet(sa.stateMachine())) : (new PetriNet(sa));
 
-                        current.type = TYPE_AUTOMATON;
+                        current.type = TYPE_OPENNET;
                         break;
                     }
                 }
@@ -183,17 +174,7 @@ int main(int argc, char** argv) {
             infile.close();
 
             if (args_info.verbose_given) {
-                switch (current.type) {
-                    case(TYPE_OPENNET):
-                    case(TYPE_LOLANET): {
-                        cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << *(current.net) << endl;
-                        break;
-                    }
-                    case(TYPE_AUTOMATON): {
-                        cerr << "petri:" << args_info.inputs[i] << endl;
-                        break;
-                    }
-                }
+              cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << *(current.net) << endl;
             }
 
             // store object
@@ -533,11 +514,7 @@ int main(int argc, char** argv) {
     * CLEANUP *
     **********/
     for (unsigned int i = 0; i < objects.size(); ++i) {
-      if(objects[i].net != NULL) {
-        delete (objects[i].net);
-      } else {
-        delete (objects[i].sa);
-      }
+      delete (objects[i].net);
     }
 
 

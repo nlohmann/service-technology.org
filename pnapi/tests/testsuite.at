@@ -254,6 +254,13 @@ AT_CHECK([GREP -q "petri:bug14116.owfn: 0" stderr],0)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14117 (https://gna.org/bugs/?14117)])
+m4_define([SA], [bug14117.sa])
+AT_CHECK([cp TESTFILES/SA .])
+AT_CHECK([PETRI --input=sa --output=owfn SA], 0, stdout, stderr)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 AT_SETUP([Bug 14119 (https://gna.org/bugs/?14119) [[1]]])
 m4_define([NET], [bug14119.1.owfn])
 AT_CHECK([cp TESTFILES/NET .])

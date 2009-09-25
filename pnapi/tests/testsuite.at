@@ -276,6 +276,16 @@ AT_CHECK([PETRI -n NET -osa], 0, ignore, ignore)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14125 (https://gna.org/bugs/?14125)])
+m4_define([NET1], [bug14125.1.owfn])
+m4_define([NET2], [bug14125.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
+AT_CHECK([PETRI NET1 -oowfn --compose=NET2], 0, ignore, ignore)
+AT_CHECK([GREP -q "AND a = 0" NET1.composed.owfn])
+AT_CHECK([GREP -q "AND b = 0" NET1.composed.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 AT_SETUP([Bug 14127 (https://gna.org/bugs/?14127)])
 m4_define([NET],[bug14127.owfn])
 AT_CHECK([cp TESTFILES/NET .])

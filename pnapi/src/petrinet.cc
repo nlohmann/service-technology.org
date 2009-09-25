@@ -806,11 +806,22 @@ namespace pnapi
     }
     
 
-    /*!
-     * \todo check me!
-     */
-    result.finalCondition().merge(finalCondition(), placeMap);
-    result.finalCondition().merge(net.finalCondition(), placeMap);
+    // here be dragons
+    Condition cond1, cond2;
+    {
+      Condition tmpCond;
+      tmpCond = finalCondition().formula(); // copy condition
+      formula::Formula * f1 = const_cast<formula::Formula*>(&(tmpCond.formula()));
+      f1->unfold(*this);
+      cond1 = *f1;
+      
+      tmpCond = net.finalCondition().formula();
+      formula::Formula * f2 = const_cast<formula::Formula*>(&(tmpCond.formula()));
+      f2->unfold(net);
+      cond2 = *f2;
+    }
+    result.finalCondition().merge(cond1, placeMap);
+    result.finalCondition().merge(cond2, placeMap);
 
     // overwrite this net with the resulting net
     *this = result;

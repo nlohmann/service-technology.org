@@ -29,6 +29,8 @@ TESTFILES = test_input.owfn \
 	    bug14117.sa \
 	    bug14119.1.owfn \
 	    bug14119.2.owfn \
+	    bug14125.1.owfn \
+	    bug14125.2.owfn \
             bug14127.owfn \
             bug14128.1.owfn \
             bug14128.2.owfn \

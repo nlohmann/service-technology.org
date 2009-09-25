@@ -49,6 +49,9 @@ namespace pnapi
 
       /// set of concerning places
       virtual std::set<const Place *> places() const;
+      
+      /// unfold wildcard
+      virtual void unfold(const PetriNet &) {};
 
     };
 
@@ -76,6 +79,8 @@ namespace pnapi
       const std::set<const Formula *> & children() const;
 
       std::set<const Place *> places() const;
+      
+      virtual void unfold(const PetriNet &);
 
     protected:
       std::set<const Formula *> children_;
@@ -133,6 +138,8 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+      
+      void unfold(const PetriNet &);
 
     protected:
 

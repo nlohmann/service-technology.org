@@ -585,6 +585,49 @@ namespace pnapi
           }
         }
     }
+    
+    /**************************************************************************
+     ***** unfolding implementation
+     **************************************************************************/
+    
+    void Operator::unfold(const PetriNet & net)
+    {
+      for(set<const Formula*>::iterator it = children_.begin();
+           it != children_.end(); ++it)
+      {
+        const_cast<Formula*>(*it)->unfold(net);
+      }
+    }
+    
+    /*!
+     * \brief unfolds the wildcard ALL_OTHER_EXTERNAL_PLACES_EMPTY
+     *        (needed by compose).
+     */
+    void Conjunction::unfold(const PetriNet & net)
+    {
+      Operator::unfold(net);
+      
+      // actual unfolding
+      if(flag_ == ALL_OTHER_EXTERNAL_PLACES_EMPTY)
+      {
+        set<const Place*> covered = places();
+        set<const Place*> toCover;
+        for(set<Place*>::iterator p = net.getInterfacePlaces().begin();
+             p != net.getInterfacePlaces().end(); ++p)
+        {
+          toCover.insert(*p);
+        }
+        toCover = util::setDifference(toCover, covered);
+        
+        for(set<const Place*>::iterator p = toCover.begin();
+             p != toCover.end(); ++p)
+        {
+          const Formula * f = new FormulaEqual(**p, 0);
+          children_.insert(f);
+        }
+        flag_ = NONE;
+      }
+    }
 
   } /* namespace formula */
 

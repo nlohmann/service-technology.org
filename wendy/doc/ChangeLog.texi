@@ -3,6 +3,8 @@
 @item knowledge bubbles are finally sorted to avoid duplicates
 
 @item implemented first diagnosis functions: the @option{--diagnosis} parameter creates a Dot file which indicates the blacklisted markings
+
+@item removed memory leaks
 @end itemize
 
 

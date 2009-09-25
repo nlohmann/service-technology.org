@@ -44,7 +44,9 @@ extern FILE *cover_in;
 
 // the parsers
 extern int graph_parse();
+extern int graph_lex_destroy();
 extern int cover_parse();
+extern int cover_lex_destroy();
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -249,6 +251,7 @@ int main(int argc, char** argv) {
             }
             cover_parse();
             fclose(cover_in);
+            cover_lex_destroy();
 
             status("read cover file '%s'", args_info.cover_arg);
         } else {
@@ -287,6 +290,7 @@ int main(int argc, char** argv) {
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
+    graph_lex_destroy();
     time(&end_time);
     status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
 

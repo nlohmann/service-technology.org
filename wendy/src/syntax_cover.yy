@@ -31,9 +31,6 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
-/// the current NAME token as string
-std::string cover_NAME_token;
-
 /* Type of read labels:
  * 0 - places
  * 1 - transition
@@ -50,6 +47,12 @@ std::vector<std::string> cover_transitionNames;
 extern int cover_lex();
 extern int cover_error(const char *);
 %}
+
+%union {
+  char* str;
+}
+
+%type <str> NAME
 
 %%
 
@@ -83,21 +86,23 @@ names:
   {
     switch(labelType)
     {
-    case 0: cover_placeNames.push_back(cover_NAME_token); break;
-    case 1: cover_transitionNames.push_back(cover_NAME_token); break;
-    case 2: Cover::synchronousLabels.push_back(cover_NAME_token); break;
+    case 0: cover_placeNames.push_back($1); break;
+    case 1: cover_transitionNames.push_back($1); break;
+    case 2: Cover::synchronousLabels.push_back($1); break;
     default: /* ignore */ ;
     }
+    free($1);
   }
 | names COMMA NAME
   {
     switch(labelType)
     {
-    case 0: cover_placeNames.push_back(cover_NAME_token); break;
-    case 1: cover_transitionNames.push_back(cover_NAME_token); break;
-    case 2: Cover::synchronousLabels.push_back(cover_NAME_token); break;
+    case 0: cover_placeNames.push_back($3); break;
+    case 1: cover_transitionNames.push_back($3); break;
+    case 2: Cover::synchronousLabels.push_back($3); break;
     default: /* ignore */ ;
     }
+    free($3);
   }
 ;
 

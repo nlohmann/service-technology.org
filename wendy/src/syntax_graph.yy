@@ -41,9 +41,6 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
-/// the current NAME token as string
-std::string NAME_token;
-
 /// the vector of the successor state numbers of the current marking
 std::vector<InnerMarking_ID> currentSuccessors;
 
@@ -74,9 +71,11 @@ extern int graph_error(const char *);
 
 %union {
   unsigned int val;
+  char* str;
 }
 
 %type <val> NUMBER
+%type <str> NAME
 
 %%
 
@@ -178,7 +177,7 @@ markings:
 
 marking:
   NAME COLON NUMBER
-    { marking[InnerMarking::net->findPlace(NAME_token)] = $3; }
+    { marking[InnerMarking::net->findPlace($1)] = $3; free($1); }
 ;
 
 transitions:
@@ -189,10 +188,11 @@ transitions:
 transition:
   NAME ARROW NUMBER
     {
-      currentLabels.push_back(Label::name2id[NAME_token]);
+      currentLabels.push_back(Label::name2id[$1]);
       if(args_info.cover_given) {
-          currentTransitions.insert(NAME_token);
+          currentTransitions.insert($1);
       }
       currentSuccessors.push_back($3);
+      free($1);
     }
 ;

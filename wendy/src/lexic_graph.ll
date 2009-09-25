@@ -27,11 +27,8 @@
 
 %{
 #include <cstring>
-#include <string>
 #include "syntax_graph.h"
 #include "verbose.h"
-
-extern std::string NAME_token;
 
 void graph_error(const char *);
 %}
@@ -54,7 +51,7 @@ number    "-"?[0-9][0-9]*
 "->"         { return ARROW; }
 
 {number}     { graph_lval.val = atoi(graph_text); return NUMBER; }
-{name}       { NAME_token = graph_text; return NAME; }
+{name}       { graph_lval.str = strdup(graph_text); return NAME; }
 
 [ \t\r\n]*   { /* skip */ }
 <<EOF>>      { return EOF; }

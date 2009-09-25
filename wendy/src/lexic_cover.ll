@@ -26,11 +26,9 @@
 %option prefix="cover_"
 
 %{
-#include <string>
+#include <cstring>
 #include "syntax_cover.h"
 #include "verbose.h"
-
-extern std::string cover_NAME_token;
 
 
 void cover_error(const char *);
@@ -54,7 +52,7 @@ name      [^,;:()\t \n\{\}]+
 ","             { return COMMA;                         }
 ";"             { return SEMICOLON;                     }
 
-{name}          { cover_NAME_token = cover_text; return NAME; }
+{name}          { cover_lval.str = strdup(cover_text); return NAME; }
 [ \t\r\n]*      { /* skip */                            }
 
 .               { cover_error("lexical error");         }

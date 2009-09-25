@@ -281,8 +281,8 @@ m4_define([NET1], [bug14125.1.owfn])
 m4_define([NET2], [bug14125.2.owfn])
 AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
 AT_CHECK([PETRI NET1 -oowfn --compose=NET2], 0, ignore, ignore)
-AT_CHECK([GREP -q "AND a = 0" NET1.composed.owfn])
-AT_CHECK([GREP -q "AND b = 0" NET1.composed.owfn])
+AT_CHECK([GREP -q "a = 0" NET1.composed.owfn])
+AT_CHECK([GREP -q "b = 0" NET1.composed.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 

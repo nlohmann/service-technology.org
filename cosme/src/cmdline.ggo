@@ -44,14 +44,22 @@ option "lola" -
 
 option "tmpfile" -
   "Set the path and name of temporary files"
-  details="The filename Cosme should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  details="The filename Cosme should use to create temporary files (i.e., the intermediate Petri net passed to LoLA).\n"
   string
   typestr="FILENAME"
-  default="/tmp/cosme-XXXXXX"
+  default="/tmp/cosme-myFile.graph"
   optional
   hidden
 
 option "noClean" -
   "Do not delete temporary files."
   details="Any temporary files created by Cosme is kept after Cosme terminates.\n"
+  flag off
+
+section "Debugging"
+sectiondesc="These options control how much debug output Cosme creates. The more debug output is used, the slower Cosme runs.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information on the several intermediate steps. Note this option might slow down the execution.\n"
   flag off

@@ -3,14 +3,14 @@ bin_PROGRAMS = cosme
 
 cosme_SOURCES = og-syntax.yy og-lexic.ll \
               graph-syntax.yy graph-lexic.ll \
+							main.cc types.h \
               BitSetC.cc BitSetC.h \
               Label.cc Label.h \
               OperatingGuideline.cc OperatingGuideline.h \
               Service.cc Service.h\
               RBTreeStack.cc RBTreeStack.h \
-              main.cc \
               cmdline.c cmdline.h \
-              types.h
+							Output.cc Output.h
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI

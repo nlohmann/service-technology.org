@@ -9,6 +9,7 @@
 #include "Service.h"
 #include "OperatingGuideline.h"
 #include "cmdline.h"
+#include "Output.h"
 #include <pnapi/pnapi.h>
 
 using std::cerr;
@@ -36,7 +37,7 @@ std::map<og_service_index_t, ServiceMarking*> ServiceMarkings;
 
 pnapi::PetriNet tmpNet;
 
-/// evaluate the command line parameters
+// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // overwrite invocation for consistent error messages
     argv[0] = basename(argv[0]);
@@ -45,9 +46,6 @@ void evaluateParameters(int argc, char** argv) {
     for (int i = 0; i < argc; ++i) {
       invocation += string(argv[i]) + " ";
     }
-
-    // set default values
-    cmdline_parser_init(&args_info);
 
     // initialize the parameters structure
     struct cmdline_parser_params *params = cmdline_parser_params_create();
@@ -157,30 +155,28 @@ Service* parseService(char* file) {
   } 
 	
 	parseService_LabelHelper();
-
-	//TODO: auf Pipes umstellen
-	std::ofstream OutputStream("myFile.lola");
-	if (!OutputStream) {
-		cerr << PACKAGE << ": ERROR: failed to open output file 'myFile.lola'" << endl;
-		return NULL;
-	}
-
-	OutputStream << pnapi::io::lola << tmpNet;
-	OutputStream.close();
-
-	int ret;
-	//TODO: Aufruf flexibler machen
-	ret = system("src/lola-statespace myFile.lola -m >/dev/null");
-
-	graph_yyin = fopen("myFile.graph", "r");	
-	if(!graph_yyin) // if an error occurred
-  {
-    cerr << PACKAGE << ": ERROR: failed to open input file 'myFile.graph'" << endl;
-		return NULL;
-  }
-  graph_yyparse();
-  fclose(graph_yyin);
 	
+	//TODO: ggf. allgemeinen Constructor nutzen
+#if defined(__MINGW32__)
+    Output temp(basename(args_info.tmpfile_arg), "");
+#else
+    Output temp(args_info.tmpfile_arg, "");
+#endif
+
+  temp.stream() << pnapi::io::lola << tmpNet;
+
+  // select LoLA binary and build LoLA command
+#if defined(__MINGW32__)
+    // MinGW does not understand pathnames with "/", so we use the basename
+    string command_line = string(basename(args_info.lola_arg)) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+#else
+    string command_line = string(args_info.lola_arg) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+#endif
+
+	graph_yyin = popen(command_line.c_str(), "r");
+  graph_yyparse();
+  pclose(graph_yyin);	
+
 	Service *tmpService = new Service(ServiceMarkings, ServiceInterface);
 	ServiceMarkings.clear();
 	ServiceInterface.clear();
@@ -239,62 +235,6 @@ int main(int argc, char** argv)
 		delete A;
 		delete B;
 	}
-
-	/*
-	if (argv[1][0] == 'o') {
-		OperatingGuideline *A, *B;
-
-		A = parseOG(argv[2]);
-		assert(A != NULL);
-
-		cout << GlobalLabels.toString();
-
-		B = parseOG(argv[3]);
-		assert(B != NULL);
-
-		cout << GlobalLabels.toString();
-
-		//cout << A->toString() << "\n" << B->toString();
-
-		cout << "\nTests:\n";
-		if (A->isSimulation(*B)) cout << "B simulates A\n";
-		if (B->isSimulation(*A)) cout << "A simulates B\n";
-		if (A->isEquivalent(*B)) cout << "A is equivalent to B\n";
-
-		delete A;
-		delete B;
-	}
-	else if (argv[1][0] == 's') {
-
-		Service* C;
-
-		C = parseService(argv[2]);
-		assert(C != NULL);
-
-		cout << GlobalLabels.toString();
-		//cout << C->toString() << "\n";
-
-		OperatingGuideline *A;
-
-		A = parseOG(argv[3]);
-		assert(A != NULL);
-
-		cout << GlobalLabels.toString();
-
-		//new stuff
-		C->calculateBitSets(GlobalLabels);
-		A->calculateBitSets(GlobalLabels);
-
-		//cout << C->toString() << "\n";
-		//cout << A->toString() << "\n";
-
-		cout << "\nTests:\n";
-		if (A->isMatching(*C)) cout << "C matches A\n";
-
-		delete A;
-		delete C;
-	}
-	*/
 
   return EXIT_SUCCESS;
 }

@@ -105,7 +105,6 @@ class OperatingGuideline {
 				if (allowed->isSubset(this->marking(indexB)->mCheckedPaths)) return false;
 				this->marking(indexB)->mCheckedPaths->makeUnion(allowed);
 				for (label_index_t x = 0; x < this->marking(indexB)->outDegree(); x++) {
-					//curLabel = this->marking(indexB)->label(x);
 					if (allowed->getBit(this->marking(indexB)->label(x)))
 						pTodo.add(this->marking(indexB)->successor(x), this->marking(indexB)->successor(x));
 				}

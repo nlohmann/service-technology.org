@@ -375,7 +375,7 @@ bool Knowledge::receivingHelps() const {
 */
 void Knowledge::sequentializeReceivingEvents() {
     // count the number that a receiving event is activated
-    map<Label_ID, unsigned int> occuranceOfReceivingEvent;
+    map<Label_ID, uint8_t> occuranceOfReceivingEvent;
 
     // remember to consider this state again; actually we only need to take a look at its interface
     map<vector<InterfaceMarking*>, bool> visitStateAgain;

@@ -28,9 +28,6 @@
 #include <string>
 #include "Cover.h"
 
-#define YYDEBUG 1
-#define YYERROR_VERBOSE 1
-
 /* Type of read labels:
  * 0 - places
  * 1 - transition
@@ -84,25 +81,22 @@ names:
   /* empty */
 | NAME
   {
-    switch(labelType)
-    {
-    case 0: cover_placeNames.push_back($1); break;
-    case 1: cover_transitionNames.push_back($1); break;
-    case 2: Cover::synchronousLabels.push_back($1); break;
-    default: /* ignore */ ;
+    switch(labelType) {
+        case 0: cover_placeNames.push_back($1); break;
+        case 1: cover_transitionNames.push_back($1); break;
+        case 2: Cover::synchronousLabels.push_back($1); break;
+        default: /* ignore */ ;
     }
     free($1);
   }
 | names COMMA NAME
   {
-    switch(labelType)
-    {
-    case 0: cover_placeNames.push_back($3); break;
-    case 1: cover_transitionNames.push_back($3); break;
-    case 2: Cover::synchronousLabels.push_back($3); break;
-    default: /* ignore */ ;
+    switch(labelType) {
+        case 0: cover_placeNames.push_back($3); break;
+        case 1: cover_transitionNames.push_back($3); break;
+        case 2: Cover::synchronousLabels.push_back($3); break;
+        default: /* ignore */ ;
     }
     free($3);
   }
 ;
-

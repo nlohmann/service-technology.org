@@ -35,8 +35,6 @@
 #include "Cover.h"
 #include "verbose.h"
 
-using std::string;
-
 
 // input files
 extern FILE *graph_in;
@@ -52,7 +50,7 @@ extern int cover_lex_destroy();
 gengetopt_args_info args_info;
 
 /// the invocation string
-string invocation;
+std::string invocation;
 
 /// a file to store a mapping from marking ids to actual Petri net markings
 Output *markingoutput = NULL;
@@ -62,7 +60,7 @@ clock_t start_clock = clock();
 
 
 /// check if a file exists and can be opened for reading
-inline bool fileExists(std::string filename) {
+inline bool fileExists(const std::string& filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);
     return tmp.good();
 }
@@ -73,9 +71,9 @@ void evaluateParameters(int argc, char** argv) {
     // overwrite invocation for consistent error messages
     argv[0] = basename(argv[0]);
 
-    // store invocation in a string for meta information in file output
+    // store invocation in a std::string for meta information in file output
     for (int i = 0; i < argc; ++i) {
-        invocation += string(argv[i]) + " ";
+        invocation += std::string(argv[i]) + " ";
     }
 
     // initialize the parameters structure
@@ -108,10 +106,10 @@ void evaluateParameters(int argc, char** argv) {
         }
     } else {
         // check for configuration files
-        string conf_generic_filename = string(PACKAGE) + ".conf";
-        string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
-                               (fileExists(string(SYSCONFDIR) + "/" + conf_generic_filename) ?
-                               (string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+        std::string conf_generic_filename = std::string(PACKAGE) + ".conf";
+        std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
+                               (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+                               (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
 
         if (conf_filename != "") {
             // initialize the config file parser
@@ -141,7 +139,7 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--og' and '--sa' parameter are mutually exclusive");
     }
 
-    // --diagnose only works with --smartSendingEvent and --waitstatesOnly
+    // --diagnose implies --smartSendingEvent and --waitstatesOnly
     if (args_info.diagnose_given) {
         args_info.smartSendingEvent_flag = 1;
         args_info.waitstatesOnly_flag = 1;
@@ -168,7 +166,7 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        system((string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 }
 
@@ -180,7 +178,7 @@ int main(int argc, char** argv) {
     atexit(terminationHandler);
 
     // set a standard filename
-    string filename = string(PACKAGE) + "_output";
+    std::string filename = std::string(PACKAGE) + "_output";
 
     /*--------------------------------------.
     | 0. parse the command line parameters  |
@@ -196,7 +194,7 @@ int main(int argc, char** argv) {
             std::cin >> pnapi::io::owfn >> *InnerMarking::net;
         } else {
             // strip suffix from input filename
-            filename = string(args_info.inputs[0]).substr(0, string(args_info.inputs[0]).find_last_of("."));
+            filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
 
             std::ifstream inputStream(args_info.inputs[0]);
             if (!inputStream) {
@@ -211,7 +209,7 @@ int main(int argc, char** argv) {
             status("read net: %s", s.str().c_str());
         }
     } catch(pnapi::io::InputError error) {
-        std::stringstream s;
+        std::ostringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());
     }
@@ -233,7 +231,7 @@ int main(int argc, char** argv) {
     | 2. initialize labels and interface markings |
     `--------------------------------------------*/
     Label::initialize();
-    InterfaceMarking::initialize(args_info.messagebound_arg);
+    InterfaceMarking::initialize();
     PossibleSendEvents::initialize();
 
 
@@ -266,7 +264,7 @@ int main(int argc, char** argv) {
     temp.stream() << pnapi::io::lola << *InnerMarking::net;
     // marking information output
     if (args_info.mi_given) {
-        string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
+        std::string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
         markingoutput = new Output(mi_filename, "marking information");
     }
 
@@ -276,9 +274,9 @@ int main(int argc, char** argv) {
     // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     // MinGW does not understand pathnames with "/", so we use the basename
-    string command_line = string(basename(args_info.lola_arg)) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+    std::string command_line = std::string(basename(args_info.lola_arg)) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    string command_line = string(args_info.lola_arg) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+    std::string command_line = std::string(args_info.lola_arg) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
     // call LoLA
@@ -330,8 +328,8 @@ int main(int argc, char** argv) {
     status("stored %d knowledges [%.0f sec]",
         StoredKnowledge::stats.storedKnowledges, difftime(end_time, start_time));
     status("used %d of %d hash buckets, maximal bucket size: %d",
-        static_cast<unsigned int>(StoredKnowledge::hashTree.size()),
-        (1 << (8*sizeof(hash_t))), static_cast<unsigned int>(StoredKnowledge::stats.maxBucketSize));
+        static_cast<size_t>(StoredKnowledge::hashTree.size()),
+        (1 << (8*sizeof(hash_t))), static_cast<size_t>(StoredKnowledge::stats.maxBucketSize));
     status("at most %d interface markings per inner marking",
         StoredKnowledge::stats.maxInterfaceMarkings);
     status("calculated %d trivial SCCs",
@@ -366,7 +364,7 @@ int main(int argc, char** argv) {
     if (controllable or args_info.diagnose_given) {
         // operating guidelines output
         if (args_info.og_given) {
-            string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
+            std::string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
             Output output(og_filename, "operating guidelines");
 
             if (args_info.fionaFormat_flag) {
@@ -376,7 +374,7 @@ int main(int argc, char** argv) {
             }
 
             if (args_info.cover_given) {
-                string cover_filename = og_filename + ".cover";
+                std::string cover_filename = og_filename + ".cover";
                 Output cover_output(cover_filename, "cover constraint");
                 Cover::write(cover_output);
             }
@@ -384,21 +382,21 @@ int main(int argc, char** argv) {
 
         // service automaton output
         if (args_info.sa_given) {
-            string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
+            std::string sa_filename = args_info.sa_arg ? args_info.sa_arg : filename + ".sa";
             Output output(sa_filename, "service automaton");
             StoredKnowledge::output_og(output);
         }
 
         // dot output
         if (args_info.dot_given) {
-            string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
+            std::string dot_filename = args_info.dot_arg ? args_info.dot_arg : filename + ".dot";
             Output output(dot_filename, "dot representation");
             StoredKnowledge::output_dot(output);
         }
 
         // migration output
         if (args_info.im_given) {
-            string im_filename = args_info.im_arg ? args_info.im_arg : filename + ".im";
+            std::string im_filename = args_info.im_arg ? args_info.im_arg : filename + ".im";
             Output output(im_filename, "migration information");
 
             time(&start_time);
@@ -411,7 +409,7 @@ int main(int argc, char** argv) {
 
         // diagnose output
         if (args_info.diagnose_given) {
-            string diag_filename = args_info.diagnose_arg ? args_info.diagnose_arg : filename + ".diag.dot";
+            std::string diag_filename = args_info.diagnose_arg ? args_info.diagnose_arg : filename + ".diag.dot";
             Output output(diag_filename, "diagnosis information");
             StoredKnowledge::output_diagnosedot(output);
         }

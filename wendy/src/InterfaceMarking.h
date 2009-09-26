@@ -54,26 +54,26 @@
 class InterfaceMarking {
     public: /* static functions */
         /// initializes the class InterfaceMarking
-        static void initialize(unsigned int);
+        static void initialize();
 
         /// comparison function to use std::sort
         static bool sort_cmp(const InterfaceMarking*, const InterfaceMarking*);
 
     private: /* static attributes */
         /// the message bound
-        static unsigned int message_bound;
+        static uint8_t message_bound;
 
         /// the size of the asynchronous interface (send + receive)
-        static unsigned int interface_length;
+        static uint8_t interface_length;
 
         /// how many bits are needed to store a single message bound
-        static unsigned int message_bound_bits;
+        static uint8_t message_bound_bits;
 
         /// how many bytes are needed to store an interface marking
-        static unsigned int bytes;
+        static uint8_t bytes;
 
         /// how many markings can be stored in one byte
-        static unsigned int markings_per_byte;
+        static uint8_t markings_per_byte;
 
     public: /* member functions */
         /// constructor

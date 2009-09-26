@@ -21,11 +21,10 @@
 #ifndef _POSSIBLESENDEVENTS_H
 #define _POSSIBLESENDEVENTS_H
 
-#include <algorithm>
 #include "types.h"
 
 /*!
- \brief storage for sending events reachable by an inner marking, every possible sending event is either set to 0 or 1
+ \brief storage for sending events reachable by an inner marking
  */
 class PossibleSendEvents {
     public: /* static functions */
@@ -34,34 +33,35 @@ class PossibleSendEvents {
 
     private: /* static attributes */
         /// the number of bytes needed
-        static unsigned int bytes;
+        static uint8_t bytes;
 
     public: /* member functions */
         /// constructor
         PossibleSendEvents();
 
         /// constructor with initialization
-        PossibleSendEvents(bool, Label_ID);
+        PossibleSendEvents(const bool&, const Label_ID&);
 
         /// destructor; also cleans decodedLabels
         ~PossibleSendEvents();
 
         /// overloaded bit-wise AND operator
-        void operator&=(const PossibleSendEvents &);
+        void operator&=(const PossibleSendEvents&);
 
         /// overloaded bit-wise OR operator
-        void operator|=(const PossibleSendEvents &);
+        void operator|=(const PossibleSendEvents&);
 
         /// copies storage
-        void copy(const PossibleSendEvents &);
-
-        /// set a label to be possible
-        void labelPossible(Label_ID l);
+        void copy(const PossibleSendEvents&);
 
         /// returns array of all sending events (possible or not)
         char* decode();
 
-    private: /* member functions */
+    private:
+        /// set a label to be possible
+        void labelPossible(const Label_ID&);
+
+    private: /* member attributes */
         /// a byte array to store the possible sending events
         uint8_t* storage;
 

@@ -25,12 +25,11 @@
 #include "verbose.h"
 
 
-
 /******************
  * STATIC MEMBERS *
  ******************/
 
-unsigned int PossibleSendEvents::bytes = 0;
+uint8_t PossibleSendEvents::bytes = 0;
 
 
 /******************
@@ -68,9 +67,9 @@ PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
                  label that is to be set to one, all others are initialized
                  with 0
  */
-PossibleSendEvents::PossibleSendEvents(bool allValues, Label_ID label) : decodedLabels(NULL) {
+PossibleSendEvents::PossibleSendEvents(const bool& allValues, const Label_ID& l) : decodedLabels(NULL) {
     assert(bytes > 0);
-    assert((allValues and label <= 1) or (not allValues and SENDING(label)));
+    assert((allValues and l <= 1) or (not allValues and SENDING(l)));
 
     // reserve memory
     storage = new uint8_t[bytes];
@@ -82,7 +81,7 @@ PossibleSendEvents::PossibleSendEvents(bool allValues, Label_ID label) : decoded
 
     // set one particular label to 1
     if (not allValues) {
-        labelPossible(label);
+        labelPossible(l);
     }
 }
 
@@ -104,17 +103,13 @@ PossibleSendEvents::~PossibleSendEvents() {
  * OPERATORS *
  *************/
 
-void PossibleSendEvents::operator&=(const PossibleSendEvents &other) {
-    assert(bytes > 0);
-
+void PossibleSendEvents::operator&=(const PossibleSendEvents& other) {
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] &= other.storage[i];
     }
 }
 
-void PossibleSendEvents::operator|=(const PossibleSendEvents &other) {
-    assert(bytes > 0);
-
+void PossibleSendEvents::operator|=(const PossibleSendEvents& other) {
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] |= other.storage[i];
     }
@@ -129,7 +124,7 @@ void PossibleSendEvents::operator|=(const PossibleSendEvents &other) {
   the values of other are copied into current storage
   \param other the values of the other storage to be copied into the current one
 */
-void PossibleSendEvents::copy(const PossibleSendEvents &other) {
+void PossibleSendEvents::copy(const PossibleSendEvents& other) {
     assert(bytes > 0);
 
     // reserve memory and copy values
@@ -139,12 +134,12 @@ void PossibleSendEvents::copy(const PossibleSendEvents &other) {
     }
 }
 
-void PossibleSendEvents::labelPossible(Label_ID l) {
+void PossibleSendEvents::labelPossible(const Label_ID& l) {
     assert(storage != NULL);
     assert(SENDING(l));
 
-    unsigned int myByte = (l - Label::first_send) / 8;
-    unsigned int myBit  = (l - Label::first_send) % 8;
+    const uint8_t myByte = (l - Label::first_send) / 8;
+    const uint8_t myBit  = (l - Label::first_send) % 8;
     storage[myByte] += (1 << myBit);
 }
 
@@ -153,6 +148,8 @@ void PossibleSendEvents::labelPossible(Label_ID l) {
        we can skip the first if and make this a const function.
  \todo Check if decode() would ever return different values. Otherwise, the
        implementation is wrong and should be reverted to revision 4731.
+ \todo Depending on the number of calls to this function, we can think of not
+       storing decodedLabels at all.
 */
 char* PossibleSendEvents::decode() {
     assert(bytes > 0);
@@ -163,8 +160,8 @@ char* PossibleSendEvents::decode() {
 
         // decode and store values
         for (Label_ID l = 0; l < Label::send_events; ++l) {
-            unsigned int myByte = l / 8;
-            unsigned int myBit  = l % 8;
+            const uint8_t myByte = l / 8;
+            const uint8_t myBit  = l % 8;
             decodedLabels[l] = (storage[myByte] & (1 << myBit)) >> myBit;
         }
     }

@@ -70,7 +70,7 @@ void status(const char* format, ...) {
 
  \note The codes should be documented in the manual.
 */
-void abort(unsigned int code, const char* format, ...) {
+void abort(unsigned short code, const char* format, ...) {
     fprintf(stderr, "%s: ", PACKAGE);
 
     va_list args;

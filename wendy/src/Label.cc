@@ -38,7 +38,7 @@ extern gengetopt_args_info args_info;
  * STATIC MEMBERS *
  ******************/
 
-Label_ID Label::first_receive = 0;
+Label_ID Label::first_receive = 1; //sic!
 Label_ID Label::last_receive = 0;
 Label_ID Label::first_send = 0;
 Label_ID Label::last_send = 0;
@@ -64,13 +64,9 @@ std::map<string, Label_ID> Label::name2id;
  */
 void Label::initialize() {
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
-    first_receive = 1;
-
     const set<Place*> outputPlaces(InnerMarking::net->getOutputPlaces());
-    for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
-        ++events;
-        ++receive_events;
-        id2name[events] = (**p).getName();
+    for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p, ++receive_events) {
+        id2name[++events] = (**p).getName();
         if (args_info.cover_given) {
             Cover::labelCache[(**p).getName()] = events;
         }
@@ -89,10 +85,8 @@ void Label::initialize() {
 
     const set<Place*> inputPlaces(InnerMarking::net->getInputPlaces());
 
-    for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
-        ++events;
-        ++send_events;
-        id2name[events] = (**p).getName();
+    for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p, ++send_events) {
+        id2name[++events] = (**p).getName();
         if (args_info.cover_given) {
             Cover::labelCache[(**p).getName()] = events;
         }
@@ -123,9 +117,9 @@ void Label::initialize() {
         name2id[(**t).getName()] = sync_labels[*(**t).getSynchronizeLabels().begin()];
     }
 
-
     last_sync = events;
     sync_events = last_sync - send_events - receive_events;
+
 
 /// \todo The label output should be moved to "--mi" (after adjusting Mia)
 //    for (unsigned int i = first_receive; i <= last_sync; ++i) {

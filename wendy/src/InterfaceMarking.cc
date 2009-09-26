@@ -29,49 +29,36 @@
 extern gengetopt_args_info args_info;
 
 
-/*! \def LOG2(i)
-    \brief base 2 logarithm as lookup */
-#define LOG2(i) ((i <   2) ? 1 : \
-                ((i <   4) ? 2 : \
-                ((i <   8) ? 3 : \
-                ((i <  16) ? 4 : \
-                ((i <  32) ? 5 : \
-                ((i <  64) ? 6 : \
-                ((i < 128) ? 7 : 8)))))))
-
-
 /******************
  * STATIC MEMBERS *
  ******************/
 
-unsigned int InterfaceMarking::message_bound = 0;
-unsigned int InterfaceMarking::interface_length = 0;
-unsigned int InterfaceMarking::message_bound_bits = 0;
-unsigned int InterfaceMarking::bytes = 0;
-unsigned int InterfaceMarking::markings_per_byte = 0;
+uint8_t InterfaceMarking::message_bound = 0;
+uint8_t InterfaceMarking::interface_length = 0;
+uint8_t InterfaceMarking::message_bound_bits = 0;
+uint8_t InterfaceMarking::bytes = 0;
+uint8_t InterfaceMarking::markings_per_byte = 0;
 
 
 /******************
  * STATIC METHODS *
  ******************/
 
-void InterfaceMarking::initialize(unsigned int m) {
+void InterfaceMarking::initialize() {
     // check the message bound
-    if (m < 1 or m > 255) {
-        abort(9, "message bound must be between 1 and %d", 255);
+    if (args_info.messagebound_arg < 1 or args_info.messagebound_arg > 255) {
+        abort(9, "message bound must be between 1 and 255");
     }
 
-    message_bound = m;
+    message_bound = args_info.messagebound_arg;
     interface_length = Label::send_events + Label::receive_events;
-    message_bound_bits = LOG2(message_bound);
+    message_bound_bits = ceil(log2(message_bound+1));
 
     // allow to store a larger interface marking to display diagnosis results
-    if (args_info.diagnose_given) {
-        ++message_bound_bits;
-    }
+    message_bound_bits += args_info.diagnose_given;
 
     markings_per_byte = 8 / message_bound_bits;
-    bytes = static_cast<unsigned int>(
+    bytes = static_cast<uint8_t>(
       ceil(static_cast<double>(interface_length) / static_cast<double>(markings_per_byte)));
 
     status("message bound set to %d (%d bytes/interface marking, %d bits/event)",
@@ -87,7 +74,6 @@ void InterfaceMarking::initialize(unsigned int m) {
 bool InterfaceMarking::sort_cmp(const InterfaceMarking* a, const InterfaceMarking* b) {
     assert(a);
     assert(b);
-
     return (*a < *b);
 }
 
@@ -104,7 +90,6 @@ InterfaceMarking::InterfaceMarking() {
     }
 
     // initialize() must be called before first object is created
-    assert(interface_length);
     assert(message_bound_bits);
     assert(bytes);
     assert(markings_per_byte);
@@ -124,7 +109,6 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other)
     }
 
     // initialize() must be called before first object is created
-    assert(interface_length);
     assert(message_bound_bits);
     assert(bytes);
     assert(markings_per_byte);
@@ -158,7 +142,8 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other)
                           (message bound violation) or decrement (no message
                           present) 
  */
-InterfaceMarking::InterfaceMarking(const InterfaceMarking& other, const Label_ID& label,
+InterfaceMarking::InterfaceMarking(const InterfaceMarking& other,
+                                   const Label_ID& label,
                                    const bool& increase, bool& success) {
     // initialize() must be called before first object is created
     assert(interface_length);
@@ -173,15 +158,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other, const Label_ID
         storage[i] = other.storage[i];
     }
 
-    if (increase) {
-        if (not inc(label)) {
-            success = false;
-        }
-    } else {
-        if (not dec(label)) {
-            success = false;
-        }
-    }
+    success = increase ? inc(label) : dec(label);
 }
 
 
@@ -206,7 +183,6 @@ bool InterfaceMarking::operator< (const InterfaceMarking& other) const {
             return true;
         }
     }
-
     return false;
 }
 
@@ -249,15 +225,15 @@ uint8_t InterfaceMarking::get(const Label_ID& label) const {
     assert(label <= interface_length);
 
     // the byte in which this interface is stored
-    unsigned int byte = (label-1) / markings_per_byte;
+    const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // first, create (2**message_bound_bits)-1, then shift it to the needed position
-    uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
+    const uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // get the result by masking the respective byte
-    uint8_t result = storage[byte] & mask;
+    const uint8_t result = storage[byte] & mask;
 
     // shift back the result
     return (result >> offset);
@@ -271,26 +247,26 @@ bool InterfaceMarking::inc(const Label_ID& label) {
     assert(label <= interface_length);
 
     // the byte in which this interface is stored
-    unsigned int byte = (label-1) / markings_per_byte;
+    const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // create a mask to select the bits we want to modify:
     // (2**message_bound_bits)-1, then shift it to the needed position
-    uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
+    const uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // before increment, the value for this label should be smaller than the message bound
-    bool OK = ( (unsigned)( (storage[byte] & mask) >> offset) < message_bound );
+    const bool OK = ( (unsigned)((storage[byte] & mask) >> offset) < message_bound );
 
     // use the mask to get the current value from the byte,
     // then shift and increment the value
-    uint8_t update = ((storage[byte] & mask) >> offset) + 1;
+    const uint8_t update = ((storage[byte] & mask) >> offset) + 1;
 
     // shift back and mask the value to store
-    uint8_t result = ((update << offset) & mask);
+    const uint8_t result = ((update << offset) & mask);
 
     // remove values of this label
-    uint8_t crop = (storage[byte] & ~mask);
+    const uint8_t crop = (storage[byte] & ~mask);
 
     // combine incremented value and the stored byte
     storage[byte] = (crop | result);
@@ -307,26 +283,26 @@ bool InterfaceMarking::dec(const Label_ID& label) {
     assert(label <= interface_length);
 
     // the byte in which this interface is stored
-    unsigned int byte = (label-1) / markings_per_byte;
+    const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // create a mask to select the bits we want to modify:
     // (2**message_bound_bits)-1, then shift it to the needed position
-    uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
+    const uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // before decrement, the value for this label should be positive
-    bool OK = (((storage[byte] & mask) >> offset) > 0);
+    const bool OK = (((storage[byte] & mask) >> offset) > 0);
 
     // use the mask to get the current value from the byte,
     // then shift and increment the value
-    uint8_t update = ((storage[byte] & mask) >> offset) - 1;
+    const uint8_t update = ((storage[byte] & mask) >> offset) - 1;
 
     // shift back and mask the value to store
-    uint8_t result = ((update << offset) & mask);
+    const uint8_t result = ((update << offset) & mask);
 
     // remove values of this label
-    uint8_t crop = (storage[byte] & ~mask);
+    const uint8_t crop = (storage[byte] & ~mask);
 
     // combine incremented value and the stored byte
     storage[byte] = (crop | result);
@@ -355,15 +331,15 @@ bool InterfaceMarking::marked(const Label_ID& label) const {
     assert(label <= interface_length);
 
     // the byte in which this interface is stored
-    unsigned int byte = (label-1) / markings_per_byte;
+    const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // first, create (2**message_bound_bits)-1, then shift it to the needed position
-    uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
+    const uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
 
     // get the result by masking the respective byte
-    uint8_t result = storage[byte] & mask;
+    const uint8_t result = storage[byte] & mask;
 
     // shift back the result
     return ((result >> offset) > 0);
@@ -390,10 +366,8 @@ bool InterfaceMarking::pendingOutput() const {
 
 hash_t InterfaceMarking::hash() const {
     hash_t result = 0;
-
     for (unsigned int i = 0; i < bytes; ++i) {
         result += (storage[i] << (7*i));
     }
-
     return result;
 }

@@ -35,11 +35,7 @@
 #include "Cover.h"
 #include "cmdline.h"
 #include "types.h"
-
 #include "verbose.h"
-
-#define YYDEBUG 1
-#define YYERROR_VERBOSE 1
 
 /// the vector of the successor state numbers of the current marking
 std::vector<InnerMarking_ID> currentSuccessors;
@@ -143,16 +139,15 @@ scc:
 | KW_SCC scc_members
 ;
 
-scc_member:
-  NUMBER
-    { currentSCC.push_back($1); }
-;
-
 scc_members:
   scc_member
 | scc_members scc_member
 ;
 
+scc_member:
+  NUMBER
+    { currentSCC.push_back($1); }
+;
 
 lowlink:
   KW_LOWLINK NUMBER

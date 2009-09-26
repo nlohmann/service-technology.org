@@ -90,7 +90,7 @@ class InnerMarking {
     public: /* member functions */
         /// constructor
         InnerMarking(const InnerMarking_ID&, const std::vector<Label_ID>&,
-                     const std::vector<InnerMarking_ID>&, bool);
+                     const std::vector<InnerMarking_ID>&, const bool&);
 
         /// destructor
         ~InnerMarking();

@@ -80,8 +80,6 @@ void InnerMarking::initialize() {
     markingMap.clear();
     finalMarkingReachableMap.clear();
 
-    delete net;
-
     if (stats.final_markings == 0) {
         message("warning: no final marking found");
     }
@@ -93,6 +91,7 @@ void InnerMarking::initialize() {
 
 
 void InnerMarking::finalize() {
+    delete net;
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         delete inner_markings[i];
     }
@@ -109,7 +108,7 @@ void InnerMarking::finalize() {
 InnerMarking::InnerMarking(const InnerMarking_ID& myId,
                            const std::vector<Label_ID>& _labels,
                            const std::vector<InnerMarking_ID>& _successors,
-                           bool _is_final)
+                           const bool& _is_final)
         : is_final(_is_final), is_waitstate(0), is_bad(0),
           out_degree(_successors.size()), possibleSendEvents(NULL) {
     assert(_labels.size() == out_degree);

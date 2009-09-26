@@ -28,6 +28,6 @@ void message(const char* format, ...);
 void status(const char* format, ...);
 
 /// abort with an error message and an error code
-void abort(unsigned int code, const char* format, ...);
+void abort(unsigned short code, const char* format, ...);
 
 #endif

@@ -130,7 +130,7 @@ class StoredKnowledge {
 
     public: /* member functions */
         /// constructs an object from a Knowledge object
-        explicit StoredKnowledge(Knowledge&);
+        explicit StoredKnowledge(Knowledge const&);
 
         /// destructor
         ~StoredKnowledge();

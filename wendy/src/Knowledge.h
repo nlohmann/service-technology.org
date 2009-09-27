@@ -42,6 +42,9 @@
        building the bubble to avoid repeated traversion. Then, it might be
        cheaper to precompute the results and store them as members than
        actually making a function call.
+
+ \todo In general, std::map<Label_ID, bool> could be replaced by
+       std::vector<Label_ID>. No overhead and constant access!
  */
 class Knowledge {
     public: /* member functions */
@@ -64,10 +67,10 @@ class Knowledge {
         void sequentializeReceivingEvents();
 
         /// \todo Daniela, please comment me
-        bool considerReceivingEvent(Label_ID) const;
+        bool considerReceivingEvent(const Label_ID&) const;
 
         /// \todo Daniela, please comment me
-        bool considerSendingEvent(Label_ID) const;
+        bool considerSendingEvent(const Label_ID&) const;
 
     public: /* attributes */
         /// whether this knowledge is sane

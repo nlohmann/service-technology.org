@@ -222,6 +222,7 @@ inline void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& 
             currentKnowledge->is_sane = 0;
 
             // tell each predecessor of current knowledge that this knowledge switched its status to insane
+            /// \todo looks as if a set union would do the job here
             for (std::set<StoredKnowledge*>::const_iterator iter = tempPredecessors[currentKnowledge].begin();
                                                             iter != tempPredecessors[currentKnowledge].end(); ++iter) {
                 knowledgeSet.insert(*iter);
@@ -300,7 +301,7 @@ inline void StoredKnowledge::rearrangeKnowledgeBubble() {
 /*!
  \param[in] K  the knowledge to copy from
 */
-StoredKnowledge::StoredKnowledge(Knowledge& K)
+StoredKnowledge::StoredKnowledge(Knowledge const& K)
         : is_final(0), is_final_reachable(0), is_sane(K.is_sane),
           is_on_tarjan_stack(1), sizeDeadlockMarkings(K.size),
           sizeAllMarkings(K.size), inner(NULL), interface(NULL),

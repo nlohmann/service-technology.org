@@ -477,8 +477,8 @@ void Knowledge::sequentializeReceivingEvents() {
 
  \param label current receiving event
 */
-bool Knowledge::considerReceivingEvent(Label_ID label) const {
-    assert(args_info.seqReceivingEvents_flag == true);
+bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
+    assert(args_info.seqReceivingEvents_flag);
 
     return (consideredReceivingEvents.find(label) != consideredReceivingEvents.end());
 }
@@ -493,9 +493,9 @@ bool Knowledge::considerReceivingEvent(Label_ID label) const {
 
  \note given label must be adjusted such that first send event has label 0
 */
-bool Knowledge::considerSendingEvent(Label_ID label) const {
+bool Knowledge::considerSendingEvent(const Label_ID& label) const {
     assert(args_info.smartSendingEvent_flag);
-    assert(posSendEventsDecoded != NULL);
+    assert(posSendEventsDecoded);
 
     return (posSendEventsDecoded[label - Label::first_send] == 1);
 }

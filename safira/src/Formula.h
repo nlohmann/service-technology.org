@@ -11,6 +11,10 @@ using namespace std;
 
 /// a formula to be attached to a node
 class Formula {
+private:
+	/// measures the time needed by minisat
+	static double full_time;
+
 public:
 
 	/// type of the formula
@@ -41,6 +45,9 @@ public:
 	/// transforms an formula into conjunctive normal form (CNF). Assumption: all negations were already moved to the inner before.
 	/// returns a list of clauses
 	virtual list<Clause> toCNF( int varId = 1,  int max = 1) const = 0;
+
+	///return the time needed by minisat
+	static double getMinisatTime();
 };
 
 

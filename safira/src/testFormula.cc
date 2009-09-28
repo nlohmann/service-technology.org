@@ -142,12 +142,14 @@ void testFALSE(){
 	assert(clauses.size() == 2);
 
 	assert(clauses.begin()->literal0 != emptyLiteral());
+	assert(clauses.begin()->literal0 == -2);
 	assert(clauses.begin()->literal1 == emptyLiteral());
 	assert(clauses.begin()->literal2 == emptyLiteral());
 
 	list<Clause>::const_iterator iter = clauses.begin(); //first clause
 	++iter;
 	assert(iter->literal0 != emptyLiteral());
+	assert(iter->literal0 == 2);
 	assert(iter->literal1 == emptyLiteral());
 	assert(iter->literal2 == emptyLiteral());
 

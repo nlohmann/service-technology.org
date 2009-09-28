@@ -6,6 +6,7 @@
 #include <set>
 #include <map>
 #include <list>
+#include <ctime>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "Formula.h"
@@ -20,10 +21,13 @@ extern gengetopt_args_info args_info;
 extern map<int, string> id2label;
 extern map<string, int> label2id;
 
+double Formula::full_time;
+
 /****************************************************************************
  * constructors
  ***************************************************************************/
 Formula::Formula(){
+
 }
 
 FormulaAND::FormulaAND(const Formula *_left, const Formula *_right) :
@@ -174,6 +178,9 @@ FormulaNOT::~FormulaNOT() {
 	delete f;
 }
 
+double Formula::getMinisatTime(){
+	return full_time;
+}
 
 
 //fVar: number of Variables in the formula to be checked
@@ -213,8 +220,13 @@ bool Formula::isSatisfiable(int fVar){
     status("executing '%s'", s.c_str());
 	//int result = system("echo 'p cnf 1 2 -1 0 -1 0' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null");
 
+
+
+    clock_t start_clock = clock();
+    //int result = 10;
 	int result = system(s.c_str());
     result = WEXITSTATUS(result);
+    full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
 /* 0 = error
  * 1 = could not open file

@@ -27,6 +27,7 @@ string invocation;
 // lexer and parser
 extern int og_yyparse();
 extern FILE* og_yyin;
+extern int og_yylex_destroy();
 
 extern Graph * graph;
 
@@ -86,6 +87,7 @@ int main(int argc, char **argv) {
     if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
 
     fclose(og_yyin);
+    og_yylex_destroy();
 
 //    time_t parsingTime_end = time(NULL);
 //    cout << "number of labels: " << label2id.size()-4 << endl;
@@ -100,6 +102,7 @@ int main(int argc, char **argv) {
 //	time_t buildOG_end = time(NULL);
 //	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
 //	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
+//	cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
 
 	for (int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {
@@ -200,7 +203,7 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // set default values
-    cmdline_parser_init(&args_info);
+    //cmdline_parser_init(&args_info);
 
     // initialize the parameters structure
     struct cmdline_parser_params *params = cmdline_parser_params_create();

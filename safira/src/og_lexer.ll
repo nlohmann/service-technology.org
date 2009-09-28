@@ -53,7 +53,7 @@ number         [0-9]+
 "->"                                    { return ARROW;                }
 
 {number}       { og_yylval.value = atoi(og_yytext); return NUMBER;     }
-{identifier}   { og_yylval.str = og_yytext; return IDENT;              }
+{identifier}   { og_yylval.str = strdup(og_yytext); return IDENT;              }
 
 {whitespace}                            { /* do nothing */             }
 

@@ -119,6 +119,7 @@ identlist:
 		  //assert(label2id.find(string($1)) == label2id.end());
 		  //id2label[currentIdPos] = string($1);
 		  //label2id[string($1)] = currentIdPos; 
+		  free($1);
 		  } 
 | identlist COMMA IDENT { 
           ++currentIdPos;
@@ -127,6 +128,7 @@ identlist:
 		  //assert(label2id.find(string($3)) == label2id.end());
           //id2label[currentIdPos] = string($3);
 		  //label2id[string($3)] = currentIdPos; 
+		  free($3);
 		  } 
 ;
 
@@ -196,7 +198,8 @@ formula:
 | IDENT 
 	{ if (label2id.find(string($1)) == label2id.end()){
 	  	 og_yyerror("could not find the literal");}
-	  $$ = new FormulaLit(label2id[string($1)]); }
+	  $$ = new FormulaLit(label2id[string($1)]); 
+	  free($1);}
 ;
 
 
@@ -206,7 +209,8 @@ successors:
 | successors IDENT 
   	{ identTmp = $2;
   	  if (label2id.find(string($2)) == label2id.end()) 
-		og_yyerror("could not find label of edge"); } 
+		og_yyerror("could not find label of edge"); 
+	  } 
 				
   ARROW NUMBER
   	{ int l = label2id[identTmp];
@@ -215,7 +219,9 @@ successors:
   	  }
   	  currentNode->addEdge(l, graph->nodes[$5]);
   	  //printf("Kante %d - %s -> %d added \n", currentNode->id, identTmp.c_str(), nodes[$5]->id);  
+  	  free($2);
   	}
+  	
 ;
 %%
 

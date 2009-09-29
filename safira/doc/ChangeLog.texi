@@ -1,3 +1,8 @@
+@heading Version 1.1-unreleased
+@itemize
+@item removed memory leaks caused by gengetopt, lex and yacc
+@end itemize
+
 @heading Version 1.0
 @itemize
 @item initial release

@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT(Safira, 1.0, safira@service-technology.org, safira, http://service-technology.org/safira)
+AC_INIT(Safira, 1.1-unreleased, safira@service-technology.org, safira, http://service-technology.org/safira)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src/main.cc])

@@ -6,6 +6,11 @@
                      http://service-technology.org/safira
 
 
+Version 1.1-unreleased
+======================
+
+* removed memory leaks caused by gengetopt, lex and yacc
+
 Version 1.0
 ===========
 

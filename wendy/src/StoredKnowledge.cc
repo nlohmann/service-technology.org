@@ -368,9 +368,8 @@ void StoredKnowledge::finalize() {
     unsigned int count = 0;
 
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
-        for (size_t i = 0; i < it->second.size(); ++i) {
+        for (size_t i = 0; i < it->second.size(); ++i, ++count) {
             delete it->second[i];
-            ++count;
         }
     }
 
@@ -1122,7 +1121,7 @@ void StoredKnowledge::output_diagnosedot(std::ostream& file) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if (seen.find(it->second[i]) != seen.end()) {
 
-                file << "\"" << it->second[i] << "\" [label=<";
+                file << "\"" << it->second[i] << "\" [label=<" << it->second[i] << "<BR/>";
 
                 bool blacklisted = false;
 
@@ -1147,9 +1146,12 @@ void StoredKnowledge::output_diagnosedot(std::ostream& file) {
 
                     if (inner_dead) {
                         reason += " (dl)";
+                        message("node %p is blacklisted: m%u is internal deadlock",
+                            it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
                     }
                     if (not interface_sane) {
                         reason += " (mb)";
+                        message("node %p is blacklisted: message bound violation", it->second[i]);
                     }
 
                     if (not reason.empty()) {
@@ -1177,6 +1179,8 @@ void StoredKnowledge::output_diagnosedot(std::ostream& file) {
                                 if (disallowedResolvers.size() == resolvers.size()) {
                                     blacklisted = true;
                                     file << " <FONT COLOR=\"RED\">(uw)</FONT>";
+                                    message("node %p is blacklisted: m%u cannot be safely resolved",
+                                        it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
                                 } else {
                                     file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
                                 }

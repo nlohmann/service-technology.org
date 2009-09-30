@@ -24,11 +24,17 @@ option "ServiceC" c
 
 section "Tasks"
 
-option "task" -
-  "Set the task."
-  details="Choose between 'matching' (service and og), 'simulation' (two ogs) and 'equivalence' (two ogs).\n"
-  values="matching","simulation","equivalence" enum
-  typestr="STYLE"
+option "matching" -
+  "Check matching for given Service and Operating Guidelinde."
+	flag off
+
+option "simulation" -
+  "Check simulation for given Operating Guidelindes."
+	flag off
+
+option "equivalence" -
+  "Check equivalence for Operating Guidelindes."
+	flag off
 
 section "Configuration"
 sectiondesc="Cosme relies on several other tools. These options configure Cosme to find these tools.\n"

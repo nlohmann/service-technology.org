@@ -55,8 +55,16 @@ void evaluateParameters(int argc, char** argv) {
 			cerr << PACKAGE << ": ERROR: invalid command-line parameter(s)" << endl;
     }
 
+		// check what to do
+		if ((args_info.matching_flag + args_info.simulation_flag + args_info.equivalence_flag) > 1) {
+			cerr << PACKAGE << ": ERROR: don't know what to do (matching, simulation or equivalence)" << endl;
+		}
+		if ((args_info.matching_flag + args_info.simulation_flag + args_info.equivalence_flag) == 0) {
+			cerr << PACKAGE << ": ERROR: don't know what to do (matching, simulation or equivalence)" << endl;
+		}
+
     // check whether two files are given
-    if (args_info.task_arg == task_arg_matching) {
+    if (args_info.matching_flag) {
 			if (!args_info.ServiceC_given or !args_info.OGA_given) {
 				cerr << PACKAGE << ": ERROR: for matching a service and an operating guideline must be given" << endl;
 			}
@@ -191,7 +199,7 @@ int main(int argc, char** argv)
 	
 	evaluateParameters(argc, argv);
 
-	if (args_info.task_arg == task_arg_matching) {
+	if (args_info.matching_flag) {
 		Service* C;
 		OperatingGuideline *A;
 
@@ -211,7 +219,7 @@ int main(int argc, char** argv)
 		delete A;
 		delete C;
 	}
-	else if ((args_info.task_arg == task_arg_simulation) or (args_info.task_arg == task_arg_equivalence)) {
+	else if ((args_info.simulation_flag) or (args_info.equivalence_flag)) {
 		OperatingGuideline *A, *B;
 
 		A = parseOG(args_info.OGA_arg);
@@ -219,7 +227,7 @@ int main(int argc, char** argv)
 		B = parseOG(args_info.OGB_arg);
 		if (B == NULL) return EXIT_FAILURE;
 		
-		if (args_info.task_arg == task_arg_simulation) {
+		if (args_info.simulation_flag) {
 			if (A->isSimulation(*B))
 				cout << "\nObjective completed\n" << endl;
 			else

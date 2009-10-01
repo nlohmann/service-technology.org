@@ -614,6 +614,7 @@ namespace pnapi
       {
         // create a prefixed transition in the resulting net
         Transition & rt = result.createTransition(prefix+(*t)->getName(), (*t)->getSynchronizeLabels());
+        rt.setCost((*t)->getCost()); // copy transition costs
         
         // copy preset arcs
         for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -644,6 +645,7 @@ namespace pnapi
       {
         // create a prefixed transition in the resulting net
         Transition & rt = result.createTransition(netPrefix+(*t)->getName(), (*t)->getSynchronizeLabels());
+        rt.setCost((*t)->getCost()); // copy transition costs
         
         // copy preset arcs
         for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -698,6 +700,8 @@ namespace pnapi
           
           // create new transition by merging
           Transition & rt = result.createTransition((*t1)->getName() + netPrefix + (*t2)->getName(), rtLabels);
+          /// TODO: maybe calculate other costs for merged transitions
+          rt.setCost((*t1)->getCost() + (*t2)->getCost()); // copy transition costs
           
           // copy preset arcs
           for (set<Arc *>::iterator f = (*t1)->getPresetArcs().begin(); 
@@ -753,6 +757,7 @@ namespace pnapi
                 
       // create new transition by merging
       Transition & rt = result.createTransition(prefix + (*t)->getName(), rtLabels);
+      rt.setCost((*t)->getCost()); // copy transition costs
       
       // copy preset arcs
       for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -778,6 +783,7 @@ namespace pnapi
                 
       // create new transition by merging
       Transition & rt = result.createTransition(netPrefix + (*t)->getName(), rtLabels);
+      rt.setCost((*t)->getCost()); // copy transition costs
       
       // copy preset arcs
       for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 

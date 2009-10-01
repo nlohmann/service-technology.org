@@ -339,6 +339,17 @@ AT_CHECK([PETRI NET1 --compose=NET2])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14417 (https://gna.org/bugs/?14417)])
+m4_define([NET1],[bug14417.1.owfn])
+m4_define([NET2],[bug14417.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
+AT_CHECK([PETRI NET1 --compose=NET2 -oowfn])
+AT_CHECK([GREP -q "COST 2;" NET1.composed.owfn])
+AT_CHECK([GREP -q "COST 3;" NET1.composed.owfn])
+AT_CHECK([GREP -q "COST 42;" NET1.composed.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Murata Reduction Rules])

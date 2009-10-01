@@ -1,0 +1,7 @@
+TEuro -> MEuro (1);
+TEuro -> TRetEuro (1000);
+-> MCB (1);
+-> MTB (1);
+MBevT -> TBevT (10);
+MBevT -> TBevT (10);
+

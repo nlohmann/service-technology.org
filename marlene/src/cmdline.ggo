@@ -49,6 +49,10 @@ option "arrogant" -
   dependon="asyncif"
   flag off
 
+option "costoptimized" -
+  "Adapter is optimized for costs. If no cost information are provided, the most liberal adapter is calculated."
+  flag off
+
 option "controlleronly" -
   "Only return the controller, not the whole adapter"
   flag off
@@ -98,6 +102,14 @@ option "wendy" -
   string
   typestr="FILE"
   default="wendy"
+  optional
+  hidden
+
+option "candy" -
+  "Set the name of the Candy binary used to cost-optimize controller parts of the adapter."
+  string
+  typestr="FILE"
+  default="candy"
   optional
   hidden
 

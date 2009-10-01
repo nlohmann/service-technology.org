@@ -1,3 +1,24 @@
+@heading Version 1.2-unreleased
+@itemize
+
+@item added new version of PNAPI -- nets no longer become unbounded when normalized
+
+@item when building binary for Win32-Systems, path for temporary files is automatically set to %TEMP%
+
+@item added experimental support for Candy (@url{http://service-technology.org/tools/candy})
+
+@item known issues:
+
+@itemize
+
+@item added workaround when dealing with synchronouns interface between controller and engine (see bug #14416, @url{https://gna.org/bugs/?14416})
+
+@item cost-optimization is not fully working due to bug #14417, @url{https://gna.org/bugs/?14416}
+
+@end itemize
+
+@end itemize
+
 @heading Version 1.1
 @itemize
 

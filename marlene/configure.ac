@@ -1,4 +1,4 @@
-AC_INIT(Marlene, 1.1, christian.gierds@service-technology.org)
+AC_INIT([Marlene],[1.2-unreleased],[christian.gierds@service-technology.org])
 
 AC_CONFIG_SRCDIR([src/marlene.cc])
 AC_CONFIG_HEADERS([src/config.h])
@@ -11,25 +11,6 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # check if this package was checkedout from a repository
 AM_CONDITIONAL(FROMSVN,test -d ".svn")
-
-#CXXFLAGS=""
-#CFLAGS=""
-
-#if test -z "${CXXFLAGS}" -a  -z "${CFLAGS}" 
-#then
-#if test -d ".svn" 
-#  then 
-#    configured_CXXFLAGS="-O0 -g -Wall -pedantic"
-#    configured_CFLAGS="-O0 -g -Wall -pedantic"
-#  else
-#    configured_CXXFLAGS="-O3 -DNDEBUG"
-#    configured_CFLAGS="-O3 -DNDEBUG"
-#fi
-#else
-#    configured_CXXFLAGS="${CXXFLAGS}"
-#    configured_CFLAGS="${CFLAGS}"
-#fi
-#configured_LDFLAGS="${LDFLAGS}"
 
 # check for programs needed to compile
 AC_PROG_YACC
@@ -56,9 +37,10 @@ AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
 AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
 
 # check for required tools
-AC_PATH_PROG(LOLA_FULL, [lola-full], [])
+AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
 #AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
+AC_PATH_PROG(CANDY, [candy], [])
 AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
   AC_MSG_WARN([Petrify was not found. See file README.])
@@ -68,9 +50,6 @@ else
 fi
 AC_SUBST(PETRIFY)
 
-
-# needed for the Petri Net API
-#AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
 AC_ARG_ENABLE(pnapi,
@@ -90,6 +69,23 @@ if test "$enable_pnapi" = "yes"; then
 else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
+
+# enable Windows temp files
+AC_ARG_ENABLE(windowstemp,
+              AS_HELP_STRING([--enable-windowstemp],[sets standard temp file for Marlene to %TEMP%/marlene-XXXXXX (should only set when compiling for pure Win32 binary)]),
+              enable_windowstemp=${enableval}, enable_windowstemp="no")
+AC_MSG_CHECKING([whether to use Windows temp folder])
+AC_MSG_RESULT($enable_windowstemp)
+if test "$enable_windowstemp" = "yes" ; then
+    TEMPFOLDER=`cygpath --windows $TEMP`
+else
+    TEMPFOLDER=/tmp/marlene-XXXXXX
+fi
+
+AC_SUBST(TEMPFOLDER)
+
+AC_MSG_CHECKING([weather to be sunny])
+AC_MSG_RESULT([better should be])
 
 # Checks for header files.
 AC_FUNC_ALLOCA

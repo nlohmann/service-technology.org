@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-09-17 17:34:46 +0200 (Do, 17. Sep 2009) $
+ * \date    $Date: 2009-09-25 05:58:43 +0200 (Fr, 25. Sep 2009) $
  *
- * \version $Revision: 4726 $
+ * \version $Revision: 4768 $
  */
 
 #include "config.h"
@@ -211,6 +211,7 @@ namespace pnapi
 
   void ComponentObserver::initializeNodeNameHistory(Node & node)
   {
+    /*
     deque<string> history = node.getNameHistory();
     deque<string>::iterator it = history.begin();
     //for (deque<string>::iterator it = history.begin(); it != history.end();
@@ -218,8 +219,16 @@ namespace pnapi
     {
       assert((net_.nodesByName_.find(*it))->second == &node ||
 	     net_.nodesByName_.find(*it) == net_.nodesByName_.end());
+      
       net_.nodesByName_[*it] = &node;
     }
+    //*/
+    
+    string name = node.getName();
+    assert( (net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
+            ((net_.nodesByName_.find(name))->second == &node) );
+    
+    net_.nodesByName_[name] = &node;
   }
 
 
@@ -797,11 +806,22 @@ namespace pnapi
     }
     
 
-    /*!
-     * \todo check me!
-     */
-    result.finalCondition().merge(finalCondition(), placeMap);
-    result.finalCondition().merge(net.finalCondition(), placeMap);
+    // here be dragons
+    Condition cond1, cond2;
+    {
+      Condition tmpCond;
+      tmpCond = finalCondition().formula(); // copy condition
+      formula::Formula * f1 = const_cast<formula::Formula*>(&(tmpCond.formula()));
+      f1->unfold(*this);
+      cond1 = *f1;
+      
+      tmpCond = net.finalCondition().formula();
+      formula::Formula * f2 = const_cast<formula::Formula*>(&(tmpCond.formula()));
+      f2->unfold(net);
+      cond2 = *f2;
+    }
+    result.finalCondition().merge(cond1, placeMap);
+    result.finalCondition().merge(cond2, placeMap);
 
     // overwrite this net with the resulting net
     *this = result;
@@ -1306,48 +1326,37 @@ namespace pnapi
     }
 
     std::map<Transition *, string> edgeLabels; ///< returning map
-    edgeLabels.clear();
-
-    for (set<Transition *>::const_iterator t = transitions_.begin();
-        t != transitions_.end(); t++)
+    
+    // get input labels
+    for(set<Place*>::iterator p = inputPlaces_.begin();
+          p != inputPlaces_.end(); ++p)
     {
-      switch ((*t)->getType())
+      for(set<Node*>::iterator t = (*p)->getPostset().begin();
+            t != (*p)->getPostset().end(); ++t)
       {
-      case Node::INPUT:
+        edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
+      }
+    }
+    
+    // get output labels
+    for(set<Place*>::iterator p = outputPlaces_.begin();
+          p != outputPlaces_.end(); ++p)
+    {
+      for(set<Node*>::iterator t = (*p)->getPreset().begin();
+            t != (*p)->getPreset().end(); ++t)
       {
-        set<Arc *> preset = (*t)->getPresetArcs();
-        for (set<Arc *>::const_iterator f = preset.begin();
-            f != preset.end(); f++)
-        {
-          if ((*f)->getPlace().getType() == Node::INPUT)
-          {
-            edgeLabels[*t] = (*f)->getPlace().getName();
-            break;
-          }
-        }
-        break;
+        edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
       }
-      case Node::OUTPUT:
-      {
-        set<Arc *> postset = (*t)->getPostsetArcs();
-        for (set<Arc *>::const_iterator f = postset.begin();
-            f != postset.end(); f++)
-        {
-          if ((*f)->getPlace().getType() == Node::OUTPUT)
-          {
-            edgeLabels[*t] = (*f)->getPlace().getName();
-            break;
-          }
-        }
-        break;
-      }
-      case Node::INTERNAL:
-      {
-        edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
-        break;
-      }
-      default: ;//assert(false);
-      }
+    }
+    
+    // get synchronous and TAU labels
+    for (set<Transition*>::iterator t = transitions_.begin();
+          t != transitions_.end(); ++t)
+    {
+      if((*t)->getType() != Node::INTERNAL)
+        continue;
+        
+      edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
     }
 
     return edgeLabels;
@@ -1753,55 +1762,96 @@ namespace pnapi
    */
   void PetriNet::normalize_classical()
   {
-    if (isNormal())
-      return;
-
-    std::set<Place *> input = getInputPlaces();
-    std::set<Place *> output = getOutputPlaces();
-
-    for (std::set<Place *>::const_iterator p = input.begin();
-        p != input.end(); p++)
+    // transitions may to synchronize
+    set<Transition*> candidates = synchronizedTransitions_;
+    // complement places generated during normalisation
+    set<Place*> complementPlaces;
+    
+    // fill candidates
+    for(set<Place*>::iterator p = inputPlaces_.begin();
+         p != inputPlaces_.end(); ++p)
     {
-      std::string name = (*p)->getName();
-
-      Place &intp = createPlace("normal_"+name);
-      Transition &intt = createTransition("t_"+name);
-      Place &comp = createPlace("comp_"+name);
-      comp.mark();
-
-      std::set<Arc *> postset = (*p)->getPostsetArcs();
-      for (std::set<Arc *>::const_iterator f = postset.begin();
-          f != postset.end(); f++)
+      for(set<Node*>::iterator t = (*p)->getPostset().begin();
+           t != (*p)->getPostset().end(); ++t)
       {
-        createArc(intp, (*f)->getTransition());
-        createArc((*f)->getTransition(), comp);
-        deleteArc(**f);
+        candidates.insert(static_cast<Transition*>(*t));
       }
-      createArc(**p, intt);
-      createArc(intt, intp);
-      createArc(comp, intt);
-
-      condition_ = condition_.formula() && comp == 1;
     }
-    for (std::set<Place *>::const_iterator p = output.begin();
-        p != output.end(); p++)
+    for(set<Place*>::iterator p = outputPlaces_.begin();
+         p != outputPlaces_.end(); ++p)
     {
-      std::string name = (*p)->getName();
-
-      Place &intp = createPlace("normal_"+name);
-      Transition &intt = createTransition("t_"+name);
-
-      std::set<Arc *> preset = (*p)->getPresetArcs();
-      for (std::set<Arc *>::const_iterator f = preset.begin();
-          f != preset.end(); f++)
+      for(set<Node*>::iterator t = (*p)->getPreset().begin();
+           t != (*p)->getPreset().end(); ++t)
       {
-        createArc((*f)->getTransition(), intp);
-        deleteArc(**f);
+        candidates.insert(static_cast<Transition*>(*t));
       }
-      createArc(intt, **p);
-      createArc(intp, intt);
     }
-    finalCondition() = finalCondition().formula() && formula::ALL_OTHER_PLACES_EMPTY;
+    
+    for(set<Transition*>::iterator t = candidates.begin();
+         t != candidates.end(); ++t)
+    {
+      if( ((*t)->isNormal()) || // already normal; nothing to do
+          ((*t)->getSynchronizeLabels().size() > 1) ) // can't normalize this transition
+        continue;
+      
+      // check neighbor arcs
+      set<Arc*> possiblyEvilArcs = util::setUnion((*t)->getPresetArcs(),(*t)->getPostsetArcs());
+      for(set<Arc*>::iterator a = possiblyEvilArcs.begin(); 
+           a != possiblyEvilArcs.end(); ++a)
+      {
+        if((*a)->getPlace().getType() == Node::INTERNAL)
+          continue;
+        // arcs reaching this line are evil
+        
+        Place & p = (*a)->getPlace();
+        if(p.getType() == Node::INPUT)
+        {
+          for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
+          {
+            stringstream ss;
+            ss << i;
+            
+            Place & np = createPlace("normal" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
+            Place & cp = createPlace("complement" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
+            cp.mark(1);
+            complementPlaces.insert(&cp);
+            Transition & nt = createTransition("t_in" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
+            
+            createArc(p, nt);
+            createArc(nt, np);
+            createArc(cp, nt);
+            createArc(np, **t);
+            createArc(**t, cp);
+          }
+        }
+        else
+        {
+          for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
+          {
+            stringstream ss;
+            ss << i;
+            
+            Place & np = createPlace("p" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
+            Transition & nt = createTransition("t_out" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
+            
+            createArc(nt, p);
+            createArc(np, nt);
+            createArc(**t, np);
+          }
+        }
+        
+        // remove arc
+        deleteArc(**a);
+      }
+    }
+
+    for(set<Place*>::iterator p = complementPlaces.begin();
+         p != complementPlaces.end(); ++p)
+    {
+      condition_ = condition_.formula() && ((**p) == 1);
+    }
+    
+    condition_ = condition_.formula() && formula::ALL_OTHER_PLACES_EMPTY;
   }
 
 

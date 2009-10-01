@@ -58,7 +58,8 @@ int adapt_rules_yyerror(const char* msg)
 %name-prefix="adapt_rules_yy"
 
 %token RULE_HIDDEN RULE_OBSERVABLE RULE_CONTROLLABLE
-%token NAME ARROW COMMA SEMICOLON DMINUS
+%token NAME VALUE ARROW COMMA SEMICOLON DMINUS
+%token LBRACE RBRACE
 
 %token_table
 
@@ -68,11 +69,14 @@ typedef std::list< unsigned int > uilist;
 
 %union {
   char *str;
+  int ival;
   uilist * channelList;
 }
 
 /* the types of the non-terminal symbols */
 %type <str> NAME
+%type <ival> VALUE
+%type <ival> opt_costvalue
 %type <channelList> channel_list
 %type <channelList> opt_channel_list
 
@@ -137,10 +141,11 @@ partial_rule:
 total_rule:
     opt_channel_list 
     ARROW opt_channel_list
+    opt_costvalue
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
         std::list< unsigned int > * slist = new std::list< unsigned int >();
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist);
+        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist, RuleSet::AdapterRule::AR_NORMAL, $4);
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
@@ -149,9 +154,10 @@ total_rule:
     opt_channel_list 
     DMINUS channel_list
     ARROW opt_channel_list
+    opt_costvalue
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *$3);
+        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *$3, RuleSet::AdapterRule::AR_NORMAL, $6);
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
@@ -176,13 +182,24 @@ channel_list:
     {
         $$ = new std::list< unsigned int>();
         $$->push_back(workingSet->getIdForMessage(std::string($1)));
+        free $1;
     }
 |
     NAME COMMA channel_list
     {
         $$ = $3;
         $$->push_back(workingSet->getIdForMessage(std::string($1)));
+        free $1;
     }
 ;
 
-
+opt_costvalue:
+    /* empty */
+    {
+        $$ = 0;
+    }
+|
+    LBRACE VALUE RBRACE
+    {
+        $$ = $2;
+    }

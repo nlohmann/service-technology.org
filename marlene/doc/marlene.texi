@@ -178,9 +178,20 @@ For an overview of the command line options, type @samp{marlene -h} to see the f
 
 @section Exit Codes
 
+@itemize
 
+@item 0 -- adapter (or controller/engine) was built successfully
+@item >0 -- adapter could not be built
+
+@end itemize
 
 @section Error Codes
+
+@itemize
+
+@item 2 -- wrong command line command line parameter
+
+@end itemize
 
 
 

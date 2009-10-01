@@ -49,7 +49,8 @@ namespace pnapi
   Marking::Marking(PetriNet &n, bool empty) :
     net_(&n)
   {
-    for (set<Place *>::const_iterator p = n.getPlaces().begin(); p != n.getPlaces().end(); p++)
+    for (set<Place *>::const_iterator p = n.getPlaces().begin(); 
+          p != n.getPlaces().end(); ++p)
         m_[*p] = empty ? 0 : (*p)->getTokenCount();
   }
 
@@ -71,6 +72,20 @@ namespace pnapi
   Marking::Marking(std::map<const Place *, unsigned int> m, PetriNet *net) :
     m_(m), net_(net)
   {
+  }
+  
+  /*!
+   * \brief constructor for cross-net-copying
+   */
+  Marking::Marking(const Marking & m, PetriNet* net, 
+                   std::map<const Place*, const Place*>& placeMap) :
+    net_(net)
+  {
+    for(map<const Place*, unsigned int>::const_iterator it = m.m_.begin();
+         it != m.m_.end(); ++it)
+    {
+      m_[placeMap[it->first]] = it->second;
+    }
   }
 
 

@@ -394,7 +394,8 @@ marking:
 
 final:
     KEY_FINALMARKING { finalMarking_ = new Marking(pnapi_owfn_yynet, true); } 
-    finalmarkings SEMICOLON 
+    finalmarkings SEMICOLON
+    { delete finalMarking_; finalMarking_ = NULL; } 
   | condition 
     {
       pnapi_owfn_yynet.finalCondition() = (*$1);

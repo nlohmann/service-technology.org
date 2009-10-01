@@ -6,6 +6,27 @@
                      http://service-technology.org/marlene
 
 
+Version 1.2-unreleased
+======================
+
+* added new version of PNAPI - nets no longer become unbounded when normalized
+
+* when building binary for Win32-Systems, path for temporary files is
+  automatically set to %TEMP%
+
+* added experimental support for Candy
+  (`http://service-technology.org/tools/candy')
+
+* known issues:
+
+     * added workaround when dealing with synchronouns interface between
+       controller and engine (see bug #14416, `https://gna.org/bugs/?14416')
+
+     * cost-optimization is not fully working due to bug #14417,
+       `https://gna.org/bugs/?14416'
+
+
+
 Version 1.1
 ===========
 

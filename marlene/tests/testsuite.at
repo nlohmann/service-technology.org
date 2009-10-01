@@ -1,7 +1,7 @@
 AT_INIT
 
 # define macros to skip a test if LoLA or Fiona was not found by configure
-m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA_FULL" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
 #m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 
@@ -32,7 +32,7 @@ AT_SETUP([Small test (synchronous)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn -r test.ar],0,ignore)
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar],0,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -40,7 +40,7 @@ AT_SETUP([Small test (asynchronous)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn -r test.ar -a],0,ignore)
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --asyncif],0,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -48,7 +48,7 @@ AT_SETUP([Small test (no complement)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
-AT_CHECK([MARLENE test-n.owfn -r test-n.ar -n],0,ignore)
+AT_CHECK([MARLENE test-n.owfn --rulefile=test-n.ar --nocomplementplaces],0,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -56,7 +56,15 @@ AT_SETUP([Small test (piping)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
-AT_CHECK([MARLENE -r test-n.ar -n < test-n.owfn > out.owfn],0,ignore)
+AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces < test-n.owfn > out.owfn],0,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (saving result)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
+AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --output=out.owfn --verbose < test-n.owfn],0,ignore,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -68,7 +76,15 @@ AT_SETUP([Verbose and very verbose information])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn -r test.ar -vw],0,ignore,ignore)
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --veryverbose],0,ignore,ignore)
+AT_KEYWORDS(special)
+AT_CLEANUP
+
+AT_SETUP([Do not remove temporary files])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --veryverbose --noClean],0,ignore,ignore)
 AT_KEYWORDS(special)
 AT_CLEANUP
 
@@ -85,31 +101,31 @@ AT_SETUP([control of rules])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
-AT_CHECK([MARLENE ca1.owfn td.owfn -r td.ar],0,ignore)
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar],0,ignore)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
-#AT_SETUP([chatty adapter])
-#AT_CHECK_WENDY
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
-#AT_CHECK([MARLENE ca2.owfn td.owfn -r td.ar -a --chatty],0,ignore)
-#AT_KEYWORDS(specadapters)
-#AT_CLEANUP
+AT_SETUP([chatty adapter])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --chatty],0,ignore)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
 
-#AT_SETUP([arrogant adapter])
-#AT_CHECK_WENDY
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
-#AT_CHECK([MARLENE ca2.owfn td.owfn -r td.ar -a --arrogant],0,ignore)
-#AT_KEYWORDS(specadapters)
-#AT_CLEANUP
+AT_SETUP([arrogant adapter])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --arrogant],0,ignore)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
 
 AT_SETUP([engine only])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn -r test.ar --engineonly],0,ignore)
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --engineonly],0,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -117,7 +133,7 @@ AT_SETUP([controller only])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn -r test.ar --controlleronly],0,ignore)
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --controlleronly],0,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -125,7 +141,51 @@ AT_SETUP([adding prefixes to nets])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
-AT_CHECK([MARLENE ca1.owfn td.owfn td.owfn -r td.ar --withprefix],0,ignore)
+AT_CHECK([MARLENE ca1.owfn td.owfn td.owfn --rulefile=td.ar --withprefix],0,ignore)
 AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+AT_SETUP([diagnosis of unadaptability])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --diagnosis --verbose],1,ignore,ignore)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+AT_SETUP([state machine conversion for controller])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar TESTFILES/nopetrify.conf .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --config=nopetrify.conf --messagebound=1 --verbose],0,ignore,ignore)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Error handling])
+############################################################################
+AT_SETUP([wrong command line parameter])
+AT_CHECK([MARLENE --wrongparameter],1,ignore,ignore)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([no temporary file creation possible])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([MKDIR temptest])
+AT_CHECK([chmod 400 temptest])
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --tmpfile=temptest/marlene-XXXXXX --verbose],1,ignore,ignore)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([cannot write to output file])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([MKDIR temptest])
+AT_CHECK([chmod 400 temptest])
+AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
+AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --output=temptest/out.owfn --verbose < test-n.owfn],1,ignore,ignore)
+AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 

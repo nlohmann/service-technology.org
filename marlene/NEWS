@@ -6,20 +6,25 @@
                      http://service-technology.org/marlene
 
 
-Version 1.1
-===========
+Version 1.2-unreleased
+======================
 
-* changed behavior concerning prefixes: default is no prefixes added to the
-  nets, `--with-prefix' adds a unique prefix to each read net.
-  (parameter for invoking prefixes is `--withprefix')
+* added new version of PNAPI - nets no longer become unbounded when normalized
 
-* added parameter `--engineonly' to get only the engine part of an adapter
+* when building binary for Win32-Systems, path for temporary files is
+  automatically set to %TEMP%
 
-* composition of controller and engine works now (see bug #13968,
-  `https://gna.org/bugs/?13968')
+* added experimental support for Candy
+  (`http://service-technology.org/tools/candy')
 
-* switched off redution rule `conflictfree transitions' due to
-  counterexamples by Arjan
+* known issues:
+
+     * added workaround when dealing with synchronouns interface between
+       controller and engine (see bug #14416, `https://gna.org/bugs/?14416')
+
+     * cost-optimization is not fully working due to bug #14417,
+       `https://gna.org/bugs/?14416'
+
 
 
 \nSee file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for\ncomplete version history.\n

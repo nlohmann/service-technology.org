@@ -65,7 +65,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
 
     // adapter specific reduction should take place here
     removeUnnecessaryRules();
-    // findConflictFreeTransitions();
+    //findConflictFreeTransitions();
     
     // reduce engine with standard PNAPI methods
     _engine->reduce(pnapi::PetriNet::LEVEL_4);
@@ -196,11 +196,24 @@ const pnapi::PetriNet * Adapter::buildController()
         std::string owfn_filename = tmpname;
         std::string sa_filename = tmpname + ".sa";
         std::string og_filename = tmpname + ".og";
+        
+        // workaround!!!
+        std::string net_workaround = tmpname + "_engine.owfn";
 
         temp.stream() << pnapi::io::owfn << *composed;
+        
+        // only a workaround for bug #14417 <https://gna.org/bugs/?14417>
+        if (args_info.costoptimized_flag)
+        {
+            Output workaround(net_workaround, "engine file for costs");
+
+            workaround.stream() << pnapi::io::owfn << *_engine;
+        }
 
         std::string wendy_command;
+        std::string candy_command;
 
+        // should we diagnose?
         if (args_info.diagnosis_flag)
         {
             wendy_command = std::string(args_info.wendy_arg) + " "
@@ -208,8 +221,22 @@ const pnapi::PetriNet * Adapter::buildController()
                             + og_filename;
         } else
         {
-            wendy_command = std::string(args_info.wendy_arg) + " "
-                            + owfn_filename + " --smart --sa=" + sa_filename; // + " --og=" + og_filename;
+            if (args_info.costoptimized_flag)
+            {
+                // optimization
+                wendy_command = std::string(args_info.wendy_arg) + " "
+                                + owfn_filename + " --smart --og=-";
+                candy_command = " | " + std::string(args_info.candy_arg) 
+                                + " --automata --output=" + sa_filename
+                                + " --netfile=" + net_workaround;
+            }
+            else
+            {
+                // default behavior
+                wendy_command = std::string(args_info.wendy_arg) + " "
+                                + owfn_filename + " --smart --sa="
+                                + sa_filename; // + " --og=" + og_filename;
+            }
         }
         wendy_command += " -m" + toString(_messageBound);
 
@@ -226,10 +253,19 @@ const pnapi::PetriNet * Adapter::buildController()
 #ifdef __MINGW32__
         wendy_command += ((args_info.verbose_flag) ? " --verbose"
             : " 2> NUL");        
+        candy_command += ((args_info.verbose_flag) ? " --verbose"
+            : " 2> NUL");        
 #else
         wendy_command += ((args_info.verbose_flag) ? " --verbose"
             : " 2> /dev/null");
+        candy_command += ((args_info.verbose_flag) ? " --verbose"
+            : " 2> NUL");        
 #endif
+
+        if (args_info.costoptimized_flag)
+        {
+            wendy_command += candy_command;
+        }
         time(&start_time);
         status("executing '%s'", wendy_command.c_str());
         system(wendy_command.c_str());
@@ -346,6 +382,14 @@ void Adapter::createEngineInterface()
                 std::set< std::string> syncLabel;
                 syncLabel.insert("sync_" + inttransname);
                 inttrans.setSynchronizeLabels(syncLabel);
+
+                // workaround for bug #14416 <https://gna.org/bugs/?14416>
+                // \TODO: remove!
+                std::set< std::string > labels (_engine->getSynchronousLabels());
+                labels.insert("sync_" + inttransname);
+                _engine->setSynchronousLabels(labels);
+                
+                status("known labels: %d", _engine->getSynchronousLabels().size());
             }
             // else create interface place to the controller
             else
@@ -404,6 +448,10 @@ void Adapter::createRuleTransitions()
         {
             trans = &_engine->createTransition(transName);
         }
+        
+        // add costs to the transition
+        trans->setCost(rule.getCosts());
+        // status("setting costs %d for %s", rule.getCosts(), transName.c_str());
         
         // now for the places, iterate and connect them to the transition
         std::list< unsigned int > messageList = rule.getRule().first;
@@ -468,6 +516,14 @@ void Adapter::createRuleTransitions()
         {
             syncLabel.insert("sync_" + transName);
             trans->setSynchronizeLabels(syncLabel);
+            
+            // workaround for bug #14416 <https://gna.org/bugs/?14416>
+            // \TODO: remove!
+            std::set< std::string > labels (_engine->getSynchronousLabels());
+            labels.insert("sync_" + transName);
+            _engine->setSynchronousLabels(labels);
+            
+            status("known labels: %d", _engine->getSynchronousLabels().size());
         }
         // else create interface place to the controller
         else
@@ -636,6 +692,7 @@ void Adapter::removeUnnecessaryRules()
     FUNCOUT
 }
 
+/*
 void Adapter::findConflictFreeTransitions()
 {
     FUNCIN
@@ -665,6 +722,15 @@ void Adapter::findConflictFreeTransitions()
                                         trans->getSynchronizeLabels();
                         labels.erase("sync_" + transname);
                         trans->setSynchronizeLabels(labels);
+
+            // workaround for bug #14416 <https://gna.org/bugs/?14416>
+            // \TODO: remove!
+            std::set< std::string > labels (_engine->getSynchronousLabels());
+            labels.insert("sync_" + transName);
+            _engine->setSynchronousLabels(labels);
+            
+            status("known labels: %d", _engine->getSynchronousLabels().size());
+
                     } 
                     else // remove interface places
                     {
@@ -698,6 +764,7 @@ void Adapter::findConflictFreeTransitions()
     }
     FUNCOUT
 }
+*/
 
 //! returns the name for the rule with index i
 inline std::string Adapter::getRuleName(unsigned int i)
@@ -756,6 +823,11 @@ void RuleSet::addRules(FILE * inputStream)
     adapt_rules_yylineno = 1;
     
     adapt_rules_yyparse();
+    fclose(adapt_rules_yyin);
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+    adapt_rules_yylex_destroy();
+#endif
+
     FUNCOUT
 }
 
@@ -801,8 +873,8 @@ unsigned int RuleSet::getIdForMessage(std::string message)
     }
 }
 
-RuleSet::AdapterRule::AdapterRule(rulepair & rule, syncList & slist, cfMode modus) :
-    _rule(rule), _syncList(slist), _modus(modus)
+RuleSet::AdapterRule::AdapterRule(rulepair & rule, syncList & slist, cfMode modus, int costs) :
+    _rule(rule), _syncList(slist), _modus(modus), _costs(costs)
 {   
     FUNCIN
     /* empty */
@@ -835,5 +907,12 @@ inline const RuleSet::AdapterRule::cfMode & RuleSet::AdapterRule::getMode() cons
     FUNCIN
     FUNCOUT
     return _modus; 
+}
+
+inline const int & RuleSet::AdapterRule::getCosts() const
+{ 
+    FUNCIN
+    FUNCOUT
+    return _costs; 
 }
 

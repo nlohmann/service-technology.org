@@ -140,7 +140,8 @@ int main(int argc, char* argv[])
         if((rulefile = fopen(args_info.rulefile_arg,"r")))
         {
             rs.addRules(rulefile);
-            fclose(rulefile);
+            // not needed here, rulefile will be closed in addRules()
+            // fclose(rulefile);
             rulefile = NULL;
         }
         else

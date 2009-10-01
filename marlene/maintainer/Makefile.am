@@ -98,18 +98,21 @@ bin:
 	@echo "=============================================="
 
 bin-SunOS:
-	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="solaris-sparc"
-	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="solaris-sparc-64" EXTRA_CFLAGS="-m64"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="solaris-`uname -p`"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="solaris-`uname -p`-64" EXTRA_CFLAGS="-m64"
 
 bin-Linux:
-	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86"
-	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86-64" EXTRA_CFLAGS="-m64"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-`uname -p`"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-`uname -p`-64" EXTRA_CFLAGS="-m64"
 
 bin-CYGWIN_NT-5.1:
-	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="win32" EXTRA_CFLAGS="-mno-cygwin -U _WIN32"
+	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="win32-`uname -m`" EXTRA_CFLAGS="-mno-cygwin -U _WIN32" EXTRA_CONFFLAGS="--enable-windowstemp" # EXTRA_CONFFLAGS="--tempfile=`cygpath -w $(TEMP)`"
 
 # Vista is not different from XP besides version number
 bin-CYGWIN_NT-6.0: bin-CYGWIN_NT-5.1
+
+# Windows 7 is not different from XP besides version number
+bin-CYGWIN_NT-7.0: bin-CYGWIN_NT-5.1
 
 bin-Darwin:
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="mac-universal" EXTRA_CONFFLAGS="--disable-dependency-tracking" EXTRA_CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"

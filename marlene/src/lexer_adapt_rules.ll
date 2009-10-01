@@ -47,6 +47,8 @@ namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9/.:]
 name			{namestart}{namechar}*
 
+valuestart              [1-9]
+valueproceed            [0-9]
 
 %%
 
@@ -65,10 +67,19 @@ CONTROLLABLE { return RULE_CONTROLLABLE; }
 
  /* identifiers and other characters */
 {name}	{ adapt_rules_yylval.str = strdup(adapt_rules_yytext); return NAME; }
+
+{valuestart}                                    { adapt_rules_yylval.ival = atoi(adapt_rules_yytext); return VALUE; }
+{valuestart}\.{valueproceed}{valueproceed}*     { adapt_rules_yylval.ival = atoi(adapt_rules_yytext); return VALUE; }
+{valuestart}{valueproceed}*                                     { adapt_rules_yylval.ival = atoi(adapt_rules_yytext); return VALUE; }
+{valuestart}{valueproceed}*\.{valueproceed}{valueproceed}*      { adapt_rules_yylval.ival = atoi(adapt_rules_yytext); return VALUE; }
+
 "->"    { return ARROW; }
 "--"    { return DMINUS; }
 ","     { return COMMA; }
 ";"     { return SEMICOLON; }
+
+"("     { return LBRACE; }
+")"     { return RBRACE; }
 
 
  /* whitespaces */

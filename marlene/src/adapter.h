@@ -142,7 +142,7 @@ class Adapter
          *        without any confict, and removes these transitions' interface
          *        to the controller.
          */
-        void findConflictFreeTransitions();
+        // void findConflictFreeTransitions();
         
         /*! 
          * \brief Returns the name for the rule with index i.
@@ -200,7 +200,7 @@ class RuleSet {
                  * \param rule  a reference to a #rulepair
                  * \param modus modus of the transformation rule
                  */
-                AdapterRule(rulepair & rule, syncList & slist, cfMode modus = AR_NORMAL); 
+                AdapterRule(rulepair & rule, syncList & slist, cfMode modus = AR_NORMAL, int costs = 0); 
 
                 /*!
                  * \brief basic destructor, nothing happens here
@@ -228,6 +228,13 @@ class RuleSet {
                  */
                 inline const cfMode & getMode() const;
             
+                /*!
+                 * \brief Returns the costs for the transformation rule.
+                 * 
+                 * \return the transformation rule's costs
+                 */
+                inline const int & getCosts() const;
+            
             private:
                 
                 /*! 
@@ -248,6 +255,9 @@ class RuleSet {
                 
                 //! modus of the commnunication flow for this rule
                 const cfMode _modus;
+                
+                //! cost for this rule
+                const int _costs;
             
         };
 

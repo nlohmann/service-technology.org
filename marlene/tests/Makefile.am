@@ -9,7 +9,7 @@
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = test.owfn test.ar \
 	    test-n.owfn test-n.ar \
-	    ca1.owfn td.owfn td.ar \
+	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td.ar \
 	    nopetrify.conf
 
 

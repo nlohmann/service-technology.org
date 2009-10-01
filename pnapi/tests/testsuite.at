@@ -331,6 +331,14 @@ AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14411 (https://gna.org/bugs/?14411)])
+m4_define([NET1],[bug14411.owfn])
+m4_define([NET2],[bug14411-constraint.owfn])
+AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
+AT_CHECK([PETRI NET1 --compose=NET2])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Murata Reduction Rules])

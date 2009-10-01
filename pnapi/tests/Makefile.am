@@ -38,6 +38,8 @@ TESTFILES = test_input.owfn \
             bug14208.1.owfn \
             bug14208.2.owfn \
 	    bug14335.owfn \
+	    bug14411.owfn \
+	    bug14411-constraint.owfn \
             test_input.lola \
             test_dead_nodes.net.owfn \
             test_identical_places.net.owfn \

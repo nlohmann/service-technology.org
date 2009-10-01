@@ -341,8 +341,8 @@ synchronize:
 
 constrain:
     /* empty */                    
-  | KEY_CONSTRAIN { labels_.clear(); } labels SEMICOLON 
-    { constrains_[transition_] = labels_; }
+  | KEY_CONSTRAIN { labels_.clear(); checkLabels_ = false; } 
+    labels SEMICOLON { constrains_[transition_] = labels_; }
   ;
 
 

@@ -346,6 +346,18 @@ namespace pnapi
     /// sets synchronous labels
     void setSynchronousLabels(const std::set<std::string> &);
     
+    /// adds a label to the interface
+    void addSynchronousLabel(std::string);
+    
+    /// adds a set of labels to the interface
+    void addSynchronousLabels(const std::set<std::string> &);
+    
+    /// removes a label from the interface
+    void removeSynchronousLabel(std::string);
+    
+    /// removes a set of labels from the interface
+    void removeSynchronousLabels(const std::set<std::string> &);
+    
     /// sets labels (and translates references)
     void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
 

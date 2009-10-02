@@ -1248,7 +1248,42 @@ namespace pnapi
     labels_ = ls;
   }
 
+  /*!
+   * \brief Adds a label to the interface
+   */
+  void PetriNet::addSynchronousLabel(std::string label)
+  {
+    labels_.insert(label);
+  }
+  
+  /*!
+   * \brief Adds a set of labels to the interface
+   */
+  void PetriNet::addSynchronousLabels(const std::set<std::string> & labels)
+  {
+    for(set<string>::const_iterator label = labels.begin();
+         label != labels.end(); ++label)
+      labels_.insert(*label);
+  }
 
+  /*!
+   * \brief Removes a label to the interface
+   */
+  void PetriNet::removeSynchronousLabel(std::string label)
+  {
+    labels_.erase(label);
+  }
+  
+  /*!
+   * \brief Removes a set of labels to the interface
+   */
+  void PetriNet::removeSynchronousLabels(const std::set<std::string> & labels)
+  {
+    for(set<string>::const_iterator label = labels.begin();
+         label != labels.end(); ++label)
+      labels_.erase(*label);
+  }
+  
   /*!
    * \param   base  base name
    * \return  a string to be used as a name for a new node

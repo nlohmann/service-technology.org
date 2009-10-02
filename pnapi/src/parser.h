@@ -188,7 +188,10 @@ namespace pnapi
 
       /// flex generated lexer function
       int lex();
-
+      
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+      
       /// bison generated parser function
       int parse();
 
@@ -199,8 +202,6 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      extern std::string ident; 
       /// generated petrinet
       extern PetriNet pnapi_owfn_yynet;
       
@@ -276,6 +277,9 @@ namespace pnapi
       /// flex generated lexer function
       int lex();
 
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+
       /// bison generated parser function
       int parse();
 
@@ -286,8 +290,6 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      extern std::string ident; 
       /// generated petrinet
       extern PetriNet pnapi_lola_yynet;
       
@@ -474,6 +476,9 @@ namespace pnapi
       // flex lexer
       int lex();
 
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+
       // bison parser
       int parse();
 
@@ -531,6 +536,9 @@ namespace pnapi
       // flex lexer
       int lex();
 
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+
       // bison parser
       int parse();
     
@@ -539,8 +547,6 @@ namespace pnapi
       extern std::map<std::string, unsigned int> initialMarked_;
       extern std::set<std::string> interface_;
       extern std::map<std::string, std::set<std::string> > arcs_;
-      extern std::string ident;
-      extern std::string ident2; // backup
       extern std::set<std::string> tempNodeSet_;
       extern bool in_marking_list;
       extern bool in_arc_list;

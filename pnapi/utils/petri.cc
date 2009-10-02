@@ -42,9 +42,6 @@ struct FileObject {
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
-    // set default values
-    cmdline_parser_init(&args_info);
-
     // initialize the parameters structure
     struct cmdline_parser_params *params = cmdline_parser_params_create();
 

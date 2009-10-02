@@ -55,7 +55,7 @@
 #include "parser.h"
 #include "parser-petrify.h"
 
-#include <string>
+#include <cstring>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
@@ -63,6 +63,7 @@
 #define yyerror  pnapi::parser::error
 
 #define yylex    pnapi::parser::petrify::lex
+#define yylex_destroy pnapi::parser::petrify::lex_destroy
 
 /* hack to read input from a C++ stream */
 #define YY_INPUT(buf,result,max_size)		\
@@ -74,8 +75,6 @@
 /* hack to overwrite YY_FATAL_ERROR behavior */
 #define fprintf(file,fmt,msg) \
    yyerror(msg);
-
-using pnapi::parser::petrify::ident;
 
 %}
 
@@ -108,15 +107,15 @@ transitionname3		"in."{name}
 "{"                     { return OPENBRACE; }
 "}"                     { return CLOSEBRACE; }
 
-{placename}		{ ident = pnapi_petrify_yytext; return PLACENAME; }
+{placename}		{ pnapi_petrify_yylval.yt_str = strdup(pnapi_petrify_yytext); return PLACENAME; }
 
-{transitionname1}	{ ident = pnapi_petrify_yytext; return TRANSITIONNAME; }
+{transitionname1}	{ pnapi_petrify_yylval.yt_str = strdup(pnapi_petrify_yytext); return TRANSITIONNAME; }
 
-{transitionname2}	{ ident = pnapi_petrify_yytext; return TRANSITIONNAME; }
+{transitionname2}	{ pnapi_petrify_yylval.yt_str = strdup(pnapi_petrify_yytext); return TRANSITIONNAME; }
 
-{transitionname3}	{ ident = pnapi_petrify_yytext; return TRANSITIONNAME; }
+{transitionname3}	{ pnapi_petrify_yylval.yt_str = strdup(pnapi_petrify_yytext); return TRANSITIONNAME; }
 
-"finalize"		{ ident = pnapi_petrify_yytext; return TRANSITIONNAME; }
+"finalize"		{ pnapi_petrify_yylval.yt_str = strdup(pnapi_petrify_yytext); return TRANSITIONNAME; }
 
 {name}			{ return IDENTIFIER; }
 

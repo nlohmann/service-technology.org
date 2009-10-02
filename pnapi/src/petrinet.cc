@@ -1747,13 +1747,20 @@ namespace pnapi
   void PetriNet::deleteTransition(Transition & trans)
   {
     if (trans.isSynchronized())
+    {
       synchronizedTransitions_.erase(&trans);
+      for(map<string, set<Transition*> >::iterator it = transitionsByLabel_.begin();
+           it != transitionsByLabel_.end(); ++it)
+        it->second.erase(&trans);
+    }
     transitions_.erase(&trans);
 
+    /*
     labels_.clear();
     for (std::set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
       for (std::set<std::string>::iterator l = (*t)->getSynchronizeLabels().begin(); l != (*t)->getSynchronizeLabels().end(); l++)
         labels_.insert(*l);
+    //*/
 
     deleteNode(trans);
   }

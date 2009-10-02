@@ -61,6 +61,7 @@
 
 #define yyerror pnapi::parser::error
 #define yylex pnapi::parser::petrify::lex
+#define yylex_destroy pnapi::parser::petrify::lex_destroy
 #define yyparse pnapi::parser::petrify::parse
 
 using namespace pnapi::parser::petrify;
@@ -75,6 +76,13 @@ using namespace pnapi::parser::petrify;
 %token PLACENAME TRANSITIONNAME IDENTIFIER
 %token K_MODEL K_DUMMY K_GRAPH K_MARKING K_END NEWLINE
 %token OPENBRACE CLOSEBRACE
+
+%union
+{
+  char * yt_str;
+}
+
+%type <yt_str> PLACENAME TRANSITIONNAME
 
 %defines
 
@@ -95,6 +103,9 @@ transition_list:
   /* empty */
 | transition_list TRANSITIONNAME
   { 
+    std::string ident = $2;
+    free($2);
+
     if (in_arc_list) 
     {
       tempNodeSet_.insert(ident);
@@ -111,6 +122,9 @@ place_list:
   /* empty */
 | place_list PLACENAME
   { 
+    std::string ident = $2;
+    free($2);
+
     places_.insert(ident);
     if (in_marking_list)
       initialMarked_[ident] = 1;
@@ -121,18 +135,20 @@ place_list:
 
 tp_list:
   /* empty */
-| tp_list TRANSITIONNAME {ident2 = ident;} place_list newline
+| tp_list TRANSITIONNAME place_list newline
   { 
-    arcs_[ident2] = tempNodeSet_;
+    arcs_[$2] = tempNodeSet_;
     tempNodeSet_.clear();
+    free($2);
   } 
 ;
 
 pt_list:
   /* empty */
-| pt_list PLACENAME {ident2 = ident;} transition_list newline
-  { arcs_[ident2] = tempNodeSet_;
+| pt_list PLACENAME transition_list newline
+  { arcs_[$2] = tempNodeSet_;
     tempNodeSet_.clear();
+    free($2);
   }
 ;
 

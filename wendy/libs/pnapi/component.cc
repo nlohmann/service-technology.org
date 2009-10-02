@@ -288,10 +288,10 @@ namespace pnapi {
 	       const Place & place, const string & prefix) :
     Node(net, observer, place, prefix), tokens_(place.tokens_),
     capacity_(place.capacity_), wasInterface_(place.wasInterface_),
-    port_(place.port_)
+    port_(place.port_), maxOccurrence_(place.maxOccurrence_)
   {
     observer_.updatePlaces(*this);
-    setType(getType());
+    // setType(getType()); <- ???
   }
 
 

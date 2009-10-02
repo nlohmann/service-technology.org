@@ -16,7 +16,7 @@ Version 2.3-unreleased
 * implemented first diagnosis functions: the `--diagnosis' parameter
   creates a Dot file which indicates the blacklisted markings
 
-* removed memory leaks
+* removed all memory leaks
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

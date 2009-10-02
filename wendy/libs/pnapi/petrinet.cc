@@ -11,9 +11,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-09-24 04:18:37 +0200 (Do, 24. Sep 2009) $
+ * \date    $Date: 2009-10-01 23:49:21 +0200 (Do, 01. Okt 2009) $
  *
- * \version $Revision: 4756 $
+ * \version $Revision: 4786 $
  */
 
 #include "config.h"
@@ -614,6 +614,7 @@ namespace pnapi
       {
         // create a prefixed transition in the resulting net
         Transition & rt = result.createTransition(prefix+(*t)->getName(), (*t)->getSynchronizeLabels());
+        rt.setCost((*t)->getCost()); // copy transition costs
         
         // copy preset arcs
         for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -644,6 +645,7 @@ namespace pnapi
       {
         // create a prefixed transition in the resulting net
         Transition & rt = result.createTransition(netPrefix+(*t)->getName(), (*t)->getSynchronizeLabels());
+        rt.setCost((*t)->getCost()); // copy transition costs
         
         // copy preset arcs
         for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -698,6 +700,8 @@ namespace pnapi
           
           // create new transition by merging
           Transition & rt = result.createTransition((*t1)->getName() + netPrefix + (*t2)->getName(), rtLabels);
+          /// TODO: maybe calculate other costs for merged transitions
+          rt.setCost((*t1)->getCost() + (*t2)->getCost()); // copy transition costs
           
           // copy preset arcs
           for (set<Arc *>::iterator f = (*t1)->getPresetArcs().begin(); 
@@ -753,6 +757,7 @@ namespace pnapi
                 
       // create new transition by merging
       Transition & rt = result.createTransition(prefix + (*t)->getName(), rtLabels);
+      rt.setCost((*t)->getCost()); // copy transition costs
       
       // copy preset arcs
       for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -778,6 +783,7 @@ namespace pnapi
                 
       // create new transition by merging
       Transition & rt = result.createTransition(netPrefix + (*t)->getName(), rtLabels);
+      rt.setCost((*t)->getCost()); // copy transition costs
       
       // copy preset arcs
       for (set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); 
@@ -806,11 +812,22 @@ namespace pnapi
     }
     
 
-    /*!
-     * \todo check me!
-     */
-    result.finalCondition().merge(finalCondition(), placeMap);
-    result.finalCondition().merge(net.finalCondition(), placeMap);
+    // here be dragons
+    Condition cond1, cond2;
+    {
+      Condition tmpCond;
+      tmpCond = finalCondition().formula(); // copy condition
+      formula::Formula * f1 = const_cast<formula::Formula*>(&(tmpCond.formula()));
+      f1->unfold(*this);
+      cond1 = *f1;
+      
+      tmpCond = net.finalCondition().formula();
+      formula::Formula * f2 = const_cast<formula::Formula*>(&(tmpCond.formula()));
+      f2->unfold(net);
+      cond2 = *f2;
+    }
+    result.finalCondition().merge(cond1, placeMap);
+    result.finalCondition().merge(cond2, placeMap);
 
     // overwrite this net with the resulting net
     *this = result;

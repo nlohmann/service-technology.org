@@ -7,7 +7,6 @@
 
 using std::map;
 
-//TODO: State::~State()
 
 namespace pnapi
 {

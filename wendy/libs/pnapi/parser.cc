@@ -56,8 +56,6 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      string ident; 
       /// generated petrinet
       PetriNet pnapi_owfn_yynet;
       
@@ -142,8 +140,10 @@ namespace pnapi
         // call the parser
         owfn::parse();
         
+        // clean up lexer
+        owfn::lex_destroy();
+        
         // clean up global variables
-        ident.clear();
         places_.clear();
         transition_ = NULL;
         synchronousLabels_.clear();
@@ -176,8 +176,6 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      string ident; 
       /// generated petrinet
       PetriNet pnapi_lola_yynet;
       
@@ -236,8 +234,10 @@ namespace pnapi
         // call the parser
         lola::parse();
         
+        // clean up lexer
+        lola::lex_destroy();
+        
         // clean up global variables
-        ident.clear();
         places_.clear();
         transition_ = NULL;
         place_ = NULL;
@@ -534,6 +534,9 @@ namespace pnapi
 
         sa2sm = false;
         sa::parse();
+        
+        // clean up lexer
+        sa::lex_destroy();
 
         // copy synchronous interface
         pnapi_sa_yyautomaton.setSynchronousLabels(synchronous_);
@@ -557,6 +560,9 @@ namespace pnapi
 
         sa2sm = true;
         sa::parse();
+        
+        // clean up lexer
+        sa::lex_destroy();
 
         for (int i = 0; i < (int) finalPlaces_.size(); i++)
         {
@@ -584,8 +590,6 @@ namespace pnapi
       std::map<string, unsigned int> initialMarked_;
       std::set<string> interface_;
       std::map<string, set<string> > arcs_;
-      std::string ident;
-      std::string ident2; // backup
       std::set<string> tempNodeSet_;
       bool in_marking_list = false;
       bool in_arc_list = false;
@@ -616,6 +620,9 @@ namespace pnapi
         
         // call the parser
         petrify::parse();
+        
+        // clean up lexer
+        petrify::lex_destroy();
       }
       
       void Parser::clean()

@@ -4,7 +4,7 @@
 
 @item implemented first diagnosis functions: the @option{--diagnosis} parameter creates a Dot file which indicates the blacklisted markings
 
-@item removed memory leaks
+@item removed all memory leaks
 @end itemize
 
 

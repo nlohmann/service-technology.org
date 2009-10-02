@@ -29,6 +29,7 @@
 
 #define yyerror pnapi::parser::error
 #define yylex   pnapi::parser::lola::lex
+#define yylex_destroy pnapi::parser::lola::lex_destroy
 #define yyparse pnapi::parser::lola::parse
 
 
@@ -50,9 +51,11 @@ using namespace pnapi::parser::lola;
 %union 
 {
   int yt_int;
+  char * yt_str;
 }
 
 %type <yt_int> NUMBER NEGATIVE_NUMBER
+%type <yt_str> IDENT
 
 %start net
 
@@ -74,7 +77,8 @@ node_name:
       nodeName_.str("");
       nodeName_.clear();
 
-      nodeName_ << ident; 
+      nodeName_ << $1;
+      free($1); 
     }
   | NUMBER 
     { 

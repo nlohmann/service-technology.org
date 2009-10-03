@@ -193,7 +193,7 @@ Knowledge::~Knowledge() {
 /*!
  initialize current knowledge's member attributes appropriately
 */
-inline void Knowledge::initialize() {
+void Knowledge::initialize() {
     // reduction rule: sequentialize receiving events
     if (args_info.seqReceivingEvents_flag) {
         // calculate those receiving events that are essential to resolve each and every waitstate
@@ -227,7 +227,7 @@ inline void Knowledge::initialize() {
  \note In case the --diagnose flag is given, the insane marking is added to
        the knowledge before the function is left.
 */
-inline void Knowledge::closure(std::queue<FullMarking>& todo) {
+void Knowledge::closure(std::queue<FullMarking>& todo) {
     // process the queue
     while (not todo.empty()) {
         // process successors of the current marking

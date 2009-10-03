@@ -171,7 +171,7 @@ InnerMarking::~InnerMarking() {
  \note except is_final, all types are initialized with 0, so it is sufficent
        to only set values to 1
  */
-inline void InnerMarking::determineType(const InnerMarking_ID& myId) {
+void InnerMarking::determineType(const InnerMarking_ID& myId) {
     bool is_transient = false;
 
     // deadlock: no successor markings and not final

@@ -85,10 +85,10 @@ class Knowledge {
 
     private: /* member functions */
         /// initialze member attributes
-        void initialize();
+        inline void initialize();
 
         /// calculate the closure of this knowledge
-        void closure(std::queue<FullMarking>&);
+        inline void closure(std::queue<FullMarking>&);
 
     private: /* attributes */
         /// reduction rule: smart send events; pointer to possible sending events data structure

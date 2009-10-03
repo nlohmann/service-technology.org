@@ -92,7 +92,7 @@ class FormulaLit : public Formula {
         std::string literal; ///< the lable the litaral consists
 
     public:    
-        FormulaLit(const std::string literal);
+        FormulaLit(const std::string& literal);
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;

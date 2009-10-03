@@ -106,7 +106,7 @@ class InnerMarking {
         void calcReachableSendingEvents();
 
         /// determine the type of this marking
-        void determineType(const InnerMarking_ID&);
+        inline void determineType(const InnerMarking_ID&);
 
     public: /* member attributes */
         /// whether this marking is final

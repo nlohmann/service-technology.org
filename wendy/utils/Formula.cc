@@ -30,7 +30,7 @@ FormulaNeg::FormulaNeg(const Formula *_f) :
     assert(_f);
 }
 
-FormulaLit::FormulaLit(const std::string _literal) :
+FormulaLit::FormulaLit(const std::string& _literal) :
     literal(_literal) {}
 
 
@@ -220,7 +220,7 @@ const Formula *FormulaNeg::cnf() const {
     return this;
 }
 
-const Formula *FormulaAND::cnf() const {}
+const Formula *FormulaAND::cnf() const { return this; }
 const Formula *FormulaLit::cnf() const { return this; }
 const Formula *FormulaTrue::cnf() const { return this; }
 const Formula *FormulaFalse::cnf() const { return this; }

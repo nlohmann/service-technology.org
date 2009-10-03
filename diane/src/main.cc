@@ -203,7 +203,6 @@ int main(int argc, char *argv[])
       // writing file output
       string fileprefix;
       string filepostfix = ".owfn";
-      ofstream outputfiles[_statistics.fragments_];
       if (args_info.prefix_given)
         fileprefix += args_info.prefix_arg;
       fileprefix += args_info.inputs[i];
@@ -228,13 +227,12 @@ int main(int argc, char *argv[])
           int z = digits-num.length();
           ss << setfill('0') << setw(z) << netnumber;
           ss >> num;
-          outputfiles[netnumber].open((fileprefix+num+filepostfix).c_str());
-          outputfiles[netnumber] << pnapi::io::owfn
+          ofstream outputfile((fileprefix+num+filepostfix).c_str());
+          outputfile << pnapi::io::owfn
               << meta(pnapi::io::INPUTFILE, args_info.inputs[i])
               << meta(pnapi::io::CREATOR, PACKAGE_STRING)
               << meta(pnapi::io::INVOCATION, invocation)
               << *nets[j];
-          outputfiles[netnumber].close();
           netnumber++;
         }
     }

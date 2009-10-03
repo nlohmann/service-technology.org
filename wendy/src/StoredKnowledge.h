@@ -143,22 +143,22 @@ class StoredKnowledge {
 
     private: /* member functions */
         /// adds a successor knowledge
-        void addSuccessor(const Label_ID&, StoredKnowledge* const);
+        inline void addSuccessor(const Label_ID&, StoredKnowledge* const);
 
         /// return whether this node fulfills its annotation
         bool sat(const bool = false) const;
 
         /// return the hash value of this object
-        hash_t hash() const;
+        inline hash_t hash() const;
 
         /// move all transient markings to the end of the array and adjust size of the markings array
         void rearrangeKnowledgeBubble();
 
         /// adjust lowlink values of the stored knowledge
-        void adjustLowlinkValue(const StoredKnowledge* const, const bool) const;
+        inline void adjustLowlinkValue(const StoredKnowledge* const, const bool) const;
 
         /// evaluates the current knowledge bubble with respect to (T)SCCs
-        void evaluateKnowledge();
+        inline void evaluateKnowledge();
 
         /// print knowledge
         void print(std::ostream&) const;

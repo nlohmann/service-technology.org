@@ -387,7 +387,7 @@ void StoredKnowledge::finalize() {
  \param SK           new knowledge whose successors have been calculated completely
  \param newKnowledge SK has been newly created in calling function process()
 */
-inline void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK, const bool newKnowledge) const {
+void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK, const bool newKnowledge) const {
     // successor node is not new
     if (not newKnowledge) {
         if (SK->is_on_tarjan_stack) {
@@ -404,7 +404,7 @@ inline void StoredKnowledge::adjustLowlinkValue(const StoredKnowledge* const SK,
 /*!
  if current knowledge is representative of an SCC (of knowledges) then evaluate current SCC
 */
-inline void StoredKnowledge::evaluateKnowledge() {
+void StoredKnowledge::evaluateKnowledge() {
     assert(not tarjanStack.empty());
 
     // check, if the current knowledge is a representative of a SCC
@@ -524,7 +524,7 @@ StoredKnowledge* StoredKnowledge::store() {
 }
 
 
-inline hash_t StoredKnowledge::hash() const {
+hash_t StoredKnowledge::hash() const {
     hash_t result = 0;
 
     for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
@@ -535,7 +535,7 @@ inline hash_t StoredKnowledge::hash() const {
 }
 
 
-inline void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const knowledge) {
+void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const knowledge) {
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
 

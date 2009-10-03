@@ -138,10 +138,7 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
 InnerMarking::~InnerMarking() {
     delete[] labels;
     delete[] successors;
-
-    if (possibleSendEvents != NULL) {
-        delete possibleSendEvents;
-    }
+    delete possibleSendEvents;
 }
 
 

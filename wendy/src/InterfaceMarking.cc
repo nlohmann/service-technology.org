@@ -26,6 +26,11 @@
 #include "Label.h"
 #include "verbose.h"
 
+// a fix for FreeBSD which does not know log2()
+#ifndef HAVE_LOG2
+#define log2(x)        (log(x) / M_LN2)
+#endif
+
 extern gengetopt_args_info args_info;
 
 

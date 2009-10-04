@@ -74,6 +74,9 @@ fi
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
+# FreeBSD does not know log2()
+AC_CHECK_FUNCS([log2])
+
 # check and set exact unsigned types
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T

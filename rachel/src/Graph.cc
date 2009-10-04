@@ -212,7 +212,7 @@ Assignments Graph::sat(Node q) {
  * \param _id  identifier of the graph
  *
  */
-Graph::Graph(const std::string _id) :
+Graph::Graph(const std::string& _id) :
     edges(), root(), finalNode(), max_value(0), insertionValue(),
     deletionValue(), formulas(), formulaBits(), id(_id),  nodes(),
     addedNodes() {

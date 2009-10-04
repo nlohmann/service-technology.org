@@ -35,7 +35,7 @@ class Edge;
 
 
 /// different actions for edges
-typedef enum action_type {
+enum action_type {
     NONE,       ///< no action determined yet (this is not "keep"!)
     INSERT,     ///< insert edge
     DELETE,     ///< delete egde

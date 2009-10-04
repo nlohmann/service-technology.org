@@ -192,7 +192,7 @@ class Graph {
         /// BPMN output of a service automaton
         void bpmnOutput();
     
-        Graph(const std::string id);
+        Graph(const std::string&);
 };
 
 #endif

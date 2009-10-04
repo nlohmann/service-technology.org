@@ -2679,6 +2679,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
       done += reduce_unused_status_places();
     }
     if ((reduction_level & SUSPICIOS_TRANSITIONS) == SUSPICIOS_TRANSITIONS)
+    {
       done += reduce_suspicious_transitions();
     }
 #endif

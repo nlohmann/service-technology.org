@@ -1,11 +1,9 @@
 AC_INIT(st, 1.0, tools@service-technology.org)
 
-AC_PREREQ(2.59)
-
 AC_HEADER_ASSERT
 
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES(Makefile)
-AC_CONFIG_SUBDIRS([../../bpel2owfn ../../candy ../../diane ../../fiona ../../linda ../../marlene ../../mia ../../owfn2bpel ../../pnapi ../../rachel ../../rebecca ../../sayo ../../uml2owfn ../../wendy])
+AC_CONFIG_SUBDIRS([../../bpel2owfn ../../candy ../../cosme ../../diane ../../fiona ../../linda ../../marlene ../../mia ../../owfn2bpel ../../pnapi ../../rachel ../../rebecca ../../sayo ../../uml2owfn ../../wendy ../../yasmina])
 
 AC_OUTPUT

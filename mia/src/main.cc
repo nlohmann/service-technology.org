@@ -314,6 +314,7 @@ int main(int argc, char** argv) {
 
     status("%d jumper transitions found", jumperCount);
 
+    fclose(outputfile);
 
     return EXIT_SUCCESS;
 }

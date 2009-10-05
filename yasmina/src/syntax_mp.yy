@@ -164,7 +164,7 @@ imar.insert(std::pair<std::string,int>(*$1,$3));
 }
 ;
   
-terms: KEY_TERMS term2
+terms: KEY_TERMS {nc=0;} term2 
 ;
 
 term2: 
@@ -203,7 +203,7 @@ bound: FIDENT COMMA CIDENT COLON lbound COMMA ubound SEMICOLON
 	//cout << nc*(fm-1)+c-1;
 	//std::pair<unsigned int,unsigned int> mat(fm,c); 
 	 int lb=$5;
-	int ub=$7;
+	int ub=$7; 
 	//std::string ub(*$7);
 	BoundsMP bds(lb,ub);bMP.push_back(bds);
 	//std::vector<BoundsMP> stu(bMP.at(fm));

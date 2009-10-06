@@ -1,6 +1,4 @@
-bin_PROGRAMS = owfn2bpel
-
-all: owfn2bpel_lola
+bin_PROGRAMS = owfn2bpel owfn2bpel_lola
 
 owfn2bpel_SOURCES = BPEL.cc BPEL.h \
 	     	    Place.cc Place.h \
@@ -12,7 +10,9 @@ owfn2bpel_SOURCES = BPEL.cc BPEL.h \
 
 BUILT_SOURCES = cmdline.c
 
-EXTRA_DIST = cmdline.ggo $(LOLANAME).tar.gz create_lola userconfig.H
+owfn2bpel_lola_SOURCES = $(LOLANAME).tar.gz create_lola
+
+EXTRA_DIST = cmdline.ggo userconfig.H
 
 cmdline.c: cmdline.ggo
 	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required
@@ -27,13 +27,6 @@ owfn2bpel_lola: $(LOLANAME).tar.gz
 	tar xfz $(srcdir)/$(LOLANAME).tar.gz
 	mv $(LOLANAME) lola
 	cp $(srcdir)/userconfig.H lola/src
-	$(srcdir)/create_lola
+	cd $(builddir) ; $(SHELL) $(srcdir)/create_lola
 	cp lola/src/lola $(builddir)/owfn2bpel_lola
 	rm -fr lola
-
-# organize installation and uninstallation of the needed LoLA binary
-install-exec-hook: owfn2bpel_lola
-	$(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) owfn2bpel_lola "$(DESTDIR)$(bindir)/owfn2bpel_lola"
-
-uninstall-hook:
-	rm $(DESTDIR)$(bindir)/owfn2bpel_lola

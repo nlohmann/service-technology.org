@@ -5,7 +5,7 @@ yasmina_SOURCES = main.cc cmdline.c cmdline.h verbose.cc verbose.h \
 
 yasmina_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a $(top_builddir)/libs/lp_solve/liblpsolve55.a
 
-yasmina_LDFLAGS = -ldl
+
 
 yasmina_CPPFLAGS = -I$(top_srcdir)/libs/pnapi -I$(top_srcdir)/libs/lp_solve
 

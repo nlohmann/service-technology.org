@@ -233,7 +233,7 @@ const pnapi::formula::Formula *  transformNegFormula(const pnapi::PetriNet &net1
 std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::Formula * form){
 	//std::cout<<"transform"<<std::endl;
 	std::set<lprec *> retlpset;
-	REAL rowpl[1+ net1.getPlaces().size()];
+	//REAL rowpl[1+ net1.getPlaces().size()];
 	lprec *lppl;
 	lppl = make_lp(0,  net1.getPlaces().size());
 //	for(int i=0;i<=net1.getPlaces().size();i++)
@@ -1080,7 +1080,7 @@ int main(int argc, char** argv) {
 		//insert 
 		//solve
 		if (args_info.inputs_num==0) {
-		for(int ifm=0;ifm<lpmps.size();ifm++){
+		for(unsigned int ifm=0;ifm<lpmps.size();ifm++){
 			for(i=1;i<=get_Ncolumns(lpmps.at(ifm));i++){
 				set_int(lpmps.at(ifm),i,TRUE);
 			}
@@ -1141,7 +1141,6 @@ int main(int argc, char** argv) {
 
 	// for starters  no set
 	//set<const lprec *> lpset;
-	int ip=1;
 //	const pnapi::formula::Formula* f=&net1.finalCondition().formula();
 	
 
@@ -1264,7 +1263,7 @@ int main(int argc, char** argv) {
 			//
 			set<lprec *> mps;
 			mps.insert(lp);lp=lpmc;
-			lprec *lpmp;
+			
 			//match the interfaces
 			//for each final marking
 			for (int ifm=0; ifm<lpmps.size(); ifm++) {int kn=1;
@@ -1356,8 +1355,8 @@ int main(int argc, char** argv) {
 				cout<<get_col_name(lp,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
 			}
 			cout<<endl;
-			bool gata=true;
-/*			pnapi::Marking m(net1);
+/*			bool gata=true;
+			pnapi::Marking m(net1);
 			do{
 				for(int s=0;s<nTransitions;s++){
 					const pnapi::Transition* t=net1.findTransition(get_col_name(lp,s+1));
@@ -1392,8 +1391,6 @@ int main(int argc, char** argv) {
   int Ncol, *colno = NULL, j, ret = 0;
   REAL *row = NULL;
 
-  /* We will build the model row by row
-     So we start with creating a model with 0 rows and 2 columns *
   Ncol = nTransitions+nPlaces+1; /* there are two variables in the model *
   lp = make_lp(0, Ncol);
   for(int i=1;i<Ncol;i++){

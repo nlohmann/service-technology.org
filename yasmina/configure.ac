@@ -16,6 +16,10 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# check for dlopen/ftime (required by lp_solve)
+AC_SEARCH_LIBS([dlopen],[dl zrldsrl])
+AC_SEARCH_LIBS([ftime],[compat])
+
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
 

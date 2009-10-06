@@ -676,6 +676,7 @@ AT_SETUP([Behavior preservation (asynchronous, sa2owfn)])
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK_PETRIFY
 AT_CHECK([SA2OWFN NET.sa NET.sa.owfn], 0, ignore, ignore)
 AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)

@@ -1039,6 +1039,15 @@ AT_CHECK([GREP -q "(mb)" mb.diag.dot])
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
+AT_SETUP([Message bound violation])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Lohmann_2008_wsfm-Fig2b.owfn .])
+AT_CHECK([WENDY Lohmann_2008_wsfm-Fig2b.owfn --verbose --diagnose],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: NO" stderr])
+AT_CHECK([GREP -q "message bound violation on channel g" stderr])
+AT_KEYWORDS(diagnosis)
+AT_CLEANUP
+
 AT_SETUP([Multiple reasons])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/uncontrollable.owfn .])

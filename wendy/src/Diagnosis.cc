@@ -19,12 +19,16 @@
 
 
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <iostream>
 #include "Diagnosis.h"
 #include "verbose.h"
 
 using std::map;
+using std::set;
 using std::string;
 using std::vector;
 
@@ -51,6 +55,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                     p &= *InnerMarking::inner_markings[it->second[i]->inner[j]]->possibleSendEvents;
                 }
 
+                set<InnerMarking_ID> hiddenStates;
                 for (unsigned int j = 0; j < it->second[i]->sizeAllMarkings; ++j) {
                     bool inner_waitstate = (j < it->second[i]->sizeDeadlockMarkings);
                     bool inner_final = InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final;
@@ -71,7 +76,12 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                     }
                     if (not interface_sane) {
                         reason += " (mb)";
-                        message("node %p is blacklisted: message bound violation", it->second[i]);
+                        for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                            if (it->second[i]->interface[j]->get(l) > InterfaceMarking::message_bound) {
+                                message("node %p is blacklisted: message bound violation on channel %s",
+                                    it->second[i], Label::id2name[l].c_str());
+                            }
+                        }
                     }
 
                     if (not reason.empty()) {
@@ -101,6 +111,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                                     file << " <FONT COLOR=\"RED\">(uw)</FONT>";
                                     message("node %p is blacklisted: m%u cannot be safely resolved",
                                         it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
+                                    hiddenStates.insert(it->second[i]->inner[j]);
                                 } else {
                                     file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
                                 }
@@ -120,6 +131,16 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                 }
                 file << "]" << std::endl;
 
+                if (not hiddenStates.empty()) {
+                    for (set<InnerMarking_ID>::iterator it1 = hiddenStates.begin(); it1 != hiddenStates.end(); ++it1) {
+                        for (set<InnerMarking_ID>::iterator it2 = hiddenStates.begin(); it2 != hiddenStates.end(); ++it2) {
+                            if (*it1 != *it2) {
+                                message("you need to fix m%u", lastCommonPredecessor(*it1,*it2));
+                            }
+                        }
+                    }
+                }
+
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
@@ -135,4 +156,49 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
     }
 
     file << "}" << std::endl;
+}
+
+InnerMarking_ID Diagnosis::lastCommonPredecessor(InnerMarking_ID m1, InnerMarking_ID m2) {
+    static map<InnerMarking_ID, set<InnerMarking_ID> > reachable;
+
+    // first call: initialize reachability information
+    if (reachable.empty()) {
+        // for each marking: add yourself and your direct successors
+        for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
+            reachable[m].insert(m);
+            InnerMarking *current = InnerMarking::inner_markings[m];
+            for (uint8_t succ = 0; succ < current->out_degree; ++succ) {
+                reachable[m].insert(current->successors[succ]);
+            }
+        }
+
+        // until fixed point is reached: collect successors' sucessors
+        bool done = false;
+        do {
+            done = true;
+            for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
+                InnerMarking *current = InnerMarking::inner_markings[m];
+                for (uint8_t succ = 0; succ < current->out_degree; ++succ) {
+                    for (set<InnerMarking_ID>::iterator it = reachable[current->successors[succ]].begin(); it != reachable[current->successors[succ]].end(); ++it) {
+                        if (reachable[m].insert(*it).second) {
+                            done = false;
+                        }
+                    }
+                }
+            }
+        } while (not done);
+    }
+
+    InnerMarking_ID last_common = 0;
+    for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
+//        std::cerr << (unsigned int)m;
+        bool m1_reach = reachable[m].find(m1) != reachable[m].end();
+        bool m2_reach = reachable[m].find(m2) != reachable[m].end();
+        if (m1_reach and m2_reach and m > last_common) {
+            last_common = m;
+        }
+//        std::cerr << "\t" << m1_reach << " " << m2_reach << std::endl;
+    }
+
+    return last_common;
 }

@@ -97,20 +97,20 @@ Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label)
                 // copy an interface marking from the parent and increment it
                 bool result = true;
                 InterfaceMarking* interface = new InterfaceMarking(*(pos->second[i]), label, true, result);
+                is_sane = is_sane and result;
 
                 // analyze the result of the copying
-                if (result) {
+                if (result or args_info.diagnose_given) {
                     // store this interface marking
                     bubble[pos->first].push_back(interface);
                     ++size;
 
                     // success -- possibly, this marking became transient
-                    if (receiver) {
+                    if (receiver and result) {
                         todo.push(FullMarking(pos->first, *interface));
                     }
                 } else {
                     // increment failed -- message bound violation
-                    is_sane = 0;
                     delete interface;
                     return;
                 }

@@ -52,6 +52,8 @@
         especially using preprocessor macros
 */
 class InterfaceMarking {
+    friend class Diagnosis;
+
     public: /* static functions */
         /// initializes the class InterfaceMarking
         static void initialize();

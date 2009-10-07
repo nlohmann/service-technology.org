@@ -140,10 +140,11 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--og' and '--sa' parameter are mutually exclusive");
     }
 
-    // --diagnose implies --smartSendingEvent and --waitstatesOnly
+    // --diagnose implies several reduction rules
     if (args_info.diagnose_given) {
         args_info.smartSendingEvent_flag = 1;
         args_info.waitstatesOnly_flag = 1;
+        args_info.receiveBeforeSend_flag = 1;
     }
 
     free(params);
@@ -415,7 +416,6 @@ int main(int argc, char** argv) {
             Diagnosis::output_diagnosedot(output);
         }
     }
-
 
     return EXIT_SUCCESS;
 }

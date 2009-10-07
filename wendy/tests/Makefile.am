@@ -64,7 +64,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             genericNonTrivialSCC.owfn \
             marlene-ca.owfn marlene-td.ar marlene-td.owfn \
             genericSynchLFQAP.owfn \
-            dead.owfn mb.owfn nlc.owfn uncontrollable.owfn
+            dead.owfn mb.owfn nlc.owfn uncontrollable.owfn \
+            Lohmann_2008_wsfm-Fig2b.owfn
 
 
 

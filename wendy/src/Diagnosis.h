@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include "StoredKnowledge.h"
+#include "InnerMarking.h"
 
 /*!
  \brief diagnosis information for uncontrollable services
@@ -31,6 +32,9 @@ class Diagnosis {
     public:
         /// print a dot representation for diagnosis
         static void output_diagnosedot(std::ostream&);
+
+        /// return the last marking from which two given markings are reachable
+        static InnerMarking_ID lastCommonPredecessor(InnerMarking_ID, InnerMarking_ID);
 };
 
 #endif

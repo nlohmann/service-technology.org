@@ -766,18 +766,19 @@ int main(int argc, char** argv) {
 	int nPlaces;
 	int nTransitions;
 	std::set<lprec *> retlpset;//set of all final markings of the composition
- 	if(args_info.enforceEvents_given){
-		for (i = 0; i < args_info.enforceEvents_given; ++i){
+ 	
+	for (i = 0; i < args_info.enforceEvents_given; ++i){
  		std::string s=args_info.enforceEvents_arg[i];std::string st,cs;
   		if(s.find("@")!=std::string::npos) {st=s.substr(0,s.find("@"));//cout<<st<<endl;
 			cs=s.substr(s.find("@")+1); 		
  			stringstream ss;ss<<st;
  			int net; ss>>net;//cout<<net;
  			const int netc=net;//const std::string cs;
+			if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
 //		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
  			set<std::string> sets;sets.insert(cs);
   			if(enforcedT.find(net)==enforcedT.end()) {
-				enforcedT.insert(std::pair<unsigned, set<std::string> >(net,sets));
+				enforcedT.insert(std::pair<unsigned int, set<std::string> >(net,sets));
 				cout<<"new";
 			}
   			else{set<std::string> se=(enforcedT.find(net))->second;
@@ -786,11 +787,20 @@ int main(int argc, char** argv) {
 // 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
 			}
 		}
-		else abort(2, "wrong format for enforce events. Read the manual.\n");
+		else {//interface 
+			set<std::string> sets;sets.insert(s);
+			if(enforcedT.find(0)==enforcedT.end()) {
+				enforcedT.insert(std::pair<unsigned int, set<std::string> >(0,sets));	
+			}
+			else{   set<std::string> se=(enforcedT.find(0))->second;
+	  			se.insert(cs);
+	  			enforcedT.find(0)->second=se;//cout<<"old"<<endl;
+// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
+			}	
+		}
  	}
-	}
-	if(args_info.enforceEvents_given){
- 	for (i = 0; i < args_info.enforceFC_given; ++i){
+	
+	for (i = 0; i < args_info.enforceFC_given; ++i){
  //		std::string s=args_info.enforceFC_arg[i];
 //  		std::string st=s.substr(0,s.find("."));stringstream ss;ss<<st;
 // 		int net; ss>>net;
@@ -803,63 +813,58 @@ int main(int argc, char** argv) {
 // 			enforcedT.find(net)->second=se;cout<<"old"<<endl;}
 // 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
  	}
-	}
+	
 	
 	
 	//parse the input nets
-	if(args_info.inputs_num>0){
+	
 //		try {
 		// std::string nets[args_info.inputs_num];	
-		for(int i=0; i<args_info.inputs_num;i++){
-			if(i==0){			
-				ifstream ifs1(args_info.inputs[i]);
-				inputStream.open(args_info.inputs[i]);
-				try { ifs1 >> owfn >> net1;}
-				catch (InputError e) { std::cerr <<"net " <<i<<" failed" << endl << e << endl; assert(false); }
-				ifs1.close();
-				//const int zero=0; now check whether these are real transitions
-				if(enforcedT.find(0)!=enforcedT.end()&&(args_info.enforceEvents_given>0)){
-					set<std::string> se=(enforcedT.find(0))->second;
-					for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
-						if(net1.findTransition(*it)!=NULL) cout<<(*it);
-						else abort(2, "the transitions do not belong to the net");
-				}
-				
-				if(args_info.inputs_num==1) break;
+	for(int i=0; i<args_info.inputs_num;i++){
+		if(i==0){			
+			ifstream ifs1(args_info.inputs[i]);
+			inputStream.open(args_info.inputs[i]);
+			try { ifs1 >> owfn >> net1;}
+			catch (InputError e) { std::cerr <<"net " <<i<<" failed" << endl << e << endl; assert(false); }
+			ifs1.close();
+			//const int zero=0; now check whether these are real transitions
+			if(enforcedT.find(1)!=enforcedT.end()&&(args_info.enforceEvents_given>0)){
+				set<std::string> se=(enforcedT.find(1))->second;
+				for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
+					if(net1.findTransition(*it)!=NULL) cout<<"Transition: "<<(*it);
+				  	else if(net1.findPlace(*it)!=NULL) cout<<"Place: "<<(*it);
+					else abort(2, "the node does not belong to the net");
 			}
-			else{
-			  std::stringstream s;s<<(i); cout<< s.str();
-			  std::string s2; s2=s.str()+"@";//"net"+s.str();
-			  ifstream ifs2(args_info.inputs[i]);
-			  try { ifs2 >> owfn >> net2;}
-			  catch (InputError e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
-			  ifs2.close();
-			  if((enforcedT.find(i)!=enforcedT.end())&&(args_info.enforceEvents_given>0)){
-					set<std::string> se=(enforcedT.find(i))->second;
-				  for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
-					  if(net1.findTransition(*it)!=NULL) cout<<(*it);
-					  else abort(2, "the transitions do not belong to the net");
-			  }
+			if(args_info.inputs_num==1) break;
+		}
+		else{
+		std::stringstream s;s<<(i+1); cout<< s.str();
+		std::string s2; s2=s.str()+"@";//"net"+s.str();
+		ifstream ifs2(args_info.inputs[i]);
+		try { ifs2 >> owfn >> net2;}
+		catch (InputError e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
+		ifs2.close();
+		if((enforcedT.find(i+1)!=enforcedT.end())&&(args_info.enforceEvents_given>0)){
+			set<std::string> se=(enforcedT.find(i))->second;
+			for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
+				  if(net1.findTransition(*it)!=NULL) cout<<(*it);
+				  else if(net1.findPlace(*it)!=NULL) cout<<(*it);
+				  else abort(2, "the node do not belong to the net");
+			}
 			   //else abort(3, "the transitions do not belong to the net");
-			if(i==1) s1="0@"; else s1=""; net1.compose(net2, s1, s2);
+		if(i==1) s1="1@"; else s1=""; net1.compose(net2, s1, s2);
 			//renew the prefixes: s1 has the old 
 		//	if(!net1.isClosed()){cout<<" is not closed"<<std::endl;} else 
-			}
 		}
-		//std::cout << owfn << net1<<"end of composition"<<std::endl;
-			nPlaces = (int) net1.getPlaces().size();
-			nTransitions = (int) net1.getTransitions().size();
-			
-			// get the initial marking
-			pnapi::Marking m(net1);
-			const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
-			retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
-				
+	}
+		std::cout << owfn << net1<<"end of composition"<<std::endl;
+
+
 		//}
 //	catch (pnapi::io::InputError error) {
 //		std::cerr << PACKAGE << error << std::endl;
 //		exit(EXIT_FAILURE);}
-	}
+	
 // print result
 	//fflush(stdin);
 	int res;//the result of the system
@@ -875,9 +880,6 @@ int main(int argc, char** argv) {
 			
 		}
 		
-
-		
-
 		std::set<std::string> inputp,outputp, syncp; // variables necessary for the composition
 		for (set<std::string>::iterator sit=hh.begin(); sit!=hh.end(); ++sit) { //for each net
 			cout <<"Net id: "<< *sit;int no=0;//i=0;
@@ -1161,7 +1163,11 @@ int main(int argc, char** argv) {
 	// for each final marking one builds and solves  the state equation
 
 	if(args_info.inputs_num>0){
-
+		nPlaces = (int) net1.getPlaces().size();
+		nTransitions = (int) net1.getTransitions().size();
+		pnapi::Marking m(net1);
+		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
+		retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
 	for(set<lprec *>::iterator citr = retlpset.begin();citr!=retlpset.end();citr++){
 		lprec *lp;//lp = make_lp(0, nTransitions);
 		
@@ -1267,11 +1273,8 @@ int main(int argc, char** argv) {
 			//match the interfaces
 			//for each final marking
 			for (int ifm=0; ifm<lpmps.size(); ifm++) {int kn=1;
-
 //					mps.insert(lp);lp=lpmc;cout<<get_col_name(lp,get_Ncolumns(lp))<<"help"<<endl;
-					//aici adauga constraints
-
-				
+					//aici adauga constraints	
 				//adauga variabiles for places to relate them to their input and output transitions
 				int nvars=get_Ncolumns(lpmps.at(ifm));
 				for(int j=0;j<nvars;j++){//to do if it is already there skip
@@ -1321,16 +1324,39 @@ int main(int argc, char** argv) {
 			
 		}
 		//add constraints for cover places and transitions
+		//std::set<lprec* > cover;
 		if(args_info.enforceEvents_given>0){
 			for(map<int,set<std::string> >::const_iterator itr=enforcedT.begin();itr!=enforcedT.end();++itr){
 				cout<<"enforced "<<itr->first;
 				for(set<std::string>::const_iterator it=(itr->second).begin();it!=(itr->second).end();++it){
-					std::string gg;stringstream ss;ss<<itr->first<<"@"<<(*it); ss>>gg;cout<<gg;
+					//lprec* nn=copy_lp(lp);
+					std::string gg;
+					if(itr->first==0) gg=*it;
+					else{ stringstream ss;ss<<itr->first<<"@"<<(*it); ss>>gg;}
 					char * cstr= new char [gg.size()+1];
-					strcpy(cstr,gg.c_str());
-					cout<<*it<<it->c_str()<<"  bla "<<get_nameindex(lp,cstr,FALSE)<<endl;
-					set_lowbo(lp, get_nameindex(lp,cstr,FALSE),1);
-					//if(!add_constraint(lp, roww,EQ, rhs))								cout<<"gata"<<endl;
+					strcpy(cstr,gg.c_str());strcpy(cstr,gg.c_str());cout<<gg<<cstr<<endl;
+					if(get_nameindex(lp,cstr,FALSE)!=-1) set_lowbo(lp, get_nameindex(lp,cstr,FALSE),1);
+					else{	//internal place which needs extra variable and constraint
+						if(net1.findPlace(gg)!=NULL) cout<<gg;
+						else abort(2,"non-identifiable node for cover");
+						add_columnex(lp,0,NULL,NULL);REAL roww[get_Ncolumns(lp)+1];
+						set_col_name(lp,get_Ncolumns(lp), cstr);
+						for(int rr=0;rr<get_Ncolumns(lp);rr++) roww[rr+1]=0.0;
+						roww[get_Ncolumns(lp)]=1.0;
+						Place & l= *net1.findPlace(gg);
+						for(std::set<pnapi::Transition *>::iterator cit=net1.getTransitions().begin();cit!=net1.getTransitions().end();++cit){
+						//cout<<(*cit)->getName()<<" ";
+							char * cstr= new char [(*cit)->getName().size()+1];
+							strcpy(cstr,(*cit)->getName().c_str());
+							int fp=0,fm=0;
+							Transition & r= *net1.findTransition((*cit)->getName());
+							//if(net1.findArc(r,l)!=NULL){fp=net1.findArc(r,l)->getWeight();}
+							if(net1.findArc(l,r)!=NULL) {fm=net1.findArc(l,r)->getWeight();}
+							roww[get_nameindex(lp, cstr,FALSE)]=-fabs(fp-fm);//j is the current place
+						}
+						if(!add_constraint(lp, roww,EQ, 0.0))	cout<<"gata"<<endl;
+						set_lowbo(lp, get_nameindex(lp,cstr,FALSE),1);
+					}
 				}
 			}
 		}

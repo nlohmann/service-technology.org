@@ -13,6 +13,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 StoredKnowledge.h StoredKnowledge.cc \
                 PossibleSendEvents.h PossibleSendEvents.cc \
                 Cover.h Cover.cc \
+                Diagnosis.h Diagnosis.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h

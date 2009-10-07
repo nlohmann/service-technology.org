@@ -18,6 +18,7 @@
 \*****************************************************************************/
 
 
+#include <config.h>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -26,13 +27,13 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <config.h>
 #include "config-log.h"
 #include "StoredKnowledge.h"
 #include "PossibleSendEvents.h"
 #include "cmdline.h"
 #include "Output.h"
 #include "Cover.h"
+#include "Diagnosis.h"
 #include "verbose.h"
 
 
@@ -115,7 +116,7 @@ void evaluateParameters(int argc, char** argv) {
             // initialize the config file parser
             params->initialize = 0;
             params->override = 0;
-            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
+            if (cmdline_parser_config_file(conf_filename.c_str(), &args_info, params) != 0) {
                 abort(14, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());
@@ -411,7 +412,7 @@ int main(int argc, char** argv) {
         if (args_info.diagnose_given) {
             std::string diag_filename = args_info.diagnose_arg ? args_info.diagnose_arg : filename + ".diag.dot";
             Output output(diag_filename, "diagnosis information");
-            StoredKnowledge::output_diagnosedot(output);
+            Diagnosis::output_diagnosedot(output);
         }
     }
 

@@ -33,6 +33,9 @@
  \brief knowledge (data structure for storing knowledges)
  */
 class StoredKnowledge {
+	/// the Diagnosis needs to traverse the hash tree
+	friend class Diagnosis;
+
     public: /* static functions */
         /// destroy all objects of this class
         static void finalize();
@@ -45,9 +48,6 @@ class StoredKnowledge {
 
         /// print a dot representation
         static void output_dot(std::ostream&);
-
-        /// print a dot representation for diagnosis
-        static void output_diagnosedot(std::ostream&);
 
         /// print the knowledges as OG
         static void output_og(std::ostream&);

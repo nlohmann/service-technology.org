@@ -116,7 +116,7 @@ void evaluateParameters(int argc, char** argv) {
             // initialize the config file parser
             params->initialize = 0;
             params->override = 0;
-            if (cmdline_parser_config_file(conf_filename.c_str(), &args_info, params) != 0) {
+            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
                 abort(14, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());

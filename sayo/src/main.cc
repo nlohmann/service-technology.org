@@ -55,6 +55,7 @@ gengetopt_args_info args_info;
 
 /// lexer and parser
 extern int og_yyparse();
+extern int og_yylex_destroy();
 extern FILE* og_yyin;
 
 
@@ -65,9 +66,6 @@ std::ostream* myOut = &cout;
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) 
 {
-  // set default values
-  cmdline_parser_init(&args_info);
-
   // initialize the parameters structure
   struct cmdline_parser_params *params = cmdline_parser_params_create();
 
@@ -117,10 +115,13 @@ int main(int argc, char** argv)
   
   /// actual parsing
   og_yyparse();
-  
+
   // close input (output is closed by destructor)
   fclose(og_yyin);
   
+  /// clean lexer memory
+  og_yylex_destroy();
+
   return EXIT_SUCCESS; // finished parsing
 }
 

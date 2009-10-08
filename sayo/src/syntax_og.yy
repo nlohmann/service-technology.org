@@ -181,7 +181,7 @@ og:
   
   {
     // cleanup
-    delete inputSockets;
+    delete[] inputSockets;
   }  
 ;
 
@@ -398,7 +398,11 @@ successors:
   {
     // don't copy the empty node or arcs to the empty node
     if( (emptyNode) || ($4 == 0) )
+    {
+       // but still free the ident
+       free($2);
        break;    
+    }
 
     // read an OG successor on an event
     // write corresponting SA successor on the same event

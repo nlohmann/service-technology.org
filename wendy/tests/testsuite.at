@@ -175,7 +175,7 @@ AT_SETUP([Checking for memory leaks with Valgrind])
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK_LOLA
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW myCoffee.owfn --finalize],0,ignore,stderr)
-AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible." stderr])
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_CLEANUP
 
 

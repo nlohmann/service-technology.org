@@ -754,7 +754,7 @@ int main(int argc, char** argv) {
 	//the stupid way using the compose function which is not implemented correctly
 	// parse the open nets and obtain the incidence matrix of the composition and the corresponding final marking(s)
 	pnapi::PetriNet net1, net2;
-	
+	bool coverall;
 	std::string s1("0");
 	std::ifstream inputStream;
 
@@ -767,38 +767,42 @@ int main(int argc, char** argv) {
 	int nTransitions;
 	std::set<lprec *> retlpset;//set of all final markings of the composition
  	
-	for (i = 0; i < args_info.enforceEvents_given; ++i){
- 		std::string s=args_info.enforceEvents_arg[i];std::string st,cs;
-  		if(s.find("@")!=std::string::npos) {st=s.substr(0,s.find("@"));//cout<<st<<endl;
-			cs=s.substr(s.find("@")+1); 		
- 			stringstream ss;ss<<st;
- 			int net; ss>>net;//cout<<net;
- 			const int netc=net;//const std::string cs;
-			if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
+	if (args_info.enforceEvents_arg){
+		for (i = 0; i < args_info.enforceEvents_given; ++i){
+ 			std::string s=args_info.enforceEvents_arg[i];std::string st,cs;
+			if(s=="all") {coverall=true;status("Cover all nodes");break;}
+  			if(s.find("@")!=std::string::npos) {st=s.substr(0,s.find("@"));//cout<<st<<endl;
+				cs=s.substr(s.find("@")+1); 		
+	 			stringstream ss;ss<<st;
+ 				int net; ss>>net;//cout<<net;
+ 				const int netc=net;//const std::string cs;
+				if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
 //		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
- 			set<std::string> sets;sets.insert(cs);
-  			if(enforcedT.find(net)==enforcedT.end()) {
-				enforcedT.insert(std::pair<unsigned int, set<std::string> >(net,sets));
-				cout<<"new";
-			}
-  			else{set<std::string> se=(enforcedT.find(net))->second;
-	  			se.insert(cs);
-	  			enforcedT.find(net)->second=se;//cout<<"old"<<endl;
+	 			set<std::string> sets;sets.insert(cs);
+  				if(enforcedT.find(net)==enforcedT.end()) {
+					enforcedT.insert(std::pair<unsigned int, set<std::string> >(net,sets));
+				}
+  				else{set<std::string> se=(enforcedT.find(net))->second;
+	  				se.insert(cs);
+	  				enforcedT.find(net)->second=se;//cout<<"old"<<endl;
 // 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
+				}
 			}
-		}
-		else {//interface 
-			set<std::string> sets;sets.insert(s);
-			if(enforcedT.find(0)==enforcedT.end()) {
-				enforcedT.insert(std::pair<unsigned int, set<std::string> >(0,sets));	
-			}
-			else{   set<std::string> se=(enforcedT.find(0))->second;
-	  			se.insert(cs);
-	  			enforcedT.find(0)->second=se;//cout<<"old"<<endl;
+			else {//interface 
+				if(enforcedT.find(0)==enforcedT.end()) {
+					set<std::string> sets;sets.insert(s);
+					enforcedT.insert(std::pair<unsigned int, set<std::string> >(0,sets));	
+				}
+				else{   set<std::string> se=(enforcedT.find(0))->second;
+	  				se.insert(cs);
+	  				enforcedT.find(0)->second=se;//cout<<"old"<<endl;
 // 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
-			}	
-		}
- 	}
+				}	
+			}
+ 		}
+	}
+
+	
 	
 	for (i = 0; i < args_info.enforceFC_given; ++i){
  //		std::string s=args_info.enforceFC_arg[i];
@@ -857,7 +861,7 @@ int main(int argc, char** argv) {
 		//	if(!net1.isClosed()){cout<<" is not closed"<<std::endl;} else 
 		}
 	}
-		std::cout << owfn << net1<<"end of composition"<<std::endl;
+		//std::cout << owfn << net1<<"end of composition"<<std::endl;
 
 
 		//}
@@ -868,7 +872,7 @@ int main(int argc, char** argv) {
 // print result
 	//fflush(stdin);
 	int res;//the result of the system
-	std::vector<lprec *> lpmps;// mp staff
+	std::vector<lprec *> lpmps;// 
 	std::set<std::string> resultinp, resultout,resultsyn, result, resintern;//interface 
 	//parse the message profile files
 	if(args_info.messageProfiles_given>0){
@@ -1168,6 +1172,53 @@ int main(int argc, char** argv) {
 		pnapi::Marking m(net1);
 		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
 		retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
+		if(coverall) {
+			set<std::string> sets;// fill in the set of nodes of the composition
+			std::set<pnapi::Place*> pl;
+			std::set<pnapi::Place*> tr;
+			for(std::set<pnapi::Node*>::iterator p=net1.getNodes().begin();p!=net1.getNodes().end();++p){
+				/*Place * pl = dynamic_cast<Place *> ((*p));
+				if(pl==NULL){	sets.insert((*p)->getName());//transition
+					std::string st,cs;
+ 					if(pl->getName().find("@")!=std::string::npos) {
+						std::string st,cs;
+						st=pl->getName().substr(0,pl->getName().find("@"));//cout<<st<<endl;
+						cs=pl->getName().substr(pl->getName().find("@")+1);
+	 					stringstream ss;ss<<st;
+ 						int net; ss>>net;//cout<<net;
+ 						const int netc=net;//const std::string cs;
+						if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
+//		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
+		 				set<std::string> sets;sets.insert(cs);
+  						if(enforcedT.find(net)==enforcedT.end()) {
+							enforcedT.insert(std::pair<unsigned int, set<std::string> >(net,sets));
+						}
+	  					else{set<std::string> se=(enforcedT.find(net))->second;
+		  					se.insert(cs);
+			  				enforcedT.find(net)->second=se;//cout<<"old"<<endl;
+// 					//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));			
+						}
+					}
+					else {//interface 
+						if(enforcedT.find(0)==enforcedT.end()) {
+							set<std::string> sets;sets.insert(pl->getName());
+							enforcedT.insert(std::pair<unsigned int, set<std::string> >(0,sets));	
+						}
+						else{   set<std::string> se=(enforcedT.find(0))->second;
+	  						se.insert(cs);
+	  						enforcedT.find(0)->second=se;//cout<<"old"<<endl;
+// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));	
+						}
+					}
+				}
+				else if ((pl->getPresetArcs().size()==0)&&(pl->getTokenCount()==0)) 
+					abort(2, "input place is unmarked");*/
+			}
+		}
+	
+			//enforcedT.insert(std::pair<unsigned int, set<std::string> >(1,sets));
+	
+
 	for(set<lprec *>::iterator citr = retlpset.begin();citr!=retlpset.end();citr++){
 		lprec *lp;//lp = make_lp(0, nTransitions);
 		

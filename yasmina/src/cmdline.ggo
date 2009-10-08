@@ -19,18 +19,18 @@ option "enforceFC" f
 	"Enforce free choice sending structures"
 	flag off
 	
-option "excludeE" x
-	"Exclude events"
-	flag off
+#option "excludeE" x
+#	"Exclude events"
+#	flag off
 
 option "messageProfiles" m
 	"Use message profiles (format filename.output) - "
 	string multiple
 	optional
 	
-option "constrain" c
-	"use constraints - "
-	optional
+#option "constrain" c
+#	"use constraints - "
+#	optional
 
 #option "df" -
 #	"Deadlock freedom"

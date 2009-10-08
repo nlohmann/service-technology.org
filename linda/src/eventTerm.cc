@@ -8,16 +8,21 @@
 #include <eventTerm.h>
 
 
-
-
+/*!
+ * \brief Destructor for a MultiplyTerm (k * T).
+ *
+ * Deletes the term T.
+ */
 MultiplyTerm::~MultiplyTerm() {
 	delete term;
 }
+
 
 AddTerm::~AddTerm() {
 	delete term1;
 	delete term2;
 }
+
 
 BasicTerm::~BasicTerm() {
 	// Do nothing!!!
@@ -30,9 +35,11 @@ EventTerm* MultiplyTerm::flatten() {
 	return result;
 }
 
+
 EventTerm* AddTerm::flatten() {
 	return new AddTerm(term1->flatten(),term2->flatten());
 }
+
 
 EventTerm* BasicTerm::flatten() {
 	return new MultiplyTerm(new BasicTerm(event),1);
@@ -43,16 +50,19 @@ EventTerm* MultiplyTerm::multiplyWith(int k) {
 	return this;
 }
 
+
 EventTerm* AddTerm::multiplyWith(int k) {
 	term1 = term1->multiplyWith(k);
 	term2 = term2->multiplyWith(k);
 	return this;
 }
 
+
 EventTerm* BasicTerm::multiplyWith(int k) {
 	EventTerm* result = new MultiplyTerm(this,k);
 	return result;
 }
+
 
 int* EventTerm::termToMap(EventTerm* e) {
 	EventTerm* temp = e->flatten();

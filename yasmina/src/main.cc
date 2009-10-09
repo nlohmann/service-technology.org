@@ -754,7 +754,7 @@ int main(int argc, char** argv) {
 	//the stupid way using the compose function which is not implemented correctly
 	// parse the open nets and obtain the incidence matrix of the composition and the corresponding final marking(s)
 	pnapi::PetriNet net1, net2;
-	bool coverall;
+	bool coverall=false;
 	std::string s1("0");
 	std::ifstream inputStream;
 
@@ -984,10 +984,11 @@ int main(int argc, char** argv) {
 					int kn=1;//cout<<"hello"<<term_vec->size()<<endl;
 					//int k=1;//print_lp(mps.at(ifm-1));
 					//cout<<ifm-1<<"in"<<get_Nrows(mps.at(0))<<get_Nrows(mps.at(1))<<get_Nrows(mps.at(2))<<endl;
-					REAL roww[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
+					//REAL roww[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
 				//initialize roww ith zero values
 					for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 						//need to initialize the roww set_add_rowmode(lpmp, TRUE);
+						REAL *roww;//[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
 						for (k=1; k<1+inputPlaces.size()+ outputPlaces.size()+synchrT.size(); k++) {
 							roww[k]=0;
 						}
@@ -1069,7 +1070,7 @@ int main(int argc, char** argv) {
 							//if( grex==-1) cout<<"gata";
 							add_constraint(lpr,rowp,get_constr_type(lpmps.at(j),r+1),get_rh(lpmps.at(j),r+1));
 							set_rh_range(lpr,get_Nrows(lpmps.at(j)),get_rh_range(lpmps.at(j),r+1));
-							print_lp(lpr);
+							//print_lp(lpr);
 						}
 					}
 					st.push_back(lpr);
@@ -1096,8 +1097,8 @@ int main(int argc, char** argv) {
 			if(res==0){
 				cout<<endl<<"Compatibility check inconclusive"<<endl;
 				cout<<endl<<"The constraint system has at least a solution:"<<endl;
-				REAL sol[get_Ncolumns(lpmps.at(ifm))];
-				get_variables(lpmps.at(ifm),sol);
+				REAL *sol;//[get_Ncolumns(lpmps.at(ifm))];
+				get_ptr_variables(lpmps.at(ifm),&sol);
 				for(int s=0;s<get_Ncolumns(lpmps.at(ifm));s++){
 					cout<<get_col_name(lpmps.at(ifm),s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
 				}
@@ -1337,7 +1338,7 @@ int main(int argc, char** argv) {
 					//}
 					add_columnex(lp,0,NULL,NULL);//then add constraint iff there is some connection between 
 					set_col_name(lp, get_Ncolumns(lp),get_col_name(lpmps.at(ifm),j+1));
-					REAL roww[1+get_Ncolumns(lp)];
+					REAL *roww;//[1+get_Ncolumns(lp)];
 					for(int r=0;r<get_Ncolumns(lp);r++) roww[r+1]=0.0;
 					roww[get_Ncolumns(lp)]=1.0;
 					for(std::set<pnapi::Transition *>::iterator cit=net1.getTransitions().begin();cit!=net1.getTransitions().end();++cit){
@@ -1357,7 +1358,7 @@ int main(int argc, char** argv) {
 				//set_add_rowmode(lp,TRUE); add the constraints of the message profiles
 				int hh=1+get_Ncolumns(lp);//set_verbose(lp,5);//print_lp(lpmps.at(ifm)); //cout<<"col"<<hh<<"dd";
 				for(int i=0;i<get_Nrows(lpmps.at(ifm));i++){
-					REAL rowp[1+get_Ncolumns(lpmps.at(ifm))], rowwpp[hh];//int *colp;
+					REAL *rowp,*rowwpp;//[1+get_Ncolumns(lpmps.at(ifm))], rowwpp[hh];//int *colp;
 					char grex=get_row(lpmps.at(ifm),i+1,rowp);
 					for(int j=0;j<hh-1;j++)rowwpp[j]=0;
 				        for(int j=0;j<get_Ncolumns(lpmps.at(ifm));j++){rowwpp[j+hh-get_Ncolumns(lpmps.at(ifm))]=rowp[j+1];}
@@ -1390,7 +1391,7 @@ int main(int argc, char** argv) {
 					else{	//internal place which needs extra variable and constraint
 						if(net1.findPlace(gg)!=NULL) cout<<gg;
 						else abort(2,"non-identifiable node for cover");
-						add_columnex(nn,0,NULL,NULL);REAL roww[get_Ncolumns(nn)+1];
+						add_columnex(nn,0,NULL,NULL);REAL *roww;//[get_Ncolumns(nn)+1];
 						set_col_name(nn,get_Ncolumns(nn), cstr);
 						for(int rr=0;rr<get_Ncolumns(nn);rr++) roww[rr+1]=0.0;
 						roww[get_Ncolumns(nn)]=1.0;
@@ -1408,22 +1409,22 @@ int main(int argc, char** argv) {
 						if(!add_constraint(nn, roww,EQ, 0.0))	cout<<"gata"<<endl;
 						set_lowbo(nn, get_nameindex(nn,cstr,FALSE),1);
 					}
-					REAL rowobj[get_Ncolumns(nn)];
-					for(int s=1;s<=get_Ncolumns(nn)+1;s++){
-						rowobj[s]=0.0;
-					}
-					set_obj_fn(nn,rowobj);
+					//REAL rowobj[get_Ncolumns(nn)];
+					//for(int s=1;s<=get_Ncolumns(nn)+1;s++){
+					//	rowobj[s]=0.0;
+					//}
+					set_obj_fnex(nn,0, NULL,NULL);//nn,rowobj);
 					set_verbose(nn,IMPORTANT);
 					for(int i=1;i<=get_Ncolumns(nn);++i){
 						set_int(nn,i,TRUE);
 					}
-					print_lp(nn);
+					//print_lp(nn);
 					res=solve(nn);	
 					if(res==0){
 						cout<<endl<<"Compatibility check inconclusive for "<<gg<<endl;
 						cout<<endl<<"The constraint system has at least a solution:"<<endl;
-						REAL sol[get_Ncolumns(nn)];
-						get_variables(nn,sol);
+						REAL *sol;//[get_Ncolumns(nn)];
+						get_ptr_variables(nn,&sol);
 						for(int s=0;s<get_Ncolumns(nn);s++){
 							cout<<get_col_name(nn,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
 						}
@@ -1438,23 +1439,25 @@ int main(int argc, char** argv) {
 			}
 		}
 		else{
-		REAL rowobj[get_Ncolumns(lp)];
+		set_obj_fnex(lp,0, NULL,NULL);
+		/*REAL rowobj[get_Ncolumns(lp)];
 		for(int s=1;s<=get_Ncolumns(lp)+1;s++){
 			rowobj[s]=0.0;
 		}
-		set_obj_fn(lp,rowobj);
+		set_obj_fn(lp,rowobj);*/
 		set_verbose(lp,IMPORTANT);
 		for(int i=1;i<=get_Ncolumns(lp);++i){
 			set_int(lp,i,TRUE);
 		}
-		print_lp(lp);
+		//print_lp(lp);
 		res=solve(lp);
 		//cout<<"Solve "<<solve(lp)<<endl;
 		if(res==0){
 			cout<<endl<<"Compatibility check inconclusive"<<endl;
 			cout<<endl<<"The constraint system has at least a solution:"<<endl;
-			REAL sol[nTransitions];
-			get_variables(lp,sol);
+			REAL *sol;//[get_Ncolumns(nn)];
+			get_ptr_variables(lp,&sol);//REAL sol[nTransitions];
+			//get_variables(lp,&sol);
 			for(int s=0;s<nTransitions;s++){
 				cout<<get_col_name(lp,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
 			}

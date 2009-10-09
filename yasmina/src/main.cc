@@ -842,7 +842,7 @@ int main(int argc, char** argv) {
 			if(args_info.inputs_num==1) break;
 		}
 		else{
-		std::stringstream s;s<<(i+1); cout<< s.str();
+		std::stringstream s;s<<(i+1); //cout<< s.str();
 		std::string s2; s2=s.str()+"@";//"net"+s.str();
 		ifstream ifs2(args_info.inputs[i]);
 		try { ifs2 >> owfn >> net2;}
@@ -853,7 +853,7 @@ int main(int argc, char** argv) {
 			for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
 				  if(net1.findTransition(*it)!=NULL) cout<<(*it);
 				  else if(net1.findPlace(*it)!=NULL) cout<<(*it);
-				  else abort(2, "the node do not belong to the net");
+				  else abort(2, "the node does not belong to the net");
 			}
 			   //else abort(3, "the transitions do not belong to the net");
 		if(i==1) s1="1@"; else s1=""; net1.compose(net2, s1, s2);
@@ -1175,17 +1175,16 @@ int main(int argc, char** argv) {
 		if(coverall) {
 			set<std::string> sets;// fill in the set of nodes of the composition
 			std::set<pnapi::Place*> pl;
-			std::set<pnapi::Place*> tr;
 			for(std::set<pnapi::Node*>::iterator p=net1.getNodes().begin();p!=net1.getNodes().end();++p){
-				/*Place * pl = dynamic_cast<Place *> ((*p));
-				if(pl==NULL){	sets.insert((*p)->getName());//transition
+				Place * pl = dynamic_cast<Place *> ((*p));
+				if(pl==NULL){	sets.insert((*p)->getName());//cout<<(*p)->getName()<<endl;//transition
 					std::string st,cs;
- 					if(pl->getName().find("@")!=std::string::npos) {
+ 					if((*p)->getName().find("@")!=std::string::npos) {
 						std::string st,cs;
-						st=pl->getName().substr(0,pl->getName().find("@"));//cout<<st<<endl;
-						cs=pl->getName().substr(pl->getName().find("@")+1);
+						st=(*p)->getName().substr(0,(*p)->getName().find("@"));
+						cs=(*p)->getName().substr((*p)->getName().find("@")+1);
 	 					stringstream ss;ss<<st;
- 						int net; ss>>net;//cout<<net;
+ 						int net; ss>>net;
  						const int netc=net;//const std::string cs;
 						if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
 //		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
@@ -1212,7 +1211,7 @@ int main(int argc, char** argv) {
 					}
 				}
 				else if ((pl->getPresetArcs().size()==0)&&(pl->getTokenCount()==0)) 
-					abort(2, "input place is unmarked");*/
+					abort(2, "input place is unmarked");
 			}
 		}
 	
@@ -1377,23 +1376,24 @@ int main(int argc, char** argv) {
 		//add constraints for cover places and transitions
 		//std::set<lprec* > cover;
 		if(args_info.enforceEvents_given>0){
+			bool globres=1;
 			for(map<int,set<std::string> >::const_iterator itr=enforcedT.begin();itr!=enforcedT.end();++itr){
-				cout<<"enforced "<<itr->first;
+				//cout<<"enforced "<<itr->first;
 				for(set<std::string>::const_iterator it=(itr->second).begin();it!=(itr->second).end();++it){
-					//lprec* nn=copy_lp(lp);
+					lprec* nn=copy_lp(lp);
 					std::string gg;
 					if(itr->first==0) gg=*it;
 					else{ stringstream ss;ss<<itr->first<<"@"<<(*it); ss>>gg;}
 					char * cstr= new char [gg.size()+1];
-					strcpy(cstr,gg.c_str());strcpy(cstr,gg.c_str());cout<<gg<<cstr<<endl;
-					if(get_nameindex(lp,cstr,FALSE)!=-1) set_lowbo(lp, get_nameindex(lp,cstr,FALSE),1);
+					strcpy(cstr,gg.c_str());strcpy(cstr,gg.c_str());//cout<<gg<<cstr<<endl;
+					if(get_nameindex(nn,cstr,FALSE)!=-1) set_lowbo(nn, get_nameindex(nn,cstr,FALSE),1);
 					else{	//internal place which needs extra variable and constraint
 						if(net1.findPlace(gg)!=NULL) cout<<gg;
 						else abort(2,"non-identifiable node for cover");
-						add_columnex(lp,0,NULL,NULL);REAL roww[get_Ncolumns(lp)+1];
-						set_col_name(lp,get_Ncolumns(lp), cstr);
-						for(int rr=0;rr<get_Ncolumns(lp);rr++) roww[rr+1]=0.0;
-						roww[get_Ncolumns(lp)]=1.0;
+						add_columnex(nn,0,NULL,NULL);REAL roww[get_Ncolumns(nn)+1];
+						set_col_name(nn,get_Ncolumns(nn), cstr);
+						for(int rr=0;rr<get_Ncolumns(nn);rr++) roww[rr+1]=0.0;
+						roww[get_Ncolumns(nn)]=1.0;
 						Place & l= *net1.findPlace(gg);
 						for(std::set<pnapi::Transition *>::iterator cit=net1.getTransitions().begin();cit!=net1.getTransitions().end();++cit){
 						//cout<<(*cit)->getName()<<" ";
@@ -1403,14 +1403,41 @@ int main(int argc, char** argv) {
 							Transition & r= *net1.findTransition((*cit)->getName());
 							//if(net1.findArc(r,l)!=NULL){fp=net1.findArc(r,l)->getWeight();}
 							if(net1.findArc(l,r)!=NULL) {fm=net1.findArc(l,r)->getWeight();}
-							roww[get_nameindex(lp, cstr,FALSE)]=-fabs(fp-fm);//j is the current place
+							roww[get_nameindex(nn, cstr,FALSE)]=-fabs(fp-fm);//j is the current place
 						}
-						if(!add_constraint(lp, roww,EQ, 0.0))	cout<<"gata"<<endl;
-						set_lowbo(lp, get_nameindex(lp,cstr,FALSE),1);
+						if(!add_constraint(nn, roww,EQ, 0.0))	cout<<"gata"<<endl;
+						set_lowbo(nn, get_nameindex(nn,cstr,FALSE),1);
 					}
+					REAL rowobj[get_Ncolumns(nn)];
+					for(int s=1;s<=get_Ncolumns(nn)+1;s++){
+						rowobj[s]=0.0;
+					}
+					set_obj_fn(nn,rowobj);
+					set_verbose(nn,IMPORTANT);
+					for(int i=1;i<=get_Ncolumns(nn);++i){
+						set_int(nn,i,TRUE);
+					}
+					print_lp(nn);
+					res=solve(nn);	
+					if(res==0){
+						cout<<endl<<"Compatibility check inconclusive for "<<gg<<endl;
+						cout<<endl<<"The constraint system has at least a solution:"<<endl;
+						REAL sol[get_Ncolumns(nn)];
+						get_variables(nn,sol);
+						for(int s=0;s<get_Ncolumns(nn);s++){
+							cout<<get_col_name(nn,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
+						}
+						cout<<endl;
+						globres=0;
+					}
+					
 				}
 			}
+			if (globres==0) {
+				res=0; break;
+			}
 		}
+		else{
 		REAL rowobj[get_Ncolumns(lp)];
 		for(int s=1;s<=get_Ncolumns(lp)+1;s++){
 			rowobj[s]=0.0;
@@ -1450,6 +1477,7 @@ int main(int argc, char** argv) {
 			break;
 		}
 		else{std::cout<<endl<<"So far no solution  ..."<<endl;}
+		}
 	}
 	}
 	if(res!=0){std::cout<<endl<<"Not compatible wrt weak termination"<<endl;}

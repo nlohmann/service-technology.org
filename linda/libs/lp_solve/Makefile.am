@@ -1,12 +1,12 @@
-noinst_LIBRARIES = liblpsolve55.a
+noinst_LTLIBRARIES = liblpsolve55.la
 
 INCLUDES = -I. -I$(srcdir)/shared -I$(srcdir)/bfp -I$(srcdir)/bfp/bfp_LUSOL -I$(srcdir)/bfp/bfp_LUSOL/LUSOL -I$(srcdir)/colamd
 
 DEFINES = -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine
 
-liblpsolve55_a_CFLAGS = -fPIC $(DEFINES)
+liblpsolve55_la_CFLAGS = -fPIC $(DEFINES)
 
-liblpsolve55_a_SOURCES = lp_MDO.c lp_MDO.h \
+liblpsolve55_la_SOURCES = lp_MDO.c lp_MDO.h \
 	ini.c ini.h \
 	fortify.c fortify.h \
 	lp_crash.c lp_crash.h \
@@ -48,3 +48,10 @@ EXTRA_DIST = bfp/lp_BFP1.c bfp/lp_BFP2.c \
 	bfp/bfp_LUSOL/LUSOL/lusol6u.c \
 	lp_rlp.l lp_rlp.y \
 	README.txt
+
+# information for libtool
+includedir = @includedir@/lp_solve
+
+include_HEADERS = ini.h fortify.h lp_crash.h lp_Hash.h lp_lib.h lp_wlp.h lp_matrix.h lp_mipbb.h lp_MPS.h lp_presolve.h lp_price.h lp_pricePSE.h lp_report.h \
+	lp_scale.h lp_simplex.h lp_SOS.h lp_rlp.h lp_utils.h yacc_read.h bfp/lp_BFP.h bfp/bfp_LUSOL/lp_LUSOL.h bfp/bfp_LUSOL/LUSOL/lusol.h colamd/colamd.h shared/commonlib.h \
+	shared/mmio.h shared/myblas.h declare.h lp_explicit.h lp_fortify.h lp_solveDLL.h lp_types.h lpkit.h lpsolve.h ufortify.h

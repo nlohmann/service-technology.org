@@ -72,7 +72,7 @@ summe: produkt {$$ = $1;}
 ;
 
 produkt: IDENT {$$ = new BasicTerm($1);}
-         | NUMBER LPAR summe RPAR {$$ = new MultiplyTerm($3,$1);}
+         | NUMBER MULT LPAR summe RPAR {$$ = new MultiplyTerm($4,$1);}
          | vorzeichen NUMBER LPAR summe RPAR {$$ = new MultiplyTerm($4,$1*$2);}
          | NUMBER MULT IDENT {$$ = new MultiplyTerm(new BasicTerm($3),$1);}
          | vorzeichen NUMBER MULT IDENT {$$ = new MultiplyTerm(new BasicTerm($4),$1*$2);}

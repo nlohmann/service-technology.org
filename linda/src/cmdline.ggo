@@ -9,6 +9,10 @@ section "Message Profile"
 option "level-0" 0
   "Level 0 Message Profile"
   flag off
+
+option "level-1" 1
+  "Level 1 Message Profile"
+  flag off
   
 option "file" f
   "Message Profile from a term file"
@@ -20,10 +24,6 @@ option "constraint-file" c
   string typestr="path"
   optional
 
-
-option "interactive" i
-  "Interactive Message Profile building"
-  flag off
 
 section "Output options"
 
@@ -58,3 +58,8 @@ option "bound" b
   int typestr="uint"
   default="10"
   optional
+  
+option "about" A
+	""
+	flag off
+	hidden

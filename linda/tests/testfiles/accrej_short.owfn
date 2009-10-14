@@ -1,0 +1,47 @@
+PLACE
+  INTERNAL
+    p0,p1,p2,w0,wacc,wrej;
+
+  INPUT
+    check,
+	getinfo,
+	sugg;
+
+  OUTPUT
+	info,
+	rej,
+	feedback,
+	acc,
+	finalrej;
+
+
+INITIALMARKING
+  p0:	1;
+
+FINALCONDITION
+	(wacc = 1 AND ALL_OTHER_PLACES_EMPTY);
+
+
+TRANSITION t1
+  CONSUME p0,check;
+  PRODUCE p1;
+
+TRANSITION t2
+  CONSUME p0,getinfo;
+  PRODUCE info,w0;
+
+TRANSITION t3
+  CONSUME p1,sugg;
+  PRODUCE p2;
+
+TRANSITION t4
+  CONSUME p2;
+  PRODUCE rej,feedback,p1;
+
+TRANSITION t5
+  CONSUME p2;
+  PRODUCE acc,wacc;
+
+TRANSITION t6
+  CONSUME p2;
+  PRODUCE wrej,finalrej;

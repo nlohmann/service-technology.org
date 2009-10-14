@@ -1,235 +1,282 @@
-/*
- * stateEquation.cc
- *
- *  Created on: 17.06.2009
- *      Author: Jan
- */
-
 #include "stateEquation.h"
 #include "cmdline.h"
+
 /// the command line parameters
 extern gengetopt_args_info args_info;
 
-
-BinaryTree<const pnapi::Place*,std::pair<int*,REAL*> >* ExtendedStateEquation::lines = new BinaryTree<const pnapi::Place*,std::pair<int*,REAL*> >();
-
+/// Initialize the static members.
+BinaryTree<const pnapi::Place*, std::pair<int*, REAL*> >
+		* ExtendedStateEquation::lines = new BinaryTree<const pnapi::Place*,
+				std::pair<int*, REAL*> > ();
+std::pair<int*, REAL*>* ExtendedStateEquation::eventLines = 0;
+BinaryTree<pnapi::Transition*, unsigned int>
+		* ExtendedStateEquation::transitionID = 0;
 
 bool ExtendedStateEquation::constructLP() {
 
-
-	const unsigned int NR_OF_COLS = net->getTransitions().size() + net->getInterfacePlaces().size();
+	// Our LP system has columns T1,T2,...,Tn,E1,...,Ek. We determine where events start and the like.
+	const unsigned int NR_OF_COLS = net->getTransitions().size()
+			+ net->getInterfacePlaces().size();
 	const unsigned int START_TRANSITIONS = 1;
-	const unsigned int START_EVENTS = START_TRANSITIONS + net->getTransitions().size();
-	const unsigned int START_SYNCHRO = START_EVENTS + net->getSynchronizedTransitions().size();
+	const unsigned int START_EVENTS = START_TRANSITIONS
+			+ net->getTransitions().size();
+	const unsigned int START_SYNCHRO = START_EVENTS
+			+ net->getSynchronizedTransitions().size();
 
-	// Build a map for quick transition referencing
-	BinaryTree<pnapi::Transition*, unsigned int> transitionID;
-	unsigned int current = 0;
-
-
-	for (std::set<pnapi::Transition*>::iterator tIt = net->getTransitions().begin(); tIt != net->getTransitions().end(); ++tIt) {
-		transitionID.insert(*tIt,current++,false);
+	// Build a mapping between an lp column (int) to the pointer of the associated transition
+	if (transitionID == 0) {
+		unsigned int current = 0;
+		transitionID = new BinaryTree<pnapi::Transition*, unsigned int> ();
+		for (std::set<pnapi::Transition*>::iterator tIt =
+				net->getTransitions().begin(); tIt
+				!= net->getTransitions().end(); ++tIt) {
+			transitionID->insert(*tIt, current++, false);
+		}
 	}
+
+	// Create the lp_system
 	lp = make_lp(0, NR_OF_COLS);
 
+	// Set each column to integer since we want to solve an ILP
 	for (int i = 1; i <= NR_OF_COLS; ++i) {
-		set_int(lp,i,TRUE);
+		set_int(lp, i, TRUE);
 	}
 
-	if(lp == NULL) {
-		fprintf(stderr, "Unable to create new LP model\n");
-		exit(1);
+	// If for some reason the lp system is null, we exit.
+	if (lp == NULL) {
+		abort(1, "Unable to create new LP model");
 	}
 
-	set_debug(lp,FALSE);
-	set_verbose(lp,FALSE);
+	// Set debug and verbose of this linear problem to FALSE
+	set_debug(lp, FALSE);
+	set_verbose(lp, FALSE);
 
+	// Enter the "add row mode" for faster row insertion
 	set_add_rowmode(lp, TRUE);
 
+	// Iterate over the places in this final marking
+	for (BinaryTreeIterator<const pnapi::Place*, int>* placesIt =
+			omega->values.begin(); placesIt->valid(); placesIt->next()) {
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* placesIt = omega->values.begin(); placesIt->valid(); placesIt->next()) {
-
-		const pnapi::Place* place = placesIt->getKey();
-
+		// Prepare the arrays for the column ids and values
 		int* transCol;
 		REAL* transVal;
-			int value = placesIt->getValue();
 
-			int number_of_transitions_for_this_place = place->getPresetArcs().size() + place->getPostsetArcs().size();
+		// Get the place pointer
+		const pnapi::Place* place = placesIt->getKey();
 
-		BinaryTreeNode<const pnapi::Place*,std::pair<int*,REAL*> >* line = lines->find(place);
+		// Get the value of the place in the partial marking
+		int value = placesIt->getValue();
+
+		// See how many transitions are connected to this place
+		int number_of_transitions_for_this_place =
+				place->getPresetArcs().size() + place->getPostsetArcs().size();
+
+		// See if this line was already created before (and thus is stored in the static member).
+		BinaryTreeNode<const pnapi::Place*, std::pair<int*, REAL*> >* line =
+				lines->find(place);
+
+		// If the line did not exist before...
 		if (line == 0) {
 
+			// Allocate memory for the arrays
 			transCol = new int[number_of_transitions_for_this_place]();
 			transVal = new REAL[number_of_transitions_for_this_place]();
 
+			// Just a counter.
 			int tr = 0;
 
 			// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
-			for (set<pnapi::Arc *>::iterator pIt = place->getPresetArcs().begin(); pIt != place->getPresetArcs().end();
-			++pIt) {
+			for (std::set<pnapi::Arc *>::iterator pIt =
+					place->getPresetArcs().begin(); pIt
+					!= place->getPresetArcs().end(); ++pIt) {
+
+				assert(*pIt != NULL);
 				pnapi::Transition& t = (*pIt)->getTransition();
+
 				// We add the transition, with the weight as a factor.
-
-				assert(tr < number_of_transitions_for_this_place);
-
-				transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
+				transCol[tr] = START_TRANSITIONS
+						+ transitionID->find(&t)->value;
 				transVal[tr] = (*pIt)->getWeight();
 				++tr;
 			}
 
 			// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
-			for (set<pnapi::Arc *>::iterator pIt = place->getPostsetArcs().begin(); pIt != place->getPostsetArcs().end(); ++pIt) {
+			for (std::set<pnapi::Arc *>::iterator pIt =
+					place->getPostsetArcs().begin(); pIt
+					!= place->getPostsetArcs().end(); ++pIt) {
+
+				assert(*pIt != NULL);
 				pnapi::Transition& t = (*pIt)->getTransition();
 
-				assert(tr < number_of_transitions_for_this_place);
-
 				// We add the transition, with the weight as a factor.
-				transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
+				transCol[tr] = START_TRANSITIONS
+						+ transitionID->find(&t)->value;
 				transVal[tr] = -1 * (int) (*pIt)->getWeight();
 				++tr;
 			}
 
+			// Store this line for further use in the static member
+			lines->insert(place, std::pair<int*, REAL*>(transCol, transVal),
+					false);
 
-			lines->insert(place,std::pair<int*,REAL*>(transCol,transVal),false);
-
-		} else {
+		} else { // The line already exist, we just set our pointers to those in the static member
 			transCol = line->value.first;
 			transVal = line->value.second;
 		}
+
+		// Find the difference between initial and final marking for this place (and final marking)
 		int diffval = value;
 		int initialm = place->getTokenCount();
 		diffval -= initialm;
 
-		add_constraintex(lp, number_of_transitions_for_this_place, transVal, transCol, EQ, diffval);
+		// Add the row to the linear program (name of lp, number of columns affected, the columns affected,
+		//                                    the values for each affected column, the comparison operator,
+		//                                    the right hand side value.)
+		add_constraintex(lp, number_of_transitions_for_this_place, transVal,
+				transCol, EQ, diffval);
 	}
 
-	// Now add all the events
+	// If the event line array has not been initialized yet, do that now.
+	if (eventLines == 0) {
+		eventLines = new std::pair<int*, REAL*>[LindaHelpers::NR_OF_EVENTS]();
+		for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 
+			pnapi::Place* p = LindaHelpers::EVENT_PLACES[i];
 
-	//int ev = 0;
+			int* transCol = new int[p->getPresetArcs().size()
+					+ p->getPostsetArcs().size() + 1];
+			REAL* transVal = new REAL[p->getPresetArcs().size()
+					+ p->getPostsetArcs().size() + 1];
 
+			int tr = 0;
 
-	for (int i = 0; i < NR_OF_EVENTS; ++i) {
+			std::stringstream pnstats;
 
-		pnapi::Place* p = EVENT_PLACES[i];
+			// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
+			for (std::set<pnapi::Arc *>::iterator pIt =
+					p->getPresetArcs().begin(); pIt != p->getPresetArcs().end(); ++pIt) {
 
-		//EventID[p] = ev+START_EVENTS;
+				assert(pIt != p->getPresetArcs().end());
+				assert(*pIt != NULL);
 
-		int transCol[p->getPresetArcs().size() + p->getPostsetArcs().size() + 1];
-		REAL transVal[p->getPresetArcs().size() + p->getPostsetArcs().size() + 1];
-		int tr = 0;
+				pnapi::Transition& t = (*pIt)->getTransition();
+				// We add the transition, with the weight as a factor.
+				transCol[tr] = START_TRANSITIONS
+						+ transitionID->find(&t)->value;
+				transVal[tr++] = (*pIt)->getWeight();
+			}
 
-		// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
-		for (set<pnapi::Arc *>::iterator pIt = p->getPresetArcs().begin(); pIt != p->getPresetArcs().end();
-		++pIt) {
-			pnapi::Transition& t = (*pIt)->getTransition();
-			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
-			transVal[tr++] = (*pIt)->getWeight();
+			// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
+			for (std::set<pnapi::Arc *>::iterator pIt =
+					p->getPostsetArcs().begin(); pIt
+					!= p->getPostsetArcs().end(); ++pIt) {
+
+				pnapi::Transition& t = (*pIt)->getTransition();
+				// We add the transition, with the weight as a factor.
+				transCol[tr] = START_TRANSITIONS
+						+ transitionID->find(&t)->value;
+				transVal[tr++] = (*pIt)->getWeight();
+			}
+
+			transCol[tr] = START_EVENTS + i;
+			transVal[tr] = -1;
+
+			eventLines[i] = std::pair<int*, REAL*>(transCol, transVal);
 		}
-
-		// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
-		for (set<pnapi::Arc *>::iterator pIt = p->getPostsetArcs().begin(); pIt != p->getPostsetArcs().end(); ++pIt) {
-			pnapi::Transition& t = (*pIt)->getTransition();
-			// We add the transition, with the weight as a factor.
-			transCol[tr] = START_TRANSITIONS + transitionID.find(&t)->value;
-			transVal[tr++] = (*pIt)->getWeight();
-		}
-
-		transCol[tr] = START_EVENTS + i;
-		transVal[tr] = -1;
-		add_constraintex(lp, tr+1, transVal, transCol, EQ, 0);
 	}
 
+	// Add the rows for each event, retrieved from the event lines.
+	for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+
+		int* transCol = eventLines[i].first;
+		REAL* transVal = eventLines[i].second;
+
+		add_constraintex(
+				lp,
+				LindaHelpers::EVENT_PLACES[i]->getPresetArcs().size()
+						+ LindaHelpers::EVENT_PLACES[i]->getPostsetArcs().size()
+						+ 1, transVal, transCol, EQ, 0);
+
+	}
+
+	// We are done adding rows, so we leave the "add row mode" and set the flag.
 	set_add_rowmode(lp, FALSE);
+	isConstructed = true;
 
+	// We solve the linear program to see if it is feasible. objective function is min 0 at this point.
 	int ret = solve(lp);
 
-	if (ret == INFEASIBLE) {
-		std::cout << "Final marking not reachable from initial marking:" << std::endl;
-		std::cout << "\t";
-		omega->output(std::cout);
+	// Set the flag for feasibility
+	isFeasible = ret != INFEASIBLE;
+
+	// We find that the linear program is infeasible, so we do not take it into account anymore and return false.
+	if (!isFeasible) {
+		std::cerr << "Final marking not reachable from initial marking:"
+				<< std::endl;
+		std::cerr << "\t";
+		omega->output(std::cerr);
 		return false;
 	}
-
-	isFeasible = true;
-	isConstructed = true;
 
 	return true;
 }
 
 EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 
-
-
-	std::string term = e->toString();
+	// Create a mapping from the term
 	int* map = EventTerm::termToMap(e);
 
-	const unsigned int START_TRANSITIONS = 1;
-	const unsigned int START_EVENTS = START_TRANSITIONS + net->getTransitions().size();
+	// Determine the first event column
+	const unsigned int START_EVENTS = 1 + net->getTransitions().size();
 
+	// Create the arrays for the objective function
+	double* obj_row = new double[LindaHelpers::NR_OF_EVENTS]();
+	int* obj_cols = new int[LindaHelpers::NR_OF_EVENTS]();
 
-	double obj_row[NR_OF_EVENTS];
-	int obj_cols[NR_OF_EVENTS];
-
-	std::string normalformterm = "";
-
-	for (int i = 0; i < NR_OF_EVENTS; ++i) {
-
-		if (map[i] > 0) {
-			normalformterm += " +";
-		} else {
-			normalformterm += " ";
-		}
-		normalformterm += map[i];
-		normalformterm += "*";
-		normalformterm += EVENT_STRINGS[i];
-
+	// Fill the array with the values from the mapping
+	for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 		obj_row[i] = map[i];
 		obj_cols[i] = START_EVENTS + i;
 	}
 
-	int ret;
-
+	// Create a new EventTermBound, neither lower nor upper bounded by default
 	EventTermBound* bound = new EventTermBound();
 
-	assert(set_obj_fnex(lp,NR_OF_EVENTS,obj_row,obj_cols)== TRUE);
+	// Set the objective function
+	set_obj_fnex(lp, LindaHelpers::NR_OF_EVENTS, obj_row, obj_cols);
 
+	// Set the objective two minimize
 	set_minim(lp);
 
-	ret = solve(lp);
+	// Solve the linear problem
+	int ret = solve(lp);
 
-	//	std::cout << "\t";
-
-	if (ret == UNBOUNDED) {
-		//		std::cout << "unbounded <= ";
-		bound->lowerBounded = false;
-	} else {
-		//		std::cout << get_objective(lp) << " <= ";
+	// If lp_solve found a lower bound, set the bounds object to lower bounded and set the lower bound
+	if (ret != UNBOUNDED) {
 		bound->lowerBounded = true;
 		bound->lowerBound = (int) get_objective(lp);
 	}
 
+	// Set the objective two maximize, the objective function stays the same
 	set_maxim(lp);
 
-	//print_lp(lp);
-
+	// Solve the linear problem
 	ret = solve(lp);
 
-	if (ret == UNBOUNDED) {
-		//		std::cout << " <= unbounded; ";
-		bound->upperBounded = false;
-	} else {
-		//		std::cout << " <= " << get_objective(lp) << "; ";
+	// If lp_solve found an upper bound, set the bounds object to upper bounded and set the upper bound
+	if (ret != UNBOUNDED) {
 		bound->upperBounded = true;
 		bound->upperBound = (int) get_objective(lp);
 	}
 
-	calculatedBounds.push_back(bound);
-	calculatedEventTerms.push_back(e);
+	if (storeHistory) {
+		// Add this term and bound to the "archive".
+		calculatedBounds.push_back(bound);
+		calculatedEventTerms.push_back(e);
+	}
 
+	// Return the pointer to the calculated bound
 	return bound;
 
-	//	std::cout << "\n";
 }

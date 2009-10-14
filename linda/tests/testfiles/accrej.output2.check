@@ -13,46 +13,10 @@ PLACE
     rej;
 
 FINALMARKINGS
-    F1: acc=0, check=0, feedback=0, finalrej=0, getinfo=0, info=0, p0=0, p1=0, p2=0, rej=0, sugg=0, w0=1, wacc=0, wrej=0;
-    F2: acc=0, check=0, feedback=0, finalrej=0, getinfo=0, info=0, p0=0, p1=0, p2=0, rej=0, sugg=0, w0=0, wacc=1, wrej=0;
-    F3: acc=0, check=0, feedback=0, finalrej=0, getinfo=0, info=0, p0=0, p1=0, p2=0, rej=0, sugg=0, w0=0, wacc=0, wrej=1;
+    F1: p0=0; p1=0; p2=0; w0=0; wacc=1; wrej=0; 
 
 TERMS
-    T1: +1*getinfo-1*info;
-    T2: +14*acc-12*info;
-    T3: -1*finalrej-1*rej+1*sugg;
-    T4: -1*acc-1*finalrej-1*rej+1*sugg;
-    T5: +1*check+1*getinfo;
-    T6: +1*check+1*info;
-    T7: +1*info+1*sugg;
-    T8: -1*feedback+1*rej;
-    T9: -1*acc-1*feedback-1*finalrej+1*sugg;
+    T1: -1*acc-1*finalrej+36*getinfo-36*info-1*rej+1*sugg;
 
 BOUNDS
     F1,T1: 0,0;
-    F1,T2: -12,-12;
-    F1,T3: 0,0;
-    F1,T4: 0,0;
-    F1,T5: 1,1;
-    F1,T6: 1,1;
-    F1,T7: 1,unbounded;
-    F1,T8: 0,0;
-    F1,T9: 0,0;
-    F2,T1: 0,0;
-    F2,T2: 14,14;
-    F2,T3: 1,1;
-    F2,T4: 0,0;
-    F2,T5: 1,1;
-    F2,T6: 1,1;
-    F2,T7: 1,unbounded;
-    F2,T8: 0,0;
-    F2,T9: 0,0;
-    F3,T1: 0,0;
-    F3,T2: 0,0;
-    F3,T3: 0,0;
-    F3,T4: 0,0;
-    F3,T5: 1,1;
-    F3,T6: 1,1;
-    F3,T7: 1,unbounded;
-    F3,T8: 0,0;
-    F3,T9: 0,0;

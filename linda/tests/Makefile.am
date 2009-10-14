@@ -7,8 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = accrej.owfn accrej.output.check
-
+TESTFILES = accrej.owfn accrej.output.check accrej_short.owfn accrej.output2.check accrej.et
 
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,

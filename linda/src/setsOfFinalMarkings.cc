@@ -2,56 +2,63 @@
 #include <iostream>
 #include "setsOfFinalMarkings.h"
 
-using std::cout;
-using std::cerr;
 using std::string;
 
 bool PartialMarking::isEquivalentTo(PartialMarking* other) {
 
+	// If the two partial markings are equivalent, they define the same number of places.
+	if (values.size != other->values.size) {
+		return false;
+	}
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* it = values.begin(); it->valid(); it->next()) {
+	for (BinaryTreeIterator<const pnapi::Place*, int>* it = values.begin(); it->valid(); it->next()) {
+		// If the two partial markings are equivalent, each place that is defined by this, is also defined by the other.
 		if (!(other->defines(it->getKey()))) {
 			return false;
 		}
 
+		// If the two partial markings are equivalent, both markings define the same value
 		if (other->values.find(it->getKey())->value != it->getValue()) {
 			return false;
 		}
 
-
 	}
 
+	/*	for (BinaryTreeIterator<const pnapi::Place*,int>* it = other->values.begin(); it->valid(); it->next()) {
 
+	 if (!(defines(it->getKey()))) {
+	 return false;
+	 }
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* it = other->values.begin(); it->valid(); it->next()) {
+	 if (values.find(it->getKey())->value != it->getValue()) {
+	 return false;
+	 }
 
-		if (!(defines(it->getKey()))) {
-			return false;
-		}
-
-		if (values.find(it->getKey())->value != it->getValue()) {
-			return false;
-		}
-
-	}
-
+	 }
+	 */
 
 	return true;
 }
 
-PartialMarking* PartialMarking::merge(PartialMarking* m1,PartialMarking* m2) {
+PartialMarking* PartialMarking::merge(PartialMarking* m1, PartialMarking* m2) {
 
 	PartialMarking* result = new PartialMarking();
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* it = m1->values.begin(); it->valid(); it->next()) {
-		if (m2->defines(it->getKey()) && m2->values.find(it->getKey())->value != it->getValue()) {
+	// Collect each element of the first marking.
+	for (BinaryTreeIterator<const pnapi::Place*, int>* it = m1->values.begin(); it->valid(); it->next()) {
+
+		// If we find a contradiction, we delete the result and return the null pointer.
+		if (m2->defines(it->getKey()) && m2->values.find(it->getKey())->value
+				!= it->getValue()) {
 			delete result;
 			return 0;
 		}
-		result->values.insert(it->getKey(),it->getValue(),true);
+		result->values.insert(it->getKey(), it->getValue(), true);
 	}
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* it = m2->values.begin(); it->valid(); it->next()) {
+	// Collect each element of the second marking.
+	for (BinaryTreeIterator<const pnapi::Place*, int>* it = m2->values.begin(); it->valid(); it->next()) {
+		// Only add those places that are not defined yet.
 		if (!result->defines(it->getKey())) {
 			result->values.insert(it->getKey(), it->getValue(), true);
 		}
@@ -63,10 +70,10 @@ PartialMarking* PartialMarking::merge(PartialMarking* m1,PartialMarking* m2) {
 
 void PartialMarking::output(std::ostream& stream) {
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* it = values.begin(); it->valid(); it->next()) {
+	for (BinaryTreeIterator<const pnapi::Place*, int>* it = values.begin(); it->valid(); it->next()) {
 		stream << it->getKey()->getName() << "=" << it->getValue() << "; ";
 	}
-	stream << "\n";
+	stream << std::endl;
 
 }
 
@@ -74,44 +81,44 @@ string PartialMarking::toString() {
 
 	string result = "";
 
-	for (BinaryTreeIterator<const pnapi::Place*,int>* it = values.begin(); it->valid(); it->next()) {
-		result += it->getKey()->getName() + "=" + intToStr(it->getValue()) + ", ";
+	for (BinaryTreeIterator<const pnapi::Place*, int>* it = values.begin(); it->valid(); it->next()) {
+		result += it->getKey()->getName() + "=" + LindaHelpers::intToStr(
+				it->getValue()) + "; ";
 	}
 
-	return result.substr(0,result.length()-2) + ";";
+	return result;
 }
-
-
 
 void SetOfPartialMarkings::output() {
 
-	for (std::vector<PartialMarking*>::iterator it = partialMarkings.begin(); it != partialMarkings.end(); ++it) {
-		std::cout << "\n" << "A new one" << std::endl;
-
-		(*it)->output(std::cout);
+	for (std::vector<PartialMarking*>::iterator it = partialMarkings.begin(); it
+			!= partialMarkings.end(); ++it) {
+		(*it)->output(std::cerr);
 	}
 
 }
 
-
 void SetOfPartialMarkings::add(SetOfPartialMarkings* aSet) {
-	for (std::vector<PartialMarking*>::iterator mIt = aSet->partialMarkings.begin(); mIt != aSet->partialMarkings.end(); ++mIt) {
+	for (std::vector<PartialMarking*>::iterator mIt =
+			aSet->partialMarkings.begin(); mIt != aSet->partialMarkings.end(); ++mIt) {
 		protectedInsert(*mIt);
 	}
 
 }
 
-
-
-SetOfPartialMarkings* SetOfPartialMarkings::intersect(SetOfPartialMarkings* set1, SetOfPartialMarkings* set2) {
+SetOfPartialMarkings* SetOfPartialMarkings::intersect(
+		SetOfPartialMarkings* set1, SetOfPartialMarkings* set2) {
 
 	SetOfPartialMarkings* result = new SetOfPartialMarkings();
 
-	for (std::vector<PartialMarking*>::iterator mIt = set1->partialMarkings.begin(); mIt != set1->partialMarkings.end(); ++mIt) {
-		for (std::vector<PartialMarking*>::iterator mIt2 = set2->partialMarkings.begin(); mIt2 != set2->partialMarkings.end(); ++mIt2) {
+	for (std::vector<PartialMarking*>::iterator mIt =
+			set1->partialMarkings.begin(); mIt != set1->partialMarkings.end(); ++mIt) {
+		for (std::vector<PartialMarking*>::iterator mIt2 =
+				set2->partialMarkings.begin(); mIt2
+				!= set2->partialMarkings.end(); ++mIt2) {
 
-			PartialMarking* temp = PartialMarking::merge(*mIt,*mIt2);
-			if(temp != 0) {
+			PartialMarking* temp = PartialMarking::merge(*mIt, *mIt2);
+			if (temp != 0) {
 				result->partialMarkings.push_back(temp);
 			}
 		}
@@ -121,7 +128,10 @@ SetOfPartialMarkings* SetOfPartialMarkings::intersect(SetOfPartialMarkings* set1
 }
 
 bool SetOfPartialMarkings::contains(PartialMarking* partialMarking) {
-	for (std::vector<PartialMarking*>::iterator mIt = partialMarkings.begin(); mIt != partialMarkings.end(); ++mIt) {
+
+	// Iterate over the vector to find out if the partial marking is contained.
+	for (std::vector<PartialMarking*>::iterator mIt = partialMarkings.begin(); mIt
+			!= partialMarkings.end(); ++mIt) {
 		if ((*mIt)->isEquivalentTo(partialMarking)) {
 			return true;
 		}
@@ -130,170 +140,250 @@ bool SetOfPartialMarkings::contains(PartialMarking* partialMarking) {
 }
 
 bool SetOfPartialMarkings::protectedInsert(PartialMarking* partialMarking) {
+
+	// Check if the partial marking is already contained.
 	if (contains(partialMarking)) {
 		return false;
 	}
 
+	// Partial marking is not an element --> insert it.
 	partialMarkings.push_back(partialMarking);
 	return true;
 }
 
+SetOfPartialMarkings* SetOfPartialMarkings::create(pnapi::PetriNet* net,
+		const pnapi::formula::Formula* const src, unsigned int bound) {
 
-
-
-SetOfPartialMarkings* SetOfPartialMarkings::create(pnapi::PetriNet* net, const pnapi::formula::Formula* const src,unsigned int bound) {
+	// The resulting set.
 	SetOfPartialMarkings* result = new SetOfPartialMarkings();
 
-	//std::cerr << "Typeid is: " << typeid(*src).name() << std::endl;
+	// Disjunction means union of the children
+	if (typeid(*src) == typeid(pnapi::formula::Disjunction)) {
 
-	//std::cerr << "Testing equivalence to " << typeid(pnapi::formula::Disjunction).name() << "..." << std::endl;
-	if (typeid(*src) ==  typeid(pnapi::formula::Disjunction)) {
-		//	std::cerr << "Equal! " << std::endl;
+				const pnapi::formula::Disjunction
+						* const castedSrc =
+								dynamic_cast<const pnapi::formula::Disjunction* const > (src);
 
-		const pnapi::formula::Disjunction* const castedSrc = dynamic_cast<const pnapi::formula::Disjunction* const>(src);
-
-		for (std::set<const pnapi::formula::Formula *>::iterator cIt = castedSrc->children().begin(); cIt != castedSrc->children().end(); ++cIt) {
-			SetOfPartialMarkings* current = create(net,(*cIt),bound);
-			result->add(current);
-		}
-	}
-
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::Conjunction).name() << "..." << std::endl;
-	if (typeid(*src) ==  typeid(pnapi::formula::Conjunction)) {
-		// std::cerr << "Equal! " << std::endl;
-
-
-		const pnapi::formula::Conjunction* const castedSrc = dynamic_cast<const pnapi::formula::Conjunction* const >(src);
-		/*
-		for (std::set<const pnapi::formula::Formula *>::iterator cIt = castedSrc->children().begin(); cIt != castedSrc->children().end(); ++cIt) {
-			SetOfPartialMarkings* current = create((*cIt),bound);
-			result->add(current);
-		}
-		 */
-
-		SetOfPartialMarkings* last = create(net,*(castedSrc->children().begin()),bound);
-
-		for (std::set<const pnapi::formula::Formula *>::iterator cIt = (++castedSrc->children().begin()); cIt != castedSrc->children().end(); ++cIt) {
-			SetOfPartialMarkings* current = intersect(last,create(net,*cIt,bound));
-			delete last;
-			last = current;
-			//			last->output();
-		}
-
-		result = last;
-
-
-	}
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaEqual).name() << "..." << std::endl;
-
-	if (typeid(*src) ==  typeid(pnapi::formula::FormulaEqual)) {
-		// std::cerr << "Equal! " << std::endl;
-
-		const pnapi::formula::FormulaEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaEqual* const >(src);
-
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(&(castedSrc->place()))) == net->getInterfacePlaces().end()) {
-			PartialMarking* m = new PartialMarking();
-			m->values.insert(&(castedSrc->place()),castedSrc->tokens(),false);
-			result->partialMarkings.push_back(m);
-		} else {
-			result->partialMarkings.push_back(new PartialMarking());
-		}
-	}
-
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaGreater).name() << "..." << std::endl;
-
-	if (typeid(*src) ==  typeid(pnapi::formula::FormulaGreater)) {
-		// std::cerr << "Equal! " << std::endl;
-
-		const pnapi::formula::FormulaGreater* const castedSrc = dynamic_cast<const pnapi::formula::FormulaGreater* const>(src);
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(&(castedSrc->place()))) == net->getInterfacePlaces().end()) {
-
-
-			for (unsigned int i = castedSrc->tokens()+1; i <= bound; ++i) {
-				PartialMarking* m = new PartialMarking();
-				m->values.insert(&(castedSrc->place()),i,false);
-				result->partialMarkings.push_back(m);
-			}
-		} else {
-			result->partialMarkings.push_back(new PartialMarking());
-		}
-	}
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaGreaterEqual).name() << "..." << std::endl;
-
-	if (typeid(*src) ==  typeid(pnapi::formula::FormulaGreaterEqual)) {
-		// std::cerr << "Equal! " << std::endl;
-
-		const pnapi::formula::FormulaGreaterEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaGreaterEqual* const >(src);
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(&(castedSrc->place()))) == net->getInterfacePlaces().end()) {
-
-
-			for (unsigned int i = castedSrc->tokens(); i <= bound; ++i) {
-				PartialMarking* m = new PartialMarking();
-				m->values.insert(&(castedSrc->place()), i, false);
-				result->partialMarkings.push_back(m);
+				for (std::set<const pnapi::formula::Formula *>::iterator cIt =
+						castedSrc->children().begin(); cIt
+						!= castedSrc->children().end(); ++cIt) {
+					SetOfPartialMarkings* current = create(net, (*cIt), bound);
+					result->add(current);
+				}
 			}
 
-		} else {
-			result->partialMarkings.push_back(new PartialMarking());
-		}
-	}
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaLess).name() << "..." << std::endl;
+			// Conjunction means intersection of the partial markings
+			if (typeid(*src) == typeid(pnapi::formula::Conjunction)) {
 
-	if (typeid(*src) ==  typeid(pnapi::formula::FormulaLess)) {
-		// std::cerr << "Equal! " << std::endl;
-		const pnapi::formula::FormulaLess* const castedSrc = dynamic_cast<const pnapi::formula::FormulaLess* const >(src);
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(&(castedSrc->place()))) == net->getInterfacePlaces().end()) {
+						const pnapi::formula::Conjunction
+								* const castedSrc =
+										dynamic_cast<const pnapi::formula::Conjunction* const > (src);
+						/*
+						 for (std::set<const pnapi::formula::Formula *>::iterator cIt = castedSrc->children().begin(); cIt != castedSrc->children().end(); ++cIt) {
+						 SetOfPartialMarkings* current = create((*cIt),bound);
+						 result->add(current);
+						 }
+						 */
 
-			for (unsigned int i = 0; i < castedSrc->tokens(); ++i) {
-				PartialMarking* m = new PartialMarking();
-				m->values.insert(&(castedSrc->place()), i, false);
-				result->partialMarkings.push_back(m);
-			}
-		} else {
-			result->partialMarkings.push_back(new PartialMarking());
-		}
-	}
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaLessEqual).name() << "..." << std::endl;
+						SetOfPartialMarkings* last = create(net,
+								*(castedSrc->children().begin()), bound);
 
-	if (typeid(*src) ==  typeid(pnapi::formula::FormulaLessEqual)) {
-		// std::cerr << "Equal! " << std::endl;
-		const pnapi::formula::FormulaLessEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaLessEqual* const>(src);
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(&(castedSrc->place()))) == net->getInterfacePlaces().end()) {
+						for (std::set<const pnapi::formula::Formula *>::iterator
+								cIt = (++castedSrc->children().begin()); cIt
+								!= castedSrc->children().end(); ++cIt) {
+							SetOfPartialMarkings* current = intersect(last,
+									create(net, *cIt, bound));
+							delete last;
+							last = current;
+						}
 
-			for (unsigned int i = 0; i <= castedSrc->tokens(); ++i) {
-				PartialMarking* m = new PartialMarking();
-				m->values.insert(&(castedSrc->place()), i, false);
-				result->partialMarkings.push_back(m);
-			}
-		} else {
-			result->partialMarkings.push_back(new PartialMarking());
-		}
-	}
-	// std::cerr << "Testing equivalence to " << typeid(pnapi::formula::FormulaNotEqual).name() << "..." << std::endl;
-	if (typeid(*src) ==  typeid(pnapi::formula::FormulaNotEqual)) {
-		// std::cerr << "Equal! " << std::endl;
-		const pnapi::formula::FormulaNotEqual* const castedSrc = dynamic_cast<const pnapi::formula::FormulaNotEqual* const >(src);
-		if (net->getInterfacePlaces().find(const_cast<pnapi::Place*>(&(castedSrc->place()))) == net->getInterfacePlaces().end()) {
+						result = last;
 
+					}
 
-			for (unsigned int i = castedSrc->tokens(); i >= 0; --i) {
-				PartialMarking* m = new PartialMarking();
-				m->values.insert(&(castedSrc->place()), i, false);
-				result->partialMarkings.push_back(m);
-			}
+					// p1 = j means a new partial marking M with M(p1) = j
+					if (typeid(*src) == typeid(pnapi::formula::FormulaEqual)) {
 
-			for (unsigned int i = castedSrc->tokens()+1; i <= bound; ++i) {
+								const pnapi::formula::FormulaEqual
+										* const castedSrc =
+												dynamic_cast<const pnapi::formula::FormulaEqual* const > (src);
 
-				PartialMarking* m = new PartialMarking();
-				m->values.insert(&(castedSrc->place()), i, false);
-				result->partialMarkings.push_back(m);
-			}
-		} else {
-			result->partialMarkings.push_back(new PartialMarking());
-		}
-	}
+								if (net->getInterfacePlaces().find(
+										const_cast<pnapi::Place*> (&(castedSrc->place())))
+										== net->getInterfacePlaces().end()) {
+									PartialMarking* m = new PartialMarking();
+									m->values.insert(&(castedSrc->place()),
+											castedSrc->tokens(), false);
+									result->partialMarkings.push_back(m);
+								} else {
+									result->partialMarkings.push_back(
+											new PartialMarking());
+								}
+							}
 
+							// p1 > j means a new partial marking Mi for each 1 <= i <= bound - j where Mi(p1) = i+j+1
+							if (typeid(*src)
+											== typeid(pnapi::formula::FormulaGreater)) {
 
-	return result;
+										const pnapi::formula::FormulaGreater
+												* const castedSrc =
+														dynamic_cast<const pnapi::formula::FormulaGreater* const > (src);
+										if (net->getInterfacePlaces().find(
+												const_cast<pnapi::Place*> (&(castedSrc->place())))
+												== net->getInterfacePlaces().end()) {
 
-}
+											for (unsigned int i =
+													castedSrc->tokens() + 1; i
+													<= bound; ++i) {
+												PartialMarking* m =
+														new PartialMarking();
+												m->values.insert(
+														&(castedSrc->place()),
+														i, false);
+												result->partialMarkings.push_back(
+														m);
+											}
+										} else {
+											result->partialMarkings.push_back(
+													new PartialMarking());
+										}
+									}
+
+									// p1 >= j means a new partial marking Mi for each 0 <= i <= bound - j where Mi(p1) = i+j
+									if (typeid(*src)
+													== typeid(pnapi::formula::FormulaGreaterEqual)) {
+
+												const pnapi::formula::FormulaGreaterEqual
+														* const castedSrc =
+																dynamic_cast<const pnapi::formula::FormulaGreaterEqual* const > (src);
+												if (net->getInterfacePlaces().find(
+														const_cast<pnapi::Place*> (&(castedSrc->place())))
+														== net->getInterfacePlaces().end()) {
+
+													for (unsigned int i =
+															castedSrc->tokens(); i
+															<= bound; ++i) {
+														PartialMarking
+																* m =
+																		new PartialMarking();
+														m->values.insert(
+																&(castedSrc->place()),
+																i, false);
+														result->partialMarkings.push_back(
+																m);
+													}
+
+												} else {
+													result->partialMarkings.push_back(
+															new PartialMarking());
+												}
+											}
+
+											// p1 < j means a new partial marking Mi for each 0 <= i <= j-1 where Mi(p1) = i
+											if (typeid(*src)
+															== typeid(pnapi::formula::FormulaLess)) {
+														const pnapi::formula::FormulaLess
+																* const castedSrc =
+																		dynamic_cast<const pnapi::formula::FormulaLess* const > (src);
+														if (net->getInterfacePlaces().find(
+																const_cast<pnapi::Place*> (&(castedSrc->place())))
+																== net->getInterfacePlaces().end()) {
+
+															for (unsigned int
+																	i = 0; i
+																	< castedSrc->tokens(); ++i) {
+																PartialMarking
+																		* m =
+																				new PartialMarking();
+																m->values.insert(
+																		&(castedSrc->place()),
+																		i,
+																		false);
+																result->partialMarkings.push_back(
+																		m);
+															}
+														} else {
+															result->partialMarkings.push_back(
+																	new PartialMarking());
+														}
+													}
+
+													// p1 <= j means a new partial marking Mi for each 0 <= i <= j where Mi(p1) = i
+													if (typeid(*src)
+																	== typeid(pnapi::formula::FormulaLessEqual)) {
+																const pnapi::formula::FormulaLessEqual
+																		* const castedSrc =
+																				dynamic_cast<const pnapi::formula::FormulaLessEqual* const > (src);
+																if (net->getInterfacePlaces().find(
+																		const_cast<pnapi::Place*> (&(castedSrc->place())))
+																		== net->getInterfacePlaces().end()) {
+
+																	for (unsigned int
+																			i =
+																					0; i
+																			<= castedSrc->tokens(); ++i) {
+																		PartialMarking
+																				* m =
+																						new PartialMarking();
+																		m->values.insert(
+																				&(castedSrc->place()),
+																				i,
+																				false);
+																		result->partialMarkings.push_back(
+																				m);
+																	}
+																} else {
+																	result->partialMarkings.push_back(
+																			new PartialMarking());
+																}
+															}
+
+															// p1 != j means a new partial marking Mi for each 0 <= i < j where Mi(p1) = i and Mk for each 1 <= i <= bound-k where Mi(p1) = i+k
+															if (typeid(*src)
+																			== typeid(pnapi::formula::FormulaNotEqual)) {
+																		const pnapi::formula::FormulaNotEqual
+																				* const castedSrc =
+																						dynamic_cast<const pnapi::formula::FormulaNotEqual* const > (src);
+																		if (net->getInterfacePlaces().find(
+																				const_cast<pnapi::Place*> (&(castedSrc->place())))
+																				== net->getInterfacePlaces().end()) {
+
+																			for (unsigned int
+																					i =
+																							castedSrc->tokens(); i
+																					>= 0; --i) {
+																				PartialMarking
+																						* m =
+																								new PartialMarking();
+																				m->values.insert(
+																						&(castedSrc->place()),
+																						i,
+																						false);
+																				result->partialMarkings.push_back(
+																						m);
+																			}
+
+																			for (unsigned int
+																					i =
+																							castedSrc->tokens()
+																									+ 1; i
+																					<= bound; ++i) {
+																				PartialMarking
+																						* m =
+																								new PartialMarking();
+																				m->values.insert(
+																						&(castedSrc->place()),
+																						i,
+																						false);
+																				result->partialMarkings.push_back(
+																						m);
+																			}
+																		} else {
+																			result->partialMarkings.push_back(
+																					new PartialMarking());
+																		}
+																	}
+
+																	return result;
+
+																}

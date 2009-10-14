@@ -24,10 +24,9 @@ AT_CLEANUP
 AT_SETUP([Final Condition to Final Markings.])
 AT_CHECK([cp TESTFILES/accrej.owfn .])
 AT_CHECK([LINDA -v accrej.owfn],0,ignore,stderr)
-AT_CHECK([GREP -q "p0=0; p1=0; p2=0; w0=1; wacc=0; wrej=0;" stderr])
-AT_CHECK([GREP -q "p0=0; p1=0; p2=0; w0=0; wacc=1; wrej=0;" stderr])
-AT_CHECK([GREP -q "p0=0; p1=0; p2=0; w0=0; wacc=0; wrej=1;" stderr])
-AT_CHECK([GREP -q "Number of lp systems: 3" stderr])
+AT_CHECK([GREP "p0=0" stderr | GREP "p1=0" | GREP "p2=0" | GREP "w0=1" | GREP "wacc=0" | GREP -q "wrej=0"])
+AT_CHECK([GREP "p0=0" stderr | GREP "p1=0" | GREP "p2=0" | GREP "w0=0" | GREP "wacc=1" | GREP -q "wrej=0"])
+AT_CHECK([GREP "p0=0" stderr | GREP "p1=0" | GREP "p2=0" | GREP "w0=0" | GREP "wacc=0" | GREP -q "wrej=1"])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
@@ -39,14 +38,16 @@ AT_CLEANUP
 #AT_KEYWORDS(basic)
 #AT_CLEANUP
 
-#AT_SETUP([Event term file.])
-#AT_CHECK([cp TESTFILES/accrej.owfn .])
-#AT_CHECK([cp TESTFILES/accrej.output2.check .])
-#AT_CHECK([cp TESTFILES/accrej.et .])
-#AT_CHECK([LINDA accrej.owfn -f accrej.et -o accrej.output2],0,ignore,ignore)
-#AT_CHECK([DIFF accrej.output2.check accrej.output2])
-#AT_KEYWORDS(basic)
-#AT_CLEANUP
+AT_SETUP([Event term file.])
+AT_CHECK([cp TESTFILES/accrej_short.owfn .])
+AT_CHECK([cp TESTFILES/accrej.output2.check .])
+AT_CHECK([cp TESTFILES/accrej.et .])
+AT_CHECK([LINDA accrej_short.owfn -f accrej.et -o accrej.output2],0,ignore,ignore)
+AT_CHECK([tail -n 1 accrej.output2.check > accrej.output2.checktail])
+AT_CHECK([tail -n 1 accrej.output2 > accrej.output2tail])
+AT_CHECK([DIFF accrej.output2.checktail accrej.output2tail])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
 #AT_SETUP([Constraint file.])
 #AT_CHECK([cp TESTFILES/accrej.owfn .])

@@ -14,8 +14,17 @@ AC_PROG_SED
 AC_PROG_GREP
 AC_PROG_AWK
 
+# check if we can handle dynamic libs
+AC_DISABLE_SHARED
+AC_PROG_LIBTOOL
+AC_CONFIG_MACRO_DIR([m4])
+
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# check and set exact unsigned types
+AC_TYPE_INT64_T
+
 
 # export tools needed to determine memory consumption
 AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])

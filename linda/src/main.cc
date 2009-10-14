@@ -1,31 +1,16 @@
 #include "config.h"
 #include <cassert>
-
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
 #include <sstream>
 #include "cmdline.h"
 #include "helpers.h"
-#include "lp_lib.h"
 #include "setsOfFinalMarkings.h"
-#include <typeinfo>
 #include "eventTerm.h"
 #include "stateEquation.h"
 #include "files.h"
-
-int NR_OF_EVENTS = 0;
-std::string* EVENT_STRINGS = 0;
-pnapi::Place** EVENT_PLACES = 0;
-int GET_EVENT_ID(std::string* s) {
-	for (int i = 0; i < NR_OF_EVENTS; ++i) {
-		if (EVENT_STRINGS[i] == *s) {
-			return i;
-		}
-	}
-	return -1;
-}
-
+#include "eventTermParser.h"
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -41,37 +26,22 @@ void evaluateParameters(int argc, char** argv) {
 	// call the cmdline parser
 	cmdline_parser(argc, argv, &args_info);
 
-	// check whether at most one file is given
-	if (args_info.inputs_num > 1) {
-		fprintf(stderr, "%s: at most one input file (open net) must be given -- aborting\n", PACKAGE);
-		exit(EXIT_FAILURE);
+	if (args_info.about_given) {
+		LindaHelpers::printAsciiArtImage();
+		exit(0);
 	}
+
 	// check whether at least one file is given
 	if (args_info.inputs_num != 1) {
-		fprintf(stderr, "%s: Exactly one input file (open net) must be given -- aborting\n", PACKAGE);
-		exit(EXIT_FAILURE);
+		abort(1, "Exactly one input file (open net) must be given.");
 	}
 
 	free(params);
 }
 
 /// the parser vector
-std::vector<EventTerm*>* term_vec = 0;
 std::vector<EventTermConstraint*>* constraint_vec = 0;
 bool stop_interaction = false;
-
-extern int et_yylineno;
-extern int et_yydebug;
-extern int et_yy_flex_debug;
-extern FILE* et_yyin;
-extern int et_yyerror();
-extern int et_yyparse();
-
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY
-extern int et_yylex_destroy();
-#endif
-
-
 
 extern int etc_yylineno;
 extern int etc_yydebug;
@@ -84,319 +54,319 @@ extern int etc_yyparse();
 extern int etc_yylex_destroy();
 #endif
 
-void initialize_et_parser() {
-	et_yylineno = 1;
-	et_yydebug = 0;
-	et_yy_flex_debug = 0;
-
-}
-
-
-
-
-
-
 int main(int argc, char** argv) {
 
+	/*
+	 * The Linda Workflow in short:
+	 * ----------------------------
+	 * Evaluate command line parameters
+	 * Parse an Open Net
+	 * If specified, create level 0 message profile.
+	 * If specified, create message profile from file.
+	 * If specified, create message profile from constraint file and try to decide compliance.
+	 * If specified, create an output file that contains all computed terms/bounds.
+	 */
+
+	// Start the stopwatch
 	clock_t start_clock = clock();
 
-	/*--------------------------------------.
-	| 0. parse the command line parameters  |
-	`--------------------------------------*/
-
+	// Evaluate parameters
 	evaluateParameters(argc, argv);
+
 	if (args_info.quiet_flag) {
 
 		std::cerr.rdbuf(0);
-		std::cout.rdbuf(0);
 
 		args_info.verbose_flag = 0;
 
 	}
 
-
-	std::cerr << PACKAGE << ": Processing " << args_info.inputs[0] << ".\n";
-
+	// Parsing the open net, using the PNAPI
+	message("Processing %s", args_info.inputs[0]);
 	pnapi::PetriNet* net = new pnapi::PetriNet;
 
-	/*----------------------.
-	| 1. parse the open net |
-	`----------------------*/
-
 	try {
+
 		// parse either from standard input or from a given file
 		if (args_info.inputs_num == 0) {
 			std::cin >> pnapi::io::owfn >> *(net);
 		} else {
-			assert (args_info.inputs_num == 1);
+			assert(args_info.inputs_num == 1);
 			std::ifstream inputStream;
 			inputStream.open(args_info.inputs[0]);
 			inputStream >> pnapi::io::owfn >> *(net);
 			inputStream.close();
 		}
-		if (args_info.verbose_flag) {
-			std::cerr << PACKAGE << ": read net " << pnapi::io::stat << *(net) << std::endl;
-		}
+
+		std::stringstream pnstats;
+		pnstats << pnapi::io::stat << *(net);
+
+		status("read net %s", pnstats.str().c_str());
 	} catch (pnapi::io::InputError error) {
-		std::cerr << PACKAGE << ": " << error << std::endl;
-		exit(EXIT_FAILURE);
+		std::stringstream inputerror;
+		inputerror << error;
+		abort(1, "pnapi error %i", inputerror.str().c_str());
 	}
 
-	/*
-	 * Set up the event <-> nat mapping.
-	 */
-
-	NR_OF_EVENTS = net->getInterfacePlaces().size();
-	EVENT_STRINGS = new std::string[NR_OF_EVENTS]();
-	EVENT_PLACES = new pnapi::Place*[NR_OF_EVENTS]();
+	// Create the global event IDs
+	LindaHelpers::NR_OF_EVENTS = net->getInterfacePlaces().size();
+	LindaHelpers::EVENT_STRINGS = new std::string[LindaHelpers::NR_OF_EVENTS]();
+	LindaHelpers::EVENT_PLACES
+			= new pnapi::Place*[LindaHelpers::NR_OF_EVENTS]();
 
 	int counter = 0;
-
-	for (set<pnapi::Place *>::iterator it = net->getInterfacePlaces().begin(); it != net->getInterfacePlaces().end(); ++it) {
-		EVENT_STRINGS[counter] = (*it)->getName();
-		EVENT_PLACES[counter] = (*it);
+	for (std::set<pnapi::Place *>::iterator it =
+			net->getInterfacePlaces().begin(); it
+			!= net->getInterfacePlaces().end(); ++it) {
+		LindaHelpers::EVENT_STRINGS[counter] = (*it)->getName();
+		LindaHelpers::EVENT_PLACES[counter] = (*it);
 		++counter;
 	}
 
-	/*----------------------------.
-	| 2. Calculate final markings |
-	`----------------------------*/
+	// Calculate the final markings from the final condition
 
 	int bound = args_info.bound_arg;
 
-	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(net,&(net->finalCondition().formula()),bound);
-	std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> > systems;
+	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(net,
+			&(net->finalCondition().formula()), bound);
 
-	if (args_info.verbose_flag) {
-		std::cerr << PACKAGE << ": Final markings:\n";
-		for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
-		finalMarkingIt != fSet->partialMarkings.end();
-		++finalMarkingIt) {
-			std::cerr << "    ";
-			(*finalMarkingIt)->output(std::cerr);
-		}
+	ExtendedStateEquation** systems = new ExtendedStateEquation*[fSet->size()];
+
+	status("Computed final markings:");
+	for (std::vector<PartialMarking*>::iterator finalMarkingIt =
+			fSet->partialMarkings.begin(); finalMarkingIt
+			!= fSet->partialMarkings.end(); ++finalMarkingIt) {
+		status("    %s", (*finalMarkingIt)->toString().c_str());
 	}
 
+	// Create the linear program for each final marking
 
-
-	for (std::vector<PartialMarking*>::iterator finalMarkingIt = fSet->partialMarkings.begin();
-	finalMarkingIt != fSet->partialMarkings.end();
-	++finalMarkingIt) {
-		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,(*finalMarkingIt));
+	for (int i = 0; i < fSet->size(); ++i) {
+		// Create a new state equation for this final marking
+		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,fSet->partialMarkings[i]);
 		if (XSE->constructLP()) {
-			systems.push_back(std::pair<PartialMarking*,ExtendedStateEquation*>(*finalMarkingIt,XSE));
+			systems[i] = XSE;
 
 			// If flag is on, output the lps.
 
 			if (args_info.show_lp_flag) {
-				std::cout << "\nFinal marking:";
-				(*finalMarkingIt)->output(std::cout);
+				message("    Processing final marking: %s",
+						fSet->partialMarkings[i]->toString().c_str());
 				XSE->output();
 			}
 		} else {
-			std::cerr << PACKAGE << ": WARNING: Construction of a system failed!" << std::endl;
+			abort(1, "Construction of a system failed!");
 
 		}
 	}
 
+	// Cached incidence matrix is not needed anymore
 	delete ExtendedStateEquation::lines;
+	delete[] ExtendedStateEquation::eventLines;
+	delete ExtendedStateEquation::transitionID;
 
-	if (!args_info.output_given) { delete net; }
+	// Verbose output of the number of linear programs created
+	status("Number of lp systems: %i", fSet->size());
 
-	if (args_info.verbose_flag) {
-		std::cerr << PACKAGE << ": Number of lp systems: " << systems.size() << std::endl;
-	}
-
-
-
+	// MODE Level 0 Message Profile
+	// We evaluate a term (1*a) for each event (a).
 	if (args_info.level_0_flag) {
+		message("Evaluating basic terms.");
+		status("Number of basic terms: %i", LindaHelpers::NR_OF_EVENTS);
 
-		std::cerr << PACKAGE << ": Minimum and maximum occurence of single events." << std::endl;
+		// Iterate over the finalmarkings/lps
+		for (int x = 0; x < fSet->size(); ++x) {
 
+			status("    Processing final marking: %s",
+					fSet->partialMarkings[x]->toString().c_str());
 
-		if (args_info.verbose_flag) {
-			std::cerr << PACKAGE << ": Number of basic terms: " << NR_OF_EVENTS << std::endl;
-		}
-
-		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
-		systemsIt != systems.end();
-		++systemsIt) {
-
-			std::cout << "\nFinal marking: ";
-
-			(*systemsIt).first->output(std::cout);
-
-			for (int i = 0; i < NR_OF_EVENTS; ++i) {
+			// For each event, we create a term and evaluate it
+			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 				BasicTerm* bt = new BasicTerm(i);
-				EventTermBound* b = (*systemsIt).second->evaluate(bt);
-				b->output(bt,args_info.show_terms_as_given_flag);
+				EventTermBound* b = systems[x]->evaluate(bt);
 			}
 
 		}
 
 	}
 
+	// MODE Level 1 Message Profile
+	// We evaluate a term (1*a + 1*b) for any two events a,b with a != b.
+	if (args_info.level_1_flag) {
+		message("Evaluating mutual exclusion terms.");
+		status("Number of mutual exclsion terms: %i",
+				(LindaHelpers::NR_OF_EVENTS * LindaHelpers::NR_OF_EVENTS)
+						- LindaHelpers::NR_OF_EVENTS);
 
+		// Iterate over the finalmarkings/lps
+		for (int x = 0; x < fSet->size(); ++x) {
+
+			status("    Processing final marking: %s",
+					fSet->partialMarkings[x]->toString().c_str());
+
+			// For each event, we create a term and evaluate it
+			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+				BasicTerm* bt1 = new BasicTerm(i);
+				for (int j = i + 1; j < LindaHelpers::NR_OF_EVENTS; ++j) {
+					BasicTerm* bt2 = new BasicTerm(j);
+					AddTerm* at = new AddTerm(bt1, bt2);
+					EventTermBound* b = systems[x]->evaluate(at);
+					if (b->lowerBounded && b->upperBounded && b->lowerBound
+							<= 1) {
+						if (b->upperBound == 1) {
+							status(
+									"        Events '%s' and '%s' are mutual exclusive.",
+									LindaHelpers::EVENT_STRINGS[i].c_str(),
+									LindaHelpers::EVENT_STRINGS[j].c_str());
+						} else if (b->upperBound == 0) {
+							status(
+									"        Events '%s' and '%s' do not occur.",
+									LindaHelpers::EVENT_STRINGS[i].c_str(),
+									LindaHelpers::EVENT_STRINGS[j].c_str());
+						}
+					}
+				}
+			}
+
+		}
+
+	}
+
+	// MODE Event term file
+	// We read a file that contains event terms and evaluate them
 	if (args_info.file_given) {
 
-		std::cerr << PACKAGE << ": Event term file <" << args_info.file_arg << ">" << std::endl;
+		message("Evaluating terms from file <%s>", args_info.file_arg);
 
-		initialize_et_parser();
-		et_yyin = fopen(args_info.file_arg, "r");
+		// Initialize Parser.
+		EventTermParser::initialize();
+		vector<EventTerm*>* term_vec = EventTermParser::parseFile(std::string(args_info.file_arg));
 
-		if (!et_yyin) {
-			std::cerr << "cannot open ET file '" << args_info.file_arg << "' for reading'\n" << std::endl;
-		}
-		term_vec = new std::vector<EventTerm*>();
+		// For each system, evaluate all event terms
+		for (int i = 0; i < fSet->size(); ++i) {
 
-		et_yyparse();
-		fclose(et_yyin);
+			status("    Processing final marking: %s",
+					fSet->partialMarkings[i]->toString().c_str());
 
-		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
-		systemsIt != systems.end();
-		++systemsIt) {
-
-			std::cout << "\nFinal marking: ";
-
-			(*systemsIt).first->output(std::cout);
-
-			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
-				EventTermBound* b = (*systemsIt).second->evaluate((*it));
-				b->output(*it,args_info.show_terms_as_given_flag);
+			// For each parsed event term...
+			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it
+					!= term_vec->end(); ++it) {
+				EventTermBound* b = systems[i]->evaluate((*it));
 			}
 		}
 
 	}
 
-
+	// MODE Constraint file
+	// A constraint file contains event terms with bounds.
+	// We evaluate the terms and then try to decide if the given bounds are correct.
 	if (args_info.constraint_file_given) {
 
-		std::cerr << PACKAGE << ": Constraint file <" << args_info.constraint_file_arg << ">" << std::endl;
+		message("Evaluating constraints from file <%s>",
+				args_info.constraint_file_arg);
 
+		// Initialize parser
 		etc_yylineno = 1;
 		etc_yydebug = 0;
 		etc_yy_flex_debug = 0;
 
 		etc_yyin = fopen(args_info.constraint_file_arg, "r");
+
+		// If the file can not be read we warn the user and cancel the mode.
 		if (!etc_yyin) {
-			std::cerr << "cannot open ETC file '" << args_info.constraint_file_arg << "' for reading'\n" << std::endl;
-		}
-		constraint_vec = new std::vector<EventTermConstraint*>();
+			abort(1, "cannot open ETC file '%s' for reading!",
+					args_info.constraint_file_arg);
+		} else {
 
-		etc_yyparse();
-		fclose(etc_yyin);
+			constraint_vec = new std::vector<EventTermConstraint*>();
 
-		for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
-		systemsIt != systems.end();
-		++systemsIt) {
+			etc_yyparse();
+			fclose(etc_yyin);
 
-			std::cout << "\nFinal marking: ";
+			// For each system...
+			for (int i = 0; i < fSet->size(); ++i) {
 
-			(*systemsIt).first->output(std::cout);
+				message("    Processing final marking: %s",
+						fSet->partialMarkings[i]->toString().c_str());
 
-			std::vector<EventTermConstraint*> maybes;
-			int holds = EventTermConstraint::is_true;
+				bool thereWereMaybes = false;
 
-			for (std::vector<EventTermConstraint*>::iterator it = constraint_vec->begin(); it != constraint_vec->end(); ++it) {
-				EventTermBound* b = (*systemsIt).second->evaluate((*it)->getEventTerm());
+				// For each term...
+				for (std::vector<EventTermConstraint*>::iterator it =
+						constraint_vec->begin(); it != constraint_vec->end(); ++it) {
+					// Evaluate the term
+					EventTermBound* b = systems[i]->evaluate(
+							(*it)->getEventTerm());
 
-				if ((*it)->holds(b) == EventTermConstraint::is_false) {
-					std::cout << "\tConstraint " << (*it)->toString() << " violated." << std::endl;
-					holds = holds*EventTermConstraint::is_false;
-				} else if ((*it)->holds(b) == EventTermConstraint::is_true) {
-					std::cout << "\tConstraint " << (*it)->toString() << " verified." << std::endl;
-					holds = holds*EventTermConstraint::is_true;
-				} else if ((*it)->holds(b) == EventTermConstraint::is_maybe) {
-					std::cout << "\tConstraint " << (*it)->toString() << " could not be verified, but might hold." << std::endl;
-					maybes.push_back((*it));
-					holds = holds*EventTermConstraint::is_maybe;
+					// Try to decide if the given bounds are correct or not
+					if ((*it)->holds(b) == EventTermConstraint::is_false) {
+						message("        Constraint %s falsified",
+								(*it)->toString().c_str());
+					} else if ((*it)->holds(b) == EventTermConstraint::is_true) {
+						message("        Constraint %s verified",
+								(*it)->toString().c_str());
+					} else if ((*it)->holds(b) == EventTermConstraint::is_maybe) {
+						status(
+								"        Constraint %s could neither be verified nor falsified",
+								(*it)->toString().c_str());
+						thereWereMaybes = true;
+					}
+
 				}
 
-			}
-
-			std::cout << "\n\n" << "Overall result:";
-
-			if (holds == EventTermConstraint::is_true) {
-				std::cout << "Verified.";
-			} else if (holds == EventTermConstraint::is_false) {
-				std::cout << "Violated.";
-			} else if (holds == EventTermConstraint::is_maybe) {
-				std::cout << "Verified iff all of the following constraints hold: \n";
-				for (std::vector<EventTermConstraint*>::iterator it = maybes.begin(); it != maybes.end(); ++it) {
-					std::cout  << "\t"<< (*it)->toString()<< "\n";
+				// Print out the overall result.
+				if (thereWereMaybes) {
+					message(
+							"        Some constraints could neither be verified nor falsified.");
 				}
 			}
-			std::cout << "\n\n";
+
+			delete constraint_vec;
 
 		}
-
-		delete constraint_vec;
-
 	}
 
-
-
-
-	if (args_info.interactive_flag) {
-
-		std::cerr << PACKAGE << ": " << "Interactive mode." << std::endl;
-		stop_interaction = false;
-
-		while (!stop_interaction) {
-
-			std::cerr << "Enter a number of terms, seperated by <;> or <:q> to quit the interaction mode." << std::endl;
-
-			initialize_et_parser();
-
-			et_yyin = stdin;
-
-			delete term_vec;
-
-			term_vec = new std::vector<EventTerm*>();
-
-
-			et_yyparse();
-
-			if (term_vec->size() == 0) {
-				continue;
-			}
-
-			for (std::vector<std::pair<PartialMarking*,ExtendedStateEquation*> >::iterator systemsIt = systems.begin();
-			systemsIt != systems.end();
-			++systemsIt) {
-
-				std::cout << "\nFinal marking: ";
-
-				(*systemsIt).first->output(std::cout);
-
-				for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
-					EventTermBound* b = (*systemsIt).second->evaluate((*it));
-					b->output(*it,args_info.show_terms_as_given_flag);
-
-				}
-			}
-
-		}
-		delete term_vec;
-	}
+	// OUTPUT FILE GENERATION
 
 	if (args_info.output_given) {
 
-		std::ofstream file;
-		file.open(args_info.output_arg);
-		ProfileFile* outputFile = new ProfileFile(&systems,net);
-		outputFile->output(file,args_info.show_terms_as_given_flag);
+		if (std::string(args_info.output_arg) != std::string("-")) {
+			// Initialize stream
+			std::ofstream file;
+			file.open(args_info.output_arg);
 
-		file.close();
-		delete outputFile;
-		delete net;
-		std::cerr << "\n" << PACKAGE << ": Output file " << args_info.output_arg << " created." << std::endl << std::endl;
+			// Create the file and output it to the stream
+			ProfileFile* outputFile = new ProfileFile(systems, net,fSet->size());
+			outputFile->output(file, args_info.show_terms_as_given_flag);
 
+			// Close the file
+			file.close();
+			delete outputFile;
+
+			// Creation complete.
+			message("Output file %s created.", args_info.output_arg);
+
+		} else {
+
+			// Create the file and output it to the stream
+			ProfileFile* outputFile = new ProfileFile(systems, net,fSet->size());
+			outputFile->output(std::cout, args_info.show_terms_as_given_flag);
+			delete outputFile;
+
+			std::cout << std::flush;
+
+			// Output complete.
+			message("Output written to standard out.");
+		}
 	}
-
-	if (args_info.verbose_flag) {
-		std::cerr << PACKAGE << ": runtime: " << ((double(clock()) - double(start_clock)) / CLOCKS_PER_SEC) << " sec\n";
-		std::cerr << PACKAGE << ": memory consumption: "; system((string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+	// Verbose output the result of the stop watch
+	status("runtime: %.2f sec", ((double(clock()) - double(start_clock))
+			/ CLOCKS_PER_SEC));
+	if (args_info.verbose_given) {
+		fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+		system(
+				(std::string("ps | ") + TOOL_GREP + " " + PACKAGE + " | "
+						+ TOOL_AWK
+						+ " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	}
-
 }

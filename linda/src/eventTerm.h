@@ -1,10 +1,3 @@
-/*
- * eventTerm.h
- *
- *  Created on: 16.06.2009
- *      Author: Jan
- */
-
 #ifndef EVENTTERM_H_
 #define EVENTTERM_H_
 
@@ -16,26 +9,18 @@
 #include <ctime>
 #include <string>
 
-//enum TermType {TypeAbstract,TypeAddTerm,TypeMultiplyTerm,TypeBasicTerm};
-
 
 /*!
- *
  * \brief Parent class for all types of terms.
  * Declares a number of pure virtual and static functions.
- *
  */
 class EventTerm {
 public:
 
-	/*!
-	 * Returns a string representation of the term.
-	 */
+	/// Returns a string representation of the term.
 	virtual std::string toString() = 0;
 
-	/*!
-	 * Multiplies the term with a given integer. Uses distributive law instead of creating a new MultiplyTerm if possible.
-	 */
+	/// Multiplies the term with a given integer. Uses distributive law instead of creating a new MultiplyTerm if possible.
 	virtual EventTerm* multiplyWith(int) = 0;
 
 	/*!
@@ -45,312 +30,166 @@ public:
 	 */
 	static int* termToMap(EventTerm*);
 
-	/*!
-	 * First creates a mapping (s. EventTerm::termToMap) and transforms it to a string.
-	 */
+	/// First creates a mapping (s. EventTerm::termToMap) and transforms it to a string.
 	static std::string toPrettyString(EventTerm*);
 
-	/*!
-	 * Destructs the term, depending on its type.
-	 */
+	/// Destructs the term, depending on its type.
 	virtual ~EventTerm() {}
 
-	/*!
-	 * Flattens a term. Flattening means transforming a term to a normal form.
-	 */
+	/// Flattens a term. Flattening means transforming a term to a normal form.
 	virtual EventTerm* flatten() = 0;
 
-	/*!
-	 * Summarizes the factors of terms to an integer array. Used by EventTerm::termToMap(EventTerm*) -- expects a flattened term.
-	 */
+	/// Summarizes the factors of terms to an integer array. Used by EventTerm::termToMap(EventTerm*) -- expects a flattened term.
 	virtual void collectR(int*) = 0;
 
 };
 
-/*!
- * A term of the form (T1 + T2) where T1 and T2 are terms.
- */
+/// A term of the form (T1 + T2) where T1 and T2 are terms.
 class AddTerm : public EventTerm {
 public:
 	EventTerm* term1; //!< the first addend.
 	EventTerm* term2; //!< the second addend.
 
-	/*!
-	 * Creates a new AddTerm from to given addends.
-	 */
+	/// Creates a new AddTerm from to given addends.
 	AddTerm(EventTerm* t1, EventTerm* t2) : term1(t1),term2(t2) {};
 
-	/*!
-	 * Multiplies by multiplying both addends (distributive law) and returns the result. Changes the term itself.
-	 */
+	/// Multiplies by multiplying both addends (distributive law) and returns the result. Changes the term itself.
 	virtual EventTerm* multiplyWith(int);
 
-	/*!
-	 * Returns a string representation.
-	 */
-	std::string toString() {
-		return "( " + term1->toString() + " + " + term2->toString() + " )";
-	}
+	/// Returns a string representation.
+	virtual std::string toString();
 
-	/*!
-	 * Flattens the AddTerm by flattening its addends. Changes the term structure.
-	 */
+	/// Flattens the AddTerm by flattening its addends. Changes the term structure.
 	virtual EventTerm* flatten();
 
-	/*!
-	 * s. EventTerm::collectR(int*);
-	 */
+	/// s. EventTerm::collectR(int*);
 	virtual void collectR(int*);
 
-	/*!
-	 * Deletes the addends.
-	 */
+	/// Deletes the addends.
 	virtual ~AddTerm();
 };
 
-/*!
- * A term of the form (k * T) where T is a term.
- */
+/// A term of the form (k * T) where T is a term.
 class MultiplyTerm : public EventTerm {
 public:
 	EventTerm* term; //!< The term T
 	int factor; //!< the integer factor k
 
-	/*!
-	 * Constructs a MultiplyTerm by assigning the given parameters to the fields.
-	 */
+	/// Constructs a MultiplyTerm by assigning the given parameters to the fields.
 	MultiplyTerm(EventTerm* t, int f) : term(t),factor(f) {};
 
-	/*!
-	 * Multiplies by multiplying the factor (associative law) and returns the result. Changes the term itself.
-	 */
+	/// Multiplies by multiplying the factor (associative law) and returns the result. Changes the term itself.
 	virtual EventTerm* multiplyWith(int);
 
-	/*!
-	 * Returns a string representation.
-	 */
-	virtual std::string toString() {
-		return "( " + intToStr(factor) + " * " + term->toString() + " )";
-	}
+	/// Returns a string representation.
+	virtual std::string toString();
 
-	/*!
-	 * Flattens the MultiplyTerm by flattening its underlying term and multiplying the result with the factor. Changes the term structure.
-	 */
+	/// Flattens the MultiplyTerm by flattening its underlying term and multiplying the result with the factor. Changes the term structure.
 	virtual EventTerm* flatten();
 
-	/*!
-		 * s. EventTerm::collectR(int*);
-		 */
+	/// s. EventTerm::collectR(int*);
 	virtual void collectR(int*);
 
-	/*!
-	 * Deletes the underlying term.
-	 */
+	/// Deletes the underlying term.
 	virtual ~MultiplyTerm();
 };
 
-/*!
- * A term of the form (E) where E is an event.
- */
+/// A term of the form (E) where E is an event.
 class BasicTerm : public EventTerm {
 public:
 	int event; //!< The event
 
-	/*!
-	 * Creates a BasicTerm by assigning the event ID that is associated with the given string. Used by the parser.
-	 */
-	BasicTerm(std::string* s) : event(GET_EVENT_ID(s)) {
+	/// Creates a BasicTerm by assigning the event ID that is associated with the given string. Used by the parser.
+	BasicTerm(std::string* s) : event(LindaHelpers::getEventID(s)) {
 		if (event == -1) {
 			std::cerr << PACKAGE << ": An unspecified event label has been used: \"" << *s <<  "\" ! Cancel." << std::endl;
 			exit(1);
 		}
 	}
 
-	/*!
-	 * Creates a BasicTerm from a known event ID.
-	 */
+	/// Creates a BasicTerm from a known event ID.
 	BasicTerm(int i) : event(i) {	}
 
-	/*!
-	 * Returns a string representation.
-	 */
-	virtual std::string toString() {
-		return EVENT_STRINGS[event];
-	}
+	/// Returns a string representation.
+	virtual std::string toString();
+
+	/// Multiplies the BasicTerm by creating a new MultiplyTerm with the given factor.
 	virtual EventTerm* multiplyWith(int);
 
-	/*!
-	 * Flattens the BasicTerm by creating a new MultiplyTerm with a factor of 1.
-	 */
+	/// Flattens the BasicTerm by creating a new MultiplyTerm with a factor of 1.
 	virtual EventTerm* flatten();
 
-	/*!
-		 * s. EventTerm::collectR(int*);
-		 */
+	/// s. EventTerm::collectR(int*);
 	virtual void collectR(int*)  {};
 
-	/*!
-	 * Does nothing since nothing is to be deleted.
-	 */
+	/// Does nothing since nothing is to be deleted.
 	~BasicTerm();
 };
 
 
-/*!
- * A record containing a lower and an upper bound, including unboundedness in one or both directions.
- */
+/// A record containing a lower and an upper bound, including unboundedness in one or both directions.
 class EventTermBound {
 public:
+
+	/// Merges several event bounds by finding the minimum lower bound and the maximum upper bound.
+	static EventTermBound* merge(EventTermBound* termArray, unsigned int size);
 
 	bool lowerBounded; //!< True, if there exists a lower bound.
 	bool upperBounded; //!< True, if there exists an upper bound.
 	int lowerBound; //!< An integer lower bound.
 	int upperBound; //!< An integer upper bound.
 
-	/*!
-	 * Creates a record, assigning lower and upper bounds if they exist.
-	 */
-	EventTermBound(bool lowerBounded,bool upperBounded,int lowerBound,int upperBound) {
-		this->lowerBounded = lowerBounded;
-		this->upperBounded = upperBounded;
-		this->lowerBound = lowerBound;
-		this->upperBound = upperBound;
-	}
+	/// Creates a record, assigning lower and upper bounds if they exist.
+	EventTermBound(bool lBounded,bool uBounded,int lBound,int uBound) : lowerBounded(lBounded), lowerBound(lBound), upperBounded(uBounded), upperBound(uBound) {}
 
-	/*!
-	 * Creates a record that represents the interval with neither a lower nor an upper bound.
-	 */
+	/// Creates a record that represents the interval with neither a lower nor an upper bound.
 	EventTermBound() {lowerBounded = false; upperBounded = false;}
 
-	/*!
-	 * Compares these bounds with others, checking if the intervals overlap.
-	 */
-	bool intersectionEmpty (EventTermBound* other) {
-		if ((!lowerBounded && !upperBounded) || (!other->upperBounded && !other->lowerBounded)) return false;
-		return (other->upperBounded && lowerBounded && lowerBound > other->upperBound) || (other->lowerBounded && upperBounded && upperBound < other->lowerBound);
-	}
+	/// Compares these bounds with others, checking if the intervals overlap.
+	bool intersectionEmpty (EventTermBound* other);
 
-	/*!
-	 * Compares the bounds with others, checking if the others are included in these.
-	 */
-	bool contains(EventTermBound* other) {
-		return 	(!lowerBounded || (other->lowerBounded && lowerBound <= other->lowerBound)) && (!upperBounded || (other->upperBounded && upperBound >= other->upperBound));
-	}
+	/// Compares the bounds with others, checking if the others are included in these.
+	bool contains(EventTermBound* other);
 
-	/*!
-	 * Returns true, if the lower bound and the upper bound both exist and are identical.
-	 */
-	bool isDecided () {
-		if (lowerBounded && upperBounded && lowerBound == upperBound) return true;
-		return false;
-	}
+	/// Returns true, if the lower bound and the upper bound both exist and are identical.
+	bool isDecided ();
 
-	/*!
-	 * Outputs the bounds, together with a given term, to std::cout.
-	 */
-	void output (EventTerm* term, bool as_given) {
-		std::cout << "\t" << getLowerBoundString() << " <= ";
-		if (as_given) {
-			std::cout << term->toString();
-		} else {
-			std::cout << EventTerm::toPrettyString(term);
-		}
-		std::cout << " <= "<< getUpperBoundString() << "\n";
-	}
+	/// Outputs the bounds, together with a given term, to std::cerr.
+	void output (EventTerm* term, bool as_given);
 
-	/*!
-	 * Returns a string representation for the lower bound: Either "unbounded" or the integer.
-	 */
-	std::string getLowerBoundString() {
-		if (lowerBounded) {
-			return intToStr(lowerBound);
-		} else {
-			return "unbounded";
-		}
-	}
+	/// Returns a string representation for the lower bound: Either "unbounded" or the integer.
+	std::string getLowerBoundString();
 
-	/*!
-	 * Returns a string representation for the upper bound: Either "unbounded" or the integer.
-	 */
-	std::string getUpperBoundString() {
-		if (upperBounded) {
-			return intToStr(upperBound);
-		} else {
-			return "unbounded";
-		}
-	}
+	/// Returns a string representation for the upper bound: Either "unbounded" or the integer.
+	std::string getUpperBoundString();
 
 };
 
-/*!
- * A constraint, consisting of lower and upper bounds for an event term.
- */
+/// A constraint, consisting of lower and upper bounds for an event term.
 class EventTermConstraint {
 public:
 	EventTermBound* vals; //!< The specified lower and upper bound
 	EventTerm* e; //!< The event term that is subject of this constraint
 
-	/*!
-	 * Basic constructor, assigning the fields.
-	 */
-	EventTermConstraint(EventTerm* e, EventTermBound* vals) {
-		this->vals = vals;
-		this->e = e;
-	}
+	/// Basic constructor, assigning the fields.
+	EventTermConstraint(EventTerm* e, EventTermBound* vals);
 
-	/*!
-	 * Getter function for the event term.
-	 */
-	EventTerm* getEventTerm() {
-		return e;
-	}
+	/// Getter function for the event term.
+	EventTerm* getEventTerm();
 
-	/*!
-	 * Compares this constraint with a lower and an upper bound, checking for a contradiction (= their intervals do not overlap).
-	 */
-	bool contradicts(EventTermBound* toCheck) {
-		return toCheck->intersectionEmpty(vals);
-	}
+	/// Compares this constraint with a lower and an upper bound, checking for a contradiction (= their intervals do not overlap).
+	bool contradicts(EventTermBound* toCheck);
 
 	static const int is_true = 1; //!< The constraint could be proven.
 	static const int is_false = 0; //!< The negation of the constraint could be proven.
 	static const int is_maybe = -1; //!< Neither the constraint nor its negation could be proven.
 
 
-	/*!
-	 * Tries to prove that the constraint holds by comparing the bounds with given ones.
-	 */
-	unsigned int holds(EventTermBound* toCheck) {
+	/// Tries to prove that the constraint holds by comparing the bounds with given ones.
+	unsigned int holds(EventTermBound* toCheck);
 
-		if (toCheck->intersectionEmpty(vals)) {
-			return is_false;
-		}
-		if (vals->contains(toCheck)) {
-			return is_true;
-		}
-		return is_maybe;
-	}
-
-
-	/*!
-	 * Returns a string representation.
-	 */
-	std::string toString() {
-		std::string result = "";
-		if (vals->lowerBounded) {
-			result += intToStr(vals->lowerBound);
-		} else {
-			result += "unbounded";
-		}
-		result += " <= " + e->toString() + " <= ";
-		if (vals->upperBounded) {
-			result += intToStr(vals->upperBound);
-		} else {
-			result += "unbounded";
-		}
-		return result;
-	}
-
+	/// Returns a string representation.
+	std::string toString();
 };
 
 

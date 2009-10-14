@@ -317,8 +317,8 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 						for(int j=1;j<=get_Nrows(*cIt2);j++){
 							//for(int k=0;k<1+ net1.getPlaces().size();k++) rowpl[k]=get_mat(*cIt2,j,k);
 							int Ncol=net1.getPlaces().size();
-							int colno[Ncol];
-							REAL rowe[Ncol];
+							int * colno=new int[Ncol]();
+							REAL * rowe= new REAL[Ncol]();
 							/* create space large enough for one row */
 							//colno = (int *) malloc(Ncol * sizeof(*colno));
 							//rowe = (REAL *) malloc(Ncol * sizeof(*rowe));
@@ -326,12 +326,12 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 							int nr_of_cols = get_rowex(*cIt2,j,rowe,colno);
 							//cout<<"Sizeof "<<sizeof(rowe)<<" and j is " << j << endl;
 							//for(int k=0;k<1+ net1.getPlaces().size();k++) cout<<rowpl[k]<<" ";
-;							set_verbose(lpcopy,FULL);//cout<<"Constraint type "<<get_constr_type(*cIt2,j)<<endl;
+;							//set_verbose(lpcopy,FULL);//cout<<"Constraint type "<<get_constr_type(*cIt2,j)<<endl;
 							if(!add_constraintex(lpcopy, nr_of_cols ,rowe,colno ,get_constr_type(*cIt2,j), get_rh(*cIt2,j)))
 								cout<<"gata"<<endl;
 							set_row_name(lpcopy,get_Nrows(lpcopy), get_row_name(*cIt2,j));
 							//cout<<get_nameindex(lpcopy,get_row_name(lpcopy,get_Nrows(lpcopy)-2),TRUE)<<get_row_name(lpcopy,get_Nrows(lpcopy)-1)<< "am adaugat"<<get_row_name(lpcopy,get_Nrows(lpcopy)-1)<<"si"<<get_row_name(lpcopy,get_Nrows(lpcopy))<<endl;
-							set_verbose(lpcopy,NORMAL);
+							//set_verbose(lpcopy,NORMAL);
 							//print_lp(lpcopy);
 							retlpset.insert(lpcopy);
 							
@@ -735,7 +735,9 @@ const pnapi::formula::Formula * unfoldFlags(const pnapi::PetriNet &net1, const p
 }
 
 
-// 
+//
+
+
 
 int main(int argc, char** argv) {
 	
@@ -744,7 +746,7 @@ int main(int argc, char** argv) {
 	evaluateParameters(argc, argv);
 	std::cerr << PACKAGE << " processing ";
 	if(args_info.inputs_num>0) {
-		for (int i = 0; i < args_info.inputs_num; i++)
+		for (unsigned int i = 0; i < args_info.inputs_num; i++)
         	{
                 	std::cerr << " " << args_info.inputs[i]<<" ";
         	}
@@ -761,14 +763,17 @@ int main(int argc, char** argv) {
 	//time(&start_time);
 	int i = 0;
 	//initialization of parameter structures	
- 	map<int, set<std::string> > enforcedT;
- 	map<int, set<set<std::string> > >  enforcedFC;	
+ 	map<int, std::set<std::string> > enforcedT;//for enforcing transitions/messages
+	map<int, std::set<std::string> > excludeE;//for excluding transitions
+ 	map<int, std::set<std::set<std::string> > >  enforcedFC;//enforcing free-choice clusters
 	int nPlaces;
 	int nTransitions;
 	std::set<lprec *> retlpset;//set of all final markings of the composition
  	
+	
+	
 	if (args_info.enforceEvents_arg){
-		for (i = 0; i < args_info.enforceEvents_given; ++i){
+		for (unsigned i = 0; i < args_info.enforceEvents_given; ++i){
  			std::string s=args_info.enforceEvents_arg[i];std::string st,cs;
 			if(s=="all") {coverall=true;status("Cover all nodes");break;}
   			if(s.find("@")!=std::string::npos) {st=s.substr(0,s.find("@"));//cout<<st<<endl;
@@ -790,10 +795,10 @@ int main(int argc, char** argv) {
 			}
 			else {//interface 
 				if(enforcedT.find(0)==enforcedT.end()) {
-					set<std::string> sets;sets.insert(s);
+					std::set<std::string> sets;sets.insert(s);
 					enforcedT.insert(std::pair<unsigned int, set<std::string> >(0,sets));	
 				}
-				else{   set<std::string> se=(enforcedT.find(0))->second;
+				else{   std::set<std::string> se=(enforcedT.find(0))->second;
 	  				se.insert(cs);
 	  				enforcedT.find(0)->second=se;//cout<<"old"<<endl;
 // 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
@@ -802,21 +807,42 @@ int main(int argc, char** argv) {
  		}
 	}
 
+	//exclude events
+	if (args_info.excludeE_arg){
+		for (unsigned i = 0; i < args_info.excludeE_given; ++i){
+ 			std::string s=args_info.excludeE_arg[i];std::string st,cs;
+			if(s=="all") {coverall=true;status("Cover all nodes");break;}
+  			if(s.find("@")!=std::string::npos) {st=s.substr(0,s.find("@"));//cout<<st<<endl;
+				cs=s.substr(s.find("@")+1); 		
+	 			stringstream ss;ss<<st;
+ 				int net; ss>>net;//cout<<net;
+ 				const int netc=net;//const std::string cs;
+				if(net==0){abort(2, "wrong format for exclude events. Read the manual.\n");}
+				//		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
+	 			set<std::string> sets;sets.insert(cs);
+  				if(excludeE.find(net)==excludeE.end()) {
+					excludeE.insert(std::pair<unsigned int, std::set<std::string> >(net,sets));
+				}
+  				else{set<std::string> se=(excludeE.find(net))->second;
+	  				se.insert(cs);
+	  				excludeE.find(net)->second=se;//cout<<"old"<<endl;
+					// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
+				}
+			}
+			else {//interface 
+				if(excludeE.find(0)==excludeE.end()) {
+					std::set<std::string> sets;sets.insert(s);
+					excludeE.insert(std::pair<unsigned int, std::set<std::string> >(0,sets));	
+				}
+				else{   std::set<std::string> se=(excludeE.find(0))->second;
+	  				se.insert(cs);
+	  				excludeE.find(0)->second=se;//cout<<"old"<<endl;
+					// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
+				}	
+			}
+ 		}
+	}
 	
-	
-	for (i = 0; i < args_info.enforceFC_given; ++i){
- //		std::string s=args_info.enforceFC_arg[i];
-//  		std::string st=s.substr(0,s.find("."));stringstream ss;ss<<st;
-// 		int net; ss>>net;
-// 		const int netc=net;const std::string cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
-// 		set<std::string> sets;sets.insert(cs);
-// 		if(enforcedT.find(net)!=enforcedT.end()) 
-// 			{enforcedT.insert(std::pair<unsigned, set<std::string> >(net,sets));cout<<"new";}
-// 		else{set<std::string> se=(enforcedT.find(net))->second;
-// 			se.insert(cs);
-// 			enforcedT.find(net)->second=se;cout<<"old"<<endl;}
-// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
- 	}
 	
 	
 	
@@ -824,7 +850,8 @@ int main(int argc, char** argv) {
 	
 //		try {
 		// std::string nets[args_info.inputs_num];	
-	for(int i=0; i<args_info.inputs_num;i++){
+	if(args_info.inputs_num){
+	  for(unsigned int i=0; i<args_info.inputs_num;i++){
 		if(i==0){			
 			ifstream ifs1(args_info.inputs[i]);
 			inputStream.open(args_info.inputs[i]);
@@ -833,34 +860,86 @@ int main(int argc, char** argv) {
 			ifs1.close();
 			//const int zero=0; now check whether these are real transitions
 			if(enforcedT.find(1)!=enforcedT.end()&&(args_info.enforceEvents_given>0)){
-				set<std::string> se=(enforcedT.find(1))->second;
+				std::set<std::string> se=(enforcedT.find(1))->second;
 				for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
-					if(net1.findTransition(*it)!=NULL) cout<<"Transition: "<<(*it);
-				  	else if(net1.findPlace(*it)!=NULL) cout<<"Place: "<<(*it);
-					else abort(2, "the node does not belong to the net");
+					if((net1.findTransition(*it)==NULL) && (net1.findPlace(*it)==NULL) )
+						abort(2, "the node does not belong to the net");
 			}
-			if(args_info.inputs_num==1) break;
+			if(excludeE.find(1)!=excludeE.end()&&(args_info.excludeE_given>0)){
+				std::set<std::string> se=(excludeE.find(1))->second;
+				for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
+					if((net1.findTransition(*it)==NULL) && (net1.findPlace(*it)==NULL) )
+						abort(2, "the node does not belong to the net");
+			}
 		}
 		else{
-		std::stringstream s;s<<(i+1); //cout<< s.str();
-		std::string s2; s2=s.str()+"@";//"net"+s.str();
-		ifstream ifs2(args_info.inputs[i]);
-		try { ifs2 >> owfn >> net2;}
-		catch (InputError e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
-		ifs2.close();
-		if((enforcedT.find(i+1)!=enforcedT.end())&&(args_info.enforceEvents_given>0)){
-			set<std::string> se=(enforcedT.find(i))->second;
-			for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
-				  if(net1.findTransition(*it)!=NULL) cout<<(*it);
-				  else if(net1.findPlace(*it)!=NULL) cout<<(*it);
-				  else abort(2, "the node does not belong to the net");
+			std::stringstream s;s<<(i+1); //cout<< s.str();
+			std::string s2; s2=s.str()+"@";//"net"+s.str();
+			ifstream ifs2(args_info.inputs[i]);
+			try { ifs2 >> owfn >> net2;}
+			catch (InputError e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
+			ifs2.close();
+			if((enforcedT.find(i+1)!=enforcedT.end())&&(args_info.enforceEvents_given>0)){
+				std::set<std::string> se=(enforcedT.find(i))->second;
+				for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
+				  if((net1.findTransition(*it)==NULL)&&(net1.findPlace(*it)==NULL))
+					  abort(2, "the node does not belong to the net");
+			}
+			if((excludeE.find(i+1)!=excludeE.end())&&(args_info.excludeE_given>0)){
+				std::set<std::string> se=(excludeE.find(i))->second;
+				for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
+					if((net1.findTransition(*it)==NULL)&&(net1.findPlace(*it)==NULL))
+						abort(2, "the node does not belong to the net");
 			}
 			   //else abort(3, "the transitions do not belong to the net");
-		if(i==1) s1="1@"; else s1=""; net1.compose(net2, s1, s2);
+			if(i==1) s1="1@"; else s1=""; net1.compose(net2, s1, s2);
 			//renew the prefixes: s1 has the old 
 		//	if(!net1.isClosed()){cout<<" is not closed"<<std::endl;} else 
 		}
-	}
+	  }
+	  if (args_info.enforceFC_given){// detect all sending FC cluster for the transitions
+		  std::set<std::set<std::string> > fcc;//iterate all transitions to find free choice clusters
+		  std::set<pnapi::Transition *> fct=net1.getTransitions();
+		  do{
+			  pnapi::Transition *t=*fct.begin();std::string s=t->getName();//=args_info.enforceFC_args[0];
+		//std::string st=s.substr(0,s.find("@"));stringstream ss;ss<<st;
+		//int net; ss>>net;;
+		//if(net1.findTransition(s)){
+		    std::set<Node *> past, curr;
+			bool init=true;//initial set of post-transitions	
+			for (std::set<Node *>::iterator nit=net1.findTransition(s)->getPreset().begin(); nit!=net1.findTransition(s)->getPreset().end(); ++nit) {
+			  if (init) {
+				  curr=(*nit)->getPostset();init=false;
+				  for (std::set<Node *>::iterator sendit=curr.begin(); sendit!=curr.end(); ++sendit) {
+					  const std::set<Node *> sending=(*sendit)->getPostset();
+					  for (std::set<Node *>::iterator on=sending.begin(); on!=sending.end(); ++on) {
+						  if (net1.getOutputPlaces().find(dynamic_cast<Place *>(*on))!=net1.getOutputPlaces().end()) {
+							  break;
+						  }
+					  }
+				  }
+			  }
+			  else if(past!=curr) {cout<<"Non-free choice cluster delete all";}
+			  past=curr;
+		    }
+		  }
+		  while(!fct.empty());
+	/*	}
+		else{
+			abort(2,"The free-choice sending cluster does not exist");
+		}*/
+		// 		const int netc=net;const std::string cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
+		// 		set<std::string> sets;sets.insert(cs);
+		// 		if(enforcedT.find(net)!=enforcedT.end()) 
+		// 			{enforcedT.insert(std::pair<unsigned, set<std::string> >(net,sets));cout<<"new";}
+		// 		else{set<std::string> se=(enforcedT.find(net))->second;
+		// 			se.insert(cs);
+		// 			enforcedT.find(net)->second=se;cout<<"old"<<endl;}
+		// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
+ 	  }
+	
+
+    }
 		//std::cout << owfn << net1<<"end of composition"<<std::endl;
 
 
@@ -877,7 +956,7 @@ int main(int argc, char** argv) {
 	//parse the message profile files
 	if(args_info.messageProfiles_given>0){
 		std::multimap<std::string,int> mpinvocation;set<std::string> hh;
-		for (int imp = 0; imp <args_info.messageProfiles_given; ++imp) {//hh.insert(args_info.messageProfiles_arg[imp]);
+		for (unsigned int imp = 0; imp <args_info.messageProfiles_given; ++imp) {//hh.insert(args_info.messageProfiles_arg[imp]);
 			size_t found=std::string(args_info.messageProfiles_arg[imp]).find(".output");
 			hh.insert(std::string(args_info.messageProfiles_arg[imp]).substr(0,found));
 			mpinvocation.insert(std::pair<std::string,int>(std::string(args_info.messageProfiles_arg[imp]).substr(0,found),imp));
@@ -978,17 +1057,17 @@ int main(int argc, char** argv) {
 				//int ifm=1;
 				for (unsigned int ifm=1;ifm<nfm+1;ifm++){
 					//if(no==1){
-					int k=1;//cout <<"before";
+					unsigned int k=1;//cout <<"before";
 					lprec *lpmp=copy_lp(lpt);
 					if(no==1) mps.push_back(lpmp);
 					int kn=1;//cout<<"hello"<<term_vec->size()<<endl;
 					//int k=1;//print_lp(mps.at(ifm-1));
 					//cout<<ifm-1<<"in"<<get_Nrows(mps.at(0))<<get_Nrows(mps.at(1))<<get_Nrows(mps.at(2))<<endl;
-					//REAL roww[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
+					REAL* roww=new REAL[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()]();
 				//initialize roww ith zero values
 					for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 						//need to initialize the roww set_add_rowmode(lpmp, TRUE);
-						REAL *roww;//[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
+						//REAL *roww;//[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
 						for (k=1; k<1+inputPlaces.size()+ outputPlaces.size()+synchrT.size(); k++) {
 							roww[k]=0;
 						}
@@ -1042,7 +1121,7 @@ int main(int argc, char** argv) {
 			//here add the new constraints to the previous computed ones
 			if(sit==hh.begin()){lpmps=mps;}
 			else {//here combine 
-				for (int i=0; i<get_Ncolumns(lpmps.at(0)); i++) { //add variables from previous
+				for (unsigned int i=0; i<get_Ncolumns(lpmps.at(0)); i++) { //add variables from previous
 					std::string pr(get_col_name(lpmps.at(0),i+1));
 					if (result.find(pr)==result.end()) {//add columns from old composition to the new interface
 						result.insert(pr);
@@ -1059,12 +1138,12 @@ int main(int argc, char** argv) {
 				}
 				//combine all final markings and add the rows of lpmps
 				std::vector<lprec *> st;
-				for(int i=0;i<mps.size();++i){
+				for(unsigned int i=0;i<mps.size();++i){
 					lprec * lpr=copy_lp(mps.at(i));//make copies
-					for(int j=0;j<lpmps.size();++j){// add lpr too
-						for (int r=0; r<get_Nrows(lpmps.at(i)); ++r) {
-							REAL rowp[1+get_Ncolumns(lpr)];//int *colp;
-							char grex=get_row(lpmps.at(j),r+1,rowp);for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
+					for(unsigned int j=0;j<lpmps.size();++j){// add lpr too
+						for (unsigned int r=0; r<get_Nrows(lpmps.at(i)); ++r) {
+							REAL *rowp=new REAL[1+get_Ncolumns(lpr)]();//int *colp;
+							char grex=get_row(lpmps.at(j),r+1,rowp);//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
 							//for(int j=0;j<get_Ncolumns(lpmp);j++){rowwpp[j+hh-get_Ncolumns(lpmp)]=rowp[j+1];}
 							//for(int j=0;j<hh;j++){cout<<rowwpp[j]<<" ";}
 							//if( grex==-1) cout<<"gata";
@@ -1091,7 +1170,7 @@ int main(int argc, char** argv) {
 			for(i=1;i<=get_Ncolumns(lpmps.at(ifm));i++){
 				set_int(lpmps.at(ifm),i,TRUE);
 			}
-			//print_lp(lpmps.at(ifm));
+			set_verbose(lpmps.at(ifm),IMPORTANT);//print_lp(lpmps.at(ifm));
 			res=solve(lpmps.at(ifm));
 			//cout<<"Solve "<<solve(lp)<<endl;
 			if(res==0){
@@ -1174,7 +1253,7 @@ int main(int argc, char** argv) {
 		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
 		retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
 		if(coverall) {
-			set<std::string> sets;// fill in the set of nodes of the composition
+			std::set<std::string> sets;// fill in the set of nodes of the composition
 			std::set<pnapi::Place*> pl;
 			for(std::set<pnapi::Node*>::iterator p=net1.getNodes().begin();p!=net1.getNodes().end();++p){
 				Place * pl = dynamic_cast<Place *> ((*p));
@@ -1186,14 +1265,14 @@ int main(int argc, char** argv) {
 						cs=(*p)->getName().substr((*p)->getName().find("@")+1);
 	 					stringstream ss;ss<<st;
  						int net; ss>>net;
- 						const int netc=net;//const std::string cs;
+ 						//const int netc=net;//const std::string cs;
 						if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
 //		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
-		 				set<std::string> sets;sets.insert(cs);
+						std::set<std::string> sets;sets.insert(cs);
   						if(enforcedT.find(net)==enforcedT.end()) {
 							enforcedT.insert(std::pair<unsigned int, set<std::string> >(net,sets));
 						}
-	  					else{set<std::string> se=(enforcedT.find(net))->second;
+	  					else{std::set<std::string> se=(enforcedT.find(net))->second;
 		  					se.insert(cs);
 			  				enforcedT.find(net)->second=se;//cout<<"old"<<endl;
 // 					//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));			
@@ -1201,7 +1280,7 @@ int main(int argc, char** argv) {
 					}
 					else {//interface 
 						if(enforcedT.find(0)==enforcedT.end()) {
-							set<std::string> sets;sets.insert(pl->getName());
+							std::set<std::string> sets;sets.insert(pl->getName());
 							enforcedT.insert(std::pair<unsigned int, set<std::string> >(0,sets));	
 						}
 						else{   set<std::string> se=(enforcedT.find(0))->second;
@@ -1223,8 +1302,8 @@ int main(int argc, char** argv) {
 		lprec *lp;//lp = make_lp(0, nTransitions);
 		
 			lp = make_lp(0, nTransitions);
-			//set_verbose(lp,0);
-			REAL roww[get_Ncolumns(lp)];
+			set_verbose(lp,IMPORTANT);
+			REAL * roww=new REAL[get_Ncolumns(lp)]();
 			for(i=1;i<=nTransitions;i++){
 				set_int(lp,i,TRUE);
 			}
@@ -1244,14 +1323,14 @@ int main(int argc, char** argv) {
 					set_col_name(lp, k, cstr);k++;
 			}
 			int ii=0; 
-			for(set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();p++){
+		for(std::set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();p++){
 			//add the constraint's left side
 			//cout<<(*p)->getName()<<"="<<(*p)->getTokenCount()<<std::endl;
 				int j=1;
 		//	cout<<"m["<<(*p)->getName()<<"]"<<"="<<(*p)->getTokenCount()<<std::endl;
 				Place & l= *net1.findPlace((*p)->getName());
 				if((args_info.inputs_num==1)&&(l.getType()!=pnapi::Node::INTERNAL)) continue;
-				for(set<Transition *>::const_iterator t = net1.getTransitions().begin();t!=net1.getTransitions().end();t++){
+				for(std::set<Transition *>::const_iterator t = net1.getTransitions().begin();t!=net1.getTransitions().end();t++){
 				//cout<<(*t)->getName();
 					int fp=0,fm=0;
 					Transition & r= *net1.findTransition((*t)->getName());
@@ -1338,7 +1417,7 @@ int main(int argc, char** argv) {
 					//}
 					add_columnex(lp,0,NULL,NULL);//then add constraint iff there is some connection between 
 					set_col_name(lp, get_Ncolumns(lp),get_col_name(lpmps.at(ifm),j+1));
-					REAL *roww;//[1+get_Ncolumns(lp)];
+					REAL * roww= new REAL[1+get_Ncolumns(lp)];
 					for(int r=0;r<get_Ncolumns(lp);r++) roww[r+1]=0.0;
 					roww[get_Ncolumns(lp)]=1.0;
 					for(std::set<pnapi::Transition *>::iterator cit=net1.getTransitions().begin();cit!=net1.getTransitions().end();++cit){
@@ -1358,7 +1437,8 @@ int main(int argc, char** argv) {
 				//set_add_rowmode(lp,TRUE); add the constraints of the message profiles
 				int hh=1+get_Ncolumns(lp);//set_verbose(lp,5);//print_lp(lpmps.at(ifm)); //cout<<"col"<<hh<<"dd";
 				for(int i=0;i<get_Nrows(lpmps.at(ifm));i++){
-					REAL *rowp,*rowwpp;//[1+get_Ncolumns(lpmps.at(ifm))], rowwpp[hh];//int *colp;
+					REAL * rowp=new REAL[1+get_Ncolumns(lpmps.at(ifm))](); 
+					REAL * rowwpp=new REAL[hh]();//int *colp;
 					char grex=get_row(lpmps.at(ifm),i+1,rowp);
 					for(int j=0;j<hh-1;j++)rowwpp[j]=0;
 				        for(int j=0;j<get_Ncolumns(lpmps.at(ifm));j++){rowwpp[j+hh-get_Ncolumns(lpmps.at(ifm))]=rowp[j+1];}
@@ -1369,16 +1449,16 @@ int main(int argc, char** argv) {
 //					set_rh_range(lp,get_Nrows(lpmp),get_rh_range(lpmp,i+1));
 					 //set_add_rowmode(lp,FALSE);
 				}
-				set_verbose(lp,0);
+				set_verbose(lp,IMPORTANT);
 				
 			}
 			
 		}
 		//add constraints for cover places and transitions
-		//std::set<lprec* > cover;
+		
 		if(args_info.enforceEvents_given>0){
 			bool globres=1;
-			for(map<int,set<std::string> >::const_iterator itr=enforcedT.begin();itr!=enforcedT.end();++itr){
+			for(map<int,std::set<std::string> >::const_iterator itr=enforcedT.begin();itr!=enforcedT.end();++itr){
 				//cout<<"enforced "<<itr->first;
 				for(set<std::string>::const_iterator it=(itr->second).begin();it!=(itr->second).end();++it){
 					lprec* nn=copy_lp(lp);
@@ -1391,7 +1471,7 @@ int main(int argc, char** argv) {
 					else{	//internal place which needs extra variable and constraint
 						if(net1.findPlace(gg)!=NULL) cout<<gg;
 						else abort(2,"non-identifiable node for cover");
-						add_columnex(nn,0,NULL,NULL);REAL *roww;//[get_Ncolumns(nn)+1];
+						add_columnex(nn,0,NULL,NULL);REAL *roww=new REAL[get_Ncolumns(nn)+1]();
 						set_col_name(nn,get_Ncolumns(nn), cstr);
 						for(int rr=0;rr<get_Ncolumns(nn);rr++) roww[rr+1]=0.0;
 						roww[get_Ncolumns(nn)]=1.0;
@@ -1409,10 +1489,7 @@ int main(int argc, char** argv) {
 						if(!add_constraint(nn, roww,EQ, 0.0))	cout<<"gata"<<endl;
 						set_lowbo(nn, get_nameindex(nn,cstr,FALSE),1);
 					}
-					//REAL rowobj[get_Ncolumns(nn)];
-					//for(int s=1;s<=get_Ncolumns(nn)+1;s++){
-					//	rowobj[s]=0.0;
-					//}
+					
 					set_obj_fnex(nn,0, NULL,NULL);//nn,rowobj);
 					set_verbose(nn,IMPORTANT);
 					for(int i=1;i<=get_Ncolumns(nn);++i){
@@ -1439,12 +1516,8 @@ int main(int argc, char** argv) {
 			}
 		}
 		else{
-		set_obj_fnex(lp,0, NULL,NULL);
-		/*REAL rowobj[get_Ncolumns(lp)];
-		for(int s=1;s<=get_Ncolumns(lp)+1;s++){
-			rowobj[s]=0.0;
-		}
-		set_obj_fn(lp,rowobj);*/
+		set_obj_fnex(lp,0, NULL,NULL);set_verbose(lp,IMPORTANT);
+		
 		set_verbose(lp,IMPORTANT);
 		for(int i=1;i<=get_Ncolumns(lp);++i){
 			set_int(lp,i,TRUE);
@@ -1487,26 +1560,6 @@ int main(int argc, char** argv) {
 
 	
 
-/*	if(lp == NULL) {
-		std::cerr<< "Unable to create new LP model"<<std::endl;
-		return(1);
-	}
-		
-	}
-
-
-//lprec *lp;
-  int Ncol, *colno = NULL, j, ret = 0;
-  REAL *row = NULL;
-
-  Ncol = nTransitions+nPlaces+1; /* there are two variables in the model *
-  lp = make_lp(0, Ncol);
-  for(int i=1;i<Ncol;i++){
-	set_int(lp,i,TRUE);
-  }
-
-
-  }*/	
 	//time(&end_time);
 	//status("checked necessary condition for weak termination  in [%.0f sec]", difftime(end_time,start_time));
 	std::cerr << PACKAGE << ": runtime: " << ((double(clock()) - double(start_clock)) / CLOCKS_PER_SEC) << " sec\n";

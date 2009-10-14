@@ -7,22 +7,23 @@ description "Usage: checks compatibility using MILP"
 section "Analysis task"
 sectiondesc="Yasmina implements quick compatibility checks using ILP. 
 Yasmina's compatibility check is reachability of the final markings (which is a necessary condition for weak termination). 
-Yasmina's defalut input are open nets. Further, Yasmina checks compatibility under semantical constraints specified as events (e.g.the receipt/sending of a message) and choices (independent events). Moreover it blends message profile compatibility checking with all of the above metioned parameters. The result is usually no in case the input parameters are not compatible or it give information which can help further in the analysis (e.g. message profile, a terminating Parikh vector)."
+Yasmina's defalut input are open nets. Further, Yasmina checks compatibility under semantical constraints specified as events (e.g.the receipt/sending of a message) and choices (independent events). Moreover it blends message profile compatibility checking with all of the above metioned parameters. The result is usually no in case the input parameters are not compatible or it give information which can help further in the analysis (e.g. a terminating Parikh vector)."
 
 
 option "enforceEvents" e
-	"Enforce event(s) - list of transitions numberfile_arg.t"
+	"Enforce event(s) - list of transitions"
 	string multiple
 	optional
+	
+option "excludeE" x
+		"Exclude events"
+		string multiple
+		optional
 
 option "enforceFC" f
-	"Enforce free choice sending structures"
+	"Enforce all free choice sending clusters"
 	flag off
 	
-#option "excludeE" x
-#	"Exclude events"
-#	flag off
-
 option "messageProfiles" m
 	"Use message profiles (format filename.output) - "
 	string multiple
@@ -32,13 +33,12 @@ option "messageProfiles" m
 #	"use constraints - "
 #	optional
 
-#option "df" -
-#	"Deadlock freedom"
-#	flag off
 
-#option "adapterRules" -
-#	"given a set of adapter rules"
-#	flag off
+option "adapterRules" -
+	"Set of adapter rules"
+	string
+	typestr="FILE"
+	optional
 
 section "Debug"
 

@@ -7,7 +7,7 @@
   #if defined __BORLANDC__
     #define LLONG __int64
   #elif !defined _MSC_VER || _MSC_VER >= 1310
-    #define LLONG long long
+    #define LLONG int64_t
   #else
     #define LLONG __int64
   #endif

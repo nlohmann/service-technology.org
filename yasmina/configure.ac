@@ -35,6 +35,7 @@ AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
+AC_TYPE_INT64_T
 
 AC_CONFIG_FILES([Makefile libs/pnapi/Makefile libs/lp_solve/Makefile  src/Makefile doc/Doxyfile man/Makefile])
 AC_OUTPUT

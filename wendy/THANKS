@@ -12,3 +12,5 @@ ACKNOWLEDGEMENTS
     native (non-Cygwin) Windows environment.
   * Thanks to Christian Gierds for testing Wendy with strange nets that
     revealed several really subtle bugs.
+  * Thanks to Dirk Fahland for pointing out a problem in the STL sorting
+    algorithm which led to a segmentation fault.

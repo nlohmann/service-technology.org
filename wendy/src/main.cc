@@ -142,9 +142,9 @@ void evaluateParameters(int argc, char** argv) {
 
     // --diagnose implies several reduction rules
     if (args_info.diagnose_given) {
-        args_info.smartSendingEvent_flag = 1;
+        args_info.ignoreUnreceivedMessages_flag = 0;
         args_info.waitstatesOnly_flag = 1;
-        args_info.receiveBeforeSend_flag = 1;
+        args_info.receivingBeforeSending_flag = 1;
     }
 
     free(params);

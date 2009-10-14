@@ -146,8 +146,6 @@ void PossibleSendEvents::labelPossible(const Label_ID& l) {
 /*!
  \todo Check if this function is actually called more than once. If not, then
        we can skip the first if and make this a const function.
- \todo Check if decode() would ever return different values. Otherwise, the
-       implementation is wrong and should be reverted to revision 4731.
  \todo Depending on the number of calls to this function, we can think of not
        storing decodedLabels at all.
 */

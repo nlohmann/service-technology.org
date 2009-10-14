@@ -116,7 +116,7 @@ $(TESTSUITE): $(srcdir)/testsuite.at
 ######################
 
 # distribute the LGOV scripts
-EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov
+EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov zcov
 
 # compile the code for code coverage
 cover-prepare:
@@ -144,7 +144,7 @@ descriptions: $(TESTSUITE)
 cover-check: cover-prepare $(TESTSUITE)
 	test ! -d cover || rm -fr cover
 	$(MKDIR_P) cover
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=TRUE
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=LCOV
 
 # exclude generated code using the wildcards specified in NO_COVER_FILES
 cover.info:
@@ -160,6 +160,15 @@ cover-html: descriptions cover.info
 	@echo see `pwd`/cover-html/index.html for a coverage report
 
 cover: cover-check cover-html
+
+# use ZCOV for branch coverage
+cover-branch: cover-prepare $(TESTSUITE)
+	test ! -d cover || rm -fr cover
+	$(MKDIR_P) cover
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=ZCOV
+	zcov/zcov-merge cover/output.zcov cover/*.zcov
+	zcov/zcov-genhtml cover/output.zcov cover-html
+	@echo see `pwd`/cover-html/index.html for a coverage report
 
 # clean also the temp files in the src directory
 CLEANFILES = -fr cover descriptions 

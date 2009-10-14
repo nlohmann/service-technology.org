@@ -22,6 +22,7 @@
 #define _INTERFACEMARKING_H
 
 #include <ostream>
+#include <vector>
 #include "types.h"
 
 
@@ -58,8 +59,8 @@ class InterfaceMarking {
         /// initializes the class InterfaceMarking
         static void initialize();
 
-        /// comparison function to use std::sort
-        static bool sort_cmp(const InterfaceMarking*, const InterfaceMarking*);
+        /// sorts a given vector of interface markings
+        static void sort(std::vector<InterfaceMarking*> &);
 
     private: /* static attributes */
         /// the message bound

@@ -143,7 +143,7 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
         // reduction rule: send leads to insane node
-        if (args_info.smartSendingEvent_flag and SENDING(l) and not K.considerSendingEvent(l)) {
+        if (not args_info.ignoreUnreceivedMessages_flag and SENDING(l) and not K.considerSendingEvent(l)) {
             continue;
         }
 
@@ -154,7 +154,7 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
         }
 
         // reduction rule: receive before send
-        if (args_info.receiveBeforeSend_flag) {
+        if (args_info.receivingBeforeSending_flag) {
             // check if we're done receiving and each deadlock was resolved
             if (l > Label::last_receive and K.receivingHelps()) {
                 break;
@@ -178,7 +178,7 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
         // latest sending event considered succeeded
         /// \todo what about synchronous events?
         if (args_info.succeedingSendingEvent_flag and SENDING(l) and SK->sat(true)) {
-            if (not args_info.lf_flag or SK->is_final_reachable) {
+            if ((args_info.correctness_arg != correctness_arg_livelock) or SK->is_final_reachable) {
                 l = Label::first_sync;
             }
         }
@@ -227,7 +227,7 @@ inline void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& 
                                                             iter != tempPredecessors[currentKnowledge].end(); ++iter) {
                 knowledgeSet.insert(*iter);
             }
-        } else if (args_info.lf_flag) {
+        } else if (args_info.correctness_arg == correctness_arg_livelock) {
             currentKnowledge->is_final_reachable = 1;
         }
     }
@@ -563,7 +563,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
                 continue;
             }
 
-            if (args_info.lf_flag and not successors[l-1]->is_final_reachable) {
+            if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
                 continue;
             }
 
@@ -585,7 +585,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
                     continue;
                 }
 
-                if (args_info.lf_flag and not successors[l-1]->is_final_reachable) {
+                if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
                     continue;
                 }
 
@@ -603,7 +603,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
                     continue;
                 }
 
-                if (args_info.lf_flag and not successors[l-1]->is_final_reachable) {
+                if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
                     continue;
                 }
 

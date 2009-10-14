@@ -20,7 +20,6 @@
 
 #include <config.h>
 #include <set>
-#include <algorithm>
 #include "Knowledge.h"
 #include "cmdline.h"
 
@@ -180,7 +179,7 @@ Knowledge::~Knowledge() {
         }
     }
 
-    if (args_info.smartSendingEvent_flag) {
+    if (not args_info.ignoreUnreceivedMessages_flag) {
         delete posSendEvents;
     }
 }
@@ -202,7 +201,7 @@ void Knowledge::initialize() {
 
     // reduction rule: smart sending event
     // create array of those sending events that are possible in _all_ markings of the current bubble
-    if (args_info.smartSendingEvent_flag) {
+    if (not args_info.ignoreUnreceivedMessages_flag) {
         // initially, every sending event is possible
         posSendEvents = new PossibleSendEvents(true, 1);
 
@@ -234,7 +233,7 @@ void Knowledge::closure(std::queue<FullMarking>& todo) {
         InnerMarking* m = InnerMarking::inner_markings[todo.front().inner];
 
         // check, if each sent message contained on the interface of this marking will ever be consumed
-        if (args_info.smartSendingEvent_flag and not m->sentMessagesConsumed(todo.front().interface)) {
+        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(todo.front().interface)) {
             is_sane = 0;
             if (not args_info.diagnose_given) {
                 return;
@@ -294,7 +293,7 @@ void Knowledge::closure(std::queue<FullMarking>& todo) {
 
                 // sort bubble using STL algorithms
                 if (bubble[candidate.inner].size() > 1) {
-                    sort(bubble[candidate.inner].begin(), bubble[candidate.inner].end(), InterfaceMarking::sort_cmp);
+                    InterfaceMarking::sort(bubble[candidate.inner]);
                 }
 
                 if (not is_sane) {
@@ -494,7 +493,7 @@ bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
  \note given label must be adjusted such that first send event has label 0
 */
 bool Knowledge::considerSendingEvent(const Label_ID& label) const {
-    assert(args_info.smartSendingEvent_flag);
+    assert(not args_info.ignoreUnreceivedMessages_flag);
     assert(posSendEventsDecoded);
 
     return (posSendEventsDecoded[label - Label::first_send] == 1);

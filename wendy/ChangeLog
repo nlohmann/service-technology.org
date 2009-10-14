@@ -18,6 +18,11 @@ Version 2.3-unreleased
 
 * removed all memory leaks
 
+* removed parameter `--smartSendingEvent': Wendy will always use this
+  technique unless `--ignoreUnreceivedMessages' is given
+
+* renamed parameter `--receiveBeforeSend' to `--receivingBeforeSending'
+
 Version 2.2 (16 September 2009)
 ===============================
 

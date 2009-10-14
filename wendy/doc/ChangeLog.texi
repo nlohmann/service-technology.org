@@ -5,6 +5,10 @@
 @item implemented first diagnosis functions: the @option{--diagnosis} parameter creates a Dot file which indicates the blacklisted markings
 
 @item removed all memory leaks
+
+@item removed parameter @option{--smartSendingEvent}: Wendy will always use this technique unless @option{--ignoreUnreceivedMessages} is given
+
+@item renamed parameter @option{--receiveBeforeSend} to @option{--receivingBeforeSending}
 @end itemize
 
 

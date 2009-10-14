@@ -129,7 +129,7 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
 
     // ...and we can make an approximation of the receiving transitions that
     // are reachable from here
-    if (args_info.smartSendingEvent_flag) {
+    if (not args_info.ignoreUnreceivedMessages_flag) {
         calcReachableSendingEvents();
     }
 }
@@ -185,7 +185,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
     }
 
     // when only deadlocks are considered, we don't care about final markings
-    finalMarkingReachableMap[myId] = args_info.lf_flag ? is_final : true;
+    finalMarkingReachableMap[myId] = (args_info.correctness_arg == correctness_arg_livelock) ? is_final : true;
 
     // variable to detect whether this marking has only deadlocking successors
     bool deadlock_inevitable = true;
@@ -202,7 +202,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
             deadlock_inevitable = false;
         }
 
-        if (args_info.lf_flag) {
+        if (args_info.correctness_arg == correctness_arg_livelock) {
             if (markingMap[successors[i]] != NULL and
                 finalMarkingReachableMap[successors[i]]) {
                 finalMarkingReachableMap[myId] = true;

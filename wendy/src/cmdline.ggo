@@ -5,16 +5,33 @@ purpose "Wendy is a tool to synthesize partners for services.\n\n  Report bugs t
 
 
 section "Analysis Task"
-sectiondesc="Wendy is able to handle two different analysis tasks. It generates the operating guidelines (or partners in general) with respect to (1) deadlock freedom or (2) livelock freedom. By default, Wendy will consider deadlock freedom.\n"
+sectiondesc="Wendy is able to handle two different analysis tasks. It synthesizes partners of a service with respect to (1) deadlock freedom or (2) livelock freedom. By default, Wendy will consider deadlock freedom.\n"
 
-option "lf" -
-  "Livelock freedom."
-  details="The operating guidelines and reduced partners are generated with respect to livelock freedom. This means, that the composition of the currently analyzed service and the generated partner(s) do not run into a livelock from which no final marking is reachable anymore.\n"
+option "correctness" -
+  "Correctness criterion."
+  details="The partners are synthesized with respect to a correctness criterion. We distinguish between deadlock and livelock freedom. For deadlock freedom, the composition of the currently analyzed service and the synthesized partner must not deadlock; that is, a maximal run must end in a final state. Livelock freedom additionally demands that it is always possible to reach a final state.\n"
+  values="deadlock","livelock" enum
+  typestr="CRITERION"
+  default="deadlock"
+  optional
+
+option "messagebound" m
+  "Set the message bound."
+  details="The message bound sets the maximal number of messages per channel. Values within the range of 1..255 are allowed.\n"
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+
+option "ignoreUnreceivedMessages" -
+  "Also synthesize partners that send messages that might be left unreceived."
+  details="If the correctness criterion is deadlock freedom, then the composition might reach a livelock in which a message is pending on a channel, but is never received.\n"
   flag off
+  hidden
 
 
 section "Input/Output"
-sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after building the operating guidelines. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `-' is given, Wendy will pipe the respective output to the standard output stream.\n"
+sectiondesc="When called without an input file, Wendy reads from the standard input stream. When called without an output parameter, Wendy does not create an output file, but exits after synthesis. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `-' is given, Wendy will pipe the respective output to the standard output stream.\n"
 
 option "og" -
   "Operating guidelines output."
@@ -54,31 +71,25 @@ option "im" -
   hidden
 
 option "mi" -
-  "Prints a mapping from marking identifiers to actual Petri net markings."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-
-  option "cover" -
-  "Generate cover operating guidelines, reading a specification from a given file. If no file is given, all nodes will be covered."
-  dependon="og"
+  "Marking information output."
+  details="Prints a mapping from marking identifiers (e.g., `m3') to actual Petri net markings (e.g., `p5: 1, p6: 2')."
   string
   typestr="FILENAME"
   argoptional
   optional
 
 
-section "General Options"
+section "Operating Guidelines Options"
 sectiondesc="These options control the calculation of the operating guidelines as well as the style the operating guidelines are represented.\n"
 
-option "messagebound" m
-  "Set the message bound."
-  details="The message bound sets the maximal number of messages per channel. Values within the range of 1..255 are allowed.\n"
-  int
-  typestr="BOUND"
-  default="1"
-  optional
+option "cover" -
+"Cover operating guidelines output."
+details="Generate cover operating guidelines, reading a specification from a given file. If no file is given, all nodes will be covered."
+dependon="og"
+string
+typestr="FILENAME"
+argoptional
+optional
 
 option "formula" -
   "Set the formula style for outputs."
@@ -101,7 +112,7 @@ option "showEmptyNode" -
 
 option "showWaitstates" -
   "Show waitstates."
-  details="A waitstate is a state that the net can only leave with an asynchronous receive event or a synchronous event. Waitstates help to understand how the CNF formulas are constructed.\n"
+  details="A waitstate is a state that the net can only leave with an asynchronous receive event or a synchronous event.\n"
   dependon="dot"
   flag off
 
@@ -112,24 +123,15 @@ option "showTransients" -
   flag off
 
 
-section "Optimizations"
-sectiondesc="These options control the optimizations Wendy uses while synthesizing partners.\n"
-
-option "smartSendingEvent" -
-  "Send only if no marking within current knowledge is found that will definitely not consume the message sent."
-  details="A sending event is only considered if from the inner markings contained within the current knowledge in case of (1) deadlock freedom, some (inner) marking is reachable; (2) livelock freedom, a final (inner) marking is reachable. This will lead to less insane nodes and thus increases speed and uses less memory. In case of deadlock freedom, partners which will send messages that will never be consumed get lost. In case of livelock freedom no partners will be lost.\n"
-  flag off
-
-
 section "Reductions"
 sectiondesc="These options control the reductions Wendy uses while synthesizing partners. Note that reduction rules do not necessarily preserve all partners, but return a partner if one exists.\n"
 
 option "waitstatesOnly" -
   "Only consider waitstates when calculating successors."
-  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a concrete waitstate are sent.\n"
+  details="This rule avoids asynchronous `sending in advance'. That is, only messages that might help to resolve a certain waitstate are sent.\n"
   flag off
 
-option "receiveBeforeSend" -
+option "receivingBeforeSending" -
   "Only send if receiving does not resolve all waitstates."
   details="This rule will consider exactly those sending events that are absolutely necessary. That is, using this rule will create `arrogant' partners which first try to receive as many messages as possible and only send messages if a waitstate cannot be resolved otherwise.\n"
   flag off
@@ -142,22 +144,20 @@ option "seqReceivingEvents" -
 option "succeedingSendingEvent" -
   "One succeeding sending event is enough."
   details="If there exists one sending event such that the current knowledge is satisfied, no more (sending event) successor knowledges are calculated.\n"
-  hidden
   flag off
 
 option "quitAsSoonAsPossible" -
-  "Once all waitstates of a knowledge are resolved no more successor knowledges are calculated."
+  "Once all waitstates of a knowledge are resolved, no more successor knowledges are calculated."
   details="Once all waitstates of a knowledge are resolved no more successor knowledges are calculated.\n"
-  hidden
   flag off
 
 
 section "Debugging"
-sectiondesc="These options control how much debug output Wendy creates. The more debug output is used, the slower Wendy runs.\n"
+sectiondesc="These options control how much debug output Wendy creates.\n"
 
 option "verbose" v
   "Show verbose messages."
-  details="Show verbose information on the several intermediate steps. Note this option might slow down the execution.\n"
+  details="Show verbose information reporting intermediate steps.\n"
   flag off
 
 option "diagnose" -

@@ -71,15 +71,30 @@ void InterfaceMarking::initialize() {
 }
 
 
-/*!
- This function is necessary to sort vectors or sets of pointers to
- InterfaceMarking objects using sort functions from the STL Algorithms. The
- result must be any ordering.
- */
-bool InterfaceMarking::sort_cmp(const InterfaceMarking* a, const InterfaceMarking* b) {
-    assert(a);
-    assert(b);
-    return (*a < *b);
+void InterfaceMarking::sort(std::vector<InterfaceMarking*> &v) {
+    if (v.size() <= 1) {
+        return;
+    }
+
+    std::vector<InterfaceMarking*> smaller;
+    std::vector<InterfaceMarking*> bigger;
+    InterfaceMarking& pivot = *v[0];
+
+    for (unsigned int i = 1; i < v.size(); ++i) {
+        if (*v[i] < pivot) {
+            smaller.push_back(v[i]);
+        } else {
+            bigger.push_back(v[i]);
+        }
+    }
+
+    sort(smaller);
+    sort(bigger);
+    v.clear();
+
+    v.insert(v.begin(), smaller.begin(), smaller.end());
+    v.push_back(&pivot);
+    v.insert(v.end(), bigger.begin(), bigger.end());
 }
 
 

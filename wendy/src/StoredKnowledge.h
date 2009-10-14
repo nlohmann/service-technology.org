@@ -33,8 +33,8 @@
  \brief knowledge (data structure for storing knowledges)
  */
 class StoredKnowledge {
-	/// the Diagnosis needs to traverse the hash tree
-	friend class Diagnosis;
+    /// the Diagnosis needs to traverse the hash tree
+    friend class Diagnosis;
 
     public: /* static functions */
         /// destroy all objects of this class

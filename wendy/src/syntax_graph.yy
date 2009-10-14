@@ -106,7 +106,7 @@ state:
         /* calculate strongly connected components and do some evaluation on its members     */
         /* ================================================================================= */
 
-        if (args_info.smartSendingEvent_flag or args_info.lf_flag) {
+        if (not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
             /* current marking is representative */
             while (not currentSCC.empty()) {
                 /* get marking from current SCC */
@@ -120,7 +120,7 @@ state:
                    the strongly connected component */
                 InnerMarking::finalMarkingReachableMap[poppedMarking] = InnerMarking::finalMarkingReachableMap[$2];
 
-                if (args_info.smartSendingEvent_flag) {
+                if (not args_info.ignoreUnreceivedMessages_flag) {
                     /* ... the same is true for possible sending events */
                     InnerMarking::markingMap[poppedMarking]->possibleSendEvents->copy(*InnerMarking::markingMap[$2]->possibleSendEvents);
                 }

@@ -26,8 +26,8 @@ svn-clean: maintainer-clean
 	  install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub config.guess \
 	  config.h.in~
 	rm -fr libs/pnapi/Makefile.in
-	rm -fr doc/.DS_Store doc/ChangeLog.txt doc/Makefile.in doc/mdate-sh doc/manual
-	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~
+	rm -fr doc/.DS_Store doc/ChangeLog.txt doc/ChangeLog2.txt doc/Makefile.in doc/mdate-sh doc/manual
+	rm -fr src/.DS_Store src/Makefile.in src/config.h.in config.h.in~ src/uml2owfn.h
 	rm -fr tests/Makefile.in tests/.DS_Store doc/Makefile.in anon/Makefile.in doc/mdate-sh
 	rm -fr maintainer/Makefile.in maintainer/.DS_Store
 	rm -fr doc/doxygen doc/Doxyfile

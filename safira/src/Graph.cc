@@ -30,7 +30,7 @@ extern int lastInputId;
 extern int lastOutputId;
 
 ///constructor
-Graph::Graph(){
+Graph::Graph() : trap(NULL), globalFormula(NULL){
 	trap = NULL;
 }
 

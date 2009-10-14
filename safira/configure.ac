@@ -13,6 +13,7 @@ AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_GREP
 AC_PROG_LN_S
+AC_PROG_RANLIB
 
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
@@ -33,6 +34,6 @@ AC_SUBST(DOT)
 # Minisat needs the Zlib library
 AC_CHECK_LIB([z], [main], , AC_MSG_ERROR([Zlib was not found!]))
 
-AC_CONFIG_FILES([Makefile src/Makefile minisat/Makefile tests/Makefile tests/package.m4 maintainer/Makefile man/Makefile doc/Makefile doc/Doxyfile])
+AC_CONFIG_FILES([Makefile src/Makefile libs/minisat/Makefile tests/Makefile tests/package.m4 maintainer/Makefile man/Makefile doc/Makefile doc/Doxyfile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

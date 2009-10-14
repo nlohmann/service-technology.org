@@ -64,7 +64,7 @@ void testNodeClass(){
 	string s1;
 	stringstream out1;
 
-    for (int i = firstLabelId; i <= lastLabelId; ++i){
+    for (unsigned int i = firstLabelId; i <= lastLabelId; ++i){
     	if (n1->outEdges[i].size() > 0){
     		for (list<Node*>::iterator s = n1->outEdges[i].begin(); s != n1->outEdges[i].end(); ++s){
 
@@ -78,7 +78,7 @@ void testNodeClass(){
     string s2;
     stringstream out2;
 
-    for (int i = firstLabelId; i <= lastLabelId; ++i){
+    for (unsigned int i = firstLabelId; i <= lastLabelId; ++i){
     	if (trap->outEdges[i].size() > 0){
     		for (list<Node*>::iterator s = trap->outEdges[i].begin(); s != trap->outEdges[i].end(); ++s){
 

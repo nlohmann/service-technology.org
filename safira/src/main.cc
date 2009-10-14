@@ -88,22 +88,22 @@ int main(int argc, char **argv) {
 
     fclose(og_yyin);
     og_yylex_destroy();
-
-//    time_t parsingTime_end = time(NULL);
-//    cout << "number of labels: " << label2id.size()-4 << endl;
-//    cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
-//    cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
-//    time_t buildOG_start = time(NULL);
-
+/*
+    time_t parsingTime_end = time(NULL);
+    cout << "number of labels: " << label2id.size()-4 << endl;
+    cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
+    cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+    time_t buildOG_start = time(NULL);
+*/
 	g->makeTotal();
 	g->makeComplete();
 	g->print();
-
-//	time_t buildOG_end = time(NULL);
-//	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
-//	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
-//	cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
-
+/*
+	time_t buildOG_end = time(NULL);
+	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
+	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
+	cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+*/
 	for (int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {
 
@@ -211,38 +211,6 @@ void evaluateParameters(int argc, char** argv) {
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
         abort(7, "invalid command-line parameter(s)");
-    }
-
-    // read a configuration file if necessary
-    if (args_info.config_given) {
-        // initialize the config file parser
-        params->initialize = 0;
-        params->override = 0;
-
-        // call the config file parser
-        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
-        } else {
-            status("using configuration file '%s'", args_info.config_arg);
-        }
-    } else {
-        // check for configuration files
-        string conf_filename = fileExists("safira.conf") ? "safira.conf" :
-                               (fileExists(string(SYSCONFDIR) + "/safira.conf") ?
-                               (string(SYSCONFDIR) + "/safira.conf") : "");
-
-        if (conf_filename != "") {
-            // initialize the config file parser
-            params->initialize = 0;
-            params->override = 0;
-            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
-            } else {
-                status("using configuration file '%s'", conf_filename.c_str());
-            }
-        } else {
-            status("not using a configuration file");
-        }
     }
 
 //    StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;

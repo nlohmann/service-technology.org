@@ -9,9 +9,10 @@ int Node::maxId = 0;
 extern int currentIdPos;
 
 extern map<string, int> label2id;
+extern map<int, string> id2label;
 
 /// constructor
-Node::Node(Formula *_formula, int _id) : formula(_formula), id(_id) {
+Node::Node(Formula *_formula, int _id) : id(_id), formula(_formula) {
 	if (maxId < id){
 		maxId = id;
 	}
@@ -36,7 +37,8 @@ Node::~Node() {
 /// add an outoing edge to the node
 void Node::addEdge(int label, Node *target) {
 	assert(target);
-	assert(label <= label2id.size()-1);
+	//assert(label <= label2id.size()-1);
+	assert(id2label.find(label) != id2label.end());
 	outEdges[label].push_back(target);
 }
 

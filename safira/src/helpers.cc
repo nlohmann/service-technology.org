@@ -49,7 +49,7 @@ int emptyLiteral(){
 }
 
 //x <-> true  is equal to the empty clause
-list<Clause> xEqualsTrue(int x){
+list<Clause> xEqualsTrue(int){
 	list<Clause> clauses;
 	assert(clauses.size() == 0);
 	return clauses;

@@ -7,6 +7,7 @@
 #include <map>
 #include <list>
 #include <ctime>
+#include <zlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "Formula.h"
@@ -14,6 +15,9 @@
 #include "helpers.h"
 #include "cmdline.h"
 #include "verbose.h"
+
+/// the old "main()" of Minisat with adjusted exit codes
+extern int minisat(gzFile in);
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -26,7 +30,7 @@ double Formula::full_time;
 /****************************************************************************
  * constructors
  ***************************************************************************/
-Formula::Formula(){
+Formula::Formula() : formulaType(UNDEF){
 
 }
 
@@ -189,58 +193,24 @@ bool Formula::isSatisfiable(int fVar){
 	list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
 	delete h;
 
-	int cntVar = fVar + clauses.size(); //TODO: das müsste eine Abschätzung nach oben sein für die Anzahl der Variablen
-	string sVar_Clauses;
-	stringstream out;
-	out << cntVar;
-	sVar_Clauses = out.str();
-
-	int cntClauses = clauses.size();
-	out << "  " << cntClauses;
-	sVar_Clauses = out.str();
-
-	string s = "echo 'p cnf " + sVar_Clauses;
+  string s;
 
 	for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
-			s = s + clauseToString(*n) + "0 ";
+			s += clauseToString(*n) + "0 ";
 	}
-    s = s +  " ' | " + args_info.minisat_arg + " >/dev/null 2>&1";
-
-//	cout << "in function isSatisfiable: \n";
-//	cout << "max. number of the Variables in the formula: " << fVar << endl;
-//	cout << "formula: " << toString() << endl;
-//	cout << "moveNegation(): " << moveNegation()->toString() << endl;
-//	cout << "CNF-String: " << moveNegation()->toStringCNF(fVar+1,fVar+1) << endl;
-//	cout << "Clauses:\n";
-//	for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
-//		cout << n->literal0 << "\t" << n->literal1 << "\t" << n->literal2 << endl;
-//	}
-//	cout << s << endl;
-
-    status("executing '%s'", s.c_str());
-	//int result = system("echo 'p cnf 1 2 -1 0 -1 0' | /Users/kathrin/5_Projekte/minisat/core/minisat &> /dev/null");
-
-
 
     clock_t start_clock = clock();
-    //int result = 10;
-	int result = system(s.c_str());
-    result = WEXITSTATUS(result);
+
+    FILE *temp = fopen("foo", "w");
+    fprintf(temp, "%s", s.c_str());
+    fclose(temp);
+
+    gzFile in = gzopen("foo", "rb");;
+    int result = minisat(in);
+
     full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
-/* 0 = error
- * 1 = could not open file
- * 3 = parse error
- * 10 = formula satisfiable (GOOD)
- * 20 = formula unsatisfiable (GOOD)
- * 127 = binary not found (comes from shell)
- */
-
-    if (result != 20 and result != 10) {
-        abort(7, "minisat exited with code '%d'", result);
-	}
-
-    return (result == 10);
+    return result;
 }
 
 
@@ -688,7 +658,7 @@ list<Clause> FormulaNOT::toCNF(int varId, int maxId) const{
 
 }
 
-list<Clause> FormulaLit::toCNF(int varId, int maxId) const{
+list<Clause> FormulaLit::toCNF(int, int) const{
 
     list<Clause> clauses;
 	Clause cl;
@@ -699,7 +669,7 @@ list<Clause> FormulaLit::toCNF(int varId, int maxId) const{
 	return clauses;
 }
 
-list<Clause> FormulaNUM::toCNF(int varId, int maxId) const{
+list<Clause> FormulaNUM::toCNF(int, int) const{
 
     list<Clause> clauses;
 	Clause cl;
@@ -710,19 +680,19 @@ list<Clause> FormulaNUM::toCNF(int varId, int maxId) const{
 	return clauses;
 }
 
-list<Clause> FormulaTrue::toCNF(int varId, int maxId) const {
+list<Clause> FormulaTrue::toCNF(int, int) const {
 	assert(label2id.find("true") != label2id.end());
 	list<Clause> clauses = xEqualsTrue(label2id["true"]);
 	return clauses;
 }
 
-list<Clause> FormulaFalse::toCNF(int varId, int maxId) const{
+list<Clause> FormulaFalse::toCNF(int, int) const{
 	assert(label2id.find("false") != label2id.end());
 	list<Clause> clauses = xEqualsFalse(label2id["false"]);
 	return clauses;
 }
 
-list<Clause> FormulaFinal::toCNF(int varId, int maxId) const{
+list<Clause> FormulaFinal::toCNF(int, int) const{
 
 	assert(label2id.find("final") != label2id.end());
 
@@ -820,25 +790,25 @@ string FormulaNOT::toStringCNF(int varId, int maxId) const{
 	return ("-" + f->toStringCNF(varId, maxId));
 }
 
-string FormulaLit::toStringCNF(int varId, int maxId) const{
+string FormulaLit::toStringCNF(int, int) const{
 	string sNumber = intToString(number);
 	return (sNumber);
 
 }
 
-string FormulaNUM::toStringCNF(int varId, int maxId) const{
+string FormulaNUM::toStringCNF(int, int) const{
 	string sNumber = intToString(number);
 	return (sNumber);
 }
 
-string FormulaTrue::toStringCNF(int varId, int maxId) const{
+string FormulaTrue::toStringCNF(int, int) const{
 	return ("true");
 }
 
-string FormulaFalse::toStringCNF(int varId, int maxId) const{
+string FormulaFalse::toStringCNF(int, int) const{
 	return ("false");
 }
 
-string FormulaFinal::toStringCNF(int varId, int maxId) const{
+string FormulaFinal::toStringCNF(int, int) const{
 	return ("final");
 }

@@ -11,7 +11,7 @@ $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
 		--output=$@ \
 		--manual="service-technology.org" \
 		--source="service-technology.org" \
-		--help-option="--detailed-help" \
+		--help-option="--help" \
 		--opt-include=extra
 
 man-pdf: $(PACKAGE).1

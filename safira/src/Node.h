@@ -14,7 +14,7 @@ class Node {
 
     public:
         Labels outLabels; 		/// the labels of outgoing arcs
-        int id; 		/// an identifier as given by the .og file
+        int id; 		        /// an identifier as given by the .og file
         Formula *formula;  		/// a formula assigned to this node
         list<Node*> *outEdges; 	/// outgoing edges
 

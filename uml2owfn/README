@@ -3,19 +3,50 @@
          | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
          | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
           \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+        Translating IBM WebSphere Business Process Models to Petri Nets
                  http://www.service-technology.org/uml2owfn/
 
 
-About this Distribution
-***********************
+PURPOSE
 
-This file describes this distribution of UML2oWFN, version 2.00, a
-tool translating business processes described in IBM Websphere Business
-Modeler XML to open workflow nets (oWFN), last updated 19 October 2008.
+    UML2oWFN implements a standard compiler for translating IBM WebSphere
+    Business Process Models to Petri Nets. In addition UML2oWFN can generate
+    Petri Nets for soundness analysis with the model checker LoLA and the
+    soundness checker Woflan.
+    
+    
+COPYRIGHT
 
-UML2oWFN is licensed under the GNU General Public License version 3.
+    Copyright (c) 2007, 2008, 2009 Dirk Fahland, Martin Znamirowski,
+    and Niels Lohmann
+    
 
-Copyright (C) 2007,2008 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
+AUTHORS
+    See file "AUTHORS" for details.
+    
+    
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    UML2oWFN is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of UML2oWFN.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    UML2oWFN can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop UML2oWFN.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of UML2oWFN. It can also be
+    downloaded at <http://service-technology.org/files/uml2owfn/uml2owfn.pdf>.
 
 
 Contents of this Distribution
@@ -75,16 +106,3 @@ Directories
      Several LoLA configuration files that can be used to create the LoLA
      model checker variants for automated soundness analysis of translated
      processes.
-
-Copyright
-=========
-
-Copyright (C) 2007, 2008 Dirk Fahland
-
-     Copying and distribution of this file, with or without
-     modification, are permitted in any medium without royalty provided
-     the copyright notice and this notice are preserved.
-
-See the User's Manual for more information.
-
-END OF README file for UML2oWFN Version 2.00-unreleased

@@ -1,42 +1,26 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2007, 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
-                            Martin Znamirowski <znamirow@informatik.hu-berlin.de>
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+
 /*!
- * \file    options.cc
- *
- * \brief   evaluation of command-line options
- *
- * \author  Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
- *
- * \since   2008/05/07
- *
- * \date    \$Date: 2008/05/09 12:38:16 $
- *
- * \note    This file is part of the tool UML2OWFN and was created at the
- *          Humboldt-Universität zu Berlin. See
- *
- * \version \$Revision: 1.00 $
+ * command-line options handling
  */
-
-
-
 
 /******************************************************************************
  * Headers
@@ -165,7 +149,7 @@ void print_help()
   trace("                        (if applicable)");
 	trace("\n");
 	trace("  FORMAT is one of the following (multiple formats permitted):\n");
-  trace("    lola, owfn, dot, pep, tpn, apnn, ina, spin, pnml, info\n");
+  trace("    lola, owfn, dot, tpn\n");
 	trace("\n");
   trace("  TASK is one of the following (multiple parameters permitted):\n");
   trace("    soundness           analyze for soundness\n");
@@ -228,12 +212,6 @@ void parse_command_line(int argc, char* argv[])
 	suffixes[F_OWFN] = "owfn";
 	suffixes[F_DOT]  = "dot";
 	suffixes[F_TPN]  = "tpn";
-	suffixes[F_INA]  = "pnt";
-	suffixes[F_SPIN]  = "spin";
-	suffixes[F_PEP]  = "ll_net";
-	suffixes[F_APNN] = "apnn"  ;
-	suffixes[F_INFO] = "info"  ;
-	suffixes[F_PNML] = "pnml"  ;
 
 	// the programme's name on the commandline
 	string progname = string(argv[0]);
@@ -303,20 +281,8 @@ void parse_command_line(int argc, char* argv[])
 				formats[F_OWFN] = true;
 			else if (parameter == suffixes[F_DOT])
 				formats[F_DOT] = true;
-			else if (parameter == "pep")
-				formats[F_PEP] = true;
-			else if (parameter == suffixes[F_APNN])
-				formats[F_APNN] = true;
       else if (parameter == suffixes[F_TPN])
         formats[F_TPN] = true;
-			else if (parameter == suffixes[F_INFO])
-				formats[F_INFO] = true;
-			else if (parameter == "ina")
-				formats[F_INA] = true;
-			else if (parameter == "spin")
-				formats[F_SPIN] = true;
-			else if (parameter == suffixes[F_PNML])
-				formats[F_PNML] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
@@ -688,7 +654,7 @@ ostream *openOutput(string name)
  *
  * \param file file stream of the output file
  *
- * \post out file addressed by output file stream #file closed
+ * \post out file addressed by output file stream closed
  */
 void closeOutput(ostream *file)
 {

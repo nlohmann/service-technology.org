@@ -99,7 +99,7 @@ echo "[CTL model checking]"
 	  result=1
 	  echo "[fail] CTL properties not generated for all processes"
 	fi
-	lola_mc_count=$(grep "lola-mc" $builddir/check_$FILE.sh | wc -l)
+	lola_mc_count=$(grep "lola-bpm-modelchecking1" $builddir/check_$FILE.sh | wc -l)
 	if [ ! $lola_mc_count -eq $must_filecount_filter ] ; then
 	  result=1
 	  echo "[fail] not calling CTL model checker for CTL analysis"

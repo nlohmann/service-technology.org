@@ -1,4 +1,21 @@
+/*****************************************************************************\
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
+
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
 
 #ifndef INTERNALREPRESENTATION_H
 #define INTERNALREPRESENTATION_H
@@ -16,10 +33,15 @@
 #include <map>
 #include <list>
 #include <deque>
-#include "pnapi.h"
+
+// include PN Api headers
+#include "pnapi/pnapi.h"
+#include "petrinet-workflow.h"
 
 #include "AST.h"
 #include "UML-public.h"
+
+#include "options.h"
 
 using std::string;
 using std::vector;
@@ -149,7 +171,7 @@ class Pin {
         FlowContentNode* owningNode;
 
         /// pointer to the petrinet place representing this pin
-        Place* pinPlace;
+        pnapi::Place* pinPlace;
 
         /// pointer to the owning criterion. Mainly used to get sure that pinsets are not overlapping
         PinCombination* owningCriterion;
@@ -169,10 +191,10 @@ class Pin {
         string getName();
 
         /// returns the name
-        void setPlace(Place* placeToSet);
+        void setPlace(pnapi::Place* placeToSet);
 
         /// returns the name
-        Place* getPlace();
+        pnapi::Place* getPlace();
 
         /// returns true if there is no owning criterion
         bool free();
@@ -236,7 +258,7 @@ class PinCombination {
 class InputCriterion : public PinCombination {
     public:
         // place indicating, that this inputcriterion has been used
-        Place* statusPlace;
+        pnapi::Place* statusPlace;
 
         // constructor
         InputCriterion(string givenName, FlowContentNode* owner) : PinCombination(givenName, owner) {}
@@ -299,7 +321,7 @@ class FlowContentElement {
 
         /// translates this flow content element to its petri net pattern
         /// in the given petri net
-        virtual void translateToNet(ExtendedWorkflowNet* PN) {}
+        virtual void translateToNet(pnapi::ExtendedWorkflowNet* PN) {}
 
         /// get number of incoming edges of this control-flow element
         virtual int statistics_getInDegree () { return 0; }
@@ -336,7 +358,7 @@ class FlowContentConnection : public FlowContentElement {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         /// sets the input pin
         void setInput(Pin* givenInput);
@@ -391,7 +413,7 @@ class FlowContentNode : public FlowContentElement {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        virtual void translateToNet(ExtendedWorkflowNet* PN) {}
+        virtual void translateToNet(pnapi::ExtendedWorkflowNet* PN) {}
 
         /// returns a pin if its name is given
         Pin* getPinByName(string find);
@@ -429,7 +451,7 @@ class Task : public FlowContentNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        virtual void translateToNet(ExtendedWorkflowNet* PN) {}
+        virtual void translateToNet(pnapi::ExtendedWorkflowNet* PN) {}
 
         // list of this tasks input criteria
         list<InputCriterion*> inputCriteria;
@@ -454,7 +476,7 @@ class Task : public FlowContentNode {
 class Process : public Task {
     private:
         // pointer to this process petrinet representation
-        ExtendedWorkflowNet* processNet;
+        pnapi::ExtendedWorkflowNet* processNet;
 
         // all nodes from the flow content
         list<FlowContentNode*> flowContentNodes;
@@ -468,7 +490,7 @@ class Process : public Task {
         Process(string givenName, uml_elementType givenType, ASTElement* link, FlowContentElement* parent) : Task(givenName,givenType,link,parent) {nodeNameMap = map<string,FlowContentNode*>();}
 
         // list of starting transition of this process
-        list<Node*> startingTransitions;
+        list<pnapi::Node*> startingTransitions;
 
         // current map for names->nodes in this process
         map<string,FlowContentNode*> nodeNameMap;
@@ -484,7 +506,7 @@ class Process : public Task {
 
         /// translates this flow content element to its petri net pattern
         /// in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         /// adds a flow content node to this process
         void addFCN(FlowContentNode* toAdd);
@@ -521,7 +543,7 @@ class SimpleTask : public Task {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         // creates a debug output on the console for this element
         void debugOutput(string delay);
@@ -536,7 +558,7 @@ class ControlFlowNode: public FlowContentNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        virtual void translateToNet(ExtendedWorkflowNet* PN) {}
+        virtual void translateToNet(pnapi::ExtendedWorkflowNet* PN) {}
 
         // list of output branches
         list<PinCombination*> outputBranches;
@@ -560,13 +582,13 @@ class Decision: public ControlFlowNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         // decides whether this is an inclusive decision
         bool inclusive;
 
         // generates the pattern for an inclusive decision recursively
-        void inclusiveDecisionPatternRecursively(Place* centralNode, set<PinCombination*>& currentOutputBranches, string number, ExtendedWorkflowNet* PN, set<set<PinCombination*> >& powerSet);
+        void inclusiveDecisionPatternRecursively(pnapi::Place & centralNode, set<PinCombination*>& currentOutputBranches, string number, pnapi::ExtendedWorkflowNet* PN, set<set<PinCombination*> >& powerSet);
 
         /// number of outgoing edges of this node
         int statistics_getOutDegree();
@@ -584,7 +606,7 @@ class Fork: public ControlFlowNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         // constructor
         Fork(string givenName, uml_elementType givenType, ASTElement* link, FlowContentElement* parent) : ControlFlowNode(givenName,givenType,link,parent) {}
@@ -599,7 +621,7 @@ class Join: public ControlFlowNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         // constructor
         Join(string givenName, uml_elementType givenType, ASTElement* link, FlowContentElement* parent) : ControlFlowNode(givenName,givenType,link,parent) {}
@@ -614,7 +636,7 @@ class Merge: public ControlFlowNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         /// number of incoming edges of this node
         int statistics_getInDegree();
@@ -632,7 +654,7 @@ class AtomicCFN: public FlowContentNode {
 
         // translates this flow content element to its petri net pattern
         // in the given petri net
-        void translateToNet(ExtendedWorkflowNet* PN);
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         // constructor
         AtomicCFN(string givenName, uml_elementType givenType, ASTElement* link, FlowContentElement* parent) : FlowContentNode(givenName,givenType,link,parent) {}

@@ -1,20 +1,20 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2007, 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
-                            Martin Znamirowski <znamirow@informatik.hu-berlin.de>
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -102,13 +102,7 @@ typedef enum
   F_LOLA,   ///< LoLA Petri net
   F_OWFN,   ///< Fiona open workflow net
   F_DOT,    ///< Graphviz dot format
-  F_PEP,    ///< low-level PEP notation
   F_TPN,    ///< Woflan TPN format
-  F_APNN,   ///< Abstract Petri Net Notation
-  F_INA,    ///< INA Petri net
-  F_SPIN,   ///< SPIN Petri net
-  F_PNML,   ///< Petri Net Markup Language
-  F_INFO,   ///< BPEL2oWFN information file
   F_BOM_XML,  ///< BOM .xml-file
   F_NONE    ///< place holder for "no format"
 } possibleFormats;

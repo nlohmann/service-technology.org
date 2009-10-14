@@ -1,28 +1,30 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
-
 
 #ifndef UML2OWFNIO_H_
 #define UML2OWFNIO_H_
 
 #include <string.h>
 
-#include "pnapi.h"      // Petri Net support
+#include "pnapi/pnapi.h"
+#include "petrinet-formula.h"
+#include "petrinet-workflow.h"
 #include "globals.h"
 
 using std::string;
@@ -53,7 +55,7 @@ string getOutputFilename_net (possibleFormats format);
 string process_name_to_file_name (string processName);
 
 // file contents create/write functions
-void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis);
+void write_net_file(pnapi::ExtendedWorkflowNet *PN, analysis_t analysis);
 
 void write_log_file ();
 void log_print (string text);

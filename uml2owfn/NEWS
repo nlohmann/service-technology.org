@@ -3,66 +3,22 @@
          | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
          | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
           \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+        Translating IBM WebSphere Business Process Models to Petri Nets
                  http://www.service-technology.org/uml2owfn/
 
+Version 2.10-unreleased
+=======================
 
-Version 2.00
-============
+* Migrated UML2oWFN to the new Petri net API. The included PNAPI slightly
+  deviates from the original API, see SVN repository for details.
 
-* Re-implementation of the compiler frontend.
+* Dropped support for several file formats. The currently supported file
+  formats are .lola, .owfn, .dot, and .tpn (Woflan)
 
-* Local sub processes and loops are now treated as simple tasks in the parent
-  process. Each subprocess and each loop is added as a process to the list of
-  all output-processes.
+* Changed the filenames of the LoLA binaries for soundness analysis to
+  `lola-bpm-liveprop1' and `lola-bpm-statepredicate1'
 
-* Processes can be cut according to the role information using new options
-     * `--rolecut', cut away all roles that do not include a startnode
-
-     * `--rolecontains=ROLE', additionally keep those roles
-
-     * `--rolexclusively=ROLE', delete all roles, that are not covered by a
-       startnode or by a containrole, that do not match the set of exclusive
-       roles
-
-* Added generation of FINALCONDITION for oWFN output; oWFN ouput now uses
-  full node names instead of short node names.
-
-* Bugfix: Updated generation of formula for safe states to consider
-  post-places of transitions that lie on a cycle of the net as well.
-
-* Modified semantics of workflow net termination semantics (parameter `-a
-  wfNet') which now assumes that the net terminates with a global orJoin and
-  extends the given net to a single terminal workflow net. The extension
-  constructs a dead-path elimination logic from structural information. The
-  extenion preserves soundness if the net is free-choice.
-
-* Made filtering of processes more precise according to the semantics
-  implemented in the WebSphere tools, providing a dedicated filtering
-  parameter for different process characteristics:
-     * Translation may filter empty processes (`-s empty'),
-
-     * processes with pin multiplcities (`-s multi'),
-
-     * processes with non-matching pin multiplicities at edges (produce one
-       token, consume two token, `-s multiNonMatching'),
-
-     * processes with overlapping pinsets (`-s overlappingPins'), and
-
-     * processes with trivial communication interfaces (`-s
-       trivialInterface', only applicable if using `--rolecut').
-  The old parameter `-p filter' remains for backwards compatibility and
-  implements `-s empty -s overlappingPins'.
-
-* Extended the translation log file which now distinguishes properties of UML
-  processes and of the Petri nets
-
-* Added `--enable-debug' and `--disable-assert' to `./configure' parameters
-  to control the use of debug and assert code
-
-* integrated BOM Anonymizer to UML2oWFN distribution (see directory `anon')
-
-* Added `./lola/Makefile' to automatically create all LoLA binaries needed
-  for soundness analysis. Prepared a sample translation and analysis scenario.
+* Role cutting functionality has been disabled.
 
  
 See file ChangeLog <http://service-technology.org/files/uml2owfn/ChangeLog>

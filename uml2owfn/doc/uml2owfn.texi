@@ -210,61 +210,26 @@ source-code releases available at @url{http://service-technology.org/files/lola}
 to be accessible from the command-line. 
 
 @itemize
-@item @file{lola-lp} - LoLA compiled with LIVEPROP,
-@item @file{lola-sp} - LoLA compiled with STATEPREDICATE,
-@item @file{lola-full-limited} - LoLA compiled with FULL (and MAXIMALSTATES 100000), and
-@item optionally @file{lola-mc} - LoLA compiled with MODELCHECKING;
+@item @file{lola-bpm-liveprop1} - LoLA compiled with LIVEPROP,
+@item @file{lola-bpm-state-predicate1} - LoLA compiled with STATEPREDICATE, and
+@item optionally @file{lola-bpm-modelchecking1} - LoLA compiled with MODELCHECKING;
 @end itemize
 
 each with CAPACITY 1 and CHECKCAPACITY. The analysis script files rely on these
 model checkers. 
 
-In @file{<uml2owfn>/lola/}, we are providing the corresponding LoLA configuration
-files for these LOLA variants with this release. You can generate these LoLA
+In @file{<uml2owfn>/lola/}, we provide the corresponding LoLA configuration
+files for these LoLA variants with this release. You can generate these LoLA
 executables as follows. 
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/lola}.
-@item Download @acronym{LoLA}, say @file{lola-1.11.tar.gz}, and extract the
-source code files into its own directory, and prepare
-@acronym{LoLA} for compilation.
-@cartouche
-@smallexample
-tar xfz lola-1.11.tar.gz
-cd lola-1.11
-./configure
-@end smallexample
-@end cartouche
-
-@item Change to directory @file{<uml2owfn>/lola/} and call
-@example
-make LOLA_SRC_DIR=<lola-1.11-dir>/src
-@end example
-to automatically create the correct LoLA binaries for your platform. The variable
-@samp{LOLA_SRC_DIR} defaults to @samp{../../lola/src}, i.e., if you extract LoLA
-next to @acronym{UML2oWFN} like this
-@example
-<some-dir>
-  + uml2owfn (your uml2owfn directory)
-  |  + anon
-  |  + doc
-  |  + lola  (uml2owfn's lola directory)
-  |  |  + Makefile
-  |  |  + userconfig.H.full-limited
-  |  |  + userconfig.H.liveprop
-  |  |  ...
-  |  + scripts
-  |  ...
-  + lola  (your lola directory)
-  |  + doc
-  |  ...
-  |  + src
- ... ...
-@end example
-you can call @samp{make} without any parameters.
-
-@item Make all LoLA binaries in @file{./uml2owfn/lola/} available on your
-command-line, for instance by copying them to @file{/usr/local/bin/}.
+@item download `http://service-technology.org/files/lola/lola.tar.gz'
+@item untar @file{lola.tar.gz}, configure
+@item call @samp{make lola-bpm-liveprop1}
+@item copy the binary @file{src/lola-liveprop1} to a directory of your path
+      (e.g., @file{/usr/local/bin}) or call @samp{make install}
+@item repeat steps 3 and 4 with @samp{make lola-bpm-statepredicate1} and
+      optionally @samp{make lola-bpm-modelchecking1}
 @end enumerate
 
 
@@ -296,8 +261,8 @@ specifies the valid final states of the process.
 LoLA command calls for each file.
 
 @example
-lola-sp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.safe.task -P
-lola-lp lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
+lola-bpm-statepredicate1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.safe.task -P
+lola-bpm-liveprop1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
 @end example
 
 If the first call returns @samp{predicate is not satisfiable}, then the process
@@ -480,7 +445,6 @@ make targets are available
 	@item @samp{translateor}    translate library nets with OR-join on the controlflow
 	@item @samp{soundness}      soundness check (AGEF omega)
 	@item @samp{safeness}       safeness check
-	@item @samp{full}           full state space
 	@item @samp{table}          collect results in table
 	@item @samp{clean}          remove analysis files
 	@item @samp{veryclean}      remove Petri nets
@@ -499,14 +463,6 @@ make table
 @end example
 To run the second use case, execute @samp{make translateweak} instead of
 @samp{make translate}.
-
-In case you want to include numbers on the size of the state space of each
-process, execute
-@example
-make translate
-make full
-make table
-@end example
 
 The target @samp{table} prepares two different representation of the analysis
 results in @file{results.csv} and @file{results-comparison.csv}. The target
@@ -531,15 +487,13 @@ Use the parameter @samp{UML2OWFN-PARAM} for refining the translation with furthe
 command-line parameters of @acronym{UML2oWFN} if you need.
 
 You can immediately try this Makefile with the following setup. Create the
-necessary @acronym{LoLA} binaries with the @file{./lola/Makefile} as described
-above. Then execute the following commands in the root directory of @acronym{UML2oWFN}.
+necessary @acronym{LoLA} binaries as described above and copy them to
+@file{./lola/} of your @acronym{UML2oWFN} directory. Then execute the
+following commands in the root directory of @acronym{UML2oWFN}.
 
 @cartouche
 @smallexample
-make
-cd ./lola/
-make
-cd ../scripts/
+cd ./scripts/
 make translateor LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
                LIBRARY=../tests/soundness/TestSuite_soundness
 make table LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
@@ -565,7 +519,7 @@ use the parameter @samp{-p ctl}. To verify whether the generated CTL formula hol
 for a given process, use LoLA with the model checking algorithms, e.g. call
 
 @example
-lola-mc lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
+lola-bpm-modelchecking1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
 @end example
 
 This line is automatically included in the verification script @file{check_lib.sh}.
@@ -573,7 +527,7 @@ To use the Using the @file{./scripts/Makefile} to automate the compilation of
 results in this setting, you have to set two parameters:
 @example
 make translate UML2OWFN-PARAM="-p ctl"
-make table LOLA-LP=lola-mc
+make table LOLA-LP=lola-bpm-modelchecking1
 @end example
 The first line causes the translation to generate CTL properties, the second line
 switches the model-checker for the soundness analysis to the LoLA variant with

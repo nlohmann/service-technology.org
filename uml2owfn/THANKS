@@ -1,0 +1,22 @@
+          _   _  __  __  _      ____        __        __ _____  _   _ 
+         | | | ||  \/  || |    |___ \   ___ \ \      / /|  ___|| \ | |
+         | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
+         | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
+          \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+            Translating IBM WebSphere Business Models to Petri Nets
+                 http://www.service-technology.org/uml2owfn/
+
+
+ACKNOWLEDGEMENTS
+
+We would like to thank:
+
+   * Antoon van Breda a.k.a. Jaded Hobo
+     for the original version of the `colorconsole.h' header,
+
+   * Jana Koehler, IBM Zurich
+     for valueable support concerning the IBM Business Modeler Semantics
+
+   * Hagen V"olzer, IBM Zurich
+     for valueable support concerning the IBM Business Modeler Semantics
+ 

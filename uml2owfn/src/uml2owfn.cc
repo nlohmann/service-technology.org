@@ -1,3 +1,22 @@
+/*****************************************************************************\
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
+
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
 /******************************************************************************
  * Headers
  *****************************************************************************/
@@ -15,7 +34,10 @@
 
 #include "uml2owfn-io.h"  // file input and output operations
 
-#include "pnapi.h"      // Petri Net support
+// include PN Api headers
+#include "pnapi/pnapi.h"
+#include "petrinet-workflow.h"
+
 #include "debug.h"		  // debugging help
 #include "options.h"
 #include "globals.h"
@@ -102,7 +124,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
   trace(TRACE_WARNINGS, "\ngenerating Petri net for " + process->getName()+ "\n");
 
   // Generates a petri net from the current process
-  ExtendedWorkflowNet *PN = new ExtendedWorkflowNet();   // get a new net
+  pnapi::ExtendedWorkflowNet *PN = new pnapi::ExtendedWorkflowNet();   // get a new net
   process->translateToNet(PN);
 
 #ifdef DEBUG
@@ -126,7 +148,8 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #ifdef DEBUG
     trace(TRACE_DEBUG, "  cut net\n");
 #endif
-    PN->cutByRoles();
+    //PN->cutByRoles();
+    cerr << "cutting by roles has been disabled in this version" << endl;
 
     if (!PN->isStructurallyCorrect()) {
       res |= RES_SKIPPED|RES_INCORR_STRUCTURE;
@@ -140,14 +163,14 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 
     // check net structure: free choice?
     trace(TRACE_DEBUG, "-> checking whether net is free-choice\n");
-    set<Node *> nonFC = PN->isFreeChoice();
+    set<pnapi::Node *> nonFC = PN->isFreeChoice();
 
     // see if the net contains nodes that violate the free-choice property
     if (!nonFC.empty()) {
       res |= RES_NOT_FREECHOICE;
       string witnessString = "";
-      for (set<Node*>::iterator n=nonFC.begin(); n!=nonFC.end(); n++) {
-        witnessString += " '"+(*n)->nodeFullName()+"'";
+      for (set<pnapi::Node*>::iterator n=nonFC.begin(); n!=nonFC.end(); n++) {
+        witnessString += " '"+(*n)->getName()+"'";
       }
       trace(TRACE_WARNINGS, " [INFO] process is not free-choice: transitions"+witnessString+" are not free-choice.\n");
     }
@@ -156,6 +179,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 #endif
 
     // create proper initial marking
+    trace(TRACE_DEBUG, "-> creating initial places\n");
     PN->soundness_initialPlaces();
 
     // set termination semantics that will be used for the analysis
@@ -193,9 +217,11 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 
   // start of checking properties and generating verification formulas and files
 #ifdef DEBUG
-  trace(TRACE_DEBUG, "-> checking whether net is connected\n");
+  trace(TRACE_DEBUG, "-> checking whether net is connected2\n");
 #endif
+  //cout << "a" << endl;
   if (options[O_ROLECUT] && !PN->isConnected()) {
+    //cout << "c" << endl;
     res |= RES_SKIPPED|RES_UNCONNECTED;
     trace(TRACE_WARNINGS, " [INFO] process is not connected.\n\n");
     // TODO: WARNING: the allocated net is not freed to avoid
@@ -203,18 +229,30 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     //delete PN;    // finish Petri net
     return res;   // do not translate in this case
   }
+  //cout << "d" << endl;
+#ifdef DEBUG
+  //cout << "d2" << endl;
+  //trace(TRACE_DEBUG, "-> done\n");
+  //cout << "d3" << endl;
+#endif
 
+  //cout << "d4" << endl;
   if (analysis[A_SOUNDNESS]) {
     // check net structure: alpha to omega?
 #ifdef DEBUG
-    trace(TRACE_DEBUG, "-> checking whether each node is on a path from alpha to omega\n");
+    //trace(TRACE_DEBUG, "-> checking whether each node is on a path from alpha to omega\n");
 #endif
-    Node* ll_node = NULL;
+    //cout << "e" << endl;
+    pnapi::Node* ll_node = NULL;
+    //cout << "f" << endl;
     ll_node = PN->isPathCovered();
+    //cout << "g" << endl;
     if (ll_node != NULL){
       res |= RES_NO_WF_STRUCTURE;
-      trace(TRACE_WARNINGS, " [INFO] process has no workflow-structure: node " + ll_node->nodeFullName() + " is not on alpha-omega path\n.");
+      //cout << "h" << endl;
+      trace(TRACE_WARNINGS, " [INFO] process has no workflow-structure: node " + ll_node->getName() + " is not on alpha-omega path\n.");
     }
+    //cout << "i" << endl;
 
     if (res != RES_OK) {
       // the net either is not a free-choice net or has no WF-structure,
@@ -250,7 +288,7 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     // check whether net reduction created an empty net
     if (PN->getInternalPlaces().size() == 0) {
       cerr << process->getName() << " retrying (reason: empty process)." << endl;
-      cerr << PN->information() << endl;
+      cerr << pnapi::io::stat << PN << endl;
       // TODO: WARNING: the allocated net is not freed to avoid
       //                a bug with the GCC under Linux and Cygwin
       //delete PN;    // finish Petri net

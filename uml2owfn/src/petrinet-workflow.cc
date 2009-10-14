@@ -1,19 +1,20 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -47,7 +48,6 @@
 
 #include "petrinet-workflow.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
-#include "pnapi.h"
 #include "debug.h"      // (trace)
 
 using std::stack;
@@ -56,6 +56,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 
+namespace pnapi {
 
 /******************************************************************************
  * Member methods on properties of extended workflow nets
@@ -65,17 +66,17 @@ set< Node* > ExtendedWorkflowNet::isFreeChoice() const {
 
 	set< Node* > resultSet;
 
-	for (set<Transition *>::iterator it = T.begin(); it != T.end(); it++)
+	for (set<Transition *>::iterator it = getTransitions().begin(); it != getTransitions().end(); it++)
 	{
 		set<Transition *>::iterator it2 = it; it2++;	// get next transition
-		for (; it2 != T.end(); it2++)
+		for (; it2 != getTransitions().end(); it2++)
 		{
 			Transition* t = static_cast<Transition*>(*it);
 			Transition* t2 = static_cast<Transition*>(*it2);
 
 			bool empty = true;
-			for (set<Node *>::iterator pre = t->preset.begin(); pre != t->preset.end(); pre++) {
-				if (t2->preset.find(*pre) != t2->preset.end()) {
+			for (set<Node *>::iterator pre = t->getPreset().begin(); pre != t->getPreset().end(); pre++) {
+				if (t2->getPreset().find(*pre) != t2->getPreset().end()) {
 					empty = false;	// intersection is non-empty
 				} else if (!empty) {
 					//cerr << "transitions " << t->nodeFullName() << " and " << t2->nodeFullName() << " are not free-choice" << endl;
@@ -92,38 +93,49 @@ set< Node* > ExtendedWorkflowNet::isFreeChoice() const {
 
 Node* ExtendedWorkflowNet::isPathCovered() const {
 
-	stack< Node* > searchStack;
-
-	set< Node* > fromAlpha;
+	//std::cout << "search alpha" << std::flush << endl;
 	Place* p = findPlace("alpha");
-	if (p == NULL) return false;
-	else searchStack.push(p);
+	//std::cout << "done" << std::flush << endl;
 
+	stack< Node* > searchStack;
+	if (p == NULL) return false;
+	else {
+	  //std::cout << "push" << std::flush << endl;
+	  searchStack.push(p);
+	}
+	//std::cout << "done" << endl;
+
+	//std::cout << "fromAlpha" << endl;
+	set< Node* > fromAlpha;
 	while (!searchStack.empty()) {
 		Node *n = searchStack.top(); searchStack.pop();
 		fromAlpha.insert(n);
 
-		for (set<Node *>::iterator n2 = n->postset.begin(); n2 != n->postset.end(); n2++) {
+		for (set<Node *>::const_iterator n2 = n->getPostset().begin(); n2 != n->getPostset().end(); n2++) {
 			// already seen in this search
 			if (fromAlpha.find(*n2) != fromAlpha.end())
 				continue;
 			searchStack.push(*n2);
 		}
 	}
+	//std::cout << "done" << endl;
 
-	set< Node* > fromAlphaToOmega;
-	for (set<Place *>::iterator n = P.begin(); n != P.end(); n++) {
-		string name = (*n)->nodeFullName();
+	//std::cout << "find omega" << endl;
+	for (set<Place *>::const_iterator n = getPlaces().begin(); n != getPlaces().end(); n++) {
+		string name = (*n)->getName();
 		if (name.find("omega", 0) != string::npos) {
 			searchStack.push(*n);
 		}
 	}
+	//std::cout << "find done" << endl;
 
+	//std::cout << "fromAlphaToOmega" << endl;
+	set< Node* > fromAlphaToOmega;
 	while (!searchStack.empty()) {
 		Node *n = searchStack.top(); searchStack.pop();
 		fromAlphaToOmega.insert(n);
 
-		for (set<Node *>::iterator n2 = n->preset.begin(); n2 != n->preset.end(); n2++) {
+		for (set<Node *>::const_iterator n2 = n->getPreset().begin(); n2 != n->getPreset().end(); n2++) {
 			// already seen in this search
 			if (fromAlphaToOmega.find(*n2) != fromAlphaToOmega.end())
 				continue;
@@ -135,53 +147,67 @@ Node* ExtendedWorkflowNet::isPathCovered() const {
 			searchStack.push(*n2);
 		}
 	}
+	//std::cout << "done" << endl;
 
-	for (set<Transition *>::iterator n = T.begin(); n != T.end(); n++) {
+	//std::cout << "find in fromAlphaToOmega: T" << endl;
+	for (set<Transition *>::const_iterator n = getTransitions().begin(); n != getTransitions().end(); n++) {
 		if (fromAlphaToOmega.find(*n) == fromAlphaToOmega.end()) {
 			//cerr << "wf-struct: transition " << (*n)->nodeFullName() << " is not on a path from alpha to omega" << endl;
 			return *n;
 		}
 	}
 
-	for (set<Place *>::iterator n = P.begin(); n != P.end(); n++) {
+	//std::cout << "find in fromAlphaToOmega: P" << endl;
+	for (set<Place *>::const_iterator n = getPlaces().begin(); n != getPlaces().end(); n++) {
 		if (fromAlphaToOmega.find(*n) == fromAlphaToOmega.end()) {
 			//cerr << "wf-struct: place " << (*n)->nodeFullName() << " is not on a path from alpha to omega" << endl;
 			return *n;
 		}
 	}
 
-	for (set<Place *>::iterator n = P_in.begin(); n != P_in.end(); n++) {
-		if (fromAlphaToOmega.find(*n) == fromAlphaToOmega.end()) {
-			//cerr << "wf-struct: input place " << (*n)->nodeFullName() << " is not on a path from alpha to omega" << endl;
-			return *n;
-		}
-	}
+	//std::cout << "done" << endl;
 
-	for (set<Place *>::iterator n = P_out.begin(); n != P_out.end(); n++) {
-		if (fromAlphaToOmega.find(*n) == fromAlphaToOmega.end()) {
-			//cerr << "wf-struct: output place " << (*n)->nodeFullName() << " is not on a path from alpha to omega" << endl;
-			return *n;
-		}
-	}
 	return NULL;
 }
 
+
+// #include <sstream>  // (std::ostringstream, std::istringstream)
+
 bool ExtendedWorkflowNet::isConnected() const {
+
   set<Node*> reachableNodes;
   stack<Node*> searchStack;
 
-  searchStack.push(*(P.begin()));
+#ifdef DEBUG
+  trace(TRACE_DEBUG, "---> init\n");
+#endif
+  searchStack.push(*(getInternalPlaces().begin()));
+#ifdef DEBUG
+  trace(TRACE_DEBUG, "---> 1\n");
+#endif
   while (!searchStack.empty()) {
     Node *n = searchStack.top(); searchStack.pop();
     reachableNodes.insert(n);
 
-    for (set<Node *>::iterator n2 = n->preset.begin(); n2 != n->preset.end(); n2++) {
+#ifdef DEBUG
+    //std::ostringstream buffer;
+    //buffer << "---> " << n << " pre\n";
+    //trace(TRACE_DEBUG, buffer.str());
+#endif
+
+    for (set<Node *>::iterator n2 = n->getPreset().begin(); n2 != n->getPreset().end(); n2++) {
       // already seen in this search
       if (reachableNodes.find(*n2) != reachableNodes.end())
         continue;
       searchStack.push(*n2);
     }
-    for (set<Node *>::iterator n2 = n->postset.begin(); n2 != n->postset.end(); n2++) {
+
+#ifdef DEBUG
+    //std::ostringstream buffer2;
+    //buffer2 << "---> " << n << " post\n";
+    //trace(TRACE_DEBUG, buffer2.str());
+#endif
+    for (set<Node *>::iterator n2 = n->getPostset().begin(); n2 != n->getPostset().end(); n2++) {
       // already seen in this search
       if (reachableNodes.find(*n2) != reachableNodes.end())
         continue;
@@ -189,7 +215,11 @@ bool ExtendedWorkflowNet::isConnected() const {
     }
   }
 
-  int totalNodeNum = P.size() + P_in.size() + P_out.size() + T.size();
+#ifdef DEBUG
+  trace(TRACE_DEBUG, "---> done\n");
+#endif
+
+  int totalNodeNum = getPlaces().size() + getTransitions().size();
   return (totalNodeNum == reachableNodes.size());
 }
 
@@ -206,32 +236,41 @@ bool ExtendedWorkflowNet::isStructurallyCorrect() const {
  * \result  size of the input interface
  */
 int ExtendedWorkflowNet::inputSize() const {
-  return P_in.size();
+  return getInputPlaces().size();
 }
 
 /*!
  * \result  size of the output interface
  */
 int ExtendedWorkflowNet::outputSize() const {
-  return P_out.size();
+  return getOutputPlaces().size();
 }
 
-/**
- * \brief anonymize the roles of all nodes of the net by making the id of
- *        each node its first role
+/*!
+ * \brief anonymize the roles of all nodes of the net
  */
 void ExtendedWorkflowNet::anonymizeNodes() {
   int currentId = 1;
 
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*p)->history.push_front("p"+toString((*p)->id));
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-    (*p)->history.push_front("p"+toString((*p)->id));
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-    (*p)->history.push_front("p"+toString((*p)->id));
+  for (set<Place *>::iterator p = getPlaces().begin(); p != getPlaces().end(); p++)
+    (*p)->setName("p"+toString(++currentId));
 
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*t)->history.push_front("t"+toString((*t)->id));
+  for (set<Transition *>::iterator t = getTransitions().begin(); t != getTransitions().end(); t++)
+    (*t)->setName("t"+toString(++currentId));
+}
+
+/*!
+ *
+ */
+void ExtendedWorkflowNet::toLoLAIdent() {
+  for (set<Place *>::iterator p = getPlaces().begin(); p != getPlaces().end(); p++) {
+    (*p)->setName(toLoLAident((*p)->getName()));
+  }
+
+  for (set<Transition *>::iterator t = getTransitions().begin(); t != getTransitions().end(); t++) {
+    (*t)->setName(toLoLAident((*t)->getName()));
+  }
+
 }
 
 /******************************************************************************
@@ -255,28 +294,29 @@ void ExtendedWorkflowNet::anonymizeNodes() {
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
 */
-void ExtendedWorkflowNet::reduce_series_places()
+
+int ExtendedWorkflowNet::reduce_series_places()
 {
   int result=0;
   trace(TRACE_DEBUG, "[PN]\tApplying rule RA1(k) (fusion of series places preserving k-boundedness)...\n");
 
-  set<string> uselessTransitions;
+  set<Transition *> uselessTransitions;
   set<pair<string, string> > placePairs;
   ////<Dirk.F> preserve (un)safeness of nets, 1 line
   set<Place *> touched;
 
-  // iterate the transtions
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
+  // iterate the transitions
+  for (set<Transition*>::iterator t = getTransitions().begin(); t != getTransitions().end(); t++)
   {
-    Place* prePlace = static_cast<Place*>(*((*t)->preset.begin()));
-    Place* postPlace = static_cast<Place*>(*((*t)->postset.begin()));
+    Place* prePlace = static_cast<Place*>(*((*t)->getPreset().begin()));
+    Place* postPlace = static_cast<Place*>(*((*t)->getPostset().begin()));
 
-    if (((*t)->preset.size() == 1) && ((*t)->postset.size() == 1) && // precondition 1
+    if (((*t)->getPreset().size() == 1) && ((*t)->getPostset().size() == 1) && // precondition 1
         (prePlace != postPlace) &&       // precondition 2
-        ((prePlace)->postset.size() == 1) &&     // precondition 3
-        (prePlace->type == INTERNAL) &&      // precondition 4
-        (postPlace->type == INTERNAL) &&
-        (arc_weight(prePlace, *t) == 1 && arc_weight(*t, postPlace) == 1)) // precondition 5
+        ((prePlace)->getPostset().size() == 1) &&     // precondition 3
+        (prePlace->getType() == Node::INTERNAL) &&      // precondition 4
+        (postPlace->getType() == Node::INTERNAL) &&
+        (findArc(*prePlace, **t)->getWeight() == 1 && findArc(**t, *postPlace)->getWeight() == 1)) // precondition 5
     {
       ////<Dirk.F> start, preserve (un)safeness of nets, 25 lines
       if (touched.find(prePlace) != touched.end())
@@ -288,8 +328,8 @@ void ExtendedWorkflowNet::reduce_series_places()
       // if not then their fusion either changes the number of produces tokens or the
       // number of consumed tokens
       bool disjoint = true;
-      for (set<Node*>::iterator t2 = prePlace->postset.begin(); t2 != prePlace->postset.end(); t2++) {
-        if (postPlace->postset.find(*t2) != postPlace->postset.end()) {
+      for (set<Node*>::iterator t2 = prePlace->getPostset().begin(); t2 != prePlace->getPostset().end(); t2++) {
+        if (postPlace->getPostset().find(*t2) != postPlace->getPostset().end()) {
           disjoint = false; break;
         }
       }
@@ -297,8 +337,8 @@ void ExtendedWorkflowNet::reduce_series_places()
         continue;
 
       disjoint = true;
-      for (set<Node*>::iterator t2 = prePlace->preset.begin(); t2 != prePlace->preset.end(); t2++) {
-        if (postPlace->preset.find(*t2) != postPlace->preset.end()) {
+      for (set<Node*>::iterator t2 = prePlace->getPreset().begin(); t2 != prePlace->getPreset().end(); t2++) {
+        if (postPlace->getPreset().find(*t2) != postPlace->getPreset().end()) {
           disjoint = false; break;
         }
       }
@@ -306,10 +346,8 @@ void ExtendedWorkflowNet::reduce_series_places()
         continue;
       ////<Dirk.F> end, preserve (un)safeness of nets
 
-      string id1 = ((*((*t)->preset.begin()))->nodeFullName());
-      string id2 = ((*((*t)->postset.begin()))->nodeFullName());
-      placePairs.insert(pair<string, string>(id1, id2));
-      uselessTransitions.insert(((*t)->nodeFullName()));
+      placePairs.insert(pair<string, string>(prePlace->getName(), postPlace->getName()));
+      uselessTransitions.insert(*t);
       ////<Dirk.F> start, preserve (un)safeness of nets, 2 lines
       touched.insert(prePlace);
       touched.insert(postPlace);
@@ -318,28 +356,118 @@ void ExtendedWorkflowNet::reduce_series_places()
   }
 
   // remove useless transtions
-  for (set<string>::iterator label = uselessTransitions.begin();
-       label != uselessTransitions.end(); label++)
+  for (set<Transition *>::iterator t = uselessTransitions.begin();
+       t != uselessTransitions.end(); t++)
   {
-    trace(TRACE_DEBUG, "trying to remove "+(*label));
-    Transition* uselessTransition = findTransition(*label);
-    if (uselessTransition != NULL) {
-      removeTransition(uselessTransition);
-      trace(TRACE_DEBUG, " done");
-    }
-    trace(TRACE_DEBUG, "\n");
+    trace(TRACE_DEBUG, "trying to remove "+(*t)->getName());
+    deleteTransition(**t);
+    trace(TRACE_DEBUG, " done\n");
   }
 
-  // merge place pairs
-  for (set<pair<string, string> >::iterator placePair = placePairs.begin();
-       placePair != placePairs.end(); placePair++)
+  // merge the found places
+  for (set<pair<string, string> >::iterator labels = placePairs.begin();
+       labels != placePairs.end(); labels++)
   {
-    mergePlaces(placePair->first, placePair->second);
+    Place* p1 = findPlace(labels->first);
+    Place* p2 = findPlace(labels->second);
+    if (p1 == NULL || p2 == NULL) continue;   // place no longer present (previous merge)
+    mergePlaces(p1, p2);
     result++;
   }
   if (result!=0)
     trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+
+  return result;
 }
+
+/*!
+ * \brief   Returns true only if the given node's incoming and outgoing arcs
+ *          all have the same weight.
+ *
+ * \param   n  node to be examined
+ *
+ * \pre     n != NULL
+ */
+bool ExtendedWorkflowNet::sameweights(Node *n) const {
+  assert(n != NULL);
+  bool first = true;
+  unsigned int w = 0;
+
+  for (set<Arc*>::iterator f = getArcs().begin(); f != getArcs().end(); f++) {
+    if ((&(*f)->getSourceNode() == n) || (&(*f)->getTargetNode() == n) )
+      if (first) {
+        first=false;
+        w = (*f)->getWeight();
+      } else {
+        if ( (*f)->getWeight() != w)
+          return false;
+      }
+  }
+  return true;
+}
+
+
+
+/*!
+ * \brief Elimination of identical places (RB1):
+ *
+ * If there exist two distinct (precondition 1) places with identical preset
+ * (precondition 2) and postset (precondition 3) and the weights of all incoming
+ * and outgoing arcs have the same value (precondition 4), then they can be merged.
+ *
+ * \todo
+ *       - Overwork the preconditions and postconditions.
+ *       - Re-organize the storing and removing of nodes.
+ */
+int ExtendedWorkflowNet::reduce_identical_places()
+{
+  int result=0;
+  set<pair<string, string> > placePairs;
+
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
+
+  // iterate the places
+  for (set<Place*>::iterator p1 = getInternalPlaces().begin(); p1 != getInternalPlaces().end(); p1++)
+  {
+    if (((*p1)->getPreset().empty()) || ((*p1)->getPostset().empty()) || !(sameweights(*p1)))
+      continue;
+
+    for (set<Node*>:: iterator preTransition = (*p1)->getPreset().begin(); preTransition != (*p1)->getPreset().end(); preTransition++)
+    {
+      for (set<Node*>::iterator p2 = (*preTransition)->getPostset().begin(); p2 != (*preTransition)->getPostset().end(); p2++)
+        if ((*p1 != *p2) &&   // precondition 1
+            ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
+            ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
+            (sameweights(*p2)) && // precondition 4
+            (findArc(**preTransition, **p1)->getWeight() == findArc(**p2, (**((*p1)->getPostset().begin())))->getWeight()) ) // precondition 4
+        {
+          string id1 = ((*p1)->getName());
+          string id2 = ((*p2)->getName());
+          placePairs.insert(pair<string, string>(id1, id2));
+        }
+    }
+  }
+
+  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(placePairs.size()) + " places with same preset and postset...\n");
+
+  // merge the found places
+  for (set<pair<string, string> >::iterator labels = placePairs.begin();
+       labels != placePairs.end(); labels++)
+  {
+    Place* p1 = findPlace(labels->first);
+    Place* p2 = findPlace(labels->second);
+    if (p1 == NULL || p2 == NULL) continue;   // place no longer present (previous merge)
+
+    mergePlaces(p1, p2);
+    result++;
+  }
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
+
+  return result;
+}
+
+
 
 /*!
  * \brief Fusion of series transition (RA2):
@@ -357,23 +485,24 @@ void ExtendedWorkflowNet::reduce_series_places()
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
  */
-void ExtendedWorkflowNet::reduce_series_transitions()
+
+int ExtendedWorkflowNet::reduce_series_transitions()
 {
   trace(TRACE_DEBUG, "[PN]\tApplying rule RA2(k) (fusion of series transitions preserving k-boundedness)...\n");
   int result=0;
 
-  set<string> uselessPlaces;
+  set<Place *> uselessPlaces;
   set<pair<string, string> > transitionPairs;
   ////<Dirk.F> preserve (un)safeness of nets, 1 line
   set<Transition *> touched;
 
   // iterate the places
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place*>::iterator p = getInternalPlaces().begin(); p != getInternalPlaces().end(); p++)
   {
-    if (((*p)->postset.size() == 1) && ((*p)->preset.size() == 1)) // precondition 1
+    if (((*p)->getPostset().size() == 1) && ((*p)->getPreset().size() == 1)) // precondition 1
     {
-      Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
-      Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
+      Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
+      Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
 
       ////<Dirk.F> start, preserve (un)safeness of nets, 24 lines
       if (touched.find(t1) != touched.end())
@@ -383,8 +512,8 @@ void ExtendedWorkflowNet::reduce_series_transitions()
 
       // check whether t1 and t2 have disjoint post-sets and disjoint pre-sets
       bool disjoint = true;
-      for (set<Node*>::iterator p2 = t1->postset.begin(); p2 != t1->postset.end(); p2++) {
-        if (t2->postset.find(*p2) != t2->postset.end()) {
+      for (set<Node*>::iterator p2 = t1->getPostset().begin(); p2 != t1->getPostset().end(); p2++) {
+        if (t2->getPostset().find(*p2) != t2->getPostset().end()) {
           disjoint = false; break;
         }
       }
@@ -392,8 +521,8 @@ void ExtendedWorkflowNet::reduce_series_transitions()
         continue;
 
       disjoint = true;
-      for (set<Node*>::iterator p2 = t1->preset.begin(); p2 != t1->preset.end(); p2++) {
-        if (t2->preset.find(*p2) != t2->preset.end()) {
+      for (set<Node*>::iterator p2 = t1->getPreset().begin(); p2 != t1->getPreset().end(); p2++) {
+        if (t2->getPreset().find(*p2) != t2->getPreset().end()) {
           disjoint = false; break;
         }
       }
@@ -401,13 +530,11 @@ void ExtendedWorkflowNet::reduce_series_transitions()
         continue;
       ////<Dirk.F> end, preserve (un)safeness of nets
 
-      if (((t2)->preset.size() == 1) && // precondition 2
-          (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
+      if (((t2)->getPreset().size() == 1) && // precondition 2
+          (findArc(*t1, **p)->getWeight() == findArc(**p, *t2)->getWeight())) // precondition 5
       {
-        string id1 = (t1->nodeFullName());
-        string id2 = (t2->nodeFullName());
-        transitionPairs.insert(pair<string, string>(id1, id2));
-        uselessPlaces.insert(((*p)->nodeFullName()));
+        transitionPairs.insert(pair<string, string>(t1->getName(), t2->getName()));
+        uselessPlaces.insert(*p);
         ////<Dirk.F> start, preserve (un)safeness of nets, 2 lines
         touched.insert(t1);
         touched.insert(t2);
@@ -418,11 +545,10 @@ void ExtendedWorkflowNet::reduce_series_transitions()
 
 
   // remove useless places
-  for (set<string>::iterator label = uselessPlaces.begin();
-       label != uselessPlaces.end(); label++)
+  for (set<Place*>::iterator p = uselessPlaces.begin();
+       p != uselessPlaces.end(); p++)
   {
-    Place *uselessPlace = findPlace(*label);
-    removePlace(uselessPlace);
+    deletePlace(**p);
   }
 
 
@@ -432,11 +558,14 @@ void ExtendedWorkflowNet::reduce_series_transitions()
   {
     Transition* t1 = findTransition(transitionPair->first);
     Transition* t2 = findTransition(transitionPair->second);
+    if (t1 == NULL || t2 == NULL) continue;   // transition no longer present (previous merge)
     mergeTransitions(t1, t2);
     result++;
   }
   if (result!=0)
     trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
+
+  return result;
 }
 
 /*!
@@ -459,66 +588,66 @@ void ExtendedWorkflowNet::reduce_series_transitions()
  *       - Pass a parameter to this function to choose the property of the
  *         model to be preserved.
  */
+
 unsigned int ExtendedWorkflowNet::reduce(unsigned int reduction_level)
 {
-  trace(TRACE_DEBUG, "[PN]\tWorkflow size before simplification: " + information() + "\n");
+  //trace(TRACE_DEBUG, "[PN]\tWorkflow size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying workflow...\n");
 
-  string old = information();
   bool done = false;
   unsigned int passes = 1;
 
+  int result;
+
   while (!done)
   {
+    result = 0;
+
     if (reduction_level >= 1)
     {
       //reduce_dead_nodes();
-      reduce_series_places();   // RA1
+      result += reduce_series_places();   // RA1
     }
-    /*
-    if (reduction_level >= 2)
-    {
-      reduce_unused_status_places();
-      reduce_suspicious_transitions();
-    }
-    */
+//    if (reduction_level >= 2)
+//    {
+//      reduce_unused_status_places();
+//      reduce_suspicious_transitions();
+//    }
     if (reduction_level >= 3)
     {
-      reduce_identical_places();  // RB1
-      //reduce_identical_transitions(); // RB2
+      result += reduce_identical_places();  // RB1
+      //reduce_identical_transitions();   // RB2
     }
-    /*
-    if (reduction_level >= 4)
-    {
-      reduce_series_places();   // RA1
-      reduce_series_transitions();  // RA2
-    }
+//    if (reduction_level >= 4)
+//    {
+//      reduce_series_places();   // RA1
+//      reduce_series_transitions();  // RA2
+//    }
+//
+//    if (reduction_level == 5)
+//    {
+//      reduce_self_loop_places();  // RC1
+//      reduce_self_loop_transitions(); // RC2
+//      reduce_remove_initially_marked_places_in_choreographies();
+//    }
+//
+//    if (reduction_level == 6)
+//    {
+//      reduce_equal_places();    // RD1
+//    }
 
-    if (reduction_level == 5)
-    {
-      reduce_self_loop_places();  // RC1
-      reduce_self_loop_transitions(); // RC2
-      reduce_remove_initially_marked_places_in_choreographies();
-    }
+    //trace(TRACE_DEBUG, "[PN]\tWorkflow size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 
-    if (reduction_level == 6)
-    {
-      reduce_equal_places();    // RD1
-    }
-    */
-
-    trace(TRACE_DEBUG, "[PN]\tWorkflow size after simplification pass " + toString(passes++) + ": " + information() + "\n");
-
-    done = (old == information());
-    old = information();
+    done = (result == 0);
   }
 
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
-  trace(TRACE_DEBUG, "[PN]\tWorkflow size after simplification: " + information() + "\n");
+  //trace(TRACE_DEBUG, "[PN]\tWorkflow size after simplification: " + information() + "\n");
 
   return passes;
 }
+
 
 /*!
  * \brief   merge the given two places of the net, extends the standard
@@ -598,9 +727,19 @@ Place* ExtendedWorkflowNet::mergePlaces(Place * & p1, Place * & p2) {
     isInputCriterionUsed = true;
   }
 
-  //cerr << "merging " << p1->id << " and " << p2->id << endl;
+  // final places
+  bool isOmega = false;
+  if (omegaPlaces.find(p1) != omegaPlaces.end()) {
+    omegaPlaces.erase(p1);
+    isOmega = true;
+  }
+  if (omegaPlaces.find(p2) != omegaPlaces.end()) {
+    omegaPlaces.erase(p2);
+    isOmega = true;
+  }
 
-  Place* result = PetriNet::mergePlaces(p1,p2);
+  p1->merge(*p2, false, false);
+  Place* result = p1;
 
   if (isPin)
     pinPlaces.insert(result);
@@ -614,19 +753,18 @@ Place* ExtendedWorkflowNet::mergePlaces(Place * & p1, Place * & p2) {
     process_stopNodes.insert(result);
   if (isInputCriterionUsed)
     process_inputCriterion_used.insert(result);
+  if (isOmega)
+    omegaPlaces.insert(result);
 
   return result;
-}
-
-Place* ExtendedWorkflowNet::mergePlaces(string role1, string role2) {
-  PetriNet::mergePlaces(role1,role2);
 }
 
 /*!
  * \brief   remove the given place from the net and update all sets of places
  *          of the workflow net
  */
-void ExtendedWorkflowNet::removePlace(Place* p) {
+void ExtendedWorkflowNet::deletePlace(Place & place) {
+  Place *p = &place;
   if (pinPlaces.find(p) != pinPlaces.end())
     pinPlaces.erase(p);
   if (process_startNodes.find(p) != process_startNodes.end())
@@ -639,8 +777,10 @@ void ExtendedWorkflowNet::removePlace(Place* p) {
     process_internalPlaces.erase(p);
   if (process_inputCriterion_used.find(p) != process_inputCriterion_used.end())
     process_inputCriterion_used.erase(p);
+  if (omegaPlaces.find(p) != omegaPlaces.end())
+    omegaPlaces.erase(p);
 
-  PetriNet::removePlace(p);
+  PetriNet::deletePlace(place);
 }
 
 
@@ -680,7 +820,8 @@ Transition* ExtendedWorkflowNet::mergeTransitions(Transition * & t1, Transition 
 
   //cerr << "merging " << t1->id << " and " << t2->id << endl;
 
-  Transition* result = PetriNet::mergeTransitions(t1,t2);
+  t1->merge(*t2, false);
+  Transition* result = t1;
 
   if (isInputPinset)
     process_inputPinSets.insert(result);
@@ -695,17 +836,15 @@ Transition* ExtendedWorkflowNet::mergeTransitions(Transition * & t1, Transition 
  * \brief   remove the given place from the net and update all sets of places
  *          of the workflow net
  */
-void ExtendedWorkflowNet::removeTransition(Transition* t) {
-  process_inputPinSets.erase(t);
-  process_outputPinSets.erase(t);
+void ExtendedWorkflowNet::deleteTransition(Transition & t) {
+  process_inputPinSets.erase(&t);
+  process_outputPinSets.erase(&t);
 
-  PetriNet::removeTransition(t);
+  PetriNet::deleteTransition(t);
 }
 
 /*!
  * \brief remove places representing unconnected pins from the net
- *
- * \param PN  the net to be modified
  */
 void ExtendedWorkflowNet::removeUnconnectedPins() {
 
@@ -721,21 +860,21 @@ void ExtendedWorkflowNet::removeUnconnectedPins() {
       Place* p = static_cast<Place*>(*it);
 
       // if the place has an empty pre-set or post-set, remove it
-      if (preset(p).empty() || postset(p).empty())
+      if (p->getPreset().empty() || p->getPostset().empty())
         to_remove.insert(p);
     }
 
     // finally remove all gathered nodes
     for (set< Place * >::iterator place = to_remove.begin(); place != to_remove.end(); place ++) {
 
-        if (!(*place)->postset.empty()) {
+        if (!(*place)->getPostset().empty()) {
           // we are going to delete a place,
           // its post-transitions may become unbounded
-          maybeUnbounded.insert((*place)->postset.begin(), (*place)->postset.end());
+          maybeUnbounded.insert((*place)->getPostset().begin(), (*place)->getPostset().end());
         }
 
         //cerr << "Removing Place: " << (*place)->nodeFullName() << "\n";
-        removePlace(*place);
+        deletePlace(**place);
         // remove place from BOM process structure as well
         process_internalPlaces.erase(*place);
         pinPlaces.erase(*place);
@@ -745,8 +884,8 @@ void ExtendedWorkflowNet::removeUnconnectedPins() {
     // remove transitions that become unbounded because of removing
     // an unconnected pin
     for (set< Node * >::iterator t = maybeUnbounded.begin(); t != maybeUnbounded.end(); t++) {
-        if ((*t)->preset.empty())
-          removeTransition(static_cast<Transition*>(*t));
+        if ((*t)->getPreset().empty())
+          deleteTransition(*static_cast<Transition*>(*t));
     }
     // keep removing until no more unconnected pins are removed
   } while (changed);
@@ -759,11 +898,10 @@ void ExtendedWorkflowNet::removeUnconnectedPins() {
 void ExtendedWorkflowNet::soundness_initialPlaces() {
 
   // create new initially marked alpha-place
-  Place* pAlpha = newPlace("alpha", INTERNAL);
-  pAlpha->mark();
+  Place &pAlpha = createPlace("alpha");
+  pAlpha.mark();
 
   set<Place*> removeNodes;
-  set<Node*> noMoreInput;
   unsigned int setNum = 1;
 
   // create an activating transition for each input pinset of the process
@@ -771,16 +909,15 @@ void ExtendedWorkflowNet::soundness_initialPlaces() {
   {
     // the transition of the input pinset
     Transition* pinset_transition = static_cast<Transition *>(*inPS);
-    set<Node *> inputPins = preset(pinset_transition);  // and the input pins
+    set<Node *> inputPins = pinset_transition->getPreset();  // and the input pins
 
     if (inputPins.size() == 0)  // if the pinset has no transition (process without data input)
     {
-      newArc(pAlpha, pinset_transition);  // add new arc to the pinset transition
+      createArc(pAlpha, *pinset_transition);  // add new arc to the pinset transition
       continue;
     }
 
-    newArc(pAlpha, pinset_transition);
-    noMoreInput.insert(pinset_transition);
+    createArc(pAlpha, *pinset_transition);
 
     for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
     {
@@ -794,12 +931,7 @@ void ExtendedWorkflowNet::soundness_initialPlaces() {
   // remove all chosen places
   for (set<Place*>::iterator p = removeNodes.begin(); p != removeNodes.end(); p++) {
     //cerr << "removing place " << (*p)->nodeFullName() << endl;
-      removePlace(*p);
-  }
-  // make all post-transitions that had an input-place internal transitions
-  for (set<Node*>::iterator t = noMoreInput.begin(); t != noMoreInput.end(); t++) {
-    //cerr << "making transition " << (*t)->nodeFullName() << " internal" << endl;
-      (*t)->type = INTERNAL;
+      deletePlace(**p);
   }
 }
 
@@ -846,22 +978,14 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
 {
   set<Place*>      places_to_remove;
   set<Transition*> transitions_to_remove;
-  set<Node*>       noMoreOutput;
-  set<Place*>      omegaPlaces;      // set of new omega places
 
   // make all final places (as found in the final marking) non-final
-  set<Place *>  finalPlaces = getFinalPlaces();
-  for (set<Place *>::iterator place = finalPlaces.begin(); place != finalPlaces.end(); place ++)
-  {
-    (*place)->isFinal = false;
-      // possible extension: introduce omega-place as unqiue final place
-  }
+  omegaPlaces.clear();
 
   // preparation for termination semantics #1 ("standard")
   if (termination == TERM_UML_STANDARD) { // in case of an OR-join: add unique omega-place
-    Place *omega = newPlace("omega");
-    omega->isFinal = true,
-    omegaPlaces.insert(omega);
+    Place &omega = createPlace("omega");
+    omegaPlaces.insert(&omega);
   }
 
   // preparation for termination semantics #4 ("OR-join")
@@ -871,7 +995,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
     for (set<Place*>::iterator p = process_inputCriterion_used.begin(); p != process_inputCriterion_used.end(); p++)
       places_to_remove.insert(*p);
     for (set<Place*>::iterator p = places_to_remove.begin(); p != places_to_remove.end(); p++)
-      removePlace(*p);
+      deletePlace(**p);
     places_to_remove.clear();
   }
 
@@ -884,14 +1008,12 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
   for (set<Transition *>::iterator outPS = process_outputPinSets.begin(); outPS != process_outputPinSets.end(); outPS++)
   {
     // remove the outer data-flow output places
-    set<Node *> outputPins = (*outPS)->postset; // and the output pins
+    set<Node *> outputPins = (*outPS)->getPostset(); // and the output pins
     for (set<Node *>::iterator it = outputPins.begin(); it != outputPins.end(); it++)
     {
       Place* place = static_cast<Place*>(*it);
       places_to_remove.insert(place);
     }
-    // the output pinset transition is not an output transition anymore
-    noMoreOutput.insert((*outPS));
 
     // now extend the output pinset transition according to the termination
     // semantics
@@ -901,16 +1023,15 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
 
       // keep pinsets: create omega post-place of the pinset-transition,
       // and add a live-locking loop if necessary
-      Place* outputPlace = newPlace((*outPS)->nodeFullName() + "_omega");
-      newArc((*outPS), outputPlace);
-      outputPlace->isFinal = true;      // make it a final place
-
-      omegaPlaces.insert(outputPlace);  // is one of the new final places
+      Place& outputPlace = createPlace((*outPS)->getName() + "_omega");
+      createArc((**outPS), outputPlace);
+      // make it a final place
+      omegaPlaces.insert(&outputPlace);  // is one of the new final places
 
       if (liveLocks) {  // introduce live-lock at omega-place
-        Transition* tLoop = newTransition(outputPlace->nodeFullName() + ".loop");
-        newArc(outputPlace, tLoop, STANDARD, 1);
-        newArc(tLoop, outputPlace, STANDARD, 1);
+        Transition& tLoop = createTransition(outputPlace.getName() + ".loop");
+        createArc(outputPlace, tLoop);
+        createArc(tLoop, outputPlace);
       }
 
     } else if (termination == TERM_IGNORE_DATA) {
@@ -919,16 +1040,16 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
       // do not keep pinsets: remove pinset transition
       transitions_to_remove.insert(*outPS);
       // and add a token consuming transition to each pre-place
-      set<Node *> inputPins = (*outPS)->preset;
+      set<Node *> inputPins = (*outPS)->getPreset();
       for (set<Node *>::iterator it = inputPins.begin(); it != inputPins.end(); it++)
       {
         Place* place = static_cast<Place*>(*it);
 
-        string tConsume_str = place->nodeFullName()+"_consume";
+        string tConsume_str = place->getName()+"_consume";
         // check whether transition already exists (overlapping pinsets)
         if (!findTransition(tConsume_str)) {
-          Transition* tConsume = newTransition(tConsume_str);
-          newArc(place, tConsume);
+          Transition& tConsume = createTransition(tConsume_str);
+          createArc(*place, tConsume);
           // adding live-locks is not necessary
         }
       }
@@ -937,13 +1058,13 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
       // semantics #1 ("standard")
 
       // add an arc producing a token on omega
-      Place* omega = *omegaPlaces.begin();
-      newArc(*outPS, omega, STANDARD, 1);
+      Place* omega = *(omegaPlaces.begin());
+      createArc(**outPS, *omega);
 
     } else if (termination == TERM_ORJOIN) {
 
       // see if the pinset has any data pins at all
-      if ((*outPS)->preset.empty()) {
+      if ((*outPS)->getPreset().empty()) {
         // empty output pinset, this output transition is isolated, remove it
         Transition* t = static_cast<Transition*>(*outPS);
         // DO NOT ADD t FOR REMOVAL HERE, REMOVAL IS PERFORMED
@@ -953,9 +1074,10 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         // keep pinsets: create omega post-place of the pinset-transition,
         // marking this place indicates that the process terminated via this
         // (data) output pinset
-        Place* outputPlace = newPlace((*outPS)->nodeFullName() + "_omega");
-        newArc((*outPS), outputPlace);
-        outputPlace->isFinal = true;      // make it a final place
+        Place& outputPlace = createPlace((*outPS)->getName() + "_omega");
+        createArc((**outPS), outputPlace);
+        // make it a final place
+        omegaPlaces.insert(&outputPlace);
       }
     }
   }
@@ -992,7 +1114,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         // termination semantics #2 ("workflow net")
 
         // remove post-transition ".eat" of end place p
-        Transition* t = static_cast<Transition*>(*(postset(p).begin()));
+        Transition* t = static_cast<Transition*>(*(p->getPostset().begin()));
         transitions_to_remove.insert(t);
 
         // try to create a workflow net: each output pinset has its own
@@ -1001,16 +1123,16 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         for (set<Transition *>::iterator outPS = process_outputPinSets.begin();
              outPS != process_outputPinSets.end(); outPS++)
         {
-          newArc(p, (*outPS));
+          createArc(*p, (**outPS));
         }
 
       } else if (termination == TERM_ORJOIN) {
         // each endNode is a final place, marking this place means that
         // the process terminated via this endNode
-        p->isFinal = true;
+        omegaPlaces.insert(p);
 
         // remove post-transition ".eat" of end place p
-        Transition* t = static_cast<Transition*>(*(postset(p).begin()));
+        Transition* t = static_cast<Transition*>(*(p->getPostset().begin()));
         transitions_to_remove.insert(t);
       }
 
@@ -1025,7 +1147,7 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         // termination semantics #2 ("workflow net")
 
         // remove post-transition ".eat" of end place p
-        Transition* t = static_cast<Transition*>(*(postset(p).begin()));
+        Transition* t = static_cast<Transition*>(*(p->getPostset().begin()));
         transitions_to_remove.insert(t);
       }
 
@@ -1035,10 +1157,10 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
         if (termination == TERM_ORJOIN) {
           // each stopNode is a final place, marking this place means that
           // the process terminated via this stopNode
-          p->isFinal = true;
+          omegaPlaces.insert(p);
 
           // remove post-transition ".eat" of stop place p
-          Transition* t = static_cast<Transition*>(*(postset(p).begin()));
+          Transition* t = static_cast<Transition*>(*(p->getPostset().begin()));
           transitions_to_remove.insert(t);
         }
 
@@ -1053,17 +1175,17 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
           for (set<Transition *>::iterator outPS = process_outputPinSets.begin();
                outPS != process_outputPinSets.end(); outPS++)
           {
-            newArc(p, (*outPS));
+            createArc(*p, (**outPS));
           }
         }
 
         else if (termination == TERM_ORJOIN) {
           // each endNode is a final place, marking this place means that
           // the process terminated via this endNode
-          p->isFinal = true;
+          omegaPlaces.insert(p);
 
           // remove post-transition ".eat" of end place p
-          Transition* t = static_cast<Transition*>(*(postset(p).begin()));
+          Transition* t = static_cast<Transition*>(*(p->getPostset().begin()));
           transitions_to_remove.insert(t);
         }
       }
@@ -1073,33 +1195,29 @@ void ExtendedWorkflowNet::soundness_terminalPlaces(bool liveLocks, bool stopNode
     // a workflow net may have only one omega place, create it here
     if (termination == TERM_WORKFLOW) {
       // termination semenatics #2 ("workflow net")
-      Place* processOmega = newPlace("omega");
+      Place& processOmega = createPlace("omega");
       for (set<Place *>::iterator omega = omegaPlaces.begin();
                     omega != omegaPlaces.end(); omega++)
       {
-        Transition* tOmega = newTransition((*omega)->nodeFullName() + ".finish");
-        newArc(*omega, tOmega);
-        newArc(tOmega, processOmega);
-        (*omega)->isFinal = false;  // local omega is no longer a final place
+        Transition& tOmega = createTransition((*omega)->getName() + ".finish");
+        createArc(**omega, tOmega);
+        createArc(tOmega, processOmega);
+        //(*omega)->isFinal = false;  // local omega is no longer a final place
       }
-      processOmega->isFinal = true; // is the only final place in the process
+      // is the only final place in the process
+      omegaPlaces.insert(&processOmega);
     }
   } // end: connect end/stop nodes with pinsets
 
   // finally clean up the net from the nodes which we remembered for removal
   // remove the old interface output places
   for (set<Place*>::iterator p = places_to_remove.begin(); p != places_to_remove.end(); p++) {
-      removePlace(*p);
+      deletePlace(**p);
   }
 
   // remove transitions, e.g. "endNode.eat"
   for (set<Transition*>::iterator t = transitions_to_remove.begin(); t != transitions_to_remove.end(); t++) {
-      removeTransition(*t);
-  }
-
-  // make all pre-transitions of former output places internal
-  for (set<Node*>::iterator t = noMoreOutput.begin(); t != noMoreOutput.end(); t++) {
-      (*t)->type = INTERNAL;
+    deleteTransition(**t);
   }
 
   // clean up the net, this code must be executed here until the
@@ -1123,14 +1241,14 @@ void ExtendedWorkflowNet::deleteIsolatedPinsetTransitions() {
     Transition* t = static_cast<Transition*>(*outPS);
 
     // see if the transition is isolated
-    if (t->preset.empty() && t->postset.empty()) {
+    if (t->getPreset().empty() && t->getPostset().empty()) {
       transitions_to_remove.insert(t);
     }
   }
 
   // remove all isolated transitions
   for (set<Transition*>::iterator t = transitions_to_remove.begin(); t != transitions_to_remove.end(); t++) {
-      removeTransition(*t);
+      deleteTransition(**t);
   }
 }
 
@@ -1140,8 +1258,6 @@ void ExtendedWorkflowNet::deleteIsolatedPinsetTransitions() {
  *        nodes and end nodes, the construction of the formula is based on the
  *        fields of this object that distinguish internal nodes, stop nodes, and
  *        end nodes
- *
- * \param PN  a net that formalizes the process of this object
  */
 FormulaState* ExtendedWorkflowNet::createFinalStatePredicate() const
 {
@@ -1190,7 +1306,6 @@ FormulaState* ExtendedWorkflowNet::createFinalStatePredicate() const
  *        process, the construction of the formula is based on the declaration
  *        of Petri net places as "final places"
  *
- * \param PN  a net that formalizes a workflow
  * \param stopNodes  switch whether final places shall be treated as stopNodes
  *                   which clear the tokens on all internal places, this
  *                   functionality is currently not implemented and returns NULL
@@ -1205,7 +1320,8 @@ FormulaState* ExtendedWorkflowNet::createOmegaPredicate(bool stopNodes) const
   for (set<Place *>::iterator it = PN_P.begin(); it != PN_P.end(); it++) {
     Place* p = static_cast<Place*>(*it);
 
-    if (p->isFinal) // skip final places (= omega place)
+    // skip final places (= omega place)
+    if (omegaPlaces.find(p) != omegaPlaces.end())
       continue;
     // all non-final places must have no token in the terminal state
     processNodesLit_zero.insert(new PetriNetLiteral(p, COMPARE_EQUAL, 0));
@@ -1216,13 +1332,19 @@ FormulaState* ExtendedWorkflowNet::createOmegaPredicate(bool stopNodes) const
   } else {
     FormulaState* omegaF = new FormulaState(LOG_OR);
 
-    // create a literal "> 0" for all final places (= omega places)
-    set<Place *>  finalPlaces = getFinalPlaces();
-    for (set<Place*>::iterator it = finalPlaces.begin(); it != finalPlaces.end(); it++)
+    for (set<Place *>::const_iterator it = getPlaces().begin(); it != getPlaces().end(); ++it)
     {
+      // create a literal "> 0" for all final places (= omega places)
       Place* p = static_cast<Place*>(*it);
+      assert(p != NULL);
+
+      // check if p is a final place
+      if (omegaPlaces.find(p) == omegaPlaces.end())
+        continue;
+
       // pOmega > 0
-      omegaF->subFormulas.insert(new PetriNetLiteral(p, COMPARE_GREATER, 0));
+      PetriNetLiteral *lit = new PetriNetLiteral(p, COMPARE_GREATER, 0);
+      omegaF->subFormulas.insert(lit);
     }
 
     // and build the conjunction
@@ -1248,7 +1370,7 @@ FormulaState* ExtendedWorkflowNet::createSafeStatePredicate (bool mustBeNonEmpty
   for (set<Place *>::iterator it = PN_P.begin(); it != PN_P.end(); it++) {
     Place* p = static_cast<Place*>(*it);
 
-    if (p->preset.size() <= 1) {
+    if (p->getPreset().size() <= 1) {
       // this place is only unsafe if its predecessor is unsafe
       // or if it is unsafely marked
       // TODO add check for initial marking
@@ -1260,12 +1382,12 @@ FormulaState* ExtendedWorkflowNet::createSafeStatePredicate (bool mustBeNonEmpty
 
   // the post-places of all transitions that lay on a circle are also
   // candidates for getting more than one token
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++) {
+  for (set<Transition*>::iterator t = getTransitions().begin(); t != getTransitions().end(); t++) {
     set<Node*> reach;
     forwardReachableNodes(*t, &reach);
     if (reach.find(*t) != reach.end()) {
       // transition *t lies on a circle of the net
-      for (set<Node *>::iterator p = (*t)->postset.begin(); p != (*t)->postset.end(); p++) {
+      for (set<Node *>::iterator p = (*t)->getPostset().begin(); p != (*t)->getPostset().end(); p++) {
         // all post-places *p of *t must have not more than one token
         processNodesLit_zero.insert(new PetriNetLiteral(static_cast<Place*>(*p), COMPARE_GREATER, 1));
       }
@@ -1297,16 +1419,16 @@ FormulaState* ExtendedWorkflowNet::createSafeStatePredicate (bool mustBeNonEmpty
  *          (by depth-first search), add resulting nodes to the
  *          set of nodes *reachable
  */
-void ExtendedWorkflowNet::forwardReachableNodes(Node *n, set<Node*>* reachable) const {
+void ExtendedWorkflowNet::forwardReachableNodes(const Node *n, set<Node*>* reachable) const {
   assert(reachable != NULL);
 
-  list<Node *> stack;
+  list<const Node *> stack;
   stack.push_front(n);
   // depth-first search on all nodes of the net that are reachable from node *n
   while (!stack.empty()) {
-    Node *current = stack.front(); stack.pop_front();
+    const Node *current = stack.front(); stack.pop_front();
     // follow the post-set relation
-    for (set<Node*>::const_iterator post = current->postset.begin(); post != current->postset.end(); post++) {
+    for (set<Node*>::const_iterator post = current->getPostset().begin(); post != current->getPostset().end(); post++) {
       if (reachable->find(*post) == reachable->end()) {
         stack.push_front(*post);
         reachable->insert(*post);
@@ -1316,21 +1438,21 @@ void ExtendedWorkflowNet::forwardReachableNodes(Node *n, set<Node*>* reachable) 
 }
 
 /*!
- * \brief   compute the set of all nodes that are forward reachable from node *n
+ * \brief   compute the set of all nodes that are backward reachable from node *n
  *          (by depth-first search), add resulting nodes to the
  *          set of nodes *reachable
  */
-void ExtendedWorkflowNet::backwardReachableNodes(Node *n, set<Node*>* reachable) const {
+void ExtendedWorkflowNet::backwardReachableNodes(const Node *n, set<Node*>* reachable) const {
   assert(reachable != NULL);
 
-  list<Node *> stack;
+  list<const Node *> stack;
   stack.push_front(n);
   // depth-first search on all nodes of the net that are reachable from node *n
   // via predecessor relation
   while (!stack.empty()) {
-    Node *current = stack.front(); stack.pop_front();
+    const Node *current = stack.front(); stack.pop_front();
     // follow the pre-set relation
-    for (set<Node*>::const_iterator pre = current->preset.begin(); pre != current->preset.end(); pre++) {
+    for (set<Node*>::const_iterator pre = current->getPreset().begin(); pre != current->getPreset().end(); pre++) {
       if (reachable->find(*pre) == reachable->end()) {
         stack.push_front(*pre);
         reachable->insert(*pre);
@@ -1341,305 +1463,13 @@ void ExtendedWorkflowNet::backwardReachableNodes(Node *n, set<Node*>* reachable)
 
 /*!
  * \brief   extend a multi-terminal workflow net to a single-terminal
- *          workflow net
- *
- * \result  true iff the net could be completed to a single terminal workflow
- *          net while preserving soundness
- */
-bool ExtendedWorkflowNet::complete_to_WFnet() {
-  // breadth-first search to identify concurrent nodes
-
-  list<Place *> omegaPlaces;
-
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
-    if ((*p)->isFinal)
-      omegaPlaces.push_back(*p);
-  }
-
-  map<Place *, set<Place*> > co;
-  map<Place *, set<Place*> > confl;
-
-  for (list<Place*>::iterator p = omegaPlaces.begin(); p != omegaPlaces.end(); p++) {
-    set<Node *> past_p;
-    list<Node *> stack;
-    stack.push_front(*p);
-    // backwards depth-first search to find all predecessors of place *p
-    while (!stack.empty()) {
-      Node *n = stack.front(); stack.pop_front();
-
-      // search all predecessors of n
-      for (set<Node*>::iterator pred = n->preset.begin(); pred != n->preset.end(); pred++) {
-        if (past_p.find(*pred) == past_p.end()) {
-          // put unvisited predecessor onto stack and add it to the visited nodes
-          stack.push_front(*pred);
-          past_p.insert(*pred);
-        }
-      }
-    }
-    // the set past_p contains all transitive predecessors of place *p
-
-    // compare with all omega places
-    for (list<Place*>::iterator p2 = omegaPlaces.begin(); p2 != omegaPlaces.end(); p2++) {
-      if (*p == *p2)  // don't compare identical places
-        continue;
-
-      set<Node *> past_p2;
-      stack.clear();
-      stack.push_front(*p2);
-      while (!stack.empty()) {
-        Node *n = stack.front(); stack.pop_front();
-
-        // search all predecessors of n
-        for (set<Node*>::iterator pred = n->preset.begin(); pred != n->preset.end(); pred++) {
-          if (past_p2.find(*pred) == past_p2.end()) {
-            // we're just visiting predecessor *pred
-            past_p2.insert(*pred);
-
-            // check if *pred is also backwards reachable from place *p
-            if (past_p.find(*pred) != past_p.end()) {
-              // node *pred is a common predecessor of place *p and place *p2
-
-              // if the predecessor is a transition, both places can be
-              // marked concurrenctly
-              if (typeid(**pred) == typeid(Transition)) {
-                co[*p].insert(*p2);
-                co[*p2].insert(*p);
-
-              // if the predecessor is a place, both places can be
-              // marked alternatively
-              } else if (typeid(**pred) == typeid(Place)) {
-                confl[*p].insert(*p2);
-                confl[*p2].insert(*p);
-              }
-              // we found evidence on how *p and *p2 relate to each other
-              // do not descend further
-            } else {
-              // no hit, search further before node *pred
-              stack.push_front(*pred);
-            }
-          }
-        } // finished searhcing all direct predecessors of node n
-      } // finished searching all transitive predecessors of place *p2
-    } // finished comparing the past of place *p to the past of all other places
-  } // finished constructing the co and confl relation for all omega places
-
-  // construct the set of all possible concurrent set of omega places
-  set< set<Place*> > omegaCoSets;
-  bool contradicting = false;
-  for (list<Place*>::iterator p = omegaPlaces.begin(); p != omegaPlaces.end(); p++) {
-
-    set<Place*> p_coset = co[*p];   // copy the co-set of p
-    p_coset.insert(*p); // and add *p to its co-set as well
-
-    if (p_coset.size() > 1) // only add the interesting coSets
-      omegaCoSets.insert(p_coset);
-
-/*
-    for (set<Place*>::iterator p2 = co[*p].begin(); p2 != co[*p].end(); p2++) {
-      cerr << "(" << (*p)->nodeFullName() << " || " << (*p2)->nodeFullName() << ") " << endl;
-    }
-*/
-
-    // check if there are omega places which are concurrent AND conflicting
-    // then the subsequent extension cannot create an AND-join transition to
-    // consume tokens in case of concurrent marking of the places, but only for
-    // the alternative case
-    for (set<Place*>::iterator p2 = confl[*p].begin(); p2 != confl[*p].end(); p2++) {
-//      cerr << "(" << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << ") " << endl;
-      if (co[*p].find(*p2) != co[*p].end())
-        contradicting = true;
-    }
-//    cerr << endl;
-  }
-
-  // the constructed sets are an overapproximation, it may contain sets
-  // that contain conflicting nodes, find these sets, and split them
-  bool splitSets;
-  do {
-    splitSets = false;
-    for (set< set<Place*> >::iterator coset = omegaCoSets.begin(); coset != omegaCoSets.end(); coset++ ) {
-      // see if the current coset contains conflicting places
-      for (set<Place*>::iterator p = (*coset).begin(); p != (*coset).end(); p++) {
-        for (set<Place*>::iterator p2 = confl[*p].begin(); p2 != confl[*p].end(); p2++) {
-          if ((*coset).find(*p2) != (*coset).end()) {
-            // place *p2 is in conflict with place *p and both places are in
-            // the current coset
-
-/*
-            cerr << "because of " << (*p)->nodeFullName() << " # " << (*p2)->nodeFullName() << endl;
-            cerr << "splitting" << endl;
-            cerr << "{";
-            for (set<Place*>::iterator p3 = (*coset).begin(); p3 != (*coset).end(); p3++)
-              cerr << (*p3)->nodeFullName() << ", " << endl << " ";
-            cerr << "}" << endl << "to" << endl;
-*/
-
-            // create two copies of the coset
-            set<Place*> coset_p = *coset;
-            set<Place*> coset_p2 = *coset;
-            // one not containing place *p, one not containing place *p2
-            coset_p.erase(*p2);
-            coset_p2.erase(*p);
-
-            // remove the old coset and insert the new cosets
-            omegaCoSets.erase(*coset);
-
-            bool canBeMaximal = false;
-            // check if the new cosets are maximal, i.e. describe reachable markings
-            for (set<Place*>::iterator p3 = coset_p.begin(); p3 != coset_p.end(); p3++) {
-              bool onePlaceMissing = false;
-              for (set<Place*>::iterator p4 = co[*p3].begin(); p4 != co[*p3].end(); p4++) {
-                // place *p4 is concurrently reachable to place *p3
-                if (coset_p.find(*p4) == coset_p.end()) {
-                  // place *p4 is not in the reduced coSet that contains place *p3
-                  onePlaceMissing = true;
-                  break;
-                }
-              }
-              // for place *p3, all concurrent places are still in coset_p
-              // so coset_p contains a maximal set of concurrent places
-              if (!onePlaceMissing)
-                canBeMaximal = true;
-            }
-
-            if (canBeMaximal) {
-              omegaCoSets.insert(coset_p);
-
-/*
-              cerr << "{";
-              for (set<Place*>::iterator p3 = coset_p.begin(); p3 != coset_p.end(); p3++)
-                cerr << (*p3)->nodeFullName() << ", " << endl << " ";
-              cerr << "}" << endl;
-*/
-            }
-
-            canBeMaximal = false;
-            // check if the new cosets are maximal, i.e. describe reachable markings
-            for (set<Place*>::iterator p3 = coset_p2.begin(); p3 != coset_p2.end(); p3++) {
-              bool onePlaceMissing = false;
-              for (set<Place*>::iterator p4 = co[*p3].begin(); p4 != co[*p3].end(); p4++) {
-                // place *p4 is concurrently reachable to place *p3
-                if (coset_p2.find(*p4) == coset_p2.end()) {
-                  // place *p4 is not in the reduced coSet that contains place *p3
-                  onePlaceMissing = true;
-                  break;
-                }
-              }
-              // for place *p3, all concurrent places are still in coset_p2
-              // so coset_p2 contains a maximal set of concurrent places
-              if (!onePlaceMissing)
-                canBeMaximal = true;
-            }
-
-            if (canBeMaximal) {
-              omegaCoSets.insert(coset_p2);
-/*
-              cerr << "{";
-              for (set<Place*>::iterator p3 = coset_p2.begin(); p3 != coset_p2.end(); p3++)
-                cerr << (*p3)->nodeFullName() << ", " << endl<< " ";
-              cerr << "}" << endl;
-*/
-            }
-
-            splitSets = true;
-            break;
-          }
-        }
-        if (splitSets)  // leave for-loop to re-initialize the iterators
-          break;
-      }
-      if (splitSets)  // leave for-loop to re-initialize the iterators
-        break;
-    }
-  } while (splitSets);
-
-  bool duplicateFound;
-  do {
-    duplicateFound = false;
-    // for each coSet
-    for (set< set<Place*> >::iterator coset = omegaCoSets.begin(); coset != omegaCoSets.end(); coset++ ) {
-      // check if there is a second coSet s.t. both coSets are equal
-      for (set< set<Place*> >::iterator coset2 = omegaCoSets.begin(); coset2 != omegaCoSets.end(); coset2++ ) {
-        if (*coset == *coset2) continue;
-
-        if ((*coset).size() == (*coset2).size()) {
-          // we found a coet2 that is possibly equal to coset
-
-          // see if the sets are different
-          bool noDifference = true;
-          for (set<Place*>::iterator p2 = (*coset2).begin(); p2 != (*coset2).end(); p2++) {
-            if ( (*coset).find(*p2) == (*coset).end() ) {
-              // place *p2 is not contained in the given coSet: they are not equal
-              noDifference = false;
-              break;
-            }
-          }
-
-          if (noDifference) {
-            duplicateFound = true;     // we found a duplicate set
-            omegaCoSets.erase(*coset); // remove the duplicate set from the set of all coSets
-            break;
-          }
-        }
-      } // finished comparing to all existing coSets
-    }
-  } while (duplicateFound);
-
-  // now construct the completion of the multi-terminal workflow net
-  // add an AND-join transition for each coset of omega places
-  int joinNum = 0;
-  for (set< set<Place*> >::iterator coset = omegaCoSets.begin(); coset != omegaCoSets.end(); coset++ ) {
-    Transition *t = newTransition("tANDjoin"+toString(joinNum));
-    for (set<Place*>::iterator pre = (*coset).begin(); pre != (*coset).end(); pre++) {
-      (*pre)->isFinal = false;
-      newArc(*pre, t);    // add arc from omega place to the AND-join transition
-    }
-    Place *p = newPlace("pANDjoinOmega"+toString(joinNum));
-    p->isFinal = true;
-    newArc(t,p);  // add new omega place after AND-join transition
-    joinNum++;
-  }
-
-  // add an XOR-join transition that that finishes all alternative completions
-  // to a single final omega place
-  Place *pOmega = newPlace("omega");
-
-  joinNum = 0;
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++ ) {
-    if ((*p)->isFinal) {
-      // create a transition consuming from the old omega node and producing
-      // on the new omega node
-      Transition *tFinal = newTransition("tXORjoin"+toString(joinNum));
-      (*p)->isFinal = false;
-      newArc(*p, tFinal);
-      newArc(tFinal, pOmega);
-      joinNum++;
-    }
-  }
-  pOmega->isFinal = true;
-
-
-  return !contradicting;
-}
-
-/*!
- * \brief   extend a multi-terminal workflow net to a single-terminal
  *          workflow net by structurally computing dead-path eliminiation
  *
  */
 bool ExtendedWorkflowNet::complete_to_WFnet_DPE() {
 
-  list<Place *> omegaPlaces;
-
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
-    if ((*p)->isFinal) {
-      omegaPlaces.push_back(*p);
-      (*p)->isFinal = false;
-    }
-  }
-
   // will terminate the net via an AND-join on all omegaPlaces
-  Transition* omegaANDJoin = newTransition("finalANDjoin");
+  Transition& omegaANDJoin = createTransition("finalANDjoin");
 
   // To make this AND-join sound, we have to guarantee that if a final
   // marking is reached, all omegaPlaces get a token. To this end, we implement
@@ -1648,35 +1478,206 @@ bool ExtendedWorkflowNet::complete_to_WFnet_DPE() {
   // branch that would not lead to marking this omegaPlace.
 
   // for each omega place
-  for (list<Place*>::iterator omega = omegaPlaces.begin(); omega != omegaPlaces.end(); omega++) {
+  for (set<Place*>::const_iterator omega = omegaPlaces.begin(); omega != omegaPlaces.end(); omega++) {
     // find all transitive predecessors
     set<Node *> backwards;
     backwardReachableNodes(*omega, &backwards);
 
-    for (set<Node*>::iterator n = backwards.begin(); n != backwards.end(); n++) {
+    for (set<Node*>::const_iterator n = backwards.begin(); n != backwards.end(); n++) {
       if (typeid(**n) == typeid(Place)) {
         // for each *greyPlace that precedes place *omega, find all post-transitions
         // that do not precede *omega
         Place *greyPlace = static_cast<Place*>(*n);
-        for (set<Node*>::iterator blackTransition = greyPlace->postset.begin(); blackTransition != greyPlace->postset.end(); blackTransition++) {
+        for (set<Node*>::iterator blackTransition = greyPlace->getPostset().begin(); blackTransition != greyPlace->getPostset().end(); blackTransition++) {
           if (backwards.find(*blackTransition) != backwards.end())
             continue;
 
           // the *blackTransition is not a predecessor of place *omega, if it
           // fires, then *omega will not get a token, therefore add an arc
           // to guarantee that *omega always gets marked
-          newArc(*blackTransition, *omega);
+          createArc(**blackTransition, (**omega));
         }
       }
     }
 
     // add an arc to the final AND join
-    newArc(*omega, omegaANDJoin);
+    createArc(**omega, omegaANDJoin);
   }
+  omegaPlaces.clear();  // all former final places will no longer be final
 
-  Place* omega = newPlace("omega");
-  newArc(omegaANDJoin, omega);
-  omega->isFinal = true;
+  // the new final place is this new omega place
+  Place& omega = createPlace("omega");
+  createArc(omegaANDJoin, omega);
+  omegaPlaces.insert(&omega);
 
   return true;
 }
+
+/******************************************************************************
+ * Methods for modifying the Petri net with respect to roles.
+ *****************************************************************************/
+/*
+// removes places, transitions and adjusts the interface according to the role set and mode
+void ExtendedWorkflowNet::cutByRoles() {
+
+    // dont cut anything if the net would become empty
+    if(globals::keepRoles.empty() && globals::exclusiveRoles.empty() && globals::keepRolesExact.empty()) {
+        return;
+    }
+
+    list<Transition*> deleteTransitions;
+    bool remove;
+    bool foundExcluded;
+
+    // first find all transitions that do not fullfil the role requirements
+    for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++) {
+
+        remove = true;
+        foundExcluded = false;
+
+        if (!globals::keepRoles.empty() || !globals::exclusiveRoles.empty()) {
+          if (!(*t)->roles.empty()) {
+              for (set<string>::iterator tRole = (*t)->roles.begin(); tRole != (*t)->roles.end(); tRole ++) {
+                  if (globals::keepRoles.find(*tRole) != globals::keepRoles.end()) {
+                      remove = false;
+                      break;
+                  } else if (globals::exclusiveRoles.find((*tRole)) != globals::exclusiveRoles.end()) {
+                      foundExcluded = true;
+                  }
+              }
+              if (!globals::exclusiveRoles.empty()) {
+                  if (!foundExcluded) {
+                      remove = false;
+                  }
+              }
+          }
+        } else {
+          if (globals::keepRolesExact.find((*t)->roles) != globals::keepRolesExact.end())
+            remove = false;
+        }
+
+        if (remove) {
+            bool hasAlpha = false;
+            for (set<Node*>::const_iterator p = (*t)->preset.begin(); p != (*t)->preset.end(); p++) {
+              if ((*p)->historyContains("process.alpha")) {
+                hasAlpha = true;
+                break;
+              }
+            }
+            if (!hasAlpha)
+              deleteTransitions.push_back(*t);
+        }
+    }
+
+    // now delete all those transitions
+    for (list<Transition*>::iterator t = deleteTransitions.begin(); t != deleteTransitions.end(); t++) {
+        deleteTransition(*t);
+    }
+
+    // all places that were internal to a deletet role are now isolated and can be found ...
+    list<Place*> removeIsolatedPlaces;
+    for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
+        if ((*p)->postset.empty() && (*p)->preset.empty()) {
+            removeIsolatedPlaces.push_back(*p);
+        }
+    }
+    for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++) {
+        if ((*p)->postset.empty() && (*p)->preset.empty()) {
+            removeIsolatedPlaces.push_back(*p);
+        }
+    }
+    for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++) {
+        if ((*p)->postset.empty() && (*p)->preset.empty()) {
+            removeIsolatedPlaces.push_back(*p);
+        }
+    }
+
+    // ... and delete as well
+    for (list<Place*>::iterator p = removeIsolatedPlaces.begin(); p != removeIsolatedPlaces.end(); p++) {
+        if (*p)
+        deletePlace(*p);
+    }
+
+    // sets for all places that now have to be made interface places
+    list<Place*> turnToInput;
+    list<Place*> turnToOutput;
+
+    // find those places
+    for (set<Place*>::iterator p = P.begin(); p != P.end(); p++) {
+        if ((*p)->preset.empty() && !(*p)->marked()) {
+            turnToInput.push_back(*p);
+        } else if ((*p)->postset.empty()) {
+            turnToOutput.push_back(*p);
+        }
+    }
+
+    // create the new input interface
+    for (list<Place*>::iterator p = turnToInput.begin(); p != turnToInput.end(); p++) {
+        (*p)->type = IN;
+        P.erase(*p);
+        P_in.insert(*p);
+        for (set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++) {
+            (*t)->type = IN;
+        }
+    }
+
+    // create the new output interface
+    for (list<Place*>::iterator p = turnToOutput.begin(); p != turnToOutput.end(); p++) {
+        (*p)->type = OUT;
+        P.erase(*p);
+        P_out.insert(*p);
+        for (set<Node*>::iterator t = (*p)->preset.begin(); t != (*p)->preset.end(); t++) {
+            (*t)->type = OUT;
+        }
+    }
+}
+*/
+
+/*!
+ * \brief Converts a given identifier into a LoLA/oWFN compatible identifier
+ *      warning: conversion may project two different strings onto the same
+ *      compatible string
+ *
+ * \param name  identifier to convert
+ *
+ * \pre name != NULL
+ */
+string toLoLAident(string name)
+{
+  bool nonUpperCaseFound = false;
+  string result = "";
+
+  // Display the list
+  string::iterator it;
+  for( it = name.begin(); it != name.end(); it++ )
+  {
+    switch (*it) {
+      case ',':
+      case ';':
+      case ':':
+      case '(':
+      case ')':
+      case '{':
+      case '}':
+      case ' ':
+        result = result + "_";
+        nonUpperCaseFound = true;
+        break;
+      default:
+        if (!isupper(*it))
+          nonUpperCaseFound = true;
+        result = result + *it;
+        break;
+    }
+   }
+   if (!nonUpperCaseFound)
+   {
+      int i;
+    for( i=0,it = result.begin(); it != result.end(); it++,i++ )
+      result.replace(i, 1,1, tolower(*it));
+   }
+   return result;
+}
+
+} // namespace pnapi
+

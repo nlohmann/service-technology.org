@@ -3,8 +3,22 @@
          | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
          | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
           \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+        Translating IBM WebSphere Business Process Models to Petri Nets
                  http://www.service-technology.org/uml2owfn/
 
+Version 2.10-unreleased
+=======================
+
+* Migrated UML2oWFN to the new Petri net API. The included PNAPI slightly
+  deviates from the original API, see SVN repository for details.
+
+* Dropped support for several file formats. The currently supported file
+  formats are .lola, .owfn, .dot, and .tpn (Woflan)
+
+* Changed the filenames of the LoLA binaries for soundness analysis to
+  `lola-bpm-liveprop1' and `lola-bpm-statepredicate1'
+
+* Role cutting functionality has been disabled.
 
 Version 2.00
 ============

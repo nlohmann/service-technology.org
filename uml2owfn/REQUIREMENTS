@@ -1,0 +1,71 @@
+          _   _  __  __  _      ____        __        __ _____  _   _ 
+         | | | ||  \/  || |    |___ \   ___ \ \      / /|  ___|| \ | |
+         | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
+         | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
+          \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+        Translating IBM WebSphere Business Process Models to Petri Nets
+                 http://www.service-technology.org/uml2owfn/
+
+In order to run, compile, and develop UML2oWFN, several tools are required.
+
+Runtime
+-------
+
+For the standard compiler functionality, no additional tools are required.
+For the analysis functionality either LoLA or Woflan are required.
+
+   * LoLA (`http://service-technology.org/lola'), compiled with the
+     `STATEPREDICATE' and the `LIVEPROP' options. Suitable LoLA binaries
+     can be created as follows:
+       1. download `http://service-technology.org/files/lola/lola.tar.gz'
+
+       2. untar `lola.tar.gz', configure
+
+       3. call `make lola-bpm-liveprop1'
+
+       4. copy the binary `src/lola-liveprop1' to a directory of your path
+          (e.g., `/usr/local/bin') or call `make install'
+       
+       5. repeat steps 3 and 4 with `make lola-bpm-statepredicate1'
+       
+     The corresponding configuration files for LoLA are also stored in 
+     the directory `./lola/' of this distribution. Please consult the
+     LoLA manual for additional information.          
+
+Compilation
+-----------
+
+To compile the source code from a source distribution, the following tools are
+required.
+
+   * GCC (`http://gcc.gnu.org/')
+
+   * GNU Make (`http://www.gnu.org/software/make/')
+
+Development
+-----------
+
+In case you want to make changes to the source code, the following tools are
+required to reconfigure and compile Wendy.
+
+   * Autoconf, `http://www.gnu.org/software/autoconf/'
+
+   * Automake, `http://www.gnu.org/software/automake/'
+
+   * Bison, `http://www.gnu.org/software/bison/'
+
+   * flex, `http://flex.sourceforge.net/'
+
+   * help2man, `http://www.gnu.org/software/help2man/'
+
+   * Texinfo, `http://www.gnu.org/software/texinfo/'
+
+
+
+
+Please check our nightly build server at
+`http://service-technology.org/nightly' for the versions we use during
+development.
+
+
+

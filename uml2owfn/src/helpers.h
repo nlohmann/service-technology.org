@@ -1,25 +1,21 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2008 Dirk Fahland <dirk.fahland@service-technolog.org>,
-                     Martin Znamirowski <znamirow@informatik.hu-berlin.de>
-  Copyright (C) 2006, 2007  Niels Lohmann,
-                            Christian Gierds, and
-                            Martin Znamirowski
-  Copyright (C) 2005        Niels Lohmann and
-                            Christian Gierds
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2005, 2006, 2007  Niels Lohmann, Christian Gierds,
+                                 Martin Znamirowski, and Dirk Fahland
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -108,7 +104,7 @@ unsigned int max(unsigned int a, unsigned int b);
  *****************************************************************************/
 
 // to avoid compile errors
-class Node;
+//class Node;
 
 
 /*!

@@ -4,10 +4,9 @@
 
 LIBRARY           = b3
 SED               = sed                # sed
-LOLA-SP           = lola-sp            # LoLA with STATEPREDICATE
-LOLA-MC           = lola-mc            # LoLA with MODELCHECKING
-LOLA-LP           = lola-lp            # LoLA with LIVEPROP
-LOLA-FULL-LIMITED = lola-full-limited  # LoLA with FULL
+LOLA-SP           = lola-bpm-statepredicate1 # LoLA with STATEPREDICATE
+LOLA-MC           = lola-bpm-modelchecking1  # LoLA with MODELCHECKING
+LOLA-LP           = lola-bpm-liveprop1       # LoLA with LIVEPROP
 
 REDUCTION-LEVEL   = 0                  # Petri net reduction level for the
                                        # translation
@@ -35,7 +34,6 @@ help:
 	@echo "* translateor    translate library nets with OR-join termination"
 	@echo "* soundness      soundness check (AGEF omega)"
 	@echo "* safeness       safeness check"
-	@echo "* full           full state space"
 	@echo "* table          collect results in table"
 	@echo "* clean          remove analysis files"
 	@echo "* veryclean      remove Petri nets"
@@ -54,10 +52,6 @@ full:      $(LOLAFILES:.lola=.lola.full.output)
 
 %.lola.sound.output: %.lola
 	-@$(LOLA_DIR)$(LOLA-MC) $< -a$(<:.lola=.lola.fin.task) > $@ 2> $@ ; echo SOUNDNESS-RESULT: $$? >> $@
-
-%.lola.full.output: %.lola
-	-@$(LOLA_DIR)$(LOLA-FULL-LIMITED) $< > $@ 2> $@ || echo FULL-RESULT: $$? >> $@
-	@$(SED) -i 's/FULL-RESULT: 5/FULL-RESULT: 5\n>>>>> oo States/' $@
 
 
 ##########################################################################

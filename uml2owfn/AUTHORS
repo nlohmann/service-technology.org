@@ -3,68 +3,41 @@
          | | | || |\/| || |      __) | / _ \ \ \ /\ / / | |_   |  \| |
          | |_| || |  | || |___  / __/ | (_) | \ V  V /  |  _|  | |\  |
           \___/ |_|  |_||_____||_____| \___/   \_/\_/   |_|    |_| \_|
+            Translating IBM WebSphere Business Models to Petri Nets
                  http://www.service-technology.org/uml2owfn/
 
-Authors and Acknowledgements
-****************************
+COPYRIGHT
 
-Authors
-=======
+    Copyright (c) 2007, 2008, 2009 Dirk Fahland, Martin Znamirowski,
+    and Niels Lohmann
+    
+    
+AUTHORS
 
-UML2oWFN was written by:
-   * Martin Znamirowski, Humboldt-Universit"at zu Berlin
+   Martin Znamirowski
+      implemented the parser and the compiler functionality of UML2oWFN
    
-   * Dirk Fahland, Humboldt-Universit"at zu Berlin
+   Dirk Fahland
+      implemented soundness analysis functionality and back-end
+      functionality (net output) of UML2oWFN
 
-   * Niels Lohmann, Universtit"at Rostock
+   Niels Lohmann
+      provided UML2oWFN's core infrastructure for the compiler and the
+      build environment
+      
+      
+MAINTAINER
+    UML2oWFN is maintained by Dirk Fahland.
    
-Acknowledgements
-================
 
-We would like to thank:
+CONTACT
 
-   * Antoon van Breda a.k.a. Jaded Hobo
-     for the original version of the `colorconsole.h' header,
-
-   * Jana Koehler, IBM Zurich
-     for valueable support concerning the IBM Business Modeler Semantics
-
-   * Hagen V"olzer, IBM Zurich
-     for valueable support concerning the IBM Business Modeler Semantics
-     
-
-
-Contact Person
-==============
-
-Dirk Fahland
-
-Humboldt-Universit"at zu Berlin
-Institut f"ur Informatik
-Unter den Linden 6
-10099 Berlin, Germany
-
-Homepage
-     `http://www.informatik.hu-berlin.de/top/mitarbeiter/fahland'
-
-E-mail
-     <fahland@informatik.hu-berlin.de>
-
-Phone
-     (+49) (30) 2093-3907
-
-Fax
-     (+49) (30) 2093-3067
-
-Copyright
-=========
-
-Copyright (C) 2007, 2008  Martin Znamirowksi, Dirk Fahland, Niels Lohmann
-
-     Copying and distribution of this file, with or without
-     modification, are permitted in any medium without royalty provided
-     the copyright notice and this notice are preserved.
-
-See the User's Manual for more information.
-
-END OF AUTHORS file for UML2oWFN Version 2.00-unreleased
+      Dirk Fahland
+      Humboldt-Universit"at zu Berlin
+      Institut f"ur Informatik
+      Unter den Linden 6
+      10099 Berlin, Germany
+	
+      WWW:    http://service-technology.org/uml2owfn
+      Email:  uml2owfn@service-technology.org
+      Phone:  (+49) (30) 2093-3073

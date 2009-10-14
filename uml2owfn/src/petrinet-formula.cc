@@ -1,19 +1,20 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>,
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -43,7 +44,8 @@
 
 #include "petrinet-formula.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
-#include "pnapi.h"
+#include "pnapi/pnapi.h"
+#include "petrinet-workflow.h"
 
 using std::set;
 using std::cerr;
@@ -83,7 +85,7 @@ PetriNetLiteral::~PetriNetLiteral() {
 /*!
  * \brief create a new Petri net literal  p REL val
  */
-PetriNetLiteral::PetriNetLiteral(Place *aPlace, comparison_relation aRel, int aVal) :
+PetriNetLiteral::PetriNetLiteral(const pnapi::Place *aPlace, comparison_relation aRel, int aVal) :
 	rel(COMPARE_GREATER),
 	val(0)
 {
@@ -103,7 +105,7 @@ const string PetriNetLiteral::output_lola() const {
 		str << "NOT ";
 
 	// node name
-	str << toLoLAident(p->nodeFullName()) << " ";
+	str << pnapi::toLoLAident(p->getName()) << " ";
 
 	// relation symbol
 	string relStr = "";
@@ -152,7 +154,7 @@ FormulaState::~FormulaState() {
 /*!
  * \brief	set the logical connective for this formula, sets
  * 			quantifier to NONE
- * \param	conn logical connective
+ * \param	aConn logical connective
  */
 void FormulaState::set_connective(logical_connective aConn) {
 	op = aConn;
@@ -162,6 +164,7 @@ void FormulaState::set_connective(logical_connective aConn) {
 /*!
  * \brief	set the quantifier for this formula, sets logical
  * 			connective to NONE
+ * \param aQuant quantifier
  */
 void FormulaState::set_quantifier(logical_quantifier aQuant) {
 	quant = aQuant;
@@ -232,8 +235,6 @@ void FormulaState::output_lola_complete(ostream *output) const
 
 /*!
  * \brief   outputs the formula as a state formula in LoLA format
- *
- * \param   output  output stream
  *
  * \pre     output != NULL
  */

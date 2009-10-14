@@ -8,10 +8,8 @@ bin_PROGRAMS = uml2owfn
 # frontend files: for them C++ code is generated).
 uml2owfn_SOURCES = uml2owfn.cc \
 			uml2owfn-io.cc uml2owfn-io.h \
-		    pnapi.h petrinet.h petrinet.cc \
-		    petrinet-output.cc petrinet-reduction.cc \
 		    petrinet-workflow.cc petrinet-workflow.h \
-		    petrinet-formula.cc petrinet-formula.h \
+			petrinet-formula.cc petrinet-formula.h \
 		    helpers.cc helpers.h \
     	    colorconsole.h \
 		    frontend-parser.yy \
@@ -23,6 +21,10 @@ uml2owfn_SOURCES = uml2owfn.cc \
 		    globals.cc globals.h \
 		    AST.cc AST.h AST-public.h \
 		    internal-representation.cc internal-representation.h UML-public.h
+		    
+# pnapi.h petrinet.h petrinet.cc
+# petrinet-output.cc petrinet-reduction.cc
+# petrinet-formula.cc petrinet-formula.h
 
 
 # These sources have to be present before the rest is compiled.
@@ -39,6 +41,11 @@ uml2owfn_LDFLAGS  = @configured_LDFLAGS@
 uml2owfn_CFLAGS   = @configured_CFLAGS@
 uml2owfn_CXXFLAGS = @configured_CXXFLAGS@
 
+# only add the local Petri net API if necessary
+if COMPILE_PNAPI
+uml2owfn_CXXFLAGS += -I$(top_srcdir)/libs
+uml2owfn_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+endif
 
 ############################
 # organization of cleaning #

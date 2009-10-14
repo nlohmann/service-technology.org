@@ -1,10 +1,33 @@
+/*****************************************************************************\
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
+
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
+
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
 #include <cassert>
 #include <iostream>
 #include <utility>
 #include "debug.h"
 #include "globals.h"
 #include "helpers.h"        // helper functions (setUnion, setDifference, max, toString)
-#include "pnapi.h"        // helper functions (setUnion, setDifference, max, toString)
+
+// include PN Api headers
+#include "pnapi/pnapi.h"
+#include "petrinet-workflow.h"
+
 #include "internal-representation.h"
 using std::pair;
 using std::cerr;
@@ -37,12 +60,12 @@ string PinCombination::getName() {
 }
 
 // returns the petri net place of this pin
-Place* Pin::getPlace() {
+pnapi::Place* Pin::getPlace() {
     return pinPlace;
 }
 
 // sets the petri net place of this pin
-void Pin::setPlace(Place* placeToSet) {
+void Pin::setPlace(pnapi::Place* placeToSet) {
     pinPlace = placeToSet;
 }
 
@@ -185,13 +208,13 @@ string FlowContentConnection::getName() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void FlowContentConnection::translateToNet(ExtendedWorkflowNet* PN) {
+void FlowContentConnection::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 #ifdef DEBUG
     trace(TRACE_VERY_DEBUG, "  translating connection " + getName() + "\n");
 #endif
-    Place *in = inputPin->getPlace();
-    Place *out = outputPin->getPlace();
-    Place* result = PN->mergePlaces(in, out);
+    pnapi::Place *in = inputPin->getPlace();
+    pnapi::Place *out = outputPin->getPlace();
+    pnapi::Place* result = PN->mergePlaces(in, out);
     // update relation between model and net
     inputPin->setPlace(result);
     outputPin->setPlace(result);
@@ -230,6 +253,10 @@ void FlowContentConnection::setTarget(FlowContentNode* givenTarget) {
 FlowContentConnection::FlowContentConnection(string givenName, ASTElement* link, FlowContentElement* parent) : FlowContentElement(link,parent) {
     name = givenName;
     type = ECONNECTION;   // every connection has type connection
+    targetNode = NULL;
+    sourceNode = NULL;
+    outputPin = NULL;
+    inputPin = NULL;
 }
 
 // returns the input pin of this connection
@@ -449,88 +476,82 @@ void Process::spreadRoles() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void Process::translateToNet(ExtendedWorkflowNet* PN) {
+void Process::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 
 #ifdef DEBUG
     trace(TRACE_INFORMATION, "translating process: " + name +"\n");
 #endif
 
-    //Create pointer to the current place and the current transition
-    Place* p;
-    Transition* t;
-
     startingTransitions.clear();
-    map<InputCriterion*, Node*> processCentralNodes;
-    map<Pin*, Node*> trueInterfacePlaces;
+    map<InputCriterion*, pnapi::Node*> processCentralNodes;
+    map<Pin*, pnapi::Node*> trueInterfacePlaces;
 
     // create the overall starting place for this process
-    Place* alpha;
-    alpha = PN->newPlace("process.alpha", INTERNAL);
-    alpha->roles = set<string>(roles);
-    alpha->mark();
+    pnapi::Place& alpha = PN->createPlace("process.alpha", pnapi::Node::INTERNAL, 1);
+    alpha.roles().insert(roles.begin(),roles.end());
 
     // create all input places of the process
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace(("process."+ name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
-        PN->pinPlaces.insert(p);
+        pnapi::Place& p = PN->createPlace(("process."+ name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
 
-        p = PN->newPlace(("process."+ name + ".trueInput." + (*input)->getName()), IN);
-        p->roles = set<string>(roles);
-        trueInterfacePlaces [(*input)] = p;
+        pnapi::Place& p2 = PN->createPlace(("process."+ name + ".trueInput." + (*input)->getName()), pnapi::Node::INPUT);
+        p2.roles().insert(roles.begin(),roles.end());
+        trueInterfacePlaces [(*input)] = &p2;
     }
 
     // translate all of the input criteria
     for (list<InputCriterion*>::iterator inputCriterion = inputCriteria.begin(); inputCriterion != inputCriteria.end(); inputCriterion++)
     {
-        t = PN->newTransition("process."+ name + ".inputCriterion." + (*inputCriterion)->getName());
-        t->roles = set<string>(roles);
-        startingTransitions.push_back(t);
-        PN->newArc(alpha,t);
-        PN->process_inputPinSets.insert(t);
+        pnapi::Transition& t = PN->createTransition("process."+ name + ".inputCriterion." + (*inputCriterion)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        startingTransitions.push_back(&t);
+        PN->createArc(alpha,t);
+        PN->process_inputPinSets.insert(&t);
 
-        p = PN->newPlace(("process."+ name + ".inputCriterion." + (*inputCriterion)->getName() + ".used"), INTERNAL);
-        p->roles = set<string>(roles);
-        processCentralNodes[(*inputCriterion)] = p;
-        PN->newArc(t,p);
-        PN->process_inputCriterion_used.insert(p);
+        pnapi::Place& p = PN->createPlace(("process."+ name + ".inputCriterion." + (*inputCriterion)->getName() + ".used"), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        processCentralNodes[(*inputCriterion)] = &p;
+        PN->createArc(t,p);
+        PN->process_inputCriterion_used.insert(&p);
 
         for (list<Pin*>::iterator input = (*inputCriterion)->pins.begin(); input != (*inputCriterion)->pins.end(); input++) {
-            PN->newArc(t,(*input)->getPlace());
-            PN->newArc(trueInterfacePlaces[(*input)],t);
+            PN->createArc(t,*(*input)->getPlace());
+            PN->createArc(*trueInterfacePlaces[(*input)],t);
         }
     }
 
     // create all output places of the process
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace(("process."+ name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
-        PN->pinPlaces.insert(p);
+        pnapi::Place& p = PN->createPlace(("process."+ name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
 
-        p = PN->newPlace(("process."+ name + ".trueOutput." + (*output)->getName()), OUT);
-        p->roles = set<string>(roles);
-        trueInterfacePlaces [(*output)] = p;
+        pnapi::Place& p2 = PN->createPlace(("process."+ name + ".trueOutput." + (*output)->getName()), pnapi::Node::OUTPUT);
+        p2.roles().insert(roles.begin(),roles.end());
+        trueInterfacePlaces [(*output)] = &p2;
     }
 
     // translate all of the output criteria
     for (list<OutputCriterion*>::iterator outputCriterion = outputCriteria.begin(); outputCriterion != outputCriteria.end(); outputCriterion++) {
-        t = PN->newTransition("process."+ name + ".outputCriterion." + (*outputCriterion)->getName());
-        t->roles = set<string>(roles);
-        PN->process_outputPinSets.insert(t);
+        pnapi::Transition& t = PN->createTransition("process."+ name + ".outputCriterion." + (*outputCriterion)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        PN->process_outputPinSets.insert(&t);
 
         if ((*outputCriterion)->relatedInputCriteria.begin() == (*outputCriterion)->relatedInputCriteria.end()) {
-            PN->newArc(processCentralNodes[(*(inputCriteria.begin()))],t);
+            PN->createArc(*processCentralNodes[(*(inputCriteria.begin()))],t);
         } else {
             for (list<InputCriterion*>::iterator relatedInputCriterion = (*outputCriterion)->relatedInputCriteria.begin(); relatedInputCriterion != (*outputCriterion)->relatedInputCriteria.end(); relatedInputCriterion++) {
-                PN->newArc(processCentralNodes[*relatedInputCriterion],t);
+                PN->createArc(*processCentralNodes[*relatedInputCriterion],t);
             }
         }
 
         for (list<Pin*>::iterator output = (*outputCriterion)->pins.begin(); output != (*outputCriterion)->pins.end(); output++) {
-            PN->newArc((*output)->getPlace(),t);
-            PN->newArc(t,trueInterfacePlaces[(*output)]);
+            PN->createArc(*(*output)->getPlace(),t);
+            PN->createArc(t,*trueInterfacePlaces[(*output)]);
         }
     }
 
@@ -768,63 +789,61 @@ SimpleTask::~SimpleTask() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void SimpleTask::translateToNet(ExtendedWorkflowNet* PN) {
+void SimpleTask::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
     //
     //Create pointer to the current place and the current transition
-    Place* p;
-    Transition* t;
 
-    map<InputCriterion*, Node*> processCentralNodes;
+    map<InputCriterion*, pnapi::Node*> processCentralNodes;
 
     // create all input places of the task
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace((typeString() + "." + name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the input criteria
     for (list<InputCriterion*>::iterator inputCriterion = inputCriteria.begin(); inputCriterion != inputCriteria.end(); inputCriterion++)
     {
-        t = PN->newTransition(typeString() + "." + name + ".inputCriterion." + (*inputCriterion)->getName());
-        t->roles = set<string>(roles);
-        p = PN->newPlace((typeString() + "." + name + ".inputCriterion." + (*inputCriterion)->getName() + ".used"), INTERNAL);
-        p->roles = set<string>(roles);
-        processCentralNodes[(*inputCriterion)] = p;
-        PN->newArc(t,p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".inputCriterion." + (*inputCriterion)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".inputCriterion." + (*inputCriterion)->getName() + ".used"), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        processCentralNodes[(*inputCriterion)] = &p;
+        PN->createArc(t,p);
+        PN->process_internalPlaces.insert(&p);
 
         for (list<Pin*>::iterator input = (*inputCriterion)->pins.begin(); input != (*inputCriterion)->pins.end(); input++) {
-            PN->newArc((*input)->getPlace(),t);
+            PN->createArc(*(*input)->getPlace(),t);
         }
     }
 
     // create all output places of the task
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace((typeString() + "." + name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the output criteria
     for (list<OutputCriterion*>::iterator outputCriterion = outputCriteria.begin(); outputCriterion != outputCriteria.end(); outputCriterion++) {
-        t = PN->newTransition(typeString() + "." + name + ".outputCriterion." + (*outputCriterion)->getName());
-        t->roles = set<string>(roles);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".outputCriterion." + (*outputCriterion)->getName());
+        t.roles().insert(roles.begin(),roles.end());
 
         if ((*outputCriterion)->relatedInputCriteria.begin() == (*outputCriterion)->relatedInputCriteria.end()) {
-            PN->newArc(processCentralNodes[(*(inputCriteria.begin()))],t);
+            PN->createArc(*processCentralNodes[(*(inputCriteria.begin()))],t);
         } else {
             for (list<InputCriterion*>::iterator relatedInputCriterion = (*outputCriterion)->relatedInputCriteria.begin(); relatedInputCriterion != (*outputCriterion)->relatedInputCriteria.end(); relatedInputCriterion++) {
-                PN->newArc(processCentralNodes[*relatedInputCriterion],t);
+                PN->createArc(*processCentralNodes[*relatedInputCriterion],t);
             }
         }
 
         for (list<Pin*>::iterator output = (*outputCriterion)->pins.begin(); output != (*outputCriterion)->pins.end(); output++) {
-            PN->newArc(t,(*output)->getPlace());
+            PN->createArc(t,*(*output)->getPlace());
         }
     }
 }
@@ -903,43 +922,40 @@ Decision::~Decision() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void Decision::translateToNet(ExtendedWorkflowNet* PN) {
+void Decision::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 
     //Create pointer to the current place and the current transition
-    Place* p;
-    Transition* t;
-
-    Place* centralNode = PN->newPlace((typeString() + "." + name + ".activated"), INTERNAL);
-    centralNode->roles = set<string>(roles);
-    PN->process_internalPlaces.insert(centralNode);
+    pnapi::Place& centralNode = PN->createPlace((typeString() + "." + name + ".activated"), pnapi::Node::INTERNAL);
+    centralNode.roles().insert(roles.begin(),roles.end());
+    PN->process_internalPlaces.insert(&centralNode);
 
     // create all input places of the process
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace((typeString() + "." + name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // create all output places of the process
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace((typeString() + "." + name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the input branch
     for (list<PinCombination*>::iterator inputBranch = inputBranches.begin(); inputBranch != inputBranches.end(); inputBranch++)
     {
-        t = PN->newTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
-        t->roles = set<string>(roles);
-        PN->newArc(t,centralNode);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        PN->createArc(t,centralNode);
 
         for (list<Pin*>::iterator input = (*inputBranch)->pins.begin(); input != (*inputBranch)->pins.end(); input++) {
-            PN->newArc((*input)->getPlace(),t);
+            PN->createArc(*(*input)->getPlace(),t);
         }
     }
 
@@ -961,34 +977,33 @@ void Decision::translateToNet(ExtendedWorkflowNet* PN) {
         // translate all of the output branch
         for (list<PinCombination*>::iterator outputBranch = outputBranches.begin(); outputBranch != outputBranches.end(); outputBranch++)
         {
-            t = PN->newTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
-            t->roles = set<string>(roles);
-            PN->newArc(centralNode,t);
+            pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
+            t.roles().insert(roles.begin(),roles.end());
+            PN->createArc(centralNode,t);
 
             for (list<Pin*>::iterator output = (*outputBranch)->pins.begin(); output != (*outputBranch)->pins.end(); output++) {
-                PN->newArc(t,(*output)->getPlace());
+                PN->createArc(t,*(*output)->getPlace());
             }
         }
     }
 }
 
-void Decision::inclusiveDecisionPatternRecursively(Place* centralNode, set<PinCombination*>& currentOutputBranches, string number, ExtendedWorkflowNet* PN, set<set<PinCombination*> >& powerSet)
+void Decision::inclusiveDecisionPatternRecursively(pnapi::Place & centralNode, set<PinCombination*>& currentOutputBranches, string number, pnapi::ExtendedWorkflowNet* PN, set<set<PinCombination*> >& powerSet)
 {
     if (!powerSet.insert(currentOutputBranches).second)
     {
         return;
     }
 
-    Transition* t;
-    t = PN->newTransition(("decision." + name + ".fire." + number));
-    t->roles = set<string>(roles);
-    PN->newArc(centralNode, t);
+    pnapi::Transition& t = PN->createTransition(("decision." + name + ".fire." + number));
+    t.roles().insert(roles.begin(),roles.end());
+    PN->createArc(centralNode, t);
 
     for (set<PinCombination*>::iterator outputBranch = currentOutputBranches.begin(); outputBranch != currentOutputBranches.end(); outputBranch++)
     {
         for (list<Pin*>::iterator output = (*outputBranch)->pins.begin(); output != (*outputBranch)->pins.end(); output++)
         {
-            PN->newArc(t,(*output)->getPlace());
+            PN->createArc(t,*(*output)->getPlace());
         }
     }
     int i = 0;
@@ -1027,62 +1042,59 @@ Fork::~Fork() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void Fork::translateToNet(ExtendedWorkflowNet* PN) {
+void Fork::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 
     //Create pointer to the current place and the current transition
-    Place* p;
-    Transition* t;
-
-    list<Place*> centralPlaces;
+    list<pnapi::Place*> centralPlaces;
 
     // create all output places of the process
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace((typeString() + "." + name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the output branches
     for (list<PinCombination*>::iterator outputBranch = outputBranches.begin(); outputBranch != outputBranches.end(); outputBranch++)
     {
-        p = PN->newPlace((typeString() + "." + name + ".activated." + (*outputBranch)->getName()),INTERNAL);
-        p->roles = set<string>(roles);
-        centralPlaces.push_back(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".activated." + (*outputBranch)->getName()),pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        centralPlaces.push_back(&p);
+        PN->process_internalPlaces.insert(&p);
 
-        t = PN->newTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
-        t->roles = set<string>(roles);
-        PN->newArc(p,t);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        PN->createArc(p,t);
 
         for (list<Pin*>::iterator output = (*outputBranch)->pins.begin(); output != (*outputBranch)->pins.end(); output++) {
-            PN->newArc(t,(*output)->getPlace());
+            PN->createArc(t,*(*output)->getPlace());
         }
     }
 
     // create all input places of the process
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace((typeString() + "." + name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
 
     }
 
     // translate all of the input branches
     for (list<PinCombination*>::iterator inputBranch = inputBranches.begin(); inputBranch != inputBranches.end(); inputBranch++)
     {
-        t = PN->newTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
-        t->roles = set<string>(roles);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
 
         for (list<Pin*>::iterator input = (*inputBranch)->pins.begin(); input != (*inputBranch)->pins.end(); input++) {
-            PN->newArc((*input)->getPlace(),t);
+            PN->createArc(*(*input)->getPlace(),t);
         }
 
-        for (list<Place*>::iterator central = centralPlaces.begin(); central != centralPlaces.end(); central++) {
-            PN->newArc(t, *central);
+        for (list<pnapi::Place*>::iterator central = centralPlaces.begin(); central != centralPlaces.end(); central++) {
+            PN->createArc(t, **central);
         }
     }
 }
@@ -1093,62 +1105,59 @@ Join::~Join() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void Join::translateToNet(ExtendedWorkflowNet* PN) {
+void Join::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 
     //Create pointer to the current place and the current transition
-    Place* p;
-    Transition* t;
-
-    list<Place*> centralPlaces;
+    list<pnapi::Place*> centralPlaces;
 
     // create all input places of the process
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace((typeString() + "." + name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the input branches
     for (list<PinCombination*>::iterator inputBranch = inputBranches.begin(); inputBranch != inputBranches.end(); inputBranch++)
     {
-        p = PN->newPlace((typeString() + "." + name + ".activated." + (*inputBranch)->getName()),INTERNAL);
-        p->roles = set<string>(roles);
-        centralPlaces.push_back(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".activated." + (*inputBranch)->getName()),pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        centralPlaces.push_back(&p);
+        PN->process_internalPlaces.insert(&p);
 
-        t = PN->newTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
-        t->roles = set<string>(roles);
-        PN->newArc(t,p);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        PN->createArc(t,p);
 
         for (list<Pin*>::iterator input = (*inputBranch)->pins.begin(); input != (*inputBranch)->pins.end(); input++) {
-            PN->newArc((*input)->getPlace(),t);
+            PN->createArc(*(*input)->getPlace(),t);
         }
 
     }
 
     // create all output places of the process
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace((typeString() + "." + name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the output branches
     for (list<PinCombination*>::iterator outputBranch = outputBranches.begin(); outputBranch != outputBranches.end(); outputBranch++)
     {
-        t = PN->newTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
-        t->roles = set<string>(roles);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
 
         for (list<Pin*>::iterator output = (*outputBranch)->pins.begin(); output != (*outputBranch)->pins.end(); output++) {
-            PN->newArc(t,(*output)->getPlace());
+            PN->createArc(t,*(*output)->getPlace());
         }
 
-        for (list<Place*>::iterator central = centralPlaces.begin(); central != centralPlaces.end(); central++) {
-            PN->newArc(*central,t);
+        for (list<pnapi::Place*>::iterator central = centralPlaces.begin(); central != centralPlaces.end(); central++) {
+            PN->createArc(**central,t);
         }
     }
 }
@@ -1168,54 +1177,51 @@ int Merge::statistics_getInDegree () {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void Merge::translateToNet(ExtendedWorkflowNet* PN) {
+void Merge::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 
     //Create pointer to the current place and the current transition
-    Place* p;
-    Transition* t;
-
-    Place* centralNode = PN->newPlace((typeString() + "." + name + ".activated"), INTERNAL);
-    PN->process_internalPlaces.insert(centralNode);
+    pnapi::Place& centralNode = PN->createPlace((typeString() + "." + name + ".activated"), pnapi::Node::INTERNAL);
+    PN->process_internalPlaces.insert(&centralNode);
 
     // create all input places of the process
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace((typeString() + "." + name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the input criteria
     for (list<PinCombination*>::iterator inputBranch = inputBranches.begin(); inputBranch != inputBranches.end(); inputBranch++)
     {
-        t = PN->newTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
-        t->roles = set<string>(roles);
-        PN->newArc(t,centralNode);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".activate." + (*inputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        PN->createArc(t,centralNode);
 
         for (list<Pin*>::iterator input = (*inputBranch)->pins.begin(); input != (*inputBranch)->pins.end(); input++) {
-            PN->newArc((*input)->getPlace(),t);
+            PN->createArc(*(*input)->getPlace(),t);
         }
     }
 
     // create all output places of the process
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace((typeString() + "." + name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
-        PN->pinPlaces.insert(p);
-        PN->process_internalPlaces.insert(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
+        PN->pinPlaces.insert(&p);
+        PN->process_internalPlaces.insert(&p);
     }
 
     // translate all of the output criteria
     for (list<PinCombination*>::iterator outputBranch = outputBranches.begin(); outputBranch != outputBranches.end(); outputBranch++)
     {
-        t = PN->newTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
-        t->roles = set<string>(roles);
-        PN->newArc(centralNode,t);
+        pnapi::Transition &t = PN->createTransition(typeString() + "." + name + ".fire." + (*outputBranch)->getName());
+        t.roles().insert(roles.begin(),roles.end());
+        PN->createArc(centralNode,t);
 
         for (list<Pin*>::iterator output = (*outputBranch)->pins.begin(); output != (*outputBranch)->pins.end(); output++) {
-            PN->newArc(t,(*output)->getPlace());
+            PN->createArc(t,*(*output)->getPlace());
         }
     }
 }
@@ -1245,54 +1251,51 @@ AtomicCFN::~AtomicCFN() {
 
 // translates this Flow content element to its corresponding
 // petri net pattern in the given petri net
-void AtomicCFN::translateToNet(ExtendedWorkflowNet* PN) {
-
-    Place* p;
-    Transition* t;
+void AtomicCFN::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
 
     // create all input places of the process
     for (list<Pin*>::iterator input = inputPins.begin(); input != inputPins.end(); input++) {
-        p = PN->newPlace((typeString() + "." + name + ".input." + (*input)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*input)->setPlace(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".input." + (*input)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*input)->setPlace(&p);
 
         switch (type) {
           case NENDNODE:
-            PN->process_endNodes.insert(p);
+            PN->process_endNodes.insert(&p);
             break;
           case NSTOPNODE:
-            PN->process_stopNodes.insert(p);
+            PN->process_stopNodes.insert(&p);
             break;
         }
 
         // now act depending on if this atomic cnf is a stopNode or not (meaning an endnode)
         if (type == NSTOPNODE) {
-            t = PN->newTransition((typeString() + "." + name + ".loop"));
-            t->roles = set<string>(roles);
-            PN->newArc(p,t);
-            PN->newArc(t,p);
-            p->isFinal = true;
+            pnapi::Transition &t = PN->createTransition((typeString() + "." + name + ".loop"));
+            t.roles().insert(roles.begin(),roles.end());
+            PN->createArc(p,t);
+            PN->createArc(t,p);
+            PN->omegaPlaces.insert(&p);
         } else {
-            t = PN->newTransition((typeString() + "." + name + ".eat"));
-            t->roles = set<string>(roles);
-            PN->newArc(p,t);
+            pnapi::Transition &t = PN->createTransition((typeString() + "." + name + ".eat"));
+            t.roles().insert(roles.begin(),roles.end());
+            PN->createArc(p,t);
         }
     }
 
     // create all output places of the process, this only happens for a startNode
     for (list<Pin*>::iterator output = outputPins.begin(); output != outputPins.end(); output++) {
-        p = PN->newPlace((typeString() + "." + name + ".output." + (*output)->getName()), INTERNAL);
-        p->roles = set<string>(roles);
-        (*output)->setPlace(p);
+        pnapi::Place &p = PN->createPlace((typeString() + "." + name + ".output." + (*output)->getName()), pnapi::Node::INTERNAL);
+        p.roles().insert(roles.begin(),roles.end());
+        (*output)->setPlace(&p);
 
         switch (type) {
           case NSTARTNODE:
-            PN->process_startNodes.insert(p);
+            PN->process_startNodes.insert(&p);
             break;
         }
 
-        for(list<Node*>::iterator t = (static_cast<Process*>(parentFCE))->startingTransitions.begin(); t != (static_cast<Process*>(parentFCE))->startingTransitions.end(); t++) {
-            PN->newArc((*t),p);
+        for(list<pnapi::Node*>::iterator t = (static_cast<Process*>(parentFCE))->startingTransitions.begin(); t != (static_cast<Process*>(parentFCE))->startingTransitions.end(); t++) {
+            PN->createArc((**t),p);
         }
     }
 

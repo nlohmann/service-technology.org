@@ -1,19 +1,20 @@
 /*****************************************************************************\
-  UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
-  Copyright (C) 2008  Dirk Fahland <dirk.fahland@service-technolog.org>
+ UML2oWFN -- Translating UML2 Activity Diagrams to Petri nets
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ Copyright (C) 2007, 2008, 2009  Dirk Fahland and Martin Znamirowski
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ UML2oWFN is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ UML2oWFN is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #include <stdio.h>
@@ -181,18 +182,18 @@ string process_name_to_file_name (string processName) {
  *****************************************************************************/
 
 /// write the current Petri net
-void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
+void write_net_file(pnapi::ExtendedWorkflowNet *PN, analysis_t analysis) {
     trace(TRACE_DEBUG, "-> writing Petri net to file\n");
 
     // now the net will not change anymore, re-enumerate nodes of the net
     // to anonymize it
     if (globals::parameters[P_ANONYMIZE]) {
-      PN->reenumerate();
+      //PN->reenumerate();
       PN->anonymizeNodes();
     }
 
-    //  PN.calculate_max_occurrences();
-    cerr << PN->information() << endl;
+    // print statistical info
+    cerr << pnapi::io::stat << *PN << endl;
 
     // create oWFN output ?
     if (formats[F_OWFN]) {
@@ -201,8 +202,8 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-        PN->set_format(FORMAT_OWFN);
-        (*output) << *PN;
+        PN->toLoLAIdent();
+        (*output) << pnapi::io::owfn << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -217,8 +218,8 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
-        PN->set_format(FORMAT_LOLA);
-        (*output) << *PN;
+        PN->toLoLAIdent();
+        (*output) << pnapi::io::lola << *PN;
 
        if (!shall_write_task_to_file(analysis)) { // append verification property to net
            trace(TRACE_DEBUG, "-> Appending specification for verification ...\n");
@@ -230,7 +231,7 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
-
+/*
     // create PNML output ?
     if (formats[F_PNML]) {
         if (globals::output_filename != "") {
@@ -246,7 +247,8 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
-
+ */
+/*
     // create PEP output ?
     if (formats[F_PEP]) {
         if (globals::output_filename != "") {
@@ -262,6 +264,7 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
+*/
 
     // create Woflan TPN output ?
     if (formats[F_TPN]) {
@@ -270,8 +273,8 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for Woflan (TPN) ...\n");
-        PN->set_format(FORMAT_TPN);
-        (*output) << *PN;
+        PN->toLoLAIdent();
+        (*output) << pnapi::io::woflan << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -279,6 +282,7 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
         }
     }
 
+/*
     // create INA output ?
     if (formats[F_INA]) {
         if (globals::output_filename != "") {
@@ -294,7 +298,8 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
-
+*/
+/*
     // create SPIN output ?
     if (formats[F_SPIN]) {
         if (globals::output_filename != "") {
@@ -310,7 +315,9 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
+*/
 
+/*
     // create APNN output ?
     if (formats[F_APNN]) {
         if (globals::output_filename != "") {
@@ -326,7 +333,7 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
-
+*/
     // create dot output ?
     if (formats[F_DOT]) {
         if (globals::output_filename != "") {
@@ -334,8 +341,8 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
         }
 
         trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-        PN->set_format(FORMAT_DOT, true);
-        (*output) << *PN;
+        //PN->set_format(FORMAT_DOT, true);
+        (*output) << pnapi::io::dot << *PN;
 
         if (globals::output_filename != "") {
             closeOutput(output);
@@ -350,7 +357,7 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
 #endif
         }
     }
-
+/*
     // create info file ?
     if (formats[F_INFO]) {
         if (globals::output_filename != "") {
@@ -366,6 +373,7 @@ void write_net_file(ExtendedWorkflowNet *PN, analysis_t analysis) {
             output = NULL;
         }
     }
+*/
 }
 
 /******************************************************************************
@@ -414,8 +422,8 @@ void write_log_file () {
  *        to append a single task to the file. If the analysis requires
  *        several task files to be written, this method gives incorrect results.
  *        For multiple task files, use the dedicated methods
- *           #generate_mc_task_file_contents()
- *           #generate_state_task_file_contents()
+ *           #generate_task_file_contents_finalState()
+ *           #generate_task_file_contents_safeState()
  *        and/or
  *           #write_task_file()
  *
@@ -597,21 +605,21 @@ void extend_script_file_subAnalysis_lola (possibleAnalysis an) {
 
   if (an == A_DEADLOCKS) {
     analysis_text = " for deadlocks";
-    lolaCommand = "lola-dl";
+    lolaCommand = "lola-deadlock";
     taskFile_suffix = "";
 
   } else if (an == A_SAFE) {
     analysis_text = " for safeness";
-    lolaCommand = "lola-sp";
+    lolaCommand = "lola-bpm-statepredicate1";
     taskFile_suffix = ".safe"; // safeness of the net
     isTaskFileAnalysis = true;
 
   } else if (an == A_SOUNDNESS) {
     analysis_text = " for soundness";
     if (globals::parameters[P_CTL])
-      lolaCommand = "lola-mc";
+      lolaCommand = "lola-bpm-modelchecking1";
     else
-      lolaCommand = "lola-lp";
+      lolaCommand = "lola-bpm-liveprop1";
     taskFile_suffix = ".fin"; // reachability of final state
     isTaskFileAnalysis = true;
 

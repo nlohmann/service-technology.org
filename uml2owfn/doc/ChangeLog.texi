@@ -1,3 +1,11 @@
+@heading Version 2.10-unreleased
+@itemize
+@item Migrated UML2oWFN to the new Petri net API. The included PNAPI slightly deviates from the original API, see SVN repository for details. 
+@item Dropped support for several file formats. The currently supported file formats are .lola, .owfn, .dot, and .tpn (Woflan)
+@item Changed the filenames of the LoLA binaries for soundness analysis to @file{lola-bpm-liveprop1} and @file{lola-bpm-statepredicate1}
+@item Role cutting functionality has been disabled. 
+@end itemize
+
 @heading Version 2.00
 @itemize
 @item Re-implementation of the compiler frontend.

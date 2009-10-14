@@ -1,4 +1,4 @@
-AC_INIT(Yasmina, 0.3, olivia.oanea@service-technology.org)
+AC_INIT(Yasmina, 0.4-unreleased, olivia.oanea@service-technology.org)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 

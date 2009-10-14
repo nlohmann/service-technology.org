@@ -79,6 +79,10 @@ std::vector<std::map<std::string, int> > fmar;
 extern int mp_yylex_destroy();
 #endif
 
+std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::Formula * form);
+const pnapi::formula::Formula *  transformNegFormula(const pnapi::PetriNet &net1, const pnapi::formula::Formula * form);
+
+
 void initialize_mp_parser() {
 	mp_yylineno = 1;
 	mp_yydebug = 0;
@@ -262,7 +266,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 	if(typeid(*form)==typeid(pnapi::formula::Conjunction)){ 
 		//std::cout<<"Conjunction "<<std::endl;
 		//form->output(std::cout);//cout<<form->children().size()<<endl;
-		const pnapi::formula::Operator *fop=dynamic_cast<const pnapi::formula::Operator *>(form);
+		//const pnapi::formula::Operator *fop=dynamic_cast<const pnapi::formula::Operator *>(form);
 		//cout<<"Number of children: ";cout<<fop->children().size()<<endl;
 		std::set<lprec *> previous, current;
 	        lprec *lpcopy;
@@ -732,6 +736,7 @@ const pnapi::formula::Formula * unfoldFlags(const pnapi::PetriNet &net1, const p
 				}
 		}
 	}
+	return form;
 }
 
 
@@ -780,7 +785,7 @@ int main(int argc, char** argv) {
 				cs=s.substr(s.find("@")+1); 		
 	 			stringstream ss;ss<<st;
  				int net; ss>>net;//cout<<net;
- 				const int netc=net;//const std::string cs;
+ 				//const int netc=net;//const std::string cs;
 				if(net==0){abort(2, "wrong format for enforce events. Read the manual.\n");}
 //		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
 	 			set<std::string> sets;sets.insert(cs);
@@ -816,7 +821,7 @@ int main(int argc, char** argv) {
 				cs=s.substr(s.find("@")+1); 		
 	 			stringstream ss;ss<<st;
  				int net; ss>>net;//cout<<net;
- 				const int netc=net;//const std::string cs;
+ 				//const int netc=net;//const std::string cs;
 				if(net==0){abort(2, "wrong format for exclude events. Read the manual.\n");}
 				//		if(s.find(".")!=std::string::npos) cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
 	 			set<std::string> sets;sets.insert(cs);
@@ -950,7 +955,7 @@ int main(int argc, char** argv) {
 	
 // print result
 	//fflush(stdin);
-	int res;//the result of the system
+	int res=0;//the result of the system
 	std::vector<lprec *> lpmps;// 
 	std::set<std::string> resultinp, resultout,resultsyn, result, resintern;//interface 
 	//parse the message profile files
@@ -1143,7 +1148,7 @@ int main(int argc, char** argv) {
 					for(unsigned int j=0;j<lpmps.size();++j){// add lpr too
 						for (unsigned int r=0; r<get_Nrows(lpmps.at(i)); ++r) {
 							REAL *rowp=new REAL[1+get_Ncolumns(lpr)]();//int *colp;
-							char grex=get_row(lpmps.at(j),r+1,rowp);//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
+							if(get_row(lpmps.at(j),r+1,rowp)==-1) abort(2, "lpsolve	");//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
 							//for(int j=0;j<get_Ncolumns(lpmp);j++){rowwpp[j+hh-get_Ncolumns(lpmp)]=rowp[j+1];}
 							//for(int j=0;j<hh;j++){cout<<rowwpp[j]<<" ";}
 							//if( grex==-1) cout<<"gata";
@@ -1402,12 +1407,12 @@ int main(int argc, char** argv) {
 			
 			//match the interfaces
 			//for each final marking
-			for (int ifm=0; ifm<lpmps.size(); ifm++) {int kn=1;
+			for (unsigned int ifm=0; ifm<lpmps.size(); ifm++) {//int kn=1;
 //					mps.insert(lp);lp=lpmc;cout<<get_col_name(lp,get_Ncolumns(lp))<<"help"<<endl;
 					//aici adauga constraints	
 				//adauga variabiles for places to relate them to their input and output transitions
-				int nvars=get_Ncolumns(lpmps.at(ifm));
-				for(int j=0;j<nvars;j++){//to do if it is already there skip
+				unsigned int nvars=get_Ncolumns(lpmps.at(ifm));
+				for(unsigned int j=0;j<nvars;j++){//to do if it is already there skip
 					Place & l= *net1.findPlace(get_col_name(lpmps.at(ifm),j+1)); 
 					if(&l==NULL) {continue;} //place is already there or it is a sync transition cout<<get_col_name(lpmps.at(ifm),j+1)<<" ";
 					//cout<<get_col_name(lpmps.at(ifm),j+1)<<" ";

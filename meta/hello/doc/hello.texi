@@ -1,0 +1,323 @@
+\input texinfo
+@setfilename hello.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Hello User's Manual
+
+
+@c --------------------------------------------------------------------------
+
+
+@copying
+@b{About this document:}
+
+This manual is for Hello, version @value{VERSION}, a <<-- HELLO WORLD -->> tool, last updated @value{UPDATED}.
+
+Copyright @copyright{} 20XX <<-- AUTHOR -->>
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* Hello: (hello).       <<-- HELLO WORLD -->>.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+
+@titlepage
+
+@title Hello
+
+@subtitle <<-- MISSION STATEMENT -->>
+@subtitle @url{http://service-technology.org/hello}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author <<-- AUTHOR -->>
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@c --------------------------------------------------------------------------
+
+
+@ifnottex
+@node Top
+@top Hello
+@insertcopying
+@end ifnottex
+
+
+@c --------------------------------------------------------------------------
+
+
+@menu
+* First Steps::How to set up and install Hello.
+* Command Line Options::How to run Hello.
+* Theory::The theory behind Hello.
+* Exit and Error Codes::What the error and exit codes of Hello mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+
+@contents
+@paragraphindent none
+
+
+@c --------------------------------------------------------------------------
+
+
+@node First Steps
+@chapter First Steps
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/hello} and download the latest release version of Hello, say @file{hello-@value{VERSION}.tar.gz}. To setup and compile Hello, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz hello-@value{VERSION}.tar.gz
+cd hello-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/hello} is generated.@footnote{On Microsoft Windows, the file will be called @file{hello.exe}.} If you experience any compiler warnings, don't panic: Hello contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All <<-- TESTNUM -->> tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{hello@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Hello. The documentation can be created using @samp{make pdf}. Note you need to have Hello properly installed before (see installation description above).
+
+@item libs
+The Petri Net @acronym{API} used by Hello to parse and organize the open net.
+
+@item man
+The manpage of Hello which can be displayed using @samp{man hello} after having Hello installed (see installation description above).
+
+@item src
+The source code of Hello.
+
+@item tests
+Testcases for Hello which check the generated binary.
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Hello, several tools are required.
+
+@subsection Runtime
+@itemize
+@item Wendy (@url{http://service-technology.org/wendy}). A suitable Wendy binary can be created as follows:
+@enumerate
+@item download @url{http://service-technology.org/files/wendy/wendy.tar.gz}
+@item untar @file{wendy.tar.gz}, configure
+@item call @samp{make}
+@item copy the binary @file{src/wendy} to a directory of your path
+(e.g., @file{/usr/local/bin}) or call @samp{make install}
+@end enumerate
+@end itemize
+
+Hello's configure script checks whether Wendy (with binary @file{wendy}) is found in the path and adjusts the configuration file @file{src/hello.conf} accordingly.
+
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Hello.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking Hello
+
+Hello is a command line tool and does not come with a fancy @acronym{GUI}. However, Hello can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{hello -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+
+@section Configuration Files
+
+The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+
+@cartouche
+@smallexample
+hello net.owfn --config=myconf.conf
+@end smallexample
+@end cartouche
+
+A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+
+The configure script creates a default configuration file @file{hello.conf} which located in the @file{src} folder. When installing Hello, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+
+When Hello is executed, it evaluates parameters as follows:
+@enumerate
+@item When a configuration file is given via @option{--config}, it is used.
+@item Otherwise, the configuration file @file{hello.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{hello.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, no configuration file is used.
+@end enumerate
+Parameters given via command-line will overwrite parameters given via configuration files.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Hello implements several algorithms and result published in several scientific articles.
+
+@section <<-- THEORY -->>
+
+@subsubheading <<-- THEORY -->>
+
+@quotation
+<<-- THEORY -->>
+@end quotation
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+@section Exit Codes
+
+Hello will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, <<-- MORE ERRORS -->>. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+@section Error Codes
+
+In case any error occurs, Hello aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+
+@item #01
+<<-- ERROR DESCRIPTION -->>
+
+@smallexample
+@cartouche
+hello: <<-- ERROR MESSAGE -->> -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Hello is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at Hello's website at @url{http://service-technology.org/files/hello/ChangeLog}.
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

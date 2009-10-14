@@ -1,0 +1,11 @@
+@heading Version 1.0-unreleased (32 October 2009)
+@itemize
+@item first release of Hello
+
+@item normalizes a net and pipes the result to Wendy.
+
+@item <<-- CHANGES -->>
+
+@end itemize
+
+@heading Version 0.0-unreleased (32 October 2009)

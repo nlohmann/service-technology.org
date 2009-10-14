@@ -1,0 +1,58 @@
+AT_INIT
+
+m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
+
+AT_TESTED(versions.sh)
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([HELLO --help],0,ignore)
+AT_CHECK([HELLO --detailed-help],0,ignore)
+AT_CHECK([HELLO --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([HELLO --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cat myCoffee.owfn | HELLO],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from file])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([HELLO myCoffee.owfn],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Output to stderr])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([HELLO myCoffee.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "parsed: wendy: net is controllable" stderr], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Output to given file])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([HELLO myCoffee.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "parsed: wendy: net is controllable" stderr], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+

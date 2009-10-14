@@ -1,0 +1,19 @@
+# Configuration file for @PACKAGE_STRING@
+# @configure_input@
+
+# This file configures the paths to binaries needed by Hello. The configure
+# script already tried to suggest paths, but its entries might have been left
+# empty. In that case, you need to manually add the path to the respective
+# tool.
+
+# Hello needs a Wendy binary. Such a Wendy binary can be built by executing
+# "make wendy" using a recent Wendy distribution, available at 
+# http://service-technology.org/files/wendy
+
+wendy = @WENDY@
+
+# Hello needs to create a temporary file to pass it to Wendy. The filename
+# Hello should use can be specified below. The filename should end with
+# 'XXXXXX' which is replaced at runtime with a random string.
+
+tmpfile = /tmp/hello-XXXXXX

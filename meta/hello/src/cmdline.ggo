@@ -1,0 +1,80 @@
+# This is the only input file for gengetopt.
+
+# arguments for gengetopt ... what do they do?
+# --long-help: long usage line in help
+# --include-getopt: adds code for getopt_long in generated C file
+# --show-required: output of help will specify which options are mandatory
+# --unamed-opts=FILE: accept options without names
+# --no-handle-error: TODO
+# --conf-parser: TODO
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Hello:"
+purpose "Hello World.\n This programm normalizes a given open net, pipes it to Wendy and parses Wendy's output.\n\n  Report bugs to hello@service-technology.org.\n  Visit Hello's home page at http://service-technology.org/hello"
+
+
+section "Input/Output"
+sectiondesc="When called without an input file, Hello reads from the standard input stream. When called without an output parameter, Hello writes to the standard output stream. If no filename is given for the output option Hello creates a file with a temporary name.\n"
+
+option "output" o
+  "Wendy's output."
+  details="This option is used when Wendy's output should be stored to a file.\n"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+
+section "Configuration"
+sectiondesc="Hello relies on several other tools. These options configure Hello to find these tools.\n"
+
+option "config" c
+  "Read configuration from file."
+  details="If no file is given, Hello first tries to parse file `hello.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Hello was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "wendy" -
+  "Set the path and binary of Wendy."
+  details="The Wendy binary. Wendy can be downloaded from http://service-technology.org/wendy and compiled using `make wendy'.\n"
+  string
+  typestr="FILENAME"
+  default="wendy"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files."
+  details="The filename Hello should use to create temporary files (i.e., the output derived from Wendy). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/hello-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created will be kept after Hello terminates.\n"
+  flag off
+
+
+section "Debugging"
+sectiondesc="These options control how much debug output Hello creates.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Hello was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden

@@ -1,0 +1,43 @@
+                       __        __             _       
+                       \ \      / /__ _ __   __| |_   _ 
+                        \ \ /\ / / _ \ '_ \ / _` | | | |
+                         \ V  V /  __/ | | | (_| | |_| |
+                          \_/\_/ \___|_| |_|\__,_|\__, |
+                                                  |___/
+                      Hello World
+                      http://service-technology.org/hello
+
+
+PURPOSE
+    Hello World
+
+
+COPYRIGHT
+    Copyright (c) 20XX <<-- AUTHOR1, AUTHOR2, ... -->>
+
+
+AUTHORS
+    See file "AUTHORS" for details.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Hello is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Hello.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Hello can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Hello.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Hello. It can also be
+    downloaded at <http://service-technology.org/files/hello/hello.pdf>.

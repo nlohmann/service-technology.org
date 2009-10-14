@@ -19,6 +19,10 @@ candy = @CANDY@
 
 petrify = @PETRIFY@
 
+# Providing the binary for Petrify result in nices controller
+
+genet = @GENET@
+
 # Wendy needs to create a temporary file to pass it to LoLA. The filename
 # Wendy should use can be specified below. The filename should end with
 # 'XXXXXX' which is replaced at runtime with a random string.

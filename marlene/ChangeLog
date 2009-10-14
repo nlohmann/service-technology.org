@@ -17,6 +17,8 @@ Version 1.2-unreleased
 * added experimental support for Candy
   (`http://service-technology.org/tools/candy')
 
+* added support for building controllers using Genet
+
 * known issues:
 
      * added workaround when dealing with synchronouns interface between

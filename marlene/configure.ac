@@ -28,6 +28,10 @@ AC_PROG_AWK
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# export tools needed to determine memory consumption
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
@@ -41,7 +45,7 @@ AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
 #AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(CANDY, [candy], [])
-AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
+AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], "not_found")
 if test "$PETRIFY" = "not found"; then
   AC_MSG_WARN([Petrify was not found. See file README.])
   AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
@@ -49,6 +53,16 @@ else
   AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
 fi
 AC_SUBST(PETRIFY)
+
+
+AC_PATH_PROGS(GENET, [genet], not_found)
+if test "$GENET" = "not_found"; then
+  AC_MSG_WARN([GENET not found. See file README.])
+  AC_DEFINE(CONFIG_GENET, "not_found", [Genet was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_GENET, "${GENET}", [Genet can be used.])
+fi
+AC_SUBST(GENET)
 
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
@@ -90,7 +104,15 @@ AC_MSG_RESULT([better should be])
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
+
+# allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

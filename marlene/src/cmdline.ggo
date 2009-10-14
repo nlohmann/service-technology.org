@@ -83,6 +83,10 @@ option "veryverbose" w
   dependon="verbose"
   flag off
 
+option "stats" -
+  "Print some statistical information about runtime and memory consumption"
+  flag off
+
 option "bug" -
   "Creates a file called 'bug.log' that can be sent to the developer. Program will exit immediately after creating this file."
   flag off
@@ -96,6 +100,15 @@ option "output" o
   typestr="FILE"
   default="result.owfn"
   optional
+
+option "sa2on" -
+  "Sets the kind of converter from a state automaton to an open net. (State machine conversion is always the fall back)."
+  string
+  typestr="TYPE"
+  values="petrify","genet","statemachine" enum
+  default="petrify"
+  optional
+  hidden
   
 option "wendy" -
   "Set the name of the Wendy binary used to build most-permissive partners."
@@ -110,6 +123,14 @@ option "candy" -
   string
   typestr="FILE"
   default="candy"
+  optional
+  hidden
+
+option "genet" -
+  "Set the name of the Genet binary for transformation of service automata to open nets."
+  string
+  typestr="FILE"
+  default="genet"
   optional
   hidden
 

@@ -59,8 +59,8 @@ $(TESTSUITE): $(srcdir)/testsuite.at
 # LCOV test coverage #
 ######################
 
-# distribute the LGOV scripts
-EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov
+# distribute the LCOV scripts
+EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov zcov
 
 # compile the code for code coverage
 cover-prepare:
@@ -88,12 +88,22 @@ descriptions: $(TESTSUITE)
 cover-check: cover-prepare $(TESTSUITE)
 	test ! -d cover || rm -fr cover
 	$(MKDIR_P) cover
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=TRUE
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=LCOV
 
 # exclude generated code using the wildcards specified in NO_COVER_FILES
 cover.info:
 	cat cover/*.info > cover.info
 	lcov/lcov --remove cover.info $(addprefix ",$(addsuffix ", $(NO_COVER_FILES))) -o cover.info
+
+# use ZCOV for branch coverage
+cover-branch: cover-prepare $(TESTSUITE)
+	test ! -d cover || rm -fr cover
+	$(MKDIR_P) cover
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=ZCOV
+	zcov/zcov-merge cover/output.zcov cover/*.zcov
+	zcov/zcov-genhtml cover/output.zcov cover-html
+	@echo see `pwd`/cover-html/index.html for a coverage report
+
 
 # create a HTML table with results from LCOV
 cover-html: descriptions cover.info
@@ -112,3 +122,5 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcov -exec rm {} \;
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
+
+

@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <cerrno>
 #include <sstream>
 
 #include "config.h"
@@ -60,22 +61,44 @@ void print_version (void)
  \param format  the error message formatted as printf string
 */
 // code by Niels
-void abort(unsigned int code, const char* format, ...) {
+__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...) 
+{
     fprintf(stderr, "%s: ", PACKAGE);
 
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
-    va_end (args);
+    va_end(args);
 
     fprintf(stderr, " -- aborting [#%02d]\n", code);
 
-    if (args_info.verbose_given) {
-        fprintf(stderr, "%s: see manual for a documentation of this error\n", PACKAGE);
+    status("see manual for a documentation of this error");
+
+    if (errno != 0) {
+        status("last error message: %s", strerror(errno));
     }
 
     exit(EXIT_FAILURE);
 }
+
+/*!
+ \param format  the status message formatted as printf string
+ 
+ \note use this function rather sparsely in order not to spam the output
+*/
+// code by Niels
+void message(const char* format, ...) {
+    fprintf(stderr, "%s: ", PACKAGE);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+
+    fprintf(stderr, "\n");
+}
+
+
 
 /*!
  \brief

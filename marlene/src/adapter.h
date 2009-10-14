@@ -109,10 +109,12 @@ class Adapter
         ControllerType _contType;
         
         //! message bound on interface, neccesary for complement places
+        //! \todo: uint_8t
         unsigned int _messageBound;
 
         //! flag indicating, whether to use complementary places or not
-        bool _useCompPlaces;
+        //! \todo: kann man das entfernen?
+        unsigned _useCompPlaces : 1;
         
         /*!
          * \brief Given the #_nets, creates the interface for #_engine.
@@ -152,6 +154,8 @@ class Adapter
          * \return string representing the rule's for using as transition name
          */ 
         static inline std::string getRuleName(unsigned int i);
+
+        std::string cost_file_content;
         
 
 };
@@ -177,7 +181,7 @@ class RuleSet {
                 //! type of a list of sync channels
                 typedef std::list< unsigned int > syncList;
                 
-                /*! 
+                /*!
                  * \brief Modus of a transformation rule
                  *
                  * Normally a transformation rule is observable and 
@@ -278,6 +282,7 @@ class RuleSet {
          * \brief Returns a const reference to the transformation rules.
          * 
          * \return list of transformation rules
+         * \todo Warum keine Referenzen?
          */
         inline const std::list< AdapterRule * > getRules() const;
         
@@ -318,6 +323,7 @@ class RuleSet {
          * \brief Reference to the rules file parser, which shall have access to this classes members.
          * 
          * \return error code
+         * \todo Brauche ich wirklich die friend-Deklaration oder geht alles über addRUle?
          */
         friend int adapt_rules_yyparse();
         

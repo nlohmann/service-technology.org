@@ -12,312 +12,312 @@
 namespace pnapi
 {
 
-  // forward declarations
-  class PetriNet;
-  class Place;
-  class Node;
+// forward declarations
+class PetriNet;
+class Place;
+class Node;
 
 
-  /*!
-   * \brief   Final Condition Formulas
-   */
-  namespace formula {
+/*!
+ * \brief   Final Condition Formulas
+ */
+namespace formula {
 
 
-    typedef enum { NONE = 1, ALL_PLACES_EMPTY = 7,
-      ALL_OTHER_PLACES_EMPTY = 5, ALL_OTHER_INTERNAL_PLACES_EMPTY = 3,
-      ALL_OTHER_EXTERNAL_PLACES_EMPTY = 6
-    } AllOtherPlaces;
+typedef enum { NONE = 1, ALL_PLACES_EMPTY = 7,
+  ALL_OTHER_PLACES_EMPTY = 5, ALL_OTHER_INTERNAL_PLACES_EMPTY = 3,
+  ALL_OTHER_EXTERNAL_PLACES_EMPTY = 6
+} AllOtherPlaces;
 
 
-    class Formula
-    {
-    public:
+class Formula
+{
+public:
 
-      /// destructor
-      virtual ~Formula();
+  /// destructor
+  virtual ~Formula();
 
-      /// evaluating the formula under the given marking
-      virtual bool isSatisfied(const Marking &) const =0;
+  /// evaluating the formula under the given marking
+  virtual bool isSatisfied(const Marking &) const =0;
 
-      /// create a deep copy of the formula
-      virtual Formula * clone(const std::map<const Place *, const Place *> *
-			      = NULL) const =0;
+  /// create a deep copy of the formula
+  virtual Formula * clone(const std::map<const Place *, const Place *> *
+      = NULL) const =0;
 
-      /// output the formula
-      virtual std::ostream & output(std::ostream &) const =0;
+  /// output the formula
+  virtual std::ostream & output(std::ostream &) const =0;
 
-      /// set of concerning places
-      virtual std::set<const Place *> places() const;
-      
-      /// unfold wildcard
-      virtual void unfold(const PetriNet &) {};
+  /// set of concerning places
+  virtual std::set<const Place *> places() const;
 
-    };
+  /// unfold wildcard
+  virtual void unfold(const PetriNet &) {};
 
+};
 
 
-    /**************************************************************************
-     ***** Formula Tree Inner Nodes
-     **************************************************************************/
 
-    class Operator : public Formula
-    {
-    public:
+/**************************************************************************
+ ***** Formula Tree Inner Nodes
+ **************************************************************************/
 
-      Operator();
+class Operator : public Formula
+{
+public:
 
-      Operator(const Formula &);
+  Operator();
 
-      Operator(const Formula &, const Formula &);
+  Operator(const Formula &);
 
-      Operator(const std::set<const Formula *> &,
-	       const std::map<const Place *, const Place *> * = NULL);
+  Operator(const Formula &, const Formula &);
 
-      ~Operator();
+  Operator(const std::set<const Formula *> &,
+      const std::map<const Place *, const Place *> * = NULL);
 
-      const std::set<const Formula *> & children() const;
+  ~Operator();
 
-      std::set<const Place *> places() const;
-      
-      virtual void unfold(const PetriNet &);
+  const std::set<const Formula *> & children() const;
 
-    protected:
-      std::set<const Formula *> children_;
+  std::set<const Place *> places() const;
 
-      virtual void simplifyChildren() =0;
-    };
+  virtual void unfold(const PetriNet &);
 
+protected:
+  std::set<const Formula *> children_;
 
-    class Negation : public Operator
-    {
-    public:
+  virtual void simplifyChildren() =0;
+};
 
-      Negation(const Negation &);
 
-      Negation(const Formula &);
+class Negation : public Operator
+{
+public:
 
-      Negation(const std::set<const Formula *> &,
-	       const std::map<const Place *, const Place *> * = NULL);
+  Negation(const Negation &);
 
-      bool isSatisfied(const Marking &) const;
+  Negation(const Formula &);
 
-      Negation * clone(const std::map<const Place *, const Place *> * = NULL) const;
+  Negation(const std::set<const Formula *> &,
+      const std::map<const Place *, const Place *> * = NULL);
 
-      std::ostream & output(std::ostream &) const;
+  bool isSatisfied(const Marking &) const;
 
-    protected:
-      void simplifyChildren();
-    };
+  Negation * clone(const std::map<const Place *, const Place *> * = NULL) const;
 
+  std::ostream & output(std::ostream &) const;
 
-    class Conjunction : public Operator
-    {
-      friend std::ostream & pnapi::io::__owfn::output(std::ostream &, const Conjunction &);
+protected:
+  void simplifyChildren();
+};
 
-    public:
 
-      Conjunction(const Conjunction &);
+class Conjunction : public Operator
+{
+  friend std::ostream & pnapi::io::__owfn::output(std::ostream &, const Conjunction &);
 
-      Conjunction(const AllOtherPlaces = NONE);
+public:
 
-      Conjunction(const Formula &, const AllOtherPlaces = NONE);
+  Conjunction(const Conjunction &);
 
-      Conjunction(const Formula &, const Formula &);
+  Conjunction(const AllOtherPlaces = NONE);
 
-      // FIXME: obsolete wildcard implementation
-      Conjunction(const Formula &, const std::set<const Place *> &);
+  Conjunction(const Formula &, const AllOtherPlaces = NONE);
 
-      Conjunction(const std::set<const Formula *> &,
-		  const std::map<const Place *, const Place *> * = NULL,
-		  const AllOtherPlaces = NONE);
+  Conjunction(const Formula &, const Formula &);
 
-      bool isSatisfied(const Marking &) const;
+  // FIXME: obsolete wildcard implementation
+  Conjunction(const Formula &, const std::set<const Place *> &);
 
-      Conjunction * clone(const std::map<const Place *, const Place *> *
-			  = NULL) const;
+  Conjunction(const std::set<const Formula *> &,
+      const std::map<const Place *, const Place *> * = NULL,
+      const AllOtherPlaces = NONE);
 
-      std::ostream & output(std::ostream &) const;
-      
-      void unfold(const PetriNet &);
+  bool isSatisfied(const Marking &) const;
 
-    protected:
+  Conjunction * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-      void simplifyChildren();
+  std::ostream & output(std::ostream &) const;
 
-    private:
+  void unfold(const PetriNet &);
 
-      AllOtherPlaces flag_;
+protected:
 
-    };
+  void simplifyChildren();
 
+private:
 
-    class Disjunction : public Operator
-    {
-    public:
+  AllOtherPlaces flag_;
 
-      Disjunction(const Disjunction &);
+};
 
-      Disjunction(const Formula &, const Formula &);
 
-      Disjunction(const std::set<const Formula *> &,
-		  const std::map<const Place *, const Place *> * = NULL);
+class Disjunction : public Operator
+{
+public:
 
-      bool isSatisfied(const Marking &) const;
+  Disjunction(const Disjunction &);
 
-      Disjunction * clone(const std::map<const Place *, const Place *> *
-			  = NULL) const;
+  Disjunction(const Formula &, const Formula &);
 
-      std::ostream & output(std::ostream &) const;
+  Disjunction(const std::set<const Formula *> &,
+      const std::map<const Place *, const Place *> * = NULL);
 
-    protected:
-      void simplifyChildren();
-    };
+  bool isSatisfied(const Marking &) const;
 
+  Disjunction * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
+  std::ostream & output(std::ostream &) const;
 
-    /**************************************************************************
-     ***** Formula Tree Leaves
-     **************************************************************************/
+protected:
+  void simplifyChildren();
+};
 
-    class Proposition : public Formula
-    {
-    public:
 
-      Proposition(const Place &, unsigned int,
-		  const std::map<const Place *, const Place *> *);
 
-      const Place & place() const;
+/**************************************************************************
+ ***** Formula Tree Leaves
+ **************************************************************************/
 
-      unsigned int tokens() const;
+class Proposition : public Formula
+{
+public:
 
-      std::set<const Place *> places() const;
+  Proposition(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> *);
 
-    protected:
-      const Place & place_;
-      const unsigned int tokens_;
-    };
+  const Place & place() const;
 
+  unsigned int tokens() const;
 
-    class FormulaTrue : public Formula
-    {
-    public:
+  std::set<const Place *> places() const;
 
-      bool isSatisfied(const Marking &) const;
+protected:
+  const Place & place_;
+  const unsigned int tokens_;
+};
 
-      FormulaTrue * clone(const std::map<const Place *, const Place *> *
-			  = NULL) const;
 
-      std::ostream & output(std::ostream &) const;
+class FormulaTrue : public Formula
+{
+public:
 
-    };
+  bool isSatisfied(const Marking &) const;
 
+  FormulaTrue * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-    class FormulaFalse : public Formula
-    {
-    public:
-      bool isSatisfied(const Marking &) const;
+  std::ostream & output(std::ostream &) const;
 
-      FormulaFalse * clone(const std::map<const Place *, const Place *> *
-			      = NULL) const;
+};
 
-      std::ostream & output(std::ostream &) const;
 
-    };
+class FormulaFalse : public Formula
+{
+public:
+  bool isSatisfied(const Marking &) const;
 
+  FormulaFalse * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-    class FormulaEqual : public Proposition
-    {
-    public:
+  std::ostream & output(std::ostream &) const;
 
-      FormulaEqual(const Place &, unsigned int,
-		   const std::map<const Place *, const Place *> * = NULL);
+};
 
-      bool isSatisfied(const Marking &) const;
 
-      FormulaEqual * clone(const std::map<const Place *, const Place *> *
-			   = NULL) const;
+class FormulaEqual : public Proposition
+{
+public:
 
-      std::ostream & output(std::ostream &) const;
-    };
+  FormulaEqual(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> * = NULL);
 
+  bool isSatisfied(const Marking &) const;
 
-    class FormulaNotEqual : public Proposition
-    {
-    public:
+  FormulaEqual * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-      FormulaNotEqual(const Place &, unsigned int,
-		      const std::map<const Place *, const Place *> * = NULL);
+  std::ostream & output(std::ostream &) const;
+};
 
-      bool isSatisfied(const Marking &) const;
 
-      FormulaNotEqual * clone(const std::map<const Place *, const Place *> *
-			      = NULL) const;
+class FormulaNotEqual : public Proposition
+{
+public:
 
-      std::ostream & output(std::ostream &) const;
-    };
+  FormulaNotEqual(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> * = NULL);
 
+  bool isSatisfied(const Marking &) const;
 
-    class FormulaGreater : public Proposition
-    {
-    public:
-      FormulaGreater(const Place &, unsigned int,
-		     const std::map<const Place *, const Place *> * = NULL);
+  FormulaNotEqual * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-      bool isSatisfied(const Marking &) const;
+  std::ostream & output(std::ostream &) const;
+};
 
-      FormulaGreater * clone(const std::map<const Place *, const Place *> *
-			     = NULL) const;
 
-      std::ostream & output(std::ostream &) const;
-    };
+class FormulaGreater : public Proposition
+{
+public:
+  FormulaGreater(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> * = NULL);
 
+  bool isSatisfied(const Marking &) const;
 
-    class FormulaGreaterEqual : public Proposition
-    {
-    public:
-      FormulaGreaterEqual(const Place &, unsigned int,
-			  const std::map<const Place *, const Place *> * = NULL);
+  FormulaGreater * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-      bool isSatisfied(const Marking &) const;
+  std::ostream & output(std::ostream &) const;
+};
 
-      FormulaGreaterEqual * clone(const std::map<const Place *, const Place *> *
-				  = NULL) const;
 
-      std::ostream & output(std::ostream &) const;
-    };
+class FormulaGreaterEqual : public Proposition
+{
+public:
+  FormulaGreaterEqual(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> * = NULL);
 
+  bool isSatisfied(const Marking &) const;
 
-    class FormulaLess : public Proposition
-    {
-    public:
-      FormulaLess(const Place &, unsigned int,
-		  const std::map<const Place *, const Place *> * = NULL);
+  FormulaGreaterEqual * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-      bool isSatisfied(const Marking &) const;
+  std::ostream & output(std::ostream &) const;
+};
 
-      FormulaLess * clone(const std::map<const Place *, const Place *> *
-			  = NULL) const;
 
-      std::ostream & output(std::ostream &) const;
-    };
+class FormulaLess : public Proposition
+{
+public:
+  FormulaLess(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> * = NULL);
 
+  bool isSatisfied(const Marking &) const;
 
-    class FormulaLessEqual : public Proposition
-    {
-    public:
-      FormulaLessEqual(const Place &, unsigned int,
-		       const std::map<const Place *, const Place *> * = NULL);
+  FormulaLess * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
 
-      bool isSatisfied(const Marking &) const;
+  std::ostream & output(std::ostream &) const;
+};
 
-      FormulaLessEqual * clone(const std::map<const Place *, const Place *> *
-			       = NULL) const;
 
-      std::ostream & output(std::ostream &) const;
-    };
+class FormulaLessEqual : public Proposition
+{
+public:
+  FormulaLessEqual(const Place &, unsigned int,
+      const std::map<const Place *, const Place *> * = NULL);
 
-  }
+  bool isSatisfied(const Marking &) const;
+
+  FormulaLessEqual * clone(const std::map<const Place *, const Place *> *
+      = NULL) const;
+
+  std::ostream & output(std::ostream &) const;
+};
+
+}
 
 }
 

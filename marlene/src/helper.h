@@ -33,7 +33,8 @@ extern bool veryverbose;
 extern unsigned int veryverboseindent;
 
 extern gengetopt_args_info args_info;
-extern void abort(unsigned int code, const char* format, ...);
+extern void message(const char* format, ...);
+extern void abort(unsigned short code, const char* format, ...);
 extern void evaluate_command_line(int argc, char* argv[]);
 
 extern void status(const char* format, ...);

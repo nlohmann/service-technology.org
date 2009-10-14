@@ -37,10 +37,37 @@
 // include PN Api headers
 #include "pnapi/pnapi.h"
 
+/// a variable holding the time of the call
+clock_t start_clock = clock();
+
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // release memory (used to detect memory leaks)
+/*    if (args_info.finalize_flag) {
+        time_t start_time, end_time;
+        time(&start_time);
+        cmdline_parser_free(&args_info);
+        InnerMarking::finalize();
+        StoredKnowledge::finalize();
+        time(&end_time);
+        status("released memory [%.0f sec]", difftime(end_time, start_time));
+    }
+*/
+    // print statistics
+    if (args_info.stats_flag) {
+        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
+
 int main(int argc, char* argv[])
 {
     argv[0]=basename(argv[0]);
     
+    // set the function to call on normal termination
+    atexit(terminationHandler);
+
     std::vector< pnapi::PetriNet * > nets;
     
     /*************************************************\

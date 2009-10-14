@@ -17,9 +17,10 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
+#include <config.h>
+
 #include <iostream>
 #include <fstream>
-#include <cassert>
 #include <cstdlib>
 #include <sstream>
 
@@ -48,11 +49,8 @@ Adapter::~Adapter()
 {
     FUNCIN
     // deleting the engine if it exists
-    if (_engine != NULL)
-    {
-        delete (_engine);
-        _engine = NULL;
-    }
+    delete (_engine);
+    _engine = NULL;
     FUNCOUT
 }
 
@@ -99,9 +97,8 @@ const pnapi::PetriNet * Adapter::buildController()
     {
         // we make a copy of the engine, #_engine is needed for the result
         // #_enginecopy for the synthesis of the controller
-        PetriNet * _enginecopy = new PetriNet(*_engine);
         
-        PetriNet * composed = new PetriNet(*_enginecopy);
+        PetriNet * composed = new PetriNet(*_engine);
 
         // compose engine with nets
         for ( unsigned int i = 0; i < _nets.size(); i++)
@@ -128,15 +125,16 @@ const pnapi::PetriNet * Adapter::buildController()
                 std::set< Place *>::const_iterator placeIter = ifPlaces.begin();
                 while (placeIter != ifPlaces.end() )
                 {
+                    // \todo: warum werden beide Platznamen gebraucht? wo geht hier beim Komponieren was schief?
                     std::string placeName = (*placeIter)->getName();
                     std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
                     
                     Place * place = composed->findPlace(placeName);
-                    if (place == NULL)
-                    {
-                        place = composed->findPlace(placeName2);
-                        placeName = placeName2;
-                    }
+                    //if (place == NULL)
+                    //{
+                    //    place = composed->findPlace(placeName2);
+                    //    placeName = placeName2;
+                    //}
                     assert(place);
 
                     Place * compPlace = &composed->createPlace("comp_"
@@ -168,7 +166,7 @@ const pnapi::PetriNet * Adapter::buildController()
                                                     + placeName);
                     composed->createArc(*place, *dlTrans, _messageBound + 1);
 
-                    placeIter++;
+                    ++placeIter;
                 }
             }
         }
@@ -184,31 +182,23 @@ const pnapi::PetriNet * Adapter::buildController()
         {
             composed->normalize();
         }
+        // \todo: Experiment, ob sich das hier noch lohnt.
         composed->reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
 
         /***********************************\
         * calculate most permissive partner *
         \***********************************/
         // create a unique temporary file name
-        Output temp;
+        Output owfn_temp;
+//        Output sa_temp;
+ //       Output og_temp;
 
-        std::string tmpname(temp.name());
-        std::string owfn_filename = tmpname;
-        std::string sa_filename = tmpname + ".sa";
-        std::string og_filename = tmpname + ".og";
+        std::string owfn_filename (owfn_temp.name());
+        std::string sa_filename = owfn_filename + ".sa";
+        std::string og_filename = owfn_filename + ".og";
+        std::string cost_filename = owfn_filename + ".cf";
         
-        // workaround!!!
-        std::string net_workaround = tmpname + "_engine.owfn";
-
-        temp.stream() << pnapi::io::owfn << *composed;
-        
-        // only a workaround for bug #14417 <https://gna.org/bugs/?14417>
-        if (args_info.costoptimized_flag)
-        {
-            Output workaround(net_workaround, "engine file for costs");
-
-            workaround.stream() << pnapi::io::owfn << *_engine;
-        }
+        owfn_temp.stream() << pnapi::io::owfn << *composed;
 
         std::string wendy_command;
         std::string candy_command;
@@ -223,18 +213,21 @@ const pnapi::PetriNet * Adapter::buildController()
         {
             if (args_info.costoptimized_flag)
             {
+                Output cf_file (cost_filename,"cost file");
+                cf_file.stream() << cost_file_content;
+
                 // optimization
                 wendy_command = std::string(args_info.wendy_arg) + " "
-                                + owfn_filename + " --smart --og=-";
+                                + owfn_filename + " --og=-";
                 candy_command = " | " + std::string(args_info.candy_arg) 
                                 + " --automata --output=" + sa_filename
-                                + " --netfile=" + net_workaround;
+                                + " --costfile=" + cost_filename;
             }
             else
             {
                 // default behavior
                 wendy_command = std::string(args_info.wendy_arg) + " "
-                                + owfn_filename + " --smart --sa="
+                                + owfn_filename + " --sa="
                                 + sa_filename; // + " --og=" + og_filename;
             }
         }
@@ -245,7 +238,7 @@ const pnapi::PetriNet * Adapter::buildController()
             wendy_command += " --succeedingSendingEvent";
         } else if (args_info.arrogant_flag)
         {
-            wendy_command += " --receiveBeforeSend";
+            wendy_command += " --receivingBeforeSending";
         }
 
         time_t start_time, end_time;
@@ -259,7 +252,7 @@ const pnapi::PetriNet * Adapter::buildController()
         wendy_command += ((args_info.verbose_flag) ? " --verbose"
             : " 2> /dev/null");
         candy_command += ((args_info.verbose_flag) ? " --verbose"
-            : " 2> NUL");        
+            : " 2> /dev/null");        
 #endif
 
         if (args_info.costoptimized_flag)
@@ -268,16 +261,25 @@ const pnapi::PetriNet * Adapter::buildController()
         }
         time(&start_time);
         status("executing '%s'", wendy_command.c_str());
-        system(wendy_command.c_str());
+        int result = system(wendy_command.c_str());
+        result = WEXITSTATUS(result);
         time(&end_time);
         status("Wendy done [%.0f sec]", difftime(end_time, start_time));
+
+        if (result != 0)
+        {
+            message("Wendy returned with status %d.", result);
+            message("Controller could not be built! No adapter was created, exiting.");
+            exit(EXIT_FAILURE);
+        }
 
         /*******************************\
         * parse most-permissive partner *
         \*******************************/
         std::ifstream sa_file(sa_filename.c_str(), std::ios_base::in);
         if (! sa_file) {
-            abort(5, "could not read controller");
+            message("Controller was not built! No adapter was created, exiting.");
+            exit(EXIT_FAILURE);
         }
         pnapi::Automaton * mpp_sa = new pnapi::Automaton();
         sa_file >> pnapi::io::sa >> *mpp_sa;
@@ -289,14 +291,26 @@ const pnapi::PetriNet * Adapter::buildController()
         time(&start_time);
         pnapi::PetriNet * controller;
 
-        if (std::string(args_info.petrify_arg) != "not found") // && _contType == ASYNCHRONOUS)
+        if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "not_found") // && _contType == ASYNCHRONOUS)
         {
-            std::string petrify = std::string(args_info.petrify_arg);
-            controller = new pnapi::PetriNet(*mpp_sa, petrify);
+            status("Using Petrify for conversion from SA to open net.");
+            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
+            pnapi::PetriNet::setPetrify(args_info.petrify_arg);
+            controller = new pnapi::PetriNet(*mpp_sa);
+        }
+        else
+        if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "not_found") // && _contType == ASYNCHRONOUS)
+        {
+            status("Using Genet for conversion from SA to open net.");
+            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
+            pnapi::PetriNet::setGenet(args_info.genet_arg);
+            controller = new pnapi::PetriNet(*mpp_sa);
         }
         else
         {
-            controller = new pnapi::PetriNet(mpp_sa->stateMachine());
+            status("Using a state machine for conversion from SA to open net.");
+            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
+            controller = new pnapi::PetriNet(*mpp_sa);
         }
         time(&end_time);
         
@@ -388,8 +402,9 @@ void Adapter::createEngineInterface()
                 std::set< std::string > labels (_engine->getSynchronousLabels());
                 labels.insert("sync_" + inttransname);
                 _engine->setSynchronousLabels(labels);
+
+                cost_file_content += "sync_" + inttransname + " 0;\n";
                 
-                status("known labels: %d", _engine->getSynchronousLabels().size());
             }
             // else create interface place to the controller
             else
@@ -451,7 +466,9 @@ void Adapter::createRuleTransitions()
         
         // add costs to the transition
         trans->setCost(rule.getCosts());
-        // status("setting costs %d for %s", rule.getCosts(), transName.c_str());
+        status("setting costs %d for %s", rule.getCosts(), transName.c_str());
+
+        cost_file_content += "sync_" + transName + " " + toString(rule.getCosts()) + ";\n";
         
         // now for the places, iterate and connect them to the transition
         std::list< unsigned int > messageList = rule.getRule().first;
@@ -553,6 +570,7 @@ void Adapter::createRuleTransitions()
     FUNCOUT
 }
 
+/// \todo: was ist mit Plätzen, die Selfloop haben?
 void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
 {
     FUNCIN
@@ -596,6 +614,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
     FUNCOUT
 }
 
+/// \todo: kann doch die API!?
 void Adapter::removeUnnecessaryRules()
 {
     FUNCIN
@@ -606,7 +625,7 @@ void Adapter::removeUnnecessaryRules()
 
     while ( !possibleDeadPlaces.empty() )
     {
-        // find all place with an empty preset (so places are structually dead
+        // find all place with an empty preset (so places are structually dead)
 
         std::set<Place *>::iterator placeIter = possibleDeadPlaces.begin();
 

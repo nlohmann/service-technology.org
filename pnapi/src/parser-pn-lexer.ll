@@ -80,6 +80,8 @@
 
 %s COMMENT
 %s CAPACITY
+%s ARCWEIGHT
+%s G_OUTPUT
 
 namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9/.:]
@@ -94,38 +96,45 @@ transitionname3		"in."{name}
 
  /* RULES */
 
-"#"                     { BEGIN(COMMENT); }
-<COMMENT>[\n\r]         { BEGIN(INITIAL); }
-<COMMENT>[^\n]*         { /* ignore */    }
+"#"                            { BEGIN(COMMENT); }
+<COMMENT>[\n\r]                { BEGIN(INITIAL); }
+<COMMENT>[^\n]*                { /* ignore */    }
 
-".capacity"             { BEGIN(CAPACITY); }
-<CAPACITY>[\n\r]        { BEGIN(INITIAL); }
-<CAPACITY>[^\n]*        { /* ignore */    }
+".capacity"                    { BEGIN(CAPACITY); }
+<CAPACITY>[\n\r]               { BEGIN(INITIAL); }
+<CAPACITY>[^\n]*               { /* ignore */    }
 
-".model"                { return K_MODEL; }
-".dummy"                { return K_DUMMY; }
-".outputs"              { return K_OUTPUTS; }
-".graph"                { return K_GRAPH; }
-".marking"              { return K_MARKING; }
-".end"                  { return K_END; }
+".model"                       { return K_MODEL; }
+".dummy"                       { return K_DUMMY; }
+".graph"                       { return K_GRAPH; }
+".marking"                     { return K_MARKING; }
+".end"                         { return K_END; }
 
-"{"                     { return OPENBRACE; }
-"}"                     { return CLOSEBRACE; }
+".outputs"                     { BEGIN(G_OUTPUT); return K_OUTPUTS; }
+<G_OUTPUT>{transitionname1}    { /* ignore */ }
+<G_OUTPUT>[\n\r]               { BEGIN(INITIAL); return NEWLINE; }
 
-{placename}		{ pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return PLACENAME; }
+"{"                            { return OPENBRACE; }
+"}"                            { return CLOSEBRACE; }
 
-{transitionname1}	{ pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+"("                            { BEGIN(ARCWEIGHT); return LPAR; }
+<ARCWEIGHT>{number}            { BEGIN(INITIAL); pnapi_pn_yylval.yt_uInt = atoi(pnapi_pn_yytext); return WEIGHT; }
+")"                            { return RPAR; }
 
-{transitionname2}	{ pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+{placename}	               { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return PLACENAME; }
 
-{transitionname3}	{ pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+{transitionname1}	       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
 
-"finalize"		{ pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+{transitionname2}	       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
 
-{name}			{ return IDENTIFIER; }
+{transitionname3}	       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
 
-[\n\r]                  { return NEWLINE; }
+"finalize"		       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
 
-[ \t]                   { /* ingore */ }
+{name}		               { return IDENTIFIER; }
 
-.                       { yyerror("unexpected lexical token"); }
+[\n\r]                         { return NEWLINE; }
+
+[ \t]                          { /* ingore */ }
+
+.                              { yyerror("unexpected lexical token"); }

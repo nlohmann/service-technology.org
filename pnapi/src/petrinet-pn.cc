@@ -315,9 +315,10 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         transition = &createTransition("t" + remapped);
 
       // create arcs t->p
-      for (set<string>::iterator p = arcs_[*t].begin(); p != arcs_[*t].end(); ++p)
+      for (map<string, unsigned int>::iterator p = arcs_[*t].begin(); 
+            p != arcs_[*t].end(); ++p)
       {
-        createArc(*transition, *findPlace(*p));
+        createArc(*transition, *findPlace(p->first), p->second);
       }
 
       // create arcs t->interface and interface->t
@@ -355,13 +356,13 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
   for (set<string>::iterator p = places_.begin(); p != places_.end(); ++p)
   {
-    for (set<string>::iterator t = arcs_[*p].begin(); t != arcs_[*p].end(); ++t)
+    for (map<string, unsigned int>::iterator t = arcs_[*p].begin(); t != arcs_[*p].end(); ++t)
     {
-      string transitionName = remap(*t, edgeLabels);
+      string transitionName = remap(t->first, edgeLabels);
 
       if (transitionName.substr(0,5) != "FINAL")
       {
-        createArc(*findPlace(*p), *findTransition("t" + transitionName));
+        createArc(*findPlace(*p), *findTransition("t" + transitionName), t->second);
       }
       else
       {

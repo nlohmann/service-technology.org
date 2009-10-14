@@ -546,8 +546,8 @@ extern std::set<std::string> transitions_;
 extern std::set<std::string> places_;
 extern std::map<std::string, unsigned int> initialMarked_;
 extern std::set<std::string> interface_;
-extern std::map<std::string, std::set<std::string> > arcs_;
-extern std::set<std::string> tempNodeSet_;
+extern std::map<std::string, std::map<std::string, unsigned int> > arcs_;
+extern std::map<std::string, unsigned int> tempNodeMap_;
 extern bool in_marking_list;
 extern bool in_arc_list;
 

@@ -92,6 +92,16 @@ option "mirror" M
   flag off
 
 
+section "Configuration"
+
+option "converter" -
+  "Specifies, which converter should be used to transform service automata in petri nets."
+  typestr="CONVERTER"
+  values="petrify","genet","statemachine" enum
+  optional
+  hidden
+
+
 section "Debugging"
 
 option "verbose" v

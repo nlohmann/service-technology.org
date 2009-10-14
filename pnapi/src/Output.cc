@@ -33,10 +33,10 @@
 
 namespace pnapi
 {
-  namespace util
-  {
-    const char* tmpFileTemplate = "/tmp/pnapi-XXXXXX";
-  }
+namespace util
+{
+const char* tmpFileTemplate = "/tmp/pnapi-XXXXXX";
+}
 }
 
 using namespace pnapi::util;
@@ -49,7 +49,7 @@ using namespace pnapi::util;
  This constructor creates a temporary file using mktemp().
  In case of MinGW compilations, the
  basename has to be used to avoid problems with path names.
-*/
+ */
 Output::Output() :
 #if defined(__MINGW32__)
   os(*(new std::ofstream(mktemp(temp = basename(strdup(tmpFileTemplate))), std::ofstream::out | std::ofstream::trunc))),
@@ -57,7 +57,7 @@ Output::Output() :
   os(*(new std::ofstream(mktemp(temp = strdup(tmpFileTemplate)), std::ofstream::out | std::ofstream::trunc))),
 #endif 
   filename(temp), kind("")
-{
+  {
   if (not os.good() or filename == "") 
   {
     //  abort(13, "could not create to temporary file '%s'", filename.c_str());
@@ -66,24 +66,24 @@ Output::Output() :
   }
 
   // status("writing to temporary file '%s'", filename.c_str());
-}
+  }
 
 /*!
  This constructor creates a file with the given filename. In case the
  filename matches "-", no file is created, but std::cout is used as output.
-*/
+ */
 Output::Output(std::string& str, std::string kind) :
   os((!str.compare("-")) ?
-        std::cout :
-        *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
-    ),
-    filename(str), temp(NULL), kind(kind)
-{
+      std::cout :
+  *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
+  ),
+  filename(str), temp(NULL), kind(kind)
+  {
   if (not os.good()) 
   {
     //  abort(11, "could not write to file '%s'", str.c_str());
-  std::cerr << "PNAPI: could not write to file '" << str << "'" << std::endl;
-  exit(EXIT_FAILURE);
+    std::cerr << "PNAPI: could not write to file '" << str << "'" << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   /*
@@ -92,8 +92,8 @@ Output::Output(std::string& str, std::string kind) :
   } else {
       status("writing %s to standard output", kind.c_str());
   }
-  */
-}
+   */
+  }
 
 
 /**************
@@ -125,7 +125,7 @@ Output::~Output()
           status("closed, but could not delete temporary file '%s'", filename.c_str());
       }
     }
-    */
+     */
     remove(filename.c_str());
     if(temp)
       free(temp);
@@ -140,9 +140,9 @@ Output::~Output()
 /*!
  This implicit conversation operator allows to use Output objects like
  ostream streams.
-*/
+ */
 Output::operator std::ostream&() {
-    return os;
+  return os;
 }
 
 
@@ -151,9 +151,9 @@ Output::operator std::ostream&() {
  ********************/
 
 std::string Output::name() const {
-    return filename;
+  return filename;
 }
 
 std::ostream& Output::stream() const {
-    return os;
+  return os;
 }

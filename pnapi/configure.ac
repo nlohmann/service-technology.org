@@ -1,4 +1,4 @@
-AC_INIT(Petri Net API, 2.00, pnapi@service-technology.org, pnapi)
+AC_INIT(Petri Net API, 1.00-reloaded-unreleased, pnapi@service-technology.org, pnapi)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -73,6 +73,15 @@ else
   AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
 fi
 AC_SUBST(PETRIFY)
+
+AC_PATH_PROGS(GENET, [genet], not found)
+if test "$GENET" = "not found"; then
+  AC_MSG_WARN([Genet was not found. See file README.])
+  AC_DEFINE(CONFIG_GENET, "not found", [Genet was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_GENET, "${GENET}", [Genet can be used.])
+fi
+AC_SUBST(GENET)
 
 # check for Fiona (would be used in test cases)
 AC_PATH_PROG(FIONA, [fiona], not found)
@@ -150,7 +159,7 @@ AC_CONFIG_FILES([Makefile
                  tests/Makefile
                  tests/package.m4
                  tests/petrinet/Makefile
-                 utils/Makefile])
+                 utils/Makefile utils/unfolder/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

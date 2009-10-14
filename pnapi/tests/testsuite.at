@@ -4,6 +4,7 @@ AT_INIT
 m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
 AT_TESTED(versions.sh)
 
 ############################################################################
@@ -716,7 +717,7 @@ AT_CLEANUP
 AT_BANNER([Net Synthesis])
 ############################################################################
 
-AT_SETUP([Synthesis using Petrify])
+AT_SETUP([Synthesis using Petrify (sa2owfn)])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
 AT_CHECK_PETRIFY
@@ -729,7 +730,7 @@ AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ig
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
 
-AT_SETUP([Synthesis using state machine transition])
+AT_SETUP([Synthesis using state machine transition (sa2sm)])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
 AT_CHECK([SA2SM AUTOMATON AUTOMATON.owfn],0)
@@ -740,3 +741,38 @@ AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
+
+AT_SETUP([Synthesis using state machine transition (petri)])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
+AT_CHECK([PETRI -isa -oowfn --converter=statemachine AUTOMATON],0)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+
+AT_SETUP([Synthesis using Petrify (petri)])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
+AT_CHECK_PETRIFY
+AT_CHECK([PETRI -isa -oowfn --converter=petrify AUTOMATON],0)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
+AT_CHECK_FIONA
+AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ignore)
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+
+AT_SETUP([Synthesis using Genet (petri)])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON .])
+AT_CHECK_GENET
+AT_CHECK([PETRI -isa -oowfn --converter=genet AUTOMATON],0)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+

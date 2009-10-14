@@ -66,6 +66,28 @@ int main(int argc, char** argv) {
         invocation += string(argv[i]) + " ";
     }
 
+    if (args_info.converter_given)
+    {
+      switch(args_info.converter_arg)
+      {
+      case (converter_arg_petrify) : 
+      {
+        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
+        break;
+      }
+      case (converter_arg_genet) :
+      {
+        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
+        break;
+      }
+      case (converter_arg_statemachine) :
+      {
+        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
+        break;
+      }
+      default: assert(false);
+      }
+    }
 
     /********
     * INPUT *
@@ -100,7 +122,7 @@ int main(int argc, char** argv) {
                     std::cin >> meta(io::INPUTFILE, current.filename)
                         >> meta(io::CREATOR, PACKAGE_STRING)
                         >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
-                    current.net = (CONFIG_PETRIFY == "not found") ? (new PetriNet(sa.stateMachine())) : (new PetriNet(sa));
+                    current.net = new PetriNet(sa);
                     
                     current.type = TYPE_OPENNET;
                     break;
@@ -156,7 +178,7 @@ int main(int argc, char** argv) {
                         infile >> meta(io::INPUTFILE, current.filename)
                             >> meta(io::CREATOR, PACKAGE_STRING)
                             >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
-                        current.net = (CONFIG_PETRIFY == "not found") ? (new PetriNet(sa.stateMachine())) : (new PetriNet(sa));
+                        current.net = new PetriNet(sa);
 
                         current.type = TYPE_OPENNET;
                         break;

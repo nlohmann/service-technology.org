@@ -1,4 +1,4 @@
-SUBDIRS = src tests utils man
+SUBDIRS = src tests utils utils/unfolder man
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean

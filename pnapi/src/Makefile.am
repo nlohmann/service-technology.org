@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libpnapi.la
 
 libpnapi_la_SOURCES = \
 	parser-owfn.yy    parser-owfn-lexer.ll \
-	parser-petrify.yy parser-petrify-lexer.ll \
+	parser-pn.yy parser-pn-lexer.ll \
 	parser-onwd.yy    parser-onwd-lexer.ll \
 	parser-lola.yy    parser-lola-lexer.ll \
 	parser-sa.yy	  parser-sa-lexer.ll \
@@ -15,7 +15,7 @@ libpnapi_la_SOURCES = \
 	formula.h formula.cc \
 	condition.h condition.cc \
 	petrinet-reduction.cc \
-	petrinet-petrify.cc \
+	petrinet-pn.cc \
 	automaton.h automaton.cc\
 	state.h state.cc \
 	marking.h marking.cc \
@@ -24,12 +24,12 @@ libpnapi_la_SOURCES = \
 	Output.h Output.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
-                parser-petrify.cc parser-petrify.h parser-petrify-lexer.cc \
+                parser-pn.cc parser-pn.h parser-pn-lexer.cc \
 		parser-onwd.cc parser-onwd.h parser-onwd-lexer.cc \
 		parser-lola.cc parser-lola.h parser-lola-lexer.cc \
 		parser-sa.cc parser-sa.h parser-sa-lexer.cc
 
-EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h parser-lola.h \
+EXTRA_DIST = parser-owfn.h parser-pn.h parser-onwd.h parser-lola.h \
 	     parser-sa.h
 
 # get flags from configure script
@@ -46,7 +46,7 @@ include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
 		  automaton.h formula.h component.h \
 		  parser.h util.h state.h \
 		  marking.h link.h \
-		  parser-owfn.h parser-petrify.h \
+		  parser-owfn.h parser-pn.h \
 		  parser-onwd.h parser-lola.h \
 		  parser-sa.h \
 		  Output.h
@@ -54,6 +54,6 @@ include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
 # clean additional (generated) files
 DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
 		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \
-		 parser-petrify.h parser-petrify.cc parser-petrify-lexer.cc \
+		 parser-pn.h parser-pn.cc parser-pn-lexer.cc \
 		 parser-lola.h parser-lola.cc parser-lola-lexer.cc \
 		 parser-sa.h parser-sa.cc parser-sa-lexer.cc

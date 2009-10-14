@@ -25,7 +25,7 @@ Version 1.2-unreleased
        controller and engine (see bug #14416, `https://gna.org/bugs/?14416')
 
      * cost-optimization is not fully working due to bug #14417,
-       `https://gna.org/bugs/?14416'
+       `https://gna.org/bugs/?14417'
 
 
 

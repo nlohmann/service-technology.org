@@ -570,7 +570,7 @@ void Adapter::createRuleTransitions()
     FUNCOUT
 }
 
-/// \todo: was ist mit Pl√§tzen, die Selfloop haben?
+/// \todo: was ist mit Pl‰tzen, die Selfloop haben?
 void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
 {
     FUNCIN

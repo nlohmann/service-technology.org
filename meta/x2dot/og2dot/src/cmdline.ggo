@@ -1,0 +1,20 @@
+args "--include-getopt"
+
+purpose "og2dot converts 2-bit operating guidelines into dot format."
+
+description "About og2dot:"
+
+section "Input / Output"
+
+option "input" i
+  "Input file. If no file is given, the operating guideline will be read from standard in. "
+  string
+  typestr="OG"
+  optional
+
+option "output" o
+  "Output file. If no file is given, the dot output will be written to standard out."
+  string
+  typestr="DOT"
+  optional
+

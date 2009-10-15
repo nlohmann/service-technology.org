@@ -15,16 +15,32 @@ void addLabel(string label, int id){
 	label2id[label] = id;
 }
 
+std::vector<int> clauseToIntVector(const Clause &c) {
+  std::vector<int> result;
+
+	if (c.literal0 != emptyLiteral()){
+    result.push_back(c.literal0);
+	}
+	if (c.literal1 != emptyLiteral()){
+    result.push_back(c.literal1);
+	}
+	if (c.literal2 != emptyLiteral()){
+    result.push_back(c.literal2);
+	}
+  
+  return result;
+}
+
 string clauseToString(Clause c){
 	string s = " ";
 	if (c.literal0 != emptyLiteral()){
 		s = s + intToString(c.literal0);
 	}
 	if (c.literal1 != emptyLiteral()){
-		s = s + intToString(c.literal1);
+		s = s + " " + intToString(c.literal1);
 	}
 	if (c.literal2 != emptyLiteral()){
-		s = s + intToString(c.literal2);
+		s = s + " " + intToString(c.literal2);
 	}
 
 	s = s + " ";
@@ -32,11 +48,11 @@ string clauseToString(Clause c){
 	return s;  // s = " " + c->literal0 + " " + c->literal1 + " " + c->literal2 + " "
 }
 
-string intToString(const int i){
-	string s;
-	stringstream out;
-	out << i;
-	s = out.str();
+string intToString(int i){
+
+	stringstream ssout;
+	ssout <<  i;
+        string s (ssout.str());
 	return s;
 }
 

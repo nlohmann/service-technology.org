@@ -17,7 +17,8 @@
 #include "verbose.h"
 
 /// the old "main()" of Minisat with adjusted exit codes
-extern int minisat(gzFile in);
+//extern int minisat(gzFile);//, vector<vector<int> >&);
+extern int minisat(vector< vector <int> > &);//, vector<vector<int> >&);
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -189,24 +190,33 @@ double Formula::getMinisatTime(){
 
 //fVar: number of Variables in the formula to be checked
 bool Formula::isSatisfiable(int fVar){
-	Formula* h = moveNegation();
-	list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
-	delete h;
+    Formula* h = moveNegation();
+    list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
+    delete h;
 
-  string s;
+    vector<vector<int> > clausesVector;
 
-	for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
-			s += clauseToString(*n) + "0 ";
-	}
+    for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
+        vector<int> currentClause(clauseToIntVector(*n));
+        currentClause.push_back(0);
+        clausesVector.push_back(currentClause);
+    }
 
+
+/*
+    FILE *temp = fopen("foo", "w");
+    for(unsigned int i = 0; i < clausesVector.size(); ++i) {
+        for(unsigned j = 0; j < clausesVector[i].size(); ++j) {
+            fprintf(temp, "%d ", clausesVector[i][j]);
+        }
+    }
+    fclose(temp);
+*/
     clock_t start_clock = clock();
 
-    FILE *temp = fopen("foo", "w");
-    fprintf(temp, "%s", s.c_str());
-    fclose(temp);
-
-    gzFile in = gzopen("foo", "rb");;
-    int result = minisat(in);
+//    gzFile in = gzopen("foo", "rb");;
+    int result = minisat(clausesVector);//, clausesVector);
+//    remove("foo");
 
     full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
@@ -236,8 +246,7 @@ string FormulaLit::toString() const {
 }
 
 string FormulaNUM::toString() const {
-	string s = intToString(number);
-    return s;
+    return intToString(number);
 }
 
 string FormulaTrue::toString() const {

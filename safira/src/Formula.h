@@ -133,7 +133,7 @@ public:
 	FormulaNUM(const FormulaNUM &formula);
 	~FormulaNUM(){};
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString() const;
 	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int max) const;

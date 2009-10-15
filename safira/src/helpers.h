@@ -1,6 +1,7 @@
 #ifndef HELPERS_H_
 #define HELPERS_H_
 
+#include <vector>
 #include <string>
 #include <list>
 #include "types.h"
@@ -10,8 +11,9 @@ using namespace std;
 
 void addLabel(string label, int id);
 
-string intToString(const int i);
+string intToString(int i);
 string clauseToString(Clause c);
+std::vector<int> clauseToIntVector(const Clause &c);
 int negateLiteral(int i);
 int emptyLiteral();
 list<Clause> tripleAND(int x, int l, int r);

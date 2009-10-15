@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = erg.txt spec_klein.og
+TESTFILES = erg.txt spec_klein.og PO.og PO.txt
 
 
 # Below you can list all the files you do not want to have counted in the

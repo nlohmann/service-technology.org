@@ -25,6 +25,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <signal.h>
 #include <zlib.h>
 
+#include <vector>
+using std::vector;
+
 #include "Solver.h"
 
 /*************************************************************************************/
@@ -129,10 +132,23 @@ static int parseInt(B& in) {
         ++in;
     return neg ? -val : val; }
 
-template<class B>
-static void readClause(B& in, Solver& S, vec<Lit>& lits) {
+//template<class B>
+//static void readClause(B& in, Solver& S, vec<Lit>& lits) {
+static void readClause(vector< int > &  in, Solver& S, vec<Lit>& lits) {
     int     parsed_lit, var;
     lits.clear();
+
+    int i = 0;
+    while (i < in.size())
+    {
+        parsed_lit = in[i];
+        if (parsed_lit == 0) break;
+        var = abs(parsed_lit) - 1;
+        while (var >= S.nVars()) S.newVar();
+        lits.push( (parsed_lit > 0) ? Lit(var) : ~Lit(var) );
+        ++i;
+    }
+/*
     for (;;){
         parsed_lit = parseInt(in);
         if (parsed_lit == 0) break;
@@ -140,6 +156,7 @@ static void readClause(B& in, Solver& S, vec<Lit>& lits) {
         while (var >= S.nVars()) S.newVar();
         lits.push( (parsed_lit > 0) ? Lit(var) : ~Lit(var) );
     }
+*/
 }
 
 template<class B>
@@ -151,9 +168,16 @@ static bool match(B& in, char* str) {
 }
 
 
-template<class B>
-static void parse_DIMACS_main(B& in, Solver& S) {
+//template<class B>
+static void parse_DIMACS_main(vector< vector< int > > & in, Solver& S) {
     vec<Lit> lits;
+
+    for (int i = 0; i < in.size(); ++i)
+    {
+        readClause(in[i], S, lits),
+        S.addClause(lits);
+    }
+/*
     for (;;){
         skipWhitespace(in);
         if (*in == EOF)
@@ -162,14 +186,16 @@ static void parse_DIMACS_main(B& in, Solver& S) {
             readClause(in, S, lits),
             S.addClause(lits);
     }
+*/
 }
 
 // Inserts problem into solver.
 //
+/*
 static void parse_DIMACS(gzFile input_stream, Solver& S) {
     StreamBuffer in(input_stream);
     parse_DIMACS_main(in, S); }
-
+*/
 
 //=================================================================================================
 
@@ -220,9 +246,10 @@ const char* hasPrefix(const char* str, const char* prefix)
 }
 
 
-int minisat(gzFile in)
+//int minisat(gzFile in)
+int minisat(vector< vector< int > > & in)
 {
-  assert(in);
+  //assert(in);
   
     Solver      S;
     S.verbosity = 1;
@@ -238,8 +265,8 @@ int minisat(gzFile in)
     signal(SIGINT,SIGINT_handler);
     signal(SIGHUP,SIGINT_handler);
 
-    parse_DIMACS(in, S);
-    gzclose(in);
+    parse_DIMACS_main(in, S);
+    //gzclose(in);
 
     if (!S.simplify()){
         return(0); // UNSAT

@@ -1,6 +1,6 @@
 # the username at Gna! used for "upload" target (Note: your PGP key must be
 # properly set up; you must be able to execute "gpg --detach"!)
-gnauser = <<-- USERNAME -->>
+gnauser = <<-- GNA_USERNAME -->>
 
 # which targets should be built for the binary releases
 BINTARGETS="all"

@@ -7,9 +7,11 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
+# <<-- CHANGE START (testfiles) -->>
 TESTFILES = myCoffee.owfn \
 		uncontrollable.owfn \
 		unnormal.owfn
+# <<-- CHANGE END -->>
 
 
 

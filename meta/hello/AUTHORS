@@ -1,29 +1,33 @@
-                        __    __       
-                       | |   | |
-		       | |__| |
-		       |  __  |
-		       |_|   |_|
-			Hello World
-                      http://service-technology.org/hello
+			 __    __   _______  __       __        ______   
+			|  |  |  | |   ____||  |     |  |      /  __  \  
+			|  |__|  | |  |__   |  |     |  |     |  |  |  | 
+			|   __   | |   __|  |  |     |  |     |  |  |  | 
+			|  |  |  | |  |____ |  `----.|  `----.|  `--'  | 
+			|__|  |__| |_______||_______||_______| \______/  
+			<<-- Hello World (Short Mission Statement) -->>
+			http://service-technology.org/hello
 
 
 COPYRIGHT
-    Copyright (c) 20XX AUTHOR1, AUTHOR2, ...
+    Copyright (c) <<-- 20XX AUTHOR1, AUTHOR2, ... -->>
 
 
 AUTHORS
+    <<-- CHANGE START (authors) -->>
     AUTHOR1
         implemented ...
     AUTHOR2
         implemented ...
-    ...
+    ... 
+    <<-- CHANGE END -->>
 
 
 MAINTAINER
-    Hello is maintained by MAINTAINER.
+    Hello is maintained by <<-- MAINTAINER -->>.
 
 
 CONTACT
+    <<-- CHANGE START (contact Information) -->>
     SOMEBODY
     Institut fuer Informatik
     Lehrstuhl ...
@@ -32,5 +36,6 @@ CONTACT
 
     (Phone:  ... )
     (Skype:  ... )
+    <<-- CHANGE END -->>
     WWW:  http://service-technology.org/hello
     E-Mail:  hello@service-technology.org

@@ -10,9 +10,9 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Hello:"
-purpose "Hello World.\n This programm normalizes a given open net, pipes it to Wendy and parses Wendy's output.\n\n  Report bugs to hello@service-technology.org.\n  Visit Hello's home page at http://service-technology.org/hello"
+purpose "<<-- Hello World -->.\n <-- This programm normalizes a given open net, pipes it to Wendy and parses Wendy's output. -->>\n\n  Report bugs to hello@service-technology.org.\n  Visit Hello's home page at http://service-technology.org/hello"
 
-
+# <<-- CHANGE START (parameters) -->>
 section "Input/Output"
 sectiondesc="When called without an input file, Hello reads from the standard input stream. When called without an output parameter, Hello writes to the standard output stream. If no filename is given for the output option Hello creates a file with a temporary name.\n"
 
@@ -23,10 +23,10 @@ option "output" o
   typestr="FILENAME"
   argoptional
   optional
-
+  
 
 section "Configuration"
-sectiondesc="Hello relies on several other tools. These options configure Hello to find these tools.\n"
+sectiondesc="<<-- Hello relies on several other tools. These options configure Hello to find these tools. -->>\n"
 
 option "config" c
   "Read configuration from file."
@@ -78,3 +78,4 @@ option "stats" -
   details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
   flag off
   hidden
+# <<-- CHANGE END -->>

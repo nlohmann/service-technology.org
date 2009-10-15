@@ -1,22 +1,23 @@
 /*****************************************************************************\
- Sayo -- Service Automata Yielded from Operating guidelines
+ Hello -- <<-- Hello World -->>
 
- Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
+ Copyright (c) <<-- 20XX Author1, Author2, ... -->>
 
- Sayo is free software: you can redistribute it and/or modify it under the
+ Hello is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Sayo is distributed in the hope that it will be useful, but WITHOUT ANY
+ Hello is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Sayo.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+/* <<-- CHANGE START (lexer) -->> */
 %option outfile="lex.yy.c"
 %option prefix="wendy_yy"
 %option noyywrap
@@ -53,4 +54,4 @@ int wendy_yyerror(char const *msg) {
               << "': " << msg << std::endl;
     exit(EXIT_FAILURE);
 }
-
+/* <<-- CHANGE END -->> */

@@ -1,7 +1,7 @@
 /*****************************************************************************\
- Hello -- Hello World
+ Hello -- <<-- Hello World -->>
 
- Copyright (c) 20XX Author1, Author2, ...
+ Copyright (c) <<-- 20XX Author1, Author2, ... -->>
 
  Hello is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free

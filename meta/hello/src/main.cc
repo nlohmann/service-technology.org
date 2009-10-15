@@ -1,7 +1,7 @@
 /*****************************************************************************\
- Hello -- Hello World
+ Hello -- <<-- Hello World -->>
 
- Copyright (c) 20XX Author1, Author2, ...
+ Copyright (c) <<-- 20XX Author1, Author2, ... -->>
 
  Hello is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
@@ -17,12 +17,9 @@
  along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+/* <<-- CHANGE START (main program) -->> */
 // include header files
-/* [USER] Add code here */
 #include <config.h>
-//#include <cstdarg>
-//#include <cstdio>
-//#include <cstdlib>
 #include <ctime>
 #include <libgen.h>
 #include <fstream>
@@ -297,3 +294,4 @@ int main(int argc, char** argv) {
 
     return EXIT_SUCCESS;
 }
+/* <<-- CHANGE END -->> */

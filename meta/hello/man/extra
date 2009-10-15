@@ -2,11 +2,13 @@
 Hello exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
 
 [EXAMPLES]
-<<-- To normalize a service `service.owfn', pipe it to Wendy and get the result, execute -->>
+# <<-- CHANGE START (examples) -->>
+To normalize a service `service.owfn', pipe it to Wendy and get the result, execute
 .IP
-<<-- hello service.owfn -->>
+hello service.owfn
 .PP
-<<-- The result will be written to the shell. -->>
+The result will be written to the shell.
+# <<-- CHANGE END -->>
 
 [FILES]
 Unless a configuration file is explicitly given using the
@@ -19,7 +21,7 @@ from the sysconf directory (usually `/usr/local/etc') and then from the current 
 See https://gna.org/bugs/?group=service-tech for open bugs.
 
 [COPYRIGHT]
-Copyright (c) 20XX <<-- AUTHOR1, AUTHOR2, ... -->>
+Copyright (c) <<-- 20XX AUTHOR1, AUTHOR2, ... -->>
 
 [SEE ALSO]
 <<-- wendy(1) -->>

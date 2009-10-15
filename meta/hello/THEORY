@@ -1,11 +1,11 @@
-                       __        __             _       
-                       \ \      / /__ _ __   __| |_   _ 
-                        \ \ /\ / / _ \ '_ \ / _` | | | |
-                         \ V  V /  __/ | | | (_| | |_| |
-                          \_/\_/ \___|_| |_|\__,_|\__, |
-                                                  |___/
-                      Hello World
-                      http://service-technology.org/hello
+			 __    __   _______  __       __        ______   
+			|  |  |  | |   ____||  |     |  |      /  __  \  
+			|  |__|  | |  |__   |  |     |  |     |  |  |  | 
+			|   __   | |   __|  |  |     |  |     |  |  |  | 
+			|  |  |  | |  |____ |  `----.|  `----.|  `--'  | 
+			|__|  |__| |_______||_______||_______| \______/  
+			<<-- Hello World (Short Mission Statement) -->>
+			http://service-technology.org/hello
 
 
 Hello implements several algorithms and result published in several scientific

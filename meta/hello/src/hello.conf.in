@@ -6,6 +6,7 @@
 # empty. In that case, you need to manually add the path to the respective
 # tool.
 
+# <<-- CHANGE START (needed binaries, etc. in config-file) -->>
 # Hello needs a Wendy binary. Such a Wendy binary can be built by executing
 # "make wendy" using a recent Wendy distribution, available at 
 # http://service-technology.org/files/wendy
@@ -17,3 +18,4 @@ wendy = @WENDY@
 # 'XXXXXX' which is replaced at runtime with a random string.
 
 tmpfile = /tmp/hello-XXXXXX
+# <<-- CHANGE END -->>

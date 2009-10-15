@@ -2,11 +2,13 @@
 bin_PROGRAMS = hello
 
 # the plain sources you need to compile (no generated code)
+# <<-- CHANGE START (the program's sources) -->>
 hello_SOURCES = wendy_syntax.yy wendy_lexic.ll \
 		main.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h
+# <<-- CHANGE END -->>
 
 # the configuration files
 sysconf_DATA = hello.conf

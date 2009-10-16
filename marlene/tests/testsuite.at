@@ -50,7 +50,8 @@ AT_SETUP([Small test (no complement)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
-AT_CHECK([MARLENE test-n.owfn --rulefile=test-n.ar --nocomplementplaces --verbose],0,ignore,ignore)
+AT_CHECK([MARLENE test-n.owfn --rulefile=test-n.ar --nocomplementplaces --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "skipping creation of complementary places" stderr],0)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
@@ -153,7 +154,7 @@ AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn --verbose],1,ignore,stderr)
-AT_CHECK(GREP "Controller was not built" stderr,0,ignore)
+AT_CHECK([GREP -q "Controller was not built" stderr],0)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
@@ -277,7 +278,8 @@ AT_CLEANUP
 AT_BANNER([Error handling])
 ############################################################################
 AT_SETUP([wrong command line parameter])
-AT_CHECK([MARLENE --wrongparameter],1,ignore,ignore)
+AT_CHECK([MARLENE --wrongparameter --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "unrecognized option" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
@@ -287,7 +289,8 @@ AT_CHECK_LOLA
 AT_CHECK([MKDIR temptest])
 AT_CHECK([chmod 400 temptest])
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
-AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --tmpfile=temptest/marlene-XXXXXX --verbose],1,ignore,ignore)
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --tmpfile=temptest/marlene-XXXXXX --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "could not create to temporary file 'temptest/marlene" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
@@ -297,7 +300,29 @@ AT_CHECK_LOLA
 AT_CHECK([MKDIR temptest])
 AT_CHECK([chmod 400 temptest])
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
-AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --output=temptest/out.owfn --verbose < test-n.owfn],1,ignore,ignore)
+AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --output=temptest/out.owfn --verbose < test-n.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "could not write to file 'temptest/out.owfn' -- aborting" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Wendy fails])
+AT_CHECK([cp TESTFILES/test-n.owfn .])
+AT_CHECK([MARLENE test-n.owfn --verbose --wendy=false],1,ignore,stderr)
+AT_CHECK([GREP -q "Wendy returned with status 256" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Reading oWFN with wrong syntax])
+AT_CHECK([cp TESTFILES/wrongsyntax.owfn .])
+AT_CHECK([MARLENE wrongsyntax.owfn --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "wrongsyntax.owfn:1: error" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Reading adapter rules with wrong syntax])
+AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/wrongsyntax.ar .])
+AT_CHECK([MARLENE test-n.owfn --rulefile=wrongsyntax.ar --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "error while reading adapter rules" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 

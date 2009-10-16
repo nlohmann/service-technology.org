@@ -290,7 +290,7 @@ AT_CHECK([MKDIR temptest])
 AT_CHECK([chmod 400 temptest])
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --tmpfile=temptest/marlene-XXXXXX --verbose],1,ignore,stderr)
-AT_CHECK([GREP -q "could not create to temporary file 'temptest/marlene" stderr],0)
+AT_CHECK([GREP -q "could not create to temporary file" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 

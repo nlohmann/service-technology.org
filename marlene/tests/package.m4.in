@@ -18,3 +18,6 @@ m4_define([GREP],                 [@GREP@])
 m4_define([MKDIR],                [@MKDIR_P@])
 m4_define([NOPETRIFY],            ['"not found"'])
 
+m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
+m4_define([MARLENE_RAW],            [@abs_top_builddir@/src/marlene])
+

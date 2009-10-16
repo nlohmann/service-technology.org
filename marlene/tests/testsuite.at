@@ -3,8 +3,8 @@ AT_INIT
 # define macros to skip a test if LoLA or Fiona was not found by configure
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
-m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not_found"; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not_found"; then exit 77; fi])])
+m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not_found"; then exit 77; fi])])
 #m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 
 AT_TESTED(versions.sh)
@@ -169,8 +169,9 @@ AT_SETUP([region based conversion (Petrify) for controller])
 AT_CHECK_PETRIFY
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar TESTFILES/nopetrify.conf .])
-AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --config=nopetrify.conf --messagebound=1 --verbose --sa2on=petrify],0,ignore,ignore)
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --messagebound=1 --verbose --sa2on=petrify],0,ignore,stderr)
+AT_CHECK([GREP -q "Using Petrify for conversion from SA to open net." stderr],0)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
@@ -178,17 +179,98 @@ AT_SETUP([region based conversion (Genet) for controller])
 AT_CHECK_GENET
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar TESTFILES/nopetrify.conf .])
-AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --config=nopetrify.conf --messagebound=1 --verbose --sa2on=gene],0,ignore,ignore)
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --messagebound=1 --verbose --sa2on=genet],0,ignore,stderr)
+AT_CHECK([GREP -q "Using Genet for conversion from SA to open net." stderr],0)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
 AT_SETUP([state machine conversion for controller])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar TESTFILES/nopetrify.conf .])
-AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --config=nopetrify.conf --messagebound=1 --verbose --sa2on=statemachine],0,ignore,ignore)
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --messagebound=1 --verbose --sa2on=statemachine],0,ignore,stderr)
+AT_CHECK([GREP -q "Using a state machine for conversion from SA to open net." stderr],0)
 AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+AT_SETUP([state machine conversion for controller (fall-back from Petrify and Genet)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar TESTFILES/nopetrify.conf .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=nopetrify.conf --messagebound=1 --verbose --sa2on=petrify],0,ignore,stderr)
+AT_CHECK([GREP -q "Using a state machine for conversion from SA to open net." stderr],0)
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=nopetrify.conf --messagebound=1 --verbose --sa2on=genet],0,ignore,stderr)
+AT_CHECK([GREP -q "Using a state machine for conversion from SA to open net." stderr],0)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Infrastructure])
+############################################################################
+
+AT_SETUP([Using own configuration file])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_DATA([my.conf],[verbose
+])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=my.conf --stats],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'my.conf'" stderr],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using present configuration file])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_DATA([marlene.conf],[verbose
+])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --stats],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'marlene.conf'" stderr],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Failure using own configuration file])
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_DATA([my.conf],[verbose
+])
+AT_CHECK([chmod 000 my.conf],0)
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=my.conf --stats],1,ignore,stderr)
+AT_CHECK([GREP -q "Error opening configuration file 'my.conf'" stderr],0)
+AT_CHECK([chmod 666 my.conf],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+#AT_SETUP([Failure using present configuration file])
+#AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+#AT_DATA([marlene.conf],[verbose
+#])
+#AT_CHECK([chmod 000 marlene.conf],0)
+#AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --stats],0,ignore,stderr)
+#AT_CHECK([GREP -q "Error opening configuration file 'marlene.conf'" stderr],0)
+#AT_CHECK([chmod 666 marlene.conf],0)
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP
+
+AT_SETUP([Determining runtime and allocated memory])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --verbose --stats],0,ignore,stderr)
+AT_CHECK([GREP -q "runtime" stderr])
+AT_CHECK([GREP -q "memory consumption" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind])
+AT_XFAIL_IF(true)
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes MARLENE_RAW ca1.owfn td.owfn --rulefile=td.ar],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 ############################################################################

@@ -308,7 +308,7 @@ AT_CLEANUP
 AT_SETUP([Wendy fails])
 AT_CHECK([cp TESTFILES/test-n.owfn .])
 AT_CHECK([MARLENE test-n.owfn --verbose --wendy=false],1,ignore,stderr)
-AT_CHECK([GREP -q "Wendy returned with status 256" stderr],0)
+AT_CHECK([GREP -q "Wendy returned with status" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 

@@ -10,7 +10,8 @@
 TESTFILES = test.owfn test.ar \
 	    test-n.owfn test-n.ar \
 	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td.ar \
-	    nopetrify.conf
+	    nopetrify.conf \
+	    wrongsyntax.owfn wrongsyntax. ar
 
 
 # Below you can list all the files you do not want to have counted in the

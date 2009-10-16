@@ -690,7 +690,7 @@ AT_CHECK([WENDY PO.owfn --sa --verbose --waitstatesOnly],0,ignore,ignore)
 AT_CHECK([GREP -q "137 nodes" PO.sa])
 AT_CHECK([GREP -c "\->" PO.sa],0,[437
 ])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction waitstates)
 AT_CLEANUP
 
 AT_SETUP([Receiving before sending])
@@ -700,7 +700,7 @@ AT_CHECK([WENDY PO.owfn --sa --verbose --receivingBeforeSending],0,ignore,ignore
 AT_CHECK([GREP -q "168 nodes" PO.sa])
 AT_CHECK([GREP -c "\->" PO.sa],0,[416
 ])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction receivingBeforeSending)
 AT_CLEANUP
 
 AT_SETUP([Sequentializing receiving events])
@@ -710,7 +710,7 @@ AT_CHECK([WENDY seqTest1.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignor
 AT_CHECK([SA2SM seqTest1.sa seqTest1.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch seqTest1.sa.owfn seqTest1.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction seqReceivingEvent)
 AT_CLEANUP
 
 AT_SETUP([Sequentializing receiving events])
@@ -720,7 +720,7 @@ AT_CHECK([WENDY seqTest2.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignor
 AT_CHECK([SA2SM seqTest2.sa seqTest2.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch seqTest2.sa.owfn seqTest2.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction seqReceivingEvent)
 AT_CLEANUP
 
 AT_SETUP([Sequentializing receiving events])
@@ -730,9 +730,17 @@ AT_CHECK([WENDY seqTest3.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignor
 AT_CHECK([SA2SM seqTest3.sa seqTest3.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch seqTest3.sa.owfn seqTest3.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction seqReceivingEvent)
 AT_CLEANUP
 
+AT_SETUP([Sequentializing receiving events])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/SaScSdRb.owfn .])
+AT_CHECK([WENDY SaScSdRb.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
+AT_CHECK([GREP -c "\->" SaScSdRb.sa],0,[12
+])
+AT_KEYWORDS(ig reduction seqReceivingEvent)
+AT_CLEANUP
 
 # TOO slow!
 #AT_SETUP([Sequentializing receiving events])
@@ -742,7 +750,7 @@ AT_CLEANUP
 #AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
 #AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
 #AT_CHECK([GREP -q "YES" stdout])
-#AT_KEYWORDS(ig)
+#AT_KEYWORDS(ig reduction seqReceivingEvent)
 #AT_CLEANUP
 
 AT_SETUP([Sequentializing receiving events])
@@ -752,7 +760,7 @@ AT_CHECK([WENDY PO.owfn --sa --verbose --seqReceivingEvent],0,ignore,ignore)
 AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction seqReceivingEvent)
 AT_CLEANUP
 
 AT_SETUP([Succeeding sending event])
@@ -762,7 +770,7 @@ AT_CHECK([WENDY sequence10.owfn --sa --verbose --succeedingSendingEvent],0,ignor
 AT_CHECK([SA2SM sequence10.sa sequence10.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch sequence10.sa.owfn sequence10.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction succeedingSendingEvent)
 AT_CLEANUP
 
 #AT_SETUP([Succeeding sending event])
@@ -772,7 +780,7 @@ AT_CLEANUP
 #AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
 #AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
 #AT_CHECK([GREP -q "YES" stdout])
-#AT_KEYWORDS(ig)
+#AT_KEYWORDS(ig reduction succeedingSendingEvent)
 #AT_CLEANUP
 
 AT_SETUP([Succeeding sending event])
@@ -782,7 +790,7 @@ AT_CHECK([WENDY PO.owfn --sa --verbose --succeedingSendingEvent],0,ignore,ignore
 AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction succeedingSendingEvent)
 AT_CLEANUP
 
 AT_SETUP([succeedingSendingEvent + seqReceivingEvents])
@@ -792,7 +800,7 @@ AT_CHECK([WENDY QR.owfn --sa --verbose --succeedingSendingEvent --seqReceivingEv
 AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction)
 AT_CLEANUP
 
 AT_SETUP([succeedingSendingEvent + seqReceivingEvents])
@@ -802,7 +810,7 @@ AT_CHECK([WENDY PO.owfn --sa --verbose --succeedingSendingEvent --seqReceivingEv
 AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig)
+AT_KEYWORDS(ig reduction)
 AT_CLEANUP
 
 AT_SETUP([Quit as soon as possible])
@@ -812,7 +820,7 @@ AT_CHECK([WENDY sequence10.owfn --sa --verbose --quitAsSoonAsPossible],0,ignore,
 AT_CHECK([SA2SM sequence10.sa sequence10.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch sequence10.sa.owfn sequence10.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig qsp)
+AT_KEYWORDS(ig reduction qsp)
 AT_CLEANUP
 
 #AT_SETUP([Quit as soon as possible])
@@ -822,7 +830,7 @@ AT_CLEANUP
 #AT_CHECK([SA2SM QR.sa QR.sa.owfn],0,ignore,ignore)
 #AT_CHECK([FIONA -tmatch QR.sa.owfn QR.fiona.og],0,stdout,ignore)
 #AT_CHECK([GREP -q "YES" stdout])
-#AT_KEYWORDS(ig qsp)
+#AT_KEYWORDS(ig reduction qsp)
 #AT_CLEANUP
 
 AT_SETUP([Quit as soon as possible])
@@ -832,7 +840,7 @@ AT_CHECK([WENDY PO.owfn --sa --verbose --quitAsSoonAsPossible],0,ignore,ignore)
 AT_CHECK([SA2SM PO.sa PO.sa.owfn],0,ignore,ignore)
 AT_CHECK([FIONA -tmatch PO.sa.owfn PO.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
-AT_KEYWORDS(ig qsp)
+AT_KEYWORDS(ig reduction qsp)
 AT_CLEANUP
 
 AT_SETUP([Generic Example, Quit as soon as possible])
@@ -840,7 +848,7 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/genericNonTrivialSCC.owfn .])
 AT_CHECK([WENDY genericNonTrivialSCC.owfn --verbose --messagebound=4 --quitAsSoonAsPossible],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: NO" stderr])
-AT_KEYWORDS(ig qsp)
+AT_KEYWORDS(ig reduction qsp)
 AT_CLEANUP
 
 AT_SETUP([Quit as soon as possible + waitstatesOnly + SSE])
@@ -850,7 +858,7 @@ AT_CHECK([WENDY phcontrol9.unf.owfn --verbose  --quitAsSoonAsPossible --waitstat
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
 AT_CHECK([GREP -q "wendy: stored 19 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 19 sane nodes reachable" stderr])
-AT_KEYWORDS(ig qsp)
+AT_KEYWORDS(ig reduction qsp)
 AT_CLEANUP
 
 

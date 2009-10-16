@@ -368,13 +368,39 @@ bool Knowledge::receivingHelps() const {
 
 
 /*!
+*  inner marking is really waitstate in the context of the current knowledge
+*  \param inner pointer to the current inner marking
+*  \param interface interface belonging to the inner marking within the current knowledge
+*/
+bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, const vector<InterfaceMarking*> & interface) {
+
+    // check if waitstate is resolved by interface marking
+    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+    	for (size_t i = 0; i < interface.size(); ++i) {
+			if (interface[i]->marked(l) and
+				InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
+				return false;
+			}
+    	}
+    }
+
+    // inner waitstate remains a waitstate with the current interface of the knowledge
+    return true;
+}
+
+
+/*!
  before traversing through each and every receiving event, we first check
  which receiving events are essentially needed to resolve every waitstate
  of the current bubble
 */
 void Knowledge::sequentializeReceivingEvents() {
     // count the number that a receiving event is activated
-    map<Label_ID, uint8_t> occuranceOfReceivingEvent;
+	uint8_t * occuranceOfReceivingEvent = new uint8_t[Label::receive_events + 1];
+
+	for (uint8_t i = 0; i <= Label::receive_events; ++i) {
+		occuranceOfReceivingEvent[i] = 0;
+	}
 
     // remember to consider this state again; actually we only need to take a look at its interface
     map<vector<InterfaceMarking*>, bool> visitStateAgain;
@@ -383,7 +409,7 @@ void Knowledge::sequentializeReceivingEvents() {
     for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
 
         // only consider non-final waitstates
-        if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
+        if (InnerMarking::inner_markings[pos->first]->is_waitstate and isWaitstateInCurrentKnowledge(pos->first, pos->second)) {
 
             // traverse the interface markings
             for (size_t i = 0; i < pos->second.size(); ++i) {
@@ -465,6 +491,8 @@ void Knowledge::sequentializeReceivingEvents() {
             consideredReceivingEvents[consideredReceivingEvent] = true;
         }
     } // end for, traverse through states
+
+    delete occuranceOfReceivingEvent;
 }
 
 

@@ -113,6 +113,8 @@ bin-Linux:
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86"
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="linux-x86-64" EXTRA_CFLAGS="-m64"
 
+bin-CYGWIN_NT-6.1: bin-CYGWIN_NT-5.1
+
 bin-CYGWIN_NT-6.0: bin-CYGWIN_NT-5.1
 
 bin-CYGWIN_NT-5.1:

@@ -112,7 +112,7 @@ bin-CYGWIN_NT-5.1:
 bin-CYGWIN_NT-6.0: bin-CYGWIN_NT-5.1
 
 # Windows 7 is not different from XP besides version number
-bin-CYGWIN_NT-7.0: bin-CYGWIN_NT-5.1
+bin-CYGWIN_NT-6.1: bin-CYGWIN_NT-5.1
 
 bin-Darwin:
 	-$(MAKE) bin-generic TARGETS="$(TARGETS)" ARCH="mac-universal" EXTRA_CONFFLAGS="--disable-dependency-tracking" EXTRA_CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386"

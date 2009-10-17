@@ -31,7 +31,6 @@
 #include "Output.h"
 #include "pnapi/pnapi.h"
 
-
 /* For documentation of the following functions, please see header file. */
 
 Adapter::Adapter(std::vector< pnapi::PetriNet *> & nets, RuleSet & rs,

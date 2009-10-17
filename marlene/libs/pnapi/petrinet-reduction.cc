@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-10-04 11:58:01 +0200 (So, 04. Okt 2009) $
+ * \date    \$Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 4798 $
+ * \version \$Revision: 4827 $
  *
  * \ingroup petrinet
  */

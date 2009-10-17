@@ -73,16 +73,18 @@ using namespace pnapi::parser::pn;
  * types, tokens, start symbol
  ****************************************************************************/
 
-%token PLACENAME TRANSITIONNAME IDENTIFIER
+%token PLACENAME TRANSITIONNAME IDENTIFIER WEIGHT
 %token K_MODEL K_DUMMY K_OUTPUTS K_GRAPH K_MARKING K_END NEWLINE
-%token OPENBRACE CLOSEBRACE
+%token OPENBRACE CLOSEBRACE LPAR RPAR
 
 %union
 {
   char * yt_str;
+  unsigned int yt_uInt;
 }
 
 %type <yt_str> PLACENAME TRANSITIONNAME
+%type <yt_uInt> WEIGHT weight
 
 %defines
 
@@ -106,14 +108,14 @@ stg:
 
 transition_list:
   /* empty */
-| transition_list TRANSITIONNAME
+| transition_list TRANSITIONNAME weight
   { 
     std::string ident = $2;
     free($2);
 
     if (in_arc_list) 
     {
-      tempNodeSet_.insert(ident);
+      tempNodeMap_[ident] = $3;
       transitions_.insert(ident);
     } 
     else
@@ -125,7 +127,7 @@ transition_list:
 
 place_list:
   /* empty */
-| place_list PLACENAME
+| place_list PLACENAME weight
   { 
     std::string ident = $2;
     free($2);
@@ -134,25 +136,30 @@ place_list:
     if (in_marking_list)
       initialMarked_[ident] = 1;
     else
-      tempNodeSet_.insert(ident);
+      tempNodeMap_[ident] = $3;
   }
+;
+
+weight:
+  /* empty */       { $$ = 1; }
+| LPAR WEIGHT RPAR  { $$ = $2; }
 ;
 
 tp_list:
   /* empty */
 | tp_list TRANSITIONNAME place_list newline
   { 
-    arcs_[$2] = tempNodeSet_;
-    tempNodeSet_.clear();
+    arcs_[$2] = tempNodeMap_;
+    tempNodeMap_.clear();
     free($2);
   } 
 ;
 
 pt_list:
   /* empty */
-| pt_list PLACENAME transition_list newline
-  { arcs_[$2] = tempNodeSet_;
-    tempNodeSet_.clear();
+| pt_list PLACENAME transition_list weight newline
+  { arcs_[$2] = tempNodeMap_;
+    tempNodeMap_.clear();
     free($2);
   }
 ;

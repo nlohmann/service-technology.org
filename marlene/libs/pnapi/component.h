@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: niels $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-09-09 23:49:23 +0200 (Mi, 09. Sep 2009) $
+ * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
  *
- * \version $Revision: 4694 $
+ * \version $Revision: 4827 $
  */
 
 #ifndef PNAPI_PETRINODE_H

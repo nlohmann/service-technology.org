@@ -104,6 +104,7 @@ AC_MSG_RESULT([better should be])
 
 # Checks for header files.
 AC_FUNC_ALLOCA
+AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
 
 # allow the configure script to control assertions (just include config.h)

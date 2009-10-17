@@ -7,13 +7,13 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: niels $
  *
  * \since   2005/11/11
  *
- * \date    $Date: 2009-02-16 19:45:27 +0100 (Mo, 16. Feb 2009) $
+ * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
  *
- * \version $Revision: 3885 $
+ * \version $Revision: 4827 $
  */
 
 #ifndef PNAPI_UTIL_H

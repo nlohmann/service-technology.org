@@ -162,7 +162,7 @@ Marking::Marking(const Marking & m, PetriNet* net,
       for (set<Node *>::const_iterator p = Ppre.begin(); p != Ppre.end(); ++p)
         m[*static_cast<Place *>(*p)] -= net_->findArc(**p, t)->getWeight();
 
-      for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); p++)
+      for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); ++p)
         m[*static_cast<Place *>(*p)] += net_->findArc(t, **p)->getWeight();
 
       return m;

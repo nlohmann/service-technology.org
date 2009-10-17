@@ -7,13 +7,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: niels $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-10-03 01:17:21 +0200 (Sa, 03. Okt 2009) $
+ * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
  *
- * \version $Revision: 4793 $
+ * \version $Revision: 4827 $
  */
 
 #include "config.h"
@@ -1826,6 +1826,8 @@ set<Place *> PetriNet::getInterfacePlaces(const string & port) const
 
 
   /*!
+   \todo reimplementation: see [LohmannMW_2007_icatpn], Figure 4
+         capacities need to be adjusted appropriately
    */
   void PetriNet::normalize_classical()
   {

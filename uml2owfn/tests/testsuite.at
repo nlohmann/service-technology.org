@@ -163,7 +163,7 @@ AT_SETUP([Log file output (*.log)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
 AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p log -f lola --output=TestSuite],0,stdout,ignore)
 AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
-AT_CHECK([test -f uml2owfn_Testsuite.log])
+AT_CHECK([test -f uml2owfn_TestSuite.log])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP
 

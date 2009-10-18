@@ -9,9 +9,9 @@
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = test.owfn test.ar \
 	    test-n.owfn test-n.ar \
-	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td.ar \
+	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td.ar td_sync.ar \
 	    nopetrify.conf \
-	    wrongsyntax.owfn wrongsyntax.ar
+	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar
 
 
 # Below you can list all the files you do not want to have counted in the
@@ -21,7 +21,7 @@ TESTFILES = test.owfn test.ar \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */parser_adapt_rules.cc */lexer_adapt_rules.cc */cmdline.c
+NO_COVER_FILES = */libs/* */parser_adapt_rules.cc */lexer_adapt_rules.cc */cmdline.* */Output.*
 
 
 

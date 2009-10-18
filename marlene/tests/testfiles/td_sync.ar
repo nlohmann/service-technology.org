@@ -1,0 +1,8 @@
+TEuro -> MEuro;
+-- MCB ->;
+-- MTB ->;
+HIDDEN -- dummy, foobar ->;
+-- foo, bar ->;
+MBevT -> TBevT;
+MBevT -> TBevT;
+

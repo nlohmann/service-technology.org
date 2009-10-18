@@ -92,238 +92,232 @@ const pnapi::PetriNet * Adapter::buildController()
     using namespace pnapi;
 
     // _engine should exist here 
-    if (_engine != NULL)
+    assert(_engine != NULL);
+
+    // we make a copy of the engine, #_engine is needed for the result
+    // #_enginecopy for the synthesis of the controller
+
+    PetriNet * composed = new PetriNet(*_engine);
+
+    // compose engine with nets
+    for (unsigned int i = 0; i < _nets.size(); i++)
     {
-        // we make a copy of the engine, #_engine is needed for the result
-        // #_enginecopy for the synthesis of the controller
-        
-        PetriNet * composed = new PetriNet(*_engine);
-
-        // compose engine with nets
-        for ( unsigned int i = 0; i < _nets.size(); i++)
+        if (i == 0)
         {
-            if ( i == 0 )
-            {
-                composed->compose(*_nets[i], std::string("engine."), std::string("net" + toString(i+1) + "." ));
-            }
-            else
-            {
-                composed->compose(*_nets[i], std::string(""), std::string("net" + toString(i+1) + "." ));
-            }
-        }
-
-        // add complementary places for the now internal former interface places
-        if (_useCompPlaces)
-        {
-            Condition & finalCond = composed->finalCondition();
-
-            for (unsigned int i = 0; i < _nets.size(); i++)
-            {
-                const std::set< Place *> & ifPlaces =
-                                _nets[i]->getInterfacePlaces();
-                std::set< Place *>::const_iterator placeIter = ifPlaces.begin();
-                while (placeIter != ifPlaces.end() )
-                {
-                    // \todo: warum werden beide Platznamen gebraucht? wo geht hier beim Komponieren was schief?
-                    std::string placeName = (*placeIter)->getName();
-                    std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
-                    
-                    Place * place = composed->findPlace(placeName);
-                    //if (place == NULL)
-                    //{
-                    //    place = composed->findPlace(placeName2);
-                    //    placeName = placeName2;
-                    //}
-                    assert(place);
-
-                    Place * compPlace = &composed->createPlace("comp_"
-                                    + placeName, Node::INTERNAL, _messageBound
-                                    +1, _messageBound+1);
-
-                    formula::FormulaEqual * prop = new formula::FormulaEqual(*compPlace,_messageBound + 1);
-                    finalCond.addProposition(*prop);
-
-                    std::set< Node *> postSet = place->getPostset();
-                    std::set< Node *>::iterator nodeIter = postSet.begin();
-                    while (nodeIter != postSet.end() )
-                    {
-                        composed->createArc(**nodeIter, *compPlace);
-                        nodeIter++;
-                    }
-
-                    std::set< Node *> preSet = place->getPreset();
-                    nodeIter = preSet.begin();
-                    while (nodeIter != preSet.end() )
-                    {
-                        composed->createArc(*compPlace, **nodeIter);
-                        nodeIter++;
-                    }
-
-                    // deadlock transition for message bound violation of former interface
-                    Transition * dlTrans =
-                                    &composed->createTransition("dl_"
-                                                    + placeName);
-                    composed->createArc(*place, *dlTrans, _messageBound + 1);
-
-                    ++placeIter;
-                }
-            }
-        }
-        else
-        {
-            status("skipping creation of complementary places twice ..");
-        }
-        
-        // finally reduce the strucure of the net as far as possible
-        composed->reduce(pnapi::PetriNet::LEVEL_4);
-
-        if (_contType == ASYNCHRONOUS)
-        {
-            composed->normalize();
-        }
-        // \todo: Experiment, ob sich das hier noch lohnt.
-        composed->reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
-
-        /***********************************\
-        * calculate most permissive partner *
-        \***********************************/
-        // create a unique temporary file name
-        Output owfn_temp;
-//        Output sa_temp;
- //       Output og_temp;
-
-        std::string owfn_filename (owfn_temp.name());
-        std::string sa_filename = owfn_filename + ".sa";
-        std::string og_filename = owfn_filename + ".og";
-        std::string cost_filename = owfn_filename + ".cf";
-        
-        owfn_temp.stream() << pnapi::io::owfn << *composed;
-
-        std::string wendy_command;
-        std::string candy_command;
-
-        // should we diagnose?
-        if (args_info.diagnosis_flag)
-        {
-            wendy_command = std::string(args_info.wendy_arg) + " "
-                            + owfn_filename + " --diagnose --im --mi --og="
-                            + og_filename;
+            composed->compose(*_nets[i], std::string("engine."),
+                std::string("net" + toString(i+1) + "."));
         } else
         {
-            if (args_info.costoptimized_flag)
-            {
-                Output cf_file (cost_filename,"cost file");
-                cf_file.stream() << cost_file_content;
+            composed->compose(*_nets[i], std::string(""), std::string("net"
+                            + toString(i+1) + "."));
+        }
+    }
 
-                // optimization
-                wendy_command = std::string(args_info.wendy_arg) + " "
-                                + owfn_filename + " --og=-";
-                candy_command = " | " + std::string(args_info.candy_arg) 
-                                + " --automata --output=" + sa_filename
-                                + " --costfile=" + cost_filename;
-            }
-            else
+    // add complementary places for the now internal former interface places
+    if (_useCompPlaces)
+    {
+        Condition & finalCond = composed->finalCondition();
+
+        for (unsigned int i = 0; i < _nets.size(); i++)
+        {
+            const std::set< Place *> & ifPlaces = _nets[i]->getInterfacePlaces();
+            std::set< Place *>::const_iterator placeIter = ifPlaces.begin();
+            while (placeIter != ifPlaces.end() )
             {
-                // default behavior
-                wendy_command = std::string(args_info.wendy_arg) + " "
-                                + owfn_filename + " --sa="
-                                + sa_filename; // + " --og=" + og_filename;
+                // \todo: warum werden beide Platznamen gebraucht? wo geht hier beim Komponieren was schief?
+                std::string placeName = (*placeIter)->getName();
+                std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
+
+                Place * place = composed->findPlace(placeName);
+                //if (place == NULL)
+                //{
+                //    place = composed->findPlace(placeName2);
+                //    placeName = placeName2;
+                //}
+                assert(place);
+
+                Place * compPlace = &composed->createPlace("comp_" + placeName,
+                    Node::INTERNAL, _messageBound +1, _messageBound+1);
+
+                formula::FormulaEqual * prop = new formula::FormulaEqual(*compPlace,_messageBound + 1);
+                finalCond.addProposition(*prop);
+
+                std::set< Node *> postSet = place->getPostset();
+                std::set< Node *>::iterator nodeIter = postSet.begin();
+                while (nodeIter != postSet.end() )
+                {
+                    composed->createArc(**nodeIter, *compPlace);
+                    nodeIter++;
+                }
+
+                std::set< Node *> preSet = place->getPreset();
+                nodeIter = preSet.begin();
+                while (nodeIter != preSet.end() )
+                {
+                    composed->createArc(*compPlace, **nodeIter);
+                    nodeIter++;
+                }
+
+                // deadlock transition for message bound violation of former interface
+                Transition * dlTrans = &composed->createTransition("dl_"
+                                + placeName);
+                composed->createArc(*place, *dlTrans, _messageBound + 1);
+
+                ++placeIter;
             }
         }
-        wendy_command += " -m" + toString(_messageBound);
+    } else
+    {
+        status("skipping creation of complementary places twice ..");
+    }
 
-        if (args_info.chatty_flag)
-        {
-            wendy_command += " --succeedingSendingEvent";
-        } else if (args_info.arrogant_flag)
-        {
-            wendy_command += " --receivingBeforeSending";
-        }
+    // finally reduce the strucure of the net as far as possible
+    composed->reduce(pnapi::PetriNet::LEVEL_4);
 
-        time_t start_time, end_time;
+    if (_contType == ASYNCHRONOUS)
+    {
+        composed->normalize();
+    }
+    // \todo: Experiment, ob sich das hier noch lohnt.
+    composed->reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
 
-#ifdef __MINGW32__
-        wendy_command += ((args_info.verbose_flag) ? " --verbose"
-            : " 2> NUL");        
-        candy_command += ((args_info.verbose_flag) ? " --verbose"
-            : " 2> NUL");        
-#else
-        wendy_command += ((args_info.verbose_flag) ? " --verbose"
-            : " 2> /dev/null");
-        candy_command += ((args_info.verbose_flag) ? " --verbose"
-            : " 2> /dev/null");        
-#endif
+    /***********************************\
+        * calculate most permissive partner *
+     \***********************************/
+    // create a unique temporary file name
+    Output owfn_temp;
+    //        Output sa_temp;
+    //       Output og_temp;
 
+    std::string owfn_filename(owfn_temp.name());
+    std::string sa_filename = owfn_filename + ".sa";
+    std::string og_filename = owfn_filename + ".og";
+    std::string cost_filename = owfn_filename + ".cf";
+
+    owfn_temp.stream() << pnapi::io::owfn << *composed;
+
+    std::string wendy_command;
+    std::string candy_command;
+
+    // should we diagnose?
+    if (args_info.diagnosis_flag)
+    {
+        wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
+                        + " --diagnose --im --mi --og=" + og_filename;
+    } else
+    {
         if (args_info.costoptimized_flag)
         {
-            wendy_command += candy_command;
-        }
-        time(&start_time);
-        status("executing '%s'", wendy_command.c_str());
-        int result = system(wendy_command.c_str());
-        result = WEXITSTATUS(result);
-        time(&end_time);
-        status("Wendy done [%.0f sec]", difftime(end_time, start_time));
+            Output cf_file(cost_filename, "cost file");
+            cf_file.stream() << cost_file_content;
 
-        if (result != 0)
+            // optimization
+            wendy_command = std::string(args_info.wendy_arg) + " "
+                            + owfn_filename + " --og=-";
+            candy_command = " | " + std::string(args_info.candy_arg)
+                            + " --automata --output=" + sa_filename
+                            + " --costfile=" + cost_filename;
+        } else
         {
-            message("Wendy returned with status %d.", result);
-            message("Controller could not be built! No adapter was created, exiting.");
-            exit(EXIT_FAILURE);
+            // default behavior
+            wendy_command = std::string(args_info.wendy_arg) + " "
+                            + owfn_filename + " --sa=" + sa_filename; // + " --og=" + og_filename;
         }
-
-        /*******************************\
-        * parse most-permissive partner *
-        \*******************************/
-        std::ifstream sa_file(sa_filename.c_str(), std::ios_base::in);
-        if (! sa_file) {
-            message("Controller was not built! No adapter was created, exiting.");
-            exit(EXIT_FAILURE);
-        }
-        pnapi::Automaton * mpp_sa = new pnapi::Automaton();
-        sa_file >> pnapi::io::sa >> *mpp_sa;
-        sa_file.close();
-
-        /***********************************************\
-        * transform most-permissive partner to open net *
-        \***********************************************/
-        time(&start_time);
-        pnapi::PetriNet * controller;
-
-        if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "not_found") // && _contType == ASYNCHRONOUS)
-        {
-            status("Using Petrify for conversion from SA to open net.");
-            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
-            pnapi::PetriNet::setPetrify(args_info.petrify_arg);
-            controller = new pnapi::PetriNet(*mpp_sa);
-        }
-        else
-        if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "not_found") // && _contType == ASYNCHRONOUS)
-        {
-            status("Using Genet for conversion from SA to open net.");
-            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
-            pnapi::PetriNet::setGenet(args_info.genet_arg);
-            controller = new pnapi::PetriNet(*mpp_sa);
-        }
-        else
-        {
-            status("Using a state machine for conversion from SA to open net.");
-            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
-            controller = new pnapi::PetriNet(*mpp_sa);
-        }
-        time(&end_time);
-        
-        if (args_info.verbose_flag) {
-            std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *controller << std::endl;
-        }
-        status("converting most-permissive partner done [%.0f sec]", difftime(end_time, start_time));
-
-        FUNCOUT
-        return controller;
     }
-    
+    wendy_command += " -m" + toString(_messageBound);
+
+    if (args_info.chatty_flag)
+    {
+        wendy_command += " --succeedingSendingEvent";
+    } else if (args_info.arrogant_flag)
+    {
+        wendy_command += " --receivingBeforeSending";
+    }
+
+    time_t start_time, end_time;
+
+#ifdef __MINGW32__
+    wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
+    candy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
+#else
+    wendy_command += ((args_info.verbose_flag) ? " --verbose"
+                    : " 2> /dev/null");
+    candy_command += ((args_info.verbose_flag) ? " --verbose"
+                    : " 2> /dev/null");
+#endif
+
+    if (args_info.costoptimized_flag)
+    {
+        wendy_command += candy_command;
+    }
+    time(&start_time);
+    status("executing '%s'", wendy_command.c_str());
+    int result = system(wendy_command.c_str());
+    result = WEXITSTATUS(result);
+    time(&end_time);
+    status("Wendy done [%.0f sec]", difftime(end_time, start_time));
+
+    if (result != 0)
+    {
+        message("Wendy returned with status %d.", result);
+        message("Controller could not be built! No adapter was created, exiting.");
+        exit(EXIT_FAILURE);
+    }
+
+    /*******************************\
+        * parse most-permissive partner *
+     \*******************************/
+    std::ifstream sa_file(sa_filename.c_str(), std::ios_base::in);
+    if (!sa_file)
+    {
+        message("Controller was not built! No adapter was created, exiting.");
+        exit(EXIT_FAILURE);
+    }
+    pnapi::Automaton * mpp_sa = new pnapi::Automaton();
+    sa_file >> pnapi::io::sa >> *mpp_sa;
+    sa_file.close();
+
+    /***********************************************\
+        * transform most-permissive partner to open net *
+     \***********************************************/
+    time(&start_time);
+    pnapi::PetriNet * controller;
+
+    if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "not_found") // && _contType == ASYNCHRONOUS)
+
+    {
+        status("Using Petrify for conversion from SA to open net.");
+        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
+        pnapi::PetriNet::setPetrify(args_info.petrify_arg);
+        controller = new pnapi::PetriNet(*mpp_sa);
+    }
+    else
+    if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "not_found") // && _contType == ASYNCHRONOUS)
+
+    {
+        status("Using Genet for conversion from SA to open net.");
+        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
+        pnapi::PetriNet::setGenet(args_info.genet_arg);
+        controller = new pnapi::PetriNet(*mpp_sa);
+    }
+    else
+    {
+        status("Using a state machine for conversion from SA to open net.");
+        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
+        controller = new pnapi::PetriNet(*mpp_sa);
+    }
+    time(&end_time);
+
+    if (args_info.verbose_flag)
+    {
+        std::cerr << PACKAGE << ": most-permissive partner: "
+                        << pnapi::io::stat << *controller << std::endl;
+    }
+    status("converting most-permissive partner done [%.0f sec]", difftime(
+        end_time, start_time));
+
     FUNCOUT
-    return NULL;
+    return controller;
 }
     
 /**
@@ -860,16 +854,10 @@ inline const std::string RuleSet::getMessageForId(const unsigned int id) const
 {
     FUNCIN
     std::map< unsigned int, std::string >::const_iterator iter = _messageIndex.find(id);
-    if ( iter != _messageIndex.end() )
-    {
-        FUNCOUT
-        return iter->second;
-    }
-    else
-    {
-        FUNCOUT
-        return "";
-    }
+    assert ( iter != _messageIndex.end() );
+
+    FUNCOUT
+    return iter->second;
 }
 
 unsigned int RuleSet::getIdForMessage(std::string message)

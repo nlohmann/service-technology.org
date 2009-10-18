@@ -86,4 +86,3 @@ CONTROLLABLE { return RULE_CONTROLLABLE; }
 [ \t\n\r]         { break; /* skip */ }
 
 .             { adapt_rules_yyerror("lexical error"); }
-

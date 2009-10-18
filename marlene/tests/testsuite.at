@@ -3,6 +3,7 @@ AT_INIT
 # define macros to skip a test if LoLA or Fiona was not found by configure
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_CANDY, [AT_CHECK([if test "CANDY" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not_found"; then exit 77; fi])])
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not_found"; then exit 77; fi])])
 #m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
@@ -30,7 +31,7 @@ AT_CLEANUP
 AT_BANNER([Small examples])
 ############################################################################
 
-AT_SETUP([Small test (synchronous)])
+AT_SETUP([Small test (synchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
@@ -38,13 +39,30 @@ AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose],0,ignore,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
-AT_SETUP([Small test (asynchronous)])
+AT_SETUP([Small test (synchronous 2)])
+AT_XFAIL_IF(true)
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync.ar .])
+AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync.ar --verbose],0,ignore,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (asynchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --asyncif --verbose],0,ignore,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
+
+#AT_SETUP([Small test (asynchronous 2)])
+#AT_CHECK_WENDY
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync.ar .])
+#AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync.ar --asyncif --verbose],0,ignore,ignore)
+#AT_KEYWORDS(sample)
+#AT_CLEANUP
 
 AT_SETUP([Small test (no complement)])
 AT_CHECK_WENDY
@@ -125,6 +143,16 @@ AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --arrogant --verbo
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
+AT_SETUP([costs optimized adapter])
+AT_XFAIL_IF(true)
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK_CANDY
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td_ret.owfn TESTFILES/td_ret.ar .])
+AT_CHECK([MARLENE ca1.owfn td_ret.owfn --rulefile=td_ret.ar --costoptimized --verbose],0,ignore,ignore)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
 AT_SETUP([engine only])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
@@ -141,11 +169,19 @@ AT_CHECK([MARLENE test.owfn --rulefile=test.ar --controlleronly --verbose],0,ign
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
-AT_SETUP([adding prefixes to nets])
+AT_SETUP([adding prefixes to nets (1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn td.owfn --rulefile=td.ar --withprefix --verbose],0,ignore,ignore)
+AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+AT_SETUP([adding prefix to net (2)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
+AT_CHECK([MARLENE --rulefile=test.ar --withprefix --verbose < test.owfn],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
@@ -277,9 +313,28 @@ AT_CLEANUP
 ############################################################################
 AT_BANNER([Error handling])
 ############################################################################
-AT_SETUP([wrong command line parameter])
+AT_SETUP([wrong command line option])
 AT_CHECK([MARLENE --wrongparameter --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "unrecognized option" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([wrong command line argument])
+AT_CHECK([MARLENE --sa2on=wrongoption --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "invalid argument" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Reading open net fails])
+AT_CHECK([MARLENE nichtda.owfn --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "Open net file nichtda.owfn could not be opened for reading" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Reading adapter rules fails])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([MARLENE test.owfn --rulefile=nichtda.ar --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "Rule file nichtda.ar could not be opened for reading" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
@@ -312,10 +367,17 @@ AT_CHECK([GREP -q "Wendy returned with status" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
-AT_SETUP([Reading oWFN with wrong syntax])
+AT_SETUP([Reading oWFN with wrong syntax (1)])
 AT_CHECK([cp TESTFILES/wrongsyntax.owfn .])
 AT_CHECK([MARLENE wrongsyntax.owfn --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "wrongsyntax.owfn:1: error" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Reading oWFN with wrong syntax (2)])
+AT_CHECK([cp TESTFILES/wrongsyntax.owfn .])
+AT_CHECK([MARLENE --verbose < wrongsyntax.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "marlene::1: error near" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
@@ -323,6 +385,13 @@ AT_SETUP([Reading adapter rules with wrong syntax])
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/wrongsyntax.ar .])
 AT_CHECK([MARLENE test-n.owfn --rulefile=wrongsyntax.ar --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "error while reading adapter rules" stderr],0)
+AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+AT_SETUP([Reading adapter rules with wrong lexic])
+AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/wronglexic.ar .])
+AT_CHECK([MARLENE test-n.owfn --rulefile=wronglexic.ar --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "lexical error" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 

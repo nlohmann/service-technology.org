@@ -122,8 +122,6 @@ int main(int argc, char* argv[])
             } catch (pnapi::io::InputError error) {
                 std::cerr << PACKAGE << ":" << error << std::endl;
                 abort(2, " ");
-                //infile.close();
-                exit(EXIT_FAILURE);
             }
 
         }
@@ -143,8 +141,6 @@ int main(int argc, char* argv[])
         } catch (pnapi::io::InputError error) {
             std::cerr << PACKAGE << ":" << error << std::endl;
             abort(2, " ");
-            //infile.close();
-            exit(EXIT_FAILURE);
         }
     }
     time(&end_time);

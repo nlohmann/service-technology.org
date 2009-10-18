@@ -1,0 +1,214 @@
+AT_INIT
+
+m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
+AT_TESTED(versions.sh)
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([UML2OWFN --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([UML2OWFN --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parser])
+############################################################################
+
+AT_SETUP([Test suite])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml],0,ignore,ignore)
+AT_KEYWORDS(parser)
+AT_CLEANUP
+
+AT_SETUP([Test suite (soundness)])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml],0,ignore,ignore)
+AT_KEYWORDS(parser)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parser Filter])
+############################################################################
+
+AT_SETUP([Test suite])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter],0,ignore,ignore)
+AT_KEYWORDS(parser)
+AT_CLEANUP
+
+AT_SETUP([Test suite (soundness)])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter],0,ignore,ignore)
+AT_KEYWORDS(parser)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Compiler Tests])
+############################################################################
+
+AT_SETUP([Test suite])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 25])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (empty)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s empty --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 25])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (multi)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s multi --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "20 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 20])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (multiNonMatching)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s multiNonMatching --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "22 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 22])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (overlappingPins)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s overlappingPins --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 24])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (combined parameters)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s overlappingPins -s empty -s multi -s multiNonMatching --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "20 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 20])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (filter)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f lola --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 24])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (keeppins)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p keeppins -f lola --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | wc -l | GREP -q 25])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([File Formats])
+############################################################################
+
+AT_SETUP([Graphviz dot output (*.dot, *.png)])
+AT_CHECK_DOT
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f dot --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.png | wc -l | GREP -q 24])
+AT_CHECK([ls *.dot | wc -l | GREP -q 24])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
+AT_SETUP([Woflan output (*.tpn)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f tpn --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.tpn | wc -l | GREP -q 24])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
+AT_SETUP([Open net output (*.owfn)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f owfn --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.owfn | wc -l | GREP -q 24])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
+AT_SETUP([Anonymized LoLA output (*.lola)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p anon -f lola --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([ls *.lola | xargs GREP "process" | wc -l | GREP -q 0])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
+AT_SETUP([Log file output (*.log)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p log -f lola --output=TestSuite],0,stdout,ignore)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([test -f uml2owfn_Testsuite.log])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Soundness Analysis])
+############################################################################
+
+AT_SETUP([Strong termination+safeness, taskfiles])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter -a soundness -a safe -p taskfile -f lola --output=TestSuite_soundness],0,stdout,ignore)
+AT_CHECK([test -f TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.fin.task])
+AT_CHECK([test -f TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.safe.task])
+AT_KEYWORDS([soundness])
+AT_CLEANUP
+
+AT_SETUP([Strong termination+safeness, no taskfiles])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter -a soundness -f lola --output=TestSuite_soundness],0,stdout,ignore)
+AT_CHECK([test -f TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.fin.task],1)
+AT_CHECK([test -f TestSuite_soundness.UMLcncpt1__ProcessPinDisjoint_sound_ifStop.lola.safe.task],1)
+AT_KEYWORDS([soundness])
+AT_CLEANUP
+
+AT_SETUP([Strong termination+safeness, taskfiles, orJoin])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter -a soundness -a safe -a orJoin -p taskfile -f lola --output=TestSuite_soundness],0,stdout,ignore)
+AT_KEYWORDS([soundness])
+AT_CLEANUP
+
+AT_SETUP([Strong termination+safeness, taskfiles, w data-flow])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter -a soundness -a safe -a noData -p taskfile -f lola --output=TestSuite_soundness],0,stdout,ignore)
+AT_KEYWORDS([soundness])
+AT_CLEANUP
+
+AT_SETUP([Woflan (TPN)])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter -a soundness -a wfNet -f tpn --output=TestSuite_soundness],0,stdout,ignore)
+AT_KEYWORDS([soundness])
+AT_CLEANUP
+
+AT_SETUP([CTL model checking])
+AT_CHECK([cp TESTFILES/TestSuite_soundness.xml .])
+AT_CHECK([UML2OWFN -i TestSuite_soundness.xml -p filter -a soundness -p ctl -f lola --output=TestSuite_soundness],0,stdout,ignore)
+AT_CHECK([ls *.lola | xargs GREP "ALLPATH ALWAYS" | wc -l | GREP -q 12])
+AT_KEYWORDS([soundness])
+AT_CLEANUP

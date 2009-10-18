@@ -1,4 +1,4 @@
-AC_INIT([UML2oWFN],[2.10-unreleased],[fahland@informatik.hu-berlin.de],[uml2owfn])
+AC_INIT(UML2oWFN, 2.10-unreleased, uml2owfn@service-technology.org, uml2owfn, http://service-technology.org/uml2owfn)
 
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.59)
@@ -17,6 +17,10 @@ AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 # Check for C/C++.
 AC_PROG_CXX
 AM_PROG_CC_C_O
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
 # flags set by the configure script
 configured_CFLAGS=""
@@ -170,6 +174,7 @@ AC_CONFIG_FILES([Makefile
                  anon/Makefile  
                  doc/Makefile
                  doc/Doxyfile
-                 ])
+                 tests/package.m4])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 
 AC_OUTPUT

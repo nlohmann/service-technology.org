@@ -376,12 +376,12 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, con
 
     // check if waitstate is resolved by interface marking
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-    	for (size_t i = 0; i < interface.size(); ++i) {
-			if (interface[i]->marked(l) and
-				InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
-				return false;
-			}
-    	}
+        for (size_t i = 0; i < interface.size(); ++i) {
+            if (interface[i]->marked(l) and
+                InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
+                return false;
+            }
+        }
     }
 
     // inner waitstate remains a waitstate with the current interface of the knowledge
@@ -396,11 +396,11 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, con
 */
 void Knowledge::sequentializeReceivingEvents() {
     // count the number that a receiving event is activated
-	uint8_t * occuranceOfReceivingEvent = new uint8_t[Label::receive_events + 1];
+    uint8_t* occuranceOfReceivingEvent = new uint8_t[Label::receive_events + 1];
 
-	for (uint8_t i = 0; i <= Label::receive_events; ++i) {
-		occuranceOfReceivingEvent[i] = 0;
-	}
+    for (uint8_t i = 0; i <= Label::receive_events; ++i) {
+        occuranceOfReceivingEvent[i] = 0;
+    }
 
     // remember to consider this state again; actually we only need to take a look at its interface
     map<vector<InterfaceMarking*>, bool> visitStateAgain;
@@ -492,7 +492,7 @@ void Knowledge::sequentializeReceivingEvents() {
         }
     } // end for, traverse through states
 
-    delete occuranceOfReceivingEvent;
+    delete[] occuranceOfReceivingEvent;
 }
 
 

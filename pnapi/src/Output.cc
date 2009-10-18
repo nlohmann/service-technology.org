@@ -127,8 +127,7 @@ Output::~Output()
     }
      */
     remove(filename.c_str());
-    if(temp)
-      free(temp);
+    free(temp);
   }
 }
 

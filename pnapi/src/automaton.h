@@ -55,7 +55,7 @@ public:
   /// creating an edge from state 1 to state 2
   Edge & createEdge(State &, State &);
   /// creating an edge with label and type
-  Edge & createEdge(State &, State &, const std::string, Type = TAU);
+  Edge & createEdge(State &, State &, const std::string&, Type = TAU);
 
   /// creates a state machine from automaton
   PetriNet stateMachine() const;

@@ -121,7 +121,7 @@ class Edge
 {
 public:
   /// standard constructor
-  Edge(State &source, State &destination, const std::string label = "",
+  Edge(State &source, State &destination, const std::string& label = "",
       const Automaton::Type type = Automaton::TAU);
   /// standard destructor
   virtual ~Edge();

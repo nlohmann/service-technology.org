@@ -84,13 +84,8 @@ if test "$enable_64bit" = "yes"; then
   configured_LDFLAGS=$configured_LDFLAGS" -m64"
 fi
 
-# In case we compile for 64 bit (either explicitly with "--using-64bit" or
-# implicitly on a x86_64 system), we have to set a preprocessor definition
-# "SIZEOF_VOID_P" for CUDD.
-# (the variable "$ac_cv_sizeof_voidp" is set by "AC_CHECK_SIZEOF([void*])")
-if test "$ac_cv_sizeof_voidp" = "8" -o "$enable_64bit" = "yes"; then
-  CUDD_XFLAGS=$CUDD_XFLAGS" -DSIZEOF_VOID_P=8"
-fi
+# pass sizeof(void*) to CUDD
+CUDD_XFLAGS=$CUDD_XFLAGS" -DSIZEOF_VOID_P=$ac_cv_sizeof_voidp"
 
 
 #############################################################################

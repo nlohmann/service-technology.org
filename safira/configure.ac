@@ -18,6 +18,14 @@ AC_PROG_RANLIB
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# allow the configure script to control assertions (just include config.h)
+AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

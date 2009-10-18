@@ -1,5 +1,4 @@
-#include "config.h"
-#include <cassert>
+#include <config.h>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>

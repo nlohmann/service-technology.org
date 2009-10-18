@@ -1,5 +1,4 @@
-#include "config.h"
-#include <cassert>
+#include <config.h>
 #include <cstdio>
 #include <string>
 #include <map>

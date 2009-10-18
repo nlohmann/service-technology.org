@@ -1,6 +1,5 @@
+#include <config.h>
 //#include <cstdio>
-#include "config.h"
-#include <cassert>
 #include "Node.h"
 #include "map"
 #include <iostream>

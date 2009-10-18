@@ -1,6 +1,5 @@
+#include <config.h>
 #include "helpers.h"
-#include "config.h"
-#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <map>

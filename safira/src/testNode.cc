@@ -1,5 +1,5 @@
+#include <config.h>
 #include "helpers.h"
-#include "config.h"
 #include "cassert"
 #include "testNode.h"
 #include "testFormula.h"

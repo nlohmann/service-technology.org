@@ -2,9 +2,6 @@
 #.PHONY : subversion.h
 #endif
 
-AM_CFLAGS = -W -Wall -pedantic
-AM_CXXFLAGS = -W -Wall -pedantic
-
 bin_PROGRAMS = marlene
 
 marlene_SOURCES = parser_adapt_rules.yy lexer_adapt_rules.ll \

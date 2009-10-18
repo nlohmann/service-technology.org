@@ -73,9 +73,6 @@
 #include "cudd.h"
 #include "st.h"
 
-// for ptrdiff_t
-#include <cstddef>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -251,15 +248,13 @@ typedef struct DdHook {		/* hook list element */
     struct DdHook *next;	/* next element in the list */
 } DdHook;
 
-typedef size_t ptruint;
-typedef ptrdiff_t ptrint;
-//#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
-//typedef long ptrint;
-//typedef unsigned long ptruint;
-//#else
-//typedef int ptrint;
-//typedef unsigned int ptruint;
-//#endif
+#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
+typedef long ptrint;
+typedef unsigned long ptruint;
+#else
+typedef int ptrint;
+typedef unsigned int ptruint;
+#endif
 
 #ifdef __osf__
 #pragma pointer_size save

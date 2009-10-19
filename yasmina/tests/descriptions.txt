@@ -1,0 +1,19 @@
+Yasmina 0.4-unreleased test suite test groups:
+
+ NUM: FILE-NAME:LINE     TEST-GROUP-NAME
+      KEYWORDS
+
+   1: testsuite.at:9     Help output
+      basic
+   2: testsuite.at:14    Version output
+      basic
+   3: testsuite.at:23    Incompatible open nets.
+      basic
+   4: testsuite.at:32    Compatible open nets.
+      basic
+   5: testsuite.at:40    Compatibility cover all nodes check for open nets.
+      basic
+   6: testsuite.at:48    Compatibility check open net with message profile.
+      basic
+   7: testsuite.at:56    Compatibility check of two message profile.
+      basic

@@ -1126,7 +1126,7 @@ int main(int argc, char** argv) {
 			//here add the new constraints to the previous computed ones
 			if(sit==hh.begin()){lpmps=mps;}
 			else {//here combine 
-				for (unsigned int i=0; i<get_Ncolumns(lpmps.at(0)); i++) { //add variables from previous
+				for (unsigned int i=0; i<get_Ncolumns(lpmps.at(0)); ++i) { //add variables from previous
 					std::string pr(get_col_name(lpmps.at(0),i+1));
 					if (result.find(pr)==result.end()) {//add columns from old composition to the new interface
 						result.insert(pr);

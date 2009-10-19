@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = jm1.owfn jm2.owfn jm3.owfn 
+TESTFILES = jm1.owfn jm2.owfn jm3.owfn  myCoffee.output.check  myCoffee.owfn  mycoffee-partner.owfn  myCoffeep.output.check
 
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,

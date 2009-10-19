@@ -105,18 +105,6 @@ AC_MSG_RESULT([better should be])
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_SYS_WAIT
-AH_BOTTOM([#include <sys/types.h>
-#ifdef HAVE_SYS_WAIT_H
-# include <sys/wait.h>
-#endif
-#ifndef WEXITSTATUS
-# define WEXITSTATUS(stat_val) ((unsigned int) (stat_val) >> 8)
-#endif
-#ifndef WIFEXITED
-# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
-#endif
-])
-
 AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
 
 # allow the configure script to control assertions (just include config.h)

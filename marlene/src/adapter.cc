@@ -23,6 +23,16 @@
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
+#include <sys/types.h>
+#ifdef HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) ((unsigned int) (stat_val) >> 8)
+#endif
+#ifndef WIFEXITED
+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif
 
 #include "adapter.h"
 #include "macros.h"

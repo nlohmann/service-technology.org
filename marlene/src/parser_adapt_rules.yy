@@ -121,6 +121,7 @@ partial_rule:
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
+	delete slist;
     }
 |
     channel_list 
@@ -146,9 +147,10 @@ total_rule:
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
         std::list< unsigned int > * slist = new std::list< unsigned int >();
         RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist, RuleSet::AdapterRule::AR_NORMAL, $4);
-        workingSet->_adapterRules.push_back(rule);
+	workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
+	delete slist;
     }
 |    
     opt_channel_list 

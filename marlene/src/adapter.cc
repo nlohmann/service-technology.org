@@ -46,7 +46,7 @@
 Adapter::Adapter(std::vector< pnapi::PetriNet *> & nets, RuleSet & rs,
                 ControllerType contType, unsigned int messageBound, 
                 bool useCompPlaces) :
-    _engine(new pnapi::PetriNet), _nets(nets), _rs(rs), _contType(contType),
+    _engine(new pnapi::PetriNet), _controller(NULL), _nets(nets), _rs(rs), _contType(contType),
                     _messageBound(messageBound), _useCompPlaces(useCompPlaces)
 {
     FUNCIN
@@ -60,6 +60,8 @@ Adapter::~Adapter()
     // deleting the engine if it exists
     delete (_engine);
     _engine = NULL;
+    delete (_controller);
+    _controller = NULL;
     FUNCOUT
 }
 
@@ -79,7 +81,8 @@ const pnapi::PetriNet * Adapter::buildEngine()
     
     // set final condition
     pnapi::Condition & finalCond = _engine->finalCondition();
-    finalCond.addMarking(*(new pnapi::Marking(*_engine)));
+    pnapi::Marking finalMarking (*_engine);
+    finalCond.addMarking(finalMarking);
 
     // create complementary places for the engine's internal places
     if (_useCompPlaces)
@@ -107,18 +110,18 @@ const pnapi::PetriNet * Adapter::buildController()
     // we make a copy of the engine, #_engine is needed for the result
     // #_enginecopy for the synthesis of the controller
 
-    PetriNet * composed = new PetriNet(*_engine);
+    PetriNet composed (*_engine);
 
     // compose engine with nets
     for (unsigned int i = 0; i < _nets.size(); i++)
     {
         if (i == 0)
         {
-            composed->compose(*_nets[i], std::string("engine."),
+            composed.compose(*_nets[i], std::string("engine."),
                 std::string("net" + toString(i+1) + "."));
         } else
         {
-            composed->compose(*_nets[i], std::string(""), std::string("net"
+            composed.compose(*_nets[i], std::string(""), std::string("net"
                             + toString(i+1) + "."));
         }
     }
@@ -126,7 +129,7 @@ const pnapi::PetriNet * Adapter::buildController()
     // add complementary places for the now internal former interface places
     if (_useCompPlaces)
     {
-        Condition & finalCond = composed->finalCondition();
+        Condition & finalCond = composed.finalCondition();
 
         for (unsigned int i = 0; i < _nets.size(); i++)
         {
@@ -138,7 +141,7 @@ const pnapi::PetriNet * Adapter::buildController()
                 std::string placeName = (*placeIter)->getName();
                 std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
 
-                Place * place = composed->findPlace(placeName);
+                Place * place = composed.findPlace(placeName);
                 //if (place == NULL)
                 //{
                 //    place = composed->findPlace(placeName2);
@@ -146,17 +149,17 @@ const pnapi::PetriNet * Adapter::buildController()
                 //}
                 assert(place);
 
-                Place * compPlace = &composed->createPlace("comp_" + placeName,
+                Place * compPlace = &composed.createPlace("comp_" + placeName,
                     Node::INTERNAL, _messageBound +1, _messageBound+1);
 
-                formula::FormulaEqual * prop = new formula::FormulaEqual(*compPlace,_messageBound + 1);
-                finalCond.addProposition(*prop);
+                formula::FormulaEqual prop (formula::FormulaEqual(*compPlace,_messageBound + 1));
+                finalCond.addProposition(prop);
 
                 std::set< Node *> postSet = place->getPostset();
                 std::set< Node *>::iterator nodeIter = postSet.begin();
                 while (nodeIter != postSet.end() )
                 {
-                    composed->createArc(**nodeIter, *compPlace);
+                    composed.createArc(**nodeIter, *compPlace);
                     nodeIter++;
                 }
 
@@ -164,14 +167,14 @@ const pnapi::PetriNet * Adapter::buildController()
                 nodeIter = preSet.begin();
                 while (nodeIter != preSet.end() )
                 {
-                    composed->createArc(*compPlace, **nodeIter);
+                    composed.createArc(*compPlace, **nodeIter);
                     nodeIter++;
                 }
 
                 // deadlock transition for message bound violation of former interface
-                Transition * dlTrans = &composed->createTransition("dl_"
+                Transition * dlTrans = &composed.createTransition("dl_"
                                 + placeName);
-                composed->createArc(*place, *dlTrans, _messageBound + 1);
+                composed.createArc(*place, *dlTrans, _messageBound + 1);
 
                 ++placeIter;
             }
@@ -182,14 +185,14 @@ const pnapi::PetriNet * Adapter::buildController()
     }
 
     // finally reduce the strucure of the net as far as possible
-    composed->reduce(pnapi::PetriNet::LEVEL_4);
+    composed.reduce(pnapi::PetriNet::LEVEL_4);
 
     if (_contType == ASYNCHRONOUS)
     {
-        composed->normalize();
+        composed.normalize();
     }
     // \todo: Experiment, ob sich das hier noch lohnt.
-    composed->reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
+    composed.reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
 
     /***********************************\
         * calculate most permissive partner *
@@ -204,7 +207,7 @@ const pnapi::PetriNet * Adapter::buildController()
     std::string og_filename = owfn_filename + ".og";
     std::string cost_filename = owfn_filename + ".cf";
 
-    owfn_temp.stream() << pnapi::io::owfn << *composed;
+    owfn_temp.stream() << pnapi::io::owfn << composed;
 
     std::string wendy_command;
     std::string candy_command;
@@ -291,7 +294,7 @@ const pnapi::PetriNet * Adapter::buildController()
         * transform most-permissive partner to open net *
      \***********************************************/
     time(&start_time);
-    pnapi::PetriNet * controller;
+    delete _controller;
 
     if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "not_found") // && _contType == ASYNCHRONOUS)
 
@@ -299,7 +302,7 @@ const pnapi::PetriNet * Adapter::buildController()
         status("Using Petrify for conversion from SA to open net.");
         pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
         pnapi::PetriNet::setPetrify(args_info.petrify_arg);
-        controller = new pnapi::PetriNet(*mpp_sa);
+        _controller = new pnapi::PetriNet(*mpp_sa);
     }
     else
     if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "not_found") // && _contType == ASYNCHRONOUS)
@@ -308,26 +311,27 @@ const pnapi::PetriNet * Adapter::buildController()
         status("Using Genet for conversion from SA to open net.");
         pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
         pnapi::PetriNet::setGenet(args_info.genet_arg);
-        controller = new pnapi::PetriNet(*mpp_sa);
+        _controller = new pnapi::PetriNet(*mpp_sa);
     }
     else
     {
         status("Using a state machine for conversion from SA to open net.");
         pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
-        controller = new pnapi::PetriNet(*mpp_sa);
+        _controller = new pnapi::PetriNet(*mpp_sa);
     }
+    delete mpp_sa;
     time(&end_time);
 
     if (args_info.verbose_flag)
     {
         std::cerr << PACKAGE << ": most-permissive partner: "
-                        << pnapi::io::stat << *controller << std::endl;
+                        << pnapi::io::stat << *_controller << std::endl;
     }
     status("converting most-permissive partner done [%.0f sec]", difftime(
         end_time, start_time));
 
     FUNCOUT
-    return controller;
+    return _controller;
 }
     
 /**
@@ -592,8 +596,8 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
         // update final condition
         Condition & finalCond = net.finalCondition();
 
-        formula::FormulaEqual * prop = new formula::FormulaEqual(compPlace, place.getCapacity());
-        finalCond.addProposition(*prop);
+        formula::FormulaEqual prop (formula::FormulaEqual(compPlace, place.getCapacity()));
+        finalCond.addProposition(prop);
 
         std::set< Node * > preSet = place.getPreset();
         std::set< Node * >::iterator nodeIter = preSet.begin();

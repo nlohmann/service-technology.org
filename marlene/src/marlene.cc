@@ -232,13 +232,15 @@ int main(int argc, char* argv[])
     /*******************\
     * Deleting all nets *
     \*******************/
-/*
+
     for ( unsigned int index = 0; index < nets.size(); ++index)
     {
         delete nets[index];
     }
     nets.clear();
-*/    
+    
+    cmdline_parser_free(&args_info);
+
     return 0;
 }
 

@@ -99,6 +99,9 @@ class Adapter
         //! pnapi::PetriNet containing the engine part of the adapter
         pnapi::PetriNet * _engine;
         
+        //! pnapi::PetriNet containing the engine part of the adapter
+        pnapi::PetriNet * _controller;
+        
         //! vector of all nets being adapted
         std::vector< pnapi::PetriNet * > & _nets;
         

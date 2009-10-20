@@ -15,7 +15,14 @@ NEWNAME=$1
 NEWBIGNAME=$2
 NEWBIGBIGNAME=$3
 
-# assuming the script is started in "/hello/utils/"
+# test if the script was started in "/hello/utils/"
+if [ ! -f changeName.sh ]
+then
+    echo "script wasn't started in [.../hello/utils]!"
+    exit
+fi
+
+# change the directory
 cd ../..
 
 # does a folder with the given name already exist?
@@ -35,32 +42,16 @@ then
     echo "...done"
 fi
 
-# copy the whole folder of the 'Hello World' program to a new one with the given name
-echo "copying directory [hello] into directory [$NEWNAME]..."
-cp -R hello $NEWNAME
+# export the whole folder of the 'Hello World' program to a new one with the given name
+echo "exporting directory [hello] into directory [$NEWNAME]..."
+svn export hello $NEWNAME
 echo "...done"
 
 # go into that just created folder
 cd $NEWNAME
 
-# delete all svn-related folders
-echo "deleting svn-files..."
-rm -r -f .svn
-rm -r -f doc/.svn
-rm -r -f libs/.svn
-rm -r -f libs/pnapi/.svn
-rm -r -f maintainer/.svn
-rm -r -f maintainer/debian/.svn
-rm -r -f maintainer/macports/.svn
-rm -r -f man/.svn
-rm -r -f src/.svn
-rm -r -f tests/.svn
-rm -r -f tests/lcov/.svn
-rm -r -f tests/testfiles/.svn
-
-# also delete the folder 'utils', which isn't needed any more
+# delete the folder 'utils', which isn't needed any more
 rm -r -f utils
-echo "...done"
 
 # declaration of a function to change all appearances of "hello" into the name of the new program
 function changeit () {
@@ -106,6 +97,13 @@ rm ./src/hello.conf.in
 changeit ./doc/hello.texi
 cp ./doc/hello.texi ./doc/$NEWNAME.texi
 rm ./doc/hello.texi
+echo "...done"
+
+# ...is this really necessary???
+echo "doing a <chmod 775> on all shell-scripts..."
+find . -name *.sh -exec chmod 775 {} \;
+# this one might be necessary...
+chmod 775 ./tests/lcov/lcov
 echo "...done"
 
 echo "Job done! Bye bye!"

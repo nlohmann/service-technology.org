@@ -4,7 +4,7 @@ SUBDIRS = src man doc tests exp maintainer
 # remove everything that cannot be built
 #############################################################################
 svn-clean: maintainer-clean
-	rm -fr COPYING INSTALL Makefile.in aclocal.m4 compile configure \
+	rm -fr INSTALL Makefile.in aclocal.m4 compile configure \
 	depcomp install-sh missing ylwrap $(DIST_ARCHIVES).sig config.sub \
 	config.guess config.h.in~
 	rm -fr doc/Makefile.in doc/mdate-sh doc/manual
@@ -18,23 +18,6 @@ svn-clean: maintainer-clean
 	@echo "To recreate installation status enter"
 	@echo "  autoreconf -i"
 	@echo
-
-
-#############################################################################
-# create a binary distribution
-#############################################################################
-bindist:
-	$(MAKE) $(AM_MAKEFLAGS)
-	mkdir bin
-	cp src/$(PACKAGE_TARNAME) bin
-	wget http://download.gna.org/service-tech/$(PACKAGE_TARNAME)/$(PACKAGE_TARNAME).pdf
-	mv $(PACKAGE_TARNAME).pdf bin
-	cp COPYING bin
-	file bin/* > CONTENT
-	mv CONTENT bin
-	zip -r $(distdir)-$(build_cpu)-$(build_os).zip bin
-	rm -fr bin
-
 
 #############################################################################
 # run experiments

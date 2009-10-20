@@ -18,66 +18,28 @@
  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
-#include <cassert>
+#include <config.h>
 #include <set>
 
-#include "config.h"
 #include "Formula.h"
 
 /*
  * constructors
  */
-FormulaBits::FormulaBits(bool S, bool F, bool S_1, bool S_2, bool F_prime) :
-    S(S), F(F), S_1(S_1), S_2(S_2), F_prime(F_prime)
-{}
-
-
-FormulaAND::FormulaAND(Formula *_left, Formula *_right) : 
-    left(_left), right(_right)
-{
-    assert(_left != NULL);
-    assert(_right != NULL);
+FormulaAND::FormulaAND(Formula *_left, Formula *_right)
+  : left(_left), right(_right) {
+    assert(_left);
+    assert(_right);
 }
 
-FormulaOR::FormulaOR(Formula *_left, Formula *_right) :
-    left(_left), right(_right)
-{    
-    assert(_left != NULL);
-    assert(_right != NULL);
+FormulaOR::FormulaOR(Formula *_left, Formula *_right)
+  : left(_left), right(_right) {
+    assert(_left);
+    assert(_right);
 }
 
-FormulaLit::FormulaLit(const Label _literal) :
-    literal(_literal)
-{
-}
-
-
-/*
- * string output
- */
-
-std::string FormulaAND::toString() const {
-    return "(" + left->toString() + " AND " + right->toString() + ")";
-}
-
-std::string FormulaOR::toString() const {
-    return "(" + left->toString() + " OR " + right->toString() + ")";
-}
-
-std::string FormulaLit::toString() const {
-    return literal;
-}
-
-std::string FormulaTrue::toString() const {
-    return "TRUE";
-}
-
-std::string FormulaFalse::toString() const {
-    return "FALSE";
-}
-
-std::string FormulaFinal::toString() const {
-    return "FINAL";
+FormulaLit::FormulaLit(const Label& _literal)
+  : literal(_literal) {
 }
 
 
@@ -121,11 +83,11 @@ std::string FormulaFinal::toDot(bool noBrackets) const {
  */
 
 bool FormulaAND::sat(const std::set<Label> &l) const {
-    return (left->sat(l) && right->sat(l));
+    return (left->sat(l) and right->sat(l));
 }
 
 bool FormulaOR::sat(const std::set<Label> &l) const {
-    return (left->sat(l) || right->sat(l));
+    return (left->sat(l) or right->sat(l));
 }
 
 bool FormulaLit::sat(const std::set<Label> &l) const {
@@ -159,34 +121,6 @@ bool FormulaFalse::sat(const std::set<Label> &l) const {
  * This bug was found by Martin Znamirowski. See <http://gna.org/bugs/?11944>.
  */
 bool FormulaFinal::sat(const std::set<Label> &l) const {
-    return true; // true by default
+    return true;  // true by default
 }
 
-
-/*
- * test if formula contains final
- */
-
-bool FormulaAND::hasFinal() const {
-    return (left->hasFinal() || right->hasFinal()); // sic!
-}
-
-bool FormulaOR::hasFinal() const {
-    return (left->hasFinal() || right->hasFinal());
-}
-
-bool FormulaLit::hasFinal() const {
-    return false;
-}
-
-bool FormulaTrue::hasFinal() const { // sic!
-    return false;
-}
-
-bool FormulaFalse::hasFinal() const {
-    return false;
-}
-
-bool FormulaFinal::hasFinal() const {
-    return true;
-}

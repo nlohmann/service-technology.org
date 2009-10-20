@@ -14,8 +14,18 @@ Version 1.14-unreleased
 * added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
   to determine test case coverage (use `make cover' in `tests' directory)
 
-Version 1.13
-============
+* added scripts to use ZCOV (`http://minormatter.com/zcov') to determine test
+  branch case coverage (use `make cover-branch' in `tests' directory)
+
+* cleaned code:
+     * removed support for aspects - not used any more
+
+     * removed BPMN output - this does not belong here
+
+     * removed 2-bit annotation - Wendy can do this
+
+Version 1.13 (6 June 2009)
+==========================
 
 * the bit annotations are now written inside the nodes of the Graphviz dot
   annotation
@@ -51,8 +61,8 @@ Version 1.13
 
 * tests are now organized by GNU Autotest
 
-Version 1.12
-============
+Version 1.12 (17 January 2009)
+==============================
 
 * implemented methods to calculate a compact representation of the formulae
   annotated to the operating guideline's states according to the paper
@@ -79,8 +89,8 @@ Version 1.12
   annotated formulae now use mathematical symbols for conjunctions and
   disjunctions, and the initial state is marked
 
-Version 1.11
-============
+Version 1.11 (2 November 2008)
+==============================
 
 * implemented Fiona's modified OG file format (an OG file now also consists
   of an interface definition) and adjusted the respective test cases -- note
@@ -122,8 +132,8 @@ Version 1.11
   this value, it is immediately returned instead of the optimum; this results
   in faster, yet sub-optimal results
 
-Version 1.10
-============
+Version 1.10 (20 August 2008)
+=============================
 
 * Rachel does not need to be installed to execute `make experiments'
 
@@ -160,8 +170,8 @@ Version 1.10
   (`http://ltp.sourceforge.net/coverage/lcov.php'); checks can be invoked in
   directory `tests' with `make prepare-cover cover'
 
-Version 1.09
-============
+Version 1.09 (7 August 2008)
+============================
 
 * fixed bug #12153 (`https://gna.org/bugs/?12153'): the patch for the
   aspected sources now works on x86_64 machines
@@ -207,8 +217,8 @@ Version 1.09
   needed. Furthermore, the tools  `fakeroot' and `alien' are needed to create
   an RPM binary package from the Debian binary package.
 
-Version 1.08
-============
+Version 1.08 (3 August 2008)
+============================
 
 * MAINTAINER: added a directory `maintainer/debian' containing files to
   create Debian and Redhat packages
@@ -218,8 +228,8 @@ Version 1.08
 
 * the file `NEWS' is now extracted from file `doc/ChangeLog.texi'
 
-Version 1.07
-============
+Version 1.07 (29 July 2008)
+===========================
 
 * fixed bug #12112 (`https://gna.org/bugs/?12112'): allow to compile Rachel
   using GCC 4.3.1
@@ -228,8 +238,8 @@ Version 1.07
 
 * minor changes to avoid compiler warnings
 
-Version 1.06
-============
+Version 1.06 (16 July 2008)
+===========================
 
 * added a Makefile target `make bindist' to create a zipped archive with a
   binary and a documentation
@@ -249,15 +259,15 @@ Version 1.06
 
 * updated `src/Doxyfile.in' template for `doxygen' version 1.5.5
 
-Version 1.05
-============
+Version 1.05 (8 July 2008)
+==========================
 
 * fixed a memory leak in the OG lexer
 
 * fixed a memory leak in the command line parser
 
-Version 1.04
-============
+Version 1.04 (30 June 2008)
+===========================
 
 * added the experiments (file `exp/bpm2008.tgz') from the paper
 
@@ -280,14 +290,14 @@ Version 1.04
 
 * overworked the documentation
 
-Version 1.03
-============
+Version 1.03 (22 June 2008)
+===========================
 
 * some adjustments to improve the compatibility between AspectC++
   (`http://www.aspectc.org') and Cygwin
 
-Version 1.02
-============
+Version 1.02 (14 May 2008)
+==========================
 
 * added more files to the deletion list of Makefile target `cvs-clean'
 
@@ -302,8 +312,8 @@ Version 1.02
 
 * the lexer was overworked to be backward compatible with older Flex versions
 
-Version 1.01
-============
+Version 1.01 (6 May 2008)
+=========================
 
 * adding copyright notices to comply to the GNU GPL
 
@@ -311,8 +321,8 @@ Version 1.01
 
 * overworked documentation
 
-Version 1.00
-============
+Version 1.00 (6 May 2008)
+=========================
 
 * tool is now called Rachel = "Repairing Automata for Choreographies by
   Editing Labels"

@@ -9,7 +9,7 @@ section "Options"
 
 option "mode" m
   "Execution mode of Rachel"
-  string values="matching","simulation","annotation","bpmn","og","sa" enum
+  string values="matching","simulation","og","sa" enum
   typestr="MODE"
   default="matching"
   optional
@@ -30,14 +30,6 @@ option "og" o
   "Read an operating guideline"
   typestr="FILE"
   string optional
-
-option "shapedir" -
-  "Path to BPMN shapes for Graphviz dot output"
-  string
-  default="bpmn/"
-  typestr="PATH"
-  optional
-  hidden
 
 
 section "File output"
@@ -115,3 +107,17 @@ option "bug" -
   "Show helpful information (version number, compilation date, compiler version, and platform) in case a bug was found and should be reported."
   flag off
   hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Wendy should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/rachel-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
+  flag off

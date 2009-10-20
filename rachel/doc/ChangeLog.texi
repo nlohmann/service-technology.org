@@ -3,10 +3,21 @@
 @item updated maintainer scripts
 
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+
+@item added scripts to use ZCOV (@url{http://minormatter.com/zcov}) to determine test branch case coverage (use @samp{make cover-branch} in @file{tests} directory)
+
+@item cleaned code:
+@itemize
+@item removed support for aspects -- not used any more
+
+@item removed @acronym{BPMN} output -- this does not belong here
+
+@item removed 2-bit annotation -- Wendy can do this
+@end itemize
 @end itemize
 
 
-@heading Version 1.13
+@heading Version 1.13 (6 June 2009)
 @itemize
 @item the bit annotations are now written inside the nodes of the Graphviz dot annotation
 
@@ -32,7 +43,7 @@
 @end itemize
 
 
-@heading Version 1.12
+@heading Version 1.12 (17 January 2009)
 @itemize
 @item implemented methods to calculate a compact representation of the formulae annotated to the operating guideline's states according to the paper submitted to ACSD 2009; the new method can be triggered with the new mode @option{-m annotation}
 
@@ -48,7 +59,7 @@
 @end itemize
 
 
-@heading Version 1.11
+@heading Version 1.11 (2 November 2008)
 @itemize
 @item implemented Fiona's modified OG file format (an OG file now also consists of an interface definition) and adjusted the respective test cases --- note that Rachel's parser is backwards compatible and still accepts OG files without interface definition
 
@@ -79,7 +90,7 @@
 
 
 
-@heading Version 1.10
+@heading Version 1.10 (20 August 2008)
 @itemize
 @item Rachel does not need to be installed to execute @command{make experiments}
 
@@ -106,7 +117,7 @@
 
 
 
-@heading Version 1.09
+@heading Version 1.09 (7 August 2008)
 
 @itemize
 @item fixed bug #12153 (@url{https://gna.org/bugs/?12153}): the patch for the aspected sources now works on x86_64 machines
@@ -140,7 +151,7 @@ Note that @command{make deb} can only be executed on a machine where the tools @
 
 
 
-@heading Version 1.08
+@heading Version 1.08 (3 August 2008)
 
 @itemize
 @item MAINTAINER: added a directory @file{maintainer/debian} containing files to create Debian and Redhat packages
@@ -152,7 +163,7 @@ Note that @command{make deb} can only be executed on a machine where the tools @
 
 
 
-@heading Version 1.07
+@heading Version 1.07 (29 July 2008)
 
 @itemize
 @item fixed bug #12112 (@url{https://gna.org/bugs/?12112}): allow to compile Rachel using GCC 4.3.1
@@ -164,7 +175,7 @@ Note that @command{make deb} can only be executed on a machine where the tools @
 
 
 
-@heading Version 1.06
+@heading Version 1.06 (16 July 2008)
 
 @itemize
 @item added a Makefile target @command{make bindist} to create a zipped archive with a binary and a documentation
@@ -189,7 +200,7 @@ Please email the following information to @email{rachel@@service-technology.org}
 
 
 
-@heading Version 1.05
+@heading Version 1.05 (8 July 2008)
 
 @itemize
 @item fixed a memory leak in the OG lexer
@@ -199,7 +210,7 @@ Please email the following information to @email{rachel@@service-technology.org}
 
 
 
-@heading Version 1.04
+@heading Version 1.04 (30 June 2008)
 
 @itemize
 @item added the experiments (file @file{exp/bpm2008.tgz}) from the paper
@@ -217,7 +228,7 @@ Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-b
 
 
 
-@heading Version 1.03
+@heading Version 1.03 (22 June 2008)
 
 @itemize
 @item some adjustments to improve the compatibility between AspectC++ (@url{http://www.aspectc.org}) and Cygwin
@@ -225,7 +236,7 @@ Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-b
 
 
 
-@heading Version 1.02
+@heading Version 1.02 (14 May 2008)
 
 @itemize
 @item added more files to the deletion list of Makefile target @code{cvs-clean}
@@ -241,7 +252,7 @@ Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-b
 
 
 
-@heading Version 1.01
+@heading Version 1.01 (6 May 2008)
 
 @itemize
 @item adding copyright notices to comply to the @acronym{GNU} @acronym{GPL}
@@ -253,7 +264,7 @@ Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-b
 
 
 
-@heading Version 1.00
+@heading Version 1.00 (6 May 2008)
 
 @itemize
 @item tool is now called Rachel = ``@b{R}epairing @b{A}utomata for @b{Ch}oreographies by @b{E}diting @b{L}abels''

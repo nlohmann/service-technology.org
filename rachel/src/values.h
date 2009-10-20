@@ -22,7 +22,7 @@
  * \file values.h
  * \brief Node and label similarity (can be overridden by command line parameters)
  */
- 
+
 #ifndef __VALUES_H
 #define __VALUES_H
 
@@ -32,10 +32,10 @@ class Graph;
 
 
 /// node similarity
-Value N(Graph &g1, Graph &g2, Node q1, Node q2);
+Value N(const Graph &g1, const Graph &g2, Node q1, Node q2);
 
 /// label similarity
-Value L(Graph &g1, Graph &g2, Label l1, Label l2);
+Value L(const Graph &g1, const Graph &g2, Label l1, Label l2);
 
 
 #endif

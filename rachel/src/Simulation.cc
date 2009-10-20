@@ -26,15 +26,14 @@
 #include <vector>
 #include <cstdlib>
 #include <cstdio>
+#include <map>
 #include "helpers.h"
 #include "cmdline.h"
 #include "costfunction.h"
 #include "Simulation.h"
 #include "Action.h"
 #include "Graph.h"
-
-using std::pair;
-using std::map;
+#include "verbose.h"
 
 
 /*************
@@ -42,7 +41,7 @@ using std::map;
  *************/
 
 /// a map caching the best script for all action pairs
-extern map<Node, map<Node, ActionScript> > G_script_cache;
+extern std::map<Node, std::map<Node, ActionScript> > G_script_cache;
 
 /// the command line options
 extern gengetopt_args_info args_info;
@@ -65,12 +64,12 @@ extern Graph B;
  */
 ActionScript Simulation::w1(Node q1, Node q2) {
     Action action_insert(INSERT, 0);
-    
+
     // traverse B's edges and find edge with highest value if A stutters
     for (size_t i = 0; i < B.outEdges(q2).size(); ++i)  {
         Value currentvalue = L("", B.outEdges(q2)[i].label) *
             simulation_recursively(q1, B.outEdges(q2)[i].target);
- 
+
         if (currentvalue > action_insert.value) {
             action_insert.value = currentvalue;
             action_insert.stateA = q1;
@@ -78,7 +77,7 @@ ActionScript Simulation::w1(Node q1, Node q2) {
             action_insert.label_new = B.outEdges(q2)[i].label;
         }
     }
-    
+
     // create a singleton script out of the action and return it
     return ActionScript(action_insert);
 }
@@ -93,15 +92,15 @@ ActionScript Simulation::w1(Node q1, Node q2) {
  */
 ActionScript Simulation::w2(Node q1, Node q2) {
     ActionScript script;
-    
+
     // traverse A's edges
     for (size_t i = 0; i < A.outEdges(q1).size(); ++i) {
         Action action_modify(MODIFY, 0);
-        
+
         // traverse B's edges: find edge with highest value if no-one stutters
         for (size_t j = 0; j < B.outEdges(q2).size(); ++j) {
             Value currentvalue = L(A.outEdges(q1)[i].label, B.outEdges(q2)[j].label) *
-                simulation_recursively(A.outEdges(q1)[i].target, B.outEdges(q2)[j].target);            
+                simulation_recursively(A.outEdges(q1)[i].target, B.outEdges(q2)[j].target);
 
             if (currentvalue > action_modify.value) {
                 action_modify.value = currentvalue;
@@ -111,24 +110,20 @@ ActionScript Simulation::w2(Node q1, Node q2) {
                 action_modify.label_new = B.outEdges(q2)[j].label;
             }
         }
-        
+
         // B stutters
         Value value_delete = L(A.outEdges(q1)[i].label, "") *
             simulation_recursively(A.outEdges(q1)[i].target, q2);
         Action action_delete(DELETE, value_delete, A.outEdges(q1)[i].target, q2);
         action_delete.label_old = A.outEdges(q1)[i].label;
-        
+
         // add best action to script
-        if (action_delete.value > action_modify.value) {
-            script.add(action_delete);
-        } else {
-            script.add(action_modify);
-        }
+        script.add((action_delete.value > action_modify.value) ? action_delete : action_modify);
     }
-    
+
     // discount value of all actions using the sum of actions
     script.value *= (discount() / A.outEdges(q1).size());
-    
+
     return script;
 }
 
@@ -144,35 +139,35 @@ ActionScript Simulation::w2(Node q1, Node q2) {
 Value Simulation::simulation_recursively(Node q1, Node q2) {
     // recycle previously calculated values
     if (cache[q1][q2] != 0) {
-        cache_hit++;
+        ++cache_hit;
         return cache[q1][q2];
     }
-        
+
     // value was not in the cache: calculate it
-    cache_miss++;
-    
+    ++cache_miss;
+
     // statistical output
-    if (args_info.verbose_flag && cache_miss > 1 && (cache_miss % 1000) == 0) {
-        fprintf(stderr, "%8u\n", cache_miss);
+    if (cache_miss % 1000 == 0) {
+        status("%8u", cache_miss);
     }
-    
+
     // calculate successor values
     if (A.outEdges(q1).empty()) {
-        cache[q1][q2] = N(q1,q2);
+        cache[q1][q2] = N(q1, q2);
     } else {
         // collect helper values and choose maximum
-        ActionScript script1 = w1(q1,q2);
-        ActionScript script2 = w2(q1,q2); 
+        ActionScript script1 = w1(q1, q2);
+        ActionScript script2 = w2(q1, q2);
         ActionScript bestScript = (script1.value > script2.value) ? script1 : script2;
-        
+
         // cache best action
         G_script_cache[q1][q2] = bestScript;
-        
+
         // calculate and cache value
-        cache[q1][q2] = (((1-discount()) * N(q1,q2)) + bestScript.value);
+        cache[q1][q2] = (((1-discount()) * N(q1, q2)) + bestScript.value);
     }
-    
-    
+
+
     return cache[q1][q2];
 }
 
@@ -198,20 +193,20 @@ Value Simulation::simulation() {
     // reset static values
     cache_hit = 0;
     cache_miss = 0;
-    
+
     // allocate memory for cache
     initializeCache(A, B);
-    
+
     // calculate the matching between the root nodes
     Value result = simulation_recursively(A.getRoot(), B.getRoot());
-    
+
     // statistical output
     double hit_rate = 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
-    fprintf(stderr, "cache: %u hits, %u misses, hit rate %.2f%%\n",
-            cache_hit, cache_miss, hit_rate * 100);
-    
+    status("cache: %u hits, %u misses, hit rate %.2f%%",
+        cache_hit, cache_miss, hit_rate * 100);
+
     // delete cache
-    emptyCache(A, B);    
-    
+    emptyCache(A, B);
+
     return result;
 }

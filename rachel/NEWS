@@ -14,6 +14,16 @@ Version 1.14-unreleased
 * added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
   to determine test case coverage (use `make cover' in `tests' directory)
 
+* added scripts to use ZCOV (`http://minormatter.com/zcov') to determine test
+  branch case coverage (use `make cover-branch' in `tests' directory)
+
+* cleaned code:
+     * removed support for aspects - not used any more
+
+     * removed BPMN output - this does not belong here
+
+     * removed 2-bit annotation - Wendy can do this
+
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for
 complete version history.

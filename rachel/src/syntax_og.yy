@@ -21,8 +21,6 @@
 
 
 %{
-#include <libgen.h>
-#include "cmdline.h"
 #include "Graph.h"
 #include "Formula.h"
 
@@ -42,7 +40,6 @@ extern Graph G_parsedGraph;
 extern char* og_yytext;
 extern int og_yylex();
 extern int og_yyerror(char const *msg);
-extern gengetopt_args_info args_info;
 %}
 
 // Bison options
@@ -78,26 +75,23 @@ extern gengetopt_args_info args_info;
 
 
 og:
- interface nodes initialnode transitions
-   { // Do not reenumerate nodes in annotation mode, because there the
-     // node numbers are printed and reenumeration would be confusing.
-     if (args_info.mode_arg != mode_arg_annotation)
-       G_parsedGraph.reenumerate();
-   }
+ interface nodes initialnode key_transitions transitions_list semicolon
+   { G_parsedGraph.reenumerate(); }
 ;
 
 
 interface:
   /* for backwards compatibility, the interface is optional */
-| key_interface key_input places_list semicolon
-  key_output places_list semicolon
+| key_interface key_input places_list semicolon key_output places_list semicolon
 ;
 
 
 places_list:
   /* empty */
 | places_list comma ident
+    { free($3); }
 | ident
+    { free($1); }
 ;
 
 
@@ -150,7 +144,7 @@ formula:
 | key_false
     { $$ = new FormulaFalse(); }
 | ident
-    { $$ = new FormulaLit($1); }
+    { $$ = new FormulaLit($1); free($1); }
 ;
 
 
@@ -166,11 +160,6 @@ initialnode:
 ;
 
 
-transitions:
-  key_transitions transitions_list semicolon
-;
-
-
 transitions_list:
   /* empty */
 | transition
@@ -180,5 +169,6 @@ transitions_list:
 
 transition:
   number arrow number colon ident
-    { G_parsedGraph.addEdge($1, $3, $5); }
+    { G_parsedGraph.addEdge($1, $3, $5);
+      free($5); }
 ;

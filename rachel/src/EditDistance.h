@@ -48,10 +48,10 @@ class EditDistance {
         static unsigned int cache_miss;
     
         /// allocate memory for cache and initialize it
-        static void initializeCache(Graph &g1, Graph &g2);
+        static void initializeCache(const Graph&, const Graph&);
 
         /// allocate memory for cache and initialize it
-        static void emptyCache(Graph &g1, Graph &g2);
+        static void emptyCache(const Graph&, const Graph&);
     
         /// destructor
         virtual ~EditDistance() {};

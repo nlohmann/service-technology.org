@@ -32,17 +32,17 @@ Value **EditDistance::cache = NULL;
  * \note Assertions about NULL pointers are not needed, because "new" would
  *       throw an execption if allocation does not work.
  */
-void EditDistance::initializeCache(Graph &g1, Graph &g2) {
+void EditDistance::initializeCache(const Graph& g1, const Graph& g2) {
     cache = new Value*[g1.nodes.size()];
-    
+
     for (size_t i = 0; i < g1.nodes.size(); ++i) {
         cache[i] = new Value[g2.nodes.size()];
-        
+
         // initialize cache entries to 0
         for (size_t j = 0; j < g2.nodes.size(); ++j) {
             cache[i][j] = 0;
         }
-    }    
+    }
 }
 
 
@@ -52,10 +52,10 @@ void EditDistance::initializeCache(Graph &g1, Graph &g2) {
  * \bug This function crashes for reasons I don't understand if it is called
  *      after calculating the matching.
  */
-void EditDistance::emptyCache(Graph &g1, Graph &g2) {
+void EditDistance::emptyCache(const Graph& g1, const Graph& g2) {
     for (size_t i = 0; i < g1.nodes.size(); ++i) {
         delete [] cache[i];
     }
-    
-    delete [] cache;    
+
+    delete [] cache;
 }

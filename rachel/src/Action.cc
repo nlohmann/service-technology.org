@@ -19,6 +19,7 @@
 \*****************************************************************************/
 
 #include "Action.h"
+#include <string>
 
 
 /**************************************
@@ -34,17 +35,17 @@ std::string Action::toString() const {
     switch (type) {
         case(INSERT):
             return "insert " + label_new;
- 
+
         case(DELETE):
             return "delete " + label_old;
-        
+
         case(MODIFY):
             if (label_old != label_new) {
                 return "modify " + label_old + " to " + label_new;
             } else {
                 return "keep " + label_old;
             }
-            
+
         case(NONE):
         case(KEEP):
         default:
@@ -54,14 +55,9 @@ std::string Action::toString() const {
 
 
 // constructor
-Action::Action(action_type myType, Value myValue, Node myNodeA, Node myNodeB) : 
-    type(myType),
-    value(myValue),
-    stateA(myNodeA),
-    stateB(myNodeB),
-    label_old(""),
-    label_new("")
-{
+Action::Action(action_type myType, Value myValue, Node myNodeA, Node myNodeB)
+  : type(myType), value(myValue), stateA(myNodeA), stateB(myNodeB),
+    label_old(""), label_new("") {
 }
 
 
@@ -71,9 +67,9 @@ void Action::setType(const action_type a) {
 
 
 action_type Action::getType() const {
-    if ( (type == MODIFY) && (label_new == label_old) )
+    if (type == MODIFY and label_new == label_old)
         return KEEP;
-    
+
     return type;
 }
 
@@ -92,27 +88,25 @@ void ActionScript::add(const Action &a) {
 /// return a string representation of the script
 std::string ActionScript::toString() const {
     std::string result;
-    
+
     for (size_t i = 0; i < script.size(); ++i) {
         if (i != 0)
             result += ", ";
         result += script[i].toString();
     }
-    
+
     return result;
 }
 
 
 /// constructor
-ActionScript::ActionScript() :
-    script(), value(0)
-{
+ActionScript::ActionScript()
+  : script(), value(0) {
 }
 
 
 /// constructor to construct a singleton script
-ActionScript::ActionScript(const Action &a) :
-    script(), value(0)
-{
+ActionScript::ActionScript(const Action &a)
+  : script(), value(0) {
     add(a);
 }

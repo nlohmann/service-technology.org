@@ -40,36 +40,35 @@ class Matching : EditDistance {
     private:
         /// how often the function Matching::permuteEdges was called
         static unsigned int permuteEdges_calls;
-    
+
         /// how often the function Matching::calcPermutations was called
         static unsigned int calcPermutations_calls;
-        
+
         /// how often the function Matching::w was called
         static unsigned int w_calls;
-    
+
         /// how often the function Matching::matching was called
         static unsigned int matching_calls;
-    
+
     private:
         /// satisfying asignments in a state q
-        static Assignments sat(Graph &g, Node q);
+        static Assignments sat(Graph&, Node);
 
         /// create a permutation
-        static Permutation permuteEdges(Edges &e1, Edges &e2);
+        static Permutation permuteEdges(const Edges&, const Edges&);
 
         /// calculates permutations
-        static Permutations calcPermutations(Node q1, Node q2,
-                                             Assignment &beta);
+        static Permutations calcPermutations(Node, Node, const Assignment&);
 
         /// preprocess OG
-        static Value preprocess(Graph &g, Node q);
-    
+        static Value preprocess(Graph&, Node);
+
         /// helper function for Matching::matching
-        static ActionScript w(Node q1, Node q2);
+        static ActionScript w(Node, Node);
 
         /// weighted matching (helper)
-        static Value matching_recursively(Node q1, Node q2);
-    
+        static Value matching_recursively(Node, Node);
+
     public:
         /// weighted matching
         static Value matching();

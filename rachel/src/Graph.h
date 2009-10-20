@@ -39,22 +39,22 @@ class Edge {
     public:
         /// the source of the edge
         Node source;
-    
+
         /// the target of the edge
         Node target;
-    
+
         /// the label of the edge
         Label label;
-    
+
         /// the type of the edge (for edit distance)
         action_type type;
-        
+
     public:
-        bool operator == (const Edge &e) const;
-        bool operator <  (const Edge &e) const;
-        
+        bool operator == (const Edge&) const;
+        bool operator <  (const Edge&) const;
+
         Edge();
-        Edge(Node mysource, Node mytarget, const Label mylabel);
+        Edge(Node, Node, const Label&);
 };
 
 
@@ -64,13 +64,13 @@ class Graph {
     private:
         /// edges indexed by source node
         std::map<Node, Edges> edges;
-    
+
         /// the root node
         Node root;
-        
+
         /// the final nodes (IG only)
         std::map<Node, bool> finalNode;
-    
+
         /// the node with the maximal value
         Node max_value;
 
@@ -82,85 +82,74 @@ class Graph {
 
         /// the node formulas
         std::map<Node, Formula*> formulas;
-        
-        /// bit representation of the formulas
-        std::map<Node, FormulaBits> formulaBits;
-    
+
+
     private:
         /// preprocess the graph with insertion values (helper)
-        Value preprocessInsertionRecursively(Node q);
-    
+        Value preprocessInsertionRecursively(Node);
+
         /// preprocess the graph with deletion values (helper)
-        Value preprocessDeletionRecursively(Node q);
+        Value preprocessDeletionRecursively(Node);
 
         /// calculate the number of characterized services (helper)
-        long double countServicesRecursively(Node q);
-    
+        long double countServicesRecursively(Node);
+
         /// check if graph is cyclic (helper)
-        bool isCyclicRecursively(Node q);
-        
+        bool isCyclicRecursively(Node);
+
         /// returns (at most 1) successor of a node with a given label
-        Edge successor(Node q, const Label &l);
-                
-        /// returns the outgoing receive labels of a node
-        std::set<Label> receiveLabels(Node q);
+        Edge successor(Node, const Label&);
 
-        /// returns the outgoing send labels of a node
-        std::set<Label> sendLabels(Node q);
-        
         /// returns all satisfying label vectors
-        std::vector<Labels> checkSat(Node q);
-        
-        /// returns a dot annotation of the graph
-        std::string toDot(bool drawFormulae = true);
+        std::vector<Labels> checkSat(Node);
 
-        /// returns a dot annotation of the graph with formula bits
-        std::string toDotAnnotated(bool reduced = false);
-        
-        
+        /// writes a dot annotation of the graph
+        void toDot(std::ostream&, bool = true);
+
+
     public:
         /// identifier string
         std::string id;
 
         /// the nodes
         Nodes nodes;
-        
+
     public:
         /// returns true iff the node's annotation is fulfilled by "final"
-        bool isFinal(Node q);
+        bool isFinal(Node);
 
         /// which nodes where added during matching?
         std::map<Node, bool> addedNodes;
-    
+
         /// returns outgoing edges of a node
-        Edges outEdges(Node q);
-        
+        Edges outEdges(Node);
+
         /// add a node to the graph
-        Node addNode(Node q);
-    
+        Node addNode(Node);
+
         /// add a new node and organize edges
-        Node addNewNode(Node q, const Label l);
-    
+        Node addNewNode(Node, const Label&);
+
         /// add an edge to the graph
-        Edge addEdge(Node q1, Node q2, const Label l, action_type type = NONE);
-    
+        Edge addEdge(Node, Node, const Label&, action_type = NONE);
+
         /// sets the root node
-        void setRoot(Node q);
-        
+        void setRoot(Node);
+
         /// adds this node to the final nodes (IG only)
-        void setFinal(Node q);
-    
+        void setFinal(Node);
+
         /// gets the root node
         Node getRoot() const;
-        
+
         /// add a formula to a node
-        void addFormula(Node q, Formula *f);
+        void addFormula(Node, Formula*);
 
         /// returns all combinations of edges that satisfy a node's annotation
-        Assignments sat(Node q);
+        Assignments sat(Node);
 
         /// writes a Dot file to disk
-        void createDotFile(bool reduced = false);
+        void createDotFile();
 
         /// preprocess the graph with insertion values (for OGs)
         void preprocessInsertion();
@@ -172,27 +161,21 @@ class Graph {
         long double countServices();
 
         /// return insertion value (for OGs)
-        Value getInsertionValue(Node q);
+        Value getInsertionValue(Node);
 
         /// return deletion value (for service automata)
-        Value getDeletionValue(Node q);
+        Value getDeletionValue(Node);
 
         /// check if graph is cyclic
         bool isCyclic();
 
         /// coherently re-enumerate the graph's nodes
         void reenumerate();
-    
+
         /// return the average size of the satisfying assignments
         double averageSatSize();
-    
-        /// calculate a compact represenation of the OG's formulae
-        void calculateCompactAnnotations();
-    
-        /// BPMN output of a service automaton
-        void bpmnOutput();
-    
-        Graph(const std::string&);
+
+        explicit Graph(const std::string&);
 };
 
 #endif

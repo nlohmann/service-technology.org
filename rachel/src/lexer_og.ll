@@ -30,11 +30,9 @@
 %option caseless
 
 %{
-#include <cassert>
-#include <cstdio>
-#include <string>
-
-#include "config.h"
+#include <config.h>
+#include <cstring>
+#include "verbose.h"
 
 /* make this class visible for flex as flex uses it in og_yylval. */
 class Formula;
@@ -85,7 +83,7 @@ number         [0-9]+
 "->"                                    { return arrow;                }
 
 {number}       { og_yylval.value = atoi(og_yytext); return number;     }
-{identifier}   { og_yylval.str = og_yytext; return ident;              }
+{identifier}   { og_yylval.str = strdup(og_yytext); return ident;      }
 
 {whitespace}                            { /* do nothing */             }
 
@@ -100,8 +98,5 @@ int og_yyerror(char const *msg) {
     assert(og_yytext != NULL);
     assert(G_filename != NULL);
 
-    fprintf(stderr, "%s: %s:%d: %s - token last read '%s'\n",
-            PACKAGE, G_filename, og_yylineno, msg, og_yytext);
-    
-    exit(EXIT_FAILURE);
+    abort(7, "%s:%d: error near '%s': %s", G_filename, og_yylineno, og_yytext, msg);
 }

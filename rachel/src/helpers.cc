@@ -18,11 +18,10 @@
  Floor, Boston, MA 02110-1301  USA.
 \*****************************************************************************/
 
+#include <config.h>
 #include <string>
 #include <map>
 #include <sstream>
-#include <cassert>
-#include "config.h"
 #include "Graph.h"
 #include "helpers.h"
 
@@ -42,13 +41,12 @@ using std::map;
  * \invariant Each index lies between 0 and its maximal value minus 1.
  */
 void next_index(std::vector<unsigned int> &current_index,
-                const std::vector<unsigned int> &max_index)
-{
+                const std::vector<unsigned int> &max_index) {
     assert(current_index.size() == max_index.size());
-    
+
     for (unsigned int i = 0; i < current_index.size(); ++i) {
         if (current_index[i] < max_index[i]-1) {
-            current_index[i]++;
+            ++current_index[i];
             break;
         } else {
             current_index[i] = 0;

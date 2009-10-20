@@ -21,19 +21,7 @@
 #ifndef __HELPERS_H
 #define __HELPERS_H
 
-#include <string>
-#include <sstream>
 #include <vector>
-
-
-/// converts streamable data types to string
-template<typename T> inline std::string toString(const T q) {
-    std::ostringstream buffer;    
-    buffer << q;
-    
-    return buffer.str();
-}
-
 
 /// updates an index
 void next_index(std::vector<unsigned int> &current_index,

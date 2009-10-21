@@ -1569,6 +1569,6 @@ int main(int argc, char** argv) {
 	//status("checked necessary condition for weak termination  in [%.0f sec]", difftime(end_time,start_time));
 	std::cerr << PACKAGE << ": runtime: " << ((double(clock()) - double(start_clock)) / CLOCKS_PER_SEC) << " sec\n";
 	//std::cerr << PACKAGE << ": memory consumption: "; system((string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
-
+	return 0;
 	
 }

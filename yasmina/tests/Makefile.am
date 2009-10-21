@@ -16,7 +16,7 @@ TESTFILES = jm1.owfn jm2.owfn jm3.owfn  myCoffee.output.check  myCoffee.owfn  my
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-#NO_COVER_FILES = */libs/* */parser_adapt_rules.cc */lexer_adapt_rules.cc */cmdline.* #*/Output.*
+NO_COVER_FILES = */libs/* */syntax_mp.cc */lexer_mp.cc */cmdline.* */Output.*
 
 
 

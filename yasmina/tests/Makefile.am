@@ -9,6 +9,8 @@
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = jm1.owfn jm2.owfn jm3.owfn  myCoffee.output.check  myCoffee.owfn  mycoffee-partner.owfn  myCoffeep.output.check
 
+
+
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,
 # these files are generated code or helper libraries that have not much to
@@ -16,7 +18,7 @@ TESTFILES = jm1.owfn jm2.owfn jm3.owfn  myCoffee.output.check  myCoffee.owfn  my
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */syntax_mp.cc */lexer_mp.cc */cmdline.* */Output.*
+NO_COVER_FILES = */libs/* */lexer_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.*
 
 
 
@@ -29,7 +31,7 @@ NO_COVER_FILES = */libs/* */syntax_mp.cc */lexer_mp.cc */cmdline.* */Output.*
 ################
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+EXTRA_DIST = testsuite.at wrap.sh \
              $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 
@@ -55,7 +57,7 @@ $(TESTSUITE): $(srcdir)/testsuite.at
 # LCOV test coverage #
 ######################
 
-# distribute the LCOV scripts
+# distribute the LGOV scripts
 EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov zcov
 
 # compile the code for code coverage
@@ -91,16 +93,6 @@ cover.info:
 	cat cover/*.info > cover.info
 	lcov/lcov --remove cover.info $(addprefix ",$(addsuffix ", $(NO_COVER_FILES))) -o cover.info
 
-# use ZCOV for branch coverage
-cover-branch: cover-prepare $(TESTSUITE)
-	test ! -d cover || rm -fr cover
-	$(MKDIR_P) cover
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=ZCOV
-	zcov/zcov-merge cover/output.zcov cover/*.zcov
-	zcov/zcov-genhtml cover/output.zcov cover-html
-	@echo see `pwd`/cover-html/index.html for a coverage report
-
-
 # create a HTML table with results from LCOV
 cover-html: descriptions cover.info
 	lcov/genhtml cover.info \
@@ -111,6 +103,15 @@ cover-html: descriptions cover.info
 
 cover: cover-check cover-html
 
+# use ZCOV for branch coverage
+cover-branch: cover-prepare $(TESTSUITE)
+	test ! -d cover || rm -fr cover
+	$(MKDIR_P) cover
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=ZCOV
+	zcov/zcov-merge cover/output.zcov cover/*.zcov
+	zcov/zcov-genhtml cover/output.zcov cover-html
+	@echo see `pwd`/cover-html/index.html for a coverage report
+
 # clean also the temp files in the src directory
 CLEANFILES = -fr cover descriptions 
 MAINTAINERCLEANFILES = -fr cover-html cover.info
@@ -118,5 +119,3 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcov -exec rm {} \;
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
-
-

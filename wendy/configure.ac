@@ -1,4 +1,4 @@
-AC_INIT(Wendy, 2.3-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT(Wendy, 2.3, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -52,25 +52,6 @@ AC_PATH_PROG(MARLENE, [marlene], not found)
 AC_PATH_PROG(MIA, [mia], not found)
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
 
-# only use installed Petri Net API if this was configured with --enable-pnapi
-AC_ARG_ENABLE(pnapi,
-  AS_HELP_STRING([--enable-pnapi],[use installed Petri Net API (disabled by default)]),
-  enable_pnapi=${enableval}, enable_pnapi="no")
-AC_MSG_CHECKING([whether to use installed Petri Net API])
-AC_MSG_RESULT($enable_pnapi)
-if test "$enable_pnapi" = "yes"; then
-  # check if the Petri Net API is already installed
-  AM_MISSING_PROG(PKG_CONFIG, pkg-config)
-  AC_CHECK_LIB(pnapi, main)
-  if test "${ac_cv_lib_pnapi_main}" = "no"; then
-    AC_MSG_WARN([Petri Net API was not found!])
-    AC_MSG_WARN([Using shipped version from libs/pnapi.])
-  fi
-  AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
-else
-  AM_CONDITIONAL(COMPILE_PNAPI, [true])
-fi
-
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
@@ -86,8 +67,8 @@ AC_TYPE_SIZE_T
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
-	doc/Doxyfile man/Makefile maintainer/Makefile utils/Makefile
-	maintainer/debian/changelog.template maintainer/debian/info
+	doc/Doxyfile doc/Doxydetails man/Makefile maintainer/Makefile
+	utils/Makefile maintainer/debian/changelog.template maintainer/debian/info
 	maintainer/debian/rules maintainer/macports/Portfile tests/Makefile
 	tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])

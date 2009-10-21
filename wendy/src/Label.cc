@@ -38,7 +38,7 @@ extern gengetopt_args_info args_info;
  * STATIC MEMBERS *
  ******************/
 
-Label_ID Label::first_receive = 1; //sic!
+Label_ID Label::first_receive = 1;  //sic!
 Label_ID Label::last_receive = 0;
 Label_ID Label::first_send = 0;
 Label_ID Label::last_send = 0;

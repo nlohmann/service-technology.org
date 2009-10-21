@@ -22,13 +22,8 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
 sysconf_DATA = wendy.conf
 
 # pass the sysconfdir to Wendy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
-wendy_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
-
-# only add the local Petri net API if necessary
-if COMPILE_PNAPI
-wendy_CPPFLAGS += -I$(top_srcdir)/libs
+wendy_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\" -I$(top_srcdir)/libs
 wendy_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
-endif
 
 
 #############################################################################

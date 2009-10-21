@@ -1,4 +1,4 @@
-@heading Version 2.3-unreleased
+@heading Version 2.3 (22 October 2009)
 @itemize
 @item knowledge bubbles are finally sorted to avoid duplicates
 

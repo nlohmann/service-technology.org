@@ -1,9 +1,9 @@
-                           
+    Yasmina is a tool for checking compatibility of open nets using integer 				linear programming.                 
                       http://service-technology.org/yasmina
 
+Version 0.4-unreleased
+======================
 
-PURPOSE
-    Yasmina is a tool for checking compatibility of open nets using integer linear programming.
+* changed the news file  
 
-
-COPYRIGHT
+See file ChangeLog <http://service-technology.org/files/yasmina/ChangeLog> for complete version history.

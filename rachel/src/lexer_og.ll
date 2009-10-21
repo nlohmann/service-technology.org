@@ -31,6 +31,7 @@
 #include <config.h>
 #include <cstring>
 #include "verbose.h"
+#include "types.h"
 
 /* make this class visible for flex as flex uses it in og_yylval. */
 class Formula;
@@ -39,6 +40,8 @@ class Formula;
 
 extern char* G_filename;
 extern int og_yyerror(char const *msg);
+
+Node last_parsed;
 %}
 
 %s COMMENT
@@ -62,6 +65,7 @@ number         [0-9]+
 "INTERFACE"                             { return key_interface;        }
 "INPUT"                                 { return key_input;            }
 "OUTPUT"                                { return key_output;           }
+"SYNCHRONOUS"                           { return key_synchronous;      }
 
 "TRUE"                                  { return key_true;             }
 "FALSE"                                 { return key_false;            }
@@ -70,6 +74,7 @@ number         [0-9]+
 "+"                                     { return op_or;                }
 "("                                     { return lpar;                 }
 ")"                                     { return rpar;                 }
+"INITIAL"                               { return key_initial;          }
 
 "RED"                                   { return key_red;              }
 "BLUE"                                  { return key_blue;             }
@@ -80,7 +85,7 @@ number         [0-9]+
 ","                                     { return comma;                }
 "->"                                    { return arrow;                }
 
-{number}       { og_yylval.value = atoi(og_yytext); return number;     }
+{number}       { last_parsed = og_yylval.value = atoi(og_yytext); return number;     }
 {identifier}   { og_yylval.str = strdup(og_yytext); return ident;      }
 
 {whitespace}                            { /* do nothing */             }

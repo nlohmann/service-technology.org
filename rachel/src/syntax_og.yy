@@ -37,6 +37,9 @@ extern Graph G_parsedGraph;
 extern char* og_yytext;
 extern int og_yylex();
 extern int og_yyerror(char const *msg);
+
+Node current_node;
+extern Node last_parsed;
 %}
 
 // Bison options
@@ -44,8 +47,8 @@ extern int og_yyerror(char const *msg);
 %error-verbose
 
 %token key_nodes key_initialnode key_finalnode key_transitions
-%token key_interface key_input key_output
-%token key_red key_blue
+%token key_interface key_input key_output key_synchronous
+%token key_red key_blue key_initial
 %token comma colon semicolon ident arrow number
 %token key_true key_false key_final
 %token lpar rpar
@@ -74,14 +77,29 @@ extern int og_yyerror(char const *msg);
 og:
  interface nodes initialnode key_transitions transitions_list semicolon
    { G_parsedGraph.reenumerate(); }
+| interface key_nodes newnodes
 ;
 
 
 interface:
   /* for backwards compatibility, the interface is optional */
-| key_interface key_input places_list semicolon key_output places_list semicolon
+| key_interface input output synchronous
 ;
 
+input:
+  /* empty */
+| key_input places_list semicolon
+;
+
+output:
+  /* empty */
+| key_output places_list semicolon
+;
+
+synchronous:
+  /* empty */
+| key_synchronous places_list semicolon
+;
 
 places_list:
   /* empty */
@@ -124,7 +142,6 @@ node:
     { G_parsedGraph.addNode($1);
       G_parsedGraph.addFormula($1, $3);
       G_parsedGraph.setFinal($1); }
-;
 
 
 formula:
@@ -135,7 +152,8 @@ formula:
 | formula op_or formula
     { $$ = new FormulaOR($1, $3); }
 | key_final
-    { $$ = new FormulaFinal(); }
+    { $$ = new FormulaFinal();
+      G_parsedGraph.setFinal(last_parsed); }
 | key_true
     { $$ = new FormulaTrue(); }
 | key_false
@@ -168,4 +186,59 @@ transition:
   number arrow number colon ident
     { G_parsedGraph.addEdge($1, $3, $5);
       free($5); }
+;
+
+
+/***********************************************************
+ * The following rules implement the new SA and OG formats *
+ ***********************************************************/
+
+newnodes:
+  newnode
+| newnodes newnode
+;
+
+newnode:
+  number colon key_initial {current_node=$1;} successors
+    {
+      if ($1 != 0) {
+        G_parsedGraph.setRoot($1);
+        G_parsedGraph.addNode($1);
+      }
+    }
+| number colon key_initial comma key_final {current_node=$1;} successors
+    {
+      if ($1 != 0) {
+        G_parsedGraph.setRoot($1);
+        G_parsedGraph.addNode($1);
+        G_parsedGraph.setFinal($1);
+      }
+    }
+| number {current_node=$1;} successors
+    { 
+      if ($1 != 0) {
+        G_parsedGraph.addNode($1);
+      }
+    }
+| number colon formula {current_node=$1;} successors
+    { 
+      if ($1 != 0) {
+        G_parsedGraph.addNode($1);
+        G_parsedGraph.addFormula($1, $3);
+      }
+    }
+;
+
+successors:
+  /* empty */
+| successors successor;
+
+successor:
+  ident arrow number
+  { 
+    if (current_node != 0 and $3 != 0) {
+      G_parsedGraph.addEdge(current_node, $3, $1);
+    }
+    free($1);
+  }
 ;

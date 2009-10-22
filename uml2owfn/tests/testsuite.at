@@ -44,7 +44,7 @@ AT_CLEANUP
 AT_SETUP([AST parser failure])
 AT_CHECK([cp TESTFILES/broken_syntax.xml .])
 AT_CHECK([UML2OWFN -i broken_syntax.xml],1,ignore,stderr)
-AT_CHECK([GREP -q "uml2owfn: Failed to resolve 'NON_EXISTING_SOURCE_NODE' in process Prcsss##coffeeMachine_unsound" stderr])
+AT_CHECK([GREP -q "uml2owfn: Failed to resolve 'NON_EXISTING_SOURCE_NODE' in process" stderr])
 AT_KEYWORDS(parser)
 AT_CLEANUP
 

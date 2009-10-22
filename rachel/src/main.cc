@@ -22,7 +22,6 @@
 #include <climits>
 #include <cstdlib>
 #include <cstdio>
-#include <fstream>
 #include <stack>
 #include <string>
 #include "Action.h"
@@ -36,11 +35,9 @@
 #include "config-log.h"
 
 
-using std::endl;
 using std::stack;
 using std::pair;
 using std::map;
-using std::ofstream;
 using std::string;
 
 
@@ -85,7 +82,7 @@ gengetopt_args_info args_info;
 
 /// output complete edit script
 /// \todo move me somewhere else
-Graph outputEditScript(const Graph &g1, const Graph &g2) {
+Graph outputEditScript(const Graph& g1, const Graph& g2) {
     typedef pair<Node, Node> NodePair;
 
     Graph g3("edit");
@@ -95,7 +92,7 @@ Graph outputEditScript(const Graph &g1, const Graph &g2) {
 
     while (!todo.empty()) {
         // pop top element
-        NodePair index = todo.top();
+        NodePair& index = todo.top();
         ActionScript current = G_script_cache[index.first][index.second];
         todo.pop();
 
@@ -240,16 +237,12 @@ int main(int argc, char** argv) {
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case(mode_arg_simulation): {
-            message("similarity: %.2f", Simulation::simulation());
-            break;
+            message("similarity: %.2f", Simulation::simulation()); break;
         }
 
         case(mode_arg_matching): {
-            message("matching: %.2f\n", Matching::matching());
-            break;
+            message("matching: %.2f\n", Matching::matching()); break;
         }
-
-        default: {}
     }
 
 
@@ -258,19 +251,15 @@ int main(int argc, char** argv) {
         switch (args_info.mode_arg) {
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                Graph C = outputEditScript(A, B);
-                C.createDotFile();
-                break;
+                outputEditScript(A, B).createDotFile(); break;
             }
 
             case(mode_arg_og): {
-                B.createDotFile();
-                break;
+                B.createDotFile(); break;
             }
 
             case(mode_arg_sa): {
-                A.createDotFile();
-                break;
+                A.createDotFile(); break;
             }
         }
     }

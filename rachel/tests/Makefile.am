@@ -14,7 +14,8 @@ TESTFILES = agency_airline.og \
             purchase_order.og \
             purchase_order.sa \
             rachel.conf \
-            traveler.sa
+            traveler.sa \
+            myCoffee.sa myCoffee.og
 
 
 # Below you can list all the files you do not want to have counted in the

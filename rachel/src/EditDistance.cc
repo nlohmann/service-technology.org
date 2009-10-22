@@ -22,7 +22,7 @@
 
 unsigned int EditDistance::cache_hit = 0;
 unsigned int EditDistance::cache_miss = 0;
-Value **EditDistance::cache = NULL;
+Value** EditDistance::cache = NULL;
 
 
 /*!

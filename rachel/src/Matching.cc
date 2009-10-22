@@ -242,7 +242,6 @@ ActionScript Matching::w(Node q1, Node q2) {
         }
     }
 
-    // fprintf(stderr, "(%d,%d) %lf %d\n", q1, q2, (1-discount()) * N(q1,q2) + result.value, result.script.size());
     return result;
 }
 

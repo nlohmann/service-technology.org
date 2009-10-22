@@ -78,6 +78,16 @@ AT_CHECK([cp TESTFILES/purchase_order.sa TESTFILES/full.og .])
 AT_CHECK([RACHEL -a purchase_order.sa -o full.og],0,ignore,ignore)
 AT_CLEANUP
 
+AT_SETUP([New automaton format])
+AT_CHECK([cp TESTFILES/myCoffee.sa .])
+AT_CHECK([RACHEL -a myCoffee.sa -m sa],0,ignore,ignore)
+AT_CLEANUP
+
+AT_SETUP([New operating guideline format])
+AT_CHECK([cp TESTFILES/myCoffee.og .])
+AT_CHECK([RACHEL -o myCoffee.og -m og],0,ignore,ignore)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Dot Output])

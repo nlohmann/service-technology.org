@@ -48,16 +48,16 @@ FormulaLit::FormulaLit(const Label& _literal)
 
 std::string FormulaAND::toDot(bool noBrackets) const {
     if (noBrackets)
-        return left->toDot(false) + "<FONT> &and; </FONT>" + right->toDot(false);
+        return left->toDot(false) + "<FONT>& and; </FONT>" + right->toDot(false);
     else
-        return "(" + left->toDot(false) + "<FONT> &and; </FONT>" + right->toDot(false) + ")";
+        return "(" + left->toDot(false) + "<FONT>& and; </FONT>" + right->toDot(false) + ")";
 }
 
 std::string FormulaOR::toDot(bool noBrackets) const {
     if (noBrackets)
-        return left->toDot(false) + "<FONT> &or; </FONT>" + right->toDot(false);
+        return left->toDot(false) + "<FONT>& or; </FONT>" + right->toDot(false);
     else
-        return "(" + left->toDot(false) + "<FONT> &or; </FONT>" + right->toDot(false) + ")";
+        return "(" + left->toDot(false) + "<FONT>& or; </FONT>" + right->toDot(false) + ")";
 }
 
 std::string FormulaLit::toDot(bool noBrackets) const {
@@ -81,23 +81,23 @@ std::string FormulaFinal::toDot(bool noBrackets) const {
  * satisfaction test
  */
 
-bool FormulaAND::sat(const std::set<Label> &l) const {
+bool FormulaAND::sat(const std::set<Label>& l) const {
     return (left->sat(l) and right->sat(l));
 }
 
-bool FormulaOR::sat(const std::set<Label> &l) const {
+bool FormulaOR::sat(const std::set<Label>& l) const {
     return (left->sat(l) or right->sat(l));
 }
 
-bool FormulaLit::sat(const std::set<Label> &l) const {
+bool FormulaLit::sat(const std::set<Label>& l) const {
     return (l.find(literal) != l.end());
 }
 
-bool FormulaTrue::sat(const std::set<Label> &l) const {
+bool FormulaTrue::sat(const std::set<Label>& l) const {
     return true;
 }
 
-bool FormulaFalse::sat(const std::set<Label> &l) const {
+bool FormulaFalse::sat(const std::set<Label>& l) const {
     return false;
 }
 
@@ -119,7 +119,7 @@ bool FormulaFalse::sat(const std::set<Label> &l) const {
  *
  * This bug was found by Martin Znamirowski. See <http://gna.org/bugs/?11944>.
  */
-bool FormulaFinal::sat(const std::set<Label> &l) const {
+bool FormulaFinal::sat(const std::set<Label>& l) const {
     return true;  // true by default
 }
 

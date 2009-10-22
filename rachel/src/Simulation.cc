@@ -22,7 +22,6 @@
  * \brief Implements functions for the simulation-based graph similarity
  */
 
-#include <vector>
 #include <cstdlib>
 #include <cstdio>
 #include <map>
@@ -155,9 +154,9 @@ Value Simulation::simulation_recursively(Node q1, Node q2) {
         cache[q1][q2] = N(q1, q2);
     } else {
         // collect helper values and choose maximum
-        ActionScript script1 = w1(q1, q2);
-        ActionScript script2 = w2(q1, q2);
-        ActionScript bestScript = (script1.value > script2.value) ? script1 : script2;
+        ActionScript script1(w1(q1, q2));
+        ActionScript script2(w2(q1, q2));
+        ActionScript& bestScript = (script1.value > script2.value) ? script1 : script2;
 
         // cache best action
         G_script_cache[q1][q2] = bestScript;

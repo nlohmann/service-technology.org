@@ -1,0 +1,40 @@
+{
+  generator:    Wendy 2.3-unreleased (i386-apple-darwin10.0.0)
+  invocation:   wendy myCoffee.owfn --og 
+  events:       3 send, 1 receive, 0 synchronous
+  statistics:   7 nodes
+}
+
+INTERFACE
+  INPUT
+    B;
+  OUTPUT
+    E, T, C;
+
+NODES
+  4297087664 : (C + E + T)
+    B -> 0
+    E -> 4297085216
+    T -> 4297107952
+    C -> 4297086096
+  4297085216 : (C + T)
+    B -> 0
+    T -> 4297087136
+    C -> 4297086560
+  4297086096 : E
+    B -> 0
+    E -> 4297086560
+  4297086560 : B
+    B -> 4297086656
+  4297086656 : final
+    B -> 0
+  4297087136 : B
+    B -> 4297086656
+  4297107952 : E
+    B -> 0
+    E -> 4297087136
+  0 : true
+    B -> 0
+    E -> 0
+    T -> 0
+    C -> 0

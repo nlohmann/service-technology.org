@@ -21,9 +21,6 @@ char currentAnnotation;
 
 std::vector<unsigned int> nodes;
 
-//Remember whether a node has successors
-std::map<unsigned int, bool> hasSuccessors;
-
 //Mapping of node ID to the node's annotation
 
 std::map<unsigned int, char> nodeAnnotation;
@@ -81,21 +78,19 @@ og:
 	//Finished parsing, write output
 
 	//For all nodes...
-	for(int i=0;i<nodes.size();++i){
-		//...check whether the node has successors...
-		if(hasSuccessors[nodes[i]]){
-			std::vector<std::pair<char*, unsigned int> > successors = nodeSuccessors[nodes[i]];
-			//... if yes, write the node's ID, node's annotation and all links to its successors to the stream...
-			for(int j=0;j<successors.size();++j){
-				(*outStream) << nodeAnnotation[nodes[i]] << nodes[i];
-				(*outStream) << " -> " << nodeAnnotation[successors[j].second] << successors[j].second;
-				(*outStream) << " [label= " << successors[j].first << "]\n";
-			}
+	for(int i=0;i<nodes.size();++i){			
+		//List nodes
+		(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
+		//Add style information
+		
+		std::vector<std::pair<char*, unsigned int> > successors = nodeSuccessors[nodes[i]];
+		//... if yes, write the node's ID, node's annotation and all links to its successors to the stream...
+		for(int j=0;j<successors.size();++j){
+			(*outStream) << nodes[i];
+			(*outStream) << " -> " << successors[j].second;
+			(*outStream) << " [label= " << successors[j].first << "]\n";
 		}
-		else{
-			//... if not, just write the node's ID and its annotation to the stream
-			(*outStream) << nodeAnnotation[nodes[i]] << nodes[i] <<"\n";
-		}
+	
 
 	}
 	//Finish writing output
@@ -149,8 +144,6 @@ node:
 	nodes.push_back($1);
 	currentNode = $1;
 	nodeAnnotation[$1] = $2;
-	hasSuccessors[$1] = false;
-
 
   }
 
@@ -189,7 +182,6 @@ successors:
 		break;
 	//Store list of successors
 	nodeSuccessors[currentNode].push_back(std::pair<char*, unsigned int>($2, $4)); 	
-	hasSuccessors[currentNode] = true;
   
   }
 ;

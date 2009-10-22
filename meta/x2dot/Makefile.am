@@ -1,4 +1,4 @@
-SUBDIRS = src 
+SUBDIRS = src/og2dot 
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean

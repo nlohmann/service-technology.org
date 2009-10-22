@@ -18,6 +18,24 @@ AT_CLEANUP
 AT_BANNER([Small examples])
 ############################################################################
 
+
+
+AT_SETUP([Compatibility check open net with message profile.])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/myCoffeep.output.check .])
+AT_CHECK([YASMINA myCoffee.owfn -m myCoffeep.output.check],0,stdout,stderr)
+AT_CHECK([GREP -q "Not compatible" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Compatibility check of two message profile.])
+AT_CHECK([cp TESTFILES/myCoffee.output.check .])
+AT_CHECK([cp TESTFILES/myCoffeep.output.check .])
+AT_CHECK([YASMINA -m myCoffee.output.check -m myCoffeep.output.check],0,stdout,stderr)
+AT_CHECK([GREP -q "Not compatible" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
 AT_SETUP([Incompatible open nets.])
 AT_CHECK([cp TESTFILES/jm1.owfn .])
 AT_CHECK([cp TESTFILES/jm2.owfn .])
@@ -40,21 +58,5 @@ AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([cp TESTFILES/mycoffee-partner.owfn .])
 AT_CHECK([YASMINA myCoffee.owfn mycoffee-partner.owfn -e all],0,stdout,stderr)
 AT_CHECK([GREP -q "Compatibility check inconclusive" stdout])
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Compatibility check open net with message profile.])
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([cp TESTFILES/myCoffeep.output.check .])
-AT_CHECK([YASMINA myCoffee.owfn -m myCoffeep.output.check],0,stdout,stderr)
-AT_CHECK([GREP -q "Not compatible" stdout])
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Compatibility check of two message profile.])
-AT_CHECK([cp TESTFILES/myCoffee.output.check .])
-AT_CHECK([cp TESTFILES/myCoffeep.output.check .])
-AT_CHECK([YASMINA -m myCoffee.output.check -m myCoffeep.output.check],0,stdout,stderr)
-AT_CHECK([GREP -q "Not compatible" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP

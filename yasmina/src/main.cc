@@ -1023,7 +1023,7 @@ int main(int argc, char** argv) {
 					//resultsyn.insert(synct.begin(),synct.end());
 					lprec *lpt;//current set of constraints 
 					lpt = make_lp(0, result.size());
-					for(i=1;i<=get_Ncolumns(lpt);i++){
+					for(unsigned int i=1;i<=get_Ncolumns(lpt);i++){
 						set_int(lpt,i,TRUE);
 					}
 					if(lpt == NULL) {
@@ -1126,7 +1126,7 @@ int main(int argc, char** argv) {
 			//here add the new constraints to the previous computed ones
 			if(sit==hh.begin()){lpmps=mps;}
 			else {//here combine 
-				for (unsigned int i=0; i<get_Ncolumns(lpmps.at(0)); ++i) { //add variables from previous
+				for (int i=0; i<get_Ncolumns(lpmps.at(0)); ++i) { //add variables from previous
 					std::string pr(get_col_name(lpmps.at(0),i+1));
 					if (result.find(pr)==result.end()) {//add columns from old composition to the new interface
 						result.insert(pr);
@@ -1146,9 +1146,9 @@ int main(int argc, char** argv) {
 				for(unsigned int i=0;i<mps.size();++i){
 					lprec * lpr=copy_lp(mps.at(i));//make copies
 					for(unsigned int j=0;j<lpmps.size();++j){// add lpr too
-						for (unsigned int r=0; r<get_Nrows(lpmps.at(i)); ++r) {
+						for (int r=0; r<get_Nrows(lpmps.at(i)); ++r) {
 							REAL *rowp=new REAL[1+get_Ncolumns(lpr)]();//int *colp;
-							if(get_row(lpmps.at(j),r+1,rowp)==-1) abort(2, "lpsolve	");//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
+							if(get_row(lpmps.at(j),r+1,rowp)==0) abort(2, "lpsolve	");//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
 							//for(int j=0;j<get_Ncolumns(lpmp);j++){rowwpp[j+hh-get_Ncolumns(lpmp)]=rowp[j+1];}
 							//for(int j=0;j<hh;j++){cout<<rowwpp[j]<<" ";}
 							//if( grex==-1) cout<<"gata";
@@ -1568,7 +1568,7 @@ int main(int argc, char** argv) {
 	//time(&end_time);
 	//status("checked necessary condition for weak termination  in [%.0f sec]", difftime(end_time,start_time));
 	std::cerr << PACKAGE << ": runtime: " << ((double(clock()) - double(start_clock)) / CLOCKS_PER_SEC) << " sec\n";
-	//std::cerr << PACKAGE << ": memory consumption: "; system((string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+	std::cerr << PACKAGE << ": memory consumption: "; system((std::string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	return 0;
 	
 }

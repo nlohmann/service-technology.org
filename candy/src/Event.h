@@ -5,7 +5,7 @@
 
 
 
-/// TODO comment
+/// possible event types
 enum EventType {
   T_INPUT,
   T_OUTPUT,
@@ -21,12 +21,15 @@ class Event {
 		| attributes |
 		`-----------*/
 
-    	// TODO comment
+    	/// the event's name
         string name;
+
+        /// the event's cost
         unsigned int cost;
+
+        /// the event's type
         EventType type;
 
-        bool flag;
 
 
         /*--------.
@@ -34,8 +37,8 @@ class Event {
 		`--------*/
 
         /// basic constructor
-        explicit Event(string _name, unsigned int _cost, EventType _type, bool _flag) :
-        	name(_name), cost(_cost), type(_type), flag(_flag) {};
+        explicit Event(string _name, unsigned int _cost, EventType _type) :
+        	name(_name), cost(_cost), type(_type) {};
 
         /// basic destructor
         ~Event() {};
@@ -52,7 +55,7 @@ class Event {
         	} else {
                 file << "invalid";
             }
-        	file << ", flag " << (flag ? "true" : "false") << endl;
+            file << endl;
         };
 
 };

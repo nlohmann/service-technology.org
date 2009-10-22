@@ -1,6 +1,6 @@
 AT_INIT([standard tests])
 
-AT_TESTED(versions.sh)
+#AT_TESTED(versions.sh)
 
 
 
@@ -199,7 +199,7 @@ AT_CLEANUP
 AT_BANNER([Formula Tests])
 ############################################################################
 
-AT_SETUP([Flatten AND])
+AT_SETUP([flatten AND])
 AT_CHECK([cp TESTFILES/formula_flatten_and.og .])
 AT_CHECK([cp TESTFILES/formula_flatten.cf .])
 AT_CHECK([cp TESTFILES/formula_flatten_and.expected.og .])
@@ -209,7 +209,7 @@ AT_CHECK([diff sed.og formula_flatten_and.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Flatten OR])
+AT_SETUP([flatten OR])
 AT_CHECK([cp TESTFILES/formula_flatten_or.og .])
 AT_CHECK([cp TESTFILES/formula_flatten.cf .])
 AT_CHECK([cp TESTFILES/formula_flatten_or.expected.og .])
@@ -219,7 +219,7 @@ AT_CHECK([diff sed.og formula_flatten_or.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Flatten AND/OR])
+AT_SETUP([flatten AND/OR])
 AT_CHECK([cp TESTFILES/formula_flatten_andor.og .])
 AT_CHECK([cp TESTFILES/formula_flatten.cf .])
 AT_CHECK([cp TESTFILES/formula_flatten_andor.expected.og .])
@@ -229,7 +229,7 @@ AT_CHECK([diff sed.og formula_flatten_andor.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Flatten Multiary Size 0])
+AT_SETUP([flatten multiary size 0])
 AT_CHECK([cp TESTFILES/formula_flatten_sizezero.og .])
 AT_CHECK([cp TESTFILES/formula_flatten.cf .])
 AT_CHECK([cp TESTFILES/formula_flatten_sizezero.expected.og .])
@@ -239,7 +239,7 @@ AT_CHECK([diff sed.og formula_flatten_sizezero.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Flatten Multiary Size 1])
+AT_SETUP([flatten multiary size 1])
 AT_CHECK([cp TESTFILES/formula_flatten_sizeone.og .])
 AT_CHECK([cp TESTFILES/formula_flatten.cf .])
 AT_CHECK([cp TESTFILES/formula_flatten_sizeone.expected.og .])
@@ -249,7 +249,7 @@ AT_CHECK([diff sed.og formula_flatten_sizeone.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 
-AT_SETUP([Flatten Multiary Size 2])
+AT_SETUP([flatten multiary size 2])
 AT_CHECK([cp TESTFILES/formula_flatten_sizetwo.og .])
 AT_CHECK([cp TESTFILES/formula_flatten.cf .])
 # should yield same result as size one
@@ -257,6 +257,61 @@ AT_CHECK([cp TESTFILES/formula_flatten_sizeone.expected.og .])
 AT_CHECK([CANDY --input=formula_flatten_sizetwo.og --output=c.og --costfile=formula_flatten.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
 AT_CHECK([diff sed.og formula_flatten_sizeone.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([flatten NOT])
+AT_CHECK([cp TESTFILES/formula_flatten_not.og .])
+AT_CHECK([cp TESTFILES/formula_flatten.cf .])
+AT_CHECK([cp TESTFILES/formula_flatten_not.expected.og .])
+AT_CHECK([CANDY --input=formula_flatten_not.og --output=c.og --costfile=formula_flatten.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_flatten_not.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+
+
+AT_SETUP([merge AND])
+AT_CHECK([cp TESTFILES/formula_merge_and.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_and.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_and.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_and.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([merge OR])
+AT_CHECK([cp TESTFILES/formula_merge_or.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_or.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_or.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_or.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([merge AND/OR])
+AT_CHECK([cp TESTFILES/formula_merge_andor.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_andor.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_andor.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_andor.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+
+
+AT_SETUP([simplify small AND])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/formula_merge_not.og .])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_merge_not.expected.og .])
+AT_CHECK([CANDY --input=formula_merge_not.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_merge_not.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 

@@ -120,11 +120,11 @@ identlist:
   {
     Event* newEvent = NULL;
     if ( currentType == T_INPUT ) {
-        newEvent = new Event($1, 0, T_INPUT, false);
+        newEvent = new Event($1, 0, T_INPUT);
     } else if ( currentType == T_OUTPUT ) {
-        newEvent = new Event($1, 0, T_OUTPUT, false);
+        newEvent = new Event($1, 0, T_OUTPUT);
     } else if ( currentType == T_SYNC ) {
-        newEvent = new Event($1, 0, T_SYNC, false);
+        newEvent = new Event($1, 0, T_SYNC);
     } else {
         og_yyerror("read an event of unknown type");
         exit(EXIT_FAILURE);
@@ -143,11 +143,11 @@ identlist:
   {
     Event* newEvent = NULL;
     if ( currentType == T_INPUT ) {
-        newEvent = new Event($3, 0, T_INPUT, false);
+        newEvent = new Event($3, 0, T_INPUT);
     } else if ( currentType == T_OUTPUT ) {
-        newEvent = new Event($3, 0, T_OUTPUT, false);
+        newEvent = new Event($3, 0, T_OUTPUT);
     } else if ( currentType == T_SYNC ) {
-        newEvent = new Event($3, 0, T_SYNC, false);
+        newEvent = new Event($3, 0, T_SYNC);
     } else {
         og_yyerror("read an event of unknown type");
         exit(EXIT_FAILURE);
@@ -235,16 +235,13 @@ formula:
   }
 | OP_NOT formula
   {
-    //$$ = new pnapi::formula::Negation(*$2);
-    // TODO implement negation
-    $$ = NULL;
+    $$ = new FormulaNegation($2);
   }
 | KEY_FINAL
   {
-    // TODO remove
+    // we found a final node so we set the final flag
     currentNode->final = true;
     $$ = new FormulaFinal();
-    //$$ = NULL;
   }
 | KEY_TRUE
   {

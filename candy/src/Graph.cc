@@ -26,8 +26,8 @@ void Graph::removeInefficientNodesAndEvents() {
     root->setFlagRecursively(true);
 
     // remove unused nodes
-    for ( map< unsigned int, Node* >::iterator i = nodes.begin();
-          i != nodes.end(); ) { // increment inside because of erase
+    // ATTENTION: increment inside because of erase
+    for ( map< unsigned int, Node* >::iterator i = nodes.begin(); i != nodes.end(); ) {
 
         // remove non-flaged node
         if ( not (i->second)->flag ) {

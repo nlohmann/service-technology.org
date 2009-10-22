@@ -18,10 +18,13 @@ class Node {
         /// successor nodes together with their corresponding events
         map< Node*, list<Event*> > successors;
 
-        // this node's formula
+        /// this node's formula
         Formula* formula;
 
+        /// states if this is a final node or not
         bool final;
+
+        /// a boolean flag used to speed up some algorithms
         bool flag;
 
         /*--------.
@@ -33,12 +36,11 @@ class Node {
 
         /// basic destructor
         virtual ~Node() {
-
             formula->clear();
             successors.clear();
         };
 
-        // getter and setter for id
+        /// getter and setter for id
         unsigned int getID() const { return id; }
         void setID(unsigned int newID) { id = newID; }
 
@@ -65,12 +67,13 @@ class Node {
         void outputDebug(std::ostream&);
         void outputDebugRecursively(std::ostream&, map<Node*, bool>&);
 
-        /// print this node
+        /// print standard information about this node
         void output(std::ostream&, map<Node*, bool>&, bool);
 
 
     private:
 
+        /// the node's ID
         unsigned int id;
 };
 

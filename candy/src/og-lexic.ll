@@ -26,7 +26,7 @@ extern int og_yyerror(char const *msg);
 %s BITS
 
 whitespace     [\n\r\t ]
-identifier     [^,;:()\t \n\r\{\}=]+
+identifier     [^\n\r\t ,;:()\{\}=+*~]+
 number         [0-9]+
 
 
@@ -38,7 +38,6 @@ number         [0-9]+
 <COMMENT>[^}]*                          { /* do nothing */             }
 
 "NODES"                                 { return KEY_NODES;            }
-
 "INTERFACE"                             { return KEY_INTERFACE;        }
 "INPUT"                                 { return KEY_INPUT;            }
 "OUTPUT"                                { return KEY_OUTPUT;           }

@@ -36,20 +36,67 @@ void FormulaMultiary::removeLiteral(const string& literal) {
 			// the current formula is no literal, so call removeLiteral again
 			(*i)->removeLiteral( literal );
 
-			FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
-			if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
+            FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( *i );
+            if ( checkNegation != NULL && checkNegation->subFormula == NULL ) {
 
-				// a size zero multiary formula is useless, so erase it and redirect
-				// the iterator to the new current subformula
+                // a size zero negation formula is useless, so erase it
 				subFormulas.erase( i++ );
-				cerr << "\t removeLiteral: size zero MULTIARY flattened, result is '" << asString() << "'" << endl;
+				cerr << "\t removeLiteral: size zero NEGATION removed, result is '" << asString() << "'" << endl;
 
-			} else {
+            } else {
 
-				// adopt flattened subformula
-				++i;
-				cerr << "\t removeLiteral: nothing to flatten, result is '" << asString() << "'" << endl;
-			}
+                FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
+                if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
+
+                    // a size zero multiary formula is useless, so erase it
+                    subFormulas.erase( i++ );
+                    cerr << "\t removeLiteral: size zero MULTIARY removed, result is '" << asString() << "'" << endl;
+
+                } else {
+
+                    // adopt flattened subformula
+                    ++i;
+                    cerr << "\t removeLiteral: nothing to remove, result is '" << asString() << "'" << endl;
+                }
+            }
+        }
+    }
+
+    cerr << "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" << endl;
+}
+
+void FormulaNegation::removeLiteral(const string& literal) {
+
+    cerr << "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" << endl;
+
+    // if the subformula is a literal, then remove it;
+    // call the function recursively, otherwise
+    cerr << "\t removeLiteral: subformula '" << subFormula->asString() << "'" << endl;
+    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( subFormula );
+    if (checkLiteral != NULL) {
+
+        // the subformula is a literal, so delete it if it matches
+        if ( literal.compare( checkLiteral->asString() ) == 0 ) {
+            delete subFormula;
+            subFormula = NULL;
+        }
+
+    } else {
+
+        // the current formula is no literal, so call removeLiteral again
+        subFormula->removeLiteral( literal );
+
+        FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( subFormula );
+        if ( checkNegation != NULL && checkNegation->subFormula == NULL ) {
+            delete subFormula;
+            subFormula = NULL;
+        } else {
+
+            FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( subFormula );
+            if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
+                delete subFormula;
+                subFormula = NULL;
+            }
         }
     }
 
@@ -125,7 +172,7 @@ string FormulaMultiaryAnd::asString() const {
 
         // return dummy value
         //cerr << "AND asString END" << endl;
-        return "(empyty AND)";
+        return "(empty AND)";
 
     } else if ( subFormulas.size() == 1 ) {
 
@@ -159,7 +206,7 @@ string FormulaMultiaryOr::asString() const {
 
         // return dummy value
         //cerr << "OR asString END" << endl;
-        return "(empyty OR)";
+        return "(empty OR)";
 
     } else if ( subFormulas.size() == 1 ) {
 
@@ -210,6 +257,25 @@ void FormulaMultiaryAnd::flatten() {
 			cerr << "\tAND flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
         }
 
+
+        // check if subformula is a double negation
+		FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( *i );
+		if ( checkNegation != NULL ) {
+
+            FormulaNegation* checkSubNegation = dynamic_cast<FormulaNegation*> ( checkNegation->subFormula );
+            if ( checkSubNegation != NULL ) {
+                // a double negation formula is ugly, so erase it and redirect
+                // the iterator to the new current subformula
+                subFormulas.insert( i, checkSubNegation->subFormula );
+                delete checkSubNegation;
+                delete checkNegation;
+                subFormulas.erase( i++ );
+                --i;
+                cerr << "\tAND flatten: double NEGATION flattened, result is '" << asString() << "'" << endl;
+            }
+		}
+
+
         // check if subformula is a conjunction
         FormulaMultiaryAnd* checkAnd = dynamic_cast<FormulaMultiaryAnd*> ( *i );
         if ( checkAnd != NULL ) {
@@ -253,6 +319,25 @@ void FormulaMultiaryOr::flatten() {
 			cerr << "\tOR flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
 		}
 
+
+        // check if subformula is a double negation
+		FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( *i );
+		if ( checkNegation != NULL ) {
+
+            FormulaNegation* checkSubNegation = dynamic_cast<FormulaNegation*> ( checkNegation->subFormula );
+            if ( checkSubNegation != NULL ) {
+                // a double negation formula is ugly, so erase it and redirect
+                // the iterator to the new current subformula
+                subFormulas.insert( i, checkSubNegation->subFormula );
+                delete checkSubNegation;
+                delete checkNegation;
+                subFormulas.erase( i++ );
+                --i;
+                cerr << "\tOR flatten: double NEGATION flattened, result is '" << asString() << "'" << endl;
+            }
+		}
+
+
         // check if subformula is a disjunction
         cerr << "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" << endl;
         FormulaMultiaryOr* checkOr = dynamic_cast<FormulaMultiaryOr*> ( *i );
@@ -275,6 +360,39 @@ void FormulaMultiaryOr::flatten() {
     }
 
     cerr << "\tOR flatten END: '" << asString() << "'" << endl;
+}
+
+void FormulaNegation::flatten() {
+
+    cerr << "\tNOT flatten START: '" << asString() << "'" << endl;
+
+    // check if subformula is a size one multiary formula
+    cerr << "\tNOT flatten: subformula '" << subFormula->asString() << "'" << endl;
+    FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( subFormula );
+    if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
+
+        // a size one multiary formula is useless, so erase it
+        subFormula = checkMultiary->subFormulas.front();
+        delete checkMultiary;
+        cerr << "\tNOT flatten: size one MULTIARY flattened, result is '" << asString() << "'" << endl;
+    }
+
+
+    // check if subformula is a double negation
+    FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( subFormula );
+    if ( checkNegation != NULL ) {
+
+        FormulaNegation* checkSubNegation = dynamic_cast<FormulaNegation*> ( checkNegation->subFormula );
+        if ( checkSubNegation != NULL ) {
+            // a double negation formula is ugly, so erase it
+            subFormula = checkSubNegation->subFormula;
+            delete checkSubNegation;
+            delete checkNegation;
+            cerr << "\tNOT flatten: double NEGATION flattened, result is '" << asString() << "'" << endl;
+        }
+    }
+
+    cerr << "\tNOT flatten END: '" << asString() << "'" << endl;
 }
 
 
@@ -371,19 +489,20 @@ void FormulaMultiaryAnd::simplify() {
     // step 1: merge
 	// iterate over all subformulas twice: first we determine the current
     // assumption and then we check all subformulae for being a conclusion
-	merge();
 
     // step 2: flatten
     // iterate over all subformula and check them for being a size one mulitary
     // formula, a conjunction or a double negation
 	flatten();
+    // TODO
+	merge();
 
     cerr << "AND simplify END: '" << asString() << "'" << endl;
 }
 
 void FormulaMultiaryOr::simplify() {
 
-	cerr << "OR merge START: '" << asString() << "'" << endl;
+	cerr << "OR simplify START: '" << asString() << "'" << endl;
 
 	// simplify recursively all subformula first
 	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
@@ -395,14 +514,31 @@ void FormulaMultiaryOr::simplify() {
 	// step 1: merge
 	// iterate over all subformulas twice: first we determine the current
 	// assumption and then we check all subformulae for being a conclusion
-	merge();
 
 	// step 2: flatten
 	// iterate over all subformula and check them for being a size one mulitary
 	// formula, a disjunction or a double negation
 	flatten();
+	merge();
 
-    cerr << "OR merge END: '" << asString() << "'" << endl;
+    cerr << "OR simplify END: '" << asString() << "'" << endl;
+}
+
+void FormulaNegation::simplify() {
+
+	cerr << "NOT simplify START: '" << asString() << "'" << endl;
+
+	// simplify subformula first
+    cerr << "\tNOT simplify: subformula '" << subFormula->asString() << "'" << endl;
+    subFormula->simplify();
+    cerr << "\tNOT simplify: simplified subformula '" << subFormula->asString() << "'" << endl;
+
+	// only step 1: flatten
+	// iterate over all subformula and check them for being a size one mulitary
+	// formula, a disjunction or a double negation TODO
+	flatten();
+
+    cerr << "NOT simplify END: '" << asString() << "'" << endl;
 }
 
 
@@ -452,6 +588,7 @@ bool FormulaMultiaryAnd::implies(Formula* conclusion) const {
 	return false;
 }
 
+
 bool FormulaMultiaryOr::implies(Formula* conclusion) const {
 
 	assert( conclusion != NULL );
@@ -493,9 +630,28 @@ bool FormulaMultiaryOr::implies(Formula* conclusion) const {
 	return false;
 }
 
+
+bool FormulaNegation::implies(Formula* conclusion) const {
+
+    assert( conclusion != NULL );
+
+	// a negation B is implied by a negation A iff unnegated B implies unnegated A
+    // B => A iff ~A => ~B
+	FormulaNegation* negation = dynamic_cast<FormulaNegation*> ( conclusion );
+	if ( negation != NULL ) {
+        return ( (negation->subFormula)->implies(this->subFormula) );
+	} else {
+        // this implies only negations
+        return false;
+    }
+}
+
+
 bool FormulaLiteral::implies(Formula* conclusion) const {
 
 	assert( conclusion != NULL );
+
+    // TODO what about TRUE and FALSE? think about it ...
 
 	// a literal implies a literal only
 	FormulaLiteral* literal = dynamic_cast<FormulaLiteral*> ( conclusion );

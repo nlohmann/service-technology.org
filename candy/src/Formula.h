@@ -98,7 +98,7 @@ class Formula {
 
 
 // ****************************************************************************
-// Multiary Formulas
+// Multiary Formula
 // ****************************************************************************
 
 /**
@@ -149,7 +149,7 @@ class FormulaMultiary : public Formula {
         /// removes a literal from the formula, if this literal is the only one of a clause,
         /// the clause gets removed as well
         /// this function is used in the IG reduction
-        virtual void removeLiteral(const std::string&);
+        virtual void removeLiteral(const string&);
 };
 
 
@@ -229,7 +229,69 @@ class FormulaMultiaryOr : public FormulaMultiary {
 
 
 // ****************************************************************************
-// Literals
+// Negation
+// ****************************************************************************
+
+/**
+ * A negated formula.
+ */
+class FormulaNegation : public Formula {
+    public:
+
+        /// the un-negated subformula
+        Formula* subFormula;
+    public:
+
+        /// Constructs a literal with the given string representation.
+        FormulaNegation(Formula* sub) : Formula() {
+            subFormula = sub;
+        };
+
+        /// basic deconstructor
+		virtual ~FormulaNegation() {};
+
+        /// destroys the subformula of this FormulaNegation
+        virtual void clear() {
+            delete subFormula;
+        };
+
+        /// returns a deep copy of this formula
+        virtual FormulaNegation* getDeepCopy() const {
+        	return new FormulaNegation(*this);
+        }
+
+        /// returns the value of the literal in the given asisgnment
+        virtual bool value(const FormulaAssignment& assignment) const {
+            return not subFormula->value( assignment );
+        }
+
+        /// returns the name of the literal
+        virtual string asString() const {
+            return subFormula != NULL ? "(~" + subFormula->asString() + ")" : "(empty not)";
+        }
+
+        /// returns the size of this formula
+        virtual int size() const {
+            return 1;
+        }
+
+        /// removes a literal from the formula
+        virtual void removeLiteral(const string& literal);
+
+        /// simplifies the formula
+        virtual void simplify();
+
+        /// flattens this negation formula
+        void flatten();
+
+        /// returns true iff this formula implies the given formula
+        virtual bool implies(Formula* conclusion) const;
+};
+
+
+
+// ****************************************************************************
+// Literal
 // ****************************************************************************
 
 /**

@@ -18,7 +18,6 @@
 \*****************************************************************************/
 
 #include <config.h>
-#include <algorithm>
 #include <cstdlib>
 #include <map>
 #include <set>
@@ -28,12 +27,7 @@
 #include "costfunction.h"
 #include "Action.h"
 #include "Graph.h"
-#include "helpers.h"
 #include "verbose.h"
-
-using std::map;
-using std::set;
-using std::string;
 
 
 /*************
@@ -41,7 +35,7 @@ using std::string;
  *************/
 
 /// a map caching the best script for all action pairs
-extern map<Node, map<Node, ActionScript> > G_script_cache;
+extern std::map<Node, std::map<Node, ActionScript> > G_script_cache;
 
 /// the command line options
 extern gengetopt_args_info args_info;
@@ -78,7 +72,7 @@ Permutation Matching::permuteEdges(const Edges& e1, const Edges& e2) {
     assert(e1.size() == e2.size());
 
     // set to store labels of inserted or deleted edges
-    set<string> insert_delete;
+    std::set<std::string> insert_delete;
 
     // create pairs without ("","")-pairs or duplicates
     Permutation result;
@@ -157,13 +151,12 @@ Permutations Matching::calcPermutations(Node q1, Node q2, const Assignment& beta
     Permutations result;
     do {
         Permutation p = permuteEdges(e1, e2);
-        if (!p.empty()) {
+        if (not p.empty()) {
             result.insert(p);
         }
 
         perm_result = std::next_permutation(e2.begin(), e2.end());
-        ++count;
-    } while (perm_result || count < 2);
+    } while (perm_result or ++count < 2);
 
 
     return result;
@@ -193,8 +186,8 @@ ActionScript Matching::w(Node q1, Node q2) {
             for (Permutation::iterator perm = perms->begin(); perm != perms->end(); ++perm) {
                 Value current_value = 0;
 
-                Edge e1 = perm->first;
-                Edge e2 = perm->second;
+                Edge e1(perm->first);
+                Edge e2(perm->second);
 
                 // add a node
                 if (e1.label.empty()) {

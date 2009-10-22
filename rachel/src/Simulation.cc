@@ -200,8 +200,7 @@ Value Simulation::simulation() {
 
     // statistical output
     double hit_rate = 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
-    status("cache: %u hits, %u misses, hit rate %.2f%%",
-        cache_hit, cache_miss, hit_rate * 100);
+    status("cache: %u hits, %u misses, hit rate %.2f%%", cache_hit, cache_miss, hit_rate * 100);
 
     // delete cache
     emptyCache(A);

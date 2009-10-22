@@ -24,6 +24,8 @@ Version 1.14-unreleased
 
      * removed 2-bit annotation - Wendy can do this
 
+* implemented Wendy's new IG/OG formats
+
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for
 complete version history.

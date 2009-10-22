@@ -41,6 +41,7 @@
 #include "options.h"
 #include "helpers.h"
 #include "debug.h"
+#include "verbose.h"
 #include "getopt.h"	// for radon
 #include "globals.h"
 
@@ -114,73 +115,73 @@ void print_help()
 {
 	// 80 chars
 	//    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-	trace(string(PACKAGE_NAME) + " -- Translating UML Processes into Petri Net Models\n");
-	trace("\n");
-	trace("Usage: " + globals::program_name + " [OPTION]\n");
-	trace("\n");
-	trace("Options:\n");
-	trace(" -p, --parameter=PARAM     modify processing with given parameter\n");
-	trace(" -i, --input=FILE          read a BPEL process from FILE\n");
-	trace(" -o, --output[=NAME]       write output to file (NAME sets filename)\n");
-	trace(" -f, --format=FORMAT       create output of the given format\n");
-	trace(" -d, --debug=NUMBER        set a debug level (NUMBER=0..4 or \"flex\" or \"bison\")\n");
-	trace(" -r, --reduce=NUMBER       apply structural reduction level (NUMBER=0..5)\n");
-	trace(" -R, --rolecut             cuts away all swimlanes in a process that\n");
-	trace("                           do not contain a startnode\n");
-	trace(" -e, --roleexclusive=ROLE  cuts away all swimlanes in a process that\n");
-	trace("                           do not contain a startnode or don't have\n");
-	trace("                           exactly the exclusive role\n");
-	trace(" -c, --rolecontains=ROLE   cuts away all swimlanes in a process that\n");
-	trace("                           do not contain a startnode or are one of the\n");
-	trace("                           contained roles\n");
-	trace(" -s, --skip=PROCESS-PROP   skip processes in the translation that have the given\n");
-  trace("                           structural property\n");
-	trace(" -h, --help                print this help list and exit\n");
-	trace(" -v, --version             print program version and exit\n");
-	trace("\n");
-  trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
-  trace("    filter              filter out infeasible processes from the library\n");
-  trace("                        equivalent to: '-s empty -s overlappingPins'\n");
-  trace("    keeppins            keep unconnected pins\n");
-  trace("    log                 write a log file for the translation\n");
-  trace("    taskfile            write analysis task to a separate file\n");
-  trace("    anon                anonymize the process output\n");
-  trace("    ctl                 generate CTL model checking properties for analysis\n");
-  trace("                        (if applicable)");
-	trace("\n");
-	trace("  FORMAT is one of the following (multiple formats permitted):\n");
-  trace("    lola, owfn, dot, tpn\n");
-	trace("\n");
-  trace("  TASK is one of the following (multiple parameters permitted):\n");
-  trace("    soundness           analyze for soundness\n");
-  trace("    deadlocks           check for deadlocks (except in the final state),\n");
-  trace("                        requires -a soundness\n");
-  trace("    safe                analyze for safeness\n");
-  trace("    stop                distinguish stop nodes from end nodes\n");
-  trace("\n");
-  trace("  the following TASK parameters determine the process termination semantics\n");
-  trace("  that is used for the analysis, they are used mutually exclusive, all\n");
-  trace("  parameters require '-a soundness'\n");
-  trace("    noData              ignore state of data flow upon process termination,\n");
-  trace("    wfNet               attempt to translate net into a workflow net,\n");
-  trace("    orJoin              analyze net by assuming an implicit OR-join,\n");
-  trace("\n");
+	fprintf(stdout, "%s -- Translating UML Processes into Petri Net Models\n", PACKAGE_NAME);
+	fprintf(stdout, "\n");
+	fprintf(stdout, "Usage: %s [OPTION]\n", globals::program_name.c_str());
+	fprintf(stdout, "\n");
+	fprintf(stdout, "Options:\n");
+	fprintf(stdout, " -p, --parameter=PARAM     modify processing with given parameter\n");
+	fprintf(stdout, " -i, --input=FILE          read a BPEL process from FILE\n");
+	fprintf(stdout, " -o, --output[=NAME]       write output to file (NAME sets filename)\n");
+	fprintf(stdout, " -f, --format=FORMAT       create output of the given format\n");
+	fprintf(stdout, " -d, --debug=NUMBER        set a debug level (NUMBER=0..4 or \"flex\" or \"bison\")\n");
+	fprintf(stdout, " -r, --reduce=NUMBER       apply structural reduction level (NUMBER=0..5)\n");
+	fprintf(stdout, " -R, --rolecut             cuts away all swimlanes in a process that\n");
+	fprintf(stdout, "                           do not contain a startnode\n");
+	fprintf(stdout, " -e, --roleexclusive=ROLE  cuts away all swimlanes in a process that\n");
+	fprintf(stdout, "                           do not contain a startnode or don't have\n");
+	fprintf(stdout, "                           exactly the exclusive role\n");
+	fprintf(stdout, " -c, --rolecontains=ROLE   cuts away all swimlanes in a process that\n");
+	fprintf(stdout, "                           do not contain a startnode or are one of the\n");
+	fprintf(stdout, "                           contained roles\n");
+	fprintf(stdout, " -s, --skip=PROCESS-PROP   skip processes in the translation that have the given\n");
+  fprintf(stdout, "                           structural property\n");
+	fprintf(stdout, " -h, --help                print this help list and exit\n");
+	fprintf(stdout, " -v, --version             print program version and exit\n");
+	fprintf(stdout, "\n");
+  fprintf(stdout, "  PARAMETER is one of the following (multiple parameters permitted):\n");
+  fprintf(stdout, "    filter              filter out infeasible processes from the library\n");
+  fprintf(stdout, "                        equivalent to: '-s empty -s overlappingPins'\n");
+  fprintf(stdout, "    keeppins            keep unconnected pins\n");
+  fprintf(stdout, "    log                 write a log file for the translation\n");
+  fprintf(stdout, "    taskfile            write analysis task to a separate file\n");
+  fprintf(stdout, "    anon                anonymize the process output\n");
+  fprintf(stdout, "    ctl                 generate CTL model checking properties for analysis\n");
+  fprintf(stdout, "                        (if applicable)");
+	fprintf(stdout, "\n");
+	fprintf(stdout, "  FORMAT is one of the following (multiple formats permitted):\n");
+  fprintf(stdout, "    lola, owfn, dot, tpn\n");
+	fprintf(stdout, "\n");
+  fprintf(stdout, "  TASK is one of the following (multiple parameters permitted):\n");
+  fprintf(stdout, "    soundness           analyze for soundness\n");
+  fprintf(stdout, "    deadlocks           check for deadlocks (except in the final state),\n");
+  fprintf(stdout, "                        requires -a soundness\n");
+  fprintf(stdout, "    safe                analyze for safeness\n");
+  fprintf(stdout, "    stop                distinguish stop nodes from end nodes\n");
+  fprintf(stdout, "\n");
+  fprintf(stdout, "  the following TASK parameters determine the process termination semantics\n");
+  fprintf(stdout, "  that is used for the analysis, they are used mutually exclusive, all\n");
+  fprintf(stdout, "  parameters require '-a soundness'\n");
+  fprintf(stdout, "    noData              ignore state of data flow upon process termination,\n");
+  fprintf(stdout, "    wfNet               attempt to translate net into a workflow net,\n");
+  fprintf(stdout, "    orJoin              analyze net by assuming an implicit OR-join,\n");
+  fprintf(stdout, "\n");
   //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-  trace("  PROCESS-PROP is one of the following (multiple parameters permitted):\n");
-  trace("    empty               the process contains no nodes\n");
-  trace("    multi               the process contains edges with token production\n");
-  trace("                        or consumption different than 1\n");
-  trace("    multiNonMatching    the process contains edges where token production and\n");
-  trace("                        consumption do not match, e.g. produce 1, consume 2\n");
-  trace("    overlappingPins     the process has overlapping pinsets\n");
-  trace("    trivialInterface    the process has a trivial interface (at most one input\n");
-  trace("                        place or output place), effective only with '-R'\n");
-  trace("\n");
-	trace("Examples:\n");
-	trace("  uml2owfn -i library.xml -f dot -o\n");
-	trace("  uml2owfn -i library.xml -f lola -a soundness -o\n");
-	trace("\n");
-	//trace("Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
+  fprintf(stdout, "  PROCESS-PROP is one of the following (multiple parameters permitted):\n");
+  fprintf(stdout, "    empty               the process contains no nodes\n");
+  fprintf(stdout, "    multi               the process contains edges with token production\n");
+  fprintf(stdout, "                        or consumption different than 1\n");
+  fprintf(stdout, "    multiNonMatching    the process contains edges where token production and\n");
+  fprintf(stdout, "                        consumption do not match, e.g. produce 1, consume 2\n");
+  fprintf(stdout, "    overlappingPins     the process has overlapping pinsets\n");
+  fprintf(stdout, "    trivialInterface    the process has a trivial interface (at most one input\n");
+  fprintf(stdout, "                        place or output place), effective only with '-R'\n");
+  fprintf(stdout, "\n");
+	fprintf(stdout, "Examples:\n");
+	fprintf(stdout, "  uml2owfn -i library.xml -f dot -o\n");
+	fprintf(stdout, "  uml2owfn -i library.xml -f lola -a soundness -o\n");
+	fprintf(stdout, "\n");
+	//fprintf(stdout, "Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
 }
 
 
@@ -191,8 +192,8 @@ void print_version()
 {
 	// 80 chars
 	//    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-	trace(string(PACKAGE_STRING) + " (compiled " + string(__DATE__) + ")\n\n");
-	trace("Copyright (C) 2007, 2008 Martin Znamirowski, Dirk Fahland\n");
+	fprintf(stdout, "%s (compiled %s)\n\n", PACKAGE_STRING, __DATE__);
+	fprintf(stdout, "Copyright (C) 2007, 2008, 2009 Martin Znamirowski, Dirk Fahland\n");
 }
 
 
@@ -255,8 +256,7 @@ void parse_command_line(int argc, char* argv[])
 		case 'o':
 		{
 			if (options[O_OUTPUT]) {
-				trace(TRACE_ALWAYS, "Multiple output options are given, please choose only one!\n");
-				exit(EXIT_FAILURE);
+				abort(4, "Multiple output options are given, please choose only one!");
 			}
 
       options[O_OUTPUT] = true;
@@ -286,7 +286,7 @@ void parse_command_line(int argc, char* argv[])
 			else {
 				trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
-				exit(EXIT_FAILURE);
+				abort(4, "Parameter error");
 			}
 
 			break;
@@ -315,7 +315,7 @@ void parse_command_line(int argc, char* argv[])
 			else {
 				trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
-				exit(EXIT_FAILURE);
+        abort(4, "Parameter error");
 			}
 
 			break;
@@ -339,7 +339,7 @@ void parse_command_line(int argc, char* argv[])
       else {
         trace(TRACE_ALWAYS, "Unknown filtering process characteristic \"" + parameter +"\".\n");
         trace(TRACE_ALWAYS, "Use -h to get a list of valid process characteristics.\n");
-        exit(1);
+        abort(4, "Parameter error");
       }
 
 		  break;
@@ -367,7 +367,7 @@ void parse_command_line(int argc, char* argv[])
       else {
         trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
         trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
-        exit(1);
+        abort(4, "Parameter error");
       }
 
       break;
@@ -395,7 +395,7 @@ void parse_command_line(int argc, char* argv[])
 			else {
 				trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
-				exit(EXIT_FAILURE);
+        abort(4, "Parameter error");
 			}
 			break;
 		}
@@ -407,7 +407,7 @@ void parse_command_line(int argc, char* argv[])
 			{
 				trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(optarg) +"\"!\n");
 				trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
-				exit(EXIT_FAILURE);
+        abort(4, "Parameter error");
 			}
 
 			break;
@@ -439,7 +439,7 @@ void parse_command_line(int argc, char* argv[])
 		{
 			trace("Unknown option!\n");
 			trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");
-			exit(EXIT_FAILURE);
+      abort(4, "Parameter error");
 			break;
 		}
 		}
@@ -485,8 +485,7 @@ void parse_command_line(int argc, char* argv[])
 	    FILE * fin = NULL;
 	    if (!(fin = fopen(file->c_str(), "r")))
 	    {
-	      trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
-	      exit(EXIT_FAILURE);
+	      abort(5, "File `%s' not found.", file->c_str());
 	    }
 	    fclose(fin);
 		}
@@ -596,7 +595,7 @@ void parse_command_line(int argc, char* argv[])
 
     if (terminationFlags > 1) {
       trace(TRACE_ALWAYS, "ERROR: more than one termination semantics selected, please choose at most one.\n");
-      exit(EXIT_FAILURE);
+      abort(4, "Parameter error");
     }
 
   }

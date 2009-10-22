@@ -22,9 +22,10 @@
 #include <map>
 #include <iostream>
 #include "AST.h"
-#include "debug.h"
+//#include "debug.h"
 #include "helpers.h"  // for toInt
 #include "options.h"
+#include "verbose.h"
 
 using std::string;
 using std::map;
@@ -766,8 +767,8 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
         FlowContentNode* sourceNode = currNodeNameMap[sourceName];
 
         if (sourceNode == NULL) {
-            // error handling to detect untranslated nodes
-            ast_error("Failed to resolve '"+sourceName+"' in process "+currProcess->getName());
+          // error handling to detect untranslated nodes
+          abort(2, "Failed to resolve '%s' in process %s\n", sourceName.c_str(), currProcess->getName().c_str());
         } else {
             currConnection->setSource(sourceNode);
             currConnection->setInput(sourceNode->getPinByName(sourceContact));
@@ -791,8 +792,8 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
         }
         FlowContentNode* targetNode = currNodeNameMap[targetName];
         if (targetNode == NULL) {
-            // error handling to detect untranslated nodes
-            ast_error("Failed to resolve '"+targetName+"' in process "+currProcess->getName());
+          // error handling to detect untranslated nodes
+          abort(2, "Failed to resolve '%s' in process %s\n", targetName.c_str(), currProcess->getName().c_str());
         } else {
             currConnection->setTarget(targetNode);
             currConnection->setOutput(targetNode->getPinByName(targetContact));

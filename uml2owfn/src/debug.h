@@ -113,7 +113,6 @@ extern trace_level debug_level; // defined in debug.cc
 void trace(trace_level pTraceLevel, string message);
 void trace(string message);
 int frontend_error(const char *msg);
-int ast_error(const string message);
 
 /******************************************************************************
  * Macros

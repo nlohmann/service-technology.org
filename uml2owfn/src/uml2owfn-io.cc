@@ -28,6 +28,7 @@
 #include "uml2owfn-io.h"
 
 #include "debug.h"      // debugging help
+#include "verbose.h"
 #include "helpers.h"    // toString etc.
 
 using std::cerr;
@@ -67,8 +68,7 @@ void open_file(string file) {
         free(ffile);
 
         if (!(frontend_in = fopen(file.c_str(), "r"))) {
-            cerr << "Could not open file for reading: " << file.c_str() << endl;
-            exit(EXIT_FAILURE);
+            abort(5, "Could not open file for reading: `%s'", file.c_str());
         }
     }
 }

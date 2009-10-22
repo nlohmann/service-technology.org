@@ -34,6 +34,20 @@ AT_CHECK([UML2OWFN -i TestSuite_soundness.xml],0,ignore,ignore)
 AT_KEYWORDS(parser)
 AT_CLEANUP
 
+AT_SETUP([XML parser failure])
+AT_CHECK([cp TESTFILES/broken_xml_syntax.xml .])
+AT_CHECK([UML2OWFN -i broken_xml_syntax.xml],1,ignore,stderr)
+AT_CHECK([GREP -q "uml2owfn: broken_xml_syntax.xml: 882" stderr])
+AT_KEYWORDS(parser)
+AT_CLEANUP
+
+AT_SETUP([AST parser failure])
+AT_CHECK([cp TESTFILES/broken_syntax.xml .])
+AT_CHECK([UML2OWFN -i broken_syntax.xml],1,ignore,stderr)
+AT_CHECK([GREP -q "uml2owfn: Failed to resolve 'NON_EXISTING_SOURCE_NODE' in process Prcsss##coffeeMachine_unsound" stderr])
+AT_KEYWORDS(parser)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Parser Filter])
@@ -58,68 +72,83 @@ AT_BANNER([Compiler Tests])
 
 AT_SETUP([Test suite])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -f lola --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "25 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 25])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (empty)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s empty --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "25 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s empty --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 25])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (multi)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s multi --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "20 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s multi --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "20 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 20])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (multiNonMatching)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s multiNonMatching --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "22 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s multiNonMatching --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "22 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 22])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (overlappingPins)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s overlappingPins --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s overlappingPins --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 24])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (combined parameters)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s overlappingPins -s empty -s multi -s multiNonMatching --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "20 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -s overlappingPins -s empty -s multi -s multiNonMatching --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "20 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 20])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (filter)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f lola --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f lola --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 24])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
 AT_SETUP([Test suite (keeppins)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p keeppins -f lola --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "25 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p keeppins -f lola --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | wc -l | GREP -q 25])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
+AT_SETUP([Test suite (reduction level 1)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -r1 --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stderr])
+AT_CHECK([ls *.lola | wc -l | GREP -q 25])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
+AT_SETUP([Test suite (reduction level 3)])
+AT_CHECK([cp TESTFILES/TestSuite.xml .])
+AT_CHECK([UML2OWFN -i TestSuite.xml -f lola -r3 --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "25 of 25 processes have been translated." stderr])
+AT_CHECK([ls *.lola | wc -l | GREP -q 25])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([File Formats])
@@ -128,8 +157,8 @@ AT_BANNER([File Formats])
 AT_SETUP([Graphviz dot output (*.dot, *.png)])
 AT_CHECK_DOT
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f dot --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f dot --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.png | wc -l | GREP -q 24])
 AT_CHECK([ls *.dot | wc -l | GREP -q 24])
 AT_KEYWORDS([compiler formats])
@@ -137,32 +166,32 @@ AT_CLEANUP
 
 AT_SETUP([Woflan output (*.tpn)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f tpn --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f tpn --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.tpn | wc -l | GREP -q 24])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP
 
 AT_SETUP([Open net output (*.owfn)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f owfn --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -f owfn --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.owfn | wc -l | GREP -q 24])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP
 
 AT_SETUP([Anonymized LoLA output (*.lola)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p anon -f lola --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p anon -f lola --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([ls *.lola | xargs GREP "process" | wc -l | GREP -q 0])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP
 
 AT_SETUP([Log file output (*.log)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
-AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p log -f lola --output=TestSuite],0,stdout,ignore)
-AT_CHECK([GREP -q "24 of 25 processes have been translated." stdout])
+AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p log -f lola --output=TestSuite],0,ignore,stderr)
+AT_CHECK([GREP -q "24 of 25 processes have been translated." stderr])
 AT_CHECK([test -f uml2owfn_TestSuite.log])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP

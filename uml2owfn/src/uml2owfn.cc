@@ -39,6 +39,7 @@
 #include "petrinet-workflow.h"
 
 #include "debug.h"		  // debugging help
+#include "verbose.h"
 #include "options.h"
 #include "globals.h"
 #include "helpers.h"
@@ -121,7 +122,8 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
 {
   int res = RES_OK;
 
-  trace(TRACE_WARNINGS, "\ngenerating Petri net for " + process->getName()+ "\n");
+  trace(TRACE_WARNINGS, "\n");
+  trace(TRACE_WARNINGS, "generating Petri net for " + process->getName()+ "\n");
 
   // Generates a petri net from the current process
   pnapi::ExtendedWorkflowNet *PN = new pnapi::ExtendedWorkflowNet();   // get a new net
@@ -413,6 +415,8 @@ int main( int argc, char *argv[])
         // invoke XML parser
         trace(TRACE_INFORMATION, "Parsing " + globals::filename + " ...\n");
         int parse_result = frontend_parse();
+        if (parse_result)
+          abort(3, "Failed to parse %s\n", globals::filename.c_str());
         trace(TRACE_INFORMATION, "Parsing of " + globals::filename + " complete.\n");
 
         // create lists for the global processes, tasks and services so
@@ -576,16 +580,16 @@ int main( int argc, char *argv[])
       } // for all processes of the current file
 
       if (translatedProcesses > 1)
-        trace(TRACE_ALWAYS, toString(translatedProcesses)+" of "+toString(processNum)+" processes have been translated.\n");
+        message("%i of %i processes have been translated.", translatedProcesses, processNum);
       else if (translatedProcesses == 1)
-        trace(TRACE_ALWAYS, toString(translatedProcesses)+" of "+toString(processNum)+" processes has been translated.\n");
+        message("%i of %i processes has been translated.", translatedProcesses, processNum);
       else
-        trace(TRACE_ALWAYS, "None of "+toString(processNum)+" processes has been translated.\n");
+        message("None of %i processes have been translated.", processNum);
 
       if (soundViolatingWfCompletion >= 1)
-        trace(TRACE_ALWAYS, "For "+toString(soundViolatingWfCompletion)+" of "+toString(translatedProcesses)+" processes soundness could not be preserved.\n");
+        message("For %i of %i processes soundness could not be preserved.\n", soundViolatingWfCompletion, translatedProcesses);
       else
-        trace(TRACE_ALWAYS, "All processes have been translated preserving soundness.\n");
+        message("All processes have been translated preserving soundness.");
 
 
       write_script_file();  // write script file for the entire process library

@@ -11,13 +11,13 @@ uml2owfn_SOURCES = uml2owfn.cc \
 		    petrinet-workflow.cc petrinet-workflow.h \
 			petrinet-formula.cc petrinet-formula.h \
 		    helpers.cc helpers.h \
-    	    colorconsole.h \
 		    frontend-parser.yy \
 		    frontend-lexer.ll \
 		    yystype.h \
 		    options.cc options.h \
 		    getopt.h getopt.c getopt1.c \
 		    debug.cc debug.h \
+		    verbose.cc verbose.h \
 		    globals.cc globals.h \
 		    AST.cc AST.h AST-public.h \
 		    internal-representation.cc internal-representation.h UML-public.h

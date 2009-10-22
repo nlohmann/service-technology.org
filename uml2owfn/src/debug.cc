@@ -53,11 +53,11 @@
 #include <iomanip>
 
 #include "debug.h"
+#include "verbose.h"
 //#include "options.h"
 #include "config.h"
 #include "helpers.h"	// for toInt
 #include "globals.h"
-#include "colorconsole.h"
 
 using std::cerr;
 using std::clog;
@@ -111,8 +111,10 @@ trace_level debug_level = TRACE_ALWAYS;
  */
 void trace(trace_level pTraceLevel, string message)
 {
-  if (pTraceLevel <= debug_level)
-    std::cout << message << flush;
+  if (debug_level <= 1) {
+      return;
+  }
+  std::cerr << PACKAGE << ": " << message;
 }
 
 
@@ -126,7 +128,7 @@ void trace(trace_level pTraceLevel, string message)
  */
 void trace(string message)
 {
-  trace(TRACE_ALWAYS, message);
+  std::cerr << PACKAGE << ": " << message;
 }
 
 
@@ -148,57 +150,16 @@ void trace(string message)
  */
 int frontend_error(const char *msg)
 {
-/*
   // defined by flex
   extern int frontend_lineno;      // line number of current token
   extern char *frontend_text;      // text of the current token
 
-  cerr << colorconsole::fg_blue;
-  cerr << globals::filename << ":" << frontend_lineno+1 << " - [SYNTAX]\n";
-  cerr << colorconsole::fg_standard;
-
-  if (debug_level == TRACE_ERROR)
-    return 1;
-
-  cerr << string(msg);
-
-  if (debug_level >= TRACE_WARNINGS)
-    cerr << "; last token read: `" << string(frontend_text) << "'" << endl << endl;
-  else
-    cerr << endl << endl;
+  message ("%s: %i - [SYNTAX ERROR]", globals::filename.c_str(), frontend_lineno+1);
+  message ("%s; last token read: `%s'", msg, frontend_text);
 
   // remember the last token
   globals::last_error_token = string(frontend_text);
   globals::last_error_line = toString(frontend_lineno);
-
-  return 1;
-*/
-}
-
-/*!
- * \brief signal a syntax error
- *
- * This function is invoked by the parser and the lexer during the syntax
- * analysis. When an error occurs, it prints an accordant message and shows
- * the lines of the input files where the error occured.
- *
- * \param message  a message (mostly "Parse error") and some more information e.g.
- *                 the location of the syntax error.
- * \return 1, since an error occured
- *
- * \ingroup debug
- */
-int ast_error(const string message)
-{
-
-  cerr << colorconsole::fg_magenta;
-  cerr << globals::filename << ":" << " - [AST]\n";
-  cerr << colorconsole::fg_standard;
-
-  if (debug_level == TRACE_ERROR)
-    return 1;
-
-  cerr << message << endl << endl;
 
   return 1;
 }

@@ -4,6 +4,8 @@ AT_INIT
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_CANDY, [AT_CHECK([if test "CANDY" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_VALGRIND, [AT_CHECK([if test "VALGRIND" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_DIFF, [AT_CHECK([if test "DIFF" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not_found"; then exit 77; fi])])
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not_found"; then exit 77; fi])])
 #m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
@@ -34,35 +36,62 @@ AT_BANNER([Small examples])
 AT_SETUP([Small test (synchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose],0,ignore,ignore)
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/sync1_exp.owfn .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose],0,stdout,ignore)
+#AT_CHECK_DIFF
+#AT_CHECK([DIFF stdout sync1_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (synchronous 2)])
-AT_XFAIL_IF(true)
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync.ar .])
-AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync.ar --verbose],0,ignore,ignore)
+AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync2.ar TESTFILES/sync2_exp.owfn .])
+AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --verbose],0,stdout,ignore)
+#AT_CHECK_DIFF
+#AT_CHECK([DIFF stdout sync2_exp.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (synchronous 3)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/sync3_exp.owfn .])
+AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --verbose],0,stdout,ignore)
+#AT_CHECK_DIFF
+#AT_CHECK([DIFF stdout sync3_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (asynchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
-AT_CHECK([MARLENE test.owfn --rulefile=test.ar --asyncif --verbose],0,ignore,ignore)
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/async1_exp.owfn .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --asyncif --verbose],0,stdout,ignore)
+#AT_CHECK_DIFF
+#AT_CHECK([DIFF stdout async1_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
-#AT_SETUP([Small test (asynchronous 2)])
-#AT_CHECK_WENDY
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync.ar .])
-#AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync.ar --asyncif --verbose],0,ignore,ignore)
-#AT_KEYWORDS(sample)
-#AT_CLEANUP
+AT_SETUP([Small test (asynchronous 2)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync2.ar TESTFILES/async2_exp.owfn .])
+AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --asyncif --verbose],0,stdout,ignore)
+#AT_CHECK_DIFF
+#AT_CHECK([DIFF stdout async2_exp.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (asynchronous 3)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/async3_exp.owfn .])
+AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --asyncif --verbose],0,stdout,ignore)
+#AT_CHECK_DIFF
+#AT_CHECK([DIFF stdout async3_exp.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
 
 AT_SETUP([Small test (no complement)])
 AT_CHECK_WENDY
@@ -304,6 +333,7 @@ AT_SETUP([Checking for memory leaks with Valgrind])
 AT_XFAIL_IF(true)
 AT_CHECK_WENDY
 AT_CHECK_LOLA
+AT_CHECK_VALGRIND
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes MARLENE_RAW ca1.owfn td.owfn --rulefile=td.ar],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])

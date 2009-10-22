@@ -241,7 +241,7 @@ State::~State()
 
  /*!
   */
- Edge::Edge(State &source, State &destination, const std::string label, const Automaton::Type type) :
+ Edge::Edge(State &source, State &destination, const std::string& label, const Automaton::Type type) :
    label_(label), source_(source), destination_(destination), type_(type)
    {
    source_.addPost(destination_);

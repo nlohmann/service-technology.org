@@ -9,13 +9,13 @@
 
 @item added support for building controllers using Genet
 
+@item open nets with synchronous interface are now supported
+
 @item known issues:
 
 @itemize
 
-@item added workaround when dealing with synchronouns interface between controller and engine (see bug #14416, @url{https://gna.org/bugs/?14416})
-
-@item cost-optimization is not fully working due to bug #14417, @url{https://gna.org/bugs/?14417}
+@item cost-optimization is not fully working
 
 @end itemize
 

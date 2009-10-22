@@ -46,6 +46,7 @@ AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(CANDY, [candy], [])
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
+AC_PATH_PROG(DIFF, [diff], not found)
 AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], "not_found")
 if test "$PETRIFY" = "not found"; then
   AC_MSG_WARN([Petrify was not found. See file README.])

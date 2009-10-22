@@ -272,7 +272,7 @@ Edge & Automaton::createEdge(State &s1, State &s2)
 /*!
  */
 Edge & Automaton::createEdge(State &s1, State &s2,
-    const std::string label, Type type)
+    const std::string& label, Type type)
 {
   Edge *e = new Edge(s1, s2, label, type);
   edges_.push_back(e);

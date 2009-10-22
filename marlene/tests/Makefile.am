@@ -9,9 +9,12 @@
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = test.owfn test.ar \
 	    test-n.owfn test-n.ar \
-	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td.ar td_sync.ar \
+	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td_cyclic.owfn \
+	    td.ar td_sync.ar td_sync2.ar \
 	    nopetrify.conf \
-	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar
+	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar \
+	    sync1_exp.owfn sync2_exp.owfn sync3_exp.owfn \
+	    async1_exp.owfn async2_exp.owfn async3_exp.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

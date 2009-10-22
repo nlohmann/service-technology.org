@@ -1,8 +1,6 @@
 TEuro -> MEuro;
 -- MCB ->;
 -- MTB ->;
-HIDDEN alpha -- dummy, foobar -> beta;
--- foo, bar ->;
 MBevT -> TBevT;
 MBevT -> TBevT;
 

@@ -372,7 +372,7 @@ bool Conjunction::isSatisfied(const Marking & m) const
 bool Disjunction::isSatisfied(const Marking & m) const
 {
   for (set<const Formula *>::const_iterator f = children_.begin();
-  f != children_.end(); f++)
+  f != children_.end(); ++f)
     if ((*f)->isSatisfied(m))
       return true;
   return false;

@@ -19,17 +19,12 @@ Version 1.2-unreleased
 
 * added support for building controllers using Genet
 
+* open nets with synchronous interface are now supported
+
 * known issues:
 
-     * added workaround when dealing with synchronouns interface between
-       controller and engine (see bug #14416, `https://gna.org/bugs/?14416')
-
-     * cost-optimization is not fully working due to bug #14417,
-       `https://gna.org/bugs/?14417'
+     * cost-optimization is not fully working
 
 
 
-
-See file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for\ncomplete version history.\n

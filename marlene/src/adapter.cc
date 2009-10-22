@@ -346,6 +346,8 @@ void Adapter::createEngineInterface()
     {
         using namespace pnapi;
         // renaming the net is done when merging the nets
+        
+        std::string portname = "net" + toString(netindex);
 
         const std::set< Place * > & netIf = _nets[netindex]->getInterfacePlaces();
         for (std::set< Place *>::const_iterator place = netIf.begin(); place
@@ -367,7 +369,7 @@ void Adapter::createEngineInterface()
             // create interface place for a service's interface place
             Place & ifplace = _engine->createPlace(ifname, 
                             ((*place)->getType() == Node::INPUT) ? Node::OUTPUT
-                            : Node::INPUT, 0, _messageBound);
+                            : Node::INPUT, 0, _messageBound, portname);
             
             Place * intplace = _engine->findPlace(internalname);
             if (intplace == NULL)
@@ -421,7 +423,7 @@ void Adapter::createEngineInterface()
                 Place & contplace =
                                 _engine->createPlace(contplacename, ((*place)->getType()
                                                 == Node::INPUT) ? Node::INPUT
-                                    : Node::OUTPUT, 0, _messageBound);
+                                    : Node::OUTPUT, 0, _messageBound, "controller");
                 if ((*place)->getType() == Node::INPUT)
                 {
                     _engine->createArc(contplace, inttrans);
@@ -558,14 +560,14 @@ void Adapter::createRuleTransitions()
             if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
                             || rule.getMode() == RuleSet::AdapterRule::AR_CONTROLLABLE)
             {
-                Place & controlplace = _engine->createPlace( controlplacename, Node::INPUT, 0, _messageBound);
+                Place & controlplace = _engine->createPlace( controlplacename, Node::INPUT, 0, _messageBound, "controller");
                 _engine->createArc(controlplace, *trans);
             }
             
             if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
                             || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE)
             {
-                Place & observeplace = _engine->createPlace( observeplacename, Node::OUTPUT, 0, _messageBound);
+                Place & observeplace = _engine->createPlace( observeplacename, Node::OUTPUT, 0, _messageBound, "controller");
                 _engine->createArc(*trans, observeplace);
             }
 

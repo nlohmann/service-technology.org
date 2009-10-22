@@ -16,6 +16,7 @@ m4_define([PETRIFY],              [@PETRIFY@])
 m4_define([GENET],                [@GENET@])
 m4_define([GREP],                 [@GREP@])
 m4_define([MKDIR],                [@MKDIR_P@])
+m4_define([DIFF],                 [@DIFF@])
 m4_define([NOPETRIFY],            ['"not found"'])
 
 m4_define([VALGRIND],             [wrap.sh @VALGRIND@])

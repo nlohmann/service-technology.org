@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = TestSuite.xml TestSuite_soundness.xml
+TESTFILES = TestSuite.xml TestSuite_soundness.xml broken_syntax.xml broken_xml_syntax.xml
 
 
 # Below you can list all the files you do not want to have counted in the

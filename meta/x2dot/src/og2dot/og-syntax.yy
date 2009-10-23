@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <string.h>
+#include <sstream>
 
 //Result of lexical analyis
 extern char* og_yytext;
@@ -23,11 +25,13 @@ std::vector<unsigned int> nodes;
 
 //Mapping of node ID to the node's annotation
 
-std::map<unsigned int, char> nodeAnnotation;
+std::map<unsigned int, std::string> nodeAnnotation;
 
 //Mapping of node ID to a list of the successors of this node
 
 std::map<unsigned int, std::vector<std::pair<char*, unsigned int> > > nodeSuccessors;
+
+std::stringstream strStream;
 
 %}
 
@@ -50,8 +54,6 @@ std::map<unsigned int, std::vector<std::pair<char*, unsigned int> > > nodeSucces
 
 %type <value> NUMBER
 %type <str>   IDENT
-%type <bit>   annotation
-
 
 %left OP_OR
 %left OP_AND
@@ -81,7 +83,7 @@ og:
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes
 		(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
-		//Add style information
+	
 		
 		std::vector<std::pair<char*, unsigned int> > successors = nodeSuccessors[nodes[i]];
 		//... if yes, write the node's ID, node's annotation and all links to its successors to the stream...
@@ -143,8 +145,8 @@ node:
 	//Store current node and map its ID to its annotation
 	nodes.push_back($1);
 	currentNode = $1;
-	nodeAnnotation[$1] = $2;
-
+	nodeAnnotation[$1] = strStream.str();
+	strStream.str("");
   }
 
   successors
@@ -152,23 +154,37 @@ node:
 
 
 annotation:
-  /* empty */ {$$ = ' ';}
-| COLON formula {og_yyerror("read a formula; only 2-bit annotations are supported");}
-| DOUBLECOLON BIT_S {$$ = 'S';}
-| DOUBLECOLON BIT_F {$$ = 'F';}
+  /* empty */
+| COLON formula
+| DOUBLECOLON BIT_S {strStream << "S";}
+| DOUBLECOLON BIT_F {strStream << "F";}
 
 ;
 
 
 formula:
-  LPAR formula RPAR
-| formula OP_AND formula
-| formula OP_OR formula
-| OP_NOT formula
-| KEY_FINAL
-| KEY_TRUE
-| KEY_FALSE
-| IDENT {free($1);}
+  LPAR {strStream << "(";}
+  formula
+  RPAR {strStream << ")";}
+
+| formula 
+  OP_AND {strStream << " and ";} 
+  formula 
+
+| formula 
+  OP_OR  {strStream << " or ";} 
+  formula 
+
+| OP_NOT  {strStream << " not ";} 
+  formula 
+
+| KEY_FINAL {strStream << " final ";}
+
+| KEY_TRUE {strStream << " true ";}
+
+| KEY_FALSE {strStream << " false ";}
+
+| IDENT {strStream << $1;}
 ;
 
 

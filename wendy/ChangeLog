@@ -8,7 +8,12 @@
                       http://service-technology.org/wendy
 
 
-Version 2.3 (22 October 2009)
+Version 2.4-unreleased
+======================
+
+* added target for benchmarks (execute `make bench -C tests')
+
+Version 2.3 (21 October 2009)
 =============================
 
 * knowledge bubbles are finally sorted to avoid duplicates

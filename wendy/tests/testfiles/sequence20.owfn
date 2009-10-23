@@ -45,6 +45,7 @@ INPUT
   r,
   s,
   t;
+OUTPUT;
 
 INITIALMARKING
   p0:   1;

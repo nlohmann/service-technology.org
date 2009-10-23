@@ -8,20 +8,10 @@
                       http://service-technology.org/wendy
 
 
-Version 2.3 (22 October 2009)
-=============================
+Version 2.4-unreleased
+======================
 
-* knowledge bubbles are finally sorted to avoid duplicates
-
-* implemented first diagnosis functions: the `--diagnosis' parameter
-  creates a Dot file which indicates the blacklisted markings
-
-* removed all memory leaks
-
-* removed parameter `--smartSendingEvent': Wendy will always use this
-  technique unless `--ignoreUnreceivedMessages' is given
-
-* renamed parameter `--receiveBeforeSend' to `--receivingBeforeSending'
+* added target for benchmarks (execute `make bench -C tests')
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

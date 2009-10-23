@@ -39,7 +39,7 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             error16.2.cov \
             myCoffee.fiona.og myCoffee.owfn \
             phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
-            phcontrol9.unf.owfn \
+            phcontrol9.unf.owfn phcontrol6.unf.owfn \
             phil5.owfn \
             small.owfn \
             PO.fiona.og PO.owfn \
@@ -66,7 +66,8 @@ TESTFILES = bug1.fiona.og bug1.owfn \
             genericSynchLFQAP.owfn \
             dead.owfn mb.owfn nlc.owfn uncontrollable.owfn \
             Lohmann_2008_wsfm-Fig2b.owfn \
-	    SaScSdRb.owfn
+            SaScSdRb.owfn \
+            AP.owfn
 
 
 
@@ -178,3 +179,20 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcov -exec rm {} \;
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
+
+
+##############
+# BENCHMARKS #
+##############
+
+EXTRA_DIST += benchmarks.at
+
+# create the benchmark script using autom4te
+benchmarks: $(srcdir)/benchmarks.at
+	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	mv $@.tmp $@
+
+bench: atconfig benchmarks
+	test ! -d benchmarks-results || rm -fr benchmarks-results
+	$(MKDIR_P) benchmarks-results
+	$(SHELL) 'benchmarks' $(TESTSUITEFLAGS)

@@ -6,15 +6,28 @@ m4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])
 m4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])
 m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 
-m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+# SVN Revision-URL
+m4_define([SVNURL],               [http://svn.gna.org/viewcvs/service-tech?rev=@VERSION_SVN@&view=rev])
 
-m4_define([GREP],                 [@GREP@])
+# the main executable, called through a shell script for code coverage
 m4_define([WENDY],                [cover.sh @abs_top_builddir@/src/wendy])
+
+# directories
+m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+m4_define([BENCHRESULTS],         [@abs_srcdir@/benchmarks-results])
+
+# UNIX helper tools
+m4_define([GREP],                 [@GREP@])
+m4_define([AWK],                  [@AWK@])
+m4_define([SED],                  [@SED@])
+
+# tools needed by the testscript
 m4_define([FIONA],                [wrap.sh @FIONA@])
 m4_define([MIA],                  [wrap.sh @MIA@])
 m4_define([MARLENE],              [wrap.sh @MARLENE@])
 m4_define([SA2SM],                [wrap.sh @SA2SM@])
 m4_define([LOLA],                 [@LOLA@])
 
+# Valgrind
 m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
 m4_define([WENDY_RAW],            [@abs_top_builddir@/src/wendy])

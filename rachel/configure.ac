@@ -21,14 +21,18 @@ AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
 
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AC_DEFINE_UNQUOTED(CONFIG_DOT, "$DOT", [whether dot was found by configure])
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# export tools needed to determine memory consumption
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
 
 # store the SVN revision number
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")

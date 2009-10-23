@@ -1,0 +1,38 @@
+NODES
+  1 : (!in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren + !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren + !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen) : blue,
+  2 : (!in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren + !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen) : blue,
+  3 : !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen : blue,
+  4 : final : blue,
+  5 : !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren : blue,
+  6 : (!in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren + !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen) : blue,
+  7 : !in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren : blue,
+  8 : (!in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren + !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren) : blue,
+  0 : ?out.Normale_Bestellung_Lieferung_Lagerhaus_Endprodukte.Bewegungsaufträge_bearbeiten : blue,
+101 : ?out.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen : blue, 
+102 : ?out.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren : blue,
+103 : ?out.Normale_Bestellung_Lieferung_Transportunternehmen.Transport_ausführen : blue,
+104 : ?out.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren : blue,
+105 : ?out.Normale_Bestellung_Lieferung_Vertriebsabteilung.Probleme_bei_Unverfügbarkeit_registrieren : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  1 -> 2 : !in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren,
+  1 -> 6 : !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren,
+  1 -> 8 : !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen,
+  2 -> 3 : !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren,
+  2 -> 5 : !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen,
+  3 -> 4 : !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen,
+  5 -> 4 : !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren,
+  6 -> 3 : !in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren,
+  6 -> 7 : !in.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen,
+  7 -> 4 : !in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren,
+  8 -> 5 : !in.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren,
+  8 -> 7 : !in.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren,
+  0 -> 101 : ?out.Normale_Bestellung_Lieferung_Lagerhaus_Endprodukte.Bewegungsaufträge_bearbeiten,
+101 -> 102 : out.Normale_Bestellung_Lieferung_Lagerverwalter.Lager_zuteilen,
+102 -> 103 : ?out.Normale_Bestellung_Lieferung_Transportabteilung.Bewegungen_kombinieren,
+103 -> 104 : ?out.Normale_Bestellung_Lieferung_Transportunternehmen.Transport_ausführen,
+104 -> 105 : ?out.Normale_Bestellung_Lieferung_Vertriebsabteilung.Bestellungen_sortieren,
+105 -> 1 : ?out.Normale_Bestellung_Lieferung_Vertriebsabteilung.Probleme_bei_Unverfügbarkeit_registrieren;

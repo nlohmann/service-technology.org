@@ -26,6 +26,8 @@ Version 1.14-unreleased
 
 * implemented Wendy's new IG/OG formats
 
+* added target for benchmarks (execute `make bench -C tests')
+
 Version 1.13 (6 June 2009)
 ==========================
 

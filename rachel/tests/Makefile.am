@@ -11,11 +11,11 @@ TESTFILES = agency_airline.og \
             error-lexer.og \
             error-parser.og \
             full.og \
-            purchase_order.og \
-            purchase_order.sa \
+            purchase_order.og purchase_order.sa \
             rachel.conf \
             traveler.sa \
-            myCoffee.sa myCoffee.og
+            myCoffee.sa myCoffee.og \
+            internal_order.sa internal_order.og
 
 
 # Below you can list all the files you do not want to have counted in the
@@ -126,3 +126,20 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcov -exec rm {} \;
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
+
+
+##############
+# BENCHMARKS #
+##############
+
+EXTRA_DIST += benchmarks.at
+
+# create the benchmark script using autom4te
+benchmarks: $(srcdir)/benchmarks.at
+	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	mv $@.tmp $@
+
+bench: atconfig benchmarks
+	test ! -d benchmarks-results || rm -fr benchmarks-results
+	$(MKDIR_P) benchmarks-results
+	$(SHELL) 'benchmarks' $(TESTSUITEFLAGS)

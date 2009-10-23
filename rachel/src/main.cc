@@ -34,11 +34,13 @@
 #include "Output.h"
 #include "config-log.h"
 
-
 using std::stack;
 using std::pair;
 using std::map;
 using std::string;
+
+/// a variable holding the time of the call
+clock_t start_clock = clock();
 
 
 
@@ -150,7 +152,21 @@ void evaluateParameters(int argc, char** argv) {
 }
 
 
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // print statistics
+    if (args_info.stats_flag) {
+        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
+
+
 int main(int argc, char** argv) {
+    // set the function to call on normal termination
+    atexit(terminationHandler);
+
     evaluateParameters(argc, argv);
 
     // modes that read a service automaton
@@ -241,7 +257,7 @@ int main(int argc, char** argv) {
         }
 
         case(mode_arg_matching): {
-            message("matching: %.2f\n", Matching::matching()); break;
+            message("matching: %.2f", Matching::matching()); break;
         }
     }
 

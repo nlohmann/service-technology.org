@@ -7,7 +7,6 @@
 #include <set>
 #include <string>
 
-
 std::ostream & operator <<(std::ostream &, const PeerAutomaton &);
 std::ostream & operator <<(std::ostream &, const Choreography &);
 

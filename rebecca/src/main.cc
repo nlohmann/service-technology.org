@@ -121,6 +121,7 @@ int main(int argc, char** argv) {
               continue;
             if (chor->disables(*q, a, b))
             {
+              status("%s disables %s in state %d", chor->events()[a].c_str(), chor->events()[b].c_str(), *q);
               complete = false;
               changed = true;
               int qa = chor->createState();
@@ -147,6 +148,7 @@ int main(int argc, char** argv) {
               continue;
             if (chor->enables(*q, a, b))
             {
+              status("%s enables %s in state %d", chor->events()[a].c_str(), chor->events()[b].c_str(), *q);
               complete = distributed = false;
               changed = true;
               int qab = chor->findState(*q, a, b);
@@ -164,15 +166,28 @@ int main(int argc, char** argv) {
             int qba = chor->findState(*q, b, a);
             if (qab != -1 && qba != -1 && !chor->equivalent(qab, qba))
             {
+              status("States %d and %d are not equivalent", qab, qba);
               complete = distributed = false;
               changed = true;
               chor->unite(qab, qba);
             }
           }
     }
+
+    if (args_info.Chor_given)
+    {
+      std::cout << *chor;
+    }
+    if (args_info.chor_given)
+    {
+      std::ofstream chorFile(args_info.chor_arg);
+      chorFile << *chor;
+      chorFile.close();
+    }
+
     if (chor->initialState() == INT_MIN)
       partial = false;
-    std::cout << "The input choreography is" << std::endl
+    std::cerr << "The input choreography is" << std::endl
               << "  COMPLETELY REALIZABLE:    " << (complete ? "YES" : "NO") << std::endl
               << "  DISTRIBUTEDLY REALIZABLE: " << (distributed ? "YES" : "NO") << std::endl
               << "  PARTIALLY REALIZABLE:     " << (partial ? "YES" : "NO") << std::endl;

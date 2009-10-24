@@ -33,24 +33,24 @@ AT_BANNER([Realizability Tests])
 
 AT_SETUP([Complete Realizability])
 AT_CHECK([cp TESTFILES/fig4b.chor .])
-AT_CHECK([REBECCA < fig4b.chor -q],0,stdout)
-AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    YES" stdout],0)
+AT_CHECK([REBECCA < fig4b.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    YES" stderr],0)
 AT_KEYWORDS(realizability)
 AT_CLEANUP
 
 AT_SETUP([Distributed Realizability])
 AT_CHECK([cp TESTFILES/fig4c.chor .])
-AT_CHECK([REBECCA < fig4c.chor -q],0,stdout)
-AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    NO" stdout],0)
-AT_CHECK([GREP -q "DISTRIBUTEDLY REALIZABLE: YES" stdout],0)
+AT_CHECK([REBECCA < fig4c.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    NO" stderr],0)
+AT_CHECK([GREP -q "DISTRIBUTEDLY REALIZABLE: YES" stderr],0)
 AT_KEYWORDS(realizability)
 AT_CLEANUP
 
 AT_SETUP([Partial Realizability])
 AT_CHECK([cp TESTFILES/fig4d.chor .])
-AT_CHECK([REBECCA < fig4d.chor -q],0,stdout)
-AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    NO" stdout],0)
-AT_CHECK([GREP -q "DISTRIBUTEDLY REALIZABLE: NO" stdout],0)
-AT_CHECK([GREP -q "PARTIALLY REALIZABLE:     YES" stdout],0)
+AT_CHECK([REBECCA < fig4d.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "COMPLETELY REALIZABLE:    NO" stderr],0)
+AT_CHECK([GREP -q "DISTRIBUTEDLY REALIZABLE: NO" stderr],0)
+AT_CHECK([GREP -q "PARTIALLY REALIZABLE:     YES" stderr],0)
 AT_KEYWORDS(realizability)
 AT_CLEANUP

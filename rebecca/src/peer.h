@@ -10,6 +10,7 @@ class Peer
 {
 public:
   Peer(const std::string &);
+  ~Peer();
 
   void pushIn(const std::string &);
   void pushOut(const std::string &);

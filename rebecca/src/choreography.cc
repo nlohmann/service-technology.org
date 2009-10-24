@@ -21,6 +21,12 @@ Choreography::Choreography()
  */
 Choreography::~Choreography()
 {
+  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
+    delete (*e);
+  edges_.clear();
+  for (int i = 0; i < collaboration_.size(); ++i)
+    delete collaboration_[i];
+  collaboration_.clear();
 }
 
 
@@ -124,6 +130,7 @@ Edge * Choreography::createEdge(int source, const string & label, int destinatio
  *
  * \param e
  */
+#include <iostream>
 void Choreography::deleteEdge(Edge * e)
 {
   edges_.erase(e);
@@ -547,7 +554,7 @@ void Choreography::unite(int qa, int qb)
   {
     bool found = false;
     for (set<Edge *>::iterator ee = rm.begin(); ee != rm.end(); ee++)
-      if ((*e)->label == (*ee)->label)
+      if ((*e)->label == (*ee)->label && (*e)->label != "")
       {
         rm.erase(ee);
         found = true;
@@ -557,6 +564,7 @@ void Choreography::unite(int qa, int qb)
   }
   for (set<Edge *>::iterator e = rm.begin(); e != rm.end(); e++)
   {
+    std::cout << "unite: not equivalent ways" << std::endl;
     deleteEdge(*e);
   }
   // recursive call

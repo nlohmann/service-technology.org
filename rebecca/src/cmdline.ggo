@@ -14,6 +14,16 @@ option "prefix" p
   typestr="PREFIX"
   optional
   
+option "Chor" C
+  "Writes the input choreography to stdout after the resolutiion of dependencies."
+  flag off
+  
+option "chor" c
+  "Writes the input choreography to a file after the resolution of dependencies."
+  string
+  typestr="FILE"
+  optional
+  
 option "quiet" q
   "If selected, no automaton file will be written to file system."
   flag off

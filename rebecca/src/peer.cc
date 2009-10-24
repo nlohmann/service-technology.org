@@ -12,6 +12,15 @@ Peer::Peer(const string & name) :
 }
 
 
+Peer::~Peer()
+{
+  in_.clear();
+  out_.clear();
+  input_.clear();
+  output_.clear();
+}
+
+
 void Peer::pushIn(const string & inLabel)
 {
   in_.insert(inLabel);

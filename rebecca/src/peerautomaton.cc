@@ -24,6 +24,9 @@ PeerAutomaton::PeerAutomaton()
 
 PeerAutomaton::~PeerAutomaton()
 {
+  for (set<PEdge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
+    delete (*e);
+  edges_.clear();
 }
 
 

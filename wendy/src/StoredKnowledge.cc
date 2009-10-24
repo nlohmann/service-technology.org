@@ -849,7 +849,7 @@ void StoredKnowledge::print(std::ostream& file) const {
                 file << " : " << formula();
                 break;
             }
-            case(formula_arg_2bits): {
+            case(formula_arg_bits): {
                 string form(bits());
                 if (form != "") {
                     file << " :: " << form;
@@ -979,8 +979,9 @@ string StoredKnowledge::formula() const {
 
 
 /*!
- \return "S" if formula can only be satisfied by sending events; "F" if
-         formula contains the "final" literal
+ \return "T" if formula is true (no deadlocks), "S" if formula can only be
+         satisfied by sending events; "F" if formula contains the "final"
+         literal
 
  \pre  all markings are deadlocks
  \pre  the node is sane, i.e. "sane()" would return true
@@ -990,6 +991,11 @@ string StoredKnowledge::formula() const {
        defined in this case.
  */
 string StoredKnowledge::bits() const {
+    if (sizeDeadlockMarkings == 0) {
+        // the knowledge has no deadlock
+        return "T";
+    }
+
     if (is_final) {
         // the formula contains final
         return "F";
@@ -1042,7 +1048,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                 string formula;
                 switch (args_info.formula_arg) {
                     case(formula_arg_cnf): formula = it->second[i]->formula(); break;
-                    case(formula_arg_2bits): formula = it->second[i]->bits(); break;
+                    case(formula_arg_bits): formula = it->second[i]->bits(); break;
                 }
                 file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
 

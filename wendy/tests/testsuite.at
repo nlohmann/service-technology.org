@@ -58,7 +58,7 @@ AT_CLEANUP
 AT_SETUP([Dot output (2-bit formulae)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --dot --showEmptyNode --showWaitstates --showTransients --formula=2bits --verbose],0,ignore,ignore)
+AT_CHECK([WENDY myCoffee.owfn --og --dot --showEmptyNode --showWaitstates --showTransients --formula=bits --verbose],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -74,7 +74,7 @@ AT_CLEANUP
 AT_SETUP([OG output (2-bit formulae)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --formula=2bits],0,ignore,ignore)
+AT_CHECK([WENDY myCoffee.owfn --og --formula=bits],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.og])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -236,7 +236,7 @@ AT_CLEANUP
 
 AT_SETUP([Synchronous channels and 2-bit annotations])
 AT_CHECK([cp TESTFILES/error10.* .])
-AT_CHECK([WENDY error10.owfn --lola= --formula=2bits --og],1,ignore,stderr)
+AT_CHECK([WENDY error10.owfn --lola= --formula=bits --og],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -418,7 +418,7 @@ AT_CLEANUP
 AT_SETUP([Bug 13718 (https://gna.org/bugs/?13718)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13718.owfn .])
-AT_CHECK([WENDY bug13718.owfn --verbose --og --formula=2],0,ignore,stderr)
+AT_CHECK([WENDY bug13718.owfn --verbose --og --formula=bits],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 8 sane nodes reachable" stderr])
 AT_CHECK([GREP -c ":: S" bug13718.og],0,[4
 ])
@@ -568,6 +568,19 @@ AT_CHECK([cp TESTFILES/zeus.* .])
 AT_CHECK([WENDY zeus.owfn --fionaFormat --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 6 sane nodes reachable" stderr])
 AT_CHECK([FIONA -tequivalence zeus.og zeus.fiona.og],0,ignore,ignore)
+AT_KEYWORDS(og)
+AT_CLEANUP
+
+AT_SETUP([Bit Annotation (T, S, F bits)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bits.* .])
+AT_CHECK([WENDY bits.owfn --og --formula=bits --verbose],0,ignore,stderr)
+AT_CHECK([GREP -c ":: T" bits.og],0,[2
+])
+AT_CHECK([GREP -c ":: F" bits.og],0,[1
+])
+AT_CHECK([GREP -c ":: S" bits.og],0,[1
+])
 AT_KEYWORDS(og)
 AT_CLEANUP
 

@@ -93,8 +93,8 @@ optional
 
 option "formula" -
   "Set the formula style for outputs."
-  details="Choose between either standard formulae in conjunctive normal form (`cnf') or a compact 2-bit-representation (`2bits'). Note that the 2-bit-representation cannot be used if synchronous communication occurs in the input file.\n"
-  values="cnf","2bits" enum
+  details="Choose between either standard formulae in conjunctive normal form (`cnf') or a compact bit-representation (`bits'). Note that the 2-bit-representation cannot be used if synchronous communication occurs in the input file.\n"
+  values="cnf","bits" enum
   typestr="STYLE"
   dependon="og"
   default="cnf"

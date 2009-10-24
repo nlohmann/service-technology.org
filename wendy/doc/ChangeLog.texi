@@ -1,6 +1,8 @@
 @heading Version 2.4-unreleased
 @itemize
 @item added target for benchmarks (execute @samp{make bench -C tests})
+
+@item implemented new 3-bit representation: at @samp{T} bit is necessary to correctly cope with ``true''-annotated nodes -- renamed @option{2bits} option to @option{bits}
 @end itemize
 
 @heading Version 2.3 (21 October 2009)

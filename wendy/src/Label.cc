@@ -129,7 +129,7 @@ void Label::initialize() {
         events, send_events+receive_events, sync_events);
 
     // 2-bit annotations must not be used with synchronous communication
-    if (Label::sync_events > 0 and args_info.formula_arg == formula_arg_2bits) {
+    if (Label::sync_events > 0 and args_info.formula_arg == formula_arg_bits) {
         abort(10, "2-bit annotations must not be used with synchronous communication");
     }
 }

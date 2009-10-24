@@ -7,67 +7,35 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = bug1.fiona.og bug1.owfn \
-            bug2.fiona.og bug2.owfn \
-            bug3.fiona.og bug3.owfn \
-            bug4.fiona.og bug4.owfn \
-            bug5.fiona.og bug5.owfn \
-            bug6.fiona.og bug6.owfn \
-            bug7.fiona.og bug7.owfn \
-            bug8.fiona.og bug8.owfn \
-            bug9.fiona.og bug9.owfn \
-            bug10.owfn \
-            bug11.owfn \
-            bug13651.owfn \
-            bug13718.owfn \
-            bug13994-1.owfn bug13994-2.owfn \
-            bug14025.owfn \
-            bug14150.owfn \
-            bug14158.owfn \
-            bug14166.owfn \
-            carreservation_with_engine.owfn \
-            coverFiona_Nc1.owfn coverFiona_Nc1.owfn.cov\
-            coverFiona_Nc2.owfn coverFiona_Nc2.owfn.cov \
-            coverFiona_Nc3.owfn coverFiona_Nc3.owfn.cov \
-            sync_cover.owfn sync_cover.owfn.cov \
-            error02.owfn \
-            error03.owfn \
-            error04-1.owfn error04-2.owfn \
-            error06.owfn \
-            error10.owfn \
-            error16.1.cov \
-            error16.2.cov \
-            myCoffee.fiona.og myCoffee.owfn \
-            phcontrol3.unf.fiona.og phcontrol3.unf.owfn \
-            phcontrol9.unf.owfn phcontrol6.unf.owfn \
-            phil5.owfn \
-            small.owfn \
-            PO.fiona.og PO.owfn \
-            mia-PO.owfn mia-PO-pv.owfn \
-            mia-reg_new.owfn mia-reg_old.owfn \
-            QR.fiona.og QR.owfn \
-            regist-priv.owfn regist-priv.owfn.cov \
-            seqTest1.fiona.og seqTest1.owfn \
-            seqTest2.fiona.og seqTest2.owfn \
-            seqTest3.fiona.og  seqTest3.owfn \
-            sequence10.fiona.og sequence10.owfn \
-            smtp3.fiona.og smtp3.owfn \
-            T2.fiona.og T2.owfn \
-            test-sync.owfn \
-            sync_deadlock.owfn \
-            zeus.fiona.og zeus.owfn \
-            LF_DF_controllable.owfn \
-            nLF_DF_controllable.owfn \
-            LF_DF_controllable2.owfn \
-            smartSendingEvent.owfn smartSendingEvent.fiona.og \
-            06-03-23_BPM06_shop_sect_6.owfn 06-03-23_BPM06_shop_sect_6.fiona.og \
-            genericNonTrivialSCC.owfn \
-            marlene-ca.owfn marlene-td.ar marlene-td.owfn \
-            genericSynchLFQAP.owfn \
-            dead.owfn mb.owfn nlc.owfn uncontrollable.owfn \
-            Lohmann_2008_wsfm-Fig2b.owfn \
-            SaScSdRb.owfn \
-            AP.owfn
+TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
+            06-03-23_BPM06_shop_sect_6.owfn AP.owfn LF_DF_controllable.owfn \
+            LF_DF_controllable2.owfn Lohmann_2008_wsfm-Fig2b.owfn \
+            PO.fiona.og PO.owfn QR.fiona.og QR.owfn SaScSdRb.owfn \
+            T2.fiona.og T2.owfn bits.owfn bug1.fiona.og bug1.owfn bug10.owfn \
+            bug11.owfn bug13651.owfn bug13718.owfn bug13994-1.owfn \
+            bug13994-2.owfn bug14025.owfn bug14150.owfn bug14158.owfn \
+            bug14166.owfn bug2.fiona.og bug2.owfn bug3.fiona.og bug3.owfn \
+            bug4.fiona.og bug4.owfn bug5.fiona.og bug5.owfn bug6.fiona.og \
+            bug6.owfn bug7.fiona.og bug7.owfn bug8.fiona.og bug8.owfn \
+            bug9.fiona.og bug9.owfn carreservation_with_engine.owfn \
+            coverFiona_Nc1.owfn coverFiona_Nc1.owfn.cov coverFiona_Nc2.owfn \
+            coverFiona_Nc2.owfn.cov coverFiona_Nc3.owfn \
+            coverFiona_Nc3.owfn.cov dead.owfn error02.owfn error03.owfn \
+            error04-1.owfn error04-2.owfn error06.owfn error10.owfn \
+            error16.1.cov error16.2.cov genericNonTrivialSCC.owfn \
+            genericSynchLFQAP.owfn marlene-ca.owfn marlene-td.ar \
+            marlene-td.owfn mb.owfn mia-PO-pv.owfn mia-PO.owfn \
+            mia-reg_new.owfn mia-reg_old.owfn myCoffee.fiona.og \
+            myCoffee.owfn nLF_DF_controllable.owfn nlc.owfn \
+            phcontrol3.unf.fiona.og phcontrol3.unf.owfn phcontrol6.unf.owfn \
+            phcontrol9.unf.owfn phil5.owfn regist-priv.owfn \
+            regist-priv.owfn.cov seqTest1.fiona.og seqTest1.owfn \
+            seqTest2.fiona.og seqTest2.owfn seqTest3.fiona.og seqTest3.owfn \
+            sequence10.fiona.og sequence10.owfn small.owfn \
+            smartSendingEvent.fiona.og smartSendingEvent.owfn \
+            smtp3.fiona.og smtp3.owfn sync_cover.owfn sync_cover.owfn.cov \
+            sync_deadlock.owfn test-sync.owfn uncontrollable.owfn \
+            zeus.fiona.og zeus.owfn
 
 
 

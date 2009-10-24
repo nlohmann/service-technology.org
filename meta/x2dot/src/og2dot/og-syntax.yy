@@ -168,21 +168,21 @@ formula:
   RPAR {strStream << ")";}
 
 | formula 
-  OP_AND {strStream << " and ";} 
+  OP_AND {strStream << " &and; ";} 
   formula 
 
 | formula 
-  OP_OR  {strStream << " or ";} 
+  OP_OR  {strStream << " &or; ";} 
   formula 
 
-| OP_NOT  {strStream << " not ";} 
+| OP_NOT  {strStream << " &not; ";} 
   formula 
 
-| KEY_FINAL {strStream << " final ";}
+| KEY_FINAL {strStream << " FINAL ";}
 
-| KEY_TRUE {strStream << " true ";}
+| KEY_TRUE {strStream << " TRUE ";}
 
-| KEY_FALSE {strStream << " false ";}
+| KEY_FALSE {strStream << " FALSE ";}
 
 | IDENT {strStream << $1;}
 ;

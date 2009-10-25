@@ -1,0 +1,81 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --waitstatesOnly --succeedingSendingEvent --quitAsSoonAsPossible ../cosme/tests/Niels/RS.owfn -v --sa=../cosme/tests/Niels/RS-partner.sa --lola=src/lola-statespace 
+  events:       2 send, 8 receive, 0 synchronous
+  statistics:   26 nodes
+}
+
+INTERFACE
+  INPUT
+    out.Reservations_Process_Reservation_.Rental_Reservation, out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations, out.Reservations_Rental_Agent.Charge_Customer, out.Reservations_Rental_Agent.Create_Customer_Profile, out.Reservations_Rental_Agent.Customer_Welcome, out.Reservations_Rental_Agent.Determine_Price___Discount, out.Reservations_Rental_Agent.Negociate_CarGroup, out.Reservations_Rental_Agent.Select_Payment_Type;
+  OUTPUT
+    in.Reservations_Rental_Agent.Charge_Customer, in.Reservations_Rental_Requester.Rental_Request;
+
+NODES
+  168491136 : INITIAL
+    in.Reservations_Rental_Requester.Rental_Request -> 168576096
+  168498864
+    out.Reservations_Rental_Agent.Charge_Customer -> 168500176
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168507472
+    out.Reservations_Rental_Agent.Customer_Welcome -> 168508224
+  168500176
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168500576
+    out.Reservations_Rental_Agent.Customer_Welcome -> 168504792
+  168500576
+    out.Reservations_Rental_Agent.Customer_Welcome -> 168501104
+  168501104
+    out.Reservations_Rental_Agent.Determine_Price___Discount -> 168501472
+  168501472
+    out.Reservations_Rental_Agent.Negociate_CarGroup -> 168501968
+  168501968
+    out.Reservations_Rental_Agent.Select_Payment_Type -> 168502336
+  168502336
+    in.Reservations_Rental_Agent.Charge_Customer -> 168504504
+  168504088 : FINAL
+  168504504
+    out.Reservations_Process_Reservation_.Rental_Reservation -> 168504088
+  168504792
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168501104
+    out.Reservations_Rental_Agent.Determine_Price___Discount -> 168504904
+  168504904
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168501472
+    out.Reservations_Rental_Agent.Negociate_CarGroup -> 168505016
+  168505016
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168501968
+    out.Reservations_Rental_Agent.Select_Payment_Type -> 168505280
+  168505280
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168502336
+    in.Reservations_Rental_Agent.Charge_Customer -> 168506040
+  168506040
+    out.Reservations_Process_Reservation_.Rental_Reservation -> 168506672
+  168506672 : FINAL
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168504088
+  168507472
+    out.Reservations_Rental_Agent.Charge_Customer -> 168500576
+    out.Reservations_Rental_Agent.Customer_Welcome -> 168507648
+  168507648 : FINAL
+    out.Reservations_Rental_Agent.Charge_Customer -> 168501104
+  168508224 : FINAL
+    out.Reservations_Rental_Agent.Charge_Customer -> 168504792
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168507648
+  168509848
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168500176
+  168510376
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168507472
+    out.Reservations_Rental_Agent.Charge_Customer -> 168510552
+    out.Reservations_Rental_Agent.Customer_Welcome -> 168510664
+  168510552
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168500576
+  168510664 : FINAL
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168507648
+  168511376 : FINAL
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168508224
+    out.Reservations_Rental_Agent.Charge_Customer -> 168520864
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168510664
+  168520864
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168504792
+  168576096
+    out.Reservations_Rental_Agent.Ask_for_Rental_Dates_and_Locations -> 168498864
+    out.Reservations_Rental_Agent.Charge_Customer -> 168509848
+    out.Reservations_Rental_Agent.Create_Customer_Profile -> 168510376
+    out.Reservations_Rental_Agent.Customer_Welcome -> 168511376

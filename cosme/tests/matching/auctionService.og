@@ -1,0 +1,98 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy ../cosme/tests/Niels/auctionService.owfn --og --formula=bits --lola=src/lola-statespace 
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   16 nodes
+}
+
+INTERFACE
+  INPUT
+    out.auctionHouse.auctionRegistrationService.process, out.auctionHouse.buyer.answer, out.auctionHouse.seller.answer;
+  OUTPUT
+    in.buyer.auctionHouse.submit, in.auctionRegistrationService.auctionHouse.answer, in.seller.auctionHouse.submit;
+
+NODES
+  166374344 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.buyer.auctionHouse.submit -> 166393256
+    in.auctionRegistrationService.auctionHouse.answer -> 166374136
+    in.seller.auctionHouse.submit -> 166344264
+  166341640 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 166346296
+  166343776
+    out.auctionHouse.auctionRegistrationService.process -> 166341640
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 166344576
+  166344264 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.buyer.auctionHouse.submit -> 166343776
+    in.auctionRegistrationService.auctionHouse.answer -> 166345648
+  166344576
+    out.auctionHouse.auctionRegistrationService.process -> 166346296
+    out.auctionHouse.buyer.answer -> 166348824
+    out.auctionHouse.seller.answer -> 166349208
+  166345648 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.buyer.auctionHouse.submit -> 166344576
+  166346296
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 166347504
+    out.auctionHouse.seller.answer -> 166348448
+  166347504
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 166348128
+  166348128 :: F
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+  166348448
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 166348128
+    out.auctionHouse.seller.answer -> 0
+  166348824
+    out.auctionHouse.auctionRegistrationService.process -> 166347504
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 166349064
+  166349064
+    out.auctionHouse.auctionRegistrationService.process -> 166348128
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+  166349208
+    out.auctionHouse.auctionRegistrationService.process -> 166348448
+    out.auctionHouse.buyer.answer -> 166349064
+    out.auctionHouse.seller.answer -> 0
+  166371528 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.seller.auctionHouse.submit -> 166344576
+  166374136 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.buyer.auctionHouse.submit -> 166371528
+    in.seller.auctionHouse.submit -> 166345648
+  166393256 :: S
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 166371528
+    in.seller.auctionHouse.submit -> 166343776
+  0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.seller.auctionHouse.submit -> 0

@@ -1,0 +1,37 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --waitstatesOnly --succeedingSendingEvent --quitAsSoonAsPossible ../cosme/tests/Niels/AP.owfn -v --sa=AP-partner.sa --lola=src/lola-statespace 
+  events:       2 send, 9 receive, 0 synchronous
+  statistics:   12 nodes
+}
+
+INTERFACE
+  INPUT
+    out.Ausstellung_Personalausweis.Fachverfahren_Einwohnermeldewesen.M.Ausstellung_Personalausweis.Personalausweis_ausstellen, out.Ausstellung_Personalausweis.Fachverfahren_Einwohnermeldewesen.M.Ausstellung_Personalausweis.Postzustelladresse_prüfen, out.Ausstellung_Personalausweis.Internet-Portal.M.Ausstellung_Personalausweis.Antrag_auf_Personalausweis_stellen, out.Ausstellung_Personalausweis.Mitarbeiterportal.M.Ausstellung_Personalausweis.Antrag_prüfen, out.Ausstellung_Personalausweis.Process_Engine.M.Ausstellung_Personalausweis.Daten_an_zuständiges_Einwohnermeldeamt_leiten, out.Ausstellung_Personalausweis.Process_Engine.M.Ausstellung_Personalausweis.Zahlungsart_feststellen, out.Ausstellung_Personalausweis.Process_Engine.M.Ausstellung_Personalausweis.Zuständigkeit_prüfen, out.Ausstellung_Personalausweis.Process_Engine_Zahlungsplattform.M.Ausstellung_Personalausweis.Zahlungseingang_prüfen, out.Ausstellung_Personalausweis.Stadt_XY.M.Ausstellung_Personalausweis.Antrag_auf_Personalausweis_bearbeiten;
+  OUTPUT
+    in.Fachverfahren_Einwohnermeldewesen.Ausstellung_Personalausweis.M.Ausstellung_Personalausweis.Personalausweis_ausstellen, in.Kommunikationskomponente.Ausstellung_Personalausweis.Antragsteller_benachrichtigen;
+
+NODES
+  147649488 : INITIAL
+    out.Ausstellung_Personalausweis.Fachverfahren_Einwohnermeldewesen.M.Ausstellung_Personalausweis.Personalausweis_ausstellen -> 148001496
+  148001496
+    out.Ausstellung_Personalausweis.Fachverfahren_Einwohnermeldewesen.M.Ausstellung_Personalausweis.Postzustelladresse_prüfen -> 148138592
+  148138592
+    out.Ausstellung_Personalausweis.Internet-Portal.M.Ausstellung_Personalausweis.Antrag_auf_Personalausweis_stellen -> 148203552
+  148203552
+    out.Ausstellung_Personalausweis.Process_Engine.M.Ausstellung_Personalausweis.Daten_an_zuständiges_Einwohnermeldeamt_leiten -> 148299408
+  148206560
+    out.Ausstellung_Personalausweis.Process_Engine.M.Ausstellung_Personalausweis.Zuständigkeit_prüfen -> 148507104
+  148299408
+    out.Ausstellung_Personalausweis.Process_Engine.M.Ausstellung_Personalausweis.Zahlungsart_feststellen -> 148206560
+  148507104
+    out.Ausstellung_Personalausweis.Process_Engine_Zahlungsplattform.M.Ausstellung_Personalausweis.Zahlungseingang_prüfen -> 148610464
+  148610464
+    out.Ausstellung_Personalausweis.Stadt_XY.M.Ausstellung_Personalausweis.Antrag_auf_Personalausweis_bearbeiten -> 148704896
+  148704896
+    in.Fachverfahren_Einwohnermeldewesen.Ausstellung_Personalausweis.M.Ausstellung_Personalausweis.Personalausweis_ausstellen -> 149925720
+  149925720
+    out.Ausstellung_Personalausweis.Mitarbeiterportal.M.Ausstellung_Personalausweis.Antrag_prüfen -> 151065064
+  151065064
+    in.Kommunikationskomponente.Ausstellung_Personalausweis.Antragsteller_benachrichtigen -> 151790432
+  151790432 : FINAL

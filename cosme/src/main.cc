@@ -145,7 +145,7 @@ Service* parseService(char* file) {
          << file << "'" << endl;
 		return NULL;
 	}	
-	
+
 	// parse OWFN
 	InputStream >> pnapi::io::owfn >> tmpNet;
 	InputStream.close();

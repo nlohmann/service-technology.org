@@ -1,0 +1,27 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --waitstatesOnly --succeedingSendingEvent --quitAsSoonAsPossible ../cosme/tests/Niels/phcontrol3.unf.owfn -v --sa=../cosme/tests/Niels/phcontrol3.unf-partner.sa --lola=src/lola-statespace 
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   7 nodes
+}
+
+INTERFACE
+  INPUT
+    interface_out_1, interface_out_2, interface_out_3;
+  OUTPUT
+    interface_in_1, interface_in_2, interface_in_3;
+
+NODES
+  135939960 : INITIAL
+    interface_in_1 -> 135902712
+  135891800
+    interface_in_3 -> 135910184
+  135892264
+    interface_out_2 -> 135891800
+  135902712
+    interface_out_1 -> 135923064
+  135904376 : FINAL
+  135910184
+    interface_out_3 -> 135904376
+  135923064
+    interface_in_2 -> 135892264

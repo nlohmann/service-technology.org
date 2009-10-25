@@ -1,0 +1,37 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --waitstatesOnly --succeedingSendingEvent --quitAsSoonAsPossible ../cosme/tests/Niels/TR.owfn -v --sa=../cosme/tests/Niels/TR-partner.sa --lola=src/lola-statespace 
+  events:       3 send, 6 receive, 0 synchronous
+  statistics:   12 nodes
+}
+
+INTERFACE
+  INPUT
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung, out.Ticket-Reservierung_Kunde.E1, out.Ticket-Reservierung_Kunde.Flugangebote, out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung, out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen, out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen;
+  OUTPUT
+    in.Ticket-Reservierung_Kunde.E1, in.Ticket-Reservierung_Kunde.Eingang_Antrag, in.Ticket-Reservierung_Kunde.Flugangebote;
+
+NODES
+  149644552 : INITIAL
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 149260000
+  149260000
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 149295808
+  149292544
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 149307304
+  149295808
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 149302936
+  149302936
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 149306360
+  149306360
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 149311864
+  149307304 : FINAL
+  149311864
+    out.Ticket-Reservierung_Kunde.E1 -> 149317472
+  149317472
+    in.Ticket-Reservierung_Kunde.E1 -> 149320680
+  149320680
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 149326256
+  149326256
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 149332488
+  149332488 : FINAL
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 149292544

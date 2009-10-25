@@ -1,0 +1,21 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --waitstatesOnly --succeedingSendingEvent --quitAsSoonAsPossible ../cosme/tests/Niels/myCoffee.owfn -v --sa=../cosme/tests/Niels/myCoffee-partner.sa --lola=src/lola-statespace 
+  events:       3 send, 1 receive, 0 synchronous
+  statistics:   4 nodes
+}
+
+INTERFACE
+  INPUT
+    B;
+  OUTPUT
+    E, T, C;
+
+NODES
+  143496592 : INITIAL
+    E -> 143485496
+  143484992
+    B -> 143485824
+  143485496
+    T -> 143484992
+  143485824 : FINAL

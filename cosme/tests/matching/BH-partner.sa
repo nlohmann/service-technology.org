@@ -1,0 +1,41 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --waitstatesOnly --succeedingSendingEvent --quitAsSoonAsPossible ../cosme/tests/Niels/BH.owfn -v --sa=../cosme/tests/Niels/BH-partner.sa --lola=src/lola-statespace 
+  events:       2 send, 5 receive, 0 synchronous
+  statistics:   12 nodes
+}
+
+INTERFACE
+  INPUT
+    out.Bestellung_Hauslieferung_Bote.Bestellung_liefern, out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen, out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_registrieren, out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Entschuldigung_und_Rückerstattung, out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Kunden_benachrichtigen;
+  OUTPUT
+    in.Bestellung_Hauslieferung_Bote.Bestellung_liefern, in.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen;
+
+NODES
+  168780696 : INITIAL
+    out.Bestellung_Hauslieferung_Bote.Bestellung_liefern -> 168770096
+  168770096
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen -> 168873880
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_registrieren -> 168918712
+  168873880
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_registrieren -> 168883320
+  168883320
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Entschuldigung_und_Rückerstattung -> 168889584
+  168889584
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Kunden_benachrichtigen -> 168893040
+  168893040
+    in.Bestellung_Hauslieferung_Bote.Bestellung_liefern -> 168894616
+  168894616
+    in.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen -> 168910136
+  168910136 : FINAL
+  168918712
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen -> 168883320
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Entschuldigung_und_Rückerstattung -> 168929144
+  168929144
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen -> 168889584
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Kunden_benachrichtigen -> 168944624
+  168944624
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen -> 168893040
+    in.Bestellung_Hauslieferung_Bote.Bestellung_liefern -> 168962312
+  168962312 : FINAL
+    out.Bestellung_Hauslieferung_Verkäufer_per_Telefon.Bestellung_im_voraus_ausführen -> 168894616

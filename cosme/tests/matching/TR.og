@@ -1,0 +1,856 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy ../cosme/tests/Niels/TR.owfn --og --formula=bits --lola=src/lola-statespace 
+  events:       3 send, 6 receive, 0 synchronous
+  statistics:   110 nodes
+}
+
+INTERFACE
+  INPUT
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung, out.Ticket-Reservierung_Kunde.E1, out.Ticket-Reservierung_Kunde.Flugangebote, out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung, out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen, out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen;
+  OUTPUT
+    in.Ticket-Reservierung_Kunde.E1, in.Ticket-Reservierung_Kunde.Eingang_Antrag, in.Ticket-Reservierung_Kunde.Flugangebote;
+
+NODES
+  152154088
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 152136648
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151843584
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 152269336
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151974632
+  151792680
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151796176
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151957904
+  151792784
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151811384
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151826888
+    in.Ticket-Reservierung_Kunde.E1 -> 152006352
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151809912
+  151792984
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151988056
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151793520
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151940272
+    out.Ticket-Reservierung_Kunde.E1 -> 151967616
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152273504
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151996408
+  151793880 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 151809912
+  151796176 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151801320
+  151801320 :: F
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152130544
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151980144
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151809912
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151979200
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151843224
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151894552
+  151811384
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151957360
+    in.Ticket-Reservierung_Kunde.E1 -> 151950312
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151843224
+  151816864
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151980144
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151817472
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151817472
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151998712
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151821208
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151863072
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151989416
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151801320
+  151822112
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151796176
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151979744
+  151822368
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151796176
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151821208
+  151824808 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151957904
+  151826888
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151957360
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151792984
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151894552
+  151833360
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151822368
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151792680
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151845480
+  151843224
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151957288
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151918680
+    in.Ticket-Reservierung_Kunde.E1 -> 151940272
+  151843464
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152130544
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151817472
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151843584
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151958056
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 151980304
+  151845480
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151821208
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151894696
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151894976
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151957904
+  151847528
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151824808
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151852848
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 152130544
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151853216
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151853216
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151998712
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151853368
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151980144
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151853216
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151863072
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151866160
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 152130544
+  151866160
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151998712
+  151874344
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151853368
+    out.Ticket-Reservierung_Kunde.E1 -> 151992384
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151885424
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151875416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151826888
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152286336
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151898816
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 152029792
+  151877184
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151863072
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152248896
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151968240
+  151885424
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151853216
+    out.Ticket-Reservierung_Kunde.E1 -> 151984160
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151891376
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151796176
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151935664
+  151893416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151918016
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151847528
+  151894552
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151893416
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151918680
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151894696
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151863072
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152004336
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151843464
+  151894976
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151989416
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152004336
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151816864
+  151898816
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151792984
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151995912
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151902144
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151863072
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151930016
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151852848
+  151903656
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151792680
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151891376
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151911992
+  151911992
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151957904
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151935664
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151964088
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151915880
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151913664
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151918680
+    out.Ticket-Reservierung_Kunde.E1 -> 151966296
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151996408
+  151915128
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151817472
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151984160
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151915880
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151816864
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151992384
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151915128
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151918016 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151792680
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151824808
+  151918680
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151918016
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151997768
+  151923136
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151822368
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151891376
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151953344
+  151930016
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151866160
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151853216
+  151934216
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151957288
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151966296
+    in.Ticket-Reservierung_Kunde.E1 -> 151967616
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 152248008
+  151935664
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151801320
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151968240
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151992384
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151940272
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151833360
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151976648
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151997768
+  151947432
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151989416
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151930016
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151853368
+  151949776
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151821208
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151902144
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151947432
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151979744
+  151950312
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151988056
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151940272
+  151953344
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151821208
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151877184
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152252184
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151935664
+  151955496
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151980464
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152248008
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151993088
+  151956408
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151824808
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151911992
+  151957288
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151918016
+    in.Ticket-Reservierung_Kunde.E1 -> 151833360
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 152025088
+  151957360 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151988056
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151918680
+  151957904
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151801320
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151843464
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151816864
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151958056 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 152006352
+  151964088
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151843464
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151968240
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151915128
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151965072
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151949776
+    out.Ticket-Reservierung_Kunde.E1 -> 151953344
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152275416
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152276416
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 152022320
+  151966296
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151918016
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151903656
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151956408
+  151967416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151852848
+    out.Ticket-Reservierung_Kunde.E1 -> 151968240
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151885424
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151967616
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151833360
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151923136
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151903656
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 152003664
+  151968240
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 152130544
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151984160
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151971216
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151822112
+    out.Ticket-Reservierung_Kunde.E1 -> 151891376
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 152022320
+  151974632
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151793880
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 152257768
+  151976648
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151822368
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151822112
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151949776
+  151979200
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151957288
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151893416
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151980464
+  151979744
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151801320
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151852848
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151853368
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151980144
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151998712
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151980304
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 152006352
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152011560
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151898816
+  151980464
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152025088
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151847528
+  151984160
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151998712
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151987072
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151893416
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151966296
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151993088
+  151988056 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151997768
+  151989416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151866160
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151980144
+  151992384
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151980144
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151984160
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151992416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151843224
+    out.Ticket-Reservierung_Kunde.E1 -> 151934216
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151913664
+    in.Ticket-Reservierung_Kunde.E1 -> 151793520
+  151993088
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151847528
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151956408
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151995912
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151988056
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151996408
+  151996408
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151997768
+    out.Ticket-Reservierung_Kunde.E1 -> 151903656
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151971216
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151997768
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 151792680
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151822112
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  151998712 :: F
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  152003664
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151845480
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151953344
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152265952
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152273160
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151911992
+  152004336
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151866160
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151817472
+  152006352
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151950312
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151792984
+  152011560
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151950312
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151995912
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151793520
+  152022320
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151979744
+    out.Ticket-Reservierung_Kunde.E1 -> 151935664
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 151967416
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151874344
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  152025088
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151824808
+    in.Ticket-Reservierung_Kunde.E1 -> 151845480
+  152029792
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151894552
+    out.Ticket-Reservierung_Kunde.E1 -> 151987072
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151913664
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  152130544
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 151998712
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+  152136648 :: S
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151958056
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 151792784
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151793880
+  152247304
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151811384
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 152286336
+    in.Ticket-Reservierung_Kunde.E1 -> 152011560
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151992416
+  152248008
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 152025088
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151956408
+    in.Ticket-Reservierung_Kunde.E1 -> 152003664
+  152248896
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151866160
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151984160
+  152252184
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151989416
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152248896
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151992384
+  152257768
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151809912
+    out.Ticket-Reservierung_Kunde.E1 -> 152264088
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151992416
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 152029792
+  152264088
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151979200
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151934216
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151987072
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151955496
+  152265952
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151894696
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 151877184
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152272776
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151964088
+  152269336
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151792784
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152247304
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151875416
+    in.Ticket-Reservierung_Kunde.E1 -> 151980304
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 152257768
+  152272776
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 152004336
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152248896
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151915128
+  152273160
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151894976
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 152252184
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152272776
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151915880
+  152273504
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151976648
+    out.Ticket-Reservierung_Kunde.E1 -> 151923136
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151971216
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151965072
+  152275416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151902144
+    out.Ticket-Reservierung_Kunde.E1 -> 151877184
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 152276032
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151967416
+  152276032
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151930016
+    out.Ticket-Reservierung_Kunde.E1 -> 152248896
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151885424
+  152276416
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151947432
+    out.Ticket-Reservierung_Kunde.E1 -> 152252184
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 152276032
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 151874344
+  152286336
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 151957360
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 151995912
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 151913664
+  0
+    out.Ticket-Reservierung_Fluggesellschaft.Reservierungsstornierung -> 0
+    out.Ticket-Reservierung_Kunde.E1 -> 0
+    out.Ticket-Reservierung_Kunde.Flugangebote -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.CRM-Aktualisierung -> 0
+    out.Ticket-Reservierung_Ticket-Schalter.Flugticket_ausstellen -> 0
+    out.Ticket-Reservierung_Verantwortlicher_Kunden-Follow-Up.Suche_nach_Flügen -> 0
+    in.Ticket-Reservierung_Kunde.E1 -> 0
+    in.Ticket-Reservierung_Kunde.Eingang_Antrag -> 0
+    in.Ticket-Reservierung_Kunde.Flugangebote -> 0

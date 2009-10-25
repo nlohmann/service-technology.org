@@ -26,17 +26,17 @@
  * Headers
  *****************************************************************************/
 
+#include <config.h>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include <map>
 #include <utility>
 
 #include <libgen.h>     // for ::basename
 
-#include "config.h"
 #include "uml2owfn-io.h"
 #include "options.h"
 #include "helpers.h"

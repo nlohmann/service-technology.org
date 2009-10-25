@@ -22,15 +22,13 @@
  *****************************************************************************/
 
 
-#include <stdio.h>
-#include <string.h>
+#include <config.h>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cassert>
 #include <map>
-
-#include "config.h"     // generated configuration file
 
 #include "uml2owfn-io.h"  // file input and output operations
 

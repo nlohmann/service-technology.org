@@ -20,7 +20,7 @@
 #ifndef UML2OWFNIO_H_
 #define UML2OWFNIO_H_
 
-#include <string.h>
+#include <cstring>
 
 #include "pnapi/pnapi.h"
 #include "petrinet-formula.h"

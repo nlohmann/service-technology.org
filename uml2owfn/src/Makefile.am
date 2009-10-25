@@ -22,10 +22,6 @@ uml2owfn_SOURCES = uml2owfn.cc \
 		    AST.cc AST.h AST-public.h \
 		    internal-representation.cc internal-representation.h UML-public.h
 		    
-# pnapi.h petrinet.h petrinet.cc
-# petrinet-output.cc petrinet-reduction.cc
-# petrinet-formula.cc petrinet-formula.h
-
 
 # These sources have to be present before the rest is compiled.
 BUILT_SOURCES = frontend-parser.cc
@@ -39,13 +35,9 @@ EXTRA_DIST = frontend-parser.h
 
 uml2owfn_LDFLAGS  = @configured_LDFLAGS@
 uml2owfn_CFLAGS   = @configured_CFLAGS@
-uml2owfn_CXXFLAGS = @configured_CXXFLAGS@
-
-# only add the local Petri net API if necessary
-if COMPILE_PNAPI
-uml2owfn_CXXFLAGS += -I$(top_srcdir)/libs
+uml2owfn_CXXFLAGS = @configured_CXXFLAGS@ -I$(top_srcdir)/libs
 uml2owfn_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
-endif
+
 
 ############################
 # organization of cleaning #

@@ -22,9 +22,9 @@
  * Headers
  *****************************************************************************/
 
+#include <config.h>
 #include <fstream>	// (std::ofstream)
 #include <sstream>	// (std::ostringstream, std::istringstream)
-#include <cassert>
 
 #include "debug.h"	// (trace)
 #include "helpers.h"

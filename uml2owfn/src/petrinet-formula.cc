@@ -35,7 +35,7 @@
  * \ingroup petrinet
  */
 
-#include <cassert>
+#include <config.h>
 #include <iostream>
 #include <set>
 #include <sstream>

@@ -17,14 +17,14 @@
  along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#include <stdio.h>
+#include <config.h>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include <libgen.h>     // for ::basename
 
-#include "config.h"
 #include "uml2owfn-io.h"
 
 #include "debug.h"      // debugging help

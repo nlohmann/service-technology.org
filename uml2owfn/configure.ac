@@ -52,24 +52,6 @@ fi
 # Petri net API
 AC_PROG_RANLIB
 
-# only use installed Petri Net API if this was configured with --enable-pnapi
-AC_ARG_ENABLE(pnapi,
-  AS_HELP_STRING([--enable-pnapi],[use installed Petri Net API (disabled by default)]),
-  enable_pnapi=${enableval}, enable_pnapi="no")
-AC_MSG_CHECKING([whether to use installed Petri Net API])
-AC_MSG_RESULT($enable_pnapi)
-if test "$enable_pnapi" = "yes"; then
-  # check if the Petri Net API is already installed
-  AM_MISSING_PROG(PKG_CONFIG, pkg-config)
-  AC_CHECK_LIB(pnapi, main)
-  if test "${ac_cv_lib_pnapi_main}" = "no"; then
-    AC_MSG_WARN([Petri Net API was not found!])
-    AC_MSG_WARN([Using shiped version from /libs/pnapi.])
-  fi
-  AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
-else
-  AM_CONDITIONAL(COMPILE_PNAPI, [true])
-fi
 
 ############################################################################
 # further compiler flags and definitions.
@@ -97,21 +79,13 @@ if test "$enable_debug" = "yes"; then
   configured_LDFLAGS=$configured_LDFLAGS" -g"
 fi
 
-# parameter "--disable-assert"
-AC_ARG_ENABLE(assert,
-  AS_HELP_STRING([--disable-assert],[disable assertions and verbose debug messages (enabled by default)]),
-  [enable_assert=${enableval}], [enable_assert=yes])
-AC_MSG_CHECKING([whether to use assertions])
-AC_MSG_RESULT($enable_assert)
-AC_DEFINE_UNQUOTED(CONFIG_ENABLEASSERT, "$enable_assert", [whether to use assertions])
-
-if test "$enable_assert" = "no"; then
-  if test "$enable_debug" = "no"; then
-    AC_DEFINE(NDEBUG,1,[Turn off assertions and verbose debug messages.])
-  else
-    AC_MSG_ERROR([Cannot combine `--disable-assert' and `--enable-debug'])
-  fi
-fi
+# allow the configure script to control assertions (just include config.h)
+AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
 
 # parameter "--enable-64bit"
 AC_ARG_ENABLE(64bit,
@@ -168,10 +142,10 @@ AC_SUBST(configured_LDFLAGS)
 # Set files to generate.
 ############################################################################
 AC_CONFIG_FILES([Makefile 
-				 libs/pnapi/Makefile 
-				 src/Makefile 
+                 libs/pnapi/Makefile 
+                 src/Makefile 
                  tests/Makefile 
-                 anon/Makefile  
+                 utils/Makefile  
                  doc/Makefile
                  doc/Doxyfile
                  tests/package.m4])

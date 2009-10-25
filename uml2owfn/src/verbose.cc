@@ -19,11 +19,11 @@
 \*****************************************************************************/
 
 
+#include <config.h>
 #include <cstdarg>
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
-#include <config.h>
 
 #include "debug.h"
 

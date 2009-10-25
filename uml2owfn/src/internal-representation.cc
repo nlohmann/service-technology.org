@@ -17,7 +17,7 @@
  along with UML2oWFN.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#include <cassert>
+#include <config.h>
 #include <iostream>
 #include <utility>
 #include "debug.h"

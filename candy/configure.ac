@@ -27,6 +27,7 @@ AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_SED
 AC_PROG_GREP
+AC_PROG_AWK
 
 # checks for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)

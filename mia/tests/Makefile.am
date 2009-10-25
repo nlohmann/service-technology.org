@@ -10,7 +10,10 @@
 TESTFILES = reg_old.owfn reg_new.owfn \
             sequence5.owfn sequence5-pv.owfn \
             ex1.owfn ex2.owfn \
-            PO.owfn PO-pv.owfn
+            PO.owfn PO-pv.owfn \
+            AP.owfn AP-pv.owfn \
+            CN.owfn CN-pv.owfn \
+            DG.owfn DG-pv.owfn
 
 
 # Below you can list all the files you do not want to have counted in the
@@ -33,7 +36,7 @@ NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.c */verbose.*
 ################
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+EXTRA_DIST = testsuite.at wrap.sh \
              $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 
@@ -112,3 +115,20 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcov -exec rm {} \;
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
+
+
+##############
+# BENCHMARKS #
+##############
+
+EXTRA_DIST += benchmarks.at
+
+# create the benchmark script using autom4te
+benchmarks: $(srcdir)/benchmarks.at
+	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	mv $@.tmp $@
+
+bench: atconfig benchmarks
+	test ! -d benchmarks-results || rm -fr benchmarks-results
+	$(MKDIR_P) benchmarks-results
+	$(SHELL) 'benchmarks' $(TESTSUITEFLAGS)

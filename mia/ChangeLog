@@ -17,6 +17,11 @@ Version 1.2-unreleased
   (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
   coverage (use `make cover' in `tests' directory)
 
+* added target for benchmarks (execute `make bench -C tests')
+
+* implemented parameter `--stats' to display information on runtime and
+  memory consumption (the latter uses `ps' and does not work under Cygwin)
+
 Version 1.1
 ===========
 

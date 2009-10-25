@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include <cstdlib>
+#include <ctime>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -43,6 +44,9 @@ using std::ofstream;
 
 /// the command line parameters
 gengetopt_args_info args_info;
+
+/// a variable holding the time of the call
+clock_t start_clock = clock();
 
 // the tuples
 extern map<unsigned, vector<vector<unsigned int> > > tuples_source;
@@ -141,8 +145,23 @@ void evaluateParameters(int argc, char** argv) {
 }
 
 
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // release memory (used to detect memory leaks)
+    // print statistics
+    if (args_info.stats_flag) {
+        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
+
+
 int main(int argc, char** argv) {
     time_t start_time, end_time;
+
+    // set the function to call on normal termination
+    atexit(terminationHandler);
 
     /*--------------------------------------.
     | 0. parse the command line parameters  |

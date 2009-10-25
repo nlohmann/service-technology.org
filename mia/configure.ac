@@ -18,6 +18,10 @@ AC_PROG_AWK
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# export tools needed to determine memory consumption
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

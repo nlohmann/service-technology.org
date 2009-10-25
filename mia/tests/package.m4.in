@@ -5,9 +5,20 @@ m4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])
 m4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])
 m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 
-m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+# SVN Revision-URL
+m4_define([SVNURL],               [http://svn.gna.org/viewcvs/service-tech?rev=@VERSION_SVN@&view=rev])
 
+# the main executable, called through a shell script for code coverage
 m4_define([MIA],                  [cover.sh @abs_top_builddir@/src/mia])
+
+# directories
+m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+m4_define([BENCHRESULTS],         [@abs_srcdir@/benchmarks-results])
+
+# UNIX helper tools
 m4_define([GREP],                 [@GREP@])
+m4_define([AWK],                  [@AWK@])
+m4_define([SED],                  [@SED@])
+
 m4_define([LOLA_FULL]             [@LOLA_FULL@])
 m4_define([WENDY]                 [@WENDY@])

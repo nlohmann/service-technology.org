@@ -18,6 +18,8 @@
 @item implemented Wendy's new IG/OG formats
 
 @item added target for benchmarks (execute @samp{make bench -C tests})
+
+@item implemented parameter @option{--stats} to display information on runtime and memory consumption (the latter uses @code{ps} and does not work under Cygwin)
 @end itemize
 
 

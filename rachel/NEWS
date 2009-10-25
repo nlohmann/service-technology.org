@@ -28,6 +28,9 @@ Version 1.14-unreleased
 
 * added target for benchmarks (execute `make bench -C tests')
 
+* implemented parameter `--stats' to display information on runtime and
+  memory consumption (the latter uses `ps' and does not work under Cygwin)
+
 
 See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for
 complete version history.

@@ -4,9 +4,8 @@ AC_INIT(Rachel, 1.14-unreleased, rachel@service-technology.org, rachel, http://s
 # check for prerequisites, programms, headers, and libraries
 #############################################################################
 
-# prerequisites for Autoconf and Automake
-AC_PREREQ(2.61)
 AM_INIT_AUTOMAKE(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR([src/main.cc])

@@ -67,6 +67,7 @@ CONFIGS = $(patsubst $(srcdir)/configs/userconfig.H.%,lola-%,$(wildcard $(srcdir
 
 $(CONFIGS): $@
 	$(AM_V_at)$(MAKE) -s clean-am
+	$(AM_V_at)chmod 777 $(srcdir)/userconfig.H
 	$(AM_V_at)cp $(srcdir)/userconfig.H /tmp/userconfig.H~
 	$(AM_V_at)cp $(srcdir)/configs/userconfig.H.$(patsubst lola-%,%,$@) $(srcdir)/userconfig.H
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am

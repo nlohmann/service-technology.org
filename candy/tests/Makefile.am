@@ -39,7 +39,16 @@ TESTFILES = costOG1.og \
             formula_flatten_sizeone.og \
             formula_flatten_sizeone.expected.og \
             formula_flatten_sizetwo.og \
-            formula_flatten.cf
+            formula_flatten_not.og \
+            formula_flatten_not.expected.og \
+            formula_flatten.cf \
+            formula_merge_and.og \
+            formula_merge_and.expected.og \
+            formula_merge_or.og \
+            formula_merge_or.expected.og \
+            formula_merge_andor.og \
+            formula_merge_andor.expected.og \
+            formula_merge.cf
 
 
 # Below you can list all the files you do not want to have counted in the

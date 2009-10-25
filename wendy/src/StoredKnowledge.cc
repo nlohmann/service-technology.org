@@ -722,7 +722,7 @@ void StoredKnowledge::output_og(std::ostream& file) {
         if (args_info.formula_arg == formula_arg_cnf) {
             file << " : true\n";
         } else {
-            file << "\n";
+            file << " :: T\n";
         }
 
         // empty node loops
@@ -1085,7 +1085,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
                     // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_flag and
-                    it->second[i]->successors[l-1] == empty) {
+                        it->second[i]->successors[l-1] == empty) {
                         emptyNodeReachable = true;
                         file << "\"" << it->second[i] << "\" -> 0"
                             << " [label=\"" << PREFIX(l)
@@ -1101,6 +1101,8 @@ void StoredKnowledge::output_dot(std::ostream& file) {
         file << "0 [label=\"";
         if (args_info.formula_arg == formula_arg_cnf) {
             file << "true";
+        } else {
+            file << "T";
         }
         file << "\"]\n";
 

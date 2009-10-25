@@ -17,6 +17,8 @@ Version 2.4-unreleased
   correctly cope with "true"-annotated nodes - renamed `2bits' option to
   `bits'
 
+* removed explicit `std::flush' calls
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

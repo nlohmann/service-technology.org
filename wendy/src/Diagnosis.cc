@@ -129,7 +129,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                 if (blacklisted) {
                     file << " color=red";
                 }
-                file << "]" << std::endl;
+                file << "]\n";
 
                 if (not hiddenStates.empty()) {
                     for (set<InnerMarking_ID>::iterator it1 = hiddenStates.begin(); it1 != hiddenStates.end(); ++it1) {
@@ -155,7 +155,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
         }
     }
 
-    file << "}" << std::endl;
+    file << "}\n";
 }
 
 InnerMarking_ID Diagnosis::lastCommonPredecessor(InnerMarking_ID m1, InnerMarking_ID m2) {

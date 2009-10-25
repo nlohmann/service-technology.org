@@ -17,6 +17,8 @@ Version 2.4-unreleased
   correctly cope with "true"-annotated nodes - renamed `2bits' option to
   `bits'
 
+* removed explicit `std::flush' calls
+
 Version 2.3 (21 October 2009)
 =============================
 

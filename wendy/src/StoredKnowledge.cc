@@ -777,7 +777,7 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
     for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         file << ",\n  " << reinterpret_cast<size_t>(*it) << " : " << (**it).formula();
     }
-    file << ";\n" << std::endl;
+    file << ";\n\n";
 
     file << "INITIALNODE\n  " << reinterpret_cast<size_t>(root) << ";\n\n";
 
@@ -822,7 +822,7 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
         file << "  0 -> 0 : " << PREFIX(l) << Label::id2name[l];
     }
 
-    file << ";" << std::endl;
+    file << ";\n";
 }
 
 
@@ -1070,7 +1070,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                     }
                 }
 
-                file << "\"]" << std::endl;
+                file << "\"]\n";
 
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
@@ -1109,7 +1109,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
         }
     }
 
-    file << "}" << std::endl;
+    file << "}\n";
 }
 
 
@@ -1148,9 +1148,6 @@ void StoredKnowledge::output_migration(std::ostream& o) {
                 o << (size_t) it1->first << " " << (size_t) it2->first << " " << **it3 << "\n";
             }
         }
-        o << std::flush;
     }
-
-    o << std::flush;
 }
 

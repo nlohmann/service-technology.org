@@ -88,7 +88,7 @@ void evaluateParameters(int argc, char** argv) {
     // debug option
     if (args_info.bug_flag) {
         { Output debug_output("bug.log", "configuration information");
-          debug_output.stream() << CONFIG_LOG << std::flush; }
+          debug_output.stream() << CONFIG_LOG; }
         message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
         exit(EXIT_SUCCESS);
     }

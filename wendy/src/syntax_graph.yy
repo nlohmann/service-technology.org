@@ -94,7 +94,7 @@ state:
                 }
                 markingoutput->stream() << p->first->getName() << ":" << p->second;
             }
-            markingoutput->stream() << std::endl;
+            markingoutput->stream() << "\n";
         }
 
         if (args_info.cover_given) {

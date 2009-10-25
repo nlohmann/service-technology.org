@@ -24,7 +24,7 @@ Choreography::~Choreography()
   for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
     delete (*e);
   edges_.clear();
-  for (int i = 0; i < collaboration_.size(); ++i)
+  for (int i = 0; i < (int) collaboration_.size(); ++i)
     delete collaboration_[i];
   collaboration_.clear();
 }
@@ -390,14 +390,17 @@ bool ** Choreography::distantEvents() const
  */
 bool Choreography::distant(const string & a, const string & b) const
 {
+  std::cerr << "checking distance of " << a << " and " << b;
   for (int i = 0; i < (int) collaboration_.size(); i++)
     if (collaboration_[i]->output().count(a)
         || collaboration_[i]->input().count(a))
       if (collaboration_[i]->output().count(b)
           || collaboration_[i]->input().count(b))
       {
+        std::cerr << " .. FALSE" << std::endl;
         return false;
       }
+  std::cerr << " .. TRUE" << std::endl;
   return true;
 }
 
@@ -419,6 +422,9 @@ bool Choreography::distant(const string & a, const string & b) const
  */
 bool Choreography::enables(int state, int a, int b) const
 {
+  if (events_[a].substr(1, events_[a].size()) ==
+      events_[b].substr(1, events_[b].size()))
+    return false;
   set<Edge *> qE = edgesFrom(state);
   bool qabExists = false;
   for(set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)

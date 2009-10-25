@@ -562,7 +562,7 @@ void Choreography::unite(int qa, int qb)
     for (set<Edge *>::iterator ee = rm.begin(); ee != rm.end(); ++ee)
       if ((*e)->label == (*ee)->label && (*e)->label != "")
       {
-        rm.erase(ee);
+        rm.erase(*ee);
         found = true;
       }
     if (!found)

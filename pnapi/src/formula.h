@@ -24,9 +24,9 @@ class Node;
 namespace formula {
 
 
-typedef enum { NONE = 1, ALL_PLACES_EMPTY = 7,
-  ALL_OTHER_PLACES_EMPTY = 5, ALL_OTHER_INTERNAL_PLACES_EMPTY = 3,
-  ALL_OTHER_EXTERNAL_PLACES_EMPTY = 6
+typedef enum {
+  NONE,
+  ALL_OTHER_PLACES_EMPTY
 } AllOtherPlaces;
 
 
@@ -52,6 +52,12 @@ public:
 
   /// unfold wildcard
   virtual void unfold(const PetriNet &) {};
+  /// evil hack part 1
+  virtual void unfold(const PetriNet &) const;
+  /// fold wildcard again
+  virtual void fold() {};
+  /// evil hack part 2
+  virtual void fold() const;
 
 };
 
@@ -81,6 +87,7 @@ public:
   std::set<const Place *> places() const;
 
   virtual void unfold(const PetriNet &);
+  virtual void fold();
 
 protected:
   std::set<const Formula *> children_;
@@ -126,11 +133,14 @@ public:
   Conjunction(const Formula &, const Formula &);
 
   // FIXME: obsolete wildcard implementation
-  Conjunction(const Formula &, const std::set<const Place *> &);
+  // TODO: remove me!
+  // Conjunction(const Formula &, const std::set<const Place *> &);
 
   Conjunction(const std::set<const Formula *> &,
       const std::map<const Place *, const Place *> * = NULL,
       const AllOtherPlaces = NONE);
+  
+  ~Conjunction();
 
   bool isSatisfied(const Marking &) const;
 
@@ -140,6 +150,7 @@ public:
   std::ostream & output(std::ostream &) const;
 
   void unfold(const PetriNet &);
+  void fold();
 
 protected:
 
@@ -147,7 +158,10 @@ protected:
 
 private:
 
+  /// whether a wildcard is attached
   AllOtherPlaces flag_;
+  /// names of places, concerned by unfolding when folded again
+  std::set<std::string> * foldedPlaces_;
 
 };
 
@@ -192,7 +206,7 @@ public:
   unsigned int tokens() const;
 
   std::set<const Place *> places() const;
-
+  
 protected:
   const Place & place_;
   const unsigned int tokens_;
@@ -231,7 +245,8 @@ class FormulaEqual : public Proposition
 public:
 
   FormulaEqual(const Place &, unsigned int,
-      const std::map<const Place *, const Place *> * = NULL);
+      const std::map<const Place *, const Place *> * = NULL,
+      bool = false);
 
   bool isSatisfied(const Marking &) const;
 
@@ -239,6 +254,9 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// whether this proposition is the result of unfolding a wildcard
+  const bool unfolded_;
 };
 
 
@@ -317,8 +335,8 @@ public:
   std::ostream & output(std::ostream &) const;
 };
 
-}
+} /* namespace formula */
 
-}
+} /* namespace pnapi */
 
 #endif

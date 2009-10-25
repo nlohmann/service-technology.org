@@ -1,7 +1,21 @@
-            ____      _        _   _   _      _        _    ____ ___ 
-           |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
-           | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
-           |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
-           |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
-                       http://service-technology.org/pnapi
+             ____      _        _   _   _      _        _    ____ ___ 
+            |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
+            | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
+            |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
+            |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+                        http://service-technology.org/pnapi
 
+
+PURPOSE
+
+Version 3.00-unreleased
+=======================
+
+* started proper versioning
+
+* started proper documentation
+
+* formulae now only concern internal places; only left wildcard ist
+  ALL_OTHER_PLACES_EMPTY
+
+\nSee file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for\ncomplete version history.\n

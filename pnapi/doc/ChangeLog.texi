@@ -1,0 +1,94 @@
+@heading Version 3.00-unreleased
+@itemize
+@item started proper versioning
+@item started proper documentation
+@item formulae now only concern internal places; only left wildcard ist 
+ALL_OTHER_PLACES_EMPTY
+@end itemize
+
+@heading Version 2.00
+@itemize
+@item removed memory leaks
+@item integrated Output class from Wendy
+@item added make target "win32" to compile the api without linking against the cygwin1.dll
+@item added manpage for petri tool
+@item API can be compiled with foreign config.h (removed macro dependencies)
+@item added scripts to use LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
+  coverage (use `make cover' in `tests' directory)
+@item new features:
+@itemize
+@item Transition costs (https://gna.org/task/index.php?6615)
+@item test cases and integration of new owfn parser (https://gna.org/task/index.php?6658)
+@item Function to add a prefix to all places and transitions (https://gna.org/task/index.php?6749)
+@item Integrate Genet for SA2ON conversion (https://gna.org/task/index.php?6767)
+@end itemize
+@item fixed bugs:
+@itemize
+@item PetriNet does not know Synchronous Labels of its transitions (https://gna.org/bugs/index.php?13936)
+@item sa2sm/sa2owfn ignore synchronous labels (https://gna.org/bugs/index.php?13968)
+@item Net reduction invalidates finalCondition and leads to core dump (https://gna.org/bugs/index.php?13969)
+@item Composition of more than two nets fails because of prefixes to I/O places (https://gna.org/bugs/index.php?13990)
+@item No (public) method to remove nodes (https://gna.org/bugs/index.php?14003)
+@item Removal of dead nodes also deletes interface place (https://gna.org/bugs/index.php?14064)
+@item Arc weights to/from interface places are ignored by isNormal() function (https://gna.org/bugs/index.php?14116)
+@item Normalization yields unequivalent nets (https://gna.org/bugs/index.php?14119)
+@item No error when using SYNCHRONIZE with undeclared label in oWFN file (https://gna.org/bugs/index.php?14127)
+@item LoLA-Parser is more strict than LoLA's parser (https://gna.org/bugs/index.php?14206)
+@item synchronous steps become tau-transitions (https://gna.org/bugs/index.php?14335)
+@item product with constraint does not work with synchronous communication (https://gna.org/bugs/index.php?14411)
+@item When composing nets, costs of a transition get lost (https://gna.org/bugs/index.php?14417)
+@end itemize
+@item further (undocumented) bugs fixed
+@item further (undocumented) changes
+@end itemize
+
+@heading Version 1.1
+@itemize
+@item implemented scanner and parser for oWFN files
+
+@item structural changes
+
+@item added formula class
+
+@item overworked reduction rules
+@itemize
+@item murata rules will only be applied if the weight of all involved arcs is 1
+@item some murata rules are extended by arc weights according to Thomas Pillat's proofs (see [pillat2008])
+@item remaining rules have been deactivated
+@item normalized nets can be kept normal
+@item implemented new functions
+@item findLivingTransition
+@item calcSuccessorMarking
+@item marking2Places
+@item calcCurrentMarking
+@item initMarking
+@item isWorkflowNet
+@item isFreeChoice
+@item set and get methods for P, P_in, P_out, T and F
+@item reevaluateType
+@item isNormal
+@item normalize
+@item makeInnerStructure
+@item set and get methods for invocation_string and package_string
+@end itemize
+
+@item bugfixes
+@itemize
+@item added missing "=NULL" after use of delete
+@item searching for a place which has been removed or renamed won't cause a crash anymore
+@end itemize
+
+@item added files
+@itemize
+@item generic Doxygen configuration file
+@item testcases
+@end itemize
+@end itemize
+
+@heading Version 1.0 
+@itemize
+@item copied api from fiona
+@item created Makefile.am and configure.ac for autotools usage
+@item it's compilable running autoreconf, configure and make
+@end itemize

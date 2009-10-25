@@ -6,4 +6,57 @@
                         http://service-technology.org/pnapi
 
 
-* GNU Libtool (http://www.gnu.org/software/libtool/)
+PURPOSE
+
+In order to run, compile, and develop PNAPI, several tools are required.
+
+Runtime
+-------
+
+   * Petrify (`http://www.lsi.upc.edu/~jordicf/petrify/') to convert service
+     automata in petri nets (used by default if found).
+
+   * Genet (`http://genet.sourceforge.net/') to convert service automata in
+     petri nets (used by default, if Petrify was not found but Genet was).
+
+The configure script will search for them an set the default paths.
+
+Compilation
+-----------
+
+To compile the source code from a source distribution, the following tools are
+required.
+
+   * GCC (`http://gcc.gnu.org/')
+
+   * GNU Make (`http://www.gnu.org/software/make/')
+
+   * Libtool (`http://www.gnu.org/software/libtool/')
+
+Development
+-----------
+
+In case you want to make changes to the source code, the following tools are
+required to reconfigure and compile PNAPI.
+
+   * Autoconf, `http://www.gnu.org/software/autoconf/'
+
+   * Automake, `http://www.gnu.org/software/automake/'
+
+   * Bison, `http://www.gnu.org/software/bison/'
+
+   * flex, `http://flex.sourceforge.net/'
+
+   * Gengetopt, `http://www.gnu.org/software/gengetopt/'
+
+   * help2man, `http://www.gnu.org/software/help2man/'
+
+   * Texinfo, `http://www.gnu.org/software/texinfo/'
+
+
+
+
+Please check our nightly build server at
+`http://service-technology.org/nightly' for the versions we use during
+development.
+

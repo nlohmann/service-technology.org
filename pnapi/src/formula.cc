@@ -106,46 +106,33 @@ Negation::Negation(const Negation & n) :
 }
 
 Conjunction::Conjunction(const AllOtherPlaces v) :
-  Operator(), flag_(v)
+  Operator(), flag_(v), foldedPlaces_(NULL)
 {
 }
 
 Conjunction::Conjunction(const Formula & f, const AllOtherPlaces v) :
-  Operator(f), flag_(v)
+  Operator(f), flag_(v), foldedPlaces_(NULL)
 {
-simplifyChildren();
+  simplifyChildren();
 }
 
 Conjunction::Conjunction(const Formula & l, const Formula & r) :
-  Operator(l, r)
+  Operator(l, r), foldedPlaces_(NULL)
 {
-// taking ALL[_OTHER][_EXTERNAL|_INTERNAL]_PLACES to the new Conjunction
-AllOtherPlaces v1, v2;
-const Formula *fl = &l;
-const Conjunction *cl = dynamic_cast<const Conjunction *>(fl);
-if (cl != NULL)
-  v1 = cl->flag_;
-else
-  v1 = NONE;
-const Formula *fr = &r;
-const Conjunction *cr = dynamic_cast<const Conjunction *>(fr);
-if (cr != NULL)
-  v2 = cr->flag_;
-else
-  v2 = NONE;
-
-if (v1/v2==2 || v2/v1==2)
-  flag_ = ALL_OTHER_PLACES_EMPTY;
-else
-  if (v1 > v2)
-    flag_ = v1;
+  // taking ALL_OTHER_PLACES to the new Conjunction
+  const Formula * fr = &r;
+  const Conjunction * cr = dynamic_cast<const Conjunction *>(fr);
+  if (cr != NULL)
+    flag_ = cr->flag_;
   else
-    flag_ = v2;
-
-
-simplifyChildren();
+    flag_ = NONE;
+  
+  simplifyChildren();
 }
 
+/*!
+ * \TODO: remove me!
+ * 
 Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
   Operator(f)
 {
@@ -153,17 +140,19 @@ std::cerr << "This method is no longer necessary!" << std::endl;
 assert(false);
 simplifyChildren();
 }
+*/
 
 Conjunction::Conjunction(const set<const Formula *> & children,
     const map<const Place *, const Place *> * places,
     AllOtherPlaces v) :
-      Operator(children, places), flag_(v)
+      Operator(children, places), flag_(v), foldedPlaces_(NULL)
 {
 simplifyChildren();
 }
 
 Conjunction::Conjunction(const Conjunction & c) :
-  Operator(c.children_), flag_(c.flag_)
+  Operator(c.children_), flag_(c.flag_), 
+  foldedPlaces_((c.foldedPlaces_ == NULL) ? NULL : new set<string>(*c.foldedPlaces_))
 {
 simplifyChildren();
 }
@@ -195,8 +184,9 @@ assert(places == NULL || places->find(&p)->second != NULL);
 }
 
 FormulaEqual::FormulaEqual(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+    const map<const Place *, const Place *> * places,
+    bool unfolded) :
+      Proposition(p, k, places), unfolded_(unfolded)
 {
 }
 
@@ -247,6 +237,10 @@ Operator::~Operator()
     delete *it;
 }
 
+Conjunction::~Conjunction()
+{
+  delete foldedPlaces_;
+}
 
 
 /**************************************************************************
@@ -330,41 +324,16 @@ bool Negation::isSatisfied(const Marking & m) const
   return !(*children_.begin())->isSatisfied(m);
 }
 
+/*!
+ * \brief checks, whether this conjunction is satisfied by a given marking
+ * \pre   the formel is unfolded
+ */
 bool Conjunction::isSatisfied(const Marking & m) const
 {
   for (set<const Formula *>::const_iterator f = children_.begin();
   f != children_.end(); ++f)
     if (!(*f)->isSatisfied(m))
       return false;
-
-  std::set<const Place *> formulaPlaces = places();
-  std::set<Place *> netPlaces = m.getPetriNet().getPlaces();
-  for (std::set<Place *>::iterator p = netPlaces.begin(); p != netPlaces.end(); ++p)
-  {
-    bool count = formulaPlaces.count(*p) == 0;
-    switch (flag_)
-    {
-    case ALL_PLACES_EMPTY:
-      if (!formulaPlaces.empty())
-        std::cerr << PACKAGE_STRING << ": Warning: ALL_PLACES_EMPTY implies that there is no place named in the formula.\n";
-      if (m[**p] != 0)
-        return false;
-      break;
-    case ALL_OTHER_PLACES_EMPTY:
-      if (count && m[**p] != 0)
-        return false;
-      break;
-    case ALL_OTHER_EXTERNAL_PLACES_EMPTY:
-      if (count && (*p)->getType() != Node::INTERNAL && m[**p] != 0)
-        return false;
-      break;
-    case ALL_OTHER_INTERNAL_PLACES_EMPTY:
-      if (count && (*p)->getType() == Node::INTERNAL && m[**p] != 0)
-        return false;
-      break;
-    default: break;
-    }
-  }
 
   return true;
 }
@@ -587,8 +556,26 @@ void Disjunction::simplifyChildren()
 }
 
 /**************************************************************************
- ***** unfolding implementation
+ ***** (un)folding implementation
  **************************************************************************/
+
+/*!
+ * \brief evil hack part 1
+ */
+void Formula::unfold(const PetriNet & net) const
+{
+  Formula * me = const_cast<Formula *>(this);
+  me->unfold(net);
+}
+
+/*!
+ * \brief evil hack part 2
+ */
+void Formula::fold() const
+{
+  Formula * me = const_cast<Formula *>(this);
+  me->fold();
+}
 
 void Operator::unfold(const PetriNet & net)
 {
@@ -599,33 +586,77 @@ void Operator::unfold(const PetriNet & net)
   }
 }
 
+void Operator::fold()
+{
+  for(set<const Formula*>::iterator it = children_.begin();
+  it != children_.end(); ++it)
+  {
+    const_cast<Formula*>(*it)->fold();
+  }
+}
+
 /*!
- * \brief unfolds the wildcard ALL_OTHER_EXTERNAL_PLACES_EMPTY
- *        (needed by compose).
+ * \brief unfolds the wildcard ALL_OTHER_PLACES_EMPTY
  */
 void Conjunction::unfold(const PetriNet & net)
 {
   Operator::unfold(net);
 
   // actual unfolding
-  if(flag_ == ALL_OTHER_EXTERNAL_PLACES_EMPTY)
+  if(flag_ == ALL_OTHER_PLACES_EMPTY)
   {
-    set<const Place*> covered = places();
     set<const Place*> toCover;
-    for(set<Place*>::iterator p = net.getInterfacePlaces().begin();
-    p != net.getInterfacePlaces().end(); ++p)
+   
+    if(foldedPlaces_ == NULL)
     {
-      toCover.insert(*p);
+      set<const Place*> covered = places();
+      
+      // this loop is necassary to implicitly cast the pointer type
+      for(set<Place*>::iterator p = net.getInternalPlaces().begin();
+           p != net.getInternalPlaces().end(); ++p)
+      {
+        toCover.insert(*p);
+      }
+      toCover = util::setDifference(toCover, covered);
     }
-    toCover = util::setDifference(toCover, covered);
+    else
+    {
+      for(set<string>::iterator p = foldedPlaces_->begin();
+           p != foldedPlaces_->end(); ++p)
+      {
+        toCover.insert(net.findPlace(*p));
+      }
+    }
 
     for(set<const Place*>::iterator p = toCover.begin();
-    p != toCover.end(); ++p)
+         p != toCover.end(); ++p)
     {
-      const Formula * f = new FormulaEqual(**p, 0);
+      if(*p == NULL)
+        continue;
+      
+      const Formula * f = new FormulaEqual(**p, 0, NULL, true);
       children_.insert(f);
     }
-    flag_ = NONE;
+  }
+}
+
+void Conjunction::fold()
+{
+  if(foldedPlaces_ == NULL)
+    foldedPlaces_ = new set<string>();
+  
+  set<const Formula *> children = children_;  
+    
+  for(set<const Formula *>::iterator f = children.begin();
+       f != children.end(); ++f)
+  {
+    const FormulaEqual * fe = dynamic_cast<const FormulaEqual *>(*f);
+    if((fe != NULL) && (fe->unfolded_))
+    {
+      foldedPlaces_->insert(fe->place().getName());
+      children_.erase(*f);
+      delete (*f);
+    }
   }
 }
 

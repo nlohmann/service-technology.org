@@ -335,7 +335,7 @@ uint8_t PetriNet::genetCapacity_ = 2;
  * \note    The condition is standardly set to True.
  */
 PetriNet::PetriNet() :
-  observer_(*this)
+  observer_(*this), warnings_(0)
   {
   }
 
@@ -349,7 +349,7 @@ PetriNet::PetriNet(const PetriNet & net) :
   labels_(net.labels_),
   observer_(*this),
   condition_(net.condition_, copyStructure(net)),
-  meta_(net.meta_)
+  meta_(net.meta_), warnings_(net.warnings_)
   {
   setConstraintLabels(net.constraints_);
   }
@@ -381,6 +381,7 @@ void PetriNet::clear()
   meta_.clear();
   constraints_.clear();
   condition_ = true;
+  warnings_ = 0;
 
   // delete all places
   set<Place *> places = places_;
@@ -829,21 +830,16 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
 
 
   // here be dragons
-  Condition cond1, cond2;
-  {
-    Condition tmpCond;
-    tmpCond = finalCondition().formula(); // copy condition
-    formula::Formula * f1 = const_cast<formula::Formula*>(&(tmpCond.formula()));
-    f1->unfold(*this);
-    cond1 = *f1;
-
-    tmpCond = net.finalCondition().formula();
-    formula::Formula * f2 = const_cast<formula::Formula*>(&(tmpCond.formula()));
-    f2->unfold(net);
-    cond2 = *f2;
-  }
-  result.finalCondition().merge(cond1, placeMap);
-  result.finalCondition().merge(cond2, placeMap);
+  Condition tmpCond;
+  tmpCond = finalCondition().formula();
+  tmpCond.formula().fold();
+  result.finalCondition().merge(tmpCond, placeMap);
+  
+  tmpCond = net.finalCondition().formula();
+  tmpCond.formula().fold();
+  result.finalCondition().merge(tmpCond, placeMap);
+  
+  result.finalCondition().formula().unfold(result);
 
   // overwrite this net with the resulting net
   *this = result;
@@ -1221,6 +1217,22 @@ set<Place *> PetriNet::getInterfacePlaces(const string & port) const
 
 
  /*!
+  * \brief get warnings
+  */
+ unsigned int PetriNet::getWarnings()
+ {
+   return warnings_;
+ }
+ 
+ /*!
+  * \brief set warnings
+  */
+ void PetriNet::setWarnings(unsigned int warnings)
+ {
+   warnings_ = warnings;
+ }
+ 
+ /*!
   */
  const set<Transition *> & PetriNet::getSynchronizedTransitions() const
  {
@@ -1463,7 +1475,12 @@ set<Place *> PetriNet::getInterfacePlaces(const string & port) const
     PlaceMapping placeMapping = copyPlaces(net, netPrefix);
 
     // merge final conditions
-    condition_.merge(net.condition_, placeMapping);
+    Condition tmpCond;
+    tmpCond = net.condition_.formula();
+    tmpCond.formula().fold();
+    condition_.formula().fold();
+    condition_.merge(tmpCond, placeMapping);
+    condition_.formula().unfold(*this);
 
     // handle transitions with empty label
     for (Transitions::iterator it = net.transitions_.begin();

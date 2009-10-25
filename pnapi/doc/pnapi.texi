@@ -1,0 +1,393 @@
+\input texinfo
+@setfilename pnapi.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle PNAPI User's Manual
+
+@c --------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for PNAPI, version @value{VERSION}, a library to encapsulate petri net functionalities, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2009 Niels Lohmann
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* PNAPI: (pnapi).       encapsulating petri net functionalities.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+@titlepage
+
+@title PNAPI
+
+@subtitle Encapuslating Petri Net Functionalities
+@subtitle @url{http://service-technology.org/pnapi}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Niels Lohmann
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c --------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top PNAPI
+@insertcopying
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@menu
+* First Steps::How to set up and install PNAPI.
+* Command Line Options::How to run PNAPI frontend "Petri".
+* Usage::How to use the API in other programs.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c --------------------------------------------------------------------------
+
+@node First Steps
+@chapter First Steps
+
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/pnapi} and download the latest release version of PNAPI, say @file{pnapi-@value{VERSION}.tar.gz}. To setup and compile PNAPI, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz pnapi-@value{VERSION}.tar.gz
+cd pnapi-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a library @samp{src/libpnapi.a} and a frontend tool @samp{utils/petri} are generated.@footnote{On Microsoft Windows, the file will be called @file{petri.exe}.} If you experience any compiler warnings, don't panic: PNAPI contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use external tools (Fiona, Wendy, Petrify, Genet) to check whether the calculated results are correct. If a needed tool was not found by the configure script, theses tests are skipped.}
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 70 tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{pnapi@@service-technology.org}.
+
+@item To install the library, the frontend binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of PNAPI. The documentation can be created using @samp{make pdf}. Note you need to have PNAPI properly installed before (see installation description above).
+
+@item man
+The manpage of PNAPI which can be displayed using @samp{man pnapi} after having PNAPI installed (see installation description above).
+
+@item src
+The source code of PNAPI.
+
+@item tests
+Testcases for PNAPI which check the generated library by using the frontend. Some test scripts use external tools (e.g. Fiona or Wendy) to check whether the calculated operating guidelines are correct. If a needed tool was not found by the configure script, theses tests are skipped.
+@end table
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop PNAPI, several tools are required.
+
+@subsection Runtime
+@itemize
+@item Petrify (@url{http://www.lsi.upc.edu/~jordicf/petrify/}) to convert service automata in petri nets (used by default if found).
+@item Genet (@url{http://genet.sourceforge.net/}) to convert service automata in petri nets 
+(used by default, if Petrify was not found but Genet was).
+@end itemize
+
+The configure script will search for them an set the default paths.
+
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@item Libtool (@url{http://www.gnu.org/software/libtool/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile PNAPI.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter How to run PNAPI frontend "Petri"
+
+Petri is a command line tool and does not come with a fancy @acronym{GUI}. However, Petri can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{petri -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+
+@c --------------------------------------------------------------------------
+
+@node Usage
+@chapter How to use the API in other programs
+
+The Petri Net API provides structures for working with Petri nets.
+
+For using it, simply include the header file pnapi.h in your code:
+@cartouche
+@smallexample
+#include "pnapi.h"
+@end smallexample
+@end cartouche
+
+Everything you will use can be found in the following namespaces:
+@itemize
+@item pnapi
+@item pnapi::formula
+@item pnapi::io
+@end itemize
+
+The classes pnapi::PetriNet and pnapi::Automaton provide the main 
+functionality and can serve as
+an entry point for getting an overview of the API's functionality.
+
+@chapter Some Examples
+
+Creating a small Petrinet
+@cartouche
+@smallexample
+PetriNet net;
+Place & p1 = net.createPlace();
+p1.mark();
+Place & p2 = net.createPlace();
+Transition & t = net.createTransition();
+net.createArc(p1,t);
+net.createArc(t,p2);
+@end smallexample
+@end cartouche
+
+Assigning a final condition
+@cartouche
+@smallexample
+// net from the previous example is recycled here
+net.finalCondition() = ((p1 == 0) && (p2 == 1));
+Place & p3 = net.createPlace();
+net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
+@end smallexample
+@end cartouche
+
+Reading from stream
+@cartouche
+@smallexample
+istream is;
+is >> io::owfn >> net;
+@end smallexample
+@end cartouche
+
+Writing to a stream
+@cartouche
+@smallexample
+ostream os;
+// LoLA without formulae
+os << io::lola << net;
+// LoLA with formulae
+os << io::lola << io::formula << net;
+@end smallexample
+@end cartouche
+
+Reducing by applying some rules
+@cartouche
+@smallexample
+net.reduce(PetriNet::SET_STARKE | PetriNet::KEEP_NORMAL);
+@end smallexample
+@end cartouche
+
+Creating a service automaton
+@cartouche
+@smallexample
+Automaton sa(net);
+@end smallexample
+@end cartouche
+
+Query structural information
+@cartouche
+@smallexample
+net.isNormal();
+net.isWorkflow();
+@end smallexample
+@end cartouche
+
+@chapter Caution With Wildcards in Formulae
+
+Since Version 3.00 the formula classes have been refactored. I.e. from now on they 
+only concern internal places and only one wildcard is left: @samp{ALL_OTHER_PLACES_EMPTY}.
+After parsing a net, all wildcards will be unfolded by using @samp{PetriNet::unfold(PetriNet &);}.
+Each function dealing with formulae assumes, that the net's wildcards 
+are unfolded before being called, and will eventually temporary fold these wildcards again.
+So when you bild a final condition by yourself, you are strongly advised to unfold the
+formula afterwards by using e.g.
+@cartouche
+@smallexample
+net.finalCondition().formula().unfold(net);
+@end smallexample
+@end cartouche
+
+Unfolding means, that for each place @samp{p}, not being concerned by the formula subtree 
+containing the wildcard, a proposition @samp{p = 0} is added to the appropriate conjuncion.
+I.e., assumed we have a petri net containing the places @samp{p1}, @samp{p2} 
+and @samp{p3}, the formula
+@cartouche
+@smallexample
+(p1=1) OR (p2=3 AND ALL_OTHER_PLACES_EMPTY)
+@end smallexample
+@end cartouche
+will be unfolded to:
+@cartouche
+@smallexample
+(p1=1) OR (p2=3 AND p1=0 AND p3=0)
+@end smallexample
+@end cartouche
+
+
+A wildcard must be the last "subformula" attached to a conjunction, i.e. formulas like
+@cartouche
+@smallexample
+p=42 AND ALL_OTHER_PLACES_EMPTY AND q=23
+@end smallexample
+@end cartouche
+are not allowed.
+
+Once a wildcard has been unfolded, its scope is affixed. I.e. by folding the formula, 
+adding places and unfolding the formula again the new places will not be concerned
+by the formula.
+
+Furthermore, if you want to remove places concerned by unfolded wildcards, you should fold
+the formula again to avoid segmentation faults:
+@cartouche
+@smallexample
+net.finalCondition().formula().fold();
+net.deletePlace(p3);
+net.finalCondition().formula().unfold(net);
+@end smallexample
+@end cartouche
+
+When unfolding a second time, a conjunction will search for the names of the places former
+concerned by the wildcard. If a place is not found, no proposition will be created.
+I.e. if you want to recreate or merge a "wildcard-place", you just have to fold the formula,
+delete the place, create a new one with the same name (or merge the place and therewith
+the name in an other place) and unfold the formula again, and the appropriate proposition
+will concern the place that now holds the name of the former place.
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+PNAPI is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at PNAPI's website at @url{http://service-technology.org/files/pnapi/ChangeLog}.
+
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

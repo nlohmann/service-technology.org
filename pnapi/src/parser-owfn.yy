@@ -434,7 +434,7 @@ formula:
   | KEY_FALSE         { $$ = new formula::FormulaFalse(); }
   | KEY_ALL_PLACES_EMPTY 
     { 
-      $$ = new formula::Conjunction(formula::ALL_PLACES_EMPTY); 
+      $$ = new formula::Conjunction(formula::ALL_OTHER_PLACES_EMPTY); 
     }
   | OP_NOT formula
     { 
@@ -460,13 +460,11 @@ formula:
     }
   | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_INTERNAL_PLACES_EMPTY);
-      delete $1;
+      $$ = $1; // obsolete; kept due to compatibility
     }
   | formula OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_EXTERNAL_PLACES_EMPTY);
-      delete $1;
+      $$ = $1; // obsolete; kept due to compatibility
     }
   | node_name OP_EQ NUMBER
     {

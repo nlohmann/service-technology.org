@@ -1,4 +1,4 @@
-AC_INIT(Petri Net API, 1.00-reloaded-unreleased, pnapi@service-technology.org, pnapi)
+AC_INIT(Petri Net API, 3.00-unreleased, pnapi@service-technology.org, pnapi)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -153,6 +153,7 @@ AC_SUBST(configured_LDFLAGS)
 #############################################################################
 AC_CONFIG_FILES([Makefile
                  pnapi.pc
+		 doc/Makefile
                  doc/Doxyfile
                  src/Makefile
                  man/Makefile

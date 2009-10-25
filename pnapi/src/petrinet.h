@@ -21,12 +21,13 @@
 #ifndef PNAPI_PETRINET_H
 #define PNAPI_PETRINET_H
 
+#include "config.h"
+
 #include <vector>
 
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
-#include "config.h"
 
 #ifndef CONFIG_PETRIFY
 #define CONFIG_PETRIFY "not found"
@@ -34,6 +35,10 @@
 
 #ifndef CONFIG_GENET
 #define CONFIG_GENET "not found"
+#endif
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
 #endif
 
 namespace pnapi
@@ -195,19 +200,19 @@ public:
     LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
     LEVEL_4 = (LEVEL_3 | SERIES_PLACES | SERIES_TRANSITIONS),
     LEVEL_5 = (LEVEL_4 | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
-        INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
-        LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
-        SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
-            DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
-            SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
-                SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
-                EQUAL_PLACES),
-                SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
-                    STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
-                    STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
-                    K_BOUNDEDNESS = SET_PILLAT,
-                    BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
-                    LIVENESS = (SET_PILLAT | SET_STARKE)
+               INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
+    LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
+    SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
+                        DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
+    SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
+                  SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
+                  EQUAL_PLACES),
+    SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
+                  STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
+                  STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
+    K_BOUNDEDNESS = SET_PILLAT,
+    BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
+    LIVENESS = (SET_PILLAT | SET_STARKE)
   };
 
   enum AutomatonConverter
@@ -215,6 +220,12 @@ public:
     PETRIFY,
     GENET,
     STATEMACHINE
+  };
+  
+  enum Warning
+  {
+    W_NONE = 0,
+    W_INTERFACE_PLACE_IN_FINAL_CONDITION = 1
   };
 
   /// standard constructor
@@ -372,6 +383,12 @@ public:
 
   /// sets labels (and translates references)
   void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
+  
+  /// get warnings
+  unsigned int getWarnings();
+  
+  /// set warnings
+  void setWarnings(unsigned int = W_NONE);
 
   //@}
 
@@ -447,6 +464,9 @@ private:
   /// converter Automaton => PetriNet
   static AutomatonConverter automatonConverter_;
 
+  /// warning flags
+  unsigned int warnings_;
+  
   /* structural changes */
 
 public:

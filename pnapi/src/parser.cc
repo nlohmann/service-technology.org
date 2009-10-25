@@ -154,6 +154,16 @@ const PetriNet & Parser::parse(istream & is)
   constrains_.clear();
   placeSet_.clear();
 
+  // final condition stuff
+  set<const Place*> concernedPlaces = pnapi_owfn_yynet.finalCondition().formula().places();
+  for(set<Place*>::iterator p = pnapi_owfn_yynet.getInterfacePlaces().begin();
+       p != pnapi_owfn_yynet.getInterfacePlaces().end(); ++p)
+  {
+    if(concernedPlaces.count(*p) > 0)
+      pnapi_owfn_yynet.setWarnings(PetriNet::W_INTERFACE_PLACE_IN_FINAL_CONDITION);
+  }
+  pnapi_owfn_yynet.finalCondition().formula().unfold(pnapi_owfn_yynet);
+  
   return pnapi_owfn_yynet;
 }
 } /* namespace owfn */

@@ -1,9 +1,99 @@
+             ____      _        _   _   _      _        _    ____ ___ 
+            |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
+            | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
+            |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
+            |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+                        http://service-technology.org/pnapi
+
+
+PURPOSE
+
+Version 3.00-unreleased
+=======================
+
+* started proper versioning
+
+* started proper documentation
+
+* formulae now only concern internal places; only left wildcard ist
+  ALL_OTHER_PLACES_EMPTY
+
+Version 2.00
+============
+
+* removed memory leaks
+
+* integrated Output class from Wendy
+
+* added make target "win32" to compile the api without linking against the
+  cygwin1.dll
+
+* added manpage for petri tool
+
+* API can be compiled with foreign config.h (removed macro dependencies)
+
 * added scripts to use LCOV
   (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
   coverage (use `make cover' in `tests' directory)
 
-Version 1.0.1
-===============
+* new features:
+     * Transition costs (https://gna.org/task/index.php?6615)
+
+     * test cases and integration of new owfn parser
+       (https://gna.org/task/index.php?6658)
+
+     * Function to add a prefix to all places and transitions
+       (https://gna.org/task/index.php?6749)
+
+     * Integrate Genet for SA2ON conversion
+       (https://gna.org/task/index.php?6767)
+
+* fixed bugs:
+     * PetriNet does not know Synchronous Labels of its transitions
+       (https://gna.org/bugs/index.php?13936)
+
+     * sa2sm/sa2owfn ignore synchronous labels
+       (https://gna.org/bugs/index.php?13968)
+
+     * Net reduction invalidates finalCondition and leads to core dump
+       (https://gna.org/bugs/index.php?13969)
+
+     * Composition of more than two nets fails because of prefixes to I/O
+       places (https://gna.org/bugs/index.php?13990)
+
+     * No (public) method to remove nodes
+       (https://gna.org/bugs/index.php?14003)
+
+     * Removal of dead nodes also deletes interface place
+       (https://gna.org/bugs/index.php?14064)
+
+     * Arc weights to/from interface places are ignored by isNormal()
+       function (https://gna.org/bugs/index.php?14116)
+
+     * Normalization yields unequivalent nets
+       (https://gna.org/bugs/index.php?14119)
+
+     * No error when using SYNCHRONIZE with undeclared label in oWFN file
+       (https://gna.org/bugs/index.php?14127)
+
+     * LoLA-Parser is more strict than LoLA's parser
+       (https://gna.org/bugs/index.php?14206)
+
+     * synchronous steps become tau-transitions
+       (https://gna.org/bugs/index.php?14335)
+
+     * product with constraint does not work with synchronous communication
+       (https://gna.org/bugs/index.php?14411)
+
+     * When composing nets, costs of a transition get lost
+       (https://gna.org/bugs/index.php?14417)
+
+* further (undocumented) bugs fixed
+
+* further (undocumented) changes
+
+Version 1.1
+===========
 
 * implemented scanner and parser for oWFN files
 
@@ -12,37 +102,63 @@ Version 1.0.1
 * added formula class
 
 * overworked reduction rules
-	* murata rules will only be applied if the weight of all involved arcs is 1
-	* some murata rules are extended by arc weights according to Thomas Pillat's proofs (see [pillat2008])
-	* remaining rules have been deactivated
-	* normalized nets can be kept normal
+     * murata rules will only be applied if the weight of all involved arcs
+       is 1
 
-* implemented new functions
-	* findLivingTransition
-	* calcSuccessorMarking
-	* marking2Places
-	* calcCurrentMarking
-	* initMarking
-	* isWorkflowNet
-	* isFreeChoice
-	* set and get methods for P, P_in, P_out, T and F
-	* reevaluateType
-	* isNormal
-	* normalize
-	* makeInnerStructure
-	* set and get methods for invocation_string and package_string
+     * some murata rules are extended by arc weights according to Thomas
+       Pillat's proofs (see [pillat2008])
+
+     * remaining rules have been deactivated
+
+     * normalized nets can be kept normal
+
+     * implemented new functions
+
+     * findLivingTransition
+
+     * calcSuccessorMarking
+
+     * marking2Places
+
+     * calcCurrentMarking
+
+     * initMarking
+
+     * isWorkflowNet
+
+     * isFreeChoice
+
+     * set and get methods for P, P_in, P_out, T and F
+
+     * reevaluateType
+
+     * isNormal
+
+     * normalize
+
+     * makeInnerStructure
+
+     * set and get methods for invocation_string and package_string
 
 * bugfixes
-	* added missing "=NULL" after use of delete
-	* searching for a place which has been removed or renamed won't cause a crash anymore
+     * added missing "=NULL" after use of delete
+
+     * searching for a place which has been removed or renamed won't cause
+       a crash anymore
 
 * added files
-	* generic Doxygen configuration file
-	* testcases
+     * generic Doxygen configuration file
 
-Version 1.0 
+     * testcases
+
+Version 1.0
 ===========
 
 * copied api from fiona
+
 * created Makefile.am and configure.ac for autotools usage
+
 * it's compilable running autoreconf, configure and make
+
+
+

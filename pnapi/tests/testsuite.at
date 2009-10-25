@@ -117,6 +117,7 @@ AT_BANNER([Composition and Product])
 ############################################################################
 
 AT_SETUP([Product with constraint net])
+AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
 AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
 AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
@@ -279,6 +280,7 @@ AT_KEYWORDS([bug])
 AT_CLEANUP
 
 AT_SETUP([Bug 14125 (https://gna.org/bugs/?14125)])
+AT_XFAIL_IF(true)
 m4_define([NET1], [bug14125.1.owfn])
 m4_define([NET2], [bug14125.2.owfn])
 AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])

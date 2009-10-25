@@ -682,23 +682,14 @@ ostream & output(ostream & os, const formula::Conjunction & f)
 
   switch (f.flag_)
   {
-  case formula::ALL_PLACES_EMPTY:
-    wildcard = "ALL_PLACES_EMPTY";
-    break;
   case formula::ALL_OTHER_PLACES_EMPTY:
     wildcard = " AND ALL_OTHER_PLACES_EMPTY";
-    break;
-  case formula::ALL_OTHER_INTERNAL_PLACES_EMPTY:
-    wildcard = " AND ALL_OTHER_INTERNAL_PLACES_EMPTY";
-    break;
-  case formula::ALL_OTHER_EXTERNAL_PLACES_EMPTY:
-    wildcard = " AND ALL_OTHER_EXTERNAL_PLACES_EMPTY";
     break;
   case formula::NONE:
   default: break;
   }
 
-  if (f.children().empty() && f.flag_ == formula::ALL_PLACES_EMPTY)
+  if (f.children().empty() && f.flag_ == formula::ALL_OTHER_PLACES_EMPTY)
     return os << wildcard;
   else
     if (f.children().empty())

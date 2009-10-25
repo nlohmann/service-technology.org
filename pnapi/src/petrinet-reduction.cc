@@ -2666,6 +2666,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
   unsigned int done = 1;
   unsigned int passes = 0;
 
+  finalCondition().formula().fold();
 
   // apply reductions
   while (done > 0)
@@ -2773,5 +2774,7 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
       break;
   }
 
+  finalCondition().formula().unfold(*this);
+  
   return passes;
 }

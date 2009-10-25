@@ -68,14 +68,15 @@ int main(int argc, char** argv) {
     bool ** distantMessages = chor->distantEvents();
 
     std::vector<PeerAutomaton *> projected;
-    for (int i = 0; i < (int) chor->collaboration().size(); i++)
+    for (int i = 0; i < (int) chor->collaboration().size(); ++i)
     {
       PeerAutomaton * at = new PeerAutomaton();
-      for (int a = 0; a < (int) chor->events().size(); a++)
+      for (int a = 0; a < (int) chor->events().size(); ++a)
       {
         if (chor->collaboration()[i]->input().count(chor->events()[a]))
         {
-          for (std::set<Edge *>::iterator e = chor->edges().begin(); e != chor->edges().end(); e++)
+          for (std::set<Edge *>::iterator e = chor->edges().begin();
+              e != chor->edges().end(); ++e)
             if ((*e)->label == chor->events()[a])
             {
               if ((*e)->type == SYN)
@@ -87,7 +88,8 @@ int main(int argc, char** argv) {
         }
         if (chor->collaboration()[i]->output().count(chor->events()[a]))
         {
-          for (std::set<Edge *>::iterator e = chor->edges().begin(); e != chor->edges().end(); e++)
+          for (std::set<Edge *>::iterator e = chor->edges().begin();
+              e != chor->edges().end(); ++e)
             if ((*e)->label == chor->events()[a])
             {
               if ((*e)->type == SYN)
@@ -113,26 +115,31 @@ int main(int argc, char** argv) {
     {
       changed = false;
       /// 3.1 if a disables b
-      for (std::set<int>::iterator q = chor->states().begin(); q != chor->states().end(); q++)
-        for (int a = 0; a < (int) chor->events().size(); a++)
-          for (int b = 0; b < (int) chor->events().size(); b++)
+      for (std::set<int>::iterator q = chor->states().begin();
+          q != chor->states().end(); ++q)
+        for (int a = 0; a < (int) chor->events().size(); ++a)
+          for (int b = 0; b < (int) chor->events().size(); ++b)
           {
             if (!distantMessages[a][b])
               continue;
             if (chor->disables(*q, a, b))
             {
-              status("%s disables %s in state %d", chor->events()[a].c_str(), chor->events()[b].c_str(), *q);
+              status("%s disables %s in state %d", chor->events()[a].c_str(),
+                  chor->events()[b].c_str(), *q);
               complete = false;
               changed = true;
               int qa = chor->createState();
               int qb = chor->createState();
               std::set<Edge *> qE = chor->edgesFrom(*q);
-              for (std::set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+              for (std::set<Edge *>::iterator e = qE.begin(); e != qE.end();
+                  ++e)
               {
                 if ((*e)->label != chor->events()[a])
-                  chor->createEdge(qa, (*e)->label, (*e)->destination, (*e)->type);
+                  chor->createEdge(qa, (*e)->label, (*e)->destination,
+                      (*e)->type);
                 if ((*e)->label != chor->events()[b])
-                  chor->createEdge(qb, (*e)->label, (*e)->destination, (*e)->type);
+                  chor->createEdge(qb, (*e)->label, (*e)->destination,
+                      (*e)->type);
                 chor->deleteEdge(*e);
               }
               chor->createEdge(*q, "", qa, CHI);
@@ -140,15 +147,17 @@ int main(int argc, char** argv) {
             }
           }
       /// 3.2 if a enables b
-      for (std::set<int>::iterator q = chor->states().begin(); q != chor->states().end(); q++)
-        for (int a = 0; a < (int) chor->events().size(); a++)
-          for (int b = 0; b < (int) chor->events().size(); b++)
+      for (std::set<int>::iterator q = chor->states().begin();
+          q != chor->states().end(); ++q)
+        for (int a = 0; a < (int) chor->events().size(); ++a)
+          for (int b = 0; b < (int) chor->events().size(); ++b)
           {
             if (!distantMessages[a][b])
               continue;
             if (chor->enables(*q, a, b))
             {
-              status("%s enables %s in state %d", chor->events()[a].c_str(), chor->events()[b].c_str(), *q);
+              status("%s enables %s in state %d", chor->events()[a].c_str(),
+                  chor->events()[b].c_str(), *q);
               complete = distributed = false;
               changed = true;
               int qab = chor->findState(*q, a, b);
@@ -156,9 +165,10 @@ int main(int argc, char** argv) {
             }
           }
       /// 3.3 if q_ab and q_ba are not equivalent
-      for (std::set<int>::iterator q = chor->states().begin(); q != chor->states().end(); q++)
-        for (int a = 0; a < (int) chor->events().size(); a++)
-          for (int b = 0; b < (int) chor->events().size(); b++)
+      for (std::set<int>::iterator q = chor->states().begin();
+          q != chor->states().end(); ++q)
+        for (int a = 0; a < (int) chor->events().size(); ++a)
+          for (int b = 0; b < (int) chor->events().size(); ++b)
           {
             if (!distantMessages[a][b])
               continue;
@@ -195,7 +205,7 @@ int main(int argc, char** argv) {
     /*--------------------------------.
     | 4. final step: peer projection  |
     `--------------------------------*/
-    for (int i = 0; i < (int) chor->collaboration().size(); i++)
+    for (int i = 0; i < (int) chor->collaboration().size(); ++i)
     {
       PeerAutomaton * a = projected[i];
       /*
@@ -212,10 +222,10 @@ int main(int argc, char** argv) {
        * 4.2 calculate all other states
        */
       for (std::set<std::set<int> >::iterator q = a->states().begin();
-          q != a->states().end(); q++)
+          q != a->states().end(); ++q)
       {
         std::set<Edge *> E = chor->edgesFrom(*q);
-        for (std::set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
+        for (std::set<Edge *>::iterator e = E.begin(); e != E.end(); ++e)
         {
           std::set<int> qprime;
           if (a->isState((*e)->destination))
@@ -250,9 +260,10 @@ int main(int argc, char** argv) {
         fprefix.push_back('.');
       }
       std::ofstream file;
-      for (int i = 0; i < (int) projected.size(); i++)
+      for (int i = 0; i < (int) projected.size(); ++i)
       {
-        std::string filename = fprefix+"peer"+chor->collaboration()[i]->name()+".sa";
+        std::string filename =
+            fprefix+"peer"+chor->collaboration()[i]->name()+".sa";
         file.open(filename.c_str());
         file << *projected[i];
         file.close();
@@ -262,11 +273,11 @@ int main(int argc, char** argv) {
     /*-------------.
     | 6. Clean up  |
     `--------------*/
-    for (int i = 0; i < (int) chor->events().size(); i++)
+    for (int i = 0; i < (int) chor->events().size(); ++i)
       delete [] distantMessages[i];
     delete [] distantMessages;
     delete chor;
-    for (int i = 0; i < (int) projected.size(); i++)
+    for (int i = 0; i < (int) projected.size(); ++i)
       delete projected[i];
     projected.clear();
 

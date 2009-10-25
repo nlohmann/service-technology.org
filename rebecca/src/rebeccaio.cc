@@ -9,12 +9,13 @@ using std::string;
 
 ostream & operator <<(ostream & os, const Choreography & chor)
 {
-  for (int i = 0; i < (int) chor.collaboration_.size(); i++)
+  for (int i = 0; i < (int) chor.collaboration_.size(); ++i)
     os << "PEER " << chor.collaboration_[i]->name() << endl
        << "  IN " << chor.collaboration_[i]->in() << ";" << endl
        << "  OUT " << chor.collaboration_[i]->out() << ";" << endl << endl;
   os << "NODES" << endl;
-  for (set<int>::iterator q = chor.states_.begin(); q != chor.states_.end(); q++)
+  for (set<int>::iterator q = chor.states_.begin(); q != chor.states_.end();
+      ++q)
   {
     os << "  " << *q;
     if (chor.initialState_ == *q)
@@ -28,7 +29,7 @@ ostream & operator <<(ostream & os, const Choreography & chor)
         os << " : FINAL";
     os << endl;
     set<Edge *> E = chor.edgesFrom(*q);
-    for (set<Edge *>::iterator e = E.begin(); e != E.end(); e++)
+    for (set<Edge *>::iterator e = E.begin(); e != E.end(); ++e)
     {
       string pre = (*e)->type == CHI ? "CHI" : "";
       os << "    " << pre << (*e)->label << " -> " << (*e)->destination << endl;
@@ -64,7 +65,8 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
   }
   os << endl;
   os << "NODES" << endl;
-  for (set<set<int> >::iterator q = pa.states_.begin(); q != pa.states_.end(); q++)
+  for (set<set<int> >::iterator q = pa.states_.begin(); q != pa.states_.end();
+      ++q)
   {
     os << "  " << *q;
     if (pa.initialState_ == *q)
@@ -78,7 +80,7 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
         os << " : FINAL";
     os << endl;
     set<PEdge *> E = pa.edgesFrom(*q);
-    for (set<PEdge *>::iterator e = E.begin(); e != E.end(); e++)
+    for (set<PEdge *>::iterator e = E.begin(); e != E.end(); ++e)
       os << "    " << (*e)->label << " -> " << (*e)->destination << endl;
     os << endl;
   }
@@ -91,7 +93,7 @@ ostream & operator <<(ostream & os, const PeerAutomaton & pa)
 ostream & operator <<(ostream & os, const set<string> & s)
 {
   bool first = true;
-  for (set<string>::iterator i = s.begin(); i != s.end(); i++)
+  for (set<string>::iterator i = s.begin(); i != s.end(); ++i)
     if (first)
     {
       first = false;
@@ -105,7 +107,7 @@ ostream & operator <<(ostream & os, const set<string> & s)
 
 ostream & operator <<(ostream & os, const set<int> & s)
 {
-  for (set<int>::iterator i = s.begin(); i != s.end(); i++)
+  for (set<int>::iterator i = s.begin(); i != s.end(); ++i)
     os << *i;
   return os;
 }

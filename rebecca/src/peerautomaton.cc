@@ -45,7 +45,7 @@ PEdge * PeerAutomaton::createEdge(set<int> source, string label,
   e->destination = destination;
   e->type = type;
 
-  for (set<PEdge *>::iterator ee = edges_.begin(); ee != edges_.end(); ee++)
+  for (set<PEdge *>::iterator ee = edges_.begin(); ee != edges_.end(); ++ee)
     if (e->source == (*ee)->source && e->destination == (*ee)->destination &&
         e->label == (*ee)->label && e->type == (*ee)->type)
       return e;
@@ -70,7 +70,7 @@ void PeerAutomaton::pushFinalState(set<int> qf)
 bool PeerAutomaton::isState(int q) const
 {
   for (set<set<int> >::iterator qq = states_.begin();
-      qq != states_.end(); qq++)
+      qq != states_.end(); ++qq)
     if (qq->count(q) > 0)
       return true;
   return false;
@@ -83,7 +83,7 @@ bool PeerAutomaton::isState(int q) const
  */
 const set<int> PeerAutomaton::findState(int sq) const
 {
-  for (set<set<int> >::iterator q = states_.begin(); q != states_.end(); q++)
+  for (set<set<int> >::iterator q = states_.begin(); q != states_.end(); ++q)
     if (q->count(sq))
       return *q;
   return set<int>();
@@ -118,7 +118,7 @@ const set<PEdge *> PeerAutomaton::edgesFrom(set<int> source) const
     return cache[source];
 
   set<PEdge *> result;
-  for (set<PEdge *>::iterator e = edges_.begin(); e != edges_.end(); e++)
+  for (set<PEdge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
     if ((*e)->source == source)
       result.insert(*e);
   cache[source] = result;

@@ -1,5 +1,6 @@
 #include "choreography.h"
 #include "verbose.h"
+#include <climits>
 #include <map>
 
 using std::map;
@@ -11,7 +12,8 @@ using std::vector;
 /*!
  * \brief Standard constructor
  */
-Choreography::Choreography()
+Choreography::Choreography() :
+    initialState_(INT_MIN)
 {
 }
 
@@ -41,7 +43,7 @@ const int Choreography::createState()
     states_.insert(states_.end(), ++max);
     return max;
   }
-  for (set<int>::iterator i = states_.begin(); i != states_.end(); i++)
+  for (set<int>::iterator i = states_.begin(); i != states_.end(); ++i)
     max = max < *i ? *i : max;
   states_.insert(states_.end(), ++max);
   return max;
@@ -70,7 +72,7 @@ void Choreography::pushState(int q)
 void Choreography::deleteState(int q)
 {
   states_.erase(q);
-  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); e++)
+  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
     if ((*e)->destination == q || (*e)->source == q)
       deleteEdge(*e);
 }
@@ -115,7 +117,7 @@ Edge * Choreography::createEdge(int source, const string & label, int destinatio
   e->destination = destination;
   e->type = type;
 
-  for (set<Edge *>::iterator ee = edges_.begin(); ee != edges_.end(); ee++)
+  for (set<Edge *>::iterator ee = edges_.begin(); ee != edges_.end(); ++ee)
     if (e->source == (*ee)->source && e->label == (*ee)->label &&
         e->destination == (*ee)->destination && e->type == (*ee)->type)
       return *ee;
@@ -184,7 +186,7 @@ const int Choreography::initialState() const
 const int Choreography::findState(int q, int a) const
 {
   set<Edge *> qE = edgesFrom(q);
-  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
     if ((*e)->label == events_[a])
       return (*e)->destination;
   return -1;
@@ -197,7 +199,7 @@ const int Choreography::findState(int q, int a) const
 const int Choreography::findState(int q, const string & a) const
 {
   set<Edge *> qE = edgesFrom(q);
-  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
     if ((*e)->label == a)
       return (*e)->destination;
   return -1;
@@ -213,7 +215,7 @@ const int Choreography::findState(int q, int a, int b) const
   if (qa == -1)
     return -1;
   set<Edge *> qaE = edgesFrom(qa);
-  for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); e++)
+  for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); ++e)
     if ((*e)->label == events_[b])
       return (*e)->destination;
   return -1;
@@ -250,7 +252,7 @@ const set<Edge *> Choreography::edgesFrom(int q) const
 
   // computing edges from q
   set<Edge *> result;
-  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); e++)
+  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
     if ((*e)->source == q)
       result.insert(*e);
 
@@ -277,8 +279,8 @@ const set<Edge *> Choreography::edgesFrom(set<int> q) const
     return cache[q];
 
   set<Edge *> result;
-  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); e++)
-    for (set<int>::iterator qprime = q.begin(); qprime != q.end(); qprime++)
+  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
+    for (set<int>::iterator qprime = q.begin(); qprime != q.end(); ++qprime)
       if ((*e)->source == *qprime)
         result.insert(*e);
 
@@ -308,7 +310,7 @@ const set<Edge *> Choreography::edgesTo(int q) const
 
   // computing edges to q
   set<Edge *> result;
-  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); e++)
+  for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
     if ((*e)->destination == q)
       result.insert(*e);
 
@@ -351,7 +353,7 @@ bool Choreography::isFinal(int q) const
  */
 bool Choreography::isFinal(const set<int> & qf) const
 {
-  for (set<int>::iterator q = qf.begin(); q != qf.end(); q++)
+  for (set<int>::iterator q = qf.begin(); q != qf.end(); ++q)
     if (isFinal(*q))
       return true;
   return false;
@@ -365,13 +367,13 @@ bool Choreography::isFinal(const set<int> & qf) const
 bool ** Choreography::distantEvents() const
 {
   bool ** result = new bool * [events_.size()];
-  for (int i = 0; i < (int) events_.size(); i++)
+  for (int i = 0; i < (int) events_.size(); ++i)
   {
     result[i] = new bool[events_.size()];
     result[i][i] = false;
   }
-  for (int i = 0; i < (int) events_.size(); i++)
-    for (int j = i+1; j < (int) events_.size(); j++)
+  for (int i = 0; i < (int) events_.size(); ++i)
+    for (int j = i+1; j < (int) events_.size(); ++j)
       result[i][j] = result[j][i] = distant(events_[i], events_[j]);
 
   return result;
@@ -390,8 +392,7 @@ bool ** Choreography::distantEvents() const
  */
 bool Choreography::distant(const string & a, const string & b) const
 {
-  std::cerr << "checking distance of " << a << " and " << b;
-  for (int i = 0; i < (int) collaboration_.size(); i++)
+  for (int i = 0; i < (int) collaboration_.size(); ++i)
     if (collaboration_[i]->output().count(a)
         || collaboration_[i]->input().count(a))
       if (collaboration_[i]->output().count(b)
@@ -400,7 +401,6 @@ bool Choreography::distant(const string & a, const string & b) const
         std::cerr << " .. FALSE" << std::endl;
         return false;
       }
-  std::cerr << " .. TRUE" << std::endl;
   return true;
 }
 
@@ -427,7 +427,7 @@ bool Choreography::enables(int state, int a, int b) const
     return false;
   set<Edge *> qE = edgesFrom(state);
   bool qabExists = false;
-  for(set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+  for(set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
   {
     if ((*e)->label == events_[b])
       return false;
@@ -435,7 +435,7 @@ bool Choreography::enables(int state, int a, int b) const
     if ((*e)->label == events_[a])
     {
       set<Edge *> qaE = edgesFrom((*e)->destination);
-      for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ea++)
+      for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ++ea)
         if ((*ea)->label == events_[b])
           qabExists = true;
     }
@@ -455,13 +455,13 @@ bool Choreography::disables(int state, int a, int b) const
   set<Edge *> qE = edgesFrom(state);
   bool qaExists, qbExists;
   qaExists = qbExists = false;
-  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); e++)
+  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
   {
     if ((*e)->label == events_[a])
     {
       qaExists = true;
       set<Edge *> qaE = edgesFrom((*e)->destination);
-      for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ea++)
+      for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ++ea)
         if ((*ea)->label == events_[b])
           return false;
     }
@@ -489,7 +489,7 @@ bool Choreography::equivalent(int qa, int qb) const
   bool result = true;
   set<string> seen;
   set<Edge *> Eqa = edgesFrom(qa);
-  for (set<Edge *>::iterator e = Eqa.begin(); e != Eqa.end(); e++)
+  for (set<Edge *>::iterator e = Eqa.begin(); e != Eqa.end(); ++e)
   {
     int qax = (*e)->destination;
     int qbx = findState(qb, (*e)->label);
@@ -499,7 +499,7 @@ bool Choreography::equivalent(int qa, int qb) const
     result = result && equivalent(qax, qbx);
   }
   set<Edge *> Eqb = edgesFrom(qb);
-  for (set<Edge *>::iterator e = Eqb.begin(); e != Eqb.end(); e++)
+  for (set<Edge *>::iterator e = Eqb.begin(); e != Eqb.end(); ++e)
   {
     if (!seen.count((*e)->label))
       return false;
@@ -511,10 +511,10 @@ bool Choreography::equivalent(int qa, int qb) const
 set<int> & Choreography::closure(set<int> & S, int peer) const
 {
   const Peer * p = collaboration_[peer];
-  for (set<int>::iterator q = S.begin(); q != S.end(); q++)
+  for (set<int>::iterator q = S.begin(); q != S.end(); ++q)
   {
     set<Edge *> E = edgesFrom(*q);
-    for (set<Edge *>::iterator eq = E.begin(); eq != E.end(); eq++)
+    for (set<Edge *>::iterator eq = E.begin(); eq != E.end(); ++eq)
       if (!S.count((*eq)->destination))
         switch ((*eq)->type)
         {
@@ -554,12 +554,12 @@ void Choreography::unite(int qa, int qb)
   set<Edge *> qaE = edgesFrom(qa);
   set<Edge *> qbE = edgesFrom(qb);
   set<Edge *> rm;
-  for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); e++)
+  for (set<Edge *>::iterator e = qaE.begin(); e != qaE.end(); ++e)
     rm.insert(*e);
-  for (set<Edge *>::iterator e = qbE.begin(); e != qbE.end(); e++)
+  for (set<Edge *>::iterator e = qbE.begin(); e != qbE.end(); ++e)
   {
     bool found = false;
-    for (set<Edge *>::iterator ee = rm.begin(); ee != rm.end(); ee++)
+    for (set<Edge *>::iterator ee = rm.begin(); ee != rm.end(); ++ee)
       if ((*e)->label == (*ee)->label && (*e)->label != "")
       {
         rm.erase(ee);
@@ -568,7 +568,7 @@ void Choreography::unite(int qa, int qb)
     if (!found)
       rm.insert(*e);
   }
-  for (set<Edge *>::iterator e = rm.begin(); e != rm.end(); e++)
+  for (set<Edge *>::iterator e = rm.begin(); e != rm.end(); ++e)
   {
     std::cout << "unite: not equivalent ways" << std::endl;
     deleteEdge(*e);
@@ -576,8 +576,8 @@ void Choreography::unite(int qa, int qb)
   // recursive call
   qaE = edgesFrom(qa);
   qbE = edgesFrom(qb);
-  for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ea++)
-    for (set<Edge *>::iterator eb = qbE.begin(); eb != qbE.end(); eb++)
+  for (set<Edge *>::iterator ea = qaE.begin(); ea != qaE.end(); ++ea)
+    for (set<Edge *>::iterator eb = qbE.begin(); eb != qbE.end(); ++eb)
       if ((*ea)->label == (*eb)->label)
       {
         unite((*ea)->destination, (*eb)->destination);
@@ -585,7 +585,7 @@ void Choreography::unite(int qa, int qb)
       }
   // merge qa and qb
   set<Edge *> qbEt = edgesTo(qb);
-  for (set<Edge *>::iterator e = qbEt.begin(); e != qbEt.end(); e++)
+  for (set<Edge *>::iterator e = qbEt.begin(); e != qbEt.end(); ++e)
   {
     createEdge((*e)->source, (*e)->label, qa, (*e)->type);
   }
@@ -597,16 +597,16 @@ bool Choreography::isChoreography() const
 {
   set<string> inChannels, outChannels;
   bool isChor = false;
-  for (int i = 0; i < (int) collaboration_.size(); i++)
+  for (int i = 0; i < (int) collaboration_.size(); ++i)
   {
     for (set<string>::iterator in = collaboration_[i]->in().begin(); in
-        != collaboration_[i]->in().end(); in++)
+        != collaboration_[i]->in().end(); ++in)
       if (outChannels.count(*in) > 0)
         outChannels.erase(*in);
       else
         inChannels.insert(*in);
     for (set<string>::iterator out = collaboration_[i]->out().begin(); out
-        != collaboration_[i]->out().end(); out++)
+        != collaboration_[i]->out().end(); ++out)
       if (inChannels.count(*out) > 0)
         inChannels.erase(*out);
       else
@@ -618,10 +618,10 @@ bool Choreography::isChoreography() const
   else
   {
     for (set<string>::iterator in = inChannels.begin(); in != inChannels.end();
-        in++)
+        ++in)
       status("'%s' has no appropriate output event", in->c_str());
     for (set<string>::iterator out = outChannels.begin(); out
-        != outChannels.end(); out++)
+        != outChannels.end(); ++out)
       status("'%s' has no appropriate input event", out->c_str());
   }
 

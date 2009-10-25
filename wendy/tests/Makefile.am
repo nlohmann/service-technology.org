@@ -65,7 +65,7 @@ DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 
 # run the test suite when calling "make check"
 check-local: atconfig $(TESTSUITE)
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
+	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
 
 # clean the test results on "make clean"
 clean-local:
@@ -73,12 +73,12 @@ clean-local:
 
 # call a specific test set, (e.g. "make check-basic")
 check-%: atconfig $(TESTSUITE)
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) --keywords=$*
+	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) --keywords=$*
 
 # create the testsuite using autom4te
-$(TESTSUITE): $(srcdir)/testsuite.at
-	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
-	mv $@.tmp $@
+$(TESTSUITE): $(srcdir)/testsuite.at package.m4
+	$(AM_V_GEN)$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	$(AM_V_at)mv $@.tmp $@
 
 
 ######################

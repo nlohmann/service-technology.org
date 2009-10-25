@@ -394,7 +394,7 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, con
 */
 void Knowledge::sequentializeReceivingEvents() {
 
-	// count the number that a receiving event is activated
+    // count the number that a receiving event is activated
     uint8_t* occuranceOfReceivingEvent = new uint8_t[Label::receive_events + 1];
 
     for (uint8_t i = 0; i <= Label::receive_events; ++i) {
@@ -413,30 +413,30 @@ void Knowledge::sequentializeReceivingEvents() {
             // traverse the interface markings
             for (size_t i = 0; i < pos->second.size(); ++i) {
 
-            	if (isWaitstateInCurrentKnowledge(pos->first, pos->second[i])) {
-					// check if waitstate marks an output place
-					Label_ID marked = 0;
-					Label_ID consideredReceivingEvent = 0;
+                if (isWaitstateInCurrentKnowledge(pos->first, pos->second[i])) {
+                    // check if waitstate marks an output place
+                    Label_ID marked = 0;
+                    Label_ID consideredReceivingEvent = 0;
 
-					for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-						if (pos->second[i]->marked(l)) {
-							// remember that current receiving event is activated in a waitstate
-							++occuranceOfReceivingEvent[l];
-							// remember this event in case the current waitstate activates only one receiving event
-							consideredReceivingEvent = l;
-							++marked;
-						}
-					}
-					// check if waitstate activates only a single receiving event
-					if (marked == 1) {
-						// this receiving event has to be considered
-						consideredReceivingEvents[consideredReceivingEvent] = true;
-					}
+                    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+                        if (pos->second[i]->marked(l)) {
+                            // remember that current receiving event is activated in a waitstate
+                            ++occuranceOfReceivingEvent[l];
+                            // remember this event in case the current waitstate activates only one receiving event
+                            consideredReceivingEvent = l;
+                            ++marked;
+                        }
+                    }
+                    // check if waitstate activates only a single receiving event
+                    if (marked == 1) {
+                        // this receiving event has to be considered
+                        consideredReceivingEvents[consideredReceivingEvent] = true;
+                    }
 
-					// remember to visit this state again; we only store the
-					// interface here, we don't need more information later on
-					visitStateAgain[pos->second[i]] = true;
-            	}
+                    // remember to visit this state again; we only store the
+                    // interface here, we don't need more information later on
+                    visitStateAgain[pos->second[i]] = true;
+                }
             }
         }
     }
@@ -451,35 +451,33 @@ void Knowledge::sequentializeReceivingEvents() {
         // we need to remember if the value stored in consideredReceivingEvent is a real one
         bool realEvent = false;
 
-		// check if a receiving event is activated that we have remembered already
-		for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+        // check if a receiving event is activated that we have remembered already
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
 
-			// receiving event will resolve this waitstate
-			if ((currenState->first)->marked(l)) {
+            // receiving event will resolve this waitstate
+            if ((currenState->first)->marked(l)) {
 
-				// it will be considered, so continue with the next waitstate
-				if (consideredReceivingEvents.find(l) != consideredReceivingEvents.end()) {
-					consideredReceivingEvent = l;
-					break;
-				}
-				// if currently considered activated receiving event is not the currently considered one
-				if (not realEvent or l > consideredReceivingEvent) {
-					// check if the currently considered activated receiving event is activated by more
-					// waitstates than the currently considered one
+                // it will be considered, so continue with the next waitstate
+                if (consideredReceivingEvents.find(l) != consideredReceivingEvents.end()) {
+                    consideredReceivingEvent = l;
+                    break;
+                }
+                // if currently considered activated receiving event is not the currently considered one
+                if (not realEvent or l > consideredReceivingEvent) {
+                    // check if the currently considered activated receiving event is activated by more
+                    // waitstates than the currently considered one
 
-					bool tmp = occuranceOfReceivingEvent[l] > occuranceOfReceivingEvent[consideredReceivingEvent];
+                    if (not realEvent or occuranceOfReceivingEvent[l] > occuranceOfReceivingEvent[consideredReceivingEvent]) {
+                        // yes, so we will (temporarily) consider the current receiving event to be essential to
+                        // resolve the waitstate
+                        consideredReceivingEvent = l;
 
-					if (not realEvent or occuranceOfReceivingEvent[l] > occuranceOfReceivingEvent[consideredReceivingEvent]) {
-						// yes, so we will (temporarily) consider the current receiving event to be essential to
-						// resolve the waitstate
-						consideredReceivingEvent = l;
-
-						// the value stored in consideredReceivingEvent is a real event
-						realEvent = true;
-					}
-				}
-			} // end if, receiving event is activated
-		} // end for, traverse through receiving interface
+                        // the value stored in consideredReceivingEvent is a real event
+                        realEvent = true;
+                    }
+                }
+            } // end if, receiving event is activated
+        } // end for, traverse through receiving interface
 
         // consider the temporal receiving event for real
         if (realEvent) {

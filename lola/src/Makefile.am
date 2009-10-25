@@ -8,24 +8,24 @@ noinst_PROGRAMS = lola
 #######################
 
 lola_SOURCES = readnet-syntax.yy \
-	       readnet-lexic.ll \
-	       cmdline.c cmdline.h \
-	       net.cc net.H \
-	       buchi.cc buchi.H \
-	       formula.cc formula.H \
-	       stubborn.cc stubborn.H \
-	       graph.cc graph.H \
-	       symboltab.cc symboltab.H \
-	       symm.cc symm.H \
-	       check.cc check.H \
-	       unfold.cc unfold.H \
-	       dimensions.cc dimensions.H \
-	       path.cc path.H \
-	       printnet.cc printnet.H \
-	       tinv.cc tinv.H \
-	       sweep.cc sweep.H \
-	       structure.H \
-	       userconfig.H 
+               readnet-lexic.ll \
+               cmdline.c cmdline.h \
+               net.cc net.H \
+               buchi.cc buchi.H \
+               formula.cc formula.H \
+               stubborn.cc stubborn.H \
+               graph.cc graph.H \
+               symboltab.cc symboltab.H \
+               symm.cc symm.H \
+               check.cc check.H \
+               unfold.cc unfold.H \
+               dimensions.cc dimensions.H \
+               path.cc path.H \
+               printnet.cc printnet.H \
+               tinv.cc tinv.H \
+               sweep.cc sweep.H \
+               structure.H \
+               userconfig.H 
 
 lola_EXTRASOURCES = ltl.H ltl.cc
 
@@ -48,18 +48,14 @@ EXTRA_DIST = readnet-syntax.h cmdline.ggo \
              configs/userconfig.H.none \
              configs/userconfig.H.statepredicate \
              configs/userconfig.H.statepredicate1 \
-	     configs/userconfig.H.statespace 
-
-lola_CFLAGS = @configured_CFLAGS@
-lola_CXXFLAGS = @configured_CXXFLAGS@
-lola_LDFLAGS = @configured_LDFLAGS@
+             configs/userconfig.H.statespace 
 
 
 ################################################################
 # use GNU gengetopt to create command line parser
 ################################################################
 .ggo.c:
-	$(GENGETOPT) --input=$< -F $(@:.c=)
+	$(AM_V_GEN)$(GENGETOPT) --input=$< -F $(@:.c=)
 
 
 #############################################################################
@@ -70,13 +66,12 @@ lola_LDFLAGS = @configured_LDFLAGS@
 CONFIGS = $(patsubst $(srcdir)/configs/userconfig.H.%,lola-%,$(wildcard $(srcdir)/configs/userconfig.H.*))
 
 $(CONFIGS): $@
-	$(MAKE) clean-am
-	chmod 777 $(srcdir)/userconfig.H
-	cp $(srcdir)/userconfig.H /tmp/userconfig.H~
-	cp $(srcdir)/configs/userconfig.H.$(patsubst lola-%,%,$@) $(srcdir)/userconfig.H
-	$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am
-	mv $(builddir)/lola$(EXEEXT) $(builddir)/$@$(EXEEXT)
-	cp /tmp/userconfig.H~ $(srcdir)/userconfig.H
+	$(AM_V_at)$(MAKE) -s clean-am
+	$(AM_V_at)cp $(srcdir)/userconfig.H /tmp/userconfig.H~
+	$(AM_V_at)cp $(srcdir)/configs/userconfig.H.$(patsubst lola-%,%,$@) $(srcdir)/userconfig.H
+	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am
+	$(AM_V_GEN)mv $(builddir)/lola$(EXEEXT) $(builddir)/$@$(EXEEXT)
+	$(AM_V_at)cp /tmp/userconfig.H~ $(srcdir)/userconfig.H
 
 MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
 DISTCLEANFILES = $(CONFIGS)$(EXEEXT)

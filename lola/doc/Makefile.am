@@ -37,8 +37,8 @@ all: ../ChangeLog
 # collect the "--help" outputs of the utilities for the documentation
 #############################################################################
 graph2dot.out: $(top_srcdir)/utils/cmdline-graph2dot.ggo $(top_srcdir)/configure.ac
-	$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
-	$(top_srcdir)/utils/graph2dot --help > graph2dot.out
+	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
+	$(AM_V_GEN)$(top_srcdir)/utils/graph2dot --help > graph2dot.out
 
 
 #############################################################################

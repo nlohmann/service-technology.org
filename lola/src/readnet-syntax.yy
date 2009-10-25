@@ -968,7 +968,7 @@ fac: ident {
 			s = GlobalTable -> lookup($1);
 			if(!s) 
 			{
-				printf($1);
+				printf("%s", $1);
 				yyerror("identifier not defined");
 			}
 			if(s->kind != en) yyerror("identifier of wrong kind");

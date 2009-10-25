@@ -166,31 +166,31 @@ State * binSearch();
 inline State::~State()
 {
 #ifndef MODELCHECKING
-  if(firelist) delete [] firelist;
+  delete [] firelist;
 #if defined(TARJAN) || defined(BREADTH_FIRST)
-  if(succ) delete [] succ;
+  delete [] succ;
 #endif
 #endif
 #ifdef MODELCHECKING
-	if(witness) delete [] witness;
-	if(witnesstransition) delete [] witnesstransition;
-	if(checkfirelist) delete [] checkfirelist;
-	if(checksucc) delete [] checksucc;
-	if(checkparent) delete [] checkparent;
-	if(checkcurrent) delete [] checkcurrent;
-	if(value) delete [] value;
-	if(known) delete [] known;
-	if(checknexttar) delete [] checknexttar;
-	if(checkdfs) delete [] checkdfs;
-	if(checkmin) delete [] checkmin;
-	if(checkexpired) delete [] checkexpired;
-	if(checkprevtar) delete [] checkprevtar;
-	if(checktarlevel) delete [] checktarlevel;
-	if(checkddfs) delete [] checkddfs;
-	if(checkmmin) delete [] checkmmin;
+	delete [] witness;
+	delete [] witnesstransition;
+	delete [] checkfirelist;
+	delete [] checksucc;
+	delete [] checkparent;
+	delete [] checkcurrent;
+	delete [] value;
+	delete [] known;
+	delete [] checknexttar;
+	delete [] checkdfs;
+	delete [] checkmin;
+	delete [] checkexpired;
+	delete [] checkprevtar;
+	delete [] checktarlevel;
+	delete [] checkddfs;
+	delete [] checkmmin;
 #endif
 #ifdef COVER
-	if(NewOmega) delete [] NewOmega;
+	delete [] NewOmega;
 #endif
 }
 

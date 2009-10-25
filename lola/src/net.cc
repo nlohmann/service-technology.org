@@ -351,10 +351,6 @@ int main(int argc, char ** argv){
     printf("- compilation date:     %s\n", __DATE__);
     printf("- compiler version:     %s\n", __VERSION__);
     printf("- platform:             %s\n", BUILDSYSTEM);
-    printf("- config ASSERT:        %s\n", CONFIG_ENABLEASSERT);
-    printf("- config UNIVERSAL:     %s\n", CONFIG_ENABLEUNIVERSAL);
-    printf("- config ENABLE64BIT:   %s\n", CONFIG_ENABLE64BIT);
-    printf("- config WIN32:         %s\n", CONFIG_ENABLEWIN32);
     printf("- config MPI:           %s\n", CONFIG_ENABLEMPI);
 #ifdef STANDARDCONFIG
     printf("- chosen userconfig.H:  predefined\n", STANDARDCONFIG);

@@ -1,4 +1,4 @@
-SUBDIRS = src utils doc man maintainer tests
+SUBDIRS = src utils man doc maintainer tests
 
 ##############################################################################
 # remove everything that can be rebuilt

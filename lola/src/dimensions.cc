@@ -19,13 +19,12 @@
 \*****************************************************************************/
 
 
+#include <config.h>
 #include <iostream>
-#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include "dimensions.H"
-#include "config.h"
 
 using std::cout;
 using std::endl;

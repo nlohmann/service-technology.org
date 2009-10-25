@@ -7,7 +7,7 @@ binaries:
 	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-boundednet
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+EXTRA_DIST = testsuite.at wrap.sh \
 		testfiles
 
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)

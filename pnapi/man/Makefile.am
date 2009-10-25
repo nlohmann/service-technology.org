@@ -5,7 +5,7 @@ MAINTAINERCLEANFILES = $(man_MANS) petri.pdf
 EXTRA_DIST = $(man_MANS) extra
 
 petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
-	$(HELP2MAN) \
+	$(AM_V_GEN)$(HELP2MAN) \
 		$(top_builddir)/utils/petri \
 		--name="$(PACKAGE_NAME) Frontend" \
 		--output=$@ \
@@ -15,5 +15,7 @@ petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
 		--opt-include=extra \
 		--no-info
 
-man-pdf: petri.1
-	groff -Tps -mandoc -c petri.1 | ps2pdf - petri.pdf
+petri.pdf:
+	$(AM_V_GEN)groff -Tps -mandoc -c petri.1 | ps2pdf - petri.pdf
+
+man-pdf: petri.1 petri.pdf

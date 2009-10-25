@@ -28,5 +28,5 @@ DISTCLEANFILES = cmdline.c cmdline.h
 # use GNU gengetopt to create command line parser
 ################################################################
 cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=$(srcdir)/cmdline.ggo --set-version=$(VERSION)
+	$(AM_V_GEN)$(GENGETOPT) --input=$(srcdir)/cmdline.ggo --set-version=$(VERSION)
 

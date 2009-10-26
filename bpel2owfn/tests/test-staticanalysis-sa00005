@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="bpel2owfn -mcfg --input=$testdir/sa_tests/sa00005.bpel" # --wsdl=$testdir/sa_tests/sa00005.wsdl"
-echo ""
-echo "test: static analysis test [SA00005]"
-echo "      $command"
-$command &> /dev/null

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="bpel2owfn --bug"
-echo ""
-echo "test: bug output"
-echo "      $command"
-$command &> /dev/null

@@ -54,7 +54,7 @@
  * Headers
  *****************************************************************************/
 
-#include <cassert>
+#include <config.h>
 #include <iostream>
 #include <utility>
 

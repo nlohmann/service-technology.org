@@ -53,7 +53,7 @@
  * Headers
  *****************************************************************************/
 
-#include <cassert>
+#include <config.h>
 #include <iomanip>		// (std::setw)
 
 #include "helpers.h"		// helper functions (toString)

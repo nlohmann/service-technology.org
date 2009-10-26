@@ -58,7 +58,7 @@
 %}
 
 %{
-#include <cassert>
+#include <config.h>
 
 #include "ast-config.h"
 #include "helpers.h"

@@ -43,14 +43,6 @@ BUILT_SOURCES = $(KCDUMMY) \
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY) $(KCFILES_TEMP) $(KCFILES_NECESSARY) cmdline.ggo
 
-################################################################
-# inherit flags set by the configure script
-################################################################
-
-bpel2owfn_LDFLAGS  = @configured_LDFLAGS@
-bpel2owfn_CFLAGS   = @configured_CFLAGS@
-bpel2owfn_CXXFLAGS = @configured_CXXFLAGS@
-
 
 ##########################################
 # everything about the Kimwitu++ sources #
@@ -96,17 +88,17 @@ KCSOURCES = ast-system-k.cc ast-system-k.h \
 # The sed-script fixes problems occurring when BPEL2oWFN is compiled on
 # x86_64 machines.
 $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
-	touch $@
-	$(KC) $(KCFLAGS) $^
-	-rm $(KCFILES_TEMP:.k=.cc) $(KCFILES_TEMP:.k=.h)
-	$(SED) -i 's/reinterpret_cast<int>/reinterpret_cast<long>/g' ast-system-k.cc
+	$(AM_V_at)touch $@
+	$(AM_V_GEN)$(KC) $(KCFLAGS) $^
+	$(AM_V_at)-rm $(KCFILES_TEMP:.k=.cc) $(KCFILES_TEMP:.k=.h)
+	$(AM_V_at)$(SED) -i 's/reinterpret_cast<int>/reinterpret_cast<long>/g' ast-system-k.cc
 
 
 ################################################################
 # use GNU gengetopt to create command line parser
 ################################################################
 cmdline.c: cmdline.ggo
-	$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --unamed-opts
+	$(AM_V_GEN)$(GENGETOPT) --input=cmdline.ggo --long-help --include-getopt --show-required --unamed-opts
 
 
 ############################

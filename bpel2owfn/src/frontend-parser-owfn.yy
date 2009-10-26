@@ -59,12 +59,12 @@ extern int frontend_owfn_error(const char *);
 
 
 
-#include<stdio.h>
+#include <stdio.h>
 #include "globals.h"
 #include "petrinet.h"
 #include "helpers.h"
-#include<limits.h>
-#include<set>
+#include <limits.h>
+#include <set>
 #include <string>
 using namespace std;
 using namespace PNapi;

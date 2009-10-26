@@ -53,10 +53,10 @@
  * Headers
  *****************************************************************************/
 
+#include <config.h>
 #include <iostream>
 #include <fstream>	// (std::ofstream)
 #include <sstream>	// (std::ostringstream, std::istringstream)
-#include <cassert>
 #include <string>
 #include <vector>
 

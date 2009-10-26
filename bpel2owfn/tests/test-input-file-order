@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="bpel2owfn --input=$testdir/testfiles/OrderingServiceProcess.bpel"
-echo ""
-echo "test: reading WS-BPEL 2.0 abstract process (OrderingServiceProcess)"
-echo "      $command"
-$command &> /dev/null

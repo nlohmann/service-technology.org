@@ -1,137 +1,122 @@
-TESTS = test-cmdline-help \
-	test-cmdline-full-help \
-	test-cmdline-detailed-help \
-	test-cmdline-bug \
-	test-cmdline-version \
-	test-input-file-error \
-	test-input-pipe \
-	test-input-pipe-error \
-	test-input-file-auction \
-	test-input-file-loan \
-	test-input-file-order \
-	test-input-file-purchase \
-	test-input-file-shipping \
-	test-input-file-loan11 \
-	test-input-file-purchase11 \
-	test-input-file-shipping11 \
-	test-output-apnn \
-	test-output-ina \
-	test-output-lola \
-	test-output-owfn \
-	test-output-pep \
-	test-output-pnml \
-	test-output-spin \
-	test-output-tpn \
-	test-output-dot \
-	test-output-xml \
-	test-choreography-customer1 \
-	test-choreography-customer2 \
-	test-choreography-customer3 \
-	test-bpel4chor-1instance \
-	test-bpel4chor-10instances \
-	test-staticanalysis-sa00002 \
-	test-staticanalysis-sa00003 \
-	test-staticanalysis-sa00005 \
-	test-staticanalysis-sa00006 \
-	test-staticanalysis-sa00007 \
-	test-staticanalysis-sa00008 \
-	test-staticanalysis-sa00015 \
-	test-staticanalysis-sa00016 \
-	test-staticanalysis-sa00017 \
-	test-staticanalysis-sa00018 \
-	test-staticanalysis-sa00023 \
-	test-staticanalysis-sa00024 \
-	test-staticanalysis-sa00025 \
-	test-staticanalysis-sa00032 \
-	test-staticanalysis-sa00035 \
-	test-staticanalysis-sa00036 \
-	test-staticanalysis-sa00037 \
-	test-staticanalysis-sa00044 \
-	test-staticanalysis-sa00048 \
-	test-staticanalysis-sa00051 \
-	test-staticanalysis-sa00052 \
-	test-staticanalysis-sa00055 \
-	test-staticanalysis-sa00056 \
-	test-staticanalysis-sa00057 \
-	test-staticanalysis-sa00058 \
-	test-staticanalysis-sa00059 \
-	test-staticanalysis-sa00060 \
-	test-staticanalysis-sa00061 \
-	test-staticanalysis-sa00062 \
-	test-staticanalysis-sa00063 \
-	test-staticanalysis-sa00064 \
-	test-staticanalysis-sa00065 \
-	test-staticanalysis-sa00066 \
-	test-staticanalysis-sa00067 \
-	test-staticanalysis-sa00068 \
-	test-staticanalysis-sa00069 \
-	test-staticanalysis-sa00070 \
-	test-staticanalysis-sa00071 \
-	test-staticanalysis-sa00072 \
-	test-staticanalysis-sa00073 \
-	test-staticanalysis-sa00074 \
-	test-staticanalysis-sa00075 \
-	test-staticanalysis-sa00076 \
-	test-staticanalysis-sa00077 \
-	test-staticanalysis-sa00078 \
-	test-staticanalysis-sa00079 \
-	test-staticanalysis-sa00080 \
-	test-staticanalysis-sa00081 \
-	test-staticanalysis-sa00082 \
-	test-staticanalysis-sa00083 \
-	test-staticanalysis-sa00084 \
-	test-staticanalysis-sa00087 \
-	test-staticanalysis-sa00088 \
-	test-staticanalysis-sa00091 \
-	test-staticanalysis-sa00092 \
-	test-staticanalysis-sa00093
+#############################################################################
+# You need to perform three steps to add a test case:
+#   1.) edit the file `testsuite.at' and add you test case
+#   2.) add the files you need for the test to the `testfile' directory
+#   3.) add these files (without path) to the `TESTFILES' list
+# Do not forget to add your test files to the repository!
+#############################################################################
 
-XFAIL_TESTS = test-input-file-error \
-	test-input-pipe-error \
-	test-staticanalysis-sa00007 \
-	test-staticanalysis-sa00065 \
-	test-staticanalysis-sa00077 \
-	test-staticanalysis-sa00078
-
-TESTS_ENVIRONMENT = testdir=@srcdir@ builddir=@builddir@ \
-	PATH=.:../src:$$PATH
-
-CLEANFILES = -fr output $(COVERINFOS)
-	     
-EXTRA_DIST = $(TESTS) testfiles sa_tests consistency bpel4chor
+# the files needed by the test cases (without `testfile/' directory)
+TESTFILES = OrderingServiceProcess.bpel auction.bpel auction.wsdl auctionService.bpel auctionServiceInterface.wsdl chor_paper_agency.bpel chor_paper_airline.bpel chor_paper_topology1.xml chor_paper_topology10.xml chor_paper_traveler.bpel coffee.bpel customer1.bpel customer2.bpel customer3.bpel error.bpel loan.bpel loan.wsdl loanApprovalProcess.bpel loanServicePT.wsdl orderingLT.wsdl orderingPT.wsdl orderingProperties.wsdl purchase.bpel purchase.wsdl purchaseOrderProcess.bpel purchaseOrderProcess.dot purchaseOrderProcess.wsdl sa00002.bpel sa00002.wsdl sa00003.bpel sa00005.bpel sa00005.wsdl sa00006.bpel sa00007.bpel sa00008.bpel sa00015.bpel sa00016.bpel sa00017.bpel sa00018.bpel sa00023.bpel sa00024.bpel sa00025.bpel sa00032.bpel sa00035.bpel sa00036.bpel sa00037.bpel sa00044.bpel sa00048.bpel sa00048.wsdl sa00051.bpel sa00052.bpel sa00055.bpel sa00056.bpel sa00057.bpel sa00058.bpel sa00058.wsdl sa00059.bpel sa00060.bpel sa00061.bpel sa00062.bpel sa00063.bpel sa00064.bpel sa00065.bpel sa00066.bpel sa00067.bpel sa00068.bpel sa00069.bpel sa00070.bpel sa00071.bpel sa00072.bpel sa00073.bpel sa00074.bpel sa00075.bpel sa00076.bpel sa00077.bpel sa00078.bpel sa00079.bpel sa00080.bpel sa00081.bpel sa00082.bpel sa00083.bpel sa00084.bpel sa00087.bpel sa00087.wsdl sa00088.bpel sa00091.bpel sa00092.bpel sa00093.bpel shipping.bpel shippingLT.wsdl shippingPT.wsdl shippingProperties.wsdl shippingService.bpel
 
 
-##############################################################################
-# all you need for code coverage
-##############################################################################
+# Below you can list all the files you do not want to have counted in the
+# coverability report that can be created by calling "make cover". Usually,
+# these files are generated code or helper libraries that have not much to
+# do with your tool.
+# Absolute filenames are expected, but you may use '*' as wildcard. For
+# example '*/libs/*' ignores everything in the 'libs' directory and
+# '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
+NO_COVER_FILES = */libs/* */cmdline.c */verbose.* \
+                 */ast-config.cc */ast-grammar.cc */ast-system-k.cc \
+                 */ast-system-k.h */ast-system-rk.cc */ast-system-rk.h \
+                 */ast-system-unpk.cc */ast-system-unpk.h \
+                 */frontend-lexer-owfn.cc */frontend-lexer.cc \
+                 */frontend-parser-chor.cc */frontend-parser-owfn.cc \
+                 */frontend-parser-pnml.cc */frontend-parser-wsdl.cc \
+                 */frontend-parser.cc */petrinet-patterns-basic.cc \
+                 */petrinet-patterns-handlers.cc \
+                 */petrinet-patterns-links.cc \
+                 */petrinet-patterns-scopes.cc \
+                 */petrinet-patterns-shortcuts.cc \
+                 */petrinet-patterns-structured.cc
 
-# path to the tools
-LCOV    = lcov/lcov
-GENHTML = lcov/genhtml
-GENDESC = lcov/gendesc
-GENPNG  = lcov/genpng
 
-# use .info as suffix for cover information
-SUFFIXES = .info
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
 
-# for each test, create an .info file
-COVERINFOS = $(TESTS:=.info)
+################
+# GNU autotest #
+################
 
-# wrapper for the testscripts
-%.info: %
-	@$(LCOV) --zerocounters --quiet --directory $(top_srcdir)/src
-	-@$(TESTS_ENVIRONMENT) $(top_srcdir)/tests/$<
-	@$(LCOV) --capture --directory $(top_srcdir)/src --output-file $@ --test-name $<
+TESTSUITE = $(builddir)/testsuite
+EXTRA_DIST = testsuite.at wrap.sh \
+             $(addprefix testfiles/,$(TESTFILES))
+DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 
+# run the test suite when calling "make check"
+check-local: atconfig $(TESTSUITE)
+	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
+
+# clean the test results on "make clean"
+clean-local:
+	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
+
+# call a specific test set, (e.g. "make check-basic")
+check-%: atconfig $(TESTSUITE)
+	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) --keywords=$*
+
+# create the testsuite using autom4te
+$(TESTSUITE): $(srcdir)/testsuite.at package.m4
+	$(AM_V_GEN)$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	$(AM_V_at)mv $@.tmp $@
+
+
+######################
+# LCOV test coverage #
+######################
+
+# distribute the LGOV scripts
+EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov
+
+# compile the code for code coverage
 cover-prepare:
-	$(MAKE) --directory=$(top_srcdir) clean
-	$(MAKE) --directory=$(top_srcdir)/src all \
-	  CXXFLAGS="-fprofile-arcs -ftest-coverage" \
-	  CFLAGS="-fprofile-arcs -ftest-coverage" \
-	  LDFLAGS="-lgcov"
+	$(MAKE) --directory=$(top_srcdir) clean all \
+	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
+	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
+	  LDFLAGS+="-lgcov"
 
-# create a HTML table from the results
-cover: $(COVERINFOS)
-	$(GENHTML) $(COVERINFOS) \
-	   --output-directory output --title "$(PACKAGE_STRING)" \
-	   --show-details --legend
+# get descriptions from the testsuite
+descriptions: $(TESTSUITE)
+	$(SHELL) '$(TESTSUITE)' -l > descriptions.txt
+	$(SED) -i '1,5d;n;d;' descriptions.txt
+	$(SED) -i 's/:[ \t]*testsuite.at:[0-9]*[ \t]*/ /;s/^[ \t]*//' descriptions.txt
+	$(SED) -i 's/ /\n\t/' descriptions.txt
+	lcov/gendesc descriptions.txt -o descriptions1
+	cp descriptions1 descriptions10
+	cp descriptions1 descriptions100
+	$(SED) -i 's/^TN: \([1-9]\)$$/TN: 0\1/' descriptions10
+	$(SED) -i 's/^TN: \([1-9]\)$$/TN: 00\1/' descriptions100
+	$(SED) -i 's/^TN: \([1-9][1-9]\)$$/TN: 0\1/' descriptions100
+	cat descriptions1 descriptions10 descriptions100 > descriptions
+	rm descriptions1 descriptions10 descriptions100 descriptions.txt
+
+# execute tests using coverage
+cover-check: cover-prepare $(TESTSUITE)
+	test ! -d cover || rm -fr cover
+	$(MKDIR_P) cover
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=TRUE
+
+# exclude generated code using the wildcards specified in NO_COVER_FILES
+cover.info:
+	cat cover/*.info > cover.info
+	lcov/lcov --remove cover.info $(addprefix ",$(addsuffix ", $(NO_COVER_FILES))) -o cover.info
+
+# create a HTML table with results from LCOV
+cover-html: descriptions cover.info
+	lcov/genhtml cover.info \
+	   --output-directory cover-html --title "$(PACKAGE_STRING)" \
+	   --show-details --legend --description-file descriptions --sort \
+	   --no-function-coverage --prefix $(abs_top_builddir)
+	@echo see `pwd`/cover-html/index.html for a coverage report
+
+cover: cover-check cover-html
+
+# clean also the temp files in the src directory
+CLEANFILES = -fr cover descriptions 
+MAINTAINERCLEANFILES = -fr cover-html cover.info
+maintainer-clean-local:
+	find $(top_builddir) -name *.gcov -exec rm {} \;
+	find $(top_builddir) -name *.gcno -exec rm {} \;
+	find $(top_builddir) -name *.gcda -exec rm {} \;

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="bpel2owfn --full-help"
-echo ""
-echo "test: full help output"
-echo "      $command"
-$command &> /dev/null

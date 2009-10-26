@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="cat $testdir/testfiles/purchaseOrderProcess.bpel | bpel2owfn"
-echo ""
-echo "test: pipe input"
-echo "      $command"
-cat $testdir/testfiles/purchaseOrderProcess.bpel | bpel2owfn &> /dev/null

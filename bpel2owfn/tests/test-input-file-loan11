@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="bpel2owfn --input=$testdir/testfiles/loan.bpel"
-echo ""
-echo "test: reading BPEL4WS 1.1 executable process (loanApprovalProcess)"
-echo "      $command"
-$command &> /dev/null

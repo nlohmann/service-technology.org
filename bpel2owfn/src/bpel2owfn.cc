@@ -52,15 +52,13 @@
  * Headers
  *****************************************************************************/
 
+#include <config.h>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cassert>
 #include <map>
 #include <cstdlib>
-
-#include "config.h"          // generated configuration file
 
 #include "petrinet.h"           // Petri Net support
 #include "cfg.h"		// Control Flow Graph

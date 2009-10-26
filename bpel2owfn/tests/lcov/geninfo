@@ -44,6 +44,9 @@
 #   2004-02-16 / Andreas Krebbel: Added support for .gcno/.gcda files and
 #                gcov versioning
 #   2004-08-09 / Peter Oberparleiter: added configuration file support
+#   2008-07-14 / Tom Zoerner: added --function-coverage command line option
+#   2008-08-13 / Peter Oberparleiter: modified function coverage
+#                implementation (now enabled per default)
 #
 
 use strict;
@@ -53,9 +56,10 @@ use Digest::MD5 qw(md5_base64);
 
 
 # Constants
-our $lcov_version	= "LTP GCOV extension version 1.6";
+our $lcov_version	= "LCOV version 1.7";
 our $lcov_url		= "http://ltp.sourceforge.net/coverage/lcov.php";
 our $gcov_tool		= "gcov";
+our $tool_name		= basename($0);
 
 our $GCOV_VERSION_3_4_0	= 0x30400;
 our $GCOV_VERSION_3_3_0	= 0x30300;
@@ -94,6 +98,8 @@ sub read_config($);
 sub apply_config($);
 sub gen_initial_info($);
 sub process_graphfile($);
+sub warn_handler($);
+sub die_handler($);
 
 # Global variables
 our $gcov_version;
@@ -119,6 +125,8 @@ our $compatibility;	# Compatibility version flag - used to indicate
 our @ignore_errors;	# List of errors to ignore (parameter)
 our @ignore;		# List of errors to ignore (array)
 our $initial;
+our $no_recursion = 0;
+our $maxdepth;
 
 our $cwd = `pwd`;
 chomp($cwd);
@@ -130,6 +138,8 @@ chomp($cwd);
 
 # Register handler routine to be called when interrupted
 $SIG{"INT"} = \&int_handler;
+$SIG{__WARN__} = \&warn_handler;
+$SIG{__DIE__} = \&die_handler;
 
 # Read configuration file if available
 if (-r $ENV{"HOME"}."/.lcovrc")
@@ -167,16 +177,17 @@ if (!GetOptions("test-name=s" => \$test_name,
 		"base-directory=s" => \$base_directory,
 		"version" =>\$version,
 		"quiet" => \$quiet,
-		"help" => \$help,
+		"help|?" => \$help,
 		"follow" => \$follow,
 		"compat-libtool" => \$compat_libtool,
 		"no-compat-libtool" => \$no_compat_libtool,
 		"gcov-tool=s" => \$gcov_tool,
 		"ignore-errors=s" => \@ignore_errors,
-		"initial|i" => \$initial
+		"initial|i" => \$initial,
+		"no-recursion" => \$no_recursion,
 		))
 {
-	print_usage(*STDERR);
+	print(STDERR "Use $tool_name --help to get usage information\n");
 	exit(1);
 }
 else
@@ -207,7 +218,7 @@ if ($help)
 # Check for version option
 if ($version)
 {
-	print($lcov_version."\n");
+	print("$tool_name: $lcov_version\n");
 	exit(0);
 }
 
@@ -263,12 +274,21 @@ else
 	$compat_libtool = 1;
 }
 
+# Determine max depth for recursion
+if ($no_recursion)
+{
+	$maxdepth = "-maxdepth 1";
+}
+else
+{
+	$maxdepth = "";
+}
+
 # Check for directory name
 if (!@data_directory)
 {
-	print(STDERR "No directory specified\n");
-	print_usage(*STDERR);
-	exit(1);
+	die("No directory specified\n".
+	    "Use $tool_name --help to get usage information\n");
 }
 else
 {
@@ -387,7 +407,6 @@ exit(0);
 sub print_usage(*)
 {
 	local *HANDLE = $_[0];
-	my $tool_name = basename($0);
 
 	print(HANDLE <<END_OF_USAGE);
 Usage: $tool_name [OPTIONS] DIRECTORY
@@ -408,8 +427,10 @@ sequentially.
       --(no-)compat-libtool         Enable (disable) libtool compatibility mode
       --gcov-tool TOOL              Specify gcov tool location
       --ignore-errors ERROR         Continue after ERROR (gcov, source)
+      --no-recursion                Exlude subdirectories from processing
+      --function-coverage           Capture function call counts
 
-See $lcov_url for more information about this tool.
+For more information see: $lcov_url
 END_OF_USAGE
 	;
 }
@@ -458,7 +479,7 @@ sub gen_info($)
 		info("Scanning $directory for $data_file_extension ".
 		     "files ...\n");	
 
-		@file_list = `find $directory $follow -name \\*$data_file_extension -type f 2>/dev/null`;
+		@file_list = `find "$directory" $maxdepth $follow -name \\*$data_file_extension -type f 2>/dev/null`;
 		chomp(@file_list);
 		@file_list or die("ERROR: no $data_file_extension files found ".
 				  "in $directory!\n");
@@ -498,10 +519,13 @@ sub process_dafile($)
 	my $gcov_file;		# Name of a .gcov file
 	my @gcov_content;	# Content of a .gcov file
 	my @gcov_branches;	# Branch content of a .gcov file
+	my @gcov_functions;	# Function calls of a .gcov file
 	my @gcov_list;		# List of generated .gcov files
 	my $line_number;	# Line number count
 	my $lines_hit;		# Number of instrumented lines hit
 	my $lines_found;	# Number of instrumented lines found
+	my $funcs_hit;		# Number of instrumented functions hit
+	my $funcs_found;	# Number of instrumented functions found
 	my $source;		# gcov source header information
 	my $object;		# gcov object header information
 	my @matches;		# List of absolute paths matching filename
@@ -697,12 +721,8 @@ sub process_dafile($)
 	foreach $gcov_file (@gcov_list)
 	{
 		($source, $object) = read_gcov_header($gcov_file);
-		if (!defined($source))
-		{
-			next;
-		}
 
-		if ($source)
+		if (defined($source))
 		{
 			$source = solve_relative_path($base_dir, $source);
 		}
@@ -738,6 +758,7 @@ sub process_dafile($)
 		@result = read_gcov_file($gcov_file);
 		@gcov_content = @{$result[0]};
 		@gcov_branches = @{$result[1]};
+		@gcov_functions = @{$result[2]};
 
 		# Skip empty files
 		if (!@gcov_content)
@@ -779,11 +800,36 @@ sub process_dafile($)
 			{
 				my ($fn, $line) = split("=", $_);
 
-				if ($fn ne "")
-				{
-					print(INFO_HANDLE "FN:$line,$fn\n");
+				if ($fn eq "") {
+					next;
 				}
+
+				# Normalize function name
+				$fn =~ s/\W/_/g;
+
+				print(INFO_HANDLE "FN:$line,$fn\n");
 			}
+		}
+
+		#--
+		#-- FNDA: <call-count>, <function-name>
+		#-- FNF: overall count of functions
+		#-- FNH: overall count of functions with non-zero call count
+		#--
+		$funcs_found = 0;
+		$funcs_hit = 0;
+		while (@gcov_functions)
+		{
+			printf(INFO_HANDLE "FNDA:%s,%s\n",
+				       $gcov_functions[0],
+				       $gcov_functions[1]);
+				$funcs_found++;
+			$funcs_hit++ if $gcov_functions[0];
+			splice(@gcov_functions,0,2);
+		}
+		if ($funcs_found > 0) {
+			printf(INFO_HANDLE "FNF:%s\n", $funcs_found);
+			printf(INFO_HANDLE "FNH:%s\n", $funcs_hit);
 		}
 
 		# Reset line counters
@@ -1082,7 +1128,7 @@ sub read_gcov_header($)
 # read_gcov_file(gcov_filename)
 #
 # Parse file GCOV_FILENAME (.gcov file format) and return the list:
-# (reference to gcov_content, reference to gcov_branch)
+# (reference to gcov_content, reference to gcov_branch, reference to gcov_func)
 #
 # gcov_content is a list of 3 elements
 # (flag, count, source) for each source code line:
@@ -1094,6 +1140,9 @@ sub read_gcov_header($)
 # gcov_branch is a list of 2 elements
 # (linenumber, branch result) for each branch
 #
+# gcov_func is a list of 2 elements
+# (number of calls, function name) for each function
+#
 # Die on error.
 #
 
@@ -1102,6 +1151,7 @@ sub read_gcov_file($)
 	my $filename = $_[0];
 	my @result = ();
 	my @branches = ();
+	my @functions = ();
 	my $number;
 	local *INPUT;
 
@@ -1182,6 +1232,10 @@ sub read_gcov_file($)
 					push(@branches, 2);
 				}
 			}
+			elsif (/^function\s+(\S+)\s+called\s+(\d+)/)
+			{
+				push(@functions, $2, $1);
+			}
 			elsif (/^call/)
 			{
 				# Function call return data
@@ -1217,7 +1271,7 @@ sub read_gcov_file($)
 	}
 
 	close(INPUT);
-	return(\@result, \@branches);
+	return(\@result, \@branches, \@functions);
 }
 
 
@@ -1287,6 +1341,7 @@ sub read_bb_file($$)
 			$function_name = read_string(*INPUT, $minus_two)
 				 or die("ERROR: incomplete function ".
 					"name in $bb_filename!\n");
+			$function_name =~ s/\W/_/g;
 		}
 		elsif ($value > 0)
 		{
@@ -1420,6 +1475,7 @@ sub read_gcno_file($$)
 			seek(INPUT, 12, 1);
 			(undef, $function_name) =
 				read_gcno_string(*INPUT, $endianness);
+			$function_name =~ s/\W/_/g;
 			(undef, $filename) =
 				read_gcno_string(*INPUT, $endianness);
 			$filename = solve_relative_path($base_dir, $filename);
@@ -1465,6 +1521,7 @@ sub read_gcno_file($$)
 					}
 					next;
 				}
+				last if ($length == 0);
 				($blocks, $string) =
 					read_gcno_string(*INPUT, $endianness);
 				if (defined($string))
@@ -1526,11 +1583,24 @@ sub read_gcno_string(*$)
 		return (1, undef);
 	}
 
-	read($handle, $packed_word, 4 * $number_of_blocks) ==
-		4 * $number_of_blocks or die("ERROR: reading string\n");
-	
+	if (read($handle, $packed_word, 4 * $number_of_blocks) !=
+	     4 * $number_of_blocks)
+	{
+		my $msg = "invalid string size ".(4 * $number_of_blocks)." in ".
+			  "gcno file at position ".tell($handle)."\n";
+		if ($ignore[$ERROR_SOURCE])
+		{
+			warn("WARNING: $msg");
+			return (1, undef);
+		}
+		else
+		{
+			die("ERROR: $msg");
+		}
+	}
+
 	$string = $string . $packed_word;
-	
+
 	# Remove trailing nil bytes
 	$/="\0";
 	while (chomp($string)) {};
@@ -1604,6 +1674,7 @@ sub read_hammer_bbg_file($$)
 			# Get function name
 			($value, $function_name) =
 				read_hammer_bbg_string(*INPUT, $endianness);
+			$function_name =~ s/\W/_/g;
 			$filename = undef;
 			$first_line = undef;
 
@@ -1952,7 +2023,7 @@ sub gen_initial_info($)
 		info("Scanning $directory for $graph_file_extension ".
 		     "files ...\n");	
 
-		@file_list = `find $directory $follow -name \\*$graph_file_extension -type f 2>/dev/null`;
+		@file_list = `find "$directory" $maxdepth $follow -name \\*$graph_file_extension -type f 2>/dev/null`;
 		chomp(@file_list);
 		@file_list or die("ERROR: no $graph_file_extension files ".
 				  "found in $directory!\n");
@@ -2049,8 +2120,11 @@ sub process_graphfile($)
 	{
 		my %lines;
 		my $count = 0;
+		my @functions;
 
 		print(INFO_HANDLE "SF:$filename\n");
+
+		# Write function related data
 		foreach (split(",",$graph_data{$filename}))
 		{
 			my ($fn, $line) = split("=", $_);
@@ -2058,12 +2132,22 @@ sub process_graphfile($)
 			if ($fn eq "")
 			{
 				$lines{$line} = "";
+				next;
 			}
-			else
-			{
-				print(INFO_HANDLE "FN:$line,$fn\n");
-			}
+
+			# Normalize function name
+			$fn =~ s/\W/_/g;
+
+			print(INFO_HANDLE "FN:$line,$fn\n");
+			push(@functions, $fn);
 		}
+		foreach (@functions) {
+			print(INFO_HANDLE "FNDA:$_,0\n");
+		}
+		print(INFO_HANDLE "FNF:".scalar(@functions)."\n");
+		print(INFO_HANDLE "FNH:0\n");
+
+		# Write line related data
 		foreach (sort {$a <=> $b } keys(%lines))
 		{
 			print(INFO_HANDLE "DA:$_,0\n");
@@ -2077,4 +2161,18 @@ sub process_graphfile($)
 	{
 		close(INFO_HANDLE);
 	}
+}
+
+sub warn_handler($)
+{
+	my ($msg) = @_;
+
+	warn("$tool_name: $msg");
+}
+
+sub die_handler($)
+{
+	my ($msg) = @_;
+
+	die("$tool_name: $msg");
 }

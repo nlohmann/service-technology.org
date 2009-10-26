@@ -1,0 +1,143 @@
+digraph N {
+ graph [fontname="Helvetica" nodesep=0.25 ranksep="0.25" fontsize=10 remincross=true label="structurally reduced Petri net generated from /Users/niels/Documents/6Tools/service-tech/bpel2owfn/tests/testfiles/purchaseOrderProcess.bpel"]
+ node [fontname="Helvetica" fontsize=8 fixedsize width=".3" height=".3" label="" style=filled fillcolor=white]
+ edge [fontname="Helvetica" fontsize=8 color=white arrowhead=none weight="20.0"]
+
+
+ // places
+ node [shape=circle];
+ p1  	[fillcolor=green]
+ p1_l	[style=invis];
+ p1_l -> p1 [headlabel="link.19.ship-to-invoice"]
+ p2  	[fillcolor=green]
+ p2_l	[style=invis];
+ p2_l -> p2 [headlabel="link.19.ship-to-scheduling"]
+ p3  	[]
+ p3_l	[style=invis];
+ p3_l -> p3 [headlabel="p3"]
+ p4  	[]
+ p4_l	[style=invis];
+ p4_l -> p4 [headlabel="p4"]
+ p5  	[]
+ p5_l	[style=invis];
+ p5_l -> p5 [headlabel="p5"]
+ p6  	[]
+ p6_l	[style=invis];
+ p6_l -> p6 [headlabel="p6"]
+ p7  	[]
+ p7_l	[style=invis];
+ p7_l -> p7 [headlabel="p7"]
+ p8  	[]
+ p8_l	[style=invis];
+ p8_l -> p8 [headlabel="p8"]
+ p9  	[]
+ p9_l	[style=invis];
+ p9_l -> p9 [headlabel="p9"]
+ p10  	[]
+ p10_l	[style=invis];
+ p10_l -> p10 [headlabel="p10"]
+ p11  	[fillcolor=black peripheries=2 height=".2" width=".2" ]
+ p11_l	[style=invis];
+ p11_l -> p11 [headlabel="p11"]
+ p12  	[fillcolor=gray]
+ p12_l	[style=invis];
+ p12_l -> p12 [headlabel="p12"]
+ p13  	[fillcolor=orange]
+ p13_l	[style=invis];
+ p13_l -> p13 [headlabel="invoiceService.invoiceRequester.sendInvoice"]
+ p14  	[fillcolor=orange]
+ p14_l	[style=invis];
+ p14_l -> p14 [headlabel="purchasing.sendPurchaseOrder"]
+ p15  	[fillcolor=orange]
+ p15_l	[style=invis];
+ p15_l -> p15 [headlabel="shippingService.shippingRequester.requestShipping"]
+ p16  	[fillcolor=orange]
+ p16_l	[style=invis];
+ p16_l -> p16 [headlabel="shippingService.shippingRequester.sendSchedule"]
+ p17  	[fillcolor=yellow]
+ p17_l	[style=invis];
+ p17 -> p17_l [taillabel="invoiceRequester.invoiceService.initiatePriceCalculation"]
+ p18  	[fillcolor=yellow]
+ p18_l	[style=invis];
+ p18 -> p18_l [taillabel="invoiceRequester.invoiceService.sendShippingPrice"]
+ p19  	[fillcolor=yellow]
+ p19_l	[style=invis];
+ p19 -> p19_l [taillabel="purchasing.sendPurchaseOrder"]
+ p20  	[fillcolor=yellow]
+ p20_l	[style=invis];
+ p20 -> p20_l [taillabel="scheduling.requestProductionScheduling"]
+ p21  	[fillcolor=yellow]
+ p21_l	[style=invis];
+ p21 -> p21_l [taillabel="scheduling.sendShippingSchedule"]
+ p22  	[fillcolor=yellow]
+ p22_l	[style=invis];
+ p22 -> p22_l [taillabel="shippingRequester.shippingService.requestShipping"]
+
+ // transitions
+ node [shape=box]
+ t1  	[fillcolor=yellow ]
+ t1_l	[style=invis];
+ t1_l -> t1 [headlabel="t1" style=invis]
+ t2  	[fillcolor=orange ]
+ t2_l	[style=invis];
+ t2_l -> t2 [headlabel="t2" style=invis]
+ t3  	[fillcolor=yellow ]
+ t3_l	[style=invis];
+ t3_l -> t3 [headlabel="t3" style=invis]
+ t4  	[fillcolor=gold label=< <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0" HEIGHT="21" WIDTH="21" FIXEDSIZE="TRUE"><TR><TD HEIGHT="11" WIDTH="21" FIXEDSIZE="TRUE" BGCOLOR="ORANGE"></TD></TR><TR><TD HEIGHT="10" WIDTH="21" FIXEDSIZE="TRUE" BGCOLOR="YELLOW"></TD></TR></TABLE> >]
+ t4_l	[style=invis];
+ t4_l -> t4 [headlabel="t4" style=invis]
+ t5  	[fillcolor=yellow ]
+ t5_l	[style=invis];
+ t5_l -> t5 [headlabel="t5" style=invis]
+ t6  	[fillcolor=orange label="recv"]
+ t6_l	[style=invis];
+ t6_l -> t6 [headlabel="t6" style=invis]
+ t7  	[fillcolor=orange ]
+ t7_l	[style=invis];
+ t7_l -> t7 [headlabel="t7" style=invis]
+
+ // cluster the inner of the net
+ subgraph cluster1
+ {
+  t1 t1_l t2 t2_l t3 t3_l t4 t4_l t5 t5_l t6 t6_l t7 t7_l
+  p1 p1_l p2 p2_l p3 p3_l p4 p4_l p5 p5_l p6 p6_l p7 p7_l p8 p8_l p9 p9_l p10 p10_l p11 p12 p12_l
+  label="" style="dashed"
+ }
+
+ // arcs
+ edge [fontname="Helvetica" fontsize=8 arrowhead=normal color=black]
+ t3 -> p6	[weight=10000.0]
+ t1 -> p12	[weight=10000.0]
+ p8 -> t3	[weight=10000.0]
+ t7 -> p3	[weight=10000.0]
+ p15 -> t7	[]
+ t1 -> p19	[]
+ t4 -> p8	[weight=10000.0]
+ t5 -> p7	[weight=10000.0]
+ p5 -> t1	[weight=10000.0]
+ t4 -> p20	[]
+ p1 -> t3	[weight=10000.0]
+ p9 -> t1	[weight=10000.0]
+ t3 -> p18	[]
+ t2 -> p2	[weight=10000.0]
+ t2 -> p5	[weight=10000.0]
+ p7 -> t1	[weight=10000.0]
+ p3 -> t2	[weight=10000.0]
+ t4 -> p10	[weight=10000.0]
+ p16 -> t2	[]
+ t7 -> p1	[weight=10000.0]
+ t6 -> p9	[weight=10000.0]
+ p13 -> t6	[]
+ p2 -> t5	[weight=10000.0]
+ t5 -> p21	[]
+ p6 -> t6	[weight=10000.0]
+ p11 -> t4	[weight=10000.0]
+ p4 -> t7	[weight=10000.0]
+ p14 -> t4	[]
+ t4 -> p4	[weight=10000.0]
+ t4 -> p17	[]
+ t4 -> p22	[]
+ p10 -> t5	[weight=10000.0]
+
+}

@@ -63,7 +63,7 @@
  * See \ref ast-config.cc for more information.
  */
 
-#include <cassert>
+#include <config.h>
 #include <climits>
 
 #include "ast-system-k.h"	// phylum definitions
@@ -96,9 +96,9 @@ extern string forEach_suffix;
 // the header file
 
 %{ KC_UNPARSE
+#include <config.h>
 #include <iostream>
 #include <cmath>
-#include <cassert>
 #include <map>
 #include <set>
 #include <climits>

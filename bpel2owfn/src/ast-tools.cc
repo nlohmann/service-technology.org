@@ -55,7 +55,6 @@
  *****************************************************************************/
 
 #include <cmath>
-#include <cassert>
 #include <utility>
 
 #include "options.h"

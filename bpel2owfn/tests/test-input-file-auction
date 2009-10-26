@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-command="bpel2owfn --input=$testdir/testfiles/auctionService.bpel"
-echo ""
-echo "test: reading WS-BPEL 2.0 executable process (auctionService)"
-echo "      $command"
-$command &> /dev/null

@@ -62,11 +62,11 @@
  * Headers
  *****************************************************************************/
 
+#include <config.h>
 #include <string>
 #include <map>
 #include <set>
 #include <vector>
-#include <cassert>
 
 using std::string;
 using std::vector;

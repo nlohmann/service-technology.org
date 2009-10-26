@@ -1,0 +1,570 @@
+AT_INIT
+
+m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == ""; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([BPEL4Chor])
+############################################################################
+
+AT_SETUP([BPEL4Chor choreography with 10 instances])
+AT_CHECK([cp TESTFILES/chor_paper_traveler.bpel TESTFILES/chor_paper_airline.bpel TESTFILES/chor_paper_agency.bpel TESTFILES/chor_paper_topology10.xml .])
+AT_CHECK([BPEL2OWFN --input=chor_paper_traveler.bpel --input=chor_paper_airline.bpel --input=chor_paper_agency.bpel --topology=chor_paper_topology10.xml --mode=choreography --parameter=communicationonly --output=choreography10 --format=owfn],0,ignore,ignore)
+AT_CHECK([test -f choreography10.owfn])
+AT_KEYWORDS(bpel4chor)
+AT_CLEANUP
+
+AT_SETUP([BPEL4Chor choreography with 1 instance])
+AT_CHECK([cp TESTFILES/chor_paper_traveler.bpel TESTFILES/chor_paper_airline.bpel TESTFILES/chor_paper_agency.bpel TESTFILES/chor_paper_topology1.xml .])
+AT_CHECK([BPEL2OWFN --input=chor_paper_traveler.bpel --input=chor_paper_airline.bpel --input=chor_paper_traveler.bpel --topology=chor_paper_topology1.xml --mode=choreography --parameter=communicationonly --output=choreography1 --format=owfn],0,ignore,ignore)
+AT_CHECK([test -f choreography1.owfn])
+AT_KEYWORDS(bpel4chor)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([User-defined Compositions])
+############################################################################
+
+AT_SETUP([user-defined choreography, customer 1])
+AT_CHECK([cp TESTFILES/coffee.bpel TESTFILES/customer1.bpel .])
+AT_CHECK([BPEL2OWFN --input=coffee.bpel --input=customer1.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer1],0,ignore,ignore)
+AT_CHECK([test -f coffee_customer1.lola])
+AT_CHECK([test -f coffee_customer1.task])
+AT_KEYWORDS(composition)
+AT_CLEANUP
+
+AT_SETUP([user-defined choreography, customer 2])
+AT_CHECK([cp TESTFILES/coffee.bpel TESTFILES/customer2.bpel .])
+AT_CHECK([BPEL2OWFN --input=coffee.bpel --input=customer2.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer2],0,ignore,ignore)
+AT_CHECK([test -f coffee_customer2.lola])
+AT_CHECK([test -f coffee_customer2.task])
+AT_KEYWORDS(composition)
+AT_CLEANUP
+
+AT_SETUP([user-defined choreography, customer 3])
+AT_CHECK([cp TESTFILES/coffee.bpel TESTFILES/customer3.bpel .])
+AT_CHECK([BPEL2OWFN --input=coffee.bpel --input=customer3.bpel --mode=choreography --format=lola --parameter=communicationonly --parameter=reduce --output=coffee_customer3],0,ignore,ignore)
+AT_CHECK([test -f coffee_customer3.lola])
+AT_CHECK([test -f coffee_customer3.task])
+AT_KEYWORDS(composition)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([bug output])
+AT_CHECK([BPEL2OWFN --bug],0,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([detailed help output])
+AT_CHECK([BPEL2OWFN --detailed-help],0,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([full help output])
+AT_CHECK([BPEL2OWFN --full-help],0,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([help output])
+AT_CHECK([BPEL2OWFN --help],0,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([version output])
+AT_CHECK([BPEL2OWFN --version],0,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Input file formats])
+############################################################################
+
+AT_SETUP([pipe input])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([cat purchaseOrderProcess.bpel | BPEL2OWFN],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([pipe input])
+AT_CHECK(cp TESTFILES/error.bpel .)
+AT_CHECK([cat error.bpel | BPEL2OWFN],1,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([file input])
+AT_CHECK(cp TESTFILES/error.bpel .)
+AT_CHECK([BPEL2OWFN --input=error.bpel],1,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([WS-BPEL 2.0 executable (auctionService)])
+AT_CHECK(cp TESTFILES/auctionService.bpel .)
+AT_CHECK([BPEL2OWFN --input=auctionService.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([WS-BPEL 2.0 executable (loanApprovalProcess)])
+AT_CHECK(cp TESTFILES/loanApprovalProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=loanApprovalProcess.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([BPEL4WS 1.1 executable (loanApprovalProcess)])
+AT_CHECK(cp TESTFILES/loan.bpel .)
+AT_CHECK([BPEL2OWFN --input=loan.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([WS-BPEL 2.0 abstract (OrderingServiceProcess)])
+AT_CHECK(cp TESTFILES/OrderingServiceProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=OrderingServiceProcess.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([WS-BPEL 2.0 executable (purchaseOrderProcess)])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([BPEL4WS 1.1 executable (purchaseOrderProcess)])
+AT_CHECK(cp TESTFILES/purchase.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchase.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([WS-BPEL 2.0 abstract (shippingService)])
+AT_CHECK(cp TESTFILES/shippingService.bpel .)
+AT_CHECK([BPEL2OWFN --input=shippingService.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+AT_SETUP([BPEL4WS 1.1 abstract (shippingService)])
+AT_CHECK(cp TESTFILES/shipping.bpel .)
+AT_CHECK([BPEL2OWFN --input=shipping.bpel],0,ignore,ignore)
+AT_KEYWORDS(input)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Output file formats])
+############################################################################
+
+AT_SETUP([Petri net file output: APNN format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=apnn --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.apnn])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: Dot format])
+AT_CHECK_DOT
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=dot --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.dot])
+AT_CHECK([test -f purchaseOrderProcess.png])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: INA format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=ina --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.pnt])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: LoLA format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=lola --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.lola])
+AT_CHECK([test -f purchaseOrderProcess.task])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: oWFN format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=owfn --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.owfn])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: PEP format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=pep --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.ll_net])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: PNML format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=pnml --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.pnml])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: SPIN format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=spin --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.spin])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: tpn format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=petrinet --format=tpn --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.tpn])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+AT_SETUP([Petri net file output: TPN format])
+AT_CHECK(cp TESTFILES/purchaseOrderProcess.bpel .)
+AT_CHECK([BPEL2OWFN --input=purchaseOrderProcess.bpel --mode=pretty --format=xml --output=purchaseOrderProcess],0,ignore,ignore)
+AT_CHECK([test -f purchaseOrderProcess.xml])
+AT_KEYWORDS(ouput)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Static Analysis])
+############################################################################
+
+AT_SETUP([static analysis test [SA00002]])
+AT_CHECK([CP TESTFILES/sa00002.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00002.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00003]])
+AT_CHECK([CP TESTFILES/sa00003.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00003.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00005]])
+AT_CHECK([CP TESTFILES/sa00005.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00005.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00006]])
+AT_CHECK([CP TESTFILES/sa00006.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00006.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00007]])
+AT_CHECK([CP TESTFILES/sa00007.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00007.bpel],4,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00008]])
+AT_CHECK([CP TESTFILES/sa00008.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00008.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00015]])
+AT_CHECK([CP TESTFILES/sa00015.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00015.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00016]])
+AT_CHECK([CP TESTFILES/sa00016.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00016.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00017]])
+AT_CHECK([CP TESTFILES/sa00017.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00017.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00018]])
+AT_CHECK([CP TESTFILES/sa00018.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00018.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00023]])
+AT_CHECK([CP TESTFILES/sa00023.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00023.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00024]])
+AT_CHECK([CP TESTFILES/sa00024.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00024.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00025]])
+AT_CHECK([CP TESTFILES/sa00025.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00025.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00032]])
+AT_CHECK([CP TESTFILES/sa00032.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00032.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00035]])
+AT_CHECK([CP TESTFILES/sa00035.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00035.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00036]])
+AT_CHECK([CP TESTFILES/sa00036.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00036.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00037]])
+AT_CHECK([CP TESTFILES/sa00037.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00037.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00044]])
+AT_CHECK([CP TESTFILES/sa00044.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00044.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00048]])
+AT_CHECK([CP TESTFILES/sa00048.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00048.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00051]])
+AT_CHECK([CP TESTFILES/sa00051.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00051.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00052]])
+AT_CHECK([CP TESTFILES/sa00052.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00052.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00055]])
+AT_CHECK([CP TESTFILES/sa00055.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00055.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00056]])
+AT_CHECK([CP TESTFILES/sa00056.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00056.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00057]])
+AT_CHECK([CP TESTFILES/sa00057.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00057.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00058]])
+AT_CHECK([CP TESTFILES/sa00058.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00058.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00059]])
+AT_CHECK([CP TESTFILES/sa00059.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00059.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00060]])
+AT_CHECK([CP TESTFILES/sa00060.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00060.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00061]])
+AT_CHECK([CP TESTFILES/sa00061.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00061.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00062]])
+AT_CHECK([CP TESTFILES/sa00062.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00062.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00063]])
+AT_CHECK([CP TESTFILES/sa00063.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00063.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00064]])
+AT_CHECK([CP TESTFILES/sa00064.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00064.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00065]])
+AT_CHECK([CP TESTFILES/sa00065.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00065.bpel],1,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00066]])
+AT_CHECK([CP TESTFILES/sa00066.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00066.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00067]])
+AT_CHECK([CP TESTFILES/sa00067.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00067.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00068]])
+AT_CHECK([CP TESTFILES/sa00068.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00068.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00069]])
+AT_CHECK([CP TESTFILES/sa00069.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00069.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00070]])
+AT_CHECK([CP TESTFILES/sa00070.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00070.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00071]])
+AT_CHECK([CP TESTFILES/sa00071.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00071.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00072]])
+AT_CHECK([CP TESTFILES/sa00072.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00072.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00073]])
+AT_CHECK([CP TESTFILES/sa00073.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00073.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00074]])
+AT_CHECK([CP TESTFILES/sa00074.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00074.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00075]])
+AT_CHECK([CP TESTFILES/sa00075.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00075.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00076]])
+AT_CHECK([CP TESTFILES/sa00076.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00076.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00077]])
+AT_CHECK([CP TESTFILES/sa00077.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00077.bpel],4,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00078]])
+AT_CHECK([CP TESTFILES/sa00078.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00078.bpel],4,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00079]])
+AT_CHECK([CP TESTFILES/sa00079.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00079.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00080]])
+AT_CHECK([CP TESTFILES/sa00080.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00080.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00081]])
+AT_CHECK([CP TESTFILES/sa00081.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00081.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00082]])
+AT_CHECK([CP TESTFILES/sa00082.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00082.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00083]])
+AT_CHECK([CP TESTFILES/sa00083.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00083.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00084]])
+AT_CHECK([CP TESTFILES/sa00084.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00084.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00087]])
+AT_CHECK([CP TESTFILES/sa00087.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00087.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00088]])
+AT_CHECK([CP TESTFILES/sa00088.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00088.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00091]])
+AT_CHECK([CP TESTFILES/sa00091.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00091.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00092]])
+AT_CHECK([CP TESTFILES/sa00092.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00092.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP
+
+AT_SETUP([static analysis test [SA00093]])
+AT_CHECK([CP TESTFILES/sa00093.bpel .])
+AT_CHECK([BPEL2OWFN -mcfg --input=sa00093.bpel],0,ignore,ignore)
+AT_KEYWORDS(static)
+AT_CLEANUP

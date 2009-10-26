@@ -58,10 +58,9 @@
  * Headers
  *****************************************************************************/
 
-#include <cassert>
+#include <config.h>
 #include <iostream>
 
-#include "config.h"
 #include "cfg.h"
 #include "options.h"
 #include "debug.h"

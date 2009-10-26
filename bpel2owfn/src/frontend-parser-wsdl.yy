@@ -118,7 +118,7 @@
 
 
 %{
-#include <cassert>
+#include <config.h>
 #include <map>
 
 #include "ast-config.h"

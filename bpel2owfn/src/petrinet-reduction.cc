@@ -54,9 +54,9 @@
  * Headers
  *****************************************************************************/
 
+#include <config.h>
 #include <iostream>
 #include <list>
-#include <cassert>
 #include <set>
 #include <utility>
 

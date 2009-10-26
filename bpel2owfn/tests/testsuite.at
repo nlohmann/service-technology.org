@@ -234,337 +234,337 @@ AT_BANNER([Static Analysis])
 ############################################################################
 
 AT_SETUP([static analysis test [SA00002]])
-AT_CHECK([CP TESTFILES/sa00002.bpel .])
+AT_CHECK([cp TESTFILES/sa00002.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00002.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00003]])
-AT_CHECK([CP TESTFILES/sa00003.bpel .])
+AT_CHECK([cp TESTFILES/sa00003.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00003.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00005]])
-AT_CHECK([CP TESTFILES/sa00005.bpel .])
+AT_CHECK([cp TESTFILES/sa00005.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00005.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00006]])
-AT_CHECK([CP TESTFILES/sa00006.bpel .])
+AT_CHECK([cp TESTFILES/sa00006.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00006.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00007]])
-AT_CHECK([CP TESTFILES/sa00007.bpel .])
+AT_CHECK([cp TESTFILES/sa00007.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00007.bpel],4,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00008]])
-AT_CHECK([CP TESTFILES/sa00008.bpel .])
+AT_CHECK([cp TESTFILES/sa00008.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00008.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00015]])
-AT_CHECK([CP TESTFILES/sa00015.bpel .])
+AT_CHECK([cp TESTFILES/sa00015.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00015.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00016]])
-AT_CHECK([CP TESTFILES/sa00016.bpel .])
+AT_CHECK([cp TESTFILES/sa00016.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00016.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00017]])
-AT_CHECK([CP TESTFILES/sa00017.bpel .])
+AT_CHECK([cp TESTFILES/sa00017.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00017.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00018]])
-AT_CHECK([CP TESTFILES/sa00018.bpel .])
+AT_CHECK([cp TESTFILES/sa00018.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00018.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00023]])
-AT_CHECK([CP TESTFILES/sa00023.bpel .])
+AT_CHECK([cp TESTFILES/sa00023.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00023.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00024]])
-AT_CHECK([CP TESTFILES/sa00024.bpel .])
+AT_CHECK([cp TESTFILES/sa00024.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00024.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00025]])
-AT_CHECK([CP TESTFILES/sa00025.bpel .])
+AT_CHECK([cp TESTFILES/sa00025.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00025.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00032]])
-AT_CHECK([CP TESTFILES/sa00032.bpel .])
+AT_CHECK([cp TESTFILES/sa00032.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00032.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00035]])
-AT_CHECK([CP TESTFILES/sa00035.bpel .])
+AT_CHECK([cp TESTFILES/sa00035.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00035.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00036]])
-AT_CHECK([CP TESTFILES/sa00036.bpel .])
+AT_CHECK([cp TESTFILES/sa00036.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00036.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00037]])
-AT_CHECK([CP TESTFILES/sa00037.bpel .])
+AT_CHECK([cp TESTFILES/sa00037.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00037.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00044]])
-AT_CHECK([CP TESTFILES/sa00044.bpel .])
+AT_CHECK([cp TESTFILES/sa00044.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00044.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00048]])
-AT_CHECK([CP TESTFILES/sa00048.bpel .])
+AT_CHECK([cp TESTFILES/sa00048.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00048.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00051]])
-AT_CHECK([CP TESTFILES/sa00051.bpel .])
+AT_CHECK([cp TESTFILES/sa00051.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00051.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00052]])
-AT_CHECK([CP TESTFILES/sa00052.bpel .])
+AT_CHECK([cp TESTFILES/sa00052.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00052.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00055]])
-AT_CHECK([CP TESTFILES/sa00055.bpel .])
+AT_CHECK([cp TESTFILES/sa00055.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00055.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00056]])
-AT_CHECK([CP TESTFILES/sa00056.bpel .])
+AT_CHECK([cp TESTFILES/sa00056.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00056.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00057]])
-AT_CHECK([CP TESTFILES/sa00057.bpel .])
+AT_CHECK([cp TESTFILES/sa00057.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00057.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00058]])
-AT_CHECK([CP TESTFILES/sa00058.bpel .])
+AT_CHECK([cp TESTFILES/sa00058.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00058.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00059]])
-AT_CHECK([CP TESTFILES/sa00059.bpel .])
+AT_CHECK([cp TESTFILES/sa00059.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00059.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00060]])
-AT_CHECK([CP TESTFILES/sa00060.bpel .])
+AT_CHECK([cp TESTFILES/sa00060.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00060.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00061]])
-AT_CHECK([CP TESTFILES/sa00061.bpel .])
+AT_CHECK([cp TESTFILES/sa00061.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00061.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00062]])
-AT_CHECK([CP TESTFILES/sa00062.bpel .])
+AT_CHECK([cp TESTFILES/sa00062.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00062.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00063]])
-AT_CHECK([CP TESTFILES/sa00063.bpel .])
+AT_CHECK([cp TESTFILES/sa00063.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00063.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00064]])
-AT_CHECK([CP TESTFILES/sa00064.bpel .])
+AT_CHECK([cp TESTFILES/sa00064.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00064.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00065]])
-AT_CHECK([CP TESTFILES/sa00065.bpel .])
+AT_CHECK([cp TESTFILES/sa00065.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00065.bpel],1,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00066]])
-AT_CHECK([CP TESTFILES/sa00066.bpel .])
+AT_CHECK([cp TESTFILES/sa00066.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00066.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00067]])
-AT_CHECK([CP TESTFILES/sa00067.bpel .])
+AT_CHECK([cp TESTFILES/sa00067.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00067.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00068]])
-AT_CHECK([CP TESTFILES/sa00068.bpel .])
+AT_CHECK([cp TESTFILES/sa00068.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00068.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00069]])
-AT_CHECK([CP TESTFILES/sa00069.bpel .])
+AT_CHECK([cp TESTFILES/sa00069.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00069.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00070]])
-AT_CHECK([CP TESTFILES/sa00070.bpel .])
+AT_CHECK([cp TESTFILES/sa00070.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00070.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00071]])
-AT_CHECK([CP TESTFILES/sa00071.bpel .])
+AT_CHECK([cp TESTFILES/sa00071.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00071.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00072]])
-AT_CHECK([CP TESTFILES/sa00072.bpel .])
+AT_CHECK([cp TESTFILES/sa00072.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00072.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00073]])
-AT_CHECK([CP TESTFILES/sa00073.bpel .])
+AT_CHECK([cp TESTFILES/sa00073.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00073.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00074]])
-AT_CHECK([CP TESTFILES/sa00074.bpel .])
+AT_CHECK([cp TESTFILES/sa00074.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00074.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00075]])
-AT_CHECK([CP TESTFILES/sa00075.bpel .])
+AT_CHECK([cp TESTFILES/sa00075.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00075.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00076]])
-AT_CHECK([CP TESTFILES/sa00076.bpel .])
+AT_CHECK([cp TESTFILES/sa00076.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00076.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00077]])
-AT_CHECK([CP TESTFILES/sa00077.bpel .])
+AT_CHECK([cp TESTFILES/sa00077.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00077.bpel],4,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00078]])
-AT_CHECK([CP TESTFILES/sa00078.bpel .])
+AT_CHECK([cp TESTFILES/sa00078.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00078.bpel],4,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00079]])
-AT_CHECK([CP TESTFILES/sa00079.bpel .])
+AT_CHECK([cp TESTFILES/sa00079.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00079.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00080]])
-AT_CHECK([CP TESTFILES/sa00080.bpel .])
+AT_CHECK([cp TESTFILES/sa00080.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00080.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00081]])
-AT_CHECK([CP TESTFILES/sa00081.bpel .])
+AT_CHECK([cp TESTFILES/sa00081.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00081.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00082]])
-AT_CHECK([CP TESTFILES/sa00082.bpel .])
+AT_CHECK([cp TESTFILES/sa00082.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00082.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00083]])
-AT_CHECK([CP TESTFILES/sa00083.bpel .])
+AT_CHECK([cp TESTFILES/sa00083.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00083.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00084]])
-AT_CHECK([CP TESTFILES/sa00084.bpel .])
+AT_CHECK([cp TESTFILES/sa00084.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00084.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00087]])
-AT_CHECK([CP TESTFILES/sa00087.bpel .])
+AT_CHECK([cp TESTFILES/sa00087.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00087.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00088]])
-AT_CHECK([CP TESTFILES/sa00088.bpel .])
+AT_CHECK([cp TESTFILES/sa00088.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00088.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00091]])
-AT_CHECK([CP TESTFILES/sa00091.bpel .])
+AT_CHECK([cp TESTFILES/sa00091.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00091.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00092]])
-AT_CHECK([CP TESTFILES/sa00092.bpel .])
+AT_CHECK([cp TESTFILES/sa00092.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00092.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP
 
 AT_SETUP([static analysis test [SA00093]])
-AT_CHECK([CP TESTFILES/sa00093.bpel .])
+AT_CHECK([cp TESTFILES/sa00093.bpel .])
 AT_CHECK([BPEL2OWFN -mcfg --input=sa00093.bpel],0,ignore,ignore)
 AT_KEYWORDS(static)
 AT_CLEANUP

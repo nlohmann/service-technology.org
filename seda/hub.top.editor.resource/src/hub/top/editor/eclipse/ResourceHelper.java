@@ -431,7 +431,7 @@ public class ResourceHelper {
 	 * @return <code>true</code> iff stored resource holds an object
 	 */
 	public boolean hasModel() {
-		 return (getResource(true) != null && !getResource(true).getContents().isEmpty());
+		 return (!getModel().isEmpty());
 	}
 	
 	/**
@@ -498,7 +498,7 @@ public class ResourceHelper {
 	 * this helper {@link ResourceHelper#addToModelContents(EObject)}
 	 * is contained in the resource
 	 */
-	public boolean isInSync() {
+	public boolean resourceIsInSync() {
 		if (newModelContents == null) return true;
 		if (getResource(true) != null
 			&& getResource(true).getContents().containsAll(newModelContents))
@@ -533,7 +533,7 @@ public class ResourceHelper {
 		// resolve fields from the helper
 		resolveFields();
 		// if the resource is in sync, don't do anything
-		if (isInSync()) return;
+		if (resourceIsInSync()) return;
 		
 		Resource resource = createResource();
 		assert (resource != null);
@@ -571,7 +571,7 @@ public class ResourceHelper {
 		// resolve fields and empty existing resource
 		resolveFields();
 		// if the resource is in sync, don't do anything
-		if (isInSync()) return;
+		if (resourceIsInSync()) return;
 
 		Resource resource = getResource(false);
 		// clear resource if required

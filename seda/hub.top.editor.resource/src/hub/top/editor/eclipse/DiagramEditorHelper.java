@@ -138,9 +138,9 @@ public class DiagramEditorHelper extends EditorHelper {
 	 * contents of its model helper
 	 */
 	public boolean diagramInSync () {
-		Diagram diagram = (Diagram)getResource(true).getContents().get(0);
-		return (modelHelper.isInSync() &&
-				diagram.getElement() == modelHelper.getResource(true).getContents().get(0));
+		Diagram diagram = (Diagram)getModelRoot();
+		return (modelHelper.resourceIsInSync() &&
+				diagram.getElement() == modelHelper.getModelRoot());
 	}
 	
 	/**

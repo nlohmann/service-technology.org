@@ -36,6 +36,8 @@
 
 package hub.top.editor.eclipse;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * Pretty printer interface that can be used by {@link IEditorUtil}s to
  * switch between different text representations. 
@@ -47,8 +49,8 @@ public interface PrettyPrinter {
 	/**
 	 * Pretty print the given object into a text-based representation.
 	 * 
-	 * @param editor
+	 * @param the object to print
 	 * @return 
 	 */
-	public String getText (Object o);
+	public String getText (EObject o);
 }

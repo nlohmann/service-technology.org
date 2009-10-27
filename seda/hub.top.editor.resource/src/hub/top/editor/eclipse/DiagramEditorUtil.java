@@ -35,6 +35,13 @@
 \*****************************************************************************/
 package hub.top.editor.eclipse;
 
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
+import org.eclipse.gmf.runtime.notation.Diagram;
+
 /**
  * an abstract implementation of {@link IDiagramEditorUtil}
  *
@@ -54,6 +61,28 @@ public abstract class DiagramEditorUtil extends EditorUtil implements IDiagramEd
 	public boolean standardCreate_InitializesModel() {
 		return true;
 	}
+	
+	/**
+	 * @return
+	 *     current model of this diagram editor, if the editor displays a model
+	 *     that is not stored in a resource, then the method retrieves the model
+	 *     directly from the diagram editor
+	 *     
+	 * @see hub.top.editor.eclipse.EditorUtil#getCurrentModel()
+	 */
+  @Override
+  public EList<EObject> getCurrentModel() {
+    Resource res = getCurrentResource();
+    if (res != null) return res.getContents();
+    
+    // no resource available, retrieve diagram from the editor
+    DiagramDocumentEditor dde = (DiagramDocumentEditor)getEditor();
+    Diagram diag = (Diagram)dde.getDiagramEditPart().getModel();
+    EList<EObject> result = new BasicEList<EObject>();
+    result.add(diag);
+    
+    return result;
+  }
 	
 	/**
 	 * @return text representation of the diagram, diagram editors

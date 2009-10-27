@@ -72,7 +72,7 @@ public class NewDiagramFromModelOperation extends NewDiagramFileOperation {
 			IAdaptable arg1) throws ExecutionException
 	{
 		final Resource diagramResource = diagramHelper.createResource();
-		final EObject diagramRoot = modelHelper.getResource(true).getContents().get(0);
+		final EObject diagramRoot = modelHelper.getModelRoot();
 		final IDiagramEditorUtil editorUtil = diagramHelper.getEditorUtil();
 		
 		try {

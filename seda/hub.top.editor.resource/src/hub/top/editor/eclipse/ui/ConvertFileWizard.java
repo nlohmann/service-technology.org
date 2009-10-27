@@ -43,7 +43,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -58,14 +57,14 @@ public class ConvertFileWizard extends Wizard {
 	// location of the source model
 	protected URI 	modelURI;
 	// object to convert (usually root object at modelURI)
-	protected EObject	modelObject;
+	protected Object	modelObject;
 	// extension of target
 	protected String 	extension;
 
 	// wizard pages
 	protected WizardNewFileCreationPage 	pageFileCreation;
 	
-	public ConvertFileWizard(URI domainModelURI, EObject resourceRoot,
+	public ConvertFileWizard(URI domainModelURI, Object resourceRoot,
 		      TransactionalEditingDomain editingDomain, String targetExtension)
 	{
 	    assert domainModelURI != null : "Domain model uri must be specified";

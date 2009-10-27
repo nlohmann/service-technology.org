@@ -134,6 +134,8 @@ public class ExportWizardPage extends WizardPage implements Listener {
 				}
 			}
 		});
+		
+		
 
 		setControl(composite);
 	}
@@ -152,7 +154,8 @@ public class ExportWizardPage extends WizardPage implements Listener {
 	 */
 	private String getSuggestedOutputFileName () {
 		if (suggestedExtensions != null && suggestedExtensions.length > 0) {
-			String out = originalResourceName.substring(0,originalResourceName.lastIndexOf("."));
+		  String out = originalResourceName;
+		  if (out.lastIndexOf(".") != -1) out = out.substring(0,out.lastIndexOf("."));
 			return out+"."+suggestedExtensions[0];
 		}
 		else
@@ -188,6 +191,13 @@ public class ExportWizardPage extends WizardPage implements Listener {
 	 */
 	protected String getEnteredTargetFileName () {
 		return exportFileNameBox.getText().trim();
+	}
+	
+	/**
+	 * @return the file format into which the model shall be exported
+	 */
+	protected String getTargetFileFormat() {
+	  return "lola";
 	}
 	
 	/**

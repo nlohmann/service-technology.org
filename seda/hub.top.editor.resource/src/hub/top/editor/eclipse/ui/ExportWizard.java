@@ -45,6 +45,7 @@ import hub.top.editor.resource.Activator;
 
 import java.io.PrintStream;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -95,21 +96,24 @@ public class ExportWizard extends Wizard implements IExportWizard {
 		invalidEditor = false;
 		uihelper = new UIhelper(workbench, pluginHelper);
 		
-		// there was nothing selected, so try the current editor
-		if (!selection.isEmpty())
-		{
-			// try to open the selection in an editor
-			if (!uihelper.openSelectionInEditor(selection))
-			{
-				invalidEditor = true;
-				MessageDialog.openInformation(workbench.getActiveWorkbenchWindow().getShell(),
-					"File export", "The selected resource cannot be exported with this wizard. Please open the resource in the editor and try again.");
-			}
-		}
+		if (uihelper.getSelectedResource(selection)) {
+		  // resource found in the selection
+  		if (uihelper.selectedURI != null)	{
+  			// try to open the selection in an editor
+  			if (!uihelper.openSelectionInEditor())
+  			{
+  				invalidEditor = true;
+  				MessageDialog.openInformation(workbench.getActiveWorkbenchWindow().getShell(),
+  					"File export", "The selected resource cannot be exported with this wizard. Please open the resource in the editor and try again.");
+  			} // else, opening was successful, resource is displayed in an
+  			  // open editor window
+  		}
+		} // else, nothing was selected, but there may be still
+		  // an open editor window which we can use
 		
 		if (!invalidEditor)
 		{
-			// assume that the object to be exported is display in the
+			// assume that the object to be exported is displayed in the
 			// active editor window
 			IEditorPart _editor = (IEditorPart) window.getActivePage().getActiveEditor();
 			if (_editor instanceof IFrameWorkEditor) {
@@ -146,12 +150,19 @@ public class ExportWizard extends Wizard implements IExportWizard {
 
 		// save name of the current resource from the editor in the wizard
 		if (editorHelper != null) {
-			page1.setOriginalResourceName(editorHelper.getURI(true).lastSegment());
+		  URI uri = editorHelper.getURI(true);
+		  if (uri == null) uri = uihelper.selectedURI;
+		  
+		  if (uri != null)
+		    page1.setOriginalResourceName(uri.lastSegment());
+		  else
+		    page1.setOriginalResourceName("net");
+		  
 			page1.setSuggestedExtensions(editorHelper.getEditorUtil().compatibleTextFileExtensions());
 		//} else if (uihelper != null) {
 		//	page1.setOriginalResourceName(uihelper.getURI().lastSegment());
 		} else {
-			page1.setOriginalResourceName(null);
+			page1.setOriginalResourceName("net");
 		}
 	}
 	
@@ -168,61 +179,39 @@ public class ExportWizard extends Wizard implements IExportWizard {
 	 * @see org.eclipse.jface.wizard.IWizard#performFinish()
 	 */
 	public boolean performFinish() {
-		//EList<org.eclipse.emf.common.util.URI> seenURIs = new BasicEList<org.eclipse.emf.common.util.URI>();
-		//EList<Resource> resources = uihelper.getResources();
-		//for (int i=0; i<resources.size(); i++)
-		{
-			/*
-			Resource res = resources.get(i);
-			
-			EObject modelObject = res.getContents().get(0);
-			
-			// make sure that we see each model only once
-			org.eclipse.emf.common.util.URI uri = modelObject.eResource().getURI();
-			if (seenURIs.contains(uri))	continue;
-			else seenURIs.add(uri);
-			
-			// diagram resources always come bundled with their underlying models
-			if (modelObject instanceof Diagram) {
-				Diagram diag = (Diagram) modelObject;
-				uri = diag.getElement().eResource().getURI();
-				if (seenURIs.contains(uri))	continue;
-				else seenURIs.add(uri);
-			}
-			*/
-			
-			String exportText = null;
-			String targetFileName = page1.getEnteredTargetFileName();
-			
-			if (editorHelper != null) {
-				PrettyPrinter pp = chooseOutputFormatPrinter();
-				if (pp != null)
-					// there is a pretty printer to be used for export
-					exportText = editorHelper.getEditorUtil().getCurrentText(pp);
-				else
-					// no pretty printer, default exporting
-					exportText = editorHelper.getEditorUtil().getCurrentText();
-			}
 
-			if (exportText == null) {
-				MessageDialog.openError(workbench.getActiveWorkbenchWindow().getShell(),
-						"File export", "There is no support for exporting "+page1.getOriginalResourceName()+".");
-				return false;
-			}
-			// now we are treating an object we haven't seen before
-			try {
-				// write to external file
-				PrintStream outStream = new PrintStream(targetFileName);
-				outStream.print(exportText);
-				outStream.checkError();
-				outStream.close();
-			} catch (Exception e) {
-				pluginHelper.logError("Failed to write "+targetFileName+".", e);
-				MessageDialog.openError(workbench.getActiveWorkbenchWindow().getShell(),
-						"File export", "Failed to export currently selected resource.\n\nReason: "+e);
-				return false;
-			}
+		String exportText = null;
+		String targetFileName = page1.getEnteredTargetFileName();
+
+		if (editorHelper != null) {
+			PrettyPrinter pp = chooseOutputFormatPrinter();
+			if (pp != null)
+				// there is a pretty printer to be used for export
+				exportText = editorHelper.getEditorUtil().getCurrentText(pp);
+			else
+				// no pretty printer, default exporting
+				exportText = editorHelper.getEditorUtil().getCurrentText();
 		}
+
+		if (exportText == null) {
+			MessageDialog.openError(workbench.getActiveWorkbenchWindow().getShell(),
+					"File export", "There is no support for exporting "+page1.getOriginalResourceName()+".");
+			return false;
+		}
+
+		try {
+			// write to external file
+			PrintStream outStream = new PrintStream(targetFileName);
+			outStream.print(exportText);
+			outStream.checkError();
+			outStream.close();
+		} catch (Exception e) {
+			pluginHelper.logError("Failed to write "+targetFileName+".", e);
+			MessageDialog.openError(workbench.getActiveWorkbenchWindow().getShell(),
+					"File export", "Failed to export currently selected resource.\n\nReason: "+e);
+			return false;
+		}
+
 		return true;
 	}
 	

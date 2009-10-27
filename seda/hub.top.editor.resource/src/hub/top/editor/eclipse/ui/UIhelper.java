@@ -38,6 +38,7 @@ package hub.top.editor.eclipse.ui;
 
 import hub.top.editor.eclipse.PluginHelper;
 import hub.top.editor.eclipse.ResourceHelper;
+import hub.top.editor.resource.Activator;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -45,12 +46,15 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.XMLResource;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
+import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.gmf.runtime.notation.impl.DiagramImpl;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -67,7 +71,6 @@ public class UIhelper {
 	// the workbench of this UI helper
 	private IWorkbench workbench;
 	private PluginHelper plugin;
-
 
 	// selected resource
 	protected Resource resource;
@@ -88,10 +91,9 @@ public class UIhelper {
 	 * the selection and load it into the member fields of this helper
 	 * 
 	 * @param selection
-	 * @param openEditors allow editors to be opened to retrieve resources
 	 * @return true if a resource was found and loaded
 	 */
-	public boolean retrieveSelectedResource (IStructuredSelection selection, boolean openEditors)
+	public boolean getSelectedResource (IStructuredSelection selection)
 	{
 		// see what has been selected
 		Object selectedObject = null;
@@ -104,7 +106,7 @@ public class UIhelper {
 		
 		if (selectedObject instanceof IFile) {
 			IFile file = (IFile) selectedObject;
-			return getSelectedIFileResource(file, openEditors);
+			return getSelectedIFileResource(file);
 			
 		} else if (selectedObject instanceof org.eclipse.emf.ecore.resource.Resource) {
 			Resource res = (Resource) selectedObject;
@@ -121,7 +123,7 @@ public class UIhelper {
 		}
 		
 		// System.err.println("no resouce has been selected for exporting");
-		plugin.logError("No or unknown resource has been selected.");
+		//plugin.logError("No or unknown resource has been selected.");
 		return false;
 	}
 	
@@ -132,12 +134,10 @@ public class UIhelper {
 	 * @param selection
 	 * @return <code>true</code> iff an editor could be opened
 	 */
-	public boolean openSelectionInEditor (IStructuredSelection selection) {
-		if (!retrieveSelectedResource(selection, false))
+	public boolean openSelectionInEditor () {
+		if (this.selectedURI == null)
 			return false;
 		IFile file = ResourceHelper.uriToFile(selectedURI);
-		if (file == null)
-			return false;
 		return openFileInEditor(file);
 	}
 	
@@ -147,24 +147,19 @@ public class UIhelper {
 	 * @param openEditors allow editors to be opened to retrieve file resource
 	 * @return true if retrieval was successful
 	 */
-	private boolean getSelectedIFileResource (IFile file, boolean openEditors) {
+	private boolean getSelectedIFileResource (IFile file) {
 		URI fileURI = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
 		
-		// register URI handler for the current file
-		if (!registerResourceURI(file, openEditors)) {
-			selectedURI = fileURI;
-			if (openEditors) return false;
-			else return true;
-		}
-
 		try {
+		  TransactionalEditingDomain editingDomain =
+		                  GMFEditingDomainFactory.INSTANCE.createEditingDomain();
+		  
 			// load the contents of the resource from the file system.
 			// requires that the URI handler for this file is in memory
-			ResourceSet resourceSet = new ResourceSetImpl();
-			resourceSet.createResource(fileURI);
-
+			ResourceSet resourceSet = editingDomain.getResourceSet();
 			Resource res = resourceSet.getResource(fileURI, true);
-			
+
+			/*
 			Map<Object, Object> options = new HashMap<Object, Object>();
 			options.put(XMLResource.OPTION_ENCODING, "UTF-8");
 			// TODO fix encoding from UTF-8 to a real choice
@@ -172,11 +167,13 @@ public class UIhelper {
 			
 			if (res == null)
 				return false;
+			*/
 			
 			resource = res;
-			selectedURI = res.getURI();
+			selectedURI = fileURI;
 			//System.err.println("export file from uri: "+fileURI);
 			//System.err.println(this.resources.get(0).getContents().get(0).getClass());
+		/*
 		} catch (IOException e) {
 			plugin.logError(e);
 			return false;
@@ -189,22 +186,12 @@ public class UIhelper {
 				return false;
 			}
 		}
+		*/
+		} catch (WrappedException ex) {
+		  Activator.getPluginHelper().logError("Unable to load resource: " + fileURI, ex);
+		}
+			
 		return true;
-	}
-	
-	/**
-	 * register resource URI to have the XMI parser in memory to parse
-	 * the resource from file,
-	 * @param file
-	 * @param openEditors allow editors to be opened to retrieve file resource
-	 * @return true if registering was successful
-	 */
-	private boolean registerResourceURI (IFile file, boolean openEditors) {
-		// open the file in an editor to register the plugin-id
-		// TODO this should go without opening a window...
-		if (openEditors)
-			return openFileInEditor(file);
-		return false;
 	}
 
 	/**
@@ -213,6 +200,9 @@ public class UIhelper {
 	 * @return <code>true</code> iff opening the editor was successful
 	 */
 	private boolean openFileInEditor (IFile file) {
+	  
+	  if (file == null) return false;
+	  
 		try
 		{
 			FileEditorInput input = new FileEditorInput(file);
@@ -262,8 +252,8 @@ public class UIhelper {
 			if (dge.getModel() instanceof org.eclipse.gmf.runtime.notation.impl.DiagramImpl)
 			{
 				DiagramImpl diag = (DiagramImpl) dge.getModel();
-				this.resource = diag.getElement().eResource();
-				this.selectedURI = diag.getElement().eResource().getURI();
+				this.resource = diag.eResource();//diag.getElement().eResource();
+				this.selectedURI = diag.eResource().getURI();//diag.getElement().eResource().getURI();
 				//System.err.println("export file from visual editor resource at "+this.selectedURI);
 				return true;
 			}

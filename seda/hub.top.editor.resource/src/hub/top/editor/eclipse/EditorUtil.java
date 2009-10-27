@@ -35,6 +35,8 @@
 \*****************************************************************************/
 package hub.top.editor.eclipse;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.ui.IEditorInput;
 
@@ -59,6 +61,30 @@ public abstract class EditorUtil implements IEditorUtil {
 	}
 	
 	public abstract Resource getCurrentResource();
+
+	 /**
+   * @return all available models in the editor, an implementation can return the
+   * models contained in the current resource by the following code:
+   * 
+   * <code>
+   *    Resource res = getCurrentResource();
+   *    if (res != null) return res.getContents();
+   *    return null;
+   * </code>
+   * 
+   * but this method shall also handle the cases where there is a model that is
+   * not stored in a resource (yet)
+   */
+	public abstract EList<EObject> getCurrentModel();
+	
+	/**
+	 * @return current root model of the editor
+	 */
+	public EObject getCurrentRootModel() {
+	  EList<EObject> objs = getCurrentModel();
+	  if (objs != null && objs.size() > 0) return objs.get(0);
+	  return null;
+	}
 	
 	/**
 	 * @return current input of the editor, calls <code>{@link org.eclipse.ui.part.EditorPart#getEditorInput()}</code>
@@ -98,6 +124,6 @@ public abstract class EditorUtil implements IEditorUtil {
 	 * @see hub.top.editor.eclipse.IEditorUtil#getCurrentText(hub.top.editor.eclipse.PrettyPrinter)
 	 */
 	public String getCurrentText(PrettyPrinter pp) {
-		return pp.getText(getCurrentResource());
+		return pp.getText(getCurrentRootModel());
 	}
 }

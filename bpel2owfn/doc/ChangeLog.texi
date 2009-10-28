@@ -5,6 +5,8 @@
 
 @item updated maintainer scripts
 
+@item implemented new final conditions for oWFN output (not @samp{ALL_EXTERNAL_PLACES_EMPTY} any more)
+
 @item fixed oWFN output (problems with nested @code{ALL_OTHER_PLACES_EMPTY})
 
 @item fixed bug #12110 (@url{https://gna.org/bugs/?12110}): compilation errors using GCC 4.3.1

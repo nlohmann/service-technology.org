@@ -1497,7 +1497,7 @@ void PetriNet::output_owfn(ostream *output) const
       {
         Place* p = (*((*final_set).begin()));
 #ifdef USING_BPEL2OWFN
-        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_EXTERNAL_PLACES_EMPTY )";
+        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #else
         (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
 #endif

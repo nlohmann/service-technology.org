@@ -48,7 +48,16 @@ TESTFILES = costOG1.og \
             formula_merge_or.expected.og \
             formula_merge_andor.og \
             formula_merge_andor.expected.og \
-            formula_merge.cf
+            formula_merge.cf \
+            formula_minimal_and.og \
+            formula_minimal_and.expected.og \
+            formula_minimal_or.og \
+            formula_minimal_andor.og \
+            formula_minimal_not.og \
+            formula_minimal_not.expected.og \
+            formula_minimal_true.og \
+            formula_minimal_false.og \
+            formula_minimal_false.expected.og
 
 
 # Below you can list all the files you do not want to have counted in the

@@ -37,7 +37,7 @@ void FormulaMultiary::removeLiteral(const string& literal) {
 			(*i)->removeLiteral( literal );
 
             FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( *i );
-            if ( checkNegation != NULL && checkNegation->subFormula == NULL ) {
+            if ( checkNegation != NULL && checkNegation->size() == 0 ) {
 
                 // a size zero negation formula is useless, so erase it
 				subFormulas.erase( i++ );
@@ -77,8 +77,7 @@ void FormulaNegation::removeLiteral(const string& literal) {
 
         // the subformula is a literal, so delete it if it matches
         if ( literal.compare( checkLiteral->asString() ) == 0 ) {
-            delete subFormula;
-            subFormula = NULL;
+            clear();
         }
 
     } else {
@@ -87,15 +86,13 @@ void FormulaNegation::removeLiteral(const string& literal) {
         subFormula->removeLiteral( literal );
 
         FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( subFormula );
-        if ( checkNegation != NULL && checkNegation->subFormula == NULL ) {
-            delete subFormula;
-            subFormula = NULL;
+        if ( checkNegation != NULL && checkNegation->size() == 0 ) {
+            clear();
         } else {
 
             FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( subFormula );
             if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
-                delete subFormula;
-                subFormula = NULL;
+                clear();
             }
         }
     }

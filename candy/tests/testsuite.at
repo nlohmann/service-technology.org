@@ -304,14 +304,63 @@ AT_CLEANUP
 
 
 
-AT_SETUP([simplify small AND])
-AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/formula_merge_not.og .])
+AT_SETUP([minimal AND])
 AT_CHECK([cp TESTFILES/formula_merge.cf .])
-AT_CHECK([cp TESTFILES/formula_merge_not.expected.og .])
-AT_CHECK([CANDY --input=formula_merge_not.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([cp TESTFILES/formula_minimal_and.og .])
+AT_CHECK([cp TESTFILES/formula_minimal_and.expected.og .])
+AT_CHECK([CANDY --input=formula_minimal_and.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og formula_merge_not.expected.og], 0, ignore)
+AT_CHECK([diff sed.og formula_minimal_and.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([minimal OR])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_minimal_or.og .])
+AT_CHECK([cp TESTFILES/formula_minimal_and.expected.og .])
+AT_CHECK([CANDY --input=formula_minimal_or.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_minimal_and.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([minimal AND/OR])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_minimal_andor.og .])
+AT_CHECK([cp TESTFILES/formula_minimal_and.expected.og .])
+AT_CHECK([CANDY --input=formula_minimal_andor.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_minimal_and.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([minimal NOT])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_minimal_not.og .])
+AT_CHECK([cp TESTFILES/formula_minimal_not.expected.og .])
+AT_CHECK([CANDY --input=formula_minimal_not.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_minimal_not.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([minimal TRUE])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_minimal_true.og .])
+AT_CHECK([cp TESTFILES/formula_minimal_not.expected.og .])
+AT_CHECK([CANDY --input=formula_minimal_true.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_minimal_not.expected.og], 0, ignore)
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([minimal FALSE])
+AT_CHECK([cp TESTFILES/formula_merge.cf .])
+AT_CHECK([cp TESTFILES/formula_minimal_false.og .])
+AT_CHECK([cp TESTFILES/formula_minimal_false.expected.og .])
+AT_CHECK([CANDY --input=formula_minimal_false.og --output=c.og --costfile=formula_merge.cf], 0, ignore, ignore)
+AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+AT_CHECK([diff sed.og formula_minimal_false.expected.og], 0, ignore)
 AT_KEYWORDS(formula)
 AT_CLEANUP
 

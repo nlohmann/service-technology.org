@@ -1,0 +1,10 @@
+INTERFACE
+  INPUT
+    ;
+  OUTPUT
+    a, b, c, d;
+  SYNCHRONOUS
+    ;
+
+NODES
+  1 : TRUE

@@ -108,8 +108,12 @@ unsigned int Node::computeEfficientSuccessors() {
 
             // remove unnecessary literal
             formula->removeLiteral( maxEvent->name );
-
             DEBUG "      node " << getID() << " has lost successor " << currentSuccessor->getID() END
+            if ( formula->size() == 0 ) {
+                formula = new FormulaTrue();
+                DEBUG "      node " << getID() << " has lost formula and is set to TRUE" END
+            }
+
         } else {
         	++i;
         }

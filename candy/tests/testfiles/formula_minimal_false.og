@@ -1,0 +1,14 @@
+INTERFACE
+  OUTPUT
+    a, b, c, d;
+
+NODES
+  1 : FALSE
+    a -> 2
+    b -> 3
+    c -> 4
+    d -> 5
+  2 : FINAL
+  3 : FINAL
+  4 : FINAL
+  5 : FINAL

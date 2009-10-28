@@ -1,0 +1,12 @@
+INTERFACE
+  INPUT
+    ;
+  OUTPUT
+    a, b, c, d;
+  SYNCHRONOUS
+    ;
+
+NODES
+  1 : b
+    b -> 3
+  3 : FINAL

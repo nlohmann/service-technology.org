@@ -253,6 +253,7 @@ class FormulaNegation : public Formula {
         /// destroys the subformula of this FormulaNegation
         virtual void clear() {
             delete subFormula;
+            subFormula = NULL;
         };
 
         /// returns a deep copy of this formula
@@ -272,7 +273,7 @@ class FormulaNegation : public Formula {
 
         /// returns the size of this formula
         virtual int size() const {
-            return 1;
+            return ( subFormula != NULL ? 1 : 0);
         }
 
         /// removes a literal from the formula

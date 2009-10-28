@@ -40,13 +40,13 @@ AT_CHECK([test -f costOG1_efficient.og])
 AT_KEYWORDS(io)
 AT_CLEANUP
 
-AT_SETUP([netfile shortcut])
-AT_CHECK([cp TESTFILES/costOG1.og .])
-AT_CHECK([cp TESTFILES/costOG1.owfn .])
-AT_CHECK([CANDY --input=costOG1.og -o -n], 0, ignore, ignore)
-AT_CHECK([test -f costOG1_efficient.og])
-AT_KEYWORDS(io)
-AT_CLEANUP
+#AT_SETUP([netfile shortcut])
+#AT_CHECK([cp TESTFILES/costOG1.og .])
+#AT_CHECK([cp TESTFILES/costOG1.owfn .])
+#AT_CHECK([CANDY --input=costOG1.og -o -n], 0, ignore, ignore)
+#AT_CHECK([test -f costOG1_efficient.og])
+#AT_KEYWORDS(io)
+#AT_CLEANUP
 
 AT_SETUP([file in, file out])
 AT_CHECK([cp TESTFILES/costOG1.og .])
@@ -150,48 +150,48 @@ AT_CHECK([GREP -q "given costfile includes events several times" stderr], 0, ign
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([incomplete netfile])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_incomplete.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_incomplete.owfn], 1, ignore, stderr)
-AT_CHECK([GREP -q "given netfile does not include all events from given OG" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
-
-AT_SETUP([overfull netfile])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_overfull.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_overfull.owfn], 1, ignore, stderr)
-AT_CHECK([GREP -q "given netfile includes events which are not used in given OG" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
-
-# arc weights > 1 to interface places produce no definded cost
-AT_SETUP([netfile with arc weights to interface place])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_weights.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_weights.owfn], 1, ignore, stderr)
-AT_CHECK([GREP -q "cannot compute cost for event from transition with arc weights > 1" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
-
-# more than one transition linking to interface place produce no definded cost
-AT_SETUP([netfile with shared interface place])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_shared.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_shared.owfn], 1, ignore, stderr)
-AT_CHECK([GREP -q "cannot compute cost for event from multiple transition" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
-
-# non-normal transition produce no defined cost
-AT_SETUP([netfile with non-normal transitions])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_nonnormal.owfn .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_nonnormal.owfn], 1, ignore, stderr)
-AT_CHECK([GREP -q "cannot compute cost for event from non-normal transition" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
+#AT_SETUP([incomplete netfile])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_incomplete.owfn .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_incomplete.owfn], 1, ignore, stderr)
+#AT_CHECK([GREP -q "given netfile does not include all events from given OG" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+#
+#AT_SETUP([overfull netfile])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_overfull.owfn .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_overfull.owfn], 1, ignore, stderr)
+#AT_CHECK([GREP -q "given netfile includes events which are not used in given OG" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+#
+## arc weights > 1 to interface places produce no definded cost
+#AT_SETUP([netfile with arc weights to interface place])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_weights.owfn .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_weights.owfn], 1, ignore, stderr)
+#AT_CHECK([GREP -q "cannot compute cost for event from transition with arc weights > 1" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+#
+## more than one transition linking to interface place produce no definded cost
+#AT_SETUP([netfile with shared interface place])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_shared.owfn .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_shared.owfn], 1, ignore, stderr)
+#AT_CHECK([GREP -q "cannot compute cost for event from multiple transition" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+#
+## non-normal transition produce no defined cost
+#AT_SETUP([netfile with non-normal transitions])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_nonnormal.owfn .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=error_nonnormal.owfn], 1, ignore, stderr)
+#AT_CHECK([GREP -q "cannot compute cost for event from non-normal transition" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
 
 
 
@@ -367,52 +367,6 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Fiona's Test Cases])
-############################################################################
-
-#AT_SETUP([Complex Public View])
-#AT_CHECK([cp TESTFILES/complexPV.*.og .])
-#AT_CHECK([SAYO --input=complexPV.wendy.og --output=complexPV.sa])
-#AT_CHECK([SA2SM complexPV.sa complexPV.owfn])
-#AT_CHECK([WENDY complexPV.owfn --og --fionaFormat],0, ignore, ignore)
-#AT_CHECK([FIONA -t equivalence complexPV.og complexPV.fiona.og], 0, stdout, ignore)
-#AT_CHECK([GREP -q "equivalent: YES" stdout])
-#AT_KEYWORDS(equivalence)
-#AT_CLEANUP
-#
-#AT_SETUP([Coffee Automaton])
-#AT_CHECK([cp TESTFILES/myCoffee.*.og .])
-#AT_CHECK([SAYO --input=myCoffee.wendy.og --output=myCoffee.sa])
-#AT_CHECK([SA2SM myCoffee.sa myCoffee.owfn])
-#AT_CHECK([WENDY myCoffee.owfn --og --fionaFormat],0, ignore, ignore)
-#AT_CHECK([FIONA -t equivalence myCoffee.og myCoffee.fiona.og], 0, stdout, ignore)
-#AT_CHECK([GREP -q "equivalent: YES" stdout])
-#AT_KEYWORDS(equivalence)
-#AT_CLEANUP
-#
-#AT_SETUP([Non Final Tau Node 1])
-#AT_CHECK([cp TESTFILES/NonFinalTauNode1.*.og .])
-#AT_CHECK([SAYO --input=NonFinalTauNode1.wendy.og --output=NonFinalTauNode1.sa])
-#AT_CHECK([SA2SM NonFinalTauNode1.sa NonFinalTauNode1.owfn])
-#AT_CHECK([WENDY NonFinalTauNode1.owfn --og --fionaFormat],0, ignore, ignore)
-#AT_CHECK([FIONA -t equivalence NonFinalTauNode1.og NonFinalTauNode1.fiona.og], 0, stdout, ignore)
-#AT_CHECK([GREP -q "equivalent: YES" stdout])
-#AT_KEYWORDS(equivalence)
-#AT_CLEANUP
-#
-#AT_SETUP([Non Final Tau Node 1 Not])
-#AT_CHECK([cp TESTFILES/NonFinalTauNode1not.*.og .])
-#AT_CHECK([SAYO --input=NonFinalTauNode1not.wendy.og --output=NonFinalTauNode1not.sa])
-#AT_CHECK([SA2SM NonFinalTauNode1not.sa NonFinalTauNode1not.owfn])
-#AT_CHECK([WENDY NonFinalTauNode1not.owfn --og --fionaFormat],0, ignore, ignore)
-#AT_CHECK([FIONA -t equivalence NonFinalTauNode1not.og NonFinalTauNode1not.fiona.og], 0, stdout, ignore)
-#AT_CHECK([GREP -q "equivalent: YES" stdout])
-#AT_KEYWORDS(equivalence)
-#AT_CLEANUP
-
-
-
-############################################################################
 AT_BANNER([Equivalence Tests])
 ############################################################################
 
@@ -426,9 +380,9 @@ AT_CHECK([CANDY --input=costOG1.og --output=c.og --costfile=costOG1.cf], 0, igno
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
 AT_CHECK([diff sed.og costOG1.expected.og], 0, ignore)
 # test with netfile
-AT_CHECK([CANDY --input=costOG1.og --output=c.og --netfile=costOG1.owfn], 0, ignore, ignore)
-AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og costOG1.expected.og], 0, ignore)
+#AT_CHECK([CANDY --input=costOG1.og --output=c.og --netfile=costOG1.owfn], 0, ignore, ignore)
+#AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+#AT_CHECK([diff sed.og costOG1.expected.og], 0, ignore)
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
@@ -442,9 +396,9 @@ AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=costOG2.cf], 0, igno
 AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
 AT_CHECK([diff sed.og costOG2.expected.og], 0, ignore)
 # test with netfile
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=costOG2.owfn], 0, ignore, ignore)
-AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
-AT_CHECK([diff sed.og costOG2.expected.og], 0, ignore)
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --netfile=costOG2.owfn], 0, ignore, ignore)
+#AT_CHECK([SED -e '1,7d' c.og > sed.og], 0, ignore)
+#AT_CHECK([diff sed.og costOG2.expected.og], 0, ignore)
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 

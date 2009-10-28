@@ -32,7 +32,7 @@ class Node {
 		`--------*/
 
         /// basic constructor
-        explicit Node(unsigned int _id) : id(_id), final(false), flag(false) {};
+        explicit Node(unsigned int _id) : formula(NULL), id(_id), final(false), flag(false) {};
 
         /// basic destructor
         virtual ~Node() {

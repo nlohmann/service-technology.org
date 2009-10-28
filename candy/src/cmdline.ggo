@@ -40,7 +40,8 @@ option "automata" a
 
 # -----------------------------------------------------------------
 section "Cost" 
-sectiondesc="This section explains where to get the cost for calculating a cost efficient partner. Exactly one out of these two options always has to be used.\n"
+#sectiondesc="This section explains where to get the cost for calculating a cost efficient partner. Exactly one out of these two options always has to be used.\n"
+sectiondesc="This section explains where to get the cost for calculating a cost efficient partner.\n"
 
 option "costfile" c
   "Use a given cost file for the transition cost. If no filename is given the input filename's prefix will be used for finding a '.cf' file."
@@ -49,12 +50,12 @@ option "costfile" c
   argoptional
   optional
 
-option "netfile" n
-  "Use a given open net for the transition cost. If no filename is given the input filenames's prefix will be used for finding a '.owfn' file."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
+#option "netfile" n
+#  "Use a given open net for the transition cost. If no filename is given the input filenames's prefix will be used for finding a '.owfn' file."
+#  string
+#  typestr="FILENAME"
+#  argoptional
+#  optional
   
 
 # -----------------------------------------------------------------

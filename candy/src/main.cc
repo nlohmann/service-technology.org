@@ -94,23 +94,24 @@ int main(int argc, char** argv) {
             ERROR "failed to open costfile '" << costfile << "'" END
             exit(EXIT_FAILURE);
         }
-    } else if ( args_info.netfile_given ) {
+    //} else if ( args_info.netfile_given ) {
 
-        INFO "cost will be read from netfile" END
+    //    INFO "cost will be read from netfile" END
 
-        // get netfile name
-        string netfile = ( args_info.netfile_arg != NULL ? args_info.netfile_arg : inputPrefix + ".owfn" );
-        assert(netfile != "");
+    //    // get netfile name
+    //    string netfile = ( args_info.netfile_arg != NULL ? args_info.netfile_arg : inputPrefix + ".owfn" );
+    //    assert(netfile != "");
 
-        // open filestream
-        nf_yyin = fopen( netfile.c_str(), "r");
-        if ( !nf_yyin ) {
-            ERROR "failed to open netfile '" << netfile << "'" END
-            exit(EXIT_FAILURE);
-        }
+    //    // open filestream
+    //    nf_yyin = fopen( netfile.c_str(), "r");
+    //    if ( !nf_yyin ) {
+    //        ERROR "failed to open netfile '" << netfile << "'" END
+    //        exit(EXIT_FAILURE);
+    //    }
     } else {
 
-        ERROR "a costfile or a netfile must be given" END
+        //ERROR "a costfile or a netfile must be given" END
+        ERROR "a costfile must be given" END
         exit(EXIT_FAILURE);
     }
 
@@ -164,8 +165,9 @@ int main(int argc, char** argv) {
 		cf_yyparse();
 		fclose(cf_yyin);
 	} else {
-        nf_yyparse();
-        fclose(nf_yyin);
+        //nf_yyparse();
+        //fclose(nf_yyin);
+        assert(false);
 	}
 
 	DEBUG "finished cost parsing, parsed following data:\n\n" END

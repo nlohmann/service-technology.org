@@ -126,21 +126,21 @@ AT_CHECK([CANDY --input=error_overfull_nodes.og --output=c.og --costfile=costOG2
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([incomplete costfile])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_incomplete.cf .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_incomplete.cf], 1, ignore, stderr)
-AT_CHECK([GREP -q "given costfile does not include all events from given OG" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
-
-AT_SETUP([overfull costfile])
-AT_CHECK([cp TESTFILES/costOG2.og .])
-AT_CHECK([cp TESTFILES/error_overfull.cf .])
-AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_overfull.cf], 1, ignore, stderr)
-AT_CHECK([GREP -q "given costfile includes events which are not used in given OG" stderr], 0, ignore)
-AT_KEYWORDS(error)
-AT_CLEANUP
+#AT_SETUP([incomplete costfile])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_incomplete.cf .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_incomplete.cf], 1, ignore, stderr)
+#AT_CHECK([GREP -q "given costfile does not include all events from given OG" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+#
+#AT_SETUP([overfull costfile])
+#AT_CHECK([cp TESTFILES/costOG2.og .])
+#AT_CHECK([cp TESTFILES/error_overfull.cf .])
+#AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_overfull.cf], 1, ignore, stderr)
+#AT_CHECK([GREP -q "given costfile includes events which are not used in given OG" stderr], 0, ignore)
+#AT_KEYWORDS(error)
+#AT_CLEANUP
 
 AT_SETUP([costfile with repetitions])
 AT_CHECK([cp TESTFILES/costOG2.og .])

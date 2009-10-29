@@ -24,10 +24,18 @@ void Node::setFlagRecursively(bool _flag) {
 unsigned int Node::computeEfficientSuccessors() {
 
     // if this node is a final node then we dont have to consider any leaving edge
+    // reason: per definition has final node in an OG no successors
     DEBUG "DEBUG computing costs for node " << getID() END
     if (args_info.debug_flag) outputDebug( cout );
     if ( final ) {
     	DEBUG "      node '" << getID() << "', " << this << " is final, cost is 0" END
+        return 0;
+    }
+
+    // if this node has ID 0 we dont have to consider leaving edges
+    // reason: per definition from the tool wendy is ID 0 the empty node
+    if ( getID() == 0 ) {
+    	DEBUG "      node '" << getID() << "', " << this << " is the empty node, cost is 0" END
         return 0;
     }
 
@@ -142,8 +150,9 @@ unsigned int Node::getCostMinimalAssignments(
     unsigned int minimalCost = UINT_MAX;
 
     // the literals "true" and "final" are always set to true in every assignment
-    possibleAssignment.setToTrue("true");
-    possibleAssignment.setToTrue("final");
+    // RICH not necessary because TRUE and FINAL are allways true
+    //possibleAssignment.setToTrue("true");
+    //possibleAssignment.setToTrue("final");
 
     // compute minimal assignments with recursion
     getCostMinimalAssignmentsRecursively(totalCost, 0, possibleAssignment, minimalCost, minimalAssignments);

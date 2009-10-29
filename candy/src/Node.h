@@ -36,7 +36,10 @@ class Node {
 
         /// basic destructor
         virtual ~Node() {
-            formula->clear();
+            if ( formula != NULL ) {
+                formula->clear();
+                delete formula;
+            }
             successors.clear();
         };
 

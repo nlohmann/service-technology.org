@@ -47,10 +47,12 @@ map< string, bool > parsedEventsCF;
 costfile:
   eventcost
   {
-    if ( parsedEventsCF.size() != parsedOG->events.size() ) {
-        cf_yyerror("given costfile does not include all events from given OG");
-        exit(EXIT_FAILURE);
-    }
+    // we ignore this because all non-mentioned events have cost of 0 due to
+    // the og parser
+    //if ( parsedEventsCF.size() != parsedOG->events.size() ) {
+    //    cf_yyerror("given costfile does not include all events from given OG");
+    //    exit(EXIT_FAILURE);
+    //}
   }
 ;
 
@@ -66,10 +68,12 @@ eventcost:
             (iter->second)->cost = $3;
             parsedEventsCF[$2] = true;
         } else {
-            cf_yyerror("given costfile includes events which are not used in given OG");
-            exit(EXIT_FAILURE);
+            // we ignore them
+            //cf_yyerror("given costfile includes events which are not used in given OG");
+            //exit(EXIT_FAILURE);
         }
     } else {
+        // TODO ignore multiple events if we want to save time parsing this file
         cf_yyerror("given costfile includes events several times");
         exit(EXIT_FAILURE);
     }

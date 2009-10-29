@@ -401,6 +401,11 @@ class FormulaFinal : public FormulaLiteral {
 		virtual FormulaFinal* getDeepCopy() const {
 			return new FormulaFinal(*this);
 		}
+
+		/// returns the prefixed value of this formula
+		virtual bool value(const FormulaAssignment& assignment) const {
+			return true;
+		}
 };
 
 #endif

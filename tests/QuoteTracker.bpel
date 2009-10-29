@@ -1,0 +1,111 @@
+<process name="QuoteTrackerProcess" 
+         targetNamespace="http://tempuri.org/services/PriceTrackerBpel"
+         suppressJoinFailure="yes"
+         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:wsdlns="http://tempuri.org/services/PriceTrackerWsdl"
+         xmlns:qns="http://www.themindelectric.com/wsdl/net.xmethods.services.stockquote.StockQuote/"
+         xmlns:cexns="http://www.xmethods.net/sd/CurrencyExchangeService.wsdl"
+         xmlns:calns="http://tempuri.org/services/calc">
+
+
+  <partnerLinks>
+    <partnerLink name="customer" serviceLinkType="wsdlns:QuoteTrackerLinkType" myRole="QuoteTracker"/> 
+    <partnerLink name="QuoteFinder" serviceLinkType="wsdlns:QuoteFinderLinkType" myRole="QuoteFinder" partnerRole="QuoteFinder"/>
+    <partnerLink name="currencyExchanger" serviceLinkType="wsdlns:currencyExchangerLinkType" partnerRole="currencyExchanger"/>
+    <partnerLink name="calculator" serviceLinkType="wsdlns:calculatorLinkType" partnerRole="calculator"/>
+  </partnerLinks>
+
+  <variables>
+    <variable name="quoteRequest" messageType="qns:getQuoteRequest1"/>
+    <variable name="quoteResponse" messageType="qns:getQuoteResponse1"/>
+    <variable name="countryRequest" messageType="wsdlns:getCountryNameRequest"/>
+    <variable name="countryResponse" messageType="wsdlns:getCountryNameResponse"/>
+    <variable name="rateRequest" messageType="cexns:getRateRequest"/>
+    <variable name="rateResponse" messageType="cexns:getRateResponse"/>
+    <variable name="multiplyRequest" messageType="calns:multRequest"/>
+    <variable name="multiplyResponse" messageType="calns:multResponse"/>
+  </variables>
+
+  <correlationSets>
+     <correlationSet name="qid" properties="wsdlns:q_id"/>
+  </correlationSets>
+
+    <sequence>
+           <receive name="receive1" partnerLink="customer" 
+                portType="qns:net.xmethods.services.stockquote.StockQuotePortType" 
+                operation="getQuote" variable="quoteRequest"
+                createInstance="yes">
+
+                <correlations>
+                    <correlation set="qid" initiate="yes"/>
+                </correlations>
+           </receive>
+           <invoke name="invoke1" partnerLink="QuoteFinder" 
+                portType="qns:net.xmethods.services.stockquote.StockQuotePortType" 
+                operation="getQuote" inputVariable="quoteRequest" outputVariable="quoteResponse">
+           </invoke>
+           <reply name="reply1" partnerLink="customer" portType="qns:net.xmethods.services.stockquote.StockQuotePortType" 
+                operation="getQuote" variable="quoteResponse">
+                <correlations>
+                    <correlation set="qid"/>
+                </correlations>
+		</reply>
+
+           <pick>
+                <onMessage partnerLink="customer" portType="wsdlns:QuoteTrackerPortType" operation="getCountryName" 
+                       variable="countryRequest">
+                      <correlations>
+                         <correlation set="qid"/>
+                      </correlations>
+
+                  <sequence>
+                      <assign name="assign1">
+				   <copy>
+					<from variable="countryRequest" part="country"/>   
+					<to variable="rateRequest" part="country2"/>
+				   </copy>
+			      </assign>
+                        <reply partnerLink="customer" portType="wsdlns:QuoteTrackerPortType" operation="getCountryName" variable="countryResponse"/>
+                  </sequence>  
+                  </onMessage>
+                  <onAlarm for="'PT30S'">
+
+                    <sequence>
+				<empty/>
+                      <assign name="assign3">
+				   <copy>
+					<from expression="'uk'"/>   
+					<to variable="rateRequest" part="country2"/>
+				   </copy>
+			      </assign>
+                     </sequence>
+
+                   </onAlarm>  
+            </pick>
+
+            <assign name="assign5">
+		   <copy>
+			<from expression="'usa'"/>
+			<to variable="rateRequest" part="country1"/>
+		   </copy>
+	      </assign>
+            <invoke name="invoke2" partnerLink="currencyExchanger" portType="cexns:CurrencyExchangePortType" operation="getRate" 
+                        inputVariable="rateRequest" outputVariable="rateResponse">					
+            </invoke> 
+            <assign name="assign6">
+		   <copy>
+			<from variable="rateResponse" part="Result"/>
+			<to variable="multiplyRequest" part="in0"/>
+		   </copy>
+	      </assign>
+            <assign name="assign7">
+		   <copy>
+			<from variable="quoteResponse" part="Result"/>
+			<to variable="multiplyRequest" part="in1"/>
+		   </copy>
+	      </assign>
+            <invoke name="invoke3" partnerLink="calculator" portType="calns:Calculator" operation="mult" 
+                             inputVariable="multiplyRequest" outputVariable="multiplyResponse">					
+            </invoke>
+    </sequence>
+</process>

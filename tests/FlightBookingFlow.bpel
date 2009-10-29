@@ -1,0 +1,95 @@
+<process name="FlightBookingFlow"
+    targetNamespace="http://samples.otn.com"
+    suppressJoinFailure="yes"
+    xmlns:tns="http://samples.otn.com"
+    xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+    xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/">
+
+  <partnerLinks>
+    <partnerLink name="client"
+             partnerLinkType="tns:FlightBooking"
+             myRole="FlightBookingProvider"
+             partnerRole="FlightBookingRequester"/>
+  </partnerLinks>
+
+  <variables>
+    <variable name="input" messageType="tns:FlightBookingRequestMessage"/>
+    <variable name="offer" messageType="tns:FlightBookingOfferMessage"/> 
+    <variable name="approved" messageType="tns:FlightBookingApproveMessage"/>
+    <variable name="canceled" messageType="tns:FlightBookingCancelMessage"/> 
+    <variable name="output" messageType="tns:FlightBookingResultMessage"/>
+  </variables>
+
+  <sequence>
+
+    <receive name="receiveInput" partnerLink="client"
+             portType="tns:FlightBooking" operation="initiate"
+	     variable="input" createInstance="yes"/>
+ 
+    <assign name="setOffer">
+      <copy>
+        <from expression="number(500)"/>
+        <to variable="offer" query="/tns:offer"/>
+      </copy>               
+    </assign> 
+
+    <invoke name="sendOffer" partnerLink="client"
+        portType="tns:FlightBookingCallback" operation="onOffer"
+	inputVariable="offer"/> 
+            
+    <assign name="recordOffer">
+      <copy>
+	<from variable="offer" query="/offer"/>
+	<to variable="input" query="/tns:flightRequest/tns:price"/>
+      </copy>          
+    </assign>            
+
+    <pick name="handleOfferResponse">
+      <onMessage partnerLink="client" portType="tns:FlightBooking"
+                 operation="approve" variable="approved">
+	<assign name="clientApproved">
+	  <copy>
+	    <from expression="string('Approved')"/>
+	    <to variable="input" query="/tns:flightRequest/tns:status"/>
+	  </copy>
+	  <copy>
+	    <from expression="string('12345')"/>
+	    <to variable="input" query="/tns:flightRequest/tns:confirmationId"/>
+	  </copy>                
+	</assign> 
+      </onMessage>
+
+      <onMessage partnerLink="client" portType="tns:FlightBooking"
+                 operation="cancel" variable="canceled">
+        <assign name="clientCanceled">
+	  <copy>
+	    <from expression="string('Canceled')"/>
+	    <to variable="input" query="/tns:flightRequest/tns:status"/>
+	  </copy>               
+        </assign> 
+      </onMessage>       
+
+      <onAlarm for="'PT30M'">
+        <assign name="autoCanceled">
+	  <copy>
+	    <from expression="string('Canceled')"/>
+	    <to variable="input" query="/tns:flightRequest/tns:status"/>
+	  </copy>               
+	</assign> 
+      </onAlarm>
+    </pick>
+    
+    <assign name="generateOutput">
+      <copy>
+        <from variable="input"/>
+        <to variable="output"/>
+      </copy>
+    </assign>      
+    
+    <invoke name="replyOutput" partnerLink="client"
+            portType="tns:FlightBookingCallback"
+            operation="onResult" inputVariable="output"/>
+
+  </sequence>
+
+</process>

@@ -1,0 +1,14 @@
+FILES = $(wildcard *)
+
+all: bpel2owfn
+
+bpel2owfn: $(FILES:.bpel=)
+	$(MAKE) lola
+
+lola: $(FILES:.lola=.output)
+
+%: %.bpel
+	bpel2owfn --mode=petrinet --input=$< --format=lola --output=$@
+
+%.output: %.lola
+	lola $< --marking=$@

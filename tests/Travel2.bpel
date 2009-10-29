@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- Asynchrnous BPEL process -->
+<process name="Travel" targetNamespace="http://packtpub.com/bpel/travel/" xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:ns4="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:identityservice="http://xmlns.oracle.com/pcbpel/identityservice/local" xmlns:ns1="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20" xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager" xmlns:aln="http://packtpub.com/service/airline/" xmlns:emp="http://packtpub.com/service/employee/" xmlns:trv="http://packtpub.com/bpel/travel/" xmlns:ns3="http://schemas.oracle.com/xpath/extension/ldap" xmlns:taskroutingservice="http://xmlns.oracle.com/pcbpel/taskservice/taskroutingservice" xmlns:ns2="http://schemas.oracle.com/xpath/extension" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task" xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler">
+  <partnerLinks>
+    <partnerLink name="client" partnerLinkType="trv:travelLT" myRole="travelService" partnerRole="travelServiceCustomer"/>
+    <partnerLink name="employeeTravelStatus" partnerLinkType="emp:employeeLT" partnerRole="employeeTravelStatusService"/>
+    <partnerLink name="AmericanAirlines" partnerLinkType="aln:flightLT" myRole="airlineCustomer" partnerRole="airlineService"/>
+    <partnerLink name="DeltaAirlines" partnerLinkType="aln:flightLT" myRole="airlineCustomer" partnerRole="airlineService"/>
+    <partnerLink myRole="TaskManagerCallbackListener" name="TaskManagerService" partnerRole="TaskManager" partnerLinkType="taskmngr:TaskManager"/>
+    <partnerLink name="TaskRoutingService" partnerRole="TaskRoutingService" partnerLinkType="taskroutingservice:TaskRoutingService"/>
+    <partnerLink myRole="HandleTaskActionRequester" name="TaskActionHandler" partnerRole="HandleTaskActionProvider" partnerLinkType="taskactionhandler:TaskActionHandler"/>
+    <partnerLink name="IdentityService" partnerRole="IdentityServiceProvider" partnerLinkType="identityservice:IdentityService"/>
+  </partnerLinks>
+  <variables><!-- input for this process -->
+    <variable name="TravelRequest" messageType="trv:TravelRequestMessage"/><!-- input for American and Delta web services -->
+    <variable name="FlightDetails" messageType="aln:FlightTicketRequestMessage"/><!-- output from BPEL process -->
+    <variable name="TravelResponse" messageType="aln:TravelResponseMessage"/><!-- fault to the BPEL client -->
+    <variable name="TravelFault" messageType="trv:TravelFaultMessage"/>
+    <variable name="TravelApprovalVar" element="task:task"/>
+  </variables>
+  <faultHandlers>
+    <catchAll>
+      <sequence><!-- Create the TravelFault variable -->
+        <assign>
+          <copy>
+            <from expression="string('Other fault')"/>
+            <to variable="TravelFault" part="error"/>
+          </copy>
+        </assign>
+        <invoke partnerLink="client" portType="trv:ClientCallbackPT" operation="ClientCallbackFault" inputVariable="TravelFault"/>
+      </sequence>
+    </catchAll>
+  </faultHandlers>
+  <sequence><!-- Receive the initial request for business travel from client -->
+    <receive partnerLink="client" portType="trv:TravelApprovalPT" operation="TravelApproval" variable="TravelRequest" createInstance="yes"/>
+    <scope name="RetrieveEmployeeTravelStatus">
+      <variables><!-- input for the Employee Travel Status web service -->
+        <variable name="EmployeeTravelStatusRequest" messageType="emp:EmployeeTravelStatusRequestMessage"/><!-- output from the Employee Travel Status web service -->
+        <variable name="EmployeeTravelStatusResponse" messageType="emp:EmployeeTravelStatusResponseMessage"/>
+      </variables>
+      <faultHandlers>
+        <catchAll>
+          <sequence><!-- Create the TravelFault variable -->
+            <assign>
+              <copy>
+                <from expression="string('Unable to retrieve employee travel status')"/>
+                <to variable="TravelFault" part="error"/>
+              </copy>
+            </assign>
+            <invoke partnerLink="client" portType="trv:ClientCallbackPT" operation="ClientCallbackFault" inputVariable="TravelFault"/>
+            <terminate/>
+          </sequence>
+        </catchAll>
+      </faultHandlers>
+      <sequence><!-- Prepare the input for the Employee Travel Status Web Service -->
+        <assign>
+          <copy>
+            <from variable="TravelRequest" part="employee"/>
+            <to variable="EmployeeTravelStatusRequest" part="employee"/>
+          </copy>
+        </assign><!-- Synchronously invoke the Employee Travel Status Web Service -->
+        <invoke partnerLink="employeeTravelStatus" portType="emp:EmployeeTravelStatusPT" operation="EmployeeTravelStatus" inputVariable="EmployeeTravelStatusRequest" outputVariable="EmployeeTravelStatusResponse"/><!-- Prepare the input for AA and DA -->
+        <assign>
+          <copy>
+            <from variable="TravelRequest" part="flightData"/>
+            <to variable="FlightDetails" part="flightData"/>
+          </copy>
+          <copy>
+            <from variable="EmployeeTravelStatusResponse" part="travelClass"/>
+            <to variable="FlightDetails" part="travelClass"/>
+          </copy>
+        </assign>
+      </sequence>
+    </scope>
+    <scope name="CheckFlightAvailability">
+      <variables><!-- output from American Airlines -->
+        <variable name="FlightResponseAA" messageType="aln:TravelResponseMessage"/><!-- output from Delta Airlines -->
+        <variable name="FlightResponseDA" messageType="aln:TravelResponseMessage"/>
+      </variables>
+      <faultHandlers>
+        <catchAll>
+          <sequence><!-- Create the TravelFault variable -->
+            <assign>
+              <copy>
+                <from expression="string('Unable to invoke airline web service')"/>
+                <to variable="TravelFault" part="error"/>
+              </copy>
+            </assign>
+            <invoke partnerLink="client" portType="trv:ClientCallbackPT" operation="ClientCallbackFault" inputVariable="TravelFault"/>
+            <terminate/>
+          </sequence>
+        </catchAll>
+      </faultHandlers>
+      <sequence><!-- Make a concurrent invocation to AA in DA -->
+        <flow>
+          <sequence><!-- Async invoke of the AA web service and wait for the callback -->
+            <invoke partnerLink="AmericanAirlines" portType="aln:FlightAvailabilityPT" operation="FlightAvailability" inputVariable="FlightDetails"/>
+            <receive partnerLink="AmericanAirlines" portType="aln:FlightCallbackPT" operation="FlightTicketCallback" variable="FlightResponseAA" createInstance="no"/>
+          </sequence>
+          <sequence><!-- Async invoke of the DA web service and wait for the callback -->
+            <invoke partnerLink="DeltaAirlines" portType="aln:FlightAvailabilityPT" operation="FlightAvailability" inputVariable="FlightDetails"/>
+            <receive partnerLink="DeltaAirlines" portType="aln:FlightCallbackPT" operation="FlightTicketCallback" variable="FlightResponseDA" createInstance="no"/>
+          </sequence>
+        </flow><!-- Select the best offer and construct the TravelResponse -->
+        <switch>
+          <case condition="bpws:getVariableData('FlightResponseAA','confirmationData','/confirmationData/aln:Price')                          &lt;= bpws:getVariableData('FlightResponseDA','confirmationData','/confirmationData/aln:Price')"><!-- Select American Airlines -->
+            <assign>
+              <copy>
+                <from variable="FlightResponseAA"/>
+                <to variable="TravelResponse"/>
+              </copy>
+            </assign>
+          </case>
+          <otherwise><!-- Select Delta Airlines -->
+            <assign>
+              <copy>
+                <from variable="FlightResponseDA"/>
+                <to variable="TravelResponse"/>
+              </copy>
+            </assign>
+          </otherwise>
+        </switch>
+      </sequence>
+    </scope>
+    <scope name="TravelApproval" variableAccessSerializable="no" xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager" xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ora="http://schemas.oracle.com/xpath/extension" xmlns:wf="http://schemas.oracle.com/bpel/extension/workflow" wf:key="TravelApprovalVar;taskConfigTravelApproval.xml;SimpleUserActivity;Ticket approval for &lt;%concat(bpws:getVariableData('TravelRequest','employee','/employee/emp:FirstName'),' ',bpws:getVariableData('TravelRequest','employee','/employee/emp:LastName'))%&gt;;bpws:getVariableData('TravelResponse', 'confirmationData', '/confirmationData');; ;1; ;">
+      <variables>
+        <variable name="oraBPMTaskMessage" messageType="taskmngr:taskMessage"/>
+        <variable name="oraBPMTaskErroredFaultMessage" messageType="taskmngr:taskErroredMessage"/>
+        <variable name="oraBPMTemporaryVariable" type="xsd:string"/>
+      </variables>
+      <correlationSets>
+        <correlationSet name="oraBPMTaskIdCor" properties="taskmngr:taskId"/>
+      </correlationSets>
+      <sequence>
+        <assign name="setUserDefinedAttributes">
+          <copy>
+            <from expression="concat(&quot;Ticket approval for &quot;,concat(bpws:getVariableData('TravelRequest','employee','/employee/emp:FirstName'),' ',bpws:getVariableData('TravelRequest','employee','/employee/emp:LastName')))"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:title"/>
+          </copy>
+          <copy>
+            <from expression="bpws:getVariableData('TravelResponse', 'confirmationData', '/confirmationData')"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:payload"/>
+          </copy>
+          <copy>
+            <from expression="&quot;PT1H&quot;"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:expirationDuration"/>
+          </copy>
+          <copy>
+            <from expression="string('admin')"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:assigneeUsers[1]"/>
+          </copy>
+          <copy>
+            <from expression="concat(ora:getProcessURL(), string('/taskConfigTravelApproval.xml'))"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:taskType"/>
+          </copy>
+        </assign>
+        <assign name="setSystemDefinedAttributes">
+          <copy>
+            <from expression="ora:getInstanceId()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:instanceId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:processName"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:processId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessVersion()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:processVersion"/>
+          </copy>
+          <copy>
+            <from expression="ora:getDomainId()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:domainId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessOwnerId()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:processOwner"/>
+          </copy>
+          <copy>
+            <from expression="string('SINGLE_APPROVAL')"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:pattern"/>
+          </copy>
+          <copy>
+            <from expression="false()"/>
+            <to variable="TravelApprovalVar" query="/task:task/task:hasSubTasks"/>
+          </copy>
+          <copy>
+            <from variable="TravelApprovalVar"/>
+            <to variable="oraBPMTaskMessage" part="payload"/>
+          </copy>
+        </assign>
+        <scope name="initiateTask">
+          <faultHandlers>
+            <catch faultName="taskmngr:taskErroredFault" faultVariable="oraBPMTaskErroredFaultMessage">
+              <assign name="readErroredTask">
+                <copy>
+                  <from variable="oraBPMTaskErroredFaultMessage" part="payload"/>
+                  <to variable="oraBPMTaskMessage" part="payload"/>
+                </copy>
+              </assign>
+            </catch>
+          </faultHandlers>
+          <sequence>
+            <invoke name="initiateTask" partnerLink="TaskManagerService" portType="taskmngr:TaskManager" operation="initiateTask" inputVariable="oraBPMTaskMessage" outputVariable="oraBPMTaskMessage"/>
+          </sequence>
+        </scope>
+        <sequence>
+          <invoke name="initiateTaskActionHandler" partnerLink="TaskActionHandler" portType="taskactionhandler:TaskActionHandler" operation="initiate" inputVariable="oraBPMTaskMessage">
+            <correlations>
+              <correlation set="oraBPMTaskIdCor" initiate="yes" pattern="out"/>
+            </correlations>
+          </invoke>
+          <receive name="receiveUpdatedTask" partnerLink="TaskActionHandler" portType="taskactionhandler:TaskActionHandlerCallback" operation="onTaskCompleted" variable="oraBPMTaskMessage" createInstance="no">
+            <correlations>
+              <correlation set="oraBPMTaskIdCor" initiate="no"/>
+            </correlations>
+          </receive>
+        </sequence>
+        <assign name="readUpdatedTask">
+          <copy>
+            <from variable="oraBPMTaskMessage" part="payload"/>
+            <to variable="TravelApprovalVar"/>
+          </copy>
+        </assign>
+      </sequence>
+    </scope>
+    <switch name="taskSwitch" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:tt="http://xmlns.oracle.com/pcbpel/taskservice/tasktype" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <case condition="bpws:getVariableData('TravelApprovalVar',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('TravelApprovalVar',                     '/task:task/task:conclusion') = 'APPROVE'">
+	      <!--        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is APPROVE
+          </bpelx:pattern>
+  </bpelx:annotation>-->
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from expression="'true'"/>
+              <to variable="TravelResponse" part="confirmationData" query="/confirmationData/aln:Approved"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <case condition="bpws:getVariableData('TravelApprovalVar',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('TravelApprovalVar',                     '/task:task/task:conclusion') = 'DECLINE'">
+	      <!--        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is DECLINE
+          </bpelx:pattern>
+  </bpelx:annotation>-->
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from expression="'false'"/>
+              <to variable="TravelResponse" part="confirmationData" query="/confirmationData/aln:Approved"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <otherwise>
+	      <!--        <bpelx:annotation>
+          <bpelx:pattern>Task is EXPIRED, WITHDRAWN or ERRORED
+          </bpelx:pattern>
+  </bpelx:annotation>-->
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from expression="'false'"/>
+              <to variable="TravelResponse" part="confirmationData" query="/confirmationData/aln:Approved"/>
+            </copy>
+          </assign>
+        </sequence>
+      </otherwise>
+    </switch>
+    <scope name="CallbackClient">
+      <faultHandlers>
+        <catch faultName="trv:TicketNotApproved" faultVariable="TravelFault"><!-- Make a callback to the client -->
+          <invoke partnerLink="client" portType="trv:ClientCallbackPT" operation="ClientCallbackFault" inputVariable="TravelFault"/>
+        </catch>
+      </faultHandlers><!-- Check if the ticket is approved -->
+      <switch>
+        <case condition="bpws:getVariableData('TravelResponse',                                'confirmationData',                                '/confirmationData/aln:Approved')='true' "><!-- Make a callback to the client -->
+          <invoke partnerLink="client" portType="trv:ClientCallbackPT" operation="ClientCallback" inputVariable="TravelResponse"/>
+        </case>
+        <otherwise>
+          <sequence><!-- Create the TravelFault variable with fault description -->
+            <assign>
+              <copy>
+                <from expression="string('Ticket not approved')"/>
+                <to variable="TravelFault" part="error"/>
+              </copy>
+            </assign><!-- Throw fault -->
+            <throw faultName="trv:TicketNotApproved" faultVariable="TravelFault"/>
+          </sequence>
+        </otherwise>
+      </switch>
+    </scope>
+  </sequence>
+</process>

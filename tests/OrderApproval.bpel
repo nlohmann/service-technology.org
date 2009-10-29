@@ -1,0 +1,338 @@
+<!--
+  ///////////////////////////////////////////////////////////////////////////////////////////// 
+  // Oracle JDeveloper BPEL Designer 
+  // 
+  // Created: Thu Jan 27 14:04:01 PST 2005
+  // Author:  rarangas
+  // Purpose: Asynchronous BPEL Process
+  ///////////////////////////////////////////////////////////////////////////////////////////// 
+-->
+<process name="OrderApproval"
+         targetNamespace="http://xmlns.oracle.com/OrderApproval"
+         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:client="http://xmlns.oracle.com/OrderApproval"
+         xmlns:ora="http://schemas.oracle.com/xpath/extension"
+         xmlns:identityservice="http://xmlns.oracle.com/pcbpel/identityservice/local"
+         xmlns:ns1="http://www.mycompany.com/ns/sales"
+         xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager"
+         xmlns:taskroutingservice="http://xmlns.oracle.com/pcbpel/taskservice/taskroutingservice"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task"
+         xmlns:orcl="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler">
+  <partnerLinks xmlns:plext="http://schemas.oracle.com/bpel/extension/partnerlink">
+    <partnerLink name="client" partnerLinkType="client:OrderApproval"
+                 myRole="OrderApprovalProvider"
+                 partnerRole="OrderApprovalRequester"
+                 plext:wsdlloc="OrderApproval.wsdl"/>
+    <partnerLink myRole="TaskManagerCallbackListener" name="TaskManagerService"
+                 partnerRole="TaskManager"
+                 partnerLinkType="taskmngr:TaskManager"
+                 plext:wsdlloc="TaskManagerService.wsdl"
+                 plext:runtimeloc="${domain_url}/TaskActionHandler/TaskManagerService.wsdl"/>
+    <partnerLink name="TaskRoutingService" partnerRole="TaskRoutingService"
+                 partnerLinkType="taskroutingservice:TaskRoutingService"
+                 plext:wsdlloc="TaskRoutingService.wsdl"
+                 plext:runtimeloc="${domain_url}/TaskActionHandler/TaskRoutingService.wsdl"/>
+    <partnerLink myRole="HandleTaskActionRequester" name="TaskActionHandler"
+                 partnerRole="HandleTaskActionProvider"
+                 partnerLinkType="taskactionhandler:TaskActionHandler"
+                 plext:wsdlloc="TaskActionHandler.wsdl"
+                 plext:runtimeloc="${domain_url}/TaskActionHandler/TaskActionHandler?wsdl"/>
+    <partnerLink name="IdentityService" partnerRole="IdentityServiceProvider"
+                 partnerLinkType="identityservice:IdentityService"
+                 plext:wsdlloc="LocalIdentityService.wsdl"/>
+  </partnerLinks>
+  <variables>
+    <variable name="inputVariable"
+              messageType="client:OrderApprovalRequestMessage"/>
+    <variable name="outputVariable"
+              messageType="client:OrderApprovalResponseMessage"/>
+    <variable name="SequentialWorkflowVar1" element="task:task"/>
+  </variables>
+  <sequence name="main">
+    <receive name="receiveInput" partnerLink="client"
+             portType="client:OrderApproval" operation="initiate"
+             variable="inputVariable" createInstance="yes"/>
+    <scope name="SequentialWorkflow1" variableAccessSerializable="no"
+           xmlns:identityservice="http://xmlns.oracle.com/pcbpel/identityservice/local"
+           xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler"
+           xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+           xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+           xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+           xmlns:tt="http://xmlns.oracle.com/pcbpel/taskservice/tasktype"
+           xmlns:bpel="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+           xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager"
+           xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task"
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:ora="http://schemas.oracle.com/xpath/extension"
+           xmlns:taskroutingservice="http://xmlns.oracle.com/pcbpel/taskservice/taskroutingservice">
+      <variables>
+        <variable name="oraBPMTaskMessage" messageType="taskmngr:taskMessage"/>
+        <variable name="oraBPMTemporaryVariable" type="xsd:string"/>
+        <variable name="oraBPMTaskErroredFaultMessage"
+                  messageType="taskmngr:taskErroredMessage"/>
+        <variable name="oraBPMNumOfTimesApproved" type="xsd:int"/>
+      </variables>
+      <correlationSets>
+        <correlationSet name="oraBPMTaskIdCor" properties="taskmngr:taskId"/>
+      </correlationSets>
+      <sequence>
+        <assign name="setUserDefinedAttributes">
+          <copy>
+            <from expression="concat(string('Order for '),bpws:getVariableData('inputVariable','payload','/ns1:PurchaseOrder/ns1:CustID'))"/>
+            <to variable="SequentialWorkflowVar1" query="/task:task/task:title"/>
+          </copy>
+          <copy>
+            <from expression="bpws:getVariableData('inputVariable','payload','/ns1:PurchaseOrder')"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:payload"/>
+          </copy>
+          <copy>
+            <from expression="string('Supervisor')"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:assigneeGroups[1]"/>
+          </copy>
+          <copy>
+            <from expression="concat(ora:getProcessURL(), string('/taskConfigSequentialWorkflow1.xml'))"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:taskType"/>
+          </copy>
+        </assign>
+        <assign name="setRoutingPolicy">
+          <copy>
+            <from expression="concat( 'getManagementChain(&quot;',  string('1'),  '&quot;,&quot;',  string('Chief Executive Officer'),  '&quot;)')"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:approvers"/>
+          </copy>
+        </assign>
+        <assign name="setSystemDefinedAttributes">
+          <copy>
+            <from expression="ora:getInstanceId()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:instanceId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:processName"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:processId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessVersion()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:processVersion"/>
+          </copy>
+          <copy>
+            <from expression="ora:getDomainId()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:domainId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessOwnerId()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:processOwner"/>
+          </copy>
+          <copy>
+            <from expression="string('SEQUENTIAL')"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:pattern"/>
+          </copy>
+          <copy>
+            <from expression="false()"/>
+            <to variable="SequentialWorkflowVar1"
+                query="/task:task/task:hasSubTasks"/>
+          </copy>
+          <copy>
+            <from expression="number(0)"/>
+            <to variable="oraBPMNumOfTimesApproved"/>
+          </copy>
+          <copy>
+            <from variable="SequentialWorkflowVar1"/>
+            <to variable="oraBPMTaskMessage" part="payload"/>
+          </copy>
+        </assign>
+        <scope name="initiateTask">
+          <faultHandlers>
+            <catch faultName="taskmngr:taskErroredFault"
+                   faultVariable="oraBPMTaskErroredFaultMessage">
+              <assign name="readErroredTask">
+                <copy>
+                  <from variable="oraBPMTaskErroredFaultMessage" part="payload"/>
+                  <to variable="oraBPMTaskMessage" part="payload"/>
+                </copy>
+              </assign>
+            </catch>
+          </faultHandlers>
+          <sequence>
+            <invoke name="initiateTask" partnerLink="TaskManagerService"
+                    portType="taskmngr:TaskManager" operation="initiateTask"
+                    inputVariable="oraBPMTaskMessage"
+                    outputVariable="oraBPMTaskMessage">
+              <correlations>
+                <correlation set="oraBPMTaskIdCor" initiate="yes" pattern="in"/>
+              </correlations>
+            </invoke>
+          </sequence>
+        </scope>
+        <while condition="bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'EXPIRED' and bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'COMPLETED' and bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'WITHDRAWN' and bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'ERRORED'">
+          <sequence>
+            <sequence>
+              <invoke name="initiateTaskActionHandler"
+                      partnerLink="TaskActionHandler"
+                      portType="taskactionhandler:TaskActionHandler"
+                      operation="initiate" inputVariable="oraBPMTaskMessage"/>
+              <receive name="receiveUpdatedTask" partnerLink="TaskActionHandler"
+                       portType="taskactionhandler:TaskActionHandlerCallback"
+                       operation="onTaskCompleted" variable="oraBPMTaskMessage"
+                       createInstance="no">
+                <correlations>
+                  <correlation set="oraBPMTaskIdCor" initiate="no"/>
+                </correlations>
+              </receive>
+            </sequence>
+            <switch>
+              <case condition="bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') = 'COMPLETED' and ((bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:conclusion') = 'ACCEPT'))">
+                <bpelx:annotation>
+                  <bpelx:pattern>Task is COMPLETED and task outcome is one of the outcomes specified in the routing policy
+                  </bpelx:pattern>
+                </bpelx:annotation>
+                <sequence>
+                  <assign name="setSystemDefinedAttributes">
+                    <copy>
+                      <from expression="bpws:getVariableData('oraBPMNumOfTimesApproved') + 1"/>
+                      <to variable="oraBPMNumOfTimesApproved"/>
+                    </copy>
+                  </assign>
+                  <scope name="routeTaskToNextApprover">
+                    <faultHandlers>
+                      <catch faultName="taskmngr:taskErroredFault"
+                             faultVariable="oraBPMTaskErroredFaultMessage">
+                        <sequence>
+                          <assign name="readErroredTask">
+                            <copy>
+                              <from variable="oraBPMTaskErroredFaultMessage"
+                                    part="payload"/>
+                              <to variable="oraBPMTaskMessage" part="payload"/>
+                            </copy>
+                          </assign>
+                        </sequence>
+                      </catch>
+                    </faultHandlers>
+                    <sequence>
+                      <invoke name="routeTaskToNextApprover"
+                              partnerLink="TaskRoutingService"
+                              portType="taskroutingservice:TaskRoutingService"
+                              operation="routeTaskToNextApprover"
+                              inputVariable="oraBPMTaskMessage"
+                              outputVariable="oraBPMTaskMessage"/>
+                    </sequence>
+                  </scope>
+                </sequence>
+              </case>
+            </switch>
+          </sequence>
+        </while>
+        <assign name="readUpdatedTask">
+          <copy>
+            <from variable="oraBPMTaskMessage" part="payload"/>
+            <to variable="SequentialWorkflowVar1"/>
+          </copy>
+        </assign>
+      </sequence>
+    </scope>
+    <switch name="taskSwitch"
+            xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+            xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+            xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+            xmlns:tt="http://xmlns.oracle.com/pcbpel/taskservice/tasktype"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <case condition="bpws:getVariableData('SequentialWorkflowVar1',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('SequentialWorkflowVar1',                     '/task:task/task:conclusion') = 'ACCEPT'">
+        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is ACCEPT
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SequentialWorkflowVar1"
+                    query="/task:task/task:payload"/>
+              <to variable="inputVariable" part="payload"
+                  query="/ns1:PurchaseOrder"/>
+            </copy>
+          </assign>
+          <assign name="Assign_1">
+            <copy>
+              <from expression="string('Accepted')"/>
+              <to variable="inputVariable" part="payload"
+                  query="/ns1:PurchaseOrder/ns1:OrderInfo/ns1:OrderComments"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <case condition="bpws:getVariableData('SequentialWorkflowVar1',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('SequentialWorkflowVar1',                     '/task:task/task:conclusion') = 'REJECT'">
+        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is REJECT
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SequentialWorkflowVar1"
+                    query="/task:task/task:payload"/>
+              <to variable="inputVariable" part="payload"
+                  query="/ns1:PurchaseOrder"/>
+            </copy>
+          </assign>
+          <assign name="Assign_2">
+            <copy>
+              <from expression="string('Rejected')"/>
+              <to variable="inputVariable" part="payload"
+                  query="/ns1:PurchaseOrder/ns1:OrderInfo/ns1:OrderComments"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <otherwise>
+        <bpelx:annotation>
+          <bpelx:pattern>Task is EXPIRED, WITHDRAWN or ERRORED
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SequentialWorkflowVar1"
+                    query="/task:task/task:payload"/>
+              <to variable="inputVariable" part="payload"
+                  query="/ns1:PurchaseOrder"/>
+            </copy>
+          </assign>
+          <assign name="Assign_3">
+            <copy>
+              <from expression="string('Rejected')"/>
+              <to variable="inputVariable" part="payload"
+                  query="/ns1:PurchaseOrder/ns1:OrderInfo/ns1:OrderComments"/>
+            </copy>
+          </assign>
+        </sequence>
+      </otherwise>
+    </switch>
+    <assign name="setOutputVariable">
+      <copy>
+        <from variable="inputVariable" part="payload" query="/ns1:PurchaseOrder"/>
+        <to variable="outputVariable" part="payload" query="/ns1:PurchaseOrder"/>
+      </copy>
+    </assign>
+    <invoke name="callbackClient" partnerLink="client"
+            portType="client:OrderApprovalCallback" operation="onResult"
+            inputVariable="outputVariable"/>
+  </sequence>
+</process>

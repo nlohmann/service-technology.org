@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<process name="BuyBook" 
+         targetNamespace="http://oracle.com/bpel/buybook/" 
+         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:buy="http://oracle.com/bpel/buybook/"
+         xmlns:bkr="http://oracle.com/service/bookrating/" 
+         xmlns:bst="http://oracle.com/service/bookstore/" >
+   
+   <partnerLinks>
+      <partnerLink name="Client" 
+                   partnerLinkType="buy:BuyBookLT"
+                   myRole="BuyBookService"
+                   partnerRole="BuyBookCustomer"/>
+
+      <partnerLink name="BookRating" 
+                   partnerLinkType="bkr:BookRatingLT"
+                   partnerRole="BookRatingService"/>
+
+      <partnerLink name="BookStore1-1" 
+                   partnerLinkType="bst:BookStoreLT"
+                   myRole="BookStoreCustomer"
+                   partnerRole="BookStoreService"/>
+                   
+      <partnerLink name="BookStore1-2" 
+                   partnerLinkType="bst:BookStoreLT"
+                   myRole="BookStoreCustomer"
+                   partnerRole="BookStoreService"/>                   
+                   
+      <partnerLink name="BookStore2-1" 
+                   partnerLinkType="bst:BookStoreLT"
+                   myRole="BookStoreCustomer"
+                   partnerRole="BookStoreService"/>
+                   
+      <partnerLink name="BookStore2-2" 
+                   partnerLinkType="bst:BookStoreLT"
+                   myRole="BookStoreCustomer"
+                   partnerRole="BookStoreService"/>                   
+                   
+   </partnerLinks>
+
+   <variables>
+      <!-- input for this process -->      
+      <variable name="BookPurchase" messageType="bst:BookPurchaseMessage"/>
+      <!-- input for Book Store web services -->
+      <variable name="BookRequest" messageType="bst:BookRequestMessage"/>
+      <!-- output final -->
+      <variable name="BookResponseFinal" messageType="bst:BookResponseMessage"/>
+      <!-- fault -->
+      <variable name="Fault" messageType="bst:FaultMessage"/>
+   </variables>
+
+
+   <faultHandlers>
+
+      <catchAll>
+
+        <sequence>
+          <!-- Create the Fault variable -->
+          <assign>
+            <copy>
+              <from expression="string('Other fault')" />
+              <to variable="Fault" part="error" />
+            </copy>
+          </assign>
+  
+          <invoke partnerLink="Client" 
+                  portType="buy:ClientCallbackPT" 
+                  operation="ClientCallbackFault"
+                  inputVariable="Fault" />
+        </sequence>
+                
+      </catchAll>
+
+   </faultHandlers>
+
+   <sequence>
+
+      <!-- Receive the initial request from client -->
+      <receive partnerLink="Client" 
+               portType="buy:BuyBookPT" 
+               operation="BuyBook" 
+               variable="BookPurchase"
+               createInstance="yes" />
+
+      <scope name="RetrieveBookRating">
+
+        <variables>
+            <!-- input for the Book Rating web service -->
+            <variable name="BookRatingRequest" messageType="bkr:BookRatingRequestMessage"/>
+            <!-- output from the Book Rating web service -->
+            <variable name="BookRatingResponse" messageType="bkr:BookRatingResponseMessage"/>
+        </variables>
+
+        <faultHandlers>
+      
+            <catchAll>
+      
+              <sequence>
+                <assign>
+                  <copy>
+                    <from expression="string('Unable to retrieve book rating')" />
+                    <to variable="Fault" part="error" />
+                  </copy>
+                </assign>
+        
+                <invoke partnerLink="Client" 
+                        portType="buy:ClientCallbackPT" 
+                        operation="ClientCallbackFault"
+                        inputVariable="Fault" />
+              </sequence>
+                      
+            </catchAll>
+      
+        </faultHandlers>
+        
+        <sequence>
+
+          <!-- Prepare the input for the Book Rating -->
+          <assign>
+            <copy>
+              <from variable="BookPurchase" part="book"/>
+              <to variable="BookRatingRequest" part="book"/>
+            </copy>
+          </assign>
+          
+          <!-- Synchronously invoke the Book Rating Web Service -->
+          <scope name="BookRatingInvoke">
+          
+            <faultHandlers>
+
+              <catchAll>
+                <!-- If book rating is not avaliable assign 0 -->
+                <assign>
+                  <copy>
+                    <from expression="number(0)"/>
+                    <to variable="BookRatingResponse" part="rating"/>
+                  </copy>
+                </assign>          
+              </catchAll>
+              
+            </faultHandlers>
+            
+            <invoke partnerLink="BookRating" 
+                  portType="bkr:BookRatingPT" 
+                  operation="BookRating"
+                  inputVariable="BookRatingRequest" 
+                  outputVariable="BookRatingResponse" />
+          
+          </scope>
+    
+          <!-- Prepare the input for Book Stores -->
+          <assign>
+            <copy>
+              <from variable="BookPurchase" part="book"/>
+              <to variable="BookRequest" part="book"/>
+            </copy>
+            <copy>
+              <from variable="BookPurchase" part="quantity"/>
+              <to variable="BookRequest" part="quantity"/>
+            </copy>
+          </assign>
+          
+        </sequence>
+        
+      </scope>
+
+      <scope name="SelectBestBookPrice">
+
+        <variables>
+          <!-- output from BS1 -->
+          <variable name="BookResponse1" messageType="bst:BookResponseMessage"/>
+          <!-- output from BS2 -->
+          <variable name="BookResponse2" messageType="bst:BookResponseMessage"/>
+        </variables>
+
+        <faultHandlers>
+      
+            <catchAll>
+      
+              <sequence>
+                <assign>
+                  <copy>
+                    <from expression="string('Unable to query book price')" />
+                    <to variable="Fault" part="error" />
+                  </copy>
+                </assign>
+        
+                <invoke partnerLink="Client" 
+                        portType="buy:ClientCallbackPT" 
+                        operation="ClientCallbackFault"
+                        inputVariable="Fault" />
+              </sequence>
+                      
+            </catchAll>
+      
+        </faultHandlers>
+        
+        <sequence>
+        
+          <!-- Make a concurrent invocation to BS1 and BS2 -->
+          <flow>
+          
+            <sequence>
+            
+              <invoke partnerLink="BookStore1-1" 
+                  portType="bst:BookPurchasePT" 
+                  operation="BookPriceQuery"
+                  inputVariable="BookRequest" />
+    
+              <receive partnerLink="BookStore1-1" 
+                  portType="bst:BookPurchaseCallbackPT" 
+                  operation="BookPurchaseCallback"
+                  variable="BookResponse1" />
+    
+            </sequence>
+    
+            <sequence>
+            
+              <invoke partnerLink="BookStore2-1" 
+                  portType="bst:BookPurchasePT" 
+                  operation="BookPriceQuery"
+                  inputVariable="BookRequest" />
+    
+              <receive partnerLink="BookStore2-1" 
+                  portType="bst:BookPurchaseCallbackPT" 
+                  operation="BookPurchaseCallback"
+                  variable="BookResponse2" />
+    
+            </sequence>
+    
+          </flow>
+    
+          <!-- Select the best offer -->
+          <switch>
+                  
+            <case condition="bpws:getVariableData('BookResponse1','confirmation','/confirmation/bst:Price') 
+                          &lt;= bpws:getVariableData('BookResponse2','confirmation','/confirmation/bst:Price')">
+                        
+               <!-- Select BS1 -->
+               <sequence>
+                 <invoke partnerLink="BookStore1-2" 
+                      portType="bst:BookPurchasePT" 
+                      operation="BookPurchase"
+                      inputVariable="BookPurchase" />
+        
+                 <receive partnerLink="BookStore1-2" 
+                      portType="bst:BookPurchaseCallbackPT" 
+                      operation="BookPurchaseCallback"
+                      variable="BookResponseFinal" />
+               </sequence>
+               
+            </case>
+                        
+            <otherwise>
+               <!-- Select BS2 -->
+               <sequence>
+                      <invoke partnerLink="BookStore2-2" 
+                      portType="bst:BookPurchasePT" 
+                      operation="BookPurchase"
+                      inputVariable="BookPurchase" />
+        
+                  <receive partnerLink="BookStore2-2" 
+                      portType="bst:BookPurchaseCallbackPT" 
+                      operation="BookPurchaseCallback"
+                      variable="BookResponseFinal" />
+               </sequence>
+    
+            </otherwise>
+          </switch>
+
+        </sequence>
+
+      </scope>
+      
+      <scope name="ClientCallback">
+
+        <faultHandlers>
+
+            <catch faultName="buy:CreditCardNotApproved" faultVariable="Fault">
+              
+                <invoke partnerLink="Client" 
+                        portType="buy:ClientCallbackPT" 
+                        operation="ClientCallbackFault"
+                        inputVariable="Fault" />
+                      
+            </catch>
+      
+        </faultHandlers>
+
+      
+        <!-- Check if the credit card is processed -->
+        <switch>
+                
+          <case condition="bpws:getVariableData('BookResponseFinal',
+                                'confirmation',
+                                '/confirmation/bst:Approved')='true' ">
+  
+            <!-- Make a callback to the client -->
+            <invoke partnerLink="Client" 
+                    portType="buy:ClientCallbackPT" 
+                    operation="ClientCallback"
+                    inputVariable="BookResponseFinal" />
+  
+          </case>
+                      
+          <otherwise>
+  
+            <sequence>
+              <!-- Create the fault -->
+              <assign>
+                 <copy>
+                   <from expression="string('Credit card not approved')" />
+                   <to variable="Fault" part="error" />
+                 </copy>
+              
+              </assign>
+    
+              <!-- Throw fault -->
+              <throw faultName="buy:CreditCardNotApproved" 
+                     faultVariable="Fault" />
+            </sequence>
+  
+          </otherwise>
+        </switch>
+      
+      </scope>
+      
+   </sequence>
+
+</process>

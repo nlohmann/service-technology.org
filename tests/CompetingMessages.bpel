@@ -1,0 +1,18 @@
+<process name="competingMessages01"
+         targetNamespace="http://samples.otn.com"
+         suppressJoinFailure="yes"
+         xmlns:tns="http://samples.otn.com"
+         xmlns:services="http://services.otn.com"
+         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/">
+<sequence>
+<pick name="Pi">
+   <onMessage partnerLink="pl1" portType="pt1" operation="op1">
+     <empty name="Em1"/>
+   </onMessage>
+   <onMessage partnerLink="pl1" portType="pt1" operation="op1"> 
+     <empty name="Em2"/>
+   </onMessage>
+</pick>
+</sequence>
+
+</process>

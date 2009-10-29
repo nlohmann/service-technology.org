@@ -1,0 +1,119 @@
+! section "Compilers"
+
+purpose "Translates BPEL processes into Petri net models."
+
+description "About:"
+
+section "Parameters"
+
+option "mode" m
+  "The processing mode"
+  string values="petrinet","ast","pretty","cfg","choreography","visualization"
+  typestr="MODE"
+  optional
+
+option "parameter" p
+  "Modify processing with given parameter"
+  string values="reduce","variables","standardfaults","fhfaults","communicationonly","xor","nointerface","loopcount","loopcontrol","deadlocktest","ports","small","decomp"
+  typestr="PARAM"
+  optional
+  multiple
+
+option "reduce" r
+  "Apply structural reduction level "
+  int values="0","1","2","3","4","5","6","7"
+  typestr="NUMBER"
+  optional
+  default="0"
+
+section "File input"
+
+option "input" i
+  "Read a BPEL process from file"
+  details="In modes 'ast', 'pretty', 'cfg', and 'visualization', exactly one file has to be given. In case the 'choreography' mode is used, several files can be used. In that case, also wildcards are allowed.\n"
+  string
+  typestr="FILE"
+  optional
+  multiple
+
+option "topology" t
+  "Read a BPEL4Chor participant topology file from FILE"
+  details="In the 'choreography' mode, this option is used to read a participant topology file which configures the interconnections and the instantiations of the participants of a BPEL4Chor choreography.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "wsdl" w
+  "Read a WSDL file from FILE"
+  details="Several of the static analysis checks BPEL2oWFN can conduct depend on information that cannot be derived from the BPEL file under consideration. To refine the results, a WSDL file can be read.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "net" n
+  "Read a Fiona oWFN or PNML file from FILE"
+  string
+  typestr="FILE"
+  optional
+
+section "File output"
+
+option "format" f
+  "Create output of the given format"
+  details="\
+Choose one or several file formats. The choice of a file format is confined by the chosen modes. Most formats are only applicable if the 'petrinet' or 'choreography' mode is chosen.
+  lola:   LoLA low-level file format
+  owfn:   Fiona open workflow net format
+  dot:    Graphviz dot format and, if dot is installed, a PNG is created
+  pep:    PEP format
+  apnn:   Abstract Petri Net Notation (APPN) format
+  ina:    Integrated Net Analyzer (INA) format
+  spin:   Promela format for SPIN
+  pnml:   Petri Net Markup Language (PNML) format
+  iolola: LoLA file format with decomposition information
+  info:   detailed description of a generated Petri net
+  tpn:    Woflan workflow net
+"
+  string values="lola","owfn","dot","pep","apnn","ina","spin","info","pnml","txt","info","iolola","xml","tpn"
+  typestr="FORMAT"
+  optional
+  multiple
+
+option "output" o
+  "Write output to file (NAME sets filename)"
+  string
+  typestr="FILE"
+  optional
+  argoptional
+
+option "log" l
+  "Create log file (NAME sets filename)"
+  string
+  typestr="FILE"
+  optional
+  argoptional
+
+section "Debugging"
+
+option "debug" d
+  "Set a debug level"
+  details="\
+Several debug modes can be chosen to display verbose information during the execution of BPEL2oWFN.
+  0      display errors only (default)
+  1      display warnings
+  2      display informative messages
+  3      display debug information 
+  4      display verbose debug information
+  flex   display flex's debugging information about token recognition
+  bison  display Bison's debugging information about syntax rule application
+"
+  string values="0","1","2","3","4","flex","bison"
+  typestr="NUMBER"
+  optional
+  multiple
+  default="0"
+
+option "bug" -
+  "Show helpful information (version number, compilation date, compiler version, and platform) in case a bug was found and should be reported."
+  flag off
+  hidden

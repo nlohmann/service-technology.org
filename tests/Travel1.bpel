@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- Asynchrnous BPEL process -->
+
+<process name="Travel" 
+         targetNamespace="http://packtpub.com/bpel/travel/" 
+         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:trv="http://packtpub.com/bpel/travel/"
+         xmlns:emp="http://packtpub.com/service/employee/"
+         xmlns:aln="http://packtpub.com/service/airline/" >
+   
+   <partnerLinks>
+      <partnerLink name="client" 
+                   partnerLinkType="trv:travelLT"
+                   myRole="travelService"
+                   partnerRole="travelServiceCustomer"/>
+
+      <partnerLink name="employeeTravelStatus" 
+                   partnerLinkType="emp:employeeLT"
+                   partnerRole="employeeTravelStatusService"/>
+
+      <partnerLink name="AmericanAirlines" 
+                   partnerLinkType="aln:flightLT"
+                   myRole="airlineCustomer"
+                   partnerRole="airlineService"/>
+                   
+      <partnerLink name="DeltaAirlines" 
+                   partnerLinkType="aln:flightLT"
+                   myRole="airlineCustomer"
+                   partnerRole="airlineService"/>
+                   
+   </partnerLinks>
+
+   <variables>
+      <!-- input for this process -->      
+      <variable name="TravelRequest" messageType="trv:TravelRequestMessage"/>
+      <!-- input for the Employee Travel Status web service -->
+      <variable name="EmployeeTravelStatusRequest" messageType="emp:EmployeeTravelStatusRequestMessage"/>
+      <!-- output from the Employee Travel Status web service -->
+      <variable name="EmployeeTravelStatusResponse" messageType="emp:EmployeeTravelStatusResponseMessage"/>
+      <!-- input for American and Delta web services -->
+      <variable name="FlightDetails" messageType="aln:FlightTicketRequestMessage"/>
+      <!-- output from American Airlines -->
+      <variable name="FlightResponseAA" messageType="aln:TravelResponseMessage"/>
+      <!-- output from Delta Airlines -->
+      <variable name="FlightResponseDA" messageType="aln:TravelResponseMessage"/>
+      <!-- output from BPEL process -->
+      <variable name="TravelResponse" messageType="aln:TravelResponseMessage"/>
+   </variables>
+
+   <sequence>
+
+      <!-- Receive the initial request for business travel from client -->
+      <receive partnerLink="client" 
+               portType="trv:TravelApprovalPT" 
+               operation="TravelApproval" 
+               variable="TravelRequest"
+               createInstance="yes" />
+
+      <!-- Prepare the input for the Employee Travel Status Web Service -->
+      <assign>
+        <copy>
+          <from variable="TravelRequest" part="employee"/>
+          <to variable="EmployeeTravelStatusRequest" part="employee"/>
+        </copy>
+      </assign>
+      
+      <!-- Synchronously invoke the Employee Travel Status Web Service -->
+      <invoke partnerLink="employeeTravelStatus" 
+              portType="emp:EmployeeTravelStatusPT" 
+              operation="EmployeeTravelStatus"
+              inputVariable="EmployeeTravelStatusRequest" 
+              outputVariable="EmployeeTravelStatusResponse" />
+
+      <!-- Prepare the input for AA and DA -->
+      <assign>
+        <copy>
+          <from variable="TravelRequest" part="flightData"/>
+          <to variable="FlightDetails" part="flightData"/>
+        </copy>
+        <copy>
+          <from variable="EmployeeTravelStatusResponse" part="travelClass"/>
+          <to variable="FlightDetails" part="travelClass"/>
+        </copy>
+      </assign>
+
+      <!-- Make a concurrent invocation to AA in DA -->
+      <flow>
+      
+        <sequence>
+          <!-- Async invoke of the AA web service and wait for the callback -->
+        
+          <invoke partnerLink="AmericanAirlines" 
+              portType="aln:FlightAvailabilityPT" 
+              operation="FlightAvailability"
+              inputVariable="FlightDetails" />
+
+          <receive partnerLink="AmericanAirlines" 
+              portType="aln:FlightCallbackPT" 
+              operation="FlightTicketCallback"
+              variable="FlightResponseAA" />
+
+        </sequence>
+
+        <sequence>
+          <!-- Async invoke of the DA web service and wait for the callback -->
+        
+          <invoke partnerLink="DeltaAirlines" 
+              portType="aln:FlightAvailabilityPT" 
+              operation="FlightAvailability"
+              inputVariable="FlightDetails" />
+
+          <receive partnerLink="DeltaAirlines" 
+              portType="aln:FlightCallbackPT" 
+              operation="FlightTicketCallback"
+              variable="FlightResponseDA" />
+
+        </sequence>
+
+      </flow>
+
+      <!-- Select the best offer and construct the TravelResponse -->
+      <switch>
+              
+        <case condition="bpws:getVariableData('FlightResponseAA','confirmationData','/confirmationData/aln:Price') 
+                      &lt;= bpws:getVariableData('FlightResponseDA','confirmationData','/confirmationData/aln:Price')">
+                    
+           <!-- Select American Airlines -->
+           <assign>
+             <copy>
+               <from variable="FlightResponseAA" />
+               <to variable="TravelResponse" />
+             </copy>
+           </assign>
+        </case>
+                    
+        <otherwise>
+           <!-- Select Delta Airlines -->
+           <assign>
+             <copy>
+               <from variable="FlightResponseDA" />
+               <to variable="TravelResponse" />
+             </copy>
+           </assign>
+        </otherwise>
+      </switch>
+      
+      <!-- Make a callback to the client -->
+      <invoke partnerLink="client" 
+              portType="trv:ClientCallbackPT" 
+              operation="ClientCallback"
+              inputVariable="TravelResponse" />
+   </sequence>
+
+</process>

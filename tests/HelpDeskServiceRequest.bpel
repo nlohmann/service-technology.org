@@ -1,0 +1,271 @@
+<process xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" name="HelpDeskServiceRequest" targetNamespace="http://xmlns.oracle.com/HelpDeskServiceRequest" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20" xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:client="http://xmlns.oracle.com/HelpDeskServiceRequest" xmlns:ora="http://schemas.oracle.com/xpath/extension" xmlns:identityservice="http://xmlns.oracle.com/pcbpel/identityservice/local" xmlns:ns1="http://www.mycompany.com/ns/sr" xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager" xmlns:taskroutingservice="http://xmlns.oracle.com/pcbpel/taskservice/taskroutingservice" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task" xmlns:orcl="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc" xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler"><!--
+  //////////////////////////////////////////////////////////////////////////////
+  //  Partner Links Section
+  //////////////////////////////////////////////////////////////////////////////
+  -->
+  <partnerLinks xmlns:plext="http://schemas.oracle.com/bpel/extension/partnerlink">
+    <partnerLink myRole="HelpDeskServiceRequestProvider" name="client" partnerRole="HelpDeskServiceRequestRequester" partnerLinkType="client:HelpDeskServiceRequest" plext:wsdlloc="HelpDeskServiceRequest.wsdl"/>
+    <partnerLink myRole="TaskManagerCallbackListener" name="TaskManagerService" partnerRole="TaskManager" partnerLinkType="taskmngr:TaskManager" plext:wsdlloc="TaskManagerService.wsdl" plext:runtimeloc="${domain_url}/TaskActionHandler/TaskManagerService.wsdl"/>
+    <partnerLink myRole="HandleTaskActionRequester" name="TaskActionHandler" partnerRole="HandleTaskActionProvider" partnerLinkType="taskactionhandler:TaskActionHandler" plext:wsdlloc="TaskActionHandler.wsdl" plext:runtimeloc="${domain_url}/TaskActionHandler/TaskActionHandler?wsdl"/>
+    <partnerLink name="IdentityService" partnerRole="IdentityServiceProvider" partnerLinkType="identityservice:IdentityService" plext:wsdlloc="LocalIdentityService.wsdl"/>
+    <partnerLink name="TaskRoutingService" partnerRole="TaskRoutingService" partnerLinkType="taskroutingservice:TaskRoutingService" plext:wsdlloc="TaskRoutingService.wsdl" plext:runtimeloc="${domain_url}/TaskActionHandler/TaskRoutingService.wsdl"/>
+  </partnerLinks><!--
+  //////////////////////////////////////////////////////////////////////////////
+  //  Process Variables Section
+  //////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <variable name="inputVariable" messageType="client:ServiceRequestMessage"/>
+    <variable name="payload" messageType="client:ServiceMessage"/>
+    <variable name="outputVariable" messageType="client:ServiceMessage"/>
+    <variable name="SimpleWorkflowVar1" element="task:task"/>
+    <variable name="SimpleWorkflowWithAutomaticEscalationVar1" element="task:task"/>
+  </variables><!--
+  //////////////////////////////////////////////////////////////////////////////
+  //  Activity Flow Section
+  //////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+    <receive name="receiveInput" partnerLink="client" portType="client:HelpDeskServiceRequest" operation="initiate" variable="inputVariable" createInstance="yes"/>
+    <assign name="Assign_1">
+      <copy>
+        <from variable="inputVariable" part="request" query="/ns1:serviceRequest"/>
+        <to variable="payload" part="service" query="/ns1:service/ns1:serviceRequest"/>
+      </copy>
+      <copy>
+        <from expression="string('')"/>
+        <to variable="payload" part="service" query="/ns1:service/ns1:serviceUpdate/updatedBy"/>
+      </copy>
+      <copy>
+        <from expression="string('')"/>
+        <to variable="payload" part="service" query="/ns1:service/ProblemResolution/problemResolvedBy"/>
+      </copy>
+    </assign>
+    <scope name="SimpleWorkflowWithAutomaticEscalation1" variableAccessSerializable="no" xmlns:identityservice="http://xmlns.oracle.com/pcbpel/identityservice/local" xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:tt="http://xmlns.oracle.com/pcbpel/taskservice/tasktype" xmlns:bpel="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager" xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ora="http://schemas.oracle.com/xpath/extension" xmlns:taskroutingservice="http://xmlns.oracle.com/pcbpel/taskservice/taskroutingservice" xmlns:wf="http://schemas.oracle.com/bpel/extension/workflow" wf:key="SimpleWorkflowWithAutomaticEscalationVar1;taskConfigSimpleWorkflowWithAutomaticEscalation1.xml;AutomaticEscalation;Help Desk Service Request;bpws:getVariableData('payload', 'service');bpws:getVariableData('payload','service','/ns1:service/ns1:serviceRequest/requestor'); ; ;1;">
+      <variables>
+        <variable name="oraBPMTaskMessage" messageType="taskmngr:taskMessage"/>
+        <variable name="oraBPMEscalateTaskVariable" messageType="taskroutingservice:taskEscalateOnExpirationMessage"/>
+        <variable name="oraBPMTaskErroredFaultMessage" messageType="taskmngr:taskErroredMessage"/>
+        <variable name="oraBPMExpDuration" type="xsd:duration"/>
+        <variable name="oraBPMTemporaryVariable" type="xsd:string"/>
+        <variable name="oraBPMManagementChain" element="identityservice:managementChain"/>
+      </variables>
+      <correlationSets>
+        <correlationSet name="oraBPMTaskIdCor" properties="taskmngr:taskId"/>
+      </correlationSets>
+      <sequence>
+        <assign name="setUserDefinedAttributes">
+          <copy>
+            <from expression="&quot;Help Desk Service Request&quot;"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:title"/>
+          </copy>
+          <copy>
+            <from expression="bpws:getVariableData('payload','service','/ns1:service/ns1:serviceRequest/requestor')"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:creator"/>
+          </copy>
+          <copy>
+            <from expression="bpws:getVariableData('payload', 'service')"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:payload"/>
+          </copy>
+          <copy>
+            <from expression="&quot;PT1M&quot;"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:expirationDuration"/>
+          </copy>
+          <copy>
+            <from expression="string('jstein')"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:assigneeUsers[1]"/>
+          </copy>
+          <copy>
+            <from expression="concat(ora:getProcessURL(), string('/taskConfigSimpleWorkflowWithAutomaticEscalation1.xml'))"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:taskType"/>
+          </copy>
+        </assign>
+        <assign name="setEscalationPolicy">
+          <copy>
+            <from variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:expirationDuration"/>
+            <to variable="oraBPMExpDuration"/>
+          </copy>
+          <copy>
+            <from expression="string('Chief Executive Officer')"/>
+            <to variable="oraBPMManagementChain" query="/identityservice:managementChain/identityservice:uptoTitle"/>
+          </copy>
+          <copy>
+            <from expression="string('3')"/>
+            <to variable="oraBPMManagementChain" query="/identityservice:managementChain/identityservice:levels"/>
+          </copy>
+        </assign>
+        <assign name="setSystemDefinedAttributes">
+          <copy>
+            <from expression="ora:getInstanceId()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:instanceId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:processName"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:processId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessVersion()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:processVersion"/>
+          </copy>
+          <copy>
+            <from expression="ora:getDomainId()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:domainId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessOwnerId()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:processOwner"/>
+          </copy>
+          <copy>
+            <from expression="string('SINGLE_APPROVAL_WITH_ESCALATION')"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:pattern"/>
+          </copy>
+          <copy>
+            <from expression="false()"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:hasSubTasks"/>
+          </copy>
+          <copy>
+            <from variable="SimpleWorkflowWithAutomaticEscalationVar1"/>
+            <to variable="oraBPMTaskMessage" part="payload"/>
+          </copy>
+        </assign>
+        <scope name="initiateTask">
+          <faultHandlers>
+            <catch faultName="taskmngr:taskErroredFault" faultVariable="oraBPMTaskErroredFaultMessage">
+              <assign name="readErroredTask">
+                <copy>
+                  <from variable="oraBPMTaskErroredFaultMessage" part="payload"/>
+                  <to variable="oraBPMTaskMessage" part="payload"/>
+                </copy>
+              </assign>
+            </catch>
+          </faultHandlers>
+          <sequence>
+            <invoke name="initiateTask" partnerLink="TaskManagerService" portType="taskmngr:TaskManager" operation="initiateTask" inputVariable="oraBPMTaskMessage" outputVariable="oraBPMTaskMessage"/>
+          </sequence>
+        </scope>
+        <while condition="bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'EXPIRED' and bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'COMPLETED' and bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'WITHDRAWN' and bpws:getVariableData('oraBPMTaskMessage', 'payload', '/task:task/task:state') != 'ERRORED'">
+          <sequence>
+            <sequence>
+              <invoke name="initiateTaskActionHandler" partnerLink="TaskActionHandler" portType="taskactionhandler:TaskActionHandler" operation="initiate" inputVariable="oraBPMTaskMessage">
+                <correlations>
+                  <correlation set="oraBPMTaskIdCor" initiate="yes" pattern="out"/>
+                </correlations>
+              </invoke>
+              <receive name="receiveUpdatedTask" partnerLink="TaskActionHandler" portType="taskactionhandler:TaskActionHandlerCallback" operation="onTaskCompleted" variable="oraBPMTaskMessage" createInstance="no">
+                <correlations>
+                  <correlation set="oraBPMTaskIdCor" initiate="no"/>
+                </correlations>
+              </receive>
+            </sequence>
+            <switch>
+              <case condition="bpws:getVariableData('oraBPMTaskMessage',                                                       'payload',                                                       '/task:task/task:state') = 'EXPIRED'">
+                <bpelx:annotation>
+                  <bpelx:pattern>Task is EXPIRED
+                  </bpelx:pattern>
+                </bpelx:annotation>
+                <scope name="escalateTask">
+                  <faultHandlers>
+                    <catch faultName="taskroutingservice:taskErroredFault" faultVariable="oraBPMTaskErroredFaultMessage">
+                      <sequence>
+                        <assign name="readErroredTask">
+                          <copy>
+                            <from variable="oraBPMTaskErroredFaultMessage" part="payload"/>
+                            <to variable="oraBPMTaskMessage" part="payload"/>
+                          </copy>
+                        </assign>
+                      </sequence>
+                    </catch>
+                  </faultHandlers>
+                  <sequence>
+                    <assign name="setEscalationMessage">
+                      <copy>
+                        <from variable="oraBPMTaskMessage" part="payload"/>
+                        <to variable="oraBPMEscalateTaskVariable" part="task"/>
+                      </copy>
+                      <copy>
+                        <from variable="oraBPMManagementChain"/>
+                        <to variable="oraBPMEscalateTaskVariable" part="managementChain"/>
+                      </copy>
+                      <copy>
+                        <from variable="oraBPMExpDuration"/>
+                        <to variable="oraBPMEscalateTaskVariable" part="renewDuration"/>
+                      </copy>
+                    </assign>
+                    <invoke name="escalateTask" partnerLink="TaskRoutingService" portType="taskroutingservice:TaskRoutingService" operation="escalateTaskOnExpiration" inputVariable="oraBPMEscalateTaskVariable" outputVariable="oraBPMTaskMessage"/>
+                    <assign name="updateEscalationPolicy">
+                      <copy>
+                        <from expression="number(bpws:getVariableData('oraBPMManagementChain', '/identityservice:managementChain/identityservice:levels')) - 1"/>
+                        <to variable="oraBPMManagementChain" query="/identityservice:managementChain/identityservice:levels"/>
+                      </copy>
+                    </assign>
+                  </sequence>
+                </scope>
+              </case>
+            </switch>
+          </sequence>
+        </while>
+        <assign name="readUpdatedTask">
+          <copy>
+            <from variable="oraBPMTaskMessage" part="payload"/>
+            <to variable="SimpleWorkflowWithAutomaticEscalationVar1"/>
+          </copy>
+        </assign>
+      </sequence>
+    </scope>
+    <switch name="taskSwitch" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:tt="http://xmlns.oracle.com/pcbpel/taskservice/tasktype" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <case condition="bpws:getVariableData('SimpleWorkflowWithAutomaticEscalationVar1',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('SimpleWorkflowWithAutomaticEscalationVar1',                     '/task:task/task:conclusion') = 'COMPLETED'">
+        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is COMPLETED
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:payload"/>
+              <to variable="payload" part="service"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <case condition="bpws:getVariableData('SimpleWorkflowWithAutomaticEscalationVar1',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('SimpleWorkflowWithAutomaticEscalationVar1',                     '/task:task/task:conclusion') = 'UNRESOLVED'">
+        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is UNRESOLVED
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:payload"/>
+              <to variable="payload" part="service"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <otherwise>
+        <bpelx:annotation>
+          <bpelx:pattern>Task is EXPIRED, WITHDRAWN or ERRORED
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SimpleWorkflowWithAutomaticEscalationVar1" query="/task:task/task:payload"/>
+              <to variable="payload" part="service"/>
+            </copy>
+          </assign>
+        </sequence>
+      </otherwise>
+    </switch>
+    <assign name="Assign_2">
+      <copy>
+        <from variable="payload" part="service"/>
+        <to variable="outputVariable" part="service"/>
+      </copy>
+    </assign>
+    <invoke name="callbackClient" partnerLink="client" portType="client:HelpDeskServiceRequestCallback" operation="onResult" inputVariable="outputVariable"/>
+  </sequence>
+</process>

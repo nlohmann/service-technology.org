@@ -1,0 +1,84 @@
+{ Petri net created by GNU BPEL2oWFN 2.04-unreleased reading UnreachableActivity.bpel }
+
+PLACE
+  link.5.x1,
+  !link.5.x1,
+  link.5.x2,
+  !link.5.x2,
+  p5,
+  p6,
+  p7,
+  p8,
+  p9,
+  p10
+;
+
+
+MARKING
+  p9:	1
+;
+
+
+TRANSITION t1
+CONSUME
+  p9:	1;
+PRODUCE
+  p6:	1,
+  p8:	1;
+
+TRANSITION t2
+CONSUME
+  p7:	1,
+  p10:	1;
+PRODUCE
+  p5:	1;
+
+TRANSITION t3
+CONSUME
+  link.5.x1:	1,
+  link.5.x2:	1,
+  p8:	1;
+PRODUCE
+  p10:	1;
+
+TRANSITION t4
+CONSUME
+  p6:	1;
+PRODUCE
+  link.5.x1:	1,
+  !link.5.x2:	1,
+  p7:	1;
+
+TRANSITION t5
+CONSUME
+  p6:	1;
+PRODUCE
+  !link.5.x1:	1,
+  link.5.x2:	1,
+  p7:	1;
+
+TRANSITION t6
+CONSUME
+  !link.5.x1:	1,
+  link.5.x2:	1,
+  p8:	1;
+PRODUCE
+  p10:	1;
+
+TRANSITION t7
+CONSUME
+  link.5.x1:	1,
+  !link.5.x2:	1,
+  p8:	1;
+PRODUCE
+  p10:	1;
+
+TRANSITION t8
+CONSUME
+  !link.5.x1:	1,
+  !link.5.x2:	1,
+  p8:	1;
+PRODUCE
+  p10:	1;
+
+{ END OF FILE }

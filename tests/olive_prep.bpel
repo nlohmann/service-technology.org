@@ -1,0 +1,192 @@
+<process name="oliveProcess" 
+  targetNamespace="http://www.it.uc3m.es/jaf/ns/OliveOilService"
+  xmlns:tns="http://www.it.uc3m.es/jaf/ns/OliveOilService"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:verbus="http://www.it.uc3m.es/jaf/ns/verbus-bpel/"
+  xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/">
+
+  <partnerLinks>
+    <partnerLink name="OliveOilPlnk" partnerLinkType="OliveOilLnk"
+                 myRole="provider" />      
+    <partnerLink name="OilProviderPlnk" partnerLinkType="OilProviderLnk"
+                 partnerRole="provider" />      
+  </partnerLinks>
+
+
+  <variables>
+    <variable name="request" messageType="tns:OliveOilRequest" />
+    <variable name="response" messageType="tns:OliveOilResponse" />
+    <variable name="oPrice" messageType="tns:OilPriceResponse" />
+    <variable name="oOrder" messageType="tns:OilOrder" />
+    <variable name="oOrderConfirm" messageType="tns:OilConfirmation" />
+  </variables>
+
+
+  <faultHandlers>
+    <catchAll>
+      <sequence>
+	<assign name="prepare_neg_response">
+	  <copy>
+	    <from variable="request" part="request" />
+	    <to variable="response" part="request" />
+	  </copy>
+	  <copy>
+	    <from><!-- <ordered>false</ordered> --></from>
+	    <to variable="response" part="ordered" />
+	  </copy>
+	</assign>
+	
+	<reply name="response_neg" partnerLink="OliveOilPlnk" 
+          portType="tns:OliveOilService" operation="order" variable="response" />
+      </sequence>
+    </catchAll>
+  </faultHandlers>
+
+
+  <sequence name="main">
+    <receive createInstance="yes" partnerLink="OliveOilPlnk" 
+	portType="tns:OliveOilService"
+	operation="order" variable="request">
+      <!-- <verbus:altMessages>
+	<verbus:message>
+	  <request>
+	    <quantity>1</quantity>
+	    <maxPrice>3</maxPrice>
+	    <deadline>5</deadline>
+	    <customerId>c102000</customerId>
+	  </request>
+	</verbus:message>	
+      </verbus:altMessages> -->
+    </receive>
+
+    <assign name="initializations">
+      <copy>
+	<from><!-- <waitingDays>0</waitingDays> --></from>
+	<to variable="response" part="waitingDays"/>
+      </copy>
+      <copy>
+        <from expression="bpws:getVariableData('request', 'request', 'quantity')" />
+        <to variable="oOrder" part="quantity" />
+      </copy>
+      <copy>
+        <from expression="bpws:getVariableData('request', 'request', 'customerId')" />
+        <to variable="oOrder" part="customerId" />
+      </copy>
+      <copy>
+        <from><!-- <oilType>olive</oilType> --></from>
+        <to variable="oOrder" part="oilType" />
+      </copy>
+    </assign>
+
+    <!-- ask the price for the first time -->
+    <invoke name="askPrice1" 
+      partnerLink="OilProviderPlnk" portType="tns:OilProviderService"
+      operation="getPrice" inputVariable="oOrder" outputVariable="oPrice">
+      <!-- <verbus:altMessages>
+	<verbus:message>
+	  <price>1</price>
+	</verbus:message>
+	<verbus:message>
+	  <price>2</price>
+	</verbus:message>
+	<verbus:message>
+	  <price>4</price>
+	</verbus:message>
+	<verbus:message>
+	  <price>5</price>
+	</verbus:message>
+	<verbus:message>
+	  <price>6</price>
+	</verbus:message>
+      </verbus:altMessages> -->
+    </invoke>
+
+    <!-- while the price is too high... -->
+    <while name="wait" condition="bpws:getVariableData('response', 'waitingDays') &lt; bpws:getVariableData('request', 'request', 'deadline')
+                                  and bpws:getVariableData('oPrice', 'price') >
+                                  bpws:getVariableData('request', 'request', 'maxPrice')">
+      <sequence name="loop">
+	<wait name="white_a_day" for="1D" />
+	<assign name="incdays">
+	  <copy>
+	    <from expression="bpws:getVariableData('response', 'waitingDays') + 1" />
+	    <to variable="response" part="waitingDays" />
+	  </copy>
+	</assign>
+	<invoke name="askPrice2" partnerLink="OilProviderPlnk" 
+          portType="tns:OilProviderService"
+	  operation="getPrice" inputVariable="oOrder" outputVariable="oPrice">
+	  <!-- <verbus:altMessages>
+	    <verbus:message>
+	      <price>1</price>
+	    </verbus:message>
+	    <verbus:message>
+	      <price>2</price>
+	    </verbus:message>
+	    <verbus:message>
+	      <price>4</price>
+	    </verbus:message>
+	    <verbus:message>
+	      <price>5</price>
+	    </verbus:message>
+	    <verbus:message>
+	      <price>6</price>
+	    </verbus:message>
+	  </verbus:altMessages> -->
+	</invoke>
+      </sequence>
+    </while>
+
+    <invoke partnerLink="OilProviderPlnk" portType="tns:OilProviderService"
+      operation="order" inputVariable="oOrder" outputVariable="oOrderConfirm">
+      <!-- <verbus:altMessages>
+	<verbus:message>
+	  <accepted>true</accepted>
+	</verbus:message>
+	<verbus:message>
+	  <accepted>false</accepted>
+	</verbus:message>
+      </verbus:altMessages> -->
+    </invoke>
+
+    <assign name="prepare_response">
+      <copy>
+	<from variable="request" part="request" />
+	<to variable="response" part="request" />
+      </copy>
+      <copy>
+	<from variable="oOrderConfirm" part="accepted" />
+	<to variable="response" part="ordered" />
+      </copy>
+      <copy>
+	<from variable="oPrice" part="price" />
+	<to variable="response" part="price" />
+      </copy>
+      <copy>
+	<from expression="bpws:getVariableData('request', 'request', 'quantity')
+                          * bpws:getVariableData('oPrice', 'price')" />
+	<to variable="response" part="totalPrice" />
+      </copy>
+    </assign>
+    
+    <reply name="response" partnerLink="OliveOilPlnk" portType="tns:OliveOilService"
+	operation="order" variable="response" />
+
+  </sequence>
+
+  <!-- <verbus:property type="invariant" 
+    expression="bpws:getVariableData('response', 'waitingDays') &lt;=
+                bpws:getVariableData('request', 'request', 'deadline')" />
+
+  <verbus:property type="goal" 
+    expression="verbus:activityState('response') = 'completed'
+                or verbus:activityState('response_neg') = 'completed'" />
+
+  <verbus:property type="invariant" 
+    expression="bpws:getVariableData('response', 'price') &lt;=
+                bpws:getVariableData('request', 'request', 'maxPrice')
+                or 
+                bpws:getVariableData('response', 'waitingDays') =
+		bpws:getVariableData('request', 'request', 'deadline')" /> -->
+
+</process>

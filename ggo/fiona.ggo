@@ -1,0 +1,120 @@
+package "fiona"
+version "2.0"
+
+args "-u --show-required"
+
+purpose "Fiona is a tool to automatically analyze the interactional behavior of a given open net (oWFN)."
+
+description "About Fiona"
+
+
+section "Scenarios"
+
+option "type" t
+  "Select the modus operandi of fiona (only one type is allowed)."
+  string values="IG", "OG", "match", "productog", "minimizeOG", "reduce", "normalize", "pv", "simulation", "equivalence", "mostpermissivepartner", "smallpartner", "adapter", "png", "checkfalsenodes", "removefalsenodes", "isacyclic", "count", "readOG" enum
+  typestr="TYPE"
+  optional
+  default="IG"
+
+option "messagebound" m
+  "Set maximum number of same messages per state."
+  int
+  default="1"
+  typestr="LEVEL"
+  optional
+
+
+
+section "Reduction"
+
+option "reduceIG" r
+  "Use reduction rules for IG. If no reduction rules are given (see -p), all rules are used."
+  flag off
+
+option "reduce-nodes" R
+  "Use node reduction (IG or OG) which stores less states per IG/OG node (reduces memory, but increases time)"
+  flag off
+
+
+
+section "Debug and verbosity"
+
+option "debug" d
+  "Set the debug level."
+  int values="1", "2", "3", "4", "5" enum
+  typestr="LEVEL"
+  optional
+
+
+option "show" s
+  "Different display options."
+  string values="blue", "empty", "rednodes", "allnodes", "allstates", "deadlocks" enum
+  default="blue"
+  typestr="PARAMETER"
+  optional
+
+
+
+section "BDD-related options"
+
+option "BDD" b
+  "Enable BDD construction (only relevant for OG)."
+  int values="0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21" enum
+  typestr="REORDERING"
+  optional
+
+option "OnTheFly" B
+  "BDD construction on the fly (only for OG)."
+  flag off
+
+
+
+section "Further options"
+
+option "multipledeadlocks" M
+  "Create multiple deadlocks of public view (only relevant for PV mode -t PV)."
+  flag off
+
+
+option "parameter" p
+  "Additional parameter."
+  string values="no-png", "no-dot", "responsive", "r1", "r2", "r3", "r4", "r5", "cre", "rbs", "cover" enum
+  typestr="PARAM"
+  optional
+  multiple
+
+option "readevents" E
+  "Set the maximum occurrences of events to values taken from the oWFN file. If none are given, eventsmaximum is used."
+  flag off
+  hidden
+
+option "eventsmaximum" e
+  "Set event to occur at most LEVEL times. '-1' means disabling -e option, but is only possible if -m option is set. (only relevant for OG)"
+  int
+  typestr="LEVEL"
+  default="1"
+  optional
+  hidden
+
+
+section "File input/output"
+
+option "output" o
+  "Prefix of the output files."
+  string
+  typestr="FILENAME"
+  optional
+
+option "adapterrules" a
+  "Read adapter rules from filename."
+  string
+  typestr="FILENAME"
+  optional
+  
+option "no-output" Q
+  "Runs quietly, i.e., produces no output files."
+  flag off
+  
+
+text "\n\nFor more information see:\n  http://www.service-technology.org/fiona"

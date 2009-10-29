@@ -1,0 +1,337 @@
+<process name="LoanFlowPlus" targetNamespace="http://samples.otn.com" suppressJoinFailure="yes" xmlns:tns="http://samples.otn.com" xmlns:services="http://services.otn.com" xmlns:bpelx="http://schemas.oracle.com/bpel/extension" xmlns:task="http://services.oracle.com/bpel/task" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:auto="http://www.autoloan.com/ns/autoloan" xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/">
+	<!-- *********************************************************************
+         This process invokes a synchronous credit rating service (which
+         throws NegativeCredit exceptions), then  it invokes two asynchronous
+         loan processor services in parallel and finally selects the best loan
+         offer received and returns it (asynchronously) to its caller.
+       *********************************************************************-->
+	<partnerLinks>
+		<partnerLink name="client" partnerLinkType="tns:LoanFlowPlus" partnerRole="LoanFlowPlusRequester" myRole="LoanFlowPlusProvider"/>
+		<partnerLink name="customerService" partnerLinkType="tns:CustomerService" partnerRole="CustomerServiceProvider"/>
+		<partnerLink name="creditRatingService" partnerLinkType="services:CreditRatingService" partnerRole="CreditRatingServiceProvider"/>
+		<partnerLink name="UnitedLoanService" partnerLinkType="services:LoanService" myRole="LoanServiceRequester" partnerRole="LoanServiceProvider"/>
+		<partnerLink name="StarLoanService" partnerLinkType="services:LoanService" myRole="LoanServiceRequester" partnerRole="LoanServiceProvider"/>
+		<partnerLink name="confirmationManager" partnerLinkType="task:TaskManager" partnerRole="TaskManager" myRole="TaskManagerRequester"/>
+		<partnerLink name="exceptionManager" partnerLinkType="task:TaskManager" partnerRole="TaskManager" myRole="TaskManagerRequester"/>
+	</partnerLinks>
+	<variables>
+		<!-- input of this process -->
+		<variable name="input" messageType="tns:LoanFlowPlusRequestMessage"/>
+		<!-- input of united loan and star loan-->
+		<variable name="loanApplication" messageType="services:LoanServiceRequestMessage"/>
+		<!-- output of united loan-->
+		<variable name="loanOffer1" messageType="services:LoanServiceResultMessage"/>
+		<!-- output of star loan-->
+		<variable name="loanOffer2" messageType="services:LoanServiceResultMessage"/>
+		<!-- output of this process -->
+		<variable name="selectedLoanOffer" messageType="tns:LoanFlowPlusResultMessage"/>
+	</variables>
+	<sequence>
+		<!-- ************************************************************
+         Receive input from requestor - this is what kicks
+         off this flow. We get passed a loan application business doc
+         ************************************************************ -->
+		<receive name="receiveInput" partnerLink="client" portType="tns:LoanFlowPlus" operation="initiate" variable="input" createInstance="yes"/>
+		<!-- retrieve SSN using Entity bean -->
+		<!-- ************************************************************
+         Invoke the synchronous creditRatingService. Define a scope
+         for handling faults from it and set the credit rating in the
+         loan app bus doc if we get a credit rating back. In the case
+         of a NegativeCredit exception, set it to -1000.
+         ************************************************************ -->
+		<scope name="getCustomerSSN"><variables>
+				<variable messageType="tns:GetCustomerSSNRequestMessage" name="getCustomerSSNRequest"/>
+				<variable messageType="tns:GetCustomerSSNResponseMessage" name="getCustomerSSNResponse"/>
+                                <variable messageType="tns:CustomerNotFoundFaultMessage" name="getCustomerSSNError" />
+			</variables>
+			<faultHandlers>
+				<catch faultName="tns:CustomerNotFoundException" faultVariable="getCustomerSSNError">
+                                  <assign name="assignDefaultSSN">
+                                        <copy>
+							<from expression="string('000-00-0000')"></from>
+							<to variable="input" part="payload" query="/auto:loanApplication/auto:SSN"/>
+					</copy>
+					</assign>
+				</catch>
+			</faultHandlers>
+			<sequence>
+				<assign name="assignRequest">
+					<copy>
+						<from variable="input" part="payload" query="/auto:loanApplication/auto:email"></from>
+						<to variable="getCustomerSSNRequest" part="email"/>
+					</copy>
+				</assign>
+				<invoke name="getCustomerSSN" partnerLink="customerService" portType="tns:CustomerService" operation="getCustomerSSN" inputVariable="getCustomerSSNRequest" outputVariable="getCustomerSSNResponse"/>
+				<assign name="assignRespose">
+					<copy>
+						<from variable="getCustomerSSNResponse" part="ssn"></from>
+						<to variable="input" part="payload" query="/auto:loanApplication/auto:SSN"/>
+					</copy>
+				</assign>
+			</sequence>
+		</scope>
+		<scope name="getCreditRating" variableAccessSerializable="no">
+			<variables>
+				<variable name="crInput" messageType="services:CreditRatingServiceRequestMessage"/>
+				<variable name="crOutput" messageType="services:CreditRatingServiceResponseMessage"/>
+				<variable name="crError" messageType="services:CreditRatingServiceFaultMessage"/>
+			</variables>
+			<!-- Watch for faults (exceptions) being thrown from creditRatingService -->
+			<faultHandlers>
+				<catch faultName="services:NegativeCredit" faultVariable="crError">
+					<scope name="manageException" variableAccessSerializable="no">
+						<variables>
+							<variable name="exceptionTask" element="task:task"/>
+						</variables>
+						<sequence>
+							<assign name="prepareTask">
+								<!-- Assign 'title' to task request -->
+								<copy>
+									<from expression="string( 'Negative Credit Review Task' )"/>
+									<to variable="exceptionTask" query="/task:task/task:title"/>
+								</copy>
+								<!-- Assign 'creator' to task request -->
+								<copy>
+									<from expression="string( 'LoanFlowPlusWorkflow' )"/>
+									<to variable="exceptionTask" query="/task:task/task:creator"/>
+								</copy>
+								<!-- Assign 'assignee' to task request -->
+								<copy>
+									<from expression="string( 'exception@loandemoplus.com' )"/>
+									<to variable="exceptionTask" query="/task:task/task:assignee"/>
+								</copy>
+								<!-- Assign 'duration' to task request -->
+								<copy>
+									<from expression="string( 'PT1H' )"/>
+									<to variable="exceptionTask" query="/task:task/task:duration"/>
+								</copy>
+								<!-- Assign 'priority' to task request -->
+								<copy>
+									<from expression="2"/>
+									<to variable="exceptionTask" query="/task:task/task:priority"/>
+								</copy>
+								<!-- Assign 'attachment' to task request -->
+								<copy>
+									<from variable="input" part="payload" query="/auto:loanApplication"/>
+									<to variable="exceptionTask" query="/task:task/task:attachment"/>
+								</copy>
+							</assign>
+							<scope name="exceptionUserInteraction" variableAccessSerializable="no">
+								<variables>
+									<variable name="taskRequest" messageType="task:taskMessage"/>
+									<variable name="taskResponse" messageType="task:taskMessage"/>
+								</variables>
+								<sequence>
+									<!-- Assign task document to task message -->
+									<assign name="setPayload">
+										<copy>
+											<from variable="exceptionTask"/>
+											<to variable="taskRequest" part="payload"/>
+										</copy>
+									</assign>
+									<!--  initiate task -->
+									<invoke name="initiateTask" partnerLink="exceptionManager" portType="task:TaskManager" operation="initiateTask" inputVariable="taskRequest"/>
+									<!--  Receive the outcome of the task -->
+									<receive name="receiveTaskResult" partnerLink="exceptionManager" portType="task:TaskManagerCallback" operation="onTaskResult" variable="taskResponse"/>
+									<!-- Read task document from task message -->
+									<assign name="readPayload">
+										<copy>
+											<from variable="taskResponse" part="payload"/>
+											<to variable="exceptionTask"/>
+										</copy>
+									</assign>
+								</sequence>
+							</scope>
+							<!-- switch depends on the input value -->
+							<switch>
+								<case condition="bpws:getVariableData('exceptionTask', '/task:task/task:conclusion') = 'Approved'">
+									<assign>
+										<copy>
+											<from variable="exceptionTask" query="/task:task/task:attachment"/>
+											<to variable="input" part="payload" query="/auto:loanApplication"/>
+										</copy>
+									</assign>
+								</case>
+								<otherwise>
+									<terminate/>
+								</otherwise>
+							</switch>
+						</sequence>
+					</scope>
+				</catch>
+			</faultHandlers>
+			<sequence>
+				<!-- ************************************************************
+             Copy the SSN from the input LoanApplication variable
+             to the creditRating service input variable
+             ************************************************************ -->
+				<assign name="copySSN">
+					<copy>
+						<from variable="input" part="payload" query="/auto:loanApplication/auto:SSN"/>
+						<to variable="crInput" part="payload" query="/services:ssn"/>
+					</copy>
+				</assign>
+				<!-- Invoke the CreditRating Service, the URL of this service's
+            WSDL is specified in the deployment descriptor -->
+				<invoke name="invokeCR" partnerLink="creditRatingService" portType="services:CreditRatingService" operation="process" inputVariable="crInput" outputVariable="crOutput"/>
+				<!-- Add the credit rating we received to the loan application
+            business document -->
+				<assign name="copyRating">
+					<copy>
+						<from variable="crOutput" part="payload" query="/services:rating"/>
+						<to variable="input" part="payload" query="/auto:loanApplication/auto:creditRating"/>
+					</copy>
+				</assign>
+			</sequence>
+		</scope>
+		<!-- ************************************************************
+         Now we will invoke the 2 loan providers (async web services)
+         in parallel. We send each a LoanApplication bus doc and wait
+         for a LoanOffer to be returned.
+         ************************************************************ -->
+		<!-- initialize the input of UnitedLoan and StarLoan -->
+		<scope name="collectOffers">
+			<sequence>
+				<assign name="prepareApplication">
+					<copy>
+						<from variable="input" part="payload"/>
+						<to variable="loanApplication" part="payload"/>
+					</copy>
+				</assign>
+				<flow name="collectOffers">
+					<!-- ************************************************************
+         Invoke the first loan provider (UnitedLoan)
+           ************************************************************ -->
+					<!-- invoke first loan provider -->
+					<sequence>
+						<!--  initiate the remote service -->
+						<invoke name="invokeUnitedLoan" partnerLink="UnitedLoanService" portType="services:LoanService" operation="initiate" inputVariable="loanApplication"/>
+						<!--  receive the result of the remote service -->
+						<receive partnerLink="UnitedLoanService" portType="services:LoanServiceCallback" operation="onResult" variable="loanOffer1"/>
+					</sequence>
+					<!-- ************************************************************
+           Invoke the second loan provider (StarLoan)
+           ************************************************************ -->
+					<sequence>
+						<!--  initiate the remote service -->
+						<invoke name="invokeStarLoan" partnerLink="StarLoanService" portType="services:LoanService" operation="initiate" inputVariable="loanApplication"/>
+						<!--  receive the result of the remote service -->
+						<receive partnerLink="StarLoanService" portType="services:LoanServiceCallback" operation="onResult" variable="loanOffer2"/>
+					</sequence>
+				</flow>
+				<switch name="selectBestOffer">
+					<!-- If loanOffer1 is greater (worse) than loanOffer2 -->
+					<case condition="bpws:getVariableData('loanOffer1','payload','/auto:loanOffer/auto:APR') &gt; bpws:getVariableData('loanOffer2','payload','/auto:loanOffer/auto:APR') ">
+						<!-- Then take loanOffer2 -->
+						<assign name="selectStarLoanOffer">
+							<copy>
+								<from variable="loanOffer2" part="payload"/>
+								<to variable="selectedLoanOffer" part="payload"/>
+							</copy>
+						</assign>
+					</case>
+					<!-- Otherwise take loanOffer1 -->
+					<otherwise>
+						<assign name="selectUnitedLoanOffer">
+							<copy>
+								<from variable="loanOffer1" part="payload"/>
+								<to variable="selectedLoanOffer" part="payload"/>
+							</copy>
+						</assign>
+					</otherwise>
+				</switch>
+			</sequence>
+		</scope>
+		<!-- ************************************************************
+         Decide which offer has the lower APR. Copy the offer with the
+         lowest APR into the selectedLoanOffer return document.
+         ************************************************************ -->
+		<!-- initialize the input of Task Service -->
+		<scope name="confirmationManager" variableAccessSerializable="no">
+			<variables>
+				<variable name="taskTitle" type="xsd:string"/>
+				<variable name="confirmationTask" element="task:task"/>
+			</variables>
+			<sequence>
+				<assign name="prepareTitle">
+					<copy>
+						<from expression="concat('Received offer from ',bpws:getVariableData('selectedLoanOffer', 'payload','/auto:loanOffer/auto:providerName'))"/>
+						<to variable="taskTitle"/>
+					</copy>
+					<copy>
+						<from expression="concat(bpws:getVariableData('taskTitle'),' with APR ')"/>
+						<to variable="taskTitle"/>
+					</copy>
+					<copy>
+						<from expression="concat(bpws:getVariableData('taskTitle'),bpws:getVariableData('selectedLoanOffer', 'payload','/auto:loanOffer/auto:APR'))"/>
+						<to variable="taskTitle"/>
+					</copy>
+				</assign>
+				<assign name="prepareTask">
+					<!-- Assign 'title' to task request -->
+					<copy>
+						<from variable="taskTitle"/>
+						<to variable="confirmationTask" query="/task:task/task:title"/>
+					</copy>
+					<!-- Assign 'creator' to task request -->
+					<copy>
+						<from expression="string( 'LoanFlowPlusWorkflow' )"/>
+						<to variable="confirmationTask" query="/task:task/task:creator"/>
+					</copy>
+					<!-- Assign 'assignee' to task request -->
+					<copy>
+						<from expression="string( 'dave@otn.com' )"/>
+						<to variable="confirmationTask" query="/task:task/task:assignee"/>
+					</copy>
+					<!-- Assign 'duration' to task request -->
+					<copy>
+						<from expression="string( 'PT1H' )"/>
+						<to variable="confirmationTask" query="/task:task/task:duration"/>
+					</copy>
+					<!-- Assign 'priority' to task request -->
+					<copy>
+						<from expression="3"/>
+						<to variable="confirmationTask" query="/task:task/task:priority"/>
+					</copy>
+					<!-- Assign 'attachment' to task request -->
+					<copy>
+						<from variable="selectedLoanOffer" part="payload" query="/auto:loanOffer"/>
+						<to variable="confirmationTask" query="/task:task/task:attachment"/>
+					</copy>
+				</assign>
+				<scope name="confirmationUserInteraction" variableAccessSerializable="no">
+					<variables>
+						<variable name="taskRequest" messageType="task:taskMessage"/>
+						<variable name="taskResponse" messageType="task:taskMessage"/>
+					</variables>
+					<sequence>
+						<!-- Assign task document to task message -->
+						<assign name="setPayload">
+							<copy>
+								<from variable="confirmationTask"/>
+								<to variable="taskRequest" part="payload"/>
+							</copy>
+						</assign>
+						<!--  initiate task -->
+						<invoke name="initiateTask" partnerLink="confirmationManager" portType="task:TaskManager" operation="initiateTask" inputVariable="taskRequest"/>
+						<!--  Receive the outcome of the task -->
+						<receive name="receiveTaskResult" partnerLink="confirmationManager" portType="task:TaskManagerCallback" operation="onTaskResult" variable="taskResponse"/>
+						<!-- Read task document from task message -->
+						<assign name="readPayload">
+							<copy>
+								<from variable="taskResponse" part="payload"/>
+								<to variable="confirmationTask"/>
+							</copy>
+						</assign>
+					</sequence>
+				</scope>
+				<!--  receive the result of the remote process -->
+			</sequence>
+		</scope>
+		<!-- ************************************************************
+         And, finally, send the return offer back to our client who
+         kicked off the whole process.
+         ************************************************************ -->
+		<invoke name="replyOutput" partnerLink="client" portType="tns:LoanFlowPlusCallback" operation="onResult" inputVariable="selectedLoanOffer"/>
+	</sequence>
+</process>

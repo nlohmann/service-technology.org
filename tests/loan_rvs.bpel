@@ -1,0 +1,134 @@
+<process name="loanApprovalProcess"
+    targetNamespace="http://example.com/loan-approval/"
+    xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:lns="http://example.com/loan-approval/wsdl/"
+    suppressJoinFailure="yes">
+    
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="loanServicePT.wsdl"
+	namespace="http://example.com/loan-approval/wsdl/" />
+    
+    <partnerLinks>
+	<partnerLink name="customer"
+	    partnerLinkType="lns:loanPartnerLT"
+	    myRole="loanService" />
+	<partnerLink name="approver"
+	    partnerLinkType="lns:loanApprovalLT"
+	    partnerRole="approver" />
+	<partnerLink name="assessor"
+	    partnerLinkType="lns:riskAssessmentLT"
+	    partnerRole="assessor" />
+    </partnerLinks>
+    
+    <variables>
+	<variable name="request"
+	    messageType="lns:creditInformationMessage" />
+	<variable name="risk"
+	    messageType="lns:riskAssessmentMessage" />
+	<variable name="approval"
+	    messageType="lns:approvalMessage" />
+    </variables>
+    
+    <faultHandlers>
+	<catch faultName="lns:loanProcessFault"
+	    faultVariable="error"
+	    faultMessageType="lns:errorMessage">
+	    <reply partnerLink="customer"
+		portType="lns:loanServicePT"
+		operation="request" variable="error"
+		faultName="unableToHandleRequest" />
+	</catch>
+    </faultHandlers>
+    
+    <flow>
+	<links>
+	    <link name="receive-to-assess" />
+	    <link name="receive-to-approval" />
+	    <link name="approval-to-reply" />
+	    <link name="assess-to-setMessage" />
+	    <link name="setMessage-to-reply" />
+	    <link name="assess-to-approval" />
+	</links>
+	
+	<receive partnerLink="customer"
+	    portType="lns:loanServicePT"
+	    operation="request"
+	    variable="request"
+	    createInstance="yes">
+	    <sources>
+		<source linkName="receive-to-assess">
+		    <transitionCondition>
+			$request.amount $lt; 10000
+		    </transitionCondition>
+		</source>
+		<source linkName="receive-to-approval">
+		    <transitionCondition>
+ 					$request.amount $gr; 10000 or
+ 					$request.amount = 10000
+		    </transitionCondition>
+		</source>
+	    </sources>
+	</receive>
+	
+	<invoke partnerLink="assessor"
+	    portType="lns:riskAssessmentPT"
+	    operation="check"
+	    inputVariable="request"
+	    outputVariable="risk">
+	    <targets>
+		<target linkName="receive-to-assess" />
+	    </targets>
+	    <sources>
+		<source linkName="assess-to-setMessage">
+		    <transitionCondition>
+			$risk.level ='low'
+		    </transitionCondition>
+		</source>
+		<source linkName="assess-to-approval">
+		    <transitionCondition>
+			$risk.level!='low'
+		    </transitionCondition>
+		</source>
+	    </sources>
+	</invoke>
+	
+	<assign>
+	    <targets>
+		<target linkName="assess-to-setMessage" />
+	    </targets>
+	    <sources>
+		<source linkName="setMessage-to-reply" />
+	    </sources>
+	    <copy>
+		<from>
+		    <literal>yes</literal>
+		</from>
+		<to variable="approval" part="accept" />
+	    </copy>
+	</assign>
+	
+	<invoke partnerLink="approver"
+	    portType="lns:loanApprovalPT"
+	    operation="approve"
+	    inputVariable="request"
+	    outputVariable="approval">
+	    <targets>
+		<target linkName="receive-to-approval" />
+		<target linkName="assess-to-approval" />
+	    </targets>
+	    <sources>
+		<source linkName="approval-to-reply" />
+	    </sources>
+	</invoke>
+	
+	<reply partnerLink="customer"
+	    portType="lns:loanServicePT"
+	    operation="request"
+	    variable="approval">
+	    <targets>
+		<target linkName="setMessage-to-reply" />
+		<target linkName="approval-to-reply" />
+	    </targets>
+	</reply>
+    </flow>
+</process>

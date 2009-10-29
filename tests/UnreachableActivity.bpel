@@ -1,0 +1,40 @@
+<process name="controlLink03"
+         targetNamespace="http://samples.otn.com"
+         suppressJoinFailure="yes"
+         xmlns:tns="http://samples.otn.com"
+         xmlns:services="http://services.otn.com"
+         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/">
+<flow suppressJoinFailure="yes">
+<links>
+   <link name="x1"/>
+   <link name="x2"/>
+</links>
+<switch name="Sw">
+   <case>
+     
+     <invoke name="A1">
+       <sources>
+        <source linkName="x1"/>
+       </sources>
+     </invoke>
+   </case>
+   <otherwise>     
+     <invoke name="A2">
+       <sources>
+         <source linkName="x2"/>
+       </sources>
+     </invoke>
+   </otherwise>
+</switch>
+<invoke name = "A3"> 
+  <targets> 
+   <joinCondition> 
+     bpws:getLinkStatus('x1') and bpws:getLinkStatus('x2')
+   </joinCondition>
+   <target linkName="x1"/>
+   <target linkName="x2"/>
+  </targets>
+</invoke>  
+</flow>
+
+</process>

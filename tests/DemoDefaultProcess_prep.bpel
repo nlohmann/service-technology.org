@@ -1,0 +1,171 @@
+<process xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/" name="marketplace" targetNamespace="http://bpeldemo.ibm.com/processing/" xmlns:tns="http://bpeldemo.ibm.com/processing/" suppressJoinFailure="no">
+	<partners>
+		<partner name="Seller" xmlns:ns1="urn:demo:MarketplaceService" serviceLinkType="ns1:SellerSLT" myRole="salesSystem"/>
+		<partner name="Buyer" xmlns:ns2="urn:demo:MarketplaceService" serviceLinkType="ns2:BuyerSLT" myRole="buyerSystem"/>
+		<partner name="Anyone" xmlns:ns3="urn:demo:MarketplaceService" serviceLinkType="ns3:AnyoneSLT" myRole="anyone"/>
+		<partner name="ValidationService" xmlns:ns4="urn:demo:MarketplaceService" serviceLinkType="ns4:ValidatorSLT" partnerRole="validator"/>
+		<partner name="CalculationService" xmlns:ns5="urn:demo:MarketplaceService" serviceLinkType="ns5:CalculatorSLT" partnerRole="calculator"/>
+		<partner name="AssessmentService" xmlns:ns6="urn:demo:MarketplaceService" serviceLinkType="ns6:AssessorSLT" partnerRole="assessor"/>
+		<partner name="SynchronizationService" xmlns:ns7="urn:demo:MarketplaceService" serviceLinkType="ns7:SynchronizerSLT" partnerRole="synchronizer"/>
+		<partner name="MeteringService" xmlns:ns8="urn:demo:MarketplaceService" serviceLinkType="ns8:MeterSLT" partnerRole="meter"/>
+	</partners>
+	<variables>
+		<variable name="order" xmlns:ns9="http://bpeldemo.ibm.com/definitions/" messageType="ns9:Order"/>
+		<variable name="status" xmlns:ns10="http://bpeldemo.ibm.com/definitions/" messageType="ns10:Status"/>
+		<variable name="id" xmlns:ns11="http://bpeldemo.ibm.com/definitions/" messageType="ns11:ID"/>
+		<variable name="meteringEvent" xmlns:ns12="http://bpeldemo.ibm.com/definitions/" messageType="ns12:meteringMessage"/>
+	</variables>
+	<correlationSets>
+		<correlationSet name="identifier" xmlns:ns13="urn:demo:MarketplaceService" properties="ns13:pid"/>
+	</correlationSets>
+	<flow name="Main_Flow">
+		<sequence name="CREATION_SEQUENCE">
+			<assign name="Status_Assign">
+				<copy>
+					<from>
+						<!-- <status xmlns="" xmlns:def="http://bpeldemo.ibm.com/definitions/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="def:Status">
+							<time xsi:type="xsd:long">0</time>
+							<type xsi:type="xsd:short">-2</type>
+							<role xsi:type="xsd:string">Buyer</role>
+						</status> -->
+					</from>
+					<to variable="status" part="status"/>
+				</copy>
+			</assign>
+			<while name="CREATION_WHILE" condition="bpws:getVariableData('status', 'status', '//type')=-1 or bpws:getVariableData('status', 'status', '//type')=-2" xmlns:demo="urn:demo:MarketplaceService" xmlns:svc="http://bpeldemo.ibm.com/services/">
+				<sequence name="While_Sequence">
+					<receive name="Create_Receive" partner="Buyer" portType="demo:BuyerPT" operation="create" variable="order" createInstance="yes">
+						<correlations>
+							<correlation set="identifier" initiate="yes"/>
+						</correlations>
+					</receive>
+					<assign name="Status_Assign">
+						<copy>
+							<from variable="order" part="order" query="//status"/>
+							<to variable="status" part="status"/>
+						</copy>
+					</assign>
+					<switch name="Validation_Switch">
+						<case condition="bpws:getVariableData('status', 'status', '//type')!=-3">
+							<sequence name="Validation_Sequence">
+								<invoke name="Validation_Invoke" partner="ValidationService" xmlns:svc="http://bpeldemo.ibm.com/services/" portType="svc:ValidationUtilityPT" operation="validate" inputVariable="order" outputVariable="status"/>
+								<assign name="Sync_Assign">
+									<copy>
+										<from variable="status" part="status"/>
+										<to variable="order" part="order" query="//status"/>
+									</copy>
+								</assign>
+								<invoke name="Sync_Invoke" partner="SynchronizationService" portType="svc:SynchronizationUtilityPT" operation="synchronize" inputVariable="order" outputVariable="order"/>
+								<switch name="Calculation_Switch">
+									<case condition="bpws:getVariableData('status', 'status', '//type')=1">
+										<sequence name="Calculation_Sequence">
+											<invoke name="Calculation_Invoke" partner="CalculationService" portType="svc:CalculationUtilityPT" operation="calculate" inputVariable="order" outputVariable="status"/>
+											<assign name="Sync_Assign">
+												<copy>
+													<from variable="status" part="status"/>
+													<to variable="order" part="order" query="//status"/>
+												</copy>
+											</assign>
+											<invoke name="Sync_Invoke" partner="SynchronizationService" portType="svc:SynchronizationUtilityPT" operation="synchronize" inputVariable="order" outputVariable="order"/>
+										</sequence>
+									</case>
+<otherwise><empty /></otherwise>
+								</switch>
+							</sequence>
+						</case><otherwise><empty /></otherwise>
+					</switch>
+					<reply name="Create_Reply" partner="Buyer" portType="demo:BuyerPT" operation="create" variable="status"/>
+				</sequence>
+			</while>
+			<switch name="Agreement_Switch" xmlns:demo="urn:demo:MarketplaceService" xmlns:svc="http://bpeldemo.ibm.com/services/">
+				<case condition="bpws:getVariableData('status', 'status', '//type')=2">
+					<sequence name="Agree_Sequence">
+						<receive name="Agree_Receive" partner="Buyer" portType="demo:BuyerPT" operation="agree" variable="id" createInstance="no">
+							<correlations>
+								<correlation set="identifier" initiate="yes"/>
+							</correlations>
+						</receive>
+						<assign name="Status_Assign">
+							<copy>
+								<from variable="id" part="status"/>
+								<to variable="status" part="status"/>
+							</copy>
+						</assign>
+						<assign name="Sync_Assign">
+							<copy>
+								<from variable="status" part="status"/>
+								<to variable="order" part="order" query="//status"/>
+							</copy>
+						</assign>
+						<invoke name="Sync_Invoke" partner="SynchronizationService" portType="svc:SynchronizationUtilityPT" operation="synchronize" inputVariable="order" outputVariable="order"/>
+						<switch name="Solvency_Switch">
+							<case condition="bpws:getVariableData('status', 'status', '//type')=3">
+								<sequence name="Solvency_Sequence">
+									<invoke name="Solvency_Invoke" partner="AssessmentService" portType="svc:SolvencyUtilityPT" operation="isCreditable" inputVariable="order" outputVariable="status"/>
+									<assign name="Sync_Assign">
+										<copy>
+											<from variable="status" part="status"/>
+											<to variable="order" part="order" query="//status"/>
+										</copy>
+									</assign>
+									<invoke name="Sync_Invoke" partner="SynchronizationService" portType="svc:SynchronizationUtilityPT" operation="synchronize" inputVariable="order" outputVariable="order"/>
+								</sequence>
+							</case>
+<otherwise><empty /></otherwise>
+						</switch>
+						<reply name="Agree_Reply" partner="Buyer" portType="demo:BuyerPT" operation="agree" variable="status"/>
+					</sequence>
+				</case><otherwise><empty /></otherwise>
+			</switch>
+			<switch name="Approval_Switch" xmlns:demo="urn:demo:MarketplaceService" xmlns:svc="http://bpeldemo.ibm.com/services/">
+				<case condition="bpws:getVariableData('status', 'status', '//type')=4">
+					<sequence name="Seller_Sequence">
+						<receive name="Seller_Receive" partner="Seller" portType="demo:SellerPT" operation="approve" variable="id" createInstance="no">
+							<correlations>
+								<correlation set="identifier" initiate="yes"/>
+							</correlations>
+						</receive>
+						<assign name="Sync_Assign">
+							<copy>
+								<from variable="id" part="status"/>
+								<to variable="order" part="order" query="//status"/>
+							</copy>
+						</assign>
+						<invoke name="Sync_Invoke" partner="SynchronizationService" portType="svc:SynchronizationUtilityPT" operation="synchronize" inputVariable="order" outputVariable="order"/>
+					</sequence>
+				</case><otherwise><empty /></otherwise>
+			</switch>
+		</sequence>
+		<while name="SEARCH_CYCLE" condition="0=0">
+			<sequence name="Search_Sequence" xmlns:demo="urn:demo:MarketplaceService" xmlns:svc="http://bpeldemo.ibm.com/services/">
+				<pick name="Search_Pick" createInstance="no">
+					<onMessage partner="Anyone" portType="demo:CommonPT" operation="find" variable="id" createInstance="no">
+						<correlations>
+							<correlation set="identifier" initiate="yes"/>
+						</correlations>
+						<empty name="Empty_Activity"/>
+					</onMessage>
+					<onAlarm for="'P0Y0MT60M'">
+						<sequence name="NotifyAndTerminate_Sequence">
+							<invoke name="Notify_Invoke" partner="MeteringService" portType="svc:MeteringPT" operation="decrease" inputVariable="meteringEvent" outputVariable="meteringEvent"/>
+							<terminate name="Terminate_Activity"/>
+						</sequence>
+					</onAlarm>
+				</pick>
+				<reply name="Search_Reply" partner="Anyone" portType="demo:CommonPT" operation="find" variable="order">
+					<correlations>
+						<correlation set="identifier" initiate="yes"/>
+					</correlations>
+				</reply>
+			</sequence>
+		</while>
+		<sequence name="TERMINATION_SEQUENCE">
+			<receive name="Terminate_Receive" partner="Anyone" xmlns:ns14="urn:demo:MarketplaceService" portType="ns14:CommonPT" operation="terminate" variable="id" createInstance="no">
+				<correlations>
+					<correlation set="identifier" initiate="yes"/>
+				</correlations>
+			</receive>
+			<terminate name="Terminate"/>
+		</sequence>
+	</flow>
+</process>

@@ -1,0 +1,46 @@
+{ Petri net created by GNU BPEL2oWFN 2.04-unreleased reading FlightBookingFlow.bpel }
+
+PLACE
+  p1,
+  p2,
+  p3,
+  p4
+;
+
+
+MARKING
+  p4:	1
+;
+
+
+TRANSITION t1
+CONSUME
+  p1:	1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t2
+CONSUME
+  p4:	1;
+PRODUCE
+  p1:	1;
+
+TRANSITION t3
+CONSUME
+  p1:	1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t4
+CONSUME
+  p1:	1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t5
+CONSUME
+  p2:	1;
+PRODUCE
+  p3:	1;
+
+{ END OF FILE }

@@ -1,0 +1,274 @@
+<process xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         name="VacationRequest"
+         targetNamespace="http://xmlns.oracle.com/VacationRequest"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:taskroutingservice="http://xmlns.oracle.com/pcbpel/taskservice/taskroutingservice"
+         xmlns:client="http://xmlns.oracle.com/VacationRequest"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:ora="http://schemas.oracle.com/xpath/extension"
+         xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task"
+         xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler"
+         xmlns:identityservice="http://xmlns.oracle.com/pcbpel/identityservice/local">
+  <!--
+  //////////////////////////////////////////////////////////////////////////////
+  //  Partner Links Section
+  //////////////////////////////////////////////////////////////////////////////
+  -->
+  <partnerLinks xmlns:plext="http://schemas.oracle.com/bpel/extension/partnerlink">
+    <partnerLink myRole="VacationRequestProvider" name="Client"
+                 partnerRole="VacationRequestRequester"
+                 partnerLinkType="client:VacationRequest"
+                 plext:wsdlloc="VacationRequest.wsdl"/>
+    <partnerLink myRole="TaskManagerCallbackListener" name="TaskManagerService"
+                 partnerRole="TaskManager"
+                 partnerLinkType="taskmngr:TaskManager"
+                 plext:wsdlloc="TaskManagerService.wsdl"
+                 plext:runtimeloc="${domain_url}/TaskActionHandler/TaskManagerService.wsdl"/>
+    <partnerLink name="TaskRoutingService" partnerRole="TaskRoutingService"
+                 partnerLinkType="taskroutingservice:TaskRoutingService"
+                 plext:wsdlloc="TaskRoutingService.wsdl"
+                 plext:runtimeloc="${domain_url}/TaskActionHandler/TaskRoutingService.wsdl"/>
+    <partnerLink myRole="HandleTaskActionRequester" name="TaskActionHandler"
+                 partnerRole="HandleTaskActionProvider"
+                 partnerLinkType="taskactionhandler:TaskActionHandler"
+                 plext:wsdlloc="TaskActionHandler.wsdl"
+                 plext:runtimeloc="${domain_url}/TaskActionHandler/TaskActionHandler?wsdl"/>
+    <partnerLink name="IdentityService" partnerRole="IdentityServiceProvider"
+                 partnerLinkType="identityservice:IdentityService"
+                 plext:wsdlloc="LocalIdentityService.wsdl"/>
+  </partnerLinks>
+  <!--
+  //////////////////////////////////////////////////////////////////////////////
+  //  Process Variables Section
+  //////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <variable name="inputVariable"
+              messageType="client:VacationRequestRequestMessage"/>
+    <variable name="outputVariable"
+              messageType="client:VacationRequestResponseMessage"/>
+    <variable name="SimpleWorkflowVar1" element="task:task"/>
+  </variables>
+  <!--
+  //////////////////////////////////////////////////////////////////////////////
+  //  Activity Flow Section
+  //////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+    <receive name="Receive_1" partnerLink="Client"
+             portType="client:VacationRequest" operation="initiate"
+             variable="inputVariable" createInstance="yes"/>
+    <scope name="SimpleWorkflow1" variableAccessSerializable="no"
+           xmlns:taskactionhandler="http://xmlns.oracle.com/pcbpel/taskservice/taskActionHandler"
+           xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+           xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+           xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+           xmlns:bpel="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+           xmlns:taskmngr="http://xmlns.oracle.com/pcbpel/taskservice/taskmanager"
+           xmlns:task="http://xmlns.oracle.com/pcbpel/taskservice/task"
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:ora="http://schemas.oracle.com/xpath/extension">
+      <variables>
+        <variable name="oraBPMTaskMessage" messageType="taskmngr:taskMessage"/>
+        <variable name="oraBPMTaskErroredFaultMessage"
+                  messageType="taskmngr:taskErroredMessage"/>
+        <variable name="oraBPMTemporaryVariable" type="xsd:string"/>
+      </variables>
+      <correlationSets>
+        <correlationSet name="oraBPMTaskIdCor" properties="taskmngr:taskId"/>
+      </correlationSets>
+      <sequence>
+        <assign name="setUserDefinedAttributes">
+          <copy>
+            <from expression="concat(string('Vacation request for '),bpws:getVariableData('inputVariable','payload','/client:VacationRequestProcessRequest/client:creator'))"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:title"/>
+          </copy>
+          <copy>
+            <from expression="bpws:getVariableData('inputVariable','payload','/client:VacationRequestProcessRequest')"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:payload"/>
+          </copy>
+          <copy>
+            <from expression="string('P1D')"/>
+            <to variable="SimpleWorkflowVar1"
+                query="/task:task/task:expirationDuration"/>
+          </copy>
+          <copy>
+            <from variable="SimpleWorkflowVar1"
+                  query="/task:task/task:assigneeUsers[1]"/>
+            <to variable="SimpleWorkflowVar1"
+                query="/task:task/task:assigneeUsers[1]"/>
+          </copy>
+          <copy>
+            <from expression="ora:copyList('SimpleWorkflowVar1', '/task:task/task:assigneeUsers', ora:getManager(bpws:getVariableData('inputVariable','payload','/client:VacationRequestProcessRequest/client:creator')))"/>
+            <to variable="oraBPMTemporaryVariable"/>
+          </copy>
+          <copy>
+            <from expression="concat(ora:getProcessURL(), string('/taskConfigSimpleWorkflow1.xml'))"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:taskType"/>
+          </copy>
+        </assign>
+        <assign name="setSystemDefinedAttributes">
+          <copy>
+            <from expression="ora:getInstanceId()"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:instanceId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="SimpleWorkflowVar1"
+                query="/task:task/task:processName"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessId()"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:processId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessVersion()"/>
+            <to variable="SimpleWorkflowVar1"
+                query="/task:task/task:processVersion"/>
+          </copy>
+          <copy>
+            <from expression="ora:getDomainId()"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:domainId"/>
+          </copy>
+          <copy>
+            <from expression="ora:getProcessOwnerId()"/>
+            <to variable="SimpleWorkflowVar1"
+                query="/task:task/task:processOwner"/>
+          </copy>
+          <copy>
+            <from expression="string('SINGLE_APPROVAL')"/>
+            <to variable="SimpleWorkflowVar1" query="/task:task/task:pattern"/>
+          </copy>
+          <copy>
+            <from expression="false()"/>
+            <to variable="SimpleWorkflowVar1"
+                query="/task:task/task:hasSubTasks"/>
+          </copy>
+          <copy>
+            <from variable="SimpleWorkflowVar1"/>
+            <to variable="oraBPMTaskMessage" part="payload"/>
+          </copy>
+        </assign>
+        <scope name="initiateTask">
+          <faultHandlers>
+            <catch faultName="taskmngr:taskErroredFault"
+                   faultVariable="oraBPMTaskErroredFaultMessage">
+              <assign name="readErroredTask">
+                <copy>
+                  <from variable="oraBPMTaskErroredFaultMessage" part="payload"/>
+                  <to variable="oraBPMTaskMessage" part="payload"/>
+                </copy>
+              </assign>
+            </catch>
+          </faultHandlers>
+          <sequence>
+            <invoke name="initiateTask" partnerLink="TaskManagerService"
+                    portType="taskmngr:TaskManager" operation="initiateTask"
+                    inputVariable="oraBPMTaskMessage"
+                    outputVariable="oraBPMTaskMessage">
+              <correlations>
+                <correlation set="oraBPMTaskIdCor" initiate="yes" pattern="in"/>
+              </correlations>
+            </invoke>
+          </sequence>
+        </scope>
+        <sequence>
+          <invoke name="initiateTaskActionHandler"
+                  partnerLink="TaskActionHandler"
+                  portType="taskactionhandler:TaskActionHandler"
+                  operation="initiate" inputVariable="oraBPMTaskMessage"/>
+          <receive name="receiveUpdatedTask" partnerLink="TaskActionHandler"
+                   portType="taskactionhandler:TaskActionHandlerCallback"
+                   operation="onTaskCompleted" variable="oraBPMTaskMessage"
+                   createInstance="no">
+            <correlations>
+              <correlation set="oraBPMTaskIdCor" initiate="no"/>
+            </correlations>
+          </receive>
+        </sequence>
+        <assign name="readUpdatedTask">
+          <copy>
+            <from variable="oraBPMTaskMessage" part="payload"/>
+            <to variable="SimpleWorkflowVar1"/>
+          </copy>
+        </assign>
+      </sequence>
+    </scope>
+    <switch name="taskSwitch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+            xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+            xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+            xmlns:tt="http://xmlns.oracle.com/pcbpel/taskservice/tasktype">
+      <case condition="bpws:getVariableData('SimpleWorkflowVar1',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('SimpleWorkflowVar1',                     '/task:task/task:conclusion') = 'APPROVE'">
+        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is APPROVE
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SimpleWorkflowVar1"
+                    query="/task:task/task:payload"/>
+              <to variable="inputVariable" part="payload"
+                  query="/client:VacationRequestProcessRequest"/>
+            </copy>
+          </assign>
+          <assign name="Assign_4">
+            <copy>
+              <from expression="string('APPROVED')"/>
+              <to variable="outputVariable" part="payload"
+                  query="/client:VacationRequestProcessResponse/client:result"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <case condition="bpws:getVariableData('SimpleWorkflowVar1',                     '/task:task/task:state') = 'COMPLETED' and            bpws:getVariableData('SimpleWorkflowVar1',                     '/task:task/task:conclusion') = 'REJECT'">
+        <bpelx:annotation>
+          <bpelx:pattern>Task outcome is REJECT
+          </bpelx:pattern>
+        </bpelx:annotation>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SimpleWorkflowVar1"
+                    query="/task:task/task:payload"/>
+              <to variable="inputVariable" part="payload"
+                  query="/client:VacationRequestProcessRequest"/>
+            </copy>
+          </assign>
+          <assign name="Assign_5">
+            <copy>
+              <from expression="string('REJECTED')"/>
+              <to variable="outputVariable" part="payload"
+                  query="/client:VacationRequestProcessResponse/client:result"/>
+            </copy>
+          </assign>
+        </sequence>
+      </case>
+      <otherwise>
+        <sequence>
+          <assign name="copyPayloadFromTask">
+            <copy>
+              <from variable="SimpleWorkflowVar1"
+                    query="/task:task/task:payload"/>
+              <to variable="inputVariable" part="payload"
+                  query="/client:VacationRequestProcessRequest"/>
+            </copy>
+          </assign>
+          <assign name="Assign_6">
+            <copy>
+              <from expression="string('REJECTED')"/>
+              <to variable="outputVariable" part="payload"
+                  query="/client:VacationRequestProcessResponse/client:result"/>
+            </copy>
+          </assign>
+        </sequence>
+      </otherwise>
+    </switch>
+    <invoke name="Invoke_1" partnerLink="Client"
+            portType="client:VacationRequestCallback" operation="onResult"
+            inputVariable="outputVariable"/>
+  </sequence>
+</process>

@@ -21,6 +21,11 @@ Version 1.2-unreleased
 
 * open nets with synchronous interface are now supported
 
+* to be more consistent, engine interface is partioned into ports
+
+* added initial CMake support (all rules, to build binaries, but no
+  documentation or tests)
+
 * known issues:
 
      * cost-optimization is not fully working

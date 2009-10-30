@@ -37,7 +37,7 @@ NO_COVER_FILES = */libs/* */parser_adapt_rules.cc */lexer_adapt_rules.cc */cmdli
 ################
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+EXTRA_DIST = CMakeLists.txt testsuite.at versions.sh wrap.sh \
              $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

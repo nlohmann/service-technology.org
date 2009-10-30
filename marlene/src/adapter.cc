@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <sys/types.h>
-#ifdef HAVE_SYS_WAIT_H
+#if defined(HAVE_SYS_WAIT_H) && ! defined(__MINGW32__)
 # include <sys/wait.h>
 #endif
 #ifndef WEXITSTATUS

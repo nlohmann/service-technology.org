@@ -2,7 +2,8 @@ EXTRA_DIST = debian/compat \
 	     debian/control \
 	     debian/copyright \
 	     debian/dirs \
-	     debian/docs
+	     debian/docs \
+	     CMakeLists.txt
 
 MAINTAINERCLEANFILES = debian/README.Debian
 

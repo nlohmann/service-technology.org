@@ -14,3 +14,7 @@ svn-clean: maintainer-clean
 	rm -fr doc/doxygen doc/Makefile.in doc/mdate-sh
 	rm -fr tests/Makefile.in
 
+EXTRA_DIST = CMakeLists.txt man/CMakeLists.txt \
+	     cmake/Bison.cmake cmake/Flex.cmake cmake/Gengetopt.cmake \
+	     vs_header/stdint.h
+

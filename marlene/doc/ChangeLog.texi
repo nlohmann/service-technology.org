@@ -11,6 +11,10 @@
 
 @item open nets with synchronous interface are now supported
 
+@item to be more consistent, engine interface is partioned into ports
+
+@item added initial CMake support (all rules, to build binaries, but no documentation or tests)
+
 @item known issues:
 
 @itemize

@@ -23,6 +23,11 @@
 
 #include <vector>
 
+// include int types, when using Visual Studio Compiler
+#ifdef _MSC_VER
+#include "stdint.h"
+#endif
+
 #include "myio.h"
 #include "condition.h"
 #include "component.h"

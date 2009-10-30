@@ -31,7 +31,8 @@ BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
 		parser-sa.cc parser-sa.h parser-sa-lexer.cc
 
 EXTRA_DIST = parser-owfn.h parser-pn.h parser-onwd.h parser-lola.h \
-	     parser-sa.h
+	     parser-sa.h \
+	     CMakeLists.txt
 
 # clean additional (generated) files
 DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \

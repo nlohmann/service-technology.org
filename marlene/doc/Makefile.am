@@ -4,7 +4,7 @@ marlene_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex
 
-EXTRA_DIST = cmdline.out 
+EXTRA_DIST = cmdline.out CMakeLists.txt 
 
 MAINTAINERCLEANFILES = cmdline.out
 

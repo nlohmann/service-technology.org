@@ -31,7 +31,7 @@ endif
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
 BUILT_SOURCES =
-EXTRA_DIST =
+EXTRA_DIST = CMakeLists.txt
 MAINTAINERCLEANFILES =
 DISTCLEANFILES = 
 

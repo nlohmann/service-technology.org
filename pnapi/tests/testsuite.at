@@ -5,7 +5,6 @@ m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; f
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
-AT_TESTED(versions.sh)
 
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])

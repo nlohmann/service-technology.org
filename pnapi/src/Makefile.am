@@ -32,10 +32,6 @@ BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
 EXTRA_DIST = parser-owfn.h parser-pn.h parser-onwd.h parser-lola.h \
 	     parser-sa.h
 
-# get flags from configure script
-AM_LDFLAGS  = @configured_LDFLAGS@
-AM_CXXFLAGS = @configured_CXXFLAGS@
-
 # show all warnings
 libpnapi_a_CPPFLAGS = -Wall
 

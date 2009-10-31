@@ -58,7 +58,7 @@ NO_COVER_FILES = */cmdline.c */lexic_og.cc */syntax_og.cc
 ################
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+EXTRA_DIST = testsuite.at wrap.sh \
              $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

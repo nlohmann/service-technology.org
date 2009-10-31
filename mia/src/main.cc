@@ -31,6 +31,7 @@
 #include <set>
 
 #include "cmdline.h"
+#include "Output.h"
 #include "config-log.h"
 #include "pnapi/pnapi.h"
 #include "verbose.h"
@@ -305,14 +306,7 @@ int main(int argc, char** argv) {
     /*---------------------------.
     | 9. find jumper transitions |
     `---------------------------*/
-    FILE *outputfile = stdout;
-    if (args_info.output_given) {
-        outputfile = fopen(args_info.output_arg, "w");
-        if (!outputfile) {
-            abort(12, "could not write to file '%s'", args_info.output_arg);
-        }
-        status("writing jumper transitions to '%s'", args_info.output_arg);
-    }
+    Output out((args_info.output_given ? args_info.output_arg : "-"), "jumper transitions");
 
     unsigned int jumperCount = 0;
     for (map<unsigned, vector<vector<unsigned int> > >::iterator q1 = tuples_source.begin(); q1 != tuples_source.end(); ++q1) {
@@ -325,15 +319,13 @@ int main(int argc, char** argv) {
                 }
             }
             if (pos) {
-                fprintf(outputfile, "[%s] -> [%s]\n", id2marking[q1->first].c_str(), q2->first.c_str());
+                out.stream() << "[" << id2marking[q1->first] << "] -> [" << q2->first << "]\n";
                 ++jumperCount;
             }
         }
     }
 
     status("%d jumper transitions found", jumperCount);
-
-    fclose(outputfile);
 
     return EXIT_SUCCESS;
 }

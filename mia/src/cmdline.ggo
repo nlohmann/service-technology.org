@@ -76,4 +76,18 @@ option "config" c
   typestr="FILE"
   optional
 
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Wendy should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/wendy-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
+  flag off
+
 text "\nReport bugs to mia@service-technology.org\nMia's home page: http://service-technology.org/mia"

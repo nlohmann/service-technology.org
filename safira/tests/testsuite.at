@@ -1,7 +1,6 @@
 AT_INIT
 
 # m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
-AT_TESTED(versions.sh)
 
 ############################################################################
 AT_BANNER([Standard Options])

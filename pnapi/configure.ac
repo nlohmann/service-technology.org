@@ -99,7 +99,6 @@ AC_CONFIG_FILES([Makefile
                  man/Makefile
                  tests/Makefile
                  tests/package.m4
-                 tests/petrinet/Makefile
                  utils/Makefile utils/unfolder/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

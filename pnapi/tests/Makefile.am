@@ -1,9 +1,5 @@
 # trigger those tests that are not run with the petri tool
-SUBDIRS = . petrinet
-check_LIBRARIES = libtest.a
-libtest_a_SOURCES = test.h test.cc
-AM_CPPFLAGS = -I$(top_srcdir)/src
-
+SUBDIRS = .
 
 #############################################################################
 # You need to perform three steps to add a test case:
@@ -108,7 +104,7 @@ NO_COVER_FILES = */cmdline.c */parser-*.cc
 ################
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at wrap.sh \
+EXTRA_DIST = testsuite.at \
              $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

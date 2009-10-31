@@ -33,7 +33,7 @@ NO_COVER_FILES = */syntax_chor.cc */lexic_chor.cc */cmdline.* */verbose.*
 ################
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at versions.sh wrap.sh \
+EXTRA_DIST = testsuite.at wrap.sh \
              $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 

@@ -1261,701 +1261,701 @@ set<Place *> PetriNet::getInterfacePlaces(const string & port) const
 
 
  /*!
-  */
-  const std::set<std::string> & PetriNet::getSynchronousLabels() const
-  {
-    return labels_;
-  }
+*/
+const std::set<std::string> & PetriNet::getSynchronousLabels() const
+{
+  return labels_;
+}
 
 
-  /*!
-   * \todo  Maybe make private again.
-   */
-  void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
-  {
-    labels_ = ls;
-  }
+/*!
+ * \todo  Maybe make private again.
+ */
+void PetriNet::setSynchronousLabels(const std::set<std::string> & ls)
+{
+  labels_ = ls;
+}
 
-  /*!
-   * \brief Adds a label to the interface
-   */
-  void PetriNet::addSynchronousLabel(std::string label)
-  {
-    labels_.insert(label);
-  }
+/*!
+ * \brief Adds a label to the interface
+ */
+void PetriNet::addSynchronousLabel(std::string label)
+{
+  labels_.insert(label);
+}
 
-  /*!
-   * \brief Adds a set of labels to the interface
-   */
-  void PetriNet::addSynchronousLabels(const std::set<std::string> & labels)
-  {
-    for(set<string>::const_iterator label = labels.begin();
-    label != labels.end(); ++label)
-      labels_.insert(*label);
-  }
+/*!
+ * \brief Adds a set of labels to the interface
+ */
+void PetriNet::addSynchronousLabels(const std::set<std::string> & labels)
+{
+  for(set<string>::const_iterator label = labels.begin();
+  label != labels.end(); ++label)
+    labels_.insert(*label);
+}
 
-  /*!
-   * \brief Removes a label to the interface
-   */
-  void PetriNet::removeSynchronousLabel(std::string label)
-  {
-    labels_.erase(label);
-  }
+/*!
+ * \brief Removes a label to the interface
+ */
+void PetriNet::removeSynchronousLabel(std::string label)
+{
+  labels_.erase(label);
+}
 
-  /*!
-   * \brief Removes a set of labels to the interface
-   */
-  void PetriNet::removeSynchronousLabels(const std::set<std::string> & labels)
-  {
-    for(set<string>::const_iterator label = labels.begin();
-    label != labels.end(); ++label)
-      labels_.erase(*label);
-  }
+/*!
+ * \brief Removes a set of labels to the interface
+ */
+void PetriNet::removeSynchronousLabels(const std::set<std::string> & labels)
+{
+  for(set<string>::const_iterator label = labels.begin();
+  label != labels.end(); ++label)
+    labels_.erase(*label);
+}
 
-  /*!
-   * \param   base  base name
-   * \return  a string to be used as a name for a new node
-   */
-  string PetriNet::getUniqueNodeName(const string & base) const
-  {
-    int i = 1;
-    string name;
+/*!
+ * \param   base  base name
+ * \return  a string to be used as a name for a new node
+ */
+string PetriNet::getUniqueNodeName(const string & base) const
+{
+  int i = 1;
+  string name;
 
-    // use a "mutable" cache to make this more efficient
-    do { ostringstream str; str << base << i++; name = str.str(); }
-    while (nodesByName_.find(name) != nodesByName_.end());
+  // use a "mutable" cache to make this more efficient
+  do { ostringstream str; str << base << i++; name = str.str(); }
+  while (nodesByName_.find(name) != nodesByName_.end());
 
-    return name;
-  }
-
-
-  /*!
-   * \brief   checks whether the Petri net is free choice
-   *
-   *          A Petri net is free choice iff
-   *            all two transitions have either disjoint or equal presets
-   *
-   * \return  true if the criterion is fulfilled and false if not
-   */
-  bool PetriNet::isFreeChoice() const
-  {
-    for (set<Transition *>::iterator t = transitions_.begin();
-    t != transitions_.end(); t++)
-      for (set<Transition *>::iterator tt = transitions_.begin();
-      tt != transitions_.end(); tt++)
-      {
-        set<Node *> t_pre  = (*t)->getPreset();
-        set<Node *> tt_pre = (*tt)->getPreset();
-        if ((t_pre != tt_pre) &&
-            !(util::setIntersection(t_pre, tt_pre).empty()))
-          return false;
-      }
-    return true;
-  }
+  return name;
+}
 
 
-  /*!
-   * \brief   Checks if the net is normal
-   *
-   * A PetriNet N is called normal iff each transition t has only one
-   * Place \f[p \in (P_{in} \cup P_{out}) : p \in ^*t \cup t^*\f]
-   *
-   * \return  true iff the net is normal
-   */
-  bool PetriNet::isNormal() const
-  {
-    for (set<Transition *>::const_iterator t = transitions_.begin();
-    t != transitions_.end(); t++)
-      if (!(*t)->isNormal())
+/*!
+ * \brief   checks whether the Petri net is free choice
+ *
+ *          A Petri net is free choice iff
+ *            all two transitions have either disjoint or equal presets
+ *
+ * \return  true if the criterion is fulfilled and false if not
+ */
+bool PetriNet::isFreeChoice() const
+{
+  for (set<Transition *>::iterator t = transitions_.begin();
+  t != transitions_.end(); t++)
+    for (set<Transition *>::iterator tt = transitions_.begin();
+    tt != transitions_.end(); tt++)
+    {
+      set<Node *> t_pre  = (*t)->getPreset();
+      set<Node *> tt_pre = (*tt)->getPreset();
+      if ((t_pre != tt_pre) &&
+          !(util::setIntersection(t_pre, tt_pre).empty()))
         return false;
-
-    return true;
-  }
-
-
-  /*!
-   * \brief   normalizes the given Petri net
-   *
-   * A Petri net (resp. open net) is called normal if
-   * each transition has only one adjacent interface
-   * place.
-   *
-   * \return  map<Transition *, string> a mapping representing the edge labels
-   *          of the later service automaton.
-   */
-  const std::map<Transition *, string> PetriNet::normalize()
-  {
-    if (!getSynchronizedTransitions().empty())
-    {
-      normalize_classical();
     }
-    else
-    {
-      normalize_rules();
-    }
-
-    std::map<Transition *, string> edgeLabels; ///< returning map
-
-    // get input labels
-    for(set<Place*>::iterator p = inputPlaces_.begin();
-    p != inputPlaces_.end(); ++p)
-    {
-      for(set<Node*>::iterator t = (*p)->getPostset().begin();
-      t != (*p)->getPostset().end(); ++t)
-      {
-        edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
-      }
-    }
-
-    // get output labels
-    for(set<Place*>::iterator p = outputPlaces_.begin();
-    p != outputPlaces_.end(); ++p)
-    {
-      for(set<Node*>::iterator t = (*p)->getPreset().begin();
-      t != (*p)->getPreset().end(); ++t)
-      {
-        edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
-      }
-    }
-
-    // get synchronous and TAU labels
-    for (set<Transition*>::iterator t = transitions_.begin();
-    t != transitions_.end(); ++t)
-    {
-      if((*t)->getType() != Node::INTERNAL)
-        continue;
-
-      edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
-    }
-
-    return edgeLabels;
-  }
+  return true;
+}
 
 
-  /*!
-   * Makes the inner structure of the net, which means to delete all
-   * interface places to simplify the firing rules when creating a
-   * service automaton.
-   */
-  void PetriNet::makeInnerStructure()
-  {
-    std::set<Place *> interface;
-    while (!(interface = getInterfacePlaces()).empty())
-      deletePlace(**interface.begin());
-  }
-
-
-  /*!
-   * described in "Behavioral Constraints for Services" (BPM 2007)
-   * (http://dx.doi.org/10.1007/978-3-540-75183-0_20)
-   *
-   * \note  There is an error in definition 5: The arcs of the transitions
-   *        with empty label are missing.
-   */
-  void PetriNet::produce(const PetriNet & net, const string & aPrefix,
-      const string & aNetPrefix) throw (io::InputError)
-      {
-    typedef set<Transition *> Transitions;
-    typedef map<Transition *, Transitions> Labels;
-    typedef map<const Place *, const Place *> PlaceMapping;
-
-    assert(!aPrefix.empty());
-    assert(!aNetPrefix.empty());
-    assert(aPrefix != aNetPrefix);
-    assert(net.inputPlaces_.empty());
-    assert(net.outputPlaces_.empty());
-
-    string prefix = aPrefix + ".";
-    string netPrefix = aNetPrefix + ".";
-    Labels labels = translateConstraintLabels(net);
-
-
-    // add (internal) places
-    prefixNodeNames(prefix, true); // prefix only internal nodes
-    PlaceMapping placeMapping = copyPlaces(net, netPrefix);
-
-    // merge final conditions
-    Condition tmpCond;
-    tmpCond = net.condition_.formula();
-    tmpCond.formula().fold();
-    condition_.formula().fold();
-    condition_.merge(tmpCond, placeMapping);
-    condition_.formula().unfold(*this);
-
-    // handle transitions with empty label
-    for (Transitions::iterator it = net.transitions_.begin();
-    it != net.transitions_.end(); ++it)
-    {
-      Transition & netTrans = **it; // t'
-      Transitions label;
-      if (labels.find(&netTrans) != labels.end())
-        label = labels.find(&netTrans)->second;
-      if (label.empty())
-      {
-        Transition & trans = createTransition(netTrans, netPrefix);
-        createArcs(trans, netTrans, &placeMapping);
-      }
-    }
-
-    // create product transitions
-    Transitions labelTransitions;
-    for (Labels::const_iterator it1 = labels.begin();
-    it1 != labels.end(); ++it1)
-    {
-      assert(it1->first != NULL);
-      Transition & netTrans = *it1->first;             // t'
-      assert(net.containsNode(netTrans));
-      Transitions ts = it1->second;
-      for (Transitions::const_iterator it2 = ts.begin();
-      it2 != ts.end(); ++it2)
-      {
-        assert(*it2 != NULL);
-        Transition & trans = **it2;                  // t
-        assert(containsNode(trans));
-        labelTransitions.insert(&trans);
-        Transition & prodTrans = createTransition(); // (t, t')
-        createArcs(prodTrans, trans);
-        createArcs(prodTrans, netTrans, &placeMapping);
-      }
-    }
-
-    // remove label transitions
-    for (Transitions::iterator it = labelTransitions.begin();
-    it != labelTransitions.end(); ++it)
-      deleteTransition(**it);
-      }
-
-
-  /*
-   * \todo  maybe private again
-   */
-  void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
-  {
-    constraints_.clear();
-    for (map<Transition *, set<string> >::const_iterator it = labels.begin();
-    it != labels.end(); ++it)
-    {
-      Transition * t = findTransition(it->first->getName());
-      assert(t != NULL);
-      constraints_[t] = it->second;
-    }
-  }
-
-
-  map<Transition *, set<Transition *> >
-  PetriNet::translateConstraintLabels(const PetriNet & net)
-  throw (io::InputError)
-  {
-    typedef set<string> Labels;
-    typedef set<Transition *> Transitions;
-    typedef map<Transition *, Labels> OriginalLabels;
-    typedef map<Transition *, Transitions> ResultLabels;
-
-    OriginalLabels labels = net.constraints_;
-    ResultLabels result;
-    for (OriginalLabels::iterator it1 = labels.begin();
-    it1 != labels.end(); ++it1)
-    {
-      assert(it1->first != NULL);
-      Transition & t = *it1->first;
-      for (Labels::iterator it2 = it1->second.begin();
-      it2 != it1->second.end(); ++it2)
-      {
-        Transition * labelTrans = findTransition(*it2);
-        if (labelTrans != NULL)
-          result[&t].insert(labelTrans);
-        else
-        {
-          string filename =
-            net.meta_.find(io::INPUTFILE) != net.meta_.end()
-            ? net.meta_.find(io::INPUTFILE)->second : "";
-          throw io::InputError(io::InputError::SEMANTIC_ERROR, filename,
-              0, *it2, "unknown transition");
-        }
-      }
-    }
-    return result;
-  }
-
-
-  /*!
-   */
-  Transition & PetriNet::createTransition(const Transition & t,
-      const std::string & prefix)
-  {
-    return *new Transition(*this, observer_, t, prefix);
-  }
-
-
-  /*!
-   */
-  void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
-      const map<const Place *, const Place *> * placeMapping)
-  {
-    typedef set<Arc *> Arcs;
-
-    // add preset arcs of t' to t
-    Arcs preset = otherTrans.getPresetArcs();
-    for (Arcs::iterator it = preset.begin(); it != preset.end(); ++it)
-    {
-      Arc & arc = **it;
-      Place & place = placeMapping == NULL ? arc.getPlace() :
-        *const_cast<Place *>(placeMapping->find(&arc.getPlace())->second);
-        new Arc(*this, observer_, arc, place, trans);
-    }
-
-    // add postset arcs of t' to t
-    Arcs postset = otherTrans.getPostsetArcs();
-    for (Arcs::iterator it = postset.begin(); it != postset.end(); ++it)
-    {
-      Arc & arc = **it;
-      Place & place = placeMapping == NULL ? arc.getPlace() :
-        *const_cast<Place *>(placeMapping->find(&arc.getPlace())->second);
-        new Arc(*this, observer_, arc, trans, place);
-    }
-  }
-
-
-  /*!
-   * \brief   checks whether the Petri net is a workflow net or not
-   *
-   *          A Petri net N is a workflow net iff
-   *            (1) there is exactly one place with empty preset
-   *            (2) there is exactly one place with empty postset
-   *            (3) all other nodes are situated on a path between the places described in (1) and (2)
-   *
-   * \return  true iff (1), (2) and (3) are fulfilled
-   * \return  false in any other case
-   * 
-   * \todo    Erkennung der SZK ohne Hinzufügen der Transition
-   *          Daniela nach Alorithmus fragen; Funktion const machen
-   */
-  bool PetriNet::isWorkflow()
-  {
-    Place *first = NULL;
-    Place *last  = NULL;
-
-    // finding places described in condition (1) & (2)
-    for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
-    {
-      if ((*p)->getPreset().empty())
-      {
-        if (first == NULL)
-          first = *p;
-        else
-          return false;
-      }
-      if ((*p)->getPostset().empty())
-      {
-        if (last == NULL)
-          last = *p;
-        else
-          return false;
-      }
-    }
-    if (first == NULL || last == NULL)
+/*!
+ * \brief   Checks if the net is normal
+ *
+ * A PetriNet N is called normal iff each transition t has only one
+ * Place \f[p \in (P_{in} \cup P_{out}) : p \in ^*t \cup t^*\f]
+ *
+ * \return  true iff the net is normal
+ */
+bool PetriNet::isNormal() const
+{
+  for (set<Transition *>::const_iterator t = transitions_.begin();
+  t != transitions_.end(); t++)
+    if (!(*t)->isNormal())
       return false;
 
-    // insert new transition which consumes from last and produces on first to form a cycle
-    Transition &tarjan = createTransition("tarjan");
-    createArc(*last, tarjan);
-    createArc(tarjan, *first);
-
-    // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
-    // (strongly connected net using tarjan's algorithm)
-    unsigned int i = 0; ///< count index
-    map<Node *, int> index; ///< index property for nodes
-    map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
-    set<Node *> stacked; ///< the stack indication for nodes
-    stack<Node *> S; ///< stack used by Tarjan's algorithm
-
-    // set all nodes' index values to ``undefined''
-    for (set<Place *>::const_iterator p = places_.begin();
-    p != places_.end(); p++)
-      index[*p] = (-1);
-    for (set<Transition *>::const_iterator t = transitions_.begin();
-    t != transitions_.end(); t++)
-      index[*t] = (-1);
-
-    // getting the number of strongly connected components reachable from first
-    unsigned int sscCount = util::dfsTarjan<Node *>(first, S,
-        stacked, i, index, lowlink);
-
-    deleteTransition(tarjan);
-
-    // check set $P \cup T$
-    set<Node *> nodeSet;
-    for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
-      nodeSet.insert(*p);
-    for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
-      nodeSet.insert(*t);
-
-    /*
-     * true iff only one strongly connected component found from first and all nodes
-     * of $\mathcal{N}$ are members of this component
-     */
-    if (sscCount == 1 && util::setDifference(nodeSet, stacked).empty())
-      return true;
-    else
-      return false;
-  }
+  return true;
+}
 
 
-  /*!
-   */
-  void PetriNet::mirror()
-  {
-    typedef set<Place *> Places;
-    Places interface = getInterfacePlaces();
-
-    for (Places::iterator it = interface.begin(); it != interface.end(); ++it)
-      (*it)->mirror();
-  }
-
-
-
-  /****************************************************************************
-   *** Private PetriNet Function Definitions
-   ***************************************************************************/
-
-  string PetriNet::getMetaInformation(std::ios_base & ios,
-      io::MetaInformation i,
-      const string & def) const
-      {
-    map<io::MetaInformation, string> & streamMeta =
-      io::util::MetaData::data(ios);
-    if (streamMeta.find(i) != streamMeta.end())
-      return streamMeta.find(i)->second;
-    if (meta_.find(i) != meta_.end())
-      return meta_.find(i)->second;
-    return def;
-      }
-
-
-  /*!
-   * All Places and Transitions of the net are prefixed.
-   *
-   * \param   prefix  the prefix to be added
-   * \param   noInterface  whether interface places should not be prefixed
-   */
-  PetriNet & PetriNet::prefixNodeNames(const string & prefix, bool noInterface)
-  {
-    if(noInterface)
-    {
-      for (set<Node *>::iterator it = nodes_.begin(); 
-      it != nodes_.end(); ++it)
-      {
-        Place * p = dynamic_cast<Place*>(*it);
-        if( (p != NULL) && // recent node is a place
-            ((p->getType() == Node::INPUT) || (p->getType() == Node::OUTPUT)) ) // and its an interface place
-          continue; // do not prefix this node
-
-        (*it)->prefixNameHistory(prefix);
-      }
-    }
-    else
-    {
-      for (set<Node *>::iterator it = nodes_.begin(); 
-      it != nodes_.end(); ++it)
-      {
-        (*it)->prefixNameHistory(prefix);
-      }
-    }
-    return *this;
-  }
-
-
-  void PetriNet::deletePlace(Place & place)
-  {
-    if (finalCondition().concerningPlaces().count(&place) > 0)
-    {
-      std::cerr << PACKAGE_STRING << ": place '" << place.getName()
-      << "' occurs in the final condition. Please rewrite the final condition first."
-      << " (the place was not deleted)" << std::endl;
-      return;
-    }
-    observer_.finalizePlaceType(place, place.getType());
-    places_.erase(&place);
-    deleteNode(place);
-  }
-
-
-  void PetriNet::deleteTransition(Transition & trans)
-  {
-    if (trans.isSynchronized())
-    {
-      synchronizedTransitions_.erase(&trans);
-      for(map<string, set<Transition*> >::iterator it = transitionsByLabel_.begin();
-      it != transitionsByLabel_.end(); ++it)
-        it->second.erase(&trans);
-    }
-    transitions_.erase(&trans);
-
-    /*
-    labels_.clear();
-    for (std::set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
-      for (std::set<std::string>::iterator l = (*t)->getSynchronizeLabels().begin(); l != (*t)->getSynchronizeLabels().end(); l++)
-        labels_.insert(*l);
-    //*/
-
-    deleteNode(trans);
-  }
-
-
-  /*!
-   * \note  Never call this method directly! Use deletePlace() or
-   *        deleteTransition() instead!
-   */
-  void PetriNet::deleteNode(Node & node)
-  {
-    assert(containsNode(node));
-    assert(dynamic_cast<Place *>(&node) == NULL ? true :
-    places_.find(dynamic_cast<Place *>(&node)) == places_.end());
-    assert(dynamic_cast<Transition *>(&node) == NULL ? true :
-    transitions_.find(dynamic_cast<Transition *>(&node)) ==
-      transitions_.end());
-
-    while (!node.getPreset().empty())
-      deleteArc(*findArc(**node.getPreset().begin(), node));
-    while (!node.getPostset().empty())
-      deleteArc(*findArc(node, **node.getPostset().begin()));
-
-    observer_.finalizeNodeNameHistory(node, node.getNameHistory());
-    nodes_.erase(&node);
-
-    delete &node;
-  }
-
-
-  /*!
-   * \pre Net and Arc have the same observer
-   */
-  void PetriNet::deleteArc(Arc & arc)
-  {
-    assert(arcs_.find(&arc) != arcs_.end());
-
-    arcs_.erase(&arc);
-
-    observer_.updateArcRemoved(arc);
-
-    delete &arc;
-  }
-
-
-  /*!
-   \todo reimplementation: see [LohmannMW_2007_icatpn], Figure 4
-         capacities need to be adjusted appropriately
-   */
-  void PetriNet::normalize_classical()
-  {
-    // transitions may to synchronize
-    set<Transition*> candidates = synchronizedTransitions_;
-    // complement places generated during normalisation
-    set<Place*> complementPlaces;
-
-    // fill candidates
-    for(set<Place*>::iterator p = inputPlaces_.begin();
-    p != inputPlaces_.end(); ++p)
-    {
-      for(set<Node*>::iterator t = (*p)->getPostset().begin();
-      t != (*p)->getPostset().end(); ++t)
-      {
-        candidates.insert(static_cast<Transition*>(*t));
-      }
-    }
-    for(set<Place*>::iterator p = outputPlaces_.begin();
-    p != outputPlaces_.end(); ++p)
-    {
-      for(set<Node*>::iterator t = (*p)->getPreset().begin();
-      t != (*p)->getPreset().end(); ++t)
-      {
-        candidates.insert(static_cast<Transition*>(*t));
-      }
-    }
-
-    for(set<Transition*>::iterator t = candidates.begin();
-    t != candidates.end(); ++t)
-    {
-      if( ((*t)->isNormal()) || // already normal; nothing to do
-          ((*t)->getSynchronizeLabels().size() > 1) ) // can't normalize this transition
-        continue;
-
-      // check neighbor arcs
-      set<Arc*> possiblyEvilArcs = util::setUnion((*t)->getPresetArcs(),(*t)->getPostsetArcs());
-      for(set<Arc*>::iterator a = possiblyEvilArcs.begin(); 
-      a != possiblyEvilArcs.end(); ++a)
-      {
-        if((*a)->getPlace().getType() == Node::INTERNAL)
-          continue;
-        // arcs reaching this line are evil
-
-        Place & p = (*a)->getPlace();
-        if(p.getType() == Node::INPUT)
-        {
-          for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
-          {
-            stringstream ss;
-            ss << i;
-
-            Place & np = createPlace("normalIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
-            Place & cp = createPlace("complementIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
-            cp.mark(1);
-            complementPlaces.insert(&cp);
-            Transition & nt = createTransition("t_in" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
-
-            createArc(p, nt);
-            createArc(nt, np);
-            createArc(cp, nt);
-            createArc(np, **t);
-            createArc(**t, cp);
-          }
-        }
-        else
-        {
-          for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
-          {
-            stringstream ss;
-            ss << i;
-
-            Place & np = createPlace("normalOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
-            Place & cp = createPlace("complementOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
-            cp.mark(1);
-            complementPlaces.insert(&cp);
-            Transition & nt = createTransition("t_out" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
-
-            createArc(nt, p);
-            createArc(np, nt);
-            createArc(nt, cp);
-            createArc(**t, np);
-            createArc(cp, **t);
-          }
-        }
-
-        // remove arc
-        deleteArc(**a);
-      }
-    }
-
-    for(set<Place*>::iterator p = complementPlaces.begin();
-    p != complementPlaces.end(); ++p)
-    {
-      condition_ = condition_.formula() && ((**p) == 1);
-    }
-
-    condition_ = condition_.formula() && formula::ALL_OTHER_PLACES_EMPTY;
-  }
-
-
-  /*!
-   * This method detects sequences of transitions with interface
-   * communication. Then, it tries to normalize the net through
-   * the rules from [Aalst07].
-   *
-   * \todo     The rules from [Aalst07] will follow soon!
-   */
-  void PetriNet::normalize_rules()
+/*!
+ * \brief   normalizes the given Petri net
+ *
+ * A Petri net (resp. open net) is called normal if
+ * each transition has only one adjacent interface
+ * place.
+ *
+ * \return  map<Transition *, string> a mapping representing the edge labels
+ *          of the later service automaton.
+ */
+const std::map<Transition *, string> PetriNet::normalize()
+{
+  if (!getSynchronizedTransitions().empty())
   {
     normalize_classical();
   }
+  else
+  {
+    normalize_rules();
+  }
 
+  std::map<Transition *, string> edgeLabels; ///< returning map
+
+  // get input labels
+  for(set<Place*>::iterator p = inputPlaces_.begin();
+  p != inputPlaces_.end(); ++p)
+  {
+    for(set<Node*>::iterator t = (*p)->getPostset().begin();
+    t != (*p)->getPostset().end(); ++t)
+    {
+      edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
+    }
+  }
+
+  // get output labels
+  for(set<Place*>::iterator p = outputPlaces_.begin();
+  p != outputPlaces_.end(); ++p)
+  {
+    for(set<Node*>::iterator t = (*p)->getPreset().begin();
+    t != (*p)->getPreset().end(); ++t)
+    {
+      edgeLabels[static_cast<Transition*>(*t)] = (*p)->getName();
+    }
+  }
+
+  // get synchronous and TAU labels
+  for (set<Transition*>::iterator t = transitions_.begin();
+  t != transitions_.end(); ++t)
+  {
+    if((*t)->getType() != Node::INTERNAL)
+      continue;
+
+    edgeLabels[*t] = ((*t)->isSynchronized()) ? (*(*t)->getSynchronizeLabels().begin()) : "TAU";
+  }
+
+  return edgeLabels;
 }
+
+
+/*!
+ * Makes the inner structure of the net, which means to delete all
+ * interface places to simplify the firing rules when creating a
+ * service automaton.
+ */
+void PetriNet::makeInnerStructure()
+{
+  std::set<Place *> interface;
+  while (!(interface = getInterfacePlaces()).empty())
+    deletePlace(**interface.begin());
+}
+
+
+/*!
+ * described in "Behavioral Constraints for Services" (BPM 2007)
+ * (http://dx.doi.org/10.1007/978-3-540-75183-0_20)
+ *
+ * \note  There is an error in definition 5: The arcs of the transitions
+ *        with empty label are missing.
+ */
+void PetriNet::produce(const PetriNet & net, const string & aPrefix,
+    const string & aNetPrefix) throw (io::InputError)
+    {
+  typedef set<Transition *> Transitions;
+  typedef map<Transition *, Transitions> Labels;
+  typedef map<const Place *, const Place *> PlaceMapping;
+
+  assert(!aPrefix.empty());
+  assert(!aNetPrefix.empty());
+  assert(aPrefix != aNetPrefix);
+  assert(net.inputPlaces_.empty());
+  assert(net.outputPlaces_.empty());
+
+  string prefix = aPrefix + ".";
+  string netPrefix = aNetPrefix + ".";
+  Labels labels = translateConstraintLabels(net);
+
+
+  // add (internal) places
+  prefixNodeNames(prefix, true); // prefix only internal nodes
+  PlaceMapping placeMapping = copyPlaces(net, netPrefix);
+
+  // merge final conditions
+  Condition tmpCond;
+  tmpCond = net.condition_.formula();
+  tmpCond.formula().fold();
+  condition_.formula().fold();
+  condition_.merge(tmpCond, placeMapping);
+  condition_.formula().unfold(*this);
+
+  // handle transitions with empty label
+  for (Transitions::iterator it = net.transitions_.begin();
+  it != net.transitions_.end(); ++it)
+  {
+    Transition & netTrans = **it; // t'
+    Transitions label;
+    if (labels.find(&netTrans) != labels.end())
+      label = labels.find(&netTrans)->second;
+    if (label.empty())
+    {
+      Transition & trans = createTransition(netTrans, netPrefix);
+      createArcs(trans, netTrans, &placeMapping);
+    }
+  }
+
+  // create product transitions
+  Transitions labelTransitions;
+  for (Labels::const_iterator it1 = labels.begin();
+  it1 != labels.end(); ++it1)
+  {
+    assert(it1->first != NULL);
+    Transition & netTrans = *it1->first;             // t'
+    assert(net.containsNode(netTrans));
+    Transitions ts = it1->second;
+    for (Transitions::const_iterator it2 = ts.begin();
+    it2 != ts.end(); ++it2)
+    {
+      assert(*it2 != NULL);
+      Transition & trans = **it2;                  // t
+      assert(containsNode(trans));
+      labelTransitions.insert(&trans);
+      Transition & prodTrans = createTransition(); // (t, t')
+      createArcs(prodTrans, trans);
+      createArcs(prodTrans, netTrans, &placeMapping);
+    }
+  }
+
+  // remove label transitions
+  for (Transitions::iterator it = labelTransitions.begin();
+  it != labelTransitions.end(); ++it)
+    deleteTransition(**it);
+    }
+
+
+/*
+ * \todo  maybe private again
+ */
+void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
+{
+  constraints_.clear();
+  for (map<Transition *, set<string> >::const_iterator it = labels.begin();
+  it != labels.end(); ++it)
+  {
+    Transition * t = findTransition(it->first->getName());
+    assert(t != NULL);
+    constraints_[t] = it->second;
+  }
+}
+
+
+map<Transition *, set<Transition *> >
+PetriNet::translateConstraintLabels(const PetriNet & net)
+throw (io::InputError)
+{
+  typedef set<string> Labels;
+  typedef set<Transition *> Transitions;
+  typedef map<Transition *, Labels> OriginalLabels;
+  typedef map<Transition *, Transitions> ResultLabels;
+
+  OriginalLabels labels = net.constraints_;
+  ResultLabels result;
+  for (OriginalLabels::iterator it1 = labels.begin();
+  it1 != labels.end(); ++it1)
+  {
+    assert(it1->first != NULL);
+    Transition & t = *it1->first;
+    for (Labels::iterator it2 = it1->second.begin();
+    it2 != it1->second.end(); ++it2)
+    {
+      Transition * labelTrans = findTransition(*it2);
+      if (labelTrans != NULL)
+        result[&t].insert(labelTrans);
+      else
+      {
+        string filename =
+          net.meta_.find(io::INPUTFILE) != net.meta_.end()
+          ? net.meta_.find(io::INPUTFILE)->second : "";
+        throw io::InputError(io::InputError::SEMANTIC_ERROR, filename,
+            0, *it2, "unknown transition");
+      }
+    }
+  }
+  return result;
+}
+
+
+/*!
+ */
+Transition & PetriNet::createTransition(const Transition & t,
+    const std::string & prefix)
+{
+  return *new Transition(*this, observer_, t, prefix);
+}
+
+
+/*!
+ */
+void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
+    const map<const Place *, const Place *> * placeMapping)
+{
+  typedef set<Arc *> Arcs;
+
+  // add preset arcs of t' to t
+  Arcs preset = otherTrans.getPresetArcs();
+  for (Arcs::iterator it = preset.begin(); it != preset.end(); ++it)
+  {
+    Arc & arc = **it;
+    Place & place = placeMapping == NULL ? arc.getPlace() :
+      *const_cast<Place *>(placeMapping->find(&arc.getPlace())->second);
+      new Arc(*this, observer_, arc, place, trans);
+  }
+
+  // add postset arcs of t' to t
+  Arcs postset = otherTrans.getPostsetArcs();
+  for (Arcs::iterator it = postset.begin(); it != postset.end(); ++it)
+  {
+    Arc & arc = **it;
+    Place & place = placeMapping == NULL ? arc.getPlace() :
+      *const_cast<Place *>(placeMapping->find(&arc.getPlace())->second);
+      new Arc(*this, observer_, arc, trans, place);
+  }
+}
+
+
+/*!
+ * \brief   checks whether the Petri net is a workflow net or not
+ *
+ *          A Petri net N is a workflow net iff
+ *            (1) there is exactly one place with empty preset
+ *            (2) there is exactly one place with empty postset
+ *            (3) all other nodes are situated on a path between the places described in (1) and (2)
+ *
+ * \return  true iff (1), (2) and (3) are fulfilled
+ * \return  false in any other case
+ * 
+ * \todo    Erkennung der SZK ohne Hinzufügen der Transition
+ *          Daniela nach Alorithmus fragen; Funktion const machen
+ */
+bool PetriNet::isWorkflow()
+{
+  Place *first = NULL;
+  Place *last  = NULL;
+
+  // finding places described in condition (1) & (2)
+  for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+  {
+    if ((*p)->getPreset().empty())
+    {
+      if (first == NULL)
+        first = *p;
+      else
+        return false;
+    }
+    if ((*p)->getPostset().empty())
+    {
+      if (last == NULL)
+        last = *p;
+      else
+        return false;
+    }
+  }
+  if (first == NULL || last == NULL)
+    return false;
+
+  // insert new transition which consumes from last and produces on first to form a cycle
+  Transition &tarjan = createTransition("tarjan");
+  createArc(*last, tarjan);
+  createArc(tarjan, *first);
+
+  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
+  // (strongly connected net using tarjan's algorithm)
+  unsigned int i = 0; ///< count index
+  map<Node *, int> index; ///< index property for nodes
+  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
+  set<Node *> stacked; ///< the stack indication for nodes
+  stack<Node *> S; ///< stack used by Tarjan's algorithm
+
+  // set all nodes' index values to ``undefined''
+  for (set<Place *>::const_iterator p = places_.begin();
+  p != places_.end(); p++)
+    index[*p] = (-1);
+  for (set<Transition *>::const_iterator t = transitions_.begin();
+  t != transitions_.end(); t++)
+    index[*t] = (-1);
+
+  // getting the number of strongly connected components reachable from first
+  unsigned int sscCount = util::dfsTarjan<Node *>(first, S,
+      stacked, i, index, lowlink);
+
+  deleteTransition(tarjan);
+
+  // check set $P \cup T$
+  set<Node *> nodeSet;
+  for (set<Place *>::const_iterator p = places_.begin(); p != places_.end(); p++)
+    nodeSet.insert(*p);
+  for (set<Transition *>::const_iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    nodeSet.insert(*t);
+
+  /*
+   * true iff only one strongly connected component found from first and all nodes
+   * of $\mathcal{N}$ are members of this component
+   */
+  if (sscCount == 1 && util::setDifference(nodeSet, stacked).empty())
+    return true;
+  else
+    return false;
+}
+
+
+/*!
+ */
+void PetriNet::mirror()
+{
+  typedef set<Place *> Places;
+  Places interface = getInterfacePlaces();
+
+  for (Places::iterator it = interface.begin(); it != interface.end(); ++it)
+    (*it)->mirror();
+}
+
+
+
+/****************************************************************************
+ *** Private PetriNet Function Definitions
+ ***************************************************************************/
+
+string PetriNet::getMetaInformation(std::ios_base & ios,
+    io::MetaInformation i,
+    const string & def) const
+    {
+  map<io::MetaInformation, string> & streamMeta =
+    io::util::MetaData::data(ios);
+  if (streamMeta.find(i) != streamMeta.end())
+    return streamMeta.find(i)->second;
+  if (meta_.find(i) != meta_.end())
+    return meta_.find(i)->second;
+  return def;
+    }
+
+
+/*!
+ * All Places and Transitions of the net are prefixed.
+ *
+ * \param   prefix  the prefix to be added
+ * \param   noInterface  whether interface places should not be prefixed
+ */
+PetriNet & PetriNet::prefixNodeNames(const string & prefix, bool noInterface)
+{
+  if(noInterface)
+  {
+    for (set<Node *>::iterator it = nodes_.begin(); 
+    it != nodes_.end(); ++it)
+    {
+      Place * p = dynamic_cast<Place*>(*it);
+      if( (p != NULL) && // recent node is a place
+          ((p->getType() == Node::INPUT) || (p->getType() == Node::OUTPUT)) ) // and its an interface place
+        continue; // do not prefix this node
+
+      (*it)->prefixNameHistory(prefix);
+    }
+  }
+  else
+  {
+    for (set<Node *>::iterator it = nodes_.begin(); 
+    it != nodes_.end(); ++it)
+    {
+      (*it)->prefixNameHistory(prefix);
+    }
+  }
+  return *this;
+}
+
+
+void PetriNet::deletePlace(Place & place)
+{
+  if (finalCondition().concerningPlaces().count(&place) > 0)
+  {
+    std::cerr << PACKAGE_STRING << ": place '" << place.getName()
+    << "' occurs in the final condition. Please rewrite the final condition first."
+    << " (the place was not deleted)" << std::endl;
+    return;
+  }
+  observer_.finalizePlaceType(place, place.getType());
+  places_.erase(&place);
+  deleteNode(place);
+}
+
+
+void PetriNet::deleteTransition(Transition & trans)
+{
+  if (trans.isSynchronized())
+  {
+    synchronizedTransitions_.erase(&trans);
+    for(map<string, set<Transition*> >::iterator it = transitionsByLabel_.begin();
+    it != transitionsByLabel_.end(); ++it)
+      it->second.erase(&trans);
+  }
+  transitions_.erase(&trans);
+
+  /*
+  labels_.clear();
+  for (std::set<Transition *>::iterator t = transitions_.begin(); t != transitions_.end(); t++)
+    for (std::set<std::string>::iterator l = (*t)->getSynchronizeLabels().begin(); l != (*t)->getSynchronizeLabels().end(); l++)
+      labels_.insert(*l);
+  //*/
+
+  deleteNode(trans);
+}
+
+
+/*!
+ * \note  Never call this method directly! Use deletePlace() or
+ *        deleteTransition() instead!
+ */
+void PetriNet::deleteNode(Node & node)
+{
+  assert(containsNode(node));
+  assert(dynamic_cast<Place *>(&node) == NULL ? true :
+  places_.find(dynamic_cast<Place *>(&node)) == places_.end());
+  assert(dynamic_cast<Transition *>(&node) == NULL ? true :
+  transitions_.find(dynamic_cast<Transition *>(&node)) ==
+    transitions_.end());
+
+  while (!node.getPreset().empty())
+    deleteArc(*findArc(**node.getPreset().begin(), node));
+  while (!node.getPostset().empty())
+    deleteArc(*findArc(node, **node.getPostset().begin()));
+
+  observer_.finalizeNodeNameHistory(node, node.getNameHistory());
+  nodes_.erase(&node);
+
+  delete &node;
+}
+
+
+/*!
+ * \pre Net and Arc have the same observer
+ */
+void PetriNet::deleteArc(Arc & arc)
+{
+  assert(arcs_.find(&arc) != arcs_.end());
+
+  arcs_.erase(&arc);
+
+  observer_.updateArcRemoved(arc);
+
+  delete &arc;
+}
+
+
+/*!
+ \todo reimplementation: see [LohmannMW_2007_icatpn], Figure 4
+       capacities need to be adjusted appropriately
+ */
+void PetriNet::normalize_classical()
+{
+  // transitions may to synchronize
+  set<Transition*> candidates = synchronizedTransitions_;
+  // complement places generated during normalisation
+  set<Place*> complementPlaces;
+
+  // fill candidates
+  for(set<Place*>::iterator p = inputPlaces_.begin();
+       p != inputPlaces_.end(); ++p)
+  {
+    for(set<Node*>::iterator t = (*p)->getPostset().begin();
+    t != (*p)->getPostset().end(); ++t)
+    {
+      candidates.insert(static_cast<Transition*>(*t));
+    }
+  }
+  for(set<Place*>::iterator p = outputPlaces_.begin();
+       p != outputPlaces_.end(); ++p)
+  {
+    for(set<Node*>::iterator t = (*p)->getPreset().begin();
+    t != (*p)->getPreset().end(); ++t)
+    {
+      candidates.insert(static_cast<Transition*>(*t));
+    }
+  }
+
+  for(set<Transition*>::iterator t = candidates.begin();
+       t != candidates.end(); ++t)
+  {
+    if( ((*t)->isNormal()) || // already normal; nothing to do
+        ((*t)->getSynchronizeLabels().size() > 1) ) // can't normalize this transition
+      continue;
+
+    // check neighbor arcs
+    set<Arc*> possiblyEvilArcs = util::setUnion((*t)->getPresetArcs(),(*t)->getPostsetArcs());
+    for(set<Arc*>::iterator a = possiblyEvilArcs.begin(); 
+    a != possiblyEvilArcs.end(); ++a)
+    {
+      if((*a)->getPlace().getType() == Node::INTERNAL)
+        continue;
+      // arcs reaching this line are evil
+
+      Place & p = (*a)->getPlace();
+      if(p.getType() == Node::INPUT)
+      {
+        for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
+        {
+          stringstream ss;
+          ss << i;
+
+          Place & np = createPlace("normalIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
+          Place & cp = createPlace("complementIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
+          cp.mark(1);
+          complementPlaces.insert(&cp);
+          Transition & nt = createTransition("t_in" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
+
+          createArc(p, nt);
+          createArc(nt, np);
+          createArc(cp, nt);
+          createArc(np, **t);
+          createArc(**t, cp);
+        }
+      }
+      else
+      {
+        for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
+        {
+          stringstream ss;
+          ss << i;
+
+          Place & np = createPlace("normalOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
+          Place & cp = createPlace("complementOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
+          cp.mark(1);
+          complementPlaces.insert(&cp);
+          Transition & nt = createTransition("t_out" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
+
+          createArc(nt, p);
+          createArc(np, nt);
+          createArc(nt, cp);
+          createArc(**t, np);
+          createArc(cp, **t);
+        }
+      }
+
+      // remove arc
+      deleteArc(**a);
+    }
+  }
+
+  for(set<Place*>::iterator p = complementPlaces.begin();
+  p != complementPlaces.end(); ++p)
+  {
+    condition_ = condition_.formula() && ((**p) == 1);
+  }
+
+  condition_ = condition_.formula() && formula::ALL_OTHER_PLACES_EMPTY;
+}
+
+
+/*!
+ * This method detects sequences of transitions with interface
+ * communication. Then, it tries to normalize the net through
+ * the rules from [Aalst07].
+ *
+ * \todo     The rules from [Aalst07] will follow soon!
+ */
+void PetriNet::normalize_rules()
+{
+  normalize_classical();
+}
+
+} /* namespace pnapi */

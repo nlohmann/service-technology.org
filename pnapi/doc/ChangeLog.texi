@@ -4,6 +4,7 @@
 @item started proper documentation
 @item formulae now only concern internal places; only left wildcard ist 
 ALL_OTHER_PLACES_EMPTY
+@item fixed bug #14648: PNAPI: Shift/reduce conflict in parser-pn.cc
 @end itemize
 
 @heading Version 2.00

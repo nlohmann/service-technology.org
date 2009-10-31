@@ -11,8 +11,6 @@ EXTRA_DIST = $(TESTS)
 
 AM_CPPFLAGS = -I$(top_srcdir)/tests           -I$(top_srcdir)/src
 LDADD       = $(top_builddir)/tests/libtest.a $(top_builddir)/src/libpnapi.la
-AM_CXXFLAGS = @configured_CXXFLAGS@
-AM_CFLAGS = @configured_CFLAGS@
 
 
 #############################################################################

@@ -4,13 +4,11 @@ AC_INIT([GNU BPEL2oWFN],[2.04-unreleased],[bpel2owfn@service-technology.org],[bp
 # check for prerequisites, programms, headers, and libraries
 #############################################################################
 
-# prerequisites for Autoconf and Automake
-AC_PREREQ(2.61)
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # where to look for source code and how the config header should be called
-AC_CONFIG_SRCDIR(src/bpel2owfn.cc)
+AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/config.h)
 
 # check for generic programs
@@ -63,15 +61,7 @@ AH_BOTTOM([#ifdef __cplusplus
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile \
-	  doc/Makefile \
-	  src/Makefile doc/Doxyfile \
-	  man/Makefile \
-	  tests/Makefile tests/package.m4 \
-	  gui/static_release.sh \
-	  maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile
-	  maintainer/gnu/Makefile
-	  ])
+AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile doc/Doxyfile man/Makefile tests/Makefile tests/package.m4 gui/static_release.sh maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile maintainer/gnu/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

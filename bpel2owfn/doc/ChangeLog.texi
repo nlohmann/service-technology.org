@@ -66,6 +66,10 @@
 @item fixed a bug: Woflan TPN files were not created because of missing invokation in @code{main()} method
 
 @item overworked test scripts: creation of output files is checked now
+
+@item removed @acronym{PNML} and oWFN parser -- this belongs into the Petri Net API
+
+@item changed license to GNU Affero General Public License Version 3
 @end itemize
 
 
@@ -76,7 +80,7 @@
 @itemize
  @item miscellaneous:
  @itemize
-  @item adpoted the GNU GPL Version 3
+  @item adopted the GNU GPL Version 3
   @item minor changes and bug fixes
  @end itemize
 @end itemize

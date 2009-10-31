@@ -1,26 +1,25 @@
 /*****************************************************************************\
   GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
 
+  Copyright (C) 2009        Niels Lohmann
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+                            Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  GNU BPEL2oWFN is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
 
   GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
   details.
 
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU Affero General Public License
+  along with GNU BPEL2oWFN. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -839,62 +838,6 @@ int main( int argc, char *argv[])
     show_wsdl_information();
   }
 
-  /*
-   * parse an OWFN file
-   */
-  if (globals::net_filename != "")
-  {
-
-    globals::filename = globals::net_filename;
-    
-    if (globals::net_mode == OWFN)
-    {
-      if (!(frontend_owfn_in = fopen(globals::filename.c_str(), "r"))) 
-      {
-        cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
-        exit(2);
-      }
-  
-      show_process_information_header();
-  
-      // invoke Bison BPEL4WSDL parser
-      trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
-      int parse_result = frontend_owfn_parse();
-      trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
-  
-      // closing a file
-      trace(TRACE_INFORMATION," + Closing owfn file: " + globals::filename + "\n");
-      fclose(frontend_owfn_in);
-      frontend_owfn_in = NULL;
-    }
-    else if (globals::net_mode == PNML)
-    {
-      if (!(frontend_in = fopen(globals::filename.c_str(), "r"))) 
-      {
-        cerr << "Could not open file for reading: " << globals::filename.c_str() << endl;
-        exit(2);
-      }
-  
-      show_process_information_header();
-  
-      // invoke Bison BPEL4WSDL parser
-      trace(TRACE_INFORMATION, "Parsing " + globals::net_filename + " ...\n");
-      int parse_result = frontend_pnml_parse();
-      trace(TRACE_INFORMATION, "Parsing of " + globals::net_filename + " complete.\n");
-  
-      // closing a file
-      trace(TRACE_INFORMATION," + Closing pnml file: " + globals::filename + "\n");
-      fclose(frontend_in);
-      frontend_in = NULL;
-    }
-    else
-    {
-      trace(TRACE_INFORMATION, "No parsable files.");
-      globals::output_filename = "";
-    }
-  }
-  else
-  {
     // parsing all inputfiles
     set< string >::iterator file = inputfiles.begin();
     do
@@ -953,7 +896,7 @@ int main( int argc, char *argv[])
       file++;
   
     } while (modus == M_CHOREOGRAPHY && file != inputfiles.end());
-  }
+  
   trace(TRACE_INFORMATION, "All files have been parsed.\n");
 
 

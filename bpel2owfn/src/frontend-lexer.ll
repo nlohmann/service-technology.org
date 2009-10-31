@@ -1,26 +1,25 @@
 /*****************************************************************************\
   GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
 
+  Copyright (C) 2009        Niels Lohmann
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+                            Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  GNU BPEL2oWFN is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
 
   GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
   details.
 
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU Affero General Public License
+  along with GNU BPEL2oWFN. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 %{
@@ -126,7 +125,6 @@ bool parseUnicode = false;
 // the inteface to the WSDL and BPEL4Chor parser
 extern YYSTYPE frontend_wsdl_lval;
 extern YYSTYPE frontend_chor_lval;
-extern YYSTYPE frontend_pnml_lval;
 
 %}
 
@@ -187,7 +185,6 @@ UB     			[\200-\277]
 
  /* text */
 <TEXT>">"{text}?"<"	{ BEGIN(INITIAL);
-					  frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text);
 					  return X_TEXT;
 					}
 
@@ -200,12 +197,12 @@ UB     			[\200-\277]
 <ATTRIBUTE,JOINCONDITION>"("				{ return LBRACKET; }
 <ATTRIBUTE,JOINCONDITION>")"				{ return RBRACKET; }
 <ATTRIBUTE,JOINCONDITION>"'"				{ return APOSTROPHE; }
-<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<ATTRIBUTE,JOINCONDITION>{name}                         { frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                                           return X_NAME; }
 
  /* attributes */
 <ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(frontend_text).substr(1, strlen(frontend_text)-2);
-                          frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = frontend_pnml_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
+                          frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
                           return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
@@ -382,12 +379,12 @@ UB     			[\200-\277]
 <INITIAL>"$"{variablename}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return VARIABLENAME; }
 
-<INITIAL>{name}			{ frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text);
+<INITIAL>{name}			{ frontend_chor_lval.yt_casestring = frontend_wsdl_lval.yt_casestring = frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return X_NAME; }
 {number}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                   return NUMBER; }
  /* string needed for toolspecific element in pnml */
-{string} 	{  frontend_pnml_lval.yt_casestring = kc::mkcasestring(frontend_text); return X_STRING; }
+{string} 	{  return X_STRING; }
 
 
  /* end of input file */

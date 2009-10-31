@@ -1,26 +1,25 @@
 /*****************************************************************************\
   GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
 
+  Copyright (C) 2009        Niels Lohmann
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+                            Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  GNU BPEL2oWFN is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
 
   GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
   details.
 
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU Affero General Public License
+  along with GNU BPEL2oWFN. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
  
 /*!
@@ -261,46 +260,6 @@ void show_wsdl_information()
 
 
 
-
-/*!
- * \brief signal a syntax error
- *
- * This function is invoked by the parser and the lexer during the syntax
- * analysis. When an error occurs, it prints an accordant message and shows
- * the lines of the input files where the error occured.
- *
- * \param msg a message (mostly "Parse error") and some more information e.g.
- *            the location of the syntax error.
- * \return 1, since an error occured
- *
- * \ingroup debug
- */
-int frontend_owfn_error(const char *msg)
-{ 
-  /* defined by flex */
-  extern int frontend_owfn_lineno;      // line number of current token
-  extern char *frontend_owfn_text;      // text of the current token
-
-  cerr << colorconsole::fg_blue;
-  cerr << globals::filename << ":" << frontend_owfn_lineno+1 << " - [SYNTAX]\n";
-  cerr << colorconsole::fg_standard;
-
-  if (debug_level == TRACE_ERROR)
-    return 1;
-
-  cerr << string(msg);
-
-  if (debug_level >= TRACE_WARNINGS)
-    cerr << "; last token read: `" << string(frontend_owfn_text) << "'" << endl << endl;
-  else
-    cerr << endl << endl;
-
-  // remember the last token
-  globals::last_error_token = string(frontend_owfn_text);
-  globals::last_error_line = toString(frontend_owfn_lineno);
-
-  return 1;
-}
 
 int frontend_error(const char *msg)
 {

@@ -47,7 +47,7 @@ EXTRA_DIST = gui/bpel2owfn-gui.cc \
 # remove everything that can be rebuilt
 svn-clean: maintainer-clean
 	-rm -f aclocal.m4
-	-rm -f compile COPYING INSTALL
+	-rm -f compile INSTALL
 	-rm -f configure config.guess config.sub
 	-rm -f depcomp
 	-rm -f install-sh

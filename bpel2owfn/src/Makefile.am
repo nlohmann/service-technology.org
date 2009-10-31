@@ -9,14 +9,11 @@ bin_PROGRAMS = bpel2owfn
 # frontend files: for them C++ code is generated).
 bpel2owfn_SOURCES = $(KCSOURCES) \
 	frontend-parser.yy \
-	frontend-parser-owfn.yy \
-	frontend-parser-pnml.yy \
 	frontend-parser-chor.yy \
 	frontend-parser-wsdl.yy \
 	frontend-lexer.ll \
-	frontend-lexer-owfn.ll \
 	frontend-parser.h frontend-parser-owfn.h \
-	bpel2owfn.cc \
+	main.cc \
 	globals.cc globals.h \
 	debug.cc debug.h \
 	colorconsole.h \
@@ -36,8 +33,6 @@ BUILT_SOURCES = $(KCDUMMY) \
 	frontend-parser.cc \
 	frontend-parser-chor.cc \
 	frontend-parser-wsdl.cc \
-	frontend-parser-owfn.cc \
-	frontend-parser-pnml.cc \
 	cmdline.c
 
 # These files have to be distributed to compile without compiler generators.

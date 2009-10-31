@@ -99,6 +99,10 @@ Version 2.04-unreleased
 
 * overworked test scripts: creation of output files is checked now
 
+* removed PNML and oWFN parser - this belongs into the Petri Net API
+
+* changed license to GNU Affero General Public License Version 3
+
 
 See file ChangeLog <http://service-technology.org/files/bpel2owfn/ChangeLog> for
 complete version history.

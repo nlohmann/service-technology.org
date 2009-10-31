@@ -99,11 +99,15 @@ Version 2.04-unreleased
 
 * overworked test scripts: creation of output files is checked now
 
+* removed PNML and oWFN parser - this belongs into the Petri Net API
+
+* changed license to GNU Affero General Public License Version 3
+
 Version 2.0.3 (29 June 2007)
 ============================
 
 * miscellaneous:
-     * adpoted the GNU GPL Version 3
+     * adopted the GNU GPL Version 3
 
      * minor changes and bug fixes
 

@@ -48,12 +48,6 @@ option "wsdl" w
   typestr="FILE"
   optional
 
-option "net" n
-  "Read a Fiona oWFN or PNML file from FILE"
-  string
-  typestr="FILE"
-  optional
-
 section "File output"
 
 option "format" f

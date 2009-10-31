@@ -1,26 +1,25 @@
 /*****************************************************************************\
   GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
 
+  Copyright (C) 2009        Niels Lohmann
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+                            Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  GNU BPEL2oWFN is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
 
   GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
   details.
 
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU Affero General Public License
+  along with GNU BPEL2oWFN. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -184,9 +183,6 @@ void parse_command_line(int argc, char* argv[])
   // turn off debug modi of flex and bison by default
   frontend_debug = 0;
   frontend__flex_debug = 0;
-  frontend_owfn_debug = 0;
-  frontend_owfn__flex_debug = 0;
-  frontend_pnml_debug = 0;
 
   
   // copy getopt-results to variables
@@ -240,13 +236,10 @@ void parse_command_line(int argc, char* argv[])
       if (argument == "flex")
       {
         frontend__flex_debug = 1;
-        frontend_owfn__flex_debug = 1;
       }
       else if (argument == "bison")
       {
         frontend_debug = 1;
-        frontend_owfn_debug = 1;
-        frontend_pnml_debug = 1;
       }
       else if (argument == "1")
         debug_level = TRACE_WARNINGS;
@@ -381,33 +374,6 @@ void parse_command_line(int argc, char* argv[])
       globals::output_filename = string(args_info.output_arg);    
   }
   
-  // NET
-  if (args_info.net_given) {
-    options[O_NET] = true;
-    
-    // set the mode to Petri net
-    modus = M_PETRINET;
-    string suffix;
-    string argument = string(args_info.net_arg);
-    
-    suffix = argument.substr(argument.length()-4);
-    if (suffix == "owfn")
-    {
-      globals::net_filename = argument;
-      globals::net_mode = OWFN;
-    }
-    else if (suffix == "pnml")
-    {
-      globals::net_filename = argument;
-      globals::net_mode = PNML;
-    }
-    else
-    {
-      globals::net_mode = NONE;
-      trace(argument + " does not have a valid filetype!\n");
-      trace(TRACE_ALWAYS, "Use -h to get a list of valid filetypes.\n");
-    }
-  }
   
   // collect all input files
   for (size_t i=0; i < args_info.inputs_num; i++) {

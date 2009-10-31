@@ -1,26 +1,25 @@
 /*****************************************************************************\
   GNU BPEL2oWFN -- Translating BPEL Processes into Petri Net Models
 
+  Copyright (C) 2009        Niels Lohmann
   Copyright (C) 2006, 2007  Niels Lohmann,
                             Christian Gierds, and
                             Martin Znamirowski
   Copyright (C) 2005        Niels Lohmann and
-			    Christian Gierds
+                            Christian Gierds
 
-  GNU BPEL2oWFN is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 3 of the License, or (at your option) any
-  later version.
+  GNU BPEL2oWFN is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
 
   GNU BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT
   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
   details.
 
-  You should have received a copy of the GNU General Public License along with
-  GNU BPEL2oWFN (see file COPYING); if not, see http://www.gnu.org/licenses
-  or write to the Free Software Foundation,Inc., 51 Franklin Street, Fifth
-  Floor, Boston, MA 02110-1301  USA.
+  You should have received a copy of the GNU Affero General Public License
+  along with GNU BPEL2oWFN. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 /*!
@@ -137,7 +136,6 @@ void show_process_information();
 void show_wsdl_information();
 void show_process_information_header();
 int frontend_error(const char *msg);
-int frontend_owfn_error(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
 void genericError(unsigned int code, string information, string line, error_level level = ERRORLEVER_WARNING);

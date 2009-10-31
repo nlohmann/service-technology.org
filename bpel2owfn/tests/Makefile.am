@@ -21,9 +21,8 @@ NO_COVER_FILES = */libs/* */cmdline.c */verbose.* \
                  */ast-config.cc */ast-grammar.cc */ast-system-k.cc \
                  */ast-system-k.h */ast-system-rk.cc */ast-system-rk.h \
                  */ast-system-unpk.cc */ast-system-unpk.h \
-                 */frontend-lexer-owfn.cc */frontend-lexer.cc \
-                 */frontend-parser-chor.cc */frontend-parser-owfn.cc \
-                 */frontend-parser-pnml.cc */frontend-parser-wsdl.cc \
+                 */frontend-lexer.cc \
+                 */frontend-parser-chor.cc */frontend-parser-wsdl.cc \
                  */frontend-parser.cc */petrinet-patterns-basic.cc \
                  */petrinet-patterns-handlers.cc \
                  */petrinet-patterns-links.cc \

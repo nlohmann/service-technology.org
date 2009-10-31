@@ -11,11 +11,4 @@
 #include "globals.h"
 
 
-//#warning "using Petri Net API outside BPEL2oWFN"
-//class ASTE; 			// forward declaration of class ASTE
-//#ifndef PACKAGE_STRING
-//#define PACKAGE_STRING "Petri Net API"
-//#endif
-
-
 #endif

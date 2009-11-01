@@ -335,7 +335,7 @@ uint8_t PetriNet::genetCapacity_ = 2;
  * \note    The condition is standardly set to True.
  */
 PetriNet::PetriNet() :
-  observer_(*this), warnings_(0)
+  observer_(*this), warnings_(0), reducablePlaces_(NULL)
   {
   }
 
@@ -348,8 +348,9 @@ PetriNet::PetriNet() :
 PetriNet::PetriNet(const PetriNet & net) :
   labels_(net.labels_),
   observer_(*this),
-  condition_(net.condition_, copyStructure(net)),
-  meta_(net.meta_), warnings_(net.warnings_)
+  finalCondition_(net.finalCondition_, copyStructure(net)),
+  meta_(net.meta_), warnings_(net.warnings_),
+  reducablePlaces_(NULL)
   {
   setConstraintLabels(net.constraints_);
   }
@@ -380,7 +381,7 @@ void PetriNet::clear()
   labels_.clear();
   meta_.clear();
   constraints_.clear();
-  condition_ = true;
+  finalCondition_ = true;
   warnings_ = 0;
 
   // delete all places
@@ -457,7 +458,7 @@ PetriNet::copyStructure(const PetriNet & net, const string & prefix)
  */
 Condition & PetriNet::finalCondition()
 {
-  return condition_;
+  return finalCondition_;
 }
 
 
@@ -465,7 +466,7 @@ Condition & PetriNet::finalCondition()
  */
 const Condition & PetriNet::finalCondition() const
 {
-  return condition_;
+  return finalCondition_;
 }
 
 
@@ -828,18 +829,9 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
     result.createArc(p, **t);
   }
 
-
   // here be dragons
-  Condition tmpCond;
-  tmpCond = finalCondition().formula();
-  tmpCond.formula().fold();
-  result.finalCondition().merge(tmpCond, placeMap);
-  
-  tmpCond = net.finalCondition().formula();
-  tmpCond.formula().fold();
-  result.finalCondition().merge(tmpCond, placeMap);
-  
-  result.finalCondition().formula().unfold(result);
+  result.finalCondition().merge(finalCondition(), placeMap);
+  result.finalCondition().merge(net.finalCondition(), placeMap);
 
   // overwrite this net with the resulting net
   *this = result;
@@ -886,7 +878,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
       }
 
     // merge final conditions
-    condition_.merge(net.condition_, placeMapping);
+    finalCondition_.merge(net.finalCondition_, placeMapping);
    */
 }
 
@@ -985,7 +977,7 @@ PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
       map<const Place *, const Place *> placeMapping =
         copyStructure(net.prefixNodeNames(it->first + "[" + ss.str() +
         "]."));
-      condition_.merge(net.condition_, placeMapping);
+      finalCondition_.merge(net.finalCondition_, placeMapping);
 
       // translate references in wiring
       for (map<Place *, LinkNode *>::const_iterator it = wiring.begin();
@@ -1475,12 +1467,7 @@ void PetriNet::produce(const PetriNet & net, const string & aPrefix,
   PlaceMapping placeMapping = copyPlaces(net, netPrefix);
 
   // merge final conditions
-  Condition tmpCond;
-  tmpCond = net.condition_.formula();
-  tmpCond.formula().fold();
-  condition_.formula().fold();
-  condition_.merge(tmpCond, placeMapping);
-  condition_.formula().unfold(*this);
+  finalCondition_.merge(net.finalCondition_, placeMapping);
 
   // handle transitions with empty label
   for (Transitions::iterator it = net.transitions_.begin();
@@ -1521,9 +1508,9 @@ void PetriNet::produce(const PetriNet & net, const string & aPrefix,
 
   // remove label transitions
   for (Transitions::iterator it = labelTransitions.begin();
-  it != labelTransitions.end(); ++it)
+        it != labelTransitions.end(); ++it)
     deleteTransition(**it);
-    }
+}
 
 
 /*
@@ -1767,6 +1754,8 @@ PetriNet & PetriNet::prefixNodeNames(const string & prefix, bool noInterface)
 
 void PetriNet::deletePlace(Place & place)
 {
+  /*
+   * \todo remove me!
   if (finalCondition().concerningPlaces().count(&place) > 0)
   {
     std::cerr << PACKAGE_STRING << ": place '" << place.getName()
@@ -1774,6 +1763,9 @@ void PetriNet::deletePlace(Place & place)
     << " (the place was not deleted)" << std::endl;
     return;
   }
+  */
+  finalCondition_.removePlace(place);
+  
   observer_.finalizePlaceType(place, place.getType());
   places_.erase(&place);
   deleteNode(place);
@@ -1850,8 +1842,6 @@ void PetriNet::normalize_classical()
 {
   // transitions may to synchronize
   set<Transition*> candidates = synchronizedTransitions_;
-  // complement places generated during normalisation
-  set<Place*> complementPlaces;
 
   // fill candidates
   for(set<Place*>::iterator p = inputPlaces_.begin();
@@ -1900,7 +1890,6 @@ void PetriNet::normalize_classical()
           Place & np = createPlace("normalIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
           Place & cp = createPlace("complementIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
           cp.mark(1);
-          complementPlaces.insert(&cp);
           Transition & nt = createTransition("t_in" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
 
           createArc(p, nt);
@@ -1908,6 +1897,9 @@ void PetriNet::normalize_classical()
           createArc(cp, nt);
           createArc(np, **t);
           createArc(**t, cp);
+          
+          finalCondition_ = finalCondition_.formula() && (np == 0);
+          finalCondition_ = finalCondition_.formula() && (cp == 1);
         }
       }
       else
@@ -1920,7 +1912,6 @@ void PetriNet::normalize_classical()
           Place & np = createPlace("normalOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
           Place & cp = createPlace("complementOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
           cp.mark(1);
-          complementPlaces.insert(&cp);
           Transition & nt = createTransition("t_out" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
 
           createArc(nt, p);
@@ -1928,6 +1919,9 @@ void PetriNet::normalize_classical()
           createArc(nt, cp);
           createArc(**t, np);
           createArc(cp, **t);
+          
+          finalCondition_ = finalCondition_.formula() && (np == 0);
+          finalCondition_ = finalCondition_.formula() && (cp == 1);
         }
       }
 
@@ -1935,14 +1929,6 @@ void PetriNet::normalize_classical()
       deleteArc(**a);
     }
   }
-
-  for(set<Place*>::iterator p = complementPlaces.begin();
-  p != complementPlaces.end(); ++p)
-  {
-    condition_ = condition_.formula() && ((**p) == 1);
-  }
-
-  condition_ = condition_.formula() && formula::ALL_OTHER_PLACES_EMPTY;
 }
 
 

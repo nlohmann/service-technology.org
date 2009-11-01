@@ -44,6 +44,10 @@
  * \version \$Revision$
  *
  * \ingroup petrinet
+ * 
+ * \todo    Check, if rules still can be applied by precondition 
+ *          "place is empty in each final marking" and add new places
+ *          to the set of implied empty places (and also to the final condition).
  */
 
 
@@ -75,7 +79,7 @@ using std::set;
 using namespace pnapi;
 
 
-#define __REDUCE_CHECK_FINAL(x) (finalCondition().concerningPlaces().count(x) == 0)
+#define __REDUCE_CHECK_FINAL(x) (reducablePlaces_->count(x) > 0)
 
 
 /******************************************************************************
@@ -2666,7 +2670,19 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
   unsigned int done = 1;
   unsigned int passes = 0;
 
-  finalCondition().formula().fold();
+  // places implied as empty can be reduced
+  reducablePlaces_ = new set<const Place*>(finalCondition().formula().emptyPlaces());
+  
+  {
+    set<const Place*> noReduce = finalCondition().concerningPlaces();
+    for(set<Place*>::iterator p = internalPlaces_.begin();
+         p != internalPlaces_.end(); ++p)
+    {
+      // places not concerned by the final condition can be reduced
+      if(noReduce.count(*p) == 0)
+        reducablePlaces_->insert(*p);
+    }
+  }
 
   // apply reductions
   while (done > 0)
@@ -2774,7 +2790,8 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
       break;
   }
 
-  finalCondition().formula().unfold(*this);
+  delete reducablePlaces_;
+  reducablePlaces_ = NULL;
   
   return passes;
 }

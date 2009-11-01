@@ -421,7 +421,7 @@ ostream & output(ostream & os, const PetriNet & net)
 
   if (util::FormulaData::data(os).formula) os
   << "FORMULA" << endl
-  << "  " << net.condition_ << endl
+  << "  " << net.finalCondition_ << endl
   << endl;
 
   return os
@@ -603,10 +603,36 @@ ostream & output(ostream & os, const PetriNet & net)
   << "  " << io::util::filterMarkedPlaces(net.internalPlaces_) << ";" << endl
   << endl
 
-  << "FINALCONDITION" << endl
-  << "  " << net.condition_ << ";" << endl << endl
-  << endl
+  << "FINALCONDITION" << endl;
+  
+  // if formel is total
+  if(net.finalCondition().concerningPlaces().size() == net.getInternalPlaces().size()) 
+  {
+    Condition tmpCond;
+    tmpCond = net.finalCondition_.formula();
+    set<const Place*> emptyPlaces = tmpCond.formula().emptyPlaces();
+    
+    if(emptyPlaces.size() == net.getInternalPlaces().size())
+    {
+      os << "  ALL_PLACES_EMPTY;" << endl << endl << endl;
+    }
+    else
+    {
+      for(set<const Place*>::iterator p = emptyPlaces.begin();
+           p != emptyPlaces.end(); ++p)
+      {
+        tmpCond.removePlace(**p);
+      }
+      
+      os << "  (" << tmpCond << ") AND ALL_OTHER_PLACES_EMPTY;" << endl << endl << endl;
+    }
+  }
+  else
+  {
+    os << "  " << net.finalCondition_ << ";" << endl << endl << endl;
+  }
 
+  os
   << delim("\n")
   << net.transitions_ << endl
   << endl
@@ -678,24 +704,10 @@ ostream & output(ostream & os, const formula::Negation & f)
 
 ostream & output(ostream & os, const formula::Conjunction & f)
 {
-  string wildcard;
-
-  switch (f.flag_)
-  {
-  case formula::ALL_OTHER_PLACES_EMPTY:
-    wildcard = " AND ALL_OTHER_PLACES_EMPTY";
-    break;
-  case formula::NONE:
-  default: break;
-  }
-
-  if (f.children().empty() && f.flag_ == formula::ALL_OTHER_PLACES_EMPTY)
-    return os << wildcard;
+  if (f.children().empty())
+    return os << formula::FormulaTrue();
   else
-    if (f.children().empty())
-      return os << formula::FormulaTrue();
-    else
-      return os << "(" << delim(" AND ") << f.children() << wildcard << ")";
+    return os << "(" << delim(" AND ") << f.children() << ")";
 }
 
 

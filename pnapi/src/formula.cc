@@ -105,88 +105,65 @@ Negation::Negation(const Negation & n) :
 {
 }
 
-Conjunction::Conjunction(const AllOtherPlaces v) :
-  Operator(), flag_(v), foldedPlaces_(NULL)
+Conjunction::Conjunction() :
+  Operator()
 {
 }
 
-Conjunction::Conjunction(const Formula & f, const AllOtherPlaces v) :
-  Operator(f), flag_(v), foldedPlaces_(NULL)
+Conjunction::Conjunction(const Formula & f) :
+  Operator(f)
 {
   simplifyChildren();
 }
 
 Conjunction::Conjunction(const Formula & l, const Formula & r) :
-  Operator(l, r), foldedPlaces_(NULL)
+  Operator(l, r)
 {
-  // taking ALL_OTHER_PLACES to the new Conjunction
-  const Formula * fr = &r;
-  const Conjunction * cr = dynamic_cast<const Conjunction *>(fr);
-  if (cr != NULL)
-    flag_ = cr->flag_;
-  else
-    flag_ = NONE;
-  
   simplifyChildren();
 }
 
-/*!
- * \TODO: remove me!
- * 
-Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
-  Operator(f)
-{
-std::cerr << "This method is no longer necessary!" << std::endl;
-assert(false);
-simplifyChildren();
-}
-*/
-
 Conjunction::Conjunction(const set<const Formula *> & children,
-    const map<const Place *, const Place *> * places,
-    AllOtherPlaces v) :
-      Operator(children, places), flag_(v), foldedPlaces_(NULL)
+    const map<const Place *, const Place *> * places) :
+      Operator(children, places)
 {
-simplifyChildren();
+  simplifyChildren();
 }
 
 Conjunction::Conjunction(const Conjunction & c) :
-  Operator(c.children_), flag_(c.flag_), 
-  foldedPlaces_((c.foldedPlaces_ == NULL) ? NULL : new set<string>(*c.foldedPlaces_))
+  Operator(c.children_)
 {
-simplifyChildren();
+  simplifyChildren();
 }
 
 Disjunction::Disjunction(const Formula & l, const Formula & r) :
   Operator(l, r)
 {
-simplifyChildren();
+  simplifyChildren();
 }
 
 Disjunction::Disjunction(const set<const Formula *> & children,
     const map<const Place *, const Place *> * places) :
       Operator(children, places)
 {
-simplifyChildren();
+  simplifyChildren();
 }
 
 Disjunction::Disjunction(const Disjunction & d) :
   Operator(children_)
 {
-simplifyChildren();
+  simplifyChildren();
 }
 
 Proposition::Proposition(const Place & p, unsigned int k,
     const map<const Place *, const Place *> * places) :
       place_(places == NULL ? p : *places->find(&p)->second), tokens_(k)
 {
-assert(places == NULL || places->find(&p)->second != NULL);
+  assert(places == NULL || places->find(&p)->second != NULL);
 }
 
 FormulaEqual::FormulaEqual(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places,
-    bool unfolded) :
-      Proposition(p, k, places), unfolded_(unfolded)
+    const map<const Place *, const Place *> * places) :
+      Proposition(p, k, places)
 {
 }
 
@@ -237,26 +214,19 @@ Operator::~Operator()
     delete *it;
 }
 
-Conjunction::~Conjunction()
-{
-  delete foldedPlaces_;
-}
-
-
 /**************************************************************************
  ***** clone() implementation
  **************************************************************************/
 
 Negation * Negation::clone(const map<const Place *, const Place *> * places) const
 {
-  Negation *f = new Negation(children_, places);
-  return f;
+  return new Negation(children_, places);
 }
 
 Conjunction * Conjunction::clone(const map<const Place *,
     const Place *> * places) const
 {
-  return new Conjunction(children_, places, flag_);
+  return new Conjunction(children_, places);
 }
 
 Disjunction * Disjunction::clone(const map<const Place *,
@@ -388,6 +358,54 @@ bool FormulaLessEqual::isSatisfied(const Marking & m) const
 }
 
 
+/**************************************************************************
+ ***** remove place implementation
+ **************************************************************************/
+
+/*!
+ * \brief   removes a place recursively
+ * 
+ * \return  true, if this formula has to be removed by parent
+ *          due to this removal, false otherwise.
+ */
+bool Formula::removePlace(const Place & p)
+{
+  return false;
+}
+
+/*!
+ * \brief   removes a place recursively
+ * 
+ * \return  true, if this formula has to be removed by parent
+ *          due to this removal, false otherwise.
+ */
+bool Operator::removePlace(const Place & p)
+{
+  set<const Formula*> children = children_;
+  for(set<const Formula*>::iterator f = children.begin();
+       f != children.end(); ++f)
+  {
+    if(const_cast<Formula*>(*f)->removePlace(p))
+    {
+      children_.erase(*f);
+      delete (*f);
+    }
+  }
+  
+  return children_.empty();
+}
+
+/*!
+ * \brief   removes a place recursively
+ * 
+ * \return  true, if this formula has to be removed by parent
+ *          due to this removal, false otherwise.
+ */
+bool Proposition::removePlace(const Place & p)
+{
+  return (&p == &place_);
+}
+
 
 /**************************************************************************
  ***** output() implementation
@@ -471,7 +489,7 @@ unsigned int Proposition::tokens() const
 
 
 /**************************************************************************
- ***** concerning places implementation
+ ***** concerning/empty places implementation
  **************************************************************************/
 
 set<const Place *> Formula::places() const
@@ -498,6 +516,60 @@ set<const Place *> Proposition::places() const
   return places;
 }
 
+/*!
+ * \brief set of places implied to be empty
+ */
+std::set<const Place *> Formula::emptyPlaces() const
+{
+  return set<const Place*>();
+}
+
+/*!
+ * \brief set of places implied to be empty
+ */
+std::set<const Place *> Conjunction::emptyPlaces() const
+{
+  set<const Place*> result;
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    result = util::setUnion(result, (*f)->emptyPlaces());
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief set of places implied to be empty
+ */
+std::set<const Place *> Disjunction::emptyPlaces() const
+{
+  if(children_.empty())
+    return set<const Place*>();
+    
+  set<const Place*> result = (*children_.begin())->emptyPlaces();
+  for(set<const Formula*>::iterator f = ++(children_.begin());
+       f != children_.end(); ++f)
+  {
+    result = util::setIntersection(result, (*f)->emptyPlaces());
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief set of places implied to be empty
+ */
+std::set<const Place *> FormulaEqual::emptyPlaces() const
+{
+  set<const Place*> result;
+  
+  if(tokens_ == 0)
+    result.insert(&place_);
+  
+  return result;
+}
+
 
 /**************************************************************************
  ***** simplify children implementation
@@ -510,8 +582,8 @@ void Negation::simplifyChildren()
 void Conjunction::simplifyChildren()
 {
   set<const Formula *> children = children_;
-  for (set<const Formula *>::iterator it = children.begin(); it
-  != children.end(); ++it)
+  for (set<const Formula *>::iterator it = children.begin(); 
+        it != children.end(); ++it)
     if (dynamic_cast<const FormulaTrue *> (*it) != NULL)
     {
       children_.erase(*it);
@@ -522,8 +594,8 @@ void Conjunction::simplifyChildren()
       const Operator * o = dynamic_cast<const Conjunction *> (*it);
       if (o != NULL)
       {
-        for (set<const Formula *>::const_iterator it =
-          o->children().begin(); it != o->children().end(); ++it)
+        for (set<const Formula *>::const_iterator it = o->children().begin(); 
+              it != o->children().end(); ++it)
           children_.insert((*it)->clone());
         children_.erase(o);
         delete o;
@@ -534,8 +606,8 @@ void Conjunction::simplifyChildren()
 void Disjunction::simplifyChildren()
 {
   set<const Formula *> children = children_;
-  for (set<const Formula *>::iterator it = children.begin(); it
-  != children.end(); ++it)
+  for (set<const Formula *>::iterator it = children.begin(); 
+        it != children.end(); ++it)
     if (dynamic_cast<const FormulaFalse *> (*it) != NULL)
     {
       children_.erase(*it);
@@ -546,118 +618,13 @@ void Disjunction::simplifyChildren()
       const Operator * o = dynamic_cast<const Disjunction *> (*it);
       if (o != NULL)
       {
-        for (set<const Formula *>::const_iterator it =
-          o->children().begin(); it != o->children().end(); ++it)
+        for (set<const Formula *>::const_iterator it = o->children().begin(); 
+              it != o->children().end(); ++it)
           children_.insert((*it)->clone());
         children_.erase(o);
         delete o;
       }
     }
-}
-
-/**************************************************************************
- ***** (un)folding implementation
- **************************************************************************/
-
-/*!
- * \brief evil hack part 1
- */
-void Formula::unfold(const PetriNet & net) const
-{
-  Formula * me = const_cast<Formula *>(this);
-  me->unfold(net);
-}
-
-/*!
- * \brief evil hack part 2
- */
-void Formula::fold() const
-{
-  Formula * me = const_cast<Formula *>(this);
-  me->fold();
-}
-
-void Operator::unfold(const PetriNet & net)
-{
-  for(set<const Formula*>::iterator it = children_.begin();
-  it != children_.end(); ++it)
-  {
-    const_cast<Formula*>(*it)->unfold(net);
-  }
-}
-
-void Operator::fold()
-{
-  for(set<const Formula*>::iterator it = children_.begin();
-  it != children_.end(); ++it)
-  {
-    const_cast<Formula*>(*it)->fold();
-  }
-}
-
-/*!
- * \brief unfolds the wildcard ALL_OTHER_PLACES_EMPTY
- */
-void Conjunction::unfold(const PetriNet & net)
-{
-  Operator::unfold(net);
-
-  // actual unfolding
-  if(flag_ == ALL_OTHER_PLACES_EMPTY)
-  {
-    set<const Place*> toCover;
-   
-    if(foldedPlaces_ == NULL)
-    {
-      set<const Place*> covered = places();
-      
-      // this loop is necassary to implicitly cast the pointer type
-      for(set<Place*>::iterator p = net.getInternalPlaces().begin();
-           p != net.getInternalPlaces().end(); ++p)
-      {
-        toCover.insert(*p);
-      }
-      toCover = util::setDifference(toCover, covered);
-    }
-    else
-    {
-      for(set<string>::iterator p = foldedPlaces_->begin();
-           p != foldedPlaces_->end(); ++p)
-      {
-        toCover.insert(net.findPlace(*p));
-      }
-    }
-
-    for(set<const Place*>::iterator p = toCover.begin();
-         p != toCover.end(); ++p)
-    {
-      if(*p == NULL)
-        continue;
-      
-      const Formula * f = new FormulaEqual(**p, 0, NULL, true);
-      children_.insert(f);
-    }
-  }
-}
-
-void Conjunction::fold()
-{
-  if(foldedPlaces_ == NULL)
-    foldedPlaces_ = new set<string>();
-  
-  set<const Formula *> children = children_;  
-    
-  for(set<const Formula *>::iterator f = children.begin();
-       f != children.end(); ++f)
-  {
-    const FormulaEqual * fe = dynamic_cast<const FormulaEqual *>(*f);
-    if((fe != NULL) && (fe->unfolded_))
-    {
-      foldedPlaces_->insert(fe->place().getName());
-      children_.erase(*f);
-      delete (*f);
-    }
-  }
 }
 
 } /* namespace formula */

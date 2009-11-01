@@ -442,9 +442,8 @@ private:
   /// observer for nodes and arcs
   util::ComponentObserver observer_;
 
-  //TODO: rename: finalCondition
   /// final condition
-  Condition condition_;
+  Condition finalCondition_;
 
   /// meta information
   std::map<io::MetaInformation, std::string> meta_;
@@ -466,6 +465,9 @@ private:
 
   /// warning flags
   unsigned int warnings_;
+  
+  /// cache for reduction
+  std::set<const Place *> * reducablePlaces_;
   
   /* structural changes */
 

@@ -403,6 +403,11 @@ final:
   | condition 
     {
       pnapi_owfn_yynet.finalCondition() = (*$1);
+      if(wildcardGiven_)
+      {
+        wildcardGiven_ = false;
+        pnapi_owfn_yynet.finalCondition().allOtherPlacesEmpty(pnapi_owfn_yynet);
+      }
       delete $1; 
     }
   ;
@@ -434,7 +439,8 @@ formula:
   | KEY_FALSE         { $$ = new formula::FormulaFalse(); }
   | KEY_ALL_PLACES_EMPTY 
     { 
-      $$ = new formula::Conjunction(formula::ALL_OTHER_PLACES_EMPTY); 
+      wildcardGiven_ = true;
+      $$ = new formula::FormulaTrue();
     }
   | OP_NOT formula
     { 
@@ -455,8 +461,8 @@ formula:
     }
   | formula OP_AND KEY_ALL_OTHER_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_PLACES_EMPTY);
-      delete $1;
+      wildcardGiven_ = true;
+      $$ = $1;
     }
   | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
     {

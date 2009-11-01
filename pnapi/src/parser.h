@@ -239,6 +239,8 @@ extern bool placeSetType_;
 extern std::set<Place*> placeSet_;
 /// whether to check labels
 extern bool checkLabels_;
+/// wildcard ALL[_OTHER]_PLACES_EMPTY given
+extern bool wildcardGiven_;
 
 /*!
  * \brief   Encapsulation of the flex/bison OWFN parser

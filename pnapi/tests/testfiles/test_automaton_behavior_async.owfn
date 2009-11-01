@@ -22,8 +22,12 @@ INITIALMARKING
 
 FINALCONDITION
   (
-    ((p13 = 1) AND (p9 = 1) AND (p10 = 1) AND ALL_OTHER_PLACES_EMPTY) OR
-    ((p13 = 1) AND (p14 = 1) AND ALL_OTHER_PLACES_EMPTY)
+    (
+      ((p13 = 1) AND (p9 = 1) AND (p10 = 1)) 
+      OR
+      ((p13 = 1) AND (p14 = 1))
+    ) 
+    AND ALL_OTHER_PLACES_EMPTY
   );
 
 

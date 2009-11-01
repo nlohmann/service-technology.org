@@ -23,13 +23,6 @@ class Node;
  */
 namespace formula {
 
-
-typedef enum {
-  NONE,
-  ALL_OTHER_PLACES_EMPTY
-} AllOtherPlaces;
-
-
 class Formula
 {
 public:
@@ -49,15 +42,12 @@ public:
 
   /// set of concerning places
   virtual std::set<const Place *> places() const;
-
-  /// unfold wildcard
-  virtual void unfold(const PetriNet &) {};
-  /// evil hack part 1
-  virtual void unfold(const PetriNet &) const;
-  /// fold wildcard again
-  virtual void fold() {};
-  /// evil hack part 2
-  virtual void fold() const;
+  
+  /// set of places implied to be empty
+  virtual std::set<const Place *> emptyPlaces() const;
+  
+  /// removes a place recursively
+  virtual bool removePlace(const Place &);
 
 };
 
@@ -85,9 +75,9 @@ public:
   const std::set<const Formula *> & children() const;
 
   std::set<const Place *> places() const;
-
-  virtual void unfold(const PetriNet &);
-  virtual void fold();
+  
+  /// removes a place recursively
+  bool removePlace(const Place &);
 
 protected:
   std::set<const Formula *> children_;
@@ -126,21 +116,14 @@ public:
 
   Conjunction(const Conjunction &);
 
-  Conjunction(const AllOtherPlaces = NONE);
+  Conjunction();
 
-  Conjunction(const Formula &, const AllOtherPlaces = NONE);
+  Conjunction(const Formula &);
 
   Conjunction(const Formula &, const Formula &);
 
-  // FIXME: obsolete wildcard implementation
-  // TODO: remove me!
-  // Conjunction(const Formula &, const std::set<const Place *> &);
-
   Conjunction(const std::set<const Formula *> &,
-      const std::map<const Place *, const Place *> * = NULL,
-      const AllOtherPlaces = NONE);
-  
-  ~Conjunction();
+      const std::map<const Place *, const Place *> * = NULL);
 
   bool isSatisfied(const Marking &) const;
 
@@ -148,21 +131,14 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
-
-  void unfold(const PetriNet &);
-  void fold();
+  
+  /// set of places implied to be empty
+  std::set<const Place *> emptyPlaces() const;
 
 protected:
 
   void simplifyChildren();
-
-private:
-
-  /// whether a wildcard is attached
-  AllOtherPlaces flag_;
-  /// names of places, concerned by unfolding when folded again
-  std::set<std::string> * foldedPlaces_;
-
+  
 };
 
 
@@ -183,6 +159,9 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// set of places implied to be empty
+  std::set<const Place *> emptyPlaces() const;
 
 protected:
   void simplifyChildren();
@@ -206,6 +185,9 @@ public:
   unsigned int tokens() const;
 
   std::set<const Place *> places() const;
+  
+  /// removes a place recursively
+  bool removePlace(const Place &);
   
 protected:
   const Place & place_;
@@ -245,8 +227,7 @@ class FormulaEqual : public Proposition
 public:
 
   FormulaEqual(const Place &, unsigned int,
-      const std::map<const Place *, const Place *> * = NULL,
-      bool = false);
+      const std::map<const Place *, const Place *> * = NULL);
 
   bool isSatisfied(const Marking &) const;
 
@@ -255,8 +236,8 @@ public:
 
   std::ostream & output(std::ostream &) const;
   
-  /// whether this proposition is the result of unfolding a wildcard
-  const bool unfolded_;
+  /// set of places implied to be empty
+  std::set<const Place *> emptyPlaces() const;
 };
 
 

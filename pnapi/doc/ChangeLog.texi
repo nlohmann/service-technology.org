@@ -1,5 +1,7 @@
-@heading Version 3.00-unreleased
+@heading Version 3.00
 @itemize
+@item final condition can now be converted in disjunctive normal form
+@item added type getter to formula classes
 @item started proper versioning
 @item started proper documentation
 @item formulae now only concern internal places; only left wildcard ist 

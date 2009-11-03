@@ -304,66 +304,41 @@ net.isWorkflow();
 @end smallexample
 @end cartouche
 
-@chapter Caution With Wildcards in Formulae
+@chapter Wildcards in Formulae
 
 Since Version 3.00 the formula classes have been refactored. I.e. from now on they 
-only concern internal places and only one wildcard is left: @samp{ALL_OTHER_PLACES_EMPTY}.
-After parsing a net, all wildcards will be unfolded by using @samp{PetriNet::unfold(PetriNet &);}.
-Each function dealing with formulae assumes, that the net's wildcards 
-are unfolded before being called, and will eventually temporary fold these wildcards again.
-So when you bild a final condition by yourself, you are strongly advised to unfold the
-formula afterwards by using e.g.
+only concern internal places and only two wildcards are left: @samp{ALL_OTHER_PLACES_EMPTY} and 
+@samp{ALL_PLACES_EMPTY}@footnote{Other wildcards are left due to compatibility reasons.}.
+
+When parsing a net, the wildcard will be unfolded by using 
 @cartouche
 @smallexample
-net.finalCondition().formula().unfold(net);
+net.finalCondition().allOtherPlacesEmpty(net);
 @end smallexample
 @end cartouche
 
-Unfolding means, that for each place @samp{p}, not being concerned by the formula subtree 
-containing the wildcard, a proposition @samp{p = 0} is added to the appropriate conjuncion.
-I.e., assumed we have a petri net containing the places @samp{p1}, @samp{p2} 
-and @samp{p3}, the formula
+A wildcard must be given top level, i.e. the final condition must have the form
 @cartouche
 @smallexample
-(p1=1) OR (p2=3 AND ALL_OTHER_PLACES_EMPTY)
+(...) AND ALL_OTHER_PLACES_EMPTY;
 @end smallexample
 @end cartouche
-will be unfolded to:
+or
 @cartouche
 @smallexample
-(p1=1) OR (p2=3 AND p1=0 AND p3=0)
+ALL_PLACES_EMPTY;
 @end smallexample
 @end cartouche
 
+A final condition is satisfied under a given marking, iff the formula is satisfied @emph{and} the interface is empty.
 
-A wildcard must be the last "subformula" attached to a conjunction, i.e. formulas like
+Furthermore a wildcard can be transformed in disjunctive normal form by using 
 @cartouche
 @smallexample
-p=42 AND ALL_OTHER_PLACES_EMPTY AND q=23
-@end smallexample
-@end cartouche
-are not allowed.
-
-Once a wildcard has been unfolded, its scope is affixed. I.e. by folding the formula, 
-adding places and unfolding the formula again the new places will not be concerned
-by the formula.
-
-Furthermore, if you want to remove places concerned by unfolded wildcards, you should fold
-the formula again to avoid segmentation faults:
-@cartouche
-@smallexample
-net.finalCondition().formula().fold();
-net.deletePlace(p3);
-net.finalCondition().formula().unfold(net);
+net.finalCondition().dnf();
 @end smallexample
 @end cartouche
 
-When unfolding a second time, a conjunction will search for the names of the places former
-concerned by the wildcard. If a place is not found, no proposition will be created.
-I.e. if you want to recreate or merge a "wildcard-place", you just have to fold the formula,
-delete the place, create a new one with the same name (or merge the place and therewith
-the name in an other place) and unfold the formula again, and the appropriate proposition
-will concern the place that now holds the name of the former place.
 
 @c --------------------------------------------------------------------------
 

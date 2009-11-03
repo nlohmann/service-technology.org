@@ -8,8 +8,12 @@
 
 PURPOSE
 
-Version 3.00-unreleased
-=======================
+Version 3.00
+============
+
+* final condition can now be converted in disjunctive normal form
+
+* added type getter to formula classes
 
 * started proper versioning
 
@@ -17,6 +21,8 @@ Version 3.00-unreleased
 
 * formulae now only concern internal places; only left wildcard ist
   ALL_OTHER_PLACES_EMPTY
+
+* fixed bug #14648: PNAPI: Shift/reduce conflict in parser-pn.cc
 
 Version 2.00
 ============

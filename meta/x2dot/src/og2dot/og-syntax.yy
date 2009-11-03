@@ -71,6 +71,9 @@ og:
   {
 	//Write keyword to stream
 	(*outStream) << "digraph{\n\n";
+	//Use Helvetica
+	(*outStream) << "edge [fontname=Helvetica fontsize=10]\n";
+	(*outStream) << "node [fontname=Helvetica fontsize=10]\n";
       
   }
 

@@ -68,6 +68,9 @@ og:
   {
 	//Write keyword to stream
 	(*outStream) << "digraph{\n\n";
+	//Use Helvetica
+	(*outStream) << "edge [fontname=Helvetica fontsize=10]\n";
+	(*outStream) << "node [fontname=Helvetica fontsize=10]\n";
 
   }	
 
@@ -132,9 +135,6 @@ node:
   number
 	
 	{
-		//The empty node can be omitted
-		if($1 == 0)
-			break;
 		//Store current node and map its ID to its annotation
 		nodesOld.push_back($1);
 	}
@@ -142,8 +142,6 @@ node:
 | number colon formula
 	
 	{
-		if($1 == 0)
-			break;
 		nodesOld.push_back($1);
 		nodeAnnotationOld[$1] = strStreamOld.str();
 		strStreamOld.str("");
@@ -152,8 +150,6 @@ node:
 | number colon key_finalnode
 		
 	{
-		if($1 == 0)
-			break;
 		nodesOld.push_back($1);
 		nodeAnnotationOld[$1] = strStreamOld.str();
 		strStreamOld.str("");
@@ -162,8 +158,6 @@ node:
 | number colon formula colon color
 		
 	{
-		if($1 == 0)
-			break;
 		nodesOld.push_back($1);
 		nodeAnnotationOld[$1] = strStreamOld.str();
 		nodeColor[$1] = $5;
@@ -173,8 +167,6 @@ node:
 | number colon formula colon key_finalnode
 		
 	{
-		if($1 == 0)
-			break;
 		nodesOld.push_back($1);
 		nodeAnnotationOld[$1] = strStreamOld.str();
 		strStreamOld.str("");
@@ -183,8 +175,6 @@ node:
 | number colon formula colon color colon key_finalnode
 	
 	{
-		if($1 == 0)
-			break;
 		nodesOld.push_back($1);
 		nodeAnnotationOld[$1] = strStreamOld.str();
 		nodeColor[$1] = $5;

@@ -5,7 +5,7 @@ info_TEXINFOS = pnapi.texi
 EXTRA_DIST =
 
 # the height of the README's ASCII art + URL + 3 spaces
-BANNERHEIGHT = 10
+BANNERHEIGHT = 7
 
 # the help option that should be used in the manual
 HELPOPTION = --full-help

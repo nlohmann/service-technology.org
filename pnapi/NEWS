@@ -5,9 +5,6 @@
             |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
                         http://service-technology.org/pnapi
 
-
-PURPOSE
-
 Version 3.00
 ============
 
@@ -24,4 +21,7 @@ Version 3.00
 
 * fixed bug #14648: PNAPI: Shift/reduce conflict in parser-pn.cc
 
-\nSee file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for
+complete version history.
+

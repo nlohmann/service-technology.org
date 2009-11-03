@@ -91,6 +91,10 @@ option "mirror" M
   "Mirror the interface, i.e. change the direction of communication"
   flag off
 
+option "dnf" -
+  "Convert final condition to disjunctive normal form"
+  flag off
+
 
 section "Configuration"
 

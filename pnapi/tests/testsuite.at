@@ -776,3 +776,18 @@ AT_CHECK([test -f AUTOMATON.owfn])
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Formulae])
+############################################################################
+
+AT_SETUP([Disjunctive Normal Form])
+m4_define([NET], [test_dnf.owfn])
+m4_define([NET2], [NET.dnf.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn --dnf -oowfn NET], 0)
+AT_CHECK([GREP -q "NOT" NET2], 1)
+AT_CHECK([GREP -q "<>" NET2], 1)
+AT_CHECK([GREP -q -e "((p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .));" NET2], 0)
+AT_KEYWORDS([formulae dnf])
+AT_CLEANUP
+

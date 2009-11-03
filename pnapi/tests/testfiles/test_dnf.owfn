@@ -1,0 +1,13 @@
+PLACE
+  INTERNAL p, q;
+
+  INPUT;
+
+  OUTPUT;
+
+INITIALMARKING
+  p;
+
+FINALCONDITION
+  ( (p <> 0) AND ( (p = 1) OR ( NOT (p >= 2) ) ) );
+

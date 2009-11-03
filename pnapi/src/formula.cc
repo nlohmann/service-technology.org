@@ -1,6 +1,7 @@
 #include "config.h"
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 #ifndef NDEBUG
 #include "myio.h"
@@ -18,6 +19,7 @@ using std::endl;
 using std::map;
 using std::set;
 using std::ostream;
+using std::vector;
 
 using pnapi::io::util::operator<<;
 
@@ -584,7 +586,7 @@ void Conjunction::simplifyChildren()
   set<const Formula *> children = children_;
   for (set<const Formula *>::iterator it = children.begin(); 
         it != children.end(); ++it)
-    if (dynamic_cast<const FormulaTrue *> (*it) != NULL)
+    if ((*it)->getType() == F_TRUE)
     {
       children_.erase(*it);
       delete *it;
@@ -608,7 +610,7 @@ void Disjunction::simplifyChildren()
   set<const Formula *> children = children_;
   for (set<const Formula *>::iterator it = children.begin(); 
         it != children.end(); ++it)
-    if (dynamic_cast<const FormulaFalse *> (*it) != NULL)
+    if ((*it)->getType() == F_FALSE)
     {
       children_.erase(*it);
       delete *it;
@@ -625,6 +627,425 @@ void Disjunction::simplifyChildren()
         delete o;
       }
     }
+}
+
+
+/**************************************************************************
+ ***** get type implementation
+ **************************************************************************/
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type Negation::getType() const
+{
+  return F_NEGATION;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type Conjunction::getType() const
+{
+  return F_CONJUNCTION;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type Disjunction::getType() const
+{
+  return F_DISJUNCTION;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaTrue::getType() const
+{
+  return F_TRUE;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaFalse::getType() const
+{
+  return F_FALSE;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaEqual::getType() const
+{
+  return F_EQUAL;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaNotEqual::getType() const
+{
+  return F_NOT_EQUAL;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaGreater::getType() const
+{
+  return F_GREATER;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaGreaterEqual::getType() const
+{
+  return F_GREATER_EQUAL;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaLess::getType() const
+{
+  return F_LESS;
+}
+
+/*!
+ * \brief returns formula type
+ */
+Formula::Type FormulaLessEqual::getType() const
+{
+  return F_LESS_EQUAL;
+}
+
+
+/**************************************************************************
+ ***** DNF implementation
+ **************************************************************************/
+
+/*!
+ * \brief removes negation
+ */
+Formula * Formula::removeNegation() const
+{
+  return clone();
+}
+
+/*!
+ * \brief removes negation
+ */
+Formula * Negation::removeNegation() const
+{
+  return (*children_.begin())->negate();
+}
+
+/*!
+ * \brief removes negation
+ */
+Formula * Conjunction::removeNegation() const
+{
+  Conjunction * result = new Conjunction();
+  
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    result->children_.insert((*f)->removeNegation());
+  }
+  
+  return static_cast<Formula*>(result);
+}
+
+/*!
+ * \brief removes negation
+ */
+Formula * Disjunction::removeNegation() const
+{
+  set<const Formula*> children;
+    
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    children.insert((*f)->removeNegation());
+  }
+  
+  Disjunction * result = new Disjunction(children);
+  
+  for(set<const Formula*>::iterator f = children.begin();
+       f != children.end(); ++f)
+  {
+    delete (*f);
+  }
+  
+  return static_cast<Formula*>(result);
+}
+
+/*!
+ * \brief removes negation
+ */
+Formula * FormulaNotEqual::removeNegation() const
+{
+  return ((place_ < tokens_) || (place_ > tokens_)).clone();
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * Negation::negate() const
+{
+  return (*children_.begin())->clone();
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * Conjunction::negate() const
+{
+  set<const Formula*> children;
+  
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    children.insert((*f)->negate());
+  }
+  
+  Formula * result = static_cast<Formula*>(new Disjunction(children));
+  
+  for(set<const Formula*>::iterator f = children.begin();
+         f != children.end(); ++f)
+  {
+    delete (*f);
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * Disjunction::negate() const
+{
+  set<const Formula*> children;
+    
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    children.insert((*f)->negate());
+  }
+  
+  Formula * result = static_cast<Formula*>(new Conjunction(children));
+  
+  for(set<const Formula*>::iterator f = children.begin();
+         f != children.end(); ++f)
+  {
+    delete (*f);
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaTrue::negate() const
+{
+  return static_cast<Formula*>(new FormulaFalse());
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaFalse::negate() const
+{
+  return static_cast<Formula*>(new FormulaTrue());
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaEqual::negate() const
+{
+  return static_cast<Formula*>(((place_ < tokens_) || (place_ > tokens_)).clone());
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaNotEqual::negate() const
+{
+  return static_cast<Formula*>(new FormulaEqual(place_, tokens_));
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaGreater::negate() const
+{
+  return static_cast<Formula*>(new FormulaLessEqual(place_, tokens_));
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaGreaterEqual::negate() const
+{
+  return static_cast<Formula*>(new FormulaLess(place_, tokens_));
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaLess::negate() const
+{
+  return static_cast<Formula*>(new FormulaGreaterEqual(place_, tokens_));
+}
+
+/*!
+ * \brief negates the formula
+ */
+Formula * FormulaLessEqual::negate() const
+{
+  return static_cast<Formula*>(new FormulaGreater(place_, tokens_));
+}
+
+/*! 
+ * AND(a1,...,an,OR(b11,...,b1m1),...,OR(bl1,...,blml))
+ * -> OR(AND(a1,...,an,b11,...,bl1), ...,
+ *       AND(a1,...,an,b11,...,blml), ...,
+ *       AND(a1,...,an,b1m1,...,blml))
+ */
+
+/*!
+ * \brief forms formula in disjunctive normal form
+ */
+Formula * Formula::dnf() const
+{
+  return clone();
+}
+
+/*!
+ * \brief forms formula in disjunctive normal form
+ */
+Formula * Conjunction::dnf() const
+{
+  set<const Formula*> atomics;
+  set<const Formula*> disjunctions;
+  
+  /// split children
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    if((*f)->getType() == F_DISJUNCTION)
+    {
+      /// convert child in dnf
+      disjunctions.insert((*f)->dnf());
+    }
+    else
+    {
+      atomics.insert(*f);
+    }
+  }
+  
+  if(disjunctions.empty()) // just atomics
+    return clone();
+  
+  set<set<const Formula*> > disChildren;
+  /// calculate cartesian product
+  {
+    set<set<const Formula*> > * result = new set<set<const Formula*> >();
+    bool first = true;
+    
+    for(set<const Formula*>::iterator f = disjunctions.begin();
+         f != disjunctions.end(); ++f)
+    {
+      set<set<const Formula*> > * newResult = new set<set<const Formula*> >();
+      const Disjunction * d = static_cast<const Disjunction*>(*f);
+      
+      if(first)
+      {
+        first = false;
+        for(set<const Formula*>::iterator ff = d->children().begin();
+             ff != d->children().end(); ++ff)
+        {
+          set<const Formula*> tmpset;
+          tmpset.insert(*ff);
+          newResult->insert(tmpset);
+        }
+      }
+      else
+      {
+        for(set<const Formula*>::iterator ff = d->children().begin();
+             ff != d->children().end(); ++ff)
+        {
+          for(set<set<const Formula*> >::iterator fff = result->begin();
+               fff != result->end(); ++fff)
+          {
+            set<const Formula*> tmpset = *fff;
+            tmpset.insert(*ff);
+            newResult->insert(tmpset);
+          }
+        }
+      }
+      
+      delete result;
+      result = newResult;
+    }
+    
+    disChildren = *result;
+    delete result;
+  }
+  
+  set<const Formula*> conjunctions;
+  /// create conjunctions
+  for(set<set<const Formula*> >::iterator f = disChildren.begin();
+       f != disChildren.end(); ++f)
+  {
+    set<const Formula*> tmpset = util::setUnion(atomics, *f);
+    conjunctions.insert(static_cast<Formula*>(new Conjunction(tmpset)));
+  }
+  
+  Formula * result = static_cast<Formula*>(new Disjunction(conjunctions));
+  
+  // cleanup
+  for(set<const Formula*>::iterator f = conjunctions.begin();
+       f != conjunctions.end(); ++f)
+  {
+    delete (*f);
+  }
+  for(set<const Formula*>::iterator f = disjunctions.begin();
+       f != disjunctions.end(); ++f)
+  {
+    delete (*f);
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief forms formula in disjunctive normal form
+ */
+Formula * Disjunction::dnf() const
+{
+  set<const Formula*> children;
+  
+  for(set<const Formula*>::iterator f = children_.begin();
+       f != children_.end(); ++f)
+  {
+    children.insert((*f)->dnf());
+  }
+  
+  Formula * result = static_cast<Formula*>(new Disjunction(children));
+  
+  for(set<const Formula*>::iterator f = children.begin();
+       f != children.end(); ++f)
+  {
+    delete (*f);
+  }
+  
+  return result;
 }
 
 } /* namespace formula */

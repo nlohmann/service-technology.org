@@ -40,6 +40,7 @@ TESTFILES = test_input.owfn \
 	    bug14417.2.owfn \
             test_input.lola \
             test_dead_nodes.net.owfn \
+	    test_dnf.owfn \
             test_identical_places.net.owfn \
             test_identical_transitions.net.owfn \
             test_self_loop_places.net.owfn \

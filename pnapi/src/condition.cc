@@ -216,4 +216,25 @@ void Condition::allOtherPlacesEmpty(PetriNet & net)
   }
 }
 
+/*!
+ * \brief removes all negations
+ */
+void Condition::removeNegation()
+{
+  Formula * tmp = formula_->removeNegation();
+  delete formula_;
+  formula_ = tmp;
+}
+
+/*!
+ * \brief calculate disjunctive normal form
+ */
+void Condition::dnf()
+{
+  removeNegation();
+  Formula * tmp = formula_->dnf();
+  delete formula_;
+  formula_ = tmp;
+}
+
 }

@@ -107,6 +107,9 @@ public:
 
   /// negates the formula
   void negate();
+  
+  /// calculate disjunctive normal form
+  void dnf();
 
   /// forces all places not concerned by the formula to be empty
   void allOtherPlacesEmpty(PetriNet&);
@@ -121,6 +124,9 @@ private:
 
   /// no default copy assignment operator!
   Condition & operator=(const Condition &);
+  
+  /// removes all negations
+  void removeNegation();
 
 };
 

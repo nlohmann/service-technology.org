@@ -359,6 +359,19 @@ int main(int argc, char** argv) {
             objects[i].net->mirror();
         }
     }
+    
+    if (args_info.dnf_given) {
+        suffix += ".dnf";
+        for (unsigned int i = 0; i < objects.size(); ++i) {
+          
+            if (args_info.verbose_given) {
+                cerr << "petri: calculation dnf of final condition of net '"
+                     << objects[i].filename << "'..." << endl;
+            }
+            
+            objects[i].net->finalCondition().dnf();
+        }
+    }
 
 
     /***********************

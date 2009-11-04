@@ -11,9 +11,9 @@ svn-clean: maintainer-clean
 	-rm -f missing
 	-rm -f ylwrap
 	-rm -f -r autom4te.cache
-	-rm -f src/Makefile.in
-	-rm -f -r src/.deps
-	-rm -f src/config.h.in
+	-rm -f src/og2dot/Makefile.in
+	-rm -f -r src/og2dot/.deps
+	-rm -f src/og2dot/config.h.in
 	-rm -f tests/Makefile.in
 	-rm -fr doc/doxygen
 	-rm -f doc/Doxyfile doc/mdate-sh

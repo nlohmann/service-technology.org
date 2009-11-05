@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
 
         if (StoredKnowledge::root->is_sane) {
             StoredKnowledge::root->store();
-            StoredKnowledge::processRecursively(K0, StoredKnowledge::root);
+            StoredKnowledge::processNode(K0, StoredKnowledge::root);
         } else {
             // store insane root in case of diagnosis
             if (args_info.diagnose_given) {

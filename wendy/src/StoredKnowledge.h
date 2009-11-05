@@ -40,11 +40,8 @@ class StoredKnowledge {
         /// destroy all objects of this class
         static void finalize();
 
-        /// generate the successor of a knowledge bubble given a label
-        static void process(const Knowledge&, StoredKnowledge* const, const Label_ID&);
-
         /// recursively calculate knowledge bubbles
-        static void processRecursively(const Knowledge&, StoredKnowledge* const);
+        static void processNode(const Knowledge&, StoredKnowledge* const);
 
         /// print a dot representation
         static void output_dot(std::ostream&);
@@ -122,15 +119,18 @@ class StoredKnowledge {
         static unsigned int bookmarkTSCC;
 
     private: /* static functions */
-        /// returns the header for output files
+        /// generate the successor of a knowledge bubble given a label
+        inline static void processSuccessor(const Knowledge&, StoredKnowledge* const, const Label_ID&);
+
+        /// creates the header for output files
         static void fileHeader(std::ostream&);
 
         /// evaluate each member of the given (T)SCC and propagate the property of being insane accordingly
-        static void analyzeSCCOfKnowledges(std::set<StoredKnowledge*>&);
+        inline static void analyzeSCCOfKnowledges(std::set<StoredKnowledge*>&);
 
     public: /* member functions */
         /// constructs an object from a Knowledge object
-        explicit StoredKnowledge(Knowledge const&);
+        explicit StoredKnowledge(const Knowledge&);
 
         /// destructor
         ~StoredKnowledge();
@@ -152,7 +152,7 @@ class StoredKnowledge {
         inline hash_t hash() const;
 
         /// move all transient markings to the end of the array and adjust size of the markings array
-        void rearrangeKnowledgeBubble();
+        inline void rearrangeKnowledgeBubble();
 
         /// adjust lowlink values of the stored knowledge
         inline void adjustLowlinkValue(const StoredKnowledge* const, const bool) const;

@@ -52,7 +52,7 @@ class Knowledge {
         explicit Knowledge(InnerMarking_ID);
 
         /// construct knowledge from a given knowledge and a label
-        Knowledge(Knowledge const&, const Label_ID&);
+        Knowledge(const Knowledge&, const Label_ID&);
 
         /// destructor
         ~Knowledge();
@@ -91,7 +91,7 @@ class Knowledge {
         inline void closure(std::queue<FullMarking>&);
 
         /// inner marking is really waitstate in the context of the current knowledge
-        inline bool isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, const InterfaceMarking* interface);
+        inline bool isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface);
 
     private: /* attributes */
         /// reduction rule: smart send events; pointer to possible sending events data structure

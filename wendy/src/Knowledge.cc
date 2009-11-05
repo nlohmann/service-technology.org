@@ -58,7 +58,7 @@ Knowledge::Knowledge(InnerMarking_ID m)
 /*!
  \note no action in this constructor can introduce a duplicate
 */
-Knowledge::Knowledge(Knowledge const& parent, const Label_ID& label)
+Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
         : is_sane(1), size(0), posSendEvents(NULL), posSendEventsDecoded(NULL) {
     // tau does not make sense here
     assert(not SILENT(label));
@@ -372,14 +372,14 @@ bool Knowledge::receivingHelps() const {
 *  \param inner pointer to the current inner marking
 *  \param interface interface belonging to the inner marking within the current knowledge
 */
-bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, const InterfaceMarking* interface) {
+bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface) {
 
     // check if waitstate is resolved by interface marking
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-		if (interface->marked(l) and
-			InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
-			return false;
-		}
+        if (interface->marked(l) and
+            InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
+            return false;
+        }
     }
 
     // inner waitstate remains a waitstate with the current interface of the knowledge
@@ -393,7 +393,6 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID & inner, con
  of the current bubble
 */
 void Knowledge::sequentializeReceivingEvents() {
-
     // count the number that a receiving event is activated
     uint8_t* occuranceOfReceivingEvent = new uint8_t[Label::receive_events + 1];
 
@@ -406,7 +405,6 @@ void Knowledge::sequentializeReceivingEvents() {
 
     // traverse the inner markings
     for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
-
         // only consider non-final waitstates
         if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
 
@@ -442,9 +440,8 @@ void Knowledge::sequentializeReceivingEvents() {
     }
 
     // now traverse through all states that we remembered to consider again
-    for (map<InterfaceMarking*, bool>::const_iterator currenState = visitStateAgain.begin();
-                                                      currenState != visitStateAgain.end(); ++currenState) {
-
+    for (map<InterfaceMarking*, bool>::const_iterator currenState = visitStateAgain.begin(); currenState != visitStateAgain.end(); ++currenState) {
+ 
         // remember the receiving event that will resolve this waitstate
         Label_ID consideredReceivingEvent = 0;
 

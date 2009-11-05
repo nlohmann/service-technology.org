@@ -75,9 +75,9 @@ StoredKnowledge::_stats::_stats()
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-inline void StoredKnowledge::process(const Knowledge& K,
-                                     StoredKnowledge* const SK,
-                                     const Label_ID& l) {
+void StoredKnowledge::processSuccessor(const Knowledge& K,
+                                       StoredKnowledge* const SK,
+                                       const Label_ID& l) {
     // create a new knowledge for the given label
     Knowledge K_new(K, l);
 
@@ -108,7 +108,7 @@ inline void StoredKnowledge::process(const Knowledge& K,
             newKnowledge = true;
             if (K_new.is_sane) {
                 // the node was new and sane, so check its successors
-                processRecursively(K_new, SK_store);
+                processNode(K_new, SK_store);
             }
         } else {
             // we did not find new knowledge
@@ -131,7 +131,7 @@ inline void StoredKnowledge::process(const Knowledge& K,
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* const SK) {
+void StoredKnowledge::processNode(const Knowledge& K, StoredKnowledge* const SK) {
     static unsigned int calls = 0;
 
     // statistics output
@@ -167,7 +167,7 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
         }
 
         // recursion
-        process(K, SK, l);
+        processSuccessor(K, SK, l);
 
         // reduction rule: quit, once all waitstates are resolved
         if (args_info.quitAsSoonAsPossible_flag and SK->sat(true)) {
@@ -196,7 +196,7 @@ void StoredKnowledge::processRecursively(const Knowledge& K, StoredKnowledge* co
  \pre  knowledgeSet contains all nodes (knowledges) of the current SCC
  \post knowledgeSet is empty
 */
-inline void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowledgeSet) {
+void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowledgeSet) {
     // a temporary data structure to store the predecessor relation
     std::map<StoredKnowledge*, std::set<StoredKnowledge*> > tempPredecessors;
 
@@ -240,7 +240,7 @@ inline void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& 
 
   \post all deadlock markings can be found between index 0 and sizeDeadlockMarkings
  */
-inline void StoredKnowledge::rearrangeKnowledgeBubble() {
+void StoredKnowledge::rearrangeKnowledgeBubble() {
     // check the stored markings and remove all transient states
     unsigned int j = 0;
 
@@ -299,9 +299,11 @@ inline void StoredKnowledge::rearrangeKnowledgeBubble() {
  ******************************************/
 
 /*!
+ converts a Knowledge object into a StoredKnowledge object
+
  \param[in] K  the knowledge to copy from
 */
-StoredKnowledge::StoredKnowledge(Knowledge const& K)
+StoredKnowledge::StoredKnowledge(const Knowledge& K)
         : is_final(0), is_final_reachable(0), is_sane(K.is_sane),
           is_on_tarjan_stack(1), sizeDeadlockMarkings(K.size),
           sizeAllMarkings(K.size), inner(NULL), interface(NULL),
@@ -470,7 +472,7 @@ StoredKnowledge* StoredKnowledge::store() {
     assert(sizeAllMarkings != 0);
 
     // get the element's hash value
-    hash_t myHash = hash();
+    const hash_t myHash(hash());
 
     // check if we find a bucket with that hash value
     std::map<hash_t, std::vector<StoredKnowledge*> >::const_iterator el = hashTree.find(myHash);
@@ -525,7 +527,7 @@ StoredKnowledge* StoredKnowledge::store() {
 
 
 hash_t StoredKnowledge::hash() const {
-    hash_t result = 0;
+    hash_t result(0);
 
     for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
         result += ((1 << i) * (inner[i]) + interface[i]->hash());
@@ -554,7 +556,6 @@ void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const
       states or unmarked final markings are removed from the marking array
 */
 bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
-
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
@@ -887,7 +888,7 @@ void StoredKnowledge::print(std::ostream& file) const {
  \todo Adjust comments and variable names to reflect the fact that we also
        treat synchronous communication.
  */
-string StoredKnowledge::formula() const {
+std::string StoredKnowledge::formula() const {
     set<string> sendDisjunction;
     set<set<string> > receiveDisjunctions;
 
@@ -990,7 +991,7 @@ string StoredKnowledge::formula() const {
        method already aborts with an error as the 2-bit annotations are not
        defined in this case.
  */
-string StoredKnowledge::bits() const {
+std::string StoredKnowledge::bits() const {
     if (sizeDeadlockMarkings == 0) {
         // the knowledge has no deadlock
         return "T";

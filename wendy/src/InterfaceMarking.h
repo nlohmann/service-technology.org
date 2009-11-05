@@ -60,7 +60,7 @@ class InterfaceMarking {
         static void initialize();
 
         /// sorts a given vector of interface markings
-        static void sort(std::vector<InterfaceMarking*> &);
+        static void sort(std::vector<InterfaceMarking*>&);
 
     private: /* static attributes */
         /// the message bound

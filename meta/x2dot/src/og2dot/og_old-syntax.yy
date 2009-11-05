@@ -27,6 +27,8 @@ std::map<unsigned int, std::string> nodeAnnotationOld;
 
 std::map<unsigned int, char> nodeColor;
 
+//Initial node ID
+int initialNode;
 
 std::stringstream strStreamOld;
 
@@ -97,7 +99,10 @@ og:
  initialnode transitions	
 
   {
-
+	//Create invisible node (in order to mark the initial state)
+	(*outStream) << "INIT" << initialNode <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
+  	//Mark initial state
+	(*outStream) << "INIT" << initialNode << " -> " << initialNode << "\n";
 	//Finish writing output
 	(*outStream) << "\n}";
 	
@@ -208,7 +213,7 @@ color: {$$ = ' ';}
 
 
 initialnode:
-  key_initialnode number semicolon
+  key_initialnode number semicolon {initialNode = $2;}
 ;
 
 

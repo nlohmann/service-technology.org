@@ -13,6 +13,14 @@ AC_PROG_YACC
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# allow the configure script to control assertions (just include config.h)
+AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
+
 AC_CONFIG_FILES([Makefile src/og2dot/Makefile])
 
 AC_OUTPUT

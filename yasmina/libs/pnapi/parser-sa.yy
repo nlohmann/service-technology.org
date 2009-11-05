@@ -18,6 +18,7 @@
 %{
 
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include "parser.h"
@@ -32,6 +33,7 @@ using namespace pnapi;
 #define yyerror pnapi::parser::error
 
 #define yylex   pnapi::parser::sa::lex
+#define yylex_destroy pnapi::parser::sa::lex_destroy
 #define yyparse pnapi::parser::sa::parse
 
 %}
@@ -47,11 +49,11 @@ using namespace pnapi;
 %union 
 {
   int yt_int;
-  std::string * yt_string;
+  char * yt_str;
 }
 
 %type <yt_int> NUMBER
-%type <yt_string> IDENT
+%type <yt_str> IDENT
 
 %start sa
 
@@ -63,6 +65,24 @@ using namespace pnapi;
 
 sa:
   KEY_INTERFACE input output synchronous KEY_NODES nodes
+  {
+    if (sa2sm)
+    {
+      std::set<Transition *> transitions = pnapi_sa_yynet.getTransitions();
+      for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
+      {
+        // same reason as in automaton.cc method stateMachine (see FIXME)
+        // making a copy of all transitions and give them the labels
+        Transition &tt = pnapi_sa_yynet.createTransition("", synchlabel[*t]);
+        for (std::set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); f != (*t)->getPresetArcs().end(); f++)
+          pnapi_sa_yynet.createArc((*f)->getPlace(), tt, (*f)->getWeight());
+        for (std::set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); f != (*t)->getPostsetArcs().end(); f++)
+          pnapi_sa_yynet.createArc(tt, (*f)->getPlace(), (*f)->getWeight());
+  
+        pnapi_sa_yynet.deleteTransition(**t);
+      }
+    } 
+  }
 ;
 
 
@@ -70,7 +90,7 @@ input:
   /* empty */
 | KEY_INPUT identlist SEMICOLON
   {
-    for (int i = 0; i < identlist.size(); i++)
+    for (int i = 0; i < (int) identlist.size(); i++)
     {
       if (sa2sm)
       {
@@ -90,7 +110,7 @@ output:
   /* empty */
 | KEY_OUTPUT identlist SEMICOLON
   { 
-    for (int i = 0; i < identlist.size(); i++)
+    for (int i = 0; i < (int) identlist.size(); i++)
     {
       if (sa2sm)
       {
@@ -109,13 +129,18 @@ output:
 synchronous:
   /* empty */
 | KEY_SYNCHRONOUS identlist SEMICOLON
+  {
+    for (int i = 0; i < (int) identlist.size(); i++)
+      synchronous_.insert(identlist[i]);
+    identlist.clear();
+  }
 ;
 
 
 identlist:
   /* empty */
-| IDENT                    { identlist.push_back(*$1); delete $1; }
-| identlist COMMA IDENT    { identlist.push_back(*$3); delete $3; }
+| IDENT                    { identlist.push_back(std::string($1)); free($1); }
+| identlist COMMA IDENT    { identlist.push_back(std::string($3)); free($3); }
 ;
 
 
@@ -143,16 +168,21 @@ nodes:
         finalPlaces_.push_back(place_);
       }
         
-      for (int i = 0; i < succState_.size(); i++)
+      for (int i = 0; i < (int) succState_.size(); i++)
       {
         Transition *t = &pnapi_sa_yynet.createTransition();
         if (succType_[i] == Automaton::INPUT)
           pnapi_sa_yynet.createArc(*label2places_[succLabel_[i]], *t);
         if (succType_[i] == Automaton::OUTPUT)
           pnapi_sa_yynet.createArc(*t, *label2places_[succLabel_[i]]);
+        if (succType_[i] == Automaton::SYNCHRONOUS)
+        {
+          synchlabel[t].insert(succLabel_[i]);
+        }
           
         pnapi_sa_yynet.createArc(*place_, *t);
         pnapi_sa_yynet.createArc(*t, *places_[succState_[i]]);
+        t = NULL;
       }
       
       final_ = false;
@@ -175,7 +205,7 @@ nodes:
 	    if (final_)
 	      state_->final();
 	    
-	    for (int i = 0; i < succState_.size(); i++)
+	    for (int i = 0; i < (int) succState_.size(); i++)
 	      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
 	    
 	    final_ = false;
@@ -221,13 +251,15 @@ successors:
 	    }
 	  }
 
-    edgeLabel_ = *$2;
-    delete $2;
+    edgeLabel_ = $2;
+    free($2);
     edgeType_ = Automaton::TAU;
     if (input_.count(edgeLabel_) > 0)
       edgeType_ = Automaton::INPUT;
     if (output_.count(edgeLabel_) > 0)
       edgeType_ = Automaton::OUTPUT;
+    if (synchronous_.count(edgeLabel_) > 0)
+      edgeType_ = Automaton::SYNCHRONOUS;
     succState_.push_back($4);
     succLabel_.push_back(edgeLabel_);
     succType_.push_back(edgeType_);

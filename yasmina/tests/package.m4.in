@@ -8,5 +8,9 @@ m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 
 m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
 
+# UNIX helper tools
 m4_define([GREP],                 [@GREP@])
+m4_define([AWK],                  [@AWK@])
+m4_define([SED],                  [@SED@])
+
 m4_define([YASMINA],              [cover.sh @abs_top_builddir@/src/yasmina])

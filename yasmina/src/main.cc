@@ -126,15 +126,16 @@ void evaluateParameters(int argc, char** argv) {
 
 
 //this function gets a formula and returns one with negations on atomic prepositions
+
 const pnapi::formula::Formula *  transformNegFormula(const pnapi::PetriNet &net1, const pnapi::formula::Formula * form){
 //if it is in postive form gata
 //reduce negations 2 by two we first 
-	std::cout<<"Transform Negation"<<endl;
+/*	std::cout<<"Transform Negation"<<endl;
 	//if(typeid(form)==typeid(pnapi::formula::Negation)) form->output(std::cout);
-/*	else{ 
-		cout<<"The formula is not a negation"<<endl;
-		return form;
-	}*/
+//	else{ 
+//		cout<<"The formula is not a negation"<<endl;
+//		return form;
+//	}
 	const pnapi::formula::Negation *ff=dynamic_cast<const pnapi::formula::Negation *>(form);
 	//first reduce negations
 	const pnapi::formula::Formula* child=*ff->children().begin();
@@ -231,9 +232,10 @@ const pnapi::formula::Formula *  transformNegFormula(const pnapi::PetriNet &net1
 		}
 		const pnapi::formula::Disjunction * dis=new pnapi::formula::Disjunction(disj);
 		return dis;
-	}
+	}*/
 }
 
+			
 std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::Formula * form){
 	//std::cout<<"transform"<<std::endl;
 	std::set<lprec *> retlpset;
@@ -690,7 +692,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 // set_presolve(lp, PRESOLVE_LINDEP, get_presolveloops(lp));
 
 
-
+/*
 
 const pnapi::formula::Formula * unfoldFlags(const pnapi::PetriNet &net1, const pnapi::formula::Formula * form){
 	//if it is a disjunction return the result recursively
@@ -738,7 +740,7 @@ const pnapi::formula::Formula * unfoldFlags(const pnapi::PetriNet &net1, const p
 	}
 	return form;
 }
-
+*/
 
 //
 
@@ -902,47 +904,40 @@ int main(int argc, char** argv) {
 		//	if(!net1.isClosed()){cout<<" is not closed"<<std::endl;} else 
 		}
 	  }
-	  if (args_info.enforceFC_given){// detect all sending FC cluster for the transitions
-		  std::set<std::set<std::string> > fcc;//iterate all transitions to find free choice clusters
-		  std::set<pnapi::Transition *> fct=net1.getTransitions();
-		  do{
-			  pnapi::Transition *t=*fct.begin();std::string s=t->getName();//=args_info.enforceFC_args[0];
-		//std::string st=s.substr(0,s.find("@"));stringstream ss;ss<<st;
-		//int net; ss>>net;;
-		//if(net1.findTransition(s)){
-		    std::set<Node *> past, curr;
-			bool init=true;//initial set of post-transitions	
-			for (std::set<Node *>::iterator nit=net1.findTransition(s)->getPreset().begin(); nit!=net1.findTransition(s)->getPreset().end(); ++nit) {
-			  if (init) {
-				  curr=(*nit)->getPostset();init=false;
-				  for (std::set<Node *>::iterator sendit=curr.begin(); sendit!=curr.end(); ++sendit) {
-					  const std::set<Node *> sending=(*sendit)->getPostset();
-					  for (std::set<Node *>::iterator on=sending.begin(); on!=sending.end(); ++on) {
-						  if (net1.getOutputPlaces().find(dynamic_cast<Place *>(*on))!=net1.getOutputPlaces().end()) {
-							  break;
-						  }
-					  }
-				  }
-			  }
-			  else if(past!=curr) {cout<<"Non-free choice cluster delete all";}
-			  past=curr;
-		    }
-		  }
-		  while(!fct.empty());
-	/*	}
-		else{
-			abort(2,"The free-choice sending cluster does not exist");
-		}*/
-		// 		const int netc=net;const std::string cs=s.substr(s.find(".")+1);//cout<<" "<<s.substr(s.find(".")+1)<<endl;
-		// 		set<std::string> sets;sets.insert(cs);
-		// 		if(enforcedT.find(net)!=enforcedT.end()) 
-		// 			{enforcedT.insert(std::pair<unsigned, set<std::string> >(net,sets));cout<<"new";}
-		// 		else{set<std::string> se=(enforcedT.find(net))->second;
-		// 			se.insert(cs);
-		// 			enforcedT.find(net)->second=se;cout<<"old"<<endl;}
-		// 				//enforcedT.insert(std::pair<unsigned, set<std::string> >)(net,s.substr(s.find(".")+1 ));		
- 	  }
-	
+
+	  //find free-choice sending clusters
+		if (args_info.enforceFC_given){// detect all sending FC cluster for the transitions
+			std::set<std::set<std::string> > fcc;//iterate all transitions to find free choice clusters
+			std::set<pnapi::Transition *> fct=net1.getTransitions();
+			do{
+				pnapi::Transition *t=*fct.begin();std::string s=t->getName();//=args_info.enforceFC_args[0];
+				//std::string st=s.substr(0,s.find("@"));stringstream ss;ss<<st;
+				//int net; ss>>net;;
+				//if(net1.findTransition(s)){
+				std::set<Node *> past, curr;
+				bool init=true;//initial set of post-transitions	
+				for (std::set<Node *>::iterator nit=net1.findTransition(s)->getPreset().begin(); nit!=net1.findTransition(s)->getPreset().end(); ++nit) {
+					if (init) {
+						curr=(*nit)->getPostset();init=false;
+						for (std::set<Node *>::iterator sendit=curr.begin(); sendit!=curr.end(); ++sendit) {
+							const std::set<Node *> sending=(*sendit)->getPostset();
+							for (std::set<Node *>::iterator on=sending.begin(); on!=sending.end(); ++on) {
+								if (net1.getOutputPlaces().find(dynamic_cast<Place *>(*on))!=net1.getOutputPlaces().end()) {
+									break;
+								}
+							}
+						}
+					}
+					else if(past!=curr) {cout<<"Non-free choice cluster delete all";}
+					past=curr;
+				}
+			}
+			while(!fct.empty());
+			/*	}
+			 else{
+			 abort(2,"The free-choice sending cluster does not exist");
+			 }*/
+		}
 
     }
 		//std::cout << owfn << net1<<"end of composition"<<std::endl;
@@ -1023,7 +1018,7 @@ int main(int argc, char** argv) {
 					//resultsyn.insert(synct.begin(),synct.end());
 					lprec *lpt;//current set of constraints 
 					lpt = make_lp(0, result.size());
-					for(unsigned int i=1;i<=get_Ncolumns(lpt);i++){
+					for(int i=1;i<=get_Ncolumns(lpt);i++){
 						set_int(lpt,i,TRUE);
 					}
 					if(lpt == NULL) {
@@ -1180,13 +1175,14 @@ int main(int argc, char** argv) {
 			//cout<<"Solve "<<solve(lp)<<endl;
 			if(res==0){
 				cout<<endl<<"Compatibility check inconclusive"<<endl;
-				cout<<endl<<"The constraint system has at least a solution:"<<endl;
-				REAL *sol;//[get_Ncolumns(lpmps.at(ifm))];
-				get_ptr_variables(lpmps.at(ifm),&sol);
-				for(int s=0;s<get_Ncolumns(lpmps.at(ifm));s++){
-					cout<<get_col_name(lpmps.at(ifm),s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
-				}
-
+				if (args_info.verbose_flag) {
+					cout<<endl<<"The constraint system has at least a solution:"<<endl;
+					REAL *sol;//[get_Ncolumns(lpmps.at(ifm))];
+					get_ptr_variables(lpmps.at(ifm),&sol);
+					for(int s=0;s<get_Ncolumns(lpmps.at(ifm));s++){
+						cout<<get_col_name(lpmps.at(ifm),s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
+					}
+				}	
 				break;
 			}
 			else {
@@ -1532,14 +1528,16 @@ int main(int argc, char** argv) {
 		//cout<<"Solve "<<solve(lp)<<endl;
 		if(res==0){
 			cout<<endl<<"Compatibility check inconclusive"<<endl;
-			cout<<endl<<"The constraint system has at least a solution:"<<endl;
-			REAL *sol;//[get_Ncolumns(nn)];
-			get_ptr_variables(lp,&sol);//REAL sol[nTransitions];
-			//get_variables(lp,&sol);
-			for(int s=0;s<nTransitions;s++){
-				cout<<get_col_name(lp,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
+			if (args_info.verbose_flag) {
+				cout<<endl<<"The constraint system has at least a solution:"<<endl;
+				REAL *sol;//[get_Ncolumns(nn)];
+				get_ptr_variables(lp,&sol);//REAL sol[nTransitions];
+				//get_variables(lp,&sol);
+				for(int s=0;s<nTransitions;s++){
+					cout<<get_col_name(lp,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
+				}
+				cout<<endl;
 			}
-			cout<<endl;
 /*			bool gata=true;
 			pnapi::Marking m(net1);
 			do{

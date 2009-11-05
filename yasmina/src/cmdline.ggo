@@ -7,7 +7,7 @@ description "Usage: checks compatibility using MILP"
 section "Analysis task"
 sectiondesc="Yasmina implements quick compatibility checks using ILP. 
 Yasmina's compatibility check is reachability of the final markings (which is a necessary condition for weak termination). 
-Yasmina's defalut input are open nets. Further, Yasmina checks compatibility under semantical constraints specified as events (e.g.the receipt/sending of a message) and choices (independent events). Moreover it blends message profile compatibility checking with all of the above metioned parameters. The result is usually no in case the input parameters are not compatible or it give information which can help further in the analysis (e.g. a terminating Parikh vector)."
+Yasmina's default input are open nets. Further, Yasmina checks compatibility under semantical constraints specified as events (e.g.the receipt/sending of a message) and choices (independent events). Moreover it blends message profile compatibility checking with all of the above mentioned parameters. The result is usually no in case the input parameters are not compatible or it give information which can help further in the analysis (e.g. a terminating Parikh vector)."
 
 
 option "enforceEvents" e
@@ -44,5 +44,5 @@ section "Debug"
 
 option "verbose" v
   "Verbose output"
-  flag on
+  flag off
 

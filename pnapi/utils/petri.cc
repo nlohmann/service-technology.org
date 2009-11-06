@@ -549,6 +549,7 @@ int main(int argc, char** argv) {
       delete (objects[i].net);
     }
 
+    cmdline_parser_free(&args_info);
 
     return EXIT_SUCCESS;
 }

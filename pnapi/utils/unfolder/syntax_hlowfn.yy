@@ -32,7 +32,7 @@ placelist:
 
 places:
   place
-| place COMMA { fprintf(pipe_out, ", "); } places
+| places COMMA { fprintf(pipe_out, ", "); } place
 ;
 
 place:

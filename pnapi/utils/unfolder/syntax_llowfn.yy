@@ -4,7 +4,6 @@
 %name-prefix="llowfn_"
 
 %{
-#include <cstdio>
 #include <string>
 #include <map>
 #include "types.h"
@@ -30,7 +29,7 @@ placelist:
 
 places:
   place
-| place COMMA places
+| places COMMA place
 ;
 
 place:

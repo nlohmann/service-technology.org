@@ -19,6 +19,7 @@
 #include "types.h"
 
 extern int llowfn_parse();
+extern int llowfn_lineno;
 %}
 
 whitespace     [\n\r\t ]
@@ -40,6 +41,6 @@ number         [0-9]+
 %%
 
 int llowfn_error(const char *s) {
-	fprintf(stderr, "%s: %s", llowfn_text, s);
-	exit(EXIT_FAILURE);
+    fprintf(stderr, "ll-net:%d: %s near '%s'\n", llowfn_lineno, s, llowfn_text);
+    exit(EXIT_FAILURE);
 }

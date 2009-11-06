@@ -49,6 +49,6 @@ number         [0-9]+
 %%
 
 int hlowfn_error(const char *s) {
-	fprintf(stderr, "%s: %s", hlowfn_text, s);
-	exit(EXIT_FAILURE);
+    fprintf(stderr, "hl-net:%d: %s near '%s'\n", hlowfn_lineno, s, hlowfn_text);
+    exit(EXIT_FAILURE);
 }

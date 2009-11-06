@@ -55,12 +55,12 @@ class Node {
 
         /// compute a list of cost minimal assignments for this node
         unsigned int getCostMinimalAssignments(
-        		list< pair< pair< Node*, Event*>, unsigned int> >,
+        		list< pair<Event*, unsigned int> >,
         		list< FormulaAssignment >& );
 
         /// helper function for getCostMinimalAssignments
         void getCostMinimalAssignmentsRecursively(
-        		list< pair< pair<Node*, Event*>, unsigned int> >,
+        		list< pair<Event*, unsigned int> >,
         		unsigned int,
         		FormulaAssignment,
         		unsigned int&,

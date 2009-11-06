@@ -8,5 +8,9 @@ INTERFACE
 
 NODES
   1 : b
+    a -> 2
     b -> 3
+    c -> 4
+  2 : FINAL
   3 : FINAL
+  4 : FINAL

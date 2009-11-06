@@ -102,7 +102,7 @@ og:
 	//Create invisible node (in order to mark the initial state)
 	(*outStream) << "INIT" << initialNode <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
   	//Mark initial state
-	(*outStream) << "INIT" << initialNode << " -> " << initialNode << "\n";
+	(*outStream) << "INIT" << initialNode << " -> " << initialNode << " [minlen=\"0.5\"]" << "\n";
 	//Finish writing output
 	(*outStream) << "\n}";
 	

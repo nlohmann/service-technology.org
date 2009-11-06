@@ -101,7 +101,7 @@ og:
 
 	}
 	//Mark initial state
-	(*outStream) << "INIT" << nodes[0] << " -> " << nodes[0] << "\n";
+	(*outStream) << "INIT" << nodes[0] << " -> " << nodes[0] << " [minlen=\"0.5\"]" << "\n";
 
 	//Finish writing output
 	(*outStream) << "\n}";

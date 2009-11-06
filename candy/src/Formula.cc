@@ -6,129 +6,8 @@ using namespace std;
 
 
 // ****************************************************************************
-// FormulaMultiary
-// ****************************************************************************
-
-//! \brief removes the given literal from the formula, if this literal is the
-//!        only one of a clause, the clause gets removed as well
-//! \param name name of the literal to be removed
-void FormulaMultiary::removeLiteral(const string& literal) {
-
-    DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
-
-    for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
-
-        // if the considered current formula is a literal, then remove it;
-        // call the function recursively, otherwise
-    	DEBUG "\t removeLiteral: current formula '" << (*i)->asString() << "'" END
-        FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> (*i);
-        if (checkLiteral != NULL) {
-
-            // the current formula is a literal, so delete it if it matches
-            if ( literal.compare( checkLiteral->asString() ) == 0 ) {
-            	subFormulas.erase( i++ );
-            } else {
-                ++i;
-            }
-
-        } else {
-
-			// the current formula is no literal, so call removeLiteral again
-			(*i)->removeLiteral( literal );
-
-            FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( *i );
-            if ( checkNegation != NULL && checkNegation->size() == 0 ) {
-
-                // a size zero negation formula is useless, so erase it
-				subFormulas.erase( i++ );
-				DEBUG "\t removeLiteral: size zero NEGATION removed, result is '" << asString() << "'" END
-
-            } else {
-
-                FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
-                if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
-
-                    // a size zero multiary formula is useless, so erase it
-                    subFormulas.erase( i++ );
-                    DEBUG "\t removeLiteral: size zero MULTIARY removed, result is '" << asString() << "'" END
-
-                } else {
-
-                    // adopt flattened subformula
-                    ++i;
-                    DEBUG "\t removeLiteral: nothing to remove, result is '" << asString() << "'" END
-                }
-            }
-        }
-    }
-
-    DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
-}
-
-void FormulaNegation::removeLiteral(const string& literal) {
-
-    DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
-
-    // if the subformula is a literal, then remove it;
-    // call the function recursively, otherwise
-    DEBUG "\t removeLiteral: subformula '" << subFormula->asString() << "'" END
-    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( subFormula );
-    if (checkLiteral != NULL) {
-
-        // the subformula is a literal, so delete it if it matches
-        if ( literal.compare( checkLiteral->asString() ) == 0 ) {
-            clear();
-        }
-
-    } else {
-
-        // the current formula is no literal, so call removeLiteral again
-        subFormula->removeLiteral( literal );
-
-        FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( subFormula );
-        if ( checkNegation != NULL && checkNegation->size() == 0 ) {
-            clear();
-        } else {
-
-            FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( subFormula );
-            if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
-                clear();
-            }
-        }
-    }
-
-    DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
-}
-
-
-
-// ****************************************************************************
 // FormulaMultiaryAnd and FormulaMultiaryOr
 // ****************************************************************************
-
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaMultiaryAnd* FormulaMultiaryAnd::getDeepCopy() const {
-
-    FormulaMultiaryAnd* newFormula = new FormulaMultiaryAnd();
-    for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
-        newFormula->subFormulas.push_back( (*i)->getDeepCopy() );
-    }
-    return newFormula;
-}
-
-//! \brief deep copies this formula
-//! \return returns copy
-FormulaMultiaryOr* FormulaMultiaryOr::getDeepCopy() const {
-
-    FormulaMultiaryOr* newFormula = new FormulaMultiaryOr();
-    for (subFormulas_t::const_iterator i = subFormulas.begin(); i != subFormulas.end(); ++i) {
-        newFormula->subFormulas.push_back( (*i)->getDeepCopy() );
-    }
-    return newFormula;
-}
-
-
 
 //! \brief computes and returns the value of this formula under the given
 //!        assignment
@@ -226,6 +105,103 @@ string FormulaMultiaryOr::asString() const {
         //cerr << "OR asString END" << endl;
         return formulaString + ')';
     }
+}
+
+
+
+// ****************************************************************************
+// removeLiteral
+// ****************************************************************************
+
+//! \brief removes the given literal from the formula, if this literal is the
+//!        only one of a clause, the clause gets removed as well
+//! \param literal name of the literal to be removed
+void FormulaMultiary::removeLiteral(const string& literal) {
+
+    DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
+
+    for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
+
+        // if the considered current formula is a literal, then remove it;
+        // call the function recursively, otherwise
+    	DEBUG "\t removeLiteral: current formula '" << (*i)->asString() << "'" END
+        FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> (*i);
+        if (checkLiteral != NULL) {
+
+            // the current formula is a literal, so delete it if it matches
+            if ( literal.compare( checkLiteral->asString() ) == 0 ) {
+            	subFormulas.erase( i++ );
+            } else {
+                ++i;
+            }
+
+        } else {
+
+			// the current formula is no literal, so call removeLiteral again
+			(*i)->removeLiteral( literal );
+
+            FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( *i );
+            if ( checkNegation != NULL && checkNegation->size() == 0 ) {
+
+                // a size zero negation formula is useless, so erase it
+				subFormulas.erase( i++ );
+				DEBUG "\t removeLiteral: size zero NEGATION removed, result is '" << asString() << "'" END
+
+            } else {
+
+                FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
+                if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
+
+                    // a size zero multiary formula is useless, so erase it
+                    subFormulas.erase( i++ );
+                    DEBUG "\t removeLiteral: size zero MULTIARY removed, result is '" << asString() << "'" END
+
+                } else {
+
+                    // adopt flattened subformula
+                    ++i;
+                    DEBUG "\t removeLiteral: nothing to remove, result is '" << asString() << "'" END
+                }
+            }
+        }
+    }
+
+    DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
+}
+
+void FormulaNegation::removeLiteral(const string& literal) {
+
+    DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
+
+    // if the subformula is a literal, then remove it;
+    // call the function recursively, otherwise
+    DEBUG "\t removeLiteral: subformula '" << subFormula->asString() << "'" END
+    FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( subFormula );
+    if (checkLiteral != NULL) {
+
+        // the subformula is a literal, so delete it if it matches
+        if ( literal.compare( checkLiteral->asString() ) == 0 ) {
+            clear();
+        }
+
+    } else {
+
+        // the current formula is no literal, so call removeLiteral again
+        subFormula->removeLiteral( literal );
+
+        FormulaNegation* checkNegation = dynamic_cast<FormulaNegation*> ( subFormula );
+        if ( checkNegation != NULL && checkNegation->size() == 0 ) {
+            clear();
+        } else {
+
+            FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( subFormula );
+            if ( checkMultiary != NULL && checkMultiary->size() == 0 ) {
+                clear();
+            }
+        }
+    }
+
+    DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
 }
 
 

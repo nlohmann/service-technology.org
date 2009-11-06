@@ -18,8 +18,7 @@ void Node::setFlagRecursively(bool _flag) {
 }
 
 
-//! \brief computes a list of inefficient successors for this node and the node's minimal cost
-//! \param inefficientSuccessors contains all reached nodes and their inefficient successors
+//! \brief computes the node's minimal cost and erase all inefficient edges
 //! \return returns the minimal cost of this node
 unsigned int Node::computeEfficientSuccessors() {
 
@@ -138,9 +137,9 @@ unsigned int Node::computeEfficientSuccessors() {
 
 
 //! \brief computes a list of all cost minimal assignments for this node and the minimal cost
-//! \param labelCost a list with all edge labels and all edge cost
+//! \param edgeCost a list with all outgoing events and their cost
 //! \param minimalAssignments list of all found minimal assignments
-//! \return returns the minimal cost
+//! \return returns the cost of a minimal assignment
 unsigned int Node::getCostMinimalAssignments(
         list< pair<Event*, unsigned int> > edgeCost,
         list< FormulaAssignment >& minimalAssignments) {
@@ -156,13 +155,13 @@ unsigned int Node::getCostMinimalAssignments(
 
 
 //! \brief recursive helper function for getCostMinimalAssignments
-//! \param labelCost a list with all edge labels and all edge cost
+//! \param edgeCost a list with all outgoing events and their cost
 //! \param currentCost cost of current assignment
 //! \param currentAssignment current assignment
 //! \param minimalCost cost of found minimal assignment(s)
 //! \param minimalAssignments list of all found minimal assignments
 void Node::getCostMinimalAssignmentsRecursively(
-        list< pair<Event*, unsigned int> > edgeCost, // edge label and edge cost
+        list< pair<Event*, unsigned int> > edgeCost,
         unsigned int currentCost,
         FormulaAssignment currentAssignment,
         unsigned int& minimalCost,
@@ -186,7 +185,7 @@ void Node::getCostMinimalAssignmentsRecursively(
     if ( edgeCost.empty() ) {
 
         // set it to False ...
-        currentAssignment.setToFalse(currentLabel);
+        currentAssignment.set(currentLabel, false);
         if ( formula->value(currentAssignment) == true ) {
 
             if ( currentCost < minimalCost ) {
@@ -202,7 +201,7 @@ void Node::getCostMinimalAssignmentsRecursively(
 
         // set it to True
         // only for true labels the label's cost are added
-        currentAssignment.setToTrue(currentLabel);
+        currentAssignment.set(currentLabel, true);
         if ( formula->value(currentAssignment) == true ) {
 
             unsigned int newCurrentCost = currentCost < currentLabelCost ? currentLabelCost : currentCost;
@@ -221,13 +220,13 @@ void Node::getCostMinimalAssignmentsRecursively(
     } else {
 
         // set it to False
-        currentAssignment.setToFalse(currentLabel);
+        currentAssignment.set(currentLabel, false);
         getCostMinimalAssignmentsRecursively(edgeCost,
                                              currentCost,
                                              currentAssignment, minimalCost, minimalAssignments);
 
         // set it to True
-        currentAssignment.setToTrue(currentLabel);
+        currentAssignment.set(currentLabel, true);
         getCostMinimalAssignmentsRecursively(edgeCost,
                                              (currentCost >= currentLabelCost ? currentCost : currentLabelCost),
                                              currentAssignment, minimalCost, minimalAssignments);

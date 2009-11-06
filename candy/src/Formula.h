@@ -11,31 +11,24 @@
 
 /**
  * Assignment of literals to truth values to determine the truth value of a
- * Formula under the given assignment. Typical literals are edge
- * labels of IGs and OGs.
+ * Formula under the given assignment.
  */
 class FormulaAssignment {
     public:
+        /// an assignment is a mapping from literal names to truth values
         typedef map<string, bool> literalValues_t;
 
     private:
-        /// Maps literals to their truth values.
+        /// maps literals to their truth values.
         literalValues_t literalValues;
 
     public:
+        /// destroys the given assignment
+        virtual ~FormulaAssignment() {};
+
         /// sets the given literal to the given truth value
         void set(const string& literal, bool value) {
         	literalValues[literal] = value;
-        }
-
-        /// sets the given literal to true
-        void setToTrue(const string& literal) {
-        	set(literal, true);
-        }
-
-        /// sets the given literal to false
-        void setToFalse(const string& literal) {
-        	set(literal, false);;
         }
 
         /// returns the bool value of a literal
@@ -62,34 +55,25 @@ class Formula {
         virtual ~Formula() {};
 
         /// destroys all subformulas of this formula
-        virtual void clear() {};
-
-        /// copies and returns this Formula
-        virtual Formula* getDeepCopy() const = 0;
-
-        /// Returns the truth value of this Formula under the given
-        /// FormulaAssignment.
-        /// @param assignment The FormulaAssignment under which the truth
-        ///  value of this Formula should be computed. The value of
-        ///  literals not set in assignment are considered false.
-        /// @returns The truth value of this Formula under the given
-        ///  FormulaAssignment.
-        virtual bool value(const FormulaAssignment& assignment) const = 0;
-
-        /// Formats and returns this formula as a string. This string is
-        /// suitable for showing the user and for the OG output format.
-        /// returns The string representation for this Formula.
-        virtual string asString() const = 0;
+        virtual void clear() = 0;
 
         /// returns the number of subformulas
         virtual int size() const = 0;
 
-        /// removes a literal from the formula, if this literal is the only one of a clause,
-        /// the clause gets removed as well
-        virtual void removeLiteral(const string& literal) {};
+        /// returns the truth value of this formula under the given assignment
+        virtual bool value(const FormulaAssignment& assignment) const = 0;
+
+        /// formats and returns this formula as a string, which is
+        /// suitable for showing the user and for the OG output format
+        virtual string asString() const = 0;
+
+        /// removes a literal from the formula
+        /// if this literal is the only one of a clause, the clause gets
+        /// removed as well
+        virtual void removeLiteral(const string& literal) = 0;
 
         /// simplifies the formula
-        virtual void simplify() {};
+        virtual void simplify() = 0;
 
         /// returns true iff this formula implies the given formula
         virtual bool implies(Formula* conclusion) const = 0;
@@ -102,18 +86,14 @@ class Formula {
 // ****************************************************************************
 
 /**
- * Base class for all multiary \link Formula
- * CommFormulas\endlink, such as FormulaMultiaryAnd and
- * FormulaMultiaryOr. This class exists because the classes
- * FormulaMultiaryAnd and FormulaMultiaryOr share
- * functionality which should be implemented only once.
+ * Base class for all multiary formula.
  */
 class FormulaMultiary : public Formula {
     public:
-        /// Type of the container holding all subformula of this multiary formula.
+        /// type of the container holding all subformula of this multiary formula
         typedef list<Formula*> subFormulas_t;
 
-        /// Holds all subformulas of this multiary formula.
+        /// holds all subformulas of this multiary formula
         subFormulas_t subFormulas;
 
     public:
@@ -167,9 +147,6 @@ class FormulaMultiaryAnd : public FormulaMultiary {
         /// destroys this FormulaMultiaryAnd
         virtual ~FormulaMultiaryAnd() {};
 
-        /// deep copies the formula
-        virtual FormulaMultiaryAnd* getDeepCopy() const;
-
         /// returns the value of this formula under given assignment
         virtual bool value(const FormulaAssignment& assignment) const;
 
@@ -203,9 +180,6 @@ class FormulaMultiaryOr : public FormulaMultiary {
 
         /// destroys this FormulaMultiaryOr
         virtual ~FormulaMultiaryOr() {};
-
-        /// returns a deep copy of this formula
-        virtual FormulaMultiaryOr* getDeepCopy() const;
 
         /// returns the value of this formula under given assignment
         virtual bool value(const FormulaAssignment& assignment) const;
@@ -256,11 +230,6 @@ class FormulaNegation : public Formula {
             subFormula = NULL;
         };
 
-        /// returns a deep copy of this formula
-        virtual FormulaNegation* getDeepCopy() const {
-        	return new FormulaNegation(*this);
-        }
-
         /// returns the value of the literal in the given asisgnment
         virtual bool value(const FormulaAssignment& assignment) const {
             return not subFormula->value( assignment );
@@ -310,9 +279,12 @@ class FormulaLiteral : public Formula {
         /// basic deconstructor
 		virtual ~FormulaLiteral() {};
 
-        /// returns a deep copy of this formula
-        virtual FormulaLiteral* getDeepCopy() const {
-        	return new FormulaLiteral(*this);
+        /// clear all subformulae (i.e. nothing)
+        virtual void clear() {};
+
+        /// returns the size of this formula
+        virtual int size() const {
+            return 1;
         }
 
         /// returns the value of the literal in the given asisgnment
@@ -325,10 +297,13 @@ class FormulaLiteral : public Formula {
         	return _literal;
         }
 
-        /// returns the size of this formula
-        virtual int size() const {
-            return 1;
-        }
+        /// removes a literal from the formula
+        /// but we cannot remove ourself
+        virtual void removeLiteral(const string& literal) {};
+
+        /// simplifies the formula
+        /// but we are a literal and as simple as possible
+        virtual void simplify() {};
 
         /// returns true iff this formula implies the given formula
         virtual bool implies(Formula* conclusion) const;

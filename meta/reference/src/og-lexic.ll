@@ -17,7 +17,7 @@ extern int og_yyerror(char const *msg);
 %s BITS
 
 whitespace     [\n\r\t ]
-identifier     [^,;:()\t \n\r\{\}=]+
+identifier     [^,;:()\t \n\r\{\}=~]+
 number         [0-9]+
 
 

@@ -4,6 +4,7 @@ AC_CONFIG_SRCDIR([src/og-lexic.ll])
 AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE
+m4_ifdef([AM_SILENT_RULE],[AM_SILENT_RULE([yes])])
 
 AC_PROG_CXX
 AM_PROG_LEX

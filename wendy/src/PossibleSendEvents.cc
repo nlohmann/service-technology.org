@@ -19,6 +19,7 @@
 
 
 #include <config.h>
+
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
 #include "Label.h"
@@ -144,10 +145,7 @@ void PossibleSendEvents::labelPossible(const Label_ID& l) {
 }
 
 /*!
- \todo Check if this function is actually called more than once. If not, then
-       we can skip the first if and make this a const function.
- \todo Depending on the number of calls to this function, we can think of not
-       storing decodedLabels at all.
+ decode the bit array into a char array (function is called more than once)
 */
 char* PossibleSendEvents::decode() {
     assert(bytes > 0);

@@ -36,13 +36,6 @@
  optimization. A later translation into StoredKnowledge objects removes any
  unneccessary information, yielding a compact representation.
 
- \todo It seems that many of the functions that organized reduction
-       techniques traverse all markings the knowledge bubble. Hence,
-       efficiency could be imporoved by making the respective check while
-       building the bubble to avoid repeated traversion. Then, it might be
-       cheaper to precompute the results and store them as members than
-       actually making a function call.
-
  \todo In general, std::map<Label_ID, bool> could be replaced by
        std::vector<Label_ID>. No overhead and constant access!
  */
@@ -66,10 +59,10 @@ class Knowledge {
         /// calculate those receiving events that are essential to resolve each and every waitstate
         void sequentializeReceivingEvents();
 
-        /// \todo Daniela, please comment me
+        /// reduction rule: seguentialize receiving
         bool considerReceivingEvent(const Label_ID&) const;
 
-        /// \todo Daniela, please comment me
+        /// reduction rule: smart sending event
         bool considerSendingEvent(const Label_ID&) const;
 
     public: /* attributes */

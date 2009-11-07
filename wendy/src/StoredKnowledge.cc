@@ -239,10 +239,8 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
 
             // tell each predecessor of current knowledge that this knowledge switched its status to insane
             /// \todo looks as if a set union would do the job here
-            for (std::set<StoredKnowledge*>::const_iterator iter = tempPredecessors[currentKnowledge].begin();
-                                                            iter != tempPredecessors[currentKnowledge].end(); ++iter) {
-                knowledgeSet.insert(*iter);
-            }
+            knowledgeSet.insert(tempPredecessors[currentKnowledge].begin(), tempPredecessors[currentKnowledge].end());
+
         } else if (args_info.correctness_arg == correctness_arg_livelock) {
             currentKnowledge->is_final_reachable = 1;
         }

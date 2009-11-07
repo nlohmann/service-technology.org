@@ -23,7 +23,7 @@
 
 #include <unistd.h>
 #include <cstdio>
-
+#include <cstring>
 
 /// unconditionally print a message
 void message(const char* format, ...);

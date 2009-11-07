@@ -5,6 +5,8 @@
 @item implemented new 3-bit representation: at @samp{T} bit is necessary to correctly cope with ``true''-annotated nodes -- renamed @option{2bits} option to @option{bits}
 
 @item removed explicit @code{std::flush} calls
+
+@item colored status messages
 @end itemize
 
 

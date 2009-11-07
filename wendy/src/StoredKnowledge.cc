@@ -136,7 +136,7 @@ void StoredKnowledge::processNode(const Knowledge& K, StoredKnowledge* const SK)
 
     // statistics output
     if (++calls % args_info.reportFrequency_arg == 0 and args_info.reportFrequency_arg > 0) {
-        fprintf(stderr, "%8d knowledges, %8d edges\n", stats.storedKnowledges, stats.storedEdges);
+        message("%8d knowledges, %8d edges", stats.storedKnowledges, stats.storedEdges);
     }
 
     // traverse the labels of the interface and process K's successors

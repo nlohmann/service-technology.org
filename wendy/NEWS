@@ -19,6 +19,8 @@ Version 2.4-unreleased
 
 * removed explicit `std::flush' calls
 
+* colored status messages
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

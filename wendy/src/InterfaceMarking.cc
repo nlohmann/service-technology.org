@@ -57,7 +57,7 @@ void InterfaceMarking::initialize() {
 
     message_bound = args_info.messagebound_arg;
     interface_length = Label::send_events + Label::receive_events;
-    message_bound_bits = ceil(log2(message_bound+1));
+    message_bound_bits = static_cast<uint8_t>(ceil(log2(message_bound+1)));
 
     // allow to store a larger interface marking to display diagnosis results
     message_bound_bits += args_info.diagnose_given;

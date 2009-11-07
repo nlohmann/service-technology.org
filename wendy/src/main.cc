@@ -344,10 +344,13 @@ int main(int argc, char** argv) {
     status("%d sane nodes reachable", StoredKnowledge::seen.size());
 
     // analyze root node and print result
-    bool controllable = (StoredKnowledge::root->is_sane);
-    message("net is controllable: %s", controllable ? "YES" : "NO");
-    if (not controllable and not args_info.diagnose_given) {
-        message("use '--diagnose' option for diagnosis information");
+    if (StoredKnowledge::root->is_sane) {
+        message("%snet is controllable%s: %sYES%s", _c0, _c_, _cG, _c_);
+    } else {
+        message("%snet is controllable%s: %sNO%s", _c0, _c_, _cR, _c_);
+        if (not args_info.diagnose_given) {
+            message("use '--diagnose' option for diagnosis information");
+        }
     }
 
 
@@ -363,7 +366,7 @@ int main(int argc, char** argv) {
     /*-------------------.
     | 9. output options |
     `-------------------*/
-    if (controllable or args_info.diagnose_given) {
+    if (StoredKnowledge::root->is_sane or args_info.diagnose_given) {
         // operating guidelines output
         if (args_info.og_given) {
             std::string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
@@ -405,8 +408,7 @@ int main(int argc, char** argv) {
             StoredKnowledge::output_migration(output);
             time(&end_time);
 
-            status("wrote migration information to file '%s' [%.0f sec]",
-                im_filename.c_str(), difftime(end_time, start_time));
+            status("wrote migration information [%.0f sec]", difftime(end_time, start_time));
         }
 
         // diagnose output

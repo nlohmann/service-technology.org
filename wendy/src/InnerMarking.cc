@@ -81,7 +81,7 @@ void InnerMarking::initialize() {
     finalMarkingReachableMap.clear();
 
     if (stats.final_markings == 0) {
-        message("warning: no final marking found");
+        message("%swarning%s: %sno final marking found%s", _c0, _c_, _cY, _c_);
     }
 
     status("found %d final markings, %d bad states, and %d inevitable deadlocks",
@@ -115,7 +115,7 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
     assert(out_degree < UCHAR_MAX);
 
     if (++stats.markings % 50000 == 0) {
-        fprintf(stderr, "%8d inner markings\n", stats.markings);
+        message("%8d inner markings", stats.markings);
     }
 
     // copy given STL vectors to C arrays

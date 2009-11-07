@@ -21,9 +21,10 @@
 #ifndef VERBOSE_H
 #define VERBOSE_H
 
-#include <unistd.h>
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
+#include <unistd.h>
 
 /// unconditionally print a message
 void message(const char* format, ...);

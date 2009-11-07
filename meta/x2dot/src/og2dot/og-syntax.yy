@@ -187,7 +187,6 @@ node:
 		break;
 	//Store current node and map its ID to its annotation
 	nodes.push_back($1);
-	std::cout << "DEBUG: Storing node " << $1 << std::endl;
 	currentNode = $1;
 	nodeAnnotation[$1] = strStream.str();
 	strStream.str("");

@@ -555,7 +555,7 @@ void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const
  \pre the markings in the array (0 to sizeDeadlockMarkings-1) are deadlocks -- all transient
       states or unmarked final markings are removed from the marking array
 */
-bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
+bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
@@ -567,6 +567,8 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
             if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
                 continue;
             }
+
+            is_final_reachable = successors[l-1]->is_final_reachable;
 
             return true;
         }
@@ -590,6 +592,8 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
                     continue;
                 }
 
+                is_final_reachable = successors[l-1]->is_final_reachable;
+
                 resolved = true;
                 break;
             }
@@ -607,6 +611,8 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
                 if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
                     continue;
                 }
+
+                is_final_reachable = successors[l-1]->is_final_reachable;
 
                 resolved = true;
                 break;
@@ -630,6 +636,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) const {
  */
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
+
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if (successors[l-1] != NULL and successors[l-1] != empty and
                 (successors[l-1]->is_sane or args_info.diagnose_given)) {

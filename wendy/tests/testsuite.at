@@ -114,7 +114,7 @@ AT_CLEANUP
 
 AT_SETUP([Bug information output])
 AT_CHECK([WENDY --bug],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: please send file 'bug.log' to wendy@service-technology.org!" stderr])
+AT_CHECK([GREP -q "wendy: Please send file 'bug.log' to wendy@service-technology.org!" stderr])
 AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP

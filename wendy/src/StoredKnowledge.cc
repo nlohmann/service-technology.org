@@ -65,9 +65,9 @@ std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredK
  \note maxBucketSize must be initialized to 1
  */
 StoredKnowledge::_stats::_stats()
-        : hashCollisions(0), storedEdges(0), maxInterfaceMarkings(0),
-          builtInsaneNodes(0), maxBucketSize(1), storedKnowledges(0),
-          maxSCCSize(0), numberOfNonTrivialSCCs(0), numberOfTrivialSCCs(0) {}
+        : hashCollisions(0), storedEdges(0), builtInsaneNodes(0),
+          maxBucketSize(1), storedKnowledges(0), maxSCCSize(0),
+          numberOfNonTrivialSCCs(0), numberOfTrivialSCCs(0) {}
 
 
 /*!
@@ -331,8 +331,6 @@ StoredKnowledge::StoredKnowledge(const Knowledge& K)
             inner[count] = pos->first;
             interface[count] = new InterfaceMarking(*(pos->second[i]));
         }
-
-        stats.maxInterfaceMarkings = MAXIMUM(stats.maxInterfaceMarkings, static_cast<unsigned int>(pos->second.size()));
     }
 
     // we must not forget a marking

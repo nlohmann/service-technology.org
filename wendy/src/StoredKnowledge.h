@@ -68,9 +68,6 @@ class StoredKnowledge {
                 /// the number of edges stored overall
                 unsigned int storedEdges;
 
-                /// the maximal number of interface markings per inner marking
-                unsigned int maxInterfaceMarkings;
-
                 /// the number of nodes that were built, but immediately detected insane
                 unsigned int builtInsaneNodes;
 

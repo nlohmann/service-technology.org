@@ -89,7 +89,7 @@ void evaluateParameters(int argc, char** argv) {
     if (args_info.bug_flag) {
         { Output debug_output("bug.log", "configuration information");
           debug_output.stream() << CONFIG_LOG; }
-        message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
+        message("Please send file '%sbug.log%s' to %s%s%s!", _cb_, _c_, _cB_, PACKAGE_BUGREPORT, _c_);
         exit(EXIT_SUCCESS);
     }
 
@@ -103,7 +103,7 @@ void evaluateParameters(int argc, char** argv) {
         if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
             abort(14, "error reading configuration file '%s'", args_info.config_arg);
         } else {
-            status("using configuration file '%s'", args_info.config_arg);
+            status("using configuration file '%s%s%s'", _cb_, args_info.config_arg, _c_);
         }
     } else {
         // check for configuration files
@@ -119,7 +119,7 @@ void evaluateParameters(int argc, char** argv) {
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
                 abort(14, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
-                status("using configuration file '%s'", conf_filename.c_str());
+                status("using configuration file '%s%s%s'", _cb_, conf_filename.c_str(), _c_);
             }
         } else {
             status("not using a configuration file");
@@ -167,7 +167,7 @@ void terminationHandler() {
     // print statistics
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
-        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+        fprintf(stderr, "%s%s%s: memory consumption: ", _cm_, PACKAGE, _c_);
         system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 }
@@ -327,13 +327,10 @@ int main(int argc, char** argv) {
     time(&end_time);
 
     // statistics output
-    status("stored %d knowledges [%.0f sec]",
-        StoredKnowledge::stats.storedKnowledges, difftime(end_time, start_time));
+    status("stored %d knowledges, %d edges [%.0f sec]",
+        StoredKnowledge::stats.storedKnowledges, StoredKnowledge::stats.storedEdges, difftime(end_time, start_time));
     status("used %d of %d hash buckets, maximal bucket size: %d",
-        static_cast<size_t>(StoredKnowledge::hashTree.size()),
-        (1 << (8*sizeof(hash_t))), static_cast<size_t>(StoredKnowledge::stats.maxBucketSize));
-    status("at most %d interface markings per inner marking",
-        StoredKnowledge::stats.maxInterfaceMarkings);
+        static_cast<size_t>(StoredKnowledge::hashTree.size()), (1 << (8*sizeof(hash_t))), static_cast<size_t>(StoredKnowledge::stats.maxBucketSize));
     status("calculated %d trivial SCCs",
         StoredKnowledge::stats.numberOfTrivialSCCs);
     status("calculated %d non-trivial SCCs, at most %d members in nontrivial SCC",
@@ -345,9 +342,9 @@ int main(int argc, char** argv) {
 
     // analyze root node and print result
     if (StoredKnowledge::root->is_sane) {
-        message("%snet is controllable%s: %sYES%s", _c0, _c_, _cG, _c_);
+        message("%snet is controllable%s: %sYES%s", _c0_, _c_, _cG_, _c_); 
     } else {
-        message("%snet is controllable%s: %sNO%s", _c0, _c_, _cR, _c_);
+        message("%snet is controllable%s: %sNO%s", _c0_, _c_, _cR_, _c_);
         if (not args_info.diagnose_given) {
             message("use '--diagnose' option for diagnosis information");
         }

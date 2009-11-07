@@ -60,32 +60,32 @@ const bool _useColor = false;
 #endif
 
 /// set foreground color to red
-#define _cr (_useColor ? "\033[0;31m" : "" )
+#define _cr_ (_useColor ? "\033[0;31m" : "" )
 /// set foreground color to green
-#define _cg (_useColor ? "\033[0;32m" : "" )
+#define _cg_ (_useColor ? "\033[0;32m" : "" )
 /// set foreground color to yellow
-#define _cy (_useColor ? "\033[0;33m" : "" )
+#define _cy_ (_useColor ? "\033[0;33m" : "" )
 /// set foreground color to blue
-#define _cb (_useColor ? "\033[0;34m" : "" )
+#define _cb_ (_useColor ? "\033[0;34m" : "" )
 /// set foreground color to magenta
-#define _cm (_useColor ? "\033[0;35m" : "" )
+#define _cm_ (_useColor ? "\033[0;35m" : "" )
 /// set foreground color to cyan
-#define _cc (_useColor ? "\033[0;36m" : "" )
+#define _cc_ (_useColor ? "\033[0;36m" : "" )
 
 /// set foreground color to black (bold)
-#define _c0 (_useColor ? "\033[0;1;30m" : "" )
+#define _c0_ (_useColor ? "\033[0;1;30m" : "" )
 /// set foreground color to red (bold)
-#define _cR (_useColor ? "\033[0;1;31m" : "" )
+#define _cR_ (_useColor ? "\033[0;1;31m" : "" )
 /// set foreground color to green (bold)
-#define _cG (_useColor ? "\033[0;1;32m" : "" )
+#define _cG_ (_useColor ? "\033[0;1;32m" : "" )
 /// set foreground color to yellow (bold)
-#define _cY (_useColor ? "\033[0;1;33m" : "" )
+#define _cY_ (_useColor ? "\033[0;1;33m" : "" )
 /// set foreground color to blue (bold)
-#define _cB (_useColor ? "\033[0;1;34m" : "" )
+#define _cB_ (_useColor ? "\033[0;1;34m" : "" )
 /// set foreground color to magenta (bold)
-#define _cM (_useColor ? "\033[0;1;35m" : "" )
+#define _cM_ (_useColor ? "\033[0;1;35m" : "" )
 /// set foreground color to cyan (bold)
-#define _cC (_useColor ? "\033[0;1;36m" : "" )
+#define _cC_ (_useColor ? "\033[0;1;36m" : "" )
 
 /// reset foreground color
 #define _c_ (_useColor ? "\033[m" : "")

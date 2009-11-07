@@ -80,13 +80,12 @@ void InnerMarking::initialize() {
     markingMap.clear();
     finalMarkingReachableMap.clear();
 
-    if (stats.final_markings == 0) {
-        message("%swarning%s: %sno final marking found%s", _c0, _c_, _cY, _c_);
-    }
+    status("stored %d inner markings (%d final, %d bad, %d inevitable deadlocks)",
+        stats.markings, stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
 
-    status("found %d final markings, %d bad states, and %d inevitable deadlocks",
-        stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
-    status("stored %d inner markings", stats.markings);
+    if (stats.final_markings == 0) {
+        message("%swarning%s: %sno final marking found%s", _c0_, _c_, _cY_, _c_);
+    }
 }
 
 

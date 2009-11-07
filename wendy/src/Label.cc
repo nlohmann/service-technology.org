@@ -125,8 +125,8 @@ void Label::initialize() {
 //    for (unsigned int i = first_receive; i <= last_sync; ++i) {
 //        status("label with id %2d is '%s%s'", i, PREFIX(i), id2name[i].c_str());
 //    }
-    status("initialized labels for %d events (%d asynchronous, %d synchronous)",
-        events, send_events+receive_events, sync_events);
+//    status("initialized labels for %d events (%d asynchronous, %d synchronous)",
+//        events, send_events+receive_events, sync_events);
 
     // 2-bit annotations must not be used with synchronous communication
     if (Label::sync_events > 0 and args_info.formula_arg == formula_arg_bits) {

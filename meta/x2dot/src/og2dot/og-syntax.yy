@@ -187,6 +187,7 @@ node:
 		break;
 	//Store current node and map its ID to its annotation
 	nodes.push_back($1);
+	std::cout << "DEBUG: Storing node " << $1 << std::endl;
 	currentNode = $1;
 	nodeAnnotation[$1] = strStream.str();
 	strStream.str("");
@@ -227,7 +228,13 @@ formula:
 
 | KEY_FALSE {strStream << " FALSE ";}
 
-| IDENT {strStream << $1;}
+| IDENT 
+	{
+		if(args_info.noPrefix_given)
+			strStream << $1;
+		else 
+			strStream << labelPrefix[$1] << $1;
+	}
 ;
 
 

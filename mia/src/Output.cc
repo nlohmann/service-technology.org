@@ -52,7 +52,7 @@ Output::Output() :
         abort(13, "could not create to temporary file '%s'", filename.c_str());
     }
 
-    status("writing to temporary file '%s'", filename.c_str());
+    status("writing to temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
 }
 
 /*!
@@ -67,11 +67,11 @@ Output::Output(std::string str, std::string kind) :
     filename(str), temp(NULL), kind(kind)
 {
     if (not os.good()) {
-        abort(11, "could not write to file '%s'", str.c_str());
+        abort(11, "could not write to file '%s%s%s'", _cb, str.c_str(), _c_);
     }
 
     if (str.compare("-")) {
-        status("writing %s to file '%s'", kind.c_str(), filename.c_str());
+        status("writing %s to file '%s%s%s'", kind.c_str(), _cb, filename.c_str(), _c_);
     } else {
         status("writing %s to standard output", kind.c_str());
     }
@@ -90,15 +90,15 @@ Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
         if (!temp) {
-            status("closed file '%s'", filename.c_str());
+            status("closed file '%s%s%s'", _cb, filename.c_str(), _c_);
         } else {
             if (args_info.noClean_flag) {
-                status("closed temporary file '%s'", filename.c_str());
+                status("closed temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
             } else {
                 if (remove(filename.c_str()) == 0) {
-                    status("closed and deleted temporary file '%s'", filename.c_str());
+                    status("closed and deleted temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
                 } else {
-                    status("closed, but could not delete temporary file '%s'", filename.c_str());
+                    status("closed, but could not delete temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
                 }
             }
         }

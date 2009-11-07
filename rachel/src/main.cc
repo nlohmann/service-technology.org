@@ -230,10 +230,10 @@ int main(int argc, char** argv) {
 
         // statistical output
         status("calculating %s", cmdline_parser_mode_values[args_info.mode_arg]);
-        status("source (SA): %s\t%u nodes",
-                basename(args_info.automaton_arg), static_cast<unsigned int>(A.nodes.size()));
-        status("target (OG): %s\t%u nodes",
-                basename(args_info.og_arg), static_cast<unsigned int>(B.nodes.size()));
+        status("source (SA): %s%s%s\t%u nodes",
+                _cb, basename(args_info.automaton_arg), _c_, static_cast<unsigned int>(A.nodes.size()));
+        status("target (OG): %s%s%s\t%u nodes",
+                _cb, basename(args_info.og_arg), _c_, static_cast<unsigned int>(B.nodes.size()));
     }
 
 
@@ -253,11 +253,11 @@ int main(int argc, char** argv) {
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case(mode_arg_simulation): {
-            message("similarity: %.2f", Simulation::simulation()); break;
+            message("%ssimilarity: %.2f%s", _c0, Simulation::simulation(), _c_); break;
         }
 
         case(mode_arg_matching): {
-            message("matching: %.2f", Matching::matching()); break;
+            message("%smatching: %.2f%s", _c0, Matching::matching(), _c_); break;
         }
     }
 

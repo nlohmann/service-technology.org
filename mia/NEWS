@@ -22,6 +22,8 @@ Version 1.2-unreleased
 * implemented parameter `--stats' to display information on runtime and
   memory consumption (the latter uses `ps' and does not work under Cygwin)
 
+* colored status messages
+
 
 See file ChangeLog <http://service-technology.org/files/mia/ChangeLog> for
 complete version history.

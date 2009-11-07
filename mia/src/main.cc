@@ -233,7 +233,9 @@ int main(int argc, char** argv) {
     mpp_file >> pnapi::io::sa >> *mpp_sa;
     mpp_file.close();
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp_sa << std::endl;
+        std::ostringstream s;
+        s << pnapi::io::stat << *mpp_sa;
+        status("most-permissive partner: %s", s.str().c_str());
     }
 
     /*------------------------.
@@ -247,7 +249,9 @@ int main(int argc, char** argv) {
     target_file >> pnapi::io::owfn >> *target;
     target_file.close();
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": target: " << pnapi::io::stat << *target << std::endl;
+        std::ostringstream s;
+        s << pnapi::io::stat << *target;
+        status("target: %s", s.str().c_str());
     }
 
     /*-------------------------------------------------.
@@ -257,7 +261,9 @@ int main(int argc, char** argv) {
     pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
     time(&end_time);
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat << *mpp << std::endl;
+        std::ostringstream s;
+        s << pnapi::io::stat << *mpp;
+        status("most-permissive partner: %s", s.str().c_str());
     }
     status("converting most-permissive partner done [%.0f sec]", difftime(end_time, start_time));
 
@@ -270,7 +276,9 @@ int main(int argc, char** argv) {
     mpp->compose(*target, "mpp[1].", "target[1].");
     time(&end_time);
     if (args_info.verbose_flag) {
-        std::cerr << PACKAGE << ": composition: " << pnapi::io::stat << *mpp << std::endl;
+        std::ostringstream s;
+        s << pnapi::io::stat << *mpp;
+        status("composition: %s", s.str().c_str());
     }
     status("composition done [%.0f sec]", difftime(end_time, start_time));
 
@@ -325,7 +333,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    status("%d jumper transitions found", jumperCount);
+    message("%s%d jumper transitions found%s", _c0, jumperCount, _c_);
 
     return EXIT_SUCCESS;
 }

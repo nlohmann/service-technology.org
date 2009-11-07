@@ -1,28 +1,29 @@
 /*****************************************************************************\
- Rachel -- Reparing Service Choreographies
+ Wendy -- Synthesizing Partners for Services
 
- Copyright (c) 2008, 2009 Niels Lohmann
+ Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
- Rachel is free software: you can redistribute it and/or modify it under the
+ Wendy is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Rachel is distributed in the hope that it will be useful, but WITHOUT ANY
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+
+#include <config.h>
+#include <libgen.h>
+#include <unistd.h>
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
-#include <libgen.h>
-#include <unistd.h>
-#include <config.h>
 #include "verbose.h"
 #include "Output.h"
 #include "cmdline.h"
@@ -51,7 +52,7 @@ Output::Output() :
         abort(13, "could not create to temporary file '%s'", filename.c_str());
     }
 
-    status("writing to temporary file '%s'", filename.c_str());
+    status("writing to temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
 }
 
 /*!
@@ -66,11 +67,11 @@ Output::Output(std::string str, std::string kind) :
     filename(str), temp(NULL), kind(kind)
 {
     if (not os.good()) {
-        abort(11, "could not write to file '%s'", str.c_str());
+        abort(11, "could not write to file '%s%s%s'", _cb, str.c_str(), _c_);
     }
 
     if (str.compare("-")) {
-        status("writing %s to file '%s'", kind.c_str(), filename.c_str());
+        status("writing %s to file '%s%s%s'", kind.c_str(), _cb, filename.c_str(), _c_);
     } else {
         status("writing %s to standard output", kind.c_str());
     }
@@ -89,15 +90,15 @@ Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
         if (!temp) {
-            status("closed file '%s'", filename.c_str());
+            status("closed file '%s%s%s'", _cb, filename.c_str(), _c_);
         } else {
             if (args_info.noClean_flag) {
-                status("closed temporary file '%s'", filename.c_str());
+                status("closed temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
             } else {
                 if (remove(filename.c_str()) == 0) {
-                    status("closed and deleted temporary file '%s'", filename.c_str());
+                    status("closed and deleted temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
                 } else {
-                    status("closed, but could not delete temporary file '%s'", filename.c_str());
+                    status("closed, but could not delete temporary file '%s%s%s'", _cb, filename.c_str(), _c_);
                 }
             }
         }

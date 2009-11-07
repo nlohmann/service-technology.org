@@ -31,6 +31,8 @@ Version 1.14-unreleased
 * implemented parameter `--stats' to display information on runtime and
   memory consumption (the latter uses `ps' and does not work under Cygwin)
 
+* colored status messages
+
 Version 1.13 (6 June 2009)
 ==========================
 

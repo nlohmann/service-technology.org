@@ -200,6 +200,9 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
     // a temporary data structure to store the predecessor relation
     std::map<StoredKnowledge*, std::set<StoredKnowledge*> > tempPredecessors;
 
+    // remember if from at least one node of the current SCC a final node is reachable
+    bool is_final_reachable = false;
+
     // if it is not a TSCC, we have to evaluate each member of the SCC
     // first, we generate the predecessor relation between the members
     for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
@@ -210,6 +213,19 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
 
                 tempPredecessors[(**iScc).successors[l-1]].insert(*iScc);
             }
+            // check if there exists a successor (within or without the current SCC) from which a
+            // final node is reachable
+            if ((**iScc).successors[l-1] != NULL and (**iScc).successors[l-1] != empty and
+                (**iScc).successors[l-1]->is_final_reachable) {
+                is_final_reachable = true;
+            }
+        }
+    }
+
+    // propagate that at least from one node of the current SCC a final node is reachable
+    if (is_final_reachable) {
+        for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
+            (**iScc).is_final_reachable = true;
         }
     }
 
@@ -579,6 +595,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
         // we found a deadlock -- check whether for at least one marked
         // output place exists a respective receiving edge
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+
             if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
 

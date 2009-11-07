@@ -494,6 +494,13 @@ AT_CHECK([GREP -q "net is controllable: YES" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
+AT_SETUP([Bug 14693 Part 2 (https://gna.org/bugs/?14693)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/zeus.owfn .])
+AT_CHECK([WENDY zeus.owfn --verbose --correctness=livelock],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: YES" stderr])
+AT_KEYWORDS(bug)
+AT_CLEANUP
 
 
 ############################################################################

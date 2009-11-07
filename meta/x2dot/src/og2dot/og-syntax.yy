@@ -7,10 +7,15 @@
 #include <string.h>
 #include <sstream>
 
+#include "cmdline.h"
+
 //Result of lexical analyis
 extern char* og_yytext;
 extern int og_yylex();
 extern int og_yyerror(char const *msg);
+
+// the command line parameters (declared in main.cc)
+extern gengetopt_args_info args_info;
 
 //Output stream defined and used in main.cc
 extern std::ostream* outStream;
@@ -32,6 +37,11 @@ std::map<unsigned int, std::string> nodeAnnotation;
 std::map<unsigned int, std::vector<std::pair<char*, unsigned int> > > nodeSuccessors;
 
 std::stringstream strStream;
+
+//Mapping of labels to their prefixes
+
+std::map<std::string, char> labelPrefix;
+char currentSection = ' ';
 
 %}
 
@@ -95,7 +105,10 @@ og:
 		for(int j=0;j<successors.size();++j){
 			(*outStream) << nodes[i];
 			(*outStream) << " -> " << successors[j].second;
-			(*outStream) << " [label= " << successors[j].first << "]\n";
+			if(args_info.noPrefix_given)
+				(*outStream) << " [label= \"" << successors[j].first << "\"]\n";
+			else
+				(*outStream) << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";	
 		}
 	
 
@@ -113,26 +126,48 @@ og:
 
 input:
   /* empty */
-| KEY_INPUT identlist SEMICOLON
+| KEY_INPUT {currentSection = 'i';}
+  identlist SEMICOLON
 ;
 
 
 output:
   /* empty */
-| KEY_OUTPUT identlist SEMICOLON
+| KEY_OUTPUT {currentSection = 'o';} 
+  identlist SEMICOLON 
 ;
 
 
 synchronous:
   /* empty */
-| KEY_SYNCHRONOUS identlist SEMICOLON
+| KEY_SYNCHRONOUS {currentSection = 's';}
+  identlist SEMICOLON
 ;
 
 
 identlist:
   /* empty */
-| IDENT {free($1);}
-| identlist COMMA IDENT {free($3);}
+| IDENT 
+	{
+		switch(currentSection){
+			case 'i': labelPrefix[$1] = '?'; break;
+			case 'o': labelPrefix[$1] = '!'; break;
+			case 's': labelPrefix[$1] = '#'; break;
+			default: labelPrefix[$1] = ' ';
+		}	
+	
+	}
+| identlist COMMA IDENT
+	{
+		switch(currentSection){
+			case 'i': labelPrefix[$3] = '?'; break;
+			case 'o': labelPrefix[$3] = '!'; break;
+			case 's': labelPrefix[$3] = '#'; break;
+			default: labelPrefix[$3] = ' ';
+		}	
+	
+	}	
+
 ;
 
 

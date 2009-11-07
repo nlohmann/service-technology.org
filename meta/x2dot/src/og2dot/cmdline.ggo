@@ -1,6 +1,6 @@
 args "--include-getopt"
 
-purpose "og2dot converts 2-bit operating guidelines into dot format."
+purpose "og2dot converts operating guidelines into dot format."
 
 description "About og2dot:"
 
@@ -20,4 +20,10 @@ option "output" o
 
 option "old" -
   "Use old Fiona format. If this flag is not set, Wendy format will be used."
+  flag off
+
+section "Labeling"
+
+option "noPrefix" -
+  "If this flag is set, labels will not be prefixed."  
   flag off

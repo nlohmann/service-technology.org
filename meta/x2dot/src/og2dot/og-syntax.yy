@@ -36,7 +36,16 @@ std::map<unsigned int, std::string> nodeAnnotation;
 
 std::map<unsigned int, std::vector<std::pair<char*, unsigned int> > > nodeSuccessors;
 
+//Mapping of node ID to it's color
+
+std::map<unsigned int, char> nodeColor;
+
+//Initial node ID
+int initialNode;
+
+//Helper variables
 std::stringstream strStream;
+std::stringstream strStreamOld;
 
 //Mapping of labels to their prefixes
 
@@ -50,8 +59,8 @@ char currentSection = ' ';
 %token_table
 %defines
 
-%token KEY_NODES
-%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
+%token KEY_NODES KEY_TRANSITIONS KEY_INITIALNODE
+%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS KEY_RED KEY_BLUE KEY_FINALNODE
 %token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
 %token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
 %token LPAR RPAR
@@ -59,11 +68,12 @@ char currentSection = ' ';
 %union {
     char* str;
     unsigned int value;
-    char bit;
+    char ch;
 }
 
 %type <value> NUMBER
-%type <str>   IDENT
+%type <str>   IDENT 
+%type <ch>    color
 
 %left OP_OR
 %left OP_AND
@@ -72,21 +82,13 @@ char currentSection = ' ';
 %start og
 %%
 
+
+
 /*Everything concerning the interface of the operating guideline can
 safely be skipped as it is not relevant for creating
 the dot output */
 
 og:
-
-  {
-	//Write keyword to stream
-	(*outStream) << "digraph{\n\n";
-	//Use Helvetica
-	(*outStream) << "edge [fontname=Helvetica fontsize=10]\n";
-	(*outStream) << "node [fontname=Helvetica fontsize=10]\n";
- 	
-
-  }
 
   KEY_INTERFACE input output synchronous KEY_NODES nodes
 
@@ -120,6 +122,39 @@ og:
 	(*outStream) << "\n}";
 
   }
+
+/*Syntax for old format*/
+|  KEY_INTERFACE input output synchronous nodesOld
+
+  {
+	for(int i=0;i<nodes.size();++i){			
+		//List nodes
+		(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"";
+		if(nodeColor[nodes[i]]=='b' || nodeColor[nodes[i]]=='r'){
+			(*outStream) << ",style= \"filled\"";
+			if(nodeColor[nodes[i]]=='b')
+				(*outStream) << ",color=\"blue\"]\n";
+			else
+				(*outStream) << ",color=\"red\"]\n";		
+		}
+		else
+			(*outStream) << "]\n";
+	}
+
+  }
+ 
+ initialnode transitions	
+
+  {
+	//Create invisible node (in order to mark the initial state)
+	(*outStream) << "INIT" << initialNode <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
+  	//Mark initial state
+	(*outStream) << "INIT" << initialNode << " -> " << initialNode << " [minlen=\"0.5\"]" << "\n";
+	//Finish writing output
+	(*outStream) << "\n}";
+	
+  }
+
 ;
 
 
@@ -177,7 +212,6 @@ nodes:
 | nodes node
 ;
 
-
 node:
   NUMBER annotation
 
@@ -195,6 +229,99 @@ node:
   successors
 ;
 
+nodesOld: 
+  KEY_NODES nodes_list SEMICOLON
+;
+
+
+nodes_list:
+  /* empty */
+| nodeOld 
+| nodes_list COMMA nodeOld
+;
+
+
+nodeOld:
+  NUMBER
+	
+	{
+		//Store current node and map its ID to its annotation
+		nodes.push_back($1);
+	}
+	
+| NUMBER COLON formula
+	
+	{
+		nodes.push_back($1);
+		nodeAnnotation[$1] = strStreamOld.str();
+		strStreamOld.str("");
+	}
+	
+| NUMBER COLON KEY_FINALNODE
+		
+	{
+		nodes.push_back($1);
+		nodeAnnotation[$1] = strStreamOld.str();
+		strStreamOld.str("");
+	}
+	
+| NUMBER COLON formula COLON color
+		
+	{
+		nodes.push_back($1);
+		nodeAnnotation[$1] = strStreamOld.str();
+		nodeColor[$1] = $5;
+		strStreamOld.str("");
+	}
+	
+| NUMBER COLON formula COLON KEY_FINALNODE
+		
+	{
+		nodes.push_back($1);
+		nodeAnnotation[$1] = strStreamOld.str();
+		strStreamOld.str("");
+	}
+
+| NUMBER COLON formula COLON color COLON KEY_FINALNODE
+	
+	{
+		nodes.push_back($1);
+		nodeAnnotation[$1] = strStreamOld.str();
+		nodeColor[$1] = $5;
+		strStreamOld.str("");
+	}
+
+;
+
+color: 
+	{$$ = ' ';}
+| KEY_BLUE {$$ = 'b';}
+| KEY_RED {$$ = 'r';}
+;
+
+initialnode:
+  KEY_INITIALNODE NUMBER SEMICOLON {initialNode = $2;}
+;
+
+
+transitions:
+  KEY_TRANSITIONS transitions_list SEMICOLON
+;
+
+
+transitions_list:
+  /* empty */
+| transition
+| transitions_list COMMA transition
+;
+
+
+transition:
+  NUMBER ARROW NUMBER COLON IDENT 
+  	{
+		*(outStream) << $1 << "->" << $3 << "[label=\"" << $5 << "\"]\n";
+  	}
+;
 
 annotation:
   /* empty */
@@ -206,33 +333,34 @@ annotation:
 
 
 formula:
-  LPAR {strStream << "(";}
+  LPAR {strStream << "("; strStreamOld << "(";}
   formula
-  RPAR {strStream << ")";}
+  RPAR {strStream << ")"; strStreamOld << ")";}
 
 | formula 
-  OP_AND {strStream << " &and; ";} 
+  OP_AND {strStream << " &and; "; strStreamOld << " &and; ";} 
   formula 
 
 | formula 
-  OP_OR  {strStream << " &or; ";} 
+  OP_OR  {strStream << " &or; "; strStreamOld <<  " &or; ";} 
   formula 
 
-| OP_NOT  {strStream << " &not; ";} 
+| OP_NOT  {strStream << " &not; "; strStreamOld << " &not; ";} 
   formula 
 
-| KEY_FINAL {strStream << " FINAL ";}
+| KEY_FINAL {strStream << " FINAL "; strStreamOld << " FINAL ";}
 
-| KEY_TRUE {strStream << " TRUE ";}
+| KEY_TRUE {strStream << " TRUE "; strStreamOld << " TRUE ";}
 
-| KEY_FALSE {strStream << " FALSE ";}
+| KEY_FALSE {strStream << " FALSE "; strStreamOld << " FALSE ";}
 
 | IDENT 
 	{
-		if(args_info.noPrefix_given)
+		 if(args_info.noPrefix_given)
 			strStream << $1;
-		else 
+		 else 
 			strStream << labelPrefix[$1] << $1;
+		 strStreamOld << $1;
 	}
 ;
 

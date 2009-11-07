@@ -1,7 +1,6 @@
 bin_PROGRAMS = og2dot
 
 og2dot_SOURCES = og-syntax.yy og-lexic.ll \
-                 og_old-syntax.yy og_old-lexic.ll \
                  main.cc config.h \
                  cmdline.c cmdline.h 
 

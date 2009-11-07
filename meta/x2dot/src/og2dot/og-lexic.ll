@@ -30,6 +30,9 @@ number         [0-9]+
 
 "NODES"                                 { return KEY_NODES;            }
 
+"INITIALNODE"                           { return KEY_INITIALNODE;      }
+"TRANSITIONS"                           { return KEY_TRANSITIONS;      }
+
 "INTERFACE"                             { return KEY_INTERFACE;        }
 "INPUT"                                 { return KEY_INPUT;            }
 "OUTPUT"                                { return KEY_OUTPUT;           }
@@ -45,6 +48,10 @@ number         [0-9]+
 "+"                                     { return OP_OR;                }
 "("                                     { return LPAR;                 }
 ")"                                     { return RPAR;                 }
+
+"RED"                                   { return KEY_RED;              }
+"BLUE"                                  { return KEY_BLUE;             }
+"FINALNODE"                             { return KEY_FINALNODE;        }
 
 ":"                                     { return COLON;                }
 "::"                                    { BEGIN(BITS); return DOUBLECOLON; }

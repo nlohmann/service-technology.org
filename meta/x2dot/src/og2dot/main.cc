@@ -22,12 +22,6 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 extern FILE* og_yyin;
 
-/// lexer and parser for old Fiona format
-extern int og_old_yyparse();
-extern int og_old_yylex_destroy();
-extern FILE* og_old_yyin;
-
-FILE* filePtr;
 /// output stream
 std::ostream* outStream = &cout;
 
@@ -75,16 +69,8 @@ int main(int argc, char** argv)
   if(args_info.input_given) // if user set an input file
   {
     // open file and link input file pointer
-    FILE* filePtr;
-    if(args_info.old_given){
-	og_old_yyin = fopen(args_info.input_arg, "r");
-	filePtr = og_old_yyin;
-    }
-    else{
-	og_yyin = fopen(args_info.input_arg, "r");
-	filePtr = og_yyin;
-    }
-    if(!filePtr) // if an error occurred
+    og_yyin = fopen(args_info.input_arg, "r");
+    if(!og_yyin) // if an error occurred
     {
       cerr << PACKAGE << ": ERROR: failed to open input file '"
            << args_info.input_arg << "'" << endl;
@@ -92,28 +78,19 @@ int main(int argc, char** argv)
     }
   }
   
-  //Decide whether which format to use for parsing
-  if(args_info.old_given){
-  	/// actual parsing
-  	og_old_yyparse();
+  //Write keyword to stream
+  (*outStream) << "digraph{\n\n";
+  //Use Helvetica
+  (*outStream) << "edge [fontname=Helvetica fontsize=10]\n";
+  (*outStream) << "node [fontname=Helvetica fontsize=10]\n";
+	
 
- 	// close input (output is closed by destructor)
- 	fclose(og_old_yyin);
-
+  /// actual parsing
+   og_yyparse();
+	
+ // close input (output is closed by destructor)   fclose(og_yyin);
+ /// clean lexer memory   og_yylex_destroy();
   
- 	/// clean lexer memory
-	og_old_yylex_destroy();
-  }
-  else{
-	/// actual parsing
-  	og_yyparse();
-
- 	// close input (output is closed by destructor)
- 	fclose(og_yyin);
-  
- 	/// clean lexer memory
-	og_yylex_destroy();
-  }
 
 
   return EXIT_SUCCESS; // finished parsing

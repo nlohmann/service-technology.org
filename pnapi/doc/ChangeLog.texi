@@ -1,4 +1,9 @@
-@heading Version 3.00
+@heading Version 3.01-unreleased
+@itemize
+@item reimplemented normalize() according to [LohmannMW_2007_icatpn]
+@end itemize
+
+@heading Version 3.00 (2009-11-03)
 @itemize
 @item final condition can now be converted in disjunctive normal form
 @item added type getter to formula classes

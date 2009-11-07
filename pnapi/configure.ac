@@ -1,4 +1,4 @@
-AC_INIT(Petri Net API, 3.00, pnapi@service-technology.org, pnapi)
+AC_INIT(Petri Net API, 3.01-unreleased, pnapi@service-technology.org, pnapi)
 
 # the first line should be everything you will ever need to touch
 #############################################################################

@@ -35,7 +35,7 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             smartSendingEvent.fiona.og smartSendingEvent.owfn \
             smtp3.fiona.og smtp3.owfn sync_cover.owfn sync_cover.owfn.cov \
             sync_deadlock.owfn test-sync.owfn uncontrollable.owfn \
-            zeus.fiona.og zeus.owfn
+            zeus.fiona.og zeus.owfn bignode1500000.owfn
 
 
 

@@ -43,3 +43,13 @@ AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHR
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
 AT_CLEANUP
+
+AT_SETUP([Big Node (1500000)])
+m4_define([TESTCASE], [bignode1500000])
+AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
+AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP

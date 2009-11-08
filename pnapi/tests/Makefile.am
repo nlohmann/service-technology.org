@@ -177,6 +177,15 @@ cover-html: descriptions cover.info
 
 cover: cover-check cover-html
 
+# use ZCOV for branch coverage
+cover-branch: cover-prepare $(TESTSUITE)
+	test ! -d cover || rm -fr cover
+	$(MKDIR_P) cover
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=ZCOV
+	zcov/zcov-merge cover/output.zcov cover/*.zcov
+	zcov/zcov-genhtml cover/output.zcov cover-html
+	@echo see `pwd`/cover-html/index.html for a coverage report
+
 # clean also the temp files in the src directory
 CLEANFILES = -fr cover descriptions 
 MAINTAINERCLEANFILES = -fr cover-html cover.info

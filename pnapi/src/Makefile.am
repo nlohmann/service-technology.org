@@ -37,6 +37,8 @@ include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
           Output.h
 
 
+EXTRA_DIST = Makefile.am.customer
+
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
 #############################################################################
@@ -45,7 +47,6 @@ include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
 BUILT_SOURCES =
-EXTRA_DIST =
 MAINTAINERCLEANFILES =
 DISTCLEANFILES = 
 

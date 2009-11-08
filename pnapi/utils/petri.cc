@@ -11,9 +11,13 @@
 #include "pnapi.h"
 #include "cmdline.h"
 #include "config.h"
+#include "Output.h"
+#include "verbose.h"
 
+//*
 using std::cerr;
 using std::endl;
+//*/
 using std::vector;
 using std::map;
 using std::string;
@@ -27,6 +31,9 @@ gengetopt_args_info args_info;
 
 /// a suffix for the output filename
 string suffix = "";
+
+/// a variable holding the time of the call
+clock_t start_clock = clock();
 
 typedef enum { TYPE_OPENNET, TYPE_LOLANET } objectType;
 
@@ -46,16 +53,30 @@ void evaluateParameters(int argc, char** argv) {
     struct cmdline_parser_params *params = cmdline_parser_params_create();
 
     // call the cmdline parser
-    if (cmdline_parser (argc, argv, &args_info) != 0) {
-        fprintf(stderr, "       see 'petri --help' for more information\n");
-        exit(EXIT_FAILURE);
+    if (cmdline_parser(argc, argv, &args_info) != 0) {
+        abort(1, "invalid command-line parameter(s)");
     }
 
     free(params);
 }
 
 
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // print statistics
+    if (args_info.stats_flag) {
+        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s%s%s: memory consumption: ", _cm_, PACKAGE, _c_);
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
+
+
 int main(int argc, char** argv) {
+  
+    // set the function to call on normal termination
+    atexit(terminationHandler);
+  
     evaluateParameters(argc, argv);
 
     vector<FileObject> objects;
@@ -129,14 +150,15 @@ int main(int argc, char** argv) {
                 }
             }
         } catch (io::InputError error) {
-            cerr << "petri:" << error << endl;
-            exit(EXIT_FAILURE);
+            std::stringstream ss;
+            ss << error;
+            abort(2, "Input Error: %s", ss.str().c_str());
         }
 
-        if (args_info.verbose_given) {
-          cerr << "petri:<stdin>: " << io::stat << *(current.net) << endl;
-        }
-
+        std::stringstream ss;
+        ss << io::stat << *(current.net);
+        status("<stdin>: %s", ss.str().c_str());
+        
         // store object
         objects.push_back(current);
     } else {
@@ -148,8 +170,7 @@ int main(int argc, char** argv) {
             // try to open file
             ifstream infile(args_info.inputs[i], ifstream::in);
             if (!infile.is_open()) {
-                cerr << "petri: could not read from file '" << args_info.inputs[i] << "'" << endl;
-                exit(EXIT_FAILURE);
+                abort(3, "could not read from file '%s'", args_info.inputs[i]);
             }
 
             // try to parse net
@@ -185,16 +206,17 @@ int main(int argc, char** argv) {
                     }
                 }
             } catch (io::InputError error) {
-                cerr << "petri:" << error << endl;
                 infile.close();
-                exit(EXIT_FAILURE);
+                std::stringstream ss;
+                ss << error;
+                abort(2, "Input Error: %s", ss.str().c_str());
             }
 
             infile.close();
 
-            if (args_info.verbose_given) {
-              cerr << "petri:" << args_info.inputs[i] << ": " << io::stat << *(current.net) << endl;
-            }
+            std::stringstream ss;
+            ss << io::stat << *(current.net);
+            status("%s: %s", args_info.inputs[i], ss.str().c_str()); 
 
             // store object
             objects.push_back(current);
@@ -223,13 +245,10 @@ int main(int argc, char** argv) {
             // try to open wiring file
             ifstream infile(args_info.wire_arg, ifstream::in);
             if (!infile.is_open()) {
-                cerr << "petri: could not read from wiring file '" << args_info.wire_arg << "'" << endl;
-                exit(EXIT_FAILURE);
+                abort(3, "could not read from wiring file '%s'", args_info.wire_arg);
             }
 
-            if (args_info.verbose_given) {
-                cerr << "petri: composing " << objects.size() << " nets according to '" << args_info.wire_arg << "'" << endl;
-            }
+            status("composing %d nets according to '%s'", objects.size(), args_info.wire_arg);
 
             // create a new net consisting of the composed nets
             try {
@@ -238,24 +257,23 @@ int main(int argc, char** argv) {
                     >> meta(io::INVOCATION, invocation)
                     >> io::onwd >> pnapi::io::nets(netsByName) >> net;
             } catch (io::InputError error) {
-                cerr << "petri:" << error << endl;
-                exit(EXIT_FAILURE);
+                std::stringstream ss;
+                ss << error;
+                abort(2, "Input Error: %s", ss.str().c_str());
             }
         } else {
             // no wiring file is given
             compositionName = "composition"; //FIXME: choose a nicer name
 
-            if (args_info.verbose_given) {
-                cerr << "petri: composing " << objects.size() << " nets using implicit wiring" << endl;
-            }
+            status("composing %d nets using implicit wiring", objects.size());
 
             // calling implicit composition
             net = PetriNet::composeByWiring(netsByName);
         }
 
-        if (args_info.verbose_given) {
-            cerr << "petri:" << compositionName << ".owfn: " << io::stat << net << endl;
-        }
+        std::stringstream ss;
+        ss << io::stat << net;
+        status("%s.owfn: %s", compositionName.c_str(), ss.str().c_str()); 
 
         // remove the parsed objects
         objects.clear();
@@ -274,8 +292,7 @@ int main(int argc, char** argv) {
         // try to open file
         ifstream infile(args_info.compose_arg, ifstream::in);
         if (!infile.is_open()) {
-            cerr << "petri: could not read from file '" << args_info.compose_arg << "'" << endl;
-            exit(EXIT_FAILURE);
+            abort(3, "could not read from file '%s'", args_info.compose_arg);
         }
 
         PetriNet secondNet; // to store composition "partner"
@@ -299,15 +316,13 @@ int main(int argc, char** argv) {
      ***********/
     if (args_info.produce_given) {
         if (args_info.inputs_num > 1) {
-            cerr << "petri: at most one net can be used with '--produce' parameter" << endl;
-            exit(EXIT_FAILURE);
+            abort(4, "at most one net can be used with '--produce' parameter");
         }
 
         // try to open file
         ifstream infile(args_info.produce_arg, ifstream::in);
         if (!infile.is_open()) {
-            cerr << "petri: could not read from file '" << args_info.produce_arg << "'" << endl;
-            exit(EXIT_FAILURE);
+            abort(3, "could not read from file '%s'", args_info.produce_arg);
         }
 
         PetriNet constraintNet; // to store constraint
@@ -328,9 +343,7 @@ int main(int argc, char** argv) {
         suffix += ".normalized";
         for (unsigned int i = 0; i < objects.size(); ++i) {
 
-            if (args_info.verbose_given) {
-                cerr << "petri: normalizing reducing Petri net '" << objects[i].filename << "'..." << endl;
-            }
+            status("normalizing reducing Petri net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->normalize();
         }
@@ -340,9 +353,7 @@ int main(int argc, char** argv) {
         suffix += ".negated";
         for (unsigned int i = 0; i < objects.size(); ++i) {
 
-            if (args_info.verbose_given) {
-                cerr << "petri: negating the final condition of net '" << objects[i].filename << "'..." << endl;
-            }
+            status("negating the final condition of net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->finalCondition().negate();
         }
@@ -352,9 +363,7 @@ int main(int argc, char** argv) {
         suffix += ".mirrored";
         for (unsigned int i = 0; i < objects.size(); ++i) {
 
-            if (args_info.verbose_given) {
-                cerr << "petri: mirroring the net '" << objects[i].filename << "'..." << endl;
-            }
+            status("mirroring the net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->mirror();
         }
@@ -364,10 +373,7 @@ int main(int argc, char** argv) {
         suffix += ".dnf";
         for (unsigned int i = 0; i < objects.size(); ++i) {
           
-            if (args_info.verbose_given) {
-                cerr << "petri: calculation dnf of final condition of net '"
-                     << objects[i].filename << "'..." << endl;
-            }
+            status("calculation dnf of final condition of net '%s'...", objects[i].filename.c_str());
             
             objects[i].net->finalCondition().dnf();
         }
@@ -423,9 +429,7 @@ int main(int argc, char** argv) {
                 level = (PetriNet::ReductionLevel)(level | newLevel);
             }
 
-            if (args_info.verbose_given) {
-                cerr << "petri: structurally reducing Petri net '" << objects[i].filename << "'..." << endl;
-            }
+            status("structurally reducing Petri net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->reduce(level);
         }
@@ -440,22 +444,24 @@ int main(int argc, char** argv) {
         args_info.isNormal_given or
         args_info.isWorkflow_given) {
         for (unsigned int i = 0; i < objects.size(); ++i) {
-            cerr << "petri:" << objects[i].filename << ": ";
+            std::stringstream ss;
 
             // check for free choice
             if (args_info.check_arg == check_arg_freechoice or args_info.isFreeChoice_given) {
-                cerr << objects[i].net->isFreeChoice() << endl;
+                ss << objects[i].net->isFreeChoice() << endl;
             }
 
             // check for normality
             if (args_info.check_arg == check_arg_normal or args_info.isNormal_given) {
-                cerr << objects[i].net->isNormal() << endl;
+                ss << objects[i].net->isNormal() << endl;
             }
 
             // check for workflow structure
             if (args_info.check_arg == check_arg_workflow or args_info.isWorkflow_given) {
-                cerr << objects[i].net->isWorkflow() << endl;
+                ss << objects[i].net->isWorkflow() << endl;
             }
+            
+            message("%s: %s", objects[i].filename.c_str(), ss.str().c_str());
         }
     }
 
@@ -468,45 +474,39 @@ int main(int argc, char** argv) {
             for (unsigned int j = 0; j < args_info.output_given; ++j) {
                 // try to open file to write
                 string outname = objects[i].filename + suffix + "." + args_info.output_orig[j];
-                ofstream outfile(outname.c_str(), ofstream::trunc);
-                if (!outfile.is_open()) {
-                    cerr << "petri: could not write to file '" << outname << "'" << endl;
-                    exit(EXIT_FAILURE);
-                }
+                Output outfile(outname, "Output file");
 
-                if (args_info.verbose_given) {
-                    cerr << "petri: creating file '" << outname << "'..." << endl;
-                }
+                status("creating file '%s'...", outname.c_str());
 
-                outfile << meta(io::OUTPUTFILE, outname);
+                outfile.stream() << meta(io::OUTPUTFILE, outname);
 
                 switch(args_info.output_arg[j]) {
 
                     // create oWFN output
                     case (output_arg_owfn): {
-                        outfile << io::owfn << *(objects[i].net);
+                        outfile.stream() << io::owfn << *(objects[i].net);
                         break;
                     }
 
                     // create LoLA output
                     case (output_arg_lola): {
                         if (args_info.formula_flag)
-                          outfile << io::lola << io::formula << *(objects[i].net);
+                          outfile.stream() << io::lola << io::formula << *(objects[i].net);
                         else
-                          outfile << io::lola << *(objects[i].net);
+                          outfile.stream() << io::lola << *(objects[i].net);
                         break;
                     }
 
                     // create automaton output
                     case (output_arg_sa): {
                         Automaton sauto(*(objects[i].net));
-                        outfile << io::sa << sauto;
+                        outfile.stream() << io::sa << sauto;
                         break;
                     }
 
                     // create dot output
                     case (output_arg_dot): {
-                        outfile << io::dot << *(objects[i].net);
+                        outfile.stream() << io::dot << *(objects[i].net);
                         break;
                     }
 
@@ -516,18 +516,14 @@ int main(int argc, char** argv) {
                     case (output_arg_pdf):
                     case (output_arg_svg): {
                         if (CONFIG_DOT == "not found") {
-                            cerr << "petri: Graphviz dot was not found by configure script; see README" << endl;
-                            cerr << "       necessary for option '--output=owfn'" << endl;
-                            exit(EXIT_FAILURE);
+                            abort(5, "Graphviz dot was not found by configure script");
                         }
 #if !defined(HAVE_POPEN) or !defined(HAVE_PCLOSE)
-                        cerr << "petri: cannot open UNIX pipe to Graphviz dot" << endl;
-                        cerr << "       create dot file with '--output=dot' and call Graphviz dot manually" << endl;
-                        exit(EXIT_FAILURE);
+                        abort(6, "petri: cannot open UNIX pipe to Graphviz dot");
 #endif
                         ostringstream d;
                         d << io::dot << *(objects[i].net);
-                        string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + outname;;
+                        string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
                         FILE *s = popen(call.c_str(), "w");
                         assert(s);
                         fprintf(s, "%s\n", d.str().c_str());
@@ -536,8 +532,6 @@ int main(int argc, char** argv) {
                         break;
                     }
                 }
-
-                outfile.close();
             }
         }
     }

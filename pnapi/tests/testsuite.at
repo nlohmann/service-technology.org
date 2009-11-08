@@ -1,10 +1,11 @@
 AT_INIT
 
-# check if dot/petrify/fiona was found by the configure script
+# check if several tools were found by the configure script
 m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_SVN, [AT_CHECK([if test "SVN" == "not found"; then exit 77; fi])])
 
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])
@@ -251,7 +252,7 @@ AT_SETUP([Bug 14116 (https://gna.org/bugs/?14116)])
 m4_define([NET], [bug14116.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI --isNormal --verbose NET],0,stdout,stderr)
-AT_CHECK([GREP -q "petri:bug14116.owfn: 0" stderr],0)
+AT_CHECK([GREP -q "pnapi: bug14116.owfn: 0" stderr],0)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
@@ -566,7 +567,7 @@ AT_SETUP([Workflow net])
 m4_define([NET], [test_criteria.workflownet.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --isWorkflow],0,ignore,stderr)
-AT_CHECK([GREP -q "petri:NET: 1" stderr])
+AT_CHECK([GREP -q "pnapi: NET: 1" stderr])
 AT_KEYWORDS([frontend criteria])
 AT_CLEANUP
 
@@ -574,7 +575,7 @@ AT_SETUP([No workflow net])
 m4_define([NET], [test_criteria.noworkflownet.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --isWorkflow],0,ignore,stderr)
-AT_CHECK([GREP -q "petri:NET: 0" stderr])
+AT_CHECK([GREP -q "pnapi: NET: 0" stderr])
 AT_KEYWORDS([frontend criteria])
 AT_CLEANUP
 
@@ -582,7 +583,7 @@ AT_SETUP([Free choice net])
 m4_define([NET], [test_criteria.freechoice.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --isFreeChoice],0,ignore,stderr)
-AT_CHECK([GREP -q "petri:NET: 1" stderr])
+AT_CHECK([GREP -q "pnapi: NET: 1" stderr])
 AT_KEYWORDS([frontend criteria])
 AT_CLEANUP
 
@@ -590,7 +591,7 @@ AT_SETUP([No free choice net])
 m4_define([NET], [test_criteria.nofreechoice.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --isFreeChoice],0,ignore,stderr)
-AT_CHECK([GREP -q "petri:NET: 0" stderr])
+AT_CHECK([GREP -q "pnapi: NET: 0" stderr])
 AT_KEYWORDS([frontend criteria])
 AT_CLEANUP
 
@@ -789,5 +790,39 @@ AT_CHECK([GREP -q "NOT" NET2], 1)
 AT_CHECK([GREP -q "<>" NET2], 1)
 AT_CHECK([GREP -q -e "((p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .));" NET2], 0)
 AT_KEYWORDS([formulae dnf])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Customer Tools])
+############################################################################
+
+AT_SETUP([Wendy])
+AT_CHECK_SVN
+AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE wendy], 0, ignore, ignore)
+AT_KEYWORDS([customer])
+AT_CLEANUP
+
+AT_SETUP([Mia])
+AT_CHECK_SVN
+AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE mia], 0, ignore, ignore)
+AT_KEYWORDS([customer])
+AT_CLEANUP
+
+AT_SETUP([Marlene])
+AT_CHECK_SVN
+AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE marlene], 0, ignore, ignore)
+AT_KEYWORDS([customer])
+AT_CLEANUP
+
+AT_SETUP([Yasmina])
+AT_CHECK_SVN
+AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE yasmina], 0, ignore, ignore)
+AT_KEYWORDS([customer])
+AT_CLEANUP
+
+AT_SETUP([Diane])
+AT_CHECK_SVN
+AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE diane], 0, ignore, ignore)
+AT_KEYWORDS([customer])
 AT_CLEANUP
 

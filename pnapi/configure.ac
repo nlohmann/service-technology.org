@@ -29,6 +29,10 @@ AC_CHECK_FUNCS([popen pclose])
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# export tools needed to determine memory consumption
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
@@ -83,6 +87,13 @@ AC_SUBST(GENET)
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_SUBST(FIONA)
 
+# check for svn (would be used in test cases)
+AC_PATH_PROGS(SVN, [svn], not found)
+AC_SUBST(SVN)
+
+# check for GNU make (if it's not the default make)
+AC_PATH_PROGS(MAKE, [gmake make], not found)
+AC_SUBST(MAKE)
 
 # organize assertions -- switch off by "--disable-assert"
 AC_HEADER_ASSERT

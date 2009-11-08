@@ -1,5 +1,10 @@
 @heading Version 3.01-unreleased
 @itemize
+@item make check now tests, whether customer tools still work with the API (see https://gna.org/task/?6813)
+@item added Makefile.am.customer for customer tools
+@item added make target for zcov
+@item copied parameter '--stats' from Wendy to Petri
+@item integrated Output.* and verbose.* to Petri (see https://gna.org/task/?6837)
 @item reimplemented normalize() according to [LohmannMW_2007_icatpn]
 @end itemize
 

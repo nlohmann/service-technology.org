@@ -61,6 +61,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * First Steps::How to set up and install PNAPI.
 * Command Line Options::How to run PNAPI frontend "Petri".
 * Usage::How to use the API in other programs.
+* Error Codes::What the error codes of the frontend "Petri" mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -339,6 +340,93 @@ net.finalCondition().dnf();
 @end smallexample
 @end cartouche
 
+
+@c --------------------------------------------------------------------------
+
+@node Error Codes
+@chapter Error Codes
+
+In case any error occurs, Petri aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+@item #01
+A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{petri --help} for an overview of the valid command-line parameters.
+
+@smallexample
+@cartouche
+pnapi: unrecognized option `--foo'
+pnapi: invalid command-line parameter(s) -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+An error occurred while parsing the net.
+The message will give further information.
+
+@smallexample
+@cartouche
+pnapi: Input Error: stdin:1: error: syntax error, unexpected $end, expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+Could not open input file.
+
+@smallexample
+@cartouche
+pnapi: could not read from file 'foo' -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+Too many nets used with @samp{--produce} parameter.
+
+@smallexample
+@cartouche
+pnapi: at most one net can be used with '--produce' parameter -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+Graphviz dot was not found by configure script; see README.
+Necessary for option @samp{--output=FORMAT} where FORMAT is 'png', 'eps', 'pdf' or 'svg'.
+
+@smallexample
+@cartouche
+pnapi: Graphviz dot was not found by configure script -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #06
+Cannot open UNIX pipe to Graphviz dot.
+Create dot file with @samp{--output=dot} and call Graphviz dot manually.
+
+@smallexample
+@cartouche
+pnapi: cannot open UNIX pipe to Graphviz dot -- aborting [#06]
+@end cartouche
+@end smallexample
+
+@item #11
+Error opening a file to write. Usually, this error occurs in case Petri is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--output} parameter.
+
+@smallexample
+@cartouche
+pnapi: could not write to file `foo.owfn' -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #13
+Petri cannot create a temporary file @file{/tmp/petri-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running Petri under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter.
+
+@smallexample
+@cartouche
+pnapi: could not create a temporary file `/tmp/petri-k4CS4x' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+
+@end table
 
 @c --------------------------------------------------------------------------
 

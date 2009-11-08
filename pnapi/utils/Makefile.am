@@ -1,7 +1,9 @@
 bin_PROGRAMS = petri sa2owfn sa2sm
 noinst_PROGRAMS = generator
 
-petri_SOURCES = petri.cc cmdline.c cmdline.h
+petri_SOURCES = petri.cc cmdline.c cmdline.h \
+		Output.h Output.cc \
+		verbose.h verbose.cc
 generator_SOURCES = generator.cc cmdline.ggo
 sa2owfn_SOURCES = sa2owfn.cc
 sa2sm_SOURCES = sa2sm.cc

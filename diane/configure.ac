@@ -19,6 +19,9 @@ AC_PROG_AWK
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# check and set exact unsigned types
+AC_TYPE_UINT8_T
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

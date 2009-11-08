@@ -23,6 +23,9 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
 AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 
+# check and set exact unsigned types
+AC_TYPE_UINT8_T
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

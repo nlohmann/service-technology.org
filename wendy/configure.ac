@@ -45,6 +45,7 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])
+AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version`]])
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)

@@ -19,15 +19,13 @@
 
 
 #include <config.h>
-#include <set>
 #include "Knowledge.h"
 #include "cmdline.h"
 
 using std::map;
-using std::vector;
-using std::set;
 
 extern gengetopt_args_info args_info;
+typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
 
 
 /***************
@@ -35,8 +33,7 @@ extern gengetopt_args_info args_info;
  ***************/
 
 Knowledge::Knowledge(InnerMarking_ID m)
-        : is_sane(1), size(1),
-          posSendEvents(NULL), posSendEventsDecoded(NULL) {
+        : is_sane(1), size(1), posSendEvents(NULL), posSendEventsDecoded(NULL) {
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     std::queue<FullMarking> todo;
@@ -65,7 +62,7 @@ Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
 
     // CASE 1: we receive -- decrement interface markings
     if (RECEIVING(label)) {
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
+        for (Bubble::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
             for (size_t i = 0; i < pos->second.size(); ++i) {
                 // copy an interface marking from the parent and decrement it
                 bool result = true;
@@ -88,7 +85,7 @@ Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
     if (SENDING(label)) {
         std::queue<FullMarking> todo;
 
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
+        for (Bubble::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             bool receiver = (InnerMarking::receivers[label].find(pos->first) != InnerMarking::receivers[label].end());
 
@@ -124,7 +121,7 @@ Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
     if (SYNC(label)) {
         std::queue<FullMarking> todo;
 
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
+        for (Bubble::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
 
@@ -173,7 +170,7 @@ Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
 
 Knowledge::~Knowledge() {
     // delete the stored interface markings
-    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    for (Bubble::iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
         for (size_t i = 0; i < pos->second.size(); ++i) {
             delete pos->second[i];
         }
@@ -199,21 +196,23 @@ void Knowledge::initialize() {
         sequentializeReceivingEvents();
     }
 
+    if (args_info.ignoreUnreceivedMessages_flag) {
+        return;
+    }
+
     // reduction rule: smart sending event
     // create array of those sending events that are possible in _all_ markings of the current bubble
-    if (not args_info.ignoreUnreceivedMessages_flag) {
-        // initially, every sending event is possible
-        posSendEvents = new PossibleSendEvents(true, 1);
+    // initially, every sending event is possible
+    posSendEvents = new PossibleSendEvents(true, 1);
 
-        // traverse each marking of the current bubble
-        for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
-            // use boolean AND to detect which sending event is possible in each and every marking of the current bubble
-            *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
-        }
-
-        // create array to be used when traversing all events
-        posSendEventsDecoded = posSendEvents->decode();
+    // traverse each marking of the current bubble
+    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+        // use boolean AND to detect which sending event is possible in each and every marking of the current bubble
+        *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
     }
+
+    // create array to be used when traversing all events
+    posSendEventsDecoded = posSendEvents->decode();
 }
 
 
@@ -313,7 +312,7 @@ void Knowledge::closure(std::queue<FullMarking>& todo) {
 bool Knowledge::resolvableWaitstate(const Label_ID& l) const {
     assert(not RECEIVING(l));
 
-    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
         if (InnerMarking::inner_markings[pos->first]->waitstate(l)) {
             return true;
         }
@@ -328,7 +327,7 @@ bool Knowledge::resolvableWaitstate(const Label_ID& l) const {
 */
 bool Knowledge::receivingHelps() const {
     // traverse the inner markings
-    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
 
         // only consider non-final waitstates
         if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
@@ -406,7 +405,7 @@ void Knowledge::sequentializeReceivingEvents() {
     map<InterfaceMarking*, bool> visitStateAgain;
 
     // traverse the inner markings
-    for (map<InnerMarking_ID, vector<InterfaceMarking*> >::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
         // only consider non-final waitstates
         if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
 
@@ -457,7 +456,7 @@ void Knowledge::sequentializeReceivingEvents() {
             if ((currenState->first)->marked(l)) {
 
                 // it will be considered, so continue with the next waitstate
-                if (consideredReceivingEvents.at(l) == true) {
+                if (consideredReceivingEvents.at(l)) {
                     consideredReceivingEvent = l;
                     break;
                 }
@@ -499,7 +498,7 @@ void Knowledge::sequentializeReceivingEvents() {
 bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
     assert(args_info.seqReceivingEvents_flag);
 
-    return (consideredReceivingEvents.at(label) == true);
+    return consideredReceivingEvents.at(label);
 }
 
 

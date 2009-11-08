@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <string>
 #include <unistd.h>
 
 /// unconditionally print a message
@@ -89,5 +90,14 @@ const bool _useColor = false;
 
 /// reset foreground color
 #define _c_ (_useColor ? "\033[m" : "")
+
+#define _ctool_(s)       (std::string(_cm_) + s + _c_).c_str()
+#define _cfilename_(s)   (std::string(_cb_) + s + _c_).c_str()
+#define _coutput_(s)     (std::string(_cB_) + s + _c_).c_str()
+#define _cgood_(s)       (std::string(_cG_) + s + _c_).c_str()
+#define _cbad_(s)        (std::string(_cR_) + s + _c_).c_str()
+#define _cwarning_(s)    (std::string(_cY_) + s + _c_).c_str()
+#define _cimportant_(s)  (std::string(_c0_) + s + _c_).c_str()
+#define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
 
 #endif

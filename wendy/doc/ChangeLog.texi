@@ -7,6 +7,8 @@
 @item removed explicit @code{std::flush} calls
 
 @item colored status messages
+
+@item fixed bug #14693 (@url{https://gna.org/bugs/?14693}): wrong propagation of final states yielded wrong results for livelock freedom
 @end itemize
 
 

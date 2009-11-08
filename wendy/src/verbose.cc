@@ -36,7 +36,7 @@ extern gengetopt_args_info args_info;
  \note use this function rather sparsely in order not to spam the output
 */
 void message(const char* format, ...) {
-    fprintf(stderr, "%s%s%s: ", _cm_, PACKAGE, _c_);
+    fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
     va_list args;
     va_start(args, format);
@@ -55,7 +55,7 @@ void status(const char* format, ...) {
         return;
     }
 
-    fprintf(stderr, "%s%s%s: ", _cm_, PACKAGE, _c_);
+    fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
     va_list args;
     va_start(args, format);
@@ -73,7 +73,7 @@ void status(const char* format, ...) {
  \note The codes should be documented in the manual.
 */
 __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...) {
-    fprintf(stderr, "%s%s%s: %s", _cm_, PACKAGE, _c_, _c0_);
+    fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _c0_);
 
     va_list args;
     va_start(args, format);

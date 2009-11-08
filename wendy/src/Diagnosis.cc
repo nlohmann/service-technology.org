@@ -191,13 +191,11 @@ InnerMarking_ID Diagnosis::lastCommonPredecessor(InnerMarking_ID m1, InnerMarkin
 
     InnerMarking_ID last_common = 0;
     for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
-//        std::cerr << (unsigned int)m;
         bool m1_reach = reachable[m].find(m1) != reachable[m].end();
         bool m2_reach = reachable[m].find(m2) != reachable[m].end();
         if (m1_reach and m2_reach and m > last_common) {
             last_common = m;
         }
-//        std::cerr << "\t" << m1_reach << " " << m2_reach << std::endl;
     }
 
     return last_common;

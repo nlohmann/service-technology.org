@@ -89,7 +89,7 @@ void evaluateParameters(int argc, char** argv) {
     if (args_info.bug_flag) {
         { Output debug_output("bug.log", "configuration information");
           debug_output.stream() << CONFIG_LOG; }
-        message("Please send file '%sbug.log%s' to %s%s%s!", _cb_, _c_, _cB_, PACKAGE_BUGREPORT, _c_);
+        message("Please send file '%s' to %s!", _cfilename_("bug.log"), _coutput_(PACKAGE_BUGREPORT));
         exit(EXIT_SUCCESS);
     }
 
@@ -103,7 +103,7 @@ void evaluateParameters(int argc, char** argv) {
         if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
             abort(14, "error reading configuration file '%s'", args_info.config_arg);
         } else {
-            status("using configuration file '%s%s%s'", _cb_, args_info.config_arg, _c_);
+            status("using configuration file '%s'", _cfilename_(args_info.config_arg));
         }
     } else {
         // check for configuration files
@@ -119,7 +119,7 @@ void evaluateParameters(int argc, char** argv) {
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
                 abort(14, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
-                status("using configuration file '%s%s%s'", _cb_, conf_filename.c_str(), _c_);
+                status("using configuration file '%s'", _cfilename_(conf_filename));
             }
         } else {
             status("not using a configuration file");
@@ -262,8 +262,8 @@ int main(int argc, char** argv) {
     /*--------------------------------------------.
     | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
-    Output temp;
-    temp.stream() << pnapi::io::lola << *InnerMarking::net;
+    Output* temp = new Output();
+    temp->stream() << pnapi::io::lola << *InnerMarking::net;
     // marking information output
     if (args_info.mi_given) {
         std::string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";
@@ -276,20 +276,21 @@ int main(int argc, char** argv) {
     // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     // MinGW does not understand pathnames with "/", so we use the basename
-    std::string command_line = std::string(basename(args_info.lola_arg)) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+    std::string command_line = std::string(basename(args_info.lola_arg)) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    std::string command_line = std::string(args_info.lola_arg) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+    std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
     // call LoLA
-    status("creating a pipe to LoLA by calling '%s'", command_line.c_str());
+    status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
     time(&start_time);
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
     graph_lex_destroy();
     time(&end_time);
-    status("LoLA is done [%.0f sec]", difftime(end_time, start_time));
+    status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    delete temp;
 
     // close marking information output file
     if (args_info.mi_given) {
@@ -338,16 +339,12 @@ int main(int argc, char** argv) {
 
     // traverse all nodes reachable from the root
     StoredKnowledge::root->traverse();
-    status("%d sane nodes reachable", StoredKnowledge::seen.size());
+    status("%d knowledges reachable", StoredKnowledge::seen.size());
 
     // analyze root node and print result
-    if (StoredKnowledge::root->is_sane) {
-        message("%snet is controllable%s: %sYES%s", _c0_, _c_, _cG_, _c_); 
-    } else {
-        message("%snet is controllable%s: %sNO%s", _c0_, _c_, _cR_, _c_);
-        if (not args_info.diagnose_given) {
-            message("use '--diagnose' option for diagnosis information");
-        }
+    message("%s: %s", _cimportant_("net is controllable"), (StoredKnowledge::root->is_sane ? _cgood_("YES") : _cbad_("NO")));
+    if (not StoredKnowledge::root->is_sane and not args_info.diagnose_given) {
+        message("use '%s' option for diagnosis information", _cparameter_("--diagnose"));
     }
 
 
@@ -356,7 +353,7 @@ int main(int argc, char** argv) {
     `--------------------------------*/
     if (args_info.cover_given) {
         Cover::calculate(StoredKnowledge::seen);
-        message("cover constraint is satisfiable: %s", (Cover::satisfiable) ? "YES" : "NO");
+        message("%s: %s", _cimportant_("cover constraint is satisfiable"), (Cover::satisfiable ? _cgood_("YES") : _cbad_("NO")));
     }
 
 

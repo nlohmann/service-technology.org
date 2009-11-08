@@ -84,7 +84,7 @@ void InnerMarking::initialize() {
         stats.markings, stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
 
     if (stats.final_markings == 0) {
-        message("%swarning%s: %sno final marking found%s", _c0_, _c_, _cY_, _c_);
+        message("%s: %s", _cimportant_("warning"), _cwarning_("no final marking found"));
     }
 }
 

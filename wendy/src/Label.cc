@@ -38,7 +38,7 @@ extern gengetopt_args_info args_info;
  * STATIC MEMBERS *
  ******************/
 
-Label_ID Label::first_receive = 1;  //sic!
+Label_ID Label::first_receive = 1;  //sic! (0 is the id for tau)
 Label_ID Label::last_receive = 0;
 Label_ID Label::first_send = 0;
 Label_ID Label::last_send = 0;
@@ -125,11 +125,9 @@ void Label::initialize() {
 //    for (unsigned int i = first_receive; i <= last_sync; ++i) {
 //        status("label with id %2d is '%s%s'", i, PREFIX(i), id2name[i].c_str());
 //    }
-//    status("initialized labels for %d events (%d asynchronous, %d synchronous)",
-//        events, send_events+receive_events, sync_events);
 
     // 2-bit annotations must not be used with synchronous communication
     if (Label::sync_events > 0 and args_info.formula_arg == formula_arg_bits) {
-        abort(10, "2-bit annotations must not be used with synchronous communication");
+        abort(10, "bit annotations must not be used with synchronous communication");
     }
 }

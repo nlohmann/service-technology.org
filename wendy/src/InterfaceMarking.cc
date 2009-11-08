@@ -26,7 +26,7 @@
 #include "Label.h"
 #include "verbose.h"
 
-// a fix for FreeBSD which does not know log2()
+// a fix for systems which do not know log2()
 #ifndef HAVE_LOG2
 #define log2(x)        (log(x) / M_LN2)
 #endif
@@ -80,7 +80,7 @@ void InterfaceMarking::sort(std::vector<InterfaceMarking*> &v) {
     std::vector<InterfaceMarking*> bigger;
     InterfaceMarking& pivot = *v[0];
 
-    for (unsigned int i = 1; i < v.size(); ++i) {
+    for (size_t i = 1; i < v.size(); ++i) {
         if (*v[i] < pivot) {
             smaller.push_back(v[i]);
         } else {
@@ -103,7 +103,7 @@ void InterfaceMarking::sort(std::vector<InterfaceMarking*> &v) {
  * CONSTRUCTOR *
  ***************/
 
-InterfaceMarking::InterfaceMarking() {
+InterfaceMarking::InterfaceMarking() : storage(NULL) {
     // if no (asynchronous) events are present, we are done here
     if (interface_length == 0) {
         return;
@@ -121,8 +121,7 @@ InterfaceMarking::InterfaceMarking() {
     }
 }
 
-InterfaceMarking::InterfaceMarking(const InterfaceMarking& other)
-        : storage(NULL) {
+InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) : storage(NULL) {
     // if no (asynchronous) events are present, we are done here
     if (interface_length == 0) {
         return;

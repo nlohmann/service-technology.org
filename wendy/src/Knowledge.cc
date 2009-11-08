@@ -400,6 +400,8 @@ void Knowledge::sequentializeReceivingEvents() {
         occuranceOfReceivingEvent[i] = 0;
     }
 
+    consideredReceivingEvents.assign(Label::receive_events + 1, false);
+
     // remember to consider this state again; actually we only need to take a look at its interface
     map<InterfaceMarking*, bool> visitStateAgain;
 
@@ -455,7 +457,7 @@ void Knowledge::sequentializeReceivingEvents() {
             if ((currenState->first)->marked(l)) {
 
                 // it will be considered, so continue with the next waitstate
-                if (consideredReceivingEvents.find(l) != consideredReceivingEvents.end()) {
+                if (consideredReceivingEvents.at(l) == true) {
                     consideredReceivingEvent = l;
                     break;
                 }
@@ -487,7 +489,7 @@ void Knowledge::sequentializeReceivingEvents() {
 
 
 /*!
- if map consideredReceivingEvents has been set, return whether to consider the current
+ if vector consideredReceivingEvents has been set, return whether to consider the current
  receiving event or not
 
  \pre reduction rule seguentialize receiving events is used
@@ -497,7 +499,7 @@ void Knowledge::sequentializeReceivingEvents() {
 bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
     assert(args_info.seqReceivingEvents_flag);
 
-    return (consideredReceivingEvents.find(label) != consideredReceivingEvents.end());
+    return (consideredReceivingEvents.at(label) == true);
 }
 
 

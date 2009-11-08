@@ -35,10 +35,7 @@
  This class is used to build knowledges. Its main focus is runtime
  optimization. A later translation into StoredKnowledge objects removes any
  unneccessary information, yielding a compact representation.
-
- \todo In general, std::map<Label_ID, bool> could be replaced by
-       std::vector<Label_ID>. No overhead and constant access!
- */
+*/
 class Knowledge {
     public: /* member functions */
         /// construct knowledge from (initial) inner marking
@@ -95,7 +92,7 @@ class Knowledge {
 
         /// reduction rule: sequentialize receiving events; remember only those receiving events
         ///                 which are essential to resolve each and every waitstate
-        std::map<Label_ID, bool> consideredReceivingEvents;
+        std::vector<bool> consideredReceivingEvents;
 };
 
 #endif

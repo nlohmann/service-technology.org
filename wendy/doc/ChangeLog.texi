@@ -1,4 +1,4 @@
-@heading Version 2.4-unreleased
+@heading Version 2.4 (9 November 2009)
 @itemize
 @item added target for benchmarks (execute @samp{make bench -C tests})
 

@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 2.4-unreleased
-======================
+Version 2.4 (9 November 2009)
+=============================
 
 * added target for benchmarks (execute `make bench -C tests')
 

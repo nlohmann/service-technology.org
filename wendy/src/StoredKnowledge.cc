@@ -135,7 +135,7 @@ void StoredKnowledge::processNode(const Knowledge& K, StoredKnowledge* const SK)
     static unsigned int calls = 0;
 
     // statistics output
-    if (++calls % args_info.reportFrequency_arg == 0 and args_info.reportFrequency_arg > 0) {
+    if (args_info.reportFrequency_arg and ++calls % args_info.reportFrequency_arg == 0) {
         message("%8d knowledges, %8d edges", stats.storedKnowledges, stats.storedEdges);
     }
 

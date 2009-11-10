@@ -149,6 +149,14 @@ AT_CHECK([GREP -q "using configuration file 'wendy.conf'" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Switching off reporting])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --reportFrequency=0],0,,[wendy: net is controllable: YES
+])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Releasing allocated memory])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])

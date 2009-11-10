@@ -108,6 +108,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Doxyfile
                  src/Makefile
                  man/Makefile
+                 maintainer/Makefile
                  tests/Makefile
                  tests/package.m4
                  utils/Makefile utils/unfolder/Makefile])

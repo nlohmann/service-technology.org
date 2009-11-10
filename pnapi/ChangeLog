@@ -5,8 +5,25 @@
             |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
                         http://service-technology.org/pnapi
 
-Version 3.00
-============
+Version 3.01-unreleased
+=======================
+
+* make check now tests, whether customer tools still work with the API (see
+  https://gna.org/task/?6813)
+
+* added Makefile.am.customer for customer tools
+
+* added make target for zcov
+
+* copied parameter '-stats' from Wendy to Petri
+
+* integrated Output.* and verbose.* to Petri (see
+  https://gna.org/task/?6837)
+
+* reimplemented normalize() according to [LohmannMW_2007_icatpn]
+
+Version 3.00 (2009-11-03)
+=========================
 
 * final condition can now be converted in disjunctive normal form
 

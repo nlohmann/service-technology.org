@@ -5,21 +5,22 @@
             |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
                         http://service-technology.org/pnapi
 
-Version 3.00
-============
+Version 3.01-unreleased
+=======================
 
-* final condition can now be converted in disjunctive normal form
+* make check now tests, whether customer tools still work with the API (see
+  https://gna.org/task/?6813)
 
-* added type getter to formula classes
+* added Makefile.am.customer for customer tools
 
-* started proper versioning
+* added make target for zcov
 
-* started proper documentation
+* copied parameter '-stats' from Wendy to Petri
 
-* formulae now only concern internal places; only left wildcard ist
-  ALL_OTHER_PLACES_EMPTY
+* integrated Output.* and verbose.* to Petri (see
+  https://gna.org/task/?6837)
 
-* fixed bug #14648: PNAPI: Shift/reduce conflict in parser-pn.cc
+* reimplemented normalize() according to [LohmannMW_2007_icatpn]
 
 
 See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for

@@ -4,12 +4,13 @@
                            ___) | (_| | |_| | (_) |
                           |____/ \__,_|\__, |\___/
                                        |___/
+                      generating public view from bit-og
                       http://service-technology.org/sayo
 
 
 PURPOSE
     Sayo is a tool to generate public view service automata
-    from 2-bit operating guidelines.
+    from bit operating guidelines.
 
 
 COPYRIGHT

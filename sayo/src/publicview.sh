@@ -5,7 +5,7 @@ WENDY=wendy
 SA2SM=sa2sm
 SAYO=sayo
 
-${WENDY} --og=${NET}.og --formula=2bits ${NET} &> /dev/null
+${WENDY} --og=${NET}.og --formula=bits ${NET} &> /dev/null
 
 ${SAYO} -i ${NET}.og -o ${NET}.sa
 

@@ -1,3 +1,10 @@
+{
+  generator:    Wendy 2.4 (i686-pc-linux-gnu)
+  invocation:   wendy --og --fionaFormat non_empty_true_node3.owfn.normalized.owfn 
+  events:       3 send, 1 receive, 0 synchronous
+  statistics:   8 nodes
+}
+
 INTERFACE
   INPUT
     c;
@@ -7,43 +14,36 @@ INTERFACE
     d;
 
 NODES
-  0 : (!a + !b + !d) : blue,
-  1 : !a : blue,
-  4 : ?c : blue,
-  5 : final : blue : finalnode,
-  9 : true : blue,
-  10 : final : blue : finalnode,
-  12 : true : blue,
-  13 : true : blue,
-  14 : true : blue,
-  15 : true : blue,
-  16 : true : blue;
+  0 : true,
+  157513336 : !a,
+  157522664 : final,
+  157532128 : true,
+  157533920 : (!a + !b + !d),
+  157538656 : true,
+  157542808 : true,
+  157543768 : final,
+  157556440 : ?c;
 
 INITIALNODE
-  0;
+  157533920;
 
 TRANSITIONS
-  0 -> 1 : !d,
-  0 -> 10 : !b,
-  0 -> 12 : !a,
-  0 -> 9 : ?c,
-  1 -> 4 : !a,
-  1 -> 9 : ?c,
-  4 -> 5 : ?c,
-  5 -> 9 : ?c,
-  9 -> 9 : ?c,
-  9 -> 9 : !d,
-  9 -> 9 : !b,
-  9 -> 9 : !a,
-  10 -> 9 : ?c,
-  12 -> 13 : ?c,
-  12 -> 4 : !d,
-  13 -> 9 : ?c,
-  13 -> 5 : !d,
-  13 -> 14 : !b,
-  13 -> 16 : !a,
-  14 -> 9 : ?c,
-  14 -> 15 : !a,
-  15 -> 9 : ?c,
-  16 -> 9 : ?c,
-  16 -> 15 : !b;
+  157513336 -> 0 : ?c,
+  157513336 -> 157556440 : !a,
+  157522664 -> 0 : ?c,
+  157532128 -> 157538656 : ?c,
+  157532128 -> 157556440 : !d,
+  157533920 -> 0 : ?c,
+  157533920 -> 157532128 : !a,
+  157533920 -> 157522664 : !b,
+  157533920 -> 157513336 : !d,
+  157538656 -> 0 : ?c,
+  157538656 -> 157542808 : !a,
+  157538656 -> 157543768 : !d,
+  157542808 -> 0 : ?c,
+  157543768 -> 0 : ?c,
+  157556440 -> 157543768 : ?c,
+  0 -> 0 : ?c,
+  0 -> 0 : !a,
+  0 -> 0 : !b,
+  0 -> 0 : !d;

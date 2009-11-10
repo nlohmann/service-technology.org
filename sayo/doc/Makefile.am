@@ -3,9 +3,9 @@ info_TEXINFOS = sayo.texi
 sayo_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
 TEXINFO_TEX = texinfo.tex \
-              examples/2bits.og \
-              examples/2bits.interface \
-              examples/2bits.nodes \
+              examples/bits.og \
+              examples/bits.interface \
+              examples/bits.nodes \
               examples/coffee.owfn \
               examples/coffee.og \
               examples/coffee.sa \
@@ -13,9 +13,9 @@ TEXINFO_TEX = texinfo.tex \
               examples/coffee.pv.owfn.part2 
 
 EXTRA_DIST = cmdline.out \
-             examples/2bits.og \
-             examples/2bits.interface \
-             examples/2bits.nodes \
+             examples/bits.og \
+             examples/bits.interface \
+             examples/bits.nodes \
              examples/coffee.owfn \
              examples/coffee.og \
              examples/coffee.sa \

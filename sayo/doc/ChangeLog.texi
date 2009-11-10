@@ -1,5 +1,8 @@
-@heading Version 1.1-unreleased
+@heading Version 1.1 (2009-11-10)
 @itemize
+@item implemented T-Bit support
+@item fixed bug #13712 (https://gna.org/bugs/?13712)
+@item implemented --stats
 @item simplified testsuite by using wrapper script
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize

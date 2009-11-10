@@ -113,7 +113,7 @@ bool emptyNode;
 %token KEY_NODES
 %token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
 %token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
-%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
+%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S BIT_T
 %token LPAR RPAR
 
 %union {
@@ -330,9 +330,16 @@ node:
      * If the s- or f-bit is set, copy this node and all successors
      * on each input event, and add a TAU transition to the copy. 
      * If the f bit is set, the copy has to be final.
+     * If the t-bit is set, add a TAU-loop.
      */
     switch($3)
     {
+      case 't':
+      {
+        // add TAU-loop
+        (*myOut) << "    TAU -> " << mapNode($1) << "\n";
+        break; 
+      }
       case 's':
       case 'f':
       {
@@ -368,11 +375,12 @@ annotation:
   /* empty */    { $$ = '-'; }
 | COLON formula
   {
-    // parsing 2-bit OGs there should be no formula
-    og_yyerror("read a formula; only 2-bit annotations are supported");
+    // parsing bit OGs there should be no formula
+    og_yyerror("read a formula; only bit annotations are supported");
   } 
 | DOUBLECOLON BIT_S    { $$ = 's'; }
 | DOUBLECOLON BIT_F    { $$ = 'f'; }
+| DOUBLECOLON BIT_T    { $$ = 't'; }
 ;
 
 

@@ -1,4 +1,4 @@
-AC_INIT(Sayo, 1.1-unreleased, sayo@service-technology.org, sayo, http://service-technology.org/sayo)
+AC_INIT(Sayo, 1.1, sayo@service-technology.org, sayo, http://service-technology.org/sayo)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -35,6 +35,10 @@ AC_PATH_PROG(WENDY, [wendy], not found)
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
+
+# export tools needed to determine memory consumption
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)

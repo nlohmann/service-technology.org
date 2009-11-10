@@ -1,6 +1,6 @@
 {
-  generator:    Wendy 1.4-unreleased (i386-unknown-freebsd7.0)
-  invocation:   wendy --og --formula=2bits non_empty_true_node2.owfn 
+  generator:    Wendy 2.4 (i686-pc-linux-gnu)
+  invocation:   wendy --og --formula=bits non_empty_true_node2.owfn 
   events:       1 send, 1 receive, 0 synchronous
   statistics:   2 nodes
 }
@@ -12,11 +12,11 @@ INTERFACE
     a;
 
 NODES
-  675311968
+  158320592 :: T
     b -> 0
-    a -> 675312096
-  675312096 :: F
+    a -> 158352152
+  158352152 :: F
     b -> 0
-  0
+  0 :: T
     b -> 0
     a -> 0

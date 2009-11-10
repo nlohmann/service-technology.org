@@ -58,6 +58,8 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 extern FILE* og_yyin;
 
+/// a variable holding the time of the call
+clock_t start_clock = clock();
 
 /// output stream
 std::ostream* myOut = &cout;
@@ -75,10 +77,22 @@ void evaluateParameters(int argc, char** argv)
   free(params);
 }
 
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // print statistics
+    if (args_info.stats_flag) {
+        fprintf(stderr, "%s: runtime: %.2f sec\n", PACKAGE, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
 
 /// main function
 int main(int argc, char** argv)
 {
+  // set the function to call on normal termination
+  atexit(terminationHandler);
+
   // stream for file output
   ofstream ofs;
   

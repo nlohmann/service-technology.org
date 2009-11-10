@@ -4,11 +4,17 @@
                            ___) | (_| | |_| | (_) |
                           |____/ \__,_|\__, |\___/
                                        |___/
+                      generating public view from bit-og
                       http://service-technology.org/sayo
 
+Version 1.1 (2009-11-10)
+========================
 
-Version 1.1-unreleased
-======================
+* implemented T-Bit support
+
+* fixed bug #13712 (https://gna.org/bugs/?13712)
+
+* implemented -stats
 
 * simplified testsuite by using wrapper script
 

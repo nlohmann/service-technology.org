@@ -8,21 +8,12 @@
                       http://service-technology.org/wendy
 
 
-Version 2.4 (9 November 2009)
-=============================
+Version 2.5-unreleased
+======================
 
-* added target for benchmarks (execute `make bench -C tests')
-
-* implemented new 3-bit representation: at `T' bit is necessary to
-  correctly cope with "true"-annotated nodes - renamed `2bits' option to
-  `bits'
-
-* removed explicit `std::flush' calls
-
-* colored status messages
-
-* fixed bug #14693 (`https://gna.org/bugs/?14693'): wrong propagation of
-  final states yielded wrong results for livelock freedom
+* added an error message to avoid segmentation faults in case a marking has
+  two outgoing transitions with the same synchronous label (see
+  `https://gna.org/bugs/?14719')
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

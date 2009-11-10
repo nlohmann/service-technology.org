@@ -500,6 +500,15 @@ wendy: unknown transition `t' in file `foo.cov' -- aborting [#16]
 @end cartouche
 @end smallexample
 
+@item #17
+A marking activates two transitions with the same synchronous label. This is not an error of the input net, but a situation Wendy cannot handle due to design decisions. It might be resolved in later versions. See @url{https://gna.org/bugs/?14719} for more information.
+
+@smallexample
+@cartouche
+wendy: synchronous label of `a' already using in this marking -- aborting [#17]
+@end cartouche
+@end smallexample
+
 @end table
 
 

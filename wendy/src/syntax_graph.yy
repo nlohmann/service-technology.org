@@ -84,9 +84,9 @@ state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
     {
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
-                                                InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
+                                           InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
-        if (markingoutput != NULL) {
+        if (markingoutput) {
             markingoutput->stream() << $2 << ": ";
             for (std::map<const pnapi::Place*, unsigned int>::iterator p = marking.begin(); p != marking.end(); ++p) {
                 if (p != marking.begin()) {
@@ -183,8 +183,17 @@ transitions:
 transition:
   NAME ARROW NUMBER
     {
+      // a workaround for bug #14719
+      if (Label::sync_events > 0) {
+          for (size_t i = 0; i < currentLabels.size(); ++i) {
+              if (SYNC(Label::name2id[$1]) and currentLabels[i] == Label::name2id[$1]) {
+                  abort(17, "synchronous label of '%s' already using in this marking", $1, Label::id2name[Label::name2id[$1]].c_str());
+              }
+          }
+      }
+
       currentLabels.push_back(Label::name2id[$1]);
-      if(args_info.cover_given) {
+      if(args_info. cover_given) {
           currentTransitions.insert($1);
       }
       currentSuccessors.push_back($3);

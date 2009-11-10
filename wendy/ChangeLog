@@ -8,6 +8,13 @@
                       http://service-technology.org/wendy
 
 
+Version 2.5-unreleased
+======================
+
+* added an error message to avoid segmentation faults in case a marking has
+  two outgoing transitions with the same synchronous label (see
+  `https://gna.org/bugs/?14719')
+
 Version 2.4 (9 November 2009)
 =============================
 

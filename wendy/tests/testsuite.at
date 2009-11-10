@@ -402,8 +402,9 @@ AT_CLEANUP
 AT_SETUP([Bug 11])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug11.owfn .])
-AT_CHECK([WENDY bug11.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 2 knowledges reachable" stderr])
+AT_CHECK([WENDY bug11.owfn --verbose],1,ignore,stderr)
+#AT_CHECK([GREP -q "wendy: 2 knowledges reachable" stderr])
+AT_CHECK([GREP -q "aborting \[[#17\]]" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -491,14 +492,17 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug14693.owfn .])
 AT_CHECK([WENDY bug14693.owfn --verbose --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
-AT_KEYWORDS(bug)
-AT_CLEANUP
-
-AT_SETUP([Bug 14693 Part 2 (https://gna.org/bugs/?14693)])
-AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/zeus.owfn .])
 AT_CHECK([WENDY zeus.owfn --verbose --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+AT_SETUP([Bug 14719 (https://gna.org/bugs/?14719)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14719.owfn .])
+AT_CHECK([WENDY bug14719.owfn --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#17\]]" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 

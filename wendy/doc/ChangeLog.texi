@@ -1,3 +1,9 @@
+@heading Version 2.5-unreleased
+@itemize
+@item added an error message to avoid segmentation faults in case a marking has two outgoing transitions with the same synchronous label (see @url{https://gna.org/bugs/?14719})
+@end itemize
+
+
 @heading Version 2.4 (9 November 2009)
 @itemize
 @item added target for benchmarks (execute @samp{make bench -C tests})

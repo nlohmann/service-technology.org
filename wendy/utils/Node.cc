@@ -11,9 +11,9 @@ using std::map;
 using std::set;
 using std::vector;
 
-/// constructor
+/// constructors
 Node::Node(unsigned int _id, Formula *_formula) :
-    id(_id), formula(_formula), sat(NULL) {
+    sat(NULL), id(_id), formula(_formula) {
         outEdges.clear();
     }
 
@@ -73,6 +73,10 @@ void Node::addEdge(std::string label, Node *target) {
 void Node::setFormula(Formula *f) {
     assert(f);
     formula = f;
+}
+
+void Node::setBit(Bit b) {
+    bit = b;
 }
 
 /// returns the first successors reachable by the given label
@@ -197,4 +201,19 @@ void Node::replaceWith(Node *newNode) {
     }
     
     delete this;
+}
+
+
+const std::string Node::bitString() const {
+    switch (bit)
+    {
+    case S:
+        return "S";
+    case F:
+        return "F";
+    case T:
+        return "T";
+    default:
+        return "";
+    }
 }

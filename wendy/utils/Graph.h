@@ -6,6 +6,9 @@
 #include "types.h"
 
 class Graph {
+    public:
+        enum Type { BIT = 1, FORMULA = 0, NOTDEFINED };
+
     private:
         /// the root node of the graph
         const Node *root;
@@ -19,10 +22,15 @@ class Graph {
         /// the maximal node id
         static unsigned int maxId;
         
+        Type type;
+
     public:
         /// set the root of the graph
         void setRoot(Node *n);
         
+        /// set the graph's type
+        void setType(Type t);
+
         /// adds a label to the graphs
         void addLabel(std::string l);
         
@@ -33,7 +41,17 @@ class Graph {
         void minimize();
         
         /// Fiona OG output
-        void ogOut() const;
+        void ogOut(FILE *out = stdout) const;
+
+    private:
+        /// input check
+        Labels input() const;
+
+        /// output check
+        Labels output() const;
+
+        /// synchronous check
+        Labels synchronous() const;
 };
 
 #endif

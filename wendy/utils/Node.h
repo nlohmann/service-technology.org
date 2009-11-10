@@ -22,7 +22,10 @@ class Node {
         
         /// a formula assigned to this node
         Formula *formula;
-        
+
+        ///  a bit assigned to this node
+        enum Bit { NONE, S, F, T } bit;
+
         /// incoming edges
         std::map<std::string, std::vector<Node*> > inEdges;
 
@@ -30,9 +33,9 @@ class Node {
         std::map<std::string, std::vector<Node*> > outEdges;
 
     public:
-        /// constructor
+        /// constructors
         Node(unsigned int _id, Formula *_formula = NULL);
-        
+
         /// destructor
         ~Node();
         
@@ -42,6 +45,9 @@ class Node {
         /// add a formula to the node
         void setFormula(Formula *f);
         
+        /// set the node's bit
+        void setBit(Bit b);
+
         /// returns the first successors reachable by the given label
         Node *successor(const std::string &label);
         
@@ -53,6 +59,9 @@ class Node {
         
         /// replace this node with a given one
         void replaceWith(Node *n);
+
+        /// returns the bit string
+        const std::string bitString() const;
 };
 
 #endif

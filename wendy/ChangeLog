@@ -31,6 +31,14 @@ Version 2.4 (9 November 2009)
 * fixed bug #14693 (`https://gna.org/bugs/?14693'): wrong propagation of
   final states yielded wrong results for livelock freedom
 
+* added command-line parameters [utils/minimize]
+
+* implemented bit representation of operating guidelines [utils/minimize]
+
+* implemented new operating guideline format (input and output) [utils/minimize]
+
+* added verbose-framework for status output (--verbose) [utils/minimize]
+
 Version 2.3 (21 October 2009)
 =============================
 

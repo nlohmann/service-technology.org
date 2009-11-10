@@ -1,0 +1,25 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About:"
+purpose "This tool is made for minimizing operating guidelines."
+
+section "Input/Output"
+
+option "output" o
+  "Specifying output filename."
+  string
+  typestr="FILENAME"
+  optional
+
+section "Debugging"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose messages reporting intermediate steps."
+  flag off
+  
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden

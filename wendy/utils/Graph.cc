@@ -1,9 +1,11 @@
 #include <cstdio>
+#include <cstring>
 #include <string>
 #include <cassert>
 #include <map>
 #include <vector>
 #include "Graph.h"
+#include "verbose.h"
 
 using std::map;
 using std::string;
@@ -15,6 +17,11 @@ void Graph::setRoot(Node *n) {
     root = n;
 }
 
+void Graph::setType(Type t) {
+    assert(t != NOTDEFINED);
+    type = t;
+}
+
 /// add a node to the graph
 void Graph::addNode(Node *n) {
     assert(n);
@@ -23,10 +30,19 @@ void Graph::addNode(Node *n) {
 
 /// minimize the graph by removing redundant nodes
 void Graph::minimize() {
-    // create formula->node mapping
+    // create formula/bit->node mapping
     map<string, vector<Node *> > form;
     for (map<unsigned int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-        form[(n->second)->dnf()].push_back(n->second);
+        if (type == FORMULA)
+          form[(n->second)->dnf()].push_back(n->second);
+        else
+        {
+          string bit;
+          bit = (n->second)->bit == Node::NONE ? "" :
+                (n->second)->bit == Node::S    ? "S" :
+                (n->second)->bit == Node::F    ? "F" : "T";
+          form[bit].push_back(n->second);
+        }
     }
     
     // the partitions
@@ -42,19 +58,19 @@ void Graph::minimize() {
         }
     }
     
-    fprintf(stderr, "%d initial partitions (showing only non-trivial partions)\n", partitions.size());
+    status("%d initial partitions (showing only non-trivial partions)\n", partitions.size());
 
-    for (unsigned int i = 0; i < partitions.size(); i++) {
+    for (unsigned int i = 0; i < partitions.size(); ++i) {
         if (partitions[i].size() > 1) {
-            fprintf(stderr, "partition %d [", i);
+            status("partition %d [", i);
             for (unsigned j = 0; j < partitions[i].size(); ++j) {
-                fprintf(stderr, " %d", partitions[i][j]->id);
+                status(" %d", partitions[i][j]->id);
             }
-            fprintf(stderr, " ]\n");
+            status(" ]\n");
         }
     }
 
-    fprintf(stderr, "\nREFINING\n");
+    status("REFINING");
 
     bool done = false;
     unsigned int passes = 0;
@@ -83,26 +99,26 @@ void Graph::minimize() {
 
                     if (reachedNode == NULL) {
                         reach[-1].push_back(thisNode);
-                        fprintf(stderr, "partition %d: node %d has no %s-successor\n", i, thisNode->id, labels[l].c_str());
+                        status("partition %d: node %d has no %s-successor\n", i, thisNode->id, labels[l].c_str());
                     } else {
                         reach[ partition[reachedNode] ].push_back(thisNode);
-                        fprintf(stderr, "partition %d: node %d has a %s-successor in partition %d\n", i, thisNode->id, labels[l].c_str(), partition[reachedNode]);
+                        status("partition %d: node %d has a %s-successor in partition %d\n", i, thisNode->id, labels[l].c_str(), partition[reachedNode]);
                     }
                 }
 
                 // if more than one temporary partition is found, we can refine
                 if (reach.size() > 1) {
-                    fprintf(stderr, "[PASS %d] refining partition %d to %d sub-partitions using label %s\n", passes, i, reach.size(), labels[l].c_str());
+                    status("[PASS %d] refining partition %d to %d sub-partitions using label %s\n", passes, i, reach.size(), labels[l].c_str());
 
                     for (map<int, vector<Node *> >::iterator np = reach.begin(); np != reach.end(); ++np) {
                         unsigned int newPartitionNumber;
 
                         if (np == reach.begin()) {
                             newPartitionNumber = i;
-                            fprintf(stderr, "refined partition %d\n", newPartitionNumber);
+                            status("refined partition %d\n", newPartitionNumber);
                         } else {
                             newPartitionNumber = partitions.size();                        
-                            fprintf(stderr, "added partition %d\n", newPartitionNumber);
+                            status("added partition %d\n", newPartitionNumber);
                         }
 
                         partitions[newPartitionNumber] = np->second;
@@ -120,18 +136,18 @@ void Graph::minimize() {
         }
     }
 
-    fprintf(stderr, "\nDONE PARTITIONING  (showing only non-trivial partions)\n");
+    status("DONE PARTITIONING  (showing only non-trivial partions)\n");
     for (unsigned int i = 0; i < partitions.size(); i++) {
         if (partitions[i].size() > 1) {
-            fprintf(stderr, "partition %d [", i);
+            status("partition %d [", i);
             for (unsigned j = 0; j < partitions[i].size(); ++j) {
-                fprintf(stderr, " %d", partitions[i][j]->id);
+                status(" %d", partitions[i][j]->id);
             }
-            fprintf(stderr, " ]\n");
+            status(" ]\n");
         }
     }
 
-    fprintf(stderr, "\n%d partition passes\n", passes);
+    status("%d partition passes\n", passes);
     if (nodes.size() != partitions.size()) {
         unsigned int nodesBefore = nodes.size();
         
@@ -146,8 +162,8 @@ void Graph::minimize() {
             }
         }
         
-        fprintf(stderr, "%d nodes before reduction\n", nodesBefore);
-        fprintf(stderr, "%d nodes after reduction\n", nodes.size());
+        status("%d nodes before reduction\n", nodesBefore);
+        status("%d nodes after reduction\n", nodes.size());
     }
     
 }
@@ -157,37 +173,117 @@ void Graph::addLabel(std::string l) {
     labels.push_back(l);
 }
 
-/// Fiona OG output
-void Graph::ogOut() const {
-    fprintf(stdout, "INTERFACE\n");
-    fprintf(stdout, "  INPUT\n");
-    fprintf(stdout, "  OUTPUT\n");
-    
-    fprintf(stdout, "NODES\n");
-    for (map<unsigned int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-        if (n != nodes.begin())
-            fprintf(stdout, ",\n");
-
-        fprintf(stdout, "  %d : %s : blue", n->second->id, n->second->formula->toString().c_str());        
-    }
-    fprintf(stdout, ";\n\n");
-
-
-    fprintf(stdout, "INITIALNODE\n  %d;\n\n", root->id);
-
-
-    fprintf(stdout, "TRANSITIONS\n");
-    for (map<unsigned int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-        for (map<string, vector<Node*> >::iterator e = n->second->outEdges.begin(); e != n->second->outEdges.end(); ++e) {
-            for (unsigned int i = 0; i < e->second.size(); ++i) {
-                
-                if (n != nodes.begin() || e != n->second->outEdges.begin() || i != 0)
-                    fprintf(stdout, ",\n");
-                
-                fprintf(stdout, "  %d -> %d : %s", n->second->id, e->second[i]->id, e->first.c_str());
-            }
+/// OG output format
+void Graph::ogOut(FILE *out) const {
+    if (!labels.empty())
+    {
+        Labels temp;
+        fprintf(out, "INTERFACE\n");
+        if (!(temp = input()).empty())
+        {
+            fprintf(out, "  INPUT\n");
+            fprintf(out, "    ");
+            for (int i = 0; i < (int) temp.size(); ++i)
+              fprintf(out, i == 0 ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
+            fprintf(out, "\n");
         }
+        if (!(temp = output()).empty())
+        {
+            fprintf(out, "  OUTPUT\n");
+            fprintf(out, "    ");
+            for (int i = 0; i < (int) temp.size(); ++i)
+              fprintf(out, i == 0 ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
+            fprintf(out, "\n");
+        }
+        if (!(temp = synchronous()).empty())
+        {
+            fprintf(out, "  SYNCHRONOUS\n");
+            fprintf(out, "    ");
+            for (int i = 0; i < (int) temp.size(); ++i)
+              fprintf(out, i == 0 ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
+            fprintf(out, "\n");
+        }
+        fprintf(out, "\n");
+    } /* INTERFACE */
+
+    fprintf(out, "NODES\n");
+    std::string bit;
+    fprintf(out, "  %d ", root->id);
+    switch (type)
+    {
+    case FORMULA:
+        fprintf(out, (string(": ")+root->formula->toString()).c_str());
+        break;
+    case BIT:
+        bit = root->bitString();
+        if (!bit.empty())
+            fprintf(out, (string(":: ")+bit).c_str());
+        break;
+    default:
+        assert(false);
+        break;
     }
-    fprintf(stdout, ";\n");
-    
+    fprintf(out, "\n");
+    for (std::map<std::string, std::vector<Node *> >::const_iterator
+          s = root->outEdges.begin(); s != root->outEdges.end(); ++s)
+    {
+        for (int i = 0; i < (int) s->second.size(); ++i)
+            fprintf(out, "    %s -> %d\n", s->first.c_str(), s->second[i]->id);
+    }
+
+    for (std::map<unsigned int, Node *>::const_iterator n = nodes.begin();
+        n != nodes.end(); ++n)
+    {
+        if (n->second == root)
+            continue;
+        fprintf(out, "  %d ", n->second->id);
+        switch (type)
+        {
+        case FORMULA:
+            fprintf(out, (string(": ")+n->second->formula->toString()).c_str());
+            break;
+        case BIT:
+            bit = n->second->bitString();
+            if (!bit.empty())
+                fprintf(out, (string(":: ")+bit).c_str());
+            break;
+        default:
+            assert(false);
+            break;
+        }
+        fprintf(out, "\n");
+        for (std::map<std::string, std::vector<Node *> >::const_iterator
+              s = n->second->outEdges.begin(); s != n->second->outEdges.end(); ++s)
+        {
+            for (int i = 0; i < (int) s->second.size(); ++i)
+                fprintf(out, "    %s -> %d\n", s->first.c_str(), s->second[i]->id);
+        }
+    } /* NODES */
+}
+
+
+Labels Graph::input() const {
+    Labels result;
+    for (int i = 0; i < (int) labels.size(); ++i)
+        if (labels[i].c_str()[0] == '?')
+            result.push_back(labels[i].substr(1, labels[i].size()));
+    return result;
+}
+
+
+Labels Graph::output() const {
+    Labels result;
+    for (int i = 0; i < (int) labels.size(); ++i)
+        if (labels[i].c_str()[0] == '!')
+            result.push_back(labels[i].substr(1, labels[i].size()));
+    return result;
+}
+
+
+Labels Graph::synchronous() const {
+  Labels result;
+  for (int i = 0; i < (int) labels.size(); ++i)
+      if (labels[i].c_str()[0] == '#')
+          result.push_back(labels[i].substr(1, labels[i].size()));
+  return result;
 }

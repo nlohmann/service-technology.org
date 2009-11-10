@@ -24,6 +24,7 @@ extern int og_yyerror(char const *msg);
 %}
 
 %s COMMENT
+%s BITS
 
 whitespace     [\n\r\t ]
 identifier     [^,;:()\t \n\r\{\}=]+
@@ -37,48 +38,45 @@ number         [0-9]+
 <COMMENT>"}"                            { BEGIN(INITIAL);              }
 <COMMENT>[^}]*                          { /* do nothing */             }
 
-"NODES"                                 { return key_nodes;            }
-"INITIALNODE"                           { return key_initialnode;      }
-"TRANSITIONS"                           { return key_transitions;      }
+"NODES"                                 { return KEY_NODES;            }
 
-"INTERFACE"                             { return key_interface;        }
-"INPUT"                                 { return key_input;            }
-"OUTPUT"                                { return key_output;           }
+"INTERFACE"                             { return KEY_INTERFACE;        }
+"INPUT"                                 { return KEY_INPUT;            }
+"OUTPUT"                                { return KEY_OUTPUT;           }
+"SYNCHRONOUS"                           { return KEY_SYNCHRONOUS;      }
 
-"TRUE"                                  { return key_true;             }
-"FALSE"                                 { return key_false;            }
-"FINAL"                                 { return key_final;            }
-"*"                                     { return op_and;               }
-"+"                                     { return op_or;                }
-"("                                     { return lpar;                 }
-")"                                     { return rpar;                 }
+<BITS>"F"                               { BEGIN(INITIAL); return BIT_F; }
+<BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
+<BITS>"T"                               { BEGIN(INITIAL); return BIT_T; }
+"TRUE"                                  { return KEY_TRUE;             }
+"FALSE"                                 { return KEY_FALSE;            }
+"FINAL"                                 { return KEY_FINAL;            }
+"~"                                     { return OP_NOT;               }
+"*"                                     { return OP_AND;               }
+"+"                                     { return OP_OR;                }
+"("                                     { return LPAR;                 }
+")"                                     { return RPAR;                 }
 
-"RED"                                   { return key_red;              }
-"BLUE"                                  { return key_blue;             }
-"FINALNODE"                             { return key_finalnode;        }
+":"                                     { return COLON;                }
+"::"                                    { BEGIN(BITS); return DOUBLECOLON; }
+";"                                     { return SEMICOLON;            }
+","                                     { return COMMA;                }
+"->"                                    { return ARROW;                }
 
-":"                                     { return colon;                }
-";"                                     { return semicolon;            }
-","                                     { return comma;                }
-"->"                                    { return arrow;                }
-
-{number}       { og_yylval.value = atoi(og_yytext); return number;     }
-{identifier}   { og_yylval.str = og_yytext; return ident;              }
+{number}       { og_yylval.value = atoi(og_yytext); return NUMBER;     }
+{identifier}   { og_yylval.str = strdup(og_yytext); return IDENT;      }
 
 {whitespace}                            { /* do nothing */             }
 
 .                                       { og_yyerror("lexical error"); }
 
-
 %%
-
 
 int og_yyerror(char const *msg) {
     assert(msg);
     assert(og_yytext);
 
-    fprintf(stderr, "%s: %d: error near ‘%s’: %s\n",
-            PACKAGE, og_yylineno, og_yytext, msg);
-    
+    fprintf(stderr, "%s: %d: error near '%s': %s\n", PACKAGE, 
+        og_yylineno, og_yytext, msg);
     exit(EXIT_FAILURE);
 }

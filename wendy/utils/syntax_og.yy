@@ -1,10 +1,13 @@
 %{
+#include <iostream>
 #include <map>
 #include <string>
 #include "Graph.h"
 
 using std::map;
 using std::string;
+
+enum Interface { INPUT, OUTPUT, SYNCHRONOUS };
 
 /* Prologue: Syntax and usage of the prologue.
  * Bison Declarations: Syntax and usage of the Bison declarations section.
@@ -23,26 +26,24 @@ extern int og_yyerror(char const *msg);
 
 Graph G;
 map<unsigned int, Node*> tempMap;
-bool input = true;
+Interface interface = INPUT;
+Node *temp = NULL;
 %}
 
-// Bison options
 %name-prefix="og_yy"
 %error-verbose
 
-%token key_nodes key_initialnode key_finalnode key_transitions
-%token key_interface key_input key_output
-%token key_red key_blue
-%token comma colon semicolon ident arrow number
-%token key_true key_false key_final
-%token lpar rpar
+%token KEY_NODES
+%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
+%token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
+%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S BIT_T
+%token LPAR RPAR
 
-%left op_or
-%left op_and
+%left OP_OR
+%left OP_AND
+%left OP_NOT
 
-
-// Bison generates a list of all used tokens in file "syntax_og.h" (for flex)
-%token_table
+%token-table
 %defines
 
 %union {
@@ -52,125 +53,138 @@ bool input = true;
     Node *n;
 }
 
-%type <value> number
-%type <str>   ident
+%type <value> NUMBER
+%type <str>   IDENT
 %type <f>     formula
 %type <n>     node
 
+%start og
 %%
 
 
 og:
-  interface nodes initialnode transitions
-    { tempMap.clear(); }
+  KEY_INTERFACE input output synchronous KEY_NODES nodes
+  { tempMap.clear(); }
 ;
 
 
-interface:
-  key_interface key_input places_list semicolon
-  key_output { input = false; } places_list semicolon
-;
-
-
-places_list:
+input:
   /* empty */
-| places_list comma ident
-    { if (input)
-          G.addLabel("?" + string($3));
-      else
-          G.addLabel("!" + string($3)); } 
-| ident
-    { if (input)
-          G.addLabel("?" + string($1));
-      else
-          G.addLabel("!" + string($1)); } 
+| KEY_INPUT identlist SEMICOLON
+;
+
+
+output:
+  /* empty */
+| KEY_OUTPUT { interface = OUTPUT; } identlist SEMICOLON
+;
+
+
+synchronous:
+  /* empty */
+| KEY_SYNCHRONOUS {interface = SYNCHRONOUS; } identlist SEMICOLON
+;
+
+
+identlist:
+  /* empty */
+| IDENT
+  { 
+    if (interface == INPUT) G.addLabel("?" + string($1));
+    else if (interface == OUTPUT) G.addLabel("!" + string($1));
+    else G.addLabel("#" + string($1));
+  }
+| identlist COMMA IDENT
+  { 
+    if (interface == INPUT) G.addLabel("?" + string($3));
+    else if (interface == OUTPUT) G.addLabel("!" + string($3));
+    else G.addLabel("#" + string($3));
+  }
 ;
 
 
 nodes:
-  key_nodes nodes_list semicolon
-;
-
-
-nodes_list:
-  /* empty */
-| node
-    { G.addNode($1);
-      tempMap[$1->id] = $1; }
-| nodes_list comma node
-    { G.addNode($3);
-      tempMap[$3->id] = $3; }
+  node
+  {
+    G.addNode($1);
+    G.setRoot($1);
+    tempMap[$1->id] = $1;
+  }
+| nodes node
+  { 
+    G.addNode($2);
+    tempMap[$2->id] = $2;
+  }
 ;
 
 
 node:
-  number
-    { $$ = new Node($1); }
-| number colon formula
-    { $$ = new Node($1, $3); }
-| number colon key_finalnode
-    { $$ = new Node($1); }
-| number colon formula colon color
-    { $$ = new Node($1, $3); }
-| number colon formula colon key_finalnode
-    { $$ = new Node($1, $3); }
-| number colon formula colon color colon key_finalnode
-    { $$ = new Node($1, $3); }
+  NUMBER 
+  { 
+    if (tempMap.count($1) > 0) 
+      temp = tempMap[$1]; 
+    else 
+      temp = new Node($1); 
+  } 
+  annotation successors
+  { $$ = temp; }
+;
+
+
+annotation:
+  /* empty */
+| COLON formula
+  {
+    G.setType(Graph::FORMULA);
+    temp->setFormula($2); 
+  }
+| DOUBLECOLON BIT_S
+  { 
+    G.setType(Graph::BIT);
+    temp->setBit(Node::S); 
+  }
+| DOUBLECOLON BIT_F
+  { 
+    G.setType(Graph::BIT);
+    temp->setBit(Node::F); 
+  }
+| DOUBLECOLON BIT_T
+  { 
+    G.setType(Graph::BIT);
+    temp->setBit(Node::T); 
+  }
 ;
 
 
 formula:
-  lpar formula rpar
-    { $$ = $2; }
-| formula op_and formula
-    { $$ = new FormulaAND($1, $3); }
-| formula op_or formula
-    { $$ = new FormulaOR($1, $3); }
-| key_final
-    { $$ = new FormulaFinal(); }
-| key_true
-    { $$ = new FormulaTrue(); }
-| key_false
-    { $$ = new FormulaFalse(); }
-| ident
-    { $$ = new FormulaLit($1); }
+  LPAR formula RPAR
+  { $$ = $2; }
+| formula OP_AND formula
+  { $$ = new FormulaAND($1, $3); }
+| formula OP_OR formula
+  { $$ = new FormulaOR($1, $3); }
+| OP_NOT formula
+  { $$ = new FormulaNeg($2); }
+| KEY_FINAL
+  { $$ = new FormulaFinal(); }
+| KEY_TRUE
+  { $$ = new FormulaTrue(); }
+| KEY_FALSE
+  { $$ = new FormulaFalse(); }
+| IDENT
+  { $$ = new FormulaLit($1); }
 ;
 
 
-color:
-| key_blue
-| key_red
-;
-
-
-initialnode:
-  key_initialnode number
-    { if (!tempMap[$2])
-        og_yyerror("could not find node specified as root"); }  
-  semicolon
-    { G.setRoot(tempMap[$2]); }
-;
-
-
-transitions:
-  key_transitions transitions_list semicolon
-;
-
-
-transitions_list:
+successors:
   /* empty */
-| transition
-| transitions_list comma transition
-;
-
-
-transition:
-  number
-    { if (!tempMap[$1])
-        og_yyerror("could not find source node of edge"); }  
-  arrow number
-    { if (!tempMap[$4])
-        og_yyerror("could not find target node of edge"); }  
-  colon ident
-    { tempMap[$1]->addEdge($7, tempMap[$4]); }
+| successors IDENT ARROW NUMBER
+  {
+    if (!tempMap.count($4))
+    {
+      Node *h = new Node($4);
+      tempMap[h->id] = h;
+    }
+    temp->addEdge($2, tempMap[$4]);
+  }
 ;

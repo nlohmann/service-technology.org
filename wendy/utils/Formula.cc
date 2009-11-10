@@ -191,11 +191,9 @@ const Formula *FormulaAND::dnf() const {
     return result;
 }
 
-/// we don't support negations at this point
-const Formula *FormulaNeg::dnf() const {
-    assert(false);
-    return this;
-}
+/*!
+ */
+const Formula *FormulaNeg::dnf() const { return this; }
 
 const Formula *FormulaOR::dnf() const { return this; }
 const Formula *FormulaLit::dnf() const { return this; }

@@ -18,11 +18,14 @@
 \*****************************************************************************/
 
 
+#include <config.h>
 #include <cstdarg>
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
+#include <string>
 #include "cmdline.h"
+#include "verbose.h"
 
 extern gengetopt_args_info args_info;
 
@@ -33,7 +36,7 @@ extern gengetopt_args_info args_info;
  \note use this function rather sparsely in order not to spam the output
 */
 void message(const char* format, ...) {
-    fprintf(stderr, "%s: ", PACKAGE);
+    fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
     va_list args;
     va_start(args, format);
@@ -52,7 +55,7 @@ void status(const char* format, ...) {
         return;
     }
 
-    fprintf(stderr, "%s: ", PACKAGE);
+    fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
     va_list args;
     va_start(args, format);
@@ -70,14 +73,14 @@ void status(const char* format, ...) {
  \note The codes should be documented in the manual.
 */
 __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...) {
-    fprintf(stderr, "%s: ", PACKAGE);
+    fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _c0_);
 
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
 
-    fprintf(stderr, " -- aborting [#%02d]\n", code);
+    fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
 
     status("see manual for a documentation of this error");
 

@@ -3,25 +3,25 @@ args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --co
 description "About Safira:"
 purpose "Safira: Set Algebra for Service Behavior."
 
-option "complment" p
-  "Complements the extended annotated service automaton"
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-
-option "output" o
-  "Select the output file format(s)"
-  typestr="FORMAT"
-  values="og","dot","png","pdf","eps" enum
-  optional
-  multiple
-
 option "verbose" v
   "Show verbose output"
   flag off
   
-option "clean" -
-  "Any temporary files created by Wendy are deleted once they are not used any more."
-  flag off 
+option "complment" c
+  "Complements the extended annotated service automaton"
+  string
+  typestr="FILENAME"
+  optional
   
+section "Input/Output"
+sectiondesc="When called without an input file, Safira reads from the standard input stream.  If 'eaa' doesn't selected as output format Safira will pipe the result to the standard output stream. The input filename's suffix (e.g. '.og') is replaced by the name of the respective option (e.g., '.eaa').\n"
+  
+
+option "output" o
+  "Select the output file format(s)"
+  typestr="FORMAT"
+  values="eaa","dot","png","pdf","eps" enum
+  optional
+  multiple
+
+ 

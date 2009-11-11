@@ -155,7 +155,7 @@ class StoredKnowledge {
         inline void adjustLowlinkValue(const StoredKnowledge* const, const bool) const;
 
         /// evaluates the current knowledge bubble with respect to (T)SCCs
-        inline void evaluateKnowledge();
+        void evaluateKnowledge();
 
         /// print knowledge
         void print(std::ostream&) const;

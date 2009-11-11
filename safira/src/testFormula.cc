@@ -31,6 +31,37 @@ void testFormulaClass(){
 	testAND_NOT();
 	testOR();
 	testAND_OR_NOT();
+
+	testSat();
+
+}
+
+void testSat(){
+    label2id.clear();
+    id2label.clear();
+
+	id2label[1] = "true";
+	label2id["true"] = 1;
+
+	id2label[2] = "false";
+	label2id["false"] = 2;
+
+	id2label[3] = "final";
+	label2id["final"] = 3;
+
+	id2label[4] = "Z";
+	label2id["Z"] = 4;
+
+	Formula * h = new FormulaNOT(new FormulaLit(4));
+	assert (h->isSatisfiable(label2id.size()) == true);
+
+	Formula * f = new FormulaOR(new FormulaNOT(new FormulaLit(4)), new FormulaLit(4)); // ~Z*Z
+	assert (f->isSatisfiable(label2id.size()) == false);
+
+	Formula * g = new FormulaOR(new FormulaLit(4), new FormulaNOT(new FormulaLit(4))); // Z*~Z
+	assert (g->isSatisfiable(label2id.size()) == false);
+
+
 }
 
 void initFormulaClass(){

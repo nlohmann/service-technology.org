@@ -30,7 +30,7 @@ extern int lastOutputId;
 
 ///constructor
 Graph::Graph() : trap(NULL), globalFormula(NULL){
-	trap = NULL;
+
 }
 
 ///destructor
@@ -254,73 +254,138 @@ void Graph::toDot(FILE* out, string title) const {
 
 }
 
-
-
 /// print the graph
-void Graph::print() const{
+void Graph::print(ostream& o) const{
 
-	fprintf(stdout, "INTERFACE\n");
-	fprintf(stdout, "  INPUT\n");
+	o << "INTERFACE\n";
+	o << "  INPUT\n";
 
 	for (int i = firstInputId; i <= lastInputId; ++i){
 		assert(id2label.find(i) != id2label.end());
 		if (i == firstInputId){
-			fprintf(stdout, "    %s", id2label[i].c_str());
+			o << "    " << id2label[i];
 		}
 		else{
-			fprintf(stdout, ", %s", id2label[i].c_str());
+			o << ", " << id2label[i];
 		}
 	}
 
-	fprintf(stdout, ";\n  OUTPUT\n");
+	o << ";\n  OUTPUT\n";
 	for (int i = firstOutputId; i <= lastOutputId; ++i){
 		assert(id2label.find(i) != id2label.end());
 		if (i == firstOutputId){
-			fprintf(stdout, "    %s", id2label[i].c_str());
+			o << "    " << id2label[i];
 		}
 		else{
-			fprintf(stdout, ", %s", id2label[i].c_str());
+			o << ", " << id2label[i];
 		}
 	}
 
-	fprintf(stdout, ";\n\nINITIALNODES ");
+	o << ";\n\nINITIALNODES ";
 	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
 		if (n == initialNodes.begin()){
-			fprintf(stdout, " %d", *n);
+			o << " " << *n;
 		}
 		else {
-			fprintf(stdout, ", %d", *n);
+			o << ", " << *n;
 		}
 	}
 
-	fprintf(stdout, ";\n\nGLOBALFORMULA %s", globalFormula->toString().c_str());
+	o << ";\n\nGLOBALFORMULA " << globalFormula->toString();
 
-    fprintf(stdout, ";\n\nNODES\n");
+	o << ";\n\nNODES\n";
 
     //print all nodes
 	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
-		fprintf(stdout, "  %d: %s\n", n->first, n->second->formula->toString().c_str());
+		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
 		for (int i = firstLabelId; i <= lastLabelId; ++i){
 			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
 				assert(id2label.find(i) != id2label.end());
-				fprintf(stdout, "    %s -> %d\n", id2label[i].c_str(), (*s)->id);
+				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
 			}
 		}
-		fprintf(stdout, "\n");
+		o << endl;
 	}
 
     //print all addednodes
 	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
-		fprintf(stdout, "  %d: %s\n", n->first, n->second->formula->toString().c_str());
+		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
 		for (int i = firstLabelId; i <= lastLabelId; ++i){
 			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
 				assert(id2label.find(i) != id2label.end());
-				fprintf(stdout, "    %s -> %d\n", id2label[i].c_str(), (*s)->id);
+				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
 			}
 		}
-		fprintf(stdout, "\n");
+		o << endl;
 	}
 }
+
+
+/// print the graph
+//void Graph::print() const{
+//
+//	fprintf(stdout, "INTERFACE\n");
+//	fprintf(stdout, "  INPUT\n");
+//
+//	for (int i = firstInputId; i <= lastInputId; ++i){
+//		assert(id2label.find(i) != id2label.end());
+//		if (i == firstInputId){
+//			fprintf(stdout, "    %s", id2label[i].c_str());
+//		}
+//		else{
+//			fprintf(stdout, ", %s", id2label[i].c_str());
+//		}
+//	}
+//
+//	fprintf(stdout, ";\n  OUTPUT\n");
+//	for (int i = firstOutputId; i <= lastOutputId; ++i){
+//		assert(id2label.find(i) != id2label.end());
+//		if (i == firstOutputId){
+//			fprintf(stdout, "    %s", id2label[i].c_str());
+//		}
+//		else{
+//			fprintf(stdout, ", %s", id2label[i].c_str());
+//		}
+//	}
+//
+//	fprintf(stdout, ";\n\nINITIALNODES ");
+//	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
+//		if (n == initialNodes.begin()){
+//			fprintf(stdout, " %d", *n);
+//		}
+//		else {
+//			fprintf(stdout, ", %d", *n);
+//		}
+//	}
+//
+//	fprintf(stdout, ";\n\nGLOBALFORMULA %s", globalFormula->toString().c_str());
+//
+//    fprintf(stdout, ";\n\nNODES\n");
+//
+//    //print all nodes
+//	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
+//		fprintf(stdout, "  %d: %s\n", n->first, n->second->formula->toString().c_str());
+//		for (int i = firstLabelId; i <= lastLabelId; ++i){
+//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+//				assert(id2label.find(i) != id2label.end());
+//				fprintf(stdout, "    %s -> %d\n", id2label[i].c_str(), (*s)->id);
+//			}
+//		}
+//		fprintf(stdout, "\n");
+//	}
+//
+//    //print all addednodes
+//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
+//		fprintf(stdout, "  %d: %s\n", n->first, n->second->formula->toString().c_str());
+//		for (int i = firstLabelId; i <= lastLabelId; ++i){
+//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+//				assert(id2label.find(i) != id2label.end());
+//				fprintf(stdout, "    %s -> %d\n", id2label[i].c_str(), (*s)->id);
+//			}
+//		}
+//		fprintf(stdout, "\n");
+//	}
+//}
 
 void Graph::printNodes(map<int, Node*> nodeMap){
 	cout << "\nsize of map: " << nodeMap.size() << endl;

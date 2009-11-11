@@ -16,6 +16,7 @@ void testAND_NOT();
 void testOR_NOT();
 void testAND_OR();
 void testAND_OR_NOT();
+void testSat();
 
 
 

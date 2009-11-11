@@ -11,7 +11,8 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
                  testNode.h testNode.cc \
                  types.h \
                  cmdline.c cmdline.h \
-                 verbose.h verbose.cc 
+                 verbose.h verbose.cc \
+                 Output.h Output.cc
 
 safira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
 

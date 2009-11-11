@@ -1,4 +1,5 @@
 #include <config.h>
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <cstdio>
@@ -14,6 +15,7 @@
 #include "testFormula.h"
 #include "testNode.h"
 #include "testGraph.h"
+#include "Output.h"
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -96,13 +98,14 @@ int main(int argc, char **argv) {
 */
 	g->makeTotal();
 	g->makeComplete();
-	g->print();
+
 /*
 	time_t buildOG_end = time(NULL);
 	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
 	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
 	cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
 */
+	bool printToStdout = true;
 	for (int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {
 
@@ -112,11 +115,11 @@ int main(int argc, char **argv) {
 		case (output_arg_pdf): {
 			if (CONFIG_DOT == "not found") {
 				cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
-				cerr << "       necessary for option '--output=owfn'" << endl;
+				cerr << "       necessary for option '--output'" << endl;
 				exit(EXIT_FAILURE);
 			}
 
-			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename+ "." + args_info.output_orig[j];
+			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_complement." + args_info.output_orig[j];
 			FILE *s = popen(call.c_str(), "w");
 			assert(s);
 			//fprintf(s, "%s\n", d.str().c_str());
@@ -126,7 +129,17 @@ int main(int argc, char **argv) {
 
 			pclose(s);
 		}
+		case (output_arg_eaa): {
+			printToStdout = false;
+			Output o(filename+"_complement.eaa", "complement OG");
+			g->print(o);
 		}
+		}
+	}
+
+	if(printToStdout){
+		Output o("-", "complement OG");
+		g->print(o);
 	}
 
 	delete g;

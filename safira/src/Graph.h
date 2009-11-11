@@ -4,6 +4,7 @@
 #include <map>
 #include "Node.h"
 #include "types.h"
+#include <iostream>
 
 using namespace std;
 
@@ -37,8 +38,8 @@ class Graph {
         void toDot(FILE* out, string title = "") const;
        // void toDot(string filename, string title = "") const;
 
-        /// Fiona OG output
-        void print() const;
+        /// OG output
+        void print(ostream& o) const;
 
         /// print the node numbers of the given map
         void printNodes(map<int, Node*> nodeMap);

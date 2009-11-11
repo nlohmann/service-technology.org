@@ -7,6 +7,24 @@ option "verbose" v
   "Show verbose output"
   flag off
   
+option "clean" -
+  "Any temporary files created by Safira are deleted once they are not used any more."
+  flag off 
+  
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/wendy-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
+  flag off  
+ 
 option "complment" c
   "Complements the extended annotated service automaton"
   string

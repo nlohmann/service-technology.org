@@ -33,7 +33,7 @@ std::vector<int> clauseToIntVector(const Clause &c) {
 string clauseToString(Clause c){
 	string s = " ";
 	if (c.literal0 != emptyLiteral()){
-		s = s + intToString(c.literal0);
+		s = s + " " + intToString(c.literal0);
 	}
 	if (c.literal1 != emptyLiteral()){
 		s = s + " " + intToString(c.literal1);
@@ -47,7 +47,7 @@ string clauseToString(Clause c){
 	return s;  // s = " " + c->literal0 + " " + c->literal1 + " " + c->literal2 + " "
 }
 
-string intToString(int i){
+string intToString(const int i){
 
 	stringstream ssout;
 	ssout <<  i;

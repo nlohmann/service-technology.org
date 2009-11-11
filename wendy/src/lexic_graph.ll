@@ -19,9 +19,9 @@
 
 
 %option noyywrap
-%option yylineno
 %option nodefault
 %option nounput
+%option fast
 %option outfile="lex.yy.c"
 %option prefix="graph_"
 
@@ -30,11 +30,11 @@
 #include "syntax_graph.h"
 #include "verbose.h"
 
-void graph_error(const char *);
+void graph_error(const char*);
 %}
 
 name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
-number    "-"?[0-9][0-9]*
+number    [0-9][0-9]*
 
 %%
 
@@ -59,7 +59,7 @@ number    "-"?[0-9][0-9]*
 
 %%
 
-void graph_error(const char *msg) {
-  status("%d: error near '%s': %s", graph_lineno, graph_text, msg);
+void graph_error(const char* msg) {
+  status("error near '%s': %s", graph_text, msg);
   abort(6, "error while parsing the reachability graph");
 }

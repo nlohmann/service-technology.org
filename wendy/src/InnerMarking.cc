@@ -113,7 +113,7 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
     assert(_labels.size() == out_degree);
     assert(out_degree < UCHAR_MAX);
 
-    if (++stats.markings % 100000 == 0) {
+    if (++stats.markings % 50000 == 0) {
         message("%8d inner markings", stats.markings);
     }
 

@@ -21,7 +21,7 @@
 %option noyywrap
 %option nodefault
 %option nounput
-%option fast
+%option full
 %option outfile="lex.yy.c"
 %option prefix="graph_"
 

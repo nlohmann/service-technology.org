@@ -4,16 +4,6 @@ AT_INIT
 AT_BANNER([Benchmark Set 1])
 ############################################################################
 
-AT_SETUP([AP])
-m4_define([TESTCASE], [AP])
-AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
-AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
-AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
-AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
-AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
-AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
-AT_CLEANUP
-
 AT_SETUP([QR])
 m4_define([TESTCASE], [QR])
 AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
@@ -26,16 +16,6 @@ AT_CLEANUP
 
 AT_SETUP([CB])
 m4_define([TESTCASE], [CB])
-AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
-AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
-AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
-AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
-AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
-AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
-AT_CLEANUP
-
-AT_SETUP([CR])
-m4_define([TESTCASE], [CR])
 AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
 AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
 AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
@@ -64,10 +44,48 @@ AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Benchmark Set 2])
+############################################################################
+
+AT_SETUP([AP])
+m4_define([TESTCASE], [AP])
+AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
+AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([CR])
+m4_define([TESTCASE], [CR])
+AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
+AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
 AT_SETUP([Big Node (1500000)])
 m4_define([TESTCASE], [bignode1500000])
 AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
 AT_CHECK([WENDY TESTCASE.owfn --stats --ignoreUnreceivedMessages],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Benchmark Set 3 (smart sending event)])
+############################################################################
+
+AT_SETUP([TPO])
+m4_define([TESTCASE], [TPO])
+AT_CHECK([cp TESTFILES/TESTCASE.owfn .])
+AT_CHECK([WENDY TESTCASE.owfn --stats --messagebound=2],0,ignore,stderr)
 AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
 AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])

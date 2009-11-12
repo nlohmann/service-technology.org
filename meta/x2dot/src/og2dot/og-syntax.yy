@@ -62,7 +62,7 @@ char currentSection = ' ';
 %token KEY_NODES KEY_TRANSITIONS KEY_INITIALNODE
 %token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS KEY_RED KEY_BLUE KEY_FINALNODE KEY_INITIAL
 %token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
-%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
+%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S BIT_T
 %token LPAR RPAR
 
 %union {
@@ -82,15 +82,12 @@ char currentSection = ' ';
 %start og
 %%
 
-
-
 /*Everything concerning the interface of the operating guideline can
 safely be skipped as it is not relevant for creating
 the dot output */
 
 og:
-
-  KEY_INTERFACE input output synchronous KEY_NODES nodes
+   KEY_INTERFACE input output synchronous KEY_NODES nodes
 
   {
 	//Finished parsing, write output
@@ -124,7 +121,7 @@ og:
   }
 
 /*Syntax for old format*/
-|  KEY_INTERFACE input output synchronous nodesOld
+| KEY_INTERFACE input output synchronous nodesOld
 
   {
 	for(int i=0;i<nodes.size();++i){			
@@ -328,6 +325,7 @@ annotation:
 | COLON formula
 | DOUBLECOLON BIT_S {strStream << "S";}
 | DOUBLECOLON BIT_F {strStream << "F";}
+| DOUBLECOLON BIT_T {strStream << "T";}
 
 ;
 

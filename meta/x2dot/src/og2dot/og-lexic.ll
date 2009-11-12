@@ -40,6 +40,7 @@ number         [0-9]+
 
 <BITS>"F"                               { BEGIN(INITIAL); return BIT_F; }
 <BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
+<BITS>"T"                               { BEGIN(INITIAL); return BIT_T; }
 "TRUE"                                  { return KEY_TRUE;             }
 "FALSE"                                 { return KEY_FALSE;            }
 "FINAL"                                 { return KEY_FINAL;            }

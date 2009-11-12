@@ -25,6 +25,8 @@ extern FILE* og_yyin;
 /// output stream
 std::ostream* outStream = &cout;
 
+/// a variable holding the time of the call
+clock_t start_clock = clock();
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) 
@@ -40,9 +42,23 @@ void evaluateParameters(int argc, char** argv)
 }
 
 
+void terminationHandler() {
+    // print statistics
+    if (args_info.stats_given) {
+        fprintf(stderr, "%s: runtime: %.2f sec\n", PACKAGE, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        fprintf(stderr, "%s: memory consumption: ", PACKAGE);
+	//TODO: Replace "grep" and "awk" with macros defined in configure.ac
+        system((std::string("ps -o rss -o comm | ") + "grep" + " " + PACKAGE + " | " + "awk" + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+    }
+}
+
+
 /// main function
 int main(int argc, char** argv)
 {
+
+  // set the function to call on normal termination
+  atexit(terminationHandler);
 
   // stream for file output
   ofstream ofs;
@@ -77,21 +93,18 @@ int main(int argc, char** argv)
       exit(EXIT_FAILURE);
     }
   }
-  
+
   //Write keyword to stream
   (*outStream) << "digraph{\n\n";
   //Use Helvetica
   (*outStream) << "edge [fontname=Helvetica fontsize=10]\n";
-  (*outStream) << "node [fontname=Helvetica fontsize=10]\n";
-	
+  (*outStream) << "node [fontname=Helvetica fontsize=10]\n";  
 
   /// actual parsing
    og_yyparse();
 	
- // close input (output is closed by destructor)   fclose(og_yyin);
- /// clean lexer memory   og_yylex_destroy();
-  
-
+  // close input (output is closed by destructor)   fclose(og_yyin);
+  /// clean lexer memory   og_yylex_destroy();
 
   return EXIT_SUCCESS; // finished parsing
 }

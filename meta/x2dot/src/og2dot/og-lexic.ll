@@ -43,6 +43,7 @@ number         [0-9]+
 "TRUE"                                  { return KEY_TRUE;             }
 "FALSE"                                 { return KEY_FALSE;            }
 "FINAL"                                 { return KEY_FINAL;            }
+"INITIAL"				{ return KEY_INITIAL;	       }
 "~"                                     { return OP_NOT;               }
 "*"                                     { return OP_AND;               }
 "+"                                     { return OP_OR;                }

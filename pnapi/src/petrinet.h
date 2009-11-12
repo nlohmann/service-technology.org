@@ -344,6 +344,11 @@ public:
   void compose(const PetriNet &, const std::string & = "net1",
       const std::string & = "net2");
 
+  /// compose two nets by adding the given one and merging interface places of the same port only
+  void composeByPorts(const PetriNet &, const std::string &portA,
+      const std::string &portB, const std::string &prefixA = "net1",
+      const std::string &prefixB = "net2");
+
   /// compose the given nets into a new one
   static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
@@ -429,6 +434,8 @@ private:
 
   /// ports (grouping of interface places)
   std::multimap<std::string, Place *> interfacePlacesByPort_;
+
+  /// ports (grouping of synchronous labels)
 
   /// all arcs
   std::set<Arc *> arcs_;

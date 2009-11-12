@@ -21,7 +21,9 @@ libpnapi_la_SOURCES = \
     marking.h marking.cc \
     myio.h myio.cc io-format.cc \
     errorhandling.cc \
-    Output.h Output.cc
+    Output.h Output.cc \
+    interface.h interface.cc \
+    port.h port.cc
 
 
 # information for libtool

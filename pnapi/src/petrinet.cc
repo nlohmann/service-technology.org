@@ -884,6 +884,21 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
 
 
 /*!
+ * \param net the 2nd Petri net
+ * \param portA the identifier of the port to be composed in the 1st Petri net
+ * \param portB the identifier of the port to be composed in the 2nd Petri net
+ * \param prefixA the net prefix for the 1st net
+ * \param prefixB the net prefix for the 2nd net
+ *
+ * The result is written to the net which has called the method.
+ */
+void PetriNet::composeByPorts(const PetriNet &net, const string &portA,
+    const string &portB, const string &prefixA, const string &prefixB)
+{
+}
+
+
+/*!
  */
 PetriNet PetriNet::composeByWiring(const map<string, PetriNet *> & nets)
 {
@@ -1614,7 +1629,7 @@ void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
  * \return  true iff (1), (2) and (3) are fulfilled
  * \return  false in any other case
  * 
- * \todo    Erkennung der SZK ohne Hinzufügen der Transition
+ * \todo    Erkennung der SZK ohne Hinzufï¿½gen der Transition
  *          Daniela nach Alorithmus fragen; Funktion const machen
  */
 bool PetriNet::isWorkflow()

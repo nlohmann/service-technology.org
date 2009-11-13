@@ -37,9 +37,9 @@ AT_KEYWORDS(io)
 AT_CLEANUP
 
 AT_SETUP([Pipe In, File Out])
-AT_CHECK([cp TESTFILES/myCoffee.og .])
-AT_CHECK([cat myCoffee.og | OG2DOT --output=myCoffee.dot],0)
-AT_CHECK([test -f myCoffee.dot])
+AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
+AT_CHECK([cat myCoffee.wendy.og | OG2DOT --output=myCoffee.wendy.dot],0)
+AT_CHECK([test -f myCoffee.wendy.dot])
 AT_KEYWORDS(io)
 AT_CLEANUP
 
@@ -56,8 +56,8 @@ AT_BANNER([DOT OUTPUT TESTS])
 
 AT_SETUP([Piping to dot])
 AT_CHECK_DOT
-AT_CHECK([cp TESTFILES/myCoffee.og .])
-AT_CHECK([OG2DOT --input=myCoffee.og | dot],0,ignore)
+AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
+AT_CHECK([OG2DOT --input=myCoffee.wendy.og | dot],0,ignore)
 AT_KEYWORDS(dot)
 AT_CLEANUP
 

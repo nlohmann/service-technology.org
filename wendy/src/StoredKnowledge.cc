@@ -75,22 +75,22 @@ StoredKnowledge::_stats::_stats()
  \param[in] SK  a knowledge bubble (compactly stored)
  \param[in] l   a label
  */
-void StoredKnowledge::processSuccessor(const Knowledge& K,
+void StoredKnowledge::processSuccessor(const Knowledge* K,
                                        StoredKnowledge* const SK,
                                        const Label_ID& l) {
     // create a new knowledge for the given label
-    Knowledge K_new(K, l);
+    Knowledge* K_new = new Knowledge(K, l);
 
     // do not store and process the empty node explicitly
-    if (K_new.size == 0) {
-        if (K_new.is_sane) {
+    if (K_new->size == 0) {
+        if (K_new->is_sane) {
             SK->addSuccessor(l, empty);
         }
         return;
     }
 
     // only process knowledges within the message bounds
-    if (K_new.is_sane or args_info.diagnose_given) {
+    if (K_new->is_sane or args_info.diagnose_given) {
         // remember whether SK_new is new
         bool newKnowledge = false;
 
@@ -106,7 +106,7 @@ void StoredKnowledge::processSuccessor(const Knowledge& K,
         // evaluate the storage result
         if (SK_store == SK_new) {
             newKnowledge = true;
-            if (K_new.is_sane) {
+            if (K_new->is_sane) {
                 // the node was new and sane, so check its successors
                 processNode(K_new, SK_store);
             }
@@ -121,6 +121,8 @@ void StoredKnowledge::processSuccessor(const Knowledge& K,
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
     }
+
+    delete K_new;
 }
 
 
@@ -131,7 +133,7 @@ void StoredKnowledge::processSuccessor(const Knowledge& K,
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::processNode(const Knowledge& K, StoredKnowledge* const SK) {
+void StoredKnowledge::processNode(const Knowledge* K, StoredKnowledge* const SK) {
     static unsigned int calls = 0;
 
     // statistics output
@@ -143,26 +145,26 @@ void StoredKnowledge::processNode(const Knowledge& K, StoredKnowledge* const SK)
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
         // reduction rule: send leads to insane node
-        if (not args_info.ignoreUnreceivedMessages_flag and SENDING(l) and not K.considerSendingEvent(l)) {
+        if (not args_info.ignoreUnreceivedMessages_flag and SENDING(l) and not K->considerSendingEvent(l)) {
             continue;
         }
 
         // reduction rule: sequentialize receiving events
         // if current receiving event is not to be considered, continue
-        if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not K.considerReceivingEvent(l)) {
+        if (args_info.seqReceivingEvents_flag and RECEIVING(l) and not K->considerReceivingEvent(l)) {
             continue;
         }
 
         // reduction rule: receive before send
         if (args_info.receivingBeforeSending_flag) {
             // check if we're done receiving and each deadlock was resolved
-            if (l > Label::last_receive and K.receivingHelps()) {
+            if (l > Label::last_receive and K->receivingHelps()) {
                 break;
             }
         }
 
         // reduction rule: only consider waitstates
-        if (args_info.waitstatesOnly_flag and not RECEIVING(l) and not K.resolvableWaitstate(l)) {
+        if (args_info.waitstatesOnly_flag and not RECEIVING(l) and not K->resolvableWaitstate(l)) {
             continue;
         }
 
@@ -317,10 +319,10 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
 
  \param[in] K  the knowledge to copy from
 */
-StoredKnowledge::StoredKnowledge(const Knowledge& K)
-        : is_final(0), is_final_reachable(0), is_sane(K.is_sane),
-          is_on_tarjan_stack(1), sizeDeadlockMarkings(K.size),
-          sizeAllMarkings(K.size), inner(NULL), interface(NULL),
+StoredKnowledge::StoredKnowledge(const Knowledge* K)
+        : is_final(0), is_final_reachable(0), is_sane(K->is_sane),
+          is_on_tarjan_stack(1), sizeDeadlockMarkings(K->size),
+          sizeAllMarkings(K->size), inner(NULL), interface(NULL),
           successors(NULL) {
     assert(sizeAllMarkings > 0);
 
@@ -339,7 +341,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge& K)
     size_t count = 0;
 
     // traverse the bubble and copy the markings into the C arrays
-    for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K.bubble.begin(); pos != K.bubble.end(); ++pos) {
+    for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
         for (size_t i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking and the interface marking
             inner[count] = pos->first;
@@ -352,7 +354,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge& K)
 
     // check this knowledge for covering nodes
     if (args_info.cover_given) {
-        Cover::checkKnowledge(this, K.bubble);
+        Cover::checkKnowledge(this, K->bubble);
     }
 
     // move waitstates to front of bubble

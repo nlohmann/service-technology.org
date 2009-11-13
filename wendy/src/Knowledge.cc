@@ -55,14 +55,14 @@ Knowledge::Knowledge(InnerMarking_ID m)
 /*!
  \note no action in this constructor can introduce a duplicate
 */
-Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
+Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
         : is_sane(1), size(0), posSendEvents(NULL), posSendEventsDecoded(NULL) {
     // tau does not make sense here
     assert(not SILENT(label));
 
     // CASE 1: we receive -- decrement interface markings
     if (RECEIVING(label)) {
-        for (Bubble::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
+        for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
             for (size_t i = 0; i < pos->second.size(); ++i) {
                 // copy an interface marking from the parent and decrement it
                 bool result = true;
@@ -85,7 +85,7 @@ Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
     if (SENDING(label)) {
         std::queue<FullMarking> todo;
 
-        for (Bubble::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
+        for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             bool receiver = (InnerMarking::receivers[label].find(pos->first) != InnerMarking::receivers[label].end());
 
@@ -121,7 +121,7 @@ Knowledge::Knowledge(const Knowledge& parent, const Label_ID& label)
     if (SYNC(label)) {
         std::queue<FullMarking> todo;
 
-        for (Bubble::const_iterator pos = parent.bubble.begin(); pos != parent.bubble.end(); ++pos) {
+        for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
 

@@ -41,7 +41,7 @@ class StoredKnowledge {
         static void finalize();
 
         /// recursively calculate knowledge bubbles
-        static void processNode(const Knowledge&, StoredKnowledge* const);
+        static void processNode(const Knowledge*, StoredKnowledge* const);
 
         /// print a dot representation
         static void output_dot(std::ostream&);
@@ -117,7 +117,7 @@ class StoredKnowledge {
 
     private: /* static functions */
         /// generate the successor of a knowledge bubble given a label
-        inline static void processSuccessor(const Knowledge&, StoredKnowledge* const, const Label_ID&);
+        inline static void processSuccessor(const Knowledge*, StoredKnowledge* const, const Label_ID&);
 
         /// creates the header for output files
         static void fileHeader(std::ostream&);
@@ -127,7 +127,7 @@ class StoredKnowledge {
 
     public: /* member functions */
         /// constructs an object from a Knowledge object
-        explicit StoredKnowledge(const Knowledge&);
+        explicit StoredKnowledge(const Knowledge*);
 
         /// destructor
         ~StoredKnowledge();

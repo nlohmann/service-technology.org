@@ -42,7 +42,7 @@ class Knowledge {
         explicit Knowledge(InnerMarking_ID);
 
         /// construct knowledge from a given knowledge and a label
-        Knowledge(const Knowledge&, const Label_ID&);
+        Knowledge(const Knowledge*, const Label_ID&);
 
         /// destructor
         ~Knowledge();

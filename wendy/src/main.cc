@@ -311,20 +311,19 @@ int main(int argc, char** argv) {
     | 7. calculate knowledge bubbles |
     `-------------------------------*/
     time(&start_time);
-    {
-        Knowledge K0(0);
-        StoredKnowledge::root = new StoredKnowledge(K0);
+    Knowledge* K0 = new Knowledge(0);
+    StoredKnowledge::root = new StoredKnowledge(K0);
 
-        if (StoredKnowledge::root->is_sane) {
+    if (StoredKnowledge::root->is_sane) {
+        StoredKnowledge::root->store();
+        StoredKnowledge::processNode(K0, StoredKnowledge::root);
+    } else {
+        // store insane root in case of diagnosis
+        if (args_info.diagnose_given) {
             StoredKnowledge::root->store();
-            StoredKnowledge::processNode(K0, StoredKnowledge::root);
-        } else {
-            // store insane root in case of diagnosis
-            if (args_info.diagnose_given) {
-                StoredKnowledge::root->store();
-            }
         }
     }
+    delete K0;
     time(&end_time);
 
     // statistics output

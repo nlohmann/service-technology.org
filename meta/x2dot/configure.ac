@@ -16,6 +16,13 @@ AC_PROG_GREP
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# search for dot (useful for test cases)
+AC_PATH_PROG(DOT, [dot], not found)
+
+# set up autotest
+AM_MISSING_PROG(AUTOM4TE, autom4te)
+AC_CONFIG_TESTDIR(tests)
+
 # allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
 AH_BOTTOM([#ifdef __cplusplus
@@ -24,6 +31,6 @@ AH_BOTTOM([#ifdef __cplusplus
 #include <assert.h>
 #endif])
 
-AC_CONFIG_FILES([Makefile src/og2dot/Makefile])
+AC_CONFIG_FILES([Makefile src/og2dot/Makefile tests/Makefile tests/package.m4])
 
 AC_OUTPUT

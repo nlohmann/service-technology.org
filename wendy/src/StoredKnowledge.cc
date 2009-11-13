@@ -86,6 +86,7 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
         if (K_new->is_sane) {
             SK->addSuccessor(l, empty);
         }
+        delete K_new;
         return;
     }
 

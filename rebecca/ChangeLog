@@ -33,3 +33,9 @@ Version 1.0-unreleased
 
 * implemented output on stdout
 
+* added THEORY file
+
+* added routines to open and read from files
+
+* added testcase for new error code
+

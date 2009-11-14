@@ -18,6 +18,12 @@ AT_CLEANUP
 AT_BANNER([Error Codes])
 ############################################################################
 
+AT_SETUP([Input file not readable])
+AT_CHECK([REBECCA foo.bar -q], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting \[[#01\]]" stderr],0)
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
 AT_SETUP([Choreography check])
 AT_CHECK([cp TESTFILES/fig2bIll.chor .])
 AT_CHECK([REBECCA < fig2bIll.chor],1,ignore,stderr)

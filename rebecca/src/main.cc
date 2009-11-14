@@ -22,6 +22,7 @@ using std::vector;
 Choreography * chor;
 /// the parser
 extern int chor_parse();
+extern FILE *chor_in;
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -49,11 +50,16 @@ int main(int argc, char** argv) {
     /*--------------------------------------.
     | 1. parse the chreography description  |
     `--------------------------------------*/
+    if (args_info.inputs_num > 0)
+    {
+      chor_in = fopen(args_info.inputs[0], "r");
+      if (!chor_in)
+        abort(1, "could not open the input file '%s'", args_info.inputs[0]);
+    }
     chor = new Choreography();
-    // * open the file
     status("parsing input choreography");
     chor_parse();
-    // * close the file
+    fclose(chor_in);
 
     /*----------------------------.
     | 2. prepare data structures  |

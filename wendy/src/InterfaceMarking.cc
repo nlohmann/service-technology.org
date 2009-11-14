@@ -68,6 +68,10 @@ void InterfaceMarking::initialize() {
 
     status("message bound set to %d (%d bytes/interface marking, %d bits/event)",
         message_bound, bytes, message_bound_bits);
+
+    if (uint8_t wastedBytes = bytes - static_cast<uint8_t>(ceil(static_cast<double>(message_bound_bits * interface_length) / 8.0))) {
+        message("%s: a better alignment could save %d bytes/interface marking", _cimportant_("note"), wastedBytes);
+    }
 }
 
 

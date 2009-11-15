@@ -92,9 +92,6 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
 
     // only process knowledges within the message bounds
     if (K_new->is_sane or args_info.diagnose_given) {
-        // remember whether SK_new is new
-        bool newKnowledge = false;
-
         // create a compact version of the knowledge bubble
         StoredKnowledge* SK_new = new StoredKnowledge(K_new);
 
@@ -106,7 +103,6 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
 
         // evaluate the storage result
         if (SK_store == SK_new) {
-            newKnowledge = true;
             if (K_new->is_sane) {
                 // the node was new and sane, so check its successors
                 processNode(K_new, SK_store);
@@ -117,7 +113,7 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
         }
 
         // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
-        SK->adjustLowlinkValue(SK_store, newKnowledge);
+        SK->adjustLowlinkValue(SK_store, SK_store == SK_new);
     } else {
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
@@ -157,11 +153,8 @@ void StoredKnowledge::processNode(const Knowledge* K, StoredKnowledge* const SK)
         }
 
         // reduction rule: receive before send
-        if (args_info.receivingBeforeSending_flag) {
-            // check if we're done receiving and each deadlock was resolved
-            if (l > Label::last_receive and K->receivingHelps()) {
-                break;
-            }
+        if (args_info.receivingBeforeSending_flag and not RECEIVING(l) and K->receivingHelps()) {
+            break;
         }
 
         // reduction rule: only consider waitstates
@@ -652,7 +645,6 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
  */
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
-
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if (successors[l-1] != NULL and successors[l-1] != empty and
                 (successors[l-1]->is_sane or args_info.diagnose_given)) {
@@ -823,7 +815,7 @@ void StoredKnowledge::output_ogold(std::ostream& file) {
                     << " : " << PREFIX(l) << Label::id2name[l];
             } else {
                 // edges to the empty node
-                if ((**it).successors[l-1] != NULL and (**it).successors[l-1] == empty) {
+                if ((**it).successors[l-1] == empty) {
                     if (first) {
                         first = false;
                     } else {

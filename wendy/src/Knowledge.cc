@@ -19,10 +19,9 @@
 
 
 #include <config.h>
+#include <set>
 #include "Knowledge.h"
 #include "cmdline.h"
-
-using std::map;
 
 extern gengetopt_args_info args_info;
 typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
@@ -32,8 +31,14 @@ typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
  * CONSTRUCTOR *
  ***************/
 
+/*!
+ \todo Why is the size of consideredReceivingEvents = receive_events + 1? Why
+       do we need to store an additional event? It seems as if we just need to
+       adjust the labels and access the vector by consideredReceivingEvents[l-1].
+*/
 Knowledge::Knowledge(InnerMarking_ID m)
-        : is_sane(1), size(1), posSendEvents(NULL), posSendEventsDecoded(NULL) {
+        : is_sane(1), size(1), posSendEvents(NULL), posSendEventsDecoded(NULL),
+          consideredReceivingEvents(Label::receive_events+1, false) {
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     std::queue<FullMarking> todo;
@@ -54,9 +59,14 @@ Knowledge::Knowledge(InnerMarking_ID m)
 
 /*!
  \note no action in this constructor can introduce a duplicate
+
+ \todo Why is the size of consideredReceivingEvents = receive_events + 1? Why
+       do we need to store an additional event? It seems as if we just need to
+       adjust the labels and access the vector by consideredReceivingEvents[l-1].
 */
 Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
-        : is_sane(1), size(0), posSendEvents(NULL), posSendEventsDecoded(NULL) {
+        : is_sane(1), size(0), posSendEvents(NULL), posSendEventsDecoded(NULL),
+          consideredReceivingEvents(Label::receive_events+1, false) {
     // tau does not make sense here
     assert(not SILENT(label));
 
@@ -290,10 +300,8 @@ void Knowledge::closure(std::queue<FullMarking>& todo) {
                 ++size;
                 todo.push(candidate);
 
-                // sort bubble using STL algorithms
-                if (bubble[candidate.inner].size() > 1) {
-                    InterfaceMarking::sort(bubble[candidate.inner]);
-                }
+                // sort bubble using self-implemented quicksort
+                InterfaceMarking::sort(bubble[candidate.inner]);
 
                 if (not is_sane) {
                     return;
@@ -390,19 +398,17 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, cons
  before traversing through each and every receiving event, we first check
  which receiving events are essentially needed to resolve every waitstate
  of the current bubble
+ 
+ \todo Why is the size of occuranceOfReceivingEvent = receive_events + 1? Why
+       do we need to store an additional event? It seems as if we just need to
+       adjust the labels and access the vector by occuranceOfReceivingEvent[l-1].
 */
 void Knowledge::sequentializeReceivingEvents() {
     // count the number that a receiving event is activated
-    uint8_t* occuranceOfReceivingEvent = new uint8_t[Label::receive_events + 1];
-
-    for (uint8_t i = 0; i <= Label::receive_events; ++i) {
-        occuranceOfReceivingEvent[i] = 0;
-    }
-
-    consideredReceivingEvents.assign(Label::receive_events + 1, false);
+    std::vector<uint8_t> occuranceOfReceivingEvent(Label::receive_events + 1, 0);
 
     // remember to consider this state again; actually we only need to take a look at its interface
-    map<InterfaceMarking*, bool> visitStateAgain;
+    std::set<InterfaceMarking*> visitStateAgain;
 
     // traverse the inner markings
     for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
@@ -434,14 +440,14 @@ void Knowledge::sequentializeReceivingEvents() {
 
                     // remember to visit this state again; we only store the
                     // interface here, we don't need more information later on
-                    visitStateAgain[pos->second[i]] = true;
+                    visitStateAgain.insert(pos->second[i]);
                 }
             }
         }
     }
 
     // now traverse through all states that we remembered to consider again
-    for (map<InterfaceMarking*, bool>::const_iterator currenState = visitStateAgain.begin(); currenState != visitStateAgain.end(); ++currenState) {
+    for (std::set<InterfaceMarking*>::const_iterator currenState = visitStateAgain.begin(); currenState != visitStateAgain.end(); ++currenState) {
  
         // remember the receiving event that will resolve this waitstate
         Label_ID consideredReceivingEvent = 0;
@@ -453,10 +459,10 @@ void Knowledge::sequentializeReceivingEvents() {
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
 
             // receiving event will resolve this waitstate
-            if ((currenState->first)->marked(l)) {
+            if ((*currenState)->marked(l)) {
 
                 // it will be considered, so continue with the next waitstate
-                if (consideredReceivingEvents.at(l)) {
+                if (consideredReceivingEvents[l]) {
                     consideredReceivingEvent = l;
                     break;
                 }
@@ -482,8 +488,6 @@ void Knowledge::sequentializeReceivingEvents() {
             consideredReceivingEvents[consideredReceivingEvent] = true;
         }
     } // end for, traverse through states
-
-    delete[] occuranceOfReceivingEvent;
 }
 
 
@@ -498,7 +502,7 @@ void Knowledge::sequentializeReceivingEvents() {
 bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
     assert(args_info.seqReceivingEvents_flag);
 
-    return consideredReceivingEvents.at(label);
+    return consideredReceivingEvents[label];
 }
 
 

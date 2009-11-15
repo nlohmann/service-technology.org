@@ -250,7 +250,7 @@ uint8_t InterfaceMarking::get(const Label_ID& label) const {
     // the byte in which this interface is stored
     const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const uint8_t offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // first, create (2**message_bound_bits)-1, then shift it to the needed position
     const uint8_t mask = ((1 << message_bound_bits) - 1) << offset;
@@ -272,7 +272,7 @@ bool InterfaceMarking::inc(const Label_ID& label) {
     // the byte in which this interface is stored
     const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const uint8_t offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // create a mask to select the bits we want to modify:
     // (2**message_bound_bits)-1, then shift it to the needed position
@@ -308,7 +308,7 @@ bool InterfaceMarking::dec(const Label_ID& label) {
     // the byte in which this interface is stored
     const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const uint8_t offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // create a mask to select the bits we want to modify:
     // (2**message_bound_bits)-1, then shift it to the needed position
@@ -318,7 +318,7 @@ bool InterfaceMarking::dec(const Label_ID& label) {
     const bool OK = (((storage[byte] & mask) >> offset) > 0);
 
     // use the mask to get the current value from the byte,
-    // then shift and increment the value
+    // then shift and decrement the value
     const uint8_t update = ((storage[byte] & mask) >> offset) - 1;
 
     // shift back and mask the value to store
@@ -356,7 +356,7 @@ bool InterfaceMarking::marked(const Label_ID& label) const {
     // the byte in which this interface is stored
     const unsigned int byte = (label-1) / markings_per_byte;
     // the offset inside the byte, i.e. the starting position
-    const unsigned int offset = ((label-1) % markings_per_byte) * message_bound_bits;
+    const uint8_t offset = ((label-1) % markings_per_byte) * message_bound_bits;
 
     // first, create (2**message_bound_bits)-1, then shift it to the needed position
     const uint8_t mask = ((1 << message_bound_bits) - 1) << offset;

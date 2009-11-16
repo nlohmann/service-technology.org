@@ -39,8 +39,11 @@ number         [0-9]+
 <BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
 <BITS>"T"                               { BEGIN(INITIAL); return BIT_T; }
 "TRUE"                                  { return KEY_TRUE;             }
+"true"                                  { return KEY_TRUE;             }
 "FALSE"                                 { return KEY_FALSE;            }
+"false"                                 { return KEY_FALSE;            }
 "FINAL"                                 { return KEY_FINAL;            }
+"final"                                 { return KEY_FINAL;            }
 "~"                                     { return OP_NOT;               }
 "*"                                     { return OP_AND;               }
 "+"                                     { return OP_OR;                }

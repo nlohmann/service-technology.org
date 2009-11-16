@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <inttypes.h>
 #include <vector>
 
 #include "myio.h"

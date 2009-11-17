@@ -1,0 +1,20 @@
+args "--include-getopt"
+
+purpose "Compiling several service-technology formats in each other."
+
+description "About compilers:"
+
+section "Input / Output"
+
+option "input" i
+  "Input file. If no file is given, it will be read from standard in."
+  string
+  typestr="INFILE"
+  optional
+
+option "output" o
+  "Output file. If no file is given, it will be written to standard out."
+  string
+  typestr="OUTFILE"
+  optional
+

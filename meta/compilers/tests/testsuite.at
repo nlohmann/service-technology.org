@@ -1,0 +1,50 @@
+AT_INIT
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([Help output (fiona2wendy)])
+AT_CHECK([FIONA2WENDY --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Help output (wendy2fiona)])
+AT_CHECK([WENDY2FIONA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output (fiona2wendy)])
+AT_CHECK([FIONA2WENDY --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output (wendy2fiona)])
+AT_CHECK([WENDY2FIONA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Fiona <-> Wendy])
+############################################################################
+
+AT_SETUP([Syntax Example 1])
+m4_define([NET], [syntax_example.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
+AT_CHECK([FIONA2WENDY --input=NET.og --output=NET.w.og])
+AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
+AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
+AT_KEYWORDS(fiona wendy)
+AT_CLEANUP
+
+AT_SETUP([Syntax Example 2])
+m4_define([NET], [syntax_example.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
+AT_CHECK([WENDY --og=NET.w.og NET], 0, ignore, ignore)
+AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
+AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
+AT_KEYWORDS(fiona wendy)
+AT_CLEANUP
+

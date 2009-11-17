@@ -1,4 +1,4 @@
-bin_PROGRAMS = fiona2wendy wendy2fiona
+bin_PROGRAMS = fiona2wendy wendy2fiona wendyFormula2bits
 
 COMMON = main.cc config.h \
          cmdline.c cmdline.h
@@ -10,6 +10,9 @@ fiona2wendy_SOURCES =  syntax-f2w.yy lexic-f2w.ll \
 
 wendy2fiona_SOURCES =  syntax-w2f.yy lexic-w2f.ll \
 		       $(COMMON)
+
+wendyFormula2bits_SOURCES =  syntax-wf2b.yy lexic-wf2b.ll \
+		             $(COMMON)
 
 
 #############################################################################
@@ -29,6 +32,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(fiona2wendy_SOURCES))
 BISON_FILES += $(filter %.yy,$(wendy2fiona_SOURCES))
+BISON_FILES += $(filter %.yy,$(wendyFormula2bits_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

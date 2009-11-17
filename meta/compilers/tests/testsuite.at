@@ -61,3 +61,20 @@ AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
 AT_KEYWORDS(fiona wendy)
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Wendy: Formula OG -> Bit OG])
+############################################################################
+
+AT_SETUP([Syntax Example])
+m4_define([NET], [syntax_example.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([WENDY --og=NET.og NET], 0, ignore, ignore)
+AT_CHECK([WENDYFORMULA2BITS --input=NET.og --output=NET.b.og])
+AT_CHECK([SAYO --input=NET.b.og --output=NET.sa])
+AT_CHECK([SA2SM NET.sa NET.owfn])
+AT_CHECK([WENDY --og=NET.owfn.og --fionaFormat NET.owfn], 0, ignore, ignore)
+AT_CHECK([WENDY --og=NET.f.og --fionaFormat NET], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.f.og NET.owfn.og], 0, ignore, ignore)
+AT_KEYWORDS(wendy formula bit)
+AT_CLEANUP
+

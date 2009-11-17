@@ -39,6 +39,8 @@ AC_CONFIG_TESTDIR(tests)
 # search for Fiona and Wendy (nice to have for "make check")
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(WENDY, [wendy], not found)
+AC_PATH_PROG(SAYO,  [sayo],  not found)
+AC_PATH_PROG(SA2SM, [sa2sm], not found)
 
 #############################################################################
 # create configured files (Makefiles, scripts, etc.)

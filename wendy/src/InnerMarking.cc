@@ -61,6 +61,7 @@ void InnerMarking::initialize() {
 
     // copy data from STL mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
+
         inner_markings[i] = markingMap[i];
         inner_markings[i]->is_bad = (inner_markings[i]->is_bad or not finalMarkingReachableMap[i]);
 
@@ -126,11 +127,12 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
     // knowing all successors, we can determine the type of the marking...
     determineType(myId);
 
-    // ...and we can make an approximation of the receiving transitions that
+    // ... and we can make an approximation of the receiving transitions that
     // are reachable from here
     if (not args_info.ignoreUnreceivedMessages_flag) {
-        calcReachableSendingEvents();
+        calcReachableSendingEvents(myId);
     }
+
 }
 
 
@@ -275,7 +277,7 @@ bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const
 /*!
   determines which sending events are potentially reachable from this marking
 */
-void InnerMarking::calcReachableSendingEvents() {
+void InnerMarking::calcReachableSendingEvents(const InnerMarking_ID& myId) {
     // never call this function more than once
     assert(possibleSendEvents == NULL);
 
@@ -288,16 +290,35 @@ void InnerMarking::calcReachableSendingEvents() {
 
         // traverse successors
         for (uint8_t i = 0; i < out_degree; i++) {
-            // if successor exists and if it leads to a final marking
-            if (markingMap[successors[i]] != NULL and finalMarkingReachableMap[successors[i]]) {
+
+            // there is a self-loop of the current inner marking
+            // in this case map markingMap is not yet set appropriately
+            // --> markingMap[currentMarking] == 0 because the map is set in syntax_graph.yy after this method has been called
+            if (successors[i] == myId) {
                 // direct successor reachable by sending event
-                if (SENDING(labels[i]) and not consideredLabels[labels[i]]) {
+                if (SENDING(labels[i]) and (consideredLabels.find(labels[i]) == consideredLabels.end())) {
+
                     // add current sending event
                     *possibleSendEvents |= PossibleSendEvents(false, labels[i]);
 
                     consideredLabels[labels[i]] = true;
                 }
 
+                continue;
+            }
+
+            // if successor exists and if it leads to a final marking
+            if ((markingMap.find(successors[i]) != markingMap.end() and markingMap[successors[i]] != NULL) and
+                    (finalMarkingReachableMap.find(successors[i]) != finalMarkingReachableMap.end())) {
+
+                // direct successor reachable by sending event
+                if (SENDING(labels[i]) and (consideredLabels.find(labels[i]) == consideredLabels.end())) {
+
+                    // add current sending event
+                    *possibleSendEvents |= PossibleSendEvents(false, labels[i]);
+
+                    consideredLabels[labels[i]] = true;
+                }
                 // everything that is possible for the successor is possible
                 // for the current marking as well
                 *possibleSendEvents |= *(markingMap[successors[i]]->possibleSendEvents);

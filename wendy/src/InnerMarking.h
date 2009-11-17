@@ -105,7 +105,7 @@ class InnerMarking {
 
     private: /* member functions */
         /// determines which receiving transitions are potentially reachable from this marking
-        void calcReachableSendingEvents();
+        void calcReachableSendingEvents(const InnerMarking_ID&);
 
         /// determine the type of this marking
         inline void determineType(const InnerMarking_ID&);

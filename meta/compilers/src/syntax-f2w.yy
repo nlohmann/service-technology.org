@@ -20,6 +20,7 @@
 
 %{
 #include "config.h"
+#include "verbose.h"
 #include <iostream>
 #include <map>
 #include <set>
@@ -328,6 +329,8 @@ void createEmpty()
         succ[it->first][*i] = *emptyNode;
     }
   }
+
+  message("empty-node created");
 }
 
 /*!

@@ -3,8 +3,10 @@ bin_PROGRAMS = fiona2wendy wendy2fiona
 COMMON = main.cc config.h \
          cmdline.c cmdline.h
 
+VERBOSE = verbose.cc verbose.h
+
 fiona2wendy_SOURCES =  syntax-f2w.yy lexic-f2w.ll \
-                       $(COMMON)
+                       $(COMMON) $(VERBOSE)
 
 wendy2fiona_SOURCES =  syntax-w2f.yy lexic-w2f.ll \
 		       $(COMMON)

@@ -18,3 +18,13 @@ option "output" o
   typestr="OUTFILE"
   optional
 
+
+
+section "Debugging"
+sectiondesc="These options control how much debug output the comiplers create.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+

@@ -7,9 +7,9 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2009-08-04 16:59:49 +0200 (Tue, 04 Aug 2009) $
+ * \date    $Date: 2009-09-09 00:41:39 +0200 (Wed, 09 Sep 2009) $
  *
- * \version $Revision: 4511 $
+ * \version $Revision: 4691 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -53,6 +53,58 @@ using pnapi::operator&&;
  * The classes pnapi::PetriNet and pnapi::Automaton provide the main 
  * functionality and can serve as
  * an entry point for getting an overview of the API's functionality.
+ * 
+ * \section sec Some Examples
+ * 
+ * Creating a small Petrinet
+ * \code
+ * PetriNet net;
+ * Place & p1 = net.createPlace();
+ * p1.mark();
+ * Place & p2 = net.createPlace();
+ * Transition & t = net.createTransition();
+ * net.createArc(p1,t);
+ * net.createArc(t,p2);
+ * \endcode
+ * 
+ * Assigning a final condition
+ * \code
+ * // net from the previous example is recycled here
+ * net.finalCondition() = ((p1 == 0) && (p2 == 1));
+ * Place & p3 = net.createPlace();
+ * net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
+ * \endcode
+ * 
+ * Reading from stream
+ * \code
+ * istream is;
+ * is >> io::owfn >> net;
+ * \endcode
+ * 
+ * Writing to a stream
+ * \code
+ * ostream os;
+ * // LoLA without formulae
+ * os << io::lola << net;
+ * // LoLA with formulae
+ * os << io::lola << io::formula << net;
+ * \endcode
+ * 
+ * Reducing by applying some rules
+ * \code
+ * net.reduce(PetriNet::SET_STARKE | PetriNet::KEEP_NORMAL);
+ * \endcode
+ * 
+ * Creating a service automaton
+ * \code
+ * Automaton sa(net);
+ * \endcode
+ * 
+ * Query structural information
+ * \code
+ * net.isNormal();
+ * net.isWorkflow();
+ * \endcode
  */
 
 

@@ -100,7 +100,7 @@ gengetopt_args_info args_info;
 /// evaluate the command line parameters
 void evaluateParameters(int, char **);
 /// statistical output
-void statistics(int, PetriNet &, vector<PetriNet *> &);
+void statistics(PetriNet &, vector<PetriNet *> &);
 
 
 int main(int argc, char *argv[])
@@ -115,140 +115,139 @@ int main(int argc, char *argv[])
     invocation += string(argv[i]) + " ";
   }
 
-  for (unsigned int i = 0; i < args_info.inputs_num; i++)
+  time_t start_total = time(NULL);
+  /*
+   * 1. Reading Petri net via PNAPI
+   */
+  PetriNet net;
+  try
   {
-    time_t start_total = time(NULL);
-    /*
-     * 1. Reading Petri net via PNAPI
-     */
-    PetriNet net;
-    try
-    {
-      ifstream inputfile;
-      inputfile.open(args_info.inputs[i]);
-      if (inputfile.fail())
-        abort(1, "could not open file '%s'", args_info.inputs[i]);
-      switch (args_info.mode_arg)
-      {
-      case (mode_arg_standard):
-        inputfile >> pnapi::io::lola >> net;
-        break;
-      case (mode_arg_freechoice):
-        inputfile >> pnapi::io::owfn >> net;
-        break;
-      default: break;
-      }
-      inputfile.close();
-    }
-    catch (pnapi::io::InputError e)
-    {
-      abort(2, "could not parse file '%s': %s", args_info.inputs[i], e.message.c_str());
-    }
-    status("read file '%s' (%d of %d)", args_info.inputs[i], i+1, args_info.inputs_num);
-
-    /*
-     * 2. Determine the mode and compute the service parts.
-     */
-    int *tree = NULL;
-    int size, psize;
-    map<int, Node *> reremap;
-    size = net.getNodes().size();
-    psize = net.getPlaces().size();
-    tree = new int [size];
-
-    time_t start_computing = time(NULL);
+    ifstream inputfile;
+    inputfile.open(args_info.inputs[0]);
+    if (inputfile.fail())
+      abort(1, "could not open file '%s'", args_info.inputs[0]);
     switch (args_info.mode_arg)
     {
     case (mode_arg_standard):
-      _statistics.fragments_ = decomposition::computeComponentsByUnionFind(net,
-              tree, size, psize, reremap);
+      inputfile >> pnapi::io::lola >> net;
       break;
     case (mode_arg_freechoice):
-      _statistics.fragments_ = 0;
-      break;
-    default: break; /* do nothing */
-    }
-    time_t finish_computing = time(NULL);
-    _statistics.t_computingComponents_ = finish_computing - start_computing;
-    status("computed components of net '%s'", args_info.inputs[i]);
-
-    /*
-     * 3. Build Fragments.
-     */
-    vector<PetriNet *> nets(size);
-    for (int j = 0; j < size; j++)
-      nets[j] = NULL;
-
-    // save start time of building
-    time_t start_building = time(NULL);
-    switch (args_info.mode_arg)
-    {
-    case (mode_arg_standard):
-      decomposition::createOpenNetComponentsByUnionFind(nets, tree, size, psize, reremap);
-      break;
-    case (mode_arg_freechoice):
+      inputfile >> pnapi::io::owfn >> net;
       break;
     default: break;
     }
-    // save the finish time and make statistics
-    time_t finish_building = time(NULL);
-    _statistics.t_buildingComponents_ = finish_building - start_building;
-    status("created net fragments of '%s'", args_info.inputs[i]);
-
-    /*
-     * 4. Write output files.
-     */
-    if (!args_info.quiet_flag)
-    {
-      // writing file output
-      string fileprefix;
-      string filepostfix = ".owfn";
-      if (args_info.prefix_given)
-        fileprefix += args_info.prefix_arg;
-      fileprefix += args_info.inputs[i];
-
-      int netnumber = 0;
-
-      int digits;
-      string digits_s;
-      stringstream ds;
-      ds << _statistics.fragments_;
-      ds >> digits_s;
-      digits = digits_s.length();
-
-      for (int j = 0; j < (int) nets.size(); j++)
-        if (nets[j] == NULL)
-          continue;
-        else
-        {
-          stringstream ss;
-          string num;
-          /// leading zeros
-          int z = digits-num.length();
-          ss << setfill('0') << setw(z) << netnumber;
-          ss >> num;
-          ofstream outputfile((fileprefix+num+filepostfix).c_str());
-          outputfile << pnapi::io::owfn
-              << meta(pnapi::io::INPUTFILE, args_info.inputs[i])
-              << meta(pnapi::io::CREATOR, PACKAGE_STRING)
-              << meta(pnapi::io::INVOCATION, invocation)
-              << *nets[j];
-          netnumber++;
-        }
-    }
-
-    time_t finish_total = time(NULL);
-    _statistics.t_total_ = finish_total - start_total;
-
-    /*
-     * 5. Make statistical output.
-     */
-    statistics(i, net, nets);
-
-    // memory cleaner
-    delete [] tree;
-    _statistics.clear();
+    inputfile.close();
   }
+  catch (pnapi::io::InputError e)
+  {
+    abort(2, "could not parse file '%s': %s", args_info.inputs[0], e.message.c_str());
+  }
+  status("reading file '%s'", args_info.inputs[0]);
+
+  /*
+   * 2. Determine the mode and compute the service parts.
+   */
+  int *tree = NULL;
+  int size, psize;
+  map<int, Node *> reremap;
+  size = net.getNodes().size();
+  psize = net.getPlaces().size();
+  tree = new int [size];
+
+  time_t start_computing = time(NULL);
+  switch (args_info.mode_arg)
+  {
+  case (mode_arg_standard):
+    _statistics.fragments_ = decomposition::computeComponentsByUnionFind(net,
+            tree, size, psize, reremap);
+    break;
+  case (mode_arg_freechoice):
+    _statistics.fragments_ = 0;
+    break;
+  default: break; /* do nothing */
+  }
+  time_t finish_computing = time(NULL);
+  _statistics.t_computingComponents_ = finish_computing - start_computing;
+  status("computed components of net '%s'", args_info.inputs[0]);
+
+  /*
+   * 3. Build Fragments.
+   */
+  vector<PetriNet *> nets(size);
+  for (int j = 0; j < size; j++)
+    nets[j] = NULL;
+
+  // save start time of building
+  time_t start_building = time(NULL);
+  switch (args_info.mode_arg)
+  {
+  case (mode_arg_standard):
+    decomposition::createOpenNetComponentsByUnionFind(nets, tree, size, psize, reremap);
+    break;
+  case (mode_arg_freechoice):
+    break;
+  default: break;
+  }
+  // save the finish time and make statistics
+  time_t finish_building = time(NULL);
+  _statistics.t_buildingComponents_ = finish_building - start_building;
+  status("created net fragments of '%s'", args_info.inputs[0]);
+
+  /*
+   * 4. Write output files.
+   */
+  if (!args_info.quiet_flag)
+  {
+    // writing file output
+    string fileprefix;
+    string filepostfix = ".owfn";
+    if (args_info.prefix_given)
+      fileprefix += args_info.prefix_arg;
+    fileprefix += args_info.inputs[0];
+    fileprefix += ".part";
+
+    int netnumber = 0;
+
+    int digits;
+    string digits_s;
+    stringstream ds;
+    ds << _statistics.fragments_;
+    ds >> digits_s;
+    digits = digits_s.length();
+
+    for (int j = 0; j < (int) nets.size(); j++)
+      if (nets[j] == NULL)
+        continue;
+      else
+      {
+        stringstream ss;
+        string num;
+        /// leading zeros
+        int z = digits-num.length();
+        ss << setfill('0') << setw(z) << netnumber;
+        ss >> num;
+        ofstream outputfile((fileprefix+num+filepostfix).c_str());
+        outputfile << pnapi::io::owfn
+            << meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+            << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+            << meta(pnapi::io::INVOCATION, invocation)
+            << *nets[j];
+        netnumber++;
+      }
+  }
+
+  time_t finish_total = time(NULL);
+  _statistics.t_total_ = finish_total - start_total;
+
+  /*
+   * 5. Make statistical output.
+   */
+  statistics(net, nets);
+
+  // memory cleaner
+  delete [] tree;
+  _statistics.clear();
+
 
   exit(EXIT_SUCCESS);
 }
@@ -283,7 +282,7 @@ void evaluateParameters(int argc, char** argv) {
 /*!
  * Provides statistical output.
  */
-void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
+void statistics(PetriNet &net, vector<PetriNet *> &nets)
 {
   if (args_info.statistics_flag)
   {
@@ -325,7 +324,7 @@ void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
     if (!args_info.csv_flag)
     {
       cout << "*******************************************************" << endl;
-      cout << "* " << PACKAGE << ": " << args_info.inputs[i] << endl;
+      cout << "* " << PACKAGE << ": " << args_info.inputs[0] << endl;
       cout << "* Statistics:" << endl;
       cout << "*******************************************************" << endl;
       cout << "* Petri net Statistics:" << endl;
@@ -365,7 +364,7 @@ void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
        *
        * where lf = largest fragment, af = average fragment
        */
-      cout << args_info.inputs[i] << ","
+      cout << args_info.inputs[0] << ","
            << net.getPlaces().size() << ","
            << net.getTransitions().size() << ","
            << net.getArcs().size() << ","
@@ -389,7 +388,7 @@ void statistics(int i, PetriNet &net, vector<PetriNet *> &nets)
   }
   else
   {
-    cout << PACKAGE_NAME << ": " << args_info.inputs[i]
+    cout << PACKAGE_NAME << ": " << args_info.inputs[0]
          << " - number of components: " << _statistics.fragments_
          << endl;
   }

@@ -23,6 +23,30 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([Input/Output])
+############################################################################
+
+AT_SETUP([File output])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([DIANE phils.lola], 0, ignore, ignore)
+AT_CHECK([ls | GREP "phils.lola.part" | wc -l], 0, stdout)
+AT_CHECK([GREP -q "20" stdout])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Statistical Output])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([DIANE -s -q phils.lola], 0, ignore, ignore)
+AT_KEYWORDS(statistics)
+AT_CLEANUP
+
+AT_SETUP([Statistical Output (CSV)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([DIANE -s --csv -q phils.lola], 0, ignore, ignore)
+AT_KEYWORDS(statistics)
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Errors])
 ############################################################################
 
@@ -64,3 +88,7 @@ AT_CHECK([DIANE phils.lola -q --service],0,stdout)
 AT_CHECK([GREP -q "number of components: 1" stdout],0)
 AT_KEYWORDS(service)
 AT_CLEANUP
+
+############################################################################
+#AT_BANNER([De- and Recomposition])
+############################################################################

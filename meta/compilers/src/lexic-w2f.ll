@@ -11,7 +11,9 @@
 #include "syntax-w2f.h"
 #include "config.h"
 
-extern int yyerror(char const *msg);
+int yyerror(char const *msg);
+
+extern std::ostream * myOut;
 
 %}
 
@@ -26,9 +28,9 @@ number         [0-9]+
 %%
 
 
-"{"                                     { BEGIN(COMMENT);              }
-<COMMENT>"}"                            { BEGIN(INITIAL);              }
-<COMMENT>[^}]*                          { /* do nothing */             }
+"{"                                     { (*myOut) << "\n{"; BEGIN(COMMENT);      }
+<COMMENT>"}"                            { (*myOut) << "}\n"; BEGIN(INITIAL);      }
+<COMMENT>[^}]*                          { (*myOut) << yytext; /* copy comment */  }
 
 "NODES"                                 { return KEY_NODES;            }
 

@@ -25,10 +25,8 @@
 #include <set>
 #include <string>
 
-
 /// output stream - set in main.cc
 extern std::ostream* myOut;
-
 
 /// from flex
 extern char* yytext;
@@ -37,13 +35,30 @@ extern int yyerror(char const *msg);
 extern int colonCount;
 
 // data structures
-
-std::map<unsigned int, std::string> formulae;
-std::map<unsigned int, std::map<std::string, unsigned int> > transitions;
-unsigned int initialNode;
+// input events
 std::set<std::string> inputs;
+// output events
 std::set<std::string> outputs;
-bool interfaceInput;
+// whether reading input events
+bool inputEvent;
+// ID of initial node (unmapped)
+unsigned int initialNode;
+// mapping of old IDs to new IDs
+std::map<unsigned int, unsigned int> IDMapping;
+// map node IDs
+unsigned int mapNode(unsigned int);
+// empty node's ID
+unsigned int * emptyNode;
+// finds the empty node
+void findEmpty();
+// create empty node if none present
+void createEmpty();
+// mapping of nodes to formulae
+std::map<unsigned int, std::string> formulae;
+// mapping of nodes to successors
+std::map<unsigned int, std::map<std::string, unsigned int> > succ;
+// print a node
+void printNode(unsigned int);
 
 
 %}
@@ -54,7 +69,7 @@ bool interfaceInput;
 
 %token K_INTERFACE K_INPUT K_OUTPUT K_NODES K_INITIALNODE K_TRANSITIONS
 %token COMMA SEMICOLON COLON ARROW
-%token K_FINAL K_TRUE SEND RECEIVE LPAR RPAR 
+%token K_FINAL K_TRUE K_FALSE SEND RECEIVE LPAR RPAR 
 %token IDENT NUMBER
 
 %left OP_AND OP_OR
@@ -75,59 +90,40 @@ bool interfaceInput;
 %%
 
 og: 
-  { 
-    colonCount = 0; 
-    (*myOut) << "INTERFACE\n  INPUT\n    ";
-    interfaceInput = true;
-  }
   K_INTERFACE
+  { 
+    colonCount = 0; // initialize for flex
+    emptyNode = NULL;
+    inputEvent = true;
+    (*myOut) << "\nINTERFACE\n  INPUT\n    ";
+  }
   K_INPUT identlist SEMICOLON
   { 
     (*myOut) << ";\n  OUTPUT\n    ";
-    interfaceInput = false;
+    inputEvent = false;
   }
   K_OUTPUT identlist SEMICOLON
   { (*myOut) << ";\n\nNODES\n"; }
   K_NODES nodes SEMICOLON
   K_INITIALNODE NUMBER SEMICOLON
-  { initialNode = $15 + 1; }
+  { initialNode = $15; }
   K_TRANSITIONS transitions SEMICOLON
   {
-    // initial node
-    (*myOut) << "  " << initialNode << " : " << formulae[initialNode] << std::endl;
-    for(std::map<std::string, unsigned int>::iterator t = transitions[initialNode].begin();
-         t != transitions[initialNode].end(); ++t)
-    {
-      (*myOut) << "    " << t->first << " -> " << t->second << std::endl;
-    }
+    findEmpty();
 
-    // other nodes
-    for(std::map<unsigned int, std::string>::iterator it = formulae.begin();
-         it != formulae.end(); ++it)
+    // print initial node
+    printNode(initialNode);
+    for(std::map<unsigned int, std::string>::iterator n = formulae.begin();
+         n != formulae.end(); ++n)
     {
-      if(it->first == initialNode)
+      if( (n->first == initialNode) || (n->first == *emptyNode) )
         continue;
 
-      (*myOut) << "  " << it->first << " : " << it->second << std::endl;
-      for(std::map<std::string, unsigned int>::iterator t = transitions[it->first].begin();
-           t != transitions[it->first].end(); ++t)
-      {
-        (*myOut) << "    " << t->first << " -> " << t->second << std::endl;
-      }
+      printNode(n->first);
     }
-
-    // empty node
-    (*myOut) << "  0 : true\n";
-    for(std::set<std::string>::iterator it = inputs.begin();
-         it != inputs.end(); ++it)
-    {
-      (*myOut) << "    " << (*it) << " -> 0\n";
-    }
-    for(std::set<std::string>::iterator it = outputs.begin();
-         it != outputs.end(); ++it)
-    {
-      (*myOut) << "    " << (*it) << " -> 0\n";
-    }
+    printNode(*emptyNode);
+    delete emptyNode;
+    (*myOut) << std::endl << std::flush;
   }
 ;
 
@@ -135,21 +131,19 @@ identlist:
   /* empty */
 | IDENT
   { 
-    if(interfaceInput)
+    if(inputEvent)
       inputs.insert($1);
     else
       outputs.insert($1);
-
     (*myOut) << $1;
     free($1);
   }
 | identlist COMMA IDENT
   {
-    if(interfaceInput)
+    if(inputEvent)
       inputs.insert($3);
     else
       outputs.insert($3);
-
     (*myOut) << ", " << $3;
     free($3);
   }
@@ -163,23 +157,13 @@ nodes:
 node:
   NUMBER COLON formula COLON
   {
-    formulae[$1 + 1] = *$3;
+    formulae[$1] = *$3;
     delete $3;
-    for(std::set<std::string>::iterator it = inputs.begin();
-         it != inputs.end(); ++it)
-    {
-      transitions[$1 + 1][*it] = 0;
-    }
   }
 | NUMBER COLON formula COLON COLON
   {
-    formulae[$1 + 1] = *$3;
+    formulae[$1] = *$3;
     delete $3;
-    for(std::set<std::string>::iterator it = inputs.begin();
-         it != inputs.end(); ++it)
-    {
-      transitions[$1 + 1][*it] = 0;
-    }
   }
 ;
 
@@ -205,6 +189,8 @@ formula:
   { $$ = new std::string("final"); }
 | K_TRUE
   { $$ = new std::string("true"); }
+| K_FALSE
+  { $$ = new std::string("false"); }
 | SEND IDENT
   {
     $$ = new std::string($2);
@@ -225,16 +211,135 @@ transitions:
 transition:
   NUMBER ARROW NUMBER COLON SEND IDENT
   {
-    transitions[$1 + 1][$6] = $3 + 1;
-    delete $6;
+    succ[$1][$6] = $3;
+    free($6);
   }
 | NUMBER ARROW NUMBER COLON RECEIVE IDENT
   {
-    transitions[$1 + 1][$6] = $3 + 1;
-    delete $6;
+    succ[$1][$6] = $3;
+    free($6);
   }
 ;
 
 
 %%
+
+
+/*!
+ * \brief map node IDs
+ * 
+ * \note only call, AFTER finding the final node
+ */
+unsigned int mapNode(unsigned int n)
+{
+  static unsigned int nextFree = 1;
+  if(n == *emptyNode)
+    return 0;
+
+  if(IDMapping[n] == 0)
+    IDMapping[n] = nextFree++;
+
+  return IDMapping[n];
+}
+
+/*!
+ * \brief finds the empty node
+ */
+void findEmpty()
+{
+  for(std::map<unsigned int, std::string>::iterator it = formulae.begin();
+       it != formulae.end(); ++it)
+  {
+    if(it->second == "true")
+    {
+      bool abort = false;
+      for(std::set<std::string>::iterator i = inputs.begin();
+           i != inputs.end(); ++i)
+      {
+        if( (succ[it->first].find(*i) == succ[it->first].end()) || // no successor by this event
+            (succ[it->first][*i] != it->first) ) // successor is not this node
+        {
+          abort = true; // this is not the empty node
+          break;
+        }
+      }
+
+      if(abort)
+        continue;
+
+      for(std::set<std::string>::iterator o = outputs.begin();
+           o != outputs.end(); ++o)
+      {
+        if( (succ[it->first].find(*o) == succ[it->first].end()) || // no successor by this event
+            (succ[it->first][*o] != it->first) ) // successor is not this node
+        {
+          abort = true; // this is not the empty node
+          break;
+        }
+      }
+
+      if(!abort)
+      {
+        emptyNode = new unsigned int(it->first);
+        break;
+      }
+    }
+  }
+
+  if(emptyNode == NULL)
+    createEmpty();
+}
+
+/*!
+ * \brief create empty node if none present
+ */
+void createEmpty()
+{
+  for(unsigned int i = 0;;++i)
+  {
+    if(formulae.find(i) == formulae.end()) // find first unused "old" ID
+    {
+      emptyNode = new unsigned int(i); // set empty node
+      formulae[i] = "true"; // set formula
+      // set successors
+      for(std::set<std::string>::iterator s = inputs.begin();
+           s != inputs.end(); ++s)
+      {
+        succ[i][*s] = i;
+      }
+      for(std::set<std::string>::iterator s = outputs.begin();
+           s != outputs.end(); ++s)
+      {
+        succ[i][*s] = i;
+      }
+
+      break; // quit loop
+    }
+  }
+
+  // link other nodes to empty node
+  for(std::map<unsigned int, std::string >::iterator it = formulae.begin();
+       it != formulae.end(); ++it)
+  {
+    for(std::set<std::string>::iterator i = inputs.begin();
+         i != inputs.end(); ++i)
+    {
+      if(succ[it->first].find(*i) == succ[it->first].end())
+        succ[it->first][*i] = *emptyNode;
+    }
+  }
+}
+
+/*!
+ * \brief print a node
+ */
+void printNode(unsigned int n)
+{
+  (*myOut) << "  " << mapNode(n) << " : " << formulae[n] << "\n";
+  for(std::map<std::string, unsigned int>::iterator s = succ[n].begin();
+       s != succ[n].end(); ++s)
+  {
+    (*myOut) << "    " << s->first << " -> " << mapNode(s->second) << "\n";
+  }
+}
 

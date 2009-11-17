@@ -34,14 +34,23 @@ int yyerror(char const*);
 // needed for red/blue nodes
 int colonCount;
 
+extern std::ostream * myOut;
+
 %}
 
 whitespace     [\n\r\t ]
 identifier     [^,;:!?()\t \n\r\{\}=]+
 number         [0-9]+
 
+%s COMMENT
+
 
 %%
+
+
+"{"                                     { (*myOut) << "\n{"; BEGIN(COMMENT);      }
+<COMMENT>"}"                            { (*myOut) << "}\n"; BEGIN(INITIAL);      }
+<COMMENT>[^}]*                          { (*myOut) << yytext; /* copy comment */  }
 
 "INTERFACE"    { return K_INTERFACE; }
 "INPUT"        { return K_INPUT; }
@@ -51,6 +60,7 @@ number         [0-9]+
 "TRANSITIONS"  { return K_TRANSITIONS; }
 "final"        { return K_FINAL; }
 "true"         { return K_TRUE; }
+"false"        { return K_FALSE; }
 
 ","            { colonCount = 0; return COMMA; }
 ";"            { colonCount = 0; return SEMICOLON; }

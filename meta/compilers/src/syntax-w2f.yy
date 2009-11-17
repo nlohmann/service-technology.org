@@ -8,20 +8,28 @@
 #include <map>
 #include <string>
 
+// from lex
 extern char* yytext;
 extern int yylex();
 extern int yyerror(char const *msg);
 
+// from main
 extern std::ostream * myOut;
 
 // data structures
+// event types
 std::map<std::string, char> events;
+// event type
 char event;
+// whether recent node is final
 bool finalNode;
-bool emptyNode;
+// recent node name
 unsigned int nodeID;
+// transition list
 std::map<unsigned int, std::map<std::string, unsigned int> > transitions;
+// first node
 unsigned int * initialNode;
+// delimeter for lists
 std::string delim;
 
 
@@ -55,13 +63,13 @@ std::string delim;
 
 
 og:
+  KEY_INTERFACE 
   { 
-    (*myOut) << "INTERFACE\n  INPUT\n    ";
+    (*myOut) << "\nINTERFACE\n  INPUT\n    ";
     event = '?';
-    emptyNode = false;
     initialNode = NULL;
   }
-  KEY_INTERFACE input
+  input
   { 
     (*myOut) << ";\n  OUTPUT\n    "; 
     event = '!';
@@ -77,18 +85,16 @@ og:
              << (*initialNode) << ";\n\nTRANSITIONS";
     delete initialNode;
     delim = "";
+
     for(std::map<unsigned int, std::map<std::string, unsigned int> >::iterator it = transitions.begin();
          it != transitions.end(); ++it)
     {
       for(std::map<std::string, unsigned int>::iterator t = it->second.begin();
            t != it->second.end(); ++t)
       {
-        if(t->second != 0)
-        {
-          (*myOut) << delim << "\n  " << it->first << " -> " << t->second << " : "
-                   << events[t->first] << t->first;
-          delim = ",";
-        }
+        (*myOut) << delim << "\n  " << it->first << " -> " << t->second << " : "
+                 << events[t->first] << t->first;
+        delim = ",";
       }
     }
     (*myOut) << ";\n" << std::flush;
@@ -150,19 +156,12 @@ node:
   }
   annotation 
   {
-    if(nodeID == 0)
-    {
-      emptyNode = true;
-    }
-    else
-    {
-      (*myOut) << delim << "\n  " << nodeID << " : " << (*$3) << " : blue";
-      delim = ",";
-
-      if(finalNode)
-        (*myOut) << " : finalnode";
-    }
+    (*myOut) << delim << "\n  " << nodeID << " : " << (*$3) << " : blue";
     delete $3;
+    delim = ",";
+
+    if(finalNode)
+      (*myOut) << " : finalnode";
   }
   successors
 ;
@@ -223,10 +222,7 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    if(!emptyNode)
-    {
-      transitions[nodeID][$2] = $4;
-    }
+    transitions[nodeID][$2] = $4;
     free($2);
   }
 ;

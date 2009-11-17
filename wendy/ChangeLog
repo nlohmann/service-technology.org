@@ -11,6 +11,9 @@
 Version 2.5-unreleased
 ======================
 
+* fixed bug #14782 (see `https://gna.org/bugs/?14782'): smart sending event
+  does not handle self loops of inner markings correctly
+
 * added an error message to avoid segmentation faults in case a marking has
   two outgoing transitions with the same synchronous label (see
   `https://gna.org/bugs/?14719')
@@ -30,14 +33,6 @@ Version 2.4 (9 November 2009)
 
 * fixed bug #14693 (`https://gna.org/bugs/?14693'): wrong propagation of
   final states yielded wrong results for livelock freedom
-
-* added command-line parameters [utils/minimize]
-
-* implemented bit representation of operating guidelines [utils/minimize]
-
-* implemented new operating guideline format (input and output) [utils/minimize]
-
-* added verbose-framework for status output (--verbose) [utils/minimize]
 
 Version 2.3 (21 October 2009)
 =============================

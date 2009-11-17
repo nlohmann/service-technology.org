@@ -42,31 +42,42 @@ package hub.top.adaptiveSystem.diagram.edit.parts;
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Oclet;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.GridData;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.LayoutListener;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.impl.EAttributeImpl;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.commands.CompoundCommand;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+import org.eclipse.gmf.runtime.diagram.ui.commands.ICommandProxy;
+import org.eclipse.gmf.runtime.diagram.ui.commands.SetBoundsCommand;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CreationEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.DragDropEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
+import org.eclipse.gmf.runtime.diagram.ui.editpolicies.PopupBarEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.XYLayoutEditPolicy;
+import org.eclipse.gmf.runtime.diagram.ui.l10n.DiagramUIMessages;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
@@ -123,7 +134,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
 		// XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
 		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
-
+		removeEditPolicy(EditPolicyRoles.POPUPBAR_ROLE);
 	}
 
 	/**
@@ -158,6 +169,201 @@ public class OcletEditPart extends ShapeNodeEditPart {
 		OcletDescriptor figure = new OcletDescriptor();
 		return primaryShape = figure;
 	}
+	
+	/**
+	 * @param aep
+	 * @return
+	 *   a {@link Rectangle} that directly encloses all children of
+	 *   the given edit part
+	 *   
+	 * @generated NOT
+	 */
+	@SuppressWarnings("unchecked")
+  public static Rectangle getChildrenBounds(AbstractGraphicalEditPart aep) {
+    Rectangle r = new Rectangle(0,0,0,0);
+    
+    Iterator it = aep.getChildren().iterator();
+    while (it.hasNext()) {
+      Object o2 = it.next();
+      if (o2 instanceof AbstractGraphicalEditPart) {
+        AbstractGraphicalEditPart child = (AbstractGraphicalEditPart)o2;
+        Rectangle bounds = child.getFigure().getBounds();
+        
+        r.union(bounds);
+      }
+    }
+    return r;
+	}
+	
+	/**
+	 * Resize {@link OcletEditPart} to the size that it displays all event and all conditions
+	 * which it contains. It does not internally resize its child edit parts {@link DoNetEditPart}
+	 * and {@link PreNetEditPart}.
+	 */
+	public void resizeOclet() {
+    
+	  // update only if change made some nodes disappear
+    //boolean preNetVisible = false, doNetVisible = false;
+    Rectangle preNetChildBounds = null, doNetChildBounds = null;
+    PreNetEditPart pne = null;
+    DoNetEditPart dne = null;
+    // compute bounds of the children
+    if (OcletEditPart.this.getChildren().size() > 0) {
+
+      for (Object childEP : OcletEditPart.this.getChildren()) {
+        if (childEP instanceof PreNetEditPart) {
+          pne = (PreNetEditPart)childEP;
+          PreNetCompartmentEditPart pnce = (PreNetCompartmentEditPart)pne.getChildren().get(0);
+          preNetChildBounds = getChildrenBounds(pnce);
+
+          // update only if change made some nodes disappear
+          //preNetVisible = (pne.primaryShape.getBounds().width >= preNetChildBounds.x + preNetChildBounds.width)
+          //             && (pne.primaryShape.getBounds().height >= preNetChildBounds.y + preNetChildBounds.height);
+        }
+        if (childEP instanceof DoNetEditPart) {
+          dne = (DoNetEditPart)childEP;
+          DoNetCompartmentEditPart dnce = (DoNetCompartmentEditPart)dne.getChildren().get(0);
+          doNetChildBounds = getChildrenBounds(dnce);
+         
+          // update only if change made some nodes disappear
+          //doNetVisible = (dne.primaryShape.getBounds().width >= doNetChildBounds.x + doNetChildBounds.width)
+          //            && (dne.primaryShape.getBounds().height >= doNetChildBounds.y + doNetChildBounds.height);
+        }
+      }
+    }
+    
+    if (preNetChildBounds == null || doNetChildBounds == null)
+      return;
+    if (preNetChildBounds.isEmpty() || doNetChildBounds.isEmpty())
+      return;
+    // update only if change made some nodes disappear
+    //if (preNetVisible && doNetVisible)
+    //  return;
+    
+    // compute new bounds and position
+    //int oldWidth = getSize().width;
+    //int oldHeight = getSize().width;
+    
+    int oldX = getLocation().x;
+    int oldY = getLocation().y;
+
+    // enlarge size of preNet and doNet parts to allow for a small border around the nodes
+    preNetChildBounds.width += 30 + preNetChildBounds.x;
+    preNetChildBounds.height += 30 + preNetChildBounds.y;
+    doNetChildBounds.width += 30 + doNetChildBounds.x;
+    doNetChildBounds.height += 30 + doNetChildBounds.y;
+    
+    // compute new total width and height of the oclet
+    int newWidth = (preNetChildBounds.width > doNetChildBounds.width) ? preNetChildBounds.width : doNetChildBounds.width;
+    int newHeight = preNetChildBounds.height + doNetChildBounds.height + getPrimaryShape().getFigureOcletHeader().getBounds().height;
+    int newX = oldX;
+    int newY = oldY;
+    
+    // cap size at minimum dimensions
+    if (newWidth < getPrimaryShape().getMinimumSize().width)
+      newWidth = getPrimaryShape().getMinimumSize().width;
+    if (newHeight < getPrimaryShape().getMinimumSize().height)
+      newHeight = getPrimaryShape().getMinimumSize().height;
+    
+    // set coordinates for oclet
+    Point     ocletLocation
+      = new Point(getMapMode().DPtoLP(newX), getMapMode().DPtoLP(newY));
+    Dimension ocletSize
+      = new Dimension(getMapMode().DPtoLP(newWidth), getMapMode().DPtoLP(newHeight));
+    
+    // now compute size of preNet and doNet inside the newly positioned oclet
+    
+    // compute size of the border of the oclet for proper alignment of preNet and doNet
+    int borderOffset = 0;
+    Border border = getPrimaryShape().getBorder();
+    if (border != null && border instanceof LineBorder) {
+      borderOffset = ((LineBorder)border).getWidth();
+    }
+    
+    // the preNet is positioned right below the OcletHeader
+    // the width of the oclet is larger than the contents of the preNet: use it
+    // set height of the preNet to show all its contents
+    int preNet_x = 0;
+    int preNet_y = getPrimaryShape().getFigureOcletHeader().getBounds().height;
+    int preNet_width = newWidth - 2*borderOffset;
+    int preNet_height = preNetChildBounds.height;
+    Point     preNetLocation
+      = new Point(getMapMode().DPtoLP(preNet_x), getMapMode().DPtoLP(preNet_y));
+    Dimension preNetSize
+      = new Dimension(getMapMode().DPtoLP(preNet_width), getMapMode().DPtoLP(preNet_height));
+
+    // the doNet is positioned below the preNet and extends to the bottom of the oclet
+    // the width of the oclet is larger than the contents of the doNet: use it
+    // set height of the doNet relative to height of the oclet, preNet, and header
+    int doNet_x = 0;
+    int doNet_y = preNet_height + (preNet_y - borderOffset);
+    int doNet_width = newWidth - 2*borderOffset;
+    int doNet_height = newHeight - preNet_height - preNet_y - borderOffset;
+    Point     doNetLocation
+      = new Point(getMapMode().DPtoLP(doNet_x), getMapMode().DPtoLP(doNet_y));
+    Dimension doNetSize
+      = new Dimension(getMapMode().DPtoLP(doNet_width), getMapMode().DPtoLP(doNet_height));
+    
+    // and set new size and positions by SetBoundsCommand, one for each EditPart
+    TransactionalEditingDomain editingDomain = OcletEditPart.this.getEditingDomain();
+    
+    CompoundCommand cc = new CompoundCommand(DiagramUIMessages.SetAutoSizeCommand_Label);
+    SetBoundsCommand c = new SetBoundsCommand(editingDomain,
+        DiagramUIMessages.SetAutoSizeCommand_Label,
+        OcletEditPart.this, new Rectangle(ocletLocation,ocletSize));
+    SetBoundsCommand c2 = new SetBoundsCommand(editingDomain,
+        DiagramUIMessages.SetAutoSizeCommand_Label,
+        pne, new Rectangle(preNetLocation,preNetSize));
+    SetBoundsCommand c3 = new SetBoundsCommand(editingDomain,
+        DiagramUIMessages.SetAutoSizeCommand_Label,
+        dne, new Rectangle(doNetLocation,doNetSize));
+    
+    cc.add(new ICommandProxy(c));
+    cc.add(new ICommandProxy(c2));
+    cc.add(new ICommandProxy(c3));
+    
+    OcletEditPart.this.getViewer().getEditDomain().getCommandStack().execute(cc);
+	}
+	
+ /**
+   * Flag for notifying the oclet that the layout of its children has changed and
+   * that a resize is reasonable. Reset this flag after the resize has been done.
+   */
+  public boolean layoutDirty = true;
+  
+
+	
+	/**
+   * @generated NOT
+   * 
+   * Install a Layout-Listener to automatically resizes the {@link OcletEditPart}
+   * to display all its child elements. The resize is only performed if {@link #layoutDirty} is
+   * set to <code>true</code>.
+   * 
+   * @author Dirk Fahland
+   */
+  @Override
+  public void activate() {
+    
+    // retrieve figure
+    IFigure figure = getFigure();
+    IFigure parentFigure = figure.getParent();
+
+    parentFigure.addLayoutListener(new LayoutListener.Stub() {
+      
+      @Override
+      public void postLayout(IFigure hostFigure) {
+        if (layoutDirty) {
+          resizeOclet();
+          layoutDirty = false;
+        }
+      }
+    });
+    layoutDirty = true;
+
+    super.activate();
+  }
+
 
 	/**
 	 * @generated
@@ -373,7 +579,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
 			fFigureOcletHeader.setOutline(false);
 			fFigureOcletHeader.setForegroundColor(ColorConstants.orange);
 			fFigureOcletHeader.setPreferredSize(new Dimension(getMapMode().DPtoLP(
-					200), getMapMode().DPtoLP(20)));
+					500), getMapMode().DPtoLP(20)));
 			fFigureOcletHeader.setMaximumSize(new Dimension(getMapMode().DPtoLP(
 					1000), getMapMode().DPtoLP(20)));
 			fFigureOcletHeader.setMinimumSize(new Dimension(getMapMode().DPtoLP(
@@ -381,7 +587,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
 			fFigureOcletHeader.setLocation(
 					new Point(getMapMode().DPtoLP(0),
 							  getMapMode().DPtoLP(0)));
-			fFigureOcletHeader.setSize(fFigureOcletHeader.getMinimumSize());
+			fFigureOcletHeader.setSize(fFigureOcletHeader.getPreferredSize());
 
 			this.add(fFigureOcletHeader);
 

@@ -1,14 +1,39 @@
-package hub.top.greta.oclets.canonical;
+/*****************************************************************************\
+ * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. EPL1.0/AGPL3.0
+ * 
+ * ServiceTechnolog.org - Greta
+ *                       (Graphical Runtime Environment for Adaptive Processes) 
+ * 
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0, which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ * 
+ * The Original Code is this file as it was released on June 6, 2009.
+ * The Initial Developer of the Original Code are
+ * 		Dirk Fahland
+ * 
+ * Portions created by the Initial Developer are Copyright (c) 2008, 2009
+ * the Initial Developer. All Rights Reserved.
+ * 
+ * Contributor(s):
+ * 
+ * Alternatively, the contents of this file may be used under the terms of
+ * the GNU Affero General Public License Version 3 or later (the "GPL") in
+ * which case the provisions of the AGPL are applicable instead of those above.
+ * If you wish to allow use of your version of this file only under the terms
+ * of the AGPL and not to allow others to use your version of this file under
+ * the terms of the EPL, indicate your decision by deleting the provisions
+ * above and replace them with the notice and other provisions required by the 
+ * AGPL. If you do not delete the provisions above, a recipient may use your
+ * version of this file under the terms of any one of the EPL or the AGPL.
+\*****************************************************************************/
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
+package hub.top.greta.oclets.canonical;
 
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
@@ -21,42 +46,62 @@ import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.Orientation;
 import hub.top.adaptiveSystem.PreNet;
 
-public class DNodeAS {
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
-	public String				properNames[];		// translate IDs to Names
-	public Map<String, Short>	nameToID;
+/**
+ * A {@link DNode} representation of an {@link AdaptiveSystem} consisting of
+ * {@link Oclet}s used for constructing a McMillan prefix of this system. This
+ * class is used in {@link DNodeBP}.
+ * 
+ * 
+ * @author Dirk Fahland
+ */
+public class DNodeSys_AdaptiveSystem extends DNodeSys {
+
+	private int						nodeNum;	// counter number of nodes 
 	
-	private int					nodeNum; 
-	public DNode.SortedLinearList fireableEvents;	// set of all contributed oclet events
-	public DNode.SortedLinearList preConEvents;		// set of all precondition events
-	public Map<Node, DNode>		nodeEncoding;		// encoding of oclet Nodes as DNodes
+	private Map<Node, DNode>     nodeEncoding;    // encoding of oclet Nodes as DNodes
+	private Map<Oclet, DNodeSet> ocletEncoding;   // encoding of oclets to DNodeSets
+
 	
-	public Map<Oclet, DNodeSet>	ocletEncoding;
-	public DNodeSet				apEncoding;
-	
-	public int					maxHistoryDepth;	// depth of the longest history of a transition 
-	
-	public DNodeAS(AdaptiveSystem as) {
+	/**
+	 * Construct DNode representation of an {@link AdaptiveSystem}. Every event
+	 * of an {@link Oclet}s contribution ({@link Oclet#getDoNet()}) becomes a
+	 * {@link DNodeSys#fireableEvents}, every event of an {@link Oclet}s
+	 * precondition ({@link Oclet#getPreNet()}) becomes a {@link DNodeSys#preConEvents).
+	 * Pre- and post-conditions of these events are stored accordingly.
+	 * 
+	 * @param as
+	 */
+	public DNodeSys_AdaptiveSystem(AdaptiveSystem as) {
+
+		// initialize the standard data structures
+		super();
 		
-		DNode.idGen = 0;	// reset IDs
-		
-		fireableEvents = new DNode.SortedLinearList();
-		preConEvents = new DNode.SortedLinearList();
-		
-		buildTranslationTable(as);
+		// create a name table initialize the translation tables
+		buildNameTable(as);
 		nodeEncoding = new HashMap<Node, DNode>(nodeNum);
 		ocletEncoding = new HashMap<Oclet, DNodeSet>(as.getOclets().size());
 		
-		maxHistoryDepth = -1;
-		
-		DNode.translationTable = this;		// all happens wrt. to this class
-		
+		// then translate all oclets
 		for (Oclet o : as.getOclets())
 			ocletEncoding.put(o, buildDNodeRepresentation(o));
-		apEncoding = buildDNodeRepresentation(as.getAdaptiveProcess());
+		// and the adaptive process
+		initialRun = buildDNodeRepresentation(as.getAdaptiveProcess());
+		
+		finalize_setPreConditions();
 	}
-	
-	private void buildTranslationTable(AdaptiveSystem as) {
+
+	/**
+	 * Translate full strings of the Adaptive System to ids and fill
+   * {@link DNodeSys#nameToID} and {@link DNodeSys#properNames}.
+   * 
+	 * @param as
+	 */
+	private void buildNameTable(AdaptiveSystem as) {
 		short currentNameID = 0;
 		nameToID = new HashMap<String, Short>();
 		
@@ -82,12 +127,18 @@ public class DNodeAS {
 		}
 		
 		// build the translation table from IDs to names
-		properNames = new String[currentNameID];
-		for (Entry<String,Short> line : nameToID.entrySet()) {
-			properNames[line.getValue()] = line.getKey();
-		}
+		finalize_setProperNames();
 	}
-	
+
+	/**
+   * The actual translation algorithm for transforming an acylic Petri net
+   * into a {@link DNodeSet}. The translations preserves the structure
+   * of the net.
+	 * 
+	 * @param o
+	 * @param isAnti
+	 * @return
+	 */
 	private Collection<DNode> translateToDNodes(OccurrenceNet o, boolean isAnti) {
 		LinkedList<DNode> maxNodes = new LinkedList<DNode>();
 		LinkedList<Node> searchQueue = new LinkedList<Node>();
@@ -120,7 +171,7 @@ public class DNodeAS {
 			}
 		}
 
-		// then do a breath-first search on the structure of the oclet
+		// then do a breadth-first search on the structure of the oclet
 		// and add each visited node to the buildStack, the same node
 		// can be added multiple times
 		LinkedList<Node> buildStack = new LinkedList<Node>();
@@ -205,6 +256,7 @@ public class DNodeAS {
 				for (int i=0; i<postSize; i++)
 					d.post[i] = null;
 			} else {
+			  d.post = new DNode[0];
 				maxNodes.add(d);	// no predecessor: a maximal node
 			}
 			
@@ -226,7 +278,13 @@ public class DNodeAS {
 		}
 		return maxNodes;
 	}
-	
+
+	/**
+	 * Translate an oclet into a {@link DNodeSet} of its {@link DNode}s.
+	 * 
+	 * @param o
+	 * @return
+	 */
 	private DNodeSet buildDNodeRepresentation(Oclet o) {
 		
 		Collection<DNode> maxNodesOfO = translateToDNodes(o.getDoNet(), o.getOrientation() == Orientation.ANTI);
@@ -238,6 +296,13 @@ public class DNodeAS {
 		return ds;
 	}
 	
+	/**
+	 * Translate the initial run of an {@link AdaptiveSystem} into a {@link DNodeSet}
+	 * representation.
+	 *  
+	 * @param ap
+	 * @return
+	 */
 	private DNodeSet buildDNodeRepresentation(AdaptiveProcess ap) {
 		
 		Collection<DNode> maxNodesOfAP = translateToDNodes(ap, false);
@@ -248,4 +313,5 @@ public class DNodeAS {
 			ds.add(d);
 		return ds;
 	}
+
 }

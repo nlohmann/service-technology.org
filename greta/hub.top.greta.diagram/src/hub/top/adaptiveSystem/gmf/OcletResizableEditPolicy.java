@@ -52,6 +52,7 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CompoundCommand;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.ResizableEditPolicy;
 import org.eclipse.gef.handles.NonResizableHandleKit;
 import org.eclipse.gef.handles.ResizableHandleKit;
@@ -62,7 +63,10 @@ import org.eclipse.gmf.runtime.diagram.ui.l10n.DiagramUIMessages;
 import org.eclipse.swt.SWT;
 
 public class OcletResizableEditPolicy extends ResizableEditPolicy {
-	
+
+  /**
+   * the {@link GraphicalEditPart} this policy is attached to
+   */
 	private GraphicalEditPart fShape;
 	
 	private int layoutDirections;
@@ -157,6 +161,7 @@ public class OcletResizableEditPolicy extends ResizableEditPolicy {
 					if ((layoutDirections & SWT.CENTER) != 0) {
 						// set top of preNet under the header
 						y = oep.getPrimaryShape().getFigureOcletHeader().getBounds().height;
+
 						// height of the preNet is a free parameter
 					} else if ((layoutDirections & SWT.BOTTOM) != 0) {
 						// set height of doNet relative to preNet and oclet size

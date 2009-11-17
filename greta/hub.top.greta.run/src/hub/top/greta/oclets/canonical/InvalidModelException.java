@@ -15,7 +15,7 @@
  * 
  * The Original Code is this file as it was released on June 6, 2009.
  * The Initial Developer of the Original Code are
- * 		Dirk Fahland
+ *    Dirk Fahland
  * 
  * Portions created by the Initial Developer are Copyright (c) 2008, 2009
  * the Initial Developer. All Rights Reserved.
@@ -33,34 +33,39 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
+
 package hub.top.greta.oclets.canonical;
 
-import java.util.HashSet;
+import org.eclipse.emf.ecore.EObject;
 
-@Deprecated
-public class GraphNode {
+/**
+ * Expresses that the input model for the verification is invalid.
+ *  
+ * @author Dirk Fahland
+ */
+public class InvalidModelException extends Exception {
 
-	public String label;
-	public boolean event = false;
-	
-	public boolean marked = false;
-	
-	HashSet<GraphNode> pred = new HashSet<GraphNode>();
-	HashSet<GraphNode> succ = new HashSet<GraphNode>();
-	
-	public GraphNode (String label, boolean isEvent, boolean isMarked) {
-		this.label = label;
-		this.event = isEvent;
-		this.marked = isMarked;
-	}
-	
-	public void addSucc(GraphNode n) {
-		this.succ.add(n);
-		n.pred.add(this);
-	}
-	
-	public void addPred(GraphNode n) {
-		this.pred.add(n);
-		n.succ.add(this);
-	}
+  public static final int EMPTY_PRESET = 1;
+  
+  private EObject cause;
+  private int reason;
+  
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 6873607885393583626L;
+
+  public InvalidModelException(int reason, EObject e, String text) {
+    super(text);
+    this.reason = reason;
+    this.cause = e;
+  }
+  
+  public EObject getCausingObject() {
+    return cause;
+  }
+  
+  public int getReason() {
+    return reason;
+  }
 }

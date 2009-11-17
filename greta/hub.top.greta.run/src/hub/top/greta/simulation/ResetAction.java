@@ -34,10 +34,8 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
-package hub.top.greta.run.actions;
+package hub.top.greta.simulation;
 
-import hub.top.greta.run.AdaptiveProcessSimulationView;
-import hub.top.greta.run.RunConfiguration;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -46,7 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public class AdaptiveProcessReset implements IWorkbenchWindowActionDelegate {
+public class ResetAction implements IWorkbenchWindowActionDelegate {
 
 	public static final String ID = "hub.top.GRETA.run.reset";
 	protected IWorkbenchWindow workbenchWindow;
@@ -62,7 +60,7 @@ public class AdaptiveProcessReset implements IWorkbenchWindowActionDelegate {
 	}
 
 	public void run(IAction action) {
-		if (!action.getId().equals(AdaptiveProcessReset.ID))
+		if (!action.getId().equals(ResetAction.ID))
 			return;
 		if (simView.processViewEditor == null)
 			return;
@@ -73,7 +71,7 @@ public class AdaptiveProcessReset implements IWorkbenchWindowActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 		boolean validContext = true;
 
-		if (!action.getId().equals(AdaptiveProcessReset.ID))
+		if (!action.getId().equals(ResetAction.ID))
 			validContext = false;
 		
 		// set and check whether the current editor can handle this action
@@ -83,7 +81,7 @@ public class AdaptiveProcessReset implements IWorkbenchWindowActionDelegate {
 		
 		if (validContext)
 		{
-			if (AdaptiveProcessSimulation.isValidConfigOf(simView.adaptiveSystem)) {
+			if (StartAction.isValidConfigOf(simView.adaptiveSystem)) {
 				if (!action.isEnabled()) {
 					// we have a running simulation,
 					// looking at the right simulation view
@@ -113,10 +111,10 @@ public class AdaptiveProcessReset implements IWorkbenchWindowActionDelegate {
 	 * @param simView
 	 */
 	protected static void resetSimulation(Shell shell, AdaptiveProcessSimulationView simView) {
-		RunConfiguration config = AdaptiveProcessSimulation.getActiveRunConfiguration(simView.adaptiveSystem);
+		RunConfiguration config = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
 		if (config != null) {
 			config.resetToInitial(simView.processViewEditor);
-			AdaptiveProcessRun.arrangeAllAdaptiveProcess(simView.processViewEditor.getEditingDomain(), simView.apEditPart, null);
+			SimulationHelper.arrangeAllAdaptiveProcess(simView.processViewEditor.getEditingDomain(), simView.apEditPart, null);
 		} else {
 			MessageDialog.openError(shell,
 					"Could not reset simulation.",

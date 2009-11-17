@@ -50,8 +50,6 @@ import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.diagram.edit.parts.EventAPEditPart;
-import hub.top.greta.run.AdaptiveProcessSimulationView;
-import hub.top.greta.run.actions.AdaptiveProcessSimulation;
 
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
@@ -129,13 +127,13 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     
     if (validContext)
     {
-      if (!AdaptiveProcessSimulation.isValidConfigOf(simView.adaptiveSystem)) {
+      if (!StartAction.isValidConfigOf(simView.adaptiveSystem)) {
         // no simulation running or this view is not the current simulation
         if (action.isEnabled()) {
           action.setEnabled(false);
         }
         
-        if (!AdaptiveProcessSimulation.isSimuluationRunning()) {
+        if (!StartAction.isSimuluationRunning()) {
           inWaitForFireEvent = false;  // no simulation running: reset internal configuration
         }
 

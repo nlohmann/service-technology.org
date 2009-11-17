@@ -35,15 +35,13 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
-package hub.top.greta.run.actions;
+package hub.top.greta.simulation;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.Orientation;
-import hub.top.greta.simulation.SimulationHelper;
-import hub.top.greta.simulation.SimulationInteractiveAction;
 
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.util.BasicEList;
@@ -51,7 +49,7 @@ import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 
-public class AdaptiveProcessStep extends SimulationInteractiveAction {
+public class SimulationInt_OcletAction extends SimulationInteractiveAction {
 
   public static final String ID = "hub.top.GRETA.run.step";
 
@@ -69,7 +67,7 @@ public class AdaptiveProcessStep extends SimulationInteractiveAction {
 	 */
   @Override
   public String getID() {
-    return AdaptiveProcessStep.ID;
+    return SimulationInt_OcletAction.ID;
   }
 	
 	/**
@@ -139,8 +137,8 @@ public class AdaptiveProcessStep extends SimulationInteractiveAction {
 	/**
 	 * Check whether the precondition of an oclet matches with the cut
 	 * and all transitive predecessors of the cut. If it matches, return true
-	 * and extend {@link AdaptiveProcessStep#activatedNormalOclets} 
-   * or {@link AdaptiveProcessStep#activatedAntiOclets}
+	 * and extend {@link SimulationInt_OcletAction#activatedNormalOclets} 
+   * or {@link SimulationInt_OcletAction#activatedAntiOclets}
    * with the Map of pre-conditions of the transitions (key) associated
    * with the cut condtions (adaptiveProcess - value).
    *

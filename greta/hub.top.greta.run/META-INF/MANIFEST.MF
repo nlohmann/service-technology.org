@@ -15,7 +15,10 @@ Require-Bundle: org.eclipse.ui,
  hub.top.GRETA.diagram.process;bundle-version="1.1.2",
  org.eclipse.gmf.runtime.diagram.ui.resources.editor,
  org.eclipse.jface.text,
- org.eclipse.ui.editors
+ org.eclipse.ui.editors,
+ hub.top.editor.resource;bundle-version="1.0.5",
+ hub.top.editor.lola.text;bundle-version="1.0.5",
+ hub.top.editor.ptnetLoLA;bundle-version="1.0.5"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: hub.top.adaptiveSystem,

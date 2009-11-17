@@ -8,7 +8,7 @@
             label="Adaptive System Actions"
             visible="true">
          <action
-               class="hub.top.greta.run.actions.AdaptiveProcessSimulation"
+               class="hub.top.greta.simulation.StartAction"
                disabledIcon="icons/full/dtool16/run_exc.gif"
                icon="icons/full/etool16/run_exc.gif"
                id="hub.top.GRETA.run.simulation"
@@ -19,43 +19,30 @@
                tooltip="start simulation of adaptive process">
          </action>
          <action
-               class="hub.top.greta.run.actions.AdaptiveProcessStep"
+               class="hub.top.greta.simulation.SimulationInt_OcletAction"
                disabledIcon="icons/adaptiveProcessStepDisabled4.png"
                icon="icons/adaptiveProcessStepEnabled4.png"
                id="hub.top.GRETA.run.step"
-               label="go one step in adaptive process"
+               label="extend by all enabled oclets"
                menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
                style="push"
                toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
-               tooltip="go one step in adaptive process">
+               tooltip="extend by all enabled oclets">
          </action>
-         <!--
          <action
-               class="hub.top.greta.run.actions.AdaptiveProcessChooseEvent"
-               disabledIcon="icons/FireEventDisabled.png"
-               icon="icons/FireEventEnabled2.png"
-               id="hub.top.GRETA.run.chooseEvent"
-               label="extend adaptive process"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
-               style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
-               tooltip="extend adaptive process">
-         </action>
-         -->
-         <action
-               class="hub.top.greta.run.actions.AdaptiveProcessRun"
+               class="hub.top.greta.simulation.SimulationInt_EventAction"
                disabledIcon="icons/full/dlcl16/resume_co.gif"
                icon="icons/full/elcl16/resume_co.gif"
                id="hub.top.GRETA.run.process"
-               label="step in adaptive process"
+               label="fire single event"
                menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
                state="false"
                style="push"
                toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
-               tooltip="step in adaptive process">
+               tooltip="fire single event">
          </action>
          <action
-               class="hub.top.greta.run.actions.AdaptiveProcessReset"
+               class="hub.top.greta.simulation.ResetAction"
                disabledIcon="icons/full/dlcl16/refresh.gif"
                icon="icons/full/elcl16/refresh.gif"
                id="hub.top.GRETA.run.reset"
@@ -194,10 +181,24 @@
                menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
          </action>
          <action
+               class="hub.top.greta.run.actions.BuildBranchingProcess2"
+               id="hub.top.GRETA.run.buildBranchingProcess2"
+               label="build branching process"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
+               tooltip="build branching process of the system">
+         </action>
+         <action
                class="hub.top.greta.run.actions.BuildStateSpace"
                enablesFor="1"
                id="hub.top.GRETA.run.buildStateSpace"
                label="build transition system"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
+         </action>
+         <action
+               class="hub.top.greta.synthesis.SyntesizeNetAction"
+               enablesFor="1"
+               id="hub.top.GRETA.run.convertToNet"
+               label="convert to P/T net"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
          <!--
@@ -232,6 +233,50 @@
          </action>
       </objectContribution>
       -->
+      
+      <objectContribution
+            id="hub.top.editor.lola.text.popupMenus"
+            nameFilter="*.lola"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.editor.lola.text.lolaMenu"
+               label="Petri Net (LoLA)"
+               path="additions">
+            <separator
+                  name="analysis">
+            </separator>
+         </menu>
+         <action
+               label="build branching process"
+               class="hub.top.greta.verification.BuildBPLolaAction"
+               menubarPath="hub.top.editor.lola.text.lolaMenu/analysis"
+               enablesFor="1"
+               id="hub.top.GRETA.run.buildBranchingProcessLoLA">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="hub.top.GRETA.run.menu.folder"
+            objectClass="org.eclipse.core.resources.IFolder">
+         <menu
+               id="hub.top.GRETA.run.folderMenu"
+               label="Adaptive Processes"
+               path="additions">
+            <separator
+                  name="maintenance">
+            </separator>
+            <separator
+                  name="analysis">
+            </separator>
+         </menu>
+         <action
+               label="analyze models..."
+               class="hub.top.greta.verification.AnalyzeModelsFolderAction"
+               menubarPath="hub.top.GRETA.run.folderMenu/analysis"
+               enablesFor="1"
+               id="hub.top.GRETA.run.analyzeModelsFolder">
+         </action>
+      </objectContribution>
    </extension>
    <!--
    <extension

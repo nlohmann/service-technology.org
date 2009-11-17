@@ -72,7 +72,7 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
@@ -81,7 +81,9 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 				new hub.top.adaptiveSystem.diagram.edit.policies.AdaptiveProcessItemSemanticEditPolicy());
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
 		// XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
-		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
+
+		removeEditPolicy(EditPolicyRoles.CONNECTION_HANDLES_ROLE);
+		removeEditPolicy(EditPolicyRoles.POPUPBAR_ROLE);  // do not show editor popup bars
 	}
 
 	/**
@@ -118,6 +120,15 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 		return primaryShape = figure;
 	}
 	
+	/**
+	 * @generated NOT
+	 * 
+	 * Install a Layout-Listener to automatically resizes the {@link AdaptiveProcessEditPart}
+	 * to display all its child elements. The resize policy extends this edit part to the left
+	 * and the bottom keeping the right border and the top border fixed.
+	 * 
+	 * @author Dirk Fahland
+	 */
 	@Override
 	public void activate() {
 		// retrieve figure
@@ -126,12 +137,17 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 		
 		parentFigure.addLayoutListener(new LayoutListener.Stub() {
 			
-			@Override
+		  /**
+		   * layout listener for automatic resizing of this edit part to display all its children
+		   */
+			@SuppressWarnings("unchecked")
+      @Override
 			public void postLayout(IFigure hostFigure) {
 
 				int minX = Integer.MAX_VALUE, maxX = 0;
 				int minY = Integer.MAX_VALUE, maxY = 0;
 
+				// compute bounds of the children
 				if (AdaptiveProcessEditPart.this.getChildren().size() > 0) {
 					AdaptiveProcessCompartmentEditPart apce =
 						(AdaptiveProcessCompartmentEditPart)AdaptiveProcessEditPart.this.getChildren().get(0);
@@ -151,6 +167,7 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 					}
 				}
 				
+				// compute new bounds and position
 				int oldWidth = getSize().width;
 				int oldHeight = getSize().width;
 				
@@ -179,6 +196,7 @@ public class AdaptiveProcessEditPart extends ShapeNodeEditPart {
 						+"("+newX+","+newY+","+(newX+newWidth)+","+(newY+newHeight)+")");
 				 */	
 				
+				// and set new size and position by a SetBoundsCommand
 				TransactionalEditingDomain editingDomain = AdaptiveProcessEditPart.this.getEditingDomain();
 				
 				SetBoundsCommand c = new SetBoundsCommand(editingDomain,

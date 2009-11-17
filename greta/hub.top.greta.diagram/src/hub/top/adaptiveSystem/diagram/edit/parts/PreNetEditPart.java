@@ -185,6 +185,7 @@ public class PreNetEditPart extends ShapeNodeEditPart {
 		parentFig.addLayoutListener(new LayoutListener.Stub() {
             @Override
             public void postLayout(IFigure hostFigure) {
+              
             	// after every re-layout of the host figure, send an auto re-size
             	// request to all edit parts and execute the corresponding commands
             	// TODO: move to the host figure?
@@ -193,9 +194,9 @@ public class PreNetEditPart extends ShapeNodeEditPart {
     	        		hostFigure, newSize);
 
     	        if (PreNetEditPart.this.understandsRequest(request)) {
-		        	Command c = PreNetEditPart.this.getCommand(request);
-		        	PreNetEditPart.this.getViewer().getEditDomain().getCommandStack().execute(c);
-		        }
+    	          Command c = PreNetEditPart.this.getCommand(request);
+    	          PreNetEditPart.this.getViewer().getEditDomain().getCommandStack().execute(c);
+    	        }
             }
 		});
 		super.activate();

@@ -179,7 +179,7 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 			
             @Override
             public void postLayout(IFigure hostFigure) {
-            	
+              
             	// after every re-layout of the host figure, send an auto re-size
             	// request to all edit parts and execute the corresponding commands
             	// TODO: move to the host figure?
@@ -188,9 +188,9 @@ public class DoNetEditPart extends ShapeNodeEditPart {
     	        		hostFigure, newSize);
 
     	        if (DoNetEditPart.this.understandsRequest(request)) {
-		        	Command c = DoNetEditPart.this.getCommand(request);
-		        	DoNetEditPart.this.getViewer().getEditDomain().getCommandStack().execute(c);
-		        }
+  		        	Command c = DoNetEditPart.this.getCommand(request);
+  		        	DoNetEditPart.this.getViewer().getEditDomain().getCommandStack().execute(c);
+    	        }
             }
 		});
 		super.activate();

@@ -15,7 +15,7 @@
  * 
  * The Original Code is this file as it was released on June 6, 2009.
  * The Initial Developer of the Original Code are
- * 		Dirk Fahland
+ *    Dirk Fahland
  * 
  * Portions created by the Initial Developer are Copyright (c) 2008, 2009
  * the Initial Developer. All Rights Reserved.
@@ -33,34 +33,33 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
-package hub.top.greta.oclets.canonical;
+package hub.top.greta.verification;
 
-import java.util.HashSet;
+import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.greta.run.actions.ActionHelper;
 
-@Deprecated
-public class GraphNode {
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
-	public String label;
-	public boolean event = false;
-	
-	public boolean marked = false;
-	
-	HashSet<GraphNode> pred = new HashSet<GraphNode>();
-	HashSet<GraphNode> succ = new HashSet<GraphNode>();
-	
-	public GraphNode (String label, boolean isEvent, boolean isMarked) {
-		this.label = label;
-		this.event = isEvent;
-		this.marked = isMarked;
-	}
-	
-	public void addSucc(GraphNode n) {
-		this.succ.add(n);
-		n.pred.add(this);
-	}
-	
-	public void addPred(GraphNode n) {
-		this.pred.add(n);
-		n.succ.add(this);
-	}
+public class IOUtil {
+
+  /**
+   * Write a dot file that graphically represents the given branching process
+   * into a file. The method will take the inputFile, strip its extension, and
+   * append a suffix and the standard extension ".dot". For instance the
+   * branching process of "<code>/a/input.model</code>" is written to
+   * "<code>/a/input_bp.dot</code>" 
+   * 
+   * @param bp
+   * @param inputFile
+   * @param suffix
+   */
+  public static void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
+
+    String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
+    IPath targetPath = new Path(targetPathStr+suffix+".dot");
+
+    ActionHelper.writeFile (targetPath, bp.toDot());
+  }
 }

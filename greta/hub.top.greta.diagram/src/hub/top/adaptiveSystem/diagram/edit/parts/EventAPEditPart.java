@@ -43,14 +43,10 @@ import org.eclipse.swt.graphics.Color;
  */
 public class EventAPEditPart extends AbstractBorderedShapeEditPart {
 
-	static final Color ACTIVATED_COLD_EVENT_BACKGROUND = new Color(null, 123,
-			166, 254);
-	static final Color ACTIVATED_COLD_EVENT_FOREGROUND = new Color(null, 74,
-			74, 254);
-	static final Color ACTIVATED_HOT_EVENT_BACKGROUND = new Color(null, 250,
-			142, 180);
-	static final Color ACTIVATED_HOT_EVENT_FOREGROUND = new Color(null, 255, 0,
-			0);
+	public static final Color ACTIVATED_COLD_EVENT_BACKGROUND = new Color(null, 123, 166, 254);
+	public static final Color ACTIVATED_COLD_EVENT_FOREGROUND = new Color(null, 74, 74, 254);
+	public static final Color ACTIVATED_HOT_EVENT_BACKGROUND = new Color(null, 250, 142, 180);
+	public static final Color ACTIVATED_HOT_EVENT_FOREGROUND = new Color(null, 255, 0, 0);
 
 	/**
 	 * @generated

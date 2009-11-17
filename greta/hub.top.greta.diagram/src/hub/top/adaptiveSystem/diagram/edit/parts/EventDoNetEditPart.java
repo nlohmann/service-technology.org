@@ -7,8 +7,10 @@ import hub.top.adaptiveSystem.ArcToCondition;
 import hub.top.adaptiveSystem.ArcToEvent;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Oclet;
+import hub.top.adaptiveSystem.Temp;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.StackLayout;
@@ -240,10 +242,22 @@ public class EventDoNetEditPart extends AbstractBorderedShapeEditPart {
 												.getName())) {
 					UserImplUpdateNode.updateEvent(this, primaryShape);
 				}
+				
+				// event enabled in simulation view
+        if (attribute.getName().equals(
+            AdaptiveSystemPackage.eINSTANCE.getEvent_Enabled()
+                .getName())) {
+          this.getPrimaryShape().recolorActivatedEvent();
+        }
 			}
 		} else
 		//do something after moving an event
 		if (notification.getNotifier() instanceof Bounds) {
+		  
+      // layout: resize the containing oclet
+      OcletEditPart oep = (OcletEditPart)getParent().getParent().getParent();
+      oep.layoutDirty = true;
+		  
 			//there is at least one arc connected with event as source
 			if (this.getSourceConnections() != null
 					&& !this.getSourceConnections().isEmpty()) {
@@ -468,6 +482,37 @@ public class EventDoNetEditPart extends AbstractBorderedShapeEditPart {
 			myUseLocalCoordinates = useLocalCoordinates;
 		}
 
+    /**
+     * recolor the event if it is an activated one and it should be fired now or
+     * set to default after firing
+     * @author Manja Wolf
+     * 
+     */
+    protected void recolorActivatedEvent() {
+      Event event = (Event) ((Node) (EventDoNetEditPart.this).getModel())
+          .getElement();
+
+      if (event.isEnabled()) {
+        //this.setPreferredSize(new Dimension(getMapMode().DPtoLP(24),
+        //    getMapMode().DPtoLP(24)));
+        if (event.getTemp().equals(Temp.COLD)) {
+          this.setBorder(new LineBorder(
+              EventAPEditPart.ACTIVATED_COLD_EVENT_FOREGROUND, getMapMode().DPtoLP(3)));
+          this.setForegroundColor(EventAPEditPart.ACTIVATED_COLD_EVENT_FOREGROUND);
+          this.setBackgroundColor(EventAPEditPart.ACTIVATED_COLD_EVENT_BACKGROUND);
+        } else if (event.getTemp().equals(Temp.HOT)) {
+          this.setBorder(new LineBorder(
+              EventAPEditPart.ACTIVATED_HOT_EVENT_FOREGROUND, getMapMode().DPtoLP(3)));
+          this.setForegroundColor(EventAPEditPart.ACTIVATED_HOT_EVENT_FOREGROUND);
+          this.setBackgroundColor(EventAPEditPart.ACTIVATED_HOT_EVENT_BACKGROUND);
+        }
+      } else {
+        UserImplUpdateNode.updateEvent(EventDoNetEditPart.this, this);
+        //this.setPreferredSize(new Dimension(getMapMode().DPtoLP(20),
+        //    getMapMode().DPtoLP(20)));
+        this.setBorder(null);
+      }
+    }
 	}
 
 }

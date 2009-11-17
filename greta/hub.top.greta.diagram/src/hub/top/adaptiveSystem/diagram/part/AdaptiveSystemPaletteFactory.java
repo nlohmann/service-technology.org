@@ -8,6 +8,7 @@ import org.eclipse.gef.palette.PaletteContainer;
 import org.eclipse.gef.palette.PaletteGroup;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.palette.ToolEntry;
+import org.eclipse.gmf.runtime.diagram.ui.internal.services.palette.PaletteToolEntry;
 import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeConnectionTool;
 import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeCreationTool;
 
@@ -169,9 +170,11 @@ public class AdaptiveSystemPaletteFactory {
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
-	private static class NodeToolEntry extends ToolEntry {
+	private static class NodeToolEntry extends PaletteToolEntry {
+	  // original class inherited from ToolEntry
+	  // PaletteToolEntry allows drag&drop from the tool palette
 
 		/**
 		 * @generated
@@ -183,7 +186,12 @@ public class AdaptiveSystemPaletteFactory {
 		 */
 		private NodeToolEntry(String title, String description,
 				List elementTypes) {
-			super(title, description, null, null);
+			
+		  // adapter super constructor call for PaletteToolEntry
+		  //super(title, description, null, null);
+		  super(null, title, null);          
+		  this.setDescription(description);
+		  
 			this.elementTypes = elementTypes;
 		}
 

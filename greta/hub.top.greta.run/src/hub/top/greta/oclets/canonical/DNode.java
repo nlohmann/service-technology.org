@@ -1,19 +1,63 @@
+/*****************************************************************************\
+ * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. EPL1.0/AGPL3.0
+ * 
+ * ServiceTechnolog.org - Greta
+ *                       (Graphical Runtime Environment for Adaptive Processes) 
+ * 
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0, which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ * 
+ * The Original Code is this file as it was released on June 6, 2009.
+ * The Initial Developer of the Original Code are
+ * 		Dirk Fahland
+ * 
+ * Portions created by the Initial Developer are Copyright (c) 2008, 2009
+ * the Initial Developer. All Rights Reserved.
+ * 
+ * Contributor(s):
+ * 
+ * Alternatively, the contents of this file may be used under the terms of
+ * the GNU Affero General Public License Version 3 or later (the "GPL") in
+ * which case the provisions of the AGPL are applicable instead of those above.
+ * If you wish to allow use of your version of this file only under the terms
+ * of the AGPL and not to allow others to use your version of this file under
+ * the terms of the EPL, indicate your decision by deleting the provisions
+ * above and replace them with the notice and other provisions required by the 
+ * AGPL. If you do not delete the provisions above, a recipient may use your
+ * version of this file under the terms of any one of the EPL or the AGPL.
+\*****************************************************************************/
+
 package hub.top.greta.oclets.canonical;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 
+/**
+ * A node in a branching process. It has a name and possibly empty set of
+ * predecessor nodes.
+ * 
+ * @author Dirk Fahland
+ *
+ */
 public class DNode {
 	
-	// table for translating DNodes and IDs to the original model 
-	public static DNodeAS		translationTable;	
+	// global table for translating DNodes and IDs to the original model 
+	public static DNodeSys		translationTable;	
 	
-	// for globally identifying nodes, debugging only
+	// each node has a unique global ID, the global member idGen holds the
+	// next ID for the next new node
 	public static int idGen = 0;
-	public int localId = idGen++;
 
-	//	public hub.top.adaptiveSystem.Node origin;
-	public short	id;				// unique id of this node
+	// the node's global ID, automatically assign latest ID upon construction
+	public int globalId = idGen++;
+
+	public short	id;				      // id of this node (its name)
 	public DNode  pre[] = null;		// sorted: ids ascending
 	public DNode  post[] = null;	// sorted: ids ascending
 	
@@ -21,8 +65,21 @@ public class DNode {
 	public boolean  isCutOff = false;
 	public boolean  isAnti = false;
 	
-	public int causedBy[] = null;	// remember localIDs of events that generated this event
+	/**
+	 * For finding cutOff events using the signature method, we compare whether
+	 * two events in the branaching process are fired by the same set of oclet
+	 * events (see {@link DNodeBP#equivalentCuts_signature}). This array stores
+	 * the globalIDs of the oclet events that were fired for creating this event.
+	 * Is only used for events. 
+	 */
+	public int causedBy[] = null;	// remember globalIDs of events that generated this event
 	
+	/**
+	 * New node with known predecessors nodes. Sorts the precedessor array by
+	 * their ids.
+	 * @param id   of the new node
+	 * @param pre
+	 */
 	public DNode (short id, DNode[] pre) {
 		//origin = n;
 		this.id = id;
@@ -30,6 +87,11 @@ public class DNode {
 
 	}
 	
+	/**
+	 * New node with unknown predecessors.
+	 * @param id       of the new node
+	 * @param preSize  number of predecessors of the new node
+	 */
 	public DNode (short id, int preSize) {
 		//origin = n;
 		this.id = id;
@@ -46,23 +108,31 @@ public class DNode {
 				&& pre.equals(other.pre));
 	}
 	
+	/**
+	 * Adds new successor to this node and sorts successors by their ids.
+	 * Dynamically enlarges array of successors by re-initialization and
+	 * copying.
+	 * 
+	 * @param d
+	 */
 	public void addPostNode(DNode d) {
 		if (post == null) {
 			post = new DNode[1];
 			post[0] = d;
 		}
 		else {
-			post = Arrays.copyOf(post, post.length+1);
-			post[post.length-1] = d;
-			DNode.sortIDs(post);
+			DNode[] newPost = new DNode[post.length+1];
+			for (int i=0; i<post.length; i++) newPost[i] = post[i];
+			newPost[newPost.length-1] = d;
+			post = DNode.sortIDs(newPost);
 		}
 	}
 	
 	/**
+	 * Check whether this node's history contains a partial history that is
+	 * isomorphic to the entire history of the other node.
+	 * 
 	 * @param other
-	 * @param depth
-	 * 		compare to the given depth, set to <code>-1</code> if full depth
-	 * 		shall be compared
 	 * @return
 	 * 		<code>true</code> iff other (and its predecessors) is a suffix
 	 * 		of this node (and its predecessors)
@@ -119,6 +189,14 @@ public class DNode {
 		return true;
 	}
 	
+	/**
+	 * Check whether the history of this node is isomorphic to the history
+	 * of the other node up to the given depth.
+	 * 
+	 * @param other
+	 * @param depth
+	 * @return
+	 */
 	public boolean equals(DNode other, int depth) {
 		if (this.id != other.id)
 			return false;
@@ -162,10 +240,23 @@ public class DNode {
 		return false;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return translationTable.properNames[this.id]+" ("+this.id+")["+this.localId+"]"; 
+		return translationTable.properNames[this.id]+" ("+this.id+")["+this.globalId+"]"; 
 	}
+
+	
+	/* =======================================================================
+
+	     static util functions
+	     
+	   ======================================================================= */
+	
+	/* ------------------------------ merge sort ----------------------------- */ 
 	
 	/**
 	 * Merge two DNode arrays half1 and half2 into a DNode array by sorting
@@ -228,23 +319,46 @@ public class DNode {
 		return nodes;
 	}
 	
+	/* ------------------ data structure for collecting DNodes ------------- */
+	
+	/**
+	 * Sorted linear list of {@link DNode}s. The nodes are sorted by their
+	 * {@link DNode#id}.
+	 */
 	public static class SortedLinearList implements Iterable<DNode> {
 		private DNode 			d;
 		private SortedLinearList next;
 		
+		/**
+		 * new empty list
+		 */
 		public SortedLinearList() {
 			this(null);
 		}
 		
+		/**
+		 * new list with a new node
+		 * @param node
+		 */
 		public SortedLinearList(DNode node) {
 			this(node, null);
 		}
 		
+		/**
+		 * new list with head <code>node</code> and tail <code>rest</code>  
+		 * @param node
+		 * @param rest
+		 */
 		public SortedLinearList(DNode node, SortedLinearList rest) {
 			this.d = node;
 			this.next = rest;
 		}
 
+		/**
+		 * insert <code>node</code> into list
+		 * @param node
+		 * @return new head of list
+		 */
 		public SortedLinearList add(DNode node) {
 			if (d == null) {	// no value set so far
 				d = node;
@@ -269,6 +383,10 @@ public class DNode {
 			}
 		}
 		
+		/**
+		 * Remove nodes from the list. For each {@link DNode#id} keep only the first
+		 * node with this id.
+		 */
 		public void removeDuplicateIDs() {
 			if (d == null || next == null)
 				return;
@@ -286,12 +404,19 @@ public class DNode {
 				next.removeDuplicateIDs();
 		}
 		
+		/**
+		 * @return length of the list
+		 */
 		public int length() {
 			if (d == null) return 0;
 			if (next == null) return 1;
 			return next.length() + 1;
 		}
 
+		/**
+		 * Standard iterator for {@link DNode.SortedLinearList}. Cannot remove
+		 * elements from the list via this iterator. 
+		 */
 		public Iterator<DNode> iterator() {
 			return new Iterator<DNode>() {
 				
@@ -314,6 +439,10 @@ public class DNode {
 			};
 		}
 		
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			String result = "[";
@@ -324,21 +453,23 @@ public class DNode {
 		}
 	}
 	
-	/*
-	public static void main (String [] args) {
-		short ids_1[] = { 0, 1, 2, 3, 4, 5, 6};
-		short ids_2[] = { 067, 14, 4527, 63, -4, 4575, 106};
-		
-		sortIDs(ids_1);
-		sortIDs(ids_2);
-		
-		for (int i=0;i<ids_1.length;i++)
-			System.out.print(ids_1[i]+" ");
-		System.out.println();
-		
-		for (int i=0;i<ids_2.length;i++)
-			System.out.print(ids_2[i]+" ");
-		System.out.println();
+	
+  /* ---------------------------- misc. util functions ---------------------- */
+	
+	/**
+	 * Convert a Java {@link Collection} into an array of {@link DNode}.
+	 * The array is filled in the order that is provided by the collections
+	 * iterator.
+	 * 
+	 * @param nodes
+	 * @return
+	 */
+	public static DNode[] asArray(Collection<DNode> nodes) {
+	  DNode[] result = new DNode[nodes.size()];
+	  int i = 0;
+	  for (DNode d : nodes)
+	    result[i++] = d;
+	  return result;
 	}
-	*/
+	
 }

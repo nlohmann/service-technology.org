@@ -1,6 +1,5 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009. Manja Wolf, Dirk Fahland. EPL1.0/AGPL3.0
- * All rights reserved.
+ * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. EPL1.0/AGPL3.0
  * 
  * ServiceTechnolog.org - Greta
  *                       (Graphical Runtime Environment for Adaptive Processes) 
@@ -16,7 +15,7 @@
  * 
  * The Original Code is this file as it was released on June 6, 2009.
  * The Initial Developer of the Original Code are
- * 		Manja Wolf, Dirk Fahland
+ * 		Dirk Fahland
  * 
  * Portions created by the Initial Developer are Copyright (c) 2008, 2009
  * the Initial Developer. All Rights Reserved.
@@ -34,7 +33,7 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
-package hub.top.greta.run;
+package hub.top.greta.simulation;
 
 import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
 import hub.top.adaptiveSystem.AdaptiveProcess;

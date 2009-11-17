@@ -323,6 +323,11 @@ public class ConditionPreNetEditPart extends AbstractBorderedShapeEditPart {
 		} else
 		//do something after moving a condition 
 		if (notification.getNotifier() instanceof Bounds) {
+		  
+      // layout: resize the containing oclet
+      OcletEditPart oep = (OcletEditPart)getParent().getParent().getParent();
+      oep.layoutDirty = true;
+		  
 			//there is at least one arc connected with condition as source
 			if (this.getSourceConnections() != null
 					&& !this.getSourceConnections().isEmpty()) {

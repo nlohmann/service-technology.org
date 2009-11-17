@@ -35,17 +35,18 @@ public class AdaptiveProcessCompartmentEditPart extends
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public IFigure createFigure() {
 		ResizableCompartmentFigure result = (ResizableCompartmentFigure) super
 				.createFigure();
 		result.setTitleVisibility(false);
+    result.setToolTip((IFigure)null);   // remove tool tip
 		return result;
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
@@ -59,6 +60,9 @@ public class AdaptiveProcessCompartmentEditPart extends
 		installEditPolicy(
 				EditPolicyRoles.CANONICAL_ROLE,
 				new hub.top.adaptiveSystem.diagram.edit.policies.AdaptiveProcessCompartmentCanonicalEditPolicy());
+		
+		removeEditPolicy(EditPolicyRoles.CONNECTION_HANDLES_ROLE);
+    //removeEditPolicy(EditPolicyRoles.POPUPBAR_ROLE);  // do not show editor tool pop-up bars
 	}
 
 	/**

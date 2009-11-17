@@ -1,6 +1,5 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009. Manja Wolf, Dirk Fahland. EPL1.0/AGPL3.0
- * All rights reserved.
+ * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. EPL1.0/AGPL3.0
  * 
  * ServiceTechnolog.org - Greta
  *                       (Graphical Runtime Environment for Adaptive Processes) 
@@ -16,7 +15,7 @@
  * 
  * The Original Code is this file as it was released on June 6, 2009.
  * The Initial Developer of the Original Code are
- * 		Manja Wolf, Dirk Fahland
+ * 		Dirk Fahland
  * 
  * Portions created by the Initial Developer are Copyright (c) 2008, 2009
  * the Initial Developer. All Rights Reserved.
@@ -34,33 +33,34 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
-package hub.top.greta.run;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-
-import org.eclipse.emf.common.command.CommandStack;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.common.util.BasicEMap;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.command.SetCommand;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.emf.transaction.RecordingCommand;
-import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CanonicalConnectionEditPolicy;
-import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
+package hub.top.greta.simulation;
 
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
-import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Arc;
 import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+
+import org.eclipse.emf.common.util.BasicEMap;
+import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CanonicalConnectionEditPolicy;
+import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
+
+/**
+ * Stores and handles the states of the {@link AdaptiveProcess} during simulation.
+ * Creating a new {@link RunConfiguration} creates a snapshot of the current
+ * {@link AdaptiveProcess}. This snapshot can be restored by calling
+ * {@link #resetToInitial(DiagramDocumentEditor)}.
+ * 
+ * @author Dirk Fahland
+ */
 public class RunConfiguration {
 
 	protected AdaptiveSystem 	as;
@@ -72,24 +72,6 @@ public class RunConfiguration {
 	}
 	
 	
-	private static EList<? extends Node> getPreSet(Node n) {
-		if (n instanceof Event) {
-			return ((Event)n).getPreConditions();
-		} else if (n instanceof Condition) {
-			return ((Condition)n).getPreEvents();
-		}
-		return null;
-	}
-	
-	private static EList<? extends Node> getPostSet(Node n) {
-		if (n instanceof Event) {
-			return ((Event)n).getPostConditions();
-		} else if (n instanceof Condition) {
-			return ((Condition)n).getPostEvents();
-		}
-		return null;
-	}
-	
 	public void resetToInitial(DiagramDocumentEditor editor) {
 		
 
@@ -99,7 +81,7 @@ public class RunConfiguration {
 		// get all minimal nodes of the current adaptive process
 		LinkedList<Node> queue = new LinkedList<Node>();
 		for (Node n : as.getAdaptiveProcess().getNodes()) {
-			if (getPreSet(n).size() == 0)
+			if (n.getPreSet().size() == 0)
 				queue.add(n);
 		}
 		
@@ -111,13 +93,13 @@ public class RunConfiguration {
 			for (Node m : unmatchedNodes) {
 				if (!n.getName().equals(m.getName()))
 					continue;	// no match
-				if (getPreSet(n).size() != getPreSet(m).size())
+				if (n.getPreSet().size() != m.getPreSet().size())
 					continue;
 				
 				boolean unmatchedPredecessor = false;
 				// compare predecessors
-				for (Node preN : getPreSet(n)) {
-					if (!getPreSet(m).contains(matchingNodes.get(preN))) {
+				for (Node preN : n.getPreSet()) {
+					if (!m.getPreSet().contains(matchingNodes.get(preN))) {
 						unmatchedPredecessor = true;
 					}
 				}
@@ -127,7 +109,7 @@ public class RunConfiguration {
 				if (!unmatchedPredecessor) {
 					matchingNodes.put(n, m);
 					// add all successors of n for matching as well
-					queue.addAll(getPostSet(n));
+					queue.addAll(n.getPostSet());
 				}
 			}
 		}

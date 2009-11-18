@@ -1,0 +1,15 @@
+
+
+Version 0.02:
+
+* reconfigured configure.ac and Makefile.am
+
+* handled some trick to delegate work from Autotools to Qt software
+
+Version 0.01
+
+* initial commit
+
+* GUI runs platform dependent (header errors)
+
+* providing first functionalities like parsing .ggo-files

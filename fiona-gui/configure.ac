@@ -1,4 +1,4 @@
-AC_INIT(Fiona,0.1)
+AC_INIT(Fiona GUI,0.01)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 

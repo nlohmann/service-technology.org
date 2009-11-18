@@ -17,11 +17,12 @@ class OGMarking {
     public:
 	
 			OGMarking(const std::map<label_id_t, std::pair<label_id_t, og_service_index_t> > &successors,
-								unsigned has_FBit, unsigned has_SBit);
+								unsigned has_FBit, unsigned has_SBit, unsigned has_TBit);
 			~OGMarking();
 
 			inline unsigned FBit() const { return this->mFBit; }
 			inline unsigned SBit() const { return this->mSBit; }
+			inline unsigned TBit() const { return this->mTBit; }
 			inline label_index_t outDegree() const { return this->mOutDegree; }
 			inline og_service_index_t successor(label_index_t pos) const {
 				assert(pos < this->mOutDegree);
@@ -41,7 +42,8 @@ class OGMarking {
 			og_service_index_t *mSuccessors;
 			label_id_t *mLabels;
 			unsigned mFBit;
-			unsigned mSBit;			
+			unsigned mSBit;
+			unsigned mTBit;			
 
 };
 
@@ -78,6 +80,7 @@ class OperatingGuideline {
 	private:
 		
 		inline bool isStateMatching(og_service_index_t indexC, og_service_index_t indexB, Service &C) {
+			if (this->marking(indexB)->TBit()) return true;
 			if (!C.marking(indexC)->mEnabledTransitions->isIntersectionEmpty(this->mOutputInterface)) return true;
 			if (this->marking(indexB)->FBit() && !C.marking(indexC)->isFinal()) return false;
 			if (this->marking(indexB)->SBit()) return false;

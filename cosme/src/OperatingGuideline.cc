@@ -2,7 +2,7 @@
 
 
 OGMarking::OGMarking(const std::map<label_id_t, std::pair<label_id_t, og_service_index_t> > &successors,
-								unsigned has_FBit, unsigned has_SBit) {
+								unsigned has_FBit, unsigned has_SBit, unsigned has_TBit) {
 
 	std::map<label_id_t, std::pair<label_id_t, og_service_index_t> >::const_iterator it;
 	label_index_t i = 0;	
@@ -18,6 +18,7 @@ OGMarking::OGMarking(const std::map<label_id_t, std::pair<label_id_t, og_service
 
 	this->mFBit = has_FBit;
 	this->mSBit = has_SBit;
+	this->mTBit = has_TBit;
 
 	this->mCheckedPaths = NULL;
 
@@ -34,6 +35,7 @@ std::string OGMarking::toString() const {
 	tmpStr << std::endl;
   tmpStr << " S: " << (this->mSBit) ? "1" : "0";
 	tmpStr << " F: " << (this->mFBit) ? "1" : "0";
+	tmpStr << " T: " << (this->mTBit) ? "1" : "0";
 	tmpStr << std::endl;
 	if (this->mCheckedPaths != NULL) {
 		tmpStr << " p(q): " << this->mCheckedPaths->toString() << std::endl;
@@ -116,8 +118,9 @@ bool OperatingGuideline::isSimulation(OperatingGuideline &B) const {
 	label_index_t y;
 
 	while (todo.pop(indexA, indexB)) {	
-		if ((this->marking(indexA)->SBit() != B.marking(indexB)->SBit()) || 
-				(this->marking(indexA)->FBit() != B.marking(indexB)->FBit())) {
+		if ((this->marking(indexA)->TBit() && !B.marking(indexB)->TBit()) || 
+				(B.marking(indexB)->SBit() && !this->marking(indexA)->SBit()) ||
+				(B.marking(indexB)->FBit() && !this->marking(indexA)->FBit() && !this->marking(indexA)->SBit())) {
 			
 			return false;
 		}
@@ -149,7 +152,8 @@ bool OperatingGuideline::isEquivalent(OperatingGuideline &B) const {
 
 	while (todo.pop(indexA, indexB)) {
 		if ((this->marking(indexA)->SBit() != B.marking(indexB)->SBit()) || 
-				(this->marking(indexA)->FBit() != B.marking(indexB)->FBit())) {
+				(this->marking(indexA)->FBit() != B.marking(indexB)->FBit()) ||
+				(this->marking(indexA)->TBit() != B.marking(indexB)->TBit())) {
 			
 			return false;
 		}

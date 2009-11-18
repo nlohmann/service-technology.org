@@ -22,6 +22,7 @@ std::map<unsigned int, og_service_index_t> OGNumberConverter;
 og_service_index_t CurrentMarkingNumber;
 unsigned SBit;
 unsigned FBit;
+unsigned TBit;
 std::map<label_id_t, std::pair<label_id_t, og_service_index_t> > CurrentSuccessors;
 
 // for current transition
@@ -61,7 +62,7 @@ inline og_service_index_t mapNodeNumber(unsigned int NodeNumber) {
 %token KEY_NODES
 %token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
 %token COMMA COLON DOUBLECOLON SEMICOLON IDENT ARROW NUMBER
-%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
+%token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S BIT_T
 %token LPAR RPAR
 
 %union {
@@ -176,14 +177,14 @@ nodes:
 node:
   NUMBER 
 	{ /*current node*/
-		SBit = FBit = 0;
+		SBit = FBit = TBit = 0;
 		CurrentSuccessors.clear();
 		CurrentMarkingNumber = mapNodeNumber($1);
 	} 
 	annotation successors
 	/*save current node*/
 	{ 
-		OGMarking *newMarking = new OGMarking(CurrentSuccessors, FBit, SBit);
+		OGMarking *newMarking = new OGMarking(CurrentSuccessors, FBit, SBit, TBit);
 		OGMarkings.insert ( std::make_pair(CurrentMarkingNumber, newMarking) );
 	}
 ;
@@ -193,11 +194,12 @@ annotation:
   /* empty */
 | COLON formula
 	{
-    // parsing 2-bit OGs there should be no formula
-    og_yyerror("read a formula; only 2-bit annotations are supported");
+    // parsing 3-bit OGs there should be no formula
+    og_yyerror("read a formula; only 3-bit annotations are supported");
   } 
 | DOUBLECOLON BIT_S { SBit = 1; }
 | DOUBLECOLON BIT_F { FBit = 1; }
+| DOUBLECOLON BIT_T { TBit = 1; }
 ;
 
 

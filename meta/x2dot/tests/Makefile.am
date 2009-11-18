@@ -9,7 +9,11 @@
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = PO.fiona.og \
             myCoffee.fiona.og \
-            myCoffee.wendy.og 
+            myCoffee.wendy.og \
+            example.fiona.og \
+            myCoffee.sa \
+	    error.wendy.og
+		
 
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,

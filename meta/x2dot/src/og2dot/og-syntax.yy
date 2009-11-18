@@ -103,7 +103,7 @@ og:
 				(*outStream) << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
 			}				
 			if(nodeAnnotation[nodes[i]] == " FINAL "){
-				(*outStream) << nodes[i] << " [label=\" \" shape=\"doublecircle\"]\n";
+				(*outStream) << nodes[i] << " [label=\" \" peripheries=2]\n";
 			}
 		}
 		else
@@ -193,8 +193,7 @@ identlist:
 		switch(currentSection){
 			case 'i': labelPrefix[$1] = '?'; break;
 			case 'o': labelPrefix[$1] = '!'; break;
-			case 's': labelPrefix[$1] = '#'; break;
-			default: labelPrefix[$1] = ' ';
+			case 's': labelPrefix[$1] = '#';
 		}	
 	
 	}
@@ -203,8 +202,7 @@ identlist:
 		switch(currentSection){
 			case 'i': labelPrefix[$3] = '?'; break;
 			case 'o': labelPrefix[$3] = '!'; break;
-			case 's': labelPrefix[$3] = '#'; break;
-			default: labelPrefix[$3] = ' ';
+			case 's': labelPrefix[$3] = '#';
 		}	
 	
 	}	

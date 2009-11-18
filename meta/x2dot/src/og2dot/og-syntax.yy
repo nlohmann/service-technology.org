@@ -82,10 +82,6 @@ char currentSection = ' ';
 %start og
 %%
 
-/*Everything concerning the interface of the operating guideline can
-safely be skipped as it is not relevant for creating
-the dot output */
-
 og:
    KEY_INTERFACE input output synchronous KEY_NODES nodes
 
@@ -98,7 +94,20 @@ og:
 	//For all nodes...
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes
-		(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
+		if(nodeAnnotation[nodes[i]] == " INITIAL " || nodeAnnotation[nodes[i]] == " FINAL "){
+			if(nodeAnnotation[nodes[i]] == " INITIAL "){
+				(*outStream) << nodes[i] << " [label=\" \"]\n";
+				//Create invisible node (in order to mark the initial state)
+				(*outStream) << "INIT" << nodes[i] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
+  				//Mark initial state
+				(*outStream) << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
+			}				
+			if(nodeAnnotation[nodes[i]] == " FINAL "){
+				(*outStream) << nodes[i] << " [label=\" \" shape=\"doublecircle\"]\n";
+			}
+		}
+		else
+			(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
 		std::vector<std::pair<char*, unsigned int> > successors = nodeSuccessors[nodes[i]];
 		//write the node's ID, node's annotation and all links to its successors to the stream...
 		for(int j=0;j<successors.size();++j){
@@ -125,7 +134,7 @@ og:
 
   {
 	for(int i=0;i<nodes.size();++i){			
-		//List nodes
+		//List nodes		
 		(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"";
 		if(nodeColor[nodes[i]]=='b' || nodeColor[nodes[i]]=='r'){
 			(*outStream) << ",style= \"filled\"";

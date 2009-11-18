@@ -11,6 +11,5 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: graphviz
 Description: a tool to generate public view service automata
- Sayo is a tool to generate public view service automata from 2-bit operating
- guidelines.
+  Compilers compile several service-technology formats in each other.
 

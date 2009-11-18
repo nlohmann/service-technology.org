@@ -15,4 +15,5 @@ m4_define([SA2SM],                [wrap.sh @SA2SM@])
 m4_define([FIONA2WENDY],          [cover.sh @abs_top_builddir@/src/fiona2wendy])
 m4_define([WENDY2FIONA],          [cover.sh @abs_top_builddir@/src/wendy2fiona])
 m4_define([WENDYFORMULA2BITS],    [cover.sh @abs_top_builddir@/src/wendyFormula2bits])
+m4_define([IG2SA],                [cover.sh @abs_top_builddir@/src/ig2sa])
 

@@ -32,7 +32,7 @@ label_id_t Label::mapLabel(string label) {
 std::string Label::toString() const {
   std::stringstream tmpStr;
 	tmpStr << std::endl << "Interface:" << std::endl;
-	for (map<label_id_t, string>::const_iterator it = this->mID2Name.begin(); it != this->mID2Name.end(); it++) {
+	for (map<label_id_t, string>::const_iterator it = this->mID2Name.begin(); it != this->mID2Name.end(); ++it) {
 		tmpStr << " " << static_cast<unsigned int>(it->first) << ": " << it->second << std::endl;
 	}
 

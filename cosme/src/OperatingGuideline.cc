@@ -88,7 +88,6 @@ void OperatingGuideline::calculateBitSets(Label &interface) {
 
 	std::set<label_id_t>::const_iterator it;	
 	std::string label;
-	label_id_t id;
 
 	for (it = this->mInterface.begin(); it != this->mInterface.end(); it++) {
 		assert(interface.ID2Name((*it), label));

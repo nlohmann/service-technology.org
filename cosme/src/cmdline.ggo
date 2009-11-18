@@ -1,7 +1,7 @@
 args "--include-getopt"
 
 description "About Cosme:"
-purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivalence) is a tool for 2-bit operating guidelines."
+purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivalence) is a tool for 3-bit operating guidelines."
 
 section "Input"
 

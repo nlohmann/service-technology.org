@@ -17,7 +17,7 @@ TESTFILES = syntax_example.owfn
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-NO_COVER_FILES = */cmdline.c */lexic.cc */syntax.cc
+NO_COVER_FILES = */cmdline.c */lexic-*.cc */syntax-*.cc */verbose.*
 
 
 

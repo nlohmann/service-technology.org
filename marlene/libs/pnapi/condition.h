@@ -37,10 +37,6 @@ formula::Negation operator!(const formula::Formula &);
 formula::Conjunction operator&&(const formula::Formula &,
     const formula::Formula &);
 
-/// formula construction operator (empty places)
-formula::Conjunction operator&&(const formula::Formula &,
-    const formula::AllOtherPlaces);
-
 /// formula construction operator
 formula::Disjunction operator||(const formula::Formula &,
     const formula::Formula &);
@@ -86,9 +82,6 @@ public:
   /// standard assignment operator
   Condition & operator=(const formula::Formula &);
 
-  /// standard assignment operator for flag settings
-  Condition & operator=(const formula::AllOtherPlaces);
-
   /// standard assignment operator for boolean values
   Condition & operator=(bool);
 
@@ -104,6 +97,9 @@ public:
 
   /// creates a condition for the given marking and adds it
   void addMarking(const Marking &);
+  
+  /// removes a place recursively
+  void removePlace(const Place &);
 
   /// returns a set of place names, which are contained in the condition
   /// (excluding empty places)
@@ -111,7 +107,12 @@ public:
 
   /// negates the formula
   void negate();
+  
+  /// calculate disjunctive normal form
+  void dnf();
 
+  /// forces all places not concerned by the formula to be empty
+  void allOtherPlacesEmpty(PetriNet&);
 
 private:
 
@@ -123,6 +124,9 @@ private:
 
   /// no default copy assignment operator!
   Condition & operator=(const Condition &);
+  
+  /// removes all negations
+  void removeNegation();
 
 };
 

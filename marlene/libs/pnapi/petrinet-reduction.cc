@@ -18,11 +18,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: niels $
+ *          last changes of: \$Author: cas $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
+ * \date    \$Date: 2009-11-01 06:26:26 +0100 (So, 01. Nov 2009) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,9 +41,13 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 4827 $
+ * \version \$Revision: 4956 $
  *
  * \ingroup petrinet
+ * 
+ * \todo    Check, if rules still can be applied by precondition 
+ *          "place is empty in each final marking" and add new places
+ *          to the set of implied empty places (and also to the final condition).
  */
 
 
@@ -75,7 +79,7 @@ using std::set;
 using namespace pnapi;
 
 
-#define __REDUCE_CHECK_FINAL(x) (finalCondition().concerningPlaces().count(x) == 0)
+#define __REDUCE_CHECK_FINAL(x) (reducablePlaces_->count(x) > 0)
 
 
 /******************************************************************************
@@ -2666,6 +2670,19 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
   unsigned int done = 1;
   unsigned int passes = 0;
 
+  // places implied as empty can be reduced
+  reducablePlaces_ = new set<const Place*>(finalCondition().formula().emptyPlaces());
+  
+  {
+    set<const Place*> noReduce = finalCondition().concerningPlaces();
+    for(set<Place*>::iterator p = internalPlaces_.begin();
+         p != internalPlaces_.end(); ++p)
+    {
+      // places not concerned by the final condition can be reduced
+      if(noReduce.count(*p) == 0)
+        reducablePlaces_->insert(*p);
+    }
+  }
 
   // apply reductions
   while (done > 0)
@@ -2773,5 +2790,8 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
       break;
   }
 
+  delete reducablePlaces_;
+  reducablePlaces_ = NULL;
+  
   return passes;
 }

@@ -9,29 +9,26 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
+ * \date    $Date: 2009-11-16 15:27:08 +0100 (Mo, 16. Nov 2009) $
  *
- * \version $Revision: 4827 $
+ * \version $Revision: 5027 $
  */
 
 #ifndef PNAPI_PETRINET_H
 #define PNAPI_PETRINET_H
 
-#include <vector>
+#include "config.h"
 
-// include int types, when using Visual Studio Compiler
-#ifdef _MSC_VER
-#include "stdint.h"
-#endif
+#include <inttypes.h>
+#include <vector>
 
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
-#include "config.h"
 
 #ifndef CONFIG_PETRIFY
 #define CONFIG_PETRIFY "not found"
@@ -39,6 +36,10 @@
 
 #ifndef CONFIG_GENET
 #define CONFIG_GENET "not found"
+#endif
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
 #endif
 
 namespace pnapi
@@ -200,19 +201,19 @@ public:
     LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
     LEVEL_4 = (LEVEL_3 | SERIES_PLACES | SERIES_TRANSITIONS),
     LEVEL_5 = (LEVEL_4 | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
-        INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
-        LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
-        SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
-            DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
-            SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
-                SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
-                EQUAL_PLACES),
-                SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
-                    STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
-                    STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
-                    K_BOUNDEDNESS = SET_PILLAT,
-                    BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
-                    LIVENESS = (SET_PILLAT | SET_STARKE)
+               INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
+    LEVEL_6 = (LEVEL_5 | EQUAL_PLACES),
+    SET_UNNECCESSARY = (UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS |
+                        DEAD_NODES | INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES),
+    SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
+                  SERIES_TRANSITIONS | SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS |
+                  EQUAL_PLACES),
+    SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
+                  STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
+                  STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
+    K_BOUNDEDNESS = SET_PILLAT,
+    BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
+    LIVENESS = (SET_PILLAT | SET_STARKE)
   };
 
   enum AutomatonConverter
@@ -220,6 +221,12 @@ public:
     PETRIFY,
     GENET,
     STATEMACHINE
+  };
+  
+  enum Warning
+  {
+    W_NONE = 0,
+    W_INTERFACE_PLACE_IN_FINAL_CONDITION = 1
   };
 
   /// standard constructor
@@ -338,6 +345,11 @@ public:
   void compose(const PetriNet &, const std::string & = "net1",
       const std::string & = "net2");
 
+  /// compose two nets by adding the given one and merging interface places of the same port only
+  void composeByPorts(const PetriNet &, const std::string &portA,
+      const std::string &portB, const std::string &prefixA = "net1",
+      const std::string &prefixB = "net2");
+
   /// compose the given nets into a new one
   static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
@@ -377,6 +389,12 @@ public:
 
   /// sets labels (and translates references)
   void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
+  
+  /// get warnings
+  unsigned int getWarnings();
+  
+  /// set warnings
+  void setWarnings(unsigned int = W_NONE);
 
   //@}
 
@@ -418,6 +436,8 @@ private:
   /// ports (grouping of interface places)
   std::multimap<std::string, Place *> interfacePlacesByPort_;
 
+  /// ports (grouping of synchronous labels)
+
   /// all arcs
   std::set<Arc *> arcs_;
 
@@ -430,9 +450,8 @@ private:
   /// observer for nodes and arcs
   util::ComponentObserver observer_;
 
-  //TODO: rename: finalCondition
   /// final condition
-  Condition condition_;
+  Condition finalCondition_;
 
   /// meta information
   std::map<io::MetaInformation, std::string> meta_;
@@ -452,6 +471,12 @@ private:
   /// converter Automaton => PetriNet
   static AutomatonConverter automatonConverter_;
 
+  /// warning flags
+  unsigned int warnings_;
+  
+  /// cache for reduction
+  std::set<const Place *> * reducablePlaces_;
+  
   /* structural changes */
 
 public:

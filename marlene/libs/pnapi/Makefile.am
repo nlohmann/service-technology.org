@@ -22,7 +22,8 @@ libpnapi_a_SOURCES = \
 	marking.h marking.cc \
 	myio.h myio.cc io-format.cc \
 	errorhandling.cc \
-	Output.h Output.cc
+	Output.h Output.cc \
+	port.h port.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-owfn.h parser-owfn-lexer.cc \
                 parser-pn.cc parser-pn.h parser-pn-lexer.cc \

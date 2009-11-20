@@ -157,7 +157,7 @@ tp_list:
 
 pt_list:
   /* empty */
-| pt_list PLACENAME transition_list weight newline
+| pt_list PLACENAME transition_list newline
   { arcs_[$2] = tempNodeMap_;
     tempNodeMap_.clear();
     free($2);

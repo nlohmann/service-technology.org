@@ -24,7 +24,7 @@ class Place;
 class Marking
 {
 public:
-  //Marking();
+  Marking();
   Marking(PetriNet &n, bool = false);
   Marking(const Marking &m);
   Marking(std::map<const Place *, unsigned int> m, PetriNet *net = NULL);

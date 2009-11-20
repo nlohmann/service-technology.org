@@ -255,8 +255,8 @@ const pnapi::PetriNet * Adapter::buildController()
 #else
     wendy_command += ((args_info.verbose_flag) ? " --verbose"
                     : " 2> /dev/null");
-    candy_command += ((args_info.verbose_flag) ? " --verbose"
-                    : " 2> /dev/null");
+    candy_command += ((args_info.verbose_flag) ? " --verbose 1>&2"
+                    : " 1>&2 2> /dev/null");
 #endif
 
     if (args_info.costoptimized_flag)

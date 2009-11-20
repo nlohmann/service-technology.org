@@ -371,8 +371,9 @@ PetriNet Automaton::stateMachine() const
   }
 
   // generate final condition
-  result.finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
-
+  result.finalCondition() = final.formula();
+  result.finalCondition().allOtherPlacesEmpty(result); // actually unneccassary
+  
   // copy synchronous interface (how did this ever work before???)
   result.setSynchronousLabels(labels_);
 

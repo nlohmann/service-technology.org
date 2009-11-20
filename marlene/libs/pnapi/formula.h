@@ -17,22 +17,30 @@ class PetriNet;
 class Place;
 class Node;
 
-
 /*!
  * \brief   Final Condition Formulas
  */
 namespace formula {
 
-
-typedef enum { NONE = 1, ALL_PLACES_EMPTY = 7,
-  ALL_OTHER_PLACES_EMPTY = 5, ALL_OTHER_INTERNAL_PLACES_EMPTY = 3,
-  ALL_OTHER_EXTERNAL_PLACES_EMPTY = 6
-} AllOtherPlaces;
-
-
 class Formula
 {
 public:
+  
+  /// formula types
+  enum Type
+  {
+    F_NEGATION,
+    F_CONJUNCTION,
+    F_DISJUNCTION,
+    F_TRUE,
+    F_FALSE,
+    F_EQUAL,
+    F_NOT_EQUAL,
+    F_GREATER,
+    F_GREATER_EQUAL,
+    F_LESS,
+    F_LESS_EQUAL
+  };
 
   /// destructor
   virtual ~Formula();
@@ -49,9 +57,24 @@ public:
 
   /// set of concerning places
   virtual std::set<const Place *> places() const;
-
-  /// unfold wildcard
-  virtual void unfold(const PetriNet &) {};
+  
+  /// set of places implied to be empty
+  virtual std::set<const Place *> emptyPlaces() const;
+  
+  /// removes a place recursively
+  virtual bool removePlace(const Place &);
+  
+  /// returns formula type
+  virtual Type getType() const =0;
+  
+  /// removes negation
+  virtual Formula * removeNegation() const;
+  
+  /// negates the formula
+  virtual Formula * negate() const =0;
+  
+  /// forms formula in disjunctive normal form
+  virtual Formula * dnf() const;
 
 };
 
@@ -79,8 +102,9 @@ public:
   const std::set<const Formula *> & children() const;
 
   std::set<const Place *> places() const;
-
-  virtual void unfold(const PetriNet &);
+  
+  /// removes a place recursively
+  bool removePlace(const Place &);
 
 protected:
   std::set<const Formula *> children_;
@@ -105,9 +129,20 @@ public:
   Negation * clone(const std::map<const Place *, const Place *> * = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
 
+  /// removes negation
+  Formula * removeNegation() const;
+
+  /// negates the formula
+  Formula * negate() const;  
+  
 protected:
+  
   void simplifyChildren();
+    
 };
 
 
@@ -119,18 +154,14 @@ public:
 
   Conjunction(const Conjunction &);
 
-  Conjunction(const AllOtherPlaces = NONE);
+  Conjunction();
 
-  Conjunction(const Formula &, const AllOtherPlaces = NONE);
+  Conjunction(const Formula &);
 
   Conjunction(const Formula &, const Formula &);
 
-  // FIXME: obsolete wildcard implementation
-  Conjunction(const Formula &, const std::set<const Place *> &);
-
   Conjunction(const std::set<const Formula *> &,
-      const std::map<const Place *, const Place *> * = NULL,
-      const AllOtherPlaces = NONE);
+      const std::map<const Place *, const Place *> * = NULL);
 
   bool isSatisfied(const Marking &) const;
 
@@ -138,17 +169,26 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// set of places implied to be empty
+  std::set<const Place *> emptyPlaces() const;
+  
+  /// returns formula type
+  Type getType() const;
 
-  void unfold(const PetriNet &);
+  /// removes negation
+  Formula * removeNegation() const;
 
+  /// negates the formula
+  Formula * negate() const;
+  
+  /// forms formula in disjunctive normal form
+  Formula * dnf() const;
+  
 protected:
 
   void simplifyChildren();
-
-private:
-
-  AllOtherPlaces flag_;
-
+  
 };
 
 
@@ -169,9 +209,25 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// set of places implied to be empty
+  std::set<const Place *> emptyPlaces() const;
 
+  /// returns formula type
+  Type getType() const;
+
+  /// removes negation
+  Formula * removeNegation() const;
+
+  /// negates the formula
+  Formula * negate() const;
+  
+  /// forms formula in disjunctive normal form
+  Formula * dnf() const;
+  
 protected:
   void simplifyChildren();
+  
 };
 
 
@@ -192,7 +248,10 @@ public:
   unsigned int tokens() const;
 
   std::set<const Place *> places() const;
-
+  
+  /// removes a place recursively
+  bool removePlace(const Place &);
+  
 protected:
   const Place & place_;
   const unsigned int tokens_;
@@ -209,6 +268,12 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
 
 };
 
@@ -223,6 +288,12 @@ public:
 
   std::ostream & output(std::ostream &) const;
 
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+  
 };
 
 
@@ -239,6 +310,16 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// set of places implied to be empty
+  std::set<const Place *> emptyPlaces() const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+    
 };
 
 
@@ -255,6 +336,16 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// removes negation
+  Formula * removeNegation() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+  
 };
 
 
@@ -270,6 +361,13 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+  
 };
 
 
@@ -285,6 +383,13 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+  
 };
 
 
@@ -300,6 +405,13 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+  
 };
 
 
@@ -315,10 +427,17 @@ public:
       = NULL) const;
 
   std::ostream & output(std::ostream &) const;
+  
+  /// returns formula type
+  Type getType() const;
+  
+  /// negates the formula
+  Formula * negate() const;
+  
 };
 
-}
+} /* namespace formula */
 
-}
+} /* namespace pnapi */
 
 #endif

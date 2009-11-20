@@ -464,13 +464,14 @@ std::ostream & operator<<(std::ostream & os,
 
  bool compareContainerElements(const Place * p1, const Place * p2)
  {
-   return compareContainerElements((Node *) p1, (Node *) p2);
+   return compareContainerElements(static_cast<Node *>(const_cast<Place *>(p1)), 
+                                   static_cast<Node *>(const_cast<Place *>(p2)));
  }
 
 
  bool compareContainerElements(Transition * t1, Transition * t2)
  {
-   return compareContainerElements(reinterpret_cast<Node *>(t1), reinterpret_cast<Node *>(t2));
+   return compareContainerElements(static_cast<Node *>(t1), static_cast<Node *>(t2));
  }
 
 

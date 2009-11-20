@@ -54,7 +54,7 @@ namespace owfn
 {
 /******************************************\
  *  "global" variables for flex and bison *
-      \******************************************/
+\******************************************/
 
 /// generated petrinet
 PetriNet pnapi_owfn_yynet;
@@ -93,6 +93,8 @@ bool placeSetType_;
 set<Place*> placeSet_;
 /// whether to check labels
 bool checkLabels_;
+/// wildcard ALL[_OTHER]_PLACES_EMPTY given
+bool wildcardGiven_ = false;
 
 /// "assertion"
 void check(bool condition, const std::string & msg)
@@ -153,6 +155,15 @@ const PetriNet & Parser::parse(istream & is)
   labels_.clear();
   constrains_.clear();
   placeSet_.clear();
+
+  // final condition stuff
+  set<const Place*> concernedPlaces = pnapi_owfn_yynet.finalCondition().formula().places();
+  for(set<Place*>::iterator p = pnapi_owfn_yynet.getInterfacePlaces().begin();
+       p != pnapi_owfn_yynet.getInterfacePlaces().end(); ++p)
+  {
+    if(concernedPlaces.count(*p) > 0)
+      pnapi_owfn_yynet.setWarnings(PetriNet::W_INTERFACE_PLACE_IN_FINAL_CONDITION);
+  }
 
   return pnapi_owfn_yynet;
 }
@@ -569,7 +580,8 @@ const PetriNet & Parser::parseSA2SM(std::istream &is)
     final = final.formula() || *finalPlaces_[i] == 1;
   }
 
-  pnapi_sa_yynet.finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
+  pnapi_sa_yynet.finalCondition() = final.formula();
+  pnapi_sa_yynet.finalCondition().allOtherPlacesEmpty(pnapi_sa_yynet); // actually unnecassary
   pnapi_sa_yynet.setSynchronousLabels(synchronous_);
 
   // clean up global variables

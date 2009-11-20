@@ -179,7 +179,6 @@ char* PossibleSendEvents::decode() {
 */
 void PossibleSendEvents::setFalse() {
     // reserve memory
-    storage = new uint8_t[bytes];
     for (size_t i = 0; i < bytes; ++i) {
         // initially, all sending events are not reachable
         storage[i] = 0;

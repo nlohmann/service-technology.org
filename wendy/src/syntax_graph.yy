@@ -53,7 +53,7 @@ InnerMarking_ID currentLowlink;
 std::map<const pnapi::Place*, unsigned int> marking;
 
 /// storage for current (terminal) strongly connected component
-std::vector<InnerMarking_ID> currentSCC;
+std::set<InnerMarking_ID> currentSCC;
 
 /// a file to store a mapping from marking ids to actual Petri net markings
 extern Output *markingoutput;
@@ -83,7 +83,6 @@ states:
 state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
     {
-	
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
                                            InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
@@ -107,25 +106,27 @@ state:
         /* calculate strongly connected components and do some evaluation on its members     */
         /* ================================================================================= */
 
-        if (not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
-            /* current marking is representative */
-            while (not currentSCC.empty()) {
-                /* get marking from current SCC */
-                InnerMarking_ID poppedMarking = currentSCC.back();
-
-                /* actually delete it from vector */
-                currentSCC.pop_back();
-
-                /* if a final marking is reachable from the representative,
-                   then a final marking is reachable from all markings within
-                   the strongly connected component */
-                InnerMarking::finalMarkingReachableMap[poppedMarking] = InnerMarking::finalMarkingReachableMap[$2];
-
-                if (not args_info.ignoreUnreceivedMessages_flag) {
-                    /* ... the same is true for possible sending events */
-                    InnerMarking::markingMap[poppedMarking]->possibleSendEvents->copy(*InnerMarking::markingMap[$2]->possibleSendEvents);
-                }
-            }
+		/* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
+        if (currentLowlink == $2 and
+				not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
+	
+			// insert representative into current SCC of inner markings
+			currentSCC.insert($2);
+	
+			// reduction by smart sending events is turned on
+			if (not args_info.ignoreUnreceivedMessages_flag) {
+				/* it is a trivial SCC */
+				if (currentSCC.size() == 1) {
+					/* analyze only representative with respect to possible sending events */
+					InnerMarking::markingMap[$2]->calcReachableSendingEvents();
+				} else {
+					/* analyze all members of current SCC with respect to possible sending events and final markings reachable */
+					InnerMarking::analyzeSCCOfInnerMarkings(currentSCC);
+				}
+			} else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock) {
+				// no smart sending event reduction but livelock freedom is turned on
+				InnerMarking::finalMarkingReachableSCC(currentSCC);
+			}
         } /* end if, livelock freedom */
 
         currentLabels.clear();
@@ -147,7 +148,7 @@ scc_members:
 
 scc_member:
   NUMBER
-    { currentSCC.push_back($1); }
+    { currentSCC.insert($1); }
 ;
 
 lowlink:

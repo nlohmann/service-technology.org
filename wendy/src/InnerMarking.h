@@ -54,6 +54,13 @@ class InnerMarking {
         /// destroy all objects of this class
         static void finalize();
 
+        /// reduction rule: smart sending events
+        /// analyze non-trivial SCC of inner markings with respect to reachable final inner markings and possible sending events
+        static void analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingSet);
+
+        /// analyze non-trivial SCC of inner markings with respect to reachable final inner markings (in case of livelock freedom only)
+        static void finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSet);
+
     public: /* static attributes */
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;
@@ -103,10 +110,10 @@ class InnerMarking {
         /// checks if all input messages will be consumed later on
         bool sentMessagesConsumed(const InterfaceMarking&) const;
 
-    private: /* member functions */
         /// determines which receiving transitions are potentially reachable from this marking
-        void calcReachableSendingEvents(const InnerMarking_ID&);
+        void calcReachableSendingEvents();
 
+    private: /* member functions */
         /// determine the type of this marking
         inline void determineType(const InnerMarking_ID&);
 

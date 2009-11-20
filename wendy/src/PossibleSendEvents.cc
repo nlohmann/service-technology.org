@@ -116,6 +116,14 @@ void PossibleSendEvents::operator|=(const PossibleSendEvents& other) {
     }
 }
 
+bool PossibleSendEvents::operator==(const PossibleSendEvents& other) {
+    for (size_t i = 0; i < bytes; ++i) {
+        if (storage[i] != other.storage[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /******************
  * MEMBER METHODS *
@@ -164,3 +172,17 @@ char* PossibleSendEvents::decode() {
 
     return decodedLabels;
 }
+
+/*!
+ reduction rule: smart sending event
+ set all bits to false (needed when analyzing an SCC of inner markings)
+*/
+void PossibleSendEvents::setFalse() {
+    // reserve memory
+    storage = new uint8_t[bytes];
+    for (size_t i = 0; i < bytes; ++i) {
+        // initially, all sending events are not reachable
+        storage[i] = 0;
+    }
+}
+

@@ -126,13 +126,6 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
 
     // knowing all successors, we can determine the type of the marking...
     determineType(myId);
-
-    // ... and we can make an approximation of the receiving transitions that
-    // are reachable from here
-    if (not args_info.ignoreUnreceivedMessages_flag) {
-        calcReachableSendingEvents(myId);
-    }
-
 }
 
 
@@ -275,14 +268,16 @@ bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const
 
 
 /*!
+  reduction rule: smart sending event
+
   determines which sending events are potentially reachable from this marking
 */
-void InnerMarking::calcReachableSendingEvents(const InnerMarking_ID& myId) {
-    // never call this function more than once
-    assert(possibleSendEvents == NULL);
+void InnerMarking::calcReachableSendingEvents() {
 
-    // we reserve a Boolean value for each sending event possible
-    possibleSendEvents = new PossibleSendEvents();
+    if (possibleSendEvents == NULL) {
+        // we reserve a Boolean value for each sending event possible
+        possibleSendEvents = new PossibleSendEvents();
+    }
 
     if (out_degree > 0) {
         // remember which directly reachable sending events (edges) we have considered already
@@ -290,22 +285,6 @@ void InnerMarking::calcReachableSendingEvents(const InnerMarking_ID& myId) {
 
         // traverse successors
         for (uint8_t i = 0; i < out_degree; i++) {
-
-            // there is a self-loop of the current inner marking
-            // in this case map markingMap is not yet set appropriately
-            // --> markingMap[currentMarking] == 0 because the map is set in syntax_graph.yy after this method has been called
-            if (successors[i] == myId) {
-                // direct successor reachable by sending event
-                if (SENDING(labels[i]) and (consideredLabels.find(labels[i]) == consideredLabels.end())) {
-
-                    // add current sending event
-                    *possibleSendEvents |= PossibleSendEvents(false, labels[i]);
-
-                    consideredLabels[labels[i]] = true;
-                }
-
-                continue;
-            }
 
             // if successor exists and if it leads to a final marking
             if ((markingMap.find(successors[i]) != markingMap.end() and markingMap[successors[i]] != NULL) and
@@ -321,8 +300,134 @@ void InnerMarking::calcReachableSendingEvents(const InnerMarking_ID& myId) {
                 }
                 // everything that is possible for the successor is possible
                 // for the current marking as well
-                *possibleSendEvents |= *(markingMap[successors[i]]->possibleSendEvents);
+                if (markingMap[successors[i]]->possibleSendEvents != NULL) {
+                    *possibleSendEvents |= *(markingMap[successors[i]]->possibleSendEvents);
+                }
             }
+        }
+    }
+}
+
+
+/*!
+ reduction rule: smart sending event
+
+ create the predecessor relation of all inner markings contained in the given set
+ and then evaluate each member of the given set of knowledges and propagate
+ the property of possible sending events accordingly
+
+ \pre  markingSet contains all inner markings of the current SCC
+ \post markingSet is empty
+*/
+void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingSet) {
+    // a temporary data structure to store the predecessor relation
+    std::map<InnerMarking_ID, std::set<InnerMarking_ID> > tempPredecessors;
+
+    // remember if from at least one inner marking of the current SCC a final inner marking is reachable
+    bool is_final_reachable = false;
+
+    // if it is not a TSCC, we have to evaluate each member of the SCC
+    // first, we generate the predecessor relation between the members
+    for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+        // for each successor which is part of the current SCC, register the predecessor
+
+        InnerMarking * currentInnerMarking = markingMap.find((*iScc))->second;
+
+        // get predecessor within current SCC
+        for (uint8_t i = 0; i < currentInnerMarking->out_degree; i++) {
+            if (markingMap.find(currentInnerMarking->successors[i]) != markingMap.end() and
+                    markingMap[currentInnerMarking->successors[i]] != NULL and
+                    markingSet.find(currentInnerMarking->successors[i]) != markingSet.end()) {
+
+                tempPredecessors[currentInnerMarking->successors[i]].insert((*iScc));
+            }
+
+            // check if there exists a successor (within or outside of the current SCC) from which a
+            // final inner marking is reachable
+            if (markingMap[currentInnerMarking->successors[i]] != NULL and
+                    finalMarkingReachableMap.find((*iScc)) != finalMarkingReachableMap.end()) {
+                is_final_reachable = true;
+            }
+        }
+    }
+
+    // propagate that at least from one inner marking of the current SCC a final inner marking is reachable
+    if (is_final_reachable) {
+        for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+            finalMarkingReachableMap[*iScc] = true;
+        }
+    }
+
+    // remember possible sending events
+    PossibleSendEvents * tmpPossibleSendEvents = new PossibleSendEvents();
+
+    // evaluate each member
+    while (not markingSet.empty()) {
+
+        // reset temporary possible sending events
+        tmpPossibleSendEvents->setFalse();
+
+        InnerMarking_ID currentInnerMarkingID = *markingSet.begin();
+        InnerMarking* currentInnerMarking = markingMap.find(*markingSet.begin())->second;
+        markingSet.erase(markingSet.begin());
+
+        // it might be the case that the possible sending events are not yet set
+        if (currentInnerMarking->possibleSendEvents != NULL) {
+            // remember which sending events are set
+            *tmpPossibleSendEvents |= *(currentInnerMarking->possibleSendEvents);
+        }
+
+        // calculate possible sending events (again)
+        currentInnerMarking->calcReachableSendingEvents();
+
+        // set of possible sending events has changed, so inform predecessors
+        if (not (*tmpPossibleSendEvents == *(currentInnerMarking->possibleSendEvents))) {
+            // tell each predecessor of current inner marking that the possibe sending events from this inner marking have changed
+            /// \todo looks as if a set union would do the job here
+            markingSet.insert(tempPredecessors[currentInnerMarkingID].begin(), tempPredecessors[currentInnerMarkingID].end());
+        }
+    }
+}
+
+
+/*!
+ in case of correctness criterion livelock freedom
+
+ analyze SCC of inner markings and find out if a final inner marking is reachable from at least one inner marking
+ of the SCC
+
+ \pre  markingSet contains all inner markings of the current SCC
+ \post markingSet is empty
+*/
+void InnerMarking::finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSet) {
+
+    // remember if from at least one inner marking of the current SCC a final inner marking is reachable
+    bool is_final_reachable = false;
+
+    // evaluate each member of the SCC
+    for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+
+        InnerMarking * currentInnerMarking = markingMap.find((*iScc))->second;
+
+        // get successor of current inner marking
+        for (uint8_t i = 0; i < currentInnerMarking->out_degree; i++) {
+            // is a final inner marking reachable
+            if (markingMap[currentInnerMarking->successors[i]] != NULL and
+                    finalMarkingReachableMap.find((*iScc)) != finalMarkingReachableMap.end()) {
+                // ... yes, remember this and get out
+                is_final_reachable = true;
+                break;
+            }
+        }
+        if (is_final_reachable) {
+            break;
+        }
+    }
+
+    // propagate that at least from one inner marking of the current SCC a final inner marking is reachable
+    if (is_final_reachable) {
+        for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+            finalMarkingReachableMap[*iScc] = true;
         }
     }
 }

@@ -45,11 +45,17 @@ class PossibleSendEvents {
         /// destructor; also cleans decodedLabels
         ~PossibleSendEvents();
 
+        /// set all sending events to false
+        void setFalse();
+
         /// overloaded bit-wise AND operator
         void operator&=(const PossibleSendEvents&);
 
         /// overloaded bit-wise OR operator
         void operator|=(const PossibleSendEvents&);
+
+        /// overloaded comparison operator
+        bool operator==(const PossibleSendEvents&);
 
         /// copies storage
         void copy(const PossibleSendEvents&);

@@ -530,6 +530,17 @@ AT_CHECK([GREP -q "wendy: 3 knowledges reachable" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
+AT_SETUP([Bug 14798 (https://gna.org/bugs/?14798)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14798.owfn .])
+AT_CHECK([WENDY bug14798.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 5 knowledges reachable" stderr])
+AT_KEYWORDS(bug)
+AT_CLEANUP
+
+
+
+
 ############################################################################
 AT_BANNER([Operating Guidelines])
 ############################################################################

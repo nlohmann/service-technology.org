@@ -209,7 +209,7 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
 
                 tempPredecessors[(**iScc).successors[l-1]].insert(*iScc);
             }
-            // check if there exists a successor (within or without the current SCC) from which a
+            // check if there exists a successor (within or outside of the current SCC) from which a
             // final node is reachable
             if ((**iScc).successors[l-1] != NULL and (**iScc).successors[l-1] != empty and
                 (**iScc).successors[l-1]->is_final_reachable) {

@@ -387,6 +387,8 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
             markingSet.insert(tempPredecessors[currentInnerMarkingID].begin(), tempPredecessors[currentInnerMarkingID].end());
         }
     }
+
+    delete tmpPossibleSendEvents;
 }
 
 

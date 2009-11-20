@@ -729,6 +729,7 @@ catch(overflow)
 void removeisolated()
 {
   unsigned int i=0;
+#ifndef STATESPACE
   while(i<Places[0]->cnt)
   {
     if(Places[i]->references == 0) // Place isolated
@@ -743,6 +744,7 @@ void removeisolated()
       i++;
     }
   }
+#endif
   for(i=0;i<Transitions[0]->cnt;i++)
   {
     Transitions[i]->nr = i;

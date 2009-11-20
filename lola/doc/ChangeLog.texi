@@ -1,5 +1,6 @@
 @heading Version 1.14-unreleased
 @itemize
+@item fixed bug #14295 (see @url{https://gna.org/bugs/?14295}): Place is ignored in marking output; isolated places are not removed when using directive STATESPACE
 @item whenever a SCC representative is found, all members (excluding the representative) of the current SCC are now printed out when directive STATESPACE is used
 @end itemize
 

@@ -9,7 +9,15 @@
 Version 1.14-unreleased
 =======================
 
-* whenever a SCC representative is found, all members (excluding the
-  representative) of SCC are now printed out when directive STATESPACE is used
+* fixed bug #14295 (see `https://gna.org/bugs/?14295'): Place is ignored in
+  marking output; isolated places are not removed when using directive
+  STATESPACE
 
-\nSee file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for\ncomplete version history.\n
+* whenever a SCC representative is found, all members (excluding the
+  representative) of the current SCC are now printed out when directive
+  STATESPACE is used
+
+
+See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
+complete version history.
+

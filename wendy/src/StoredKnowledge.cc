@@ -252,7 +252,7 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
  */
 void StoredKnowledge::rearrangeKnowledgeBubble() {
     // check the stored markings and remove all transient states
-    unsigned int j = 0;
+    innermarkingcount_t j = 0;
 
     while (j < sizeDeadlockMarkings) {
         assert(interface[j]);
@@ -332,11 +332,11 @@ StoredKnowledge::StoredKnowledge(const Knowledge* K)
     interface = new InterfaceMarking*[sizeAllMarkings];
 
     // finally copy data structure to C-style arrays
-    size_t count = 0;
+    innermarkingcount_t count = 0;
 
     // traverse the bubble and copy the markings into the C arrays
     for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
-        for (size_t i = 0; i < pos->second.size(); ++i, ++count) {
+        for (innermarkingcount_t i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking and the interface marking
             inner[count] = pos->first;
             interface[count] = new InterfaceMarking(*(pos->second[i]));
@@ -358,7 +358,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* K)
 
 StoredKnowledge::~StoredKnowledge() {
     // delete the interface markings
-    for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
+    for (innermarkingcount_t i = 0; i < sizeAllMarkings; ++i) {
         delete interface[i];
     }
     delete[] interface;
@@ -495,7 +495,7 @@ StoredKnowledge* StoredKnowledge::store() {
                 bool found = true;
 
                 // compare the inner and interface markings
-                for (unsigned int j = 0; (j < sizeAllMarkings and found); ++j) {
+                for (innermarkingcount_t j = 0; (j < sizeAllMarkings and found); ++j) {
                     if (inner[j] != el->second[i]->inner[j] or
                         *interface[j] != *el->second[i]->interface[j]) {
                         found = false;
@@ -537,7 +537,7 @@ StoredKnowledge* StoredKnowledge::store() {
 hash_t StoredKnowledge::hash() const {
     hash_t result(0);
 
-    for (unsigned int i = 0; i < sizeAllMarkings; ++i) {
+    for (innermarkingcount_t i = 0; i < sizeAllMarkings; ++i) {
         result += ((1 << i) * (inner[i]) + interface[i]->hash());
     }
 
@@ -583,7 +583,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
     }
 
     // now each deadlock must have ?-successors
-    for (unsigned int i = 0; i < sizeDeadlockMarkings; ++i) {
+    for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
         bool resolved = false;
 
         // we found a deadlock -- check whether for at least one marked
@@ -920,7 +920,7 @@ std::string StoredKnowledge::formula() const {
 
     // collect outgoing ?-edges and #-edges for the deadlocks
     bool dl_found = false;
-    for (unsigned int i = 0; i < sizeDeadlockMarkings; ++i) {
+    for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
         dl_found = true;
         set<string> temp(sendDisjunction);
 
@@ -1018,7 +1018,7 @@ std::string StoredKnowledge::bits() const {
     }
 
     // traverse the deadlocks
-    for (unsigned int i = 0; i < sizeDeadlockMarkings; ++i) {
+    for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
         bool resolved = false;
 
         // check whether receiving resolves this deadlock
@@ -1073,14 +1073,14 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                 }
 
                 if (args_info.showWaitstates_flag) {
-                    for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
+                    for (innermarkingcount_t j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
                         file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (w)\\n";
                     }
                 }
 
                 if (args_info.showTransients_flag) {
-                    for (unsigned int j = it->second[i]->sizeDeadlockMarkings; j < it->second[i]->sizeAllMarkings; ++j) {
+                    for (innermarkingcount_t j = it->second[i]->sizeDeadlockMarkings; j < it->second[i]->sizeAllMarkings; ++j) {
                         file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
                         file << *(it->second[i]->interface[j]) << " (t)\\n";
                     }
@@ -1136,7 +1136,7 @@ void StoredKnowledge::output_migration(std::ostream& o) {
 
     for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
         // traverse the bubble
-        for (unsigned int i = 0; i < (**it).sizeAllMarkings; ++i) {
+        for (innermarkingcount_t i = 0; i < (**it).sizeAllMarkings; ++i) {
             InnerMarking_ID inner = (**it).inner[i];
             InterfaceMarking* interface = (**it).interface[i];
             StoredKnowledge* knowledge = *it;

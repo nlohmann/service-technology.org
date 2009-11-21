@@ -32,6 +32,9 @@ typedef uint16_t hash_t;
 /// the range of labels (max. 255)
 typedef uint8_t Label_ID;
 
+/// the range of markings (all markings, deadlock markings) stored within a knowledge (max. 65535)
+typedef uint16_t innermarkingcount_t;
+
 /// the range of inner markings (max. 4294967296)
 typedef uint32_t InnerMarking_ID;
 

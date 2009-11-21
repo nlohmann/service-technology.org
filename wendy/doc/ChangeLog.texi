@@ -1,5 +1,7 @@
 @heading Version 2.5-unreleased
 @itemize
+@item Wendy expects LoLA to omit printing out statistical data; usage of LoLA 1.14 is required
+
 @item fixed bug #14798 (see @url{https://gna.org/bugs/?14798}): smart sending is too strict (now fix of bug #14782 is obsolete and is handled with the new implementation)
 
 @item fixed bug #14782 (see @url{https://gna.org/bugs/?14782}): smart sending event does not handle self loops of inner markings correctly

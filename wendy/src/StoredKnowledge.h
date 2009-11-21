@@ -181,12 +181,10 @@ class StoredKnowledge {
 
     private: /* member attributes */
         /// \brief the number of markings stored in this knowledge
-        /// \todo Do we need to have unsigned ints here? Maybe short is enough.
-        unsigned int sizeDeadlockMarkings;
+        innermarkingcount_t sizeDeadlockMarkings;
 
         /// \brief the number of markings stored in this knowledge
-        /// \todo Do we need to have unsigned ints here? Maybe short is enough.
-        unsigned int sizeAllMarkings;
+        innermarkingcount_t sizeAllMarkings;
 
         /// an array of inner markings (length is sizeAllMarkings)
         InnerMarking_ID* inner;

@@ -38,11 +38,6 @@ number    [0-9][0-9]*
 
 %%
 
-{number}" Places"               { /* skip */ }
-{number}" Transitions"          { /* skip */ }
-{number}" significant places"   { /* skip */ }
-">>>>> "{number}" States, "{number}" Edges, "{number}" Hash table entries" { /* skip */ }
-
 "STATE"      { return KW_STATE; }
 "Lowlink:"   { return KW_LOWLINK; }
 "SCC:"       { return KW_SCC; }

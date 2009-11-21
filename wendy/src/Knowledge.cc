@@ -31,14 +31,9 @@ typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
  * CONSTRUCTOR *
  ***************/
 
-/*!
- \todo Why is the size of consideredReceivingEvents = receive_events + 1? Why
-       do we need to store an additional event? It seems as if we just need to
-       adjust the labels and access the vector by consideredReceivingEvents[l-1].
-*/
 Knowledge::Knowledge(InnerMarking_ID m)
         : is_sane(1), posSendEventsDecoded(NULL), size(1), posSendEvents(NULL),
-          consideredReceivingEvents(Label::receive_events+1, false) {
+          consideredReceivingEvents(Label::receive_events, false) {
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
     todo.push(FullMarking(m));
@@ -58,14 +53,10 @@ Knowledge::Knowledge(InnerMarking_ID m)
 
 /*!
  \note no action in this constructor can introduce a duplicate
-
- \todo Why is the size of consideredReceivingEvents = receive_events + 1? Why
-       do we need to store an additional event? It seems as if we just need to
-       adjust the labels and access the vector by consideredReceivingEvents[l-1].
 */
 Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
         : is_sane(1), posSendEventsDecoded(NULL), size(0), posSendEvents(NULL),
-          consideredReceivingEvents(Label::receive_events+1, false) {
+          consideredReceivingEvents(Label::receive_events, false) {
     // tau does not make sense here
     assert(not SILENT(label));
 
@@ -379,10 +370,6 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, cons
  before traversing through each and every receiving event, we first check
  which receiving events are essentially needed to resolve every waitstate
  of the current bubble
- 
- \todo Why is the size of occuranceOfReceivingEvent = receive_events + 1? Why
-       do we need to store an additional event? It seems as if we just need to
-       adjust the labels and access the vector by occuranceOfReceivingEvent[l-1].
 */
 void Knowledge::sequentializeReceivingEvents() {
     // count the number that a receiving event is activated
@@ -416,7 +403,7 @@ void Knowledge::sequentializeReceivingEvents() {
                     // check if waitstate activates only a single receiving event
                     if (marked == 1) {
                         // this receiving event has to be considered
-                        consideredReceivingEvents[consideredReceivingEvent] = true;
+                        consideredReceivingEvents[consideredReceivingEvent-1] = true;
                     }
 
                     // remember to visit this state again; we only store the
@@ -443,7 +430,7 @@ void Knowledge::sequentializeReceivingEvents() {
             if ((*currenState)->marked(l)) {
 
                 // it will be considered, so continue with the next waitstate
-                if (consideredReceivingEvents[l]) {
+                if (consideredReceivingEvents[l-1]) {
                     consideredReceivingEvent = l;
                     break;
                 }
@@ -466,7 +453,7 @@ void Knowledge::sequentializeReceivingEvents() {
 
         // consider the temporal receiving event for real
         if (realEvent) {
-            consideredReceivingEvents[consideredReceivingEvent] = true;
+            consideredReceivingEvents[consideredReceivingEvent-1] = true;
         }
     } // end for, traverse through states
 }
@@ -483,7 +470,7 @@ void Knowledge::sequentializeReceivingEvents() {
 bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
     assert(args_info.seqReceivingEvents_flag);
 
-    return consideredReceivingEvents[label];
+    return consideredReceivingEvents[label-1];
 }
 
 

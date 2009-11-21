@@ -73,7 +73,9 @@ char rapportstring[] = "search";
 
 void statistics(unsigned int s, unsigned int e, unsigned int h)
 {
+#ifndef STATESPACE
    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
+#endif
 }
 
 Transition ** firelist()

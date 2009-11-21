@@ -452,8 +452,10 @@ unsigned int j;
     {
       Places[j] -> set_hash(rand());
     }
+#ifndef STATESPACE
   cout << Places[0]->cnt << " Places\n";
   cout << Transitions[0]->cnt << " Transitions\n";
+#endif
   Places[0]->NrSignificant = Places[0]->cnt;
 
 

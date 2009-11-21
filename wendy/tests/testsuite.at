@@ -192,6 +192,13 @@ AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW myCoffee.owf
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_CLEANUP
 
+AT_SETUP([Alignment warning for high message bounds])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --messagebound=16 --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "wendy: note: a better alignment could save 1 bytes/interface marking" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Errors])
@@ -243,7 +250,7 @@ AT_CHECK([GREP -q "aborting \[[#08\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Message bound violation])#
+AT_SETUP([Message bound violation])
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([WENDY myCoffee.owfn --messagebound=400 --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#09\]]" stderr])

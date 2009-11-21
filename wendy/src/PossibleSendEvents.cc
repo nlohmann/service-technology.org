@@ -129,20 +129,6 @@ bool PossibleSendEvents::operator==(const PossibleSendEvents& other) {
  * MEMBER METHODS *
  ******************/
 
-/*!
-  the values of other are copied into current storage
-  \param other the values of the other storage to be copied into the current one
-*/
-void PossibleSendEvents::copy(const PossibleSendEvents& other) {
-    assert(bytes > 0);
-
-    // reserve memory and copy values
-    storage = new uint8_t[bytes];
-    for (size_t i = 0; i < bytes; ++i) {
-        storage[i] = other.storage[i];
-    }
-}
-
 void PossibleSendEvents::labelPossible(const Label_ID& l) {
     assert(storage != NULL);
     assert(SENDING(l));

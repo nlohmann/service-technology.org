@@ -57,9 +57,6 @@ class PossibleSendEvents {
         /// overloaded comparison operator
         bool operator==(const PossibleSendEvents&);
 
-        /// copies storage
-        void copy(const PossibleSendEvents&);
-
         /// returns array of all sending events (possible or not)
         char* decode();
 

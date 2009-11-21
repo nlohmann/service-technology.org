@@ -37,7 +37,7 @@ typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
        adjust the labels and access the vector by consideredReceivingEvents[l-1].
 */
 Knowledge::Knowledge(InnerMarking_ID m)
-        : is_sane(1), size(1), posSendEvents(NULL), posSendEventsDecoded(NULL),
+        : is_sane(1), posSendEventsDecoded(NULL), size(1), posSendEvents(NULL),
           consideredReceivingEvents(Label::receive_events+1, false) {
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
@@ -64,7 +64,7 @@ Knowledge::Knowledge(InnerMarking_ID m)
        adjust the labels and access the vector by consideredReceivingEvents[l-1].
 */
 Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
-        : is_sane(1), size(0), posSendEvents(NULL), posSendEventsDecoded(NULL),
+        : is_sane(1), posSendEventsDecoded(NULL), size(0), posSendEvents(NULL),
           consideredReceivingEvents(Label::receive_events+1, false) {
     // tau does not make sense here
     assert(not SILENT(label));
@@ -145,20 +145,10 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
                                     return;
                                 }
                             }
-                            // check if we found a new marking (THIS IS UGLY, but necessary in case the asynchronous interface is empty!)
-                            bool found = false;
-                            for (std::vector<InterfaceMarking*>::iterator it = bubble[m->successors[j]].begin(); it != bubble[m->successors[j]].end(); ++it) {
-                                if (*it == interface) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (not found) {
-                                // the marking is OK and new, so add it to the bubble
-                                todo.push(FullMarking(m->successors[j], *interface));
-                                bubble[m->successors[j]].push_back(interface);
-                                ++size;
-                            }
+                            // the marking is OK and new, so add it to the bubble
+                            todo.push(FullMarking(m->successors[j], *interface));
+                            bubble[m->successors[j]].push_back(interface);
+                            ++size;
                         }
                     }
                 }

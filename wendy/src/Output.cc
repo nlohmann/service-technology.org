@@ -137,11 +137,14 @@ std::ostream& Output::stream() const {
 char* Output::createTmp() {
 #if defined(__MINGW32__)
     temp = strdup(basename(args_info.tmpfile_arg));
+    if (mktemp(temp) == NULL) {
+        abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
+    };
 #else
     temp = strdup(args_info.tmpfile_arg);
-#endif
     if (mkstemp(temp) == -1) {
         abort(13, "could not create to temporary file '%s'", temp);
     };
+#endif
     return temp;
 }

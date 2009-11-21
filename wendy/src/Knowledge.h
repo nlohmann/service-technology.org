@@ -78,12 +78,15 @@ class Knowledge {
         inline void initialize();
 
         /// calculate the closure of this knowledge
-        inline void closure(std::queue<FullMarking>&);
+        inline void closure();
 
         /// inner marking is really waitstate in the context of the current knowledge
         inline bool isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface);
 
     private: /* attributes */
+        /// a queue of markings to be processed by closuse()
+        std::queue<FullMarking> todo;
+
         /// reduction rule: smart send events; pointer to possible sending events data structure
         PossibleSendEvents* posSendEvents;
 

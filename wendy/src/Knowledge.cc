@@ -41,7 +41,6 @@ Knowledge::Knowledge(InnerMarking_ID m)
           consideredReceivingEvents(Label::receive_events+1, false) {
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
-    std::queue<FullMarking> todo;
     todo.push(FullMarking(m));
 
     // check if initial marking is already bad
@@ -51,7 +50,7 @@ Knowledge::Knowledge(InnerMarking_ID m)
     }
 
     // calculate the closure
-    closure(todo);
+    closure();
 
     initialize();
 }
@@ -93,8 +92,6 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
     // CASE 2: we send -- increment interface markings and calculate closure
     if (SENDING(label)) {
-        std::queue<FullMarking> todo;
-
         for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             bool receiver = (InnerMarking::receivers[label].find(pos->first) != InnerMarking::receivers[label].end());
@@ -124,13 +121,11 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
         }
 
         // calculate the closure
-        closure(todo);
+        closure();
     }
 
     // CASE 3: synchronization
     if (SYNC(label)) {
-        std::queue<FullMarking> todo;
-
         for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
             // check if this label makes the current inner marking possibly transient
             if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
@@ -171,7 +166,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
         }
 
         // calculate the closure
-        closure(todo);
+        closure();
     }
 
     initialize();
@@ -186,9 +181,7 @@ Knowledge::~Knowledge() {
         }
     }
 
-    if (not args_info.ignoreUnreceivedMessages_flag) {
-        delete posSendEvents;
-    }
+    delete posSendEvents;
 }
 
 
@@ -227,15 +220,13 @@ void Knowledge::initialize() {
 
 
 /*!
- \param todo  a queue of markings to process (will be altered by this function)
-
- \post queue is empty
+ \post queue todo is empty
 
  \note no action in this constructor can introduce a duplicate
  \note In case the --diagnose flag is given, the insane marking is added to
        the knowledge before the function is left.
 */
-void Knowledge::closure(std::queue<FullMarking>& todo) {
+void Knowledge::closure() {
     // process the queue
     while (not todo.empty()) {
         // process successors of the current marking

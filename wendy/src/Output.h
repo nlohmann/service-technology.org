@@ -42,6 +42,10 @@
  http://ubuntuforums.org/showthread.php?p=5929211
  */
 class Output {
+    private:
+        /// helper function to create temp files
+        char* createTmp();
+
     public: /* member functions */
         /// constructor (creates temp file)
         Output();

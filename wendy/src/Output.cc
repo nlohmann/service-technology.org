@@ -36,22 +36,12 @@ extern gengetopt_args_info args_info;
  ***************/
 
 /*!
- This constructor creates a temporary file using mktemp(). It uses the value
- of the tmpfile parameter as template. In case of MinGW compilations, the
- basename has to be used to avoid problems with path names.
+ This constructor creates a temporary file using createTmp() as helper.
 */
 Output::Output() :
-#if defined(__MINGW32__)
-    os(*(new std::ofstream(mktemp(temp = basename(args_info.tmpfile_arg)), std::ofstream::out | std::ofstream::trunc))),
-#else
-    os(*(new std::ofstream(mktemp(temp = args_info.tmpfile_arg), std::ofstream::out | std::ofstream::trunc))),
-#endif
+    os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
     filename(temp), kind("")
 {
-    if (not os.good() or filename == "") {
-        abort(13, "could not create to temporary file '%s'", filename.c_str());
-    }
-
     status("writing to temporary file '%s'", _cfilename_(filename));
 }
 
@@ -89,7 +79,7 @@ Output::Output(std::string str, std::string kind) :
 Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
-        if (!temp) {
+        if (temp == NULL) {
             status("closed file '%s'", _cfilename_(filename));
         } else {
             if (args_info.noClean_flag) {
@@ -98,9 +88,12 @@ Output::~Output() {
                 if (remove(filename.c_str()) == 0) {
                     status("closed and deleted temporary file '%s'", _cfilename_(filename));
                 } else {
+                    // this should never happen, because mkstemp creates temp
+                    // files in mode 0600.
                     status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
                 }
             }
+            free(temp);
         }
     }
 }
@@ -129,4 +122,26 @@ std::string Output::name() const {
 
 std::ostream& Output::stream() const {
     return os;
+}
+
+/*!
+ This function creates a temporary file using mkstemp(). It uses the value
+ of the tmpfile parameter as template. In case of MinGW compilations, the
+ basename has to be used to avoid problems with path names.
+
+ \return name of already opened temp file
+
+ \note mkstemp already opens the temp file, so there is no need to check
+       whether the creation of the std::ofstream succeeded.
+*/
+char* Output::createTmp() {
+#if defined(__MINGW32__)
+    temp = strdup(basename(args_info.tmpfile_arg));
+#else
+    temp = strdup(args_info.tmpfile_arg);
+#endif
+    if (mkstemp(temp) == -1) {
+        abort(13, "could not create to temporary file '%s'", temp);
+    };
+    return temp;
 }

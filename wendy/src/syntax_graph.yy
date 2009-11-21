@@ -106,27 +106,27 @@ state:
         /* calculate strongly connected components and do some evaluation on its members     */
         /* ================================================================================= */
 
-		/* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
+        /* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
         if (currentLowlink == $2 and
-				not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
-	
-			// insert representative into current SCC of inner markings
-			currentSCC.insert($2);
-	
-			// reduction by smart sending events is turned on
-			if (not args_info.ignoreUnreceivedMessages_flag) {
-				/* it is a trivial SCC */
-				if (currentSCC.size() == 1) {
-					/* analyze only representative with respect to possible sending events */
-					InnerMarking::markingMap[$2]->calcReachableSendingEvents();
-				} else {
-					/* analyze all members of current SCC with respect to possible sending events and final markings reachable */
-					InnerMarking::analyzeSCCOfInnerMarkings(currentSCC);
-				}
-			} else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock) {
-				// no smart sending event reduction but livelock freedom is turned on
-				InnerMarking::finalMarkingReachableSCC(currentSCC);
-			}
+                not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
+    
+            // insert representative into current SCC of inner markings
+            currentSCC.insert($2);
+    
+            // reduction by smart sending events is turned on
+            if (not args_info.ignoreUnreceivedMessages_flag) {
+                /* it is a trivial SCC */
+                if (currentSCC.size() == 1) {
+                    /* analyze only representative with respect to possible sending events */
+                    InnerMarking::markingMap[$2]->calcReachableSendingEvents();
+                } else {
+                    /* analyze all members of current SCC with respect to possible sending events and final markings reachable */
+                    InnerMarking::analyzeSCCOfInnerMarkings(currentSCC);
+                }
+            } else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock) {
+                // no smart sending event reduction but livelock freedom is turned on
+                InnerMarking::finalMarkingReachableSCC(currentSCC);
+            }
         } /* end if, livelock freedom */
 
         currentLabels.clear();

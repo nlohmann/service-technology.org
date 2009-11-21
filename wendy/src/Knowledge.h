@@ -83,8 +83,7 @@ class Knowledge {
         char* posSendEventsDecoded;
 
         /// \brief the number of markings stored in the bubble
-        /// \todo Do we need to have unsigned ints here? Maybe short is enough.
-        unsigned int size;
+        innermarkingcount_t size;
 
         /// primary data structure
         std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > bubble;

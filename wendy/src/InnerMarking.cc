@@ -312,8 +312,8 @@ void InnerMarking::calcReachableSendingEvents() {
 /*!
  reduction rule: smart sending event
 
- create the predecessor relation of all inner markings contained in the given set
- and then evaluate each member of the given set of knowledges and propagate
+ create the predecessor relation of all inner markings contained in the given
+ set and then evaluate each member of the given set of knowledges and propagate
  the property of possible sending events accordingly
 
  \pre  markingSet contains all inner markings of the current SCC
@@ -395,8 +395,8 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
 /*!
  in case of correctness criterion livelock freedom
 
- analyze SCC of inner markings and find out if a final inner marking is reachable from at least one inner marking
- of the SCC
+ analyze SCC of inner markings and find out if a final inner marking is
+ reachable from at least one inner marking of the SCC
 
  \pre  markingSet contains all inner markings of the current SCC
  \post markingSet is empty

@@ -161,7 +161,7 @@ In order to run, compile, and develop Wendy, several tools are required.
 
 @subsection Runtime
 @itemize
-@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{STATESPACE} option. A suitable LoLA binary can be created as follows:
+@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{STATESPACE} option. A suitable LoLA (version 1.14 or above) binary can be created as follows:
 @enumerate
 @item download @url{http://service-technology.org/files/lola/lola.tar.gz}
 @item untar @file{lola.tar.gz}, configure

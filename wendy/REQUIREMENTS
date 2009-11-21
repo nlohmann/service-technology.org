@@ -14,7 +14,8 @@ Runtime
 -------
 
    * LoLA (`http://service-technology.org/lola'), compiled with the
-     `STATESPACE' option. A suitable LoLA binary can be created as follows:
+     `STATESPACE' option. A suitable LoLA (version 1.14 or above) binary can
+     be created as follows:
        1. download `http://service-technology.org/files/lola/lola.tar.gz'
 
        2. untar `lola.tar.gz', configure

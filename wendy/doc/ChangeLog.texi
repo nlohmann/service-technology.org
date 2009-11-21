@@ -1,4 +1,4 @@
-@heading Version 2.5-unreleased
+@heading Version 2.5 (21 November 2009)
 @itemize
 @item Wendy expects LoLA to omit printing out statistical data; usage of LoLA 1.14 is required
 

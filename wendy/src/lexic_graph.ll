@@ -49,8 +49,6 @@ number    [0-9][0-9]*
 {name}       { graph_lval.str = strdup(graph_text); return NAME; }
 
 [ \t\r\n]*   { /* skip */ }
-<<EOF>>      { return EOF; }
-.            { graph_error("lexical error"); }
 
 %%
 

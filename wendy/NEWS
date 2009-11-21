@@ -8,8 +8,11 @@
                       http://service-technology.org/wendy
 
 
-Version 2.5-unreleased
-======================
+Version 2.5 (21 November 2009)
+==============================
+
+* Wendy expects LoLA to omit printing out statistical data; usage of LoLA
+  1.14 is required
 
 * fixed bug #14798 (see `https://gna.org/bugs/?14798'): smart sending is
   too strict (now fix of bug #14782 is obsolete and is handled with the new

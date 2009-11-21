@@ -18,7 +18,6 @@
 \*****************************************************************************/
 
 
-#include <config.h>
 #include <cstdarg>
 #include <cstdlib>
 #include <cerrno>

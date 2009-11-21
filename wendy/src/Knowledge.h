@@ -37,15 +37,18 @@
  unneccessary information, yielding a compact representation.
 */
 class Knowledge {
+    friend class StoredKnowledge;
+
     public: /* member functions */
         /// construct knowledge from (initial) inner marking
         explicit Knowledge(InnerMarking_ID);
 
-        /// construct knowledge from a given knowledge and a label
-        Knowledge(const Knowledge*, const Label_ID&);
-
         /// destructor
         ~Knowledge();
+
+    private: /* member functions */
+        /// construct knowledge from a given knowledge and a label
+        Knowledge(const Knowledge*, const Label_ID&);
 
         /// whether the knowledge contains a waitstate resolvable by l
         bool resolvableWaitstate(const Label_ID&) const;
@@ -62,9 +65,22 @@ class Knowledge {
         /// reduction rule: smart sending event
         bool considerSendingEvent(const Label_ID&) const;
 
+        /// initialze member attributes
+        inline void initialize();
+
+        /// calculate the closure of this knowledge
+        inline void closure();
+
+        /// inner marking is really waitstate in the context of the current knowledge
+        inline bool isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface) const;
+
     public: /* attributes */
         /// whether this knowledge is sane
         unsigned is_sane : 1;
+
+    private: /* attributes */
+        /// reduction rule: smart send events; array of sending events that are either possible or not
+        char* posSendEventsDecoded;
 
         /// \brief the number of markings stored in the bubble
         /// \todo Do we need to have unsigned ints here? Maybe short is enough.
@@ -73,25 +89,11 @@ class Knowledge {
         /// primary data structure
         std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > bubble;
 
-    private: /* member functions */
-        /// initialze member attributes
-        inline void initialize();
-
-        /// calculate the closure of this knowledge
-        inline void closure();
-
-        /// inner marking is really waitstate in the context of the current knowledge
-        inline bool isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface);
-
-    private: /* attributes */
         /// a queue of markings to be processed by closuse()
         std::queue<FullMarking> todo;
 
         /// reduction rule: smart send events; pointer to possible sending events data structure
         PossibleSendEvents* posSendEvents;
-
-        /// reduction rule: smart send events; array of sending events that are either possible or not
-        char* posSendEventsDecoded;
 
         /// reduction rule: sequentialize receiving events; remember only those receiving events
         ///                 which are essential to resolve each and every waitstate

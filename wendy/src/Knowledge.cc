@@ -370,7 +370,7 @@ bool Knowledge::receivingHelps() const {
 *  \param inner pointer to the current inner marking
 *  \param interface interface belonging to the inner marking within the current knowledge
 */
-bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface) {
+bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface) const {
 
     // check if waitstate is resolved by interface marking
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {

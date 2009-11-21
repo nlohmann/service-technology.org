@@ -21,6 +21,7 @@
 #ifndef VERBOSE_H
 #define VERBOSE_H
 
+#include <config.h>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>

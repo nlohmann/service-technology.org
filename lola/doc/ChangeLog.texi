@@ -1,7 +1,9 @@
-@heading Version 1.14-unreleased
+@heading Version 1.14
 @itemize
-@item fixed bug #14295 (see @url{https://gna.org/bugs/?14295}): Place is ignored in marking output; isolated places are not removed when using directive STATESPACE
-@item whenever a SCC representative is found, all members (excluding the representative) of the current SCC are now printed out when directive STATESPACE is used
+@item no statistics output is printed when using directive @option{STATESPACE}
+
+@item fixed bug #14295 (see @url{https://gna.org/bugs/?14295}): Place is ignored in marking output; isolated places are not removed when using directive @option{STATESPACE}
+@item whenever a @acronym{SCC} representative is found, all members (excluding the representative) of the current @acronym{SCC} are now printed out when directive @option{STATESPACE} is used
 @end itemize
 
 @heading Version 1.13

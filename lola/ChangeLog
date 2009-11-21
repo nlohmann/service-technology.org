@@ -6,16 +6,18 @@
                      http://service-technology.org/lola
 
 
-Version 1.14-unreleased
-=======================
+Version 1.14
+============
+
+* no statistics output is printed when using directive `STATESPACE'
 
 * fixed bug #14295 (see `https://gna.org/bugs/?14295'): Place is ignored in
   marking output; isolated places are not removed when using directive
-  STATESPACE
+  `STATESPACE'
 
 * whenever a SCC representative is found, all members (excluding the
   representative) of the current SCC are now printed out when directive
-  STATESPACE is used
+  `STATESPACE' is used
 
 Version 1.13
 ============

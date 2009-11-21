@@ -38,6 +38,8 @@ void status(const char* format, ...);
 void abort(unsigned short code, const char* format, ...);
 
 
+void displayFileError(char* filename, int lineno, char* token);
+
 /**************************************************************************\
  The following code organizes colored output on stderr. It defines several
  preprosessor directives to be used in printf. Each color has one macro to

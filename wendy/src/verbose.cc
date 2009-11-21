@@ -23,6 +23,7 @@
 #include <cerrno>
 #include <cstring>
 #include <string>
+#include <fstream>
 #include "cmdline.h"
 #include "verbose.h"
 
@@ -50,7 +51,7 @@ void message(const char* format, ...) {
  \param format  the status message formatted as printf string
 */
 void status(const char* format, ...) {
-    if (args_info.verbose_flag == 0) {
+    if (not args_info.verbose_flag) {
         return;
     }
 
@@ -88,4 +89,25 @@ __attribute__((noreturn)) void abort(unsigned short code, const char* format, ..
     }
 
     exit(EXIT_FAILURE);
+}
+
+
+
+void displayFileError(char* filename, int lineno, char* token) {
+    std::ifstream f(filename);
+    std::string line;
+    for (unsigned int i = 0; i < lineno; ++i) {
+        getline(f,line);
+    }
+    size_t firstpos(line.find_first_of(token));
+    std::string format = line.replace(firstpos, strlen(token), std::string(_cbad_(token)));
+    fprintf(stderr, "  %s\n", line.c_str());
+    fprintf(stderr, "  ");
+    for (unsigned int i = 0; i < firstpos; ++i) {
+        fprintf(stderr, "  ");
+    }
+    for (unsigned int i = 0; i < strlen(token); ++i) {
+        fprintf(stderr, "^");
+    }
+    fprintf(stderr, "\n");
 }

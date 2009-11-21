@@ -6,6 +6,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 syntax_cover.yy lexic_cover.ll \
                 main.cc types.h \
                 FullMarking.h FullMarking.cc \
+                FullMarkingQueue.h FullMarkingQueue.cc \
                 InterfaceMarking.h InterfaceMarking.cc \
                 Label.h Label.cc \
                 InnerMarking.h InnerMarking.cc \

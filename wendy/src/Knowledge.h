@@ -21,12 +21,13 @@
 #ifndef _KNOWLEDGE_H
 #define _KNOWLEDGE_H
 
-#include <queue>
 #include <vector>
 #include <map>
 #include "Label.h"
 #include "InnerMarking.h"
-#include "FullMarking.h"
+#include "FullMarkingQueue.h"
+
+typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
 
 
 /*!
@@ -86,10 +87,10 @@ class Knowledge {
         innermarkingcount_t size;
 
         /// primary data structure
-        std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > bubble;
+        Bubble bubble;
 
         /// a queue of markings to be processed by closuse()
-        std::queue<FullMarking> todo;
+        FullMarkingQueue todo;
 
         /// reduction rule: smart send events; pointer to possible sending events data structure
         PossibleSendEvents* posSendEvents;

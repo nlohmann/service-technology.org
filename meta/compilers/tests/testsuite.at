@@ -61,6 +61,15 @@ AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
 AT_KEYWORDS(fiona wendy)
 AT_CLEANUP
 
+AT_SETUP([Synchronous Fiona OG])
+m4_define([NET], [synchronous])
+AT_CHECK([cp TESTFILES/NET.fiona.og .])
+AT_CHECK([FIONA2WENDY --input=NET.fiona.og --output=NET.wendy.og])
+AT_CHECK([WENDY2FIONA --input=NET.wendy.og --output=NET.fiona.2.og])
+AT_CHECK([FIONA -t equivalence NET.fiona.og NET.fiona.2.og], 0, ignore, ignore)
+AT_KEYWORDS(fiona wendy synchronous)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Wendy: CNF OG -> Bit OG])
 ############################################################################
@@ -77,6 +86,23 @@ AT_CHECK([WENDY --og=NET.f.og --fionaFormat NET], 0, ignore, ignore)
 AT_CHECK([FIONA -t equivalence NET.f.og NET.owfn.og], 0, ignore, ignore)
 AT_KEYWORDS(wendy formula bit)
 AT_CLEANUP
+
+AT_SETUP([S-Bit])
+m4_define([NET], [bit_s.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([WENDY --og=NET.bit.og --formula=bits NET], 0, ignore, ignore)
+AT_CHECK([WENDY --og=NET.cnf.og --formula=cnf NET], 0, ignore, ignore)
+AT_CHECK([WENDYFORMULA2BITS --input=NET.cnf.og --output=NET.cnf.b.og], 0, ignore, ignore)
+AT_CHECK([SAYO --input=NET.bit.og --output=NET.bit.sa], 0, ignore, ignore)
+AT_CHECK([SAYO --input=NET.cnf.b.og --output=NET.cnf.sa], 0, ignore, ignore)
+AT_CHECK([SA2SM NET.bit.sa NET.bit.owfn], 0, ignore, ignore)
+AT_CHECK([SA2SM NET.cnf.sa NET.cnf.owfn], 0, ignore, ignore)
+AT_CHECK([WENDY --og=NET.bit.owfn.og --fionaFormat NET.bit.owfn], 0, ignore, ignore)
+AT_CHECK([WENDY --og=NET.cnf.owfn.og --fionaFormat NET.cnf.owfn], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.cnf.owfn.og NET.bit.owfn.og], 0, ignore, ignore)
+AT_KEYWORDS(wendy formula bit)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([IG <-> SA])

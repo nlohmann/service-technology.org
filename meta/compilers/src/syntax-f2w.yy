@@ -40,6 +40,9 @@ extern int colonCount;
 std::set<std::string> inputs;
 // output events
 std::set<std::string> outputs;
+// synchronous events
+std::set<std::string> synchronous;
+
 // whether reading input events
 bool inputEvent;
 // ID of initial node (unmapped)
@@ -70,7 +73,7 @@ void printNode(unsigned int);
 
 %token K_INTERFACE K_INPUT K_OUTPUT K_NODES K_INITIALNODE K_TRANSITIONS
 %token COMMA SEMICOLON COLON ARROW
-%token K_FINAL K_TRUE K_FALSE SEND RECEIVE LPAR RPAR 
+%token K_FINAL K_TRUE K_FALSE SEND RECEIVE SYNCHRONOUS LPAR RPAR 
 %token IDENT NUMBER
 
 %left OP_AND OP_OR
@@ -96,7 +99,7 @@ og:
     colonCount = 0; // initialize for flex
     emptyNode = NULL;
     inputEvent = true;
-    (*myOut) << "\nINTERFACE\n  INPUT\n    ";
+    (*myOut) << "INTERFACE\n  INPUT\n    ";
   }
   K_INPUT identlist SEMICOLON
   { 
@@ -104,12 +107,23 @@ og:
     inputEvent = false;
   }
   K_OUTPUT identlist SEMICOLON
-  { (*myOut) << ";\n\nNODES\n"; }
+  { (*myOut) << ";\n  SYNCHRONOUS\n    "; }
   K_NODES nodes SEMICOLON
   K_INITIALNODE NUMBER SEMICOLON
   { initialNode = $15; }
   K_TRANSITIONS transitions SEMICOLON
   {
+    // complete interface
+    std::string delim = ""; // delimeter
+    for(std::set<std::string>::iterator it = synchronous.begin();
+         it != synchronous.end(); ++it)
+    {
+      (*myOut) << delim << *it;
+      delim = ", ";
+    }
+  
+    (*myOut) << ";\n\nNODES\n";
+
     findEmpty();
 
     // print initial node
@@ -195,12 +209,18 @@ formula:
 | SEND IDENT
   {
     $$ = new std::string($2);
-    delete $2;
+    free($2);
   }
 | RECEIVE IDENT
   {
     $$ = new std::string($2);
-    delete $2;
+    free($2);
+  }
+| SYNCHRONOUS IDENT
+  {
+    $$ = new std::string($2);
+    synchronous.insert($2);
+    free($2);
   }
 ;
 
@@ -218,6 +238,12 @@ transition:
 | NUMBER ARROW NUMBER COLON RECEIVE IDENT
   {
     succ[$1][$6] = $3;
+    free($6);
+  }
+| NUMBER ARROW NUMBER COLON SYNCHRONOUS IDENT
+  {
+    succ[$1][$6] = $3;
+    synchronous.insert($6);
     free($6);
   }
 ;
@@ -279,6 +305,20 @@ void findEmpty()
         }
       }
 
+      if(abort)
+        continue;
+
+      for(std::set<std::string>::iterator s = synchronous.begin();
+           s != synchronous.end(); ++s)
+      {
+        if( (succ[it->first].find(*s) == succ[it->first].end()) || // no successor by this event
+            (succ[it->first][*s] != it->first) ) // successor is not this node
+        {
+          abort = true; // this is not the empty node
+          break;
+        }
+      }
+
       if(!abort)
       {
         emptyNode = new unsigned int(it->first);
@@ -310,6 +350,11 @@ void createEmpty()
       }
       for(std::set<std::string>::iterator s = outputs.begin();
            s != outputs.end(); ++s)
+      {
+        succ[i][*s] = i;
+      }
+      for(std::set<std::string>::iterator s = synchronous.begin();
+           s != synchronous.end(); ++s)
       {
         succ[i][*s] = i;
       }

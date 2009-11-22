@@ -28,8 +28,8 @@ number         [0-9]+
 %%
 
 
-"{"                                     { (*myOut) << "\n{"; BEGIN(COMMENT);      }
-<COMMENT>"}"                            { (*myOut) << "}\n"; BEGIN(INITIAL);      }
+"{"                                     { (*myOut) << "{"; BEGIN(COMMENT);      }
+<COMMENT>"}"                            { (*myOut) << "}\n\n"; BEGIN(INITIAL);      }
 <COMMENT>[^}]*                          { (*myOut) << yytext; /* copy comment */  }
 
 "NODES"                                 { return KEY_NODES;            }

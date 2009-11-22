@@ -1,21 +1,27 @@
-bin_PROGRAMS = fiona2wendy wendy2fiona wendyFormula2bits ig2sa
+bin_PROGRAMS = fiona2wendy wendy2fiona \
+	       wendyFormula2bits \
+	       ig2sa sa2ig
 
 COMMON = main.cc config.h \
          cmdline.c cmdline.h
 
 VERBOSE = verbose.cc verbose.h
 
-fiona2wendy_SOURCES =  syntax-f2w.yy lexic-f2w.ll \
-                       $(COMMON) $(VERBOSE)
+fiona2wendy_SOURCES = syntax-f2w.yy lexic-f2w.ll \
+                      $(COMMON) $(VERBOSE)
 
-wendy2fiona_SOURCES =  syntax-w2f.yy lexic-w2f.ll \
-		       $(COMMON)
+wendy2fiona_SOURCES = syntax-w2f.yy lexic-w2f.ll \
+		      $(COMMON)
 
-wendyFormula2bits_SOURCES =  syntax-wf2b.yy lexic-wf2b.ll \
-		             $(COMMON)
+wendyFormula2bits_SOURCES = syntax-wf2b.yy lexic-wf2b.ll \
+			    types-wf2b.h \
+		            $(COMMON)
 
-ig2sa_SOURCES =  syntax-ig2sa.yy lexic-ig2sa.ll \
-		 $(COMMON)
+ig2sa_SOURCES = syntax-ig2sa.yy lexic-ig2sa.ll \
+		$(COMMON)
+
+sa2ig_SOURCES = syntax-sa2ig.yy lexic-sa2ig.ll \
+		$(COMMON)
 
 
 #############################################################################
@@ -37,6 +43,7 @@ BISON_FILES = $(filter %.yy,$(fiona2wendy_SOURCES))
 BISON_FILES += $(filter %.yy,$(wendy2fiona_SOURCES))
 BISON_FILES += $(filter %.yy,$(wendyFormula2bits_SOURCES))
 BISON_FILES += $(filter %.yy,$(ig2sa_SOURCES))
+BISON_FILES += $(filter %.yy,$(sa2ig_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

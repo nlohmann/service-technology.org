@@ -65,7 +65,7 @@ std::string delim;
 og:
   KEY_INTERFACE 
   { 
-    (*myOut) << "\nINTERFACE\n  INPUT\n    ";
+    (*myOut) << "INTERFACE\n  INPUT\n    ";
     event = '?';
     initialNode = NULL;
   }
@@ -74,7 +74,11 @@ og:
     (*myOut) << ";\n  OUTPUT\n    "; 
     event = '!';
   }
-  output synchronous KEY_NODES 
+  output 
+  {
+    event = '#';
+  }
+  synchronous KEY_NODES 
   {
     (*myOut) << ";\n\nNODES";
     delim = "";
@@ -116,9 +120,7 @@ output:
 
 synchronous:
   /* empty */
-| KEY_SYNCHRONOUS 
-  { yyerror("cannot convert to Fiona OG format since Fiona does not support synchronous communication"); }
-  identlist SEMICOLON
+| KEY_SYNCHRONOUS identlist SEMICOLON
 ;
 
 
@@ -127,13 +129,15 @@ identlist:
 | IDENT
   { 
     events[$1] = event;
-    (*myOut) << $1;
+    if(event != '#')
+      (*myOut) << $1;
     free($1);
   }
 | identlist COMMA IDENT
   { 
     events[$3] = event;
-    (*myOut) << ", " << $3;
+    if(event != '#')
+      (*myOut) << ", " << $3;
     free($3);
   }
 ;

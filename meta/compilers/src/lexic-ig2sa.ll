@@ -39,7 +39,7 @@ extern std::ostream * myOut;
 %}
 
 whitespace     [\n\r\t ]
-identifier     [^,;:!?()\t \n\r\{\}=]+
+identifier     [^,;:!?#()\t \n\r\{\}=]+
 number         [0-9]+
 
 %s COMMENT
@@ -48,8 +48,8 @@ number         [0-9]+
 %%
 
 
-"{"                                     { (*myOut) << "\n{"; BEGIN(COMMENT);      }
-<COMMENT>"}"                            { (*myOut) << "}\n"; BEGIN(INITIAL);      }
+"{"                                     { (*myOut) << "{"; BEGIN(COMMENT);      }
+<COMMENT>"}"                            { (*myOut) << "}\n\n"; BEGIN(INITIAL);      }
 <COMMENT>[^}]*                          { (*myOut) << yytext; /* copy comment */  }
 
 "INTERFACE"    { return K_INTERFACE; }
@@ -67,6 +67,7 @@ number         [0-9]+
 ":"            { ++colonCount; return COLON; }
 "!"            { return SEND; }
 "?"            { return RECEIVE; }
+"#"            { return SYNCHRONOUS; }
 "("            { return LPAR; }
 ")"            { return RPAR; }
 "+"            { return OP_OR; }

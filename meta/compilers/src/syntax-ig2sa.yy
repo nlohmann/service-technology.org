@@ -41,6 +41,8 @@ unsigned int initialNode;
 std::map<unsigned int, std::map<std::string, unsigned int> > succ;
 // output labels (event type has to be switched)
 std::set<std::string> outputs;
+// synchronous labels
+std::set<std::string> synchronous;
 // whether reading later output places
 bool interfaceOutput;
 // recent node ID
@@ -57,7 +59,7 @@ std::map<unsigned int, bool> finalNodes;
 
 %token K_INTERFACE K_INPUT K_OUTPUT K_NODES K_INITIALNODE K_TRANSITIONS
 %token COMMA SEMICOLON COLON ARROW
-%token K_FINAL K_TRUE K_FALSE SEND RECEIVE LPAR RPAR 
+%token K_FINAL K_TRUE K_FALSE SEND RECEIVE SYNCHRONOUS LPAR RPAR 
 %token IDENT NUMBER
 
 %left OP_AND OP_OR
@@ -80,11 +82,15 @@ og:
   { 
     colonCount = 0; // initialize for flex
     interfaceOutput = true;
-    (*myOut) << "\nINTERFACE\n  INPUT\n    ";
+    (*myOut) << "INTERFACE\n  INPUT\n    ";
   }
   K_INPUT identlist SEMICOLON
   { interfaceOutput = false ;}
   K_OUTPUT identlist SEMICOLON
+  K_NODES nodes SEMICOLON
+  K_INITIALNODE NUMBER SEMICOLON
+  { initialNode = $14; }
+  K_TRANSITIONS transitions SEMICOLON
   {
     (*myOut) << ";\n  OUTPUT\n    ";
     std::string delim = ""; // delimeter
@@ -95,12 +101,9 @@ og:
       delim = ", ";
     }
     (*myOut) << ";\n\nNODES\n";
-  }
-  K_NODES nodes SEMICOLON
-  K_INITIALNODE NUMBER SEMICOLON
-  { initialNode = $15; }
-  K_TRANSITIONS transitions SEMICOLON
-  {
+
+
+
     for(std::map<unsigned int, std::map<std::string, unsigned int> >::iterator it = succ.begin();
          it != succ.end(); ++it)
     {
@@ -181,6 +184,7 @@ formula:
 | K_FALSE
 | SEND IDENT { free($2); }
 | RECEIVE IDENT { free($2); }
+| SYNCHRONOUS IDENT { synchronous.insert($2); free($2); }
 ;
 
 transitions:
@@ -197,6 +201,12 @@ transition:
 | NUMBER ARROW NUMBER COLON RECEIVE IDENT
   {
     succ[$1][$6] = $3;
+    free($6);
+  }
+| NUMBER ARROW NUMBER COLON SYNCHRONOUS IDENT
+  {
+    succ[$1][$6] = $3;
+    synchronous.insert($6);
     free($6);
   }
 ;

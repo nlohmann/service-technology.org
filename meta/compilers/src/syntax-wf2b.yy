@@ -4,6 +4,7 @@
 
 %{
 #include "config.h"
+#include "types-wf2b.h"
 #include <iostream>
 #include <map>
 #include <string>
@@ -21,8 +22,32 @@ extern std::ostream * myOut;
 bool outputEvent;
 // events and whether they are input events
 std::map<std::string, bool> events;
-// resulting bit
-std::string bit;
+
+
+/*
+ * Nodes' formulae will be evaluated as follows:
+ *  - if a formula containes the condition "final",
+ *    the F flag will be set
+ *  - if the formula evaluates to "true", the T flag
+ *    will be set (true AND x evaluates to x;
+ *    true OR x evaluates to true)
+ *  - if the formula can only be satisfied by sending
+ *    something, the S bit will be set
+ *    (S and x evaluates to S; S or x evaluates to x)
+ *  - otherwise no bit will be set
+ */
+
+Bit_T bitsAnd[][4] = {{NONE, SEND, NONE, FINAL},
+                     {SEND, SEND, SEND, FINAL},
+                     {NONE, SEND, TRUE, FINAL},
+                     {FINAL, FINAL, FINAL, FINAL}};
+
+Bit_T bitsOr[][4] = {{NONE, NONE, TRUE, FINAL},
+                    {NONE, SEND, TRUE, FINAL},
+                    {TRUE, TRUE, TRUE, FINAL},
+                    {FINAL, FINAL, FINAL, FINAL}};
+
+char bitLabels[][10] = {"\n", " :: S\n", " :: T\n", " :: F\n"};
 
 %}
 
@@ -36,10 +61,12 @@ std::string bit;
 %union {
     char *str;
     unsigned int value;
+    Bit_T bit;
 }
 
 %type <value> NUMBER
 %type <str>   IDENT
+%type <bit>   formula annotation
 
 %left OP_OR
 %left OP_AND
@@ -53,7 +80,7 @@ std::string bit;
 
 og:
   KEY_INTERFACE
-  { (*myOut) << "\nINTERFACE\n"; }
+  { (*myOut) << "INTERFACE\n"; }
   input output synchronous
   { (*myOut) << "\nNODES\n"; }
   KEY_NODES nodes
@@ -121,19 +148,18 @@ nodes:
 
 
 node:
-  NUMBER
+  NUMBER annotation 
   {
-    (*myOut) << "  " << $1;
+    (*myOut) << "  " << $1 << bitLabels[$2];
     // if we read a formula and this bit was not overwritten, we only read send events
-    bit = " :: S\n";
   }
-  annotation successors
+  successors
 ;
 
 
 annotation:
   /* empty; i.e. we do not write a bit */
-| COLON formula { (*myOut) << bit; }
+| COLON formula     { $$ = $2; }
 | DOUBLECOLON BIT_S { yyerror("this seems to be already a bit-OG"); }
 | DOUBLECOLON BIT_F { yyerror("this seems to be already a bit-OG"); }
 | DOUBLECOLON BIT_T { yyerror("this seems to be already a bit-OG"); }
@@ -141,17 +167,17 @@ annotation:
 
 
 formula:
-  LPAR formula RPAR
-| formula OP_AND formula
-| formula OP_OR formula
-| OP_NOT formula
-| KEY_FINAL { bit = " :: F\n"; } 
-| KEY_TRUE  { bit = " :: T\n"; }
-| KEY_FALSE
+  LPAR formula RPAR       { $$ = $2; }
+| formula OP_AND formula  { $$ = bitsAnd[$1][$3]; }
+| formula OP_OR formula   { $$ = bitsOr[$1][$3]; }
+| OP_NOT formula          { $$ = NONE; }
+| KEY_FINAL               { $$ = FINAL; } 
+| KEY_TRUE                { $$ = TRUE; }
+| KEY_FALSE               { $$ = NONE; }
 | IDENT
-  {
-    if(!events[$1]) // if we read an event that is no output event
-      bit = "\n"; // set no bit
+  { 
+    $$ = (events[$1] ? SEND : NONE);
+    free($1);
   }
 ;
 

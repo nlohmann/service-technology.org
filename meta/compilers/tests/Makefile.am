@@ -7,7 +7,9 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = syntax_example.owfn
+TESTFILES = syntax_example.owfn \
+            synchronous.fiona.og \
+	    bit_s.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

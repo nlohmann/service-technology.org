@@ -8,8 +8,8 @@
 
 #include <cstring>
 #include <iostream>
-#include "types-wf2b.h"
-#include "syntax-wf2b.h"
+
+#include "syntax-sa2ig.h"
 #include "config.h"
 
 int yyerror(char const *msg);
@@ -19,10 +19,9 @@ extern std::ostream * myOut;
 %}
 
 %s COMMENT
-%s BITS
 
 whitespace     [\n\r\t ]
-identifier     [^,;:()\t \n\r\{\}=~]+
+identifier     [^,;:()\t \n\r\{\}=]+
 number         [0-9]+
 
 
@@ -34,35 +33,21 @@ number         [0-9]+
 <COMMENT>[^}]*                          { (*myOut) << yytext; /* copy comment */  }
 
 "NODES"                                 { return KEY_NODES;            }
+"INITIAL"                               { return KEY_INITIAL;          }
+"FINAL"                                 { return KEY_FINAL;            }
 
 "INTERFACE"                             { return KEY_INTERFACE;        }
 "INPUT"                                 { return KEY_INPUT;            }
 "OUTPUT"                                { return KEY_OUTPUT;           }
 "SYNCHRONOUS"                           { return KEY_SYNCHRONOUS;      }
 
-<BITS>"F"                               { BEGIN(INITIAL); return BIT_F; }
-<BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
-<BITS>"T"                               { BEGIN(INITIAL); return BIT_T; }
-"TRUE"                                  { return KEY_TRUE;             }
-"true"                                  { return KEY_TRUE;             }
-"FALSE"                                 { return KEY_FALSE;            }
-"false"                                 { return KEY_FALSE;            }
-"FINAL"                                 { return KEY_FINAL;            }
-"final"                                 { return KEY_FINAL;            }
-"~"                                     { return OP_NOT;               }
-"*"                                     { return OP_AND;               }
-"+"                                     { return OP_OR;                }
-"("                                     { return LPAR;                 }
-")"                                     { return RPAR;                 }
-
 ":"                                     { return COLON;                }
-"::"                                    { BEGIN(BITS); return DOUBLECOLON; }
 ";"                                     { return SEMICOLON;            }
 ","                                     { return COMMA;                }
 "->"                                    { return ARROW;                }
 
 {number}       { yylval.value = atoi(yytext); return NUMBER;     }
-{identifier}   { yylval.str = strdup(yytext); return IDENT;              }
+{identifier}   { yylval.str = yytext; return IDENT;              }
 
 {whitespace}                            { /* do nothing */             }
 

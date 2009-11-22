@@ -1053,18 +1053,34 @@ AT_CLEANUP
 AT_BANNER([Livelock Freedom])
 ############################################################################
 
-AT_SETUP([livelock free controllable])
+AT_SETUP([livelock free controllable 1])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/LF_DF_controllable.owfn .])
-AT_CHECK([WENDY LF_DF_controllable.owfn --correctness=livelock --verbose],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/LF_DF_controllable_1.owfn .])
+AT_CHECK([WENDY LF_DF_controllable_1.owfn --correctness=livelock --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
 AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP
 
-AT_SETUP([livelock free controllable])
+AT_SETUP([livelock free controllable 2])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/LF_DF_controllable2.owfn .])
-AT_CHECK([WENDY LF_DF_controllable2.owfn --correctness=livelock --verbose],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/LF_DF_controllable_2.owfn .])
+AT_CHECK([WENDY LF_DF_controllable_2.owfn --correctness=livelock --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: YES" stderr])
+AT_KEYWORDS(livelock-freedom)
+AT_CLEANUP
+
+AT_SETUP([livelock free controllable 3])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/LF_DF_controllable_3.owfn .])
+AT_CHECK([WENDY LF_DF_controllable_3.owfn --correctness=livelock --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: YES" stderr])
+AT_KEYWORDS(livelock-freedom)
+AT_CLEANUP
+
+AT_SETUP([livelock free controllable 4])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/LF_DF_controllable_4.owfn .])
+AT_CHECK([WENDY LF_DF_controllable_4.owfn --correctness=livelock --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "net is controllable: YES" stderr])
 AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP

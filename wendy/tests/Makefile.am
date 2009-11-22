@@ -8,8 +8,8 @@
 
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
-            06-03-23_BPM06_shop_sect_6.owfn AP.owfn LF_DF_controllable.owfn \
-            LF_DF_controllable2.owfn Lohmann_2008_wsfm-Fig2b.owfn \
+            06-03-23_BPM06_shop_sect_6.owfn AP.owfn LF_DF_controllable_1.owfn \
+            LF_DF_controllable_2.owfn Lohmann_2008_wsfm-Fig2b.owfn \
             PO.fiona.og PO.owfn QR.fiona.og QR.owfn SaScSdRb.owfn \
             T2.fiona.og T2.owfn bits.owfn bug1.fiona.og bug1.owfn bug10.owfn \
             bug11.owfn bug13651.owfn bug13718.owfn bug13994-1.owfn \
@@ -27,6 +27,7 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             marlene-td.owfn mb.owfn mia-PO-pv.owfn mia-PO.owfn \
             mia-reg_new.owfn mia-reg_old.owfn myCoffee.fiona.og \
             myCoffee.owfn nLF_DF_controllable.owfn nlc.owfn \
+            LF_DF_controllable_3.owfn LF_DF_controllable_4.owfn \ 
             phcontrol3.unf.fiona.og phcontrol3.unf.owfn phcontrol6.unf.owfn \
             phcontrol9.unf.owfn phil5.owfn regist-priv.owfn \
             regist-priv.owfn.cov seqTest1.fiona.og seqTest1.owfn \

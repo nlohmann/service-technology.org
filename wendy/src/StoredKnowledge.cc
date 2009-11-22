@@ -608,6 +608,11 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
             }
         }
 
+        // deadlock is resolved, so check the next deadlock
+        if (resolved) {
+            continue;
+        }
+
         // check if a synchronous action can resolve this deadlock
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
@@ -899,13 +904,12 @@ void StoredKnowledge::print(std::ostream& file) const {
 
  \note This function is also used for an operating guidelines output for
        Fiona.
-
- \todo Adjust comments and variable names to reflect the fact that we also
-       treat synchronous communication.
- */
+*/
 std::string StoredKnowledge::formula() const {
     set<string> sendDisjunction;
-    set<set<string> > receiveDisjunctions;
+
+    // represents the formula (set of disjunctions which each are a set again)
+    set<set<string> > conjunctionOfDisjunctions;
 
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
@@ -918,60 +922,70 @@ std::string StoredKnowledge::formula() const {
         }
     }
 
+    // traverse through the deadlock markings and
     // collect outgoing ?-edges and #-edges for the deadlocks
     bool dl_found = false;
     for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
         dl_found = true;
-        set<string> temp(sendDisjunction);
+        // add sending events to current disjunction
+        set<string> disjunctionSendingReceivingSynchronous(sendDisjunction);
 
-        // sending
+        // receiving event
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            // receiving event resolves deadlock
             if (interface[i]->marked(l) and
                 successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
 
                 if (args_info.fionaFormat_flag) {
-                    temp.insert(PREFIX(l) + Label::id2name[l]);
+                    disjunctionSendingReceivingSynchronous.insert(PREFIX(l) + Label::id2name[l]);
                 } else {
-                    temp.insert(Label::id2name[l]);
+                    disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
                 }
             }
         }
 
         // synchronous communication
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+            // synchronous communication resolves deadlock
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
                 successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
                 if (args_info.fionaFormat_flag) {
-                    temp.insert(PREFIX(l) + Label::id2name[l]);
+                    disjunctionSendingReceivingSynchronous.insert(PREFIX(l) + Label::id2name[l]);
                 } else {
-                    temp.insert(Label::id2name[l]);
+                    disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
                 }
             }
         }
 
+        // deadlock is final
         if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
-            temp.insert("final");
+            disjunctionSendingReceivingSynchronous.insert("final");
         }
 
-        receiveDisjunctions.insert(temp);
+        // add clause
+        conjunctionOfDisjunctions.insert(disjunctionSendingReceivingSynchronous);
     }
 
+    // all markings are transient
     if (not dl_found) {
         return "true";
     }
 
     // create the formula
     string formula;
-    if (not receiveDisjunctions.empty()) {
-        for (set<set<string> >::iterator it = receiveDisjunctions.begin(); it != receiveDisjunctions.end(); ++it) {
-            if (it != receiveDisjunctions.begin()) {
+
+    if (not conjunctionOfDisjunctions.empty()) {
+        // traverse the conjunctions to access the disjunctions
+        for (set<set<string> >::iterator it = conjunctionOfDisjunctions.begin(); it != conjunctionOfDisjunctions.end(); ++it) {
+            if (it != conjunctionOfDisjunctions.begin()) {
                 formula += " * ";
             }
             if (it->size() > 1) {
                 formula += "(";
             }
+            // get clause which contains !, ? or # events
             for (set<string>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
                 if (it2 != it->begin()) {
                     formula += " + ";

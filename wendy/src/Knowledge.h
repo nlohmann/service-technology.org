@@ -25,7 +25,7 @@
 #include <map>
 #include "Label.h"
 #include "InnerMarking.h"
-#include "FullMarkingQueue.h"
+#include "Queue.h"
 
 typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
 
@@ -90,7 +90,7 @@ class Knowledge {
         Bubble bubble;
 
         /// a queue of markings to be processed by closuse()
-        FullMarkingQueue todo;
+        Queue todo;
 
         /// reduction rule: smart send events; pointer to possible sending events data structure
         PossibleSendEvents* posSendEvents;

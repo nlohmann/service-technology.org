@@ -20,47 +20,57 @@
 
 #include <config.h>
 #include <cstdlib>
-#include "FullMarkingQueue.h"
+#include "Queue.h"
 
 
-size_t FullMarkingQueue::maximal_length = 0;
-size_t FullMarkingQueue::initial_length = 128;
-size_t FullMarkingQueue::current_objects = 0;
-size_t FullMarkingQueue::maximal_objects = 0;
+size_t Queue::maximal_length = 0;
+size_t Queue::initial_length = 128;
+size_t Queue::current_objects = 0;
+size_t Queue::maximal_objects = 0;
 
 
-FullMarkingQueue::FullMarkingQueue()
-  : storage(static_cast<FullMarking**>(malloc(initial_length * SIZEOF_VOIDP))),
-  first(0), last(0) {
-    assert(storage);
+Queue::Queue()
+  : interface(static_cast<InterfaceMarking**>(malloc(initial_length * SIZEOF_VOIDP))),
+    inner(static_cast<InnerMarking_ID*>(malloc(initial_length * sizeof(InnerMarking_ID)))),
+    first(0), last(0) {
+    assert(interface);
+    assert(inner);
     maximal_objects = (++current_objects > maximal_objects) ? current_objects : maximal_objects;
 }
 
-FullMarkingQueue::~FullMarkingQueue() {
+Queue::~Queue() {
     maximal_length = (last > maximal_length) ? last : maximal_length;
     --current_objects;
 
-    for (size_t i = 0; i < last; ++i) {
-        delete storage[i];
-    }
-    free(storage);
+    free(interface);
+    free(inner);
 }
 
-void FullMarkingQueue::push(FullMarking* m) {
+void Queue::push(InnerMarking_ID _inner, InterfaceMarking* _interface) {
     // if storage is full
     if (last++ == initial_length) {
         // double its size and use this size from now on
         initial_length *= 2;
-        storage = static_cast<FullMarking**>(realloc(storage, initial_length * SIZEOF_VOIDP));
-        assert(storage);
+        interface = static_cast<InterfaceMarking**>(realloc(interface, initial_length * SIZEOF_VOIDP));
+        inner = static_cast<InnerMarking_ID*>(realloc(inner, initial_length * sizeof(InnerMarking_ID)));
+        assert(interface);
+        assert(inner);
     }
-    storage[last-1] = m;
+
+    inner[last-1] = _inner;
+    interface[last-1] = _interface;
 }
 
-FullMarking* FullMarkingQueue::pop() {
+InterfaceMarking* Queue::popInterface() {
     if (first == last) {
         return NULL;
     }
 
-    return storage[first++];
+    return interface[first++];
+}
+
+InnerMarking_ID& Queue::popInner() {
+    assert(first != last);
+
+    return inner[first-1];
 }

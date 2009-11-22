@@ -18,12 +18,13 @@
 \*****************************************************************************/
 
 
-#ifndef _FULLMARKINGQUEUE_H
-#define _FULLMARKINGQUEUE_H
+#ifndef _QUEUE_H
+#define _QUEUE_H
 
-#include "FullMarking.h"
+#include "types.h"
+#include "InterfaceMarking.h"
 
-class FullMarkingQueue {
+class Queue {
     public:
         /// the maximal queue length
         static size_t maximal_length;
@@ -31,15 +32,18 @@ class FullMarkingQueue {
         /// the initially reserved queue length
         static size_t initial_length;
 
-        /// the current number of FullMarkingQueue objects
+        /// the current number of Queue objects
         static size_t current_objects;
 
-        /// the maximal number of simultaneously stored FullMarkingQueue objects
+        /// the maximal number of simultaneously stored Queue objects
         static size_t maximal_objects;
 
     private:
-        /// a vector to implement the queue
-        FullMarking** storage;
+        /// a vector to implement the interface marking queue
+        InterfaceMarking** interface;
+
+        /// a vector to implement the innner marking queue
+        InnerMarking_ID* inner;
 
         /// index of the top element
         size_t first;
@@ -49,16 +53,19 @@ class FullMarkingQueue {
 
     public:
         /// constructor
-        FullMarkingQueue();
+        Queue();
 
         /// denstructor
-        ~FullMarkingQueue();
+        ~Queue();
 
         /// adds en element to the end of the queue
-        void push(FullMarking*);
+        void push(InnerMarking_ID, InterfaceMarking*);
 
         /// removes an element from the top of the queue and returns pointer to it
-        FullMarking* pop();
+        InterfaceMarking* popInterface();
+
+        /// returns the top inner marking
+        InnerMarking_ID& popInner();
 };
 
 #endif

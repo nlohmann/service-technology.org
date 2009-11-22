@@ -34,8 +34,9 @@ Knowledge::Knowledge(InnerMarking_ID m)
         : is_sane(1), posSendEventsDecoded(NULL), size(1), posSendEvents(NULL),
           consideredReceivingEvents(Label::receive_events, false) {
     // add this marking to the bubble and the todo queue
-    bubble[m].push_back(new InterfaceMarking());
-    todo.push(new FullMarking(m));
+              InterfaceMarking* empty = new InterfaceMarking();
+    bubble[m].push_back(empty);
+    todo.push(m, empty);
 
     // check if initial marking is already bad
     if (InnerMarking::inner_markings[m]->is_bad) {
@@ -100,7 +101,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
                     // success -- possibly, this marking became transient
                     if (receiver and result) {
-                        todo.push(new FullMarking(pos->first, *interface));
+                        todo.push(pos->first, interface);
                     }
                 } else {
                     // increment failed -- message bound violation
@@ -136,7 +137,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
                                 }
                             }
                             // the marking is OK and new, so add it to the bubble
-                            todo.push(new FullMarking(m->successors[j], *interface));
+                            todo.push(m->successors[j], interface);
                             bubble[m->successors[j]].push_back(interface);
                             ++size;
                         }
@@ -208,12 +209,12 @@ void Knowledge::initialize() {
 */
 void Knowledge::closure() {
     // process the queue
-    while (FullMarking* front = todo.pop()) {
+    while (InterfaceMarking* current_interface = todo.popInterface()) {
         // process successors of the current marking
-        InnerMarking* m = InnerMarking::inner_markings[front->inner];
+        InnerMarking* m = InnerMarking::inner_markings[todo.popInner()];
 
         // check, if each sent message contained on the interface of this marking will ever be consumed
-        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(front->interface)) {
+        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(*current_interface)) {
             is_sane = 0;
             if (not args_info.diagnose_given) {
                 return;
@@ -228,14 +229,16 @@ void Knowledge::closure() {
 
             // in any case, create a successor candidate -- it will be valid
             // for transient transitions anyway
-            FullMarking* candidate = new FullMarking(m->successors[i], front->interface);
+            InnerMarking_ID candidate_inner = m->successors[i];
+            InterfaceMarking* candidate_interface = new InterfaceMarking(*current_interface);
 
             // we receive -> the net sends
             if (RECEIVING(m->labels[i])) {
                 // message bound violation?
-                if (not candidate->interface.inc(m->labels[i])) {
+                if (not candidate_interface->inc(m->labels[i])) {
                     is_sane = 0;
                     if (not args_info.diagnose_given) {
+                        delete candidate_interface;
                         return;
                     }
                 }
@@ -243,37 +246,38 @@ void Knowledge::closure() {
 
             // we send -> the net receives
             if (SENDING(m->labels[i])) {
-                if (not candidate->interface.dec(m->labels[i])) {
+                if (not candidate_interface->dec(m->labels[i])) {
                     // this marking is not reachable
-                    delete candidate;
+                    delete candidate_interface;
                     continue;
                 }
             }
 
             // check if successor is a deadlock or livelock
-            if (InnerMarking::inner_markings[m->successors[i]]->is_bad) {
+            if (InnerMarking::inner_markings[candidate_inner]->is_bad) {
                 is_sane = 0;
                 if (not args_info.diagnose_given) {
+                    delete candidate_interface;
                     return;
                 }
             }
 
             // if we found a valid successor candidate, check if it is already stored
             bool candidateFound = false;
-            for (size_t j = 0; j < bubble[candidate->inner].size(); ++j) {
-                if (*(bubble[candidate->inner][j]) == candidate->interface) {
+            for (size_t j = 0; j < bubble[candidate_inner].size(); ++j) {
+                if (*(bubble[candidate_inner][j]) == *candidate_interface) {
                     candidateFound = true;
-                    delete candidate;
+                    delete candidate_interface;
                     break;
                 }
             }
             if (not candidateFound) {
-                bubble[candidate->inner].push_back(new InterfaceMarking(candidate->interface));
+                bubble[candidate_inner].push_back(candidate_interface);
                 ++size;
-                todo.push(candidate);
+                todo.push(candidate_inner, candidate_interface);
 
                 // sort bubble using self-implemented quicksort
-                InterfaceMarking::sort(bubble[candidate->inner]);
+                InterfaceMarking::sort(bubble[candidate_inner]);
 
                 if (not is_sane) {
                     return;

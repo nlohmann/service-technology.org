@@ -35,7 +35,7 @@ Knowledge::Knowledge(InnerMarking_ID m)
           consideredReceivingEvents(Label::receive_events, false) {
     // add this marking to the bubble and the todo queue
     bubble[m].push_back(new InterfaceMarking());
-    todo.push(FullMarking(m));
+    todo.push(new FullMarking(m));
 
     // check if initial marking is already bad
     if (InnerMarking::inner_markings[m]->is_bad) {
@@ -100,7 +100,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
                     // success -- possibly, this marking became transient
                     if (receiver and result) {
-                        todo.push(FullMarking(pos->first, *interface));
+                        todo.push(new FullMarking(pos->first, *interface));
                     }
                 } else {
                     // increment failed -- message bound violation
@@ -136,7 +136,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
                                 }
                             }
                             // the marking is OK and new, so add it to the bubble
-                            todo.push(FullMarking(m->successors[j], *interface));
+                            todo.push(new FullMarking(m->successors[j], *interface));
                             bubble[m->successors[j]].push_back(interface);
                             ++size;
                         }
@@ -208,12 +208,12 @@ void Knowledge::initialize() {
 */
 void Knowledge::closure() {
     // process the queue
-    while (not todo.empty()) {
+    while (FullMarking* front = todo.pop()) {
         // process successors of the current marking
-        InnerMarking* m = InnerMarking::inner_markings[todo.front().inner];
+        InnerMarking* m = InnerMarking::inner_markings[front->inner];
 
         // check, if each sent message contained on the interface of this marking will ever be consumed
-        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(todo.front().interface)) {
+        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(front->interface)) {
             is_sane = 0;
             if (not args_info.diagnose_given) {
                 return;
@@ -228,7 +228,7 @@ void Knowledge::closure() {
 
             // in any case, create a successor candidate -- it will be valid
             // for transient transitions anyway
-            FullMarking candidate(m->successors[i], todo.front().interface);
+            FullMarking candidate(m->successors[i], front->interface);
 
             // we receive -> the net sends
             if (RECEIVING(m->labels[i])) {
@@ -266,10 +266,9 @@ void Knowledge::closure() {
                 }
             }
             if (not candidateFound) {
-                InterfaceMarking* copy = new InterfaceMarking(candidate.interface);
-                bubble[candidate.inner].push_back(copy);
+                bubble[candidate.inner].push_back(new InterfaceMarking(candidate.interface));
                 ++size;
-                todo.push(candidate);
+                todo.push(new FullMarking(candidate));
 
                 // sort bubble using self-implemented quicksort
                 InterfaceMarking::sort(bubble[candidate.inner]);
@@ -279,7 +278,6 @@ void Knowledge::closure() {
                 }
             }
         }
-        todo.pop();
     }
 }
 

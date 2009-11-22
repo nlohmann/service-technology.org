@@ -76,6 +76,19 @@ const bool _useColor = false;
 /// set foreground color to cyan
 #define _cc_ (_useColor ? "\033[0;36m" : "" )
 
+/// set foreground color to red (undelined)
+#define _cr__ (_useColor ? "\033[0;4;31m" : "" )
+/// set foreground color to green (undelined)
+#define _cg__ (_useColor ? "\033[0;4;32m" : "" )
+/// set foreground color to yellow (undelined)
+#define _cy__ (_useColor ? "\033[0;4;33m" : "" )
+/// set foreground color to blue (undelined)
+#define _cb__ (_useColor ? "\033[0;4;34m" : "" )
+/// set foreground color to magenta (undelined)
+#define _cm__ (_useColor ? "\033[0;4;35m" : "" )
+/// set foreground color to cyan (undelined)
+#define _cc__ (_useColor ? "\033[0;4;36m" : "" )
+
 /// set foreground color to black (bold)
 #define _c0_ (_useColor ? "\033[0;1;30m" : "" )
 /// set foreground color to red (bold)
@@ -95,7 +108,7 @@ const bool _useColor = false;
 #define _c_ (_useColor ? "\033[m" : "")
 
 #define _ctool_(s)       (std::string(_cm_) + s + _c_).c_str()
-#define _cfilename_(s)   (std::string(_cb_) + s + _c_).c_str()
+#define _cfilename_(s)   (std::string(_cb__) + s + _c_).c_str()
 #define _coutput_(s)     (std::string(_cB_) + s + _c_).c_str()
 #define _cgood_(s)       (std::string(_cG_) + s + _c_).c_str()
 #define _cbad_(s)        (std::string(_cR_) + s + _c_).c_str()

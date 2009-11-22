@@ -166,9 +166,10 @@ void terminationHandler() {
 
     // print statistics
     if (args_info.stats_flag) {
-        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
-        fprintf(stderr, "%s%s%s: memory consumption: ", _cm_, PACKAGE, _c_);
+        message("runtime: %s%.2f sec%s", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c0_, _c_);
+        fprintf(stderr, "%s%s%s: memory consumption: %s", _cm_, PACKAGE, _c_, _c0_);
         int tmp = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        fprintf(stderr, "%s", _c_);
     }
 }
 
@@ -337,6 +338,7 @@ int main(int argc, char** argv) {
         StoredKnowledge::stats.numberOfTrivialSCCs);
     status("calculated %d non-trivial SCCs, at most %d members in nontrivial SCC",
         StoredKnowledge::stats.numberOfNonTrivialSCCs, StoredKnowledge::stats.maxSCCSize);
+    status("maximal simultaneously stored Knowledge objects: %d", FullMarkingQueue::maximal_objects);
 
     // traverse all nodes reachable from the root
     StoredKnowledge::root->traverse();

@@ -1,34 +1,44 @@
+#include <config.h>
+#include <cstdlib>
 #include "FullMarkingQueue.h"
 
 size_t FullMarkingQueue::maximal_length = 0;
 size_t FullMarkingQueue::initial_length = 128;
+size_t FullMarkingQueue::current_objects = 0;
+size_t FullMarkingQueue::maximal_objects = 0;
+
+FullMarkingQueue::FullMarkingQueue()
+  : storage(static_cast<FullMarking**>(malloc(initial_length * SIZEOF_VOIDP))),
+  first(0), last(0) {
+    assert(storage);
+    maximal_objects = (++current_objects > maximal_objects) ? current_objects : maximal_objects;
+}
 
 FullMarkingQueue::~FullMarkingQueue() {
     maximal_length = (last > maximal_length) ? last : maximal_length;
+    --current_objects;
+
+    for (size_t i = 0; i < last; ++i) {
+        delete storage[i];
+    }
+    free(storage);
 }
 
-FullMarkingQueue::FullMarkingQueue() : first(0), last(0) {
-    storage.reserve(initial_length);
-}
-
-bool FullMarkingQueue::empty() const {
-    return (first == last);
-}
-
-FullMarking& FullMarkingQueue::front() {
-    return storage[first];
-}
-
-void FullMarkingQueue::push(const FullMarking& m) {
+void FullMarkingQueue::push(FullMarking* m) {
     // if storage is full
     if (last++ == initial_length) {
         // double its size and use this size from now on
-        storage.reserve(initial_length);
         initial_length *= 2;
+        storage = static_cast<FullMarking**>(realloc(storage, initial_length * SIZEOF_VOIDP));
+        assert(storage);
     }
-    storage.push_back(m);
+    storage[last-1] = m;
 }
 
-void FullMarkingQueue::pop() {
-    ++first;
+FullMarking* FullMarkingQueue::pop() {
+    if (first == last) {
+        return NULL;
+    }
+
+    return storage[first++];
 }

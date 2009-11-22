@@ -1,7 +1,6 @@
 #ifndef _FULLMARKINGQUEUE_H
 #define _FULLMARKINGQUEUE_H
 
-#include <vector>
 #include "FullMarking.h"
 
 class FullMarkingQueue {
@@ -12,9 +11,15 @@ class FullMarkingQueue {
         /// the initially reserved queue length
         static size_t initial_length;
 
+        /// the current number of FullMarkingQueue objects
+        static size_t current_objects;
+
+        /// the maximal number of simultaneously stored FullMarkingQueue objects
+        static size_t maximal_objects;
+
     private:
         /// a vector to implement the queue
-        std::vector<FullMarking> storage;
+        FullMarking** storage;
 
         /// index of the top element
         size_t first;
@@ -29,17 +34,11 @@ class FullMarkingQueue {
         /// denstructor
         ~FullMarkingQueue();
 
-        /// returns whether the queue is empty
-        bool empty() const;
-
-        /// returns reference to top element
-        FullMarking& front();
-
         /// adds en element to the end of the queue
-        void push(const FullMarking&);
+        void push(FullMarking*);
 
-        /// removes an element from the top of the queue
-        void pop();
+        /// removes an element from the top of the queue and returns pointer to it
+        FullMarking* pop();
 };
 
 #endif

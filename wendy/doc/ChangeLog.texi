@@ -1,7 +1,8 @@
 @heading Version 2.6-unreleased
 @itemize
-@item ...
+@item implemented user-defined data structure for the queue used in the closure operation
 @end itemize
+
 
 @heading Version 2.5 (21 November 2009)
 @itemize

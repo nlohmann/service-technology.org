@@ -329,7 +329,8 @@ int main(int argc, char** argv) {
     // statistics output
     status("stored %d knowledges, %d edges [%.0f sec]",
         StoredKnowledge::stats.storedKnowledges, StoredKnowledge::stats.storedEdges, difftime(end_time, start_time));
-    status("maximal queue length: %d", FullMarkingQueue::maximal_length);
+    status("maximal queue length: %d, final queue default length: %d",
+        FullMarkingQueue::maximal_length, FullMarkingQueue::initial_length);
     status("used %d of %d hash buckets, maximal bucket size: %d",
         static_cast<size_t>(StoredKnowledge::hashTree.size()), (1 << (8*sizeof(hash_t))), static_cast<size_t>(StoredKnowledge::stats.maxBucketSize));
     status("calculated %d trivial SCCs",

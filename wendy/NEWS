@@ -11,7 +11,8 @@
 Version 2.6-unreleased
 ======================
 
-* ...
+* implemented user-defined data structure for the queue used in the closure
+  operation
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

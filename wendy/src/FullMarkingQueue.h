@@ -6,7 +6,11 @@
 
 class FullMarkingQueue {
     public:
+        /// the maximal queue length
         static size_t maximal_length;
+
+        /// the initially reserved queue length
+        static size_t initial_length;
 
     private:
         /// a vector to implement the queue

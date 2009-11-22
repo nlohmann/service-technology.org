@@ -70,7 +70,7 @@ InterfaceMarking* Queue::popInterface() {
 }
 
 InnerMarking_ID& Queue::popInner() {
-    assert(first != last);
+    assert(first-1 != last);
 
     return inner[first-1];
 }

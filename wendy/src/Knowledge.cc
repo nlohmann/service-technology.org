@@ -228,12 +228,12 @@ void Knowledge::closure() {
 
             // in any case, create a successor candidate -- it will be valid
             // for transient transitions anyway
-            FullMarking candidate(m->successors[i], front->interface);
+            FullMarking* candidate = new FullMarking(m->successors[i], front->interface);
 
             // we receive -> the net sends
             if (RECEIVING(m->labels[i])) {
                 // message bound violation?
-                if (not candidate.interface.inc(m->labels[i])) {
+                if (not candidate->interface.inc(m->labels[i])) {
                     is_sane = 0;
                     if (not args_info.diagnose_given) {
                         return;
@@ -243,8 +243,9 @@ void Knowledge::closure() {
 
             // we send -> the net receives
             if (SENDING(m->labels[i])) {
-                if (not candidate.interface.dec(m->labels[i])) {
+                if (not candidate->interface.dec(m->labels[i])) {
                     // this marking is not reachable
+                    delete candidate;
                     continue;
                 }
             }
@@ -259,19 +260,20 @@ void Knowledge::closure() {
 
             // if we found a valid successor candidate, check if it is already stored
             bool candidateFound = false;
-            for (size_t j = 0; j < bubble[candidate.inner].size(); ++j) {
-                if (*(bubble[candidate.inner][j]) == candidate.interface) {
+            for (size_t j = 0; j < bubble[candidate->inner].size(); ++j) {
+                if (*(bubble[candidate->inner][j]) == candidate->interface) {
                     candidateFound = true;
+                    delete candidate;
                     break;
                 }
             }
             if (not candidateFound) {
-                bubble[candidate.inner].push_back(new InterfaceMarking(candidate.interface));
+                bubble[candidate->inner].push_back(new InterfaceMarking(candidate->interface));
                 ++size;
-                todo.push(new FullMarking(candidate));
+                todo.push(candidate);
 
                 // sort bubble using self-implemented quicksort
-                InterfaceMarking::sort(bubble[candidate.inner]);
+                InterfaceMarking::sort(bubble[candidate->inner]);
 
                 if (not is_sane) {
                     return;

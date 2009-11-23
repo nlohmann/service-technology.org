@@ -49,9 +49,6 @@ class StoredKnowledge {
         /// print the knowledges as OG
         static void output_og(std::ostream&);
 
-        /// print the knowledges as Fiona OG
-        static void output_ogold(std::ostream&);
-
         /// print information for instance migration
         static void output_migration(std::ostream&);
 
@@ -161,10 +158,7 @@ class StoredKnowledge {
         void print(std::ostream&) const;
 
         /// return a string representation of the knowledge's formula
-        std::string formula() const;
-
-        /// return a two-bit representation of the knowledge's formula
-        std::string bits() const;
+        std::string formula(bool = false) const;
 
     public: /* member attributes */
         /// whether this bubble contains a final marking

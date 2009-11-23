@@ -40,12 +40,6 @@ option "og" -
   argoptional
   optional
 
-option "fionaFormat" -
-  "Use the deprecated Fiona OG file format (does not work with `--sa')."
-  dependon="og"
-  flag off
-  hidden
-
 option "sa" -
   "Service automaton output."
   string
@@ -90,15 +84,6 @@ string
 typestr="FILENAME"
 argoptional
 optional
-
-option "formula" -
-  "Set the formula style for outputs."
-  details="Choose between either standard formulae in conjunctive normal form (`cnf') or a compact bit-representation (`bits'). Note that the bit-representation cannot be used if synchronous communication occurs in the input file.\n"
-  values="cnf","bits" enum
-  typestr="STYLE"
-  dependon="og"
-  default="cnf"
-  optional
 
 
 section "Dot Options"

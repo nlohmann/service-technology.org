@@ -47,7 +47,7 @@ AT_CHECK([GREP -q "3 send, 1 receive, 0 synchronous" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot output (CNF formulae)])
+AT_SETUP([Dot output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([WENDY myCoffee.owfn --dot --showEmptyNode --showWaitstates --showTransients --verbose],0,ignore,ignore)
@@ -55,37 +55,11 @@ AT_CHECK([test -f myCoffee.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot output (3-bit formulae)])
+AT_SETUP([OG output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --dot --showEmptyNode --showWaitstates --showTransients --formula=bits --verbose],0,ignore,ignore)
-AT_CHECK([test -f myCoffee.dot])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([OG output (CNF formulae)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --formula=cnf],0,ignore,ignore)
+AT_CHECK([WENDY myCoffee.owfn --og],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.og])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([OG output (3-bit formulae)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --formula=bits],0,ignore,ignore)
-AT_CHECK([test -f myCoffee.og])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([OG output (Fiona format)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --fionaFormat],0,ignore,ignore)
-AT_CHECK([test -f myCoffee.og])
-AT_CHECK([GREP -q "TRANSITIONS" myCoffee.og])
-AT_CHECK([GREP -q "true" myCoffee.og])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -257,13 +231,6 @@ AT_CHECK([GREP -q "aborting \[[#09\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Synchronous channels and 3-bit annotations])
-AT_CHECK([cp TESTFILES/error10.* .])
-AT_CHECK([WENDY error10.owfn --lola= --formula=bits --og],1,ignore,stderr)
-AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
-AT_KEYWORDS(error)
-AT_CLEANUP
-
 AT_SETUP([Cannot write to file])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
@@ -338,79 +305,88 @@ AT_BANNER([Regression Tests])
 AT_SETUP([Bug 1])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug1.* .])
-AT_CHECK([WENDY bug1.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug1.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 2 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug1.og bug1.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug1.og -o bug1.f.og])
+AT_CHECK([FIONA -tequivalence bug1.f.og bug1.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 2])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug2.* .])
-AT_CHECK([WENDY bug2.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug2.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 1 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug2.og bug2.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug2.og -o bug2.f.og])
+AT_CHECK([FIONA -tequivalence bug2.f.og bug2.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 3])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug3.* .])
-AT_CHECK([WENDY bug3.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug3.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 1 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug3.og bug3.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug3.og -o bug3.f.og])
+AT_CHECK([FIONA -tequivalence bug3.f.og bug3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 4])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug4.* .])
-AT_CHECK([WENDY bug4.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug4.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 3 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug4.og bug4.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug4.og -o bug4.f.og])
+AT_CHECK([FIONA -tequivalence bug4.f.og bug4.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 5])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug5.* .])
-AT_CHECK([WENDY bug5.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug5.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 4 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug5.og bug5.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug5.og -o bug5.f.og])
+AT_CHECK([FIONA -tequivalence bug5.f.og bug5.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 6])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug6.* .])
-AT_CHECK([WENDY bug6.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug6.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 1 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug6.og bug6.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug6.og -o bug6.f.og])
+AT_CHECK([FIONA -tequivalence bug6.f.og bug6.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 7])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug7.* .])
-AT_CHECK([WENDY bug7.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([FIONA -tequivalence bug7.og bug7.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY bug7.owfn --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY2FIONA -i bug7.og -o bug7.f.og])
+AT_CHECK([FIONA -tequivalence bug7.f.og bug7.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 8])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug8.* .])
-AT_CHECK([WENDY bug8.owfn --fionaFormat --og --verbose],0,ignore,stderr)
-AT_CHECK([FIONA -tequivalence bug8.og bug8.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY bug8.owfn --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY2FIONA -i bug8.og -o bug8.f.og])
+AT_CHECK([FIONA -tequivalence bug8.f.og bug8.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
 AT_SETUP([Bug 9])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug9.* .])
-AT_CHECK([WENDY bug9.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY bug9.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 13 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence bug9.og bug9.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i bug9.og -o bug9.f.og])
+AT_CHECK([FIONA -tequivalence bug9.f.og bug9.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
@@ -442,11 +418,12 @@ AT_CLEANUP
 AT_SETUP([Bug 13718 (https://gna.org/bugs/?13718)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug13718.owfn .])
-AT_CHECK([WENDY bug13718.owfn --verbose --og --formula=bits],0,ignore,stderr)
+AT_CHECK([WENDY bug13718.owfn --verbose --og],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 8 knowledges reachable" stderr])
-AT_CHECK([GREP -c ":: S" bug13718.og],0,[4
+AT_CHECK([CNF2BITS -i bug13718.og -o bug13718.bits.og])
+AT_CHECK([GREP -c ":: S" bug13718.bits.og],0,[4
 ])
-AT_CHECK([GREP -c ":: F" bug13718.og],0,[4
+AT_CHECK([GREP -c ":: F" bug13718.bits.og],0,[4
 ])
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -478,7 +455,7 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bug14025.owfn .])
 AT_CHECK([WENDY bug14025.owfn --verbose --dot --og --ignoreUnreceivedMessages],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 5 knowledges reachable" stderr])
-AT_CHECK([GREP -c "\->" bug14025.dot],0,[5
+AT_CHECK([GREP -c "\->" bug14025.dot],0,[6
 ])
 AT_KEYWORDS(bug)
 AT_CLEANUP
@@ -563,84 +540,93 @@ AT_CLEANUP
 AT_SETUP([BPM 2006, Section 6])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/06-03-23_BPM06_shop_sect_6.* .])
-AT_CHECK([WENDY 06-03-23_BPM06_shop_sect_6.owfn --og --fionaFormat --verbose],0,ignore,stderr)
+AT_CHECK([WENDY 06-03-23_BPM06_shop_sect_6.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 7 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence 06-03-23_BPM06_shop_sect_6.og 06-03-23_BPM06_shop_sect_6.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i 06-03-23_BPM06_shop_sect_6.og -o 06-03-23_BPM06_shop_sect_6.f.og])
+AT_CHECK([FIONA -tequivalence 06-03-23_BPM06_shop_sect_6.f.og 06-03-23_BPM06_shop_sect_6.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Coffee Automaton])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.* .])
-AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY myCoffee.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 7 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence myCoffee.og myCoffee.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i myCoffee.og -o myCoffee.f.og])
+AT_CHECK([FIONA -tequivalence myCoffee.f.og myCoffee.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
-AT_CHECK([WENDY phcontrol3.unf.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY phcontrol3.unf.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 67 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i phcontrol3.unf.og -o phcontrol3.unf.f.og])
+AT_CHECK([FIONA -tequivalence phcontrol3.unf.f.og phcontrol3.unf.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Purchase Order Process])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
-AT_CHECK([WENDY PO.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY PO.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 168 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence PO.og PO.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i PO.og -o PO.f.og])
+AT_CHECK([FIONA -tequivalence PO.f.og PO.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Sequence])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/sequence10.* .])
-AT_CHECK([WENDY sequence10.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY sequence10.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 1024 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence sequence10.og sequence10.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i sequence10.og -o sequence10.f.og])
+AT_CHECK([FIONA -tequivalence sequence10.f.og sequence10.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([SMTP Protocol])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smtp3.* .])
-AT_CHECK([WENDY smtp3.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY smtp3.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 474 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence smtp3.og smtp3.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i smtp3.og -o smtp3.f.og])
+AT_CHECK([FIONA -tequivalence smtp3.f.og smtp3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Travel Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/T2.* .])
-AT_CHECK([WENDY T2.owfn --fionaFormat --og --verbose --messagebound=2],0,ignore,stderr)
+AT_CHECK([WENDY T2.owfn --og --verbose --messagebound=2],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 192 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence T2.og T2.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i T2.og -o T2.f.og])
+AT_CHECK([FIONA -tequivalence T2.f.og T2.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([ZEUS Seller Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/zeus.* .])
-AT_CHECK([WENDY zeus.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY zeus.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 6 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence zeus.og zeus.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i zeus.og -o zeus.f.og])
+AT_CHECK([FIONA -tequivalence zeus.f.og zeus.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
 AT_CLEANUP
 
 AT_SETUP([Bit Annotation (T, S, F bits)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/bits.* .])
-AT_CHECK([WENDY bits.owfn --og --formula=bits --verbose],0,ignore,stderr)
-AT_CHECK([GREP -c ":: T" bits.og],0,[2
+AT_CHECK([WENDY bits.owfn --og --verbose],0,ignore,stderr)
+AT_CHECK([CNF2BITS -i bits.og -o bits.bits.og])
+AT_CHECK([GREP -c ":: T" bits.bits.og],0,[2
 ])
-AT_CHECK([GREP -c ":: F" bits.og],0,[1
+AT_CHECK([GREP -c ":: F" bits.bits.og],0,[1
 ])
-AT_CHECK([GREP -c ":: S" bits.og],0,[1
+AT_CHECK([GREP -c ":: S" bits.bits.og],0,[1
 ])
 AT_KEYWORDS(og)
 AT_CLEANUP
@@ -653,8 +639,9 @@ AT_BANNER([Smart Sending Event])
 AT_SETUP([Generic Example])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smartSendingEvent.* .])
-AT_CHECK([WENDY smartSendingEvent.owfn --og --fionaFormat --verbose],0,ignore,ignore)
-AT_CHECK([FIONA -tequivalence smartSendingEvent.og smartSendingEvent.fiona.og],0,stdout,ignore)
+AT_CHECK([WENDY smartSendingEvent.owfn --og --verbose],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i smartSendingEvent.og -o smartSendingEvent.f.og])
+AT_CHECK([FIONA -tequivalence smartSendingEvent.f.og smartSendingEvent.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
@@ -662,10 +649,11 @@ AT_CLEANUP
 AT_SETUP([BPM 2006, Section 6])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/06-03-23_BPM06_shop_sect_6.* .])
-AT_CHECK([WENDY 06-03-23_BPM06_shop_sect_6.owfn --og --fionaFormat --verbose],0,ignore,stderr)
+AT_CHECK([WENDY 06-03-23_BPM06_shop_sect_6.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 13 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 7 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence 06-03-23_BPM06_shop_sect_6.og 06-03-23_BPM06_shop_sect_6.fiona.og],0,stdout,ignore)
+AT_CHECK([WENDY2FIONA -i 06-03-23_BPM06_shop_sect_6.og -o 06-03-23_BPM06_shop_sect_6.f.og])
+AT_CHECK([FIONA -tequivalence 06-03-23_BPM06_shop_sect_6.f.og 06-03-23_BPM06_shop_sect_6.fiona.og],0,stdout,ignore)
 AT_CHECK([GREP -q "YES" stdout])
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
@@ -673,70 +661,77 @@ AT_CLEANUP
 AT_SETUP([Coffee Automaton])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.* .])
-AT_CHECK([WENDY myCoffee.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY myCoffee.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 8 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 7 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence myCoffee.og myCoffee.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i myCoffee.og -o myCoffee.f.og])
+AT_CHECK([FIONA -tequivalence myCoffee.f.og myCoffee.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/phcontrol3.unf.* .])
-AT_CHECK([WENDY phcontrol3.unf.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY phcontrol3.unf.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 67 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 67 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence phcontrol3.unf.og phcontrol3.unf.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i phcontrol3.unf.og -o phcontrol3.unf.f.og])
+AT_CHECK([FIONA -tequivalence phcontrol3.unf.f.og phcontrol3.unf.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 AT_SETUP([Purchase Order Process])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.* .])
-AT_CHECK([WENDY PO.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY PO.owfn  --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 168 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 168 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence PO.og PO.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i PO.og -o PO.f.og])
+AT_CHECK([FIONA -tequivalence PO.f.og PO.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 AT_SETUP([Sequence])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/sequence10.* .])
-AT_CHECK([WENDY sequence10.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY sequence10.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 1024 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 1024 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence sequence10.og sequence10.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i sequence10.og -o sequence10.f.og])
+AT_CHECK([FIONA -tequivalence sequence10.f.og sequence10.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 AT_SETUP([SMTP Protocol])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smtp3.* .])
-AT_CHECK([WENDY smtp3.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY smtp3.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 1358 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 474 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence smtp3.og smtp3.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i smtp3.og -o smtp3.f.og])
+AT_CHECK([FIONA -tequivalence smtp3.f.og smtp3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 AT_SETUP([Travel Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/T2.* .])
-AT_CHECK([WENDY T2.owfn --fionaFormat --og --verbose --messagebound=2],0,ignore,stderr)
+AT_CHECK([WENDY T2.owfn --og --verbose --messagebound=2],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 351 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 192 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence T2.og T2.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i T2.og -o T2.f.og])
+AT_CHECK([FIONA -tequivalence T2.f.og T2.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 
 AT_SETUP([ZEUS Seller Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/zeus.* .])
-AT_CHECK([WENDY zeus.owfn --fionaFormat --og --verbose],0,ignore,stderr)
+AT_CHECK([WENDY zeus.owfn --og --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: stored 6 knowledges" stderr])
 AT_CHECK([GREP -q "wendy: 6 knowledges reachable" stderr])
-AT_CHECK([FIONA -tequivalence zeus.og zeus.fiona.og],0,ignore,ignore)
+AT_CHECK([WENDY2FIONA -i zeus.og -o zeus.f.og])
+AT_CHECK([FIONA -tequivalence zeus.f.og zeus.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
 AT_CLEANUP
 

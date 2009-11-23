@@ -27,6 +27,8 @@ m4_define([MIA],                  [wrap.sh @MIA@])
 m4_define([MARLENE],              [wrap.sh @MARLENE@])
 m4_define([SA2SM],                [wrap.sh @SA2SM@])
 m4_define([LOLA],                 [@LOLA@])
+m4_define([WENDY2FIONA],          [wrap.sh @WENDY2FIONA@])
+m4_define([CNF2BITS],             [wrap.sh @CNF2BITS@])
 
 # Valgrind
 m4_define([VALGRIND],             [wrap.sh @VALGRIND@])

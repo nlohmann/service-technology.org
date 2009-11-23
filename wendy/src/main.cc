@@ -368,12 +368,7 @@ int main(int argc, char** argv) {
         if (args_info.og_given) {
             std::string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";
             Output output(og_filename, "operating guidelines");
-
-            if (args_info.fionaFormat_flag) {
-                StoredKnowledge::output_ogold(output);
-            } else {
-                StoredKnowledge::output_og(output);
-            }
+            StoredKnowledge::output_og(output);
 
             if (args_info.cover_given) {
                 std::string cover_filename = og_filename + ".cover";

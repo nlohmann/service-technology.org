@@ -247,12 +247,8 @@ Parameters given via command-line will overwrite parameters given via configurat
 
 @section Compatibility to Fiona
 
-@multitable @columnfractions .5 .5
-@headitem Wendy @tab Fiona
-@item @code{wendy net.owfn} @tab @code{fiona net.owfn -t OG -Q}
-@item @code{wendy net.owfn --og} @tab @code{fiona net.owfn -t OG -p no-dot}
-@item @code{wendy net.owfn --og --dot} @tab @code{fiona net.owfn -t OG -p no-png}
-@end multitable
+Since Wendy Version 2.6, direct support of Fiona's file format has been discontinued. Instead, a compiler @code{wendy2fiona} can translate Wendy's OG output into Fiona's file format.
+
 
 
 @c --------------------------------------------------------------------------
@@ -394,7 +390,7 @@ wendy: at most one input file must be given -- aborting [#04]
 @end smallexample
 
 @item #05
-@i{This parameter is deprecated since version 1.5.}
+@i{This error code is deprecated since version 1.5.}
 
 @item #06
 This error occurs in case Wendy could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{STATESPACE} mode, see @ref{Requirements}) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
@@ -434,14 +430,7 @@ wendy: message bound must be between 1 and 255 -- aborting [#09]
 @end smallexample
 
 @item #10
-The 2-bit annotations (@option{--formula=2bit}) currently do not support synchronous communication. Only operating guidelines with classical formulae (@option{--formula=dnf}) can be calculated if the open net uses synchronous communication.
-
-@smallexample
-@cartouche
-wendy: 2-bit annotations must not be used with
-       synchronous communication -- aborting [#10]
-@end cartouche
-@end smallexample
+@i{This parameter is deprecated since version 2.6.}
 
 @item #11
 Error opening a file to write. Usually, this error occurs in case Wendy is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola} or the generated cover constraint file @file{ogfile.cover}.

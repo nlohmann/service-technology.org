@@ -1,4 +1,16 @@
 AC_INIT(Wendy, 2.6-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+
+AC_MSG_NOTICE([__        __             _       ])
+AC_MSG_NOTICE([\ \      / /__ _ __   __| |_   _ ])
+AC_MSG_NOTICE([ \ \ /\ / / _ \ '_ \ / _` | | | |])
+AC_MSG_NOTICE([  \ V  V /  __/ | | | (_| | |_| |])
+AC_MSG_NOTICE([   \_/\_/ \___|_| |_|\__,_|\__, |])
+AC_MSG_NOTICE([                           |___/])
+AC_MSG_NOTICE([synthesizing partners for services])
+AC_MSG_NOTICE([http://service-technology.org/wendy])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -43,16 +55,28 @@ AH_BOTTOM([#ifdef __cplusplus
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
-# search for required tools
-AC_PATH_PROG(LOLA, [lola-statespace], [])
-AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version`]])
-
 # search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(SA2SM, [sa2sm], not found)
 AC_PATH_PROG(MARLENE, [marlene], not found)
 AC_PATH_PROG(MIA, [mia], not found)
+AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
+AC_PATH_PROG(CNF2BITS, [wendyFormula2bits], not found)
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
+
+# search for required tools
+AC_PATH_PROG(LOLA, [lola-statespace], [])
+if test "${LOLA}" = ""; then
+  AC_MSG_WARN([LoLA was not found. Please read file REQUIREMENTS!])
+else
+AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version`]])
+AC_MSG_CHECKING([LoLA version])
+AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
+if test "${ac_cv_path_LOLAVERSION}" != "LoLA 1.14"; then
+  AC_MSG_WARN([You have ${ac_cv_path_LOLAVERSION}, but Wendy needs LoLA 1.14!])
+  AC_MSG_WARN([See file REQUIREMENTS.])
+fi
+fi
 
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
@@ -76,12 +100,3 @@ AC_CONFIG_FILES([
 	tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
-
-# display a warning in case a required tool has not been found
-if test "${LOLA}" = ""; then
-  echo
-  echo "WARNING: Not all required tools have been found. Please read file"
-  echo "         REQUIREMENTS and edit the file src/wendy.conf before"
-  echo "         using or installing Wendy."
-  echo
-fi

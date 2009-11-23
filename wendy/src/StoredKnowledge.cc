@@ -739,111 +739,13 @@ void StoredKnowledge::output_og(std::ostream& file) {
     // print empty node unless we print an automaton
     if (not args_info.sa_given and emptyNodeReachable) {
          // the empty node
-        file << "  0";
-        if (args_info.formula_arg == formula_arg_cnf) {
-            file << " : true\n";
-        } else {
-            file << " :: T\n";
-        }
+        file << "  0 : true\n";
 
         // empty node loops
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             file << "    " << Label::id2name[l]  << " -> 0\n";
         }
     }
-}
-
-
-/*!
-  \param[in,out] file  the output stream to write the OG to
-
-  \note Fiona identifies node numbers by integers. To avoid numbering of
-        nodes, the pointers are casted to integers. Though ugly, it still is
-        a valid numbering.
-
-  \deprecated This is the old OG file format -- it is only kept here for
-              compatibility reasons and to test generated operating
-              guidelines.
- */
-void StoredKnowledge::output_ogold(std::ostream& file) {
-    fileHeader(file);
-    file << "INTERFACE\n";
-    file << "  INPUT\n";
-    bool first = true;
-    for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-        if (not first) {
-            file << ",\n";
-        }
-        first = false;
-        file << "    " << Label::id2name[l];
-    }
-    file << ";\n";
-
-    file << "  OUTPUT\n";
-    first = true;
-    for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (not first) {
-            file << ",\n";
-        }
-        first = false;
-        file << "    " << Label::id2name[l];
-    }
-    file << ";\n";
-
-    file << "\nNODES\n";
-
-    // the empty node
-    file << "  0 : true";
-
-    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        file << ",\n  " << reinterpret_cast<size_t>(*it) << " : " << (**it).formula();
-    }
-    file << ";\n\n";
-
-    file << "INITIALNODE\n  " << reinterpret_cast<size_t>(root) << ";\n\n";
-
-    file << "TRANSITIONS\n";
-    first = true;
-    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
-        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((**it).successors[l-1] != NULL and
-                (**it).successors[l-1] != empty and
-                (seen.find((**it).successors[l-1]) != seen.end())) {
-
-                if (first) {
-                    first = false;
-                } else {
-                    file << ",\n";
-                }
-                file << "  " << reinterpret_cast<size_t>(*it) << " -> "
-                    << reinterpret_cast<size_t>((**it).successors[l-1])
-                    << " : " << PREFIX(l) << Label::id2name[l];
-            } else {
-                // edges to the empty node
-                if ((**it).successors[l-1] == empty) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        file << ",\n";
-                    }
-                    file << "  " << reinterpret_cast<size_t>(*it) << " -> 0"
-                        << " : " << PREFIX(l) << Label::id2name[l];
-                }
-            }
-        }
-    }
-
-    // empty node loops
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        if (first) {
-            first = false;
-        } else {
-            file << ",\n";
-        }
-        file << "  0 -> 0 : " << PREFIX(l) << Label::id2name[l];
-    }
-
-    file << ";\n";
 }
 
 
@@ -865,19 +767,7 @@ void StoredKnowledge::print(std::ostream& file) const {
             }
         }
     } else {
-        switch (args_info.formula_arg) {
-            case(formula_arg_cnf): {
-                file << " : " << formula();
-                break;
-            }
-            case(formula_arg_bits): {
-                string form(bits());
-                if (form != "") {
-                    file << " :: " << form;
-                }
-                break;
-            }
-        }
+        file << " : " << formula();
     }
 
     file << "\n";
@@ -902,10 +792,12 @@ void StoredKnowledge::print(std::ostream& file) const {
 /*!
  \return a string representation of the formula
 
+ \param dot whether this formula should be drawn in dot mode
+
  \note This function is also used for an operating guidelines output for
        Fiona.
 */
-std::string StoredKnowledge::formula() const {
+std::string StoredKnowledge::formula(bool dot) const {
     set<string> sendDisjunction;
 
     // represents the formula (set of disjunctions which each are a set again)
@@ -914,11 +806,7 @@ std::string StoredKnowledge::formula() const {
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1]->is_sane) {
-            if (args_info.fionaFormat_flag) {
-                sendDisjunction.insert(PREFIX(l) + Label::id2name[l]);
-            } else {
-                sendDisjunction.insert(Label::id2name[l]);
-            }
+            sendDisjunction.insert(Label::id2name[l]);
         }
     }
 
@@ -936,12 +824,7 @@ std::string StoredKnowledge::formula() const {
             if (interface[i]->marked(l) and
                 successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
-
-                if (args_info.fionaFormat_flag) {
-                    disjunctionSendingReceivingSynchronous.insert(PREFIX(l) + Label::id2name[l]);
-                } else {
-                    disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
-                }
+                disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
             }
         }
 
@@ -951,11 +834,7 @@ std::string StoredKnowledge::formula() const {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
                 successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
-                if (args_info.fionaFormat_flag) {
-                    disjunctionSendingReceivingSynchronous.insert(PREFIX(l) + Label::id2name[l]);
-                } else {
-                    disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
-                }
+                disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
             }
         }
 
@@ -980,7 +859,7 @@ std::string StoredKnowledge::formula() const {
         // traverse the conjunctions to access the disjunctions
         for (set<set<string> >::iterator it = conjunctionOfDisjunctions.begin(); it != conjunctionOfDisjunctions.end(); ++it) {
             if (it != conjunctionOfDisjunctions.begin()) {
-                formula += " * ";
+                formula += (dot) ? " &and; " : " * ";
             }
             if (it->size() > 1) {
                 formula += "(";
@@ -988,7 +867,7 @@ std::string StoredKnowledge::formula() const {
             // get clause which contains !, ? or # events
             for (set<string>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
                 if (it2 != it->begin()) {
-                    formula += " + ";
+                    formula += (dot) ? " &or; " : " + ";
                 }
                 formula += *it2;
             }
@@ -1009,54 +888,6 @@ std::string StoredKnowledge::formula() const {
 
 
 /*!
- \return "T" if formula is true (no deadlocks), "S" if formula can only be
-         satisfied by sending events; "F" if formula contains the "final"
-         literal
-
- \pre  all markings are deadlocks
- \pre  the node is sane, i.e. "sane()" would return true
-
- \note If the net contains synchronous communication channels, the main
-       method already aborts with an error as the 2-bit annotations are not
-       defined in this case.
- */
-std::string StoredKnowledge::bits() const {
-    if (sizeDeadlockMarkings == 0) {
-        // the knowledge has no deadlock
-        return "T";
-    }
-
-    if (is_final) {
-        // the formula contains final
-        return "F";
-    }
-
-    // traverse the deadlocks
-    for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
-        bool resolved = false;
-
-        // check whether receiving resolves this deadlock
-        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
-            if (interface[i]->marked(l) and
-                successors[l-1] != NULL and successors[l-1] != empty and
-                successors[l-1]->is_sane) {
-                resolved = true;
-                break;
-            }
-        }
-
-        if (not resolved) {
-            // the deadlock can not be resolved by receiving -> must send
-            return "S";
-        }
-    }
-
-    // no bit needed
-    return "";
-}
-
-
-/*!
   \param[in,out] file  the output stream to write the dot representation to
 
   \note  The empty node has the number 0 and is only drawn if the command line
@@ -1069,18 +900,17 @@ void StoredKnowledge::output_dot(std::ostream& file) {
         << " node [fontname=\"Helvetica\" fontsize=10]\n"
         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
+    // create invisible node (in order to mark the initial state)
+    file << "INIT [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";
+    file << "INIT -> \"" << root << "\" [minlen=\"0.5\"]" << "\n";
+
     // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if ((it->second[i]->is_sane or args_info.diagnose_given) and
                 (seen.find(it->second[i]) != seen.end())) {
 
-                string formula;
-                switch (args_info.formula_arg) {
-                    case(formula_arg_cnf): formula = it->second[i]->formula(); break;
-                    case(formula_arg_bits): formula = it->second[i]->bits(); break;
-                }
-                file << "\"" << it->second[i] << "\" [label=\"" << formula << "\\n";
+                file << "\"" << it->second[i] << "\" [label=\"" << it->second[i]->formula(true) << "\\n";
 
                 if (args_info.diagnose_given and not it->second[i]->is_sane) {
                     file << "is not sane\\n";
@@ -1128,13 +958,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
     // draw the empty node if it is requested and reachable
     if (args_info.showEmptyNode_flag and emptyNodeReachable) {
-        file << "0 [label=\"";
-        if (args_info.formula_arg == formula_arg_cnf) {
-            file << "true";
-        } else {
-            file << "T";
-        }
-        file << "\"]\n";
+        file << "0 [label=\"true\"]\n";
 
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             file << "0 -> 0 [label=\"" << PREFIX(l) << Label::id2name[l] << "\"]\n";

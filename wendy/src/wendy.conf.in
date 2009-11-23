@@ -1,3 +1,14 @@
+#
+#                     __        __             _       
+#                     \ \      / /__ _ __   __| |_   _ 
+#                      \ \ /\ / / _ \ '_ \ / _` | | | |
+#                       \ V  V /  __/ | | | (_| | |_| |
+#                        \_/\_/ \___|_| |_|\__,_|\__, |
+#                                                |___/
+#                    synthesizing partners for services
+#                    http://service-technology.org/wendy
+#
+
 # Configuration file for @PACKAGE_STRING@
 # @configure_input@
 
@@ -9,11 +20,13 @@
 # Wendy needs a LoLA binary that builds complete unreduced state spaces. Such
 # a LoLA binary can be built by executing "make lola-statspace" using a recent
 # LoLA distribution, available at http://service-technology.org/files/lola.
+# See file REQUIREMENTS for more information.
 
 lola = @LOLA@
 
 # Wendy needs to create a temporary file to pass it to LoLA. The filename
 # Wendy should use can be specified below. The filename should end with
-# 'XXXXXX' which is replaced at runtime with a random string.
+# 'XXXXXX' which is replaced at runtime with a random string. In case you use
+# MinGW, path names are ignored and the basename is used instead.
 
 tmpfile = /tmp/wendy-XXXXXX

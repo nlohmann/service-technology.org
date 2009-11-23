@@ -1,6 +1,10 @@
 @heading Version 2.6-unreleased
 @itemize
 @item implemented user-defined data structure for the queue used in the closure operation
+
+@item discontinued deprecated output of operating guidelines in Fiona's file format (parameter @option{--fionaFormat}) -- this can be done with the compiler @code{wendy2fiona}
+
+@item discontinued output of bit operating guidelines (parameter @option{--formula=bits}) -- this can be done with the compiler @code{wendyFormula2bits}
 @end itemize
 
 

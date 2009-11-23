@@ -11,7 +11,7 @@
 #		files.h files.cc \
 #		verbose.h verbose.cc \
 #		lindaAgent.h lindaAgent.cc \
-#		eventTermParser.h eventTermParser.cc 
+#		eventTermParser.h eventTermParser.cc
 
 #liblinda_la_LIBADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
 #liblinda_la_CPPFLAGS = -I$(top_srcdir)/libs/lp_solve
@@ -42,7 +42,8 @@ linda_SOURCES = main.cc \
 		files.h files.cc \
 		verbose.h verbose.cc \
 		lindaAgent.h lindaAgent.cc \
-		eventTermParser.h eventTermParser.cc 
+		eventTermParser.h eventTermParser.cc \
+		staticAnalysis.h staticAnalysis.cc
 
 linda_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
 linda_CPPFLAGS = -I$(top_srcdir)/libs/lp_solve

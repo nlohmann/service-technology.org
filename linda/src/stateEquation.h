@@ -9,7 +9,7 @@
 /// A data structure for the extended state equation of an open net.
 class ExtendedStateEquation {
 public:
-	static BinaryTree<const pnapi::Place*,std::pair<int*,REAL*> >* lines; //!< For the analyzed open net, those are the place<->transition lines in the equation system.
+	static BinaryTree<const pnapi::Place*,std::pair<int, std::pair<int*,REAL*> > >* lines; //!< For the analyzed open net, those are the place<->transition lines in the equation system.
 	static std::pair<int*,REAL*>* eventLines; //!< For the analyzed open net, those are the event lines in the equation system.
 	static BinaryTree<pnapi::Transition*, unsigned int>* transitionID; //!< Quick transition referencing.
 

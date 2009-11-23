@@ -5,9 +5,9 @@
 extern gengetopt_args_info args_info;
 
 /// Initialize the static members.
-BinaryTree<const pnapi::Place*, std::pair<int*, REAL*> >
+BinaryTree<const pnapi::Place*, std::pair<int, std::pair<int*, REAL*> > >
 		* ExtendedStateEquation::lines = new BinaryTree<const pnapi::Place*,
-				std::pair<int*, REAL*> > ();
+				std::pair< int, std::pair<int*, REAL*>  > > ();
 std::pair<int*, REAL*>* ExtendedStateEquation::eventLines = 0;
 BinaryTree<pnapi::Transition*, unsigned int>
 		* ExtendedStateEquation::transitionID = 0;
@@ -73,25 +73,26 @@ bool ExtendedStateEquation::constructLP() {
 				place->getPresetArcs().size() + place->getPostsetArcs().size();
 
 		// See if this line was already created before (and thus is stored in the static member).
-		BinaryTreeNode<const pnapi::Place*, std::pair<int*, REAL*> >* line =
+		BinaryTreeNode<const pnapi::Place*, std::pair<int , std::pair<int*, REAL*> > >* line =
 				lines->find(place);
+
+		// Counter for the columns with values.
+		int tr = 0;
 
 		// If the line did not exist before...
 		if (line == 0) {
+
 
 			// Allocate memory for the arrays
 			transCol = new int[number_of_transitions_for_this_place]();
 			transVal = new REAL[number_of_transitions_for_this_place]();
 
-			// Just a counter.
-			int tr = 0;
 
 			// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
 			for (std::set<pnapi::Arc *>::iterator pIt =
 					place->getPresetArcs().begin(); pIt
 					!= place->getPresetArcs().end(); ++pIt) {
 
-				assert(*pIt != NULL);
 				pnapi::Transition& t = (*pIt)->getTransition();
 
 				// We add the transition, with the weight as a factor.
@@ -106,23 +107,35 @@ bool ExtendedStateEquation::constructLP() {
 					place->getPostsetArcs().begin(); pIt
 					!= place->getPostsetArcs().end(); ++pIt) {
 
-				assert(*pIt != NULL);
 				pnapi::Transition& t = (*pIt)->getTransition();
+				if (place->getPreset().find(&t) != place->getPreset().end()) {
+					int thisID = START_TRANSITIONS + transitionID->find(&t)->value;
+					for (int i = 0; i < tr; ++i) {
+						if (transCol[i] == thisID) {
+							transVal[i] +=  -1 * (int) (*pIt)->getWeight();
+						}
+					}
+
+				} else {
 
 				// We add the transition, with the weight as a factor.
 				transCol[tr] = START_TRANSITIONS
 						+ transitionID->find(&t)->value;
 				transVal[tr] = -1 * (int) (*pIt)->getWeight();
+
 				++tr;
+
+				}
 			}
 
 			// Store this line for further use in the static member
-			lines->insert(place, std::pair<int*, REAL*>(transCol, transVal),
+			lines->insert(place, std::pair<int, std::pair<int*, REAL*> > (tr, std::pair<int*, REAL*>(transCol, transVal)),
 					false);
 
 		} else { // The line already exist, we just set our pointers to those in the static member
-			transCol = line->value.first;
-			transVal = line->value.second;
+			tr = line->value.first;
+			transCol = line->value.second.first;
+			transVal = line->value.second.second;
 		}
 
 		// Find the difference between initial and final marking for this place (and final marking)
@@ -133,7 +146,7 @@ bool ExtendedStateEquation::constructLP() {
 		// Add the row to the linear program (name of lp, number of columns affected, the columns affected,
 		//                                    the values for each affected column, the comparison operator,
 		//                                    the right hand side value.)
-		add_constraintex(lp, number_of_transitions_for_this_place, transVal,
+		add_constraintex(lp, tr, transVal,
 				transCol, EQ, diffval);
 	}
 
@@ -212,6 +225,9 @@ bool ExtendedStateEquation::constructLP() {
 
 	// We find that the linear program is infeasible, so we do not take it into account anymore and return false.
 	if (!isFeasible) {
+
+		print_lp(lp);
+
 		std::cerr << "Final marking not reachable from initial marking:"
 				<< std::endl;
 		std::cerr << "\t";

@@ -6,6 +6,7 @@
 #include <sstream>
 #include "cmdline.h"
 #include "helpers.h"
+#include "staticAnalysis.h"
 #include "setsOfFinalMarkings.h"
 #include "eventTerm.h"
 #include "stateEquation.h"
@@ -173,11 +174,14 @@ int main(int argc, char** argv) {
 	// Verbose output of the number of linear programs created
 	status("Number of lp systems: %i", fSet->size());
 
+
+	// MODE Structural Analysis
+	// For each found t-invariant, we check a number of terms.
 	if (args_info.structure_flag) {
 		// Calculate t-invariants
 		FlowMatrix f(net);
 		f.computeTInvariants();
-		f.output();
+//		f.output();
 		f.createTerms();
 
 		// For each system, evaluate all event terms
@@ -193,6 +197,7 @@ int main(int argc, char** argv) {
 			}
 
 		}
+
 	}
 
 

@@ -2,6 +2,7 @@
 #define _GRAPH_H
 
 #include <map>
+#include <stdio.h>
 #include "Node.h"
 #include "types.h"
 

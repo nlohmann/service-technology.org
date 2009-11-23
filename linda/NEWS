@@ -10,6 +10,9 @@
 Version 0.6-unreleased
 ======================
 
+* Added mode "-structure": Chooses terms for profile creation from
+  t-invariants.
+
 * Added an option for output file creation.
 
 * Removed random event term mode (-r).

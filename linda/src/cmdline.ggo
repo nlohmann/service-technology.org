@@ -13,6 +13,10 @@ option "level-0" 0
 option "level-1" 1
   "Level 1 Message Profile"
   flag off
+
+option "structure" s
+  "Message Profile from structural analysis (atm: t-invariants)"
+  flag off
   
 option "file" f
   "Message Profile from a term file"

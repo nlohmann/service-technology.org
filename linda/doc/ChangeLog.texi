@@ -1,5 +1,6 @@
 @heading Version 0.6-unreleased
 @itemize
+@item Added mode "--structure": Chooses terms for profile creation from t-invariants.
 @item Added an option for output file creation.
 @item Removed random event term mode (-r).
 @item Code refactoring towards more efficient data structures.

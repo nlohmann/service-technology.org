@@ -112,16 +112,21 @@ int main(int argc, char** argv) {
 	LindaHelpers::NR_OF_EVENTS = net->getInterfacePlaces().size();
 	LindaHelpers::EVENT_STRINGS = new std::string[LindaHelpers::NR_OF_EVENTS]();
 	LindaHelpers::EVENT_PLACES
-			= new pnapi::Place*[LindaHelpers::NR_OF_EVENTS]();
+	= new pnapi::Place*[LindaHelpers::NR_OF_EVENTS]();
 
 	int counter = 0;
 	for (std::set<pnapi::Place *>::iterator it =
-			net->getInterfacePlaces().begin(); it
-			!= net->getInterfacePlaces().end(); ++it) {
+		net->getInterfacePlaces().begin(); it
+		!= net->getInterfacePlaces().end(); ++it) {
 		LindaHelpers::EVENT_STRINGS[counter] = (*it)->getName();
 		LindaHelpers::EVENT_PLACES[counter] = (*it);
 		++counter;
 	}
+
+
+
+
+
 
 	// Calculate the final markings from the final condition
 
@@ -134,8 +139,8 @@ int main(int argc, char** argv) {
 
 	status("Computed final markings:");
 	for (std::vector<PartialMarking*>::iterator finalMarkingIt =
-			fSet->partialMarkings.begin(); finalMarkingIt
-			!= fSet->partialMarkings.end(); ++finalMarkingIt) {
+		fSet->partialMarkings.begin(); finalMarkingIt
+		!= fSet->partialMarkings.end(); ++finalMarkingIt) {
 		status("    %s", (*finalMarkingIt)->toString().c_str());
 	}
 
@@ -168,6 +173,31 @@ int main(int argc, char** argv) {
 	// Verbose output of the number of linear programs created
 	status("Number of lp systems: %i", fSet->size());
 
+	if (args_info.structure_flag) {
+		// Calculate t-invariants
+		FlowMatrix f(net);
+		f.computeTInvariants();
+		f.output();
+		f.createTerms();
+
+		// For each system, evaluate all event terms
+		for (int i = 0; i < fSet->size(); ++i) {
+
+			status("    Processing final marking: %s",
+					fSet->partialMarkings[i]->toString().c_str());
+
+			ListElement<EventTerm*>* currentTerm = f.terms;
+			while (currentTerm != 0) {
+				EventTermBound* b = systems[i]->evaluate(currentTerm->element);
+				currentTerm = currentTerm->next;
+			}
+
+		}
+	}
+
+
+
+
 	// MODE Level 0 Message Profile
 	// We evaluate a term (1*a) for each event (a).
 	if (args_info.level_0_flag) {
@@ -196,7 +226,7 @@ int main(int argc, char** argv) {
 		message("Evaluating mutual exclusion terms.");
 		status("Number of mutual exclsion terms: %i",
 				(LindaHelpers::NR_OF_EVENTS * LindaHelpers::NR_OF_EVENTS)
-						- LindaHelpers::NR_OF_EVENTS);
+				- LindaHelpers::NR_OF_EVENTS);
 
 		// Iterate over the finalmarkings/lps
 		for (int x = 0; x < fSet->size(); ++x) {
@@ -250,7 +280,7 @@ int main(int argc, char** argv) {
 
 			// For each parsed event term...
 			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it
-					!= term_vec->end(); ++it) {
+			!= term_vec->end(); ++it) {
 				EventTermBound* b = systems[i]->evaluate((*it));
 			}
 		}
@@ -293,7 +323,7 @@ int main(int argc, char** argv) {
 
 				// For each term...
 				for (std::vector<EventTermConstraint*>::iterator it =
-						constraint_vec->begin(); it != constraint_vec->end(); ++it) {
+					constraint_vec->begin(); it != constraint_vec->end(); ++it) {
 					// Evaluate the term
 					EventTermBound* b = systems[i]->evaluate(
 							(*it)->getEventTerm());

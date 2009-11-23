@@ -17,6 +17,16 @@ class LindaHelpers {
 public:
 	/// A function creating a string of an integer.
 	static const std::string intToStr(const int);
+	static int abs(int i) {
+		if (i < 0) return -1*i;
+		return i;
+	}
+
+	static std::string fillup(std::string s, int len) {
+		std::string result = string(len-s.length(), ' ');
+		return s + result;
+	}
+
 	static void initialize();
 
 	static int NR_OF_EVENTS; //!< The number of events in the analyzed open nets.
@@ -186,6 +196,167 @@ public:
 	ValueType getValue() {
 		return current->value;
 	}
+
+};
+
+
+template <class ElemType>
+class ListElement {
+public:
+	ListElement<ElemType>* prev;
+	ListElement<ElemType>* next;
+	ElemType element;
+	ListElement<ElemType>(ElemType element, ListElement<ElemType>* prev, ListElement<ElemType>* next) {
+		this->element = element;
+		this->prev = prev;
+		this->next = next;
+	}
+	bool hasPrev() {
+		return prev != 0;
+	}
+	bool hasNext() {
+		return next != 0;
+	}
+
+};
+
+class EventTerm;
+
+class FlowMatrix {
+public:
+	FlowMatrix(pnapi::PetriNet* net) {
+		nrOfTerms = 0;
+		terms = 0;
+		this->net = net;
+		root = 0;
+		last = 0;
+		width = net->getInternalPlaces().size() + net->getInterfacePlaces().size();
+		int index = 0;
+		maxNameLen = 0;
+
+		for (std::set<pnapi::Place*>::iterator eventIt = net->getInterfacePlaces().begin(); eventIt != net->getInterfacePlaces().end(); ++eventIt) {
+			int nameLen = (*eventIt)->getName().length();
+			if (maxNameLen < nameLen) {
+				maxNameLen = nameLen;
+			}
+		}
+
+		for (std::set<pnapi::Transition*>::iterator transIt = net->getTransitions().begin(); transIt != net->getTransitions().end(); ++transIt) {
+//			std::cerr << " " << (*transIt)->getName() << " ";
+
+			int* currentRow = new int[width];
+
+			int count = 0;
+
+/*			while (count < net->getTransitions().size()) {
+				if (count == index) {
+					currentRow[count++] = 1;
+				} else {
+					currentRow[count++] = 0;
+				}
+
+			}
+*/
+
+			for (std::set<pnapi::Place*>::iterator placeIt = net->getInterfacePlaces().begin(); placeIt != net->getInterfacePlaces().end(); ++placeIt) {
+							pnapi::Place* p = (*placeIt);
+			//				std::cout << count << std::endl;
+							int inPre = 0;
+							int inPost = 0;
+							if (p->getPreset().find((*transIt)) != p->getPreset().end()) {
+								inPre = 1;
+			//					std::cout << "Transition " << (*transIt)->getName() << " in preset of place " << p->getName() << std::endl;
+							}
+							if (p->getPostset().find((*transIt)) != p->getPostset().end()) {
+								inPost = 1;
+			//					std::cout << "Transition " << (*transIt)->getName() << " in postset of place " << p->getName() << std::endl;
+							}
+			//				std::cout  << count << ":" << inPre - inPost << std::endl;
+							currentRow[count] = inPre + inPost;
+			//				currentRow[count] = 1001;
+							++count;
+			}
+
+
+
+			for (std::set<pnapi::Place*>::iterator placeIt = net->getInternalPlaces().begin(); placeIt != net->getInternalPlaces().end(); ++placeIt) {
+				pnapi::Place* p = (*placeIt);
+//				std::cout << count << std::endl;
+				int inPre = 0;
+				int inPost = 0;
+				if (p->getPreset().find((*transIt)) != p->getPreset().end()) {
+					inPre = 1;
+//					std::cout << "Transition " << (*transIt)->getName() << " in preset of place " << p->getName() << std::endl;
+				}
+				if (p->getPostset().find((*transIt)) != p->getPostset().end()) {
+					inPost = 1;
+//					std::cout << "Transition " << (*transIt)->getName() << " in postset of place " << p->getName() << std::endl;
+				}
+//				std::cout  << count << ":" << inPre - inPost << std::endl;
+				currentRow[count] = inPre - inPost;
+//				currentRow[count] = 1001;
+				++count;
+			}
+
+			ListElement<int*>* currentElement = new ListElement<int*>(currentRow,last,0);
+
+/*			for (int i = 0; i < width; ++i) {
+							std::cerr << " " << currentRow[i] << "/";
+							std::cerr << " " << currentElement->element[i] << "\t";
+						}
+						std::cerr << std::endl;
+*/
+			if (root == 0) {
+				root = currentElement;
+			} else {
+				last->next = currentElement;
+			}
+			last = currentElement;
+			++index;
+
+		}
+	}
+
+	ListElement<int*>* root;
+	ListElement<int*>* last;
+	pnapi::PetriNet* net;
+
+	int width;
+	int maxNameLen;
+
+	void createTerms();
+
+	ListElement<EventTerm*>* terms;
+	int nrOfTerms;
+
+
+	void output() {
+/*		for (std::set<pnapi::Transition*>::iterator transIt = net->getTransitions().begin(); transIt != net->getTransitions().end(); ++transIt) {
+
+
+		std::cerr << LindaHelpers::fillup((*transIt)->getName(),maxNameLen+2);
+
+		}
+*/
+
+
+		for (std::set<pnapi::Place*>::iterator eventIt = net->getInterfacePlaces().begin(); eventIt != net->getInterfacePlaces().end(); ++eventIt) {
+				std::cerr << LindaHelpers::fillup((*eventIt)->getName(),maxNameLen+2);
+		}
+
+
+		std::cerr << std::endl;
+		ListElement<int*>* current = root;
+		while (current != 0) {
+			for (int i = 0; i < width; ++i) {
+				std::cerr << LindaHelpers::fillup(LindaHelpers::intToStr(current->element[i]), maxNameLen+2);
+			}
+			std::cerr << std::endl;
+			current = current->next;
+		}
+	}
+
+	void computeTInvariants();
 
 };
 

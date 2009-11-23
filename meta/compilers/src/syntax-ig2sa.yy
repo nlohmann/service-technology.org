@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Fiona2wendy -- compiling Fiona OGs to Wendy OGs
+ IG2SA -- compiling Fiona IGs to Wendy SAs
 
  Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
 
- Fiona2wendy is free software: you can redistribute it and/or modify it under the
+ IG2SA is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Fiona2wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ IG2SA is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Fiona2wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with IG2SA.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
 
@@ -32,7 +32,6 @@ extern std::ostream* myOut;
 extern char* yytext;
 extern int yylex();
 extern int yyerror(char const *msg);
-extern int colonCount;
 
 // data structures
 // initial node ID
@@ -59,7 +58,7 @@ std::map<unsigned int, bool> finalNodes;
 
 %token K_INTERFACE K_INPUT K_OUTPUT K_NODES K_INITIALNODE K_TRANSITIONS
 %token COMMA SEMICOLON COLON ARROW
-%token K_FINAL K_TRUE K_FALSE SEND RECEIVE SYNCHRONOUS LPAR RPAR 
+%token K_FINAL SEND RECEIVE SYNCHRONOUS
 %token IDENT NUMBER
 
 %left OP_AND OP_OR
@@ -80,7 +79,6 @@ std::map<unsigned int, bool> finalNodes;
 og: 
   K_INTERFACE
   { 
-    colonCount = 0; // initialize for flex
     interfaceOutput = true;
     (*myOut) << "INTERFACE\n  INPUT\n    ";
   }
@@ -167,24 +165,13 @@ node:
     succ[$1]; // add node to list
     nodeID = $1;
   }
-  COLON formula colon
+  finalnode
 ;
 
-colon:
-  COLON
-| COLON COLON
-;
-
-formula:
-  LPAR formula RPAR
-| formula OP_AND formula
-| formula OP_OR formula
-| K_FINAL { finalNodes[nodeID] = true; }
-| K_TRUE
-| K_FALSE
-| SEND IDENT { free($2); }
-| RECEIVE IDENT { free($2); }
-| SYNCHRONOUS IDENT { synchronous.insert($2); free($2); }
+finalnode:
+  /* empty */
+| K_FINAL
+  { finalNodes[nodeID] = true; }
 ;
 
 transitions:

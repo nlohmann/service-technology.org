@@ -4,103 +4,183 @@ AT_INIT
 AT_BANNER([Standard Options])
 ############################################################################
 
-AT_SETUP([Help output (fiona2wendy)])
-AT_CHECK([FIONA2WENDY --help],0,ignore)
-AT_KEYWORDS(basic)
+m4_define([TEST_OPTIONS], [AT_CHECK([TOOL --help],0,ignore)
+                           AT_KEYWORDS(basic)])
+m4_define([TEST_VERSION], [AT_CHECK([TOOL --version],0,ignore)
+                           AT_KEYWORDS(basic)])
+
+
+AT_SETUP([Help output (Fiona2Wendy)])
+m4_define([TOOL], [FIONA2WENDY])
+TEST_OPTIONS
 AT_CLEANUP
 
-AT_SETUP([Help output (wendy2fiona)])
-AT_CHECK([WENDY2FIONA --help],0,ignore)
-AT_KEYWORDS(basic)
+AT_SETUP([Help output (Wendy2Fiona)])
+m4_define([TOOL], [WENDY2FIONA])
+TEST_OPTIONS
 AT_CLEANUP
 
-AT_SETUP([Version output (fiona2wendy)])
-AT_CHECK([FIONA2WENDY --version],0,ignore)
-AT_KEYWORDS(basic)
+AT_SETUP([Help output (WendyFormula2Bits)])
+m4_define([TOOL], [WENDYFORMULA2BITS])
+TEST_OPTIONS
 AT_CLEANUP
 
-AT_SETUP([Version output (wendy2fiona)])
-AT_CHECK([WENDY2FIONA --version],0,ignore)
-AT_KEYWORDS(basic)
+AT_SETUP([Help output (ig2sa)])
+m4_define([TOOL], [IG2SA])
+TEST_OPTIONS
 AT_CLEANUP
+
+AT_SETUP([Help output (sa2ig)])
+m4_define([TOOL], [SA2IG])
+TEST_OPTIONS
+AT_CLEANUP
+
+
+AT_SETUP([Version output (Fiona2Wendy)])
+m4_define([TOOL], [FIONA2WENDY])
+TEST_VERSION
+AT_CLEANUP
+
+AT_SETUP([Version output (Wendy2Fiona)])
+m4_define([TOOL], [WENDY2FIONA])
+TEST_VERSION
+AT_CLEANUP
+
+AT_SETUP([Version output (WendyFormula2Bits)])
+m4_define([TOOL], [WENDYFORMULA2BITS])
+TEST_VERSION
+AT_CLEANUP
+
+AT_SETUP([Version output (ig2sa)])
+m4_define([TOOL], [IG2SA])
+TEST_VERSION
+AT_CLEANUP
+
+AT_SETUP([Version output (sa2ig)])
+m4_define([TOOL], [SA2IG])
+TEST_VERSION
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Fiona <-> Wendy])
 ############################################################################
 
-AT_SETUP([Syntax Example 1])
+m4_define([TEST_F2W2F], [AT_CHECK([cp TESTFILES/NET .])
+                         AT_CHECK([FIONA -s empty -t og NET], 0, ignore, ignore)
+                         AT_CHECK([mv NET.og NET.2.og])
+                         AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
+                         AT_CHECK([FIONA2WENDY --input=NET.og --output=NET.w.og], 0, ignore, stderr)
+                         AT_CHECK([GREP -q "empty-node created" stderr])
+                         AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
+                         AT_CHECK([FIONA -t equivalence NET.2.og NET.f.og], 0, ignore, ignore)
+                         AT_KEYWORDS(fiona wendy)])
+
+m4_define([TEST_W2F], [AT_CHECK([cp TESTFILES/NET .])
+                       AT_CHECK([FIONA -s empty -t og NET], 0, ignore, ignore)
+                       AT_CHECK([WENDY --og=NET.w.og NET], 0, ignore, ignore)
+                       AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
+                       AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
+                       AT_KEYWORDS(fiona wendy)])
+
+m4_define([TEST_F2W2F_E], [AT_CHECK([cp TESTFILES/NET .])
+                           AT_CHECK([FIONA -s empty -t og NET], 0, ignore, ignore)
+                           AT_CHECK([FIONA2WENDY --input=NET.og --output=NET.w.og])
+                           AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
+                           AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
+                           AT_KEYWORDS(fiona wendy empty)])
+
+m4_define([TEST_F2W2F_S], [AT_CHECK([cp TESTFILES/NET.fiona.og .])
+                           AT_CHECK([FIONA2WENDY --input=NET.fiona.og --output=NET.wendy.og])
+                           AT_CHECK([WENDY2FIONA --input=NET.wendy.og --output=NET.fiona.2.og])
+                           AT_CHECK([FIONA -t equivalence NET.fiona.og NET.fiona.2.og], 0, ignore, ignore)
+                           AT_KEYWORDS(fiona wendy synchronous)])
+
+
+AT_SETUP([Fiona->Wendy->Fiona (Syntax Example)])
 m4_define([NET], [syntax_example.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([FIONA -s empty -t og NET], 0, ignore, ignore)
-AT_CHECK([mv NET.og NET.2.og])
-AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
-AT_CHECK([FIONA2WENDY --input=NET.og --output=NET.w.og], 0, ignore, stderr)
-AT_CHECK([GREP -q "empty-node created" stderr])
-AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
-AT_CHECK([FIONA -t equivalence NET.2.og NET.f.og], 0, ignore, ignore)
-AT_KEYWORDS(fiona wendy)
+TEST_F2W2F
 AT_CLEANUP
 
-AT_SETUP([Syntax Example 2])
-m4_define([NET], [syntax_example.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([FIONA -s empty -t og NET], 0, ignore, ignore)
-AT_CHECK([WENDY --og=NET.w.og NET], 0, ignore, ignore)
-AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
-AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
-AT_KEYWORDS(fiona wendy)
+AT_SETUP([Fiona->Wendy->Fiona (Coffee)])
+m4_define([NET], [myCoffee.owfn])
+TEST_F2W2F
 AT_CLEANUP
 
-AT_SETUP([Fiona with Empty Node])
+AT_SETUP([Fiona->Wendy->Fiona (Zeus)])
+m4_define([NET], [zeus.owfn])
+TEST_F2W2F
+AT_CLEANUP
+
+AT_SETUP([Wendy->Fiona (Syntax Example)])
 m4_define([NET], [syntax_example.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([FIONA -s empty -t og NET], 0, ignore, ignore)
-AT_CHECK([FIONA2WENDY --input=NET.og --output=NET.w.og])
-AT_CHECK([WENDY2FIONA --input=NET.w.og --output=NET.f.og])
-AT_CHECK([FIONA -t equivalence NET.og NET.f.og], 0, ignore, ignore)
-AT_KEYWORDS(fiona wendy)
+TEST_W2F
+AT_CLEANUP
+
+AT_SETUP([Wendy->Fiona (Coffee)])
+m4_define([NET], [myCoffee.owfn])
+TEST_W2F
+AT_CLEANUP
+
+AT_SETUP([Wendy->Fiona (Zeus)])
+m4_define([NET], [zeus.owfn])
+TEST_W2F
+AT_CLEANUP
+
+AT_SETUP([Fiona with Empty Node (Syntax Example)])
+m4_define([NET], [syntax_example.owfn])
+TEST_F2W2F_E
+AT_CLEANUP
+
+AT_SETUP([Fiona with Empty Node (Coffee)])
+m4_define([NET], [myCoffee.owfn])
+TEST_F2W2F_E
+AT_CLEANUP
+
+AT_SETUP([Fiona with Empty Node (Zeus)])
+m4_define([NET], [zeus.owfn])
+TEST_F2W2F_E
 AT_CLEANUP
 
 AT_SETUP([Synchronous Fiona OG])
 m4_define([NET], [synchronous])
-AT_CHECK([cp TESTFILES/NET.fiona.og .])
-AT_CHECK([FIONA2WENDY --input=NET.fiona.og --output=NET.wendy.og])
-AT_CHECK([WENDY2FIONA --input=NET.wendy.og --output=NET.fiona.2.og])
-AT_CHECK([FIONA -t equivalence NET.fiona.og NET.fiona.2.og], 0, ignore, ignore)
-AT_KEYWORDS(fiona wendy synchronous)
+TEST_F2W2F_S
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Wendy: CNF OG -> Bit OG])
 ############################################################################
 
+m4_define([TEST_CNF2B], [AT_CHECK([cp TESTFILES/NET .])
+                         AT_CHECK([WENDY --og=NET.c.og --formula=cnf NET], 0, ignore, ignore)
+                         AT_CHECK([WENDYFORMULA2BITS --input=NET.c.og --output=NET.b.og])
+                         AT_CHECK([SAYO --input=NET.b.og --output=NET.sa])
+                         AT_CHECK([SA2SM NET.sa NET.owfn])
+                         AT_CHECK([FIONA -t og NET.owfn], 0, ignore, ignore)
+                         AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
+                         AT_CHECK([FIONA -t equivalence NET.og NET.owfn.og], 0, ignore, ignore)
+                         AT_KEYWORDS(wendy formula bit)])
+
+
 AT_SETUP([Syntax Example])
 m4_define([NET], [syntax_example.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([WENDY --og=NET.og --formula=cnf NET], 0, ignore, ignore)
-AT_CHECK([WENDYFORMULA2BITS --input=NET.og --output=NET.b.og])
-AT_CHECK([SAYO --input=NET.b.og --output=NET.sa])
-AT_CHECK([SA2SM NET.sa NET.owfn])
-AT_CHECK([WENDY --og=NET.owfn.og --fionaFormat NET.owfn], 0, ignore, ignore)
-AT_CHECK([WENDY --og=NET.f.og --fionaFormat NET], 0, ignore, ignore)
-AT_CHECK([FIONA -t equivalence NET.f.og NET.owfn.og], 0, ignore, ignore)
-AT_KEYWORDS(wendy formula bit)
+TEST_CNF2B
+AT_CLEANUP
+
+AT_SETUP([Coffee])
+m4_define([NET], [myCoffee.owfn])
+TEST_CNF2B
+AT_CLEANUP
+
+AT_SETUP([Zeus])
+m4_define([NET], [zeus.owfn])
+TEST_CNF2B
 AT_CLEANUP
 
 AT_SETUP([S-Bit])
 m4_define([NET], [bit_s.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([WENDY --og=NET.bit.og --formula=bits NET], 0, ignore, ignore)
-AT_CHECK([WENDY --og=NET.cnf.og --formula=cnf NET], 0, ignore, ignore)
-AT_CHECK([WENDYFORMULA2BITS --input=NET.cnf.og --output=NET.cnf.b.og], 0, ignore, ignore)
-AT_CHECK([SAYO --input=NET.bit.og --output=NET.bit.sa], 0, ignore, ignore)
-AT_CHECK([SAYO --input=NET.cnf.b.og --output=NET.cnf.sa], 0, ignore, ignore)
-AT_CHECK([SA2SM NET.bit.sa NET.bit.owfn], 0, ignore, ignore)
-AT_CHECK([SA2SM NET.cnf.sa NET.cnf.owfn], 0, ignore, ignore)
-AT_CHECK([WENDY --og=NET.bit.owfn.og --fionaFormat NET.bit.owfn], 0, ignore, ignore)
-AT_CHECK([WENDY --og=NET.cnf.owfn.og --fionaFormat NET.cnf.owfn], 0, ignore, ignore)
-AT_CHECK([FIONA -t equivalence NET.cnf.owfn.og NET.bit.owfn.og], 0, ignore, ignore)
-AT_KEYWORDS(wendy formula bit)
+TEST_CNF2B
 AT_CLEANUP
 
 
@@ -108,16 +188,53 @@ AT_CLEANUP
 AT_BANNER([IG <-> SA])
 ############################################################################
 
-AT_SETUP([Syntax Example])
+m4_define([TEST_IG2SA], [AT_CHECK([cp TESTFILES/NET .])
+                         AT_CHECK([FIONA -t ig NET], 0, ignore, ignore)
+                         AT_CHECK([IG2SA --input=NET.ig.og --output=NET.sa])
+                         AT_CHECK([SA2SM NET.sa NET.owfn])
+                         AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
+                         AT_CHECK([FIONA -t og NET.owfn], 0, ignore, ignore)
+                         AT_CHECK([FIONA -t equivalence NET.og NET.owfn.og], 0, ignore, ignore)
+                         AT_KEYWORDS(ig sa)])
+
+m4_define([TEST_SA2IG], [AT_CHECK([cp TESTFILES/NET .])
+                         AT_CHECK([PETRI -osa NET], 0, ignore, ignore)
+                         AT_CHECK([SA2IG --input=NET.sa --output=NET.ig.og], 0, ignore, ignore)
+                         AT_CHECK([IG2SA --input=NET.ig.og --output=NET.2.sa])
+                         AT_CHECK([SA2SM NET.2.sa NET.owfn])
+                         AT_CHECK([FIONA -t og NET], 0, ignore, ignore)
+                         AT_CHECK([FIONA -t og NET.owfn], 0, ignore, ignore)
+                         AT_CHECK([FIONA -t equivalence NET.og NET.owfn.og], 0, ignore, ignore)
+                         AT_KEYWORDS(ig sa)])
+
+
+AT_SETUP([IG->SA (Syntax Example)])
 m4_define([NET], [syntax_example.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([FIONA -t ig NET], 0, ignore, ignore)
-AT_CHECK([IG2SA --input=NET.ig.og --output=NET.sa])
-AT_CHECK([SA2SM NET.sa NET.owfn])
-AT_CHECK([WENDY --og=NET.og --fionaFormat NET], 0, ignore, ignore)
-AT_CHECK([WENDY --og=NET.owfn.og --fionaFormat NET.owfn], 0, ignore, ignore)
-AT_CHECK([FIONA -t equivalence NET.og NET.owfn.og], 0, ignore, ignore)
-AT_KEYWORDS(ig sa)
+TEST_IG2SA
 AT_CLEANUP
 
+AT_SETUP([IG->SA (Coffee)])
+m4_define([NET], [myCoffee.owfn])
+TEST_IG2SA
+AT_CLEANUP
+
+AT_SETUP([IG->SA (Zeus)])
+m4_define([NET], [zeus.owfn])
+TEST_IG2SA
+AT_CLEANUP
+
+AT_SETUP([SA->IG->SA (Syntax Example)])
+m4_define([NET], [syntax_example.owfn])
+TEST_SA2IG
+AT_CLEANUP
+
+AT_SETUP([SA->IG->SA (Coffee)])
+m4_define([NET], [myCoffee.owfn])
+TEST_SA2IG
+AT_CLEANUP
+
+AT_SETUP([SA->IG->SA (Zeus)])
+m4_define([NET], [zeus.owfn])
+TEST_SA2IG
+AT_CLEANUP
 

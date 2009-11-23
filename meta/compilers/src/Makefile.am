@@ -32,7 +32,7 @@ sa2ig_SOURCES = syntax-sa2ig.yy lexic-sa2ig.ll \
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
 BUILT_SOURCES =
-EXTRA_DIST =
+EXTRA_DIST = compilers
 MAINTAINERCLEANFILES =
 DISTCLEANFILES = 
 

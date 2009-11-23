@@ -1,4 +1,4 @@
-AC_INIT(compilers, 1.00-unreleased, compilers@service-technology.org, [fiona2wendy], http://service-technology.org/compilers)
+AC_INIT(compilers, 1.00, compilers@service-technology.org, compilers, http://service-technology.org/compilers)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -41,6 +41,7 @@ AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(WENDY, [wendy], not found)
 AC_PATH_PROG(SAYO,  [sayo],  not found)
 AC_PATH_PROG(SA2SM, [sa2sm], not found)
+AC_PATH_PROG(PETRI, [petri], not found)
 
 #############################################################################
 # create configured files (Makefiles, scripts, etc.)

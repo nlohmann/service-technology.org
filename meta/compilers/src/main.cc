@@ -24,7 +24,7 @@
 #include <cstdlib>
 
 #include "cmdline.h"
-#include "config.h"
+#include <config.h>
 
 using std::cerr;
 using std::cout;

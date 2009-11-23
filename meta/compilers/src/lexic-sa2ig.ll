@@ -1,3 +1,22 @@
+/*****************************************************************************\
+ SA2IG -- compiling Wendy SAs to FIONA IGs
+
+ Copyright (C) 2009  Christian Sura <christian.sura@uni-rostock.de>
+
+ SA2IG is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ SA2IG is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with SA2IG.  If not, see <http://www.gnu.org/licenses/>. 
+\*****************************************************************************/
+
 %option outfile="lex.yy.c"
 %option noyywrap
 %option yylineno
@@ -46,8 +65,8 @@ number         [0-9]+
 ","                                     { return COMMA;                }
 "->"                                    { return ARROW;                }
 
-{number}       { yylval.value = atoi(yytext); return NUMBER;     }
-{identifier}   { yylval.str = yytext; return IDENT;              }
+{number}             { yylval.value = atoi(yytext); return NUMBER;     }
+{identifier}         { yylval.str = strdup(yytext); return IDENT;      }
 
 {whitespace}                            { /* do nothing */             }
 

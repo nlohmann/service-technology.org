@@ -274,12 +274,6 @@ Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating Guidelines for Fin
 Christian Stahl and Karsten Wolf. @b{Covering Places and Transitions in Open Nets}. In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1-4, 2008, Proceedings}, volume 5240 of Lecture Notes in Computer Science, pages 116-131, September 2008. Springer-Verlag. 
 @end quotation
 
-@subsubheading 2-Bit Formulae
-
-@quotation
-Niels Lohmann and Karsten Wolf. @b{Petrifying Operating Guidelines for Services}. In Stephen Edwards and Walter Vogler, editors, @i{Ninth International Conference on Application of Concurrency to System Design (ACSD 2009), 1-3 July 2009, Augsburg, Germany}, June 2009. IEEE Computer Society. 
-@end quotation
-
 
 @section Interaction Graphs
 

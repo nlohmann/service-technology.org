@@ -153,7 +153,7 @@ AT_BANNER([Wendy: CNF OG -> Bit OG])
 ############################################################################
 
 m4_define([TEST_CNF2B], [AT_CHECK([cp TESTFILES/NET .])
-                         AT_CHECK([WENDY --og=NET.c.og --formula=cnf NET], 0, ignore, ignore)
+                         AT_CHECK([WENDY --og=NET.c.og NET], 0, ignore, ignore)
                          AT_CHECK([WENDYFORMULA2BITS --input=NET.c.og --output=NET.b.og])
                          AT_CHECK([SAYO --input=NET.b.og --output=NET.sa])
                          AT_CHECK([SA2SM NET.sa NET.owfn])

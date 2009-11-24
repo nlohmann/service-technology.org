@@ -274,7 +274,7 @@ int main(int argc, char** argv) {
 
 		// Initialize Parser.
 		EventTermParser::initialize();
-		vector<EventTerm*>* term_vec = EventTermParser::parseFile(std::string(args_info.file_arg));
+		vector<int*>* term_vec = EventTermParser::parseFile(std::string(args_info.file_arg));
 
 		// For each system, evaluate all event terms
 		for (int i = 0; i <sysCounter; ++i) {
@@ -283,7 +283,7 @@ int main(int argc, char** argv) {
 					fSet->partialMarkings[i]->toString().c_str());
 
 			// For each parsed event term...
-			for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it
+			for (std::vector<int*>::iterator it = term_vec->begin(); it
 			!= term_vec->end(); ++it) {
 				EventTermBound* b = systems[i]->evaluate((*it));
 			}

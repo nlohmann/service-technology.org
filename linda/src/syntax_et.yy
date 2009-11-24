@@ -22,7 +22,7 @@ extern int et_yylex();
 #include <string>
 #include <vector>
 
-extern std::vector<EventTerm*>* term_vec;
+extern std::vector<int*>* term_vec;
 extern bool stop_interaction;
 
 int et_yyerror(const char* msg)
@@ -65,7 +65,7 @@ terms:  QUIT {stop_interaction = true; return 0;}
         | 
 ;
 
-term: summe NEW_TERM {term_vec->push_back($1);};
+term: summe NEW_TERM {term_vec->push_back(EventTerm::termToMap($1));};
 
 summe: produkt {$$ = $1;}
        | produkt summe {$$ = new AddTerm($1,$2);} 

@@ -1,7 +1,7 @@
 #include "eventTermParser.h"
 
 /// the parser vector
-std::vector<EventTerm*>* term_vec = 0;
+std::vector<int*>* term_vec = 0;
 /// Parser variables
 extern int et_yylineno;
 extern int et_yydebug;
@@ -26,7 +26,7 @@ bool EventTermParser::initialize() {
 	return true;
 }
 
-std::vector<EventTerm*>* EventTermParser::parseFile(std::string filename) {
+std::vector<int*>* EventTermParser::parseFile(std::string filename) {
 
 	et_yyin = fopen(filename.c_str(), "r");
 	if (!et_yyin) {
@@ -34,7 +34,7 @@ std::vector<EventTerm*>* EventTermParser::parseFile(std::string filename) {
 	}
 
 	// Initialize the vector that stores the parsed events
-	term_vec = new std::vector<EventTerm*>();
+	term_vec = new std::vector<int*>();
 
 	// Parse the file
 	et_yyparse();

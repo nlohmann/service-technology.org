@@ -8,7 +8,7 @@ class EventTermParser {
 public:
 	static bool initialize();
 
-	static std::vector<EventTerm*>* parseFile(std::string filename);
+	static std::vector<int*>* parseFile(std::string filename);
 
 };
 

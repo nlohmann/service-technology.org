@@ -137,6 +137,7 @@ int main(int argc, char** argv) {
 			&(net->finalCondition().formula()), bound);
 
 	ExtendedStateEquation** systems = new ExtendedStateEquation*[fSet->size()];
+	int sysCounter = 0;
 
 	status("Computed final markings:");
 	for (std::vector<PartialMarking*>::iterator finalMarkingIt =
@@ -151,18 +152,15 @@ int main(int argc, char** argv) {
 		// Create a new state equation for this final marking
 		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,fSet->partialMarkings[i]);
 		if (XSE->constructLP()) {
-			systems[i] = XSE;
-
+			systems[sysCounter] = XSE;
+			++sysCounter;
 			// If flag is on, output the lps.
+		}
 
-			if (args_info.show_lp_flag) {
-				message("    Processing final marking: %s",
-						fSet->partialMarkings[i]->toString().c_str());
-				XSE->output();
-			}
-		} else {
-			abort(1, "Construction of a system failed!");
-
+		if (args_info.show_lp_flag) {
+			message("    Processing final marking: %s",
+					fSet->partialMarkings[i]->toString().c_str());
+			XSE->output();
 		}
 	}
 
@@ -172,7 +170,11 @@ int main(int argc, char** argv) {
 	delete ExtendedStateEquation::transitionID;
 
 	// Verbose output of the number of linear programs created
-	status("Number of lp systems: %i", fSet->size());
+	status("Number of lp systems: %i", sysCounter);
+
+	if (sysCounter == 0) {
+		abort(1,"No final markings are reachable from the initial marking.");
+	}
 
 
 	// MODE Structural Analysis
@@ -181,11 +183,11 @@ int main(int argc, char** argv) {
 		// Calculate t-invariants
 		FlowMatrix f(net);
 		f.computeTInvariants();
-//		f.output();
+		//		f.output();
 		f.createTerms();
 
 		// For each system, evaluate all event terms
-		for (int i = 0; i < fSet->size(); ++i) {
+		for (int i = 0; i <sysCounter; ++i) {
 
 			status("    Processing final marking: %s",
 					fSet->partialMarkings[i]->toString().c_str());
@@ -278,7 +280,7 @@ int main(int argc, char** argv) {
 		vector<EventTerm*>* term_vec = EventTermParser::parseFile(std::string(args_info.file_arg));
 
 		// For each system, evaluate all event terms
-		for (int i = 0; i < fSet->size(); ++i) {
+		for (int i = 0; i <sysCounter; ++i) {
 
 			status("    Processing final marking: %s",
 					fSet->partialMarkings[i]->toString().c_str());
@@ -319,7 +321,7 @@ int main(int argc, char** argv) {
 			fclose(etc_yyin);
 
 			// For each system...
-			for (int i = 0; i < fSet->size(); ++i) {
+			for (int i = 0; i <sysCounter; ++i) {
 
 				message("    Processing final marking: %s",
 						fSet->partialMarkings[i]->toString().c_str());
@@ -371,7 +373,7 @@ int main(int argc, char** argv) {
 			file.open(args_info.output_arg);
 
 			// Create the file and output it to the stream
-			ProfileFile* outputFile = new ProfileFile(systems, net,fSet->size());
+			ProfileFile* outputFile = new ProfileFile(systems, net,sysCounter);
 			outputFile->output(file, args_info.show_terms_as_given_flag);
 
 			// Close the file
@@ -384,7 +386,7 @@ int main(int argc, char** argv) {
 		} else {
 
 			// Create the file and output it to the stream
-			ProfileFile* outputFile = new ProfileFile(systems, net,fSet->size());
+			ProfileFile* outputFile = new ProfileFile(systems, net,sysCounter);
 			outputFile->output(std::cout, args_info.show_terms_as_given_flag);
 			delete outputFile;
 
@@ -393,6 +395,9 @@ int main(int argc, char** argv) {
 			// Output complete.
 			message("Output written to standard out.");
 		}
+	} else {
+		message("Computation finished. No output produced, since no output target was given.");
+		message("To produce output to a file, use \"-o <path/to/file>\", to output to standard out, use \"-o-\". ");
 	}
 	// Verbose output the result of the stop watch
 	status("runtime: %.2f sec", ((double(clock()) - double(start_clock))

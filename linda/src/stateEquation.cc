@@ -225,13 +225,8 @@ bool ExtendedStateEquation::constructLP() {
 
 	// We find that the linear program is infeasible, so we do not take it into account anymore and return false.
 	if (!isFeasible) {
-
-		print_lp(lp);
-
-		std::cerr << "Final marking not reachable from initial marking:"
-				<< std::endl;
-		std::cerr << "\t";
-		omega->output(std::cerr);
+		message("Final marking not reachable from initial marking: %s",
+				omega->toString().c_str());
 		return false;
 	}
 

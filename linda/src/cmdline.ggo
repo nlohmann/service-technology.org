@@ -31,18 +31,20 @@ option "constraint-file" c
 
 section "Output options"
 
+option "output" o
+  "Output results to file. Results can be output to standard out by providing - (a dash) as the path."
+  string typestr="path"
+  optional
+
 option "quiet" q
 	"No output to stdout, stderr."
 	flag off
-
-option "output" o
-  "Output results to file."
-  string typestr="path"
-  optional
+	hidden
 
 option "show-terms-as-given" g
 	"Show terms as given in user input instead of internal normal form."
 	flag off
+	hidden
 
 section "Debug"
 
@@ -53,6 +55,7 @@ option "verbose" v
 option "show-lp" l
 	"Show linear programs."
 	flag off
+	hidden
 
 
 section "Advanced Options"
@@ -62,6 +65,7 @@ option "bound" b
   int typestr="uint"
   default="10"
   optional
+  hidden
   
 option "about" A
 	""

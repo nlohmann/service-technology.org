@@ -1,4 +1,4 @@
-@heading Version 2.10-unreleased
+@heading Version 2.10
 @itemize
 @item Migrated UML2oWFN to the new Petri net API. The included PNAPI slightly deviates from the original API, see SVN repository for details. 
 @item Dropped support for several file formats. The currently supported file formats are .lola, .owfn, .dot, and .tpn (Woflan)

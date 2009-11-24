@@ -21,28 +21,10 @@
 /*!
  * \file frontend-lexer.cc
  *
- * \brief BPEL lexer
- *
- * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of \$Author: nielslohmann $
- *
- * \since   2005-11-10
- *
- * \date    \$Date: 2007/06/28 07:38:16 $
- * 
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ * \brief generic XML lexer
  *
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
- *
- * \version \$Revision: 1.67 $
- *
- * \todo    
- *          - Add rules to ignored everything non-BPEL.
- *          - Add a more elegant way to handle XSD-namespaces
  *
  * \ingroup frontend
  */

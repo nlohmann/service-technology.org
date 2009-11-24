@@ -654,7 +654,7 @@ unsigned int ExtendedWorkflowNet::reduce(unsigned int reduction_level)
  *          Petri net merge method by taking care of the sets of places
  *          of which the places to be merged may be part of
  */
-Place* ExtendedWorkflowNet::mergePlaces(Place * & p1, Place * & p2) {
+Place* ExtendedWorkflowNet::mergePlaces(pnapi::Place * & p1, pnapi::Place * & p2) {
 
   if (p1 == p2 && p1 != NULL)
     return p1;
@@ -763,7 +763,7 @@ Place* ExtendedWorkflowNet::mergePlaces(Place * & p1, Place * & p2) {
  * \brief   remove the given place from the net and update all sets of places
  *          of the workflow net
  */
-void ExtendedWorkflowNet::deletePlace(Place & place) {
+void ExtendedWorkflowNet::deletePlace(pnapi::Place & place) {
   Place *p = &place;
   if (pinPlaces.find(p) != pinPlaces.end())
     pinPlaces.erase(p);
@@ -789,7 +789,7 @@ void ExtendedWorkflowNet::deletePlace(Place & place) {
  *          Petri net merge method by taking care of the sets of transitions
  *          of which the transitions may be part of
  */
-Transition* ExtendedWorkflowNet::mergeTransitions(Transition * & t1, Transition * & t2) {
+Transition* ExtendedWorkflowNet::mergeTransitions(pnapi::Transition * & t1, pnapi::Transition * & t2) {
 
   if (t1 == t2)
     return t1;
@@ -1419,7 +1419,7 @@ FormulaState* ExtendedWorkflowNet::createSafeStatePredicate (bool mustBeNonEmpty
  *          (by depth-first search), add resulting nodes to the
  *          set of nodes *reachable
  */
-void ExtendedWorkflowNet::forwardReachableNodes(const Node *n, set<Node*>* reachable) const {
+void ExtendedWorkflowNet::forwardReachableNodes(const pnapi::Node *n, set<pnapi::Node*>* reachable) const {
   assert(reachable != NULL);
 
   list<const Node *> stack;
@@ -1442,7 +1442,7 @@ void ExtendedWorkflowNet::forwardReachableNodes(const Node *n, set<Node*>* reach
  *          (by depth-first search), add resulting nodes to the
  *          set of nodes *reachable
  */
-void ExtendedWorkflowNet::backwardReachableNodes(const Node *n, set<Node*>* reachable) const {
+void ExtendedWorkflowNet::backwardReachableNodes(const pnapi::Node *n, set<pnapi::Node*>* reachable) const {
   assert(reachable != NULL);
 
   list<const Node *> stack;

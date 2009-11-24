@@ -6,8 +6,8 @@
         Translating IBM WebSphere Business Process Models to Petri Nets
                  http://www.service-technology.org/uml2owfn/
 
-Version 2.10-unreleased
-=======================
+Version 2.10
+============
 
 * Migrated UML2oWFN to the new Petri net API. The included PNAPI slightly
   deviates from the original API, see SVN repository for details.

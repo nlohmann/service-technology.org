@@ -201,6 +201,12 @@ processes shall not be translated. @samp{PROP} can take the following values
 
 @chapter Soundness Analysis with UML2oWFN
 
+You may use @acronym{UML2oWFN} together with the Petri net model checker
+@acronym{LoLA} for analyzing the soundness of business process models created
+in the IBM WebSphere Business Modeler. This chapter describes the available
+parameters of @acronym{UML2oWFN} for this use-case and how to set up @acronym{LoLA}
+for the analysis.
+
 
 @section Setup LoLA as Analysis Tool
 
@@ -233,7 +239,6 @@ executables as follows.
 @end enumerate
 
 
-
 @section Use Case: Standard Soundness Analysis
 
 This section describes how to achieve standard soundness analysis. Translate
@@ -260,10 +265,10 @@ specifies the valid final states of the process.
 @acronym{UML2oWFN} also generates a script @file{check_lib.sh} containing the appropriate
 LoLA command calls for each file.
 
-@example
+@smallexample
 lola-bpm-statepredicate1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.safe.task -P
 lola-bpm-liveprop1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
-@end example
+@end smallexample
 
 If the first call returns @samp{predicate is not satisfiable}, then the process
 is safe. Otherwise LoLA returns a place which can hold more than one token. If
@@ -420,7 +425,39 @@ control-flow and data-flow terminate via an implicit OR-join. Choose
  @example
  -a safe
  @end example
- to the parameters. 
+ to the parameters.
+
+ 
+@section Case Study: Soundness Analysis of Industrial Business Process Models
+ 
+We conducted an experimental case study with @acronym{UML2oWFN}
+and @acronym{LoLA} in which we checked soundness of over 700 industrial
+business processes. The original process models are available in XML format
+from @url{http://service-technology.org/soundness}. For this case study, we
+translated each original process library @file{lib.xml} into Petri nets, by
+calling
+
+@smallexample
+uml2owfn -i lib.xml -f lola -a soundness -a safe -a orJoin -p taskfile -p filter -o
+@end smallexample
+
+which creates one Petri net per process of the library assuming an OR-join
+termination of each process. Then we called
+
+@smallexample
+lola-bpm-liveprop1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
+lola-bpm-statepredicate1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.safe.task -P
+@end smallexample
+
+for each generated Petri net to check soundness. See @emph{Standard Soundness
+Analysis}, for details. The results of the case study
+have been presented at the Conference on Business Process Management 2009 in Ulm,
+Germany: Dirk Fahland, Cédric Favre, Barbara Jobstmann, Jana Koehler, Niels Lohmann,
+Hagen Völzer, and Karsten Wolf. @emph{Instantaneous Soundness Checking of Industrial
+Business Process Models.} In BPM 2009, Ulm, Germany, volume 5701 of Lecture Notes in
+Computer Science, September 2009. Springer-Verlag. 
+
+
 
 
 @section Use Case: Anonymize the Processes
@@ -491,7 +528,6 @@ necessary @acronym{LoLA} binaries as described above and copy them to
 @file{./lola/} of your @acronym{UML2oWFN} directory. Then execute the
 following commands in the root directory of @acronym{UML2oWFN}.
 
-@cartouche
 @smallexample
 cd ./scripts/
 make translateor LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
@@ -499,7 +535,6 @@ make translateor LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
 make table LOLA_DIR=../lola/ UML2OWFN_DIR=../src/ \
            LIBRARY=../tests/soundness/TestSuite_soundness 
 @end smallexample
-@end cartouche
 
 This will translate and analyze the processes from our soundness test library in
 @file{./tests/soundness/TestSuite_soundness.xml}. The parameters @samp{LOLA_DIR}
@@ -518,9 +553,9 @@ To invoke the generation of CTL properties and corresponding analysis script fil
 use the parameter @samp{-p ctl}. To verify whether the generated CTL formula holds
 for a given process, use LoLA with the model checking algorithms, e.g. call
 
-@example
+@smallexample
 lola-bpm-modelchecking1 lib.XXX__YYY.lola -a lib.XXX__YYY.lola.fin.task -P
-@end example
+@end smallexample
 
 This line is automatically included in the verification script @file{check_lib.sh}.
 To use the Using the @file{./scripts/Makefile} to automate the compilation of

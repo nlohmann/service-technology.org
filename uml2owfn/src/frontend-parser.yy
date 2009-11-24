@@ -18,33 +18,19 @@
 \*****************************************************************************/
 %{
 /*!
- * \file    frontend-parser-wsdl.cc
+ * \file    frontend-parser.cc
  *
- * \brief   WSDL 1.1 parser
- *
- *          WSDL is parsed as defined in
- *          http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd
- *
- *          Partner Link Types are parsed according to the "Schema for OASIS
- *          Business Process Execution Language (WS-BPEL) 2.0 - Schema for
- *          Partner Link Type" (http://docs.oasis-open.org/wsbpel/2.0/plnktype)
- *
- * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
- *
- * \since   2007/04/29
- *
- * \date    \$Date: 2007/06/28 07:38:16 $
- * 
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ * \brief   A generic XML parser for parsing any kind of XML documents into
+ *          generic abstract syntax tree (class AST). The parser does not
+ *          validate the XML document against a specific schema. The aim of
+ *          this parser is to allow for partial or selective parsing of XML
+ *          documents. After reading the XML document into an abstract syntax
+ *          tree, the constructed AST can selectively be traversed by a
+ *          visitor in as many visits as required.
  *
  * \note    This file was created using GNU Bison reading file
- *          frontend-parser-chor.yy.
+ *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
- *
- * \version \$Revision: 1.10 $
  *
  * \ingroup frontend
  */

@@ -41,11 +41,6 @@ option "quiet" q
 	flag off
 	hidden
 
-option "show-terms-as-given" g
-	"Show terms as given in user input instead of internal normal form."
-	flag off
-	hidden
-
 section "Debug"
 
 option "verbose" v

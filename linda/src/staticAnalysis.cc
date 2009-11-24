@@ -98,8 +98,25 @@ void FlowMatrix::computeTInvariants() {
 					int fac = LindaHelpers::abs(currNr);
 					int facComp = LindaHelpers::abs(currCompNr);
 
+					int euclidA = fac;
+					int euclidB = facComp;
+
+					while (euclidB != 0) {
+						int h = euclidA % euclidB;
+						euclidA = euclidB;
+						euclidB = h;
+					}
+
+					int ggt = euclidA;
+
+					int kgv = LindaHelpers::abs(fac*facComp)/ggt;
+
+					assert(kgv/fac - facComp == 0);
+					assert(kgv/facComp - fac == 0);
+
 					for (int init = 0; init < width; ++init) {
-						newRow[init] = facComp * current->element[init] + fac
+						newRow[init] =
+							kgv/fac * current->element[init] + kgv/facComp
 						* currentComp->element[init];
 					}
 					ListElement<int*>* toInsert = new ListElement<int*> (
@@ -176,7 +193,7 @@ void FlowMatrix::computeTInvariants() {
 
 void FlowMatrix::createTerms() {
 
-	ListElement<EventTerm*>* currentInList = 0;
+	ListElement<int*>* currentInList = 0;
 	ListElement<int*>* current = root;
 	while (current != 0) {
 		for (int i = 0; i < width - 1; ++i) {
@@ -188,12 +205,18 @@ void FlowMatrix::createTerms() {
 						int e2 = j;
 						int f2 = -1* current ->element[j];
 
-						EventTerm* term = new AddTerm(new MultiplyTerm(
-								new BasicTerm(e1), f1), new MultiplyTerm(
-										new BasicTerm(e2), f2));
 
-						ListElement<EventTerm*>* newElem = new ListElement<
-						EventTerm*> (term, 0, 0);
+
+						int* term = new int[LindaHelpers::NR_OF_EVENTS];
+						for (int counter = 0; counter < LindaHelpers::NR_OF_EVENTS; ++counter) {
+							term[counter] = 0;
+						}
+
+						term[e1] = f1;
+						term[e2] = f2;
+
+						ListElement<int*>* newElem = new ListElement<
+						int*> (term, 0, 0);
 
 						if (terms == 0) {
 							terms = newElem;

@@ -17,7 +17,7 @@ public:
 	ProfileFile(ExtendedStateEquation** s, pnapi::PetriNet* n, uint8_t nrOfSystems) : systems(s), net(n), nr(nrOfSystems) {}
 
 	/// Creates the file and its contents.
-	void output(std::ostream& file,bool termsAsGiven);
+	void output(std::ostream& file);
 
 };
 

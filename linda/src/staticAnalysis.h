@@ -18,7 +18,7 @@ public:
 
 	void createTerms();
 
-	ListElement<EventTerm*>* terms;
+	ListElement<int*>* terms;
 
 
 	void output();

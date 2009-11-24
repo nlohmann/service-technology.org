@@ -234,9 +234,12 @@ bool ExtendedStateEquation::constructLP() {
 }
 
 EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
-
 	// Create a mapping from the term
 	int* map = EventTerm::termToMap(e);
+	evaluate(map);
+}
+
+EventTermBound* ExtendedStateEquation::evaluate(int* e) {
 
 	// Determine the first event column
 	const unsigned int START_EVENTS = 1 + net->getTransitions().size();
@@ -247,7 +250,7 @@ EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 
 	// Fill the array with the values from the mapping
 	for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
-		obj_row[i] = map[i];
+		obj_row[i] = e[i];
 		obj_cols[i] = START_EVENTS + i;
 	}
 

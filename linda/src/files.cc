@@ -1,6 +1,6 @@
 #include "files.h"
 
-void ProfileFile::output(std::ostream& file, bool termsAsGiven) {
+void ProfileFile::output(std::ostream& file) {
 
 	file << "PLACE";
 	file << std::endl << "  INTERNAL" << std::endl << "    ";
@@ -75,14 +75,19 @@ void ProfileFile::output(std::ostream& file, bool termsAsGiven) {
 
 	file << std::endl << std::endl << "TERMS";
 
-	for (std::vector<EventTerm*>::iterator termsIt =
+	for (std::vector<int*>::iterator termsIt =
 			systems[0]->calculatedEventTerms.begin(); termsIt
 			!= systems[0]->calculatedEventTerms.end(); ++termsIt) {
 		file << std::endl << "    T" << counter << ": ";
-		if (termsAsGiven) {
-			file << (*termsIt)->toString();
-		} else {
-			file << EventTerm::toPrettyString((*termsIt));
+		for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+			if ((*termsIt)[i] == 0) {
+				continue;
+			}
+
+			if ((*termsIt)[i] > 0) {
+				file << "+";
+			}
+			file << (*termsIt)[i] << "*" << LindaHelpers::EVENT_STRINGS[i] << " ";
 		}
 		file << ";";
 		++counter;

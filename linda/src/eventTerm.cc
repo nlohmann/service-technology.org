@@ -229,4 +229,19 @@ std::string EventTermConstraint::toString() {
 	}
 	return result;
 }
+/*
 
+void RawTerm::setValue(int id, int newValue) {
+	data->insert(id,newValue,true);
+}
+
+int RawTerm::getValue(int id) {
+	BinaryTreeNode<int,int>* b = data->find(id);
+	if (b != 0) return b->value;
+	return 0;
+}
+
+void RawTerm::addValue(int id, int addend) {
+	int newVal = getValue(id);
+	setValue(id,newVal);
+}*/

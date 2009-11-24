@@ -34,6 +34,8 @@ public:
 
     /// Evaluates a given event term and returns the bounds.
 	EventTermBound* evaluate(EventTerm*);
+    /// Evaluates a given event term and returns the bounds.
+	EventTermBound* evaluate(int*);
 
     /// Deletes the underlying lp system.
 	~ExtendedStateEquation() {
@@ -41,7 +43,7 @@ public:
 	}
 
 
-	std::vector<EventTerm*> calculatedEventTerms; //!< Contains all evaluated event terms.
+	std::vector<int*> calculatedEventTerms; //!< Contains all evaluated event terms.
 	std::vector<EventTermBound*> calculatedBounds; //!< Contains all computed bounds.
 
 };

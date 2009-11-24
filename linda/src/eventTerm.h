@@ -125,7 +125,19 @@ public:
 	/// Does nothing since nothing is to be deleted.
 	~BasicTerm();
 };
-
+/*
+class RawTerm {
+public:
+	RawTerm() {
+		data = new BinaryTree<int,int>();
+	}
+	void setValue(int id, int newValue);
+	void addValue(int id, int addend);
+	int getValue(int id);
+private:
+	BinaryTree<int,int>* data;
+};
+*/
 
 /// A record containing a lower and an upper bound, including unboundedness in one or both directions.
 class EventTermBound {

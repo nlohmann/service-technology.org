@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
 			status("    Processing final marking: %s",
 					fSet->partialMarkings[i]->toString().c_str());
 
-			ListElement<EventTerm*>* currentTerm = f.terms;
+			ListElement<int*>* currentTerm = f.terms;
 			while (currentTerm != 0) {
 				EventTermBound* b = systems[i]->evaluate(currentTerm->element);
 				currentTerm = currentTerm->next;
@@ -201,9 +201,6 @@ int main(int argc, char** argv) {
 		}
 
 	}
-
-
-
 
 	// MODE Level 0 Message Profile
 	// We evaluate a term (1*a) for each event (a).
@@ -374,7 +371,7 @@ int main(int argc, char** argv) {
 
 			// Create the file and output it to the stream
 			ProfileFile* outputFile = new ProfileFile(systems, net,sysCounter);
-			outputFile->output(file, args_info.show_terms_as_given_flag);
+			outputFile->output(file);
 
 			// Close the file
 			file.close();
@@ -387,7 +384,7 @@ int main(int argc, char** argv) {
 
 			// Create the file and output it to the stream
 			ProfileFile* outputFile = new ProfileFile(systems, net,sysCounter);
-			outputFile->output(std::cout, args_info.show_terms_as_given_flag);
+			outputFile->output(std::cout);
 			delete outputFile;
 
 			std::cout << std::flush;

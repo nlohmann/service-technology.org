@@ -184,7 +184,7 @@ void Graph::ogOut(FILE *out) const {
             fprintf(out, "  INPUT\n");
             fprintf(out, "    ");
             for (int i = 0; i < (int) temp.size(); ++i)
-              fprintf(out, i == 0 ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
+              fprintf(out, "%s", (i == 0) ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
             fprintf(out, "\n");
         }
         if (!(temp = output()).empty())
@@ -192,7 +192,7 @@ void Graph::ogOut(FILE *out) const {
             fprintf(out, "  OUTPUT\n");
             fprintf(out, "    ");
             for (int i = 0; i < (int) temp.size(); ++i)
-              fprintf(out, i == 0 ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
+              fprintf(out, "%s", (i == 0) ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
             fprintf(out, "\n");
         }
         if (!(temp = synchronous()).empty())
@@ -200,7 +200,7 @@ void Graph::ogOut(FILE *out) const {
             fprintf(out, "  SYNCHRONOUS\n");
             fprintf(out, "    ");
             for (int i = 0; i < (int) temp.size(); ++i)
-              fprintf(out, i == 0 ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
+              fprintf(out, "%s", (i == 0) ? temp[i].c_str() : (string(", ")+temp[i]).c_str());
             fprintf(out, "\n");
         }
         fprintf(out, "\n");
@@ -212,12 +212,12 @@ void Graph::ogOut(FILE *out) const {
     switch (type)
     {
     case FORMULA:
-        fprintf(out, (string(": ")+root->formula->toString()).c_str());
+        fprintf(out, "%s", (string(": ")+root->formula->toString()).c_str());
         break;
     case BIT:
         bit = root->bitString();
         if (!bit.empty())
-            fprintf(out, (string(":: ")+bit).c_str());
+            fprintf(out, "%s", (string(":: ")+bit).c_str());
         break;
     default:
         assert(false);
@@ -240,12 +240,12 @@ void Graph::ogOut(FILE *out) const {
         switch (type)
         {
         case FORMULA:
-            fprintf(out, (string(": ")+n->second->formula->toString()).c_str());
+            fprintf(out, "%s", (string(": ")+n->second->formula->toString()).c_str());
             break;
         case BIT:
             bit = n->second->bitString();
             if (!bit.empty())
-                fprintf(out, (string(":: ")+bit).c_str());
+                fprintf(out, "%s", (string(":: ")+bit).c_str());
             break;
         default:
             assert(false);

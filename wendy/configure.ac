@@ -1,11 +1,11 @@
-AC_INIT(Wendy, 2.6, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT([Wendy], 2.7-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 
 AC_MSG_NOTICE([__        __             _       ])
 AC_MSG_NOTICE([\ \      / /__ _ __   __| |_   _ ])
 AC_MSG_NOTICE([ \ \ /\ / / _ \ '_ \ / _` | | | |])
 AC_MSG_NOTICE([  \ V  V /  __/ | | | (_| | |_| |])
 AC_MSG_NOTICE([   \_/\_/ \___|_| |_|\__,_|\__, |])
-AC_MSG_NOTICE([                           |___/])
+AC_MSG_NOTICE([                           |___/ ])
 AC_MSG_NOTICE([synthesizing partners for services])
 AC_MSG_NOTICE([http://service-technology.org/wendy])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
@@ -56,13 +56,13 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # search for optional tools needed by "make check"
+AC_PATH_PROG(CNF2BITS, [wendyFormula2bits], not found)
 AC_PATH_PROG(FIONA, [fiona], not found)
-AC_PATH_PROG(SA2SM, [sa2sm], not found)
 AC_PATH_PROG(MARLENE, [marlene], not found)
 AC_PATH_PROG(MIA, [mia], not found)
-AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
-AC_PATH_PROG(CNF2BITS, [wendyFormula2bits], not found)
+AC_PATH_PROG(SA2SM, [sa2sm], not found)
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
+AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
 
 # search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])

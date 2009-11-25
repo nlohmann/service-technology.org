@@ -41,7 +41,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(wendy_SOURCES))
+BISON_FILES = $(filter %.yy,$($(PACKAGE)_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

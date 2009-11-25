@@ -96,7 +96,7 @@ __attribute__((noreturn)) void abort(unsigned short code, const char* format, ..
 void displayFileError(char* filename, int lineno, char* token) {
     std::ifstream f(filename);
     std::string line;
-    for (unsigned int i = 0; i < lineno; ++i) {
+    for (int i = 0; i < lineno; ++i) {
         getline(f,line);
     }
     size_t firstpos(line.find_first_of(token));

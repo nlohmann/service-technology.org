@@ -8,18 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 2.6 (23 November 2009)
-==============================
-
-* implemented user-defined data structure for the queue used in the closure
-  operation
-
-* discontinued deprecated output of operating guidelines in Fiona's file
-  format (parameter `--fionaFormat') - this can be done with the compiler
-  `wendy2fiona'
-
-* discontinued output of bit operating guidelines (parameter
-  `--formula=bits') - this can be done with the compiler `wendyFormula2bits'
+Version 2.7-unreleased
+======================
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

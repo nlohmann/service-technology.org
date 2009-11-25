@@ -19,7 +19,6 @@
 
 
 %option noyywrap
-%option nodefault
 %option nounput
 %option full
 %option outfile="lex.yy.c"

@@ -168,7 +168,7 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %s%.2f sec%s", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c0_, _c_);
         fprintf(stderr, "%s%s%s: memory consumption: %s", _cm_, PACKAGE, _c_, _c0_);
-        int tmp = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
         fprintf(stderr, "%s", _c_);
     }
 }

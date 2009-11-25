@@ -16,8 +16,16 @@ AC_PROG_GREP
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
-# search for dot (useful for test cases)
+# search for dot
 AC_PATH_PROG(DOT, [dot], not found)
+if test "$DOT" = "not found"; then
+  AC_MSG_WARN([Graphviz Dot was not found. See file README.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Graphviz Dot can be used.])
+fi
+AC_SUBST(DOT)
+
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)

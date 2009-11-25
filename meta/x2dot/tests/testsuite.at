@@ -57,7 +57,8 @@ AT_BANNER([Dot Output Tests])
 AT_SETUP([Piping to dot])
 AT_CHECK_DOT
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og | dot],0,ignore)
+AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.png --calldot=png],0,ignore)
+AT_CHECK([test -f myCoffee.png])
 AT_KEYWORDS(dot)
 AT_CLEANUP
 

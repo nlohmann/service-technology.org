@@ -18,7 +18,7 @@ extern int og_yyerror(char const *msg);
 extern gengetopt_args_info args_info;
 
 //Output stream defined and used in main.cc
-extern std::ostream* outStream;
+extern std::stringstream outStream;
 
 //Helper variables
 unsigned int currentNode;
@@ -87,45 +87,52 @@ og:
 
   {
 	//Finished parsing, write output
+   
+        //Write keyword to stream
+  	outStream << "digraph{\n\n";
+  	//Use Helvetica
+  	outStream << "edge [fontname=Helvetica fontsize=10]\n";
+  	outStream << "node [fontname=Helvetica fontsize=10]\n";  
+
 
 	//Create invisible node (in order to mark the initial state)
-	(*outStream) << "INIT" << nodes[0] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";     
+	outStream << "INIT" << nodes[0] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";     
 
 	//For all nodes...
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes
 		if(nodeAnnotation[nodes[i]] == " INITIAL " || nodeAnnotation[nodes[i]] == " FINAL "){
 			if(nodeAnnotation[nodes[i]] == " INITIAL "){
-				(*outStream) << nodes[i] << " [label=\" \"]\n";
+				outStream << nodes[i] << " [label=\" \"]\n";
 				//Create invisible node (in order to mark the initial state)
-				(*outStream) << "INIT" << nodes[i] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
+				outStream << "INIT" << nodes[i] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
   				//Mark initial state
-				(*outStream) << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
+				outStream << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
 			}				
 			if(nodeAnnotation[nodes[i]] == " FINAL "){
-				(*outStream) << nodes[i] << " [label=\" \" peripheries=2]\n";
+				outStream << nodes[i] << " [label=\" \" peripheries=2]\n";
 			}
 		}
 		else
-			(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
+			outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
 		std::vector<std::pair<char*, unsigned int> > successors = nodeSuccessors[nodes[i]];
 		//write the node's ID, node's annotation and all links to its successors to the stream...
 		for(int j=0;j<successors.size();++j){
-			(*outStream) << nodes[i];
-			(*outStream) << " -> " << successors[j].second;
+			outStream << nodes[i];
+			outStream << " -> " << successors[j].second;
 			if(args_info.noPrefix_given)
-				(*outStream) << " [label= \"" << successors[j].first << "\"]\n";
+				outStream << " [label= \"" << successors[j].first << "\"]\n";
 			else
-				(*outStream) << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";	
+				outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";	
 		}
 	
 
 	}
 	//Mark initial state
-	(*outStream) << "INIT" << nodes[0] << " -> " << nodes[0] << " [minlen=\"0.5\"]" << "\n";
+	outStream << "INIT" << nodes[0] << " -> " << nodes[0] << " [minlen=\"0.5\"]" << "\n";
 
 	//Finish writing output
-	(*outStream) << "\n}";
+	outStream << "\n}";
 
   }
 
@@ -133,18 +140,26 @@ og:
 | KEY_INTERFACE input output synchronous nodesOld
 
   {
+	//Finished parsing, write output
+   
+        //Write keyword to stream
+  	outStream << "digraph{\n\n";
+  	//Use Helvetica
+  	outStream << "edge [fontname=Helvetica fontsize=10]\n";
+  	outStream << "node [fontname=Helvetica fontsize=10]\n";  
+
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes		
-		(*outStream) << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"";
+		outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"";
 		if(nodeColor[nodes[i]]=='b' || nodeColor[nodes[i]]=='r'){
-			(*outStream) << ",style= \"filled\"";
+			outStream << ",style= \"filled\"";
 			if(nodeColor[nodes[i]]=='b')
-				(*outStream) << ",color=\"blue\"]\n";
+				outStream << ",color=\"blue\"]\n";
 			else
-				(*outStream) << ",color=\"red\"]\n";		
+				outStream << ",color=\"red\"]\n";		
 		}
 		else
-			(*outStream) << "]\n";
+			outStream << "]\n";
 	}
 
   }
@@ -153,11 +168,11 @@ og:
 
   {
 	//Create invisible node (in order to mark the initial state)
-	(*outStream) << "INIT" << initialNode <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
+	outStream << "INIT" << initialNode <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
   	//Mark initial state
-	(*outStream) << "INIT" << initialNode << " -> " << initialNode << " [minlen=\"0.5\"]" << "\n";
+	outStream << "INIT" << initialNode << " -> " << initialNode << " [minlen=\"0.5\"]" << "\n";
 	//Finish writing output
-	(*outStream) << "\n}";
+	outStream << "\n}";
 	
   }
 
@@ -323,7 +338,7 @@ transitions_list:
 transition:
   NUMBER ARROW NUMBER COLON IDENT 
   	{
-		*(outStream) << $1 << "->" << $3 << "[label=\"" << $5 << "\"]\n";
+		outStream << $1 << "->" << $3 << "[label=\"" << $5 << "\"]\n";
   	}
 ;
 

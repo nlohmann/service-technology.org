@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <string>
 #include <map>
 #include <cstdio>
 #include <cstdlib>
@@ -23,7 +25,9 @@ extern int og_yylex_destroy();
 extern FILE* og_yyin;
 
 /// output stream
-std::ostream* outStream = &cout;
+//std::ostream* outStream = &cout;
+std::stringstream outStream;
+
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
@@ -66,21 +70,6 @@ int main(int argc, char** argv)
   // parse commandline
   evaluateParameters(argc, argv);
   
-  // set output destination
-  if(args_info.output_given) // if user set an output file
-  {
-    ofs.open(args_info.output_arg, std::ios_base::trunc); // open file
-    if(!ofs) // if an error occurred on opening the file
-    {
-      cerr << PACKAGE << ": ERROR: failed to open output file '"
-           << args_info.output_arg << "'" << endl;
-      exit(EXIT_FAILURE);
-    }
-    
-    // else link output stream to file stream
-    outStream = &ofs;
-  }
-  
   // set input source
   if(args_info.input_given) // if user set an input file
   {
@@ -94,15 +83,40 @@ int main(int argc, char** argv)
     }
   }
 
-  //Write keyword to stream
-  (*outStream) << "digraph{\n\n";
-  //Use Helvetica
-  (*outStream) << "edge [fontname=Helvetica fontsize=10]\n";
-  (*outStream) << "node [fontname=Helvetica fontsize=10]\n";  
-
   /// actual parsing
-   og_yyparse();
-	
+  og_yyparse();
+
+  // set output destination
+  if(args_info.output_given) // if user set an output file
+  {
+    if(!args_info.calldot_given){
+ 	  ofs.open(args_info.output_arg, std::ios_base::trunc); // open file
+  	  if(!ofs) // if an error occurred on opening the file
+  	  {
+   	  	cerr << PACKAGE << ": ERROR: failed to open output file '"
+   	        << args_info.output_arg << "'" << endl;
+      		exit(EXIT_FAILURE);
+   	  }
+    
+    	  // else print output stream to file
+    	  ofs << outStream.str();
+    }
+    else{
+     	  //Pipe to dot
+   	  if(args_info.calldot_given){
+        	 //string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
+         	 std::string call = std::string(CONFIG_DOT) + " -T" + args_info.calldot_arg + " -o " + args_info.output_arg;
+	         FILE *s = popen(call.c_str(), "w");
+                 fprintf(s, "%s\n", outStream.str().c_str());
+                 pclose(s);
+          }
+
+    }
+  }
+  else
+    	std::cout << outStream.str();
+
+
   // close input (output is closed by destructor)   fclose(og_yyin);
   /// clean lexer memory   og_yylex_destroy();
 

@@ -1,35 +1,33 @@
+include $(top_srcdir)/build-aux/autotroll.mk
+
 bin_PROGRAMS = fiona
 
-# Some trick to let qmake do the job
-all:
-  $(QMAKE) -project -o fiona.pro
-  $(QMAKE) -o Makefile.qt
-  $(MAKE) -f Makefile.qt
-
-# Ensure that those files are in the dist tarball (including generated 
-# moc- and ui-files. Resource files must be named, too.
-EXTRA_DIST = \
+fiona_SOURCES = \
+  tool_syntax.yy tool_lexic.ll \
   main.cc \
-  mainwindow.cc mainwindow.h \
-  monitorwidget.cc monitorwidget.h \
-  projectswidget.cc projectswidget.h \
-  projectview.cc projectview.h \
-  node.cc node.h \
+  mainwindow.cc mainwindow.h mainwindow.moc.cc \
+  importwizard.cc importwizard.h importwizard.moc.cc\
   link.cc link.h \
-  tool.cc tool.h \
-  option.cc option.h \
-  importwizard.cc importwizard.h \
-  tool_syntax.yy tool_syntax.cc tool_syntax.h \
-  tool_lexic.ll tool_syntax.cc tool_syntax.h
- 
+  monitorwidget.cc monitorwidget.h monitorwidget.moc.cc \
+  node.cc node.h node.moc.cc \
+  option.cc option.h option.moc.cc \
+  projectswidget.cc projectswidget.h projectswidget.moc.cc \
+  projectview.cc projectview.h projectview.moc.cc \
+  tool.cc tool.h tool.moc.cc
 
-# This rule lets GNU make create any moc_*.cc from the equivalent *.h
+fiona_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
+fiona_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
+fiona_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
+fiona_LDADD    = $(QT_LIBS) $(LDADD)
 
+BUILT_SOURCES = \
+  mainwindow.moc.cc \
+  importwizard.moc.cc \
+  monitorwidget.moc.cc \
+  node.moc.cc \
+  option.moc.cc \
+  projectswidget.moc.cc \
+  projectview.moc.cc \
+  tool.moc.cc
 
-# This rule lets GNU make create the resources.cc from resources.qrc file
-#resources.cc : resources.qrc qrc/*.png
-#	rcc resources.qrc -o resources.cc
-
-# This line ensures that generated moc_*.cpp, ui_*.h and resources.cc files are
-# deleted when we make clean.
-CLEANFILES = moc_*.cpp Makefile.qt fiona.pro
+CLEANFILES = *.moc.cc

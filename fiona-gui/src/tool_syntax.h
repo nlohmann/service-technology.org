@@ -128,7 +128,7 @@ typedef union YYSTYPE
   char short_;
 }
 /* Line 1489 of yacc.c.  */
-#line 132 "tool_syntax.tab.hh"
+#line 132 "tool_syntax.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

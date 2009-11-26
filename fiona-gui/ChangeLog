@@ -2,9 +2,13 @@
 
 Version 0.02:
 
-* reconfigured configure.ac and Makefile.am
+* rewrote configure.ac and Makefile.am
 
-* handled some trick to delegate work from Autotools to Qt software
+* did some trick to delegate work from Autotools to Qt software
+
+{ * in this version Autotools are obsolete (actually Qt only) }
+
+* converted GUI to AutoTrolls project (AutoTools without Qmake)
 
 Version 0.01
 

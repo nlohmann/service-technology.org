@@ -199,7 +199,7 @@ typedef union YYSTYPE
   char short_;
 }
 /* Line 187 of yacc.c.  */
-#line 203 "tool_syntax.tab.cc"
+#line 203 "tool_syntax.cc"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -212,7 +212,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 216 "tool_syntax.tab.cc"
+#line 216 "tool_syntax.cc"
 
 #ifdef short
 # undef short
@@ -1464,40 +1464,40 @@ yyreduce:
 #line 93 "tool_syntax.yy"
     {
     t->setPackage(QString((yyvsp[(2) - (2)].long_)));
-  ;}
+  }
     break;
 
   case 5:
 #line 97 "tool_syntax.yy"
     {
     t->setVersion(QString((yyvsp[(2) - (2)].long_)));
-  ;}
+  }
     break;
 
   case 6:
 #line 101 "tool_syntax.yy"
     {
     t->setPurpose(QString((yyvsp[(2) - (2)].long_)));
-  ;}
+  }
     break;
 
   case 7:
 #line 105 "tool_syntax.yy"
     {
     t->setUsage(QString((yyvsp[(2) - (2)].long_)));
-  ;}
+  }
     break;
 
   case 8:
 #line 109 "tool_syntax.yy"
     {
     t->setDescription(QString((yyvsp[(2) - (2)].long_)));
-  ;}
+  }
     break;
 
   case 10:
 #line 113 "tool_syntax.yy"
-    { o = new Option(); ;}
+    { o = new Option(); }
     break;
 
   case 11:
@@ -1510,14 +1510,14 @@ yyreduce:
   	  t->addOption(o);
   	else
   	  t->addOption(QString(section), o);
-  ;}
+  }
     break;
 
   case 12:
 #line 124 "tool_syntax.yy"
     {
     section = (yyvsp[(2) - (2)].long_);
-  ;}
+  }
     break;
 
   case 13:
@@ -1525,131 +1525,131 @@ yyreduce:
     { 
     section = (yyvsp[(2) - (5)].long_);
     t->mapSection(QString(section), QString((yyvsp[(5) - (5)].long_)));
-  ;}
+  }
     break;
 
   case 14:
 #line 133 "tool_syntax.yy"
     {
     t->setText(QString((yyvsp[(2) - (2)].long_)));
-  ;}
+  }
     break;
 
   case 16:
 #line 141 "tool_syntax.yy"
     { 
     o->flagGiven_ = true; 
-  ;}
+  }
     break;
 
   case 17:
 #line 145 "tool_syntax.yy"
     {
     o->details_ = QString((yyvsp[(4) - (4)].long_));
-  ;}
+  }
     break;
 
   case 19:
 #line 150 "tool_syntax.yy"
     {
     o->typeString_ = QString((yyvsp[(4) - (4)].long_));
-  ;}
+  }
     break;
 
   case 21:
 #line 155 "tool_syntax.yy"
     {
     o->default_ = QString((yyvsp[(4) - (4)].long_));
-  ;}
+  }
     break;
 
   case 22:
 #line 159 "tool_syntax.yy"
     {
     o->dependon_ = QString((yyvsp[(4) - (4)].long_));
-  ;}
+  }
     break;
 
   case 24:
 #line 164 "tool_syntax.yy"
     {
     o->argoptional_ = true;
-  ;}
+  }
     break;
 
   case 25:
 #line 168 "tool_syntax.yy"
     {
     o->multiple_ = true;
-  ;}
+  }
     break;
 
   case 26:
 #line 172 "tool_syntax.yy"
     {
     o->hidden_ = true; 
-  ;}
+  }
     break;
 
   case 27:
 #line 176 "tool_syntax.yy"
     {
     o->type_ = INPUT;
-  ;}
+  }
     break;
 
   case 28:
 #line 180 "tool_syntax.yy"
     {
     o->type_ = OUTPUT;
-  ;}
+  }
     break;
 
   case 37:
 #line 198 "tool_syntax.yy"
     {
     o->values_.push_back(QString((yyvsp[(1) - (1)].long_)));
-  ;}
+  }
     break;
 
   case 38:
 #line 202 "tool_syntax.yy"
     {
     o->values_.push_back(QString((yyvsp[(3) - (3)].long_)));
-  ;}
+  }
     break;
 
   case 39:
 #line 209 "tool_syntax.yy"
     {
     o->flag_ = true; 
-  ;}
+  }
     break;
 
   case 40:
 #line 213 "tool_syntax.yy"
     {
     o->flag_ = false; 
-  ;}
+  }
     break;
 
   case 41:
 #line 220 "tool_syntax.yy"
     {
     o->required_ = true; 
-  ;}
+  }
     break;
 
   case 42:
 #line 224 "tool_syntax.yy"
     {
     o->required_ = false; 
-  ;}
+  }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1653 "tool_syntax.tab.cc"
+#line 1653 "tool_syntax.cc"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

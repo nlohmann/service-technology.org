@@ -1,5 +1,5 @@
 
-#line 3 "lex.yy.c"
+#line 3 "tool_lexic.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -681,7 +681,7 @@ char *yytext;
 int yyerror(const char *);
 
 
-#line 685 "lex.yy.c"
+#line 685 "tool_lexic.cc"
 
 #define INITIAL 0
 #define STRING_STATE 1
@@ -867,7 +867,7 @@ YY_DECL
 #line 23 "tool_lexic.ll"
 
 
-#line 871 "lex.yy.c"
+#line 871 "tool_lexic.cc"
 
 	if ( !(yy_init) )
 		{
@@ -1174,7 +1174,7 @@ YY_RULE_SETUP
 #line 78 "tool_lexic.ll"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1178 "lex.yy.c"
+#line 1178 "tool_lexic.cc"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING_STATE):
 	yyterminate();

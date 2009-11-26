@@ -30,4 +30,6 @@ BUILT_SOURCES = \
   projectview.moc.cc \
   tool.moc.cc
 
+EXTRA_DIST = tool_lexic.cc tool_syntax.cc tool_syntax.h
+
 CLEANFILES = *.moc.cc

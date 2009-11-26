@@ -118,13 +118,13 @@ string FormulaMultiaryOr::asString() const {
 //! \param literal name of the literal to be removed
 void FormulaMultiary::removeLiteral(const string& literal) {
 
-    DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
+    //DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
 
     for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
 
         // if the considered current formula is a literal, then remove it;
         // call the function recursively, otherwise
-    	DEBUG "\t removeLiteral: current formula '" << (*i)->asString() << "'" END
+    	//DEBUG "\t removeLiteral: current formula '" << (*i)->asString() << "'" END
         FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> (*i);
         if (checkLiteral != NULL) {
 
@@ -145,7 +145,7 @@ void FormulaMultiary::removeLiteral(const string& literal) {
 
                 // a size zero negation formula is useless, so erase it
 				subFormulas.erase( i++ );
-				DEBUG "\t removeLiteral: size zero NEGATION removed, result is '" << asString() << "'" END
+				//DEBUG "\t removeLiteral: size zero NEGATION removed, result is '" << asString() << "'" END
 
             } else {
 
@@ -154,28 +154,28 @@ void FormulaMultiary::removeLiteral(const string& literal) {
 
                     // a size zero multiary formula is useless, so erase it
                     subFormulas.erase( i++ );
-                    DEBUG "\t removeLiteral: size zero MULTIARY removed, result is '" << asString() << "'" END
+                    //DEBUG "\t removeLiteral: size zero MULTIARY removed, result is '" << asString() << "'" END
 
                 } else {
 
                     // adopt flattened subformula
                     ++i;
-                    DEBUG "\t removeLiteral: nothing to remove, result is '" << asString() << "'" END
+                    //DEBUG "\t removeLiteral: nothing to remove, result is '" << asString() << "'" END
                 }
             }
         }
     }
 
-    DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
+    //DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
 }
 
 void FormulaNegation::removeLiteral(const string& literal) {
 
-    DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
+    //DEBUG "\t removeLiteral START: '" << asString() << "', literal '" << literal << "'" END
 
     // if the subformula is a literal, then remove it;
     // call the function recursively, otherwise
-    DEBUG "\t removeLiteral: subformula '" << subFormula->asString() << "'" END
+    //DEBUG "\t removeLiteral: subformula '" << subFormula->asString() << "'" END
     FormulaLiteral* checkLiteral = dynamic_cast<FormulaLiteral*> ( subFormula );
     if (checkLiteral != NULL) {
 
@@ -201,7 +201,7 @@ void FormulaNegation::removeLiteral(const string& literal) {
         }
     }
 
-    DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
+    //DEBUG "\t removeLiteral END: '" << asString() << "', literal '" << literal << "'" END
 }
 
 
@@ -212,13 +212,13 @@ void FormulaNegation::removeLiteral(const string& literal) {
 
 void FormulaMultiaryAnd::flatten() {
 
-    DEBUG "\tAND flatten START: '" << asString() << "'" END
+    //DEBUG "\tAND flatten START: '" << asString() << "'" END
 
     // ATTENTION: increment iterator inside because of erase
     for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
 
         // check if subformula is a size one multiary formula
-    	DEBUG "\tAND flatten: current formula '" << (*i)->asString() << "'" END
+    	//DEBUG "\tAND flatten: current formula '" << (*i)->asString() << "'" END
         FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
         if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
 
@@ -227,7 +227,7 @@ void FormulaMultiaryAnd::flatten() {
 			subFormulas.insert( i, checkMultiary->subFormulas.front() );
 			subFormulas.erase( i++ );
 			--i;
-			DEBUG "\tAND flatten: size one MULTIARY flattened, result is '" << asString() << "'" END
+			//DEBUG "\tAND flatten: size one MULTIARY flattened, result is '" << asString() << "'" END
         }
 
 
@@ -244,7 +244,7 @@ void FormulaMultiaryAnd::flatten() {
                 delete checkNegation;
                 subFormulas.erase( i++ );
                 --i;
-                DEBUG "\tAND flatten: double NEGATION flattened, result is '" << asString() << "'" END
+                //DEBUG "\tAND flatten: double NEGATION flattened, result is '" << asString() << "'" END
             }
 		}
 
@@ -259,28 +259,28 @@ void FormulaMultiaryAnd::flatten() {
                 subFormulas.insert( i, *j );
             }
             subFormulas.erase( i++ );
-            DEBUG "\tAND flatten: subformulas taken, result is '" << asString() << "'" END
+            //DEBUG "\tAND flatten: subformulas taken, result is '" << asString() << "'" END
 
         } else {
 
 			// adopt flattened subformula
 			++i;
-			DEBUG "\tAND flatten: flattened used, result is '" << asString() << "'" END
+			//DEBUG "\tAND flatten: flattened used, result is '" << asString() << "'" END
         }
     }
 
-    DEBUG "\tAND flatten END: '" << asString() << "'" END
+    //DEBUG "\tAND flatten END: '" << asString() << "'" END
 }
 
 void FormulaMultiaryOr::flatten() {
 
-    DEBUG "\tOR flatten START: '" << asString() << "'" END
+    //DEBUG "\tOR flatten START: '" << asString() << "'" END
 
     // ATTENTION: increment iterator inside because of erase
     for (subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ) {
 
         // check if subformula is a size one multiary formula
-    	DEBUG "\tOR flatten: current formula '" << (*i)->asString() << "'" END
+    	//DEBUG "\tOR flatten: current formula '" << (*i)->asString() << "'" END
 		FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( *i );
 		if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
 
@@ -289,7 +289,7 @@ void FormulaMultiaryOr::flatten() {
 			subFormulas.insert( i, checkMultiary->subFormulas.front() );
 			subFormulas.erase( i++ );
 			--i;
-			DEBUG "\tOR flatten: size one MULTIARY flattened, result is '" << asString() << "'" END
+			//DEBUG "\tOR flatten: size one MULTIARY flattened, result is '" << asString() << "'" END
 		}
 
 
@@ -306,13 +306,13 @@ void FormulaMultiaryOr::flatten() {
                 delete checkNegation;
                 subFormulas.erase( i++ );
                 --i;
-                DEBUG "\tOR flatten: double NEGATION flattened, result is '" << asString() << "'" END
+                //DEBUG "\tOR flatten: double NEGATION flattened, result is '" << asString() << "'" END
             }
 		}
 
 
         // check if subformula is a disjunction
-        DEBUG "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" END
+        //DEBUG "\tOR flatten: flattened current formula '" << (*i)->asString() << "'" END
         FormulaMultiaryOr* checkOr = dynamic_cast<FormulaMultiaryOr*> ( *i );
         if ( checkOr != NULL ) {
 
@@ -322,32 +322,32 @@ void FormulaMultiaryOr::flatten() {
                 subFormulas.insert( i, *j );
             }
             subFormulas.erase( i++ );
-            DEBUG "\tOR flatten: subformulas taken, result is '" << asString() << "'" END
+            //DEBUG "\tOR flatten: subformulas taken, result is '" << asString() << "'" END
 
         } else {
 
 			// adopt flattened subformula
 			++i;
-			DEBUG "\tOR flatten: flattened used, result is '" << asString() << "'" END
+			//DEBUG "\tOR flatten: flattened used, result is '" << asString() << "'" END
         }
     }
 
-    DEBUG "\tOR flatten END: '" << asString() << "'" END
+    //DEBUG "\tOR flatten END: '" << asString() << "'" END
 }
 
 void FormulaNegation::flatten() {
 
-    DEBUG "\tNOT flatten START: '" << asString() << "'" END
+    //DEBUG "\tNOT flatten START: '" << asString() << "'" END
 
     // check if subformula is a size one multiary formula
-    DEBUG "\tNOT flatten: subformula '" << subFormula->asString() << "'" END
+    //DEBUG "\tNOT flatten: subformula '" << subFormula->asString() << "'" END
     FormulaMultiary* checkMultiary = dynamic_cast<FormulaMultiary*> ( subFormula );
     if ( checkMultiary != NULL && checkMultiary->size() == 1 ) {
 
         // a size one multiary formula is useless, so erase it
         subFormula = checkMultiary->subFormulas.front();
         delete checkMultiary;
-        DEBUG "\tNOT flatten: size one MULTIARY flattened, result is '" << asString() << "'" END
+        //DEBUG "\tNOT flatten: size one MULTIARY flattened, result is '" << asString() << "'" END
     }
 
 
@@ -361,11 +361,11 @@ void FormulaNegation::flatten() {
             subFormula = checkSubNegation->subFormula;
             delete checkSubNegation;
             delete checkNegation;
-            DEBUG "\tNOT flatten: double NEGATION flattened, result is '" << asString() << "'" END
+            //DEBUG "\tNOT flatten: double NEGATION flattened, result is '" << asString() << "'" END
         }
     }
 
-    DEBUG "\tNOT flatten END: '" << asString() << "'" END
+    //DEBUG "\tNOT flatten END: '" << asString() << "'" END
 }
 
 
@@ -376,13 +376,13 @@ void FormulaNegation::flatten() {
 
 void FormulaMultiaryAnd::merge() {
 
-	DEBUG "\tAND merge START: '" << asString() << "'" END
+	//DEBUG "\tAND merge START: '" << asString() << "'" END
 
 	// iterate over all subformulas twice: first we determine the current
 	// assumption and then we check all subformulae for being an conclusion
 	for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ++assumption ) {
 
-		DEBUG "\tAND merge: current formula '" << (*assumption)->asString() << "'" END
+		//DEBUG "\tAND merge: current formula '" << (*assumption)->asString() << "'" END
 		for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ) {
 
 			// check if we have the same subformula as assumption and
@@ -395,28 +395,28 @@ void FormulaMultiaryAnd::merge() {
 				// check if assumption implies conclusion, which means in a
 				// CONJUNCTION the conclusion is redundant
 				if ( (*assumption)->implies(*conclusion) ) {
-					DEBUG "\tAND merge: erase formula '" << (*conclusion)->asString() << "'" END
+					//DEBUG "\tAND merge: erase formula '" << (*conclusion)->asString() << "'" END
 					subFormulas.erase( conclusion++ );
 				} else {
-					DEBUG "\tAND merge: skipped formula '" << (*conclusion)->asString() << "'" END
+					//DEBUG "\tAND merge: skipped formula '" << (*conclusion)->asString() << "'" END
 					++conclusion;
 				}
 			}
 		}
 	}
 
-	DEBUG "\tAND merge END: '" << asString() << "'" END
+	//DEBUG "\tAND merge END: '" << asString() << "'" END
 }
 
 void FormulaMultiaryOr::merge() {
 
-	DEBUG "\tOR merge START: '" << asString() << "'" END
+	//DEBUG "\tOR merge START: '" << asString() << "'" END
 
 	// iterate over all subformulas twice: first we determine the current
 	// conclusion and then we check all subformulae for being an assumption
 	for ( subFormulas_t::iterator conclusion = subFormulas.begin(); conclusion != subFormulas.end(); ++conclusion ) {
 
-		DEBUG "\tOR merge: current formula '" << (*conclusion)->asString() << "'" END
+		//DEBUG "\tOR merge: current formula '" << (*conclusion)->asString() << "'" END
 		for ( subFormulas_t::iterator assumption = subFormulas.begin(); assumption != subFormulas.end(); ) {
 
 			// check if we have the same subformula as assumption and
@@ -429,17 +429,17 @@ void FormulaMultiaryOr::merge() {
 				// check if assumption implies conclusion, which means in a
 				// DISJUNCTION the assumption is redundant
 				if ( (*assumption)->implies(*conclusion) ) {
-					DEBUG "\tOR merge: erase formula '" << (*assumption)->asString() << "'" END
+					//DEBUG "\tOR merge: erase formula '" << (*assumption)->asString() << "'" END
 					subFormulas.erase( assumption++ );
 				} else {
-					DEBUG "\tOR merge: skipped formula '" << (*assumption)->asString() << "'" END
+					//DEBUG "\tOR merge: skipped formula '" << (*assumption)->asString() << "'" END
 					++assumption;
 				}
 			}
 		}
 	}
 
-	DEBUG "\tOR merge END: '" << asString() << "'" END
+	//DEBUG "\tOR merge END: '" << asString() << "'" END
 }
 
 
@@ -450,13 +450,13 @@ void FormulaMultiaryOr::merge() {
 
 void FormulaMultiaryAnd::simplify() {
 
-	DEBUG "AND simplify START: '" << asString() << "'" END
+	//DEBUG "AND simplify START: '" << asString() << "'" END
 
 	// simplify recursively all subformula first
 	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
-		DEBUG "\tAND simplify: current formula '" << (*i)->asString() << "'" END
+		//DEBUG "\tAND simplify: current formula '" << (*i)->asString() << "'" END
 		(*i)->simplify();
-		DEBUG "\tAND simplify: simplified current formula '" << (*i)->asString() << "'" END
+		//DEBUG "\tAND simplify: simplified current formula '" << (*i)->asString() << "'" END
 	}
 
     // step 1: flatten
@@ -469,18 +469,18 @@ void FormulaMultiaryAnd::simplify() {
     // assumption and then we check all subformulae for being a conclusion
 	merge();
 
-    DEBUG "AND simplify END: '" << asString() << "'" END
+    //DEBUG "AND simplify END: '" << asString() << "'" END
 }
 
 void FormulaMultiaryOr::simplify() {
 
-	DEBUG "OR simplify START: '" << asString() << "'" END
+	//DEBUG "OR simplify START: '" << asString() << "'" END
 
 	// simplify recursively all subformula first
 	for ( subFormulas_t::iterator i = subFormulas.begin(); i != subFormulas.end(); ++i ) {
-		DEBUG "\tOR simplify: current formula '" << (*i)->asString() << "'" END
+		//DEBUG "\tOR simplify: current formula '" << (*i)->asString() << "'" END
 		(*i)->simplify();
-		DEBUG "\tOR simplify: simplified current formula '" << (*i)->asString() << "'" END
+		//DEBUG "\tOR simplify: simplified current formula '" << (*i)->asString() << "'" END
 	}
 
 	// step 1: flatten
@@ -493,24 +493,24 @@ void FormulaMultiaryOr::simplify() {
 	// conclusion and then we check all subformulae for being an assumption
 	merge();
 
-    DEBUG "OR simplify END: '" << asString() << "'" END
+    //DEBUG "OR simplify END: '" << asString() << "'" END
 }
 
 void FormulaNegation::simplify() {
 
-	DEBUG "NOT simplify START: '" << asString() << "'" END
+	//DEBUG "NOT simplify START: '" << asString() << "'" END
 
 	// simplify subformula first
-    DEBUG "\tNOT simplify: subformula '" << subFormula->asString() << "'" END
+    //DEBUG "\tNOT simplify: subformula '" << subFormula->asString() << "'" END
     subFormula->simplify();
-    DEBUG "\tNOT simplify: simplified subformula '" << subFormula->asString() << "'" END
+    //DEBUG "\tNOT simplify: simplified subformula '" << subFormula->asString() << "'" END
 
 	// only step 1: flatten
 	// iterate over all subformula and check them for being a size one mulitary
 	// formula or a double negation
 	flatten();
 
-    DEBUG "NOT simplify END: '" << asString() << "'" END
+    //DEBUG "NOT simplify END: '" << asString() << "'" END
 }
 
 

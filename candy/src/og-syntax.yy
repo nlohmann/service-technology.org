@@ -236,6 +236,7 @@ formula:
 | OP_NOT formula
   {
     $$ = new FormulaNegation($2);
+    currentNode->negation = true;
   }
 | KEY_FINAL
   {

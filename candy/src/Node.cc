@@ -22,12 +22,20 @@ void Node::setFlagRecursively(bool _flag) {
 //! \return returns the minimal cost of this node
 unsigned int Node::computeEfficientSuccessors() {
 
-    // if this node has ID 0 we dont have to consider leaving edges
-    // reason: per definition from the tool wendy is ID 0 the empty node
+    // return computed cost if we handled this node before
     DEBUG "DEBUG computing costs for node " << getID() END
     if (args_info.debug_flag) outputDebug( cout );
+    if ( computedCost ) {
+    	DEBUG "      node '" << getID() << "', " << this << " already computed, cost is '" << cost << "'" END
+        return cost;
+    }
+
+    // if this node has ID 0 we dont have to consider leaving edges
+    // reason: per definition from the tool wendy is ID 0 the empty node
     if ( getID() == 0 ) {
     	DEBUG "      node '" << getID() << "', " << this << " is the empty node, cost is 0" END
+        computedCost = true;
+        cost = 0;
         return 0;
     }
 
@@ -35,6 +43,8 @@ unsigned int Node::computeEfficientSuccessors() {
     // reason: per definition has final node in an OG no successors
     if ( final ) {
     	DEBUG "      node '" << getID() << "', " << this << " is final, cost is 0" END
+        computedCost = true;
+        cost = 0;
         return 0;
     }
 
@@ -67,7 +77,16 @@ unsigned int Node::computeEfficientSuccessors() {
     // second we compute all cost minimal assignments for this node as well as
     // the minimal cost
     list<FormulaAssignment> minimalAssignments;
-    unsigned int minimalCost = getCostMinimalAssignments(edgeCost, minimalAssignments);
+    unsigned int minimalCost = 0;
+    if ( negation ) {
+        // run-time complexity O(2^n)
+        minimalCost = getCostMinimalAssignments(edgeCost, minimalAssignments);
+        DEBUG "      node " << getID() << " has formula with negation" END
+    } else {
+        // run-time complexity O(n^2)
+        minimalCost = getCostMinimalAssignmentsWithoutNegation(edgeCost, minimalAssignments);
+        DEBUG "      node " << getID() << " has formula without negation" END
+    }
     DEBUG "      node " << getID() << " has minimalAssignment with cost " << minimalCost END
 
 
@@ -108,6 +127,7 @@ unsigned int Node::computeEfficientSuccessors() {
             }
 
             // check if there is a valid formula
+            // this is possible, e.g. with a formula ~a
             if ( formula->size() == 0 ) {
                 delete formula;
                 formula = new FormulaTrue();
@@ -132,6 +152,11 @@ unsigned int Node::computeEfficientSuccessors() {
     formula->simplify();
     DEBUG "      new formula: " << (formula != NULL ? formula->asString() : "NULL") END
 
+    // mark this node as already handled and store computed cost
+    computedCost = true;
+    cost = minimalCost;
+
+    // return minimal cost
     return minimalCost;
 }
 
@@ -184,9 +209,9 @@ void Node::getCostMinimalAssignmentsRecursively(
     // if this was the last label ...
     if ( edgeCost.empty() ) {
 
-        // set it to False ...
+        // set it to false ...
         currentAssignment.set(currentLabel, false);
-        if ( formula->value(currentAssignment) == true ) {
+        if ( formula->value(currentAssignment) ) {
 
             if ( currentCost < minimalCost ) {
                 // we found a minimal assignment with lesser cost
@@ -199,10 +224,10 @@ void Node::getCostMinimalAssignmentsRecursively(
             }
         }
 
-        // set it to True
-        // only for true labels the label's cost are added
+        // set it to true
+        // only for true labels the label's cost are regarded
         currentAssignment.set(currentLabel, true);
-        if ( formula->value(currentAssignment) == true ) {
+        if ( formula->value(currentAssignment) ) {
 
             unsigned int newCurrentCost = currentCost < currentLabelCost ? currentLabelCost : currentCost;
             if ( newCurrentCost < minimalCost ) {
@@ -228,12 +253,90 @@ void Node::getCostMinimalAssignmentsRecursively(
         // set it to True
         currentAssignment.set(currentLabel, true);
         getCostMinimalAssignmentsRecursively(edgeCost,
-                                             (currentCost >= currentLabelCost ? currentCost : currentLabelCost),
+                                             (currentCost < currentLabelCost ? currentLabelCost : currentCost),
                                              currentAssignment, minimalCost, minimalAssignments);
     }
 
     // reinsert the label afterwards
+    // TODO we dont need this, do we?
     edgeCost.push_front( pair<Event*, unsigned int>(currentEvent, currentLabelCost));
+}
+
+
+//! \brief computes a list of the cost minimal assignment for this node and the minimal cost
+//!        we explore the fact that there is no negation inside the formula
+//! \param edgeCost a list with all outgoing events and their cost
+//! \param minimalAssignments list of all found minimal assignments
+//! \return returns the cost of a minimal assignment
+unsigned int Node::getCostMinimalAssignmentsWithoutNegation(
+        list< pair<Event*, unsigned int> > edgeCost,
+        list< FormulaAssignment >& minimalAssignments) {
+
+    assert( not edgeCost.empty() );
+    assert( minimalAssignments.empty() );
+
+
+    // initial assignment is true for all literals
+    FormulaAssignment minimalAssignment = FormulaAssignment();
+    for ( list< pair<Event*, unsigned int> >::const_iterator i = edgeCost.begin();
+            i != edgeCost.end(); ++i ) {
+
+        minimalAssignment.set( (*i).first->name, true );
+    }
+    if ( not formula->value(minimalAssignment) ) {
+        // the formula is unsatisfiable, so the cost are maximal to prevent the
+        // previous node of choosing an edge to the current node
+        return UINT_MAX;
+    }
+
+
+    // try to compute assignment for formula with lesser costs
+    bool found = false;
+    unsigned int maximalEdgeCost = 0;
+    while ( not found and not edgeCost.empty() ) {
+
+        // find maximal edge cost
+        maximalEdgeCost = 0;
+        for ( list< pair<Event*, unsigned int> >::iterator i = edgeCost.begin(); i != edgeCost.end(); ++i ) {
+
+            maximalEdgeCost = ( (*i).second > maximalEdgeCost ) ? (*i).second : maximalEdgeCost;
+        }
+
+        // find edges with maximal cost and remove them from edgeCost
+        list< Event* > maximalEdges;
+        for ( list< pair<Event*, unsigned int> >::iterator i = edgeCost.begin(); i != edgeCost.end(); /**/ ) {
+
+            if ( (*i).second == maximalEdgeCost ) {
+
+                maximalEdges.push_back( (*i).first );
+                edgeCost.erase( i++ );
+            } else {
+
+                ++i;
+            }
+        }
+        DEBUG "found '" << maximalEdges.size() << "' edges with maximalEdgeCost '" << maximalEdgeCost << "'" END
+
+        // set literals corresponding to edges with maximal cost to false
+        for ( list< Event* >::const_iterator i = maximalEdges.begin(); i != maximalEdges.end(); ++i ) {
+
+            minimalAssignment.set( (*i)->name, false );
+        }
+
+        if ( not formula->value( minimalAssignment ) ) {
+
+            // restore original assignment and exit loop
+            for ( list< Event* >::const_iterator i = maximalEdges.begin(); i != maximalEdges.end(); ++i ) {
+
+                minimalAssignment.set( (*i)->name, true );
+            }
+            found = true;
+        }
+    }
+
+
+    minimalAssignments.push_back( minimalAssignment );
+    return maximalEdgeCost;
 }
 
 

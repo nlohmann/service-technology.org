@@ -27,12 +27,18 @@ class Node {
         /// a boolean flag used to speed up some algorithms
         bool flag;
 
+        bool negation;
+
+        bool computedCost;
+        unsigned int cost;
+
         /*--------.
 		| methods |
 		`--------*/
 
         /// basic constructor
-        explicit Node(unsigned int _id) : formula(NULL), id(_id), final(false), flag(false) {};
+        explicit Node(unsigned int _id) : formula(NULL), id(_id), final(false),
+            flag(false), negation(false), computedCost(false), cost(0) {};
 
         /// basic destructor
         virtual ~Node() {
@@ -65,6 +71,22 @@ class Node {
         		FormulaAssignment,
         		unsigned int&,
         		list< FormulaAssignment >&);
+
+        /// compute a list of cost minimal assignments for this node
+        /// under the assumption that the node's formula does not
+        /// contain a negation
+        unsigned int getCostMinimalAssignmentsWithoutNegation(
+        		list< pair<Event*, unsigned int> >,
+        		list< FormulaAssignment >& );
+
+        /// helper function for getCostMinimalAssignmentsWithoutNegation
+        void getCostMinimalAssignmentsWithoutNegationRecursively(
+        		list< pair<Event*, unsigned int> >,
+        		unsigned int,
+        		FormulaAssignment,
+        		unsigned int&,
+        		list< FormulaAssignment >&);
+
 
         /// print debug information about this node
         void outputDebug(std::ostream&);

@@ -15,8 +15,8 @@ fiona_SOURCES = \
   projectview.cc projectview.h projectview.moc.cc \
   tool.cc tool.h tool.moc.cc
 
-fiona_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
-fiona_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
+fiona_CXXFLAGS = $(QT_CXXFLAGS) #$(AM_CXXFLAGS)
+fiona_CPPFLAGS = $(QT_CPPFLAGS) #$(AM_CPPFLAGS)
 fiona_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
 fiona_LDADD    = $(QT_LIBS) $(LDADD)
 

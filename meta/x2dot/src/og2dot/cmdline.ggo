@@ -1,4 +1,4 @@
-args "--include-getopt"
+args "--unamed-opts=INPUT_FILE --include-getopt"
 
 purpose "og2dot converts operating guidelines and service automata into dot format."
 
@@ -6,17 +6,18 @@ description "About og2dot:"
 
 section "Input / Output"
 
-option "input" i
-  "Input file. If no file is given, the operating guideline or service automaton will be read from standard in. "
-  string
-  typestr="INPUT"
+option "output" o
+  "Dot output format."
+  typestr="OUTPUT"
+  values="jpg","png","pdf"
+  default = "jpg"
   optional
 
-option "output" o
-  "Output file name. If not set, the dot output will be written to standard out. If used with option --calldot, the output will be piped
-   to dot passing this file name as an argument. Otherwise the output will be written to a file with this name."
+option "name" n
+  "Defines a name for dot output file."
   string
-  typestr="OUTPUT"
+  typestr="NAME"
+  dependon="output"
   optional
 
 section "Labeling"
@@ -24,16 +25,6 @@ section "Labeling"
 option "noPrefix" -
   "If this flag is set, labels will not be prefixed."  
   flag off
-
-section "Dot output parameters"
-
-option "calldot" c
-   "Pipes output to dot (uses name specified with --input as output file name)."
-   dependon = "output"
-   typestr="DOT"
-   values="jpg","png","pdf"
-   default = "jpg"
-   optional
 
 section "Debugging"
 

@@ -22,44 +22,40 @@ AT_CLEANUP
 AT_BANNER([I/O Tests])
 ############################################################################
 
-AT_SETUP([File In, File Out])
+AT_SETUP([Read file, write output to stdout])
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.wendy.dot],0)
-AT_CHECK([test -f myCoffee.wendy.dot])
+AT_CHECK([OG2DOT myCoffee.wendy.og],0,ignore)
 AT_KEYWORDS(io)
 AT_CLEANUP
 
-AT_SETUP([File In, Pipe Out])
-AT_CHECK([cp TESTFILES/myCoffee.fiona.og .])
-AT_CHECK([OG2DOT --input=myCoffee.fiona.og > myCoffee.fiona.dot],0)
-AT_CHECK([test -f myCoffee.fiona.dot])
-AT_KEYWORDS(io)
-AT_CLEANUP
-
-AT_SETUP([Pipe In, File Out])
-AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([cat myCoffee.wendy.og | OG2DOT --output=myCoffee.wendy.dot],0)
-AT_CHECK([test -f myCoffee.wendy.dot])
-AT_KEYWORDS(io)
-AT_CLEANUP
-
-AT_SETUP([Pipe In, Pipe Out])
-AT_CHECK([cp TESTFILES/PO.fiona.og .])
-AT_CHECK([cat PO.fiona.og | OG2DOT > PO.fiona.dot],0)
-AT_CHECK([test -f PO.fiona.dot])
-AT_KEYWORDS(io)
-AT_CLEANUP
-
-############################################################################
-AT_BANNER([Dot Output Tests])
-############################################################################
-
-AT_SETUP([Piping to dot])
+AT_SETUP([Read file, pipe to dot])
 AT_CHECK_DOT
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.png --calldot=png],0,ignore)
-AT_CHECK([test -f myCoffee.png])
-AT_KEYWORDS(dot)
+AT_CHECK([OG2DOT myCoffee.wendy.og -opng],0,ignore)
+AT_CHECK([test -f myCoffee.wendy.og.png])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([Read from stdin, write to stdout])
+AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
+AT_CHECK([cat myCoffee.wendy.og | OG2DOT],0,ignore)
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([Read from stdin, pipe to dot])
+AT_CHECK_DOT
+AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
+AT_CHECK([cat myCoffee.wendy.og | OG2DOT -ojpg],0,ignore)
+AT_CHECK([test -f stdin.jpg])
+AT_KEYWORDS(io)
+AT_CLEANUP
+
+AT_SETUP([Read from file, pipe to dot with specified output file name])
+AT_CHECK_DOT
+AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
+AT_CHECK([OG2DOT myCoffee.wendy.og -opdf -nmyCoffee],0,ignore)
+AT_CHECK([test -f myCoffee.pdf])
+AT_KEYWORDS(io)
 AT_CLEANUP
 
 ############################################################################
@@ -68,36 +64,35 @@ AT_BANNER([Formats])
 
 AT_SETUP([Wendy format (Bits)])
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.wendy.dot],0)
-AT_CHECK([test -f myCoffee.wendy.dot])
+AT_CHECK([OG2DOT myCoffee.wendy.og -opng],0)
+AT_CHECK([test -f myCoffee.wendy.og.png])
 AT_KEYWORDS(formats)
 AT_CLEANUP
 
 AT_SETUP([Wendy format (Formulae)])
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.wendy.dot],0)
-AT_CHECK([test -f myCoffee.wendy.dot])
+AT_CHECK([OG2DOT myCoffee.wendy.og -opng],0)
+AT_CHECK([test -f myCoffee.wendy.og.png])
 AT_KEYWORDS(formats)
 AT_CLEANUP
 
 AT_SETUP([Fiona format])
 AT_CHECK([cp TESTFILES/example.fiona.og .])
-AT_CHECK([OG2DOT --input=example.fiona.og --output=example.fiona.dot],0)
-AT_CHECK([test -f example.fiona.dot])
+AT_CHECK([OG2DOT example.fiona.og -opng],0)
+AT_CHECK([test -f example.fiona.og.png])
 AT_KEYWORDS(formats)
 AT_CLEANUP
 
 AT_SETUP([Fiona format (only blue nodes)])
 AT_CHECK([cp TESTFILES/PO.fiona.og .])
-AT_CHECK([OG2DOT --input=PO.fiona.og --output=PO.fiona.dot],0)
-AT_CHECK([test -f PO.fiona.dot])
+AT_CHECK([OG2DOT PO.fiona.og],0, ignore, ignore)
 AT_KEYWORDS(formats)
 AT_CLEANUP
 
 AT_SETUP([Service automata])
 AT_CHECK([cp TESTFILES/myCoffee.sa .])
-AT_CHECK([OG2DOT --input=myCoffee.sa --output=myCoffee.sa.dot],0)
-AT_CHECK([test -f myCoffee.sa.dot])
+AT_CHECK([OG2DOT myCoffee.sa -opng],0)
+AT_CHECK([test -f myCoffee.sa.png])
 AT_KEYWORDS(formats)
 AT_CLEANUP
 
@@ -106,17 +101,17 @@ AT_BANNER([Non-standard options])
 ############################################################################
 AT_SETUP([Parameter --stats])
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.wendy.dot --stats],0, ignore, stderr)
+AT_CHECK([OG2DOT myCoffee.wendy.og -opng --stats],0, ignore, stderr)
 AT_CHECK([GREP -q "runtime" stderr])
 AT_CHECK([GREP -q "memory consumption" stderr])
-AT_CHECK([test -f myCoffee.wendy.dot])
+AT_CHECK([test -f myCoffee.wendy.og.png])
 AT_KEYWORDS(options)
 AT_CLEANUP
 
 AT_SETUP([Parameter --noPrefix])
 AT_CHECK([cp TESTFILES/myCoffee.wendy.og .])
-AT_CHECK([OG2DOT --input=myCoffee.wendy.og --output=myCoffee.wendy.dot --noPrefix],0)
-AT_CHECK([test -f myCoffee.wendy.dot])
+AT_CHECK([OG2DOT myCoffee.wendy.og -opng --noPrefix],0)
+AT_CHECK([test -f myCoffee.wendy.og.png])
 AT_KEYWORDS(options)
 AT_CLEANUP
 
@@ -126,13 +121,13 @@ AT_BANNER([Error cases])
 
 AT_SETUP([Parsing error])
 AT_CHECK([cp TESTFILES/error.wendy.og .])
-AT_CHECK([OG2DOT --input=error.wendy.og --output=error.wendy.dot],0, ignore, stderr)
+AT_CHECK([OG2DOT error.wendy.og],0, ignore, stderr)
 AT_CHECK([GREP -q "error" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([Error opening file])
-AT_CHECK([OG2DOT --input=none.og],1, ignore, stderr)
+AT_CHECK([OG2DOT none.og],1, ignore, stderr)
 AT_CHECK([GREP -q "ERROR: failed to open input file 'none.og'" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

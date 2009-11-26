@@ -25,9 +25,10 @@ extern int og_yylex_destroy();
 extern FILE* og_yyin;
 
 /// output stream
-//std::ostream* outStream = &cout;
 std::stringstream outStream;
 
+// Name for dot output file
+std::string filename;
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
@@ -52,7 +53,7 @@ void terminationHandler() {
         fprintf(stderr, "%s: runtime: %.2f sec\n", PACKAGE, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
 	//TODO: Replace "grep" and "awk" with macros defined in configure.ac
-        system((std::string("ps -o rss -o comm | ") + "grep" + " " + PACKAGE + " | " + "awk" + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        int ret = system((std::string("ps -o rss -o comm | ") + "grep" + " " + PACKAGE + " | " + "awk" + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 }
 
@@ -70,48 +71,43 @@ int main(int argc, char** argv)
   // parse commandline
   evaluateParameters(argc, argv);
   
+  
   // set input source
-  if(args_info.input_given) // if user set an input file
+  if(args_info.inputs_num > 0) // if user set an input file
   {
     // open file and link input file pointer
-    og_yyin = fopen(args_info.input_arg, "r");
+    og_yyin = fopen(args_info.inputs[0], "r");
     if(!og_yyin) // if an error occurred
     {
       cerr << PACKAGE << ": ERROR: failed to open input file '"
-           << args_info.input_arg << "'" << endl;
+           << args_info.inputs[0] << "'" << endl;
       exit(EXIT_FAILURE);
     }
+    filename = args_info.inputs[0];
   }
-
+  else
+    filename = "stdin";
+ 
   /// actual parsing
   og_yyparse();
 
   // set output destination
-  if(args_info.output_given) // if user set an output file
-  {
-    if(!args_info.calldot_given){
- 	  ofs.open(args_info.output_arg, std::ios_base::trunc); // open file
-  	  if(!ofs) // if an error occurred on opening the file
-  	  {
-   	  	cerr << PACKAGE << ": ERROR: failed to open output file '"
-   	        << args_info.output_arg << "'" << endl;
-      		exit(EXIT_FAILURE);
-   	  }
-    
-    	  // else print output stream to file
-    	  ofs << outStream.str();
-    }
-    else{
-     	  //Pipe to dot
-   	  if(args_info.calldot_given){
-        	 //string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
-         	 std::string call = std::string(CONFIG_DOT) + " -T" + args_info.calldot_arg + " -o " + args_info.output_arg;
-	         FILE *s = popen(call.c_str(), "w");
-                 fprintf(s, "%s\n", outStream.str().c_str());
-                 pclose(s);
-          }
+  if(args_info.output_given){
+     // if user set an output file
+     if(args_info.name_given){
+	//If user has specified a file name
+        filename = args_info.name_arg;
+     }
+     //Append format suffix to file name
+     filename = filename + "." + args_info.output_arg;
 
-    }
+     //Pipe to dot
+     std::string call = std::string(CONFIG_DOT) + " -T" + args_info.output_arg + " -o " + filename;
+     FILE *s = popen(call.c_str(), "w");
+     fprintf(s, "%s\n", outStream.str().c_str());
+     pclose(s);
+
+
   }
   else
     	std::cout << outStream.str();

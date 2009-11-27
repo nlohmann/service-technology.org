@@ -23,6 +23,7 @@ extern std::stringstream outStream;
 //Helper variables
 unsigned int currentNode;
 char currentAnnotation;
+bool isServiceAutomaton = false;
 
 //List of nodes
 
@@ -94,42 +95,65 @@ og:
   	outStream << "edge [fontname=Helvetica fontsize=10]\n";
   	outStream << "node [fontname=Helvetica fontsize=10]\n";  
 
-
-	//Create invisible node (in order to mark the initial state)
-	outStream << "INIT" << nodes[0] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";     
+	std::vector<std::pair<char*, unsigned int> > successors;  
 
 	//For all nodes...
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes
-		if(nodeAnnotation[nodes[i]] == " INITIAL " || nodeAnnotation[nodes[i]] == " FINAL "){
-			if(nodeAnnotation[nodes[i]] == " INITIAL "){
-				outStream << nodes[i] << " [label=\" \"]\n";
-				//Create invisible node (in order to mark the initial state)
-				outStream << "INIT" << nodes[i] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
-  				//Mark initial state
-				outStream << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
-			}				
-			if(nodeAnnotation[nodes[i]] == " FINAL "){
+		if(nodeAnnotation[nodes[i]] == " initial "){
+			outStream << nodes[i] << " [label=\" \"]\n";
+			successors = nodeSuccessors[nodes[i]];
+			//Create invisible node (in order to mark the initial state)
+			outStream << "INIT" << nodes[i] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
+  			//Mark initial state
+			outStream << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
+			//write the node's ID, node's annotation and all links to its successors to the stream...
+			for(int j=0;j<successors.size();++j){
+				outStream << nodes[i];
+				outStream << " -> " << successors[j].second;
+				if(args_info.noPrefix_given)
+					outStream << " [label= \"" << successors[j].first << "\"]\n";
+				else
+					outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
+			}	
+			isServiceAutomaton = true;				
+		}
+		else{
+			if(nodeAnnotation[nodes[i]] == " final " && isServiceAutomaton == true){
 				outStream << nodes[i] << " [label=\" \" peripheries=2]\n";
+				successors = nodeSuccessors[nodes[i]];
+				//write the node's ID, node's annotation and all links to its successors to the stream...
+				for(int j=0;j<successors.size();++j){
+					outStream << nodes[i];
+					outStream << " -> " << successors[j].second;
+					if(args_info.noPrefix_given)
+						outStream << " [label= \"" << successors[j].first << "\"]\n";
+					else
+						outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
+				}	
+			}
+			else{
+				outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
+				successors = nodeSuccessors[nodes[i]];
+				//write the node's ID, node's annotation and all links to its successors to the stream...
+				for(int j=0;j<successors.size();++j){
+					outStream << nodes[i];
+					outStream << " -> " << successors[j].second;
+					if(args_info.noPrefix_given)
+						outStream << " [label= \"" << successors[j].first << "\"]\n";
+					else
+						outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
+				}	
 			}
 		}
-		else
-			outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
-		std::vector<std::pair<char*, unsigned int> > successors = nodeSuccessors[nodes[i]];
-		//write the node's ID, node's annotation and all links to its successors to the stream...
-		for(int j=0;j<successors.size();++j){
-			outStream << nodes[i];
-			outStream << " -> " << successors[j].second;
-			if(args_info.noPrefix_given)
-				outStream << " [label= \"" << successors[j].first << "\"]\n";
-			else
-				outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";	
-		}
-	
 
 	}
 	//Mark initial state
-	outStream << "INIT" << nodes[0] << " -> " << nodes[0] << " [minlen=\"0.5\"]" << "\n";
+	if(isServiceAutomaton == false){
+		//Create invisible node (in order to mark the initial state)
+		outStream << "INIT" << nodes[0] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";     
+		outStream << "INIT" << nodes[0] << " -> " << nodes[0] << " [minlen=\"0.5\"]" << "\n";
+	}
 
 	//Finish writing output
 	outStream << "\n}";
@@ -151,12 +175,9 @@ og:
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes		
 		outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"";
-		if(nodeColor[nodes[i]]=='b' || nodeColor[nodes[i]]=='r'){
-			outStream << ",style= \"filled\"";
-			if(nodeColor[nodes[i]]=='b')
-				outStream << ",color=\"blue\"]\n";
-			else
-				outStream << ",color=\"red\"]\n";		
+		if(nodeColor[nodes[i]]=='r'){
+			//outStream << ",style= \"filled\"";
+			outStream << ",color=\"red\"]\n";	
 		}
 		else
 			outStream << "]\n";
@@ -368,13 +389,13 @@ formula:
 | OP_NOT  {strStream << " &not; "; strStreamOld << " &not; ";} 
   formula 
 
-| KEY_FINAL {strStream << " FINAL "; strStreamOld << " FINAL ";}
+| KEY_FINAL {strStream << " final "; strStreamOld << " final ";}
 
-| KEY_TRUE {strStream << " TRUE "; strStreamOld << " TRUE ";}
+| KEY_TRUE {strStream << " true "; strStreamOld << " true ";}
 
-| KEY_FALSE {strStream << " FALSE "; strStreamOld << " FALSE ";}
+| KEY_FALSE {strStream << " false "; strStreamOld << " false ";}
 
-| KEY_INITIAL {strStream << " INITIAL "; strStreamOld << " INITIAL ";}
+| KEY_INITIAL {strStream << " initial "; strStreamOld << " initial ";}
 
 | IDENT 
 	{

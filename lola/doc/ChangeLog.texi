@@ -1,3 +1,5 @@
+@heading Version 1.15-unreleased
+
 @heading Version 1.14
 @itemize
 @item no statistics output is printed when using directive @option{STATESPACE}

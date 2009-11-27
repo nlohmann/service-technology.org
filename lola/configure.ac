@@ -1,4 +1,14 @@
-AC_INIT(LoLA, 1.14, lola@service-technology.org, lola, http://service-technology.org/lola)
+AC_INIT([LoLA], 1.15-unreleased, lola@service-technology.org, lola, http://service-technology.org/lola)
+
+AC_MSG_NOTICE([ _          _        _    ])
+AC_MSG_NOTICE([| |    ___ | |      / \   ])
+AC_MSG_NOTICE([| |   / _ \| |     / _ \  ])
+AC_MSG_NOTICE([| |__| (_) | |___ / ___ \ ])
+AC_MSG_NOTICE([|_____\\___/|_____/_/   \_\\])
+AC_MSG_NOTICE([a low-level analyzer])
+AC_MSG_NOTICE([http://service-technology.org/lola])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries

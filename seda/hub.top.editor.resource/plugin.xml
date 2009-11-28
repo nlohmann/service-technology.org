@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.editor.resource.refactor.diagram"
+            nameFilter="*_diagram"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.editor.resource.refactorMenu"
+               label="Refactor"
+               path="additions">
+            <separator
+                  name="refactor">
+            </separator>
+         </menu>
+         <action
+               class="hub.top.editor.eclipse.ui.RenameDiagramFileAction"
+               enablesFor="1"
+               id="hub.top.editor.resource.rename.diagramFile"
+               label="Rename..."
+               menubarPath="hub.top.editor.resource.refactorMenu/refactor">
+         </action>
+       </objectContribution>
+   </extension>
+
+</plugin>

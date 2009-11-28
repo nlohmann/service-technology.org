@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Text Editors
 Bundle-SymbolicName: hub.top.editor.lola.text;singleton:=true
-Bundle-Version: 1.0.5.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: hub.top.editor.lola.text.Activator
 Bundle-Vendor: Service-Technology.org
 Require-Bundle: org.eclipse.ui,
@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  hub.top.editor.ptnetLoLA,
  hub.top.editor.ptnetLoLA.edit,
  hub.top.editor.resource,
- hub.sam.tef,
+ hub.sam.tef;bundle-version="1.0.9",
  org.eclipse.emf.transaction,
  org.eclipse.gmf.runtime.diagram.core,
  org.eclipse.osgi.services,
@@ -22,3 +22,5 @@ Eclipse-RegisterBuddy: hub.top.editor.petrinets
 Export-Package: hub.top.editor.lola.text
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.ui.actions,
+ org.eclipse.ui.dialogs

@@ -229,6 +229,9 @@ public class NodeDecorator implements IDecorator {
         for (EStructuralFeature feat : subscribedFeatures) {
         	EObject modelObject = gep.getPrimaryView().getElement();
         	
+        	if (modelObject == null)
+        	  continue;
+        	
         	// see if the current object can be watched for the current feature
         	if (!modelObject.eClass().getEAllStructuralFeatures().contains(feat))
         		continue;

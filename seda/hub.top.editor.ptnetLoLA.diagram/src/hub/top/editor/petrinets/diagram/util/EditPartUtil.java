@@ -2,7 +2,7 @@ package hub.top.editor.petrinets.diagram.util;
 
 public class EditPartUtil {
 	
-	private static int LINE_LENGTH_LABEL = 10;
+	private static int LINE_LENGTH_LABEL = 30;
 
 	public static String insertLineBreaks(String text, int maxLine) {
 		// format string to a suitable length

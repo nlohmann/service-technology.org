@@ -37,6 +37,8 @@
 package hub.top.editor.lola.text;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
@@ -44,13 +46,19 @@ import org.osgi.framework.Bundle;
 
 
 
+import hub.sam.tef.Utilities;
 import hub.sam.tef.editor.text.FormatAction;
 import hub.sam.tef.layout.AbstractLayoutManager;
 import hub.sam.tef.layout.BlockLayout;
 import hub.sam.tef.modelcreating.IModelCreatingContext;
+import hub.sam.tef.modelcreating.ModelCreatingException;
+import hub.sam.tef.prettyprinting.PrettyPrintState;
 import hub.sam.tef.prettyprinting.PrettyPrinter;
+import hub.sam.tef.semantics.DefaultIdentificationScheme;
+import hub.sam.tef.semantics.DefaultSemanticsProvider;
 import hub.sam.tef.semantics.ISemanticsProvider;
 import hub.sam.tef.tsl.Syntax;
+import hub.sam.tef.tsl.TslException;
 import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.lola.text.Activator;
 import hub.top.editor.lola.text.modelcreating.LolaModelCreatingContext;
@@ -58,32 +66,104 @@ import hub.top.editor.lola.text.prettyprinting.PrettyPrinterOpenNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.provider.PtnetLoLAItemProviderAdapterFactory;
 
-public class ModelEditorON extends hub.sam.tef.editor.model.ModelEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
+public class ModelEditorON extends hub.top.editor.ModelEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
 
-	@Override
-	public EPackage[] createMetaModelPackages() {
-		return new EPackage[] { PtnetLoLAPackage.eINSTANCE };
-	}
+  /**
+   * @return
+   *    references to all EMF packages this editor needs for
+   *    parsing and writing its files
+   */
+  public static EPackage[] createMetaModelPackages_default() {
+    return new EPackage[] { PtnetLoLAPackage.eINSTANCE };
+  }
 
-	@Override
-	protected Bundle getPluginBundle() {
-		return Activator.getDefault().getBundle();
-	}
+  /**
+   * @return
+   *    reference to the Bundle of this plugin for referencing
+   *    resources files of this editor, e.g. grammar descriptions
+   * @see TextEditor#getSyntaxPath_default()
+   */
+  public static Bundle getPluginBundle_default() {
+    return Activator.getDefault().getBundle();
+  }
+  
+  /**
+   * @return
+   *    location of the grammar description relative to this plugin
+   * @see TextEditor#getPluginBundle_default()
+   */
+  public static String getSyntaxPath_default() {
+    return "/resources/ptnetON.etslt";
+  }
+  
+  /**
+   * @return syntax model for this editor
+   */
+  public static Syntax createSyntax_default() {
+    try {
+      Syntax syntax = Utilities.loadSyntaxDescription(
+          ModelEditor.getPluginBundle_default(),
+          ModelEditor.getSyntaxPath_default(),
+          createMetaModelPackages_default());
+      return syntax;
+    } catch (TslException e) {
+        Activator.getPluginHelper().logError("Failed to read syntax description: "+ModelEditor.getSyntaxPath_default(), e);
+    }
+    return null;
+  }
+  
+  /**
+   * @return standard layout manager for pretty printing models 
+   */
+  public static AbstractLayoutManager createLayout_default() {
+    return new BlockLayout();  
+  }
+  
+  /**
+   * @param model
+   * @return
+   *    a pretty printed text representation of the <code>model</code>
+   */
+  public static String getText(EObject model) {
+    PrettyPrinter pp = new PrettyPrinterOpenNet(
+        createSyntax_default(),
+        new DefaultSemanticsProvider(DefaultIdentificationScheme.INSTANCE));
+    pp.setLayout(createLayout_default());
+    
+    try {
+      PrettyPrintState state = pp.print(model);
+      return state.toString();
+    } catch (ModelCreatingException e) {
+      Activator.getPluginHelper().logError("Failed to print model.", e);
+    }
+    
+    return null;
+  }
+  
+  @Override
+  public EPackage[] createMetaModelPackages() {
+    return createMetaModelPackages_default();
+  }
 
-	@Override
-	protected String getSyntaxPath() {
-		return "/resources/ptnetON.etslt";
-	}
+  @Override
+  protected Bundle getPluginBundle() {
+    return getPluginBundle_default();
+  }
+
+  @Override
+  protected String getSyntaxPath() {
+    return getSyntaxPath_default();
+  }
 
 	@Override
 	public AdapterFactory[] createItemProviderAdapterFactories() {
 		return new AdapterFactory[] { new PtnetLoLAItemProviderAdapterFactory() };
 	}
 	
-	@Override
-	public AbstractLayoutManager createLayout() {	
-		return new BlockLayout();
-	}
+  @Override
+  public AbstractLayoutManager createLayout() { 
+    return createLayout_default();
+  }
 	
 	@Override
 	public IModelCreatingContext createModelCreatingContext() {
@@ -116,6 +196,13 @@ public class ModelEditorON extends hub.sam.tef.editor.model.ModelEditor implemen
 				return ((ModelEditorON)getEditor()).getCurrentModel();
 
 			}
+			
+      @Override
+      public EList<EObject> getCurrentModel() {
+        Resource res = getCurrentResource();
+        if (res != null) return res.getContents();
+        return null;
+      }
 			
 			/*
 			 * (non-Javadoc)

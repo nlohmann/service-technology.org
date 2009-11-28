@@ -43,6 +43,8 @@ import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.provider.PtnetLoLAItemProviderAdapterFactory;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
@@ -50,7 +52,7 @@ import org.eclipse.ui.IEditorInput;
 import org.osgi.framework.Bundle;
 
 
-public class TextEditorTPN extends hub.sam.tef.editor.text.TextEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
+public class TextEditorTPN extends hub.top.editor.TextEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
 
 	@Override
 	public EPackage[] createMetaModelPackages() {
@@ -100,8 +102,18 @@ public class TextEditorTPN extends hub.sam.tef.editor.text.TextEditor implements
 			 */
 			public Resource getCurrentResource() {
 				return ((TextEditorTPN)getEditor()).getCurrentModel();
-
 			}
+			
+			/*
+       * (non-Javadoc)
+       * @see hub.top.editor.eclipse.EditorUtil#getCurrentModel()
+       */
+      @Override
+      public EList<EObject> getCurrentModel() {
+        Resource res = getCurrentResource();
+        if (res != null) return res.getContents();
+        return null;
+      }
 			
 			/*
 			 * (non-Javadoc)

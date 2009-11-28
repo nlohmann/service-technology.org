@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: hub.top.editor.ptnetLoLA.diagram; singleton:=true
-Bundle-Version: 1.0.4.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-ClassPath: .
 Bundle-Activator: hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
 Bundle-Vendor: %providerName
@@ -47,3 +47,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gmf.runtime.diagram.ui.printing,
  org.eclipse.gmf.runtime.diagram.ui.printing.render
 Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Import-Package: hub.sam.tef.editor.model,
+ hub.top.editor.lola.text

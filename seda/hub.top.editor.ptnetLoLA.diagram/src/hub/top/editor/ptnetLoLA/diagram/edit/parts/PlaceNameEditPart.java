@@ -85,7 +85,7 @@ public class PlaceNameEditPart extends LabelEditPart implements
 		registerSnapBackPosition(
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
 						.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart.VISUAL_ID),
-				new Point(0, 0));
+				new Point(0, -10));
 	}
 
 	/**

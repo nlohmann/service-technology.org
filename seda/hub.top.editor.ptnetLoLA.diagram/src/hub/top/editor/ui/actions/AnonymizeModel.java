@@ -23,6 +23,7 @@ import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
+import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IEditorPart;
@@ -59,7 +60,7 @@ public class AnonymizeModel extends AbstractHandler implements IHandler {
 				res = diagEdit.getDiagram().eResource();
 			} else if (editor instanceof hub.top.editor.eclipse.IFrameWorkEditor) {
 				sourceEditor = ((IFrameWorkEditor)window.getActivePage().getActiveEditor()).getEditorUtil();
-				net = (PtNet) sourceEditor.getCurrentResource().getContents().get(0);
+				net = (PtNet) sourceEditor.getCurrentRootModel();
 				res = net.eResource();
 			}
 			
@@ -67,6 +68,9 @@ public class AnonymizeModel extends AbstractHandler implements IHandler {
 
 			if (net != null) {
 				TransactionalEditingDomain editDomain = PtnetLoLAEditingDomainFactory.INSTANCE.getEditingDomain(net.eResource().getResourceSet());
+				if (editDomain == null)
+					editDomain = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
+				
 				CompoundCommand cc = new CompoundCommand();
 				int placeNum = 0;
 				for (Place p : net.getPlaces()) {

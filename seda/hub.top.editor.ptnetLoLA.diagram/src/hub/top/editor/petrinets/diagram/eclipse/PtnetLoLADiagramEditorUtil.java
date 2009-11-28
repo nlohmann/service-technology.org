@@ -35,6 +35,16 @@
 \*****************************************************************************/
 package hub.top.editor.petrinets.diagram.eclipse;
 
+import java.lang.reflect.Method;
+
+import hub.top.editor.eclipse.DiagramEditorUtil;
+import hub.top.editor.lola.text.ModelEditorON;
+import hub.top.editor.ptnetLoLA.NodeType;
+import hub.top.editor.ptnetLoLA.Place;
+import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditor;
+import hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,12 +53,10 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.gmf.runtime.diagram.core.services.ViewService;
 import org.eclipse.gmf.runtime.diagram.ui.parts.IDiagramEditorInput;
+import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCommand;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
-
-import hub.top.editor.eclipse.DiagramEditorUtil;
-import hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditor;
 
 public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 
@@ -60,6 +68,9 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	 * create diagram that can be opened by the wrapped editor,
 	 * method calls corresponding method from the GMF-generated
 	 * GEF sources
+	 * 
+	 * TODO: remove dependency of the hub.top.editor.ptnetLoLA.diagram package from hub.top.editor.lola.text (find different mechansism for registering export functionality in this editor)
+	 * 
 	 * @see hub.top.editor.eclipse.DiagramEditorUtil#createDiagram(org.eclipse.emf.common.util.URI, org.eclipse.emf.common.util.URI, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public Resource createDiagram(URI diagramURI, URI modelURI,
@@ -86,6 +97,7 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 		}
 		return null;
 	}
+
 
 	/**
 	 * open diagram in the wrapped editor, method calls corresponding
@@ -132,5 +144,79 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 				root,
 				hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.MODEL_ID,
 				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see hub.top.editor.eclipse.DiagramEditorUtil#compatibleTextFileExtensions()
+	 */
+	@Override
+	public String[] compatibleTextFileExtensions() {
+	  EObject model = getCurrentRootModel();
+	  if (model != null && model instanceof Diagram) {
+	    // return a list of file extensions that matches the current model
+	    PtNet net = (PtNet)((Diagram)model).getElement();
+	    if (isOpenNet(net))
+	      return new String[] {"owfn"};
+	    else
+	      return new String[] {"lola"};
+	  }
+	  return new String[] {"lola", "owfn"};
+	}
+
+	@SuppressWarnings("unchecked")
+	private static boolean modelEditorAvailable(String className) {
+	  
+	  boolean modelEditorAvailable = false;
+	  try {
+      Class<ModelEditorON> mcClass = 
+        (Class<ModelEditorON>) Class.forName(className);
+      for (Method m : mcClass.getDeclaredMethods()) {
+        if (m.getName().equals("getText")) {
+          if (    m.getParameterTypes().length == 1
+              &&  m.getParameterTypes()[0] == EObject.class
+              &&  m.getReturnType() == String.class)
+          {
+            modelEditorAvailable = true;
+          }
+        }
+      }
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+    return modelEditorAvailable;
+	}
+	
+	private boolean isOpenNet(PtNet net) {
+    for (Place p : net.getPlaces()) {
+      if (p.getType() != NodeType.INTERNAL) {
+        return true;
+      }
+    }
+	  return false;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see hub.top.editor.eclipse.DiagramEditorUtil#getCurrentText()
+	 */
+  @Override
+	public String getCurrentText() {
+	  Diagram diag = (Diagram)getCurrentRootModel();
+	  PtNet net = (PtNet)diag.getElement();
+	  
+	  if (isOpenNet(net)) {
+	    if (modelEditorAvailable("hub.top.editor.lola.text.ModelEditorON"))
+	      return hub.top.editor.lola.text.ModelEditorON.getText(net);
+	    else
+	      PtnetLoLADiagramEditorPlugin.getInstance().logError("Plugin for writing open net files is not available.");
+      
+	  } else {
+	    if (modelEditorAvailable("hub.top.editor.lola.text.ModelEditor"))
+	      return hub.top.editor.lola.text.ModelEditor.getText(net);
+	    else
+	      PtnetLoLADiagramEditorPlugin.getInstance().logError("Plugin for writing LoLA files is not available.");
+	  }
+	  return "";
 	}
 }

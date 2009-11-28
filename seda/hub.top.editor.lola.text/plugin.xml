@@ -77,5 +77,18 @@
       </primitivetypedescriptor>
    </extension>
 
-
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.editor.lola.text.popupMenus"
+            nameFilter="*.lola"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to P/T net"
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_LOLAtoPT"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.editor.lola.text.ConvertToPtNet">
+         </action>
+      </objectContribution>
+   </extension>
 </plugin>

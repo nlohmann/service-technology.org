@@ -1,23 +1,24 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Service-Technology.org Editor Resource Plugin
-Bundle-SymbolicName: hub.top.editor.resource
+Bundle-SymbolicName: hub.top.editor.resource;singleton:=true
 Bundle-Version: 1.0.5.qualifier
 Bundle-Activator: hub.top.editor.resource.Activator
 Bundle-Vendor: Service-Technology.org
-Require-Bundle: org.eclipse.ui,
+Require-Bundle: org.eclipse.ui;visibility:=reexport,
  org.eclipse.core.runtime,
- org.eclipse.core.resources,
+ org.eclipse.core.resources;visibility:=reexport,
  org.eclipse.emf;visibility:=reexport,
- org.eclipse.emf.transaction,
+ org.eclipse.emf.transaction;visibility:=reexport,
  org.eclipse.emf.ecore.xmi,
  org.eclipse.gef,
  org.eclipse.gmf.runtime.diagram.ui,
- org.eclipse.ui.ide,
+ org.eclipse.ui.ide;visibility:=reexport,
  org.eclipse.emf.workspace
 Eclipse-LazyStart: true
 Export-Package: hub.top.editor.eclipse,
- hub.top.editor.eclipse.ui
+ hub.top.editor.eclipse.ui,
+ hub.top.editor.resource
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts

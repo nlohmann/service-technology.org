@@ -1,6 +1,15 @@
 ChangeLog for hub.top.seda
 --------------------------
 
+Version 1.1.0 (seda-flowchart)
+------------------------------
+
++ added Petri Net API functionality to hub.top.editor.ptnetLoLA for manipulating Petri nets through high-level functions
++ added extended classes for Places, Transitions, and Arcs for creating more expressive Petri net models (with time, probabilities, and costs)
++ added option for consistently renaming diagram and models files in the workspace 
+* made diagram editor dynamically aware of hub.top.editor.lola.text (only used for exporting diagrams to text files)
+* minor bug fixes
+
 Version 1.0.5
 -------------
 + added dynamic drawing of a bounding dashed rectangle around open nets

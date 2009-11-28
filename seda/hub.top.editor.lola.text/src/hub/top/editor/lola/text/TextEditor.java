@@ -39,10 +39,11 @@ package hub.top.editor.lola.text;
 import hub.sam.tef.modelcreating.IModelCreatingContext;
 import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.lola.text.modelcreating.LolaModelCreatingContext;
-import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.provider.PtnetLoLAItemProviderAdapterFactory;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
@@ -50,21 +51,23 @@ import org.eclipse.ui.IEditorInput;
 import org.osgi.framework.Bundle;
 
 
-public class TextEditor extends hub.sam.tef.editor.text.TextEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
+public class TextEditor extends hub.top.editor.TextEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
 
+
+  
 	@Override
 	public EPackage[] createMetaModelPackages() {
-		return new EPackage[] { PtnetLoLAPackage.eINSTANCE };
+		return ModelEditor.createMetaModelPackages_default();
 	}
 
 	@Override
 	protected Bundle getPluginBundle() {
-		return Activator.getDefault().getBundle();
+		return ModelEditor.getPluginBundle_default();
 	}
-	
+
 	@Override
 	protected String getSyntaxPath() {
-		return "/resources/ptnetLoLA.etslt";
+		return ModelEditor.getSyntaxPath_default();
 	}
 
 	@Override
@@ -88,6 +91,7 @@ public class TextEditor extends hub.sam.tef.editor.text.TextEditor implements hu
 		return super.getEditorInput();
 	}
 	
+
 	/**
 	 * wrap this editor in a {@link EditorUtil}
 	 * @return editor util wrapping this editor
@@ -100,8 +104,18 @@ public class TextEditor extends hub.sam.tef.editor.text.TextEditor implements hu
 			 */
 			public Resource getCurrentResource() {
 				return ((TextEditor)getEditor()).getCurrentModel();
-
 			}
+			
+			/*
+			 * (non-Javadoc)
+			 * @see hub.top.editor.eclipse.EditorUtil#getCurrentModel()
+			 */
+      @Override
+      public EList<EObject> getCurrentModel() {
+        Resource res = getCurrentResource();
+        if (res != null) return res.getContents();
+        return null;
+      }
 			
 			/*
 			 * (non-Javadoc)

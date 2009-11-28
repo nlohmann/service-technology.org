@@ -1,0 +1,22 @@
+PLACE
+  INTERNAL
+    p;
+
+  INPUT
+    i;
+
+  OUTPUT
+    ;
+
+
+INITIALMARKING
+    ;
+
+FINALCONDITION
+  (p=0);
+
+
+TRANSITION t
+  CONSUME i;
+  PRODUCE p;
+

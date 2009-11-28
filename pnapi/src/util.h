@@ -19,6 +19,8 @@
 #ifndef PNAPI_UTIL_H
 #define PNAPI_UTIL_H
 
+#define PNAPI_FOREACH(CLASS, INSTANCE, IDENT) for(CLASS::iterator IDENT = INSTANCE.begin(); IDENT != INSTANCE.end(); ++IDENT)
+
 #include <set>
 #include <string>
 #include <vector>

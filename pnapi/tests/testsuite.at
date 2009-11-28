@@ -353,6 +353,13 @@ AT_CHECK([GREP -q "COST 42;" NET1.composed.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14856 (https://gna.org/bugs/?14856)])
+m4_define([NET],[bug14856.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=starke,keep_normal])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Murata Reduction Rules])

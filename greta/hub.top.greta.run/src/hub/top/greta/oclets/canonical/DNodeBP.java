@@ -354,14 +354,14 @@ public class DNodeBP {
 		for (DNode e : dNodeAS.fireableEvents)
 		{
 		
-			System.out.println(e+" "+toString(e.pre)+":");
+			//System.out.println(e+" "+toString(e.pre)+":");
 			LinkedList<DNode[]> cuts = findEnablingCuts(e.pre, co, null);
 
 			//Iterable<DNode> cutNodes = bp.maxNodes;
 			
 		  for (DNode[] cutNodes : cuts) {
 		    
-        System.out.println(toString(cutNodes));
+        //System.out.println(toString(cutNodes));
   
   			// see if this event is already present at the given cut
   
@@ -379,7 +379,7 @@ public class DNodeBP {
   			// we want to fire at every node of the current location: the transition
   			// was already fired here, so skip this one
   			if (foundNum == cutNodes.length) {
-  			  System.out.println("foundNum == cutNodes.length");
+  			  //System.out.println("foundNum == cutNodes.length");
   				continue;	
   			}
   
@@ -403,7 +403,7 @@ public class DNodeBP {
   					}
   				}
   				if (loc[i] == null)	{ // no match, cancel
-  				  System.out.println("no match for "+ e.pre[i]);
+  				  //System.out.println("no match for "+ e.pre[i]);
   					break;
   				}
   			} // finish searching for matching preconditions in max BP
@@ -461,7 +461,7 @@ public class DNodeBP {
   					}
   				}
   			} else {
-  			  System.out.println("incomplete match");
+  			  //System.out.println("incomplete match");
   			}
 		  } // for all cuts
 		}
@@ -822,8 +822,11 @@ public class DNodeBP {
         elementary_ccPair.put(newConditions[i], equivalentConditions[i]);
       else
         elementary_ccPair.put(newConditions[i], existing);
-
-      newConditions[i].isCutOff = true; // remember it
+      
+      if (newConditions[i] == equivalentConditions[i])
+        System.out.println("[DNodeBP:updateCCpair] WARNING: making "+newConditions[i]+" equivalent to itself");
+      else
+        newConditions[i].isCutOff = true; // remember it
     }
   }
   
@@ -1393,6 +1396,11 @@ public class DNodeBP {
 	 */
 	public void minimize() {
 
+	  System.out.println("minimize()");
+	  
+	  // run a breadth-first search from the maximal nodes of the branching
+	  // process to its initial nodes, for each node that has no equivalent
+	  // smaller node yet, seek an equivalent image node,  
 	  LinkedList<DNode> queue = new LinkedList<DNode>();
 	  queue.addAll(bp.maxNodes);
 	  
@@ -1405,53 +1413,84 @@ public class DNodeBP {
 
 	      if (d.post == null || d.post.length == 0) {
 	        // d has no successor, search in all maximal nodes for an equivalent node
-	        for (DNode d0 : bp.maxNodes) {
-	          if (d0 == d) continue;
-	          if (d0.id != d.id) continue;
+	        for (DNode d_img : bp.maxNodes) {
+	          if (d_img == d) continue;
+	          if (d_img.id != d.id) continue;
+	          // do not map normal nodes to non-existing nodes
+	          if (d_img.isAnti != d.isAnti) continue; 
+	          
 	          // d and d0 are nodes with the same ID and without successor
-	          if (elementary_ccPair.get(d0) != null) continue;
+	          if (elementary_ccPair.get(d_img) != null) continue;
 	          // d0 also has no equivalent node, e.g. is not a cut-off node
 	          // then d and d0 are equivalent
 	          
-	          System.out.println(d+" --> "+d0);
-	          elementary_ccPair.put(d, d0);
+	          System.out.println(d+" --> "+d_img+" (max nodes)");
+	          elementary_ccPair.put(d, d_img);
 	          d.isCutOff = true;
 	        }
 	        continue;
+	        // TODO: shouldn't we add 'd's successors to the queue?
 	      }
 	      
-	      // see if all successors of e have an equivalent partner
-	      // and whether the partners have all the same predecessor
-	      DNode[] dSucc0 = new DNode[d.post.length];
+	      // 'd' has successor nodes, an equivalent node 'd_img' must have the
+	      // corresponding equivalent successors, we find 'd_img' by searching in
+	      // the equivalent nodes of 'd's successors for a node with the same id
+	      // as the node 'd'
+        DNode d_img = null;
+	      
+	      // see if all successors of 'd0' have an equivalent node
+	      // and whether the equivalent nodes have all the same predecessor
+	      
+	      // for each successor 'd.post' of 'd'
+	      // find the equivalent image node 'dPost_img'
+	      DNode[] dPost_img = new DNode[d.post.length];
 	      for (int i=0; i<d.post.length; i++) {
-	        dSucc0[i] = elementary_ccPair.get(d.post[i]);
+	        dPost_img[i] = elementary_ccPair.get(d.post[i]);
 	      }
 	      
-	      if (dSucc0[0] == null)
+	      // then see if all images of the successors of 'd' have a common
+	      // predecessor
+	      
+	      // there is no image of the first successor of 'd': we cannot minimize
+	      if (dPost_img[0] == null)
 	        continue;  // no equivalent partner of the first successor
 
-	      // get the predecessor of the first equivalent node that has the
-	      // same name as DNode 'e'
-	      DNode d0 = null;
-	      for (int j=0; j<dSucc0[0].pre.length; j++)
-	        if (dSucc0[0].pre[j].id == d.id) {
-	          d0 = dSucc0[0].pre[j];
+	      // find the predecessor of the image of 'd's first successor  that has
+	      // same id (name) as DNode 'd', this predecessor should be 'd_img'
+	      System.out.print("checking 0: "+dPost_img[0]+"...");
+	      for (int j=0; j<dPost_img[0].pre.length; j++)
+	        if (dPost_img[0].pre[j].id == d.id) {
+	          d_img = dPost_img[0].pre[j];
 	          break;
 	        }
+	      System.out.println(" found "+d_img);
 	      
-	      if (d0 == null)
-	        continue;  // no match :(
+	      // the image of the first successor of 'd' has no predecessor with
+	      // the same id as 'd', there is no node we can make equivalent to 'd'
+	      if (d_img == null) continue;  // no match :(
 	      
+	      // the found image has a different number of successors,
+	      // they cannot be equivalent
+	      if (d_img.post.length != d.post.length) continue;
+	      
+	      // now check whether each image of all successors of 'd' also have
+	      // 'd_img' as their predecessor
 	      boolean notFound = false;
-	      for (int i=1; i<dSucc0.length; i++) {
-          boolean found = false;
-          if (dSucc0[i] != null)
-  	        for (int j=0; j<dSucc0[i].pre.length; j++) {
-  	          if (dSucc0[i].pre[j] == d0) {
-  	            found = true; break;
+	      for (int i=1; i<dPost_img.length; i++) {
+          boolean foundPreFor_i = false;
+          System.out.print("checking "+i+": "+dPost_img[i]+"...");
+          if (dPost_img[i] != null)
+  	        for (int j=0; j<dPost_img[i].pre.length; j++) {
+  	          if (dPost_img[i].pre[j] == d_img) {
+  	            // the i-th successor has 'd_img' as predecessor
+  	            System.out.println(" found again");
+  	            foundPreFor_i = true; break; 
   	          }
   	        }
-          if (!found) {
+          if (!foundPreFor_i) {
+            System.out.println(" found not");
+            // if the ith successor does not have 'd_img' as predecessor,
+            // then we have no node we can make equivalent to 'd' 
             notFound = true;
             break;
           }
@@ -1460,14 +1499,15 @@ public class DNodeBP {
 	      if (notFound)
 	        continue;  // no match :(
 	      
-	      System.out.println(d+" --> "+d0);
-	      elementary_ccPair.put(d, d0);
+	      System.out.println(d+" --> "+d_img+" (successor)");
+	      elementary_ccPair.put(d, d_img);
 	      d.isCutOff = true;
+	      // extended equivalence relation by 'd' ~ 'd_img' 
 	    }
+      // and continue with all predecessors of 'd'
       for (DNode dPre : d.pre)
         if (!queue.contains(dPre)) queue.addLast(dPre);
-
-	  }
+	  } // END: search all nodes of the branching process 
 	  
 	  HashSet<DNode> seen = new HashSet<DNode>();
 	  queue.addAll(bp.initialConditions);
@@ -1493,6 +1533,7 @@ public class DNodeBP {
 	        DNode preEquiv = elementary_ccPair.get(d.pre[0]);
 	        for (DNode d0 : preEquiv.post) {
 	          if (d0.id == d.id) {
+	            System.out.println(d+" --> "+d0+" (initial)");
 	            d.isCutOff = true;
 	            updateCCpair(d, d0);
 	            break;
@@ -1592,6 +1633,21 @@ public class DNodeBP {
 	
 	public String toDot() {
 		return bp.toDot();
+	}
+	
+	public void printEquivalenceRelation() {
+	  System.out.println("--- equivalence relation ---");
+	  System.out.println("EVENTS:");
+    for (DNode e : bp.getAllEvents()) {
+      DNode e0 = elementary_ccPair.get(e);
+      System.out.println(e+" -> "+e0);
+    }
+    System.out.println("CONDITIONS:");
+    for (DNode b : bp.getAllConditions()) {
+      DNode b0 = elementary_ccPair.get(b);
+      System.out.println(b+" -> "+b0);
+    }
+    System.out.println("--- /equivalence relation ---");
 	}
 	
 /* --------------------------------------------------------------------------

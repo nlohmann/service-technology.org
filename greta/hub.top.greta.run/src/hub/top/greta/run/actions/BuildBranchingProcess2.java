@@ -37,8 +37,12 @@
 package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
+import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ResourceHelper;
+import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.greta.synthesis.DNode2PtNet;
+import hub.top.greta.verification.BuildBP;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -49,7 +53,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -103,66 +109,32 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 		if (adaptiveSystem == null)
 			return;
 			
-		final DNodeBP bp = new DNodeBP(adaptiveSystem);
+		//final DNodeBP bp = BuildBP.init(adaptiveSystem);
+		final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
 		
-		Job bpBuildJob = new Job("Constructing branching process II") 
+		Job bpBuildJob = new Job("constructing branching process") 
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+			  
+        monitor.beginTask("constructing branching process", IProgressMonitor.UNKNOWN);
+        
+        // build branching process
+        boolean interrupted = !build.run(monitor, System.out);
+			  build.printStatistics(System.out);
+			  build.analyze(monitor, System.out);
 				
-				monitor.beginTask("Constructing branching process II", IProgressMonitor.UNKNOWN);
-				
-				System.out.println("------- constructing branching process II -------");
-				System.out.println("input file: "+adaptiveSystem.eResource().getURI());
-				
-				int steps = 0;
-				int current_steps = 0;
-				int num = 0;
-				
-				boolean interrupted = false;
-				long tStart = System.currentTimeMillis();
-				while ((current_steps = bp.step()) > 0) {
-					steps += current_steps;
+			  build.minimize(monitor, System.out);
+			  build.writeBPtoFile(monitor, System.out, "_bp2");
+			  
+			  PtNet net = DNode2PtNet.process(build.getBranchingProcess());
+			  
+        String modelName = selectedFile.getFullPath().removeFileExtension().lastSegment();
+        IPath targetPath = selectedFile.getFullPath().removeLastSegments(1).append(modelName+"_bp2").addFileExtension("ptnet");
+        TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
+        FileIOHelper.writeEObjectToResource(net, editing, targetPath);
 
-					monitor.subTask("explored "+steps+" events");
-					
-					if (monitor.isCanceled()) {
-						interrupted = true;
-						break;
-					}
-					
-					System.out.print(steps+"... ");
-					if (num++ > 10) { System.out.print("\n"); num = 0; }
-				}
-				long tEnd = System.currentTimeMillis();
-				
-				if (interrupted) System.out.print("\ninterrupted ");
-				else System.out.print("\ndone ");
-				
-				System.out.println("after "+steps+" steps, "+(tEnd-tStart)+"ms");
-				System.out.println(bp.getStatistics());
-				
-        boolean hasDeadlock = bp.hasDeadCondition();
-        boolean isUnsafe = !bp.isSafe();
-        if (hasDeadlock)
-          System.out.println("has a deadlock.");
-        if (isUnsafe)
-          System.out.println("is unsafe.");
-				
-				try {
-				  bp.minimize();
-				} catch (NullPointerException e) {
-				  
-				}
-				
-				monitor.beginTask("Writing result files", 1);
-				if (selectedFile != null) {
-					monitor.subTask("writing dot file");
-					writeDotFile(bp, selectedFile, "_bp2");
-					monitor.worked(1);
-
-				}
-				monitor.done();
+			  monitor.done();
 				
 				/*
 				if (interrupted)
@@ -204,6 +176,8 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 		    action.setEnabled(true);
 	    } catch (ClassCastException e) {
 	    	// just catch, do nothing
+	    } catch (NullPointerException e) {
+	      // just catch, do nothing
 	    }
 	}
 

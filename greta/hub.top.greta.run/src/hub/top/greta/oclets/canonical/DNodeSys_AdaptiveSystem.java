@@ -93,6 +93,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		initialRun = buildDNodeRepresentation(as.getAdaptiveProcess());
 		
 		finalize_setPreConditions();
+		finalize_initialRun();
 	}
 
 	/**
@@ -102,9 +103,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 * @param as
 	 */
 	private void buildNameTable(AdaptiveSystem as) {
-		short currentNameID = 0;
-		nameToID = new HashMap<String, Short>();
-		
+
 		nodeNum = 0;
 		
 		// collect all names and assign each new name a new ID

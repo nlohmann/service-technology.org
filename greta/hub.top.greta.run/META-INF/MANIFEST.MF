@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Greta Adaptive System Runtime Environment
 Bundle-SymbolicName: hub.top.GRETA.run;singleton:=true
-Bundle-Version: 1.1.3.qualifier
+Bundle-Version: 1.1.4.qualifier
 Bundle-Activator: hub.top.greta.run.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -11,14 +11,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.4.1",
  org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.1.2",
  org.eclipse.ui.ide,
- hub.top.GRETA.diagram;bundle-version="1.1.2",
+ hub.top.GRETA.diagram;bundle-version="1.1.2";visibility:=reexport,
  hub.top.GRETA.diagram.process;bundle-version="1.1.2",
  org.eclipse.gmf.runtime.diagram.ui.resources.editor,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
- hub.top.editor.resource;bundle-version="1.0.5",
- hub.top.editor.lola.text;bundle-version="1.0.5",
- hub.top.editor.ptnetLoLA;bundle-version="1.0.5"
+ hub.top.editor.resource;bundle-version="1.0.5";visibility:=reexport,
+ hub.top.editor.ptnetLoLA;bundle-version="1.0.5";visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: hub.top.adaptiveSystem,
@@ -33,3 +32,7 @@ Import-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.provider,
  hub.top.adaptiveSystem.util
 Bundle-Vendor: service-technology.org
+Export-Package: hub.top.greta.oclets.canonical,
+ hub.top.greta.run.actions,
+ hub.top.greta.synthesis,
+ hub.top.greta.verification

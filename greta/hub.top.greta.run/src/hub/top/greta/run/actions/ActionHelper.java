@@ -87,6 +87,8 @@ public class ActionHelper {
 			if (r0.getContents().get(0) instanceof AdaptiveSystem) {
 				adaptiveSystem = (AdaptiveSystem)r0.getContents().get(0);
 			}
+			
+		// FIXME: remove this dependency from the hub.top.GRETA.diagram.process package
 		} else if (editor instanceof AdaptiveProcessDiagramViewer) {
 			AdaptiveProcessDiagramViewer apViewer = (AdaptiveProcessDiagramViewer)editor;
 			AdaptiveProcess ap = (AdaptiveProcess)apViewer.getDiagram().getElement();
@@ -95,6 +97,24 @@ public class ActionHelper {
 		
 		return adaptiveSystem;
 	}
+	
+	 /**
+   * Retrieve {@link Diagram} object from the current editor, if this editor 
+   * if it represents an {@link AdaptiveSystem} the editor stores such an object.
+   * 
+   * @param editor
+   * @return
+   */
+  public static Diagram getAdaptiveSystemDiagram(IEditorPart editor) {
+    Diagram d = null;
+    if (editor instanceof AdaptiveSystemDiagramEditor) {
+      AdaptiveSystemDiagramEditor adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) editor;
+      d = adaptiveSystemDiagramEditor.getDiagram();
+      
+    }
+    
+    return d;
+  }
 	
 	/**
 	 * Retrieve {@link AdaptiveSystem} object from the resource at

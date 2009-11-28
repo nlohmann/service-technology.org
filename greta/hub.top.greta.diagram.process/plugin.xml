@@ -108,15 +108,23 @@ version of this file under the terms of any one of the EPL or the AGPL.
    </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
-      <?gmfgen generated="true"?>
+      <!-- put "init process diagram view" in the adaptive system sub-menu -->
       <objectContribution
             id="hub.top.GRETA.diagram.process.InitDiagram"
             nameFilter="*.adaptivesystem"
             objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.GRETA.run.apDiagramMenu"
+               label="Adaptive Processes"
+               path="additions">
+            <separator
+                  name="simulation">
+            </separator>
+         </menu>
          <action
                label="%initDiagramActionLabel"
                class="hub.top.adaptiveProcess.diagram.part.AdaptiveProcessInitDiagramFileAction"
-               menubarPath="additions"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/simulation"
                enablesFor="1"
                id="hub.top.GRETA.diagram.process.InitDiagramAction">
          </action>

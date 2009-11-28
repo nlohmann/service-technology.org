@@ -67,7 +67,7 @@ public class DNode {
 	
 	/**
 	 * For finding cutOff events using the signature method, we compare whether
-	 * two events in the branaching process are fired by the same set of oclet
+	 * two events in the branching process are fired by the same set of oclet
 	 * events (see {@link DNodeBP#equivalentCuts_signature}). This array stores
 	 * the globalIDs of the oclet events that were fired for creating this event.
 	 * Is only used for events. 
@@ -127,6 +127,30 @@ public class DNode {
 			post = DNode.sortIDs(newPost);
 		}
 	}
+	
+	 /**
+   * Adds new predecessor to this node and sorts predecessor by their ids.
+   * Dynamically enlarges array of predecessor by re-initialization and
+   * copying.
+   * 
+   * This method should not be used during the standard branching process
+   * construction. Rather initialize the size of the predecessor array in the
+   * constructor.
+   * 
+   * @param d
+   */
+  public void addPreNode(DNode d) {
+    if (pre == null) {
+      pre = new DNode[1];
+      pre[0] = d;
+    }
+    else {
+      DNode[] newPre = new DNode[pre.length+1];
+      for (int i=0; i<pre.length; i++) newPre[i] = pre[i];
+      newPre[newPre.length-1] = d;
+      pre = DNode.sortIDs(newPre);
+    }
+  }
 	
 	/**
 	 * Check whether this node's history contains a partial history that is

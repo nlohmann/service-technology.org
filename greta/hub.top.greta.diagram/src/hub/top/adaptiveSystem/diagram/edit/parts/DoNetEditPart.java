@@ -391,7 +391,13 @@ public class DoNetEditPart extends ShapeNodeEditPart {
 		Oclet oclet;
 		
 		try {
-			adaptiveSystem = (AdaptiveSystem) ((DoNet) ((Node) this
+      // in case of complex deletion operations, container relations and model
+      // relations might no longer be valid, returning null values
+      if (this.getModel() == null) return;
+      if ( (((Node)this.getModel()).getElement()) == null) return;
+      if ( (((Node)this.getModel()).getElement()).eContainer() == null) return;
+      if ( (((Node)this.getModel()).getElement()).eContainer().eContainer() == null) return;
+      adaptiveSystem = (AdaptiveSystem) ((DoNet) ((Node) this
 				.getModel()).getElement()).eContainer().eContainer();
 			oclet = (Oclet) ((DoNet) ((Node) this.getModel()).getElement())
 				.eContainer();

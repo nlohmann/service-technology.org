@@ -1,3 +1,11 @@
+Greta v1.1.4
+------------
+
++ added synthesis of (unlabeled) Petri nets
+* the generated branching process is now also written to an EMF-based Petri net format (hub.top.editor.ptnetLoLA) for manipulation
+* restructured menus and inner organization of UI
+* refactoring of functionality, additional analysis functionality has been moved to plugin hub.top.GRETA.run.ext to reduce dependencies of hub.top.GRETA.run
+
 Greta v1.1.3
 ------------
 

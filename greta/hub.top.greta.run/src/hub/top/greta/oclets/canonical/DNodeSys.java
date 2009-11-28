@@ -35,6 +35,8 @@
 
 package hub.top.greta.oclets.canonical;
 
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -69,6 +71,11 @@ public abstract class DNodeSys {
 	 * consistent.
 	 */
 	public Map<String, Short>	nameToID;			// and names to IDs
+	
+	/**
+	 * The highest name ID that has been given.
+	 */
+  public short currentNameID = 0;
 	
 	/**
 	 * A {@link DNodeSys} has two kinds of events. This set contains all events of
@@ -112,16 +119,33 @@ public abstract class DNodeSys {
 		
 		fireableEvents = new DNode.SortedLinearList();
 		preConEvents = new DNode.SortedLinearList();
+		
+		init_setProperNames();
 	}
 
+	public static final String NAME_TAU = "_tau_";
+	
+	/**
+	 * Initialize the {@link #nameToID} map.  Is called in the
+   * {@link Constructor} of {@link DNodeSys}.
+	 */
+	protected void init_setProperNames() {
+	   nameToID = new HashMap<String, Short>();
+	}
+	
 	/**
 	 * Reverse the {@literal DNodeSys#nameToID} map and store it in
-	 * {@literal DNodeSys#properNames}.
+	 * {@literal DNodeSys#properNames}. Adds some default names like
+	 * {@value #NAME_TAU} for later use.
 	 * 
 	 * Assumes that {@literal DNodeSys#nameToID} contains entries
 	 * <code>(name_i, i)</code> with indices i=0,...,(nameToID.size() - 1)
 	 */
 	protected void finalize_setProperNames () {
+	  
+	  if (!nameToID.containsKey(NAME_TAU))
+	    nameToID.put(NAME_TAU, currentNameID++);
+	  
 		properNames = new String[nameToID.size()];
 		for (Entry<String,Short> line : nameToID.entrySet()) {
 			properNames[line.getValue()] = line.getKey();
@@ -156,6 +180,20 @@ public abstract class DNodeSys {
 	}
 	
 	/**
+	 * Update data structures that describe the initial run/state of the system.
+	 * This method must be called by an implementation after building the
+	 * representation of the intial run.
+	 */
+	protected void finalize_initialRun() {
+	  for (DNode d : initialRun.allEvents) {
+	    d.causedBy = new int[1]; d.causedBy[0] = d.globalId;
+	  }
+    for (DNode d : initialRun.allConditions) {
+      d.causedBy = new int[1]; d.causedBy[0] = d.globalId;
+    }
+	}
+	
+	/**
 	 * @param d
 	 * @return
 	 *   <code>true</code> iff the given node <code>d</code> represents a terminal
@@ -164,5 +202,19 @@ public abstract class DNodeSys {
 	 */
 	public boolean isTerminal(DNode d) {
 	  return false;
+	}
+	
+	/**
+	 * @param globalId
+	 * @return
+	 *   {@link DNode} that represents a fireable transition of the original
+	 *   system that has the given globalId. Useful for retrieve the system
+	 *   transition that caused an event in a branching process.
+	 */
+	public DNode getTransitionForID(int globalId) {
+	  for (DNode d : fireableEvents) {
+	    if (d.globalId == globalId) return d;
+	  }
+	  return null;
 	}
 }

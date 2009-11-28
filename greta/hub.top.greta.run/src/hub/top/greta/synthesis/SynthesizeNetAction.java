@@ -38,20 +38,9 @@ package hub.top.greta.synthesis;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.editor.eclipse.FileIOHelper;
-import hub.top.editor.ptnetLoLA.Arc;
-import hub.top.editor.ptnetLoLA.Node;
-import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.editor.ptnetLoLA.PtnetLoLAFactory;
-import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
-import hub.top.editor.ptnetLoLA.Transition;
-import hub.top.greta.oclets.canonical.DNode;
-import hub.top.greta.oclets.canonical.DNodeBP;
-import hub.top.greta.oclets.canonical.DNodeSet;
-import hub.top.greta.oclets.canonical.DNodeSys;
 import hub.top.greta.run.actions.ActionHelper;
-
-import java.util.HashMap;
+import hub.top.greta.verification.BuildBP;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -71,13 +60,13 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 /**
- * Synthesize a P/T net from an {@link Oclet} specification.
+ * Synthesize a Petri net from an {@link Oclet} specification.
  * 
  * @author Dirk Fahland
  */
-public class SyntesizeNetAction implements IWorkbenchWindowActionDelegate {
+public class SynthesizeNetAction implements IWorkbenchWindowActionDelegate {
 
-  public static final String ID = "hub.top.GRETA.run.convertToNet";
+  public static final String ID = "hub.top.GRETA.run.SynthesizeNet";
   
   private IWorkbenchWindow workbenchWindow;
 
@@ -119,133 +108,28 @@ public class SyntesizeNetAction implements IWorkbenchWindowActionDelegate {
     if (adaptiveSystem == null)
       return;
       
-    final DNodeBP bp = new DNodeBP(adaptiveSystem);
-    Job bpBuildJob = new Job("Folding to P/T net") 
+    final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
+    
+    Job bpBuildJob = new Job("Synthesizing Petri Net") 
     {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         
-        monitor.beginTask("Folding to P/T net", IProgressMonitor.UNKNOWN);
-        
-        int steps = 0;
-        int current_steps = 0;
-        int num = 0;
-        
-        boolean interrupted = false;
-        long tStart = System.currentTimeMillis();
-        while ((current_steps = bp.step()) > 0) {
-          steps += current_steps;
+        monitor.beginTask("Synthesizing Petri Net", IProgressMonitor.UNKNOWN);
 
-          monitor.subTask("explored "+steps+" events");
-          
-          if (monitor.isCanceled()) {
-            interrupted = true;
-            break;
-          }
-        }
-        long tEnd = System.currentTimeMillis();
+        // build branching process
+        boolean interrupted = !build.run(monitor, System.out);
         
         if (!interrupted && selectedFile != null) {
-          monitor.subTask("generating P/T net");
-
-          try {
-            bp.minimize();
-            bp.relax();
-          } catch (NullPointerException e) {
-            
-          }
+          monitor.subTask("generating Petri net");
           
-          DNodeSys dAS = bp.getSystem();
-          DNodeSet dBP = bp.getBranchingProcess();
+          NetSynthesisLocal synth = new NetSynthesisLocal(build.getBranchingProcess());
+          PtNet synthNet = synth.foldToPetriNet();
           
-          HashMap<DNode, DNode> equiv = bp.getElementary_ccPair();
-          
-          HashMap<DNode, Node> d2n = new HashMap<DNode, Node>();
-          
-          PtnetLoLAFactory fact = PtnetLoLAPackage.eINSTANCE.getPtnetLoLAFactory();
-          PtNet net = fact.createPtNet();
-          
-          for (DNode b: dBP.getAllConditions()) {
-            if (!b.isCutOff || equiv.get(b) == b) {
-              Place p = fact.createPlace();
-              p.setName(dAS.properNames[b.id]+"_"+b.globalId);
-              net.getPlaces().add(p);
-              
-              if (b.pre == null || b.pre.length == 0)
-                p.setToken(1);
-              
-              d2n.put(b, p);
-            }
-          }
-          
-          // now map each condition that has an equivalent counterpart to
-          // the place that represents this counterpart
-          for (DNode b: dBP.getAllConditions()) {
-            if (b.isCutOff && !b.isAnti) {
-              d2n.put(b, d2n.get(equiv.get(b)));
-            }
-          }
-
-          for (DNode e : dBP.getAllEvents()) {
-            
-            if (!e.isCutOff || equiv.get(e) == e) {
-              Transition t = fact.createTransition();
-              t.setName(dAS.properNames[e.id]+"_"+e.globalId);
-              net.getTransitions().add(t);
-              d2n.put(e, t);
-            }
-          }
-          
-          for (DNode e : dBP.getAllEvents()) {
-            
-            if (e.isAnti)
-              continue;
-            
-            Transition t = null;
-            if (!e.isCutOff)
-              t = (Transition) d2n.get(e);
-            else {
-              DNode e2 = equiv.get(e);
-              if (e2 == null) {
-                t = fact.createTransition();
-                t.setName(dAS.properNames[e.id]+"_"+e.globalId);
-                net.getTransitions().add(t);
-                d2n.put(e, t);
-              } else {
-                t = (Transition)d2n.get(e2);
-              }
-            }
-            
-            for (DNode b : e.pre) {
-              Place p = (Place)d2n.get(b);
-              if (t.getPreSet().contains(p))
-                continue;
-              
-              Arc a = fact.createArcToTransition();
-              a.setSource(p);
-              a.setTarget(t);
-              
-              net.getArcs().add(a);
-            }
-            
-            for (DNode b : e.post) {
-              Place p = (Place)d2n.get(b);
-              if (t.getPostSet().contains(p))
-                continue;
-
-              Arc a = fact.createArcToPlace();
-              a.setSource(t);
-              a.setTarget(p);
-              
-              net.getArcs().add(a);
-            }
-          }
-          
-          
-          IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("ptnet");
-          
+          String modelName = selectedFile.getFullPath().removeFileExtension().lastSegment();
+          IPath targetPathSynth = selectedFile.getFullPath().removeLastSegments(1).append(modelName).addFileExtension("ptnet"); 
           TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
-          FileIOHelper.writeEObjectToResource(net, editing, targetPath);
+          FileIOHelper.writeEObjectToResource(synthNet, editing, targetPathSynth);
         }
         monitor.done();
         

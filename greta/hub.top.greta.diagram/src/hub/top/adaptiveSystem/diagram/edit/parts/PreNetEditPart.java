@@ -62,6 +62,7 @@ import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -384,6 +385,12 @@ public class PreNetEditPart extends ShapeNodeEditPart {
 		Oclet oclet;
 		
 		try {
+      // in case of complex deletion operations, container relations and model
+		  // relations might no longer be valid, returning null values
+		  if (this.getModel() == null) return;
+		  if ( (((Node)this.getModel()).getElement()) == null) return;
+		  if ( (((Node)this.getModel()).getElement()).eContainer() == null) return;
+		  if ( (((Node)this.getModel()).getElement()).eContainer().eContainer() == null) return;
 			adaptiveSystem = (AdaptiveSystem) ((PreNet) ((Node) this
 				.getModel()).getElement()).eContainer().eContainer();
 			oclet = (Oclet) ((PreNet) ((Node) this.getModel()).getElement())

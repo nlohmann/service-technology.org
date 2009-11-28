@@ -35,7 +35,10 @@
 
 package hub.top.greta.oclets.canonical;
 
+import hub.top.greta.synthesis.NetSynthesis;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -425,6 +428,48 @@ public class DNodeSet {
 		return postConditions;
 	}
 	
+	/**
+	 * Compute the maximal distance of each node from the {@link #initialConditions}
+	 * of this branching process. The result is returned as a {@link HashMap} from
+	 * {@link DNode}s to shorts. The depth of a node can be used see whether two 
+	 * events of this branching process are direct successor events. In this case
+	 * they are separated by only one condition and the difference of their depths
+	 * is exactly 2. If the difference is larger, then there are more events in
+	 * between, even if there is a direct dependency between the two events via a
+	 * condition.
+	 * 
+	 * @return
+	 */
+	
+  public HashMap<DNode, Short> getDepthMap() {
+    // initialize depth map
+    HashMap<DNode, Short> depth = new HashMap<DNode, Short>();
+    
+    // then run a breadth-first search beginning at the initial conditions
+    LinkedList<DNode> queue = new LinkedList<DNode>();
+    for (DNode d : this.initialConditions) {
+      depth.put(d, (short)0); // begin with depth 0
+      queue.addLast(d);
+    }
+    
+    while (!queue.isEmpty()) {
+      DNode d = queue.remove();
+      if (d.post == null) continue;
+      for (DNode dPost : d.post) {
+        // for each successor, take the maximum of the depths + 1
+        Short dPostDepth = depth.get(dPost);
+        if (dPostDepth == null) depth.put(dPost, (short)(depth.get(d)+1));
+        else {
+          if (dPostDepth < depth.get(d)) dPostDepth = (short)(depth.get(d)+1);
+          depth.put(dPost, (short)(depth.get(d)+1));
+        }
+        queue.addLast(dPost);
+      }
+    }
+    
+    return depth;
+  }
+	
 	/*
 	public void fire(LinkedList<DNode> ocletEvents, DNode[] fireLocation) {
 		// instantiate the oclet event
@@ -489,7 +534,7 @@ public class DNodeSet {
 		String antiFillString = "fillcolor=red";
 		
 		HashSet<DNode> allNodes = getAllNodes();
-
+		
 		// first print all conditions
 		b.append("\n\n");
 		b.append("node [shape=circle];\n");
@@ -510,9 +555,11 @@ public class DNodeSet {
         b.append("  c"+n.globalId+" ["+cutOffFillString+"]\n");
 			else
 				b.append("  c"+n.globalId+" []\n");
+			
+			String auxLabel = "";
 				
 			b.append("  c"+n.globalId+"_l [shape=none];\n");
-			b.append("  c"+n.globalId+"_l -> c"+n.globalId+" [headlabel=\""+n+"\"]\n");
+			b.append("  c"+n.globalId+"_l -> c"+n.globalId+" [headlabel=\""+n+" "+auxLabel+"\"]\n");
 		}
 
     // then print all events
@@ -532,8 +579,11 @@ public class DNodeSet {
 				b.append("  e"+n.globalId+" ["+cutOffFillString+"]\n");
 			else
 				b.append("  e"+n.globalId+" []\n");
+			
+      String auxLabel = "";
+      
 			b.append("  e"+n.globalId+"_l [shape=none];\n");
-			b.append("  e"+n.globalId+"_l -> e"+n.globalId+" [headlabel=\""+n+"\"]\n");
+			b.append("  e"+n.globalId+"_l -> e"+n.globalId+" [headlabel=\""+n+" "+auxLabel+"\"]\n");
 		}
 		
 		/*

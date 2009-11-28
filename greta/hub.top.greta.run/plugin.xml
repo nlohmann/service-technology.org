@@ -1,11 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+
+   <!-- menu structure to present the actions and controls to the user -->
+   <extension
+         point="org.eclipse.ui.menus">
+         
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="hub.top.GRETA.menus.gretaMenu"
+               label="Greta"
+               mnemonic="G">
+            <separator
+                  name="simulation"
+                  visible="true">
+            </separator>
+            <separator
+                  name="analysis"
+                  visible="true">
+            </separator>
+            <separator
+                  name="model"
+                  visible="true">
+            </separator>
+            <separator
+                  name="synthesis"
+                  visible="true">
+            </separator>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <menu
+               id="hub.top.GRETA.toolbars.gretaToolbar"
+               label="Greta">
+            <separator
+                  name="simulation"
+                  visible="true">
+            </separator>
+            <separator
+                  name="analysis"
+                  visible="true">
+            </separator>
+         </menu>
+      </menuContribution>
+   </extension>
+
    <extension
          point="org.eclipse.ui.actionSets">
+
+      <!-- actions for controlling the simulation in the graphical interface -->
       <actionSet
-            id="hub.top.GRETA.run.actionSet1"
-            label="Adaptive System Actions"
+            id="hub.top.GRETA.simulation.SimulationControlActions"
+            label="Simulation Control Actions"
             visible="true">
          <action
                class="hub.top.greta.simulation.StartAction"
@@ -13,9 +61,9 @@
                icon="icons/full/etool16/run_exc.gif"
                id="hub.top.GRETA.run.simulation"
                label="start simulation"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
                style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="start simulation of adaptive process">
          </action>
          <action
@@ -24,9 +72,9 @@
                icon="icons/adaptiveProcessStepEnabled4.png"
                id="hub.top.GRETA.run.step"
                label="extend by all enabled oclets"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
                style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="extend by all enabled oclets">
          </action>
          <action
@@ -35,10 +83,10 @@
                icon="icons/full/elcl16/resume_co.gif"
                id="hub.top.GRETA.run.process"
                label="fire single event"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
                state="false"
                style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="fire single event">
          </action>
          <action
@@ -47,10 +95,10 @@
                icon="icons/full/elcl16/refresh.gif"
                id="hub.top.GRETA.run.reset"
                label="reset current run"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
                state="false"
                style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="reset current run">
          </action>
          <action
@@ -59,11 +107,18 @@
                icon="icons/wellformedOcletsFrage1.png"
                id="hub.top.GRETA.run.checkOclets"
                label="check wellformedness of oclets"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/execute"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
                style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/execute"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="check wellformedness of oclets">
          </action>
+      </actionSet>
+      
+      <!-- actions for analyzing an adaptive system -->
+      <actionSet
+            id="hub.top.GRETA.analysis.AnalysisActions"
+            label="Adaptive System Analysis Actions"
+            visible="true">
          <action
                class="hub.top.greta.run.actions.OcletDependencies"
                id="hub.top.GRETA.run.ocletDependencies"
@@ -80,15 +135,6 @@
                style="push"
                tooltip="build state space of the system">
          </action>
-         <action
-               class="hub.top.greta.run.actions.VipWriteLPO"
-               id="hub.top.GRETA.run.export.vip.lpo"
-               label="export current run as VIP scenario"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
-               style="push"
-               tooltip="export current run as VIP scenario">
-         </action>
-         
          <!--
          <action
                class="hub.top.greta.run.actions.BuildBranchingProcess"
@@ -107,7 +153,21 @@
                style="push"
                tooltip="build branching process of the system">
          </action>
-         
+      </actionSet>
+      
+      <!-- actions for transforming an adaptive system -->
+      <actionSet
+            id="hub.top.GRETA.model.TransformationActions"
+            label="Adaptive System Model Transformation Actions"
+            visible="true">
+         <action
+               class="hub.top.greta.synthesis.UnfoldTransitiveDependenciesAction"
+               id="hub.top.GRETA.run.synthesis.UnfoldTransitiveDependenciesAction"
+               label="unfold transitive dependencies"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/model"
+               style="push"
+               tooltip="unfold transitive dependencies">
+         </action>
          <action
                class="hub.top.greta.run.actions.InstantiateSystem"
                id="hub.top.GRETA.run.instantiateSystem"
@@ -117,47 +177,30 @@
                tooltip="instantiate the system">
          </action>
       </actionSet>
+      
+      <!-- actions for synthesizing a state-based system from an adaptive system -->
+      <actionSet
+            id="hub.top.GRETA.synthesis.SynthesisActions"
+            label="Adaptive System Synthesis Actions"
+            visible="true">
+         <action
+               class="hub.top.greta.run.actions.VipWriteLPO"
+               id="hub.top.GRETA.run.export.vip.lpo"
+               label="export current run as VIP scenario"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/synthesis"
+               style="push"
+               tooltip="export current run as VIP scenario">
+         </action>
+      </actionSet>
    </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="hub.top.GRETA.menus.gretaMenu"
-               label="Greta"
-               mnemonic="G">
-            <separator
-                  name="execute"
-                  visible="true">
-            </separator>
-            <separator
-                  name="analysis"
-                  visible="true">
-            </separator>
-            <separator
-                  name="model"
-                  visible="true">
-            </separator>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <menu
-               id="hub.top.GRETA.toolbars.gretaToolbar"
-               label="Greta">
-            <separator
-                  name="execute"
-                  visible="true">
-            </separator>
-            <separator
-                  name="analysis"
-                  visible="true">
-            </separator>
-         </menu>
-      </menuContribution>
-   </extension>
+   <!-- end of action declarations -->
+   
+
+   
+   <!-- context menus on files in the workspace -->
    <extension
          point="org.eclipse.ui.popupMenus">
+      <!-- general context menu structure for adaptive system diagram files -->
       <objectContribution
             id="hub.top.GRETA.run.apDiagramFileActions"
             nameFilter="*.adaptivesystem_diagram"
@@ -167,26 +210,37 @@
                label="Adaptive Processes"
                path="additions">
             <separator
-                  name="maintenance">
-            </separator>
-            <separator
                   name="analysis">
             </separator>
+            <separator
+                  name="synthesis">
+            </separator>
+            <separator
+                  name="maintenance">
+            </separator>
+
          </menu>
+         
+         <!--
+         	fix a problem with the label positioning that causes GMF to
+         	livelock when loading a diagram file 
+           -->
          <action
                class="hub.top.greta.run.actions.FixDiagramFile"
                enablesFor="1"
                id="hub.top.GRETA.run.fixDiagramFileAction"
-               label="Fix diagram file"
+               label="fix diagram file"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
          </action>
+         
+         <!-- build branching process -->
          <action
                class="hub.top.greta.run.actions.BuildBranchingProcess2"
                id="hub.top.GRETA.run.buildBranchingProcess2"
                label="build branching process"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
-               tooltip="build branching process of the system">
          </action>
+         <!-- build state space -->
          <action
                class="hub.top.greta.run.actions.BuildStateSpace"
                enablesFor="1"
@@ -194,26 +248,77 @@
                label="build transition system"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
+         <!-- synthesize a labeled Petri net -->
          <action
-               class="hub.top.greta.synthesis.SyntesizeNetAction"
+               class="hub.top.greta.synthesis.SynthesizeLabeledNetAction"
                enablesFor="1"
-               id="hub.top.GRETA.run.convertToNet"
-               label="convert to P/T net"
-               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
+               id="hub.top.GRETA.run.SynthesizeNetLabeled"
+               label="synthesize labeled Petri net"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/synthesis">
          </action>
-         <!--
+         <!-- synthesize an unlabeled Petri net -->
          <action
-               class="hub.top.greta.run.actions.InitProcessSimulationView"
+               class="hub.top.greta.synthesis.SynthesizeNetAction"
                enablesFor="1"
-               id="hub.top.GRETA.run.initProcessSimulationViewAction"
-               label="Initialize Simulation View"
-               menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
+               id="hub.top.GRETA.run.SynthesizeNet"
+               label="synthesize Petri net"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/synthesis">
          </action>
-         -->
+
       </objectContribution>
-      <!--
+
+      <!-- menu entries for entire workspace folders -->
       <objectContribution
-            id="hub.top.GRETA.run.apModelFileActions"
+            adaptable="false"
+            id="hub.top.GRETA.run.menu.folder"
+            objectClass="org.eclipse.core.resources.IFolder">
+         <!-- general context menu structure for folders -->
+         <menu
+               id="hub.top.GRETA.run.folderMenu"
+               label="Adaptive Processes"
+               path="additions">
+            <separator
+                  name="analysis">
+            </separator>
+            <separator
+                  name="synthesis">
+            </separator>
+            <separator
+                  name="maintenance">
+            </separator>
+         </menu>
+      </objectContribution>
+   </extension>
+   <!-- end of menu and action specifications --> 
+   
+   <!-- integration of additional editors and views for adaptive processes -->
+   <!-- 
+        a multi view editor where different views on the model
+        are presented in multiple tabs
+     -->
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="hub.top.greta.run.editors.AdaptiveSystemMultiEditor"
+            contributorClass="hub.top.greta.run.editors.AdaptiveSystemMultiEditorContributor"
+            extensions="adaptivesystem_diagram"
+            id="hub.top.greta.run.editors.AdaptiveSystemMultiEditor"
+            name="Adaptive System Editor">
+      </editor>
+   </extension>
+
+    
+   <!--
+   		simulation view for the simulation mode that display the adaptive
+   		process only and no oclets
+     -->
+     
+   <!--
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.GRETA.simulation.ModelFileActions"
             nameFilter="*.adaptivesystem"
             objectClass="org.eclipse.core.resources.IFile">
          <menu
@@ -221,7 +326,7 @@
                label="Adaptive Processes"
                path="additions">
             <separator
-                  name="maintenance">
+                  name="simulation">
             </separator>
          </menu>
          <action
@@ -229,66 +334,30 @@
                enablesFor="1"
                id="hub.top.GRETA.run.initProcessSimulationViewAction"
                label="Initialize Simulation View"
-               menubarPath="hub.top.GRETA.run.apDiagramMenu/maintenance">
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/simulation">
          </action>
       </objectContribution>
-      -->
       
       <objectContribution
-            id="hub.top.editor.lola.text.popupMenus"
-            nameFilter="*.lola"
+            id="hub.top.GRETA.simulation.DiagramFileActions"
+            nameFilter="*.adaptivesystem_diagram"
             objectClass="org.eclipse.core.resources.IFile">
          <menu
-               id="hub.top.editor.lola.text.lolaMenu"
-               label="Petri Net (LoLA)"
-               path="additions">
-            <separator
-                  name="analysis">
-            </separator>
-         </menu>
-         <action
-               label="build branching process"
-               class="hub.top.greta.verification.BuildBPLolaAction"
-               menubarPath="hub.top.editor.lola.text.lolaMenu/analysis"
-               enablesFor="1"
-               id="hub.top.GRETA.run.buildBranchingProcessLoLA">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="false"
-            id="hub.top.GRETA.run.menu.folder"
-            objectClass="org.eclipse.core.resources.IFolder">
-         <menu
-               id="hub.top.GRETA.run.folderMenu"
+               id="hub.top.GRETA.run.apDiagramMenu"
                label="Adaptive Processes"
                path="additions">
             <separator
-                  name="maintenance">
-            </separator>
-            <separator
-                  name="analysis">
+                  name="simulation">
             </separator>
          </menu>
          <action
-               label="analyze models..."
-               class="hub.top.greta.verification.AnalyzeModelsFolderAction"
-               menubarPath="hub.top.GRETA.run.folderMenu/analysis"
+               class="hub.top.greta.run.actions.InitProcessSimulationView"
                enablesFor="1"
-               id="hub.top.GRETA.run.analyzeModelsFolder">
+               id="hub.top.GRETA.run.initProcessSimulationViewAction"
+               label="Initialize Simulation View"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/simulation">
          </action>
       </objectContribution>
    </extension>
-   <!--
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="hub.top.greta.run.editors.AdaptiveSystemMultiEditor"
-            contributorClass="hub.top.greta.run.editors.AdaptiveSystemMultiEditorContributor"
-            extensions="adaptivesystem_diagram"
-            icon="icons/sample.gif"
-            id="hub.top.greta.run.editors.AdaptiveSystemMultiEditor"
-            name="Adaptive System Editor">
-      </editor>
-   </extension>
-	-->
+   -->
 </plugin>

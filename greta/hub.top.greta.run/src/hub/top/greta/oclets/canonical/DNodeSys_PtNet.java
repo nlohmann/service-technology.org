@@ -85,6 +85,7 @@ public class DNodeSys_PtNet extends DNodeSys {
 		initialRun = buildInitialState(net);
 		
 		finalize_setPreConditions();
+		finalize_initialRun();
 	}
 	
 	/**

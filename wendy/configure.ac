@@ -91,6 +91,9 @@ AC_TYPE_UINT32_T
 AC_TYPE_SIZE_T
 AC_CHECK_SIZEOF([void*])
 
+# syslogging can be configured with `--enable-syslog'
+AC_ARG_ENABLE(syslog, AS_HELP_STRING([--enable-syslog], [whether to use syslog (default is off)]), AC_DEFINE([USE_SYSLOG], 1, [whether to use syslog]))
+
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile

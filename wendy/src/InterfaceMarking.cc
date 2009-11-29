@@ -120,9 +120,7 @@ InterfaceMarking::InterfaceMarking() : storage(NULL) {
 
     // reserve memory and initialize to 0
     storage = new uint8_t[bytes];
-    for (size_t i = 0; i < bytes; ++i) {
-        storage[i] = 0;
-    }
+    memset(storage, 0, bytes);
 }
 
 InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) : storage(NULL) {

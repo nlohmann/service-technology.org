@@ -158,7 +158,7 @@ option "reportFrequency" -
   details="Note that small values might slow down the execution. To switch reporting off completely, set it to `0'.\n"
   int
   typestr="FREQ"
-  default="10000"
+  default="100000"
   optional
 
 option "bug" -

@@ -30,6 +30,33 @@
 extern gengetopt_args_info args_info;
 
 
+/***************************************************************************\
+ * syslog functionalities (to be enabled with "configure --enable-syslog") *
+\***************************************************************************/
+#ifdef USE_SYSLOG
+#include <syslog.h>
+
+extern std::string invocation;
+
+/// dummy class to have global constructor and destructor
+class _syslogwrapper {
+    public:
+        _syslogwrapper() {
+            openlog(PACKAGE, LOG_PID, LOG_USER);
+            syslog(LOG_NOTICE, "--> starting %s", PACKAGE_STRING);
+        }
+
+        ~_syslogwrapper() {
+            syslog(LOG_NOTICE, "<-- done: %s", invocation.c_str());
+            closelog();
+        }
+};
+
+/// dummy object living in global namespace
+_syslogwrapper __syslogwraper;
+#endif
+
+
 /*!
  \param format  the status message formatted as printf string
  
@@ -42,6 +69,12 @@ void message(const char* format, ...) {
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+
+#ifdef USE_SYSLOG
+    va_start(args, format);
+    vsyslog(LOG_NOTICE, format, args);
+    va_end(args);
+#endif
 
     fprintf(stderr, "\n");
 }
@@ -62,6 +95,12 @@ void status(const char* format, ...) {
     vfprintf(stderr, format, args);
     va_end(args);
 
+#ifdef USE_SYSLOG
+    va_start(args, format);
+    vsyslog(LOG_NOTICE, format, args);
+    va_end(args);
+#endif
+
     fprintf(stderr, "\n");
 }
 
@@ -80,8 +119,13 @@ __attribute__((noreturn)) void abort(unsigned short code, const char* format, ..
     vfprintf(stderr, format, args);
     va_end(args);
 
-    fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
+#ifdef USE_SYSLOG
+    va_start(args, format);
+    vsyslog(LOG_ERR, format, args);
+    va_end(args);
+#endif
 
+    fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
     status("see manual for a documentation of this error");
 
     if (errno != 0) {
@@ -97,7 +141,7 @@ void displayFileError(char* filename, int lineno, char* token) {
     std::ifstream f(filename);
     std::string line;
     for (int i = 0; i < lineno; ++i) {
-        getline(f,line);
+        getline(f, line);
     }
     size_t firstpos(line.find_first_of(token));
     std::string format = line.replace(firstpos, strlen(token), std::string(_cbad_(token)));

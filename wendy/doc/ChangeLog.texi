@@ -1,4 +1,10 @@
 @heading Version 2.7-unreleased
+@itemize
+@item configure Wendy with @option{--enable-syslog} to additionally write verbose output to the syslog (e.g. @file{/var/log/system.log})
+
+@item @option{--reportFrequency} sets the number of edges to be reported (was: number of knowledges)
+@end itemize
+
 
 @heading Version 2.6 (23 November 2009)
 @itemize

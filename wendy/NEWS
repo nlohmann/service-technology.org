@@ -11,6 +11,12 @@
 Version 2.7-unreleased
 ======================
 
+* configure Wendy with `--enable-syslog' to additionally write verbose
+  output to the syslog (e.g. `/var/log/system.log')
+
+* `--reportFrequency' sets the number of edges to be reported (was: number
+  of knowledges)
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

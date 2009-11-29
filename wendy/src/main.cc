@@ -167,9 +167,12 @@ void terminationHandler() {
     // print statistics
     if (args_info.stats_flag) {
         message("runtime: %s%.2f sec%s", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c0_, _c_);
-        fprintf(stderr, "%s%s%s: memory consumption: %s", _cm_, PACKAGE, _c_, _c0_);
-        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
-        fprintf(stderr, "%s", _c_);
+        std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+        FILE* ps = popen(call.c_str(), "r");
+        unsigned int memory;
+        fscanf(ps, "%u", &memory);
+        pclose(ps);
+        message("memory: %s%u KB %s", _c0_, memory, _c_);
     }
 }
 
@@ -194,6 +197,7 @@ int main(int argc, char** argv) {
     try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
+            status("reading from stdin...");
             std::cin >> pnapi::io::owfn >> *InnerMarking::net;
         } else {
             // strip suffix from input filename
@@ -220,8 +224,7 @@ int main(int argc, char** argv) {
     // "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
     if (InnerMarking::net->getTransitions().empty()) {
         status("net has no transitions -- adding dead dummy transition");
-        InnerMarking::net->createArc(InnerMarking::net->createPlace(),
-                                     InnerMarking::net->createTransition());
+        InnerMarking::net->createArc(InnerMarking::net->createPlace(), InnerMarking::net->createTransition());
     }
 
     // only normal nets are supported so far
@@ -243,8 +246,7 @@ int main(int argc, char** argv) {
     `----------------------------*/
     if (args_info.cover_given) {
         if (args_info.cover_arg) {
-            cover_in = fopen(args_info.cover_arg, "r");
-            if (cover_in == NULL) {
+            if (!(cover_in = fopen(args_info.cover_arg, "r"))) {
                 abort(15, "could not open cover file '%s'", args_info.cover_arg);
             }
             cover_parse();
@@ -294,18 +296,14 @@ int main(int argc, char** argv) {
     delete temp;
 
     // close marking information output file
-    if (args_info.mi_given) {
-        delete markingoutput;
-    }
+    delete markingoutput;
 
 
     /*-------------------------------.
     | 6. organize reachability graph |
     `-------------------------------*/
     InnerMarking::initialize();
-    if (args_info.cover_given) {
-        Cover::clear();
-    }
+    Cover::clear();
 
 
     /*-------------------------------.
@@ -315,14 +313,9 @@ int main(int argc, char** argv) {
     Knowledge* K0 = new Knowledge(0);
     StoredKnowledge::root = new StoredKnowledge(K0);
 
+    StoredKnowledge::root->store();
     if (StoredKnowledge::root->is_sane) {
-        StoredKnowledge::root->store();
         StoredKnowledge::processNode(K0, StoredKnowledge::root);
-    } else {
-        // store insane root in case of diagnosis
-        if (args_info.diagnose_given) {
-            StoredKnowledge::root->store();
-        }
     }
     delete K0;
     time(&end_time);
@@ -334,8 +327,7 @@ int main(int argc, char** argv) {
         Queue::maximal_length, Queue::initial_length);
     status("used %d of %d hash buckets, maximal bucket size: %d",
         static_cast<size_t>(StoredKnowledge::hashTree.size()), (1 << (8*sizeof(hash_t))), static_cast<size_t>(StoredKnowledge::stats.maxBucketSize));
-    status("calculated %d trivial SCCs",
-        StoredKnowledge::stats.numberOfTrivialSCCs);
+    status("calculated %d trivial SCCs", StoredKnowledge::stats.numberOfTrivialSCCs);
     status("calculated %d non-trivial SCCs, at most %d members in nontrivial SCC",
         StoredKnowledge::stats.numberOfNonTrivialSCCs, StoredKnowledge::stats.maxSCCSize);
     status("maximal simultaneously stored Knowledge objects: %d", Queue::maximal_objects);

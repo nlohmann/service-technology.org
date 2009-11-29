@@ -28,6 +28,7 @@
 #include <string>
 #include <unistd.h>
 
+
 /// unconditionally print a message
 void message(const char* format, ...);
 
@@ -37,8 +38,9 @@ void status(const char* format, ...);
 /// abort with an error message and an error code
 void abort(unsigned short code, const char* format, ...);
 
-
+/// verbosely display an error in a file (still experimental)
 void displayFileError(char* filename, int lineno, char* token);
+
 
 /**************************************************************************\
  The following code organizes colored output on stderr. It defines several
@@ -52,7 +54,7 @@ void displayFileError(char* filename, int lineno, char* token);
 \**************************************************************************/
 
 /// whether to use colored output
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 const bool _useColor = isatty(fileno(stderr)) && (
     !strcmp(getenv("TERM"), "linux") ||
     !strcmp(getenv("TERM"), "cygwin") ||
@@ -107,13 +109,21 @@ const bool _useColor = false;
 /// reset foreground color
 #define _c_ (_useColor ? "\033[m" : "")
 
+/// color the name of a tool
 #define _ctool_(s)       (std::string(_cm_) + s + _c_).c_str()
+/// color the name of a file
 #define _cfilename_(s)   (std::string(_cb__) + s + _c_).c_str()
+/// color the type of a file
 #define _coutput_(s)     (std::string(_cB_) + s + _c_).c_str()
+/// color some good output
 #define _cgood_(s)       (std::string(_cG_) + s + _c_).c_str()
+/// color some bad output
 #define _cbad_(s)        (std::string(_cR_) + s + _c_).c_str()
+/// color a warning
 #define _cwarning_(s)    (std::string(_cY_) + s + _c_).c_str()
+/// color an important message
 #define _cimportant_(s)  (std::string(_c0_) + s + _c_).c_str()
+/// color a command-line parameter
 #define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
 
 #endif

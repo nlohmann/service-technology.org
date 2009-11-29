@@ -49,7 +49,7 @@ Output::Output() :
  This constructor creates a file with the given filename. In case the
  filename matches "-", no file is created, but std::cout is used as output.
 */
-Output::Output(std::string str, std::string kind) :
+Output::Output(const std::string& str, const std::string& kind) :
     os((!str.compare("-")) ?
         std::cout :
         *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
@@ -75,7 +75,7 @@ Output::Output(std::string str, std::string kind) :
 /*!
  This destructor closes the associated file. Unless the "--noClean" parameter
  is given, temporary files are deleted after closing.
- */
+*/
 Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
@@ -107,7 +107,7 @@ Output::~Output() {
  This implicit conversation operator allows to use Output objects like
  ostream streams.
 */
-Output::operator std::ostream&() {
+Output::operator std::ostream&() const {
     return os;
 }
 
@@ -135,7 +135,7 @@ std::ostream& Output::stream() const {
        whether the creation of the std::ofstream succeeded.
 */
 char* Output::createTmp() {
-#if defined(__MINGW32__)
+#ifdef __MINGW32__
     temp = strdup(basename(args_info.tmpfile_arg));
     if (mktemp(temp) == NULL) {
         abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));

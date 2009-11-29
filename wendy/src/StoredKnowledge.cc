@@ -23,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 #include "StoredKnowledge.h"
 #include "Cover.h"
 #include "verbose.h"
@@ -131,13 +132,6 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
        the object itself
  */
 void StoredKnowledge::processNode(const Knowledge* K, StoredKnowledge* const SK) {
-    static unsigned int calls = 0;
-
-    // statistics output
-    if (args_info.reportFrequency_arg and ++calls % args_info.reportFrequency_arg == 0) {
-        message("%8d knowledges, %8d edges", stats.storedKnowledges, stats.storedEdges);
-    }
-
     // traverse the labels of the interface and process K's successors
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
@@ -311,27 +305,23 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
 /*!
  converts a Knowledge object into a StoredKnowledge object
 
+ \note The arrays for the successors is allocated with calloc to avoid a for
+       loop to set the entries to NULL.
+
  \param[in] K  the knowledge to copy from
 */
 StoredKnowledge::StoredKnowledge(const Knowledge* K)
         : is_final(0), is_final_reachable(0), is_sane(K->is_sane),
           is_on_tarjan_stack(1), sizeDeadlockMarkings(K->size),
-          sizeAllMarkings(K->size), inner(NULL), interface(NULL),
-          successors(NULL) {
+          sizeAllMarkings(K->size),
+          // reserve the necessary memory for the internal and interface markings
+          inner(new InnerMarking_ID[sizeAllMarkings]),
+          interface(new InterfaceMarking*[sizeAllMarkings]),
+          // reserve and zero the necessary memory for the successors (fixed)
+          successors((StoredKnowledge**)calloc(Label::events, SIZEOF_VOIDP)) {
     assert(sizeAllMarkings > 0);
 
-    // reserve the necessary memory for the successors (fixed)
-    successors = new StoredKnowledge*[Label::events];
-    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        // initialization is necessary to detect absent edges
-        successors[l-1] = NULL;
-    }
-
-    // reserve the necessary memory for the internal and interface markings
-    inner = new InnerMarking_ID[sizeAllMarkings];
-    interface = new InterfaceMarking*[sizeAllMarkings];
-
-    // finally copy data structure to C-style arrays
+    // copy data structure to C-style arrays
     innermarkingcount_t count = 0;
 
     // traverse the bubble and copy the markings into the C arrays
@@ -364,7 +354,7 @@ StoredKnowledge::~StoredKnowledge() {
     delete[] interface;
 
     delete[] inner;
-    delete[] successors;
+    free(successors);
 
     if (args_info.cover_given) {
         Cover::removeKnowledge(this);
@@ -549,7 +539,10 @@ void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const
     // we will never store label 0 (tau) -- hence decrease the label
     successors[label-1] = knowledge;
 
-    ++stats.storedEdges;
+    // statistics output
+    if (args_info.reportFrequency_arg and ++stats.storedEdges % args_info.reportFrequency_arg == 0) {
+        message("%8d knowledges, %8d edges", stats.storedKnowledges, stats.storedEdges);
+    }
 }
 
 
@@ -666,12 +659,12 @@ void StoredKnowledge::traverse() {
 
 void StoredKnowledge::fileHeader(std::ostream &file) {
     file << "{\n  generator:    " << PACKAGE_STRING
-        << " (" << CONFIG_BUILDSYSTEM ")"
-        << "\n  invocation:   " << invocation << "\n  events:       "
-        << static_cast<unsigned int>(Label::send_events) << " send, "
-        << static_cast<unsigned int>(Label::receive_events) << " receive, "
-        << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-        << "\n  statistics:   " << seen.size() << " nodes\n}\n\n";
+         << " (" << CONFIG_BUILDSYSTEM ")"
+         << "\n  invocation:   " << invocation << "\n  events:       "
+         << static_cast<unsigned int>(Label::send_events) << " send, "
+         << static_cast<unsigned int>(Label::receive_events) << " receive, "
+         << static_cast<unsigned int>(Label::sync_events) << " synchronous"
+         << "\n  statistics:   " << seen.size() << " nodes\n}\n\n";
 }
 
 /*!
@@ -738,7 +731,7 @@ void StoredKnowledge::output_og(std::ostream& file) {
 
     // print empty node unless we print an automaton
     if (not args_info.sa_given and emptyNodeReachable) {
-         // the empty node
+        // the empty node
         file << "  0 : true\n";
 
         // empty node loops

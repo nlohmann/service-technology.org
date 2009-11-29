@@ -19,6 +19,7 @@
 
 
 #include <config.h>
+#include <cstdlib>
 
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
@@ -49,16 +50,11 @@ void PossibleSendEvents::initialize() {
 
 /*
   \brief all values are initialized with 0
+  \note we assume sizeof(uint8_t) == 1
 */
-PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
+PossibleSendEvents::PossibleSendEvents()
+  : storage((uint8_t*)calloc(bytes, 1)), decodedLabels(NULL) {
     assert(bytes > 0);
-
-    // reserve memory
-    storage = new uint8_t[bytes];
-    for (size_t i = 0; i < bytes; ++i) {
-        // initially, all sending events are not reachable
-        storage[i] = 0;
-    }
 }
 
 /*
@@ -67,18 +63,15 @@ PossibleSendEvents::PossibleSendEvents() : decodedLabels(NULL) {
                  otherwise if allValues is set to false, label represents the
                  label that is to be set to one, all others are initialized
                  with 0
- */
-PossibleSendEvents::PossibleSendEvents(const bool& allValues, const Label_ID& l) : decodedLabels(NULL) {
+  \note we assume sizeof(uint8_t) == 1
+*/
+PossibleSendEvents::PossibleSendEvents(const bool& allValues, const Label_ID& l)
+  : storage((uint8_t*)malloc(bytes)), decodedLabels(NULL) {
     assert(bytes > 0);
     assert((allValues and l <= 1) or (not allValues and SENDING(l)));
 
-    // reserve memory
-    storage = new uint8_t[bytes];
-    for (size_t i = 0; i < bytes; ++i) {
-        // if allValues is set, initially all sending events are reachable
-        // otherwise they are set to 1
-        storage[i] = allValues ? 255 : 0;
-    }
+    // if allValues is set, initially all sending events are reachable
+    memset(storage, (allValues ? 255 : 0), bytes);
 
     // set one particular label to 1
     if (not allValues) {
@@ -95,7 +88,7 @@ PossibleSendEvents::PossibleSendEvents(const bool& allValues, const Label_ID& l)
        at this memory; don't try to delete these pointers (double free)!
 */
 PossibleSendEvents::~PossibleSendEvents() {
-    delete[] storage;
+    free(storage);
     delete[] decodedLabels;
 }
 
@@ -164,10 +157,6 @@ char* PossibleSendEvents::decode() {
  set all bits to false (needed when analyzing an SCC of inner markings)
 */
 void PossibleSendEvents::setFalse() {
-    // reserve memory
-    for (size_t i = 0; i < bytes; ++i) {
-        // initially, all sending events are not reachable
-        storage[i] = 0;
-    }
+    memset(storage, 0, bytes);
 }
 

@@ -61,7 +61,6 @@ void InnerMarking::initialize() {
 
     // copy data from STL mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
-
         inner_markings[i] = markingMap[i];
         inner_markings[i]->is_bad = (inner_markings[i]->is_bad or not finalMarkingReachableMap[i]);
 

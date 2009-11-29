@@ -172,7 +172,7 @@ void terminationHandler() {
         unsigned int memory;
         fscanf(ps, "%u", &memory);
         pclose(ps);
-        message("memory: %s%u KB %s", _c0_, memory, _c_);
+        message("memory consumption: %s%u KB %s", _c0_, memory, _c_);
     }
 }
 

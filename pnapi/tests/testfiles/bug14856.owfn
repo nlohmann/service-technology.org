@@ -1,6 +1,6 @@
 PLACE
   INTERNAL
-    p;
+    p1, p2;
 
   INPUT
     i;
@@ -10,13 +10,13 @@ PLACE
 
 
 INITIALMARKING
-    ;
+    p1: 1;
 
 FINALCONDITION
-  (p=0);
+  (p2=1);
 
 
 TRANSITION t
-  CONSUME i;
-  PRODUCE p;
+  CONSUME p1, i;
+  PRODUCE p2;
 

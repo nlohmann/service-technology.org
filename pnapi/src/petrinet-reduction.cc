@@ -359,6 +359,7 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  * \brief Elimination of parallel places:
  * 
  * If there exist two parallel places p1 and p2 (precondition 1)
+ * and both p1 and p2 are internal places (precondition 4)
  * and p1 has less than or as many tokens as p2 (precondition 2),
  * and p2 is not concerned by a final condition (precondition 3),
  * then p2 can be removed.
@@ -382,7 +383,7 @@ unsigned int PetriNet::reduce_rule_3p()
   map<Place*, Place*> replaceRelation;
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p1)
+  PNAPI_FOREACH(set<Place*>, internalPlaces_, p1) // precondition 4 for p1
   { 
     /*
      * Since parallel places form an equivalence class, each place once
@@ -400,7 +401,8 @@ unsigned int PetriNet::reduce_rule_3p()
     {
       PNAPI_FOREACH(set<Node*>, preTransition->getPostset(), p2)
       {
-        if ((*p1)->isParallel(*(*p2))) // precondition 1
+        if ( ((*p2)->getType() == Node::INTERNAL) && // precondition 4 for p2
+             ((*p1)->isParallel(*(*p2))) ) // precondition 1
         {
           parallelPlaces.insert(static_cast<Place*>(*p2));
         }
@@ -414,7 +416,8 @@ unsigned int PetriNet::reduce_rule_3p()
       if(postTransition != 0)
       {
         PNAPI_FOREACH(set<Node*>, postTransition->getPreset(), p2)
-          if ((*p1)->isParallel(*(*p2))) // precondition 1
+          if ( ((*p2)->getType() == Node::INTERNAL) && // precondition 4 for p2
+               ((*p1)->isParallel(*(*p2))) ) // precondition 1
           {
             parallelPlaces.insert(static_cast<Place*>(*p2));
           }

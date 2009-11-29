@@ -1,6 +1,7 @@
 bin_PROGRAMS = fiona2wendy wendy2fiona \
 	       wendyFormula2bits \
-	       ig2sa sa2ig
+	       ig2sa sa2ig \
+	       wendyReduceBits wendyExpandBits
 
 COMMON = main.cc config.h \
          cmdline.c cmdline.h
@@ -23,6 +24,12 @@ ig2sa_SOURCES = syntax-ig2sa.yy lexic-ig2sa.ll \
 sa2ig_SOURCES = syntax-sa2ig.yy lexic-sa2ig.ll \
 		$(COMMON)
 
+wendyReduceBits_SOURCES = syntax-wrb.yy lexic-wrb.ll \
+			  $(COMMON)
+
+wendyExpandBits_SOURCES = syntax-web.yy lexic-web.ll \
+			  $(COMMON)
+
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
@@ -44,6 +51,8 @@ BISON_FILES += $(filter %.yy,$(wendy2fiona_SOURCES))
 BISON_FILES += $(filter %.yy,$(wendyFormula2bits_SOURCES))
 BISON_FILES += $(filter %.yy,$(ig2sa_SOURCES))
 BISON_FILES += $(filter %.yy,$(sa2ig_SOURCES))
+BISON_FILES += $(filter %.yy,$(wendyReduceBits_SOURCES))
+BISON_FILES += $(filter %.yy,$(wendyExpandBits_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

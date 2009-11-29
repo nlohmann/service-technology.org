@@ -11,7 +11,8 @@ TESTFILES = syntax_example.owfn \
             synchronous.fiona.og \
 	    bit_s.owfn \
             myCoffee.owfn \
-	    zeus.owfn
+	    zeus.owfn \
+	    redex.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

@@ -18,4 +18,6 @@ m4_define([WENDY2FIONA],          [cover.sh @abs_top_builddir@/src/wendy2fiona])
 m4_define([WENDYFORMULA2BITS],    [cover.sh @abs_top_builddir@/src/wendyFormula2bits])
 m4_define([IG2SA],                [cover.sh @abs_top_builddir@/src/ig2sa])
 m4_define([SA2IG],                [cover.sh @abs_top_builddir@/src/sa2ig])
+m4_define([WENDYREDUCEBITS],      [cover.sh @abs_top_builddir@/src/wendyReduceBits])
+m4_define([WENDYEXPANDBITS],      [cover.sh @abs_top_builddir@/src/wendyExpandBits])
 

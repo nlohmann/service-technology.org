@@ -16,7 +16,7 @@ public:
 	int width;
 	int maxNameLen;
 
-	void createTerms();
+	void createTerms(EventTermBound*** level0);
 
 	ListElement<int*>* terms;
 

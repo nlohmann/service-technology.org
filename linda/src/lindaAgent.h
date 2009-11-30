@@ -26,13 +26,41 @@ public:
 	/// add all final markings from the final condition
 	static bool addFinalMarkingsFromFinalCondition(uint8_t bound);
 
-
-	/// add a final marking and build an lp system
+	/// Get a bit table, 1 = xor dependency.
 	static uint8_t* getXORTable(uint8_t firstOfInterest, uint8_t lastOfInterest);
 	static uint8_t* getXORTable(uint8_t* eventsOfInterest, uint8_t count);
 
 	/// Terminate the Linda Agent, clean up everything.
 	static void finalize();
+
+	static unsigned int getNumberOfSystems () {
+		return mFinals->size();
+	}
+
+	static std::vector<PartialMarking*>* getFinalMarkings() {
+		return mFinals;
+	}
+
+	static PartialMarking* getFinalMarking(int x) {
+		if (x < mFinals->size()) {
+			return (*mFinals)[x];
+		}
+		return 0;
+	}
+	static ExtendedStateEquation* getSystem(int x) {
+		if (x < mSystems->size()) {
+			return (*mSystems)[x];
+		}
+		return 0;
+	}
+
+	static ExtendedStateEquation** getSystemsArray() {
+		ExtendedStateEquation** result = new ExtendedStateEquation*[mSystems->size()];
+		for (int i = 0; i < mSystems->size(); ++i) {
+			result[i] = (*mSystems)[i];
+		}
+		return result;
+	}
 
 private:
 	static pnapi::PetriNet* mNet;

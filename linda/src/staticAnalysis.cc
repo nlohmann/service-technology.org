@@ -117,7 +117,7 @@ void FlowMatrix::computeTInvariants() {
 					for (int init = 0; init < width; ++init) {
 						newRow[init] =
 							kgv/fac * current->element[init] + kgv/facComp
-						* currentComp->element[init];
+							* currentComp->element[init];
 					}
 					ListElement<int*>* toInsert = new ListElement<int*> (
 							newRow, newRows, 0);
@@ -191,7 +191,7 @@ void FlowMatrix::computeTInvariants() {
 
 }
 
-void FlowMatrix::createTerms() {
+void FlowMatrix::createTerms(EventTermBound*** level0) {
 
 	ListElement<int*>* currentInList = 0;
 	ListElement<int*>* current = root;
@@ -202,31 +202,118 @@ void FlowMatrix::createTerms() {
 				int f1 = current->element[i];
 				for (int j = i + 1; j < width; ++j) {
 					if (current->element[j] > 0) {
-						int e2 = j;
-						int f2 = -1* current ->element[j];
+
+						if (level0 == 0 || !((level0[0][i]->upperBounded && !level0[0][j]->upperBounded) || (level0[0][j]->upperBounded && !level0[0][i]->upperBounded)) ) {
+
+							int e2 = j;
+							int f2 = -1* current->element[j];
+
+							ListElement<int*>* search = terms;
+							bool alreadyStored = false;
+
+							while (search != 0) {
 
 
 
-						int* term = new int[LindaHelpers::NR_OF_EVENTS];
-						for (int counter = 0; counter < LindaHelpers::NR_OF_EVENTS; ++counter) {
-							term[counter] = 0;
+								int stored1 = abs(search->element[e1]);
+								int stored2 = abs(search->element[e2]);
+
+								if (stored1 != 0 && stored2 != 0) {
+
+								bool eq = (stored1 == f1 && stored2 == abs(f2)) || (stored2 == f1 && stored1 == abs(f2));
+
+								if (eq) {
+									alreadyStored = true;
+								}
+
+								else {
+
+									bool multiple = (stored1 % f1 == 0 && stored1/f1 == stored2/abs(f2)) || (f1 % stored1 == 0 && f1/stored1 == abs(f2)/stored2);
+
+									if (multiple) {
+										alreadyStored = true;
+									}
+								}
+
+								}
+								/*
+
+								lprec* lp = make_lp(0, 2);
+								for (int i = 1; i <= 2; ++i) {
+									set_int(lp, i, TRUE);
+								}
+								set_debug(lp, FALSE);
+								set_verbose(lp, FALSE);
+								int* transCol;
+								REAL* transVal;
+								transCol = new int[2]();
+								transVal = new REAL[2]();
+								transCol[0] = 0;
+								transCol[1] = 1;
+
+								transVal[0] = abs(f1);
+								transVal[1] = abs(stored1);
+
+
+								add_constraintex(lp, 2, transVal, transCol, EQ, 0);
+
+								transCol = new int[2]();
+								transVal = new REAL[2]();
+								transCol[0] = 0;
+								transCol[1] = 1;
+
+								transVal[0] = abs(f2);
+								transVal[1] = abs(stored2);
+
+
+								add_constraintex(lp, 2, transVal, transCol, EQ, 0);
+
+								transCol = new int[2]();
+								transVal = new REAL[2]();
+								transCol[0] = 0;
+								transCol[1] = 1;
+
+								transVal[0] = 1;
+								transVal[1] = 1;
+
+								add_constraintex(lp, 2, transVal, transCol, NEQ, 0);
+
+								int ret = solve(lp);
+
+								if (ret != INFEASIBLE) {
+									alreadyStored = true;
+								}
+
+
+*/
+								search = search->next;
+
+							}
+
+							if (!alreadyStored) {
+
+								int* term = new int[LindaHelpers::NR_OF_EVENTS];
+								for (int counter = 0; counter < LindaHelpers::NR_OF_EVENTS; ++counter) {
+									term[counter] = 0;
+								}
+
+								term[e1] = f1;
+								term[e2] = f2;
+
+								ListElement<int*>* newElem = new ListElement<
+								int*> (term, 0, 0);
+
+								if (terms == 0) {
+									terms = newElem;
+									currentInList = newElem;
+								} else {
+									currentInList->next = newElem;
+									newElem->prev = currentInList;
+									currentInList = newElem;
+								}
+
+							}
 						}
-
-						term[e1] = f1;
-						term[e2] = f2;
-
-						ListElement<int*>* newElem = new ListElement<
-						int*> (term, 0, 0);
-
-						if (terms == 0) {
-							terms = newElem;
-							currentInList = newElem;
-						} else {
-							currentInList->next = newElem;
-							newElem->prev = currentInList;
-							currentInList = newElem;
-						}
-
 					}
 				}
 			}

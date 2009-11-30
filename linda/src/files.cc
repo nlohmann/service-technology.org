@@ -103,10 +103,15 @@ void ProfileFile::output(std::ostream& file) {
 		for (std::vector<EventTermBound*>::iterator termsIt =
 				systems[i]->calculatedBounds.begin(); termsIt
 				!= systems[i]->calculatedBounds.end(); ++termsIt) {
+
+			if ((*termsIt)->upperBounded || (*termsIt)->lowerBounded) {
+
 			file << std::endl << "    F" << fCounter << ",T" << tCounter
 					<< ": ";
 			file << (*termsIt)->getLowerBoundString() << ","
 					<< (*termsIt)->getUpperBoundString() << ";";
+
+			}
 
 			++tCounter;
 		}

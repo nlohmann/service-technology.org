@@ -6,6 +6,7 @@
 #include <sstream>
 #include "cmdline.h"
 #include "helpers.h"
+#include "lindaAgent.h"
 #include "staticAnalysis.h"
 #include "setsOfFinalMarkings.h"
 #include "eventTerm.h"
@@ -125,55 +126,47 @@ int main(int argc, char** argv) {
 	}
 
 
-
-
-
-
-	// Calculate the final markings from the final condition
-
-	int bound = args_info.bound_arg;
-
-	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(net,
-			&(net->finalCondition().formula()), bound);
-
-	ExtendedStateEquation** systems = new ExtendedStateEquation*[fSet->size()];
-	int sysCounter = 0;
-
-	status("Computed final markings:");
-	for (std::vector<PartialMarking*>::iterator finalMarkingIt =
-		fSet->partialMarkings.begin(); finalMarkingIt
-		!= fSet->partialMarkings.end(); ++finalMarkingIt) {
-		status("    %s", (*finalMarkingIt)->toString().c_str());
-	}
-
 	// Create the linear program for each final marking
 
-	for (int i = 0; i < fSet->size(); ++i) {
-		// Create a new state equation for this final marking
-		ExtendedStateEquation* XSE = new ExtendedStateEquation(net,fSet->partialMarkings[i]);
-		if (XSE->constructLP()) {
-			systems[sysCounter] = XSE;
-			++sysCounter;
-			// If flag is on, output the lps.
-		}
+	LindaAgent::initialize(net, args_info.output_given);
 
-		if (args_info.show_lp_flag) {
-			message("    Processing final marking: %s",
-					fSet->partialMarkings[i]->toString().c_str());
-			XSE->output();
-		}
-	}
+	LindaAgent::addFinalMarkingsFromFinalCondition(args_info.bound_arg);
 
-	// Cached incidence matrix is not needed anymore
-	delete ExtendedStateEquation::lines;
-	delete[] ExtendedStateEquation::eventLines;
-	delete ExtendedStateEquation::transitionID;
+	unsigned int sysCounter = LindaAgent::getNumberOfSystems();
 
 	// Verbose output of the number of linear programs created
 	status("Number of lp systems: %i", sysCounter);
 
 	if (sysCounter == 0) {
 		abort(1,"No final markings are reachable from the initial marking.");
+	}
+
+	// MODE Level 0 Message Profile
+	// We evaluate a term (1*a) for each event (a).
+	EventTermBound*** level0 = 0;
+	if (args_info.level_0_flag) {
+		message("Evaluating basic terms.");
+		status("Number of basic terms: %i", LindaHelpers::NR_OF_EVENTS);
+
+		level0 = new EventTermBound**[sysCounter];
+
+		// Iterate over the finalmarkings/lps
+		for (int x = 0; x < sysCounter; ++x) {
+
+			status("    Processing final marking: %s",
+					LindaAgent::getFinalMarking(x)->toString().c_str());
+
+			level0[x] = new EventTermBound*[LindaHelpers::NR_OF_EVENTS];
+
+
+			// For each event, we create a term and evaluate it
+			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+				BasicTerm* bt = new BasicTerm(i);
+				level0[x][i] = LindaAgent::getSystem(x)->evaluate(bt);
+			}
+
+		}
+
 	}
 
 
@@ -184,17 +177,17 @@ int main(int argc, char** argv) {
 		FlowMatrix f(net);
 		f.computeTInvariants();
 		//		f.output();
-		f.createTerms();
+		f.createTerms(level0);
 
 		// For each system, evaluate all event terms
 		for (int i = 0; i <sysCounter; ++i) {
 
 			status("    Processing final marking: %s",
-					fSet->partialMarkings[i]->toString().c_str());
+					LindaAgent::getFinalMarking(i)->toString().c_str());
 
 			ListElement<int*>* currentTerm = f.terms;
 			while (currentTerm != 0) {
-				EventTermBound* b = systems[i]->evaluate(currentTerm->element);
+				EventTermBound* b = LindaAgent::getSystem(i)->evaluate(currentTerm->element);
 				currentTerm = currentTerm->next;
 			}
 
@@ -202,27 +195,6 @@ int main(int argc, char** argv) {
 
 	}
 
-	// MODE Level 0 Message Profile
-	// We evaluate a term (1*a) for each event (a).
-	if (args_info.level_0_flag) {
-		message("Evaluating basic terms.");
-		status("Number of basic terms: %i", LindaHelpers::NR_OF_EVENTS);
-
-		// Iterate over the finalmarkings/lps
-		for (int x = 0; x < fSet->size(); ++x) {
-
-			status("    Processing final marking: %s",
-					fSet->partialMarkings[x]->toString().c_str());
-
-			// For each event, we create a term and evaluate it
-			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
-				BasicTerm* bt = new BasicTerm(i);
-				EventTermBound* b = systems[x]->evaluate(bt);
-			}
-
-		}
-
-	}
 
 	// MODE Level 1 Message Profile
 	// We evaluate a term (1*a + 1*b) for any two events a,b with a != b.
@@ -233,18 +205,23 @@ int main(int argc, char** argv) {
 				- LindaHelpers::NR_OF_EVENTS);
 
 		// Iterate over the finalmarkings/lps
-		for (int x = 0; x < fSet->size(); ++x) {
+		for (int x = 0; x < sysCounter; ++x) {
 
 			status("    Processing final marking: %s",
-					fSet->partialMarkings[x]->toString().c_str());
+					LindaAgent::getFinalMarking(x)->toString().c_str());
 
 			// For each event, we create a term and evaluate it
 			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 				BasicTerm* bt1 = new BasicTerm(i);
 				for (int j = i + 1; j < LindaHelpers::NR_OF_EVENTS; ++j) {
+
+
+
 					BasicTerm* bt2 = new BasicTerm(j);
 					AddTerm* at = new AddTerm(bt1, bt2);
-					EventTermBound* b = systems[x]->evaluate(at);
+
+
+					EventTermBound* b = LindaAgent::getSystem(x)->evaluate(at);
 					if (b->lowerBounded && b->upperBounded && b->lowerBound
 							<= 1) {
 						if (b->upperBound == 1) {
@@ -280,12 +257,12 @@ int main(int argc, char** argv) {
 		for (int i = 0; i <sysCounter; ++i) {
 
 			status("    Processing final marking: %s",
-					fSet->partialMarkings[i]->toString().c_str());
+					LindaAgent::getFinalMarking(i)->toString().c_str());
 
 			// For each parsed event term...
 			for (std::vector<int*>::iterator it = term_vec->begin(); it
 			!= term_vec->end(); ++it) {
-				EventTermBound* b = systems[i]->evaluate((*it));
+				EventTermBound* b = LindaAgent::getSystem(i)->evaluate((*it));
 			}
 		}
 
@@ -321,7 +298,7 @@ int main(int argc, char** argv) {
 			for (int i = 0; i <sysCounter; ++i) {
 
 				message("    Processing final marking: %s",
-						fSet->partialMarkings[i]->toString().c_str());
+						LindaAgent::getFinalMarking(i)->toString().c_str());
 
 				bool thereWereMaybes = false;
 
@@ -329,7 +306,7 @@ int main(int argc, char** argv) {
 				for (std::vector<EventTermConstraint*>::iterator it =
 					constraint_vec->begin(); it != constraint_vec->end(); ++it) {
 					// Evaluate the term
-					EventTermBound* b = systems[i]->evaluate(
+					EventTermBound* b = LindaAgent::getSystem(i)->evaluate(
 							(*it)->getEventTerm());
 
 					// Try to decide if the given bounds are correct or not
@@ -370,7 +347,7 @@ int main(int argc, char** argv) {
 			file.open(args_info.output_arg);
 
 			// Create the file and output it to the stream
-			ProfileFile* outputFile = new ProfileFile(systems, net,sysCounter);
+			ProfileFile* outputFile = new ProfileFile(LindaAgent::getSystemsArray(), net,sysCounter);
 			outputFile->output(file);
 
 			// Close the file
@@ -383,7 +360,7 @@ int main(int argc, char** argv) {
 		} else {
 
 			// Create the file and output it to the stream
-			ProfileFile* outputFile = new ProfileFile(systems, net,sysCounter);
+			ProfileFile* outputFile = new ProfileFile(LindaAgent::getSystemsArray(), net,sysCounter);
 			outputFile->output(std::cout);
 			delete outputFile;
 

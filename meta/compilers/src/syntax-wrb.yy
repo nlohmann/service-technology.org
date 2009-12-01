@@ -24,7 +24,7 @@
 %{
 
 /* 
- * According to [?pnog?] Wendy Bit OGs can be reduced by the following rules:
+ * According to [LohmannW_2009_acsd] Wendy Bit OGs can be reduced by the following rules:
  *
  * 1.: For each state annotated with the F bit and without successors
  *     the F bit can be removed.

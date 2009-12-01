@@ -42,6 +42,7 @@ AC_PATH_PROG(WENDY, [wendy], not found)
 AC_PATH_PROG(SAYO,  [sayo],  not found)
 AC_PATH_PROG(SA2SM, [sa2sm], not found)
 AC_PATH_PROG(PETRI, [petri], not found)
+AC_PATH_PROG(DIFF,  [diff],  not found)
 
 #############################################################################
 # create configured files (Makefiles, scripts, etc.)

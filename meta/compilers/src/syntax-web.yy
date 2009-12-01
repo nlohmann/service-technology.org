@@ -24,7 +24,7 @@
 %{
 
 /* 
- * According to [?pnog?] Wendy Bit OGs can be reduced.
+ * According to [LohmannW_2009_acsd] Wendy Bit OGs can be reduced.
  * By the following rules these reductions are reverted:
  *
  * 1.: For each state without successors

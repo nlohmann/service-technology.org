@@ -12,7 +12,20 @@ TESTFILES = syntax_example.owfn \
 	    bit_s.owfn \
             myCoffee.owfn \
 	    zeus.owfn \
-	    redex.owfn
+	    redex.owfn \
+	    AP.owfn \
+	    auctionService.owfn \
+	    BH.owfn \
+	    CN.owfn \
+	    DG.owfn \
+	    loanApprovalProcess.owfn \
+	    phcontrol3.unf.owfn \
+	    PO.owfn \
+	    QR.owfn \
+	    RE.owfn \
+	    RS.owfn \
+	    SD.owfn \
+	    TR.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

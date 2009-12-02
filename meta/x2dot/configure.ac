@@ -26,6 +26,8 @@ else
 fi
 AC_SUBST(DOT)
 
+AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)

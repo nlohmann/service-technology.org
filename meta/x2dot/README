@@ -5,3 +5,35 @@
 					/_/\_\_____\__,_|\___/ \__
 				 converting various formats into dot format
 								   
+PURPOSE
+	x2dot is a tool that generates a Graphviz dot output for operating guidelines and service automata.
+
+COPYRIGHT
+	Copyright (c) 2009 Georg Straube
+
+AUTHOR
+	x2dot is written and maintained by Georg Straube. See file "AUTHORS" for more information.
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    x2dot is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of x2dot.
+
+    Any different licensing scheme may be negotiated with the author(s).
+ 
+INSTALLATION
+    x2dot can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+ 
+    x2dot can directly call Graphviz dot:
+     * Graphviz Dot (http://www.graphviz.org/)
+
+    If you want to make changes to the source code, you might need the following tools to regenerate the code:
+     * Flex (http://flex.sourceforge.net)
+     * Bison (http://www.gnu.org/software/bison)
+     * Gengetopt (http://www.gnu.org/software/gengetopt)
+

@@ -56,7 +56,7 @@ void testSat(){
 	// ~Z
 	Formula * h = new FormulaNOT(new FormulaLit(4)); //~Z
 	assert (h->toString() == "~(Z)");
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->isSatisfiable() == true);
 
 	list<Clause> clauses = h->calculateCNF();
 	assert(clauses.size() == 3);
@@ -69,7 +69,7 @@ void testSat(){
 	// (~Z * Z)
 	Formula * f = new FormulaAND(new FormulaNOT(new FormulaLit(4)), new FormulaLit(4)); // ~Z*Z
 	assert (f->toString() == "(~(Z) * Z)");
-	assert (f->isSatisfiable(label2id.size()) == false);
+	assert (f->isSatisfiable() == false);
 
 	clauses = f->calculateCNF();
 	assert(clauses.size() == 4);
@@ -83,7 +83,7 @@ void testSat(){
 	// (Z * ~Z)
 	Formula * g = new FormulaAND(new FormulaLit(4), new FormulaNOT(new FormulaLit(4))); // Z*~Z
 	assert (g->toString() == "(Z * ~(Z))");
-	assert (g->isSatisfiable(label2id.size()) == false);
+	assert (g->isSatisfiable() == false);
 
 	clauses = g->calculateCNF();
 	assert(clauses.size() == 4);
@@ -92,6 +92,10 @@ void testSat(){
 	++iter; assert(checkClause(*iter,  5, -4, 4));
 	++iter; assert(checkClause(*iter,  -5, 4, 0));
 	++iter; assert(checkClause(*iter,  -5, 0, -4));
+
+	delete h;
+	delete f;
+	delete g;
 }
 
 void initFormulaClass(){
@@ -144,7 +148,7 @@ void testTRUE(){
 	assert (f->formulaType == TRUE);
 	assert (f->toString() == "true");
 	assert (f1->toString() == "true");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -168,7 +172,7 @@ void testTRUE(){
 	assert (g->formulaType == NOT);
 	assert(g->toString() == "~(true)");
 	assert(g1->toString() == "false");
-	assert(g->isSatisfiable(label2id.size()) == false);
+	assert(g->isSatisfiable() == false);
 
 	Formula* g_clone = g->getCopy();
 	assert(g_clone->toString() == g->toString());
@@ -205,7 +209,7 @@ void testFALSE(){
 	assert (f->formulaType == FALSE);
 	assert (f->toString() == "false");
 	assert (f1->toString() == "false");
-	assert (f->isSatisfiable(label2id.size()) == false);
+	assert (f->isSatisfiable() == false);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -228,7 +232,7 @@ void testFALSE(){
 	assert(g->formulaType == NOT);
 	assert(g->toString() == "~(false)");
 	assert(g1->toString() == "true");
-	assert(g->isSatisfiable(label2id.size()) == true);
+	assert(g->isSatisfiable() == true);
 
 	Formula* g_clone = g->getCopy();
 	assert(g_clone->toString() == g->toString());
@@ -262,7 +266,7 @@ void testFINAL(){
 	assert (f->formulaType == FINAL);
 	assert (f->toString() == "final");
 	assert (f1->toString() == "final");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -291,7 +295,7 @@ void testNUM(){
 
 	Formula* f1 = f->moveNegation();
 	assert (f1->toString() == "42");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -320,7 +324,7 @@ void testLIT(){
 	assert (f->formulaType == LIT);
 	assert (f->toString() == "I");
 	assert (f1->toString() == "I");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -351,7 +355,7 @@ void testNOT(){
 	assert (f->formulaType == NOT);
 	assert (f->toString() == "~(I)");
 	assert (f1->toString() == "~(I)");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -378,7 +382,7 @@ void testNOT(){
 
 	assert (c->toString() == "~(~(R))");
 	assert (c1->toString() == "R");
-	assert (c->isSatisfiable(label2id.size()) == true);
+	assert (c->isSatisfiable() == true);
 
 	clauses = c->calculateCNF();
 	assert(clauses.size() == 3);
@@ -409,7 +413,7 @@ void testAND(){
 	assert (c->formulaType == AND);
 	assert (c->toString() == "(I * R)");
 	assert (c1->toString() == "(I * R)");
-	assert (c->isSatisfiable(label2id.size()) == true);
+	assert (c->isSatisfiable() == true);
 
 	Formula* c_clone = c->getCopy();
 	assert(c_clone->toString() == c->toString());
@@ -440,7 +444,7 @@ void testAND(){
 	assert (e->formulaType == AND);
 	assert (e->toString() == "(O * (I * R))");
 	assert (e1->toString() == "(O * (I * R))");
-	assert (e->isSatisfiable(label2id.size()) == true);
+	assert (e->isSatisfiable() == true);
 
 	Formula *e_clone = e->getCopy();
 	assert(e_clone->toString() == e->toString());
@@ -474,7 +478,7 @@ void testAND(){
 	assert (e->formulaType == AND);
 	assert (e->toString() == "((I * R) * A)");
 	assert (e1->toString() == "((I * R) * A)");
-	assert (e->isSatisfiable(label2id.size()) == true);
+	assert (e->isSatisfiable() == true);
 
 	e_clone = e->getCopy();
 	assert(e_clone->toString() == e->toString());
@@ -510,7 +514,7 @@ void testAND(){
 	assert (h->formulaType == AND);
 	assert (h->toString() == "((O * A) * (I * R))");
 	assert (h1->toString() == "((O * A) * (I * R))");
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->isSatisfiable() == true);
 
 	Formula* h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
@@ -548,7 +552,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(false * (I * R))");
 	assert (f1->toString() == "(false * (I * R))");
-	assert (f->isSatisfiable(label2id.size()) == false);
+	assert (f->isSatisfiable() == false);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -578,7 +582,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "((I * R) * false)");
 	assert (f1->toString() == "((I * R) * false)");
-	assert (f->isSatisfiable(label2id.size()) == false);
+	assert (f->isSatisfiable() == false);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -606,7 +610,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(true * false)");
 	assert (f1->toString() == "(true * false)");
-	assert (f->isSatisfiable(label2id.size()) == false);
+	assert (f->isSatisfiable() == false);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -634,7 +638,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(true * true)");
 	assert (f1->toString() == "(true * true)");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -662,7 +666,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(true * A)");
 	assert (f1->toString() == "(true * A)");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -692,7 +696,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(true * (A * I))");
 	assert (f1->toString() == "(true * (A * I))");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -726,7 +730,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(A * true)");
 	assert (f1->toString() == "(A * true)");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -757,7 +761,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "((A * I) * true)");
 	assert (f1->toString() == "((A * I) * true)");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -797,7 +801,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(((A * I) * (I * R)) * ((O * R) * (O * I)))");
 	assert (f1->toString() == "(((A * I) * (I * R)) * ((O * R) * (O * I)))");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -855,7 +859,7 @@ void testOR(){
 	Formula* c_clone = c->getCopy();
 	assert(c_clone->toString() == c->toString());
 
-	assert (c->isSatisfiable(label2id.size()) == true);
+	assert (c->isSatisfiable() == true);
 	list<Clause> clauses = c->calculateCNF();
 	assert(clauses.size() == 4);
 
@@ -885,7 +889,7 @@ void testOR(){
 	Formula *e_clone = e->getCopy();
 	assert(e_clone->toString() == e->toString());
 
-	assert (e->isSatisfiable(label2id.size()) == true);
+	assert (e->isSatisfiable() == true);
 	clauses = e->calculateCNF();
 
 	assert(clauses.size() == 7);
@@ -919,7 +923,7 @@ void testOR(){
 	e_clone = e->getCopy();
 	assert(e_clone->toString() == e->toString());
 
-	assert (e->isSatisfiable(label2id.size()) == true);
+	assert (e->isSatisfiable() == true);
 	clauses = e->calculateCNF();
 
 	assert(clauses.size() == 7);
@@ -955,7 +959,7 @@ void testOR(){
 	Formula* h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->isSatisfiable() == true);
 	clauses = h->calculateCNF();
 
 	assert(clauses.size() == 10);
@@ -989,7 +993,7 @@ void testOR(){
 	h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (h->isSatisfiable(label2id.size()) == false);
+	assert (h->isSatisfiable() == false);
 	clauses = h->calculateCNF();
 
 	assert(clauses.size() == 2);
@@ -1015,7 +1019,7 @@ void testOR(){
 	h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->isSatisfiable() == true);
 	clauses = h->calculateCNF();
 
 	assert(clauses.size() == 2);
@@ -1041,7 +1045,7 @@ void testOR(){
 	h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->isSatisfiable() == true);
 	clauses = h->calculateCNF();
 
 	assert(clauses.size() == 2);
@@ -1069,7 +1073,7 @@ void testOR(){
 	h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->isSatisfiable() == true);
 	clauses = h->calculateCNF();
 	assert(clauses.size() == 6);
 
@@ -1100,7 +1104,7 @@ void testOR(){
 	h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 	clauses = h->calculateCNF();
 	assert(clauses.size() == 6);
 
@@ -1136,12 +1140,12 @@ void testOR(){
 	assert (f->formulaType == OR);
 	assert (f->toString() == "(((A + I) + (I + R)) + ((O + R) + (O + I)))");
 	assert (f1->toString() == "(((A + I) + (I + R)) + ((O + R) + (O + I)))");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula *f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 	clauses = f->calculateCNF();
 	assert(clauses.size() == 22);
 
@@ -1197,7 +1201,7 @@ void testAND_OR_NOT(){
 	Formula* d1_clone = d1->getCopy();
 	assert(d1_clone->toString() == d1->toString());
 
-	assert (d->isSatisfiable(label2id.size()) == true);
+	assert (d->isSatisfiable() == true);
 	list<Clause> clauses = d->calculateCNF();
 	assert(clauses.size() == 4);
 
@@ -1223,7 +1227,7 @@ void testAND_OR_NOT(){
 	assert (k->formulaType == NOT);
 	assert (k->toString() == "~(~((I * R)))");
 	assert (k1->toString() == "(I * R)");
-	assert (k->isSatisfiable(label2id.size()) == true);
+	assert (k->isSatisfiable() == true);
 
 	Formula* k_clone = k->getCopy();
 	assert(k_clone->toString() == k->toString());
@@ -1263,7 +1267,7 @@ void testAND_OR_NOT(){
 	Formula* i_clone = i->getCopy();
 	assert(i_clone->toString() == i->toString());
 
-	assert (i->isSatisfiable(label2id.size()) == true);
+	assert (i->isSatisfiable() == true);
 	clauses = i->calculateCNF();
 	assert(clauses.size() == 7);
 
@@ -1294,7 +1298,7 @@ void testAND_OR_NOT(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(true * ~((A * I)))");
 	assert (f1->toString() == "(true * (~(A) + ~(I)))");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	Formula *f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -1326,7 +1330,7 @@ void testAND_OR_NOT(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(true * ~(A))");
 	assert (f1->toString() == "(true * ~(A))");
-	assert (f->isSatisfiable(label2id.size()) == true);
+	assert (f->isSatisfiable() == true);
 
 	f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
@@ -1360,7 +1364,7 @@ void testAND_OR_NOT(){
 	Formula* p_clone = p->getCopy();
 	assert(p_clone->toString() == p->toString());
 
-	assert (p->isSatisfiable(label2id.size()) == true);
+	assert (p->isSatisfiable() == true);
 	clauses = p->calculateCNF();
 	assert(clauses.size() == 5);
 

@@ -15,8 +15,8 @@
 extern gengetopt_args_info args_info;
 
 using namespace std;
-extern map<string, unsigned int> label2id;
-extern map<unsigned int, string> id2label;
+extern map<string, int> label2id;
+extern map<int, string> id2label;
 
 void testNodeClass(){
 	initFormulaClass();
@@ -57,14 +57,14 @@ void testNodeClass(){
 	assert (trap->id == 24);
 	assert (trap->formula->toString() == "true");
 	//add for each label a self loop
-    for (unsigned int l = firstLabelId; l <= lastLabelId; ++l){
+    for (int l = firstLabelId; l <= lastLabelId; ++l){
     	trap->addEdge(l,trap); //self loop
     }
 
 	string s1;
 	stringstream out1;
 
-    for (unsigned int i = firstLabelId; i <= lastLabelId; ++i){
+    for (int i = firstLabelId; i <= lastLabelId; ++i){
     	if (n1->outEdges[i].size() > 0){
     		for (list<Node*>::iterator s = n1->outEdges[i].begin(); s != n1->outEdges[i].end(); ++s){
 
@@ -78,7 +78,7 @@ void testNodeClass(){
     string s2;
     stringstream out2;
 
-    for (unsigned int i = firstLabelId; i <= lastLabelId; ++i){
+    for (int i = firstLabelId; i <= lastLabelId; ++i){
     	if (trap->outEdges[i].size() > 0){
     		for (list<Node*>::iterator s = trap->outEdges[i].begin(); s != trap->outEdges[i].end(); ++s){
 

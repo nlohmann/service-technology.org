@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 
 	initGlobalVariables();
 
-	time_t parsingTime_start = time(NULL);
+	//time_t parsingTime_start = time(NULL);
 
     //parse
     if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
@@ -106,34 +106,34 @@ int main(int argc, char **argv) {
 	cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
 */
 	bool printToStdout = true;
-	for (int j = 0; j<args_info.output_given; ++j){
+	for (unsigned int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {
 
-		// create output using Graphviz dot
-		case (output_arg_png):
-		case (output_arg_eps):
-		case (output_arg_pdf): {
-			if (CONFIG_DOT == "not found") {
-				cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
-				cerr << "       necessary for option '--output'" << endl;
-				exit(EXIT_FAILURE);
+			// create output using Graphviz dot
+			case (output_arg_png):
+			case (output_arg_eps):
+			case (output_arg_pdf): {
+				if (CONFIG_DOT == "not found") {
+					cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
+					cerr << "       necessary for option '--output'" << endl;
+					exit(EXIT_FAILURE);
+				}
+
+				string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_complement." + args_info.output_orig[j];
+				FILE *s = popen(call.c_str(), "w");
+				assert(s);
+				//fprintf(s, "%s\n", d.str().c_str());
+				string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
+				g->toDot(s, title);
+				assert(!ferror(s));
+
+				pclose(s);
 			}
-
-			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_complement." + args_info.output_orig[j];
-			FILE *s = popen(call.c_str(), "w");
-			assert(s);
-			//fprintf(s, "%s\n", d.str().c_str());
-			string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
-			g->toDot(s, title);
-			assert(!ferror(s));
-
-			pclose(s);
-		}
-		case (output_arg_eaa): {
-			printToStdout = false;
-			Output o(filename+"_complement.eaa", "complement OG");
-			g->print(o);
-		}
+			case (output_arg_eaa): {
+				printToStdout = false;
+				Output o(filename+"_complement.eaa", "complement OG");
+				g->print(o);
+			}
 		}
 	}
 

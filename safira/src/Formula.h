@@ -21,8 +21,7 @@ public:
 	FormulaType formulaType;
 
 	/// returns true if the formula is satisfiable; returns false otherwise
-	/// fVar: number of Variables in the formula to be checked
-	bool isSatisfiable(int fVar);
+	bool isSatisfiable();
 	list<Clause> calculateCNF();
 
 	Formula();

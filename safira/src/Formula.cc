@@ -208,8 +208,8 @@ list<Clause> Formula::calculateCNF(){
 }
 
 
-//fVar: number of Variables in the formula to be checked
-bool Formula::isSatisfiable(int fVar){
+
+bool Formula::isSatisfiable(){
  //   Formula* h = moveNegation();
  //   list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
  //   delete h;

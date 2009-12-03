@@ -114,7 +114,7 @@ void Graph::makeComplete() {
 		Formula *g = nodes[*n]->formula->getCopy();
 		Formula *f = new FormulaNOT(g);
 
-		if(f->isSatisfiable(id2label.size()+1) == true){ 	//TODO: das ist nur eine AbschŠtzung nach oben
+		if(f->isSatisfiable() == true){ 	//TODO: das ist nur eine AbschŠtzung nach oben
 			Node *q = new Node(f);
 			addedNodes[q->id] = q;
 			addedInitialNodes.push_back(q->id);
@@ -166,7 +166,7 @@ void Graph::makeComplete() {
 				f = h;
 				assert(f);
 
-				if(f->isSatisfiable(id2label.size()+1) == true){ //TODO: das ist nur eine AbschŠtzung nach oben
+				if(f->isSatisfiable() == true){ //TODO: das ist nur eine AbschŠtzung nach oben
 					//generate new node q with the formula f and add edge with label i to it
 					Node *q = new Node(f);
 					addedNodes[q->id] = q;
@@ -202,7 +202,8 @@ void Graph::makeComplete() {
 
 
 //! \brief creates a dot output of the graph
-//! \param title: a string containing the title for the graph to be shown in the image
+//! \param out: output file
+//! \param title: a string containing the title for the graph to be shown in the image (optional)
 void Graph::toDot(FILE* out, string title) const {
 //void Graph::toDot(string filename, string title) const {
 

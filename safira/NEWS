@@ -10,8 +10,6 @@ Version 1.1-unreleased
 ======================
 
 * removed memory leaks caused by gengetopt, lex and yacc
+* fixed bug in CNF calculation
 
-
-See file ChangeLog <http://service-technology.org/files/safira/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/safira/ChangeLog> for\ncomplete version history.\n

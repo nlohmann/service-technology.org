@@ -23,6 +23,7 @@ public:
 	/// returns true if the formula is satisfiable; returns false otherwise
 	/// fVar: number of Variables in the formula to be checked
 	bool isSatisfiable(int fVar);
+	list<Clause> calculateCNF();
 
 	Formula();
 	Formula (const Formula & formula);
@@ -36,15 +37,12 @@ public:
 	/// returns a string representation of the formula
 	virtual string toString() const = 0;
 
-	/// returns a string representation of the formula as conjunction of (x <-> a OP b)-expressions
-	virtual string toStringCNF( int varId = 0,  int max = 0) const = 0;
-
 	/// moves all negations to the inner of the formula
 	virtual Formula* moveNegation(bool leadingNot = false) const = 0;
 
 	/// transforms an formula into conjunctive normal form (CNF). Assumption: all negations were already moved to the inner before.
 	/// returns a list of clauses
-	virtual list<Clause> toCNF( int varId = 1,  int max = 1) const = 0;
+	virtual list<Clause> toCNF( int varId,  int& max) const = 0;
 
 	///return the time needed by minisat
 	static double getMinisatTime();
@@ -64,9 +62,8 @@ public:
 //	FormulaAND& operator = (const FormulaAND &formula);
 	~FormulaAND();
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 /// a formula to express a disjunction of two other formulae
@@ -83,9 +80,8 @@ public:
 	~FormulaOR();
 	virtual Formula * getCopy() const;
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 /// a formula to express a negation of another formula
@@ -101,9 +97,8 @@ public:
 	~FormulaNOT();
 	virtual Formula * getCopy() const;
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 /// a formula to express a string literal
@@ -117,9 +112,8 @@ public:
 	~FormulaLit(){};
 	virtual Formula * getCopy() const;
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 
@@ -134,9 +128,8 @@ public:
 	~FormulaNUM(){};
 	virtual Formula * getCopy() const;
 	virtual string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 
@@ -147,9 +140,8 @@ public:
 	~FormulaTrue(){};
 	virtual Formula * getCopy() const;
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 /// a formula to express falsity
@@ -160,9 +152,8 @@ public:
 	~FormulaFalse(){};
 	virtual Formula * getCopy() const;
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 /// a formula to express the final predicate
@@ -172,9 +163,8 @@ public:
 	~FormulaFinal(){};
 	virtual Formula * getCopy() const;
 	string toString() const;
-	string toStringCNF(int varId, int max) const;
 	Formula* moveNegation(bool leadingNot) const;
-	list<Clause> toCNF(int varId, int max) const;
+	list<Clause> toCNF(int varId, int& max) const;
 };
 
 

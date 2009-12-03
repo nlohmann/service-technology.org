@@ -6,6 +6,7 @@
 #include "Formula.h"
 #include "Node.h"
 #include "cmdline.h"
+#include "testFormula.h"
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -26,48 +27,22 @@ extern unsigned int lastInputId;
 extern unsigned int lastOutputId;
 
 void initGraph(){
-    label2id.clear();
-    id2label.clear();
+	initFormulaClass();
 
-    id2label[0] = ""; //0 has a special meaning in minisat, therefore 0 cannot use as ID for labels
-    label2id[""] = 0;
-
-	id2label[1] = "true";
-	label2id["true"] = 1;
-
-	id2label[2] = "false";
-	label2id["false"] = 2;
-
-	id2label[3] = "final";
-	label2id["final"] = 3;
-
-	id2label[4] = "tau";
-	label2id["tau"] = 4;
-
-	id2label[5] = "A";
-	label2id["A"] = 5;
-
-	id2label[6] = "R";
-	label2id["R"] = 6;
-
-	id2label[7] = "I";
-	label2id["I"] = 7;
-
-	id2label[8] = "O";
-	label2id["O"] = 8;
-
-	firstLabelId = 4;
-	firstInputId = 4;
-	firstOutputId = 7;
-	lastLabelId = 8;
-	lastInputId = 6;
-	lastOutputId = 8;
+	firstLabelId = 2;
+	firstInputId = 3;
+	lastInputId = 4;
+	firstOutputId = 5;
+	lastOutputId = 6;
+	lastLabelId = 6;
 
 	cout << "initGraphClass... \t passed" << endl;
 
 }
 
-
+/* only computes the complement of a given annotated Graph;
+ * the correctness of the result is not checked here
+ */
 void testGraphClass(){
 
 	initGraph();

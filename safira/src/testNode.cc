@@ -20,8 +20,8 @@ extern map<unsigned int, string> id2label;
 
 void testNodeClass(){
 	initFormulaClass();
-	unsigned int firstLabelId = 4;
-	unsigned int lastLabelId = label2id.size()-1;
+	int firstLabelId = 2;
+	int lastLabelId = label2id.size()-1;
 	assert(label2id.size() == id2label.size());
 
 	/**************

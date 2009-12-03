@@ -153,17 +153,13 @@ void initGlobalVariables(){
     label2id.clear();
     id2label.clear();
 
-    addLabel("", 0); //0 has a special meaning in minisat, therefore 0 cannot use as ID for labels
-    addLabel("true", 1);
-    addLabel("false", 2);
-    addLabel("final", 3);
-    addLabel("tau", 4);
+    addLabel("", 0); //0 has a special meaning in minisat, therefore 0 cannot use as label ID
+    addLabel("final", 1);
+    addLabel("tau", 2);
 
-	currentIdPos = 4;
-//	currentIdPos = 3;
-	firstLabelId = 4;
-
-
+    //	currentIdPos = 1;  //if there is no tau in the OG
+	currentIdPos = 2;
+	firstLabelId = 2;
 
 }
 

@@ -5,7 +5,7 @@
 #include <map>
 #include "testFormula.h"
 #include "Formula.h"
-#include "helpers.h"
+
 #include "cmdline.h"
 
 /// the command line parameters
@@ -16,7 +16,6 @@ extern map<string, unsigned int> label2id;
 extern map<unsigned int, string> id2label;
 
 void testFormulaClass(){
-	initFormulaClass();
 
 	string s = intToString(23);
 	assert (s == "23");
@@ -28,7 +27,6 @@ void testFormulaClass(){
 	testLIT();
 	testNOT();
 	testAND();
-	testAND_NOT();
 	testOR();
 	testAND_OR_NOT();
 
@@ -39,6 +37,9 @@ void testFormulaClass(){
 void testSat(){
     label2id.clear();
     id2label.clear();
+
+    id2label[0] = "";
+    label2id[""] = 0;
 
 	id2label[1] = "true";
 	label2id["true"] = 1;
@@ -52,16 +53,45 @@ void testSat(){
 	id2label[4] = "Z";
 	label2id["Z"] = 4;
 
-	Formula * h = new FormulaNOT(new FormulaLit(4));
+	// ~Z
+	Formula * h = new FormulaNOT(new FormulaLit(4)); //~Z
+	assert (h->toString() == "~(Z)");
 	assert (h->isSatisfiable(label2id.size()) == true);
 
-	Formula * f = new FormulaOR(new FormulaNOT(new FormulaLit(4)), new FormulaLit(4)); // ~Z*Z
+	list<Clause> clauses = h->calculateCNF();
+	assert(clauses.size() == 3);
+
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 5,0,0));
+	++iter; assert(checkClause(*iter, -5,-4,0));
+	++iter; assert(checkClause(*iter, 5, 4,0));
+
+
+	// (~Z * Z)
+	Formula * f = new FormulaAND(new FormulaNOT(new FormulaLit(4)), new FormulaLit(4)); // ~Z*Z
+	assert (f->toString() == "(~(Z) * Z)");
 	assert (f->isSatisfiable(label2id.size()) == false);
 
-	Formula * g = new FormulaOR(new FormulaLit(4), new FormulaNOT(new FormulaLit(4))); // Z*~Z
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 4);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 5,0,0));
+	++iter; assert(checkClause(*iter, 5, 4, -4));
+	++iter; assert(checkClause(*iter,  -5, -4, 0));
+	++iter; assert(checkClause(*iter,  -5, 0,4));
+
+
+	// (Z * ~Z)
+	Formula * g = new FormulaAND(new FormulaLit(4), new FormulaNOT(new FormulaLit(4))); // Z*~Z
+	assert (g->toString() == "(Z * ~(Z))");
 	assert (g->isSatisfiable(label2id.size()) == false);
 
+	clauses = g->calculateCNF();
+	assert(clauses.size() == 4);
 
+	iter = clauses.begin(); assert(checkClause(*iter, 5,0,0));
+	++iter; assert(checkClause(*iter,  5, -4, 4));
+	++iter; assert(checkClause(*iter,  -5, 4, 0));
+	++iter; assert(checkClause(*iter,  -5, 0, -4));
 }
 
 void initFormulaClass(){
@@ -71,136 +101,146 @@ void initFormulaClass(){
     id2label[0] = ""; //0 has a special meaning in minisat, therefore 0 cannot use as ID for labels
     label2id[""] = 0;
 
-	id2label[1] = "true";
-	label2id["true"] = 1;
+	id2label[1] = "final";
+	label2id["final"] = 1;
 
-	id2label[2] = "false";
-	label2id["false"] = 2;
+	id2label[2] = "tau";
+	label2id["tau"] = 2;
 
-	id2label[3] = "final";
-	label2id["final"] = 3;
+	id2label[3] = "A";
+	label2id["A"] = 3;
 
-	id2label[4] = "tau";
-	label2id["tau"] = 4;
+	id2label[4] = "R";
+	label2id["R"] = 4;
 
-	id2label[5] = "A";
-	label2id["A"] = 5;
+	id2label[5] = "I";
+	label2id["I"] = 5;
 
-	id2label[6] = "R";
-	label2id["R"] = 6;
+	id2label[6] = "O";
+	label2id["O"] = 6;
 
-	id2label[7] = "I";
-	label2id["I"] = 7;
+	//cout << "initFormulaClass... \t passed" << endl;
+}
 
-	id2label[8] = "O";
-	label2id["O"] = 8;
+bool checkClause(const Clause& cl, const int l0, const int l1, const int l2){
 
-	cout << "initFormulaClass... \t passed" << endl;
+	return ((cl.literal0 == l0) && (cl.literal1 == l1) && (cl.literal2 == l2));
+}
+
+void printClause(const Clause& cl){
+	cout << "Clausel: " << cl.literal0 << ", " << cl.literal1 << ", " << cl.literal2 << endl;
 }
 
 void testTRUE(){
+	cout << "testTRUE... ";
+	initFormulaClass();
+
+	/****************
+	 * f = TRUE
+	 ****************/
 	Formula* f = new FormulaTrue();
 	Formula* f1 = f->moveNegation();
 
 	assert (f->formulaType == TRUE);
 	assert (f->toString() == "true");
 	assert (f1->toString() == "true");
-	assert (f1->toStringCNF() == "true");
 	assert (f->isSatisfiable(label2id.size()) == true);
-
-	list<Clause> clauses = f1->toCNF();
-	assert(clauses.size() == 0);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	/*
+	list<Clause> clauses = f->calculateCNF();
+	assert(clauses.size() == 2);
+
+	list<Clause>::const_iterator iter = clauses.begin(); //first clause
+	assert(checkClause(*iter, 7,0,0));
+
+	++iter; //second clause
+	assert(checkClause(*iter, 7,0,0));
+
+
+	/******************
 	 * g = NOT(true)
-	 */
+	 ******************/
 	Formula* g = new FormulaNOT(new FormulaTrue());
 	Formula* g1 = g->moveNegation();
 
 	assert (g->formulaType == NOT);
 	assert(g->toString() == "~(true)");
 	assert(g1->toString() == "false");
-	assert(g1->toStringCNF() == "false");
 	assert(g->isSatisfiable(label2id.size()) == false);
 
 	Formula* g_clone = g->getCopy();
 	assert(g_clone->toString() == g->toString());
 
-	clauses = g1->toCNF();
+	clauses = g1->calculateCNF();
 	assert(clauses.size() == 2);
 
-	assert(clauses.begin()->literal0 == -2);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
+	iter = clauses.begin(); //first clause
+	assert(checkClause(*iter, 7,0,0));
 
-	list<Clause>::const_iterator iter = clauses.begin(); //first clause
-	++iter;
-	assert(iter->literal0 == 2);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == emptyLiteral());
+	++iter;	//second clause
+	assert(checkClause(*iter, -7,0,0));
 
-	delete f1;
+
 	delete f;
 	delete g1;
 	delete g;
 	delete f_clone;
 	delete g_clone;
 
-	cout << "testTRUE... \t passed." << endl;
+	cout << "\t passed." << endl;
 }
 
 void testFALSE(){
-	/*
+	cout << "testFALSE... ";
+	initFormulaClass();
+
+	/**************
 	 * f = false
-	 */
+	 **************/
 	Formula* f = new FormulaFalse();
 	Formula* f1 = f->moveNegation();
 
 	assert (f->formulaType == FALSE);
 	assert (f->toString() == "false");
 	assert (f1->toString() == "false");
-	assert (f1->toStringCNF() == "false");
 	assert (f->isSatisfiable(label2id.size()) == false);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	list<Clause> clauses = f1->toCNF();
+	list<Clause> clauses = f1->calculateCNF();
 	assert(clauses.size() == 2);
 
-	assert(clauses.begin()->literal0 != emptyLiteral());
-	assert(clauses.begin()->literal0 == -2);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
-
 	list<Clause>::const_iterator iter = clauses.begin(); //first clause
-	++iter;
-	assert(iter->literal0 != emptyLiteral());
-	assert(iter->literal0 == 2);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == emptyLiteral());
+	assert(checkClause(*iter, 7,0,0));
 
+	++iter;	//second clause
+	assert(checkClause(*iter, -7,0,0));
 
-	/*
+	/*******************
 	 * g = NOT(false)
-	 */
+	 *******************/
 	Formula* g = new FormulaNOT(new FormulaFalse());
 	Formula* g1 = g->moveNegation();
 
 	assert(g->formulaType == NOT);
 	assert(g->toString() == "~(false)");
 	assert(g1->toString() == "true");
-	assert(g1->toStringCNF() == "true");
 	assert(g->isSatisfiable(label2id.size()) == true);
 
 	Formula* g_clone = g->getCopy();
 	assert(g_clone->toString() == g->toString());
 
-	clauses = g1->toCNF();
-    assert(clauses.size() == 0);
+	clauses = g1->calculateCNF();
+    assert(clauses.size() == 2);
+
+	iter = clauses.begin(); //first clause
+	assert(checkClause(*iter, 7,0,0));
+
+	++iter; //second clause
+	assert(checkClause(*iter, 7,0,0));
 
     delete f1;
     delete f;
@@ -209,94 +249,101 @@ void testFALSE(){
 	delete f_clone;
 	delete g_clone;
 
-    cout << "testFALSE... \t passed." << endl;
+    cout << "\t passed." << endl;
 }
 
 void testFINAL(){
+	cout << "testFINAL... ";
+	initFormulaClass();
+
 	Formula* f = new FormulaFinal();
 	Formula* f1 = f->moveNegation();
 
 	assert (f->formulaType == FINAL);
 	assert (f->toString() == "final");
 	assert (f1->toString() == "final");
-	assert (f1->toStringCNF() == "final");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	list<Clause> clauses = f1->toCNF();
-	assert(clauses.size() == 1);
+	list<Clause> clauses = f->calculateCNF();
+	assert(clauses.size() == 3);
 
-	assert(clauses.begin()->literal0 == 3);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter;	assert(checkClause(*iter, -7,1,0));
+	++iter; assert(checkClause(*iter, 7,-1,0));
 
 	delete f1;
 	delete f;
 	delete f_clone;
 
-	cout << "testFINAL... \t passed." << endl;
+	cout << "\t passed." << endl;
 }
 
 void testNUM(){
+	cout << "testINT... ";
+	initFormulaClass();
+
 	Formula* f = new FormulaNUM(42);
 	assert (f->formulaType == INT);
 	assert (f->toString() == "42");
 
 	Formula* f1 = f->moveNegation();
 	assert (f1->toString() == "42");
-	assert (f1->toStringCNF() == "42");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	list<Clause> clauses = f1->toCNF();
-	assert(clauses.size() == 1);
+	list<Clause> clauses = f->calculateCNF();
+	assert(clauses.size() == 3);
 
-	assert(clauses.begin()->literal0 == 42);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,42,0));
+	++iter; assert(checkClause(*iter, 7,-42,0));
 
 	delete f1;
 	delete f;
 	delete f_clone;
 
-	cout << "testINT... \t passed." << endl;
+	cout << "\t passed." << endl;
 }
 
 void testLIT(){
+	cout << "testLIT... ";
+	initFormulaClass();
+
 	Formula* f = new FormulaLit(label2id["I"]);
 	Formula* f1 = f->moveNegation();
 
 	assert (f->formulaType == LIT);
 	assert (f->toString() == "I");
 	assert (f1->toString() == "I");
-	assert (f1->toStringCNF() == "7");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	list<Clause> clauses = f1->toCNF();
-	assert(clauses.size() == 1);
+	list<Clause> clauses = f->calculateCNF();
+	assert(clauses.size() == 3);
 
-	assert(clauses.begin()->literal0 == 7);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,5,0));
+	++iter; assert(checkClause(*iter, 7,-5,0));
 
 	delete f1;
 	delete f;
 	delete f_clone;
 
-	cout << "testLIT... \t passed." << endl;
+	cout << "\t passed." << endl;
 }
 
-
 void testNOT(){
+	cout << "testNOT... ";
+	initFormulaClass();
 
-	/*simple NOT*/
+	/*simple NOT: ~I   */
 	Formula* g = new FormulaLit(label2id["I"]);
 	Formula* f = new FormulaNOT(g);
 	Formula* f1 = f->moveNegation();
@@ -304,24 +351,23 @@ void testNOT(){
 	assert (f->formulaType == NOT);
 	assert (f->toString() == "~(I)");
 	assert (f1->toString() == "~(I)");
-	assert (f1->toStringCNF() == "-7");
 	assert (f->isSatisfiable(label2id.size()) == true);
 
 	Formula* f_clone = f->getCopy();
 	assert(f_clone->toString() == f->toString());
 
-	list<Clause> clauses = f1->toCNF();
-	assert(clauses.size() == 1);
+	list<Clause> clauses = f->calculateCNF();
+	assert(clauses.size() == 3);
 
-	assert(clauses.begin()->literal0 == -7);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,-5,0));
+	++iter;	assert(checkClause(*iter, 7,5,0));
 
 	delete f1;
 	delete f;
 	delete f_clone;
 
-	/*double NOT*/
+	/*double NOT: ~(~R)   */
 	Formula *a = new FormulaLit(label2id["R"]);
 	Formula *b = new FormulaNOT(a);
 	Formula *c = new FormulaNOT(b);
@@ -332,28 +378,28 @@ void testNOT(){
 
 	assert (c->toString() == "~(~(R))");
 	assert (c1->toString() == "R");
-	assert (c1->toStringCNF() == "6");
 	assert (c->isSatisfiable(label2id.size()) == true);
 
-	clauses = c1->toCNF();
-	assert(clauses.size() == 1);
+	clauses = c->calculateCNF();
+	assert(clauses.size() == 3);
 
-	assert(clauses.begin()->literal0 == 6);
-	assert(clauses.begin()->literal1 == emptyLiteral());
-	assert(clauses.begin()->literal2 == emptyLiteral());
+	iter = clauses.begin();	assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,4,0));
+	++iter; assert(checkClause(*iter, 7,-4,0));
 
 	delete c1;
 	delete c;
 	delete c_clone;
 
-	cout << "testNOT... \t passed." << endl;
+	cout << "\t passed." << endl;
 }
 
 void testAND(){
-	unsigned int maxId = label2id.size()-1;
+	cout << "testAND... ";
+	initFormulaClass();
 
 	/**************
-	 * simple AND: (I*R)
+	 * simple AND 1.1: (I*R)   (CASE1.1)
 	 **************/
 	Formula *a = new FormulaLit(label2id["I"]);
 	Formula *b = new FormulaLit(label2id["R"]);
@@ -363,208 +409,775 @@ void testAND(){
 	assert (c->formulaType == AND);
 	assert (c->toString() == "(I * R)");
 	assert (c1->toString() == "(I * R)");
-	assert (c1->toStringCNF(maxId+1,maxId+1) == "(9<->7*6)");
 	assert (c->isSatisfiable(label2id.size()) == true);
 
 	Formula* c_clone = c->getCopy();
 	assert(c_clone->toString() == c->toString());
 
-	list<Clause> clauses = c1->toCNF(maxId+1,maxId+1);
+	list<Clause> clauses = c->calculateCNF();
+	assert(clauses.size() == 4);
+
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7,-5,-4));
+	++iter; assert(checkClause(*iter, -7,5,0));
+	++iter; assert(checkClause(*iter, -7,0,4));
+
+	delete c1;
+	delete c;
+	delete c_clone;
+
+
+	/*****************
+	 * complex AND 1.2:  O*(I*R)   (CASE1.2 and CASE1.1)
+	 *****************/
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaAND(a,b); //I*R
+	Formula *d = new FormulaLit(label2id["O"]);
+	Formula *e = new FormulaAND(d, c);
+	Formula *e1 = e->moveNegation();
+
+	assert (e->formulaType == AND);
+	assert (e->toString() == "(O * (I * R))");
+	assert (e1->toString() == "(O * (I * R))");
+	assert (e->isSatisfiable(label2id.size()) == true);
+
+	Formula *e_clone = e->getCopy();
+	assert(e_clone->toString() == e->toString());
+
+	clauses = e->calculateCNF();
+	assert(clauses.size() == 7);
+
+	iter = clauses.begin();	assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7,-6,-8));
+	++iter; assert(checkClause(*iter, -7,6,0));
+	++iter; assert(checkClause(*iter, -7,0,8));
+	++iter; assert(checkClause(*iter, 8,-5,-4));
+	++iter; assert(checkClause(*iter, -8,5,0));
+	++iter; assert(checkClause(*iter, -8,0,4));
+
+	delete e1;
+	delete e;
+	delete e_clone;
+
+
+	/*****************
+	 * complex AND 1.3:  (I*R)*A    (CASE1.3 and CASE1.1)
+	 *****************/
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaAND(a,b);           //I*R
+	d = new FormulaLit(label2id["A"]);
+	e = new FormulaAND(c, d); //(I*R)*A
+	e1 = e->moveNegation();
+
+	assert (e->formulaType == AND);
+	assert (e->toString() == "((I * R) * A)");
+	assert (e1->toString() == "((I * R) * A)");
+	assert (e->isSatisfiable(label2id.size()) == true);
+
+	e_clone = e->getCopy();
+	assert(e_clone->toString() == e->toString());
+
+	clauses = e->calculateCNF();
+	assert(clauses.size() == 7);
+
+	iter = clauses.begin();	assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7,-8,-3));
+	++iter; assert(checkClause(*iter, -7,8,0));
+	++iter; assert(checkClause(*iter, -7,0,3));
+	++iter; assert(checkClause(*iter, 8,-5,-4));
+	++iter; assert(checkClause(*iter, -8,5,0));
+	++iter; assert(checkClause(*iter, -8,0,4));
+
+	delete e1;
+	delete e;
+	delete e_clone;
+
+
+	/*****************
+	 * complex AND 1.4:  (O*A)*(I*R)  (CASE1.4 and CASE1.1)
+	 *****************/
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaAND(a,b);          // I*R
+	d = new FormulaLit(label2id["O"]);
+	e = new FormulaLit(label2id["A"]);
+	Formula *f = new FormulaAND(d,e); // O*A
+	Formula *h = new FormulaAND(f,c); // (O*A)*(I*R)
+	Formula *h1 = h->moveNegation();
+
+	assert (h->formulaType == AND);
+	assert (h->toString() == "((O * A) * (I * R))");
+	assert (h1->toString() == "((O * A) * (I * R))");
+	assert (h->isSatisfiable(label2id.size()) == true);
+
+	Formula* h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	clauses = h->calculateCNF();
+	assert(clauses.size() == 10);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7,-8,-9));
+	++iter; assert(checkClause(*iter, -7,8,0));
+	++iter; assert(checkClause(*iter, -7,0,9));
+	++iter; assert(checkClause(*iter, 8,-6,-3));
+	++iter; assert(checkClause(*iter, -8,6,0));
+	++iter; assert(checkClause(*iter, -8,0,3));
+	++iter; assert(checkClause(*iter, 9,-5,-4));
+	++iter; assert(checkClause(*iter, -9,5,0));
+	++iter; assert(checkClause(*iter, -9,0,4));
+
+	delete h1;
+	delete h;
+	delete h_clone;
+
+	/*****************
+	 * complex AND2.1 :  false*(I*R)    (CASE2.1 and CASE1.1)
+	 *****************/
+
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaAND(a,b);           //I*R
+	d = new FormulaFalse();
+	f = new FormulaAND(d,c);
+
+	Formula *f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(false * (I * R))");
+	assert (f1->toString() == "(false * (I * R))");
+	assert (f->isSatisfiable(label2id.size()) == false);
+
+	Formula* f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,0,0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/*****************
+	 * complex AND2.1 :  (I*R)*false    (CASE2.1 and CASE1.1)
+	 *****************/
+
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaAND(a,b);           //I*R
+	d = new FormulaFalse();
+	f = new FormulaAND(c,d);
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "((I * R) * false)");
+	assert (f1->toString() == "((I * R) * false)");
+	assert (f->isSatisfiable(label2id.size()) == false);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,0,0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/*****************
+	 * complex AND2.1 :  true*false (Case2.1)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaFalse();
+	f = new FormulaAND(a,b); //true*false
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(true * false)");
+	assert (f1->toString() == "(true * false)");
+	assert (f->isSatisfiable(label2id.size()) == false);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,0,0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/*****************
+	 * complex AND2.2 :  true*true    (CASE2.2 and CASE1.1)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaTrue();
+	f = new FormulaAND(a,b); //true*true
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(true * true)");
+	assert (f1->toString() == "(true * true)");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7,0,0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+
+	/*****************
+	 * complex AND2.3 :  true*A    (CASE2.3)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaLit(label2id["A"]);
+	f = new FormulaAND(a,b); //true*A
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(true * A)");
+	assert (f1->toString() == "(true * A)");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
 	assert(clauses.size() == 3);
 
-	list<Clause>::const_iterator iter = clauses.begin(); //first clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == 6);
-	++iter; //second clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -6);
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,3,0));
+	++iter; assert(checkClause(*iter, 7,-3,0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/*****************
+	 * complex AND2.4 :  true*(A*I)    (CASE2.3, CASE 1.1)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaLit(label2id["A"]);
+	c = new FormulaLit(label2id["I"]);
+	f = new FormulaAND(a, new FormulaAND(b,c)); //true*(A*I)
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(true * (A * I))");
+	assert (f1->toString() == "(true * (A * I))");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 6);
+
+	iter = clauses.begin();  assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,8,0));
+	++iter; assert(checkClause(*iter, 7,-8,0));
+	++iter; assert(checkClause(*iter, 8,-3,-5));
+	++iter; assert(checkClause(*iter, -8,3,0));
+	++iter; assert(checkClause(*iter, -8,0,5));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+
+
+	/*****************
+	 * complex AND2.5 :  A*true    (CASE2.5)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaLit(label2id["A"]);
+	f = new FormulaAND(b, a); //true*A
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(A * true)");
+	assert (f1->toString() == "(A * true)");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 3);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,3,0));
+	++iter; assert(checkClause(*iter, 7,-3,0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+
+	/*****************
+	 * complex AND2.6 :  (A*I)*true    (CASE2.6 CASE1.1)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaLit(label2id["A"]);
+	c = new FormulaLit(label2id["I"]);
+	f = new FormulaAND(new FormulaAND(b,c), a); // (A*I)*true
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "((A * I) * true)");
+	assert (f1->toString() == "((A * I) * true)");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 6);
+
+	iter = clauses.begin();  assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,8,0));
+	++iter; assert(checkClause(*iter, 7,-8,0));
+	++iter; assert(checkClause(*iter, 8,-3,-5));
+	++iter; assert(checkClause(*iter, -8,3,0));
+	++iter; assert(checkClause(*iter, -8,0,5));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/*****************
+	 * long AND:  ((A*I)*(I*R))*((O*R)*(O*I))
+	 *****************/
+	a = new FormulaLit(label2id["A"]);
+	b = new FormulaLit(label2id["I"]);
+	c = new FormulaLit(label2id["I"]);
+	d = new FormulaLit(label2id["R"]);
+	Formula *v = new FormulaLit(label2id["O"]);
+	Formula *x = new FormulaLit(label2id["R"]);
+	Formula *y = new FormulaLit(label2id["O"]);
+	Formula *z = new FormulaLit(label2id["I"]);
+
+	Formula *n = new FormulaAND(new FormulaAND(a,b), new FormulaAND(c,d));
+	Formula *m = new FormulaAND(new FormulaAND(v,x), new FormulaAND(y,z));
+
+	f = new FormulaAND(n,m);
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(((A * I) * (I * R)) * ((O * R) * (O * I)))");
+	assert (f1->toString() == "(((A * I) * (I * R)) * ((O * R) * (O * I)))");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 22);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7,-8,-11));
+	++iter; assert(checkClause(*iter, -7,8,0));
+	++iter; assert(checkClause(*iter, -7,0,11));
+	++iter; assert(checkClause(*iter, 8,-9,-10));
+	++iter; assert(checkClause(*iter, -8,9,0));
+	++iter; assert(checkClause(*iter, -8,0,10));
+	++iter; assert(checkClause(*iter, 9,-3,-5));
+	++iter; assert(checkClause(*iter, -9,3,0));
+	++iter; assert(checkClause(*iter, -9,0,5));
+	++iter; assert(checkClause(*iter, 10,-5,-4));
+	++iter; assert(checkClause(*iter, -10,5,0));
+	++iter; assert(checkClause(*iter, -10,0,4));
+	++iter; assert(checkClause(*iter, 11,-12,-13));
+	++iter; assert(checkClause(*iter, -11,12,0));
+	++iter; assert(checkClause(*iter, -11,0,13));
+	++iter; assert(checkClause(*iter, 12,-6,-4));
+	++iter; assert(checkClause(*iter, -12,6,0));
+	++iter; assert(checkClause(*iter, -12,0,4));
+	++iter; assert(checkClause(*iter, 13,-6,-5));
+	++iter; assert(checkClause(*iter, -13,6,0));
+	++iter; assert(checkClause(*iter, -13,0,5));
+
+	delete f;
+	delete f1;
+	delete f_clone;
+
+	cout << "\t passed." << endl;
+
+}
+
+void testOR(){
+	cout << "testOR... ";
+	initFormulaClass();
+
+	/**************
+	 * simple ORb1.1: (I+R)
+	 **************/
+	Formula *a = new FormulaLit(label2id["I"]);
+	Formula *b = new FormulaLit(label2id["R"]);
+	Formula *c = new FormulaOR(a,b); //I+R
+	Formula *c1 = c->moveNegation();
+
+	assert (c->formulaType == OR);
+	assert (c->toString() == "(I + R)");
+	assert (c1->toString() == "(I + R)");
+
+	Formula* c_clone = c->getCopy();
+	assert(c_clone->toString() == c->toString());
+
+	assert (c->isSatisfiable(label2id.size()) == true);
+	list<Clause> clauses = c->calculateCNF();
+	assert(clauses.size() == 4);
+
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,5,4));
+	++iter; assert(checkClause(*iter, 7,-5,0));
+	++iter; assert(checkClause(*iter, 7,0,-4));
 
 	delete c1;
 	delete c;
 	delete c_clone;
 
 	/*****************
-	 * complex AND 1:  (I*R)*A
+	 * OR 1.2:  O+(I+R)
 	 *****************/
 	a = new FormulaLit(label2id["I"]);
 	b = new FormulaLit(label2id["R"]);
-	c = new FormulaAND(a,b);           //I*R
-	Formula *d = new FormulaLit(label2id["A"]);
-	Formula *e = new FormulaAND(c, d); //(I*R)*A
+	c = new FormulaOR(a,b); //I+R
+	Formula *d = new FormulaLit(label2id["O"]);
+	Formula *e = new FormulaOR(d, c);
 	Formula *e1 = e->moveNegation();
 
-	assert (e->formulaType == AND);
-	assert (e->toString() == "((I * R) * A)");
-	assert (e1->toString() == "((I * R) * A)");
-	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->10*5) * (10<->7*6)");
-	assert (e->isSatisfiable(label2id.size()) == true);
+	assert (e->formulaType == OR);
+	assert (e->toString() == "(O + (I + R))");
+	assert (e1->toString() == "(O + (I + R))");
 
-	Formula* e_clone = e->getCopy();
+	Formula *e_clone = e->getCopy();
 	assert(e_clone->toString() == e->toString());
 
-	clauses = e1->toCNF(maxId+1,maxId+1);
+	assert (e->isSatisfiable(label2id.size()) == true);
+	clauses = e->calculateCNF();
 
-	assert(clauses.size() == 6);
+	assert(clauses.size() == 7);
 
-	iter = clauses.begin(); //first clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == 6);
-	++iter; //second clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -6);
-	++iter; //fourth clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 10);
-	assert(iter->literal2 == 5);
-	++iter; //5. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -10);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //1. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -5);
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 6, 8));
+	++iter; assert(checkClause(*iter, 7, -6, 0));
+	++iter; assert(checkClause(*iter, 7, 0, -8));
+	++iter; assert(checkClause(*iter, -8, 5, 4));
+	++iter; assert(checkClause(*iter, 8, -5, 0));
+	++iter; assert(checkClause(*iter, 8, 0, -4));
 
 	delete e1;
 	delete e;
 	delete e_clone;
 
 	/*****************
-	 * complex AND 2:  O*(I*R)
+	 * OR 1.3:  (I+R)+A
 	 *****************/
 	a = new FormulaLit(label2id["I"]);
 	b = new FormulaLit(label2id["R"]);
-	c = new FormulaAND(a,b); //I*R
-	d = new FormulaLit(label2id["O"]);
-	e = new FormulaAND(d, c);
+	c = new FormulaOR(a,b); //I+R
+	d = new FormulaLit(label2id["A"]);
+	e = new FormulaOR(c, d);
 	e1 = e->moveNegation();
 
-	assert (e->formulaType == AND);
-	assert (e->toString() == "(O * (I * R))");
-	assert (e1->toString() == "(O * (I * R))");
-	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->8*10) * (10<->7*6)");
-	assert (e->isSatisfiable(label2id.size()) == true);
+	assert (e->formulaType == OR);
+	assert (e->toString() == "((I + R) + A)");
+	assert (e1->toString() == "((I + R) + A)");
 
 	e_clone = e->getCopy();
 	assert(e_clone->toString() == e->toString());
 
-	clauses = e1->toCNF(maxId+1,maxId+1);
+	assert (e->isSatisfiable(label2id.size()) == true);
+	clauses = e->calculateCNF();
 
-	assert(clauses.size() == 6);
+	assert(clauses.size() == 7);
 
-	//cout << "AUSGABE: " << (e->moveNegation()->toCNF(maxId+1,maxId+1)).begin()->literal0 << endl;
-	iter = clauses.begin(); //first clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == 6);
-	++iter; //second clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -6);
-	++iter; //fourth clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 8);
-	assert(iter->literal2 == 10);
-	++iter; //5. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -8);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //1. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -10);
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter;  assert(checkClause(*iter, -7, 8, 3));
+	++iter;  assert(checkClause(*iter, 7, -8, 0));
+	++iter;  assert(checkClause(*iter, 7, 0, -3));
+	++iter;  assert(checkClause(*iter, -8, 5, 4));
+	++iter;  assert(checkClause(*iter, 8, -5, 0));
+	++iter;  assert(checkClause(*iter, 8, 0, -4));
 
 	delete e1;
 	delete e;
 	delete e_clone;
 
 	/*****************
-	 * complex AND 2:  (O*A)*(I*R)
+	 * OR 1.4:  (O+A)+(I+R)
 	 *****************/
 	a = new FormulaLit(label2id["I"]);
 	b = new FormulaLit(label2id["R"]);
-	c = new FormulaAND(a,b); //I*R
+	c = new FormulaOR(a,b); //I+R
 	d = new FormulaLit(label2id["O"]);
 	e = new FormulaLit(label2id["A"]);
-	Formula *f = new FormulaAND(d,e);
-	Formula *h = new FormulaAND(f,c);
+	Formula *f = new FormulaOR(d,e);
+	Formula *h = new FormulaOR(f,c);
 	Formula *h1 = h->moveNegation();
 
-	assert (h->formulaType == AND);
-	assert (h->toString() == "((O * A) * (I * R))");
-	assert (h1->toString() == "((O * A) * (I * R))");
-	assert (h1->toStringCNF(maxId+1,maxId+1) == "(9<->10*11) * (10<->8*5) * (11<->7*6)");
-	assert (h->isSatisfiable(label2id.size()) == true);
+	assert (h->formulaType == OR);
+	assert (h->toString() == "((O + A) + (I + R))");
+	assert (h1->toString() == "((O + A) + (I + R))");
 
 	Formula* h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	clauses = h1->toCNF(maxId+1,maxId+1);
+	assert (h->isSatisfiable(label2id.size()) == true);
+	clauses = h->calculateCNF();
 
-	assert(clauses.size() == 9);
+	assert(clauses.size() == 10);
 
-	iter = clauses.begin(); //1. clause
-	assert(iter->literal0 == -11);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == 6);
-	++iter; //second clause
-	assert(iter->literal0 == 11);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == 11);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -6);
-	++iter; //4. clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == 8);
-	assert(iter->literal2 == 5);
-	++iter; //5. clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == -8);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //6. clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -5);
-	++iter; //7. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 10);
-	assert(iter->literal2 == 11);
-	++iter; //8. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -10);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //9. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -11);
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 8, 9));
+	++iter; assert(checkClause(*iter, 7, -8, 0));
+	++iter; assert(checkClause(*iter, 7, 0, -9));
+	++iter; assert(checkClause(*iter, -8, 6, 3));
+	++iter; assert(checkClause(*iter, 8, -6, 0));
+	++iter; assert(checkClause(*iter, 8, 0, -3));
+	++iter; assert(checkClause(*iter, -9, 5, 4));
+	++iter; assert(checkClause(*iter, 9, -5, 0));
+	++iter; assert(checkClause(*iter, 9, 0, -4));
 
 	delete h1;
 	delete h;
 	delete h_clone;
-	cout << "testAND... \t passed." << endl;
 
+	/*****************
+	 * OR 2.1:  false + false
+	 *****************/
+
+	h = new FormulaOR(new FormulaFalse(), new FormulaFalse());
+	h1 = h->moveNegation();
+
+	assert (h->formulaType == OR);
+	assert (h->toString() == "(false + false)");
+	assert (h1->toString() == "(false + false)");
+
+	h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	assert (h->isSatisfiable(label2id.size()) == false);
+	clauses = h->calculateCNF();
+
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 0, 0));
+
+	delete h1;
+	delete h;
+	delete h_clone;
+
+	/*****************
+	 * OR 2.2:  true + false // result should be equal to true + arbitrary formula
+	 *****************/
+
+	h = new FormulaOR(new FormulaTrue(), new FormulaFalse());
+	h1 = h->moveNegation();
+
+	assert (h->formulaType == OR);
+	assert (h->toString() == "(true + false)");
+	assert (h1->toString() == "(true + false)");
+
+	h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	assert (h->isSatisfiable(label2id.size()) == true);
+	clauses = h->calculateCNF();
+
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7, 0, 0));
+
+	delete h1;
+	delete h;
+	delete h_clone;
+
+	/*****************
+	 * OR 2.2:  false + true      // result should be equal to true + arbitrary formula
+	 *****************/
+
+	h = new FormulaOR(new FormulaFalse(), new FormulaTrue());
+	h1 = h->moveNegation();
+
+	assert (h->formulaType == OR);
+	assert (h->toString() == "(false + true)");
+	assert (h1->toString() == "(false + true)");
+
+	h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	assert (h->isSatisfiable(label2id.size()) == true);
+	clauses = h->calculateCNF();
+
+	assert(clauses.size() == 2);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7, 0, 0));
+
+	delete h1;
+	delete h;
+	delete h_clone;
+
+	/*****************
+	 * OR 2.3/2.4:  false + (I+R)
+	 *****************/
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaOR(a,b); //I+R
+	h = new FormulaOR(new FormulaFalse(), c);
+	h1 = h->moveNegation();
+
+	assert (h->formulaType == OR);
+	assert (h->toString() == "(false + (I + R))");
+	assert (h1->toString() == "(false + (I + R))");
+
+	h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	assert (h->isSatisfiable(label2id.size()) == true);
+	clauses = h->calculateCNF();
+	assert(clauses.size() == 6);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 8, 0));
+	++iter; assert(checkClause(*iter,  7, -8, 0));
+	++iter; assert(checkClause(*iter,  -8, 5, 4));
+	++iter; assert(checkClause(*iter, 8, -5, 0));
+	++iter; assert(checkClause(*iter, 8, 0, -4));
+
+	delete h1;
+	delete h;
+	delete h_clone;
+
+	/*****************
+	 * OR 2.5/2.6:  (I+R) + false
+	 *****************/
+	a = new FormulaLit(label2id["I"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaOR(a,b); //I+R
+	h = new FormulaOR(c, new FormulaFalse());
+	h1 = h->moveNegation();
+
+	assert (h->formulaType == OR);
+	assert (h->toString() == "((I + R) + false)");
+	assert (h1->toString() == "((I + R) + false)");
+
+	h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	assert (f->isSatisfiable(label2id.size()) == true);
+	clauses = h->calculateCNF();
+	assert(clauses.size() == 6);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 8, 0));
+	++iter; assert(checkClause(*iter,  7, -8, 0));
+	++iter; assert(checkClause(*iter,  -8, 5, 4));
+	++iter; assert(checkClause(*iter, 8, -5, 0));
+	++iter; assert(checkClause(*iter, 8, 0, -4));
+
+	delete h1;
+	delete h;
+	delete h_clone;
+
+	/*****************
+	 * long AND:  ((A*I)*(I*R))*((O*R)*(O*I))
+	 *****************/
+	a = new FormulaLit(label2id["A"]);
+	b = new FormulaLit(label2id["I"]);
+	c = new FormulaLit(label2id["I"]);
+	d = new FormulaLit(label2id["R"]);
+	Formula *v = new FormulaLit(label2id["O"]);
+	Formula *x = new FormulaLit(label2id["R"]);
+	Formula *y = new FormulaLit(label2id["O"]);
+	Formula *z = new FormulaLit(label2id["I"]);
+
+	Formula *n = new FormulaOR(new FormulaOR(a,b), new FormulaOR(c,d));
+	Formula *m = new FormulaOR(new FormulaOR(v,x), new FormulaOR(y,z));
+
+	f = new FormulaOR(n,m);
+	Formula *f1 = f->moveNegation();
+
+	assert (f->formulaType == OR);
+	assert (f->toString() == "(((A + I) + (I + R)) + ((O + R) + (O + I)))");
+	assert (f1->toString() == "(((A + I) + (I + R)) + ((O + R) + (O + I)))");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	Formula *f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	assert (f->isSatisfiable(label2id.size()) == true);
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 22);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 8, 11));
+	++iter; assert(checkClause(*iter, 7, -8, 0));
+	++iter; assert(checkClause(*iter, 7, 0, -11));
+	++iter; assert(checkClause(*iter, -8, 9, 10));
+	++iter; assert(checkClause(*iter, 8, -9, 0));
+	++iter; assert(checkClause(*iter, 8, 0, -10));
+	++iter; assert(checkClause(*iter, -9, 3, 5));
+	++iter; assert(checkClause(*iter, 9, -3, 0));
+	++iter; assert(checkClause(*iter, 9, 0, -5));
+	++iter; assert(checkClause(*iter, -10, 5, 4));
+	++iter; assert(checkClause(*iter, 10, -5, 0));
+	++iter; assert(checkClause(*iter, 10, 0, -4));
+	++iter; assert(checkClause(*iter, -11, 12, 13));
+	++iter; assert(checkClause(*iter,  11, -12, 0));
+	++iter; assert(checkClause(*iter,  11, 0, -13));
+	++iter; assert(checkClause(*iter, -12, 6, 4));
+	++iter; assert(checkClause(*iter, 12, -6, 0));
+	++iter; assert(checkClause(*iter, 12, 0, -4));
+	++iter; assert(checkClause(*iter, -13, 6, 5));
+	++iter; assert(checkClause(*iter, 13, -6, 0));
+	++iter; assert(checkClause(*iter, 13, 0, -5));
+
+	delete f;
+	delete f1;
+	delete f_clone;
+
+	cout << "\t passed." << endl;
 }
 
-void testAND_NOT(){
-	unsigned int maxId = label2id.size()-1;
+void testAND_OR_NOT(){
+	cout << "testAND_OR_NOT... ";
+	initFormulaClass();
 
 	/**************
 	 * ~(I*R)
@@ -578,27 +1191,20 @@ void testAND_NOT(){
 	assert (d->formulaType == NOT);
 	assert (d->toString() == "~((I * R))");
 	assert (d1->toString() == "(~(I) + ~(R))");
-	assert (d1->toStringCNF(maxId+1,maxId+1) == "(9<->-7+-6)");
-	assert (d->isSatisfiable(label2id.size()) == true);
 
 	Formula* d_clone = d->getCopy();
 	assert(d_clone->toString() == d->toString());
+	Formula* d1_clone = d1->getCopy();
+	assert(d1_clone->toString() == d1->toString());
 
-	list<Clause> clauses = d1->toCNF(maxId+1,maxId+1);
-	assert(clauses.size() == 3);
+	assert (d->isSatisfiable(label2id.size()) == true);
+	list<Clause> clauses = d->calculateCNF();
+	assert(clauses.size() == 4);
 
-	list<Clause>::const_iterator iter = clauses.begin(); //first clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == 6);
-	++iter; //second clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -6);
+	list<Clause>::const_iterator iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, -5, -4));
+	++iter; assert(checkClause(*iter, 7, 5, 0));
+	++iter; assert(checkClause(*iter, 7, 0, 4));
 
 	delete d1;
 	delete d;
@@ -617,351 +1223,159 @@ void testAND_NOT(){
 	assert (k->formulaType == NOT);
 	assert (k->toString() == "~(~((I * R)))");
 	assert (k1->toString() == "(I * R)");
-	assert (k1->toStringCNF(maxId+1,maxId+1) == "(9<->7*6)");
 	assert (k->isSatisfiable(label2id.size()) == true);
 
 	Formula* k_clone = k->getCopy();
 	assert(k_clone->toString() == k->toString());
 
-	clauses = k1->toCNF(maxId+1,maxId+1);
-	assert(clauses.size() == 3);
+	clauses = k->calculateCNF();
+	assert(clauses.size() == 4);
 
-	iter = clauses.begin(); //first clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == 6);
-	++iter; //second clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == -6);
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7, -5, -4));
+	++iter; assert(checkClause(*iter, -7, 5, 0));
+	++iter; assert(checkClause(*iter, -7, 0, 4));
 
 	delete k1;
 	delete k;
 	delete k_clone;
 
-	cout << "testAND_NOT... \t passed."<< endl;
-}
 
-void testOR(){
-	unsigned int maxId = label2id.size()-1;
-
-	/**************
-	 * simple OR: (I+R)
-	 **************/
-	Formula *a = new FormulaLit(label2id["I"]);
-	Formula *b = new FormulaLit(label2id["R"]);
-	Formula *c = new FormulaOR(a,b); //I+R
-	Formula *c1 = c->moveNegation();
-
-	assert (c->formulaType == OR);
-	assert (c->toString() == "(I + R)");
-	assert (c1->toString() == "(I + R)");
-	assert (c1->toStringCNF(maxId+1,maxId+1) == "(9<->7+6)");
-
-	Formula* c_clone = c->getCopy();
-	assert(c_clone->toString() == c->toString());
-
-	list<Clause> clauses = c1->toCNF(maxId+1,maxId+1);
-	assert(clauses.size() == 3);
-
-	list<Clause>::const_iterator iter = clauses.begin(); //first clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == -6);
-	++iter; //second clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 6);
-
-	delete c1;
-	delete c;
-	delete c_clone;
-
-	/*****************
-	 * complex AND 1:  (I+R)+A
-	 *****************/
-	a = new FormulaLit(label2id["I"]);
-	b = new FormulaLit(label2id["R"]);
-	c = new FormulaOR(a,b); //I+R
-	Formula *d = new FormulaLit(label2id["A"]);
-	Formula *e = new FormulaOR(c, d);
-	Formula *e1 = e->moveNegation();
-
-	assert (e->formulaType == OR);
-	assert (e->toString() == "((I + R) + A)");
-	assert (e1->toString() == "((I + R) + A)");
-	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->10+5) * (10<->7+6)");
-
-	Formula* e_clone = e->getCopy();
-	assert(e_clone->toString() == e->toString());
-
-	clauses = e1->toCNF(maxId+1,maxId+1);
-
-	assert(clauses.size() == 6);
-    //cout << "AUSGABE: " << (e->moveNegation()->toCNF(maxId+1,maxId+1)).begin()->literal1 << endl;
-	iter = clauses.begin(); //first clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == -6);
-	++iter; //second clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 6);
-	++iter; //fourth clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -10);
-	assert(iter->literal2 == -5);
-	++iter; //5. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 10);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //6. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 5);
-
-	delete e1;
-	delete e;
-	delete e_clone;
-
-	/*****************
-	 * complex OR 2:  O+(I+R)
-	 *****************/
-	a = new FormulaLit(label2id["I"]);
-	b = new FormulaLit(label2id["R"]);
-	c = new FormulaOR(a,b); //I+R
-	d = new FormulaLit(label2id["O"]);
-	e = new FormulaOR(d, c);
-	e1 = e->moveNegation();
-
-	assert (e->formulaType == OR);
-	assert (e->toString() == "(O + (I + R))");
-	assert (e1->toString() == "(O + (I + R))");
-	assert (e1->toStringCNF(maxId+1,maxId+1) == "(9<->8+10) * (10<->7+6)");
-
-	e_clone = e->getCopy();
-	assert(e_clone->toString() == e->toString());
-
-	clauses = e1->toCNF(maxId+1,maxId+1);
-
-	assert(clauses.size() == 6);
-
-	iter = clauses.begin(); //first clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == -6);
-	++iter; //second clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 6);
-	++iter; //fourth clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -8);
-	assert(iter->literal2 == -10);
-	++iter; //5. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 8);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //1. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 10);
-
-	delete e1;
-	delete e;
-	delete e_clone;
-
-	/*****************
-	 * complex AND 2:  (O+A)+(I+R)
-	 *****************/
-	a = new FormulaLit(label2id["I"]);
-	b = new FormulaLit(label2id["R"]);
-	c = new FormulaOR(a,b); //I+R
-	d = new FormulaLit(label2id["O"]);
-	e = new FormulaLit(label2id["A"]);
-	Formula *f = new FormulaOR(d,e);
-	Formula *h = new FormulaOR(f,c);
-	Formula *h1 = h->moveNegation();
-
-	assert (h->formulaType == OR);
-	assert (h->toString() == "((O + A) + (I + R))");
-	assert (h1->toString() == "((O + A) + (I + R))");
-	assert (h1->toStringCNF(maxId+1,maxId+1) == "(9<->10+11) * (10<->8+5) * (11<->7+6)");
-
-	Formula* h_clone = h->getCopy();
-	assert(h_clone->toString() == h->toString());
-
-	clauses = h1->toCNF(maxId+1,maxId+1);
-
-	assert(clauses.size() == 9);
-
-	iter = clauses.begin(); //1. clause
-	assert(iter->literal0 == 11);
-	assert(iter->literal1 == -7);
-	assert(iter->literal2 == -6);
-	++iter; //second clause
-	assert(iter->literal0 == -11);
-	assert(iter->literal1 == 7);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == -11);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 6);
-	++iter; //4. clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == -8);
-	assert(iter->literal2 == -5);
-	++iter; //5. clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == 8);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //6. clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 5);
-	++iter; //7. clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -10);
-	assert(iter->literal2 == -11);
-	++iter; //8. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 10);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //9. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 11);
-
-	cout << "testOR... \t passed." << endl;
-	delete h1;
-	delete h;
-	delete h_clone;
-
-}
-
-void testAND_OR_NOT(){
-	/*
+	/********************
 	 * ~((A * ~R) + ~~A)
-	 */
-	unsigned int maxId = label2id.size()-1;
-	Formula *a = new FormulaLit(label2id["A"]);
-	Formula *b = new FormulaLit(label2id["R"]);
-	Formula *c = new FormulaNOT(b);
-	Formula *d = new FormulaAND(a,c); //A*~R
-	Formula *e = new FormulaLit(label2id["A"]);
-	Formula *f = new FormulaNOT(e);
-	Formula *g = new FormulaNOT(f); //~~A
-	Formula *h = new FormulaOR(d,g);
+	 ********************/
+
+	a = new FormulaLit(label2id["A"]);
+	b = new FormulaLit(label2id["R"]);
+	c = new FormulaNOT(b);
+	d = new FormulaAND(a,c); //A*~R
+	e = new FormulaLit(label2id["A"]);
+	f = new FormulaNOT(e);
+	g = new FormulaNOT(f); //~~A
+	h = new FormulaOR(d,g);
 	Formula *i = new FormulaNOT(h); //~((A * ~R) + ~~A)
 	Formula *i1 = i->moveNegation();
 
 	assert (i->formulaType == NOT);
 	assert (i->toString() == "~(((A * ~(R)) + ~(~(A))))");
 	assert (i1->toString() == "((~(A) + R) * ~(A))");
-	assert (i1->toStringCNF(maxId+1,maxId+1) == "(9<->10*-5) * (10<->-5+6)");
 
 	Formula* i_clone = i->getCopy();
 	assert(i_clone->toString() == i->toString());
 
-	list<Clause> clauses = i1->toCNF(maxId+1,maxId+1);
-	assert(clauses.size() == 6);
+	assert (i->isSatisfiable(label2id.size()) == true);
+	clauses = i->calculateCNF();
+	assert(clauses.size() == 7);
 
-	list<Clause>::const_iterator iter = clauses.begin(); //first clause
-	assert(iter->literal0 == 10);
-	assert(iter->literal1 == 5);
-	assert(iter->literal2 == -6);
-	++iter; //second clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == -5);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == -10);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 6);
-	++iter; //4. clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 10);
-	assert(iter->literal2 == -5);
-	++iter; //second clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -10);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //third clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == emptyLiteral());
-	assert(iter->literal2 == 5);
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, 7, -8, 3));
+	++iter; assert(checkClause(*iter, -7, 8, 0));
+	++iter; assert(checkClause(*iter, -7, 0, -3));
+	++iter; assert(checkClause(*iter, -8, -3, 4));
+	++iter; assert(checkClause(*iter, 8, 3, 0));
+	++iter; assert(checkClause(*iter, 8, 0, -4));
+
 
 	delete i1;
 	delete i;
 	delete i_clone;
 
-	/*
-	 * (final + true) * ~false
-	 */
+	/*****************
+	 * true * ~(A*I)
+	 *****************/
 
-	Formula *k = new FormulaFinal();
-	Formula *l = new FormulaTrue();
-	Formula *m = new FormulaOR(k,l); //final+true
+	a = new FormulaTrue();
+	b = new FormulaLit(label2id["A"]);
+	c = new FormulaLit(label2id["I"]);
+	f = new FormulaAND(a, new FormulaNOT(new FormulaAND(b,c))); //true * (~(A*I))
+
+	Formula *f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(true * ~((A * I)))");
+	assert (f1->toString() == "(true * (~(A) + ~(I)))");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	Formula *f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 6);
+
+	iter = clauses.begin();  assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,8,0));
+	++iter; assert(checkClause(*iter, 7,-8,0));
+	++iter; assert(checkClause(*iter, -8, -3, -5));
+	++iter; assert(checkClause(*iter, 8, 3, 0));
+	++iter; assert(checkClause(*iter, 8, 0, 5));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/*****************
+	 * true * ~(A)
+	 *****************/
+
+	a = new FormulaTrue();
+	b = new FormulaLit(label2id["A"]);
+	f = new FormulaAND(a, new FormulaNOT(b)); //true * (~(A))
+
+	f1 = f->moveNegation();
+
+	assert (f->formulaType == AND);
+	assert (f->toString() == "(true * ~(A))");
+	assert (f1->toString() == "(true * ~(A))");
+	assert (f->isSatisfiable(label2id.size()) == true);
+
+	f_clone = f->getCopy();
+	assert(f_clone->toString() == f->toString());
+
+	clauses = f->calculateCNF();
+	assert(clauses.size() == 3);
+
+	iter = clauses.begin();  assert(checkClause(*iter, 7,0,0));
+	++iter;  assert(checkClause(*iter, -7, -3, 0));
+	++iter;  assert(checkClause(*iter, 7, 3, 0));
+
+	delete f1;
+	delete f;
+	delete f_clone;
+
+	/******************************
+	 * (final + ~true) * ~false
+	 *****************************/
+
+	k = new FormulaFinal();
+	Formula *l = new FormulaNOT(new FormulaTrue());
+	Formula *m = new FormulaOR(k,l); //final + ~true
 	Formula *n = new FormulaFalse();
 	Formula *o = new FormulaNOT(n); //~false
 	Formula *p = new FormulaAND(m,o);
 	Formula *p1 = p->moveNegation();
 
-	assert (p->toString() == "((final + true) * ~(false))");
-	assert (p1->toString() == "((final + true) * true)");
-	assert (p1->toStringCNF(maxId+1,maxId+1) == "(9<->10*true) * (10<->final+true)");
+	assert (p->toString() == "((final + ~(true)) * ~(false))");
+	assert (p1->toString() == "((final + false) * true)");
 
 	Formula* p_clone = p->getCopy();
 	assert(p_clone->toString() == p->toString());
 
-	clauses = p1->toCNF(maxId+1,maxId+1);
-	assert(clauses.size() == 2);
+	assert (p->isSatisfiable(label2id.size()) == true);
+	clauses = p->calculateCNF();
+	assert(clauses.size() == 5);
 
-	iter = clauses.begin(); //first clause
-	assert(iter->literal0 == -9);
-	assert(iter->literal1 == 10);
-	assert(iter->literal2 == emptyLiteral());
-	++iter; //second clause
-	assert(iter->literal0 == 9);
-	assert(iter->literal1 == -10);
-	assert(iter->literal2 == emptyLiteral());
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 8, 0));
+	++iter; assert(checkClause(*iter, 7, -8, 0));
+	++iter; assert(checkClause(*iter, -8, 1, 0));
+	++iter; assert(checkClause(*iter, 8, -1, 0));
+
 
 	delete p1;
 	delete p;
 	delete p_clone;
 	
-	//false * f/A
-	//f/A* false
-	//false*false
-	
-	// true * f/A
-	// f/A * true
-	// true * true
-	
-        // Analog für OR
-        
-        // clauseToString
-        // test isSatisfiable für true
-        // test isSatisfiable für false
-        // test isSatisfiable für x + y ...
-	
-	cout << "testAND_OR_NOT... \t passed." << endl;
+	cout << "\t passed." << endl;
 }
 
 

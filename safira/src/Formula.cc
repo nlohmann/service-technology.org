@@ -15,6 +15,8 @@
 #include "cmdline.h"
 #include "verbose.h"
 
+#include "testFormula.h"
+
 /// the old "main()" of Minisat with adjusted exit codes
 //extern int minisat(gzFile);//, vector<vector<int> >&);
 extern int minisat(vector< vector <int> > &);//, vector<vector<int> >&);
@@ -182,42 +184,61 @@ FormulaNOT::~FormulaNOT() {
 	delete f;
 }
 
-double Formula::getMinisatTime(){
-	return full_time;
+
+list<Clause> Formula::calculateCNF(){
+
+	int maxId = label2id.size();
+
+	Clause cl;
+	cl.literal0 = maxId;
+	cl.literal1 = emptyLiteral();
+	cl.literal2 = emptyLiteral();
+
+	Formula* h = moveNegation();
+	list<Clause> clauses = h->toCNF(maxId,maxId);
+	assert(clauses.size() >= 1);
+
+	//append the cl to clauses
+//	list<Clause>::iterator iter = clauses.begin();
+//	clauses.splice(iter, c);
+	clauses.push_front(cl);
+
+	delete h;
+	return clauses;
 }
 
 
 //fVar: number of Variables in the formula to be checked
 bool Formula::isSatisfiable(int fVar){
-    Formula* h = moveNegation();
-    list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
-    delete h;
+ //   Formula* h = moveNegation();
+ //   list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
+ //   delete h;
 
+	list<Clause> clauses = calculateCNF();
     vector<vector<int> > clausesVector;
 
     for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
+    	//printClause(*n);
         vector<int> currentClause(clauseToIntVector(*n));
         currentClause.push_back(0);
         clausesVector.push_back(currentClause);
     }
 
 
-/*
-    FILE *temp = fopen("foo", "w");
-    for(unsigned int i = 0; i < clausesVector.size(); ++i) {
-        for(unsigned j = 0; j < clausesVector[i].size(); ++j) {
-            fprintf(temp, "%d ", clausesVector[i][j]);
-        }
-    }
-    fclose(temp);
-*/
-    clock_t start_clock = clock();
+//    for(unsigned int i = 0; i < clausesVector.size(); ++i) {
+//        for(unsigned j = 0; j < clausesVector[i].size(); ++j) {
+//            printf("%d ", clausesVector[i][j]);
+//        }
+//    }
+
+
+//    clock_t start_clock = clock();
 
 //    gzFile in = gzopen("foo", "rb");;
     int result = minisat(clausesVector);//, clausesVector);
 //    remove("foo");
 
-    full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+//    full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
     return result;
 }
@@ -347,20 +368,12 @@ Formula* FormulaFinal::moveNegation(bool leadingNot) const {
 /***********************************************************************
  * formula to CNF
  ***********************************************************************/
-
-list<Clause> FormulaAND::toCNF(int varId, int maxId) const {
-//	string sId = intToString(varId);
-//	string sMax1 = intToString(maxId+1);
-//	string sMax2 = intToString(maxId+2);
-
-	int sId = varId;
-	int sMax1 = maxId + 1;
-	int sMax2 = maxId + 2;
+//maxId: bisher h�chste ID in Formel
+list<Clause> FormulaAND::toCNF(int id, int& maxId) const {
 
     bool leftLit = false;
     bool rightLit = false;
-    bool tf = false; //at least one subformula is equal to (t)rue or (f)alse
-    list<Clause> clauses;
+    bool tf = false; //none of the subformulas is equal to (T)RUE or (F)ALSE
 
     if (left->formulaType == TRUE || left->formulaType == FALSE || right->formulaType == TRUE || right->formulaType == FALSE){
 		tf = true;
@@ -374,104 +387,102 @@ list<Clause> FormulaAND::toCNF(int varId, int maxId) const {
 		rightLit = true;
 	}
 
-	if(tf == false){
+	list<Clause> clausesLeft;
+	list<Clause> clausesRight;
+
+	if(tf == false){	//none of the two subformuals ist equivalent to TRUE or FALSE
+
+		if (leftLit == true){
+			// to get the number of the left side
+			clausesLeft = left->toCNF(id, maxId);
+			assert(clausesLeft.size() == 2);
+			assert(clausesLeft.begin()->literal0 == -1 * id);
+			assert(clausesLeft.begin()->literal1 != emptyLiteral());
+			assert(clausesLeft.begin()->literal2 == emptyLiteral());
+		}
+
+		if (rightLit == true) {
+			//to get the number of the right side
+			clausesRight = right->toCNF(id, maxId);
+			assert(clausesRight.size() == 2);
+			assert(clausesRight.begin()->literal0 == -1 * id);
+			assert(clausesLeft.begin()->literal1 != emptyLiteral());
+			assert(clausesRight.begin()->literal2 == emptyLiteral());
+		}
+
 
 		if (leftLit == true && rightLit == true){ //CASE 1.1
 			//cout << "case1.1" << endl;
-			list<Clause> clausesLeft = left->toCNF();
-			assert(clausesLeft.size() == 1);
-			assert(clausesLeft.begin()->literal1 == emptyLiteral());
-			assert(clausesLeft.begin()->literal2 == emptyLiteral());
-			assert(clauses.size() == 0);
 
-			list<Clause> clausesRight = right->toCNF();
-			assert(clausesRight.size() == 1);
-			assert(clausesRight.begin()->literal1 == emptyLiteral());
-			assert(clausesRight.begin()->literal2 == emptyLiteral());
-
-			clauses = tripleAND(sId, (clausesLeft.begin())->literal0, (clausesRight.begin())->literal0);
-
-			return clauses;
-			//return ("(" + Id + "<-> " + left->toCNF() + "*" + right->toCNF() + ")");
+			return (tripleAND(id, (clausesLeft.begin())->literal1, (clausesRight.begin())->literal1));
 		}
 
-		if (leftLit == true){ // CASE 1.2
+
+		if (leftLit == true ){	// CASE 1.2
 			//cout << "case1.2" << endl;
-			assert(rightLit == false);
-			assert(clauses.size() == 0);
+			assert (rightLit == false);
 
-			list<Clause> clausesLeft = left->toCNF();
-			assert(clausesLeft.size() == 1);
-			assert(clausesLeft.begin()->literal1 == emptyLiteral());
-			assert(clausesLeft.begin()->literal2 == emptyLiteral());
+			++maxId;
+			list<Clause> templist = tripleAND(id, (clausesLeft.begin())->literal1, maxId);
 
-			clauses = tripleAND(sId, (clausesLeft.begin())->literal0, sMax1);
-
+			list<Clause> clauses = right->toCNF(maxId, maxId);
 			list<Clause>::iterator iter = clauses.begin();
-			list<Clause> templist = right->toCNF(maxId+1, maxId+1);
-			clauses.splice(iter, templist); //append the clauses of the right child
+			clauses.splice(iter, templist); //add the clauses of the left child
 
 			return clauses;
-			//return ("(" + sId + "<->" + left->toCNF() + "*" + sMax1 + ")" + " * " + right->toCNF(maxId+1, maxId+1));
 		}
+
 
 		if (rightLit == true){ // CASE 1.3
 			//cout << "case1.3" << endl;
 			assert(leftLit == false);
-			assert(clauses.size() == 0);
 
-			list<Clause> clausesRight = right->toCNF();
-			assert(clausesRight.size() == 1);
-			assert(clausesRight.begin()->literal1 == emptyLiteral());
-			assert(clausesRight.begin()->literal2 == emptyLiteral());
+			++maxId;
+			list<Clause> templist = tripleAND(id, maxId, (clausesRight.begin())->literal1);
 
-			clauses = tripleAND(sId, sMax1, (clausesRight.begin())->literal0);
-
+			list<Clause> clauses = left->toCNF(maxId, maxId);
 			list<Clause>::iterator iter = clauses.begin();
-			list<Clause> templist = left->toCNF(maxId+1, maxId+1);
 			clauses.splice(iter, templist); //append the clauses of the left child
 
 			return clauses;
-			//return ("(" + sId + "<->" + sMax1 + "*" + right->toCNF() + ")" + " * " + left->toCNF(maxId+1, maxId+1));
 		}
 
-		if (leftLit == false && rightLit == false){ //CASE 1.4
-			//cout << "case1.4" << endl;
-			//express sId<->sMax1*sMax2 as set of clauses
-			clauses = tripleAND(sId, sMax1, sMax2);
 
-			//append the clauses of the left child
-			list<Clause>::iterator iter = clauses.begin();
-			list<Clause> templeft = left->toCNF(maxId+1, maxId+2);
-			clauses.splice(iter, templeft);
+		assert(leftLit == false && rightLit == false); //CASE 1.4
+		//cout << "case1.4" << endl;
 
-			//append the clauses of the right child
-			iter = clauses.begin();
-			list<Clause> tempright = right->toCNF(maxId+2, maxId+2);
-			clauses.splice(iter, tempright);
+		int x1 = ++maxId;
+		list<Clause> clauses = left->toCNF(maxId, maxId);
 
-			return clauses;
-			//return ("(" + sId + " <-> " + sMax1 + "*" + sMax2 + ")" + " * " + left->toCNF(maxId+1, maxId+2) + "*" + right->toCNF(maxId+2, maxId+2));
-		}
-		assert(false);
+		int x2 = ++maxId;
+		list<Clause> tempRight = right->toCNF(maxId, maxId);
+		//append the clauses of the right child
+		list<Clause>::iterator iter = clauses.end();
+		clauses.splice(iter, tempRight);
+
+		//express id<->x1*x2 as set of clauses
+		list<Clause> tempRoot = tripleAND(id, x1, x2);
+		iter = clauses.begin();
+		clauses.splice(iter, tempRoot);
+
+		return clauses;
 	}
+
     else {
     	assert(tf == true);
 
     	if (left->formulaType == FALSE || right->formulaType == FALSE){ // CASE 2.1
     		//cout << "case 2.1" << endl;
-    		// "x <-> <arbitrary> * false" is equivalent to x <-> false
-    		assert(clauses.size() == 0);
-    		clauses = xEqualsFalse(varId);
-    		return clauses;
 
+    		// "x <-> <arbitrary> * false" is equivalent to x <-> false
+    		return (xEqualsFalse(id));
     	}
 
     	if (left->formulaType == TRUE && right->formulaType == TRUE){ //CASE 2.2
     		//cout << "case 2.2" << endl;
+
     		//x <-> true * true  is equal to x<->true
-    		clauses = xEqualsTrue();
-    		return clauses;
+    		return (xEqualsTrue(id));
     	}
 
     	/*
@@ -479,12 +490,11 @@ list<Clause> FormulaAND::toCNF(int varId, int maxId) const {
     	 * CASE 2.4: right->formulaType == AND/OR
     	 */
     	if(left->formulaType == TRUE){
-    		//cout << "case2.3" << endl;
-    		assert(clauses.size() == 0);
+    		//cout << "case2.3/case2.4" << endl;
+
     		assert(right->formulaType != TRUE);
     		assert(right->formulaType != FALSE);
-
-    		clauses = xEqualsFormula(varId, maxId, right);
+    		return xEqualsFormula(id, maxId, right);
     	}
 
     	/*
@@ -492,28 +502,21 @@ list<Clause> FormulaAND::toCNF(int varId, int maxId) const {
     	 * CASE 2.6: left->formulaType == AND/OR
     	 */
     	if(right->formulaType == TRUE){
-    		//cout << "case2.5" << endl;
-    		assert(clauses.size() == 0);
-			clauses = xEqualsFormula(varId, maxId, left);
-    		return clauses;
+    		//cout << "case2.5/case 2.6" << endl;
+
+    		assert(left->formulaType != TRUE);
+    		assert(left->formulaType != FALSE);
+    		return (xEqualsFormula(id, maxId, left));
     	}
     }
     assert(false);
 }
 
-list<Clause> FormulaOR::toCNF(int varId, int maxId) const {
-//	string sId = intToString(varId);
-//	string sMax1 = intToString(maxId+1);
-//	string sMax2 = intToString(maxId+2);
-
-	int sId = varId;
-	int sMax1 = maxId + 1;
-	int sMax2 = maxId + 2;
+list<Clause> FormulaOR::toCNF(int id, int& maxId) const {
 
     bool leftLit = false;
     bool rightLit = false;
-    bool tf = false; //at least one subformula is equal to (t)rue or (f)alse
-    list<Clause> clauses;
+    bool tf = false; //none of the subformulas is equal to (T)RUE or (F)ALSE
 
     if (left->formulaType == TRUE || left->formulaType == FALSE || right->formulaType == TRUE || right->formulaType == FALSE){
     	tf = true;
@@ -527,138 +530,143 @@ list<Clause> FormulaOR::toCNF(int varId, int maxId) const {
     	rightLit = true;
     }
 
-    if(tf == false){
+    list<Clause> clausesLeft;
+    list<Clause> clausesRight;
+
+    if(tf == false){	//none of the two subformuals ist equivalent to TRUE or FALSE
+
+    	if (leftLit == true){
+    		// to get the number of the left side
+    		clausesLeft = left->toCNF(id, maxId);
+    		assert(clausesLeft.size() == 2);
+    		assert(clausesLeft.begin()->literal0 == -1 * id);
+    		assert(clausesLeft.begin()->literal1 != emptyLiteral());
+    		assert(clausesLeft.begin()->literal2 == emptyLiteral());
+    	}
+
+    	if (rightLit == true) {
+    		//to get the number of the right side
+    		clausesRight = right->toCNF(id, maxId);
+    		assert(clausesRight.size() == 2);
+    		assert(clausesRight.begin()->literal0 == -1 * id);
+    		assert(clausesLeft.begin()->literal1 != emptyLiteral());
+    		assert(clausesRight.begin()->literal2 == emptyLiteral());
+    	}
+
+
     	if (leftLit == true && rightLit == true){ //CASE 1.1
-			list<Clause> clausesLeft = left->toCNF();
-			assert(clausesLeft.size() == 1);
-			assert(clausesLeft.begin()->literal1 == emptyLiteral());
-			assert(clausesLeft.begin()->literal2 == emptyLiteral());
-			assert(clauses.size() == 0);
+    		//cout << "case1.1" << endl;
 
-			list<Clause> clausesRight = right->toCNF();
-			assert(clausesRight.size() == 1);
-			assert(clausesRight.begin()->literal1 == emptyLiteral());
-			assert(clausesRight.begin()->literal2 == emptyLiteral());
-
-			clauses = tripleOR(sId, (clausesLeft.begin())->literal0, (clausesRight.begin())->literal0);
-
-			return clauses;
-			//return ("(" + sId + "<->" + left->toCNF() + "+" + right->toCNF() + ")");
-    }
+			return (tripleOR(id, (clausesLeft.begin())->literal1, (clausesRight.begin())->literal1));
+    	}
 
     	if (leftLit == true){ // CASE 1.2
+    		//cout << "case1.2" << endl;
 			assert(rightLit == false);
-			assert(clauses.size() == 0);
 
-			list<Clause> clausesLeft = left->toCNF();
-			assert(clausesLeft.size() == 1);
-			assert(clausesLeft.begin()->literal1 == emptyLiteral());
-			assert(clausesLeft.begin()->literal2 == emptyLiteral());
+			++maxId;
+			list<Clause> templist = tripleOR(id, (clausesLeft.begin())->literal1, maxId);
 
-			clauses = tripleOR(sId, (clausesLeft.begin())->literal0, sMax1);
-
+			list<Clause> clauses = right->toCNF(maxId, maxId);
 			list<Clause>::iterator iter = clauses.begin();
-			list<Clause> templist = right->toCNF(maxId+1, maxId+1);
-			clauses.splice(iter, templist); //append the clauses of the right child
-			return clauses;
-
-			//return ("(" + sId + "<->" + left->toCNF() + "+" + sMax1 + ")" + " * " + right->toCNF(maxId+1, maxId+1));
-		}
-
-		if (rightLit == true){ // CASE 1.3
-			assert(leftLit == false);
-			assert(clauses.size() == 0);
-
-			list<Clause> clausesRight = right->toCNF();
-			assert(clausesRight.size() == 1);
-			assert(clausesRight.begin()->literal1 == emptyLiteral());
-			assert(clausesRight.begin()->literal2 == emptyLiteral());
-
-			clauses = tripleOR(sId, sMax1, (clausesRight.begin())->literal0);
-
-			list<Clause>::iterator iter = clauses.begin();
-			list<Clause> templist = left->toCNF(maxId+1, maxId+1);
 			clauses.splice(iter, templist); //append the clauses of the left child
 
 			return clauses;
-			//return ("(" + sId + "<->" + sMax1 + "+" + right->toCNF() + ")" + " * " + left->toCNF(maxId+1, maxId+1));
 		}
 
-		if (leftLit == false && rightLit == false){ // CASE 1.4
-			assert(clauses.size() == 0);
+		if (rightLit == true){ // CASE 1.3
+			//cout << "case1.3" << endl;
+			assert(leftLit == false);
 
-			//express sId<->sMax1+sMax2 as set of clauses
-			clauses = tripleOR(sId, sMax1, sMax2);
+			++maxId;
+			list<Clause> templist = tripleOR(id, maxId, (clausesRight.begin())->literal1);
 
-			//append the clauses of the left child
+			list<Clause> clauses = left->toCNF(maxId, maxId);
 			list<Clause>::iterator iter = clauses.begin();
-			list<Clause> templeft = left->toCNF(maxId+1, maxId+2);
-			clauses.splice(iter, templeft);
-
-			//append the clauses of the right child
-			iter = clauses.begin();
-			list<Clause> tempright = right->toCNF(maxId+2, maxId+2);
-			clauses.splice(iter, tempright);
+			clauses.splice(iter, templist); //append the clauses of the left child
 
 			return clauses;
-			//return ("(" + sId + " <-> " + sMax1 + "+" + sMax2 + ")" + " * " + left->toCNF(maxId+1, maxId+2) + "*" + right->toCNF(maxId+2, maxId+2));
 		}
-		assert(false);
+
+		assert(leftLit == false && rightLit == false); //CASE 1.4
+		//cout << "case1.4" << endl;
+
+		int x1 = ++maxId;
+		list<Clause> clauses = left->toCNF(maxId, maxId);
+
+		int x2 = ++maxId;
+		list<Clause> tempRight = right->toCNF(maxId, maxId);
+
+		//append the clauses of the right child
+		list<Clause>::iterator iter = clauses.end();
+		clauses.splice(iter, tempRight);
+
+
+		//express id<->x1+x2 as set of clauses
+		list<Clause> tempRoot = tripleOR(id, x1, x2);
+		iter = clauses.begin();
+		clauses.splice(iter, tempRoot);
+
+		return clauses;
+
     }
     else {
     	assert(tf == true);
 
-    	/*
-    	 * CASE 2.1: x <-> false + false" is equivalent to x <-> false
-    	 */
-    	if (left->formulaType == FALSE && right->formulaType == FALSE){ //CASE 2.1
-    		clauses = xEqualsFalse(varId);
-			return clauses;
+    	if (left->formulaType == FALSE && right->formulaType == FALSE){  // CASE 2.1
+    		//cout << "case 2.1" << endl;
+
+    		//x <-> false + false" is equivalent to x <-> false
+    		return (xEqualsFalse(id));
     	}
 
     	/*
     	 * CASE 2.2: x <-> <arbitrary> + true   is equal to x <-> true
     	 */
     	if (left->formulaType == TRUE || right->formulaType == TRUE){
-    		clauses = xEqualsTrue(varId);
-    		return clauses;
+    		//cout << "case 2.2" << endl;
+
+    		//x <-> true + formula  is equal to x<->true
+    		return (xEqualsTrue(id));
     	}
 
-    	/* x <-> false + formula  is equal to x <-> formula
+    	/*
     	 * CASE 2.3:  right->formulaType == INT/LIT/FINAL/NOT
     	 * CASE 2.4:  right->formulaType == AND/OR
     	 */
     	if(left->formulaType == FALSE){
+    		//cout << "case2.3/case2.4" << endl;
+
     		assert(right->formulaType != TRUE);
     		assert(right->formulaType != FALSE);
-    		assert(clauses.size() == 0);
-
-   			clauses = xEqualsFormula(varId, maxId, right);
-			return clauses;
+   			return (xEqualsFormula(id, maxId, right));
     	}
 
-    	/* x <-> formula + false  is equal to x <-> formula
+    	/*
     	 * CASE 2.5:  left->formulaType == INT/LIT/FINAL/NOT
     	 * CASE 2.6:  left->formulaType == AND/OR
     	 */
     	if(right->formulaType == FALSE){
-    		assert(clauses.size() == 0);
+    		//cout << "case2.5/case 2.6" << endl;
+
     		assert(left->formulaType != TRUE);
     		assert(left->formulaType != FALSE);
 
-    		clauses = xEqualsFormula(varId, maxId, left);
-    		return clauses;
+    		return (xEqualsFormula(id, maxId, left));
     	}
     }
     assert(false);
 }
 
-list<Clause> FormulaNOT::toCNF(int varId, int maxId) const{
+list<Clause> FormulaNOT::toCNF(int varId, int& maxId) const{
     list<Clause> clauses = f->toCNF(varId,maxId);
-    assert(clauses.size() == 1);
-    assert(clauses.begin()->literal1 == emptyLiteral());
-    assert(clauses.begin()->literal2 == emptyLiteral());
-    clauses.begin()->literal0 = negateLiteral(clauses.begin()->literal0);
+    assert(clauses.size() == 2);
+
+    list<Clause>::iterator iter = clauses.begin(); //first clause
+    iter->literal1 = negateLiteral(iter->literal1);
+    ++iter;
+    iter->literal1 = negateLiteral(iter->literal1);
+
     return clauses;
 
 	//return ("~" + f->toCNF(varId, maxId));
@@ -666,157 +674,59 @@ list<Clause> FormulaNOT::toCNF(int varId, int maxId) const{
 
 }
 
-list<Clause> FormulaLit::toCNF(int, int) const{
+list<Clause> FormulaLit::toCNF(int x, int&) const{
 
-    list<Clause> clauses;
-	Clause cl;
-	cl.literal0 = number;
-	cl.literal1 = emptyLiteral();
-	cl.literal2 = emptyLiteral();
-	clauses.push_back(cl);
+//    list<Clause> clauses;
+//	Clause cl;
+//	cl.literal0 = number;
+//	cl.literal1 = emptyLiteral();
+//	cl.literal2 = emptyLiteral();
+//	clauses.push_back(cl);
+//	return clauses;
+
+	return (xEqualsI(x, number));
+
+}
+
+list<Clause> FormulaNUM::toCNF(int x, int&) const{
+
+//	list<Clause> clauses;
+//	Clause cl;
+//	cl.literal0 = number;
+//	cl.literal1 = emptyLiteral();
+//	cl.literal2 = emptyLiteral();
+//	clauses.push_back(cl);
+//	return clauses;
+
+	return (xEqualsI(x, number));
+
+}
+
+list<Clause> FormulaTrue::toCNF(int x, int&) const {
+	assert(label2id.find("true") == label2id.end());
+	list<Clause> clauses = xEqualsTrue(x);
 	return clauses;
 }
 
-list<Clause> FormulaNUM::toCNF(int, int) const{
-
-    list<Clause> clauses;
-	Clause cl;
-	cl.literal0 = number;
-	cl.literal1 = emptyLiteral();
-	cl.literal2 = emptyLiteral();
-	clauses.push_back(cl);
+list<Clause> FormulaFalse::toCNF(int x, int&) const{
+	assert(label2id.find("false") == label2id.end());
+	list<Clause> clauses = xEqualsFalse(x);
 	return clauses;
 }
 
-list<Clause> FormulaTrue::toCNF(int, int) const {
-	assert(label2id.find("true") != label2id.end());
-	list<Clause> clauses = xEqualsTrue(label2id["true"]);
-	return clauses;
-}
-
-list<Clause> FormulaFalse::toCNF(int, int) const{
-	assert(label2id.find("false") != label2id.end());
-	list<Clause> clauses = xEqualsFalse(label2id["false"]);
-	return clauses;
-}
-
-list<Clause> FormulaFinal::toCNF(int, int) const{
+list<Clause> FormulaFinal::toCNF(int x, int&) const{
 
 	assert(label2id.find("final") != label2id.end());
 
-	list<Clause> clauses;
-	Clause cl;
+//	list<Clause> clauses;
+//	Clause cl;
+//
+//	cl.literal0 = label2id["final"];
+//	cl.literal1 = emptyLiteral();
+//	cl.literal2 = emptyLiteral();
+//	clauses.push_back(cl);
+//	return clauses;
 
-	cl.literal0 = label2id["final"];
-	cl.literal1 = emptyLiteral();
-	cl.literal2 = emptyLiteral();
-	clauses.push_back(cl);
-	return clauses;
-}
+	return (xEqualsI(x, label2id["final"]));
 
-
-string FormulaAND::toStringCNF(int varId, int maxId) const{
-	string sId = intToString(varId);
-	string sMax1 = intToString(maxId+1);
-	string sMax2 = intToString(maxId + 2);
-
-	bool leftLit = false;
-	bool rightLit = false;
-
-	if (left->formulaType == INT || left->formulaType == LIT || left->formulaType == NOT ||
-			left->formulaType == TRUE || left->formulaType == FALSE || left->formulaType == FINAL){
-		leftLit = true;
-	}
-
-	if (right->formulaType == INT || right->formulaType == LIT || right->formulaType == NOT ||
-			right->formulaType == TRUE || right->formulaType == FALSE || right->formulaType == FINAL){
-		rightLit = true;
-	}
-
-	if (leftLit == true && rightLit == true){
-		return ("(" + sId + "<->" + left->toStringCNF() + "*" + right->toStringCNF() + ")");
-	}
-
-	if (leftLit == true){
-		assert(rightLit == false);
-		return ("(" + sId + "<->" + left->toStringCNF() + "*" + sMax1 + ")" + " * "
-				+ right->toStringCNF(maxId+1, maxId+1));
-	}
-
-	if (rightLit == true){
-		assert(leftLit == false);
-		return ("(" + sId + "<->" + sMax1 + "*" + right->toStringCNF() + ")" + " * "
-				+ left->toStringCNF(maxId+1, maxId+1));
-	}
-
-	assert(leftLit == false && rightLit == false);
-	return ("(" + sId + "<->" + sMax1 + "*" + sMax2 + ")" + " * "
-			+ left->toStringCNF(maxId+1, maxId+2) + " * " + right->toStringCNF(maxId+2, maxId+2));
-}
-
-string FormulaOR::toStringCNF(int varId, int maxId) const{
-	string sId = intToString(varId);
-	string sMax1 = intToString(maxId+1);
-	string sMax2 = intToString(maxId + 2);
-
-    bool leftLit = false;
-    bool rightLit = false;
-
-    if (left->formulaType == INT || left->formulaType == LIT || left->formulaType == NOT ||
-            left->formulaType == TRUE || left->formulaType == FALSE || left->formulaType == FINAL){
-    	leftLit = true;
-    }
-
-    if (right->formulaType == INT || right->formulaType == LIT || right->formulaType == NOT ||
-            right->formulaType == TRUE || right->formulaType == FALSE || right->formulaType == FINAL){
-    	rightLit = true;
-    }
-
-    if (leftLit == true && rightLit == true){
-    	return ("(" + sId + "<->" + left->toStringCNF() + "+" + right->toStringCNF() + ")");
-    }
-
-    if (leftLit == true){
-    	assert(rightLit == false);
-        return ("(" + sId + "<->" + left->toStringCNF() + "+" + sMax1 + ")" + " * "
-    	+ right->toStringCNF(maxId+1, maxId+1));
-    }
-
-    if (rightLit == true){
-    	assert(leftLit == false);
-    	return ("(" + sId + "<->" + sMax1 + "+" + right->toStringCNF() + ")" + " * "
-    	+ left->toStringCNF(maxId+1, maxId+1));
-    }
-
-    assert(leftLit == false && rightLit == false);
-	return ("(" + sId + "<->" + sMax1 + "+" + sMax2 + ")" + " * "
-			+ left->toStringCNF(maxId+1, maxId+2) + " * " + right->toStringCNF(maxId+2, maxId+2));
-
-}
-
-string FormulaNOT::toStringCNF(int varId, int maxId) const{
-	return ("-" + f->toStringCNF(varId, maxId));
-}
-
-string FormulaLit::toStringCNF(int, int) const{
-	string sNumber = intToString(number);
-	return (sNumber);
-
-}
-
-string FormulaNUM::toStringCNF(int, int) const{
-	string sNumber = intToString(number);
-	return (sNumber);
-}
-
-string FormulaTrue::toStringCNF(int, int) const{
-	return ("true");
-}
-
-string FormulaFalse::toStringCNF(int, int) const{
-	return ("false");
-}
-
-string FormulaFinal::toStringCNF(int, int) const{
-	return ("final");
 }

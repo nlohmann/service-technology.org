@@ -20,6 +20,5 @@ struct Clause {
 	int literal2;
 };
 
-
 #endif
 

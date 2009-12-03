@@ -19,8 +19,9 @@ int emptyLiteral();
 list<Clause> tripleAND(int x, int l, int r);
 list<Clause> tripleOR(int x, int l, int r);
 
-list<Clause> xEqualsFormula(int x, int max, const Formula* f);
-list<Clause> xEqualsTrue(int x = 0);
+list<Clause> xEqualsFormula(int x, int& max, const Formula* f);
+list<Clause> xEqualsTrue(int x);
 list<Clause> xEqualsFalse(int x);
+list<Clause> xEqualsI(int x, int i);
 
 #endif

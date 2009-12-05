@@ -65,7 +65,7 @@ class Queue {
         InterfaceMarking* popInterface();
 
         /// returns the top inner marking
-        InnerMarking_ID& popInner();
+        const InnerMarking_ID& popInner();
 };
 
 #endif

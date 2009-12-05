@@ -62,14 +62,10 @@ void Queue::push(InnerMarking_ID _inner, InterfaceMarking* _interface) {
 }
 
 InterfaceMarking* Queue::popInterface() {
-    if (first == last) {
-        return NULL;
-    }
-
-    return interface[first++];
+    return (first == last) ? NULL : interface[first++];
 }
 
-InnerMarking_ID& Queue::popInner() {
+const InnerMarking_ID& Queue::popInner() {
     assert(first-1 != last);
 
     return inner[first-1];

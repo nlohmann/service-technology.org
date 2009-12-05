@@ -391,7 +391,6 @@ int main(int argc, char** argv) {
             time(&start_time);
             StoredKnowledge::output_migration(output);
             time(&end_time);
-
             status("wrote migration information [%.0f sec]", difftime(end_time, start_time));
         }
 

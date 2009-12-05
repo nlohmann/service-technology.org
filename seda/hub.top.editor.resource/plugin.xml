@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="hub.top.editor.resource.modelToTextTransformation" name="modelToTextTransformation" schema="schema/hub.top.editor.modelToTextTransformation.exsd"/>
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution

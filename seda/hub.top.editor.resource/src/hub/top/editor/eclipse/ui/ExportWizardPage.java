@@ -123,9 +123,19 @@ public class ExportWizardPage extends WizardPage implements Listener {
 					// fill "save as..." dialogue with a suggested name
 					dialog.setFileName(getSuggestedOutputFileName());
 					dialog.setFilterExtensions(getSuggestExtensionFilter());
+					String[] ext = getSuggestExtensionFilter();
+					dialog.setFilterNames(ext);
 					
 					String selectedFile = dialog.open();
 					if (selectedFile != null) {
+					  
+					  // append the selected file extension to the file name
+	          String chosenExtension = suggestedExtensions[dialog.getFilterIndex()];
+	          int lastDot = selectedFile.lastIndexOf('.');
+	          if (lastDot == -1 || !selectedFile.substring(lastDot+1).equals(chosenExtension)) {
+	            selectedFile += "."+chosenExtension;
+	          }
+
 						exportFileNameBox.add(selectedFile, 0);
 						exportFileNameBox.setText(selectedFile);
 					}
@@ -153,12 +163,14 @@ public class ExportWizardPage extends WizardPage implements Listener {
 	 * @return suggested output filename
 	 */
 	private String getSuggestedOutputFileName () {
+	  /*
 		if (suggestedExtensions != null && suggestedExtensions.length > 0) {
 		  String out = originalResourceName;
 		  if (out.lastIndexOf(".") != -1) out = out.substring(0,out.lastIndexOf("."));
 			return out+"."+suggestedExtensions[0];
 		}
 		else
+		*/
 			return originalResourceName;
 	}
 	

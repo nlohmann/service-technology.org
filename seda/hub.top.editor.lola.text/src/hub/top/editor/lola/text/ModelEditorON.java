@@ -102,8 +102,8 @@ public class ModelEditorON extends hub.top.editor.ModelEditor implements hub.top
   public static Syntax createSyntax_default() {
     try {
       Syntax syntax = Utilities.loadSyntaxDescription(
-          ModelEditor.getPluginBundle_default(),
-          ModelEditor.getSyntaxPath_default(),
+          getPluginBundle_default(),
+          getSyntaxPath_default(),
           createMetaModelPackages_default());
       return syntax;
     } catch (TslException e) {
@@ -218,10 +218,6 @@ public class ModelEditorON extends hub.top.editor.ModelEditor implements hub.top
 				ModelEditorON editor = (ModelEditorON)getEditor();
 				FormatAction act = new FormatAction(editor);
 				act.run();
-			}
-			
-			public String getCurrentText() {
-				return ((ModelEditorON)getEditor()).getCurrentPrettyPrintedText();
 			}
 			
 			@Override

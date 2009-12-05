@@ -123,10 +123,6 @@ public class TextEditorTPN extends hub.top.editor.TextEditor implements hub.top.
 			public String defaultFileExtension() {
 				return "tpn";
 			}
-			
-			public String getCurrentText() {
-				return ((TextEditorTPN)getEditor()).getCurrentText();
-			}
 		};
 	}
 }

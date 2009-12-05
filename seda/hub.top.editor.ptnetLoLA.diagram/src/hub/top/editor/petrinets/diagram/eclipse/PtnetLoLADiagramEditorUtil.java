@@ -35,10 +35,7 @@
 \*****************************************************************************/
 package hub.top.editor.petrinets.diagram.eclipse;
 
-import java.lang.reflect.Method;
-
 import hub.top.editor.eclipse.DiagramEditorUtil;
-import hub.top.editor.lola.text.ModelEditorON;
 import hub.top.editor.ptnetLoLA.NodeType;
 import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtNet;
@@ -164,29 +161,6 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
 	  return new String[] {"lola", "owfn"};
 	}
 
-	@SuppressWarnings("unchecked")
-	private static boolean modelEditorAvailable(String className) {
-	  
-	  boolean modelEditorAvailable = false;
-	  try {
-      Class<ModelEditorON> mcClass = 
-        (Class<ModelEditorON>) Class.forName(className);
-      for (Method m : mcClass.getDeclaredMethods()) {
-        if (m.getName().equals("getText")) {
-          if (    m.getParameterTypes().length == 1
-              &&  m.getParameterTypes()[0] == EObject.class
-              &&  m.getReturnType() == String.class)
-          {
-            modelEditorAvailable = true;
-          }
-        }
-      }
-    } catch (ClassNotFoundException e) {
-      return false;
-    }
-    return modelEditorAvailable;
-	}
-	
 	private boolean isOpenNet(PtNet net) {
     for (Place p : net.getPlaces()) {
       if (p.getType() != NodeType.INTERNAL) {
@@ -194,29 +168,5 @@ public class PtnetLoLADiagramEditorUtil extends DiagramEditorUtil {
       }
     }
 	  return false;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see hub.top.editor.eclipse.DiagramEditorUtil#getCurrentText()
-	 */
-  @Override
-	public String getCurrentText() {
-	  Diagram diag = (Diagram)getCurrentRootModel();
-	  PtNet net = (PtNet)diag.getElement();
-	  
-	  if (isOpenNet(net)) {
-	    if (modelEditorAvailable("hub.top.editor.lola.text.ModelEditorON"))
-	      return hub.top.editor.lola.text.ModelEditorON.getText(net);
-	    else
-	      PtnetLoLADiagramEditorPlugin.getInstance().logError("Plugin for writing open net files is not available.");
-      
-	  } else {
-	    if (modelEditorAvailable("hub.top.editor.lola.text.ModelEditor"))
-	      return hub.top.editor.lola.text.ModelEditor.getText(net);
-	    else
-	      PtnetLoLADiagramEditorPlugin.getInstance().logError("Plugin for writing LoLA files is not available.");
-	  }
-	  return "";
 	}
 }

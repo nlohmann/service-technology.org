@@ -116,14 +116,4 @@ public abstract class EditorUtil implements IEditorUtil {
 	public void refreshEditorView() {
 		// standard refresh does nothing
 	}
-	
-	/**
-	 * Default implementation of pretty-printer based text generation.
-	 * Passes the editor's resource to the pretty printer.
-	 *  
-	 * @see hub.top.editor.eclipse.IEditorUtil#getCurrentText(hub.top.editor.eclipse.PrettyPrinter)
-	 */
-	public String getCurrentText(PrettyPrinter pp) {
-		return pp.getText(getCurrentRootModel());
-	}
 }

@@ -49,5 +49,3 @@ Require-Bundle: org.eclipse.core.runtime,
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Import-Package: hub.sam.tef.editor.model,
- hub.top.editor.lola.text

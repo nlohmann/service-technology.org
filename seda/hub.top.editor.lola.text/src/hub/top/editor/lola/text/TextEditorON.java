@@ -123,10 +123,6 @@ public class TextEditorON extends hub.top.editor.TextEditor implements hub.top.e
 			public String defaultFileExtension() {
 				return "owfn";
 			}
-			
-			public String getCurrentText() {
-				return ((TextEditorON)getEditor()).getCurrentText();
-			}
 		};
 	}
 }

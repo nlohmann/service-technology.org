@@ -245,10 +245,6 @@ public class ModelEditor extends hub.top.editor.ModelEditor implements hub.top.e
 			  return null;
 			}
 			
-			public String getCurrentText() {
-				return ((ModelEditor)getEditor()).getCurrentPrettyPrintedText();
-			}
-			
 			@Override
 			public String[] compatibleTextFileExtensions() {
 				return new String[] {"lola"};

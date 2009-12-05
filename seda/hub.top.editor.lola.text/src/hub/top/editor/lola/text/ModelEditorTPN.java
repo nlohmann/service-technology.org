@@ -46,12 +46,18 @@ import org.osgi.framework.Bundle;
 
 
 
+import hub.sam.tef.Utilities;
 import hub.sam.tef.layout.AbstractLayoutManager;
 import hub.sam.tef.layout.BlockLayout;
 import hub.sam.tef.modelcreating.IModelCreatingContext;
+import hub.sam.tef.modelcreating.ModelCreatingException;
+import hub.sam.tef.prettyprinting.PrettyPrintState;
 import hub.sam.tef.prettyprinting.PrettyPrinter;
+import hub.sam.tef.semantics.DefaultIdentificationScheme;
+import hub.sam.tef.semantics.DefaultSemanticsProvider;
 import hub.sam.tef.semantics.ISemanticsProvider;
 import hub.sam.tef.tsl.Syntax;
+import hub.sam.tef.tsl.TslException;
 import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.lola.text.Activator;
 import hub.top.editor.lola.text.modelcreating.LolaModelCreatingContext;
@@ -60,20 +66,92 @@ import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.provider.PtnetLoLAItemProviderAdapterFactory;
 
 public class ModelEditorTPN extends hub.top.editor.ModelEditor implements hub.top.editor.eclipse.IFrameWorkEditor {
+  
+  /**
+   * @return
+   *    references to all EMF packages this editor needs for
+   *    parsing and writing its files
+   */
+  public static EPackage[] createMetaModelPackages_default() {
+    return new EPackage[] { PtnetLoLAPackage.eINSTANCE };
+  }
+
+  /**
+   * @return
+   *    reference to the Bundle of this plugin for referencing
+   *    resources files of this editor, e.g. grammar descriptions
+   * @see TextEditor#getSyntaxPath_default()
+   */
+  public static Bundle getPluginBundle_default() {
+    return Activator.getDefault().getBundle();
+  }
+  
+  /**
+   * @return
+   *    location of the grammar description relative to this plugin
+   * @see TextEditor#getPluginBundle_default()
+   */
+  public static String getSyntaxPath_default() {
+    return "/resources/ptnetTPN.etslt";
+  }
+  
+  /**
+   * @return syntax model for this editor
+   */
+  public static Syntax createSyntax_default() {
+    try {
+      Syntax syntax = Utilities.loadSyntaxDescription(
+          getPluginBundle_default(),
+          getSyntaxPath_default(),
+          createMetaModelPackages_default());
+      return syntax;
+    } catch (TslException e) {
+        Activator.getPluginHelper().logError("Failed to read syntax description: "+ModelEditor.getSyntaxPath_default(), e);
+    }
+    return null;
+  }
+  
+  /**
+   * @return standard layout manager for pretty printing models 
+   */
+  public static AbstractLayoutManager createLayout_default() {
+    return new BlockLayout();  
+  }
+  
+  /**
+   * @param model
+   * @return
+   *    a pretty printed text representation of the <code>model</code>
+   */
+  public static String getText(EObject model) {
+    PrettyPrinter pp = new PrettyPrinter(
+        createSyntax_default(),
+        new DefaultSemanticsProvider(DefaultIdentificationScheme.INSTANCE));
+    pp.setLayout(createLayout_default());
+    
+    try {
+      PrettyPrintState state = pp.print(model);
+      return state.toString();
+    } catch (ModelCreatingException e) {
+      Activator.getPluginHelper().logError("Failed to print model.", e);
+    }
+    
+    return null;
+  }
 
 	@Override
 	public EPackage[] createMetaModelPackages() {
-		return new EPackage[] { PtnetLoLAPackage.eINSTANCE };
+		return createMetaModelPackages_default();
 	}
 
 	@Override
 	protected Bundle getPluginBundle() {
-		return Activator.getDefault().getBundle();
+		return getPluginBundle_default();
 	}
 
 	@Override
 	protected String getSyntaxPath() {
-		return "/resources/ptnetTPN.etslt";
+		return getSyntaxPath_default();
 	}
 
 	@Override
@@ -83,7 +161,7 @@ public class ModelEditorTPN extends hub.top.editor.ModelEditor implements hub.to
 	
 	@Override
 	public AbstractLayoutManager createLayout() {	
-		return new BlockLayout();
+		return createLayout_default();
 	}
 	
 	@Override
@@ -138,10 +216,6 @@ public class ModelEditorTPN extends hub.top.editor.ModelEditor implements hub.to
 				ModelEditorTPN editor = (ModelEditorTPN)getEditor();
 				hub.sam.tef.editor.text.FormatAction act = new hub.sam.tef.editor.text.FormatAction(editor);
 				act.run();
-			}
-			
-			public String getCurrentText() {
-				return ((ModelEditorTPN)getEditor()).getCurrentPrettyPrintedText();
 			}
 			
 			@Override

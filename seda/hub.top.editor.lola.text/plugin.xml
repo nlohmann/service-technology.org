@@ -91,4 +91,25 @@
          </action>
       </objectContribution>
    </extension>
+   <extension
+         point="hub.top.editor.resource.modelToTextTransformation">
+      <transformation
+            class="hub.top.editor.lola.text.prettyprinting.OpenNet2Text"
+            fileExtension="owfn"
+            inputClass="hub.top.editor.ptnetLoLA.PtNet"
+            name="hub.top.editor.lola.text.owfn">
+      </transformation>
+      <transformation
+            class="hub.top.editor.lola.text.prettyprinting.LoLA2Text"
+            fileExtension="lola"
+            inputClass="hub.top.editor.ptnetLoLA.PtNet"
+            name="hub.top.editor.lola.text.lola">
+      </transformation>
+      <transformation
+            class="hub.top.editor.lola.text.prettyprinting.Woflan2Text"
+            fileExtension="tpn"
+            inputClass="hub.top.editor.ptnetLoLA.PtNet"
+            name="hub.top.editor.lola.text.woflan">
+      </transformation>
+   </extension>
 </plugin>

@@ -125,10 +125,7 @@ public class TextEditor extends hub.top.editor.TextEditor implements hub.top.edi
 			public String defaultFileExtension() {
 				return "lola";
 			}
-			
-			public String getCurrentText() {
-				return ((TextEditor)getEditor()).getCurrentText();
-			}
+
 		};
 	}
 }

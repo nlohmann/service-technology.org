@@ -41,11 +41,17 @@ import hub.top.editor.eclipse.IEditorUtil;
 import hub.top.editor.eclipse.IFrameWorkEditor;
 import hub.top.editor.eclipse.PluginHelper;
 import hub.top.editor.eclipse.PrettyPrinter;
+import hub.top.editor.eclipse.emf.AbstractTextToModelTransformation;
 import hub.top.editor.resource.Activator;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -66,13 +72,16 @@ public class ExportWizard extends Wizard implements IExportWizard {
 	protected UIhelper 		uihelper = null;
 	protected EditorHelper 	editorHelper = null;
 	protected PluginHelper  pluginHelper = Activator.getPluginHelper();
+	
+	protected Diagram     selectedDiagram = null;
+	protected EObject     selectedObject = null;
+	
+	protected ArrayList<AbstractTextToModelTransformation> transformations;
 
 	private boolean invalidEditor;
 	
 	// the pages of the wizard, stored individually for cross-page checks
 	protected ExportWizardPage page1;
-	
-
 	
 	/**
 	 * create a new wizard
@@ -93,12 +102,12 @@ public class ExportWizard extends Wizard implements IExportWizard {
 		this.selection = selection;
 		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 
-		invalidEditor = false;
 		uihelper = new UIhelper(workbench, pluginHelper);
 		
 		if (uihelper.getSelectedResource(selection)) {
 		  // resource found in the selection
   		if (uihelper.selectedURI != null)	{
+  		  /*
   			// try to open the selection in an editor
   			if (!uihelper.openSelectionInEditor())
   			{
@@ -107,23 +116,65 @@ public class ExportWizard extends Wizard implements IExportWizard {
   					"File export", "The selected resource cannot be exported with this wizard. Please open the resource in the editor and try again.");
   			} // else, opening was successful, resource is displayed in an
   			  // open editor window
+  			   */
+  		  Resource res = uihelper.getResource();
+  		  if (res.getContents().size() > 0)
+  		    selectedObject = res.getContents().get(0);
   		}
-		} // else, nothing was selected, but there may be still
-		  // an open editor window which we can use
+		}
 		
-		if (!invalidEditor)
+		if (selectedObject == null) {
+		  // no model found at the given resource (the resource was maybe null), check
+		  // the selection directly
+		  if (selection.size() > 0) {
+		    if (selection.getFirstElement() instanceof EObject)
+		      selectedObject = (EObject)selection.getFirstElement();
+		    
+		    // selected something in a diagram, get its EObject model if possible
+		    else if (selection.getFirstElement() instanceof EditPart) {
+		      EditPart ep = (EditPart)selection.getFirstElement();
+		      if (ep.getModel() instanceof EObject)
+		        selectedObject = (EObject)ep.getModel();
+		    }
+		  }
+		}
+
+		if (selectedObject == null)
 		{
-			// assume that the object to be exported is displayed in the
+		  // else, nothing was selected, but there may be still
+      // an open editor window which we can use assume that
+		  // the object to be exported is displayed in the
 			// active editor window
 			IEditorPart _editor = (IEditorPart) window.getActivePage().getActiveEditor();
 			if (_editor instanceof IFrameWorkEditor) {
 				IEditorUtil editorUtil = ((IFrameWorkEditor)_editor).getEditorUtil();
 				editorHelper = new EditorHelper(Activator.getPluginHelper(), editorUtil);
+				selectedObject = editorHelper.getModelRoot();
 			} else {
 				MessageDialog.openInformation(workbench.getActiveWorkbenchWindow().getShell(),
 						"File export", "We're sorry, this editor does not support plain text export with this wizard.");
 			}
 		}
+		
+		if (selectedObject != null) {
+		  while (selectedObject.eContainer() != null) {
+		    selectedObject = selectedObject.eContainer();
+		  }
+		}
+		
+    if (selectedObject instanceof Diagram) {
+      selectedDiagram = (Diagram)selectedObject;
+      selectedObject = selectedDiagram.getElement();
+    }
+		
+    ArrayList<AbstractTextToModelTransformation> invalid = new ArrayList<AbstractTextToModelTransformation>();
+		transformations = AbstractTextToModelTransformation.getAvailableTransformations();
+		for (AbstractTextToModelTransformation t : transformations) {
+		  if (!t.isValidInput(selectedObject)) {
+		    invalid.add(t);
+		  }
+		}
+		transformations.removeAll(invalid);
 	}
 	
 
@@ -158,12 +209,17 @@ public class ExportWizard extends Wizard implements IExportWizard {
 		  else
 		    page1.setOriginalResourceName("net");
 		  
-			page1.setSuggestedExtensions(editorHelper.getEditorUtil().compatibleTextFileExtensions());
-		//} else if (uihelper != null) {
-		//	page1.setOriginalResourceName(uihelper.getURI().lastSegment());
 		} else {
 			page1.setOriginalResourceName("net");
 		}
+
+		// collect all file extensions of all available transformations
+		String[] ext = new String[transformations.size()];
+		for (int i=0; i<ext.length; i++) {
+		  ext[i] = transformations.get(i).getFileExtension();
+		}
+    page1.setSuggestedExtensions(ext);
+
 	}
 	
 	/**
@@ -182,7 +238,27 @@ public class ExportWizard extends Wizard implements IExportWizard {
 
 		String exportText = null;
 		String targetFileName = page1.getEnteredTargetFileName();
-
+		
+		String chosenExtension = null;
+		int extBegin = targetFileName.lastIndexOf('.')+1;
+		if (extBegin < targetFileName.length())
+		  chosenExtension = targetFileName.substring(extBegin);
+		
+		AbstractTextToModelTransformation chosenTrafo = null;
+		for (AbstractTextToModelTransformation t : transformations) {
+		  if (t.getFileExtension().equals(chosenExtension)) {
+		    chosenTrafo = t;
+		  }
+		}
+		
+		if (chosenTrafo == null) {
+      MessageDialog.openError(workbench.getActiveWorkbenchWindow().getShell(),
+          "File export", "There is no support for exporting "+page1.getOriginalResourceName()+" to '."+chosenExtension+"'.");
+      return false;		  
+		}
+		
+    exportText = chosenTrafo.toText(selectedObject);
+/*
 		if (editorHelper != null) {
 			PrettyPrinter pp = chooseOutputFormatPrinter();
 			if (pp != null)
@@ -192,14 +268,15 @@ public class ExportWizard extends Wizard implements IExportWizard {
 				// no pretty printer, default exporting
 				exportText = editorHelper.getEditorUtil().getCurrentText();
 		}
-
+*/
 		if (exportText == null) {
 			MessageDialog.openError(workbench.getActiveWorkbenchWindow().getShell(),
-					"File export", "There is no support for exporting "+page1.getOriginalResourceName()+".");
+					"File export", "Could not export "+page1.getOriginalResourceName()+" to '."+chosenExtension+"'.");
 			return false;
 		}
 
 		try {
+		  
 			// write to external file
 			PrintStream outStream = new PrintStream(targetFileName);
 			outStream.print(exportText);
@@ -211,7 +288,6 @@ public class ExportWizard extends Wizard implements IExportWizard {
 					"File export", "Failed to export currently selected resource.\n\nReason: "+e);
 			return false;
 		}
-
 		return true;
 	}
 	

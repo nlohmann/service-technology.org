@@ -83,23 +83,4 @@ public abstract class DiagramEditorUtil extends EditorUtil implements IDiagramEd
     
     return result;
   }
-	
-	/**
-	 * @return text representation of the diagram, diagram editors
-	 * have no text representation by default (returns <code>null</code>)
-	 * @see hub.top.editor.eclipse.IEditorUtil#getCurrentText()
-	 */
-	public String getCurrentText() {
-		return null;
-	}
-
-	/**
-	 * @return a list of extensions of text file formats that
-	 * is understood by this editor, diagram editors have no
-	 * text file extensions by default
-	 */
-	@Override
-	public String[] compatibleTextFileExtensions() {
-		return null;
-	}
 }

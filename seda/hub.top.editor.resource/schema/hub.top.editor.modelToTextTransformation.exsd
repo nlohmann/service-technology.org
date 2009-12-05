@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="hub.top.editor.resource" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="hub.top.editor.resource" id="hub.top.editor.modelToTextTransformation" name="modelToTextTransformation"/>
+      </appinfo>
+      <documentation>
+         Specify a model-to-text transformation for an EMF-based model.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="transformation" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="transformation">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Implementation of the text-to-model transformation.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="hub.top.editor.eclipse.emf.AbstractTextToModelTransformation:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="inputClass" type="string">
+            <annotation>
+               <documentation>
+                  The base class of the objects this transformation can process.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.emf.ecore.EObject:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="fileExtension" type="string">
+            <annotation>
+               <documentation>
+                  If the result of the transformation is written to a file, the file shall have this default file extension.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         1.0.6
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2008, 2009. Manja Wolf, Dirk Fahland. EPL1.0/AGPL3.0
+All rights reserved.
+
+This program and the accompanying materials are made available under
+the terms of
+
+ - the Eclipse Public License v1.0 (&quot;EPL&quot;), which accompanies this
+   distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html,
+
+OR ALTERNATIVELY
+
+ - the GNU Affero General Public License Version 3 or later (&quot;AGPL&quot;), which
+   accompanies this distribution, and is available at
+   http://www.gnu.org/licenses/agpl-3.0-standalone.html,
+   
+Software distributed under the License is distributed on an &quot;AS IS&quot; basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+for the specific language governing rights and limitations under the
+License.
+
+For Original Creators and Contributors, and the respective copyright
+ownership, see AUTHORS file. 
+
+If you wish to allow use of your version of this file only under the terms
+of the AGPL and not to allow others to use your version of this file under
+the terms of the EPL, indicate your decision by deleting the provisions
+above and replace them with the notice and other provisions required by the 
+AGPL. If you do not delete the provisions above, a recipient may use your
+version of this file under the terms of any one of the EPL or the AGPL.
+      </documentation>
+   </annotation>
+
+</schema>

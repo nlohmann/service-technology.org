@@ -29,6 +29,9 @@
 
 extern gengetopt_args_info args_info;
 
+// abort will call exit and hence never returns to caller
+__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
+
 
 /***************************************************************************\
  * syslog functionalities (to be enabled with "configure --enable-syslog") *
@@ -39,21 +42,23 @@ extern gengetopt_args_info args_info;
 extern std::string invocation;
 
 /// dummy class to have global constructor and destructor
-class _syslogwrapper {
-    public:
-        _syslogwrapper() {
-            openlog(PACKAGE, LOG_PID, LOG_USER);
-            syslog(LOG_NOTICE, "--> starting %s", PACKAGE_STRING);
-        }
+namespace st {
+    class Logger {
+        public:
+            Logger() {
+                openlog(PACKAGE, LOG_PID, LOG_USER);
+                syslog(LOG_NOTICE, "--> starting %s", PACKAGE_STRING);
+            }
 
-        ~_syslogwrapper() {
-            syslog(LOG_NOTICE, "<-- done: %s", invocation.c_str());
-            closelog();
-        }
-};
+            ~Logger() {
+                syslog(LOG_NOTICE, "<-- done: %s", invocation.c_str());
+                closelog();
+            }
+    };
 
-/// dummy object living in global namespace
-_syslogwrapper __syslogwraper;
+    /// dummy object living in global namespace
+    Logger myLogger;
+}
 #endif
 
 
@@ -111,7 +116,7 @@ void status(const char* format, ...) {
 
  \note The codes should be documented in the manual.
 */
-__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...) {
+void abort(unsigned short code, const char* format, ...) {
     fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _c0_);
 
     va_list args;

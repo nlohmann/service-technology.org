@@ -29,9 +29,6 @@
 
 extern gengetopt_args_info args_info;
 
-// abort will call exit and hence never returns to caller
-__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
-
 
 /***************************************************************************\
  * syslog functionalities (to be enabled with "configure --enable-syslog") *

@@ -36,7 +36,7 @@ void message(const char* format, ...);
 void status(const char* format, ...);
 
 /// abort with an error message and an error code
-void abort(unsigned short code, const char* format, ...);
+__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
 
 /// verbosely display an error in a file (still experimental)
 void displayFileError(char* filename, int lineno, char* token);

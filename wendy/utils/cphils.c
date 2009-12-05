@@ -1,21 +1,25 @@
-#include <cstdlib>
-#include <cstdio>
-#include <cstdlib>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char **argv) {
-    if (argc != 3 or !atoi(argv[1]) or !atoi(argv[2])) {
+    unsigned int i;
+
+    if (argc != 3 || !atoi(argv[1]) || !atoi(argv[2])) {
         fprintf(stderr, "error: call %s n k\n", argv[0]);
+        fprintf(stderr, "  n : number of philosophers\n");
+        fprintf(stderr, "  k : number of internal steps\n");
         return EXIT_FAILURE;
     }
-    
+
     unsigned int n = atoi(argv[1]);
     unsigned int k = atoi(argv[2]);
-    
+
     printf("{ n=%d, k=%d }\n\n", n, k);
-    
+
     printf("PLACE\n");
     printf("INTERNAL\n");
-    for (unsigned int i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
         printf("  phil%d_id, phil%d_i1, phil%d_i2, phil%d_ea, ", i, i, i, i);
         if (i % 2 == 0) {
             printf("phil%d_i0,", i);
@@ -23,40 +27,40 @@ int main(int argc, char **argv) {
         printf("\n");
     }
     printf("  ");
-    for (unsigned int i = 0; i < n-1; ++i) {
+    for (i = 0; i < n-1; ++i) {
         printf("fork_%d, ", i);
     }
     printf("fork_%d;\n", n-1);
     printf("SYNCHRONOUS\n");
-    for (unsigned int i = 0; i < n-1; ++i) {
+    for (i = 0; i < n-1; ++i) {
         printf("  tl_%d, in_%d, tr_%d, rn_%d,\n", i, i, i, i);
     }
     printf("  tl_%d, in_%d, tr_%d, rn_%d;\n", n-1, n-1, n-1, n-1);
 
 
     printf("\n");
-    
+
     printf("INITIALMARKING\n  ");
-    for (unsigned int i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
         printf("phil%d_id, ", i);
     }
     printf("\n  ");
-    for (unsigned int i = 0; i < n-1; ++i) {
+    for (i = 0; i < n-1; ++i) {
         printf("fork_%d, ", i);
     }
     printf("fork_%d;\n\n", n-1);
 
     printf("FINALMARKING\n  ");
-    for (unsigned int i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
         printf("phil%d_id, ", i);
     }
     printf("\n  ");
-    for (unsigned int i = 0; i < n-1; ++i) {
+    for (i = 0; i < n-1; ++i) {
         printf("fork_%d, ", i);
     }
     printf("fork_%d;\n\n", n-1);
-    
-    for (unsigned int i = 0; i < n; ++i) {
+
+    for (i = 0; i < n; ++i) {
         printf("{ philosopher #%d }\n", i);
         if (i % 2 != 0) {
             printf("TRANSITION phil%d_takeleft\n", i);
@@ -89,6 +93,6 @@ int main(int argc, char **argv) {
         printf("PRODUCE phil%d_id, fork_%d, fork_%d;\n", i, i, (i+1)%n);
         printf("SYNCHRONIZE rn_%d;\n\n", i);
     }
-    
+
     return EXIT_SUCCESS;
 }

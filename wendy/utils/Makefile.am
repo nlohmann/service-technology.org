@@ -10,7 +10,7 @@ minimize_SOURCES = syntax_og.yy lexer_og.ll \
                    verbose.cc verbose.h \
                    types.h
 
-cphils_SOURCES = cphils.cc
+cphils_SOURCES = cphils.c
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

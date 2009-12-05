@@ -21,10 +21,13 @@
 #ifndef VERBOSE_H
 #define VERBOSE_H
 
+#include <config.h>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <string>
 #include <unistd.h>
+
 
 /// unconditionally print a message
 void message(const char* format, ...);
@@ -33,7 +36,10 @@ void message(const char* format, ...);
 void status(const char* format, ...);
 
 /// abort with an error message and an error code
-void abort(unsigned short code, const char* format, ...);
+__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
+
+/// verbosely display an error in a file (still experimental)
+void displayFileError(char* filename, int lineno, char* token);
 
 
 /**************************************************************************\
@@ -48,7 +54,7 @@ void abort(unsigned short code, const char* format, ...);
 \**************************************************************************/
 
 /// whether to use colored output
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 const bool _useColor = isatty(fileno(stderr)) && (
     !strcmp(getenv("TERM"), "linux") ||
     !strcmp(getenv("TERM"), "cygwin") ||
@@ -72,6 +78,19 @@ const bool _useColor = false;
 /// set foreground color to cyan
 #define _cc_ (_useColor ? "\033[0;36m" : "" )
 
+/// set foreground color to red (undelined)
+#define _cr__ (_useColor ? "\033[0;4;31m" : "" )
+/// set foreground color to green (undelined)
+#define _cg__ (_useColor ? "\033[0;4;32m" : "" )
+/// set foreground color to yellow (undelined)
+#define _cy__ (_useColor ? "\033[0;4;33m" : "" )
+/// set foreground color to blue (undelined)
+#define _cb__ (_useColor ? "\033[0;4;34m" : "" )
+/// set foreground color to magenta (undelined)
+#define _cm__ (_useColor ? "\033[0;4;35m" : "" )
+/// set foreground color to cyan (undelined)
+#define _cc__ (_useColor ? "\033[0;4;36m" : "" )
+
 /// set foreground color to black (bold)
 #define _c0_ (_useColor ? "\033[0;1;30m" : "" )
 /// set foreground color to red (bold)
@@ -89,5 +108,22 @@ const bool _useColor = false;
 
 /// reset foreground color
 #define _c_ (_useColor ? "\033[m" : "")
+
+/// color the name of a tool
+#define _ctool_(s)       (std::string(_cm_) + s + _c_).c_str()
+/// color the name of a file
+#define _cfilename_(s)   (std::string(_cb__) + s + _c_).c_str()
+/// color the type of a file
+#define _coutput_(s)     (std::string(_cB_) + s + _c_).c_str()
+/// color some good output
+#define _cgood_(s)       (std::string(_cG_) + s + _c_).c_str()
+/// color some bad output
+#define _cbad_(s)        (std::string(_cR_) + s + _c_).c_str()
+/// color a warning
+#define _cwarning_(s)    (std::string(_cY_) + s + _c_).c_str()
+/// color an important message
+#define _cimportant_(s)  (std::string(_c0_) + s + _c_).c_str()
+/// color a command-line parameter
+#define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
 
 #endif

@@ -36,30 +36,20 @@ extern gengetopt_args_info args_info;
  ***************/
 
 /*!
- This constructor creates a temporary file using mktemp(). It uses the value
- of the tmpfile parameter as template. In case of MinGW compilations, the
- basename has to be used to avoid problems with path names.
+ This constructor creates a temporary file using createTmp() as helper.
 */
 Output::Output() :
-#if defined(__MINGW32__)
-    os(*(new std::ofstream(mktemp(temp = basename(args_info.tmpfile_arg)), std::ofstream::out | std::ofstream::trunc))),
-#else
-    os(*(new std::ofstream(mktemp(temp = args_info.tmpfile_arg), std::ofstream::out | std::ofstream::trunc))),
-#endif
+    os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
     filename(temp), kind("")
 {
-    if (not os.good() or filename == "") {
-        abort(13, "could not create to temporary file '%s'", filename.c_str());
-    }
-
-    status("writing to temporary file '%s%s%s'", _cb_, filename.c_str(), _c_);
+    status("writing to temporary file '%s'", _cfilename_(filename));
 }
 
 /*!
  This constructor creates a file with the given filename. In case the
  filename matches "-", no file is created, but std::cout is used as output.
 */
-Output::Output(std::string str, std::string kind) :
+Output::Output(const std::string& str, const std::string& kind) :
     os((!str.compare("-")) ?
         std::cout :
         *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
@@ -67,13 +57,13 @@ Output::Output(std::string str, std::string kind) :
     filename(str), temp(NULL), kind(kind)
 {
     if (not os.good()) {
-        abort(11, "could not write to file '%s%s%s'", _cb_, str.c_str(), _c_);
+        abort(11, "could not write to file '%s'", _cfilename_(filename));
     }
 
     if (str.compare("-")) {
-        status("writing %s to file '%s%s%s'", kind.c_str(), _cb_, filename.c_str(), _c_);
+        status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
     } else {
-        status("writing %s to standard output", kind.c_str());
+        status("writing %s to standard output", _coutput_(kind));
     }
 }
 
@@ -85,22 +75,25 @@ Output::Output(std::string str, std::string kind) :
 /*!
  This destructor closes the associated file. Unless the "--noClean" parameter
  is given, temporary files are deleted after closing.
- */
+*/
 Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
-        if (!temp) {
-            status("closed file '%s%s%s'", _cb_, filename.c_str(), _c_);
+        if (temp == NULL) {
+            status("closed file '%s'", _cfilename_(filename));
         } else {
             if (args_info.noClean_flag) {
-                status("closed temporary file '%s%s%s'", _cb_, filename.c_str(), _c_);
+                status("closed temporary file '%s'", _cfilename_(filename));
             } else {
                 if (remove(filename.c_str()) == 0) {
-                    status("closed and deleted temporary file '%s%s%s'", _cb_, filename.c_str(), _c_);
+                    status("closed and deleted temporary file '%s'", _cfilename_(filename));
                 } else {
-                    status("closed, but could not delete temporary file '%s%s%s'", _cb_, filename.c_str(), _c_);
+                    // this should never happen, because mkstemp creates temp
+                    // files in mode 0600.
+                    status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
                 }
             }
+            free(temp);
         }
     }
 }
@@ -114,7 +107,7 @@ Output::~Output() {
  This implicit conversation operator allows to use Output objects like
  ostream streams.
 */
-Output::operator std::ostream&() {
+Output::operator std::ostream&() const {
     return os;
 }
 
@@ -129,4 +122,29 @@ std::string Output::name() const {
 
 std::ostream& Output::stream() const {
     return os;
+}
+
+/*!
+ This function creates a temporary file using mkstemp(). It uses the value
+ of the tmpfile parameter as template. In case of MinGW compilations, the
+ basename has to be used to avoid problems with path names.
+
+ \return name of already opened temp file
+
+ \note mkstemp already opens the temp file, so there is no need to check
+       whether the creation of the std::ofstream succeeded.
+*/
+char* Output::createTmp() {
+#ifdef __MINGW32__
+    temp = strdup(basename(args_info.tmpfile_arg));
+    if (mktemp(temp) == NULL) {
+        abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
+    };
+#else
+    temp = strdup(args_info.tmpfile_arg);
+    if (mkstemp(temp) == -1) {
+        abort(13, "could not create to temporary file '%s'", temp);
+    };
+#endif
+    return temp;
 }

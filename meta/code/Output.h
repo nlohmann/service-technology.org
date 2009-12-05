@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 
+
 /*!
  \brief output file organization
 
@@ -38,22 +39,26 @@
  deleted when the object is destroyed unless the paramter '--noClean' is
  given. To redirect to standard output, use the the filename "-".
 
- The quite tricky constructor was taken from the Ubuntu Forums at
+ The quite tricky constructor was motivated from the Ubuntu Forums at
  http://ubuntuforums.org/showthread.php?p=5929211
- */
+*/
 class Output {
+    private:
+        /// helper function to create temp files
+        char* createTmp();
+
     public: /* member functions */
         /// constructor (creates temp file)
         Output();
 
         /// constructor (opens named stream or directs to std::cout)
-        Output(std::string, std::string);
+        Output(const std::string&, const std::string&);
 
         /// destructor (closes stream)
         ~Output();
 
         /// implicit conversation operator to ostream
-        operator std::ostream&();
+        operator std::ostream&() const;
 
         /// returns the filename of this object
         std::string name() const;
@@ -72,7 +77,7 @@ class Output {
         char* temp;
 
         /// the kind of the file
-        std::string kind;
+        const std::string kind;
 };
 
 #endif

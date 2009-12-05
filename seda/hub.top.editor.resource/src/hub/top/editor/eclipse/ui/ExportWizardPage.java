@@ -129,12 +129,14 @@ public class ExportWizardPage extends WizardPage implements Listener {
 					String selectedFile = dialog.open();
 					if (selectedFile != null) {
 					  
-					  // append the selected file extension to the file name
-	          String chosenExtension = suggestedExtensions[dialog.getFilterIndex()];
-	          int lastDot = selectedFile.lastIndexOf('.');
-	          if (lastDot == -1 || !selectedFile.substring(lastDot+1).equals(chosenExtension)) {
-	            selectedFile += "."+chosenExtension;
-	          }
+					  if (dialog.getFilterIndex() < suggestedExtensions.length) {
+  					  // append the selected file extension to the file name
+  	          String chosenExtension = suggestedExtensions[dialog.getFilterIndex()];
+  	          int lastDot = selectedFile.lastIndexOf('.');
+  	          if (lastDot == -1 || !selectedFile.substring(lastDot+1).equals(chosenExtension)) {
+  	            selectedFile += "."+chosenExtension;
+  	          }
+					  }
 
 						exportFileNameBox.add(selectedFile, 0);
 						exportFileNameBox.setText(selectedFile);

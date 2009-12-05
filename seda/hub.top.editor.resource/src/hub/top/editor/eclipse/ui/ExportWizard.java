@@ -78,7 +78,7 @@ public class ExportWizard extends Wizard implements IExportWizard {
 	
 	protected ArrayList<AbstractTextToModelTransformation> transformations;
 
-	private boolean invalidEditor;
+	private boolean noExportFound = false;
 	
 	// the pages of the wizard, stored individually for cross-page checks
 	protected ExportWizardPage page1;
@@ -152,7 +152,7 @@ public class ExportWizard extends Wizard implements IExportWizard {
 				selectedObject = editorHelper.getModelRoot();
 			} else {
 				MessageDialog.openInformation(workbench.getActiveWorkbenchWindow().getShell(),
-						"File export", "We're sorry, this editor does not support plain text export with this wizard.");
+						"File export", "We're sorry, this editor does not support export with this wizard.");
 			}
 		}
 		
@@ -175,6 +175,12 @@ public class ExportWizard extends Wizard implements IExportWizard {
 		  }
 		}
 		transformations.removeAll(invalid);
+		
+		if (transformations.isEmpty()) {
+		  noExportFound = true;
+      MessageDialog.openInformation(workbench.getActiveWorkbenchWindow().getShell(),
+          "File export", "We're sorry, this editor does not support export with this wizard.");
+  	}
 	}
 	
 
@@ -228,7 +234,7 @@ public class ExportWizard extends Wizard implements IExportWizard {
 	 * @see org.eclipse.jface.wizard.IWizard#canFinish()
 	 */
 	public boolean canFinish() {
-		return page1.isPageComplete() && !invalidEditor;
+		return page1.isPageComplete() && !noExportFound;
 	}
 	
 	/**

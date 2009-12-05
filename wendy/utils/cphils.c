@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-    unsigned int i;
+    unsigned int i, n, k;
 
     if (argc != 3 || !atoi(argv[1]) || !atoi(argv[2])) {
         fprintf(stderr, "error: call %s n k\n", argv[0]);
@@ -12,8 +12,8 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    unsigned int n = atoi(argv[1]);
-    unsigned int k = atoi(argv[2]);
+    n = atoi(argv[1]);
+    k = atoi(argv[2]);
 
     printf("{ n=%d, k=%d }\n\n", n, k);
 

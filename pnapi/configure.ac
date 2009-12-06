@@ -100,6 +100,32 @@ AC_HEADER_ASSERT
 
 
 #############################################################################
+# In the following, command line paraemters for the configure script are
+# defined. Each parameter is also written into a Makefile conditional to
+# later set compliler flags accordingly. Finally, the result is also written
+# into the configuration header "config.h".
+#############################################################################
+
+# parameter "--enable-win32"
+AC_ARG_ENABLE(win32,
+  AS_HELP_STRING([--enable-win32],[build a Windows binary that is independent of a local Cygwin installation (disabled by default)]),
+  enable_win32=${enableval}, enable_win32="no")
+AC_MSG_CHECKING([whether to build Windows MinGW binary])
+AC_MSG_RESULT($enable_win32)
+
+if test "$enable_win32" = "yes"; then
+  configured_CFLAGS=$configured_CFLAGS" -mno-cygwin -U _WIN32"
+  configured_CXXFLAGS=$configured_CXXFLAGS" -mno-cygwin -U _WIN32"
+  configured_LDFLAGS=$configured_LDFLAGS" -mno-cygwin -U _WIN32"
+fi
+
+# export flags
+AC_SUBST(configured_CFLAGS)
+AC_SUBST(configured_CXXFLAGS)
+AC_SUBST(configured_LDFLAGS)
+
+
+#############################################################################
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
 AC_CONFIG_FILES([Makefile

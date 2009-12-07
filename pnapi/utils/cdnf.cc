@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <libgen.h>
 
 #include "pnapi.h"
 #include "cdnf-cmdline.h"

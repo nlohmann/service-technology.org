@@ -87,6 +87,19 @@ AC_SUBST(GENET)
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_SUBST(FIONA)
 
+# search for required tools
+AC_PATH_PROG(LOLA, [lola-statespace], [])
+if test "${LOLA}" = ""; then
+  AC_MSG_WARN([LoLA was not found.])
+else
+AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version`]])
+AC_MSG_CHECKING([LoLA version])
+AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
+if test "${ac_cv_path_LOLAVERSION}" != "LoLA 1.14"; then
+  AC_MSG_WARN([You have ${ac_cv_path_LOLAVERSION}, but CDNF needs LoLA 1.14!])
+fi
+fi
+
 # check for svn (would be used in test cases)
 AC_PATH_PROGS(SVN, [svn], not found)
 AC_SUBST(SVN)

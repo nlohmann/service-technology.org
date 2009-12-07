@@ -159,9 +159,10 @@ void Condition::addProposition(const Proposition & p, bool conjunct)
 void Condition::addMarking(const Marking & m)
 {
   set<const Formula *> propositions;
-  for (map<const Place *, unsigned int>::const_iterator it = m.begin();
-        it != m.end(); ++it)
-    propositions.insert(new FormulaEqual(*it->first, it->second));
+  set<Place*> places = m.getPetriNet().getInternalPlaces();
+  
+  PNAPI_FOREACH(set<Place*>, places, p)
+    propositions.insert(new FormulaEqual(**p, m[**p]));
 
   if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
     *this = Conjunction(propositions, NULL);

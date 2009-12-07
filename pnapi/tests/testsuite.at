@@ -802,6 +802,36 @@ AT_KEYWORDS([formulae dnf])
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Canonical DNF])
+############################################################################
+
+m4_define([TEST_CDNF], [AT_CHECK([cp TESTFILES/NET.owfn .])
+                        AT_CHECK([CDNF NET.owfn])
+                        AT_CHECK([FIONA -t equivalence NET.owfn NET.cdnf.owfn], 0, ignore, ignore)
+                        AT_KEYWORDS(cdnf)])
+
+AT_SETUP([Syntax Check])
+m4_define([NET], [test_cdnf])
+TEST_CDNF
+AT_CHECK([GREP -q "AND" NET.cdnf.owfn])
+AT_CHECK([GREP -q "OR" NET.cdnf.owfn])
+AT_CHECK([GREP -q "pf = 2" NET.cdnf.owfn])
+AT_CHECK([GREP -q "pf = 1" NET.cdnf.owfn])
+AT_CHECK([GREP -q "p2 = 1" NET.cdnf.owfn])
+AT_CHECK([GREP -q "p3 = 1" NET.cdnf.owfn])
+AT_CLEANUP
+
+AT_SETUP([Equivalence Check (Coffee)])
+m4_define([NET], [myCoffee])
+TEST_CDNF
+AT_CLEANUP
+
+AT_SETUP([Equivalence Check (Zeus)])
+m4_define([NET], [zeus])
+TEST_CDNF
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Customer Tools])
 ############################################################################
 

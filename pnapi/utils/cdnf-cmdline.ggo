@@ -1,0 +1,43 @@
+args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error"
+
+package "cdnf"
+purpose "A command-line converter from petri net final conditions to canonical DNF"
+
+
+section "Configuration"
+
+option "lola" -
+  "Set the path and binary of LoLA."
+  details="The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'.\n"
+  string
+  typestr="FILENAME"
+  default="lola-statespace"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename CDNF should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/cdnf-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by CDNF is kept after CDNF terminates.\n"
+  flag off
+
+
+section "Debugging"
+
+option "verbose" v
+  "Show verbose output"
+  flag off
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden

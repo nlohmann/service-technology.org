@@ -39,6 +39,8 @@ TESTFILES = test_input.owfn \
 	    bug14417.1.owfn \
 	    bug14417.2.owfn \
 	    bug14856.owfn \
+	    myCoffee.owfn \
+	    test_cdnf.owfn \
             test_input.lola \
             test_dead_nodes.net.owfn \
 	    test_dnf.owfn \
@@ -82,7 +84,8 @@ TESTFILES = test_input.owfn \
             fiona_abnormal_output.normalized.expected.owfn \
             fiona_abnormal_output.owfn \
             fiona_coffee.normalized.expected.owfn \
-            fiona_coffee.owfn
+            fiona_coffee.owfn \
+	    zeus.owfn
 	    
 
 

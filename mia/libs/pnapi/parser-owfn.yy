@@ -29,6 +29,7 @@
 
 #define yyerror pnapi::parser::error
 #define yylex pnapi::parser::owfn::lex
+#define yylex_destory pnapi::parser::owfn::lex_destroy
 #define yyparse pnapi::parser::owfn::parse
 
 
@@ -62,10 +63,12 @@ using namespace pnapi::parser::owfn;
 {
   int yt_int;
   pnapi::formula::Formula * yt_formula;
+  char * yt_str;
 }
 
 %type <yt_int> NUMBER NEGATIVE_NUMBER 
 %type <yt_int> transition_cost
+%type <yt_str> IDENT
 %type <yt_formula> condition formula
 
 %start petrinet
@@ -77,9 +80,19 @@ using namespace pnapi::parser::owfn;
 %%
 
 petrinet: 
-    { port_ = ""; }
+    { 
+      // clean up from previous parsing
+      port_ = "";
+      places_.clear();
+      synchronousLabels_.clear();
+      constrains_.clear();
+      placeSet_.clear();
+    }
     places_ports markings transitions
-    { pnapi_owfn_yynet.setConstraintLabels(constrains_); }
+    { 
+      pnapi_owfn_yynet.setConstraintLabels(constrains_); 
+      pnapi_owfn_yynet.setSynchronousLabels(synchronousLabels_);
+    }
   ;
 
 
@@ -154,7 +167,8 @@ node_name:
       nodeName_.str("");
       nodeName_.clear();
 
-      nodeName_ << ident; 
+      nodeName_ << $1;
+      free($1); 
     }
   | NUMBER 
     { 
@@ -235,21 +249,21 @@ port_list_new:
 synchronous:
     /* empty */ 
   | KEY_SYNCHRONOUS { labels_.clear(); checkLabels_ = false; } labels SEMICOLON
-    { pnapi_owfn_yynet.setSynchronousLabels(labels_); }
+    { synchronousLabels_ = labels_; }
   ;
 
 labels:
     node_name 
     { 
-      check(!(checkLabels_ && (pnapi_owfn_yynet.getSynchronousLabels().find(ident) == pnapi_owfn_yynet.getSynchronousLabels().end())),
+      check(!(checkLabels_ && (synchronousLabels_.find(nodeName_.str()) == synchronousLabels_.end())),
              "undeclared label");
-      labels_.insert(std::string(ident)); 
+      labels_.insert(nodeName_.str()); 
     } 
   | labels COMMA node_name 
     {
-      check(!(checkLabels_ && (pnapi_owfn_yynet.getSynchronousLabels().find(ident) == pnapi_owfn_yynet.getSynchronousLabels().end())),
+      check(!(checkLabels_ && (synchronousLabels_.find(nodeName_.str()) == synchronousLabels_.end())),
              "undeclared label"); 
-      labels_.insert(std::string(ident)); 
+      labels_.insert(nodeName_.str()); 
     } 
   ;
 
@@ -266,7 +280,7 @@ transitions:
 transition: 
     KEY_TRANSITION node_name transition_cost
     { 
-      check(!pnapi_owfn_yynet.containsNode(ident), "node name already used");
+      check(!pnapi_owfn_yynet.containsNode(nodeName_.str()), "node name already used");
       transition_ = & pnapi_owfn_yynet.createTransition(nodeName_.str()); 
       transition_->setCost($3);
     }
@@ -331,8 +345,8 @@ synchronize:
 
 constrain:
     /* empty */                    
-  | KEY_CONSTRAIN { labels_.clear(); } labels SEMICOLON 
-    { constrains_[transition_] = labels_; }
+  | KEY_CONSTRAIN { labels_.clear(); checkLabels_ = false; } 
+    labels SEMICOLON { constrains_[transition_] = labels_; }
   ;
 
 
@@ -384,7 +398,8 @@ marking:
 
 final:
     KEY_FINALMARKING { finalMarking_ = new Marking(pnapi_owfn_yynet, true); } 
-    finalmarkings SEMICOLON 
+    finalmarkings SEMICOLON
+    { delete finalMarking_; finalMarking_ = NULL; } 
   | condition 
     {
       pnapi_owfn_yynet.finalCondition() = (*$1);

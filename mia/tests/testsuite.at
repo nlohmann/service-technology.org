@@ -83,3 +83,15 @@ AT_CHECK([MIA PO-pv.owfn PO.owfn --verbose],0,stdout,ignore)
 AT_CHECK([GREP -c "\->" stdout],0,[429
 ],ignore)
 AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind])
+AT_CHECK_LOLA
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/ex1.owfn TESTFILES/ex2.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes MIA_RAW ex1.owfn ex2.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_CLEANUP
+
+
+
+

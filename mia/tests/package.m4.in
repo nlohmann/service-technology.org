@@ -22,3 +22,7 @@ m4_define([SED],                  [@SED@])
 
 m4_define([LOLA_FULL]             [@LOLA_FULL@])
 m4_define([WENDY]                 [@WENDY@])
+
+# Valgrind
+m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
+m4_define([MIA_RAW],              [@abs_top_builddir@/src/mia])

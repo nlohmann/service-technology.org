@@ -20,6 +20,7 @@ libpnapi_a_SOURCES = \
 		state.h state.cc \
 		marking.h marking.cc \
 		myio.h myio.cc io-format.cc \
+		Output.cc Output.h \
 		errorhandling.cc
 
 BUILT_SOURCES = parser-owfn.cc parser-petrify.cc parser-onwd.cc parser-lola.cc \

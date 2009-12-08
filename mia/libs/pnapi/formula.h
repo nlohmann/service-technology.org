@@ -24,8 +24,9 @@ namespace pnapi
   namespace formula {
 
 
-    typedef enum { NONE, ALL_PLACES_EMPTY, ALL_OTHER_PLACES_EMPTY,
-      ALL_OTHER_INTERNAL_PLACES_EMPTY, ALL_OTHER_EXTERNAL_PLACES_EMPTY
+    typedef enum { NONE = 1, ALL_PLACES_EMPTY = 7,
+      ALL_OTHER_PLACES_EMPTY = 5, ALL_OTHER_INTERNAL_PLACES_EMPTY = 3,
+      ALL_OTHER_EXTERNAL_PLACES_EMPTY = 6
     } AllOtherPlaces;
 
 
@@ -48,6 +49,9 @@ namespace pnapi
 
       /// set of concerning places
       virtual std::set<const Place *> places() const;
+      
+      /// unfold wildcard
+      virtual void unfold(const PetriNet &) {};
 
     };
 
@@ -75,6 +79,8 @@ namespace pnapi
       const std::set<const Formula *> & children() const;
 
       std::set<const Place *> places() const;
+      
+      virtual void unfold(const PetriNet &);
 
     protected:
       std::set<const Formula *> children_;
@@ -132,6 +138,8 @@ namespace pnapi
 			  = NULL) const;
 
       std::ostream & output(std::ostream &) const;
+      
+      void unfold(const PetriNet &);
 
     protected:
 

@@ -66,11 +66,13 @@ extern FILE *graph_in;
 extern FILE *im_in;
 extern FILE *mi_in;
 
-// the parsers
+// the parsers and lexers
 extern int graph_parse();
 extern int im_parse();
 extern int mi_parse();
-
+extern int graph_lex_destroy();
+extern int im_lex_destroy();
+extern int mi_lex_destroy();
 
 bool fileExists(std::string filename) {
     FILE *tmp = fopen(filename.c_str(), "r");
@@ -96,8 +98,6 @@ void evaluateParameters(int argc, char** argv) {
         fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
         exit(EXIT_SUCCESS);
     }
-
-    cmdline_parser_init(&args_info);
 
     // initialize the parameters structure
     struct cmdline_parser_params *params = cmdline_parser_params_create();
@@ -148,7 +148,8 @@ void evaluateParameters(int argc, char** argv) {
 
 /// a function collecting calls to organize termination (close files, ...)
 void terminationHandler() {
-    // release memory (used to detect memory leaks)
+    // release memory
+    cmdline_parser_free(&args_info);
     // print statistics
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
@@ -210,6 +211,7 @@ int main(int argc, char** argv) {
     }
     im_parse();
     fclose(im_in);
+    im_lex_destroy();
     status("parsed migration information: %d tuples", stat_tupleCount);
 
     /*-----------------------------.
@@ -221,6 +223,7 @@ int main(int argc, char** argv) {
     }
     mi_parse();
     fclose(mi_in);
+    mi_lex_destroy();
 
     /*---------------------------------.
     | 4. parse most-permissive partner |
@@ -305,6 +308,7 @@ int main(int argc, char** argv) {
     }
     graph_parse();
     pclose(graph_in);
+    graph_lex_destroy();
     time(&end_time);
 
     status("LoLA done [%.0f sec]", difftime(end_time, start_time));
@@ -334,6 +338,11 @@ int main(int argc, char** argv) {
     }
 
     message("%s%d jumper transitions found%s", _c0, jumperCount, _c_);
+
+    // free memory
+    delete mpp_sa;
+    delete target;
+    delete mpp;
 
     return EXIT_SUCCESS;
 }

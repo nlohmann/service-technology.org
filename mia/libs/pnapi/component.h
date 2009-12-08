@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-07-08 01:04:33 +0200 (Mi, 08. Jul 2009) $
+ * \date    $Date: 2009-09-09 23:49:23 +0200 (Mi, 09. Sep 2009) $
  *
- * \version $Revision: 4408 $
+ * \version $Revision: 4694 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -190,6 +190,7 @@ namespace pnapi
 
     /// the set of labels
     const std::set<std::string> & getSynchronizeLabels() const;
+    //std::set<std::string> getSynchronizeLabels() const;
     
     /// set the set of labels
     void setSynchronizeLabels(const std::set<std::string> &);
@@ -330,6 +331,9 @@ namespace pnapi
 
     /// weight
     unsigned int getWeight() const;
+    
+    /// set the weight
+    void setWeight(unsigned int);
 
     /// merges another arc into this one
     void merge(Arc &);

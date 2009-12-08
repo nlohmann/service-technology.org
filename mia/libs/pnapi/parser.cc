@@ -56,21 +56,21 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      string ident; 
       /// generated petrinet
       PetriNet pnapi_owfn_yynet;
       
       /// mapping of names to places
       std::map<std::string, Place*> places_;
       /// recently read transition
-      Transition* transition_;
+      Transition* transition_ = NULL;
+      /// cache of synchronous labels
+      std::set<std::string> synchronousLabels_;
       /// all purpose place pointer
-      Place* place_;
+      Place* place_ = NULL;
       /// target of an arc
-      Node * * target_;
+      Node * * target_ = NULL;
       /// source of an arc
-      Node * * source_;
+      Node * * source_ = NULL;
       /// converts NUMBER and IDENT in string
       std::stringstream nodeName_;
       /// type of recently read places
@@ -86,7 +86,7 @@ namespace pnapi
       /// whether read marking is the initial marking or a final marking
       bool markInitial_;
       /// pointer to a final marking
-      Marking* finalMarking_;
+      Marking* finalMarking_ = NULL;
       /// whether pre- or postset is read
       bool placeSetType_;
       /// precet/postset for fast checks
@@ -110,6 +110,23 @@ namespace pnapi
       {
       }
       
+      /*!
+       * \brief Destructor
+       * \note  Just used to call clean() automaticly
+       */
+      Parser::~Parser()
+      {
+        clean();
+      }
+      
+      /*!
+       * \brief Overwrites read net with empty net to free memory.
+       */
+      void Parser::clean()
+      {
+        pnapi_owfn_yynet = PetriNet();
+      }
+      
       const PetriNet & Parser::parse(istream & is)
       {
         // assign lexer input stream
@@ -123,9 +140,15 @@ namespace pnapi
         // call the parser
         owfn::parse();
         
+        // clean up lexer
+        owfn::lex_destroy();
+        
         // clean up global variables
-        ident.clear();
         places_.clear();
+        transition_ = NULL;
+        synchronousLabels_.clear();
+        place_ = NULL;
+        source_ = target_ = NULL;
         nodeName_.clear();
         labels_.clear();
         constrains_.clear();
@@ -153,28 +176,24 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      string ident; 
       /// generated petrinet
       PetriNet pnapi_lola_yynet;
       
       /// mapping of names to places
       map<std::string, Place*> places_;
       /// recently read transition
-      Transition* transition_;
+      Transition* transition_ = NULL;
       /// all purpose place pointer
-      Place* place_;
+      Place* place_ = NULL;
       /// target of an arc
-      Node * * target_;
+      Node * * target_ = NULL;
       /// source of an arc
-      Node * * source_;
+      Node * * source_ = NULL;
       /// converts NUMBER and IDENT in string
       std::stringstream nodeName_;
       /// read capacity
       int capacity_;
-      /// precet/postset for fast checks
-      set<Place*> placeSet_;
-      /// preset/postset label for parse exception
+      /// whether reading preset or postset places
       bool placeSetType_;
       
       
@@ -183,6 +202,23 @@ namespace pnapi
        */
       Parser::Parser()
       {
+      }
+      
+      /*!
+       * \brief Destructor
+       * \note  Just used to call clean() automaticly
+       */
+      Parser::~Parser()
+      {
+        clean();
+      }
+      
+      /*!
+       * \brief Overwrites read net with empty net to free memory.
+       */
+      void Parser::clean()
+      {
+        pnapi_lola_yynet = PetriNet();
       }
       
       const PetriNet & Parser::parse(istream & is)
@@ -198,11 +234,15 @@ namespace pnapi
         // call the parser
         lola::parse();
         
+        // clean up lexer
+        lola::lex_destroy();
+        
         // clean up global variables
-        ident.clear();
         places_.clear();
+        transition_ = NULL;
+        place_ = NULL;
+        source_ = target_ = NULL;
         nodeName_.clear();
-        placeSet_.clear();
 
         return pnapi_lola_yynet;
       }
@@ -459,6 +499,7 @@ namespace pnapi
       std::vector<std::string> identlist;
       std::set<std::string> input_;
       std::set<std::string> output_;
+      std::set<std::string> synchronous_;
 
       State *state_;
       bool final_;
@@ -466,6 +507,7 @@ namespace pnapi
       std::vector<unsigned int> succState_;
       std::vector<std::string> succLabel_;
       std::vector<Automaton::Type> succType_;
+      std::map<Transition *, std::set<std::string> > synchlabel;
 
       State *edgeState_;
       std::string edgeLabel_;
@@ -492,7 +534,13 @@ namespace pnapi
 
         sa2sm = false;
         sa::parse();
+        
+        // clean up lexer
+        sa::lex_destroy();
 
+        // copy synchronous interface
+        pnapi_sa_yyautomaton.setSynchronousLabels(synchronous_);
+        
         // clean up global variables
         states_.clear();
 
@@ -502,9 +550,7 @@ namespace pnapi
       const PetriNet & Parser::parseSA2SM(std::istream &is)
       {
         Condition final;
-        Condition empty;
         final = false;
-        empty = true;
 
         stream = &is;
 
@@ -514,27 +560,83 @@ namespace pnapi
 
         sa2sm = true;
         sa::parse();
+        
+        // clean up lexer
+        sa::lex_destroy();
 
-        std::set<Place *> places = pnapi_sa_yynet.getPlaces();
         for (int i = 0; i < (int) finalPlaces_.size(); i++)
         {
           final = final.formula() || *finalPlaces_[i] == 1;
-          places.erase(finalPlaces_[i]);
         }
-        for (std::set<Place *>::iterator p = places.begin(); p != places.end(); p++)
-          empty = empty.formula() && **p == 0;
 
-        pnapi_sa_yynet.finalCondition() = final.formula() && empty.formula();
-
+        pnapi_sa_yynet.finalCondition() = final.formula() && formula::ALL_OTHER_PLACES_EMPTY;
+        pnapi_sa_yynet.setSynchronousLabels(synchronous_);
+        
         // clean up global variables
         label2places_.clear();
         places_.clear();
         finalPlaces_.clear();
+        synchlabel.clear();
 
         return pnapi_sa_yynet;
       }
 
     } /* namespace sa */
+    
+    namespace petrify
+    {
+      std::set<string> transitions_;
+      std::set<string> places_;
+      std::map<string, unsigned int> initialMarked_;
+      std::set<string> interface_;
+      std::map<string, set<string> > arcs_;
+      std::set<string> tempNodeSet_;
+      bool in_marking_list = false;
+      bool in_arc_list = false;
+      
+      /*!
+       * \brief Constructor
+       */
+      Parser::Parser()
+      {
+      }
+      
+      /*!
+       * \brief Destructor
+       * \note  Just used to call clean() automaticly
+       */
+      Parser::~Parser()
+      {
+        clean();
+      }
+      
+      void Parser::parse(istream & is)
+      {
+        // assign lexer input stream
+        stream = &is;
+
+        // reset line counter
+        line = 1;
+        
+        // call the parser
+        petrify::parse();
+        
+        // clean up lexer
+        petrify::lex_destroy();
+      }
+      
+      void Parser::clean()
+      {
+        transitions_.clear();
+        places_.clear();
+        initialMarked_.clear();
+        interface_.clear();
+        arcs_.clear();
+        in_marking_list = false;
+        in_arc_list = false;
+        tempNodeSet_.clear();
+      }
+    } /* namespace petrify */
 
   } /* namespace parser */
 

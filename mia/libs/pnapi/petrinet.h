@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: gierds $
+ *          last changes of: $Author: niels $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-08-05 10:20:55 +0200 (Mi, 05. Aug 2009) $
+ * \date    $Date: 2009-09-24 07:57:24 +0200 (Do, 24. Sep 2009) $
  *
- * \version $Revision: 4517 $
+ * \version $Revision: 4757 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -26,6 +26,11 @@
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
+#include "config.h"
+
+#ifndef CONFIG_PETRIFY
+#define CONFIG_PETRIFY "not found"
+#endif
 
 namespace pnapi
 {
@@ -154,7 +159,9 @@ namespace pnapi
 
     /// Petri net output, see pnapi::io
     friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
-
+    
+    /// path to Petrify, can be set with setPetrify() externally
+    std::string pathToPetrify;
 
   public:
 
@@ -207,7 +214,7 @@ namespace pnapi
     PetriNet();
 
     /// constructor Automaton => Petri net
-    PetriNet(const Automaton &);
+    PetriNet(const Automaton &, std::string petrify = std::string(CONFIG_PETRIFY));
 
     /// destructor
     virtual ~PetriNet();
@@ -222,7 +229,10 @@ namespace pnapi
     Condition & finalCondition();
     const Condition & finalCondition() const;
 
-
+    /// setting path to Petrify
+    inline void setPetrify(std::string petrify = CONFIG_PETRIFY)
+                            { pathToPetrify = petrify; }  
+    
     /*!
      * \name   Querying Structural Properties
      *
@@ -257,6 +267,8 @@ namespace pnapi
     std::set<Place *> getInterfacePlaces(const std::string &) const;
 
     const std::set<Transition *> & getTransitions() const;
+
+    const std::set<Arc *> & getArcs() const;
 
     const std::set<Transition *> & getSynchronizedTransitions() const;
     
@@ -310,7 +322,7 @@ namespace pnapi
 		 const std::string & = "net2");
 
     /// compose the given nets into a new one
-    static PetriNet compose(const std::map<std::string, PetriNet *> &);
+    static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
     /// normalizes the Petri net
     const std::map<Transition *, std::string> normalize();
@@ -324,7 +336,10 @@ namespace pnapi
     /// product with Constraint oWFN
     void produce(const PetriNet &, const std::string & = "net",
 		 const std::string & = "constraint") throw (io::InputError);
-
+    
+    /// adds a given prefix to all nodes
+    PetriNet & prefixNodeNames(const std::string &, bool = false);
+    
     /// swaps input and output places
     void mirror();
     
@@ -438,9 +453,6 @@ namespace pnapi
     /// returns a name for a node to be added
     std::string getUniqueNodeName(const std::string &) const;
 
-    /// adds a given prefix to all nodes
-    PetriNet & prefixNodeNames(const std::string &);
-
     /// returns the meta information if available
     std::string getMetaInformation(std::ios_base &, io::MetaInformation,
 				   const std::string & = "") const;
@@ -453,7 +465,7 @@ namespace pnapi
 
     /// crates a petri net from an STG file
     void createFromSTG(std::vector<std::string> &, const std::string &,
-		       std::set<std::string> &, std::set<std::string> &);
+		       std::set<std::string> &, std::set<std::string> &, std::set<std::string> &);
 
     /// helper function for STG2oWFN
     std::string remap(std::string edge, std::vector<std::string> & edgeLabels);

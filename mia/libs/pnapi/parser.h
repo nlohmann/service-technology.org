@@ -188,7 +188,10 @@ namespace pnapi
 
       /// flex generated lexer function
       int lex();
-
+      
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+      
       /// bison generated parser function
       int parse();
 
@@ -199,8 +202,6 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      extern std::string ident; 
       /// generated petrinet
       extern PetriNet pnapi_owfn_yynet;
       
@@ -208,6 +209,8 @@ namespace pnapi
       extern std::map<std::string, Place*> places_;
       /// recently read transition
       extern Transition* transition_;
+      /// cache of synchronous labels
+      extern std::set<std::string> synchronousLabels_;
       /// all purpose place pointer
       extern Place* place_;
       /// target of an arc
@@ -246,6 +249,11 @@ namespace pnapi
       {
       public:
 	      Parser();
+	      /// used to call clean() automaticly
+	      ~Parser();
+	      
+	      /// cleans global net
+	      void clean();
 	      
 	      /// parses stream contents with the associated parser
         const PetriNet & parse(std::istream &);
@@ -269,6 +277,9 @@ namespace pnapi
       /// flex generated lexer function
       int lex();
 
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+
       /// bison generated parser function
       int parse();
 
@@ -279,8 +290,6 @@ namespace pnapi
        *  "global" variables for flex and bison *
       \******************************************/
       
-      /// parsed ident
-      extern std::string ident; 
       /// generated petrinet
       extern PetriNet pnapi_lola_yynet;
       
@@ -298,9 +307,7 @@ namespace pnapi
       extern std::stringstream nodeName_;
       /// read capacity
       extern int capacity_;
-      /// precet/postset for fast checks
-      extern std::set<Place*> placeSet_;
-      /// preset/postset label for parse exception
+      /// whether reading preset or postset places
       extern bool placeSetType_;
       
       
@@ -313,6 +320,11 @@ namespace pnapi
       {
       public:
         Parser();
+        /// used to call clean() automaticly
+        ~Parser();
+        
+        /// cleans global net
+        void clean();
         
         /// parses stream contents with the associated parser
         const PetriNet & parse(std::istream &);
@@ -464,6 +476,9 @@ namespace pnapi
       // flex lexer
       int lex();
 
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+
       // bison parser
       int parse();
 
@@ -475,6 +490,7 @@ namespace pnapi
       extern std::vector<std::string> identlist;
       extern std::set<std::string> input_;
       extern std::set<std::string> output_;
+      extern std::set<std::string> synchronous_;
 
       extern State *state_;
       extern bool final_;
@@ -482,6 +498,7 @@ namespace pnapi
       extern std::vector<unsigned int> succState_;
       extern std::vector<std::string> succLabel_;
       extern std::vector<Automaton::Type> succType_;
+      extern std::map<Transition *, std::set<std::string> > synchlabel;
 
       extern State *edgeState_;
       extern std::string edgeLabel_;
@@ -509,8 +526,51 @@ namespace pnapi
 
     } /* namespace sa */
 
+    
+    /*************************************************************************
+     ***** Petrify Parser
+     *************************************************************************/
 
+    namespace petrify
+    {
+      // flex lexer
+      int lex();
 
+      /// flex generated lexer cleanup function
+      int lex_destroy();
+
+      // bison parser
+      int parse();
+    
+      extern std::set<std::string> transitions_;
+      extern std::set<std::string> places_;
+      extern std::map<std::string, unsigned int> initialMarked_;
+      extern std::set<std::string> interface_;
+      extern std::map<std::string, std::set<std::string> > arcs_;
+      extern std::set<std::string> tempNodeSet_;
+      extern bool in_marking_list;
+      extern bool in_arc_list;
+      
+      /*!
+       * \brief   Encapsulation of the flex/bison petrify parser
+       *
+       * Connects to the flex/bison implementation for parsing.
+       */
+      class Parser
+      {
+      public:
+        Parser();
+        /// used to call clean() automaticly
+        ~Parser();
+        
+        /// parses stream contents with the associated parser
+        void parse(std::istream &);
+        /// cleans global variables
+        void clean();
+      };
+    } /* namespace petrify */
+
+    
     /*************************************************************************
      ***** Template Implementation
      *************************************************************************/

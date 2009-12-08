@@ -11,6 +11,5 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: graphviz
 Description: a tool to calculate migration information
- Mia is a tool to calculate migration information for runtime
- substitutability.
+  Mia is a tool to calculate migration information.
 

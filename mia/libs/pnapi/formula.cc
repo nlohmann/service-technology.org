@@ -119,19 +119,38 @@ namespace pnapi
     Conjunction::Conjunction(const Formula & l, const Formula & r) :
       Operator(l, r)
     {
+      // taking ALL[_OTHER][_EXTERNAL|_INTERNAL]_PLACES to the new Conjunction
+      AllOtherPlaces v1, v2;
+      const Formula *fl = &l;
+      const Conjunction *cl = dynamic_cast<const Conjunction *>(fl);
+      if (cl != NULL)
+        v1 = cl->flag_;
+      else
+        v1 = NONE;
+      const Formula *fr = &r;
+      const Conjunction *cr = dynamic_cast<const Conjunction *>(fr);
+      if (cr != NULL)
+        v2 = cr->flag_;
+      else
+        v2 = NONE;
+
+      if (v1/v2==2 || v2/v1==2)
+        flag_ = ALL_OTHER_PLACES_EMPTY;
+      else
+        if (v1 > v2)
+          flag_ = v1;
+        else
+          flag_ = v2;
+
+
       simplifyChildren();
     }
 
     Conjunction::Conjunction(const Formula & f, const set<const Place *> & wc) :
       Operator(f)
     {
-      set<const Place *> cps = places();
-
-      for (set<const Place *>::const_iterator it = wc.begin(); it != wc.end();
-	   ++it)
-	if (cps.find(*it) == cps.end())
-	  children_.insert(new FormulaEqual(**it, 0));
-
+      std::cerr << "This method is no longer necessary!" << std::endl;
+      assert(false);
       simplifyChildren();
     }
 
@@ -565,6 +584,49 @@ namespace pnapi
             delete o;
           }
         }
+    }
+    
+    /**************************************************************************
+     ***** unfolding implementation
+     **************************************************************************/
+    
+    void Operator::unfold(const PetriNet & net)
+    {
+      for(set<const Formula*>::iterator it = children_.begin();
+           it != children_.end(); ++it)
+      {
+        const_cast<Formula*>(*it)->unfold(net);
+      }
+    }
+    
+    /*!
+     * \brief unfolds the wildcard ALL_OTHER_EXTERNAL_PLACES_EMPTY
+     *        (needed by compose).
+     */
+    void Conjunction::unfold(const PetriNet & net)
+    {
+      Operator::unfold(net);
+      
+      // actual unfolding
+      if(flag_ == ALL_OTHER_EXTERNAL_PLACES_EMPTY)
+      {
+        set<const Place*> covered = places();
+        set<const Place*> toCover;
+        for(set<Place*>::iterator p = net.getInterfacePlaces().begin();
+             p != net.getInterfacePlaces().end(); ++p)
+        {
+          toCover.insert(*p);
+        }
+        toCover = util::setDifference(toCover, covered);
+        
+        for(set<const Place*>::iterator p = toCover.begin();
+             p != toCover.end(); ++p)
+        {
+          const Formula * f = new FormulaEqual(**p, 0);
+          children_.insert(f);
+        }
+        flag_ = NONE;
+      }
     }
 
   } /* namespace formula */

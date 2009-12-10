@@ -188,6 +188,7 @@ void testTRUE(){
 
 
 	delete f;
+	delete f1;
 	delete g1;
 	delete g;
 	delete f_clone;
@@ -1104,7 +1105,7 @@ void testOR(){
 	h_clone = h->getCopy();
 	assert(h_clone->toString() == h->toString());
 
-	assert (f->isSatisfiable() == true);
+	assert (h->isSatisfiable() == true);
 	clauses = h->calculateCNF();
 	assert(clauses.size() == 6);
 
@@ -1213,6 +1214,7 @@ void testAND_OR_NOT(){
 	delete d1;
 	delete d;
 	delete d_clone;
+	delete d1_clone;
 
 	/**************
 	 * ~(~(I*R))

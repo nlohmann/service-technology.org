@@ -114,7 +114,7 @@ void Graph::makeComplete() {
 		Formula *g = nodes[*n]->formula->getCopy();
 		Formula *f = new FormulaNOT(g);
 
-		if(f->isSatisfiable() == true){ 	//TODO: das ist nur eine AbschŠtzung nach oben
+		if(f->isSatisfiable() == true){
 			Node *q = new Node(f);
 			addedNodes[q->id] = q;
 			addedInitialNodes.push_back(q->id);
@@ -166,7 +166,7 @@ void Graph::makeComplete() {
 				f = h;
 				assert(f);
 
-				if(f->isSatisfiable() == true){ //TODO: das ist nur eine AbschŠtzung nach oben
+				if(f->isSatisfiable() == true){
 					//generate new node q with the formula f and add edge with label i to it
 					Node *q = new Node(f);
 					addedNodes[q->id] = q;

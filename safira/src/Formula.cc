@@ -406,7 +406,7 @@ list<Clause> FormulaAND::toCNF(int id, int& maxId) const {
 			clausesRight = right->toCNF(id, maxId);
 			assert(clausesRight.size() == 2);
 			assert(clausesRight.begin()->literal0 == -1 * id);
-			assert(clausesLeft.begin()->literal1 != emptyLiteral());
+			assert(clausesRight.begin()->literal1 != emptyLiteral());
 			assert(clausesRight.begin()->literal2 == emptyLiteral());
 		}
 
@@ -549,7 +549,7 @@ list<Clause> FormulaOR::toCNF(int id, int& maxId) const {
     		clausesRight = right->toCNF(id, maxId);
     		assert(clausesRight.size() == 2);
     		assert(clausesRight.begin()->literal0 == -1 * id);
-    		assert(clausesLeft.begin()->literal1 != emptyLiteral());
+    		assert(clausesRight.begin()->literal1 != emptyLiteral());
     		assert(clausesRight.begin()->literal2 == emptyLiteral());
     	}
 

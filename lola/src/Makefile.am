@@ -72,7 +72,7 @@ $(CONFIGS): $@
 	$(AM_V_at)cp $(srcdir)/configs/userconfig.H.$(patsubst lola-%,%,$@) $(srcdir)/userconfig.H
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am
 	$(AM_V_GEN)mv $(builddir)/lola$(EXEEXT) $(builddir)/$@$(EXEEXT)
-	$(AM_V_at)cp /tmp/userconfig.H~ $(srcdir)/userconfig.H
+	$(AM_V_at)mv /tmp/userconfig.H~ $(srcdir)/userconfig.H
 
 MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
 DISTCLEANFILES = $(CONFIGS)$(EXEEXT)

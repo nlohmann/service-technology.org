@@ -113,6 +113,7 @@ int main(int argc, char **argv) {
 			case (output_arg_png):
 			case (output_arg_eps):
 			case (output_arg_pdf): {
+				printToStdout = false;
 				if (CONFIG_DOT == "not found") {
 					cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
 					cerr << "       necessary for option '--output'" << endl;
@@ -122,17 +123,30 @@ int main(int argc, char **argv) {
 				string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_complement." + args_info.output_orig[j];
 				FILE *s = popen(call.c_str(), "w");
 				assert(s);
-				//fprintf(s, "%s\n", d.str().c_str());
+
+				//printf("%s\n", call.c_str());
 				string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
 				g->toDot(s, title);
 				assert(!ferror(s));
 
 				pclose(s);
+				break;
 			}
+			case (output_arg_dot): {
+				printToStdout = false;
+				FILE *s = fopen((filename+"_complement.dot").c_str(), "w");
+				string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
+				g->toDot(s, title);
+				assert(!ferror(s));
+				pclose(s);
+				break;
+			}
+
 			case (output_arg_eaa): {
 				printToStdout = false;
 				Output o(filename+"_complement.eaa", "complement OG");
 				g->print(o);
+				break;
 			}
 		}
 	}

@@ -1,11 +1,9 @@
 INSTALLATION
 ------------
 
-1. copy the AppleScript "Export to open net.scpt" to ~/Library/Scripts/Applications/OmniGraffle Pro
+1. run install.sh script
 
-2. copy the Stencils to ~/Library/Application Support/OmniGraffle/Stencils
-
-3. start the AppleScript Editor and tick "Show Script menu in menu bar" in the Preferences
+2. start the AppleScript Editor and tick "Show Script menu in menu bar" in the Preferences
 
 
 USAGE

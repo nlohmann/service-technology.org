@@ -1,17 +1,26 @@
-%token NAME COMMA COLON SEMICOLON
+%token NAME COMMA COLON SEMICOLON KEY_PLACE KEY_MARKING KEY_TRANSITIONS
+%token LBRACK RBRACK KEY_CONSUME KEY_PRODUCE
 
 %defines
 %name-prefix="llowfn_"
 
 %{
+#include <cstdlib>
+#include <cstdio>
 #include <string>
 #include <map>
+#include <vector>
 #include "types.h"
 
 extern int llowfn_lex();
 extern int llowfn_error(const char *);
 
+extern FILE* llowfn_out;
 extern std::map<std::string, pType> placeTypes;
+
+std::vector<std::string> internalPlaces;
+std::vector<std::string> inputPlaces;
+std::vector<std::string> outputPlaces; 
 %}
 
 %union {
@@ -22,9 +31,40 @@ extern std::map<std::string, pType> placeTypes;
 
 %%
 
+
 placelist:
-  places SEMICOLON placelist
-| places SEMICOLON
+  places SEMICOLON
+  {
+    /* Write interface */
+    int i;
+
+    //Internal places
+    if(internalPlaces.empty() == false){
+	fprintf(llowfn_out, "%s\n", "INTERNAL");
+    	for(i=0;i<internalPlaces.size()-1;++i){
+		fprintf(llowfn_out, "\t%s,\n", internalPlaces[i].c_str()); 
+    	}	    
+    	fprintf(llowfn_out, "\t%s\n;\n", internalPlaces[i].c_str());
+    }
+    //Input places
+
+    if(inputPlaces.empty() == false){
+    	    fprintf(llowfn_out, "%s\n", "INPUT");
+	    for(i=0;i<inputPlaces.size()-1;++i){
+		fprintf(llowfn_out, "\t%s,\n", inputPlaces[i].c_str());
+            } 
+    		fprintf(llowfn_out, "\t%s\n;\n", inputPlaces[i].c_str());
+    }
+    //Output places
+
+    if(outputPlaces.empty() == false){
+    	fprintf(llowfn_out, "%s\n", "OUTPUT");
+        for(i=0;i<outputPlaces.size()-1;++i){
+      		fprintf(llowfn_out, "\t%s,\n", outputPlaces[i].c_str()); 
+    	}    
+        	fprintf(llowfn_out, "\t%s\n;\n", outputPlaces[i].c_str());
+    }
+  }
 ;
 
 places:
@@ -34,5 +74,20 @@ places:
 
 place:
   NAME
-| NAME COLON NAME
+  {
+    std::string id = std::string($1);
+    int pos = id.rfind(".");
+    id = id.substr(0, id.length() - (id.length() - pos));
+    switch ( placeTypes[id] ) {
+	 case INTERNAL:
+                 internalPlaces.push_back($1);	
+		 break;
+         case INPUT:
+                 inputPlaces.push_back($1);
+	         break;
+	 case OUTPUT:	
+		  outputPlaces.push_back($1);			  
+    }
+  }			
 ;
+

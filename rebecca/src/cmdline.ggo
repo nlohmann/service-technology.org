@@ -1,10 +1,8 @@
-package "Rebecca"
-version "1.0-unreleased"
-purpose "Rebecca -- choreography realization"
-usage ""
-description "Usage: "
-
 args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+
+description "About Rebecca:"
+purpose "Rebecca is a tool to realize service choreographies.\n\n  Report bugs to rebecca@service-technology.org.\n  Visit Rebecca's home page at http://service-technology.org/rebecca"
+
 
 section "Input/Output"
 
@@ -14,16 +12,13 @@ option "prefix" p
   typestr="PREFIX"
   optional
   
-option "Chor" C
-  "Writes the input choreography to stdout after the resolutiion of dependencies."
-  flag off
-  
 option "chor" c
-  "Writes the input choreography to a file after the resolution of dependencies."
+  "Output of the choreography after the resolutiion of dependencies."
   string
-  typestr="FILE"
+  typestr="FILENAME"
+  argoptional
   optional
-  
+
 option "quiet" q
   "If selected, no automaton file will be written to file system."
   flag off
@@ -33,5 +28,26 @@ section "Debug"
 option "verbose" v
   "Verbose output"
   flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Rebecca should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/rebecca-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Rebecca is kept after Rebecca terminates.\n"
+  flag off
+  hidden
 
 text "\nReport bugs to rebecca@service-technology.org\nRebecca's home page: http://service-technology.org/rebecca"

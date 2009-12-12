@@ -1,8 +1,20 @@
-AC_INIT(Rebecca, 1.0-unreleased, rebecca@service-technology.org)
+AC_INIT([Rebecca], 1.0-unreleased, rebecca@service-technology.org, rebecca, http://service-technology.org/rebecca)
+
+AC_MSG_NOTICE([ ____      _                        ])
+AC_MSG_NOTICE([|  _ \ ___| |__   ___  ___ ___ __ _ ])
+AC_MSG_NOTICE([| |_) / _ \ '_ \ / _ \/ __/ __/ _` |])
+AC_MSG_NOTICE([|  _ <  __/ |_) |  __/ (_| (_| (_| |])
+AC_MSG_NOTICE([|_| \_\___|_.__/ \___|\___\___\__,_|])
+AC_MSG_NOTICE([realizing service choreographies])
+AC_MSG_NOTICE([http://service-technology.org/rebecca])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE #(gnits)
+AM_INIT_AUTOMAKE(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # check for programs needed to compile
 AC_PROG_CXX

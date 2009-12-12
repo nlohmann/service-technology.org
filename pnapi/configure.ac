@@ -1,9 +1,18 @@
-AC_INIT(Petri Net API, 3.01-unreleased, pnapi@service-technology.org, pnapi)
+AC_INIT([Petri Net API], 3.01-unreleased, pnapi@service-technology.org, pnapi, http://service-technology.org/pnapi)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
 
-AC_PREREQ(2.59)
+AC_MSG_NOTICE([ ____      _        _            _        _    ____ ___ ])
+AC_MSG_NOTICE([|  _ \ ___| |_ _ __(_)_ __   ___| |_     / \  |  _ \_ _|])
+AC_MSG_NOTICE([| |_) / _ \ __| '__| | '_ \ / _ \ __|   / _ \ | |_) | | ])
+AC_MSG_NOTICE([|  __/  __/ |_| |  | | | | |  __/ |_   / ___ \|  __/| | ])
+AC_MSG_NOTICE([|_|   \___|\__|_|  |_|_| |_|\___|\__| /_/   \_\_|  |___|])
+AC_MSG_NOTICE([encapsulating Petri net-related functions in a C++ API])
+AC_MSG_NOTICE([http://service-technology.org/pnapi])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
 AM_INIT_AUTOMAKE #(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
@@ -16,6 +25,8 @@ AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_GREP
 AM_PROG_CC_C_O
+AC_PROG_LEX
+AC_PROG_YACC
 
 # check if we can handle dynamic libs
 AC_DISABLE_SHARED
@@ -36,21 +47,6 @@ AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
-
-#############################################################################
-# search for Flex and Bison
-#############################################################################
-AC_PROG_LEX
-if test "$LEX" != "flex"; then
-  AC_MSG_WARN([Flex was not found. You will not be able to compile from scratch. See file README.])
-  AM_MISSING_PROG(LEX, flex)
-fi
-
-AC_PROG_YACC
-if test "$YACC" = "yacc"; then
-  AC_MSG_WARN([Bison was not found. You will not be able to compile from scratch. See file README.])
-  AM_MISSING_PROG(YACC, bison)
-fi
 
 
 #############################################################################
@@ -108,8 +104,13 @@ AC_SUBST(SVN)
 AC_PATH_PROGS(MAKE, [gmake make], not found)
 AC_SUBST(MAKE)
 
-# organize assertions -- switch off by "--disable-assert"
+# allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
 
 
 #############################################################################

@@ -43,7 +43,7 @@ AC_PATH_PROG(WENDY, [wendy], [])
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
-AC_CHECK_FUNCS([mkstemp vfprintf],,AC_MSG_WARN([cannot use required functions]))
+AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
 
 # check for optional tools needed by "make check"
 AC_PATH_PROG(VALGRIND, [valgrind], not found)

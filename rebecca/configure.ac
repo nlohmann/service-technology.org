@@ -45,7 +45,7 @@ AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 # check for functions
-AC_CHECK_FUNCS([mkstemp vfprintf],,AC_MSG_WARN([cannot use required functions]))
+AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
 
 # write files
 AC_CONFIG_FILES([

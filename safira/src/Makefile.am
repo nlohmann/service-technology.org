@@ -6,15 +6,29 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
                  Formula.h Formula.cc \
                  Graph.h Graph.cc \
                  helpers.h helpers.cc \
-                 testFormula.h testFormula.cc \
-                 testGraph.h testGraph.cc \
-                 testNode.h testNode.cc \
                  types.h \
                  cmdline.c cmdline.h \
                  verbose.h verbose.cc \
                  Output.h Output.cc
 
 safira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
+
+
+check_PROGRAMS = testsafira
+
+testsafira_SOURCES = testmain.cc config.h \
+                 Node.h Node.cc \
+                 Formula.h Formula.cc \
+                 Graph.h Graph.cc \
+                 helpers.h helpers.cc \
+                 testFormula.h testFormula.cc \
+                 testGraph.h testGraph.cc \
+                 testNode.h testNode.cc \
+                 types.h 
+
+
+safira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
+testsafira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
 
 
 #############################################################################

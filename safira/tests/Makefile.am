@@ -61,7 +61,7 @@ EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lco
 
 # compile the code for code coverage
 cover-prepare:
-	$(MAKE) --directory=$(top_srcdir) clean all \
+	$(MAKE) --directory=$(top_srcdir) clean all check \
 	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  LDFLAGS+="-lgcov"

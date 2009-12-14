@@ -6,6 +6,13 @@ AT_INIT
 AT_BANNER([Standard Options])
 ############################################################################
 
+AT_SETUP([unit test])
+AT_CHECK([cp TESTFILES/EMPTY  .])
+AT_CHECK([TESTSAFIRA],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+AT_KEYWORDS(unitTest)
+AT_CLEANUP
+
 AT_SETUP([complement minispec.og])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/minispec_complement_ref.eaa TESTFILES/minispec.og .])
 AT_CHECK([SAFIRA minispec.og],0,stdout,stderr)

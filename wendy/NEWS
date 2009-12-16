@@ -17,6 +17,10 @@ Version 2.7-unreleased
 * `--reportFrequency' sets the number of edges to be reported (was: number
   of knowledges)
 
+* fixed bug #14922 (see `https://gna.org/bugs/?14922'): Wendy could not
+  process markings with Unicode place names which yielded a crash when
+  using `--mi'
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

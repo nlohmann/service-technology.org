@@ -522,7 +522,14 @@ AT_CHECK([GREP -q "wendy: 5 knowledges reachable" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
-
+AT_SETUP([Bug 14922 (https://gna.org/bugs/?14922)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14922.owfn .])
+AT_CHECK([WENDY bug14922.owfn --verbose --mi --waitstatesOnly --quitAsSoonAsPossible],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: writing marking information to file" stderr])
+AT_CHECK([test -f bug14922.mi])
+AT_KEYWORDS(bug)
+AT_CLEANUP
 
 
 ############################################################################

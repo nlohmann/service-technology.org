@@ -3,6 +3,8 @@
 @item configure Wendy with @option{--enable-syslog} to additionally write verbose output to the syslog (e.g. @file{/var/log/system.log})
 
 @item @option{--reportFrequency} sets the number of edges to be reported (was: number of knowledges)
+
+@item fixed bug #14922 (see @url{https://gna.org/bugs/?14922}): Wendy could not process markings with Unicode place names which yielded a crash when using @option{--mi}
 @end itemize
 
 

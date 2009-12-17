@@ -136,6 +136,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) : storage(NULL
 
     // reserve memory and copy values
     storage = new uint8_t[bytes];
+
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = other.storage[i];
     }

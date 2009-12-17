@@ -104,7 +104,7 @@ class InnerMarking {
         /// destructor
         ~InnerMarking();
 
-        /// whether this marking is a waitstate resolveable by the given label
+        /// whether this marking is a waitstate resolvable by the given label
         bool waitstate(const Label_ID&) const;
 
         /// checks if all input messages will be consumed later on

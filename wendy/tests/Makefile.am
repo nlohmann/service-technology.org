@@ -37,8 +37,9 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             smtp3.fiona.og smtp3.owfn sync_cover.owfn sync_cover.owfn.cov \
             sync_deadlock.owfn test-sync.owfn uncontrollable.owfn \
             zeus.fiona.og zeus.owfn bignode1500000.owfn \
-            bug14693.owfn bug14719.owfn bug14922.owfn \
-            CB.owfn CR.owfn TPO.owfn bug14782.owfn bug14798.owfn
+            bug14693.owfn bug14719.owfn \
+			CB.owfn CR.owfn TPO.owfn bug14782.owfn bug14798.owfn \
+			phils_3_2.owfn RS.owfn
 
 
 

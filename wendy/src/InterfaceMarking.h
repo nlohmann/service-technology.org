@@ -54,6 +54,7 @@
 */
 class InterfaceMarking {
     friend class Diagnosis;
+    friend class LivelockOperatingGuideline;
 
     public: /* static functions */
         /// initializes the class InterfaceMarking

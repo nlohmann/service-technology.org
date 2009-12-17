@@ -1,4 +1,4 @@
-@heading Version 2.7-unreleased
+@heading Version 2.7 (17 December 2009)
 @itemize
 @item configure Wendy with @option{--enable-syslog} to additionally write verbose output to the syslog (e.g. @file{/var/log/system.log})
 

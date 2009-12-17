@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 2.7-unreleased
-======================
+Version 2.7 (17 December 2009)
+==============================
 
 * configure Wendy with `--enable-syslog' to additionally write verbose
   output to the syslog (e.g. `/var/log/system.log')

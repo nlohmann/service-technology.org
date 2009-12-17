@@ -522,7 +522,14 @@ AT_CHECK([GREP -q "wendy: 5 knowledges reachable" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
 
-
+AT_SETUP([Bug 14922 (https://gna.org/bugs/?14922)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug14922.owfn .])
+AT_CHECK([WENDY bug14922.owfn --verbose --mi --waitstatesOnly --quitAsSoonAsPossible],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: writing marking information to file" stderr])
+AT_CHECK([test -f bug14922.mi])
+AT_KEYWORDS(bug)
+AT_CLEANUP
 
 
 ############################################################################
@@ -1096,45 +1103,6 @@ AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP
 
-############################################################################
-AT_BANNER([Livelock Operating Guideline])
-############################################################################
-
-AT_SETUP([ZEUS Seller Service])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/zeus.owfn .])
-AT_CHECK([WENDY zeus.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 8" stderr])
-AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 10" stderr])
-AT_KEYWORDS(livelock-freedom og)
-AT_CLEANUP
-
-AT_SETUP([ZEUS Seller Service (dot output)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/zeus.owfn .])
-AT_CHECK([WENDY zeus.owfn --verbose --og --dot --correctness=livelock],0,ignore,stderr)
-AT_CHECK([GREP -c "<tr><td" zeus.dot],0,[9
-],ignore)
-AT_KEYWORDS(livelock-freedom og)
-AT_CLEANUP
-
-AT_SETUP([3 Dining Philosophers])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/phils_3_2.owfn .])
-AT_CHECK([WENDY phils_3_2.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 2239" stderr])
-AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2239" stderr])
-AT_KEYWORDS(livelock-freedom og)
-AT_CLEANUP
-
-AT_SETUP([RS])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/RS.owfn .])
-AT_CHECK([WENDY RS.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 369" stderr])
-AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 571" stderr])
-AT_KEYWORDS(livelock-freedom og)
-AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Diagnosis of uncontrollable services])

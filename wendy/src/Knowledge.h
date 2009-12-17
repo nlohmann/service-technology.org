@@ -35,7 +35,7 @@ typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
 
  This class is used to build knowledges. Its main focus is runtime
  optimization. A later translation into StoredKnowledge objects removes any
- unnecessary information, yielding a compact representation.
+ unneccessary information, yielding a compact representation.
 */
 class Knowledge {
     friend class StoredKnowledge;
@@ -60,13 +60,13 @@ class Knowledge {
         /// calculate those receiving events that are essential to resolve each and every waitstate
         void sequentializeReceivingEvents();
 
-        /// reduction rule: sequentialize receiving
+        /// reduction rule: seguentialize receiving
         bool considerReceivingEvent(const Label_ID&) const;
 
         /// reduction rule: smart sending event
         bool considerSendingEvent(const Label_ID&) const;
 
-        /// initialize member attributes
+        /// initialze member attributes
         inline void initialize();
 
         /// calculate the closure of this knowledge
@@ -89,7 +89,7 @@ class Knowledge {
         /// primary data structure
         Bubble bubble;
 
-        /// a queue of markings to be processed by closure()
+        /// a queue of markings to be processed by closuse()
         Queue todo;
 
         /// reduction rule: smart send events; pointer to possible sending events data structure

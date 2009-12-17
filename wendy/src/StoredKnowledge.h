@@ -36,11 +36,6 @@ class StoredKnowledge {
     /// the Diagnosis needs to traverse the hash tree
     friend class Diagnosis;
 
-    /// calculation of a livelock operating guideline needs access to successors
-    friend class LivelockOperatingGuideline;
-    friend class CompositeMarking;
-    friend class CompositeMarkingsHandler;
-
     public: /* static functions */
         /// destroy all objects of this class
         static void finalize();
@@ -99,7 +94,6 @@ class StoredKnowledge {
         static std::set<StoredKnowledge*> seen;
 
     private: /* static attributes */
-
         /// maps dfs (first) and lowlink (second) number to a stored knowledge which is still on the Tarjan stack
         static std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > tarjanMapping;
 

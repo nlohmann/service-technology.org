@@ -16,10 +16,7 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 Diagnosis.h Diagnosis.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
-                Output.cc Output.h \
-                CompositeMarking.cc CompositeMarking.h \
-                AnnotationLivelockOG.cc AnnotationLivelockOG.h \
-                LivelockOperatingGuideline.cc LivelockOperatingGuideline.h
+                Output.cc Output.h
 
 # the configuration files
 sysconf_DATA = wendy.conf

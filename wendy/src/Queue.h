@@ -55,10 +55,10 @@ class Queue {
         /// constructor
         Queue();
 
-        /// destructor
+        /// denstructor
         ~Queue();
 
-        /// adds an element to the end of the queue
+        /// adds en element to the end of the queue
         void push(InnerMarking_ID, InterfaceMarking*);
 
         /// removes an element from the top of the queue and returns pointer to it

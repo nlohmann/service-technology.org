@@ -5,7 +5,6 @@
                      |_| \_\___|_.__/ \___|\___\___\__,_|
                      http://service-technology.org/rebecca
 
-
 Version 1.0-unreleased
 ======================
 
@@ -39,3 +38,7 @@ Version 1.0-unreleased
 
 * added testcase for new error code
 
+* fixed bug #14956 (https://gna.org/bugs/index.php?14956) partly (added
+  regression test (bug14956a.chor)
+
+* implemented synchronous communication consideration when projecting peers

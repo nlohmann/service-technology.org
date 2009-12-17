@@ -398,7 +398,6 @@ bool Choreography::distant(const string & a, const string & b) const
       if (collaboration_[i]->output().count(b)
           || collaboration_[i]->input().count(b))
       {
-        std::cerr << " .. FALSE" << std::endl;
         return false;
       }
   return true;
@@ -515,7 +514,9 @@ set<int> & Choreography::closure(set<int> & S, int peer) const
   {
     set<Edge *> E = edgesFrom(*q);
     for (set<Edge *>::iterator eq = E.begin(); eq != E.end(); ++eq)
+    {
       if (!S.count((*eq)->destination))
+      {
         switch ((*eq)->type)
         {
         case RCV:
@@ -537,6 +538,14 @@ set<int> & Choreography::closure(set<int> & S, int peer) const
             break;
           }
         case SYN:
+        {
+          if (!p->output().count((*eq)->label) && !p->input().count((*eq)->label))
+          {
+            S.insert((*eq)->destination);
+            S = closure(S, peer);
+          }
+          break;
+        }
         default:
           {
             S.insert((*eq)->destination);
@@ -544,6 +553,8 @@ set<int> & Choreography::closure(set<int> & S, int peer) const
             break;
           }
         }
+      }
+    }
   }
   return S;
 }

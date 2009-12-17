@@ -32,6 +32,29 @@ AT_KEYWORDS(errors)
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Regression Tests])
+############################################################################
+
+AT_SETUP([Bug 14956a (https://gna.org/bugs/index.php?14956)])
+AT_CHECK([cp TESTFILES/bug14956a.chor .])
+AT_CHECK([REBECCA bug14956a.chor], 0, ignore, stderr)
+AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_CHECK([ls peer* | wc -l], 0, stdout, ignore)
+AT_CHECK([GREP -q "4" stdout], 0)
+AT_CHECK([GREP -q "1 : INITIAL" peerA.sa], 0)
+AT_CHECK([GREP -q "m1 -> 235" peerA.sa], 0)
+AT_CHECK([GREP -q "m1 -> 2" peerB.sa], 0)
+AT_CHECK([GREP -q "35 : FINAL" peerB.sa], 0)
+AT_CHECK([GREP -q "12 : INITIAL" peerC.sa], 0)
+AT_CHECK([GREP -q "5 : FINAL" peerC.sa], 0)
+AT_CHECK([GREP -q "123 : INITIAL" peerD.sa], 0)
+AT_CHECK([GREP -q "m3 -> 5" peerD.sa], 0)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Realizability Tests])
 ############################################################################
 

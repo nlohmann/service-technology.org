@@ -54,6 +54,15 @@ AT_CHECK([GREP -q "m3 -> 5" peerD.sa], 0)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 14956b (https://gna.org/bugs/index.php?14956)])
+AT_CHECK([cp TESTFILES/bug14956b.chor .])
+AT_CHECK([REBECCA bug14956b.chor], 0, ignore, stderr)
+AT_CHECK([GREP -q "completely realizable:    YES" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: YES" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Realizability Tests])
 ############################################################################

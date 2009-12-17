@@ -8,15 +8,13 @@ using std::set;
 using std::string;
 using std::vector;
 
-
 /*!
  * \brief Standard constructor
  */
 Choreography::Choreography() :
-    initialState_(INT_MIN)
+  initialState_(INT_MIN)
 {
 }
-
 
 /*!
  * \brief Standard destructor
@@ -30,7 +28,6 @@ Choreography::~Choreography()
     delete collaboration_[i];
   collaboration_.clear();
 }
-
 
 /*!
  * \brief Create a state with a fresh name
@@ -49,7 +46,6 @@ const int Choreography::createState()
   return max;
 }
 
-
 /*!
  * \brief Add a state to the set of states
  *
@@ -59,7 +55,6 @@ void Choreography::pushState(int q)
 {
   states_.insert(states_.end(), q);
 }
-
 
 /*!
  * \brief Delete a state from the set of states
@@ -77,7 +72,6 @@ void Choreography::deleteState(int q)
       deleteEdge(*e);
 }
 
-
 /*!
  * \brief Set the initial state to the given value
  *
@@ -87,7 +81,6 @@ void Choreography::setInitialState(int q)
 {
   initialState_ = q;
 }
-
 
 /*!
  * \brief Add the given state to the set of final states
@@ -99,7 +92,6 @@ void Choreography::pushFinalState(int q)
   finalStates_.insert(q);
 }
 
-
 /*!
  * \brief Create a new edge
  *
@@ -108,7 +100,8 @@ void Choreography::pushFinalState(int q)
  * \param destination
  * \param type
  */
-Edge * Choreography::createEdge(int source, const string & label, int destination, EventType type)
+Edge * Choreography::createEdge(int source, const string & label,
+    int destination, EventType type)
 {
   Edge *e = new Edge();
 
@@ -118,14 +111,13 @@ Edge * Choreography::createEdge(int source, const string & label, int destinatio
   e->type = type;
 
   for (set<Edge *>::iterator ee = edges_.begin(); ee != edges_.end(); ++ee)
-    if (e->source == (*ee)->source && e->label == (*ee)->label &&
-        e->destination == (*ee)->destination && e->type == (*ee)->type)
+    if (e->source == (*ee)->source && e->label == (*ee)->label
+        && e->destination == (*ee)->destination && e->type == (*ee)->type)
       return *ee;
   edges_.insert(edges_.end(), e);
 
   return e;
 }
-
 
 /*!
  * \brief Delete an edge
@@ -139,7 +131,6 @@ void Choreography::deleteEdge(Edge * e)
   delete e;
 }
 
-
 /*!
  * \brief Add the given peer to the collaboration
  *
@@ -149,7 +140,6 @@ void Choreography::pushPeer(Peer * p)
 {
   collaboration_.push_back(p);
 }
-
 
 /*!
  * \brief Add the given event to the events vector
@@ -161,7 +151,6 @@ void Choreography::pushEvent(const string & e)
   events_.push_back(e);
 }
 
-
 /*!
  * \brief Return the set of states
  */
@@ -170,7 +159,6 @@ const set<int> & Choreography::states() const
   return states_;
 }
 
-
 /*!
  * \brief Return the initial state
  */
@@ -178,7 +166,6 @@ const int Choreography::initialState() const
 {
   return initialState_;
 }
-
 
 /*!
  * \brief This method finds a state qa with q -a-> qa
@@ -192,7 +179,6 @@ const int Choreography::findState(int q, int a) const
   return -1;
 }
 
-
 /*!
  * \brief See PeerAutomaton::findState(int q, int a) const
  */
@@ -204,7 +190,6 @@ const int Choreography::findState(int q, const string & a) const
       return (*e)->destination;
   return -1;
 }
-
 
 /*!
  * \brief This method finds a state qab with q -a-> qa -b-> qab
@@ -221,7 +206,6 @@ const int Choreography::findState(int q, int a, int b) const
   return -1;
 }
 
-
 /*!
  * \brief Return the set of edges
  */
@@ -229,7 +213,6 @@ const set<Edge *> & Choreography::edges() const
 {
   return edges_;
 }
-
 
 /*!
  * \brief Return the set of edges where q is the source state
@@ -260,20 +243,19 @@ const set<Edge *> Choreography::edgesFrom(int q) const
   return result;
 }
 
-
 /*!
  * \brief Return the set of edges where one q' in q is the source state
  */
 const set<Edge *> Choreography::edgesFrom(set<int> q) const
 {
   // handling cache structure
-  static map<set<int>, set<Edge *> > cache;
+  static map<set<int> , set<Edge *> > cache;
   if (cache.size() == 0)
-    cache[set<int>()] = edges_;
-  if (cache[set<int>()] != edges_)
+    cache[set<int> ()] = edges_;
+  if (cache[set<int> ()] != edges_)
   {
     cache.clear();
-    cache[set<int>()] = edges_;
+    cache[set<int> ()] = edges_;
   }
   if (cache.count(q))
     return cache[q];
@@ -287,7 +269,6 @@ const set<Edge *> Choreography::edgesFrom(set<int> q) const
   cache[q] = result;
   return result;
 }
-
 
 /*!
  * \brief Return the set of edges where q is the destination state
@@ -318,7 +299,6 @@ const set<Edge *> Choreography::edgesTo(int q) const
   return result;
 }
 
-
 /*!
  * \brief Return the collaboration
  */
@@ -327,7 +307,6 @@ const std::vector<Peer *> & Choreography::collaboration() const
   return collaboration_;
 }
 
-
 /*!
  * \brief Return the events
  */
@@ -335,7 +314,6 @@ const std::vector<std::string> & Choreography::events() const
 {
   return events_;
 }
-
 
 /*!
  * \brief Checks whether \f$q_f \in\f$ finalStates_
@@ -346,7 +324,6 @@ bool Choreography::isFinal(int q) const
 {
   return finalStates_.count(q);
 }
-
 
 /*!
  * \brief Checks whether one state in q is a final state
@@ -359,26 +336,24 @@ bool Choreography::isFinal(const set<int> & qf) const
   return false;
 }
 
-
 /*!
  * \brief Return a 2-dimensional array to quickly check whether two events
  *        are distant.
  */
 bool ** Choreography::distantEvents() const
 {
-  bool ** result = new bool * [events_.size()];
+  bool ** result = new bool *[events_.size()];
   for (int i = 0; i < (int) events_.size(); ++i)
   {
     result[i] = new bool[events_.size()];
     result[i][i] = false;
   }
   for (int i = 0; i < (int) events_.size(); ++i)
-    for (int j = i+1; j < (int) events_.size(); ++j)
+    for (int j = i + 1; j < (int) events_.size(); ++j)
       result[i][j] = result[j][i] = distant(events_[i], events_[j]);
 
   return result;
 }
-
 
 /*!
  * \brief Return true if the given events are distant
@@ -403,7 +378,6 @@ bool Choreography::distant(const string & a, const string & b) const
   return true;
 }
 
-
 /*!
  * \brief Checks whether a enables b in q
  *
@@ -421,12 +395,12 @@ bool Choreography::distant(const string & a, const string & b) const
  */
 bool Choreography::enables(int state, int a, int b) const
 {
-  if (events_[a].substr(1, events_[a].size()) ==
-      events_[b].substr(1, events_[b].size()))
+  if (events_[a].substr(1, events_[a].size()) == events_[b].substr(1,
+      events_[b].size()))
     return false;
   set<Edge *> qE = edgesFrom(state);
   bool qabExists = false;
-  for(set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
+  for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
   {
     if ((*e)->label == events_[b])
       return false;
@@ -441,7 +415,6 @@ bool Choreography::enables(int state, int a, int b) const
   }
   return qabExists;
 }
-
 
 /*!
  * \brief Checks whether a disables b in state q
@@ -469,7 +442,6 @@ bool Choreography::disables(int state, int a, int b) const
   }
   return qaExists && qbExists;
 }
-
 
 /*!
  * \brief Checks whether qa and qb are equivalent
@@ -506,7 +478,6 @@ bool Choreography::equivalent(int qa, int qb) const
   return result;
 }
 
-
 set<int> & Choreography::closure(set<int> & S, int peer) const
 {
   const Peer * p = collaboration_[peer];
@@ -520,26 +491,27 @@ set<int> & Choreography::closure(set<int> & S, int peer) const
         switch ((*eq)->type)
         {
         case RCV:
+        {
+          if (!p->input().count((*eq)->label))
           {
-            if (!p->input().count((*eq)->label))
-            {
-              S.insert((*eq)->destination);
-              S = closure(S, peer);
-            }
-            break;
+            S.insert((*eq)->destination);
+            S = closure(S, peer);
           }
+          break;
+        }
         case SND:
+        {
+          if (!p->output().count((*eq)->label))
           {
-            if (!p->output().count((*eq)->label))
-            {
-              S.insert((*eq)->destination);
-              S = closure(S, peer);
-            }
-            break;
+            S.insert((*eq)->destination);
+            S = closure(S, peer);
           }
+          break;
+        }
         case SYN:
         {
-          if (!p->output().count((*eq)->label) && !p->input().count((*eq)->label))
+          if (!p->output().count((*eq)->label) && !p->input().count(
+              (*eq)->label))
           {
             S.insert((*eq)->destination);
             S = closure(S, peer);
@@ -547,18 +519,17 @@ set<int> & Choreography::closure(set<int> & S, int peer) const
           break;
         }
         default:
-          {
-            S.insert((*eq)->destination);
-            S = closure(S, peer);
-            break;
-          }
+        {
+          S.insert((*eq)->destination);
+          S = closure(S, peer);
+          break;
+        }
         }
       }
     }
   }
   return S;
 }
-
 
 void Choreography::unite(int qa, int qb)
 {
@@ -603,7 +574,6 @@ void Choreography::unite(int qa, int qb)
   deleteState(qb);
 }
 
-
 bool Choreography::isChoreography() const
 {
   set<string> inChannels, outChannels;
@@ -628,8 +598,7 @@ bool Choreography::isChoreography() const
     isChor = true;
   else
   {
-    for (set<string>::iterator in = inChannels.begin(); in != inChannels.end();
-        ++in)
+    for (set<string>::iterator in = inChannels.begin(); in != inChannels.end(); ++in)
       status("'%s' has no appropriate output event", in->c_str());
     for (set<string>::iterator out = outChannels.begin(); out
         != outChannels.end(); ++out)

@@ -38,7 +38,7 @@ Version 1.0-unreleased
 
 * added testcase for new error code
 
-* fixed bug #14956 (https://gna.org/bugs/index.php?14956) partly (added
-  regression test (bug14956a.chor)
+* fixed bug #14956 (https://gna.org/bugs/index.php?14956) (added
+  regression tests (bug14956a.chor and bug14956b.chor))
 
 * implemented synchronous communication consideration when projecting peers

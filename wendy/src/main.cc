@@ -34,6 +34,7 @@
 #include "Output.h"
 #include "Cover.h"
 #include "Diagnosis.h"
+#include "LivelockOperatingGuideline.h"
 #include "verbose.h"
 
 
@@ -160,6 +161,7 @@ void terminationHandler() {
         cmdline_parser_free(&args_info);
         InnerMarking::finalize();
         StoredKnowledge::finalize();
+
         time(&end_time);
         status("released memory [%.0f sec]", difftime(end_time, start_time));
     }
@@ -299,6 +301,7 @@ int main(int argc, char** argv) {
     delete markingoutput;
 
 
+
     /*-------------------------------.
     | 6. organize reachability graph |
     `-------------------------------*/
@@ -330,11 +333,24 @@ int main(int argc, char** argv) {
     status("calculated %d trivial SCCs", StoredKnowledge::stats.numberOfTrivialSCCs);
     status("calculated %d non-trivial SCCs, at most %d members in nontrivial SCC",
         StoredKnowledge::stats.numberOfNonTrivialSCCs, StoredKnowledge::stats.maxSCCSize);
-    status("maximal simultaneously stored Knowledge objects: %d", Queue::maximal_objects);
 
     // traverse all nodes reachable from the root
     StoredKnowledge::root->traverse();
     status("%d knowledges reachable", StoredKnowledge::seen.size());
+
+    ///\todo rausfinden, was mit dot ist (kann ich eine LL-OG dotten)
+    // in case of livelock freedom and if the operating guideline shall be
+    // calculated, we have to analyse every strongly connected set of knowledges
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+        LivelockOperatingGuideline::generateLLOG();
+        status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);
+        status("number of terminal strongly connected sets: %d", LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);
+
+        double averageSizeOfAnnotation = static_cast<double>(LivelockOperatingGuideline::stats.numberAllElementsAnnotations) / static_cast<double>(LivelockOperatingGuideline::stats.numberOfSCSs);
+        status("average size of annotation per SCS: %.2f", averageSizeOfAnnotation);
+    }
+
+    status("maximal simultaneously stored Knowledge objects: %d", Queue::maximal_objects);
 
     // analyze root node and print result
     message("%s: %s", _cimportant_("net is controllable"), (StoredKnowledge::root->is_sane ? _cgood_("YES") : _cbad_("NO")));

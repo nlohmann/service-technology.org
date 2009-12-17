@@ -42,7 +42,6 @@ std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
 InnerMarking::_stats InnerMarking::stats;
 
-
 /******************
  * STATIC METHODS *
  ******************/

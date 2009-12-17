@@ -8,18 +8,13 @@
                       http://service-technology.org/wendy
 
 
-Version 2.7 (17 December 2009)
-==============================
+Version 3.0-unreleased (17 December 2009)
+=========================================
 
-* configure Wendy with `--enable-syslog' to additionally write verbose
-  output to the syslog (e.g. `/var/log/system.log')
-
-* `--reportFrequency' sets the number of edges to be reported (was: number
-  of knowledges)
-
-* fixed bug #14922 (see `https://gna.org/bugs/?14922'): Wendy could not
-  process markings with Unicode place names which yielded a crash when
-  using `--mi'
+* introducing the livelock operating guideline: use `--correctness=livelock
+  --og' to calculate the livelock operating guideline with appropriate
+  annotations which are then printed out in the og-file; providing
+  parameter `--dot' prints the respective annotations in the dot output
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

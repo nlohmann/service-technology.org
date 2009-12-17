@@ -1,3 +1,8 @@
+@heading Version 3.0-unreleased (17 December 2009)
+@itemize
+@item introducing the livelock operating guideline: use @option{--correctness=livelock --og} to calculate the livelock operating guideline with appropriate annotations which are then printed out in the og-file; providing parameter @option{--dot} prints the respective annotations in the dot output
+@end itemize
+
 @heading Version 2.7 (17 December 2009)
 @itemize
 @item configure Wendy with @option{--enable-syslog} to additionally write verbose output to the syslog (e.g. @file{/var/log/system.log})

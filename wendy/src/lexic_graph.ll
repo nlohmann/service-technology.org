@@ -23,7 +23,6 @@
 %option full
 %option outfile="lex.yy.c"
 %option prefix="graph_"
-%option 8bit
 
 %{
 #include <cstring>

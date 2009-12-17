@@ -24,10 +24,14 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+
 #include "StoredKnowledge.h"
 #include "Cover.h"
 #include "verbose.h"
 #include "cmdline.h"
+#include "LivelockOperatingGuideline.h"
+#include "AnnotationLivelockOG.h"
+
 
 using std::map;
 using std::set;
@@ -664,7 +668,13 @@ void StoredKnowledge::fileHeader(std::ostream &file) {
          << static_cast<unsigned int>(Label::send_events) << " send, "
          << static_cast<unsigned int>(Label::receive_events) << " receive, "
          << static_cast<unsigned int>(Label::sync_events) << " synchronous"
-         << "\n  statistics:   " << seen.size() << " nodes\n}\n\n";
+         << "\n  statistics:   " << seen.size() << " nodes";
+
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+        file << ", " << LivelockOperatingGuideline::stats.numberOfSCSs << " SCSs";
+    }
+
+    file << "\n}\n\n";
 }
 
 /*!
@@ -717,6 +727,13 @@ void StoredKnowledge::output_og(std::ostream& file) {
         file << ";\n";
     }
 
+    // livelock operating guideline has been calculated
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+
+        // get the annotations of the livelock operating guideline
+        LivelockOperatingGuideline::output(false, file);
+    }
+
     file << "\nNODES\n";
 
     // the root
@@ -759,7 +776,7 @@ void StoredKnowledge::print(std::ostream& file) const {
                 file << " : FINAL";
             }
         }
-    } else {
+    } else if (not (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given)) {
         file << " : " << formula();
     }
 
@@ -889,13 +906,20 @@ std::string StoredKnowledge::formula(bool dot) const {
          before.
 */
 void StoredKnowledge::output_dot(std::ostream& file) {
-    file << "digraph G {\n"
-        << " node [fontname=\"Helvetica\" fontsize=10]\n"
-        << " edge [fontname=\"Helvetica\" fontsize=10]\n";
+    file << "digraph G {\n";
 
-    // create invisible node (in order to mark the initial state)
-    file << "INIT [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";
-    file << "INIT -> \"" << root << "\" [minlen=\"0.5\"]" << "\n";
+    // livelock operating guideline has been calculated
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+        // generate dot output showing the annotation of the livelock operating guideline
+        LivelockOperatingGuideline::output(true, file);
+    }
+
+   file  << " node [fontname=\"Helvetica\" fontsize=10]\n"
+         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
+
+   // create invisible node (in order to mark the initial state)
+   file << "INIT [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";
+   file << "INIT -> \"" << root << "\" [minlen=\"0.5\"]" << "\n";
 
     // draw the nodes
     for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
@@ -903,7 +927,16 @@ void StoredKnowledge::output_dot(std::ostream& file) {
             if ((it->second[i]->is_sane or args_info.diagnose_given) and
                 (seen.find(it->second[i]) != seen.end())) {
 
-                file << "\"" << it->second[i] << "\" [label=\"" << it->second[i]->formula(true) << "\\n";
+                file << "\"" << it->second[i] << "\" [label=\"";
+
+                // livelock operating guideline has been calculated
+                if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+                    // formula is not shown, but node number is shown
+                    file << reinterpret_cast<size_t>(it->second[i]) << "\\n";
+                } else {
+                    // show only formula
+                    file << it->second[i]->formula(true) << "\\n";
+                }
 
                 if (args_info.diagnose_given and not it->second[i]->is_sane) {
                     file << "is not sane\\n";

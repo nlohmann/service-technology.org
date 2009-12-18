@@ -219,9 +219,10 @@ int main(int argc, char** argv) {
 
 					BasicTerm* bt2 = new BasicTerm(j);
 					AddTerm* at = new AddTerm(bt1, bt2);
-
+					AddTerm* at2 = new AddTerm(bt1, new MultiplyTerm(bt2,-1));
 
 					EventTermBound* b = LindaAgent::getSystem(x)->evaluate(at);
+					EventTermBound* b2 = LindaAgent::getSystem(x)->evaluate(at2);
 					if (b->lowerBounded && b->upperBounded && b->lowerBound
 							<= 1) {
 						if (b->upperBound == 1) {

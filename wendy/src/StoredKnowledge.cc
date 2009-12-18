@@ -933,7 +933,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                 if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
                     // formula is not shown, but node number is shown
                     file << reinterpret_cast<size_t>(it->second[i]) << "\\n";
-                } else {
+                } else if (not args_info.sa_given) {
                     // show only formula
                     file << it->second[i]->formula(true) << "\\n";
                 }

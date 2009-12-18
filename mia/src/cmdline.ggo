@@ -42,6 +42,11 @@ option "stats" -
   flag off
   hidden
 
+option "finalize" -
+  "Release all allocated memory."
+  details="This option calls the destructors of all objects that have been created by Mia. This is usually not necessary, because the operating system cleans up once Mia terminates. However, this option can be used to detect memory leaks.\n"
+  flag off
+  hidden
 
 section "Configuration"
 sectiondesc="Mia relies on several other tools. These options configure Mia to find these tools.\n"

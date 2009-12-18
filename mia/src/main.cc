@@ -148,8 +148,6 @@ void evaluateParameters(int argc, char** argv) {
 
 /// a function collecting calls to organize termination (close files, ...)
 void terminationHandler() {
-    // release memory
-    cmdline_parser_free(&args_info);
     // print statistics
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
@@ -339,10 +337,17 @@ int main(int argc, char** argv) {
 
     message("%s%d jumper transitions found%s", _c0, jumperCount, _c_);
 
-    // free memory
-    delete mpp_sa;
-    delete target;
-    delete mpp;
+    // release memory (used to detect memory leaks)
+    if (args_info.finalize_flag) {
+        time_t start_time, end_time;
+        time(&start_time);
+        cmdline_parser_free(&args_info);
+        delete mpp_sa;
+   	delete target;
+        delete mpp;
+        time(&end_time);
+        status("released memory [%.0f sec]", difftime(end_time, start_time));
+    }
 
     return EXIT_SUCCESS;
 }

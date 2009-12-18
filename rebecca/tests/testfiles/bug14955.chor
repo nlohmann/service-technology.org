@@ -1,0 +1,18 @@
+PEER A
+  OUT m1;
+
+PEER B
+  IN m1;
+
+PEER C
+  OUT m2;
+
+PEER D
+  IN m2;
+
+NODES
+  1 : INITIAL
+    #m1 -> 2
+  2
+    #m2 -> 3
+  3 : FINAL

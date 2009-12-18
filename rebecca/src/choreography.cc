@@ -67,6 +67,14 @@ void Choreography::pushState(int q)
 void Choreography::deleteState(int q)
 {
   states_.erase(q);
+  if (isFinal(q))
+  {
+    finalStates_.erase(q);
+  }
+  if (q == initialState_)
+  {
+    initialState_ = INT_MIN;
+  }
   for (set<Edge *>::iterator e = edges_.begin(); e != edges_.end(); ++e)
     if ((*e)->destination == q || (*e)->source == q)
       deleteEdge(*e);
@@ -608,4 +616,21 @@ bool Choreography::isChoreography() const
   // TODO: conversation check is missing
 
   return isChor;
+}
+
+bool Choreography::resolveDeadlocks()
+{
+  bool changed = false;
+
+  if (finalStates_.empty() && !states_.empty())
+  {
+    std::set<int> tempStates = states_;
+    for (set<int>::iterator i = tempStates.begin(); i != tempStates.end(); ++i)
+    {
+      deleteState(*i);
+    }
+    changed = true;
+  }
+
+  return changed;
 }

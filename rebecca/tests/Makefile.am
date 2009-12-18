@@ -11,7 +11,8 @@ TESTFILES = fig2b.chor fig2bIll.chor fig2c.chor \
 	    fig4b.chor fig4c.chor fig4d.chor \
 	    fig5.chor \
 	    fig6b.chor fig6c.chor fig6d.chor \
-	    bug14956a.chor bug14956b.chor
+	    bug14956a.chor bug14956b.chor \
+	    bug14955.chor
 
 
 # Below you can list all the files you do not want to have counted in the

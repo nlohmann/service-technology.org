@@ -250,6 +250,9 @@ int main(int argc, char** argv)
         }
       }
     }
+    // 3.4 Resolve deadlocks
+    bool tmp = chor->resolveDeadlocks();
+    changed = changed || tmp;
   }
 
   if (chor->initialState() == INT_MIN)
@@ -279,6 +282,11 @@ int main(int argc, char** argv)
    `--------------------------------*/
   for (size_t i = 0; i < chor->collaboration().size(); ++i)
   {
+    if (!partial)
+    {
+      break;
+    }
+
     PeerAutomaton * a = projected[i];
     /*
      * 4.1 calculate q0

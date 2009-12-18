@@ -42,3 +42,8 @@ Version 1.0-unreleased
   regression tests (bug14956a.chor and bug14956b.chor))
 
 * implemented synchronous communication consideration when projecting peers
+
+* fixed bug #14955 (https://gna.org/bugs/index.php?14955) by implementing
+  a deadlock checker
+  
+* added regression test (bug14955.chor)

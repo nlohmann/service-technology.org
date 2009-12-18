@@ -72,6 +72,7 @@ public:
    * Choreography check
    */
   bool isChoreography() const;
+  bool resolveDeadlocks();
 
   /*
    * Distance

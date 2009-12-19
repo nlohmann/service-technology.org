@@ -1,0 +1,33 @@
+INTERFACE
+  INPUT
+    A, R;
+  OUTPUT
+    I, O;
+
+INITIALNODES  0;
+
+GLOBALFORMULA (0 * 1);
+
+NODES
+  0: ((((I + O) * ~(tau)) * ~(A)) * ~(R))
+    tau -> 2
+    A -> 2
+    R -> 2
+    I -> 0
+    I -> 1
+    O -> 1
+
+  1: (((((O + final) * ~(tau)) * ~(A)) * ~(R)) * ~(I))
+    tau -> 2
+    A -> 2
+    R -> 2
+    I -> 2
+    O -> 0
+
+  2: true
+    tau -> 2
+    A -> 2
+    R -> 2
+    I -> 2
+    O -> 2
+

@@ -49,6 +49,6 @@ AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
 
 # write files
 AC_CONFIG_FILES([
-	Makefile src/Makefile man/Makefile tests/Makefile doc/Makefile doc/Doxyfile tests/package.m4])
+	Makefile src/Makefile utils/Makefile man/Makefile tests/Makefile doc/Makefile doc/Doxyfile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

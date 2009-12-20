@@ -164,8 +164,7 @@ int main(int argc, char** argv)
   {
     changed = false;
     /// 3.1 if a disables b
-    for (std::set<int>::iterator q = chor->states().begin(); q
-        != chor->states().end(); ++q)
+    for (std::set<int>::iterator q = chor->states().begin(); q != chor->states().end(); ++q)
     {
       for (size_t a = 0; a < chor->events().size(); ++a)
       {
@@ -177,8 +176,8 @@ int main(int argc, char** argv)
           }
           if (chor->disables(*q, a, b))
           {
-            status("event %s disables event %s in state %d",
-                chor->events()[a].c_str(), chor->events()[b].c_str(), *q);
+            status("%s in state %d: %s disables %s",
+                _cimportant_("unenforceable dependency"), *q, chor->events()[a].c_str(), chor->events()[b].c_str());
             complete = false;
             changed = true;
             int qa = chor->createState();
@@ -198,13 +197,13 @@ int main(int argc, char** argv)
             }
             chor->createEdge(*q, "", qa, CHI);
             chor->createEdge(*q, "", qb, CHI);
+            status("%s: adding chi-edges to state %d", _cimportant_("dependency resolution"), *q);
           }
         }
       }
     }
     /// 3.2 if a enables b
-    for (std::set<int>::iterator q = chor->states().begin(); q
-        != chor->states().end(); ++q)
+    for (std::set<int>::iterator q = chor->states().begin(); q != chor->states().end(); ++q)
     {
       for (size_t a = 0; a < chor->events().size(); ++a)
       {
@@ -216,19 +215,19 @@ int main(int argc, char** argv)
           }
           if (chor->enables(*q, a, b))
           {
-            status("event %s enables event %s in state %d",
-                chor->events()[a].c_str(), chor->events()[b].c_str(), *q);
+            status("%s in state %d: %s enables %s",
+                _cimportant_("unenforceable dependency"), *q, chor->events()[a].c_str(), chor->events()[b].c_str());
             complete = distributed = false;
             changed = true;
             int qab = chor->findState(*q, a, b);
             chor->deleteState(qab);
+            status("%s: deleting state %d", _cimportant_("dependency resolution"), qab);
           }
         }
       }
     }
     /// 3.3 if q_ab and q_ba are not equivalent
-    for (std::set<int>::iterator q = chor->states().begin(); q
-        != chor->states().end(); ++q)
+    for (std::set<int>::iterator q = chor->states().begin(); q != chor->states().end(); ++q)
     {
       for (size_t a = 0; a < chor->events().size(); ++a)
       {
@@ -242,10 +241,11 @@ int main(int argc, char** argv)
           int qba = chor->findState(*q, b, a);
           if (qab != -1 && qba != -1 && !chor->equivalent(qab, qba))
           {
-            status("states %d and %d are not equivalent", qab, qba);
+            status("%s: states %d and %d are not equivalent", _cimportant_("unenforceable dependency"), qab, qba);
             complete = distributed = false;
             changed = true;
             chor->unite(qab, qba);
+            status("%s: making state %d and state %d equivalent", _cimportant_("dependency resolution"), qab, qba);
           }
         }
       }
@@ -271,8 +271,7 @@ int main(int argc, char** argv)
   // output resolved choreography if requested
   if (args_info.chor_given)
   {
-    std::string chor_filename = args_info.chor_arg ? args_info.chor_arg
-        : filename + ".chor";
+    std::string chor_filename = args_info.chor_arg ? args_info.chor_arg : filename + ".chor";
     Output output(chor_filename, "choreography");
     output.stream() << *chor;
   }
@@ -303,8 +302,7 @@ int main(int argc, char** argv)
     /*
      * 4.2 calculate all other states
      */
-    for (std::set<std::set<int> >::iterator q = a->states().begin(); q
-        != a->states().end(); ++q)
+    for (std::set<std::set<int> >::iterator q = a->states().begin(); q != a->states().end(); ++q)
     {
       std::set<Edge *> E = chor->edgesFrom(*q);
       for (std::set<Edge *>::iterator e = E.begin(); e != E.end(); ++e)

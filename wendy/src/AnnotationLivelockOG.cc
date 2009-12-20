@@ -25,17 +25,34 @@
  * AnnotationElement                      *
  ******************************************/
 
+
 /******************************************
  * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
  ******************************************/
 
 /*!
   constructor
+  \param _setOfKnowledges the set of knowledges this annotation belongs to
+  \param _annotationBoolean disjunction of clauses representing the annotation
 */
-AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges, const std::vector<std::set<Label_ID> > & _annotation) :
-                                        setOfKnowledges(_setOfKnowledges), annotation(_annotation), successor(NULL)
+AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges,
+                                     const std::vector<Clause* > & _annotationBoolean) :
+                                                   successor(NULL)
 {
 
+    // create C-Array to store the set of knowledges
+    setOfKnowledges = new StoredKnowledge*[_setOfKnowledges.size() + 1];
+
+    std::copy(_setOfKnowledges.begin(), _setOfKnowledges.end(), setOfKnowledges);
+
+    // that way we do not need to remember the size of the array
+    setOfKnowledges[_setOfKnowledges.size()] = NULL;
+
+    // create C-Array to store the set of clauses
+    annotationBool = new Clause*[_annotationBoolean.size() + 1];
+    std::copy(_annotationBoolean.begin(), _annotationBoolean.end(), annotationBool);
+
+    annotationBool[_annotationBoolean.size()] = NULL;
 }
 
 
@@ -43,53 +60,51 @@ AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfK
   destructor
 */
 AnnotationElement::~AnnotationElement() {
+    delete[] setOfKnowledges;
 
+    // explicitly delete every (real) clause
+    for(unsigned int i = 0; annotationBool[i] != NULL; ++i) {
+        if (annotationBool[i] != Clause::finalClause and annotationBool[i] != Clause::falseClause) {
+            delete annotationBool[i];
+        }
+    }
+
+    delete[] annotationBool;
 }
 
+
+/******************
+ * MEMBER METHODS *
+ ******************/
 
 /*!
   creates a string out of the set of strings representing the annotation of the set of knowledges
   \param dot the string shall be used in the dot output or not
 */
-std::string AnnotationElement::myAnnotation(const bool & dot) {
+std::string AnnotationElement::myAnnotation(const bool & dot) const {
+
     // create the annotation of the current set of knowledges
-    std::string formula;
+    std::string formulaBoolean = "";
 
-    if (not annotation.empty()) {
-        // traverse the conjunctions to access the disjunctions
-        for (std::vector<std::set<Label_ID> >::iterator it = annotation.begin();
-                it != annotation.end(); ++it) {
+    for(unsigned int i = 0; annotationBool[i] != NULL; ++i) {
 
-            if (it != annotation.begin()) {
-                formula += (dot) ? " &and; " : " * ";
-            }
-            if (it->size() > 1) {
-                formula += "(";
-            }
-            // get clause which contains !, ? or # events
-            for (std::set<Label_ID>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
-                if (it2 != it->begin()) {
-                    formula += (dot) ? " &or; " : " + ";
-                }
-                if (*it2 == 0) {
-                    formula += "final";
-                } else {
-                    formula += Label::id2name[*it2];
-                }
-            }
-            if (it->size() > 1) {
-                formula += ")";
-            }
+        if (i != 0) {
+            formulaBoolean += (dot) ? " &and; " : " * ";
+        }
+
+        if (annotationBool[i] == Clause::finalClause) {
+            formulaBoolean += "final";
+        } else if (annotationBool[i] == Clause::falseClause) {
+            formulaBoolean += "false";
+        } else {
+            std::string tmpFormula = annotationBool[i]->getString(dot);
+
+            // the clause itself takes care of "(" and ")"
+            formulaBoolean += annotationBool[i]->getString(dot);
         }
     }
 
-    // required for diagnose mode in which a non-final node might have no
-    // successors
-    if (formula.empty()) {
-        formula = "false";
-    }
-
-    return formula;
+    return formulaBoolean;
 }
 
 
@@ -135,9 +150,15 @@ AnnotationLivelockOG::~AnnotationLivelockOG() {
   \param setOfKnowledges set of knowledges the annotation belongs to
   \param annotation set of label ids representing an annotation
 */
-void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowledges, const std::vector<std::set<Label_ID> > & annotation) {
+void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowledges,
+                                const std::vector<Clause* > & annotationBoolean) {
+
+    if (rootElement == NULL) {
+        Clause::initialize();
+    }
+
     // create new annotation element
-    AnnotationElement * annotationElement = new AnnotationElement(setOfKnowledges, annotation);
+    AnnotationElement * annotationElement = new AnnotationElement(setOfKnowledges, annotationBoolean);
 
     // the queue is empty
     if (rootElement == NULL) {
@@ -147,6 +168,7 @@ void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowled
         lastElement = annotationElement;
     }
 }
+
 
 /*!
  returns the first element of the queue
@@ -161,6 +183,7 @@ AnnotationElement * AnnotationLivelockOG::pop() {
 
     return NULL;
 }
+
 
 /*!
   resets the iterator currentPointer to point to the beginning of the queue again

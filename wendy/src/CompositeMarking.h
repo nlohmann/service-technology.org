@@ -23,6 +23,7 @@
 #include "StoredKnowledge.h"
 #include "InnerMarking.h"
 #include "InterfaceMarking.h"
+#include "Clause.h"
 
 
 /*!
@@ -43,7 +44,7 @@ class CompositeMarking {
         ~CompositeMarking();
 
         /// returns a string representing the annotation of the composite marking with respect to the given set of knowledges
-        std::set<Label_ID> getMyFormula(const std::set<StoredKnowledge *> & setOfKnowledges);
+        void getMyFormula(const std::set<StoredKnowledge *> & setOfKnowledges, Clause * booleanClause, bool & emptyClause);
 
         /// compare two composite markings
         bool operator== (const CompositeMarking& other) const ;
@@ -92,7 +93,7 @@ class CompositeMarkingsHandler {
         static void finalize();
 
         /// adds the given clause to the set of annotations
-        static void addClause(std::set<Label_ID> & clause);
+        static void addClause(Clause* booleanClause);
 
     public: /* static attributes */
 
@@ -113,7 +114,7 @@ class CompositeMarkingsHandler {
         static unsigned int minBookmark;
 
         /// represents the formula (set of disjunctions which each are a set again)
-        static std::vector<std::set<Label_ID> > conjunctionOfDisjunctions;
+        static std::vector<Clause* > conjunctionOfDisjunctionsBoolean;
 };
 
 

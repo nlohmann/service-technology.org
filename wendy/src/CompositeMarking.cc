@@ -21,6 +21,7 @@
 #include "CompositeMarking.h"
 #include "LivelockOperatingGuideline.h"
 #include "Label.h"
+#include "Clause.h"
 
 
 /********************
@@ -60,12 +61,12 @@ CompositeMarking::~CompositeMarking() {
 /*!
   constructs a string that contains the annotation of the composite marking with respect to the given set of knowledges
   \param knowledgeSet set of knowledges
-  \todo std::set<Label_ID> durch einen Bool-Vektor der Länge Labels ersetzen
+  \param booleanClause a pointer to the Boolean clause of the composite marking
+  \param emptyClause if true, the clause of this composite marking is empty
 */
-std::set<Label_ID> CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledgeSet) {
-
-    // a set holding receiving and synchronous events
-    std::set<Label_ID> disjunctionReceivingSynchronous;
+void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledgeSet,
+                                                  Clause * booleanClause,
+                                                  bool & emptyClause) {
 
     // receiving event
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
@@ -73,7 +74,9 @@ std::set<Label_ID> CompositeMarking::getMyFormula(const std::set<StoredKnowledge
         if (interface->marked(l) and knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() and
             storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
             storedKnowledge->successors[l-1]->is_sane) {
-            disjunctionReceivingSynchronous.insert(l);
+
+            booleanClause->labelPossible(l);
+            emptyClause = false;
         }
     }
 
@@ -85,7 +88,8 @@ std::set<Label_ID> CompositeMarking::getMyFormula(const std::set<StoredKnowledge
                 storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
                 storedKnowledge->successors[l-1]->is_sane) {
 
-            disjunctionReceivingSynchronous.insert(l);
+            booleanClause->labelPossible(l);
+            emptyClause = false;
         }
     }
 
@@ -95,18 +99,16 @@ std::set<Label_ID> CompositeMarking::getMyFormula(const std::set<StoredKnowledge
                 storedKnowledge->successors[l-1] != NULL and
                 storedKnowledge->successors[l-1]->is_sane) {
 
-            disjunctionReceivingSynchronous.insert(l);
+            booleanClause->labelPossible(l);
+            emptyClause = false;
         }
     }
 
     // this marking is final
     if (interface->unmarked() and InnerMarking::inner_markings[innerMarking_ID]->is_final) {
-        // override label SILENT
-        disjunctionReceivingSynchronous.insert(0);
-    }
 
-    // return clause part
-    return disjunctionReceivingSynchronous;
+        booleanClause->contains_final = 1;
+    }
 }
 
 
@@ -143,7 +145,7 @@ std::vector<CompositeMarking* > CompositeMarkingsHandler::tarjanStack;
 unsigned int CompositeMarkingsHandler::numberElements = 0;
 unsigned int CompositeMarkingsHandler::maxSize = 0;
 unsigned int CompositeMarkingsHandler::minBookmark = 0;
-std::vector<std::set<Label_ID> > CompositeMarkingsHandler::conjunctionOfDisjunctions;
+std::vector<Clause* > CompositeMarkingsHandler::conjunctionOfDisjunctionsBoolean;
 
 
 /********************
@@ -198,12 +200,14 @@ bool CompositeMarkingsHandler::visitMarking(CompositeMarking * marking) {
   adds the given string clause to the conjunction of disjunctions associated with the current set of knowledges
   \param clause a string containing a disjunction of events
 */
-void CompositeMarkingsHandler::addClause(std::set<Label_ID> & clause) {
-    // add whole clause to the conjunction of clauses
-    conjunctionOfDisjunctions.push_back(clause);
+void CompositeMarkingsHandler::addClause(Clause * booleanClause) {
 
-    LivelockOperatingGuideline::stats.numberAllElementsAnnotations += clause.size();
+    // add whole clause to the conjunction of clauses
+    conjunctionOfDisjunctionsBoolean.push_back(booleanClause);
+
+//    LivelockOperatingGuideline::stats.numberAllElementsAnnotations += clause.size();
 }
+
 
 /******************************************
  * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
@@ -244,5 +248,5 @@ void CompositeMarkingsHandler::finalize() {
     tarjanStack.clear();
     maxSize = 0;
     minBookmark = 0;
-    conjunctionOfDisjunctions.clear();
+    conjunctionOfDisjunctionsBoolean.clear();
 }

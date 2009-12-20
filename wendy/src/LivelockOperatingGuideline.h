@@ -34,11 +34,18 @@ class AnnotationLivelockOG;
 typedef std::vector<std::set<StoredKnowledge*> > SetOfSCCs;
 
 
-/*! \todo comment me
+/*!
+  does all the work when the livelock operating guideline shall be computed
+  * calculate all SCSs within the reachable knowledges
+  * for each SCS calculate the TSCCs contained within the SCS's state space of the composition of MPP and P
+    which is reflected by a composite marking (knowledge + inner marking + interface)
+
+  \note this class has only to be touched when the og-file or dot-file shall be written out; livelock freedom
+        is ensured by setting parameter --correctness=livelock
 */
 class LivelockOperatingGuideline {
     public: /* static attributes */
-        /// struct combining the statistics on the class StoredKnowledge
+        /// struct combining the statistics on the class LivelockOperatingGuideline
         static struct _stats {
             public:
                 /// constructor
@@ -62,6 +69,8 @@ class LivelockOperatingGuideline {
         static unsigned int maxDFS;
 
     public: /* static function */
+
+        static void initialize();
 
         /// calculates all strongly connected sets within all knowledges that are reachable from the root and generates the annotation accordingly
         static void generateLLOG();

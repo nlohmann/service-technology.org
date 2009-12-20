@@ -342,6 +342,7 @@ int main(int argc, char** argv) {
     // in case of livelock freedom and if the operating guideline shall be
     // calculated, we have to analyse every strongly connected set of knowledges
     if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+        LivelockOperatingGuideline::initialize();
         LivelockOperatingGuideline::generateLLOG();
         status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);
         status("number of terminal strongly connected sets: %d", LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);

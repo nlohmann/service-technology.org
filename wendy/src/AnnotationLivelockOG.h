@@ -24,34 +24,36 @@
 #include <set>
 #include <string>
 #include "StoredKnowledge.h"
-
+#include "Clause.h"
 
 /*!
   Livelock Operating Guideline only
 
-  a set of knowledges is annotated with a set of strings which will be transformed into a real string later on
-  
-  \todo public/private anpassen, const für myAnnotation?
-  \todo Du weißt wie groß das Objekt wird -> brauchst keine STL-Container (C-Array)
+  a set of knowledges is annotated with a set of label IDs which will be transformed into a real string later on
 */
 class AnnotationElement {
+
+    friend class AnnotationLivelockOG;
+    friend class LivelockOperatingGuideline;
 
     public: /* member functions */
 
         /// constructor
-        AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges, const std::vector<std::set<Label_ID> > & _annotation);
+        AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges,
+                          const std::vector<Clause* > & _annotationBoolean);
 
         /// destructor
         ~AnnotationElement();
 
         /// returns a string containing the annotation of this element
-        std::string myAnnotation(const bool & dot);
+        std::string myAnnotation(const bool & dot) const;
 
+    private: /* member attributes */
         /// pointer to the set of knowledges
-        std::set<StoredKnowledge* > setOfKnowledges;
+        StoredKnowledge** setOfKnowledges;
 
         /// vector of label ids representing the annotation
-        std::vector<std::set<Label_ID> > annotation;
+        Clause ** annotationBool;
 
         /// succeeding element
         AnnotationElement * successor;
@@ -76,7 +78,8 @@ class AnnotationLivelockOG {
         ~AnnotationLivelockOG();
 
         /// inserts an annotation to the queue
-        void push(const std::set<StoredKnowledge* > & setOfKnowledges, const std::vector<std::set<Label_ID> > & annotation);
+        void push(const std::set<StoredKnowledge* > & setOfKnowledges,
+                  const std::vector<Clause* > & annotationBoolean);
 
         /// returns the first element of the queue
         AnnotationElement * pop();

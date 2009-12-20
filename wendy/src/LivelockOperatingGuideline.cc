@@ -27,6 +27,7 @@
 #include "AnnotationLivelockOG.h"
 #include "LivelockOperatingGuideline.h"
 #include "CompositeMarking.h"
+#include "Clause.h"
 
 #include "verbose.h"
 #include "cmdline.h"
@@ -54,6 +55,12 @@ extern gengetopt_args_info args_info;
  */
 LivelockOperatingGuideline::_stats::_stats()
         : numberOfSCSs(0), numberOfTSCCInSCSs(0), numberAllElementsAnnotations(0) {}
+
+
+void LivelockOperatingGuideline::initialize() {
+    Clause::initialize();
+}
+
 
 
 /*!
@@ -190,7 +197,6 @@ void LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
         have a store() function which tells you in the return value whether it actually stored the object
 
   \todo Statistik: wie viele unterschiedliche CompositeMarkingsHandler::conjunctionOfDisjunctions gibt es
-  \todo final: nicht explizit speichern sonder z.B. einen 1-Pointer (TM) benutzen
 */
 void LivelockOperatingGuideline::calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS) {
 
@@ -222,7 +228,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSet(const std::set<Stor
     // all TSCCs have been calculated within the current set of knowledges
 
     // remember annotation
-    annotationLivelockOG.push(knowledgeSCS, CompositeMarkingsHandler::conjunctionOfDisjunctions);
+    annotationLivelockOG.push(knowledgeSCS, CompositeMarkingsHandler::conjunctionOfDisjunctionsBoolean);
 
     // clean up
     CompositeMarkingsHandler::finalize();
@@ -421,8 +427,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
             if (RECEIVING(j) or SENDING(j)) {
 
                 bool success = true;
-                ///! \todo: reicht hier bool increase = SENDING(?); ?
-                bool increase = RECEIVING(j) ? false : true;
+                bool increase = SENDING(j);
 
                 candidate_interface = new InterfaceMarking(*currentMarking->interface, j, increase, success);
 
@@ -485,7 +490,9 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
         // current TSCC
         std::set<CompositeMarking * > scc;
 
-        std::set<Label_ID> clause;
+        // at first we suppose that the clause of the current TSCC is empty
+        bool emptyClause = true;
+        Clause * booleanClause = new Clause();
 
         do {
             if (CompositeMarkingsHandler::tarjanStack.empty()) {
@@ -499,13 +506,32 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
             // put popped marking into current SCC
             scc.insert(poppedMarking);
 
-            std::set<Label_ID> partOfClause(poppedMarking->getMyFormula(knowledgeSCS));
+            // create new clause to store the clause corresponding to the current composite marking
+            Clause * booleanClauseTemp = new Clause();
 
-            clause.insert(partOfClause.begin(), partOfClause.end());
+            poppedMarking->getMyFormula(knowledgeSCS, booleanClauseTemp, emptyClause);
+
+            // use boolean OR to let the overall clause know about the current (part) clause
+            *booleanClause |= *booleanClauseTemp;
+
+            delete booleanClauseTemp;
 
         } while (currentMarking != poppedMarking);
 
-        CompositeMarkingsHandler::addClause(clause);
+        // the clause of the current TSCC is empty, then it is either final or false
+        if (emptyClause) {
+
+            // is it final?
+            bool contains_final = booleanClause->contains_final;
+
+            // delete the clause
+            delete booleanClause;
+
+            // create new clause for (final) or (false)
+            booleanClause = contains_final ? Clause::finalClause : Clause::falseClause;
+        }
+
+        CompositeMarkingsHandler::addClause(booleanClause);
 
         // statistics output
         if (args_info.reportFrequency_arg and ++stats.numberOfTSCCInSCSs % args_info.reportFrequency_arg == 0) {
@@ -617,18 +643,16 @@ void LivelockOperatingGuideline::output(const bool & dot, std::ostream& file) {
         AnnotationElement * temp;
         LivelockOperatingGuideline::annotationLivelockOG.initIterator();
 
-        ///\todo move me to another class
         while ((temp = LivelockOperatingGuideline::annotationLivelockOG.pop()) != NULL) {
 
             file << "<tr><td align=\"left\">";
 
-            for(std::set<StoredKnowledge* >::const_iterator iterKnowledgeSet = temp->setOfKnowledges.begin();
-                                                            iterKnowledgeSet != temp->setOfKnowledges.end(); ) {
+            for (unsigned int i = 0; temp->setOfKnowledges[i] != NULL; ) {
 
                 bool lastNode = false;
 
-                file << reinterpret_cast<size_t>(*iterKnowledgeSet);
-                lastNode = ++iterKnowledgeSet == temp->setOfKnowledges.end();
+                file << reinterpret_cast<size_t>(temp->setOfKnowledges[i]);
+                lastNode = temp->setOfKnowledges[++i] == NULL;
                 if (not lastNode) {
                     file << ", ";
                 }
@@ -648,13 +672,12 @@ void LivelockOperatingGuideline::output(const bool & dot, std::ostream& file) {
 
         while ((temp = LivelockOperatingGuideline::annotationLivelockOG.pop()) != NULL) {
 
-            for(std::set<StoredKnowledge* >::const_iterator iterKnowledgeSet = temp->setOfKnowledges.begin();
-                                                            iterKnowledgeSet != temp->setOfKnowledges.end(); ) {
+            for (unsigned int i = 0; temp->setOfKnowledges[i] != NULL; ) {
 
                 bool lastNode = false;
 
-                file << "  " << reinterpret_cast<size_t>(*iterKnowledgeSet);
-                lastNode = ++iterKnowledgeSet == temp->setOfKnowledges.end();
+                file << reinterpret_cast<size_t>(temp->setOfKnowledges[i]);
+                lastNode = temp->setOfKnowledges[++i] == NULL;
                 if (not lastNode) {
                     file << ", ";
                 }

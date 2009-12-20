@@ -36,8 +36,6 @@ number         [0-9]+
 "INITIALNODES"                          { return KEY_INITIALNODES;     }
 "GLOBALFORMULA"                         { return KEY_GLOBALFORMULA;    }
 
-":"{whitespace}?"F"                     { return BIT_F;                }
-":"{whitespace}?"S"                     { return BIT_S;                }
 "true"                                  { return KEY_TRUE;             }
 "false"                                 { return KEY_FALSE;            }
 "final"                                 { return KEY_FINAL;            }

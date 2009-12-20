@@ -291,11 +291,9 @@ void testNUM(){
 	initFormulaClass();
 
 	Formula* f = new FormulaNUM(42);
-	assert (f->formulaType == INT);
 	assert (f->toString() == "42");
 
 	Formula* f1 = f->moveNegation();
-	assert (f1->toString() == "42");
 	assert (f->isSatisfiable() == true);
 
 	Formula* f_clone = f->getCopy();
@@ -311,6 +309,50 @@ void testNUM(){
 	delete f1;
 	delete f;
 	delete f_clone;
+
+	Formula* g = new FormulaNOT(new FormulaNUM(42)); //-42
+	assert (g->formulaType == NOT);
+	assert (g->toString() == "~(42)");
+
+	Formula* g1 = g->moveNegation();
+	assert (g1->toString() == "~(42)");
+	assert (g->isSatisfiable() == true);
+
+	Formula* g_clone = g->getCopy();
+	assert(g_clone->toString() == g->toString());
+
+	clauses = g->calculateCNF();
+	assert(clauses.size() == 3);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,-42,0));
+	++iter; assert(checkClause(*iter, 7,42,0));
+
+	delete g1;
+	delete g;
+	delete g_clone;
+
+	Formula* h = new FormulaNOT(new FormulaNOT(new FormulaNUM(42))); //--42
+	assert (h->formulaType == NOT);
+	assert (h->toString() == "~(~(42))");
+
+	Formula* h1 = h->moveNegation();
+	assert (h1->toString() == "42");
+	assert (h->isSatisfiable() == true);
+
+	Formula* h_clone = h->getCopy();
+	assert(h_clone->toString() == h->toString());
+
+	clauses = h->calculateCNF();
+	assert(clauses.size() == 3);
+
+	iter = clauses.begin(); assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7,42,0));
+	++iter; assert(checkClause(*iter, 7,-42,0));
+
+	delete h1;
+	delete h;
+	delete h_clone;
 
 	cout << "\t passed." << endl;
 }

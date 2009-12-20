@@ -41,3 +41,8 @@ void Node::addEdge(int label, Node *target) {
 	outEdges[label].push_back(target);
 }
 
+/// reset the maxId
+void Node::init(){
+	maxId = 0;
+}
+

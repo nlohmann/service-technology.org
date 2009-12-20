@@ -12,9 +12,6 @@
 #include "verbose.h"
 #include "config-log.h"
 
-#include "testFormula.h"
-#include "testNode.h"
-#include "testGraph.h"
 #include "Output.h"
 
 /// the command line parameters
@@ -44,18 +41,13 @@ extern int lastLabelId;
 extern int lastInputId;
 extern int lastOutputId;
 
-void testGraph();
 void initGlobalVariables();
 void evaluateParameters(int argc, char** argv);
 bool fileExists(string filename);
 
 int main(int argc, char **argv) {
-	evaluateParameters(argc, argv);
 
-//	testFormulaClass();
-//	testNodeClass();
-//	testGraphClass();
-//	cout << "test finished" << endl << endl;
+	evaluateParameters(argc, argv);
 
 	if (args_info.inputs_num > 1) {
 		//fehler
@@ -96,8 +88,7 @@ int main(int argc, char **argv) {
     cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
     time_t buildOG_start = time(NULL);
 */
-	g->makeTotal();
-	g->makeComplete();
+	g->complement();
 
 /*
 	time_t buildOG_end = time(NULL);
@@ -178,27 +169,15 @@ void initGlobalVariables(){
 }
 
 
-//test after parsing (for spec_klein.og)
-void testGraph(){
-	assert(firstLabelId == 4);
-	assert(firstInputId == 5);
-	assert(firstOutputId == 7);
-	assert(lastLabelId == 8);
-	assert(lastInputId = 6);
-	assert(lastOutputId == 8);
-	assert(currentIdPos == lastOutputId);
-	//assert(graph->initialNodes.size() == 1);
-}
-
-bool fileExists(std::string filename) {
-    FILE *tmp = fopen(filename.c_str(), "r");
-    if (tmp) {
-        fclose(tmp);
-        return true;
-    } else {
-        return false;
-    }
-}
+//bool fileExists(std::string filename) {
+//    FILE *tmp = fopen(filename.c_str(), "r");
+//    if (tmp) {
+//        fclose(tmp);
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}
 
 
 /// evaluate the command line parameters

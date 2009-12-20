@@ -24,10 +24,12 @@ testsafira_SOURCES = testmain.cc config.h \
                  testFormula.h testFormula.cc \
                  testGraph.h testGraph.cc \
                  testNode.h testNode.cc \
+                 cmdline.c cmdline.h \
+                 verbose.h verbose.cc \
+                 Output.h Output.cc \
                  types.h 
 
 
-safira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
 testsafira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
 
 

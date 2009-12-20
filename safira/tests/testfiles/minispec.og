@@ -6,10 +6,10 @@ INTERFACE
 
 
 
-GLOBALFORMULA 0 + 0;    
+GLOBALFORMULA 0;    
 
 NODES 
-  0: (I + O)
+  0: I + O
     I -> 0
     I -> 1
     O -> 1
@@ -17,5 +17,3 @@ NODES
   1: O
     O -> 0
 
-
-  

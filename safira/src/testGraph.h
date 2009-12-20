@@ -3,5 +3,6 @@
 
 void initGraph();
 void testGraphClass();
+void testComplement();
 
 #endif

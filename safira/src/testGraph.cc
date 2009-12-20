@@ -8,8 +8,14 @@
 #include "cmdline.h"
 #include "testFormula.h"
 
+//#include "cmdline.h"
+//#include "verbose.h"
+//#include "config-log.h"
+
+#include "Output.h"
+
 /// the command line parameters
-extern gengetopt_args_info args_info;
+gengetopt_args_info args_info;
 
 using std::map;
 using std::string;
@@ -28,6 +34,7 @@ extern unsigned int lastOutputId;
 
 void initGraph(){
 	initFormulaClass();
+	Node::init();
 
 	firstLabelId = 2;
 	firstInputId = 3;
@@ -40,11 +47,18 @@ void initGraph(){
 
 }
 
-/* only computes the complement of a given annotated Graph;
- * the correctness of the result is not checked here
- */
-void testGraphClass(){
 
+void testGraphClass(){
+	testComplement();
+	cout << "testGraphClass... \t passed" << endl;
+
+}
+
+/* computes the complement of a given annotated Graph
+ * the correctness of the result is checked by the testsuite.at
+ * the Funtion make complete is also tested by this method
+ */
+void testComplement(){
 	initGraph();
 
 	Formula* f0 = new FormulaOR(new FormulaLit(label2id["I"]), new FormulaLit(label2id["O"])); //f1 = I+O
@@ -72,9 +86,14 @@ void testGraphClass(){
 	g->globalFormula = new FormulaAND(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
 
 	g->makeTotal();
+	Output o1("testGraph_total.eaa", "total testGraph");
+	g->print(o1);
 	g->makeComplete();
+	Output o2("testGraph_complement.eaa", "complement testGraph");
+	g->print(o2);
+
+	assert(g->getSizeOfAddedNodes() == 5);
+	//g->printNodes();
 
 	delete g;
-	cout << "testGraphClass... \t passed" << endl;
-
 }

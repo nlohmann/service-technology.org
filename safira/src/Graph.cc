@@ -53,6 +53,10 @@ void Graph::addInitialNode(int id){
 	initialNodes.push_back(id);
 }
 
+void Graph::complement(){
+	makeTotal();
+	makeComplete();
+}
 
 void Graph::makeTotal(){
 //	map<int, Node*> addedNodes;
@@ -94,15 +98,18 @@ void Graph::makeTotal(){
 
 void Graph::makeComplete() {
 
-	if (NULL == trap){
-		//add trap state (with formula true and a self loop for every label) to the graph
-		Formula *t = new FormulaTrue();
-		trap = new Node(t);
-	    addedNodes[trap->id] = trap; //the trap state is already total and complete
-	    for (int l = firstLabelId; l <= lastLabelId; ++l){
-	    	trap->addEdge(l,trap); //self loop
-	    }
-	}
+	// dieser fall kann nicht (mehr) eintreten, das makeComplete immer nach makeTotal aufgerufen wird
+//	if (NULL == trap){
+//		//add trap state (with formula true and a self loop for every label) to the graph
+//		Formula *t = new FormulaTrue();
+//		trap = new Node(t);
+//	    addedNodes[trap->id] = trap; //the trap state is already total and complete
+//	    for (int l = firstLabelId; l <= lastLabelId; ++l){
+//	    	trap->addEdge(l,trap); //self loop
+//	    }
+//	}
+
+	assert(NULL != trap);
 
 	/* complete the initial nodes:
 	 * if the formula of a initial node p is not equal true:
@@ -247,7 +254,7 @@ void Graph::toDot(FILE* out, string title) const {
 		}
 
 		fprintf(out, "}\n");
-		fclose (out);
+		//fclose (out);
 
 
 		// prepare dot command line for printing
@@ -321,84 +328,6 @@ void Graph::print(ostream& o) const{
 	}
 }
 
-
-/// print the graph
-//void Graph::print() const{
-//
-//	fprintf(stdout, "INTERFACE\n");
-//	fprintf(stdout, "  INPUT\n");
-//
-//	for (int i = firstInputId; i <= lastInputId; ++i){
-//		assert(id2label.find(i) != id2label.end());
-//		if (i == firstInputId){
-//			fprintf(stdout, "    %s", id2label[i].c_str());
-//		}
-//		else{
-//			fprintf(stdout, ", %s", id2label[i].c_str());
-//		}
-//	}
-//
-//	fprintf(stdout, ";\n  OUTPUT\n");
-//	for (int i = firstOutputId; i <= lastOutputId; ++i){
-//		assert(id2label.find(i) != id2label.end());
-//		if (i == firstOutputId){
-//			fprintf(stdout, "    %s", id2label[i].c_str());
-//		}
-//		else{
-//			fprintf(stdout, ", %s", id2label[i].c_str());
-//		}
-//	}
-//
-//	fprintf(stdout, ";\n\nINITIALNODES ");
-//	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
-//		if (n == initialNodes.begin()){
-//			fprintf(stdout, " %d", *n);
-//		}
-//		else {
-//			fprintf(stdout, ", %d", *n);
-//		}
-//	}
-//
-//	fprintf(stdout, ";\n\nGLOBALFORMULA %s", globalFormula->toString().c_str());
-//
-//    fprintf(stdout, ";\n\nNODES\n");
-//
-//    //print all nodes
-//	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
-//		fprintf(stdout, "  %d: %s\n", n->first, n->second->formula->toString().c_str());
-//		for (int i = firstLabelId; i <= lastLabelId; ++i){
-//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				assert(id2label.find(i) != id2label.end());
-//				fprintf(stdout, "    %s -> %d\n", id2label[i].c_str(), (*s)->id);
-//			}
-//		}
-//		fprintf(stdout, "\n");
-//	}
-//
-//    //print all addednodes
-//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
-//		fprintf(stdout, "  %d: %s\n", n->first, n->second->formula->toString().c_str());
-//		for (int i = firstLabelId; i <= lastLabelId; ++i){
-//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				assert(id2label.find(i) != id2label.end());
-//				fprintf(stdout, "    %s -> %d\n", id2label[i].c_str(), (*s)->id);
-//			}
-//		}
-//		fprintf(stdout, "\n");
-//	}
-//}
-
-void Graph::printNodes(map<int, Node*> nodeMap){
-	cout << "\nsize of map: " << nodeMap.size() << endl;
-	for (map<int, Node*>::const_iterator n = nodeMap.begin(); n != nodeMap.end(); ++n){
-		cout << "NodeNumber: " << n->first << "   Formula: " << n->second->formula->toString() << endl;
-
-//		for (int i = 0; i < cntLabels; ++i){
-//			cout << "Number of " << id2label[i] << " successors: ";
-//			cout << n->second->outEdges[i]->size() << endl;
-//		}
-	}
-}
 
 int Graph::getSizeOfAddedNodes(){
 	return addedNodes.size();

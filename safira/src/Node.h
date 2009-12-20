@@ -10,7 +10,7 @@ using namespace std;
 
 class Node {
     private:
-    	static int maxId;
+    	static int maxId;		/// maximal id of all node objects
 
     public:
         Labels outLabels; 		/// the labels of outgoing arcs
@@ -28,6 +28,9 @@ class Node {
 
         /// add an outoing edge to the node
         void addEdge(int label, Node *target);
+
+        /// reset the maxId
+        static void init();
 };
 
 #endif

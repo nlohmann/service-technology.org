@@ -10,13 +10,15 @@ using namespace std;
 
 class Graph {
 	private:
-	list<int> initialNodes;
-	map<int, Node*> addedNodes;
-	Node *trap;
+		list<int> initialNodes;
+		map<int, Node*> addedNodes;
+		Node *trap;
 
     public:
         /// the nodes indexed by an identifier
         map<int, Node*> nodes;
+
+        /// the global formula of the graph
         Formula *globalFormula;
 
     	///constructor
@@ -27,6 +29,9 @@ class Graph {
 
     	/// add an initial node to the grpah
     	void addInitialNode(int id);
+
+    	/// computes the complement for the extended annotated graph
+    	void complement();
 
         /// complete the extended annotated graph
         void makeComplete();
@@ -40,9 +45,6 @@ class Graph {
 
         /// OG output
         void print(ostream& o) const;
-
-        /// print the node numbers of the given map
-        void printNodes(map<int, Node*> nodeMap);
 
         /// get the number of new nodes in the complement
         int getSizeOfAddedNodes();

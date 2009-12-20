@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = EMPTY minispec.og minispec_complement_ref.eaa PO.og PO.txt myCoffee_complement_ref.eaa myCoffee.og
+TESTFILES = EMPTY minispec.og minispec_complement_ref.eaa PO.og PO.txt myCoffee_complement_ref.eaa myCoffee.og testGraph_complement_ref.eaa testGraph_total_ref.eaa
 
 
 # Below you can list all the files you do not want to have counted in the
@@ -61,6 +61,7 @@ EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lco
 
 # compile the code for code coverage
 cover-prepare:
+    #target check is set to include the unit tests
 	$(MAKE) --directory=$(top_srcdir) clean all check \
 	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  CFLAGS+="-fprofile-arcs -ftest-coverage" \

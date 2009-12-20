@@ -2,7 +2,7 @@
 %token LBRACK RBRACK KEY_CONSUME KEY_PRODUCE
 
 %defines
-%name-prefix="llowfn_"
+%name-prefix="llowfn_final_"
 
 %{
 #include <cstdlib>
@@ -12,15 +12,15 @@
 #include <vector>
 #include "types.h"
 
-extern int llowfn_lex();
-extern int llowfn_error(const char *);
+extern int llowfn_final_lex();
+extern int llowfn_final_error(const char *);
 
-extern FILE* llowfn_out;
+extern FILE* llowfn_final_out;
 extern std::map<std::string, pType> placeTypes;
 
-std::vector<std::string> internalPlaces;
-std::vector<std::string> inputPlaces;
-std::vector<std::string> outputPlaces; 
+extern std::vector<std::string> internalPlaces;
+extern std::vector<std::string> inputPlaces;
+extern std::vector<std::string> outputPlaces; 
 %}
 
 %union {
@@ -40,29 +40,29 @@ placelist:
 
     //Internal places
     if(internalPlaces.empty() == false){
-	fprintf(llowfn_out, "%s\n", "INTERNAL");
+	fprintf(llowfn_final_out, "%s\n", "INTERNAL");
     	for(i=0;i<internalPlaces.size()-1;++i){
-		fprintf(llowfn_out, "\t%s,\n", internalPlaces[i].c_str()); 
+		fprintf(llowfn_final_out, "\t%s,\n", internalPlaces[i].c_str()); 
     	}	    
-    	fprintf(llowfn_out, "\t%s\n;\n", internalPlaces[i].c_str());
+    	fprintf(llowfn_final_out, "\t%s\n;\n", internalPlaces[i].c_str());
     }
     //Input places
 
     if(inputPlaces.empty() == false){
-    	    fprintf(llowfn_out, "%s\n", "INPUT");
+    	    fprintf(llowfn_final_out, "%s\n", "INPUT");
 	    for(i=0;i<inputPlaces.size()-1;++i){
-		fprintf(llowfn_out, "\t%s,\n", inputPlaces[i].c_str());
+		fprintf(llowfn_final_out, "\t%s,\n", inputPlaces[i].c_str());
             } 
-    		fprintf(llowfn_out, "\t%s\n;\n", inputPlaces[i].c_str());
+    		fprintf(llowfn_final_out, "\t%s\n;\n", inputPlaces[i].c_str());
     }
     //Output places
 
     if(outputPlaces.empty() == false){
-    	fprintf(llowfn_out, "%s\n", "OUTPUT");
+    	fprintf(llowfn_final_out, "%s\n", "OUTPUT");
         for(i=0;i<outputPlaces.size()-1;++i){
-      		fprintf(llowfn_out, "\t%s,\n", outputPlaces[i].c_str()); 
+      		fprintf(llowfn_final_out, "\t%s,\n", outputPlaces[i].c_str()); 
     	}    
-        	fprintf(llowfn_out, "\t%s\n;\n", outputPlaces[i].c_str());
+        	fprintf(llowfn_final_out, "\t%s\n;\n", outputPlaces[i].c_str());
     }
   }
 ;

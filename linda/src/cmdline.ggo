@@ -17,6 +17,15 @@ option "level-1" 1
 option "structure" s
   "Message Profile from structural analysis (atm: t-invariants)"
   flag off
+
+option "oct" 2
+  "Octagon Message Profile"
+  flag off
+
+option "dbm" 3
+  "DBM Message Profile"
+  flag off
+
   
 option "file" f
   "Message Profile from a term file"

@@ -199,10 +199,7 @@ int main(int argc, char** argv) {
 	// MODE Level 1 Message Profile
 	// We evaluate a term (1*a + 1*b) for any two events a,b with a != b.
 	if (args_info.level_1_flag) {
-		message("Evaluating mutual exclusion terms.");
-		status("Number of mutual exclsion terms: %i",
-				(LindaHelpers::NR_OF_EVENTS * LindaHelpers::NR_OF_EVENTS)
-				- LindaHelpers::NR_OF_EVENTS);
+		message("Evaluating level 1 terms.");
 
 		// Iterate over the finalmarkings/lps
 		for (int x = 0; x < sysCounter; ++x) {
@@ -244,6 +241,73 @@ int main(int argc, char** argv) {
 
 	}
 
+
+	// MODE Oct Message Profile
+	if (args_info.oct_flag) {
+		message("Evaluating octagon terms.");
+
+		// Iterate over the finalmarkings/lps
+		for (int x = 0; x < sysCounter; ++x) {
+
+			status("    Processing final marking: %s",
+					LindaAgent::getFinalMarking(x)->toString().c_str());
+
+			// For each event, we create a term and evaluate it
+			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+				BasicTerm* bt1 = new BasicTerm(i);
+				
+				EventTermBound* bsingle = LindaAgent::getSystem(x)->evaluate(bt1);
+				
+				for (int j = i + 1; j < LindaHelpers::NR_OF_EVENTS; ++j) {
+
+					BasicTerm* bt2 = new BasicTerm(j);
+					AddTerm* at1 = new AddTerm(bt1, bt2);
+					AddTerm* at2 = new AddTerm(bt1, new MultiplyTerm(bt2,-1));
+
+					EventTermBound* b1 = LindaAgent::getSystem(x)->evaluate(at1);
+					EventTermBound* b2 = LindaAgent::getSystem(x)->evaluate(at2);
+				}
+			}
+
+		}
+
+	}
+
+		
+	// MODE DBM Message Profile
+	if (args_info.dbm_flag) {
+		message("Evaluating dbm terms.");
+		status("Number of mutual exclsion terms: %i",
+				(LindaHelpers::NR_OF_EVENTS * LindaHelpers::NR_OF_EVENTS)
+				- LindaHelpers::NR_OF_EVENTS);
+
+		// Iterate over the finalmarkings/lps
+		for (int x = 0; x < sysCounter; ++x) {
+
+			status("    Processing final marking: %s",
+					LindaAgent::getFinalMarking(x)->toString().c_str());
+
+			// For each event, we create a term and evaluate it
+			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+				BasicTerm* bt1 = new BasicTerm(i);
+				
+				EventTermBound* bsingle = LindaAgent::getSystem(x)->evaluate(bt1);
+				
+				for (int j = i + 1; j < LindaHelpers::NR_OF_EVENTS; ++j) {
+
+					BasicTerm* bt2 = new BasicTerm(j);
+					AddTerm* at2 = new AddTerm(bt1, new MultiplyTerm(bt2,-1));
+
+					EventTermBound* b2 = LindaAgent::getSystem(x)->evaluate(at2);
+				}
+			}
+
+		}
+
+	}
+
+	
+	
 	// MODE Event term file
 	// We read a file that contains event terms and evaluate them
 	if (args_info.file_given) {

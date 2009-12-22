@@ -80,13 +80,23 @@ void PartialMarking::output(std::ostream& stream) {
 string PartialMarking::toString() {
 
 	string result = "";
+	
+	bool firsttime = true;
 
 	for (BinaryTreeIterator<const pnapi::Place*, int>* it = values.begin(); it->valid(); it->next()) {
-		result += it->getKey()->getName() + "=" + LindaHelpers::intToStr(
-				it->getValue()) + "; ";
+	if (!firsttime) {
+		result += ", ";
+		
+		} else {
+		firsttime = false;
+		}
+	result += it->getKey()->getName() + "=" + LindaHelpers::intToStr(
+				it->getValue());
+				
 	}
 
-	return result;
+	
+	return result + ";";
 }
 
 void SetOfPartialMarkings::output() {

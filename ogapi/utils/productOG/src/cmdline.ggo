@@ -1,0 +1,24 @@
+args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error"
+
+purpose "Calculating product OGs"
+
+description "About productOG:"
+
+section "Input / Output"
+
+option "output" o
+  "Output file. If no file is given, it will be written to standard out."
+  string
+  typestr="OUTFILE"
+  optional
+
+
+
+section "Debugging"
+sectiondesc="These options control how much debug output the comiplers create.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+

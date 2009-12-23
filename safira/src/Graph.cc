@@ -8,6 +8,7 @@
 #include <iostream>
 //#include "cmdline.h"
 #include "Graph.h"
+#include "helpers.h"
 #include <time.h>
 
 /// the command line parameters
@@ -28,6 +29,7 @@ extern int lastLabelId;
 extern int lastInputId;
 extern int lastOutputId;
 
+using namespace std;
 ///constructor
 Graph::Graph() : trap(NULL), globalFormula(NULL){
 
@@ -195,16 +197,18 @@ void Graph::makeComplete() {
 	}
 
 	//generate global formula
-	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
-		    assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
-		//	nodes[n->second->id] = n->second; //add new nodes to nodes-map
-
-			//generate new global formula;
-			const Formula *f = new FormulaNUM(n->second->id);
-			const Formula *g = new FormulaNOT(f);
-			Formula *h = new FormulaAND(globalFormula, g) ;
-			globalFormula = h;
-	}
+//	Formula *gf = new FormulaNOT(globalFormula);
+//	globalFormula = gf;
+//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+//		    assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
+//		//	nodes[n->second->id] = n->second; //add new nodes to nodes-map
+//
+//			//generate new global formula;
+//			const Formula *g = new FormulaNUM(n->second->id);
+//			//const Formula *g = new FormulaNOT(f);
+//			Formula *h = new FormulaOR(globalFormula, g) ;
+//			globalFormula = h;
+//	}
 }
 
 
@@ -262,9 +266,7 @@ void Graph::toDot(FILE* out, string title) const {
 
 }
 
-/// print the graph
-void Graph::print(ostream& o) const{
-
+void Graph::printInterface(ostream& o) const {
 	o << "INTERFACE\n";
 	o << "  INPUT\n";
 
@@ -289,7 +291,11 @@ void Graph::print(ostream& o) const{
 		}
 	}
 
-	o << ";\n\nINITIALNODES ";
+	o << ";\n";
+}
+
+void Graph::printInitialNodes(ostream& o) const{
+	o << "\nINITIALNODES ";
 	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
 		if (n == initialNodes.begin()){
 			o << " " << *n;
@@ -298,10 +304,56 @@ void Graph::print(ostream& o) const{
 			o << ", " << *n;
 		}
 	}
+}
 
-	o << ";\n\nGLOBALFORMULA " << globalFormula->toString();
+void Graph::printGlobalFormulaForComplement(ostream& o) const{
 
-	o << ";\n\nNODES\n";
+	o << ";\n\nGLOBALFORMULA " << getGlobalFormulaForComplement() << ";\n";
+
+}
+
+void Graph::printGlobalFormula(ostream& o) const{
+
+	o << ";\n\nGLOBALFORMULA " << getGlobalFormula() << ";\n";
+
+}
+
+string Graph::getGlobalFormulaForComplement() const{
+	assert(globalFormula);
+
+	Formula* g = new FormulaNOT(globalFormula);
+	string s = g->toString();
+
+	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+		assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
+
+		//generate new global formula;
+		s = s + " + " + intToString(n->second->id);
+
+	}
+
+	return s;
+}
+
+string Graph::getGlobalFormula() const{
+	assert(globalFormula);
+	string s = globalFormula->toString();
+
+
+	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+		assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
+
+		//generate new global formula;
+		s = s + " * ~" + intToString(n->second->id);
+
+	}
+
+	return s;
+}
+
+
+void Graph::printNodes(ostream& o) const{
+	o << "\nNODES\n";
 
     //print all nodes
 	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
@@ -328,6 +380,89 @@ void Graph::print(ostream& o) const{
 	}
 }
 
+void Graph::printComplement(ostream& o) const{
+
+	printInterface(o);
+	printInitialNodes(o);
+	printGlobalFormulaForComplement(o);
+	printNodes(o);
+}
+
+/// print the graph
+void Graph::print(ostream& o) const{
+
+	printInterface(o);
+	printInitialNodes(o);
+	printGlobalFormula(o);
+	printNodes(o);
+
+
+//	o << "INTERFACE\n";
+//	o << "  INPUT\n";
+//
+//	for (int i = firstInputId; i <= lastInputId; ++i){
+//		assert(id2label.find(i) != id2label.end());
+//		if (i == firstInputId){
+//			o << "    " << id2label[i];
+//		}
+//		else{
+//			o << ", " << id2label[i];
+//		}
+//	}
+//
+//	o << ";\n  OUTPUT\n";
+//	for (int i = firstOutputId; i <= lastOutputId; ++i){
+//		assert(id2label.find(i) != id2label.end());
+//		if (i == firstOutputId){
+//			o << "    " << id2label[i];
+//		}
+//		else{
+//			o << ", " << id2label[i];
+//		}
+//	}
+//
+//	o << ";\n\nINITIALNODES ";
+//	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
+//		if (n == initialNodes.begin()){
+//			o << " " << *n;
+//		}
+//		else {
+//			o << ", " << *n;
+//		}
+//	}
+//
+//	//o << ";\n\nGLOBALFORMULA " << globalFormula->toString();
+//
+//	o << ";\n\nGLOBALFORMULA " << getGlobalFormulaForComplement();
+//    //o << "\n" << getGlobalFormulaForComplement() << endl;
+//
+//	o << ";\n\nNODES\n";
+//
+//    //print all nodes
+//	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
+//		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
+//		for (int i = firstLabelId; i <= lastLabelId; ++i){
+//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+//				assert(id2label.find(i) != id2label.end());
+//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
+//			}
+//		}
+//		o << endl;
+//	}
+//
+//    //print all addednodes
+//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
+//		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
+//		for (int i = firstLabelId; i <= lastLabelId; ++i){
+//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+//				assert(id2label.find(i) != id2label.end());
+//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
+//			}
+//		}
+//		o << endl;
+//	}
+}
+
 
 int Graph::getSizeOfAddedNodes(){
 	return addedNodes.size();
@@ -347,3 +482,5 @@ int Graph::getSizeOfAddedNodes(){
 //	}
 //
 //}
+
+

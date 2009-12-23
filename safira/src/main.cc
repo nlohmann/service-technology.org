@@ -129,14 +129,14 @@ int main(int argc, char **argv) {
 				string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
 				g->toDot(s, title);
 				assert(!ferror(s));
-				pclose(s);
+				fclose(s);
 				break;
 			}
 
 			case (output_arg_eaa): {
 				printToStdout = false;
 				Output o(filename+"_complement.eaa", "complement OG");
-				g->print(o);
+				g->printComplement(o);
 				break;
 			}
 		}
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 
 	if(printToStdout){
 		Output o("-", "complement OG");
-		g->print(o);
+		g->printComplement(o);
 	}
 
 	delete g;

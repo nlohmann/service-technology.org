@@ -14,6 +14,13 @@ class Graph {
 		map<int, Node*> addedNodes;
 		Node *trap;
 
+        void printInterface(ostream& o) const;
+        void printInitialNodes(ostream& o) const;
+        void printNodes(ostream& o) const;
+        /// prints the global Formula of the complement (it is required that makeTotal and makeComplete was executed before)
+        void printGlobalFormulaForComplement(ostream& o) const;
+        void printGlobalFormula(ostream& o) const;
+
     public:
         /// the nodes indexed by an identifier
         map<int, Node*> nodes;
@@ -43,30 +50,21 @@ class Graph {
         void toDot(FILE* out, string title = "") const;
        // void toDot(string filename, string title = "") const;
 
-        /// OG output
+        /// Graph output
         void print(ostream& o) const;
+
+        /// Graph output as complement (it is required that makeTotal and makeComplete was executed before)
+        void printComplement(ostream& o) const;
+
+        string getGlobalFormulaForComplement() const;
+        string getGlobalFormula() const;
 
         /// get the number of new nodes in the complement
         int getSizeOfAddedNodes();
 
+
 //        /// adds a label to the graphs
 //        void addLabel(string label, unsigned int id);
-//
-//        /// add a node to the graph
-//        void addNode(Node *n);
-//
-//        /// returns true if the given node exits
-//        bool nodeExists(unsigned int id);
-//
-//        /// returns a pointer to the node object for the given id
-//        Node* getNode(unsigned int id);
-//
-
-//
-//        /// remove a node from the graph (triggers edge deletion)
-//        void removeNode(Node *n);
-
-
 
 };
 

@@ -83,14 +83,14 @@ void testComplement(){
 	g->nodes[n0->id] = n0;
 	g->nodes[n1->id]  = n1;
 	g->addInitialNode(n0->id);
-	g->globalFormula = new FormulaAND(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
+	g->globalFormula = new FormulaOR(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
 
 	g->makeTotal();
 	Output o1("testGraph_total.eaa", "total testGraph");
 	g->print(o1);
 	g->makeComplete();
 	Output o2("testGraph_complement.eaa", "complement testGraph");
-	g->print(o2);
+	g->printComplement(o2);
 
 	assert(g->getSizeOfAddedNodes() == 5);
 	//g->printNodes();

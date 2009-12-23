@@ -6,7 +6,7 @@ INTERFACE
 
 INITIALNODES  0;
 
-GLOBALFORMULA (0 * 1);
+GLOBALFORMULA (0 + 1) * ~2;
 
 NODES
   0: ((((I + O) * ~(tau)) * ~(A)) * ~(R))

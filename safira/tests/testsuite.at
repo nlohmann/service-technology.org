@@ -36,9 +36,9 @@ AT_CLEANUP
 
 AT_SETUP([complement of big OG])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/PO.og TESTFILES/PO.txt .])
-AT_CHECK([SAFIRA PO.og],0,stdout,stderr)
+AT_CHECK([SAFIRA -oeaa PO.og],0,stdout,stderr)
 AT_CHECK([diff EMPTY stderr])
-AT_CHECK([diff stdout PO.txt])
+AT_CHECK([diff PO_complement.eaa PO.txt])
 AT_KEYWORDS(complement)
 AT_CLEANUP
 

@@ -8,6 +8,13 @@ using std::set;
 using std::string;
 using std::vector;
 
+#define DEBUG
+#ifdef DEBUG
+#include <iostream>
+using std::cerr;
+using std::endl;
+#endif
+
 /*!
  * \brief Standard constructor
  */
@@ -618,11 +625,16 @@ bool Choreography::isChoreography() const
   return isChor;
 }
 
+/*!
+ * This method resolves deadlocks by deleting such states that do not
+ * lead to a final state. This is not the general term of resolving
+ * but it suffices the needs of the application of realizability.
+ */
 bool Choreography::resolveDeadlocks()
 {
   bool changed = false;
 
-  if (finalStates_.empty() && !states_.empty())
+/*  if (finalStates_.empty() && !states_.empty())
   {
     std::set<int> tempStates = states_;
     for (set<int>::iterator i = tempStates.begin(); i != tempStates.end(); ++i)
@@ -631,6 +643,54 @@ bool Choreography::resolveDeadlocks()
     }
     changed = true;
   }
+  else
+  {
+    if (states_.empty())
+      return false*/;
+    vector<int> toBeDeleted;
+    if (defined(initialState_))
+      bfs(initialState_, toBeDeleted);
+    for (int i = 0; i < (int) toBeDeleted.size(); ++i)
+    {
+      deleteState(toBeDeleted[i]);
+      changed = true;
+    }
+//  }
 
   return changed;
+}
+
+bool Choreography::bfs(int q, vector<int> &toBeDeleted)
+{
+#ifdef DEBUG
+  cerr << "bfs: checking " << q << endl;
+#endif
+  if (isFinal(q))
+  {
+    return true;
+  }
+  set<Edge *> edges = edgesFrom(q);
+  if (edges.empty())
+  {
+    toBeDeleted.push_back(q);
+    return false;
+  }
+  bool result = false;
+  for (set<Edge *>::iterator e = edges.begin(); e != edges.end(); ++e)
+  {
+    result = bfs((*e)->destination, toBeDeleted) || result;
+  }
+  if (!result)
+  {
+    toBeDeleted.push_back(q);
+  }
+  return result;
+}
+
+/*!
+ * Checks whether the given state is not INT_MIN (undefined state).
+ */
+bool Choreography::defined(int q)
+{
+  return q != INT_MIN;
 }

@@ -91,6 +91,12 @@ public:
 
   void unite(int, int);
 
+private:
+
+  bool bfs(int q, std::vector<int> &toBeDelted);
+
+  bool defined(int q);
+
 };
 
 #endif /* CHOREOGRAPHY_H */

@@ -47,3 +47,6 @@ Version 1.0-unreleased
   a deadlock checker
   
 * added regression test (bug14955.chor)
+
+* implemented method to resolve dead paths (paths ending in a deadlock) (task
+#6897 (https://gna.org/task/?6897)

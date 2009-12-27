@@ -46,7 +46,7 @@ int main() {
 	
     
     // parse high-level net and pipe it to LoLA (initial marking)
-    pipe_out_initial = popen("lola-none -nllnet1 > /dev/null", "w");
+    pipe_out_initial = popen("lola-statespace -nllnet1 2> /dev/null", "w");
     hlowfn_initial_in = fopen("/tmp/input", "r");
     hlowfn_initial_out = pipe_out_initial;
     hlowfn_initial_parse();
@@ -54,7 +54,7 @@ int main() {
     fclose(hlowfn_initial_in);
       
     // parse high-level net and pipe it to LoLA (final marking)
-    pipe_out_final = popen("lola-none -nllnet2 > /dev/null", "w");
+    pipe_out_final = popen("lola-statespace -nllnet2 2> /dev/null", "w");
     hlowfn_final_in = fopen("/tmp/input", "r");
     hlowfn_final_out = pipe_out_final;
     hlowfn_final_parse();

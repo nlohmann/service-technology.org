@@ -802,6 +802,42 @@ AT_KEYWORDS([formulae dnf])
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Unfolder])
+############################################################################
+
+AT_SETUP([Unfolding high-level oWFN 1])
+m4_define([NET], [phils.hlowfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
+AT_CHECK([GREP -q "INTERNAL" stdout])
+AT_CHECK([GREP -q "INITIALMARKING" stdout])
+AT_CHECK([GREP -q "FINALMARKING" stdout])
+AT_KEYWORDS([unfold hlowfn])
+AT_CLEANUP
+
+AT_SETUP([Unfolding high-level oWFN 2])
+m4_define([NET], [data.hlowfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
+AT_CHECK([GREP -q "INPUT" stdout])
+AT_CHECK([GREP -q "OUTPUT" stdout])
+AT_CHECK([GREP -q "INITIALMARKING" stdout])
+AT_CHECK([GREP -q "FINALMARKING" stdout])
+AT_KEYWORDS([unfold hlowfn])
+AT_CLEANUP
+
+AT_SETUP([Unfolding high-level oWFN 3])
+m4_define([NET], [eisen.hlowfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
+AT_CHECK([GREP -q "INTERNAL" stdout])
+AT_CHECK([GREP -q "OUTPUT" stdout])
+AT_CHECK([GREP -q "INITIALMARKING" stdout])
+AT_CHECK([GREP -q "FINALMARKING" stdout])
+AT_KEYWORDS([unfold hlowfn])
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Canonical DNF])
 ############################################################################
 

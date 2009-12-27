@@ -1,0 +1,88 @@
+{ The dining philosophers high level net specification      }
+{ In this version, a philosopher behaves deterministically, }
+{ executing the sequence                                    }
+{ * take left fork                                          }
+{ * take right fork                                         }
+{ * release left fork                                       }
+{ * release right fork                                      }
+
+{ For scaling the number of philosopher,                          }
+{ - change the right hand number in line 17 (sort declaration) to }
+{   the desired number of philosophers                            }
+
+{-----------------------------------------------------------------------------}
+{Section 1: Declare data types and operations }
+
+SORT 
+	phil = [ 1 , 10 ];   { range from 1 to #phil }
+	fork = phil ;
+
+FUNCTION L ( x : phil ) : fork 
+{ Given a philosopher, assign its left fork }
+
+BEGIN
+	RETURN x 
+END
+
+FUNCTION R ( x : phil ) : fork
+{ Given a philosopher, assign its right fork }
+
+BEGIN
+	RETURN x + 1 { If x + 1 is outside the range ofsort fork,                }
+			     { LoLA voluntarily corrects the value modulo the sort range }
+END
+
+FUNCTION all () : phil
+{ Returns the multiset where all philosophers appear once }
+{ We need this operation for a parametric initial marking }
+
+VAR x: phil;
+
+BEGIN
+	FOR ALL x DO 
+		RETURN x  { Note that this statement only adds the specified value to the }
+				  { result's multiset, without exiting from the function          }
+	END
+END
+
+{------------------------------------------------------------------------------------}
+{ Section 2: Specify actual net }
+
+PLACE
+INTERNAL
+    th : phil,
+	  hl : phil,
+	  ea : phil,
+	  hr : phil,
+	  fo : fork;
+
+INITIALMARKING th : all(),    { due to the meaning of all(), all instances of th are marked }
+		fo : L(all()); { Multi-valued subterms cause multiple calls of their  }
+					   { parent terms (linear extension of term evaluation to }
+					   { multisets                                            }
+
+FINALMARKING th : all(), fo : L(all());
+
+TRANSITION tl
+	VAR y : phil;
+	CONSUME th : y, 
+			fo : L(y);
+	PRODUCE hl : y ;
+	  
+TRANSITION tr
+	VAR y : phil;
+	CONSUME hl : y, 
+		    fo : R(y);
+	PRODUCE ea : y ;
+	  
+TRANSITION rl
+	VAR y : phil;
+	CONSUME ea : y;
+	PRODUCE hr : y, 
+		    fo : L(y);
+	  
+TRANSITION rr
+	VAR y : phil;
+	CONSUME hr : y;
+	PRODUCE th : y, 
+			fo : R(y);

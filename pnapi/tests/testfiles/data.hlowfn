@@ -1,0 +1,55 @@
+SORT
+	reader = [ 1 , 10 ] ;
+	writer = [ 1 , 10 ] ;
+
+FUNCTION allreaders() : reader
+
+VAR x : reader ;
+BEGIN
+FOR ALL x DO RETURN x END
+END
+
+FUNCTION allwriters() : writer
+
+VAR x : writer ;
+BEGIN
+FOR ALL x DO RETURN x END
+END
+
+PLACE 
+INPUT nrea : reader , rea : reader , sem : reader;
+
+OUTPUT nwri : writer , wri : writer{ ,
+pen : writer  ,  key } ;
+
+INITIALMARKING nrea : allreaders() , nwri : allwriters() , sem : allreaders() { , key : 1 }  ;
+
+FINALMARKING nrea : allreaders() ;
+
+TRANSITION br
+
+VAR x : reader ;
+
+CONSUME { key : 1 , } nrea : x , sem : x ;
+PRODUCE { key : 1 , } rea : x ;
+
+TRANSITION er 
+
+VAR x : reader ;
+
+CONSUME rea : x ;
+PRODUCE nrea : x , sem : x ;
+
+TRANSITION bw
+
+VAR y : writer ;
+
+CONSUME sem : allreaders() , nwri : y ;
+PRODUCE wri : y { , key : 1 }  ;
+
+TRANSITION ew
+
+VAR y : writer ;
+
+CONSUME wri : y ;
+PRODUCE sem : allreaders() , nwri : y ;

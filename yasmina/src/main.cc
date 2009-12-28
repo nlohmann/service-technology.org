@@ -19,6 +19,7 @@
 #include <cmath>
 #include <limits.h>
 #include "eventTerm.h"
+//#include "ppl.hh"
 
 
 using std::cout;
@@ -48,7 +49,8 @@ using pnapi::io::InputError;
 using pnapi::io::CREATOR;
 using pnapi::io::INPUTFILE;
 using pnapi::io::OUTPUTFILE;
-
+//using namespace Parma_Polyhedra_Library;
+//using namespace Parma_Polyhedra_Library::IO_Operators;
 
 /// the parser constraint vector
 std::vector<EventTerm*>* term_vec = 0;
@@ -298,7 +300,8 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 			else{ //for each element in the firs and in the second the previous make a new set out of the intersectionconstraints togetner
 				current=transform(net1,(*cIt));
 				if(current.empty()) {
-					cout<<"continue"<<previous.size()<<current.size()<<endl;continue;
+					//cout<<"continue"<<previous.size()<<current.size()<<endl;
+					continue;
 				}
 				//cout<<"nu vad"<<previous.size()<<current.size()<<endl;
 				
@@ -749,7 +752,7 @@ const pnapi::formula::Formula * unfoldFlags(const pnapi::PetriNet &net1, const p
 int main(int argc, char** argv) {
 	
 	//time_t start_time, end_time;
-	clock_t start_clock = clock();
+	//clock_t start_clock = clock();
 	evaluateParameters(argc, argv);
 	std::cerr << PACKAGE << " processing ";
 	if(args_info.inputs_num>0) {
@@ -777,7 +780,6 @@ int main(int argc, char** argv) {
 	int nTransitions;
 	std::set<lprec *> retlpset;//set of all final markings of the composition
  	
-	
 	
 	if (args_info.enforceEvents_arg){
 		for (unsigned i = 0; i < args_info.enforceEvents_given; ++i){
@@ -851,7 +853,7 @@ int main(int argc, char** argv) {
 	}
 	
 	
-	
+
 	
 	//parse the input nets
 	
@@ -942,7 +944,7 @@ int main(int argc, char** argv) {
     }
 		//std::cout << owfn << net1<<"end of composition"<<std::endl;
 
-
+	
 		//}
 //	catch (pnapi::io::InputError error) {
 //		std::cerr << PACKAGE << error << std::endl;
@@ -950,7 +952,7 @@ int main(int argc, char** argv) {
 	
 // print result
 	//fflush(stdin);
-	int res=0;//the result of the system
+clock_t start_clock = clock();		int res=0;//the result of the system
 	std::vector<lprec *> lpmps;// 
 	std::set<std::string> resultinp, resultout,resultsyn, result, resintern;//interface 
 	//parse the message profile files
@@ -1060,8 +1062,9 @@ int main(int argc, char** argv) {
 					unsigned int k=1;//cout <<"before";
 					lprec *lpmp=copy_lp(lpt);
 					if(no==1) mps.push_back(lpmp);
-					int kn=1;//cout<<"hello"<<term_vec->size()<<endl;
-					//int k=1;//print_lp(mps.at(ifm-1));
+					int kn=1;cout<<"hello"<<term_vec->size()<<endl;
+					//int k=1;//
+					//print_lp(mps.at(ifm-1));
 					//cout<<ifm-1<<"in"<<get_Nrows(mps.at(0))<<get_Nrows(mps.at(1))<<get_Nrows(mps.at(2))<<endl;
 					REAL* roww=new REAL[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()]();
 				//initialize roww ith zero values
@@ -1079,7 +1082,7 @@ int main(int argc, char** argv) {
 						//cout << EventTerm::toPrettyString((*it));
 						//std::pair<int,int> b=bd.at(kn);
 						//cout << bd.first<<" "<<bd.second<<endl;
-						
+						//std::cerr<<" parsing ";
 						for(std::map<std::string const,int>::iterator ite=ee->begin();ite!=ee->end();++ite){
 						//cout<<ite->first<<" "<<ite->second<<std::endl;
 							char * cstr= new char [ite->first.size()+1];
@@ -1102,22 +1105,23 @@ int main(int argc, char** argv) {
 					//cout<<"out"<<get_Nrows(mps.at(ifm-1))<<endl;//cout<<"coloane:"<<get_Nrows(mps.at(ifm-1));//ifm++;
 					//lp=lpmc;cout<<get_col_name(lp,get_Ncolumns(lp))<<"help"<<endl;
 				//aici adauga constraints
-					//print_lp(mps.at(ifm-1));
+					print_lp(mps.at(ifm-1));
 				}
 			//for (int ifm=1;ifm<nfm+1;++ifm){	print_lp(mps.at(ifm-1));};cout<<mps.size()<<endl;	
 				//add here to the previous set of constraints
 				
 				}	
+				
 			}
-			//here add final marking constraints;
-			for (unsigned int i=0; i<nfm; ++i) {
+			//here add final marking constraints; we can skip these ones
+			/*for (unsigned int i=0; i<nfm; ++i) {
 				
 				for (std::map<std::string,int> ::iterator itmar=fmar.at(i).begin(); itmar!=fmar.at(i).end(); ++itmar) {
 					char * cstr= new char [(*itmar).first.size()+1];
 					strcpy(cstr,(*itmar).first.c_str());
 					int index=get_nameindex(mps.at(i),cstr,FALSE);set_bounds(mps.at(i),index, (*itmar).second,(*itmar).second);
 				}
-			}
+			}*/
 			//here add the new constraints to the previous computed ones
 			if(sit==hh.begin()){lpmps=mps;}
 			else {//here combine 
@@ -1151,7 +1155,7 @@ int main(int argc, char** argv) {
 							set_rh_range(lpr,get_Nrows(lpmps.at(j)),get_rh_range(lpmps.at(j),r+1));
 							//print_lp(lpr);
 						}
-					}
+					}print_lp(lpr);
 					st.push_back(lpr);
 				}
 				lpmps=st;
@@ -1565,6 +1569,8 @@ int main(int argc, char** argv) {
 
 	//time(&end_time);
 	//status("checked necessary condition for weak termination  in [%.0f sec]", difftime(end_time,start_time));
+	
+	
 	std::cerr << PACKAGE << ": runtime: " << ((double(clock()) - double(start_clock)) / CLOCKS_PER_SEC) << " sec\n";
 	std::cerr << PACKAGE << ": memory consumption: "; system((std::string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	return 0;

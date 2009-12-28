@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-11-01 06:26:26 +0100 (Sun, 01 Nov 2009) $
+ * \date    $Date: 2009-11-16 15:27:08 +0100 (Mon, 16 Nov 2009) $
  *
- * \version $Revision: 4956 $
+ * \version $Revision: 5027 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <inttypes.h>
 #include <vector>
 
 #include "myio.h"
@@ -344,6 +345,11 @@ public:
   void compose(const PetriNet &, const std::string & = "net1",
       const std::string & = "net2");
 
+  /// compose two nets by adding the given one and merging interface places of the same port only
+  void composeByPorts(const PetriNet &, const std::string &portA,
+      const std::string &portB, const std::string &prefixA = "net1",
+      const std::string &prefixB = "net2");
+
   /// compose the given nets into a new one
   static PetriNet composeByWiring(const std::map<std::string, PetriNet *> &);
 
@@ -429,6 +435,8 @@ private:
 
   /// ports (grouping of interface places)
   std::multimap<std::string, Place *> interfacePlacesByPort_;
+
+  /// ports (grouping of synchronous labels)
 
   /// all arcs
   std::set<Arc *> arcs_;

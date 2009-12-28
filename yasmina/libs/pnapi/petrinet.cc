@@ -7,13 +7,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-11-01 06:26:26 +0100 (Sun, 01 Nov 2009) $
+ * \date    $Date: 2009-11-12 15:57:35 +0100 (Thu, 12 Nov 2009) $
  *
- * \version $Revision: 4956 $
+ * \version $Revision: 5012 $
  */
 
 #include "config.h"
@@ -884,6 +884,21 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
 
 
 /*!
+ * \param net the 2nd Petri net
+ * \param portA the identifier of the port to be composed in the 1st Petri net
+ * \param portB the identifier of the port to be composed in the 2nd Petri net
+ * \param prefixA the net prefix for the 1st net
+ * \param prefixB the net prefix for the 2nd net
+ *
+ * The result is written to the net which has called the method.
+ */
+void PetriNet::composeByPorts(const PetriNet &net, const string &portA,
+    const string &portB, const string &prefixA, const string &prefixB)
+{
+}
+
+
+/*!
  */
 PetriNet PetriNet::composeByWiring(const map<string, PetriNet *> & nets)
 {
@@ -1614,7 +1629,7 @@ void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
  * \return  true iff (1), (2) and (3) are fulfilled
  * \return  false in any other case
  * 
- * \todo    Erkennung der SZK ohne Hinzufügen der Transition
+ * \todo    Erkennung der SZK ohne Hinzufï¿½gen der Transition
  *          Daniela nach Alorithmus fragen; Funktion const machen
  */
 bool PetriNet::isWorkflow()
@@ -1835,98 +1850,118 @@ void PetriNet::deleteArc(Arc & arc)
 
 
 /*!
- \todo reimplementation: see [LohmannMW_2007_icatpn], Figure 4
-       capacities need to be adjusted appropriately
+ * \brief normalizes a net according to [LohmannMW_2007_icatpn], Figure 4
+ *        with fix for arc weights
+ * 
+ * Each interface place connected with an unnormal transition 
+ * will be wrapped by a n-bounded place, where n is the maximum
+ * weight of all arcs connected to the interface place.
  */
 void PetriNet::normalize_classical()
 {
-  // transitions may to synchronize
-  set<Transition*> candidates = synchronizedTransitions_;
-
-  // fill candidates
+  // iterate through input places
   for(set<Place*>::iterator p = inputPlaces_.begin();
-       p != inputPlaces_.end(); ++p)
+       p!= inputPlaces_.end(); ++p)
   {
+    bool needToWrap = false;
+    // check the postset
     for(set<Node*>::iterator t = (*p)->getPostset().begin();
-    t != (*p)->getPostset().end(); ++t)
+         t != (*p)->getPostset().end(); ++t)
     {
-      candidates.insert(static_cast<Transition*>(*t));
+      if(!(static_cast<Transition*>(*t)->isNormal()))
+      {
+        needToWrap = true;
+        break;
+      }
+    }
+    
+    // if a transition was not normal
+    if(needToWrap)
+    {
+      unsigned int complementMarking = 0;
+      // then we create a wrapper place
+      Place & np = createPlace();
+      // and a complement place
+      Place & cp = createPlace();
+      
+      set<Arc*> arcsToReplace = (*p)->getPostsetArcs();
+      // connect postset of the interface place to the wrapper place
+      for(set<Arc*>::iterator a = arcsToReplace.begin();
+           a != arcsToReplace.end(); ++a)
+      {
+        // consume tokens from the wrapper place
+        createArc(np, (*a)->getTargetNode(), (*a)->getWeight());
+        // produce same amount of tokens to the complement place
+        createArc((*a)->getTargetNode(), cp, (*a)->getWeight());
+        // adjust maximum arc weight
+        complementMarking = (complementMarking < (*a)->getWeight()) ? (*a)->getWeight() : complementMarking;
+        // remove original arc
+        deleteArc(**a);
+      }
+      
+      // connect wrapper place with actual place
+      Transition & t = createTransition();
+      createArc(**p, t);
+      createArc(t ,np);
+      createArc(cp, t);
+
+      // adjust complement place
+      cp.mark(complementMarking);
+      // adjust final condition
+      finalCondition_ = finalCondition_.formula() && (np == 0) && (cp == complementMarking);
     }
   }
+  
+  // iterate through output places
   for(set<Place*>::iterator p = outputPlaces_.begin();
-       p != outputPlaces_.end(); ++p)
+       p!= outputPlaces_.end(); ++p)
   {
+    bool needToWrap = false;
+    // check the preset
     for(set<Node*>::iterator t = (*p)->getPreset().begin();
-    t != (*p)->getPreset().end(); ++t)
+         t != (*p)->getPreset().end(); ++t)
     {
-      candidates.insert(static_cast<Transition*>(*t));
+      if(!(static_cast<Transition*>(*t)->isNormal()))
+      {
+        needToWrap = true;
+        break;
+      }
     }
-  }
-
-  for(set<Transition*>::iterator t = candidates.begin();
-       t != candidates.end(); ++t)
-  {
-    if( ((*t)->isNormal()) || // already normal; nothing to do
-        ((*t)->getSynchronizeLabels().size() > 1) ) // can't normalize this transition
-      continue;
-
-    // check neighbor arcs
-    set<Arc*> possiblyEvilArcs = util::setUnion((*t)->getPresetArcs(),(*t)->getPostsetArcs());
-    for(set<Arc*>::iterator a = possiblyEvilArcs.begin(); 
-    a != possiblyEvilArcs.end(); ++a)
+    
+    // if a transition was not normal
+    if(needToWrap)
     {
-      if((*a)->getPlace().getType() == Node::INTERNAL)
-        continue;
-      // arcs reaching this line are evil
-
-      Place & p = (*a)->getPlace();
-      if(p.getType() == Node::INPUT)
+      unsigned int complementMarking = 0;
+      // then we create a wrapper place
+      Place & np = createPlace();
+      // and a complement place
+      Place & cp = createPlace();
+      
+      set<Arc*> arcsToReplace = (*p)->getPresetArcs();
+      // connect preset of the interface place to the wrapper place
+      for(set<Arc*>::iterator a = arcsToReplace.begin();
+           a != arcsToReplace.end(); ++a)
       {
-        for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
-        {
-          stringstream ss;
-          ss << i;
-
-          Place & np = createPlace("normalIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
-          Place & cp = createPlace("complementIn" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
-          cp.mark(1);
-          Transition & nt = createTransition("t_in" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
-
-          createArc(p, nt);
-          createArc(nt, np);
-          createArc(cp, nt);
-          createArc(np, **t);
-          createArc(**t, cp);
-          
-          finalCondition_ = finalCondition_.formula() && (np == 0);
-          finalCondition_ = finalCondition_.formula() && (cp == 1);
-        }
+        // consume tokens from the wrapper place
+        createArc((*a)->getSourceNode(), np, (*a)->getWeight());
+        // produce same amount of tokens to the complement place
+        createArc(cp, (*a)->getSourceNode(), (*a)->getWeight());
+        // adjust maximum arc weight
+        complementMarking = (complementMarking < (*a)->getWeight()) ? (*a)->getWeight() : complementMarking;
+        // remove original arc
+        deleteArc(**a);
       }
-      else
-      {
-        for(unsigned int i = 0; i < (*a)->getWeight(); ++i) // reduce arc weights
-        {
-          stringstream ss;
-          ss << i;
+      
+      // connect wrapper place with actual place
+      Transition & t = createTransition();
+      createArc(t, **p);
+      createArc(np, t);
+      createArc(t, cp);
 
-          Place & np = createPlace("normalOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // new place
-          Place & cp = createPlace("complementOut" + ss.str() + "_" + (*t)->getName() + "_" + p.getName()); // complement place
-          cp.mark(1);
-          Transition & nt = createTransition("t_out" + ss.str() + "_" + (*t)->getName() + "_" + p.getName());
-
-          createArc(nt, p);
-          createArc(np, nt);
-          createArc(nt, cp);
-          createArc(**t, np);
-          createArc(cp, **t);
-          
-          finalCondition_ = finalCondition_.formula() && (np == 0);
-          finalCondition_ = finalCondition_.formula() && (cp == 1);
-        }
-      }
-
-      // remove arc
-      deleteArc(**a);
+      // adjust complement place
+      cp.mark(complementMarking);
+      // adjust final condition
+      finalCondition_ = finalCondition_.formula() && (np == 0) && (cp == complementMarking);
     }
   }
 }

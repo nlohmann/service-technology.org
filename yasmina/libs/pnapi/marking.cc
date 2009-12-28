@@ -25,13 +25,12 @@ namespace pnapi
 
 /*!
  * \brief   Standard Constructor
+ *
+ * \note This constructor does not instantiate a Petri net object.
  */
-/*
-  Marking::Marking() :
-    net_(*new PetriNet())
-  {
-  }
- */
+Marking::Marking()
+{
+}
 
 
 /*!

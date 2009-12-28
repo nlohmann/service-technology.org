@@ -168,8 +168,8 @@ terms: KEY_TERMS {nc=0;} term2
 ;
 
 term2: 
-CIDENT COLON sum SEMICOLON {term_vec->push_back($3);nc++;}
-|CIDENT COLON sum SEMICOLON {term_vec->push_back($3);nc++;} term2
+CIDENT COLON sum SEMICOLON {term_vec->push_back($3);++nc;}
+|CIDENT COLON sum SEMICOLON {term_vec->push_back($3);++nc;} term2
 
 sum: produkt {$$ = $1;}
        | produkt sum {$$ = new AddTerm($1,$2);} 
@@ -212,7 +212,7 @@ bound: FIDENT COMMA CIDENT COLON lbound COMMA ubound SEMICOLON
 	//cout<<stu.size()<<nc;//bMP.at(fm-1).at(c-1)=bds;
  }
 
-lbound: NUMBER{$$=$1;}| MINUS NUMBER{$$=-$2;}
+lbound: NUMBER{$$=$1;}| MINUS NUMBER{$$=-$2;}|MUNBOUNDED{$$=-USHRT_MAX;}
 ;
 ubound: NUMBER{$$=$1;}| MINUS NUMBER{$$=-$2;}|MUNBOUNDED{$$=USHRT_MAX;}
 ;

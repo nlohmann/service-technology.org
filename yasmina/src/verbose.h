@@ -23,4 +23,7 @@
 void status(const char* format, ...);
 void abort(unsigned int code, const char* format, ...);
 
+
+
+
 #endif

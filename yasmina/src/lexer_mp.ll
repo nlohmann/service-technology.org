@@ -34,7 +34,7 @@ extern int mp_yyerror(const char* msg);
 "INTERNAL"                        { return KEY_INTERNAL; }
 "INPUT"                           { return KEY_INPUT; }
 "OUTPUT"                          { return KEY_OUTPUT; }
-"SYNCHONOUS"			{return KEY_SYNCHRONOUS;}
+"SYNCHRONOUS"			{return KEY_SYNCHRONOUS;}
 "TERMS"					{ return KEY_TERMS; }
 "BOUNDS"			{ return KEY_BOUNDS; }
 "unbounded"			{ return MUNBOUNDED;}

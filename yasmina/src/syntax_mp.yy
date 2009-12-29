@@ -38,10 +38,23 @@ extern std::string IDENT_token;
 extern unsigned int nfm=0;
 /// constraint ids
 extern unsigned int nc=0;
+typedef struct constraintf{
+	unsigned int fmi; //final marking index
+	unsigned int termi; //term index
+	unsigned int lb;
+	unsigned int ub;
+} ;
+extern std::set<const constraintf *> fingerprint;
+
+//gets the bounds for a particular final marking
+//extern set<constraintf *> getconstrforfm(set<constraintf *> fingerprint, unsigned int fmn);
+	
+
+
 //extern std::set<std::string> fm_set;fm_set.insert(*$1);
 typedef std::pair<int,int>  BoundsMP;
 //extern std::vector<std::vector<BoundsMP> > bMP;
-extern std::vector<std::pair<int,int> > bMP;
+//extern std::vector<std::pair<int,int> > bMP;
 extern std::vector<std::map<std::string, int> > fmar; 
 std::map<std::string, int> imar;//current marking
 
@@ -187,7 +200,7 @@ sign: MINUS {$$ = -1;}
             | ADD {$$ = 1;}
 ;
 
-ulbounds: KEY_BOUNDS bounds { /*bMP.resize(nfm);BoundsMP dummy(0,0);
+ulbounds: KEY_BOUNDS {fingerprint.clear();} bounds { /*bMP.resize(nfm);BoundsMP dummy(0,0);
 for(int i=0;i<nfm;++i)  { vector<BoundsMP> hh;
 for(int i=0;i<nc;++i)  {hh.push_back(dummy);}; 
 bMP.push_back(hh);}*/
@@ -198,14 +211,16 @@ bounds:
 ;
 bound: FIDENT COMMA CIDENT COLON lbound COMMA ubound SEMICOLON
  {
-	//unsigned int fm=atoi($1->substr(1,$1->size()).c_str());
-	//unsigned int c=atoi($3->substr(1,$3->size()).c_str());
+	unsigned int fmx=atoi($1->substr(1,$1->size()).c_str());
+	unsigned int cx=atoi($3->substr(1,$3->size()).c_str());
 	//cout << nc*(fm-1)+c-1;
 	//std::pair<unsigned int,unsigned int> mat(fm,c); 
 	 int lb=$5;
 	int ub=$7; 
+	const constraintf cs={fmx,cx,lb,ub};const constraintf *cp(new  constraintf(cs)); //
+	fingerprint.insert(cp);
 	//std::string ub(*$7);
-	BoundsMP bds(lb,ub);bMP.push_back(bds);
+	//BoundsMP bds(lb,ub);bMP.push_back(bds);
 	//std::vector<BoundsMP> stu(bMP.at(fm));
 	//std::pair<int,int>  boundMP;
 	//boundMP.first=mat;boundMP.second=bds;boundsMP.push_back(boundMP);

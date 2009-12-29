@@ -67,7 +67,7 @@ extern unsigned int nc;
 
 typedef std::pair<int,int>  BoundsMP;
 //std::vector<std::vector<BoundsMP> > bMP;
-std::vector<std::pair<int,int> > bMP;
+//std::vector<std::pair<int,int> > bMP;
 
 extern int mp_yylineno;
 extern int mp_yydebug;
@@ -76,6 +76,27 @@ extern FILE* mp_yyin;
 extern int mp_yyerror();
 extern int mp_yyparse();
 std::vector<std::map<std::string, int> > fmar;
+
+typedef struct {
+	unsigned int fmi; //final marking index
+	unsigned int termi; //term index
+	unsigned int lb;
+	unsigned int ub;
+} constraintf;
+set<const constraintf *> fingerprint;
+//set<const pnapi::formula::Formula *>::iterator cIt=f->children().begin();cIt!=f->children().end();++cIt
+//gets the bounds for a particular final marking
+set<const constraintf *> getconstrforfm(set<const constraintf *> fingerprint, unsigned int fmn){
+	set<const constraintf *> vc;
+	for (set<const constraintf *>::iterator it=fingerprint.begin(); it!=fingerprint.end(); ++it) {
+		if ((*it)->fmi==fmn) {
+			vc.insert(*it);
+		}
+	}
+	return vc;
+}
+
+
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int mp_yylex_destroy();
@@ -977,7 +998,7 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 					continue;
 				}
 				cout<<" argument "<<(*it).second<<endl;//cout<<"no"<<no<<endl;//
-				no++;bMP.clear();
+				no++;//bMP.clear();
 				std::cerr << PACKAGE << ": Message profile file <" << args_info.messageProfiles_arg[(*it).second] << ">" << std::endl;
 				initialize_mp_parser();
 				mp_yyin = fopen(args_info.messageProfiles_arg[(*it).second], "r");
@@ -1062,23 +1083,31 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 					unsigned int k=1;//cout <<"before";
 					lprec *lpmp=copy_lp(lpt);
 					if(no==1) mps.push_back(lpmp);
-					int kn=1;cout<<"hello"<<term_vec->size()<<endl;
+					int kn=1;//cout<<"hello"<<term_vec->size()<<endl;
 					//int k=1;//
 					//print_lp(mps.at(ifm-1));
 					//cout<<ifm-1<<"in"<<get_Nrows(mps.at(0))<<get_Nrows(mps.at(1))<<get_Nrows(mps.at(2))<<endl;
 					REAL* roww=new REAL[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()]();
 				//initialize roww ith zero values
-					for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
+					set<const constraintf *> fingerprinti=getconstrforfm(fingerprint, ifm);//get the terms for the final marking
+					//std::cerr << "computing " << fingerprint.size();
+					for (set<const constraintf *>::iterator fi=fingerprinti.begin(); fi!=fingerprinti.end(); ++fi) {
+						
+						std::map<std::string const,int>* ee=EventTerm::termToMap((term_vec->at((*fi)->termi-1)));
+						//std::cerr << (*fi)->fmi-1<<(*fi)->termi-1<<endl;
+						//cout << EventTerm::toPrettyString((term_vec->at((*fi)->termi-1)));
+					//}
+					//for (std::vector<EventTerm*>::iterator it = term_vec->begin(); it != term_vec->end(); ++it) {
 						//need to initialize the roww set_add_rowmode(lpmp, TRUE);
 						//REAL *roww;//[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()];
 						for (k=1; k<1+inputPlaces.size()+ outputPlaces.size()+synchrT.size(); k++) {
 							roww[k]=0;
 						}
-					//cout<<"Constraint#"<<kn<<": ";
+						//cout<<"Constraint#"<<kn<<": ";
 						//cout <<"help" << bMP.size() << ifm << kn <<endl;
 						//cout<<ifm-1<<"in"<<get_Nrows(mps.at(0))<<get_Nrows(mps.at(1))<<get_Nrows(mps.at(2))<<endl;
-						std::pair<int,int> bd=bMP.at(term_vec->size()*(ifm-1)+kn-1);//cout<<"bMP"<<bMP.size()<<endl;
-						std::map<std::string const,int>* ee=EventTerm::termToMap((*it));
+						/*std::pair<int,int> bd=bMP.at(term_vec->size()*(ifm-1)+kn-1);//cout<<"bMP"<<bMP.size()<<endl;
+						std::map<std::string const,int>* ee=EventTerm::termToMap((*it));*/
 						//cout << EventTerm::toPrettyString((*it));
 						//std::pair<int,int> b=bd.at(kn);
 						//cout << bd.first<<" "<<bd.second<<endl;
@@ -1088,12 +1117,14 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 							char * cstr= new char [ite->first.size()+1];
 							strcpy(cstr,ite->first.c_str());
 							roww[get_nameindex(mps.at(ifm-1), cstr,FALSE)]=ite->second;
-						}
-						int rhs=bd.first;
+						}//cout << (*fi)->lb<<" "<<(*fi)->ub<<endl;
+						int rhs=(*fi)->lb;//bd.first;
+						
 						if(!add_constraint(mps.at(ifm-1), roww,GE, rhs))
 						cout<<"gata"<<endl;
-						if (bd.second!=USHRT_MAX) {
-							set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), bd.second-rhs);
+						if ((*fi)->ub!=USHRT_MAX) {//if (bd.second!=USHRT_MAX) {
+							//set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), bd.second-rhs);
+							set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), (*fi)->ub-rhs);
 						}
 						else {
 							set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), get_infinite(mps.at(ifm-1)));
@@ -1105,14 +1136,14 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 					//cout<<"out"<<get_Nrows(mps.at(ifm-1))<<endl;//cout<<"coloane:"<<get_Nrows(mps.at(ifm-1));//ifm++;
 					//lp=lpmc;cout<<get_col_name(lp,get_Ncolumns(lp))<<"help"<<endl;
 				//aici adauga constraints
-					print_lp(mps.at(ifm-1));
+					//cout<<ifm-1<<" "; print_lp(mps.at(ifm-1));
 				}
 			//for (int ifm=1;ifm<nfm+1;++ifm){	print_lp(mps.at(ifm-1));};cout<<mps.size()<<endl;	
 				//add here to the previous set of constraints
 				
 				}	
 				
-			}
+			} //cout<<mps.size();
 			//here add final marking constraints; we can skip these ones
 			/*for (unsigned int i=0; i<nfm; ++i) {
 				
@@ -1125,6 +1156,7 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 			//here add the new constraints to the previous computed ones
 			if(sit==hh.begin()){lpmps=mps;}
 			else {//here combine 
+				//cout<<mps.size()<<lpmps.size();
 				for (int i=0; i<get_Ncolumns(lpmps.at(0)); ++i) { //add variables from previous
 					std::string pr(get_col_name(lpmps.at(0),i+1));
 					if (result.find(pr)==result.end()) {//add columns from old composition to the new interface
@@ -1143,20 +1175,25 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 				//combine all final markings and add the rows of lpmps
 				std::vector<lprec *> st;
 				for(unsigned int i=0;i<mps.size();++i){
-					lprec * lpr=copy_lp(mps.at(i));//make copies
+					//lprec * lpr=copy_lp(mps.at(i)); cout<<get_Nrows(mps.at(i));//make copies
 					for(unsigned int j=0;j<lpmps.size();++j){// add lpr too
-						for (int r=0; r<get_Nrows(lpmps.at(i)); ++r) {
+						//get a lpr copy and then for each other mp make a new syste
+						lprec * lpr=copy_lp(mps.at(i)); 
+						//cout<<get_Nrows(lpmps.at(j));
+						for (int r=0; r<get_Nrows(lpmps.at(j)); ++r) {
 							REAL *rowp=new REAL[1+get_Ncolumns(lpr)]();//int *colp;
 							if(get_row(lpmps.at(j),r+1,rowp)==0) abort(2, "lpsolve	");//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
+
 							//for(int j=0;j<get_Ncolumns(lpmp);j++){rowwpp[j+hh-get_Ncolumns(lpmp)]=rowp[j+1];}
 							//for(int j=0;j<hh;j++){cout<<rowwpp[j]<<" ";}
+
 							//if( grex==-1) cout<<"gata";
 							add_constraint(lpr,rowp,get_constr_type(lpmps.at(j),r+1),get_rh(lpmps.at(j),r+1));
-							set_rh_range(lpr,get_Nrows(lpmps.at(j)),get_rh_range(lpmps.at(j),r+1));
+							
+							//set_rh_range(lpr,get_Nrows(lpmps.at(j)),get_rh_range(lpmps.at(j),r+1));
 							//print_lp(lpr);
-						}
-					}print_lp(lpr);
-					st.push_back(lpr);
+						}st.push_back(lpr);
+					}//print_lp(lpr);
 				}
 				lpmps=st;
 			}	
@@ -1176,6 +1213,7 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 			}
 			set_verbose(lpmps.at(ifm),IMPORTANT);//print_lp(lpmps.at(ifm));
 			res=solve(lpmps.at(ifm));
+			
 			//cout<<"Solve "<<solve(lp)<<endl;
 			if(res==0){
 				cout<<endl<<"Compatibility check inconclusive"<<endl;

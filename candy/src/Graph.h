@@ -34,11 +34,17 @@ class Graph {
         /// remove inefficient nodes and events
         void removeInefficientNodesAndEvents();
 
-        /// output this graph as debug information
-        void outputDebug(std::ostream&);
+        /// output graph information as file header
+        void outputFileHeader(std::ostream&);
 
         /// output this graph in og format
-        void output(std::ostream&);
+        void outputOG(std::ostream&);
+
+        /// output this graph in sa format
+		void outputSA(std::ostream&);
+
+        /// output this graph as debug information
+		void outputDebug(std::ostream&);
 };
 
 #endif /* GRAPH_H_ */

@@ -17,47 +17,51 @@ class Event {
 
     public:
 
-    	/*-----------.
-		| attributes |
-		`-----------*/
+		explicit Event(string _name, EventType _type, unsigned int _cost = 0)
+		: name(_name), type(_type), cost(_cost) {};
 
-    	/// the event's name
-        string name;
+		~Event() {};
 
-        /// the event's cost
-        unsigned int cost;
+		string getName() const {
+			return name;
+		};
 
-        /// the event's type
-        EventType type;
+		EventType getType() const {
+			return type;
+		};
 
+		unsigned int getCost() const {
+			return cost;
+		};
 
+		void setCost(unsigned int _cost) {
+			cost = _cost;
+		};
 
-        /*--------.
-		| methods |
-		`--------*/
+		void outputDebug(std::ostream& file) {
+			file << "event '" << name << "', " << cost << ", ";
+			if ( type == T_INPUT ) {
+				file << "input";
+			} else if ( type == T_OUTPUT ) {
+				file << "output";
+			} else if ( type == T_SYNC ) {
+				file << "sync";
+			} else {
+				file << "invalid";
+			}
+			file << endl;
+		};
 
-        /// basic constructor
-        explicit Event(string _name, unsigned int _cost, EventType _type) :
-        	name(_name), cost(_cost), type(_type) {};
+    private:
 
-        /// basic destructor
-        ~Event() {};
+    	// the name of the event
+    	string name;
 
-        /// print information about this event on std::cout
-        void outputDebug(std::ostream& file) {
-        	file << "event '" << name << "', " << cost << ", ";
-        	if ( type == T_INPUT ) {
-        		file << "input";
-        	} else if ( type == T_OUTPUT ) {
-        		file << "output";
-        	} else if ( type == T_SYNC ) {
-        		file << "sync";
-        	} else {
-                file << "invalid";
-            }
-            file << endl;
-        };
+		// the type of the event
+		EventType type;
 
+    	// the cost of the event (can be set later on)
+		unsigned int cost;
 };
 
 #endif /* EVENT_H_ */

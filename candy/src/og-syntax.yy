@@ -120,11 +120,11 @@ identlist:
   {
     Event* newEvent = NULL;
     if ( currentType == T_INPUT ) {
-        newEvent = new Event($1, 0, T_INPUT);
+        newEvent = new Event($1, T_INPUT);
     } else if ( currentType == T_OUTPUT ) {
-        newEvent = new Event($1, 0, T_OUTPUT);
+        newEvent = new Event($1, T_OUTPUT);
     } else if ( currentType == T_SYNC ) {
-        newEvent = new Event($1, 0, T_SYNC);
+        newEvent = new Event($1, T_SYNC);
     } else {
         og_yyerror("read an event of unknown type");
         exit(EXIT_FAILURE);
@@ -143,11 +143,11 @@ identlist:
   {
     Event* newEvent = NULL;
     if ( currentType == T_INPUT ) {
-        newEvent = new Event($3, 0, T_INPUT);
+        newEvent = new Event($3, T_INPUT);
     } else if ( currentType == T_OUTPUT ) {
-        newEvent = new Event($3, 0, T_OUTPUT);
+        newEvent = new Event($3, T_OUTPUT);
     } else if ( currentType == T_SYNC ) {
-        newEvent = new Event($3, 0, T_SYNC);
+        newEvent = new Event($3, T_SYNC);
     } else {
         og_yyerror("read an event of unknown type");
         exit(EXIT_FAILURE);
@@ -280,19 +280,14 @@ successors:
     // register successor node as successor
     // we allow more than one equal successors with different events, just
     // remember the empty node ...
-    //if ( currentNode->successors.find(currentSuccessor) == currentNode->successors.end() ) {
-        map< string, Event* >::const_iterator j = parsedOG->events.find($2);
-        if ( j != parsedOG->events.end() ) {
-            Event* successorEvent= j->second;
-            currentNode->successors[currentSuccessor].push_back(successorEvent);
-        } else {
-            og_yyerror("read a successor with unknown event");
-            exit(EXIT_FAILURE);
-        }
-    //} else {
-    //    og_yyerror("read a successor node twice");
-    //    return EXIT_FAILURE;
-    //}
+    map< string, Event* >::const_iterator j = parsedOG->events.find($2);
+    if ( j != parsedOG->events.end() ) {
+        Event* successorEvent= j->second;
+        currentNode->successors[currentSuccessor].push_back(successorEvent);
+    } else {
+        og_yyerror("read a successor with unknown event");
+        exit(EXIT_FAILURE);
+    }
     
     free($2);
   }

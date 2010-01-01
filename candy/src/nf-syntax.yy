@@ -1,6 +1,7 @@
 %{
 #include "settings.h"
 #include "Graph.h"
+#include "verbose.h"
 
 // from main.cc
 extern Graph* parsedOG;
@@ -67,7 +68,7 @@ petrinet:
     }
     places_ports
     {
-        DEBUG "countDeclaredEvents '" << countDeclaredEvents << "'" END
+        debug("%d declared events", countDeclaredEvents);
         if ( countDeclaredEvents > parsedOG->events.size() ) {
             nf_yyerror("given netfile includes events which are not used in given OG");
             exit(EXIT_FAILURE);
@@ -75,7 +76,7 @@ petrinet:
     }
     markings transitions
     {
-        DEBUG "parsedEvents '" << parsedEventsNF.size() << "'" END
+        debug("%d parsed events", parsedEventsNF.size());
         if ( parsedEventsNF.size() != parsedOG->events.size() ) {
             nf_yyerror("given netfile does not include all events from given OG");
             exit(EXIT_FAILURE);
@@ -263,7 +264,7 @@ arc:
                     nf_yyerror("cannot compute cost for event from non-normal transition");
                     exit(EXIT_FAILURE);
                 } else {
-                    (iter->second)->cost = currentCost;
+                    (iter->second)->setCost( currentCost );
                     parsedEventsNF[$1] = true;
                     currentCostHandled = true;
                 }
@@ -300,7 +301,7 @@ arc:
                     nf_yyerror("cannot compute cost for event from non-normal transition");
                     exit(EXIT_FAILURE);
                 } else {
-                    (iter->second)->cost = currentCost;
+                    (iter->second)->setCost( currentCost );
                     parsedEventsNF[ident] = true;
                     currentCostHandled = true;
                 }
@@ -330,7 +331,7 @@ arc:
                     nf_yyerror("cannot compute cost for event from non-normal transition");
                     exit(EXIT_FAILURE);
                 } else {
-                    (iter->second)->cost = currentCost;
+                    (iter->second)->setCost( currentCost );
                     parsedEventsNF[$1] = true;
                     currentCostHandled = true;
                 }
@@ -362,7 +363,7 @@ arc:
                     nf_yyerror("cannot compute cost for event from non-normal transition");
                     exit(EXIT_FAILURE);
                 } else {
-                    (iter->second)->cost = currentCost;
+                    (iter->second)->setCost( currentCost );
                     parsedEventsNF[ident] = true;
                     currentCostHandled = true;
                 }

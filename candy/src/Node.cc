@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "Node.h"
+#include "verbose.h"
 
 
 
@@ -18,22 +19,21 @@ void Node::setFlagRecursively(bool _flag) {
 }
 
 
-//! \brief computes the node's minimal cost and erase all inefficient edges
+//! \brief computes the node's minimal cost and cut connections to inefficient successor nodes
 //! \return returns the minimal cost of this node
-unsigned int Node::computeEfficientSuccessors() {
+unsigned int Node::computeCost() {
 
     // return computed cost if we handled this node before
-    DEBUG "DEBUG computing costs for node " << getID() END
-    if (args_info.debug_flag) outputDebug( cout );
+    debug("computing cost for node %d", getID());
     if ( computedCost ) {
-    	DEBUG "      node '" << getID() << "', " << this << " already computed, cost is '" << cost << "'" END
+    	debug("node %d, %d already computed, cost is %d", getID(), this, cost);
         return cost;
     }
 
     // if this node has ID 0 we dont have to consider leaving edges
     // reason: per definition from the tool wendy is ID 0 the empty node
     if ( getID() == 0 ) {
-    	DEBUG "      node '" << getID() << "', " << this << " is the empty node, cost is 0" END
+    	debug("node %d, %d is the empty node, cost is 0", getID(), this);
         computedCost = true;
         cost = 0;
         return 0;
@@ -42,7 +42,7 @@ unsigned int Node::computeEfficientSuccessors() {
     // if this node is a final node then we dont have to consider any leaving edge
     // reason: per definition has final node in an OG no successors
     if ( final ) {
-    	DEBUG "      node '" << getID() << "', " << this << " is final, cost is 0" END
+		debug("node %d, %d is a final node, cost is 0", getID(), this);
         computedCost = true;
         cost = 0;
         return 0;
@@ -52,9 +52,9 @@ unsigned int Node::computeEfficientSuccessors() {
     // this is critical as cost are defined for acyclic OGs only!!!
     // this is written for deterministic graphs only!!!
     list< pair<Event*, unsigned int> > edgeCost;
-    DEBUG "      node " << getID() << " has " << successors.size() << " successors" END
+    debug("node %d, %d has %d successors", getID(), this, successors.size());
     for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
-          i != successors.end(); ++i) {
+          i != successors.end(); ++i ) {
 
     	Node* successor = i->first;
         assert(successor != NULL);
@@ -62,13 +62,13 @@ unsigned int Node::computeEfficientSuccessors() {
         // forget about the empty node
 		if ( successor->getID() != 0 ) {
 
-            unsigned int successorCost = successor->computeEfficientSuccessors();
-            DEBUG "      node " << getID() << " has successor with cost " << successorCost END
+            unsigned int successorCost = successor->computeCost();
+            debug("node %d, %d has successor with cost %d", getID(), this, successorCost);
             for ( list<Event*>::const_iterator j = i->second.begin(); j != i->second.end(); ++j ) {
-                
-                unsigned int currentEdgeCost = (*j)->cost + successorCost;
+
+                unsigned int currentEdgeCost = (*j)->getCost() + successorCost;
                 edgeCost.push_back( pair<Event*, unsigned int>(*j, currentEdgeCost) );
-                DEBUG "      node " << getID() << " has edge with cost " << currentEdgeCost END
+                debug("node %d, %d has edge with cost %d", getID(), this, currentEdgeCost);
             }
 		}
     }
@@ -81,13 +81,13 @@ unsigned int Node::computeEfficientSuccessors() {
     if ( negation ) {
         // run-time complexity O(2^n)
         minimalCost = getCostMinimalAssignments(edgeCost, minimalAssignments);
-        DEBUG "      node " << getID() << " has formula with negation" END
+        debug("node %d, %d has formula with negation", getID(), this);
     } else {
         // run-time complexity O(n^2)
         minimalCost = getCostMinimalAssignmentsWithoutNegation(edgeCost, minimalAssignments);
-        DEBUG "      node " << getID() << " has formula without negation" END
+		debug("node %d, %d has formula without negation", getID(), this);
     }
-    DEBUG "      node " << getID() << " has minimalAssignment with cost " << minimalCost END
+    debug("node %d, %d has minimal assignment with cost %d", getID(), this, minimalCost);
 
 
     // finally we cut the connection to all inefficient successor nodes
@@ -100,7 +100,7 @@ unsigned int Node::computeEfficientSuccessors() {
         // forget about the empty node
 		if ( currentSuccessor->getID() != 0 ) {
 
-            DEBUG "      node " << getID() << " is checking successor " << currentSuccessor->getID() END
+            debug("node %d, %d is checking successor %d", getID(), this, currentSuccessor->getID());
             for ( list<Event*>::iterator j = i->second.begin(); j != i->second.end(); /*inside*/ ) {
 
                 // an edge is inefficient iff it's edge label is assigned with
@@ -109,14 +109,14 @@ unsigned int Node::computeEfficientSuccessors() {
                 for ( list<FormulaAssignment>::const_iterator a = minimalAssignments.begin();
                       inefficient && a != minimalAssignments.end(); ++a ) {
 
-                    inefficient = not a->get( (*j)->name );
+                    inefficient = not a->get( (*j)->getName() );
                 }
 
                 if ( inefficient ) {
 
                     // remove unnecessary literal
-                    formula->removeLiteral( (*j)->name );
-                    DEBUG "      node " << getID() << " has lost edge " << (*j)->name END
+                    formula->removeLiteral( (*j)->getName() );
+                    debug("node %d, %d has lost edge %s", getID(), this, (*j)->getName().c_str() );
 
                     // the erase returns incremented iterator, which is invalid for last element
                     i->second.erase( j++ );
@@ -131,13 +131,13 @@ unsigned int Node::computeEfficientSuccessors() {
             if ( formula->size() == 0 ) {
                 delete formula;
                 formula = new FormulaTrue();
-                DEBUG "      node " << getID() << " has lost formula and is set to TRUE" END
+				debug("node %d, %d has lost formula and is set to TRUE", getID(), this);
             }
 
             // check if there are edges to currentSuccessor left
             if ( i->second.empty() ) {
                 successors.erase( i++ );
-                DEBUG "      node " << getID() << " has lost successor " << currentSuccessor->getID() END
+				debug("node %d, %d has lost successor %d", getID(), this, currentSuccessor->getID());
             } else {
                 ++i;
             }
@@ -147,10 +147,7 @@ unsigned int Node::computeEfficientSuccessors() {
     }
 
     // simplify this node's formula
-    DEBUG "      node " << getID() << " get a simplified formula" END
-    DEBUG "      old formula: " << formula->asString() END
     formula->simplify();
-    DEBUG "      new formula: " << (formula != NULL ? formula->asString() : "NULL") END
 
     // mark this node as already handled and store computed cost
     computedCost = true;
@@ -202,7 +199,7 @@ void Node::getCostMinimalAssignmentsRecursively(
     // get current label and current label's cost
     // the list labelCost is handled as queue
     Event* currentEvent = edgeCost.front().first;
-    string currentLabel = currentEvent->name;
+    string currentLabel = currentEvent->getName();
     unsigned int currentLabelCost = edgeCost.front().second;
     edgeCost.pop_front();
 
@@ -281,7 +278,7 @@ unsigned int Node::getCostMinimalAssignmentsWithoutNegation(
     for ( list< pair<Event*, unsigned int> >::const_iterator i = edgeCost.begin();
             i != edgeCost.end(); ++i ) {
 
-        minimalAssignment.set( (*i).first->name, true );
+        minimalAssignment.set( (*i).first->getName(), true );
     }
     if ( not formula->value(minimalAssignment) ) {
         // the formula is unsatisfiable, so the cost are maximal to prevent the
@@ -315,12 +312,12 @@ unsigned int Node::getCostMinimalAssignmentsWithoutNegation(
                 ++i;
             }
         }
-        DEBUG "found '" << maximalEdges.size() << "' edges with maximalEdgeCost '" << maximalEdgeCost << "'" END
+        debug("found %d edges with maximal cost %d", maximalEdges.size(), maximalEdgeCost);
 
         // set literals corresponding to edges with maximal cost to false
         for ( list< Event* >::const_iterator i = maximalEdges.begin(); i != maximalEdges.end(); ++i ) {
 
-            minimalAssignment.set( (*i)->name, false );
+            minimalAssignment.set( (*i)->getName(), false );
         }
 
         if ( not formula->value( minimalAssignment ) ) {
@@ -328,7 +325,7 @@ unsigned int Node::getCostMinimalAssignmentsWithoutNegation(
             // restore original assignment and exit loop
             for ( list< Event* >::const_iterator i = maximalEdges.begin(); i != maximalEdges.end(); ++i ) {
 
-                minimalAssignment.set( (*i)->name, true );
+                minimalAssignment.set( (*i)->getName(), true );
             }
             found = true;
         }
@@ -377,34 +374,14 @@ void Node::outputDebugRecursively(std::ostream& file, map<Node*, bool>& printed)
 }
 
 
-void Node::output(std::ostream& file, map<Node*, bool>& printed, bool isRootNode) {
+void Node::outputOG(std::ostream& file, map<Node*, bool>& printed, bool isRootNode) {
 
     assert(formula != NULL);
 
     if ( getID() != 0 ) {
 
         printed[this] = true;
-        file << "  " << id;
-
-        // check if we want to write a service automaton
-        if ( args_info.automata_given ) {
-
-            if ( isRootNode ) {
-                if ( final ) {
-                    file << " : INITIAL, FINAL" << endl;
-                } else {
-                    file << " : INITIAL" << endl;
-                }
-            } else {
-                if ( final ) {
-                    file << " : FINAL" << endl;
-                } else {
-                    file << endl;
-                }
-            }
-        } else {
-            file << " : " << formula->asString() << endl;
-        }
+        file << "  " << id << " : " << formula->asString() << endl;
 
         for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
             i != successors.end(); ++i ) {
@@ -414,7 +391,7 @@ void Node::output(std::ostream& file, map<Node*, bool>& printed, bool isRootNode
                 for ( list<Event*>::const_iterator j = i->second.begin();
                     j != i->second.end(); ++j ) {
 
-                    file << "    " << (*j)->name << " -> " << currentNode->id << endl;
+                    file << "    " << (*j)->getName() << " -> " << currentNode->id << endl;
                 }
             }
         }
@@ -425,7 +402,56 @@ void Node::output(std::ostream& file, map<Node*, bool>& printed, bool isRootNode
 
             if ( printed.find( i->first ) == printed.end() and getID() != 0 ) {
                 // no other node is a root node
-                (i->first)->output(file, printed, false);
+                (i->first)->outputOG(file, printed, false);
+            }
+        }
+    }
+}
+
+
+void Node::outputSA(std::ostream& file, map<Node*, bool>& printed, bool isRootNode) {
+
+    assert(formula != NULL);
+
+    if ( getID() != 0 ) {
+
+        printed[this] = true;
+        file << "  " << id;
+
+		if ( isRootNode ) {
+			if ( final ) {
+				file << " : INITIAL, FINAL" << endl;
+			} else {
+				file << " : INITIAL" << endl;
+			}
+		} else {
+			if ( final ) {
+				file << " : FINAL" << endl;
+			} else {
+				file << endl;
+			}
+		}
+
+        for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+            i != successors.end(); ++i ) {
+
+            Node* currentNode = i->first;
+            if ( currentNode != NULL and currentNode->getID() != 0 ) {
+                for ( list<Event*>::const_iterator j = i->second.begin();
+                    j != i->second.end(); ++j ) {
+
+                    file << "    " << (*j)->getName() << " -> " << currentNode->id << endl;
+                }
+            }
+        }
+
+        // print all successor nodes which were not printed yet
+        for ( map< Node*, list<Event*> >::const_iterator i = successors.begin();
+            i != successors.end(); ++i ) {
+
+            if ( printed.find( i->first ) == printed.end() and getID() != 0 ) {
+                // no other node is a root node
+                (i->first)->outputSA(file, printed, false);
             }
         }
     }

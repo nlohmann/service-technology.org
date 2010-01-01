@@ -65,7 +65,7 @@ eventcost:
     if ( parsedEventsCF.find($2) == parsedEventsCF.end() ) {
         map< string, Event* >::iterator iter = parsedOG->events.find($2);
         if ( iter != parsedOG->events.end() ) {
-            (iter->second)->cost = $3;
+            (iter->second)->setCost($3);
             parsedEventsCF[$2] = true;
         } else {
             // we ignore them
@@ -73,7 +73,7 @@ eventcost:
             //exit(EXIT_FAILURE);
         }
     } else {
-        // TODO ignore multiple events if we want to save time parsing this file
+        // dont ignore multiple events
         cf_yyerror("given costfile includes events several times");
         exit(EXIT_FAILURE);
     }

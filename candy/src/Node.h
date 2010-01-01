@@ -46,18 +46,24 @@ class Node {
                 formula->clear();
                 delete formula;
             }
+
+            for ( map< Node*, list<Event*> >::iterator i = successors.begin();
+                  i != successors.end(); ++i ) {
+            	(*i).second.clear();
+            }
             successors.clear();
         };
 
-        /// getter and setter for id
-        unsigned int getID() const { return id; }
-        void setID(unsigned int newID) { id = newID; }
+        /// getter for id
+        unsigned int getID() const {
+        	return id;
+        }
 
         /// set flag for this node and all successor nodes
         void setFlagRecursively(bool);
 
-        /// cut connections to inefficient successor nodes
-        unsigned int computeEfficientSuccessors();
+        /// compute node's cost and cut connections to inefficient successor nodes
+        unsigned int computeCost();
 
         /// compute a list of cost minimal assignments for this node
         unsigned int getCostMinimalAssignments(
@@ -92,11 +98,18 @@ class Node {
         void outputDebug(std::ostream&);
         void outputDebugRecursively(std::ostream&, map<Node*, bool>&);
 
-        /// print standard information about this node
-        void output(std::ostream&, map<Node*, bool>&, bool);
+        /// output this node as og node
+        void outputOG(std::ostream&, map<Node*, bool>&, bool);
+
+        /// output this node as sa node
+		void outputSA(std::ostream&, map<Node*, bool>&, bool);
 
 
     private:
+
+    	/*-----------.
+		| attributes |
+		`-----------*/
 
         /// the node's ID
         unsigned int id;

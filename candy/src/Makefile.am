@@ -5,6 +5,8 @@ bin_PROGRAMS = candy
 candy_SOURCES = og-syntax.yy og-lexic.ll \
                 cf-syntax.yy cf-lexic.ll \
                 nf-syntax.yy nf-lexic.ll \
+                Output.h Output.cc \
+                verbose.h verbose.cc \
                 settings.h \
                 Graph.cc Graph.h \
                 Node.cc Node.h \

@@ -26,6 +26,20 @@ std::set<T> intersection(std::vector<std::set<T> > sets)
   // initialize iterators
   for(unsigned int i = 0; i < size; ++i)
   {
+    // check for empty sets
+    if(sets[i].empty())
+    {
+      // cleanup
+      while(!iterators.empty())
+      {
+        delete (iterators.front());
+        iterators.pop_front();
+      }
+      
+      // return empty set
+      return result;
+    }
+    
     // create iterator pointer and map to end iterator
     setIt * itP = new setIt(sets[i].begin());
     end_iterators[itP] = sets[i].end();

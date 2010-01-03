@@ -255,8 +255,8 @@ int main(int argc, char** argv)
     vector<unsigned int> state = initialIDs; // start with the initial state
     vector<unsigned int> successor = state;
     queue<unsigned int> toDo; // queue of states to do
-    stateID_ = stateID(state); 
-    toDo.push(stateID_); 
+    unsigned int maxID = stateID_ = stateID(state); // maximum ID  
+    toDo.push(stateID_);
     ID2state[stateID_] = state;
     while(!toDo.empty())
     {
@@ -288,8 +288,9 @@ int main(int argc, char** argv)
         
         unsigned int newStateID = stateID(successor);
         pSucc[stateID_][*l] = newStateID;
-        if(newStateID > stateID_)
+        if(newStateID > maxID)
         {
+          maxID = newStateID;
           toDo.push(newStateID);
           ID2state[newStateID] = successor;
         }
@@ -336,6 +337,15 @@ int main(int argc, char** argv)
   for(unsigned int i = 1; i <= stateID_; ++i)
   {
     (*myOut) << "  " << i << " : " << pFormulae[i] << "\n";
+    
+    //TODO: remove debug output
+    (*myOut) << "  { ";
+    for(unsigned int j = 0; j < ID2state[i].size(); ++j)
+    {
+      (*myOut) << ID2state[i][j] << " ";
+    }
+    (*myOut) << "}\n";
+    
     for(map<string, unsigned int>::iterator succ = pSucc[i].begin();
          succ != pSucc[i].end(); ++succ)
     {

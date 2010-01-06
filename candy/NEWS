@@ -1,10 +1,19 @@
-Version 0.5 Public Beta
-=======================
+                          ____                 _       
+                         / ___| __ _ _ __   __| |_   _ 
+                        | |    / _` | '_ \ / _` | | | |
+                        | |___| (_| | | | | (_| | |_| |
+                         \____|\__,_|_| |_|\__,_|\__, |
+                                                 |___/ 
+                      synthesizing cost efficient partners for services
+                      http://service-technology.org/candy
 
-* First public beta version of Candy.
 
-* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
-  to determine test case coverage (use `make cover' in `tests' directory)
+Version 1.0
+===========
+
+* first official release of Candy
 
 
+See file ChangeLog <http://service-technology.org/files/candy/ChangeLog> for
+complete version history.
 

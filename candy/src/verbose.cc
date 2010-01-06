@@ -119,7 +119,7 @@ void debug(const char* format, ...) {
  \note The codes should be documented in the manual.
 */
 void abort(unsigned short code, const char* format, ...) {
-    fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _c0_);
+    fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
 
     va_list args;
     va_start(args, format);

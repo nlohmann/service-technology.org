@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for candy, version @value{VERSION}, a tool to compute cost efficient operating guidelines for open nets, last updated @value{UPDATED}.
+This manual is for candy, version @value{VERSION}, a tool to synthesize cost efficient partners for services, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2009 Richard Mueller
 
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* candy: (candy).       candy.
+* candy: (candy).       synthesizing cost efficient partners for services.
 @end direntry
 
 
@@ -34,7 +34,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @title Candy
 
-@subtitle Computing cost efficient operating guidelines
+@subtitle Synthesizing cost efficient partners for services
 @subtitle @url{http://service-technology.org/candy}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
@@ -77,7 +77,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/candy} and download the latest release version of candy, say @file{candy-@value{VERSION}.tar.gz}. To setup and compile candy, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/candy} and download the latest release version of Candy, say @file{candy-@value{VERSION}.tar.gz}. To setup and compile Candy, change into your download directory and type
 
 @cartouche
 @smallexample
@@ -88,10 +88,29 @@ make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/candy} is generated.@footnote{On Microsoft Windows, the file will be called @file{candy.exe}.} If you experience any compiler warnings, don't panic: candy contains some generated or third party code that we cannot influence.
+After compilation, a binary @samp{src/candy} is generated.@footnote{On Microsoft Windows, the file will be called @file{candy.exe}.} If you experience any compiler warnings, don't panic: Candy contains some generated or third party code that we cannot influence.
 
+@item To test whether everything went fine, type
 
-If an error occurs, please send the output to @email{richard.mueller@@service-technology.org}.
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you
+should see something like:@footnote{Some tests use Wendy to check whether the
+calculated operating guidelines are correct. If Wendy was not found by the configure script, theses tests are skipped.}
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 32 tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{candy@@service-technology.org}.
 
 @item To install the binary, the manpage, and the documentation, type
 
@@ -106,13 +125,80 @@ You might need superuser permissions to do so.
 
 If you need any further information, see file @file{INSTALL} for detailed instructions.
 
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Candy. The documentation can be created using
+@samp{make pdf}. Note you need to have Candy properly installed before (see installation description above).
+
+@item man
+The manpage of Candy which can be displayed using @samp{man candy} after having
+Candy installed (see installation description above).
+
+@item src
+The source code of Candy.
+
+@item tests
+Testcases for Candy which check the generated binary. Some test scripts use
+Wendy to calculated operating guidelines. If
+Wendy was not found by the configure script, theses tests are skipped.
+@end table
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Candy, several tools are required.
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are
+required to reconfigure and compile Candy.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+
+
 @c --------------------------------------------------------------------------
 
 
 @node Command Line Options
 @chapter Invoking Candy
 
-Candy is a command line tool and does not come with a fancy @acronym{GUI}. However, candy can be easily scripted and combined with other tools.
+Candy is a command line tool and does not come with a fancy @acronym{GUI}. However, Candy can be easily scripted and combined with other tools.
 
 @section Command Line Options
 
@@ -129,13 +215,17 @@ For an overview of the command line options, type @samp{candy -h} to see the fol
 @node ChangeLog
 @chapter Version History
 
-Candy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might not always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Candy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 
 @sp 3
 
-The most recent change log is available at candy's website at @url{http://service-technology.org/files/candy/ChangeLog}.
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at Candy's website at
+@url{http://service-technology.org/files/candy/ChangeLog}.
+
 
 
 @c --------------------------------------------------------------------------

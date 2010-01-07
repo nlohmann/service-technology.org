@@ -49,6 +49,8 @@ TESTFILES = test_input.owfn \
 	    test_dnf.owfn \
             test_identical_places.net.owfn \
             test_identical_transitions.net.owfn \
+            test_input_roles.owfn \
+	    test_input_roles_error.owfn \
             test_self_loop_places.net.owfn \
             test_self_loop_transitions.net.owfn \
             test_series_places.net.owfn \

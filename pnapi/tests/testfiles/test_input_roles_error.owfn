@@ -1,0 +1,41 @@
+{ coffee drinker }
+
+PLACE
+
+ROLES a;
+
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2;
+
+INPUT
+  Coffee;
+
+OUTPUT
+  Euro;
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p2:   1;
+
+
+TRANSITION t1    { !e }
+ROLES a;
+CONSUME
+  p0:   1;
+PRODUCE
+  p1:   1,
+  Euro: 1;
+
+TRANSITION t2    { !c }
+ROLES b;
+CONSUME
+  p1:   1,
+  Coffee: 1;
+PRODUCE
+  p2:   1;
+
+{ END OF FILE }

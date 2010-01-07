@@ -193,6 +193,21 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([frontend input])
 AT_CLEANUP
 
+AT_SETUP([Reading oWFN with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
+AT_SETUP([oWFN with unspecified role (error expected)])
+m4_define([NET], [test_input_roles_error.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],1,ignore,stderr)
+AT_CHECK([GREP -q "role has not been specified" stderr])
+AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Regression Tests])
 ############################################################################

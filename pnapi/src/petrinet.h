@@ -290,6 +290,8 @@ public:
 
   std::set<Place *> getInterfacePlaces(const std::string &) const;
 
+  const std::set<std::string> & getRoles() const;
+
   const std::set<Transition *> & getTransitions() const;
 
   const std::set<Arc *> & getArcs() const;
@@ -322,6 +324,7 @@ public:
   Transition & createTransition(const std::string & = "",
       const std::set<std::string> & = std::set<std::string>());
 
+
   //@}
 
 
@@ -340,6 +343,12 @@ public:
 
   /// checks the Petri net for being normalized
   bool isNormal() const;
+
+  /// checks whether a transition role name is specified
+  bool isRoleSpecified(std::string roleName) const;
+
+  /// returns true if role information is to be ignored
+  bool isIgnoringRoles() const;
 
   /// compose two nets by adding the given one and merging interfaces
   void compose(const PetriNet &, const std::string & = "net1",
@@ -381,11 +390,17 @@ public:
   /// adds a set of labels to the interface
   void addSynchronousLabels(const std::set<std::string> &);
 
+  /// adds a role
+  void addRole(std::string roleName);
+
   /// removes a label from the interface
   void removeSynchronousLabel(std::string);
 
   /// removes a set of labels from the interface
   void removeSynchronousLabels(const std::set<std::string> &);
+
+  /// suppresses role information
+  void removeRoles();
 
   /// sets labels (and translates references)
   void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
@@ -438,12 +453,14 @@ private:
 
   /// ports (grouping of synchronous labels)
 
+  /// roles
+  std::set<std::string> roles_;
+
   /// all arcs
   std::set<Arc *> arcs_;
 
   /// all synchronous labels
   std::set<std::string> labels_;
-
 
   /* general properties */
 
@@ -476,6 +493,9 @@ private:
   
   /// cache for reduction
   std::set<const Place *> * reducablePlaces_;
+
+  /// if true, role information is ignored
+  bool ignoreRoles_;
   
   /* structural changes */
 

@@ -178,6 +178,12 @@ public:
 
   /// get transition cost
   int getCost() const;
+ 
+  /// add role
+  void addRole(std::string role_name);
+
+  /// get roles
+  std::set<std::string> getRoles() const;
 
   /// help method for normalize method
   bool isNormal() const;
@@ -201,9 +207,11 @@ private:
   /// transition cost
   int cost_;
 
+  /// roles
+  std::set<std::string> roles_;
+
   /// synchronize labels
   std::set<std::string> labels_;
-
 
   /// no standard copying!
   Transition(const Transition &);

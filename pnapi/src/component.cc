@@ -476,6 +476,22 @@ Transition::Transition(PetriNet & net, ComponentObserver & observer,
     }
 
     /*!
+     * \brief add role to transition
+     */
+    void Transition::addRole(std::string roleName)
+    {
+      roles_.insert(roleName);
+    }
+
+    /*!
+     * \brief get transition roles
+     */
+    std::set<string> Transition::getRoles() const
+    {
+      return roles_;
+    }
+
+    /*!
      * \brief   checks if the transition is normal
      *
      * \note    This is a help method for normalize method

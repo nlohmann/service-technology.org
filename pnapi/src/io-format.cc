@@ -7,6 +7,7 @@
 #include "petrinet.h"
 #include "state.h"
 #include "myio.h"
+#include "util.h"
 
 using std::endl;
 using std::map;
@@ -576,7 +577,15 @@ ostream & output(ostream & os, const PetriNet & net)
   << endl
 
   << util::mode(io::util::PLACE) << delim("; ")
-  << "PLACE"      << endl
+  << "PLACE"      << endl;
+
+  if(!net.getRoles().empty() && !net.isIgnoringRoles()){
+     os 
+     << delim(", ")
+     << "  ROLES "      << net.getRoles()          << ";" << endl;	
+  }
+
+  os
   << "  INTERNAL" << endl
   << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_)
   << ";" << endl << endl << delim(", ")
@@ -586,6 +595,7 @@ ostream & output(ostream & os, const PetriNet & net)
   << "  OUTPUT"   << endl
   << "    " << net.outputPlaces_
   << ";" << endl << endl;
+
   if (!labels.empty()) os
   << "  SYNCHRONOUS" << endl
   << "    " << labels
@@ -661,10 +671,17 @@ ostream & output(ostream & os, const Transition & t)
   if (t.getCost() != 0)
     os << "  COST " << t.getCost() << ";" << endl;
 
+  if (!t.getRoles().empty() && !t.getPetriNet().isIgnoringRoles()){
+    os 
+    << delim(", ")
+    << "  ROLES "     << t.getRoles()             << ";" << endl;
+  }
+
   os
   << delim(", ")
   << "  CONSUME "     << t.getPresetArcs()        << ";" << endl
   << "  PRODUCE "     << t.getPostsetArcs()       << ";" << endl;
+
   if (t.isSynchronized()) os
   << "  SYNCHRONIZE " << t.getSynchronizeLabels() << ";" << endl;
   return os;

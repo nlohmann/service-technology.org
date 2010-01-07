@@ -773,7 +773,7 @@ const pnapi::formula::Formula * unfoldFlags(const pnapi::PetriNet &net1, const p
 int main(int argc, char** argv) {
 	
 	//time_t start_time, end_time;
-	//clock_t start_clock = clock();
+	clock_t start_clock;// = clock();
 	evaluateParameters(argc, argv);
 	std::cerr << PACKAGE << " processing ";
 	if(args_info.inputs_num>0) {
@@ -973,7 +973,8 @@ int main(int argc, char** argv) {
 	
 // print result
 	//fflush(stdin);
-clock_t start_clock = clock();		int res=0;//the result of the system
+	//clock_t start_clock = clock();	
+	start_clock = clock();int res=0;//the result of the system
 	std::vector<lprec *> lpmps;// 
 	std::set<std::string> resultinp, resultout,resultsyn, result, resintern;//interface 
 	//parse the message profile files
@@ -1211,7 +1212,7 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 			for(i=1;i<=get_Ncolumns(lpmps.at(ifm));i++){
 				set_int(lpmps.at(ifm),i,TRUE);
 			}
-			set_verbose(lpmps.at(ifm),IMPORTANT);//print_lp(lpmps.at(ifm));
+			set_verbose(lpmps.at(ifm),NORMAL);//print_lp(lpmps.at(ifm));
 			res=solve(lpmps.at(ifm));
 			
 			//cout<<"Solve "<<solve(lp)<<endl;
@@ -1290,11 +1291,46 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 	// for each final marking one builds and solves  the state equation
 
 	if(args_info.inputs_num>0){
-		nPlaces = (int) net1.getPlaces().size();
+		nPlaces = (int) net1.getPlaces().size();cout << "No of places "<< net1.getInternalPlaces().size() << endl;
 		nTransitions = (int) net1.getTransitions().size();
 		pnapi::Marking m(net1);
+		net1.finalCondition().dnf(); 
 		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
-		retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
+		set< map<std::string const, unsigned int> > fmset;//set of final markings (set of maps)
+		if(typeid(*f)==typeid(pnapi::formula::Disjunction)){ 
+			//std::cout<<"Disjunction"<<endl;//make disjunction two by two
+			const pnapi::formula::Disjunction *fd=dynamic_cast<const pnapi::formula::Disjunction *>(f);			
+			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fd->children().begin();cIt!=fd->children().end();++cIt){
+				//here we should have a conjunction; but philosophers do not agree with it :(
+				//const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Disjunction *>(*cIt);
+				//(*cIt)->output(cout);cout<<endl;
+				if(((*cIt)->getType()==pnapi::formula::Formula::F_CONJUNCTION)){//typeid(*cIt)==typeid(pnapi::formula::Conjunction)){ 
+					const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(*cIt);
+					map<std::string const, unsigned int>  cfm;//build a marking
+					for(std::set<const pnapi::formula::Formula *>::iterator ccIt=fc->children().begin();ccIt!=fc->children().end();++ccIt){
+						const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*ccIt);
+						//const Place *pp=new Place(fp->place());
+						cfm.insert( std::pair<std::string const, unsigned int>(fp->place().getName(),fp->tokens()) );
+					}
+					fmset.insert(cfm);
+				}
+
+			}
+		}
+		if(typeid(*f)==typeid(pnapi::formula::Conjunction)){ 
+			map<std::string const, unsigned int>  cfm;//build a marking
+			const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(f);
+			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->children().begin();cIt!=fc->children().end();++cIt){
+				const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*cIt);
+				//const Place *pp=new Place(fp->place());
+				cfm.insert( std::pair<std::string const, unsigned int>(fp->place().getName(),fp->tokens()) );
+			}
+			fmset.insert(cfm);
+		}
+		cout << "No of final markings "<< fmset.size() << endl;
+		
+		//retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
+		//start_clock = clock();
 		if(coverall) {
 			std::set<std::string> sets;// fill in the set of nodes of the composition
 			std::set<pnapi::Place*> pl;
@@ -1339,9 +1375,9 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 		}
 	
 			//enforcedT.insert(std::pair<unsigned int, set<std::string> >(1,sets));
-	
-
-	for(set<lprec *>::iterator citr = retlpset.begin();citr!=retlpset.end();citr++){
+	//iterating all clauses
+	//for(set<lprec *>::iterator citr = retlpset.begin();citr!=retlpset.end();citr++){
+		for(set<map<std::string const ,unsigned int> >::iterator sfm=fmset.begin();sfm!=fmset.end();++sfm){
 		lprec *lp;//lp = make_lp(0, nTransitions);
 		
 			lp = make_lp(0, nTransitions);
@@ -1366,6 +1402,7 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 					set_col_name(lp, k, cstr);k++;
 			}
 			int ii=0; 
+		//for(set<const pnapi::Place *>::iterator p=sfm->begin();p!=sfm->end();++p){
 		for(std::set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();p++){
 			//add the constraint's left side
 			//cout<<(*p)->getName()<<"="<<(*p)->getTokenCount()<<std::endl;
@@ -1373,24 +1410,34 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 		//	cout<<"m["<<(*p)->getName()<<"]"<<"="<<(*p)->getTokenCount()<<std::endl;
 				Place & l= *net1.findPlace((*p)->getName());
 				if((args_info.inputs_num==1)&&(l.getType()!=pnapi::Node::INTERNAL)) continue;
+				unsigned int k=0;
+				int * colno=new int[get_Ncolumns(lp)]();
+				REAL * rowe= new REAL[get_Ncolumns(lp)]();
 				for(std::set<Transition *>::const_iterator t = net1.getTransitions().begin();t!=net1.getTransitions().end();t++){
 				//cout<<(*t)->getName();
 					int fp=0,fm=0;
 					Transition & r= *net1.findTransition((*t)->getName());
 					if(net1.findArc(r,l)!=NULL) fp=net1.findArc(r,l)->getWeight();
 					if(net1.findArc(l,r)!=NULL) fm=net1.findArc(l,r)->getWeight();
-					roww[j]=fp-fm;
+					if (fp!=fm) {
+						colno[k] = get_nameindex(lp,const_cast<char *>((*t)->getName().c_str()),FALSE);
+						rowe[k++]= fp-fm;
+					}
+					//roww[j]=fp-fm;
 				//cout<<roww[j]<<"="<<fp<<" minus "<<fm<<std::endl;
 				//net1.findArc( net1.findPlace((*p)->getName()), net1.findTransition((*t)->getName()));
 					j++;	
 				}
 			//now add row
 				char * cstr= new char [(*p)->getName().size()+1];
-				strcpy(cstr,(*p)->getName().c_str());
-				REAL rhs=0.0-((*p)->getTokenCount());
-			//cout<<"rhs "<<rhs<<" for "<<(*p)->getTokenCount()<<endl;
+				strcpy(cstr,(*p)->getName().c_str());const std::string ssss=(*p)->getName();
+			std::map<std::string const, unsigned int> mmm=(*sfm); ///mit=sfm->find(ssss);
+				REAL rhs=0.0+mmm[ssss]-((*p)->getTokenCount());//final marking - initial marking
+				//REAL rhs=((*p)->getTokenCount());
+			//cout<<"rhs "<<rhs<<" for "<<(*p)->getTokenCount()<<mmm[ssss]<<endl;
 			//here is the variant part that might change due to the final marking 
-				if(get_nameindex(*citr,cstr,TRUE)==-1){ 
+			//instead only eq is needed for the respective place and rsh is the number of tokens (0/1 usually)
+				/*if(get_nameindex(*citr,cstr,TRUE)==-1){ 
 				//get flag if it is all other external places empty, no flag
 					if(!add_constraint(lp, roww,EQ, rhs))
 								cout<<"gata"<<endl;
@@ -1400,7 +1447,10 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 					rhs=rhs+get_rh(*citr, get_nameindex(*citr,cstr,TRUE));
 					if(!add_constraint(lp, roww,get_constr_type(*citr,get_nameindex(*citr,cstr,TRUE)), rhs))
 								cout<<"gata"<<endl;
-				}
+				}*/
+			if(!add_constraintex(lp,k,rowe,colno, EQ, rhs)) cout<<"nu merge"<<endl;
+			//if(!add_constraint(lp, roww,EQ, rhs))
+			//	cout<<"gata"<<endl;
 				set_row_name(lp,get_Nrows(lp), cstr);
 			//add the constrain's right side
 			//get the row with the palce row name
@@ -1413,7 +1463,7 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 		
 		// add constraints for message profiles (variables included)
 		if(args_info.messageProfiles_given>0){
-			
+			cout<<"Fingerprint/message profile check"<<endl;
 			lprec *lpmc=copy_lp(lp);
 			
 			
@@ -1559,9 +1609,11 @@ clock_t start_clock = clock();		int res=0;//the result of the system
 			}
 		}
 		else{
-		set_obj_fnex(lp,0, NULL,NULL);set_verbose(lp,IMPORTANT);
-		
-		set_verbose(lp,IMPORTANT);
+			set_obj_fnex(lp,0, NULL,NULL);//set_verbose(lp,FULL);//IMPORTANT);
+			cout << "Number of interface places: "<< net2.getInterfacePlaces().size()<<endl;
+			cout << "Number of variables (transitions): "<< net1.getTransitions().size()<<endl;
+			cout<<"Number of constraints (places): "<<get_Nrows(lp)<<"; Number of variables:"<<get_Ncolumns(lp)<<endl;
+			set_verbose(lp,NORMAL);//,IMPORTANT);
 		for(int i=1;i<=get_Ncolumns(lp);++i){
 			set_int(lp,i,TRUE);
 		}

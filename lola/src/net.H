@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 #include "dimensions.H"
 #include "userconfig.H"
 

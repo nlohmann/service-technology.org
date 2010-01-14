@@ -17,6 +17,7 @@ using std::map;
 using std::string;
 
 #define YYERROR_VERBOSE
+#define YYMAXDEPTH 65535
 
 int currentState = 0;
 map<string, int> marking;
@@ -120,7 +121,7 @@ prog:
 
 markings:
   marking
-| marking COMMA markings
+| markings COMMA marking
 ;
 
 marking:
@@ -130,7 +131,7 @@ marking:
 
 transitions:
   /* empty */
-| transition transitions
+| transitions transition
 ;
 
 transition:

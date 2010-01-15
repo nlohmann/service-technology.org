@@ -497,6 +497,12 @@ int main(int argc, char** argv) {
                         break;
                     }
 
+                    // create PNML output
+                    case (output_arg_pnml): {
+                        outfile.stream() << io::pnml << *(objects[i].net);
+                        break;
+                    }
+
                     // create automaton output
                     case (output_arg_sa): {
                         Automaton sauto(*(objects[i].net));

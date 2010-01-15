@@ -111,6 +111,15 @@ AT_CHECK([test -f NET.png])
 AT_KEYWORDS([frontend output slow])
 AT_CLEANUP
 
+AT_SETUP([Writing PNML net (from open net)])
+m4_define([NET], [myCoffee.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=pnml],0)
+AT_CHECK([test -f NET.pnml])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([Composition and Product])

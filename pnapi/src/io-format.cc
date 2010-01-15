@@ -544,6 +544,199 @@ ostream & output(ostream & os, const formula::FormulaLessEqual & f)
 
 
 /*************************************************************************
+ ***** PNMP output
+ *************************************************************************/
+
+std::ios_base & pnml(std::ios_base & ios)
+{
+  util::FormatData::data(ios) = util::PNML;
+  return ios;
+}
+
+
+namespace __pnml
+{
+
+ostream & output(ostream & os, const PetriNet & net)
+{
+  string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
+  string inputfile = net.getMetaInformation(os, INPUTFILE);
+
+  os //< output everything to this stream
+
+  << "<!-- Petri net created by " << creator
+  << (inputfile.empty() ? "" : " reading " + inputfile)
+  << " -->" << endl
+  << endl
+
+  << "<pmnl>" << endl
+  
+  << "  <module>" << endl
+
+  << "    <ports>" << endl
+  << "    </ports>" << endl
+
+  << "    <net id=\"n1\">" << endl
+
+  << mode(io::util::PLACE) << net.internalPlaces_
+
+  << net.transitions_
+
+  << mode(io::util::ARC) << filterInternalArcs(net.arcs_)
+
+  << "    </net>" << endl
+
+  << "    <finalmarkings>" << endl
+  << "      <marking>" << endl
+  << net.finalCondition_
+  << "      </marking>" << endl  
+  << "    </finalmarkings>" << endl
+
+  << "  </module>" << endl
+  
+  << "</pmnl>" << endl;
+
+  return os << endl;
+}
+
+
+ostream & output(ostream & os, const Place & p)
+{
+  os << "      <place id=\"" << p.getName() << "\"";
+  
+  if (p.getTokenCount()) {
+    os
+    << ">" << endl
+    << "        <initialMarking>" << endl
+    << "          <text>" << p.getTokenCount() << "</text>" << endl
+    << "        </initialMarking>" << endl
+    << "      </place>" << endl;
+  } else {
+    os << " />" << endl;
+  }
+
+  return os;
+}
+
+
+ostream & output(ostream & os, const Transition & t)
+{
+  return os
+  << "      <transition id=\"" << t.getName() << "\" />" << endl;
+}
+
+
+ostream & output(ostream & os, const Arc & arc)
+{
+  static unsigned int id = 0;
+  os
+  << "      <arc id=\"a" << ++id
+  << "\" source=\"" << arc.getSourceNode().getName()
+  << "\" target=\"" << arc.getTargetNode().getName()
+  << "\"";
+
+  if (arc.getWeight() > 1) {
+    os << ">" << endl
+       << "        <inscription>" << endl
+       << "          <text>" << arc.getWeight() << "</text>" << endl
+       << "        </inscription>" << endl
+       << "      </arc>" << endl;
+  } else {
+    os << " />" << endl;
+  }
+
+  return os;
+}
+
+
+ostream & output(ostream & os, const formula::Negation & f)
+{
+  set<const Formula *> children =
+    filterInterfacePropositions(f.children());
+  if (children.empty())
+    assert(false); // FIXME: don't know what to do in this case
+  else
+    return os << "NOT (" << **f.children().begin() << ")";
+}
+
+
+ostream & output(ostream & os, const formula::Conjunction & f)
+{
+  set<const Formula *> children =
+    filterInterfacePropositions(f.children());
+  if (children.empty())
+    //return os << formula::FormulaTrue();
+    assert(false); // FIXME: don't know what to do in this case
+  else
+    return os << "        <place id=" << delim("        </place>\n        <place id=") << children << "        </place>\n";
+}
+
+
+ostream & output(ostream & os, const formula::Disjunction & f)
+{
+  set<const Formula *> children =
+    filterInterfacePropositions(f.children());
+  if (children.empty())
+    //return os << formula::FormulaFalse();
+    assert(false); // FIXME: don't know what to do in this case
+  else
+    return os << delim("      </marking>\n      <marking>\n") << children;
+}
+
+
+ostream & output(ostream & os, const formula::FormulaTrue &)
+{
+  return os << "TRUE";  // keyword not yet implemented in lola
+}
+
+
+ostream & output(ostream & os, const formula::FormulaFalse &)
+{
+  return os << "FALSE"; // keyword not yet implemented in lola
+}
+
+
+ostream & output(ostream & os, const formula::FormulaEqual & f)
+{
+  return os << "\"" << f.place().getName() << "\">" << endl
+  << "          <name>" << f.tokens() << "</name>" << endl;
+}
+
+
+ostream & output(ostream & os, const formula::FormulaNotEqual & f)
+{
+  return os << f.place().getName() << " # " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaGreater & f)
+{
+  return os << f.place().getName() << " > " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
+{
+  return os << f.place().getName() << " >= " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaLess & f)
+{
+  return os << f.place().getName() << " < " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaLessEqual & f)
+{
+  return os << f.place().getName() << " <= " << f.tokens();
+}
+
+} /* namespace __lola */
+
+
+
+/*************************************************************************
  ***** OWFN output
  *************************************************************************/
 

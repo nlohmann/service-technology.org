@@ -11,5 +11,6 @@ m4_define([GREP],                 [@GREP@])
 m4_define([SAYO],                 [cover.sh @abs_top_builddir@/src/sayo])
 m4_define([FIONA],                [wrap.sh @FIONA@])
 m4_define([WENDY],                [wrap.sh @WENDY@])
+m4_define([WENDY2FIONA],          [wrap.sh @WENDY2FIONA@])
 m4_define([SA2SM],                [wrap.sh @SA2SM@])
 

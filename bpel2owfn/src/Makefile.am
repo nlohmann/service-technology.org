@@ -86,7 +86,7 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 	$(AM_V_at)touch $@
 	$(AM_V_GEN)$(KC) $(KCFLAGS) $^
 	$(AM_V_at)-rm $(KCFILES_TEMP:.k=.cc) $(KCFILES_TEMP:.k=.h)
-	$(AM_V_at)$(SED) -i 's/reinterpret_cast<int>/reinterpret_cast<long>/g' ast-system-k.cc
+	$(AM_V_at)$(SED) -i 's/reinterpret_cast<int>/reinterpret_cast<size_t>/g' ast-system-k.cc
 
 
 ################################################################

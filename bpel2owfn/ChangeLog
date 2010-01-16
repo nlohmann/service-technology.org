@@ -103,6 +103,8 @@ Version 2.04-unreleased
 
 * changed license to GNU Affero General Public License Version 3
 
+* corrected output of final condition (removed `ALL_EXTERNAL_PLACES EMPTY')
+
 Version 2.0.3 (29 June 2007)
 ============================
 

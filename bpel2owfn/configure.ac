@@ -1,5 +1,17 @@
 AC_INIT([GNU BPEL2oWFN],[2.04-unreleased],[bpel2owfn@service-technology.org],[bpel2owfn],[http://service-technology.org/bpel2owfn])
 
+AC_MSG_NOTICE([ ____  ____  _____ _     ____    __        _______ _   _ ])
+AC_MSG_NOTICE([| __ )|  _ \| ____| |   |___ \ __\ \      / /  ___| \ | |])
+AC_MSG_NOTICE([|  _ \| |_) |  _| | |     __) / _ \ \ /\ / /| |_  |  \| |])
+AC_MSG_NOTICE([| |_) |  __/| |___| |___ / __/ (_) \ V  V / |  _| | |\  |])
+AC_MSG_NOTICE([|____/|_|   |_____|_____|_____\___/ \_/\_/  |_|   |_| \_|])
+AC_MSG_NOTICE([translating WS-BPEL processes into Petri net models])
+AC_MSG_NOTICE([http://service-technology.org/bpel2owfn])
+AC_MSG_NOTICE([http://www.gnu.org/software/bpel2owfn])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
+
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
 #############################################################################

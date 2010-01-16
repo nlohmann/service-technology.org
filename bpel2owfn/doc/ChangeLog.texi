@@ -70,6 +70,8 @@
 @item removed @acronym{PNML} and oWFN parser -- this belongs into the Petri Net API
 
 @item changed license to GNU Affero General Public License Version 3
+
+@item corrected output of final condition (removed @samp{ALL_EXTERNAL_PLACES EMPTY})
 @end itemize
 
 

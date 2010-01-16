@@ -1496,9 +1496,9 @@ void PetriNet::output_owfn(ostream *output) const
       {
         Place* p = (*((*final_set).begin()));
 #ifdef USING_BPEL2OWFN
-        (*output) << "( (" << p->nodeShortName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << p->nodeShortName() << "=1";
 #else
-        (*output) << "( (" << p->nodeName() << "=1) AND ALL_OTHER_PLACES_EMPTY )";
+        (*output) << p->nodeName() << "=1 AND ALL_OTHER_PLACES_EMPTY";
 #endif
       }
       else
@@ -1517,11 +1517,15 @@ void PetriNet::output_owfn(ostream *output) const
 #endif
           first_place = false;
         }
+#ifdef USING_BPEL2OWFN
+        (*output) << ")";
+#else
         (*output) << " AND ALL_OTHER_PLACES_EMPTY )";
+#endif
       }
       first_set = false;
     }
-    (*output) << " )";
+    (*output) << ")";
   }
   else
   {

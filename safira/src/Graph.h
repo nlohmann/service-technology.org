@@ -56,8 +56,8 @@ class Graph {
         /// Graph output as complement (it is required that makeTotal and makeComplete was executed before)
         void printComplement(ostream& o) const;
 
-        string getGlobalFormulaForComplement() const;
-        string getGlobalFormula() const;
+        void getGlobalFormulaForComplement(ostream& o) const;
+        void getGlobalFormula(ostream& o) const;
 
         /// get the number of new nodes in the complement
         int getSizeOfAddedNodes();

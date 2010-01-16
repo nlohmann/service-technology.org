@@ -11,7 +11,7 @@
 #include "cmdline.h"
 #include "verbose.h"
 #include "config-log.h"
-
+#include "time.h"
 #include "Output.h"
 
 /// the command line parameters
@@ -74,28 +74,29 @@ int main(int argc, char **argv) {
 
 	initGlobalVariables();
 
-	//time_t parsingTime_start = time(NULL);
+//	time_t parsingTime_start = time(NULL);
 
     //parse
     if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
 
     fclose(og_yyin);
     og_yylex_destroy();
-/*
-    time_t parsingTime_end = time(NULL);
-    cout << "number of labels: " << label2id.size()-4 << endl;
-    cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
-    cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
-    time_t buildOG_start = time(NULL);
-*/
+
+//    time_t parsingTime_end = time(NULL);
+//    cout << "number of labels: " << label2id.size()-3 << endl;
+//    cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
+//    cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+//    time_t buildOG_start = time(NULL);
+
 	g->complement();
 
-/*
-	time_t buildOG_end = time(NULL);
-	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
-	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
-	cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
-*/
+
+//	time_t buildOG_end = time(NULL);
+//	cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
+//	cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
+//	cout << "Printing output" << endl;
+	//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+
 	bool printToStdout = true;
 	for (unsigned int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {

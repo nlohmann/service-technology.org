@@ -308,47 +308,54 @@ void Graph::printInitialNodes(ostream& o) const{
 
 void Graph::printGlobalFormulaForComplement(ostream& o) const{
 
-	o << ";\n\nGLOBALFORMULA " << getGlobalFormulaForComplement() << ";\n";
+	o << ";\n\nGLOBALFORMULA ";
+	getGlobalFormulaForComplement(o);
+	o << ";\n";
 
 }
 
 void Graph::printGlobalFormula(ostream& o) const{
 
-	o << ";\n\nGLOBALFORMULA " << getGlobalFormula() << ";\n";
+	o << ";\n\nGLOBALFORMULA ";
+	getGlobalFormula(o);
+	o << ";\n";
 
 }
 
-string Graph::getGlobalFormulaForComplement() const{
+void Graph::getGlobalFormulaForComplement(ostream& o) const{
 	assert(globalFormula);
 
 	Formula* g = new FormulaNOT(globalFormula);
-	string s = g->toString();
+	//string s = g->toString();
+	o << g->toString();
 
 	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
 		assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
 
 		//generate new global formula;
-		s = s + " + " + intToString(n->second->id);
+		//s = s + " + " + intToString(n->second->id);
+		o << " + " << intToString(n->second->id);
 
 	}
 
-	return s;
+	//return s;
 }
 
-string Graph::getGlobalFormula() const{
+void Graph::getGlobalFormula(ostream& o) const{
 	assert(globalFormula);
-	string s = globalFormula->toString();
-
+	//string s = globalFormula->toString();
+	o << globalFormula->toString();
 
 	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
 		assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
 
 		//generate new global formula;
-		s = s + " * ~" + intToString(n->second->id);
+		//s = s + " * ~" + intToString(n->second->id);
+		o << " * ~" << intToString(n->second->id);
 
 	}
 
-	return s;
+	//return s;
 }
 
 
@@ -381,7 +388,6 @@ void Graph::printNodes(ostream& o) const{
 }
 
 void Graph::printComplement(ostream& o) const{
-
 	printInterface(o);
 	printInitialNodes(o);
 	printGlobalFormulaForComplement(o);
@@ -392,8 +398,11 @@ void Graph::printComplement(ostream& o) const{
 void Graph::print(ostream& o) const{
 
 	printInterface(o);
+
 	printInitialNodes(o);
+
 	printGlobalFormula(o);
+
 	printNodes(o);
 
 

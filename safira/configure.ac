@@ -26,6 +26,8 @@ AH_BOTTOM([#ifdef __cplusplus
 #include <assert.h>
 #endif])
 
+AC_CHECK_HEADERS([sys/time.h sys/resource.h zlib.h],,AC_MSG_ERROR([cannot use required headers]))
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

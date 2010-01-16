@@ -1,16 +1,17 @@
+#include "config.h"
+
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <map>
 #include <string>
+#include <ctime>
 
 #include "pnapi.h"
 #include "cmdline.h"
-#include "config.h"
 #include "Output.h"
 #include "verbose.h"
 

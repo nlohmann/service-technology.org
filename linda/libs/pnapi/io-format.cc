@@ -4,7 +4,7 @@
 #include "config.h"
 #include "petrinet.h"
 #include "state.h"
-#include "io.h"
+#include "myio.h"
 
 using std::endl;
 using std::map;

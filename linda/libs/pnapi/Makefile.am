@@ -18,7 +18,7 @@ libpnapi_a_SOURCES = \
         automaton.h automaton.cc\
         state.h state.cc \
         marking.h marking.cc \
-        io.h io.cc io-format.cc
+        myio.h myio.cc io-format.cc
 
 # to find Wendy's config.h header
 libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src

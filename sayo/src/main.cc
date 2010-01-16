@@ -38,6 +38,7 @@
 #include <map>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 
 #include "cmdline.h"
 #include "config.h"

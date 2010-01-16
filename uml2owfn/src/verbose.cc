@@ -21,6 +21,7 @@
 
 #include <config.h>
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>

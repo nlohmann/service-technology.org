@@ -19,6 +19,7 @@
 
 #include <config.h>
 #include <libgen.h>
+#include <ctime>
 #include <climits>
 #include <cstdlib>
 #include <cstdio>

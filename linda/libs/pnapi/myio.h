@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 /*!
- * \file    io.h
+ * \file    myio.h
  *
  * \brief   Input/Output related Structures
  *
@@ -28,8 +28,8 @@
  */
 
 
-#ifndef PNAPI_IO_H
-#define PNAPI_IO_H
+#ifndef PNAPI_MYIO_H
+#define PNAPI_MYIO_H
 
 #include <set>
 #include <map>

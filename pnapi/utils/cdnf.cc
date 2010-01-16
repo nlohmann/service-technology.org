@@ -1,6 +1,8 @@
+#include "verbose.h"
+
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -13,7 +15,6 @@
 #include "cdnf-cmdline.h"
 #include "config.h"
 #include "Output.h"
-#include "verbose.h"
 
 //*
 using std::cerr;

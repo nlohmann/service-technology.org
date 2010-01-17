@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <cstdio>
+#include <ctime>
 #include <cstdlib>
 
 #include "cmdline.h"
@@ -112,8 +113,11 @@ int main(int argc, char** argv)
     	std::cout << outStream.str();
 
 
-  // close input (output is closed by destructor)   fclose(og_yyin);
-  /// clean lexer memory   og_yylex_destroy();
+  // close input (output is closed by destructor)
+   fclose(og_yyin);
+
+  /// clean lexer memory
+   og_yylex_destroy();
 
   return EXIT_SUCCESS; // finished parsing
 }

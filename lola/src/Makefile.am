@@ -88,11 +88,11 @@ DISTCLEANFILES = $(CONFIGS)$(EXEEXT)
 install-am:
 	list='$(CONFIGS) lola'; for binary in $$list; do \
 	  if test -f "$$binary$(EXEEXT)"; then \
-	    $(install_sh_PROGRAM) $$binary$(EXEEXT) $(DESTDIR)$(bindir)/$$binary$(EXEEXT); \
+	    $(install_sh_PROGRAM) $$binary$(EXEEXT) $(DESTDIR)$(bindir)/`echo $$binary$(EXEEXT) | sed -e '$(program_transform_name)'`; \
 	  fi \
 	done;
 
 uninstall-hook:
 	list='$(CONFIGS) lola'; for binary in $$list; do \
-	  rm -f $(DESTDIR)$(bindir)/$$binary$(EXEEXT); \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$binary$(EXEEXT) | sed -e '$(program_transform_name)'`; \
 	done;

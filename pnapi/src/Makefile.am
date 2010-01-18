@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libpnapi.la
 
 libpnapi_la_SOURCES = \
     parser-owfn.yy    parser-owfn-lexer.ll \
+    parser-pnml.yy    parser-pnml-lexer.ll \
     parser-pn.yy parser-pn-lexer.ll \
     parser-onwd.yy    parser-onwd-lexer.ll \
     parser-lola.yy    parser-lola-lexer.ll \
@@ -33,7 +34,7 @@ include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
           automaton.h formula.h component.h \
           parser.h util.h state.h \
           marking.h link.h \
-          parser-owfn.h parser-pn.h \
+          parser-owfn.h parser-pn.h parser-pnml.h \
           parser-onwd.h parser-lola.h \
           parser-sa.h \
           Output.h

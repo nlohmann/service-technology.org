@@ -65,6 +65,15 @@ throw (InputError)
     break;
   }
 
+  case util::PNML:
+  {
+    parser::pnml::Parser parser;
+    net = parser.parse(is);
+
+    net.meta_ = util::MetaData::data(is);
+    break;
+  }
+
   case util::LOLA:
   {
     parser::lola::Parser parser;

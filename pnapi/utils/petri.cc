@@ -36,7 +36,7 @@ string suffix = "";
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
-typedef enum { TYPE_OPENNET, TYPE_LOLANET } objectType;
+typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_PNMLNET } objectType;
 
 struct FileObject {
     objectType type;
@@ -74,10 +74,9 @@ void terminationHandler() {
 
 
 int main(int argc, char** argv) {
-  
     // set the function to call on normal termination
     atexit(terminationHandler);
-  
+
     evaluateParameters(argc, argv);
 
     vector<FileObject> objects;
@@ -88,27 +87,22 @@ int main(int argc, char** argv) {
         invocation += string(argv[i]) + " ";
     }
 
-    if (args_info.converter_given)
-    {
-      switch(args_info.converter_arg)
-      {
-      case (converter_arg_petrify) : 
-      {
-        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
-        break;
-      }
-      case (converter_arg_genet) :
-      {
-        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
-        break;
-      }
-      case (converter_arg_statemachine) :
-      {
-        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
-        break;
-      }
-      default: assert(false);
-      }
+    if (args_info.converter_given) {
+        switch(args_info.converter_arg) {
+            case (converter_arg_petrify) : {
+                pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
+                break;
+            }
+            case (converter_arg_genet) : {
+                pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
+                break;
+            }
+            case (converter_arg_statemachine) : {
+                pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
+                break;
+            }
+            default: assert(false);
+        }
     }
 
     /********
@@ -139,6 +133,15 @@ int main(int argc, char** argv) {
                     current.type = TYPE_LOLANET;
                     break;
                 }
+                case(input_arg_pnml): {
+                    current.net = new PetriNet();
+                    std::cin >> meta(io::INPUTFILE, current.filename)
+                        >> meta(io::CREATOR, PACKAGE_STRING)
+                        >> meta(io::INVOCATION, invocation) >> io::pnml >> *(current.net);
+
+                    current.type = TYPE_PNMLNET;
+                    break;
+                }
                 case(input_arg_sa): {
                     Automaton sa;
                     std::cin >> meta(io::INPUTFILE, current.filename)
@@ -159,7 +162,7 @@ int main(int argc, char** argv) {
         std::stringstream ss;
         ss << io::stat << *(current.net);
         status("<stdin>: %s", ss.str().c_str());
-        
+
         // store object
         objects.push_back(current);
     } else {
@@ -281,7 +284,7 @@ int main(int argc, char** argv) {
 
         FileObject current(compositionName);
         current.type = TYPE_OPENNET;
-        current.net = new PetriNet(net);        
+        current.net = new PetriNet(net);
         objects.push_back(current);
     }
 
@@ -343,7 +346,6 @@ int main(int argc, char** argv) {
     if (args_info.normalize_given) {
         suffix += ".normalized";
         for (unsigned int i = 0; i < objects.size(); ++i) {
-
             status("normalizing reducing Petri net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->normalize();
@@ -353,7 +355,6 @@ int main(int argc, char** argv) {
     if (args_info.negate_given) {
         suffix += ".negated";
         for (unsigned int i = 0; i < objects.size(); ++i) {
-
             status("negating the final condition of net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->finalCondition().negate();
@@ -363,7 +364,6 @@ int main(int argc, char** argv) {
     if (args_info.mirror_given) {
         suffix += ".mirrored";
         for (unsigned int i = 0; i < objects.size(); ++i) {
-
             status("mirroring the net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->mirror();
@@ -373,7 +373,6 @@ int main(int argc, char** argv) {
     if (args_info.dnf_given) {
         suffix += ".dnf";
         for (unsigned int i = 0; i < objects.size(); ++i) {
-          
             status("calculation dnf of final condition of net '%s'...", objects[i].filename.c_str());
             
             objects[i].net->finalCondition().dnf();
@@ -387,7 +386,6 @@ int main(int argc, char** argv) {
     if (args_info.reduce_given) {
         suffix += ".reduced";
         for (unsigned int i = 0; i < objects.size(); ++i) {
-
             PetriNet::ReductionLevel level = PetriNet::NONE;
 
             // collect the chosen reduction rules
@@ -461,7 +459,7 @@ int main(int argc, char** argv) {
             if (args_info.check_arg == check_arg_workflow or args_info.isWorkflow_given) {
                 ss << objects[i].net->isWorkflow() << endl;
             }
-            
+
             message("%s: %s", objects[i].filename.c_str(), ss.str().c_str());
         }
     }
@@ -542,7 +540,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-    
+
     /**********
     * CLEANUP *
     **********/

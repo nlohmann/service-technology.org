@@ -569,7 +569,7 @@ ostream & output(ostream & os, const PetriNet & net)
   << " -->" << endl
   << endl
 
-  << "<pmnl>" << endl
+  << "<pnml>" << endl
   
   << "  <module>" << endl
 
@@ -594,7 +594,7 @@ ostream & output(ostream & os, const PetriNet & net)
 
   << "  </module>" << endl
   
-  << "</pmnl>" << endl;
+  << "</pnml>" << endl;
 
   return os << endl;
 }
@@ -699,7 +699,7 @@ ostream & output(ostream & os, const formula::FormulaFalse &)
 ostream & output(ostream & os, const formula::FormulaEqual & f)
 {
   return os << "\"" << f.place().getName() << "\">" << endl
-  << "          <name>" << f.tokens() << "</name>" << endl;
+  << "          <text>" << f.tokens() << "</text>" << endl;
 }
 
 

@@ -3,12 +3,21 @@
 
 
 PURPOSE
-    Yasmina is a tool for checking compatibility of open nets using integer linear programming.
+    Yasmina is a tool for checking compatibility using integer linear programming.
 
 
 COPYRIGHT
-Version 0.4-unreleased
-======================
+Version 1.0 (18 January 2009)
+=============================
+
+* first official release of Yasmina
+
+* compatibility with Linda varying length fingerprints fixed
+
+* improved final marking handling
+
+Version 0.4-unreleased (October 2009)
+=====================================
 
 * added testcases
 

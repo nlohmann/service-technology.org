@@ -1,7 +1,15 @@
-@heading Version 0.4-unreleased
+@heading Version 1.0 (18 January 2009)
+@itemize
+@item first official release of Yasmina
+@item compatibility with Linda varying length fingerprints fixed
+@item improved final marking handling
+@end itemize
+
+@heading Version 0.4-unreleased (October 2009)
 @itemize
 @item added testcases
 @item added documentation
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @item added manpage
 @end itemize
+

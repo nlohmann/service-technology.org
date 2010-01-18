@@ -3,7 +3,7 @@
 
 
 PURPOSE
-    Yasmina is a tool for checking compatibility of open nets using integer linear programming.
+    Yasmina is a tool for checking compatibility using integer linear programming.
 
 
 COPYRIGHT
@@ -18,10 +18,10 @@ LICENSE
     License AGPLv3+: GNU Affero General Public License version 3 or later
     <http://www.gnu.org/licenses/agpl.html>
 
-    Sayo is free software: you are free to change and redistribute it.
+    Yasmina is free software: you are free to change and redistribute it.
     There is NO WARRANTY, to the extent permitted by law.
 
-    See file "COPYING" for the license of Sayo.
+    See file "COPYING" for the license of Yasmina.
 
     Any different licensing scheme may be negotiated with the author(s).
 

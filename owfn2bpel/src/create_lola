@@ -1,21 +1,21 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # This script configures and compiles LoLA given in a directory "lola".
 # Therefore, it uses a the userconfig.H provided in the "src" directory.
 # The generated executable is moved into the "src" directory and named
 # "owfn_lola".
 
-echo [1/2] configuring LoLA...
+echo "[1/2] configuring LoLA..."
 cd lola
 
 # If possible, reconfigure with the same parameters.
 if test -f config.status
   then
-    ./config.status --recheck &> /dev/null
-    ./config.status &> /dev/null
+    ./config.status --recheck > /dev/null
+    ./config.status > /dev/null
   else
-    ./configure &> /dev/null
+    ./configure > /dev/null
 fi
 
-echo [2/2] compiling LoLA...
+echo "[2/2] compiling LoLA..."
 make > /dev/null

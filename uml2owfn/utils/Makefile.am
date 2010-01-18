@@ -1,4 +1,4 @@
-noinst_PROGRAMS = bom-anon
+bin_PROGRAMS = bom-anon
 
 bom_anon_LDFLAGS  = @configured_LDFLAGS@ -I$(top_srcdir)
 bom_anon_CFLAGS   = @configured_CFLAGS@

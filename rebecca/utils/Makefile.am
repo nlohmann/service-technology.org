@@ -1,4 +1,4 @@
-noinst_PROGRAMS = chor2dot
+bin_PROGRAMS = chor2dot
 
 chor2dot_SOURCES = syntax_chor.yy lexic_chor.ll
 

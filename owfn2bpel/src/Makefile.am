@@ -23,7 +23,7 @@ CLEANFILES = owfn2bpel_lola
 
 # create a LoLA to check the safeness of the nets from the given source
 # tarball announced in the configure script as "LOLANAME".
-owfn2bpel_lola: $(LOLANAME).tar.gz
+owfn2bpel_lola$(EXEEXT): $(LOLANAME).tar.gz
 	gunzip -c $(srcdir)/$(LOLANAME).tar.gz > $(builddir)/$(LOLANAME).tar
 	tar xf $(builddir)/$(LOLANAME).tar
 	rm $(builddir)/$(LOLANAME).tar

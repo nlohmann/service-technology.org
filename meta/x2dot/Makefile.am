@@ -1,4 +1,4 @@
-SUBDIRS = src/og2dot tests
+SUBDIRS = src/og2dot src/chor2dot tests
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
@@ -11,7 +11,7 @@ svn-clean: maintainer-clean
 	-rm -f missing
 	-rm -f ylwrap
 	-rm -f -r autom4te.cache
-	-rm -f src/og2dot/Makefile.in
+	-rm -f src/og2dot/Makefile.in src/chor2dot/Makefile.in
 	-rm -f -r src/og2dot/.deps
 	-rm -f src/og2dot/config.h.in
 	-rm -f tests/Makefile.in

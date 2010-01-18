@@ -1,4 +1,4 @@
-AC_INIT(og2dot, 1.0, georgstraube@service-technology.org)
+AC_INIT(x2dot, 1.0, georgstraube@service-technology.org)
 
 AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -41,7 +41,7 @@ AH_BOTTOM([#ifdef __cplusplus
 #include <assert.h>
 #endif])
 
-AC_CONFIG_FILES([Makefile src/og2dot/Makefile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile src/og2dot/Makefile src/chor2dot/Makefile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 
 AC_OUTPUT

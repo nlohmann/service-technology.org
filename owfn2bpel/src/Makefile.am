@@ -29,6 +29,7 @@ owfn2bpel_lola: $(LOLANAME).tar.gz
 	rm $(builddir)/$(LOLANAME).tar
 	mv $(LOLANAME) lola
 	cp $(srcdir)/userconfig.H lola/src
+	-cp $(abs_top_srcdir)/config.status lola
 	cd $(builddir) ; $(SHELL) $(srcdir)/create_lola
 	cp lola/src/lola $(builddir)/owfn2bpel_lola
 	rm -fr lola

@@ -7,7 +7,16 @@
 
 echo [1/2] configuring LoLA...
 cd lola
-./configure > /dev/null
+pwd
+
+# If possible, reconfigure with the same parameters.
+if test -f config.status
+  then
+    ./config.status --recheck > /dev/null
+    ./config.status > /dev/null
+  else
+    ./configure
+fi
 
 echo [2/2] compiling LoLA...
 make > /dev/null

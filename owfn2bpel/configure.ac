@@ -1,6 +1,8 @@
 AC_PREREQ(2.60)
 AC_INIT([oWFN2BPEL],[4.9-unreleased],[owfn2bpel@service-technology.org],[owfn2bpel])
-AM_INIT_AUTOMAKE
+
+AM_INIT_AUTOMAKE #(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Set directories.
 AC_CONFIG_SRCDIR(src/main.cc)
@@ -12,6 +14,14 @@ AC_PROG_CC
 AC_PROG_YACC
 AC_PROG_LEX
 AC_PROG_SED
+
+# allow the configure script to control assertions (just include config.h)
+AC_HEADER_ASSERT
+AH_BOTTOM([#ifdef __cplusplus
+#include <cassert>
+#else
+#include <assert.h>
+#endif])
 
 # Announce the build system
 AC_CANONICAL_BUILD

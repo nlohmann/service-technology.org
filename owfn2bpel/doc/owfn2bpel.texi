@@ -38,13 +38,20 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
 @author Niels Lohmann
-
 @page
 
 
 @vskip 0pt plus 1filll
 @insertcopying
 @end titlepage
+
+@c ----------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top oWFN2BPEL
+@insertcopying
+@end ifnottex
 
 @c ----------------------------------------------------------------------------
 

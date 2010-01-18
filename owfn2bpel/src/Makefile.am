@@ -31,5 +31,5 @@ owfn2bpel_lola$(EXEEXT): $(LOLANAME).tar.gz
 	cp $(srcdir)/userconfig.H lola/src
 	-cp $(abs_top_srcdir)/config.status lola
 	cd $(builddir) ; $(SHELL) $(srcdir)/create_lola
-	cp lola/src/lola $(builddir)/owfn2bpel_lola
+	cp lola/src/lola$(EXEEXT) $(builddir)/owfn2bpel_lola$(EXEEXT)
 	rm -fr lola

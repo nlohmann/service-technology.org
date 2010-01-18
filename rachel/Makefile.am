@@ -1,4 +1,4 @@
-SUBDIRS = src man doc tests exp maintainer
+SUBDIRS = src man doc tests exp
 
 #############################################################################
 # remove everything that cannot be built
@@ -12,8 +12,6 @@ svn-clean: maintainer-clean
 	rm -fr src/Makefile.in src/config.h.in src/config.h.in~ src/doc src/.deps
 	rm -fr tests/Makefile.in
 	rm -fr exp/Makefile.in exp/bpm2008
-	rm -fr maintainer/Makefile.in maintainer/debian/changelog \
-	maintainer/debian/README.Debian
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
 	@echo "  autoreconf -i"

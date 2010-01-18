@@ -1,4 +1,4 @@
-AC_INIT(Rachel, 1.14-unreleased, rachel@service-technology.org, rachel, http://service-technology.org/rachel)
+AC_INIT(Rachel, 1.14, rachel@service-technology.org, rachel, http://service-technology.org/rachel)
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
@@ -71,7 +71,6 @@ AC_SUBST(DOT)
 AC_CONFIG_FILES([Makefile
                  doc/Doxyfile doc/Doxydetails doc/Makefile
                  exp/Makefile
-                 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile
                  man/Makefile
                  src/Makefile
                  tests/Makefile tests/package.m4])

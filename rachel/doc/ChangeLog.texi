@@ -1,4 +1,4 @@
-@heading Version 1.14-unreleased
+@heading Version 1.14 (18 January 2010)
 @itemize
 @item updated maintainer scripts
 

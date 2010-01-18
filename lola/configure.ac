@@ -87,7 +87,7 @@ fi
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile maintainer/Makefile maintainer/macports/Portfile tests/Makefile tests/package.m4 utils/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile])
 
 AC_OUTPUT
 

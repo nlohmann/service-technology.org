@@ -73,7 +73,7 @@ AH_BOTTOM([#ifdef __cplusplus
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile doc/Doxyfile man/Makefile tests/Makefile tests/package.m4 gui/static_release.sh maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile maintainer/gnu/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile doc/Doxyfile man/Makefile tests/Makefile tests/package.m4 gui/static_release.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

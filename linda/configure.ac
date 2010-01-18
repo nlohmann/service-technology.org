@@ -76,8 +76,6 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile 
 		doc/Makefile doc/Doxyfile
 		man/Makefile
-		maintainer/Makefile 
-		maintainer/macports/Portfile
 		tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

@@ -1,4 +1,4 @@
-SUBDIRS = libs src tests man doc maintainer
+SUBDIRS = libs src tests man doc
 
 
 #############################################################################
@@ -22,7 +22,6 @@ svn-clean: maintainer-clean
 	-rm -f -r src/.deps
 	-rm -f src/config.h.in src/config.h.in~
 	-rm -f tests/Makefile.in tests/regression/Makefile.in tests/regression/Makefile
-	-rm -f maintainer/Makefile.in
 	-rm -f doc/Doxyfile
 	-rm -fr doc/doxygen
 	@echo -----------------------------------------------------

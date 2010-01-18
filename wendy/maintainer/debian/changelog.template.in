@@ -1,8 +1,0 @@
-@PACKAGE_TARNAME@ (YYYYYYYY-1) hardy; urgency=low
-
-  * Maintainer package release of @PACKAGE_STRING@ (Revision @VERSION_SVN@).
-    See the file ChangeLog at
-    <http://service-technology.org/files/@PACKAGE_TARNAME@/ChangeLog>
-    for more information.
-
- -- Niels Lohmann <niels.lohmann@uni-rostock.de>  XXXXXXXX

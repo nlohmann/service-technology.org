@@ -51,7 +51,6 @@ AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([Makefile
                  doc/Makefile doc/Doxyfile
                  src/Makefile
-                 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile
                  tests/Makefile tests/package.m4
                  man/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])

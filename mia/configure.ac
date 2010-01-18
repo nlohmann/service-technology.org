@@ -51,10 +51,7 @@ AC_PATH_PROG(VALGRIND, [valgrind], not found)
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/mia.conf doc/Doxyfile
-	doc/Makefile man/Makefile tests/Makefile tests/package.m4
-	maintainer/Makefile maintainer/debian/changelog.template
-	maintainer/debian/info maintainer/debian/README.Debian.template
-	maintainer/debian/rules maintainer/macports/Portfile])
+	doc/Makefile man/Makefile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

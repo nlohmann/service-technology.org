@@ -1,4 +1,4 @@
-SUBDIRS = src tests doc man maintainer
+SUBDIRS = src tests doc man
 
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
@@ -19,7 +19,6 @@ svn-clean: maintainer-clean
 	-rm -f doc/Doxyfile doc/mdate-sh
 	-rm -f doc/Makefile.in
 	-rm -f man/Makefile.in
-	-rm -f maintainer/Makefile.in
 	-rm -f INSTALL
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter

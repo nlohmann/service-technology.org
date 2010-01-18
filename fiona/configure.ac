@@ -207,8 +207,7 @@ AC_CONFIG_FILES([Makefile
                  libs/Makefile
                  libs/cudd/Makefile
                  libs/pnapi/Makefile
-		 man/Makefile
-		 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile])
+		 man/Makefile])
 AC_OUTPUT
 
 

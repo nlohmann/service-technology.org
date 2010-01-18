@@ -41,6 +41,6 @@ else
 fi
 AC_SUBST(DOT)
 
-AC_CONFIG_FILES([Makefile src/Makefile libs/minisat/Makefile tests/Makefile tests/package.m4 maintainer/Makefile man/Makefile doc/Makefile doc/Doxyfile])
+AC_CONFIG_FILES([Makefile src/Makefile libs/minisat/Makefile tests/Makefile tests/package.m4 man/Makefile doc/Makefile doc/Doxyfile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

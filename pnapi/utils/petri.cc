@@ -189,6 +189,15 @@ int main(int argc, char** argv) {
                         current.type = TYPE_OPENNET;
                         break;
                     }
+                    case(input_arg_pnml): {
+                        current.net = new PetriNet();
+                        infile >> meta(io::INPUTFILE, current.filename)
+                            >> meta(io::CREATOR, PACKAGE_STRING)
+                            >> meta(io::INVOCATION, invocation) >> io::pnml >> *(current.net);
+
+                        current.type = TYPE_OPENNET;
+                        break;
+                    }
                     case(input_arg_lola): {
                         current.net = new PetriNet();
                         infile >> meta(io::INPUTFILE, current.filename)

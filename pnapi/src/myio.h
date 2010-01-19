@@ -300,6 +300,7 @@ std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
  */
 namespace __pnml
 {
+std::ostream & outputInterface(std::ostream & os, const PetriNet & net);
 std::ostream & output(std::ostream &, const PetriNet &);
 std::ostream & output(std::ostream &, const Arc &);
 std::ostream & output(std::ostream &, const Place &);

@@ -557,6 +557,26 @@ std::ios_base & pnml(std::ios_base & ios)
 namespace __pnml
 {
 
+ostream & outputInterface(ostream & os, const PetriNet & net) {
+    os << "      <port id=\"p1\">" << endl;
+
+    PNAPI_FOREACH(set<Place*>, net.getInputPlaces(), p) {
+        os << "        <input id=\"" << (*p)->getName() << "\" />" << endl;
+    }
+
+    PNAPI_FOREACH(set<Place*>, net.getOutputPlaces(), p) {
+        os << "        <output id=\"" << (*p)->getName() << "\" />" << endl;
+    }
+
+    PNAPI_FOREACH(set<std::string>, net.getSynchronousLabels(), l) {
+        os << "        <synchronous id=\"" << *l << "\" />" << endl;
+    }
+
+    os << "      </port>" << endl;
+    return os;
+}
+
+
 ostream & output(ostream & os, const PetriNet & net)
 {
   string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
@@ -573,8 +593,10 @@ ostream & output(ostream & os, const PetriNet & net)
   
   << "  <module>" << endl
 
-  << "    <ports>" << endl
-  << "    </ports>" << endl
+  << "    <ports>" << endl;
+  outputInterface(os, net);
+  
+  os << "    </ports>" << endl
 
   << "    <net id=\"n1\">" << endl
 
@@ -621,8 +643,32 @@ ostream & output(ostream & os, const Place & p)
 
 ostream & output(ostream & os, const Transition & t)
 {
-  return os
-  << "      <transition id=\"" << t.getName() << "\" />" << endl;
+  set<Place*> inputs = t.getPetriNet().getInputPlaces();
+  set<Place*> outputs = t.getPetriNet().getOutputPlaces();
+
+  string comm;
+  PNAPI_FOREACH(set<Node*>, t.getPreset(), p) {
+      if (inputs.find(static_cast<Place*>(*p)) != inputs.end()) {
+          comm += "\n        <receive id=\"" + (*p)->getName() + "\" />";
+      }
+  }
+  PNAPI_FOREACH(set<Node*>, t.getPostset(), p) {
+      if (outputs.find(static_cast<Place*>(*p)) != outputs.end()) {
+          comm += "\n        <send id=\"" + (*p)->getName() + "\" />";
+      }
+  }
+  PNAPI_FOREACH(set<std::string>, t.getSynchronizeLabels(), l) {
+      comm += "\n        <synchronize id=\"" + *l + "\" />";
+  }
+
+  if (comm.empty()) {
+      return os << "      <transition id=\"" << t.getName() << "\" />" << endl;
+  } else {
+      return os
+      << "      <transition id=\"" << t.getName() << "\">"
+      << comm << endl
+      << "      </transition>" << endl;
+  }
 }
 
 
@@ -651,8 +697,7 @@ ostream & output(ostream & os, const Arc & arc)
 
 ostream & output(ostream & os, const formula::Negation & f)
 {
-  set<const Formula *> children =
-    filterInterfacePropositions(f.children());
+  set<const Formula *> children = filterInterfacePropositions(f.children());
   if (children.empty())
     assert(false); // FIXME: don't know what to do in this case
   else
@@ -662,20 +707,18 @@ ostream & output(ostream & os, const formula::Negation & f)
 
 ostream & output(ostream & os, const formula::Conjunction & f)
 {
-  set<const Formula *> children =
-    filterInterfacePropositions(f.children());
+  set<const Formula *> children = filterInterfacePropositions(f.children());
   if (children.empty())
     //return os << formula::FormulaTrue();
     assert(false); // FIXME: don't know what to do in this case
   else
-    return os << "        <place id=" << delim("        </place>\n        <place id=") << children << "        </place>\n";
+    return os << children;
 }
 
 
 ostream & output(ostream & os, const formula::Disjunction & f)
 {
-  set<const Formula *> children =
-    filterInterfacePropositions(f.children());
+  set<const Formula *> children = filterInterfacePropositions(f.children());
   if (children.empty())
     //return os << formula::FormulaFalse();
     assert(false); // FIXME: don't know what to do in this case
@@ -698,8 +741,8 @@ ostream & output(ostream & os, const formula::FormulaFalse &)
 
 ostream & output(ostream & os, const formula::FormulaEqual & f)
 {
-  return os << "\"" << f.place().getName() << "\">" << endl
-  << "          <text>" << f.tokens() << "</text>" << endl;
+  return os << "        <place id= \"" << f.place().getName() << "\">" << endl
+  << "          <text>" << f.tokens() << "</text>\n       </place>" << endl;
 }
 
 

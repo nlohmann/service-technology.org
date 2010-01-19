@@ -73,25 +73,36 @@ comment   ([^-]|"-"[^-])*
 <COMMENT>"-->"[ \t\r\n]*"<" { BEGIN(INITIAL); }
 
 
-"pnml"                   { return KEY_PNML; }
-"text"                   { return KEY_TEXT; }
-"place"                  { return KEY_PLACE; }
-"initialMarking"         { return KEY_INITIALMARKING; }
-"finalmarkings"          { return KEY_FINALMARKINGS; }
-"marking"                { return KEY_MARKING; }
-"transition"             { return KEY_TRANSITION; }
 "arc"                    { return KEY_ARC; }
+"finalmarkings"          { return KEY_FINALMARKINGS; }
+"initialMarking"         { return KEY_INITIALMARKING; }
+"input"                  { return KEY_INPUT; }
+"marking"                { return KEY_MARKING; }
 "module"                 { return KEY_MODULE; }
+"net"                    { return KEY_NET; }
+"output"                 { return KEY_OUTPUT; }
+"place"                  { return KEY_PLACE; }
+"pnml"                   { return KEY_PNML; }
 "port"                   { return KEY_PORT; }
 "ports"                  { return KEY_PORTS; }
-"net"                    { return KEY_NET; }
+"receive"                { return KEY_RECEIVE; }
+"send"                   { return KEY_SEND; }
+"synchronize"            { return KEY_SYNCHRONIZE; }
+"synchronous"            { return KEY_SYNCHRONOUS; }
+"text"                   { return KEY_TEXT; }
+"transition"             { return KEY_TRANSITION; }
+
 
 "="                      { return X_EQUALS; }
 
  /* identifiers */
 [0-9]+                   { pnapi_pnml_yylval.yt_int = atoi(yytext); return NUMBER; }
 [a-zA-Z0-9]+             { pnapi_pnml_yylval.yt_str = strdup(yytext); return IDENT; }
-{string}                 { return X_STRING; }
+{string}                 { pnapi_pnml_yylval.yt_str = strdup(yytext);
+                           // strip the quotes
+                           pnapi_pnml_yylval.yt_str[strlen(yytext)-1] = 0;
+                           pnapi_pnml_yylval.yt_str++;
+                           return X_STRING; }
 
 
  /* whitespace */

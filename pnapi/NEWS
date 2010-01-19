@@ -22,6 +22,8 @@ Version 3.01-unreleased
 
 * reimplemented normalize() according to [LohmannMW_2007_icatpn]
 
+* implemented PNML import and export
+
 
 See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for
 complete version history.

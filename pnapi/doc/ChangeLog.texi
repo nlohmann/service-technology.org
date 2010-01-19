@@ -6,6 +6,7 @@
 @item copied parameter '--stats' from Wendy to Petri
 @item integrated Output.* and verbose.* to Petri (see https://gna.org/task/?6837)
 @item reimplemented normalize() according to [LohmannMW_2007_icatpn]
+@item implemented @acronym{PNML} import and export
 @end itemize
 
 @heading Version 3.00 (2009-11-03)

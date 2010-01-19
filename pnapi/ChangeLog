@@ -22,6 +22,8 @@ Version 3.01-unreleased
 
 * reimplemented normalize() according to [LohmannMW_2007_icatpn]
 
+* implemented PNML import and export
+
 Version 3.00 (2009-11-03)
 =========================
 

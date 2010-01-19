@@ -1,6 +1,3 @@
-# trigger those tests that are not run with the petri tool
-SUBDIRS = .
-
 #############################################################################
 # You need to perform three steps to add a test case:
 #   1.) edit the file `testsuite.at' and add your test case
@@ -10,76 +7,36 @@ SUBDIRS = .
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = test_input.owfn \
-            syntax_example1.owfn \
-            syntax_example2.owfn \
-            syntax_example3.owfn \
-            syntax_example4.owfn \
-            bug13579.owfn \
-            bug13968.sa \
-            bug13990.1.owfn \
-            bug13990.2.owfn \
-            bug13990.3.owfn \
-            bug14064.owfn \
-            bug14116.owfn \
-	    bug14117.sa \
-	    bug14119.1.owfn \
-	    bug14119.2.owfn \
-	    bug14125.1.owfn \
-	    bug14125.2.owfn \
-            bug14127.owfn \
-            bug14128.1.owfn \
-            bug14128.2.owfn \
-            bug14206.lola \
-            bug14208.1.owfn \
-            bug14208.2.owfn \
-	    bug14335.owfn \
-	    bug14411.owfn \
-	    bug14411-constraint.owfn \
-	    bug14417.1.owfn \
-	    bug14417.2.owfn \
-	    bug14856.owfn \
-            data.hlowfn \
-	    eisen.hlowfn \
-	    myCoffee.owfn \
-            phils.hlowfn \
-	    test_cdnf.owfn \
-            test_input.lola \
-            test_dead_nodes.net.owfn \
-	    test_dnf.owfn \
-            test_identical_places.net.owfn \
-            test_identical_transitions.net.owfn \
-            test_input_roles.owfn \
-	    test_input_roles_error.owfn \
-            test_self_loop_places.net.owfn \
-            test_self_loop_transitions.net.owfn \
-            test_series_places.net.owfn \
+TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
+            syntax_example3.owfn syntax_example4.owfn bug13579.owfn \
+            bug13968.sa bug13990.1.owfn bug13990.2.owfn bug13990.3.owfn \
+            bug14064.owfn bug14116.owfn bug14117.sa bug14119.1.owfn \
+            bug14119.2.owfn bug14125.1.owfn bug14125.2.owfn bug14127.owfn \
+            bug14128.1.owfn bug14128.2.owfn bug14206.lola bug14208.1.owfn \
+            bug14208.2.owfn bug14335.owfn bug14411.owfn \
+            bug14411-constraint.owfn bug14417.1.owfn bug14417.2.owfn \
+            bug14856.owfn data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
+            test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \
+            test_dnf.owfn test_identical_places.net.owfn \
+            test_identical_transitions.net.owfn test_input_roles.owfn \
+            test_input_roles_error.owfn test_self_loop_places.net.owfn \
+            test_self_loop_transitions.net.owfn test_series_places.net.owfn \
             test_series_transitions.net.owfn \
             test_series_transitions_keepnormal.net.owfn \
-            test_starke_3p.net.owfn \
-            test_starke_3t.net.owfn \
-            test_starke_4.net.owfn \
-            test_starke_5.net.owfn \
-            test_starke_6.net.owfn \
-            test_starke_7.net.owfn \
-            test_starke_8.net.owfn \
-            test_starke_9.net.owfn \
-            test_criteria.noworkflownet.owfn \
-            test_criteria.workflownet.owfn \
-            test_criteria.nofreechoice.owfn \
-            test_criteria.freechoice.owfn \
+            test_starke_3p.net.owfn test_starke_3t.net.owfn \
+            test_starke_4.net.owfn test_starke_5.net.owfn \
+            test_starke_6.net.owfn test_starke_7.net.owfn \
+            test_starke_8.net.owfn test_starke_9.net.owfn \
+            test_criteria.noworkflownet.owfn test_criteria.workflownet.owfn \
+            test_criteria.nofreechoice.owfn test_criteria.freechoice.owfn \
             test_construction.sequence_normal.net.owfn \
             test_construction.sequence_unnormal.net.owfn \
-            test_construction.strange_net.net.owfn \
-            test_myCoffee.sa test_myCoffee-sm.owfn test_myCoffee-syn.owfn \
-            syntax_example.owfn \
-            syntax_example_new.owfn \
-            syntax_example_new_short.owfn \
-            syntax_formula.owfn \
-            syntax_max_occurrence.owfn \
+            test_construction.strange_net.net.owfn test_myCoffee.sa \
+            test_myCoffee-sm.owfn test_myCoffee-syn.owfn syntax_example.owfn \
+            syntax_example_new.owfn syntax_example_new_short.owfn \
+            syntax_formula.owfn syntax_max_occurrence.owfn \
             test_produce.onlineshop.constraint.owfn \
-            test_produce.onlineshop.owfn \
-            test_automaton_behavior_async.owfn \
+            test_produce.onlineshop.owfn test_automaton_behavior_async.owfn \
             fiona_abnormal_both.normalized.expected.owfn \
             fiona_abnormal_both.owfn \
             fiona_abnormal_both2.normalized.expected.owfn \
@@ -87,11 +44,9 @@ TESTFILES = test_input.owfn \
             fiona_abnormal_input.normalized.expected.owfn \
             fiona_abnormal_input.owfn \
             fiona_abnormal_output.normalized.expected.owfn \
-            fiona_abnormal_output.owfn \
-            fiona_coffee.normalized.expected.owfn \
-            fiona_coffee.owfn \
-	    zeus.owfn
-	    
+            fiona_abnormal_output.owfn fiona_coffee.normalized.expected.owfn \
+            fiona_coffee.owfn zeus.owfn test_input.pnml cyclicFullCoffee.pnml \
+            cyclicFullCoffee.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

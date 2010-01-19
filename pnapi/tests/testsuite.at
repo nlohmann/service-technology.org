@@ -140,7 +140,7 @@ AT_CLEANUP
 AT_BANNER([PNML])
 ############################################################################
 
-AT_SETUP([Translation PNML -> oWFN: cyclicFullCoffee.pnml])
+AT_SETUP([Translation PNML -> oWFN: Open Net PNML])
 m4_define([NET], [cyclicFullCoffee.pnml])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --input=pnml --output=owfn],0)
@@ -152,7 +152,7 @@ AT_CHECK([GREP -q "`cat tmp`" stderr],0)
 AT_KEYWORDS([frontend output pnml])
 AT_CLEANUP
 
-AT_SETUP([Translation oWFN -> PNML: cyclicFullCoffee.owfn])
+AT_SETUP([Translation oWFN -> PNML: Open Net PNML])
 m4_define([NET], [cyclicFullCoffee.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --input=owfn --output=pnml],0)
@@ -164,7 +164,7 @@ AT_CHECK([GREP -q "`cat tmp`" stderr],0)
 AT_KEYWORDS([frontend output pnml])
 AT_CLEANUP
 
-AT_SETUP([Translation PNML -> oWFN: test_input.owfn])
+AT_SETUP([Translation PNML -> oWFN: Oryx])
 m4_define([NET], [cyclicFullCoffee.pnml])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --input=pnml --output=owfn],0)
@@ -176,12 +176,36 @@ AT_CHECK([GREP -q "`cat tmp`" stderr],0)
 AT_KEYWORDS([frontend output pnml])
 AT_CLEANUP
 
-AT_SETUP([Translation oWFN -> PNML: test_input.owfn])
+AT_SETUP([Translation oWFN -> PNML: Oryx])
 m4_define([NET], [test_input.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --input=owfn --output=pnml],0)
 AT_CHECK([test -f NET.pnml])
 AT_CHECK([PETRI NET --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.pnml --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation PNML -> LoLA: LoLA's PNML format])
+m4_define([NET], [phils.pnml])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=pnml --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.owfn --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation LoLA -> PNML: LoLA's PNML format])
+m4_define([NET], [phils.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=lola --output=pnml],0)
+AT_CHECK([test -f NET.pnml])
+AT_CHECK([PETRI NET --input=lola --verbose],0,ignore,stderr)
 AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
 AT_CHECK([PETRI NET.pnml --input=pnml --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "`cat tmp`" stderr],0)

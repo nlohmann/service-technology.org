@@ -729,13 +729,13 @@ ostream & output(ostream & os, const formula::Disjunction & f)
 
 ostream & output(ostream & os, const formula::FormulaTrue &)
 {
-  return os << "TRUE";  // keyword not yet implemented in lola
+    return os;// << "TRUE";  // keyword not yet implemented in lola
 }
 
 
 ostream & output(ostream & os, const formula::FormulaFalse &)
 {
-  return os << "FALSE"; // keyword not yet implemented in lola
+  return os;// << "FALSE"; // keyword not yet implemented in lola
 }
 
 

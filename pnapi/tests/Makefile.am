@@ -46,7 +46,7 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             fiona_abnormal_output.normalized.expected.owfn \
             fiona_abnormal_output.owfn fiona_coffee.normalized.expected.owfn \
             fiona_coffee.owfn zeus.owfn test_input.pnml cyclicFullCoffee.pnml \
-            cyclicFullCoffee.owfn
+            cyclicFullCoffee.owfn phils.pnml phils.lola
 
 
 # Below you can list all the files you do not want to have counted in the

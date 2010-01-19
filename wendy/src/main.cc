@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
             status("reading from stdin...");
-            std::cin >> pnapi::io::owfn >> *InnerMarking::net;
+            std::cin >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::owfn) >> *InnerMarking::net;
         } else {
             // strip suffix from input filename
             filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
@@ -213,7 +213,8 @@ int main(int argc, char** argv) {
                 abort(1, "could not open file '%s'", args_info.inputs[0]);
             }
             inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-                        >> pnapi::io::owfn >> *InnerMarking::net;
+                        >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::owfn)
+                        >> *InnerMarking::net;
         }
         if (args_info.verbose_flag) {
             std::ostringstream s;

@@ -46,8 +46,8 @@ using namespace pnapi::parser::owfn;
 %token KEY_SAFE KEY_INTERFACE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
 %token KEY_SYNCHRONIZE KEY_SYNCHRONOUS KEY_CONSTRAIN
 %token KEY_INITIALMARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
-%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
-%token KEY_ALL_PLACES_EMPTY KEY_COST
+%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS KEY_ROLES
+%token KEY_ALL_PLACES_EMPTY KEY_COST 
 %token KEY_ALL_OTHER_PLACES_EMPTY
 %token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
 %token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
@@ -102,13 +102,13 @@ petrinet:
  /**************/
 
 places_ports: 
-    KEY_INTERFACE interface KEY_PLACE 
+    KEY_INTERFACE interface KEY_PLACE roles
     {
      placeType_ = Node::INTERNAL;
      port_ = "";
     } 
     places SEMICOLON 
-  | KEY_PLACE {placeType_ = Node::INTERNAL;} typed_places ports
+  | KEY_PLACE {placeType_ = Node::INTERNAL;} roles typed_places ports
   ;
 
 typed_places: 
@@ -180,7 +180,6 @@ node_name:
     }
   ;
 
-
 controlcommands:
     /* emtpy */
   | LCONTROL commands RCONTROL
@@ -216,7 +215,7 @@ port_participants:
     {
       Place* p = places_[nodeName_.str()];
       check(p != 0, "unknown place");
-      check(p->getType() != Place::INTERNAL, "interface place expectd");
+      check(p->getType() != Place::INTERNAL, "interface place expected");
       check(p->getPort().empty(), "place already assigned to port '" + p->getPort() +"'");
        
       p->setPort(port_);
@@ -225,7 +224,7 @@ port_participants:
     {
       Place* p = places_[nodeName_.str()];
       check(p != 0, "unknown place");
-      check(p->getType() != Place::INTERNAL, "interface place expectd");
+      check(p->getType() != Place::INTERNAL, "interface place expected");
       check(p->getPort().empty(), "place already assigned to port '" + p->getPort() +"'");
 
       p->setPort(port_);
@@ -267,6 +266,24 @@ labels:
     } 
   ;
 
+ /*******************/
+ /*** ROLES       ***/
+ /*******************/
+
+roles:
+    /* empty */
+  | KEY_ROLES role_names SEMICOLON
+;
+
+role_names:
+    role_name
+  | role_names COMMA role_name
+;
+
+role_name:
+  IDENT {pnapi_owfn_yynet.addRole($1);}
+  | NUMBER {pnapi_owfn_yynet.addRole((char*) $1);}
+;
 
  /*******************/
  /*** TRANSITIONS ***/
@@ -284,6 +301,7 @@ transition:
       transition_ = & pnapi_owfn_yynet.createTransition(nodeName_.str()); 
       transition_->setCost($3);
     }
+    transition_roles
     KEY_CONSUME 
     { 
       target_ = (Node**)(&transition_); source_ = (Node**)(&place_); 
@@ -304,6 +322,21 @@ transition:
 transition_cost:
     /*empty*/                  { $$ = 0;  }
   | KEY_COST NUMBER SEMICOLON  { $$ = $2; }
+;
+
+transition_roles:
+    /* empty */
+  | KEY_ROLES transition_role_names SEMICOLON
+;
+
+transition_role_names:
+    transition_role_name
+  | transition_role_names COMMA transition_role_name
+;
+
+transition_role_name:
+  IDENT {check(transition_->getPetriNet().isRoleSpecified($1),"role has not been specified");transition_->addRole($1);}
+  | NUMBER {check(transition_->getPetriNet().isRoleSpecified((char*) $1),"role has not been specified");transition_->addRole((char*) $1);}
 ;
 
 arcs: 
@@ -403,6 +436,11 @@ final:
   | condition 
     {
       pnapi_owfn_yynet.finalCondition() = (*$1);
+      if(wildcardGiven_)
+      {
+        wildcardGiven_ = false;
+        pnapi_owfn_yynet.finalCondition().allOtherPlacesEmpty(pnapi_owfn_yynet);
+      }
       delete $1; 
     }
   ;
@@ -434,7 +472,8 @@ formula:
   | KEY_FALSE         { $$ = new formula::FormulaFalse(); }
   | KEY_ALL_PLACES_EMPTY 
     { 
-      $$ = new formula::Conjunction(formula::ALL_PLACES_EMPTY); 
+      wildcardGiven_ = true;
+      $$ = new formula::FormulaTrue();
     }
   | OP_NOT formula
     { 
@@ -455,18 +494,16 @@ formula:
     }
   | formula OP_AND KEY_ALL_OTHER_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_PLACES_EMPTY);
-      delete $1;
+      wildcardGiven_ = true;
+      $$ = $1;
     }
   | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_INTERNAL_PLACES_EMPTY);
-      delete $1;
+      $$ = $1; // obsolete; kept due to compatibility
     }
   | formula OP_AND KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
     {
-      $$ = new formula::Conjunction(*$1, formula::ALL_OTHER_EXTERNAL_PLACES_EMPTY);
-      delete $1;
+      $$ = $1; // obsolete; kept due to compatibility
     }
   | node_name OP_EQ NUMBER
     {

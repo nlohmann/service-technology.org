@@ -16,6 +16,8 @@ Version 3.0-unreleased (17 December 2009)
   annotations which are then printed out in the og-file; providing
   parameter `--dot' prints the respective annotations in the dot output
 
+* implemented parameter `--pnml' to read a PNML file format
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-09-09 23:49:23 +0200 (Mi, 09. Sep 2009) $
+ * \date    $Date: 2010-01-07 18:03:23 +0100 (Do, 07. Jan 2010) $
  *
- * \version $Revision: 4694 $
+ * \version $Revision: 5204 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -28,342 +28,350 @@
 namespace pnapi
 {
 
-  // forward declarations
-  class PetriNet;
-  class Arc;
-  class Marking;
-  namespace util { class ComponentObserver; }
+// forward declarations
+class PetriNet;
+class Arc;
+class Marking;
+namespace util { class ComponentObserver; }
 
 
-  /*!
-   * \brief   unspecified Petri net nodes
-   *
-   * Class to represent nodes (i.e. places and transitions) of Petri
-   * nets. Each node has an id and a history (i.e. the list of roles the
-   * node had during the processing).
-   *
-   * Important properties of a node:
-   *  - belongs to exactly one PetriNet (getPetriNet(), setPetriNet())
-   *  - has a communication type (getType(), setType())
-   *  - has a name (and a history of previous names; getName(), setName())
-   *  - updates its pre- and postset automatically
-   */
-  class Node
-  {
+/*!
+ * \brief   unspecified Petri net nodes
+ *
+ * Class to represent nodes (i.e. places and transitions) of Petri
+ * nets. Each node has an id and a history (i.e. the list of roles the
+ * node had during the processing).
+ *
+ * Important properties of a node:
+ *  - belongs to exactly one PetriNet (getPetriNet(), setPetriNet())
+ *  - has a communication type (getType(), setType())
+ *  - has a name (and a history of previous names; getName(), setName())
+ *  - updates its pre- and postset automatically
+ */
+class Node
+{
 
-    /// observer needs to update pre- and postsets
-    friend class util::ComponentObserver;
+  /// observer needs to update pre- and postsets
+  friend class util::ComponentObserver;
 
-  public:
+public:
 
-    /// node types (communication)
-    enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
+  /// node types (communication)
+  enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
 
-    /// constructor
-    Node(PetriNet &, util::ComponentObserver &, const std::string &, Type);
+  /// constructor
+  Node(PetriNet &, util::ComponentObserver &, const std::string &, Type);
 
-    /// copy constructor
-    Node(PetriNet &, util::ComponentObserver &, const Node &, const std::string &);
+  /// copy constructor
+  Node(PetriNet &, util::ComponentObserver &, const Node &, const std::string &);
 
-    /// destructor
-    virtual ~Node();
+  /// destructor
+  virtual ~Node();
 
-    /// returns the petri net to which this node belongs
-    PetriNet & getPetriNet() const;
+  /// returns the petri net to which this node belongs
+  PetriNet & getPetriNet() const;
 
-    /// retrieves the communication type
-    Type getType() const;
+  /// retrieves the communication type
+  Type getType() const;
 
-    /// compares the type with another node's type
-    bool isComplementType(Type) const;
+  /// compares the type with another node's type
+  bool isComplementType(Type) const;
 
-    /// checks if two nodes are parallel to each other
-    bool isParallel(const Node &) const;
-    
-    /// returns the name of the node
-    std::string getName() const;
+  /// checks if two nodes are parallel to each other
+  bool isParallel(const Node &) const;
 
-    /// returns the name history
-    std::deque<std::string> getNameHistory() const;
+  /// returns the name of the node
+  std::string getName() const;
 
-    /// adds a prefix to all names
-    void prefixNameHistory(const std::string &);
+  /// returns the name history
+  std::deque<std::string> getNameHistory() const;
 
-    /// merges the histories of two nodes
-    void mergeNameHistory(Node &);
+  /// adds a prefix to all names
+  void prefixNameHistory(const std::string &);
 
-    /// returns the node's preset
-    const std::set<Node *> & getPreset() const;
+  /// merges the histories of two nodes
+  void mergeNameHistory(Node &);
 
-    /// returns the arcs to the node's preset
-    const std::set<Arc *> & getPresetArcs() const;
+  /// returns the node's preset
+  const std::set<Node *> & getPreset() const;
 
-    /// returns the node's postset
-    const std::set<Node *> & getPostset() const;
+  /// returns the arcs to the node's preset
+  const std::set<Arc *> & getPresetArcs() const;
 
-    /// returns the arcs to the node's postset
-    const std::set<Arc *> & getPostsetArcs() const;
+  /// returns the node's postset
+  const std::set<Node *> & getPostset() const;
 
+  /// returns the arcs to the node's postset
+  const std::set<Arc *> & getPostsetArcs() const;
 
-  protected:
 
-    /// the petri net this node belongs to
-    PetriNet & net_;
+protected:
 
-    /// petri net's observer for this node
-    util::ComponentObserver & observer_;
+  /// the petri net this node belongs to
+  PetriNet & net_;
 
-    /// changes the type of this node
-    virtual void setType(Type);
+  /// petri net's observer for this node
+  util::ComponentObserver & observer_;
 
-    /// merges another node into this one
-    void merge(Node &, bool);
+  /// changes the type of this node
+  virtual void setType(Type);
 
+  /// merges another node into this one
+  void merge(Node &, bool);
 
-  private:
 
-    /// the type of this node
-    Type type_;
+private:
 
-    /// the set of roles (i.e. the history) of the node
-    std::deque<std::string> history_;
+  /// the type of this node
+  Type type_;
 
-    /// the preset of this node
-    std::set<Node*> preset_;
-    
-    /// the arcs to the preset of this node
-    std::set<Arc*> presetArcs_;
-    
-    /// the postset of this node
-    std::set<Node*> postset_;
-    
-    /// the arcs to the postset of this node
-    std::set<Arc*> postsetArcs_;
-
-
-    /// no copying!
-    Node(const Node &);
-
-    /// merges the pre-/postsets of two nodes
-    void mergeArcs(pnapi::Node&, pnapi::Node&, const std::set<Node*> &,
-		   const std::set<Node*> &, bool, bool);
-
-  };
-
-
-  /*!
-   * \brief   transitions of the Petri net
-   *
-   * Class to represent transitions of Petri nets. Each transition
-   * inherits the functions and variables from class #Node.
-   */
-  class Transition : public Node
-  {
-
-    /// observer needs to update type
-    friend class util::ComponentObserver;
-
-  public:
-    /// constructor
-    Transition(PetriNet &, util::ComponentObserver &,
-	       const std::string &, 
-	       const std::set<std::string> & = std::set<std::string>());
-
-    /// copy constructor
-    Transition(PetriNet &, util::ComponentObserver &, const Transition &, 
-	       const std::string &);
-
-    /// set transition cost
-    void setCost(int);
-    
-    /// get transition cost
-    int getCost() const;
-    
-    /// help method for normalize method
-    bool isNormal() const;
-
-    /// merges another transition into this one
-    void merge(Transition &, bool = true);
+  /// the set of roles (i.e. the history) of the node
+  std::deque<std::string> history_;
 
-    /// returns true, if the transition is associated to at least one label
-    bool isSynchronized() const;
+  /// the preset of this node
+  std::set<Node*> preset_;
 
-    /// the set of labels
-    const std::set<std::string> & getSynchronizeLabels() const;
-    //std::set<std::string> getSynchronizeLabels() const;
-    
-    /// set the set of labels
-    void setSynchronizeLabels(const std::set<std::string> &);
+  /// the arcs to the preset of this node
+  std::set<Arc*> presetArcs_;
 
+  /// the postset of this node
+  std::set<Node*> postset_;
 
-  private:
+  /// the arcs to the postset of this node
+  std::set<Arc*> postsetArcs_;
 
-    /// transition cost
-    int cost_;
-    
-    /// synchronize labels
-    std::set<std::string> labels_;
 
+  /// no copying!
+  Node(const Node &);
 
-    /// no standard copying!
-    Transition(const Transition &);
+  /// merges the pre-/postsets of two nodes
+  void mergeArcs(pnapi::Node&, pnapi::Node&, const std::set<Node*> &,
+      const std::set<Node*> &, bool, bool);
 
-    /// updates the type
-    void updateType();
-  };
+};
 
 
-  /*!
-   * \brief   places of the Petri net
-   *
-   * Class to represent places of Petri nets. In addition to the
-   * inherited functions and variables from class #Node, each place has
-   * an initial marking.
-   */
-  class Place : public Node
-  {
-  public:
+/*!
+ * \brief   transitions of the Petri net
+ *
+ * Class to represent transitions of Petri nets. Each transition
+ * inherits the functions and variables from class #Node.
+ */
+class Transition : public Node
+{
 
-    /// constructor
-    Place(PetriNet &, util::ComponentObserver &, const std::string &, Type, unsigned int, 
-	  unsigned int, const std::string &);
+  /// observer needs to update type
+  friend class util::ComponentObserver;
 
-    /// copy constructor
-    Place(PetriNet &, util::ComponentObserver &, const Place &, const std::string &);
+public:
+  /// constructor
+  Transition(PetriNet &, util::ComponentObserver &,
+      const std::string &, 
+      const std::set<std::string> & = std::set<std::string>());
 
-    /// returns the number of tokens lying on this place
-    unsigned int getTokenCount() const;
+  /// copy constructor
+  Transition(PetriNet &, util::ComponentObserver &, const Transition &, 
+      const std::string &);
 
-    /// returns the capacity
-    unsigned int getCapacity() const;
+  /// set transition cost
+  void setCost(int);
 
-    /// if the place was an interface place before
-    bool wasInterface() const;
+  /// get transition cost
+  int getCost() const;
+ 
+  /// add role
+  void addRole(std::string role_name);
 
-    /// merges two places
-    Place & merge(Place &, bool = true, bool = true);
+  /// get roles
+  std::set<std::string> getRoles() const;
 
-    /// marks the place with token
-    void mark(unsigned int = 1);
+  /// help method for normalize method
+  bool isNormal() const;
 
-    /// returns the port this place belongs to
-    std::string getPort() const;
-    
-    /// returns the port this place belongs to
-    void setPort(std::string &);
+  /// merges another transition into this one
+  void merge(Transition &, bool = true);
 
-    /// swaps interface type
-    void mirror();
-    
-    /// set the maximum occurrence
-    void setMaxOccurrence(int);
-    
-    /// get the maximum occurrence
-    int getMaxOccurrence();
+  /// returns true, if the transition is associated to at least one label
+  bool isSynchronized() const;
 
+  /// the set of labels
+  const std::set<std::string> & getSynchronizeLabels() const;
+  //std::set<std::string> getSynchronizeLabels() const;
 
-  private:
+  /// set the set of labels
+  void setSynchronizeLabels(const std::set<std::string> &);
 
-    /// marking of the place
-    unsigned int tokens_;
 
-    /// capacity, where 0 means unlimited
-    unsigned int capacity_;
+private:
 
-    /// place was an interface place (now internal)
-    bool wasInterface_;
+  /// transition cost
+  int cost_;
 
-    /// port this place belongs to
-    std::string port_;
-    
-    /// maximum occurrence
-    int maxOccurrence_;
+  /// roles
+  std::set<std::string> roles_;
 
+  /// synchronize labels
+  std::set<std::string> labels_;
 
-    /// no standard copying!
-    Place(const Place &);
+  /// no standard copying!
+  Transition(const Transition &);
 
-    /// no standard copying!
-    Place & operator=(const Place &);
+  /// updates the type
+  void updateType();
+};
 
-    /// changes the communication type
-    void setType(Type type);
 
-  };
+/*!
+ * \brief   places of the Petri net
+ *
+ * Class to represent places of Petri nets. In addition to the
+ * inherited functions and variables from class #Node, each place has
+ * an initial marking.
+ */
+class Place : public Node
+{
+public:
 
+  /// constructor
+  Place(PetriNet &, util::ComponentObserver &, const std::string &, Type, unsigned int, 
+      unsigned int, const std::string &);
 
-  /*!
-   * \brief   arcs of the Petri net
-   *
-   * Class to represent arcs of Petri nets. An arc written as a tupel
-   * (n1,n2) has n1 as #source and n2 as #target.
-   */
-  class Arc
-  {
-  public:
+  /// copy constructor
+  Place(PetriNet &, util::ComponentObserver &, const Place &, const std::string &);
 
-    /// constructor
-    Arc(PetriNet &, util::ComponentObserver &, Node &, Node &, unsigned int = 1);
+  /// returns the number of tokens lying on this place
+  unsigned int getTokenCount() const;
 
-    /// copy constructor
-    Arc(PetriNet &, util::ComponentObserver &, const Arc &);
+  /// returns the capacity
+  unsigned int getCapacity() const;
 
-    /// copy constructor
-    Arc(PetriNet &, util::ComponentObserver &, const Arc &, Node &, Node &);
+  /// if the place was an interface place before
+  bool wasInterface() const;
 
-    /// destructor
-    virtual ~Arc();
+  /// merges two places
+  Place & merge(Place &, bool = true, bool = true);
 
-    /// returns the Petri net this arc belongs to
-    PetriNet & getPetriNet() const;
+  /// marks the place with token
+  void mark(unsigned int = 1);
 
-    /// source node
-    Node & getSourceNode() const;
+  /// returns the port this place belongs to
+  std::string getPort() const;
 
-    /// target node
-    Node & getTargetNode() const;
+  /// returns the port this place belongs to
+  void setPort(std::string &);
 
-    /// transition
-    Transition & getTransition() const;
+  /// swaps interface type
+  void mirror();
 
-    /// place
-    Place & getPlace() const;
+  /// set the maximum occurrence
+  void setMaxOccurrence(int);
 
-    /// weight
-    unsigned int getWeight() const;
-    
-    /// set the weight
-    void setWeight(unsigned int);
+  /// get the maximum occurrence
+  int getMaxOccurrence();
 
-    /// merges another arc into this one
-    void merge(Arc &);
 
-    /// swaps source and target node
-    void mirror();
+private:
 
+  /// marking of the place
+  unsigned int tokens_;
 
-  private:
+  /// capacity, where 0 means unlimited
+  unsigned int capacity_;
 
-    /// Petri net this arc belongs to
-    PetriNet & net_;
+  /// place was an interface place (now internal)
+  bool wasInterface_;
 
-    /// petri net's observer for this arc
-    util::ComponentObserver & observer_;
+  /// port this place belongs to
+  std::string port_;
 
-    /// source node of the arc
-    Node * source_;
+  /// maximum occurrence
+  int maxOccurrence_;
 
-    /// target node of the arc
-    Node * target_;
 
-    /// weight of the arc
-    unsigned int weight_;
+  /// no standard copying!
+  Place(const Place &);
 
+  /// no standard copying!
+  Place & operator=(const Place &);
 
-    /// no copying!
-    Arc(const Arc &);
+  /// changes the communication type
+  void setType(Type type);
 
-  };
+};
+
+
+/*!
+ * \brief   arcs of the Petri net
+ *
+ * Class to represent arcs of Petri nets. An arc written as a tupel
+ * (n1,n2) has n1 as #source and n2 as #target.
+ */
+class Arc
+{
+public:
+
+  /// constructor
+  Arc(PetriNet &, util::ComponentObserver &, Node &, Node &, unsigned int = 1);
+
+  /// copy constructor
+  Arc(PetriNet &, util::ComponentObserver &, const Arc &);
+
+  /// copy constructor
+  Arc(PetriNet &, util::ComponentObserver &, const Arc &, Node &, Node &);
+
+  /// destructor
+  virtual ~Arc();
+
+  /// returns the Petri net this arc belongs to
+  PetriNet & getPetriNet() const;
+
+  /// source node
+  Node & getSourceNode() const;
+
+  /// target node
+  Node & getTargetNode() const;
+
+  /// transition
+  Transition & getTransition() const;
+
+  /// place
+  Place & getPlace() const;
+
+  /// weight
+  unsigned int getWeight() const;
+
+  /// set the weight
+  void setWeight(unsigned int);
+
+  /// merges another arc into this one
+  void merge(Arc &);
+
+  /// swaps source and target node
+  void mirror();
+
+
+private:
+
+  /// Petri net this arc belongs to
+  PetriNet & net_;
+
+  /// petri net's observer for this arc
+  util::ComponentObserver & observer_;
+
+  /// source node of the arc
+  Node * source_;
+
+  /// target node of the arc
+  Node * target_;
+
+  /// weight of the arc
+  unsigned int weight_;
+
+
+  /// no copying!
+  Arc(const Arc &);
+
+};
 
 }
 

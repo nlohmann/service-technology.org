@@ -72,6 +72,11 @@ option "mi" -
   argoptional
   optional
 
+option "pnml" -
+  "Read open nets in PNML file format."
+  details="Using this option, the input file is expected to be in a PNML file format that is slightly extended to specify the interface and final markings."
+  flag off
+
 
 section "Operating Guidelines Options"
 sectiondesc="These options control the calculation of the operating guidelines as well as the style the operating guidelines are represented.\n"

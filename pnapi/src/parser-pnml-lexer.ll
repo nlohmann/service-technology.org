@@ -54,9 +54,11 @@ esc       "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 quote     \"
 string    {quote}([^"]|{esc})*{quote}
 comment   ([^-]|"-"[^-])*
+xmlheader ([^?]|"-"[^?])*
 
  /* start conditions of the lexer */
 %s COMMENT
+%s XMLHEADER
 
 
 %%
@@ -68,17 +70,23 @@ comment   ([^-]|"-"[^-])*
 ">"[ \t\r\n]*"<"         { return X_NEXT; }
 
  /* comments */
-"!--"                       { BEGIN(COMMENT); }
-<COMMENT>{comment}          { /* skip */ }
-<COMMENT>"-->"[ \t\r\n]*"<" { BEGIN(INITIAL); }
+"!--"                        { BEGIN(COMMENT); }
+<COMMENT>{comment}           { /* skip */ }
+<COMMENT>"-->"[ \t\r\n]*"<"  { BEGIN(INITIAL); }
+
+"?"                          { BEGIN(XMLHEADER); }
+<XMLHEADER>{xmlheader}       { /* skip */ }
+<XMLHEADER>"?>"[ \t\r\n]*"<" { BEGIN(INITIAL); }
 
 
 "arc"                    { return KEY_ARC; }
 "finalmarkings"          { return KEY_FINALMARKINGS; }
 "initialMarking"         { return KEY_INITIALMARKING; }
 "input"                  { return KEY_INPUT; }
+"inscription"            { return KEY_INSCRIPTION; }
 "marking"                { return KEY_MARKING; }
 "module"                 { return KEY_MODULE; }
+"name"                   { return KEY_NAME; }
 "net"                    { return KEY_NET; }
 "output"                 { return KEY_OUTPUT; }
 "place"                  { return KEY_PLACE; }
@@ -91,6 +99,7 @@ comment   ([^-]|"-"[^-])*
 "synchronous"            { return KEY_SYNCHRONOUS; }
 "text"                   { return KEY_TEXT; }
 "transition"             { return KEY_TRANSITION; }
+"value"                  { return KEY_VALUE; }
 
 
 "="                      { return X_EQUALS; }

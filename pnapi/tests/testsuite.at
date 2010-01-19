@@ -66,10 +66,10 @@ AT_KEYWORDS([frontend input pnml])
 AT_CLEANUP
 
 AT_SETUP([Reading PNML net from pipe])
-m4_define([NET], [cyclicFullCoffee.pnml])
+m4_define([NET], [testnet.pnml])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI --verbose --input=pnml < NET],0,ignore,stderr)
-AT_CHECK([GREP -q "|P|= 7  |P_in|= 1  |P_out|= 1  |T|= 6  |F|= 15" stderr])
+AT_CHECK([GREP -q "|P|= 8  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 17" stderr])
 AT_KEYWORDS([frontend input pnml])
 AT_CLEANUP
 

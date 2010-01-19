@@ -32,8 +32,8 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             test_construction.sequence_normal.net.owfn \
             test_construction.sequence_unnormal.net.owfn \
             test_construction.strange_net.net.owfn test_myCoffee.sa \
-            test_myCoffee-sm.owfn test_myCoffee-syn.owfn syntax_example.owfn \
-            syntax_example_new.owfn syntax_example_new_short.owfn \
+            test_myCoffee-sm.owfn test_myCoffee-syn.owfn testnet.pnml \
+            syntax_example.owfn syntax_example_new.owfn syntax_example_new_short.owfn \
             syntax_formula.owfn syntax_max_occurrence.owfn \
             test_produce.onlineshop.constraint.owfn \
             test_produce.onlineshop.owfn test_automaton_behavior_async.owfn \

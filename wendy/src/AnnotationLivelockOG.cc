@@ -25,6 +25,19 @@
  * AnnotationElement                      *
  ******************************************/
 
+/******************
+ * STATIC MEMBERS *
+ ******************/
+
+AnnotationElement::_stats AnnotationElement::stats;
+
+/******************
+ * STATIC METHODS *
+ ******************/
+
+AnnotationElement::_stats::_stats()
+        : cumulativeNumberOfClauses(0), maximalNumberOfClauses(0) {}
+
 
 /******************************************
  * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
@@ -53,6 +66,13 @@ AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfK
     std::copy(_annotationBoolean.begin(), _annotationBoolean.end(), annotationBool);
 
     annotationBool[_annotationBoolean.size()] = NULL;
+
+    // do some statistics
+    if (stats.maximalNumberOfClauses < _annotationBoolean.size()) {
+        stats.maximalNumberOfClauses = _annotationBoolean.size();
+    }
+
+    stats.cumulativeNumberOfClauses += _annotationBoolean.size();
 }
 
 

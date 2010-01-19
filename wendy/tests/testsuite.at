@@ -167,9 +167,9 @@ AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_CLEANUP
 
 AT_SETUP([Checking for memory leaks with Valgrind (LL-OG)])
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/zeus.owfn .])
 AT_CHECK_LOLA
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW myCoffee.owfn --finalize --correctness=livelock --og],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW zeus.owfn --finalize --correctness=livelock --og],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_CLEANUP
 
@@ -1127,10 +1127,10 @@ AT_CLEANUP
 
 AT_SETUP([3 Dining Philosophers])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/phils_3_2.owfn .])
-AT_CHECK([WENDY phils_3_2.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 2239" stderr])
-AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2239" stderr])
+AT_CHECK([cp TESTFILES/phils_3_1.owfn .])
+AT_CHECK([WENDY phils_3_1.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 2896" stderr])
+AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2896" stderr])
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 

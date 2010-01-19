@@ -24,6 +24,7 @@
 #include "InnerMarking.h"
 #include "InterfaceMarking.h"
 #include "Clause.h"
+#include "LivelockOperatingGuideline.h"
 
 
 /*!
@@ -44,7 +45,7 @@ class CompositeMarking {
         ~CompositeMarking();
 
         /// returns a string representing the annotation of the composite marking with respect to the given set of knowledges
-        void getMyFormula(const std::set<StoredKnowledge *> & setOfKnowledges, Clause * booleanClause, bool & emptyClause);
+        void getMyFormula(const std::set<StoredKnowledge *> & setOfKnowledges, SetOfEdges & setOfEdges, Clause * booleanClause, bool & emptyClause);
 
         /// compare two composite markings
         bool operator== (const CompositeMarking& other) const ;

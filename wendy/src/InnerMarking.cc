@@ -37,6 +37,7 @@ extern gengetopt_args_info args_info;
 std::map<InnerMarking_ID, InnerMarking*> InnerMarking::markingMap;
 std::map<InnerMarking_ID, bool> InnerMarking::finalMarkingReachableMap;
 pnapi::PetriNet* InnerMarking::net = new pnapi::PetriNet();
+bool InnerMarking::is_acyclic = true;
 InnerMarking** InnerMarking::inner_markings = NULL;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
@@ -81,6 +82,12 @@ void InnerMarking::initialize() {
 
     status("stored %d inner markings (%d final, %d bad, %d inevitable deadlocks)",
         stats.markings, stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
+
+    // in case of calculating the livelock operating guideline, we print out whether the inner is cyclic or not
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+        std::string result = is_acyclic ? "acyclic" : "cyclic";
+        status("reachability graph of inner is %s", result.c_str());
+    }
 
     if (stats.final_markings == 0) {
         message("%s: %s", _cimportant_("warning"), _cwarning_("no final marking found"));

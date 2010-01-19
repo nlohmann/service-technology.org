@@ -36,6 +36,21 @@ class AnnotationElement {
     friend class AnnotationLivelockOG;
     friend class LivelockOperatingGuideline;
 
+    public: /* static attributes */
+
+        /// struct combining the statistics on the class AnnotationElement
+        static struct _stats {
+            public:
+                /// constructor
+                _stats();
+
+                ///
+                unsigned int cumulativeNumberOfClauses;
+
+                /// maximal number of clauses per annotation element
+                unsigned int maximalNumberOfClauses;
+        } stats;
+
     public: /* member functions */
 
         /// constructor

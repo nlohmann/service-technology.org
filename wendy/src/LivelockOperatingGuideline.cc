@@ -28,6 +28,7 @@
 #include "LivelockOperatingGuideline.h"
 #include "CompositeMarking.h"
 #include "Clause.h"
+#include "SCSHandler.h"
 
 #include "verbose.h"
 #include "cmdline.h"
@@ -67,8 +68,13 @@ void LivelockOperatingGuideline::initialize() {
   Tarjan's algorithm to find SCCs within all nodes (consisting of SCCs themselves) contained in the TS
   \param toBeVisited the set of knowledges to be traversed
   \param setOfSCCs a set of strongly connected components
+  \param setOfEdges only use those edges when traversing the knowledges
+  \param ignoreEdges consider the set of edges or ignore them (initially, we ignore the edges; then, when traversing an SCS system, we have to consider the edges)
  */
-void LivelockOperatingGuideline::getSCCs(const std::set<StoredKnowledge* > & toBeVisited, SetOfSCCs & setOfSCCs) {
+bool LivelockOperatingGuideline::getSCCs(const std::set<StoredKnowledge* > & toBeVisited,
+                                         SetOfSCCs & setOfSCCs,
+                                         SetOfEdges & setOfEdges,
+                                         const bool & ignoreEdges) {
 
     // reset tarjan stack (used in StoredKnowledge before)
     StoredKnowledge::tarjanStack.clear();
@@ -80,8 +86,14 @@ void LivelockOperatingGuideline::getSCCs(const std::set<StoredKnowledge* > & toB
     for (std::set<StoredKnowledge* >::const_iterator iter = toBeVisited.begin(); iter != toBeVisited.end(); ++iter) {
 
         // we have not yet seen the node, find the SCCs of its reachability graph
-        getSCCsRecursively(*iter, visited, toBeVisited, setOfSCCs);
+        if (not getSCCsRecursively(*iter, visited, toBeVisited, setOfEdges, setOfSCCs, ignoreEdges)
+            and not ignoreEdges) {
+
+            return false;
+        }
     }
+
+    return true;
 }
 
 
@@ -107,20 +119,24 @@ bool LivelockOperatingGuideline::findNodeInStack(const StoredKnowledge* currentN
    \param currentNode currently considered knowledge
    \param visited set of knowledges that have been visited already
    \param toBeVisited set of knowledges that still need to be considered
+   \param setOfEdges only use those edges when traversing the knowledges
    \param setOfSCCs set of SCCs that have been found already
+   \param ignoreEdges consider the set of edges or ignore them (initially, we ignore the edges; then, when traversing an SCS system, we have to consider the edges)
    
    \todo check if we can get rid of the mapping (idea: inherit class LLStoredKnowledge from StoredKnowledge)
    \todo implement a nice set<void*> with the _needed_ operators
    \todo alternatively: store an "i'm in the set" bit at each object
  */
-void LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode,
+bool LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode,
                                          std::set<StoredKnowledge* > & visited,
                                          const std::set<StoredKnowledge* > & toBeVisited,
-                                         SetOfSCCs & setOfSCCs) {
+                                         SetOfEdges & setOfEdges,
+                                         SetOfSCCs & setOfSCCs,
+                                         const bool & ignoreEdges) {
 
     // remember, that we visited the current node
     if (not visited.insert(currentNode).second) {
-        return ;
+        return true;
     }
 
     // adjust Tarjan values of the current node (first == dfs; second == lowlink)
@@ -133,16 +149,23 @@ void LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
     StoredKnowledge::tarjanStack.push_back(currentNode);
 
     // iterate over the successors of current node
+    // in case of traversing an SCS subsystem, we only use edges contained within the setOfEdges given as a parameter
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
         if (currentNode->successors[l-1] != NULL and currentNode->successors[l-1] != StoredKnowledge::empty and
-            currentNode->successors[l-1]->is_sane) {
+            currentNode->successors[l-1]->is_sane and
+            (ignoreEdges or setOfEdges[currentNode].find(l-1) != setOfEdges[currentNode].end())) {
 
             // we have not yet touched the successor node and successor node is to be visited
+            // and if we should consider the edge
             if (visited.find(currentNode->successors[l-1]) == visited.end() and
                 toBeVisited.find(currentNode->successors[l-1]) != toBeVisited.end()) {
 
                 // do Tarjan algorithm for the successor state
-                getSCCsRecursively(currentNode->successors[l-1], visited, toBeVisited, setOfSCCs);
+                if (not getSCCsRecursively(currentNode->successors[l-1], visited, toBeVisited, setOfEdges, setOfSCCs, ignoreEdges)
+                    and not ignoreEdges) {
+
+                    return false;
+                }
 
                 // adjust lowlink value
                 StoredKnowledge::tarjanMapping[currentNode].second = MINIMUM(StoredKnowledge::tarjanMapping[currentNode].second,
@@ -182,9 +205,16 @@ void LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
 
         } while (currentNode != poppedNode);
 
+        // we are looking for an SCS subsystem, such a subsystem has to have the same number of nodes as the given SCS
+        if (not ignoreEdges and scc.size() != toBeVisited.size()) {
+            return false;
+        }
+
         // put newly found SCC into the set storing all SCCs
         setOfSCCs.push_back(scc);
     }
+
+    return true;
 }
 
 
@@ -198,7 +228,8 @@ void LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
 
   \todo Statistik: wie viele unterschiedliche CompositeMarkingsHandler::conjunctionOfDisjunctions gibt es
 */
-void LivelockOperatingGuideline::calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS) {
+void LivelockOperatingGuideline::calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS,
+                                                             SetOfEdges & setOfEdges) {
 
     CompositeMarkingsHandler::initialize(knowledgeSCS);
 
@@ -216,7 +247,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSet(const std::set<Stor
 
             // we have not yet seen this marking
             if (CompositeMarkingsHandler::getMarking(currentMarking) == NULL) {
-                calculateTSCCInKnowledgeSetRecursively(currentMarking, knowledgeSCS);
+                calculateTSCCInKnowledgeSetRecursively(currentMarking, knowledgeSCS, setOfEdges);
             } else {
                 // the marking is not new, so delete right away
                 delete currentMarking;
@@ -315,7 +346,8 @@ CompositeMarking * LivelockOperatingGuideline::getSuccessorMarking(const StoredK
    \param knowledgeSCS a set of knowledges
  */
 void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(CompositeMarking * currentMarking,
-                                                             const std::set<StoredKnowledge* > & knowledgeSCS) {
+                                                             const std::set<StoredKnowledge* > & knowledgeSCS,
+                                                             SetOfEdges & setOfEdges) {
 
 
     assert(currentMarking != NULL);
@@ -392,7 +424,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 
         if (not foundSuccessorMarking) {
             // do Tarjan algorithm for the successor state
-            calculateTSCCInKnowledgeSetRecursively(successorMarking, knowledgeSCS);
+            calculateTSCCInKnowledgeSetRecursively(successorMarking, knowledgeSCS, setOfEdges);
 
             // adjust lowlink value
             currentMarking->lowlink = MINIMUM(currentMarking->lowlink, successorMarking->lowlink);
@@ -465,7 +497,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 
             if (not foundSuccessorMarking) {
                 // do Tarjan algorithm for the successor state
-                calculateTSCCInKnowledgeSetRecursively(successorMarking, knowledgeSCS);
+                calculateTSCCInKnowledgeSetRecursively(successorMarking, knowledgeSCS, setOfEdges);
 
                 // adjust lowlink value
                 currentMarking->lowlink = MINIMUM(currentMarking->lowlink, successorMarking->lowlink);
@@ -509,7 +541,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
             // create new clause to store the clause corresponding to the current composite marking
             Clause * booleanClauseTemp = new Clause();
 
-            poppedMarking->getMyFormula(knowledgeSCS, booleanClauseTemp, emptyClause);
+            poppedMarking->getMyFormula(knowledgeSCS, setOfEdges, booleanClauseTemp, emptyClause);
 
             // use boolean OR to let the overall clause know about the current (part) clause
             *booleanClause |= *booleanClauseTemp;
@@ -549,6 +581,26 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
   \note fixedNodes.clear(); in die finalize-Methode packen und in der Regel nie rufen
 */
 void LivelockOperatingGuideline::generateLLOG() {
+
+    // operating guideline and the reachability graph of the inner do not contain any cycles
+    if (StoredKnowledge::stats.numberOfNonTrivialSCCs == 0) {
+        if (not InnerMarking::is_acyclic) {
+            std::set<StoredKnowledge* > SCS;
+
+            for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin(); iter != StoredKnowledge::seen.end(); ++iter) {
+
+                SCS.insert(*iter);
+                SetOfEdges setOfEdges;
+
+                calculateTSCCInKnowledgeSet(SCS, setOfEdges);
+
+                SCS.clear();
+            }
+        }
+        LivelockOperatingGuideline::stats.numberOfSCSs = StoredKnowledge::seen.size();
+        return ;
+    }
+
     // set of nodes, fixed and non fixed ones used for calculating the set of connected components
     std::set<StoredKnowledge* > fixedNodes;
 
@@ -560,12 +612,45 @@ void LivelockOperatingGuideline::generateLLOG() {
 
 
 /*!
+    collect all edges of current SCS and count them
+    \param SCS current SCS
+    \param setOfEdges collect all edges and knowledges of current SCS
+    \param countEdges count the edges of the SCS
+*/
+void LivelockOperatingGuideline::getEdgesOfSCS(const std::set<StoredKnowledge* > &  SCS,
+                                               SetOfEdges & setOfEdges,
+                                               unsigned int & countEdges) {
+
+    countEdges = 0;
+
+    // consider each knowledge of SCS
+    for (std::set<StoredKnowledge*>::const_iterator iter = SCS.begin(); iter != SCS.end(); ++iter) {
+
+        std::set<Label_ID> succ;
+
+        for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+            if (SCS.find((*iter)->successors[l-1]) != SCS.end()) {
+                // remember edge
+                succ.insert(l-1);
+
+                ++countEdges;
+            }
+        }
+
+        // remember edges of current knowledge
+        setOfEdges[*iter] = succ;
+    }
+}
+
+
+/*!
   recursive function to calculate all strongly connected sets within the set of knowledges
   \param fixedNodes
   \param nonFixedNodes
 */
 void LivelockOperatingGuideline::getStronglyConnectedSetsRecursively(std::set<StoredKnowledge* > & fixedNodes,
-                                                          std::set<StoredKnowledge* > & nonFixedNodes) {
+                                                                     std::set<StoredKnowledge* > & nonFixedNodes) {
+
     // initialize Tarjan's value
     maxDFS = 0;
 
@@ -580,32 +665,85 @@ void LivelockOperatingGuideline::getStronglyConnectedSetsRecursively(std::set<St
 
     // calculate the SCCs using Tarjan of the given set of nodes
     SetOfSCCs setOfSCCs;
-    getSCCs(unionFixedNodesNonFixedNodes, setOfSCCs);
+
+    // is just a placeholder and will not be used when calling getSCCs initially
+    SetOfEdges setOfEdges;
+
+    getSCCs(unionFixedNodesNonFixedNodes, setOfSCCs, setOfEdges, true);
 
     if (setOfSCCs.empty()) {
         return ;
     }
 
     // traverse through all SCCs which are the strongly connected sets we are looking for ;-)
-    for (SetOfSCCs::const_iterator iterSCCs = setOfSCCs.begin(); iterSCCs != setOfSCCs.end(); ++iterSCCs) {
+    for (SetOfSCCs::const_iterator currentSCS = setOfSCCs.begin(); currentSCS != setOfSCCs.end(); ++currentSCS) {
 
         // if the set of fixed nodes is a subset of the current SCC we have found a real SCS
-        if (std::includes((*iterSCCs).begin(), (*iterSCCs).end(), fixedNodes.begin(), fixedNodes.end())) {
+        if (std::includes((*currentSCS).begin(), (*currentSCS).end(), fixedNodes.begin(), fixedNodes.end())) {
 
-            // statistics output
-            if (args_info.reportFrequency_arg and ++stats.numberOfSCSs % args_info.reportFrequency_arg == 0) {
-                message("%8d SCSs", stats.numberOfSCSs);
+            // collect all edges of the current SCS
+            setOfEdges.clear();
+
+            SetOfEdges mandatoryEdges;
+            unsigned int countEdges;
+
+            // now the setOfEdges will be filled
+            getEdgesOfSCS(*currentSCS, setOfEdges, countEdges);
+
+            // a subsystem only exists, if the number of edges is bigger than the number of nodes in the current SCS
+            if ((*currentSCS).size() < countEdges) {
+
+                // calculate all subsystem of the current SCS and
+                // check for each subsystem if the SCS is still an SCC containing the same set of nodes
+
+                SCSHandler scsHandler;
+                scsHandler.initialize(setOfEdges, countEdges);
+                scsHandler.initializeSubsystemCalculation();
+
+                SetOfEdges currentSubsystem;
+
+                // iterate over all subsystems of the current SCS
+                while (scsHandler.nextSubsystem()) {
+                    currentSubsystem = scsHandler.getNextSubsystem();
+                    if (not currentSubsystem.empty()) {
+
+                        // calculate the SCC of the SCS with the current (sub-) set of edges
+                        // just a placeholder, will not be considered later on and usually not filled by getSCCs
+                        SetOfSCCs tmp;
+
+                        if (getSCCs(*currentSCS, tmp, currentSubsystem, false)) {
+
+                            // consider this subsystem
+
+                            // statistics output
+                            if (args_info.reportFrequency_arg and ++stats.numberOfSCSs % args_info.reportFrequency_arg == 0) {
+                                message("%8d SCSs", stats.numberOfSCSs);
+                            }
+
+                            // calculate the reachability graph being spanned by the knowledges of the current SCS
+                            // and search for the TSCC within
+                            calculateTSCCInKnowledgeSet(*currentSCS, currentSubsystem);
+                        }
+                    }
+                }
+            } else {
+
+                // statistics output
+                if (args_info.reportFrequency_arg and ++stats.numberOfSCSs % args_info.reportFrequency_arg == 0) {
+                    message("%8d SCSs", stats.numberOfSCSs);
+                }
+
+                // calculate the reachability graph being spanned by the knowledges of the current SCS
+                // and search for the TSCC within
+                calculateTSCCInKnowledgeSet(*currentSCS, setOfEdges);
             }
 
-            // calculate the reachability graph being spanned by the knowledges of the current SCS
-            // and search for the TSCC within
-            calculateTSCCInKnowledgeSet(*iterSCCs);
 
             std::set<StoredKnowledge* > f(fixedNodes);
 
             std::set<StoredKnowledge* > n;
             std::set_intersection(nonFixedNodes.begin(), nonFixedNodes.end(),
-                                  (*iterSCCs).begin(), (*iterSCCs).end(),
+                                  (*currentSCS).begin(), (*currentSCS).end(),
                                   std::insert_iterator<std::set<StoredKnowledge* > >(n, n.begin()));
 
             std::set<StoredKnowledge* > intersection(n);
@@ -631,12 +769,26 @@ void LivelockOperatingGuideline::getStronglyConnectedSetsRecursively(std::set<St
     setOfSCCs.clear();
 }
 
+
 /*!
  write the annotation of the livelock operating guideline to the given output stream
  \param dot true, in case we generate dot output
  \param file pointer to the output stream
  */
 void LivelockOperatingGuideline::output(const bool & dot, std::ostream& file) {
+    if (StoredKnowledge::stats.numberOfNonTrivialSCCs == 0 and InnerMarking::is_acyclic) {
+        output_acyclic(dot, file);
+    } else {
+        output_cyclic(dot, file);
+    }
+}
+
+/*!
+ write the annotation of the livelock operating guideline to the given output stream
+ \param dot true, in case we generate dot output
+ \param file pointer to the output stream
+ */
+void LivelockOperatingGuideline::output_cyclic(const bool & dot, std::ostream& file) {
     if (dot) {
         file << " graph[fontname=\"Helvetica\" fontsize=10 label=<<table border=\"0\"><tr><td> </td></tr><tr><td align=\"left\">Annotations:</td></tr>\n";
 
@@ -684,6 +836,40 @@ void LivelockOperatingGuideline::output(const bool & dot, std::ostream& file) {
             }
 
             file << ": " << temp->myAnnotation(false) << ";\n";
+        }
+    }
+}
+
+
+/*!
+ write the annotation of the livelock operating guideline to the given output stream
+ \param dot true, in case we generate dot output
+ \param file pointer to the output stream
+ */
+void LivelockOperatingGuideline::output_acyclic(const bool & dot, std::ostream& file) {
+    if (dot) {
+        file << " graph[fontname=\"Helvetica\" fontsize=10 label=<<table border=\"0\"><tr><td> </td></tr><tr><td align=\"left\">Annotations:</td></tr>\n";
+
+        bool lastNode = false;
+
+        for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
+
+                                                         iter != StoredKnowledge::seen.end();
+                                                         ++iter) {
+            file << "<tr><td align=\"left\">" << reinterpret_cast<size_t>(*iter) << ": " << (*iter)->formula(dot) << "</td></tr>\n";
+        }
+
+        file << "</table>>]\n";
+    } else {
+        file << "\nANNOTATIONS\n";
+
+        bool lastNode = false;
+
+        for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
+                                                         iter != StoredKnowledge::seen.end();
+                                                         ++iter) {
+
+            file << reinterpret_cast<size_t>(*iter) << ": " << (*iter)->formula(dot) << "\n";
         }
     }
 }

@@ -44,6 +44,19 @@ class Clause {
 
     public: /* static attributes */
 
+        /// struct combining the statistics on the class Clause
+        static struct _stats {
+            public:
+                /// constructor
+                _stats();
+
+                ///
+                unsigned int cumulativeSizeAllClauses;
+
+                /// maximal size a clause has reached
+                unsigned int maximalSizeOfClause;
+        } stats;
+
         /// the clause holding literal final only (just a placeholder, no object!)
         static Clause* finalClause;
 

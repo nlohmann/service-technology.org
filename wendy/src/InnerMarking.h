@@ -80,6 +80,9 @@ class InnerMarking {
         /// the open net that created these inner markings
         static pnapi::PetriNet* net;
 
+        /// remember if the reachability graph of the inner is acyclic
+        static bool is_acyclic;
+
     private: /* static attributes */
         /// struct combining the statistics on the class InnerMarking
         static struct _stats {

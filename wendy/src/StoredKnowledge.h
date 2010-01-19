@@ -40,6 +40,7 @@ class StoredKnowledge {
     friend class LivelockOperatingGuideline;
     friend class CompositeMarking;
     friend class CompositeMarkingsHandler;
+    friend class SCSHandler;
 
     public: /* static functions */
         /// destroy all objects of this class

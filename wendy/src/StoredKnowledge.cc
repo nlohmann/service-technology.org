@@ -813,9 +813,12 @@ std::string StoredKnowledge::formula(bool dot) const {
     // represents the formula (set of disjunctions which each are a set again)
     set<set<string> > conjunctionOfDisjunctions;
 
+    unsigned int countLiterals = 0;
+
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1]->is_sane) {
+
             sendDisjunction.insert(Label::id2name[l]);
         }
     }
@@ -825,6 +828,7 @@ std::string StoredKnowledge::formula(bool dot) const {
     bool dl_found = false;
     for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
         dl_found = true;
+
         // add sending events to current disjunction
         set<string> disjunctionSendingReceivingSynchronous(sendDisjunction);
 
@@ -834,6 +838,7 @@ std::string StoredKnowledge::formula(bool dot) const {
             if (interface[i]->marked(l) and
                 successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
+
                 disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
             }
         }
@@ -844,17 +849,23 @@ std::string StoredKnowledge::formula(bool dot) const {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
                 successors[l-1] != NULL and successors[l-1] != empty and
                 successors[l-1]->is_sane) {
+
                 disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
             }
         }
 
         // deadlock is final
         if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
+
             disjunctionSendingReceivingSynchronous.insert("final");
         }
 
         // add clause
         conjunctionOfDisjunctions.insert(disjunctionSendingReceivingSynchronous);
+
+        if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+            countLiterals += disjunctionSendingReceivingSynchronous.size();
+        }
     }
 
     // all markings are transient
@@ -874,6 +885,7 @@ std::string StoredKnowledge::formula(bool dot) const {
             if (it->size() > 1) {
                 formula += "(";
             }
+
             // get clause which contains !, ? or # events
             for (set<string>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
                 if (it2 != it->begin()) {
@@ -891,6 +903,24 @@ std::string StoredKnowledge::formula(bool dot) const {
     // successors
     if (formula.empty()) {
         formula = "false";
+
+        ++countLiterals;
+    }
+
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+
+        AnnotationElement::stats.cumulativeNumberOfClauses += sizeDeadlockMarkings;
+
+        if (sizeDeadlockMarkings > AnnotationElement::stats.maximalNumberOfClauses) {
+            AnnotationElement::stats.maximalNumberOfClauses = sizeDeadlockMarkings;
+        }
+
+        LivelockOperatingGuideline::stats.numberOfTSCCInSCSs += sizeDeadlockMarkings;
+        Clause::stats.cumulativeSizeAllClauses += countLiterals;
+
+        if (countLiterals > Clause::stats.maximalSizeOfClause) {
+            Clause::stats.maximalSizeOfClause = countLiterals;
+        }
     }
 
     return formula;

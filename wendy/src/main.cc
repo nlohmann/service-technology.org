@@ -35,7 +35,10 @@
 #include "Cover.h"
 #include "Diagnosis.h"
 #include "LivelockOperatingGuideline.h"
+#include "AnnotationLivelockOG.h"
+#include "Clause.h"
 #include "verbose.h"
+#include "SCSHandler.h"
 
 
 // input files
@@ -342,13 +345,11 @@ int main(int argc, char** argv) {
     // in case of livelock freedom and if the operating guideline shall be
     // calculated, we have to analyse every strongly connected set of knowledges
     if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+        time(&start_time);
         LivelockOperatingGuideline::initialize();
         LivelockOperatingGuideline::generateLLOG();
-        status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);
-        status("number of terminal strongly connected sets: %d", LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);
-
-        double averageSizeOfAnnotation = static_cast<double>(LivelockOperatingGuideline::stats.numberAllElementsAnnotations) / static_cast<double>(LivelockOperatingGuideline::stats.numberOfSCSs);
-        status("average size of annotation per SCS: %.2f", averageSizeOfAnnotation);
+        time(&end_time);
+        status("generated LL-OG [%.0f sec]", difftime(end_time, start_time));
     }
 
     status("maximal simultaneously stored Knowledge objects: %d", Queue::maximal_objects);
@@ -383,6 +384,25 @@ int main(int argc, char** argv) {
                 std::string cover_filename = og_filename + ".cover";
                 Output cover_output(cover_filename, "cover constraint");
                 Cover::write(cover_output);
+            }
+
+            // print out some statistics gained by writing out the og file
+            // (the decode() method of Clause is only called when we actually print out the annotations)
+            if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+
+                status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);
+                status("number of terminal strongly connected sets: %d", LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);
+
+                double averageSizeOfAnnotation = static_cast<double>(AnnotationElement::stats.cumulativeNumberOfClauses) / static_cast<double>(LivelockOperatingGuideline::stats.numberOfSCSs);
+                status("average number of clauses in an annotation: %.2f", averageSizeOfAnnotation);
+
+                double averageSizeOfLiteralsOfAnnotation = static_cast<double>(Clause::stats.cumulativeSizeAllClauses) / static_cast<double>(LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);
+                status("average number of literals of clause: %.2f", averageSizeOfLiteralsOfAnnotation);
+
+                status("maximal number of clauses in an annotation: %d", AnnotationElement::stats.maximalNumberOfClauses);
+                status("maximal number of literals of clause: %d", Clause::stats.maximalSizeOfClause);
+
+                status("found %d bad subsets and skipped those", SCSHandler::countBadSubsystems);
             }
         }
 

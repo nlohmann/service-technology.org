@@ -113,6 +113,12 @@ state:
             // insert representative into current SCC of inner markings
             currentSCC.insert($2);
     
+            // we have found a non-trivial SCC within the inner markings, so the reachability graph
+            // contains a cycle
+            if (currentSCC.size() > 1) {
+                InnerMarking::is_acyclic = false;
+            }
+
             // reduction by smart sending events is turned on
             if (not args_info.ignoreUnreceivedMessages_flag) {
                 /* it is a trivial SCC */
@@ -132,6 +138,7 @@ state:
         currentLabels.clear();
         currentSuccessors.clear();
         marking.clear();
+        currentSCC.clear();
    }
 ;
 

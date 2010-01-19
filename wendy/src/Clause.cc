@@ -27,6 +27,8 @@
  * STATIC MEMBERS *
  ******************/
 
+Clause::_stats Clause::stats;
+
 uint8_t Clause::bytes = 0;
 
 // a clause holding just literal final
@@ -39,6 +41,10 @@ Clause* Clause::falseClause = reinterpret_cast<Clause*>(2);
 /******************
  * STATIC METHODS *
  ******************/
+
+Clause::_stats::_stats()
+        : cumulativeSizeAllClauses(0), maximalSizeOfClause(0) {}
+
 
 void Clause::initialize() {
     bytes = ((Label::last_sync - 1) / 8) +1;
@@ -126,6 +132,13 @@ void Clause::decode() {
 
         // check if clause contains more than one literal
         more_than_one_literal = counter > 1;
+
+        // do statistics
+        if (stats.maximalSizeOfClause < counter) {
+            stats.maximalSizeOfClause = counter;
+        }
+
+        stats.cumulativeSizeAllClauses += counter;
     }
 }
 

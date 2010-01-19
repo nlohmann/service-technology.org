@@ -65,13 +65,18 @@ CompositeMarking::~CompositeMarking() {
   \param emptyClause if true, the clause of this composite marking is empty
 */
 void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledgeSet,
+                                    SetOfEdges & setOfEdges,
                                                   Clause * booleanClause,
                                                   bool & emptyClause) {
+
+    std::set<Label_ID> edges = (*setOfEdges.find(storedKnowledge)).second;
 
     // receiving event
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         // receiving event resolves deadlock
-        if (interface->marked(l) and knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() and
+        if (interface->marked(l) and
+            (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
+                    edges.find(l-1) == edges.end()) and
             storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
             storedKnowledge->successors[l-1]->is_sane) {
 
@@ -84,7 +89,8 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
     for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
         // synchronous communication resolves deadlock
         if (InnerMarking::synchs[l].find(innerMarking_ID) != InnerMarking::synchs[l].end() and
-                knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() and
+                (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
+                        edges.find(l-1) == edges.end()) and
                 storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
                 storedKnowledge->successors[l-1]->is_sane) {
 
@@ -95,7 +101,8 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
 
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() and
+        if ((knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end()  or
+                edges.find(l-1) == edges.end()) and
                 storedKnowledge->successors[l-1] != NULL and
                 storedKnowledge->successors[l-1]->is_sane) {
 
@@ -205,7 +212,9 @@ void CompositeMarkingsHandler::addClause(Clause * booleanClause) {
     // add whole clause to the conjunction of clauses
     conjunctionOfDisjunctionsBoolean.push_back(booleanClause);
 
-//    LivelockOperatingGuideline::stats.numberAllElementsAnnotations += clause.size();
+    if (booleanClause == Clause::finalClause or booleanClause == Clause::falseClause) {
+        Clause::stats.cumulativeSizeAllClauses++;
+    }
 }
 
 

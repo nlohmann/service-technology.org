@@ -78,7 +78,7 @@ SCSHandler::~SCSHandler() {
     // delete the array itself
     delete[] edges;
 
-    delete[] mandatoryEdges;
+    free(mandatoryEdges);
 }
 
 
@@ -86,7 +86,7 @@ SCSHandler::~SCSHandler() {
 /*!
     initializes the set of edges handler by calculating the set of mandatory edges of the currently considered SCS
     (if one of those mandatory edges are left out in a subsystem, the SCS is not connected anymore)
-    \param setOfEdges the SCS to be considered
+    \param SCS the SCS to be considered
     \param _numberOfAllEdges number of edges contained within the SCS
 */
 void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) {
@@ -212,7 +212,7 @@ bool SCSHandler::containsMandatoryEdges() const {
     \return true, if there exists a next subsystem; false, otherwise
 */
 bool SCSHandler::nextSubsystem() const {
-    return (currentBitMask < (1 << numberOfAllEdges));
+    return (currentBitMask < (unsigned int) (1 << numberOfAllEdges));
 }
 
 
@@ -222,7 +222,7 @@ bool SCSHandler::nextSubsystem() const {
 SetOfEdges SCSHandler::getNextSubsystem() {
 
     // current bitmask is valid
-    assert(currentBitMask < (1 << numberOfAllEdges));
+    assert(currentBitMask < (unsigned int) (1 << numberOfAllEdges));
 
     SetOfEdges subsystem;
 

@@ -61,6 +61,7 @@ CompositeMarking::~CompositeMarking() {
 /*!
   constructs a string that contains the annotation of the composite marking with respect to the given set of knowledges
   \param knowledgeSet set of knowledges
+  \param setOfEdges the currently considered set of edges within the current SCS (set of knowledges)
   \param booleanClause a pointer to the Boolean clause of the composite marking
   \param emptyClause if true, the clause of this composite marking is empty
 */

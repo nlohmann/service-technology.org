@@ -222,6 +222,7 @@ bool LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
   given a set of stored knowledges generate the whole reachability tree of the markings stored within
   the knowledges and use Tarjan's algorithm to detect TSCCs
   \param knowledgeSCS set of knowledges that is to be checked
+  \param setOfEdges the currently considered set of edges within the current SCS (set of knowledges)
   
   \todo make the storing of CompositeMarking similar to StoredKnowledge:
         have a store() function which tells you in the return value whether it actually stored the object
@@ -344,6 +345,7 @@ CompositeMarking * LivelockOperatingGuideline::getSuccessorMarking(const StoredK
          knowledge are calculated
    \param currentMarking composite marking that is considered now
    \param knowledgeSCS a set of knowledges
+   \param setOfEdges the currently considered set of edges within the current SCS (set of knowledges)
  */
 void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(CompositeMarking * currentMarking,
                                                              const std::set<StoredKnowledge* > & knowledgeSCS,
@@ -850,20 +852,16 @@ void LivelockOperatingGuideline::output_acyclic(const bool & dot, std::ostream& 
     if (dot) {
         file << " graph[fontname=\"Helvetica\" fontsize=10 label=<<table border=\"0\"><tr><td> </td></tr><tr><td align=\"left\">Annotations:</td></tr>\n";
 
-        bool lastNode = false;
-
         for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
-
                                                          iter != StoredKnowledge::seen.end();
                                                          ++iter) {
+
             file << "<tr><td align=\"left\">" << reinterpret_cast<size_t>(*iter) << ": " << (*iter)->formula(dot) << "</td></tr>\n";
         }
 
         file << "</table>>]\n";
     } else {
         file << "\nANNOTATIONS\n";
-
-        bool lastNode = false;
 
         for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
                                                          iter != StoredKnowledge::seen.end();

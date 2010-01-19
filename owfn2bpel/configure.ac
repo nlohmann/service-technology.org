@@ -30,7 +30,7 @@ AC_DEFINE_UNQUOTED([BUILDOS], ["$build_os"], [The OS.])
 
 # The name of the LoLA source distribution. The Makefiles will look for a file
 # called "src/LOLANAME.tar.gz" to compile LoLA.
-AC_SUBST(LOLANAME, lola-1.14)
+AC_SUBST(LOLANAME, lola-1.15-unreleased)
 
 # Checks for GNU gengetopt and help2man
 AM_MISSING_PROG(GENGETOPT, gengetopt)

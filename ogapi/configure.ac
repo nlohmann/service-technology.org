@@ -1,4 +1,4 @@
-AC_INIT([Product-OG], 1.00-unreleased, ogapi@service-technology.org, productOG, http://service-technology.org/ogapi)
+AC_INIT([OGAPI], 1.00-unreleased, ogapi@service-technology.org, ogapi, http://service-technology.org/ogapi)
 
 # the first line should be everything you will ever need to touch
 #############################################################################

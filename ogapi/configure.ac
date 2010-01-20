@@ -4,11 +4,11 @@ AC_INIT([Product-OG], 1.00-unreleased, ogapi@service-technology.org, productOG, 
 #############################################################################
 
 AC_PREREQ(2.59)
-AM_INIT_AUTOMAKE(gnits)
+AM_INIT_AUTOMAKE#(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # where to look for source code and how the config header should be called
-AC_CONFIG_SRCDIR(src/main.cc)
+AC_CONFIG_SRCDIR(src/productOG/main.cc)
 AC_CONFIG_HEADERS(src/config.h)
 
 # check for generic programs
@@ -44,10 +44,8 @@ AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
 AC_CONFIG_FILES([Makefile
-                 src/Makefile
-                 maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile
-                 tests/Makefile tests/package.m4
-                 man/Makefile])
+                 src/productOG/Makefile
+                 tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

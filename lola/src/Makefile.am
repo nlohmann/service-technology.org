@@ -31,6 +31,7 @@ lola_EXTRASOURCES = ltl.H ltl.cc
 
 EXTRA_DIST = readnet-syntax.h cmdline.ggo \
              configs/userconfig.H.boundednet \
+             configs/userconfig.H.boundednetsymm \
              configs/userconfig.H.bpm-liveprop \
              configs/userconfig.H.bpm-liveprop1 \
              configs/userconfig.H.bpm-modelchecking \

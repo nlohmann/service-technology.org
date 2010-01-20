@@ -25,7 +25,7 @@ option "noClean" -
   details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
   flag off  
  
-option "complment" c
+option "complement" c
   "Complements the extended annotated service automaton"
   string
   typestr="FILENAME"
@@ -38,8 +38,10 @@ sectiondesc="When called without an input file, Safira reads from the standard i
 option "output" o
   "Select the output file format(s)"
   typestr="FORMAT"
-  values="eaa","dot","png","pdf","eps" enum
+  values="eaa","dot","png","pdf","eps","none" enum
   optional
   multiple
 
- 
+option "time" t
+  "Mesures the time"
+  optional 

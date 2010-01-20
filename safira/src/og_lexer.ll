@@ -35,6 +35,7 @@ number         [0-9]+
 "OUTPUT"                                { return KEY_OUTPUT;           }
 "INITIALNODES"                          { return KEY_INITIALNODES;     }
 "GLOBALFORMULA"                         { return KEY_GLOBALFORMULA;    }
+"EXPLICITE_TAULOOPS"					{ return KEY_TAULOOPS;		   }
 
 "true"                                  { return KEY_TRUE;             }
 "false"                                 { return KEY_FALSE;            }

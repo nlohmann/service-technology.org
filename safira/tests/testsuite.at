@@ -17,7 +17,10 @@ AT_KEYWORDS(unitTest)
 AT_CLEANUP
 
 AT_SETUP([complement minispec.og])
-AT_CHECK([cp TESTFILES/EMPTY TESTFILES/minispec_complement_ref.eaa TESTFILES/minispec.og .])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/minispec_expliciteTau.og TESTFILES/minispec_expliciteTau_complement_ref.eaa TESTFILES/minispec.og TESTFILES/minispec_complement_ref.eaa .])
+AT_CHECK([SAFIRA minispec_expliciteTau.og],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([diff stdout minispec_expliciteTau_complement_ref.eaa])
 AT_CHECK([SAFIRA minispec.og],0,stdout,stderr)
 AT_CHECK([diff EMPTY stderr])
 AT_CHECK([diff stdout minispec_complement_ref.eaa])
@@ -25,20 +28,25 @@ AT_KEYWORDS(complement)
 AT_CLEANUP
 
 AT_SETUP([complement myCoffee.og])
-AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_complement_ref.eaa .])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_complement_ref.eaa TESTFILES/myCoffee_expliciteTau.og TESTFILES/myCoffee_expliciteTau_complement_ref.eaa .])
 AT_CHECK([SAFIRA -oeaa myCoffee.og],0,stdout,stderr)
 AT_CHECK([diff EMPTY stdout])
 AT_CHECK([diff EMPTY stderr])
 AT_CHECK([test -f myCoffee_complement.eaa])
 AT_CHECK([diff myCoffee_complement_ref.eaa myCoffee_complement.eaa])
+AT_CHECK([SAFIRA -oeaa myCoffee_expliciteTau.og],0,stdout,stderr)
+AT_CHECK([diff EMPTY stdout])
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([test -f myCoffee_expliciteTau_complement.eaa])
+AT_CHECK([diff myCoffee_complement_ref.eaa myCoffee_complement.eaa])
 AT_KEYWORDS(complement)
 AT_CLEANUP
 
 AT_SETUP([complement of big OG])
-AT_CHECK([cp TESTFILES/EMPTY TESTFILES/PO.og TESTFILES/PO.txt .])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/PO.og TESTFILES/PO_complement_ref.eaa .])
 AT_CHECK([SAFIRA -oeaa PO.og],0,stdout,stderr)
 AT_CHECK([diff EMPTY stderr])
-AT_CHECK([diff PO_complement.eaa PO.txt])
+AT_CHECK([diff PO_complement.eaa PO_complement_ref.eaa])
 AT_KEYWORDS(complement)
 AT_CLEANUP
 

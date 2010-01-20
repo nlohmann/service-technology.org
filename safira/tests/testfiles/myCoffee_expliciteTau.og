@@ -1,0 +1,43 @@
+EXPLICITE_TAULOOPS
+
+INTERFACE
+  INPUT
+    B;
+  OUTPUT
+    C, E, T;
+
+NODES
+  0 : (C + E + T)
+    B -> 7
+    C -> 1
+    E -> 2
+    T -> 3
+    tau -> 0 
+  6 : final
+    B -> 7
+    tau -> 6
+  1 : E
+    B -> 7
+    E -> 4
+    tau -> 1
+  5 : B
+    B -> 6
+    tau -> 5
+  2 : (C + T)
+    B -> 7
+    C -> 4
+    T -> 5
+    tau -> 2
+  3 : E
+    B -> 7
+    E -> 5
+    tau -> 3
+  4 : B
+    B -> 6
+    tau -> 4
+  7 : true
+    B -> 7
+    C -> 7
+    E -> 7
+    T -> 7
+    tau -> 7

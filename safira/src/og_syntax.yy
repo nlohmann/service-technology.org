@@ -9,6 +9,7 @@
 #include "Formula.h"
 #include "Graph.h"
 
+
 using namespace std;
 
 template<typename TKey, typename TValue>
@@ -36,6 +37,7 @@ int lastInputId;
 int lastOutputId; 
 
 bool initialNodesDecl = false;
+bool expliciteTauLoops = false;
 
 %}
 
@@ -45,7 +47,7 @@ bool initialNodesDecl = false;
 %defines
 
 %token KEY_NODES 
-%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_INITIALNODES KEY_GLOBALFORMULA
+%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_INITIALNODES KEY_GLOBALFORMULA KEY_TAULOOPS
 %token COMMA COLON SEMICOLON IDENT ARROW NUMBER
 %token KEY_TRUE KEY_FALSE KEY_FINAL BIT_F BIT_S
 %token LPAR RPAR
@@ -72,8 +74,9 @@ bool initialNodesDecl = false;
 %start og
 %%
 
-
+ 
 og:
+  opt_tauloops 
   KEY_INTERFACE 
   input {firstInputId = firstLabelId+1; lastInputId = currentIdPos;}
   output{firstOutputId = lastInputId + 1; lastOutputId = currentIdPos; lastLabelId = currentIdPos;} /*{printMap(&label2id);}*/  
@@ -82,6 +85,8 @@ og:
   KEY_NODES nodes //{printNodes(&nodes);}
 ;
 
+opt_tauloops: /* empty */
+             | KEY_TAULOOPS {expliciteTauLoops = true;}
 
 input:
   /* empty */
@@ -153,7 +158,10 @@ node:
   	  	currentNode->formula = $2; } 
     } 
   successors 
-; 
+    { if (!expliciteTauLoops)  // if tau loops are implicite
+         currentNode->addEdge(label2id["tau"], currentNode);
+    } 
+;  
 
 
 annotation: COLON formula {$$=$2;}

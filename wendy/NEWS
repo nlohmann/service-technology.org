@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 3.0-unreleased (17 December 2009)
-=========================================
+Version 3.0-unreleased
+======================
 
 * introducing the livelock operating guideline: use `--correctness=livelock
   --og' to calculate the livelock operating guideline with appropriate
@@ -17,6 +17,9 @@ Version 3.0-unreleased (17 December 2009)
   parameter `--dot' prints the respective annotations in the dot output
 
 * implemented parameter `--pnml' to read a PNML file format
+
+* moved the utility to minimize operating guidelines to the `ogapi' trunk
+  (see `http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/')
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

@@ -97,7 +97,6 @@ AC_ARG_ENABLE(syslog, AS_HELP_STRING([--enable-syslog], [whether to use syslog (
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
-	doc/Doxyfile doc/Doxydetails man/Makefile utils/Makefile tests/Makefile
-	tests/package.m4])
+	doc/Doxyfile doc/Doxydetails man/Makefile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

@@ -1,5 +1,4 @@
-bin_PROGRAMS = petri sa2owfn sa2sm cdnf
-noinst_PROGRAMS = generator
+bin_PROGRAMS = petri sa2owfn sa2sm cdnf generator cphils
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h \
 		Output.h Output.cc \
@@ -17,6 +16,8 @@ generator_LDADD =  $(top_builddir)/src/libpnapi.la
 sa2owfn_LDADD =  $(top_builddir)/src/libpnapi.la
 sa2sm_LDADD =  $(top_builddir)/src/libpnapi.la
 cdnf_LDADD =  $(top_builddir)/src/libpnapi.la
+
+cphils_SOURCES = cphils.c
 
 BUILT_SOURCES = cmdline.c cdnf-cmdline.c
 

@@ -1,9 +1,11 @@
-@heading Version 3.0-unreleased (17 December 2009)
+@heading Version 3.0-unreleased
 @itemize
 @item introducing the livelock operating guideline: use @option{--correctness=livelock --og} to calculate the livelock operating guideline with appropriate annotations which are then printed out in the og-file; providing parameter @option{--dot} prints the respective annotations in the dot output
 
 @item implemented parameter @option{--pnml} to read a @acronym{PNML} file format
+@item moved the utility to minimize operating guidelines to the @samp{ogapi} trunk (see @url{http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/})
 @end itemize
+
 
 @heading Version 2.7 (17 December 2009)
 @itemize
@@ -12,8 +14,6 @@
 @item @option{--reportFrequency} sets the number of edges to be reported (was: number of knowledges)
 
 @item fixed bug #14922 (see @url{https://gna.org/bugs/?14922}): Wendy could not process markings with Unicode place names which yielded a crash when using @option{--mi}
-
-@item moved the utility to minimize operating guidelines to the @samp{ogapi} trunk (see @url{http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/})
 @end itemize
 
 

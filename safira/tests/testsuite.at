@@ -38,7 +38,7 @@ AT_CHECK([SAFIRA -oeaa myCoffee_expliciteTau.og],0,stdout,stderr)
 AT_CHECK([diff EMPTY stdout])
 AT_CHECK([diff EMPTY stderr])
 AT_CHECK([test -f myCoffee_expliciteTau_complement.eaa])
-AT_CHECK([diff myCoffee_complement_ref.eaa myCoffee_complement.eaa])
+AT_CHECK([diff myCoffee_expliciteTau_complement_ref.eaa myCoffee_complement.eaa])
 AT_KEYWORDS(complement)
 AT_CLEANUP
 

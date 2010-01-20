@@ -74,10 +74,7 @@ int main(int argc, char **argv) {
 
 	initGlobalVariables();
 
-	time_t parsingTime_start;
-	if(args_info.time_given){
-		parsingTime_start = time(NULL);
-	}
+	time_t parsingTime_start = time(NULL);
 
     //parse
     if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
@@ -86,14 +83,15 @@ int main(int argc, char **argv) {
     og_yylex_destroy();
 
 
-    time_t buildOG_start;
+
     if(args_info.time_given){
     	time_t parsingTime_end = time(NULL);
     	cout << "number of labels: " << label2id.size()-3 << endl;
     	cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
     	cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
-    	buildOG_start = time(NULL);
     }
+
+    time_t buildOG_start = time(NULL);
 
 	g->complement();
 
@@ -123,8 +121,10 @@ int main(int argc, char **argv) {
 				FILE *s = popen(call.c_str(), "w");
 				assert(s);
 
-				//printf("%s\n", call.c_str());
-				string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
+				stringstream o;
+				g->getGlobalFormulaForComplement(o);
+
+				string title = "Complement of " + filename + "    global formula: " + string(o.str());
 				g->toDot(s, title);
 				assert(!ferror(s));
 
@@ -134,7 +134,10 @@ int main(int argc, char **argv) {
 			case (output_arg_dot): {
 				printToStdout = false;
 				FILE *s = fopen((filename+"_complement.dot").c_str(), "w");
-				string title = "Complement of " + filename + "    global formula: " + g->globalFormula->toString();
+				stringstream o;
+				g->getGlobalFormulaForComplement(o);
+
+				string title = "Complement of " + filename + "    global formula: " + string(o.str());
 				g->toDot(s, title);
 				assert(!ferror(s));
 				fclose(s);

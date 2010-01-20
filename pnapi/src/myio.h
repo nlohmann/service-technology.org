@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 /*!
- * \file    io.h
+ * \file    myio.h
  *
  * \brief   Input/Output related Structures
  *

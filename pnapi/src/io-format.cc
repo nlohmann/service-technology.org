@@ -1,3 +1,7 @@
+/*!
+ * \file  io-format.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

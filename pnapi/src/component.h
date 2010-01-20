@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 
 /*!
- * \file    petrinode.h
+ * \file    component.h
  *
  * \brief   Nodes and Arcs for Petri nets
  *
@@ -56,8 +56,20 @@ class Node
 
 public:
 
-  /// node types (communication)
-  enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
+  /*!
+   * \brief node communication types 
+   */
+  enum Type
+  {
+    /// internal places or transitions only connected to internal places
+    INTERNAL,
+    /// input places or transitions only connected to internal or input places
+    INPUT,
+    /// output places or transitions only connected to internal or output places
+    OUTPUT,
+    /// transitions connected with both input and output places
+    INOUT 
+  };
 
   /// constructor
   Node(PetriNet &, util::ComponentObserver &, const std::string &, Type);

@@ -1,3 +1,7 @@
+/*!
+ * \file  formula.cc
+ */
+
 #include "config.h"
 #include <cassert>
 #include <iostream>

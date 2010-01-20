@@ -1,3 +1,5 @@
+// -*- C++ -*-
+
 /*!
  * \file    petrinet.cc
  *

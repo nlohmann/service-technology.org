@@ -17,6 +17,9 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+/*!
+ * \file  Output.h
+ */
 
 #ifndef PNAPI_OUTPUT_H
 #define PNAPI_OUTPUT_H

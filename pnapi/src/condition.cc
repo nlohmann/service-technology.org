@@ -1,3 +1,7 @@
+/*!
+ * \file  condition.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

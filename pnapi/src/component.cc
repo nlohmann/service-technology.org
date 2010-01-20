@@ -1,3 +1,7 @@
+/*!
+ * \file    component.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

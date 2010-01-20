@@ -1,3 +1,7 @@
+/*!
+ * \file  automaton.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

@@ -1,3 +1,7 @@
+/*!
+ * \file parser.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

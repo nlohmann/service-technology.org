@@ -1,3 +1,7 @@
+/*!
+ * \file  state.h
+ */
+
 #ifndef STATE_H
 #define STATE_H
 

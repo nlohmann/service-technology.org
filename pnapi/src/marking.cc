@@ -1,3 +1,7 @@
+/*!
+ * \file  marking.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

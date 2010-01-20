@@ -1,4 +1,4 @@
-AC_INIT(Sayo, 1.1, sayo@service-technology.org, sayo, http://service-technology.org/sayo)
+AC_INIT(Sayo, 1.2-unreleased, sayo@service-technology.org, sayo, http://service-technology.org/sayo)
 
 # the first line should be everything you will ever need to touch
 #############################################################################
@@ -53,6 +53,7 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  tests/Makefile tests/package.m4
                  man/Makefile])
+AC_CONFIG_FILES([src/publicview.sh], [chmod +x src/publicview.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

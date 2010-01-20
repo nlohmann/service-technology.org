@@ -7,6 +7,11 @@
                       generating public view from bit-og
                       http://service-technology.org/sayo
 
+Version 1.2-unreleased
+======================
+
+* updated wrapper script `publicview.sh'
+
 Version 1.1 (2009-11-10)
 ========================
 

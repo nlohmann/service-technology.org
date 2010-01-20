@@ -4,6 +4,8 @@ sayo_SOURCES =  syntax_og.yy lexic_og.ll \
                 main.cc config.h \
                 cmdline.c cmdline.h 
 
+dist_bin_SCRIPTS = publicview.sh
+
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

@@ -44,7 +44,7 @@ AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
 AC_CONFIG_FILES([Makefile
-                 src/productOG/Makefile
+                 src/productOG/Makefile src/minimize/Makefile
                  tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

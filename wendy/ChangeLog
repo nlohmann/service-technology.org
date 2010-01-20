@@ -31,6 +31,9 @@ Version 2.7 (17 December 2009)
   process markings with Unicode place names which yielded a crash when
   using `--mi'
 
+* moved the utility to minimize operating guidelines to the `ogapi' trunk
+  (see `http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/')
+
 Version 2.6 (23 November 2009)
 ==============================
 

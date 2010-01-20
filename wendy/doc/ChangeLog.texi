@@ -12,6 +12,8 @@
 @item @option{--reportFrequency} sets the number of edges to be reported (was: number of knowledges)
 
 @item fixed bug #14922 (see @url{https://gna.org/bugs/?14922}): Wendy could not process markings with Unicode place names which yielded a crash when using @option{--mi}
+
+@item moved the utility to minimize operating guidelines to the @samp{ogapi} trunk (see @url{http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/})
 @end itemize
 
 
@@ -190,6 +192,7 @@
 @item added more test cases for synchronous communication
 
 @item added a utility to minimize operating guidelines (see @file{utils/minimize}) -- this is currently an adjusted branch of Rachel which needs some polishing towards the new file formats
+
 @item added @option{--bug} option to create debug output
 
 @item using generic functions to display verbose status messages

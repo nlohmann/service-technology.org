@@ -75,3 +75,21 @@ option "about" A
 	""
 	flag off
 	hidden
+
+section "Configuration"
+sectiondesc="These options configure Linda.\n"
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Linda should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/candy-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Linda is kept after Linda terminates.\n"
+  flag off
+  

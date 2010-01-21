@@ -41,6 +41,7 @@ linda_SOURCES = main.cc \
 		syntax_et.yy lexer_et.ll \
 		files.h files.cc \
 		verbose.h verbose.cc \
+		Output.h Output.cc \
 		lindaAgent.h lindaAgent.cc \
 		eventTermParser.h eventTermParser.cc \
 		staticAnalysis.h staticAnalysis.cc

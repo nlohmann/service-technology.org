@@ -57,7 +57,7 @@ if test "$DOT" = "not found"; then
   AC_MSG_WARN([Graphviz Dot was not found. See file README.])
   AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Graphviz Dot can be used.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "\"${DOT}\"", [Graphviz Dot can be used.])
 fi
 AC_SUBST(DOT)
 
@@ -66,7 +66,7 @@ if test "$PETRIFY" = "not found"; then
   AC_MSG_WARN([Petrify was not found. See file README.])
   AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "${PETRIFY}", [Petrify can be used.])
+  AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "\"${PETRIFY}\"", [Petrify can be used.])
 fi
 AC_SUBST(PETRIFY)
 
@@ -75,7 +75,7 @@ if test "$GENET" = "not found"; then
   AC_MSG_WARN([Genet was not found. See file README.])
   AC_DEFINE(CONFIG_GENET, "not found", [Genet was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_GENET, "${GENET}", [Genet can be used.])
+  AC_DEFINE_UNQUOTED(CONFIG_GENET, "\"${GENET}\"", [Genet can be used.])
 fi
 AC_SUBST(GENET)
 
@@ -153,3 +153,4 @@ AC_CONFIG_FILES([Makefile
                  utils/Makefile utils/unfolder/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
+

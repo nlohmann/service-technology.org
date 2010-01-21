@@ -316,7 +316,7 @@ private:
  * \brief   arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel
- * (n1,n2) has n1 as #source and n2 as #target.
+ * (n1,n2) has n1 as source and n2 as target.
  */
 class Arc
 {

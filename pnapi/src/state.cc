@@ -224,7 +224,7 @@ State::~State()
 
  /// copy a state from one automaton to another one
  State * State::copy(const State & s, PetriNet * net,
-     map<const Place*, const Place*> * placeMap)
+     std::map<const Place*, const Place*> * placeMap)
  {
    State * copy = new State(s.name_);
    copy->isFinal_ = s.isFinal_;

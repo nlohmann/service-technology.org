@@ -219,8 +219,8 @@ State & Automaton::createState()
  * If there exists a state with the given name, this state will
  * be returned.
  *
- * \param     const unsigned int name.
- * \return    State &s .. the newly created state.
+ * \param     name the name of the state
+ * \return    the newly created state
  */
 State & Automaton::createState(const unsigned int name)
 {
@@ -238,10 +238,9 @@ State & Automaton::createState(const unsigned int name)
  * A state will be added to the set of states. This state is based on
  * a given marking, which is needed to calculate the state's hash value.
  *
- * \param     Marking &m
- * \param     const std::string name
+ * \param     m the given marking
  *
- * \return    State &s .. the newly created state
+ * \return    the newly created state
  */
 State & Automaton::createState(Marking &m)
 {

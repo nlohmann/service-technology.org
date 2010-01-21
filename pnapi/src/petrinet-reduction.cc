@@ -701,7 +701,7 @@ unsigned int PetriNet::reduce_rule_4()
 /*!
  * \brief Checks, wether the postset of a set of nodes is empty.
  */
-bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
+bool PetriNet::reduce_emptyPostset(const std::set<Node*> & nodes)
 {
   PNAPI_FOREACH(set<Node*>, nodes, n)
   {
@@ -714,7 +714,7 @@ bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
 /*!
  * \brief Check if the preset of a set stores only one item.
  */
-bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
+bool PetriNet::reduce_singletonPreset(const std::set<Node*> & nodes)
 {
   PNAPI_FOREACH(set<Node*>, nodes, n)
   {

@@ -70,8 +70,8 @@ Operator::Operator(const Formula & l, const Formula & r)
 #endif
 }
 
-Operator::Operator(const set<const Formula *> & children,
-    const map<const Place *, const Place *> * places)
+Operator::Operator(const std::set<const Formula *> & children,
+    const std::map<const Place *, const Place *> * places)
 {
   for (set<const Formula *>::const_iterator it = children.begin();
   it != children.end(); ++it)
@@ -100,8 +100,8 @@ Negation::Negation(const Formula & f) :
 {
 }
 
-Negation::Negation(const set<const Formula *> & children,
-    const map<const Place *, const Place *> * places) :
+Negation::Negation(const std::set<const Formula *> & children,
+    const std::map<const Place *, const Place *> * places) :
   Operator(children, places)
 {
 }
@@ -128,8 +128,8 @@ Conjunction::Conjunction(const Formula & l, const Formula & r) :
   simplifyChildren();
 }
 
-Conjunction::Conjunction(const set<const Formula *> & children,
-    const map<const Place *, const Place *> * places) :
+Conjunction::Conjunction(const std::set<const Formula *> & children,
+    const std::map<const Place *, const Place *> * places) :
       Operator(children, places)
 {
   simplifyChildren();
@@ -147,8 +147,8 @@ Disjunction::Disjunction(const Formula & l, const Formula & r) :
   simplifyChildren();
 }
 
-Disjunction::Disjunction(const set<const Formula *> & children,
-    const map<const Place *, const Place *> * places) :
+Disjunction::Disjunction(const std::set<const Formula *> & children,
+    const std::map<const Place *, const Place *> * places) :
       Operator(children, places)
 {
   simplifyChildren();
@@ -161,44 +161,44 @@ Disjunction::Disjunction(const Disjunction & d) :
 }
 
 Proposition::Proposition(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       place_(places == NULL ? p : *places->find(&p)->second), tokens_(k)
 {
   assert(places == NULL || places->find(&p)->second != NULL);
 }
 
 FormulaEqual::FormulaEqual(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
 {
 }
 
 FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
 {
 }
 
 FormulaGreater::FormulaGreater(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
 {
 }
 
 FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
 {
 }
 
 FormulaLess::FormulaLess(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
 {
 }
 
 FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k,
-    const map<const Place *, const Place *> * places) :
+    const std::map<const Place *, const Place *> * places) :
       Proposition(p, k, places)
 {
 }
@@ -224,66 +224,66 @@ Operator::~Operator()
  ***** clone() implementation
  **************************************************************************/
 
-Negation * Negation::clone(const map<const Place *, const Place *> * places) const
+Negation * Negation::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new Negation(children_, places);
 }
 
-Conjunction * Conjunction::clone(const map<const Place *,
+Conjunction * Conjunction::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new Conjunction(children_, places);
 }
 
-Disjunction * Disjunction::clone(const map<const Place *,
+Disjunction * Disjunction::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new Disjunction(children_, places);
 }
 
-FormulaTrue * FormulaTrue::clone(const map<const Place *,
+FormulaTrue * FormulaTrue::clone(const std::map<const Place *,
     const Place *> *) const
 {
   return new FormulaTrue();
 }
 
-FormulaFalse * FormulaFalse::clone(const map<const Place *,
+FormulaFalse * FormulaFalse::clone(const std::map<const Place *,
     const Place *> *) const
 {
   return new FormulaFalse();
 }
 
-FormulaEqual * FormulaEqual::clone(const map<const Place *,
+FormulaEqual * FormulaEqual::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new FormulaEqual(place_, tokens_, places);
 }
 
-FormulaNotEqual * FormulaNotEqual::clone(const map<const Place *,
+FormulaNotEqual * FormulaNotEqual::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new FormulaNotEqual(place_, tokens_, places);
 }
 
-FormulaGreater * FormulaGreater::clone(const map<const Place *,
+FormulaGreater * FormulaGreater::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new FormulaGreater(place_, tokens_, places);
 }
 
-FormulaGreaterEqual * FormulaGreaterEqual::clone(const map<const Place *,
+FormulaGreaterEqual * FormulaGreaterEqual::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new FormulaGreaterEqual(place_, tokens_, places);
 }
 
-FormulaLess * FormulaLess::clone(const map<const Place *,
+FormulaLess * FormulaLess::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new FormulaLess(place_, tokens_, places);
 }
 
-FormulaLessEqual * FormulaLessEqual::clone(const map<const Place *,
+FormulaLessEqual * FormulaLessEqual::clone(const std::map<const Place *,
     const Place *> * places) const
 {
   return new FormulaLessEqual(place_, tokens_, places);
@@ -417,57 +417,57 @@ bool Proposition::removePlace(const Place & p)
  ***** output() implementation
  **************************************************************************/
 
-ostream & Negation::output(ostream & os) const
+std::ostream & Negation::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & Conjunction::output(ostream & os) const
+std::ostream & Conjunction::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & Disjunction::output(ostream & os) const
+std::ostream & Disjunction::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaTrue::output(ostream & os) const
+std::ostream & FormulaTrue::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaFalse::output(ostream & os) const
+std::ostream & FormulaFalse::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaEqual::output(ostream & os) const
+std::ostream & FormulaEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaNotEqual::output(ostream & os) const
+std::ostream & FormulaNotEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaGreater::output(ostream & os) const
+std::ostream & FormulaGreater::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaGreaterEqual::output(ostream & os) const
+std::ostream & FormulaGreaterEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaLess::output(ostream & os) const
+std::ostream & FormulaLess::output(std::ostream & os) const
 {
   return os << *this;
 }
 
-ostream & FormulaLessEqual::output(ostream & os) const
+std::ostream & FormulaLessEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
@@ -478,7 +478,7 @@ ostream & FormulaLessEqual::output(ostream & os) const
  ***** accessor implementation
  **************************************************************************/
 
-const set<const Formula *> & Operator::children() const
+const std::set<const Formula *> & Operator::children() const
 {
   return children_;
 }
@@ -498,12 +498,12 @@ unsigned int Proposition::tokens() const
  ***** concerning/empty places implementation
  **************************************************************************/
 
-set<const Place *> Formula::places() const
+std::set<const Place *> Formula::places() const
 {
   return set<const Place *>();
 }
 
-set<const Place *> Operator::places() const
+std::set<const Place *> Operator::places() const
 {
   set<const Place *> places;
   for (set<const Formula *>::const_iterator it = children_.begin();
@@ -515,7 +515,7 @@ set<const Place *> Operator::places() const
   return places;
 }
 
-set<const Place *> Proposition::places() const
+std::set<const Place *> Proposition::places() const
 {
   set<const Place *> places;
   places.insert(&place_);

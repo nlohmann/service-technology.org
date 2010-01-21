@@ -25,12 +25,12 @@ namespace pnapi
 namespace exceptions
 {
 
-GeneralException::GeneralException(string msg) : 
+GeneralException::GeneralException(std::string msg) : 
   msg_(msg)
   {
   }
 
-ComposeError::ComposeError(string msg) :
+ComposeError::ComposeError(std::string msg) :
   GeneralException(msg)
   {
   }

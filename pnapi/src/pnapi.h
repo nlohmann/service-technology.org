@@ -46,7 +46,7 @@ using pnapi::operator&&;
  * \endcode
  *
  * Everything you will use can be found in the following namespaces:
- * - pnapi
+ * - #pnapi
  * - pnapi::formula
  * - pnapi::io
  *

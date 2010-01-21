@@ -145,8 +145,8 @@ public:
  * \brief   A Petri net
  *
  * Class to represent Petri nets. The net consists of places of
- * class #Place, transitions of class #Transition and arcs of class
- * #Arc.
+ * class Place, transitions of class Transition and arcs of class
+ * Arc.
  */
 class PetriNet
 {

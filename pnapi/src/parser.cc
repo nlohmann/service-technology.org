@@ -46,7 +46,7 @@ char * token;
 
 int line;
 
-void error(const string & msg)
+void error(const std::string & msg)
 {
   throw io::InputError(io::InputError::SYNTAX_ERROR,
       io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
@@ -133,7 +133,7 @@ void Parser::clean()
   pnapi_owfn_yynet = PetriNet();
 }
 
-const PetriNet & Parser::parse(istream & is)
+const PetriNet & Parser::parse(std::istream & is)
 {
   // assign lexer input stream
   stream = &is;
@@ -252,7 +252,7 @@ void Parser::clean()
   pnapi_pnml_yynet = PetriNet();
 }
 
-const PetriNet & Parser::parse(istream & is)
+const PetriNet & Parser::parse(std::istream & is)
 {
   // assign lexer input stream
   stream = &is;
@@ -354,7 +354,7 @@ void Parser::clean()
   pnapi_lola_yynet = PetriNet();
 }
 
-const PetriNet & Parser::parse(istream & is)
+const PetriNet & Parser::parse(std::istream & is)
 {
   // assign lexer input stream
   stream = &is;
@@ -420,20 +420,20 @@ Node::Node(Node * node1, Node * node2, Node * node3) :
 
 /* data node construction */
 
-Node::Node(Type type, string * str1, int number) :
+Node::Node(Type type, std::string * str1, int number) :
   type(type), string1(*str1), number(number)
   {
   delete str1;
   }
 
-Node::Node(Type type, string * str1, string * str2) :
+Node::Node(Type type, std::string * str1, std::string * str2) :
   type(type), string1(*str1), string2(*str2), number(0)
   {
   delete str1;
   delete str2;
   }
 
-Node::Node(Type type, string * str1, string * str2, int number) :
+Node::Node(Type type, std::string * str1, std::string * str2, int number) :
   type(type), string1(*str1), string2(*str2), number(number)
   {
   delete str1;
@@ -483,7 +483,7 @@ void Node::mergeChildren(Node * node)
 
 /* visiting nodes */
 
-Visitor::Visitor(map<string, PetriNet *> & nets) :
+Visitor::Visitor(std::map<std::string, PetriNet *> & nets) :
   nets_(nets)
   {
   }
@@ -564,7 +564,7 @@ void Visitor::afterChildren(const Node & node)
   }
 }
 
-pair<Place *, bool> Visitor::getPlace(const Node & node,
+std::pair<Place *, bool> Visitor::getPlace(const Node & node,
     PlaceDescription & pd,
     Place::Type type)
 {
@@ -603,12 +603,12 @@ LinkNode::Mode Visitor::getLinkNodeMode(Type type)
     return LinkNode::ALL;
 }
 
-map<string, vector<PetriNet> > & Visitor::instances()
+std::map<std::string, std::vector<PetriNet> > & Visitor::instances()
 {
   return instances_;
 }
 
-const map<Place *, LinkNode *> & Visitor::wiring()
+const std::map<Place *, LinkNode *> & Visitor::wiring()
 {
   return wiring_;
 }
@@ -719,12 +719,12 @@ const PetriNet & Parser::parseSA2SM(std::istream &is)
 
 namespace pn
 {
-std::set<string> transitions_;
-std::set<string> places_;
-std::map<string, unsigned int> initialMarked_;
-std::set<string> interface_;
-std::map<string, map<string, unsigned int> > arcs_;
-std::map<string, unsigned int> tempNodeMap_;
+std::set<std::string> transitions_;
+std::set<std::string> places_;
+std::map<std::string, unsigned int> initialMarked_;
+std::set<std::string> interface_;
+std::map<std::string, std::map<std::string, unsigned int> > arcs_;
+std::map<std::string, unsigned int> tempNodeMap_;
 bool in_marking_list = false;
 bool in_arc_list = false;
 
@@ -744,7 +744,7 @@ bool in_arc_list = false;
    clean();
  }
 
- void Parser::parse(istream & is)
+ void Parser::parse(std::istream & is)
  {
    // assign lexer input stream
    stream = &is;

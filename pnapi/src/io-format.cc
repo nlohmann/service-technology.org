@@ -74,7 +74,7 @@ std::ostream & stat(std::ostream & ios)
 
 namespace __stat
 {
-ostream & output(ostream & os, const PetriNet & net)
+std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   return os
   << "|P|= "     << net.places_.size()       << "  "
@@ -85,7 +85,7 @@ ostream & output(ostream & os, const PetriNet & net)
 }
 
 
-ostream & output(ostream & os, const Automaton & sa)
+std::ostream & output(std::ostream & os, const Automaton & sa)
 {
   return os
   << "|Q|= " << sa.states_.size() << "  "
@@ -114,7 +114,7 @@ namespace __dot
  * net. It uses the digraph-statement and adds labels to transitions,
  * places and arcs if neccessary.
  */
-ostream & output(ostream & os, const PetriNet & net)
+std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   bool interface = true;
   string filename = net.getMetaInformation(os, io::INPUTFILE);
@@ -186,7 +186,7 @@ ostream & output(ostream & os, const PetriNet & net)
 }
 
 
-ostream & output(ostream & os, const Place & p)
+std::ostream & output(std::ostream & os, const Place & p)
 {
   // place attributes (used in NORMAL mode)
   stringstream attributes;
@@ -216,7 +216,7 @@ ostream & output(ostream & os, const Place & p)
 }
 
 
-ostream & output(ostream & os, const Transition & t)
+std::ostream & output(std::ostream & os, const Transition & t)
 {
   // transition attributes (used in NORMAL mode)
   stringstream attributes;
@@ -254,7 +254,7 @@ ostream & output(ostream & os, const Transition & t)
 }
 
 
-ostream & output(ostream & os, const Arc & arc)
+std::ostream & output(std::ostream & os, const Arc & arc)
 {
   bool interface = true;
 
@@ -270,7 +270,7 @@ ostream & output(ostream & os, const Arc & arc)
 }
 
 
-ostream & output(ostream & os, const Node & n, const string & attr)
+std::ostream & output(std::ostream & os, const Node & n, const std::string & attr)
 {
   Mode mode = ModeData::data(os);
   string dotName   = getNodeName(n);
@@ -291,7 +291,7 @@ ostream & output(ostream & os, const Node & n, const string & attr)
 }
 
 
-string getNodeName(const Node & n, bool withSuffix)
+std::string getNodeName(const Node & n, bool withSuffix)
 {
   static PetriNet * net = NULL;
   static map<string, string> names;
@@ -338,12 +338,12 @@ std::ostream & output(std::ostream & os,
     }
 
 
-void outputGroupPrefix(ostream & os, const string & port)
+void outputGroupPrefix(std::ostream & os, const std::string & port)
 {
 }
 
 
-void outputGroupSuffix(ostream & os, const string & port)
+void outputGroupSuffix(std::ostream & os, const std::string & port)
 {
 }
 
@@ -400,7 +400,7 @@ std::ostream & formula(std::ostream & os)
 namespace __lola
 {
 
-ostream & output(ostream & os, const PetriNet & net)
+std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
   string inputfile = net.getMetaInformation(os, INPUTFILE);
@@ -434,7 +434,7 @@ ostream & output(ostream & os, const PetriNet & net)
 }
 
 
-ostream & output(ostream & os, const Place & p)
+std::ostream & output(std::ostream & os, const Place & p)
 {
   os << p.getName();
   if (ModeData::data(os) == io::util::PLACE_TOKEN)
@@ -443,7 +443,7 @@ ostream & output(ostream & os, const Place & p)
 }
 
 
-ostream & output(ostream & os, const Transition & t)
+std::ostream & output(std::ostream & os, const Transition & t)
 {
   return os
   << "TRANSITION " << t.getName() << endl
@@ -455,13 +455,13 @@ ostream & output(ostream & os, const Transition & t)
 }
 
 
-ostream & output(ostream & os, const Arc & arc)
+std::ostream & output(std::ostream & os, const Arc & arc)
 {
   return os << arc.getPlace().getName() << ":" << arc.getWeight();
 }
 
 
-ostream & output(ostream & os, const formula::Negation & f)
+std::ostream & output(std::ostream & os, const formula::Negation & f)
 {
   set<const Formula *> children =
     filterInterfacePropositions(f.children());
@@ -472,7 +472,7 @@ ostream & output(ostream & os, const formula::Negation & f)
 }
 
 
-ostream & output(ostream & os, const formula::Conjunction & f)
+std::ostream & output(std::ostream & os, const formula::Conjunction & f)
 {
   set<const Formula *> children =
     filterInterfacePropositions(f.children());
@@ -484,7 +484,7 @@ ostream & output(ostream & os, const formula::Conjunction & f)
 }
 
 
-ostream & output(ostream & os, const formula::Disjunction & f)
+std::ostream & output(std::ostream & os, const formula::Disjunction & f)
 {
   set<const Formula *> children =
     filterInterfacePropositions(f.children());
@@ -496,49 +496,49 @@ ostream & output(ostream & os, const formula::Disjunction & f)
 }
 
 
-ostream & output(ostream & os, const formula::FormulaTrue &)
+std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
 {
   return os << "TRUE";  // keyword not yet implemented in lola
 }
 
 
-ostream & output(ostream & os, const formula::FormulaFalse &)
+std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
 {
   return os << "FALSE"; // keyword not yet implemented in lola
 }
 
 
-ostream & output(ostream & os, const formula::FormulaEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
 {
   return os << f.place().getName() << " = " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaNotEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaNotEqual & f)
 {
   return os << f.place().getName() << " # " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaGreater & f)
+std::ostream & output(std::ostream & os, const formula::FormulaGreater & f)
 {
   return os << f.place().getName() << " > " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaGreaterEqual & f)
 {
   return os << f.place().getName() << " >= " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaLess & f)
+std::ostream & output(std::ostream & os, const formula::FormulaLess & f)
 {
   return os << f.place().getName() << " < " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaLessEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
 {
   return os << f.place().getName() << " <= " << f.tokens();
 }
@@ -561,7 +561,7 @@ std::ios_base & pnml(std::ios_base & ios)
 namespace __pnml
 {
 
-ostream & outputInterface(ostream & os, const PetriNet & net) {
+std::ostream & outputInterface(std::ostream & os, const PetriNet & net) {
     os << "      <port id=\"p1\">" << endl;
 
     PNAPI_FOREACH(set<Place*>, net.getInputPlaces(), p) {
@@ -581,7 +581,7 @@ ostream & outputInterface(ostream & os, const PetriNet & net) {
 }
 
 
-ostream & output(ostream & os, const PetriNet & net)
+std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
   string inputfile = net.getMetaInformation(os, INPUTFILE);
@@ -626,7 +626,7 @@ ostream & output(ostream & os, const PetriNet & net)
 }
 
 
-ostream & output(ostream & os, const Place & p)
+std::ostream & output(std::ostream & os, const Place & p)
 {
   os << "      <place id=\"" << p.getName() << "\"";
   
@@ -645,7 +645,7 @@ ostream & output(ostream & os, const Place & p)
 }
 
 
-ostream & output(ostream & os, const Transition & t)
+std::ostream & output(std::ostream & os, const Transition & t)
 {
   set<Place*> inputs = t.getPetriNet().getInputPlaces();
   set<Place*> outputs = t.getPetriNet().getOutputPlaces();
@@ -676,7 +676,7 @@ ostream & output(ostream & os, const Transition & t)
 }
 
 
-ostream & output(ostream & os, const Arc & arc)
+std::ostream & output(std::ostream & os, const Arc & arc)
 {
   static unsigned int id = 0;
   os
@@ -699,7 +699,7 @@ ostream & output(ostream & os, const Arc & arc)
 }
 
 
-ostream & output(ostream & os, const formula::Negation & f)
+std::ostream & output(std::ostream & os, const formula::Negation & f)
 {
   set<const Formula *> children = filterInterfacePropositions(f.children());
   if (children.empty())
@@ -709,7 +709,7 @@ ostream & output(ostream & os, const formula::Negation & f)
 }
 
 
-ostream & output(ostream & os, const formula::Conjunction & f)
+std::ostream & output(std::ostream & os, const formula::Conjunction & f)
 {
   set<const Formula *> children = filterInterfacePropositions(f.children());
   if (children.empty())
@@ -720,7 +720,7 @@ ostream & output(ostream & os, const formula::Conjunction & f)
 }
 
 
-ostream & output(ostream & os, const formula::Disjunction & f)
+std::ostream & output(std::ostream & os, const formula::Disjunction & f)
 {
   set<const Formula *> children = filterInterfacePropositions(f.children());
   if (children.empty())
@@ -731,50 +731,50 @@ ostream & output(ostream & os, const formula::Disjunction & f)
 }
 
 
-ostream & output(ostream & os, const formula::FormulaTrue &)
+std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
 {
     return os;// << "TRUE";  // keyword not yet implemented in lola
 }
 
 
-ostream & output(ostream & os, const formula::FormulaFalse &)
+std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
 {
   return os;// << "FALSE"; // keyword not yet implemented in lola
 }
 
 
-ostream & output(ostream & os, const formula::FormulaEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
 {
   return os << "        <place id= \"" << f.place().getName() << "\">" << endl
   << "          <text>" << f.tokens() << "</text>\n       </place>" << endl;
 }
 
 
-ostream & output(ostream & os, const formula::FormulaNotEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaNotEqual & f)
 {
   return os << f.place().getName() << " # " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaGreater & f)
+std::ostream & output(std::ostream & os, const formula::FormulaGreater & f)
 {
   return os << f.place().getName() << " > " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaGreaterEqual & f)
 {
   return os << f.place().getName() << " >= " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaLess & f)
+std::ostream & output(std::ostream & os, const formula::FormulaLess & f)
 {
   return os << f.place().getName() << " < " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaLessEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
 {
   return os << f.place().getName() << " <= " << f.tokens();
 }
@@ -797,7 +797,7 @@ std::ios_base & owfn(std::ios_base & ios)
 namespace __owfn
 {
 
-ostream & output(ostream & os, const PetriNet & net)
+std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   set<string> labels = net.labels_;
   //util::collectSynchronizeLabels(net.synchronizedTransitions_);
@@ -894,7 +894,7 @@ ostream & output(ostream & os, const PetriNet & net)
 }
 
 
-ostream & output(ostream & os, const Place & p)
+std::ostream & output(std::ostream & os, const Place & p)
 {
   os << p.getName();
   if (ModeData::data(os) == io::util::PLACE_TOKEN && p.getTokenCount() != 1)
@@ -903,7 +903,7 @@ ostream & output(ostream & os, const Place & p)
 }
 
 
-ostream & output(ostream & os, const Transition & t)
+std::ostream & output(std::ostream & os, const Transition & t)
 {
   os
   << "TRANSITION " << t.getName() << endl;
@@ -928,7 +928,7 @@ ostream & output(ostream & os, const Transition & t)
 }
 
 
-ostream & output(ostream & os, const Arc & arc)
+std::ostream & output(std::ostream & os, const Arc & arc)
 {
   os << arc.getPlace().getName();
   if (arc.getWeight() != 1)
@@ -953,13 +953,13 @@ std::ostream & output(std::ostream & os,
     }
 
 
-ostream & output(ostream & os, const formula::Negation & f)
+std::ostream & output(std::ostream & os, const formula::Negation & f)
 {
   return os << "NOT (" << **f.children().begin() << ")";
 }
 
 
-ostream & output(ostream & os, const formula::Conjunction & f)
+std::ostream & output(std::ostream & os, const formula::Conjunction & f)
 {
   if (f.children().empty())
     return os << formula::FormulaTrue();
@@ -968,7 +968,7 @@ ostream & output(ostream & os, const formula::Conjunction & f)
 }
 
 
-ostream & output(ostream & os, const formula::Disjunction & f)
+std::ostream & output(std::ostream & os, const formula::Disjunction & f)
 {
   if (f.children().empty())
     return os << formula::FormulaFalse();
@@ -977,49 +977,49 @@ ostream & output(ostream & os, const formula::Disjunction & f)
 }
 
 
-ostream & output(ostream & os, const formula::FormulaTrue &)
+std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
 {
   return os << "TRUE";
 }
 
 
-ostream & output(ostream & os, const formula::FormulaFalse &)
+std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
 {
   return os << "FALSE";
 }
 
 
-ostream & output(ostream & os, const formula::FormulaEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
 {
   return os << f.place().getName() << " = " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaNotEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaNotEqual & f)
 {
   return os << f.place().getName() << " != " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaGreater & f)
+std::ostream & output(std::ostream & os, const formula::FormulaGreater & f)
 {
   return os << f.place().getName() << " > " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaGreaterEqual & f)
 {
   return os << f.place().getName() << " >= " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaLess & f)
+std::ostream & output(std::ostream & os, const formula::FormulaLess & f)
 {
   return os << f.place().getName() << " < " << f.tokens();
 }
 
 
-ostream & output(ostream & os, const formula::FormulaLessEqual & f)
+std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
 {
   return os << f.place().getName() << " <= " << f.tokens();
 }
@@ -1047,7 +1047,7 @@ std::istream & sa2sm(std::istream &is)
 
 namespace __sa
 {
-ostream & output(ostream &os, const Automaton &sa)
+std::ostream & output(std::ostream &os, const Automaton &sa)
 {
   os  << "INTERFACE" << endl
   << "  INPUT ";
@@ -1065,7 +1065,7 @@ ostream & output(ostream &os, const Automaton &sa)
   return os;
 }
 
-ostream & output(ostream &os, const State &s)
+std::ostream & output(std::ostream &os, const State &s)
 {
   os << s.name();
   if (s.isInitial() || s.isFinal())
@@ -1086,7 +1086,7 @@ ostream & output(ostream &os, const State &s)
   return os;
 }
 
-ostream & output(ostream &os, const std::vector<State *> &vs)
+std::ostream & output(std::ostream &os, const std::vector<State *> &vs)
 {
   for (unsigned int i = 0; i < vs.size(); ++i)
     output(os, *vs[i]);
@@ -1094,7 +1094,7 @@ ostream & output(ostream &os, const std::vector<State *> &vs)
   return os;
 }
 
-ostream & output(ostream &os, const std::set<Edge *> &edges)
+std::ostream & output(std::ostream &os, const std::set<Edge *> &edges)
 {
   for (std::set<Edge *>::iterator e = edges.begin(); e != edges.end(); e++)
     os << "  " << (*e)->label() << " -> " << (*e)->destination().name() << endl;
@@ -1102,7 +1102,7 @@ ostream & output(ostream &os, const std::set<Edge *> &edges)
   return os;
 }
 
-ostream & output(ostream &os, const std::set<std::string> &ss)
+std::ostream & output(std::ostream &os, const std::set<std::string> &ss)
 {
   if (!ss.empty())
   {

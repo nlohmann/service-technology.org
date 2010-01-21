@@ -96,6 +96,13 @@ AT_CHECK([test -f myCoffee.sa.png])
 AT_KEYWORDS(formats)
 AT_CLEANUP
 
+AT_SETUP([Service automata 2])
+AT_CHECK([cp TESTFILES/error.sa .])
+AT_CHECK([OG2DOT error.sa -opng],0)
+AT_CHECK([test -f error.sa.png])
+AT_KEYWORDS(formats)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Non-standard options])
 ############################################################################
@@ -131,4 +138,5 @@ AT_CHECK([OG2DOT none.og],1, ignore, stderr)
 AT_CHECK([GREP -q "ERROR: failed to open input file 'none.og'" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
+
 

@@ -1,0 +1,17 @@
+{
+  generator:    Wendy 3.0-unreleased (i386-apple-darwin10.2.0)
+  invocation:   wendy fig2-block.owfn --sa 
+  events:       0 send, 0 receive, 2 synchronous
+  statistics:   3 nodes
+}
+
+INTERFACE
+  SYNCHRONOUS
+    blockx, blocky;
+
+NODES
+  1 : INITIAL, FINAL
+    blockx -> 2
+    blocky -> 3
+  2 : FINAL
+  3 : FINAL

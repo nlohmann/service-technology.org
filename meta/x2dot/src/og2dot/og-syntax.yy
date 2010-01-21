@@ -100,8 +100,13 @@ og:
 	//For all nodes...
 	for(int i=0;i<nodes.size();++i){			
 		//List nodes
-		if(nodeAnnotation[nodes[i]] == " initial "){
-			outStream << nodes[i] << " [label=\" \"]\n";
+		//if(nodeAnnotation[nodes[i]] == " initial "){
+		if(nodeAnnotation[nodes[i]].find("initial") != std::string::npos){
+			outStream << nodes[i] << " [label=\" \" ";
+			if(nodeAnnotation[nodes[i]].find("final") != std::string::npos)
+				outStream << "peripheries=2]\n";
+			else
+				outStream <<"]\n";
 			successors = nodeSuccessors[nodes[i]];
 			//Create invisible node (in order to mark the initial state)
 			outStream << "INIT" << nodes[i] <<  " [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"]\n";   
@@ -116,10 +121,12 @@ og:
 				else
 					outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
 			}	
-			isServiceAutomaton = true;				
+			isServiceAutomaton = true;	
+				
 		}
 		else{
-			if(nodeAnnotation[nodes[i]] == " final " && isServiceAutomaton == true){
+			//if(nodeAnnotation[nodes[i]] == " final " && isServiceAutomaton == true){
+			if((nodeAnnotation[nodes[i]].find("final") != std::string::npos) && isServiceAutomaton == true){
 				outStream << nodes[i] << " [label=\" \" peripheries=2]\n";
 				successors = nodeSuccessors[nodes[i]];
 				//write the node's ID, node's annotation and all links to its successors to the stream...
@@ -296,7 +303,7 @@ nodeOld:
 		nodeAnnotation[$1] = strStreamOld.str();
 		strStreamOld.str("");
 	}
-	
+
 | NUMBER COLON KEY_FINALNODE
 		
 	{
@@ -366,12 +373,13 @@ transition:
 annotation:
   /* empty */
 | COLON formula
+| COLON KEY_INITIAL {strStream << " initial "; strStreamOld << " initial ";}
+| COLON KEY_INITIAL {strStream << " initial "; strStreamOld << " initial ";} 
+  COMMA KEY_FINAL {strStream << " final "; strStreamOld << " final ";}
 | DOUBLECOLON BIT_S {strStream << "S";}
 | DOUBLECOLON BIT_F {strStream << "F";}
 | DOUBLECOLON BIT_T {strStream << "T";}
-
 ;
-
 
 formula:
   LPAR {strStream << "("; strStreamOld << "(";}
@@ -394,8 +402,6 @@ formula:
 | KEY_TRUE {strStream << " true "; strStreamOld << " true ";}
 
 | KEY_FALSE {strStream << " false "; strStreamOld << " false ";}
-
-| KEY_INITIAL {strStream << " initial "; strStreamOld << " initial ";}
 
 | IDENT 
 	{

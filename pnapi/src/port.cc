@@ -168,7 +168,7 @@ namespace pnapi
     return id_;
   }
 
-  const Label::Type Label::type() const
+  Label::Type Label::type() const
   {
     return type_;
   }

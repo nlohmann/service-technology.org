@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <cstring>
 #include <ctime>
 
 #include "pnapi.h"
@@ -317,7 +318,7 @@ int main(int argc, char** argv) {
             >> meta(io::INVOCATION, invocation) >> io::owfn >> secondNet;
 
         // compose nets
-        for (int i=0; i < objects.size(); ++i) {
+        for (size_t i=0; i < objects.size(); ++i) {
             objects[i].net->compose(secondNet, objects[i].filename, secondNetName);
             objects[i].filename += ".composed"; 
         }
@@ -529,7 +530,7 @@ int main(int argc, char** argv) {
                     case (output_arg_eps):
                     case (output_arg_pdf):
                     case (output_arg_svg): {
-                        if (CONFIG_DOT == "not found") {
+                        if (!strcmp(CONFIG_DOT, "not found")) {
                             abort(5, "Graphviz dot was not found by configure script");
                         }
 #if !defined(HAVE_POPEN) or !defined(HAVE_PCLOSE)

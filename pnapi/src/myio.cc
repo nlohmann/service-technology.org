@@ -372,14 +372,14 @@ std::ostream & operator<<(std::ostream & os, const pair<string, set<Place *> > &
 
 std::ostream & operator<<(std::ostream & os,
     const pair<unsigned int, set<Place *> > & p)
+{
+    switch (FormatData::data(os))
     {
-  switch (FormatData::data(os))
-  {
-  case OWFN: return __owfn::output(os, p);
+        case OWFN: return __owfn::output(os, p);
 
-  default: assert(false);
-  }
+        default: assert(false);
     }
+}
 
 
 } /* namespace util */
@@ -468,7 +468,7 @@ std::ostream & operator<<(std::ostream & os,
  std::ostream & outputContainerElement(std::ostream & os,
      const std::string & s)
      {
-   return os << s;
+   return (os << s);
      }
 
 

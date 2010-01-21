@@ -255,7 +255,8 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
     systemcall = pathToGenet_ + " -k " + ss.str() + " " + fileName + " > " + pnFileName;
   }
 
-  int result = system(systemcall.c_str());
+  //int result = system(systemcall.c_str());
+  system(systemcall.c_str());
 
   /// does not work for Genet, there seems to be a bug in Cudd
   //assert(result == 0);

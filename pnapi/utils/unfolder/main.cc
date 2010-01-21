@@ -88,10 +88,10 @@ int main() {
     }
     std::cout << patternStr << std::endl;
     char c;
-    while(c != ';'){
+    do {
     	c = ll1.get();
         std::cout << c;
-    }
+    } while (c != ';');
     std::cout << std::endl;
 
     // copy everything from final marking until the end of the second net

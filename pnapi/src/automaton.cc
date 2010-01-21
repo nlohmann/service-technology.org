@@ -34,7 +34,7 @@ namespace pnapi
  * The result of the constructor is an emty automaton.
  */
 Automaton::Automaton() :
-  edgeLabels_(NULL), edgeTypes_(NULL), net_(NULL), hashTable_(NULL), weights_(NULL), counter_(0)
+  edgeLabels_(NULL), edgeTypes_(NULL), weights_(NULL), net_(NULL), hashTable_(NULL), counter_(0)
   {
   /* do nothing */
   }
@@ -130,9 +130,10 @@ Automaton::Automaton(PetriNet &net) :
  */
 Automaton::Automaton(const Automaton &a) :
   input_(a.input_), output_(a.output_),
-  labels_(a.labels_), counter_(a.counter_),
+  labels_(a.labels_),
   edgeLabels_(NULL), edgeTypes_(NULL),
-  weights_(NULL), hashTable_(NULL)
+  weights_(NULL), hashTable_(NULL),
+  counter_(a.counter_)
   {
   map<const Place*, const Place*> placeMap;
 

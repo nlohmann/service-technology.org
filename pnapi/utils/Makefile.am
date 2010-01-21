@@ -1,3 +1,5 @@
+SUBDIRS = unfolder
+
 bin_PROGRAMS = petri sa2owfn sa2sm cdnf generator cphils
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h \

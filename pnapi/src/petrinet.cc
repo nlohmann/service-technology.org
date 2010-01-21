@@ -351,8 +351,8 @@ PetriNet::PetriNet(const PetriNet & net) :
   labels_(net.labels_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
-  meta_(net.meta_), warnings_(net.warnings_), ignoreRoles_(net.isIgnoringRoles()),
-  reducablePlaces_(NULL)
+  meta_(net.meta_), warnings_(net.warnings_),
+  reducablePlaces_(NULL), ignoreRoles_(net.isIgnoringRoles())
   {
   setConstraintLabels(net.constraints_);
   }

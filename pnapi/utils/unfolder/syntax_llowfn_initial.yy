@@ -36,7 +36,7 @@ placelist:
   places SEMICOLON
   {
     /* Write interface */
-    int i;
+    size_t i;
 
     //Internal places
     if(internalPlaces.empty() == false){

@@ -34,7 +34,7 @@ public:
   /*
    * Setter and Adder (push) and Deleter
    */
-  const int createState();
+  int createState();
   void pushState(int);
   void deleteState(int);
 
@@ -51,11 +51,11 @@ public:
    * Getter
    */
   const std::set<int> & states() const;
-  const int initialState() const;
+  int initialState() const;
 
-  const int findState(int, int) const;
-  const int findState(int, const std::string &) const;
-  const int findState(int, int, int) const;
+  int findState(int, int) const;
+  int findState(int, const std::string &) const;
+  int findState(int, int, int) const;
 
   const std::set<Edge *> & edges() const;
   const std::set<Edge *> edgesFrom(int) const;

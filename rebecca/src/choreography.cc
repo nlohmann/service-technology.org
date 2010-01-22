@@ -39,7 +39,7 @@ Choreography::~Choreography()
 /*!
  * \brief Create a state with a fresh name
  */
-const int Choreography::createState()
+int Choreography::createState()
 {
   static int max = -1;
   if (max >= 0)
@@ -177,7 +177,7 @@ const set<int> & Choreography::states() const
 /*!
  * \brief Return the initial state
  */
-const int Choreography::initialState() const
+int Choreography::initialState() const
 {
   return initialState_;
 }
@@ -185,7 +185,7 @@ const int Choreography::initialState() const
 /*!
  * \brief This method finds a state qa with q -a-> qa
  */
-const int Choreography::findState(int q, int a) const
+int Choreography::findState(int q, int a) const
 {
   set<Edge *> qE = edgesFrom(q);
   for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
@@ -197,7 +197,7 @@ const int Choreography::findState(int q, int a) const
 /*!
  * \brief See PeerAutomaton::findState(int q, int a) const
  */
-const int Choreography::findState(int q, const string & a) const
+int Choreography::findState(int q, const string & a) const
 {
   set<Edge *> qE = edgesFrom(q);
   for (set<Edge *>::iterator e = qE.begin(); e != qE.end(); ++e)
@@ -209,7 +209,7 @@ const int Choreography::findState(int q, const string & a) const
 /*!
  * \brief This method finds a state qab with q -a-> qa -b-> qab
  */
-const int Choreography::findState(int q, int a, int b) const
+int Choreography::findState(int q, int a, int b) const
 {
   int qa = findState(q, a);
   if (qa == -1)

@@ -98,7 +98,7 @@ og:
 	std::vector<std::pair<char*, unsigned int> > successors;  
 
 	//For all nodes...
-	for(int i=0;i<nodes.size();++i){			
+	for(size_t i=0;i<nodes.size();++i){			
 		//List nodes
 		//if(nodeAnnotation[nodes[i]] == " initial "){
 		if(nodeAnnotation[nodes[i]].find("initial") != std::string::npos){
@@ -113,7 +113,7 @@ og:
   			//Mark initial state
 			outStream << "INIT" << nodes[i] << " -> " << nodes[i] << " [minlen=\"0.5\"]" << "\n";
 			//write the node's ID, node's annotation and all links to its successors to the stream...
-			for(int j=0;j<successors.size();++j){
+			for(size_t j=0;j<successors.size();++j){
 				outStream << nodes[i];
 				outStream << " -> " << successors[j].second;
 				if(args_info.noPrefix_given)
@@ -130,7 +130,7 @@ og:
 				outStream << nodes[i] << " [label=\" \" peripheries=2]\n";
 				successors = nodeSuccessors[nodes[i]];
 				//write the node's ID, node's annotation and all links to its successors to the stream...
-				for(int j=0;j<successors.size();++j){
+				for(size_t j=0;j<successors.size();++j){
 					outStream << nodes[i];
 					outStream << " -> " << successors[j].second;
 					if(args_info.noPrefix_given)
@@ -143,7 +143,7 @@ og:
 				outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
 				successors = nodeSuccessors[nodes[i]];
 				//write the node's ID, node's annotation and all links to its successors to the stream...
-				for(int j=0;j<successors.size();++j){
+				for(size_t j=0;j<successors.size();++j){
 					outStream << nodes[i];
 					outStream << " -> " << successors[j].second;
 					if(args_info.noPrefix_given)
@@ -179,7 +179,7 @@ og:
   	outStream << "edge [fontname=Helvetica fontsize=10]\n";
   	outStream << "node [fontname=Helvetica fontsize=10]\n";  
 
-	for(int i=0;i<nodes.size();++i){			
+	for(size_t i=0;i<nodes.size();++i){			
 		//List nodes		
 		outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"";
 		if(nodeColor[nodes[i]]=='r'){

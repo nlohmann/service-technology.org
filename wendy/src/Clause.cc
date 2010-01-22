@@ -19,8 +19,11 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <sstream>
+
 
 #include "Clause.h"
+#include "StoredKnowledge.h"
 
 
 /******************
@@ -31,11 +34,8 @@ Clause::_stats Clause::stats;
 
 uint8_t Clause::bytes = 0;
 
-// a clause holding just literal final
-Clause* Clause::finalClause = reinterpret_cast<Clause*>(1);
-
 // a clause holding just literal false
-Clause* Clause::falseClause = reinterpret_cast<Clause*>(2);
+Clause* Clause::falseClause = reinterpret_cast<Clause*>(1);
 
 
 /******************
@@ -60,7 +60,7 @@ void Clause::initialize() {
   \note we assume sizeof(uint8_t) == 1
 */
 Clause::Clause()
-  : storage((uint8_t*)calloc(bytes, 1)), contains_final(0), more_than_one_literal(0), decodedLabels(NULL) {
+  : storage((uint8_t*)calloc(bytes, 1)), finalKnowledges(NULL), numberOfFinalKnowledges(0), contains_final(0), more_than_one_literal(0), decodedLabels(NULL) {
 
     assert(bytes > 0);
 }
@@ -72,12 +72,54 @@ Clause::Clause()
 Clause::~Clause() {
     free(storage);
     delete[] decodedLabels;
+    if (finalKnowledges != NULL) {
+
+        for (unsigned int i = 0; i < numberOfFinalKnowledges; ++i) {
+            delete finalKnowledges[i];
+        }
+
+        free(finalKnowledges);
+    }
 }
 
 
 /******************
  * MEMBER METHODS *
  ******************/
+
+/*!
+    \param finalKnowledge the knowledge that is final and has to be remembered in this clause
+*/
+void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
+    if (finalKnowledges == NULL) {
+        if (not (finalKnowledges = (FinalKnowledge**) calloc(1, sizeof(FinalKnowledge*)))) {
+            return ;
+        }
+    } else {
+
+        // make sure that the given knowledge has not been added to the clause so far
+        for (unsigned int i = 0; i < numberOfFinalKnowledges; ++i) {
+            if (finalKnowledges[i]->knowledge == _finalKnowledge) {
+                return ;
+            }
+        }
+
+        if (not (finalKnowledges = (FinalKnowledge**) realloc(finalKnowledges, numberOfFinalKnowledges * sizeof(FinalKnowledge*)))) {
+            return ;
+        }
+    }
+
+    FinalKnowledge * finalKnowledge = new FinalKnowledge();
+    finalKnowledge->knowledge = _finalKnowledge;
+
+    // store the given knowledge
+    finalKnowledges[numberOfFinalKnowledges] = finalKnowledge;
+    ++numberOfFinalKnowledges;
+
+    // we just stored a literal ;-)
+    more_than_one_literal = numberOfFinalKnowledges > 1;
+}
+
 
 /*!
   set the given label to 1 in the storage
@@ -102,6 +144,29 @@ void Clause::operator|=(const Clause& other) {
     }
 
     contains_final |= other.contains_final;
+
+    bool notFound = true;
+
+    // add final knowledge of other if it is not part of the clause already
+    for (unsigned int i = 0; i < other.numberOfFinalKnowledges; ++i) {
+        // current final knowledge of other has not been found in the array of final knowledges
+        notFound = true;
+
+        // traverse through the final knowledges
+        for (unsigned int k = 0; k < numberOfFinalKnowledges; ++k) {
+            // found the same knowledge, so continue with the next one
+            if (finalKnowledges[k]->knowledge == other.finalKnowledges[i]->knowledge) {
+                notFound = false;
+                break ;
+            }
+        }
+
+        // final knowledge is new, so store it
+        if (notFound) {
+            addFinalKnowledge(other.finalKnowledges[i]->knowledge);
+        }
+    }
+
 }
 
 
@@ -131,7 +196,7 @@ void Clause::decode() {
         }
 
         // check if clause contains more than one literal
-        more_than_one_literal = counter > 1;
+        more_than_one_literal = counter + numberOfFinalKnowledges > 1;
 
         // do statistics
         if (stats.maximalSizeOfClause < counter) {
@@ -146,22 +211,34 @@ void Clause::decode() {
 /*!
   creates a string out of the set of strings representing the annotation of the set of knowledges
   \param dot the string shall be used in the dot output or not
+  \param file a stream to which this clause goes to
 */
-std::string Clause::getString(const bool & dot) {
+void Clause::printToStream(const bool & dot, std::ostream& file) {
     // create the annotation of the current set of knowledges
-    std::string formula;
+    std::string stringOr = (dot) ? " &or; " : " + ";
 
     decode();
 
     if (decodedLabels != NULL) {
         bool first = true;
 
+        if (more_than_one_literal) {
+            file << "(";
+        }
+
         // final cannot be the only literal in the clause, as otherwise this clause would not exist!
-        if (contains_final) {
-            formula += "(final";
-            first = false;
-        } else if (more_than_one_literal) {
-            formula += "(";
+        if (numberOfFinalKnowledges > 0) {
+
+            for (unsigned int i = 0; i < numberOfFinalKnowledges; ++i) {
+
+                if (not first) {
+                    file << stringOr;
+                }
+
+                file << reinterpret_cast<size_t>((StoredKnowledge* ) finalKnowledges[i]->knowledge);
+                first = false;
+            }
+
         }
 
         // get clause which contains !, ? or # events
@@ -170,26 +247,22 @@ std::string Clause::getString(const bool & dot) {
                 continue;
             }
             if (not first) {
-                formula += (dot) ? " &or; " : " + ";
+                file << stringOr;
             }
 
-            formula += Label::id2name[i+1];
+            file << Label::id2name[i+1];
 
             first = false;
         }
 
-        if (more_than_one_literal or contains_final) {
-            formula += ")";
+        if (more_than_one_literal) {
+            file << ")";
         }
     }
 
-    assert(not formula.empty());
-
     // required for diagnose mode in which a non-final node might have no
     // successors
-    if (formula.empty()) {
-        formula = "false";
-    }
-
-    return formula;
+//    if (formula.empty()) {
+//      //  file << "false";
+//    }
 }

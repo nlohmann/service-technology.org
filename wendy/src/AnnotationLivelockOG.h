@@ -61,7 +61,7 @@ class AnnotationElement {
         ~AnnotationElement();
 
         /// returns a string containing the annotation of this element
-        std::string myAnnotation(const bool & dot) const;
+        void myAnnotationToStream(const bool & dot, std::ostream& file) const;
 
     private: /* member attributes */
         /// pointer to the set of knowledges

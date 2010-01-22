@@ -84,7 +84,7 @@ AnnotationElement::~AnnotationElement() {
 
     // explicitly delete every (real) clause
     for(unsigned int i = 0; annotationBool[i] != NULL; ++i) {
-        if (annotationBool[i] != Clause::finalClause and annotationBool[i] != Clause::falseClause) {
+        if (annotationBool[i] != Clause::falseClause) {
             delete annotationBool[i];
         }
     }
@@ -100,31 +100,26 @@ AnnotationElement::~AnnotationElement() {
 /*!
   creates a string out of the set of strings representing the annotation of the set of knowledges
   \param dot the string shall be used in the dot output or not
+  \param file a stream to which this annotation goes to
 */
-std::string AnnotationElement::myAnnotation(const bool & dot) const {
+void AnnotationElement::myAnnotationToStream(const bool & dot, std::ostream& file) const {
 
     // create the annotation of the current set of knowledges
-    std::string formulaBoolean = "";
+    std::string stringAnd = (dot) ? " &and; " : " * ";
 
     for(unsigned int i = 0; annotationBool[i] != NULL; ++i) {
 
         if (i != 0) {
-            formulaBoolean += (dot) ? " &and; " : " * ";
+            file << stringAnd;
         }
 
-        if (annotationBool[i] == Clause::finalClause) {
-            formulaBoolean += "final";
-        } else if (annotationBool[i] == Clause::falseClause) {
-            formulaBoolean += "false";
+        if (annotationBool[i] == Clause::falseClause) {
+            file << "false";
         } else {
-            std::string tmpFormula = annotationBool[i]->getString(dot);
-
             // the clause itself takes care of "(" and ")"
-            formulaBoolean += annotationBool[i]->getString(dot);
+            annotationBool[i]->printToStream(dot, file);
         }
     }
-
-    return formulaBoolean;
 }
 
 

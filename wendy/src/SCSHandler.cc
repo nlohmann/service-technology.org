@@ -84,6 +84,7 @@ SCSHandler::~SCSHandler() {
 
 
 /*!
+    Optimization of the algorithm for finding all strongly connected subsystems:
     initializes the set of edges handler by calculating the set of mandatory edges of the currently considered SCS
     (if one of those mandatory edges are left out in a subsystem, the SCS is not connected anymore)
     \param SCS the SCS to be considered
@@ -103,10 +104,8 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
     edges = new Edge*[numberOfAllEdges];
 
     unsigned int i = 0;
-    unsigned int index = 0;
-    Label_ID countEdgesOfKnowledge;
-    Label_ID lastEdge;
 
+    // collect all incoming edges of one knowledge
     std::map<StoredKnowledge* , std::set< unsigned int > > incomingEdges;
 
     // initialize vector of mandatory edges
@@ -117,9 +116,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
     // create C array of the set of edges and detect mandatory edges
     for (SetOfEdges::iterator iter = SCS.begin(); iter != SCS.end(); ++iter) {
 
-        countEdgesOfKnowledge = 0;
-        lastEdge = 0;
-        index = 0;
+        unsigned int edgeBitmask = 0;
 
         for (std::set<Label_ID>::iterator iterEdges = (*iter).second.begin(); iterEdges != (*iter).second.end(); ++iterEdges) {
 
@@ -127,25 +124,23 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
 
             edges[i] = edgeObject;
 
-            index = i;
             incomingEdges[((*iter).first)->successors[*iterEdges]].insert(i);
 
+            // collect the incoming edges; each bit of the bitmask points to the edge in the edge array
+            // each edge has a unique index, thus we can add the value of each edge
+            edgeBitmask += 1 << i;
+
             ++i;
-
-            ++countEdgesOfKnowledge;
-            lastEdge = *iterEdges;
         }
 
-        // knowledge has only one outgoing edge, so we can't skip this edge when calculating a subsystem --> it is a mandatory edge
-        if (countEdgesOfKnowledge == 1) {
-
-            ++numberOfMandatoryEdges;
-            if (not (mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
-                return ;
-            }
-
-            mandatoryEdges[numberOfMandatoryEdges - 1] = 1 << index;
+        // we can't skip the outgoing edges of the current knowledge when calculating a subsystem --> they are mandatory
+        ++numberOfMandatoryEdges;
+        if (not (mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
+            return ;
         }
+
+        // the bitmask talks about the edges of the edges array, thus we store the index of the mandatory edge in the array
+        mandatoryEdges[numberOfMandatoryEdges - 1] = edgeBitmask;
     }
 
     // iterate over the map of incoming edges, to find more mandatory edges
@@ -153,18 +148,26 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
                                                                           iterIncomingEdges != incomingEdges.end();
                                                                           ++iterIncomingEdges) {
 
-        // knowledge has only one incoming edge, so this edge is mandatory as well
-        if ((*iterIncomingEdges).second.size() == 1) {
+        unsigned int edgeBitmask = 0;
 
-            ++numberOfMandatoryEdges;
-            if (not (mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
-                return ;
-            }
+        // knowledge has incoming edges, so all those edges are mandatory as well
+        for (std::set< unsigned int >::iterator iterIncomingEdge = (*iterIncomingEdges).second.begin();
+                                                iterIncomingEdge != (*iterIncomingEdges).second.end();
+                                                ++iterIncomingEdge) {
 
-            mandatoryEdges[numberOfMandatoryEdges - 1] = 1 << (*(*iterIncomingEdges).second.begin());
+            // collect the incoming edges; each bit of the bitmask points to the edge in the edge array
+            // each edge has a unique index, thus we can add the value of each edge
+            edgeBitmask += 1 << (*iterIncomingEdge);
         }
-    }
 
+        ++numberOfMandatoryEdges;
+        if (not (mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
+            return ;
+        }
+
+        // the bitmask talks about the edges of the edges array, thus we store the index of the mandatory edge in the array
+        mandatoryEdges[numberOfMandatoryEdges - 1] = edgeBitmask;
+    }
 }
 
 
@@ -193,12 +196,15 @@ void SCSHandler::initializeSubsystemCalculation() {
 
 
 /*!
+    Optimization of the algorithm for finding all strongly connected subsystems:
     \return true, iff the current bitmask contains all mandatory edges; false, otherwise
 */
 bool SCSHandler::containsMandatoryEdges() const {
 
     for (unsigned int i = 0; i < numberOfMandatoryEdges; ++i) {
-        if ((currentBitMask | mandatoryEdges[i]) != currentBitMask) {
+
+        // in the current bitmask no mandatory edge is set
+        if ((currentBitMask & mandatoryEdges[i]) == 0) {
             ++countBadSubsystems;
             return false;
         }
@@ -209,6 +215,7 @@ bool SCSHandler::containsMandatoryEdges() const {
 
 
 /*!
+    \note always call this function to find out whether there exists a next subsystem or not
     \return true, if there exists a next subsystem; false, otherwise
 */
 bool SCSHandler::nextSubsystem() const {
@@ -226,6 +233,9 @@ SetOfEdges SCSHandler::getNextSubsystem() {
 
     SetOfEdges subsystem;
 
+    // Optimization of the algorithm for finding all strongly connected subsystems:
+    // a subsystem has to have a minimum number of edges and
+    // has to contain all mandatory edges
     if (bitCount(currentBitMask) < minNumberOfEdges or not containsMandatoryEdges()) {
          ++currentBitMask;
          return subsystem;
@@ -237,6 +247,7 @@ SetOfEdges SCSHandler::getNextSubsystem() {
         }
     }
 
+    // get ready for the next subsystem
     ++currentBitMask;
 
     return subsystem;

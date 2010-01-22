@@ -556,13 +556,15 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
         if (emptyClause) {
 
             // is it final?
-            bool contains_final = booleanClause->contains_final;
+         //   bool contains_final = booleanClause->contains_final;
 
             // delete the clause
             delete booleanClause;
 
             // create new clause for (final) or (false)
-            booleanClause = contains_final ? Clause::finalClause : Clause::falseClause;
+          //  booleanClause = contains_final ? Clause::finalClause : Clause::falseClause;
+
+            booleanClause = Clause::falseClause;
         }
 
         CompositeMarkingsHandler::addClause(booleanClause);
@@ -812,7 +814,9 @@ void LivelockOperatingGuideline::output_cyclic(const bool & dot, std::ostream& f
                 }
             }
 
-            file << ": " << temp->myAnnotation(true) << "</td></tr>\n";
+            file << ": ";
+            temp->myAnnotationToStream(true, file);
+            file << "</td></tr>\n";
         }
 
         file << "</table>>]\n";
@@ -837,7 +841,9 @@ void LivelockOperatingGuideline::output_cyclic(const bool & dot, std::ostream& f
                 }
             }
 
-            file << ": " << temp->myAnnotation(false) << ";\n";
+            file << ": ";
+            temp->myAnnotationToStream(false, file);
+            file << ";\n";
         }
     }
 }

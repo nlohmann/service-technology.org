@@ -26,6 +26,17 @@
 #include "Label.h"
 
 
+class StoredKnowledge;
+
+/*!
+ sort of dummy class to hold a const pointer, which we need in Clause to store a pointer to a final knowledge
+*/
+class FinalKnowledge {
+    public:
+        const StoredKnowledge* knowledge;
+};
+
+
 /*!
  Livelock Operating Guideline only
 
@@ -57,9 +68,6 @@ class Clause {
                 unsigned int maximalSizeOfClause;
         } stats;
 
-        /// the clause holding literal final only (just a placeholder, no object!)
-        static Clause* finalClause;
-
         /// the clause holding literal false only (just a placeholder, no object!)
         static Clause* falseClause;
 
@@ -79,9 +87,12 @@ class Clause {
         void operator|=(const Clause&);
 
         /// returns a string representation of this clause
-        std::string getString(const bool & dot);
+        void printToStream(const bool & dot, std::ostream& file);
 
     private: /* member functions */
+
+        /// add final knowledge to the clause
+        void addFinalKnowledge(const StoredKnowledge* finalKnowledge);
 
         /// set given label to 1 (is part of the clause)
         void labelPossible(const Label_ID& l);
@@ -93,6 +104,10 @@ class Clause {
 
         /// store the bits representing each label of the interface
         uint8_t * storage;
+
+        FinalKnowledge** finalKnowledges;
+
+        unsigned int numberOfFinalKnowledges;
 
         /// reserve one bit to represent whether this clause contains literal final
         unsigned contains_final : 1;

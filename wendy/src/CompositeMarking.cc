@@ -67,8 +67,8 @@ CompositeMarking::~CompositeMarking() {
 */
 void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledgeSet,
                                     SetOfEdges & setOfEdges,
-                                                  Clause * booleanClause,
-                                                  bool & emptyClause) {
+                                    Clause * booleanClause,
+                                    bool & emptyClause) {
 
     std::set<Label_ID> edges = (*setOfEdges.find(storedKnowledge)).second;
 
@@ -114,8 +114,9 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
 
     // this marking is final
     if (interface->unmarked() and InnerMarking::inner_markings[innerMarking_ID]->is_final) {
-
         booleanClause->contains_final = 1;
+        booleanClause->addFinalKnowledge(storedKnowledge);
+        emptyClause = false;
     }
 }
 
@@ -213,7 +214,7 @@ void CompositeMarkingsHandler::addClause(Clause * booleanClause) {
     // add whole clause to the conjunction of clauses
     conjunctionOfDisjunctionsBoolean.push_back(booleanClause);
 
-    if (booleanClause == Clause::finalClause or booleanClause == Clause::falseClause) {
+    if (booleanClause == Clause::falseClause) {
         Clause::stats.cumulativeSizeAllClauses++;
     }
 }

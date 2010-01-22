@@ -1,6 +1,16 @@
 #ifndef HEADER_lp_types
 #define HEADER_lp_types
 
+/*
+The following lines were added by Niels Lohmann <niels.lohmann@uni-rostock.de>
+to allow for the use of the type int64_t.
+*/
+#include <config.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
+
 /* Define data types                                                         */
 /* ------------------------------------------------------------------------- */
 #ifndef LLONG

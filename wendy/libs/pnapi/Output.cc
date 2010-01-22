@@ -17,6 +17,9 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+/*!
+ * \file  Output.cc
+ */
 
 #include <fstream>
 #include <cstdio>

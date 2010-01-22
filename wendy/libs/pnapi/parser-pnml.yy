@@ -48,10 +48,11 @@ pnapi::Marking* currentMarking;
   ****************************************************************************/
 
 %token X_OPEN X_SLASH X_CLOSE X_NEXT X_STRING X_EQUALS
-%token NUMBER IDENT
+%token IDENT
 %token KEY_PNML KEY_MODULE KEY_PORT KEY_PORTS KEY_NET KEY_TEXT KEY_PLACE
 %token KEY_INITIALMARKING KEY_TRANSITION KEY_ARC KEY_FINALMARKINGS KEY_MARKING
 %token KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS KEY_SEND KEY_RECEIVE KEY_SYNCHRONIZE
+%token KEY_NAME KEY_VALUE KEY_INSCRIPTION
 
 %union
 {
@@ -59,9 +60,9 @@ pnapi::Marking* currentMarking;
   char * yt_str;
 }
 
-%type <yt_int> NUMBER
 %type <yt_int> initialmarking
-%type <yt_int> text
+%type <yt_int> inscription
+%type <yt_str> text
 %type <yt_str> IDENT
 %type <yt_str> X_STRING
 
@@ -75,6 +76,7 @@ pnapi::Marking* currentMarking;
 
 petrinet:
   X_OPEN KEY_PNML arbitraryAttributes X_NEXT module X_SLASH KEY_PNML X_CLOSE
+| X_OPEN KEY_PNML arbitraryAttributes X_NEXT net X_SLASH KEY_PNML X_CLOSE
 ;
 
 module:
@@ -120,7 +122,7 @@ synchronous_channel:
 ;
 
 net:
-  KEY_NET arbitraryAttributes X_NEXT nodes X_SLASH KEY_NET X_NEXT
+  KEY_NET arbitraryAttributes X_NEXT nodes name X_SLASH KEY_NET X_NEXT
 ;
 
 nodes:
@@ -135,8 +137,8 @@ node:
 ;
 
 place:
-  KEY_PLACE arbitraryAttributes X_NEXT initialmarking X_SLASH KEY_PLACE X_NEXT
-    { pnapi_pnml_yynet.createPlace(currentAttributes["id"], Node::INTERNAL, $4);
+  KEY_PLACE arbitraryAttributes X_NEXT name initialmarking X_SLASH KEY_PLACE X_NEXT
+    { pnapi_pnml_yynet.createPlace(currentAttributes["id"], Node::INTERNAL, $5);
       currentAttributes.clear(); }
 | KEY_PLACE arbitraryAttributes X_SLASH X_NEXT
     { pnapi_pnml_yynet.createPlace(currentAttributes["id"]);
@@ -147,12 +149,19 @@ initialmarking:
   /* empty */
     { $$ = 0; }
 | KEY_INITIALMARKING arbitraryAttributes X_NEXT text X_SLASH KEY_INITIALMARKING X_NEXT
-    { $$ = $4; }
+    { $$ = atoi($4); }
+;
+
+name:
+  /* empty */
+| KEY_NAME arbitraryAttributes X_NEXT text X_SLASH KEY_NAME X_NEXT
 ;
 
 text:
-  KEY_TEXT arbitraryAttributes X_CLOSE NUMBER X_OPEN X_SLASH KEY_TEXT X_NEXT
+  KEY_TEXT arbitraryAttributes X_CLOSE IDENT X_OPEN X_SLASH KEY_TEXT X_NEXT
     { $$ = $4; }
+| KEY_TEXT arbitraryAttributes X_SLASH X_NEXT
+    { $$ = 0; }
 ;
 
 transition:
@@ -184,6 +193,7 @@ event:
       labels.insert(currentAttributes["id"]);
       currentTransition->setSynchronizeLabels(labels);
       currentAttributes.clear(); }
+| KEY_NAME X_NEXT value text X_SLASH KEY_NAME X_NEXT
 ;
 
 arc:
@@ -192,6 +202,22 @@ arc:
       Node *target = pnapi_pnml_yynet.findNode(currentAttributes["target"]);
       pnapi_pnml_yynet.createArc(*source, *target);
       currentAttributes.clear(); }
+| KEY_ARC arbitraryAttributes X_NEXT inscription X_SLASH KEY_ARC X_NEXT
+    { Node *source = pnapi_pnml_yynet.findNode(currentAttributes["source"]);
+      Node *target = pnapi_pnml_yynet.findNode(currentAttributes["target"]);
+      pnapi_pnml_yynet.createArc(*source, *target, $4);
+      currentAttributes.clear(); }
+;
+
+inscription:
+  KEY_INSCRIPTION arbitraryAttributes X_NEXT value text X_SLASH KEY_INSCRIPTION X_NEXT
+    { $$ = atoi($5); }
+;
+
+value:
+  /* empty */
+| KEY_VALUE arbitraryAttributes X_SLASH X_NEXT
+| KEY_VALUE arbitraryAttributes X_CLOSE IDENT X_OPEN X_SLASH KEY_VALUE X_NEXT
 ;
 
 finalmarkings:
@@ -220,7 +246,7 @@ mappings:
 mapping:
   KEY_PLACE arbitraryAttributes X_NEXT text X_SLASH KEY_PLACE X_NEXT
     { Node *place = pnapi_pnml_yynet.findNode(currentAttributes["id"]);
-      (*currentMarking)[(const pnapi::Place&)*place] = $4;
+      (*currentMarking)[(const pnapi::Place&)*place] = atoi($4);
       currentAttributes.clear(); }
 ;
 
@@ -228,4 +254,3 @@ arbitraryAttributes:
   /* empty */
 | IDENT X_EQUALS X_STRING { currentAttributes[$1] = $3; } arbitraryAttributes
 ;
-

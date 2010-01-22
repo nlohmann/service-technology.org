@@ -1,5 +1,9 @@
 // -*- C++ -*-
 
+/*!
+ * \file  condition.h
+ */
+
 #ifndef PNAPI_CONDITION_H
 #define PNAPI_CONDITION_H
 

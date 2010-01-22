@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-11-29 14:51:22 +0100 (So, 29. Nov 2009) $
+ * \date    \$Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 5107 $
+ * \version \$Revision: 5258 $
  *
  * \ingroup petrinet
  * 
@@ -701,7 +701,7 @@ unsigned int PetriNet::reduce_rule_4()
 /*!
  * \brief Checks, wether the postset of a set of nodes is empty.
  */
-bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
+bool PetriNet::reduce_emptyPostset(const std::set<Node*> & nodes)
 {
   PNAPI_FOREACH(set<Node*>, nodes, n)
   {
@@ -714,7 +714,7 @@ bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
 /*!
  * \brief Check if the preset of a set stores only one item.
  */
-bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
+bool PetriNet::reduce_singletonPreset(const std::set<Node*> & nodes)
 {
   PNAPI_FOREACH(set<Node*>, nodes, n)
   {

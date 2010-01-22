@@ -104,12 +104,14 @@ private:
 };
 
 
+// hiding this from doxygen: \param   T An instance (class) of the BaseNode template.
 /*!
  * \brief   Generic Parser Capsule for flex/bison Parsers
- * \param   T An instance (class) of the BaseNode template.
  *
+ * \todo    this class (and the visitor class as well) may be broken and deprecated.
+ * 
  * All the functionality is provided by traditional C-style lexers and
- * parsers. To work with a parser, first call #parse() and then #visit().
+ * parsers. To work with a parser, call #parse().
  */
 template <typename T> class Parser
 {
@@ -461,8 +463,8 @@ int parse();
 /*!
  * \brief   Encapsulation of the flex/bison ONWD parser
  *
- * Connects to the flex/bison implementation for parsing (#parse()) and
- * result retrieval (#visit()). Call the two functions in this order.
+ * Connects to the flex/bison implementation for parsing (parse()) and
+ * result retrieval (visit()). Call the two functions in this order.
  */
 class Parser : public parser::Parser<Node>
 {
@@ -797,8 +799,6 @@ BaseNode<T>::BaseNode(T * node) :
 
   /*!
    * \brief   constructor to be used in derived classes (framework instances)
-   * \param   flexStream  a reference to a pointer variable holding the input
-   *                      stream the lexer will use during scanning
    * \param   parseResult a reference to a pointer variable that will contain
    *                      the resulting AST after parsing
    * \param   yaccParse   pointer to the parse() function of the bison parser
@@ -821,7 +821,7 @@ BaseNode<T>::BaseNode(T * node) :
    * \param   is  an input stream
    * \return the current parser instance
    *
-   * The resulting AST can be traversed using the #visit() function.
+   * The resulting AST can be traversed using the visit() function.
    */
   template <typename T> T & Parser<T>::parse(std::istream & is)
   {

@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 
 /*!
- * \file    petrinode.h
+ * \file    component.h
  *
  * \brief   Nodes and Arcs for Petri nets
  *
@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: georgstraube $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-07 18:03:23 +0100 (Do, 07. Jan 2010) $
+ * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
  *
- * \version $Revision: 5204 $
+ * \version $Revision: 5258 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -56,8 +56,20 @@ class Node
 
 public:
 
-  /// node types (communication)
-  enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
+  /*!
+   * \brief node communication types 
+   */
+  enum Type
+  {
+    /// internal places or transitions only connected to internal places
+    INTERNAL,
+    /// input places or transitions only connected to internal or input places
+    INPUT,
+    /// output places or transitions only connected to internal or output places
+    OUTPUT,
+    /// transitions connected with both input and output places
+    INOUT 
+  };
 
   /// constructor
   Node(PetriNet &, util::ComponentObserver &, const std::string &, Type);
@@ -304,7 +316,7 @@ private:
  * \brief   arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel
- * (n1,n2) has n1 as #source and n2 as #target.
+ * (n1,n2) has n1 as source and n2 as target.
  */
 class Arc
 {

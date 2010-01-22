@@ -8,13 +8,13 @@
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
  *          Stephan Mennicke <stephan.mennicke@uni-rostock.de>,
- *          last changes of: $Author:$
+ *          last changes of: $Author: cas $
  *
  * \since   2005-10-18
  *
- * \date    $Date:$
+ * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
  *
- * \version $Revision:$
+ * \version $Revision: 5258 $
  */
 
 #include "interface.h"
@@ -46,15 +46,15 @@ namespace pnapi
     ports_.clear();
   }
 
-  void Interface::addPort(const string &name)
+  void Interface::addPort(const std::string &name)
   {
     assert(!ports_.count(name));
 
     ports_[name] = new Port();
   }
 
-  void Interface::addInputLabel(const string &label,
-      const string &port)
+  void Interface::addInputLabel(const std::string &label,
+      const std::string &port)
   {
     if (!port.compare(""))
     {
@@ -71,8 +71,8 @@ namespace pnapi
     }
   }
 
-  void Interface::addOutputLabel(const string &label,
-      const string &port)
+  void Interface::addOutputLabel(const std::string &label,
+      const std::string &port)
   {
     if (!port.compare(""))
     {
@@ -89,8 +89,8 @@ namespace pnapi
     }
   }
 
-  void Interface::addSynchronousLabel(const string &label,
-      const string &port)
+  void Interface::addSynchronousLabel(const std::string &label,
+      const std::string &port)
   {
     if (!port.compare(""))
     {

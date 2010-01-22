@@ -108,7 +108,7 @@ namespace pnapi
     const std::string label() const;
 
     /// returing the label's type
-    const Type type() const;
+    Type type() const;
 
     /// returning the label's typed string (e.g. for input a = ?a)
     const std::string typedString() const;

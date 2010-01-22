@@ -1,3 +1,7 @@
+/*!
+ * \file  myio.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -354,7 +358,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLessEqual & f
 }
 
 
-std::ostream & operator<<(std::ostream & os, const pair<string, set<Place *> > & p)
+std::ostream & operator<<(std::ostream & os, const std::pair<std::string, std::set<Place *> > & p)
 {
   switch (FormatData::data(os))
   {
@@ -367,15 +371,15 @@ std::ostream & operator<<(std::ostream & os, const pair<string, set<Place *> > &
 
 
 std::ostream & operator<<(std::ostream & os,
-    const pair<unsigned int, set<Place *> > & p)
+    const std::pair<unsigned int, std::set<Place *> > & p)
+{
+    switch (FormatData::data(os))
     {
-  switch (FormatData::data(os))
-  {
-  case OWFN: return __owfn::output(os, p);
+        case OWFN: return __owfn::output(os, p);
 
-  default: assert(false);
-  }
+        default: assert(false);
     }
+}
 
 
 } /* namespace util */
@@ -397,8 +401,8 @@ std::ostream & operator<<(std::ostream & os,
  }
 
 
- InputError::InputError(Type type, const string & filename, int line,
-     const string & token, const string & msg) :
+ InputError::InputError(Type type, const std::string & filename, int line,
+     const std::string & token, const std::string & msg) :
        type(type), message(msg), token(token), line(line), filename(filename)
        {
        }
@@ -454,7 +458,7 @@ std::ostream & operator<<(std::ostream & os,
  }
 
 
- Manipulator<Delim> delim(const string & s)
+ Manipulator<Delim> delim(const std::string & s)
  {
    Delim d; d.delim = s;
    return Manipulator<Delim>(d);
@@ -464,11 +468,11 @@ std::ostream & operator<<(std::ostream & os,
  std::ostream & outputContainerElement(std::ostream & os,
      const std::string & s)
      {
-   return os << s;
+   return (os << s);
      }
 
 
- bool compareContainerElements(string s1, string s2)
+ bool compareContainerElements(std::string s1, std::string s2)
  {
    return s1 < s2;
  }
@@ -512,7 +516,7 @@ std::ostream & operator<<(std::ostream & os,
  }
 
 
- set<Place *> filterMarkedPlaces(const set<Place *> & places)
+ std::set<Place *> filterMarkedPlaces(const std::set<Place *> & places)
  {
    set<Place *> filtered;
    for (set<Place *>::iterator it = places.begin(); it != places.end();
@@ -523,7 +527,7 @@ std::ostream & operator<<(std::ostream & os,
  }
 
 
- set<Arc *> filterInternalArcs(const set<Arc *> & arcs)
+ std::set<Arc *> filterInternalArcs(const std::set<Arc *> & arcs)
  {
    set<Arc *> filtered;
    for (set<Arc *>::iterator it = arcs.begin(); it != arcs.end(); ++it)
@@ -549,7 +553,7 @@ std::ostream & operator<<(std::ostream & os,
 
 
  std::multimap<unsigned int, Place *>
- groupPlacesByCapacity(const set<Place *> & places)
+ groupPlacesByCapacity(const std::set<Place *> & places)
  {
    std::multimap<unsigned int, Place *> grouped;
    for (set<Place *>::iterator it = places.begin(); it != places.end();
@@ -559,7 +563,7 @@ std::ostream & operator<<(std::ostream & os,
  }
 
 
- set<string> collectSynchronizeLabels(const set<Transition *> & ts)
+ std::set<std::string> collectSynchronizeLabels(const std::set<Transition *> & ts)
  {
    set<string> labels;
    for (set<Transition *>::iterator it = ts.begin(); it != ts.end(); ++it)

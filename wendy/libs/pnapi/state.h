@@ -1,3 +1,7 @@
+/*!
+ * \file  state.h
+ */
+
 #ifndef STATE_H
 #define STATE_H
 
@@ -45,7 +49,7 @@ public:
   ~State();
 
   /// method which returns the state's name
-  const unsigned int name() const;
+  unsigned int name() const;
   /// method which returns the state's preset
   const std::set<State *> preset() const;
   /// method which returns the state's postset
@@ -69,9 +73,9 @@ public:
   /// returns the state's marking
   Marking * marking() const;
   /// returns the state's hash value (only needed by service automaton)
-  const unsigned int hashValue();
+  unsigned int hashValue();
   /// returns the size of the represented marking
-  const unsigned int size() const;
+  unsigned int size() const;
 
   /// copy a state from one automaton to another one
   static State * copy(const State &, PetriNet* = NULL, 

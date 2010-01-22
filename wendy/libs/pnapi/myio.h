@@ -1,18 +1,18 @@
 // -*- C++ -*-
 
 /*!
- * \file    io.h
+ * \file    myio.h
  *
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: cas $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2010-01-19 14:54:27 +0100 (Di, 19. Jan 2010) $
+ * \date    $Date: 2010-01-21 00:59:06 +0100 (Do, 21. Jan 2010) $
  *
- * \version $Revision: 5237 $
+ * \version $Revision: 5253 $
  */
 
 

@@ -58,35 +58,35 @@ namespace pnapi
     synchronous_.clear();
   }
 
-  void Port::addInputLabel(const string &label)
+  void Port::addInputLabel(const std::string &label)
   {
     // TODO: maybe check whether label is already in this port
     input_.push_back(new Label(label, Label::INPUT));
   }
 
-  void Port::addOutputLabel(const string &label)
+  void Port::addOutputLabel(const std::string &label)
   {
     // TODO: maybe check whether label is already in this port
     output_.push_back(new Label(label, Label::OUTPUT));
   }
 
-  void Port::addSynchronousLabel(const string &label)
+  void Port::addSynchronousLabel(const std::string &label)
   {
     // TODO: maybe check whether label is already in this port
     synchronous_.push_back(new Label(label, Label::SYNCHRONOUS));
   }
 
-  const vector<Label *> Port::inputLabels() const
+  const std::vector<Label *> Port::inputLabels() const
   {
     return input_;
   }
 
-  const vector<Label *> Port::outputLabels() const
+  const std::vector<Label *> Port::outputLabels() const
   {
     return output_;
   }
 
-  const vector<Label *> Port::synchronousLabel() const
+  const std::vector<Label *> Port::synchronousLabel() const
   {
     return synchronous_;
   }
@@ -105,7 +105,7 @@ namespace pnapi
    * \note This method does _neither_ include the keyword PORT
    *       _nor_ the port's name!
    */
-  const string Port::portString() const
+  const std::string Port::portString() const
   {
     string in = inputLabelString();
     string out = outputLabelString();
@@ -117,7 +117,7 @@ namespace pnapi
     return result;
   }
 
-  const string Port::inputLabelString() const
+  const std::string Port::inputLabelString() const
   {
     string result;
     for (int i = 0; i < (int) input_.size(); ++i)
@@ -125,7 +125,7 @@ namespace pnapi
     return result;
   }
 
-  const string Port::outputLabelString() const
+  const std::string Port::outputLabelString() const
   {
     string result;
     for (int i = 0; i < (int) input_.size(); ++i)
@@ -133,7 +133,7 @@ namespace pnapi
     return result;
   }
 
-  const string Port::synchronousLabelString() const
+  const std::string Port::synchronousLabelString() const
   {
     string result;
     for (int i = 0; i < (int) input_.size(); ++i)
@@ -149,7 +149,7 @@ namespace pnapi
   {
   }
 
-  Label::Label(const string &id, Type type) :
+  Label::Label(const std::string &id, Type type) :
     id_(id), type_(type)
   {
   }
@@ -168,7 +168,7 @@ namespace pnapi
     return id_;
   }
 
-  const Label::Type Label::type() const
+  Label::Type Label::type() const
   {
     return type_;
   }

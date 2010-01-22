@@ -7,9 +7,9 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2009-09-09 00:41:39 +0200 (Mi, 09. Sep 2009) $
+ * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
  *
- * \version $Revision: 4691 $
+ * \version $Revision: 5258 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -46,7 +46,7 @@ using pnapi::operator&&;
  * \endcode
  *
  * Everything you will use can be found in the following namespaces:
- * - pnapi
+ * - #pnapi
  * - pnapi::formula
  * - pnapi::io
  *

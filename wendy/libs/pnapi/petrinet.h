@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-15 15:13:46 +0100 (Fr, 15. Jan 2010) $
+ * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
  *
- * \version $Revision: 5209 $
+ * \version $Revision: 5258 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -145,8 +145,8 @@ public:
  * \brief   A Petri net
  *
  * Class to represent Petri nets. The net consists of places of
- * class #Place, transitions of class #Transition and arcs of class
- * #Arc.
+ * class Place, transitions of class Transition and arcs of class
+ * Arc.
  */
 class PetriNet
 {

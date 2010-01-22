@@ -24,6 +24,7 @@ AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
 # check and set exact unsigned types
+AC_TYPE_UINT8_T
 AC_TYPE_INT64_T
 
 

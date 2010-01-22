@@ -1,10 +1,15 @@
 #ifndef FILES_H_
 #define FILES_H_
 
+#include <config.h>
 #include "helpers.h"
 #include <fstream>
 #include <vector>
 #include "stateEquation.h"
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 /// An output file containing a number of terms, final markings, and lower/upper bounds for each final marking and term.
 class ProfileFile {

@@ -1,13 +1,16 @@
 #ifndef LINDAAGENT_H_
 #define LINDAAGENT_H_
 
+#include <config.h>
 #include <pnapi/pnapi.h>
 #include "helpers.h"
 #include "eventTerm.h"
 #include "setsOfFinalMarkings.h"
 #include "stateEquation.h"
 
-
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 class LindaAgent {
 public:

@@ -106,21 +106,21 @@ attdef          {open}"?XML-ATT"
 "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" {}
 
 <INITIAL>{ws}           {/* skip */}
-<INITIAL>{version}      {return XVERSION;}
-<INITIAL>{encoding}     {pnapi_pnml_yylval.s = word(yytext + 14); return ENCODING;}
-<INITIAL>"/"            {return SLASH;}
-<INITIAL>"="            {return EQ;}
-<INITIAL>{close}        {BEGIN(CONTENT); return CLOSE;}
-<INITIAL>{name}         {pnapi_pnml_yylval.s = strdup(yytext); return NAME;}
-<INITIAL>{string}       {pnapi_pnml_yylval.s = strdup(yytext); return VALUE;}
-<INITIAL>"?"{close}     {BEGIN(keep); return ENDDEF;}
+<INITIAL>{version}      {return XML_VERSION;}
+<INITIAL>{encoding}     {pnapi_pnml_yylval.s = word(yytext + 14); return XML_ENCODING;}
+<INITIAL>"/"            {return XML_SLASH;}
+<INITIAL>"="            {return XML_EQ;}
+<INITIAL>{close}        {BEGIN(CONTENT); return XML_CLOSE;}
+<INITIAL>{name}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_NAME;}
+<INITIAL>{string}       {pnapi_pnml_yylval.s = strdup(yytext); return XML_VALUE;}
+<INITIAL>"?"{close}     {BEGIN(keep); return XML_ENDDEF;}
 
-{attdef}                {keep = YY_START; BEGIN(INITIAL); return ATTDEF;}
-{open}{ws}?{name}       {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return START;}
-{open}{ws}?"/"          {BEGIN(INITIAL); return END;}
-{comment}               {pnapi_pnml_yylval.s = strdup(yytext); return COMMENT;}
+{attdef}                {keep = YY_START; BEGIN(INITIAL); return XML_ATTDEF;}
+{open}{ws}?{name}       {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START;}
+{open}{ws}?"/"          {BEGIN(INITIAL); return XML_END;}
+{comment}               {pnapi_pnml_yylval.s = strdup(yytext); return XML_COMMENT;}
 
-<CONTENT>{data}         {pnapi_pnml_yylval.s = strdup(yytext); return DATA;}
+<CONTENT>{data}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA;}
 
 .                       {yyerror("lexial error");}
 {nl}                    {/* skip, must be an extra one at EOF */;}

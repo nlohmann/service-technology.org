@@ -243,8 +243,8 @@ void store_data(char *s) {
 
 %union {char *s;}
 
-%token XVERSION ATTDEF ENDDEF EQ SLASH CLOSE END
-%token <s> ENCODING NAME VALUE DATA COMMENT START
+%token XML_VERSION XML_ATTDEF XML_ENDDEF XML_EQ XML_SLASH XML_CLOSE XML_END
+%token <s> XML_ENCODING XML_NAME XML_VALUE XML_DATA XML_COMMENT XML_START
 %type <s> name_opt
 
 
@@ -260,11 +260,11 @@ prolog:
   version_opt encoding_opt misc_seq_opt
 ;
 version_opt:
-  XVERSION
+  XML_VERSION
 | /*empty*/
 ;
 encoding_opt:
-  ENCODING                           {free($1);}
+  XML_ENCODING                       {free($1);}
 | /*empty*/
 ;
 misc_seq_opt:
@@ -272,28 +272,28 @@ misc_seq_opt:
 | /*empty*/
 ;
 misc:
-  COMMENT
+  XML_COMMENT
 | attribute_decl
 ;
 attribute_decl:
-  ATTDEF NAME attribute_seq_opt ENDDEF
+  XML_ATTDEF XML_NAME attribute_seq_opt XML_ENDDEF
 ;
 element:
-  START                              {open_element($1); free($1);}
+  XML_START                          {open_element($1); free($1);}
   attribute_seq_opt empty_or_content
 ;
 empty_or_content:
-  SLASH CLOSE                        {close_element();}
-| CLOSE content END name_opt CLOSE   {close_element();}
+  XML_SLASH XML_CLOSE                {close_element();}
+| XML_CLOSE content XML_END name_opt XML_CLOSE   {close_element();}
 ;
 content:
-  content DATA                       {store_data($2);}
+  content XML_DATA                   {store_data($2);}
 | content misc
 | content element
 | /*empty*/
 ;
 name_opt:
-  NAME                               {$$ = $1;}
+  XML_NAME                           {$$ = $1;}
 | /*empty*/                          {$$ = strdup("");}
 ;
 attribute_seq_opt:
@@ -301,6 +301,6 @@ attribute_seq_opt:
 | /*empty*/
 ;
 attribute:
-  NAME                               { free($1);}
-| NAME EQ VALUE                      { store_attributes($1, $3); free($1); free($3);}
+  XML_NAME                           { free($1);}
+| XML_NAME XML_EQ XML_VALUE          { store_attributes($1, $3); free($1); free($3);}
 ;

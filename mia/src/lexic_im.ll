@@ -18,6 +18,7 @@
 \*****************************************************************************/
 
 %option noyywrap
+%option nounput
 %option yylineno
 %option nodefault
 %option outfile="lex.yy.c"

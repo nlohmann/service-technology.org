@@ -13,7 +13,7 @@ AC_MSG_NOTICE([http://service-technology.org/pnapi])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 
-AM_INIT_AUTOMAKE(gnits)
+AM_INIT_AUTOMAKE #(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # where to look for source code and how the config header should be called

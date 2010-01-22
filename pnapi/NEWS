@@ -25,8 +25,6 @@ Version 3.01-unreleased
 * implemented PNML import and export based on the code of
   `http://www.w3.org/XML/9707/XML-in-C'
 
-* ensured compliance to Gnits
-
 
 See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for
 complete version history.

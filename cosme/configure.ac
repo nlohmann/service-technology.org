@@ -1,12 +1,15 @@
 AC_INIT(Cosme, 0.7, cosme@service-technology.org, cosme, http://service-technology.org/cosme)
 
-AC_CONFIG_SRCDIR([src/og-lexic.ll])
+AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
-AM_INIT_AUTOMAKE
-AM_PROG_CC_C_O
+AM_INIT_AUTOMAKE #(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+# check for standard programs needed to compile
 AC_PROG_CXX
-AM_PROG_LEX
+AM_PROG_CC_C_O
+AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
 AC_PROG_SED
@@ -36,11 +39,10 @@ AH_BOTTOM([#ifdef __cplusplus
 # search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])
 
-# check for functions
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes -- expect bad performance]))
-AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
+# check for required functions and die if they are not found
+AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
-# check for exact unsigned types
+# check and set exact unsigned types
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T

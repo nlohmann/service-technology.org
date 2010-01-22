@@ -6,6 +6,10 @@
 #include <string>
 #include <sstream>
 
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 //TODO: wieder löschen
 #include <iostream>
 

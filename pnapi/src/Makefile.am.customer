@@ -12,7 +12,7 @@ libpnapi_a_SOURCES = \
 		component.h component.cc \
 		petrinet.h petrinet.cc \
 		parser.h parser.cc \
-		util.h util.cc \
+		util.h \
 		formula.h formula.cc \
 		condition.h condition.cc \
 		petrinet-reduction.cc \

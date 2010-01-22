@@ -19,6 +19,8 @@
 /* maintain line number for error reporting */
 %option yylineno
 
+%option 8bit nodefault
+
 
  /***************************************************************************** 
   * C declarations 
@@ -29,6 +31,10 @@
 #include "parser-pnml.h"
 
 #include <cstring>
+#include <cstdio>
+#include <ctype.h>
+#include <cstring>
+#include <cstdlib>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
@@ -48,83 +54,74 @@
 /* hack to overwrite YY_FATAL_ERROR behavior */
 #define fprintf(file,fmt,msg) \
    yyerror(msg);
+
+static int keep;                        /* To store start condition */
+
+static char* word(char *s)
+{
+  char *buf;
+  int i, k;
+  for (k = 0; isspace(s[k]) || s[k] == '<'; k++) ;
+  for (i = k; s[i] && ! isspace(s[i]); i++) ;
+  buf = (char*)malloc((i - k + 1) * sizeof(char));
+  strncpy(buf, &s[k], i - k);
+  buf[i - k] = '\0';
+  return buf;
+}
+
+
 %}
 
-esc       "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
-quote     \"
-string    {quote}([^"]|{esc})*{quote}
-comment   ([^-]|"-"[^-])*
-xmlheader ([^?]|"-"[^?])*
-namestart		[A-Za-z\200-\377_]
-namechar		[A-Za-z\200-\377_0-9.\-:]
-ns        {namestart}({namechar}|[/:])*":"
-text            [\040-\176]*
 
- /* start conditions of the lexer */
-%s COMMENT
-%s XMLHEADER
-%s ATTRIBUTE
+nl              (\r\n|\r|\n)
+ws              [ \t\r\n]+
+open            {nl}?"<"
+close           ">"{nl}?
+namestart       [A-Za-z\200-\377_]
+namechar        [A-Za-z\200-\377_0-9.-]
+esc             "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
+name            {namestart}{namechar}*
+data            ([^<\n&]|\n[^<&]|\n{esc}|{esc})+
+comment         {open}"!--"([^-]|"-"[^-])*"--"{close}
+string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
+version         {open}"?XML-VERSION 1.0?"{close}
+encoding        {open}"?XML-ENCODING"{ws}{name}{ws}?"?"{close}
+attdef          {open}"?XML-ATT"
+
+/*
+ * The CONTENT mode is used for the content of elements, i.e.,
+ * between the ">" and "<" of element tags.
+ * The INITIAL mode is used outside the top level element
+ * and inside markup.
+ */
+
+%s CONTENT
 
 
 %%
 
- /* XML-elements */
-"<"                      { return X_OPEN; }
-"/"                      { return X_SLASH; }
-">"                      { BEGIN(INITIAL); return X_CLOSE; }
-">"[ \t\r\n]*"<"         { BEGIN(INITIAL); return X_NEXT; }
+"<?xml version=\"1.0\" encoding=\"utf-8\"?>" {}
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" {}
+"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" {}
+"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" {}
 
- /* comments */
-"!--"                        { BEGIN(COMMENT); }
-<COMMENT>{comment}           { /* skip */ }
-<COMMENT>"-->"[ \t\r\n]*"<"  { BEGIN(INITIAL); }
+<INITIAL>{ws}           {/* skip */}
+<INITIAL>{version}      {return XVERSION;}
+<INITIAL>{encoding}     {pnapi_pnml_yylval.s = word(yytext + 14); return ENCODING;}
+<INITIAL>"/"            {return SLASH;}
+<INITIAL>"="            {return EQ;}
+<INITIAL>{close}        {BEGIN(CONTENT); return CLOSE;}
+<INITIAL>{name}         {pnapi_pnml_yylval.s = strdup(yytext); return NAME;}
+<INITIAL>{string}       {pnapi_pnml_yylval.s = strdup(yytext); return VALUE;}
+<INITIAL>"?"{close}     {BEGIN(keep); return ENDDEF;}
 
-"?"                          { BEGIN(XMLHEADER); }
-<XMLHEADER>{xmlheader}       { /* skip */ }
-<XMLHEADER>"?>"[ \t\r\n]*"<" { BEGIN(INITIAL); }
+{attdef}                {keep = YY_START; BEGIN(INITIAL); return ATTDEF;}
+{open}{ws}?{name}       {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return START;}
+{open}{ws}?"/"          {BEGIN(INITIAL); return END;}
+{comment}               {pnapi_pnml_yylval.s = strdup(yytext); return COMMENT;}
 
+<CONTENT>{data}         {pnapi_pnml_yylval.s = strdup(yytext); return DATA;}
 
-{ns}?"arc"                    { BEGIN(ATTRIBUTE); return KEY_ARC; }
-{ns}?"finalmarkings"          { BEGIN(ATTRIBUTE); return KEY_FINALMARKINGS; }
-{ns}?"initialMarking"         { BEGIN(ATTRIBUTE); return KEY_INITIALMARKING; }
-{ns}?"input"                  { BEGIN(ATTRIBUTE); return KEY_INPUT; }
-{ns}?"inscription"            { BEGIN(ATTRIBUTE); return KEY_INSCRIPTION; }
-{ns}?"marking"                { BEGIN(ATTRIBUTE); return KEY_MARKING; }
-{ns}?"module"                 { BEGIN(ATTRIBUTE); return KEY_MODULE; }
-{ns}?"name"                   { BEGIN(ATTRIBUTE); return KEY_NAME; }
-{ns}?"net"                    { BEGIN(ATTRIBUTE); return KEY_NET; }
-{ns}?"output"                 { BEGIN(ATTRIBUTE); return KEY_OUTPUT; }
-{ns}?"place"                  { BEGIN(ATTRIBUTE); return KEY_PLACE; }
-{ns}?"pnml"                   { BEGIN(ATTRIBUTE); return KEY_PNML; }
-{ns}?"port"                   { BEGIN(ATTRIBUTE); return KEY_PORT; }
-{ns}?"ports"                  { BEGIN(ATTRIBUTE); return KEY_PORTS; }
-{ns}?"receive"                { BEGIN(ATTRIBUTE); return KEY_RECEIVE; }
-{ns}?"send"                   { BEGIN(ATTRIBUTE); return KEY_SEND; }
-{ns}?"synchronize"            { BEGIN(ATTRIBUTE); return KEY_SYNCHRONIZE; }
-{ns}?"synchronous"            { BEGIN(ATTRIBUTE); return KEY_SYNCHRONOUS; }
-{ns}?"text"                   { BEGIN(ATTRIBUTE); return KEY_TEXT; }
-{ns}?"transition"             { BEGIN(ATTRIBUTE); return KEY_TRANSITION; }
-{ns}?"value"                  { BEGIN(ATTRIBUTE); return KEY_VALUE; }
+.                       {yyerror("lexial error");}
+{nl}                    {/* skip, must be an extra one at EOF */;}
 
-
- /* attributes */
-<ATTRIBUTE>"="           { return X_EQUALS; }
-<ATTRIBUTE>{string}      { pnapi_pnml_yylval.yt_str = strdup(yytext);
-                           // strip the quotes
-                           pnapi_pnml_yylval.yt_str[strlen(yytext)-1] = 0;
-                           pnapi_pnml_yylval.yt_str++;
-                           return X_STRING; }
-
-[a-zA-Z0-9]+"."[0-9]+ { pnapi_pnml_yylval.yt_str = strdup(yytext); return IDENT; }
-[a-zA-Z0-9]+".["[^\]]*"]" { pnapi_pnml_yylval.yt_str = strdup(yytext); return IDENT; }
-
-[a-zA-Z0-9.]+             { pnapi_pnml_yylval.yt_str = strdup(yytext); return IDENT; }
-
-
- /* whitespace */
-[ \n\r\t]                { /* skip */ }
-
- /* anything else */
-.                        { yyerror("unexpected lexical token"); }
-
-%%

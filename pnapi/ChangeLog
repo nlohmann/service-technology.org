@@ -22,7 +22,10 @@ Version 3.01-unreleased
 
 * reimplemented normalize() according to [LohmannMW_2007_icatpn]
 
-* implemented PNML import and export
+* implemented PNML import and export based on the code of
+  `http://www.w3.org/XML/9707/XML-in-C'
+
+* ensured compliance to Gnits
 
 Version 3.00 (2009-11-03)
 =========================

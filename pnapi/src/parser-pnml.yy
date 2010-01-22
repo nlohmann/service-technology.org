@@ -20,7 +20,10 @@
 %{
 #include "parser.h"
 #include <string>
+#include <cstring>
 #include <sstream>
+#include <map>
+#include <vector>
 
 #undef yylex
 #undef yyparse
@@ -34,12 +37,203 @@
 using namespace pnapi;
 using namespace pnapi::parser::pnml;
 
-#include <map>
-#include <set>
-#include <string>
-std::map<std::string, std::string> currentAttributes;
-pnapi::Transition *currentTransition;
+std::map<unsigned int, std::map<std::string, std::string> > attributes;
+
+ /* we only care about these elements */
+const char* whitelist[] = {"pnml", "net", "arc", "place", "transition", "inscription", "initialMarking", "annotation", "text", "module", "ports", "port", "input", "output", "synchronous", "receive", "send", "synchronize", "finalmarkings", "marking", "page", NULL };
+enum elementTypes {
+    T_PNML,
+    T_NET, T_ARC, T_PLACE, T_TRANSITION, T_INSCRIPTION,
+    T_INITIALMARKING, T_ANNOTATION, T_TEXT, T_MODULE, T_PORTS,
+    T_PORT, T_INPUT, T_OUTPUT, T_SYNCHRONOUS, T_RECEIVE,
+    T_SEND, T_SYNCHRONIZE, T_FINALMARKINGS, T_MARKING, T_PAGE,
+    T_NONE };
+
 pnapi::Marking* currentMarking;
+
+unsigned int current_depth = 0;
+unsigned int last_interesting_depth = 0;
+bool ignoring = false;
+unsigned int file_part = T_NONE;
+std::vector<unsigned int> elementStack;
+
+bool is_whitelisted(char *s) {
+    unsigned int i = 0;
+    while (whitelist[i]) {
+        if (!strcmp(s, whitelist[i++])) {
+
+            // remember which part of the net we are parsing
+            switch(i-1) {
+                case T_PORTS:
+                case T_NET:
+                case T_FINALMARKINGS:
+                    file_part = i-1;
+                    break;
+                case T_MARKING:
+                    currentMarking = new pnapi::Marking(pnapi_pnml_yynet);
+                    break;
+            }
+            
+            elementStack.push_back(i-1);
+            return true;
+        }
+    }
+    return false;
+}
+
+void open_element(char *s) {    
+    // first check if this element is whitelisted
+    if (!ignoring && !is_whitelisted(s)) {
+        // element is blacklistet -- remember this!
+        last_interesting_depth = current_depth;
+        ignoring = true;
+    }
+
+    // we traverse a new element
+    ++current_depth;
+    attributes[current_depth].clear();
+}
+
+void close_element() {
+    unsigned int myType = T_NONE;
+    
+    if (!ignoring) {
+        myType = elementStack[elementStack.size()-1];
+        elementStack.pop_back();
+    }
+
+    if (file_part == T_PORTS) {
+        switch(myType) {
+            case(T_INPUT): {
+                pnapi_pnml_yynet.createPlace(attributes[current_depth]["id"], Node::INPUT);
+                break;
+            }
+            case(T_OUTPUT): {
+                pnapi_pnml_yynet.createPlace(attributes[current_depth]["id"], Node::OUTPUT);
+                break;
+            }
+            case(T_SYNCHRONOUS): {
+                pnapi_pnml_yynet.addSynchronousLabel(attributes[current_depth]["id"]);
+                break;
+            }
+        }
+    }
+
+    if (file_part == T_NET) {
+        switch(myType) {
+            case(T_PLACE): {
+                //printf("creating place %s\n", attributes[current_depth]["id"].c_str());
+                pnapi_pnml_yynet.createPlace(attributes[current_depth]["id"], Node::INTERNAL, atoi(attributes[current_depth]["__initialMarking__"].c_str()));
+                break;
+            }
+            case(T_TRANSITION): {
+                //printf("creating transition %s\n", attributes[current_depth]["id"].c_str());
+                pnapi::Transition *currentTransition = &pnapi_pnml_yynet.createTransition(attributes[current_depth]["id"]);
+
+                if (!attributes[current_depth]["__send__"].empty()) {
+                    Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["__send__"]);
+                    pnapi_pnml_yynet.createArc(*currentTransition, *target);
+                }
+                if (!attributes[current_depth]["__receive__"].empty()) {
+                    Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["__receive__"]);
+                    pnapi_pnml_yynet.createArc(*target, *currentTransition);
+                }
+                if (!attributes[current_depth]["__synchronize__"].empty()) {
+                    std::set<std::string> labels = currentTransition->getSynchronizeLabels();
+                    labels.insert(attributes[current_depth]["__synchronize__"]);
+                    currentTransition->setSynchronizeLabels(labels);
+                }
+                break;
+            }
+            case(T_ARC): {
+                //printf("creating arc %s\n", attributes[current_depth]["id"].c_str());
+                Node *source = pnapi_pnml_yynet.findNode(attributes[current_depth]["source"]);
+                Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["target"]);
+                unsigned int weight = (attributes[current_depth]["__inscription__"].empty()) ? 1 : atoi(attributes[current_depth]["__inscription__"].c_str());
+                pnapi_pnml_yynet.createArc(*source, *target, weight);
+                break;
+            }
+            case(T_TEXT): {
+                // check the parent
+                if (elementStack[elementStack.size()-1] == T_INITIALMARKING) {
+                    // store data as parent's attribute
+                    attributes[current_depth-2]["__initialMarking__"] = attributes[current_depth]["__data__"];
+                }
+                if (elementStack[elementStack.size()-1] == T_INSCRIPTION) {
+                    // store data as parent's attribute
+                    attributes[current_depth-2]["__inscription__"] = attributes[current_depth]["__data__"];
+                }
+                break;
+            }
+            case(T_RECEIVE): {
+                if (elementStack[elementStack.size()-1] == T_TRANSITION) {
+                    attributes[current_depth-1]["__receive__"] = attributes[current_depth]["id"];
+                }
+                break;
+            }
+            case(T_SEND): {
+                if (elementStack[elementStack.size()-1] == T_TRANSITION) {
+                    attributes[current_depth-1]["__send__"] = attributes[current_depth]["id"];
+                }
+                break;
+            }
+            case(T_SYNCHRONIZE): {
+                if (elementStack[elementStack.size()-1] == T_TRANSITION) {
+                    attributes[current_depth-1]["__synchronize__"] = attributes[current_depth]["id"];
+                }
+                break;
+            }
+        }
+    }
+
+    if (file_part == T_FINALMARKINGS) {
+        switch(myType) {
+            case(T_MARKING): {
+                pnapi_pnml_yynet.finalCondition().addMarking(*currentMarking);
+                delete currentMarking;
+                break;
+            }
+            
+            case(T_PLACE): {
+                unsigned int tokens = atoi(attributes[current_depth]["__finalMarking__"].c_str());
+                Node *place = pnapi_pnml_yynet.findNode(attributes[current_depth]["id"]);
+                (*currentMarking)[(const pnapi::Place&)*place] = tokens;
+            }
+            
+            case(T_TEXT): {
+                // check the parent
+                if (elementStack[elementStack.size()-1] == T_PLACE) {
+                    // store data as parent's attribute
+                    attributes[current_depth-1]["__finalMarking__"] = attributes[current_depth]["__data__"];
+                }
+            }
+            break;
+        }
+    }
+
+    --current_depth;
+
+    // return form ignoring elements
+    if (current_depth == last_interesting_depth) {
+        last_interesting_depth = 0;
+        ignoring = false;
+    }
+}
+
+void store_attributes(char *a1, char *a2) {
+    if (!ignoring) {
+        // store attribute (strip quotes from a2)
+        attributes[current_depth][a1] = std::string(a2).substr(1, strlen(a2)-2);
+    }
+}
+
+void store_data(char *s) {
+    if (!ignoring) {
+        // store current data as attribute of surrouding element
+        attributes[current_depth]["__data__"] = s;
+    }
+}
+
 %}
 
 
@@ -47,26 +241,11 @@ pnapi::Marking* currentMarking;
   * types, tokens, start symbol
   ****************************************************************************/
 
-%token X_OPEN X_SLASH X_CLOSE X_NEXT X_STRING X_EQUALS
-%token IDENT
-%token KEY_PNML KEY_MODULE KEY_PORT KEY_PORTS KEY_NET KEY_TEXT KEY_PLACE
-%token KEY_INITIALMARKING KEY_TRANSITION KEY_ARC KEY_FINALMARKINGS KEY_MARKING
-%token KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS KEY_SEND KEY_RECEIVE KEY_SYNCHRONIZE
-%token KEY_NAME KEY_VALUE KEY_INSCRIPTION
+%union {char *s;}
 
-%union
-{
-  int yt_int;
-  char * yt_str;
-}
-
-%type <yt_int> initialmarking
-%type <yt_int> inscription
-%type <yt_str> text
-%type <yt_str> IDENT
-%type <yt_str> X_STRING
-
-%start petrinet
+%token XVERSION ATTDEF ENDDEF EQ SLASH CLOSE END
+%token <s> ENCODING NAME VALUE DATA COMMENT START
+%type <s> name_opt
 
 
  /*****************************************************************************
@@ -74,183 +253,54 @@ pnapi::Marking* currentMarking;
   ****************************************************************************/
 %%
 
-petrinet:
-  X_OPEN KEY_PNML arbitraryAttributes X_NEXT module X_SLASH KEY_PNML X_CLOSE
-| X_OPEN KEY_PNML arbitraryAttributes X_NEXT net X_SLASH KEY_PNML X_CLOSE
+document:
+  prolog element misc_seq_opt
 ;
-
-module:
-  KEY_MODULE arbitraryAttributes X_NEXT ports net finalmarkings X_SLASH KEY_MODULE X_NEXT
+prolog:
+  version_opt encoding_opt misc_seq_opt
 ;
-
-ports:
-  KEY_PORTS arbitraryAttributes X_NEXT port_list X_SLASH KEY_PORTS X_NEXT
+version_opt:
+  XVERSION
+| /*empty*/
 ;
-
-port_list:
-  /* empty */
-| port_list port
+encoding_opt:
+  ENCODING                           {free($1);}
+| /*empty*/
 ;
-
-port:
-  KEY_PORT arbitraryAttributes X_NEXT channels X_SLASH KEY_PORT X_NEXT
+misc_seq_opt:
+  misc_seq_opt misc
+| /*empty*/
 ;
-
-channels:
-  /* empty */
-| input_channel channels
-| output_channel channels
-| synchronous_channel channels
+misc:
+  COMMENT
+| attribute_decl
 ;
-
-input_channel:
-  KEY_INPUT arbitraryAttributes X_SLASH X_NEXT
-    { pnapi_pnml_yynet.createPlace(currentAttributes["id"], Node::INPUT);
-      currentAttributes.clear(); }
+attribute_decl:
+  ATTDEF NAME attribute_seq_opt ENDDEF
 ;
-
-output_channel:
-  KEY_OUTPUT arbitraryAttributes X_SLASH X_NEXT
-    { pnapi_pnml_yynet.createPlace(currentAttributes["id"], Node::OUTPUT);
-      currentAttributes.clear(); }
+element:
+  START                              {open_element($1); free($1);}
+  attribute_seq_opt empty_or_content
 ;
-
-synchronous_channel:
-  KEY_SYNCHRONOUS arbitraryAttributes X_SLASH X_NEXT
-    { pnapi_pnml_yynet.addSynchronousLabel(currentAttributes["id"]);
-      currentAttributes.clear(); }
+empty_or_content:
+  SLASH CLOSE                        {close_element();}
+| CLOSE content END name_opt CLOSE   {close_element();}
 ;
-
-net:
-  KEY_NET arbitraryAttributes X_NEXT nodes name X_SLASH KEY_NET X_NEXT
+content:
+  content DATA                       {store_data($2);}
+| content misc
+| content element
+| /*empty*/
 ;
-
-nodes:
-  /* empty */
-| nodes node
+name_opt:
+  NAME                               {$$ = $1;}
+| /*empty*/                          {$$ = strdup("");}
 ;
-
-node:
-  place
-| transition
-| arc
+attribute_seq_opt:
+  attribute_seq_opt attribute
+| /*empty*/
 ;
-
-place:
-  KEY_PLACE arbitraryAttributes X_NEXT name initialmarking X_SLASH KEY_PLACE X_NEXT
-    { pnapi_pnml_yynet.createPlace(currentAttributes["id"], Node::INTERNAL, $5);
-      currentAttributes.clear(); }
-| KEY_PLACE arbitraryAttributes X_SLASH X_NEXT
-    { pnapi_pnml_yynet.createPlace(currentAttributes["id"]);
-      currentAttributes.clear(); }
-;
-
-initialmarking:
-  /* empty */
-    { $$ = 0; }
-| KEY_INITIALMARKING arbitraryAttributes X_NEXT text X_SLASH KEY_INITIALMARKING X_NEXT
-    { $$ = atoi($4); }
-;
-
-name:
-  /* empty */
-| KEY_NAME arbitraryAttributes X_NEXT text X_SLASH KEY_NAME X_NEXT
-;
-
-text:
-  KEY_TEXT arbitraryAttributes X_CLOSE IDENT X_OPEN X_SLASH KEY_TEXT X_NEXT
-    { $$ = $4; }
-| KEY_TEXT arbitraryAttributes X_SLASH X_NEXT
-    { $$ = 0; }
-;
-
-transition:
-  KEY_TRANSITION arbitraryAttributes X_SLASH X_NEXT
-    { pnapi_pnml_yynet.createTransition(currentAttributes["id"]);
-      currentAttributes.clear(); }
-| KEY_TRANSITION arbitraryAttributes X_NEXT
-    { currentTransition = &pnapi_pnml_yynet.createTransition(currentAttributes["id"]);
-      currentAttributes.clear(); }
-  events X_SLASH KEY_TRANSITION X_NEXT
-;
-
-events:
-  /* empty */
-| event events
-;
-
-event:
-  KEY_RECEIVE arbitraryAttributes X_SLASH X_NEXT
-    { Node *source = pnapi_pnml_yynet.findNode(currentAttributes["id"]);
-      pnapi_pnml_yynet.createArc(*source, *currentTransition);
-      currentAttributes.clear(); }
-| KEY_SEND arbitraryAttributes X_SLASH X_NEXT
-    { Node *target = pnapi_pnml_yynet.findNode(currentAttributes["id"]);
-      pnapi_pnml_yynet.createArc(*currentTransition, *target);
-      currentAttributes.clear(); }
-| KEY_SYNCHRONIZE arbitraryAttributes X_SLASH X_NEXT
-    { std::set<std::string> labels = currentTransition->getSynchronizeLabels();
-      labels.insert(currentAttributes["id"]);
-      currentTransition->setSynchronizeLabels(labels);
-      currentAttributes.clear(); }
-| KEY_NAME X_NEXT value text X_SLASH KEY_NAME X_NEXT
-;
-
-arc:
-  KEY_ARC arbitraryAttributes X_SLASH X_NEXT
-    { Node *source = pnapi_pnml_yynet.findNode(currentAttributes["source"]);
-      Node *target = pnapi_pnml_yynet.findNode(currentAttributes["target"]);
-      pnapi_pnml_yynet.createArc(*source, *target);
-      currentAttributes.clear(); }
-| KEY_ARC arbitraryAttributes X_NEXT inscription X_SLASH KEY_ARC X_NEXT
-    { Node *source = pnapi_pnml_yynet.findNode(currentAttributes["source"]);
-      Node *target = pnapi_pnml_yynet.findNode(currentAttributes["target"]);
-      pnapi_pnml_yynet.createArc(*source, *target, $4);
-      currentAttributes.clear(); }
-;
-
-inscription:
-  KEY_INSCRIPTION arbitraryAttributes X_NEXT value text X_SLASH KEY_INSCRIPTION X_NEXT
-    { $$ = atoi($5); }
-;
-
-value:
-  /* empty */
-| KEY_VALUE arbitraryAttributes X_SLASH X_NEXT
-| KEY_VALUE arbitraryAttributes X_CLOSE IDENT X_OPEN X_SLASH KEY_VALUE X_NEXT
-;
-
-finalmarkings:
-  KEY_FINALMARKINGS arbitraryAttributes X_NEXT markings X_SLASH KEY_FINALMARKINGS X_NEXT
-;
-
-markings:
-  /* empty */
-| markings marking
-;
-
-marking:
-  KEY_MARKING arbitraryAttributes X_NEXT
-    { currentMarking = new pnapi::Marking(pnapi_pnml_yynet); }
-  mappings X_SLASH KEY_MARKING X_NEXT
-    { pnapi_pnml_yynet.finalCondition().addMarking(*currentMarking);
-        delete currentMarking;
-      currentAttributes.clear(); }
-;
-
-mappings:
-  /* empty */
-| mappings mapping
-;
-
-mapping:
-  KEY_PLACE arbitraryAttributes X_NEXT text X_SLASH KEY_PLACE X_NEXT
-    { Node *place = pnapi_pnml_yynet.findNode(currentAttributes["id"]);
-      (*currentMarking)[(const pnapi::Place&)*place] = atoi($4);
-      currentAttributes.clear(); }
-;
-
-arbitraryAttributes:
-  /* empty */
-| IDENT X_EQUALS X_STRING { currentAttributes[$1] = $3; } arbitraryAttributes
+attribute:
+  NAME                               { free($1);}
+| NAME EQ VALUE                      { store_attributes($1, $3); free($1); free($3);}
 ;

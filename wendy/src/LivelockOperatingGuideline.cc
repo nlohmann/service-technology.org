@@ -564,8 +564,10 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 
         CompositeMarkingsHandler::addClause(booleanClause);
 
+        ++stats.numberOfTSCCInSCSs;
+
         // statistics output
-        if (args_info.reportFrequency_arg and ++stats.numberOfTSCCInSCSs % args_info.reportFrequency_arg == 0) {
+        if (args_info.reportFrequency_arg and stats.numberOfTSCCInSCSs % args_info.reportFrequency_arg == 0) {
             message("%8d TSCCs within SCSs", stats.numberOfTSCCInSCSs);
         }
     }
@@ -581,22 +583,28 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 */
 void LivelockOperatingGuideline::generateLLOG() {
 
-    // operating guideline and the reachability graph of the inner do not contain any cycles
+    // operating guideline does not contain any cycles
     if (StoredKnowledge::stats.numberOfNonTrivialSCCs == 0) {
+        // the reachability graph of the inner contains cycles, so consider each knowledge as a trivial SCS
         if (not InnerMarking::is_acyclic) {
-            std::set<StoredKnowledge* > SCS;
+            for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
+                                                             iter != StoredKnowledge::seen.end();
+                                                             ++iter) {
 
-            for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin(); iter != StoredKnowledge::seen.end(); ++iter) {
-
+                // create trivial SCS containing only the current knowledge
+                std::set<StoredKnowledge* > SCS;
                 SCS.insert(*iter);
+
+                // stays empty
                 SetOfEdges setOfEdges;
 
                 calculateTSCCInKnowledgeSet(SCS, setOfEdges);
-
-                SCS.clear();
             }
         }
+        // if the inner does not contain any cycles, we do not have to do anything
+
         LivelockOperatingGuideline::stats.numberOfSCSs = StoredKnowledge::seen.size();
+
         return ;
     }
 

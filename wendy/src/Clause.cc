@@ -26,6 +26,32 @@
 #include "StoredKnowledge.h"
 
 
+/************************
+ * Class FinalKnowledge *
+ ************************/
+
+/*!
+     constructor
+     \param _knowledge final knowledge to be stored
+*/
+FinalKnowledge::FinalKnowledge(const StoredKnowledge* _knowledge) : knowledge(_knowledge) {
+
+}
+
+
+/*!
+     destructor
+*/
+FinalKnowledge::~FinalKnowledge() {
+
+}
+
+
+/******************
+ * Class Clause   *
+ ******************/
+
+
 /******************
  * STATIC MEMBERS *
  ******************/
@@ -51,9 +77,9 @@ void Clause::initialize() {
 }
 
 
-/***************
- * CONSTRUCTOR *
- ***************/
+/***************************
+ * CONSTRUCTOR, DESTRUCTOR *
+ ***************************/
 
 /*
   \brief all values are initialized with 0
@@ -109,8 +135,7 @@ void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
         }
     }
 
-    FinalKnowledge * finalKnowledge = new FinalKnowledge();
-    finalKnowledge->knowledge = _finalKnowledge;
+    FinalKnowledge * finalKnowledge = new FinalKnowledge(_finalKnowledge);
 
     // store the given knowledge
     finalKnowledges[numberOfFinalKnowledges] = finalKnowledge;

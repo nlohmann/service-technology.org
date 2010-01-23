@@ -1151,12 +1151,21 @@ AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 571" stder
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 
-AT_SETUP([Generic (more than one final literal)])
+AT_SETUP([More than one final literal])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/moreThanOneFinalLiteral.owfn .])
 AT_CHECK([WENDY moreThanOneFinalLiteral.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 5" stderr])
 AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 5" stderr])
+AT_KEYWORDS(livelock-freedom og)
+AT_CLEANUP
+
+AT_SETUP([Inner cyclic, MPP acyclic])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/innerCyclicMPPacyclic.owfn .])
+AT_CHECK([WENDY innerCyclicMPPacyclic.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 2" stderr])
+AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2" stderr])
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 

@@ -32,7 +32,15 @@ class StoredKnowledge;
  sort of dummy class to hold a const pointer, which we need in Clause to store a pointer to a final knowledge
 */
 class FinalKnowledge {
-    public:
+    public: /* member functios */
+
+        /// constructor
+        FinalKnowledge(const StoredKnowledge* _knowledge);
+
+        /// destructor
+        ~FinalKnowledge();
+
+    public: /* member attributes */
         const StoredKnowledge* knowledge;
 };
 

@@ -70,14 +70,24 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
                                     Clause * booleanClause,
                                     bool & emptyClause) {
 
-    std::set<Label_ID> edges = (*setOfEdges.find(storedKnowledge)).second;
+    // edges that belong to the stored knowledge
+    std::set<Label_ID> edges;
+
+    // if the setOfEdges is empty, we ignore it ;-)
+    bool useEdges = false;
+
+    // otherwise, we store the set of edges belonging to the stored knowledge
+    if (not setOfEdges.empty()) {
+        edges = (*setOfEdges.find(storedKnowledge)).second;
+        useEdges = true;
+    }
 
     // receiving event
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         // receiving event resolves deadlock
         if (interface->marked(l) and
             (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
-                    edges.find(l-1) == edges.end()) and
+                    (useEdges and edges.find(l-1) == edges.end())) and
             storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
             storedKnowledge->successors[l-1]->is_sane) {
 
@@ -91,7 +101,7 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
         // synchronous communication resolves deadlock
         if (InnerMarking::synchs[l].find(innerMarking_ID) != InnerMarking::synchs[l].end() and
                 (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
-                        edges.find(l-1) == edges.end()) and
+                        (useEdges and edges.find(l-1) == edges.end())) and
                 storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
                 storedKnowledge->successors[l-1]->is_sane) {
 
@@ -103,7 +113,7 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if ((knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end()  or
-                edges.find(l-1) == edges.end()) and
+                (useEdges and edges.find(l-1) == edges.end())) and
                 storedKnowledge->successors[l-1] != NULL and
                 storedKnowledge->successors[l-1]->is_sane) {
 

@@ -3,6 +3,7 @@
 
 #include <map>
 #include "Node.h"
+#include "Formula.h"
 #include "types.h"
 #include <iostream>
 
@@ -20,6 +21,8 @@ class Graph {
         /// prints the global Formula of the complement (it is required that makeTotal and makeComplete was executed before)
         void printGlobalFormulaForComplement(ostream& o) const;
         void printGlobalFormula(ostream& o) const;
+        Node* getNode(Formula *f);
+        bool formulaFounded(Formula *f, Formula *g);
 
     public:
         /// the nodes indexed by an identifier
@@ -48,7 +51,6 @@ class Graph {
 
         /// Graphviz dot output
         void toDot(FILE* out, string title = "") const;
-       // void toDot(string filename, string title = "") const;
 
         /// Graph output
         void print(ostream& o) const;

@@ -24,4 +24,6 @@ list<Clause> xEqualsTrue(int x);
 list<Clause> xEqualsFalse(int x);
 list<Clause> xEqualsI(int x, int i);
 
+void printClause(const Clause& cl);
+
 #endif

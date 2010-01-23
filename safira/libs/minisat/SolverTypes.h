@@ -97,6 +97,7 @@ const lbool l_Undef = toLbool( 0);
 //=================================================================================================
 // Clause -- a simple class for representing a clause:
 
+namespace libminisat {
 
 class Clause {
     uint32_t size_etc;
@@ -146,6 +147,7 @@ public:
     void         strengthen  (Lit p);
 };
 
+}
 
 /*_________________________________________________________________________________________________
 |
@@ -160,7 +162,7 @@ public:
 |       lit_Undef  - Clause subsumes 'other'
 |       p          - The literal p can be deleted from 'other'
 |________________________________________________________________________________________________@*/
-inline Lit Clause::subsumes(const Clause& other) const
+inline Lit libminisat::Clause::subsumes(const Clause& other) const
 {
     if (other.size() < size() || (extra.abst & ~other.extra.abst) != 0)
         return lit_Error;
@@ -188,7 +190,7 @@ inline Lit Clause::subsumes(const Clause& other) const
 }
 
 
-inline void Clause::strengthen(Lit p)
+inline void libminisat::Clause::strengthen(Lit p)
 {
     remove(*this, p);
     calcAbstraction();

@@ -29,6 +29,11 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 using std::vector;
 
 #include "Solver.h"
+#include "SolverTypes.h"
+#include <cstdio>
+
+#include <bitset>
+#include <vector>
 
 /*************************************************************************************/
 #ifdef _MSC_VER
@@ -135,7 +140,7 @@ static int parseInt(B& in) {
 //template<class B>
 //static void readClause(B& in, Solver& S, vec<Lit>& lits) {
 static void readClause(vector< int > &  in, Solver& S, vec<Lit>& lits) {
-    int     parsed_lit, var;
+    int     parsed_lit, var1;
     lits.clear();
 
     int i = 0;
@@ -143,9 +148,10 @@ static void readClause(vector< int > &  in, Solver& S, vec<Lit>& lits) {
     {
         parsed_lit = in[i];
         if (parsed_lit == 0) break;
-        var = abs(parsed_lit) - 1;
-        while (var >= S.nVars()) S.newVar();
-        lits.push( (parsed_lit > 0) ? Lit(var) : ~Lit(var) );
+        var1 = abs(parsed_lit) - 1;
+        while (var1 >= S.nVars()) S.newVar();
+        Lit l = Lit(var1);
+        lits.push( (parsed_lit > 0) ? Lit(var1) : ~Lit(var1) );
         ++i;
     }
 /*
@@ -250,10 +256,10 @@ const char* hasPrefix(const char* str, const char* prefix)
 int minisat(vector< vector< int > > & in)
 {
   //assert(in);
-  
+
     Solver      S;
     S.verbosity = 1;
- 
+
 #if defined(__linux__)
     fpu_control_t oldcw, newcw;
     _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
@@ -273,4 +279,47 @@ int minisat(vector< vector< int > > & in)
     }
 
     return S.solve(); // result of SOLVE
+}
+
+vector<bool>* minisat2(vector< vector< int > > & in)
+{
+  //assert(in);
+
+    Solver* S = new Solver();
+    S->verbosity = 1;
+
+#if defined(__linux__)
+    fpu_control_t oldcw, newcw;
+    _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
+    reportf("WARNING: for repeatability, setting FPU to use double precision\n");
+#endif
+    double cpu_time = cpuTime();
+
+    solver = S;
+    signal(SIGINT,SIGINT_handler);
+    signal(SIGHUP,SIGINT_handler);
+
+    parse_DIMACS_main(in, *S);
+    //gzclose(in);
+
+
+
+    if (!S->simplify()){
+        return NULL; // UNSAT
+    }
+
+    if(S->solve()){  //if there is a satisfying assignment
+    	vector<bool> *assignment = new vector<bool>(S->model.size());
+    	//printf("\nerfuellende Belegung: ");
+    	for(unsigned int i = 0; i < S->model.size(); ++i) {
+    		//printf("%d  ", toInt(S->model[i]));
+    		assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
+    	}
+    	//printf("\n");
+    	return assignment;
+    }
+    else {
+    	return NULL;
+    }
+
 }

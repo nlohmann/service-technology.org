@@ -33,7 +33,7 @@ Node::~Node() {
 	delete[] outEdges;
 }
 
-/// add an outoing edge to the node
+/// add an outpoing edge to the node
 void Node::addEdge(int label, Node *target) {
 	assert(target);
 	//assert(label <= label2id.size()-1);

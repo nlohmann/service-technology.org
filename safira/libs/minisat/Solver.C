@@ -21,6 +21,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "Sort.h"
 #include <cmath>
 
+using namespace libminisat;
 
 //=================================================================================================
 // Constructor/Destructor:
@@ -114,7 +115,7 @@ bool Solver::addClause(vec<Lit>& ps)
         uncheckedEnqueue(ps[0]);
         return ok = (propagate() == NULL);
     }else{
-        Clause* c = Clause_new(ps, false);
+        libminisat::Clause* c = libminisat::Clause_new(ps, false);
         clauses.push(c);
         attachClause(*c);
     }

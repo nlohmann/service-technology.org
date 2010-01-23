@@ -14,6 +14,8 @@
 #include "time.h"
 #include "Output.h"
 
+#include "Formula.h"
+
 /// the command line parameters
 gengetopt_args_info args_info;
 

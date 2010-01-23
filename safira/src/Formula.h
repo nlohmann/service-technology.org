@@ -14,6 +14,7 @@ class Formula {
 private:
 	/// measures the time needed by minisat
 	static double full_time;
+	vector<vector<int> > clausesVector;
 
 public:
 

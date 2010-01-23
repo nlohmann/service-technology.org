@@ -13,6 +13,7 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
 
 safira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
 
+#safira_CPPFLAGS = -I$(top_srcdir)/libs/minisat
 
 check_PROGRAMS = testsafira
 

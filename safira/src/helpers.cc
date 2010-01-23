@@ -209,3 +209,7 @@ list<Clause> tripleOR(int x, int l, int r){
 
 	return clauses;
 }
+
+//void printClause(const Clause& cl){
+//	cout << "Clausel: " << cl.literal0 << ", " << cl.literal1 << ", " << cl.literal2 << endl;
+//}

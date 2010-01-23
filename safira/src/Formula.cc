@@ -14,12 +14,13 @@
 #include "helpers.h"
 #include "cmdline.h"
 #include "verbose.h"
+#include "vector"
 
 #include "testFormula.h"
 
 /// the old "main()" of Minisat with adjusted exit codes
-//extern int minisat(gzFile);//, vector<vector<int> >&);
-extern int minisat(vector< vector <int> > &);//, vector<vector<int> >&);
+extern vector<bool>* minisat2(vector< vector <int> > &);
+extern int minisat(vector< vector <int> > &);
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -33,12 +34,13 @@ double Formula::full_time;
  * constructors
  ***************************************************************************/
 Formula::Formula() : formulaType(UNDEF){
-
+	//cout << "Konstruktor: Formula" << endl;
 }
 
 FormulaAND::FormulaAND(const Formula *_left, const Formula *_right) :
     left(_left), right(_right)
 {
+	//cout << "Konstruktor: FormulaAnd" << endl;
     assert(_left);
     assert(_right);
     formulaType = AND;
@@ -66,6 +68,7 @@ FormulaLit::FormulaLit(const int _number) :
 
 FormulaNUM::FormulaNUM(const int _number) :
     number(_number) {
+	//cout << "Konstruktor: FormulaNUM" << endl;
 	formulaType = INT;
 }
 
@@ -199,8 +202,6 @@ list<Clause> Formula::calculateCNF(){
 	assert(clauses.size() >= 1);
 
 	//append the cl to clauses
-//	list<Clause>::iterator iter = clauses.begin();
-//	clauses.splice(iter, c);
 	clauses.push_front(cl);
 
 	delete h;
@@ -210,10 +211,7 @@ list<Clause> Formula::calculateCNF(){
 
 
 bool Formula::isSatisfiable(){
- //   Formula* h = moveNegation();
- //   list<Clause> clauses = h->toCNF(fVar+1,fVar+1);
- //   delete h;
-
+	//cout << toString() << endl;
 	list<Clause> clauses = calculateCNF();
     vector<vector<int> > clausesVector;
 
@@ -224,23 +222,16 @@ bool Formula::isSatisfiable(){
         clausesVector.push_back(currentClause);
     }
 
+//	clock_t start_clock = clock();
+    vector<bool> *assignment = minisat2(clausesVector);
+//	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
-//    for(unsigned int i = 0; i < clausesVector.size(); ++i) {
-//        for(unsigned j = 0; j < clausesVector[i].size(); ++j) {
-//            printf("%d ", clausesVector[i][j]);
-//        }
-//    }
-
-
-//    clock_t start_clock = clock();
-
-//    gzFile in = gzopen("foo", "rb");;
-    int result = minisat(clausesVector);//, clausesVector);
-//    remove("foo");
-
-//    full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
-
-    return result;
+    if(assignment){
+    	return true;
+    }
+    else {
+    	return false;
+    }
 }
 
 

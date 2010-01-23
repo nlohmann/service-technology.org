@@ -28,7 +28,6 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #include "SolverTypes.h"
 
-
 //=================================================================================================
 // Solver -- the main class:
 
@@ -114,18 +113,18 @@ protected:
     // Solver state:
     //
     bool                ok;               // If FALSE, the constraints are already unsatisfiable. No part of the solver state may be used!
-    vec<Clause*>        clauses;          // List of problem clauses.
-    vec<Clause*>        learnts;          // List of learnt clauses.
+    vec<libminisat::Clause*>        clauses;          // List of problem clauses.
+    vec<libminisat::Clause*>        learnts;          // List of learnt clauses.
     double              cla_inc;          // Amount to bump next clause with.
     vec<double>         activity;         // A heuristic measurement of the activity of a variable.
     double              var_inc;          // Amount to bump next variable with.
-    vec<vec<Clause*> >  watches;          // 'watches[lit]' is a list of constraints watching 'lit' (will go there if literal becomes true).
+    vec<vec<libminisat::Clause*> >  watches;          // 'watches[lit]' is a list of constraints watching 'lit' (will go there if literal becomes true).
     vec<char>           assigns;          // The current assignments (lbool:s stored as char:s).
     vec<char>           polarity;         // The preferred polarity of each variable.
     vec<char>           decision_var;     // Declares if a variable is eligible for selection in the decision heuristic.
     vec<Lit>            trail;            // Assignment stack; stores all assigments made in the order they were made.
     vec<int>            trail_lim;        // Separator indices for different decision levels in 'trail'.
-    vec<Clause*>        reason;           // 'reason[var]' is the clause that implied the variables current value, or 'NULL' if none.
+    vec<libminisat::Clause*>        reason;           // 'reason[var]' is the clause that implied the variables current value, or 'NULL' if none.
     vec<int>            level;            // 'level[var]' contains the level at which the assignment was made.
     int                 qhead;            // Head of queue (as index into the trail -- no more explicit propagation queue in MiniSat).
     int                 simpDB_assigns;   // Number of top-level assignments since last execution of 'simplify()'.
@@ -149,31 +148,31 @@ protected:
     void     insertVarOrder   (Var x);                                                 // Insert a variable in the decision order priority queue.
     Lit      pickBranchLit    (int polarity_mode, double random_var_freq);             // Return the next decision variable.
     void     newDecisionLevel ();                                                      // Begins a new decision level.
-    void     uncheckedEnqueue (Lit p, Clause* from = NULL);                            // Enqueue a literal. Assumes value of literal is undefined.
-    bool     enqueue          (Lit p, Clause* from = NULL);                            // Test if fact 'p' contradicts current state, enqueue otherwise.
-    Clause*  propagate        ();                                                      // Perform unit propagation. Returns possibly conflicting clause.
+    void     uncheckedEnqueue (Lit p, libminisat::Clause* from = NULL);                            // Enqueue a literal. Assumes value of literal is undefined.
+    bool     enqueue          (Lit p, libminisat::Clause* from = NULL);                            // Test if fact 'p' contradicts current state, enqueue otherwise.
+    libminisat::Clause*  propagate        ();                                                      // Perform unit propagation. Returns possibly conflicting clause.
     void     cancelUntil      (int level);                                             // Backtrack until a certain level.
-    void     analyze          (Clause* confl, vec<Lit>& out_learnt, int& out_btlevel); // (bt = backtrack)
+    void     analyze          (libminisat::Clause* confl, vec<Lit>& out_learnt, int& out_btlevel); // (bt = backtrack)
     void     analyzeFinal     (Lit p, vec<Lit>& out_conflict);                         // COULD THIS BE IMPLEMENTED BY THE ORDINARIY "analyze" BY SOME REASONABLE GENERALIZATION?
     bool     litRedundant     (Lit p, uint32_t abstract_levels);                       // (helper method for 'analyze()')
     lbool    search           (int nof_conflicts, int nof_learnts);                    // Search for a given number of conflicts.
     void     reduceDB         ();                                                      // Reduce the set of learnt clauses.
-    void     removeSatisfied  (vec<Clause*>& cs);                                      // Shrink 'cs' to contain only non-satisfied clauses.
+    void     removeSatisfied  (vec<libminisat::Clause*>& cs);                                      // Shrink 'cs' to contain only non-satisfied clauses.
 
     // Maintaining Variable/Clause activity:
     //
     void     varDecayActivity ();                      // Decay all variables with the specified factor. Implemented by increasing the 'bump' value instead.
     void     varBumpActivity  (Var v);                 // Increase a variable with the current 'bump' value.
     void     claDecayActivity ();                      // Decay all clauses with the specified factor. Implemented by increasing the 'bump' value instead.
-    void     claBumpActivity  (Clause& c);             // Increase a clause with the current 'bump' value.
+    void     claBumpActivity  (libminisat::Clause& c);             // Increase a clause with the current 'bump' value.
 
     // Operations on clauses:
     //
-    void     attachClause     (Clause& c);             // Attach a clause to watcher lists.
-    void     detachClause     (Clause& c);             // Detach a clause to watcher lists.
-    void     removeClause     (Clause& c);             // Detach and free a clause.
-    bool     locked           (const Clause& c) const; // Returns TRUE if a clause is a reason for some implication in the current state.
-    bool     satisfied        (const Clause& c) const; // Returns TRUE if a clause is satisfied in the current state.
+    void     attachClause     (libminisat::Clause& c);             // Attach a clause to watcher lists.
+    void     detachClause     (libminisat::Clause& c);             // Detach a clause to watcher lists.
+    void     removeClause     (libminisat::Clause& c);             // Detach and free a clause.
+    bool     locked           (const libminisat::Clause& c) const; // Returns TRUE if a clause is a reason for some implication in the current state.
+    bool     satisfied        (const libminisat::Clause& c) const; // Returns TRUE if a clause is satisfied in the current state.
 
     // Misc:
     //
@@ -224,15 +223,15 @@ inline void Solver::varBumpActivity(Var v) {
         order_heap.decrease(v); }
 
 inline void Solver::claDecayActivity() { cla_inc *= clause_decay; }
-inline void Solver::claBumpActivity (Clause& c) {
+inline void Solver::claBumpActivity (libminisat::Clause& c) {
         if ( (c.activity() += cla_inc) > 1e20 ) {
             // Rescale:
             for (int i = 0; i < learnts.size(); i++)
                 learnts[i]->activity() *= 1e-20;
             cla_inc *= 1e-20; } }
 
-inline bool     Solver::enqueue         (Lit p, Clause* from)   { return value(p) != l_Undef ? value(p) != l_False : (uncheckedEnqueue(p, from), true); }
-inline bool     Solver::locked          (const Clause& c) const { return reason[var(c[0])] == &c && value(c[0]) == l_True; }
+inline bool     Solver::enqueue         (Lit p, libminisat::Clause* from)   { return value(p) != l_Undef ? value(p) != l_False : (uncheckedEnqueue(p, from), true); }
+inline bool     Solver::locked          (const libminisat::Clause& c) const { return reason[var(c[0])] == &c && value(c[0]) == l_True; }
 inline void     Solver::newDecisionLevel()                      { trail_lim.push(trail.size()); }
 
 inline int      Solver::decisionLevel ()      const   { return trail_lim.size(); }

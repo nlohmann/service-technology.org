@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <string>
+#include <cstring>
+#include <cstdio>
 
 using namespace pnapi;
 using std::cerr;

@@ -294,6 +294,7 @@ bool LivelockOperatingGuideline::isWaitstateInCurrentKnowledge(const InnerMarkin
    \param storedKnowledge a knowledge
    \param innerMarking an inner marking
    \param interface a pointer to an interface
+   \param foundSuccessorMarking successor marking has been found or not
    \return if the composite markings exists already, a pointer to that markings is returned; NULL if the
            composite marking specified by the parameters does not exist at all; a pointer to a new
            composite marking in case the marking has not been visited yet
@@ -386,7 +387,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
         // First step: calculate successor marking
 
         // we need to calculate the interface of the successor marking
-        InterfaceMarking* candidate_interface;
+        InterfaceMarking* candidate_interface = NULL;
 
         // if a sending or receiving transition leaves current inner marking
         if (RECEIVING(currentInner->labels[j]) or SENDING(currentInner->labels[j])) {
@@ -455,7 +456,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
             // First step: calculate successor marking
 
             // we need to calculate the interface of the successor marking
-            InterfaceMarking* candidate_interface;
+            InterfaceMarking* candidate_interface = NULL;
 
             // receive message
             if (RECEIVING(j) or SENDING(j)) {
@@ -552,17 +553,11 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 
         } while (currentMarking != poppedMarking);
 
-        // the clause of the current TSCC is empty, then it is either final or false
+        // the clause of the current TSCC is empty, then it false
         if (emptyClause) {
-
-            // is it final?
-         //   bool contains_final = booleanClause->contains_final;
 
             // delete the clause
             delete booleanClause;
-
-            // create new clause for (final) or (false)
-          //  booleanClause = contains_final ? Clause::finalClause : Clause::falseClause;
 
             booleanClause = Clause::falseClause;
         }

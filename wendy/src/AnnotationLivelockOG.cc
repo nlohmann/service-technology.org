@@ -163,7 +163,7 @@ AnnotationLivelockOG::~AnnotationLivelockOG() {
 /*!
   inserts an annotation to the queue
   \param setOfKnowledges set of knowledges the annotation belongs to
-  \param annotation set of label ids representing an annotation
+  \param annotationBoolean set of label ids representing an annotation
 */
 void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowledges,
                                 const std::vector<Clause* > & annotationBoolean) {

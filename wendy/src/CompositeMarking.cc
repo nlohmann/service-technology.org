@@ -114,7 +114,6 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
 
     // this marking is final
     if (interface->unmarked() and InnerMarking::inner_markings[innerMarking_ID]->is_final) {
-        booleanClause->contains_final = 1;
         booleanClause->addFinalKnowledge(storedKnowledge);
         emptyClause = false;
     }
@@ -129,16 +128,6 @@ bool CompositeMarking::operator== (const CompositeMarking& other) const {
 
     return true;
 }
-
-
-std::ostream& operator<< (std::ostream& o, const CompositeMarking& m) {
-    o << "[";
-
-    o << m.storedKnowledge << " m" << static_cast<unsigned int>(m.innerMarking_ID) << " " << *(m.interface) << " d: " << m.dfs << " l: " << m.lowlink;
-
-    return o << "]";
-}
-
 
 
 /***************************
@@ -193,7 +182,7 @@ CompositeMarking* CompositeMarkingsHandler::getMarking(const CompositeMarking * 
   store the given marking in the set of visited markings and set the Tarjan values of the marking to the current number of elements stored
   \param marking composite marking to be stored
 */
-bool CompositeMarkingsHandler::visitMarking(CompositeMarking * marking) {
+void CompositeMarkingsHandler::visitMarking(CompositeMarking * marking) {
 
     assert(visitedCompositeMarkings != NULL);
     assert(numberElements < maxSize);
@@ -207,7 +196,7 @@ bool CompositeMarkingsHandler::visitMarking(CompositeMarking * marking) {
 
 /*!
   adds the given string clause to the conjunction of disjunctions associated with the current set of knowledges
-  \param clause a string containing a disjunction of events
+  \param booleanClause a string containing a disjunction of events
 */
 void CompositeMarkingsHandler::addClause(Clause * booleanClause) {
 

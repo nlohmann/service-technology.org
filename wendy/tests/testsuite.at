@@ -1112,7 +1112,7 @@ AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP
 
 ############################################################################
-AT_BANNER([Livelock Operating Guideline])
+AT_BANNER([Operating Guideline for Weak Termination])
 ############################################################################
 
 AT_SETUP([ZEUS Seller Service])
@@ -1148,6 +1148,15 @@ AT_CHECK([cp TESTFILES/RS.owfn .])
 AT_CHECK([WENDY RS.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 369" stderr])
 AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 571" stderr])
+AT_KEYWORDS(livelock-freedom og)
+AT_CLEANUP
+
+AT_SETUP([Generic (more than one final literal)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/moreThanOneFinalLiteral.owfn .])
+AT_CHECK([WENDY moreThanOneFinalLiteral.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 5" stderr])
+AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 5" stderr])
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 

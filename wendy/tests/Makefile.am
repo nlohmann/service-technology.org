@@ -39,7 +39,8 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             zeus.fiona.og zeus.owfn bignode1500000.owfn \
             bug14693.owfn bug14719.owfn \
             CB.owfn CR.owfn TPO.owfn bug14782.owfn bug14798.owfn \
-            phils_3_1.owfn RS.owfn cyclicFullCoffee.pnml
+            phils_3_1.owfn RS.owfn cyclicFullCoffee.pnml \
+			moreThanOneFinalLiteral.owfn
 
 
 

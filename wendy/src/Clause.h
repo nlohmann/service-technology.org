@@ -105,12 +105,11 @@ class Clause {
         /// store the bits representing each label of the interface
         uint8_t * storage;
 
+        /// store a pointer to each final knowledge belonging to the current clause
         FinalKnowledge** finalKnowledges;
 
+        /// how many final knowledges are part of the current clause
         unsigned int numberOfFinalKnowledges;
-
-        /// reserve one bit to represent whether this clause contains literal final
-        unsigned contains_final : 1;
 
         /// this clause stores more than one literal
         unsigned more_than_one_literal : 1;

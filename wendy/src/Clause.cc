@@ -60,7 +60,7 @@ void Clause::initialize() {
   \note we assume sizeof(uint8_t) == 1
 */
 Clause::Clause()
-  : storage((uint8_t*)calloc(bytes, 1)), finalKnowledges(NULL), numberOfFinalKnowledges(0), contains_final(0), more_than_one_literal(0), decodedLabels(NULL) {
+  : storage((uint8_t*)calloc(bytes, 1)), finalKnowledges(NULL), numberOfFinalKnowledges(0), more_than_one_literal(0), decodedLabels(NULL) {
 
     assert(bytes > 0);
 }
@@ -88,7 +88,7 @@ Clause::~Clause() {
  ******************/
 
 /*!
-    \param finalKnowledge the knowledge that is final and has to be remembered in this clause
+    \param _finalKnowledge the knowledge that is final and has to be remembered in this clause
 */
 void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
     if (finalKnowledges == NULL) {
@@ -104,7 +104,7 @@ void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
             }
         }
 
-        if (not (finalKnowledges = (FinalKnowledge**) realloc(finalKnowledges, numberOfFinalKnowledges * sizeof(FinalKnowledge*)))) {
+        if (not (finalKnowledges = (FinalKnowledge**) realloc(finalKnowledges, (numberOfFinalKnowledges + 1) * sizeof(FinalKnowledge*)))) {
             return ;
         }
     }
@@ -114,6 +114,7 @@ void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
 
     // store the given knowledge
     finalKnowledges[numberOfFinalKnowledges] = finalKnowledge;
+
     ++numberOfFinalKnowledges;
 
     // we just stored a literal ;-)
@@ -143,30 +144,11 @@ void Clause::operator|=(const Clause& other) {
         storage[i] |= other.storage[i];
     }
 
-    contains_final |= other.contains_final;
-
-    bool notFound = true;
-
     // add final knowledge of other if it is not part of the clause already
     for (unsigned int i = 0; i < other.numberOfFinalKnowledges; ++i) {
-        // current final knowledge of other has not been found in the array of final knowledges
-        notFound = true;
-
-        // traverse through the final knowledges
-        for (unsigned int k = 0; k < numberOfFinalKnowledges; ++k) {
-            // found the same knowledge, so continue with the next one
-            if (finalKnowledges[k]->knowledge == other.finalKnowledges[i]->knowledge) {
-                notFound = false;
-                break ;
-            }
-        }
-
-        // final knowledge is new, so store it
-        if (notFound) {
-            addFinalKnowledge(other.finalKnowledges[i]->knowledge);
-        }
+        // add final knowledge if it is not stored yet (done in that method)
+        addFinalKnowledge(other.finalKnowledges[i]->knowledge);
     }
-
 }
 
 
@@ -243,6 +225,7 @@ void Clause::printToStream(const bool & dot, std::ostream& file) {
 
         // get clause which contains !, ? or # events
         for (Label_ID i = 0; i < Label::last_sync; ++i) {
+
             if (decodedLabels[i] == 0) {
                 continue;
             }

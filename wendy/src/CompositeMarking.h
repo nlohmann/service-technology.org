@@ -50,10 +50,6 @@ class CompositeMarking {
         /// compare two composite markings
         bool operator== (const CompositeMarking& other) const ;
 
-        /// stream output operator
-        /// \deprecated only until we are sure about all this
-        friend std::ostream& operator<< (std::ostream&, const CompositeMarking&);
-
     public: /* member attributes */
 
         /// depth search number used for Tarjan algorithm
@@ -85,7 +81,7 @@ class CompositeMarkingsHandler {
         static CompositeMarking* getMarking(const CompositeMarking * marking);
 
         /// stores given marking in the set of visited markings
-        static bool visitMarking(CompositeMarking * marking);
+        static void visitMarking(CompositeMarking * marking);
 
         /// initializes all values
         static void initialize(const std::set<StoredKnowledge* > & setOfStoredKnowledges);

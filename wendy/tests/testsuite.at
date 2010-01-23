@@ -1166,6 +1166,8 @@ AT_CHECK([cp TESTFILES/innerCyclicMPPacyclic.owfn .])
 AT_CHECK([WENDY innerCyclicMPPacyclic.owfn --verbose --dot --og --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 2" stderr])
 AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2" stderr])
+AT_CHECK([GREP -c "<tr><td" innerCyclicMPPacyclic.dot],0,[3
+],ignore)
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 

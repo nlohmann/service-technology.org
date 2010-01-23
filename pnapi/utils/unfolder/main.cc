@@ -1,7 +1,9 @@
+#include <config.h>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 
@@ -26,7 +28,18 @@ FILE *pipe_out_final;
 
 FILE *inputFile;
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc == 2 && !strcmp(argv[1], "--version")) {
+        printf("High level open net unfolder\n");
+        printf("  part of %s\n\n", PACKAGE_STRING);
+        return EXIT_SUCCESS;
+    }
+
+    if (argc == 2 && !strcmp(argv[1], "--help")) {
+        printf("call %s < input.owfn\n", argv[0]);
+        printf("  input.owfn : open net (always read from stdin)\n");
+        return EXIT_SUCCESS;
+    }
 
      /*
       The high-level net is being unfolded twice with LoLa - once using the

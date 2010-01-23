@@ -1,9 +1,23 @@
+#include <config.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
     unsigned int i, n, k;
+
+    if (argc == 2 && !strcmp(argv[1], "--version")) {
+        printf("Dining philosophers generator\n");
+        printf("  part of %s\n\n", PACKAGE_STRING);
+        return EXIT_SUCCESS;
+    }
+
+    if (argc == 2 && !strcmp(argv[1], "--help")) {
+        printf("call %s n k\n", argv[0]);
+        printf("  n : number of philosophers\n");
+        printf("  k : number of internal steps\n");
+        return EXIT_SUCCESS;
+    }
 
     if (argc != 3 || !atoi(argv[1]) || !atoi(argv[2])) {
         fprintf(stderr, "error: call %s n k\n", argv[0]);

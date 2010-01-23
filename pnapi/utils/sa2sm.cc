@@ -13,6 +13,19 @@ using std::endl;
 
 int main(int argc, char *argv[])
 {
+    if (argc == 2 && !strcmp(argv[1], "--version")) {
+        printf("Service automaton -> state machine converter (SA2SM)\n");
+        printf("  part of %s\n\n", PACKAGE_STRING);
+        return EXIT_SUCCESS;
+    }
+
+    if (argc == 2 && !strcmp(argv[1], "--help")) {
+        printf("call %s input.sa [output.owfn]\n", argv[0]);
+        printf("  input.sa    : service automaton\n");
+        printf("  output.owfn : state machine (if skipped, stdout is used)\n");
+        return EXIT_SUCCESS;
+    }
+
     if (argc < 2) {
         cerr << "No input file given. Expecting SA file as parameter #2." << endl;
         return EXIT_FAILURE;

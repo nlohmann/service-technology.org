@@ -1,3 +1,4 @@
+#include <config.h>
 #include <iostream>
 #include <map>
 #include <utility>
@@ -7,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
 
 #include "pnapi.h"
 
@@ -163,6 +165,19 @@ string format(string text, unsigned int width) {
 
 
 int main(int argc, char** argv) {
+    if (argc == 2 && !strcmp(argv[1], "--version")) {
+        printf("Random open net generator generator\n");
+        printf("  part of %s\n\n", PACKAGE_STRING);
+        return EXIT_SUCCESS;
+    }
+
+    if (argc == 2 && !strcmp(argv[1], "--help")) {
+        printf("call %s n k\n", argv[0]);
+        printf("  n : maximal size of the nets\n");
+        printf("  k : number of nets to generatr\n");
+        return EXIT_SUCCESS;
+    }
+
     // initialize random number generator
     srand((unsigned)time(0)); 
     

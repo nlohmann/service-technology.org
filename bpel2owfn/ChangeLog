@@ -6,8 +6,11 @@
  http://service-technology.org/bpel2owfn - http://gnu.org/software/bpelo2wfn
 
 
-Version 2.04-unreleased
-=======================
+Version 2.4 (24 January 2010)
+=============================
+
+* This is a maintenance release that addresses a number of issues of the last
+  30 months.
 
 * fixed bug #1387 (`https://gna.org/bugs/?13837'): assertion failed if
   choreographies are used without `communicationonly' parameter
@@ -43,7 +46,7 @@ Version 2.04-unreleased
 * replaced previously patched files `getopt.c', `getopt.h', and `getopt1.c'
   by standard files from GNUlib
 
-* changed versioning scheme from `x.y.z' to `x.yz' - next version ist 2.04
+* changed versioning scheme from `x.y.z' to `x.y'
 
 * completed task #6117 (`https://gna.org/task/?6117'): now using gengetopt to
   organize command line options

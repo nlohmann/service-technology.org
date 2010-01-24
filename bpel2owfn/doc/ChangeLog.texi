@@ -1,6 +1,8 @@
-@heading Version 2.04-unreleased
+@heading Version 2.4 (24 January 2010)
 
 @itemize
+@item This is a maintenance release that addresses a number of issues of the last 30 months.
+
 @item fixed bug #1387 (@url{https://gna.org/bugs/?13837}): assertion failed if choreographies are used without @option{communicationonly} parameter
 
 @item updated maintainer scripts
@@ -29,7 +31,7 @@
 
 @item replaced previously patched files @file{getopt.c}, @file{getopt.h}, and @file{getopt1.c} by standard files from GNUlib
 
-@item changed versioning scheme from @samp{x.y.z} to @samp{x.yz} -- next version ist 2.04
+@item changed versioning scheme from @samp{x.y.z} to @samp{x.y}
 
 @item completed task #6117 (@url{https://gna.org/task/?6117}): now using gengetopt to organize command line options
 

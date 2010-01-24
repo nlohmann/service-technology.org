@@ -1618,10 +1618,8 @@ void PetriNet::reduce_implicit_places() {
             }
 
             /* free allocated memory */
-            if (row != NULL)
-                free(row);
-            if (colno != NULL)
-                free(colno);
+            free(row);
+            free(colno);
 
             if (lp != NULL) {
                 /* clean up such that all used memory by lpsolve is freed */

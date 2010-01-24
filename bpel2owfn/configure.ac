@@ -1,4 +1,4 @@
-AC_INIT([GNU BPEL2oWFN],[2.04-unreleased],[bpel2owfn@service-technology.org],[bpel2owfn],[http://service-technology.org/bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.4],[bpel2owfn@service-technology.org],[bpel2owfn],[http://service-technology.org/bpel2owfn])
 
 AC_MSG_NOTICE([ ____  ____  _____ _     ____    __        _______ _   _ ])
 AC_MSG_NOTICE([| __ )|  _ \| ____| |   |___ \ __\ \      / /  ___| \ | |])

@@ -1,4 +1,7 @@
+		      Yasmina: ILP compatibility checker
                       http://service-technology.org/yasmina
-Many thanks to Jan for help with lpsolve and Niels with various maintainability issues.
-
+ACKNOWLEDGEMENTS
+ * Thanks to Jan Suermeli for some tips with lpsolve 
+ * Thanks to Niels Lohmann for help with various maintainability issues
+ * Thanks to Peter Notebaert and William H. Patton, for useful tips with the lpsolve API and for sharing some sample times. 
 

@@ -1,8 +1,20 @@
-AC_INIT(Yasmina, 1.0, yasmina@service-technology.org, yasmina, http://service-technology.org/yasmina)
+AC_INIT(Yasmina, 1.1-unreleased, yasmina@service-technology.org, yasmina, http://service-technology.org/yasmina)
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+AC_MSG_NOTICE([__   __                  _             ])
+AC_MSG_NOTICE([\ \ / /_ _ ___ _ __ ___ (_)_ __   __ _ ])
+AC_MSG_NOTICE([ \ V / _` / __| '_ ` _ \| | '_ \ / _` |])
+AC_MSG_NOTICE([  | | (_| \__ \ | | | | | | | | | (_| |])
+AC_MSG_NOTICE([  |_|\__,_|___/_| |_| |_|_|_| |_|\__,_|])
+# AC_MSG_NOTICE([synthesizing partners for services])
+AC_MSG_NOTICE([http://service-technology.org/yasmina])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
 
 # Checks for programs.
 AM_PROG_CC_C_O

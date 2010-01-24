@@ -1,19 +1,15 @@
-                           
+                    __   __                  _             
+                    \ \ / /_ _ ___ _ __ ___ (_)_ __   __ _ 
+                     \ V / _` / __| '_ ` _ \| | '_ \ / _` |
+                      | | (_| \__ \ | | | | | | | | | (_| |
+                      |_|\__,_|___/_| |_| |_|_|_| |_|\__,_|
                       http://service-technology.org/yasmina
 
 
-PURPOSE
-    Yasmina is a tool for checking compatibility using integer linear programming.
+Version 1.1-unreleased
+======================
 
 
-COPYRIGHT
-Version 1.0 (18 January 2009)
-=============================
+See file ChangeLog <http://service-technology.org/files/yasmina/ChangeLog> for
+complete version history.
 
-* first official release of Yasmina
-
-* compatibility with Linda varying length fingerprints fixed
-
-* improved final marking handling
-
-\nSee file ChangeLog <http://service-technology.org/files/yasmina/ChangeLog> for\ncomplete version history.\n

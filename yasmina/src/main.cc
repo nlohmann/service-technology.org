@@ -30,7 +30,7 @@ using std::endl;
 using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
-using pnapi::Arc;
+//using pnapi::Arc;
 using pnapi::Node;
 
 using std::set;

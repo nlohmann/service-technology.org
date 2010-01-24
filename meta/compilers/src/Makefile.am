@@ -39,7 +39,7 @@ wendyExpandBits_SOURCES = syntax-web.yy lexic-web.ll \
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
 BUILT_SOURCES =
-EXTRA_DIST = compilers
+EXTRA_DIST = 
 MAINTAINERCLEANFILES =
 DISTCLEANFILES = 
 

@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-# Wrapper script for generating manpages
-
-DIR=`echo $0 | sed -e "s/compilers$//"`
-
-${DIR}fiona2wendy $*
-

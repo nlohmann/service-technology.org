@@ -44,5 +44,5 @@ option "exclude" x
 
 text "\n"
 text "Examples:\n"
-text "   graph2dot -c1 -fp1,p2,p3 -g net.graph -d net.dot\n"
+text "   graph2dot -c1 -fp1,p2,p3 -g net.graph -d net.dot\n\n"
 text "   lola net.lola -M | graph2dot | dot -Tpng -o net.png"

@@ -1,5 +1,5 @@
 # the manpages to create
-man_MANS = $(PACKAGE).1
+man_MANS = $(PACKAGE).1 graph2dot.1
 
 # additional files
 EXTRA_DIST = extra
@@ -16,6 +16,16 @@ $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
 		--source="service-technology.org" \
 		--help-option="$(HELPOPTION)" \
 		--opt-include=extra
+
+graph2dot.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline-graph2dot.ggo
+	$(AM_V_GEN)$(HELP2MAN) \
+		$(top_builddir)/utils/graph2dot \
+		--name="$(PACKAGE_NAME): graph2dot" \
+		--output=$@ \
+		--manual="service-technology.org" \
+		--source="service-technology.org" \
+		--help-option="--help" \
+		--no-info
 
 
 #############################################################################

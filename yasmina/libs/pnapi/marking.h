@@ -1,5 +1,9 @@
 // -*- C++ -*-
 
+/*!
+ * \file  marking.h
+ */
+
 #ifndef PNAPI_MARKING_H
 #define PNAPI_MARKING_H
 

@@ -1,3 +1,7 @@
+/*!
+ * \file  myio.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -38,6 +42,7 @@ std::ostream & operator<<(std::ostream & os, const PetriNet & net)
   case util::LOLA: return __lola::output(os, net);
   case util::OWFN: return __owfn::output(os, net);
   case util::STAT: return __stat::output(os, net);
+  case util::PNML: return __pnml::output(os, net);
 
   default: assert(false);
   }
@@ -58,6 +63,15 @@ throw (InputError)
   case util::OWFN:
   {
     parser::owfn::Parser parser;
+    net = parser.parse(is);
+
+    net.meta_ = util::MetaData::data(is);
+    break;
+  }
+
+  case util::PNML:
+  {
+    parser::pnml::Parser parser;
     net = parser.parse(is);
 
     net.meta_ = util::MetaData::data(is);
@@ -154,6 +168,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Arc & arc)
   case DOT:  return __dot::output(os, arc);
   case LOLA: return __lola::output(os, arc);
   case OWFN: return __owfn::output(os, arc);
+  case PNML: return __pnml::output(os, arc);
 
   default: assert(false);
   }
@@ -167,6 +182,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Place & p)
   case DOT:  return __dot::output(os, p);
   case LOLA: return __lola::output(os, p);
   case OWFN: return __owfn::output(os, p);
+  case PNML: return __pnml::output(os, p);
 
   default: assert(false);
   }
@@ -180,6 +196,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Transition & t)
   case DOT:  return __dot::output(os, t);
   case LOLA: return __lola::output(os, t);
   case OWFN: return __owfn::output(os, t);
+  case PNML: return __pnml::output(os, t);
 
   default: assert(false);
   }
@@ -193,6 +210,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Negation & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -206,6 +224,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Conjunction & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -219,6 +238,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Disjunction & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -232,6 +252,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaTrue & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -245,6 +266,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaFalse & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -258,6 +280,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaEqual & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -271,6 +294,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaNotEqual & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -284,6 +308,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaGreater & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -297,6 +322,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaGreaterEqual 
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -310,6 +336,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLess & f)
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }
@@ -323,6 +350,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLessEqual & f
   {
   case LOLA: return __lola::output(os, f);
   case OWFN: return __owfn::output(os, f);
+  case PNML: return __pnml::output(os, f);
 
   default: assert(false);
   }

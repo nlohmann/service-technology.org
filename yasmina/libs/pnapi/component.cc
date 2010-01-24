@@ -1,3 +1,7 @@
+/*!
+ * \file    component.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -473,6 +477,22 @@ Transition::Transition(PetriNet & net, ComponentObserver & observer,
     int Transition::getCost() const
     {
       return cost_;
+    }
+
+    /*!
+     * \brief add role to transition
+     */
+    void Transition::addRole(std::string roleName)
+    {
+      roles_.insert(roleName);
+    }
+
+    /*!
+     * \brief get transition roles
+     */
+    std::set<string> Transition::getRoles() const
+    {
+      return roles_;
     }
 
     /*!

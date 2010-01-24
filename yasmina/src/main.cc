@@ -19,6 +19,8 @@
 #include <cmath>
 #include <limits.h>
 #include "eventTerm.h"
+
+//#include "adapter.h"
 //#include "ppl.hh"
 
 
@@ -787,6 +789,9 @@ int main(int argc, char** argv) {
 	//the stupid way using the compose function which is not implemented correctly
 	// parse the open nets and obtain the incidence matrix of the composition and the corresponding final marking(s)
 	pnapi::PetriNet net1, net2;
+	std::vector<pnapi::PetriNet *> netps;//for the sake of adapters
+	
+
 	bool coverall=false;
 	std::string s1("0");
 	std::ifstream inputStream;
@@ -888,6 +893,7 @@ int main(int argc, char** argv) {
 			try { ifs1 >> owfn >> net1;}
 			catch (InputError e) { std::cerr <<"net " <<i<<" failed" << endl << e << endl; assert(false); }
 			ifs1.close();
+
 			//const int zero=0; now check whether these are real transitions
 			if(enforcedT.find(1)!=enforcedT.end()&&(args_info.enforceEvents_given>0)){
 				std::set<std::string> se=(enforcedT.find(1))->second;
@@ -923,9 +929,19 @@ int main(int argc, char** argv) {
 			}
 			   //else abort(3, "the transitions do not belong to the net");
 			if(i==1) s1="1@"; else s1=""; net1.compose(net2, s1, s2);
+	/*		if ( args_info.adapterrules_given )
+			{//adapter
+				pnapi::PetriNet *pnet=new PetriNet(net2);
+				netps.push_back(pnet);cout<<endl<<netps.size()<<endl;
+			}*/
 			//renew the prefixes: s1 has the old 
 		//	if(!net1.isClosed()){cout<<" is not closed"<<std::endl;} else 
 		}
+		  /*if ( args_info.adapterrules_given ) not needed anymore
+		  {//adapter
+			  pnapi::PetriNet *pnet=new PetriNet(net1);//cout<<endl<<netps.size();
+			  netps.push_back(pnet);cout<<endl<<netps.size()<<endl;
+		  }*/
 	  }
 
 	  //find free-choice sending clusters
@@ -965,6 +981,50 @@ int main(int argc, char** argv) {
     }
 		//std::cout << owfn << net1<<"end of composition"<<std::endl;
 
+	
+	
+    if ( args_info.adapterrules_given )
+    {
+        //time(&start_time);
+		
+		//RuleSet rs;
+		// ! #adapter //	Adapter adapter(net2,rs,ASYNCHRONOUS,1,false);
+			
+        status("reading transformation rules from file \"%s\"", args_info.adapterrules_arg[0]);
+		
+        /*FILE * rulefile (NULL);
+        if((rulefile = fopen(args_info.adapterrules_arg[0],"r")))
+        {
+            rs.addRules(rulefile);
+            fclose(rulefile);
+            rulefile = NULL;
+        }
+        else
+        {
+            abort(2, "Rule file %s could not be opened for reading", args_info.adapterrules_arg);
+        }
+        //time(&end_time);
+        //status("reading all rules file done [%.0f sec]", difftime(end_time, start_time));
+		Adapter *adapter=new Adapter(netps, rs, Adapter::ASYNCHRONOUS, 1, false);
+		const PetriNet * benetp=adapter->buildEngine();
+		//benetp->finalCondition().formula().output(std::cout); 
+		//for ( unsigned int index = 0; index < netps.size(); ++index)
+		//{
+		//	delete netps[index];
+		//}
+		//netps.clear();
+		std::cout <<"help"<< std::endl;	
+	*/	//return 0;
+	}
+
+	
+	
+	
+	//get the initial marking
+//	engine.compose(net1, "","");int nPlaces = (int) engine.getPlaces().size();
+//	int nTransitions = (int) engine.getTransitions().size();
+//	std::cout << owfn << engine<<"end of adaptation with"<<nTransitions<<std::endl;
+	
 	
 		//}
 //	catch (pnapi::io::InputError error) {
@@ -1120,7 +1180,7 @@ int main(int argc, char** argv) {
 							roww[get_nameindex(mps.at(ifm-1), cstr,FALSE)]=ite->second;
 						}//cout << (*fi)->lb<<" "<<(*fi)->ub<<endl;
 						int rhs=(*fi)->lb;//bd.first;
-						
+						set_add_rowmode(mps.at(ifm-1), TRUE);
 						if(!add_constraint(mps.at(ifm-1), roww,GE, rhs))
 						cout<<"gata"<<endl;
 						if ((*fi)->ub!=USHRT_MAX) {//if (bd.second!=USHRT_MAX) {
@@ -1130,7 +1190,7 @@ int main(int argc, char** argv) {
 						else {
 							set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), get_infinite(mps.at(ifm-1)));
 						}
-					//set_add_rowmode(lpmp, FALSE);
+					set_add_rowmode(mps.at(ifm-1), FALSE);
 						
 						kn++;
 					}
@@ -1212,12 +1272,15 @@ int main(int argc, char** argv) {
 			for(i=1;i<=get_Ncolumns(lpmps.at(ifm));i++){
 				set_int(lpmps.at(ifm),i,TRUE);
 			}
-			set_verbose(lpmps.at(ifm),NORMAL);//print_lp(lpmps.at(ifm));
+			//set_outputfile(lpmps.at(ifm), "log.txt");
+			set_verbose(lpmps.at(ifm),NORMAL);
+			//write_LP(lpmps.at(ifm), stdout);
+			//print_lp(lpmps.at(ifm));
 			res=solve(lpmps.at(ifm));
-			
+			//write_LP(lpmps.at(ifm), stdout);
 			//cout<<"Solve "<<solve(lp)<<endl;
 			if(res==0){
-				cout<<endl<<"Compatibility check inconclusive"<<endl;
+				//cout<<endl<<"Compatibility check inconclusive"<<endl;
 				if (args_info.verbose_flag) {
 					cout<<endl<<"The constraint system has at least a solution:"<<endl;
 					REAL *sol;//[get_Ncolumns(lpmps.at(ifm))];
@@ -1229,7 +1292,7 @@ int main(int argc, char** argv) {
 				break;
 			}
 			else {
-				std::cout<<endl<<"Not compatible wrt weak termination"<<endl;
+				//std::cout<<endl<<"Not compatible wrt weak termination"<<endl;
 			}
 
 		}
@@ -1290,12 +1353,14 @@ int main(int argc, char** argv) {
 	// here we prepare for the the solving of the equation
 	// for each final marking one builds and solves  the state equation
 
-	if(args_info.inputs_num>0){
+	if(args_info.inputs_num>0&&!args_info.adapterrules_given){
 		nPlaces = (int) net1.getPlaces().size();cout << "No of places "<< net1.getInternalPlaces().size() << endl;
+		
 		nTransitions = (int) net1.getTransitions().size();
 		pnapi::Marking m(net1);
 		net1.finalCondition().dnf(); 
 		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
+		
 		set< map<std::string const, unsigned int> > fmset;//set of final markings (set of maps)
 		if(typeid(*f)==typeid(pnapi::formula::Disjunction)){ 
 			//std::cout<<"Disjunction"<<endl;//make disjunction two by two
@@ -1310,6 +1375,7 @@ int main(int argc, char** argv) {
 					for(std::set<const pnapi::formula::Formula *>::iterator ccIt=fc->children().begin();ccIt!=fc->children().end();++ccIt){
 						const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*ccIt);
 						//const Place *pp=new Place(fp->place());
+						if(fp->tokens()>0)//insert only if it is non-zero
 						cfm.insert( std::pair<std::string const, unsigned int>(fp->place().getName(),fp->tokens()) );
 					}
 					fmset.insert(cfm);
@@ -1323,11 +1389,14 @@ int main(int argc, char** argv) {
 			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->children().begin();cIt!=fc->children().end();++cIt){
 				const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*cIt);
 				//const Place *pp=new Place(fp->place());
+				if(fp->tokens()>0)
 				cfm.insert( std::pair<std::string const, unsigned int>(fp->place().getName(),fp->tokens()) );
 			}
 			fmset.insert(cfm);
 		}
 		cout << "No of final markings "<< fmset.size() << endl;
+		
+		//now transform them into sets of vectors
 		
 		//retlpset=transform(net1, f);//cout<<"size of "<<retlpset.size()<<endl;
 		//start_clock = clock();
@@ -1378,22 +1447,21 @@ int main(int argc, char** argv) {
 	//iterating all clauses
 	//for(set<lprec *>::iterator citr = retlpset.begin();citr!=retlpset.end();citr++){
 		for(set<map<std::string const ,unsigned int> >::iterator sfm=fmset.begin();sfm!=fmset.end();++sfm){
-		lprec *lp;//lp = make_lp(0, nTransitions);
+			lprec *lp;//lp = make_lp(0, nTransitions);
 		
 			lp = make_lp(0, nTransitions);
-			set_verbose(lp,IMPORTANT);
-			REAL * roww=new REAL[get_Ncolumns(lp)]();
-			for(i=1;i<=nTransitions;i++){
-				set_int(lp,i,TRUE);
-			}
-		
 			if(lp == NULL) {
 				std::cerr<< "Unable to create new LP model"<<std::endl;
 				return(1);
 			}
+			//first add the objective function
+			set_add_rowmode(lp,TRUE);
+			set_obj_fnex(lp,0, NULL,NULL);//set_verbose(lp,FULL);//IMPORTANT);
+			//get_Ncolumns(lp)
+			
+			
 		
-		//set_add_rowmode(lp, TRUE);
-		//set the col/variable names
+		    //set the col/variable names
 			int k=1;
 			for(std::set<pnapi::Transition *>::iterator cit=net1.getTransitions().begin();cit!=net1.getTransitions().end();++cit){
 			//cout<<(*cit)->getName()<<" ";
@@ -1402,20 +1470,49 @@ int main(int argc, char** argv) {
 					set_col_name(lp, k, cstr);k++;
 			}
 			int ii=0; 
-		//for(set<const pnapi::Place *>::iterator p=sfm->begin();p!=sfm->end();++p){
-		for(std::set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();p++){
+			//for(set<const pnapi::Place *>::iterator p=sfm->begin();p!=sfm->end();++p){
+			for(std::set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();p++){
 			//add the constraint's left side
 			//cout<<(*p)->getName()<<"="<<(*p)->getTokenCount()<<std::endl;
 				int j=1;
 		//	cout<<"m["<<(*p)->getName()<<"]"<<"="<<(*p)->getTokenCount()<<std::endl;
 				Place & l= *net1.findPlace((*p)->getName());
+				REAL * roww=new REAL[l.getPresetArcs().size() + l.getPostsetArcs().size()]();
 				if((args_info.inputs_num==1)&&(l.getType()!=pnapi::Node::INTERNAL)) continue;
 				unsigned int k=0;
-				int * colno=new int[get_Ncolumns(lp)]();
-				REAL * rowe= new REAL[get_Ncolumns(lp)]();
-				for(std::set<Transition *>::const_iterator t = net1.getTransitions().begin();t!=net1.getTransitions().end();t++){
+				int * colno=new int[l.getPresetArcs().size() + l.getPostsetArcs().size()]();
+				REAL * rowe= new REAL[l.getPresetArcs().size() + l.getPostsetArcs().size()]();
+				// iterate post arcs of p and add rowe[transition] the arc weight
+				for (std::set<pnapi::Arc *>::iterator pait=l.getPresetArcs().begin(); pait!= l.getPresetArcs().end(); ++pait) {
+					Transition & t=(*pait)->getTransition();
+						//cout<<t.getName();
+					unsigned int fp=(*pait)->getWeight();
+					colno[k] = get_nameindex(lp,const_cast<char *>(t.getName().c_str()),FALSE);
+					rowe[k++]= fp+0.0;
+				}
+				for (std::set<pnapi::Arc *>::iterator pait=l.getPostsetArcs().begin(); pait!= l.getPostsetArcs().end(); ++pait) {
+					Transition & t=(*pait)->getTransition();
+					unsigned int fm=(*pait)->getWeight();
+					//if some of the transitions have been visited in the previous iteration then 
+					if (net1.findArc(t,l)!=NULL) {
+						//iterate previously visited transitions and get the id of the column
+						// and for that column do some special operations
+						for (unsigned inti=0; i<k; ++i) {
+							if (colno[i]==get_nameindex(lp,const_cast<char *>(t.getName().c_str()),FALSE)) {
+								rowe[i]=rowe[i]- 1*(int)fm;
+							}
+						}
+					}
+					else{ 
+						colno[k] = get_nameindex(lp,const_cast<char *>(t.getName().c_str()),FALSE);
+						rowe[k++]= - 1*(int)fm ; 
+					}
+				}
+				//iterate prearcs of p and substract from rowe[transition] the arc weight
+				
+/*				for(std::set<Transition *>::const_iterator t = net1.getTransitions().begin();t!=net1.getTransitions().end();t++){
 				//cout<<(*t)->getName();
-					int fp=0,fm=0;
+					
 					Transition & r= *net1.findTransition((*t)->getName());
 					if(net1.findArc(r,l)!=NULL) fp=net1.findArc(r,l)->getWeight();
 					if(net1.findArc(l,r)!=NULL) fm=net1.findArc(l,r)->getWeight();
@@ -1428,11 +1525,20 @@ int main(int argc, char** argv) {
 				//net1.findArc( net1.findPlace((*p)->getName()), net1.findTransition((*t)->getName()));
 					j++;	
 				}
-			//now add row
-				char * cstr= new char [(*p)->getName().size()+1];
-				strcpy(cstr,(*p)->getName().c_str());const std::string ssss=(*p)->getName();
-			std::map<std::string const, unsigned int> mmm=(*sfm); ///mit=sfm->find(ssss);
-				REAL rhs=0.0+mmm[ssss]-((*p)->getTokenCount());//final marking - initial marking
+*/			//now add row
+				//char * cstr= new char [(*p)->getName().size()+1];
+				//strcpy(cstr,(*p)->getName().c_str());const std::string ssss=(*p)->getName();
+				REAL rhs;
+				char *cstr= new char [(*p)->getName().size()+1];
+				strcpy(cstr,(*p)->getName().c_str());
+				std::map<std::string const, unsigned int> mmm=(*sfm); ///mit=sfm->find(ssss);
+				if(mmm.find((*p)->getName())!=mmm.end()){
+					rhs=0.0+mmm[cstr]-1*(int)((*p)->getTokenCount());//final marking - initial marking
+				}
+				else {
+					rhs = 0.0-1*(int)((*p)->getTokenCount());
+				}
+
 				//REAL rhs=((*p)->getTokenCount());
 			//cout<<"rhs "<<rhs<<" for "<<(*p)->getTokenCount()<<mmm[ssss]<<endl;
 			//here is the variant part that might change due to the final marking 
@@ -1460,10 +1566,12 @@ int main(int argc, char** argv) {
 		////for(int k=1;k<=get_Ncolumns(lp);k++){set_mat(lp,i,k,roww[i]);} cout<<endl;
 				ii++;
 			}
-		
-		// add constraints for message profiles (variables included)
-		if(args_info.messageProfiles_given>0){
-			cout<<"Fingerprint/message profile check"<<endl;
+			
+			set_add_rowmode(lp,FALSE);//for the mixed check collums are added, so we tun this off
+			//can ve improved by estimating the number of columns later
+			// add constraints for message profiles (variables included)
+			if(args_info.messageProfiles_given>0){
+			cout<<"Fingerprint+state equation check"<<endl;
 			lprec *lpmc=copy_lp(lp);
 			
 			
@@ -1523,6 +1631,7 @@ int main(int argc, char** argv) {
 						if(net1.findArc(l,r)!=NULL) {fm=net1.findArc(l,r)->getWeight();}
 						roww[get_nameindex(lp, cstr,FALSE)]=-fabs(fp-fm);//j is the current place
 					}
+					
 					add_constraint(lp,roww,EQ,0.0);//cout<<get_Ncolumns(lp)<<endl;
 					set_row_name(lp, get_Nrows(lp),get_col_name(lpmps.at(ifm),j+1));
 				}
@@ -1547,9 +1656,9 @@ int main(int argc, char** argv) {
 			}
 			
 		}
-		//add constraints for cover places and transitions
+			//add constraints for cover places and transitions
 		
-		if(args_info.enforceEvents_given>0){
+			if(args_info.enforceEvents_given>0){
 			bool globres=1;
 			for(map<int,std::set<std::string> >::const_iterator itr=enforcedT.begin();itr!=enforcedT.end();++itr){
 				//cout<<"enforced "<<itr->first;
@@ -1591,47 +1700,49 @@ int main(int argc, char** argv) {
 					//print_lp(nn);
 					res=solve(nn);	
 					if(res==0){
-						cout<<endl<<"Compatibility check inconclusive for "<<gg<<endl;
+						
+						if(args_info.verbose_flag){
+							//cout<<endl<<"Compatibility check inconclusive"<<endl;
+							cout<<endl<<"The constraint system has at least a solution including "<<gg<<endl;
+							REAL *sol;//[get_Ncolumns(nn)];
+							get_ptr_variables(nn,&sol);
+							for(int s=0;s<get_Ncolumns(nn);s++){
+								cout<<get_col_name(nn,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
+							}
+							cout<<endl;
+							globres=0;
+						}					
+					}
+				}
+				if (globres==0) {
+					res=0; break;
+				}
+			}}
+			else{
+				//here solve the SE/SE and SE/FP system
+				cout << "Number of interface places: "<< net2.getInterfacePlaces().size()<<endl;
+				cout << "Number of variables (transitions): "<< net1.getTransitions().size()<<endl;
+				cout<<"Number of constraints (places): "<<get_Nrows(lp)<<"; Number of variables:"<<get_Ncolumns(lp)<<endl;
+				
+				set_verbose(lp,NORMAL);//,IMPORTANT);
+				for(int i=1;i<=get_Ncolumns(lp);++i){
+					set_int(lp,i,TRUE);
+				}
+				//cout<<"Printing the system: "<<endl;print_lp(lp);
+				res=solve(lp);//write_lp(lp, "model.mp");
+				//cout<<"Solve "<<solve(lp)<<endl;
+				if(res==0){
+					//cout<<endl<<"Compatibility check inconclusive"<<endl;
+					if (args_info.verbose_flag) {
 						cout<<endl<<"The constraint system has at least a solution:"<<endl;
 						REAL *sol;//[get_Ncolumns(nn)];
-						get_ptr_variables(nn,&sol);
-						for(int s=0;s<get_Ncolumns(nn);s++){
-							cout<<get_col_name(nn,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
+						get_ptr_variables(lp,&sol);//REAL sol[nTransitions];
+				//get_variables(lp,&sol);
+						for(int s=0;s<nTransitions;s++){
+							cout<<get_col_name(lp,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
 						}
 						cout<<endl;
-						globres=0;
 					}
-					
-				}
-			}
-			if (globres==0) {
-				res=0; break;
-			}
-		}
-		else{
-			set_obj_fnex(lp,0, NULL,NULL);//set_verbose(lp,FULL);//IMPORTANT);
-			cout << "Number of interface places: "<< net2.getInterfacePlaces().size()<<endl;
-			cout << "Number of variables (transitions): "<< net1.getTransitions().size()<<endl;
-			cout<<"Number of constraints (places): "<<get_Nrows(lp)<<"; Number of variables:"<<get_Ncolumns(lp)<<endl;
-			set_verbose(lp,NORMAL);//,IMPORTANT);
-		for(int i=1;i<=get_Ncolumns(lp);++i){
-			set_int(lp,i,TRUE);
-		}
-		//print_lp(lp);
-		res=solve(lp);
-		//cout<<"Solve "<<solve(lp)<<endl;
-		if(res==0){
-			cout<<endl<<"Compatibility check inconclusive"<<endl;
-			if (args_info.verbose_flag) {
-				cout<<endl<<"The constraint system has at least a solution:"<<endl;
-				REAL *sol;//[get_Ncolumns(nn)];
-				get_ptr_variables(lp,&sol);//REAL sol[nTransitions];
-				//get_variables(lp,&sol);
-				for(int s=0;s<nTransitions;s++){
-					cout<<get_col_name(lp,s+1)<<" "<<sol[s]<<" "<<endl;//" "<<static_cast<int>(sol[s]) not needed anymore
-				}
-				cout<<endl;
-			}
 /*			bool gata=true;
 			pnapi::Marking m(net1);
 			do{
@@ -1647,16 +1758,17 @@ int main(int argc, char** argv) {
 			}
 			while(gata!=true);*/
 			//check reachability
-			break;
+				break;
 		}
 		else{std::cout<<endl<<"So far no solution  ..."<<endl;}
 		}
 	}
 	}
 	if(res!=0){std::cout<<endl<<"Not compatible wrt weak termination"<<endl;}
-
+	else cout<<endl<<"Compatibility check inconclusive"<<endl;
 	
 
+	
 	//time(&end_time);
 	//status("checked necessary condition for weak termination  in [%.0f sec]", difftime(end_time,start_time));
 	

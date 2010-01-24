@@ -34,11 +34,17 @@ option "messageProfiles" m
 #	optional
 
 
-option "adapterRules" -
+#option "rulefile" a
+#	"File with set of adapter rules"
+#	string
+#	typestr="FILE"
+#	optional
+option "adapterrules" a
 	"Set of adapter rules"
-	string
-	typestr="FILE"
+	string multiple
 	optional
+
+
 
 section "Debug"
 

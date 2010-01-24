@@ -1,5 +1,9 @@
 // -*- C++ -*-
 
+/*!
+ * \file  link.h
+ */
+
 #ifndef PNAPI_LINK_H
 #define PNAPI_LINK_H
 

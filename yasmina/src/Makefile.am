@@ -4,7 +4,7 @@ yasmina_SOURCES = syntax_mp.yy lexer_mp.ll \
                   main.cc \
                   cmdline.c cmdline.h \
                   verbose.cc verbose.h \
-                  eventTerm.h eventTerm.cc
+                  eventTerm.h eventTerm.cc 
 
 yasmina_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a \
                  $(top_builddir)/libs/lp_solve/liblpsolve55.a

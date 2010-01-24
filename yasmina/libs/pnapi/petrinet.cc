@@ -1,3 +1,5 @@
+// -*- C++ -*-
+
 /*!
  * \file    petrinet.cc
  *
@@ -7,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2009-11-12 15:57:35 +0100 (Thu, 12 Nov 2009) $
+ * \date    $Date: 2010-01-21 00:59:06 +0100 (Thu, 21 Jan 2010) $
  *
- * \version $Revision: 5012 $
+ * \version $Revision: 5253 $
  */
 
 #include "config.h"
@@ -335,7 +337,7 @@ uint8_t PetriNet::genetCapacity_ = 2;
  * \note    The condition is standardly set to True.
  */
 PetriNet::PetriNet() :
-  observer_(*this), warnings_(0), reducablePlaces_(NULL)
+  observer_(*this), warnings_(0), reducablePlaces_(NULL), ignoreRoles_(false)
   {
   }
 
@@ -349,7 +351,7 @@ PetriNet::PetriNet(const PetriNet & net) :
   labels_(net.labels_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
-  meta_(net.meta_), warnings_(net.warnings_),
+  meta_(net.meta_), warnings_(net.warnings_), ignoreRoles_(net.isIgnoringRoles()),
   reducablePlaces_(NULL)
   {
   setConstraintLabels(net.constraints_);
@@ -373,6 +375,7 @@ PetriNet::~PetriNet()
   assert(interfacePlaces_.empty());
   assert(interfacePlacesByPort_.empty());
   assert(arcs_.empty());
+  assert(roles_.empty());
 }
 
 
@@ -383,6 +386,7 @@ void PetriNet::clear()
   constraints_.clear();
   finalCondition_ = true;
   warnings_ = 0;
+  roles_.clear();
 
   // delete all places
   set<Place *> places = places_;
@@ -1205,6 +1209,13 @@ set<Place *> PetriNet::getInterfacePlaces(const string & port) const
   return places;
 }
 
+/*!
+ */
+
+const std::set<std::string> & PetriNet::getRoles() const
+{
+  return roles_;
+}
 
 /*!
  */
@@ -1302,6 +1313,15 @@ void PetriNet::addSynchronousLabels(const std::set<std::string> & labels)
 }
 
 /*!
+ * \brief Adds a role
+ */
+void PetriNet::addRole(std::string roleName) 
+{
+  roles_.insert(roleName);
+}
+
+
+/*!
  * \brief Removes a label to the interface
  */
 void PetriNet::removeSynchronousLabel(std::string label)
@@ -1317,6 +1337,11 @@ void PetriNet::removeSynchronousLabels(const std::set<std::string> & labels)
   for(set<string>::const_iterator label = labels.begin();
   label != labels.end(); ++label)
     labels_.erase(*label);
+}
+
+void PetriNet::removeRoles()
+{
+  ignoreRoles_ = true;
 }
 
 /*!
@@ -1379,6 +1404,28 @@ bool PetriNet::isNormal() const
   return true;
 }
 
+/*!
+ * \brief   Checks whether a transition role name is specified
+ *
+ * \return  true iff the transition role name has been specified
+ */
+bool PetriNet::isRoleSpecified(std::string roleName) const
+{
+  if(roles_.find(roleName) != roles_.end())
+	return true;
+  return false;
+
+}
+
+/*!
+ * \brief   Checks if role information is ignored
+ *
+ * \return  true iff role information is suppressed
+ */
+bool PetriNet::isIgnoringRoles() const
+{
+  return ignoreRoles_;
+}
 
 /*!
  * \brief   normalizes the given Petri net

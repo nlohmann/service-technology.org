@@ -1,3 +1,7 @@
+/*!
+ * \file  io-format.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -7,6 +11,7 @@
 #include "petrinet.h"
 #include "state.h"
 #include "myio.h"
+#include "util.h"
 
 using std::endl;
 using std::map;
@@ -543,6 +548,242 @@ ostream & output(ostream & os, const formula::FormulaLessEqual & f)
 
 
 /*************************************************************************
+ ***** PNMP output
+ *************************************************************************/
+
+std::ios_base & pnml(std::ios_base & ios)
+{
+  util::FormatData::data(ios) = util::PNML;
+  return ios;
+}
+
+
+namespace __pnml
+{
+
+ostream & outputInterface(ostream & os, const PetriNet & net) {
+    os << "      <port id=\"p1\">" << endl;
+
+    PNAPI_FOREACH(set<Place*>, net.getInputPlaces(), p) {
+        os << "        <input id=\"" << (*p)->getName() << "\" />" << endl;
+    }
+
+    PNAPI_FOREACH(set<Place*>, net.getOutputPlaces(), p) {
+        os << "        <output id=\"" << (*p)->getName() << "\" />" << endl;
+    }
+
+    PNAPI_FOREACH(set<std::string>, net.getSynchronousLabels(), l) {
+        os << "        <synchronous id=\"" << *l << "\" />" << endl;
+    }
+
+    os << "      </port>" << endl;
+    return os;
+}
+
+
+ostream & output(ostream & os, const PetriNet & net)
+{
+  string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
+  string inputfile = net.getMetaInformation(os, INPUTFILE);
+
+  os //< output everything to this stream
+
+  << "<!-- Petri net created by " << creator
+  << (inputfile.empty() ? "" : " reading " + inputfile)
+  << " -->" << endl
+  << endl
+
+  << "<pnml>" << endl
+  
+  << "  <module>" << endl
+
+  << "    <ports>" << endl;
+  outputInterface(os, net);
+  
+  os << "    </ports>" << endl
+
+  << "    <net id=\"n1\">" << endl
+
+  << mode(io::util::PLACE) << net.internalPlaces_
+
+  << net.transitions_
+
+  << mode(io::util::ARC) << filterInternalArcs(net.arcs_)
+
+  << "    </net>" << endl
+
+  << "    <finalmarkings>" << endl
+  << "      <marking>" << endl
+  << net.finalCondition_
+  << "      </marking>" << endl  
+  << "    </finalmarkings>" << endl
+
+  << "  </module>" << endl
+  
+  << "</pnml>" << endl;
+
+  return os << endl;
+}
+
+
+ostream & output(ostream & os, const Place & p)
+{
+  os << "      <place id=\"" << p.getName() << "\"";
+  
+  if (p.getTokenCount()) {
+    os
+    << ">" << endl
+    << "        <initialMarking>" << endl
+    << "          <text>" << p.getTokenCount() << "</text>" << endl
+    << "        </initialMarking>" << endl
+    << "      </place>" << endl;
+  } else {
+    os << " />" << endl;
+  }
+
+  return os;
+}
+
+
+ostream & output(ostream & os, const Transition & t)
+{
+  set<Place*> inputs = t.getPetriNet().getInputPlaces();
+  set<Place*> outputs = t.getPetriNet().getOutputPlaces();
+
+  string comm;
+  PNAPI_FOREACH(set<Node*>, t.getPreset(), p) {
+      if (inputs.find(static_cast<Place*>(*p)) != inputs.end()) {
+          comm += "\n        <receive id=\"" + (*p)->getName() + "\" />";
+      }
+  }
+  PNAPI_FOREACH(set<Node*>, t.getPostset(), p) {
+      if (outputs.find(static_cast<Place*>(*p)) != outputs.end()) {
+          comm += "\n        <send id=\"" + (*p)->getName() + "\" />";
+      }
+  }
+  PNAPI_FOREACH(set<std::string>, t.getSynchronizeLabels(), l) {
+      comm += "\n        <synchronize id=\"" + *l + "\" />";
+  }
+
+  if (comm.empty()) {
+      return os << "      <transition id=\"" << t.getName() << "\" />" << endl;
+  } else {
+      return os
+      << "      <transition id=\"" << t.getName() << "\">"
+      << comm << endl
+      << "      </transition>" << endl;
+  }
+}
+
+
+ostream & output(ostream & os, const Arc & arc)
+{
+  static unsigned int id = 0;
+  os
+  << "      <arc id=\"a" << ++id
+  << "\" source=\"" << arc.getSourceNode().getName()
+  << "\" target=\"" << arc.getTargetNode().getName()
+  << "\"";
+
+  if (arc.getWeight() > 1) {
+    os << ">" << endl
+       << "        <inscription>" << endl
+       << "          <text>" << arc.getWeight() << "</text>" << endl
+       << "        </inscription>" << endl
+       << "      </arc>" << endl;
+  } else {
+    os << " />" << endl;
+  }
+
+  return os;
+}
+
+
+ostream & output(ostream & os, const formula::Negation & f)
+{
+  set<const Formula *> children = filterInterfacePropositions(f.children());
+  if (children.empty())
+    assert(false); // FIXME: don't know what to do in this case
+  else
+    return os << "NOT (" << **f.children().begin() << ")";
+}
+
+
+ostream & output(ostream & os, const formula::Conjunction & f)
+{
+  set<const Formula *> children = filterInterfacePropositions(f.children());
+  if (children.empty())
+    //return os << formula::FormulaTrue();
+    assert(false); // FIXME: don't know what to do in this case
+  else
+    return os << children;
+}
+
+
+ostream & output(ostream & os, const formula::Disjunction & f)
+{
+  set<const Formula *> children = filterInterfacePropositions(f.children());
+  if (children.empty())
+    //return os << formula::FormulaFalse();
+    assert(false); // FIXME: don't know what to do in this case
+  else
+    return os << delim("      </marking>\n      <marking>\n") << children;
+}
+
+
+ostream & output(ostream & os, const formula::FormulaTrue &)
+{
+    return os;// << "TRUE";  // keyword not yet implemented in lola
+}
+
+
+ostream & output(ostream & os, const formula::FormulaFalse &)
+{
+  return os;// << "FALSE"; // keyword not yet implemented in lola
+}
+
+
+ostream & output(ostream & os, const formula::FormulaEqual & f)
+{
+  return os << "        <place id= \"" << f.place().getName() << "\">" << endl
+  << "          <text>" << f.tokens() << "</text>\n       </place>" << endl;
+}
+
+
+ostream & output(ostream & os, const formula::FormulaNotEqual & f)
+{
+  return os << f.place().getName() << " # " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaGreater & f)
+{
+  return os << f.place().getName() << " > " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaGreaterEqual & f)
+{
+  return os << f.place().getName() << " >= " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaLess & f)
+{
+  return os << f.place().getName() << " < " << f.tokens();
+}
+
+
+ostream & output(ostream & os, const formula::FormulaLessEqual & f)
+{
+  return os << f.place().getName() << " <= " << f.tokens();
+}
+
+} /* namespace __lola */
+
+
+
+/*************************************************************************
  ***** OWFN output
  *************************************************************************/
 
@@ -576,7 +817,15 @@ ostream & output(ostream & os, const PetriNet & net)
   << endl
 
   << util::mode(io::util::PLACE) << delim("; ")
-  << "PLACE"      << endl
+  << "PLACE"      << endl;
+
+  if(!net.getRoles().empty() && !net.isIgnoringRoles()){
+     os 
+     << delim(", ")
+     << "  ROLES "      << net.getRoles()          << ";" << endl;	
+  }
+
+  os
   << "  INTERNAL" << endl
   << "    " << io::util::groupPlacesByCapacity(net.internalPlaces_)
   << ";" << endl << endl << delim(", ")
@@ -586,6 +835,7 @@ ostream & output(ostream & os, const PetriNet & net)
   << "  OUTPUT"   << endl
   << "    " << net.outputPlaces_
   << ";" << endl << endl;
+
   if (!labels.empty()) os
   << "  SYNCHRONOUS" << endl
   << "    " << labels
@@ -661,10 +911,17 @@ ostream & output(ostream & os, const Transition & t)
   if (t.getCost() != 0)
     os << "  COST " << t.getCost() << ";" << endl;
 
+  if (!t.getRoles().empty() && !t.getPetriNet().isIgnoringRoles()){
+    os 
+    << delim(", ")
+    << "  ROLES "     << t.getRoles()             << ";" << endl;
+  }
+
   os
   << delim(", ")
   << "  CONSUME "     << t.getPresetArcs()        << ";" << endl
   << "  PRODUCE "     << t.getPostsetArcs()       << ";" << endl;
+
   if (t.isSynchronized()) os
   << "  SYNCHRONIZE " << t.getSynchronizeLabels() << ";" << endl;
   return os;

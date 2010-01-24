@@ -1,3 +1,7 @@
+/*!
+ * \file  state.cc
+ */
+
 #include <sstream>
 #include <map>
 #include "automaton.h"

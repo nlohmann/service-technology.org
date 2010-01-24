@@ -1,3 +1,7 @@
+/*!
+ * \file link.cc
+ */
+
 #include "config.h"
 #include <cassert>
 

@@ -1,18 +1,18 @@
 // -*- C++ -*-
 
 /*!
- * \file    io.h
+ * \file    myio.h
  *
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: cas $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2009-10-14 11:30:09 +0200 (Wed, 14 Oct 2009) $
+ * \date    $Date: 2010-01-21 00:59:06 +0100 (Thu, 21 Jan 2010) $
  *
- * \version $Revision: 4827 $
+ * \version $Revision: 5253 $
  */
 
 
@@ -202,6 +202,9 @@ std::istream & sa2sm(std::istream &);
 /// LOLA file format
 std::ios_base & lola(std::ios_base &);
 
+/// PNML file format
+std::ios_base & pnml(std::ios_base &);
+
 /// meta information manipulator
 util::Manipulator<std::pair<MetaInformation, std::string> >
 meta(MetaInformation, const std::string &);
@@ -228,7 +231,7 @@ namespace util
 /* FORMAT IMPLEMENTATION: add format constant */
 
 /// possible I/O formats
-enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, SA2SM, LOLA };
+enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, SA2SM, LOLA, PNML };
 
 /// I/O (sub-)mode
 enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
@@ -286,6 +289,34 @@ std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
 std::ostream & output(std::ostream &, const formula::FormulaGreater &);
 std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 } /* namespace __lola */
+
+
+//**************************
+//*** PNML output format ***
+//**************************
+
+/*!
+ * \brief   PNML I/O implementation
+ */
+namespace __pnml
+{
+std::ostream & outputInterface(std::ostream & os, const PetriNet & net);
+std::ostream & output(std::ostream &, const PetriNet &);
+std::ostream & output(std::ostream &, const Arc &);
+std::ostream & output(std::ostream &, const Place &);
+std::ostream & output(std::ostream &, const Transition &);
+std::ostream & output(std::ostream &, const formula::Negation &);
+std::ostream & output(std::ostream &, const formula::Conjunction &);
+std::ostream & output(std::ostream &, const formula::Disjunction &);
+std::ostream & output(std::ostream &, const formula::FormulaTrue &);
+std::ostream & output(std::ostream &, const formula::FormulaFalse &);
+std::ostream & output(std::ostream &, const formula::FormulaEqual &);
+std::ostream & output(std::ostream &, const formula::FormulaNotEqual &);
+std::ostream & output(std::ostream &, const formula::FormulaLess &);
+std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
+std::ostream & output(std::ostream &, const formula::FormulaGreater &);
+std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
+} /* namespace __pnml */
 
 
 //*************************

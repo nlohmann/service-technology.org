@@ -1,5 +1,9 @@
 // -*- C++ -*-
 
+/*!
+ * \file  formula.h
+ */
+
 #ifndef PNAPI_FORMULA_H
 #define PNAPI_FORMULA_H
 

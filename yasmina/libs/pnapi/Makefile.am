@@ -2,6 +2,7 @@ noinst_LIBRARIES = libpnapi.a
 
 libpnapi_a_SOURCES = \
 		parser-owfn.yy    parser-owfn-lexer.ll \
+		parser-pnml.yy    parser-pnml-lexer.ll \
 		parser-pn.yy parser-pn-lexer.ll \
 		parser-onwd.yy    parser-onwd-lexer.ll \
 		parser-lola.yy    parser-lola-lexer.ll \
@@ -21,9 +22,7 @@ libpnapi_a_SOURCES = \
 		marking.h marking.cc \
 		myio.h myio.cc io-format.cc \
 		errorhandling.cc \
-		Output.cc Output.h \
-		port.h port.cc \
-		interface.h interface.cc
+		Output.cc Output.h
 
 # to find customer's config.h header
 libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src

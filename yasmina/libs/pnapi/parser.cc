@@ -1,3 +1,7 @@
+/*!
+ * \file parser.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -169,6 +173,124 @@ const PetriNet & Parser::parse(istream & is)
 }
 } /* namespace owfn */
 
+namespace pnml
+{
+/******************************************\
+ *  "global" variables for flex and bison *
+\******************************************/
+
+/// generated petrinet
+PetriNet pnapi_pnml_yynet;
+/*
+/// mapping of names to places
+std::map<std::string, Place*> places_;
+/// recently read transition
+Transition* transition_ = NULL;
+/// cache of synchronous labels
+std::set<std::string> synchronousLabels_;
+/// all purpose place pointer
+Place* place_ = NULL;
+/// target of an arc
+Node * * target_ = NULL;
+/// source of an arc
+Node * * source_ = NULL;
+/// converts NUMBER and IDENT in string
+std::stringstream nodeName_;
+/// type of recently read places
+Node::Type placeType_;
+/// labels for synchronous communication
+std::set<std::string> labels_;
+/// read capacity
+int capacity_;
+/// used port
+std::string port_;
+/// constrains
+std::map<Transition*, std::set<std::string> > constrains_;
+/// whether read marking is the initial marking or a final marking
+bool markInitial_;
+/// pointer to a final marking
+Marking* finalMarking_ = NULL;
+/// whether pre- or postset is read
+bool placeSetType_;
+/// precet/postset for fast checks
+set<Place*> placeSet_;
+/// whether to check labels
+bool checkLabels_;
+/// wildcard ALL[_OTHER]_PLACES_EMPTY given
+bool wildcardGiven_ = false;
+*/
+/// "assertion"
+void check(bool condition, const std::string & msg)
+{
+  if (!condition)
+    throw io::InputError(io::InputError::SEMANTIC_ERROR, 
+        io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+        parser::line, parser::token, msg);
+}
+
+/*!
+ * \brief Constructor
+ */
+Parser::Parser()
+{
+}
+
+/*!
+ * \brief Destructor
+ * \note  Just used to call clean() automaticly
+ */
+Parser::~Parser()
+{
+  clean();
+}
+
+/*!
+ * \brief Overwrites read net with empty net to free memory.
+ */
+void Parser::clean()
+{
+  pnapi_pnml_yynet = PetriNet();
+}
+
+const PetriNet & Parser::parse(istream & is)
+{
+  // assign lexer input stream
+  stream = &is;
+
+  // reset line counter
+  line = 1;
+
+  pnapi_pnml_yynet = PetriNet();
+
+  // call the parser
+  pnml::parse();
+
+  // clean up lexer
+  pnml::lex_destroy();
+/*
+  // clean up global variables
+  places_.clear();
+  transition_ = NULL;
+  synchronousLabels_.clear();
+  place_ = NULL;
+  source_ = target_ = NULL;
+  nodeName_.clear();
+  labels_.clear();
+  constrains_.clear();
+  placeSet_.clear();
+
+  // final condition stuff
+  set<const Place*> concernedPlaces = pnapi_owfn_yynet.finalCondition().formula().places();
+  for(set<Place*>::iterator p = pnapi_owfn_yynet.getInterfacePlaces().begin();
+       p != pnapi_owfn_yynet.getInterfacePlaces().end(); ++p)
+  {
+    if(concernedPlaces.count(*p) > 0)
+      pnapi_owfn_yynet.setWarnings(PetriNet::W_INTERFACE_PLACE_IN_FINAL_CONDITION);
+  }
+*/
+  return pnapi_pnml_yynet;
+}
+} /* namespace pnml */
 
 
 namespace lola

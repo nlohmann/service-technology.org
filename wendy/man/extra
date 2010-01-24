@@ -12,14 +12,22 @@ The operating guidelines will be written to the file `service.og'.
 Unless a configuration file is explicitly given using the
 .B --config
 parameter, Wendy first tries to parse file
-.B wendy.conf
+.I wendy.conf
 from the sysconf directory (usually `/usr/local/etc') and then from the current working directory.
 
-[BUGS]
-See https://gna.org/bugs/?group=service-tech for open bugs.
+[REPORTING BUGS]
+If you experience a bug, please execute
+.IP
+wendy --bug
+.PP
+and send the generated file
+.I wendy.conf
+together with a description of the problem to
+.B wendy@service-technology.org.
+At https://gna.org/bugs/?group=service-tech you can see a list of open bugs.
 
 [COPYRIGHT]
-Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
+Copyright (c) 2009, 2010 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
 [SEE ALSO]
-lola(1), mia(1)
+lola(1), marlene(1), mia(1)

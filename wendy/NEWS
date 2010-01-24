@@ -21,6 +21,8 @@ Version 3.0-unreleased
 * moved the utility to minimize operating guidelines to the `ogapi' trunk
   (see `http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/')
 
+* added a tool paper with a case study (see `doc/toolpaper.pdf')
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

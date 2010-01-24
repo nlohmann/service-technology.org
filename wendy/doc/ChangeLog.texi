@@ -4,6 +4,8 @@
 
 @item implemented parameter @option{--pnml} to read a @acronym{PNML} file format
 @item moved the utility to minimize operating guidelines to the @samp{ogapi} trunk (see @url{http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/})
+
+@item added a tool paper with a case study (see @file{doc/toolpaper.pdf})
 @end itemize
 
 

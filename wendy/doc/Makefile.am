@@ -2,7 +2,7 @@
 info_TEXINFOS = wendy.texi
 
 # any other files you need to add (images)
-EXTRA_DIST =
+EXTRA_DIST = toolpaper.pdf
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 10

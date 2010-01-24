@@ -12,12 +12,12 @@ PURPOSE
     Wendy is a tool to synthesize partners for services. This includes a
     finite characterization of all partners (called "operating guidelines").
     Wendy uses a vast set of reduction rules to synthesize (small) 
-    partners. These rules may, however, not preserve all partners of the service
-    under consideration, but will synthesize a partner if one exists. 
+    partners. These rules may, however, not preserve all partners of the
+    service under consideration, but will synthesize a partner if one exists.
 
 
 COPYRIGHT
-    Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
+    Copyright (c) 2009, 2010 Niels Lohmann, Christian Sura, and Daniela Weinberg
 
 
 AUTHORS
@@ -44,4 +44,6 @@ INSTALLATION
 
 DOCUMENTATION
     The directory "doc" contains a documentation of Wendy. It can also be
-    downloaded at <http://service-technology.org/files/wendy/wendy.pdf>.
+    downloaded at <http://service-technology.org/files/wendy/wendy.pdf>. A
+    tool paper describing a case study conducted with Wendy can be found in
+    the file "doc/toolpaper.pdf".

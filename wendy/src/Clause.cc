@@ -242,7 +242,7 @@ void Clause::printToStream(const bool & dot, std::ostream& file) {
                     file << stringOr;
                 }
 
-                file << reinterpret_cast<size_t>((StoredKnowledge* ) finalKnowledges[i]->knowledge);
+                file << reinterpret_cast<size_t>(finalKnowledges[i]->knowledge);
                 first = false;
             }
 

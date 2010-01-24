@@ -26,6 +26,9 @@ class Graph {
         Type type;
 
     public:
+        /// constructor
+        Graph();
+      
         /// set the root of the graph
         void setRoot(Node *n);
         

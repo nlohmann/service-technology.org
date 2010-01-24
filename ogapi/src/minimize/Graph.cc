@@ -11,6 +11,13 @@ using std::map;
 using std::string;
 using std::vector;
 
+/// constructor
+Graph::Graph() :
+  root(NULL), type(NOTDEFINED)
+{
+  
+}
+
 /// set the root of the graph
 void Graph::setRoot(Node *n) {
     assert(n);

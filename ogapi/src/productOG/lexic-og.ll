@@ -26,11 +26,13 @@
 
 %{
 
+#include "config.h"
 #include <cstring>
 #include <iostream>
 #include <string>
+#include "formula.h"
 #include "syntax-og.h"
-#include "config.h"
+
 
 int yyerror(char const *msg);
 

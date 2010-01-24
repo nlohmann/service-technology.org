@@ -12,6 +12,9 @@ option "output" o
   typestr="OUTFILE"
   optional
 
+option "show-states" -
+  "State of input OGs will be noted at each state"
+  flag off
 
 
 section "Debugging"

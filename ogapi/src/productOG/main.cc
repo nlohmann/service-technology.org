@@ -32,6 +32,7 @@
 #include <config.h>
 #include "cmdline.h"
 #include "util.h"
+#include "formula.h"
 
 
 using std::cerr;
@@ -65,7 +66,7 @@ std::ostream* myOut = &cout;
 /// successor list of recent OG
 map<unsigned int, map<string, unsigned int> > succ;
 /// annotations of recent OG
-map<unsigned int, string> formulae;
+map<unsigned int, Formula *> formulae;
 /// input labels of recent OG
 set<string> inputs;
 /// output labels of recent OG
@@ -84,7 +85,7 @@ unsigned int * initialID = NULL;
 /// successor lists of all OGs
 vector<map<unsigned int, map<string, unsigned int> > > succList;
 /// annotations of all OGs
-vector<map<unsigned int, string> > formulaeList;
+vector<map<unsigned int, Formula *> > formulaeList;
 /// input labels of all OGs
 vector<set<string> > inputList;
 /// output labels of all OGs
@@ -106,11 +107,16 @@ set<string> pOutputs;
 /// product inputs
 set<string> pSynchronous;
 /// product formulae
-map<unsigned int, string> pFormulae;
+map<unsigned int, Formula *> pFormulae;
 /// product successors
 map<unsigned int, map<string, unsigned int> > pSucc;
 /// mapping from ID to state
 map<unsigned int, vector<unsigned int> > ID2state;
+/// needed for backtrace "false"-nodes
+map<unsigned int, map<string, unsigned int> > Pred;
+/// set of "false"-nodes or unreachable nodes
+set<unsigned int> badNodes;
+
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) 
@@ -258,19 +264,13 @@ int main(int argc, char** argv)
     unsigned int maxID = stateID_ = stateID(state); // maximum ID  
     toDo.push(stateID_);
     ID2state[stateID_] = state;
+    bool noEmptyYet = true;
     while(!toDo.empty())
     {
       stateID_ = toDo.front();
       toDo.pop();
       
       state = ID2state[stateID_];
-      string formula;
-      formula = "(" + formulaeList[0][state[0]] + ")";
-      for(unsigned int i = 1; i < state.size(); ++i)
-      {
-        formula += " * (" + formulaeList[i][state[i]] + ")";
-      }
-      pFormulae[stateID_] = formula;
       
       vector<set<string> > labels;
       for(unsigned int i = 0; i < state.size(); ++i)
@@ -279,6 +279,32 @@ int main(int argc, char** argv)
       }
       
       set<string> labels_ = util::intersection(labels);
+      
+      Formula * formula = formulaeList[0][state[0]]->clone();
+      
+      for(unsigned int i = 1; i < state.size(); ++i)
+      {
+        Formula * tmp = (*formula) & (*formulaeList[i][state[i]]);
+        delete formula;
+        formula = tmp;
+      }
+      
+      {
+        Formula * formula_ = formula->dnf();
+        delete formula;
+        
+        formula = formula_->simplify(labels_);
+        delete formula_;
+        
+        pFormulae[stateID_] = formula;
+        
+        // this node later has to be removed
+        if((*formula) == false)
+        {
+          badNodes.insert(stateID_);
+        }
+      }
+      
       for(set<string>::iterator l = labels_.begin(); l != labels_.end(); ++l)
       {
         for(unsigned int i = 0; i < state.size(); ++i)
@@ -288,9 +314,16 @@ int main(int argc, char** argv)
         
         unsigned int newStateID = stateID(successor);
         pSucc[stateID_][*l] = newStateID;
+        Pred[newStateID][*l] = stateID_;
         if(newStateID > maxID)
         {
           maxID = newStateID;
+          toDo.push(newStateID);
+          ID2state[newStateID] = successor;
+        }
+        if((noEmptyYet) && (newStateID == 0))
+        {
+          noEmptyYet = false;
           toDo.push(newStateID);
           ID2state[newStateID] = successor;
         }
@@ -298,8 +331,68 @@ int main(int argc, char** argv)
     }
   }
   
+  /*---------------------.
+  | 4. remove bad nodes  |
+  `---------------------*/
+  for(set<unsigned int>::iterator badNode = badNodes.begin();
+       badNode != badNodes.end(); badNode = badNodes.begin())
+  {
+    // we will change the set we are iterating through, so we better save the node ID
+    unsigned int node = *badNode;
+    
+    // process successors
+    for(map<string, unsigned int>::iterator it = pSucc[node].begin();
+         it != pSucc[node].end(); ++it)
+    {
+      // remove bad node from predecessors
+      Pred[it->second].erase(it->first);
+      
+      // if this node now is unreachable
+      if(Pred[it->second].empty())
+      {
+        // this node is also a bad node
+        badNodes.insert(it->second);
+      }
+    }
+    pSucc.erase(node);
+    
+    // precess predecessors
+    for(map<string, unsigned int>::iterator it = Pred[node].begin();
+         it != Pred[node].end(); ++it)
+    {
+      // remove bad nodes from successors
+      pSucc[it->second].erase(it->first);
+      
+      // get new set of present labels
+      set<string> labels;
+      for(map<string, unsigned int>::iterator l = pSucc[it->second].begin();
+           l != pSucc[it->second].end(); ++l)
+      {
+        labels.insert(l->first);
+      }
+      
+      // recalculate formula
+      Formula * formula = pFormulae[it->second]->simplify(labels);
+      delete (pFormulae[it->second]);
+      pFormulae[it->second] = formula;
+      
+      // check for bad nodes
+      if((*formula) == false)
+      {
+        badNodes.insert(it->second);
+      }
+    }
+    
+    // remove bad node
+    pSucc.erase(node);
+    Pred.erase(node);
+    delete (pFormulae[node]);
+    pFormulae.erase(node);
+    badNodes.erase(node);
+  }
+  
   /*-----------------.
-  | 4. write output  |
+  | 5. write output  |
   `-----------------*/
   (*myOut) << "INTERFACE\n";
   if(!pInputs.empty())
@@ -334,20 +427,23 @@ int main(int argc, char** argv)
   }
   
   (*myOut) << "\nNODES\n";
-  for(unsigned int i = 1; i <= stateID_; ++i)
+  for(map<unsigned int, map<string, unsigned int> >::iterator i = pSucc.begin();
+       i != pSucc.end(); ++i)
   {
-    (*myOut) << "  " << i << " : " << pFormulae[i] << "\n";
-    
-    //TODO: remove debug output
-    (*myOut) << "  { ";
-    for(unsigned int j = 0; j < ID2state[i].size(); ++j)
+    if(args_info.show_states_given)
     {
-      (*myOut) << ID2state[i][j] << " ";
+      (*myOut) << "  { ";
+      for(unsigned int j = 0; j < ID2state[i->first].size(); ++j)
+      {
+        (*myOut) << ID2state[i->first][j] << " ";
+      }
+      (*myOut) << "}\n";
     }
-    (*myOut) << "}\n";
+        
+    (*myOut) << "  " << (i->first) << " : " << pFormulae[i->first] << "\n";
     
-    for(map<string, unsigned int>::iterator succ = pSucc[i].begin();
-         succ != pSucc[i].end(); ++succ)
+    for(map<string, unsigned int>::iterator succ = (i->second).begin();
+         succ != (i->second).end(); ++succ)
     {
       (*myOut) << "    " << succ->first << " -> " << succ->second << "\n";
     }

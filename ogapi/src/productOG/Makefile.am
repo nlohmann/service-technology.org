@@ -1,6 +1,7 @@
 bin_PROGRAMS = productOG
 
-productOG_SOURCES = main.cc \
+productOG_SOURCES = main.cc config.h \
+		    formula.h formula.cc \
 		    syntax-og.yy lexic-og.ll \
                     cmdline.c cmdline.h \
 		    util.h

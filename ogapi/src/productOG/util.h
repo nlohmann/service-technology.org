@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <algorithm>
 
 namespace util
 {
@@ -112,6 +113,23 @@ std::set<T> intersection(std::vector<std::set<T> > sets)
     iterators.pop_front();
   }
   
+  return result;
+}
+
+/*!
+ * \brief returns the union of two sets
+ *
+ * \param a  a set of type T
+ * \param b  a set of type T
+ * \returns set \f$a \cup b\f$
+ */
+template <class T>
+std::set<T> setUnion(const std::set<T> & a, const std::set<T> & b)
+{
+  std::set<T> result;
+  std::insert_iterator<std::set<T, std::less<T> > > res_ins(result, result.begin());
+  std::set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+
   return result;
 }
 

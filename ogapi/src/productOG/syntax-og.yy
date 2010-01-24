@@ -25,6 +25,7 @@
 %{
 
 #include "config.h"
+#include "formula.h"
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -39,7 +40,7 @@ extern int yyerror(char const *msg);
 
 // from main
 extern std::map<unsigned int, std::map<std::string, unsigned int> > succ;
-extern std::map<unsigned int, std::string> formulae;
+extern std::map<unsigned int, Formula *> formulae;
 extern std::set<std::string> inputs;
 extern std::set<std::string> outputs;
 extern std::set<std::string> synchronous;
@@ -62,7 +63,7 @@ unsigned int nodeID;
 %union {
     char *str;
     unsigned int value;
-    std::string * phi;
+    Formula * phi;
 }
 
 %type <value> NUMBER
@@ -135,15 +136,14 @@ node:
     if(initialID == NULL)
       initialID = new unsigned int($1);
     nodeID = $1;
-    formulae[$1] = (*$2);
-    delete $2;
+    formulae[$1] = ($2);
   }
   successors
 ;
 
 
 annotation:
-  /* empty */        { $$ = new std::string(); }
+  /* empty */        { $$ = dynamic_cast<Formula *>(new Literal(true)); }
 | COLON formula      { $$ = $2; }
 | DOUBLECOLON BIT_S  { yyerror("can only produce formula OGs"); }
 | DOUBLECOLON BIT_F  { yyerror("can only produce formula OGs"); }
@@ -154,35 +154,33 @@ annotation:
 formula:
   LPAR formula RPAR
   {
-    (*$2) = "(" + (*$2) + ")";
     $$ = $2;
   }
 | formula OP_AND formula
   {
-    (*$1) += " * " + (*$3);
+    $$ = (*$1) & (*$3);
+    delete $1;
     delete $3;
-    $$ = $1;
   }
 | formula OP_OR formula
   {
-    (*$1) += " + " + (*$3);
+    $$ = (*$1) | (*$3);
+    delete $1;
     delete $3;
-    $$ = $1;
   }
 | OP_NOT formula
   {
-    (*$2) = "~" + (*$2);
-    $$ = $2;
+    yyerror("can't handle negations, yet");
   }
 | KEY_FINAL
-  { $$ = new std::string("final"); }
+  { $$ = dynamic_cast<Formula *>(new Literal(std::string("final"))); }
 | KEY_TRUE
-  { $$ = new std::string("true"); }
+  { $$ = dynamic_cast<Formula *>(new Literal(true)); }
 | KEY_FALSE
-  { $$ = new std::string("false"); }
+  { $$ = dynamic_cast<Formula *>(new Literal(false)); }
 | IDENT
   {
-    $$ = new std::string($1);
+    $$ = dynamic_cast<Formula *>(new Literal(std::string($1)));
     free($1);
   }
 ;

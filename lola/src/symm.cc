@@ -557,22 +557,19 @@ unsigned int Stamp;
 
 void NewStamp()
 {
-  NodeType n;
-  DomType d;
-  unsigned int i;
-  if(Stamp == UINT_MAX)
+    if(Stamp == UINT_MAX)
     {
-      for(n=0;n<2;n++)
-	for(d=0;d<2;d++)
-	  for(i=0;i< (n? Transitions[0]->cnt : Places[0]->cnt);i++)
-	    {
-	      Reaktor[n][d][i].stamp =0;
-	    }
-      Stamp = 1;
+        for(NodeType n=0;n<2;n++)
+            for(DomType d=0;d<2;d++)
+                for(unsigned int i=0;i< (n? Transitions[0]->cnt : Places[0]->cnt);i++)
+        {
+            Reaktor[n][d][i].stamp =0;
+        }
+        Stamp = 1;
     }
-  else
+    else
     {
-      Stamp++;
+        Stamp++;
     }
 }
 

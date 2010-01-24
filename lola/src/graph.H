@@ -227,7 +227,7 @@ class StatevectorList
 
 inline Statevector::~Statevector()
 {
-	if(vector) delete [] vector;
+	delete [] vector;
 }
 
 inline unsigned int Statevector::operator [] (unsigned int i)
@@ -288,10 +288,10 @@ inline Decision::~Decision()
 		if(next[i]) delete next[i];
 		if((!index[i]) && vector[i]) delete vector[i];
 	}
-	if(index) delete [] index;
-	if(vector) delete [] vector;
-	if(value) delete [] value;
-	if(next) delete [] next;
+	delete [] index;
+	delete [] vector;
+	delete [] value;
+	delete [] next;
 }
 
 inline Decision::Decision(unsigned int p)
@@ -1380,7 +1380,7 @@ inline void binDelete(binDecision ** Bucket)
 	if((*Bucket) -> nextold)
 	{
 		unsigned int vbyte, obyte;
-		unsigned int upper, lower; 
+		unsigned int upper; 
 		unsigned char * v, * o;
 		v = (*Bucket) -> vector;
 		
@@ -1399,8 +1399,7 @@ inline void binDelete(binDecision ** Bucket)
 		// 2. copy remaining vector
 		if(upper)
 		{
-			
-			lower = 8 - upper;
+			unsigned int lower = 8 - upper;
 			obyte = 0;
 			unsigned char vuppermask = ( (1 << upper) - 1) << lower ;
 			unsigned char vlowermask = (1 << lower) - 1;

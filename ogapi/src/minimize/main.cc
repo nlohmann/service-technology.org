@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include "cmdline.h"
 #include "Graph.h"
 #include "verbose.h"
@@ -57,15 +58,14 @@ int main(int argc, char **argv)
   status("minimizing graph done");
   if (args_info.output_given)
   {
-    char *filename;
-    if (strcmp(args_info.inputs[0], ""))
-      filename = strcat(strdup(args_info.inputs[0]), ".minimized.og");
+    std::string filename = ((args_info.inputs_num > 0) ? args_info.inputs[0] : "stdin");
+    if (strcmp(args_info.output_arg, ""))
+      filename += ".minimized.og";
     else
-      filename = strdup(args_info.inputs[0]);
-    FILE *output = fopen(filename, "w");
+      filename = args_info.output_arg;
+    FILE *output = fopen(filename.c_str(), "w");
     G.ogOut(output);
     fclose(output);
-    delete filename;
   }
   else
     G.ogOut();

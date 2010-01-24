@@ -1,4 +1,15 @@
 AC_INIT(Diane, 1.1-unreleased, diane@service-technology.org, diane, http://service-technology.org/diane)
+
+AC_MSG_NOTICE([ ____  _                  ])
+AC_MSG_NOTICE([|  _ \(_) __ _ _ __   ___ ])
+AC_MSG_NOTICE([| | | | |/ _` | '_ \ / _ \\])
+AC_MSG_NOTICE([| |_| | | (_| | | | |  __/])
+AC_MSG_NOTICE([|____/|_|\__,_|_| |_|\___|])
+AC_MSG_NOTICE([decomposing Petri nets])
+AC_MSG_NOTICE([http://service-technology.org/diane])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 

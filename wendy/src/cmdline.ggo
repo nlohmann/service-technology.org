@@ -1,7 +1,7 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Wendy:"
-purpose "Wendy is a tool to synthesize partners for services.\n\n  Report bugs to wendy@service-technology.org.\n  Visit Wendy's home page at http://service-technology.org/wendy"
+purpose "Wendy: synthesizing partners for services.\n\n  Report bugs to wendy@service-technology.org.\n  Visit Wendy's home page at http://service-technology.org/wendy"
 
 
 section "Analysis Task"

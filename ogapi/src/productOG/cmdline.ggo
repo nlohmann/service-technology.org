@@ -12,6 +12,10 @@ option "output" o
   typestr="OUTFILE"
   optional
 
+option "ignoreEmptyNode" -
+  "Nodes with ID '0' will be ignored. For evaluation purpose only."
+  flag off
+
 option "show-states" -
   "State of input OGs will be noted at each state"
   flag off

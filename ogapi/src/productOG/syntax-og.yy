@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include "formula.h"
+#include "cmdline.h"
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -46,6 +47,10 @@ extern std::set<std::string> outputs;
 extern std::set<std::string> synchronous;
 extern std::map<unsigned int, std::set<std::string> > presentLabels;
 extern unsigned int * initialID;
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
+
 
 // data structures
 std::set<std::string> * labelSet;
@@ -136,7 +141,15 @@ node:
     if(initialID == NULL)
       initialID = new unsigned int($1);
     nodeID = $1;
-    formulae[$1] = ($2);
+    if(args_info.ignoreEmptyNode_given && ($1 == 0))
+      delete ($2);
+      if((*initialID) == 0)
+      {
+        delete initialID;
+        initialID = NULL;
+      }
+    else
+      formulae[$1] = ($2);
   }
   successors
 ;
@@ -190,9 +203,12 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    succ[nodeID][$2] = $4;
-    presentLabels[nodeID].insert($2);
-    free($2);
+    if(!(args_info.ignoreEmptyNode_given && ((nodeID == 0) || ($4 == 0))))
+    {
+      succ[nodeID][$2] = $4;
+      presentLabels[nodeID].insert($2);
+      free($2);
+    }
   }
 ;
 

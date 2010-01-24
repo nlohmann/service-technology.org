@@ -252,12 +252,12 @@ int main(int argc, char** argv)
   pInputs = util::intersection(inputList);
   pOutputs = util::intersection(outputList);
   pSynchronous = util::intersection(synchronousList);
-  unsigned int stateID_; // will be the ID of the last state
   
   /* A breadth-first search will be startet by the state
    * consisting of the initial states of all OGs
    */
   {
+    unsigned int stateID_; // will be the ID of the last state
     vector<unsigned int> state = initialIDs; // start with the initial state
     vector<unsigned int> successor = state;
     queue<unsigned int> toDo; // queue of states to do

@@ -33,7 +33,7 @@ using std::endl;
 /*!
  * \brief comparison operator
  */
-bool Formula::operator==(bool b) const
+bool Formula::operator==(bool) const
 {
   return false;
 }

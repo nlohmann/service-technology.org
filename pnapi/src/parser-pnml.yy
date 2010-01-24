@@ -132,10 +132,16 @@ void close_element() {
 
                 if (!attributes[current_depth]["__send__"].empty()) {
                     Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["__send__"]);
+                    if (!target) {
+                        yyerror(std::string("output place '" + attributes[current_depth]["__send__"] + "' not found").c_str());
+                    }
                     pnapi_pnml_yynet.createArc(*currentTransition, *target);
                 }
                 if (!attributes[current_depth]["__receive__"].empty()) {
                     Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["__receive__"]);
+                    if (!target) {
+                        yyerror(std::string("input place '" + attributes[current_depth]["__receive__    "] + "' not found").c_str());
+                    }
                     pnapi_pnml_yynet.createArc(*target, *currentTransition);
                 }
                 if (!attributes[current_depth]["__synchronize__"].empty()) {
@@ -148,7 +154,13 @@ void close_element() {
             case(T_ARC): {
                 //printf("creating arc %s\n", attributes[current_depth]["id"].c_str());
                 Node *source = pnapi_pnml_yynet.findNode(attributes[current_depth]["source"]);
+                if (!source) {
+                    yyerror(std::string("node '" + attributes[current_depth]["source"] + "' not found").c_str());
+                }
                 Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["target"]);
+                if (!target) {
+                    yyerror(std::string("node '" + attributes[current_depth]["target"] + "' not found").c_str());
+                }
                 unsigned int weight = (attributes[current_depth]["__inscription__"].empty()) ? 1 : atoi(attributes[current_depth]["__inscription__"].c_str());
                 pnapi_pnml_yynet.createArc(*source, *target, weight);
                 break;
@@ -197,6 +209,9 @@ void close_element() {
             case(T_PLACE): {
                 unsigned int tokens = atoi(attributes[current_depth]["__finalMarking__"].c_str());
                 Node *place = pnapi_pnml_yynet.findNode(attributes[current_depth]["id"]);
+                if (!place) {
+                    yyerror(std::string("place '" + attributes[current_depth]["id"] + "' not found").c_str());
+                }
                 (*currentMarking)[(const pnapi::Place&)*place] = tokens;
             }
             
@@ -243,8 +258,8 @@ void store_data(char *s) {
 
 %union {char *s;}
 
-%token XML_VERSION XML_ATTDEF XML_ENDDEF XML_EQ XML_SLASH XML_CLOSE XML_END
-%token <s> XML_ENCODING XML_NAME XML_VALUE XML_DATA XML_COMMENT XML_START
+%token XML_ENDDEF XML_EQ XML_SLASH XML_CLOSE XML_END
+%token <s> XML_NAME XML_VALUE XML_DATA XML_COMMENT XML_START
 %type <s> name_opt
 
 
@@ -254,18 +269,7 @@ void store_data(char *s) {
 %%
 
 document:
-  prolog element misc_seq_opt
-;
-prolog:
-  version_opt encoding_opt misc_seq_opt
-;
-version_opt:
-  XML_VERSION
-| /*empty*/
-;
-encoding_opt:
-  XML_ENCODING                       {free($1);}
-| /*empty*/
+  misc_seq_opt element misc_seq_opt
 ;
 misc_seq_opt:
   misc_seq_opt misc
@@ -273,10 +277,6 @@ misc_seq_opt:
 ;
 misc:
   XML_COMMENT
-| attribute_decl
-;
-attribute_decl:
-  XML_ATTDEF XML_NAME attribute_seq_opt XML_ENDDEF
 ;
 element:
   XML_START                          {open_element($1); free($1);}

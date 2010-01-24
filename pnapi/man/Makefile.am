@@ -1,8 +1,8 @@
-man_MANS = petri.1
+# the manpages to create
+man_MANS = petri.1 cdnf.1
 
-MAINTAINERCLEANFILES = $(man_MANS) petri.pdf
-
-EXTRA_DIST = $(man_MANS) extra
+# additional files
+EXTRA_DIST = extra
 
 petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
@@ -15,7 +15,25 @@ petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
 		--opt-include=extra \
 		--no-info
 
-petri.pdf:
-	$(AM_V_GEN)groff -Tps -mandoc -c petri.1 | ps2pdf - petri.pdf
+cdnf.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
+	$(AM_V_GEN)$(HELP2MAN) \
+		$(top_builddir)/utils/cdnf \
+		--name="$(PACKAGE_NAME): canonic disjunctive normal form" \
+		--output=$@ \
+		--manual="service-technology.org" \
+		--source="service-technology.org" \
+		--help-option="--help" \
+		--no-info
 
-man-pdf: petri.1 petri.pdf
+
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
+
+MAINTAINERCLEANFILES = $(man_MANS) $(man_MANS:.1=.pdf)
+EXTRA_DIST += $(man_MANS)
+
+man-pdf: $(man_MANS:.1=.pdf)
+
+%.pdf: %.1
+	$(AM_V_GEN)groff -Tps -mandoc -c $< | ps2pdf - $(@:.1=.pdf)

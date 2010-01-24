@@ -73,20 +73,15 @@ static char* word(char *s)
 %}
 
 
-nl              (\r\n|\r|\n)
-ws              [ \t\r\n]+
-open            {nl}?"<"
-close           ">"{nl}?
+ws              [ \t\r\n]*
+open            "<"
 namestart       [A-Za-z\200-\377_]
 namechar        [A-Za-z\200-\377_0-9.-]
-esc             "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 name            {namestart}{namechar}*
+esc             "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 data            ([^<\n&]|\n[^<&]|\n{esc}|{esc})+
-comment         {open}"!--"([^-]|"-"[^-])*"--"{close}
+comment         {open}"!--"([^-]|"-"[^-])*"-->"
 string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
-version         {open}"?XML-VERSION 1.0?"{close}
-encoding        {open}"?XML-ENCODING"{ws}{name}{ws}?"?"{close}
-attdef          {open}"?XML-ATT"
 
 /*
  * The CONTENT mode is used for the content of elements, i.e.,
@@ -100,28 +95,21 @@ attdef          {open}"?XML-ATT"
 
 %%
 
-"<?xml version=\"1.0\" encoding=\"utf-8\"?>" {}
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" {}
-"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" {}
-"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" {}
+<INITIAL>"<?"{data}*"?>" {}
 
-<INITIAL>{ws}           {/* skip */}
-<INITIAL>{version}      {return XML_VERSION;}
-<INITIAL>{encoding}     {pnapi_pnml_yylval.s = word(yytext + 14); return XML_ENCODING;}
+{ws}                    {/* skip */}
 <INITIAL>"/"            {return XML_SLASH;}
 <INITIAL>"="            {return XML_EQ;}
-<INITIAL>{close}        {BEGIN(CONTENT); return XML_CLOSE;}
+<INITIAL>">"            {BEGIN(CONTENT); return XML_CLOSE;}
 <INITIAL>{name}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_NAME;}
 <INITIAL>{string}       {pnapi_pnml_yylval.s = strdup(yytext); return XML_VALUE;}
-<INITIAL>"?"{close}     {BEGIN(keep); return XML_ENDDEF;}
 
-{attdef}                {keep = YY_START; BEGIN(INITIAL); return XML_ATTDEF;}
-{open}{ws}?{name}       {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START;}
-{open}{ws}?"/"          {BEGIN(INITIAL); return XML_END;}
+{open}{name}            {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START;}
+{open}"/"               {BEGIN(INITIAL); return XML_END;}
 {comment}               {pnapi_pnml_yylval.s = strdup(yytext); return XML_COMMENT;}
 
 <CONTENT>{data}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA;}
 
 .                       {yyerror("lexial error");}
-{nl}                    {/* skip, must be an extra one at EOF */;}
+<<EOF>>                 {return EOF;}
 

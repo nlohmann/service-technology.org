@@ -319,6 +319,12 @@ unsigned int Place::getTokenCount() const
 }
 
 
+void Place::setTokenCount(unsigned int tokens)
+{
+  tokens_ = tokens;
+}
+
+
 /*!
  */
 unsigned int Place::getCapacity() const

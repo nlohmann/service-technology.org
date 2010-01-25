@@ -254,6 +254,9 @@ public:
   /// returns the number of tokens lying on this place
   unsigned int getTokenCount() const;
 
+  /// sets the number of tokens lying on this place
+  void setTokenCount(unsigned int);
+
   /// returns the capacity
   unsigned int getCapacity() const;
 

@@ -1118,16 +1118,9 @@ AT_BANNER([Operating Guideline for Weak Termination])
 AT_SETUP([ZEUS Seller Service])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/zeus.owfn .])
-AT_CHECK([WENDY zeus.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
+AT_CHECK([WENDY zeus.owfn --verbose --og --dot --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 8" stderr])
 AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 10" stderr])
-AT_KEYWORDS(livelock-freedom og)
-AT_CLEANUP
-
-AT_SETUP([ZEUS Seller Service (dot output)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/zeus.owfn .])
-AT_CHECK([WENDY zeus.owfn --verbose --og --dot --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -c "<tr><td" zeus.dot],0,[9
 ],ignore)
 AT_KEYWORDS(livelock-freedom og)
@@ -1142,12 +1135,14 @@ AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2896" stde
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 
-AT_SETUP([RS])
+AT_SETUP([Acyclic net])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/RS.owfn .])
-AT_CHECK([WENDY RS.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
+AT_CHECK([WENDY RS.owfn --verbose --dot --og --correctness=livelock],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 369" stderr])
 AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 571" stderr])
+AT_CHECK([GREP -c "<tr><td" RS.dot],0,[370
+],ignore)
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 

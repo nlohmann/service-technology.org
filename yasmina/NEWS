@@ -9,6 +9,9 @@
 Version 1.1-unreleased
 ======================
 
+* improved data load time for state eq, fg
+* made cover all compatible with changes
+* made output (including path witnisses) uniform
 
 See file ChangeLog <http://service-technology.org/files/yasmina/ChangeLog> for
 complete version history.

@@ -1,4 +1,9 @@
 @heading Version 1.1-unreleased
+@itemize
+@item improved data load time for state eq, fg
+@item made cover all compatible with changes
+@item made output (including path witnisses) uniform
+@end itemize
 
 @heading Version 1.0 (18 January 2009)
 @itemize

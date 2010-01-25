@@ -1180,7 +1180,7 @@ int main(int argc, char** argv) {
 							roww[get_nameindex(mps.at(ifm-1), cstr,FALSE)]=ite->second;
 						}//cout << (*fi)->lb<<" "<<(*fi)->ub<<endl;
 						int rhs=(*fi)->lb;//bd.first;
-						set_add_rowmode(mps.at(ifm-1), TRUE);
+						
 						if(!add_constraint(mps.at(ifm-1), roww,GE, rhs))
 						cout<<"gata"<<endl;
 						if ((*fi)->ub!=USHRT_MAX) {//if (bd.second!=USHRT_MAX) {
@@ -1190,7 +1190,7 @@ int main(int argc, char** argv) {
 						else {
 							set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), get_infinite(mps.at(ifm-1)));
 						}
-					set_add_rowmode(mps.at(ifm-1), FALSE);
+					//set_add_rowmode(mps.at(ifm-1), FALSE);
 						
 						kn++;
 					}
@@ -1242,15 +1242,33 @@ int main(int argc, char** argv) {
 						lprec * lpr=copy_lp(mps.at(i)); 
 						//cout<<get_Nrows(lpmps.at(j));
 						for (int r=0; r<get_Nrows(lpmps.at(j)); ++r) {
-							REAL *rowp=new REAL[1+get_Ncolumns(lpr)]();//int *colp;
+							/*
+							 int Ncol=net1.getPlaces().size();
+							 
+							//colno = (int *) malloc(Ncol * sizeof(*colno));
+							//rowe = (REAL *) malloc(Ncol * sizeof(*rowe));
+							
+							int nr_of_cols = get_rowex(*cIt2,j,rowe,colno);
+							//cout<<"Sizeof "<<sizeof(rowe)<<" and j is " << j << endl;
+							//for(int k=0;k<1+ net1.getPlaces().size();k++) cout<<rowpl[k]<<" ";
+							;							//set_verbose(lpcopy,FULL);//cout<<"Constraint type "<<get_constr_type(*cIt2,j)<<endl;
+							if(!add_constraintex(lpcopy, nr_of_cols ,rowe,colno ,get_constr_type(*cIt2,j), get_rh(*cIt2,j)))
+								cout<<"gata"<<endl;
+							set_row_name(lpcopy,get_Nrows(lpcopy), get_row_name(*cIt2,j));
+							 */
+							int * colno=new int[1+get_Ncolumns(lpr)]();
+							REAL * rowe= new REAL[1+get_Ncolumns(lpr)]();
+							/*REAL *rowp=new REAL[1+get_Ncolumns(lpr)]();//int *colp;
 							if(get_row(lpmps.at(j),r+1,rowp)==0) abort(2, "lpsolve	");//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
-
+							*/
+							int count=get_rowex(lpmps.at(j),r+1,rowe,colno);
+							if (count==0)  abort(2, "lpsolve	");//for(int b=0;b<get_Ncolumns(lpr);b++){cout<<rowp[b]<<" ";}
 							//for(int j=0;j<get_Ncolumns(lpmp);j++){rowwpp[j+hh-get_Ncolumns(lpmp)]=rowp[j+1];}
 							//for(int j=0;j<hh;j++){cout<<rowwpp[j]<<" ";}
 
 							//if( grex==-1) cout<<"gata";
-							add_constraint(lpr,rowp,get_constr_type(lpmps.at(j),r+1),get_rh(lpmps.at(j),r+1));
-							
+							//add_constraint(lpr,rowp,get_constr_type(lpmps.at(j),r+1),get_rh(lpmps.at(j),r+1));
+							add_constraintex(lpr,count,rowe,colno,get_constr_type(lpmps.at(j),r+1),get_rh(lpmps.at(j),r+1));
 							//set_rh_range(lpr,get_Nrows(lpmps.at(j)),get_rh_range(lpmps.at(j),r+1));
 							//print_lp(lpr);
 						}st.push_back(lpr);

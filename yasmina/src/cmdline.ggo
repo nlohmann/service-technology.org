@@ -11,7 +11,7 @@ Yasmina's default input are open nets. Further, Yasmina checks compatibility und
 
 
 option "enforceEvents" e
-	"Enforce event(s) - list of transitions"
+	"Enforce event(s) - list of transitions; -e all --- for covering of all places and transitions"
 	string multiple
 	optional
 	

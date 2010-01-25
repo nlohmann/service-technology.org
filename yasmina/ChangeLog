@@ -9,6 +9,10 @@
 Version 1.1-unreleased
 ======================
 
+* improved data load time
+* made cover all compatible with changes
+* made output (including path witnisses) uniform
+
 Version 1.0 (18 January 2009)
 =============================
 

@@ -34,23 +34,26 @@ namespace util
 {
 
 /*!
-     \brief output file organization
+ \brief output file organization
 
-     This file is a wrapper class around an STL ostream object and organizes the
-     lifecycle of an output. An output can be a regular file that is created by
-     the tool, a temporary file that is used to communicate with other tools,
-     or a redirection to the standard output stream.
+ This file is a wrapper class around an STL ostream object and organizes the
+ lifecycle of an output. An output can be a regular file that is created by
+ the tool, a temporary file that is used to communicate with other tools,
+ or a redirection to the standard output stream.
 
-     To create a regular file, call the constructor with a filename and a
-     description of the output (for verbose messages). To create a temporary
-     file, call the constructor without arguments. Temporary files will be
-     deleted when the object is destroyed unless the parameter '--noClean' is
-     given. To redirect to standard output, use the the filename "-".
+ To create a regular file, call the constructor with a filename and a
+ description of the output (for verbose messages). To create a temporary
+ file, call the constructor without arguments. Temporary files will be
+ deleted when the object is destroyed unless the parameter '--noClean' is
+ given. To redirect to standard output, use the the filename "-".
 
-     The quite tricky constructor was taken from the Ubuntu Forums at
-     http://ubuntuforums.org/showthread.php?p=5929211
+ The quite tricky constructor was taken from the Ubuntu Forums at
+ http://ubuntuforums.org/showthread.php?p=5929211
  */
 class Output {
+private:
+  /// helper function to create temp files
+  char * createTmp();
 
 public: /* member functions */
 
@@ -58,13 +61,13 @@ public: /* member functions */
   Output();
 
   /// constructor (opens named stream or directs to std::cout)
-  Output(std::string&, std::string);
+  Output(const std::string &, const std::string &);
 
   /// destructor (closes stream)
   ~Output();
 
   /// implicit conversation operator to ostream
-  operator std::ostream&();
+  operator std::ostream&() const;
 
   /// returns the filename of this object
   std::string name() const;
@@ -81,11 +84,12 @@ private: /* member attributes */
   std::string filename;
 
   /// its a temp file if its not NULL
-  char* temp;
+  char * temp;
 
   /// the kind of the file
-  std::string kind;
+  const std::string kind;
 };
+
 } /* namespace util */
 } /* namespace pnapi */
 

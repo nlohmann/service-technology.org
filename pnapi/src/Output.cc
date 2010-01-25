@@ -38,7 +38,7 @@ namespace pnapi
 {
 namespace util
 {
-const char* tmpFileTemplate = "/tmp/pnapi-XXXXXX";
+char* tmpFileTemplate = (char*)"/tmp/pnapi-XXXXXX";
 }
 }
 

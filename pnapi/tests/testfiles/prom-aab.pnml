@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pnml>
+<net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+<name>
+<text>
+Unlabeled net (imported from peller.pnml)</text>
+</name>
+<page id="node0">
+<place id="node1">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="317.0" y="26.0"/>
+<dimension x="20.0" y="20.0"/>
+<line color="#ff0000"/>
+</graphics>
+</place>
+<place id="node2">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="152.0" y="26.0"/>
+<dimension x="20.0" y="20.0"/>
+<line style="dash"/>
+</graphics>
+</place>
+<place id="node3">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="251.0" y="125.0"/>
+<dimension x="20.0" y="20.0"/>
+<line style="dot"/>
+</graphics>
+</place>
+<place id="node4">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="449.0" y="26.0"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+</place>
+<place id="node5">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="20.0" y="26.0"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+</place>
+<transition id="node6">
+<name>
+<text>
+tr34</text>
+</name>
+<graphics>
+<position x="218.0" y="26.0"/>
+<dimension x="32.0" y="32.0"/>
+</graphics>
+</transition>
+<transition id="node7">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="383.0" y="26.0"/>
+<dimension x="32.0" y="32.0"/>
+</graphics>
+</transition>
+<transition id="node8">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="86.0" y="26.0"/>
+<dimension x="32.0" y="32.0"/>
+</graphics>
+</transition>
+<transition id="node9">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="152.0" y="125.0"/>
+<dimension x="32.0" y="32.0"/>
+<fill color="#ffff00"/>
+</graphics>
+</transition>
+<transition id="node10">
+<name>
+<text/>
+</name>
+<graphics>
+<position x="317.0" y="92.0"/>
+<dimension x="32.0" y="32.0"/>
+<line color="#0000ff" width="3.0"/>
+</graphics>
+</transition>
+<arc id="arc11" source="node1" target="node7">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc12" source="node3" target="node10">
+<name>
+<text>
+1</text>
+</name>
+<graphics>
+<line style="dot"/>
+</graphics>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc13" source="node7" target="node4">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc14" source="node2" target="node9">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc15" source="node9" target="node2">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc16" source="node10" target="node1">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc17" source="node8" target="node2">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc18" source="node5" target="node8">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc19" source="node6" target="node1">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc20" source="node1" target="node10">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc21" source="node2" target="node6">
+<name>
+<text>
+1</text>
+</name>
+<graphics>
+<line color="#00ff00" style="dash"/>
+</graphics>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc22" source="node9" target="node3">
+<name>
+<text>
+1</text>
+</name>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+</page>
+</net>
+</pnml>

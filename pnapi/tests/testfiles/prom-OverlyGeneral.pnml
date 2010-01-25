@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pnml>
+<net id="workflownet" type="http://www.informatik.hu-berlin.de/top/pnml/basicPNML.rng">
+    <transition id="trans_2">
+        <graphics>
+            <position  x="276" y="222" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>H (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>H</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_3">
+        <graphics>
+            <position  x="276" y="188" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>G (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>G</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_4">
+        <graphics>
+            <position  x="276" y="154" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>F (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>F</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_5">
+        <graphics>
+            <position  x="276" y="120" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>E (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>E</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_6">
+        <graphics>
+            <position  x="276" y="86" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>D (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>D</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_7">
+        <graphics>
+            <position  x="276" y="52" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>C (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>C</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_8">
+        <graphics>
+            <position  x="276" y="18" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>B (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>B</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_9">
+        <graphics>
+            <position  x="103" y="120" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>A (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>A</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+    <transition id="trans_10">
+        <graphics>
+            <position  x="103" y="120" />
+            <dimension x="59" y="17" />
+        </graphics>
+        <name>
+            <text>I (complete)</text>
+         </name>
+        <toolspecific tool="ProM" version="5.0 ?">
+            <logevent>
+                <name>I</name>
+                <type>complete</type>
+            </logevent>
+        </toolspecific>
+    </transition>
+</net>
+</pnml> 

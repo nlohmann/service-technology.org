@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pnml>
+  <net type="http://www.yasper.org/specs/epnml-1.1" id="workflownet">
+    <toolspecific tool="Yasper" version="1.2.1959.33714">
+      <roles xmlns="http://www.yasper.org/specs/epnml-1.1/toolspec" />
+    </toolspecific>
+    <place id="place_0">
+      <name>
+        <text>pl10</text>
+      </name>
+      <graphics>
+        <position x="229" y="134" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_1">
+      <name>
+        <text>pl40</text>
+      </name>
+      <graphics>
+        <position x="977" y="200" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_2">
+      <name>
+        <text>pl37</text>
+      </name>
+      <graphics>
+        <position x="893" y="249" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_3">
+      <name>
+        <text>pl33</text>
+      </name>
+      <graphics>
+        <position x="893" y="200" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_4">
+      <name>
+        <text>pl29</text>
+      </name>
+      <graphics>
+        <position x="893" y="150" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_5">
+      <name>
+        <text>pl16</text>
+      </name>
+      <graphics>
+        <position x="477" y="103" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_6">
+      <name>
+        <text>pl9</text>
+      </name>
+      <graphics>
+        <position x="715" y="249" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_7">
+      <name>
+        <text>pl8</text>
+      </name>
+      <graphics>
+        <position x="715" y="199" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_8">
+      <name>
+        <text>pl7</text>
+      </name>
+      <graphics>
+        <position x="715" y="150" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_9">
+      <name>
+        <text>pl6</text>
+      </name>
+      <graphics>
+        <position x="477" y="299" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_10">
+      <name>
+        <text>pl5</text>
+      </name>
+      <graphics>
+        <position x="631" y="179" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_11">
+      <name>
+        <text>pl4</text>
+      </name>
+      <graphics>
+        <position x="631" y="117" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_12">
+      <name>
+        <text>pl3</text>
+      </name>
+      <graphics>
+        <position x="477" y="256" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_13">
+      <name>
+        <text>pl2</text>
+      </name>
+      <graphics>
+        <position x="477" y="200" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_14">
+      <name>
+        <text>pl1</text>
+      </name>
+      <graphics>
+        <position x="631" y="51" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_15">
+      <name>
+        <text>p2</text>
+      </name>
+      <graphics>
+        <position x="477" y="149" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_16">
+      <name>
+        <text>p3</text>
+      </name>
+      <graphics>
+        <position x="229" y="299" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_17">
+      <name>
+        <text>p4</text>
+      </name>
+      <graphics>
+        <position x="477" y="57" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_18">
+      <name>
+        <text>p8</text>
+      </name>
+      <graphics>
+        <position x="229" y="197" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_19">
+      <name>
+        <text>p9</text>
+      </name>
+      <graphics>
+        <position x="229" y="237" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <place id="place_20">
+      <name>
+        <text>pstart</text>
+      </name>
+      <graphics>
+        <position x="21" y="217" />
+        <dimension x="22" y="23" />
+      </graphics>
+    </place>
+    <transition id="trans_0">
+      <name>
+        <text>skip</text>
+      </name>
+      <graphics>
+        <position x="353" y="266" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_1">
+      <name>
+        <text>skip</text>
+      </name>
+      <graphics>
+        <position x="353" y="200" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_2">
+      <name>
+        <text>tr22</text>
+      </name>
+      <graphics>
+        <position x="554" y="117" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_3">
+      <name>
+        <text>tr21</text>
+      </name>
+      <graphics>
+        <position x="554" y="183" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_4">
+      <name>
+        <text>tr20</text>
+      </name>
+      <graphics>
+        <position x="353" y="332" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_5">
+      <name>
+        <text>Skip</text>
+      </name>
+      <graphics>
+        <position x="554" y="51" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_6">
+      <name>
+        <text>ge naar behandeling</text>
+      </name>
+      <graphics>
+        <position x="673" y="199" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_7">
+      <name>
+        <text>eerste consult AMC (complete)</text>
+      </name>
+      <graphics>
+        <position x="125" y="217" />
+        <dimension x="139" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_8">
+      <name>
+        <text>thorax (complete)</text>
+      </name>
+      <graphics>
+        <position x="554" y="84" />
+        <dimension x="85" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_9">
+      <name>
+        <text>MRI (complete)</text>
+      </name>
+      <graphics>
+        <position x="554" y="150" />
+        <dimension x="74" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_10">
+      <name>
+        <text>lich. onderzoek onder narcose (complete)</text>
+      </name>
+      <graphics>
+        <position x="353" y="167" />
+        <dimension x="177" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_11">
+      <name>
+        <text>OK (complete)</text>
+      </name>
+      <graphics>
+        <position x="804" y="117" />
+        <dimension x="72" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_12">
+      <name>
+        <text>echo (complete)</text>
+      </name>
+      <graphics>
+        <position x="353" y="233" />
+        <dimension x="79" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_13">
+      <name>
+        <text>CT (complete)</text>
+      </name>
+      <graphics>
+        <position x="353" y="299" />
+        <dimension x="72" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_14">
+      <name>
+        <text>ECG (complete)</text>
+      </name>
+      <graphics>
+        <position x="554" y="18" />
+        <dimension x="77" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_15">
+      <name>
+        <text>radiotherapie (complete)</text>
+      </name>
+      <graphics>
+        <position x="804" y="183" />
+        <dimension x="110" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_16">
+      <name>
+        <text>chemo (complete)</text>
+      </name>
+      <graphics>
+        <position x="804" y="249" />
+        <dimension x="85" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_17">
+      <name>
+        <text>tr7</text>
+      </name>
+      <graphics>
+        <position x="353" y="134" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_18">
+      <name>
+        <text>pre-assessment (complete)</text>
+      </name>
+      <graphics>
+        <position x="353" y="101" />
+        <dimension x="123" y="17" />
+      </graphics>
+    </transition>
+    <transition id="trans_19">
+      <name>
+        <text>skip</text>
+      </name>
+      <graphics>
+        <position x="935" y="200" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_20">
+      <name>
+        <text>skip</text>
+      </name>
+      <graphics>
+        <position x="804" y="282" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_21">
+      <name>
+        <text>skip</text>
+      </name>
+      <graphics>
+        <position x="804" y="216" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <transition id="trans_22">
+      <name>
+        <text>skip</text>
+      </name>
+      <graphics>
+        <position x="804" y="150" />
+        <dimension x="15" y="13" />
+      </graphics>
+    </transition>
+    <arc id="a1" source="trans_17" target="place_17" />
+    <arc id="a2" source="place_5" target="trans_8" />
+    <arc id="a3" source="trans_19" target="place_1" />
+    <arc id="a4" source="place_16" target="trans_13" />
+    <arc id="a5" source="trans_0" target="place_12" />
+    <arc id="a6" source="place_11" target="trans_6" />
+    <arc id="a7" source="place_16" target="trans_4" />
+    <arc id="a8" source="place_20" target="trans_7" />
+    <arc id="a9" source="place_9" target="trans_6" />
+    <arc id="a10" source="trans_18" target="place_15" />
+    <arc id="a11" source="trans_6" target="place_8" />
+    <arc id="a12" source="trans_20" target="place_2" />
+    <arc id="a13" source="trans_18" target="place_17" />
+    <arc id="a14" source="place_18" target="trans_1" />
+    <arc id="a15" source="place_3" target="trans_19" />
+    <arc id="a16" source="place_13" target="trans_6" />
+    <arc id="a17" source="trans_6" target="place_6" />
+    <arc id="a18" source="trans_17" target="place_5" />
+    <arc id="a19" source="place_8" target="trans_22" />
+    <arc id="a20" source="trans_9" target="place_10" />
+    <arc id="a21" source="place_17" target="trans_14" />
+    <arc id="a22" source="trans_7" target="place_18" />
+    <arc id="a23" source="place_14" target="trans_6" />
+    <arc id="a24" source="place_15" target="trans_3" />
+    <arc id="a25" source="trans_21" target="place_3" />
+    <arc id="a26" source="place_0" target="trans_17" />
+    <arc id="a27" source="place_5" target="trans_2" />
+    <arc id="a28" source="trans_16" target="place_2" />
+    <arc id="a29" source="place_7" target="trans_15" />
+    <arc id="a30" source="place_19" target="trans_0" />
+    <arc id="a31" source="trans_12" target="place_12" />
+    <arc id="a32" source="place_19" target="trans_12" />
+    <arc id="a33" source="trans_5" target="place_14" />
+    <arc id="a34" source="trans_13" target="place_9" />
+    <arc id="a35" source="place_0" target="trans_18" />
+    <arc id="a36" source="trans_15" target="place_3" />
+    <arc id="a37" source="trans_10" target="place_13" />
+    <arc id="a38" source="trans_18" target="place_5" />
+    <arc id="a39" source="trans_2" target="place_11" />
+    <arc id="a40" source="place_2" target="trans_19" />
+    <arc id="a41" source="place_6" target="trans_16" />
+    <arc id="a42" source="trans_17" target="place_15" />
+    <arc id="a43" source="trans_8" target="place_11" />
+    <arc id="a44" source="place_18" target="trans_10" />
+    <arc id="a45" source="trans_22" target="place_4" />
+    <arc id="a46" source="place_4" target="trans_19" />
+    <arc id="a47" source="trans_4" target="place_9" />
+    <arc id="a48" source="trans_11" target="place_4" />
+    <arc id="a49" source="place_8" target="trans_11" />
+    <arc id="a50" source="place_15" target="trans_9" />
+    <arc id="a51" source="trans_7" target="place_0" />
+    <arc id="a52" source="trans_3" target="place_10" />
+    <arc id="a53" source="place_6" target="trans_20" />
+    <arc id="a54" source="trans_6" target="place_7" />
+    <arc id="a55" source="place_12" target="trans_6" />
+    <arc id="a56" source="trans_1" target="place_13" />
+    <arc id="a57" source="trans_7" target="place_16" />
+    <arc id="a58" source="place_17" target="trans_5" />
+    <arc id="a59" source="place_10" target="trans_6" />
+    <arc id="a60" source="trans_7" target="place_19" />
+    <arc id="a61" source="place_7" target="trans_21" />
+    <arc id="a62" source="trans_14" target="place_14" />
+  </net>
+</pnml>

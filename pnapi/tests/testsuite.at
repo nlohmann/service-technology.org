@@ -6,7 +6,6 @@ m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then ex
 m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_WGET, [AT_CHECK([if test "WGET" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_TAR, [AT_CHECK([if test "TAR" == "not found"; then exit 77; fi])])
 
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])
@@ -211,6 +210,12 @@ AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
 AT_CHECK([PETRI NET.pnml --input=pnml --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "`cat tmp`" stderr],0)
 AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([ProM PNML Test Suite])
+AT_CHECK([cp TESTFILES/prom-*.pnml .])
+AT_CHECK([PETRI prom-* --input=pnml --verbose],0,[],ignore)
+AT_KEYWORDS([frontend pnml])
 AT_CLEANUP
 
 

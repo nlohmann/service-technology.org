@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pnml>
+  <net id="net" type="PTNet">
+    <place id="p(62,69)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(58,59)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(77,80)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(71,72)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(62,76)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(72,73)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(62,63)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(67,119)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(63,64)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(81,80)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(119,63)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(56,77)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(74,80)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(56,57)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(69,67)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(119,70)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(54,56)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(59,60)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(81,57)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(53,54)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(61,62)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p79">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(57,58)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(80,79)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(73,60)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(70,71)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(69,71)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(60,61)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(73,74)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(76,81)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p53">
+      <initialMarking>
+        <value>1</value>
+      </initialMarking>
+      <marking>
+        <value>1</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(81,71)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <place id="p(64,70)">
+      <initialMarking>
+        <value>0</value>
+      </initialMarking>
+      <marking>
+        <value>0</value>
+      </marking>
+      <name>
+        <text></text>
+      </name>
+    </place>
+    <transition id="t(63,62)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(70,119)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t53">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(71,70)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(81,57)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(80,77)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(80,81)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="58">
+      <name>
+        <text>.\nEnter client and offer details</text>
+      </name>
+    </transition>
+    <transition id="59">
+      <name>
+        <text>.\nCheck credit</text>
+      </name>
+    </transition>
+    <transition id="72">
+      <name>
+        <text>.\nCheck changes</text>
+      </name>
+    </transition>
+    <transition id="t(62,63)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(63,119)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="61">
+      <name>
+        <text>.\nDecide mandate</text>
+      </name>
+    </transition>
+    <transition id="77">
+      <name>
+        <text>.\nNotify sales</text>
+      </name>
+    </transition>
+    <transition id="67">
+      <name>
+        <text>.\nCheck loans</text>
+      </name>
+    </transition>
+    <transition id="t(119,70)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(62,76)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(81,80)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(81,71)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(69,67)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(71,69)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="74">
+      <name>
+        <text>.\nPrint</text>
+      </name>
+    </transition>
+    <transition id="t(60,59)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(70,64)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(71,81)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(57,56)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="64">
+      <name>
+        <text>.\nMake changes</text>
+      </name>
+    </transition>
+    <transition id="t(73,74)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(73,60)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(80,74)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(119,63)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(57,81)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="54">
+      <name>
+        <text>.\nCheck complete</text>
+      </name>
+    </transition>
+    <transition id="76">
+      <name>
+        <text>.\nFiat</text>
+      </name>
+    </transition>
+    <transition id="t(56,77)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(56,57)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(60,73)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(62,69)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t(69,71)">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <transition id="t79">
+      <name>
+        <text>tau</text>
+      </name>
+    </transition>
+    <arc id="a56" source="t(81,71)" target="p(81,71)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a19" source="p(63,64)" target="64">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a150" source="p(80,79)" target="t79">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a96" source="t(80,74)" target="p(80,79)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a100" source="t(80,77)" target="p(80,79)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a103" source="p(59,60)" target="t(60,59)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a73" source="p(62,69)" target="t(69,71)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a112" source="t(63,62)" target="p(63,64)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a36" source="77" target="p(77,80)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a148" source="t53" target="p(53,54)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a14" source="76" target="p(76,81)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a58" source="t(81,80)" target="p(81,80)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a87" source="p(54,56)" target="t(56,77)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a5" source="p(73,74)" target="74">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a124" source="t(71,81)" target="p(71,72)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a18" source="58" target="p(58,59)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a35" source="p(56,77)" target="77">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a13" source="p(62,76)" target="76">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a111" source="p(62,63)" target="t(63,62)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a122" source="t(71,69)" target="p(71,72)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a6" source="74" target="p(74,80)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a75" source="p(62,69)" target="t(69,67)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a101" source="p(73,60)" target="t(60,73)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a97" source="p(81,80)" target="t(80,81)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a121" source="p(69,71)" target="t(71,69)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a147" source="p53" target="t53">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a110" source="t(63,119)" target="p(63,64)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a102" source="t(60,73)" target="p(60,61)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a120" source="t(71,70)" target="p(71,72)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a79" source="p(72,73)" target="t(73,60)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a107" source="p(119,70)" target="t(70,119)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a94" source="t(62,76)" target="p(62,76)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a39" source="p(58,59)" target="59">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a130" source="t(57,56)" target="p(57,58)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a98" source="t(80,81)" target="p(80,79)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a88" source="t(56,77)" target="p(56,77)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a80" source="t(73,60)" target="p(73,60)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a60" source="t(81,57)" target="p(81,57)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a28" source="61" target="p(61,62)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a95" source="p(74,80)" target="t(80,74)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a85" source="p(54,56)" target="t(56,57)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a20" source="64" target="p(64,70)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a74" source="t(69,71)" target="p(69,71)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a106" source="t(70,64)" target="p(70,71)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a89" source="p(61,62)" target="t(62,69)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a78" source="t(73,74)" target="p(73,74)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a3" source="p(53,54)" target="54">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a123" source="p(81,71)" target="t(71,81)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a131" source="p(81,57)" target="t(57,81)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a4" source="54" target="p(54,56)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a109" source="p(119,63)" target="t(63,119)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a108" source="t(70,119)" target="p(70,71)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a81" source="p(67,119)" target="t(119,70)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a86" source="t(56,57)" target="p(56,57)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a59" source="p(76,81)" target="t(81,57)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a129" source="p(56,57)" target="t(57,56)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a132" source="t(57,81)" target="p(57,58)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a37" source="p(69,67)" target="67">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a27" source="p(60,61)" target="61">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a16" source="72" target="p(72,73)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a119" source="p(70,71)" target="t(71,70)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a84" source="t(119,63)" target="p(119,63)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a83" source="p(67,119)" target="t(119,63)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a57" source="p(76,81)" target="t(81,80)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a15" source="p(71,72)" target="72">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a90" source="t(62,69)" target="p(62,69)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a99" source="p(77,80)" target="t(80,77)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a82" source="t(119,70)" target="p(119,70)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a104" source="t(60,59)" target="p(60,61)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a55" source="p(76,81)" target="t(81,71)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a40" source="59" target="p(59,60)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a77" source="p(72,73)" target="t(73,74)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a76" source="t(69,67)" target="p(69,67)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a149" source="t79" target="p79">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a91" source="p(61,62)" target="t(62,63)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a93" source="p(61,62)" target="t(62,76)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a38" source="67" target="p(67,119)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a105" source="p(64,70)" target="t(70,64)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a92" source="t(62,63)" target="p(62,63)">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+    <arc id="a17" source="p(57,58)" target="58">
+      <inscription>
+        <value>1</value>
+      </inscription>
+    </arc>
+  </net>
+</pnml>

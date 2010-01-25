@@ -46,7 +46,38 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             fiona_abnormal_output.normalized.expected.owfn \
             fiona_abnormal_output.owfn fiona_coffee.normalized.expected.owfn \
             fiona_coffee.owfn zeus.owfn test_input.pnml cyclicFullCoffee.pnml \
-            cyclicFullCoffee.owfn phils.pnml phils.lola
+            cyclicFullCoffee.owfn phils.pnml phils.lola \
+            prom-2_7.pnml prom-Heuristics.pnml \
+            prom-OverlyPreciseModel_artificialStartEndTasks.pnml \
+            prom-peller.pnml prom-ADtranslationAccordingToSpec.pnml \
+            prom-M1_nonFitting.pnml prom-PetriNet.pnml \
+            prom-pellerMaarDanMetReset.pnml prom-Alpha.pnml \
+            prom-M2_underfitting.pnml prom-petrify_learn01_5cv.pnml \
+            prom-PetriNet_split_onderzoek_behandeling.pnml \
+            prom-AlphaPlusPlus.pnml prom-M3_overfitting.pnml \
+            prom-Petrinet_diagnosis.pnml prom-petrify_learn02_5cv.pnml \
+            prom-BadStructure.pnml prom-M4_perfectNet.pnml prom-Petriy.pnml \
+            prom-petrify_learn03_5cv.pnml prom-DuplicatesGenetic.pnml \
+            prom-M5_structuralInappropriate.pnml prom-ReferenceModel.pnml \
+            prom-petrify_learn04_5cv.pnml prom-GenDupl.pnml \
+            prom-M6_behaviouralInappropriate.pnml prom-aab.pnml \
+            prom-petrify_learn05_5cv.pnml prom-GenDuplicates.pnml \
+            prom-NonFitting.pnml prom-componentnet1.pnml prom-phils.pnml \
+            prom-Genetic.pnml prom-NonFittingModel.pnml prom-componentnet2.pnml \
+            prom-runningExample.pnml prom-Genetic_withLazyTasks.pnml \
+            prom-NonFittingModel_artificialStartEndTasks.pnml prom-eric.pnml \
+            prom-runningExample_Alpha.pnml prom-GoodModel.pnml \
+            prom-Onderzoek_voor_Behandeling.pnml prom-erm_model.pnml \
+            prom-runningExample_AlphaPlusPlus.pnml \
+            prom-GoodModel_artificialStartEndTasks.pnml prom-OverlyGeneral.pnml \
+            prom-freechoicetelim.pnml prom-runningExample_petriy.pnml \
+            prom-Heuristic.pnml prom-OverlyGeneralModel.pnml \
+            prom-g24_alphaAlgorithm.pnml prom-test1.pnml \
+            prom-HeuristicMiner.pnml \
+            prom-OverlyGeneralModel_artificialStartEndTasks.pnml \
+            prom-g24_alphaPlusPlusAlgorithm.pnml prom-testnet.pnml \
+            prom-Heuristic_withLazyTasks.pnml prom-OverlyPreciseModel.pnml \
+            prom-originalModel.pnml
 
 
 # Below you can list all the files you do not want to have counted in the

@@ -463,7 +463,7 @@ Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
     const Transition & trans, const std::string & prefix) :
-      Node(net, observer, trans, prefix), labels_(trans.labels_)
+      Node(net, observer, trans, prefix), labels_(trans.labels_), roles_(trans.roles_)
       {
   cost_ = trans.cost_;
   observer_.updateTransitions(*this);

@@ -7,6 +7,7 @@ m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 7
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_WGET, [AT_CHECK([if test "WGET" == "not found"; then exit 77; fi])])
 
+
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])
 ############################################################################
@@ -20,6 +21,7 @@ AT_SETUP([Version output])
 AT_CHECK([PETRI --version],0,ignore)
 AT_KEYWORDS([frontend])
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Input])
@@ -314,6 +316,7 @@ AT_CHECK([PETRI NET],1,ignore,stderr)
 AT_CHECK([GREP -q "role has not been specified" stderr])
 AT_KEYWORDS([oWFN roles])
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Regression Tests])
@@ -726,6 +729,7 @@ AT_CHECK([GREP -q "pnapi: NET: 0" stderr])
 AT_KEYWORDS([frontend criteria])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Normalize])
 ############################################################################
@@ -780,6 +784,7 @@ AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ig
 AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Service Automata])
 ############################################################################
@@ -826,6 +831,7 @@ AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Open Net Generator])
 ############################################################################
@@ -842,6 +848,89 @@ AT_CHECK([GENERATOR 20 10],0,ignore,stderr)
 AT_CHECK([wc -l stderr],0,stdout)
 AT_CHECK([GREP -q "10" stdout])
 AT_KEYWORDS([generator])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Configurator])
+############################################################################
+
+AT_SETUP([Allow by default, without roles])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+AT_SETUP([Block by default, without roles])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+AT_SETUP([Allow by default, with roles])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([TEST -f NET-allow])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],1,ignore,ignore)
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+AT_SETUP([Block by default, with roles])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([TEST -f NET-block])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],1,ignore,ignore)
+AT_KEYWORDS([configurator])
 AT_CLEANUP
 
 
@@ -908,6 +997,7 @@ AT_CHECK([test -f AUTOMATON.owfn])
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Formulae])
 ############################################################################
@@ -922,6 +1012,7 @@ AT_CHECK([GREP -q "<>" NET2], 1)
 AT_CHECK([GREP -q -e "((p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .));" NET2], 0)
 AT_KEYWORDS([formulae dnf])
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Unfolder])
@@ -959,6 +1050,7 @@ AT_CHECK([GREP -q "FINALMARKING" stdout])
 AT_KEYWORDS([unfold hlowfn])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Canonical DNF])
 ############################################################################
@@ -988,6 +1080,7 @@ AT_SETUP([Equivalence Check (Zeus)])
 m4_define([NET], [zeus])
 TEST_CDNF
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Customer Tools])
@@ -1022,4 +1115,3 @@ AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER diane], 0, ignore, ignore)
 AT_KEYWORDS([customer])
 AT_CLEANUP
-

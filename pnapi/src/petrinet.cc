@@ -349,6 +349,7 @@ PetriNet::PetriNet() :
  */
 PetriNet::PetriNet(const PetriNet & net) :
   labels_(net.labels_),
+  roles_(net.roles_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
   meta_(net.meta_), warnings_(net.warnings_),

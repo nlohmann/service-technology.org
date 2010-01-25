@@ -55,8 +55,15 @@ void evaluateParameters(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
+
+    /*--------------------------------------.
+    | 0. parse the command line parameters  |
+    `--------------------------------------*/
     evaluateParameters(argc, argv);
 
+    /*----------------------.
+    | 1. parse the open net |
+    `----------------------*/
     try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
@@ -85,9 +92,22 @@ int main(int argc, char** argv) {
         abort(2, "\b%s", s.str().c_str());
     }
 
+
+    /*--------------------------.
+    | 2. check role informaiton |
+    `--------------------------*/
+    if (args_info.roles_flag and net.getRoles().empty()) {
+        abort(6, "net has no roles, but parameter '--roles' is given");
+    }
+    status("the net has %d roles", (unsigned int)net.getRoles().size());
+
+    // preserve original transition set
     std::set<Transition *> originalTransitions = net.getTransitions();
 
-    // STEP 1: ADD START TRANSITION
+
+    /*----------------------------.
+    | 3. organize initial marking |
+    `----------------------------*/
     Place &pstart = net.createPlace("config_p0");
 
     std::set<std::string> labels;
@@ -95,52 +115,131 @@ int main(int argc, char** argv) {
     net.addSynchronousLabels(labels);
     Transition& start = net.createTransition("config_start", labels);
     net.createArc(pstart, start);
-    
+
     PNAPI_FOREACH(std::set<Place*>, net.getInternalPlaces(), p) {
         if ((*p)->getTokenCount() > 0) {
             net.createArc(start, **p, (*p)->getTokenCount());
             (*p)->setTokenCount(0);
         }
     }
-    
+
     pstart.setTokenCount(1);
 
+
+    /*--------------------------------------------.
+    | 4. proceed with the configuration interface |
+    `--------------------------------------------*/
     if (args_info.allowByDefault_given) {
         PNAPI_FOREACH(std::set<Transition*>, originalTransitions, t) {
-            Place &pt = net.createPlace("config_p_" + (*t)->getName(), Node::INTERNAL, 1);
+            // only process transitions with role information if required
+            if (args_info.roles_flag and (*t)->getRoles().empty()) {
+                continue;
+            }
+
+            // create a "guard" place for each transition and mark it
+            Place &pt = net.createPlace("config_pa_" + (*t)->getName(), Node::INTERNAL, 1);
             net.createArc(pt, **t);
             net.createArc(**t, pt);
             
-            std::set<std::string> temp_labels;
-            temp_labels.insert("block_" + (*t)->getName());
-            Transition &bt = net.createTransition("config_b_" + (*t)->getName(), temp_labels);
-            net.addSynchronousLabels(temp_labels);
-            net.createArc(pt, bt);
-            net.createArc(pstart, bt);
-            net.createArc(bt, pstart);
+            if (args_info.roles_flag) {
+                // create "block" transition for the role if not already present
+                std::set<std::string> roles = (*t)->getRoles();
+                if (roles.size() > 1) {
+                    abort(5, "transition %s has more than one label", (*t)->getName().c_str());
+                }
+                std::string role = *(roles.begin());
+                Transition *bt = net.findTransition("config_b_" + role);
+                if (bt == NULL) {
+                    std::set<std::string> temp_labels;
+                    temp_labels.insert("block_" + role);
+                    net.addSynchronousLabels(temp_labels);
+                    bt = &(net.createTransition("config_b_" + role, temp_labels));
+
+                    // connect "block" transition
+                    net.createArc(pstart, *bt);
+                    net.createArc(*bt, pstart);
+                }
+                net.createArc(pt, *bt);
+            } else {
+                // create a "block" transition for each transition
+                std::set<std::string> temp_labels;
+                temp_labels.insert("block_" + (*t)->getName());
+                Transition &bt = net.createTransition("config_b_" + (*t)->getName(), temp_labels);
+                net.addSynchronousLabels(temp_labels);
+
+                // connect "block" transition
+                net.createArc(pt, bt);
+                net.createArc(pstart, bt);
+                net.createArc(bt, pstart);
+            }
         }
     }
 
     if (args_info.blockByDefault_given) {
         PNAPI_FOREACH(std::set<Transition*>, originalTransitions, t) {
-            Place &pt = net.createPlace("config_p_" + (*t)->getName());
+            // only process transitions with role information if required
+            if (args_info.roles_flag and (*t)->getRoles().empty()) {
+                continue;
+            }
+
+            // create a "guard" place for each transition
+            Place &pt = net.createPlace("config_pa_" + (*t)->getName());
             net.createArc(pt, **t);
             net.createArc(**t, pt);
 
-            Place &pbt = net.createPlace("config_pb_" + (*t)->getName(), Node::INTERNAL, 1);
+            if (args_info.roles_flag) {
+                // create "allow" transition if not already present
+                std::set<std::string> roles = (*t)->getRoles();
+                if (roles.size() > 1) {
+                    abort(5, "transition %s has more than one label", (*t)->getName().c_str());
+                }
+                std::string role = *(roles.begin());
+                Transition *at = net.findTransition("config_a_" + role);
+                if (at == NULL) {
+                    std::set<std::string> temp_labels;
+                    temp_labels.insert("allow_" + role);
+                    net.addSynchronousLabels(temp_labels);
+                    at = &(net.createTransition("config_a_" + role, temp_labels));
 
-            std::set<std::string> temp_labels;
-            temp_labels.insert("allow_" + (*t)->getName());
-            Transition &at = net.createTransition("config_a_" + (*t)->getName(), temp_labels);
-            net.addSynchronousLabels(temp_labels);
-            net.createArc(at, pt);
-            net.createArc(pbt, at);
-            net.createArc(pstart, at);
-            net.createArc(at, pstart);
+                    // connect "allow" transition
+                    net.createArc(pstart, *at);
+                    net.createArc(*at, pstart);
+
+                    // create a "guard" place to make net bounded
+                    Place &pbt = net.createPlace("config_pb_" + role, Node::INTERNAL, 1);
+                    net.createArc(pbt, *at);
+                }
+                net.createArc(*at, pt);
+            } else {
+                // create an "allow" transition for each transition
+                std::set<std::string> temp_labels;
+                temp_labels.insert("allow_" + (*t)->getName());
+                Transition &at = net.createTransition("config_a_" + (*t)->getName(), temp_labels);
+                net.addSynchronousLabels(temp_labels);
+
+                // connect "allow" transition
+                net.createArc(at, pt);
+                net.createArc(pstart, at);
+                net.createArc(at, pstart);
+
+                // create a "guard" place to make net bounded
+                Place &pbt = net.createPlace("config_pb_" + (*t)->getName(), Node::INTERNAL, 1);
+                net.createArc(pbt, at);
+            }
         }
     }
 
-    std::cout << pnapi::io::owfn << net;
+
+    /*----------.
+    | 5. output |
+    `----------*/
+    if (args_info.output_given) {
+        std::string mode_name = args_info.allowByDefault_given ? "allow" : "block"; 
+        std::string output_filename = args_info.output_arg ? args_info.output_arg : filename + "_" + mode_name + ".owfn";
+        Output output(output_filename, "net with configuration interface");
+        output.stream() << pnapi::io::owfn << net;
+    }
+
 
     return EXIT_SUCCESS;
 }

@@ -1,5 +1,5 @@
 # the manpages to create
-man_MANS = petri.1 cdnf.1
+man_MANS = petri.1 cdnf.1 configurator.1
 
 # additional files
 EXTRA_DIST = extra
@@ -15,10 +15,20 @@ petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
 		--opt-include=extra \
 		--no-info
 
-cdnf.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
+cdnf.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cdnf-cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
 		$(top_builddir)/utils/cdnf \
 		--name="$(PACKAGE_NAME): canonic disjunctive normal form" \
+		--output=$@ \
+		--manual="service-technology.org" \
+		--source="service-technology.org" \
+		--help-option="--help" \
+		--no-info
+
+configurator.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/configurator-cmdline.ggo extra
+	$(AM_V_GEN)$(HELP2MAN) \
+		$(top_builddir)/utils/configurator \
+		--name="$(PACKAGE_NAME): configuration interface" \
 		--output=$@ \
 		--manual="service-technology.org" \
 		--source="service-technology.org" \

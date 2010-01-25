@@ -96,17 +96,9 @@ if test "${ac_cv_path_LOLAVERSION}" != "LoLA 1.14"; then
 fi
 fi
 
-# check for wget (would be used in test cases)
+# check for tools to be used in test cases
 AC_PATH_PROGS(WGET, [wget], not found)
-AC_SUBST(WGET)
-
-# check for tar (would be used in test cases)
-AC_PATH_PROGS(TAR, [tar], not found)
-AC_SUBST(TAR)
-
-# check for GNU make (if it's not the default make)
 AC_PATH_PROGS(MAKE, [gmake make], not found)
-AC_SUBST(MAKE)
 
 # allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
@@ -129,6 +121,7 @@ AC_CONFIG_FILES([Makefile
                  tests/Makefile
                  tests/package.m4
                  utils/Makefile utils/unfolder/Makefile])
+AC_CONFIG_FILES([tests/check_customer.sh], [chmod +x tests/check_customer.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

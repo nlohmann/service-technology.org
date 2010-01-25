@@ -96,9 +96,13 @@ if test "${ac_cv_path_LOLAVERSION}" != "LoLA 1.14"; then
 fi
 fi
 
-# check for svn (would be used in test cases)
-AC_PATH_PROGS(SVN, [svn], not found)
-AC_SUBST(SVN)
+# check for wget (would be used in test cases)
+AC_PATH_PROGS(WGET, [wget], not found)
+AC_SUBST(WGET)
+
+# check for tar (would be used in test cases)
+AC_PATH_PROGS(TAR, [tar], not found)
+AC_SUBST(TAR)
 
 # check for GNU make (if it's not the default make)
 AC_PATH_PROGS(MAKE, [gmake make], not found)

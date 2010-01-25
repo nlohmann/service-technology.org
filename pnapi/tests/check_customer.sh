@@ -5,14 +5,17 @@
 
 TOOL="$5"
 LIB="${TOOL}/libs/pnapi"
-SVN="$1"
-SRC="$2"
-REPOSITORY="$3"
+
+WGET="$1"
+TAR="$2"
+SRC="$3"
 MAKE="$4"
 
+TARBALL="http://esla.informatik.uni-rostock.de:8080/job/${TOOL}/lastSuccessfulBuild/artifact/${TOOL}/${TOOL}.tar.gz"
 
 # get customer tool
-${SVN} co ${REPOSITORY}/${TOOL} ${TOOL}
+${WGET} ${TARBALL}
+${TAR} xzf ${TOOL}.tar.gz
 
 # clear customer's library directory
 rm -rf ${LIB}/*
@@ -23,8 +26,6 @@ cp ${SRC}/Makefile.am.customer ${LIB}/Makefile.am
 
 # remove unnecessary files again
 rm -rf ${LIB}/config.h
-rm -rf ${LIB}/parser-*.cc
-rm -rf ${LIB}/parser-*.h
 
 # change to the temp dir and build tool
 cd ${TOOL}

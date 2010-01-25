@@ -5,7 +5,8 @@ m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; f
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_SVN, [AT_CHECK([if test "SVN" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_WGET, [AT_CHECK([if test "WGET" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_TAR, [AT_CHECK([if test "TAR" == "not found"; then exit 77; fi])])
 
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])
@@ -988,32 +989,32 @@ AT_BANNER([Customer Tools])
 ############################################################################
 
 AT_SETUP([Wendy])
-AT_CHECK_SVN
-AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE wendy], 0, ignore, ignore)
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER WGET TAR SRC MAKE wendy], 0, ignore, ignore)
 AT_KEYWORDS([customer])
 AT_CLEANUP
 
 AT_SETUP([Mia])
-AT_CHECK_SVN
-AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE mia], 0, ignore, ignore)
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER WGET TAR SRC MAKE mia], 0, ignore, ignore)
 AT_KEYWORDS([customer])
 AT_CLEANUP
 
 AT_SETUP([Marlene])
-AT_CHECK_SVN
-AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE marlene], 0, ignore, ignore)
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER WGET TAR SRC MAKE marlene], 0, ignore, ignore)
 AT_KEYWORDS([customer])
 AT_CLEANUP
 
 AT_SETUP([Yasmina])
-AT_CHECK_SVN
-AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE yasmina], 0, ignore, ignore)
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER WGET TAR SRC MAKE yasmina], 0, ignore, ignore)
 AT_KEYWORDS([customer])
 AT_CLEANUP
 
 AT_SETUP([Diane])
-AT_CHECK_SVN
-AT_CHECK([AT_CHECK_CUSTOMER SVN SRC REPOSITORY MAKE diane], 0, ignore, ignore)
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER WGET TAR SRC MAKE diane], 0, ignore, ignore)
 AT_KEYWORDS([customer])
 AT_CLEANUP
 

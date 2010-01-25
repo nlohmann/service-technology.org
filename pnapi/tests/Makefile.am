@@ -77,7 +77,8 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             prom-OverlyGeneralModel_artificialStartEndTasks.pnml \
             prom-g24_alphaPlusPlusAlgorithm.pnml prom-testnet.pnml \
             prom-Heuristic_withLazyTasks.pnml prom-OverlyPreciseModel.pnml \
-            prom-originalModel.pnml N1.owfn N2.owfn N3.owfn travel.owfn
+            prom-originalModel.pnml N0.owfn N1.owfn N2.owfn N3.owfn \
+            travel.owfn travel2.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

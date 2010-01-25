@@ -5,7 +5,7 @@ info_TEXINFOS = pnapi.texi
 EXTRA_DIST =
 
 # the height of the README's ASCII art + URL + 3 spaces
-BANNERHEIGHT = 7
+BANNERHEIGHT = 9
 
 # the help option that should be used in the manual
 HELPOPTION = --full-help
@@ -33,9 +33,9 @@ pnapi_TEXINFOS += cmdline.out
 #-----------------------------------------------------------#
 # GENERIC: create ASCII files out README and Texinfo manual #
 #-----------------------------------------------------------#
-all: $(top_srcdir)/ChangeLog $(top_srcdir)/REQUIREMENTS
+all: $(top_srcdir)/ChangeLog $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
 pnapi_TEXINFOS += ChangeLog.texi
-EXTRA_DIST += $(top_srcdir)/REQUIREMENTS
+EXTRA_DIST += $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
 
 $(top_srcdir)/ChangeLog: ChangeLog.texi
 	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=79 $(srcdir)/$(PACKAGE).texi
@@ -57,3 +57,11 @@ $(top_srcdir)/REQUIREMENTS: $(PACKAGE).texi
 	echo "" >> $(top_srcdir)/REQUIREMENTS
 	rm ChangeLog.txt ChangeLog2.txt
 
+$(top_srcdir)/THEORY: $(PACKAGE).texi
+	$(AM_V_GEN)
+	$(AM_V_at)$(MAKEINFO) -o THEORY.txt --no-split --no-headers --no-number-sections --fill-column=79 $(srcdir)/$(PACKAGE).texi
+	$(AM_V_at)$(SED) -n '/$(PACKAGE_NAME) implements several algorithms/,/for more information./w THEORY2.txt' THEORY.txt
+	$(AM_V_at)head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/THEORY
+	$(AM_V_at)cat THEORY2.txt >> $(top_srcdir)/THEORY
+	$(AM_V_at)echo "" >> $(top_srcdir)/THEORY
+	$(AM_V_at)rm THEORY.txt THEORY2.txt

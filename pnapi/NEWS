@@ -3,27 +3,32 @@
             | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
             |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
             |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+              encapsulating Petri net-related functions in a C++ API
                         http://service-technology.org/pnapi
+
 
 Version 3.01-unreleased
 =======================
 
 * make check now tests, whether customer tools still work with the API (see
-  https://gna.org/task/?6813)
+  `https://gna.org/task/?6813')
 
 * added Makefile.am.customer for customer tools
 
 * added make target for zcov
 
-* copied parameter '-stats' from Wendy to Petri
+* copied parameter `--stats' from Wendy to Petri
 
-* integrated Output.* and verbose.* to Petri (see
-  https://gna.org/task/?6837)
+* integrated `Output.*' and `verbose.*' to Petri (`see
+  https://gna.org/task/?6837')
 
-* reimplemented normalize() according to [LohmannMW_2007_icatpn]
+* reimplemented open net normalization function `normalize()') according to
+  [LohmannMW_2007_icatpn]
 
 * implemented PNML import and export based on the code of
   `http://www.w3.org/XML/9707/XML-in-C'
+
+* added a utility that adds a configuration interface to a labeled Petri net
 
 
 See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for

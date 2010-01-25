@@ -3,7 +3,9 @@
             | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
             |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
             |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+              encapsulating Petri net-related functions in a C++ API
                         http://service-technology.org/pnapi
+
 
 In order to run, compile, and develop PNAPI, several tools are required.
 

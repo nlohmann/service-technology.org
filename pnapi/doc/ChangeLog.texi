@@ -1,12 +1,13 @@
 @heading Version 3.01-unreleased
 @itemize
-@item make check now tests, whether customer tools still work with the API (see https://gna.org/task/?6813)
+@item make check now tests, whether customer tools still work with the API (see @url{https://gna.org/task/?6813})
 @item added Makefile.am.customer for customer tools
 @item added make target for zcov
-@item copied parameter '--stats' from Wendy to Petri
-@item integrated Output.* and verbose.* to Petri (see https://gna.org/task/?6837)
-@item reimplemented normalize() according to [LohmannMW_2007_icatpn]
+@item copied parameter @option{--stats} from Wendy to Petri
+@item integrated @file{Output.*} and @file{verbose.*} to Petri (@url{see https://gna.org/task/?6837})
+@item reimplemented open net normalization function @code{normalize()}) according to [LohmannMW_2007_icatpn]
 @item implemented @acronym{PNML} import and export based on the code of @url{http://www.w3.org/XML/9707/XML-in-C}
+@item added a utility that adds a configuration interface to a labeled Petri net
 @end itemize
 
 @heading Version 3.00 (2009-11-03)
@@ -15,9 +16,9 @@
 @item added type getter to formula classes
 @item started proper versioning
 @item started proper documentation
-@item formulae now only concern internal places; only left wildcard ist 
-ALL_OTHER_PLACES_EMPTY
-@item fixed bug #14648: PNAPI: Shift/reduce conflict in parser-pn.cc
+@item formulae now only concern internal places; only left wildcard is 
+@samp{ALL_OTHER_PLACES_EMPTY}
+@item fixed bug #14648: PNAPI: Shift/reduce conflict in @file{parser-pn.cc}
 @end itemize
 
 @heading Version 2.00

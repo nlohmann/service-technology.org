@@ -3,7 +3,7 @@
 @include version.texi
 @afourpaper
 @finalout
-@settitle PNAPI User's Manual
+@settitle Petri Net API User's Manual
 
 @c --------------------------------------------------------------------------
 
@@ -11,9 +11,9 @@
 
 @b{About this document:}
 
-This manual is for PNAPI, version @value{VERSION}, a library to encapsulate petri net functionalities, last updated @value{UPDATED}.
+This manual is for the Petri Net API, version @value{VERSION}, encapsulating Petri net-related functions in a C++ API, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2009 Niels Lohmann
+Copyright @copyright{} 2009, 2010 Niels Lohmann
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* PNAPI: (pnapi).       encapsulating petri net functionalities.
+* Petri Net API: (pnapi).       encapsulating Petri net-related functions in a C++ API.
 @end direntry
 
 
@@ -32,9 +32,9 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @titlepage
 
-@title PNAPI
+@title Petri Net API
 
-@subtitle Encapuslating Petri Net Functionalities
+@subtitle Encapsulating Petri Net-Related Functions in a C++ API
 @subtitle @url{http://service-technology.org/pnapi}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
@@ -58,9 +58,10 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @c --------------------------------------------------------------------------
 
 @menu
-* First Steps::How to set up and install PNAPI.
-* Command Line Options::How to run PNAPI frontend "Petri".
+* First Steps::How to set up and install the Petri Net API.
 * Usage::How to use the API in other programs.
+* Theory::The theory implemented in the Petri Net API.
+* Command Line Options::How to run the Petri Net API frontend "Petri".
 * Error Codes::What the error codes of the frontend "Petri" mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
@@ -79,7 +80,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/pnapi} and download the latest release version of PNAPI, say @file{pnapi-@value{VERSION}.tar.gz}. To setup and compile PNAPI, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/pnapi} and download the latest release version of the Petri Net API, say @file{pnapi-@value{VERSION}.tar.gz}. To setup and compile the Petri Net API, change into your download directory and type
 
 @cartouche
 @smallexample
@@ -90,7 +91,7 @@ make
 @end smallexample
 @end cartouche
 
-After compilation, a library @samp{src/libpnapi.a} and a frontend tool @samp{utils/petri} are generated.@footnote{On Microsoft Windows, the file will be called @file{petri.exe}.} If you experience any compiler warnings, don't panic: PNAPI contains some generated or third party code that we cannot influence.
+After compilation, a library @samp{src/libpnapi.a} and a frontend tool @samp{utils/petri} are generated.@footnote{On Microsoft Windows, the file will be called @file{petri.exe}.} If you experience any compiler warnings, don't panic: the Petri Net API contains some generated or third party code that we cannot influence.
 
 @item To test whether everything went fine, type
 
@@ -107,7 +108,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 70 tests were successful.
+All 104 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{pnapi@@service-technology.org}.
@@ -197,22 +198,6 @@ Please check our nightly build server at @url{http://service-technology.org/nigh
 
 
 
-@c --------------------------------------------------------------------------
-
-
-@node Command Line Options
-@chapter How to run PNAPI frontend "Petri"
-
-Petri is a command line tool and does not come with a fancy @acronym{GUI}. However, Petri can be easily scripted and combined with other tools.
-
-@section Command Line Options
-
-For an overview of the command line options, type @samp{petri -h} to see the following help screen:
-
-@smallexample
-@verbatiminclude cmdline.out
-@end smallexample
-
 
 @c --------------------------------------------------------------------------
 
@@ -221,7 +206,7 @@ For an overview of the command line options, type @samp{petri -h} to see the fol
 
 The Petri Net API provides structures for working with Petri nets.
 
-For using it, simply include the header file pnapi.h in your code:
+For using it, simply include the header file @file{pnapi.h} in your code:
 @cartouche
 @smallexample
 #include "pnapi.h"
@@ -230,14 +215,17 @@ For using it, simply include the header file pnapi.h in your code:
 
 Everything you will use can be found in the following namespaces:
 @itemize
-@item pnapi
-@item pnapi::formula
-@item pnapi::io
+@item @code{pnapi}
+@item @code{pnapi::formula}
+@item @code{pnapi::io}
 @end itemize
 
-The classes pnapi::PetriNet and pnapi::Automaton provide the main 
-functionality and can serve as
-an entry point for getting an overview of the API's functionality.
+The classes @samp{pnapi::PetriNet} and @samp{pnapi::Automaton} provide the main 
+functionality and can serve as an entry point for getting an overview of the API's functionality. For more information, please go to the online API documentation reachable at @url{http://esla.informatik.uni-rostock.de:8080/job/pnapi/doclinks/1/}.
+
+
+@c --------------------------------------------------------------------------
+
 
 @chapter Some Examples
 
@@ -339,6 +327,80 @@ Furthermore a wildcard can be transformed in disjunctive normal form by using
 net.finalCondition().dnf();
 @end smallexample
 @end cartouche
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The Petri Net API implements several algorithms and result published in several scientific articles.
+
+@section Open Nets
+
+@subsubheading Basic Definitions
+
+@quotation
+Karsten Wolf. @b{Does my service have partners?}. @i{LNCS ToPNoC}, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems.
+@end quotation
+
+
+@subsubheading Structural Reduction Rules
+
+@quotation
+Tadao Murata. @b{Petri nets: Properties, analysis and applications}. @i{Proceedings of the IEEE}, 77(4):541--580, 1989.
+@end quotation
+
+@quotation
+Peter H. Starke. @b{Analyse von Petri-Netz-Modellen}. Teubner Verlag (1990).
+@end quotation
+
+@quotation
+Thomas Pillat. @b{Gegen@"uberstellung struktureller Reduktionstechniken f@"ur Petrinetze}. Diplomarbeit, Humboldt-Universit@"at zu Berlin, March 2008.
+@end quotation
+
+
+@subsubheading Normalization
+
+@quotation
+Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating guidelines for finite-state services}. In Jetty Kleijn and Alex Yakovlev, editors, @i{28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25--29, 2007, Proceedings}, volume 4546 of Lecture Notes in Computer Science, pages 321--341. Springer-Verlag, June 2007.
+@end quotation
+
+
+@subsubheading Constraints (product operation)
+
+@quotation
+Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Behavioral constraints for services}. In Gustavo Alonso, Peter Dadam, and Michael Rosemann, editors, @i{Business Process Management, 5th International Conference, BPM 2007, Brisbane, Australia, September 24--28, 2007, Proceedings}, volume 4714 of Lecture Notes in Computer Science, pages 271--287. Springer-Verlag, September 2007.
+@end quotation
+
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter How to run PNAPI frontend "Petri"
+
+Petri is a command line tool and does not come with a fancy @acronym{GUI}. However, Petri can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{petri -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
 
 
 @c --------------------------------------------------------------------------

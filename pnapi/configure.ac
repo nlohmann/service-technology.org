@@ -44,13 +44,18 @@ AM_MISSING_PROG(HELP2MAN, help2man)
 AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
 AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 
+# check for tools to be used in test cases
+AC_PATH_PROGS(WGET, [wget], not found)
+AC_PATH_PROGS(MAKE, [gmake make], not found)
+AC_PATH_PROGS(FIONA, [fiona], not found)
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)
 
 
 #############################################################################
-# search for Dot and Petrify and write results to file "src/config.h"
+# search for Dot, Petrify, and Genet and write results to file "src/config.h"
 #############################################################################
 AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
@@ -63,7 +68,7 @@ AC_SUBST(DOT)
 
 AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
-  AC_MSG_WARN([Petrify was not found. See file README.])
+  AC_MSG_WARN([Petrify was not found! See file REQUIREMENTS.])
   AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
 else
   AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "\"${PETRIFY}\"", [Petrify can be used.])
@@ -72,33 +77,23 @@ AC_SUBST(PETRIFY)
 
 AC_PATH_PROGS(GENET, [genet], not found)
 if test "$GENET" = "not found"; then
-  AC_MSG_WARN([Genet was not found. See file README.])
+  AC_MSG_WARN([Genet was not found! See file REQUIREMENTS.])
   AC_DEFINE(CONFIG_GENET, "not found", [Genet was not found.])
 else
   AC_DEFINE_UNQUOTED(CONFIG_GENET, "\"${GENET}\"", [Genet can be used.])
 fi
 AC_SUBST(GENET)
 
-# check for Fiona (would be used in test cases)
-AC_PATH_PROG(FIONA, [fiona], not found)
-AC_SUBST(FIONA)
-
 # search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])
 if test "${LOLA}" = ""; then
-  AC_MSG_WARN([LoLA was not found.])
+  AC_MSG_WARN([LoLA was not found! See file REQUIREMENTS.])
 else
-AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version`]])
+AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version | ${SED} -e 's/LoLA //'`]])
 AC_MSG_CHECKING([LoLA version])
 AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
-if test "${ac_cv_path_LOLAVERSION}" != "LoLA 1.14"; then
-  AC_MSG_WARN([You have ${ac_cv_path_LOLAVERSION}, but CDNF needs LoLA 1.14!])
+echo ${ac_cv_path_LOLAVERSION} | ${AWK} '{if ($1>=1.14) exit 0; else exit 1}' || AC_MSG_WARN([CDNF needs at least LoLA 1.14! See file REQUIREMENTS.])
 fi
-fi
-
-# check for tools to be used in test cases
-AC_PATH_PROGS(WGET, [wget], not found)
-AC_PATH_PROGS(MAKE, [gmake make], not found)
 
 # allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
@@ -112,14 +107,11 @@ AH_BOTTOM([#ifdef __cplusplus
 #############################################################################
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
-AC_CONFIG_FILES([Makefile
-                 pnapi.pc
-                 doc/Makefile
-                 doc/Doxyfile
+AC_CONFIG_FILES([Makefile pnapi.pc
+                 doc/Makefile doc/Doxyfile
                  src/Makefile
                  man/Makefile
-                 tests/Makefile
-                 tests/package.m4
+                 tests/Makefile tests/package.m4
                  utils/Makefile utils/unfolder/Makefile])
 AC_CONFIG_FILES([tests/check_customer.sh], [chmod +x tests/check_customer.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])

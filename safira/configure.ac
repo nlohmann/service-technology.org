@@ -1,9 +1,21 @@
 AC_PREREQ([2.63])
 AC_INIT(Safira, 1.1-unreleased, safira@service-technology.org, safira, http://service-technology.org/safira)
-AM_INIT_AUTOMAKE
+
+AC_MSG_NOTICE([ ____         __ _           ])
+AC_MSG_NOTICE([/ ___|  __ _ / _(_)_ __ __ _ ])
+AC_MSG_NOTICE([\___ \ / _` | |_| | '__/ _` |])
+AC_MSG_NOTICE([ ___) | (_| |  _| | | | (_| |])
+AC_MSG_NOTICE([|____/ \__,_|_| |_|_|  \__,_|])
+AC_MSG_NOTICE([implementing set algebra for service behavior])
+AC_MSG_NOTICE([http://service-technology.org/safira])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+
+AM_INIT_AUTOMAKE(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -15,6 +27,7 @@ AC_PROG_GREP
 AC_PROG_LN_S
 AC_PROG_RANLIB
 
+# check for additional programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 

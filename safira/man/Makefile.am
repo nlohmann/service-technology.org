@@ -1,18 +1,31 @@
+# the manpages to create
 man_MANS = $(PACKAGE).1
 
-MAINTAINERCLEANFILES = $(man_MANS) $(PACKAGE).pdf
+# additional files
+EXTRA_DIST = extra
 
-EXTRA_DIST = $(man_MANS) extra
+# the help option that should be used in the manpage
+HELPOPTION = --detailed-help
 
 $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
-	$(HELP2MAN) \
+	$(AM_V_GEN)$(HELP2MAN) \
 		$(top_builddir)/src/$(PACKAGE) \
-		--name="$(PACKAGE_NAME)" \
+		--name="implementing set algebra for service behavior" \
 		--output=$@ \
 		--manual="service-technology.org" \
 		--source="service-technology.org" \
-		--help-option="--help" \
+		--help-option="$(HELPOPTION)" \
 		--opt-include=extra
 
-man-pdf: $(PACKAGE).1
-	groff -Tps -mandoc -c $(PACKAGE).1 | ps2pdf - $(PACKAGE).pdf
+
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
+
+MAINTAINERCLEANFILES = $(man_MANS) $(man_MANS:.1=.pdf)
+EXTRA_DIST += $(man_MANS)
+
+man-pdf: $(man_MANS:.1=.pdf)
+
+%.pdf: %.1
+	$(AM_V_GEN)groff -Tps -mandoc -c $< | ps2pdf - $(@:.1=.pdf)

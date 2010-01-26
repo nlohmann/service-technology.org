@@ -1,7 +1,7 @@
 /*!
  * \file    port.h
  *
- * \brief   Class Port and class Label
+ * \brief   Class Port
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
@@ -20,6 +20,7 @@
 #ifndef PORT_H
 #define PORT_H
 
+#include "component.h"
 #include "interface.h"
 #include <string>
 #include <vector>
@@ -43,14 +44,16 @@ namespace pnapi
     /// standard destructor
     virtual ~Port();
 
+    Label & addLabel(Label &l);
+
     /// adding a receive label
-    void addInputLabel(const std::string &label);
+    Label & addInputLabel(const std::string &label);
 
     /// adding a send label
-    void addOutputLabel(const std::string &label);
+    Label & addOutputLabel(const std::string &label);
 
     /// adding a synchronous label
-    void addSynchronousLabel(const std::string &label);
+    Label & addSynchronousLabel(const std::string &label);
 
     /// returning the vector of input labels
     const std::vector<Label *> inputLabels() const;
@@ -59,11 +62,17 @@ namespace pnapi
     const std::vector<Label *> outputLabels() const;
 
     /// returning the vector of synchronous label
-    const std::vector<Label *> synchronousLabel() const;
+    const std::vector<Label *> synchronousLabels() const;
 
     /// returning the port string
     const std::string portString() const;
 
+    /// checks whether the port is empty
+    bool isEmpty() const;
+
+    Label * findLabel(const std::string &label) const;
+
+  private:
     /// returning the port's input label string
     const std::string inputLabelString() const;
 
@@ -113,12 +122,21 @@ namespace pnapi
     /// returning the label's typed string (e.g. for input a = ?a)
     const std::string typedString() const;
 
+    /// adding a transition to the attached transitions
+    void addTransition(Transition *t);
+
+    /// removing a transition from the attached transitions
+    void removeTransition(const Transition *t);
+
   private:
     /// the label name
     std::string id_;
 
     /// the label type
     Type type_;
+
+    /// set of transitions
+    std::vector<Transition *> transitions_;
 
   };
 

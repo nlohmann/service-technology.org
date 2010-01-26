@@ -99,6 +99,14 @@ set<Place*> placeSet_;
 bool checkLabels_;
 /// wildcard ALL[_OTHER]_PLACES_EMPTY given
 bool wildcardGiven_ = false;
+/// a Port object
+Port * o_port_;
+/// a Label object
+Label * label_;
+/// name -> Label
+std::map<std::string, Label *> o_labels_;
+/// label type
+Label::Type labelType_;
 
 /// "assertion"
 void check(bool condition, const std::string & msg)

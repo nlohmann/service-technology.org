@@ -30,6 +30,8 @@ Version 3.01-unreleased
 
 * added a utility that adds a configuration interface to a labeled Petri net
 
+* maintained interface, port, and label code (except for parser issues)
+
 Version 3.00 (2009-11-03)
 =========================
 

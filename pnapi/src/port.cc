@@ -58,22 +58,48 @@ namespace pnapi
     synchronous_.clear();
   }
 
-  void Port::addInputLabel(const std::string &label)
+  Label & Port::addLabel(Label &label)
   {
-    // TODO: maybe check whether label is already in this port
-    input_.push_back(new Label(label, Label::INPUT));
+    switch (label.type())
+    {
+    case Label::INPUT:
+      input_.push_back(&label);
+      break;
+    case Label::OUTPUT:
+      output_.push_back(&label);
+      break;
+    case Label::SYNCHRONOUS:
+      synchronous_.push_back(&label);
+      break;
+    default:
+      break;
+    }
+
+    return label;
   }
 
-  void Port::addOutputLabel(const std::string &label)
+  Label & Port::addInputLabel(const string &label)
   {
     // TODO: maybe check whether label is already in this port
-    output_.push_back(new Label(label, Label::OUTPUT));
+    Label *l = new Label(label, Label::INPUT);
+    input_.push_back(l);
+    return *l;
   }
 
-  void Port::addSynchronousLabel(const std::string &label)
+  Label & Port::addOutputLabel(const std::string &label)
   {
     // TODO: maybe check whether label is already in this port
-    synchronous_.push_back(new Label(label, Label::SYNCHRONOUS));
+    Label *l = new Label(label, Label::OUTPUT);
+    output_.push_back(l);
+    return *l;
+  }
+
+  Label & Port::addSynchronousLabel(const std::string &label)
+  {
+    // TODO: maybe check whether label is already in this port
+    Label *l = new Label(label, Label::SYNCHRONOUS);
+    synchronous_.push_back(l);
+    return *l;
   }
 
   const std::vector<Label *> Port::inputLabels() const
@@ -86,7 +112,7 @@ namespace pnapi
     return output_;
   }
 
-  const std::vector<Label *> Port::synchronousLabel() const
+  const std::vector<Label *> Port::synchronousLabels() const
   {
     return synchronous_;
   }
@@ -141,12 +167,23 @@ namespace pnapi
     return result;
   }
 
-  /*!
-   * \class Label
-   */
-
-  Label::Label()
+  bool Port::isEmpty() const
   {
+    return (input_.empty() && output_.empty() && synchronous_.empty());
+  }
+
+  Label * Port::findLabel(const string &label) const
+  {
+    for (int i = 0; i < (int) input_.size(); ++i)
+      if (input_[i]->label() == label)
+        return input_[i];
+    for (int i = 0; i < (int) output_.size(); ++i)
+      if (output_[i]->label() == label)
+        return output_[i];
+    for (int i = 0; i < (int) synchronous_.size(); ++i)
+      if (input_[i]->label() == label)
+        return synchronous_[i];
+    return NULL;
   }
 
   Label::Label(const std::string &id, Type type) :
@@ -184,6 +221,22 @@ namespace pnapi
     case SYNCHRONOUS:
       return "#" + id_;
     }
+  }
+
+  void Label::addTransition(Transition *t)
+  {
+    transitions_.push_back(t);
+  }
+
+  void Label::removeTransition(const Transition *t)
+  {
+    for (int i = 0; i < (int) transitions_.size(); ++i)
+      if (transitions_[i] == t)
+      {
+        transitions_[i] = transitions_[transitions_.size() - 1];
+        transitions_.pop_back();
+        break;
+      }
   }
 
 } /* namespace pnapi */

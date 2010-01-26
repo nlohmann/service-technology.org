@@ -1087,6 +1087,69 @@ Transition & PetriNet::createTransition(const std::string & name,
 
 
 /*!
+ * Introduces a new port to the open net.
+ */
+Port & PetriNet::createPort(const string & name)
+{
+  return interface_.addPort(name);
+}
+
+
+/*!
+ * Creates an input label.
+ */
+Label & PetriNet::createInputLabel(const string & name, Port *port)
+{
+  return interface_.addInputLabel(name, port);
+}
+
+
+/*!
+ * Creates an input label
+ */
+Label & PetriNet::createInputLabel(const string & name, const string & port)
+{
+  return interface_.addInputLabel(name, port);
+}
+
+
+/*!
+ * Creates an output label
+ */
+Label & PetriNet::createOutputLabel(const string & name, Port *port)
+{
+  return interface_.addOutputLabel(name, port);
+}
+
+
+/*!
+ * Creates an output label
+ */
+Label & PetriNet::createOutputLabel(const string & name, const string & port)
+{
+  return interface_.addOutputLabel(name, port);
+}
+
+
+/*!
+ * Creates a synchronous label
+ */
+Label & PetriNet::createSynchronizeLabel(const string & name, Port *port)
+{
+  return interface_.addSynchronousLabel(name, port);
+}
+
+
+/*!
+ * Creates a synchronous label
+ */
+Label & PetriNet::createSynchronizeLabel(const string & name, const string & port)
+{
+  return interface_.addSynchronousLabel(name, port);
+}
+
+
+/*!
  */
 bool PetriNet::containsNode(Node & node) const
 {

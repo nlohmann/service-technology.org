@@ -1,0 +1,38 @@
+                       
+                     http://service-technology.org/stanca
+
+
+PURPOSE
+    Stanca checks the siphon-trap property using minisat.
+
+
+COPYRIGHT
+    Copyright (c) 2009 Olivia Oanea
+
+
+AUTHOR
+    Stanca is written and maintained by Olivia Oanea. See file "AUTHORS"
+    for more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Stanca is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Stanca.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Stanca can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Stanca.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Stanca. It can also be
+    downloaded at <http://service-technology.org/files/stanca/stanca.pdf>.

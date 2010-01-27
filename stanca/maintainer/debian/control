@@ -1,0 +1,15 @@
+Source: sayo
+Section: science
+Priority: optional
+Maintainer: Niels Lohmann <niels.lohmann@uni-rostock.de>
+Build-Depends: debhelper (>= 5), autotools-dev
+Standards-Version: 3.8.0
+Homepage: http://service-technology.org/sayo
+
+Package: sayo
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: graphviz
+Description: a tool to generate public view service automata
+  Stanca checks the siphon-trap property using minisat.
+

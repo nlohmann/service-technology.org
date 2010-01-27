@@ -1,0 +1,15 @@
+                       
+                     http://service-technology.org/stanca
+
+
+PURPOSE
+    Stanca checks the siphon-trap property using minisat.
+
+
+Version 0.1-unreleased
+======================
+
+* Siphon-trap check using minisat
+
+
+

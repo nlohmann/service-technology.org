@@ -31,6 +31,9 @@
   Livelock Operating Guideline only
 
   a composite marking reflects a given stored knowledge, a certain inner marking and the respective interface
+  
+  \todo Make this a member of StoredKnowledge?
+  \todo make dfs, lowlink to size_t
 */
 class CompositeMarking {
 
@@ -73,6 +76,8 @@ class CompositeMarking {
   Livelock Operating Guideline only
 
   takes care of composite markings, basically a name space to outsource specific attributes and functions
+
+  \todo consider moving me to CompositeMarking as static stuff
 */
 class CompositeMarkingsHandler {
     public: /* static functions */

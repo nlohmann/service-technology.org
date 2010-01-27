@@ -683,6 +683,7 @@ void StoredKnowledge::fileHeader(std::ostream &file) {
   \note Fiona identifies node numbers by integers. To avoid numbering of
         nodes, the pointers are casted to integers. Though ugly, it still is
         a valid numbering.
+  \todo Create a filter that maps the pointer addresses to human-readable numbers.
  */
 void StoredKnowledge::output_og(std::ostream& file) {
     fileHeader(file);

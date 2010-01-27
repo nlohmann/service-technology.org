@@ -389,6 +389,8 @@ int main(int argc, char** argv) {
 
             // print out some statistics gained by writing out the og file
             // (the decode() method of Clause is only called when we actually print out the annotations)
+            /// \todo move me to class wherever
+            /// \todo --dot should not need --og
             if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
 
                 status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);

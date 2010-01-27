@@ -89,6 +89,10 @@ SCSHandler::~SCSHandler() {
     (if one of those mandatory edges are left out in a subsystem, the SCS is not connected anymore)
     \param SCS the SCS to be considered
     \param _numberOfAllEdges number of edges contained within the SCS
+    \todo  What happens if edgeBitmask runs out of bits? #edges > sizeof(unsigned int)
+    \todo  Check if edgeBitmask can reach uint_max (overflow)
+    \todo  call error() in case no memory is returned from calloc/realloc
+    \todo  Check if adding 1 element to mandatoryEdges can be improved
 */
 void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) {
 
@@ -102,7 +106,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
 
     // C array of edges needed to generate a subsystem of edges quickly
     edges = new Edge*[numberOfAllEdges];
-
+    
     unsigned int i = 0;
 
     // collect all incoming edges of one knowledge
@@ -128,7 +132,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
 
             // collect the incoming edges; each bit of the bitmask points to the edge in the edge array
             // each edge has a unique index, thus we can add the value of each edge
-            edgeBitmask += 1 << i;
+            edgeBitmask += (1 << i);
 
             ++i;
         }

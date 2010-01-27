@@ -580,6 +580,8 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
   \note the operating guideline must have been traversed first,
         so set StoredKnowledge::seen is filled with all reachable knowledges
   \note fixedNodes.clear(); in die finalize-Methode packen und in der Regel nie rufen
+  \todo WIR WOLLEN FOREACH!
+  \todo getStronglyConnectedSetsRecursively -> getSCSRecursively
 */
 void LivelockOperatingGuideline::generateLLOG() {
 
@@ -613,7 +615,7 @@ void LivelockOperatingGuideline::generateLLOG() {
 
     getStronglyConnectedSetsRecursively(fixedNodes, StoredKnowledge::seen);
 
-    fixedNodes.clear();
+    //fixedNodes.clear();
     //seen.clear();
 }
 
@@ -654,6 +656,10 @@ void LivelockOperatingGuideline::getEdgesOfSCS(const std::set<StoredKnowledge* >
   recursive function to calculate all strongly connected sets within the set of knowledges
   \param fixedNodes
   \param nonFixedNodes
+  \todo Call getSCCs with NULL rather than empty object
+  \todo Replace setOfEdges.clear(); by a constructor call
+  \todo Delete mandatoryEdges?
+  \todo make getEdgesOfSCS return the size
 */
 void LivelockOperatingGuideline::getStronglyConnectedSetsRecursively(std::set<StoredKnowledge* > & fixedNodes,
                                                                      std::set<StoredKnowledge* > & nonFixedNodes) {

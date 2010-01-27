@@ -48,7 +48,7 @@ option "sa" -
   optional
 
 option "dot" -
-  "Graphviz dot output."
+  "Creates a graphviz dot representation of the operating guidelines for the given correctness criterion."
   details="You can pipe directly into dot by calling `wendy net.owfn --dot=- | dot'\n"
   string
   typestr="FILENAME"

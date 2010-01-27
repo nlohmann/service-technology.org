@@ -30,6 +30,7 @@
 
 class StoredKnowledge;
 
+/// \todo make me a member of the new LL-StoredKnowledge ???
 typedef std::map<const StoredKnowledge*, std::set<Label_ID> > SetOfEdges;
 
 

@@ -25,6 +25,7 @@
 #include <vector>
 #include <cstdlib>
 #include <libgen.h>
+#include <ctime>
 
 // include Marlene's own headers
 #include "config.h"

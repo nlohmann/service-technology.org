@@ -23,6 +23,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
+#include <ctime>
 #include <sys/types.h>
 #if defined(HAVE_SYS_WAIT_H) && ! defined(__MINGW32__)
 # include <sys/wait.h>

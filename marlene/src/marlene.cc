@@ -33,6 +33,7 @@
 #include "macros.h"
 #include "adapter.h"
 #include "Output.h"
+#include "verbose.h"
 
 // include PN Api headers
 #include "pnapi/pnapi.h"

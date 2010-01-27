@@ -36,6 +36,7 @@
 #include "cmdline.h"
 #include "types.h"
 #include "verbose.h"
+#include "util.h"
 
 /// the vector of the successor state numbers of the current marking
 std::vector<InnerMarking_ID> currentSuccessors;
@@ -88,7 +89,7 @@ state:
 
         if (markingoutput) {
             markingoutput->stream() << $2 << ": ";
-            for (std::map<const pnapi::Place*, unsigned int>::iterator p = marking.begin(); p != marking.end(); ++p) {
+            FOREACH(p, marking) {
                 if (p != marking.begin()) {
                     markingoutput->stream() << ", ";
                 }

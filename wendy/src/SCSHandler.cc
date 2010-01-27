@@ -21,6 +21,7 @@
 #include "SCSHandler.h"
 #include "Label.h"
 #include "StoredKnowledge.h"
+#include "util.h"
 
 
 /***************************
@@ -118,12 +119,10 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
     }
 
     // create C array of the set of edges and detect mandatory edges
-    for (SetOfEdges::iterator iter = SCS.begin(); iter != SCS.end(); ++iter) {
-
+    FOREACH(iter, SCS) {
         unsigned int edgeBitmask = 0;
 
-        for (std::set<Label_ID>::iterator iterEdges = (*iter).second.begin(); iterEdges != (*iter).second.end(); ++iterEdges) {
-
+        FOREACH(iterEdges, iter->second) {
             Edge * edgeObject = new Edge((*iter).first, *iterEdges);
 
             edges[i] = edgeObject;
@@ -148,17 +147,11 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
     }
 
     // iterate over the map of incoming edges, to find more mandatory edges
-    for (std::map<StoredKnowledge* , std::set< unsigned int > >::iterator iterIncomingEdges = incomingEdges.begin();
-                                                                          iterIncomingEdges != incomingEdges.end();
-                                                                          ++iterIncomingEdges) {
-
+    FOREACH(iterIncomingEdges, incomingEdges) {
         unsigned int edgeBitmask = 0;
 
         // knowledge has incoming edges, so all those edges are mandatory as well
-        for (std::set< unsigned int >::iterator iterIncomingEdge = (*iterIncomingEdges).second.begin();
-                                                iterIncomingEdge != (*iterIncomingEdges).second.end();
-                                                ++iterIncomingEdge) {
-
+        FOREACH(iterIncomingEdge, iterIncomingEdges->second) {
             // collect the incoming edges; each bit of the bitmask points to the edge in the edge array
             // each edge has a unique index, thus we can add the value of each edge
             edgeBitmask += 1 << (*iterIncomingEdge);

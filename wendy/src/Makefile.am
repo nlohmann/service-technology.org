@@ -20,8 +20,9 @@ wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
                 CompositeMarking.cc CompositeMarking.h \
                 AnnotationLivelockOG.cc AnnotationLivelockOG.h \
                 LivelockOperatingGuideline.cc LivelockOperatingGuideline.h \
-				Clause.cc Clause.h \
-				SCSHandler.cc SCSHandler.h
+                Clause.cc Clause.h \
+                SCSHandler.cc SCSHandler.h \
+                util.h
 
 # the configuration files
 sysconf_DATA = wendy.conf

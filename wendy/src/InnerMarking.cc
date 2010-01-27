@@ -25,6 +25,7 @@
 #include "Label.h"
 #include "cmdline.h"
 #include "verbose.h"
+#include "util.h"
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -333,7 +334,7 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
 
     // if it is not a TSCC, we have to evaluate each member of the SCC
     // first, we generate the predecessor relation between the members
-    for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+    FOREACH(iScc, markingSet) {
         // for each successor which is part of the current SCC, register the predecessor
 
         InnerMarking * currentInnerMarking = markingMap.find((*iScc))->second;
@@ -358,7 +359,7 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
 
     // propagate that at least from one inner marking of the current SCC a final inner marking is reachable
     if (is_final_reachable) {
-        for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+        FOREACH(iScc, markingSet) {
             finalMarkingReachableMap[*iScc] = true;
         }
     }
@@ -412,8 +413,7 @@ void InnerMarking::finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSe
     bool is_final_reachable = false;
 
     // evaluate each member of the SCC
-    for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
-
+    FOREACH(iScc, markingSet) {
         InnerMarking * currentInnerMarking = markingMap.find((*iScc))->second;
 
         // get successor of current inner marking
@@ -433,7 +433,7 @@ void InnerMarking::finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSe
 
     // propagate that at least from one inner marking of the current SCC a final inner marking is reachable
     if (is_final_reachable) {
-        for (std::set<InnerMarking_ID>::const_iterator iScc = markingSet.begin(); iScc != markingSet.end(); ++iScc) {
+        FOREACH(iScc, markingSet) {
             finalMarkingReachableMap[*iScc] = true;
         }
     }

@@ -22,6 +22,7 @@
 #include "LivelockOperatingGuideline.h"
 #include "Label.h"
 #include "Clause.h"
+#include "util.h"
 
 
 /********************
@@ -233,7 +234,7 @@ void CompositeMarkingsHandler::addClause(Clause * booleanClause) {
 void CompositeMarkingsHandler::initialize(const std::set<StoredKnowledge* > & setOfStoredKnowledges) {
 
     // construct a valid disjunction of sending events
-    for (std::set<StoredKnowledge* >::const_iterator iter = setOfStoredKnowledges.begin(); iter != setOfStoredKnowledges.end(); ++iter) {
+    FOREACH(iter, setOfStoredKnowledges) {
         maxSize += (*iter)->sizeAllMarkings;
     }
 

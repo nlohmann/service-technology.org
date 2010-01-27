@@ -22,6 +22,7 @@
 #include <set>
 #include "Knowledge.h"
 #include "cmdline.h"
+#include "util.h"
 
 extern gengetopt_args_info args_info;
 
@@ -62,7 +63,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
     // CASE 1: we receive -- decrement interface markings
     if (RECEIVING(label)) {
-        for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+        FOREACH(pos, parent->bubble) {
             for (size_t i = 0; i < pos->second.size(); ++i) {
                 // copy an interface marking from the parent and decrement it
                 bool result = true;
@@ -83,7 +84,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
     // CASE 2: we send -- increment interface markings and calculate closure
     if (SENDING(label)) {
-        for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+        FOREACH(pos, parent->bubble) {
             // check if this label makes the current inner marking possibly transient
             bool receiver = (InnerMarking::receivers[label].find(pos->first) != InnerMarking::receivers[label].end());
 
@@ -117,7 +118,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
     // CASE 3: synchronization
     if (SYNC(label)) {
-        for (Bubble::const_iterator pos = parent->bubble.begin(); pos != parent->bubble.end(); ++pos) {
+        FOREACH(pos, parent->bubble) {
             // check if this label makes the current inner marking possibly transient
             if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
 
@@ -156,7 +157,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
 
 Knowledge::~Knowledge() {
     // delete the stored interface markings
-    for (Bubble::iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    FOREACH(pos, bubble) {
         for (size_t i = 0; i < pos->second.size(); ++i) {
             delete pos->second[i];
         }
@@ -190,7 +191,7 @@ void Knowledge::initialize() {
     posSendEvents = new PossibleSendEvents(true, 1);
 
     // traverse each marking of the current bubble
-    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    FOREACH(pos, bubble) {
         // use boolean AND to detect which sending event is possible in each and every marking of the current bubble
         *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
     }
@@ -295,7 +296,7 @@ void Knowledge::closure() {
 bool Knowledge::resolvableWaitstate(const Label_ID& l) const {
     assert(not RECEIVING(l));
 
-    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    FOREACH(pos, bubble) {
         if (InnerMarking::inner_markings[pos->first]->waitstate(l)) {
             return true;
         }
@@ -310,8 +311,7 @@ bool Knowledge::resolvableWaitstate(const Label_ID& l) const {
 */
 bool Knowledge::receivingHelps() const {
     // traverse the inner markings
-    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
-
+    FOREACH(pos, bubble) {
         // only consider non-final waitstates
         if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
 
@@ -382,7 +382,7 @@ void Knowledge::sequentializeReceivingEvents() {
     std::set<InterfaceMarking*> visitStateAgain;
 
     // traverse the inner markings
-    for (Bubble::const_iterator pos = bubble.begin(); pos != bubble.end(); ++pos) {
+    FOREACH(pos, bubble) {
         // only consider non-final waitstates
         if (InnerMarking::inner_markings[pos->first]->is_waitstate) {
 
@@ -418,8 +418,7 @@ void Knowledge::sequentializeReceivingEvents() {
     }
 
     // now traverse through all states that we remembered to consider again
-    for (std::set<InterfaceMarking*>::const_iterator currenState = visitStateAgain.begin(); currenState != visitStateAgain.end(); ++currenState) {
- 
+    FOREACH(currenState, visitStateAgain) {
         // remember the receiving event that will resolve this waitstate
         Label_ID consideredReceivingEvent = 0;
 

@@ -31,7 +31,7 @@
 #include "cmdline.h"
 #include "LivelockOperatingGuideline.h"
 #include "AnnotationLivelockOG.h"
-
+#include "util.h"
 
 using std::map;
 using std::set;
@@ -199,7 +199,7 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
 
     // if it is not a TSCC, we have to evaluate each member of the SCC
     // first, we generate the predecessor relation between the members
-    for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
+    FOREACH(iScc, knowledgeSet) {
         // for each successor which is part of the current SCC, register the predecessor
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
             if ((**iScc).successors[l-1] != NULL and (**iScc).successors[l-1] != empty and
@@ -218,7 +218,7 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
 
     // propagate that at least from one node of the current SCC a final node is reachable
     if (is_final_reachable) {
-        for (std::set<StoredKnowledge*>::const_iterator iScc = knowledgeSet.begin(); iScc != knowledgeSet.end(); ++iScc) {
+        FOREACH(iScc, knowledgeSet) {
             (**iScc).is_final_reachable = true;
         }
     }
@@ -329,7 +329,7 @@ StoredKnowledge::StoredKnowledge(const Knowledge* K)
     innermarkingcount_t count = 0;
 
     // traverse the bubble and copy the markings into the C arrays
-    for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator pos = K->bubble.begin(); pos != K->bubble.end(); ++pos) {
+    FOREACH(pos, K->bubble) {
         for (innermarkingcount_t i = 0; i < pos->second.size(); ++i, ++count) {
             // copy the inner marking and the interface marking
             inner[count] = pos->first;
@@ -371,7 +371,7 @@ StoredKnowledge::~StoredKnowledge() {
 void StoredKnowledge::finalize() {
     unsigned int count = 0;
 
-    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+    FOREACH(it, hashTree) {
         for (size_t i = 0; i < it->second.size(); ++i, ++count) {
             delete it->second[i];
         }
@@ -741,7 +741,7 @@ void StoredKnowledge::output_og(std::ostream& file) {
     root->print(file);
 
     // all other nodes
-    for (set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+    FOREACH(it, seen) {
         if (*it != root) {
             (**it).print(file);
         }
@@ -879,7 +879,7 @@ std::string StoredKnowledge::formula(bool dot) const {
 
     if (not conjunctionOfDisjunctions.empty()) {
         // traverse the conjunctions to access the disjunctions
-        for (set<set<string> >::iterator it = conjunctionOfDisjunctions.begin(); it != conjunctionOfDisjunctions.end(); ++it) {
+        FOREACH(it, conjunctionOfDisjunctions) {
             if (it != conjunctionOfDisjunctions.begin()) {
                 formula += (dot) ? " &and; " : " * ";
             }
@@ -888,7 +888,7 @@ std::string StoredKnowledge::formula(bool dot) const {
             }
 
             // get clause which contains !, ? or # events
-            for (set<string>::iterator it2 = it->begin(); it2 != it->end(); ++it2) {
+            FOREACH(it2, *it) {
                 if (it2 != it->begin()) {
                     formula += (dot) ? " &or; " : " + ";
                 }
@@ -953,7 +953,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
    file << "INIT -> \"" << root << "\" [minlen=\"0.5\"]" << "\n";
 
     // draw the nodes
-    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = hashTree.begin(); it != hashTree.end(); ++it) {
+    FOREACH(it, hashTree) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if ((it->second[i]->is_sane or args_info.diagnose_given) and
                 (seen.find(it->second[i]) != seen.end())) {
@@ -1029,7 +1029,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 void StoredKnowledge::output_migration(std::ostream& o) {
     map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > > migrationInfo;
 
-    for (std::set<StoredKnowledge*>::const_iterator it = seen.begin(); it != seen.end(); ++it) {
+    FOREACH(it, seen) {
         // traverse the bubble
         for (innermarkingcount_t i = 0; i < (**it).sizeAllMarkings; ++i) {
             InnerMarking_ID inner = (**it).inner[i];
@@ -1051,13 +1051,11 @@ void StoredKnowledge::output_migration(std::ostream& o) {
     o << "]\n\n";
 
     // iterate the inner markings
-    for (map<InnerMarking_ID, map<StoredKnowledge*, set<InterfaceMarking*> > >::iterator it1 = migrationInfo.begin(); it1 != migrationInfo.end(); ++it1) {
-
+    FOREACH(it1, migrationInfo) {
         // iterate the interface markings
-        for (map<StoredKnowledge*, set<InterfaceMarking*> >::iterator it2 = it1->second.begin(); it2 != it1->second.end(); ++it2) {
-
+        FOREACH(it2, it1->second) {
             // iterate the knowledge bubbles
-            for (set<InterfaceMarking*>::iterator it3 = it2->second.begin(); it3 != it2->second.end(); ++it3) {
+            FOREACH(it3, it2->second) {
                 o << (size_t) it1->first << " " << (size_t) it2->first << " " << **it3 << "\n";
             }
         }

@@ -26,6 +26,7 @@
 #include <iostream>
 #include "Diagnosis.h"
 #include "verbose.h"
+#include "util.h"
 
 using std::map;
 using std::set;
@@ -42,7 +43,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
     // draw the nodes
-    for (map<hash_t, vector<StoredKnowledge*> >::iterator it = StoredKnowledge::hashTree.begin(); it != StoredKnowledge::hashTree.end(); ++it) {
+    FOREACH(it, StoredKnowledge::hashTree) {
         for (size_t i = 0; i < it->second.size(); ++i) {
             if (StoredKnowledge::seen.find(it->second[i]) != StoredKnowledge::seen.end()) {
                 file << "\"" << it->second[i] << "\" [label=<" << it->second[i] << "<BR/>";
@@ -132,8 +133,8 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                 file << "]\n";
 
                 if (not hiddenStates.empty()) {
-                    for (set<InnerMarking_ID>::iterator it1 = hiddenStates.begin(); it1 != hiddenStates.end(); ++it1) {
-                        for (set<InnerMarking_ID>::iterator it2 = hiddenStates.begin(); it2 != hiddenStates.end(); ++it2) {
+                    FOREACH(it1, hiddenStates) {
+                        FOREACH(it2, hiddenStates) {
                             if (*it1 != *it2) {
                                 message("you need to fix m%u", lastCommonPredecessor(*it1,*it2));
                             }
@@ -179,7 +180,7 @@ InnerMarking_ID Diagnosis::lastCommonPredecessor(InnerMarking_ID m1, InnerMarkin
             for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
                 InnerMarking *current = InnerMarking::inner_markings[m];
                 for (uint8_t succ = 0; succ < current->out_degree; ++succ) {
-                    for (set<InnerMarking_ID>::iterator it = reachable[current->successors[succ]].begin(); it != reachable[current->successors[succ]].end(); ++it) {
+                    FOREACH(it, reachable[current->successors[succ]]) {
                         if (reachable[m].insert(*it).second) {
                             done = false;
                         }

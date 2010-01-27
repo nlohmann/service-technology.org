@@ -29,10 +29,9 @@
 #include "CompositeMarking.h"
 #include "Clause.h"
 #include "SCSHandler.h"
-
 #include "verbose.h"
 #include "cmdline.h"
-
+#include "util.h"
 
 LivelockOperatingGuideline::_stats LivelockOperatingGuideline::stats;
 AnnotationLivelockOG LivelockOperatingGuideline::annotationLivelockOG = AnnotationLivelockOG();
@@ -83,8 +82,7 @@ bool LivelockOperatingGuideline::getSCCs(const std::set<StoredKnowledge* > & toB
     std::set<StoredKnowledge* > visited;
 
     // go through the set of nodes that are to be visited
-    for (std::set<StoredKnowledge* >::const_iterator iter = toBeVisited.begin(); iter != toBeVisited.end(); ++iter) {
-
+    FOREACH(iter, toBeVisited) {
         // we have not yet seen the node, find the SCCs of its reachability graph
         if (not getSCCsRecursively(*iter, visited, toBeVisited, setOfEdges, setOfSCCs, ignoreEdges)
             and not ignoreEdges) {
@@ -105,7 +103,7 @@ bool LivelockOperatingGuideline::getSCCs(const std::set<StoredKnowledge* > & toB
  */
 bool LivelockOperatingGuideline::findNodeInStack(const StoredKnowledge* currentNode) {
 
-    for(std::vector<StoredKnowledge*>::iterator it = StoredKnowledge::tarjanStack.begin(); it != StoredKnowledge::tarjanStack.end(); ++it){
+    FOREACH(it, StoredKnowledge::tarjanStack) {
         if(currentNode == *it) {
             return true;
         }
@@ -235,10 +233,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSet(const std::set<Stor
     CompositeMarkingsHandler::initialize(knowledgeSCS);
 
     // traverse the set of knowledges
-    for (std::set<StoredKnowledge* >::const_iterator iterSCS = knowledgeSCS.begin();
-                                                     iterSCS != knowledgeSCS.end();
-                                                     ++iterSCS) {
-
+    FOREACH(iterSCS, knowledgeSCS) {
         // traverse the markings of the current knowledge
         for (innermarkingcount_t i = 0; i < (*iterSCS)->sizeAllMarkings; ++i) {
 
@@ -589,10 +584,7 @@ void LivelockOperatingGuideline::generateLLOG() {
     if (StoredKnowledge::stats.numberOfNonTrivialSCCs == 0) {
         // the reachability graph of the inner contains cycles, so consider each knowledge as a trivial SCS
         if (not InnerMarking::is_acyclic) {
-            for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
-                                                             iter != StoredKnowledge::seen.end();
-                                                             ++iter) {
-
+            FOREACH(iter, StoredKnowledge::seen) {
                 // create trivial SCS containing only the current knowledge
                 std::set<StoredKnowledge* > SCS;
                 SCS.insert(*iter);
@@ -633,8 +625,7 @@ void LivelockOperatingGuideline::getEdgesOfSCS(const std::set<StoredKnowledge* >
     countEdges = 0;
 
     // consider each knowledge of SCS
-    for (std::set<StoredKnowledge*>::const_iterator iter = SCS.begin(); iter != SCS.end(); ++iter) {
-
+    FOREACH(iter, SCS) {
         std::set<Label_ID> succ;
 
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
@@ -689,8 +680,7 @@ void LivelockOperatingGuideline::getStronglyConnectedSetsRecursively(std::set<St
     }
 
     // traverse through all SCCs which are the strongly connected sets we are looking for ;-)
-    for (SetOfSCCs::const_iterator currentSCS = setOfSCCs.begin(); currentSCS != setOfSCCs.end(); ++currentSCS) {
-
+    FOREACH(currentSCS, setOfSCCs) {
         // if the set of fixed nodes is a subset of the current SCC we have found a real SCS
         if (std::includes((*currentSCS).begin(), (*currentSCS).end(), fixedNodes.begin(), fixedNodes.end())) {
 
@@ -762,8 +752,7 @@ void LivelockOperatingGuideline::getStronglyConnectedSetsRecursively(std::set<St
             std::set<StoredKnowledge* > intersection(n);
 
             // traverse through all elements of current SCC
-            for (std::set<StoredKnowledge* >::iterator iterSCC = intersection.begin(); iterSCC != intersection.end(); ++iterSCC) {
-
+            FOREACH(iterSCC, intersection) {
                 n.erase(*iterSCC);
 
                 getStronglyConnectedSetsRecursively(f, n);
@@ -867,10 +856,7 @@ void LivelockOperatingGuideline::output_acyclic(const bool & dot, std::ostream& 
     if (dot) {
         file << " graph[fontname=\"Helvetica\" fontsize=10 label=<<table border=\"0\"><tr><td> </td></tr><tr><td align=\"left\">Annotations:</td></tr>\n";
 
-        for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
-                                                         iter != StoredKnowledge::seen.end();
-                                                         ++iter) {
-
+        FOREACH(iter, StoredKnowledge::seen) {
             file << "<tr><td align=\"left\">" << reinterpret_cast<size_t>(*iter) << ": " << (*iter)->formula(dot) << "</td></tr>\n";
         }
 
@@ -878,10 +864,7 @@ void LivelockOperatingGuideline::output_acyclic(const bool & dot, std::ostream& 
     } else {
         file << "\nANNOTATIONS\n";
 
-        for (std::set<StoredKnowledge* >::const_iterator iter = StoredKnowledge::seen.begin();
-                                                         iter != StoredKnowledge::seen.end();
-                                                         ++iter) {
-
+        FOREACH(iter, StoredKnowledge::seen) {
             file << reinterpret_cast<size_t>(*iter) << ": " << (*iter)->formula(dot) << "\n";
         }
     }

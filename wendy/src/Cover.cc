@@ -20,6 +20,7 @@
 #include "Cover.h"
 #include "verbose.h"
 #include "cmdline.h"
+#include "util.h"
 
 extern gengetopt_args_info args_info;
 
@@ -164,22 +165,16 @@ void Cover::coverAll()
   std::vector<pnapi::Transition*> comT;   // interface transitions
   
   // determine place types 
-  for (std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInternalPlaces().begin();
-        p != InnerMarking::net->getInternalPlaces().end(); ++p)
-  {
+  FOREACH(p, InnerMarking::net->getInternalPlaces()) {
     inP.push_back(*p);
   }
   
-  for (std::set<pnapi::Place*>::iterator p = InnerMarking::net->getInterfacePlaces().begin();
-        p != InnerMarking::net->getInterfacePlaces().end(); ++p)
-  {
+  FOREACH(p, InnerMarking::net->getInterfacePlaces()) {
     comP.push_back(*p);
   }
   
   // determine transition types
-  for (std::set<pnapi::Transition*>::iterator t = InnerMarking::net->getTransitions().begin();
-        t != InnerMarking::net->getTransitions().end(); ++t)
-  {
+  FOREACH(t, InnerMarking::net->getTransitions()) {
     if ((**t).getType() == pnapi::Node::INPUT)
     {
       comT.push_back(*t);
@@ -256,9 +251,7 @@ void Cover::checkKnowledge(StoredKnowledge* K,
   std::set<unsigned int> coveredNodes[4]; 
   
   /// iterate through the knowledge bubble
-  for (std::map<InnerMarking_ID, std::vector<InterfaceMarking*> >::const_iterator current = bubble.begin();
-        current != bubble.end(); ++current)
-  {
+  FOREACH(current, bubble) {
     /// copy internal places
     for (unsigned int i=0; i<inner2CD[current->first].inP.size(); ++i)
       coveredNodes[0].insert(inner2CD[current->first].inP[i]);
@@ -298,9 +291,7 @@ void Cover::checkKnowledge(StoredKnowledge* K,
     case 3: current = &(knowledge2CD[K].comT); break;
     }
     
-    for (std::set<unsigned int>::iterator it = coveredNodes[i].begin();
-         it != coveredNodes[i].end(); ++it)
-    {
+    FOREACH(it, coveredNodes[i]) {
       current->push_back(*it);
     }
   }
@@ -323,9 +314,7 @@ void Cover::removeKnowledge(StoredKnowledge* K)
 void Cover::calculate(const std::set<StoredKnowledge*> & knowledges)
 {
   /// iterate over all knowledge bubbles
-  for (std::set<StoredKnowledge*>::iterator K = knowledges.begin();
-        K != knowledges.end(); ++K)
-  {
+  FOREACH(K, knowledges) {
     for (int i=0; i<4; ++i)
     {
       std::vector<unsigned int>* currentSource;
@@ -503,9 +492,7 @@ void Cover::write(std::ostream &os)
   
   /// verbose output
   bool firstBubble = true;
-  for (std::map<StoredKnowledge*, CoverData>::iterator it = knowledge2CD.begin();
-        it != knowledge2CD.end(); ++it)
-  {
+  FOREACH(it, knowledge2CD) {
     if (!firstBubble)
       os << ",\n";
     else

@@ -451,7 +451,7 @@ int Place::getMaxOccurrence()
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
     const std::string & name, const std::set<std::string> & labels) :
-  Node(net, observer, name, INTERNAL), labels_(labels)
+  Node(net, observer, name, INTERNAL), labels_(labels), roles_(std::set<string>())
 {
   cost_ = 0;
   observer_.updateTransitions(*this);

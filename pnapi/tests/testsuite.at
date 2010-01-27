@@ -137,6 +137,40 @@ AT_CHECK([test -f NET.pnml])
 AT_KEYWORDS([frontend output pnml])
 AT_CLEANUP
 
+AT_SETUP([Writing open net with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "ROLES a, b;" NET.owfn])
+AT_CHECK([GREP -q "ROLES a;" NET.owfn])
+AT_CHECK([GREP -q "ROLES b;" NET.owfn])
+AT_KEYWORDS([frontend output roles])
+AT_CLEANUP
+
+AT_SETUP([Writing normalized open net with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --normalize --output=owfn],0)
+AT_CHECK([test -f NET.normalized.owfn])
+AT_CHECK([GREP -q "ROLES a, b;" NET.normalized.owfn])
+AT_CHECK([GREP -q "ROLES a;" NET.normalized.owfn])
+AT_CHECK([GREP -q "ROLES b;" NET.normalized.owfn])
+AT_KEYWORDS([frontend output roles])
+AT_CLEANUP
+
+AT_SETUP([Writing mirrored open net with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --mirror --output=owfn],0)
+AT_CHECK([test -f NET.mirrored.owfn])
+AT_CHECK([GREP -q "ROLES a, b;" NET.mirrored.owfn])
+AT_CHECK([GREP -q "ROLES a;" NET.mirrored.owfn])
+AT_CHECK([GREP -q "ROLES b;" NET.mirrored.owfn])
+AT_KEYWORDS([frontend output roles])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([PNML])

@@ -1,5 +1,5 @@
 /*
- *  Formula.h
+ *  Formulamea.h
  *  
  *
  *  Created by Olivia Oanea on 12/9/09.

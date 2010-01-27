@@ -8,7 +8,7 @@
 #include "Node.h"
 #include "Graph.h"
 #include "helpers.h"
-#include "FormulaMea.h"
+#include "Formulamea.h"
 #include "cmdline.h"
 #include "verbose.h"
 #include "config-log.h"

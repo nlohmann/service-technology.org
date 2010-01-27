@@ -1,5 +1,5 @@
 /*
- *  Formula.cc
+ *  Formulamea.cc
  *  
  *
  *  Created by Olivia Oanea on 12/10/09.
@@ -19,8 +19,8 @@
 #include <sys/wait.h>
 #include "Formulamea.h"
 #include "verbose.h"
-
-
+#include <stdio.h>
+#include <string.h>
 
 /*const MFormula* MNegation::computeNFF() const{
 	if (typeid(*subf) == typeid(MNegation)) { // neg neg \phi

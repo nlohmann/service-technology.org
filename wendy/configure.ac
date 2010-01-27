@@ -67,15 +67,12 @@ AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
 # search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])
 if test "${LOLA}" = ""; then
-  AC_MSG_WARN([LoLA was not found. Please read file REQUIREMENTS!])
+  AC_MSG_WARN([LoLA was not found! See file REQUIREMENTS.])
 else
-AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version`]])
+AC_PATH_PROGS_FEATURE_CHECK([LOLAVERSION], [lola-statespace], [[ac_cv_path_LOLAVERSION=`$ac_path_LOLAVERSION --version | ${SED} -e 's/LoLA //'`]])
 AC_MSG_CHECKING([LoLA version])
 AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
-if test "${ac_cv_path_LOLAVERSION}" != "LoLA 1.14"; then
-  AC_MSG_WARN([You have ${ac_cv_path_LOLAVERSION}, but Wendy needs LoLA 1.14!])
-  AC_MSG_WARN([See file REQUIREMENTS.])
-fi
+echo ${ac_cv_path_LOLAVERSION} | ${AWK} '{if ($1>=1.14) exit 0; else exit 1}' || AC_MSG_WARN([Wendy needs at least LoLA 1.14! See file REQUIREMENTS.])
 fi
 
 # check for required functions and die if they are not found

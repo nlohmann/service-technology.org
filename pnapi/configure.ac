@@ -103,6 +103,10 @@ AH_BOTTOM([#ifdef __cplusplus
 #include <assert.h>
 #endif])
 
+# look up canonical build name and write it to config.h
+AC_CANONICAL_BUILD
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
+
 
 #############################################################################
 # create configured files (Makefiles, scripts, etc.)

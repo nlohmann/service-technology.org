@@ -80,7 +80,7 @@ namechar        [A-Za-z\200-\377_0-9.-]
 name            {namestart}{namechar}*
 esc             "&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 data            ([^<\n&]|\n[^<&]|\n{esc}|{esc})+
-comment         {open}"!--"([^-]|"-"[^-])*"-->"
+comment         {ws}*{open}"!--"([^-]|"-"[^-]|"--"[^>])*"-->"
 string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 /*
@@ -95,7 +95,8 @@ string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 %%
 
-<INITIAL>"<?"{data}*"?>" {}
+{comment}                {/* skip */}
+<INITIAL>"<?"{data}*"?>" {/* skip */}
 
 {ws}                    {/* skip */}
 <INITIAL>"/"            {return XML_SLASH;}
@@ -106,7 +107,6 @@ string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 {open}{name}            {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START;}
 {open}"/"               {BEGIN(INITIAL); return XML_END;}
-{comment}               {pnapi_pnml_yylval.s = strdup(yytext); return XML_COMMENT;}
 
 <CONTENT>{data}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA;}
 

@@ -1,4 +1,11 @@
-<!-- Petri net created by Petri Net API 3.01-unreleased reading cyclicFullCoffee.owfn -->
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  generator:   Petri Net API 3.01-unreleased Frontend (i386-apple-darwin10.2.0)
+  input file:  cyclicFullCoffee.owfn
+  invocation:  ./petri -opnml cyclicFullCoffee.owfn 
+  net size:    |P|= 7  |P_in|= 1  |P_out|= 1  |T|= 6  |F|= 15
+-->
 
 <pnml>
   <module>
@@ -10,7 +17,7 @@
         <synchronous id="T" />
       </port>
     </ports>
-    <net id="n1">
+    <net id="n1" type="PTnet">
       <place id="p0">
         <initialMarking>
           <text>1</text>
@@ -51,21 +58,21 @@
     </net>
     <finalmarkings>
       <marking>
-        <place id="p4">
+        <place id= "p4">
           <text>0</text>
-        </place>
-        <place id="p2">
+       </place>
+        <place id= "p2">
           <text>0</text>
-        </place>
-        <place id="p0">
+       </place>
+        <place id= "p0">
           <text>1</text>
-        </place>
-        <place id="p1">
+       </place>
+        <place id= "p1">
           <text>0</text>
-        </place>
-        <place id="p3">
+       </place>
+        <place id= "p3">
           <text>0</text>
-        </place>
+       </place>
       </marking>
     </finalmarkings>
   </module>

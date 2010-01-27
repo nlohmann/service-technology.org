@@ -259,7 +259,7 @@ void store_data(char *s) {
 %union {char *s;}
 
 %token XML_ENDDEF XML_EQ XML_SLASH XML_CLOSE XML_END
-%token <s> XML_NAME XML_VALUE XML_DATA XML_COMMENT XML_START
+%token <s> XML_NAME XML_VALUE XML_DATA XML_START
 %type <s> name_opt
 
 
@@ -268,16 +268,6 @@ void store_data(char *s) {
   ****************************************************************************/
 %%
 
-document:
-  misc_seq_opt element misc_seq_opt
-;
-misc_seq_opt:
-  misc_seq_opt misc
-| /*empty*/
-;
-misc:
-  XML_COMMENT
-;
 element:
   XML_START                          {open_element($1); free($1);}
   attribute_seq_opt empty_or_content
@@ -288,7 +278,6 @@ empty_or_content:
 ;
 content:
   content XML_DATA                   {store_data($2);}
-| content misc
 | content element
 | /*empty*/
 ;

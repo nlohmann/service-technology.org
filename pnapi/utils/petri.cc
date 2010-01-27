@@ -483,10 +483,9 @@ int main(int argc, char** argv) {
             for (unsigned int j = 0; j < args_info.output_given; ++j) {
                 // try to open file to write
                 string outname = objects[i].filename + suffix + "." + args_info.output_orig[j];
-                Output outfile(outname, "Output file");
+                Output outfile(outname, std::string(args_info.output_orig[j]) +  " output");
 
-                status("creating file '%s'...", outname.c_str());
-
+                outfile.stream() << meta(io::CREATOR, std::string(PACKAGE_STRING) + " Frontend (" + CONFIG_BUILDSYSTEM + ")");
                 outfile.stream() << meta(io::OUTPUTFILE, outname);
 
                 switch(args_info.output_arg[j]) {

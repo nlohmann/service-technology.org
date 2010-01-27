@@ -548,7 +548,7 @@ std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
 
 
 /*************************************************************************
- ***** PNMP output
+ ***** PNML output
  *************************************************************************/
 
 std::ios_base & pnml(std::ios_base & ios)
@@ -583,14 +583,15 @@ std::ostream & outputInterface(std::ostream & os, const PetriNet & net) {
 
 std::ostream & output(std::ostream & os, const PetriNet & net)
 {
-  string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
-  string inputfile = net.getMetaInformation(os, INPUTFILE);
-
   os //< output everything to this stream
 
-  << "<!-- Petri net created by " << creator
-  << (inputfile.empty() ? "" : " reading " + inputfile)
-  << " -->" << endl
+  << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" << endl
+  << "<!--" << endl
+  << "  generator:   " << net.getMetaInformation(os, CREATOR, PACKAGE_STRING) << endl
+  << "  input file:  " << net.getMetaInformation(os, INPUTFILE) << endl
+  << "  invocation:  " << net.getMetaInformation(os, io::INVOCATION) << endl
+  << "  net size:    " << stat << net << pnml << endl  
+  << "-->" << endl
   << endl
 
   << "<pnml>" << endl
@@ -602,7 +603,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   
   os << "    </ports>" << endl
 
-  << "    <net id=\"n1\">" << endl
+  << "    <net id=\"n1\" type=\"PTnet\">" << endl
 
   << mode(io::util::PLACE) << net.internalPlaces_
 

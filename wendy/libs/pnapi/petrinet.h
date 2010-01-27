@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
+ * \date    $Date: 2010-01-26 12:32:53 +0100 (Di, 26. Jan 2010) $
  *
- * \version $Revision: 5258 $
+ * \version $Revision: 5305 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -29,6 +29,7 @@
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
+#include "interface.h"
 
 #ifndef CONFIG_PETRIFY
 #define CONFIG_PETRIFY "not found"
@@ -311,7 +312,8 @@ public:
   /*!
    * \name   Basic Structural Changes
    *
-   * Functions to add nodes (Node, Place, Transition) and arcs (Arc).
+   * Functions to add nodes (Node, Place, Transition), arcs (Arc)
+   * and interface, i.e. ports (Port) and labels (Label).
    */
   //@{
 
@@ -327,6 +329,26 @@ public:
   Transition & createTransition(const std::string & = "",
       const std::set<std::string> & = std::set<std::string>());
 
+  /// creates a Port
+  Port & createPort(const std::string &);
+
+  /// creates an input Label
+  Label & createInputLabel(const std::string &, const std::string &);
+
+  /// creates an input Label
+  Label & createInputLabel(const std::string &, Port * = NULL);
+
+  /// creates an output Label
+  Label & createOutputLabel(const std::string &, const std::string &);
+
+  /// creates an output Label
+  Label & createOutputLabel(const std::string &, Port * = NULL);
+
+  /// creates a synchronous Label
+  Label & createSynchronizeLabel(const std::string &, const std::string &);
+
+  /// creates a synchronous Label
+  Label & createSynchronizeLabel(const std::string &, Port * = NULL);
 
   //@}
 
@@ -464,6 +486,9 @@ private:
 
   /// all synchronous labels
   std::set<std::string> labels_;
+
+  /// complete interface
+  Interface interface_;
 
   /* general properties */
 

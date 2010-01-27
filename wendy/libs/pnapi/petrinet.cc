@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
+ * \date    $Date: 2010-01-26 12:32:53 +0100 (Di, 26. Jan 2010) $
  *
- * \version $Revision: 5258 $
+ * \version $Revision: 5305 $
  */
 
 #include "config.h"
@@ -349,6 +349,7 @@ PetriNet::PetriNet() :
  */
 PetriNet::PetriNet(const PetriNet & net) :
   labels_(net.labels_),
+  roles_(net.roles_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
   meta_(net.meta_), warnings_(net.warnings_),
@@ -1082,6 +1083,69 @@ Transition & PetriNet::createTransition(const std::string & name,
   return *new Transition(*this, observer_,
       name.empty() ? getUniqueNodeName("t") : name,
           labels);
+}
+
+
+/*!
+ * Introduces a new port to the open net.
+ */
+Port & PetriNet::createPort(const string & name)
+{
+  return interface_.addPort(name);
+}
+
+
+/*!
+ * Creates an input label.
+ */
+Label & PetriNet::createInputLabel(const string & name, Port *port)
+{
+  return interface_.addInputLabel(name, port);
+}
+
+
+/*!
+ * Creates an input label
+ */
+Label & PetriNet::createInputLabel(const string & name, const string & port)
+{
+  return interface_.addInputLabel(name, port);
+}
+
+
+/*!
+ * Creates an output label
+ */
+Label & PetriNet::createOutputLabel(const string & name, Port *port)
+{
+  return interface_.addOutputLabel(name, port);
+}
+
+
+/*!
+ * Creates an output label
+ */
+Label & PetriNet::createOutputLabel(const string & name, const string & port)
+{
+  return interface_.addOutputLabel(name, port);
+}
+
+
+/*!
+ * Creates a synchronous label
+ */
+Label & PetriNet::createSynchronizeLabel(const string & name, Port *port)
+{
+  return interface_.addSynchronousLabel(name, port);
+}
+
+
+/*!
+ * Creates a synchronous label
+ */
+Label & PetriNet::createSynchronizeLabel(const string & name, const string & port)
+{
+  return interface_.addSynchronousLabel(name, port);
 }
 
 

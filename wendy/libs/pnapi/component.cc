@@ -319,6 +319,12 @@ unsigned int Place::getTokenCount() const
 }
 
 
+void Place::setTokenCount(unsigned int tokens)
+{
+  tokens_ = tokens;
+}
+
+
 /*!
  */
 unsigned int Place::getCapacity() const
@@ -445,7 +451,7 @@ int Place::getMaxOccurrence()
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
     const std::string & name, const std::set<std::string> & labels) :
-  Node(net, observer, name, INTERNAL), labels_(labels)
+  Node(net, observer, name, INTERNAL), labels_(labels), roles_(std::set<string>())
 {
   cost_ = 0;
   observer_.updateTransitions(*this);
@@ -457,7 +463,7 @@ Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
     const Transition & trans, const std::string & prefix) :
-      Node(net, observer, trans, prefix), labels_(trans.labels_)
+      Node(net, observer, trans, prefix), labels_(trans.labels_), roles_(trans.roles_)
       {
   cost_ = trans.cost_;
   observer_.updateTransitions(*this);

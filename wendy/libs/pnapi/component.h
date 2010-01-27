@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: niels $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
+ * \date    $Date: 2010-01-25 11:30:16 +0100 (Mo, 25. Jan 2010) $
  *
- * \version $Revision: 5258 $
+ * \version $Revision: 5299 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -253,6 +253,9 @@ public:
 
   /// returns the number of tokens lying on this place
   unsigned int getTokenCount() const;
+
+  /// sets the number of tokens lying on this place
+  void setTokenCount(unsigned int);
 
   /// returns the capacity
   unsigned int getCapacity() const;

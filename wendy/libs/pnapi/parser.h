@@ -243,6 +243,14 @@ extern std::set<Place*> placeSet_;
 extern bool checkLabels_;
 /// wildcard ALL[_OTHER]_PLACES_EMPTY given
 extern bool wildcardGiven_;
+/// a Port object
+extern Port * o_port_;
+/// a Label object
+extern Label * label_;
+/// name -> Label
+extern std::map<std::string, Label *> o_labels_;
+/// label type
+extern Label::Type labelType_;
 
 /*!
  * \brief   Encapsulation of the flex/bison OWFN parser

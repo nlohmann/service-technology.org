@@ -132,8 +132,8 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+#AC_FUNC_MALLOC
+#AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset strchr strcspn strdup strspn strtol])
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Marlene cannot use UNIX pipes.]))
 AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))

@@ -10,16 +10,17 @@
 #include "helpers.h"
 
 using namespace std;
-map<string, unsigned int> label2id;
-map<unsigned int, string> id2label;
+map<string, int> label2id;
+map<int, string> id2label;
+map<int, char> inout;
 
-unsigned int firstLabelId; //all labels including tau
-unsigned int firstInputId; //input labels
-unsigned int firstOutputId;//output labels
+int firstLabelId; //all labels including tau
+int firstInputId; //input labels
+int firstOutputId;//output labels
 
-unsigned int lastLabelId;
-unsigned int lastInputId;
-unsigned int lastOutputId;
+int lastLabelId;
+int lastInputId;
+int lastOutputId;
 
 int main() {
 

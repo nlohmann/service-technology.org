@@ -12,8 +12,9 @@
 extern gengetopt_args_info args_info;
 
 using namespace std;
-extern map<string, unsigned int> label2id;
-extern map<unsigned int, string> id2label;
+extern map<string, int> label2id;
+extern map<int, string> id2label;
+extern map<int, char> inout;
 
 void testFormulaClass(){
 
@@ -101,27 +102,35 @@ void testSat(){
 void initFormulaClass(){
     label2id.clear();
     id2label.clear();
+    inout.clear();
 
     id2label[0] = ""; //0 has a special meaning in minisat, therefore 0 cannot use as ID for labels
     label2id[""] = 0;
+    inout[0] = ' ';
 
 	id2label[1] = "final";
 	label2id["final"] = 1;
+	inout[1] = ' ';
 
 	id2label[2] = "tau";
 	label2id["tau"] = 2;
+	inout[2] = ' ';
 
 	id2label[3] = "A";
 	label2id["A"] = 3;
+	inout[3] = '?';
 
 	id2label[4] = "R";
 	label2id["R"] = 4;
+	inout[4] = '?';
 
 	id2label[5] = "I";
 	label2id["I"] = 5;
+	inout[5] = '!';
 
 	id2label[6] = "O";
 	label2id["O"] = 6;
+	inout[6] = '!';
 
 	//cout << "initFormulaClass... \t passed" << endl;
 }

@@ -21,8 +21,9 @@ extern int og_yylex();
 extern int og_yyerror(char const *msg);
 
 Graph* graph;
-map<string, int> label2id;
-map<int, string> id2label;
+extern map<string, int> label2id;
+extern map<int, string> id2label;
+extern map<int, char> inout;
 
 string identTmp;
 Node *currentNode;
@@ -90,13 +91,13 @@ opt_tauloops: /* empty */
 
 input:
   /* empty */
-| KEY_INPUT identlist SEMICOLON 
+| KEY_INPUT identlist_in SEMICOLON 
 ;
 
 
 output:
   /* empty */
-| KEY_OUTPUT identlist SEMICOLON
+| KEY_OUTPUT identlist_out SEMICOLON
 ;
 
 initialnodes:
@@ -108,31 +109,32 @@ globalformula:
    /*empty*/  {graph->globalFormula = new FormulaTrue();}
 | KEY_GLOBALFORMULA gformula SEMICOLON {graph->globalFormula = $2;}
 
-
-
 initialnodelist:
   NUMBER {graph->addInitialNode($1);}
 | initialnodelist NUMBER {graph->addInitialNode($2);}
 		
-
-
-identlist:
+identlist_in:
   /* empty */
 | IDENT { ++currentIdPos;
-		  addLabel(string($1), currentIdPos);
-		  //assert(id2label.find(currentIdPos) == id2label.end());
-		  //assert(label2id.find(string($1)) == label2id.end());
-		  //id2label[currentIdPos] = string($1);
-		  //label2id[string($1)] = currentIdPos; 
+		  addLabel(string($1), currentIdPos, '?');
 		  free($1);
 		  } 
-| identlist COMMA IDENT { 
+| identlist_in COMMA IDENT { 
           ++currentIdPos;
-          addLabel(string($3), currentIdPos);
-          //assert(id2label.find(currentIdPos) == id2label.end());
-		  //assert(label2id.find(string($3)) == label2id.end());
-          //id2label[currentIdPos] = string($3);
-		  //label2id[string($3)] = currentIdPos; 
+          addLabel(string($3), currentIdPos, '?');
+		  free($3);
+		  } 
+;
+
+identlist_out:
+  /* empty */
+| IDENT { ++currentIdPos;
+		  addLabel(string($1), currentIdPos, '!');
+		  free($1);
+		  } 
+| identlist_out COMMA IDENT { 
+          ++currentIdPos;
+          addLabel(string($3), currentIdPos, '!');
 		  free($3);
 		  } 
 ;

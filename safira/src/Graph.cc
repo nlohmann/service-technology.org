@@ -20,6 +20,7 @@ using std::vector;
 
 extern map<string, int> label2id;
 extern map<int, string> id2label;
+extern map<int, char> inout;
 
 extern int firstLabelId; //all labels including tau
 extern int firstInputId; //input labels
@@ -272,7 +273,8 @@ void Graph::toDot(FILE* out, string title) const {
 
 			for (int i = firstLabelId; i <= lastLabelId; ++i){
 				for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-					fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->second->id, (*s)->id, id2label[i].c_str());
+					//fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->second->id, (*s)->id, id2label[i].c_str());
+					fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", n->second->id, (*s)->id, inout[i] ,id2label[i].c_str());
 				}
 			}
 		}
@@ -282,7 +284,7 @@ void Graph::toDot(FILE* out, string title) const {
 
 //			for (int i = firstLabelId; i <= lastLabelId; ++i){
 //				for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//					fprintf(out, "  %d -> %d [label=\"%s\", style=dashed, color=red]\n", n->second->id, (*s)->id, id2label[i].c_str());
+//					fprintf(out, "  %d -> %d [label=\"%c%s\", style=dashed, color=red]\n", n->second->id, (*s)->id, inout[i], id2label[i].c_str());
 //				}
 //			}
 

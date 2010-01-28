@@ -21,16 +21,16 @@ using std::map;
 using std::string;
 using std::vector;
 
-extern map<string, unsigned int> label2id;
-extern map<unsigned int, string> id2label;
+extern map<string,  int> label2id;
+extern map< int, string> id2label;
 
-extern unsigned int firstLabelId; //all labels including tau
-extern unsigned int firstInputId; //input labels
-extern unsigned int firstOutputId;//output labels
+extern  int firstLabelId; //all labels including tau
+extern  int firstInputId; //input labels
+extern  int firstOutputId;//output labels
 
-extern unsigned int lastLabelId;
-extern unsigned int lastInputId;
-extern unsigned int lastOutputId;
+extern  int lastLabelId;
+extern  int lastInputId;
+extern  int lastOutputId;
 
 void initGraph(){
 	initFormulaClass();

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void addLabel(string label, int id);
+void addLabel(string label, int id, char io);
 
 string intToString(int i);
 string clauseToString(Clause c);

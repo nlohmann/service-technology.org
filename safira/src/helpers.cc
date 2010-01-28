@@ -6,12 +6,14 @@
 
 extern map<string, int> label2id;
 extern map<int, string> id2label;
+extern map<int, char> inout;
 
-void addLabel(string label, int id){
+void addLabel(string label, int id, char io){
 	assert(label2id.find(label) == label2id.end());
 	assert(id2label.find(id) == id2label.end());
 	id2label[id] = label;
 	label2id[label] = id;
+	inout[id] = io;
 }
 
 vector<int> clauseToIntVector(const Clause &c) {

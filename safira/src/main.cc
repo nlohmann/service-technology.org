@@ -31,8 +31,9 @@ extern int og_yylex_destroy();
 
 extern Graph * graph;
 
-extern map<string, int> label2id;
-extern map<int, string> id2label;
+map<string, int> label2id;
+map<int, string> id2label;
+map<int, char> inout;
 
 extern int currentIdPos;
 extern int firstLabelId; //all labels including tau
@@ -51,9 +52,7 @@ int main(int argc, char **argv) {
 
 	evaluateParameters(argc, argv);
 
-	if (args_info.inputs_num > 1) {
-		//fehler
-	}
+if(args_info.complement_given){
 
 	string filename = "stdin";
 
@@ -165,6 +164,10 @@ int main(int argc, char **argv) {
 	}
 
 	delete g;
+}
+   if(args_info.intersection_given){
+	   cout << "hallo";
+   }
 
 //	free(args_info.minisat_arg);
 	cmdline_parser_free(&args_info);
@@ -175,9 +178,9 @@ void initGlobalVariables(){
     label2id.clear();
     id2label.clear();
 
-    addLabel("", 0); //0 has a special meaning in minisat, therefore 0 cannot use as label ID
-    addLabel("final", 1);
-    addLabel("tau", 2);
+    addLabel("", 0, ' '); //0 has a special meaning in minisat, therefore 0 cannot use as label ID
+    addLabel("final", 1, ' ');
+    addLabel("tau", 2, ' ');
 
     //	currentIdPos = 1;  //if there is no tau in the OG
 	currentIdPos = 2;
@@ -233,16 +236,16 @@ void evaluateParameters(int argc, char** argv) {
 
 //    StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;
 
-    // check whether at most one file is given
-    if (args_info.inputs_num > 1) {
-        abort(4, "at most one input file must be given");
+    // checks the correct number of input files
+    if (args_info.inputs_num > 1 && args_info.complement_given) {
+        abort(4, "Wrong number of input files. Exactly one file must be given if complement is chosen.");
+    }
+
+    if (args_info.inputs_num > 1 && args_info.complement_given) {
+        abort(4, "Wrong number of input files. Exactly one file must be given if complement is chosen.");
     }
 
 
-    // check the message bound
-//    if ((args_info.messagebound_arg < 1) or (args_info.messagebound_arg > UINT8_MAX)) {
-//        abort(9, "message bound must be between 1 and %d", UINT8_MAX);
-//    }
 
     free(params);
 }

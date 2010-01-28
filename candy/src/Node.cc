@@ -40,13 +40,17 @@ unsigned int Node::computeCost() {
     }
 
     // if this node is a final node then we dont have to consider any leaving edge
-    // reason: per definition has final node in an OG no successors
+    // reason: per definition has final node in an OG no successors except maybe the
+    // empty node
+    // assertion: annotation has to be "FINAL" and not "final"
     if ( final ) {
 		debug("node %d, %d is a final node, cost is 0", getID(), this);
         computedCost = true;
         cost = 0;
         return 0;
     }
+    assert(formula->asString() != "final"); // prevent a common error
+
 
     // first we have to compute the cost for all outgoing edges
     // this is critical as cost are defined for acyclic OGs only!!!
@@ -80,12 +84,12 @@ unsigned int Node::computeCost() {
     unsigned int minimalCost = 0;
     if ( negation ) {
         // run-time complexity O(2^n)
-        minimalCost = getCostMinimalAssignments(edgeCost, minimalAssignments);
         debug("node %d, %d has formula with negation", getID(), this);
+        minimalCost = getCostMinimalAssignments(edgeCost, minimalAssignments);
     } else {
         // run-time complexity O(n^2)
-        minimalCost = getCostMinimalAssignmentsWithoutNegation(edgeCost, minimalAssignments);
 		debug("node %d, %d has formula without negation", getID(), this);
+        minimalCost = getCostMinimalAssignmentsWithoutNegation(edgeCost, minimalAssignments);
     }
     debug("node %d, %d has minimal assignment with cost %d", getID(), this, minimalCost);
 

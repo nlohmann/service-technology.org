@@ -17,7 +17,7 @@ extern int og_yyerror(char const *msg);
 %s COMMENT
 
 whitespace     [\n\r\t ]
-identifier     [^,;:()\t \n\r\{\}=]+
+identifier     [^\n\r\t ,;:()\{\}=+*~<>]+
 number         [0-9]+
 
 
@@ -37,9 +37,9 @@ number         [0-9]+
 "GLOBALFORMULA"                         { return KEY_GLOBALFORMULA;    }
 "EXPLICITE_TAULOOPS"					{ return KEY_TAULOOPS;		   }
 
-"true"                                  { return KEY_TRUE;             }
-"false"                                 { return KEY_FALSE;            }
-"final"                                 { return KEY_FINAL;            }
+(?i:true)                               { return KEY_TRUE;             }
+(?i:false)                              { return KEY_FALSE;            }
+(?i:final)                              { return KEY_FINAL;            }
 "~"                                     { return OP_NOT;               }
 "*"                                     { return OP_AND;               }
 "+"                                     { return OP_OR;                }

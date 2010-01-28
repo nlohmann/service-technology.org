@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 	`--------------------------------------*/
 
     // the command line parameters filled with default values
-	cmdline_parser_init(&args_info);
+	//cmdline_parser_init(&args_info);
 
     // call the command line parser from gengetopt
     // which will check for unused and unnamed paramters

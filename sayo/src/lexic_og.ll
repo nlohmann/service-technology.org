@@ -38,7 +38,7 @@ extern int og_yyerror(char const *msg);
 %s BITS
 
 whitespace     [\n\r\t ]
-identifier     [^,;:()\t \n\r\{\}=]+
+identifier     [^\n\r\t ,;:()\{\}=+*~<>]+
 number         [0-9]+
 
 
@@ -59,9 +59,9 @@ number         [0-9]+
 <BITS>"F"                               { BEGIN(INITIAL); return BIT_F; }
 <BITS>"S"                               { BEGIN(INITIAL); return BIT_S; }
 <BITS>"T"                               { BEGIN(INITIAL); return BIT_T; }
-"TRUE"                                  { return KEY_TRUE;             }
-"FALSE"                                 { return KEY_FALSE;            }
-"FINAL"                                 { return KEY_FINAL;            }
+(?i:true)                               { return KEY_TRUE;             }
+(?i:false)                              { return KEY_FALSE;            }
+(?i:final)                              { return KEY_FINAL;            }
 "~"                                     { return OP_NOT;               }
 "*"                                     { return OP_AND;               }
 "+"                                     { return OP_OR;                }

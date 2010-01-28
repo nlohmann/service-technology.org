@@ -562,7 +562,7 @@ namespace __pnml
 {
 
 std::ostream & outputInterface(std::ostream & os, const PetriNet & net) {
-    os << "      <port id=\"p1\">" << endl;
+    os << "      <port id=\"portId1\">" << endl;
 
     PNAPI_FOREACH(set<Place*>, net.getInputPlaces(), p) {
         os << "        <input id=\"" << (*p)->getName() << "\" />" << endl;
@@ -603,9 +603,15 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   
   os << "    </ports>" << endl
 
-  << "    <net id=\"n1\" type=\"PTNet\">" << endl
+  << "    <net id=\"n1\" type=\"PTNet\">" << endl;
 
-  << mode(io::util::PLACE) << net.internalPlaces_
+  if (!net.getMetaInformation(os, INPUTFILE).empty()) {
+    os << "    <name>" << endl
+       << "      <text>" << net.getMetaInformation(os, INPUTFILE) << "</text>" << endl
+       << "    </name>" << endl;
+  }
+
+  os << mode(io::util::PLACE) << net.internalPlaces_
 
   << net.transitions_
 
@@ -654,16 +660,16 @@ std::ostream & output(std::ostream & os, const Transition & t)
   string comm;
   PNAPI_FOREACH(set<Node*>, t.getPreset(), p) {
       if (inputs.find(static_cast<Place*>(*p)) != inputs.end()) {
-          comm += "\n        <receive id=\"" + (*p)->getName() + "\" />";
+          comm += "\n        <receive idref=\"" + (*p)->getName() + "\" />";
       }
   }
   PNAPI_FOREACH(set<Node*>, t.getPostset(), p) {
       if (outputs.find(static_cast<Place*>(*p)) != outputs.end()) {
-          comm += "\n        <send id=\"" + (*p)->getName() + "\" />";
+          comm += "\n        <send idref=\"" + (*p)->getName() + "\" />";
       }
   }
   PNAPI_FOREACH(set<std::string>, t.getSynchronizeLabels(), l) {
-      comm += "\n        <synchronize id=\"" + *l + "\" />";
+      comm += "\n        <synchronize idref=\"" + *l + "\" />";
   }
 
   if (comm.empty()) {
@@ -679,9 +685,9 @@ std::ostream & output(std::ostream & os, const Transition & t)
 
 std::ostream & output(std::ostream & os, const Arc & arc)
 {
-  static unsigned int id = 0;
+  static unsigned int arcId = 0;
   os
-  << "      <arc id=\"a" << ++id
+  << "      <arc id=\"arcId" << ++arcId
   << "\" source=\"" << arc.getSourceNode().getName()
   << "\" target=\"" << arc.getTargetNode().getName()
   << "\"";
@@ -746,7 +752,7 @@ std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
 
 std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
 {
-  return os << "        <place id= \"" << f.place().getName() << "\">" << endl
+  return os << "        <place idref=\"" << f.place().getName() << "\">" << endl
   << "          <text>" << f.tokens() << "</text>\n       </place>" << endl;
 }
 

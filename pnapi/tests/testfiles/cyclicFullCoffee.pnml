@@ -28,19 +28,19 @@
       <place id="p3" />
       <place id="p4" />
       <transition id="t1">
-        <receive id="E" />
+        <receive idref="E" />
       </transition>
       <transition id="t2">
-        <synchronize id="C" />
+        <synchronize idref="C" />
       </transition>
       <transition id="t3">
-        <synchronize id="T" />
+        <synchronize idref="T" />
       </transition>
       <transition id="t4">
-        <send id="B" />
+        <send idref="B" />
       </transition>
       <transition id="t5">
-        <send id="B" />
+        <send idref="B" />
       </transition>
       <transition id="t6" />
       <arc id="a1" source="p0" target="t1" />
@@ -58,19 +58,19 @@
     </net>
     <finalmarkings>
       <marking>
-        <place id= "p4">
+        <place idref="p4">
           <text>0</text>
        </place>
-        <place id= "p2">
+        <place idref="p2">
           <text>0</text>
        </place>
-        <place id= "p0">
+        <place idref="p0">
           <text>1</text>
        </place>
-        <place id= "p1">
+        <place idref="p1">
           <text>0</text>
        </place>
-        <place id= "p3">
+        <place idref="p3">
           <text>0</text>
        </place>
       </marking>

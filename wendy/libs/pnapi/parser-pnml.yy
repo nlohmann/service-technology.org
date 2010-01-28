@@ -37,18 +37,18 @@
 using namespace pnapi;
 using namespace pnapi::parser::pnml;
 
-std::map<unsigned int, std::map<std::string, std::string> > attributes;
+/// a mapping to store the attributes, accessible by the parse depth
+std::map<unsigned int, std::map<std::string, std::string> > pnml_attributes;
 
- /* we only care about these elements */
-const char* whitelist[] = {"pnml", "net", "arc", "place", "transition", "inscription", "initialMarking", "annotation", "text", "module", "ports", "port", "input", "output", "synchronous", "receive", "send", "synchronize", "finalmarkings", "marking", "page", NULL };
-enum elementTypes {
-    T_PNML,
-    T_NET, T_ARC, T_PLACE, T_TRANSITION, T_INSCRIPTION,
-    T_INITIALMARKING, T_ANNOTATION, T_TEXT, T_MODULE, T_PORTS,
-    T_PORT, T_INPUT, T_OUTPUT, T_SYNCHRONOUS, T_RECEIVE,
-    T_SEND, T_SYNCHRONIZE, T_FINALMARKINGS, T_MARKING, T_PAGE,
-    T_NONE };
+/// a mapping to store created Petri net nodes, accessible by the "id"
+std::map<std::string, Node*> pnml_id2node;
+std::map<std::string, std::string> pnml_id2name;
 
+// we only care about these elements
+const char* whitelist[] = {"pnml", "net", "arc", "place", "transition", "inscription", "initialMarking", "annotation", "text", "module", "ports", "port", "input", "output", "synchronous", "receive", "send", "synchronize", "finalmarkings", "marking", "page", "name", NULL };
+enum elementTypes { T_PNML, T_NET, T_ARC, T_PLACE, T_TRANSITION, T_INSCRIPTION, T_INITIALMARKING, T_ANNOTATION, T_TEXT, T_MODULE, T_PORTS, T_PORT, T_INPUT, T_OUTPUT, T_SYNCHRONOUS, T_RECEIVE, T_SEND, T_SYNCHRONIZE, T_FINALMARKINGS, T_MARKING, T_PAGE, T_NAME, T_NONE };
+
+// a marking we build during parsing
 pnapi::Marking* currentMarking;
 
 unsigned int current_depth = 0;
@@ -57,6 +57,7 @@ bool ignoring = false;
 unsigned int file_part = T_NONE;
 std::vector<unsigned int> elementStack;
 
+/// whether we care about a given element
 bool is_whitelisted(char *s) {
     unsigned int i = 0;
     while (whitelist[i]) {
@@ -91,7 +92,22 @@ void open_element(char *s) {
 
     // we traverse a new element
     ++current_depth;
-    attributes[current_depth].clear();
+    pnml_attributes[current_depth].clear();
+}
+
+std::string sanitize(char* s) {
+    std::string str(s);
+    char const* delims = " \t\r\n";
+
+    // trim leading whitespace
+    std::string::size_type  notwhite = str.find_first_not_of(delims);
+    str.erase(0,notwhite);
+
+    // trim trailing whitespace
+    notwhite = str.find_last_not_of(delims); 
+    str.erase(notwhite+1);
+
+    return str;
 }
 
 void close_element() {
@@ -102,128 +118,163 @@ void close_element() {
         elementStack.pop_back();
     }
 
-    if (file_part == T_PORTS) {
-        switch(myType) {
-            case(T_INPUT): {
-                pnapi_pnml_yynet.createPlace(attributes[current_depth]["id"], Node::INPUT);
-                break;
-            }
-            case(T_OUTPUT): {
-                pnapi_pnml_yynet.createPlace(attributes[current_depth]["id"], Node::OUTPUT);
-                break;
-            }
-            case(T_SYNCHRONOUS): {
-                pnapi_pnml_yynet.addSynchronousLabel(attributes[current_depth]["id"]);
-                break;
-            }
-        }
-    }
-
-    if (file_part == T_NET) {
-        switch(myType) {
-            case(T_PLACE): {
-                //printf("creating place %s\n", attributes[current_depth]["id"].c_str());
-                pnapi_pnml_yynet.createPlace(attributes[current_depth]["id"], Node::INTERNAL, atoi(attributes[current_depth]["__initialMarking__"].c_str()));
-                break;
-            }
-            case(T_TRANSITION): {
-                //printf("creating transition %s\n", attributes[current_depth]["id"].c_str());
-                pnapi::Transition *currentTransition = &pnapi_pnml_yynet.createTransition(attributes[current_depth]["id"]);
-
-                if (!attributes[current_depth]["__send__"].empty()) {
-                    Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["__send__"]);
-                    if (!target) {
-                        yyerror(std::string("output place '" + attributes[current_depth]["__send__"] + "' not found").c_str());
+    switch(file_part) {
+        case(T_PORTS): {
+            std::string id = pnml_attributes[current_depth]["id"];
+            std::string name = pnml_attributes[current_depth]["__name__"];
+            //sanitize(name);
+            std::string usedName = name.empty() ? id : name; 
+            switch(myType) {
+                case(T_INPUT): {
+                    Place &p = pnapi_pnml_yynet.createPlace(usedName, Node::INPUT);
+                    pnml_id2node[id] = &p;
+                    break;
+                }
+                case(T_OUTPUT): {
+                    Place &p = pnapi_pnml_yynet.createPlace(usedName, Node::OUTPUT);
+                    pnml_id2node[id] = &p;
+                    break;
+                }
+                case(T_SYNCHRONOUS): {
+                    pnapi_pnml_yynet.addSynchronousLabel(usedName);
+                    pnml_id2name[id] = usedName;
+                    break;
+                }
+                case(T_TEXT): {
+                    // check the parent
+                    if (elementStack[elementStack.size()-1] == T_NAME) {
+                        // store data as parent's attribute
+                        pnml_attributes[current_depth-2]["__name__"] = pnml_attributes[current_depth]["__data__"];
                     }
-                    pnapi_pnml_yynet.createArc(*currentTransition, *target);
-                }
-                if (!attributes[current_depth]["__receive__"].empty()) {
-                    Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["__receive__"]);
-                    if (!target) {
-                        yyerror(std::string("input place '" + attributes[current_depth]["__receive__    "] + "' not found").c_str());
-                    }
-                    pnapi_pnml_yynet.createArc(*target, *currentTransition);
-                }
-                if (!attributes[current_depth]["__synchronize__"].empty()) {
-                    std::set<std::string> labels = currentTransition->getSynchronizeLabels();
-                    labels.insert(attributes[current_depth]["__synchronize__"]);
-                    currentTransition->setSynchronizeLabels(labels);
-                }
-                break;
-            }
-            case(T_ARC): {
-                //printf("creating arc %s\n", attributes[current_depth]["id"].c_str());
-                Node *source = pnapi_pnml_yynet.findNode(attributes[current_depth]["source"]);
-                if (!source) {
-                    yyerror(std::string("node '" + attributes[current_depth]["source"] + "' not found").c_str());
-                }
-                Node *target = pnapi_pnml_yynet.findNode(attributes[current_depth]["target"]);
-                if (!target) {
-                    yyerror(std::string("node '" + attributes[current_depth]["target"] + "' not found").c_str());
-                }
-                unsigned int weight = (attributes[current_depth]["__inscription__"].empty()) ? 1 : atoi(attributes[current_depth]["__inscription__"].c_str());
-                pnapi_pnml_yynet.createArc(*source, *target, weight);
-                break;
-            }
-            case(T_TEXT): {
-                // check the parent
-                if (elementStack[elementStack.size()-1] == T_INITIALMARKING) {
-                    // store data as parent's attribute
-                    attributes[current_depth-2]["__initialMarking__"] = attributes[current_depth]["__data__"];
-                }
-                if (elementStack[elementStack.size()-1] == T_INSCRIPTION) {
-                    // store data as parent's attribute
-                    attributes[current_depth-2]["__inscription__"] = attributes[current_depth]["__data__"];
-                }
-                break;
-            }
-            case(T_RECEIVE): {
-                if (elementStack[elementStack.size()-1] == T_TRANSITION) {
-                    attributes[current_depth-1]["__receive__"] = attributes[current_depth]["id"];
-                }
-                break;
-            }
-            case(T_SEND): {
-                if (elementStack[elementStack.size()-1] == T_TRANSITION) {
-                    attributes[current_depth-1]["__send__"] = attributes[current_depth]["id"];
-                }
-                break;
-            }
-            case(T_SYNCHRONIZE): {
-                if (elementStack[elementStack.size()-1] == T_TRANSITION) {
-                    attributes[current_depth-1]["__synchronize__"] = attributes[current_depth]["id"];
-                }
-                break;
-            }
-        }
-    }
-
-    if (file_part == T_FINALMARKINGS) {
-        switch(myType) {
-            case(T_MARKING): {
-                pnapi_pnml_yynet.finalCondition().addMarking(*currentMarking);
-                delete currentMarking;
-                break;
-            }
-            
-            case(T_PLACE): {
-                unsigned int tokens = atoi(attributes[current_depth]["__finalMarking__"].c_str());
-                Node *place = pnapi_pnml_yynet.findNode(attributes[current_depth]["id"]);
-                if (!place) {
-                    yyerror(std::string("place '" + attributes[current_depth]["id"] + "' not found").c_str());
-                }
-                (*currentMarking)[(const pnapi::Place&)*place] = tokens;
-            }
-            
-            case(T_TEXT): {
-                // check the parent
-                if (elementStack[elementStack.size()-1] == T_PLACE) {
-                    // store data as parent's attribute
-                    attributes[current_depth-1]["__finalMarking__"] = attributes[current_depth]["__data__"];
+                    break;
                 }
             }
             break;
         }
+
+        case(T_NET): {
+            switch(myType) {
+                case(T_PLACE): {
+                    std::string id = pnml_attributes[current_depth]["id"];
+                    std::string name = pnml_attributes[current_depth]["__name__"];
+                    //sanitize(name);
+                    std::string usedName = name.empty() ? id : name; 
+                    Place &p = pnapi_pnml_yynet.createPlace(usedName, Node::INTERNAL, atoi(pnml_attributes[current_depth]["__initialMarking__"].c_str()));
+                    pnml_id2node[id] = &p;
+                    break;
+                }
+                case(T_TRANSITION): {
+                    std::string id = pnml_attributes[current_depth]["id"];
+                    std::string name = pnml_attributes[current_depth]["__name__"];
+                    //sanitize(name);
+                    std::string usedName = name.empty() ? id : name; 
+                    pnapi::Transition *currentTransition = &pnapi_pnml_yynet.createTransition(usedName);
+                    pnml_id2node[id] = currentTransition;
+
+                    if (!pnml_attributes[current_depth]["__send__"].empty()) {
+                        Node *outputPlace = pnml_id2node[pnml_attributes[current_depth]["__send__"]];
+                        if (!outputPlace) {
+                            yyerror(std::string("output place with id '" + pnml_attributes[current_depth]["__send__"] + "' not found").c_str());
+                        }
+                        pnapi_pnml_yynet.createArc(*currentTransition, *outputPlace);
+                    }
+                    if (!pnml_attributes[current_depth]["__receive__"].empty()) {
+                        Node *inputPlace = pnml_id2node[pnml_attributes[current_depth]["__receive__"]];
+                        if (!inputPlace) {
+                            yyerror(std::string("input place with id '" + pnml_attributes[current_depth]["__receive__    "] + "' not found").c_str());
+                        }
+                        pnapi_pnml_yynet.createArc(*inputPlace, *currentTransition);
+                    }
+                    if (!pnml_attributes[current_depth]["__synchronize__"].empty()) {
+                        std::string sync_name = pnml_id2name[pnml_attributes[current_depth]["__synchronize__"]];
+                        std::set<std::string> labels = currentTransition->getSynchronizeLabels();
+                        labels.insert(sync_name);
+                        currentTransition->setSynchronizeLabels(labels);
+                    }
+                    break;
+                }
+                case(T_ARC): {
+                    Node *source = pnml_id2node[pnml_attributes[current_depth]["source"]];
+                    if (!source) {
+                        yyerror(std::string("source node '" + pnml_attributes[current_depth]["source"] + "' not found").c_str());
+                    }
+                    Node *target = pnml_id2node[pnml_attributes[current_depth]["target"]];
+                    if (!target) {
+                        yyerror(std::string("target node '" + pnml_attributes[current_depth]["target"] + "' not found").c_str());
+                    }
+                    unsigned int weight = (pnml_attributes[current_depth]["__inscription__"].empty()) ? 1 : atoi(pnml_attributes[current_depth]["__inscription__"].c_str());
+                    pnapi_pnml_yynet.createArc(*source, *target, weight);
+                    break;
+                }
+                case(T_TEXT): {
+                    // check the parent
+                    if (elementStack[elementStack.size()-1] == T_INITIALMARKING) {
+                    // store data as parent's attribute
+                        pnml_attributes[current_depth-2]["__initialMarking__"] = pnml_attributes[current_depth]["__data__"];
+                    }
+                    if (elementStack[elementStack.size()-1] == T_INSCRIPTION) {
+                        // store data as parent's attribute
+                        pnml_attributes[current_depth-2]["__inscription__"] = pnml_attributes[current_depth]["__data__"];
+                    }
+                    // check the parent
+                    if (elementStack[elementStack.size()-1] == T_NAME) {
+                    // store data as parent's attribute
+                        pnml_attributes[current_depth-2]["__name__"] = pnml_attributes[current_depth]["__data__"];
+                    }
+                    break;
+                }
+                case(T_RECEIVE): {
+                    if (elementStack[elementStack.size()-1] == T_TRANSITION) {
+                        pnml_attributes[current_depth-1]["__receive__"] = pnml_attributes[current_depth]["idref"];
+                    }
+                    break;
+                }
+                case(T_SEND): {
+                    if (elementStack[elementStack.size()-1] == T_TRANSITION) {
+                        pnml_attributes[current_depth-1]["__send__"] = pnml_attributes[current_depth]["idref"];
+                    }
+                    break;
+                }
+                case(T_SYNCHRONIZE): {
+                    if (elementStack[elementStack.size()-1] == T_TRANSITION) {
+                        pnml_attributes[current_depth-1]["__synchronize__"] = pnml_attributes[current_depth]["idref"];
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+
+        case(T_FINALMARKINGS): {
+            switch(myType) {
+                case(T_MARKING): {
+                    pnapi_pnml_yynet.finalCondition().addMarking(*currentMarking);
+                    delete currentMarking;
+                    break;
+                }
+
+                case(T_PLACE): {
+                    unsigned int tokens = atoi(pnml_attributes[current_depth]["__finalMarking__"].c_str());
+                    Node *place = pnml_id2node[pnml_attributes[current_depth]["idref"]];
+                    if (!place) {
+                        yyerror(std::string("place with id '" + pnml_attributes[current_depth]["idref"] + "' not found").c_str());
+                    }
+                    (*currentMarking)[(const pnapi::Place&)*place] = tokens;
+                }
+
+                case(T_TEXT): {
+                    // check the parent
+                    if (elementStack[elementStack.size()-1] == T_PLACE) {
+                    // store data as parent's attribute
+                        pnml_attributes[current_depth-1]["__finalMarking__"] = pnml_attributes[current_depth]["__data__"];
+                    }
+                }
+                break;
+            }
+            break;
+        }
+
+        default: {}
     }
 
     --current_depth;
@@ -238,14 +289,14 @@ void close_element() {
 void store_attributes(char *a1, char *a2) {
     if (!ignoring) {
         // store attribute (strip quotes from a2)
-        attributes[current_depth][a1] = std::string(a2).substr(1, strlen(a2)-2);
+        pnml_attributes[current_depth][a1] = std::string(a2).substr(1, strlen(a2)-2);
     }
 }
 
 void store_data(char *s) {
     if (!ignoring) {
         // store current data as attribute of surrouding element
-        attributes[current_depth]["__data__"] = s;
+        pnml_attributes[current_depth]["__data__"] = sanitize(s);
     }
 }
 

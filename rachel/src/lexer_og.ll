@@ -47,7 +47,7 @@ Node last_parsed;
 %s COMMENT
 
 whitespace     [\n\r\t ]
-identifier     [^,;:()\t \n\r\{\}=]+
+identifier     [^\n\r\t ,;:()\{\}=+*~<>]+
 number         [0-9]+
 
 
@@ -67,9 +67,9 @@ number         [0-9]+
 "OUTPUT"                                { return key_output;           }
 "SYNCHRONOUS"                           { return key_synchronous;      }
 
-"TRUE"                                  { return key_true;             }
-"FALSE"                                 { return key_false;            }
-"FINAL"                                 { return key_final;            }
+(?i:true)                               { return key_true;             }
+(?i:false)                              { return key_false;            }
+(?i:final)                              { return key_final;            }
 "*"                                     { return op_and;               }
 "+"                                     { return op_or;                }
 "("                                     { return lpar;                 }

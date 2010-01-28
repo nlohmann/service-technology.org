@@ -11,6 +11,3 @@ svn-clean: maintainer-clean
 	@echo "To recreate installation status enter"
 	@echo "  autoreconf -i"
 	@echo
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = pnapi.pc

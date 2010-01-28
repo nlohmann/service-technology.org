@@ -27,18 +27,30 @@ libpnapi_la_SOURCES = \
     port.h port.cc
 
 
-# information for libtool
+# Versioning rules ( C:R:A )
+#
+# 1. Start with version 0:0:0.
+# 2. If any of the sources have changed, increment R. This is a new revision
+#    of the current interface.
+# 3. If the interface has changed, increment C and set R to 0. This is the
+#    first revision of a new interface.
+# 4. If the new interface is a superset of the previous interface
+#    (that is, if the previous interface has not been broken by the
+#    changes in this new release), increment A. This release is backwards
+#    compatible with the previous release.
+# 5. If the new interface has removed elements with respect to the
+#    previous interface, then backward compatibility is broken; set A to 0.
+#    This release has a new, but backwards incompatible interface.
+#
+# For more info see section 6.3 of the GNU Libtool Manual.
+VERINFO = -version-info 0:0:0
+
+libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libpnapi.pc
 includedir = @includedir@/pnapi
 
-include_HEADERS = pnapi.h myio.h condition.h petrinet.h \
-          automaton.h formula.h component.h \
-          parser.h util.h state.h \
-          marking.h link.h \
-          parser-owfn.h parser-pn.h parser-pnml.h \
-          parser-onwd.h parser-lola.h \
-          parser-sa.h \
-          Output.h
-
+include_HEADERS = $(filter %.h,$(libpnapi_la_SOURCES))
 
 EXTRA_DIST = Makefile.am.customer
 

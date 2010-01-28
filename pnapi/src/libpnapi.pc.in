@@ -1,0 +1,15 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libpnapi
+Description: A C++ API to process Petri nets
+Version: @VERSION@
+URL: http://service-technology.org/pnapi
+Requires:
+Conflicts:
+Libs: -L${libdir} -lpnapi
+Libs.private: 
+Cflags: -I${includedir}
+

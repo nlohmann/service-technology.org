@@ -29,7 +29,7 @@ AC_PROG_LEX
 AC_PROG_YACC
 
 # check if we can handle dynamic libs
-AC_DISABLE_SHARED
+#AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -111,7 +111,7 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 #############################################################################
 # create configured files (Makefiles, scripts, etc.)
 #############################################################################
-AC_CONFIG_FILES([Makefile pnapi.pc
+AC_CONFIG_FILES([Makefile src/libpnapi.pc
                  doc/Makefile doc/Doxyfile
                  src/Makefile
                  man/Makefile

@@ -122,8 +122,7 @@ void close_element() {
         case(T_PORTS): {
             std::string id = pnml_attributes[current_depth]["id"];
             std::string name = pnml_attributes[current_depth]["__name__"];
-            //sanitize(name);
-            std::string usedName = name.empty() ? id : name; 
+            std::string usedName = id;// = name.empty() ? id : name; 
             switch(myType) {
                 case(T_INPUT): {
                     Place &p = pnapi_pnml_yynet.createPlace(usedName, Node::INPUT);
@@ -157,8 +156,7 @@ void close_element() {
                 case(T_PLACE): {
                     std::string id = pnml_attributes[current_depth]["id"];
                     std::string name = pnml_attributes[current_depth]["__name__"];
-                    //sanitize(name);
-                    std::string usedName = name.empty() ? id : name; 
+                    std::string usedName = id;// = name.empty() ? id : name; 
                     Place &p = pnapi_pnml_yynet.createPlace(usedName, Node::INTERNAL, atoi(pnml_attributes[current_depth]["__initialMarking__"].c_str()));
                     pnml_id2node[id] = &p;
                     break;
@@ -166,8 +164,7 @@ void close_element() {
                 case(T_TRANSITION): {
                     std::string id = pnml_attributes[current_depth]["id"];
                     std::string name = pnml_attributes[current_depth]["__name__"];
-                    //sanitize(name);
-                    std::string usedName = name.empty() ? id : name; 
+                    std::string usedName = id;// = name.empty() ? id : name; 
                     pnapi::Transition *currentTransition = &pnapi_pnml_yynet.createTransition(usedName);
                     pnml_id2node[id] = currentTransition;
 

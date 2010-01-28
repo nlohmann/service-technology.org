@@ -603,7 +603,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   
   os << "    </ports>" << endl
 
-  << "    <net id=\"n1\" type=\"PTnet\">" << endl
+  << "    <net id=\"n1\" type=\"PTNet\">" << endl
 
   << mode(io::util::PLACE) << net.internalPlaces_
 

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void addLabel(string label, int id, char io);
+void addLabel(string label, char io);
 
 string intToString(int i);
 string clauseToString(Clause c);
@@ -24,6 +24,6 @@ list<Clause> xEqualsTrue(int x);
 list<Clause> xEqualsFalse(int x);
 list<Clause> xEqualsI(int x, int i);
 
-void printClause(const Clause& cl);
+//void printClause(const Clause& cl);
 
 #endif

@@ -8,12 +8,18 @@ extern map<string, int> label2id;
 extern map<int, string> id2label;
 extern map<int, char> inout;
 
-void addLabel(string label, int id, char io){
-	assert(label2id.find(label) == label2id.end());
-	assert(id2label.find(id) == id2label.end());
-	id2label[id] = label;
-	label2id[label] = id;
-	inout[id] = io;
+extern int lastLabelId;
+
+void addLabel(string label, char io){
+
+	if (label2id.find(label) == label2id.end()){
+		++lastLabelId;
+		assert(id2label.find(lastLabelId) == id2label.end());
+		assert(inout.find(lastLabelId) == inout.end());
+		id2label[lastLabelId] = label;
+		label2id[label] = lastLabelId;
+		inout[lastLabelId] = io;
+	}
 }
 
 vector<int> clauseToIntVector(const Clause &c) {

@@ -23,12 +23,12 @@ extern map<int, string> id2label;
 extern map<int, char> inout;
 
 extern int firstLabelId; //all labels including tau
-extern int firstInputId; //input labels
-extern int firstOutputId;//output labels
+//extern int firstInputId; //input labels
+//extern int firstOutputId;//output labels
 
 extern int lastLabelId;
-extern int lastInputId;
-extern int lastOutputId;
+//extern int lastInputId;
+//extern int lastOutputId;
 
 using namespace std;
 
@@ -220,6 +220,7 @@ bool Graph::formulaFounded(Formula *f, Formula *g){
 		return false;
 	}
 	//cout << "sind gleich";
+	delete h3;
 	return true;
 }
 
@@ -299,23 +300,35 @@ void Graph::printInterface(ostream& o) const {
 	o << "INTERFACE\n";
 	o << "  INPUT\n";
 
-	for (int i = firstInputId; i <= lastInputId; ++i){
+	bool first = true;
+	for (int i = firstLabelId; i <= lastLabelId; ++i){
 		assert(id2label.find(i) != id2label.end());
-		if (i == firstInputId){
+		assert(inout.find(i) != inout.end());
+		if (inout[i] == '?' && first){
+		//if (i == firstInputId){
 			o << "    " << id2label[i];
+			first = false;
+			continue;
 		}
-		else{
+		if (inout[i] == '?' && !first){
+		//else{
 			o << ", " << id2label[i];
 		}
 	}
 
+	first = true;
 	o << ";\n  OUTPUT\n";
-	for (int i = firstOutputId; i <= lastOutputId; ++i){
+	for (int i = firstLabelId; i <= lastLabelId; ++i){
 		assert(id2label.find(i) != id2label.end());
-		if (i == firstOutputId){
+		assert(inout.find(i) != inout.end());
+		if (inout[i] == '!' && first){
+		//if (i == firstOutputId){
 			o << "    " << id2label[i];
+			first = false;
+			continue;
 		}
-		else{
+		if (inout[i] == '!' && !first){
+		//else{
 			o << ", " << id2label[i];
 		}
 	}

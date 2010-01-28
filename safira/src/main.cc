@@ -35,14 +35,14 @@ map<string, int> label2id;
 map<int, string> id2label;
 map<int, char> inout;
 
-extern int currentIdPos;
-extern int firstLabelId; //all labels including tau
-extern int firstInputId; //input labels
-extern int firstOutputId;//output labels
-
-extern int lastLabelId;
-extern int lastInputId;
-extern int lastOutputId;
+//extern int currentIdPos;
+int firstLabelId; //all labels including tau
+//extern int firstInputId; //input labels
+//extern int firstOutputId;//output labels
+//
+int lastLabelId;
+//extern int lastInputId;
+//extern int lastOutputId;
 
 void initGlobalVariables();
 void evaluateParameters(int argc, char** argv);
@@ -52,60 +52,60 @@ int main(int argc, char **argv) {
 
 	evaluateParameters(argc, argv);
 
-if(args_info.complement_given){
+	if(args_info.complement_given){
 
-	string filename = "stdin";
+		string filename = "stdin";
 
-	if (args_info.inputs_num == 1){
-		assert(args_info.inputs != NULL);
-		assert(args_info.inputs[0] != NULL);
+		if (args_info.inputs_num == 1){
+			assert(args_info.inputs != NULL);
+			assert(args_info.inputs[0] != NULL);
 
-		filename = args_info.inputs[0];
-		filename = filename.substr(0,filename.find_last_of(".og")-2);
-		og_yyin = fopen(args_info.inputs[0], "r");
+			filename = args_info.inputs[0];
+			filename = filename.substr(0,filename.find_last_of(".og")-2);
+			og_yyin = fopen(args_info.inputs[0], "r");
 
-	    if (og_yyin == NULL){
-	    	abort(1, "File %s not found", args_info.inputs[0]);
-	    }
+			if (og_yyin == NULL){
+				abort(1, "File %s not found", args_info.inputs[0]);
+			}
 
-	}
+		}
 
-	Graph * g = new Graph();
-	graph = g;
+		Graph * g = new Graph();
+		graph = g;
 
-	initGlobalVariables();
+		initGlobalVariables();
 
-	time_t parsingTime_start = time(NULL);
+		time_t parsingTime_start = time(NULL);
 
-    //parse
-    if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
+		//parse
+		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
 
-    fclose(og_yyin);
-    og_yylex_destroy();
+		fclose(og_yyin);
+		og_yylex_destroy();
 
 
 
-    if(args_info.time_given){
-    	time_t parsingTime_end = time(NULL);
-    	cout << "number of labels: " << label2id.size()-3 << endl;
-    	cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
-    	cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
-    }
+		if(args_info.time_given){
+			time_t parsingTime_end = time(NULL);
+			cout << "number of labels: " << label2id.size()-3 << endl;
+			cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+		}
 
-    time_t buildOG_start = time(NULL);
+		time_t buildOG_start = time(NULL);
 
-	g->complement();
+		g->complement();
 
-	if(args_info.time_given){
-		time_t buildOG_end = time(NULL);
-		cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
-		cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
-		//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
-	}
+		if(args_info.time_given){
+			time_t buildOG_end = time(NULL);
+			cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
+			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
+			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+		}
 
-	bool printToStdout = true;
-	for (unsigned int j = 0; j<args_info.output_given; ++j){
-		switch(args_info.output_arg[j]) {
+		bool printToStdout = true;
+		for (unsigned int j = 0; j<args_info.output_given; ++j){
+			switch(args_info.output_arg[j]) {
 
 			// create output using Graphviz dot
 			case (output_arg_png):
@@ -155,19 +155,99 @@ if(args_info.complement_given){
 				printToStdout = false;
 				break;
 			}
+			}
 		}
+
+		if(printToStdout){
+			Output o("-", "complement OG");
+			g->printComplement(o);
+		}
+
+		delete g;
 	}
 
-	if(printToStdout){
-		Output o("-", "complement OG");
-		g->printComplement(o);
-	}
+	if(args_info.intersection_given){
+		string filename = "stdin";
 
-	delete g;
-}
-   if(args_info.intersection_given){
-	   cout << "hallo";
-   }
+		time_t parsingTime_start = time(NULL);
+		initGlobalVariables();
+
+		if (args_info.inputs_num >= 1){
+			assert(args_info.inputs != NULL);
+			assert(args_info.inputs[0] != NULL);
+
+			filename = args_info.inputs[0];
+			filename = filename.substr(0,filename.find_last_of(".og")-2);
+			og_yyin = fopen(args_info.inputs[0], "r");
+
+			if (og_yyin == NULL){
+				abort(1, "File %s not found", args_info.inputs[0]);
+			}
+		}
+
+		Graph * g1 = new Graph();
+		graph = g1;
+
+		//parse
+		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
+
+		fclose(og_yyin);
+		og_yylex_destroy();
+
+		if(args_info.time_given){
+			time_t parsingTime_end = time(NULL);
+			cout << "number of nodes in the given extended annotated automaton (1st file): " << g1->nodes.size() << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 1st file" << endl;
+		}
+
+		//g->complement();
+
+		delete g1;
+
+		if (args_info.inputs_num == 2){
+			assert(args_info.inputs != NULL);
+			assert(args_info.inputs[1] != NULL);
+
+			filename = args_info.inputs[1];
+			filename = filename.substr(0,filename.find_last_of(".og")-2);
+			og_yyin = fopen(args_info.inputs[1], "r");
+
+			if (og_yyin == NULL){
+				abort(1, "File %s not found", args_info.inputs[1]);
+			}
+		}
+
+		Graph * g2 = new Graph();
+		graph = g2;
+
+		//parse
+		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
+
+		fclose(og_yyin);
+		og_yylex_destroy();
+
+		if(args_info.time_given){
+			time_t parsingTime_end = time(NULL);
+			cout << "number of nodes in the given extended annotated automaton (2nd file): " << g2->nodes.size() << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 2nd file" << endl;
+		}
+
+		time_t buildIntersection_start = time(NULL);
+
+		//g->complement();
+
+		if(args_info.time_given){
+			time_t buildIntersection_end = time(NULL);
+			cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
+			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the intersection" << endl;
+			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+		}
+
+		delete g1;
+
+
+		cout << "Hallo" << endl;
+	}
 
 //	free(args_info.minisat_arg);
 	cmdline_parser_free(&args_info);
@@ -177,13 +257,16 @@ if(args_info.complement_given){
 void initGlobalVariables(){
     label2id.clear();
     id2label.clear();
+    inout.clear();
 
-    addLabel("", 0, ' '); //0 has a special meaning in minisat, therefore 0 cannot use as label ID
-    addLabel("final", 1, ' ');
-    addLabel("tau", 2, ' ');
+    lastLabelId = -1;
+
+    addLabel("", ' '); //0 has a special meaning in minisat, therefore 0 cannot use as label ID
+    addLabel("final", ' '); //Pos. 1
+    addLabel("tau", ' '); // Pos. 2
 
     //	currentIdPos = 1;  //if there is no tau in the OG
-	currentIdPos = 2;
+	// currentIdPos = 2;
 	firstLabelId = 2;
 
 }

@@ -28,14 +28,14 @@ extern map<int, char> inout;
 string identTmp;
 Node *currentNode;
 
-int currentIdPos;
-int firstLabelId; //all labels including tau
-int firstInputId; //input labels
-int firstOutputId;//output labels
+// extern int currentIdPos;
+// int firstLabelId; //all labels including tau
+//int firstInputId; //input labels
+//int firstOutputId;//output labels
 
-int lastLabelId;
-int lastInputId;
-int lastOutputId; 
+//extern int lastLabelId;
+//int lastInputId;
+//int lastOutputId; 
 
 bool initialNodesDecl = false;
 bool expliciteTauLoops = false;
@@ -79,8 +79,8 @@ bool expliciteTauLoops = false;
 og:
   opt_tauloops 
   KEY_INTERFACE 
-  input {firstInputId = firstLabelId+1; lastInputId = currentIdPos;}
-  output{firstOutputId = lastInputId + 1; lastOutputId = currentIdPos; lastLabelId = currentIdPos;} /*{printMap(&label2id);}*/  
+  input {/*firstInputId = firstLabelId+1; lastInputId = currentIdPos;*/}
+  output{/*firstOutputId = lastInputId + 1; lastOutputId = currentIdPos; lastLabelId = currentIdPos;*/} /*{printMap(&label2id);}*/  
   initialnodes 
   globalformula 
   KEY_NODES nodes //{printNodes(&nodes);}
@@ -115,26 +115,24 @@ initialnodelist:
 		
 identlist_in:
   /* empty */
-| IDENT { ++currentIdPos;
-		  addLabel(string($1), currentIdPos, '?');
+| IDENT { 
+		  addLabel(string($1), '?');
 		  free($1);
 		  } 
 | identlist_in COMMA IDENT { 
-          ++currentIdPos;
-          addLabel(string($3), currentIdPos, '?');
+          addLabel(string($3), '?');
 		  free($3);
 		  } 
 ;
 
 identlist_out:
   /* empty */
-| IDENT { ++currentIdPos;
-		  addLabel(string($1), currentIdPos, '!');
+| IDENT { 
+		  addLabel(string($1), '!');
 		  free($1);
 		  } 
 | identlist_out COMMA IDENT { 
-          ++currentIdPos;
-          addLabel(string($3), currentIdPos, '!');
+          addLabel(string($3), '!');
 		  free($3);
 		  } 
 ;

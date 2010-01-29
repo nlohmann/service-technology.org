@@ -75,6 +75,10 @@ AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
 echo ${ac_cv_path_LOLAVERSION} | ${AWK} '{if ($1>=1.14) exit 0; else exit 1}' || AC_MSG_WARN([Wendy needs at least LoLA 1.14! See file REQUIREMENTS.])
 fi
 
+# Check whether the PNAPI is present and we can link against it.
+AC_CHECK_LIB(pnapi, main)
+AC_CHECK_LIB(pnapi, libpnapi_is_present)
+
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 

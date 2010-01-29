@@ -28,9 +28,9 @@ AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
-# check if we can handle dynamic libs
-#AC_DISABLE_SHARED
+# parameters for Libtool
 AC_PROG_LIBTOOL
+AC_LIBTOOL_WIN32_DLL
 AC_CONFIG_MACRO_DIR([m4])
 
 # check for functions

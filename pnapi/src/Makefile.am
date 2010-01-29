@@ -1,30 +1,30 @@
 lib_LTLIBRARIES = libpnapi.la
 
 libpnapi_la_SOURCES = \
-    parser-owfn.yy    parser-owfn-lexer.ll \
-    parser-pnml.yy    parser-pnml-lexer.ll \
-    parser-pn.yy parser-pn-lexer.ll \
-    parser-onwd.yy    parser-onwd-lexer.ll \
     parser-lola.yy    parser-lola-lexer.ll \
+    parser-onwd.yy    parser-onwd-lexer.ll \
+    parser-owfn.yy    parser-owfn-lexer.ll \
+    parser-pn.yy      parser-pn-lexer.ll \
+    parser-pnml.yy    parser-pnml-lexer.ll \
     parser-sa.yy      parser-sa-lexer.ll \
     pnapi.h \
-    link.h link.cc \
-    component.h component.cc \
-    petrinet.h petrinet.cc \
-    parser.h parser.cc \
-    util.h \
-    formula.h formula.cc \
-    condition.h condition.cc \
-    petrinet-reduction.cc \
-    petrinet-pn.cc \
+    Output.h Output.cc \
     automaton.h automaton.cc\
-    state.h state.cc \
+    component.h component.cc \
+    condition.h condition.cc \
+    errorhandling.cc \
+    formula.h formula.cc \
+    interface.h interface.cc \
+    link.h link.cc \
     marking.h marking.cc \
     myio.h myio.cc io-format.cc \
-    errorhandling.cc \
-    Output.h Output.cc \
-    interface.h interface.cc \
-    port.h port.cc
+    parser.h parser.cc \
+    petrinet-pn.cc \
+    petrinet-reduction.cc \
+    petrinet.h petrinet.cc \
+    port.h port.cc \
+    state.h state.cc \
+    util.h
 
 
 # Versioning rules ( C:R:A )

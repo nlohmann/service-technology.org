@@ -2095,3 +2095,14 @@ void PetriNet::normalize_rules()
 }
 
 } /* namespace pnapi */
+
+/*!
+ * This auxiliary function has the sole purpose to allow other tools to
+ * check whether they can link agains this PNAPI library using Autoconf's
+ * command "AC_CHECK_LIB(pnapi, libpnapi_is_present)".
+ *
+ * \return Always 0 to indicate successful termination.
+ */
+extern "C" {
+  char libpnapi_is_present() { return 0; }
+}

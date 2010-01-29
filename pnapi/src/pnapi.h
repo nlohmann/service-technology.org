@@ -117,5 +117,21 @@ namespace pnapi
 {
 }
 
+/*!
+ * \brief Auxiliary function to check whether the PetriNet Net API is
+ *        correctly installed.
+ *
+ * \note This function is necessary to use GNU Autoconf's AC_CHECK_LIB
+ *       function. A check to "main" would only check whether we can compile
+ *       against PNAPI, but now whether linking actually works. This is
+ *       necessary if an installed PNAPI has a different architecture as
+ *       the current architecture (e.g., 32 vs 64 bit or i386 vs. x86_64).
+ *
+ * \note This has to be a C function, so we cannot put this into a namespace.
+ */
+extern "C" {
+  char libpnapi_is_present();
+}
+
 #endif
 

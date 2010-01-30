@@ -5,7 +5,6 @@
 #include <cstdio>
 #include <map>
 #include <algorithm>
-#include "helpers.h"
 #include "Formulamea.h"
 #include "cmdline.h"
 #include "verbose.h"

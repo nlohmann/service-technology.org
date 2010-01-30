@@ -5,6 +5,7 @@
 #include "cmdline.h"
 #include "Graph.h"
 #include "verbose.h"
+#include "Output.h"
 
 // lexer and parser
 extern int og_yyparse();
@@ -38,10 +39,8 @@ void evaluateParameters(int argc, char** argv) {
 
 int main(int argc, char **argv)
 {
-  status("evaluating parameters");
   evaluateParameters(argc, argv);
 
-  status("deciding input option (stdin|file)");
   if (args_info.inputs_num > 0)
     og_yyin = fopen(args_info.inputs[0], "r");
   else
@@ -56,19 +55,15 @@ int main(int argc, char **argv)
   status("minimizing graph in progress");
   G.minimize();
   status("minimizing graph done");
-  if (args_info.output_given)
-  {
-    std::string filename = ((args_info.inputs_num > 0) ? args_info.inputs[0] : "stdin");
-    if (strcmp(args_info.output_arg, ""))
-      filename += ".minimized.og";
-    else
-      filename = args_info.output_arg;
-    FILE *output = fopen(filename.c_str(), "w");
+
+  // dot output
+  if (args_info.output_given) {
+    std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "minimize_output";
+
+    std::string og_filename = args_info.output_arg ? args_info.output_arg : filename + ".reduced.og";
+    Output output(og_filename, "reduced operating guideline");
     G.ogOut(output);
-    fclose(output);
   }
-  else
-    G.ogOut();
 
   return EXIT_SUCCESS;
 }

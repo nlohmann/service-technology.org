@@ -9,6 +9,7 @@ option "output" o
   "Specifying output filename."
   string
   typestr="FILENAME"
+  argoptional
   optional
 
 section "Debugging"
@@ -23,3 +24,17 @@ option "bug" -
   details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
   flag off
   hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/wendy-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
+  flag off

@@ -8,6 +8,7 @@ minimize_SOURCES = syntax_og.yy lexer_og.ll \
                    helpers.h helpers.cc \
                    cmdline.c cmdline.h \
                    verbose.cc verbose.h \
+                   Output.cc Output.h \
                    types.h
 
 #############################################################################

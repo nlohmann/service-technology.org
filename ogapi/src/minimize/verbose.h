@@ -21,11 +21,13 @@
 #ifndef VERBOSE_H
 #define VERBOSE_H
 
+#include <config.h>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <string>
 #include <unistd.h>
+
 
 /// unconditionally print a message
 void message(const char* format, ...);
@@ -34,7 +36,10 @@ void message(const char* format, ...);
 void status(const char* format, ...);
 
 /// abort with an error message and an error code
-void abort(unsigned short code, const char* format, ...);
+__attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
+
+/// verbosely display an error in a file (still experimental)
+void displayFileError(char* filename, int lineno, char* token);
 
 
 /**************************************************************************\
@@ -46,10 +51,12 @@ void abort(unsigned short code, const char* format, ...);
 
  The idea to check the "TERM" environment variable was inspired by the
  Google C++ testing framework (http://code.google.com/p/googletest/).
+ All colors can be found at
+ http://www.faqs.org/docs/Linux-HOWTO/Bash-Prompt-HOWTO.html#AEN343
 \**************************************************************************/
 
 /// whether to use colored output
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 const bool _useColor = isatty(fileno(stderr)) && (
     !strcmp(getenv("TERM"), "linux") ||
     !strcmp(getenv("TERM"), "cygwin") ||
@@ -72,9 +79,24 @@ const bool _useColor = false;
 #define _cm_ (_useColor ? "\033[0;35m" : "" )
 /// set foreground color to cyan
 #define _cc_ (_useColor ? "\033[0;36m" : "" )
+/// set foreground color to light grey
+#define _cl_ (_useColor ? "\033[0;37m" : "" )
 
-/// set foreground color to black (bold)
-#define _c0_ (_useColor ? "\033[0;1;30m" : "" )
+/// set foreground color to red (underlined)
+#define _cr__ (_useColor ? "\033[0;4;31m" : "" )
+/// set foreground color to green (underlined)
+#define _cg__ (_useColor ? "\033[0;4;32m" : "" )
+/// set foreground color to yellow (underlined)
+#define _cy__ (_useColor ? "\033[0;4;33m" : "" )
+/// set foreground color to blue (underlined)
+#define _cb__ (_useColor ? "\033[0;4;34m" : "" )
+/// set foreground color to magenta (underlined)
+#define _cm__ (_useColor ? "\033[0;4;35m" : "" )
+/// set foreground color to cyan (underlined)
+#define _cc__ (_useColor ? "\033[0;4;36m" : "" )
+/// set foreground color to light grey (underlined)
+#define _cl__ (_useColor ? "\033[0;4;37m" : "" )
+
 /// set foreground color to red (bold)
 #define _cR_ (_useColor ? "\033[0;1;31m" : "" )
 /// set foreground color to green (bold)
@@ -87,17 +109,32 @@ const bool _useColor = false;
 #define _cM_ (_useColor ? "\033[0;1;35m" : "" )
 /// set foreground color to cyan (bold)
 #define _cC_ (_useColor ? "\033[0;1;36m" : "" )
+/// set foreground color to light grey (bold)
+#define _cL_ (_useColor ? "\033[0;1;37m" : "" )
+
 
 /// reset foreground color
-#define _c_ (_useColor ? "\033[m" : "")
+#define _c_ (_useColor ? "\033[0m" : "")
+/// other modifiers: 1 - bold, 4 - underline,
+/// 5 - blink, 7 - inverse and 8 - concealed
+#define _bold_ (_useColor ? "\033[1m" : "")
+#define _underline_ (_useColor ? "\033[4m" : "")
 
+/// color the name of a tool
 #define _ctool_(s)       (std::string(_cm_) + s + _c_).c_str()
-#define _cfilename_(s)   (std::string(_cb_) + s + _c_).c_str()
+/// color the name of a file
+#define _cfilename_(s)   (std::string(_cb__) + s + _c_).c_str()
+/// color the type of a file
 #define _coutput_(s)     (std::string(_cB_) + s + _c_).c_str()
+/// color some good output
 #define _cgood_(s)       (std::string(_cG_) + s + _c_).c_str()
+/// color some bad output
 #define _cbad_(s)        (std::string(_cR_) + s + _c_).c_str()
+/// color a warning
 #define _cwarning_(s)    (std::string(_cY_) + s + _c_).c_str()
-#define _cimportant_(s)  (std::string(_c0_) + s + _c_).c_str()
+/// color an important message
+#define _cimportant_(s)  (std::string(_bold_) + s + _c_).c_str()
+/// color a command-line parameter
 #define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
 
 #endif

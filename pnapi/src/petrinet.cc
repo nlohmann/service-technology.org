@@ -2104,5 +2104,8 @@ void PetriNet::normalize_rules()
  * \return Always 0 to indicate successful termination.
  */
 extern "C" {
-  char libpnapi_is_present() { return 0; }
+  char libpnapi_is_present() {
+      pnapi::PetriNet *a = new pnapi::PetriNet();
+      return 0;
+  }
 }

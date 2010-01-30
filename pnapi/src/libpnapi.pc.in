@@ -3,7 +3,7 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: libpnapi
+Name: Petri Net API
 Description: A C++ API to process Petri nets
 Version: @VERSION@
 URL: http://service-technology.org/pnapi

@@ -5,8 +5,6 @@
 #include <cstdio>
 #include <map>
 #include <algorithm>
-#include "Node.h"
-#include "Graph.h"
 #include "helpers.h"
 #include "Formulamea.h"
 #include "cmdline.h"
@@ -58,24 +56,7 @@ using namespace std;
 
 string invocation;
 
-// lexer and parser
-extern int og_yyparse();
-extern FILE* og_yyin;
-extern int og_yylex_destroy();
 
-extern Graph * graph;
-
-extern map<string, int> label2id;
-extern map<int, string> id2label;
-
-extern int currentIdPos;
-extern int firstLabelId; //all labels including tau
-extern int firstInputId; //input labels
-extern int firstOutputId;//output labels
-
-extern int lastLabelId;
-extern int lastInputId;
-extern int lastOutputId;
 string toPl(int id);
 
 extern map<string, vector<int> > mp;///m(p)(1) is the id of a place

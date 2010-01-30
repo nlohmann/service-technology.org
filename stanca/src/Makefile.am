@@ -1,13 +1,7 @@
 bin_PROGRAMS = stanca
 
-stanca_SOURCES = og_syntax.yy og_lexer.ll \
-                 main.cc config.h \
-                 Node.h Node.cc \
-                 Formula.h Formula.cc \
+stanca_SOURCES = main.cc config.h \
 			 Formulamea.h Formulamea.cc  \
-                 Graph.h Graph.cc \
-                 helpers.h helpers.cc \
-                 types.h \
                  cmdline.c cmdline.h \
                  verbose.h verbose.cc \
                  Output.h Output.cc
@@ -18,23 +12,6 @@ stanca_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a \
 				$(top_builddir)/libs/minisat/libminisat.a
 
 
-check_PROGRAMS = testsafira
-
-testsafira_SOURCES = testmain.cc config.h \
-                 Node.h Node.cc \
-                 Formula.h Formula.cc \
-                 Graph.h Graph.cc \
-                 helpers.h helpers.cc \
-                 testFormula.h testFormula.cc \
-                 testGraph.h testGraph.cc \
-                 testNode.h testNode.cc \
-                 cmdline.c cmdline.h \
-                 verbose.h verbose.cc \
-                 Output.h Output.cc \
-                 types.h 
-
-
-testsafira_LDADD = $(top_builddir)/libs/minisat/libminisat.a
 
 
 #############################################################################

@@ -23,6 +23,12 @@ Version 3.0-unreleased
 
 * added a tool paper with a case study (see `doc/toolpaper.pdf')
 
+* Wendy now checks whether it can use an installed version of the Petri Net
+  API (`libpnapi') and only compiles its shipped version (see `libs/pnapi')
+  if the installed version is missing, the installed version cannot be
+  linked (e.g., due to a wrong architecture), or the configure script
+  option `--without-pnapi' is used.
+
 Version 2.7 (17 December 2009)
 ==============================
 

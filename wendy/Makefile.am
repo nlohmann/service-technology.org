@@ -1,4 +1,9 @@
+# process "libs/pnapi" directory only if the Petri Net API needs to be compiled
+if COMPILE_PNAPI
 SUBDIRS = libs/pnapi src man doc tests
+else
+SUBDIRS = src man doc tests
+endif
 
 svn-clean: maintainer-clean
 	rm -fr configure Makefile.in depcomp compile config.guess config.sub \

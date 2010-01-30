@@ -75,9 +75,24 @@ AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
 echo ${ac_cv_path_LOLAVERSION} | ${AWK} '{if ($1>=1.14) exit 0; else exit 1}' || AC_MSG_WARN([Wendy needs at least LoLA 1.14! See file REQUIREMENTS.])
 fi
 
+
+# only use installed Petri Net API if this was configured with --enable-pnapi
+AC_ARG_WITH(pnapi,
+  AS_HELP_STRING([--without-pnapi],[do not use installed version of the Petri Net API]),
+  [], [with_pnapi=yes]
+)
 # Check whether the PNAPI is present and we can link against it.
 AC_CHECK_LIB(pnapi, main)
+AC_LANG([C++])
 AC_CHECK_LIB(pnapi, libpnapi_is_present)
+AC_MSG_CHECKING([whether to use installed Petri Net API])
+if test "x$with_pnapi" != xno -a "${ac_cv_lib_pnapi_main}" = "yes" -a "${ac_cv_lib_pnapi_libpnapi_is_present}" = "yes"; then
+  AC_MSG_RESULT([yes])
+  AM_CONDITIONAL(COMPILE_PNAPI, [false])
+else
+  AC_MSG_RESULT([no])
+  AM_CONDITIONAL(COMPILE_PNAPI, [true])
+fi
 
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))

@@ -9,6 +9,9 @@
 Version 1.15-unreleased
 =======================
 
+* fixed bug #15223 (`https://gna.org/bugs/?15223'): the coverability graph is
+  now not used in the `HOME' mode
+
 Version 1.14
 ============
 

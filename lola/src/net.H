@@ -35,7 +35,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include "dimensions.H"
-#include "userconfig.H"
+//#include "userconfig.H" // should fix https://gna.org/bugs/?15223
 
 using std::ostream;
 using std::ofstream;

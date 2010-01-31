@@ -1,3 +1,7 @@
+if USE_LIBCONFIG
+SUBDIRS = lola2config
+endif
+
 .SUFFIXES = .ggo
 
 bin_PROGRAMS =  graph2dot

@@ -1,4 +1,8 @@
 @heading Version 1.15-unreleased
+@itemize
+@item fixed bug #15223 (@url{https://gna.org/bugs/?15223}): the coverability graph is now not used in the @option{HOME} mode
+@end itemize
+
 
 @heading Version 1.14
 @itemize

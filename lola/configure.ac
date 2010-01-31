@@ -33,6 +33,10 @@ AC_PROG_AWK
 AC_PROG_GREP
 AC_PROG_INSTALL
 
+# check for libconfig++
+AC_CHECK_LIB(config++, main)
+AM_CONDITIONAL(USE_LIBCONFIG, [test ${ac_cv_lib_configpp_main} = "yes"])
+
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
@@ -87,7 +91,7 @@ fi
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile utils/lola2config/Makefile])
 
 AC_OUTPUT
 

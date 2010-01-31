@@ -1,0 +1,19 @@
+{ n=2}
+
+PLACE
+INTERNAL
+  p0_1, p0_2,
+  p1_1, p1_2;
+
+INITIALMARKING
+    p0_1, p0_2;
+  FINALMARKING;
+  
+  { round #0 }
+TRANSITION t0
+CONSUME p0_1, p0_2;
+PRODUCE p1_1, p1_2;
+{ round #1 }
+TRANSITION t1
+CONSUME p1_1, p1_2;
+PRODUCE p0_1, p0_2;

@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = 
+TESTFILES = e2.owfn phils5.llnet.owfn
 
 
 # Below you can list all the files you do not want to have counted in the
@@ -17,7 +17,7 @@ TESTFILES =
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sourses called 'cmdline.c'.
-NO_COVER_FILES = */minisat/* */test* */og_lexer.cc */og_syntax.cc */cmdline.* */verbose.*
+NO_COVER_FILES = */libs/* */test* */cmdline.* */verbose.*  */Output.*
 
 
 

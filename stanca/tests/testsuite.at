@@ -1,6 +1,5 @@
 AT_INIT
 
-# m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 
 ############################################################################
 AT_BANNER([Standard Options])
@@ -8,4 +7,30 @@ AT_BANNER([Standard Options])
 
 
 
+AT_SETUP([Help output])
+AT_CHECK([STANCA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
+AT_SETUP([Version output])
+AT_CHECK([STANCA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Small examples])
+############################################################################
+
+AT_SETUP([Siphon-Trap Property holds.])
+AT_CHECK([cp TESTFILES/e2.owfn .])
+AT_CHECK([STANCA e2.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is not satisfiable" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Siphon-Trap Property does not hold.])
+AT_CHECK([cp TESTFILES/phils5.llnet.owfn .])
+AT_CHECK([STANCA phils5.llnet.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is satisfiable" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP

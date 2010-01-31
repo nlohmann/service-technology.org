@@ -1,3 +1,4 @@
+#include <ctime>
 #include <fstream>
 #include <libconfig.h++>
 #include "output_syntax.h"
@@ -8,10 +9,11 @@ using namespace libconfig;
 extern void output_parse();
 extern FILE *output_in;
 
-Config cfg;
+Config *cfg;
 
 int main(int argc, char **argv) {
-    //Setting &deadlock = cfg.getRoot().add("deadlock", Setting::TypeGroup);
+    time_t t1, t2;
+    cfg = new Config();
 
     if (argc == 2 && !strcmp(argv[1], "--version")) {
         printf("LoLA Result File Generator\n");
@@ -24,8 +26,15 @@ int main(int argc, char **argv) {
         return EXIT_SUCCESS;
     }
 
+    time(&t1);
     output_parse();
-    cfg.writeFile("foo.cfg");
+    time(&t2);
+    printf("parsing input:  %.2f\n", difftime(t2, t1));
+
+    time(&t1);
+    cfg->writeFile("foo.cfg");
+    time(&t2);
+    printf("writing output: %.2f\n", difftime(t2, t1));
 
     return 0;
 }

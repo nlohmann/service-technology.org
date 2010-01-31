@@ -13,8 +13,11 @@ using namespace libconfig;
 extern int output_lex();
 extern int output_error(const char *);
 
-extern Config cfg;
+extern Config *cfg;
 Setting *currentSetting = NULL;
+Setting *currentSetting2 = NULL;
+Setting *currentSetting3 = NULL;
+Setting *currentSetting4 = NULL;
 Setting *result = NULL;
 %}
 
@@ -35,9 +38,10 @@ Setting *result = NULL;
 
 output:
   net_info
-    { result = &cfg.getRoot().add("result", Setting::TypeGroup); }
+    { result = &cfg->getRoot().add("result", Setting::TypeGroup); }
   symm_info
   result artifact net_footer
+| generators
 ;
 
 result:
@@ -114,13 +118,13 @@ successors:
 net_info:
   NUMBER KW_PLACES NUMBER KW_TRANSITIONS
     {
-        Setting &s = cfg.getRoot().add("net", Setting::TypeGroup);
+        Setting &s = cfg->getRoot().add("net", Setting::TypeGroup);
         s.add("places", Setting::TypeInt) = $1;
         s.add("transitions", Setting::TypeInt) = $3;
     }
 | NUMBER KW_PLACES NUMBER KW_TRANSITIONS NUMBER KW_SIGNIFICATPLACES
     {
-        Setting &s = cfg.getRoot().add("net", Setting::TypeGroup);
+        Setting &s = cfg->getRoot().add("net", Setting::TypeGroup);
         s.add("places", Setting::TypeInt) = $1;
         s.add("transitions", Setting::TypeInt) = $3;
         s.add("significant_places", Setting::TypeInt) = $5;
@@ -132,22 +136,63 @@ net_info:
 symm_info:
   /* empty */
 | KW_COMPUTING_SYMM NUMBER KW_GENERATORS NUMBER KW_GROUPS
-  NUMBER KW_SYMMETRIES NUMBER KW_DEADBRANCHES generators
+  NUMBER KW_SYMMETRIES NUMBER KW_DEADBRANCHES
+    {
+        Setting &s = cfg->getRoot().add("symmetries", Setting::TypeGroup);
+        s.add("nogenerators", Setting::TypeInt) = $2;
+        s.add("groups", Setting::TypeInt) = $4;
+        s.add("symmetries", Setting::TypeInt) = $6;
+        s.add("dead_branches", Setting::TypeInt) = $8;
+        currentSetting = &s.add("generators", Setting::TypeList);
+    }
+  generators
 ;
 
 generators:
-  KW_GENERATOR HASH NAME automorphisms
-| generators KW_GENERATOR HASH NAME automorphisms
+  KW_GENERATOR HASH NAME
+    {
+        if (currentSetting == NULL) {
+            Setting &s = cfg->getRoot().add("symmetries", Setting::TypeGroup);
+            currentSetting = &s.add("generators", Setting::TypeList);
+        }
+        std::string name($3);
+        int family = atoi(name.substr(0, name.find_first_of(".")).c_str());
+        int number = atoi(name.substr(name.find_first_of(".")+1, name.length()).c_str());
+        currentSetting2 = &currentSetting->add(Setting::TypeGroup);
+        currentSetting2->add("family", Setting::TypeInt) = family;
+        currentSetting2->add("number", Setting::TypeInt) = number;
+        currentSetting3 = &currentSetting2->add("cycles", Setting::TypeList);
+    }
+  automorphisms
+| generators KW_GENERATOR HASH NAME
+    {
+        if (currentSetting == NULL) {
+            Setting &s = cfg->getRoot().add("symmetries", Setting::TypeGroup);
+            currentSetting = &s.add("generators", Setting::TypeList);
+        }
+        std::string name($4);
+        int family = atoi(name.substr(0, name.find_first_of(".")).c_str());
+        int number = atoi(name.substr(name.find_first_of(".")+1, name.length()).c_str());
+        currentSetting2 = &currentSetting->add(Setting::TypeGroup);
+        currentSetting2->add("family", Setting::TypeInt) = family;
+        currentSetting2->add("number", Setting::TypeInt) = number;
+        currentSetting3 = &currentSetting2->add("cycles", Setting::TypeList);
+    }
+  automorphisms
 ;
 
 automorphisms:
-  LPAREN placelist RPAREN
-| automorphisms LPAREN placelist RPAREN
+  LPAREN
+    { currentSetting4 = &currentSetting3->add(Setting::TypeList); }
+  placelist RPAREN
+| automorphisms LPAREN
+    { currentSetting4 = &currentSetting3->add(Setting::TypeList); }
+  placelist RPAREN
 ;
 
 placelist:
-  NAME
-| placelist NAME
+  NAME           { currentSetting4->add(Setting::TypeString) = $1; }
+| placelist NAME { currentSetting4->add(Setting::TypeString) = $2; }
 ;
 
 /****************************************************************************/
@@ -156,7 +201,7 @@ net_footer:
   /* empty */
 | MARKER NUMBER KW_STATES COMMA NUMBER KW_EDGES COMMA NUMBER KW_HASHTABLEENTRIES
     {
-        Setting &s = cfg.getRoot().add("statistics", Setting::TypeGroup);
+        Setting &s = cfg->getRoot().add("statistics", Setting::TypeGroup);
         s.add("states", Setting::TypeInt) = $2;
         s.add("edges", Setting::TypeInt) = $5;
         s.add("hash_table_entries", Setting::TypeInt) = $8;

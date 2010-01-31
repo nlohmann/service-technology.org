@@ -263,9 +263,6 @@ node:
   NUMBER annotation
 
   {
-	//The empty node can be omitted
-	if($1 == 0)
-		break;
 	//Store current node and map its ID to its annotation
 	nodes.push_back($1);
 	currentNode = $1;

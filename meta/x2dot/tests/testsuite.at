@@ -161,4 +161,13 @@ AT_CHECK([GREP -q "8 nodes 10 edges" stderr])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 15230 (https://gna.org/bugs/?15230)])
+AT_CHECK_DOT
+m4_define([NET], [technical.owfn.sa])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([OG2DOT NET | DOT -v],0,ignore,stderr)
+AT_CHECK([GREP -q "17 nodes" stderr])
+AT_CHECK([GREP -q "44 edges" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
 

@@ -100,7 +100,6 @@ og:
 	//For all nodes...
 	for(size_t i=0;i<nodes.size();++i){			
 		//List nodes
-		//if(nodeAnnotation[nodes[i]] == " initial "){
 		if(nodeAnnotation[nodes[i]].find("initial") != std::string::npos){
 			outStream << nodes[i] << " [label=\" \" ";
 			if(nodeAnnotation[nodes[i]].find("final") != std::string::npos)
@@ -118,14 +117,19 @@ og:
 				outStream << " -> " << successors[j].second;
 				if(args_info.noPrefix_given)
 					outStream << " [label= \"" << successors[j].first << "\"]\n";
-				else
-					outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
+				else{
+					if(labelPrefix[successors[j].first])
+						outStream << " [label= \"" << labelPrefix[successors[j].first] 
+									   << successors[j].first << "\"]\n";
+					else
+						outStream << " [label= \"" << successors[j].first << "\"]\n"; 
+	
+				}
 			}	
 			isServiceAutomaton = true;	
 				
 		}
 		else{
-			//if(nodeAnnotation[nodes[i]] == " final " && isServiceAutomaton == true){
 			if((nodeAnnotation[nodes[i]].find("final") != std::string::npos) && isServiceAutomaton == true){
 				outStream << nodes[i] << " [label=\" \" peripheries=2]\n";
 				successors = nodeSuccessors[nodes[i]];
@@ -135,8 +139,14 @@ og:
 					outStream << " -> " << successors[j].second;
 					if(args_info.noPrefix_given)
 						outStream << " [label= \"" << successors[j].first << "\"]\n";
-					else
-						outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
+					else{
+						if(labelPrefix[successors[j].first])
+							outStream << " [label= \"" << labelPrefix[successors[j].first] 
+										   << successors[j].first << "\"]\n";
+						else
+							outStream << " [label= \"" << successors[j].first << "\"]\n"; 
+					
+					}
 				}	
 			}
 			else{
@@ -151,10 +161,14 @@ og:
 							if(args_info.noPrefix_given)
 								outStream << " [label= \"" 
 									  << successors[j].first << "\"]\n";
-							else
-								outStream << " [label= \"" 
-									  << labelPrefix[successors[j].first] 
-									  << successors[j].first << "\"]\n";
+							else{
+								if(labelPrefix[successors[j].first])
+									outStream << " [label= \"" << labelPrefix[successors[j].first] 
+												   << successors[j].first << "\"]\n";
+								else
+									outStream << " [label= \"" << successors[j].first << "\"]\n"; 
+	
+							}
 						}
 					}	
 				}

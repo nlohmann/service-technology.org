@@ -148,7 +148,7 @@ class UValue
 	virtual UValue * modop(UValue *) = 0;
 	virtual UValue * negop() = 0;
 	virtual char * text() = 0;
-	UValue(void){};
+	UValue(void){}
 	virtual ~UValue(void){}
 };
 

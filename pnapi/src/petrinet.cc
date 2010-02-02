@@ -348,8 +348,8 @@ PetriNet::PetriNet() :
  * \note    The condition is standardly set to True.
  */
 PetriNet::PetriNet(const PetriNet & net) :
-  labels_(net.labels_),
   roles_(net.roles_),
+  labels_(net.labels_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
   meta_(net.meta_), warnings_(net.warnings_),
@@ -2105,7 +2105,7 @@ void PetriNet::normalize_rules()
  */
 extern "C" {
   char libpnapi_is_present() {
-      pnapi::PetriNet *a = new pnapi::PetriNet();
+      pnapi::PetriNet a();
       return 0;
   }
 }

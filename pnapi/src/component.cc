@@ -239,6 +239,9 @@ void Node::mergeNameHistory(Node & node)
 }
 
 
+/*!
+ \bug Why is set1 not used?
+*/
 void Node::mergeArcs(Node & node1, Node & node2, const std::set<Node *> & set1,
     const std::set<Node *> & set2, bool addWeights,
     bool isPostset)
@@ -451,7 +454,7 @@ int Place::getMaxOccurrence()
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
     const std::string & name, const std::set<std::string> & labels) :
-  Node(net, observer, name, INTERNAL), labels_(labels), roles_(std::set<string>())
+  Node(net, observer, name, INTERNAL), roles_(std::set<string>()), labels_(labels)
 {
   cost_ = 0;
   observer_.updateTransitions(*this);
@@ -463,7 +466,7 @@ Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
     const Transition & trans, const std::string & prefix) :
-      Node(net, observer, trans, prefix), labels_(trans.labels_), roles_(trans.roles_)
+      Node(net, observer, trans, prefix), roles_(trans.roles_), labels_(trans.labels_)
       {
   cost_ = trans.cost_;
   observer_.updateTransitions(*this);

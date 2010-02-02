@@ -127,7 +127,7 @@ public:
     void  updateatomic();
     formula * merge();
     formula * posate();
-    virtual Transition ** spp2(State *) { return NULL; };
+    virtual Transition ** spp2(State *) { return NULL; }
     formula * negate();
     bool initatomic();
     formula * reduce(int *);
@@ -150,7 +150,7 @@ public:
     formula * posate() { return NULL; }
     formula * negate() { return NULL; }
     formula * replacequantifiers();
-    virtual Transition ** spp2(State *) { return NULL; };
+    virtual Transition ** spp2(State *) { return NULL; }
     void  setstatic();
     formula * reduce(int *);
     bool evaluatetransition(Transition *);

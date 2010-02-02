@@ -425,6 +425,7 @@ bool booleanformula::initatomic()
 	}	
 }
 
+/// \todo Karsten fragen: Rückgabe?
 bool unarytemporalformula::initatomic()
 {
 	element -> initatomic();
@@ -432,6 +433,7 @@ bool unarytemporalformula::initatomic()
 	// Karsten fragen: Rückgabe?
 }
 
+/// \todo Karsten fragen: Rückgabe?
 bool untilformula::initatomic()
 {
 	hold -> initatomic();
@@ -1384,7 +1386,7 @@ void booleanformula::print()
 	case disj: cout << "OR "; break;
 	default: cout << "???";
 	}
-	for(int i = 0; i < cardsub; i++)
+	for(unsigned int i = 0; i < cardsub; i++)
 	{
 		sub[i]->print();
 		cout << ", ";
@@ -1512,6 +1514,8 @@ Transition ** booleanformula::spp2(State * s)
 Transition ** stubbornfirelist(State *, formula *);
 #endif
 
+
+/// \todo Karsten fragen: Rückgabe?
 Transition ** atomicformula::spp2(State * s)
 {
     // Karsten fragen: Rückgabewert immer definiert?

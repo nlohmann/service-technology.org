@@ -1054,6 +1054,7 @@ if(!NewOmegas) smallerstate = (State *) 0;
      if(!search_and_insert(CurrentMarking))
 #endif
 #else
+     /// \todo: Check this line: = or == ?
      if(NewState = SEARCHPROC())
 #endif
        {

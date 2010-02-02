@@ -1793,7 +1793,8 @@ void check()
 	}
     }
 }
-		
+
+///! \todo Rückgabewert!
 State * symm_search2(Decision * d)
 {
 #if defined(SYMMETRY) && SYMMINTEGRATION == 2
@@ -1933,7 +1934,8 @@ State * symm_search_marking2()
   return (State *) 0;
 }
 
-		
+
+///! \todo Rückgabewert!
 State * bin_symm_search2(binDecision * d)
 {
 #if defined(SYMMETRY) && SYMMINTEGRATION == 2

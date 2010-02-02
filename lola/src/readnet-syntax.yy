@@ -1095,7 +1095,7 @@ arrayvalue: lbrack valuelist rbrack {
 					e -> type = at;
 					e -> card = h;
 					e -> cont = new UExpression * [h+10];
-					for(i = 0,c = $2; i < h; i++,c = c -> next)
+					for(i = 0,c = $2; i < (int)h; i++,c = c -> next)
 					{
 						e -> cont[i] = c -> exp;
 						if(!(ct -> iscompatible(c -> exp -> type)))
@@ -1479,7 +1479,7 @@ hlterm : ident {
 		unsigned int i;
 		UTermList * l;
 		for(i=0,l=$3;l;i++,l=l->next);
-		if(i != FS -> function -> arity) yyerror("wrong number of arguments");
+		if((int)i != FS -> function -> arity) yyerror("wrong number of arguments");
 		tl = new UTermList;
 		tl -> next = (UTermList *) 0;
 		tl -> mult = 1;

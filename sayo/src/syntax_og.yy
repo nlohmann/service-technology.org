@@ -159,14 +159,14 @@ og:
     // write input
     if(inputLabels.size() > 1)
       (*myOut) << inputLabels[1];
-    for(int i=2; i<inputLabels.size(); ++i)
+    for(size_t i=2; i<inputLabels.size(); ++i)
       (*myOut) << ", " << inputLabels[i];
     (*myOut) << ";\n  OUTPUT ";
 
     // write output
     if(!outputLabels.empty())
       (*myOut) << outputLabels[0];
-    for(int i=1; i<outputLabels.size(); ++i)
+    for(size_t i=1; i<outputLabels.size(); ++i)
       (*myOut) << ", " << outputLabels[i];
     (*myOut) << ";\n\nNODES\n";
 
@@ -301,7 +301,7 @@ node:
      * the successor at this event will be overwritten with
      * the corresponding node when reading the successors.
      */
-    for(int i=0; i<inputLabels.size(); ++i)
+    for(size_t i=0; i<inputLabels.size(); ++i)
       inputSockets[i] = 0;
   }
 
@@ -317,7 +317,7 @@ node:
      * still leading to node 0 write this transition
      * to the outpur stream.
      */
-    for(int i=1; i<inputLabels.size(); ++i)
+    for(size_t i=1; i<inputLabels.size(); ++i)
     {
       if(inputSockets[i] == 0)
       {
@@ -359,7 +359,7 @@ node:
         (*myOut) << "\n";
 
         // copy input-successors
-        for(int i=1; i<inputLabels.size(); ++i)
+        for(size_t i=1; i<inputLabels.size(); ++i)
           (*myOut) << "    " << inputLabels[i] << " -> "
                    << inputSockets[i] << "\n";
       }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdio>
+#include <cstring>
 #include <map>
 #include <algorithm>
 #include "Node.h"
@@ -112,7 +113,7 @@ int main(int argc, char **argv) {
 			case (output_arg_eps):
 			case (output_arg_pdf): {
 				printToStdout = false;
-				if (CONFIG_DOT == "not found") {
+				if (strcmp(CONFIG_DOT, "not found") == 0) {
 					cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
 					cerr << "       necessary for option '--output'" << endl;
 					exit(EXIT_FAILURE);

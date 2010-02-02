@@ -54,6 +54,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <map>
 #include <utility>
 
@@ -222,7 +223,7 @@ void parse_command_line(int argc, char* argv[])
   // LOG
   if (args_info.log_given) {
     options[O_LOG] = true;
-    if (args_info.log_arg != NULL && args_info.log_arg != "")
+    if (args_info.log_arg != NULL && strcmp(args_info.log_arg, "") != 0)
       log_filename = string(args_info.log_arg);
   }
   

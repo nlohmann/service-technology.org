@@ -109,7 +109,7 @@ private:
 public:
 	FormulaLit(const int _number);
 	FormulaLit(const FormulaLit &formula);
-	~FormulaLit(){};
+	~FormulaLit(){}
 	virtual Formula * getCopy() const;
 	string toString() const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -125,7 +125,7 @@ private:
 public:
 	FormulaNUM(const int literal);
 	FormulaNUM(const FormulaNUM &formula);
-	~FormulaNUM(){};
+	~FormulaNUM(){}
 	virtual Formula * getCopy() const;
 	virtual string toString() const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -137,7 +137,7 @@ public:
 class FormulaTrue :public Formula {
 public:
 	FormulaTrue();
-	~FormulaTrue(){};
+	~FormulaTrue(){}
 	virtual Formula * getCopy() const;
 	string toString() const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -149,7 +149,7 @@ class FormulaFalse :public Formula {
 protected:
 public:
 	FormulaFalse();
-	~FormulaFalse(){};
+	~FormulaFalse(){}
 	virtual Formula * getCopy() const;
 	string toString() const;
 	Formula* moveNegation(bool leadingNot) const;
@@ -160,7 +160,7 @@ public:
 class FormulaFinal : public Formula {
 public:
 	FormulaFinal();
-	~FormulaFinal(){};
+	~FormulaFinal(){}
 	virtual Formula * getCopy() const;
 	string toString() const;
 	Formula* moveNegation(bool leadingNot) const;

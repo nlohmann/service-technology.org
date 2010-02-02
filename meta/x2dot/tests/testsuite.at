@@ -139,4 +139,26 @@ AT_CHECK([GREP -q "ERROR: failed to open input file 'none.og'" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Regression tests])
+############################################################################
+
+AT_SETUP([Bug 15229 (https://gna.org/bugs/?15229)])
+AT_CHECK_DOT
+m4_define([NET], [coffeedrinker_e.owfn.sa])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([OG2DOT NET | DOT -v],0,ignore,stderr)
+AT_CHECK([GREP -q "10 nodes 13 edges" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 15229 (https://gna.org/bugs/?15229)])
+AT_CHECK_DOT
+m4_define([NET], [myCoffee.og])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([OG2DOT NET | DOT -v],0,ignore,stderr)
+AT_CHECK([GREP -q "8 nodes 10 edges" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 

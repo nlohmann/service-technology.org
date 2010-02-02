@@ -13,7 +13,9 @@ TESTFILES = PO.fiona.og \
             example.fiona.og \
             myCoffee.sa \
 	    error.wendy.og \
-	    error.sa
+	    error.sa \
+	    coffeedrinker_e.owfn.sa \
+	    myCoffee.og
 		
 
 # Below you can list all the files you do not want to have counted in the

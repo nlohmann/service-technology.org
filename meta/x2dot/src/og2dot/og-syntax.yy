@@ -140,17 +140,24 @@ og:
 				}	
 			}
 			else{
-				outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
-				successors = nodeSuccessors[nodes[i]];
-				//write the node's ID, node's annotation and all links to its successors to the stream...
-				for(size_t j=0;j<successors.size();++j){
-					outStream << nodes[i];
-					outStream << " -> " << successors[j].second;
-					if(args_info.noPrefix_given)
-						outStream << " [label= \"" << successors[j].first << "\"]\n";
-					else
-						outStream << " [label= \"" << labelPrefix[successors[j].first] << successors[j].first << "\"]\n";
-				}	
+				if(nodes[i] != 0){
+					outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
+					successors = nodeSuccessors[nodes[i]];
+					//write the node's ID, node's annotation and all links to its successors to the stream...
+					for(size_t j=0;j<successors.size();++j){
+						if(successors[j].second != 0){
+							outStream << nodes[i];
+							outStream << " -> " << successors[j].second;
+							if(args_info.noPrefix_given)
+								outStream << " [label= \"" 
+									  << successors[j].first << "\"]\n";
+							else
+								outStream << " [label= \"" 
+									  << labelPrefix[successors[j].first] 
+									  << successors[j].first << "\"]\n";
+						}
+					}	
+				}
 			}
 		}
 
@@ -416,9 +423,7 @@ successors:
 | successors IDENT ARROW NUMBER
 
   {	
-	//All links to the empty node can be skipped
-	if($4 == 0)
-		break;
+
 	//Store list of successors
 	nodeSuccessors[currentNode].push_back(std::pair<char*, unsigned int>($2, $4)); 	
   

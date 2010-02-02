@@ -1,40 +1,40 @@
 {
-  generator:    Wendy 2.4-unreleased (i386-apple-darwin10.0.0)
-  invocation:   wendy nets/myCoffee.owfn --cover --og 
+  generator:    Wendy 3.0-unreleased (i386-apple-darwin10.2.0)
+  invocation:   wendy myCoffee.owfn --og 
   events:       3 send, 1 receive, 0 synchronous
   statistics:   7 nodes
 }
 
 INTERFACE
   INPUT
-    B;
+    b;
   OUTPUT
-    E, T, C;
+    e, t, c;
 
 NODES
-  4297065712 : (C + E + T)
-    B -> 0
-    E -> 4297082432
-    T -> 4297082352
-    C -> 4297083984
-  4297082352 : E
-    B -> 0
-    E -> 4297084528
-  4297082432 : (C + T)
-    B -> 0
-    T -> 4297084528
-    C -> 4297083872
-  4297083872 : B
-    B -> 4297085056
-  4297083984 : E
-    B -> 0
-    E -> 4297083872
-  4297084528 : B
-    B -> 4297085056
-  4297085056 : final
-    B -> 0
+  1 : (c + e + t)
+    b -> 0
+    e -> 2
+    t -> 7
+    c -> 3
+  2 : (c + t)
+    b -> 0
+    t -> 4
+    c -> 5
+  3 : e
+    b -> 0
+    e -> 5
+  4 : b
+    b -> 6
+  5 : b
+    b -> 6
+  6 : final
+    b -> 0
+  7 : e
+    b -> 0
+    e -> 4
   0 : true
-    B -> 0
-    E -> 0
-    T -> 0
-    C -> 0
+    b -> 0
+    e -> 0
+    t -> 0
+    c -> 0

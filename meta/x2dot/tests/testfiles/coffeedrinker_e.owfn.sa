@@ -1,0 +1,36 @@
+INTERFACE
+  INPUT B;
+  OUTPUT C, E;
+  SYNCHRONOUS TE;
+
+NODES
+0: INITIAL
+  C -> 9
+  TE -> 1
+
+1
+  E -> 2
+  C -> 5
+
+2
+  C -> 3
+
+3
+  B -> 4
+
+4: FINAL
+
+5
+  E -> 3
+  B -> 7
+
+7
+  E -> 4
+
+9
+  B -> 11
+  TE -> 5
+
+11: FINAL
+  TE -> 7
+

@@ -90,6 +90,7 @@ char * pathfile = NULL;
 char * statefile = NULL;
 char * symmfile = NULL;
 char * netbasename = NULL;
+FILE *resultfile = NULL;
 
 bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg, cflg = false;
 char graphformat = '\0';
@@ -334,6 +335,12 @@ void processCommandLine(int argc, char **argv) {
         strcpy(graphfile, temp.c_str());
       }
     }
+  }
+
+  // set output filename for "-r" option
+  if (args_info.resultFile_given) {
+    resultfile = fopen("result.res", "w");
+    assert(resultfile);
   }
 
   // release memory

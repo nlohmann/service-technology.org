@@ -916,6 +916,7 @@ extern char * pathfile; ///< name of file for witness/counterexample path output
 extern char * statefile; ///< name of file for witness/counterexample state output
 extern char * symmfile; ///< name of file for output of generating set of all symmetries
 extern char * netbasename; ///< base of net file name (used for generic output file names)
+extern FILE * resultfile; ///< the result file
 
 extern bool Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg; ///< flags for parsing command line
 extern char graphformat; ///< command line option (verbatim) for controlling reachability graph output format

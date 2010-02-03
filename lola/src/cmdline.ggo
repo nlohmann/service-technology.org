@@ -90,6 +90,10 @@ option "automorphisms" y
  string argoptional optional
 
 
+option "resultFile" r
+  ""
+  flag off
+
 section "Used Configuration Output"
 option "userconfig" h
  "Show the configuration (i.e. the values chose in 'userconfig.H') in which this LoLA executable has been compiled."

@@ -1,6 +1,10 @@
 @heading Version 1.15-unreleased
 @itemize
 @item fixed bug #15223 (@url{https://gna.org/bugs/?15223}): the coverability graph is now not used in the @option{HOME} mode
+
+@item added an experimental parameter @option{-r} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
+
+@item first fixes of bug #12910 (@url{https://gna.org/bugs/?12910}): file output for @option{-g} and @option{-m} parameter was broken
 @end itemize
 
 

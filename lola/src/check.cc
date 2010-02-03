@@ -41,8 +41,34 @@ unsigned int * checkstart;
 unsigned int formulaindex;
 
 
-void printstate(char const* c, unsigned int * st)
-{
+/*!
+ \brief print a state
+
+ This function prints a state (i.e., a marking of the Petri net) and is called
+ to display a witness state (e.g., when checking for deadlocks whether the
+ net is unbounded).
+
+ \param c   name of the state (sometimes empty)
+ \param st  a vector of tokens, indexed by places
+*/
+void printstate(char const* c, unsigned int * st) {
+  // write state to result file
+  if (resultfile) {
+    fprintf(resultfile, "  state = ( ");
+    for (unsigned int i=0, j=0; i < Places[0]->cnt; ++i) {
+      if(st[i]) {
+        if(st[i] == VERYLARGE) {
+          fprintf(resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Places[i]->name);
+        }
+        else {
+          fprintf(resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Places[i]->name, st[i]);
+        }
+      }
+    }
+    fprintf(resultfile, " );\n");
+    return;
+  }
+
   if(Sflg)
   {
     cout << "STATE"; cout << c;
@@ -100,8 +126,7 @@ void print_witness_eu(State *, untilformula *);
 void print_witness_ef(State *, unarytemporalformula *);
 
 
-void print_witness_ex(State * s, unarytemporalformula * f,ofstream &out)
-{
+void print_witness_ex(State * s, unarytemporalformula * f,ofstream &out) {
   out  << "PATH\n";
   if(s -> witnesstransition[f->tempindex])
   {
@@ -114,8 +139,7 @@ void print_witness_ex(State * s, unarytemporalformula * f,ofstream &out)
 }
 
 
-void print_witness_ef(State * s, unarytemporalformula * f, ofstream & out)
-{
+void print_witness_ef(State * s, unarytemporalformula * f, ofstream & out) {
   out  << "PATH\n";
   while(!s->value[f->element->index])
   {
@@ -126,8 +150,7 @@ void print_witness_ef(State * s, unarytemporalformula * f, ofstream & out)
 }
 
 
-void print_witness_eg(State * s, unarytemporalformula * f,ofstream & out)
-{
+void print_witness_eg(State * s, unarytemporalformula * f,ofstream & out) {
   out  << "PATH\n";
   while(s->value[f->element->index])
   {
@@ -138,8 +161,7 @@ void print_witness_eg(State * s, unarytemporalformula * f,ofstream & out)
 }
 
 
-void print_counterexample_af(State * s, unarytemporalformula * f, ofstream & out)
-{
+void print_counterexample_af(State * s, unarytemporalformula * f, ofstream & out) {
   out  << "PATH\n";
   while(!s->value[f->element->index])
   {
@@ -151,8 +173,7 @@ void print_counterexample_af(State * s, unarytemporalformula * f, ofstream & out
 }
 
 
-void print_counterexample_au(State * s, untilformula * f,ofstream & out)
-{
+void print_counterexample_au(State * s, untilformula * f,ofstream & out) {
   out  << "PATH\n";
   while(s->value[f->hold->index])
   {
@@ -163,8 +184,7 @@ void print_counterexample_au(State * s, untilformula * f,ofstream & out)
 }
 
 
-void print_witness_eu(State * s, untilformula * f,ofstream & out)
-{
+void print_witness_eu(State * s, untilformula * f,ofstream & out) {
   out  << "PATH\n";
   while(!s->value[f->goal->index])
   {
@@ -174,8 +194,7 @@ void print_witness_eu(State * s, untilformula * f,ofstream & out)
 }
 
 
-void print_counterexample_ax(State * s, unarytemporalformula * f,ofstream & out)
-{
+void print_counterexample_ax(State * s, unarytemporalformula * f,ofstream & out) {
   out  << "PATH\n";
   if(s -> witnesstransition[f->tempindex])
   {
@@ -188,8 +207,7 @@ void print_counterexample_ax(State * s, unarytemporalformula * f,ofstream & out)
 }
 
 
-void print_counterexample_ag(State * s, unarytemporalformula * f,ofstream & out)
-{
+void print_counterexample_ag(State * s, unarytemporalformula * f,ofstream & out) {
   out  << "PATH\n";
   while(s->value[f->element->index])
   {
@@ -199,8 +217,7 @@ void print_counterexample_ag(State * s, unarytemporalformula * f,ofstream & out)
 }
 
 
-void print_witness_ex(State * s, unarytemporalformula * f)
-{
+void print_witness_ex(State * s, unarytemporalformula * f) {
   cout  << "PATH\n";
   if(s -> witnesstransition[f->tempindex])
   {
@@ -213,8 +230,7 @@ void print_witness_ex(State * s, unarytemporalformula * f)
 }
 
 
-void print_witness_ef(State * s, unarytemporalformula * f)
-{
+void print_witness_ef(State * s, unarytemporalformula * f) {
   cout  << "PATH\n";
   while(!s->value[f->element->index])
   {
@@ -224,8 +240,7 @@ void print_witness_ef(State * s, unarytemporalformula * f)
 }
 
 
-void print_witness_eg(State * s, unarytemporalformula * f)
-{
+void print_witness_eg(State * s, unarytemporalformula * f) {
   cout  << "PATH\n";
   while(s->value[f->element->index])
   {
@@ -238,8 +253,7 @@ void print_witness_eg(State * s, unarytemporalformula * f)
 }
 
 
-void print_counterexample_af(State * s, unarytemporalformula * f)
-{
+void print_counterexample_af(State * s, unarytemporalformula * f) {
   cout  << "PATH\n";
   while(!s->value[f->element->index])
   {
@@ -251,8 +265,7 @@ void print_counterexample_af(State * s, unarytemporalformula * f)
 }
 
 
-void print_counterexample_au(State * s, untilformula * f)
-{
+void print_counterexample_au(State * s, untilformula * f) {
   cout  << "PATH\n";
   while(s->value[f->hold->index])
   {
@@ -264,8 +277,7 @@ void print_counterexample_au(State * s, untilformula * f)
 }
 
 
-void print_witness_eu(State * s, untilformula * f)
-{
+void print_witness_eu(State * s, untilformula * f) {
   cout  << "PATH\n";
   while(!s->value[f->goal->index])
   {
@@ -275,8 +287,7 @@ void print_witness_eu(State * s, untilformula * f)
 }
 
 
-void print_counterexample_ax(State * s, unarytemporalformula * f)
-{
+void print_counterexample_ax(State * s, unarytemporalformula * f) {
   cout  << "PATH\n";
   if(s -> witnesstransition[f->tempindex])
   {
@@ -289,8 +300,7 @@ void print_counterexample_ax(State * s, unarytemporalformula * f)
 }
 
 
-void print_counterexample_ag(State * s, unarytemporalformula * f)
-{
+void print_counterexample_ag(State * s, unarytemporalformula * f) {
   cout  << "PATH\n";
   while(s->value[f->element->index])
   {
@@ -302,8 +312,7 @@ void print_counterexample_ag(State * s, unarytemporalformula * f)
 void check(State * ,formula *);
 
 
-void print_check_path(State * ini,formula * form)
-{
+void print_check_path(State * ini,formula * form) {
   if((form->type == ef) && ini -> value[form -> index])
   {
     print_witness_ef(ini,(unarytemporalformula *) form);
@@ -377,8 +386,7 @@ void print_check_path(State * ini,formula * form)
 }
 
 
-void print_check_path(State * ini,formula * form, ofstream & out)
-{
+void print_check_path(State * ini,formula * form, ofstream & out) {
   if((form->type == ef) && ini -> value[form -> index])
   {
     print_witness_ef(ini,(unarytemporalformula *) form,out);
@@ -452,8 +460,7 @@ void print_check_path(State * ini,formula * form, ofstream & out)
 }
 
 
-int modelcheck()
-{
+int modelcheck() {
   if(!F)
   {
     fprintf(stderr, "lola: specify formula in analysis task file\n");
@@ -537,8 +544,7 @@ void searchAX(State *,unarytemporalformula *);
 #define MAX(X,Y) ( (X) > (Y) ? (X) : (Y)) 
 
 
-bool check_analyse_fairness(State * pool, unsigned int level, unsigned int findex)
-{
+bool check_analyse_fairness(State * pool, unsigned int level, unsigned int findex) {
   // 1. cut the (not necessarily connected) graph in pool into sccs. 
   //    All states in search space have checktarlevel[findex] = level && ! checkexpired[findex].
   //    Before return "false", all states in pool must be "checkexpired[findex]".
@@ -769,8 +775,7 @@ aftercheck:
 } // end analyse_fairness
 
 
-void check(State * s, formula * f)
-{
+void check(State * s, formula * f) {
   unsigned int i;
   formulaindex = f -> index;
   if(s->known[f->index]) return;
@@ -909,8 +914,7 @@ void check(State * s, formula * f)
 }
 
 
-void searchEF(State * s,unarytemporalformula * f)
-{
+void searchEF(State * s,unarytemporalformula * f) {
   State * tarjanroot;
   bool found;
   unsigned int i;
@@ -1140,8 +1144,7 @@ firelist();
 }
 
 
-void searchAX(State * s,unarytemporalformula * f)
-{
+void searchAX(State * s,unarytemporalformula * f) {
   State * NewState;
 
 #ifdef EXTENDEDCTL
@@ -1204,8 +1207,7 @@ void searchAX(State * s,unarytemporalformula * f)
 }
 
 
-void searchEX(State * s,unarytemporalformula * f)
-{
+void searchEX(State * s,unarytemporalformula * f) {
   State * NewState;
 
 #ifdef EXTENDEDCTL
@@ -1268,8 +1270,7 @@ void searchEX(State * s,unarytemporalformula * f)
 }
 
 
-void searchAG(State * s,unarytemporalformula * f)
-{
+void searchAG(State * s,unarytemporalformula * f) {
   State * tarjanroot;
   bool found;
   unsigned int i;
@@ -1499,8 +1500,7 @@ firelist();
 extern unsigned int currentdfsnum;
 
 
-void searchEU(State * s, untilformula * f)
-{
+void searchEU(State * s, untilformula * f) {
   unsigned int MinBookmark;
   State * tarjanroot;
   unsigned int i;
@@ -1837,8 +1837,7 @@ void searchEU(State * s, untilformula * f)
 }
         
 
-void futuresearchAU(State * s, untilformula * f)
-{
+void futuresearchAU(State * s, untilformula * f) {
   unsigned int MinBookmark;
   State * tarjanroot;
   unsigned int i;
@@ -2272,8 +2271,7 @@ void futuresearchAU(State * s, untilformula * f)
 }
 
     
-void searchAU(State * s, untilformula * f)
-{
+void searchAU(State * s, untilformula * f) {
   unsigned int i;
   State * CurrentState, * NewState;
   bool found;
@@ -2474,8 +2472,7 @@ void searchAU(State * s, untilformula * f)
 }
 
 
-void searchAF(State * s, unarytemporalformula * f)
-{
+void searchAF(State * s, unarytemporalformula * f) {
   unsigned int i;
   State * CurrentState, * NewState;
   bool found;
@@ -2636,8 +2633,7 @@ void searchAF(State * s, unarytemporalformula * f)
 }
 
 
-void searchEG(State * s, unarytemporalformula * f)
-{
+void searchEG(State * s, unarytemporalformula * f) {
   unsigned int i;
   State * CurrentState, * NewState;
   bool found;
@@ -2799,8 +2795,7 @@ void searchEG(State * s, unarytemporalformula * f)
 }
 
 
-void futuresearchAF(State * s, unarytemporalformula * f)
-{
+void futuresearchAF(State * s, unarytemporalformula * f) {
   unsigned int i;
   State * CurrentState, * NewState;
   bool found;
@@ -3008,8 +3003,7 @@ void futuresearchAF(State * s, unarytemporalformula * f)
 }
 
 
-void futuresearchEG(State * s, unarytemporalformula * f)
-{
+void futuresearchEG(State * s, unarytemporalformula * f) {
   unsigned int i;
   State * CurrentState, * NewState;
   bool found;

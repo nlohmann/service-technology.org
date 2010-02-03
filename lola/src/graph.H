@@ -1754,7 +1754,7 @@ inline State * binInsert()
 	return binInsert(binHashTable + (HASHENTRY));
 
 }
-void print_path(State *);
+void print_path(State *, ostream*);
 unsigned int compute_scc();
 	
 #endif

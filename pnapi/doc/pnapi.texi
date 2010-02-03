@@ -60,6 +60,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install the Petri Net API.
 * Usage::How to use the API in other programs.
+* Open Net File Format::Open Net File Format.
 * Theory::The theory implemented in the Petri Net API.
 * Command Line Options::How to run the Petri Net API frontend "Petri".
 * Error Codes::What the error codes of the frontend "Petri" mean.
@@ -327,6 +328,66 @@ Furthermore a wildcard can be transformed in disjunctive normal form by using
 net.finalCondition().dnf();
 @end smallexample
 @end cartouche
+
+
+
+
+
+@node Open Net File Format
+@chapter Open Net File Format
+
+Below is the EBNF grammar for open net files. Comments are not part
+of the grammar, and hence are not included here.
+
+@sp 1
+@example
+net = "PLACE" roles internal_places input_places output_places
+      synchronous_labels ";" "INITIALMARKING" markings ";"
+      finalcondition ";" transitions ;
+
+roles = [ "ROLES" [ id_list ] ";" ] ;
+
+id_list = id @{ "," id @} ;
+
+internal_places = "INTERNAL" id_list ";" ;
+
+input_places = [ "INPUT" id_list ";" ] ;
+
+output_places = [ "OUTPUT" id_list ";" ] ;
+
+synchronous_labels = [ "SYNCHRONOUS" id_list ";" ] ;
+
+markings = marking @{ "," marking @} ;
+
+marking = id [ ":" number ] @{ "," id [ ":" number ] @} ;
+
+finalcondition = "FINALMARKING" markings | "FINALCONDITION" formula ;
+
+formula = id "=" <number>
+        | formula "AND" formula
+        | formula "OR" formula
+        | "(" formula ")"
+        | formula "AND" "ALL_OTHER_PLACES_EMPTY"
+        ;
+
+transitions = transition @{ transition @} ;
+
+transition = "TRANSITION" id roles
+             "CONSUME" [ markings ] ";"
+             "PRODUCE" [ markings ] ";"
+             [ "SYNCHRONIZE" id_list ";" ] ;
+@end example
+
+@sp 2
+Terminals are defined below as regular expressions:
+@sp 1
+
+@multitable @columnfractions .2 .8
+@item @code{id} @tab
+@code{[A-Za-z]*}
+@item @code{number} @tab
+@code{[0-9]+}
+@end multitable
 
 
 

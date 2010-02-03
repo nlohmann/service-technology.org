@@ -2962,7 +2962,7 @@ void print_binDec(binDecision * d, int indent) {
 
 #ifdef STATESPACE
 unsigned int compute_scc() {
-  ofstream* graphstream = NULL;
+  ostream* graphstream = NULL;
   unsigned int i;
   State * NewState;
 

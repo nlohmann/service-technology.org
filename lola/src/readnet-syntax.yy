@@ -181,16 +181,16 @@ extern int yylineno;
 
 %%
 input: declarations net            { 
-F = (formula *) 0 ; 
+F = NULL ; 
 }
      | declarations net formulaheader ctlformula { 
 F = $4;
 }
 	| declarations net key_analyse key_place aplace {
-	F = (formula *) 0;
+	F = NULL;
 	CheckPlace = $5;
 #ifdef STUBBORN
-	Transitions[0]->StartOfStubbornList = (Transition *) 0;
+	Transitions[0]->StartOfStubbornList = NULL;
 int i;
 	for(i=0;CheckPlace -> PreTransitions[i];i++)
 	{
@@ -202,16 +202,16 @@ int i;
 #endif
                 }
 	| declarations net key_analyse key_transition atransition {
-	F = (formula *) 0;
+	F = NULL;
 	CheckTransition = $5;
 #ifdef STUBBORN
 	Transitions[0]->EndOfStubbornList = LastAttractor = Transitions[0]->StartOfStubbornList = CheckTransition;
-	CheckTransition -> NextStubborn = (Transition *) 0;
+	CheckTransition -> NextStubborn = NULL;
 	CheckTransition -> instubborn = true;
 #endif
 	}
-	| declarations net key_analyse key_marking amarkinglist  { F = (formula *) 0;}
-	| declarations net key_automaton automaton  {F = (formula *) 0;}
+	| declarations net key_analyse key_marking amarkinglist  { F = NULL;}
+	| declarations net key_automaton automaton  {F = NULL;}
      ; 
 formulaheader: key_formula {LocalTable = new SymbolTab(2);}
 			;
@@ -302,7 +302,7 @@ firingmode: nodeident eqqual expression  {
 				yyerror("expression not compatible with transition variable");
 			}
 			$$ = new fmode;
-			$$ -> next = (fmode *) 0;
+			$$ -> next = NULL;
 			$$ -> v = VS;
 			$$ -> t = $3;
 			}
@@ -429,7 +429,7 @@ enu: ident {
 			e = new EnSymbol($1);
 			eel = new UEnList;
 			eel -> sy = e;
-			eel -> next = (UEnList *) 0;
+			eel -> next = NULL;
 			$$ = eel;
 			}
 	;
@@ -447,7 +447,7 @@ recordcomponent: ident colon sortdescription semicolon {
 						if(r) yyerror("record component name already used");
 						r = new RcSymbol($1,$3);
 						rl = new URcList;
-						rl -> next = (URcList *) 0;
+						rl -> next = NULL;
 						rl -> sy = r;
 						rl -> ty = $3;
 						$$ = rl;
@@ -480,7 +480,7 @@ vdeclaration: identlist colon sortdescription semicolon {
 identlist : ident {
 				$$ = new IdList;
 				$$ -> name = $1;
-				$$ -> next = (IdList *) 0;
+				$$ -> next = NULL;
 				}
 		| ident comma identlist {
 				$$ = new IdList;
@@ -501,8 +501,8 @@ head: ident lpar fparlists rpar colon sortdescription {
 			fs = new FcSymbol($1,f);
 			f -> type = $6;
 			f -> localsymb = LocalTable;
-			f -> result = (UValueList *) 0;
-			f -> resultstack = (UResultList *) 0;
+			f -> result = NULL;
+			f -> resultstack = NULL;
 			f -> arity = LocalTable -> card;
 			f -> formalpar = new UVar * [f -> arity +5];
 			int i;
@@ -686,13 +686,13 @@ case_statement : key_switch expression caselist key_end {
 		((UCaseStatement *) $$) -> card = crd;
 		}
 		;
-caselist :         { $$ = (case_list *) 0;}
+caselist :         { $$ = NULL;}
 		| case caselist {$1 -> next = $2; $$ = $1;}
 		;
 case : key_case expression colon statement_seq { $$ = new case_list;
 					$$ -> exp = $2;
 					$$ -> stm = $4;
-					$$ -> next = (case_list *) 0;
+					$$ -> next = NULL;
 					}
 	;
 assignment: lvalue eqqual expression {
@@ -1066,11 +1066,11 @@ functioncall : ident lpar expressionlist rpar {
 					$$ = e;
 				}
 			 ;
-expressionlist: {$$ = (case_list *) 0;}
+expressionlist: {$$ = NULL;}
 			  | expression {
 					$$ = new case_list;
 					$$ -> exp = $1;
-					$$ -> next = (case_list *) 0;
+					$$ -> next = NULL;
 				}
 			  | expression comma expressionlist {
 					$$ = new case_list;
@@ -1110,7 +1110,7 @@ arrayvalue: lbrack valuelist rbrack {
 valuelist: expression {
 				$$ = new case_list;
 				$$ ->exp = $1;
-				$$ -> next = (case_list *) 0;
+				$$ -> next = NULL;
 			}
 		 | expression slash valuelist {
 				$$ = new case_list;
@@ -1182,7 +1182,7 @@ amarking: nodeident colon number {
 				}
 			}
 	;
-net: key_place placelists semicolon key_marking {LocalTable = (SymbolTab *) 0;} markinglist semicolon transitionlist {
+net: key_place placelists semicolon key_marking {LocalTable = NULL;} markinglist semicolon transitionlist {
   unsigned int i,h,j;
   Symbol * ss;
   // Create array of places
@@ -1203,7 +1203,7 @@ net: key_place placelists semicolon key_marking {LocalTable = (SymbolTab *) 0;} 
 #ifdef WITHFORMULA
 	for(i=0;i<PlaceTable->card;i++)
 	{
-		Places[i]->propositions = (formula **) 0;
+		Places[i]->propositions = NULL;
 	}
 #endif
   // Create array of transitions 
@@ -1282,7 +1282,7 @@ net: key_place placelists semicolon key_marking {LocalTable = (SymbolTab *) 0;} 
 #ifdef BOUNDEDNET
 #ifdef STUBBORN
 	// initialize list of pumping transitions
-	LastAttractor = (Transition*)0;
+	LastAttractor = NULL;
 	int p,c,a; // produced, consumed tokens, current arc
 	for(i=0;i< TransitionTable -> card;i++)
 	{
@@ -1308,7 +1308,7 @@ net: key_place placelists semicolon key_marking {LocalTable = (SymbolTab *) 0;} 
 			else
 			{
 				Transitions[i]->StartOfStubbornList = LastAttractor = Transitions[i];
-				Transitions[i]-> NextStubborn = (Transition *) 0;
+				Transitions[i]-> NextStubborn = NULL;
 			}
 		}
 	}
@@ -1334,7 +1334,7 @@ place:   nodeident {
 		     }
 			 P = new Place($1);
 		     PS = new PlSymbol(P);
-			 PS -> sort = (UType *) 0;
+			 PS -> sort = NULL;
 			 P -> capacity = CurrentCapacity;
 			 P -> nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
 		}
@@ -1368,7 +1368,7 @@ place:   nodeident {
 				P -> capacity = CurrentCapacity;
 				P -> nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
 				PS = new PlSymbol(P);
-				PS -> sort = (UType *) 0;
+				PS -> sort = NULL;
 				(*v)++;
 			} while(!(v -> isfirst()));
 			}
@@ -1461,7 +1461,7 @@ hlterm : ident {
 			yyerror("undeclared variable in term");
 		}
 		tl = new UTermList;
-		tl -> next = (UTermList *) 0;
+		tl -> next = NULL;
 		tl -> mult = 1;
 		vt = new UVarTerm;
 		tl -> t = vt;
@@ -1481,7 +1481,7 @@ hlterm : ident {
 		for(i=0,l=$3;l;i++,l=l->next);
 		if((int)i != FS -> function -> arity) yyerror("wrong number of arguments");
 		tl = new UTermList;
-		tl -> next = (UTermList *) 0;
+		tl -> next = NULL;
 		tl -> mult = 1;
 		ot = new UOpTerm;
 		tl -> t = ot;
@@ -1500,7 +1500,7 @@ hlterm : ident {
 		$$ = tl;
 	   }
 	 ;
-termlist : {$$ = (UTermList *) 0;}
+termlist : {$$ = NULL;}
 		 | hlterm { $$ = $1;}
 		 | hlterm comma termlist {
 			$1 -> next = $3;
@@ -1546,7 +1546,7 @@ transition: key_transition tname transitionvariables guard key_consume arclist s
   if((!LocalTable) || LocalTable -> card == 0)
   {
 	llt = TS -> name;
-	TS -> vars = (SymbolTab *) 0;
+	TS -> vars = NULL;
   }
   else
   {
@@ -1590,8 +1590,8 @@ transition: key_transition tname transitionvariables guard key_consume arclist s
   TSI = (TrSymbol *) TransitionTable -> lookup(llt);
   if(TSI) yyerror("transition instance already exists");
   TSI = new TrSymbol(llt);
-  TSI -> vars = (SymbolTab *) 0;
-  TSI -> guard = (UExpression *) 0;
+  TSI -> vars = NULL;
+  TSI -> guard = NULL;
   }
   T = TSI -> transition = new Transition(TSI -> name);
   T -> fairness = $3;
@@ -1629,7 +1629,7 @@ transition: key_transition tname transitionvariables guard key_consume arclist s
 				if(PS -> sort) yyerror("arcs to HL places are not allowed");
 				a = new arc_list;
 				a -> place = PS;
-				a -> mt = (UTermList *) 0;
+				a -> mt = NULL;
 				a -> nu =mc -> mult;
 				a -> next = root;
 				root = a;
@@ -1693,7 +1693,7 @@ transition: key_transition tname transitionvariables guard key_consume arclist s
 				if(!ll) yyerror("place instance does not exist");
 				a = new arc_list;
 				a -> place = PS;
-				a -> mt = (UTermList *) 0;
+				a -> mt = NULL;
 				a -> nu =mc -> mult;
 				a -> next = root;
 				root = a;
@@ -1752,10 +1752,10 @@ transitionvariables: vardeclarations {$$ = 0;}
 tname:   ident {LocalTable = new SymbolTab(256);}
 		 | number {LocalTable = new SymbolTab(256);}
     ;
-guard: { $$ = (UExpression *) 0;}
+guard: { $$ = NULL;}
 	 | key_guard expression {if($2 -> type -> tag != boo) yyerror("guard expression must be boolean"); $$ = $2;}
      ;
-arclist: { $$ = (arc_list *) 0;}
+arclist: { $$ = NULL;}
 	| arc {$$ = $1;}
       | arc comma arclist {
       $1-> next = $3;
@@ -1778,7 +1778,7 @@ arc:  nodeident colon number {
       $$-> next = (arc_list *)  0;
       sscanf($3,"%u",&i);
       $$ -> nu = i;
-	  $$ -> mt = (UTermList *) 0;
+	  $$ -> mt = NULL;
     }
 	| nodeident colon multiterm {
 		UTermList * tl;
@@ -1795,7 +1795,7 @@ arc:  nodeident colon number {
 		$$ -> place = PS; 
 		$$ -> nu = 0;
 		$$ -> mt = $3;
-		$$ -> next = (arc_list *) 0;
+		$$ -> next = NULL;
 		for(tl = $3; tl; tl = tl -> next)
 		{
 			if(!(PS -> sort -> iscompatible(tl -> t -> type)))
@@ -1904,7 +1904,7 @@ cplace: nodeident {
 				    PS = (PlSymbol *) PlaceTable -> lookup($1);
                     if(!PS) yyerror("Place does not exist");
 					if(PS -> sort) yyerror("HL places require instance");
-					$$ = new hlatomicformula(neq,PS,(UExpression *) 0);
+					$$ = new hlatomicformula(neq,PS,NULL);
 				  }
 	  | nodeident dot lpar expression rpar {
 				    PS = (PlSymbol *) PlaceTable -> lookup($1);
@@ -1925,7 +1925,7 @@ quantification: nodeident colon sortdescription {
 		$$ = new VaSymbol($1,vv);
 	}
 	;
-transformula:  { $$ = (transitionformula *) 0;}
+transformula:  { $$ = NULL;}
 			| transitionformula { $$ = $1;}
 			;
 transitionformula:  key_exists quantification colon transitionformula {
@@ -1983,7 +1983,7 @@ fmodeblock: nodeident eqqual expression {
 			$$ = new fmode;
 			$$ -> v = VS;
 			$$ -> t = $3 ;
-			$$ -> next = (fmode *) 0;
+			$$ -> next = NULL;
 		}
 		  ;
 automaton:	{
@@ -2007,7 +2007,7 @@ automaton:	{
 						for(i=0;i<Places[0]->NrSignificant;i++)
 						{
 							Places[i]-> cardprop = 0;
-							Places[i]-> propositions = (formula **) 0;
+							Places[i]-> propositions = NULL;
 						}
 						for(i=0;i<buchistate::nr;i++)
 						for(j=0;j<buchiautomaton[i]->nrdelta;j++)
@@ -2019,7 +2019,7 @@ automaton:	{
 							buchiautomaton[i]->delta[j]->guard -> merge();
 							buchiautomaton[i]->delta[j]->guard =
 							buchiautomaton[i]->delta[j]->guard -> reduce(&res);
-							if(res == 0) buchiautomaton[i]->delta[j] = (buchitransition *) 0;
+							if(res == 0) buchiautomaton[i]->delta[j] = NULL;
 							buchiautomaton[i]->delta[j]->guard =
 							buchiautomaton[i]->delta[j]->guard -> posate();
 							buchiautomaton[i]->delta[j]->guard -> tempcard = 0;
@@ -2120,7 +2120,7 @@ char * diagnosefilename;
 void readnet()
 {
 	yydebug = 0;
-	diagnosefilename = (char *) 0;
+	diagnosefilename = NULL;
 	if(netfile)
 	{
 		yyin = fopen(netfile,"r");

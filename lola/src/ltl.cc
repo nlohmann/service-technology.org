@@ -72,7 +72,7 @@ Transition ** firelist()
     {
       tl[i++] = t;
     }
-  tl[i] = (Transition *) 0;
+  tl[i] = NULL;
   CardFireList = i;
   return tl;
 }
@@ -109,7 +109,7 @@ void print_path(State * s)
 	if(Pflg)
 	{
 		cout << "PATH\n";
-		printpath(s,(ofstream *) 0);
+		printpath(s, NULL);
 	}
 }
 void printpath(State *s,ofstream * pathstream)
@@ -248,7 +248,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 		// choose element from pool
 		C = pool;
 		pool = pool -> nexttar;
-		if(pool == C) pool = (State *) 0;
+		if(pool == C) pool = NULL;
 		T = C;
 		// unlink from pool and init new dfs
 		C -> nexttar -> prevtar = C -> prevtar;
@@ -256,7 +256,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 		C -> nexttar  = C -> prevtar = C;
 		C -> current = 0;
 		C -> tarlevel = level + 1;
-		C -> parent = (State *) 0;
+		C -> parent = NULL;
 		C -> ddfs = C -> mmin = 1;
 		while(C)
 		{
@@ -277,7 +277,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 						pool = pool -> nexttar;
 						if(pool == N)
 						{	
-							pool = (State *) 0;	
+							pool = NULL;	
 						}
 					}
 					N -> nexttar -> prevtar = N -> prevtar;
@@ -399,7 +399,7 @@ bool analyse_fairness(State * pool, unsigned int level)
 								{
 									State * E;
 									unsigned int j;
-									E = (State *) 0;
+									E = NULL;
 									for(j=0;S -> firelist[j];j++)
 									{
 										if(S -> firelist[j] == Transitions[i])
@@ -478,7 +478,7 @@ Persistents = 0;
 #endif
   for(i = 0; i < HASHSIZE;i++)
     {
-      binHashTable[i] = (binDecision *) 0;
+      binHashTable[i] = NULL;
     }
 #ifdef WITHFORMULA 
 	int res;
@@ -498,7 +498,7 @@ Persistents = 0;
 		exit(3);
 	}
 	cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
-	F -> parent = (formula *) 0;
+	F -> parent = NULL;
 #endif
   if(SEARCHPROC()) cerr << "Sollte eigentlich nicht vorkommen";
 	NrOfStates = 1;
@@ -507,7 +507,7 @@ Persistents = 0;
   CurrentState = INSERTPROC();
         CurrentState -> firelist = FIRELIST();
   CurrentState -> current = 0;
-  CurrentState -> parent = (State *) 0;
+  CurrentState -> parent = NULL;
 	F -> initatomic();
 
   CurrentState -> succ = new State * [CardFireList+1];
@@ -735,7 +735,7 @@ void RemoveGraph()
 	for(i=0;i<HASHSIZE;i++)
 	{
 		if(binHashTable[i]) delete binHashTable[i];
-		binHashTable[i] = (binDecision *) 0;
+		binHashTable[i] = NULL;
 	}
 #endif
 }

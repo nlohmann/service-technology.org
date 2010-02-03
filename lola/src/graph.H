@@ -536,8 +536,8 @@ inline void trace();
 //  Statevector * & v = LastVector;
 //
 //  // 0. Hashabelle leer -> alles klar
-//  v = (Statevector *) 0;
-//  if(!(d = HashTable[Places[0]->hash_value])) return (State *) 0;
+//  v = NULL;
+//  if(!(d = HashTable[Places[0]->hash_value])) return NULL;
 //  i = 0;
 //  pos = 0;
 //  FirstSymm();
@@ -545,8 +545,8 @@ inline void trace();
 //    {
 //      trace();
 //      // 1. Interpolationssuche in Tabelle
-//      if(CurrentMarking[i] < d -> value[0]) return (State *) 0;
-//      if(CurrentMarking[i] > d -> value[d->size - 1]) return (State *) 0; 
+//      if(CurrentMarking[i] < d -> value[0]) return NULL;
+//      if(CurrentMarking[i] > d -> value[d->size - 1]) return NULL; 
 //      if(CurrentMarking[i] == d -> value[0])
 //	{
 //	  // found, no interpolation necessary
@@ -586,7 +586,7 @@ inline void trace();
 //		}
 //	      if(l != r) // this means: not found!
 //		{
-//		  return (State *) 0; 
+//		  return NULL; 
 //		}
 //	    }
 //	}
@@ -596,7 +596,7 @@ inline void trace();
 //      for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Places[0]-> NrSignificant); i++,j++)
 //	{
 //	  trace();
-//	  if((*(d -> vector[m]))[j] != CurrentMarking[i]) return (State *) 0;
+//	  if((*(d -> vector[m]))[j] != CurrentMarking[i]) return NULL;
 //	}
  //     d = d -> next[m];
  //   } // while d
@@ -624,7 +624,7 @@ inline void trace();
 //      for(j=d->index[m]+i-d->PlaceNr;i < (d->next[m] ? d -> next[m]->PlaceNr : Places[0]->NrSignificant);i++,j++)
 //	{
 //	  trace();
-//	  if((*(d->vector[m]))[j] != CurrentMarking[CurrentSymm[i]]) return (State *) 0;
+//	  if((*(d->vector[m]))[j] != CurrentMarking[CurrentSymm[i]]) return NULL;
 //
 //	}
 //      d = d -> next[m];
@@ -632,8 +632,8 @@ inline void trace();
 //  while(d)
 //    {
 //      // 1. Interpolationssuche in Tabelle
-//      if(CurrentMarking[CurrentSymm[i]] < d -> value[0]) return (State *) 0;
-//      if(CurrentMarking[CurrentSymm[i]] > d -> value[d->size - 1]) return (State *) 0; 
+//      if(CurrentMarking[CurrentSymm[i]] < d -> value[0]) return NULL;
+//      if(CurrentMarking[CurrentSymm[i]] > d -> value[d->size - 1]) return NULL; 
 //      if(CurrentMarking[CurrentSymm[i]] == d -> value[0])
 //	{
 //	  // found, no interpolation necessary
@@ -673,7 +673,7 @@ inline void trace();
 //		}
 //	      if(l != r) // this means: not found!
 //		{
-//		  return (State *) 0; 
+//		  return NULL; 
 //		}
 //	    }
 //	}
@@ -683,7 +683,7 @@ inline void trace();
 //      v = d -> vector[m];
 //      for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Places[0]-> NrSignificant); i++,j++)
 //	{
-//	  if((*(d -> vector[m]))[j] != CurrentMarking[CurrentSymm[i]]) return (State *) 0;
+//	  if((*(d -> vector[m]))[j] != CurrentMarking[CurrentSymm[i]]) return NULL;
 //	  trace();
 //	}
 //      d = d -> next[m];
@@ -715,8 +715,8 @@ inline void print_marking()
 //  
 //  if(!HashTable[Places[0]->hash_value])
 //    {
-//      LastDecision = (Decision *) 0;
-//      return (State *) 0;
+//      LastDecision = NULL;
+//      return NULL;
 //    }
 //  if(s = first_symm_search_marking())
 //    {
@@ -738,7 +738,7 @@ inline void print_marking()
 //  LastChoice = flc;
 //  LastDecision = fld;
 //  LastVector = flv;
-//  return (State *) 0;
+//  return NULL;
 //}
       
       

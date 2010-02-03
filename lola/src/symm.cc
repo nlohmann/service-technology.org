@@ -150,7 +150,7 @@ void init_syms()
 {
   // int i;
   
-  ToDoList[PL] = ToDoList[TR] = (ToDo *) 0;
+  ToDoList[PL] = ToDoList[TR] = NULL;
   CardSpecification[PL] = CardSpecification[TR] = 1;
   Specification[PL] = new Constraint [Places[0] -> cnt];
   Specification[TR] = new Constraint[Transitions[0] -> cnt];
@@ -314,7 +314,7 @@ void SplitPlacesInVorReaktor(unsigned int c,unsigned int attribute(Node *))
       Specification[PL][oldc].last = i - 1;
       Specification[PL][newc].first = i;
       Specification[PL][newc].last = lastc;
-      Specification[PL][newc].changed = (ToDo *) 0;
+      Specification[PL][newc].changed = NULL;
       Specification[PL][newc].parent = 0;
       CardSpecification[PL]++;
 	  reportprogress();
@@ -343,7 +343,7 @@ void SplitTransitionsInVorReaktor(unsigned int c,unsigned int attribute(Node *))
       Specification[TR][oldc].last = i - 1;
       Specification[TR][newc].first = i;
       Specification[TR][newc].last = lastc;
-      Specification[TR][newc].changed = (ToDo *) 0;
+      Specification[TR][newc].changed = NULL;
       Specification[TR][newc].parent = 0;
       CardSpecification[TR]++;
 	  reportprogress();
@@ -863,7 +863,7 @@ bool RefineUntilNothingChanges(NodeType n)
 		{
 		  while(ToDoList[n])
 		    {
-		      Specification[n][ToDoList[n]->constraint].changed = (ToDo *) 0;
+		      Specification[n][ToDoList[n]->constraint].changed = NULL;
 		      tmp = ToDoList[n];
 		      ToDoList[n] = ToDoList[n]-> next;
 		      delete tmp;
@@ -871,7 +871,7 @@ bool RefineUntilNothingChanges(NodeType n)
 		}
 	      return false;
 	    }
-	  Specification[n][ToDoList[n]->constraint].changed = (ToDo *) 0;
+	  Specification[n][ToDoList[n]->constraint].changed = NULL;
 	  tmp = ToDoList[n];
 	  ToDoList[n] = ToDoList[n]-> next;
 	  delete tmp;
@@ -1030,7 +1030,7 @@ void DefineToOther(unsigned int imagepos)
     {
       possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
-  possibleImages[i-Specification[PL][cntriv].first] = (Node *) 0;
+  possibleImages[i-Specification[PL][cntriv].first] = NULL;
   Specification[PL][CardSpecification[PL]].first = Specification[PL][CardSpecification[PL]].last 
     = Specification[PL][cntriv].first;
   Specification[PL][CardSpecification[PL]].parent = cntriv;
@@ -1098,7 +1098,7 @@ void OnlineDefineToOther()
     {
       possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
-  possibleImages[i-Specification[PL][cntriv].first] = (Node *) 0;
+  possibleImages[i-Specification[PL][cntriv].first] = NULL;
   Specification[PL][CardSpecification[PL]].first = Specification[PL][CardSpecification[PL]].last 
     = Specification[PL][cntriv].first;
   Specification[PL][CardSpecification[PL]].parent = cntriv;
@@ -1182,7 +1182,7 @@ void OnlineCanonize()
     {
       possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
-  possibleImages[i-Specification[PL][cntriv].first] = (Node *) 0;
+  possibleImages[i-Specification[PL][cntriv].first] = NULL;
   ImageSort(possibleImages,0,Specification[PL][cntriv].last - Specification[PL][cntriv].first );
   maxmarking = CurrentMarking[((Place *) possibleImages[Specification[PL][cntriv].last - Specification[PL][cntriv].first])->index];
   Reaktor[PL][DO][SourceIndex].node -> pos[DO] = Specification[PL][cntriv].first;
@@ -1331,7 +1331,7 @@ void DefineToId(void)
   MyCardSpecification[TR] = CardSpecification[TR];
   for(j=0;j< Store[CurrentStore].length;j++)
     {
-      Store[CurrentStore].image[j].vector = (unsigned int *) 0;
+      Store[CurrentStore].image[j].vector = NULL;
       Store[CurrentStore].image[j].value = Reaktor[PL][CO][j + Specification[PL][cntriv].first].node;
     }
   MyStorePosition = CurrentStore;
@@ -1887,7 +1887,7 @@ State * symm_search2(Decision * d)
 	}
     }
   ReUnify(MyCardSpecification[PL],MyCardSpecification[TR]);
-  return (State *) 0;
+  return NULL;
 #endif
 }
   
@@ -1931,7 +1931,7 @@ State * symm_search_marking2()
   LastVector = lv;
   Scapegoat = li;
   LastChoice = lc;
-  return (State *) 0;
+  return NULL;
 }
 
 
@@ -2062,14 +2062,14 @@ State * bin_symm_search2(binDecision * d)
 	  if(!spl)
 	    {
 	      ReUnify(MyCardSpecification[PL],MyCardSpecification[TR]);
-	      return (State *) 0;
+	      return NULL;
 	    }
 	  if(ToDoList[PL])
 	    {
 	      if(!RefineUntilNothingChanges(PL))
 		{
 		  ReUnify(MyCardSpecification[PL],MyCardSpecification[TR]);
-		  return (State *) 0;
+		  return NULL;
 		}
 	    }
 	  if(CardSpecification[PL] == Places[0]->cnt)
@@ -2092,7 +2092,7 @@ State * bin_symm_search2(binDecision * d)
 #endif
 	}
   ReUnify(MyCardSpecification[PL],MyCardSpecification[TR]);
-  return (State *) 0;
+  return NULL;
 #endif
 }
   
@@ -2136,7 +2136,7 @@ State * bin_symm_search_marking2()
   //LastVector = lv;
   //Scapegoat = li;
   //LastChoice = lc;
-    return (State *) 0;
+    return NULL;
 }
 
 void canonize_on_the_fly()

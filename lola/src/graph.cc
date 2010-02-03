@@ -1527,8 +1527,8 @@ unsigned int depth_first() {
         (*graphstream) << " Prog: " << CurrentState -> progress_value;
 
         if(CurrentState -> persistent) (*graphstream) << " persistent ";
-        int j=0;
         if(graphformat == 'm') {
+          int j=0;
           for(i=0;i<Places[0]->cnt; ++i) {
             if(CurrentMarking[i]) {
               if(CurrentMarking[i] == VERYLARGE) {
@@ -1843,6 +1843,10 @@ unsigned int depth_first() {
 #endif
   statistics(NrOfStates,Edges,NonEmptyHash);
 
+  if (graphstream != &cout) {
+    delete graphstream;
+  }
+
   // return 0: we did not find what we were looking for
   return 0;
 #endif
@@ -1860,7 +1864,7 @@ unsigned int breadth_first() {
    // succ[i] 0 = dieser Zweig ist nicht mehr fruchtbar
 #ifdef BREADTH_FIRST
 
-  ofstream* graphstream = NULL;
+  ostream* graphstream = NULL;
   unsigned int limit;
   unsigned int d;
   unsigned int i;
@@ -2460,10 +2464,10 @@ if(i >= Places[0]->cnt) // target_marking found!
    }
 #endif
 #endif
-   statistics(NrOfStates,Edges,NonEmptyHash);
-   return 0;
+  statistics(NrOfStates,Edges,NonEmptyHash);
 
-
+  // return 0: we did not find what we were looking for
+  return 0;
 }
 
 
@@ -3026,8 +3030,6 @@ unsigned int compute_scc() {
     } else {
       // close state and return to previous state
 
-      bool nonTrivialSCC = false;
-
       if(gmflg || GMflg) {
         (*graphstream) << "STATE " << CurrentState ->dfs;
         (*graphstream) << " Lowlink: " << CurrentState ->min;
@@ -3045,6 +3047,8 @@ unsigned int compute_scc() {
           TarStack = newroot;
         }
         State * s;
+
+        bool nonTrivialSCC = false;
 
         // print out SCC
         for(s = CurrentState ; s -> nexttar != CurrentState; s = s -> nexttar) {
@@ -3067,8 +3071,8 @@ unsigned int compute_scc() {
       if(gmflg || GMflg) {
      // in the next line "&& gmflg" was added by Niels, because it was like this in the code I collected
         if(CurrentState -> persistent && gmflg) (*graphstream) << " persistent ";
-        int j=0;
         if(graphformat == 'm') {
+          int j=0;
           for(i=0; i<Places[0]->cnt; ++i) {
             if(CurrentMarking[i]) {
               if(CurrentMarking[i] == VERYLARGE) {
@@ -3095,6 +3099,11 @@ unsigned int compute_scc() {
       }
     }
   }
+
+  if (graphstream != &cout) {
+    delete graphstream;
+  }
+
   statistics(NrOfStates, Edges, NonEmptyHash);
   return 0;
 }

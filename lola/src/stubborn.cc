@@ -47,7 +47,7 @@ void stubbornclosure()
 			// condition SPP1 from Kristensen/Valmari (Petri nets 2000)
 			if(current -> down)
 			{
-				insert_up((State *) 0, F);
+				insert_up(NULL, F);
 			}
 #endif
 		}
@@ -56,7 +56,7 @@ void stubbornclosure()
 			if(!current -> mustbeincluded[i]->instubborn)
 			{
 				current -> mustbeincluded[i]->instubborn = true;
-				current -> mustbeincluded[i]->NextStubborn  = (Transition *) 0;
+				current -> mustbeincluded[i]->NextStubborn  = NULL;
 				current-> EndOfStubbornList -> NextStubborn = current -> mustbeincluded[i];
 				current -> EndOfStubbornList = current -> mustbeincluded[i];
 			}
@@ -124,7 +124,7 @@ void stubborninsert(Transition* t)
 {
 	if(t -> instubborn) return;
 	t -> instubborn = true;
-	t -> NextStubborn = (Transition *) 0;
+	t -> NextStubborn = NULL;
 	if(t -> StartOfStubbornList)
 	{
 		t -> EndOfStubbornList -> NextStubborn = t;
@@ -522,7 +522,7 @@ Transition ** stubbornfirelist(State *s, formula * f)
  	Transition * t;
 	int i;
 
-	t -> StartOfStubbornList = (Transition *) 0;
+	t -> StartOfStubbornList = NULL;
 	insert_up(s,f);
 	stubbornclosure();
 	i = Transitions[0]->NrStubborn;
@@ -539,15 +539,15 @@ Transition ** stubbornfirelist(State *s, formula * f)
 			result[i++] = t;
 		}
 	}
-	result[i] = (Transition *)0;
+	result[i] = NULL;
 	CardFireList = i;
 	return result;
 }
 
 Transition ** stubbornfirelistpredicate()
 {
-	if(F -> value) return (Transition **) 0;
-	return stubbornfirelist((State *) 0, F);
+	if(F -> value) return NULL;
+	return stubbornfirelist(NULL, F);
 }
 
 Transition ** stubbornfirelistneg(State *s, formula * f)
@@ -556,7 +556,7 @@ Transition ** stubbornfirelistneg(State *s, formula * f)
  	Transition * t;
 	int i;
 
-	t -> StartOfStubbornList = (Transition *) 0;
+	t -> StartOfStubbornList = NULL;
 	insert_down(s,f);
 	stubbornclosure();
 	result = new Transition * [Transitions[0]->NrStubborn + 1];
@@ -572,7 +572,7 @@ Transition ** stubbornfirelistneg(State *s, formula * f)
 			result[i++] = t;
 		}
 	}
-	result[i] = (Transition *)0;
+	result[i] = NULL;
 	return result;
 }
 
@@ -593,7 +593,7 @@ Transition ** stubbornfirelistctl()
 #endif
 		start -> StartOfStubbornList =start -> EndOfStubbornList = start;
 		start -> instubborn = true;
-		start -> NextStubborn = (Transition *) 0;
+		start -> NextStubborn = NULL;
 	  	for(current = current -> StartOfStubbornList;current; 
 			current = current -> NextStubborn)
 		{
@@ -618,7 +618,7 @@ Transition ** stubbornfirelistctl()
 				if(!current -> mustbeincluded[i]->instubborn)
 				{
 					current -> mustbeincluded[i]->instubborn = true;
-					current -> mustbeincluded[i]->NextStubborn  = (Transition *) 0;
+					current -> mustbeincluded[i]->NextStubborn  = NULL;
 					current-> EndOfStubbornList -> NextStubborn = current -> mustbeincluded[i];
 					current -> EndOfStubbornList = current -> mustbeincluded[i];
 				}
@@ -626,7 +626,7 @@ Transition ** stubbornfirelistctl()
 		}
 		result = new Transition * [2];
 		result[0] = start;
-		result[1] = (Transition *) 0;
+		result[1] = NULL;
 		for(current = current -> StartOfStubbornList;current;current = current -> NextStubborn)
 		{
 			current -> instubborn = false;
@@ -649,7 +649,7 @@ unsigned int i;
 
 	if(LastAttractor)
 	{
-		LastAttractor -> NextStubborn = (Transition *) 0;
+		LastAttractor -> NextStubborn = NULL;
 		Transitions[0]->EndOfStubbornList = LastAttractor;
 		stubbornclosure();
 	}
@@ -674,7 +674,7 @@ unsigned int i;
 		}
 	}
 	}
-	result[i] = (Transition *)0;
+	result[i] = NULL;
 	CardFireList = Transitions[0]-> NrStubborn;
 	return result;
 }
@@ -691,7 +691,7 @@ unsigned int i;
 	Transitions[0]->NrStubborn = 0;
 	if(Transitions[0]->StartOfEnabledList)
 	{
-		Transitions[0]->StartOfEnabledList -> NextStubborn = (Transition *) 0;
+		Transitions[0]->StartOfEnabledList -> NextStubborn = NULL;
 		Transitions[0]->StartOfStubbornList =
 		Transitions[0]->EndOfStubbornList = Transitions[0]->StartOfEnabledList;
 		Transitions[0]->StartOfStubbornList->instubborn = true;
@@ -699,7 +699,7 @@ unsigned int i;
 	}
 	else
 	{
-		Transitions[0]->StartOfStubbornList = (Transition *) 0;
+		Transitions[0]->StartOfStubbornList = NULL;
 	}
 	result = new Transition * [Transitions[0]->NrStubborn + 1];
 	i=0;
@@ -711,7 +711,7 @@ unsigned int i;
 			result[i++] = t;
 		}
 	}
-	result[i] = (Transition *)0;
+	result[i] = NULL;
 	CardFireList = Transitions[0]-> NrStubborn;
 	return result;
 }
@@ -734,7 +734,7 @@ unsigned int i;
 	}
 	if(i >= Places[0]->cnt) // target_marking found!
 	{
-		return (Transition **) 0;
+		return NULL;
 	}
 	if(CurrentMarking[i] > Places[i]->target_marking)
 	{
@@ -744,7 +744,7 @@ unsigned int i;
 	{
 		Attr = Places[i]->PreTransitions;
 	}
-	Transitions[0]->StartOfStubbornList = (Transition *) 0;
+	Transitions[0]->StartOfStubbornList = NULL;
 	for(i=0;Attr[i];i++)
 	{
 		Attr[i]->NextStubborn = Transitions[0]->StartOfStubbornList;
@@ -763,7 +763,7 @@ unsigned int i;
 		}
 		t -> instubborn = false;
 	}
-	result[i] = (Transition *)0;
+	result[i] = NULL;
 	CardFireList = Transitions[0]-> NrStubborn;
 	return result;
 }
@@ -808,12 +808,12 @@ Transition ** tsccstubbornlist()
 		Transitions[0]->TarjanStack -> mbiindex = 0;
 		current = Transitions[0]->TarjanStack;
 		Transitions[0]->CallStack = current;
-		current -> nextoncallstack = (Transition *) 0;
+		current -> nextoncallstack = NULL;
 	}
 	else
 	{
 		result = new Transition * [1];
-		result[0] = (Transition *) 0;
+		result[0] = NULL;
 		CardFireList = 0;
 		return result;
 	}
@@ -876,7 +876,7 @@ Transition ** tsccstubbornlist()
 							}
 							if(t == current)
 							{
-								result[cardstubborn] = (Transition *) 0;
+								result[cardstubborn] = NULL;
 								CardFireList = cardstubborn;
 								return(result);
 							}
@@ -905,7 +905,7 @@ Transition ** relaxedstubbornset()
 	unsigned int i;
 
 #if !defined(LIVEPROP) || (defined(RELAXED) && defined(TWOPHASE))
-	if(F -> value) return (Transition **) 0;
+	if(F -> value) return NULL;
 #endif
 	firstattempt = tsccstubbornlist();
 #if defined(LIVEPROP) && (!defined(RELAXED) || !defined(TWOPHASE))
@@ -934,7 +934,7 @@ Transition ** structreachstubbornset() // used: relaxed reachability, cycle dete
 	Transition ** result;
 	Transition * t;
 
-	if(F -> value) return (Transition **) 0;
+	if(F -> value) return NULL;
 	firstattempt = tsccstubbornlist();
 	for(i=0;firstattempt[i];i++)
 	{
@@ -945,7 +945,7 @@ Transition ** structreachstubbornset() // used: relaxed reachability, cycle dete
 		// cycle detected, return stubborn closure of global UP set
 
 		//delete [] firstattempt;
-		t -> StartOfStubbornList = (Transition *) 0;
+		t -> StartOfStubbornList = NULL;
 		insert_global_up(F);
 		stubbornclosure();
 		result = new Transition * [Transitions[0]->NrStubborn + 5];
@@ -957,7 +957,7 @@ Transition ** structreachstubbornset() // used: relaxed reachability, cycle dete
 				result[i++] = t;
 			}
 		}
-		result[i] = (Transition *)0;
+		result[i] = NULL;
 		return result;
 	}
 	return firstattempt;

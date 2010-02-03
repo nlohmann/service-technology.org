@@ -40,7 +40,7 @@ buchitransition ** buchistate::getenabled()
 			enabled[j++] = delta[i];
 		}
 	}
-	enabled[j] = (buchitransition *) 0;
+	enabled[j] = NULL;
 	return enabled;
 }
 
@@ -50,9 +50,9 @@ buchistate::buchistate(char * n)
 	code = nr++;
 	final = 0;
 	nrdelta = 0;
-	delta = (buchitransition **) 0;
-	transitionlist = (buchitransition *) 0;
-	next = (buchistate *) 0;
+	delta = NULL;
+	transitionlist = NULL;
+	next = NULL;
 }
 
 void init_buchi()
@@ -66,7 +66,7 @@ void init_buchi()
 	{
 		buchiautomaton[i] = b;
 	}
-	buchiautomaton[i] = (buchistate *) 0;
+	buchiautomaton[i] = NULL;
 	
 	// 1. translate list of transitions into array of transitions
 

@@ -33,7 +33,7 @@ SymbolTab::SymbolTab(unsigned int s = 65536)
     card = 0;
     for(unsigned int i = 0; i < s;i++)
     {
-        table[i] = (Symbol *) 0;
+        table[i] = NULL;
     }
 }
 
@@ -101,7 +101,7 @@ Symbol::~Symbol() {}
 
 PlSymbol::PlSymbol(char * txt): Symbol(txt,PlaceTable)
 {
-    place = NULL; // (Place *) 0;
+    place = NULL;
     kind = pl;
 }
 
@@ -113,9 +113,9 @@ PlSymbol::PlSymbol(Place * p):Symbol(p->name,PlaceTable)
 
 TrSymbol::TrSymbol(char * c):Symbol(c,TransitionTable)
 {
-    vars = NULL; // (SymbolTab * ) 0;
-    guard = NULL; //(UExpression *) 0;
-    transition = NULL; // (Transition *) 0;
+    vars = NULL;;
+    guard = NULL;
+    transition = NULL;
     kind = tr;
 }
 

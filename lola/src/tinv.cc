@@ -67,7 +67,7 @@ equation::equation(Node * p)
 	long int k;
 	Node * t;
 
-	sum = (summand *) 0;
+	sum = NULL;
 	for(i=0;i<p -> NrOfArriving;i++)
 	{
 		t = p -> ArrivingArcs[i] -> Source;
@@ -189,7 +189,7 @@ void equation::apply()
 	{
 		* anchor = new summand(s -> var, - fthis * s -> value );
 		anchor = & ( (*anchor) -> next);
-		* anchor = (summand *) 0;
+		* anchor = NULL;
 		s = s -> next;
 	}
 	while(*anchor)
@@ -337,13 +337,13 @@ void tsolve()
 				pos = esystem[i] -> sum ->var -> nr;
 				esystem[i]->next = newesystem[pos];
 				newesystem[pos] = esystem[i];
-				esystem[i] = (equation *) 0;
+				esystem[i] = NULL;
 				delete tmp;
 			}
 			else
 			{
 				newesystem[i] = esystem[i];
-				esystem[i] = (equation *) 0;
+				esystem[i] = NULL;
 			}
 		}
 		if(!newcyclic) 
@@ -477,7 +477,7 @@ void progress_measure()
 		esystem[i] = (equation * ) 0;
 		Places[i]->nr = i;
 	}
-	esystem[Places[0]->cnt] = (equation *) 0;
+	esystem[Places[0]->cnt] = NULL;
 
 	for(i=0;i < Transitions[0]->cnt;i++)
 	{
@@ -487,7 +487,7 @@ void progress_measure()
 		reference[i] = new equation(Transitions[i]);
 		for(anchor = &(reference[i] -> sum); *anchor; anchor = &((*anchor)->next));
 		*anchor = new summand(Transitions[i], 1);
-		(*anchor)-> next = (summand *) 0;
+		(*anchor)-> next = NULL;
 		reference[i] -> next = esystem[reference[i] -> sum -> var -> nr];
 		esystem[reference[i] -> sum -> var -> nr] = reference[i];
 		NrOfEquations ++;

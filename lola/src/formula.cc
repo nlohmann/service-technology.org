@@ -37,7 +37,7 @@ void yyerror(char const *);
 hlatomicformula::hlatomicformula(FType t, PlSymbol * pp, UExpression * te)
 {
   type = t;
-  p = (Place *) 0;
+  p = NULL;
   ps = pp;
   color = te;
 }
@@ -181,14 +181,14 @@ atomicformula::atomicformula(FType t, Place * pp, unsigned int kk)
 transitionformula::transitionformula(Transition * t)
 {
 	transition = t;
-	hltransition = (TrSymbol *) 0;
-	firingmode = (fmode *) 0;
+	hltransition = NULL;
+	firingmode = NULL;
 }
 
 transitionformula::transitionformula(TrSymbol * t, fmode * mode)
 {
 	type = trans;
-	transition = (Transition *) 0;
+	transition = NULL;
 	hltransition = t;
 	firingmode = mode;
 }
@@ -511,7 +511,7 @@ formula * unarytemporalformula::copy()
 	}
 	else
 	{
-    f = new unarytemporalformula(type,element -> copy(),(transitionformula *) 0);
+    f = new unarytemporalformula(type,element -> copy(),NULL);
 	}
     return f;
 }
@@ -525,7 +525,7 @@ formula * untilformula::copy()
 	}
 	else
 	{
-	f = new untilformula(type,hold -> copy(),goal -> copy(),(transitionformula *) 0);
+	f = new untilformula(type,hold -> copy(),goal -> copy(),NULL);
 	}
 	return f;
 }
@@ -592,8 +592,8 @@ formula * transitionformula::replacequantifiers()
             yyerror("HL and LL transition names mixed up");
            }
            transition = TS -> transition;
-		   hltransition = (TrSymbol *) 0;
-		   firingmode = (fmode *) 0;
+		   hltransition = NULL;
+		   firingmode = NULL;
 		   return this;
 }
 
@@ -761,7 +761,7 @@ formula * binarybooleanformula::merge()
 		f -> sub[i] -> parent = f;
 		f -> sub[i] -> parentindex = i;
 	}
-	f -> sub[f -> cardsub] = (formula *) 0;
+	f -> sub[f -> cardsub] = NULL;
 	for(i=0;i<f -> cardsub;i++)
 	{
 		f -> sub[i] = f -> sub[i]->merge();
@@ -787,7 +787,7 @@ formula * booleanformula::merge()
 		f -> sub[i] -> parent = f;
 		f -> sub[i] -> parentindex = i;
 	}
-	f -> sub[f -> cardsub] = (formula *) 0;
+	f -> sub[f -> cardsub] = NULL;
 	for(i=0;i<f -> cardsub;i++)
 	{
 		f -> sub[i] = f -> sub[i]->merge();
@@ -934,7 +934,7 @@ goal -> parent = this;
 		{
 			Transitions[i]->pathrestriction[tempindex] = tformula -> evaluatetransition(Transitions[i]);
 		}
-		DeadStatePathRestriction[tempindex] = tformula -> evaluatetransition((Transition *) 0);
+		DeadStatePathRestriction[tempindex] = tformula -> evaluatetransition(NULL);
 	}
 	else
 	{
@@ -962,7 +962,7 @@ void unarytemporalformula::setstatic()
 		{
 			Transitions[i]->pathrestriction[tempindex] = tformula -> evaluatetransition(Transitions[i]);
 		}
-		DeadStatePathRestriction[tempindex] = tformula -> evaluatetransition((Transition *) 0);
+		DeadStatePathRestriction[tempindex] = tformula -> evaluatetransition(NULL);
 	}
 	else
 	{
@@ -1092,7 +1092,7 @@ formula * atomicformula::reduce(int * res)
 	case gt: if(CurrentMarking[p -> index] > k) * res = 1;else * res = 0; break;
     default: break;
 	}
-	return (formula *) 0;
+	return NULL;
 }
 
 formula * unarybooleanformula::reduce(int * res)
@@ -1102,8 +1102,8 @@ formula * unarybooleanformula::reduce(int * res)
     if(sub) atomic = sub -> atomic;
     switch(subres)
     {
-        case 0: * res = 1; return (formula *) 0;
-        case 1: * res = 0; return (formula *) 0;
+        case 0: * res = 1; return NULL;
+        case 1: * res = 0; return NULL;
         case 2: * res = 2; return this;
         
         // Karsten fragen
@@ -1121,11 +1121,11 @@ formula * binarybooleanformula::reduce(int * res)
     {
         switch(subres1)
         {
-            case 0: * res = 0; return (formula *) 0;
+            case 0: * res = 0; return NULL;
             case 1: * res = subres2; if(right) atomic = right -> atomic; return right;
             case 2: switch(subres2)
             {
-                case 0: * res = 0; return (formula *) 0;
+                case 0: * res = 0; return NULL;
                 case 1: * res = 2; if(left) atomic = left -> atomic; return left;
                 case 2: * res = 2; if(left -> atomic && right -> atomic) atomic = true; else atomic = false; return this;
             }
@@ -1136,11 +1136,11 @@ formula * binarybooleanformula::reduce(int * res)
         switch(subres1)
         {
             case 0: * res = subres2; if(right) atomic = right -> atomic; return right;
-            case 1: * res = 1; return (formula *) 0;
+            case 1: * res = 1; return NULL;
             case 2: switch(subres2)
             {
                 case 0: * res = 2; if(left) atomic = left -> atomic; return left;
-                case 1: * res = 1; return (formula *) 0;
+                case 1: * res = 1; return NULL;
                 case 2: * res = 2; if(left -> atomic && right -> atomic) atomic = true;else atomic = false; return this;
             }
         }
@@ -1164,14 +1164,14 @@ formula * booleanformula::reduce(int * res)
 			if(sub[i] && (sub[i] -> atomic == false)) atomic = false;
 			switch(subres)
 			{
-			case 0: * res = 0; return (formula *) 0;
+			case 0: * res = 0; return NULL;
 			case 1: sub[i] = sub[cardsub - 1]; cardsub --; break;
 			case 2: i++;break;
 			}
 		}
 		if(cardsub == 0)
 		{
-			* res = 1; return (formula *) 0;
+			* res = 1; return NULL;
 		}
 		else
 		{
@@ -1196,14 +1196,14 @@ formula * booleanformula::reduce(int * res)
 			if(sub[i] && (sub[i] -> atomic == false)) atomic = false;
 			switch(subres)
 			{
-			case 1: * res = 1; return (formula *) 0;
+			case 1: * res = 1; return NULL;
 			case 0: sub[i] = sub[cardsub - 1]; cardsub --; break;
 			case 2: i++;break;
 			}
 		}
 		if(cardsub == 0)
 		{
-			* res = 0; return (formula *) 0;
+			* res = 0; return NULL;
 		}
 		else
 		{
@@ -1243,7 +1243,7 @@ formula * untilformula::reduce(int * res)
     if(subres < 2)
     {
         * res = subres;
-        return(formula *) 0;
+        return NULL;
     }
     hold = hold -> reduce(& subres);
     switch(subres)
@@ -1507,7 +1507,7 @@ Transition ** booleanformula::spp2(State * s)
 			return fl;
 		}
 	}
-	return (Transition **) 0;
+	return NULL;
 }
 
 #ifdef STUBBORN
@@ -1539,7 +1539,7 @@ Transition ** atomicformula::spp2(State * s)
 				break;
 			}
 		}
-		if(i >= p -> NrOfLeaving) return (Transition **) 0;
+		if(i >= p -> NrOfLeaving) return NULL;
 		break;
 	case geq:
 	case gt:
@@ -1552,7 +1552,7 @@ Transition ** atomicformula::spp2(State * s)
 				break;
 			}
 		}
-		if(i >= p -> NrOfArriving) return (Transition **) 0;
+		if(i >= p -> NrOfArriving) return NULL;
 		break;
 	case eq:
 		if(CurrentMarking[p -> index] < k)
@@ -1566,7 +1566,7 @@ Transition ** atomicformula::spp2(State * s)
 					break;
 				}
 			}
-			if(i >= p -> NrOfArriving) return (Transition **) 0;
+			if(i >= p -> NrOfArriving) return NULL;
 			break;
 		}
 		else
@@ -1580,7 +1580,7 @@ Transition ** atomicformula::spp2(State * s)
 					break;
 				}
 			}
-			if(i >= p -> NrOfLeaving) return (Transition **) 0;
+			if(i >= p -> NrOfLeaving) return NULL;
 			break;
 		}
 	case neq:
@@ -1604,7 +1604,7 @@ Transition ** atomicformula::spp2(State * s)
 					break;
 				}
 			}
-			if(i >= p -> NrOfLeaving) return (Transition **) 0;
+			if(i >= p -> NrOfLeaving) return NULL;
 		}
 		break;
 	}
@@ -1625,7 +1625,7 @@ Transition ** atomicformula::spp2(State * s)
 		{
 			if(s -> firelist[j] == stublist[i])
 			{
-				stublist[i] = (Transition *) 0;
+				stublist[i] = NULL;
 				break;
 			}
 		}
@@ -1635,7 +1635,7 @@ Transition ** atomicformula::spp2(State * s)
 			cardnew ++;
 		}
 	}
-	if(!cardnew) return (Transition **) 0;
+	if(!cardnew) return NULL;
 	Transition ** result;
 	result = new Transition * [cardnew+1];
 	for(i=0,j=0;i<cardnew;i++)
@@ -1643,7 +1643,7 @@ Transition ** atomicformula::spp2(State * s)
 		while(!stublist[j]) j++;
 		result[i] = stublist[j++];
 	}
-	result[i] = (Transition *) 0;
+	result[i] = NULL;
 	return result;
 #endif
 }

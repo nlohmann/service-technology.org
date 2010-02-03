@@ -50,8 +50,8 @@ using std::string;
 
 unsigned int BitVectorSize = 0;
 Place ** Places;
-Place * CheckPlace = (Place *) 0;
-Transition * CheckTransition = (Transition *) 0;
+Place * CheckPlace = NULL;
+Transition * CheckTransition = NULL;
 Transition ** Transitions;
 unsigned int  * CurrentMarking;
 unsigned int Arc::cnt = 0;
@@ -60,21 +60,21 @@ unsigned int Transition::cnt = 0;
 
 #ifdef STUBBORN
 unsigned int Transition::NrStubborn = 0;
-Transition * Transition::TarjanStack = (Transition *) 0;
-Transition * Transition::CallStack = (Transition *) 0;
+Transition * Transition::TarjanStack = NULL;
+Transition * Transition::CallStack = NULL;
 #endif
 
 Transition * LastAttractor; // Last transition in static attractor sets
 unsigned int Transition::NrEnabled = 0;
-Transition * Transition::StartOfEnabledList = (Transition *) 0;
+Transition * Transition::StartOfEnabledList = NULL;
 
 #ifdef EXTENDED
-Transition * Transition::StartOfIgnoredList = (Transition *) 0;
+Transition * Transition::StartOfIgnoredList = NULL;
 #endif
 
 #ifdef STUBBORN
-Transition * Transition::StartOfStubbornList = (Transition *) 0;
-Transition * Transition::EndOfStubbornList = (Transition *) 0;
+Transition * Transition::StartOfStubbornList = NULL;
+Transition * Transition::EndOfStubbornList = NULL;
 #endif
 
 #ifdef WITHFORMULA
@@ -414,7 +414,7 @@ int main(int argc, char ** argv){
 	  BitHashTable[i] = 0;
 #else
 #ifndef SWEEP
-          binHashTable[i] = (binDecision *) 0;
+          binHashTable[i] = NULL;
 #endif
 #endif
     }
@@ -498,8 +498,8 @@ unsigned int j;
   }
   for(i=0;i<Transitions[0]->cnt;i++)
   {
-	Transitions[i]->PrevEnabled = (i == 0 ? (Transition *) 0 : Transitions[i-1]);
-	Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? (Transition *) 0 : Transitions[i+1]);
+	Transitions[i]->PrevEnabled = (i == 0 ? NULL : Transitions[i-1]);
+	Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? NULL : Transitions[i+1]);
 	Transitions[i]->enabled = true;
   }
   Transitions[0]->StartOfEnabledList = Transitions[0];
@@ -585,8 +585,8 @@ unsigned int j;
   }
   for(j=0;j<Transitions[0]->cnt;j++)
   {
-	Transitions[j]->PrevEnabled = (j == 0 ? (Transition *) 0 : Transitions[j-1]);
-	Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? (Transition *) 0 : Transitions[j+1]);
+	Transitions[j]->PrevEnabled = (j == 0 ? NULL : Transitions[j-1]);
+	Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? NULL : Transitions[j+1]);
  	Transitions[j]->enabled = true;
   }
   Transitions[0]->StartOfEnabledList = Transitions[0];
@@ -778,7 +778,7 @@ bool IsTransition ;
 	currentnode = Transitions[0];
 	IsTransition = true;
 	currentnode -> pos[0] = 0 ;
-	currentnode -> parent = (Node *) 0 ; // bottom stack element
+	currentnode -> parent = NULL ; // bottom stack element
 	currentnode -> pos[1] = 9 ; // transition, on stack, not selected
 
 	// loop
@@ -786,7 +786,7 @@ bool IsTransition ;
 	while(currentnode)
 	{
 		// is there another successor ?
-		newnode = (Node *) 0;
+		newnode = NULL;
 		if(currentnode->pos[1] < 8)
 		{
 			// successor of place

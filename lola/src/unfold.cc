@@ -174,7 +174,7 @@ bool UArrType::iscompatible(UType * t)
 	//val -> content = new UValue * [maxlength];
 	//for(int i = 0; i < maxlength; i++)
 	//{
-		//val -> content[i] = (UValue *) 0;
+		//val -> content[i] = NULL;
 	//}
 //}
 
@@ -857,7 +857,7 @@ void UArrValue::print(ostream & os)
 	//}
 	//for(; i < ((ULstType*) type)->maxlength; i++)
 	//{
-		//val -> content[i] = (UValue *) 0;
+		//val -> content[i] = NULL;
 	//}
 //}
 
@@ -1853,7 +1853,7 @@ UValue * URecordExpression::evaluate()
 	URcList * rc;
 	URcList * rc1;
 
-	rc = (URcList *) 0;
+	rc = NULL;
 	c = new UValue * [card];
 	for(i = 0; i < card; i++)
 	{
@@ -1861,7 +1861,7 @@ UValue * URecordExpression::evaluate()
 		rc1 = new URcList;
 		rc1 -> next = rc;
 		rc1 -> ty = c[i] -> type;
-		rc1 -> sy = (RcSymbol *) 0;
+		rc1 -> sy = NULL;
 		rc = rc1;
 	}
 
@@ -2013,7 +2013,7 @@ void UFunction::leave()
 UVar::UVar(UType * t)
 {
 	type= t;
-	stack = (UValueList *) 0;
+	stack = NULL;
 	value = t -> make();
 }
 
@@ -2060,7 +2060,7 @@ UValueList* UVarTerm::evaluate()
 {
 	UValueList * vl;
 	vl = new UValueList;
-	vl -> next = (UValueList *) 0;
+	vl -> next = NULL;
 	vl -> val = v -> get();
 	char * c;
 	c = vl -> val -> text();
@@ -2074,7 +2074,7 @@ UValueList * UOpTerm::evaluate()
 	unsigned int i;
 						char * bla;
 
-	vl = (UValueList *) 0;
+	vl = NULL;
 
 	UValueList ** subresult;
 	UValueList ** subindex;
@@ -2085,7 +2085,7 @@ UValueList * UOpTerm::evaluate()
 	for(i=0;i < arity; i++)
 	{
 		subresult[i] = sub[i] -> evaluate();
-		if(!(subresult[i])) return (UValueList *) 0;
+		if(!(subresult[i])) return NULL;
 		subindex[i] = subresult[i];
 	}
 

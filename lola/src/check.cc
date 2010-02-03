@@ -562,7 +562,7 @@ bool check_analyse_fairness(State * pool, unsigned int level, unsigned int finde
     // choose element from pool
     C = pool;
     pool = pool -> checknexttar[findex];
-    if(pool == C) pool = (State *) 0;
+    if(pool == C) pool = NULL;
     T = C;
     // unlink from pool and init new dfs
     C -> checknexttar[findex] -> checkprevtar[findex] = C -> checkprevtar[findex];
@@ -571,7 +571,7 @@ bool check_analyse_fairness(State * pool, unsigned int level, unsigned int finde
     C -> checkcurrent[findex] = 0;
     while(C -> checkfirelist[findex][C -> checkcurrent[findex]] && ! C -> checksucc[findex][C -> checkcurrent[findex]]) C -> checkcurrent[findex]++;
     C -> checktarlevel[findex] = level + 1;
-    C -> checkparent[findex] = (State *) 0;
+    C -> checkparent[findex] = NULL;
     C -> checkddfs[findex] = C -> checkmmin[findex] = 1;
     while(C)
     {
@@ -593,7 +593,7 @@ bool check_analyse_fairness(State * pool, unsigned int level, unsigned int finde
             pool = pool -> checknexttar[findex];
             if(pool == N)
             { 
-              pool = (State *) 0; 
+              pool = NULL; 
             }
           }
           N -> checknexttar[findex] -> checkprevtar[findex] = N -> checkprevtar[findex];
@@ -717,7 +717,7 @@ bool check_analyse_fairness(State * pool, unsigned int level, unsigned int finde
                 {
                   State * E;
                   unsigned int j;
-                  E = (State *) 0;
+                  E = NULL;
                   for(j=0;S -> checkfirelist[findex][j];j++)
                   {
                     if(S -> checkfirelist[findex][j] == Transitions[i])
@@ -836,8 +836,8 @@ void check(State * s, formula * f) {
       if(s->value[((unarytemporalformula *) f)->element->index])
       {
       s->value[f->index] = s->known[f->index] = true;
-      s -> witness[f -> tempindex] = (State *) 0;
-      s -> witnesstransition[f->tempindex] = (Transition *) 0;
+      s -> witness[f -> tempindex] = NULL;
+      s -> witnesstransition[f->tempindex] = NULL;
       return;
       }
       searchEF(s,(unarytemporalformula *) f);
@@ -847,8 +847,8 @@ void check(State * s, formula * f) {
       {
       s->value[f->index] = false;
       s->known[f->index] = true;
-      s -> witness[f -> tempindex] = (State *) 0;
-      s -> witnesstransition[f->tempindex] = (Transition *) 0;
+      s -> witness[f -> tempindex] = NULL;
+      s -> witnesstransition[f->tempindex] = NULL;
       return;
       }
       searchAG(s,(unarytemporalformula *) f);
@@ -858,8 +858,8 @@ void check(State * s, formula * f) {
         {
         s -> value[f->index] = true;
         s -> known[f->index] = true;
-        s -> witness[f -> tempindex] = (State *) 0;
-        s -> witnesstransition[f->tempindex] = (Transition *) 0;
+        s -> witness[f -> tempindex] = NULL;
+        s -> witnesstransition[f->tempindex] = NULL;
         return;
         }
         check(s,((untilformula *) f) ->hold);
@@ -901,8 +901,8 @@ void check(State * s, formula * f) {
         {
           s->value[f->index] = false;
           s->known[f->index] = true;
-          s -> witness[f -> tempindex] = (State *) 0;
-          s -> witnesstransition[f->tempindex] = (Transition *) 0;
+          s -> witness[f -> tempindex] = NULL;
+          s -> witnesstransition[f->tempindex] = NULL;
           return;
         }
         searchAU(s,((untilformula *) f) );
@@ -937,7 +937,7 @@ stubbornfirelist(s,f->element);
 #else
 firelist();
 #endif
-  CurrentState -> checkparent[f->tempindex] = (State *) 0;
+  CurrentState -> checkparent[f->tempindex] = NULL;
   CurrentState -> checkdfs[f->tempindex] = CurrentState -> checkmin[f->tempindex] = 0;
   
   // process marking until returning from initial state
@@ -1084,14 +1084,14 @@ firelist();
     {
       State * tmp;
       tmp = tarjanroot;
-      tarjanroot -> witness[f->tempindex] = (State *) 0;
+      tarjanroot -> witness[f->tempindex] = NULL;
       if(tarjanroot == tarjanroot ->checknexttar[f->tempindex])
       { 
-        tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+        tarjanroot -> checknexttar[f->tempindex] = NULL;
         break;
       }
       tarjanroot = tarjanroot -> checknexttar[f -> tempindex];
-      tmp -> checknexttar[f -> tempindex] = (State *) 0;
+      tmp -> checknexttar[f -> tempindex] = NULL;
     }
     }
     // return to previous state
@@ -1110,7 +1110,7 @@ firelist();
       }
     else
       {
-    CurrentState = (State *) 0;
+    CurrentState = NULL;
             }
   }
     }
@@ -1134,11 +1134,11 @@ firelist();
     tarjanroot -> value[f->index] = true;
     if(tarjanroot == tarjanroot -> checknexttar[f->tempindex])
     { 
-      tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+      tarjanroot -> checknexttar[f->tempindex] = NULL;
       break;
     }
     tarjanroot = tarjanroot -> checknexttar[f->tempindex];
-    tmp -> checknexttar[f->tempindex] = (State *) 0;
+    tmp -> checknexttar[f->tempindex] = NULL;
         }
      }
 }
@@ -1168,8 +1168,8 @@ void searchAX(State * s,unarytemporalformula * f) {
     if(!(s->value[f->element->index]))
     {
       s -> value[f->index] = false;
-      s -> witness[f->tempindex] = (State *) 0;
-      s -> witnesstransition[f->tempindex] = (Transition *) 0;
+      s -> witness[f->tempindex] = NULL;
+      s -> witnesstransition[f->tempindex] = NULL;
     }
     }
     return;
@@ -1231,8 +1231,8 @@ void searchEX(State * s,unarytemporalformula * f) {
     if(s->value[f->element->index])
     {
       s -> value[f->index] = true;
-      s -> witness[f->tempindex] = (State *) 0;
-      s -> witnesstransition[f->tempindex] = (Transition *) 0;
+      s -> witness[f->tempindex] = NULL;
+      s -> witnesstransition[f->tempindex] = NULL;
     }
     }
     return;
@@ -1293,7 +1293,7 @@ void searchAG(State * s,unarytemporalformula * f) {
 #else
   firelist();
 #endif
-  CurrentState -> checkparent[f->tempindex] = (State *) 0;
+  CurrentState -> checkparent[f->tempindex] = NULL;
   CurrentState -> checkdfs[f->tempindex] = CurrentState -> checkmin[f->tempindex] = 0;
   
   // process marking until returning from initial state
@@ -1438,14 +1438,14 @@ firelist();
     {
       State * tmp;
       tmp = tarjanroot;
-      tarjanroot -> witness[f->tempindex] = (State *) 0;
+      tarjanroot -> witness[f->tempindex] = NULL;
       if(tarjanroot == tarjanroot -> checknexttar[f->tempindex])
       {
-        tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+        tarjanroot -> checknexttar[f->tempindex] = NULL;
         break;
       }
       tarjanroot = tarjanroot -> checknexttar[f -> tempindex];
-      tmp -> checknexttar[f -> tempindex] = (State *) 0;
+      tmp -> checknexttar[f -> tempindex] = NULL;
     }
     }
     // return to previous state
@@ -1464,7 +1464,7 @@ firelist();
       }
     else
       {
-    CurrentState = (State *) 0;
+    CurrentState = NULL;
             }
   }
     }
@@ -1488,11 +1488,11 @@ firelist();
     tarjanroot -> value[f->index] = false;
     if(tarjanroot == tarjanroot -> checknexttar[f->tempindex])
     { 
-      tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+      tarjanroot -> checknexttar[f->tempindex] = NULL;
       break;
     }
     tarjanroot = tarjanroot -> checknexttar[f->tempindex];
-    tmp -> checknexttar[f->tempindex] = (State *) 0;
+    tmp -> checknexttar[f->tempindex] = NULL;
         }
      }
 }
@@ -1523,7 +1523,7 @@ void searchEU(State * s, untilformula * f) {
 #else
   firelist();
 #endif
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   s -> checkdfs[f -> tempindex] = s -> checkmin[f->tempindex] = currentdfsnum;
   currentdfsnum++;
   s->checkcurrent[f->tempindex] = 0;
@@ -1776,14 +1776,14 @@ void searchEU(State * s, untilformula * f) {
         {
           State * tmp;
           tmp = tarjanroot;
-          tarjanroot -> witness[f->tempindex] = (State *) 0;
+          tarjanroot -> witness[f->tempindex] = NULL;
           if(tarjanroot == tarjanroot -> checknexttar[f->tempindex])
           {
-            tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+            tarjanroot -> checknexttar[f->tempindex] = NULL;
             break;
           }
           tarjanroot = tarjanroot -> checknexttar[f->tempindex];
-          tmp -> checknexttar[f->tempindex] = (State *) 0;
+          tmp -> checknexttar[f->tempindex] = NULL;
         }
       }
       // return to previous state
@@ -1827,11 +1827,11 @@ void searchEU(State * s, untilformula * f) {
       tarjanroot -> value[f->index] = true;
       if(tarjanroot == tarjanroot -> checknexttar[f->tempindex]) 
       {
-        tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+        tarjanroot -> checknexttar[f->tempindex] = NULL;
         break;
       }
       tarjanroot = tarjanroot -> checknexttar[f->tempindex];
-      tmp -> checknexttar[f->tempindex] = (State *) 0;
+      tmp -> checknexttar[f->tempindex] = NULL;
     }
   }
 }
@@ -1863,16 +1863,16 @@ void futuresearchAU(State * s, untilformula * f) {
   s -> checksucc[f->tempindex] = new State * [f -> tempcard];
   for(i=0;i<f -> tempcard;i++)
   {
-    s -> checksucc[f->tempindex][i] = (State *) 0;
+    s -> checksucc[f->tempindex][i] = NULL;
   }
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   s -> checkdfs[f -> tempindex] = s -> checkmin[f->tempindex] = currentdfsnum++;
   s->checkcurrent[f->tempindex] = 0;
   if(!(s->checkfirelist[f->tempindex]) || !(s->checkfirelist[f->tempindex][0]))
   {
     found = true;
-    s->witness[f->tempindex] = (State *) 0;
-    s->witnesstransition[f->tempindex] = (Transition *) 0;
+    s->witness[f->tempindex] = NULL;
+    s->witnesstransition[f->tempindex] = NULL;
   }
   else
   {
@@ -1978,9 +1978,9 @@ void futuresearchAU(State * s, untilformula * f) {
                 {
                   // deadlock  -> counterexample found!
                   found = 1;
-                  NewState -> witness[f->tempindex] = (State *) 0;
+                  NewState -> witness[f->tempindex] = NULL;
                   CurrentState -> witnesstransition[f->tempindex]
-                  =  (Transition *) 0;
+                  =  NULL;
                   CurrentState -> witness[f->tempindex] = NewState;
                   CurrentState -> witnesstransition[f->tempindex]
                   =  CurrentState -> checkfirelist[f->tempindex]
@@ -1993,7 +1993,7 @@ void futuresearchAU(State * s, untilformula * f) {
                 NewState -> checksucc[f->tempindex] = new State * [f -> tempcard];
                 for(i=0;i<f -> tempcard;i++)
                 {
-                  NewState -> checksucc[f->tempindex][i] = (State *) 0;
+                  NewState -> checksucc[f->tempindex][i] = NULL;
                 }
                 NewState -> checkdfs[f->tempindex]
                 = NewState -> checkmin[f->tempindex]
@@ -2072,9 +2072,9 @@ void futuresearchAU(State * s, untilformula * f) {
               {
                 // deadlock  -> counterexample found!
                 found = 1;
-                NewState -> witness[f->tempindex] = (State *) 0;
+                NewState -> witness[f->tempindex] = NULL;
                 CurrentState -> witnesstransition[f->tempindex]
-                =  (Transition *) 0;
+                =  NULL;
                 CurrentState -> witness[f->tempindex] = NewState;
                 CurrentState -> witnesstransition[f->tempindex]
                 =  CurrentState -> checkfirelist[f->tempindex]
@@ -2087,7 +2087,7 @@ void futuresearchAU(State * s, untilformula * f) {
               NewState -> checksucc[f->tempindex] = new State * [f -> tempcard];
               for(i=0;i<f -> tempcard;i++)
               {
-                NewState -> checksucc[f->tempindex][i] = (State *) 0;
+                NewState -> checksucc[f->tempindex][i] = NULL;
               }
               NewState -> checkcurrent[f->tempindex] = 0;
               //NewState -> checknexttar[f->tempindex] =
@@ -2176,14 +2176,14 @@ void futuresearchAU(State * s, untilformula * f) {
           //{
           //  State * tmp;
           //  tmp = tarjanroot;
-          //  tarjanroot -> witness[f->tempindex] = (State *) 0;
+          //  tarjanroot -> witness[f->tempindex] = NULL;
           //  if(tarjanroot == tarjanroot -> checknexttar[f->tempindex])
           //  {
-          //    tarjanroot -> checknexttar[f->tempindex] = (State *) 0;
+          //    tarjanroot -> checknexttar[f->tempindex] = NULL;
           //    break;
           //  }
           //  tarjanroot = tarjanroot -> checknexttar[f->tempindex];
-          //  tmp -> checknexttar[f->tempindex] = (State *) 0;
+          //  tmp -> checknexttar[f->tempindex] = NULL;
           //}
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // unlink scc and check it for counterexample sc sets
@@ -2261,11 +2261,11 @@ void futuresearchAU(State * s, untilformula * f) {
       tarjanroot -> value[f->index] = true;
       if(tarjanroot == tarjanroot -> checknexttar[f->tempindex]) 
       {
-        tarjanroot -> checkprevtar[f->tempindex] = (State *) 0;
+        tarjanroot -> checkprevtar[f->tempindex] = NULL;
         break;
       }
       tarjanroot = tarjanroot -> checkprevtar[f->tempindex];
-      tmp -> checkprevtar[f->tempindex] = tmp -> checknexttar[f->tempindex]= (State *) 0;
+      tmp -> checkprevtar[f->tempindex] = tmp -> checknexttar[f->tempindex]= NULL;
     }
   }
 }
@@ -2288,7 +2288,7 @@ void searchAU(State * s, untilformula * f) {
   firelist();
 #endif
   s->checkcurrent[f->tempindex] = 0;
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   
   while(CurrentState)
   {
@@ -2489,7 +2489,7 @@ void searchAF(State * s, unarytemporalformula * f) {
   firelist();
 #endif
   s -> checkcurrent[f->tempindex] = 0;
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   
   while(CurrentState)
   {
@@ -2650,7 +2650,7 @@ void searchEG(State * s, unarytemporalformula * f) {
   firelist();
 #endif
   s -> checkcurrent[f->tempindex] = 0;
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   s -> checkdfs[f -> tempindex] = s -> checkmin[f->tempindex] = 0;
   
   while(CurrentState)
@@ -2812,15 +2812,15 @@ void futuresearchAF(State * s, unarytemporalformula * f) {
   firelist();
 #endif
   s -> checkcurrent[f->tempindex] = 0;
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   s->value[f->index] = false;
   s->known[f->index] = true;
   
   if(!(s->checkfirelist[f->tempindex]) || !(s->checkfirelist[f->tempindex][0]))
   {
     found = true;
-    s->witness[f->tempindex] = (State *) 0;
-    s->witnesstransition[f->tempindex] = (Transition *) 0;
+    s->witness[f->tempindex] = NULL;
+    s->witnesstransition[f->tempindex] = NULL;
   }
   else
   {
@@ -2899,8 +2899,8 @@ void futuresearchAF(State * s, unarytemporalformula * f) {
                 // deadlock --> counterex found!
                 found = true;
                 CurrentState -> witness[f->tempindex] = NewState;
-                NewState -> witness[f->tempindex] = (State *) 0;
-                NewState -> witnesstransition[f->tempindex] = (Transition *) 0;
+                NewState -> witness[f->tempindex] = NULL;
+                NewState -> witnesstransition[f->tempindex] = NULL;
                 CurrentState -> witnesstransition[f->tempindex]
                  = CurrentState -> checkfirelist[f->tempindex]
                  [CurrentState -> checkcurrent[f->tempindex]];
@@ -2954,8 +2954,8 @@ void futuresearchAF(State * s, unarytemporalformula * f) {
               // deadlock --> counterex found!
               found = true;
               CurrentState -> witness[f->tempindex] = NewState;
-                NewState -> witness[f->tempindex] = (State *) 0;
-                NewState -> witnesstransition[f->tempindex] = (Transition *) 0;
+                NewState -> witness[f->tempindex] = NULL;
+                NewState -> witnesstransition[f->tempindex] = NULL;
               CurrentState -> witnesstransition[f->tempindex]
                = CurrentState -> checkfirelist[f->tempindex]
                [CurrentState -> checkcurrent[f->tempindex]];
@@ -3020,7 +3020,7 @@ void futuresearchEG(State * s, unarytemporalformula * f) {
   firelist();
 #endif
   s -> checkcurrent[f->tempindex] = 0;
-  s -> checkparent[f->tempindex] = (State *) 0;
+  s -> checkparent[f->tempindex] = NULL;
   s -> checkdfs[f -> tempindex] = s -> checkmin[f->tempindex] = 0;
   s->value[f->index] = true;
   s->known[f->index] = true;
@@ -3028,8 +3028,8 @@ void futuresearchEG(State * s, unarytemporalformula * f) {
   if(!(s->checkfirelist[f->tempindex]) || !(s->checkfirelist[f->tempindex][0]))
   {
     found = true;
-    s->witness[f->tempindex] = (State *) 0;
-    s->witnesstransition[f->tempindex] = (Transition *) 0;
+    s->witness[f->tempindex] = NULL;
+    s->witnesstransition[f->tempindex] = NULL;
   }
   else
   {

@@ -51,7 +51,7 @@ unsigned int Rescounter; // next free entry in Reserve
 					}\
 				}\
 	(X)->instubborn = StubbornStamp;\
-	(X)->NextStubborn = (Transition *) 0;\
+	(X)->NextStubborn = NULL;\
 	if((X) -> StartOfStubbornList)\
         {\
                 (X) -> EndOfStubbornList -> NextStubborn = (X);\
@@ -80,7 +80,7 @@ Transition * closure()
 			stubbinsert(current->mustbeincluded[i]);
 		}
 	}
-	return (Transition *) 0;
+	return NULL;
 }
 	
 Transition * insert_down(formula *);
@@ -134,12 +134,12 @@ Transition * insert_up(formula *f)
 		   {
 			if(tt = insert_up(((booleanformula *) f)->sub[i])) return tt;
 		   }
-		   return(Transition*) 0;
+		   return NULL;
 	case neg:  return(insert_down(((unarybooleanformula *) f) ->sub));
 		   break;
 	default:   cout << "feature not implemented\n";
 	}
-	return (Transition *) 0;
+	return NULL;
 }
 
 Transition * insert_down(formula *f)
@@ -191,12 +191,12 @@ Transition * insert_down(formula *f)
 		   {
 			if(tt = insert_down(((booleanformula *) f)->sub[i])) return tt;
 		   }
-		   return(Transition *) 0;
+		   return NULL;
 	case neg:  return(insert_up(((unarybooleanformula *) f) ->sub));
 		   break;
         default:   cout << "feature not implemented\n";
 	}
-	return(Transition*) 0;
+	return NULL;
 }
 #endif
 
@@ -213,7 +213,7 @@ Transition * GetFullTransition()
 	}
 	else
 	{
-	t= (Transition *) 0;
+	t= NULL;
 	}
 	delete [] fl;
 	return(t);
@@ -225,7 +225,7 @@ Transition * GetStubbornTransition()
 {
  	Transition * t;
 
-	Transitions[0]->StartOfStubbornList = (Transition *) 0;
+	Transitions[0]->StartOfStubbornList = NULL;
 	StubbornStamp++;
 	Rescounter = 0;
 	if(t = insert_up(F)) return t;
@@ -236,7 +236,7 @@ Transition * GetStubbornTransition()
 	}
 	else
 	{
-		return(Transition *) 0;
+		return NULL;
 	}
 }
 #endif
@@ -306,7 +306,7 @@ void find_path()
 	// 4. optimize formula
 	// 4.1. create, for all places, list of propositions mentioning place
 	// Pass 1 count;
-	F->parent = (formula *) 0;
+	F->parent = NULL;
 		for(x=0;x<HASHSIZE;x++)
 		{
 			globalhashcounter[x]=0;
@@ -341,8 +341,8 @@ void find_path()
 #endif
 		}
 		Transitions[0]->StartOfEnabledList = Transitions[0];
-		Transitions[Transitions[0]->cnt -1]->NextEnabled = (Transition*) 0;
-		Transitions[0]->PrevEnabled = (Transition *) 0;
+		Transitions[Transitions[0]->cnt -1]->NextEnabled = NULL;
+		Transitions[0]->PrevEnabled = NULL;
 		for(x=0;x<Transitions[0]->cnt;x++)
 		{
 			Transitions[x]->check_enabled();

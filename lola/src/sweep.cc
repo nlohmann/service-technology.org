@@ -284,7 +284,7 @@ int sweep()
 		exit(3);
 	}
 	cout << "\n Formula with\n" << F -> card << " subformula.\n";
-	F -> parent = (formula *) 0;
+	F -> parent = NULL;
 	if(F -> initatomic())
 	{
 		cout << "\nstate found!\n";
@@ -331,12 +331,12 @@ int sweep()
 	}
 	for(i=0;i<ProgressSpan;i++)
 	{
-		CurrentSweep[i] = CurrentSweep[ProgressSpan + i] = CurrentSweep[2 * ProgressSpan + i] = (binDecision *) 0;
+		CurrentSweep[i] = CurrentSweep[ProgressSpan + i] = CurrentSweep[2 * ProgressSpan + i] = NULL;
 		BucketSize[i] = BucketSize[ProgressSpan + i] = BucketSize[2 * ProgressSpan + i] = 0;
 		if(!MonotoneProgress) 
 		{
-			OldPersistent[i] = (binDecision *) 0;
-			currentpending[i] = nextpending[i] = (pendinglist *) 0;
+			OldPersistent[i] = NULL;
+			currentpending[i] = nextpending[i] = NULL;
 			pendingtail[i] = nextpending + i;
 		}
 	}
@@ -636,7 +636,7 @@ back:                           fl[currentfired] -> backfire();
 		if(ZeroProgress) 
 		{
 			binDeleteAll(SameValue);
-			SameValue = (binDecision *) 0;
+			SameValue = NULL;
 			CurrentMemUse -= NrSame; NrSame = 0;
 		}
 		//print_sweep("Processed Same Value");
@@ -656,14 +656,14 @@ back:                           fl[currentfired] -> backfire();
 						{
 							pendinglist * last = new pendinglist;
 							last -> content = CurrentSweep[opposite + i];
-							last -> next = (pendinglist *) 0;
+							last -> next = NULL;
 							last -> value = ProgressValueHigh - 2;
 							last -> size = BucketSize[opposite + i];
 							setpersistentbit(last -> content);
 							* (pendingtail[i]) = last;
 							pendingtail[i] = &(last -> next);
 						}
-						CurrentSweep[opposite + i] = (binDecision *) 0;
+						CurrentSweep[opposite + i] = NULL;
 						NrBehind -= BucketSize[opposite + i];
 						BucketSize[opposite + i] = 0;
 					}
@@ -684,7 +684,7 @@ back:                           fl[currentfired] -> backfire();
 					}
 					else
 					{
-						CurrentSweep[opposite + i] = (binDecision *) 0;
+						CurrentSweep[opposite + i] = NULL;
 						BucketSize[opposite + i] = 0;
 					}
 				}
@@ -726,14 +726,14 @@ back:                           fl[currentfired] -> backfire();
 						{
 							pendinglist * last = new pendinglist;
 							last -> content = CurrentSweep[opposite + i];
-							last -> next = (pendinglist *) 0;
+							last -> next = NULL;
 							last -> value = ProgressValueHigh - 2;
 							last -> size = BucketSize[opposite + i];
 							setpersistentbit(last -> content);
 							* (pendingtail[i]) = last;
 							pendingtail[i] = &(last -> next);
 						}
-						CurrentSweep[opposite + i] = (binDecision *) 0;
+						CurrentSweep[opposite + i] = NULL;
 						NrBehind -= BucketSize[opposite + i];
 						BucketSize[opposite + i] = 0;
 					}

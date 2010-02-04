@@ -58,10 +58,6 @@ StoredKnowledge::_stats StoredKnowledge::stats;
 std::map<const StoredKnowledge*, std::pair<unsigned int, unsigned int> > StoredKnowledge::tarjanMapping;
 
 
-#define MINIMUM(X, Y) ((X) < (Y) ? (X) : (Y))
-#define MAXIMUM(X, Y) ((X) > (Y) ? (X) : (Y))
-
-
 /********************
  * STATIC FUNCTIONS *
  ********************/

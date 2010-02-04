@@ -45,4 +45,7 @@
 #define FOREACH(I,C) for(__typeof((C).begin()) I=((C).begin()); I != (C).end(); ++I)
 
 
+#define MINIMUM(X, Y) ((X) < (Y) ? (X) : (Y))
+#define MAXIMUM(X, Y) ((X) > (Y) ? (X) : (Y))
+
 #endif

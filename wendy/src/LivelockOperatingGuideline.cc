@@ -40,12 +40,6 @@ unsigned int LivelockOperatingGuideline::maxDFS = 0;
 extern gengetopt_args_info args_info;
 
 
-/*! \todo put all these helpers in another file, or check if they are really
-          faster than std::max and std::min */
-#define MINIMUM(X, Y) ((X) < (Y) ? (X) : (Y))
-#define MAXIMUM(X, Y) ((X) > (Y) ? (X) : (Y))
-
-
 /********************
  * STATIC FUNCTIONS *
  ********************/

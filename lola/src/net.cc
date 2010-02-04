@@ -125,9 +125,7 @@ void checkMaximalStates(unsigned int states) {
 
 
 
-inline void garbagecollection()
-{
-}
+inline void garbagecollection() {}
 
 void findcyclingtransitions();
 void myown_newhandler()
@@ -339,8 +337,15 @@ void processCommandLine(int argc, char **argv) {
 
   // set output filename for "-r" option
   if (args_info.resultFile_given) {
-    resultfile = fopen("result.res", "w");
-    assert(resultfile);
+    if (args_info.resultFile_arg) {
+      resultfile = fopen(args_info.resultFile_arg, "w");
+    } else {
+      resultfile = fopen((string(netbasename) + ".result").c_str(), "w");
+    }
+    if(!resultfile) {
+      fprintf(stderr, "lola: could not create result file\n");
+      exit(4);
+    }
   }
 
   // release memory
@@ -373,359 +378,369 @@ int main(int argc, char ** argv){
 
   // 0. eigenen New-Handler installieren
   try {
-  set_new_handler(&myown_newhandler);
-  reserve = new char[10000];
-  garbagefound = 0;
+    set_new_handler(&myown_newhandler);
+    reserve = new char[10000];
+    garbagefound = 0;
 
-  // 1. Fileoptionen holen und auswerten
-  processCommandLine(argc, argv);
+    // 1. Fileoptionen holen und auswerten
+    processCommandLine(argc, argv);
 
-	if (hflg)
-	  reportconfiguration();
+    if (hflg)
+      reportconfiguration();
 
-  // 2. Initialisierung
-  NonEmptyHash = 0;
-  try {
+    // 2. Initialisierung
+    NonEmptyHash = 0;
+    try {
 #ifdef DISTRIBUTE
-	if(!init_communication()) _exit(6);
-	rapport("initializing");
+      if(!init_communication()) _exit(6);
+      rapport("initializing");
 #else
 #ifdef BITHASH
-  BitHashTable = new unsigned int [ HASHSIZE];
+      BitHashTable = new unsigned int [ HASHSIZE];
 #else
 #ifndef SWEEP
-  binHashTable = new binDecision * [HASHSIZE];
+      binHashTable = new binDecision * [HASHSIZE];
 #endif
 #endif
 #endif
-	}
-	catch(overflow)
-	{
-    fprintf(stderr, "lola: hash table too large\n");
+    }
+    catch(overflow)
+    {
+      fprintf(stderr, "lola: hash table too large\n");
 #ifdef DISTRIBUTE
-		end_communication();
+      end_communication();
 #endif
-		_exit(2);
-	}
+      _exit(2);
+    }
 #ifndef DISTRIBUTE
-  for(i=0;i < HASHSIZE;i++)
-  {
+    for(i=0;i < HASHSIZE;i++)
+    {
 #ifdef BITHASH
-	  BitHashTable[i] = 0;
+      BitHashTable[i] = 0;
 #else
 #ifndef SWEEP
-          binHashTable[i] = NULL;
+      binHashTable[i] = NULL;
 #endif
 #endif
     }
 #endif
-	try{
-		PlaceTable = new SymbolTab(65536);
-		TransitionTable = new SymbolTab(65536);
-	}
-	catch(overflow)
-	{
-		//write(2,mess,sizeof(mess));
-    fprintf(stderr, "lola: not enough space to read net\n");
-#ifdef DISTRIBUTE
-		end_communication();
-#endif
-		_exit(2);
-	}
-  try{
-#ifdef DISTRIBUTE
-	  rapport("reading net");
-#endif
-	  readnet();
-	  removeisolated();
-#ifdef DISTRIBUTE
-	StateLength = Places[0]->cnt;
-	MaxComponentValue = CAPACITY;
-#endif
-     }
-  catch(overflow)
-  {
-	//write(2,mess,sizeof(mess));
-    fprintf(stderr, "lola: not enough space to store net\n");
-#ifdef DISTRIBUTE
-		end_communication();
-#endif
-	_exit(2);
-  }
-  delete PlaceTable;
-  delete TransitionTable;
-unsigned int j;
-  for(j=0; j < Places[0]->cnt;j++)
+    try{
+      PlaceTable = new SymbolTab(65536);
+      TransitionTable = new SymbolTab(65536);
+    }
+    catch(overflow)
     {
+    //write(2,mess,sizeof(mess));
+      fprintf(stderr, "lola: not enough space to read net\n");
+#ifdef DISTRIBUTE
+      end_communication();
+#endif
+      _exit(2);
+    }
+    try{
+
+#ifdef DISTRIBUTE
+      rapport("reading net");
+#endif
+
+      // read the Petri net
+      readnet();
+
+      // remove isolated nodes from the net
+      removeisolated();
+
+#ifdef DISTRIBUTE
+      StateLength = Places[0]->cnt;
+      MaxComponentValue = CAPACITY;
+#endif
+    }
+    catch(overflow) {
+      fprintf(stderr, "lola: not enough space to store net\n");
+#ifdef DISTRIBUTE
+      end_communication();
+#endif
+      _exit(2);
+    }
+
+    delete PlaceTable;
+    delete TransitionTable;
+    unsigned int j;
+
+    for(j=0; j < Places[0]->cnt; ++j) {
       Places[j] -> set_hash(rand());
     }
 #ifndef STATESPACE
-  cout << Places[0]->cnt << " Places\n";
-  cout << Transitions[0]->cnt << " Transitions\n";
+    cout << Places[0]->cnt << " Places\n";
+    cout << Transitions[0]->cnt << " Transitions\n";
 #endif
-  Places[0]->NrSignificant = Places[0]->cnt;
-
+    Places[0]->NrSignificant = Places[0]->cnt;
 
 
 #ifdef SYMMETRY
-  try{
-	if(SYMMINTEGRATION == 1 || SYMMINTEGRATION == 3)
-	{
+    try{
+      if(SYMMINTEGRATION == 1 || SYMMINTEGRATION == 3) {
 #ifdef DISTRIBUTE
-		rapport("computing symmetries");
+        rapport("computing symmetries");
 #endif
-		ComputeSymmetries();
-	}
-	else
-	{
+        ComputeSymmetries();
+      } else {
 #ifdef DISTRIBUTE
-		rapport("computing partition w.r.t. symmetries");
+        rapport("computing partition w.r.t. symmetries");
 #endif
-		ComputePartition();
-	}
-  for(i=0;i<Places[0]->cnt;i++)
-  {
-	Places[i]-> index = i;
+        ComputePartition();
+      }
+
+      for(i=0; i<Places[0]->cnt; ++i) {
+        Places[i]-> index = i;
         CurrentMarking[i] = Places[i]->initial_marking;
-  }
-  for(i=0;i<Transitions[0]->cnt;i++)
-  {
-	Transitions[i]->enabled = false;
-  }
-  for(i=0;i<Transitions[0]->cnt;i++)
-  {
-	Transitions[i]->initialize();
-  }
-  for(i=0;i<Transitions[0]->cnt;i++)
-  {
-	Transitions[i]->PrevEnabled = (i == 0 ? NULL : Transitions[i-1]);
-	Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? NULL : Transitions[i+1]);
-	Transitions[i]->enabled = true;
-  }
-  Transitions[0]->StartOfEnabledList = Transitions[0];
-  Transitions[0]->NrEnabled = Transitions[0]->cnt;
-  for(i=0;i<Transitions[0]->cnt;i++)
-  {
-	Transitions[i]->check_enabled();
-  }
+      }
+
+      for(i=0; i<Transitions[0]->cnt; ++i) {
+        Transitions[i]->enabled = false;
+      }
+
+      for(i=0; i<Transitions[0]->cnt; ++i) {
+        Transitions[i]->initialize();
+      }
+
+      for(i=0; i<Transitions[0]->cnt; ++i) {
+        Transitions[i]->PrevEnabled = (i == 0 ? NULL : Transitions[i-1]);
+        Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? NULL : Transitions[i+1]);
+        Transitions[i]->enabled = true;
+      }
+      
+      Transitions[0]->StartOfEnabledList = Transitions[0];
+      Transitions[0]->NrEnabled = Transitions[0]->cnt;
+      
+      for(i=0; i<Transitions[0]->cnt; ++i) {
+        Transitions[i]->check_enabled();
+      }
+
 #ifdef PREDUCTION
 #ifdef DISTRIBUTE
-	rapport("investigating place invariants");
+      rapport("investigating place invariants");
 #endif
-	psolve();
-	// close significant bit upwards, since we cannot permute places after
-	// symmetry calculation
-	i = Places[0]->cnt - 1;
-	while(1)
-	{
-		if(Places[i]->significant) break;
-		if(i == 0) break;
-		i--;
-	}
-	for(h=0;h<i;h++)
-	{
-		Places[h]->significant = true;
-	}
-	Places[0]->NrSignificant = h+1;
-	// If we did not find a significant place, we set the number to 0 anyway
-	// to avoid subsequent problems.
-	if (Places[0]->NrSignificant) {
-        Places[0]->NrSignificant = 1;
-	}
-	cout << "\n" << Places[0]->NrSignificant << " significant places\n";
-#endif
+      psolve();
 
-  }
-  catch(overflow)
-  {
-	  //write(2,mess,sizeof(mess));
-    fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
-    fprintf(stderr, "      try again without use of symmetries!\n");
-#ifdef DISTRIBUTE
-		end_communication();
+      // close significant bit upwards, since we cannot permute places after
+      // symmetry calculation
+      i = Places[0]->cnt - 1;
+      while(1) {
+        if(Places[i]->significant) break;
+        if(i == 0) break;
+        i--;
+      }
+
+      for(h=0; h<i; ++h) {
+        Places[h]->significant = true;
+      }
+      Places[0]->NrSignificant = h+1;
+      // If we did not find a significant place, we set the number to 0 anyway
+      // to avoid subsequent problems.
+      if (Places[0]->NrSignificant) {
+        Places[0]->NrSignificant = 1;
+      }
+      cout << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
-	_exit(2);
-  }
+    }
+    catch(overflow) {
+      fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
+      fprintf(stderr, "      try again without use of symmetries!\n");
+#ifdef DISTRIBUTE
+      end_communication();
+#endif
+      _exit(2);
+    }
 #else
 #ifdef PREDUCTION
 #ifdef DISTRIBUTE
-	rapport("investigating place invariants");
+    rapport("investigating place invariants");
 #endif
-	psolve();
-	// sort places according to significance. This must not happen in the presence of
-	// symmetry reduction since places have been sorted by discretion of the symmetry
-	// calculation algorithm and subsequent procedure depend on that order.
-	for(i=0, h = Places[0]->cnt;;i++,h--)
-	{
-		Place * tmpPlace;
-		while(i < Places[0]->cnt && Places[i]->significant) i++;
-		if(i >= Places[0]->cnt) break;
-		while(h > 0 && ! (Places[h-1]->significant)) h--;
-		if(h <= 0) break;
-		if(h <= i) break;
-		tmpPlace = Places[h-1];
-		Places[h-1] = Places[i];
-		Places[i] = tmpPlace;
-	}
-	Places[0]->NrSignificant = i;
-	cout << "\n" << Places[0]->NrSignificant << " significant places\n";
+    psolve();
+    // sort places according to significance. This must not happen in the presence of
+    // symmetry reduction since places have been sorted by discretion of the symmetry
+    // calculation algorithm and subsequent procedure depend on that order.
+    for(i=0, h = Places[0]->cnt;;i++,h--) {
+      Place * tmpPlace;
+      while(i < Places[0]->cnt && Places[i]->significant) i++;
+      if(i >= Places[0]->cnt) break;
+      while(h > 0 && ! (Places[h-1]->significant)) h--;
+      if(h <= 0) break;
+      if(h <= i) break;
+      tmpPlace = Places[h-1];
+      Places[h-1] = Places[i];
+      Places[i] = tmpPlace;
+    }
+    Places[0]->NrSignificant = i;
+    cout << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
-  for(j=0;j<Places[0]->cnt;j++)
-  {
-	Places[j]-> index = j;
-        CurrentMarking[j] = Places[j]->initial_marking;
-  }
-  for(j=0;j<Transitions[0]->cnt;j++)
-  {
-	Transitions[j]->enabled = false;
-  }
-  for(j=0;j<Transitions[0]->cnt;j++)
-  {
-	Transitions[j]->initialize();
-  }
-  for(j=0;j<Transitions[0]->cnt;j++)
-  {
-	Transitions[j]->PrevEnabled = (j == 0 ? NULL : Transitions[j-1]);
-	Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? NULL : Transitions[j+1]);
- 	Transitions[j]->enabled = true;
-  }
-  Transitions[0]->StartOfEnabledList = Transitions[0];
-  Transitions[0]->NrEnabled = Transitions[0]->cnt;
-  for(j=0;j<Transitions[0]->cnt;j++)
-  {
-	Transitions[j]->check_enabled();
-  }
+    for(j=0; j<Places[0]->cnt; ++j) {
+      Places[j]-> index = j;
+      CurrentMarking[j] = Places[j]->initial_marking;
+    }
+
+    for(j=0; j<Transitions[0]->cnt; ++j) {
+      Transitions[j]->enabled = false;
+    }
+
+    for(j=0; j<Transitions[0]->cnt; ++j) {
+      Transitions[j]->initialize();
+    }
+
+    for(j=0; j<Transitions[0]->cnt; ++j) {
+      Transitions[j]->PrevEnabled = (j == 0 ? NULL : Transitions[j-1]);
+      Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? NULL : Transitions[j+1]);
+      Transitions[j]->enabled = true;
+    }
+
+    Transitions[0]->StartOfEnabledList = Transitions[0];
+    Transitions[0]->NrEnabled = Transitions[0]->cnt;
+
+    for(j=0; j<Transitions[0]->cnt; ++j) {
+      Transitions[j]->check_enabled();
+    }
 #endif
+
 #if defined(CYCLE) || defined(STRUCT)
-	tsolve();
-	for(i=0;i<Transitions[0]->cnt;i++)
-	{
-		if(Transitions[i]->cyclic)
-		{
-			cout << Transitions[i]->name << endl;
-		}
-	}
+    tsolve();
+    for(i=0; i<Transitions[0]->cnt; ++i) {
+      if(Transitions[i]->cyclic) {
+        cout << Transitions[i]->name << endl;
+      }
+    }
 #endif
-  unsigned int ii;
-  for(ii=0;ii < Transitions[0]->cnt;ii++)
-  {
-	Transitions[ii]->check_enabled();
-  }
-  for(ii=0;ii < Places[0]->cnt;ii++)
-  {
-	CurrentMarking[ii] = Places[ii]->initial_marking;
-	Places[ii]->index = ii;
-  }
+
+    unsigned int ii;
+    for(ii=0; ii < Transitions[0]->cnt; ++ii) {
+      Transitions[ii]->check_enabled();
+    }
+    for(ii=0; ii < Places[0]->cnt; ++ii) {
+      CurrentMarking[ii] = Places[ii]->initial_marking;
+      Places[ii]->index = ii;
+    }
+
 #ifdef LTLPROP
-	print_buchi();
+    print_buchi();
 #endif
-  if(Nflg) { printnet(); printpnml();}
-  if(nflg)
-  {
-	ofstream lownetstream(lownetfile);
-	if(!lownetstream)
-	{
-    fprintf(stderr, "lola: cannot open net output file '%s'\n", lownetfile);
-    fprintf(stderr, "      no output written\n");
+
+    // print nets to stdout or file
+    if(Nflg) {
+      printnet();
+      printpnml();
     }
-	else
-	{
-		printnettofile(lownetstream);
-	}
-	ofstream pnmlstream(pnmlfile);
-	if(!pnmlstream)
-	{
-    fprintf(stderr, "lola: cannot open net output file '%s'\n", pnmlfile);
-    fprintf(stderr, "      no output written\n");
+    if(nflg) {
+      ofstream lownetstream(lownetfile);
+      if(!lownetstream) {
+        fprintf(stderr, "lola: cannot open net output file '%s'\n", lownetfile);
+        fprintf(stderr, "      no output written\n");
+      } else {
+        printnettofile(lownetstream);
+      }
+      ofstream pnmlstream(pnmlfile);
+      if(!pnmlstream) {
+        fprintf(stderr, "lola: cannot open net output file '%s'\n", pnmlfile);
+        fprintf(stderr, "      no output written\n");
+      } else {
+        printpnmltofile(pnmlstream);
+      }
     }
-	else
-	{
-		printpnmltofile(pnmlstream);
-	}
-  }
+
 #ifdef DISTRIBUTE
-        SignificantLength = Places[0] -> NrSignificant;
-	if(!init_storage()) _exit(6);
+    SignificantLength = Places[0] -> NrSignificant;
+    if(!init_storage()) _exit(6);
 #endif
-  for(j=0,BitVectorSize = 0;j<Places[0]->NrSignificant;j++)
-  {
-        BitVectorSize += Places[j]->nrbits;
-  }
+
+    for(j=0,BitVectorSize = 0; j<Places[0]->NrSignificant; ++j) {
+      BitVectorSize += Places[j]->nrbits;
+    }
+
 #ifdef WITHFORMULA
-	if(F)
-	{
-		checkstart = new unsigned int[F->card+5];
-		for(i=0;i<F->card;i++)
-		{
-			checkstart[i] = 0;
-		}
-	}
+    if(F) {
+      checkstart = new unsigned int[F->card+5];
+      for(i=0;i<F->card; ++i) {
+        checkstart[i] = 0;
+      }
+    }
 #endif
 
 
-	try{
+    try{
 //siphontrapproperty();
+
 #ifdef NONE
-	return 0;
+      return EXIT_SUCCESS;
 #endif
+
 #ifdef STATESPACE
-	return compute_scc();
+      return compute_scc();
 #endif
+
 #ifdef SWEEP
-	return 1 - sweep();
-	exit(888);
+      return 1 - sweep();
+      exit(888);
 #endif
+
 #ifdef MODELCHECKING
 #ifdef STUBBORN
-  sortscapegoats();
+      sortscapegoats();
 #endif
-return modelcheck();
+      return modelcheck();
 #endif
+
 #if defined(LIVEPROP) && defined(TWOPHASE)
-return liveproperty();
+      return liveproperty();
 #endif
+
 #ifdef REVERSIBILITY
-return reversibility();
+      return reversibility();
 #endif
+
 #if defined(HOME) && defined(TWOPHASE)
-return home();
+      return home();
 #endif
+
 #ifdef FINDPATH
-find_path();
-return 0;
+      find_path();
+      return 0;
 #endif
+
 #ifdef DISTRIBUTE
-	int vvv;
-	switch(MyRole)
-	{
-	case masterT:   rapport("starting breadth first search");
-			vvv = breadth_first();
-			end_communication();
-			return 1 - vvv;
-	case clientT:   rapport("starting depth first search");
-			vvv = depth_first();
-			end_communication();
-			return 1 - vvv;
-	case monitorT: return 0;
-	case dispatcherT: return 0;
-	}
+      int vvv;
+      switch(MyRole)
+      {
+        case masterT:   rapport("starting breadth first search");
+        vvv = breadth_first();
+        end_communication();
+        return 1 - vvv;
+        case clientT:   rapport("starting depth first search");
+        vvv = depth_first();
+        end_communication();
+        return 1 - vvv;
+        case monitorT: return 0;
+        case dispatcherT: return 0;
+      }
 #endif
+
 #ifndef MODELCHECKING
-return  1 - GRAPH();
+      return 1 - GRAPH();
 #endif
+
+    }
+    catch(overflow)
+    {
+      fprintf(stderr, "lola: memory exhausted\n");
+      _exit(2);
+    }
+  }
+  catch(overflow)
+  {
+    fprintf(stderr, "lola: memory exhausted\n");
+    _exit(2);
+  }
 }
-catch(overflow)
-{
-	fprintf(stderr, "lola: memory exhausted\n");
-	_exit(2);
-}
-}
-catch(overflow)
-{
-	fprintf(stderr, "lola: memory exhausted\n");
-	_exit(2);
-}
-}
+
+
+
 
 
 
@@ -735,35 +750,33 @@ catch(overflow)
  \note The places are actually copied to the end of the array "Places" and
        made unaccessible by decreasing the place count.
 */
-void removeisolated()
-{
+void removeisolated() {
   unsigned int i=0;
 #ifndef STATESPACE
-  while(i<Places[0]->cnt)
-  {
-    if(Places[i]->references == 0) // Place isolated
-    {
+  while(i<Places[0]->cnt) {
+    if(Places[i]->references == 0) { // Place isolated
       Place *p = Places[Places[0]->cnt - 1];
       Places[Places[0]->cnt - 1] = Places[i];
       Places[i] = p;
-      Places[0]->cnt --;
+      --(Places[0]->cnt);
     }
-    else
-    {
-      i++;
+    else {
+      ++i;
     }
   }
 #endif
-  for(i=0;i<Transitions[0]->cnt;i++)
-  {
+  for(i=0; i<Transitions[0]->cnt; ++i) {
     Transitions[i]->nr = i;
   }
 }
 
 
+
+
+
 #ifdef CYCLE
-void findcyclingtransitions()
-{
+
+void findcyclingtransitions() {
 	// depth first search for cycles in net
  	// use Node::parent pointer as stack, pos[0] = current succ, pos[1] for status info
 	// 0 - never seen, 1 - on stack, 2 - explored, x+4 - already selected as cyclic

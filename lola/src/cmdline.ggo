@@ -92,7 +92,10 @@ option "automorphisms" y
 
 option "resultFile" r
   ""
-  flag off
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
 
 section "Used Configuration Output"
 option "userconfig" h

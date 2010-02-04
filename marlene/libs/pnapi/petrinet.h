@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-11-16 15:27:08 +0100 (Mo, 16. Nov 2009) $
+ * \date    $Date: 2010-01-26 12:32:53 +0100 (Tue, 26 Jan 2010) $
  *
- * \version $Revision: 5027 $
+ * \version $Revision: 5305 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -29,6 +29,7 @@
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
+#include "interface.h"
 
 #ifndef CONFIG_PETRIFY
 #define CONFIG_PETRIFY "not found"
@@ -145,8 +146,8 @@ public:
  * \brief   A Petri net
  *
  * Class to represent Petri nets. The net consists of places of
- * class #Place, transitions of class #Transition and arcs of class
- * #Arc.
+ * class Place, transitions of class Transition and arcs of class
+ * Arc.
  */
 class PetriNet
 {
@@ -169,6 +170,9 @@ class PetriNet
 
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
+
+  /// Petri net output, see pnapi::io
+  friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
 
 public:
 
@@ -290,6 +294,8 @@ public:
 
   std::set<Place *> getInterfacePlaces(const std::string &) const;
 
+  const std::set<std::string> & getRoles() const;
+
   const std::set<Transition *> & getTransitions() const;
 
   const std::set<Arc *> & getArcs() const;
@@ -306,7 +312,8 @@ public:
   /*!
    * \name   Basic Structural Changes
    *
-   * Functions to add nodes (Node, Place, Transition) and arcs (Arc).
+   * Functions to add nodes (Node, Place, Transition), arcs (Arc)
+   * and interface, i.e. ports (Port) and labels (Label).
    */
   //@{
 
@@ -321,6 +328,27 @@ public:
   /// creates a Transition
   Transition & createTransition(const std::string & = "",
       const std::set<std::string> & = std::set<std::string>());
+
+  /// creates a Port
+  Port & createPort(const std::string &);
+
+  /// creates an input Label
+  Label & createInputLabel(const std::string &, const std::string &);
+
+  /// creates an input Label
+  Label & createInputLabel(const std::string &, Port * = NULL);
+
+  /// creates an output Label
+  Label & createOutputLabel(const std::string &, const std::string &);
+
+  /// creates an output Label
+  Label & createOutputLabel(const std::string &, Port * = NULL);
+
+  /// creates a synchronous Label
+  Label & createSynchronizeLabel(const std::string &, const std::string &);
+
+  /// creates a synchronous Label
+  Label & createSynchronizeLabel(const std::string &, Port * = NULL);
 
   //@}
 
@@ -340,6 +368,12 @@ public:
 
   /// checks the Petri net for being normalized
   bool isNormal() const;
+
+  /// checks whether a transition role name is specified
+  bool isRoleSpecified(std::string roleName) const;
+
+  /// returns true if role information is to be ignored
+  bool isIgnoringRoles() const;
 
   /// compose two nets by adding the given one and merging interfaces
   void compose(const PetriNet &, const std::string & = "net1",
@@ -381,11 +415,17 @@ public:
   /// adds a set of labels to the interface
   void addSynchronousLabels(const std::set<std::string> &);
 
+  /// adds a role
+  void addRole(std::string roleName);
+
   /// removes a label from the interface
   void removeSynchronousLabel(std::string);
 
   /// removes a set of labels from the interface
   void removeSynchronousLabels(const std::set<std::string> &);
+
+  /// suppresses role information
+  void removeRoles();
 
   /// sets labels (and translates references)
   void setConstraintLabels(const std::map<Transition *, std::set<std::string> > &);
@@ -438,12 +478,17 @@ private:
 
   /// ports (grouping of synchronous labels)
 
+  /// roles
+  std::set<std::string> roles_;
+
   /// all arcs
   std::set<Arc *> arcs_;
 
   /// all synchronous labels
   std::set<std::string> labels_;
 
+  /// complete interface
+  Interface interface_;
 
   /* general properties */
 
@@ -476,6 +521,9 @@ private:
   
   /// cache for reduction
   std::set<const Place *> * reducablePlaces_;
+
+  /// if true, role information is ignored
+  bool ignoreRoles_;
   
   /* structural changes */
 

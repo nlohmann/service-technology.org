@@ -104,12 +104,14 @@ private:
 };
 
 
+// hiding this from doxygen: \param   T An instance (class) of the BaseNode template.
 /*!
  * \brief   Generic Parser Capsule for flex/bison Parsers
- * \param   T An instance (class) of the BaseNode template.
  *
+ * \todo    this class (and the visitor class as well) may be broken and deprecated.
+ * 
  * All the functionality is provided by traditional C-style lexers and
- * parsers. To work with a parser, first call #parse() and then #visit().
+ * parsers. To work with a parser, call #parse().
  */
 template <typename T> class Parser
 {
@@ -159,7 +161,7 @@ public:
    */
   virtual void afterChildren(const T &) =0;
 
-  virtual ~Visitor() {};
+  virtual ~Visitor() {}
 };
 
 }
@@ -241,6 +243,14 @@ extern std::set<Place*> placeSet_;
 extern bool checkLabels_;
 /// wildcard ALL[_OTHER]_PLACES_EMPTY given
 extern bool wildcardGiven_;
+/// a Port object
+extern Port * o_port_;
+/// a Label object
+extern Label * label_;
+/// name -> Label
+extern std::map<std::string, Label *> o_labels_;
+/// label type
+extern Label::Type labelType_;
 
 /*!
  * \brief   Encapsulation of the flex/bison OWFN parser
@@ -261,6 +271,98 @@ public:
   const PetriNet & parse(std::istream &);
 };
 }
+
+
+
+/*************************************************************************
+ ***** PNML Parser
+ *************************************************************************/
+
+
+/*!
+ * \brief   OWFN Parser
+ *
+ * Instantiation of the parser framework for parsing OWFN files.
+ */
+namespace pnml
+{
+
+/// flex generated lexer function
+int lex();
+
+/// flex generated lexer cleanup function
+int lex_destroy();
+
+/// bison generated parser function
+int parse();
+
+/// "assertion"
+void check(bool, const std::string &);
+
+/******************************************\
+ *  "global" variables for flex and bison *
+      \******************************************/
+
+/// generated petrinet
+extern PetriNet pnapi_pnml_yynet;
+/*
+/// mapping of names to places
+extern std::map<std::string, Place*> places_;
+/// recently read transition
+extern Transition* transition_;
+/// cache of synchronous labels
+extern std::set<std::string> synchronousLabels_;
+/// all purpose place pointer
+extern Place* place_;
+/// target of an arc
+extern Node * * target_;
+/// source of an arc
+extern Node * * source_;
+/// converts NUMBER and IDENT in string
+extern std::stringstream nodeName_;
+/// type of recently read places
+extern Node::Type placeType_;
+/// labels for synchronous communication
+extern std::set<std::string> labels_;
+/// read capacity
+extern int capacity_;
+/// used port
+extern std::string port_;
+/// constrains
+extern std::map<Transition*, std::set<std::string> > constrains_;
+/// whether read marking is the initial marking or a final marking
+extern bool markInitial_;
+/// pointer to a final marking
+extern Marking* finalMarking_;
+/// preset/postset label for parse exception
+extern bool placeSetType_;
+/// precet/postset for fast checks
+extern std::set<Place*> placeSet_;
+/// whether to check labels
+extern bool checkLabels_;
+/// wildcard ALL[_OTHER]_PLACES_EMPTY given
+extern bool wildcardGiven_;
+*/
+/*!
+ * \brief   Encapsulation of the flex/bison OWFN parser
+ *
+ * Connects to the flex/bison implementation for parsing.
+ */
+class Parser
+{
+public:
+  Parser();
+  /// used to call clean() automaticly
+  ~Parser();
+
+  /// cleans global net
+  void clean();
+
+  /// parses stream contents with the associated parser
+  const PetriNet & parse(std::istream &);
+};
+}
+
 
 
 
@@ -369,8 +471,8 @@ int parse();
 /*!
  * \brief   Encapsulation of the flex/bison ONWD parser
  *
- * Connects to the flex/bison implementation for parsing (#parse()) and
- * result retrieval (#visit()). Call the two functions in this order.
+ * Connects to the flex/bison implementation for parsing (parse()) and
+ * result retrieval (visit()). Call the two functions in this order.
  */
 class Parser : public parser::Parser<Node>
 {
@@ -705,8 +807,6 @@ BaseNode<T>::BaseNode(T * node) :
 
   /*!
    * \brief   constructor to be used in derived classes (framework instances)
-   * \param   flexStream  a reference to a pointer variable holding the input
-   *                      stream the lexer will use during scanning
    * \param   parseResult a reference to a pointer variable that will contain
    *                      the resulting AST after parsing
    * \param   yaccParse   pointer to the parse() function of the bison parser
@@ -729,7 +829,7 @@ BaseNode<T>::BaseNode(T * node) :
    * \param   is  an input stream
    * \return the current parser instance
    *
-   * The resulting AST can be traversed using the #visit() function.
+   * The resulting AST can be traversed using the visit() function.
    */
   template <typename T> T & Parser<T>::parse(std::istream & is)
   {

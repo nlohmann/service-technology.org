@@ -17,11 +17,11 @@ candy = @CANDY@
 
 # Providing the binary for Petrify result in nices controller
 
-petrify = @PETRIFY@
+petrify = '"@PETRIFY@"'
 
 # Providing the binary for Petrify result in nices controller
 
-genet = @GENET@
+genet = '"@GENET@"'
 
 # Wendy needs to create a temporary file to pass it to LoLA. The filename
 # Wendy should use can be specified below. The filename should end with

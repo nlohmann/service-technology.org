@@ -1,3 +1,7 @@
+/*!
+ * \file  automaton.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -30,7 +34,7 @@ namespace pnapi
  * The result of the constructor is an emty automaton.
  */
 Automaton::Automaton() :
-  edgeLabels_(NULL), edgeTypes_(NULL), net_(NULL), hashTable_(NULL), weights_(NULL), counter_(0)
+  edgeLabels_(NULL), edgeTypes_(NULL), weights_(NULL), net_(NULL), hashTable_(NULL), counter_(0)
   {
   /* do nothing */
   }
@@ -126,9 +130,10 @@ Automaton::Automaton(PetriNet &net) :
  */
 Automaton::Automaton(const Automaton &a) :
   input_(a.input_), output_(a.output_),
-  labels_(a.labels_), counter_(a.counter_),
+  labels_(a.labels_),
   edgeLabels_(NULL), edgeTypes_(NULL),
-  weights_(NULL), hashTable_(NULL)
+  weights_(NULL), hashTable_(NULL),
+  counter_(a.counter_)
   {
   map<const Place*, const Place*> placeMap;
 
@@ -214,8 +219,8 @@ State & Automaton::createState()
  * If there exists a state with the given name, this state will
  * be returned.
  *
- * \param     const unsigned int name.
- * \return    State &s .. the newly created state.
+ * \param     name the name of the state
+ * \return    the newly created state
  */
 State & Automaton::createState(const unsigned int name)
 {
@@ -233,10 +238,9 @@ State & Automaton::createState(const unsigned int name)
  * A state will be added to the set of states. This state is based on
  * a given marking, which is needed to calculate the state's hash value.
  *
- * \param     Marking &m
- * \param     const std::string name
+ * \param     m the given marking
  *
- * \return    State &s .. the newly created state
+ * \return    the newly created state
  */
 State & Automaton::createState(Marking &m)
 {

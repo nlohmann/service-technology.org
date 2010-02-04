@@ -48,7 +48,8 @@ AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(CANDY, [candy], [])
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
 AC_PATH_PROG(DIFF, [diff], not found)
-AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], "not_found")
+
+AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then
   AC_MSG_WARN([Petrify was not found. See file README.])
   AC_DEFINE(CONFIG_PETRIFY, "not found", [Petrify was not found.])
@@ -58,10 +59,10 @@ fi
 AC_SUBST(PETRIFY)
 
 
-AC_PATH_PROGS(GENET, [genet], not_found)
-if test "$GENET" = "not_found"; then
+AC_PATH_PROGS(GENET, [genet], not found)
+if test "$GENET" = "not found"; then
   AC_MSG_WARN([GENET not found. See file README.])
-  AC_DEFINE(CONFIG_GENET, "not_found", [Genet was not found.])
+  AC_DEFINE(CONFIG_GENET, "not found", [Genet was not found.])
 else
   AC_DEFINE_UNQUOTED(CONFIG_GENET, "${GENET}", [Genet can be used.])
 fi
@@ -69,21 +70,20 @@ AC_SUBST(GENET)
 
 
 # only use installed Petri Net API if this was configured with --enable-pnapi
-AC_ARG_ENABLE(pnapi,
-  AS_HELP_STRING([--enable-pnapi],[use installed Petri Net API (disabled by default)]),
-  enable_pnapi=${enableval}, enable_pnapi="no")
+AC_ARG_WITH(pnapi,
+  AS_HELP_STRING([--without-pnapi],[do not use installed version of the Petri Net API]),
+  [], [with_pnapi=yes]
+)
+# Check whether the PNAPI is present and we can link against it.
+AC_CHECK_LIB(pnapi, main)
+AC_LANG([C++])
+AC_CHECK_LIB(pnapi, libpnapi_is_present)
 AC_MSG_CHECKING([whether to use installed Petri Net API])
-AC_MSG_RESULT($enable_pnapi)
-if test "$enable_pnapi" = "yes"; then
-  # check if the Petri Net API is already installed
-  AM_MISSING_PROG(PKG_CONFIG, pkg-config)
-  AC_CHECK_LIB(pnapi, main)
-  if test "${ac_cv_lib_pnapi_main}" = "no"; then
-    AC_MSG_WARN([Petri Net API was not found!])
-    AC_MSG_WARN([Using shiped version from /libs/pnapi.])
-  fi
-  AM_CONDITIONAL(COMPILE_PNAPI, [test "${ac_cv_lib_pnapi_main}" = "no"])
+if test "x$with_pnapi" != xno -a "${ac_cv_lib_pnapi_main}" = "yes" -a "${ac_cv_lib_pnapi_libpnapi_is_present}" = "yes"; then
+  AC_MSG_RESULT([yes])
+  AM_CONDITIONAL(COMPILE_PNAPI, [false])
 else
+  AC_MSG_RESULT([no])
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
 
@@ -105,9 +105,9 @@ AC_MSG_CHECKING([weather to be sunny])
 AC_MSG_RESULT([better should be])
 
 # Checks for header files.
-AC_FUNC_ALLOCA
+#AC_FUNC_ALLOCA
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
+#AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
 
 # allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT
@@ -120,23 +120,23 @@ AH_BOTTOM([#ifdef __cplusplus
 
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_INLINE
-AC_TYPE_INT16_T
-AC_TYPE_INT32_T
-AC_TYPE_INT8_T
-AC_TYPE_SIZE_T
-AC_TYPE_UINT16_T
-AC_TYPE_UINT32_T
-AC_TYPE_UINT8_T
+#AC_HEADER_STDBOOL
+#AC_C_INLINE
+#AC_TYPE_INT16_T
+#AC_TYPE_INT32_T
+#AC_TYPE_INT8_T
+#AC_TYPE_SIZE_T
+#AC_TYPE_UINT16_T
+#AC_TYPE_UINT32_T
+#AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
 #AC_FUNC_MALLOC
 #AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memset strchr strcspn strdup strspn strtol])
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Marlene cannot use UNIX pipes.]))
-AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
+#AC_CHECK_FUNCS([memset strchr strcspn strdup strspn strtol])
+#AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Marlene cannot use UNIX pipes.]))
+#AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
 
 
 

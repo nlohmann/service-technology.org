@@ -297,7 +297,10 @@ const pnapi::PetriNet * Adapter::buildController()
     time(&start_time);
     delete _controller;
 
-    if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "not_found") // && _contType == ASYNCHRONOUS)
+    status("Path to petrify %s", args_info.petrify_arg);
+    status("Path to genet %s", args_info.genet_arg);
+
+    if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "\"not found\"") // && _contType == ASYNCHRONOUS)
 
     {
         status("Using Petrify for conversion from SA to open net.");
@@ -306,7 +309,7 @@ const pnapi::PetriNet * Adapter::buildController()
         _controller = new pnapi::PetriNet(*mpp_sa);
     }
     else
-    if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "not_found") // && _contType == ASYNCHRONOUS)
+    if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "\"not found\"") // && _contType == ASYNCHRONOUS)
 
     {
         status("Using Genet for conversion from SA to open net.");

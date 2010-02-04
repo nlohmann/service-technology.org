@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 
 /*!
- * \file    petrinode.h
+ * \file    component.h
  *
  * \brief   Nodes and Arcs for Petri nets
  *
@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
+ * \date    $Date: 2010-01-25 11:30:16 +0100 (Mon, 25 Jan 2010) $
  *
- * \version $Revision: 4827 $
+ * \version $Revision: 5299 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -56,8 +56,20 @@ class Node
 
 public:
 
-  /// node types (communication)
-  enum Type { INTERNAL, INPUT, OUTPUT, INOUT };
+  /*!
+   * \brief node communication types 
+   */
+  enum Type
+  {
+    /// internal places or transitions only connected to internal places
+    INTERNAL,
+    /// input places or transitions only connected to internal or input places
+    INPUT,
+    /// output places or transitions only connected to internal or output places
+    OUTPUT,
+    /// transitions connected with both input and output places
+    INOUT 
+  };
 
   /// constructor
   Node(PetriNet &, util::ComponentObserver &, const std::string &, Type);
@@ -178,6 +190,12 @@ public:
 
   /// get transition cost
   int getCost() const;
+ 
+  /// add role
+  void addRole(std::string role_name);
+
+  /// get roles
+  std::set<std::string> getRoles() const;
 
   /// help method for normalize method
   bool isNormal() const;
@@ -201,9 +219,11 @@ private:
   /// transition cost
   int cost_;
 
+  /// roles
+  std::set<std::string> roles_;
+
   /// synchronize labels
   std::set<std::string> labels_;
-
 
   /// no standard copying!
   Transition(const Transition &);
@@ -233,6 +253,9 @@ public:
 
   /// returns the number of tokens lying on this place
   unsigned int getTokenCount() const;
+
+  /// sets the number of tokens lying on this place
+  void setTokenCount(unsigned int);
 
   /// returns the capacity
   unsigned int getCapacity() const;
@@ -296,7 +319,7 @@ private:
  * \brief   arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel
- * (n1,n2) has n1 as #source and n2 as #target.
+ * (n1,n2) has n1 as source and n2 as target.
  */
 class Arc
 {

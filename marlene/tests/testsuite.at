@@ -6,8 +6,8 @@ m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_CANDY, [AT_CHECK([if test "CANDY" == ""; then exit 77; fi])])
 m4_define(AT_CHECK_VALGRIND, [AT_CHECK([if test "VALGRIND" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_DIFF, [AT_CHECK([if test "DIFF" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not_found"; then exit 77; fi])])
-m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not_found"; then exit 77; fi])])
+m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
 #m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 
 AT_TESTED(versions.sh)
@@ -36,7 +36,7 @@ AT_BANNER([Small examples])
 AT_SETUP([Small test (synchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/sync1_exp.owfn .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose],0,stdout,ignore)
 #AT_CHECK_DIFF
@@ -47,7 +47,7 @@ AT_CLEANUP
 AT_SETUP([Small test (synchronous 2)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync2.ar TESTFILES/sync2_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --verbose],0,stdout,ignore)
 #AT_CHECK_DIFF
@@ -58,7 +58,7 @@ AT_CLEANUP
 AT_SETUP([Small test (synchronous 3)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/sync3_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --verbose],0,stdout,ignore)
 #AT_CHECK_DIFF
@@ -69,7 +69,7 @@ AT_CLEANUP
 AT_SETUP([Small test (asynchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/async1_exp.owfn .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --asyncif --verbose],0,stdout,ignore)
 #AT_CHECK_DIFF
@@ -80,7 +80,7 @@ AT_CLEANUP
 AT_SETUP([Small test (asynchronous 2)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync2.ar TESTFILES/async2_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --asyncif --verbose],0,stdout,ignore)
 #AT_CHECK_DIFF
@@ -91,7 +91,7 @@ AT_CLEANUP
 AT_SETUP([Small test (asynchronous 3)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/async3_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --asyncif --verbose],0,stdout,ignore)
 #AT_CHECK_DIFF
@@ -102,7 +102,7 @@ AT_CLEANUP
 AT_SETUP([Small test (no complement)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
 AT_CHECK([MARLENE test-n.owfn --rulefile=test-n.ar --nocomplementplaces --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "skipping creation of complementary places" stderr],0)
@@ -112,7 +112,7 @@ AT_CLEANUP
 AT_SETUP([Small test (piping)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
 AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --verbose < test-n.owfn > out.owfn],0,ignore,ignore)
 AT_KEYWORDS(sample)
@@ -121,7 +121,7 @@ AT_CLEANUP
 AT_SETUP([Small test (saving result)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
 AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --output=out.owfn --verbose < test-n.owfn],0,ignore,ignore)
 AT_CHECK([test -f out.owfn])
@@ -135,7 +135,7 @@ AT_BANNER([Special options])
 AT_SETUP([Verbose and very verbose information])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --veryverbose],0,ignore,ignore)
 AT_KEYWORDS(special)
@@ -144,7 +144,7 @@ AT_CLEANUP
 AT_SETUP([Do not remove temporary files])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --veryverbose --noClean],0,ignore,ignore)
 AT_KEYWORDS(special)
@@ -162,7 +162,7 @@ AT_BANNER([Special adapters])
 AT_SETUP([control of rules])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
@@ -171,7 +171,7 @@ AT_CLEANUP
 AT_SETUP([chatty adapter])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --chatty --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
@@ -180,18 +180,18 @@ AT_CLEANUP
 AT_SETUP([arrogant adapter])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --arrogant --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
 AT_SETUP([costs optimized adapter])
-#AT_XFAIL_IF(true)
+AT_XFAIL_IF(true)
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK_CANDY
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td_ret.owfn TESTFILES/td_ret.ar .])
 AT_CHECK([MARLENE ca1.owfn td_ret.owfn --rulefile=td_ret.ar --costoptimized --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
@@ -208,7 +208,7 @@ AT_CLEANUP
 AT_SETUP([controller only])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --controlleronly --verbose],0,ignore,ignore)
 AT_KEYWORDS(sample)
@@ -217,7 +217,7 @@ AT_CLEANUP
 AT_SETUP([adding prefixes to nets (1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn td.owfn --rulefile=td.ar --withprefix --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
@@ -226,7 +226,7 @@ AT_CLEANUP
 AT_SETUP([adding prefix to net (2)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE --rulefile=test.ar --withprefix --verbose < test.owfn],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
@@ -296,7 +296,7 @@ AT_BANNER([Infrastructure])
 AT_SETUP([Using own configuration file])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_DATA([my.conf],[verbose
 ])
@@ -308,7 +308,7 @@ AT_CLEANUP
 AT_SETUP([Using present configuration file])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_DATA([marlene.conf],[verbose
 ])
@@ -342,7 +342,7 @@ AT_CLEANUP
 AT_SETUP([Determining runtime and allocated memory])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --verbose --stats],0,ignore,stderr)
 AT_CHECK([GREP -q "runtime" stderr])
@@ -403,7 +403,7 @@ AT_CLEANUP
 AT_SETUP([cannot write to output file])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-AT_CHECK_PETRIFY
+#AT_CHECK_PETRIFY
 AT_CHECK([MKDIR temptest])
 AT_CHECK([chmod 400 temptest])
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])

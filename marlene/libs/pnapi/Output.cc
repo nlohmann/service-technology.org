@@ -17,6 +17,9 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+/*!
+ * \file  Output.cc
+ */
 
 #include <fstream>
 #include <cstdio>
@@ -35,7 +38,7 @@ namespace pnapi
 {
 namespace util
 {
-const char* tmpFileTemplate = "/tmp/pnapi-XXXXXX";
+char* tmpFileTemplate = (char*)"/tmp/pnapi-XXXXXX";
 }
 }
 
@@ -51,49 +54,36 @@ using namespace pnapi::util;
  basename has to be used to avoid problems with path names.
  */
 Output::Output() :
-#if defined(__MINGW32__)
-  os(*(new std::ofstream(mktemp(temp = basename(strdup(tmpFileTemplate))), std::ofstream::out | std::ofstream::trunc))),
-#else
-  os(*(new std::ofstream(mktemp(temp = strdup(tmpFileTemplate)), std::ofstream::out | std::ofstream::trunc))),
-#endif 
+  os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
   filename(temp), kind("")
-  {
-  if (not os.good() or filename == "") 
-  {
-    //  abort(13, "could not create to temporary file '%s'", filename.c_str());
-    std::cerr << "PNAPI: could not create temporary file '" << filename << "'" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  // status("writing to temporary file '%s'", filename.c_str());
-  }
+{
+  // status("writing to temporary file '%s'", _cfilename_(filename));
+}
 
 /*!
  This constructor creates a file with the given filename. In case the
  filename matches "-", no file is created, but std::cout is used as output.
  */
-Output::Output(std::string& str, std::string kind) :
+Output::Output(const std::string& str, const std::string& kind) :
   os((!str.compare("-")) ?
       std::cout :
-  *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
+      *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
   ),
   filename(str), temp(NULL), kind(kind)
-  {
-  if (not os.good()) 
-  {
-    //  abort(11, "could not write to file '%s'", str.c_str());
-    std::cerr << "PNAPI: could not write to file '" << str << "'" << std::endl;
-    exit(EXIT_FAILURE);
+{
+  if (not os.good()) {
+      // abort(11, "could not write to file '%s'", _cfilename_(filename));
+      std::cerr << "PNAPI: could not write to file '" << filename << "'" << std::endl;
+      exit(EXIT_FAILURE);
   }
-
+  
   /*
   if (str.compare("-")) {
-      status("writing %s to file '%s'", kind.c_str(), filename.c_str());
+      status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
   } else {
-      status("writing %s to standard output", kind.c_str());
-  }
-   */
-  }
+      status("writing %s to standard output", _coutput_(kind));
+  } //*/
+}
 
 
 /**************
@@ -124,8 +114,7 @@ Output::~Output()
       {
           status("closed, but could not delete temporary file '%s'", filename.c_str());
       }
-    }
-     */
+    } //*/
     remove(filename.c_str());
     free(temp);
   }
@@ -140,7 +129,7 @@ Output::~Output()
  This implicit conversation operator allows to use Output objects like
  ostream streams.
  */
-Output::operator std::ostream&() {
+Output::operator std::ostream&() const {
   return os;
 }
 
@@ -155,4 +144,35 @@ std::string Output::name() const {
 
 std::ostream& Output::stream() const {
   return os;
+}
+
+/*!
+ This function creates a temporary file using mkstemp(). It uses the value
+ of the tmpfile parameter as template. In case of MinGW compilations, the
+ basename has to be used to avoid problems with path names.
+
+ \return name of already opened temp file
+
+ \note mkstemp already opens the temp file, so there is no need to check
+       whether the creation of the std::ofstream succeeded.
+*/
+char * Output::createTmp()
+{
+#ifdef __MINGW32__
+    temp = strdup(basename(tmpFileTemplate));
+    if (mktemp(temp) == NULL)
+    {
+      // abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
+      std::cerr << "could not create to temporary file '" << basename(tmpFileTemplate) << "'\n";
+      exit(EXIT_FAILURE);
+    };
+#else
+    temp = strdup(tmpFileTemplate);
+    if (mkstemp(temp) == -1) {
+      // abort(13, "could not create to temporary file '%s'", temp);
+      std::cerr << "could not create to temporary file '" << temp << "'\n";
+      exit(EXIT_FAILURE);
+    };
+#endif
+    return temp;
 }

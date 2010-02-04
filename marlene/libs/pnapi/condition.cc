@@ -1,3 +1,7 @@
+/*!
+ * \file  condition.cc
+ */
+
 #include "config.h"
 #include <cassert>
 
@@ -96,7 +100,7 @@ Condition::Condition() :
   }
 
 Condition::Condition(const Condition & c,
-                     const map<const Place *, const Place *> & places) :
+                     const std::map<const Place *, const Place *> & places) :
   formula_(c.formula().clone(&places))
 {
 }
@@ -112,7 +116,7 @@ const Formula & Condition::formula() const
 }
 
 void Condition::merge(const Condition & c,
-    const map<const Place *, const Place *> & placeMapping)
+    const std::map<const Place *, const Place *> & placeMapping)
 {
   Formula * f = c.formula().clone(&placeMapping);
   *this = formula() && *f;
@@ -159,9 +163,10 @@ void Condition::addProposition(const Proposition & p, bool conjunct)
 void Condition::addMarking(const Marking & m)
 {
   set<const Formula *> propositions;
-  for (map<const Place *, unsigned int>::const_iterator it = m.begin();
-        it != m.end(); ++it)
-    propositions.insert(new FormulaEqual(*it->first, it->second));
+  set<Place*> places = m.getPetriNet().getInternalPlaces();
+  
+  PNAPI_FOREACH(set<Place*>, places, p)
+    propositions.insert(new FormulaEqual(**p, m[**p]));
 
   if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
     *this = Conjunction(propositions, NULL);
@@ -179,7 +184,7 @@ std::set<const Place *> Condition::concerningPlaces() const
 }
 
 /*!
- * \breif removes a place recursively
+ * \brief removes a place recursively
  */
 void Condition::removePlace(const Place & p)
 {
@@ -237,4 +242,4 @@ void Condition::dnf()
   formula_ = tmp;
 }
 
-}
+} /* namespace pnapi */

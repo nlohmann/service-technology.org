@@ -4,13 +4,13 @@
  * \brief   Collection of exception classes
  *
  * \author  Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: niels $
+ *          last changes of: \$Author: cas $
  *
  * \since   2009-08-04
  *
- * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
+ * \date    $Date: 2010-01-22 00:23:39 +0100 (Fri, 22 Jan 2010) $
  *
- * \version $Revision: 4827 $
+ * \version $Revision: 5258 $
  */
 
 #include "config.h"
@@ -25,12 +25,12 @@ namespace pnapi
 namespace exceptions
 {
 
-GeneralException::GeneralException(string msg) : 
+GeneralException::GeneralException(std::string msg) : 
   msg_(msg)
   {
   }
 
-ComposeError::ComposeError(string msg) :
+ComposeError::ComposeError(std::string msg) :
   GeneralException(msg)
   {
   }

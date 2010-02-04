@@ -7,17 +7,19 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/11/11
  *
- * \date    $Date: 2009-10-14 11:30:09 +0200 (Mi, 14. Okt 2009) $
+ * \date    $Date: 2009-11-28 23:47:06 +0100 (Sat, 28 Nov 2009) $
  *
- * \version $Revision: 4827 $
+ * \version $Revision: 5104 $
  */
 
 #ifndef PNAPI_UTIL_H
 #define PNAPI_UTIL_H
+
+#define PNAPI_FOREACH(CLASS, INSTANCE, IDENT) for(CLASS::iterator IDENT = INSTANCE.begin(); IDENT != INSTANCE.end(); ++IDENT)
 
 #include <set>
 #include <string>

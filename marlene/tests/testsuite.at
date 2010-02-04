@@ -187,7 +187,6 @@ AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
 AT_SETUP([costs optimized adapter])
-AT_XFAIL_IF(true)
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK_CANDY

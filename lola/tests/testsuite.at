@@ -47,6 +47,60 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([File Output])
+############################################################################
+
+AT_SETUP([Graph output (-G)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -G],0,stdout,ignore)
+AT_CHECK([GREP -q "STATE *" stdout])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Graph output (-g)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -g],0,ignore,ignore)
+AT_CHECK([GREP -q "STATE *" phils.graph])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Graph output (-M)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -M],0,stdout,ignore)
+AT_CHECK([GREP -q "hl.10 : 1" stdout])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Graph output (-m)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -m],0,ignore,ignore)
+AT_CHECK([GREP -q "hl.10 : 1" phils.graph])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([State output (-S)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -S],0,stdout,ignore)
+AT_CHECK([GREP -q "hl.10 : 1" stdout])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([State output (-s)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -s],0,ignore,ignore)
+AT_CHECK([GREP -q "hl.10 : 1" phils.state])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Result output (-r)])
+AT_CHECK([cp TESTFILES/phils.lola .])
+AT_CHECK([LOLA_DEADLOCK phils.lola -r],0,ignore,ignore)
+AT_CHECK([GREP -q "deadlock:" phils.result])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([High-level Net Unfolding])
 ############################################################################
 
@@ -107,6 +161,7 @@ AT_CHECK([GREP -q "dead state found!" stdout],0)
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Limited State Space (lola-fulllimited)])
 ############################################################################
@@ -145,6 +200,7 @@ AT_CHECK([GREP -q "state found!" stdout],0)
 AT_KEYWORDS(statepredicate1)
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([CTL Model Checking (lola-modelchecking)])
 ############################################################################
@@ -157,6 +213,7 @@ AT_CHECK([GREP -q "result: false" stdout],0)
 AT_KEYWORDS(modelchecking)
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Liveprop (lola-liveprop)])
 ############################################################################
@@ -167,6 +224,7 @@ AT_CHECK([LOLA_LIVEPROP umlprocess.lola],1,stdout)
 AT_CHECK([GREP -q "predicate not live: not satisfiable beyond reported state" stdout],0)
 AT_KEYWORDS(liveprop)
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Boundedness Check (lola-boundednet)])

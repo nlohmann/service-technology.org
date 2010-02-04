@@ -218,6 +218,6 @@ void Graph::outputSA(std::ostream& file) {
     // print all nodes beginning from the root
     file << "\nNODES\n";
     map<Node*, bool> printed;
-    root->outputOG(file, printed, true);
+    root->outputSA(file, printed, true);
     printed.clear();
 }

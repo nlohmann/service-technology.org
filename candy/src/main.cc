@@ -184,7 +184,7 @@ int main(int argc, char** argv) {
     	if ( args_info.automata_given ) {
     		status("writing cost efficient service automata...");
     		Output out( outputFilename, "service automata" );
-			parsedOG->outputOG( out );
+			parsedOG->outputSA( out );
     	} else {
     		status("writing cost efficient operating guideline...");
     		Output out( outputFilename, "operating guideline" );

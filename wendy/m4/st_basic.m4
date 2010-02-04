@@ -2,11 +2,8 @@
 AC_DEFUN([AC_ST_BASIC],[
 
 # store the SVN revision number
-AC_CHECK_FILE([.svn],[
-  AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
-  AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])],
-  AC_DEFINE_UNQUOTED(VERSION_SVN, "not versioned", [The SVN revision.])
-)
+AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
+AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD

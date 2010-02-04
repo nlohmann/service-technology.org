@@ -16,8 +16,8 @@ Version 1.15-unreleased
   single file in the file format of libconfig (see
   `http://www.hyperrealm.com/libconfig')
 
-* first fixes of bug #12910 (`https://gna.org/bugs/?12910'): file output for
-  `-g' and `-m' parameter was broken
+* fixed bug #12910 (`https://gna.org/bugs/?12910'): file output for `-g' and
+  `-m' parameter was broken
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

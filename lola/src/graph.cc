@@ -348,6 +348,13 @@ void printincompletestates(State *s, ostream *graphstream, int level = 1) {
   printincompletestates(s->parent,graphstream,0);
 #endif
 #endif
+
+  // we return from initial call: clean up graph stream
+  if (level == 1) {
+    if (graphstream != &cout) {
+      delete graphstream;
+    }
+  }
 }
 
 
@@ -936,7 +943,6 @@ unsigned int depth_first() {
       printstate("",CurrentMarking);
       print_path(CurrentState);
       printincompletestates(CurrentState, graphstream);
-
       statistics(NrOfStates,Edges,NonEmptyHash);
       return 1;
    }
@@ -1818,7 +1824,7 @@ unsigned int depth_first() {
   if(isbounded) {
     cout << "\nnet is bounded!\n";
     if (resultfile) {
-      fprintf(resultfile, "\n  );\n};\nunbounded: {\n  result = false;\n};\n");
+      fprintf(resultfile, "unbounded: {\n  result = false;\n};\n");
     }
   } else {
     /// can this ever happen here?
@@ -1843,6 +1849,8 @@ unsigned int depth_first() {
 #endif
   statistics(NrOfStates,Edges,NonEmptyHash);
 
+  // tidy of the graph output stream, because we did not call
+  // printincompletestates()
   if (graphstream != &cout) {
     delete graphstream;
   }
@@ -2015,6 +2023,7 @@ for(i=0;i<Transitions[0]->cnt;i++) Transitions[i]->check_enabled();
     printstate("",CurrentMarking);
     print_path(CurrentState);
     printincompletestates(CurrentState,graphstream);
+    if (graphstream != &cout) delete graphstream;
     statistics(NrOfStates,Edges,NonEmptyHash);
     return 1;
   }

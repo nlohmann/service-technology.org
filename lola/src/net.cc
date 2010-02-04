@@ -365,7 +365,7 @@ int main(int argc, char ** argv){
     printf("- platform:             %s\n", BUILDSYSTEM);
     printf("- config MPI:           %s\n", CONFIG_ENABLEMPI);
 #ifdef STANDARDCONFIG
-    printf("- chosen userconfig.H:  predefined\n", STANDARDCONFIG);
+    printf("- chosen userconfig.H:  predefined\n");
 #else
     printf("- chosen userconfig.H:  user-defined\n");
 #endif

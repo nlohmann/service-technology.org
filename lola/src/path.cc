@@ -63,7 +63,7 @@ unsigned int Rescounter; // next free entry in Reserve
         }\
 		}\
 }
-void printstate(char *, unsigned int *);
+void printstate(const char *, unsigned int *);
 unsigned int StubbornStamp;
 
 
@@ -300,7 +300,8 @@ void find_path()
 	hashcounter = new unsigned int [HASHSIZE+1];
 	globalhashcounter = new unsigned int [HASHSIZE+1];
 	// 3. new path
-	path = new (Transition *) [MAXPATH+1];
+// was like this, but did not compile:	path = new (Transition *)[MAXPATH+1];
+	path = new Transition *[MAXPATH+1];
 //otherpath = new (Transition *) [MAXPATH+1];
 
 	// 4. optimize formula

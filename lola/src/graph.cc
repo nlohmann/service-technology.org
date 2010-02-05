@@ -2976,12 +2976,14 @@ unsigned int compute_scc() {
   State * NewState;
 
   // init initial marking and hash table
-  if(gmflg) {
-    graphstream = new ofstream(graphfile);
-    if(graphstream->fail()) {
-      fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
-      fprintf(stderr, "      no output written\n");
-      _exit(4);
+  if(gmflg || GMflg) {
+    if (gmflg) {
+      graphstream = new ofstream(graphfile);
+      if(graphstream->fail()) {
+        fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
+        fprintf(stderr, "      no output written\n");
+        _exit(4);
+      }
     }
     if (GMflg) {
       graphstream = &std::cout;

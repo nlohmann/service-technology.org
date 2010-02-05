@@ -5,6 +5,7 @@ binaries:
 	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-statepredicate1
 	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-liveprop
 	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-boundednet
+	$(MAKE) $(AM_MAKEFLAGS) -s -C $(top_builddir) lola-statespace
 
 TESTSUITE = $(builddir)/testsuite
 EXTRA_DIST = testsuite.at wrap.sh \

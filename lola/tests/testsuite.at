@@ -278,3 +278,18 @@ AT_CHECK([LOLA_BOUNDEDNET unbounded.lola],0,stdout)
 AT_CHECK([GREP -q "net is unbounded!" stdout],0)
 AT_KEYWORDS(boundednet)
 AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Regression Tests])
+############################################################################
+
+AT_SETUP([Bug 15282 (https://gna.org/bugs/?15282)])
+AT_CHECK([cp TESTFILES/bug15282.lola .])
+AT_CHECK([LOLA_STATESPACE bug15282.lola -M],0,stdout)
+AT_CHECK([GREP -q "STATE 2 Lowlink: 2" stdout],0)
+AT_KEYWORDS(bugs)
+AT_CLEANUP
+
+
+

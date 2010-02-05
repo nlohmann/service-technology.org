@@ -10,6 +10,7 @@
 #include "OperatingGuideline.h"
 #include "cmdline.h"
 #include "Output.h"
+#include "verbose.h"
 #include <pnapi/pnapi.h>
 
 using std::cerr;
@@ -212,9 +213,9 @@ int main(int argc, char** argv)
 		A->calculateBitSets(GlobalLabels);
 
 		if (A->isMatching(*C)) 
-			cout << "\nObjective completed\n" << endl;
+			message("Objective completed");
 		else
-			cout << "\nObjective failed\n" << endl;
+			message("Objective failed");
 
 		delete A;
 		delete C;
@@ -229,15 +230,15 @@ int main(int argc, char** argv)
 		
 		if (args_info.simulation_flag) {
 			if (A->isSimulation(*B))
-				cout << "\nObjective completed\n" << endl;
+				message("Objective completed");
 			else
-				cout << "\nObjective failed\n" << endl;
+				message("Objective failed");
 		}
 		else {
 			if (A->isEquivalent(*B))
-				cout << "\nObjective completed\n" << endl;
+				message("Objective completed");
 			else
-				cout << "\nObjective failed\n" << endl;
+				message("Objective failed");
 		}
 		
 		delete A;

@@ -26,7 +26,7 @@ AC_CONFIG_TESTDIR(tests)
 
 # store the SVN revision number
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
-AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
+AC_DEFINE_UNQUOTED(VERSION_SVN, "\"${VERSION_SVN}\"", [The SVN revision.])
 
 # allow the configure script to control assertions (just include config.h)
 AC_HEADER_ASSERT

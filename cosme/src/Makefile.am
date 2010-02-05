@@ -10,7 +10,8 @@ cosme_SOURCES = og-syntax.yy og-lexic.ll \
               Service.cc Service.h\
               RBTreeStack.cc RBTreeStack.h \
               cmdline.c cmdline.h \
-              Output.cc Output.h
+              Output.cc Output.h \
+              verbose.cc verbose.h
 
 cosme_CPPFLAGS = -I$(top_srcdir)/libs
 cosme_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a

@@ -23,106 +23,106 @@ AT_BANNER([Matching])
 
 AT_SETUP([AP])
 AT_CHECK([cp TESTFILES/matching/AP.og TESTFILES/matching/AP-partner.owfn .])
-AT_CHECK([COSME --matching -a AP.og -c AP-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a AP.og -c AP-partner.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([auctionService])
 AT_CHECK([cp TESTFILES/matching/auctionService.og TESTFILES/matching/auctionService-partner.owfn .])
-AT_CHECK([COSME --matching -a auctionService.og -c auctionService-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a auctionService.og -c auctionService-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([BH])
 AT_CHECK([cp TESTFILES/matching/BH.og TESTFILES/matching/BH-partner.owfn .])
-AT_CHECK([COSME --matching -a BH.og -c BH-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a BH.og -c BH-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([CN])
 AT_CHECK([cp TESTFILES/matching/CN.og TESTFILES/matching/CN-partner.owfn .])
-AT_CHECK([COSME --matching -a CN.og -c CN-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a CN.og -c CN-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([DG])
 AT_CHECK([cp TESTFILES/matching/DG.og TESTFILES/matching/DG-partner.owfn .])
-AT_CHECK([COSME --matching -a DG.og -c DG-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a DG.og -c DG-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([loanApprovalProcess])
 AT_CHECK([cp TESTFILES/matching/loanApprovalProcess.og TESTFILES/matching/loanApprovalProcess-partner.owfn .])
-AT_CHECK([COSME --matching -a loanApprovalProcess.og -c loanApprovalProcess-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a loanApprovalProcess.og -c loanApprovalProcess-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([myCoffee])
 AT_CHECK([cp TESTFILES/matching/myCoffee.og TESTFILES/matching/myCoffee-partner.owfn .])
-AT_CHECK([COSME --matching -a myCoffee.og -c myCoffee-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a myCoffee.og -c myCoffee-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([phcontrol3.unf])
 AT_CHECK([cp TESTFILES/matching/phcontrol3.unf.og TESTFILES/matching/phcontrol3.unf-partner.owfn .])
-AT_CHECK([COSME --matching -a phcontrol3.unf.og -c phcontrol3.unf-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a phcontrol3.unf.og -c phcontrol3.unf-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([PO])
 AT_CHECK([cp TESTFILES/matching/PO.og TESTFILES/matching/PO-partner.owfn .])
-AT_CHECK([COSME --matching -a PO.og -c PO-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a PO.og -c PO-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([QR])
 AT_CHECK([cp TESTFILES/matching/QR.og TESTFILES/matching/QR-partner.owfn .])
-AT_CHECK([COSME --matching -a QR.og -c QR-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a QR.og -c QR-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([RE])
 AT_CHECK([cp TESTFILES/matching/RE.og TESTFILES/matching/RE-partner.owfn .])
-AT_CHECK([COSME --matching -a RE.og -c RE-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a RE.og -c RE-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([RS])
 AT_CHECK([cp TESTFILES/matching/RS.og TESTFILES/matching/RS-partner.owfn .])
-AT_CHECK([COSME --matching -a RS.og -c RS-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a RS.og -c RS-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([TR])
 AT_CHECK([cp TESTFILES/matching/TR.og TESTFILES/matching/TR-partner.owfn .])
-AT_CHECK([COSME --matching -a TR.og -c TR-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a TR.og -c TR-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([internal])
 AT_CHECK([cp TESTFILES/matching/internal.og TESTFILES/matching/internal_match.owfn .])
-AT_CHECK([COSME --matching -a internal.og -c internal_match.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a internal.og -c internal_match.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([interface_match])
 AT_CHECK([cp TESTFILES/matching/interface_match.og TESTFILES/matching/interface-partner.owfn .])
-AT_CHECK([COSME --matching -a interface_match.og -c interface-partner.owfn],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --matching -a interface_match.og -c interface-partner.owfn],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
@@ -140,78 +140,78 @@ AT_BANNER([Equivalence])
 
 AT_SETUP([AP])
 AT_CHECK([cp TESTFILES/simulation/AP.og TESTFILES/simulation/AP-pv.og .])
-AT_CHECK([COSME --equivalence -a AP.og -b AP-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a AP.og -b AP-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([BH])
 AT_CHECK([cp TESTFILES/simulation/BH.og TESTFILES/simulation/BH-pv.og .])
-AT_CHECK([COSME --equivalence -a BH.og -b BH-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a BH.og -b BH-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([branch])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_compact.og .])
-AT_CHECK([COSME --equivalence -a branch.og -b branch_compact.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a branch.og -b branch_compact.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([CN])
 AT_CHECK([cp TESTFILES/simulation/CN.og TESTFILES/simulation/CN-pv.og .])
-AT_CHECK([COSME --equivalence -a CN.og -b CN-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a CN.og -b CN-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([DG])
 AT_CHECK([cp TESTFILES/simulation/DG.og TESTFILES/simulation/DG-pv.og .])
-AT_CHECK([COSME --equivalence -a DG.og -b DG-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a DG.og -b DG-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([PO])
 AT_CHECK([cp TESTFILES/simulation/PO.og TESTFILES/simulation/PO-pv.og .])
-AT_CHECK([COSME --equivalence -a PO.og -b PO-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a PO.og -b PO-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([simple])
 AT_CHECK([cp TESTFILES/simulation/simple.og TESTFILES/simulation/simple_smaller_interface.og .])
-AT_CHECK([COSME --equivalence -a simple.og -b simple_smaller_interface.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a simple.og -b simple_smaller_interface.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([TR])
 AT_CHECK([cp TESTFILES/simulation/TR.og TESTFILES/simulation/TR-pv.og .])
-AT_CHECK([COSME --equivalence -a TR.og -b TR-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --equivalence -a TR.og -b TR-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_chopped])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_chopped.og .])
-AT_CHECK([COSME --equivalence -a branch.og -b branch_chopped.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --equivalence -a branch.og -b branch_chopped.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_compact_extend])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_compact_extend.og .])
-AT_CHECK([COSME --equivalence -a branch.og -b branch_compact_extend.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --equivalence -a branch.og -b branch_compact_extend.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_wrong_bits])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_wrong_bits.og .])
-AT_CHECK([COSME --equivalence -a branch.og -b branch_wrong_bits.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --equivalence -a branch.og -b branch_wrong_bits.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
@@ -222,169 +222,169 @@ AT_BANNER([Simulation])
 
 AT_SETUP([AP vs. AP-pv])
 AT_CHECK([cp TESTFILES/simulation/AP.og TESTFILES/simulation/AP-pv.og .])
-AT_CHECK([COSME --simulation -a AP.og -b AP-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a AP.og -b AP-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([AP-pv vs. AP])
 AT_CHECK([cp TESTFILES/simulation/AP.og TESTFILES/simulation/AP-pv.og .])
-AT_CHECK([COSME --simulation -b AP.og -a AP-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b AP.og -a AP-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([BH vs. BH-pv])
 AT_CHECK([cp TESTFILES/simulation/BH.og TESTFILES/simulation/BH-pv.og .])
-AT_CHECK([COSME --simulation -a BH.og -b BH-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a BH.og -b BH-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([BH-pv vs. BH])
 AT_CHECK([cp TESTFILES/simulation/BH.og TESTFILES/simulation/BH-pv.og .])
-AT_CHECK([COSME --simulation -b BH.og -a BH-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b BH.og -a BH-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_chopped])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_chopped.og .])
-AT_CHECK([COSME --simulation -b branch.og -a branch_chopped.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b branch.og -a branch_chopped.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_compact])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_compact.og .])
-AT_CHECK([COSME --simulation -a branch.og -b branch_compact.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a branch.og -b branch_compact.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch_compact vs. branch])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_compact.og .])
-AT_CHECK([COSME --simulation -b branch.og -a branch_compact.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b branch.og -a branch_compact.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_compact_extend])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_compact_extend.og .])
-AT_CHECK([COSME --simulation -a branch.og -b branch_compact_extend.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a branch.og -b branch_compact_extend.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch_chopped vs. branch_compact])
 AT_CHECK([cp TESTFILES/simulation/branch_chopped.og TESTFILES/simulation/branch_compact.og .])
-AT_CHECK([COSME --simulation -a branch_chopped.og -b branch_compact.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a branch_chopped.og -b branch_compact.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([CN vs. CN-pv])
 AT_CHECK([cp TESTFILES/simulation/CN.og TESTFILES/simulation/CN-pv.og .])
-AT_CHECK([COSME --simulation -a CN.og -b CN-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a CN.og -b CN-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([CN-pv vs. CN])
 AT_CHECK([cp TESTFILES/simulation/CN.og TESTFILES/simulation/CN-pv.og .])
-AT_CHECK([COSME --simulation -b CN.og -a CN-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b CN.og -a CN-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([DG vs. DG-pv])
 AT_CHECK([cp TESTFILES/simulation/DG.og TESTFILES/simulation/DG-pv.og .])
-AT_CHECK([COSME --simulation -a DG.og -b DG-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a DG.og -b DG-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([DG-pv vs. DG])
 AT_CHECK([cp TESTFILES/simulation/DG.og TESTFILES/simulation/DG-pv.og .])
-AT_CHECK([COSME --simulation -b DG.og -a DG-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b DG.og -a DG-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([PO vs. PO-pv])
 AT_CHECK([cp TESTFILES/simulation/PO.og TESTFILES/simulation/PO-pv.og .])
-AT_CHECK([COSME --simulation -a PO.og -b PO-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a PO.og -b PO-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([PO-pv vs. PO])
 AT_CHECK([cp TESTFILES/simulation/PO.og TESTFILES/simulation/PO-pv.og .])
-AT_CHECK([COSME --simulation -b PO.og -a PO-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b PO.og -a PO-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([simple vs. simple_smaller_interface])
 AT_CHECK([cp TESTFILES/simulation/simple.og TESTFILES/simulation/simple_smaller_interface.og .])
-AT_CHECK([COSME --simulation -a simple.og -b simple_smaller_interface.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a simple.og -b simple_smaller_interface.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([simple_smaller_interface vs. simple])
 AT_CHECK([cp TESTFILES/simulation/simple.og TESTFILES/simulation/simple_smaller_interface.og .])
-AT_CHECK([COSME --simulation -b simple.og -a simple_smaller_interface.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b simple.og -a simple_smaller_interface.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([TR vs. TR-pv])
 AT_CHECK([cp TESTFILES/simulation/TR.og TESTFILES/simulation/TR-pv.og .])
-AT_CHECK([COSME --simulation -a TR.og -b TR-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -a TR.og -b TR-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([TR-pv vs. TR])
 AT_CHECK([cp TESTFILES/simulation/TR.og TESTFILES/simulation/TR-pv.og .])
-AT_CHECK([COSME --simulation -b TR.og -a TR-pv.og],0,stdout)
-AT_CHECK([GREP -q "Objective completed" stdout])
+AT_CHECK([COSME --simulation -b TR.og -a TR-pv.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective completed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 
 AT_SETUP([branch vs. branch_chopped])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_chopped.og .])
-AT_CHECK([COSME --simulation -a branch.og -b branch_chopped.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --simulation -a branch.og -b branch_chopped.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch_compact_extend vs. branch])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_compact_extend.og .])
-AT_CHECK([COSME --simulation -b branch.og -a branch_compact_extend.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --simulation -b branch.og -a branch_compact_extend.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch vs. branch_wrong_bits])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_wrong_bits.og .])
-AT_CHECK([COSME --simulation -a branch.og -b branch_wrong_bits.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --simulation -a branch.og -b branch_wrong_bits.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch_wrong_bits vs. branch])
 AT_CHECK([cp TESTFILES/simulation/branch.og TESTFILES/simulation/branch_wrong_bits.og .])
-AT_CHECK([COSME --simulation -b branch.og -a branch_wrong_bits.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --simulation -b branch.og -a branch_wrong_bits.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP
 
 AT_SETUP([branch_compact vs. branch_chopped])
 AT_CHECK([cp TESTFILES/simulation/branch_chopped.og TESTFILES/simulation/branch_compact.og .])
-AT_CHECK([COSME --simulation -b branch_chopped.og -a branch_compact.og],0,stdout)
-AT_CHECK([GREP -q "Objective failed" stdout])
+AT_CHECK([COSME --simulation -b branch_chopped.og -a branch_compact.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Objective failed" stderr])
 AT_KEYWORDS(simulation)
 AT_CLEANUP

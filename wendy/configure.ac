@@ -20,7 +20,6 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # check for standard programs needed to compile
 AC_PROG_CXX
-AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
@@ -56,6 +55,6 @@ AC_CHECK_SIZEOF([void*])
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
-	doc/Doxyfile doc/Doxydetails man/Makefile tests/Makefile tests/package.m4])
+	doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

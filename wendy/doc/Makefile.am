@@ -2,7 +2,7 @@
 info_TEXINFOS = wendy.texi
 
 # any other files you need to add (images)
-EXTRA_DIST = toolpaper.pdf
+EXTRA_DIST = toolpaper.pdf extra_man
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 10
@@ -67,3 +67,28 @@ $(top_srcdir)/THEORY: $(PACKAGE).texi
 	$(AM_V_at)cat THEORY2.txt >> $(top_srcdir)/THEORY
 	$(AM_V_at)echo "" >> $(top_srcdir)/THEORY
 	$(AM_V_at)rm THEORY.txt THEORY2.txt
+
+
+#---------------------------------------#
+# GENERIC: run tool to create a manpage #
+#---------------------------------------#
+
+man_MANS = $(PACKAGE).1
+
+MAINTAINERCLEANFILES += $(man_MANS) $(man_MANS:.1=)-man.pdf
+EXTRA_DIST += $(man_MANS)
+
+$(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra_man
+	$(AM_V_GEN)$(HELP2MAN) \
+		$(top_builddir)/src/$(PACKAGE) \
+		--name="synthesizing partners for services" \
+		--output=$@ \
+		--manual="service-technology.org" \
+		--source="service-technology.org" \
+		--help-option="$(HELPOPTION)" \
+		--opt-include=extra_man
+
+man-pdf: $(man_MANS:.1=)-man.pdf
+
+%-man.pdf: %.1
+	$(AM_V_GEN)groff -Tps -mandoc -c $< | ps2pdf - $(@:.1=)

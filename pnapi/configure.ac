@@ -23,6 +23,7 @@ AC_CONFIG_HEADERS(src/config.h)
 # check for generic programs
 AC_PROG_CXX
 AC_PROG_CPP
+AC_PROG_SED
 AC_PROG_GREP
 AM_PROG_CC_C_O
 AC_PROG_LEX
@@ -47,7 +48,7 @@ AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 # check for tools to be used in test cases
 AC_PATH_PROGS(WGET, [wget], not found)
 AC_PATH_PROGS(MAKE, [gmake make], not found)
-AC_PATH_PROGS(SED, [sed], not found)
+AC_PATH_PROGS(FIONA, [fiona], not found)
 AC_PATH_PROGS(HEAD, [head], not found)
 AC_PATH_PROGS(TAIL, [tail], not found)
 

@@ -20,6 +20,7 @@
 #include "petrinet.h"
 #include "automaton.h"
 #include "state.h"
+#include <string>
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
@@ -115,6 +116,7 @@ using pnapi::operator&&;
  */
 namespace pnapi
 {
+std::string version();
 }
 
 /*!

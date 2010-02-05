@@ -35,7 +35,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 
 GGOFILES = cmdline.ggo cdnf-cmdline.ggo configurator-cmdline.ggo
 BUILT_SOURCES = $(GGOFILES:.ggo=.c)
-EXTRA_DIST = $(GGOFILES)
+EXTRA_DIST = $(GGOFILES) make_customer.sh
 DISTCLEANFILES = $(GGOFILES:.ggo=.c) $(GGOFILES:.ggo=.h)
 
 ################################################################

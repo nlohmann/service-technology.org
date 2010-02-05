@@ -47,7 +47,9 @@ AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
 # check for tools to be used in test cases
 AC_PATH_PROGS(WGET, [wget], not found)
 AC_PATH_PROGS(MAKE, [gmake make], not found)
-AC_PATH_PROGS(FIONA, [fiona], not found)
+AC_PATH_PROGS(SED, [sed], not found)
+AC_PATH_PROGS(HEAD, [head], not found)
+AC_PATH_PROGS(TAIL, [tail], not found)
 
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
@@ -119,5 +121,6 @@ AC_CONFIG_FILES([Makefile src/libpnapi.pc
                  utils/Makefile utils/unfolder/Makefile])
 AC_CONFIG_FILES([tests/check_customer.sh], [chmod +x tests/check_customer.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
+AC_CONFIG_FILES([utils/make_customer.sh], [chmod +x utils/make_customer.sh])
 AC_OUTPUT
 

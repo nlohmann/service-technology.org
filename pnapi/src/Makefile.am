@@ -1,5 +1,6 @@
 lib_LTLIBRARIES = libpnapi.la
 
+# [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_la_SOURCES = \
     parser-lola.yy    parser-lola-lexer.ll \
     parser-onwd.yy    parser-onwd-lexer.ll \
@@ -7,7 +8,7 @@ libpnapi_la_SOURCES = \
     parser-pn.yy      parser-pn-lexer.ll \
     parser-pnml.yy    parser-pnml-lexer.ll \
     parser-sa.yy      parser-sa-lexer.ll \
-    pnapi.h \
+    pnapi.h pnapi.cc \
     Output.h Output.cc \
     automaton.h automaton.cc\
     component.h component.cc \
@@ -25,6 +26,7 @@ libpnapi_la_SOURCES = \
     port.h port.cc \
     state.h state.cc \
     util.h
+# [CUSTOMER_E_SRC] this line is needed to build a customer Makefile. Do not remove!
 
 
 # Versioning rules ( C:R:A )
@@ -43,7 +45,7 @@ libpnapi_la_SOURCES = \
 #    This release has a new, but backwards incompatible interface.
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
-VERINFO = -version-info 0:0:0
+VERINFO = -version-info 1:0:1
 
 libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
 pkgconfigdir = $(libdir)/pkgconfig
@@ -54,6 +56,7 @@ include_HEADERS = $(filter %.h,$(libpnapi_la_SOURCES))
 
 EXTRA_DIST = Makefile.am.customer
 
+# [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
 #############################################################################
@@ -72,3 +75,18 @@ BISON_FILES = $(filter %.yy,$(libpnapi_la_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+# [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!
+
+#----------------------------#
+# GENERIC: updating pnapi.cc #
+#----------------------------#
+pnapi.cc: Makefile Makefile.am.customer
+	@$(SED) -e "s,.*\[SUBST001\].*,  return \"$(PACKAGE_STRING)\\\\n$(PACKAGE_URL)\"; /* [SUBST001] */," pnapi.cc > pnapi.cc.2
+	@mv pnapi.cc.2 pnapi.cc
+
+#----------------------------------------#
+# GENERIC: updating Makefile.am.customer #
+#----------------------------------------#
+Makefile.am.customer: Makefile.am
+	@$(top_srcdir)/utils/make_customer.sh $@ $<
+

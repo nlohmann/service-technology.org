@@ -7,7 +7,9 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = 
+TESTFILES = pog_service.og \
+	    pog_constraint.og \
+	    pog_expected.og
 
 
 # Below you can list all the files you do not want to have counted in the

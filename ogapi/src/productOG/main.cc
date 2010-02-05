@@ -113,7 +113,7 @@ map<unsigned int, map<string, unsigned int> > pSucc;
 /// mapping from ID to state
 map<unsigned int, vector<unsigned int> > ID2state;
 /// needed for backtrace "false"-nodes
-map<unsigned int, map<string, unsigned int> > Pred;
+map<unsigned int, map<string, set<unsigned int> > > Pred;
 /// set of "false"-nodes or unreachable nodes
 set<unsigned int> badNodes;
 
@@ -314,13 +314,15 @@ int main(int argc, char** argv)
         
         unsigned int newStateID = stateID(successor);
         pSucc[stateID_][*l] = newStateID;
-        Pred[newStateID][*l] = stateID_;
+        Pred[newStateID][*l].insert(stateID_);
+        
         if(newStateID > maxID)
         {
           maxID = newStateID;
           toDo.push(newStateID);
           ID2state[newStateID] = successor;
         }
+        
         if((noEmptyYet) && (newStateID == 0))
         {
           noEmptyYet = false;
@@ -345,41 +347,46 @@ int main(int argc, char** argv)
          it != pSucc[node].end(); ++it)
     {
       // remove bad node from predecessors
-      Pred[it->second].erase(it->first);
+      Pred[it->second][it->first].erase(node);
+      if(Pred[it->second][it->first].empty())
+        Pred[it->second].erase(it->first);
       
       // if this node now is unreachable
       if(Pred[it->second].empty())
-      {
+      {  
         // this node is also a bad node
         badNodes.insert(it->second);
       }
     }
-    pSucc.erase(node);
     
-    // precess predecessors
-    for(map<string, unsigned int>::iterator it = Pred[node].begin();
-         it != Pred[node].end(); ++it)
+    // process predecessors
+    for(map<string, set<unsigned int> >::iterator it1 = Pred[node].begin();
+         it1 != Pred[node].end(); ++it1)
     {
-      // remove bad nodes from successors
-      pSucc[it->second].erase(it->first);
-      
-      // get new set of present labels
-      set<string> labels;
-      for(map<string, unsigned int>::iterator l = pSucc[it->second].begin();
-           l != pSucc[it->second].end(); ++l)
+      for(set<unsigned int>::iterator it2 = it1->second.begin();
+           it2 != it1->second.end(); ++it2)
       {
-        labels.insert(l->first);
-      }
-      
-      // recalculate formula
-      Formula * formula = pFormulae[it->second]->simplify(labels);
-      delete (pFormulae[it->second]);
-      pFormulae[it->second] = formula;
-      
-      // check for bad nodes
-      if((*formula) == false)
-      {
-        badNodes.insert(it->second);
+        // remove bad nodes from successors
+        pSucc[*it2].erase(it1->first);
+        
+        // get new set of present labels
+        set<string> labels;
+        for(map<string, unsigned int>::iterator l = pSucc[*it2].begin();
+             l != pSucc[*it2].end(); ++l)
+        {
+          labels.insert(l->first);
+        }
+        
+        // recalculate formula
+        Formula * formula = pFormulae[*it2]->simplify(labels);
+        delete (pFormulae[*it2]);
+        pFormulae[*it2] = formula;
+        
+        // check for bad nodes
+        if((*formula) == false)
+        {
+          badNodes.insert(*it2);
+        }
       }
     }
     
@@ -427,8 +434,9 @@ int main(int argc, char** argv)
   }
   
   (*myOut) << "\nNODES\n";
-  for(map<unsigned int, map<string, unsigned int> >::iterator i = pSucc.begin();
-       i != pSucc.end(); ++i)
+
+  for(map<unsigned int, Formula *>::iterator i = pFormulae.begin();
+       i != pFormulae.end(); ++i)
   {
     if(args_info.show_states_given)
     {
@@ -440,10 +448,10 @@ int main(int argc, char** argv)
       (*myOut) << "}\n";
     }
         
-    (*myOut) << "  " << (i->first) << " : " << pFormulae[i->first] << "\n";
+    (*myOut) << "  " << (i->first) << " : " << (i->second) << "\n";
     
-    for(map<string, unsigned int>::iterator succ = (i->second).begin();
-         succ != (i->second).end(); ++succ)
+    for(map<string, unsigned int>::iterator succ = pSucc[i->first].begin();
+         succ != pSucc[i->first].end(); ++succ)
     {
       (*myOut) << "    " << succ->first << " -> " << succ->second << "\n";
     }

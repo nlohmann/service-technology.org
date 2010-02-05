@@ -4,13 +4,26 @@ AT_INIT
 AT_BANNER([Standard Options])
 ############################################################################
 
-AT_SETUP([Help output])
+AT_SETUP([Help output (ProductOG)])
 AT_CHECK([PRODUCTOG --help],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-AT_SETUP([Version output])
+AT_SETUP([Version output (ProductOG)])
 AT_CHECK([PRODUCTOG --version],0,ignore)
 AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([ProductOG])
+############################################################################
+
+AT_SETUP([LohmannMW_2007_bpm])
+AT_CHECK([cp TESTFILES/pog_service.og TESTFILES/pog_constraint.og TESTFILES/pog_expected.og .])
+AT_CHECK([PRODUCTOG --output=product.og --ignoreEmptyNode pog_service.og pog_constraint.og])
+AT_CHECK([WENDY2FIONA < product.og > product.f.og])
+AT_CHECK([WENDY2FIONA < pog_expected.og > expected.f.og])
+AT_CHECK([FIONA -t equivalence product.f.og expected.f.og], 0, ignore, ignore)
+AT_KEYWORDS(productOG)
 AT_CLEANUP
 

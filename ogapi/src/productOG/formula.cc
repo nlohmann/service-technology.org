@@ -867,9 +867,12 @@ bool Literal::sat(const std::set<std::string> & labels) const
 /*!
  * \brief simplifies the formula
  */
-Formula * Literal::simplify(const std::set<std::string> &) const
+Formula * Literal::simplify(const std::set<std::string> & labels) const
 {
-  return clone();
+  if(sat(labels))
+    return clone();
+  
+  return static_cast<Formula *>(new Literal(false));
 }
 
 /*!

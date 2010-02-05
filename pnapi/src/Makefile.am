@@ -77,13 +77,6 @@ EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
 # [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!
 
-#----------------------------#
-# GENERIC: updating pnapi.cc #
-#----------------------------#
-pnapi.cc: Makefile Makefile.am.customer
-	@$(SED) -e "s,.*\[SUBST001\].*,  return \"$(PACKAGE_STRING)\\\\n$(PACKAGE_URL)\"; /* [SUBST001] */," pnapi.cc > pnapi.cc.2
-	@mv pnapi.cc.2 pnapi.cc
-
 #----------------------------------------#
 # GENERIC: updating Makefile.am.customer #
 #----------------------------------------#

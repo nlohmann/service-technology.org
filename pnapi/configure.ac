@@ -115,7 +115,7 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 #############################################################################
 AC_CONFIG_FILES([Makefile src/libpnapi.pc
                  doc/Makefile doc/Doxyfile
-                 src/Makefile
+                 src/Makefile src/pnapi.cc
                  man/Makefile
                  tests/Makefile tests/package.m4
                  utils/Makefile utils/unfolder/Makefile])

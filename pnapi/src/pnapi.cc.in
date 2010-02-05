@@ -1,0 +1,22 @@
+#include "pnapi.h"
+
+namespace pnapi
+{
+
+
+/*!
+ \brief return a version string for customer tools
+
+ \note We cannot use the macros of the config.h file, because this might be
+       unreachable due to the customer tool
+
+ \note @configure_input@
+*/
+std::string version() {
+  return "@PACKAGE_STRING@\n@PACKAGE_URL@";
+}
+
+
+
+} /* namespace pnapi */
+

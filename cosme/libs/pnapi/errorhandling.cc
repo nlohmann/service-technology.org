@@ -4,13 +4,13 @@
  * \brief   Collection of exception classes
  *
  * \author  Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: cas $
  *
  * \since   2009-08-04
  *
- * \date    $Date: 2009-08-05 10:20:55 +0200 (Mi, 05. Aug 2009) $
+ * \date    $Date: 2010-01-22 00:23:39 +0100 (Fr, 22. Jan 2010) $
  *
- * \version $Revision: 4517 $
+ * \version $Revision: 5258 $
  */
 
 #include "config.h"
@@ -22,24 +22,24 @@ using std::string;
 
 namespace pnapi
 {
-  namespace exceptions
-  {
- 
-  GeneralException::GeneralException(string msg) : 
-    msg_(msg)
-  {
-  }
-  
-  ComposeError::ComposeError(string msg) :
-    GeneralException(msg)
+namespace exceptions
+{
+
+GeneralException::GeneralException(std::string msg) : 
+  msg_(msg)
   {
   }
-  
-  UnknownTransitionError::UnknownTransitionError() :
-    GeneralException("")
+
+ComposeError::ComposeError(std::string msg) :
+  GeneralException(msg)
   {
   }
-  
-  } /* namespace exceptions */
+
+UnknownTransitionError::UnknownTransitionError() :
+  GeneralException("")
+  {
+  }
+
+} /* namespace exceptions */
 } /* namespace pnapi */
 

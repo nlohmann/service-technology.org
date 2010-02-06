@@ -33,6 +33,7 @@ using namespace pnapi;
 #define yyerror pnapi::parser::error
 
 #define yylex   pnapi::parser::sa::lex
+#define yylex_destroy pnapi::parser::sa::lex_destroy
 #define yyparse pnapi::parser::sa::parse
 
 %}
@@ -48,11 +49,11 @@ using namespace pnapi;
 %union 
 {
   int yt_int;
-  std::string * yt_string;
+  char * yt_str;
 }
 
 %type <yt_int> NUMBER
-%type <yt_string> IDENT
+%type <yt_str> IDENT
 
 %start sa
 
@@ -138,8 +139,8 @@ synchronous:
 
 identlist:
   /* empty */
-| IDENT                    { identlist.push_back(*$1); delete $1; }
-| identlist COMMA IDENT    { identlist.push_back(*$3); delete $3; }
+| IDENT                    { identlist.push_back(std::string($1)); free($1); }
+| identlist COMMA IDENT    { identlist.push_back(std::string($3)); free($3); }
 ;
 
 
@@ -250,8 +251,8 @@ successors:
 	    }
 	  }
 
-    edgeLabel_ = *$2;
-    delete $2;
+    edgeLabel_ = $2;
+    free($2);
     edgeType_ = Automaton::TAU;
     if (input_.count(edgeLabel_) > 0)
       edgeType_ = Automaton::INPUT;

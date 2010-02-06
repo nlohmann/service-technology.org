@@ -10,9 +10,6 @@
 #include <stdint.h>
 #endif
 
-//TODO: wieder löschen
-#include <iostream>
-
 #define bitset_base_t uint32_t
 #define BITSET_BASE_T_BITS 32
 #define BITSET_BASE_T_MAX  0xffffffff

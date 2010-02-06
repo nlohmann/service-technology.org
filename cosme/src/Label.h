@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include "types.h"
+#include "verbose.h"
 
 using std::map;
 using std::string;

@@ -13,11 +13,6 @@
 #include "verbose.h"
 #include <pnapi/pnapi.h>
 
-using std::cerr;
-using std::cout;
-using std::endl;
-using std::ofstream;
-
 // lexer and parser
 extern int og_yyparse();
 extern int graph_yyparse();
@@ -53,26 +48,26 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-			cerr << PACKAGE << ": ERROR: invalid command-line parameter(s)" << endl;
+			abort(7, "invalid command-line parameter(s)");
     }
 
 		// check what to do
 		if ((args_info.matching_flag + args_info.simulation_flag + args_info.equivalence_flag) > 1) {
-			cerr << PACKAGE << ": ERROR: don't know what to do (matching, simulation or equivalence)" << endl;
+			abort(12, "don't know what to do (matching, simulation or equivalence)");
 		}
 		if ((args_info.matching_flag + args_info.simulation_flag + args_info.equivalence_flag) == 0) {
-			cerr << PACKAGE << ": ERROR: don't know what to do (matching, simulation or equivalence)" << endl;
+			abort(12, "don't know what to do (matching, simulation or equivalence)");
 		}
 
     // check whether two files are given
     if (args_info.matching_flag) {
 			if (!args_info.ServiceC_given or !args_info.OGA_given) {
-				cerr << PACKAGE << ": ERROR: for matching a service and an operating guideline must be given" << endl;
+				abort(4, "for matching a service and an operating guideline must be given");
 			}
     }
 		else {
 			if (!args_info.OGA_given or !args_info.OGB_given) {
-				cerr << PACKAGE << ": ERROR: for simulation/equivalence two operating guidelines must be given" << endl;
+				abort(4, "for simulation/equivalence two operating guidelines must be given");
 			}
 		}
 	
@@ -84,9 +79,7 @@ OperatingGuideline* parseOG(char* file) {
 	
 	if(!og_yyin) // if an error occurred
   {
-    cerr << PACKAGE << ": ERROR: failed to open input file '"
-         << file << "'" << endl;
-		return NULL;
+		abort(1, "could not open file '%s'", file);
   }
   
   // actual parsing
@@ -142,9 +135,7 @@ inline void parseService_LabelHelper() {
 Service* parseService(char* file) {
 	std::ifstream InputStream(file);
 	if (!InputStream) {
-		cerr << PACKAGE << ": ERROR: failed to open input file '"
-         << file << "'" << endl;
-		return NULL;
+		abort(1, "could not open file '%s'", file);
 	}	
 
 	// parse OWFN
@@ -154,13 +145,11 @@ Service* parseService(char* file) {
 	//TODO: notwendig?	
 	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
   if (tmpNet.getTransitions().empty()) {
-		cerr << PACKAGE << ": ERROR: net has no transitions" << endl;
-		return NULL;
+		abort(3, "the input open net has no transitions");
   }
   // only normal nets are supported so far
   if (!tmpNet.isNormal()) {
-		cerr << PACKAGE << ": ERROR: the input open net must be normal" << endl;
-		return NULL;
+		abort(3, "the input open net must be normal");
   } 
 	
 	parseService_LabelHelper();
@@ -205,9 +194,7 @@ int main(int argc, char** argv)
 		OperatingGuideline *A;
 
 		C = parseService(args_info.ServiceC_arg);
-		if (C == NULL) return EXIT_FAILURE;
 		A = parseOG(args_info.OGA_arg);
-		if (A == NULL) return EXIT_FAILURE;
 
 		C->calculateBitSets(GlobalLabels);
 		A->calculateBitSets(GlobalLabels);
@@ -224,9 +211,7 @@ int main(int argc, char** argv)
 		OperatingGuideline *A, *B;
 
 		A = parseOG(args_info.OGA_arg);
-		if (A == NULL) return EXIT_FAILURE;
 		B = parseOG(args_info.OGB_arg);
-		if (B == NULL) return EXIT_FAILURE;
 		
 		if (args_info.simulation_flag) {
 			if (A->isSimulation(*B))

@@ -9,6 +9,7 @@
 #include <cstring>
 #include <string>
 #include "graph-syntax.h"
+#include "verbose.h"
 
 int graph_yyerror(const char *);
 %}
@@ -40,6 +41,6 @@ number    "-"?[0-9][0-9]*
 %%
 
 int graph_yyerror(char const *msg) {
-    fprintf(stderr, "%d: error near '%s': %s\n", graph_yylineno, graph_yytext, msg);
-    return EXIT_FAILURE;
+		status("%d: error near '%s': %s", graph_yylineno, graph_yytext, msg);
+  	abort(6, "error while parsing the reachability graph");
 }

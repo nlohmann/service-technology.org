@@ -129,7 +129,7 @@ AT_CLEANUP
 AT_SETUP([SD])
 AT_CHECK([cp TESTFILES/matching/SD.og TESTFILES/matching/SD-partner.owfn .])
 AT_CHECK([COSME --matching -a SD.og -c SD-partner.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "cosme: ERROR: net has no transitions" stderr])
+AT_CHECK([GREP -q "cosme: the input open net has no transitions" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 

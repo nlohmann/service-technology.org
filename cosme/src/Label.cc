@@ -18,7 +18,7 @@ label_id_t Label::mapLabel(string label) {
 		string test(label);
 		test[0] = (test[0] == '?') ? '!' : '?';
 		if (this->mName2ID.find(test) != this->mName2ID.end()) {
-		  std::cerr << "ERROR: '" << label << "' is used as input and output-interface" << std::endl;
+			abort(3, "%s is used as input and output-interface", label.c_str());
 		}
 		
 		this->nextLabelID();

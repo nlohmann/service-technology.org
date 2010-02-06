@@ -9,6 +9,7 @@
 #include <cstdio>
 
 #include "og-syntax.h"
+#include "verbose.h"
 
 extern int og_yyerror(char const *msg);
 %}
@@ -63,6 +64,6 @@ number         [0-9]+
 %%
 
 int og_yyerror(char const *msg) {
-    fprintf(stderr, "%d: error near '%s': %s\n", og_yylineno, og_yytext, msg);
-    return EXIT_FAILURE;
+		status("%d: error near '%s': %s", og_yylineno, og_yytext, msg);
+  	abort(6, "error while parsing the operating guideline");
 }

@@ -52,8 +52,6 @@ bool BitSetC::isIntersectionEmpty(BitSetC *a) const {
 	assert(a != NULL);
 	assert(this->mBitCount == a->bitCount());
 
-//std::cout << this->toString() << " intersec " << a->toString() << std::endl;
-
 	for(size_t i = 0; i < BITNSLOTS(this->mBitCount); i++) {
 		if ((this->mBits[i] & a->getSlot(i)) != 0) return false;
 	}

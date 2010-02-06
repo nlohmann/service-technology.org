@@ -1,10 +1,6 @@
 # serial 1
 AC_DEFUN([AC_ST_LOLA],[
 
-#AC_PROG_AWK
-#AC_PROG_SED
-
-# search for required tools
 AC_PATH_PROG(LOLA, [lola-statespace], [])
 if test "${LOLA}" = ""; then
   AC_MSG_WARN([LoLA was not found! See file REQUIREMENTS.])

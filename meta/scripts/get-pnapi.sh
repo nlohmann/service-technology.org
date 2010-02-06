@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# This script gets the most recent version of the
-# Petri Net API from "svn://svn.gna.org/service-tech/trunk/pnapi"
+# This script gets the most recent version of the Petri Net API from
+# "http://esla.informatik.uni-rostock.de:8080/job/pnapi/lastSuccessfulBuild/artifact/pnapi/pnapi.tar.gz"
 # and will install it in the relative directory "./libs/pnapi/".
 
 ########################################################################
@@ -11,8 +11,9 @@
 # print information
 echo
 echo "  This script will get the most recent version of the"
-echo "  Petri Net API from 'svn://svn.gna.org/service-tech/trunk/pnapi'"
-echo "  and will install it in the relative directory './libs/pnapi/'."
+echo "  Petri Net API from 'esla.informatik.uni-rostock.de'"
+echo "  and will install it in the relative directory"
+echo "  './libs/pnapi/' using the tools 'wget' and 'tar'."
 echo
 echo "  If a previous version of the PNAPI is alreadey installed,"
 echo "  it will be removed before installing the newer one."
@@ -35,18 +36,20 @@ mkdir -p ./libs/pnapi
 # remove possible previous version of the api
 rm -rf ./libs/pnapi/*
 
-# get recent API from the repository to temporary directory
-# (Done due to .svn information)
-svn co svn://svn.gna.org/service-tech/trunk/pnapi/src ./libs/pnapi-tmp
+# get last successful build of the API from esla
+cd ./libs/pnapi/
+wget http://esla.informatik.uni-rostock.de:8080/job/pnapi/lastSuccessfulBuild/artifact/pnapi/pnapi.tar.gz
+tar xfz pnapi.tar.gz
 
-# copy API
-cp ./libs/pnapi-tmp/* ./libs/pnapi/
+# copy relevant files
+cp pnapi/src/*.cc pnapi/src/*.h pnapi/src/*.ll pnapi/src/*.yy .
+cp pnapi/src/Makefile.am.customer Makefile.am
 
-# remove temporary directory
-rm -rf ./libs/pnapi-tmp
-
-# replace original Makefile.am by the one designed for customer tools
-mv -f ./libs/pnapi/Makefile.am.customer ./libs/pnapi/Makefile.am
+# cleanup
+rm -rf pnapi
+rm -rf pnapi.tar.gz
+rm -rf parser-*.cc
+rm -rf parser-*.h
 
 # tell user we have finished
 echo

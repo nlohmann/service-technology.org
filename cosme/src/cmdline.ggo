@@ -1,17 +1,17 @@
 args "--include-getopt"
 
 description "About Cosme:"
-purpose "Cosme (Check Operating guidelines for Simulation, Matching and Equivalence) is a tool for 3-bit operating guidelines."
+purpose "Cosme (Check Operating Guidelines for Simulation, Matching and Equivalence) is a tool for 3-bit Operating Guidelines."
 
 section "Input"
 
 option "OGA" a
-  "Input file for first OG (smaller one). "
+  "Input file for first Operating Guideline (smaller one). "
   string
   typestr="FILENAME"
 
 option "OGB" b
-  "Input file for second OG (assumed bigger one). "
+  "Input file for second Operating Guideline (assumed bigger one). "
   string
   typestr="FILENAME"
   optional
@@ -25,15 +25,15 @@ option "ServiceC" c
 section "Tasks"
 
 option "matching" -
-  "Check matching for given Service and Operating Guidelinde."
+  "Check matching for given Service and Operating Guideline."
 	flag off
 
 option "simulation" -
-  "Check simulation for given Operating Guidelindes."
+  "Check simulation for given Operating Guidelines."
 	flag off
 
 option "equivalence" -
-  "Check equivalence for Operating Guidelindes."
+  "Check equivalence for given Operating Guidelines."
 	flag off
 
 section "Configuration"

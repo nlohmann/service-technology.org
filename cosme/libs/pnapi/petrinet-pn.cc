@@ -1,10 +1,13 @@
+/*!
+ * \file  petrinet-pn.cc
+ */
+
 
 /******************************************************************************
  * Headers
  *****************************************************************************/
 
 #include "config.h"
-#include <cassert>
 
 #include <cstdlib>
 #include <cstdio>
@@ -16,11 +19,11 @@
 #include <vector>
 
 #include "automaton.h"
-#include "petrinet.h"
 #include "parser.h"
 #include "formula.h"
 #include "util.h"
 #include "Output.h"
+#include "state.h"
 
 using std::cerr;
 using std::endl;
@@ -32,27 +35,167 @@ using std::string;
 using std::vector;
 
 
-using namespace pnapi;
+namespace pnapi
+{
 
+/*!
+ * \brief setting path to Petrify
+ */
+void PetriNet::setPetrify(std::string petrify)
+{ 
+  pathToPetrify_ = petrify; 
+}
+
+/*!
+ * \brief setting path to Genet
+ */
+void PetriNet::setGenet(std::string genet, uint8_t capacity)
+{
+  pathToGenet_ = genet;
+  genetCapacity_ = capacity;
+}
+
+/// setting automaton converter
+void PetriNet::setAutomatonConverter(PetriNet::AutomatonConverter converter)
+{
+  automatonConverter_ = converter;
+}
 
 /*!
  * The constructor transforming an automaton to a Petri net.
+ * 
  */
-PetriNet::PetriNet(const Automaton &sa, std::string petrify) :
-  observer_(*this), pathToPetrify(petrify)
-{
+PetriNet::PetriNet(const Automaton &sa) :
+  observer_(*this)
+  {
+  if( (automatonConverter_ == PETRIFY) &&
+      (pathToPetrify_ == "not found") )
+  {
+    automatonConverter_ = GENET;
+  }
+
+  if( (automatonConverter_ == GENET) &&
+      (pathToGenet_ == "not found") )
+  {
+    automatonConverter_ = STATEMACHINE;
+  }  
+
+  if(automatonConverter_ == STATEMACHINE)
+  {
+    (*this) = sa.stateMachine();
+    return;
+  }
+
   util::Output out;
+
   std::vector<std::string> edgeLabels;
-  
-  sa.printToSTG(edgeLabels, out);
-  
+
+  sa.printToTransitionGraph(edgeLabels, out, automatonConverter_);
+
   std::set<std::string> input = sa.input();
   std::set<std::string> output = sa.output();
   std::set<std::string> synchronous = sa.getSynchronousLabels();
 
   createFromSTG(edgeLabels, out.name(), input, output, synchronous);
+
   setSynchronousLabels(synchronous);
-}
+  }
+
+
+
+
+/*!
+ * \brief     creates a TG file of the graph
+ * 
+ * \param     edgeLabels a reference to a vector of strings containing the old
+ *            label names from this graph
+ * \param     out a reference to the output class handleing the temporary file
+ * \param     converter the converter from Automatons to PetriNets
+ * 
+ * \pre       edgeLabels is empty
+ * \post      edgeLabels stores a mapping from event number to event label
+ */
+void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels, 
+    util::Output & out, PetriNet::AutomatonConverter converter) const
+    {
+  switch(converter)
+  {
+  case PetriNet::PETRIFY :
+  case PetriNet::GENET : break;
+  default : assert(false); // do not call with other converters
+  }
+
+  // create and fill stringstream for buffering graph information
+  std::ostringstream TGStringStream; // used as buffer for graph information
+
+  TGStringStream << ".state graph\n";
+
+  // copy edges
+  for(unsigned int i = 0; i < edges_.size(); ++i)
+  {
+    Edge * edge = edges_[i];
+
+    // build label vector:
+    // each label is mapped to his position in edgeLabes
+    int foundPosition = -1;
+    for(int j = 0; j < (int)edgeLabels.size(); ++j)
+    {
+      if (edge->label() == edgeLabels[j])
+      {
+        foundPosition = j;
+        break;
+      }
+    }
+    if (foundPosition == -1)
+    {
+      foundPosition = (int)edgeLabels.size();
+      edgeLabels.push_back(edge->label());
+    }
+
+    // print current transition to stream
+    TGStringStream  << "p" << edge->source().name() << " t" << foundPosition 
+    << " p" << edge->destination().name() << "\n";
+  }
+
+  // mark final states
+  for(unsigned int i = 0; i < states_.size(); ++i)
+  {
+    // TODO: possibly buggy because for every final node is "FINAL" added?
+    if (states_[i]->isFinal())
+    {
+      // each label is mapped to his position in edgeLabes
+      std::string currentLabel = "FINAL";
+      currentLabel += states_[i]->name();
+      int foundPosition = (int)edgeLabels.size();
+      edgeLabels.push_back(currentLabel);
+      TGStringStream << "p" << states_[i]->name() << " t" << foundPosition << " p00\n";
+    }
+  }
+
+  TGStringStream << ".marking {p" << (*initialStates().begin())->name() << "}\n";
+  TGStringStream << ".end" << std::flush;
+
+
+  // create STG file, print header, transition information and then
+  // add buffered graph information
+  if(converter == PetriNet::PETRIFY)
+  {
+    out.stream() << ".model Labeled_Transition_System\n.dummy";
+  }
+  else
+  {
+    out.stream() << ".outputs";
+  }
+
+  for (int i = 0; i < (int)edgeLabels.size(); i++)
+  {
+    out.stream() << " t" << i;
+  }
+  std::string TGGraphString = TGStringStream.str();
+  out.stream() << "\n" << TGGraphString << std::endl;
+    }
+
+
 
 
 /*!
@@ -61,19 +204,25 @@ PetriNet::PetriNet(const Automaton &sa, std::string petrify) :
  * \param edgeLabels a vector of strings containing the former labels (created by printGraphToSTG)
  * \return a string containing the remapped label, e.g. if !Euro was mapped to t0, then t0 is remapped to !Euro
  *         labels created by petrify need special handling, e.g. t0/1 is remapped to !Euro/1
+ * 
+ * \post  delimeter ('/' or '_') will be replaced by ':')
  */
-string PetriNet::remap(string edge, vector<string> & edgeLabels)
+string PetriNet::remap(std::string edge, std::vector<std::string> & edgeLabels)
 {
-    string affix = (edge.find("/") != string::npos) ? edge.substr( edge.find("/") ) : ""; // read affix
-    string indexString = edge.substr( 1, edge.size() - affix.size() - 1 );                // read index
+  char delimeter = (automatonConverter_ == PETRIFY) ? '/' : '_';
 
-    istringstream indexStream; // read index as integer
-    int index;
-    indexStream.str( indexString );
-    indexStream >> index;
+  string affix = (edge.find(delimeter) != string::npos) 
+               ? ( string("/") + edge.substr(edge.find(delimeter) + 1 )) 
+               : ""; // read affix
+  string indexString = edge.substr( 1, edge.size() - affix.size() - 1 );                // read index
+
+  istringstream indexStream; // read index as integer
+  int index;
+  indexStream.str( indexString );
+  indexStream >> index;
 
 
-    return edgeLabels[index] + affix;
+  return edgeLabels[index] + affix;
 }
 
 
@@ -81,43 +230,57 @@ string PetriNet::remap(string edge, vector<string> & edgeLabels)
 /*!
  * \brief   creates a petri net from an STG file
  *
+ * \param   edgeLabels mapping from edges' name (an unsigned integer) to their label
  * \param   fileName location of the STG file
+ * \param   inputPlacenames set of labels, that name input places
+ * \param   outputPlacenames set of labels, that name output places
+ * \param   synchronizeLabels set of labels, that name synchronization labels
  *
  * \note    - this function has been outsourced from fiona and recently only needed by fiona
  *          - petrify is needed to call this function
  *
  */
-void PetriNet::createFromSTG(vector<string> &edgeLabels,
-                             const string &fileName,
-                             std::set<std::string> &inputPlacenames,
-                             std::set<std::string> &outputPlacenames,
-                             std::set<std::string> &synchronizeLabels)
+void PetriNet::createFromSTG(std::vector<std::string> &edgeLabels,
+    const std::string &fileName,
+    std::set<std::string> &inputPlacenames,
+    std::set<std::string> &outputPlacenames,
+    std::set<std::string> &synchronizeLabels)
 {
-  // preparing system call of petrify
+  // preparing system call of petrify/genet
   string pnFileName = fileName + ".pn"; // add .pn to the output file
-  string systemcall = string(pathToPetrify) + " " + fileName +
-                      " -dead -ip -nolog -o " + pnFileName;
-
-  // calling petrify if possible
-  if (pathToPetrify != "not found")
+  string systemcall;
+  if(automatonConverter_ == PETRIFY)
   {
-    int result = system(systemcall.c_str());
-    assert(result == 0);
+    systemcall = pathToPetrify_ + " " + fileName +
+    " -dead -ip -nolog -o " + pnFileName;
   }
+  else
+  {
+    std::stringstream ss;
+    ss << (int) genetCapacity_;
+    systemcall = pathToGenet_ + " -k " + ss.str() + " " + fileName + " > " + pnFileName;
+  }
+
+  //int result = system(systemcall.c_str());
+  system(systemcall.c_str());
+
+  /// does not work for Genet, there seems to be a bug in Cudd
+  //assert(result == 0);
 
   // parse generated file
   ifstream ifs(pnFileName.c_str(), ifstream::in);
   if (!ifs.good())
-    return; // TODO: error!!!
-  parser::petrify::Parser parser;
+    assert(false);
+
+  parser::pn::Parser parser;
   parser.parse(ifs);
   ifs.close();
 
-  using parser::petrify::places_;
-  using parser::petrify::transitions_;
-  using parser::petrify::arcs_;
-  using parser::petrify::interface_;
-  using parser::petrify::initialMarked_;
+  using parser::pn::places_;
+  using parser::pn::transitions_;
+  using parser::pn::arcs_;
+  using parser::pn::interface_;
+  using parser::pn::initialMarked_;
 
   // create places
   for (set<string>::iterator p = places_.begin(); p != places_.end(); ++p)
@@ -132,7 +295,7 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
     if (remapped.substr(0,5) != "FINAL")
     {
-      assert( remapped.find("/") == remapped.npos ); // petrify should not rename/create dummy transitions
+      assert( remapped.find('/') == remapped.npos ); // petrify should not rename/create dummy transitions
 
       if ( inputPlacenames.count(remapped) > 0 )
       {
@@ -163,13 +326,14 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
         transition = &createTransition("t" + remapped);
 
       // create arcs t->p
-      for (set<string>::iterator p = arcs_[*t].begin(); p != arcs_[*t].end(); ++p)
+      for (map<string, unsigned int>::iterator p = arcs_[*t].begin(); 
+            p != arcs_[*t].end(); ++p)
       {
-        createArc(*transition, *findPlace(*p));
+        createArc(*transition, *findPlace(p->first), p->second);
       }
 
       // create arcs t->interface and interface->t
-      string placeName = remapped.substr( 0, remapped.find("/") );      // remove possible /
+      string placeName = remapped.substr( 0, remapped.find('/') );      // remove possible /
 
       Place * place = findPlace(placeName);
 
@@ -203,13 +367,13 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
   for (set<string>::iterator p = places_.begin(); p != places_.end(); ++p)
   {
-    for (set<string>::iterator t = arcs_[*p].begin(); t != arcs_[*p].end(); ++t)
+    for (map<string, unsigned int>::iterator t = arcs_[*p].begin(); t != arcs_[*p].end(); ++t)
     {
-      string transitionName = remap(*t, edgeLabels);
+      string transitionName = remap(t->first, edgeLabels);
 
       if (transitionName.substr(0,5) != "FINAL")
       {
-        createArc(*findPlace(*p), *findTransition("t" + transitionName));
+        createArc(*findPlace(*p), *findTransition("t" + transitionName), t->second);
       }
       else
       {
@@ -221,27 +385,27 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
   // fill interface places not occurring in the automaton
   for (set<string>::iterator input = inputPlacenames.begin(); 
-         input != inputPlacenames.end(); ++input)
+  input != inputPlacenames.end(); ++input)
     if (findPlace(*input) == NULL)
       createPlace(*input, Node::INPUT);
   for (set<string>::iterator output = outputPlacenames.begin(); 
-         output != outputPlacenames.end(); ++output)
+  output != outputPlacenames.end(); ++output)
     if (findPlace(*output) == NULL)
       createPlace(*output, Node::OUTPUT);
 
   // initialize final condition
   finalCondition() = false;
-  
+
   // For each transition found to be a final transition...
   for (map<string, set<string> >::iterator transIt = finalCondMap.begin(); 
-         transIt != finalCondMap.end(); ++transIt)
+  transIt != finalCondMap.end(); ++transIt)
   {
     // Create a set for the places having this transition in their post set.
     set<Place *> nextTrans;
 
     // For each place in the preset...
     for (set<string>::iterator placesIt = transIt->second.begin(); 
-           placesIt != transIt->second.end(); ++placesIt)
+    placesIt != transIt->second.end(); ++placesIt)
     {
       // Insert this place in the preset.
       nextTrans.insert(findPlace(*placesIt));
@@ -293,11 +457,13 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
 
   // make interface places empty
   for(set<Place*>::iterator p = interfacePlaces_.begin();
-       p != interfacePlaces_.end(); ++p)
+  p != interfacePlaces_.end(); ++p)
   {
     finalCondition() = finalCondition().formula() && (**p == 0); 
   }
- 
+
   // cleaning up
   remove(pnFileName.c_str());
 }
+
+} /* namespace pnapi */

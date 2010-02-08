@@ -91,7 +91,7 @@ fi
 #############################################################################
 
 # Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile utils/lola2config/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile])
 
 AC_OUTPUT
 

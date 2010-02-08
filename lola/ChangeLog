@@ -12,12 +12,13 @@ Version 1.15-unreleased
 * fixed bug #15223 (`https://gna.org/bugs/?15223'): the coverability graph is
   now not used in the `HOME' mode
 
-* added an experimental parameter `-r' to write all analysis results into a
+* added a parameter `-r'/`--resultFile' to write all analysis results into a
   single file in the file format of libconfig (see
   `http://www.hyperrealm.com/libconfig')
 
-* fixed bug #12910 (`https://gna.org/bugs/?12910'): file output for `-g' and
-  `-m' parameter was broken
+* fixed bug #12910 and bug #15282 (`https://gna.org/bugs/?12910' and
+  `https://gna.org/bugs/?15282'): file output for `-g' and `-m' parameter was
+  broken
 
 Version 1.14
 ============

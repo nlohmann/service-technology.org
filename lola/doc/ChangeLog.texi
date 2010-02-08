@@ -2,9 +2,9 @@
 @itemize
 @item fixed bug #15223 (@url{https://gna.org/bugs/?15223}): the coverability graph is now not used in the @option{HOME} mode
 
-@item added an experimental parameter @option{-r} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
+@item added a parameter @option{-r}/@option{--resultFile} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
 
-@item fixed bug #12910 (@url{https://gna.org/bugs/?12910}): file output for @option{-g} and @option{-m} parameter was broken
+@item fixed bug #12910 and bug #15282 (@url{https://gna.org/bugs/?12910} and @url{https://gna.org/bugs/?15282}): file output for @option{-g} and @option{-m} parameter was broken
 @end itemize
 
 

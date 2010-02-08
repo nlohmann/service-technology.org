@@ -91,7 +91,7 @@ option "automorphisms" y
 
 
 option "resultFile" r
-  ""
+  "Write analysis results to file. If filename is omitted, derive it from the net file and add '.result' suffix."
   string
   typestr="FILENAME"
   argoptional

@@ -31,8 +31,8 @@ rm -rf ${LIB}/config.h
 
 # change to the temp dir and build tool
 cd ${TOOL}
-# autoreconf -i
-./configure
+autoreconf -i
+./configure --without-pnapi
 ${MAKE}
 ${MAKE} check
 result=$?

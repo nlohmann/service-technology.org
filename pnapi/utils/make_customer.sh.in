@@ -38,6 +38,7 @@ echo "libpnapi_a_CPPFLAGS = -I\$(top_srcdir)/src" >> $1
 echo "" >> $1
 echo "" >> $1
 echo "EXTRA_DIST =" >> $1
+echo "BUILT_SOURCES =" >> $1
 ${HEAD} -n ${GEN_END} $2 | ${TAIL} -n +${GEN_BEGIN} | ${SED} -e "s/_la_/_a_/" >> $1
 
 

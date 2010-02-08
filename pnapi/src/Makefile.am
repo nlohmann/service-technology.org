@@ -55,6 +55,7 @@ includedir = @includedir@/pnapi
 include_HEADERS = $(filter %.h,$(libpnapi_la_SOURCES))
 
 EXTRA_DIST = Makefile.am.customer
+BUILT_SOURCES = Makefile.am.customer
 
 # [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
 #############################################################################
@@ -64,7 +65,6 @@ EXTRA_DIST = Makefile.am.customer
 #---------------------------------------------------#
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
-BUILT_SOURCES =
 MAINTAINERCLEANFILES =
 DISTCLEANFILES = 
 

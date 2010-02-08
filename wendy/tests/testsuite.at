@@ -104,9 +104,9 @@ AT_CLEANUP
 AT_SETUP([Cleaning vs. no cleaning of temporary files])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --og --tmpfile=wendy-XXXXXX],0,ignore,ignore)
+AT_CHECK([WENDY myCoffee.owfn --og --tmpfile=wendy-XXXXXX -v],0,ignore,ignore)
 AT_CHECK([test -f wendy-*],1)
-AT_CHECK([WENDY myCoffee.owfn --og --tmpfile=wendy-XXXXXX --noClean],0,ignore,ignore)
+AT_CHECK([WENDY myCoffee.owfn --og --tmpfile=wendy-XXXXXX --noClean -v],0,ignore,ignore)
 AT_CHECK([test -f wendy-*],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP

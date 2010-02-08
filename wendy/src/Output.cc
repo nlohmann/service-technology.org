@@ -26,9 +26,22 @@
 #include <cstdlib>
 #include "verbose.h"
 #include "Output.h"
-#include "cmdline.h"
 
-extern gengetopt_args_info args_info;
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
+
+/******************
+ * STATIC MEMBERS *
+ ******************/
+
+#ifdef HAVE_CONFIG
+std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + "-XXXXXX";
+#else
+std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
+#endif
+bool Output::keepTempfiles = true;
 
 
 /***************
@@ -73,8 +86,9 @@ Output::Output(const std::string& str, const std::string& kind) :
  **************/
 
 /*!
- This destructor closes the associated file. Unless the "--noClean" parameter
- is given, temporary files are deleted after closing.
+ This destructor closes the associated file. Unless the class is configured
+ to keep temporary files (by calling setKeepTempfiles()), temporary files are
+ deleted after closing.
 */
 Output::~Output() {
     if (&os != &std::cout) {
@@ -82,7 +96,7 @@ Output::~Output() {
         if (temp == NULL) {
             status("closed file '%s'", _cfilename_(filename));
         } else {
-            if (args_info.noClean_flag) {
+            if (keepTempfiles) {
                 status("closed temporary file '%s'", _cfilename_(filename));
             } else {
                 if (remove(filename.c_str()) == 0) {
@@ -136,15 +150,28 @@ std::ostream& Output::stream() const {
 */
 char* Output::createTmp() {
 #ifdef __MINGW32__
-    temp = strdup(basename(args_info.tmpfile_arg));
+    temp = basename(tempfileTemplate.c_str());
     if (mktemp(temp) == NULL) {
-        abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
+        abort(13, "could not create to temporary file '%s'", basename(tempfileTemplate.c_str()));
     };
 #else
-    temp = strdup(args_info.tmpfile_arg);
+    temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
         abort(13, "could not create to temporary file '%s'", temp);
     };
 #endif
     return temp;
+}
+
+
+/***************************
+ * STATIC MEMBER FUNCTIONS *
+ ***************************/
+
+void Output::setTempfileTemplate(std::string s) {
+    tempfileTemplate = s;
+}
+
+void Output::setKeepTempfiles(bool b) {
+    keepTempfiles = b;
 }

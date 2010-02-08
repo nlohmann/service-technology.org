@@ -110,10 +110,10 @@ state:
         /* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
         if (currentLowlink == $2 and
                 not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
-    
+
             // insert representative into current SCC of inner markings
             currentSCC.insert($2);
-    
+
             // we have found a non-trivial SCC within the inner markings, so the reachability graph
             // contains a cycle
             if (currentSCC.size() > 1) {
@@ -159,13 +159,11 @@ scc_member:
     { currentSCC.insert($1); }
 ;
 
+/* do something with Tarjan's lowlink value (needed for generating
+   livelock free partners or reduction rule smart sending event) */
 lowlink:
   KW_LOWLINK NUMBER
-    {
-        /* do something with Tarjan's lowlink value (needed for generating
-           livelock free partners or reduction rule smart sending event) */
-        currentLowlink = $2;
-    }
+    { currentLowlink = $2; }
 ;
 
 markings_or_transitions:

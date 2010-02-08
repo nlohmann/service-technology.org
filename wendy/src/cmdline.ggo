@@ -82,13 +82,13 @@ section "Operating Guidelines Options"
 sectiondesc="These options control the calculation of the operating guidelines as well as the style the operating guidelines are represented.\n"
 
 option "cover" -
-"Cover operating guidelines output."
-details="Generate cover operating guidelines, reading a specification from a given file. If no file is given, all nodes will be covered."
-dependon="og"
-string
-typestr="FILENAME"
-argoptional
-optional
+  "Cover operating guidelines output."
+  details="Generate cover operating guidelines, reading a specification from a given file. If no file is given, all nodes will be covered."
+  dependon="og"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
 
 
 section "Dot Options"
@@ -184,6 +184,7 @@ option "stats" -
   flag off
   hidden
 
+
 section "Configuration"
 sectiondesc="Wendy relies on several other tools. These options configure Wendy to find these tools.\n"
 
@@ -216,3 +217,4 @@ option "noClean" -
   "Do not delete temporary files."
   details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
   flag off
+  hidden

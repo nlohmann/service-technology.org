@@ -150,12 +150,12 @@ og:
 				}	
 			}
 			else{
-				if(nodes[i] != 0){
+				if(nodes[i] != 0 || isServiceAutomaton == true){
 					outStream << nodes[i] << " [label=\"" << nodeAnnotation[nodes[i]] << "\"]\n";
 					successors = nodeSuccessors[nodes[i]];
 					//write the node's ID, node's annotation and all links to its successors to the stream...
 					for(size_t j=0;j<successors.size();++j){
-						if(successors[j].second != 0){
+						if(successors[j].second != 0 || isServiceAutomaton == true){
 							outStream << nodes[i];
 							outStream << " -> " << successors[j].second;
 							if(args_info.noPrefix_given)

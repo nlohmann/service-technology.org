@@ -1,0 +1,28 @@
+INTERFACE
+  INPUT a, b, c, d;
+  OUTPUT e, f;
+  SYNCHRONOUS ;
+
+NODES
+0: INITIAL, FINAL
+  a -> 1
+  c -> 9
+
+1
+  b -> 2
+
+2
+  c -> 3
+  b -> 3
+  d -> 3
+  a -> 3
+  e -> 7
+
+3
+
+7
+  f -> 0
+
+9
+  d -> 2
+

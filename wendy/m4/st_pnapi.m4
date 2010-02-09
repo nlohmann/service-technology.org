@@ -5,6 +5,9 @@ AC_DEFUN([AC_ST_PNAPI],[
   AC_PROG_LEX
   AC_PROG_YACC
 
+  # remember LIBS variable set so far
+  OLDLIBS=${LIBS}
+
   # only use installed Petri Net API if this was configured with --with-pnapi
     AC_ARG_WITH(pnapi,
     AS_HELP_STRING([--without-pnapi],[The configure script will try to link against a preinstalled version of the Petri Net API (libpnapi). If this fails, a shipped version (see 'libs/pnapi') will be used instead. This parameter overrides this check and always uses the shipped version.]),
@@ -25,6 +28,8 @@ AC_DEFUN([AC_ST_PNAPI],[
     else
       AC_MSG_RESULT([no])
       AM_CONDITIONAL(COMPILE_PNAPI, [true])
+      # reset LIBS variable to previous value
+      LIBS=${OLDLIBS}
     fi
   fi
 

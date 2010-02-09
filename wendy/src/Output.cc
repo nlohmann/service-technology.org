@@ -150,9 +150,9 @@ std::ostream& Output::stream() const {
 */
 char* Output::createTmp() {
 #ifdef __MINGW32__
-    temp = basename(tempfileTemplate.c_str());
+    temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
-        abort(13, "could not create to temporary file '%s'", basename(tempfileTemplate.c_str()));
+        abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
     };
 #else
     temp = strdup(tempfileTemplate.c_str());

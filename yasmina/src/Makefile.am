@@ -1,6 +1,8 @@
 bin_PROGRAMS = yasmina
 
 yasmina_SOURCES = syntax_mp.yy lexer_mp.ll \
+				  parser_adapt_rulesmarlene.yy lexer_adapt_rulesmarlene.ll \
+				  adapternumerge.h adapternumerge.cc \
                   main.cc \
                   cmdline.c cmdline.h \
                   verbose.cc verbose.h \

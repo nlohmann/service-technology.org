@@ -59,3 +59,19 @@ AT_CHECK([GREP -q "Not compatible" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+AT_SETUP([Compatibility check of adapter.])
+AT_CHECK([cp TESTFILES/td.owfn .])
+AT_CHECK([cp TESTFILES/td.ar .])
+AT_CHECK([YASMINA -a td.ar td.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "Compatibility check inconclusive" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Compatibility check with adapter and message profile.])
+AT_CHECK([cp TESTFILES/td.output .])
+AT_CHECK([cp TESTFILES/td.ar .])
+AT_CHECK([YASMINA -a td.ar -m td.output],0,stdout,stderr)
+AT_CHECK([GREP -q "Compatibility check inconclusive" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+

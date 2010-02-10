@@ -20,7 +20,7 @@
 #include <limits.h>
 #include "eventTerm.h"
 
-//#include "adapter.h"
+#include "adapternumerge.h"
 //#include "ppl.hh"
 
 
@@ -98,6 +98,13 @@ set<const constraintf *> getconstrforfm(set<const constraintf *> fingerprint, un
 	return vc;
 }
 
+/*building a multiset to store adapter rules + rightside - leftside*/
+typedef struct{
+	std::multiset<unsigned int> msleft;
+	std::multiset<unsigned int> msright;
+	std::multiset<unsigned int> canonical;
+	std::set<std::string> base;
+} adapterrule;
 
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -130,8 +137,8 @@ void evaluateParameters(int argc, char** argv) {
 	cmdline_parser(argc, argv, &args_info);
 
 	// check whether at least one .owfn file or at least a MP is given
-	if (((args_info.inputs_num < 1)&&(args_info.messageProfiles_given<1))) {
-		fprintf(stderr, "%s: too few arguments --- (at least one input .owfn file) or (at least one .owfn file and one message profile) must be given -- aborting\n", PACKAGE);
+	if (((args_info.inputs_num < 1)&&(args_info.messageProfiles_given<1) && (args_info.adapterrules_given<1)) ) {
+		fprintf(stderr, "%s: too few arguments --- (at least one input .owfn file) or (at least one .owfn file and one message profile)  or (at least one adapter rule set) must be given -- aborting\n", PACKAGE);
 		exit(EXIT_FAILURE);
 	}
 
@@ -907,6 +914,11 @@ int main(int argc, char** argv) {
 					if((net1.findTransition(*it)==NULL) && (net1.findPlace(*it)==NULL) )
 						abort(2, "the node does not belong to the net");
 			}
+			if ( args_info.adapterrules_given )
+			{//adapter
+				pnapi::PetriNet *pnet=new PetriNet(net1);
+				netps.push_back(pnet);cout<<endl<<netps.size()<<endl;
+			}
 		}
 		else{
 			std::stringstream s;s<<(i+1); //cout<< s.str();
@@ -929,11 +941,11 @@ int main(int argc, char** argv) {
 			}
 			   //else abort(3, "the transitions do not belong to the net");
 			if(i==1) s1="1@"; else s1=""; net1.compose(net2, s1, s2);
-	/*		if ( args_info.adapterrules_given )
+			if ( args_info.adapterrules_given )
 			{//adapter
 				pnapi::PetriNet *pnet=new PetriNet(net2);
-				netps.push_back(pnet);cout<<endl<<netps.size()<<endl;
-			}*/
+				netps.push_back(pnet);
+			}
 			//renew the prefixes: s1 has the old 
 		//	if(!net1.isClosed()){cout<<" is not closed"<<std::endl;} else 
 		}
@@ -987,16 +999,18 @@ int main(int argc, char** argv) {
     {
         //time(&start_time);
 		
-		//RuleSet rs;
+		RuleSet rs;
 		// ! #adapter //	Adapter adapter(net2,rs,ASYNCHRONOUS,1,false);
 			
         status("reading transformation rules from file \"%s\"", args_info.adapterrules_arg[0]);
 		
-        /*FILE * rulefile (NULL);
+        FILE * rulefile (NULL);
         if((rulefile = fopen(args_info.adapterrules_arg[0],"r")))
         {
-            rs.addRules(rulefile);
-            fclose(rulefile);
+			rs.addRules(rulefile);
+			std::cout<<std::endl<<"Rules in the engine "<<rs.getRules().size()<<std::endl;
+			
+            //fclose(rulefile);
             rulefile = NULL;
         }
         else
@@ -1004,17 +1018,40 @@ int main(int argc, char** argv) {
             abort(2, "Rule file %s could not be opened for reading", args_info.adapterrules_arg);
         }
         //time(&end_time);
+		std::cout<<std::endl<<"pn before building engine "<<netps.size()<<std::endl;
+		//std::cout<<std::endl<<"pn before building engine "<<netps[0]->getTransitions().size()<<std::endl;
         //status("reading all rules file done [%.0f sec]", difftime(end_time, start_time));
 		Adapter *adapter=new Adapter(netps, rs, Adapter::ASYNCHRONOUS, 1, false);
-		const PetriNet * benetp=adapter->buildEngine();
-		//benetp->finalCondition().formula().output(std::cout); 
+		const PetriNet *benetp=adapter->buildEngine();
+		//give this tho the state equation
+		net1=PetriNet(*benetp);
+		//const PetriNet *senet=adapter->composeNetsEngine();
+		std::cout<<std::endl<<"pn after building engine "<<benetp->getPlaces().size()<<std::endl;
+	    std::cout<<std::endl<<"pn after building engine "<<benetp->getTransitions().size()<<std::endl;
+		//printing out
+		
+		//std::string s(args_info.inputs[0]);
+		//std::string outname=s+".adapter.owfn";
+		//pnapi::util::Output outfile(outname, "Output file");
+		//status("creating file '%s'...", outname.c_str());
+		// outfile.stream() << meta(pnapi::io::CREATOR, std::string(PACKAGE_STRING) + " Frontend (" + CONFIG_BUILDSYSTEM + ")");
+		//outfile.stream() << meta(pnapi::io::OUTPUTFILE, outname);
+	    //outfile.stream() 
+			std::cout<< pnapi::io::owfn << net1;
+	
+	
+	// string outname = objects[i].filename + suffix + "." + args_info.output_orig[j];
+	  //              Output outfile(outname, std::string(args_info.output_orig[j]) +  " output");
+
+	    //            outfile.stream() << meta(io::CREATOR, std::string(PACKAGE_STRING) + " Frontend (" + CONFIG_BUILDSYSTEM + ")");
+	      //          outfile.stream() << meta(io::OUTPUTFILE, outname);
 		//for ( unsigned int index = 0; index < netps.size(); ++index)
 		//{
 		//	delete netps[index];
 		//}
 		//netps.clear();
-		std::cout <<"help"<< std::endl;	
-	*/	//return 0;
+		//std::cout <<"help"<< std::endl;	
+		//return 0;
 	}
 
 	
@@ -1286,6 +1323,7 @@ int main(int argc, char** argv) {
 		//insert 
 		//solve
 		if (args_info.inputs_num==0) {
+			
 		for(unsigned int ifm=0;ifm<lpmps.size();ifm++){
 			for(i=1;i<=get_Ncolumns(lpmps.at(ifm));i++){
 				set_int(lpmps.at(ifm),i,TRUE);
@@ -1371,7 +1409,8 @@ int main(int argc, char** argv) {
 	// here we prepare for the the solving of the equation
 	// for each final marking one builds and solves  the state equation
 
-	if(args_info.inputs_num>0&&!args_info.adapterrules_given){
+	if(args_info.inputs_num>0){//args_info.adapterrules_given){//args_info.messageProfiles_given>0
+		cout << endl <<"State equation involved"<<endl;
 		nPlaces = (int) net1.getPlaces().size();cout << "No of places "<< net1.getInternalPlaces().size() << endl;
 		
 		nTransitions = (int) net1.getTransitions().size();
@@ -1495,6 +1534,21 @@ int main(int argc, char** argv) {
 				int j=1;
 		//	cout<<"m["<<(*p)->getName()<<"]"<<"="<<(*p)->getTokenCount()<<std::endl;
 				Place & l= *net1.findPlace((*p)->getName());
+				bool de=((*p)->getName().find("_int") != std::string::npos)&& ((*p)->getPresetArcs().empty()||(*p)->getPostsetArcs().empty());
+				bool ccob=((*p)->getName().find("observe_") != std::string::npos)|| ((*p)->getName().find("control_") != std::string::npos);
+				if(args_info.adapterrules_given&& ccob){
+					//if it has no inputs or outputs it can be diconsidered for the state equation 
+					//_engine->deletePlace(**plit);
+					std::cout<<std::endl<<(*p)->getName()<<std::endl;
+					continue;
+				}
+				if(args_info.adapterrules_given&& de&& args_info.inputs_num>0){
+					//if it has no inputs or outputs it can be diconsidered for the state equation 
+						//_engine->deletePlace(**plit);
+						std::cout<<std::endl<<(*p)->getName()<<std::endl;
+						continue;
+				}
+				
 				REAL * roww=new REAL[l.getPresetArcs().size() + l.getPostsetArcs().size()]();
 				if((args_info.inputs_num==1)&&(l.getType()!=pnapi::Node::INTERNAL)) continue;
 				unsigned int k=0;
@@ -1592,7 +1646,7 @@ int main(int argc, char** argv) {
 			cout<<"Fingerprint+state equation check"<<endl;
 			lprec *lpmc=copy_lp(lp);
 			
-			
+		/*	
 			//match interface for composition
 			std::set<std::string> inputp,outputp;
 			for (std::set<pnapi::Place *>::iterator pit=net1.getInputPlaces().begin(); pit!=net1.getInputPlaces().end(); ++pit) {
@@ -1614,7 +1668,7 @@ int main(int argc, char** argv) {
 					exit(1);
 				}
 			}
-			
+			*/
 			//
 			set<lprec *> mps;
 			mps.insert(lp);lp=lpmc;
@@ -1625,17 +1679,35 @@ int main(int argc, char** argv) {
 //					mps.insert(lp);lp=lpmc;cout<<get_col_name(lp,get_Ncolumns(lp))<<"help"<<endl;
 					//aici adauga constraints	
 				//adauga variabiles for places to relate them to their input and output transitions
+				//cout << endl<<"for each final marking"<<endl;
 				unsigned int nvars=get_Ncolumns(lpmps.at(ifm));
 				for(unsigned int j=0;j<nvars;j++){//to do if it is already there skip
-					Place & l= *net1.findPlace(get_col_name(lpmps.at(ifm),j+1)); 
-					if(&l==NULL) {continue;} //place is already there or it is a sync transition cout<<get_col_name(lpmps.at(ifm),j+1)<<" ";
+					//cout<<endl<<get_col_name(lpmps.at(ifm),j+1)<<endl;
+					std::string colname=get_col_name(lpmps.at(ifm),j+1); 
+					//for adapter's sake add an internal place
+					if(args_info.adapterrules_given) {colname+="_int";
+						//find the index of the row and set it to 1
+					}
+					Place & l= *net1.findPlace(colname); //the place is in the net/adapter
+					if(&l==NULL) {
+						continue;
+					} //place is already there or it is a sync transition 
 					//cout<<get_col_name(lpmps.at(ifm),j+1)<<" ";
 					//REAL column[1+get_Nrows(lp)];//the set of events which is supposed to become variables in the SE
 					//for(int i=0;i<=get_Nrows(lp);i++){
 					//	column[i]=0.0;	
 					//}
 					add_columnex(lp,0,NULL,NULL);//then add constraint iff there is some connection between 
+					//and also find the index of the row in the adapter setting
 					set_col_name(lp, get_Ncolumns(lp),get_col_name(lpmps.at(ifm),j+1));
+					if(args_info.adapterrules_given>0) {
+						//cout<<endl<<"hello adapter "<<endl;
+						char * cstr= new char [colname.size()+1];
+						strcpy(cstr,colname.c_str());
+						set_mat(lp, get_nameindex(lp, cstr,TRUE),get_Ncolumns(lp),1);
+					}
+					if(args_info.adapterrules_given==0){//when adapters do no exist the interface places are not there
+						//so new rows have to be created for them
 					REAL * roww= new REAL[1+get_Ncolumns(lp)];
 					for(int r=0;r<get_Ncolumns(lp);r++) roww[r+1]=0.0;
 					roww[get_Ncolumns(lp)]=1.0;
@@ -1652,8 +1724,9 @@ int main(int argc, char** argv) {
 					
 					add_constraint(lp,roww,EQ,0.0);//cout<<get_Ncolumns(lp)<<endl;
 					set_row_name(lp, get_Nrows(lp),get_col_name(lpmps.at(ifm),j+1));
+					}
 				}
-				//now add the constraints	
+				//now add the constraints	(? from the message profile ...)
 				//set_add_rowmode(lp,TRUE); add the constraints of the message profiles
 				int hh=1+get_Ncolumns(lp);//set_verbose(lp,5);//print_lp(lpmps.at(ifm)); //cout<<"col"<<hh<<"dd";
 				for(int i=0;i<get_Nrows(lpmps.at(ifm));i++){

@@ -1,0 +1,22 @@
+PLACE
+  INTERNAL
+    p0,p1,p2;
+  INPUT
+    TBevT;
+  OUTPUT
+    TEuro;
+
+FINALMARKINGS
+    F1: p0=0, p1=0, p2=1;
+
+TERMS
+    T1: +1*TBevT ;
+    T2: +1*TBevT +1*TEuro ;
+    T3: +1*TBevT -1*TEuro ;
+    T4: +1*TEuro ;
+
+BOUNDS
+    F1,T1: 1,1;
+    F1,T2: 2,2;
+    F1,T3: 0,0;
+    F1,T4: 1,1;

@@ -7,7 +7,7 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = jm1.owfn jm2.owfn jm3.owfn  myCoffee.output.check  myCoffee.owfn  mycoffee-partner.owfn  myCoffeep.output.check
+TESTFILES = jm1.owfn jm2.owfn jm3.owfn  myCoffee.output.check  myCoffee.owfn  mycoffee-partner.owfn  myCoffeep.output.check td.owfn td.output td.ar
 
 
 

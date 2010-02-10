@@ -249,7 +249,8 @@ const char* hasPrefix(const char* str, const char* prefix)
 
 
 //int minisat(gzFile in)
-int minisat(vector< vector< int > > & in)
+//int 
+vector<bool>*  minisat(vector< vector< int > > & in)
 {
   //assert(in);
   
@@ -272,21 +273,100 @@ int minisat(vector< vector< int > > & in)
     //gzclose(in);
 
     if (!S.simplify()){
-        return(0); // UNSAT
+        return NULL;//(0); // UNSAT
     }
 	
     int result=S.solve(); // result of SOLVE
 	//vec<lbool> mod=S.model;
 	//printf(" %d ", S.nVars());
-	/*for (int k=0; k<S.model.size(); ++k) {
-		//lbool val=S.model[k];
-		printf(" %d", k);
-	}*/
-	printf(" \n");
+	if(result){
+		vector<bool> *vb=new vector<bool> (S.model.size());
+		for (int k=0; k<S.model.size(); ++k) {
+			vb->at(k)=bool(S.model[k].toInt()+1);
+		//lbool val=S.model[k].;
+			//printf(" %s", val);
+		}
+		return vb;
+	}
+	else {
+		return NULL;
+	}
+
+	
+/*	if(result){  //if there is a satisfying assignment
+    	vector<bool> *assignment = new vector<bool>(S->model.size());
+    	//printf("\nerfuellende Belegung: ");
+    	for(unsigned int i = 0; i < S->model.size(); ++i) {
+    		//printf("%d  ", toInt(S->model[i]));
+    		assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
+    	}
+    	//printf("\n");
+    	return assignment;
+    }
+    else {
+    	return NULL;
+    }
+*/	
+	//printf(" \n");
 	/*for (int k=0; k<S.model.size(); ++k) {
 		lbool val=S.model[k];
 		printf("%d %d\n",k+1,val.toInt());
 	}*/
 	//printing the clauses
-	return result;
+	//return result;
 }
+
+/*int  minisat(vector< vector< int > > & in)
+{
+	//assert(in);
+	
+    Solver      S;
+    S.verbosity = 1;
+	
+	
+#if defined(__linux__)
+    fpu_control_t oldcw, newcw;
+    _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
+    reportf("WARNING: for repeatability, setting FPU to use double precision\n");
+#endif
+    double cpu_time = cpuTime();
+	
+    solver = &S;
+    signal(SIGINT,SIGINT_handler);
+    signal(SIGHUP,SIGINT_handler);
+	
+    parse_DIMACS_main(in, S);
+    //gzclose(in);
+	
+    if (!S.simplify()){
+        return NULL;//(0); // UNSAT
+    }
+	
+    int result=S.solve(); // result of SOLVE
+	//vec<lbool> mod=S.model;
+	//printf(" %d ", S.nVars());
+	
+	
+	/*	if(result){  //if there is a satisfying assignment
+	 vector<bool> *assignment = new vector<bool>(S->model.size());
+	 //printf("\nerfuellende Belegung: ");
+	 for(unsigned int i = 0; i < S->model.size(); ++i) {
+	 //printf("%d  ", toInt(S->model[i]));
+	 assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
+	 }
+	 //printf("\n");
+	 return assignment;
+	 }
+	 else {
+	 return NULL;
+	 }
+	 */	
+	//printf(" \n");
+	/*for (int k=0; k<S.model.size(); ++k) {
+	 lbool val=S.model[k];
+	 printf("%d %d\n",k+1,val.toInt());
+	 }*/
+	//printing the clauses
+//	return result;
+//}
+

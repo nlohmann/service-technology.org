@@ -307,7 +307,8 @@ const MFormula* NFF2CNF(const MFormula * f);
 const MFormula * computeCNF(const MFormula *inf);
 vector<vector<int> > CNF2MSF(const MFormula *fcnf);
 int isSatisfiable(const MFormula *f);
-extern  int minisat(vector<vector<int> > &);
+//extern  int minisat(vector<vector<int> > &);
+extern vector<bool>*  minisat(vector<vector<int> > &);
 //map<string, vector<int> > mp;
 
 #endif

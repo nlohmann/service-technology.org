@@ -280,7 +280,8 @@ int main(int argc, char **argv) {
 		
 	}
 	MConjunction *ersteit=new MConjunction(previousl, previous);
-	//cout << "First formula " <<ersteit->ft<< ersteit->toString()<<endl;
+	
+	//
 /*	cout << "First formula " << ersteit->toString()<<endl;
 	const MFormula *nef=ersteit->computeIFF();
 	cout <<endl<<" IFF "<< nef->toString();
@@ -420,7 +421,12 @@ int main(int argc, char **argv) {
 	//cout << unmarked->toString()<<endl;
 	//cout << "Final formula "<<endl;
 	MFormula *ffinal=NULL;
-	MConjunction *mc1=new MConjunction(ersteit,pit);
+	if ( args_info.siphon_flag ){
+		cout << "First formula " <<ersteit->ft<< ersteit->toString()<<endl;
+		//call minisat
+		ffinal=ersteit;
+	}
+	else {MConjunction *mc1=new MConjunction(ersteit,pit);
 	
 	if (unmarked!=NULL) {
 		ffinal=new MConjunction(mc1,unmarked);
@@ -436,7 +442,7 @@ int main(int argc, char **argv) {
 //		cout<<"Final formula "<<ffinal->toString()<<endl;
 //	}
 	cout << "Final formula "<<endl;
-	
+	}
 	const MFormula *cnf=NULL; //cnf=computeCNF(ersteit);//
 	cnf=computeCNF(ffinal);
 	cout<<"AfterCNF";
@@ -466,13 +472,15 @@ int main(int argc, char **argv) {
 	
 	cout <<endl << "Start SAT"<<endl;
 	std::cerr << endl << "Minisat time : runtime: " << ((double(clock()) - double(start_time)) / CLOCKS_PER_SEC) << " sec\n";
-	int r=minisat(inms);
+	vector<bool>* rs=minisat(inms);
 	
-	if (r) {
+	if (rs!=NULL) {
 		cout << "the formula is satisfiable"<<endl;
+		//r contains an assignement; we have to map it back to the original places (the formaula does not hold)
 	}
 	else{
 		cout << "the formula is not satisfiable"<<endl;
+		
 	}
 /*	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
 		cout << (*it)->getName()<< " ";

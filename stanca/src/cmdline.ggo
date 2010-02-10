@@ -24,9 +24,13 @@ option "output" o
   argoptional
   optional
 
+option "siphon" s
+  "Print out a siphon."
+  details="Prints out a siphon assignment.\n"
+  flag off
 
 section "Configuration"
-sectiondesc="Stanca relies on several other tools. These options configure Hello to find these tools.\n"
+sectiondesc="Stanca relies on several other tools. These options configure Stanca to find these tools.\n"
 
 option "config" c
   "Read configuration from file."
@@ -39,7 +43,7 @@ option "config" c
 
 option "tmpfile" -
   "Set the path and name of temporary files."
-  details="The filename Hello should use to create temporary files (i.e., the output derived from Wendy). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  details="The filename Stanca should use to create temporary files (i.e., the output derived from Stanca). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
   default="/tmp/hello-XXXXXX"
@@ -48,12 +52,12 @@ option "tmpfile" -
 
 option "noClean" -
   "Do not delete temporary files."
-  details="Any temporary files created will be kept after Hello terminates.\n"
+  details="Any temporary files created will be kept after Stanca terminates.\n"
   flag off
 
 
 section "Debugging"
-sectiondesc="These options control how much debug output Hello creates.\n"
+sectiondesc="These options control how much debug output Stanca creates.\n"
 
 option "verbose" v
   "Show verbose messages."

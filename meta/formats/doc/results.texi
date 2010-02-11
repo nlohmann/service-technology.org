@@ -1,0 +1,61 @@
+@node Results
+@chapter Results
+
+@cindex @code{.result}
+
+
+@section Syntax
+
+@subsection Grammar
+
+Below is the BNF grammar for configuration files. Comments are not part
+of the grammar, and hence are not included here.
+
+@sp 1
+@example
+configuration = setting-list | empty
+
+setting-list = setting | setting-list setting
+
+setting = name (":" | "=") value ";"
+
+value = scalar-value | array | list | group
+
+value-list = value | value-list "," value
+
+scalar-value = boolean | integer | integer64 | hex | hex64 | float
+               | string
+
+scalar-value-list = scalar-value | scalar-value-list "," scalar-value
+
+array = "[" (scalar-value-list | empty) "]"
+
+list = "(" (value-list | empty) ")"
+
+group = "@{" (setting-list | empty) "@}"
+
+empty =
+@end example
+
+@sp 2
+Terminals are defined below as regular expressions:
+@sp 1
+
+@multitable @columnfractions .2 .8
+@item @code{boolean} @tab
+@code{([Tt][Rr][Uu][Ee])|([Ff][Aa][Ll][Ss][Ee])}
+@item @code{string} @tab
+@code{\"([^\"\\]|\\.)*\"}
+@item @code{name} @tab
+@code{[A-Za-z\*][-A-Za-z0-9_\*]*}
+@item @code{integer} @tab
+@code{[-+]?[0-9]+}
+@item @code{integer64} @tab
+@code{[-+]?[0-9]+L(L)?}
+@item @code{hex} @tab
+@code{0[Xx][0-9A-Fa-f]+}
+@item @code{hex64} @tab
+@code{0[Xx][0-9A-Fa-f]+L(L)?}
+@item @code{float} @tab
+@code{([-+]?([0-9]*)?\.[0-9]*([eE][-+]?[0-9]+)?)|([-+]([0-9]+)(\.[0-9]*)?[eE][-+]?[0-9]+)}
+@end multitable

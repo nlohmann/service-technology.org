@@ -1,0 +1,5 @@
+@node LoLA Petri Nets
+@chapter LoLA Petri Nets
+
+@cindex @code{.lola}
+@cindex @code{.llnet}

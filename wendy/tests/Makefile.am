@@ -1,12 +1,24 @@
-#############################################################################
-# You need to perform three steps to add a test case:
-#   1.) edit the file `testsuite.at' and add your test case
-#   2.) add the files you need for the test to the `testfile' directory
-#   3.) add these files (without path) to the `TESTFILES' list
-# Do not forget to add your test files to the repository!
-#############################################################################
+#============================================================================#
+# AUTOTEST MAKEFILE                                                          #
+# skeleton written by Niels Lohmann <niels.lohmann@uni-rostock.de>           #
+#============================================================================#
 
-# the files needed by the test cases (without `testfiles/' directory)
+# This Makefile organizes the generation of the test suite, the code coverage
+# and the packaging of the tests. It consists of three parts, of which you
+# need to change the first if you want to add test files and the second if
+# you want to exclude files from the test case coverage (very seldomly). The
+# last part is generic and you must not change it.
+
+
+#--------------------#
+# Part 1: Test Files #
+#--------------------#
+
+# If you want to use a new test file in a test case, proceed as follows:
+# 1. Edit the file `testsuite.at' and add your test case
+# 2. Add the files you need for the test to the `testfile' directory.
+# 3. Add these files (without path) to the `TESTFILES' list.
+# 4. Add the file to the SVN repository.
 TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             06-03-23_BPM06_shop_sect_6.owfn AP.owfn LF_DF_controllable_1.owfn \
             LF_DF_controllable_2.owfn Lohmann_2008_wsfm-Fig2b.owfn \
@@ -40,9 +52,12 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             bug14693.owfn bug14719.owfn \
             CB.owfn CR.owfn TPO.owfn bug14782.owfn bug14798.owfn \
             phils_3_1.owfn RS.owfn cyclicFullCoffee.pnml \
-			moreThanOneFinalLiteral.owfn innerCyclicMPPacyclic.owfn
+            moreThanOneFinalLiteral.owfn innerCyclicMPPacyclic.owfn
 
 
+#-----------------------------------------#
+# Part 2: Exclusions for the Cover Script #
+#-----------------------------------------#
 
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,
@@ -54,18 +69,16 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
 NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.*
 
 
+#--------------------------------------------------------#
+# Part 3: Generics -- YOU MUST NOT CHANGE ANYTHING BELOW #
+#--------------------------------------------------------#
 
-#############################################################################
-# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
-#############################################################################
-
-################
+#--------------#
 # GNU autotest #
-################
+#--------------#
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at wrap.sh \
-             $(addprefix testfiles/,$(TESTFILES))
+EXTRA_DIST = testsuite.at wrap.sh $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 
 # run the test suite when calling "make check"
@@ -76,7 +89,7 @@ check-local: atconfig $(TESTSUITE)
 clean-local:
 	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
 
-# call a specific test set, (e.g. "make check-basic")
+# call a specific test set by keyword (e.g. "make check-basic")
 check-%: atconfig $(TESTSUITE)
 	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) --keywords=$*
 
@@ -86,12 +99,15 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 	$(AM_V_at)mv $@.tmp $@
 
 
-######################
-# LCOV test coverage #
-######################
+#---------------#
+# test coverage #
+#---------------#
 
 # distribute the LGOV scripts
-EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng lcov/lcov zcov
+EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng \
+              lcov/lcov zcov zcov/GCovGroup.py zcov/GCovParser.py \
+              zcov/style.css zcov/zcov-genhtml zcov/zcov-merge zcov/zcov-scan \
+              zcov/zcov-summarize zcov/js/sorttable.js zcov/js/sourceview.js
 
 # compile the code for code coverage
 cover-prepare:
@@ -154,9 +170,9 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcda -exec rm {} \;
 
 
-##############
-# BENCHMARKS #
-##############
+#------------#
+# benchmarks #
+#------------#
 
 EXTRA_DIST += benchmarks.at
 

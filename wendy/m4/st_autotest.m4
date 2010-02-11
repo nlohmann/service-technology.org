@@ -1,10 +1,6 @@
 # serial 1
 AC_DEFUN([AC_ST_AUTOTEST],[
 
-#AC_PROG_SED
-#AC_PROG_GREP
-#AC_PROG_AWK
-
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

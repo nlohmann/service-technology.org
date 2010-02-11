@@ -44,6 +44,7 @@ AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Benchmark Set 2])
 ############################################################################
@@ -77,6 +78,7 @@ AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHR
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
 AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Benchmark Set 3 (smart sending event)])

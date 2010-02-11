@@ -2,6 +2,7 @@ AT_INIT
 
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 
+
 ############################################################################
 AT_BANNER([Basic Options])
 ############################################################################
@@ -536,8 +537,6 @@ AT_CHECK([WENDY bug14798.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "wendy: 5 knowledges reachable" stderr])
 AT_KEYWORDS(bug)
 AT_CLEANUP
-
-
 
 
 ############################################################################
@@ -1111,6 +1110,7 @@ AT_CHECK([GREP -q "net is controllable: NO" stderr])
 AT_KEYWORDS(livelock-freedom)
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Operating Guideline for Weak Termination])
 ############################################################################
@@ -1165,6 +1165,7 @@ AT_CHECK([GREP -c "<tr><td" innerCyclicMPPacyclic.dot],0,[3
 ],ignore)
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Diagnosis of uncontrollable services])

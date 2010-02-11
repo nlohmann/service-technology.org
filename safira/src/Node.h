@@ -33,4 +33,30 @@ class Node {
         static void init();
 };
 
+
+
+
+class Nodepair {
+    private:
+    	static int maxId;		/// maximal id of all nodepair objects
+    public:
+        Labels outLabels; 		/// the labels of outgoing arcs
+        int id;
+        Node* node1;
+        Node* node2;
+        Formula *formula;  		/// a formula assigned to this node
+        list<Nodepair*> *outEdges; 	/// outgoing edges
+
+    public:
+        /// constructor
+        Nodepair(Formula* _f, Node* _node1, Node* _node2);
+
+        /// destructor
+        ~Nodepair();
+
+        /// add an outoing edge to the node
+        void addEdge(int label, Nodepair *target);
+
+};
+
 #endif

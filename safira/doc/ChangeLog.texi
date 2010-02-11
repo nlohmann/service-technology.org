@@ -1,6 +1,8 @@
 @heading Version 1.1-unreleased
 @itemize
 @item removed memory leaks caused by gengetopt, lex and yacc
+@item fixed bug in CNF calculation
+@item implemented intersection 
 @end itemize
 
 @heading Version 1.0

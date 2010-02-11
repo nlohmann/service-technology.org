@@ -50,6 +50,16 @@ AT_CHECK([diff PO_complement.eaa PO_complement_ref.eaa])
 AT_KEYWORDS(complement)
 AT_CLEANUP
 
+AT_SETUP([intersection myCoffee.og myMilk.og])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myMilk.og TESTFILES/myMilk_myCoffee_intersection_ref.eaa .])
+AT_CHECK([SAFIRA -oeaa myMilk.og myCoffee.og -i],0,stdout,stderr)
+AT_CHECK([diff EMPTY stdout])
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([test -f myMilk_myCoffee_intersection.eaa])
+AT_CHECK([diff myMilk_myCoffee_intersection_ref.eaa myMilk_myCoffee_intersection.eaa])
+AT_KEYWORDS(intersection)
+AT_CLEANUP
+
 AT_SETUP([test output: pdf, eps, png, dot])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og .])
 AT_CHECK([SAFIRA -opdf myCoffee.og -c],0,stdout,stderr)

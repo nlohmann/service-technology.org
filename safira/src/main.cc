@@ -14,6 +14,7 @@
 #include "config-log.h"
 #include "time.h"
 #include "Output.h"
+#include "Node.h"
 
 #include "Formula.h"
 
@@ -179,12 +180,14 @@ int main(int argc, char **argv) {
 
 			filename = args_info.inputs[0];
 			filename = filename.substr(0,filename.find_last_of(".og")-2);
+			//cout << "test: " << filename << endl;
 			og_yyin = fopen(args_info.inputs[0], "r");
 
 			if (og_yyin == NULL){
 				abort(1, "File %s not found", args_info.inputs[0]);
 			}
 		}
+
 
 		Graph * g1 = new Graph();
 		graph = g1;
@@ -201,17 +204,17 @@ int main(int argc, char **argv) {
 			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 1st file" << endl;
 		}
 
-		//g->complement();
-
-		delete g1;
-
 		if (args_info.inputs_num == 2){
 			assert(args_info.inputs != NULL);
 			assert(args_info.inputs[1] != NULL);
 
-			filename = args_info.inputs[1];
-			filename = filename.substr(0,filename.find_last_of(".og")-2);
+			string tmpfilename = args_info.inputs[1];
+			tmpfilename = tmpfilename.substr(0, tmpfilename.find_last_of(".og")-2);
+			tmpfilename = tmpfilename.substr(tmpfilename.find_last_of("/")+1, tmpfilename.length());
+			//cout << "testtmp: " << tmpfilename << endl;
 			og_yyin = fopen(args_info.inputs[1], "r");
+			filename = filename + "_" + tmpfilename;
+
 
 			if (og_yyin == NULL){
 				abort(1, "File %s not found", args_info.inputs[1]);
@@ -235,19 +238,85 @@ int main(int argc, char **argv) {
 
 		time_t buildIntersection_start = time(NULL);
 
-		//g->complement();
+		Graph * g3 = new Graph;
+		g3->intersection(g1,g2);
 
 		if(args_info.time_given){
 			time_t buildIntersection_end = time(NULL);
-			cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
-			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the intersection" << endl;
-			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+			cout << "number of nodes in the intersection: " << g3->nodepairs.size() << endl;
+			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the complement" << endl;
 		}
 
+/*****Output Inersection Begin  */
+
+		//cout << "out4 "<< filename << endl;
+		bool printToStdout = true;
+		for (unsigned int j = 0; j<args_info.output_given; ++j){
+			switch(args_info.output_arg[j]) {
+
+			// create output using Graphviz dot
+			case (output_arg_png):
+			case (output_arg_eps):
+			case (output_arg_pdf): {
+				printToStdout = false;
+				if (CONFIG_DOT == "not found") {
+					cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
+					cerr << "       necessary for option '--output'" << endl;
+					exit(EXIT_FAILURE);
+				}
+
+				string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_intersection." + args_info.output_orig[j];
+				FILE *s = popen(call.c_str(), "w");
+				assert(s);
+
+				//stringstream o;
+				//g->getGlobalFormulaForComplement(o);
+
+				string title = filename + "_intersection    global formula: "; // + string(o.str());
+				g3->toDotPair(s, title);
+				assert(!ferror(s));
+
+				pclose(s);
+				break;
+			}
+			case (output_arg_dot): {
+				printToStdout = false;
+				FILE *s = fopen((filename+"_intersection.dot").c_str(), "w");
+				//stringstream o;
+				//g->getGlobalFormulaForComplement(o);
+
+				string title = "Intersection of " + filename + "    global formula: "; // + string(o.str());
+				g3->toDotPair(s, title);
+				assert(!ferror(s));
+				fclose(s);
+				break;
+			}
+
+			case (output_arg_eaa): {
+				printToStdout = false;
+				Output o(filename+"_intersection.eaa", "intersection OG");
+				g3->printIntersection(o);
+				break;
+			}
+			case (output_arg_none): {
+				printToStdout = false;
+				break;
+			}
+			}
+		}
+
+		if(printToStdout){
+			Output o("-", "intersection OG");
+			g3->printComplement(o);
+		}
+
+/*****Output End */
+
+
 		delete g1;
+		delete g2;
+		delete g3;
 
-
-		cout << "Hallo" << endl;
 	}
 
 //	free(args_info.minisat_arg);
@@ -255,10 +324,13 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
+
+
 void initGlobalVariables(){
     label2id.clear();
     id2label.clear();
     inout.clear();
+ //   Node::maxId = 0;
 
     lastLabelId = -1;
 

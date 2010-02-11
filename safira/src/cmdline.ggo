@@ -39,7 +39,7 @@ groupoption "complement" c
   group="operations"
 
 groupoption "intersection" i
-  "Calculates the intersection for two given extended annotated service automata"
+  "Calculates the intersection for two given extended annotated service automata. Both automato must have the same interface!"
 #  "block by default -- choose transitions to allow "
   group="operations"
 

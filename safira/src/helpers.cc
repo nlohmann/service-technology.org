@@ -19,6 +19,8 @@ void addLabel(string label, char io){
 		id2label[lastLabelId] = label;
 		label2id[label] = lastLabelId;
 		inout[lastLabelId] = io;
+
+		//cout << "label: " << label << "  id: " << label2id[label] << endl;
 	}
 }
 

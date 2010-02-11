@@ -11,6 +11,10 @@ Version 1.1-unreleased
 
 * removed memory leaks caused by gengetopt, lex and yacc
 
+* fixed bug in CNF calculation
+
+* implemented intersection
+
 Version 1.0
 ===========
 

@@ -7,7 +7,12 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = EMPTY minispec.og minispec_complement_ref.eaa minispec_expliciteTau.og minispec_expliciteTau_complement_ref.eaa myCoffee.og myCoffee_complement_ref.eaa myCoffee_expliciteTau.og myCoffee_expliciteTau_complement_ref.eaa PO.og PO_complement_ref.eaa testGraph_complement_ref.eaa testGraph_total_ref.eaa
+TESTFILES = EMPTY \
+            minispec.og minispec_complement_ref.eaa minispec_expliciteTau.og minispec_expliciteTau_complement_ref.eaa \
+            myCoffee.og myCoffee_complement_ref.eaa myCoffee_expliciteTau.og myCoffee_expliciteTau_complement_ref.eaa \
+            PO.og PO_complement_ref.eaa \
+            testGraph_complement_ref.eaa testGraph_total_ref.eaa \
+            myMilk.og myMilk_myCoffee_intersection_ref.eaa
 
 
 # Below you can list all the files you do not want to have counted in the

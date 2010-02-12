@@ -17,7 +17,7 @@
         <synchronous id="T" />
       </port>
     </ports>
-    <net id="n1" type="PTnet">
+    <net id="n1" type="PTNet">
       <place id="p0">
         <initialMarking>
           <text>1</text>

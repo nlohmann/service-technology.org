@@ -32,7 +32,8 @@ extern gengetopt_args_info args_info;
  ***************/
 
 Knowledge::Knowledge(InnerMarking_ID m)
-        : is_sane(1), posSendEventsDecoded(NULL), size(1), posSendEvents(NULL),
+        : is_sane(1), posSendEventsDecoded(NULL), size(1), bubble(), todo(),
+          posSendEvents(NULL),
           consideredReceivingEvents(Label::receive_events, false) {
     // add this marking to the bubble and the todo queue
     InterfaceMarking* empty = new InterfaceMarking();

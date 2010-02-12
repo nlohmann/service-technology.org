@@ -50,21 +50,18 @@ AnnotationElement::_stats::_stats()
 */
 AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges,
                                      const std::vector<Clause* > & _annotationBoolean) :
-                                                   successor(NULL)
+                                     // create C-Array to store the set of knowledges
+                                     setOfKnowledges(new StoredKnowledge*[_setOfKnowledges.size() + 1]),
+                                     // create C-Array to store the set of clauses
+                                     annotationBool(new Clause*[_annotationBoolean.size() + 1]),
+                                     successor(NULL)
 {
-
-    // create C-Array to store the set of knowledges
-    setOfKnowledges = new StoredKnowledge*[_setOfKnowledges.size() + 1];
-
+    // copy values into the C arrays
     std::copy(_setOfKnowledges.begin(), _setOfKnowledges.end(), setOfKnowledges);
+    std::copy(_annotationBoolean.begin(), _annotationBoolean.end(), annotationBool);
 
     // that way we do not need to remember the size of the array
     setOfKnowledges[_setOfKnowledges.size()] = NULL;
-
-    // create C-Array to store the set of clauses
-    annotationBool = new Clause*[_annotationBoolean.size() + 1];
-    std::copy(_annotationBoolean.begin(), _annotationBoolean.end(), annotationBool);
-
     annotationBool[_annotationBoolean.size()] = NULL;
 
     // do some statistics

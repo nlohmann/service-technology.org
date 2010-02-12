@@ -166,7 +166,10 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other) : storage(NULL
  */
 InterfaceMarking::InterfaceMarking(const InterfaceMarking& other,
                                    const Label_ID& label,
-                                   const bool& increase, bool& success) {
+                                   const bool& increase, bool& success) :
+    // reserve memory
+    storage(new uint8_t[bytes]) {
+
     // initialize() must be called before first object is created
     assert(interface_length);
     assert(message_bound_bits);
@@ -174,8 +177,7 @@ InterfaceMarking::InterfaceMarking(const InterfaceMarking& other,
     assert(markings_per_byte);
     assert(success);
 
-    // reserve memory and copy values
-    storage = new uint8_t[bytes];
+    // copy values
     for (size_t i = 0; i < bytes; ++i) {
         storage[i] = other.storage[i];
     }

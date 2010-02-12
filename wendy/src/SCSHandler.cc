@@ -61,7 +61,7 @@ unsigned int SCSHandler::countBadSubsystems = 0;
 /*!
     constructor
 */
-SCSHandler::SCSHandler() : mandatoryEdges(NULL), numberOfAllEdges(0), minNumberOfEdges(0), currentBitMask(0), numberOfMandatoryEdges(0) {
+SCSHandler::SCSHandler() : edges(NULL), mandatoryEdges(NULL), numberOfAllEdges(0), minNumberOfEdges(0), currentBitMask(0), numberOfMandatoryEdges(0) {
 
 }
 

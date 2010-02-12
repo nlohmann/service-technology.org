@@ -198,6 +198,7 @@ void ComponentObserver::updateNodes(Node & node)
 }
 
 
+/// \bug Why is node1 not used?
 void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
 {
   //assert(node2.getNameHistory().empty());
@@ -234,6 +235,7 @@ void ComponentObserver::initializeNodeNameHistory(Node & node)
 }
 
 
+/// \bug Why is node not used?
 void ComponentObserver::finalizeNodeNameHistory(Node & node,
     const std::deque<std::string> & history)
 {
@@ -896,6 +898,8 @@ void PetriNet::compose(const PetriNet & net, const std::string & prefix,
  * \param prefixB the net prefix for the 2nd net
  *
  * The result is written to the net which has called the method.
+ *
+ * \bug Why is neither parameter used?
  */
 void PetriNet::composeByPorts(const PetriNet &net, const std::string &portA,
     const std::string &portB, const std::string &prefixA, const std::string &prefixB)

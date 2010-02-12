@@ -49,6 +49,7 @@ number    [0-9]+
 {name}       { yylval.str = strdup(yytext); return NAME; }
 
 [ \t\r\n]*   { /* skip */ }
+.            { yyerror("lexical error"); }
 
 %%
 

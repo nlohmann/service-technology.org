@@ -281,8 +281,7 @@ int minisat(vector< vector< int > > & in)
     return S.solve(); // result of SOLVE
 }
 
-vector<bool>* minisat2(vector< vector< int > > & in)
-{
+vector<bool>* minisat2(vector< vector< int > > & in){
   //assert(in);
 
     Solver* S = new Solver();
@@ -309,16 +308,26 @@ vector<bool>* minisat2(vector< vector< int > > & in)
     }
 
     if(S->solve()){  //if there is a satisfying assignment
-    	vector<bool> *assignment = new vector<bool>(S->model.size());
-    	//printf("\nerfuellende Belegung: ");
+    	assert(S->model);
+    	vector<bool> *assignment = new vector<bool>(S->model.size()+1);
+//    	printf("minisat2(): satisfying assignment: ");
+
     	for(unsigned int i = 0; i < S->model.size(); ++i) {
-    		//printf("%d  ", toInt(S->model[i]));
-    		assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
+//    		printf("%d  ", toInt(S->model[i]));
+    		//assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
+    		if (toInt(S->model[i]) == -1){ //-1 has the meaning of false; 1 has the meaning og true
+    			assignment->at(i+1) = false;
+    		}
+    		else{
+    			assert(toInt(S->model[i]) == 1);
+    			assignment->at(i+1) = true;
+    		}
     	}
-    	//printf("\n");
+//    	printf("\n");
     	return assignment;
     }
     else {
+//    	printf("minisat2(): no satisfying assignment\n");
     	return NULL;
     }
 

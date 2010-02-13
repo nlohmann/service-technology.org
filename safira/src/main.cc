@@ -8,6 +8,8 @@
 #include <algorithm>
 #include "Node.h"
 #include "Graph.h"
+#include "GraphComplement.h"
+#include "GraphIntersection.h"
 #include "helpers.h"
 #include "cmdline.h"
 #include "verbose.h"
@@ -49,11 +51,15 @@ int lastLabelId;
 void initGlobalVariables();
 void evaluateParameters(int argc, char** argv);
 bool fileExists(string filename);
+void out(Graph * g, string filename, string title);
 
 int main(int argc, char **argv) {
 
 	evaluateParameters(argc, argv);
 
+	/******************
+	 * Complement     *
+	 ******************/
 	if(args_info.complement_given){
 
 		string filename = "stdin";
@@ -69,10 +75,9 @@ int main(int argc, char **argv) {
 			if (og_yyin == NULL){
 				abort(1, "File %s not found", args_info.inputs[0]);
 			}
-
 		}
 
-		Graph * g = new Graph();
+		GraphComplement * g = new GraphComplement();
 		graph = g;
 
 		initGlobalVariables();
@@ -84,8 +89,6 @@ int main(int argc, char **argv) {
 
 		fclose(og_yyin);
 		og_yylex_destroy();
-
-
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
@@ -100,74 +103,24 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t buildOG_end = time(NULL);
-			cout << "number of nodes in the complement: " << graph->nodes.size() + graph->getSizeOfAddedNodes() << endl;
+			cout << "number of nodes in the complement: " << g->nodes.size() + g->getSizeOfAddedNodes() << endl;
 			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
 			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
 		}
 
-		bool printToStdout = true;
-		for (unsigned int j = 0; j<args_info.output_given; ++j){
-			switch(args_info.output_arg[j]) {
+		stringstream o;
+		g->getGlobalFormulaForComplement(o);
+		string title = "Complement of " + filename + "    global formula: " + string(o.str());
 
-			// create output using Graphviz dot
-			case (output_arg_png):
-			case (output_arg_eps):
-			case (output_arg_pdf): {
-				printToStdout = false;
-				if (strcmp(CONFIG_DOT, "not found") == 0) {
-					cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
-					cerr << "       necessary for option '--output'" << endl;
-					exit(EXIT_FAILURE);
-				}
-
-				string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_complement." + args_info.output_orig[j];
-				FILE *s = popen(call.c_str(), "w");
-				assert(s);
-
-				stringstream o;
-				g->getGlobalFormulaForComplement(o);
-
-				string title = "Complement of " + filename + "    global formula: " + string(o.str());
-				g->toDot(s, title);
-				assert(!ferror(s));
-
-				pclose(s);
-				break;
-			}
-			case (output_arg_dot): {
-				printToStdout = false;
-				FILE *s = fopen((filename+"_complement.dot").c_str(), "w");
-				stringstream o;
-				g->getGlobalFormulaForComplement(o);
-
-				string title = "Complement of " + filename + "    global formula: " + string(o.str());
-				g->toDot(s, title);
-				assert(!ferror(s));
-				fclose(s);
-				break;
-			}
-
-			case (output_arg_eaa): {
-				printToStdout = false;
-				Output o(filename+"_complement.eaa", "complement OG");
-				g->printComplement(o);
-				break;
-			}
-			case (output_arg_none): {
-				printToStdout = false;
-				break;
-			}
-			}
-		}
-
-		if(printToStdout){
-			Output o("-", "complement OG");
-			g->printComplement(o);
-		}
+		out(g, filename+"_complement",title);
 
 		delete g;
 	}
 
+
+	/******************
+     * Complement     *
+	 ******************/
 	if(args_info.intersection_given){
 		string filename = "stdin";
 
@@ -188,11 +141,10 @@ int main(int argc, char **argv) {
 			}
 		}
 
-
 		Graph * g1 = new Graph();
 		graph = g1;
 
-		//parse
+		//parse first graph
 		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
 
 		fclose(og_yyin);
@@ -224,7 +176,7 @@ int main(int argc, char **argv) {
 		Graph * g2 = new Graph();
 		graph = g2;
 
-		//parse
+		//parse second graph
 		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
 
 		fclose(og_yyin);
@@ -238,7 +190,7 @@ int main(int argc, char **argv) {
 
 		time_t buildIntersection_start = time(NULL);
 
-		Graph * g3 = new Graph;
+		GraphIntersection * g3 = new GraphIntersection();
 		g3->intersection(g1,g2);
 
 		if(args_info.time_given){
@@ -247,76 +199,15 @@ int main(int argc, char **argv) {
 			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the complement" << endl;
 		}
 
-/*****Output Inersection Begin  */
+		//stringstream o;
+		//g3->getGlobalFormulaForIntersection(o);
+		string title = filename + "_intersection    global formula: "; // + string(o.str());
 
-		//cout << "out4 "<< filename << endl;
-		bool printToStdout = true;
-		for (unsigned int j = 0; j<args_info.output_given; ++j){
-			switch(args_info.output_arg[j]) {
-
-			// create output using Graphviz dot
-			case (output_arg_png):
-			case (output_arg_eps):
-			case (output_arg_pdf): {
-				printToStdout = false;
-                if (strcmp(CONFIG_DOT, "not found") == 0) {
-					cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
-					cerr << "       necessary for option '--output'" << endl;
-					exit(EXIT_FAILURE);
-				}
-
-				string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_intersection." + args_info.output_orig[j];
-				FILE *s = popen(call.c_str(), "w");
-				assert(s);
-
-				//stringstream o;
-				//g->getGlobalFormulaForComplement(o);
-
-				string title = filename + "_intersection    global formula: "; // + string(o.str());
-				g3->toDotPair(s, title);
-				assert(!ferror(s));
-
-				pclose(s);
-				break;
-			}
-			case (output_arg_dot): {
-				printToStdout = false;
-				FILE *s = fopen((filename+"_intersection.dot").c_str(), "w");
-				//stringstream o;
-				//g->getGlobalFormulaForComplement(o);
-
-				string title = "Intersection of " + filename + "    global formula: "; // + string(o.str());
-				g3->toDotPair(s, title);
-				assert(!ferror(s));
-				fclose(s);
-				break;
-			}
-
-			case (output_arg_eaa): {
-				printToStdout = false;
-				Output o(filename+"_intersection.eaa", "intersection OG");
-				g3->printIntersection(o);
-				break;
-			}
-			case (output_arg_none): {
-				printToStdout = false;
-				break;
-			}
-			}
-		}
-
-		if(printToStdout){
-			Output o("-", "intersection OG");
-			g3->printComplement(o);
-		}
-
-/*****Output End */
-
+		out(g3, filename+"_intersection", title);
 
 		delete g1;
 		delete g2;
 		delete g3;
-
 	}
 
 //	free(args_info.minisat_arg);
@@ -343,17 +234,6 @@ void initGlobalVariables(){
 	firstLabelId = 2;
 
 }
-
-
-//bool fileExists(std::string filename) {
-//    FILE *tmp = fopen(filename.c_str(), "r");
-//    if (tmp) {
-//        fclose(tmp);
-//        return true;
-//    } else {
-//        return false;
-//    }
-//}
 
 
 /// evaluate the command line parameters
@@ -401,8 +281,62 @@ void evaluateParameters(int argc, char** argv) {
         abort(4, "Wrong number of input files. Exactly one file must be given if complement is chosen.");
     }
 
-
-
     free(params);
+}
+
+void out(Graph * g, string filename, string title){
+	bool printToStdout = true;
+	for (unsigned int j = 0; j<args_info.output_given; ++j){
+		switch(args_info.output_arg[j]) {
+
+		// create output using Graphviz dot
+		case (output_arg_png):
+		case (output_arg_eps):
+		case (output_arg_pdf): {
+			printToStdout = false;
+			if (strcmp(CONFIG_DOT, "not found") == 0) {
+				cerr << PACKAGE << ": Graphviz dot was not found by configure script; see README" << endl;
+				cerr << "       necessary for option '--output'" << endl;
+				exit(EXIT_FAILURE);
+			}
+
+			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "." + args_info.output_orig[j];
+			FILE *s = popen(call.c_str(), "w");
+			assert(s);
+
+			g->toDot(s, title);
+			assert(!ferror(s));
+
+			pclose(s);
+			break;
+		}
+		case (output_arg_dot): {
+			printToStdout = false;
+			FILE *s = fopen((filename+".dot").c_str(), "w");
+			stringstream o;
+
+			g->toDot(s, title);
+			assert(!ferror(s));
+			fclose(s);
+			break;
+		}
+
+		case (output_arg_eaa): {
+			printToStdout = false;
+			Output o(filename+".eaa", "");
+			g->print(o);
+			break;
+		}
+		case (output_arg_none): {
+			printToStdout = false;
+			break;
+		}
+		}
+	}
+
+	if(printToStdout){
+		Output o("-", "");
+		g->print(o);
+	}
 }
 

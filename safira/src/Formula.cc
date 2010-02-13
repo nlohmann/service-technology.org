@@ -222,16 +222,20 @@ bool Formula::isSatisfiable(){
         clausesVector.push_back(currentClause);
     }
 
-//	clock_t start_clock = clock();
-    vector<bool> *assignment = minisat2(clausesVector);
-//	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+    //	clock_t start_clock = clock();
+    return minisat(clausesVector);
+    //	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
-    if(assignment){
-    	return true;
-    }
-    else {
-    	return false;
-    }
+////	clock_t start_clock = clock();
+//    vector<bool> *assignment = minisat2(clausesVector);
+////	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+//
+//    if(assignment){
+//    	return true;
+//    }
+//    else {
+//    	return false;
+//    }
 }
 
 

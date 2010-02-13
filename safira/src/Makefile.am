@@ -5,6 +5,8 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
                  Node.h Node.cc \
                  Formula.h Formula.cc \
                  Graph.h Graph.cc \
+                 GraphComplement.h GraphComplement.cc \
+                 GraphIntersection.h GraphIntersection.cc \
                  helpers.h helpers.cc \
                  types.h \
                  cmdline.c cmdline.h \
@@ -21,6 +23,8 @@ testsafira_SOURCES = testmain.cc config.h \
                  Node.h Node.cc \
                  Formula.h Formula.cc \
                  Graph.h Graph.cc \
+                 GraphComplement.h GraphComplement.cc \
+                 GraphIntersection.h GraphIntersection.cc \
                  helpers.h helpers.cc \
                  testFormula.h testFormula.cc \
                  testGraph.h testGraph.cc \

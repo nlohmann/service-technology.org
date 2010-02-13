@@ -1,6 +1,7 @@
 #include <config.h>
 #include "testGraph.h"
 #include "Graph.h"
+#include "GraphComplement.h"
 #include <string>
 #include <iostream>
 #include "Formula.h"
@@ -31,6 +32,8 @@ extern  int firstOutputId;//output labels
 extern  int lastLabelId;
 extern  int lastInputId;
 extern  int lastOutputId;
+
+Graph* testgraph;
 
 void initGraph(){
 	initFormulaClass();
@@ -79,18 +82,20 @@ void testComplement(){
 	n0->addEdge(label2id["O"], n1); //n0--O->n1
 	n1->addEdge(label2id["O"], n0); //n1--O->n1
 
-	Graph* g = new Graph();
-	g->nodes[n0->id] = n0;
-	g->nodes[n1->id]  = n1;
-	g->addInitialNode(n0->id);
-	g->globalFormula = new FormulaOR(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
+	GraphComplement* g = new GraphComplement();
+	testgraph = g;
+
+	testgraph->nodes[n0->id] = n0;
+	testgraph->nodes[n1->id]  = n1;
+	testgraph->addInitialNode(n0->id);
+	testgraph->globalFormula = new FormulaOR(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
 
 	g->makeTotal();
 	Output o1("testGraph_total.eaa", "total testGraph");
 	g->print(o1);
 	g->makeComplete();
 	Output o2("testGraph_complement.eaa", "complement testGraph");
-	g->printComplement(o2);
+	g->print(o2);
 
 	assert(g->getSizeOfAddedNodes() == 5);
 	//g->printNodes();

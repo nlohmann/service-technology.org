@@ -24,12 +24,6 @@ option "noClean" -
   "Do not delete temporary files."
   details="Any temporary files created by Safira is kept after Safira terminates.\n"
   flag off  
- 
-#option "complement" c
-#  "Complements the extended annotated service automaton"
-#  string
-#  typestr="FILENAME"
-#  optional
   
 defgroup "operations" groupdesc="Choose the default strategy of the configuration interface. Either, transitions are configured to 'allow' and a configuration only lists the transitions that need to be blocked, or transitions are configured to 'block' and a configuration only lists the transitions that need to be allowed.\n" required
 
@@ -46,7 +40,8 @@ groupoption "intersection" i
 groupoption "union" u
   "Calculates the union for two given extended annotated service automata"
  # "block by default -- choose transitions to allow"
-  group="operations"  
+  group="operations"
+     
   
 section "Input/Output"
 sectiondesc="When called without an input file, Safira reads from the standard input stream.  If 'eaa' doesn't selected as output format Safira will pipe the result to the standard output stream. The input filename's suffix (e.g. '.og') is replaced by the name of the respective option (e.g., '.eaa').\n"

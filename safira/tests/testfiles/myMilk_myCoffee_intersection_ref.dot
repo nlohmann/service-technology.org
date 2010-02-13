@@ -1,0 +1,31 @@
+digraph D {
+graph [fontname="Helvetica", label="myMilk_myCoffee_intersection    global formula: "];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+  q_0 [label="" height="0.01" width="0.01" style="invis"];
+  q_0 -> 0 [minlen="0.5"];
+  0 [label="0\n (((M + E) + T) * ((C + E) + T))"]
+  0 -> 0 [label=" tau"]
+  0 -> 1 [label="?B"]
+  0 -> 2 [label="!E"]
+  0 -> 3 [label="!T"]
+  2 [label="2\n ((M + T) * (C + T))"]
+  2 -> 2 [label=" tau"]
+  2 -> 1 [label="?B"]
+  2 -> 4 [label="!T"]
+  3 [label="3\n (E * E)"]
+  3 -> 3 [label=" tau"]
+  3 -> 1 [label="?B"]
+  3 -> 4 [label="!E"]
+  4 [label="4\n (B * B)"]
+  4 -> 4 [label=" tau"]
+  4 -> 5 [label="?B"]
+  5 [label="5\n (final * final)"]
+  5 -> 5 [label=" tau"]
+  5 -> 1 [label="?B"]
+  1 [label="1\n (true * true)"]
+  1 -> 1 [label=" tau"]
+  1 -> 1 [label="?B"]
+  1 -> 1 [label="!E"]
+  1 -> 1 [label="!T"]
+}

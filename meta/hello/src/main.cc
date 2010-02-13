@@ -131,7 +131,7 @@ void evaluateParameters(int argc, char** argv) {
 
 /// a function collecting calls to organize termination (close files, ...)
 void terminationHandler() {
-	/* [USER] Add code here */
+    /* [USER] Add code here */
 
     // print statistics
     if (args_info.stats_flag) {
@@ -161,13 +161,13 @@ int main(int argc, char** argv) {
     try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
-        	// parse the open net from standard input
+            // parse the open net from standard input
             std::cin >> pnapi::io::owfn >> net;
         } else {
             // strip suffix from input filename (if necessary: uncomment next line for future use)
             //inputFilename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
 
-        	// open input file as an input file stream
+            // open input file as an input file stream
             std::ifstream inputStream(args_info.inputs[0]);
             // ... and abort, if an error occurs
             if (!inputStream) {
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
 
     // if the verbose-flag is set, it is also given to Wendy
     if ( args_info.verbose_flag ) {
-	    outputParam += " -v ";
+        outputParam += " -v ";
     }
       // for piping Wendy's output, we use " 2> " to read from std::cerr
       outputParam += " 2> ";
@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
       }
       else
       {
-    	// create a temporary file
+        // create a temporary file
 #if defined(__MINGW32__)
         fileName = mktemp(basename(args_info.tmpfile_arg));
 #else
@@ -263,33 +263,33 @@ int main(int argc, char** argv) {
 
 
     /*--------------------------------------------------------------.
-	| 5. parse Wendy's output and write out the result to the shell |
-	`--------------------------------------------------------------*/
+    | 5. parse Wendy's output and write out the result to the shell |
+    `--------------------------------------------------------------*/
 
     // if no output file is given
     if ( not args_info.output_given )
     {
 
-		// open Wendy's output file and link output file pointer
-		wendy_yyin = fopen(fileName.c_str(), "r");
-		if(!wendy_yyin)
-		{
-			std::cerr << PACKAGE << ": ERROR: failed to open file '"
-			<< args_info.output_arg << "'" << std::endl;
-			exit(EXIT_FAILURE);
-		}
+        // open Wendy's output file and link output file pointer
+        wendy_yyin = fopen(fileName.c_str(), "r");
+        if(!wendy_yyin)
+        {
+            std::cerr << PACKAGE << ": ERROR: failed to open file '"
+            << args_info.output_arg << "'" << std::endl;
+            exit(EXIT_FAILURE);
+        }
 
-		/// actual parsing
-		wendy_yyparse();
+        /// actual parsing
+        wendy_yyparse();
 
-		// close input (output is closed by destructor)
-		fclose(wendy_yyin);
+        // close input (output is closed by destructor)
+        fclose(wendy_yyin);
 
-		/// clean lexer memory
-		wendy_yylex_destroy();
+        /// clean lexer memory
+        wendy_yylex_destroy();
 
-		// write parsed result to stderr
-		message("parsed: %s", wendy_out.c_str());
+        // write parsed result to stderr
+        message("parsed: %s", wendy_out.c_str());
     }
 
     return EXIT_SUCCESS;

@@ -38,8 +38,6 @@ class GraphIntersection : public Graph {
 
         /// Graph output
         void print(ostream& o) const;
-
-        void printIntersection(ostream& o) const;
 };
 
 #endif /* GRAPHINTERSECTION_H_ */

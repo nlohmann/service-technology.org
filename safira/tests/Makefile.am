@@ -10,7 +10,9 @@
 TESTFILES = EMPTY \
             minispec.og minispec_complement_ref.eaa minispec_expliciteTau.og minispec_expliciteTau_complement_ref.eaa \
             myCoffee.og myCoffee_complement_ref.eaa myCoffee_expliciteTau.og myCoffee_expliciteTau_complement_ref.eaa myCoffee_complement_ref.dot\
-            PO.og PO_complement_ref.eaa \
+            myCoffee_complement_reduced_ref.eaa \
+            PO.og PO_complement_ref.eaa PO_complement_reduced_ref.eaa \
+            CN_cyclic.og CN_cyclic_complement_reduced_ref.eaa \
             testGraph_complement_ref.eaa testGraph_total_ref.eaa \
             myMilk.og myMilk_myCoffee_intersection_ref.eaa myMilk_myCoffee_intersection_ref.dot
 

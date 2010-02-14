@@ -2,6 +2,8 @@
 #define _GRAPHCOMPLEMENT_H
 
 #include <map>
+#include "FormulaTree.h"
+//#include "Node.h"
 #include "Graph.h"
 
 using namespace std;
@@ -10,6 +12,7 @@ class GraphComplement : public Graph {
 	private:
 		map<int, Node*> addedNodes;
 		Node* trap;
+		FormulaTree* root;
 
 		void toDot_addedNodes(FILE* out) const;
 
@@ -19,8 +22,11 @@ class GraphComplement : public Graph {
         void printGlobalFormulaForComplement(ostream& o) const;
 
         Node* getNode(Formula *f);
-        bool formulaFounded(Formula *f, Formula *g);
+        Node* getNode_stupid(Formula *f);
+        bool formulaFound(Formula *f, Formula *g);
+        Node* searchNode(Formula *f, FormulaTree *n);
 //        void getGlobalFormula(ostream& o) const;
+
 
 
     public:
@@ -34,8 +40,14 @@ class GraphComplement : public Graph {
     	/// computes the complement for the extended annotated graph
     	void complement();
 
-        /// complete the extended annotated graph
-        void makeComplete();
+        /// complete the extended annotated graph - fast algorithm, but unreduced result
+        void makeComplete_fast();
+
+        /// complete the extended annotated graph - stupid algorithm (simple reduction, slow)
+        void makeComplete_stupid();
+
+        /// complete the extended annotated graph - efficient algorithm (intelligent reduction, fast)
+        void makeComplete_efficient();
 
         /// make the extended annotated graph total
         void makeTotal();
@@ -46,15 +58,11 @@ class GraphComplement : public Graph {
         /// Graph output as complement (it is required that makeTotal and makeComplete was executed before)
         void print(ostream& o) const;
 
+        //TODO: diese Funktion private?
         void getGlobalFormulaForComplement(ostream& o) const;
 
         /// get the number of new nodes in the complement
         int getSizeOfAddedNodes();
-
-
-//        /// adds a label to the graphs
-//        void addLabel(string label, unsigned int id);
-
 };
 
 #endif /* GRAPHCOMPLEMENT_H_ */

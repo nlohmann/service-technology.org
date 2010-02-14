@@ -10,8 +10,6 @@
 #include <time.h>
 //#include <iostream>
 
-
-
 using std::map;
 using std::string;
 using std::stack;
@@ -21,12 +19,7 @@ extern map<int, string> id2label;
 extern map<int, char> inout;
 
 extern int firstLabelId; //all labels including tau
-//extern int firstInputId; //input labels
-//extern int firstOutputId;//output labels
-
 extern int lastLabelId;
-//extern int lastInputId;
-//extern int lastOutputId;
 
 using namespace std;
 
@@ -114,11 +107,6 @@ void GraphIntersection::product(Nodepair* qp){
 //	cout << "End Product(): " << qp->node1->id << " " << qp->node2->id << endl;
 }
 
-/// add a node to the graph
-//void Graph::addInitialNode(int id){
-//	initialNodes.push_back(id);
-//}
-
 
 //! \brief creates a dot output of the graph (result of intersection or union)
 //! \param out: output file
@@ -174,18 +162,6 @@ void GraphIntersection::printNodepairs(ostream& o) const{
 		}
 		o << endl;
 	}
-
-//    //print all addednodes
-//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
-//		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
-//		for (int i = firstLabelId; i <= lastLabelId; ++i){
-//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				assert(id2label.find(i) != id2label.end());
-//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
-//			}
-//		}
-//		o << endl;
-//	}
 }
 
 
@@ -196,15 +172,3 @@ void GraphIntersection::print(ostream& o) const{
 	//printGlobalFormula(o);
 	printNodepairs(o);
 }
-
-
-
-
-//int Graph::getSizeOfAddedNodes(){
-//	return addedNodes.size();
-//}
-
-
-
-
-

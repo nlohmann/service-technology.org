@@ -1,5 +1,7 @@
 #include <config.h>
+#include <cassert>
 #include "helpers.h"
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -220,6 +222,77 @@ list<Clause> tripleOR(int x, int l, int r){
 	return clauses;
 }
 
-//void printClause(const Clause& cl){
-//	cout << "Clausel: " << cl.literal0 << ", " << cl.literal1 << ", " << cl.literal2 << endl;
-//}
+void printClause(const Clause& cl){
+	cout << "Clausel: " << cl.literal0 << ", " << cl.literal1 << ", " << cl.literal2 << endl;
+}
+
+
+string assignmentToString(vector<bool>* assignment){
+	string s = "";
+	if(assignment){
+		assert(assignment->size() >= label2id.size());
+		for(int i = 1; i < label2id.size(); ++i){
+			if(assignment->at(i) == true){
+				s = s + id2label[i] + " ";
+				//cout << id2label[i] << " ";
+			}
+			else{
+				assert(assignment->at(i) == false);
+				s = s + "-" + id2label[i] + " ";
+				//cout << "-" << id2label[i] << " ";
+			}
+		}
+	}
+	else {
+		s = "no satisfying assignment";
+	}
+	return s;
+
+}
+
+void printFormulaTree(FormulaTree* root, string filename){
+
+	string call = string(CONFIG_DOT) + " -Tpdf -q -o " + filename;
+	FILE *s = popen(call.c_str(), "w");
+	assert(s);
+
+	FormulaTreeToDot(s, root);
+	assert(!ferror(s));
+
+	pclose(s);
+}
+
+void FormulaTreeToDot(FILE* out, FormulaTree* root){
+
+	fprintf(out, "digraph D {\n");
+	fprintf(out, "graph [fontname=\"Helvetica\", label=\"");
+	fprintf(out, "%s", "FormulaTree");
+	fprintf(out, "\"];\n");
+	fprintf(out, "node [fontname=\"Helvetica\" fontsize=10];\n");
+	fprintf(out, "edge [fontname=\"Helvetica\" fontsize=10];\n");
+
+	if (root->node || root->satAssignment){
+		// an arrow indicating the initial state
+		fprintf(out, "  q_%d [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n", root->id);
+		fprintf(out, "  q_%d -> %d [minlen=\"0.5\"];\n", root->id, root->id);
+	}
+
+	dfsTree(out, root);
+	fprintf(out, "}\n");
+}
+
+void dfsTree(FILE* out, FormulaTree* n){
+
+	if(n->node){
+		fprintf(out, "  %d [label=\"%d\\n %d: %s\"]\n", n->id, n->id, n->node->id, n->node->formula->toString().c_str());
+	}
+
+	if(n->satAssignment){
+		fprintf(out, "  %d [label=\"%d\\n %s\"]\n", n->id, n->id, assignmentToString(n->satAssignment).c_str());
+	}
+
+	if(n->yes){
+		fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->id, n->yes->id, "yes");
+		dfsTree(out, n->yes);
+	}
+}

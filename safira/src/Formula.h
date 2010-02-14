@@ -21,10 +21,6 @@ public:
 	/// type of the formula
 	FormulaType formulaType;
 
-	/// returns true if the formula is satisfiable; returns false otherwise
-	bool isSatisfiable();
-	list<Clause> calculateCNF();
-
 	Formula();
 	Formula (const Formula & formula);
 	virtual Formula * getCopy() const = 0;
@@ -33,6 +29,17 @@ public:
 	/// destructor
 	//virtual ~Formula() {};
 	virtual ~Formula();
+
+	/// returns true if the formula is satisfiable; returns false otherwise
+	bool isSatisfiable();
+
+	/// returns true if given assignment satify the formula; returns false otherwise
+	bool isSatisfiable(vector<bool>* assignment);
+
+	/// returns a satisfying assignment if there is one; returns NULL otherwise
+	vector<bool> * getSatisfyingAssignment();
+
+	list<Clause> calculateCNF();
 
 	/// returns a string representation of the formula
 	virtual string toString() const = 0;

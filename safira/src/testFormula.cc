@@ -140,9 +140,9 @@ bool checkClause(const Clause& cl, const int l0, const int l1, const int l2){
 	return ((cl.literal0 == l0) && (cl.literal1 == l1) && (cl.literal2 == l2));
 }
 
-void printClause(const Clause& cl){
-	cout << "Clausel: " << cl.literal0 << ", " << cl.literal1 << ", " << cl.literal2 << endl;
-}
+//void printClause(const Clause& cl){
+//	cout << "Clausel: " << cl.literal0 << ", " << cl.literal1 << ", " << cl.literal2 << endl;
+//}
 
 void testTRUE(){
 	cout << "testTRUE... ";

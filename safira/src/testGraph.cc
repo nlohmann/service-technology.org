@@ -93,7 +93,7 @@ void testComplement(){
 	g->makeTotal();
 	Output o1("testGraph_total.eaa", "total testGraph");
 	g->print(o1);
-	g->makeComplete();
+	g->makeComplete_fast();
 	Output o2("testGraph_complement.eaa", "complement testGraph");
 	g->print(o2);
 

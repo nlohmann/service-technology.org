@@ -39,14 +39,8 @@ map<string, int> label2id;
 map<int, string> id2label;
 map<int, char> inout;
 
-//extern int currentIdPos;
 int firstLabelId; //all labels including tau
-//extern int firstInputId; //input labels
-//extern int firstOutputId;//output labels
-//
 int lastLabelId;
-//extern int lastInputId;
-//extern int lastOutputId;
 
 void initGlobalVariables();
 void evaluateParameters(int argc, char** argv);
@@ -119,7 +113,7 @@ int main(int argc, char **argv) {
 
 
 	/******************
-     * Complement     *
+     * Intersection   *
 	 ******************/
 	if(args_info.intersection_given){
 		string filename = "stdin";
@@ -273,12 +267,12 @@ void evaluateParameters(int argc, char** argv) {
 //    StoredKnowledge::reportFrequency = args_info.reportFrequency_arg;
 
     // checks the correct number of input files
-    if (args_info.inputs_num > 1 && args_info.complement_given) {
+    if (args_info.inputs_num != 1 && args_info.complement_given) {
         abort(4, "Wrong number of input files. Exactly one file must be given if complement is chosen.");
     }
 
-    if (args_info.inputs_num > 1 && args_info.complement_given) {
-        abort(4, "Wrong number of input files. Exactly one file must be given if complement is chosen.");
+    if (args_info.inputs_num != 2 && args_info.intersection_given) {
+        abort(4, "Wrong number of input files. Exactly two files must be given if intersection is chosen.");
     }
 
     free(params);

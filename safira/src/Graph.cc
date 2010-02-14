@@ -1,4 +1,5 @@
 #include <config.h>
+#include <cassert>
 #include <cstdio>
 #include <string>
 #include <map>
@@ -19,12 +20,7 @@ extern map<int, string> id2label;
 extern map<int, char> inout;
 
 extern int firstLabelId; //all labels including tau
-//extern int firstInputId; //input labels
-//extern int firstOutputId;//output labels
-
 extern int lastLabelId;
-//extern int lastInputId;
-//extern int lastOutputId;
 
 using namespace std;
 
@@ -140,6 +136,7 @@ void Graph::printNodes(ostream& o) const{
 
 /// prints the graph
 void Graph::print(ostream& o) const{
+
 	printInterface(o);
 	printInitialNodes(o);
 	printGlobalFormula(o);

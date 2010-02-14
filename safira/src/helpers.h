@@ -6,6 +6,7 @@
 #include <list>
 #include "types.h"
 #include "Formula.h"
+#include "FormulaTree.h"
 
 using namespace std;
 
@@ -24,6 +25,10 @@ list<Clause> xEqualsTrue(int x);
 list<Clause> xEqualsFalse(int x);
 list<Clause> xEqualsI(int x, int i);
 
-//void printClause(const Clause& cl);
+void printClause(const Clause& cl);
+string assignmentToString(std::vector<bool>* satAssignment);
+void printFormulaTree(FormulaTree* root, string filename);
+void FormulaTreeToDot(FILE* out, FormulaTree* root);
+void dfsTree(FILE* out, FormulaTree* root);
 
 #endif

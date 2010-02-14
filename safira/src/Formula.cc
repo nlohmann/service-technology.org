@@ -208,7 +208,46 @@ list<Clause> Formula::calculateCNF(){
 	return clauses;
 }
 
+bool Formula::isSatisfiable(vector<bool> * assignment){
+//	cout << "isSatisfiable(...): " << toString() << endl;
+	assert(assignment->size() >= label2id.size());
 
+	list<Clause> clauses = calculateCNF();
+
+	Clause* cl;
+	for(int i = 1; i < label2id.size(); ++i){
+		cl = new Clause();
+		if(assignment->at(i) == true){
+			cl->literal0 = i;
+		}
+		else{
+			assignment->at(i) == false;
+			cl->literal0 = i * -1;
+		}
+		cl->literal1 = emptyLiteral();
+		cl->literal2 = emptyLiteral();
+		clauses.push_back(*cl);
+	}
+
+	vector<vector<int> > clausesVector;
+	for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
+//		cout << "isSatisfiable(...): "; printClause(*n);
+		vector<int> currentClause(clauseToIntVector(*n));
+		currentClause.push_back(0);
+		clausesVector.push_back(currentClause);
+	}
+
+	//	clock_t start_clock = clock();
+	vector<bool>* satAssignment = minisat2(clausesVector); // assignmet is NULL if Formula is not satifiable
+	//	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+
+	if(satAssignment){
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
 bool Formula::isSatisfiable(){
 	//cout << toString() << endl;
@@ -225,19 +264,28 @@ bool Formula::isSatisfiable(){
     //	clock_t start_clock = clock();
     return minisat(clausesVector);
     //	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
-
-////	clock_t start_clock = clock();
-//    vector<bool> *assignment = minisat2(clausesVector);
-////	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
-//
-//    if(assignment){
-//    	return true;
-//    }
-//    else {
-//    	return false;
-//    }
 }
 
+vector<bool> * Formula::getSatisfyingAssignment(){
+//	cout << "isSatisfiable(): " << toString() << endl;
+	list<Clause> clauses = calculateCNF();
+    vector<vector<int> > clausesVector;
+    //cout << "Number of Clauses: " << clauses.size() << endl;
+    for(list<Clause>::const_iterator n = clauses.begin(); n != clauses.end(); ++n){
+    	//cout << "isSatisfiable(): "; printClause(*n);
+        vector<int> currentClause(clauseToIntVector(*n));
+        currentClause.push_back(0);
+        clausesVector.push_back(currentClause);
+    }
+
+//	clock_t start_clock = clock();
+//	vector<bool>* satAssignment = minisat2(clausesVector); // satAssignmet is NULL if Formula is not satisfiable
+//	cout << "isSatisfiable(): satisfying assignment returned by minisat2: " << assignmentToString(satAssignment) << endl;
+//	return satAssignment;
+    return minisat2(clausesVector);
+
+//	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+}
 
 /****************************************************************************
  * string output

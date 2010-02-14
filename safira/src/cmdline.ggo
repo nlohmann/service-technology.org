@@ -28,9 +28,16 @@ option "noClean" -
 defgroup "operations" groupdesc="Choose the default strategy of the configuration interface. Either, transitions are configured to 'allow' and a configuration only lists the transitions that need to be blocked, or transitions are configured to 'block' and a configuration only lists the transitions that need to be allowed.\n" required
 
 groupoption "complement" c
-  "Complements a given extended annotated service automaton"
- # "block by default -- choose transitions to allow"
+  "Complements a given extended annotated service automaton
+0 - unreduced result
+1 - simple reduction algorithm (slow)
+2 - efficient reduction algorithm (fast)"
+#  details="0=fast, 1=stupid, 2=efficient"
   group="operations"
+  values="0","1","2" enum
+  default="2"
+  typestr="MODE"
+  argoptional 
 
 groupoption "intersection" i
   "Calculates the intersection for two given extended annotated service automata. Both automato must have the same interface!"

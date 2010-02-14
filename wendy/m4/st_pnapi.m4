@@ -13,18 +13,15 @@ ST_PNAPI_OLDLIBS=${LIBS}
   [], [with_pnapi=yes]
 )
 
-# Check whether PNAPI is present and we can link against it.
+# check whether PNAPI is present and we can link against it
 AC_LANG([C++])
 AC_CHECK_LIB(pnapi, libpnapi_is_present)
 AC_MSG_CHECKING([whether to use installed Petri Net API])
+
 if test "x$with_pnapi" != xno -a "${ac_cv_lib_pnapi_libpnapi_is_present}" = "yes"; then
   AC_MSG_RESULT([yes])
   AM_CONDITIONAL(COMPILE_PNAPI, [false])
 else
-  # these tools are needed to compile the Petri Net API
-  AC_PROG_LEX
-  AC_PROG_YACC
-
   if test "x$with_pnapi" != xno; then
     AC_MSG_RESULT([no (library not found or not usable)])
     AM_CONDITIONAL(COMPILE_PNAPI, [true])
@@ -35,6 +32,9 @@ else
     # reset LIBS variable to previous value
     LIBS=${ST_PNAPI_OLDLIBS}
   fi
+  # these tools are needed to compile the Petri Net API
+  AC_PROG_LEX
+  AC_PROG_YACC
 fi
 
 ])

@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 #include "Knowledge.h"
+#include "Results.h"
 
 
 /*!
@@ -57,6 +58,9 @@ class StoredKnowledge {
 
         /// print information for instance migration
         static void output_migration(std::ostream&);
+
+        /// print results
+        static void output_results(Results&);
 
     public: /* static attributes */
         /// struct combining the statistics on the class StoredKnowledge

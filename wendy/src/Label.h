@@ -23,6 +23,7 @@
 
 #include <map>
 #include <string>
+#include "Results.h"
 #include "types.h"
 
 
@@ -68,6 +69,9 @@ class Label {
     public: /* static functions */
         /// initialize the interface labels and prepare the necessary mappings
         static void initialize();
+
+        /// print results
+        static void output_results(Results&);
 
     public: /* static attributes */
         /// label of first receive (?) event

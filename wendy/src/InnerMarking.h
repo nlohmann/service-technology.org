@@ -27,6 +27,7 @@
 #include <set>
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
+#include "Results.h"
 
 
 /*!
@@ -53,6 +54,9 @@ class InnerMarking {
 
         /// destroy all objects of this class
         static void finalize();
+
+        /// print results
+        static void output_results(Results&);
 
         /// reduction rule: smart sending events
         /// analyze non-trivial SCC of inner markings with respect to reachable final inner markings and possible sending events

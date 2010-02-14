@@ -31,6 +31,7 @@
 #include "StoredKnowledge.h"
 #include "PossibleSendEvents.h"
 #include "cmdline.h"
+#include "Results.h"
 #include "Output.h"
 #include "Cover.h"
 #include "Diagnosis.h"
@@ -78,7 +79,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // store invocation in a std::string for meta information in file output
     for (int i = 0; i < argc; ++i) {
-        invocation += std::string(argv[i]) + " ";
+        invocation += (i == 0 ? "" : " ") + std::string(argv[i]);
     }
 
     // initialize the parameters structure
@@ -283,6 +284,7 @@ int main(int argc, char** argv) {
         markingoutput = new Output(mi_filename, "marking information");
     }
 
+
     /*------------------------------------------.
     | 5. call LoLA and parse reachability graph |
     `------------------------------------------*/
@@ -309,7 +311,6 @@ int main(int argc, char** argv) {
     delete markingoutput;
 
 
-
     /*-------------------------------.
     | 6. organize reachability graph |
     `-------------------------------*/
@@ -334,13 +335,6 @@ int main(int argc, char** argv) {
     // statistics output
     status("stored %d knowledges, %d edges [%.0f sec]",
         StoredKnowledge::stats.storedKnowledges, StoredKnowledge::stats.storedEdges, difftime(end_time, start_time));
-    status("maximal queue length: %d, final queue default length: %d",
-        Queue::maximal_length, Queue::initial_length);
-    status("used %d of %d hash buckets, maximal bucket size: %d",
-        static_cast<size_t>(StoredKnowledge::hashTree.size()), (1 << (8*sizeof(hash_t))), static_cast<size_t>(StoredKnowledge::stats.maxBucketSize));
-    status("calculated %d trivial SCCs", StoredKnowledge::stats.numberOfTrivialSCCs);
-    status("calculated %d non-trivial SCCs, at most %d members in nontrivial SCC",
-        StoredKnowledge::stats.numberOfNonTrivialSCCs, StoredKnowledge::stats.maxSCCSize);
 
     // traverse all nodes reachable from the root
     StoredKnowledge::root->traverse();
@@ -356,8 +350,6 @@ int main(int argc, char** argv) {
         time(&end_time);
         status("generated LL-OG [%.0f sec]", difftime(end_time, start_time));
     }
-
-    status("maximal simultaneously stored Knowledge objects: %d", Queue::maximal_objects);
 
     // analyze root node and print result
     message("%s: %s", _cimportant_("net is controllable"), (StoredKnowledge::root->is_sane ? _cgood_("YES") : _cbad_("NO")));
@@ -378,6 +370,20 @@ int main(int argc, char** argv) {
     /*-------------------.
     | 9. output options |
     `-------------------*/
+    // results output
+    if (args_info.resultFile_given) {
+        std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
+        Results results(results_filename);
+        StoredKnowledge::output_results(results);
+        InnerMarking::output_results(results);
+        Label::output_results(results);
+
+        results.add("meta.package_name", (char *)PACKAGE_NAME);
+        results.add("meta.package_version", (char *)PACKAGE_VERSION);
+        results.add("meta.svn_version", (char *)VERSION_SVN);
+        results.add("meta.invocation", invocation);
+    }
+
     if (StoredKnowledge::root->is_sane or args_info.diagnose_given) {
         // operating guidelines output
         if (args_info.og_given) {

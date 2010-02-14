@@ -2,27 +2,29 @@
 bin_PROGRAMS = wendy
 
 # the plain sources you need to compile (no generated code)
-wendy_SOURCES = syntax_graph.yy lexic_graph.ll \
-                syntax_cover.yy lexic_cover.ll \
-                main.cc types.h \
-                Queue.h Queue.cc \
-                InterfaceMarking.h InterfaceMarking.cc \
-                Label.h Label.cc \
-                InnerMarking.h InnerMarking.cc \
-                Knowledge.h Knowledge.cc \
-                StoredKnowledge.h StoredKnowledge.cc \
-                PossibleSendEvents.h PossibleSendEvents.cc \
+wendy_SOURCES = AnnotationLivelockOG.cc AnnotationLivelockOG.h \
+                Clause.cc Clause.h \
+                CompositeMarking.cc CompositeMarking.h \
                 Cover.h Cover.cc \
                 Diagnosis.h Diagnosis.cc \
-                verbose.cc verbose.h \
-                cmdline.c cmdline.h \
-                Output.cc Output.h \
-                CompositeMarking.cc CompositeMarking.h \
-                AnnotationLivelockOG.cc AnnotationLivelockOG.h \
+                InnerMarking.h InnerMarking.cc \
+                InterfaceMarking.h InterfaceMarking.cc \
+                Knowledge.h Knowledge.cc \
+                Label.h Label.cc \
                 LivelockOperatingGuideline.cc LivelockOperatingGuideline.h \
-                Clause.cc Clause.h \
+                Output.cc Output.h \
+                PossibleSendEvents.h PossibleSendEvents.cc \
+                Queue.h Queue.cc \
+                Results.h Results.cc \
                 SCSHandler.cc SCSHandler.h \
-                util.h
+                StoredKnowledge.h StoredKnowledge.cc \
+                cmdline.cc cmdline.h \
+                main.cc \
+                syntax_cover.yy lexic_cover.ll \
+                syntax_graph.yy lexic_graph.ll \
+                types.h \
+                util.h \
+                verbose.cc verbose.h
 
 # the configuration files
 sysconf_DATA = wendy.conf
@@ -73,9 +75,9 @@ DISTCLEANFILES += config-log.h
 #----------------------------------------------------------#
 # GENERIC: use GNU gengetopt to create command line parser #
 #----------------------------------------------------------#
-.ggo.c:
-	$(AM_V_GEN)$(GENGETOPT) --input=$<
+.ggo.cc:
+	$(AM_V_GEN)$(GENGETOPT) --input=$< --c-extension=cc
 GENGETOPT_FILES = cmdline.ggo
-BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
+BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.cc)
 EXTRA_DIST += $(GENGETOPT_FILES)
-MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
+MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.cc) $(GENGETOPT_FILES:.ggo=.h)

@@ -29,6 +29,10 @@ Version 3.0-unreleased
   linked (e.g., due to a wrong architecture), or the configure script
   option `--without-pnapi' is used.
 
+* added a parameter `-r'/`--resultFile' to write all analysis results into
+  a single file in the file format of libconfig (see
+  `http://www.hyperrealm.com/libconfig')
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

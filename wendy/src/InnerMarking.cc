@@ -437,3 +437,11 @@ void InnerMarking::finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSe
         }
     }
 }
+
+
+void InnerMarking::output_results(Results& r) {
+    r.add("statistics.inner_markings", InnerMarking::stats.markings);
+    r.add("statistics.inner_markings_final", InnerMarking::stats.final_markings);
+    r.add("statistics.inner_markings_bad", InnerMarking::stats.bad_states);
+    r.add("statistics.inner_markings_inevitable_bad", InnerMarking::stats.inevitable_deadlocks);
+}

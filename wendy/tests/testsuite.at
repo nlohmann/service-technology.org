@@ -148,6 +148,14 @@ AT_CHECK([WENDY myCoffee.owfn --reportFrequency=0],0,,[wendy: net is controllabl
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Results output])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --resultFile],0,ignore,ignore)
+AT_CHECK([GREP -q "result = true;" myCoffee.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Releasing allocated memory])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])

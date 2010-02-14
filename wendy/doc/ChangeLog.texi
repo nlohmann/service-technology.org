@@ -8,6 +8,8 @@
 @item added a tool paper with a case study (see @file{doc/toolpaper.pdf})
 
 @item Wendy now checks whether it can use an installed version of the Petri Net API (@samp{libpnapi}) and only compiles its shipped version (see @file{libs/pnapi}) if the installed version is missing, the installed version cannot be linked (e.g., due to a wrong architecture), or the configure script option @option{--without-pnapi} is used.
+
+@item added a parameter @option{-r}/@option{--resultFile} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
 @end itemize
 
 

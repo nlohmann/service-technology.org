@@ -25,8 +25,6 @@ class Results {
         void add(std::string, std::string, float);
         void add(std::string,              unsigned int);
         void add(std::string, std::string, unsigned int);
-        void add(std::string,              size_t);
-        void add(std::string, std::string, size_t);
         void add(std::string,              int);
         void add(std::string, std::string, int);
         void add(std::string,              bool);

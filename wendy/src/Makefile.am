@@ -4,6 +4,7 @@ bin_PROGRAMS = wendy
 # the plain sources you need to compile (no generated code)
 wendy_SOURCES = AnnotationLivelockOG.cc AnnotationLivelockOG.h \
                 Clause.cc Clause.h \
+                cmdline.c cmdline.h \
                 CompositeMarking.cc CompositeMarking.h \
                 Cover.h Cover.cc \
                 Diagnosis.h Diagnosis.cc \
@@ -12,14 +13,13 @@ wendy_SOURCES = AnnotationLivelockOG.cc AnnotationLivelockOG.h \
                 Knowledge.h Knowledge.cc \
                 Label.h Label.cc \
                 LivelockOperatingGuideline.cc LivelockOperatingGuideline.h \
+                main.cc \
                 Output.cc Output.h \
                 PossibleSendEvents.h PossibleSendEvents.cc \
                 Queue.h Queue.cc \
                 Results.h Results.cc \
                 SCSHandler.cc SCSHandler.h \
                 StoredKnowledge.h StoredKnowledge.cc \
-                cmdline.cc cmdline.h \
-                main.cc \
                 syntax_cover.yy lexic_cover.ll \
                 syntax_graph.yy lexic_graph.ll \
                 types.h \
@@ -75,9 +75,9 @@ DISTCLEANFILES += config-log.h
 #----------------------------------------------------------#
 # GENERIC: use GNU gengetopt to create command line parser #
 #----------------------------------------------------------#
-.ggo.cc:
-	$(AM_V_GEN)$(GENGETOPT) --input=$< --c-extension=cc
+.ggo.c:
+	$(AM_V_GEN)$(GENGETOPT) --input=$<
 GENGETOPT_FILES = cmdline.ggo
-BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.cc)
+BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
 EXTRA_DIST += $(GENGETOPT_FILES)
-MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.cc) $(GENGETOPT_FILES:.ggo=.h)
+MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)

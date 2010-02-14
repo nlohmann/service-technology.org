@@ -82,18 +82,6 @@ void Results::add(std::string part, std::string name, unsigned int value) {
     values[part][name] = tmp.str();
 }
 
-void Results::add(std::string partname, size_t value) {
-    std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
-    add(part, name, value);
-}
-
-void Results::add(std::string part, std::string name, size_t value) {
-    std::stringstream tmp;
-    tmp << value;
-    values[part][name] = tmp.str();
-}
-
 void Results::add(std::string partname, bool value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
     std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());

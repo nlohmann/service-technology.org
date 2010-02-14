@@ -1060,19 +1060,19 @@ void StoredKnowledge::output_migration(std::ostream& o) {
 
 
 void StoredKnowledge::output_results(Results& r) {
-    r.add("controllability.result", (bool)root->is_sane);
+    r.add("controllability.result", static_cast<bool>(root->is_sane));
     r.add("controllability.message_bound", args_info.messagebound_arg);
 
     r.add("statistics.nodes", stats.storedKnowledges);
-    r.add("statistics.nodes_sane", seen.size());
+    r.add("statistics.nodes_sane", static_cast<unsigned int>(seen.size()));
     r.add("statistics.nodes_insane", stats.builtInsaneNodes);
     r.add("statistics.edges", stats.storedEdges);
     r.add("statistics.hash_buckets_capacity", (1 << (sizeof(hash_t) * 8)));
-    r.add("statistics.hash_buckets_used", hashTree.size());
-    r.add("statistics.hash_buckets_maximal_size", stats.maxBucketSize);
-    r.add("statistics.queue_maximal_length", Queue::maximal_length);
-    r.add("statistics.queue_reserved_length", Queue::initial_length);
-    r.add("statistics.queue_maximal_queues", Queue::maximal_objects);
+    r.add("statistics.hash_buckets_used", static_cast<unsigned int>(hashTree.size()));
+    r.add("statistics.hash_buckets_maximal_size", static_cast<unsigned int>(stats.maxBucketSize));
+    r.add("statistics.queue_maximal_length", static_cast<unsigned int>(Queue::maximal_length));
+    r.add("statistics.queue_reserved_length", static_cast<unsigned int>(Queue::initial_length));
+    r.add("statistics.queue_maximal_queues", static_cast<unsigned int>(Queue::maximal_objects));
     r.add("statistics.scc_trivial", stats.numberOfTrivialSCCs);
     r.add("statistics.scc_nontrivial", stats.numberOfNonTrivialSCCs);
     r.add("statistics.scc_maximal_size", stats.maxSCCSize);

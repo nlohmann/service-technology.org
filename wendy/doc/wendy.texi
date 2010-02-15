@@ -61,6 +61,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * First Steps::How to set up and install Wendy.
 * Command Line Options::How to run Wendy.
 * Theory::The theory behind Wendy.
+* Results::What information is written to the results files.
 * Exit and Error Codes::What the error and exit codes of Wendy mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
@@ -314,6 +315,107 @@ See @url{http://service-technology.org/publications} for more information.
 @c --------------------------------------------------------------------------
 
 
+@node Results
+@chapter Results
+
+@heading @code{controllability}
+@findex controllability
+
+This part lists the main results of the controllability analysis.
+
+@ftable @code
+@item correctness
+The checked correctness criterion of the analysis: @code{"deadlock freedom"} or @code{"weak termination"}. [String]
+
+@item message_bound
+The message bound used during controllability analysis. [Integer]
+
+@item result
+The results of the controllability analysis: @code{true} if the net is controllable and @code{false} if the net is uncontrollable. [Boolean]
+@end ftable
+
+
+@heading @code{meta}
+@findex meta
+
+This part lists information on the tool itself.
+
+@ftable @code
+@item invocation
+The invocation string of the tool. [String]
+
+@item package_name
+@itemx package_version
+@itemx svn_version
+The name of the tool, its version, and (when applicable) the version of the SVN revision. [String]
+@end ftable
+
+
+@heading @code{statistics}
+@findex statistics
+
+This part lists all kind of information and statistics that can be relevant for debugging or optimization purposes. These information are, however, rather technical and might only be interesting for developers.
+
+@ftable @code
+@item edges
+The number of computed edges between nodes. Note: this number may also include edges to insane nodes. [Integer]
+
+@item events
+@itemx events_receive
+@itemx events_send
+@itemx events_synchronous
+The total number of events and the number of receive, send, and synchronous events, respectively. This number is directly derived from the input open net. [Integer]
+
+@item hash_buckets_capacity
+The total number of hash buckets (i.e., the length of the hash table). This number is influenced by the type @samp{hash_t} that is defined in @file{src/types.h}. [Integer]
+
+@item hash_buckets_maximal_size
+The maximal number of entries stored in a single hash bucket. Any value greater than one means that there was a hash collision which might increase runtime. [Integer]
+
+@item hash_buckets_used
+The number of hash buckets used. Useful to evaluate hash functions. [Integer]
+
+@item inner_markings
+The number of inner markings (i.e., the size of the reachability graph) of the input open net. [Integer]
+
+@item inner_markings_bad
+The number of inner markings that are identified as bad during preprocessing. A bad marking can be a non-final deadlock. When the correctness criterion is set to weak termination, also markings of terminal strongly connected components without final markings (i.e., livelocks) are considered bad. [Integer]
+
+@item inner_markings_final
+The number of reachable markings of the inner that satisfy the final condition of the input open net. [Integer]
+
+@item inner_markings_inevitable_bad
+A marking is inevitably bad if it is neither bad nor final, but all its successor markings are bad or inevitably bad. [Integer]
+
+@item nodes
+The total number of stored nodes (i.e., objects of type @samp{StoredKnowledge}) during analysis. [Integer]
+
+@item nodes_insane
+The total number of stored nodes (i.e., objects of type @samp{StoredKnowledge}) that were identified insane after building. [Integer]
+
+@item nodes_sane
+The total number of stored nodes (i.e., objects of type @samp{StoredKnowledge}) that were not identified insane after building. Only these nodes will be considered when creating files. [Integer]
+
+@item queue_maximal_length
+The maximal number of full markings (i.e., objects of type @samp{FullMarking}) that were queued during the calculation of a closure. [Integer]
+
+@item queue_maximal_queues
+The maximal number of queues that were stored at the same time. This number coincides with the depth of the recursion of the main algorithm (i.e., the depth-first building of knowledges) and the number of concurrently stored objects of type @samp{Knowledge}. [Integer]
+
+@item scc_maximal_size
+The size of the largest strongly connected component of the nodes. [Integer]
+
+@item scc_nontrivial
+The number of non-trivial (i.e., non singleton) strongly connected components of nodes. [Integer]
+
+@item scc_trivial
+The number of trivial (i.e., singleton) strongly connected components of nodes. [Integer]
+@end ftable
+
+
+@c --------------------------------------------------------------------------
+
+
 @node Exit and Error Codes
 @chapter Exit and Error Codes
 
@@ -515,12 +617,16 @@ Wendy is developed under the ``Release Early, Release Often'' maxime (see @url{h
 The most recent change log is available at Wendy's website at @url{http://service-technology.org/files/wendy/ChangeLog}.
 
 
+@c --------------------------------------------------------------------------
+
+@unnumbered Results Index
+@printindex fn
 
 @c --------------------------------------------------------------------------
 
 @node GNU Free Documentation License
 @appendix The GNU Free Documentation License
-
 @include fdl.texi
+
 
 @bye

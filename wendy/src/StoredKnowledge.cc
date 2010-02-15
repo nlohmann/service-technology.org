@@ -1060,6 +1060,14 @@ void StoredKnowledge::output_migration(std::ostream& o) {
 
 
 void StoredKnowledge::output_results(Results& r) {
+	
+	std::string correctness = "deadlock freedom";
+
+    if (args_info.correctness_arg == correctness_arg_livelock) {
+       correctness = "weak termination";
+    }
+    r.add("controllability.correctness", correctness);
+	
     r.add("controllability.result", static_cast<bool>(root->is_sane));
     r.add("controllability.message_bound", args_info.messagebound_arg);
 

@@ -30,7 +30,7 @@ ServiceMarking::~ServiceMarking() {
 std::string ServiceMarking::toString() const {
   std::stringstream tmpStr;
 	tmpStr << std::endl;
-	tmpStr << " F: " << (this->mIsFinal) ? "1" : "0";
+	if (this->mIsFinal) {tmpStr << " F: 1";} else {tmpStr << " F: 0";}
 	tmpStr << std::endl;
 	if (this->mEnabledTransitions != NULL) {
 		tmpStr << " en(q): " << this->mEnabledTransitions->toString() << std::endl;

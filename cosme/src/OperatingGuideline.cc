@@ -33,9 +33,9 @@ OGMarking::~OGMarking() {
 std::string OGMarking::toString() const {
   std::stringstream tmpStr;
 	tmpStr << std::endl;
-  tmpStr << " S: " << (this->mSBit) ? "1" : "0";
-	tmpStr << " F: " << (this->mFBit) ? "1" : "0";
-	tmpStr << " T: " << (this->mTBit) ? "1" : "0";
+	if (this->mSBit) {tmpStr << " S: 1";} else {tmpStr << " S: 0";}
+	if (this->mFBit) {tmpStr << " F: 1";} else {tmpStr << " F: 0";}
+	if (this->mTBit) {tmpStr << " T: 1";} else {tmpStr << " T: 0";}
 	tmpStr << std::endl;
 	if (this->mCheckedPaths != NULL) {
 		tmpStr << " p(q): " << this->mCheckedPaths->toString() << std::endl;

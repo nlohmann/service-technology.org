@@ -191,7 +191,7 @@ void terminationHandler() {
 
   // print statistics
   if (args_info.stats_flag) {
-    message("runtime: %s%.2f sec%s", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _bold_, _c_);
+    message("runtime: %s%.2f sec%s", _bold_, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c_);
     std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
     FILE* ps = popen(call.c_str(), "r");
     unsigned int memory;

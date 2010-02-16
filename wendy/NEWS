@@ -33,6 +33,9 @@ Version 3.0-unreleased
   a single file in the file format of libconfig (see
   `http://www.hyperrealm.com/libconfig')
 
+* fixed bug #15385 (see `https://gna.org/bugs/?15385'): runtime output
+  using the `--stats' crashed under certain Linux systems
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

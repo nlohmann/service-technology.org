@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <libgen.h>
+#include <ctime>
 #include "Label.h"
 #include "Service.h"
 #include "OperatingGuideline.h"
@@ -23,6 +24,8 @@ extern FILE* graph_yyin;
 gengetopt_args_info args_info;
 // the invocation string
 string invocation;
+// a variable holding the time of the call
+clock_t start_clock = clock();
 
 Label GlobalLabels;
 std::map <std::string, label_id_t> TransitionLabels;
@@ -183,10 +186,28 @@ Service* parseService(char* file) {
 
 }
 
+// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+
+  // print statistics
+  if (args_info.stats_flag) {
+    message("runtime: %s%.2f sec%s", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _bold_, _c_);
+    std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+    FILE* ps = popen(call.c_str(), "r");
+    unsigned int memory;
+    int res = fscanf(ps, "%u", &memory);
+    assert(res != EOF);
+    pclose(ps);
+    message("memory consumption: %s%u KB %s", _bold_, memory, _c_);
+	}
+}
+
 // main function
 int main(int argc, char** argv)
 {
-	
+	// set the function to call on normal termination
+  atexit(terminationHandler);
+
 	evaluateParameters(argc, argv);
 
 	if (args_info.matching_flag) {

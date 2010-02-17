@@ -1123,6 +1123,73 @@ std::ostream & output(std::ostream &os, const std::set<std::string> &ss)
 }
 } /* namespace __sa */
 
+/*************************************************************************
+ ***** Woflan output
+ *************************************************************************/
+
+std::ostream & woflan(std::ostream & os)
+{
+  util::FormatData::data(os) = util::WOFLAN;
+  return os;
+}
+
+namespace __woflan
+{
+
+ostream & output(ostream & os, const PetriNet & net)
+{
+  string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
+  string inputfile = net.getMetaInformation(os, INPUTFILE);
+
+  os //< output everything to this stream
+
+  << "-- Petri net created by " << creator
+  << (inputfile.empty() ? "" : " reading " + inputfile) << endl
+  << endl
+
+  << mode(io::util::PLACE) << endl
+  << "  " << delim("; \n") << net.internalPlaces_ << ";" << endl
+  << endl
+
+  // transitions
+  << delim(";\n") << net.transitions_ << ";" << endl
+  << endl;
+
+  return os
+  << "-- END OF FILE" << endl;
+}
+
+
+ostream & output(ostream & os, const Place & p)
+{
+  os << "place \"" << p.getName() << "\"";
+  if (p.getTokenCount() > 0)
+    os << "  init " << p.getTokenCount();
+  return os;
+}
+
+
+ostream & output(ostream & os, const Transition & t)
+{
+  return os
+  << "trans \"" << t.getName() << "\"" << endl
+  << delim(" ")
+  << "  in "
+  << filterInternalArcs(t.getPresetArcs())  << endl
+  << "  out "
+  << filterInternalArcs(t.getPostsetArcs()) << endl;
+}
+
+
+ostream & output(ostream & os, const Arc & arc)
+{
+  for (unsigned int i=0; i<arc.getWeight(); i++)
+    os << "\"" << arc.getPlace().getName() << "\" ";
+  return os;
+}
+
+} /* namespace __woflan */
+
 } /* namespace io */
 
 } /* namespace pnapi */

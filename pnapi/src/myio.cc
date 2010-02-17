@@ -43,7 +43,8 @@ std::ostream & operator<<(std::ostream & os, const PetriNet & net)
   case util::OWFN: return __owfn::output(os, net);
   case util::STAT: return __stat::output(os, net);
   case util::PNML: return __pnml::output(os, net);
-
+  case util::WOFLAN: return __woflan::output(os, net);
+	
   default: assert(false);
   }
 }
@@ -169,6 +170,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Arc & arc)
   case LOLA: return __lola::output(os, arc);
   case OWFN: return __owfn::output(os, arc);
   case PNML: return __pnml::output(os, arc);
+  case WOFLAN: return __woflan::output(os, arc);
 
   default: assert(false);
   }
@@ -183,6 +185,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Place & p)
   case LOLA: return __lola::output(os, p);
   case OWFN: return __owfn::output(os, p);
   case PNML: return __pnml::output(os, p);
+  case WOFLAN: return __woflan::output(os, p);
 
   default: assert(false);
   }
@@ -197,6 +200,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Transition & t)
   case LOLA: return __lola::output(os, t);
   case OWFN: return __owfn::output(os, t);
   case PNML: return __pnml::output(os, t);
+  case WOFLAN: return __woflan::output(os, t);
 
   default: assert(false);
   }

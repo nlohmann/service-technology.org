@@ -98,6 +98,9 @@ public:
   /// returns the name history
   std::deque<std::string> getNameHistory() const;
 
+  /// set new name of the node
+  void setName(std::string newName);
+
   /// adds a prefix to all names
   void prefixNameHistory(const std::string &);
 

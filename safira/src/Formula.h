@@ -6,8 +6,10 @@
 #include <set>
 #include <list>
 #include "types.h"
+#include "NumPrinter.h"
 
 using namespace std;
+
 
 /// a formula to be attached to a node
 class Formula {
@@ -41,8 +43,11 @@ public:
 
 	list<Clause> calculateCNF();
 
+
 	/// returns a string representation of the formula
-	virtual string toString() const = 0;
+	string toString() const;
+
+	virtual string toString(NumPrinterBase* printer) const = 0;
 
 	/// moves all negations to the inner of the formula
 	virtual Formula* moveNegation(bool leadingNot = false) const = 0;
@@ -68,7 +73,7 @@ public:
 	virtual Formula * getCopy() const;
 //	FormulaAND& operator = (const FormulaAND &formula);
 	~FormulaAND();
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -86,7 +91,7 @@ public:
 //	FormulaOR& operator = (const FormulaOR &formula);
 	~FormulaOR();
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -103,7 +108,7 @@ public:
 	//FormulaNOT& operator = (const FormulaNOT &formula);
 	~FormulaNOT();
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -118,7 +123,7 @@ public:
 	FormulaLit(const FormulaLit &formula);
 	~FormulaLit(){}
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -134,7 +139,7 @@ public:
 	FormulaNUM(const FormulaNUM &formula);
 	~FormulaNUM(){}
 	virtual Formula * getCopy() const;
-	virtual string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -146,7 +151,7 @@ public:
 	FormulaTrue();
 	~FormulaTrue(){}
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -158,7 +163,7 @@ public:
 	FormulaFalse();
 	~FormulaFalse(){}
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
@@ -169,10 +174,11 @@ public:
 	FormulaFinal();
 	~FormulaFinal(){}
 	virtual Formula * getCopy() const;
-	string toString() const;
+	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
 };
+
 
 
 #endif

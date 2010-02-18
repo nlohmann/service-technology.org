@@ -9,6 +9,7 @@ using namespace std;
 
 class GraphIntersection : public Graph {
 	private:
+	    string globalFormulaString;
 		list<Intpair> initialNodepairs;
 		stack<long> myStack;
 		stack<Nodepair*> unproc;

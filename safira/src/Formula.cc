@@ -291,7 +291,12 @@ vector<bool> * Formula::getSatisfyingAssignment(){
  * string output
  ***************************************************************************/
 
-string FormulaAND::toString() const {
+string Formula::toString() const {
+	NumPrinterBase* printer = new NumPrinterSingle();
+	return this->toString(printer);
+}
+
+/*string FormulaAND::toString() const {
     return ("(" + left->toString() + " * " + right->toString() + ")");
 }
 
@@ -321,6 +326,43 @@ string FormulaFalse::toString() const {
 }
 
 string FormulaFinal::toString() const {
+    return ("final");
+}*/
+
+/****************************************************************************
+ * extended string output
+ ***************************************************************************/
+
+string FormulaAND::toString(NumPrinterBase* printer) const {
+    return ("(" + left->toString(printer) + " * " + right->toString() + ")");
+}
+
+string FormulaOR::toString(NumPrinterBase* printer) const {
+    return ("(" + left->toString(printer) + " + " + right->toString() + ")");
+}
+
+string FormulaNOT::toString(NumPrinterBase* printer) const {
+    return ("~(" + f->toString(printer) + ")");
+}
+
+string FormulaLit::toString(NumPrinterBase* printer) const {
+	assert(id2label.find(number) != id2label.end());
+    return id2label[number];
+}
+
+string FormulaNUM::toString(NumPrinterBase* printer) const {
+    return printer->printNum(number);
+}
+
+string FormulaTrue::toString(NumPrinterBase* printer) const {
+    return ("true");
+}
+
+string FormulaFalse::toString(NumPrinterBase* printer) const {
+    return ("false");
+}
+
+string FormulaFinal::toString(NumPrinterBase* printer) const {
     return ("final");
 }
 
@@ -773,3 +815,4 @@ list<Clause> FormulaFinal::toCNF(int x, int&) const{
 	return (xEqualsI(x, label2id["final"]));
 
 }
+

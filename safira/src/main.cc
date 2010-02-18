@@ -23,6 +23,14 @@
 /// the command line parameters
 gengetopt_args_info args_info;
 
+///pointer to functions that return formulastring for a number
+string (* numToFormelString) (int num , bool isFromLeftGraph);
+
+string foo(int num, bool isFromLeftGraph){
+	return intToString(num);
+}
+
+//void bar(numToFormelString)
 
 using namespace std;
 

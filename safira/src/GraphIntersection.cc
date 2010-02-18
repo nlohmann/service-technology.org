@@ -9,6 +9,7 @@
 //#include "helpers.h"
 #include <time.h>
 //#include <iostream>
+#include "NumPrinterDouble.h"
 
 using std::map;
 using std::string;
@@ -62,7 +63,15 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 
 		product(top);
 	}
-	//TODO: global Formula
+
+	//generate global Formula
+	NumPrinterBase* printer1 = new NumPrinterDouble(&nodepairs, true);
+	NumPrinterBase* printer2 = new NumPrinterDouble(&nodepairs, false);
+	globalFormulaString = "("
+			+ g1->globalFormula->toString(printer1)
+			+ ") * ("
+			+ g2->globalFormula->toString(printer2)
+			+ ")";
 }
 
 void GraphIntersection::product(Nodepair* qp){
@@ -171,4 +180,8 @@ void GraphIntersection::print(ostream& o) const{
 	printInitialNodes(o);
 	//printGlobalFormula(o);
 	printNodepairs(o);
+}
+
+void GraphIntersection::printGlobalFormula(ostream& o) const{
+
 }

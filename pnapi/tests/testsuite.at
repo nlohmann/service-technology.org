@@ -521,6 +521,12 @@ AT_CHECK([GREP -q "|P|= 3" stderr])
 AT_KEYWORDS([bug reduction])
 AT_CLEANUP
 
+AT_SETUP([Bug 15415 (https://gna.org/bugs/?15415)])
+m4_define([NET],[bug15415.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --reduce=4 NET])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Murata Reduction Rules])

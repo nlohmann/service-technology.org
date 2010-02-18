@@ -1764,9 +1764,13 @@ unsigned int PetriNet::reduce_identical_transitions()
   // obsolete transitions and its "backup"-transition
   set<pair<Transition*, Transition*> > transitionPairs;
   map<Node*,bool> backupTransition; // must not be reduced
+  map<Node*,bool> obsoleteTransition; // must not be backup transitions
 
   PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  {
     backupTransition[*t] = false;
+    obsoleteTransition[*t] = false;
+  }
 
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
 
@@ -1810,6 +1814,9 @@ unsigned int PetriNet::reduce_identical_transitions()
     {
       PNAPI_FOREACH(set<Node*>, prePlace->getPostset(), t2)
       {
+        if(obsoleteTransition[*t2])
+          continue;
+        
         if ( (*t1 != *t2) &&		// precondition 1
             ((*t1)->getPreset() == (*t2)->getPreset()) &&	// precondition 2
             ((*t1)->getPostset() == (*t2)->getPostset()) ) // precondition 3
@@ -1840,6 +1847,8 @@ unsigned int PetriNet::reduce_identical_transitions()
           // transitions fullfill the preconditions
           transitionPairs.insert(pair<Transition*, Transition*>(*t1, static_cast<Transition*>(*t2)));
           backupTransition[*t2] = true; // mark t2 as backup transition
+          obsoleteTransition[*t1] = true; // t1 should not become a backup transition
+          break;
         }
       }
     }
@@ -1853,6 +1862,9 @@ unsigned int PetriNet::reduce_identical_transitions()
       {
         PNAPI_FOREACH(set<Node*>, postPlace->getPreset(), t2)
         {
+          if(obsoleteTransition[*t2])
+            continue;
+          
           if ( (*t1 != *t2) &&     // precondition 1
               ((*t2)->getPreset().empty()) && // precondition 2
               ((*t1)->getPostset() == (*t2)->getPostset()) ) // precondition 3
@@ -1874,6 +1886,8 @@ unsigned int PetriNet::reduce_identical_transitions()
             // transitions fullfill the preconditions
             transitionPairs.insert(pair<Transition*, Transition*>(*t1, static_cast<Transition*>(*t2)));
             backupTransition[*t2] = true; // mark t2 as backup transition
+            obsoleteTransition[*t1] = true; // t1 should not become a backup transition
+            break;
           }
         }
       }

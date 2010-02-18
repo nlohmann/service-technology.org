@@ -168,6 +168,15 @@ std::deque<std::string> Node::getNameHistory() const
   return history_;
 }
 
+/*!
+ */
+void Node::setName(std::string newName)
+{
+  // add history of node to this
+  std::deque<string> oldHistory = history_;
+  history_.push_front(newName);
+  observer_.updateNodeNameHistory(*this, oldHistory);
+}
 
 /*!
  */

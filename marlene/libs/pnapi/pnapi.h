@@ -7,9 +7,9 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2010-01-29 22:23:45 +0100 (Fri, 29 Jan 2010) $
+ * \date    $Date: 2010-02-05 07:28:54 +0100 (Fri, 05 Feb 2010) $
  *
- * \version $Revision: 5332 $
+ * \version $Revision: 5365 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -20,6 +20,7 @@
 #include "petrinet.h"
 #include "automaton.h"
 #include "state.h"
+#include <string>
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
@@ -115,6 +116,7 @@ using pnapi::operator&&;
  */
 namespace pnapi
 {
+std::string version();
 }
 
 /*!

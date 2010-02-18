@@ -154,6 +154,7 @@ Disjunction::Disjunction(const std::set<const Formula *> & children,
   simplifyChildren();
 }
 
+/// \bug Why is d not used?
 Disjunction::Disjunction(const Disjunction & d) :
   Operator(children_)
 {
@@ -373,6 +374,8 @@ bool FormulaLessEqual::isSatisfied(const Marking & m) const
  * 
  * \return  true, if this formula has to be removed by parent
  *          due to this removal, false otherwise.
+ *
+ * \bug     Why is p not used?
  */
 bool Formula::removePlace(const Place & p)
 {

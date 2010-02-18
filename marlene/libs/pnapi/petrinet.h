@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-26 12:32:53 +0100 (Tue, 26 Jan 2010) $
+ * \date    $Date: 2010-02-17 21:08:43 +0100 (Wed, 17 Feb 2010) $
  *
- * \version $Revision: 5305 $
+ * \version $Revision: 5408 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -173,6 +173,9 @@ class PetriNet
 
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
+
+  /// Petri net output, see pnapi::io
+  friend std::ostream & io::__woflan::output(std::ostream &, const PetriNet &);
 
 public:
 

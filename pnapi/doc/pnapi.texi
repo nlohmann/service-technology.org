@@ -341,41 +341,77 @@ of the grammar, and hence are not included here.
 
 @sp 1
 @example
-net = "PLACE" roles internal_places input_places output_places
-      synchronous_labels ";" "INITIALMARKING" markings ";"
-      finalcondition ";" transitions ;
+petrinet = interface
+           "INITIALMARKING" marking_list ";" finalcondition
+           @{ transition @}
+         ;
 
-roles = [ "ROLES" [ id_list ] ";" ] ;
+interface = "INTERFACE" interface_ports "PLACE" places roles ";"
+          | "PLACE" typed_places roles ports
+          ;
 
-id_list = id @{ "," id @} ;
+interface_ports = input_places output_places synchronous
+                | "PORT" identifier input_places output_places synchronous
+                  @{ "PORT" identifier input_places output_places synchronous @}
+                ;
 
-internal_places = "INTERNAL" id_list ";" ;
+places = [ "SAFE" [ number ] ":" ] place_list @{ ";" [ "SAFE" [ number ] ":" ] place_list @} ;
 
-input_places = [ "INPUT" id_list ";" ] ;
+roles = [ "ROLES" identifier @{ "," identifier @} ";" ] ;
 
-output_places = [ "OUTPUT" id_list ";" ] ;
 
-synchronous_labels = [ "SYNCHRONOUS" id_list ";" ] ;
+typed_places = internal_places input_places output_places synchronous
+             | places ";"
+             ;
 
-markings = marking @{ "," marking @} ;
+internal_places = [ "INTERNAL" places ";" ] ;
 
-marking = id [ ":" number ] @{ "," id [ ":" number ] @} ;
+input_places = [ "INPUT" places ";" ] ;
 
-finalcondition = "FINALMARKING" markings | "FINALCONDITION" formula ;
+output_places = [ "OUTPUT" places ";" ] ;
 
-formula = id "=" <number>
-        | formula "AND" formula
-        | formula "OR" formula
-        | "(" formula ")"
+synchronous = [ "SYNCHRONOUS" identifier @{ "," identifier @} ";" ] ;
+
+place_list = [ identifier [ "{$" commands "$}" ] ] @{ "," identifier [ "{$" commands "$}" ] @} ;
+
+identifier = id
+           | number
+           ;
+
+commands = @{ "MAX_UNIQUE_EVENTS" "=" number 
+            | "ON_LOOP" "=" ( "TRUE" | "FALSE" )
+            | "MAX_OCCURRENCES" "=" ( number | negative_number ) @}
+            ;
+
+ports = [ "PORTS" identifier ":" identifier @{ "," identifier @} ";" @{ identifier ":" identifier @{ "," identifier @} ";" @} ] ;
+
+
+transition = "TRANSITION" identifier
+             [ "COST" number ";" ]
+             [ "ROLES" identifier @{ "," itentifier @} ";" ]
+             "CONSUME" [ identifier [ ":" number ] ] @{ "," identifier [ ":" number ] @} ";"
+             "PRODUCE" [ identifier [ ":" number ] ] @{ "," identifier [ ":" number ] @} ";"
+             [ "SYNCHRONIZE" identifier @{ "," identifier @} ";" ]
+             [ "CONSTRAIN" identifier @{ "," identifier @} ";" ]
+           ;
+
+
+marking_list = [ identifier [ ":" number ] ] @{ "," identifier [ ":" number ] @} ;
+
+finalcondition = "FINALMARKING" marking_list ";" @{ marking_list ";" @}
+               | "NOFINALMARKING"
+               | "FINALCONDITION" [ formula ] ";"
+               ;
+
+formula = "(" formula ")"
+        | "TRUE"
+        | "FALSE"
+        | "ALL_PLACES_EMPTY"
+        | "NOT" formula
+        | formula ( "AND" | "OR" ) formula
         | formula "AND" "ALL_OTHER_PLACES_EMPTY"
+        | identifier ( "=" | "#" | "<>" | "<" | "<=" | ">" | ">=" ) number 
         ;
-
-transitions = transition @{ transition @} ;
-
-transition = "TRANSITION" id roles
-             "CONSUME" [ markings ] ";"
-             "PRODUCE" [ markings ] ";"
-             [ "SYNCHRONIZE" id_list ";" ] ;
 @end example
 
 @sp 2
@@ -384,9 +420,11 @@ Terminals are defined below as regular expressions:
 
 @multitable @columnfractions .2 .8
 @item @code{id} @tab
-@code{[A-Za-z]*}
+@code{[A-Za-z]+}
 @item @code{number} @tab
 @code{[0-9]+}
+@item @code{negative_number} @tab
+@code{-[0-9]+}
 @end multitable
 
 

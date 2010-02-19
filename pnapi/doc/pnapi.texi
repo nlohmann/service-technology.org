@@ -372,7 +372,7 @@ output_places = [ "OUTPUT" places ";" ] ;
 
 synchronous = [ "SYNCHRONOUS" identifier @{ "," identifier @} ";" ] ;
 
-place_list = [ identifier [ "{$" commands "$}" ] ] @{ "," identifier [ "{$" commands "$}" ] @} ;
+place_list = [ identifier [ "@{$" commands "$@}" ] ] @{ "," identifier [ "@{$" commands "$@}" ] @} ;
 
 identifier = id
            | number

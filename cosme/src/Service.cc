@@ -18,7 +18,6 @@ ServiceMarking::ServiceMarking(const std::multimap<label_id_t, std::pair<label_i
 	this->mIsFinal = is_Final;
 
 	this->mEnabledTransitions = NULL;
-
 }
 
 ServiceMarking::~ServiceMarking() {
@@ -66,10 +65,15 @@ Service::Service(const std::map<og_service_index_t, ServiceMarking*> &markings,
 
 }
 
-Service::~Service() {
-	for (og_service_index_t i = 0; i < this->mSize; i++)
+Service::~Service() {}
+
+void Service::finalize() {
+	for (og_service_index_t i = 0; i < this->mSize; i++) {
 		delete this->mMarkings[i];
+	}
 	delete[] this->mMarkings;
+	mInterface.clear();
+  status("Service: deleted %d markings", this->mSize);
 }
 
 void Service::calculateBitSets(Label &interface) {

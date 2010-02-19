@@ -16,7 +16,9 @@
 
 // lexer and parser
 extern int og_yyparse();
+extern int og_yylex_destroy();
 extern int graph_yyparse();
+extern int graph_yylex_destroy();
 extern FILE* og_yyin;
 extern FILE* graph_yyin;
 
@@ -35,6 +37,10 @@ std::map<og_service_index_t, OGMarking*> OGMarkings;
 std::map<og_service_index_t, ServiceMarking*> ServiceMarkings;
 
 pnapi::PetriNet tmpNet;
+
+OperatingGuideline *A;
+OperatingGuideline *B;
+Service *C;
 
 // evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -90,6 +96,7 @@ OperatingGuideline* parseOG(char* file) {
   
   // close input (output is closed by destructor)
   fclose(og_yyin);
+	og_yylex_destroy();
 
 	OperatingGuideline *tmpOG = new OperatingGuideline(OGMarkings, OGInterface);
 	OGMarkings.clear();
@@ -137,6 +144,8 @@ inline void parseService_LabelHelper() {
 
 Service* parseService(char* file) {
 	std::ifstream InputStream(file);
+	time_t start_time, end_time;
+
 	if (!InputStream) {
 		abort(1, "could not open file '%s'", file);
 	}	
@@ -144,13 +153,10 @@ Service* parseService(char* file) {
 	// parse OWFN
 	InputStream >> pnapi::io::owfn >> tmpNet;
 	InputStream.close();
-
-	//TODO: notwendig?	
-	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+	
   if (tmpNet.getTransitions().empty()) {
 		abort(3, "the input open net has no transitions");
   }
-  // only normal nets are supported so far
   if (!tmpNet.isNormal()) {
 		abort(3, "the input open net must be normal");
   } 
@@ -174,22 +180,27 @@ Service* parseService(char* file) {
     string command_line = string(args_info.lola_arg) + " " + temp.name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
+	status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+  time(&start_time);
 	graph_yyin = popen(command_line.c_str(), "r");
   graph_yyparse();
   pclose(graph_yyin);	
+	graph_yylex_destroy();
+	time(&end_time);
+  status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
 
-	Service *tmpService = new Service(ServiceMarkings, ServiceInterface);
+	Service *tmpService = new Service(ServiceMarkings, ServiceInterface);	
+
 	ServiceMarkings.clear();
 	ServiceInterface.clear();
 
 	return tmpService;
-
 }
 
 // a function collecting calls to organize termination (close files, ...)
 void terminationHandler() {
 
-  // print statistics
+	// print statistics
   if (args_info.stats_flag) {
     message("runtime: %s%.2f sec%s", _bold_, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c_);
     std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
@@ -211,9 +222,6 @@ int main(int argc, char** argv)
 	evaluateParameters(argc, argv);
 
 	if (args_info.matching_flag) {
-		Service* C;
-		OperatingGuideline *A;
-
 		C = parseService(args_info.ServiceC_arg);
 		A = parseOG(args_info.OGA_arg);
 
@@ -225,8 +233,19 @@ int main(int argc, char** argv)
 		else
 			message("Objective failed");
 
-		delete A;
-		delete C;
+		// release memory (used to detect memory leaks)
+		if (args_info.finalize_flag) {
+		  time_t start_time, end_time;
+		  time(&start_time); 		
+			A->finalize();
+			C->finalize();
+			delete A;
+			delete C;     
+			cmdline_parser_free(&args_info);
+		  time(&end_time);
+		  status("released memory [%.0f sec]", difftime(end_time, start_time));
+		}
+
 	}
 	else if ((args_info.simulation_flag) or (args_info.equivalence_flag)) {
 		OperatingGuideline *A, *B;
@@ -246,9 +265,20 @@ int main(int argc, char** argv)
 			else
 				message("Objective failed");
 		}
-		
-		delete A;
-		delete B;
+
+		// release memory (used to detect memory leaks)
+		if (args_info.finalize_flag) {
+		  time_t start_time, end_time;
+		  time(&start_time); 
+			A->finalize();
+			B->finalize();
+			delete A;
+			delete B;      
+			cmdline_parser_free(&args_info);
+		  time(&end_time);
+		  status("released memory [%.0f sec]", difftime(end_time, start_time));
+		}
+
 	}
 
   return EXIT_SUCCESS;

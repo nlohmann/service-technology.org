@@ -74,12 +74,17 @@ OperatingGuideline::OperatingGuideline(const std::map<og_service_index_t, OGMark
 
 }
 
-OperatingGuideline::~OperatingGuideline() {
-	for (og_service_index_t i = 0; i < this->mSize; i++)
+OperatingGuideline::~OperatingGuideline() {}
+
+void OperatingGuideline::finalize() {
+  for (og_service_index_t i = 0; i < this->mSize; i++) {
 		delete this->mMarkings[i];
+	}
 	delete[] this->mMarkings;
 	delete this->mInputInterface;
 	delete this->mOutputInterface;
+	this->mInterface.clear();
+  status("OperatingGuideline: deleted %d markings", this->mSize);
 }
 
 void OperatingGuideline::calculateBitSets(Label &interface) {

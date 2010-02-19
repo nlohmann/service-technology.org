@@ -70,6 +70,12 @@ option "verbose" v
   details="Show verbose information on the several intermediate steps. Note this option might slow down the execution.\n"
   flag off
 
+option "finalize" -
+  "Release all allocated memory."
+  details="This option calls the destructors of all objects that have been created by Cosme. This is usually not necessary, because the operating system cleans up once Cosme terminates. However, this option can be used to detect memory leaks.\n"
+  flag off
+  hidden
+
 option "stats" -
 	"Disply time and memory consumption on termination."
 	details="The time is measured using the function clock(3). The memory usage is measured using ps(1) command. Note that memory consumption contains a small overhead.\n"

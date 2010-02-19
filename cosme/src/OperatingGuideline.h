@@ -12,6 +12,7 @@
 #include "Label.h"
 #include "RBTreeStack.h"
 #include "Service.h"
+#include "Output.h"
 
 class OGMarking {
     public:
@@ -52,6 +53,8 @@ class OperatingGuideline {
 		OperatingGuideline(const std::map<og_service_index_t, OGMarking*> &markings,
 												const std::set<label_id_t> &interface);
 		~OperatingGuideline();
+
+		void finalize();
 
 		inline const OGMarking* marking(og_service_index_t pos) const {
 			assert(pos < this->mSize);

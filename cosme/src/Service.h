@@ -46,6 +46,8 @@ class Service {
 												const std::set<label_id_t> &interface);
 		~Service();
 
+		void finalize();
+
 		inline ServiceMarking* marking(og_service_index_t pos) {
 			assert(pos < this->mSize);
 			return this->mMarkings[pos];

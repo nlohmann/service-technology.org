@@ -8,6 +8,7 @@ m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
 
 # the main executable, called through a shell script for code coverage
 m4_define([COSME],                [cover.sh @abs_top_builddir@/src/cosme])
+m4_define([COSME_RAW],            [@abs_top_builddir@/src/cosme])
 
 # directories
 m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
@@ -19,4 +20,5 @@ m4_define([SED],                  [@SED@])
 
 # tools needed by the testscript
 m4_define([LOLA],                 [@LOLA@])
+m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
 

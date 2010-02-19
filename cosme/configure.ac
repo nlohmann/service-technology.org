@@ -20,6 +20,9 @@ AC_PROG_AWK
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+# search for optional tools needed by "make check"
+AC_PATH_PROG(VALGRIND,    [valgrind], not found)
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

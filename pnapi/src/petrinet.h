@@ -421,6 +421,9 @@ public:
   /// adds a role
   void addRole(std::string roleName);
 
+  /// add a set of roles
+  void addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator second);
+
   /// removes a label from the interface
   void removeSynchronousLabel(std::string);
 

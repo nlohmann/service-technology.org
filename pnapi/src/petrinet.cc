@@ -1392,6 +1392,13 @@ void PetriNet::addRole(std::string roleName)
   roles_.insert(roleName);
 }
 
+/*!
+ * \brief Adds a set of roles to transition
+ */
+void PetriNet::addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator last)
+{
+  roles_.insert(first, last);
+}
 
 /*!
  * \brief Removes a label to the interface

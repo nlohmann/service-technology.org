@@ -197,6 +197,9 @@ public:
   /// add role
   void addRole(std::string role_name);
 
+  /// add a set of roles
+  void addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator second);
+
   /// get roles
   std::set<std::string> getRoles() const;
 

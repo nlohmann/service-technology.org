@@ -506,6 +506,14 @@ void Transition::addRole(std::string roleName)
 }
 
 /*!
+ * \brief add set of roles to transition
+ */
+void Transition::addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator last)
+{
+  roles_.insert(first, last);
+}
+
+/*!
  * \brief get transition roles
  */
 std::set<std::string> Transition::getRoles() const

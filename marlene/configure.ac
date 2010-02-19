@@ -1,5 +1,17 @@
 AC_INIT([Marlene],[1.2-unreleased],[christian.gierds@service-technology.org])
 
+AC_MSG_NOTICE([  ______              _                    ])
+AC_MSG_NOTICE([ |  ___ \            | |                   ])
+AC_MSG_NOTICE([ | | _ | | ____  ____| | ____ ____   ____  ])
+AC_MSG_NOTICE([ | || || |/ _  |/ ___) |/ _  )  _ \ / _  ) ])
+AC_MSG_NOTICE([ | || || ( ( | | |   | ( (/ /| | | ( (/ /  ])
+AC_MSG_NOTICE([ |_||_||_|\_||_|_|   |_|\____)_| |_|\____) ])
+AC_MSG_NOTICE()
+AC_MSG_NOTICE([ Generating behavioral adapters ])
+AC_MSG_NOTICE([ http://service-technology.org/marlene ])
+AC_MSG_NOTICE([ version ${PACKAGE_VERSION} ])
+AC_MSG_NOTICE()
+
 AC_CONFIG_SRCDIR([src/marlene.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -10,8 +22,15 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
-# check if this package was checkedout from a repository
-AM_CONDITIONAL(FROMSVN,test -d ".svn")
+# use the service-technology.org macros
+AC_ST_BASIC
+#AC_ST_LOLA([1.14])
+AC_ST_AUTOTEST
+AC_ST_PNAPI
+AC_ST_VERBOSE
+
+## check if this package was checkedout from a repository
+#AM_CONDITIONAL(FROMSVN,test -d ".svn")
 
 # check for programs needed to compile
 AC_PROG_YACC
@@ -20,29 +39,13 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
-AC_PROG_SED
-AC_PROG_GREP
-AC_PROG_AWK
-
-# check for additional programs
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
-
-# export tools needed to determine memory consumption
-AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
-AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
 
 # store the SVN revision number
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
 AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
 
 # check for required tools
-AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
+#AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
 #AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(CANDY, [candy], [])
@@ -68,25 +71,6 @@ else
 fi
 AC_SUBST(GENET)
 
-
-# only use installed Petri Net API if this was configured with --enable-pnapi
-AC_ARG_WITH(pnapi,
-  AS_HELP_STRING([--without-pnapi],[do not use installed version of the Petri Net API]),
-  [], [with_pnapi=yes]
-)
-# Check whether the PNAPI is present and we can link against it.
-AC_CHECK_LIB(pnapi, main)
-AC_LANG([C++])
-AC_CHECK_LIB(pnapi, libpnapi_is_present)
-AC_MSG_CHECKING([whether to use installed Petri Net API])
-if test "x$with_pnapi" != xno -a "${ac_cv_lib_pnapi_main}" = "yes" -a "${ac_cv_lib_pnapi_libpnapi_is_present}" = "yes"; then
-  AC_MSG_RESULT([yes])
-  AM_CONDITIONAL(COMPILE_PNAPI, [false])
-else
-  AC_MSG_RESULT([no])
-  AM_CONDITIONAL(COMPILE_PNAPI, [true])
-fi
-
 # enable Windows temp files
 AC_ARG_ENABLE(windowstemp,
               AS_HELP_STRING([--enable-windowstemp],[sets standard temp file for Marlene to %TEMP%/marlene-XXXXXX (should only set when compiling for pure Win32 binary)]),
@@ -108,16 +92,6 @@ AC_MSG_RESULT([better should be])
 #AC_FUNC_ALLOCA
 AC_HEADER_SYS_WAIT
 #AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
-
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif
-])
-
 
 # Checks for typedefs, structures, and compiler characteristics.
 #AC_HEADER_STDBOOL

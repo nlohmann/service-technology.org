@@ -346,7 +346,7 @@ petrinet = interface
            @{ transition @}
          ;
 
-interface = "INTERFACE" interface_ports "PLACE" places roles ";"
+interface = "INTERFACE" interface_ports "PLACE" places ";" roles
           | "PLACE" typed_places roles ports
           ;
 

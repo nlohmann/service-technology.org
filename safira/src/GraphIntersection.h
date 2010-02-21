@@ -14,11 +14,14 @@ class GraphIntersection : public Graph {
 		stack<long> myStack;
 		stack<Nodepair*> unproc;
 
-        void printNodepairs(ostream& o) const;
-        /// prints the global Formula of the complement (it is required that makeTotal and makeComplete was executed before)
+//        void printNodepairs(ostream& o) const;
 
-        void printGlobalFormula(ostream& o) const;
+		/// prints the global Formula of the complement (it is required that makeTotal and makeComplete was executed before)
+//        void printGlobalFormula(ostream& o) const;
         void product(Nodepair* qp);
+
+        ///converts the map of Nodepairs to a map of Nodes
+        void convert();
 
     public:
 
@@ -34,11 +37,11 @@ class GraphIntersection : public Graph {
     	/// cumputes the intersection for the given graphs
     	void intersection(Graph *g1, Graph *g2);
 
-        /// Graphviz dot output
-        void toDot(FILE* out, string title = "") const;
-
-        /// Graph output
-        void print(ostream& o) const;
+//        /// Graphviz dot output
+//        void toDot(FILE* out, string title = "") const;
+//
+//        /// Graph output
+//        void print(ostream& o) const;
 };
 
 #endif /* GRAPHINTERSECTION_H_ */

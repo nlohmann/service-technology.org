@@ -5,7 +5,6 @@
 #include <iostream>
 
 int Node::maxId = 0;
-int Nodepair::maxId = 0;
 extern int currentIdPos;
 
 extern map<string, int> label2id;
@@ -44,33 +43,35 @@ void Node::addEdge(int label, Node *target) {
 
 /// reset the maxId
 void Node::init(){
-	maxId = 0;
+	maxId = -1;
 }
 
 
 /// constructor
-Nodepair::Nodepair(Formula *_formula, Node* _node1, Node* _node2) :
-		formula(_formula), node1(_node1), node2(_node2) {
+Nodepair::Nodepair(Formula* _f, Node* _n1, Node* _n2) : n1(_n1), n2(_n2) {
 
-	assert(formula);
-	assert(node1);
-	assert(node2);
-	id = maxId++;
-	outEdges = new list<Nodepair*>[label2id.size()];
+	assert(_f);
+	assert(n1);
+	assert(n2);
+
+	node = new Node(_f);
+	//id = maxId++;
+	//outEdges = new list<Nodepair*>[label2id.size()];
 
 }
 
 
 /// destructor
 Nodepair::~Nodepair() {
-	delete[] outEdges;
+	//delete[] outEdges;
+	delete node;
 }
 
 /// add an outpoing edge to the node
-void Nodepair::addEdge(int label, Nodepair *target) {
-	assert(target);
-	//assert(label <= label2id.size()-1);
-	assert(id2label.find(label) != id2label.end());
-	outEdges[label].push_back(target);
-}
+//void Nodepair::addEdge(int label, Nodepair *target) {
+//	assert(target);
+//	//assert(label <= label2id.size()-1);
+//	assert(id2label.find(label) != id2label.end());
+//	outEdges[label].push_back(target->node);
+//}
 

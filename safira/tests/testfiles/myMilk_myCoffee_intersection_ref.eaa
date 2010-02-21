@@ -4,13 +4,22 @@ INTERFACE
   OUTPUT
     C, M, E, T;
 
-INITIALNODES  0
+INITIALNODES  0;
+
+GLOBALFORMULA ;
+
 NODES
   0: (((M + E) + T) * ((C + E) + T))
     tau -> 0
     B -> 1
     E -> 2
     T -> 3
+
+  1: (true * true)
+    tau -> 1
+    B -> 1
+    E -> 1
+    T -> 1
 
   2: ((M + T) * (C + T))
     tau -> 2
@@ -29,10 +38,4 @@ NODES
   5: (final * final)
     tau -> 5
     B -> 1
-
-  1: (true * true)
-    tau -> 1
-    B -> 1
-    E -> 1
-    T -> 1
 

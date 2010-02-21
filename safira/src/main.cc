@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t buildOG_end = time(NULL);
-			cout << "number of nodes in the complement: " << g->nodes.size() + g->getSizeOfAddedNodes() << endl;
+			cout << "number of nodes in the complement: " << g->nodes.size() << endl;
 			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
 			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
 		}

@@ -39,13 +39,14 @@ GraphComplement::GraphComplement() : trap(NULL){
 ///destructor
 GraphComplement::~GraphComplement(){
 
-	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
-		delete n->second;
-	}
+//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+//		delete n->second;
+//	}
 }
 
 
 void GraphComplement::complement(){
+	//cout << "addedNodes.size(): " <<  addedNodes.size() << endl;
 	makeTotal();
 	if (args_info.complement_arg == 0){
 		makeComplete_fast();
@@ -57,12 +58,14 @@ void GraphComplement::complement(){
 		makeComplete_efficient();
 	}
 	generateGlobalFormula();
+	appandAddedNodes();
 }
 
 void GraphComplement::generateGlobalFormula(){
 	//generate global formula
 
 	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
+	//cout << globalFormulaAsString << endl;
 	Formula *h = new FormulaNOT(globalFormula);
 	globalFormula = h;
 
@@ -77,6 +80,12 @@ void GraphComplement::generateGlobalFormula(){
 			Formula *g = new FormulaOR(globalFormula, f) ;
 			globalFormula = g;
 	}
+}
+
+void GraphComplement::appandAddedNodes(){
+	nodes.insert(addedNodes.begin(), addedNodes.end());
+	addedNodes.clear();
+	//trap = NULL;
 }
 
 void GraphComplement::makeTotal(){
@@ -307,22 +316,40 @@ void GraphComplement::makeComplete_efficient() {
 	 * (2) replace the global formula chi with chi = AND(chi,NOT(q))
 	 */
 	list<int> addedInitialNodes;
+	Formula *f = NULL;
 	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
-		Formula *g = nodes[*n]->formula->getCopy();
-		Formula *f = new FormulaNOT(g);
+		//cout << "makeComplete(): initNode:" << nodes[*n]->id << " " << nodes[*n]->formula->toString() << endl;
 
-//		cout << "makeComplete(): initNode:" << nodes[*n]->id << " " << nodes[*n]->formula->toString() << endl;
-		if(f->isSatisfiable()){
-			Node *q = getNode(f);
-			addedInitialNodes.push_back(q->id);
+		if(n == initialNodes.begin()) { // first Node
+			f =  nodes[*n]->formula->getCopy();
 		}
-
 		else {
-			delete f;
+			Formula *g = nodes[*n]->formula->getCopy();
+			Formula *h = new FormulaOR(f,g);
+			f = h;
 		}
 	}
+	f->toString();
+
+	Formula *f2 = new FormulaNOT(f);
+	f = f2;
+
+
+	if(f->isSatisfiable()){
+//		cout << "f ist erfüllbar" << endl;
+		Node *q = getNode(f);
+		addedInitialNodes.push_back(q->id);
+	}
+
+	else {
+//		cout << "f ist NICHT erfüllbar" << endl;
+		delete f;
+	}
+
 
 	//add new initial nodes to initialnodes-list
+//	cout << "Make Complete: addedNodes.size(): " <<  addedNodes.size() << endl;
+//	cout << "Make Complete: addedInitialNodes.size(): " <<  addedInitialNodes.size() << endl;
 	for (list<int>::const_iterator n = addedInitialNodes.begin(); n != addedInitialNodes.end(); ++n) {
 		assert(find(initialNodes.begin(), initialNodes.end(), *n) == initialNodes.end()); //elements in addedNodes-map are not yet in intialNodes-map
 		initialNodes.push_back(*n);
@@ -336,7 +363,7 @@ void GraphComplement::makeComplete_efficient() {
 	 * (3) replace the global formula chi with chi = AND(chi,NOT(q))
      */
 
-	Formula *f = NULL; //formula of the new node q (if q is generated)
+	f = NULL; //formula of the new node q (if q is generated)
 
 	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
 
@@ -511,15 +538,34 @@ void GraphComplement::toDot(FILE* out, string title) const {
 
 	toDot_Header(out, title);
 	toDot_Nodes(out);
-	toDot_addedNodes(out);
+	//toDot_addedNodes(out);
 	fprintf(out, "}\n");
 }
 
 //! \brief creates the added nodes for the dot output
 //! \param out: output file
-void GraphComplement::toDot_addedNodes(FILE* out) const {
+void GraphComplement::toDot_Nodes(FILE* out) const {
 
-		for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
+		// an arrow indicating the initial state
+		fprintf(out, "  q_%d [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n", *n);
+		fprintf(out, "  q_%d -> %d [minlen=\"0.5\"];\n", *n, *n);
+	}
+
+	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
+        assert (trap != NULL);
+		if(n->second->id < trap->id){
+
+			fprintf(out, "  %d [label=\"%d\\n %s\"]\n", n->second->id, n->second->id, n->second->formula->toString().c_str());
+
+			for (int i = firstLabelId; i <= lastLabelId; ++i){
+				for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+					//fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->second->id, (*s)->id, id2label[i].c_str());
+					fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", n->second->id, (*s)->id, inout[i] ,id2label[i].c_str());
+				}
+			}
+		}
+		else {
 			fprintf(out, "  %d [label=\"%d\\n %s\", style=dashed, color=red]\n", n->second->id, n->second->id, n->second->formula->toString().c_str());
 
 //			for (int i = firstLabelId; i <= lastLabelId; ++i){
@@ -529,8 +575,8 @@ void GraphComplement::toDot_addedNodes(FILE* out) const {
 //			}
 
 			fprintf(out, "  %d -> %d [style=dashed, color=red]\n", n->second->id, trap->id);
-
 		}
+	}
 }
 
 
@@ -560,30 +606,30 @@ void GraphComplement::toDot_addedNodes(FILE* out) const {
 //}
 
 
-void GraphComplement::printAddedNodes(ostream& o) const{
-
-    //print all addednodes
-	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
-		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
-		for (int i = firstLabelId; i <= lastLabelId; ++i){
-			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-				assert(id2label.find(i) != id2label.end());
-				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
-			}
-		}
-		o << endl;
-	}
-}
+//void GraphComplement::printAddedNodes(ostream& o) const{
+//
+//    //print all addednodes
+//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n){
+//		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
+//		for (int i = firstLabelId; i <= lastLabelId; ++i){
+//			for (list<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+//				assert(id2label.find(i) != id2label.end());
+//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
+//			}
+//		}
+//		o << endl;
+//	}
+//}
 
 
 /// prints the Complement
-void GraphComplement::print(ostream& o) const{
-	printInterface(o);
-	printInitialNodes(o);
-	printGlobalFormula(o);
-	printNodes(o);
-	printAddedNodes(o);
-}
+//void GraphComplement::print(ostream& o) const{
+//	printInterface(o);
+//	printInitialNodes(o);
+//	printGlobalFormula(o);
+//	printNodes(o);
+//	printAddedNodes(o);
+//}
 
 
 int GraphComplement::getSizeOfAddedNodes(){

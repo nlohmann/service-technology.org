@@ -13,15 +13,13 @@ class GraphComplement : public Graph {
 		map<int, Node*> addedNodes;
 		Node* trap;
 		FormulaTree* root;
-
-		void toDot_addedNodes(FILE* out) const;
-
-        void printAddedNodes(ostream& o) const;
-
         Node* getNode(Formula *f);
         Node* getNode_stupid(Formula *f);
         bool formulaFound(Formula *f, Formula *g);
         Node* searchNode(Formula *f, FormulaTree *n);
+        void toDot_Nodes(FILE* out) const;
+        //	void toDot_addedNodes(FILE* out) const;
+        //  void printAddedNodes(ostream& o) const;
 
 
     public:
@@ -50,8 +48,8 @@ class GraphComplement : public Graph {
         /// Graphviz dot output
         void toDot(FILE* out, string title = "") const;
 
-        /// Graph output as complement (it is required that makeTotal and makeComplete was executed before)
-        void print(ostream& o) const;
+        // Graph output as complement (it is required that makeTotal and makeComplete was executed before)
+        //void print(ostream& o) const;
 
         //TODO: diese Funktion private?
         //void getGlobalFormulaForComplement(ostream& o) const;
@@ -61,6 +59,9 @@ class GraphComplement : public Graph {
 
         //TODO: diese Funktion private?
         void generateGlobalFormula();
+
+        //TODO: diese Funktion private?
+        void appandAddedNodes();
 };
 
 #endif /* GRAPHCOMPLEMENT_H_ */

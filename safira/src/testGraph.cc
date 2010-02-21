@@ -92,14 +92,16 @@ void testComplement(){
     testgraph->globalFormulaAsString = testgraph->globalFormula->toString();
 
 	g->makeTotal();
-	Output o1("testGraph_total.eaa", "total testGraph");
-	g->print(o1);
+	//Output o1("testGraph_total.eaa", "total testGraph");
+	//g->print(o1);
 	g->makeComplete_fast();
+	assert(g->getSizeOfAddedNodes() == 5);
 	g->generateGlobalFormula();
+	g->appandAddedNodes();
 	Output o2("testGraph_complement.eaa", "complement testGraph");
 	g->print(o2);
 
-	assert(g->getSizeOfAddedNodes() == 5);
+
 	//g->printNodes();
 
 	delete g;

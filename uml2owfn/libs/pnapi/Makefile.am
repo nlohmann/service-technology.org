@@ -1,5 +1,14 @@
+##################################
+# This file has been generated   #
+# automaticall by compiling      #
+# Petri Net API 3.01-unreleased #
+#                                #
+# You MUST NOT change this file. #
+##################################
+
 noinst_LIBRARIES = libpnapi.a
 
+# [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_a_SOURCES = \
     parser-lola.yy    parser-lola-lexer.ll \
     parser-onwd.yy    parser-onwd-lexer.ll \
@@ -7,7 +16,7 @@ libpnapi_a_SOURCES = \
     parser-pn.yy      parser-pn-lexer.ll \
     parser-pnml.yy    parser-pnml-lexer.ll \
     parser-sa.yy      parser-sa-lexer.ll \
-    pnapi.h \
+    pnapi.h pnapi.cc \
     Output.h Output.cc \
     automaton.h automaton.cc\
     component.h component.cc \
@@ -25,21 +34,30 @@ libpnapi_a_SOURCES = \
     port.h port.cc \
     state.h state.cc \
     util.h
+# [CUSTOMER_E_SRC] this line is needed to build a customer Makefile. Do not remove!
 
-# to find UML2oWFN's config.h header
+# to find customer's config.h header
 libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
 
-BUILT_SOURCES = parser-owfn.cc parser-onwd.cc parser-lola.cc \
-		parser-sa.cc parser-pn.cc parser-pnml.cc
 
-EXTRA_DIST = parser-owfn.h parser-onwd.h parser-lola.h \
-	     parser-sa.h parser-pn.h parser-pnml.h
+EXTRA_DIST =
+BUILT_SOURCES =
+# [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
+#############################################################################
+# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
+#############################################################################
 
-# clean additional (generated) files
-DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
-		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \
-		 parser-lola.h parser-lola.cc parser-lola-lexer.cc \
-		 parser-sa.h parser-sa.cc parser-sa-lexer.cc \
-		 parser-pn.h parser-pn.cc parser-pn-lexer.cc \ 
-		 parser-pnml.h parser-pnml.cc parser-pnml-lexer.cc
+#---------------------------------------------------#
+# GENERIC: initialization for other generic targets #
+#---------------------------------------------------#
+MAINTAINERCLEANFILES =
+DISTCLEANFILES = 
 
+#--------------------------------------------------------------#
+# GENERIC: organize distribution and cleaning of Bison sources #
+#--------------------------------------------------------------#
+BISON_FILES = $(filter %.yy,$(libpnapi_a_SOURCES))
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+# [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!

@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2010-02-18 17:09:06 +0100 (Do, 18. Feb 2010) $
+ * \date    \$Date: 2010-02-18 17:09:06 +0100 (Thu, 18 Feb 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See

@@ -30,12 +30,15 @@ using std::endl;
 #include "parser.h"
 #include "parser-sa.h"
 
+#include <cstring>
+
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token
 #define yyerror  pnapi::parser::error
 
 #define yylex    pnapi::parser::sa::lex
+#define yylex_destroy pnapi::parser::sa::lex_destroy
 
 /* hack to read input from a C++ stream */
 #define YY_INPUT(buf,result,max_size)   \
@@ -84,7 +87,7 @@ number         [0-9]+
 "->"                                    { return ARROW;                }
 
 {number}     { pnapi_sa_yylval.yt_int = atoi(yytext); return NUMBER;             }
-{identifier} { pnapi_sa_yylval.yt_string = new std::string(yytext); return IDENT;}
+{identifier} { pnapi_sa_yylval.yt_str = strdup(yytext); return IDENT;}
 
 {whitespace}                            { /* do nothing */             }
 

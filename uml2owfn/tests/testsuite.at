@@ -180,6 +180,16 @@ AT_CHECK([ls *.owfn | wc -l | GREP -q 24])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP
 
+AT_SETUP([Open net output (*.owfn) with roles])
+AT_CHECK([cp TESTFILES/service-tech.xml .])
+AT_CHECK([UML2OWFN -i service-tech.xml -p filter -f owfn --output=service_tech],0,ignore,stderr)
+AT_CHECK([test -f service_tech.Prcsss__coffeeMachine_unsound.owfn])
+AT_CHECK([GREP -q "ROLES CoffeeMachine, Customer;" service_tech.Prcsss__coffeeMachine_unsound.owfn])
+AT_CHECK([GREP -q "ROLES CoffeeMachine;" service_tech.Prcsss__coffeeMachine_unsound.owfn])
+AT_CHECK([GREP -q "ROLES Customer;" service_tech.Prcsss__coffeeMachine_unsound.owfn])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
 AT_SETUP([Anonymized LoLA output (*.lola)])
 AT_CHECK([cp TESTFILES/TestSuite.xml .])
 AT_CHECK([UML2OWFN -i TestSuite.xml -p filter -p anon -f lola --output=TestSuite],0,ignore,stderr)

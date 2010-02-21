@@ -28,7 +28,7 @@
 #include "parser.h"
 #include "parser-owfn.h"
 
-#include <string>
+#include <cstring>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
@@ -36,6 +36,7 @@
 #define yyerror  pnapi::parser::error
 
 #define yylex    pnapi::parser::owfn::lex
+#define yylex_destroy pnapi::parser::owfn::lex_destroy
 
 /* hack to read input from a C++ stream */
 #define YY_INPUT(buf,result,max_size)		\
@@ -47,8 +48,6 @@
 /* hack to overwrite YY_FATAL_ERROR behavior */
 #define fprintf(file,fmt,msg) \
    yyerror(msg);
-
-using pnapi::parser::owfn::ident;
 
 %}
 
@@ -94,7 +93,7 @@ OUTPUT                          { return KEY_OUTPUT; }
 
 TRANSITION                      { BEGIN(IDENT2); return KEY_TRANSITION; }
 <IDENT2>[ \n\r\t]               { /* skip whitespaces */ }
-<IDENT2>[^,;:()\t \n\r\{\}]+    { BEGIN(INITIAL); ident = yytext; return IDENT; }
+<IDENT2>[^,;:()\t \n\r\{\}]+    { BEGIN(INITIAL); pnapi_owfn_yylval.yt_str = strdup(yytext); return IDENT; }
 <IDENT2>.                       { yyerror("Unexpected symbol at transition identifier"); }
 
 INITIALMARKING                  { return KEY_INITIALMARKING; }
@@ -106,6 +105,7 @@ CONSUME                         { return KEY_CONSUME; }
 PRODUCE                         { return KEY_PRODUCE; }
 PORT                            { return KEY_PORT; }
 PORTS                           { return KEY_PORTS; }
+ROLES				{ return KEY_ROLES; }
 SYNCHRONOUS                     { return KEY_SYNCHRONOUS; }
 SYNCHRONIZE                     { return KEY_SYNCHRONIZE; }
 CONSTRAIN                       { return KEY_CONSTRAIN; }
@@ -136,7 +136,7 @@ NOT                             { return OP_NOT; }
  /* identifiers */
 [0-9]+                          { pnapi_owfn_yylval.yt_int = atoi(yytext); return NUMBER; }
 "-"[0-9]+                       { pnapi_owfn_yylval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}=]+           { ident = yytext; return IDENT; }
+[^,;:()\t \n\r\{\}=]+           { pnapi_owfn_yylval.yt_str = strdup(yytext); return IDENT; }
 
  /* whitespace */
 [ \n\r\t]                       { /* skip */ }

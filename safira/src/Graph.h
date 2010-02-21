@@ -19,7 +19,6 @@ class Graph {
         void printInitialNodes(ostream& o) const;
         void printGlobalFormula(ostream& o) const;
         void printNodes(ostream& o) const;
-        void getGlobalFormula(ostream& o) const;
 
     public:
 
@@ -30,6 +29,7 @@ class Graph {
 
         /// the global formula of the graph
         Formula *globalFormula;
+        string globalFormulaAsString;
 
     	///constructor
     	Graph();

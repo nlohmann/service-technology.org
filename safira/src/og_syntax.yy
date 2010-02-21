@@ -106,8 +106,8 @@ initialnodes:
 ;  
 
 globalformula:
-   /*empty*/  {graph->globalFormula = new FormulaTrue();}
-| KEY_GLOBALFORMULA gformula SEMICOLON {graph->globalFormula = $2;}
+   /*empty*/  {graph->globalFormula = new FormulaTrue(); graph->globalFormulaAsString = graph->globalFormula->toString();}
+| KEY_GLOBALFORMULA gformula SEMICOLON {graph->globalFormula = $2; graph->globalFormulaAsString = graph->globalFormula->toString(); }
 
 initialnodelist:
   NUMBER {graph->addInitialNode($1);}

@@ -111,8 +111,10 @@ int main(int argc, char **argv) {
 		}
 
 		stringstream o;
-		g->getGlobalFormulaForComplement(o);
-		string title = "Complement of " + filename + "    global formula: " + string(o.str());
+		//g->getGlobalFormulaForComplement(o);
+		//string title = "Complement of " + filename + "    global formula: " + string(o.str());
+		string title = "Complement of " + filename + "    global formula: " + g->globalFormulaAsString;
+
 
 		out(g, filename+"_complement",title);
 

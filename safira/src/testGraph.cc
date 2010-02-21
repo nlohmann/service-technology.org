@@ -89,11 +89,13 @@ void testComplement(){
 	testgraph->nodes[n1->id]  = n1;
 	testgraph->addInitialNode(n0->id);
 	testgraph->globalFormula = new FormulaOR(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
+    testgraph->globalFormulaAsString = testgraph->globalFormula->toString();
 
 	g->makeTotal();
 	Output o1("testGraph_total.eaa", "total testGraph");
 	g->print(o1);
 	g->makeComplete_fast();
+	g->generateGlobalFormula();
 	Output o2("testGraph_complement.eaa", "complement testGraph");
 	g->print(o2);
 

@@ -18,15 +18,10 @@ class GraphComplement : public Graph {
 
         void printAddedNodes(ostream& o) const;
 
-        /// prints the global Formula of the complement (it is required that makeTotal and makeComplete was executed before)
-        void printGlobalFormulaForComplement(ostream& o) const;
-
         Node* getNode(Formula *f);
         Node* getNode_stupid(Formula *f);
         bool formulaFound(Formula *f, Formula *g);
         Node* searchNode(Formula *f, FormulaTree *n);
-//        void getGlobalFormula(ostream& o) const;
-
 
 
     public:
@@ -59,10 +54,13 @@ class GraphComplement : public Graph {
         void print(ostream& o) const;
 
         //TODO: diese Funktion private?
-        void getGlobalFormulaForComplement(ostream& o) const;
+        //void getGlobalFormulaForComplement(ostream& o) const;
 
         /// get the number of new nodes in the complement
         int getSizeOfAddedNodes();
+
+        //TODO: diese Funktion private?
+        void generateGlobalFormula();
 };
 
 #endif /* GRAPHCOMPLEMENT_H_ */

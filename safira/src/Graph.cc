@@ -26,7 +26,7 @@ using namespace std;
 
 
 ///constructor
-Graph::Graph() : globalFormula(NULL){
+Graph::Graph() : globalFormula(NULL), globalFormulaAsString(""){
 
 }
 
@@ -103,17 +103,8 @@ void Graph::printInitialNodes(ostream& o) const{
 
 void Graph::printGlobalFormula(ostream& o) const{
 
-	o << ";\n\nGLOBALFORMULA ";
-	getGlobalFormula(o);
-	o << ";\n";
+	o << ";\n\nGLOBALFORMULA " << globalFormulaAsString << ";\n";
 
-}
-
-
-void Graph::getGlobalFormula(ostream& o) const{
-	assert(globalFormula);
-
-	o << globalFormula->toString();
 }
 
 

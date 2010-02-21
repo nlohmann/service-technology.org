@@ -56,6 +56,27 @@ void GraphComplement::complement(){
 	if (args_info.complement_arg == 2){
 		makeComplete_efficient();
 	}
+	generateGlobalFormula();
+}
+
+void GraphComplement::generateGlobalFormula(){
+	//generate global formula
+
+	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
+	Formula *h = new FormulaNOT(globalFormula);
+	globalFormula = h;
+
+	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+		    assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
+		//	nodes[n->second->id] = n->second; //add new nodes to nodes-map
+
+			//append the new nodes to the global formula;
+		    globalFormulaAsString = globalFormulaAsString + " + " + intToString(n->second->id);
+
+			const Formula *f = new FormulaNUM(n->second->id);
+			Formula *g = new FormulaOR(globalFormula, f) ;
+			globalFormula = g;
+	}
 }
 
 void GraphComplement::makeTotal(){
@@ -513,30 +534,30 @@ void GraphComplement::toDot_addedNodes(FILE* out) const {
 }
 
 
-void GraphComplement::printGlobalFormulaForComplement(ostream& o) const{
+//void GraphComplement::printGlobalFormulaForComplement(ostream& o) const{
+//
+//	o << ";\n\nGLOBALFORMULA ";
+//	getGlobalFormulaForComplement(o);
+//	o << ";\n";
+//
+//}
 
-	o << ";\n\nGLOBALFORMULA ";
-	getGlobalFormulaForComplement(o);
-	o << ";\n";
 
-}
-
-
-void GraphComplement::getGlobalFormulaForComplement(ostream& o) const{
-	assert(globalFormula);
-
-	//Formula* g = new FormulaNOT(globalFormula);
-	o << "~(" << globalFormula->toString() << ")";
-
-	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
-		assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
-
-		//generate new global formula
-		o << " + " << intToString(n->second->id);
-
-	}
-
-}
+//void GraphComplement::getGlobalFormulaForComplement(ostream& o) const{
+//	assert(globalFormula);
+//
+//	//Formula* g = new FormulaNOT(globalFormula);
+//	o << "~(" << globalFormula->toString() << ")";
+//
+//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+//		assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
+//
+//		//generate new global formula
+//		o << " + " << intToString(n->second->id);
+//
+//	}
+//
+//}
 
 
 void GraphComplement::printAddedNodes(ostream& o) const{
@@ -559,7 +580,7 @@ void GraphComplement::printAddedNodes(ostream& o) const{
 void GraphComplement::print(ostream& o) const{
 	printInterface(o);
 	printInitialNodes(o);
-	printGlobalFormulaForComplement(o);
+	printGlobalFormula(o);
 	printNodes(o);
 	printAddedNodes(o);
 }

@@ -503,6 +503,7 @@ int Transition::getCost() const
 void Transition::addRole(std::string roleName)
 {
   roles_.insert(roleName);
+  net_.addRole(roleName);
 }
 
 /*!
@@ -511,6 +512,7 @@ void Transition::addRole(std::string roleName)
 void Transition::addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator last)
 {
   roles_.insert(first, last);
+  net_.addRoles(first, last);
 }
 
 /*!

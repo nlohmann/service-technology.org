@@ -37,6 +37,11 @@ class GraphIntersection : public Graph {
     	/// cumputes the intersection for the given graphs
     	void intersection(Graph *g1, Graph *g2);
 
+    	void generateGlobalFormula(const Graph *g1, const Graph *g2);
+
+    	///converts "this" to a Graph object g
+    	void convertToGraph(Graph *g);
+
 //        /// Graphviz dot output
 //        void toDot(FILE* out, string title = "") const;
 //

@@ -27,9 +27,12 @@ class Graph {
         /// the nodes indexed by an identifier
         map<int, Node*> nodes;
 
+
         /// the global formula of the graph
         Formula *globalFormula;
         string globalFormulaAsString;
+        set<int> lits; //all literals in the global Formula
+
 
     	///constructor
     	Graph();

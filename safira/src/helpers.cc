@@ -63,7 +63,8 @@ string intToString(const int i){
 
 	stringstream ssout;
 	ssout <<  i;
-        string s (ssout.str());
+       // string s (ssout.str());
+	   string s = ssout.str();
 	return s;
 }
 

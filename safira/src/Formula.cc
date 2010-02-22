@@ -816,3 +816,55 @@ list<Clause> FormulaFinal::toCNF(int x, int&) const{
 
 }
 
+
+/***********************************************************************
+ * formula to CNF
+ ***********************************************************************/
+
+//set<int> FormulaAND::getLiterals() const {
+//	set<int> lits_left = left->getLiterals();
+//	set<int> lits_right = right->getLiterals();
+//	lits_left.insert(lits_right.begin(), lits_right.end());
+//	return (lits_left);
+//}
+//
+//set<int> FormulaOR::getLiterals() const {
+//	set<int> lits_left = left->getLiterals();
+//	set<int> lits_right = right->getLiterals();
+//	lits_left.insert(lits_right.begin(), lits_right.end());
+//	return (lits_left);
+//}
+//
+//set<int> FormulaNOT::getLiterals() const {
+//	return (f->getLiterals());
+//}
+//
+//set<int> FormulaLit::getLiterals() const {
+//	assert(id2label.find(number) != id2label.end());
+//	set<int> lits;
+//	lits.insert(number);
+//
+//    return lits;
+//}
+//
+//set<int> FormulaNUM::getLiterals() const {
+//	set<int> lits;
+//	lits.insert(number);
+//
+//    return lits;
+//}
+//
+//set<int> FormulaTrue::getLiterals() const {
+//	set<int> lits;
+//    return lits;
+//}
+//
+//set<int> FormulaFalse::getLiterals() const {
+//	set<int> lits;
+//    return lits;
+//}
+//
+//set<int> FormulaFinal::getLiterals() const {
+//	set<int> lits;
+//    return lits;
+//}

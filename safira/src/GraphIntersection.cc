@@ -10,6 +10,7 @@
 #include <time.h>
 //#include <iostream>
 #include "NumPrinterDouble.h"
+#include "helpers.h"
 
 using std::map;
 using std::string;
@@ -66,16 +67,79 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 	}
 
 	//generate global Formula
-	NumPrinterBase* printer1 = new NumPrinterDouble(&nodepairs, true);
-	NumPrinterBase* printer2 = new NumPrinterDouble(&nodepairs, false);
-	globalFormulaString = "("
-			+ g1->globalFormula->toString(printer1)
-			+ ") * ("
-			+ g2->globalFormula->toString(printer2)
-			+ ")";
+	//NumPrinterBase* printer1 = new NumPrinterDouble(&nodepairs, true);
+	//NumPrinterBase* printer2 = new NumPrinterDouble(&nodepairs, false);
+
+	generateGlobalFormula(g1, g2);
+
+//	globalFormulaString = "("
+//			+ g1->globalFormula->toString(printer1)
+//			+ ") * ("
+//			+ g2->globalFormula->toString(printer2)
+//			+ ")";
 
 	convert();
 }
+
+
+void GraphIntersection::generateGlobalFormula(const Graph *g1, const Graph *g2){
+	Formula *f1_copy = g1->globalFormula->getCopy();
+	Formula *f2_copy = g2->globalFormula->getCopy();
+
+	map<int,Formula*> formulaMap1;
+	map<int,string> formulaStringMap1;
+
+	//TODO: Schleifen umdrehen, das sollte schneller sein
+	for (set<int>::const_iterator s = g1->lits.begin(); s != g1->lits.end(); ++s){
+
+		for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n){
+			if (n->first.id1 == *s){
+
+				Formula *f;
+
+				if(formulaMap1.find(*s) == formulaMap1.end()){  //first nodepair
+					f = new FormulaNUM(*s);
+					formulaStringMap1[*s] = intToString(*s);
+				}
+				else{
+					f = new FormulaOR(formulaMap1[*s], new FormulaNUM(*s));
+					string str = formulaStringMap1[*s] + intToString(*s);
+					formulaStringMap1[*s] = str;
+				}
+
+				formulaMap1[*s] = f;
+			}
+		}
+	}
+
+	map<int,Formula*> formulaMap2;
+	map<int,string> formulaStringMap2;
+
+	//TODO: Schleifen umdrehen, das sollte schneller sein
+	for (set<int>::const_iterator s = g2->lits.begin(); s != g2->lits.end(); ++s){
+
+		for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n){
+			if (n->first.id2 == *s){
+
+				Formula *f;
+
+				if(formulaMap2.find(*s) == formulaMap2.end()){  //first nodepair
+					f = new FormulaNUM(*s);
+					formulaStringMap2[*s] = intToString(*s);
+				}
+				else{
+					f = new FormulaOR(formulaMap2[*s], new FormulaNUM(*s));
+					string str = formulaStringMap2[*s] + intToString(*s);
+					formulaStringMap2[*s] = str;
+				}
+
+				formulaMap2[*s] = f;
+			}
+		}
+	}
+
+}
+
 
 void GraphIntersection::product(Nodepair* qp){
 	Formula * f;
@@ -122,6 +186,9 @@ void GraphIntersection::product(Nodepair* qp){
 //	cout << "End Product(): " << qp->n1->id << " " << qp->n2->id << endl;
 }
 
+void GraphIntersection::convertToGraph(Graph *g){
+
+}
 
 //! \brief creates a dot output of the graph (result of intersection or union)
 //! \param out: output file

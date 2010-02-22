@@ -65,22 +65,24 @@ void GraphComplement::generateGlobalFormula(){
 	//generate global formula
 
 	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
-	//cout << globalFormulaAsString << endl;
+
 	Formula *h = new FormulaNOT(globalFormula);
 	globalFormula = h;
-
 	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
 		    assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
-		//	nodes[n->second->id] = n->second; //add new nodes to nodes-map
 
-			//append the new nodes to the global formula;
+			//append the new nodes to the global formula
+		    //TODO: intToString more efficient: char** !?
 		    globalFormulaAsString = globalFormulaAsString + " + " + intToString(n->second->id);
 
 			const Formula *f = new FormulaNUM(n->second->id);
 			Formula *g = new FormulaOR(globalFormula, f) ;
 			globalFormula = g;
+
+			lits.insert(n->second->id);
 	}
 }
+
 
 void GraphComplement::appandAddedNodes(){
 	nodes.insert(addedNodes.begin(), addedNodes.end());

@@ -184,7 +184,9 @@ gformula:
 | KEY_FALSE
 	{ $$ = new FormulaFalse(); }
 | NUMBER
-	{ $$ = new FormulaNUM($1); }
+	{ $$ = new FormulaNUM($1);
+	  graph->lits.insert($1); 
+	}
 ;
 
 

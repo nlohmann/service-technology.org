@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cstdio>
 #include <map>
+#include <set>
 #include "testFormula.h"
 #include "Formula.h"
 

@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <map>
+#include <set>
 #include <algorithm>
 #include "Node.h"
 #include "Graph.h"
@@ -200,7 +201,7 @@ int main(int argc, char **argv) {
 		if(args_info.time_given){
 			time_t buildIntersection_end = time(NULL);
 			cout << "number of nodes in the intersection: " << g3->nodepairs.size() << endl;
-			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the complement" << endl;
+			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the intersection" << endl;
 		}
 
 		//stringstream o;
@@ -213,6 +214,135 @@ int main(int argc, char **argv) {
 		delete g2;
 		delete g3;
 	}
+
+	/******************
+	 * Union          *
+	 ******************/
+	if(args_info.union_given){
+
+		string filename = "stdin";
+
+		if (args_info.inputs_num >= 1){
+			assert(args_info.inputs != NULL);
+			assert(args_info.inputs[0] != NULL);
+
+			filename = args_info.inputs[0];
+			filename = filename.substr(0,filename.find_last_of(".og")-2);
+			//cout << "test: " << filename << endl;
+			og_yyin = fopen(args_info.inputs[0], "r");
+
+			if (og_yyin == NULL){
+				abort(1, "File %s not found", args_info.inputs[0]);
+			}
+		}
+
+		/*
+		 * Complement of the first Graph
+		 */
+
+		GraphComplement * g1 = new GraphComplement();
+		graph = g1;
+
+		initGlobalVariables();
+
+		time_t parsingTime_start = time(NULL);
+
+		//parse
+		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
+
+		fclose(og_yyin);
+		og_yylex_destroy();
+
+		if(args_info.time_given){
+			time_t parsingTime_end = time(NULL);
+			cout << "number of labels: " << label2id.size()-3 << endl;
+			cout << "number of nodes in the given extended annotated automaton (1st file): " << graph->nodes.size() << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+		}
+
+		time_t buildOG_start = time(NULL);
+
+		g1->complement();
+
+		/*
+		 * Complement of the second Graph
+		 */
+
+		if (args_info.inputs_num == 2){
+			assert(args_info.inputs != NULL);
+			assert(args_info.inputs[1] != NULL);
+
+			string tmpfilename = args_info.inputs[1];
+			tmpfilename = tmpfilename.substr(0, tmpfilename.find_last_of(".og")-2);
+			tmpfilename = tmpfilename.substr(tmpfilename.find_last_of("/")+1, tmpfilename.length());
+			//cout << "testtmp: " << tmpfilename << endl;
+			og_yyin = fopen(args_info.inputs[1], "r");
+			filename = filename + "_" + tmpfilename;
+
+
+			if (og_yyin == NULL){
+				abort(1, "File %s not found", args_info.inputs[1]);
+			}
+		}
+
+		GraphComplement * g2 = new GraphComplement();
+		graph = g2;
+
+		initGlobalVariables();
+
+		parsingTime_start = time(NULL);
+
+		//parse
+		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
+
+		fclose(og_yyin);
+		og_yylex_destroy();
+
+		if(args_info.time_given){
+			time_t parsingTime_end = time(NULL);
+			cout << "number of labels: " << label2id.size()-3 << endl;
+			cout << "number of nodes in the given extended annotated automaton (2nd file): " << graph->nodes.size() << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+		}
+
+		buildOG_start = time(NULL);
+
+		g2->complement();
+
+		/*
+		 * Intersection of both GraphComplements
+		 */
+
+		GraphIntersection * g3 = new GraphIntersection();
+		g3->intersection(g1,g2);
+
+		/*
+		 * Complement of the Intersection
+		 */
+		GraphComplement * g4 = new GraphComplement();
+		g3->convertToGraph(g4);
+		g4->complement();
+
+
+		if(args_info.time_given){
+			time_t buildOG_end = time(NULL);
+			cout << "number of nodes in the complement: " << g4->nodes.size() << endl;
+			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
+			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+		}
+
+		stringstream o;
+		//g1->getGlobalFormulaForComplement(o);
+		//string title = "Complement of " + filename + "    global formula: " + string(o.str());
+		string title = "Complement of " + filename + "    global formula: " + g4->globalFormulaAsString;
+
+
+		out(g4, filename+"_union",title);
+
+		//delete g1;
+		//delete g2;
+	}
+
 
 //	free(args_info.minisat_arg);
 	cmdline_parser_free(&args_info);
@@ -283,6 +413,10 @@ void evaluateParameters(int argc, char** argv) {
 
     if (args_info.inputs_num != 2 && args_info.intersection_given) {
         abort(4, "Wrong number of input files. Exactly two files must be given if intersection is chosen.");
+    }
+
+    if (args_info.inputs_num != 2 && args_info.union_given) {
+        abort(4, "Wrong number of input files. Exactly two files must be given if union is chosen.");
     }
 
     free(params);

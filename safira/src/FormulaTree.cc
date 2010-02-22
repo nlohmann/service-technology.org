@@ -13,7 +13,7 @@ FormulaTree::FormulaTree(Node * _node):
 	id = maxId++;
 }
 
-FormulaTree::FormulaTree(vector<bool>* _satAssigment, FormulaTree* _yes, FormulaTree* _no):
-		satAssignment(_satAssigment), node(NULL), yes(_yes), no(_no){
-	id = maxId++;
-}
+//FormulaTree::FormulaTree(vector<bool>* _satAssigment, FormulaTree* _yes, FormulaTree* _no):
+//		satAssignment(_satAssigment), node(NULL), yes(_yes), no(_no){
+//	id = maxId++;
+//}

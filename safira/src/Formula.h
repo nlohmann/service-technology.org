@@ -58,6 +58,9 @@ public:
 
 	///return the time needed by minisat
 	static double getMinisatTime();
+
+	/// returns the set of all Literals (ids of the Labels, or ids of the states)
+//	virtual set<int> getLiterals() const = 0;
 };
 
 
@@ -76,6 +79,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 /// a formula to express a disjunction of two other formulae
@@ -94,6 +98,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 /// a formula to express a negation of another formula
@@ -111,6 +116,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 /// a formula to express a string literal
@@ -126,6 +132,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 
@@ -142,6 +149,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 
@@ -154,6 +162,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 /// a formula to express falsity
@@ -166,6 +175,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 /// a formula to express the final predicate
@@ -177,6 +187,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
+//	set<int> getLiterals() const;
 };
 
 

@@ -60,14 +60,14 @@ AT_CHECK([diff myCoffee_complement_reduced_ref.eaa myCoffee_complement.eaa])
 AT_KEYWORDS(complement c1)
 AT_CLEANUP
 
-AT_SETUP([complement c1 PO.og])
-AT_CHECK([cp TESTFILES/EMPTY TESTFILES/PO.og TESTFILES/PO_complement_reduced_ref.eaa .])
-AT_CHECK([SAFIRA -oeaa PO.og -c1],0,stdout,stderr)
-AT_CHECK([diff EMPTY stdout])
-AT_CHECK([diff EMPTY stderr])
-AT_CHECK([diff PO_complement_reduced_ref.eaa PO_complement.eaa])
-AT_KEYWORDS(complement c1)
-AT_CLEANUP
+#AT_SETUP([complement c1 PO.og])
+#AT_CHECK([cp TESTFILES/EMPTY TESTFILES/PO.og TESTFILES/PO_complement_reduced_ref.eaa .])
+#AT_CHECK([SAFIRA -oeaa PO.og -c1],0,stdout,stderr)
+#AT_CHECK([diff EMPTY stdout])
+#AT_CHECK([diff EMPTY stderr])
+#AT_CHECK([diff PO_complement_reduced_ref.eaa PO_complement.eaa])
+#AT_KEYWORDS(complement c1)
+#AT_CLEANUP
 
 AT_SETUP([complement c2 myCoffee.og])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_complement_reduced_ref.eaa .])

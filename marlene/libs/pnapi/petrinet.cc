@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-02-12 08:13:44 +0100 (Fri, 12 Feb 2010) $
+ * \date    $Date: 2010-02-19 17:54:57 +0100 (Fri, 19 Feb 2010) $
  *
- * \version $Revision: 5394 $
+ * \version $Revision: 5418 $
  */
 
 #include "config.h"
@@ -1392,6 +1392,13 @@ void PetriNet::addRole(std::string roleName)
   roles_.insert(roleName);
 }
 
+/*!
+ * \brief Adds a set of roles to transition
+ */
+void PetriNet::addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator last)
+{
+  roles_.insert(first, last);
+}
 
 /*!
  * \brief Removes a label to the interface

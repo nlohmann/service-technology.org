@@ -1,3 +1,5 @@
+EXPLICITE_TAULOOPS
+
 INTERFACE
   INPUT
     out.Contract_Negociation_Purchasing_Assistant.Write_up_a_new_contract, out.Contract_Negociation_Purchasing_Clerk.Finalize_contract_conditions, out.Contract_Negociation_Purchasing_Clerk.Modify_contract_terms, out.Contract_Negociation_Purchasing_Manager.Approve_contract, out.Contract_Negociation_Purchasing_Manager.Prepare_and_send_contract_proposal, out.Contract_Negociation_Supplier.Exchange-11, out.Contract_Negociation_Supplier.Purchase_contract;

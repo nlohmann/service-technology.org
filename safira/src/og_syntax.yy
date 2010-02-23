@@ -111,7 +111,7 @@ globalformula:
 
 initialnodelist:
   NUMBER {graph->addInitialNode($1);}
-| initialnodelist NUMBER {graph->addInitialNode($2);}
+| initialnodelist COMMA NUMBER {graph->addInitialNode($3);}
 		
 identlist_in:
   /* empty */

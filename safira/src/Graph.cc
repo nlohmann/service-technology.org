@@ -49,7 +49,7 @@ void Graph::addInitialNode(int id){
 
 
 void Graph::printInterface(ostream& o) const {
-	o << "INTERFACE\n";
+	o << "\nINTERFACE\n";
 	o << "  INPUT\n";
 
 	bool first = true;
@@ -128,6 +128,8 @@ void Graph::printNodes(ostream& o) const{
 
 /// prints the graph
 void Graph::print(ostream& o) const{
+
+	o << "EXPLICITE_TAULOOPS\n";
 
 	printInterface(o);
 	printInitialNodes(o);

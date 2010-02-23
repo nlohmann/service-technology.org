@@ -57,6 +57,14 @@ void GraphComplement::complement(){
 	if (args_info.complement_arg == 2){
 		makeComplete_efficient();
 	}
+
+	if (addedNodes.size() == 1){
+		assert(addedNodes.begin()->second == trap);
+		delete addedNodes.begin()->second;
+		addedNodes.clear();
+	}
+
+
 	generateGlobalFormula();
 	appandAddedNodes();
 }

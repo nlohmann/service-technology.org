@@ -21,7 +21,6 @@ class GraphComplement : public Graph {
         //	void toDot_addedNodes(FILE* out) const;
         //  void printAddedNodes(ostream& o) const;
 
-
     public:
 
     	///constructor

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include "Node.h"
 #include "Formula.h"
 #include "types.h"

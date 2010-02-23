@@ -204,9 +204,7 @@ int main(int argc, char **argv) {
 			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the intersection" << endl;
 		}
 
-		//stringstream o;
-		//g3->getGlobalFormulaForIntersection(o);
-		string title = filename + "_intersection    global formula: "; // + string(o.str());
+		string title = filename + "_intersection    global formula: " + g3->globalFormulaAsString;
 
 		out(g3, filename+"_intersection", title);
 

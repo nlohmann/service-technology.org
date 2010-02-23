@@ -818,8 +818,89 @@ list<Clause> FormulaFinal::toCNF(int x, int&) const{
 
 
 /***********************************************************************
- * formula to CNF
+ * modify the formula
  ***********************************************************************/
+const Formula* Formula::modify(map<int,Formula*> lits) const{
+	return this;
+}
+
+
+const Formula* FormulaAND::modify(map<int,Formula*> lits) const{
+	const Formula* newLeft = left->modify(lits);
+	const Formula* newRight = right->modify(lits);
+	//TODO: delete left;
+
+	if (newLeft->formulaType == FALSE || newRight->formulaType == FALSE){
+		Formula* f = new FormulaFalse();
+		return f;
+	}
+
+//	if (newLeft == NULL){
+//		assert(newRight != NULL);
+//		newLeft = new FormulaTrue();
+//	}
+//
+//    if (newRight == NULL) {
+//		assert(newLeft != NULL);
+//		newRight = new FormulaTrue();
+//	}
+
+	*((const Formula**)&left) = newLeft; //hack: left = newLeft (due to const)
+	*((const Formula**)&right) = newRight; //right = newRight (due to const)
+
+	return this;
+}
+
+const Formula* FormulaOR::modify(map<int,Formula*> lits) const{
+	Formula* newLeft = (Formula*) left->modify(lits);
+	Formula* newRight = (Formula*) right->modify(lits);
+	//TODO: delete left;
+
+	if (newLeft->formulaType == FALSE && newRight->formulaType == FALSE){
+		Formula* f = new FormulaFalse();
+		return f;
+	}
+
+//	if (newLeft == NULL){
+//		assert(newRight != NULL);
+//		newLeft = new FormulaFalse();
+//	}
+//    if (newRight == NULL) {
+//		assert(newLeft != NULL);
+//		newRight = new FormulaFalse();
+//	}
+
+	*((Formula**)&left) = newLeft; //hack: left = newLeft (due to const)
+	*((Formula**)&right) = newRight; //right = newRight (due to const)
+
+	return this;
+}
+
+const Formula* FormulaNOT::modify(map<int,Formula*> lits) const{
+	const Formula* newf = f->modify(lits);
+	//TODO: delete f;
+
+	if (newf->formulaType == FALSE){
+		Formula* f = new FormulaFalse();
+		return f;
+	}
+	else {
+		*((const Formula**)&f) = newf; //hack: f = newf (due to const)
+		return this;
+	}
+}
+
+const Formula* FormulaNUM::modify(map<int,Formula*> lits) const{
+
+	if (lits.find(number) == lits.end()){
+		Formula* f = new FormulaFalse();
+		return f;
+	}
+	else {
+		return lits[number];
+	}
+}
+
 
 //set<int> FormulaAND::getLiterals() const {
 //	set<int> lits_left = left->getLiterals();

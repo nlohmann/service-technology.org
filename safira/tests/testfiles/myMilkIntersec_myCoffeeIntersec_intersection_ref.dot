@@ -1,5 +1,5 @@
 digraph D {
-graph [fontname="Helvetica", label="myMilk_myCoffee_intersection    global formula: (true * true)"];
+graph [fontname="Helvetica", label="myMilkIntersec_myCoffeeIntersec_intersection    global formula: ((0 * 2) * ((0 + false) + 5))"];
 node [fontname="Helvetica" fontsize=10];
 edge [fontname="Helvetica" fontsize=10];
   q_0 [label="" height="0.01" width="0.01" style="invis"];

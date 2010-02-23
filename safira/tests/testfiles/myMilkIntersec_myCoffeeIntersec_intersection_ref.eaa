@@ -6,7 +6,7 @@ INTERFACE
 
 INITIALNODES  0;
 
-GLOBALFORMULA (true * true);
+GLOBALFORMULA ((0 * 2) * ((0 + false) + 5));
 
 NODES
   0: (((M + E) + T) * ((C + E) + T))

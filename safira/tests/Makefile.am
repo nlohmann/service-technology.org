@@ -14,7 +14,9 @@ TESTFILES = EMPTY \
             PO.og PO_complement_ref.eaa PO_complement_reduced_ref.eaa \
             CN_cyclic.og CN_cyclic_complement_reduced_ref.eaa \
             testGraph_complement_ref.eaa testGraph_total_ref.eaa \
-            myMilk.og myMilk_myCoffee_intersection_ref.eaa myMilk_myCoffee_intersection_ref.dot
+            myMilk.og myMilk_myCoffee_intersection_ref.eaa myMilk_myCoffee_intersection_ref.dot \
+            myMilkIntersec.og myCoffeeIntersec.og myMilkIntersec_myCoffeeIntersec_intersection_ref.eaa myMilkIntersec_myCoffeeIntersec_intersection_ref.dot
+            
 
 
 # Below you can list all the files you do not want to have counted in the

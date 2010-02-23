@@ -104,6 +104,7 @@ void Graph::printInitialNodes(ostream& o) const{
 void Graph::printGlobalFormula(ostream& o) const{
 
 	o << ";\n\nGLOBALFORMULA " << globalFormulaAsString << ";\n";
+	//o << ";\n\nGLOBALFORMULA " << globalFormula->toString() << ";\n";
 
 }
 

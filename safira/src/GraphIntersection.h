@@ -9,7 +9,6 @@ using namespace std;
 
 class GraphIntersection : public Graph {
 	private:
-	    string globalFormulaString;
 		list<Intpair> initialNodepairs;
 		stack<long> myStack;
 		stack<Nodepair*> unproc;
@@ -21,7 +20,7 @@ class GraphIntersection : public Graph {
         void product(Nodepair* qp);
 
         ///converts the map of Nodepairs to a map of Nodes
-        void convert();
+        void convertTheMap();
 
     public:
 

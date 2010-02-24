@@ -15,7 +15,8 @@ TESTFILES = EMPTY \
             CN_cyclic.og CN_cyclic_complement_reduced_ref.eaa \
             testGraph_complement_ref.eaa testGraph_total_ref.eaa \
             myMilk.og myMilk_myCoffee_intersection_ref.eaa myMilk_myCoffee_intersection_ref.dot \
-            myMilkIntersec.og myCoffeeIntersec.og myMilkIntersec_myCoffeeIntersec_intersection_ref.eaa myMilkIntersec_myCoffeeIntersec_intersection_ref.dot
+            myMilkIntersec.og myCoffeeIntersec.og myMilkIntersec_myCoffeeIntersec_intersection_ref.eaa myMilkIntersec_myCoffeeIntersec_intersection_ref.dot \
+            minispec2.og minispec2_minispec_union_ref.eaa minispec2_minispec_union_ref.pdf minispec_minispec2_union_ref.eaa minispec_minispec2_union_ref.pdf
             
 
 

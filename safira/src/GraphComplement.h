@@ -59,6 +59,8 @@ class GraphComplement : public Graph {
         //TODO: diese Funktion private?
         void generateGlobalFormula();
 
+        void negateGlobalFormula();
+
         //TODO: diese Funktion private?
         void appandAddedNodes();
 };

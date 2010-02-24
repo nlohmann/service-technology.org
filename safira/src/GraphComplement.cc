@@ -69,13 +69,17 @@ void GraphComplement::complement(){
 	appandAddedNodes();
 }
 
-void GraphComplement::generateGlobalFormula(){
-	//generate global formula
-
+void GraphComplement::negateGlobalFormula(){
 	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
 
 	Formula *h = new FormulaNOT(globalFormula);
 	globalFormula = h;
+}
+
+void GraphComplement::generateGlobalFormula(){
+	//generate global formula
+	negateGlobalFormula();
+
 	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
 		    assert(nodes.find(n->second->id) == nodes.end()); //elements in addedNodes-map are not yet in nodes-map
 
@@ -400,10 +404,13 @@ void GraphComplement::makeComplete_efficient() {
 //				cout << "===========================================\n";
 //				cout << "makeComplete(): Node:" << n->second->id << "  " << f->toString() << "  for " << id2label[i] << "-successorts " << endl;
 				if(f->isSatisfiable()){
+//					cout << "Formula is satisfiable\n";
 					Node *q = getNode(f);
 					n->second->addEdge(i,q);
+//					cout << "node ID: " << q->id << "  Formula: " << q->formula->toString() << endl;
 				}
 				else {
+//					cout << "Formula is NOT satisfiable\n";
 					delete f;
 				}
 			}

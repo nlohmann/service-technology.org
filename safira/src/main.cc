@@ -319,7 +319,13 @@ int main(int argc, char **argv) {
 		 */
 		GraphComplement * g4 = new GraphComplement();
 		g3->convertToGraph(g4);
-		g4->complement();
+
+
+		/* since g4 is still total and complete it is sufficient to negate the global Formula
+		 * (instead to apply the complement operation)
+		 */
+		g4->negateGlobalFormula();
+		//g4->complement();
 
 
 		if(args_info.time_given){

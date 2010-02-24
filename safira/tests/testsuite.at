@@ -157,6 +157,27 @@ AT_CLEANUP
 
 #####################################
 
+AT_SETUP([union minispec])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/minispec.og TESTFILES/minispec2.og TESTFILES/minispec_minispec2_union_ref.eaa TESTFILES/minispec2_minispec_union_ref.eaa .])
+
+AT_CHECK([SAFIRA -oeaa minispec.og minispec2.og -u],0,stdout,stderr)
+AT_CHECK([diff EMPTY stdout])
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([test -f minispec_minispec2_union.eaa])
+AT_CHECK([diff minispec_minispec2_union_ref.eaa minispec_minispec2_union.eaa])
+
+AT_CHECK([SAFIRA -oeaa minispec2.og minispec.og -u],0,stdout,stderr)
+AT_CHECK([diff EMPTY stdout])
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([test -f minispec2_minispec_union.eaa])
+
+AT_CHECK([diff minispec2_minispec_union_ref.eaa minispec2_minispec_union.eaa])
+
+AT_KEYWORDS(union)
+AT_CLEANUP
+
+#####################################
+
 AT_SETUP([test output complement: pdf, eps, png, dot])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_complement_ref.dot .])
 

@@ -1,5 +1,4 @@
-AC_PREREQ([2.63])
-AC_INIT(Safira, 1.1-unreleased, safira@service-technology.org, safira, http://service-technology.org/safira)
+AC_INIT(Safira, 2.0, safira@service-technology.org, safira, http://service-technology.org/safira)
 
 AC_MSG_NOTICE([ ____         __ _           ])
 AC_MSG_NOTICE([/ ___|  __ _ / _(_)_ __ __ _ ])

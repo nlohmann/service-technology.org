@@ -6,14 +6,14 @@
                      http://service-technology.org/safira
 
 
-Version 1.1-unreleased
-======================
-
-* removed memory leaks caused by gengetopt, lex and yacc
-
-* fixed bug in CNF calculation
+Version 2.0
+===========
 
 * implemented intersection
+
+* implemented union
+
+* fixed bug in CNF calculation
 
 Version 1.0
 ===========

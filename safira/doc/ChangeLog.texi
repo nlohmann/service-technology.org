@@ -1,8 +1,8 @@
-@heading Version 1.1-unreleased
+@heading Version 2.0
 @itemize
-@item removed memory leaks caused by gengetopt, lex and yacc
-@item fixed bug in CNF calculation
 @item implemented intersection 
+@item implemented union
+@item fixed bug in CNF calculation
 @end itemize
 
 @heading Version 1.0
@@ -11,3 +11,4 @@
 
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @end itemize
+

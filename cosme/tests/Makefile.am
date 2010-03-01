@@ -7,40 +7,74 @@
 #############################################################################
 
 # the files needed by the test cases (without `testfiles/' directory)
-TESTFILES = matching/AP-partner.owfn matching/AP-partner.sa matching/AP.og \
-            matching/AP.owfn matching/BH-partner.owfn matching/BH-partner.sa \
-            matching/BH.og matching/BH.owfn matching/CN-partner.owfn \
-            matching/CN-partner.sa matching/CN.og matching/CN.owfn \
-            matching/DG-partner.owfn matching/DG-partner.sa matching/DG.og \
-            matching/DG.owfn matching/PO-partner.owfn matching/PO-partner.sa \
-            matching/PO.og matching/PO.owfn matching/QR-partner.owfn \
-            matching/QR-partner.sa matching/QR.og matching/QR.owfn \
-            matching/RE-partner.owfn matching/RE-partner.sa matching/RE.og \
-            matching/RE.owfn matching/RS-partner.owfn matching/RS-partner.sa \
-            matching/RS.og matching/RS.owfn matching/SD-partner.owfn \
-            matching/SD-partner.sa matching/SD.og matching/SD.owfn \
-            matching/T2.owfn matching/TR-partner.owfn matching/TR-partner.sa \
-            matching/TR.og matching/TR.owfn \
-            matching/auctionService-partner.owfn \
-            matching/auctionService-partner.sa matching/auctionService.og \
-            matching/auctionService.owfn matching/interface-partner.owfn \
-            matching/interface_match.og matching/internal.og \
-            matching/internal_match.owfn \
-            matching/loanApprovalProcess-partner.owfn \
-            matching/loanApprovalProcess-partner.sa \
-            matching/loanApprovalProcess.og matching/loanApprovalProcess.owfn \
-            matching/myCoffee-partner.owfn matching/myCoffee-partner.sa \
-            matching/myCoffee.og matching/myCoffee.owfn \
-            matching/phcontrol3.unf-partner.owfn \
-            matching/phcontrol3.unf-partner.sa matching/phcontrol3.unf.og \
-            matching/phcontrol3.unf.owfn simulation/AP-pv.og simulation/AP.og \
-            simulation/BH-pv.og simulation/BH.og simulation/CN-pv.og \
-            simulation/CN.og simulation/DG-pv.og simulation/DG.og \
-            simulation/PO-pv.og simulation/PO.og simulation/TR-pv.og \
-            simulation/TR.og simulation/branch.og simulation/branch_chopped.og \
-            simulation/branch_compact.og simulation/branch_compact_extend.og \
-            simulation/branch_wrong_bits.og simulation/simple.og \
-            simulation/simple_smaller_interface.og
+TESTFILES = /OGs/AP.bits.og \
+						/OGs/AP.og \
+						/OGs/AP-pv.og \
+						/OGs/auctionService.bits.og \
+						/OGs/auctionService.og \
+						/OGs/BH.bits.og \
+						/OGs/BH.og \
+						/OGs/BH-pv.og \
+						/OGs/branch_chopped.og \
+						/OGs/branch_compact_extend.og \
+						/OGs/branch_compact.og \
+						/OGs/branch.og \
+						/OGs/branch_wrong_bits.og \
+						/OGs/CN.bits.og \
+						/OGs/CN-neu.og \
+						/OGs/CN.og \
+						/OGs/CN-pv.og \
+						/OGs/DG.bits.og \
+						/OGs/DG.og \
+						/OGs/DG-pv.og \
+						/OGs/interface_match.og \
+						/OGs/internal-match.bits.og \
+						/OGs/internal.og \
+						/OGs/loanApprovalProcess.bits.og \
+						/OGs/loanApprovalProcess.og \
+						/OGs/myCoffee.bits.og \
+						/OGs/myCoffee.og \
+						/OGs/phcontrol3.unf.og \
+						/OGs/phcontrol.bits.og \
+						/OGs/PO.bits.og \
+						/OGs/PO.og \
+						/OGs/PO-pv.og \
+						/OGs/QR.bits.og \
+						/OGs/QR.og \
+						/OGs/RE.bits.og \
+						/OGs/RE.og \
+						/OGs/RS.bits.og \
+						/OGs/RS.og \
+						/OGs/SD.bits.og \
+						/OGs/SD.og \
+						/OGs/simple.og \
+						/OGs/simple_smaller_interface.og \
+						/OGs/TPO.bits.og \
+						/OGs/TR.bits.og \
+						/OGs/TR.og \
+						/OGs/TR-pv.og \
+						/Services/AP.owfn \
+						/Services/AP-partner.owfn \
+						/Services/auctionService.owfn \
+						/Services/auctionService-partner.owfn \
+						/Services/BH.owfn \
+						/Services/BH-partner.owfn \
+						/Services/CN.owfn \
+						/Services/CN-partner.owfn \
+						/Services/DG.owfn \
+						/Services/DG-partner.owfn \
+						/Services/interface-partner.owfn \
+						/Services/internal_match.owfn \
+						/Services/loanApprovalProcess.owfn \
+						/Services/loanApprovalProcess-partner.owfn \
+						/Services/myCoffee.owfn \
+						/Services/myCoffee-partner.owfn \
+						/Services/phcontrol3.owfn \
+						/Services/phcontrol3.unf.owfn \
+						/Services/phcontrol3.unf-partner.owfn \
+						/Services/PO.owfn \
+						/Services/PO-partner.owfn \
+						/Services/QR.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

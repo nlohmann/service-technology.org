@@ -74,7 +74,19 @@ TESTFILES = /OGs/AP.bits.og \
 						/Services/phcontrol3.unf-partner.owfn \
 						/Services/PO.owfn \
 						/Services/PO-partner.owfn \
-						/Services/QR.owfn
+						/Services/QR.owfn \
+						/Services/QR-partner.owfn \
+						/Services/RE.owfn \
+						/Services/RE-partner.owfn \
+						/Services/RS.owfn \
+						/Services/RS-partner.owfn \
+						/Services/SD.owfn \
+						/Services/SD-partner.owfn \
+						/Services/T2.owfn \
+						/Services/TPO.owfn \
+						/Services/TPO-partner.owfn \
+						/Services/TR.owfn \
+						/Services/TR-partner.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

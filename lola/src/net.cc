@@ -37,7 +37,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <ctype.h>
+#include <cctype>
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>

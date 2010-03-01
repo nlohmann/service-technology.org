@@ -19,7 +19,7 @@
 \*****************************************************************************/
 
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "dimensions.H"
 #include "net.H"
 #include "formula.H"

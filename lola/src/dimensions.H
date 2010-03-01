@@ -26,7 +26,7 @@
 
 #include "userconfig.H"
 #include <iostream>
-#include <limits.h>
+#include <climits>
 
 #ifdef STATESPACE
   #define FULL

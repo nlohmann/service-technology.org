@@ -22,7 +22,7 @@
 #include "net.H"
 #include "graph.H"
 #include "formula.H"
-#include <limits.h>
+#include <climits>
 #ifdef STUBBORN
 
 void insert_up(State *, formula *);

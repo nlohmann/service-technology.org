@@ -23,8 +23,8 @@
 #include "dimensions.H"
 #include "unfold.H"
 #include "symboltab.H"
-#include <strings.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
 extern void yyerror(char const *);
 

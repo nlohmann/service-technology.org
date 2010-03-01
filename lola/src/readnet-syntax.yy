@@ -28,7 +28,7 @@
 #include "buchi.H"
 #include "unfold.H"
 #include <cstdio>
-#include <limits.h>
+#include <climits>
 
 extern UBooType * TheBooType;
 extern UNumType * TheNumType;

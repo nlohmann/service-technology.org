@@ -20,9 +20,9 @@
 
 
 #include "symm.H"
-#include <limits.h>
+#include <climits>
 #include "graph.H"
-#include <stdlib.h>
+#include <cstdlib>
 
 #define NodeType int
 #define PL 0

@@ -26,7 +26,7 @@
 #include "dimensions.H"
 #include "buchi.h"
 
-#include <fstream.h>
+#include <fstream>
 #include <cstring>
 #include <cstdio>
 

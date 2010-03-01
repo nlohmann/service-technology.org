@@ -29,7 +29,7 @@
 #define NET_H
 
 #include <iostream>
-#include <limits.h>
+#include <climits>
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>

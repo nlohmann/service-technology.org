@@ -1,0 +1,1365 @@
+{
+  generator:    Wendy 2.3-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy ../cosme/tests/simulation/PO-pv.owfn --og --formula=2bit --lola=../lola-statespace 
+  events:       4 send, 6 receive, 0 synchronous
+  statistics:   168 nodes
+}
+
+INTERFACE
+  INPUT
+    out.invoicing.initiatePriceCalculation, out.invoicing.sendShippingPrice, out.purchasing.sendPurchaseOrder, out.scheduling.requestProductionScheduling, out.scheduling.sendShippingSchedule, out.shipping.requestShipping;
+  OUTPUT
+    in.invoicing.sendInvoice, in.purchasing.sendPurchaseOrder, in.shipping.requestShipping, in.shipping.sendSchedule;
+
+NODES
+  141541472 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 141608640
+    in.purchasing.sendPurchaseOrder -> 141575232
+    in.shipping.requestShipping -> 144066888
+    in.shipping.sendSchedule -> 144140600
+  141573776
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141644320
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144759616
+    in.shipping.requestShipping -> 141633168
+    in.shipping.sendSchedule -> 141622032
+  141575232
+    out.invoicing.initiatePriceCalculation -> 141582656
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144067560
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144171112
+    in.invoicing.sendInvoice -> 141640192
+    in.shipping.requestShipping -> 144064808
+    in.shipping.sendSchedule -> 144060312
+  141577088
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144161592
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144769664
+    in.shipping.sendSchedule -> 144092712
+  141579360
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144760216
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 141612752
+    out.shipping.requestShipping -> 0
+  141582656
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141688448
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144193840
+    in.invoicing.sendInvoice -> 141573776
+    in.shipping.requestShipping -> 141584528
+    in.shipping.sendSchedule -> 144106728
+  141584528
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144052656
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144140072
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144097472
+    in.invoicing.sendInvoice -> 141633168
+    in.shipping.sendSchedule -> 144110632
+  141591952
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144131352
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144761592
+  141601216 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.purchasing.sendPurchaseOrder -> 143155800
+    in.shipping.sendSchedule -> 144145696
+  141605328
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144196880
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144074336
+    out.shipping.requestShipping -> 144761592
+  141606784 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.purchasing.sendPurchaseOrder -> 141690304
+    in.shipping.requestShipping -> 144145696
+  141608640 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.purchasing.sendPurchaseOrder -> 141640192
+    in.shipping.requestShipping -> 141601216
+    in.shipping.sendSchedule -> 141606784
+  141612752
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144759648
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  141616080
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144161592
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144770648
+    in.shipping.sendSchedule -> 144132552
+  141622032
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144757008
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144044408
+    in.shipping.requestShipping -> 144120648
+  141633168
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 141683296
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144766800
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 141685136
+    in.shipping.sendSchedule -> 144120648
+  141640192
+    out.invoicing.initiatePriceCalculation -> 141573776
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141668464
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144198888
+    in.shipping.requestShipping -> 143155800
+    in.shipping.sendSchedule -> 141690304
+  141644320
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 141692560
+    in.shipping.requestShipping -> 144766800
+    in.shipping.sendSchedule -> 144757008
+  141668464
+    out.invoicing.initiatePriceCalculation -> 141644320
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144155456
+    in.shipping.requestShipping -> 144763952
+    in.shipping.sendSchedule -> 144150912
+  141683296
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144764864
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144770648
+    in.shipping.sendSchedule -> 144173128
+  141685136
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144770648
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144769664
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144104600
+  141688448
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144093784
+    in.invoicing.sendInvoice -> 141644320
+    in.shipping.requestShipping -> 144140072
+    in.shipping.sendSchedule -> 144193552
+  141690304
+    out.invoicing.initiatePriceCalculation -> 141622032
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144150912
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144141520
+    in.shipping.requestShipping -> 144088824
+  141692560 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144769664
+    in.shipping.sendSchedule -> 144770104
+  143155800
+    out.invoicing.initiatePriceCalculation -> 141633168
+    out.invoicing.sendShippingPrice -> 144181496
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144763952
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144084656
+    in.shipping.sendSchedule -> 144088824
+  144042904
+    out.invoicing.initiatePriceCalculation -> 144097472
+    out.invoicing.sendShippingPrice -> 144179488
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144197352
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144084656
+    in.shipping.sendSchedule -> 144173856
+  144044408
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144770104
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144104600
+  144044456
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144196880
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144754240
+    out.shipping.requestShipping -> 141579360
+  144044560
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144074336
+    out.purchasing.sendPurchaseOrder -> 144754240
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144765816
+  144044696
+    out.invoicing.initiatePriceCalculation -> 144769664
+    out.invoicing.sendShippingPrice -> 144152856
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144050384
+  144050384
+    out.invoicing.initiatePriceCalculation -> 144765216
+    out.invoicing.sendShippingPrice -> 144164328
+    out.purchasing.sendPurchaseOrder -> 144199064
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144053880
+    out.shipping.requestShipping -> 0
+  144052600
+    out.invoicing.initiatePriceCalculation -> 144093784
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144155456
+    in.shipping.requestShipping -> 144197352
+    in.shipping.sendSchedule -> 144065912
+  144052656
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144133160
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 141616080
+    in.invoicing.sendInvoice -> 141683296
+    in.shipping.sendSchedule -> 144080048
+  144053880
+    out.invoicing.initiatePriceCalculation -> 144765816
+    out.invoicing.sendShippingPrice -> 144120512
+    out.purchasing.sendPurchaseOrder -> 144054032
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144054032
+    out.invoicing.initiatePriceCalculation -> 141612752
+    out.invoicing.sendShippingPrice -> 144117976
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144055160
+    out.invoicing.initiatePriceCalculation -> 144193808
+    out.invoicing.sendShippingPrice -> 144175880
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144171408
+    in.invoicing.sendInvoice -> 144159664
+  144056112
+    out.invoicing.initiatePriceCalculation -> 144087576
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144092288
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144189672
+  144059944
+    out.invoicing.initiatePriceCalculation -> 144128976
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144065912
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144141520
+    in.shipping.requestShipping -> 144173856
+  144060312
+    out.invoicing.initiatePriceCalculation -> 144106728
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144171376
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144059944
+    in.invoicing.sendInvoice -> 141690304
+    in.shipping.requestShipping -> 144087032
+  144062184
+    out.invoicing.initiatePriceCalculation -> 144082856
+    out.invoicing.sendShippingPrice -> 144168288
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144199064
+    out.scheduling.sendShippingSchedule -> 144065680
+    out.shipping.requestShipping -> 0
+  144064808
+    out.invoicing.initiatePriceCalculation -> 141584528
+    out.invoicing.sendShippingPrice -> 144065072
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144066376
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144042904
+    in.invoicing.sendInvoice -> 143155800
+    in.shipping.sendSchedule -> 144087032
+  144065072
+    out.invoicing.initiatePriceCalculation -> 144052656
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144066024
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144179488
+    in.invoicing.sendInvoice -> 144181496
+    in.shipping.sendSchedule -> 144068560
+  144065680
+    out.invoicing.initiatePriceCalculation -> 144081008
+    out.invoicing.sendShippingPrice -> 144189568
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144054032
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144065880
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144083256
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144193808
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144184656
+    in.invoicing.sendInvoice -> 144176528
+  144065912
+    out.invoicing.initiatePriceCalculation -> 144167936
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144198680
+    in.shipping.requestShipping -> 144066432
+  144066024
+    out.invoicing.initiatePriceCalculation -> 144133160
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144157728
+    in.invoicing.sendInvoice -> 144177120
+    in.shipping.sendSchedule -> 144179944
+  144066376
+    out.invoicing.initiatePriceCalculation -> 144140072
+    out.invoicing.sendShippingPrice -> 144066024
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144197352
+    in.invoicing.sendInvoice -> 144763952
+    in.shipping.sendSchedule -> 144166848
+  144066432
+    out.invoicing.initiatePriceCalculation -> 144092712
+    out.invoicing.sendShippingPrice -> 144079344
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144171408
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144050384
+  144066888 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 141601216
+    in.purchasing.sendPurchaseOrder -> 144064808
+    in.shipping.sendSchedule -> 144119320
+  144067560
+    out.invoicing.initiatePriceCalculation -> 141688448
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144052600
+    in.invoicing.sendInvoice -> 141668464
+    in.shipping.requestShipping -> 144066376
+    in.shipping.sendSchedule -> 144171376
+  144067784
+    out.invoicing.initiatePriceCalculation -> 144148712
+    out.invoicing.sendShippingPrice -> 144074256
+    out.purchasing.sendPurchaseOrder -> 144146552
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144159664
+    out.shipping.requestShipping -> 144050384
+  144068248
+    out.invoicing.initiatePriceCalculation -> 144184656
+    out.invoicing.sendShippingPrice -> 144056112
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144171408
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144109488
+  144068560
+    out.invoicing.initiatePriceCalculation -> 144080048
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144179944
+    out.scheduling.sendShippingSchedule -> 144152008
+    out.shipping.requestShipping -> 144167472
+    in.invoicing.sendInvoice -> 144189056
+  144071320
+    out.invoicing.initiatePriceCalculation -> 144187792
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144119992
+    out.scheduling.sendShippingSchedule -> 144074920
+    out.shipping.requestShipping -> 144168288
+  144072312
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144164016
+    out.purchasing.sendPurchaseOrder -> 144081008
+    out.scheduling.requestProductionScheduling -> 144765816
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144074256
+    out.invoicing.initiatePriceCalculation -> 141605328
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144119992
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144111144
+    out.shipping.requestShipping -> 144164328
+  144074336
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144170648
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144755184
+  144074920
+    out.invoicing.initiatePriceCalculation -> 144124824
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144120104
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144189568
+  144075512
+    out.invoicing.initiatePriceCalculation -> 144190608
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144074920
+    out.scheduling.requestProductionScheduling -> 144111144
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144189672
+  144079344
+    out.invoicing.initiatePriceCalculation -> 141591952
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144092288
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144164328
+  144080048
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144150488
+    out.scheduling.sendShippingSchedule -> 144083256
+    out.shipping.requestShipping -> 144132552
+    in.invoicing.sendInvoice -> 144173128
+  144081008
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144196616
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141612752
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144082856
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144139760
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141579360
+    out.scheduling.sendShippingSchedule -> 144081008
+    out.shipping.requestShipping -> 0
+  144083256
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144141320
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144087576
+    in.invoicing.sendInvoice -> 144190608
+  144083928
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144131352
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144765816
+  144084656
+    out.invoicing.initiatePriceCalculation -> 141685136
+    out.invoicing.sendShippingPrice -> 144132736
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144044696
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144185792
+  144087032
+    out.invoicing.initiatePriceCalculation -> 144110632
+    out.invoicing.sendShippingPrice -> 144068560
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144166848
+    out.scheduling.sendShippingSchedule -> 144126248
+    out.shipping.requestShipping -> 144173856
+    in.invoicing.sendInvoice -> 144088824
+  144087576
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144131352
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144164016
+  144088824
+    out.invoicing.initiatePriceCalculation -> 144120648
+    out.invoicing.sendShippingPrice -> 144189056
+    out.purchasing.sendPurchaseOrder -> 144136960
+    out.scheduling.requestProductionScheduling -> 144067784
+    out.scheduling.sendShippingSchedule -> 144154200
+    out.shipping.requestShipping -> 144185792
+  144092288
+    out.invoicing.initiatePriceCalculation -> 144131352
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144120512
+  144092624
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144150488
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144193808
+    out.shipping.requestShipping -> 144092712
+    in.invoicing.sendInvoice -> 144148712
+  144092712
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 141591952
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144083928
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144765216
+  144093784 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 141692560
+    in.shipping.requestShipping -> 141577088
+    in.shipping.sendSchedule -> 144167936
+  144093824
+    out.invoicing.initiatePriceCalculation -> 144179344
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144168288
+    out.scheduling.requestProductionScheduling -> 144164328
+    out.scheduling.sendShippingSchedule -> 144189672
+    out.shipping.requestShipping -> 0
+  144097472
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 141616080
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141577088
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 141685136
+    in.shipping.sendSchedule -> 144119760
+  144104600
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144179344
+    out.purchasing.sendPurchaseOrder -> 144082856
+    out.scheduling.requestProductionScheduling -> 144765216
+    out.scheduling.sendShippingSchedule -> 144072312
+    out.shipping.requestShipping -> 0
+  144106728
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144193552
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144128976
+    in.invoicing.sendInvoice -> 141622032
+    in.shipping.requestShipping -> 144110632
+  144109488
+    out.invoicing.initiatePriceCalculation -> 144072312
+    out.invoicing.sendShippingPrice -> 144189672
+    out.purchasing.sendPurchaseOrder -> 144065680
+    out.scheduling.requestProductionScheduling -> 144053880
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144110632
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144080048
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144092624
+    out.scheduling.sendShippingSchedule -> 144065880
+    out.shipping.requestShipping -> 144119760
+    in.invoicing.sendInvoice -> 144120648
+  144111144
+    out.invoicing.initiatePriceCalculation -> 144074336
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144120104
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144120512
+  144117976
+    out.invoicing.initiatePriceCalculation -> 144759648
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144119320 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144145696
+    in.purchasing.sendPurchaseOrder -> 144087032
+  144119760
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144132552
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144092712
+    out.scheduling.sendShippingSchedule -> 144184656
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144104600
+  144119992
+    out.invoicing.initiatePriceCalculation -> 144196880
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144120104
+    out.shipping.requestShipping -> 144120392
+  144120104
+    out.invoicing.initiatePriceCalculation -> 144170648
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144117976
+  144120392
+    out.invoicing.initiatePriceCalculation -> 144760216
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144117976
+    out.shipping.requestShipping -> 0
+  144120512
+    out.invoicing.initiatePriceCalculation -> 144755184
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144117976
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144120648
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144173128
+    out.purchasing.sendPurchaseOrder -> 144204536
+    out.scheduling.requestProductionScheduling -> 144148712
+    out.scheduling.sendShippingSchedule -> 144176528
+    out.shipping.requestShipping -> 144104600
+  144124824
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144170648
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144196616
+  144126248
+    out.invoicing.initiatePriceCalculation -> 144065880
+    out.invoicing.sendShippingPrice -> 144152008
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144055160
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144068248
+    in.invoicing.sendInvoice -> 144154200
+  144128976
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144167936
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144044408
+    in.shipping.requestShipping -> 144119760
+  144131352 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144755184
+  144132552
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141591952
+    out.scheduling.sendShippingSchedule -> 144087576
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144179344
+  144132736
+    out.invoicing.initiatePriceCalculation -> 144770648
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144152856
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144093824
+  144133160
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144161592
+    in.invoicing.sendInvoice -> 144764864
+    in.shipping.sendSchedule -> 144150488
+  144136960
+    out.invoicing.initiatePriceCalculation -> 144204536
+    out.invoicing.sendShippingPrice -> 144071320
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144146552
+    out.scheduling.sendShippingSchedule -> 144153456
+    out.shipping.requestShipping -> 144062184
+  144139760
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144760216
+    out.scheduling.sendShippingSchedule -> 144196616
+    out.shipping.requestShipping -> 0
+  144140072
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144133160
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 141577088
+    in.invoicing.sendInvoice -> 144766800
+    in.shipping.sendSchedule -> 144092624
+  144140600 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 141606784
+    in.purchasing.sendPurchaseOrder -> 144060312
+    in.shipping.requestShipping -> 144119320
+  144141320
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144131352
+    in.invoicing.sendInvoice -> 144074336
+  144141520
+    out.invoicing.initiatePriceCalculation -> 144044408
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144198680
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144185792
+  144145696 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.purchasing.sendPurchaseOrder -> 144088824
+  144146552
+    out.invoicing.initiatePriceCalculation -> 144044456
+    out.invoicing.sendShippingPrice -> 144119992
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144154752
+    out.shipping.requestShipping -> 144199064
+  144148712
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 141605328
+    out.purchasing.sendPurchaseOrder -> 144044456
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144044560
+    out.shipping.requestShipping -> 144765216
+  144150488
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144141320
+    out.shipping.requestShipping -> 141591952
+    in.invoicing.sendInvoice -> 141605328
+  144150912
+    out.invoicing.initiatePriceCalculation -> 144757008
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144198680
+    in.shipping.requestShipping -> 144067784
+  144152008
+    out.invoicing.initiatePriceCalculation -> 144083256
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144175880
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144056112
+    in.invoicing.sendInvoice -> 144075512
+  144152856
+    out.invoicing.initiatePriceCalculation -> 144768960
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144164328
+  144153456
+    out.invoicing.initiatePriceCalculation -> 144204640
+    out.invoicing.sendShippingPrice -> 144074920
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144154752
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144065680
+  144154200
+    out.invoicing.initiatePriceCalculation -> 144176528
+    out.invoicing.sendShippingPrice -> 144075512
+    out.purchasing.sendPurchaseOrder -> 144153456
+    out.scheduling.requestProductionScheduling -> 144159664
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144109488
+  144154752
+    out.invoicing.initiatePriceCalculation -> 144754240
+    out.invoicing.sendShippingPrice -> 144120104
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144054032
+  144155456
+    out.invoicing.initiatePriceCalculation -> 141692560
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144044696
+    in.shipping.sendSchedule -> 144198680
+  144157728
+    out.invoicing.initiatePriceCalculation -> 144161592
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144152856
+    in.shipping.sendSchedule -> 144079344
+  144159664
+    out.invoicing.initiatePriceCalculation -> 144044560
+    out.invoicing.sendShippingPrice -> 144111144
+    out.purchasing.sendPurchaseOrder -> 144154752
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144053880
+  144161592 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144768960
+    in.shipping.sendSchedule -> 141591952
+  144164016
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144196616
+    out.scheduling.requestProductionScheduling -> 144755184
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144164328
+    out.invoicing.initiatePriceCalculation -> 144761592
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144120392
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144120512
+    out.shipping.requestShipping -> 0
+  144166848
+    out.invoicing.initiatePriceCalculation -> 144092624
+    out.invoicing.sendShippingPrice -> 144179944
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144055160
+    out.shipping.requestShipping -> 144066432
+    in.invoicing.sendInvoice -> 144067784
+  144167472
+    out.invoicing.initiatePriceCalculation -> 144132552
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144079344
+    out.scheduling.sendShippingSchedule -> 144056112
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144093824
+  144167936 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144770104
+    in.shipping.requestShipping -> 144092712
+  144168288
+    out.invoicing.initiatePriceCalculation -> 144139760
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144120392
+    out.scheduling.sendShippingSchedule -> 144189568
+    out.shipping.requestShipping -> 0
+  144170648
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144759648
+  144171112
+    out.invoicing.initiatePriceCalculation -> 144193840
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144052600
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144198888
+    in.shipping.requestShipping -> 144042904
+    in.shipping.sendSchedule -> 144059944
+  144171376
+    out.invoicing.initiatePriceCalculation -> 144193552
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144065912
+    in.invoicing.sendInvoice -> 144150912
+    in.shipping.requestShipping -> 144166848
+  144171408
+    out.invoicing.initiatePriceCalculation -> 144083928
+    out.invoicing.sendShippingPrice -> 144092288
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144053880
+  144173128
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144187792
+    out.scheduling.requestProductionScheduling -> 141605328
+    out.scheduling.sendShippingSchedule -> 144190608
+    out.shipping.requestShipping -> 144179344
+  144173856
+    out.invoicing.initiatePriceCalculation -> 144119760
+    out.invoicing.sendShippingPrice -> 144167472
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144066432
+    out.scheduling.sendShippingSchedule -> 144068248
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144185792
+  144175880
+    out.invoicing.initiatePriceCalculation -> 144141320
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144092288
+    in.invoicing.sendInvoice -> 144111144
+  144176528
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144190608
+    out.purchasing.sendPurchaseOrder -> 144204640
+    out.scheduling.requestProductionScheduling -> 144044560
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144072312
+  144177120
+    out.invoicing.initiatePriceCalculation -> 144764864
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144152856
+    in.shipping.sendSchedule -> 144074256
+  144179344
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144139760
+    out.scheduling.requestProductionScheduling -> 144761592
+    out.scheduling.sendShippingSchedule -> 144164016
+    out.shipping.requestShipping -> 0
+  144179488
+    out.invoicing.initiatePriceCalculation -> 141616080
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144157728
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144132736
+    in.shipping.sendSchedule -> 144167472
+  144179944
+    out.invoicing.initiatePriceCalculation -> 144150488
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144175880
+    out.shipping.requestShipping -> 144079344
+    in.invoicing.sendInvoice -> 144074256
+  144181496
+    out.invoicing.initiatePriceCalculation -> 141683296
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144177120
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144132736
+    in.shipping.sendSchedule -> 144189056
+  144184656
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144087576
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144083928
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144072312
+  144185792
+    out.invoicing.initiatePriceCalculation -> 144104600
+    out.invoicing.sendShippingPrice -> 144093824
+    out.purchasing.sendPurchaseOrder -> 144062184
+    out.scheduling.requestProductionScheduling -> 144050384
+    out.scheduling.sendShippingSchedule -> 144109488
+    out.shipping.requestShipping -> 0
+  144187792
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144196880
+    out.scheduling.sendShippingSchedule -> 144124824
+    out.shipping.requestShipping -> 144139760
+  144189056
+    out.invoicing.initiatePriceCalculation -> 144173128
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144071320
+    out.scheduling.requestProductionScheduling -> 144074256
+    out.scheduling.sendShippingSchedule -> 144075512
+    out.shipping.requestShipping -> 144093824
+  144189568
+    out.invoicing.initiatePriceCalculation -> 144196616
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144117976
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144189672
+    out.invoicing.initiatePriceCalculation -> 144164016
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144189568
+    out.scheduling.requestProductionScheduling -> 144120512
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144190608
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144124824
+    out.scheduling.requestProductionScheduling -> 144074336
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144164016
+  144193552
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144167936
+    in.invoicing.sendInvoice -> 144757008
+    in.shipping.requestShipping -> 144092624
+  144193808
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144141320
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144083928
+    in.invoicing.sendInvoice -> 144044560
+  144193840
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144093784
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144759616
+    in.shipping.requestShipping -> 144097472
+    in.shipping.sendSchedule -> 144128976
+  144196616
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144759648
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144196880
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144170648
+    out.shipping.requestShipping -> 144760216
+  144197352
+    out.invoicing.initiatePriceCalculation -> 141577088
+    out.invoicing.sendShippingPrice -> 144157728
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 144044696
+    in.shipping.sendSchedule -> 144066432
+  144198680
+    out.invoicing.initiatePriceCalculation -> 144770104
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144050384
+  144198888
+    out.invoicing.initiatePriceCalculation -> 144759616
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144155456
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144084656
+    in.shipping.sendSchedule -> 144141520
+  144199064
+    out.invoicing.initiatePriceCalculation -> 141579360
+    out.invoicing.sendShippingPrice -> 144120392
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144054032
+    out.shipping.requestShipping -> 0
+  144204536
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144187792
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144044456
+    out.scheduling.sendShippingSchedule -> 144204640
+    out.shipping.requestShipping -> 144082856
+  144204640
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144124824
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144754240
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144081008
+  144754240
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144170648
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 141612752
+  144755184
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144759648
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144757008
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144770104
+    in.shipping.requestShipping -> 144148712
+  144759616
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 141692560
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 141685136
+    in.shipping.sendSchedule -> 144044408
+  144759648 :: F
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144760216
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144759648
+    out.shipping.requestShipping -> 0
+  144761592
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 144760216
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144755184
+    out.shipping.requestShipping -> 0
+  144763952
+    out.invoicing.initiatePriceCalculation -> 144766800
+    out.invoicing.sendShippingPrice -> 144177120
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144044696
+    in.shipping.sendSchedule -> 144067784
+  144764864
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144768960
+    in.shipping.sendSchedule -> 141605328
+  144765216
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144761592
+    out.purchasing.sendPurchaseOrder -> 141579360
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 144765816
+    out.shipping.requestShipping -> 0
+  144765816
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144755184
+    out.purchasing.sendPurchaseOrder -> 141612752
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+  144766800
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144764864
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 144769664
+    in.shipping.sendSchedule -> 144148712
+  144768960 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144761592
+  144769664
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 144768960
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144765216
+  144770104 :: S
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.requestShipping -> 144765216
+  144770648
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 144768960
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 144179344
+  0
+    out.invoicing.initiatePriceCalculation -> 0
+    out.invoicing.sendShippingPrice -> 0
+    out.purchasing.sendPurchaseOrder -> 0
+    out.scheduling.requestProductionScheduling -> 0
+    out.scheduling.sendShippingSchedule -> 0
+    out.shipping.requestShipping -> 0
+    in.invoicing.sendInvoice -> 0
+    in.purchasing.sendPurchaseOrder -> 0
+    in.shipping.requestShipping -> 0
+    in.shipping.sendSchedule -> 0

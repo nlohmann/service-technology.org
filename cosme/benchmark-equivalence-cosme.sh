@@ -35,10 +35,7 @@ echo ""
 echo "12. RS"
 time cosme --equivalence -a tests/testfiles/OGs/RS.bits.og -b tests/testfiles/OGs/RS.bits.og
 echo ""
-echo "13. TPO"
-time cosme --equivalence -a tests/testfiles/OGs/TPO.bits.og -b tests/testfiles/OGs/TPO.bits.og
-echo ""
-echo "14. TR"
+echo "13. TR"
 time cosme --equivalence -a tests/testfiles/OGs/TR.bits.og -b tests/testfiles/OGs/TR.bits.og
 echo ""
 

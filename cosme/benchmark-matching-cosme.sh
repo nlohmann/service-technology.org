@@ -35,10 +35,7 @@ echo ""
 echo "12. RS"
 time cosme --matching -a tests/testfiles/OGs/RS.bits.og -c tests/testfiles/Services/RS-partner.owfn
 echo ""
-echo "13. TPO"
-time cosme --matching -a tests/testfiles/OGs/TPO.bits.og -c tests/testfiles/Services/TPO-partner.owfn
-echo ""
-echo "14. TR"
+echo "13. TR"
 time cosme --matching -a tests/testfiles/OGs/TR.bits.og -c tests/testfiles/Services/TR-partner.owfn
 echo ""
 
